@@ -1,5 +1,5 @@
 /**
- * Copyright BCIA. All Rights Reserved.
+ * Copyright DingXuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,17 @@
  */
 package org.bcia.javachain;
 
-import io.grpc.ServerBuilder;
 import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.common.exception.PeerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.orderer.broadcast.BroadCastServer;
 import org.bcia.javachain.peer.Peer;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.io.IOException;
 
 /**
  * 这是本项目的入口类（描述该类的功能）
@@ -43,15 +43,44 @@ public class App {
 
         try {
             throw new PeerException("I make a peer exception");
-        }catch (Exception ex){
+        } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
         }
 
+        new Thread() {
+            @Override
+            public void run() {
+                final BroadCastServer server = new BroadCastServer();
+                try {
+                    server.start();
+                    server.blockUntilShutdown();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }.start();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+
+//        ApplicationContext context = new AnnotationConfigApplicationContext(App.class);
+//        Peer peer = context.getBean(Peer.class);
+
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        Peer peer = context.getBean(Peer.class);
+
 //        Peer peer = new Peer();
-//        try {
-//            peer.execCmd(args);
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
+        try {
+            peer.execCmd(args);
+        } catch (ParseException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 }
