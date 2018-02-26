@@ -6,10 +6,18 @@ import io.grpc.stub.StreamObserver;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.orderer.Ab;
 import org.bcia.javachain.protos.orderer.AtomicBroadcastGrpc;
+import org.springframework.stereotype.Service;
 
 
 import java.io.IOException;
-
+/**
+ * broadcast服务
+ *
+ * @author zhangmingyang
+ * @date 2018-02-23
+ * @company Dingxuan
+ */
+@Service
 public class BroadCastServer {
     private int port = 7050;
     private Server server;
@@ -20,7 +28,7 @@ public class BroadCastServer {
                 .build()
                 .start();
 
-        System.out.println("service start...");
+        System.out.println("broadcast service start...");
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
@@ -29,7 +37,7 @@ public class BroadCastServer {
 
                 System.err.println("*** shutting down gRPC server since JVM is shutting down");
                 BroadCastServer.this.stop();
-                System.err.println("*** server shut down");
+                System.err.println("***broadcast server shut down");
             }
         });
     }

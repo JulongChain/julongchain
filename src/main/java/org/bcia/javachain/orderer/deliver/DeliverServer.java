@@ -6,21 +6,29 @@ import io.grpc.stub.StreamObserver;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.orderer.Ab;
 import org.bcia.javachain.protos.orderer.AtomicBroadcastGrpc;
+import org.springframework.stereotype.Service;
 
 
 import java.io.IOException;
-
+/**
+ * deliver 服务
+ *
+ * @author zhangmingyang
+ * @date 2018-02-23
+ * @company Dingxuan
+ */
+@Service
 public class DeliverServer {
-    private int port = 7050;
+    private int port = 7051;
     private Server server;
 
-    private void start() throws IOException {
+    public void start() throws IOException {
         server = ServerBuilder.forPort(port)
                 .addService(new DeliverServerImpl())
                 .build()
                 .start();
 
-        System.out.println("service start...");
+        System.out.println("deliver service start...");
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
@@ -29,7 +37,7 @@ public class DeliverServer {
 
                 System.err.println("*** shutting down gRPC server since JVM is shutting down");
                 DeliverServer.this.stop();
-                System.err.println("*** server shut down");
+                System.err.println("*** deliver server shut down");
             }
         });
     }
@@ -41,7 +49,7 @@ public class DeliverServer {
     }
 
     // block 一直到退出程序
-    private void blockUntilShutdown() throws InterruptedException {
+    public void blockUntilShutdown() throws InterruptedException {
         if (server != null) {
             server.awaitTermination();
         }
