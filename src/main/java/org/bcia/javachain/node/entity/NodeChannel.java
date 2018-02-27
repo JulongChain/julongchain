@@ -45,6 +45,7 @@ public class NodeChannel {
             log.error(e.getMessage(), e);
         }
 
+
         DeliverClient deliverClient = new DeliverClient();
         try {
             deliverClient.send(ip, port, channelId);
