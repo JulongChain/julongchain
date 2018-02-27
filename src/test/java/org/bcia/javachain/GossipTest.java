@@ -1,9 +1,8 @@
 package org.bcia.javachain;
 
+import org.bcia.javachain.gossip.GossipService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import static org.junit.Assert.*;
 
 public class GossipTest extends BaseJunit4Test{
 
