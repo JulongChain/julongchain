@@ -39,7 +39,7 @@
     -->
     <!--这段配置的就是说把包名为“com.zjut.a1”且优先级为debug的日志通过myFile这个appender来处理。
     -->
-    <category name="org.bcia.javachain.peer.cmd">
+    <category name="org.bcia.javachain.node.cmd">
         <priority value="debug"/>
         <appender-ref ref="myFile"/>
     </category>

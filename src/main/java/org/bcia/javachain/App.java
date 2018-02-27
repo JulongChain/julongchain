@@ -1,5 +1,5 @@
 /**
- * Copyright DingXuan. All Rights Reserved.
+ * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,12 @@
 package org.bcia.javachain;
 
 import org.apache.commons.cli.ParseException;
-import org.bcia.javachain.common.exception.PeerException;
+import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.orderer.broadcast.BroadCastServer;
-import org.bcia.javachain.peer.Peer;
+import org.bcia.javachain.consenter.broadcast.BroadCastServer;
+import org.bcia.javachain.node.Node;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.IOException;
@@ -41,44 +40,43 @@ public class App {
         log.info("JavaChain begin, This is a right log");
         System.out.println("JavaChain begin, This is a wrong log");
 
+        //示例异常日志的打印方式
         try {
-            throw new PeerException("I make a peer exception");
+            throw new NodeException("I make a peer exception");
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
         }
 
+        //异步启动Consenter服务
         new Thread() {
             @Override
             public void run() {
-                final BroadCastServer server = new BroadCastServer();
+                BroadCastServer server = new BroadCastServer();
                 try {
                     server.start();
                     server.blockUntilShutdown();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                } catch (IOException ex) {
+                    log.error(ex.getMessage(), ex);
+                } catch (InterruptedException ex) {
+                    log.error(ex.getMessage(), ex);
                 }
-
             }
         }.start();
 
+        //等待1秒，让Consenter服务完成
         try {
             Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        } catch (InterruptedException ex) {
+            log.error(ex.getMessage(), ex);
         }
 
-
-//        ApplicationContext context = new AnnotationConfigApplicationContext(App.class);
-//        Peer peer = context.getBean(Peer.class);
-
+        //引入Spring配置文件
         ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-        Peer peer = context.getBean(Peer.class);
+        Node node = context.getBean(Node.class);
 
-//        Peer peer = new Peer();
+        //开始解析执行命令行
         try {
-            peer.execCmd(args);
+            node.execCmd(args);
         } catch (ParseException e) {
             log.error(e.getMessage(), e);
         }
