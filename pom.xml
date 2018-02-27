@@ -19,6 +19,19 @@
     </properties>
 
     <dependencies>
+    	<dependency>
+            <groupId>com.jcraft</groupId>
+            <artifactId>jsch</artifactId>
+            <version>0.1.54</version>
+        </dependency>
+        
+    	<!-- https://mvnrepository.com/artifact/org.apache.gossip/gossip -->
+        <dependency>
+            <groupId>org.apache.gossip</groupId>
+            <artifactId>gossip</artifactId>
+            <version>0.1.2-incubating</version>
+        </dependency>
+    
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
