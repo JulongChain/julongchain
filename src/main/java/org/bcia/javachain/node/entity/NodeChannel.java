@@ -18,6 +18,7 @@ package org.bcia.javachain.node.entity;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.consenter.broadcast.BroadCastClient;
+import org.bcia.javachain.consenter.deliver.DeliverClient;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,13 +38,20 @@ public class NodeChannel {
         NodeChannel channel = new NodeChannel();
         channel.setChannelId(channelId);
 
-        BroadCastClient client = new BroadCastClient();
+        BroadCastClient broadCastClient = new BroadCastClient();
         try {
-            client.send(ip, port, channelId);
+            broadCastClient.send(ip, port, channelId);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
 
+
+        DeliverClient deliverClient = new DeliverClient();
+        try {
+            deliverClient.send(ip, port, channelId);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
 
 //        Block block = Block.newBuilder().build();
 //
