@@ -30,7 +30,7 @@ import java.io.IOException;
  * 这是本项目的入口类（描述该类的功能）
  *
  * @author zhouhui   （编码人员）
- * @date 2018-01-25  （创建日期)
+ * @date 2018/1/25  （创建日期)
  * @company Dingxuan （公司名称）
  */
 public class App {

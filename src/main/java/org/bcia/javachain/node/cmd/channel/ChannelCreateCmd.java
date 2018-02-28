@@ -86,7 +86,7 @@ public class ChannelCreateCmd extends NodeChannelCmd {
         }
 
         if (StringUtils.isBlank(consenter)) {
-            log.error("consenter should not be null, Please input it");
+            log.error("Consenter should not be null, Please input it");
             return;
         }
 

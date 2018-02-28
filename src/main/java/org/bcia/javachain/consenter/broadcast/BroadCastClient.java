@@ -17,11 +17,11 @@ import org.springframework.stereotype.Component;
  * @company Dingxuan
  */
 @Component
-public class BroadCastClient  {
+public class BroadCastClient {
     public void send(String ip, int port, String message) throws Exception {
-        ManagedChannel managedChannel=ManagedChannelBuilder.forAddress(ip, port).usePlaintext(true).build();
-        AtomicBroadcastGrpc.AtomicBroadcastStub stub= AtomicBroadcastGrpc.newStub(managedChannel);
-        StreamObserver<Common.Envelope> envelopeStreamObserver=stub.broadcast(new StreamObserver<Ab.BroadcastResponse>() {
+        ManagedChannel managedChannel = ManagedChannelBuilder.forAddress(ip, port).usePlaintext(true).build();
+        AtomicBroadcastGrpc.AtomicBroadcastStub stub = AtomicBroadcastGrpc.newStub(managedChannel);
+        StreamObserver<Common.Envelope> envelopeStreamObserver = stub.broadcast(new StreamObserver<Ab.BroadcastResponse>() {
             @Override
             public void onNext(Ab.BroadcastResponse broadcastResponse) {
                 System.out.println(broadcastResponse.getStatusValue());
@@ -39,11 +39,25 @@ public class BroadCastClient  {
         });
 //        for (int i = 0; i <10 ; i++) {
 //            //客户端以流式的形式向服务器发送数据
-            envelopeStreamObserver.onNext(Common.Envelope.newBuilder().setPayload(ByteString.copyFrom(message.getBytes())).build());
+        envelopeStreamObserver.onNext(Common.Envelope.newBuilder().setPayload(ByteString.copyFrom(message.getBytes())).build());
 //            Thread.sleep(1000);
 //        }
 //        Thread.sleep(5000);
 
+    }
+
+    /**
+     * 有回调的发送方法
+     * @param ip
+     * @param port
+     * @param message
+     * @param responseObserver
+     */
+    public void send(String ip, int port, String message, StreamObserver<Ab.BroadcastResponse> responseObserver) {
+        ManagedChannel managedChannel = ManagedChannelBuilder.forAddress(ip, port).usePlaintext(true).build();
+        AtomicBroadcastGrpc.AtomicBroadcastStub stub = AtomicBroadcastGrpc.newStub(managedChannel);
+        StreamObserver<Common.Envelope> envelopeStreamObserver = stub.broadcast(responseObserver);
+        envelopeStreamObserver.onNext(Common.Envelope.newBuilder().setPayload(ByteString.copyFrom(message.getBytes())).build());
     }
 
 }
