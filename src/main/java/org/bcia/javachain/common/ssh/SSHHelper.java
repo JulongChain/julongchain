@@ -1,22 +1,36 @@
+/**
+ * Copyright Dingxuan. All Rights Reserved.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+ */
 package org.bcia.javachain.common.ssh;
+
+import com.jcraft.jsch.*;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.ChannelSftp;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpATTRS;
-import com.jcraft.jsch.SftpException;
-
+/**
+ * SSH帮助类
+ *
+ * @author wanliangbing
+ * @date 2018-02-28
+ * @company Dingxuan
+ */
 public class SSHHelper {
-    private final static Log logger =LogFactory.getLog(SSHHelper.class);
+    private static JavaChainLog logger = JavaChainLogFactory.getLog(SSHHelper.class);
 
     private String charset = Charset.defaultCharset().toString();
     private Session session;
@@ -25,6 +39,16 @@ public class SSHHelper {
         connect(host, port, user, password);
     }
 
+    /**
+     * 连接远程服务器
+     *
+     * @param host 主机
+     * @param port 端口
+     * @param user 用户名
+     * @param password 密码
+     * @return
+     * @throws JSchException
+     */
     private Session connect(String host, Integer port, String user, String password) throws JSchException{
         try {
             JSch jsch = new JSch();
@@ -39,13 +63,19 @@ public class SSHHelper {
             //30秒连接超时
             session.connect(5000);
         } catch (JSchException e) {
-            e.printStackTrace();
-            System.out.println("SFTPUitl 获取连接发生错误");
+            logger.error("SFTPUitl 获取连接发生错误",e);
             throw e;
         }
         return session;
     }
 
+    /**
+     * 发送命令
+     *
+     * @param command 命令
+     * @return
+     * @throws Exception
+     */
     public SSHResInfo sendCmd(String command) throws Exception{
         return sendCmd(command, 200);
     }
@@ -79,7 +109,6 @@ public class SSHHelper {
         ssh.connect();
 
         try {
-
             //开始获得SSH命令的结果
             while(true){
                 //获得错误输出
@@ -107,11 +136,10 @@ public class SSHHelper {
                 }
                 catch(Exception ee)
                 {
-                    ee.printStackTrace();
+                    logger.error(ee.getMessage(),ee);
                 }
             }
         } finally {
-            // TODO: handle finally clause
             channel.disconnect();
         }
 
@@ -127,6 +155,12 @@ public class SSHHelper {
         return sb.toString();
     }
 
+    /**
+     * 删除远程服务器中的文件或文件夹
+     *
+     * @param remoteFile 文件名称
+     * @return
+     */
     public boolean deleteRemoteFIleOrDir(String remoteFile){
         ChannelSftp channel=null;
         try {
@@ -159,9 +193,14 @@ public class SSHHelper {
             logger.error("SftpException",e);
             return false;
         }
-
     }
 
+    /**
+     * 检查远程服务器是否存在文件或文件夹
+     *
+     * @param remoteFile
+     * @return
+     */
     public boolean detectedFileExist(String remoteFile) {
 
         ChannelSftp channel=null;
@@ -189,6 +228,9 @@ public class SSHHelper {
         return false;
     }
 
+    /**
+     * 关闭连接
+     */
     public void close(){
         if(session.isConnected())
             session.disconnect();
