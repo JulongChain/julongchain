@@ -1,13 +1,15 @@
-package org.bcia.javachain.consenter.deliver;
+package org.bcia.javachain.consenter.common.deliver;
 
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.orderer.Ab;
-import org.bcia.javachain.protos.orderer.AtomicBroadcastGrpc;
+
+import org.bcia.javachain.protos.consenter.Ab;
 import org.springframework.stereotype.Component;
+
+import static org.bcia.javachain.protos.consenter.AtomicBroadcastGrpc.*;
 
 /**
  * deliver客户端
@@ -20,7 +22,7 @@ import org.springframework.stereotype.Component;
 public class DeliverClient {
     public void send(String ip, int port, String message){
         ManagedChannel managedChannel= ManagedChannelBuilder.forAddress(ip,port).usePlaintext(true).build();
-        AtomicBroadcastGrpc.AtomicBroadcastStub stub=AtomicBroadcastGrpc.newStub(managedChannel);
+        AtomicBroadcastStub stub= newStub(managedChannel);
         StreamObserver<Common.Envelope> envelopeStreamObserver=stub.deliver(new StreamObserver<Ab.DeliverResponse>() {
             @Override
             public void onNext(Ab.DeliverResponse deliverResponse) {

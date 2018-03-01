@@ -1,4 +1,4 @@
-package org.bcia.javachain.consenter.broadcast;
+package org.bcia.javachain.consenter.common.deliver;
 
 import org.bcia.javachain.BaseJunit4Test;
 import org.junit.Test;
@@ -9,14 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @Date 2018-02-26
  * @company Dingxuan
  */
-public class BroadCastClientTest extends BaseJunit4Test{
+public class DeliverClientTest extends BaseJunit4Test{
     @Autowired
-    public BroadCastClient broadCastClient;
+    public DeliverClient deliverClient;
     @Test
-    public void send() throws Exception {
+    public void send() {
         String ip="localhost";
-        int port=7050;
+        int port=7051;
         String mess="testmessage";
-        broadCastClient.send(ip,port,mess);
+        deliverClient.send(ip,port,mess);
     }
 }

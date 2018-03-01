@@ -1,4 +1,4 @@
-package org.bcia.javachain.consenter.deliver;
+package org.bcia.javachain.consenter.common.deliver;
 
 
 import org.bcia.javachain.BaseJunit4Test;

@@ -1,12 +1,13 @@
-package org.bcia.javachain.consenter.broadcast;
+package org.bcia.javachain.consenter.common.broadcast;
 
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.orderer.Ab;
-import org.bcia.javachain.protos.orderer.AtomicBroadcastGrpc;
+
+import org.bcia.javachain.protos.consenter.Ab;
+import org.bcia.javachain.protos.consenter.AtomicBroadcastGrpc;
 import org.springframework.stereotype.Component;
 
 /**

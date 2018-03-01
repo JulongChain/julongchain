@@ -1,4 +1,4 @@
-package org.bcia.javachain.consenter.broadcast;
+package org.bcia.javachain.consenter.common.broadcast;
 
 
 import org.bcia.javachain.BaseJunit4Test;
