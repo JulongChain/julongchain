@@ -1,7 +1,6 @@
 package org.bcia.javachain.node.entity;
 
 import org.bcia.javachain.BaseJunit4Test;
-import org.bcia.javachain.consenter.broadcast.BroadCastServer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
