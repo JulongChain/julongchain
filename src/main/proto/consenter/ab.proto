@@ -19,9 +19,9 @@ syntax = "proto3";
 import "common/common.proto";
 
 option go_package = "github.com/hyperledger/fabric/protos/orderer";
-option java_package = "org.bcia.javachain.protos.orderer";
+option java_package = "org.bcia.javachain.protos.consenter";
 
-package orderer;
+package consenter;
 
 message BroadcastResponse {
     // Status code, which may be used to programatically respond to success/failure

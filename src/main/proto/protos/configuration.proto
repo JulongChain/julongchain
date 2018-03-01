@@ -16,7 +16,7 @@ limitations under the License.
 
 syntax = "proto3";
 
-option java_package = "org.bcia.javachain.protos.peer";
+option java_package = "org.bcia.javachain.protos.node";
 option go_package = "github.com/hyperledger/fabric/protos/peer";
 
 package protos;

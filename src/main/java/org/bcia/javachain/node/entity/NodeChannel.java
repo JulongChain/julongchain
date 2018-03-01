@@ -15,10 +15,13 @@
  */
 package org.bcia.javachain.node.entity;
 
+import io.grpc.stub.StreamObserver;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.consenter.broadcast.BroadCastClient;
 import org.bcia.javachain.consenter.deliver.DeliverClient;
+import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.orderer.Ab;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,18 +43,38 @@ public class NodeChannel {
 
         BroadCastClient broadCastClient = new BroadCastClient();
         try {
-            broadCastClient.send(ip, port, channelId);
+            broadCastClient.send(ip, port, channelId, new StreamObserver<Ab.BroadcastResponse>(){
+
+                @Override
+                public void onNext(Ab.BroadcastResponse value) {
+                    //如果服务器创建成功，则可继续获取创世区块
+                    if(Common.Status.SUCCESS.equals(value.getStatus())){
+                        DeliverClient deliverClient = new DeliverClient();
+                        try {
+                            deliverClient.send(ip, port, queryMessage);
+                        } catch (Exception e) {
+                            log.error(e.getMessage(), e);
+                        }
+
+                    }
+                }
+
+                @Override
+                public void onError(Throwable t) {
+                    log.error(t.getMessage(), t);
+                }
+
+                @Override
+                public void onCompleted() {
+
+                }
+            });
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
 
 
-        DeliverClient deliverClient = new DeliverClient();
-        try {
-            deliverClient.send(ip, port, channelId);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
+
 
 //        Block block = Block.newBuilder().build();
 //
