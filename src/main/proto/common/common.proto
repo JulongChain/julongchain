@@ -99,7 +99,7 @@ message ChannelHeader {
 
     // The epoch in which this header was generated, where epoch is defined based on block height
     // Epoch in which the response has been generated. This field identifies a
-    // logical window of time. A proposal response is accepted by a peer only if
+    // logical window of time. A proposal response is accepted by a node only if
     // two conditions hold:
     // 1. the epoch specified in the message is the current epoch
     // 2. this message has been only seen once during this epoch (i.e. it hasn't
@@ -137,7 +137,7 @@ message Envelope {
     bytes signature = 2;
 }
 
-// This is finalized block structure to be shared among the orderer and peer
+// This is finalized block structure to be shared among the orderer and node
 // Note that the BlockHeader chains to the previous BlockHeader, and the BlockData hash is embedded
 // in the BlockHeader.  This makes it natural and obvious that the Data is included in the hash, but
 // the Metadata is not.

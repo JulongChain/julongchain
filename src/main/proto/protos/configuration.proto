@@ -21,16 +21,16 @@ option go_package = "github.com/hyperledger/fabric/protos/peer";
 
 package protos;
 
-// AnchorPeers simply represents list of anchor peers which is used in ConfigurationItem
-message AnchorPeers {
-    repeated AnchorPeer anchor_peers = 1;
+// AnchorNodes simply represents list of anchor nodes which is used in ConfigurationItem
+message AnchorNodes {
+    repeated AnchorNode anchor_nodes = 1;
 }
 
-// AnchorPeer message structure which provides information about anchor peer, it includes host name,
-// port number and peer certificate.
-message AnchorPeer {
+// AnchorNode message structure which provides information about anchor node, it includes host name,
+// port number and node certificate.
+message AnchorNode {
 
-    // DNS host name of the anchor peer
+    // DNS host name of the anchor node
     string host = 1;
 
     // The port number

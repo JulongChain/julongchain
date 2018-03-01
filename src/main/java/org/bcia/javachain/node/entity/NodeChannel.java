@@ -18,10 +18,9 @@ package org.bcia.javachain.node.entity;
 import io.grpc.stub.StreamObserver;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.consenter.broadcast.BroadCastClient;
-import org.bcia.javachain.consenter.deliver.DeliverClient;
+import org.bcia.javachain.consenter.common.broadcast.BroadCastClient;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.orderer.Ab;
+import org.bcia.javachain.protos.consenter.Ab;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,7 +31,7 @@ import org.springframework.stereotype.Component;
  * @company Dingxuan
  */
 @Component
-public class NodeChannel {
+public class NodeChannel implements StreamObserver<Ab.BroadcastResponse> {
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeChannel.class);
 
     private String channelId;
@@ -43,38 +42,10 @@ public class NodeChannel {
 
         BroadCastClient broadCastClient = new BroadCastClient();
         try {
-            broadCastClient.send(ip, port, channelId, new StreamObserver<Ab.BroadcastResponse>(){
-
-                @Override
-                public void onNext(Ab.BroadcastResponse value) {
-                    //如果服务器创建成功，则可继续获取创世区块
-                    if(Common.Status.SUCCESS.equals(value.getStatus())){
-                        DeliverClient deliverClient = new DeliverClient();
-                        try {
-                            deliverClient.send(ip, port, queryMessage);
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-
-                    }
-                }
-
-                @Override
-                public void onError(Throwable t) {
-                    log.error(t.getMessage(), t);
-                }
-
-                @Override
-                public void onCompleted() {
-
-                }
-            });
+            broadCastClient.send(ip, port, channelId, this);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-
-
-
 
 //        Block block = Block.newBuilder().build();
 //
@@ -89,12 +60,37 @@ public class NodeChannel {
     }
 
 
-
     public String getChannelId() {
         return channelId;
     }
 
     public void setChannelId(String channelId) {
         this.channelId = channelId;
+    }
+
+    @Override
+    public void onNext(Ab.BroadcastResponse value) {
+        //如果服务器创建成功，则可继续获取创世区块
+        if (Common.Status.SUCCESS.equals(value.getStatus())) {
+            log.info("We got 200. then we can deliver now");
+
+//            DeliverClient deliverClient = new DeliverClient();
+//            try {
+//                deliverClient.send(ip, port, queryMessage);
+//            } catch (Exception e) {
+//                log.error(e.getMessage(), e);
+//            }
+
+        }
+    }
+
+    @Override
+    public void onError(Throwable t) {
+        log.error(t.getMessage(), t);
+    }
+
+    @Override
+    public void onCompleted() {
+
     }
 }
