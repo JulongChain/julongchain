@@ -26,9 +26,9 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
  * @date 2018-02-28
  * @company Dingxuan
  */
-public class SSHDocker {
+public class SshDocker {
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SSHDocker.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(SshDocker.class);
 
     /**
      * 登录主机并执行命令
@@ -41,9 +41,9 @@ public class SSHDocker {
      */
     public static void executeCommand(String host,Integer port,String username,String password,String command){
         try {
-            SSHHelper helper = new SSHHelper(host, port, username, password);
+            SshHelper helper = new SshHelper(host, port, username, password);
             try {
-                SSHResInfo resInfo =helper.sendCmd(command);
+                SshResInfo resInfo =helper.sendCmd(command);
                 log.info(resInfo.toString());
                 helper.close();
             } catch (Exception e) {

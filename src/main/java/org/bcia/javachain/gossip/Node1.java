@@ -53,8 +53,9 @@ public class Node1 {
 		};
 		MetricRegistry registry = new MetricRegistry();
 		// 创建gossip service
+		HashMap<String, String> properties = new HashMap<>(0);
 		GossipService gossipService = new GossipService("bcia-gossip-cluster", URI.create("udp://localhost:3000"), "1",
-				new HashMap<>(), gossipMembers, settings, listener, registry);
+				properties, gossipMembers, settings, listener, registry);
 		// 启动gossip service
 		gossipService.start();
 

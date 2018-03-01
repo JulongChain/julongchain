@@ -29,13 +29,13 @@ import java.nio.charset.Charset;
  * @date 2018-02-28
  * @company Dingxuan
  */
-public class SSHHelper {
-    private static JavaChainLog logger = JavaChainLogFactory.getLog(SSHHelper.class);
+public class SshHelper {
+    private static JavaChainLog logger = JavaChainLogFactory.getLog(SshHelper.class);
 
     private String charset = Charset.defaultCharset().toString();
     private Session session;
 
-    public SSHHelper(String host, Integer port, String user, String password) throws JSchException {
+    public SshHelper(String host, Integer port, String user, String password) throws JSchException {
         connect(host, port, user, password);
     }
 
@@ -76,10 +76,10 @@ public class SSHHelper {
      * @return
      * @throws Exception
      */
-    public SSHResInfo sendCmd(String command) throws Exception{
+    public SshResInfo sendCmd(String command) throws Exception{
         return sendCmd(command, 200);
     }
-    /*
+    /**
      * 执行命令，返回执行结果
      * @param command 命令
      * @param delay 估计shell命令执行时间
@@ -87,13 +87,16 @@ public class SSHHelper {
      * @throws IOException
      * @throws JSchException
      */
-    public SSHResInfo sendCmd(String command,int delay) throws Exception{
-        if(delay <50){
+    public SshResInfo sendCmd(String command, int delay) throws Exception{
+        int minDelay = 50;
+        if(delay < minDelay){
             delay = 50;
         }
-        SSHResInfo result = null;
-        byte[] tmp = new byte[1024]; //读数据缓存
-        StringBuffer strBuffer = new StringBuffer();  //执行SSH返回的结果
+        SshResInfo result = null;
+        //读数据缓存
+        byte[] tmp = new byte[1024];
+        //执行SSH返回的结果
+        StringBuffer strBuffer = new StringBuffer();
         StringBuffer errResult=new StringBuffer();
 
         Channel channel = session.openChannel("exec");
@@ -114,20 +117,26 @@ public class SSHHelper {
                 //获得错误输出
                 while(errStream.available() > 0){
                     int i = errStream.read(tmp, 0, 1024);
-                    if(i < 0) break;
+
+                    if(i < 0) {
+                        break;
+                    }
                     errResult.append(new String(tmp, 0, i));
                 }
 
                 //获得标准输出
                 while(stdStream.available() > 0){
                     int i = stdStream.read(tmp, 0, 1024);
-                    if(i < 0) break;
+
+                    if(i < 0) {
+                        break;
+                    }
                     strBuffer.append(new String(tmp, 0, i));
                 }
                 if(ssh.isClosed()){
                     int code = ssh.getExitStatus();
                     logger.info("exit-status: " + code);
-                    result = new SSHResInfo(code, strBuffer.toString(), errResult.toString());
+                    result = new SshResInfo(code, strBuffer.toString(), errResult.toString());
                     break;
                 }
                 try
@@ -232,8 +241,9 @@ public class SSHHelper {
      * 关闭连接
      */
     public void close(){
-        if(session.isConnected())
+        if(session.isConnected()){
             session.disconnect();
+        }
     }
 
 }

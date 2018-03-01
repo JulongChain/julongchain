@@ -25,22 +25,25 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
  * @date 2018-02-28
  * @company Dingxuan
  */
-public class SSHResInfo {
+public class SshResInfo {
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SSHResInfo.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(SshResInfo.class);
 
-    private int exitStuts;//返回状态码 （在linux中可以通过 echo $? 可知每步执行令执行的状态码）
-    private String outRes;//标准正确输出流内容
-    private String errRes;//标准错误输出流内容
+    //返回状态码 （在linux中可以通过 echo $? 可知每步执行令执行的状态码）
+    private int exitStuts;
+    //标准正确输出流内容
+    private String outRes;
+    //标准错误输出流内容
+    private String errRes;
 
-    public SSHResInfo(int exitStuts, String outRes, String errRes) {
+    public SshResInfo(int exitStuts, String outRes, String errRes) {
         super();
         this.exitStuts = exitStuts;
         this.outRes = outRes;
         this.errRes = errRes;
     }
 
-    public SSHResInfo() {
+    public SshResInfo() {
         super();
     }
 
