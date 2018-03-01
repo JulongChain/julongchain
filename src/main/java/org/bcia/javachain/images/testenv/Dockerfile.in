@@ -12,26 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM _NS_/fabric-buildenv:_TAG_
+FROM _NS_/javachain-buildenv:_TAG_
 
-# fabric configuration locations
-ENV FABRIC_CFG_PATH /etc/hyperledger/fabric
+# javachain configuration locations
+ENV FABRIC_CFG_PATH /etc/bcia/javachain
 
 # create needed directories
 RUN mkdir -p \
-  $FABRIC_CFG_PATH \
-  /var/hyperledger/production
+  $JAVACHAIN_CFG_PATH \
+  /var/bcia/production
 
-# fabric configuration files
-ADD payload/sampleconfig.tar.bz2 $FABRIC_CFG_PATH
+# javachain configuration files
+ADD payload/sampleconfig.tar.bz2 $JAVACHAIN_CFG_PATH
 
-# fabric binaries
+# javachain binaries
 COPY payload/orderer /usr/local/bin
 COPY payload/peer /usr/local/bin
 
 # softhsm2
 COPY payload/install-softhsm2.sh /tmp
 RUN bash /tmp/install-softhsm2.sh && rm -f install-softhsm2.sh
-
-# typically, this is mapped to a developer's dev environment
-WORKDIR /opt/gopath/src/github.com/hyperledger/fabric

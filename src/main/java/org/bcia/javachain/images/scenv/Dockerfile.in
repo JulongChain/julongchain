@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM _BASE_NS_/fabric-baseimage:_BASE_TAG_
+FROM _BASE_NS_/javachain-baseimage:_BASE_TAG_
 COPY payload/chaintool payload/protoc-gen-go /usr/local/bin/
-ADD payload/goshim.tar.bz2 $GOPATH/src/
 RUN mkdir -p /chaincode/input /chaincode/output

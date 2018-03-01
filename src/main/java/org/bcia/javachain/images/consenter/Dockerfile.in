@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM _BASE_NS_/fabric-baseos:_BASE_TAG_
-ENV FABRIC_CFG_PATH /etc/hyperledger/fabric
-RUN mkdir -p /var/hyperledger/production $FABRIC_CFG_PATH
-COPY payload/orderer /usr/local/bin
-ADD payload/sampleconfig.tar.bz2 $FABRIC_CFG_PATH/
+FROM _BASE_NS_/javachain-baseos:_BASE_TAG_
+ENV JAVACHAIN_CFG_PATH /etc/bcia/javachain
+RUN mkdir -p /var/bcia/production $JAVACHAIN_CFG_PATH
+COPY payload/consenter /usr/local/bin
+ADD payload/sampleconfig.tar.bz2 $JAVACHAIN_CFG_PATH/
 EXPOSE 7050
 CMD ["orderer"]

@@ -11,8 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM _BASE_NS_/fabric-baseimage:_BASE_TAG_
-# Based on https://github.com/31z4/zookeeper-docker/blob/master/3.4.10/Dockerfile
+FROM _BASE_NS_/javachain-baseimage:_BASE_TAG_
 
 # Install su-exec
 RUN set -x \
