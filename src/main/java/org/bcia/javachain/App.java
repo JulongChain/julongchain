@@ -19,7 +19,7 @@ import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.consenter.broadcast.BroadCastServer;
+import org.bcia.javachain.consenter.common.server.ConsenterServer;
 import org.bcia.javachain.node.Node;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -42,7 +42,7 @@ public class App {
 
         //示例异常日志的打印方式
         try {
-            throw new NodeException("I make a peer exception");
+            throw new NodeException("I make a node exception");
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
         }
@@ -51,7 +51,7 @@ public class App {
         new Thread() {
             @Override
             public void run() {
-                BroadCastServer server = new BroadCastServer();
+                ConsenterServer server = new ConsenterServer();
                 try {
                     server.start();
                     server.blockUntilShutdown();

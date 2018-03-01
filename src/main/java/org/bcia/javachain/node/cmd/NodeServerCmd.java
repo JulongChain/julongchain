@@ -34,13 +34,13 @@ import org.bcia.javachain.node.util.NodeCLIParser;
 public class NodeServerCmd implements INodeCmd {
 	private static JavaChainLog log = JavaChainLogFactory.getLog(NodeServerCmd.class);
 
-	private NodeServer peerNode;
+	private NodeServer nodeServer;
 
 	private static final String CMD_START = "start";
 	private static final String CMD_STATUS = "status";
 
     public NodeServerCmd() {
-        peerNode = new NodeServer();
+        nodeServer = new NodeServer();
     }
 
 	@Override
@@ -63,13 +63,13 @@ public class NodeServerCmd implements INodeCmd {
         if (cmd.hasOption(CMD_START)) {
             log.info("peer node start !!!");
 
-            peerNode.start();
+            nodeServer.start();
         }
 
         if (cmd.hasOption(CMD_STATUS)) {
             log.info("peer node status!!!");
 
-            peerNode.status();
+            nodeServer.status();
         }
 	}
 }
