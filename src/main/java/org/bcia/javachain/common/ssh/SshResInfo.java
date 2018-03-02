@@ -29,11 +29,11 @@ public class SshResInfo {
 
     private static JavaChainLog log = JavaChainLogFactory.getLog(SshResInfo.class);
 
-    //返回状态码 （在linux中可以通过 echo $? 可知每步执行令执行的状态码）
+    /** 返回状态码 （在linux中可以通过 echo $? 可知每步执行令执行的状态码）*/
     private int exitStuts;
-    //标准正确输出流内容
+    /** 标准正确输出流内容 */
     private String outRes;
-    //标准错误输出流内容
+    /** 标准错误输出流内容 */
     private String errRes;
 
     public SshResInfo(int exitStuts, String outRes, String errRes) {
