@@ -15,13 +15,22 @@
  */
 package org.bcia.javachain.node.entity;
 
+import io.grpc.MethodDescriptor;
+import io.grpc.protobuf.ProtoUtils;
 import io.grpc.stub.StreamObserver;
+import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.FileUtils;
 import org.bcia.javachain.consenter.common.broadcast.BroadCastClient;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.consenter.Ab;
 import org.springframework.stereotype.Component;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 /**
  * 节点群组
@@ -36,6 +45,13 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
 
     public NodeGroup createGroup(String ip, int port, String groupId) {
         NodeGroup group = new NodeGroup();
+
+
+
+
+
+
+
 
         BroadCastClient broadCastClient = new BroadCastClient();
         try {
@@ -54,6 +70,63 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
 
 
         return group;
+    }
+
+    public NodeGroup createGroup(String ip, int port, String groupId, String groupFile) throws NodeException {
+        if(!FileUtils.isExists(groupFile)){
+            log.error("groupFile is not exists");
+            throw new NodeException("Group File is not exists");
+        }
+
+        byte[] bytes = null;
+        Common.Envelope envelope = null;
+        try {
+//            bytes = FileUtils.readFileBytes(groupFile);
+
+            MethodDescriptor.Marshaller<Common.Envelope> marshaller = ProtoUtils.marshaller(Common.Envelope.getDefaultInstance());
+            envelope = marshaller.parse(new FileInputStream(groupFile));
+
+        } catch (IOException e) {
+            throw new NodeException("Can not read Group File");
+        }
+
+
+
+//        InputStream is = marshaller.stream(block);
+//        is = new ByteArrayInputStream(ByteStreams.toByteArray(is));
+
+
+
+//        FileInputStream fis = null;
+//        try {
+//            fis = new FileInputStream(new File(groupFile));
+//
+//            int buffer_size = 4096;
+//            byte[] bytes = new Byte[buffer_size];
+//
+//
+//            int len;
+//            for(int i=0;len = fis.read(bytes, 0, buffer_size), ;len < buffer_size)
+//
+//
+//
+//
+//            fis.re
+//
+//
+//
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
+//
+//
+//        FileUtils.readFileToByteArray(groupFile)
+//
+
+
+
+
+        return null;
     }
 
     public NodeGroup joinGroup(String blockPath) {
