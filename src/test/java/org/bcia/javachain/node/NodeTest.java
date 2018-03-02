@@ -22,7 +22,7 @@ public class NodeTest extends BaseJunit4Test {
 
     @Test
     public void execCmd() throws ParseException {
-        String[] caseArgs1 = new String[]{"channel", "create", "-c", "localhost:7050", "-ci", "mychannel", "-f", "filefile"};
+        String[] caseArgs1 = new String[]{"group", "create", "-c", "localhost:7050", "-g", "mygroup", "-f", "filefile"};
 
         node.execCmd(caseArgs1);
     }

@@ -1,5 +1,5 @@
 /**
- * Copyright Dingxuan. 2017 All Rights Reserved.
+ * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,30 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.node.entity;
+package org.bcia.javachain.node.cmd.server;
 
+import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * 节点服务
+ * 完成节点开启服务命令的解析
+ * node group start
  *
  * @author zhouhui
- * @date 2018/2/23
+ * @date 2018/2/24
  * @company Dingxuan
  */
 @Component
-public class NodeServer {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(NodeServer.class);
+public class ServerStartCmd extends AbstractNodeServerCmd {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(ServerStartCmd.class);
 
-    public void start(){
-        log.info("node server start-----");
-
-    }
-
-    public void status(){
-
+    @Override
+    public void execCmd(String[] args) throws ParseException {
+        nodeServer.start();
     }
 
 }

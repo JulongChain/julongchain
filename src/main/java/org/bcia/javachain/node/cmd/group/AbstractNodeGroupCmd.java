@@ -1,5 +1,5 @@
 /**
- * Copyright DingXuan. All Rights Reserved.
+ * Copyright Dingxuan. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,21 +13,27 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package org.bcia.javachain.node.util;
+package org.bcia.javachain.node.cmd.group;
+
+import org.apache.commons.cli.ParseException;
+import org.bcia.javachain.node.cmd.INodeCmd;
+import org.bcia.javachain.node.entity.NodeGroup;
 
 /**
- * 常量类
+ * 节点通道命令
  *
  * @author zhouhui
  * @date 2018/2/23
  * @company Dingxuan
  */
-public class Constant {	
-	public static final String VERSION = "version";	
-	public static final String NODE = "node";
-	public static final String CHAINCODE = "chaincode";
-	public static final String CLI_LOG = "logging";
-	public static final String CHANNEL = "channel";
+public abstract class AbstractNodeGroupCmd implements INodeCmd {
 
-	public static final String CREATE = "create";
+	protected NodeGroup nodeGroup;
+
+	public AbstractNodeGroupCmd(){
+		nodeGroup = new NodeGroup();
+	}
+
+	@Override
+	public abstract void execCmd(String[] args) throws ParseException;
 }

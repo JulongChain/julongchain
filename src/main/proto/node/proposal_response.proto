@@ -12,6 +12,8 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+Modified java_package and other contents by Dingxuan on 2018-03-02
 */
 
 syntax = "proto3";
@@ -26,7 +28,7 @@ import "google/protobuf/timestamp.proto";
 
 // A ProposalResponse is returned from an endorser to the proposal submitter.
 // The idea is that this message contains the endorser's response to the
-// request of a client to perform an action over a chaincode (or more
+// request of a client to perform an action over a smart contract (or more
 // generically on the ledger); the response might be success/error (conveyed in
 // the Response field) together with a description of the action and a
 // signature over it by that endorser.  If a sufficient number of distinct
@@ -69,9 +71,9 @@ message Response {
 
 // ProposalResponsePayload is the payload of a proposal response.  This message
 // is the "bridge" between the client's request and the endorser's action in
-// response to that request. Concretely, for chaincodes, it contains a hashed
+// response to that request. Concretely, for smart contracts, it contains a hashed
 // representation of the proposal (proposalHash) and a representation of the
-// chaincode state changes and events inside the extension field.
+// smart contract state changes and events inside the extension field.
 message ProposalResponsePayload {
 
 	// Hash of the proposal that triggered this response. The hash is used to
@@ -81,8 +83,8 @@ message ProposalResponsePayload {
 	// (byte-by-byte). However this implies that the hash can only be verified
 	// if the entire proposal message is available when ProposalResponsePayload is
 	// included in a transaction or stored in the ledger. For confidentiality
-	// reasons, with chaincodes it might be undesirable to store the proposal
-	// payload in the ledger.  If the type is CHAINCODE, this is handled by
+	// reasons, with smart contracts it might be undesirable to store the proposal
+	// payload in the ledger.  If the type is smart contract, this is handled by
 	// separating the proposal's header and
 	// the payload: the header is always hashed in its entirety whereas the
 	// payload can either be hashed fully, or only its hash may be hashed, or
@@ -95,7 +97,7 @@ message ProposalResponsePayload {
 	// the extension in any proposal response depends on the type of the proposal
 	// that the client selected when the proposal was initially sent out.  In
 	// particular, this information is stored in the type field of a Header.  For
-	// chaincode, it's a ChaincodeAction message
+	// smart contract, it's a SmartContractAction message
 	bytes extension = 2;
 }
 

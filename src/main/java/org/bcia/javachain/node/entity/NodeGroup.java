@@ -24,25 +24,22 @@ import org.bcia.javachain.protos.consenter.Ab;
 import org.springframework.stereotype.Component;
 
 /**
- * 节点通道
+ * 节点群组
  *
  * @author zhouhui
  * @date 2018/2/23
  * @company Dingxuan
  */
 @Component
-public class NodeChannel implements StreamObserver<Ab.BroadcastResponse> {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(NodeChannel.class);
+public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(NodeGroup.class);
 
-    private String channelId;
-
-    public NodeChannel createChannel(String ip, int port, String channelId) {
-        NodeChannel channel = new NodeChannel();
-        channel.setChannelId(channelId);
+    public NodeGroup createGroup(String ip, int port, String groupId) {
+        NodeGroup group = new NodeGroup();
 
         BroadCastClient broadCastClient = new BroadCastClient();
         try {
-            broadCastClient.send(ip, port, channelId, this);
+            broadCastClient.send(ip, port, groupId, this);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -56,16 +53,13 @@ public class NodeChannel implements StreamObserver<Ab.BroadcastResponse> {
 //        is = new ByteArrayInputStream(ByteStreams.toByteArray(is));
 
 
-        return channel;
+        return group;
     }
 
+    public NodeGroup joinGroup(String blockPath) {
+        NodeGroup group = new NodeGroup();
 
-    public String getChannelId() {
-        return channelId;
-    }
-
-    public void setChannelId(String channelId) {
-        this.channelId = channelId;
+        return group;
     }
 
     @Override

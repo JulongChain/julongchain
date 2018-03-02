@@ -16,11 +16,27 @@
 package org.bcia.javachain.node.entity;
 
 /**
- * Peer节点链码功能
+ * 节点智能合约
  *
  * @author zhouhui
  * @date 2018/2/23
  * @company Dingxuan
  */
-public class NodeChainCode {
+public class NodeSmartContract {
+
+    public void install(){
+
+    }
+
+    public void instantiate(){
+
+    }
+
+    public void invoke(){
+
+    }
+
+    public void query(){
+
+    }
 }

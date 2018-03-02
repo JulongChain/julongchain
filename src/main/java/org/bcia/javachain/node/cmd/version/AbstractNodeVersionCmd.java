@@ -13,39 +13,28 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package org.bcia.javachain.node.cmd;
+package org.bcia.javachain.node.cmd.version;
+
+import org.apache.commons.cli.ParseException;
+import org.bcia.javachain.node.cmd.INodeCmd;
+import org.bcia.javachain.node.entity.NodeSmartContract;
+import org.bcia.javachain.node.entity.NodeVersion;
 
 /**
- * Peer链码命令
+ * 节点版本命令
  *
  * @author zhouhui
  * @date 2018/2/23
  * @company Dingxuan
  */
-public class NodeChaincodeCmd {
+public abstract class AbstractNodeVersionCmd implements INodeCmd {
 
-	/**
-	 * 打包
-	 */
-	public void pkg() {
+	protected NodeVersion nodeVersion;
+
+	public AbstractNodeVersionCmd(){
+		nodeVersion = new NodeVersion();
 	}
 
-	public void signPackage() {
-	}
-
-	public void install() {
-	}
-
-	public void upgrade() {
-	}
-
-	public void instantiate() {
-	}
-
-	public void invoke() {
-	}
-
-	public void query() {
-	}
-
+	@Override
+	public abstract void execCmd(String[] args) throws ParseException;
 }

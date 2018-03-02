@@ -15,12 +15,21 @@
  */
 package org.bcia.javachain.node.entity;
 
+import org.bcia.javachain.node.util.NodeConstant;
+
 /**
- * Peer节点版本功能
+ * 节点版本
  *
  * @author zhouhui
  * @date 2018/2/23
  * @company Dingxuan
  */
 public class NodeVersion {
+    /**
+     * 获取当前版本
+     * @return
+     */
+    public String getVersion(){
+        return NodeConstant.CURRENT_VERSION;
+    }
 }

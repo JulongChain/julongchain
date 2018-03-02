@@ -12,6 +12,8 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+Modified java_package and other contents by Dingxuan on 2018-03-02
 */
 
 syntax = "proto3";
@@ -63,8 +65,8 @@ ProposalResponse
 ===================================================
 
 A transaction message assembles one or more proposals and corresponding
-responses into a message to be sent to orderers. After ordering, (batches of)
-transactions are delivered to committing peers for validation and final
+responses into a message to be sent to consenters. After ordering, (batches of)
+transactions are delivered to committing nodes for validation and final
 delivery into the ledger. A transaction contains one or more actions. Each of
 them contains a header (same as that of the proposal that requested it) and an
 opaque payload that depends on the type specified in the header.
@@ -130,7 +132,7 @@ message SignedProposal {
 // 2. The payload is a SmartContractProposalPayload message.
 // 3. The extension is a SmartContractAction that might be used to ask the
 //    endorsers to endorse a specific SmartContractAction, thus emulating the
-//    submitting peer model.
+//    submitting node model.
 message Proposal {
 
 	// The header of the proposal. It is the bytes of the Header
@@ -160,7 +162,7 @@ data to be committed to the ledger; a proposal in general contains a header
 (with some metadata describing it, such as the type, the identity of the
 invoker, the time, the ID of the chain, a cryptographic nonce..) and a payload
 (the SmartContract ID, invocation arguments..). Optionally, it may contain actions
-that the endorser may be asked to endorse, to emulate a submitting peer. A
+that the endorser may be asked to endorse, to emulate a submitting node. A
 SmartContract proposal contains the following messages:
 
 SignedProposal
@@ -190,8 +192,8 @@ ProposalResponse
 ===================================================
 
 A transaction message assembles one or more proposals and corresponding
-responses into a message to be sent to orderers. After ordering, (batches of)
-transactions are delivered to committing peers for validation and final
+responses into a message to be sent to consenters. After ordering, (batches of)
+transactions are delivered to committing nodes for validation and final
 delivery into the ledger. A transaction contains one or more actions. Each of
 them contains a header (same as that of the proposal that requested it), a
 proposal payload (same as that of the proposal that requested it), a

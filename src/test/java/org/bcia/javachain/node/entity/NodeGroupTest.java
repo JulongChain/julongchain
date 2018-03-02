@@ -5,15 +5,13 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static org.junit.Assert.*;
-
-public class NodeChannelTest extends BaseJunit4Test {
+public class NodeGroupTest extends BaseJunit4Test {
     @Autowired
-    private NodeChannel nodeChannel;
+    private NodeGroup nodeGroup;
 
     @Test
-    public void createChannel() {
-        NodeChannel result = nodeChannel.createChannel("localhost", 7050, "myChannel");
+    public void createGroup() {
+        NodeGroup result = nodeGroup.createGroup("localhost", 7050, "myGroup");
         Assert.assertNotNull(result);
     }
 }
