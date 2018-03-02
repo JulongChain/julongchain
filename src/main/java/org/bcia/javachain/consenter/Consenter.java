@@ -15,10 +15,61 @@
  */
 package org.bcia.javachain.consenter;
 
+import org.apache.commons.cli.ParseException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.consenter.common.cmd.IConsenterCmd;
+import org.bcia.javachain.consenter.common.cmd.factory.ConsenterCmdFactory;
+import org.bcia.javachain.consenter.util.Constant;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 /**
  * @author zhangmingyang
  * @Date: 2018/3/1 *
  * @company Dingxuan
  */
 public class Consenter {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(Consenter.class);
+    private IConsenterCmd iConsenterCmd;
+
+    public void execCmd(String[] args) {
+        if (args.length <= 0) {
+            log.warn("Node command need more args-----");
+            return;
+        }
+        int cmdWordCount;//记录命令单词数量
+        String command = args[0];
+        if (args.length == 1 && Constant.VERSION.equalsIgnoreCase(command)) {
+            log.info("Consentor version is V0.25!..");
+            iConsenterCmd = ConsenterCmdFactory.getInstance(command);
+            String[] arg = new String[]{command};
+            try {
+                iConsenterCmd.execCmd(arg);
+            } catch (org.apache.commons.cli.ParseException e) {
+                e.printStackTrace();
+            }
+        } else if (args.length == 1 && Constant.START.equalsIgnoreCase(command)) {
+            iConsenterCmd = ConsenterCmdFactory.getInstance(command);
+            String[] argment = new String[]{command};
+            try {
+                iConsenterCmd.execCmd(argment);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }else{
+            log.info("args is error!");
+        }
+        return;
+    }
+
+    public static void main(String[] args) {
+        //引入Spring配置文件
+        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+        Consenter consenter = new Consenter();
+        //String[] version = new String[]{"start"};
+        consenter.execCmd(args);
+    }
+
 }
+
