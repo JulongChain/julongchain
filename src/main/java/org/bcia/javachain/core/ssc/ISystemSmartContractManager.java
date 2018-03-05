@@ -15,30 +15,24 @@
  */
 package org.bcia.javachain.core.ssc;
 
-import org.bcia.javachain.core.smartcontract.shim.impl.Response;
-import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
-
 /**
- * 配置系统智能合约　Configure System Smart Contract,CSSC
+ * 系统智能合约管理器接口
  *
  * @author sunianle
  * @date 3/5/18
  * @company Dingxuan
  */
-public class CSSC extends SystemSmartContractBase {
-
-    @Override
-    public Response init(ISmartContractStub stub) {
-        return null;
-    }
-
-    @Override
-    public Response invoke(ISmartContractStub stub) {
-        return null;
-    }
-
-    @Override
-    public String getSmartContractDescription() {
-        return null;
-    }
+public interface ISystemSmartContractManager {
+    //为某个群组部署系统智能合约
+    void deploySysSmartContracts(String groupID);
+    //取消部署系统智能合约
+    void deDeploySysSmartContracts(String groupID);
+    //判断是否为系统智能合约
+    boolean isSysSmartContract(String smartContractID);
+    //加载外部系统智能合约插件
+    void loadSysSmartContracts();
+    //注册外部系统智能合约插件
+    void registerSysSmartContracts();
+    //编译系统智能合约
+    void registerSysSmartContract();
 }

@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.ssc;
+package org.bcia.javachain.core.ssc.cssc;
 
 import org.bcia.javachain.core.smartcontract.shim.impl.Response;
 import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
+import org.bcia.javachain.core.ssc.SystemSmartContractBase;
 
 /**
- * 类描述
+ * 配置系统智能合约　Configure System Smart Contract,CSSC
  *
  * @author sunianle
  * @date 3/5/18
  * @company Dingxuan
  */
-public class LSSC  extends SystemSmartContractBase {
+public class CSSC extends SystemSmartContractBase {
 
     @Override
     public Response init(ISmartContractStub stub) {
@@ -42,4 +43,3 @@ public class LSSC  extends SystemSmartContractBase {
         return null;
     }
 }
-

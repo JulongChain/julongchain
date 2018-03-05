@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.ssc;
+package org.bcia.javachain.core.ssc.essc;
 
 import org.bcia.javachain.core.smartcontract.shim.impl.Response;
 import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
+import org.bcia.javachain.core.ssc.SystemSmartContractBase;
 
 /**
- * 类描述
+ * 背书系统智能合约　Endorse System Smart Contract,ESSC
  *
  * @author sunianle
  * @date 3/5/18
  * @company Dingxuan
  */
-public class QSSC extends SystemSmartContractBase {
+public class ESSC  extends SystemSmartContractBase {
 
     @Override
     public Response init(ISmartContractStub stub) {
