@@ -31,7 +31,7 @@ message KV {
     bytes value = 3;
 }
 
-// KeyModification -- QueryResult for history query. Holds a transaction ID, value,
+// IKeyModification -- QueryResult for history query. Holds a transaction ID, value,
 // timestamp, and delete marker which resulted from a history query.
 message KeyModification {
     string tx_id = 1;
