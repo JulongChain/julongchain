@@ -16,7 +16,7 @@
 package org.bcia.javachain.core.ssc;
 
 /**
- * 系统智能合约管理器
+ * 系统智能合约管理器,整合管理功能函数接口
  *
  * @author sunianle
  * @date 3/5/18
