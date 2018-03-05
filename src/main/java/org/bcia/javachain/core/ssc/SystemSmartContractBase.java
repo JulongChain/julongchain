@@ -15,15 +15,15 @@
  */
 package org.bcia.javachain.core.ssc;
 
-import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContract;
+import org.bcia.javachain.core.smartcontract.shim.intfs.SmartContractBase;
 
 /**
- * 系统智能合约接口
+ * 系统智能合约的抽象类
  *
  * @author sunianle
- * @date 2018/2/28
+ * @date 3/5/18
  * @company Dingxuan
  */
-public interface ISystemSmartContract extends ISmartContract {
+public abstract  class SystemSmartContractBase extends SmartContractBase implements ISystemSmartContract {
 
 }
