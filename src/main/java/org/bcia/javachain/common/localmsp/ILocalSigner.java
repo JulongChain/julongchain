@@ -23,6 +23,6 @@ import org.bcia.javachain.protos.common.Common;
  * @company Dingxuan
  */
 public interface ILocalSigner {
-    public Common.SignatureHeader NewSignatureHeader();
-    public byte[] Sign(byte[] message);
+     Common.SignatureHeader newSignatureHeader();
+     byte[] sign(byte[] message);
 }

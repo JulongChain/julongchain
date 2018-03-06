@@ -25,12 +25,12 @@ import org.bcia.javachain.protos.common.Common;
  */
 public class LocalSignerImpl implements ILocalSigner {
     @Override
-    public Common.SignatureHeader NewSignatureHeader() {
+    public Common.SignatureHeader newSignatureHeader() {
         return null;
     }
 
     @Override
-    public byte[] Sign(byte[] message) {
+    public byte[] sign(byte[] message) {
         String mes="testmessage";
         return mes.getBytes();
     }
