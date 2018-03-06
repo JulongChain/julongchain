@@ -95,8 +95,9 @@ public class GmCsp implements ICsp {
     }
 
     private SM3 getSm3(){
-        if(sm3==null)
+        if(sm3==null) {
             sm3=new SM3();
+        }
         return sm3;
     }
 }
