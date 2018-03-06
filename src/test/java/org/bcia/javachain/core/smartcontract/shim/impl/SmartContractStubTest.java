@@ -22,7 +22,7 @@ import static org.hamcrest.Matchers.contains;
  * 智能合约桩单元测试
  *
  * @author sunianle
- * @date 3/6/18
+ * @date 3/7/18
  * @company Dingxuan
  */
 public class SmartContractStubTest {
