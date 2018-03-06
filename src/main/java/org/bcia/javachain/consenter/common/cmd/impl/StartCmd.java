@@ -23,7 +23,6 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.consenter.common.cmd.IConsenterCmd;
 import org.bcia.javachain.consenter.common.server.ConsenterServer;
-import org.bcia.javachain.node.util.NodeCLIParser;
 
 /**
  * @author zhangmingyang

@@ -15,15 +15,11 @@
  */
 package org.bcia.javachain.consenter.common.cmd.impl;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.*;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.consenter.common.cmd.IConsenterCmd;
 import org.bcia.javachain.consenter.common.server.ConsenterServer;
-import org.bcia.javachain.node.util.NodeCLIParser;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
@@ -52,7 +48,7 @@ import java.io.IOException;
         //需要支持peer node start, 无需参数
         options.addOption(VERSION, false, "start peer node");
         //需要支持peer node start/peer node status
-       CommandLineParser parser = new NodeCLIParser();
+       CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
         String defaultValue = "UnKown";
         if (cmd.hasOption(VERSION)) {
