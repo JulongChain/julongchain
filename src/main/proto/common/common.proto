@@ -12,6 +12,8 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+Modified java_package and other contents by Dingxuan on 2018-03-01
 */
 
 syntax = "proto3";
@@ -37,12 +39,12 @@ enum Status {
 
 enum HeaderType {
     MESSAGE = 0;                   // Used for messages which are signed but opaque
-    CONFIG = 1;                    // Used for messages which express the channel config
-    CONFIG_UPDATE = 2;             // Used for transactions which update the channel config
+    CONFIG = 1;                    // Used for messages which express the group config
+    CONFIG_UPDATE = 2;             // Used for transactions which update the group config
     ENDORSER_TRANSACTION = 3;      // Used by the SDK to submit endorser based transactions
-    ORDERER_TRANSACTION = 4;       // Used internally by the orderer for management
+    CONSENTER_TRANSACTION = 4;     // Used internally by the consenter for management
     DELIVER_SEEK_INFO = 5;         // Used as the type for Envelope messages submitted to instruct the Deliver API to seek
-    CHAINCODE_PACKAGE = 6;         // Used for packaging chaincode artifacts for install
+    SMART_CONTRACT_PACKAGE = 6;    // Used for packaging smart contract artifacts for install
 }
 
 // This enum enlists indexes of the block metadata array
@@ -50,7 +52,7 @@ enum BlockMetadataIndex {
     SIGNATURES = 0;             // Block metadata array position for block signatures
     LAST_CONFIG = 1;            // Block metadata array position to store last configuration block sequence number
     TRANSACTIONS_FILTER = 2;    // Block metadata array position to store serialized bit array filter of invalid transactions
-    ORDERER = 3;                // Block metadata array position to store operational metadata for orderers
+    CONSENTER = 3;                // Block metadata array position to store operational metadata for consenters
                                 // e.g. For Kafka, this is where we store the last offset written to the local ledger.
 }
 
@@ -71,12 +73,12 @@ message MetadataSignature {
 }
 
 message Header {
-    bytes channel_header = 1;
+    bytes group_header = 1;
     bytes signature_header = 2;
 }
 
 // Header is a generic replay prevention and identity message to include in a signed payload
-message ChannelHeader {
+message GroupHeader {
     int32 type = 1; // Header types 0-10000 are reserved and defined by HeaderType
 
     // Version indicates message protocol version
@@ -86,8 +88,8 @@ message ChannelHeader {
     // by the sender
     google.protobuf.Timestamp timestamp = 3;
 
-    // Identifier of the channel this message is bound for
-    string channel_id = 4;
+    // Identifier of the group this message is bound for
+    string group_id = 4;
 
     // An unique identifier that is used end-to-end.
     //  -  set by higher layers such as end user or SDK
@@ -99,7 +101,7 @@ message ChannelHeader {
 
     // The epoch in which this header was generated, where epoch is defined based on block height
     // Epoch in which the response has been generated. This field identifies a
-    // logical window of time. A proposal response is accepted by a peer only if
+    // logical window of time. A proposal response is accepted by a node only if
     // two conditions hold:
     // 1. the epoch specified in the message is the current epoch
     // 2. this message has been only seen once during this epoch (i.e. it hasn't
@@ -137,7 +139,7 @@ message Envelope {
     bytes signature = 2;
 }
 
-// This is finalized block structure to be shared among the orderer and peer
+// This is finalized block structure to be shared among the consenter and node
 // Note that the BlockHeader chains to the previous BlockHeader, and the BlockData hash is embedded
 // in the BlockHeader.  This makes it natural and obvious that the Data is included in the hash, but
 // the Metadata is not.

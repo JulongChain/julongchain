@@ -20,7 +20,7 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * Peer节点功能
+ * 节点服务
  *
  * @author zhouhui
  * @date 2018/2/23
@@ -31,8 +31,7 @@ public class NodeServer {
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeServer.class);
 
     public void start(){
-
-        log.info("peer node start-----");
+        log.info("node server start-----");
 
     }
 

@@ -20,7 +20,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.node.cmd.INodeCmd;
 import org.bcia.javachain.node.cmd.factory.NodeCmdFactory;
-import org.bcia.javachain.node.util.Constant;
+import org.bcia.javachain.node.util.NodeConstant;
 import org.springframework.stereotype.Component;
 
 /**
@@ -49,10 +49,10 @@ public class Node {
 
         int cmdWordCount;//记录命令单词数量
         String command = args[0];
-        if (args.length == 1 && !Constant.VERSION.equalsIgnoreCase(command)) {
+        if (args.length == 1 && !NodeConstant.VERSION.equalsIgnoreCase(command)) {
             log.warn("Node " + command + " need more args-----");
             return;
-        } else if (args.length == 1 && Constant.VERSION.equalsIgnoreCase(command)) {
+        } else if (args.length == 1 && NodeConstant.VERSION.equalsIgnoreCase(command)) {
             //只有version命令只有一个单词，其余都是"命令+子命令"的形式,如"node server start"
             cmdWordCount = 1;
             nodeCmd = NodeCmdFactory.getInstance(command, null);
@@ -65,54 +65,9 @@ public class Node {
         if (nodeCmd != null) {
             String[] cleanArgs = new String[args.length - cmdWordCount];
             System.arraycopy(args, cmdWordCount, cleanArgs, 0, cleanArgs.length);
-            nodeCmd.execCmd(cleanArgs);//只传给子命令正式的参数值
+            //只传给子命令正式的参数值
+            nodeCmd.execCmd(cleanArgs);
         }
-
-
-//        String[] testArgs = new String[]{"channel", "-start","hehe","-end","hehe"};
-//
-//        Options options = new Options();
-//        //无需参数，打印版本信息
-//        options.addOption(Constant.VERSION, false, "display Node version");
-//        //需要支持Node node start/Node node status
-//        options.addOption(Constant.NODE, true, "Node node functions");
-//        //需要支持Node chaincode install -n
-//        options.addOption(Option.builder(Constant.CHAINCODE).desc("Node chaincode functions").numberOfArgs(Option.UNLIMITED_VALUES).optionalArg(true).build());
-//        //需要支持Node logging getlevel
-//        options.addOption(Option.builder(Constant.CLI_LOG).desc("Node logging functions").numberOfArgs(Option.UNLIMITED_VALUES).optionalArg(true).build());
-//        //需要支持Node channel create -o
-//        options.addOption(Option.builder(Constant.CHANNEL).desc("Node channel functions").numberOfArgs(Option.UNLIMITED_VALUES).optionalArg(true).build());
-//
-//        CommandLineParser parser = new NodeCLIParser();
-//        CommandLine cmd = parser.parse(options, testArgs);
-//
-//        if (cmd.hasOption(Constant.VERSION)) {
-//            System.out.println("version 0.1");
-//        }
-//
-//        String defaultValue = "UnKown";
-//        if (cmd.hasOption(Constant.NODE)) {
-//            String operations = cmd.getOptionValue(Constant.NODE, defaultValue);
-//            System.out.println(operations + " Done!");
-//        }
-//
-//        if (cmd.hasOption(Constant.CHAINCODE)) {
-//            String operations = cmd.getOptionValue(Constant.CHAINCODE, defaultValue);
-//            System.out.println(operations + " Done!");
-//        }
-//
-//        if (cmd.hasOption(Constant.CLI_LOG)) {
-//            String operations = cmd.getOptionValue(Constant.CLI_LOG, defaultValue);
-//            System.out.println(operations + " Done!");
-//        }
-//
-//        if (cmd.hasOption(Constant.CHANNEL)) {
-//            String[] operations = cmd.getOptionValues(Constant.CHANNEL);
-//
-//            for (String operation : operations) {
-//                log.info("operation-----$" + operation);
-//            }
-//        }
 
         log.info("Node Command end");
     }

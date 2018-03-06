@@ -16,7 +16,7 @@
 package org.bcia.javachain.node.entity;
 
 /**
- * Peer节点日志功能
+ * 节点日志
  *
  * @author zhouhui
  * @date 2018/2/23
