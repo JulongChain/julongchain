@@ -65,7 +65,7 @@ public class SmartContractStub implements ISmartContractStub {
 			try {
 				final ProposalPackage.Proposal proposal = ProposalPackage.Proposal.parseFrom(signedProposal.getProposalBytes());
 				final Common.Header header = Common.Header.parseFrom(proposal.getHeader());
-				final Common.ChannelHeader channelHeader = Common.ChannelHeader.parseFrom(header.getChannelHeader());
+				final Common.GroupHeader channelHeader = Common.GroupHeader.parseFrom(header.getGroupHeader());
 				validateProposalType(channelHeader);
 				final Common.SignatureHeader signatureHeader = Common.SignatureHeader.parseFrom(header.getSignatureHeader());
 				final ProposalPackage.SmartContractProposalPayload chaincodeProposalPayload = ProposalPackage.SmartContractProposalPayload.parseFrom(proposal.getPayload());
@@ -81,7 +81,7 @@ public class SmartContractStub implements ISmartContractStub {
 		}
 	}
 
-	private byte[] computeBinding(final Common.ChannelHeader channelHeader, final Common.SignatureHeader signatureHeader) throws NoSuchAlgorithmException {
+	private byte[] computeBinding(final Common.GroupHeader channelHeader, final Common.SignatureHeader signatureHeader) throws NoSuchAlgorithmException {
 		final MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
 		messageDigest.update(signatureHeader.getNonce().asReadOnlyByteBuffer());
 		messageDigest.update(this.creator.asReadOnlyByteBuffer());
@@ -93,7 +93,7 @@ public class SmartContractStub implements ISmartContractStub {
 		return messageDigest.digest();
 	}
 
-	private void validateProposalType(Common.ChannelHeader channelHeader) {
+	private void validateProposalType(Common.GroupHeader channelHeader) {
 		switch (Common.HeaderType.forNumber(channelHeader.getType())) {
 		case ENDORSER_TRANSACTION:
 		case CONFIG:
