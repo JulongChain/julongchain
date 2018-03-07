@@ -40,4 +40,6 @@ public interface ISystemSmartContractManager {
     boolean isSysSmartContract(String smartContractID);
     //判断某个系统智能合约是否在白名单中
     boolean isWhitelisted(ISystemSmartContract contract);
+    //获取系统智能合约
+    ISystemSmartContract getSystemSmartContract(String smartContractID);
 }

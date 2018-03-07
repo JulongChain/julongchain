@@ -18,6 +18,7 @@ package org.bcia.javachain.core.ssc.vssc;
 import org.bcia.javachain.core.smartcontract.shim.impl.Response;
 import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
+import org.bcia.javachain.core.ssc.SystemSmartContractDescriptor;
 
 /**
  * 验证系统智能合约　Validator System Smart Contract,VSSC
@@ -38,38 +39,5 @@ public class VSSC extends SystemSmartContractBase {
         return null;
     }
 
-    @Override
-    public String getSmartContractDescription() {
-        return null;
-    }
 
-    @Override
-    public String getSSCName() {
-        return null;
-    }
-
-    @Override
-    public String getSSCPath() {
-        return null;
-    }
-
-    @Override
-    public byte[][] getInitArgs() {
-        return new byte[0][];
-    }
-
-    @Override
-    public boolean isInvokableExternal() {
-        return false;
-    }
-
-    @Override
-    public boolean isInvokaleSC2SC() {
-        return false;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return false;
-    }
 }

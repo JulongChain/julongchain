@@ -38,38 +38,5 @@ public class QSSC extends SystemSmartContractBase {
         return null;
     }
 
-    @Override
-    public String getSmartContractDescription() {
-        return null;
-    }
 
-    @Override
-    public String getSSCName() {
-        return null;
-    }
-
-    @Override
-    public String getSSCPath() {
-        return null;
-    }
-
-    @Override
-    public byte[][] getInitArgs() {
-        return new byte[0][];
-    }
-
-    @Override
-    public boolean isInvokableExternal() {
-        return false;
-    }
-
-    @Override
-    public boolean isInvokaleSC2SC() {
-        return false;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return false;
-    }
 }

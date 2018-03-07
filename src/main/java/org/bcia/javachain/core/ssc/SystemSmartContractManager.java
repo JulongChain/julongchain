@@ -16,8 +16,13 @@
 package org.bcia.javachain.core.ssc;
 
 import org.bcia.javachain.common.exception.SysSmartContractException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 系统智能合约管理器,整合管理功能函数接口
@@ -36,9 +41,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class SystemSmartContractManager implements ISystemSmartContractManager{
+    private Map<String,ISystemSmartContract> map=new HashMap<String,ISystemSmartContract>();
+    private static JavaChainLog log = JavaChainLogFactory.getLog(SystemSmartContractManager.class);
     @Override
     public void registerSysSmartContracts() {
-
+        log.info("Register system contracts");
     }
 
     /**
@@ -47,6 +54,9 @@ public class SystemSmartContractManager implements ISystemSmartContractManager{
      * @return 是否注册成功
      */
     private boolean registerSysSmartContract(ISystemSmartContract contract) {
+        String contractID=contract.getSmartContractID();
+        log.info("Register system contract [%s]",contractID);
+        map.put(contractID,contract);
         return true;
     }
 
@@ -69,6 +79,11 @@ public class SystemSmartContractManager implements ISystemSmartContractManager{
     @Override
     public boolean isWhitelisted(ISystemSmartContract contract) {
         return false;
+    }
+
+    @Override
+    public ISystemSmartContract getSystemSmartContract(String smartContractID) {
+        return null;
     }
 
 

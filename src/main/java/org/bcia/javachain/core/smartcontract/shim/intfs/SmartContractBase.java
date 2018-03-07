@@ -47,7 +47,7 @@ public abstract class SmartContractBase implements ISmartContract {
     public abstract Response invoke(ISmartContractStub stub);
 
     @Override
-    public abstract String getSmartContractDescription();
+    public abstract String getSmartContractStrDescription();
 
     private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractBase.class);
 

@@ -26,4 +26,18 @@ import org.bcia.javachain.core.smartcontract.shim.intfs.SmartContractBase;
  */
 public abstract  class SystemSmartContractBase extends SmartContractBase implements ISystemSmartContract {
 
+
+    public String getSmartContractStrDescription() {
+        return null;
+    }
+
+
+    public void setSystemSmartContractDescriptor(SystemSmartContractDescriptor descriptor) {
+
+    }
+
+    public SystemSmartContractDescriptor getSystemSmartContractDescriptor() {
+        return null;
+    }
+
 }

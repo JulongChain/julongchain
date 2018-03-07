@@ -29,23 +29,23 @@ public interface ISmartContract {
      * Called during an instantiate transaction after the container has been
      * established, allowing the chaincode to initialize its internal data.
      */
-    public Response init(ISmartContractStub stub);
+    Response init(ISmartContractStub stub);
 
     /**
      * Called for every Invoke transaction. The chaincode may change its state
      * variables.
      */
-    public Response invoke(ISmartContractStub stub);
+    Response invoke(ISmartContractStub stub);
 
     /**
      * 获取智能合约ＩＤ
      * @return  智能合约ＩＤ
      */
-    public String getSmartContractID();
+    String getSmartContractID();
 
     /**
-     * 获取智能合约的描述
+     * 获取智能合约的文字描述
      * @return  智能合约的描述
      */
-    public String getSmartContractDescription();
+    String getSmartContractStrDescription();
 }
