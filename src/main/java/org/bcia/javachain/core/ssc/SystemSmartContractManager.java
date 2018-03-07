@@ -15,14 +15,42 @@
  */
 package org.bcia.javachain.core.ssc;
 
+import org.bcia.javachain.common.exception.SysSmartContractException;
+import org.bcia.javachain.protos.node.Smartcontract;
+import org.springframework.stereotype.Component;
+
 /**
  * 系统智能合约管理器,整合管理功能函数接口
- *
+ ** 各接口被调用的时机：
+ *　1.Node启动时，调用registerSysSmartContracts()
+ *  2.（SystemSmartContractManager内部）,调用loadSysSmartContracts()加载外部系统合约，与本地系统合约形成系统合约集合；
+ *  ３.（SystemSmartContractManager内部）,对每个系统合约，调用registerSysSmartContract(String smartContractID)
+ *  ４.调用deploySysSmartContracts("");
+ *  ５.(SystemSmartContractManager内部)deploySysSmartContracts调用buildSysSmartContracts编译智能合约，形成智能合约部署规范(DeploymentSpec);
+ *  ６.分别为每个组，调用deploySysSmartContracts(groupID);
+ *  ７.(SystemSmartContractManager内部)deploySysSmartContracts(groupID)调用buildSysSmartContracts编译智能合约，形成智能合约部署规范(DeploymentSpec);
  * @author sunianle
  * @date 3/6/18
  * @company Dingxuan
  */
+
+@Component
 public class SystemSmartContractManager implements ISystemSmartContractManager{
+    @Override
+    public void registerSysSmartContracts() {
+
+    }
+
+    /**
+     * 注册系统智能合约,相当于应用智能合约的Install
+     * @param contract 要注册的系统合约
+     * @return 是否注册成功
+     */
+    private boolean registerSysSmartContract(ISystemSmartContract contract) {
+        return true;
+    }
+
+    //相当于应用智能合约的Instantiate
     @Override
     public void deploySysSmartContracts(String groupID) {
 
@@ -39,17 +67,20 @@ public class SystemSmartContractManager implements ISystemSmartContractManager{
     }
 
     @Override
-    public void loadSysSmartContracts() {
-
+    public boolean isWhitelisted(ISystemSmartContract contract) {
+        return false;
     }
 
-    @Override
-    public void registerSysSmartContracts() {
 
+    //编译智能合约，形成智能合约部署规范(DeploymentSpec);
+    private Smartcontract.SmartContractDeploymentSpec buildSysSmartContract(Smartcontract.SmartContractSpec spec)
+            throws SysSmartContractException
+    {
+        return null;
     }
 
-    @Override
-    public void registerSysSmartContract() {
+    //加载外部系统智能合约插件
+    private void loadSysSmartContracts(){
 
     }
 }
