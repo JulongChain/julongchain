@@ -23,7 +23,9 @@ public class Channel<E> extends LinkedBlockingQueue<E> implements Closeable {
 	@Override
 	public E take() throws InterruptedException {
 		synchronized (waiting) {
-			if (closed) throw new InterruptedException("Channel closed");
+			if (closed) {
+				throw new InterruptedException("Channel closed");
+			}
 			waiting.add(Thread.currentThread());
 		}
 		E e = super.take();
