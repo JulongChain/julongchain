@@ -224,7 +224,9 @@ public abstract class SmartContractBase implements ISmartContract {
     }
 
     private static byte[] printStackTrace(Throwable throwable) {
-        if (throwable == null) return null;
+        if (throwable == null) {
+            return null;
+        }
         final StringWriter buffer = new StringWriter();
         throwable.printStackTrace(new PrintWriter(buffer));
         return buffer.toString().getBytes(StandardCharsets.UTF_8);
