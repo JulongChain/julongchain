@@ -1,9 +1,11 @@
 package org.bcia.javachain.node.common;
 
 import com.google.protobuf.Timestamp;
+import org.bcia.javachain.protos.common.Common;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * 类描述
@@ -36,6 +38,11 @@ public class EnvelopeHelperTest {
 
     @Test
     public void buildGroupHeader() {
+        Common.GroupHeader groupHeader = EnvelopeHelper.buildGroupHeader(Common.HeaderType.CONFIG_UPDATE_VALUE, 0, "myGroup", 30);
+        assertEquals(2, groupHeader.getType());
+        assertEquals(0, groupHeader.getVersion());
+        assertEquals("myGroup", groupHeader.getGroupId());
+        assertEquals(30, groupHeader.getEpoch());
     }
 
     @Test
@@ -43,6 +50,6 @@ public class EnvelopeHelperTest {
         Timestamp timestamp = EnvelopeHelper.nowTimestamp();
         System.out.println(timestamp.getSeconds());
         System.out.println(timestamp.getNanos());
-
+        assertEquals(System.currentTimeMillis() / 1000, timestamp.getSeconds());
     }
 }

@@ -15,14 +15,22 @@
  */
 package org.bcia.javachain.node.common;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Timestamp;
+import io.grpc.MethodDescriptor;
+import io.grpc.protobuf.ProtoUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.common.localmsp.ILocalSigner;
+import org.bcia.javachain.common.localmsp.impl.LocalSignerImpl;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
+
+import java.io.IOException;
 
 /**
  * 类描述
@@ -96,31 +104,78 @@ public class EnvelopeHelper {
 
     }
 
-    public static Common.Envelope buildSignedEnvelope(int headerType, String groupId) throws NodeException {
-        Common.Payload payload = null;
-        return null;
+    public static Common.Envelope buildSignedEnvelope(int type, int version, String groupId, ILocalSigner signer, byte[]
+            data, long epoch) throws NodeException, IOException {
+        Common.Envelope.Builder envelopeBuilder = Common.Envelope.newBuilder();
+
+        Common.Payload payload = buildPayload(type, version, groupId, signer, data, epoch);
+        MethodDescriptor.Marshaller<Common.Payload> payloadMarshaller = ProtoUtils
+                .marshaller(Common.Payload.getDefaultInstance());
+        byte[] payloadBytes = IOUtils.toByteArray(payloadMarshaller.stream(payload));
+
+        byte[] signatureBytes = signer.sign(payloadBytes);
+
+        envelopeBuilder.setPayload(ByteString.copyFrom(payloadBytes));
+        envelopeBuilder.setSignature(ByteString.copyFrom(signatureBytes));
+
+        return envelopeBuilder.build();
     }
 
-    public static Common.Payload buildPayload(int headerType, String groupId) throws NodeException {
-        Common.Payload payload = null;
-        return null;
+    public static Common.Payload buildPayload(int type, int version, String groupId, ILocalSigner signer, byte[]
+            data, long epoch) throws NodeException, IOException {
+        Common.Payload.Builder payloadBuilder = Common.Payload.newBuilder();
+
+        Common.GroupHeader groupHeader = buildGroupHeader(type, version, groupId, epoch);
+        MethodDescriptor.Marshaller<Common.GroupHeader> groupHeaderMarshaller = ProtoUtils
+                .marshaller(Common.GroupHeader.getDefaultInstance());
+        byte[] groupHeaderBytes = IOUtils.toByteArray(groupHeaderMarshaller.stream(groupHeader));
+
+        Common.SignatureHeader signatureHeader = new LocalSignerImpl().newSignatureHeader();
+        MethodDescriptor.Marshaller<Common.SignatureHeader> signatureHeaderMarshaller = ProtoUtils
+                .marshaller(Common.SignatureHeader.getDefaultInstance());
+        byte[] signatureHeaderBytes = IOUtils.toByteArray(signatureHeaderMarshaller.stream(signatureHeader));
+
+        Common.Header.Builder headerBuilder = Common.Header.newBuilder();
+        headerBuilder.setGroupHeader(ByteString.copyFrom(groupHeaderBytes));
+        headerBuilder.setSignatureHeader(ByteString.copyFrom(signatureHeaderBytes));
+        Common.Header header = headerBuilder.build();
+
+        payloadBuilder.setHeader(header);
+        payloadBuilder.setData(ByteString.copyFrom(data));
+
+        return payloadBuilder.build();
     }
 
-    public static Common.GroupHeader buildGroupHeader(int type, int version) {
+    /**
+     * 建造GroupHeader对象
+     *
+     * @param type    消息类型
+     * @param version 消息协议的版本
+     * @param groupId 群组ID
+     * @param epoch   所属纪元，目前以所需区块的高度值填充
+     * @return
+     */
+    public static Common.GroupHeader buildGroupHeader(int type, int version, String groupId, long epoch) {
         Common.GroupHeader.Builder groupHeaderBuilder = Common.GroupHeader.newBuilder();
         groupHeaderBuilder.setType(type);
         groupHeaderBuilder.setVersion(version);
         groupHeaderBuilder.setTimestamp(nowTimestamp());
-        return null;
+        groupHeaderBuilder.setGroupId(groupId);
+        groupHeaderBuilder.setEpoch(epoch);
 
+        return groupHeaderBuilder.build();
     }
 
+    /**
+     * 获取当前的时间戳
+     *
+     * @return
+     */
     public static Timestamp nowTimestamp() {
         long millis = System.currentTimeMillis();
         //完成秒和纳秒（即10亿分之一秒）的设置
         return Timestamp.newBuilder().setSeconds(millis / 1000)
                 .setNanos((int) ((millis % 1000) * 1000000)).build();
     }
-
 
 }
