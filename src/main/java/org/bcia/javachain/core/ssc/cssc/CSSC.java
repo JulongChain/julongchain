@@ -15,9 +15,12 @@
  */
 package org.bcia.javachain.core.ssc.cssc;
 
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.smartcontract.shim.impl.Response;
 import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
+import org.springframework.stereotype.Component;
 
 /**
  * 配置系统智能合约　Configure System Smart Contract,CSSC
@@ -26,7 +29,14 @@ import org.bcia.javachain.core.ssc.SystemSmartContractBase;
  * @date 3/5/18
  * @company Dingxuan
  */
+
+@Component
 public class CSSC extends SystemSmartContractBase {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(CSSC.class);
+
+    public CSSC(){
+        log.debug("Construct CSSC");
+    }
 
     @Override
     public Response init(ISmartContractStub stub) {
@@ -36,5 +46,10 @@ public class CSSC extends SystemSmartContractBase {
     @Override
     public Response invoke(ISmartContractStub stub) {
         return null;
+    }
+
+    @Override
+    public String getSmartContractStrDescription() {
+        return "与配置相关的系统智能合约";
     }
 }

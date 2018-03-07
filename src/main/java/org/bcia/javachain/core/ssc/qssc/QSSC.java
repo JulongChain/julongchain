@@ -18,6 +18,7 @@ package org.bcia.javachain.core.ssc.qssc;
 import org.bcia.javachain.core.smartcontract.shim.impl.Response;
 import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
+import org.springframework.stereotype.Component;
 
 /**
  * 查询系统智能合约　Query System Smart Contract,CSSC
@@ -26,6 +27,7 @@ import org.bcia.javachain.core.ssc.SystemSmartContractBase;
  * @date 3/5/18
  * @company Dingxuan
  */
+@Component
 public class QSSC extends SystemSmartContractBase {
 
     @Override
@@ -38,5 +40,8 @@ public class QSSC extends SystemSmartContractBase {
         return null;
     }
 
-
+    @Override
+    public String getSmartContractStrDescription() {
+        return "与查询相关的系统智能合约";
+    }
 }

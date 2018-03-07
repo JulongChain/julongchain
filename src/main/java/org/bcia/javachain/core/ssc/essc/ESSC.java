@@ -18,6 +18,7 @@ package org.bcia.javachain.core.ssc.essc;
 import org.bcia.javachain.core.smartcontract.shim.impl.Response;
 import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
+import org.springframework.stereotype.Component;
 
 /**
  * 背书系统智能合约　Endorse System Smart Contract,ESSC
@@ -26,6 +27,7 @@ import org.bcia.javachain.core.ssc.SystemSmartContractBase;
  * @date 3/5/18
  * @company Dingxuan
  */
+@Component
 public class ESSC  extends SystemSmartContractBase {
 
     @Override
@@ -38,5 +40,9 @@ public class ESSC  extends SystemSmartContractBase {
         return null;
     }
 
+    @Override
+    public String getSmartContractStrDescription() {
+        return "与背书相关的系统智能合约";
+    }
 
 }

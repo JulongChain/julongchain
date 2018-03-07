@@ -27,14 +27,14 @@ import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContract;
 public class SystemSmartContractDescriptor{
     private String sscName;
     private String sscPath;
-    private byte[][] initArgs;
+    private String[] initArgs;
     private boolean bInvokableExternal;
     private boolean bInvokaleSC2SC;
     private boolean bEnabled;
 
     public SystemSmartContractDescriptor(String sscName,
                                          String sscPath,
-                                         byte[][] initArgs,
+                                         String[] initArgs,
                                          boolean bInvokableExternal,
                                          boolean bInvokaleSC2SC,
                                          boolean bEnabled) {
@@ -58,7 +58,7 @@ public class SystemSmartContractDescriptor{
     }
 
     //获取初始化参数
-    public byte[][] getInitArgs(){
+    public String[] getInitArgs(){
         return null;
     }
 
