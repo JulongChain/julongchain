@@ -15,8 +15,11 @@
  */
 package org.bcia.javachain.common.localmsp.impl;
 
+import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.protos.common.Common;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * @author zhangmingyang
@@ -26,6 +29,12 @@ import org.bcia.javachain.protos.common.Common;
 public class LocalSigner implements ILocalSigner {
     @Override
     public Common.SignatureHeader newSignatureHeader() {
+        try {
+            return Common.SignatureHeader.newBuilder().setCreator(ByteString.copyFrom("zhouhui", "UTF-8")).build();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 

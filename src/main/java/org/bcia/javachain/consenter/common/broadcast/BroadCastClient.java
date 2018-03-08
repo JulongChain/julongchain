@@ -22,7 +22,8 @@ public class BroadCastClient {
     public void send(String ip, int port, String message) throws Exception {
         ManagedChannel managedChannel = ManagedChannelBuilder.forAddress(ip, port).usePlaintext(true).build();
         AtomicBroadcastGrpc.AtomicBroadcastStub stub = AtomicBroadcastGrpc.newStub(managedChannel);
-        StreamObserver<Common.Envelope> envelopeStreamObserver = stub.broadcast(new StreamObserver<Ab.BroadcastResponse>() {
+        StreamObserver<Common.Envelope> envelopeStreamObserver = stub.broadcast(new StreamObserver<Ab
+                .BroadcastResponse>() {
             @Override
             public void onNext(Ab.BroadcastResponse broadcastResponse) {
                 System.out.println(broadcastResponse.getStatusValue());
@@ -49,16 +50,17 @@ public class BroadCastClient {
 
     /**
      * 有回调的发送方法
+     *
      * @param ip
      * @param port
-     * @param message
+     * @param envelope
      * @param responseObserver
      */
-    public void send(String ip, int port, String message, StreamObserver<Ab.BroadcastResponse> responseObserver) {
+    public void send(String ip, int port, Common.Envelope envelope, StreamObserver<Ab.BroadcastResponse> responseObserver) {
         ManagedChannel managedChannel = ManagedChannelBuilder.forAddress(ip, port).usePlaintext(true).build();
         AtomicBroadcastGrpc.AtomicBroadcastStub stub = AtomicBroadcastGrpc.newStub(managedChannel);
         StreamObserver<Common.Envelope> envelopeStreamObserver = stub.broadcast(responseObserver);
-        envelopeStreamObserver.onNext(Common.Envelope.newBuilder().setPayload(ByteString.copyFrom(message.getBytes())).build());
+        envelopeStreamObserver.onNext(envelope);
     }
 
 }

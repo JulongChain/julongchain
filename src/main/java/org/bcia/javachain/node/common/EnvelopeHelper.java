@@ -17,23 +17,20 @@ package org.bcia.javachain.node.common;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
-import io.grpc.MethodDescriptor;
-import io.grpc.protobuf.ProtoUtils;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
-import org.bcia.javachain.common.localmsp.impl.LocalSignerImpl;
+import org.bcia.javachain.common.localmsp.impl.LocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 
-import java.io.IOException;
-
 /**
- * 类描述
+ * 信封对象帮助类
  *
  * @author
  * @date 2018/3/6
@@ -50,104 +47,158 @@ public class EnvelopeHelper {
 
     }
 
-    public static Common.Envelope sanityCheckAndSignConfigTx(Common.Envelope envelope, String gourpId) throws NodeException {
+    public static Common.Envelope sanityCheckAndSignConfigTx(Common.Envelope envelope, String groupId, ILocalSigner signer)
+            throws NodeException {
+        //检查Payload字段是否有误
+        if (envelope.getPayload() == null || envelope.getPayload().isEmpty()) {
+            //检查是否为空
+            throw new NodeException("Missing payload");
+        }
         Common.Payload payload = null;
-
         try {
             //从Envelope解析出Payload对象
-            payload = Common.Payload.newBuilder().mergeFrom(envelope.getPayload()).build();
+            payload = Common.Payload.parseFrom(envelope.getPayload());
         } catch (InvalidProtocolBufferException e) {
             log.error(e.getMessage(), e);
             throw new NodeException("Wrong payload");
         }
 
-        if (payload == null) {
-            throw new NodeException("Missing payload");
-        }
-
+        //检查Payload->Header->GroupHeader字段是否有误
         if (payload.getHeader() == null || payload.getHeader().getGroupHeader() == null) {
             throw new NodeException("Missing header");
         }
-
         Common.GroupHeader groupHeader = null;
         try {
-            groupHeader = Common.GroupHeader.newBuilder().mergeFrom(payload.getHeader().getGroupHeader()).build();
+            groupHeader = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
         } catch (InvalidProtocolBufferException e) {
             log.error(e.getMessage(), e);
             throw new NodeException("Wrong header");
         }
 
+        //检查消息类型
         if (groupHeader.getType() != Common.HeaderType.CONFIG_UPDATE_VALUE) {
             throw new NodeException("Wrong header type");
         }
 
+        //检查群组ID
         if (StringUtils.isBlank(groupHeader.getGroupId())) {
             throw new NodeException("Missing group id");
         }
-
-        if (!groupHeader.getGroupId().equals(gourpId)) {
+        if (!groupHeader.getGroupId().equals(groupId)) {
             throw new NodeException("Wrong group id");
         }
 
+        //检查Data字段是否是ConfigUpdateEnvelope类型
         Configtx.ConfigUpdateEnvelope configUpdateEnvelope = null;
 
         try {
-            //从Envelope解析出Payload对象
-            configUpdateEnvelope = Configtx.ConfigUpdateEnvelope.newBuilder().mergeFrom(payload.getData()).build();
+            configUpdateEnvelope = Configtx.ConfigUpdateEnvelope.parseFrom(payload.getData());
         } catch (InvalidProtocolBufferException e) {
             log.error(e.getMessage(), e);
             throw new NodeException("Wrong config update envelope");
         }
 
-        return null;
+        Configtx.ConfigUpdateEnvelope signedConfigUpdateEnvelope = signConfigUpdateEnvelope(configUpdateEnvelope,
+                signer);
+        Common.Envelope signedEnvelope = buildSignedEnvelope(Common.HeaderType.CONFIG_UPDATE_VALUE, 0, groupId, signer,
+                signedConfigUpdateEnvelope, 0);
 
-
+        return signedEnvelope;
     }
 
-    public static Common.Envelope buildSignedEnvelope(int type, int version, String groupId, ILocalSigner signer, byte[]
-            data, long epoch) throws NodeException, IOException {
+    /**
+     * 对一个ConfigUpdateEnvelope对象进行签名
+     *
+     * @param originalEnvelope
+     * @param signer
+     * @return
+     */
+    public static Configtx.ConfigUpdateEnvelope signConfigUpdateEnvelope(Configtx.ConfigUpdateEnvelope originalEnvelope,
+                                                                         ILocalSigner signer) {
+        //获取ConfigUpdateEnvelope对象的构造器,拷贝原对象
+        Configtx.ConfigUpdateEnvelope.Builder envelopeBuilder = Configtx.ConfigUpdateEnvelope.newBuilder(originalEnvelope);
+
+        //构造签名对象,由两个字段构成SignatureHeader和Signature（其中Signature是针对SignatureHeader+ConfigUpdate的签名）
+        Configtx.ConfigSignature.Builder configSignatureBuilder = Configtx.ConfigSignature.newBuilder();
+        Common.SignatureHeader signatureHeader = signer.newSignatureHeader();
+        //由SignatureHeader+ConfigUpdate合成原始字节数组
+        byte[] original = ArrayUtils.addAll(signatureHeader.toByteArray(), originalEnvelope.getConfigUpdate().toByteArray());
+        //对原始数组进行签名
+        byte[] signature = signer.sign(original);
+
+        configSignatureBuilder.setSignatureHeader(signatureHeader.toByteString());
+        configSignatureBuilder.setSignature(ByteString.copyFrom(signature));
+        Configtx.ConfigSignature configSignature = configSignatureBuilder.build();
+
+        //ConfigUpdateEnvelope对象由ConfigUpdate和若干个ConfigSignature组成。增加一个签名即可
+        envelopeBuilder.addSignatures(configSignature);
+
+        return envelopeBuilder.build();
+    }
+
+    /**
+     * 构建带签名的信封对象
+     *
+     * @param type    消息类型
+     * @param version 消息协议版本
+     * @param groupId 群组ID
+     * @param signer  签名者
+     * @param data    数据对象
+     * @param epoch   所属纪元
+     * @return
+     */
+    public static Common.Envelope buildSignedEnvelope(int type, int version, String groupId, ILocalSigner signer,
+                                                      Message data, long epoch) {
+        //获取Envelope对象的构造器
         Common.Envelope.Builder envelopeBuilder = Common.Envelope.newBuilder();
 
+        //构造Payload
         Common.Payload payload = buildPayload(type, version, groupId, signer, data, epoch);
-        MethodDescriptor.Marshaller<Common.Payload> payloadMarshaller = ProtoUtils
-                .marshaller(Common.Payload.getDefaultInstance());
-        byte[] payloadBytes = IOUtils.toByteArray(payloadMarshaller.stream(payload));
 
-        byte[] signatureBytes = signer.sign(payloadBytes);
+        //Signature字段由Payload字段签名而成
+        byte[] signatureBytes = signer.sign(payload.toByteArray());
 
-        envelopeBuilder.setPayload(ByteString.copyFrom(payloadBytes));
+        envelopeBuilder.setPayload(payload.toByteString());
         envelopeBuilder.setSignature(ByteString.copyFrom(signatureBytes));
 
         return envelopeBuilder.build();
     }
 
-    public static Common.Payload buildPayload(int type, int version, String groupId, ILocalSigner signer, byte[]
-            data, long epoch) throws NodeException, IOException {
+    /**
+     * 构造Payload对象
+     *
+     * @param type    消息类型
+     * @param version 消息协议版本
+     * @param groupId 群组ID
+     * @param signer  签名者
+     * @param data    数据字段
+     * @param epoch   所属纪元
+     * @return
+     * @throws NodeException
+     */
+    public static Common.Payload buildPayload(int type, int version, String groupId, ILocalSigner signer, Message
+            data, long epoch) {
+        //获取Payload对象的构造器
         Common.Payload.Builder payloadBuilder = Common.Payload.newBuilder();
 
+        //构造头部,包含GroupHeader和SignatureHeader两个字段
         Common.GroupHeader groupHeader = buildGroupHeader(type, version, groupId, epoch);
-        MethodDescriptor.Marshaller<Common.GroupHeader> groupHeaderMarshaller = ProtoUtils
-                .marshaller(Common.GroupHeader.getDefaultInstance());
-        byte[] groupHeaderBytes = IOUtils.toByteArray(groupHeaderMarshaller.stream(groupHeader));
-
-        Common.SignatureHeader signatureHeader = new LocalSignerImpl().newSignatureHeader();
-        MethodDescriptor.Marshaller<Common.SignatureHeader> signatureHeaderMarshaller = ProtoUtils
-                .marshaller(Common.SignatureHeader.getDefaultInstance());
-        byte[] signatureHeaderBytes = IOUtils.toByteArray(signatureHeaderMarshaller.stream(signatureHeader));
+        Common.SignatureHeader signatureHeader = signer.newSignatureHeader();
 
         Common.Header.Builder headerBuilder = Common.Header.newBuilder();
-        headerBuilder.setGroupHeader(ByteString.copyFrom(groupHeaderBytes));
-        headerBuilder.setSignatureHeader(ByteString.copyFrom(signatureHeaderBytes));
+        headerBuilder.setGroupHeader(groupHeader.toByteString());
+        headerBuilder.setSignatureHeader(signatureHeader.toByteString());
         Common.Header header = headerBuilder.build();
 
+        //Payload对象包含头部Header和Data两个字段
         payloadBuilder.setHeader(header);
-        payloadBuilder.setData(ByteString.copyFrom(data));
+        payloadBuilder.setData(data.toByteString());
 
         return payloadBuilder.build();
     }
 
     /**
-     * 建造GroupHeader对象
+     * 构造GroupHeader对象
      *
      * @param type    消息类型
      * @param version 消息协议的版本

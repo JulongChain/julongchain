@@ -62,6 +62,31 @@ public class FileUtils {
         }
     }
 
+    /**
+     * 将字节数组写入文件
+     * @param filePath
+     * @param bytes
+     */
+    public static void writeFileBytes(String filePath, byte[] bytes) {
+        OutputStream os = null;
+        try {
+            os = new FileOutputStream(filePath);
+            os.write(bytes);
+        } catch (FileNotFoundException e) {
+            log.error(e.getMessage(), e);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        } finally {
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        }
+    }
+
     public static boolean isExists(String filePath) {
         File file = new File(filePath);
         return file.exists();

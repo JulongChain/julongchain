@@ -15,21 +15,23 @@
  */
 package org.bcia.javachain.node.entity;
 
-import io.grpc.MethodDescriptor;
-import io.grpc.protobuf.ProtoUtils;
 import io.grpc.stub.StreamObserver;
 import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.common.localmsp.ILocalSigner;
+import org.bcia.javachain.common.localmsp.impl.LocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.FileUtils;
 import org.bcia.javachain.consenter.common.broadcast.BroadCastClient;
+import org.bcia.javachain.node.common.EnvelopeHelper;
+import org.bcia.javachain.node.common.client.BroadcastClient;
+import org.bcia.javachain.node.common.client.DeliverClient;
+import org.bcia.javachain.node.common.client.IBroadcastClient;
+import org.bcia.javachain.node.common.client.IDeliverClient;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.consenter.Ab;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -44,89 +46,101 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeGroup.class);
 
     public NodeGroup createGroup(String ip, int port, String groupId) {
+//        try {
+//            createGroup(ip, port, groupId, null);
+//        } catch (NodeException e) {
+//            e.printStackTrace();
+//        }
+
         NodeGroup group = new NodeGroup();
-
-
-
-
-
-
 
 
         BroadCastClient broadCastClient = new BroadCastClient();
         try {
-            broadCastClient.send(ip, port, groupId, this);
+            broadCastClient.send(ip, port, Common.Envelope.newBuilder().build(), this);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-
-//        Block block = Block.newBuilder().build();
+//
+////        Block block = Block.newBuilder().build();
+////
+////
+////
+////        Marshaller<Block> marshaller = ProtoUtils.marshaller(Block.getDefaultInstance());
+////        InputStream is = marshaller.stream(block);
+////        is = new ByteArrayInputStream(ByteStreams.toByteArray(is));
 //
 //
-//
-//        Marshaller<Block> marshaller = ProtoUtils.marshaller(Block.getDefaultInstance());
-//        InputStream is = marshaller.stream(block);
-//        is = new ByteArrayInputStream(ByteStreams.toByteArray(is));
-
-
-        return group;
+//        return group;
+        return null;
     }
 
-    public NodeGroup createGroup(String ip, int port, String groupId, String groupFile) throws NodeException {
-        if(!FileUtils.isExists(groupFile)){
+    public void createGroup(String ip, int port, String groupId, String groupFile) throws NodeException {
+        if (!FileUtils.isExists(groupFile)) {
             log.error("groupFile is not exists");
             throw new NodeException("Group File is not exists");
         }
 
-        byte[] bytes = null;
         Common.Envelope envelope = null;
         try {
-//            bytes = FileUtils.readFileBytes(groupFile);
-
-            MethodDescriptor.Marshaller<Common.Envelope> marshaller = ProtoUtils.marshaller(Common.Envelope.getDefaultInstance());
-            envelope = marshaller.parse(new FileInputStream(groupFile));
-
+            byte[] bytes = FileUtils.readFileBytes(groupFile);
+            envelope = Common.Envelope.parseFrom(bytes);
         } catch (IOException e) {
             throw new NodeException("Can not read Group File");
         }
 
+        ILocalSigner signer = new LocalSigner();
+        Common.Envelope signedEnvelope = EnvelopeHelper.sanityCheckAndSignConfigTx(envelope, groupId, signer);
+        IBroadcastClient broadcastClient = new BroadcastClient(ip, port);
+        broadcastClient.send(signedEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
+            @Override
+            public void onNext(Ab.BroadcastResponse value) {
+                log.info("Broadcast onNext");
+                //收到响应消息，判断是否是200消息
+                if (Common.Status.SUCCESS.equals(value.getStatus())) {
+                    getGenesisBlockThenWrite(ip, port, groupId);
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                log.error(t.getMessage(), t);
+            }
+
+            @Override
+            public void onCompleted() {
+                log.info("Broadcast completed");
+            }
+        });
+    }
+
+    private void getGenesisBlockThenWrite(String ip, int port, String groupId) {
+        log.info("getGenesisBlock begin");
+        IDeliverClient deliverClient = new DeliverClient(ip, port);
+        deliverClient.getSpecifiedBlock(groupId, 0L, new StreamObserver<Ab.DeliverResponse>() {
+            @Override
+            public void onNext(Ab.DeliverResponse value) {
+                log.info("Deliver onNext");
+                if (value.hasBlock()) {
+                    Common.Block block = value.getBlock();
+                    FileUtils.writeFileBytes(groupId + ".block", block.toByteArray());
+                } else {
+                    log.info("Deliver status:" + value.getStatus().getNumber());
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                log.error(t.getMessage(), t);
+            }
+
+            @Override
+            public void onCompleted() {
+                log.info("Deliver onCompleted");
+            }
+        });
 
 
-//        InputStream is = marshaller.stream(block);
-//        is = new ByteArrayInputStream(ByteStreams.toByteArray(is));
-
-
-
-//        FileInputStream fis = null;
-//        try {
-//            fis = new FileInputStream(new File(groupFile));
-//
-//            int buffer_size = 4096;
-//            byte[] bytes = new Byte[buffer_size];
-//
-//
-//            int len;
-//            for(int i=0;len = fis.read(bytes, 0, buffer_size), ;len < buffer_size)
-//
-//
-//
-//
-//            fis.re
-//
-//
-//
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//
-//
-//        FileUtils.readFileToByteArray(groupFile)
-//
-
-
-
-
-        return null;
     }
 
     public NodeGroup joinGroup(String blockPath) {

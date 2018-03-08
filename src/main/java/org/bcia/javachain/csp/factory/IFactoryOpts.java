@@ -27,12 +27,12 @@ package org.bcia.javachain.csp.factory;
 public interface IFactoryOpts {
 
     // The values of string type below present providers' names to be implemented.
-    String PROVIDER_NIST="NIST";
-    String PROVIDER_GM="GM";
-    String PROVIDER_PKCS11="PKCS11";
-    String PROVIDER_GMT0016="GMT0016";
-    String PROVIDER_GMT0018="GMT0018";
-    String PROVIDER_GMT0019="GMT0019";
+    String PROVIDER_NIST = "NIST";
+    String PROVIDER_GM = "GM_BOUNCYCASTLE";
+    String PROVIDER_PKCS11 = "PKCS11";
+    String PROVIDER_GMT0016 = "GMT0016";
+    String PROVIDER_GMT0018 = "GMT0018";
+    String PROVIDER_GMT0019 = "GMT0019";
 
     // The getProviderName returns a provider's name.
     String getProviderName();
