@@ -13,18 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.ssc;
-
-import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContract;
+package org.bcia.javachain.core.container.inproccontroller;
 
 /**
- * 系统智能合约
+ * 类描述
  *
  * @author sunianle
  * @date 3/7/18
  * @company Dingxuan
  */
-public interface ISystemSmartContract extends ISmartContract{
-    void setSystemSmartContractDescriptor(SystemSmartContractDescriptor descriptor);
-    SystemSmartContractDescriptor getSystemSmartContractDescriptor();
+public class InprocController {
 }

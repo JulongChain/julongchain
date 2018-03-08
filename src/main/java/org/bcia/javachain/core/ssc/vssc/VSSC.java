@@ -18,6 +18,8 @@ package org.bcia.javachain.core.ssc.vssc;
 import org.bcia.javachain.core.smartcontract.shim.impl.Response;
 import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
+import org.bcia.javachain.core.ssc.SystemSmartContractDescriptor;
+import org.springframework.stereotype.Component;
 
 /**
  * 验证系统智能合约　Validator System Smart Contract,VSSC
@@ -26,6 +28,7 @@ import org.bcia.javachain.core.ssc.SystemSmartContractBase;
  * @date 3/5/18
  * @company Dingxuan
  */
+@Component
 public class VSSC extends SystemSmartContractBase {
 
     @Override
@@ -39,7 +42,7 @@ public class VSSC extends SystemSmartContractBase {
     }
 
     @Override
-    public String getSmartContractDescription() {
-        return null;
+    public String getSmartContractStrDescription() {
+        return "与验证相关的系统智能合约";
     }
 }

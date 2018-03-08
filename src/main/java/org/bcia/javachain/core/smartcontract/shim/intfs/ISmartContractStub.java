@@ -32,7 +32,7 @@ import java.util.Map;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.stream.Collectors.toList;
 /**
- * 智能合约的桩接口
+ * 智能合约的桩（Stub，也可以翻译为垫片，理解为平台和智能合约之间贴合的垫片）接口
  *
  * @author sunianle
  * @date 2/28/18
