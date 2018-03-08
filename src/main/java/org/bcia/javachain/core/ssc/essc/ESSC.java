@@ -15,9 +15,12 @@
  */
 package org.bcia.javachain.core.ssc.essc;
 
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.smartcontract.shim.impl.Response;
 import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
+import org.bcia.javachain.core.ssc.SystemSmartContractManager;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,10 +32,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ESSC  extends SystemSmartContractBase {
-
+    private static JavaChainLog log = JavaChainLogFactory.getLog(ESSC.class);
     @Override
     public Response init(ISmartContractStub stub) {
-        return null;
+        log.info("Successfully initialized ESSC");
+        return newSuccessResponse();
     }
 
     @Override
