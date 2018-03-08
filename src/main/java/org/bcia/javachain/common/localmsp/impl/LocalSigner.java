@@ -23,7 +23,7 @@ import org.bcia.javachain.protos.common.Common;
  * @Date: 2018/3/6
  * @company Dingxuan
  */
-public class LocalSignerImpl implements ILocalSigner {
+public class LocalSigner implements ILocalSigner {
     @Override
     public Common.SignatureHeader newSignatureHeader() {
         return null;

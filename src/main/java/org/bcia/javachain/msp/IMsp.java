@@ -29,49 +29,92 @@ import java.util.Map;
  */
 public interface IMsp {
 
-    public interface  Identity{
+    public interface Identity {
         /**
          * ExpiresAt() time.Time 未定义
          */
-       /**
-        *   为定义该方法   定义实体类 IdentityIdentifier来实现  GetIdentifier() *IdentityIdentifier
-       	 */
-        public  String GetMSPIdentifier();
+        /**
+         * 为定义该方法   定义实体类 IdentityIdentifier来实现  GetIdentifier() *IdentityIdentifier
+         */
+        public String GetMSPIdentifier();
+
         public void Validate();
+
         /**
          * 未实现该方法 GetOrganizationalUnits() []*OUIdentifier 之后实现OUIdentifier的实体
          */
-        public void Verify(byte[] msg,byte[] sig);
+        public void Verify(byte[] msg, byte[] sig);
+
         public byte[] Serialize();
+
         public void SatisfiesPrincipal(MspPrincipal principal);
     }
 
-    public interface SigningIdentity{
+    public interface SigningIdentity {
+          public interface Identity {
+            /**
+             * ExpiresAt() time.Time 未定义
+             */
+            /**
+             * 为定义该方法   定义实体类 IdentityIdentifier来实现  GetIdentifier() *IdentityIdentifier
+             */
+            public String GetMSPIdentifier();
 
-      public byte[] Sign(byte[] msg);
-      public Identity GetPublicVersion();
+            public void Validate();
+
+            /**
+             * 未实现该方法 GetOrganizationalUnits() []*OUIdentifier 之后实现OUIdentifier的实体
+             */
+            public void Verify(byte[] msg, byte[] sig);
+
+            public byte[] Serialize();
+
+            public void SatisfiesPrincipal(MspPrincipal principal);
+        }
+        public byte[] Sign(byte[] msg);
+
+        public Identity GetPublicVersion();
     }
 
-    public  interface MSPManager{
-      public  void Setup();
-      public Map<String,MSP> GetMSPs();
-      public interface MSP{
-            public  interface IdentityDeserializer{
-                public   Identity DeserializeIdentity(byte[] serializedIdentity);
-                public  void IsWellFormed(Identities.SerializedIdentity identity);
+    public interface MSPManager {
+        public interface IdentityDeserializer {
+            public Identity DeserializeIdentity(byte[] serializedIdentity);
+
+            public void IsWellFormed(Identities.SerializedIdentity identity);
+        }
+
+        public void Setup(MSP[] msps);
+
+        public Map<String, MSP> GetMSPs();
+
+        public interface MSP {
+            public interface IdentityDeserializer {
+                public Identity DeserializeIdentity(byte[] serializedIdentity);
+
+                public void IsWellFormed(Identities.SerializedIdentity identity);
             }
+
             public void Setup(MspConfigPackage.MSPConfig config);
+
             public int GetVersion();
-           /**
-            * const常量,之后需要确认
-            */
+
+            /**
+             * const常量,之后需要确认
+             */
             public int GetType();
+
             public String GetIdentifier();
+
             public SigningIdentity GetSigningIdentity(IdentityIdentifier identityIdentifier);
+
             public SigningIdentity GetDefaultSigningIdentity();
+
             public byte[][] GetTLSRootCerts();
+
             public byte[][] GetTLSIntermediateCerts();
+
             public void Validate(Identity id);
+
             public void SatisfiesPrincipal(Identity id, MspPrincipal.MSPPrincipal principal);
         }
 
