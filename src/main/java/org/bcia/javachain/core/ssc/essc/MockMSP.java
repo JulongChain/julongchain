@@ -1,5 +1,5 @@
 /**
- * Copyright DingXuan. All Rights Reserved.
+ * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.msp;
+package org.bcia.javachain.core.ssc.essc;
+
+import org.bcia.javachain.msp.ISigningIdentity;
 
 /**
- * @author zhangmingyang
- * @Date: 2018/3/8
+ * 类描述
+ *
+ * @author sunianle
+ * @date 3/8/18
  * @company Dingxuan
  */
-public interface ISigningIdentity extends IIdentity{
-     byte[] sign(byte[] msg);
-
-     IIdentity getPublicVersion();
+public class MockMSP {
+    public MockSigningIdentity getDefaultSigningIdentity() {
+        return new MockSigningIdentity();
+    }
 }

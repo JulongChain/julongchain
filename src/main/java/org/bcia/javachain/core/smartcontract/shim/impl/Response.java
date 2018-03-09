@@ -50,6 +50,8 @@ public class Response {
 
     public enum Status {
         SUCCESS(200),
+        // ERRORTHRESHOLD constant - status code greater than or equal to 400 will be considered an error and rejected by endorser.
+        ERRORTHRESHOLD(400),
         INTERNAL_SERVER_ERROR(500);
 
         private static final Map<Integer, Status> codeToStatus = new HashMap<>();

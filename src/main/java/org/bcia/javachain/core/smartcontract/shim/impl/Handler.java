@@ -406,7 +406,7 @@ public class Handler {
 		}
 	}
 
-	Response invokeChaincode(String channelId, String txId, String chaincodeName, List<byte[]> args) {
+	Response invokeSmartContract(String channelId, String txId, String chaincodeName, List<byte[]> args) {
 		try {
 			// create invocation specification of the chaincode to invoke
 			final Smartcontract.SmartContractSpec invocationSpec = Smartcontract.SmartContractSpec.newBuilder()
