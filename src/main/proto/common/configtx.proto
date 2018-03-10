@@ -28,7 +28,7 @@ enum ConfigType {
 //
 // It is generated with the following scheme:
 //   1. Retrieve the existing configuration
-//   2. Note the config properties (ConfigValue, ConfigPolicy, ConfigChild) to be modified
+//   2. Note the config properties (ConfigValue, IConfigPolicy, ConfigChild) to be modified
 //   3. Add any intermediate ConfigChilds to the ConfigUpdate.read_set (sparsely)
 //   4. Add any additional desired dependencies to ConfigUpdate.read_set (sparsely)
 //   5. Modify the config properties, incrementing each version by 1, set them in the ConfigUpdate.write_set
