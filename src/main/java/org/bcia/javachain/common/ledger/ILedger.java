@@ -15,12 +15,59 @@
  */
 package org.bcia.javachain.common.ledger;
 
+import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Ledger;
+
 /**
- * ledger接口
+ * Ledger captures the methods that are common across the 'PeerLedger', 'OrdererLedger', and 'ValidatedLedger'
  *
  * @author wanliangbing
  * @date 2018/3/2
  * @company Dingxuan
  */
 public interface ILedger {
+
+    /**
+     * returns basic info about blockchain
+     *
+     * @return
+     * @throws LedgerException
+     */
+    Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException;
+
+    /**
+     * returns block at a given height
+     * blockNumber of  math.MaxUint64 will return last block
+     *
+     * @param blockNumber
+     * @return
+     * @throws LedgerException
+     */
+    Common.Block getBlockByNumber(Long blockNumber) throws LedgerException;
+
+    /**
+     * returns an iterator that starts from `startBlockNumber`(inclusive).
+     * The iterator is a blocking iterator i.e., it blocks till the next block gets available in the ledger
+     * ResultsIterator contains type BlockHolder
+     *
+     * @param startBlockNumber
+     * @return
+     * @throws LedgerException
+     */
+    ResultsIterator getBlocksIterator(Long startBlockNumber) throws LedgerException;
+
+    /**
+     * closes the ledger
+     */
+    void close() throws LedgerException;
+
+    /**
+     * adds a new block
+     *
+     * @param block
+     * @throws LedgerException
+     */
+    void commit(Common.Block block) throws LedgerException;
+
 }
