@@ -245,7 +245,7 @@ public class SmartContractStub implements ISmartContractStub {
 		} else {
 			compositeName = chaincodeName;
 		}
-		return handler.invokeChaincode(this.groupId, this.txId, compositeName, args);
+		return handler.invokeSmartContract(this.groupId, this.txId, compositeName, args);
 	}
 
 	@Override

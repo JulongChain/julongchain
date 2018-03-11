@@ -13,33 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.localmsp.impl;
+package org.bcia.javachain.consenter.common.broadcast;
 
-import com.google.protobuf.ByteString;
-import org.bcia.javachain.common.localmsp.ILocalSigner;
+import org.bcia.javachain.consenter.consensus.IChain;
 import org.bcia.javachain.protos.common.Common;
-import java.io.UnsupportedEncodingException;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/6
+ * @Date: 2018/3/8
  * @company Dingxuan
  */
-public class LocalSigner implements ILocalSigner {
+@Repository
+public class BroadCastProcessor implements IChain {
     @Override
-    public Common.SignatureHeader newSignatureHeader() {
-        try {
-            return Common.SignatureHeader.newBuilder().setCreator(ByteString.copyFrom("zhouhui", "UTF-8")).build();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+    public void order(Common.Envelope env, long configSeq) {
+        System.out.println("this is order method");
     }
 
     @Override
-    public byte[] sign(byte[] message) {
-        String mes="testmessage";
-        return mes.getBytes();
+    public void configure(Common.Envelope config, long configSeq) {
+
+    }
+
+    @Override
+    public void start() {
+
+    }
+
+    @Override
+    public void halt() {
+
     }
 }

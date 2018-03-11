@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.node.common;
+package org.bcia.javachain.node.common.helper;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -22,12 +22,23 @@ import com.google.protobuf.Timestamp;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.common.groupconfig.CapabilitiesValue;
+import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
+import org.bcia.javachain.common.groupconfig.IConfigValue;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
-import org.bcia.javachain.common.localmsp.impl.LocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.policies.ImplicitMetaAnyPolicy;
+import org.bcia.javachain.common.policies.ImplicitMetaMajorityPolicy;
+import org.bcia.javachain.common.util.FileUtils;
+import org.bcia.javachain.consenter.Consenter;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
+import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 信封对象帮助类
@@ -47,6 +58,46 @@ public class EnvelopeHelper {
 
     }
 
+    public static Configtx.ConfigUpdate buildConfigUpdate(String groupId, Configtx.ConfigChild
+            consenterSystemChannelChild, Map<String, Object> genesisProfileMap) throws NodeException {
+//        if (genesisProfileMap.get(GenesisConfig.APPLICATION) == null) {
+//            throw new NodeException("No Application in config file");
+//        }
+//
+//        if (genesisProfileMap.get(GenesisConfig.CONSORTIUM) == null) {
+//            throw new NodeException("No Consortium in config file");
+//        }
+
+        return null;
+    }
+
+    /**
+     * 从文件中读取成一个Envelope对象
+     *
+     * @param filePath
+     * @return
+     * @throws NodeException
+     */
+    public static Common.Envelope readFromFile(String filePath) throws NodeException {
+        Common.Envelope envelope = null;
+        try {
+            byte[] bytes = FileUtils.readFileBytes(filePath);
+            envelope = Common.Envelope.parseFrom(bytes);
+            return envelope;
+        } catch (IOException e) {
+            throw new NodeException("Can not read Group File");
+        }
+    }
+
+    /**
+     * 对原始Envelope对象进行完整性检查，并生成带签名的Envelope对象
+     *
+     * @param envelope
+     * @param groupId
+     * @param signer
+     * @return
+     * @throws NodeException
+     */
     public static Common.Envelope sanityCheckAndSignConfigTx(Common.Envelope envelope, String groupId, ILocalSigner signer)
             throws NodeException {
         //检查Payload字段是否有误
@@ -100,8 +151,8 @@ public class EnvelopeHelper {
 
         Configtx.ConfigUpdateEnvelope signedConfigUpdateEnvelope = signConfigUpdateEnvelope(configUpdateEnvelope,
                 signer);
-        Common.Envelope signedEnvelope = buildSignedEnvelope(Common.HeaderType.CONFIG_UPDATE_VALUE, 0, groupId, signer,
-                signedConfigUpdateEnvelope, 0);
+        Common.Envelope signedEnvelope = buildSignedEnvelope(Common.HeaderType.CONFIG_UPDATE_VALUE, groupHeader.getVersion(),
+                groupId, signer, signedConfigUpdateEnvelope, groupHeader.getEpoch());
 
         return signedEnvelope;
     }

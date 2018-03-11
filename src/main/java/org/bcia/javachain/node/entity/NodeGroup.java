@@ -23,7 +23,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.FileUtils;
 import org.bcia.javachain.consenter.common.broadcast.BroadCastClient;
-import org.bcia.javachain.node.common.EnvelopeHelper;
+import org.bcia.javachain.node.common.helper.EnvelopeHelper;
 import org.bcia.javachain.node.common.client.BroadcastClient;
 import org.bcia.javachain.node.common.client.DeliverClient;
 import org.bcia.javachain.node.common.client.IBroadcastClient;
@@ -162,6 +162,8 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
 //                log.error(e.getMessage(), e);
 //            }
 
+        }else{
+            log.info("Wrong broadcast status: " + value.getStatusValue());
         }
     }
 

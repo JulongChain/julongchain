@@ -292,10 +292,10 @@ public class SmartContractStubTest {
         final String txId = "txId", chaincodeName = "CHAINCODE_ID", channel = "CHAINCODE_CHANNEL";
         final SmartContractStub stub = new SmartContractStub(channel, txId, handler, Collections.emptyList(), null);
         final Response expectedResponse = new Response(Response.Status.SUCCESS, "MESSAGE", "PAYLOAD".getBytes(UTF_8));
-        when(handler.invokeChaincode(channel, txId, chaincodeName, Collections.emptyList())).thenReturn(expectedResponse);
+        when(handler.invokeSmartContract(channel, txId, chaincodeName, Collections.emptyList())).thenReturn(expectedResponse);
         assertThat(stub.invokeSmartContract(chaincodeName, Collections.emptyList()), is(expectedResponse));
 
-        when(handler.invokeChaincode(eq(channel), eq(txId), eq(chaincodeName + "/" + channel), anyList())).thenReturn(expectedResponse);
+        when(handler.invokeSmartContract(eq(channel), eq(txId), eq(chaincodeName + "/" + channel), anyList())).thenReturn(expectedResponse);
         assertThat(stub.invokeSmartContract(chaincodeName, Collections.emptyList(), channel), is(expectedResponse));
     }
 

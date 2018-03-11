@@ -15,36 +15,30 @@
  */
 package org.bcia.javachain.msp;
 
-import org.bcia.javachain.msp.entity.IdentityIdentifier;
+import org.bcia.javachain.msp.entity.OUIdentifier;
 import org.bcia.javachain.protos.common.MspPrincipal;
-import org.bcia.javachain.protos.msp.MspConfigPackage;
 
 /**
  * @author zhangmingyang
  * @Date: 2018/3/8
  * @company Dingxuan
  */
-public interface IMsp extends IIdentityDeserializer{
-    public void setup(MspConfigPackage.MSPConfig config);
-
-    public int getVersion();
-
+public interface IIdentity {
     /**
-     * const常量,之后需要确认
+     * ExpiresAt() time.Time 未定义
      */
-     int getType();
+    /**
+     * 为定义该方法   定义实体类 IdentityIdentifier来实现  GetIdentifier() *IdentityIdentifier
+     */
+     String getMSPIdentifier();
 
-     String getIdentifier();
+     void validate();
 
-     ISigningIdentity getSigningIdentity(IdentityIdentifier identityIdentifier);
+     OUIdentifier[] getOrganizationalUnits();
 
-     ISigningIdentity getDefaultSigningIdentity();
+     void verify(byte[] msg, byte[] sig);
 
-     byte[][] getTLSRootCerts();
+     byte[] serialize();
 
-     byte[][] getTLSIntermediateCerts();
-
-     void validate(IIdentity id);
-
-     void satisfiesPrincipal(IIdentity id, MspPrincipal.MSPPrincipal principal);
+     void satisfiesPrincipal(MspPrincipal principal);
 }

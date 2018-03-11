@@ -13,33 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.localmsp.impl;
+package org.bcia.javachain.consenter.common.broadcast;
 
-import com.google.protobuf.ByteString;
-import org.bcia.javachain.common.localmsp.ILocalSigner;
+import io.grpc.stub.StreamObserver;
 import org.bcia.javachain.protos.common.Common;
-import java.io.UnsupportedEncodingException;
+import org.bcia.javachain.protos.consenter.Ab;
+import org.springframework.stereotype.Component;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/6
+ * @Date: 2018/3/8
  * @company Dingxuan
  */
-public class LocalSigner implements ILocalSigner {
-    @Override
-    public Common.SignatureHeader newSignatureHeader() {
-        try {
-            return Common.SignatureHeader.newBuilder().setCreator(ByteString.copyFrom("zhouhui", "UTF-8")).build();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    @Override
-    public byte[] sign(byte[] message) {
-        String mes="testmessage";
-        return mes.getBytes();
+@Component
+public class BroadCastHandler  {
+   BroadCastProcessor processor=new BroadCastProcessor();
+    public void handle(Common.Envelope envelope,StreamObserver<Ab.BroadcastResponse> responseObserver){
+        processor.order(envelope,99);
+        System.out.println("i'm broadhandle");
+       responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatusValue(700).build());
     }
 }

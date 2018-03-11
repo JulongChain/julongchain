@@ -1,4 +1,4 @@
-package org.bcia.javachain.node.common;
+package org.bcia.javachain.node.common.helper;
 
 import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
