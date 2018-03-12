@@ -16,6 +16,8 @@
 
 package org.bcia.javachain.core.ledger.leveldb;
 
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.iq80.leveldb.*;
 import org.iq80.leveldb.impl.Iq80DBFactory;
 
@@ -35,6 +37,8 @@ import java.util.Set;
  */
 public class LevelDBFactory {
 
+    private static JavaChainLog log = JavaChainLogFactory.getLog(LevelDBFactory.class);
+
     private static LevelDBFactory instance = new LevelDBFactory();
 
     private static String path = "/home/wanliangbing/leveldb";
@@ -52,7 +56,7 @@ public class LevelDBFactory {
             try {
                 dbFactory.destroy(new File(path), null);
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e.getMessage(), e);
             }
         }
     }
@@ -88,7 +92,7 @@ public class LevelDBFactory {
         try {
             db.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -100,7 +104,7 @@ public class LevelDBFactory {
         try {
             writeBatch.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 
