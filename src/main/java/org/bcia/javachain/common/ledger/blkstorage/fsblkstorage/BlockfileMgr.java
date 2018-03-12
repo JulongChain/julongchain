@@ -128,7 +128,10 @@ public class BlockfileMgr {
         return null;
     }
 
-    //Get the current checkpoint information that is stored in the database
+    /** Get the current checkpoint information that is stored in the database
+     *
+     * @return
+     */
     CheckpointInfo loadCurrentInfo() {
         return null;
     }
@@ -137,8 +140,9 @@ public class BlockfileMgr {
         return;
     }
 
-    // scanForLastCompleteBlock scan a given block file and detects the last offset in the file
-    // after which there may lie a block partially written (towards the end of the file in a crash scenario).
+    /** scanForLastCompleteBlock scan a given block file and detects the last offset in the file
+     * after which there may lie a block partially written (towards the end of the file in a crash scenario).
+     */
     void scanForLastCompleteBlock(String rootDir, Integer fileNum, Long startingOffset) {
         return;
     }
