@@ -31,9 +31,15 @@ public class ESSCTest extends BaseJunit4Test {
 
     @Test
     public void invoke() {
+
     }
 
     @Test
     public void getSmartContractStrDescription() {
+        String description=essc.getSmartContractStrDescription();
+        String expectedResult="与背书相关的系统智能合约";
+        assertThat(description,is(expectedResult));
     }
+
+
 }
