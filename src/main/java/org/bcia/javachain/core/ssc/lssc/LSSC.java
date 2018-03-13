@@ -22,14 +22,20 @@ import org.bcia.javachain.core.common.smartcontractprovider.ISmartContractProvid
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractCode;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractData;
 import org.bcia.javachain.core.common.sysscprovider.ISystemSmartContractProvider;
+import org.bcia.javachain.core.common.sysscprovider.SystemSmartContractFactory;
+import org.bcia.javachain.core.common.sysscprovider.SystemSmartContractProvider;
 import org.bcia.javachain.core.policy.IPolicyChecker;
+import org.bcia.javachain.core.policy.PolicyFactory;
 import org.bcia.javachain.core.smartcontract.shim.impl.Response;
 import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
+import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * 用于智能合约生命周期管理的系统智能合约　Lifecycle System Smart Contract,LSSC
@@ -52,6 +58,8 @@ public class LSSC  extends SystemSmartContractBase {
     public final static String DEPLOY="deploy";
     //UPGRADE upgrade chaincode
     public final static String UPGRADE = "upgrade";
+    //GETSCINFO get chaincode
+    public final static String GETSCINFO = "getid";
     //GETCCINFO get chaincode
     public final static String GETDEPSPEC = "getdepspec";
     //GETSCDATA get SmartcontractData
@@ -59,7 +67,7 @@ public class LSSC  extends SystemSmartContractBase {
     //GETSMARTCONTRACTS gets the instantiated smartcontracts on a group
     public final static String GETSMARTCONTRACTS = "getsmartcontracts";
     //GETINSTALLEDMARTCONTRACTS gets the installed smartcontracts on a node
-    public final static String GETINSTALLEDMARTCONTRACTS = "getinstalledsmartcontracts";
+    public final static String GETINSTALLEDSMARTCONTRACTS = "getinstalledsmartcontracts";
 
     public final static String allowedCharsSmartContractName = "[A-Za-z0-9_-]+";
     public final static String allowedCharsVersion       = "[A-Za-z0-9_.+-]+";
@@ -72,11 +80,47 @@ public class LSSC  extends SystemSmartContractBase {
     private IPolicyChecker checker;
     @Override
     public Response init(ISmartContractStub stub) {
-        return null;
+        this.sscProvider=SystemSmartContractFactory.getSystemSmartContractProvider();
+        this.checker= PolicyFactory.getPolicyChecker();
+        log.info("Successfully initialized LSSC");
+        return newSuccessResponse();
     }
 
     @Override
     public Response invoke(ISmartContractStub stub) {
+        log.debug("Enter LSCC invoke function");
+        List<String> args = stub.getStringArgs();
+        int size=args.size();
+        if(size<1){
+            return newErrorResponse(String.format("Incorrect number of arguments (provided %d)",args.size()));
+        }
+        String function=args.get(0);
+        //Handle ACL:
+        //1. get the signed proposal
+        ProposalPackage.SignedProposal sp = stub.getSignedProposal();
+
+        switch(function){
+            case INSTALL:
+                ;
+            case DEPLOY:
+                ;
+            case UPGRADE:
+                ;
+            case GETSCINFO:
+                ;
+            case GETDEPSPEC:
+                ;
+            case GETSCDATA:
+                ;
+            case GETSMARTCONTRACTS:
+                ;
+            case GETINSTALLEDSMARTCONTRACTS:
+                ;
+            default:
+                ;
+        }
+
+        log.debug("LSCC exits successfully");
         return null;
     }
 
