@@ -16,6 +16,8 @@
 package org.bcia.javachain.consenter.common.broadcast;
 
 import io.grpc.stub.StreamObserver;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.consenter.Ab;
 import org.springframework.stereotype.Component;
@@ -26,11 +28,19 @@ import org.springframework.stereotype.Component;
  * @company Dingxuan
  */
 @Component
-public class BroadCastHandler  {
+public class BroadCastHandler {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(BroadCastHandler.class);
    BroadCastProcessor processor=new BroadCastProcessor();
+   Main main=new Main();
     public void handle(Common.Envelope envelope,StreamObserver<Ab.BroadcastResponse> responseObserver){
-        processor.order(envelope,99);
-        System.out.println("i'm broadhandle");
-       responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatusValue(700).build());
+      //解析处理消息,获取消息head,是否为配置消息,
+
+        long configSeq= processor.processNormalMsg(envelope);
+        //排序并生成区块写入账本
+        processor.order(envelope,configSeq);
+        //main.sendMess(envelope);
+        log.info("i'm broadhandle");
+        //根据不同的消息处理结果,返回给客户端或sdk对应的状态值
+       responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatusValue(200).build());
     }
 }

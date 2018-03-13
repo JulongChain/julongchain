@@ -13,18 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.consensus;
+package org.bcia.javachain.consenter.common.deliver;
 
-import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.consenter.Configuration;
-import org.springframework.core.annotation.Order;
-import java.util.Map;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/1 *
+ * @Date: 2018/3/12
  * @company Dingxuan
  */
-public interface IConsensue {
-     IChain handleChain(IConsenterSupport consenterSupport, Common.Metadata metadata) throws IllegalAccessException, InstantiationException;
+public class DeliverHandler {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(DeliverHandler.class);
+   public void handle(){
+      log.info("this is deliver handler");
+    }
+    public void  deliverBlocks(){
+       log.info("this is deliverBlocks");
+    }
 }

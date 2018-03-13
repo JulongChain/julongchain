@@ -18,7 +18,10 @@ package org.bcia.javachain.consenter.common.server;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.consenter.common.broadcast.BroadCastHandler;
+import org.bcia.javachain.consenter.common.deliver.DeliverHandler;
 import org.bcia.javachain.protos.common.Common;
 
 import org.bcia.javachain.protos.consenter.Ab;
@@ -37,22 +40,22 @@ import java.io.IOException;
 public class ConsenterServer {
     private int port = 7050;
     private Server server;
-
+    private static JavaChainLog log = JavaChainLogFactory.getLog(ConsenterServer.class);
     public void start() throws IOException {
         server = ServerBuilder.forPort(port)
                 .addService(new ConsenterServerImpl())
                 .build()
                 .start();
-        System.out.println("consenter service start...");
+        log.info("consenter service start...");
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
             @Override
             public void run() {
 
-                System.err.println("*** shutting down gRPC server since JVM is shutting down");
+               log.info("*** shutting down gRPC server since JVM is shutting down");
                 ConsenterServer.this.stop();
-                System.err.println("***consenter server shut down");
+                log.error("***consenter server shut down");
             }
         });
     }
@@ -88,10 +91,12 @@ public class ConsenterServer {
         @Override
         public StreamObserver<Common.Envelope> deliver(StreamObserver<Ab.DeliverResponse> responseObserver) {
             return new StreamObserver<Common.Envelope>() {
+                DeliverHandler deliverHandler=new DeliverHandler();
                 @Override
                 public void onNext(Common.Envelope envelope) {
-                    System.out.println("envelope:"+envelope.getPayload());
-
+                  //  System.out.println("envelope:"+envelope.getPayload());
+                    log.info("envelop:"+envelope.getPayload().toStringUtf8());
+                    deliverHandler.handle();
                     responseObserver.onNext(Ab.DeliverResponse.newBuilder().setStatusValue(500).build());
                     //封装处理消息的方法
                 }
@@ -114,7 +119,7 @@ public class ConsenterServer {
                  BroadCastHandler broadCastHandle=new BroadCastHandler();
                 @Override
                 public void onNext(Common.Envelope envelope) {
-                    System.out.println("envelope:"+envelope.getPayload());
+                    System.out.println("envelope:"+envelope.getPayload().toStringUtf8());
 
 
                     broadCastHandle.handle(envelope,responseObserver);
