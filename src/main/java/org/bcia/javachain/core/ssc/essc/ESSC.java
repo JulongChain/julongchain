@@ -64,6 +64,7 @@ public class ESSC  extends SystemSmartContractBase {
      */
     @Override
     public Response invoke(ISmartContractStub stub) {
+        log.debug("Enter ESCC invoke function");
         List<String> args = stub.getStringArgs();
         int size=args.size();
         if(size<6){
