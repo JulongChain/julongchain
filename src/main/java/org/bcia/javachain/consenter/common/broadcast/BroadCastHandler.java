@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 public class BroadCastHandler {
     private static JavaChainLog log = JavaChainLogFactory.getLog(BroadCastHandler.class);
    BroadCastProcessor processor=new BroadCastProcessor();
-   //Main main=new Main();
+  // Main main=new Main();
     public void handle(Common.Envelope envelope,StreamObserver<Ab.BroadcastResponse> responseObserver){
       //解析处理消息,获取消息head,是否为配置消息,
 
