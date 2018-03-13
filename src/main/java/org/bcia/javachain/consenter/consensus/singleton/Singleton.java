@@ -13,26 +13,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.consensus.solo;
+package org.bcia.javachain.consenter.consensus.singleton;
 
 import org.bcia.javachain.consenter.consensus.IChain;
 import org.bcia.javachain.consenter.consensus.IConsensue;
 import org.bcia.javachain.consenter.consensus.IConsenterSupport;
 import org.bcia.javachain.protos.common.Common;
 
-import java.util.Map;
-
 /**
  * @author zhangmingyang
  * @Date: 2018/3/7
  * @company Dingxuan
  */
-public class Solo implements IConsensue {
-
+public class Singleton implements  IChain{
     @Override
-    public IChain handleChain(IConsenterSupport consenterSupport, Common.Metadata metadata) throws IllegalAccessException, InstantiationException {
-        return IChain.class.newInstance();
+    public void order(Common.Envelope env, long configSeq) {
+
     }
 
+    @Override
+    public void configure(Common.Envelope config, long configSeq) {
 
+    }
+
+    @Override
+    public void start() {
+
+    }
+
+    @Override
+    public void halt() {
+
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+        for (;;){
+            //获取configMsg,判断是否为配置消息
+
+
+        }
+    }
 }

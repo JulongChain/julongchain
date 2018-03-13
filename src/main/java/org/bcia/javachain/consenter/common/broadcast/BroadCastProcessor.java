@@ -15,6 +15,9 @@
  */
 package org.bcia.javachain.consenter.common.broadcast;
 
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.consenter.Consenter;
 import org.bcia.javachain.consenter.consensus.IChain;
 import org.bcia.javachain.protos.common.Common;
 import org.springframework.stereotype.Component;
@@ -22,29 +25,42 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 /**
+ * broadcast服务对消息的处理
  * @author zhangmingyang
  * @Date: 2018/3/8
  * @company Dingxuan
  */
-@Repository
-public class BroadCastProcessor implements IChain {
+@Component
+public class BroadCastProcessor implements IBroadcastChannelSupport{
+    private static JavaChainLog log = JavaChainLogFactory.getLog(BroadCastProcessor.class);
     @Override
-    public void order(Common.Envelope env, long configSeq) {
-        System.out.println("this is order method");
-    }
-
-    @Override
-    public void configure(Common.Envelope config, long configSeq) {
+    public void order(Common.Envelope envelope, long configSeq) {
 
     }
 
     @Override
-    public void start() {
+    public void confgigure(Common.Envelope envelope, long configSeq) {
 
     }
 
     @Override
-    public void halt() {
+    public int classfiyMsg(Common.GroupHeader chdr) {
+        return 0;
+    }
 
+    @Override
+    public long processNormalMsg(Common.Envelope env) {
+       log.info("处理普通消息，并返回long类型的配置序列");
+        return 0;
+    }
+
+    @Override
+    public Object processConfigUpdateMsg(Common.Envelope env) {
+        return null;
+    }
+
+    @Override
+    public Object processConfigMsg(Common.Envelope env) {
+        return null;
     }
 }
