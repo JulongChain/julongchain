@@ -18,12 +18,10 @@ package org.bcia.javachain.core.ssc.lssc;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.common.smartcontractprovider.ISmartContractPackage;
-import org.bcia.javachain.core.common.smartcontractprovider.ISmartContractProvider;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractCode;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractData;
 import org.bcia.javachain.core.common.sysscprovider.ISystemSmartContractProvider;
 import org.bcia.javachain.core.common.sysscprovider.SystemSmartContractFactory;
-import org.bcia.javachain.core.common.sysscprovider.SystemSmartContractProvider;
 import org.bcia.javachain.core.policy.IPolicyChecker;
 import org.bcia.javachain.core.policy.PolicyFactory;
 import org.bcia.javachain.core.smartcontract.shim.impl.Response;
@@ -41,10 +39,10 @@ import java.util.List;
  * 用于智能合约生命周期管理的系统智能合约　Lifecycle System Smart Contract,LSSC
  *　The life cycle system smartcontract manages smartcontracts deployed
  *  on this peer. It manages smartcontracts via Invoke proposals.
- *    "Args":["deploy",<ChaincodeDeploymentSpec>]
- *    "Args":["upgrade",<ChaincodeDeploymentSpec>]
- *    "Args":["stop",<ChaincodeInvocationSpec>]
- *    "Args":["start",<ChaincodeInvocationSpec>]
+ *    "Args":["deploy",<SmartcontractDeploymentSpec>]
+ *    "Args":["upgrade",<SmartcontractDeploymentSpec>]
+ *    "Args":["stop",<SmartcontractInvocationSpec>]
+ *    "Args":["start",<SmartcontractInvocationSpec>]
  * @author sunianle
  * @date 3/5/18
  * @company Dingxuan
@@ -56,18 +54,18 @@ public class LSSC  extends SystemSmartContractBase {
     public final static String INSTALL="install";
     //DEPLOY deploy command
     public final static String DEPLOY="deploy";
-    //UPGRADE upgrade chaincode
+    //UPGRADE upgrade smartcontract
     public final static String UPGRADE = "upgrade";
-    //GETSCINFO get chaincode
-    public final static String GETSCINFO = "getid";
-    //GETCCINFO get chaincode
-    public final static String GETDEPSPEC = "getdepspec";
-    //GETSCDATA get SmartcontractData
-    public final static String GETSCDATA = "getscdata";
-    //GETSMARTCONTRACTS gets the instantiated smartcontracts on a group
-    public final static String GETSMARTCONTRACTS = "getsmartcontracts";
+    //GET_SC_INFO get smartcontract
+    public final static String GET_SC_INFO = "getid";
+    //GETCCINFO get smartcontract
+    public final static String GET_DEP_SPEC = "getdepspec";
+    //GET_SC_DATA get SmartcontractData
+    public final static String GET_SC_DATA = "getscdata";
+    //GET_SMART_CONTRACTS gets the instantiated smartcontracts on a group
+    public final static String GET_SMART_CONTRACTS = "getsmartcontracts";
     //GETINSTALLEDMARTCONTRACTS gets the installed smartcontracts on a node
-    public final static String GETINSTALLEDSMARTCONTRACTS = "getinstalledsmartcontracts";
+    public final static String GET_INSTALLED_SMARTCONTRACTS = "getinstalledsmartcontracts";
 
     public final static String allowedCharsSmartContractName = "[A-Za-z0-9_-]+";
     public final static String allowedCharsVersion       = "[A-Za-z0-9_.+-]+";
@@ -92,7 +90,7 @@ public class LSSC  extends SystemSmartContractBase {
         List<String> args = stub.getStringArgs();
         int size=args.size();
         if(size<1){
-            return newErrorResponse(String.format("Incorrect number of arguments (provided %d)",args.size()));
+            return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
         }
         String function=args.get(0);
         //Handle ACL:
@@ -106,15 +104,15 @@ public class LSSC  extends SystemSmartContractBase {
                 ;
             case UPGRADE:
                 ;
-            case GETSCINFO:
+            case GET_SC_INFO:
                 ;
-            case GETDEPSPEC:
+            case GET_DEP_SPEC:
                 ;
-            case GETSCDATA:
+            case GET_SC_DATA:
                 ;
-            case GETSMARTCONTRACTS:
+            case GET_SMART_CONTRACTS:
                 ;
-            case GETINSTALLEDSMARTCONTRACTS:
+            case GET_INSTALLED_SMARTCONTRACTS:
                 ;
             default:
                 ;
@@ -129,20 +127,20 @@ public class LSSC  extends SystemSmartContractBase {
         return "与生命周期管理相关的系统智能合约";
     }
 
-    //create the chaincode on the given chain
+    //create the smartcontract on the given chain
     private void putSmartContractData(ISmartContractStub stub,
                                       SmartContractData data){
 
     }
 
-    // putChaincodeCollectionData adds collection data for the chaincode
+    // putSmartcontractCollectionData adds collection data for the smartcontract
     private void putSmartContractCollectionData(ISmartContractStub stub,
                                                 SmartContractData data,
                                                 byte[] collectionConfigBytes){
 
     }
 
-    //checks for existence of chaincode on the given channel
+    //checks for existence of smartcontract on the given channel
     private byte[] getSmartContractInstance(ISmartContractStub stub,
                                           String contractName){
         return null;
@@ -153,12 +151,12 @@ public class LSSC  extends SystemSmartContractBase {
         return null;
     }
 
-    //checks for existence of chaincode on the given chain
+    //checks for existence of smartcontract on the given chain
     private SmartContractCode getSmartContractCode(String name, byte[] scdBytes){
         return null;
     }
 
-    // getChaincodes returns all chaincodes instantiated on this LSSC's group
+    // getSmartcontracts returns all smartcontracts instantiated on this LSSC's group
     private ProposalResponsePackage.Response getSmartContracts(ISmartContractStub stub){
         return null;
     }
@@ -172,13 +170,13 @@ public class LSSC  extends SystemSmartContractBase {
         return true;
     }
 
-    // isValidChaincodeName checks the validity of chaincode name. Chaincode names
+    // isValidSmartcontractName checks the validity of smartcontract name. Smartcontract names
     // should never be blank and should only consist of alphanumerics, '_', and '-'
     private boolean isValidSmartContractName(String contractName){
         return true;
     }
 
-    // isValidChaincodeVersion checks the validity of chaincode version. Versions
+    // isValidSmartcontractVersion checks the validity of smartcontract version. Versions
     // should never be blank and should only consist of alphanumerics, '_',  '-',
     // '+', and '.'
     private boolean isValidSmartContractVersion(String contractName,String version){

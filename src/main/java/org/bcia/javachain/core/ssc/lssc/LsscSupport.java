@@ -30,23 +30,23 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class LsscSupport {
-    // PutChaincodeToLocalStorage stores the supplied chaincode
+    // PutSmartcontractToLocalStorage stores the supplied smartcontract
     // package to local storage (i.e. the file system)
     public void putSmartContractToLocalStorage(ISmartContractPackage scPackage){
 
     }
-    // GetChaincodeFromLocalStorage retrieves the chaincode package
-    // for the requested chaincode, specified by name and version
+    // GetSmartcontractFromLocalStorage retrieves the smartcontract package
+    // for the requested smartcontract, specified by name and version
     public ISmartContractPackage getSmartContractFromLocalStorage(String smartcontractName,String version){
         return null;
     }
-    // GetChaincodesFromLocalStorage returns an array of all chaincode
+    // GetSmartcontractsFromLocalStorage returns an array of all smartcontract
     // data that have previously been persisted to local storage
     public Query.SmartContractQueryResponse getSmartContractsFromLocalStorage(){
         return null;
     }
     // GetInstantiationPolicy returns the instantiation policy for the
-    // supplied chaincode (or the channel's default if none was specified)
+    // supplied smartcontract (or the channel's default if none was specified)
     byte[] getInstantiationPolicy(String group,ISmartContractPackage scPackage){
         return null;
     }
