@@ -19,7 +19,7 @@ import org.bcia.javachain.common.config.IConfig;
 import org.bcia.javachain.common.config.IConfigManager;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.peer.ConfigFactory;
+import org.bcia.javachain.core.node.ConfigFactory;
 import org.bcia.javachain.core.policy.IPolicyChecker;
 import org.bcia.javachain.core.policy.PolicyFactory;
 import org.bcia.javachain.core.smartcontract.shim.impl.Response;

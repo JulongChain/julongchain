@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.policy;
+package org.bcia.javachain.core.node;
+
+import org.bcia.javachain.common.config.ConfigManager;
+import org.bcia.javachain.common.config.IConfigManager;
 
 /**
  * 类描述
@@ -22,6 +25,12 @@ package org.bcia.javachain.core.policy;
  * @date 3/13/18
  * @company Dingxuan
  */
-public interface IPolicyChecker {
-
+public class ConfigFactory {
+    private static IConfigManager configManager;
+    public  static synchronized IConfigManager getConfigManager(){
+        if(configManager==null){
+            configManager=new ConfigManager();
+        }
+        return configManager;
+    }
 }
