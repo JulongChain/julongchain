@@ -13,15 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.policy;
+package org.bcia.javachain.core.aclmgmt;
 
 /**
  * 类描述
  *
  * @author sunianle
- * @date 3/13/18
+ * @date 3/14/18
  * @company Dingxuan
  */
-public interface IPolicyChecker {
-
+public class AclManagement {
+    private static IAclProvider provider;
+    public static synchronized IAclProvider getACLProvider(){
+        if(provider==null){
+            provider=new AclProvider();
+        }
+        return provider;
+    }
 }
