@@ -164,6 +164,11 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
         return null;
     }
 
+    @Override
+    public boolean isSysSmartContractAndNotInvokableExternal(String smartContractID) {
+        return false;
+    }
+
 
     //编译智能合约，形成智能合约部署规范(DeploymentSpec);
     private Smartcontract.SmartContractDeploymentSpec buildSysSmartContract(Smartcontract.SmartContractSpec spec)
