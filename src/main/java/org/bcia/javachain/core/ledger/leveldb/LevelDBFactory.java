@@ -41,7 +41,7 @@ public class LevelDBFactory {
 
     private static LevelDBFactory instance = new LevelDBFactory();
 
-    private static String path = "/home/wanliangbing/leveldb";
+    private static String path = "D:\\test\\leveldb";
 
     private DBFactory dbFactory = Iq80DBFactory.factory;
     private Boolean cleanup = Boolean.FALSE;
@@ -76,7 +76,7 @@ public class LevelDBFactory {
 
     /**
      * 获取指定路径的 level db
-     * @param level db 安装路径
+     * @param
      * @return
      * @throws IOException
      */
