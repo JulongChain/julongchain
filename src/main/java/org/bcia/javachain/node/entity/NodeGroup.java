@@ -176,4 +176,21 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
     public void onCompleted() {
 
     }
+
+    /**
+     *  更新群组配置 V0.25
+     */
+    public NodeGroup updateGroup(String ip, int port, String groupId) {
+        NodeGroup group = new NodeGroup();
+
+        BroadCastClient broadCastClient = new BroadCastClient();
+        try {
+            //broadCastClient.send(ip, port, groupId, this);
+            broadCastClient.send(ip, port, Common.Envelope.newBuilder().build(), this);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
+
+        return group;
+    }
 }
