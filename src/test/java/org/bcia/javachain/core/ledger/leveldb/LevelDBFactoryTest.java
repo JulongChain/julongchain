@@ -63,6 +63,7 @@ public class LevelDBFactoryTest {
 
     @Test
     public void get() throws IOException {
+//        log.info(new String(LevelDBFactory.get("key-001".getBytes(Charset.forName("utf-8")))));
         String key = UUID.randomUUID().toString();
         log.info("key:" + key);
         String value = UUID.randomUUID().toString();
