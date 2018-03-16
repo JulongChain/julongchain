@@ -13,30 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.msp;
+package org.bcia.javachain.consenter.entity;
 
-import org.bcia.javachain.msp.entity.IdentityIdentifier;
-import org.bcia.javachain.protos.common.MspPrincipal;
-import org.bcia.javachain.protos.msp.Identities;
-import org.bcia.javachain.protos.msp.MspConfigPackage;
+import org.bcia.javachain.protos.common.Common;
 
-import java.util.Map;
+import java.io.Serializable;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/6
+ * @Date: 2018/3/15
  * @company Dingxuan
  */
-public interface IMspManager extends IIdentityDeserializer {
-    /**
-     * 根据配置信息设置MSP管理器实例
-     * @param msps
-     */
-     void setup(IMsp[] msps);
+public class ConfigMsg implements Serializable{
+    private Common.Envelope config;
+    private long configSeq;
 
-    /**
-     * 提供会员服务提供商的列表
-     * @return
-     */
-     Map<String, IMsp> getMSPs();
+    public Common.Envelope getConfig() {
+        return config;
+    }
+
+    public void setConfig(Common.Envelope config) {
+        this.config = config;
+    }
+
+    public long getConfigSeq() {
+        return configSeq;
+    }
+
+    public void setConfigSeq(long configSeq) {
+        this.configSeq = configSeq;
+    }
 }

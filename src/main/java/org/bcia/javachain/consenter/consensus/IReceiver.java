@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.consenter.consensus;
 
+import org.bcia.javachain.consenter.entity.BatchesMes;
 import org.bcia.javachain.protos.common.Common;
 
 /**
@@ -23,7 +24,8 @@ import org.bcia.javachain.protos.common.Common;
  * @company Dingxuan
  */
 public interface IReceiver {
-    void ordered(Common.Envelope[][] messagesBcatches, boolean pending);
 
-    Common.Envelope[] ut();
+    BatchesMes ordered(Common.Envelope msg);
+
+    Common.Envelope[] cut();
 }

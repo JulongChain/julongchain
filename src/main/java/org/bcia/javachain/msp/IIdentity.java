@@ -30,15 +30,36 @@ public interface IIdentity {
     /**
      * 为定义该方法   定义实体类 IdentityIdentifier来实现  GetIdentifier() *IdentityIdentifier
      */
+
+    /**
+     * 返回此实例的msp id
+     * @return
+     */
      String getMSPIdentifier();
 
      void validate();
 
      OUIdentifier[] getOrganizationalUnits();
 
+    /**
+     * 使用此标识作为参考验证某个消息的签名
+     * @param msg
+     * @param sig
+     */
      void verify(byte[] msg, byte[] sig);
 
+    /**
+     * 将身份转换为字节
+     * @return
+     */
      byte[] serialize();
 
+    /**
+     * SatisfiesPrincipal检查此实例是否匹配
+     在MSPPrincipal中提供的描述。 检查可能
+     涉及逐字节的比较（如果委托人是
+     序列化身份）或可能需要MSP验证
+     * @param principal
+     */
      void satisfiesPrincipal(MspPrincipal principal);
 }

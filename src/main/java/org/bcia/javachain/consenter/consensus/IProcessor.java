@@ -23,8 +23,18 @@ import org.bcia.javachain.protos.common.Common;
  * @company Dingxuan
  */
 public interface IProcessor {
-     int classfiyMsg(Common.GroupHeader chdr);
+    /**
+     * 判断是否为配置消息,如果是配置消息返回true;否则返回false
+     * @param chdr
+     * @return
+     */
+    boolean classfiyMsg(Common.GroupHeader chdr);
 
+    /**
+     * 根据当前配置检查消息的有效性,fa
+     * @param env
+     * @return
+     */
      long processNormalMsg(Common.Envelope env);
 
     /**
