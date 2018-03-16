@@ -13,30 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.msp;
+package org.bcia.javachain.consenter.entity;
 
-import org.bcia.javachain.msp.entity.IdentityIdentifier;
-import org.bcia.javachain.protos.common.MspPrincipal;
-import org.bcia.javachain.protos.msp.Identities;
-import org.bcia.javachain.protos.msp.MspConfigPackage;
-
-import java.util.Map;
+import org.bcia.javachain.protos.common.Common;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/6
+ * @Date: 2018/3/15
  * @company Dingxuan
  */
-public interface IMspManager extends IIdentityDeserializer {
-    /**
-     * 根据配置信息设置MSP管理器实例
-     * @param msps
-     */
-     void setup(IMsp[] msps);
+public class BatchesMes {
+    private Common.Envelope[][] messageBatches;
+    private boolean pending;
 
-    /**
-     * 提供会员服务提供商的列表
-     * @return
-     */
-     Map<String, IMsp> getMSPs();
+    public Common.Envelope[][] getMessageBatches() {
+        return messageBatches;
+    }
+
+    public void setMessageBatches(Common.Envelope[][] messageBatches) {
+        this.messageBatches = messageBatches;
+    }
+
+    public boolean isPending() {
+        return pending;
+    }
+
+    public void setPending(boolean pending) {
+        this.pending = pending;
+    }
 }

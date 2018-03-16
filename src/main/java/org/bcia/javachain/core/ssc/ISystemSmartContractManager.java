@@ -42,4 +42,8 @@ public interface ISystemSmartContractManager {
     boolean isWhitelisted(ISystemSmartContract contract);
     //获取系统智能合约
     ISystemSmartContract getSystemSmartContract(String smartContractID);
+    // isSysSmartContractAndNotInvokableExternal returns true if the chaincode
+    // is a system chaincode and *CANNOT* be invoked through
+    // a proposal to this peer
+    boolean isSysSmartContractAndNotInvokableExternal(String smartContractID);
 }

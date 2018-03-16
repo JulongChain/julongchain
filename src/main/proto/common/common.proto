@@ -34,6 +34,7 @@ enum Status {
     NOT_FOUND = 404;
     REQUEST_ENTITY_TOO_LARGE = 413;
     INTERNAL_SERVER_ERROR = 500;
+    NOT_IMPLEMENTED = 501;
     SERVICE_UNAVAILABLE = 503;
 }
 
@@ -45,6 +46,7 @@ enum HeaderType {
     CONSENTER_TRANSACTION = 4;     // Used internally by the consenter for management
     DELIVER_SEEK_INFO = 5;         // Used as the type for Envelope messages submitted to instruct the Deliver API to seek
     SMART_CONTRACT_PACKAGE = 6;    // Used for packaging smart contract artifacts for install
+    NODE_RESOURCE_UPDATE = 7;      // Used for encoding updates to the node resource configuration
 }
 
 // This enum enlists indexes of the block metadata array
@@ -110,6 +112,10 @@ message GroupHeader {
 
     // Extension that may be attached based on the header type
     bytes extension = 7;
+
+    // If mutual TLS is employed, this represents
+    // the hash of the client's TLS certificate
+    bytes tls_cert_hash = 8;
 }
 
 message SignatureHeader {

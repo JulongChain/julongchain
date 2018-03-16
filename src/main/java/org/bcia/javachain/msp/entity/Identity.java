@@ -13,30 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.msp;
+package org.bcia.javachain.msp.entity;
 
-import org.bcia.javachain.msp.entity.IdentityIdentifier;
-import org.bcia.javachain.protos.common.MspPrincipal;
-import org.bcia.javachain.protos.msp.Identities;
-import org.bcia.javachain.protos.msp.MspConfigPackage;
 
-import java.util.Map;
+import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.jcajce.provider.asymmetric.X509;
+
+import javax.security.cert.X509Certificate;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/6
+ * @Date: 2018/3/14
  * @company Dingxuan
  */
-public interface IMspManager extends IIdentityDeserializer {
-    /**
-     * 根据配置信息设置MSP管理器实例
-     * @param msps
-     */
-     void setup(IMsp[] msps);
+public class Identity {
 
-    /**
-     * 提供会员服务提供商的列表
-     * @return
-     */
-     Map<String, IMsp> getMSPs();
+    IdentityIdentifier identityIdentifier;
+    Cert cert;
+    CspKey cspKey;
+    CspMsp cspMsp;
+
 }

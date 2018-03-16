@@ -122,7 +122,11 @@ public class ConsenterServer {
                     System.out.println("envelope:"+envelope.getPayload().toStringUtf8());
 
 
-                    broadCastHandle.handle(envelope,responseObserver);
+                    try {
+                        broadCastHandle.handle(envelope,responseObserver);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                     //利用handle来处理收到的消息，并返回状态
                    // responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatusValue(200).build());
                 }

@@ -1,5 +1,5 @@
 /**
- * Copyright DingXuan. All Rights Reserved.
+ * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.common.deliver;
-
-import org.bcia.javachain.common.log.JavaChainLog;
-import org.bcia.javachain.common.log.JavaChainLogFactory;
+package org.bcia.javachain.common.resourceconfig;
 
 /**
- * @author zhangmingyang
- * @Date: 2018/3/12
+ * 类描述
+ *
+ * @author wanliangbing
+ * @date 2018/3/15
  * @company Dingxuan
  */
-public class DeliverHandler {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(DeliverHandler.class);
-   public void handle(){
-      log.info("this is deliver handler");
-      deliverBlocks();
-    }
-    public void  deliverBlocks(){
-       log.info("this is deliverBlocks");
-    }
+public interface IPolicyMapper {
+
+    String policyRefForAPI(String apiName);
+
 }

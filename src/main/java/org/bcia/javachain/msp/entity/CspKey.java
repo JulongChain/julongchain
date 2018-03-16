@@ -13,30 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.msp;
+package org.bcia.javachain.msp.entity;
 
-import org.bcia.javachain.msp.entity.IdentityIdentifier;
-import org.bcia.javachain.protos.common.MspPrincipal;
-import org.bcia.javachain.protos.msp.Identities;
-import org.bcia.javachain.protos.msp.MspConfigPackage;
-
-import java.util.Map;
+import org.bcia.javachain.csp.intfs.IKey;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/6
+ * @Date: 2018/3/15
  * @company Dingxuan
  */
-public interface IMspManager extends IIdentityDeserializer {
-    /**
-     * 根据配置信息设置MSP管理器实例
-     * @param msps
-     */
-     void setup(IMsp[] msps);
+public class CspKey implements IKey {
+    @Override
+    public byte[] toBytes() {
+        return new byte[0];
+    }
 
-    /**
-     * 提供会员服务提供商的列表
-     * @return
-     */
-     Map<String, IMsp> getMSPs();
+    @Override
+    public byte[] ski() {
+        return new byte[0];
+    }
+
+    @Override
+    public boolean isSymmetric() {
+        return false;
+    }
+
+    @Override
+    public boolean isPrivate() {
+        return false;
+    }
+
+    @Override
+    public IKey getPublicKey() {
+        return null;
+    }
 }

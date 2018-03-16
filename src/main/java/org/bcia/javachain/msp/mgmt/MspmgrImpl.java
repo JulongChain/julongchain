@@ -13,30 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.msp;
+package org.bcia.javachain.msp.mgmt;
 
-import org.bcia.javachain.msp.entity.IdentityIdentifier;
-import org.bcia.javachain.protos.common.MspPrincipal;
+import org.bcia.javachain.msp.IIdentity;
+import org.bcia.javachain.msp.IMsp;
+import org.bcia.javachain.msp.IMspManager;
 import org.bcia.javachain.protos.msp.Identities;
-import org.bcia.javachain.protos.msp.MspConfigPackage;
 
 import java.util.Map;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/6
+ * @Date: 2018/3/13
  * @company Dingxuan
  */
-public interface IMspManager extends IIdentityDeserializer {
-    /**
-     * 根据配置信息设置MSP管理器实例
-     * @param msps
-     */
-     void setup(IMsp[] msps);
+public class MspmgrImpl  implements IMspManager{
+    @Override
+    public void setup(IMsp[] msps) {
 
-    /**
-     * 提供会员服务提供商的列表
-     * @return
-     */
-     Map<String, IMsp> getMSPs();
+    }
+
+    @Override
+    public Map<String, IMsp> getMSPs() {
+        return null;
+    }
+
+    @Override
+    public IIdentity deserializeIdentity(byte[] serializedIdentity) {
+        return null;
+    }
+
+    @Override
+    public void isWellFormed(Identities.SerializedIdentity identity) {
+
+    }
 }

@@ -21,7 +21,16 @@ package org.bcia.javachain.msp;
  * @company Dingxuan
  */
 public interface ISigningIdentity extends IIdentity{
+    /**
+     * 对消息进行签名
+     * @param msg 待签名消息
+     * @return
+     */
      byte[] sign(byte[] msg);
 
+    /**
+     * 返回此身份的公共部分
+     * @return
+     */
      IIdentity getPublicVersion();
 }
