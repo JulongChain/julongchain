@@ -13,25 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.node;
+package org.bcia.javachain.core.container.scintf;
 
-import org.bcia.javachain.common.config.ConfigManager;
-import org.bcia.javachain.common.config.IConfigManager;
+import javax.naming.Context;
 
 /**
  * 类描述
  *
- * @author sunianle
- * @date 3/13/18
+ * @author wanliangbing
+ * @date 2018/3/18
  * @company Dingxuan
  */
-public class ConfigFactory {
-    private static IConfigManager configManager;
+public interface ISCSupport {
 
-    public static synchronized IConfigManager getConfigManager() {
-        if (configManager == null) {
-            configManager = new ConfigManager();
-        }
-        return configManager;
-    }
+    void handleSmartContractStream(Context context, ISmartContractStream smartContractStream);
+
 }

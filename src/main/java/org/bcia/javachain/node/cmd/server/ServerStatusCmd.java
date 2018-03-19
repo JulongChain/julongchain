@@ -16,6 +16,7 @@
 package org.bcia.javachain.node.cmd.server;
 
 import org.apache.commons.cli.ParseException;
+import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.springframework.stereotype.Component;
@@ -33,7 +34,7 @@ public class ServerStatusCmd extends AbstractNodeServerCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ServerStatusCmd.class);
 
     @Override
-    public void execCmd(String[] args) throws ParseException {
+    public void execCmd(String[] args) throws ParseException, NodeException {
         nodeServer.status();
     }
 

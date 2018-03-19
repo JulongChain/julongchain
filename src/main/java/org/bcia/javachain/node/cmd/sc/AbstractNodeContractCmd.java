@@ -16,6 +16,7 @@ limitations under the License.
 package org.bcia.javachain.node.cmd.sc;
 
 import org.apache.commons.cli.ParseException;
+import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.node.cmd.INodeCmd;
 import org.bcia.javachain.node.entity.NodeSmartContract;
 
@@ -35,5 +36,5 @@ public abstract class AbstractNodeContractCmd implements INodeCmd {
 	}
 
 	@Override
-	public abstract void execCmd(String[] args) throws ParseException;
+	public abstract void execCmd(String[] args) throws ParseException, NodeException;
 }

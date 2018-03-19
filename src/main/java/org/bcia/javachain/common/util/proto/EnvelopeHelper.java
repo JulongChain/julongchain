@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.node.common.helper;
+package org.bcia.javachain.common.util.proto;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
@@ -22,28 +22,21 @@ import com.google.protobuf.Timestamp;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.NodeException;
-import org.bcia.javachain.common.groupconfig.CapabilitiesValue;
-import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
-import org.bcia.javachain.common.groupconfig.IConfigValue;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.common.policies.ImplicitMetaAnyPolicy;
-import org.bcia.javachain.common.policies.ImplicitMetaMajorityPolicy;
 import org.bcia.javachain.common.util.FileUtils;
-import org.bcia.javachain.consenter.Consenter;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
-import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
+import org.bcia.javachain.protos.node.ProposalPackage;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * 信封对象帮助类
  *
- * @author
+ * @author zhouhui
  * @date 2018/3/6
  * @company Dingxuan
  */
@@ -249,6 +242,34 @@ public class EnvelopeHelper {
     }
 
     /**
+     * 构造Header对象
+     *
+     * @param type      消息类型
+     * @param version   消息协议的版本
+     * @param groupId   群组ID
+     * @param txId      交易ID
+     * @param epoch     所属纪元，目前以所需区块的高度值填充
+     * @param extension 智能合约扩展对象
+     * @param creator   消息创建者
+     * @param nonce     随机数，仅可使用一次。用于防止重播攻击
+     * @return
+     */
+    public static Common.Header buildHeader(int type, int version, String groupId, String txId, long epoch,
+                                            ProposalPackage.SmartContractHeaderExtension extension, byte[]
+                                                    creator, byte[] nonce) {
+        //构造GroupHeader对象
+        Common.GroupHeader groupHeader = buildGroupHeader(type, 0, groupId, txId, 0, extension);
+        //构造SignatureHeader对象
+        Common.SignatureHeader SignatureHeader = buildSignatureHeader(creator, nonce);
+
+        //构造Header对象
+        Common.Header.Builder headerBuilder = Common.Header.newBuilder();
+        headerBuilder.setGroupHeader(groupHeader.toByteString());
+        headerBuilder.setSignatureHeader(SignatureHeader.toByteString());
+        return headerBuilder.build();
+    }
+
+    /**
      * 构造GroupHeader对象
      *
      * @param type    消息类型
@@ -269,6 +290,48 @@ public class EnvelopeHelper {
     }
 
     /**
+     * 构造GroupHeader对象
+     *
+     * @param type      消息类型
+     * @param version   消息协议的版本
+     * @param groupId   群组ID
+     * @param txId      交易ID
+     * @param epoch     所属纪元，目前以所需区块的高度值填充
+     * @param extension 智能合约扩展对象
+     * @return
+     */
+    public static Common.GroupHeader buildGroupHeader(int type, int version, String groupId, String txId, long epoch,
+                                                      ProposalPackage.SmartContractHeaderExtension extension) {
+        //首先构造GroupHeader对象
+        Common.GroupHeader.Builder groupHeaderBuilder = Common.GroupHeader.newBuilder();
+        groupHeaderBuilder.setType(type);
+        groupHeaderBuilder.setVersion(version);
+        //TODO:是否采用UTC的时间或更精准的时间
+        groupHeaderBuilder.setTimestamp(EnvelopeHelper.nowTimestamp());
+        groupHeaderBuilder.setGroupId(groupId);
+        groupHeaderBuilder.setTxId(txId);
+        groupHeaderBuilder.setEpoch(epoch);
+        groupHeaderBuilder.setExtension(extension.toByteString());
+
+        return groupHeaderBuilder.build();
+    }
+
+    /**
+     * 构造SignatureHeader对象
+     *
+     * @param creator 消息创建者
+     * @param nonce   随机数，仅可使用一次。用于防止重播攻击
+     * @return
+     */
+    public static Common.SignatureHeader buildSignatureHeader(byte[] creator, byte[] nonce) {
+        //构造SignatureHeader对象
+        Common.SignatureHeader.Builder signatureHeaderBuilder = Common.SignatureHeader.newBuilder();
+        signatureHeaderBuilder.setCreator(ByteString.copyFrom(creator));
+        signatureHeaderBuilder.setNonce(ByteString.copyFrom(nonce));
+        return signatureHeaderBuilder.build();
+    }
+
+    /**
      * 获取当前的时间戳
      *
      * @return
@@ -279,5 +342,4 @@ public class EnvelopeHelper {
         return Timestamp.newBuilder().setSeconds(millis / 1000)
                 .setNanos((int) ((millis % 1000) * 1000000)).build();
     }
-
 }

@@ -13,25 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.node;
-
-import org.bcia.javachain.common.config.ConfigManager;
-import org.bcia.javachain.common.config.IConfigManager;
+package org.bcia.javachain.consenter.consensus.kafka;
 
 /**
  * 类描述
  *
- * @author sunianle
- * @date 3/13/18
- * @company Dingxuan
+ * @author yangdong
+ * @date 2018/3/19
+ * @company Shudun
  */
-public class ConfigFactory {
-    private static IConfigManager configManager;
 
-    public static synchronized IConfigManager getConfigManager() {
-        if (configManager == null) {
-            configManager = new ConfigManager();
-        }
-        return configManager;
+public class DataMessageHandle {
+
+    //转换kafka连接消息
+    public void newConnectMessage(){
+
+    }
+
+    //转换Enqueue（普通）方法所用消息格式
+    public void newNormalMessage(){
+
+    }
+
+    //转换Enqueue（配置）方法所用消息格式
+    public void newConfigMessage(){
+
+    }
+
+    //转换数据切块方法
+    public void newTimeToCutMessage(){
+
+    }
+
+    //生产者消息转换
+    public void newProducerMessage(){
+
     }
 }

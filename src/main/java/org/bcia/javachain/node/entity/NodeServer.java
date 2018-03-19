@@ -17,6 +17,11 @@ package org.bcia.javachain.node.entity;
 
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.aclmgmt.AclManagement;
+import org.bcia.javachain.core.aclmgmt.IAclProvider;
+import org.bcia.javachain.msp.IMsp;
+import org.bcia.javachain.node.common.helper.MockMSPManager;
+import org.bcia.javachain.node.util.NodeConstant;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,12 +35,36 @@ import org.springframework.stereotype.Component;
 public class NodeServer {
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeServer.class);
 
-    public void start(){
+    public void start() {
+        start(false);
+    }
+
+    public void start(boolean devMode) {
         log.info("node server start-----");
+        if(devMode){
+            log.info("start by devMode");
+        }
+
+        //检查当前的成员服务提供者类型，目前只支持CSP，即密码提供商
+        int mspType = MockMSPManager.getLocalMSP().getType();
+        if (mspType != NodeConstant.PROVIDER_CSP) {
+            log.error("Unsupported msp type: " + mspType);
+            return;
+        }
+
+        //获取当前的访问清单提供者
+        IAclProvider aclProvider = AclManagement.getACLProvider();
+
+        //初始化账本
+        //ledgermgmt.Initialize(peer.ConfigTxProcessors)
+
+
+
+
 
     }
 
-    public void status(){
+    public void status() {
 
     }
 

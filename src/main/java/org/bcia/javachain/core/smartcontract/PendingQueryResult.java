@@ -13,25 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.node;
+package org.bcia.javachain.core.smartcontract;
 
-import org.bcia.javachain.common.config.ConfigManager;
-import org.bcia.javachain.common.config.IConfigManager;
+import org.bcia.javachain.protos.node.SmartcontractShim;
 
 /**
  * 类描述
  *
- * @author sunianle
- * @date 3/13/18
+ * @author wanliangbing
+ * @date 2018/3/18
  * @company Dingxuan
  */
-public class ConfigFactory {
-    private static IConfigManager configManager;
+public class PendingQueryResult {
 
-    public static synchronized IConfigManager getConfigManager() {
-        if (configManager == null) {
-            configManager = new ConfigManager();
-        }
-        return configManager;
+    private SmartcontractShim.QueryResultBytes[] batch;
+    private Integer count;
+
+    public SmartcontractShim.QueryResultBytes[] getBatch() {
+        return batch;
+    }
+
+    public void setBatch(SmartcontractShim.QueryResultBytes[] batch) {
+        this.batch = batch;
+    }
+
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
     }
 }
