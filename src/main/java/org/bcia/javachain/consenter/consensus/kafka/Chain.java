@@ -84,7 +84,7 @@ public class Chain implements IChain {
 
     }
 
-
+    //order具体操作
     public void orderHandle(Common.Envelope env, long configSeq,Long originalOffset) {
 
     }
