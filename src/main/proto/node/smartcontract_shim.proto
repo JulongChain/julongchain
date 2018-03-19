@@ -54,18 +54,31 @@ message SmartContractMessage {
     string channel_id = 7;
 }
 
-message PutStateInfo {
+message GetState {
+    string key = 1;
+    string collection = 2;
+}
+
+message PutState {
     string key = 1;
     bytes value = 2;
+    string collection = 3;
+}
+
+message DelState {
+    string key = 1;
+    string collection = 2;
 }
 
 message GetStateByRange {
     string startKey = 1;
     string endKey = 2;
+    string collection = 3;
 }
 
 message GetQueryResult {
     string query = 1;
+    string collection = 2;
 }
 
 message GetHistoryForKey {
