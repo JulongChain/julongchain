@@ -19,7 +19,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import org.bcia.javachain.common.localmsp.impl.LocalSigner;
-import org.bcia.javachain.node.common.helper.EnvelopeHelper;
+import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.consenter.Ab;
 import org.bcia.javachain.protos.consenter.AtomicBroadcastGrpc;

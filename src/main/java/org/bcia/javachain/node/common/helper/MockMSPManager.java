@@ -15,6 +15,14 @@
  */
 package org.bcia.javachain.node.common.helper;
 
+import org.bcia.javachain.core.common.validation.MockIdentityDeserializer;
+import org.bcia.javachain.msp.IIdentity;
+import org.bcia.javachain.msp.IIdentityDeserializer;
+import org.bcia.javachain.msp.IMsp;
+import org.bcia.javachain.msp.ISigningIdentity;
+import org.bcia.javachain.msp.entity.IdentityIdentifier;
+import org.bcia.javachain.protos.common.MspPrincipal;
+import org.bcia.javachain.protos.msp.Identities;
 import org.bcia.javachain.protos.msp.MspConfigPackage;
 
 /**
@@ -31,5 +39,73 @@ public class MockMSPManager {
         }
 
         return null;
+    }
+
+    public static IIdentityDeserializer getIdentityDeserializer(String groupId) {
+        return new MockIdentityDeserializer();
+    }
+
+    public static IMsp getLocalMSP() {
+        return new IMsp() {
+            @Override
+            public void setup(MspConfigPackage.MSPConfig config) {
+
+            }
+
+            @Override
+            public int getVersion() {
+                return 0;
+            }
+
+            @Override
+            public int getType() {
+                return 0;
+            }
+
+            @Override
+            public String getIdentifier() {
+                return null;
+            }
+
+            @Override
+            public ISigningIdentity getSigningIdentity(IdentityIdentifier identityIdentifier) {
+                return null;
+            }
+
+            @Override
+            public ISigningIdentity getDefaultSigningIdentity() {
+                return null;
+            }
+
+            @Override
+            public byte[][] getTLSRootCerts() {
+                return new byte[0][];
+            }
+
+            @Override
+            public byte[][] getTLSIntermediateCerts() {
+                return new byte[0][];
+            }
+
+            @Override
+            public void validate(IIdentity id) {
+
+            }
+
+            @Override
+            public void satisfiesPrincipal(IIdentity id, MspPrincipal.MSPPrincipal principal) {
+
+            }
+
+            @Override
+            public IIdentity deserializeIdentity(byte[] serializedIdentity) {
+                return null;
+            }
+
+            @Override
+            public void isWellFormed(Identities.SerializedIdentity identity) {
+
+            }
+        };
     }
 }

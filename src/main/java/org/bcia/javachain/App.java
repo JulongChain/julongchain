@@ -77,7 +77,7 @@ public class App {
         //开始解析执行命令行
         try {
             node.execCmd(args);
-        } catch (ParseException e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
     }

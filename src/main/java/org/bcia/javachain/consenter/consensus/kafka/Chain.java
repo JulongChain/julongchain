@@ -1,5 +1,5 @@
 /**
- * Copyright Dingxuan. All Rights Reserved.
+ * Copyright DingXuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.node;
-
-import org.bcia.javachain.common.config.ConfigManager;
-import org.bcia.javachain.common.config.IConfigManager;
+package org.bcia.javachain.consenter.consensus.kafka;
 
 /**
- * 类描述
- *
- * @author sunianle
- * @date 3/13/18
- * @company Dingxuan
+ * @author yangdong
+ * @Date: 2018/3/19
+ * @company Shudun
  */
-public class ConfigFactory {
-    private static IConfigManager configManager;
-
-    public static synchronized IConfigManager getConfigManager() {
-        if (configManager == null) {
-            configManager = new ConfigManager();
-        }
-        return configManager;
-    }
+public class Chain {
 }

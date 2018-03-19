@@ -13,25 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.node;
+package org.bcia.javachain.core.endorser;
 
-import org.bcia.javachain.common.config.ConfigManager;
-import org.bcia.javachain.common.config.IConfigManager;
+import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.ProposalResponsePackage;
 
 /**
- * 类描述
+ * 背书服务接口定义
  *
- * @author sunianle
- * @date 3/13/18
+ * @author
+ * @date 2018/3/13
  * @company Dingxuan
  */
-public class ConfigFactory {
-    private static IConfigManager configManager;
+public interface IEndorserServer {
+    ProposalResponsePackage.ProposalResponse processProposal(ProposalPackage.SignedProposal signedProposal);
 
-    public static synchronized IConfigManager getConfigManager() {
-        if (configManager == null) {
-            configManager = new ConfigManager();
-        }
-        return configManager;
-    }
 }
