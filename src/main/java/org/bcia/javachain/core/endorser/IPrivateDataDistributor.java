@@ -13,25 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.node;
+package org.bcia.javachain.core.endorser;
 
-import org.bcia.javachain.common.config.ConfigManager;
-import org.bcia.javachain.common.config.IConfigManager;
+import org.bcia.javachain.protos.ledger.rwset.Rwset;
 
 /**
  * 类描述
  *
- * @author sunianle
- * @date 3/13/18
+ * @author
+ * @date 2018/3/15
  * @company Dingxuan
  */
-public class ConfigFactory {
-    private static IConfigManager configManager;
-
-    public static synchronized IConfigManager getConfigManager() {
-        if (configManager == null) {
-            configManager = new ConfigManager();
-        }
-        return configManager;
-    }
+public interface IPrivateDataDistributor {
+    /**
+     *
+     * @param groupId
+     * @param txId
+     * @param privateData
+     */
+    void distributePrivateData(String groupId, String txId, Rwset.TxPvtReadWriteSet privateData);
 }

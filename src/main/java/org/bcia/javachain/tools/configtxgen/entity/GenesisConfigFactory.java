@@ -44,6 +44,7 @@ public class GenesisConfigFactory {
         try {
             is = new FileInputStream(url.getFile());
             GenesisConfig genesisConfig = yaml.loadAs(is, GenesisConfig.class);
+
             genesisConfig.completeInstance();
             return genesisConfig;
         } catch (FileNotFoundException e) {

@@ -16,6 +16,7 @@
 package org.bcia.javachain.node;
 
 import org.apache.commons.cli.ParseException;
+import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.node.cmd.INodeCmd;
@@ -39,7 +40,7 @@ public class Node {
      */
     private INodeCmd nodeCmd;
 
-    public void execCmd(String[] args) throws ParseException {
+    public void execCmd(String[] args) throws ParseException, NodeException {
         log.info("Node Command Start");
 
         if (args.length <= 0) {
