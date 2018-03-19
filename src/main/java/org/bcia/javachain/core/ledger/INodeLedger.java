@@ -73,8 +73,9 @@ public interface INodeLedger extends INodeLedgerProvider{
      *
      * @return ITxSimulator
      * @throws LedgerException
+     * @param txId
      */
-    ITxSimulator newTxSimulator() throws LedgerException;
+    ITxSimulator newTxSimulator(String txId) throws LedgerException;
 
     /**
      * newQueryExecutor gives handle to a query executor.

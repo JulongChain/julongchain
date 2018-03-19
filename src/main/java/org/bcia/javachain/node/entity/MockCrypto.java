@@ -13,25 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.node;
-
-import org.bcia.javachain.common.config.ConfigManager;
-import org.bcia.javachain.common.config.IConfigManager;
+package org.bcia.javachain.node.entity;
 
 /**
  * 类描述
  *
- * @author sunianle
- * @date 3/13/18
+ * @author
+ * @date 2018/3/13
  * @company Dingxuan
  */
-public class ConfigFactory {
-    private static IConfigManager configManager;
+public class MockCrypto {
 
-    public static synchronized IConfigManager getConfigManager() {
-        if (configManager == null) {
-            configManager = new ConfigManager();
-        }
-        return configManager;
+    public static byte[] getRandomNonce() {
+
+        return new byte[]{0, 1, 2};
     }
 }

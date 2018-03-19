@@ -13,25 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.node;
+package org.bcia.javachain.core.common.validation;
 
-import org.bcia.javachain.common.config.ConfigManager;
-import org.bcia.javachain.common.config.IConfigManager;
+import org.bcia.javachain.msp.IIdentity;
+import org.bcia.javachain.msp.IIdentityDeserializer;
+import org.bcia.javachain.protos.msp.Identities;
 
 /**
  * 类描述
  *
- * @author sunianle
- * @date 3/13/18
+ * @author
+ * @date 2018/3/14
  * @company Dingxuan
  */
-public class ConfigFactory {
-    private static IConfigManager configManager;
+public class MockIdentityDeserializer implements IIdentityDeserializer {
+    @Override
+    public IIdentity deserializeIdentity(byte[] serializedIdentity) {
+        return null;
+    }
 
-    public static synchronized IConfigManager getConfigManager() {
-        if (configManager == null) {
-            configManager = new ConfigManager();
-        }
-        return configManager;
+    @Override
+    public void isWellFormed(Identities.SerializedIdentity identity) {
+
     }
 }

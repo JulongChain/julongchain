@@ -15,7 +15,8 @@
  */
 package org.bcia.javachain.node.cmd.server;
 
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.*;
+import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.springframework.stereotype.Component;
@@ -32,9 +33,23 @@ import org.springframework.stereotype.Component;
 public class ServerStartCmd extends AbstractNodeServerCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ServerStartCmd.class);
 
+    //参数：开发模式
+    private static final String ARG_DEVMODE = "dev";
+
     @Override
-    public void execCmd(String[] args) throws ParseException {
-        nodeServer.start();
+    public void execCmd(String[] args) throws ParseException, NodeException {
+        Options options = new Options();
+        options.addOption(ARG_DEVMODE, false, "dev mode");
+
+        CommandLineParser parser = new DefaultParser();
+        CommandLine cmd = parser.parse(options, args);
+
+        boolean devMode = false;
+        if (cmd.hasOption(ARG_DEVMODE)) {
+            devMode = true;
+        }
+
+        nodeServer.start(devMode);
     }
 
 }
