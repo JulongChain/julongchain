@@ -15,7 +15,7 @@ consenter: &consenterDefaults
 
     # Consenter Type: The consenter implementation to start.
     # Available types are "solo" and "kafka".
-    consenterType: solo
+    consenterType: Singleton
 
     addresses:
         - 127.0.0.1:7050
