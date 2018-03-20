@@ -17,6 +17,8 @@ package org.bcia.javachain.consenter.consensus.kafka;
 
 import org.bcia.javachain.consenter.consensus.IChain;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.consenter.Kafka;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author yangdong
@@ -24,13 +26,20 @@ import org.bcia.javachain.protos.common.Common;
  * @company Shudun
  */
 public class Chain implements IChain {
+
+    @Autowired
+    private DataMessageHandle dataMessageHandle;
+    @Autowired
+    private KafkaProduce kafkaProduce;
+
     @Override
     public void order(Common.Envelope env, long configSeq) {
+        this.orderHandle(env,configSeq,(long)0);
     }
 
     @Override
     public void configure(Common.Envelope config, long configSeq) {
-
+       this.configureHandle(config,configSeq,(long)0);
     }
 
     @Override
@@ -45,7 +54,15 @@ public class Chain implements IChain {
     }
 
     //调用kafka的客户端，实现kafka生产者
-    public void enqueue(){
+    //enqueue接受信息并返回真或假otheriwse验收
+    public void enqueue(Kafka.KafkaMessage kafkaMessage){
+       // 获取kafkaInfo，从配置文件获取（现在这里定义，TODO该成全局）
+        KafkaTopicPartitionInfo kafkaInfo=new KafkaTopicPartitionInfo("test2",0);
+        //创建生产者消息
+        ProducerMessage message=dataMessageHandle.newProducerMessage(kafkaInfo,kafkaMessage.toByteArray());
+        //调用生产者发送消息
+        kafkaProduce.send(message);
+
 
     }
    //实现kafka消费者，start调用该方法
@@ -85,12 +102,20 @@ public class Chain implements IChain {
     }
 
     //order具体操作
-    public void orderHandle(Common.Envelope env, long configSeq,Long originalOffset) {
+    public void orderHandle(Common.Envelope env, Long configSeq,Long originalOffset) {
+        //转换Kafka数据类型
+        Kafka.KafkaMessage kafkaMessage=dataMessageHandle.newNormalMessage(env.toByteString(),configSeq,originalOffset);
+        //调用enqueue()方法
+        enqueue(kafkaMessage);
 
     }
     //configure具体操作
-    public void configureHandle(Common.Envelope env, long configSeq,Long originalOffset) {
-
+    public void configureHandle(Common.Envelope config, long configSeq,Long originalOffset) {
+        //转换Kafka数据类型
+        Kafka.KafkaMessage kafkaMessage=dataMessageHandle.newConfigMessage(config.toByteString(),configSeq,originalOffset);
+        //调用enqueue()方法
+        enqueue(kafkaMessage);
     }
+
 
 }

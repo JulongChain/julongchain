@@ -15,6 +15,10 @@
  */
 package org.bcia.javachain.consenter.consensus.kafka;
 
+import com.google.protobuf.ByteString;
+import org.bcia.javachain.protos.consenter.Kafka;
+import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * 类描述
  *
@@ -25,19 +29,42 @@ package org.bcia.javachain.consenter.consensus.kafka;
 
 public class DataMessageHandle {
 
+    @Autowired
+    private ProducerMessage producerMessage;
+
     //转换kafka连接消息
     public void newConnectMessage(){
 
     }
 
     //转换Enqueue（普通）方法所用消息格式
-    public void newNormalMessage(){
+    public Kafka.KafkaMessage newNormalMessage(ByteString payload, long configSeq, long originalOffset){
+
+        // 组织KafkaMessageRegular
+        Kafka.KafkaMessageRegular.Builder kafkaRegularBuilder=Kafka.KafkaMessageRegular.newBuilder();
+        kafkaRegularBuilder.setPayload(payload);
+        kafkaRegularBuilder.setConfigSeq(configSeq);
+        kafkaRegularBuilder.setOriginalOffset(originalOffset);
+        kafkaRegularBuilder.setClass_(Kafka.KafkaMessageRegular.Class.NORMAL);
+        // 组织KafkaMessage
+        Kafka.KafkaMessage.Builder kafkaBuilder=Kafka.KafkaMessage.newBuilder();
+        kafkaBuilder.setRegular(kafkaRegularBuilder);
+        return kafkaBuilder.build();
 
     }
 
     //转换Enqueue（配置）方法所用消息格式
-    public void newConfigMessage(){
-
+    public Kafka.KafkaMessage newConfigMessage(ByteString config, long configSeq, long originalOffset){
+        // 组织KafkaMessageRegular
+        Kafka.KafkaMessageRegular.Builder kafkaRegularBuilder=Kafka.KafkaMessageRegular.newBuilder();
+        kafkaRegularBuilder.setPayload(config);
+        kafkaRegularBuilder.setConfigSeq(configSeq);
+        kafkaRegularBuilder.setOriginalOffset(originalOffset);
+        kafkaRegularBuilder.setClass_(Kafka.KafkaMessageRegular.Class.CONFIG);
+        // 组织KafkaMessage
+        Kafka.KafkaMessage.Builder kafkaBuilder=Kafka.KafkaMessage.newBuilder();
+        kafkaBuilder.setRegular(kafkaRegularBuilder);
+        return kafkaBuilder.build();
     }
 
     //转换数据切块方法
@@ -46,7 +73,12 @@ public class DataMessageHandle {
     }
 
     //生产者消息转换
-    public void newProducerMessage(){
-
+    public ProducerMessage newProducerMessage(KafkaTopicPartitionInfo kafkaInfo,byte[] pld){
+        producerMessage.setTopic(kafkaInfo.topic);
+        producerMessage.setKey(kafkaInfo.partitionID);
+        producerMessage.setValue(pld);
+        return producerMessage;
     }
+
+
 }
