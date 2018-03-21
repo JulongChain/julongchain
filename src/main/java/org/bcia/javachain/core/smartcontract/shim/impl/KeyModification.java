@@ -11,7 +11,6 @@ import com.google.protobuf.ByteString;
 import org.bcia.javachain.core.ledger.IKeyModification;
 import org.bcia.javachain.protos.ledger.queryresult.KvQueryResult;
 
-
 import java.time.Instant;
 
 public class KeyModification implements IKeyModification {

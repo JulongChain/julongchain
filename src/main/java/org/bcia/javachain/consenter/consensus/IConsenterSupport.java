@@ -32,7 +32,7 @@ public interface IConsenterSupport extends ILocalSigner, IProcessor {
 
     void writeBlock(Common.Block block, byte[] encodedMetadataValue);
 
-    void writeConfig(Common.Block block, byte[] encodedMetadataValue);
+    void writeConfigBlock(Common.Block block, byte[] encodedMetadataValue);
 
     long sequence();
 

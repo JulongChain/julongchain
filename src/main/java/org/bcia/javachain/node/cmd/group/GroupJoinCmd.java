@@ -17,6 +17,7 @@ package org.bcia.javachain.node.cmd.group;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
+import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.springframework.stereotype.Component;
@@ -37,7 +38,7 @@ public class GroupJoinCmd extends AbstractNodeGroupCmd {
     private static final String ARG_BLOCK_PATH = "b";
 
     @Override
-    public void execCmd(String[] args) throws ParseException {
+    public void execCmd(String[] args) throws ParseException, NodeException {
 
         Options options = new Options();
         options.addOption(ARG_BLOCK_PATH, true, "Imput genesis block path");

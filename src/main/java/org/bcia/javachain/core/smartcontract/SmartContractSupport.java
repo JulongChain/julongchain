@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.chaincode;
+package org.bcia.javachain.core.smartcontract;
 
 import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.ITxSimulator;
@@ -28,7 +28,7 @@ import java.time.Duration;
  * @date 2018/3/14
  * @company Dingxuan
  */
-public class ChainCodeSupport {
+public class SmartContractSupport {
 
     /** DevModeUserRunsChaincode property allows user to run chaincode in development environment
      *
@@ -69,7 +69,7 @@ public class ChainCodeSupport {
      *
      * @return
      */
-    public ChainCodeSupport GetChain()  {
+    public SmartContractSupport GetChain()  {
         return null;
     }
 
@@ -105,7 +105,7 @@ public class ChainCodeSupport {
      * @param func
      * @return
      */
-    public ChainCodeSupport newChaincodeSupport(Boolean userrunsCC, Duration ccstartuptimeout) {
+    public SmartContractSupport newChaincodeSupport(Boolean userrunsCC, Duration ccstartuptimeout) {
         return null;
     }
 

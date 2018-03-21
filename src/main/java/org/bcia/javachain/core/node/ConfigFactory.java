@@ -27,9 +27,10 @@ import org.bcia.javachain.common.config.IConfigManager;
  */
 public class ConfigFactory {
     private static IConfigManager configManager;
-    public  static synchronized IConfigManager getConfigManager(){
-        if(configManager==null){
-            configManager=new ConfigManager();
+
+    public static synchronized IConfigManager getConfigManager() {
+        if (configManager == null) {
+            configManager = new ConfigManager();
         }
         return configManager;
     }

@@ -30,4 +30,6 @@ public class NodeConstant {
 	public static final String GROUP = "group";
 
 	public static final String CURRENT_VERSION = "0.25";
+
+	public static final int PROVIDER_CSP = 0;
 }

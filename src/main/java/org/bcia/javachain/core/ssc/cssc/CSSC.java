@@ -118,8 +118,8 @@ public class CSSC extends SystemSmartContractBase {
                 ;
         }
 
-        log.debug("CSCC exits successfully");
-        return null;
+        log.debug("CSSC exits successfully");
+        return newSuccessResponse();
     }
 
     @Override

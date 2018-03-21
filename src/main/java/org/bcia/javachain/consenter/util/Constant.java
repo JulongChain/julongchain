@@ -24,4 +24,8 @@ public class Constant {
     public static final String VERSION = "version";
     public static final String START = "start";
     public static final String BENCHMARK = "benchmark";
+    public static final String ORDERER_CONFIG="orderer.yaml";
+    public static final String CONFIGTX="configtx.yaml";
+    public static final String SINGLETON="Singleton";
+    public static final String KAFKA="Kafka";
 }

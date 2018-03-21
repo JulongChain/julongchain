@@ -487,7 +487,7 @@ public class Handler {
 	}
 
 	private static SmartcontractShim.SmartContractMessage newPutStateEventMessage(final String channelId, final String txId, final String key, final ByteString value) {
-		return newEventMessage(PUT_STATE, channelId, txId, SmartcontractShim.PutStateInfo.newBuilder()
+		return newEventMessage(PUT_STATE, channelId, txId, SmartcontractShim.PutState.newBuilder()
 				.setKey(key)
 				.setValue(value)
 				.build().toByteString());

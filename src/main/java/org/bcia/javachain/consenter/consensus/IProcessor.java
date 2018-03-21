@@ -23,17 +23,34 @@ import org.bcia.javachain.protos.common.Common;
  * @company Dingxuan
  */
 public interface IProcessor {
-     int classfiyMsg(Common.GroupHeader chdr);
+    /**
+     * 判断是否为配置消息,如果是配置消息返回true;否则返回false
+     * @param chdr
+     * @return
+     */
+    boolean classfiyMsg(Common.GroupHeader chdr);
 
+    /**
+     * 根据当前配置检查消息的有效性,fa
+     * @param env
+     * @return
+     */
      long processNormalMsg(Common.Envelope env);
 
     /**
-     * 返回env 和 configSeq ,之后转换为实体
+     * 将尝试将配置更新应用于当前配置，如果成功返回结果配置消息和configSeq，则从中计算配置
+     * 如果配置更新消息无效，则返回错误
+     * @param env
+     * @return
      */
      Object processConfigUpdateMsg(Common.Envelope env);
 
     /**
-     * 返回类型为(*cb.Envelope, uint64, error) 之后做作补充
+     * 接收'ORDERER_TX'或'CONFIG`类型的消息，解压嵌入其中的ConfigUpdate信封，
+     * 并调用ProcessConfigUpdateMsg生成与原始消息类型相同的新Config消息.
+     *
+     * @param env
+     * @return
      */
      Object processConfigMsg(Common.Envelope env);
 }

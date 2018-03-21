@@ -16,23 +16,33 @@
 package org.bcia.javachain.node.entity;
 
 import io.grpc.stub.StreamObserver;
+import org.apache.commons.lang3.ArrayUtils;
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.localmsp.impl.LocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.FileUtils;
+import org.bcia.javachain.common.util.proto.ProposalUtils;
 import org.bcia.javachain.consenter.common.broadcast.BroadCastClient;
-import org.bcia.javachain.node.common.helper.EnvelopeHelper;
+import org.bcia.javachain.common.util.proto.EnvelopeHelper;
+import org.bcia.javachain.csp.gm.GmCspFactory;
+import org.bcia.javachain.msp.ISigningIdentity;
 import org.bcia.javachain.node.common.client.BroadcastClient;
 import org.bcia.javachain.node.common.client.DeliverClient;
 import org.bcia.javachain.node.common.client.IBroadcastClient;
 import org.bcia.javachain.node.common.client.IDeliverClient;
+import org.bcia.javachain.node.common.helper.SpecHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.consenter.Ab;
+import org.bcia.javachain.protos.msp.Identities;
+import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.Smartcontract;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 /**
  * 节点群组
@@ -143,8 +153,34 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
 
     }
 
-    public NodeGroup joinGroup(String blockPath) {
+    public NodeGroup joinGroup(String blockPath) throws NodeException {
         NodeGroup group = new NodeGroup();
+
+        Smartcontract.SmartContractInvocationSpec spec = null;
+        try {
+            spec = SpecHelper.buildInvocationSpec("cssc", "JoinGroup",
+                    FileUtils.readFileBytes(blockPath));
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException("Can not read block file");
+        }
+
+        ISigningIdentity identity = new MockSigningIdentity();
+        byte[] creator = identity.serialize();
+
+        byte[] nonce = MockCrypto.getRandomNonce();
+
+        String txId = null;
+        try {
+            txId = ProposalUtils.computeProposalTxID(creator, nonce);
+        } catch (JavaChainException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException("Generate txId fail");
+        }
+
+        ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType.CONFIG,
+                "", txId, spec, nonce, creator, null);
+        ProposalUtils.buildSignedProposal(proposal, identity);
 
         return group;
     }
@@ -162,7 +198,7 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
 //                log.error(e.getMessage(), e);
 //            }
 
-        }else{
+        } else {
             log.info("Wrong broadcast status: " + value.getStatusValue());
         }
     }

@@ -16,6 +16,7 @@
 package org.bcia.javachain.node.cmd.sc;
 
 import org.apache.commons.cli.ParseException;
+import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.springframework.stereotype.Component;
@@ -33,7 +34,7 @@ public class ContractInstallCmd extends AbstractNodeContractCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ContractInstallCmd.class);
 
     @Override
-    public void execCmd(String[] args) throws ParseException {
+    public void execCmd(String[] args) throws ParseException, NodeException {
 
         //TODO 待完成
         nodeSmartContract.install();

@@ -5,6 +5,7 @@ import com.google.protobuf.Timestamp;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.localmsp.impl.LocalSigner;
+import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.junit.Test;
 import org.mockito.Mock;

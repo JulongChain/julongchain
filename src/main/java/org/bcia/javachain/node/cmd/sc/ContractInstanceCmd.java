@@ -17,6 +17,7 @@ package org.bcia.javachain.node.cmd.sc;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
+import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.springframework.stereotype.Component;
@@ -38,23 +39,25 @@ public class ContractInstanceCmd extends AbstractNodeContractCmd {
     private static final String ARG_CONSENTER = "c";
     //参数：groupId
     private static final String ARG_GROUP_ID = "g";
-    //参数：group配置文件路径
-    private static final String ARG_FILE_PATH = "f";
-    //参数：超时时间
-    private static final String ARG_TIMEOUT = "t";
-    //参数：是否使用TLS传输
-    private static final String ARG_USE_TLS = "tls";
-    //参数：CA文件位置
-    private static final String ARG_CA = "ca";
+    //参数：智能合约的名称
+    private static final String ARG_SC_NAME = "n";
+    //参数：智能合约的版本
+    private static final String ARG_SC_VERSION = "v";
+    //参数：内容
+    private static final String ARG_CONTENT = "content";
+    //参数：背书策略
+    private static final String ARG_POLICY = "policy";
 
     @Override
-    public void execCmd(String[] args) throws ParseException {
+    public void execCmd(String[] args) throws ParseException, NodeException {
 
         Options options = new Options();
         options.addOption(ARG_CONSENTER, true, "Input consenter's IP and port");
         options.addOption(ARG_GROUP_ID, true, "Input group id");
-        options.addOption(ARG_FILE_PATH, true, "Input group config file path");
-        options.addOption(ARG_TIMEOUT, true, "Input group create timeout");
+        options.addOption(ARG_SC_NAME, true, "Input smart contract's name");
+        options.addOption(ARG_SC_VERSION, true, "Input smart contract's version");
+        options.addOption(ARG_CONTENT, true, "Input content");
+        options.addOption(ARG_POLICY, true, "policy");
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
@@ -73,16 +76,28 @@ public class ContractInstanceCmd extends AbstractNodeContractCmd {
             log.info("GroupId-----$" + groupId);
         }
 
-        String groupConfigFile = null;
-        if (cmd.hasOption(ARG_FILE_PATH)) {
-            groupConfigFile = cmd.getOptionValue(ARG_FILE_PATH, defaultValue);
-            log.info("GroupId config File-----$" + groupConfigFile);
+        String scName = null;
+        if (cmd.hasOption(ARG_SC_NAME)) {
+            scName = cmd.getOptionValue(ARG_SC_NAME, defaultValue);
+            log.info("scName-----$" + scName);
         }
 
-        String timeout = null;
-        if (cmd.hasOption(ARG_TIMEOUT)) {
-            timeout = cmd.getOptionValue(ARG_TIMEOUT, defaultValue);
-            log.info("Timeout-----$" + timeout);
+        String scVersion = null;
+        if (cmd.hasOption(ARG_SC_VERSION)) {
+            scVersion = cmd.getOptionValue(ARG_SC_VERSION, defaultValue);
+            log.info("scVersion-----$" + scVersion);
+        }
+
+        String content = null;
+        if (cmd.hasOption(ARG_CONTENT)) {
+            content = cmd.getOptionValue(ARG_CONTENT, defaultValue);
+            log.info("content-----$" + content);
+        }
+
+        String policy = null;
+        if (cmd.hasOption(ARG_POLICY)) {
+            policy = cmd.getOptionValue(ARG_POLICY, defaultValue);
+            log.info("policy-----$" + policy);
         }
 
         if (StringUtils.isBlank(groupId)) {
@@ -92,6 +107,21 @@ public class ContractInstanceCmd extends AbstractNodeContractCmd {
 
         if (StringUtils.isBlank(consenter)) {
             log.error("Consenter should not be null, Please input it");
+            return;
+        }
+
+        if (StringUtils.isBlank(scName)) {
+            log.error("Smart contract's name should not be null, Please input it");
+            return;
+        }
+
+        if (StringUtils.isBlank(scVersion)) {
+            log.error("Smart contract's version should not be null, Please input it");
+            return;
+        }
+
+        if (StringUtils.isBlank(scVersion)) {
+            log.error("Smart contract's version should not be null, Please input it");
             return;
         }
 

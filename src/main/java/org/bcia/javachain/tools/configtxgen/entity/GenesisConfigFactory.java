@@ -17,6 +17,7 @@ package org.bcia.javachain.tools.configtxgen.entity;
 
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
@@ -33,6 +34,7 @@ import java.util.Map;
  * @date 2018/3/9
  * @company Dingxuan
  */
+@Component
 public class GenesisConfigFactory {
     private static JavaChainLog log = JavaChainLogFactory.getLog(GenesisConfigFactory.class);
 
@@ -44,6 +46,7 @@ public class GenesisConfigFactory {
         try {
             is = new FileInputStream(url.getFile());
             GenesisConfig genesisConfig = yaml.loadAs(is, GenesisConfig.class);
+
             genesisConfig.completeInstance();
             return genesisConfig;
         } catch (FileNotFoundException e) {
@@ -58,6 +61,10 @@ public class GenesisConfigFactory {
                 }
             }
         }
+    }
+
+    public static void main(String[] args) throws Exception {
+        GenesisConfigFactory.loadGenesisConfig();
     }
 
     public static Map<String, Object> loadGenesisConfigMap() throws FileNotFoundException {

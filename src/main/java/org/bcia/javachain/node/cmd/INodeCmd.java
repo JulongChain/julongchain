@@ -16,6 +16,7 @@ limitations under the License.
 package org.bcia.javachain.node.cmd;
 
 import org.apache.commons.cli.ParseException;
+import org.bcia.javachain.common.exception.NodeException;
 
 /**
  * 节点命令接口
@@ -26,6 +27,6 @@ import org.apache.commons.cli.ParseException;
  */
 public interface INodeCmd {
 
-	void execCmd(String[] args) throws ParseException;
+	void execCmd(String[] args) throws ParseException, NodeException;
 
 }
