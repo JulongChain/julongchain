@@ -15,10 +15,14 @@
  */
 package org.bcia.javachain.node.entity;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
 import org.bcia.javachain.core.aclmgmt.IAclProvider;
+import org.bcia.javachain.core.endorser.Endorser;
+import org.bcia.javachain.core.node.NodeConfiguration;
+import org.bcia.javachain.core.node.NodeGrpcServer;
 import org.bcia.javachain.msp.IMsp;
 import org.bcia.javachain.node.common.helper.MockMSPManager;
 import org.bcia.javachain.node.util.NodeConstant;
@@ -34,6 +38,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class NodeServer {
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeServer.class);
+
+    private String cachedEndpoint;
 
     public void start() {
         start(false);
@@ -52,11 +58,30 @@ public class NodeServer {
             return;
         }
 
+        log.info("begin to start node, current version： " + NodeConstant.CURRENT_VERSION);
+
         //获取当前的访问清单提供者
         IAclProvider aclProvider = AclManagement.getACLProvider();
 
         //初始化账本
         //ledgermgmt.Initialize(peer.ConfigTxProcessors)
+
+        String nodeEndpoint = null;
+
+//        if(StringUtils.isNotBlank(cachedEndpoint)){
+//            nodeEndpoint = cachedEndpoint;
+//        }else{
+//            nodeEndpoint = NodeConfiguration.getLocalAddress()
+//        }
+
+        int port = 7051;
+        NodeGrpcServer nodeGrpcServer = new NodeGrpcServer(port);
+        //注册背书服务
+        nodeGrpcServer.bindEndorserServer(new Endorser(null));
+
+
+
+
 
 
 

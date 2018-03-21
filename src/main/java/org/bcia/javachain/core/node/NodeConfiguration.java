@@ -18,6 +18,8 @@ package org.bcia.javachain.core.node;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.protos.node.Node;
+import org.bouncycastle.util.IPAddress;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -39,11 +41,7 @@ public class NodeConfiguration {
     }
 
 
-
-
-
-
-//        // getLocalAddress returns the address:port the local peer is operating on.  Affected by env:peer.addressAutoDetect
+    //        // getLocalAddress returns the address:port the local peer is operating on.  Affected by env:peer.addressAutoDetect
 //        getLocalAddress:=func() (string, error){
 //            peerAddress:=viper.GetString("peer.address")
 //            if peerAddress == "" {
@@ -99,67 +97,65 @@ public class NodeConfiguration {
 //        }
 //        return
 //    }
+    public static Node.NodeEndpoint getNodeEndpoint() {
+        Node.NodeEndpoint.Builder nodeEndpointBuilder = Node.NodeEndpoint.newBuilder();
+
+        nodeEndpointBuilder.setAddress(getLocalAddress());
+        nodeEndpointBuilder.setId(Node.NodeID.newBuilder().setName(new NodeConfig.Node().getId()).build());
+        return nodeEndpointBuilder.build();
+    }
 
 
+    /**
+     * 获取本机地址
+     *
+     * @return
+     */
+    private static String getLocalAddress() {
+        //TODO:会获取到
+        NodeConfig.Node node = new NodeConfig.Node();
 
-//    public String getLocalAddress() {
-//        //TODO:会获取到
-//        NodeConfig.Node node = new NodeConfig.Node();
-//
-//        //获取地址(host+port)
-//        String address = node.getAddress();
-//        if(StringUtils.isBlank(address)){
-//            log.warn("Missing node.address in node.yaml");
-//            return null;
-//        }
-//
-//        String[] str = address.split(":");
-//        if(str.length != 2){
-//            log.warn("Wrong node.address: " + address);
-//            return null;
-//        }
-//
-//        String host = str[0];
-//        String port = str[1];
-//
-//
-//
-//
-//
-//        autoDetectedIPAndPort := net.JoinHostPort(GetLocalIP(), port)
-//        peerLogger.Info("Auto-detected peer address:", autoDetectedIPAndPort)
-//        // If host is the IPv4 address "0.0.0.0" or the IPv6 address "::",
-//        // then fallback to auto-detected address
-//        if ip := net.ParseIP(host); ip != nil && ip.IsUnspecified() {
-//            peerLogger.Info("Host is", host, ", falling back to auto-detected address:", autoDetectedIPAndPort)
-//            return autoDetectedIPAndPort, nil
-//        }
-//
-//        if viper.GetBool("peer.addressAutoDetect") {
-//            peerLogger.Info("Auto-detect flag is set, returning", autoDetectedIPAndPort)
-//            return autoDetectedIPAndPort, nil
-//        }
-//        peerLogger.Info("Returning", peerAddress)
-//        return peerAddress, nil
-//
-//    }
+        //获取地址(host+port)
+        String address = node.getAddress();
+        if (StringUtils.isBlank(address)) {
+            log.warn("Missing node.address in node.yaml");
+            return null;
+        }
+
+        String[] str = address.split(":");
+        if (str.length != 2) {
+            log.warn("Wrong node.address: " + address);
+            return null;
+        }
+
+        String host = str[0];
+        String port = str[1];
+
+        if ("true".equalsIgnoreCase(node.getAddressAutoDetect())) {
+            return joinHostPort(getLocalIP(), port);
+        } else if (IPAddress.isValid(host)) {
+            return address;
+        } else {
+            log.error("Invalid address: " + address);
+            return null;
+        }
+    }
 
     /**
      * 获取本地IP地址
      *
      * @return
      */
-    public static String getLocalIP() {
+    private static String getLocalIP() {
         String localIp = null;
         try {
             Enumeration netInterfaces = NetworkInterface.getNetworkInterfaces();
             InetAddress ip = null;
             while (netInterfaces.hasMoreElements()) {
                 NetworkInterface ni = (NetworkInterface) netInterfaces.nextElement();
-                ip = (InetAddress) ni.getInetAddresses().nextElement();
-                //localIp = ip.getHostAddress();
+                ip = ni.getInetAddresses().nextElement();
                 if (!ip.isSiteLocalAddress() && !ip.isLoopbackAddress()
-                        && ip.getHostAddress().indexOf(":") == -1) {
+                        && !ip.getHostAddress().contains(":")) {
                     localIp = ip.getHostAddress();
                     break;
                 } else {
@@ -171,5 +167,20 @@ public class NodeConfiguration {
         }
 
         return localIp;
+    }
+
+    /**
+     * 拼接主机名和端口，形成完整访问地址
+     *
+     * @param host
+     * @param port
+     * @return
+     */
+    private static String joinHostPort(String host, String port) {
+        if (host.indexOf(':') >= 0) {
+            return "[" + host + "]:" + port;
+        }
+
+        return host + ":" + port;
     }
 }
