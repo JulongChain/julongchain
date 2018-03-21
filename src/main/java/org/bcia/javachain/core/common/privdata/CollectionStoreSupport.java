@@ -13,17 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.common.sysscprovider;
+package org.bcia.javachain.core.common.privdata;
 
-import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
+import org.bcia.javachain.core.ledger.IQueryExecutor;
+import org.bcia.javachain.msp.IIdentityDeserializer;
+import org.bcia.javachain.protos.common.Collection;
 
 /**
  * 类描述
  *
  * @author sunianle
- * @date 3/13/18
+ * @date 3/15/18
  * @company Dingxuan
  */
-public interface ISystemSmartContractProvider {
-    GenesisConfig.Application getApplicationConfig(String groupId);
+public class CollectionStoreSupport implements IPrivDataSupport {
+
+    @Override
+    public IQueryExecutor getQueryExecotorForLedger(String groupID) {
+        return null;
+    }
+
+    @Override
+    public String getCollectionKVSKey(Collection.CollectionCriteria cc) {
+        return null;
+    }
+
+    @Override
+    public IIdentityDeserializer getIdentityDeserializer(String groupID) {
+        return null;
+    }
 }
