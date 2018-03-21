@@ -33,8 +33,12 @@ public class DataMessageHandle {
     private ProducerMessage producerMessage;
 
     //转换kafka连接消息
-    public void newConnectMessage(){
-
+    public Kafka.KafkaMessage newConnectMessage(){
+        Kafka.KafkaMessageConnect.Builder kafkaConectMessage= Kafka.KafkaMessageConnect.newBuilder();
+        kafkaConectMessage.setPayload(null);
+        Kafka.KafkaMessage.Builder kafkaBuilder=Kafka.KafkaMessage.newBuilder();
+        kafkaBuilder.setConnect(kafkaConectMessage);
+        return kafkaBuilder.build();
     }
 
     //转换Enqueue（普通）方法所用消息格式
@@ -68,8 +72,14 @@ public class DataMessageHandle {
     }
 
     //转换数据切块方法
-    public void newTimeToCutMessage(){
+    public Kafka.KafkaMessage newTimeToCutMessage(long blockNumber){
 
+        Kafka.KafkaMessageTimeToCut.Builder kafkaTimeToCut=Kafka.KafkaMessageTimeToCut.newBuilder();
+        kafkaTimeToCut.setBlockNumber(blockNumber);
+
+        Kafka.KafkaMessage.Builder kafkaBuilder=Kafka.KafkaMessage.newBuilder();
+        kafkaBuilder.setTimeToCut(kafkaTimeToCut);
+        return kafkaBuilder.build();
     }
 
     //生产者消息转换
