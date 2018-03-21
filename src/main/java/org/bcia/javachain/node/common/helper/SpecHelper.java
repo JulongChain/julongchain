@@ -16,6 +16,7 @@
 package org.bcia.javachain.node.common.helper;
 
 import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.protos.node.Smartcontract;
 
 import java.nio.charset.Charset;
@@ -28,14 +29,13 @@ import java.nio.charset.Charset;
  * @company Dingxuan
  */
 public class SpecHelper {
-
-    private static final String DEFAULT_CHARSET = "UTF-8";
-
     public static Smartcontract.SmartContractInvocationSpec buildInvocationSpec(String smartContractName, String action, byte[] content) {
         //构造SmartContractInput对象
         Smartcontract.SmartContractInput.Builder inputBuilder = Smartcontract.SmartContractInput.newBuilder();
-        inputBuilder.addArgs(ByteString.copyFrom(action, Charset.forName(DEFAULT_CHARSET)));
-        inputBuilder.addArgs(ByteString.copyFrom(content));
+        inputBuilder.addArgs(ByteString.copyFrom(action, Charset.forName(CommConstant.DEFAULT_CHARSET)));
+        if (content != null) {
+            inputBuilder.addArgs(ByteString.copyFrom(content));
+        }
         Smartcontract.SmartContractInput input = inputBuilder.build();
 
         //构造SmartContractSpec对象

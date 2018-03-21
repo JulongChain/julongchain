@@ -2,6 +2,7 @@ package org.bcia.javachain.node;
 
 import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.BaseJunit4Test;
+import org.bcia.javachain.common.exception.NodeException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +22,7 @@ public class NodeTest extends BaseJunit4Test {
     }
 
     @Test
-    public void execCmd() throws ParseException {
+    public void execCmd() throws ParseException, NodeException {
         String[] caseArgs1 = new String[]{"group", "create", "-c", "localhost:7050", "-g", "mygroup", "-f", "filefile"};
 
         node.execCmd(caseArgs1);
