@@ -13,30 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.consensus;
-
-import org.bcia.javachain.common.localmsp.ILocalSigner;
-import org.bcia.javachain.protos.common.Common;
+package org.bcia.javachain.consenter.common.multigroup;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/7
+ * @Date: 2018/3/16
  * @company Dingxuan
  */
-public interface IConsenterSupport extends ILocalSigner, IProcessor {
-    IReceiver blockCutter();
-
-    IOrderer sharedConfig();
-
-    Common.Block createNextBlock(Common.Envelope[] messages);
-
-    void writeBlock(Common.Block block, byte[] encodedMetadataValue);
-
-    void writeConfigBlock(Common.Block block, byte[] encodedMetadataValue);
-
-    long sequence();
-
-    String chainID();
-
-    long height();
+public class BlockWriter {
 }

@@ -84,7 +84,7 @@ public class ConsenterServer {
 
     }
 
-    // 实现 定义一个实现服务接口的类
+    // 定义一个实现服务接口的类
     private class ConsenterServerImpl extends AtomicBroadcastGrpc.AtomicBroadcastImplBase {
 
 
@@ -94,9 +94,8 @@ public class ConsenterServer {
                 DeliverHandler deliverHandler=new DeliverHandler();
                 @Override
                 public void onNext(Common.Envelope envelope) {
-                  //  System.out.println("envelope:"+envelope.getPayload());
                     log.info("envelop:"+envelope.getPayload().toStringUtf8());
-                    deliverHandler.handle();
+                    deliverHandler.handle(envelope);
                     responseObserver.onNext(Ab.DeliverResponse.newBuilder().setStatusValue(500).build());
                     //封装处理消息的方法
                 }
@@ -115,20 +114,14 @@ public class ConsenterServer {
         @Override
         public StreamObserver<Common.Envelope> broadcast(StreamObserver<Ab.BroadcastResponse> responseObserver) {
             return new StreamObserver<Common.Envelope>(){
-
                  BroadCastHandler broadCastHandle=new BroadCastHandler();
                 @Override
                 public void onNext(Common.Envelope envelope) {
-                    System.out.println("envelope:"+envelope.getPayload().toStringUtf8());
-
-
                     try {
                         broadCastHandle.handle(envelope,responseObserver);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    //利用handle来处理收到的消息，并返回状态
-                   // responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatusValue(200).build());
                 }
 
                 @Override

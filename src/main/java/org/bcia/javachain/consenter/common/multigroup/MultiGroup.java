@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.common.msgprocessor;
+package org.bcia.javachain.consenter.common.multigroup;
 
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -21,17 +21,19 @@ import org.bcia.javachain.consenter.consensus.IConsenterSupport;
 import org.bcia.javachain.consenter.consensus.IOrderer;
 import org.bcia.javachain.consenter.consensus.IReceiver;
 import org.bcia.javachain.protos.common.Common;
+import org.springframework.stereotype.Component;
 
 /**
+ * solo和kafka创建区块的公共部分
  * @author zhangmingyang
- * @Date: 2018/3/15
+ * @Date: 2018/3/19
  * @company Dingxuan
  */
-public class MsgProcessor implements IConsenterSupport {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(MsgProcessor.class);
+@Component
+public class MultiGroup implements IConsenterSupport {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(MultiGroup.class);
     @Override
     public IReceiver blockCutter() {
-
         return null;
     }
 
@@ -42,18 +44,19 @@ public class MsgProcessor implements IConsenterSupport {
 
     @Override
     public Common.Block createNextBlock(Common.Envelope[] messages) {
-        log.info("创建区块");
+        log.info("进入创建下一个区块的方法体");
+
         return null;
     }
 
     @Override
     public void writeBlock(Common.Block block, byte[] encodedMetadataValue) {
-        log.info("区块写入");
+
     }
 
     @Override
     public void writeConfigBlock(Common.Block block, byte[] encodedMetadataValue) {
-
+      log.info("写配置区块的方法");
     }
 
     @Override
