@@ -27,4 +27,16 @@ public class CommConstant {
      * 默认编码
      */
     public static final String DEFAULT_CHARSET = "UTF-8";
+    /**
+     * 原数据：版本
+     */
+    public static final String METADATA_VERSION = "development build";
+    /**
+     * 背书系统智能合约
+     */
+    public static final String ESSC = "essc";
+    /**
+     * 生命周期系统智能合约
+     */
+    public static final String LSSC = "lssc";
 }
