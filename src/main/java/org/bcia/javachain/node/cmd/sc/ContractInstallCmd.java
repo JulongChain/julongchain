@@ -15,8 +15,7 @@
  */
 package org.bcia.javachain.node.cmd.sc;
 
-import org.apache.commons.cli.ParseException;
-import org.bcia.javachain.common.exception.NodeException;
+import org.apache.commons.cli.*;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.springframework.stereotype.Component;
@@ -25,7 +24,7 @@ import org.springframework.stereotype.Component;
  * 完成节点安装智能合约的解析
  * node contract install -n mycc -v 1.0 -p /home/javachian/contract_file
  *
- * @author zhouhui
+ * @author zhouhui wanglei
  * @date 2018/2/24
  * @company Dingxuan
  */
@@ -33,8 +32,30 @@ import org.springframework.stereotype.Component;
 public class ContractInstallCmd extends AbstractNodeContractCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ContractInstallCmd.class);
 
+    //参数：groupId
+    private static final String ARG_PATH = "p";
+    //参数：smartContract
+    private static final String ARG_SMART_CONTRACT = "s";
+
+    //参数：超时时间
+    private static final String ARG_TIMEOUT = "t";
+    //参数：是否使用TLS传输
+    private static final String ARG_USE_TLS = "tls";
+    //参数：CA文件位置
+    private static final String ARG_CA = "ca";
+
     @Override
-    public void execCmd(String[] args) throws ParseException, NodeException {
+    public void execCmd(String[] args) throws ParseException {
+
+        Options options = new Options();
+        options.addOption(ARG_PATH, true, "Input contract path");
+
+        CommandLineParser parser = new DefaultParser();
+        CommandLine cmd = parser.parse(options, args);
+
+        String defaultValue = "UnKown";
+
+        String consenter = null;
 
         //TODO 待完成
         nodeSmartContract.install();

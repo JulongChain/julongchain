@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.node.entity;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.stub.StreamObserver;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.JavaChainException;
@@ -27,17 +28,16 @@ import org.bcia.javachain.common.util.FileUtils;
 import org.bcia.javachain.common.util.proto.ProposalUtils;
 import org.bcia.javachain.consenter.common.broadcast.BroadCastClient;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
+import org.bcia.javachain.core.ssc.cssc.CSSC;
 import org.bcia.javachain.csp.gm.GmCspFactory;
 import org.bcia.javachain.msp.ISigningIdentity;
-import org.bcia.javachain.node.common.client.BroadcastClient;
-import org.bcia.javachain.node.common.client.DeliverClient;
-import org.bcia.javachain.node.common.client.IBroadcastClient;
-import org.bcia.javachain.node.common.client.IDeliverClient;
+import org.bcia.javachain.node.common.client.*;
 import org.bcia.javachain.node.common.helper.SpecHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.consenter.Ab;
 import org.bcia.javachain.protos.msp.Identities;
 import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.springframework.stereotype.Component;
 
@@ -229,4 +229,53 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
 
         return group;
     }
+
+    /**
+     *  加入群组列表 V0.25
+     */
+    public String listGroup(String smartContractName, String action, byte[] content) throws NodeException {
+        //生成proposal  Type=ENDORSER_TRANSACTION
+        Smartcontract.SmartContractInvocationSpec spec = SpecHelper.buildInvocationSpec(smartContractName, action, content);
+
+        ISigningIdentity identity = new MockSigningIdentity();
+        byte[] creator = identity.serialize();
+
+        byte[] nonce = MockCrypto.getRandomNonce();
+
+        String txId = null;
+        try {
+            txId = ProposalUtils.computeProposalTxID(creator, nonce);
+        } catch (JavaChainException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException("Generate txId fail");
+        }
+
+        //生成proposal  Type=ENDORSER_TRANSACTION
+        ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType.ENDORSER_TRANSACTION,
+                "", txId, spec, nonce, creator, null);
+        ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
+
+        //获取背书节点返回信息
+        EndorserClient client = new EndorserClient( CSSC.DEFAULT_HOST, CSSC.DEFAULT_PORT);
+        ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
+
+        //获取结果中 Payload
+        Common.Payload payload = null;
+        try {
+            payload = Common.Payload.parseFrom( proposalResponse.getResponse().getPayload() );
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+
+        //获取Payload 中的groupHeader
+        Common.GroupHeader groupHeader = null;
+        try {
+            groupHeader = Common.GroupHeader.parseFrom( payload.getHeader().getGroupHeader() );
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+
+        return groupHeader.getGroupId();
+    }
+
 }

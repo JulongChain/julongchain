@@ -89,10 +89,8 @@ public class ContractInvokeCmd extends AbstractNodeContractCmd {
         }
         //
         nodeSmartContract.invoke();
-    }
-
-    //
-    //public InitCmdFactory() {
 
     }
+
+}
 
