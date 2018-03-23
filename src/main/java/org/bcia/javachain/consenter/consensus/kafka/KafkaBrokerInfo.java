@@ -25,9 +25,25 @@ package org.bcia.javachain.consenter.consensus.kafka;
 
 public class KafkaBrokerInfo {
     // 主机名
-    public final String brokerHost;
+    public  String brokerHost;
     // 端口号
-    public final int brokerPort;
+    public  int brokerPort;
+
+    public String getBrokerHost() {
+        return brokerHost;
+    }
+
+    public void setBrokerHost(String brokerHost) {
+        this.brokerHost = brokerHost;
+    }
+
+    public int getBrokerPort() {
+        return brokerPort;
+    }
+
+    public void setBrokerPort(int brokerPort) {
+        this.brokerPort = brokerPort;
+    }
 
     /**
      * 构造方法
@@ -39,14 +55,8 @@ public class KafkaBrokerInfo {
         this.brokerHost = brokerHost;
         this.brokerPort = brokerPort;
     }
-
-    /**
-     * 构造方法， 使用默认端口号9092进行构造
-     *
-     * @param brokerHost
-     */
-    public KafkaBrokerInfo(String brokerHost) {
-        this(brokerHost, 9092);
+    public KafkaBrokerInfo() {
     }
 }
+
 

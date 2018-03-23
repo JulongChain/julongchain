@@ -16,12 +16,16 @@
 package org.bcia.javachain.consenter.consensus.kafka;
 
 import org.bcia.javachain.consenter.consensus.IChain;
+import org.bcia.javachain.consenter.util.Constant;
+import org.bcia.javachain.consenter.util.LoadYaml;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.consenter.Kafka;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author yangdong
@@ -30,12 +34,18 @@ import java.util.List;
  */
 public class Chain implements IChain {
 
+
     @Autowired
     private DataMessageHandle dataMessageHandle;
     @Autowired
     private KafkaProduce kafkaProduce;
+    //TODO 使用自动注入报错，暂时new方式
+    private KafkaSimpleConsumer kafkaSimpleConsumer=new KafkaSimpleConsumer();
     @Autowired
-    private KafkaSimpleConsumer kafkaSimpleConsumer;
+    private LoadYaml loadYaml=new LoadYaml();
+
+    Map map=(HashMap)loadYaml.readYamlFile(Constant.ORDERER_CONFIG).get(Constant.KAFKA);
+
 
     @Override
     public void order(Common.Envelope env, long configSeq) {
@@ -105,16 +115,22 @@ public class Chain implements IChain {
     //1.创建生产者，消费者，分区消费者，父类消费者，2.调用消费者方法，调用方法
     //start方法调用该方法
     public void startThread(){
-        long maxReads = 300;
-        String topic = "test2";
-        int partitionID = 0;
+        int maxReads =(int) ((HashMap)map.get(Constant.COMSUMER)).get(Constant.MAX_READS);
+        String topic = (String)((HashMap)map.get(Constant.COMSUMER)).get(Constant.TOPIC);
+        int partitionID = (int)((HashMap)map.get(Constant.COMSUMER)).get(Constant.PARTITION_ID);
 
         KafkaTopicPartitionInfo topicPartitionInfo = new KafkaTopicPartitionInfo(topic, partitionID);
         List<KafkaBrokerInfo> seeds = new ArrayList<KafkaBrokerInfo>();
-        seeds.add(new KafkaBrokerInfo("10.0.20.91", 9092));
-        seeds.add(new KafkaBrokerInfo("10.0.20.92", 9092));
+        Map serversMap= (HashMap)map.get(Constant.SERVER);
+        for(int i=1;i<=serversMap.size();i++){
+            String index="brokerHost"+i;
+            String host=(String)serversMap.get(index);
+            String[] hostArray=host.split(":");
+            KafkaBrokerInfo kafkaInfo=new KafkaBrokerInfo(hostArray[0],Integer.parseInt(hostArray[1]));
+            seeds.add(kafkaInfo);
+        }
         try {
-            kafkaSimpleConsumer.run(maxReads, topicPartitionInfo, seeds);
+            kafkaSimpleConsumer.run((long)maxReads, topicPartitionInfo, seeds);
         } catch (Exception e) {
             e.printStackTrace();
         }
