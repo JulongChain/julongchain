@@ -16,11 +16,14 @@
 package org.bcia.javachain.node.cmd.sc;
 
 import org.apache.commons.cli.*;
+import org.apache.commons.lang3.StringUtils;
+import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 
 /**
- * node contract invoke -c consenter.example.com:7050 -g groupId -n mycc -s '{"Args":["invoke","a","b","10"]}'
+ * node contract invoke -c consenter.example.com:7050 -g groupId -n mycc -l java -ctor '{"Args":["query","a"]}'
+ * consenter节点 群组 名称 语言 执行信息
  *
  * @author  wanglei
  * @date 18-3-14
@@ -33,8 +36,13 @@ public class ContractInvokeCmd extends AbstractNodeContractCmd {
     private static final String ARG_CONSENTER = "c";
     //参数：groupId
     private static final String ARG_GROUP_ID = "g";
-    //参数：smartContract
-    private static final String ARG_SMART_CONTRACT = "s";
+    //参数：smart Contract name
+    private static final String ARG_SC_NAME = "n";
+    //参数：smartContract parameter
+    private static final String ARG_SC_CTOR = "ctor";
+    //参数：language
+    private static final String ARG_LANGUAGE = "l";
+
 
     //参数：超时时间
     private static final String ARG_TIMEOUT = "t";
@@ -44,34 +52,48 @@ public class ContractInvokeCmd extends AbstractNodeContractCmd {
     private static final String ARG_CA = "ca";
 
     @Override
-    public void execCmd(String[] args) throws ParseException {
+    public void execCmd(String[] args) throws ParseException, NodeException {
         Options options = new Options();
         options.addOption(ARG_CONSENTER, true, "Input consenter's IP and port");
         options.addOption(ARG_GROUP_ID, true, "Input group id");
-        //options.addOption(ARG_FILE_PATH, true, "Input group config file path");
-        options.addOption(ARG_SMART_CONTRACT, true, "Input smartCintract");
+        options.addOption(ARG_SC_NAME, true, "Input contract name");
+        options.addOption(ARG_SC_CTOR, true, "Input contract parameter");
+        options.addOption(ARG_LANGUAGE, true, "Input contract language");
+
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
         String defaultValue = "UnKown";
-
+        //consenter 信息  ip:port
         String consenter = null;
         if (cmd.hasOption(ARG_CONSENTER)) {
             consenter = cmd.getOptionValue(ARG_CONSENTER, defaultValue);
             log.info("Consenter-----$" + consenter);
         }
-
+        //群组信息
         String groupId = null;
         if(cmd.hasOption(ARG_GROUP_ID)){
             groupId = cmd.getOptionValue(ARG_GROUP_ID, defaultValue);
             log.info("Grout ID-----$" + groupId);
         }
-
-        String contract = null;
-        if(cmd.hasOption(ARG_SMART_CONTRACT)){
-            contract = cmd.getOptionValue(ARG_SMART_CONTRACT, defaultValue);
-            log.info("Contract-----$" + contract);
+        //解析出合约名称
+        String name = null;
+        if(cmd.hasOption(ARG_SC_NAME)){
+            name = cmd.getOptionValue(ARG_SC_NAME, defaultValue);
+            log.info("Contract name-----$" + name);
+        }
+        //合约具体执行参数
+        String ctor = null;
+        if(cmd.hasOption(ARG_SC_CTOR)){
+            ctor = cmd.getOptionValue(ARG_SC_CTOR, defaultValue);
+            log.info("Contract ctor-----$" + ctor);
+        }
+        //合约语言
+        String scLanguage = null;
+        if (cmd.hasOption(ARG_LANGUAGE)) {
+            scLanguage = cmd.getOptionValue(ARG_LANGUAGE, defaultValue);
+            log.info("Smart Contract language-----$" + scLanguage);
         }
 
         String[] ipAndPort = consenter.split(":");
@@ -87,8 +109,23 @@ public class ContractInvokeCmd extends AbstractNodeContractCmd {
             log.error("Consenter's port is not valid");
             return;
         }
+
+        //-----------------------------------参数校验--------------------------------//
+        if (StringUtils.isBlank(groupId)) {
+            log.error("groupId should not be null, Please input it");
+            return;
+        }
+        if (StringUtils.isBlank(name)) {
+            log.error("smart contract name should not be null, Please input it");
+            return;
+        }
+        if (StringUtils.isBlank(ctor)) {
+            log.error("smart contract ctor should not be null, Please input it");
+            return;
+        }
+
         //
-        nodeSmartContract.invoke();
+        nodeSmartContract.invoke(ipAndPort[0], port, groupId, name, ctor, scLanguage);
 
     }
 
