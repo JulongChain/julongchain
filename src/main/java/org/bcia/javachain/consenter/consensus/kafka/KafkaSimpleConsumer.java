@@ -33,6 +33,7 @@ import kafka.javaapi.TopicMetadataRequest;
 import kafka.javaapi.TopicMetadataResponse;
 import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.message.MessageAndOffset;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -46,6 +47,10 @@ import java.util.*;
  */
 
 public class KafkaSimpleConsumer {
+
+    @Autowired
+    private Chain chain;
+
     // 最大重试次数
     private int maxRetryTimes = 5;
     // 重试间隔时间
@@ -166,6 +171,8 @@ public class KafkaSimpleConsumer {
                     byte[] bytes = new byte[payload.limit()];
                     payload.get(bytes);
                     System.out.println("value:"+currentOffset + ": " + new String(bytes, "UTF-8"));
+                    //传给业务处理
+                    chain.processMessagesToBlocks(bytes);
                     numRead++;
                     maxReads--;
                 }

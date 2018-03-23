@@ -28,4 +28,11 @@ public class Constant {
     public static final String CONFIGTX="configtx.yaml";
     public static final String SINGLETON="Singleton";
     public static final String KAFKA="Kafka";
+    public static final String COMSUMER="Comumer";
+    public static final String MAX_READS="maxReads";
+    public static final String  TOPIC="topic";
+
+    public static final String  PARTITION_ID="partitionID";
+    public static final String   SERVER="Server";
+
 }
