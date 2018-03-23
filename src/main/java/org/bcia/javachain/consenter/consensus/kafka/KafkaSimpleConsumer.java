@@ -15,24 +15,18 @@
  */
 package org.bcia.javachain.consenter.consensus.kafka;
 
-import kafka.api.*;
+import kafka.api.FetchRequestBuilder;
+import kafka.api.PartitionOffsetRequestInfo;
 import kafka.cluster.Broker;
 import kafka.common.ErrorMapping;
 import kafka.common.OffsetAndMetadata;
 import kafka.common.OffsetMetadataAndError;
 import kafka.common.TopicAndPartition;
-import kafka.javaapi.FetchResponse;
-import kafka.javaapi.OffsetCommitRequest;
-import kafka.javaapi.OffsetFetchRequest;
-import kafka.javaapi.OffsetFetchResponse;
-import kafka.javaapi.OffsetRequest;
-import kafka.javaapi.OffsetResponse;
-import kafka.javaapi.PartitionMetadata;
-import kafka.javaapi.TopicMetadata;
-import kafka.javaapi.TopicMetadataRequest;
-import kafka.javaapi.TopicMetadataResponse;
+import kafka.javaapi.*;
 import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.message.MessageAndOffset;
+import org.bcia.javachain.consenter.util.Constant;
+import org.bcia.javachain.consenter.util.LoadYaml;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.nio.ByteBuffer;
@@ -50,11 +44,14 @@ public class KafkaSimpleConsumer {
 
     @Autowired
     private Chain chain;
+    @Autowired
+    private LoadYaml loadYaml=new LoadYaml();
+    Map map=(HashMap)loadYaml.readYamlFile(Constant.ORDERER_CONFIG).get(Constant.KAFKA);
 
     // 最大重试次数
-    private int maxRetryTimes = 5;
+    private int maxRetryTimes = (int) ((HashMap)map.get(Constant.COMSUMER)).get(Constant.MAX_RETRY_TIMES);
     // 重试间隔时间
-    private long retryIntervalMillis = 1000;
+    private long retryIntervalMillis =(int) ((HashMap)map.get(Constant.COMSUMER)).get(Constant.RETRY_INTERVAL_MILLIS);
     // 缓存Topic/Partition对应的Broker连接信息
     private Map<KafkaTopicPartitionInfo, List<KafkaBrokerInfo>> replicaBrokers = new HashMap<KafkaTopicPartitionInfo, List<KafkaBrokerInfo>>();
 

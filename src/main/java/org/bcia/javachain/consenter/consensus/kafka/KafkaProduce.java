@@ -18,7 +18,12 @@ package org.bcia.javachain.consenter.consensus.kafka;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
+import org.bcia.javachain.consenter.util.Constant;
+import org.bcia.javachain.consenter.util.LoadYaml;
+import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 
@@ -32,19 +37,41 @@ import java.util.Properties;
 
 public class KafkaProduce {
     private final Producer<String, String> producer;
-    public final static String TOPIC = "test2";
+   // public final static String TOPIC = "test2";
+
+    @Autowired
+    private LoadYaml loadYaml=new LoadYaml();
+
+    Map map=(HashMap)loadYaml.readYamlFile(Constant.ORDERER_CONFIG).get(Constant.KAFKA);
+
+
 
     private KafkaProduce(){
+        StringBuffer sbBrokerHost=new StringBuffer();
+        StringBuffer sbZookeeperHost=new StringBuffer();
+
+        Map serversMap= (HashMap)map.get(Constant.SERVER);
+        for(int i=1;i<=serversMap.size();i++){
+            String index="brokerHost"+i;
+            StringBuffer host=new StringBuffer((String)serversMap.get(index));
+            sbBrokerHost=sbBrokerHost.append(host);
+        }
+
+        Map zookeeperMap= (HashMap)map.get(Constant.ZOOKEEPER);
+        for(int i=1;i<=zookeeperMap.size();i++){
+            String index="ZKHost"+i;
+            StringBuffer host=new StringBuffer((String)zookeeperMap.get(index));
+            sbZookeeperHost=sbZookeeperHost.append(host);
+        }
 
         Properties props = new Properties();
 
         // 此处配置的是kafka的broker地址:端口列表
         // props.put("metadata.broker.list", "192.168.128.129:9092");
-        props.put("zookeeper.connect", "10.0.20.91:2181,10.0.20.92:2181");//声明zk
-        props.put("metadata.broker.list", "10.0.20.91:9092,10.0.20.92:9092");// 声明kafka broker
+        props.put("zookeeper.connect", sbZookeeperHost.toString());//声明zk
+        props.put("metadata.broker.list",sbBrokerHost.toString());// 声明kafka broker
         //配置value的序列化类
         props.put("serializer.class", "kafka.serializer.StringEncoder");
-
         //配置key的序列化类
         props.put("key.serializer.class", "kafka.serializer.StringEncoder");
 
@@ -68,7 +95,7 @@ public class KafkaProduce {
 
 
 
-    public void produce() {
+    /*public void produce() {
         int messageNo = 1;
         final int COUNT = 101;
 
@@ -84,11 +111,13 @@ public class KafkaProduce {
         }
 
         System.out.println("Producer端一共产生了" + messageCount + "条消息！");
-    }
+    }*/
 
-    public static void main( String[] args )
+  /*  public static void main( String[] args )
     {
         new KafkaProduce().produce();
-    }
-
+    }*/
+  public static void main(String[] args) {
+      KafkaProduce kk=new KafkaProduce();
+  }
 }

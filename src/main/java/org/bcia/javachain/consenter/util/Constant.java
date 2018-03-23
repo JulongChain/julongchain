@@ -33,6 +33,8 @@ public class Constant {
     public static final String  TOPIC="topic";
 
     public static final String  PARTITION_ID="partitionID";
-    public static final String   SERVER="Server";
-
+    public static final String  SERVER="Server";
+    public static final String  MAX_RETRY_TIMES ="maxRetryTimes";
+    public static final String  RETRY_INTERVAL_MILLIS="retryIntervalMillis";
+    public static final String  ZOOKEEPER = "Zookeeper";
 }
