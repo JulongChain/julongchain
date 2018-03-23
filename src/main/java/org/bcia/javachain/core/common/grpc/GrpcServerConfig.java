@@ -13,17 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.common.sysscprovider;
-
-import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
+package org.bcia.javachain.core.common.grpc;
 
 /**
- * 类描述
+ * GRPC服务器配置
  *
- * @author sunianle
- * @date 3/13/18
+ * @author zhouhui
+ * @date 2018/3/20
  * @company Dingxuan
  */
-public interface ISystemSmartContractProvider {
-    GenesisConfig.Application getApplicationConfig(String groupId);
+public class GrpcServerConfig {
+    private SecureOptions secureOptions;
+
+    private KeepaliveOptions keepaliveOptions;
+
+    public SecureOptions getSecureOptions() {
+        return secureOptions;
+    }
+
+    public void setSecureOptions(SecureOptions secureOptions) {
+        this.secureOptions = secureOptions;
+    }
+
+    public KeepaliveOptions getKeepaliveOptions() {
+        return keepaliveOptions;
+    }
+
+    public void setKeepaliveOptions(KeepaliveOptions keepaliveOptions) {
+        this.keepaliveOptions = keepaliveOptions;
+    }
 }

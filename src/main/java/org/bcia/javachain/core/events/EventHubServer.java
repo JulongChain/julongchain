@@ -13,17 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.common.sysscprovider;
+package org.bcia.javachain.core.events;
 
-import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
+import org.bcia.javachain.protos.node.EventsPackage;
 
 /**
- * 类描述
+ * 对象
  *
- * @author sunianle
- * @date 3/13/18
+ * @author zhouhui
+ * @date 2018/3/20
  * @company Dingxuan
  */
-public interface ISystemSmartContractProvider {
-    GenesisConfig.Application getApplicationConfig(String groupId);
+public class EventHubServer implements IEventHubServer {
+    @Override
+    public EventsPackage.Event chat(EventsPackage.SignedEvent value) {
+        return null;
+    }
 }

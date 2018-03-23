@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.common.sysscprovider;
-
-import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
+package org.bcia.javachain.core.common.privdata;
 
 /**
- * 类描述
+ * ICollectionStore retrieves stored collections based on the collection's
+ * properties. It works as a collection object factory and takes care of
+ * returning a collection object of an appropriate collection type.
  *
  * @author sunianle
- * @date 3/13/18
+ * @date 3/15/18
  * @company Dingxuan
  */
-public interface ISystemSmartContractProvider {
-    GenesisConfig.Application getApplicationConfig(String groupId);
+public interface ICollectionStore {
+    //Colletion retrieveColletion(CollectionCriteria );
 }

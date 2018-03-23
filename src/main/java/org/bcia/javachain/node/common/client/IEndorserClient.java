@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.common.sysscprovider;
+package org.bcia.javachain.node.common.client;
 
-import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
+import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.ProposalResponsePackage;
 
 /**
- * 类描述
+ * 背书客户端接口定义
  *
- * @author sunianle
- * @date 3/13/18
+ * @author zhouhui
+ * @date 2018/3/19
  * @company Dingxuan
  */
-public interface ISystemSmartContractProvider {
-    GenesisConfig.Application getApplicationConfig(String groupId);
+public interface IEndorserClient {
+    ProposalResponsePackage.ProposalResponse sendProcessProposal(ProposalPackage.SignedProposal signedProposal);
 }

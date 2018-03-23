@@ -13,17 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.common.sysscprovider;
-
-import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
+package org.bcia.javachain.common.util;
 
 /**
- * 类描述
+ * 公共常量
  *
- * @author sunianle
- * @date 3/13/18
+ * @author zhouhui
+ * @date 2018/3/19
  * @company Dingxuan
  */
-public interface ISystemSmartContractProvider {
-    GenesisConfig.Application getApplicationConfig(String groupId);
+public class CommConstant {
+    /**
+     * 默认编码
+     */
+    public static final String DEFAULT_CHARSET = "UTF-8";
+    /**
+     * 原数据：版本
+     */
+    public static final String METADATA_VERSION = "development build";
+    /**
+     * 背书系统智能合约
+     */
+    public static final String ESSC = "essc";
+    /**
+     * 生命周期系统智能合约
+     */
+    public static final String LSSC = "lssc";
 }

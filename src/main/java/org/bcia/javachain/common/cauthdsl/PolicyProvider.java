@@ -13,17 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.common.sysscprovider;
+package org.bcia.javachain.common.cauthdsl;
 
-import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
+import org.bcia.javachain.common.policies.IPolicy;
+import org.bcia.javachain.msp.IMspManager;
 
 /**
  * 类描述
  *
  * @author sunianle
- * @date 3/13/18
+ * @date 3/21/18
  * @company Dingxuan
  */
-public interface ISystemSmartContractProvider {
-    GenesisConfig.Application getApplicationConfig(String groupId);
+public class PolicyProvider {
+    public PolicyProvider(IMspManager manager){
+
+    }
+
+    public IPolicy newPolicy(String policy) {
+        return null;
+    }
 }

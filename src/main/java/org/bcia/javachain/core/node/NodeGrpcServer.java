@@ -15,21 +15,25 @@
  */
 package org.bcia.javachain.core.node;
 
+import com.google.protobuf.Empty;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
+import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.consenter.common.broadcast.BroadCastHandler;
+import org.bcia.javachain.core.endorser.IEndorserServer;
+import org.bcia.javachain.core.events.IEventHubServer;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.consenter.Ab;
-import org.bcia.javachain.protos.consenter.AtomicBroadcastGrpc;
-import org.bcia.javachain.protos.node.EndorserGrpc;
-import org.bcia.javachain.protos.node.ProposalPackage;
-import org.bcia.javachain.protos.node.ProposalResponsePackage;
+import org.bcia.javachain.protos.gossip.GossipGrpc;
+import org.bcia.javachain.protos.gossip.Message;
+import org.bcia.javachain.protos.node.*;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+
+import static io.grpc.stub.ServerCalls.asyncUnimplementedStreamingCall;
+import static org.bcia.javachain.protos.gossip.GossipGrpc.getPingMethod;
 
 /**
  * 节点GRPC服务
@@ -41,23 +45,58 @@ import java.io.IOException;
 @Component
 public class NodeGrpcServer {
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeGrpcServer.class);
-
+    /**
+     * 监听的端口
+     */
     private int port = 7051;
+    /**
+     * grpc框架定义的服务器抽象
+     */
     private Server server;
+    /**
+     * 业务服务1:背书服务
+     */
+    private IEndorserServer endorserServer;
+    /**
+     * 业务服务2:事件处理服务
+     */
+    private IEventHubServer eventHubServer;
+
+    public NodeGrpcServer(int port) {
+        this.port = port;
+    }
+
+    /**
+     * 绑定背书服务
+     *
+     * @param endorserServer
+     */
+    public void bindEndorserServer(IEndorserServer endorserServer) {
+        this.endorserServer = endorserServer;
+    }
+
+    /**
+     * 绑定事件处理服务
+     *
+     * @param eventHubServer
+     */
+    public void bindEventHubServer(IEventHubServer eventHubServer) {
+        this.eventHubServer = eventHubServer;
+    }
 
     public void start() throws IOException {
         server = ServerBuilder.forPort(port)
-                .addService(new ConsenterServerImpl())
+                .addService(new EndorserServerImpl())
                 .build()
                 .start();
-        log.info("NodeGrpcServer start");
+        log.info("NodeGrpcServer start, port: " + port);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
                 log.info("shutting down NodeGrpcServer since JVM is shutting down");
                 NodeGrpcServer.this.stop();
-                System.err.println("NodeGrpcServer shut down");
+                log.error("NodeGrpcServer shut down");
             }
         });
     }
@@ -77,7 +116,7 @@ public class NodeGrpcServer {
 
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        NodeGrpcServer server = new NodeGrpcServer();
+        NodeGrpcServer server = new NodeGrpcServer(7051);
         server.start();
         server.blockUntilShutdown();
     }
@@ -85,77 +124,140 @@ public class NodeGrpcServer {
     private class EndorserServerImpl extends EndorserGrpc.EndorserImplBase {
         @Override
         public void processProposal(ProposalPackage.SignedProposal request, StreamObserver<ProposalResponsePackage.ProposalResponse> responseObserver) {
-//            ProposalResponsePackage.ProposalResponse proposalResponse =
-
-
-//            responseObserver.onNext();
-
-
-
-            super.processProposal(request, responseObserver);
+            if (endorserServer != null) {
+                ProposalResponsePackage.ProposalResponse proposalResponse = endorserServer.processProposal(request);
+                responseObserver.onNext(proposalResponse);
+                responseObserver.onCompleted();
+            } else {
+                log.error("endorserServer is not ready, but client sent some message: " + request);
+                responseObserver.onError(new NodeException("endorserServer is not ready"));
+            }
         }
     }
 
-
-    // 实现 定义一个实现服务接口的类
-    private class ConsenterServerImpl extends AtomicBroadcastGrpc.AtomicBroadcastImplBase {
-
-
+    private class EventServerImpl extends EventsGrpc.EventsImplBase {
         @Override
-        public StreamObserver<Common.Envelope> deliver(StreamObserver<Ab.DeliverResponse> responseObserver) {
-            return new StreamObserver<Common.Envelope>() {
+        public StreamObserver<EventsPackage.SignedEvent> chat(StreamObserver<EventsPackage.Event> responseObserver) {
+            return new StreamObserver<EventsPackage.SignedEvent>() {
                 @Override
-                public void onNext(Common.Envelope envelope) {
-                    System.out.println("envelope:" + envelope.getPayload());
-
-                    responseObserver.onNext(Ab.DeliverResponse.newBuilder().setStatusValue(500).build());
-                    //封装处理消息的方法
-                }
-
-                @Override
-                public void onError(Throwable throwable) {
-
-                }
-
-                @Override
-                public void onCompleted() {
-
-                }
-            };
-        }
-
-        @Override
-        public StreamObserver<Common.Envelope> broadcast(StreamObserver<Ab.BroadcastResponse> responseObserver) {
-            return new StreamObserver<Common.Envelope>() {
-
-                BroadCastHandler broadCastHandle = new BroadCastHandler();
-
-                @Override
-                public void onNext(Common.Envelope envelope) {
-                    System.out.println("envelope:" + envelope.getPayload());
-
-
-                    try {
-                        broadCastHandle.handle(envelope, responseObserver);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                public void onNext(EventsPackage.SignedEvent value) {
+                    if (eventHubServer != null) {
+                        EventsPackage.Event resultEvent = eventHubServer.chat(value);
+                        responseObserver.onNext(resultEvent);
+                    } else {
+                        log.error("eventHubServer is not ready, but client sent some message: " + value);
+                        responseObserver.onError(new NodeException("eventHubServer is not ready"));
                     }
-                    //利用handle来处理收到的消息，并返回状态
-                    // responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatusValue(200).build());
                 }
 
                 @Override
-                public void onError(Throwable throwable) {
-                    System.out.println(throwable.getMessage());
+                public void onError(Throwable t) {
+
                 }
 
                 @Override
                 public void onCompleted() {
-                    responseObserver.onCompleted();
+
+                }
+            };
+        }
+    }
+
+    private class DeliverServerImpl extends DeliverGrpc.DeliverImplBase {
+        @Override
+        public StreamObserver<Common.Envelope> deliver(StreamObserver<EventsPackage.DeliverResponse> responseObserver) {
+            return new StreamObserver<Common.Envelope>() {
+                @Override
+                public void onNext(Common.Envelope value) {
+
+                }
+
+                @Override
+                public void onError(Throwable t) {
+
+                }
+
+                @Override
+                public void onCompleted() {
+
                 }
             };
         }
 
+        @Override
+        public StreamObserver<Common.Envelope> deliverFiltered(StreamObserver<EventsPackage.DeliverResponse> responseObserver) {
+            return new StreamObserver<Common.Envelope>() {
+                @Override
+                public void onNext(Common.Envelope value) {
+
+                }
+
+                @Override
+                public void onError(Throwable t) {
+
+                }
+
+                @Override
+                public void onCompleted() {
+
+                }
+            };
+        }
+    }
+
+    private class GossipServerImpl extends GossipGrpc.GossipImplBase {
+        @Override
+        public StreamObserver<Message.Envelope> gossipStream(StreamObserver<Message.Envelope> responseObserver) {
+            return new StreamObserver<Message.Envelope>() {
+                @Override
+                public void onNext(Message.Envelope value) {
+
+                }
+
+                @Override
+                public void onError(Throwable t) {
+
+                }
+
+                @Override
+                public void onCompleted() {
+
+                }
+            };
+        }
+
+        @Override
+        public void ping(Message.Empty request, StreamObserver<Message.Empty> responseObserver) {
+
+        }
+
+    }
+
+    private class AdminServerImpl extends AdminGrpc.AdminImplBase {
+        @Override
+        public void getStatus(Empty request, StreamObserver<AdminPackage.ServerStatus>
+                responseObserver) {
+        }
+
+        @Override
+        public void startServer(Empty request, StreamObserver<AdminPackage.ServerStatus> responseObserver) {
+
+        }
+
+        @Override
+        public void getModuleLogLevel(AdminPackage.LogLevelRequest request, StreamObserver<AdminPackage.LogLevelResponse> responseObserver) {
+
+        }
+
+        @Override
+        public void setModuleLogLevel(AdminPackage.LogLevelRequest request, StreamObserver<AdminPackage.LogLevelResponse> responseObserver) {
+
+        }
+
+        @Override
+        public void revertLogLevels(Empty request, StreamObserver<Empty> responseObserver) {
+
+        }
 
     }
 

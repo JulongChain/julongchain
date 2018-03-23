@@ -182,7 +182,7 @@ public class ESSC  extends SystemSmartContractBase {
             return newErrorResponse("GetProposalResponse get empty Response");
         }
 
-        log.debug("ESCC exits successfully");
+        log.debug("ESSC exits successfully");
         return newSuccessResponse(prBytes);
     }
 

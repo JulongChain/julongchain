@@ -15,12 +15,15 @@
  */
 package org.bcia.javachain.common.util.proto;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ssc.essc.MockSigningIdentity;
+import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Smartcontract;
+import org.bcia.javachain.protos.node.TransactionPackage;
 
 import java.io.UnsupportedEncodingException;
 
@@ -65,5 +68,27 @@ public class ProtoUtils {
 
     public static ProposalResponsePackage.ProposalResponse getProposalResponse(byte[] prBytes) throws InvalidProtocolBufferException {
         return ProposalResponsePackage.ProposalResponse.parseFrom(prBytes);
+    }
+
+    // GetEnvelopeFromBlock gets an envelope from a block's Data field.
+    public static Common.Envelope getEnvelopeFromBlock(String block)
+            throws UnsupportedEncodingException, InvalidProtocolBufferException {
+        byte[] bytes = block.getBytes("UTF-8");
+        return Common.Envelope.parseFrom(bytes);
+    }
+
+    public static Common.Payload getPayload(Common.Envelope envelope)
+            throws InvalidProtocolBufferException{
+        ByteString byteString = envelope.getPayload();
+        Common.Payload payload = Common.Payload.parseFrom(byteString);
+        return payload;
+    }
+
+    public static Common.GroupHeader unMarshalGroupHeader(ByteString groupHeader) throws InvalidProtocolBufferException {
+        return Common.GroupHeader.parseFrom(groupHeader);
+    }
+
+    public static TransactionPackage.Transaction getTransaction(ByteString data) throws InvalidProtocolBufferException {
+        return TransactionPackage.Transaction.parseFrom(data);
     }
 }

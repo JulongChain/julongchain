@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.common.sysscprovider;
-
-import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
+package org.bcia.javachain.core.common.privdata;
 
 /**
  * 类描述
  *
  * @author sunianle
- * @date 3/13/18
+ * @date 3/20/18
  * @company Dingxuan
  */
-public interface ISystemSmartContractProvider {
-    GenesisConfig.Application getApplicationConfig(String groupId);
+public class SimpleCollectionStore implements ICollectionStore{
 }
