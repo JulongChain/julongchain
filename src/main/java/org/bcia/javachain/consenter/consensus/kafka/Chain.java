@@ -34,9 +34,8 @@ import java.util.Map;
  */
 public class Chain implements IChain {
 
-
-    @Autowired
-    private DataMessageHandle dataMessageHandle;
+    //TODO 使用自动注入报错，暂时new方式
+    private DataMessageHandle dataMessageHandle=new DataMessageHandle();
     @Autowired
     private KafkaProduce kafkaProduce;
     //TODO 使用自动注入报错，暂时new方式
@@ -61,6 +60,7 @@ public class Chain implements IChain {
     public void start() {
         //新启动一个线程，来处理消费消息
         Thread t = new Thread(new Runnable(){
+            @Override
             public void run(){
                 startThread();
             }});
@@ -76,8 +76,11 @@ public class Chain implements IChain {
     //调用kafka的客户端，实现kafka生产者
     //enqueue接受信息并返回真或假otheriwse验收
     public void enqueue(Kafka.KafkaMessage kafkaMessage){
-       // 获取kafkaInfo，从配置文件获取（现在这里定义，TODO该成全局）
-        KafkaTopicPartitionInfo kafkaInfo=new KafkaTopicPartitionInfo("test2",0);
+
+        String topic = (String)((HashMap)map.get(Constant.COMSUMER)).get(Constant.TOPIC);
+        int partitionID = (int)((HashMap)map.get(Constant.COMSUMER)).get(Constant.PARTITION_ID);
+        // 获取kafkaInfo，从配置文件获取（现在这里定义，TODO该成全局）
+        KafkaTopicPartitionInfo kafkaInfo=new KafkaTopicPartitionInfo(topic,partitionID);
         //创建生产者消息
         ProducerMessage message=dataMessageHandle.newProducerMessage(kafkaInfo,kafkaMessage.toByteArray());
         //调用生产者发送消息
@@ -161,7 +164,8 @@ public class Chain implements IChain {
 
     public static void main(String[] args) {
         Chain cc=new Chain();
-        cc.start();
+      //  cc.start();
+        cc.enqueue(null);
     }
 
 }

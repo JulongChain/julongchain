@@ -152,9 +152,14 @@ Kafka:
          maxReads: 300
          topic: test2
          partitionID: 0
+         maxRetryTimes: 5
+         retryIntervalMillis: 1000
     Server:
         brokerHost1: 10.0.20.91:9092
         brokerHost2: 10.0.20.92:9092
+    Zookeeper:
+        ZKHost1: 10.0.20.91:2181
+        ZKHost2: 10.0.20.92:2181
     # Retry: What do if a connection to the Kafka cluster cannot be established,
     # or if a metadata request to the Kafka cluster needs to be repeated.
     Retry:
