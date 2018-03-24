@@ -32,6 +32,14 @@ public class NodeCmdConstant {
      */
     public static final String JOIN_GROUP = "join";
     /**
+     * 列出所加入的群组
+     */
+    public static final String LIST_GROUP = "list";
+    /**
+     * 更新群组配置
+     */
+    public static final String UPDATE_GROUP = "update";
+    /**
      * 启动Node服务
      */
     public static final String START_SERVER = "start";
@@ -47,4 +55,8 @@ public class NodeCmdConstant {
      * 实例化智能合约
      */
     public static final String INSTANCE_CONTRACT = "instance";
+    /**
+     * 调用智能合约
+     */
+    public static final String INVOKE_CONTRACT = "invoke";
 }

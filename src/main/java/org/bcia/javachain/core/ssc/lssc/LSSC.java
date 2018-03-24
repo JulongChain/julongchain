@@ -118,8 +118,8 @@ public class LSSC  extends SystemSmartContractBase {
                 ;
         }
 
-        log.debug("LSCC exits successfully");
-        return null;
+        log.debug("LSSC exits successfully");
+        return newSuccessResponse();
     }
 
     @Override

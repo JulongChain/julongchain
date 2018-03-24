@@ -52,4 +52,26 @@ public class LoadYaml {
 
 
     }
+
+    public Map readYamlFile(String file){
+        HashMap map=new HashMap();
+        try {
+            Yaml yaml = new Yaml();
+            URL url = LoadYaml.class.getClassLoader().getResource(file);
+            if (url != null) {
+                //可以将值转换为Map
+                log.info("Loading the yaml file...");
+                 map =(HashMap)yaml.load(new FileInputStream(url.getFile()));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+
+    public static void main(String[] args) {
+        LoadYaml ll =new LoadYaml();
+        Map map=ll.readYamlFile("orderer.yaml");
+        System.out.println(((HashMap)map.get("Kafka")).get("Comumer"));
+    }
 }

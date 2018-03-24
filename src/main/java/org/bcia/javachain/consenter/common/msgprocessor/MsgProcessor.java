@@ -52,7 +52,7 @@ public class MsgProcessor implements IConsenterSupport {
     }
 
     @Override
-    public void writeConfig(Common.Block block, byte[] encodedMetadataValue) {
+    public void writeConfigBlock(Common.Block block, byte[] encodedMetadataValue) {
 
     }
 

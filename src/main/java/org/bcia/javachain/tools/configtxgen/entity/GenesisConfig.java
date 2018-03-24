@@ -415,7 +415,7 @@ public class GenesisConfig {
         }
     }
 
-    private static class Resources {
+    public static class Resources {
         private String defaultModPolicy;
 
         /**
@@ -459,7 +459,7 @@ public class GenesisConfig {
         }
     }
 
-    private static class AnchorNode {
+    public static class AnchorNode {
         private String host;
         private int port;
 
@@ -480,7 +480,7 @@ public class GenesisConfig {
         }
     }
 
-    private static class BatchSize {
+    public static class BatchSize {
         private int maxMessageCount;
         private int absoluteMaxBytes;
         private int preferredMaxBytes;
@@ -510,7 +510,7 @@ public class GenesisConfig {
         }
     }
 
-    private static class Kafka {
+    public static class Kafka {
         private String[] brokers;
 
         public String[] getBrokers() {

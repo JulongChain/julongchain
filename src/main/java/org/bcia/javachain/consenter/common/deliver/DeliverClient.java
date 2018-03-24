@@ -4,6 +4,9 @@ import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
+import org.bcia.javachain.common.localmsp.ILocalSigner;
+import org.bcia.javachain.common.localmsp.impl.LocalSigner;
+import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.protos.common.Common;
 
 import org.bcia.javachain.protos.consenter.Ab;
@@ -20,7 +23,13 @@ import static org.bcia.javachain.protos.consenter.AtomicBroadcastGrpc.*;
  */
 @Component
 public class DeliverClient {
-    public void send(String ip, int port, String message){
+    public static void main(String[] args) throws Exception {
+        String ip="localhost";
+        String message="aba";
+        int port=7050;
+
+        System.out.println("begin");
+
         ManagedChannel managedChannel= ManagedChannelBuilder.forAddress(ip,port).usePlaintext(true).build();
         AtomicBroadcastStub stub= newStub(managedChannel);
         StreamObserver<Common.Envelope> envelopeStreamObserver=stub.deliver(new StreamObserver<Ab.DeliverResponse>() {
@@ -41,12 +50,20 @@ public class DeliverClient {
                 System.out.println("onCompled!");
             }
         });
-       // for (int i = 0; i <10 ; i++) {
+
             //客户端以流式的形式向服务器发送数据
-            envelopeStreamObserver.onNext(Common.Envelope.newBuilder().setPayload(ByteString.copyFrom(message.getBytes())).build());
-            //Thread.sleep(1000);
-        //}
-        //Thread.sleep(5000);
+           // envelopeStreamObserver.onNext(Common.Envelope.newBuilder().setPayload(ByteString.copyFrom(message.getBytes())).build());
+
+        ILocalSigner localSigner = new LocalSigner();
+        Common.GroupHeader  data = EnvelopeHelper.buildGroupHeader(Common.HeaderType.CONFIG_UPDATE_VALUE, 0,
+                "myGroup", 30);
+
+        Common.Payload payload = EnvelopeHelper.buildPayload(Common.HeaderType.CONFIG_UPDATE_VALUE, 0, "myGroup", localSigner, data, 30);
+
+        envelopeStreamObserver.onNext(Common.Envelope.newBuilder().setPayload(payload.toByteString()).build());
+
+
+        Thread.sleep(1000);
 
     }
 }

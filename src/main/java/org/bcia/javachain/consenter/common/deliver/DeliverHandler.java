@@ -17,6 +17,7 @@ package org.bcia.javachain.consenter.common.deliver;
 
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.protos.common.Common;
 
 /**
  * @author zhangmingyang
@@ -25,11 +26,11 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
  */
 public class DeliverHandler {
     private static JavaChainLog log = JavaChainLogFactory.getLog(DeliverHandler.class);
-   public void handle(){
+   public void handle(Common.Envelope envelope){
       log.info("this is deliver handler");
-      deliverBlocks();
+      deliverBlocks(envelope);
     }
-    public void  deliverBlocks(){
+    public void  deliverBlocks(Common.Envelope envelope){
        log.info("this is deliverBlocks");
     }
 }

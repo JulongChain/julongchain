@@ -15,6 +15,8 @@
  */
 package org.bcia.javachain.node.cmd.sc;
 
+import io.grpc.MethodDescriptor;
+import io.grpc.protobuf.ProtoUtils;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.NodeException;
@@ -22,9 +24,12 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 完成节点查询智能合约的解析
- * node contract query -g $group_id -n mycc -c '{"Args":["query","a"]}'
+ * node contract query -g $group_id -n mycc -ctor '{"Args":["query","a"]}'
  *
  * @author zhouhui
  * @date 2018/3/16
@@ -38,6 +43,8 @@ public class ContractQueryCmd extends AbstractNodeContractCmd {
     private static final String ARG_GROUP_ID = "g";
     //参数：智能合约的名称
     private static final String ARG_SC_NAME = "n";
+    //参数：解析出查询主体
+    private static final String ARG_CTOR = "ctor";
 
     @Override
     public void execCmd(String[] args) throws ParseException, NodeException {
@@ -64,6 +71,13 @@ public class ContractQueryCmd extends AbstractNodeContractCmd {
         if (cmd.hasOption(ARG_SC_NAME)) {
             smartContractName = cmd.getOptionValue(ARG_SC_NAME, defaultValue);
             log.info("Smart contract id-----$" + smartContractName);
+        }
+
+        //解析出智能合约名称
+        String ctor = null;
+        if (cmd.hasOption(ARG_CTOR)) {
+            ctor = cmd.getOptionValue(ARG_CTOR, defaultValue);
+            log.info("ctor-----$" + ctor);
         }
 
         //-----------------------------------校验入参--------------------------------//
@@ -106,9 +120,11 @@ public class ContractQueryCmd extends AbstractNodeContractCmd {
         String ctorJSON = null;
         if (StringUtils.isNotBlank(ctorJSON)) {
             //TODO:有一大堆逻辑
+
+
         }
 
-        nodeSmartContract.query();
+        nodeSmartContract.query(groupId, smartContractName, ctor);
     }
 
 }
