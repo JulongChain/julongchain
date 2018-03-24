@@ -37,7 +37,7 @@ public interface ITxSimulator extends IQueryExecutor {
      * @param value
      * @throws LedgerException
      */
-    void setState(String namespace,String key,byte[] value) throws LedgerException;
+    void setState(String namespace, String key, byte[] value) throws LedgerException;
 
     /**
      * DeleteState deletes the given namespace and key
@@ -46,7 +46,7 @@ public interface ITxSimulator extends IQueryExecutor {
      * @param key
      * @throws LedgerException
      */
-    void deleteState(String namespace,String key) throws LedgerException;
+    void deleteState(String namespace, String key) throws LedgerException;
 
     /**
      * SetMultipleKeys sets the values for multiple keys in a single call
@@ -55,7 +55,7 @@ public interface ITxSimulator extends IQueryExecutor {
      * @param kvs
      * @throws LedgerException
      */
-    void setStateMultipleKeys(String namespace, Map<String,byte[]> kvs) throws LedgerException;
+    void setStateMultipleKeys(String namespace, Map<String, byte[]> kvs) throws LedgerException;
 
     /**
      * ExecuteUpdate for supporting rich data model (see comments on QueryExecutor above)
@@ -70,13 +70,21 @@ public interface ITxSimulator extends IQueryExecutor {
      * This should contain enough detail for
      * - The update in the state that would be caused if the transaction is to be committed
      * - The environment in which the transaction is executed so as to be able to decide the validity of the environment
-     *   (at a later time on a different peer) during committing the transactions
+     * (at a later time on a different peer) during committing the transactions
      * Different ledger implementation (or configurations of a single implementation) may want to represent the above two pieces
      * of information in different way in order to support different data-models or optimize the information representations.
      *
      * @param bytes
      * @throws LedgerException
      */
-    void getTxSimulationResults(byte[] bytes) throws LedgerException;
+//    void getTxSimulationResults(byte[] bytes) throws LedgerException;
+
+    /**
+     * 获得模拟交易结果
+     *
+     * @return
+     * @throws LedgerException
+     */
+    TxSimulationResults getTxSimulationResults() throws LedgerException;
 
 }

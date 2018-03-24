@@ -22,7 +22,10 @@ import io.grpc.stub.StreamObserver;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.admin.AdminServer;
+import org.bcia.javachain.core.admin.IAdminServer;
 import org.bcia.javachain.core.endorser.IEndorserServer;
+import org.bcia.javachain.core.events.IDeliverEventsServer;
 import org.bcia.javachain.core.events.IEventHubServer;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.gossip.GossipGrpc;
@@ -58,9 +61,13 @@ public class NodeGrpcServer {
      */
     private IEndorserServer endorserServer;
     /**
-     * 业务服务2:事件处理服务
+     * 业务服务2:Deliver事件处理服务
      */
-    private IEventHubServer eventHubServer;
+    private IDeliverEventsServer deliverEventsServer;
+    /**
+     * 业务服务3:管理服务
+     */
+    private IAdminServer adminServer;
 
     public NodeGrpcServer(int port) {
         this.port = port;
@@ -75,13 +82,13 @@ public class NodeGrpcServer {
         this.endorserServer = endorserServer;
     }
 
-    /**
-     * 绑定事件处理服务
-     *
-     * @param eventHubServer
-     */
-    public void bindEventHubServer(IEventHubServer eventHubServer) {
-        this.eventHubServer = eventHubServer;
+
+    public void bindDeliverEventsServer(IDeliverEventsServer deliverEventsServer) {
+        this.deliverEventsServer = deliverEventsServer;
+    }
+
+    public void bindAdminServer(IAdminServer adminServer) {
+        this.adminServer = adminServer;
     }
 
     public void start() throws IOException {
@@ -121,6 +128,7 @@ public class NodeGrpcServer {
         server.blockUntilShutdown();
     }
 
+
     private class EndorserServerImpl extends EndorserGrpc.EndorserImplBase {
         @Override
         public void processProposal(ProposalPackage.SignedProposal request, StreamObserver<ProposalResponsePackage.ProposalResponse> responseObserver) {
@@ -135,41 +143,19 @@ public class NodeGrpcServer {
         }
     }
 
-    private class EventServerImpl extends EventsGrpc.EventsImplBase {
-        @Override
-        public StreamObserver<EventsPackage.SignedEvent> chat(StreamObserver<EventsPackage.Event> responseObserver) {
-            return new StreamObserver<EventsPackage.SignedEvent>() {
-                @Override
-                public void onNext(EventsPackage.SignedEvent value) {
-                    if (eventHubServer != null) {
-                        EventsPackage.Event resultEvent = eventHubServer.chat(value);
-                        responseObserver.onNext(resultEvent);
-                    } else {
-                        log.error("eventHubServer is not ready, but client sent some message: " + value);
-                        responseObserver.onError(new NodeException("eventHubServer is not ready"));
-                    }
-                }
-
-                @Override
-                public void onError(Throwable t) {
-
-                }
-
-                @Override
-                public void onCompleted() {
-
-                }
-            };
-        }
-    }
-
     private class DeliverServerImpl extends DeliverGrpc.DeliverImplBase {
         @Override
         public StreamObserver<Common.Envelope> deliver(StreamObserver<EventsPackage.DeliverResponse> responseObserver) {
             return new StreamObserver<Common.Envelope>() {
                 @Override
                 public void onNext(Common.Envelope value) {
+                    if (deliverEventsServer != null) {
+                        responseObserver.onNext(deliverEventsServer.deliver(value));
+                        return;
+                    }
 
+                    log.error("deliverEventsServer is not ready, but client sent some message: " + value);
+                    responseObserver.onError(new NodeException("deliverEventsServer is not ready"));
                 }
 
                 @Override
@@ -189,7 +175,13 @@ public class NodeGrpcServer {
             return new StreamObserver<Common.Envelope>() {
                 @Override
                 public void onNext(Common.Envelope value) {
+                    if (deliverEventsServer != null) {
+                        responseObserver.onNext(deliverEventsServer.deliverFiltered(value));
+                        return;
+                    }
 
+                    log.error("deliverEventsServer is not ready, but client sent some message: " + value);
+                    responseObserver.onError(new NodeException("deliverEventsServer is not ready"));
                 }
 
                 @Override
@@ -258,8 +250,5 @@ public class NodeGrpcServer {
         public void revertLogLevels(Empty request, StreamObserver<Empty> responseObserver) {
 
         }
-
     }
-
-
 }

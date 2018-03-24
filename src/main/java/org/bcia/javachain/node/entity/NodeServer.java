@@ -20,9 +20,19 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
 import org.bcia.javachain.core.aclmgmt.IAclProvider;
+import org.bcia.javachain.core.admin.AdminServer;
+import org.bcia.javachain.core.common.smartcontractprovider.ISmartContractProvider;
+import org.bcia.javachain.core.common.smartcontractprovider.SmartContractProviderFactory;
 import org.bcia.javachain.core.endorser.Endorser;
+import org.bcia.javachain.core.events.DeliverEventsServer;
+import org.bcia.javachain.core.events.EventGrpcServer;
+import org.bcia.javachain.core.events.EventHubServer;
+import org.bcia.javachain.core.ledger.ledgermgmt.LedgerMgmt;
 import org.bcia.javachain.core.node.NodeConfiguration;
 import org.bcia.javachain.core.node.NodeGrpcServer;
+import org.bcia.javachain.core.smartcontract.shim.SmartContractProvider;
+import org.bcia.javachain.core.ssc.ISystemSmartContractManager;
+import org.bcia.javachain.core.ssc.SystemSmartContractManager;
 import org.bcia.javachain.msp.IMsp;
 import org.bcia.javachain.node.common.helper.MockMSPManager;
 import org.bcia.javachain.node.util.NodeConstant;
@@ -47,7 +57,7 @@ public class NodeServer {
 
     public void start(boolean devMode) {
         log.info("node server start-----");
-        if(devMode){
+        if (devMode) {
             log.info("start by devMode");
         }
 
@@ -73,20 +83,44 @@ public class NodeServer {
 //        }else{
 //            nodeEndpoint = NodeConfiguration.getLocalAddress()
 //        }
+        //读取终端地址
+        //读取配置文件，形成serverConfig对象
+        //TODO:如何将Grpc服务与serverConfig关联
 
+        //启动Node主服务(Grpc Server1)
         int port = 7051;
         NodeGrpcServer nodeGrpcServer = new NodeGrpcServer(port);
-        //注册背书服务
+        //绑定背书服务
         nodeGrpcServer.bindEndorserServer(new Endorser(null));
+        //绑定投递事件服务
+        nodeGrpcServer.bindDeliverEventsServer(new DeliverEventsServer());
+        //绑定管理服务
+        nodeGrpcServer.bindAdminServer(new AdminServer());
+
+        //启动事件处理服务(Grpc Server2)
+        EventGrpcServer eventGrpcServer = new EventGrpcServer(7053);
+        //绑定事件服务
+        eventGrpcServer.bindEventHubServer(new EventHubServer());
+
+//        ISmartContractProvider smartContractProvider = new SmartContractProvider();
+//        smartContractProvider
+
+        //创建智能合约支持服务
+        //创建Gossip服务
+
+        //初始化系统智能合约
+        initSysSmartContracts();
+
+//        LedgerMgmt.getLedgerIDs()
 
 
+    }
 
+    private void initSysSmartContracts() {
+        log.info("Init system smart contracts");
 
-
-
-
-
-
+        ISystemSmartContractManager systemSmartContractManager = new SystemSmartContractManager();
+        systemSmartContractManager.deploySysSmartContracts("");
     }
 
     public void status() {

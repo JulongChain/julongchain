@@ -13,24 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.endorser;
+package org.bcia.javachain.core.events;
 
-import org.bcia.javachain.protos.ledger.rwset.Rwset;
+import org.bcia.javachain.protos.common.Common;
 
 /**
- * 私有数据分发者
+ * 检查投递策略
  *
  * @author zhouhui
- * @date 2018/3/15
+ * @date 2018/3/21
  * @company Dingxuan
  */
-public interface IPrivateDataDistributor {
-    /**
-     * 分发私有数据
-     *
-     * @param groupId
-     * @param txId
-     * @param privateData
-     */
-    void distributePrivateData(String groupId, String txId, Rwset.TxPvtReadWriteSet privateData);
+public interface IDeliverPolicyChecker {
+    void checkPolicy(Common.Envelope envelope, String groupId);
 }

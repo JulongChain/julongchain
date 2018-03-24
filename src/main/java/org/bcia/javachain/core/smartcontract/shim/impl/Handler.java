@@ -107,7 +107,7 @@ public class Handler {
 	}
 
 	private synchronized void sendChannel(SmartcontractShim.SmartContractMessage message) {
-		String key = getTxKey(message.getChannelId(), message.getTxid());
+		String key = getTxKey(message.getGroupId(), message.getTxid());
 		if (!responseChannel.containsKey(key)) {
 			throw new IllegalStateException(format("[%-8s]sendChannel does not exist", message.getTxid()));
 		}
@@ -179,11 +179,11 @@ public class Handler {
 				final Smartcontract.SmartContractInput input = Smartcontract.SmartContractInput.parseFrom(message.getPayload());
 
 				// Mark as a transaction (allow put/del state)
-				markIsTransaction(message.getChannelId(), message.getTxid(), true);
+				markIsTransaction(message.getGroupId(), message.getTxid(), true);
 
 				// Create the ChaincodeStub which the chaincode can use to
 				// callback
-				final ISmartContractStub stub = new SmartContractStub(message.getChannelId(), message.getTxid(), this, input.getArgsList(), message.getProposal());
+				final ISmartContractStub stub = new SmartContractStub(message.getGroupId(), message.getTxid(), this, input.getArgsList(), message.getProposal());
 
 				// Call chaincode's init
 				final Response result = chaincode.init(stub);
@@ -191,19 +191,19 @@ public class Handler {
 				if (result.getStatus().getCode() >= Response.Status.INTERNAL_SERVER_ERROR.getCode()) {
 					// Send ERROR with entire result.Message as payload
 					logger.error(String.format("[%-8s]Init failed. Sending %s", message.getTxid(), ERROR));
-					triggerNextState(newErrorEventMessage(message.getChannelId(), message.getTxid(), result.getMessage(), stub.getEvent()), true);
+					triggerNextState(newErrorEventMessage(message.getGroupId(), message.getTxid(), result.getMessage(), stub.getEvent()), true);
 				} else {
 					// Send COMPLETED with entire result as payload
 					logger.debug(String.format(String.format("[%-8s]Init succeeded. Sending %s", message.getTxid(), COMPLETED)));
-					triggerNextState(newCompletedEventMessage(message.getChannelId(), message.getTxid(), result, stub.getEvent()), true);
+					triggerNextState(newCompletedEventMessage(message.getGroupId(), message.getTxid(), result, stub.getEvent()), true);
 				}
 
 			} catch (InvalidProtocolBufferException | RuntimeException e) {
 				logger.error(String.format("[%-8s]Init failed. Sending %s", message.getTxid(), ERROR), e);
-				triggerNextState(newErrorEventMessage(message.getChannelId(), message.getTxid(), e), true);
+				triggerNextState(newErrorEventMessage(message.getGroupId(), message.getTxid(), e), true);
 			} finally {
 				// delete isTransaction entry
-				deleteIsTransaction(message.getChannelId(), message.getTxid());
+				deleteIsTransaction(message.getGroupId(), message.getTxid());
 			}
 		}).start();
 	}
@@ -229,11 +229,11 @@ public class Handler {
 				final Smartcontract.SmartContractInput input = Smartcontract.SmartContractInput.parseFrom(message.getPayload());
 
 				// Mark as a transaction (allow put/del state)
-				markIsTransaction(message.getChannelId(), message.getTxid(), true);
+				markIsTransaction(message.getGroupId(), message.getTxid(), true);
 
 				// Create the ChaincodeStub which the chaincode can use to
 				// callback
-				final ISmartContractStub stub = new SmartContractStub(message.getChannelId(), message.getTxid(), this, input.getArgsList(), message.getProposal());
+				final ISmartContractStub stub = new SmartContractStub(message.getGroupId(), message.getTxid(), this, input.getArgsList(), message.getProposal());
 
 				// Call chaincode's invoke
 				final Response result = chaincode.invoke(stub);
@@ -241,19 +241,19 @@ public class Handler {
 				if (result.getStatus().getCode() >= Response.Status.INTERNAL_SERVER_ERROR.getCode()) {
 					// Send ERROR with entire result.Message as payload
 					logger.error(String.format("[%-8s]Invoke failed. Sending %s", message.getTxid(), ERROR));
-					triggerNextState(newErrorEventMessage(message.getChannelId(), message.getTxid(), result.getMessage(), stub.getEvent()), true);
+					triggerNextState(newErrorEventMessage(message.getGroupId(), message.getTxid(), result.getMessage(), stub.getEvent()), true);
 				} else {
 					// Send COMPLETED with entire result as payload
 					logger.debug(String.format(String.format("[%-8s]Invoke succeeded. Sending %s", message.getTxid(), COMPLETED)));
-					triggerNextState(newCompletedEventMessage(message.getChannelId(), message.getTxid(), result, stub.getEvent()), true);
+					triggerNextState(newCompletedEventMessage(message.getGroupId(), message.getTxid(), result, stub.getEvent()), true);
 				}
 
 			} catch (InvalidProtocolBufferException | RuntimeException e) {
 				logger.error(String.format("[%-8s]Invoke failed. Sending %s", message.getTxid(), ERROR), e);
-				triggerNextState(newErrorEventMessage(message.getChannelId(), message.getTxid(), e), true);
+				triggerNextState(newErrorEventMessage(message.getGroupId(), message.getTxid(), e), true);
 			} finally {
 				// delete isTransaction entry
-				deleteIsTransaction(message.getChannelId(), message.getTxid());
+				deleteIsTransaction(message.getGroupId(), message.getTxid());
 			}
 		}).start();
 	}
@@ -375,7 +375,7 @@ public class Handler {
 	}
 
 	private ByteString invokeChaincodeSupport(final SmartcontractShim.SmartContractMessage message) {
-		final String channelId = message.getChannelId();
+		final String channelId = message.getGroupId();
 		final String txId = message.getTxid();
 
 		try {
@@ -453,7 +453,7 @@ public class Handler {
 
 		if (fsm.eventCannotOccur(message.getType().toString())) {
 			String errStr = String.format("[%s]Chaincode handler org.hyperledger.fabric.shim.fsm cannot handle message (%s) with payload size (%d) while in state: %s", message.getTxid(), message.getType(), message.getPayload().size(), fsm.current());
-			chatStream.serialSend(newErrorEventMessage(message.getChannelId(), message.getTxid(), errStr));
+			chatStream.serialSend(newErrorEventMessage(message.getGroupId(), message.getTxid(), errStr));
 			throw new RuntimeException(errStr);
 		}
 
@@ -525,14 +525,14 @@ public class Handler {
 		if (event == null) {
 			return SmartcontractShim.SmartContractMessage.newBuilder()
 					.setType(type)
-					.setChannelId(channelId)
+					.setGroupId(channelId)
 					.setTxid(txId)
 					.setPayload(payload)
 					.build();
 		} else {
 			return SmartcontractShim.SmartContractMessage.newBuilder()
 					.setType(type)
-					.setChannelId(channelId)
+					.setGroupId(channelId)
 					.setTxid(txId)
 					.setPayload(payload)
 					.setSmartcontractEvent(event)

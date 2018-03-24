@@ -15,11 +15,13 @@
  */
 package org.bcia.javachain.core.endorser;
 
+import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
 import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
+import org.bcia.javachain.protos.node.Smartcontract;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
 /**
@@ -30,40 +32,121 @@ import org.bcia.javachain.protos.node.TransactionPackage;
  * @company Dingxuan
  */
 public interface IEndorserSupport {
-    boolean isSysCCAndNotInvokableExternal(String name);
+    /**
+     * 是系统智能合约并且不允许外部调用
+     *
+     * @param scName 智能合约名称
+     * @return
+     */
+    boolean isSysSCAndNotInvokableExternal(String scName);
 
+    /**
+     * 获得某交易的模拟器
+     *
+     * @param ledgerName 账本名称，通常与groupId相同
+     * @param txId       交易ID
+     * @return
+     */
     ITxSimulator getTxSimulator(String ledgerName, String txId);
 
+    /**
+     * 获得某账本的历史库查询执行器
+     *
+     * @param ledgerName 账本名称
+     * @return
+     */
     IHistoryQueryExecutor getHistoryQueryExecutor(String ledgerName);
 
-    TransactionPackage.ProcessedTransaction getTransactionByID(String groupId, String txId);
+    /**
+     * 通过某交易ID获取交易详情
+     *
+     * @param groupId 群组ID
+     * @param txId    交易ID
+     * @return
+     */
+    TransactionPackage.ProcessedTransaction getTransactionById(String groupId, String txId);
 
-    boolean isSysCC(String name);
+    /**
+     * 是否是系统智能合约
+     *
+     * @param scName
+     * @return
+     */
+    boolean isSysSmartContract(String scName);
 
-    //TODO:两个参数？
-    ProposalResponsePackage.Response execute(String cid, String name, String version, String txid, boolean syscc,
-                                             ProposalPackage.SignedProposal signedProp, ProposalPackage.Proposal
-                                                     prop, Object spec);
+    /**
+     * 执行智能合约
+     *
+     * @param groupId        群组ID
+     * @param scName         智能合约名称
+     * @param scVersion      智能合约版本
+     * @param txId           交易ID
+     * @param sysSC          是否系统智能合约
+     * @param signedProposal 带签名提案
+     * @param proposal       原始提案
+     * @param spec           智能合约调用规格
+     * @return
+     */
+    ProposalResponsePackage.Response execute(String groupId, String scName, String scVersion, String txId, boolean
+            sysSC, ProposalPackage.SignedProposal signedProposal, ProposalPackage.Proposal proposal, Smartcontract
+                                                     .SmartContractInvocationSpec spec);
 
+    /**
+     * 执行智能合约
+     *
+     * @param groupId        群组ID
+     * @param scName         智能合约名称
+     * @param scVersion      智能合约版本
+     * @param txId           交易ID
+     * @param sysSC          是否系统智能合约
+     * @param signedProposal 带签名提案
+     * @param proposal       原始提案
+     * @param spec           智能合约部署规格
+     * @return
+     */
+    ProposalResponsePackage.Response execute(String groupId, String scName, String scVersion, String txId, boolean
+            sysSC, ProposalPackage.SignedProposal signedProposal, ProposalPackage.Proposal proposal, Smartcontract
+                                                     .SmartContractDeploymentSpec spec);
+
+    /**
+     * 获取智能合约定义
+     *
+     * @param groupId        群组ID
+     * @param scName         智能合约名称
+     * @param txId           交易ID
+     * @param signedProposal 带签名提案
+     * @param proposal       原始提案
+     * @param txSimulator    交易模拟器
+     * @return
+     */
+    ISmartContractDefinition getSmartContractDefinition(String groupId, String scName, String txId, ProposalPackage
+            .SignedProposal signedProposal, ProposalPackage.Proposal proposal, ITxSimulator txSimulator);
+
+    /**
+     * 检查访问控制清单
+     *
+     * @param signedProposal  带签名提案
+     * @param groupHeader     群组头部
+     * @param signatureHeader 签名头部
+     * @param extension       智能合约头部扩展
+     */
     void checkACL(ProposalPackage.SignedProposal signedProposal, Common.GroupHeader groupHeader, Common.SignatureHeader
             signatureHeader, ProposalPackage.SmartContractHeaderExtension extension);
 
-    boolean isJavaCC(byte[] buffer);
+    /**
+     * 是否是Java智能合约(目前未使用，因为默认支持Java)
+     *
+     * @param buffer
+     * @return
+     */
+    boolean isJavaSC(byte[] buffer);
 
-
-
-    // GetChaincodeDefinition returns resourcesconfig.ChaincodeDefinition for the chaincode with the supplied name
-//    GetChaincodeDefinition(ctx context.Context, chainID String, txid String, signedProp *pb.SignedProposal, prop *pb.Proposal, chaincodeID String, txsim ledger.TxSimulator) (resourcesconfig.ChaincodeDefinition,error)
-
-
-    // CheckInstantiationPolicy returns an error if the instantiation in the supplied
-    // ChaincodeDefinition differs from the instantiation policy stored on the ledger
-//    CheckInstantiationPolicy(name, version String, cd resourcesconfig.ChaincodeDefinition) error
-
-    // GetApplicationConfig returns the configtxapplication.SharedConfig for the channel
-    // and whether the Application config exists
-//    GetApplicationConfig(cid String) (channelconfig.Application,bool)
-
-
-//    privateDataDistributor(channel String, txID String, privateData *rwset.TxPvtReadWriteSet)
+    /**
+     * 检查实例化策略
+     *
+     * @param scName       智能合约名称
+     * @param scVersion    智能合约版本
+     * @param scDefinition 智能合约定义
+     */
+    void checkInstantiationPolicy(String scName, String scVersion, ISmartContractDefinition scDefinition);
 }
