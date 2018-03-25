@@ -16,17 +16,26 @@
 package org.bcia.javachain.core.endorser;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
+import org.bcia.javachain.common.util.CommConstant;
+import org.bcia.javachain.common.util.proto.ProposalResponseUtils;
 import org.bcia.javachain.core.common.validation.MsgValidation;
 import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.ITxSimulator;
+import org.bcia.javachain.core.ledger.TxSimulationResults;
+import org.bcia.javachain.node.common.helper.SpecHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
+import org.bcia.javachain.protos.node.SmartContractEventPackage;
+import org.bcia.javachain.protos.node.Smartcontract;
 
 /**
  * 背书节点
@@ -75,9 +84,10 @@ public class Endorser implements IEndorserServer {
             return buildErrorResponse(e.getMessage());
         }
 
-        Common.GroupHeader groupHeader = (Common.GroupHeader) objs[0];
-        Common.SignatureHeader signatureHeader = (Common.SignatureHeader) objs[1];
-        ProposalPackage.SmartContractHeaderExtension extension = (ProposalPackage.SmartContractHeaderExtension) objs[2];
+        ProposalPackage.Proposal proposal = (ProposalPackage.Proposal) objs[0];
+        Common.GroupHeader groupHeader = (Common.GroupHeader) objs[1];
+        Common.SignatureHeader signatureHeader = (Common.SignatureHeader) objs[2];
+        ProposalPackage.SmartContractHeaderExtension extension = (ProposalPackage.SmartContractHeaderExtension) objs[3];
 
         ITxSimulator txSimulator = null;
         IHistoryQueryExecutor historyQueryExecutor = null;
@@ -85,6 +95,25 @@ public class Endorser implements IEndorserServer {
         if (StringUtils.isNotBlank(groupHeader.getGroupId())) {
             txSimulator = endorserSupport.getTxSimulator(groupHeader.getGroupId(), groupHeader.getTxId());
             historyQueryExecutor = endorserSupport.getHistoryQueryExecutor(groupHeader.getGroupId());
+        }
+
+        String scName = extension.getSmartContractId().getName();
+
+        ProposalResponsePackage.Response response = simulateProposal(groupHeader.getGroupId(), scName, groupHeader
+                        .getTxId(), signedProposal, proposal,
+                Smartcontract.SmartContractID.newBuilder(extension.getSmartContractId()));
+        if (response.getStatus() != Common.Status.SUCCESS_VALUE) {
+            //TODO:是否要封装错误消息
+            return buildErrorResponse("simulateProposal fail");
+        }
+
+        //无合约提案不需要背书，例如cssc
+        if (StringUtils.isBlank(scName)) {
+            return ProposalResponseUtils.buildProposalResponse(response.getPayload());
+        } else {
+//            byte[] bytes = ;
+//            endorseProposal(groupHeader.getGroupId(), groupHeader.getTxId(), signedProposal, proposal, scIdBuilder,
+//                    response, bytes, )
         }
 
 
@@ -161,23 +190,23 @@ public class Endorser implements IEndorserServer {
 
         //校验智能合约ID
         //TODO:似乎有逻辑漏洞，如何确保extension及里面的SmartContractId不会为空，虽然前面有所校验，但仅针对其中两个消息
-        if (endorserSupport.isSysCCAndNotInvokableExternal(extension.getSmartContractId().getName())) {
+        if (endorserSupport.isSysSCAndNotInvokableExternal(extension.getSmartContractId().getName())) {
             throw new NodeException("isSysCCAndNotInvokableExternal");
         }
 
         if (StringUtils.isNotBlank(groupHeader.getGroupId())) {
             //校验重复交易
-            if (endorserSupport.getTransactionByID(groupHeader.getGroupId(), groupHeader.getTxId()) != null) {
+            if (endorserSupport.getTransactionById(groupHeader.getGroupId(), groupHeader.getTxId()) != null) {
                 throw new NodeException("duplicate transaction, creator:" + signatureHeader.getCreator());
             }
 
             //校验权限:仅应用智能合约校验
-            if (!endorserSupport.isSysCC(extension.getSmartContractId().getName())) {
+            if (!endorserSupport.isSysSmartContract(extension.getSmartContractId().getName())) {
                 endorserSupport.checkACL(signedProposal, groupHeader, signatureHeader, extension);
             }
         }
 
-        return new Object[]{groupHeader, signatureHeader, extension};
+        return new Object[]{proposal, groupHeader, signatureHeader, extension};
     }
 
     public IEndorserSupport getEndorserSupport() {
@@ -188,81 +217,186 @@ public class Endorser implements IEndorserServer {
         this.endorserSupport = endorserSupport;
     }
 
-    private Object[] simulateProposal(ProposalPackage.SignedProposal signedProposal) {
-        return null;
 
+    private ProposalResponsePackage.Response simulateProposal(String groupId, String scName, String txId,
+                                                              ProposalPackage.SignedProposal signedProposal,
+                                                              ProposalPackage.Proposal proposal, Smartcontract
+                                                                      .SmartContractID.Builder scIDBuilder) {
+        //获取Payload字段
+        ProposalPackage.SmartContractProposalPayload proposalPayload = null;
+        try {
+            proposalPayload = ProposalPackage.SmartContractProposalPayload.parseFrom(proposal.getPayload());
+        } catch (InvalidProtocolBufferException e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+
+        //获取SmartContractInvocationSpec
+        Smartcontract.SmartContractInvocationSpec invocationSpec = null;
+        try {
+            invocationSpec = Smartcontract.SmartContractInvocationSpec.parseFrom(proposalPayload.getInput());
+        } catch (InvalidProtocolBufferException e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+
+        ITxSimulator txSimulator = endorserSupport.getTxSimulator(groupId, txId);
+
+        String version = null;
+        if (endorserSupport.isSysSmartContract(scIDBuilder.getName())) {
+            version = CommConstant.METADATA_VERSION;
+        } else {
+            ISmartContractDefinition scDefinition = endorserSupport.getSmartContractDefinition(groupId, scName, txId,
+                    signedProposal, proposal, txSimulator);
+            version = scDefinition.smartContractVersion();
+
+            //TODO：检查实例化策略
+            endorserSupport.checkInstantiationPolicy(scIDBuilder.getName(), version, scDefinition);
+        }
+
+        ProposalResponsePackage.Response response = callSmartContract(groupId, scName, version, txId, signedProposal,
+                proposal, invocationSpec);
+        if (response.getStatus() >= Common.Status.BAD_REQUEST_VALUE) {
+            return null;
+        }
+
+        TxSimulationResults simulationResults = null;
+        try {
+            simulationResults = txSimulator.getTxSimulationResults();
+        } catch (LedgerException e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+
+        if (simulationResults.getPrivateReadWriteSet() != null) {
+            if (scIDBuilder.getName().equals(CommConstant.LSSC)) {
+                log.error("should not be lssc here");
+                return null;
+            }
+
+            distributor.distributePrivateData(groupId, txId, simulationResults.getPrivateReadWriteSet());
+        }
+
+
+        return response;
     }
 
-    private Object[] callChaincode(ProposalPackage.SignedProposal signedProposal) {
-        return null;
+    /**
+     * 调用essc背书提案
+     *
+     * @param signedProposal
+     * @return
+     */
+    private ProposalResponsePackage.Response endorseProposal(String groupId, String txId, ProposalPackage
+            .SignedProposal signedProposal, ProposalPackage.Proposal proposal, Smartcontract.SmartContractID.Builder
+                                                                     smartContractIDBuilder, ProposalResponsePackage
+                                                                     .Response response, byte[] simulateResults,
+                                                             SmartContractEventPackage.SmartContractEvent event,
+                                                             byte[] visibility, ISmartContractDefinition
+                                                                     smartContractDefinition) {
+        log.info("begin endorseProposal");
 
+        boolean useSysSmartContract = false;
+        if (smartContractDefinition == null) {
+            useSysSmartContract = true;
+        }
+
+        //背书系统智能合约名称
+        String essc = null;
+        if (useSysSmartContract) {
+            essc = CommConstant.ESSC;
+            //TODO:应该从某个配置文件里面读取
+            smartContractIDBuilder.setVersion(CommConstant.METADATA_VERSION);
+        } else {
+            essc = smartContractDefinition.endorsement();
+            smartContractIDBuilder.setVersion(smartContractDefinition.smartContractVersion());
+        }
+
+        // arguments:
+        // args[0] - function name (not used now)
+        // args[1] - serialized Header object
+        // args[2] - serialized ProposalPayload object
+        // args[3] - SmartContractID of executing SmartContract
+        // args[4] - result of executing SmartContract
+        // args[5] - binary blob of simulation results
+        // args[6] - serialized events
+        // args[7] - payloadVisibility
+        byte[][] args = new byte[][]{new byte[0], proposal.getHeader().toByteArray(), proposal.getPayload()
+                .toByteArray(), smartContractIDBuilder.build().toByteArray(), response.toByteArray(),
+                simulateResults, event.toByteArray(), visibility};
+        Smartcontract.SmartContractInvocationSpec invocationSpec = SpecHelper.buildInvocationSpec(essc, args);
+        String version = CommConstant.METADATA_VERSION;
+        //开始调用essc
+        ProposalResponsePackage.Response esscResponse = callSmartContract(groupId, essc, version, txId,
+                signedProposal, proposal, invocationSpec);
+        if (esscResponse.getStatus() >= Common.Status.BAD_REQUEST_VALUE) {
+            //大于等于400意味着出错，一般为200 OK
+            return esscResponse;
+        }
+
+        //TODO:是否要对负载进行处理
+        return esscResponse;
     }
 
-//    //call specified chaincode (system or user)
-//    func(e *Endorser) callChaincode(
-//    ctxt context.Context,
-//    chainID string, version
-//    string,
-//    txid string, signedProp *pb.SignedProposal,prop *pb.Proposal,cis *pb.ChaincodeInvocationSpec,cid *pb.ChaincodeID,
-//    txsim ledger.TxSimulator)(*pb.Response,*pb.ChaincodeEvent,error)
-//
-//    {
-//
-//        var err error
-//        var res *pb.Response
-//        var ccevent *pb.ChaincodeEvent
-//
-//        if txsim != nil {
-//        ctxt = context.WithValue(ctxt, chaincode.TXSimulatorKey, txsim)
-//    }
-//
-//        //is this a system chaincode
-//        scc:=e.s.IsSysCC(cid.Name)
-//
-//        res, ccevent, err = e.s.Execute(ctxt, chainID, cid.Name, version, txid, scc, signedProp, prop, cis)
-//        if err != nil {
-//        return nil,nil, err
-//    }
-//
-//        //per doc anything < 400 can be sent as TX.
-//        //fabric errors will always be >= 400 (ie, unambiguous errors )
-//        //"lscc" will respond with status 200 or 500 (ie, unambiguous OK or ERROR)
-//        if res.Status >= shim.ERRORTHRESHOLD {
-//        return res,nil, nil
-//    }
-//
-//        //----- BEGIN -  SECTION THAT MAY NEED TO BE DONE IN LSCC ------
-//        //if this a call to deploy a chaincode, We need a mechanism
-//        //to pass TxSimulator into LSCC. Till that is worked out this
-//        //special code does the actual deploy, upgrade here so as to collect
-//        //all state under one TxSimulator
-//        //
-//        //NOTE that if there's an error all simulation, including the chaincode
-//        //table changes in lscc will be thrown away
-//        if
-//        cid.Name == "lscc" && len(cis.ChaincodeSpec.Input.Args) >= 3 && (string(cis.ChaincodeSpec.Input.Args[0]) == "deploy" || string(cis.ChaincodeSpec.Input.Args[0]) == "upgrade")
-//        {
-//            var cds *pb.ChaincodeDeploymentSpec
-//                cds, err = putils.GetChaincodeDeploymentSpec(cis.ChaincodeSpec.Input.Args[2])
-//            if err != nil {
-//            return nil,nil, err
-//        }
-//
-//            //this should not be a system chaincode
-//            if e.s.IsSysCC(cds.ChaincodeSpec.ChaincodeId.Name) {
-//            return nil,
-//            nil, errors.Errorf("attempting to deploy a system chaincode %s/%s", cds.ChaincodeSpec.ChaincodeId.Name, chainID)
-//        }
-//
-//            _, _, err = e.s.Execute(ctxt, chainID, cds.ChaincodeSpec.ChaincodeId.Name, cds.ChaincodeSpec.ChaincodeId.Version, txid, false, signedProp, prop, cds)
-//            if err != nil {
-//            return nil,nil, err
-//        }
-//        }
-//        //----- END -------
-//
-//        return res,ccevent, err
-//    }
+    /**
+     * 调用智能合约
+     *
+     * @param groupId
+     * @param scName
+     * @param scVersion
+     * @param txId
+     * @param signedProposal
+     * @param proposal
+     * @param spec
+     * @return
+     */
+    private ProposalResponsePackage.Response callSmartContract(String groupId, String scName, String
+            scVersion, String txId, ProposalPackage.SignedProposal signedProposal, ProposalPackage.Proposal proposal,
+                                                               Smartcontract.SmartContractInvocationSpec spec) {
+        log.info("begin callSmartContract");
 
+        boolean isSysSmartContract = endorserSupport.isSysSmartContract(scName);
 
+        ProposalResponsePackage.Response response = endorserSupport.execute(groupId, scName,
+                scVersion, txId, isSysSmartContract, signedProposal, proposal, spec);
+        if (response.getStatus() >= Common.Status.BAD_REQUEST_VALUE) {
+            //大于等于400意味着出错，一般为200 OK
+            return response;
+        }
+
+        if (CommConstant.LSSC.equalsIgnoreCase(scName)) {
+            Smartcontract.SmartContractInput input = spec.getSmartContractSpec().getInput();
+            //参数必须3个及以上，并且第3个参数不为空
+            if (input != null && input.getArgsCount() >= 3 && input.getArgs(2) != null) {
+                String action = input.getArgs(0).toString();
+                if (isDeployAction(action)) {
+                    try {
+                        Smartcontract.SmartContractDeploymentSpec deploymentSpec = Smartcontract.SmartContractDeploymentSpec
+                                .parseFrom(input.getArgs(2));
+                        if (!endorserSupport.isSysSmartContract(deploymentSpec.getSmartContractSpec()
+                                .getSmartContractId().getName())) {
+                            endorserSupport.execute(groupId, scName, scVersion, txId, isSysSmartContract,
+                                    signedProposal, proposal, deploymentSpec);
+                        }
+                    } catch (InvalidProtocolBufferException e) {
+                        log.error(e.getMessage(), e);
+                        return ProposalResponseUtils.buildErrorResponse(Common.Status.INTERNAL_SERVER_ERROR, e
+                                .getMessage());
+                    }
+                }
+            }
+        }
+
+        return response;
+    }
+
+    /**
+     * 是否是一个部署动作
+     *
+     * @param action
+     * @return
+     */
+    private boolean isDeployAction(String action) {
+        return ArrayUtils.contains(new String[]{"deploy", "upgrade"}, action);
+    }
 }

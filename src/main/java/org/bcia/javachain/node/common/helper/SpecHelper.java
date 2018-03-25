@@ -52,5 +52,34 @@ public class SpecHelper {
         return invocationSpec.build();
     }
 
+    /**
+     * 构造针对scName的执行规格
+     *
+     * @param scName 要执行的智能合约名称
+     * @param args   参数集合，由操作和参数列表组成
+     * @return
+     */
+    public static Smartcontract.SmartContractInvocationSpec buildInvocationSpec(String scName, byte[]... args) {
+        //构造SmartContractInput对象
+        Smartcontract.SmartContractInput.Builder inputBuilder = Smartcontract.SmartContractInput.newBuilder();
+        for (byte[] bytes : args) {
+            inputBuilder.addArgs(ByteString.copyFrom(bytes));
+        }
+        Smartcontract.SmartContractInput input = inputBuilder.build();
+
+        //构造SmartContractSpec对象
+        Smartcontract.SmartContractSpec.Builder specBuilder = Smartcontract.SmartContractSpec.newBuilder();
+        specBuilder.setType(Smartcontract.SmartContractSpec.Type.JAVA);
+        specBuilder.setSmartContractId(Smartcontract.SmartContractID.newBuilder().setName(scName));
+        specBuilder.setInput(input);
+        Smartcontract.SmartContractSpec spec = specBuilder.build();
+
+        //构造SmartContractInvocationSpec对象
+        Smartcontract.SmartContractInvocationSpec.Builder invocationSpec = Smartcontract.SmartContractInvocationSpec
+                .newBuilder();
+        invocationSpec.setSmartContractSpec(spec);
+        return invocationSpec.build();
+    }
+
 
 }

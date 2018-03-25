@@ -2,6 +2,8 @@
 Copyright IBM Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
+
+Modified java_package and other contents by Dingxuan on 2018-03-22
 */
 
 syntax = "proto3";
@@ -50,8 +52,8 @@ message SmartContractMessage {
     //with Block.NonHashData.TransactionResult
     SmartContractEvent smartcontract_event = 6;
 
-    //channel id
-    string channel_id = 7;
+    //group id
+    string group_id = 7;
 }
 
 message GetState {

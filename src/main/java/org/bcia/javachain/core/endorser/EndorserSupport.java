@@ -15,33 +15,47 @@
  */
 package org.bcia.javachain.core.endorser;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
+import org.bcia.javachain.common.util.CommConstant;
+import org.bcia.javachain.core.aclmgmt.AclManagement;
+import org.bcia.javachain.core.common.smartcontractprovider.SmartContractContext;
+import org.bcia.javachain.core.common.smartcontractprovider.SmartContractData;
 import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.core.node.NodeTool;
+import org.bcia.javachain.core.smartcontract.SmartContractExecutor;
+import org.bcia.javachain.core.smartcontract.shim.SmartContractProvider;
 import org.bcia.javachain.core.ssc.ISystemSmartContractManager;
 import org.bcia.javachain.core.ssc.SystemSmartContractManager;
+import org.bcia.javachain.core.ssc.lssc.LSSC;
+import org.bcia.javachain.node.common.helper.SpecHelper;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.node.ProposalPackage;
-import org.bcia.javachain.protos.node.ProposalResponsePackage;
-import org.bcia.javachain.protos.node.Smartcontract;
-import org.bcia.javachain.protos.node.TransactionPackage;
+import org.bcia.javachain.protos.node.*;
 
 /**
- * 背书能力支持对象
+ * 背书能力支持对象(隔离对其他模块的依赖)
  *
- * @author
+ * @author zhouhui
  * @date 2018/3/15
  * @company Dingxuan
  */
 public class EndorserSupport implements IEndorserSupport {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(EndorserSupport.class);
+
     //TODO:Spring
     private ISystemSmartContractManager sysSmartContractManager = new SystemSmartContractManager();
 
+    //TODO:Spring
+    private SmartContractExecutor smartContractExecutor = new SmartContractExecutor();
+
     @Override
-    public boolean isSysCCAndNotInvokableExternal(String name) {
-        return sysSmartContractManager.isSysSmartContractAndNotInvokableExternal(name);
+    public boolean isSysSCAndNotInvokableExternal(String scName) {
+        return sysSmartContractManager.isSysSmartContractAndNotInvokableExternal(scName);
     }
 
     @Override
@@ -51,7 +65,7 @@ public class EndorserSupport implements IEndorserSupport {
         try {
             return nodeLedger.newTxSimulator(txId);
         } catch (LedgerException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
 
         return null;
@@ -63,46 +77,93 @@ public class EndorserSupport implements IEndorserSupport {
         try {
             return nodeLedger.newHistoryQueryExecutor();
         } catch (LedgerException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
 
         return null;
     }
 
     @Override
-    public TransactionPackage.ProcessedTransaction getTransactionByID(String groupId, String txId) {
+    public TransactionPackage.ProcessedTransaction getTransactionById(String groupId, String txId) {
         INodeLedger nodeLedger = NodeTool.getLedger(groupId);
         try {
             return nodeLedger.getTransactionByID(txId);
         } catch (LedgerException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
 
         return null;
     }
 
     @Override
-    public boolean isSysCC(String name) {
-        return sysSmartContractManager.isSysSmartContract(name);
+    public boolean isSysSmartContract(String scName) {
+        return sysSmartContractManager.isSysSmartContract(scName);
     }
 
     @Override
-    public ProposalResponsePackage.Response execute(String cid, String name, String version, String txid, boolean syscc, ProposalPackage.SignedProposal signedProp, ProposalPackage.Proposal prop, Object spec) {
-        if(spec instanceof Smartcontract.SmartContractInvocationSpec){
+    public ProposalResponsePackage.Response execute(String groupId, String scName, String scVersion, String txId,
+                                                    boolean sysSC, ProposalPackage.SignedProposal signedProposal,
+                                                    ProposalPackage.Proposal proposal, Smartcontract
+                                                            .SmartContractInvocationSpec spec) {
+        SmartContractContext scContext = new SmartContractContext(groupId, scName, scVersion, txId, sysSC,
+                signedProposal, proposal);
+        //TODO:Decorator功能未实现
+        return smartContractExecutor.execute(scContext, spec);
+    }
 
+    @Override
+    public ProposalResponsePackage.Response execute(String groupId, String scName, String scVersion, String txId,
+                                                    boolean sysSC, ProposalPackage.SignedProposal signedProposal,
+                                                    ProposalPackage.Proposal proposal, Smartcontract
+                                                            .SmartContractDeploymentSpec spec) {
+        SmartContractContext scContext = new SmartContractContext(groupId, scName, scVersion, txId, sysSC,
+                signedProposal, proposal);
+        return smartContractExecutor.execute(scContext, spec);
+    }
+
+    @Override
+    public ISmartContractDefinition getSmartContractDefinition(String groupId, String scName, String txId,
+                                                               ProposalPackage.SignedProposal signedProposal,
+                                                               ProposalPackage.Proposal proposal, ITxSimulator
+                                                                       txSimulator) {
+        //TODO:1、txSimulator是否有用 2、version配置如何更改
+        String version = CommConstant.METADATA_VERSION;
+        SmartContractContext scContext = new SmartContractContext(groupId, CommConstant.LSSC, version, txId, true,
+                signedProposal, proposal);
+
+        Smartcontract.SmartContractInvocationSpec lsscSpec = SpecHelper.buildInvocationSpec(CommConstant.LSSC,
+                LSSC.GET_SC_DATA.getBytes(), groupId.getBytes(), scName.getBytes());
+
+        ProposalResponsePackage.Response response = smartContractExecutor.execute(scContext, lsscSpec);
+        if (response.getStatus() == Common.Status.SUCCESS_VALUE) {
+            try {
+                Query.SmartContractInfo info = Query.SmartContractInfo.parseFrom(response.getPayload());
+                SmartContractData data = new SmartContractData(info);
+                return data;
+            } catch (InvalidProtocolBufferException e) {
+                log.error(e.getMessage(), e);
+            }
         }
-
 
         return null;
     }
 
     @Override
-    public void checkACL(ProposalPackage.SignedProposal signedProposal, Common.GroupHeader groupHeader, Common.SignatureHeader signatureHeader, ProposalPackage.SmartContractHeaderExtension extension) {
-
+    public void checkACL(ProposalPackage.SignedProposal signedProposal, Common.GroupHeader groupHeader, Common
+            .SignatureHeader signatureHeader, ProposalPackage.SmartContractHeaderExtension extension) {
+        //TODO：有些参数未使用?
+        AclManagement.getACLProvider().checkACL(null, groupHeader.getGroupId(), signedProposal);
     }
 
     @Override
-    public boolean isJavaCC(byte[] buffer) {
-        return false;
+    public boolean isJavaSC(byte[] buffer) {
+        return true;
+    }
+
+
+    @Override
+    public void checkInstantiationPolicy(String name, String version, ISmartContractDefinition scDefinition) {
+        //TODO：未实现
+        //new SmartContractProvider()
     }
 }

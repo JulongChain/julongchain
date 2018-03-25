@@ -30,10 +30,21 @@ public class SmartContractContext {
     private String name;
     private String version;
     private String txID;
-    private Boolean sysSmartContract;
+    private boolean sysSmartContract;
     private ProposalPackage.SignedProposal signedProposal;
     private ProposalPackage.Proposal proposal;
     private String canonicalName;
+
+    public SmartContractContext(String chainID, String name, String version, String txID, boolean
+            sysSmartContract, ProposalPackage.SignedProposal signedProposal, ProposalPackage.Proposal proposal) {
+        this.chainID = chainID;
+        this.name = name;
+        this.version = version;
+        this.txID = txID;
+        this.sysSmartContract = sysSmartContract;
+        this.signedProposal = signedProposal;
+        this.proposal = proposal;
+    }
 
     public String getChainID() {
         return chainID;
@@ -67,11 +78,11 @@ public class SmartContractContext {
         this.txID = txID;
     }
 
-    public Boolean getSysSmartContract() {
+    public boolean getSysSmartContract() {
         return sysSmartContract;
     }
 
-    public void setSysSmartContract(Boolean sysSmartContract) {
+    public void setSysSmartContract(boolean sysSmartContract) {
         this.sysSmartContract = sysSmartContract;
     }
 

@@ -13,58 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.common.smartcontractprovider;
+package org.bcia.javachain.core.endorser;
 
 import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
 import org.bcia.javachain.common.resourceconfig.Validation;
-import org.bcia.javachain.core.node.NodeConfig;
-import org.bcia.javachain.protos.node.Query;
+import org.bcia.javachain.common.util.CommConstant;
 
 /**
- * SmartContractData defines the datastructure for smartcontracts to be serialized by proto
- * Type provides an additional check by directing to use a specific package after instantiation
- * Data is Type specifc (see CDSPackage and SignedCDSPackage)
+ * 模拟智能合约定义
  *
- * @author sunianle
- * @date 3/13/18
+ * @author zhouhui
+ * @date 2018/3/21
  * @company Dingxuan
  */
-public class SmartContractData implements ISmartContractDefinition {
-    private Query.SmartContractInfo scInfo;
-
-    private Validation scValidation;
-
-    public SmartContractData(Query.SmartContractInfo scInfo) {
-        this.scInfo = scInfo;
-
-        scValidation = new Validation();
-        scValidation.setMethod(scInfo.getVssc());
-        //TODO:如何赋值
-        scValidation.setArgs(new byte[0]);
-    }
-
+public class MockSmartContractDefinition implements ISmartContractDefinition {
     @Override
     public String smartContractName() {
-        return scInfo.getName();
+        return null;
     }
 
     @Override
     public byte[] hash() {
-        return scInfo.getId().toByteArray();
+        return new byte[0];
     }
 
     @Override
     public String smartContractVersion() {
-        return scInfo.getVersion();
+        return "1.0";
     }
 
     @Override
     public Validation getValidation() {
-        return scValidation;
+        return null;
     }
 
     @Override
     public String endorsement() {
-        return scInfo.getEssc();
+        return CommConstant.ESSC;
     }
 }

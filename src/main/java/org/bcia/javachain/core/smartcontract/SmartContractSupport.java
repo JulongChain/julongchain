@@ -15,8 +15,13 @@
  */
 package org.bcia.javachain.core.smartcontract;
 
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.common.smartcontractprovider.SmartContractContext;
 import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.ITxSimulator;
+import org.bcia.javachain.protos.node.Smartcontract;
+import org.bcia.javachain.protos.node.SmartcontractShim;
 
 import javax.naming.Context;
 import java.time.Duration;
@@ -29,25 +34,27 @@ import java.time.Duration;
  * @company Dingxuan
  */
 public class SmartContractSupport {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractSupport.class);
 
-    /** DevModeUserRunsChaincode property allows user to run chaincode in development environment
-     *
+    /**
+     * DevModeUserRunsChaincode property allows user to run chaincode in development environment
      */
     public static final String DevModeUserRunsChaincode = "dev";
     public static final Integer chaincodeStartupTimeoutDefault = 5000;
     public static final String peerAddressDefault = "0.0.0.0:7051";
 
-    /** TXSimulatorKey is used to attach ledger simulation context
-     *
+    /**
+     * TXSimulatorKey is used to attach ledger simulation context
      */
     public static String TXSimulatorKey = "txsimulatorkey";
 
-    /** HistoryQueryExecutorKey is used to attach ledger history query executor context
-     *
+    /**
+     * HistoryQueryExecutorKey is used to attach ledger history query executor context
      */
     public static String HistoryQueryExecutorKey = "historyqueryexecutorkey";
 
-    /** use this for ledger access and make sure TXSimulator is being used
+    /**
+     * use this for ledger access and make sure TXSimulator is being used
      *
      * @param Contextcontext
      * @return
@@ -56,7 +63,8 @@ public class SmartContractSupport {
         return null;
     }
 
-    /** use this for ledger access and make sure HistoryQueryExecutor is being used
+    /**
+     * use this for ledger access and make sure HistoryQueryExecutor is being used
      *
      * @param context
      * @return
@@ -65,16 +73,16 @@ public class SmartContractSupport {
         return null;
     }
 
-    /** GetChain returns the chaincode framework support object
+    /**
+     * GetChain returns the chaincode framework support object
      *
      * @return
      */
-    public SmartContractSupport GetChain()  {
+    public SmartContractSupport GetChain() {
         return null;
     }
 
     /**
-     *
      * @param chaincode
      * @return
      */
@@ -82,7 +90,8 @@ public class SmartContractSupport {
         return Boolean.FALSE;
     }
 
-    /** call this under lock
+    /**
+     * call this under lock
      *
      * @param chaincode
      * @return
@@ -91,7 +100,8 @@ public class SmartContractSupport {
         return Boolean.FALSE;
     }
 
-    /** call this under lock
+    /**
+     * call this under lock
      *
      * @param chaincode
      * @return
@@ -100,7 +110,8 @@ public class SmartContractSupport {
         return Boolean.FALSE;
     }
 
-    /** NewChaincodeSupport creates a new ChaincodeSupport instance
+    /**
+     * NewChaincodeSupport creates a new ChaincodeSupport instance
      *
      * @param func
      * @return
@@ -109,7 +120,8 @@ public class SmartContractSupport {
         return null;
     }
 
-    /** getLogLevelFromViper gets the chaincode container log levels from viper
+    /**
+     * getLogLevelFromViper gets the chaincode container log levels from viper
      *
      * @param module
      * @return
@@ -117,5 +129,21 @@ public class SmartContractSupport {
     public String getLogLevelFromViper(String module) {
         return null;
     }
+
+    public Smartcontract.SmartContractInput launch(SmartContractContext scContext, Object spec) {
+        //TODO:add by zhouhui for test,返回一个空对象，实际处理待万良兵补充
+        log.info("call SmartContractSupport launch");
+
+        return Smartcontract.SmartContractInput.newBuilder().build();
+    }
+
+    public SmartcontractShim.SmartContractMessage execute(SmartContractContext scContext, SmartcontractShim
+            .SmartContractMessage scMessage, long timeout) {
+        //TODO:add by zhouhui for test,返回一个空对象，实际处理待万良兵补充
+        log.info("call SmartContractSupport execute");
+
+        return SmartcontractShim.SmartContractMessage.newBuilder().build();
+    }
+
 
 }
