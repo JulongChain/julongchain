@@ -13,24 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.endorser;
-
-import org.bcia.javachain.protos.ledger.rwset.Rwset;
+package org.bcia.javachain.core.smartcontract;
 
 /**
- * 私有数据分发者
+ * ChaincodeProvider provides an abstraction layer that is
+ *used for different packages to interact with code in the
+ * chaincode package without importing it; more methods
+ * should be added below if necessary
  *
- * @author zhouhui
- * @date 2018/3/15
+ * @author wanliangbing
+ * @date 2018/3/22
  * @company Dingxuan
  */
-public interface IPrivateDataDistributor {
-    /**
-     * 分发私有数据
-     *
-     * @param groupId
-     * @param txId
-     * @param privateData
-     */
-    void distributePrivateData(String groupId, String txId, Rwset.TxPvtReadWriteSet privateData);
+public interface ISmartContractProvider {
+
 }

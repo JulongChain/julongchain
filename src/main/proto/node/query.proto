@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 
-Modified java_package and other contents by Dingxuan on 2018-03-21
+Modified java_package and other contents by Dingxuan on 2018-03-02
 */
 
 syntax = "proto3";
@@ -43,10 +43,10 @@ message SmartContractInfo {
   string input = 4;
   // the name of the ESCC for this chaincode. This will be
   // blank if the query is returning information about installed chaincodes.
-  string escc = 5;
+  string essc = 5;
   // the name of the VSCC for this chaincode. This will be
   // blank if the query is returning information about installed chaincodes.
-  string vscc = 6;
+  string vssc = 6;
   // the chaincode unique id.
   // computed as: H(
   //                H(name || version) ||

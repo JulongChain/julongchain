@@ -18,6 +18,7 @@ package org.bcia.javachain.core.endorser;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.core.ledger.ITxSimulator;
+import org.bcia.javachain.core.ledger.TxSimulationResults;
 
 import java.util.Map;
 
@@ -50,8 +51,8 @@ public class MockTxSimulator implements ITxSimulator {
     }
 
     @Override
-    public void getTxSimulationResults(byte[] bytes) throws LedgerException {
-
+    public TxSimulationResults getTxSimulationResults() throws LedgerException {
+        return new TxSimulationResults();
     }
 
     @Override

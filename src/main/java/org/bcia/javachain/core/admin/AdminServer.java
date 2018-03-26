@@ -13,20 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.common.sysscprovider;
+package org.bcia.javachain.core.admin;
 
-import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
+import org.bcia.javachain.protos.node.AdminPackage;
 
 /**
- * 类描述
+ * 管理服务
  *
- * @author sunianle
- * @date 3/13/18
+ * @author zhouhui
+ * @date 2018/3/21
  * @company Dingxuan
  */
-public class SystemSmartContractProvider implements ISystemSmartContractProvider {
+public class AdminServer implements IAdminServer {
     @Override
-    public GenesisConfig.Application getApplicationConfig(String groupId) {
+    public AdminPackage.ServerStatus getStatus() {
         return null;
+    }
+
+    @Override
+    public AdminPackage.ServerStatus startServer() {
+        return null;
+    }
+
+    @Override
+    public AdminPackage.LogLevelResponse getModuleLogLevel(AdminPackage.LogLevelRequest request) {
+        return null;
+    }
+
+    @Override
+    public AdminPackage.LogLevelResponse setModuleLogLevel(AdminPackage.LogLevelRequest request) {
+        return null;
+    }
+
+    @Override
+    public void revertLogLevels() {
+
     }
 }
