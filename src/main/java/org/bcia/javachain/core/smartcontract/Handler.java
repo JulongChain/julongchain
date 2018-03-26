@@ -567,15 +567,15 @@ public class Handler {
 
     /**
      * put txCtxID into txidMap
-     * @param channelID
+     * @param GroupId
      * @param txid
      * @return
      */
-    public synchronized Boolean createTXIDEntry(String channelID, String txid) {
+    public synchronized Boolean createTXIDEntry(String GroupId, String txid) {
         if(txidMap == null){
             return Boolean.FALSE;
         }
-        String txCtxID = getTxCtxId(channelID, txid);
+        String txCtxID = getTxCtxId(GroupId, txid);
         if(txCtxID == null){
             logger.info(String.format("[%s]Transcation context id is null", shorttxid(txid)));
             throw new RuntimeException("Transcation context id is null");
@@ -590,11 +590,11 @@ public class Handler {
 
     /**
      * remove teCtxID from txidMap
-     * @param channelID
+     * @param GroupId
      * @param txid
      */
-    public synchronized void deleteTXIDEntry(String channelID, String txid) {
-        String txCtxID = getTxCtxId(channelID, txid);
+    public synchronized void deleteTXIDEntry(String GroupId, String txid) {
+        String txCtxID = getTxCtxId(GroupId, txid);
         if(txidMap != null){
             txidMap.remove(txCtxID);
         } else {
@@ -672,12 +672,12 @@ public class Handler {
      * @throws LedgerException
      */
     public synchronized void notify(SmartcontractShim.SmartContractMessage msg) {
-        String txCtxId = getTxCtxId(msg.getChannelId(), msg.getTxid());
+        String txCtxId = getTxCtxId(msg.getGroupId(), msg.getTxid());
         TransactionContext tctx = txCtxs.get(txCtxId);
         if (tctx == null) {
-            logger.info(String.format("Notifier Tid: %s, channelID: %s does not exist", msg.getTxid(), msg.getChannelId()));
+            logger.info(String.format("Notifier Tid: %s, GroupId: %s does not exist", msg.getTxid(), msg.getGroupId()));
         } else {
-            logger.info(String.format("Notifing Tid: %s, channelID: %s", msg.getTxid(), msg.getChannelId()));
+            logger.info(String.format("Notifing Tid: %s, GroupId: %s", msg.getTxid(), msg.getGroupId()));
 //            require ResponseNotifier's notify function to notify msg
 //            tctx.getResponseNotifier().notify(msg);
 
@@ -716,18 +716,18 @@ public class Handler {
     /** is this a txid for which there is a valid txsim
      *  if this txid for which txsim is not valid, return a msg with error
      *  else return null
-     * @param channelID
+     * @param GroupId
      * @param txid
      * @param fmtStr
      * @return
      */
-    public SmartcontractShim.SmartContractMessage isValidTxSim(String channelID, String txid, String fmtStr) {
-        TransactionContext txContext = getTxContext(channelID, txid);
+    public SmartcontractShim.SmartContractMessage isValidTxSim(String GroupId, String txid, String fmtStr) {
+        TransactionContext txContext = getTxContext(GroupId, txid);
         SmartcontractShim.SmartContractMessage msg = null;
 
         //if txContext is null or its txSimulator is null, create a SmartContextMessage obj with error message
         if(txContext == null || txContext.getTxSimulator() == null){
-            msg = newEventMessage(ERROR, channelID, txid, ByteString.copyFromUtf8(fmtStr), null);
+            msg = newEventMessage(ERROR, GroupId, txid, ByteString.copyFromUtf8(fmtStr), null);
         }
 
         //if getTxContext success, return null
@@ -751,7 +751,7 @@ public class Handler {
             ByteString res = null;
             try {
                 //judge if put txId into query map is success
-                boolean uniqueReq = createTXIDEntry(msg.getChannelId(), msg.getTxid());
+                boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
                 if (!uniqueReq) {
                     logger.error(String.format("[%s]Anoter state request pending for this Txid. Cannot process.", shorttxid(msg.getTxid())));
                     return;
@@ -759,11 +759,11 @@ public class Handler {
                 // after this, before function return txidEntry should be deleted and send serialSendMsg
                 flag = true;
                 //create transaction context
-                txContext = getTxContext(msg.getChannelId(), msg.getTxid());
+                txContext = getTxContext(msg.getGroupId(), msg.getTxid());
                 if (txContext == null || txContext.getTxSimulator() == null) {
                     String errStr = String.format("[%s]No ledger context for GetState. Sending %s", shorttxid(msg.getTxid()), ERROR.toString());
                     logger.error(errStr);
-                    serialSendMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(errStr), null);
+                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(errStr), null);
                     return;
                 }
                 //create key
@@ -773,7 +773,7 @@ public class Handler {
                     getState = SmartcontractShim.GetState.parseFrom(msg.getPayload());
                 } catch (InvalidProtocolBufferException e){
                     logger.error(String.format("[%s]Failed to create get state. Sending %s", ERROR.toString(), shorttxid(msg.getTxid())));
-                    serialSendMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
+                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
                     return;
                 }
                 //create chaincode id
@@ -792,23 +792,23 @@ public class Handler {
                     if (res == null) {
                         //The state object being requested does not exist
                         logger.info(String.format("[%s]No state associated with key: %s. Sending %s with an empty payload", shorttxid(msg.getTxid()), key, RESPONSE.toString()));
-                        serialSendMsg = newEventMessage(RESPONSE, msg.getChannelId(), msg.getTxid(), res, null);
+                        serialSendMsg = newEventMessage(RESPONSE, msg.getGroupId(), msg.getTxid(), res, null);
                     } else {
                         //success, send response msg back to chaincode. GetState will not trigger event
                         logger.info(String.format("[%s]Got state. Sending %s", shorttxid(msg.getTxid()), RESPONSE.toString()));
-                        serialSendMsg = newEventMessage(RESPONSE, msg.getChannelId(), msg.getTxid(), res, null);
+                        serialSendMsg = newEventMessage(RESPONSE, msg.getGroupId(), msg.getTxid(), res, null);
                     }
                 } catch (java.lang.Exception e) {
                     //Get error when create ByteString res, send error msg back to chaincode. GetState will not trigger event
                     logger.error(String.format("[%s]Failed to get chaincode state(%s). Sending %s", shorttxid(msg.getTxid()), printStackTrace(e), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getChannelId(),msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
+                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(),msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
                     return;
                 }
             } finally {
                 if (flag) {
                     //do followed functions before retun
                     //delete transaction context
-                    deleteTXIDEntry(msg.getChannelId(), msg.getTxid());
+                    deleteTXIDEntry(msg.getGroupId(), msg.getTxid());
                     logger.info(String.format("[%s]handlerGetState serial send %s", shorttxid(serialSendMsg.getTxid()), serialSendMsg.getType()));
                     //send msg
                     serialSendAsync(serialSendMsg);
@@ -849,7 +849,7 @@ public class Handler {
             ByteString payloadBytes = null;
             try {
                 //judge if put txId into query map is success
-                boolean uniqueReq = createTXIDEntry(msg.getChannelId(), msg.getTxid());
+                boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
                 if (!uniqueReq) {
                     logger.error(String.format("[%s]Anoter state request pending for this Txid. Cannot process.", shorttxid(msg.getTxid())));
                     return;
@@ -861,17 +861,17 @@ public class Handler {
                     getStateByRange = SmartcontractShim.GetStateByRange.parseFrom(msg.getPayload());
                 } catch (InvalidProtocolBufferException e){
                     logger.error(String.format("[%s]Fail to create get state by range. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
+                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
                     return;
                 }
                 //create iterId
                 //iteId = util.GenerateUUID();
                 //create transaction context
-                txContext = getTxContext(msg.getChannelId(), msg.getTxid());
+                txContext = getTxContext(msg.getGroupId(), msg.getTxid());
                 if (txContext == null || txContext.getTxSimulator() == null){
                     String errStr = String.format("[%s]No ledger context for GetStateByRange. Sending %s", shorttxid(msg.getTxid()), ERROR.toString());
                     logger.error(errStr);
-                    serialSendMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(errStr), null);
+                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(errStr), null);
                     return;
                 }
                 //create chaincode id
@@ -885,7 +885,7 @@ public class Handler {
                     }
                 } catch (Exception e) {
                     logger.error("[%s]Got error when get ledger scan iterator. Sending %s", shorttxid(msg.getTxid()), ERROR.toString());
-                    serialSendMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
+                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
                     return;
                 }
                 initializeQueryContext(txContext, iterID, rangeIter);
@@ -897,19 +897,19 @@ public class Handler {
                         cleanupQueryContext(txContext, iterID);
                     }
                     logger.error(String.format("[%s]Failed to get query result in HandlerGetStateByRange. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(RESPONSE, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
+                    serialSendMsg = newEventMessage(RESPONSE, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
                     return;
                 }
                 //create ByteString payloadBytes
                 payloadBytes = payload.toByteString();
                 //success
                 logger.info(String.format("[%s]Got keys and values. Sending %s", shorttxid(msg.getTxid()), RESPONSE.toString()));
-                serialSendMsg = newEventMessage(RESPONSE, msg.getChannelId(), msg.getTxid(), payloadBytes, null);
+                serialSendMsg = newEventMessage(RESPONSE, msg.getGroupId(), msg.getTxid(), payloadBytes, null);
             } finally {
                 if(flag){
                     //do followed functions before retun
                     //delete transaction context
-                    deleteTXIDEntry(msg.getChannelId(), msg.getTxid());
+                    deleteTXIDEntry(msg.getGroupId(), msg.getTxid());
                     logger.info(String.format("[%s]handlerGetStateByRange serial send %s", shorttxid(serialSendMsg.getTxid()), serialSendMsg.getType()));
                     //send msg
                     serialSendAsync(serialSendMsg);
@@ -1007,7 +1007,7 @@ public class Handler {
             ByteString payloadBytes = null;
             try {
                 //judge if put txId into query map is success
-                boolean uniqueReq = createTXIDEntry(msg.getChannelId(), msg.getTxid());
+                boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
                 if (!uniqueReq) {
                     logger.error(String.format("[%s]Anoter state request pending for this Txid. Cannot process.", shorttxid(msg.getTxid())));
                     return;
@@ -1019,22 +1019,22 @@ public class Handler {
                     queryStateNext = SmartcontractShim.QueryStateNext.parseFrom(msg.getPayload());
                 } catch (InvalidProtocolBufferException e){
                     logger.error(String.format("[%s]Failed to creqte query state next request. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
+                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
                     return;
                 }
                 //creqte transaction context
-                txContext = getTxContext(msg.getChannelId(), msg.getTxid());
+                txContext = getTxContext(msg.getGroupId(), msg.getTxid());
                 if(txContext == null){
                     logger.error(String.format("[%s]Failed to get transaction context. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
                     String errStr = String.format("[%s]Transcation context cannot found", shorttxid(msg.getTxid()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(errStr), null);
+                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(errStr), null);
                     return;
                 }
                 //create ResultIterator query iter
                 queryIter = getQueryIterator(txContext, queryStateNext.getId());
                 if(queryIter == null){
                     logger.error(String.format("[%s]query iterator no found. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8("Query iterator cannot found"), null);
+                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8("Query iterator cannot found"), null);
                     return;
                 }
                 //create QueryResponse payload
@@ -1043,18 +1043,18 @@ public class Handler {
                 } catch (LedgerException e) {
                     cleanupQueryContext(txContext, queryStateNext.getId());
                     logger.error(String.format("Fail to get query result in HandlerQueryStateNext. Sending %s", ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
+                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
                     return;
                 }
                 //create ByteString payloadBytes
                 payloadBytes = payload.toByteString();
                 logger.info(String.format("Got key and values. Sending %s", RESPONSE));
-                serialSendMsg = newEventMessage(RESPONSE, msg.getChannelId(), msg.getTxid(), payloadBytes, null);
+                serialSendMsg = newEventMessage(RESPONSE, msg.getGroupId(), msg.getTxid(), payloadBytes, null);
             } finally {
                 if(flag){
                     //do followed functions before retun
                     //delete transaction context
-                    deleteTXIDEntry(msg.getChannelId(), msg.getTxid());
+                    deleteTXIDEntry(msg.getGroupId(), msg.getTxid());
                     logger.info(String.format("[%s]handlerQueryStateNext serial send %s", shorttxid(serialSendMsg.getTxid()), serialSendMsg.getType()));
                     //send msg
                     serialSendAsync(serialSendMsg);
@@ -1093,7 +1093,7 @@ public class Handler {
             ByteString payloadBytes = null;
             try {
                 //judge if put txId into query map is success
-                boolean uniqueReq = createTXIDEntry(msg.getChannelId(), msg.getTxid());
+                boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
                 if (!uniqueReq) {
                     logger.error(String.format("[%s]Anoter state request pending for this Txid. Cannot process.", shorttxid(msg.getTxid())));
                     return;
@@ -1105,15 +1105,15 @@ public class Handler {
                     queryStateClose = SmartcontractShim.QueryStateClose.parseFrom(msg.getPayload());
                 } catch (InvalidProtocolBufferException e) {
                     logger.error(String.format("[%s]Failed to get state query close request. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
+                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
                     return;
                 }
                 //create transaction context
-                txContext = getTxContext(msg.getChannelId(), msg.getTxid());
+                txContext = getTxContext(msg.getGroupId(), msg.getTxid());
                 if(txContext == null){
                     logger.error(String.format("[%s]Failed to get transaction context. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
                     String errStr = String.format("[%s]Transaction context not found", shorttxid(msg.getTxid()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(errStr), null);
+                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(errStr), null);
                     return;
                 }
                 //create ResultsIterator iter
@@ -1129,11 +1129,11 @@ public class Handler {
                 //create ByteString payloadByte
                 payloadBytes = payload.toByteString();
                 logger.info(String.format("[%s]Closed. Sending %s", shorttxid(msg.getTxid()), RESPONSE.toString()));
-                serialSendMsg = newEventMessage(RESPONSE, msg.getChannelId(), msg.getTxid(), payloadBytes, null);
+                serialSendMsg = newEventMessage(RESPONSE, msg.getGroupId(), msg.getTxid(), payloadBytes, null);
             } finally {
                 //do followed functions before retun
                 //delete transaction context
-                deleteTXIDEntry(msg.getChannelId(), msg.getTxid());
+                deleteTXIDEntry(msg.getGroupId(), msg.getTxid());
                 logger.info(String.format("[%s]handlerQueryStateClose serial send %s", shorttxid(serialSendMsg.getTxid()), serialSendMsg.getType()));
                 //send msg
                 serialSendAsync(serialSendMsg);
@@ -1173,7 +1173,7 @@ public class Handler {
             ByteString payloadBytes = null;
             try {
                 //judge if put txId into query map is success
-                boolean uniqueReq = createTXIDEntry(msg.getChannelId(), msg.getTxid());
+                boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
                 if (!uniqueReq) {
                     logger.error(String.format("[%s]Anoter state request pending for this Txid. Cannot process.", shorttxid(msg.getTxid())));
                     return;
@@ -1185,17 +1185,17 @@ public class Handler {
                     getQueryResult = SmartcontractShim.GetQueryResult.parseFrom(msg.getPayload());
                 } catch (InvalidProtocolBufferException e) {
                     logger.error(String.format("[%s]Failed to unmarshall query request. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(),  ByteString.copyFromUtf8(printStackTrace(e)), null);
+                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(),  ByteString.copyFromUtf8(printStackTrace(e)), null);
                     return;
                 }
                 //create iterID
                 //iterID = util.GenerateUUID();
                 //create transaction context
-                txContext = getTxContext(msg.getChannelId(), msg.getTxid());
+                txContext = getTxContext(msg.getGroupId(), msg.getTxid());
                 if(txContext == null || txContext.getTxSimulator() == null){
                     String errStr = String.format("[%s]No ledger context for GetQueryResult. Sending %s", shorttxid(msg.getTxid()), ERROR.toString());
                     logger.error(errStr);
-                    serialSendMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(errStr), null);
+                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(errStr), null);
                     return;
                 }
                 //create chaincode id
@@ -1209,7 +1209,7 @@ public class Handler {
                     }
                 } catch (Exception e) {
                     logger.error(String.format("[%s]Failed to get ledger query iterator. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
+                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
                     return;
                 }
                 initializeQueryContext(txContext, iterID, executeIter);
@@ -1221,18 +1221,18 @@ public class Handler {
                         cleanupQueryContext(txContext, iterID);
                     }
                     logger.error(String.format("[%s]Failed to get query result in HandlerGetQueryResult. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
+                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
                     return;
                 }
                 //create ByteString payloadBytes
                 payloadBytes = payload.toByteString();
                 logger.info(String.format("[%s]Got keys and values. Send %s", shorttxid(msg.getTxid()), RESPONSE.toString()));
-                serialSendMsg = newEventMessage(RESPONSE, msg.getChannelId(), msg.getTxid(), payloadBytes, null);
+                serialSendMsg = newEventMessage(RESPONSE, msg.getGroupId(), msg.getTxid(), payloadBytes, null);
             } finally {
                 if(flag){
                     //do followed functions before retun
                     //delete transaction context
-                    deleteTXIDEntry(msg.getChannelId(), msg.getTxid());
+                    deleteTXIDEntry(msg.getGroupId(), msg.getTxid());
                     logger.info(String.format("[%s]handlerGetQueryResult serial send %s", shorttxid(serialSendMsg.getTxid()), serialSendMsg.getType()));
                     //send msg
                     serialSendAsync(serialSendMsg);
@@ -1273,7 +1273,7 @@ public class Handler {
             ByteString payloadByte = null;
             try {
                 //judge if put txId into query map is success
-                boolean uniqueReq = createTXIDEntry(msg.getChannelId(), msg.getTxid());
+                boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
                 if (!uniqueReq) {
                     logger.error(String.format("[%s]Anoter state request pending for this Txid. Cannot process.", shorttxid(msg.getTxid())));
                     return;
@@ -1285,17 +1285,17 @@ public class Handler {
                     getHistoryForKey = SmartcontractShim.GetHistoryForKey.parseFrom(msg.getPayload());
                 } catch (InvalidProtocolBufferException e) {
                     logger.error(String.format("[%s]Failed to create query result. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
+                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
                     return;
                 }
                 //create iterID
                 //iterID = util.GenerateUUID();
                 //create transaction context
-                txContext = getTxContext(msg.getChannelId(), msg.getTxid());
+                txContext = getTxContext(msg.getGroupId(), msg.getTxid());
                 if(txContext == null || txContext.getTxSimulator() == null){
                     String errStr = String.format("[%s]No ledger context for GetHistoryForKey. Sending %s", shorttxid(msg.getTxid()), ERROR.toString());
                     logger.error(errStr);
-                    serialSendMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(errStr), null);
+                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(errStr), null);
                     return;
                 }
                 //create chaincodeID
@@ -1305,7 +1305,7 @@ public class Handler {
                     historyIterator = txContext.getHistoryQueryExecutor().getHistoryForKey(chaincodeID, getHistoryForKey.getKey());
                 } catch (LedgerException e) {
                     logger.info(String.format("[%s]Failed to get ledger history iterator. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
+                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
                     return;
                 }
                 initializeQueryContext(txContext, iterID, historyIterator);
@@ -1317,18 +1317,18 @@ public class Handler {
                         cleanupQueryContext(txContext, iterID);
                     }
                     logger.error(String.format("[%s]Failed to get query result in HandleGetHistoryForKey. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
+                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
                     return;
                 }
                 //create ByteString payloadByte
                 payloadByte = payload.toByteString();
                 logger.info(String.format("[%s]Got keys and values. Sending %s", shorttxid(msg.getTxid()), RESPONSE.toString()));
-                serialSendMsg = newEventMessage(RESPONSE, msg.getChannelId(), msg.getTxid(), payloadByte, null);
+                serialSendMsg = newEventMessage(RESPONSE, msg.getGroupId(), msg.getTxid(), payloadByte, null);
             } finally {
                 if(flag){
                     //do followed functions before retun
                     //delete transaction context
-                    deleteTXIDEntry(msg.getChannelId(), msg.getTxid());
+                    deleteTXIDEntry(msg.getGroupId(), msg.getTxid());
                     logger.info(String.format("[%s]handlerGetHistoryForKey serial send %s", shorttxid(serialSendMsg.getTxid()), serialSendMsg.getType()));
                     //send msg
                     serialSendAsync(serialSendMsg);
@@ -1341,19 +1341,19 @@ public class Handler {
         return StringUtils.isEmpty(collection);
     }
 
-    public SmartcontractShim.SmartContractMessage getSmartContractMessageForMessage(String channelID, String txid, String msgType, ByteString payload, String errStr) {
-        TransactionContext txContext = getTxContext(channelID, txid);
-        //if we do not have channelID or INVOKE_CHAINCODE
-        if(!"".equals(channelID) || !INVOKE_CHAINCODE.toString().equals(msgType)){
+    public SmartcontractShim.SmartContractMessage getSmartContractMessageForMessage(String GroupId, String txid, String msgType, ByteString payload, String errStr) {
+        TransactionContext txContext = getTxContext(GroupId, txid);
+        //if we do not have GroupId or INVOKE_CHAINCODE
+        if(!"".equals(GroupId) || !INVOKE_CHAINCODE.toString().equals(msgType)){
             if (txContext == null || txContext.getTxSimulator() == null){
                 logger.error(String.format(errStr));
-                return newEventMessage(ERROR, channelID, txid, ByteString.copyFromUtf8(errStr), null);
+                return newEventMessage(ERROR, GroupId, txid, ByteString.copyFromUtf8(errStr), null);
             }
             return null;
         }
 
         //any other msgType except INVOKE_CHAINCODE has handled
-        //now handle the situation we do have channelID
+        //now handle the situation we do have GroupId
         SmartContractInstance calledCcIns = null;
         Smartcontract.SmartContractSpec chainCodeSpec = null;
 
@@ -1405,18 +1405,18 @@ public class Handler {
 
             try {
                 //judge if put txId into query map is success
-                boolean uniqueReq = createTXIDEntry(msg.getChannelId(), msg.getTxid());
+                boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
                 if (!uniqueReq) {
                     logger.error(String.format("[%s]Anoter state request pending for this CC: %s, Txid: %s. Cannot process."
                             , shorttxid(msg.getTxid()), smartContractID.getName(), msg.getTxid()));
                     return;
                 }
                 //check to get triggerNextStateMsg
-                triggerNextStateMsg = getSmartContractMessageForMessage(msg.getChannelId(), msg.getTxid(),msg.getType().toString(), msg.getPayload()
+                triggerNextStateMsg = getSmartContractMessageForMessage(msg.getGroupId(), msg.getTxid(),msg.getType().toString(), msg.getPayload()
                         , String.format("[%s]No ledger context for %s. Sending %s", shorttxid(msg.getTxid()), msg.getType().toString(), ERROR.toString()));
                 //if triggerNextStateMsg is null means txContext is vaild
                 if(triggerNextStateMsg == null){
-                    txContext = getTxContext(msg.getChannelId(), msg.getTxid());
+                    txContext = getTxContext(msg.getGroupId(), msg.getTxid());
                 }
                 // after this, before function return txidEntry should be deleted and send serialSendMsg
                 flag = true;
@@ -1438,11 +1438,11 @@ public class Handler {
                         }
                     } catch (InvalidProtocolBufferException e) {
                         logger.error(String.format("[%s]Unable to decipher payload. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                        triggerNextStateMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
+                        triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
                         return;
                     } catch (LedgerException e){
                         logger.error(String.format("[%s]Unable to set state. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                        triggerNextStateMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
+                        triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
                         return;
                     }
                 } else if(DEL_STATE.equals(msg.getType())){
@@ -1457,11 +1457,11 @@ public class Handler {
                         }
                     } catch (InvalidProtocolBufferException e) {
                         logger.error(String.format("[%s]Unable to decipher payload. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                        triggerNextStateMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
+                        triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
                         return;
                     } catch (LedgerException e){
                         logger.error(String.format("[%s]Unable to delete state. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                        triggerNextStateMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
+                        triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
                         return;
                     }
                 } else if (INVOKE_CHAINCODE.equals(msg.getType())){
@@ -1474,7 +1474,7 @@ public class Handler {
                         chaincodeSpec = Smartcontract.SmartContractSpec.parseFrom(msg.getPayload());
                     } catch (InvalidProtocolBufferException e) {
                         logger.error(String.format("[%s]Unable to decipher payload. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                        triggerNextStateMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
+                        triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
                         return;
                     }
                     // Get the chaincodeID to invoke. The chaincodeID to be called may
@@ -1498,7 +1498,7 @@ public class Handler {
                     } catch (RuntimeException e){
                         logger.error(String.format("[%s] C-call-C %s on channel %s failed check ACL [%s]. Sending %s"
                                 , shorttxid(msg.getTxid()), calledCcIns.getSmartContractName(), calledCcIns.getSmartContractID(), txContext.getSignedProp(), printStackTrace(e)));
-                        triggerNextStateMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
+                        triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
                         return;
                     }
 
@@ -1513,7 +1513,7 @@ public class Handler {
                         NodeConfig.Ledger lgr = new NodeConfig.Ledger();
                         if(lgr == null){
                             ByteString payload = ByteString.copyFromUtf8("Failed to find ledger for called channel " + calledCcIns.getSmartContractID());
-                            triggerNextStateMsg = newEventMessage(ERROR, msg.getChannelId(), msg.getTxid(), payload, null);
+                            triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), payload, null);
                             return;
                         }
 
@@ -1521,7 +1521,7 @@ public class Handler {
 //                        txsim2 = lgr.newTxSimulator(msg.getTxid());
 //                        if err2 != nil {
 //                            triggerNextStateMsg = &pb.ChaincodeMessage{Type: pb.ChaincodeMessage_ERROR,
-//                                    Payload: []byte(err2.Error()), Txid: msg.Txid, ChannelId: msg.ChannelId}
+//                                    Payload: []byte(err2.Error()), Txid: msg.Txid, GroupId: msg.GroupId}
 //                            return
 //                        }
 
@@ -1592,12 +1592,12 @@ public class Handler {
 //
 //                // Send response msg back to chaincode.
 //                chaincodeLogger.Debugf("[%s]Completed %s. Sending %s", shorttxid(msg.Txid), msg.Type.String(), pb.ChaincodeMessage_RESPONSE)
-//                triggerNextStateMsg = &pb.ChaincodeMessage{Type: pb.ChaincodeMessage_RESPONSE, Payload: res, Txid: msg.Txid, ChannelId: msg.ChannelId}
+//                triggerNextStateMsg = &pb.ChaincodeMessage{Type: pb.ChaincodeMessage_RESPONSE, Payload: res, Txid: msg.Txid, GroupId: msg.GroupId}
             } finally {
                 if(flag){
                     //do followed functions before retun
                     //delete transaction context
-                    deleteTXIDEntry(msg.getChannelId(), msg.getTxid());
+                    deleteTXIDEntry(msg.getGroupId(), msg.getTxid());
                     logger.info(String.format("[%s]enterBusyState trigger event %s", shorttxid(triggerNextStateMsg.getTxid()), triggerNextStateMsg.getType()));
                     //trigger next state
                     triggerNextState(triggerNextStateMsg, true);
@@ -1744,25 +1744,25 @@ public class Handler {
     /**
      * create new event msg
      * @param type
-     * @param channelId
+     * @param GroupId
      * @param txId
      * @param payload
      * @param event
      * @return
      */
     private static SmartcontractShim.SmartContractMessage newEventMessage(final SmartcontractShim.SmartContractMessage.Type type
-            , final  String channelId, final String txId, final ByteString payload, final SmartContractEventPackage.SmartContractEvent event){
+            , final  String GroupId, final String txId, final ByteString payload, final SmartContractEventPackage.SmartContractEvent event){
         if (event == null){
             return SmartcontractShim.SmartContractMessage.newBuilder()
                     .setType(type)
-                    .setChannelId(channelId)
+                    .setGroupId(GroupId)
                     .setTxid(txId)
                     .setPayload(payload)
                     .build();
         } else {
             return SmartcontractShim.SmartContractMessage.newBuilder()
                     .setType(type)
-                    .setChannelId(channelId)
+                    .setGroupId(GroupId)
                     .setTxid(txId)
                     .setPayload(payload)
                     .setSmartcontractEvent(event)
