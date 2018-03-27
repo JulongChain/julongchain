@@ -124,6 +124,8 @@ message SignatureHeader {
 
     // Arbitrary number that may only be used once. Can be used to detect replay attacks.
     bytes nonce = 2;
+
+    string nodeid=3;
 }
 
 // Payload is the message contents (and header to allow for signing)
