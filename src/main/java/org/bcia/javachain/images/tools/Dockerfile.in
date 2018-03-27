@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM _BASE_NS_/javachain-baseimage:_BASE_TAG_
+FROM docker.bcia.javachain:5000/baseimage
 ENV JAVACHAIN_CFG_PATH /etc/bcia/javachain
 VOLUME /etc/bcia/javachain
 ADD  payload/sampleconfig.tar.bz2 $JAVACHAIN_CFG_PATH
