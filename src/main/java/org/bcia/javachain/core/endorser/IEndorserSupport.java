@@ -15,12 +15,13 @@
  */
 package org.bcia.javachain.core.endorser;
 
+import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
 import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
-import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
@@ -47,7 +48,7 @@ public interface IEndorserSupport {
      * @param txId       交易ID
      * @return
      */
-    ITxSimulator getTxSimulator(String ledgerName, String txId);
+    ITxSimulator getTxSimulator(String ledgerName, String txId) throws NodeException;
 
     /**
      * 获得某账本的历史库查询执行器
@@ -55,7 +56,7 @@ public interface IEndorserSupport {
      * @param ledgerName 账本名称
      * @return
      */
-    IHistoryQueryExecutor getHistoryQueryExecutor(String ledgerName);
+    IHistoryQueryExecutor getHistoryQueryExecutor(String ledgerName) throws NodeException;
 
     /**
      * 通过某交易ID获取交易详情
@@ -64,7 +65,7 @@ public interface IEndorserSupport {
      * @param txId    交易ID
      * @return
      */
-    TransactionPackage.ProcessedTransaction getTransactionById(String groupId, String txId);
+    TransactionPackage.ProcessedTransaction getTransactionById(String groupId, String txId) throws NodeException;
 
     /**
      * 是否是系统智能合约
@@ -87,9 +88,9 @@ public interface IEndorserSupport {
      * @param spec           智能合约调用规格
      * @return
      */
-    ProposalResponsePackage.Response execute(String groupId, String scName, String scVersion, String txId, boolean
+    Object[] execute(String groupId, String scName, String scVersion, String txId, boolean
             sysSC, ProposalPackage.SignedProposal signedProposal, ProposalPackage.Proposal proposal, Smartcontract
-                                                     .SmartContractInvocationSpec spec);
+                             .SmartContractInvocationSpec spec) throws NodeException;
 
     /**
      * 执行智能合约
@@ -104,9 +105,9 @@ public interface IEndorserSupport {
      * @param spec           智能合约部署规格
      * @return
      */
-    ProposalResponsePackage.Response execute(String groupId, String scName, String scVersion, String txId, boolean
+    Object[] execute(String groupId, String scName, String scVersion, String txId, boolean
             sysSC, ProposalPackage.SignedProposal signedProposal, ProposalPackage.Proposal proposal, Smartcontract
-                                                     .SmartContractDeploymentSpec spec);
+                             .SmartContractDeploymentSpec spec) throws NodeException;
 
     /**
      * 获取智能合约定义
@@ -120,7 +121,8 @@ public interface IEndorserSupport {
      * @return
      */
     ISmartContractDefinition getSmartContractDefinition(String groupId, String scName, String txId, ProposalPackage
-            .SignedProposal signedProposal, ProposalPackage.Proposal proposal, ITxSimulator txSimulator);
+            .SignedProposal signedProposal, ProposalPackage.Proposal proposal, ITxSimulator txSimulator) throws
+            NodeException;
 
     /**
      * 检查访问控制清单

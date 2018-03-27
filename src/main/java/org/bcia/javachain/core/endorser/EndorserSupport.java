@@ -17,6 +17,8 @@ package org.bcia.javachain.core.endorser;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
@@ -29,7 +31,6 @@ import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.core.node.NodeTool;
 import org.bcia.javachain.core.smartcontract.SmartContractExecutor;
-import org.bcia.javachain.core.smartcontract.shim.SmartContractProvider;
 import org.bcia.javachain.core.ssc.ISystemSmartContractManager;
 import org.bcia.javachain.core.ssc.SystemSmartContractManager;
 import org.bcia.javachain.core.ssc.lssc.LSSC;
@@ -59,40 +60,37 @@ public class EndorserSupport implements IEndorserSupport {
     }
 
     @Override
-    public ITxSimulator getTxSimulator(String ledgerName, String txId) {
+    public ITxSimulator getTxSimulator(String ledgerName, String txId) throws NodeException {
         INodeLedger nodeLedger = NodeTool.getLedger(ledgerName);
-
         try {
             return nodeLedger.newTxSimulator(txId);
         } catch (LedgerException e) {
             log.error(e.getMessage(), e);
+            throw new NodeException(e);
         }
-
-        return null;
     }
 
     @Override
-    public IHistoryQueryExecutor getHistoryQueryExecutor(String ledgerName) {
+    public IHistoryQueryExecutor getHistoryQueryExecutor(String ledgerName) throws NodeException {
         INodeLedger nodeLedger = NodeTool.getLedger(ledgerName);
         try {
             return nodeLedger.newHistoryQueryExecutor();
         } catch (LedgerException e) {
             log.error(e.getMessage(), e);
+            throw new NodeException(e);
         }
-
-        return null;
     }
 
     @Override
-    public TransactionPackage.ProcessedTransaction getTransactionById(String groupId, String txId) {
+    public TransactionPackage.ProcessedTransaction getTransactionById(String groupId, String txId) throws
+            NodeException {
         INodeLedger nodeLedger = NodeTool.getLedger(groupId);
         try {
             return nodeLedger.getTransactionByID(txId);
         } catch (LedgerException e) {
             log.error(e.getMessage(), e);
+            throw new NodeException(e);
         }
-
-        return null;
     }
 
     @Override
@@ -101,31 +99,39 @@ public class EndorserSupport implements IEndorserSupport {
     }
 
     @Override
-    public ProposalResponsePackage.Response execute(String groupId, String scName, String scVersion, String txId,
-                                                    boolean sysSC, ProposalPackage.SignedProposal signedProposal,
-                                                    ProposalPackage.Proposal proposal, Smartcontract
-                                                            .SmartContractInvocationSpec spec) {
+    public Object[] execute(String groupId, String scName, String scVersion, String txId, boolean sysSC,
+                            ProposalPackage.SignedProposal signedProposal, ProposalPackage.Proposal proposal,
+                            Smartcontract.SmartContractInvocationSpec spec) throws NodeException {
         SmartContractContext scContext = new SmartContractContext(groupId, scName, scVersion, txId, sysSC,
                 signedProposal, proposal);
         //TODO:Decorator功能未实现
-        return smartContractExecutor.execute(scContext, spec);
+        try {
+            return smartContractExecutor.execute(scContext, spec);
+        } catch (SmartContractException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException(e);
+        }
     }
 
     @Override
-    public ProposalResponsePackage.Response execute(String groupId, String scName, String scVersion, String txId,
-                                                    boolean sysSC, ProposalPackage.SignedProposal signedProposal,
-                                                    ProposalPackage.Proposal proposal, Smartcontract
-                                                            .SmartContractDeploymentSpec spec) {
+    public Object[] execute(String groupId, String scName, String scVersion, String txId, boolean sysSC,
+                            ProposalPackage.SignedProposal signedProposal, ProposalPackage.Proposal proposal,
+                            Smartcontract.SmartContractDeploymentSpec spec) throws NodeException {
         SmartContractContext scContext = new SmartContractContext(groupId, scName, scVersion, txId, sysSC,
                 signedProposal, proposal);
-        return smartContractExecutor.execute(scContext, spec);
+        try {
+            return smartContractExecutor.execute(scContext, spec);
+        } catch (SmartContractException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException(e);
+        }
     }
 
     @Override
     public ISmartContractDefinition getSmartContractDefinition(String groupId, String scName, String txId,
                                                                ProposalPackage.SignedProposal signedProposal,
                                                                ProposalPackage.Proposal proposal, ITxSimulator
-                                                                       txSimulator) {
+                                                                       txSimulator) throws NodeException {
         //TODO:1、txSimulator是否有用 2、version配置如何更改
         String version = CommConstant.METADATA_VERSION;
         SmartContractContext scContext = new SmartContractContext(groupId, CommConstant.LSSC, version, txId, true,
@@ -134,18 +140,28 @@ public class EndorserSupport implements IEndorserSupport {
         Smartcontract.SmartContractInvocationSpec lsscSpec = SpecHelper.buildInvocationSpec(CommConstant.LSSC,
                 LSSC.GET_SC_DATA.getBytes(), groupId.getBytes(), scName.getBytes());
 
-        ProposalResponsePackage.Response response = smartContractExecutor.execute(scContext, lsscSpec);
-        if (response.getStatus() == Common.Status.SUCCESS_VALUE) {
-            try {
-                Query.SmartContractInfo info = Query.SmartContractInfo.parseFrom(response.getPayload());
-                SmartContractData data = new SmartContractData(info);
-                return data;
-            } catch (InvalidProtocolBufferException e) {
-                log.error(e.getMessage(), e);
+        try {
+            Object[] objs = smartContractExecutor.execute(scContext, lsscSpec);
+
+            if (objs != null && objs.length > 0) {
+                ProposalResponsePackage.Response response = (ProposalResponsePackage.Response) objs[0];
+                if (response.getStatus() == Common.Status.SUCCESS_VALUE) {
+                    Query.SmartContractInfo info = Query.SmartContractInfo.parseFrom(response.getPayload());
+                    SmartContractData data = new SmartContractData(info);
+                    return data;
+                } else {
+                    throw new NodeException("Execute smart contract fail, get status code: " + response.getStatus());
+                }
             }
+        } catch (SmartContractException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException(e);
+        } catch (InvalidProtocolBufferException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException(e);
         }
 
-        return null;
+        throw new NodeException("Unknown error");
     }
 
     @Override

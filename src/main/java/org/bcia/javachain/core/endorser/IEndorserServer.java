@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.core.endorser;
 
+import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 
@@ -26,6 +27,6 @@ import org.bcia.javachain.protos.node.ProposalResponsePackage;
  * @company Dingxuan
  */
 public interface IEndorserServer {
-    ProposalResponsePackage.ProposalResponse processProposal(ProposalPackage.SignedProposal signedProposal);
+    ProposalResponsePackage.ProposalResponse processProposal(ProposalPackage.SignedProposal signedProposal) throws NodeException;
 
 }

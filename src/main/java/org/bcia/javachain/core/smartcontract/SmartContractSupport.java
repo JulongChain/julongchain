@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.core.smartcontract;
 
+import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractContext;
@@ -130,7 +131,8 @@ public class SmartContractSupport {
         return null;
     }
 
-    public Smartcontract.SmartContractInput launch(SmartContractContext scContext, Object spec) {
+    public Smartcontract.SmartContractInput launch(SmartContractContext scContext, Object spec) throws
+            SmartContractException {
         //TODO:add by zhouhui for test,返回一个空对象，实际处理待万良兵补充
         log.info("call SmartContractSupport launch");
 
@@ -138,7 +140,7 @@ public class SmartContractSupport {
     }
 
     public SmartcontractShim.SmartContractMessage execute(SmartContractContext scContext, SmartcontractShim
-            .SmartContractMessage scMessage, long timeout) {
+            .SmartContractMessage scMessage, long timeout) throws SmartContractException {
         //TODO:add by zhouhui for test,返回一个空对象，实际处理待万良兵补充
         log.info("call SmartContractSupport execute");
 

@@ -16,6 +16,7 @@
 package org.bcia.javachain.core.smartcontract;
 
 import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.proto.ProposalResponseUtils;
@@ -40,11 +41,12 @@ public class SmartContractExecutor {
     /**
      * 执行智能合约
      *
-     * @param scContext
-     * @param spec
+     * @param scContext 智能合约上下文
+     * @param spec      智能合约规格（部署/执行）
      * @return
      */
-    public ProposalResponsePackage.Response execute(SmartContractContext scContext, Object spec) {
+    public Object[] execute(SmartContractContext scContext, Object spec) throws
+            SmartContractException {
         //TODO:测试数据
         long timeout = 3000;
 
@@ -58,14 +60,14 @@ public class SmartContractExecutor {
             msgType = SmartcontractShim.SmartContractMessage.Type.TRANSACTION_VALUE;
         } else {
             log.error("Unsupported spec");
-            return ProposalResponseUtils.buildErrorResponse(Common.Status.INTERNAL_SERVER_ERROR, "Unsupported spec");
+            throw new SmartContractException("Unsupported spec");
         }
 
         //启动智能合约
         Smartcontract.SmartContractInput scInput = scSupport.launch(scContext, spec);
         if (scInput == null) {
             log.error("launch smart contract fail");
-            return ProposalResponseUtils.buildErrorResponse(Common.Status.INTERNAL_SERVER_ERROR, "launch smart contract fail");
+            throw new SmartContractException("launch smart contract fail");
         }
 
         //TODO:SmartContractInput是否需要再处理?
@@ -79,23 +81,23 @@ public class SmartContractExecutor {
         if (responseMessage != null) {
             //完成时返回负载
             if (responseMessage.getType().equals(SmartcontractShim.SmartContractMessage.Type.COMPLETED)) {
-                return ProposalResponseUtils.buildResponse(responseMessage.getPayload());
+                ProposalResponsePackage.Response response = ProposalResponseUtils.buildResponse(responseMessage.getPayload());
+                return new Object[]{response, responseMessage.getSmartcontractEvent()};
             } else {
-                return ProposalResponseUtils.buildErrorResponse(Common.Status.INTERNAL_SERVER_ERROR,
-                        "execute smart contract fail: " + responseMessage.getPayload());
+                throw new SmartContractException("execute smart contract fail: " + responseMessage.getPayload());
             }
         }
 
-        return ProposalResponseUtils.buildErrorResponse(Common.Status.INTERNAL_SERVER_ERROR, "Unknow error");
+        throw new SmartContractException("Unknow error");
     }
 
     /**
      * 构造智能合约消息对象
      *
-     * @param msgType
-     * @param payload
-     * @param txId
-     * @param groupId
+     * @param msgType 消息类型
+     * @param payload 消息负载
+     * @param txId    交易ID
+     * @param groupId 群组ID
      * @return
      */
     private SmartcontractShim.SmartContractMessage buildSmartContractMessage(int msgType, byte[] payload, String
