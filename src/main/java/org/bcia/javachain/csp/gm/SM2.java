@@ -673,6 +673,26 @@ public class SM2 {
     }
 
     /**
+     * 公钥转换为ECPoint类型
+     * @param publicKey
+     * @return
+     */
+    public static ECPoint byte2ECpoint(byte[] publicKey){
+        byte[] formatedPubKey;
+        if (publicKey.length == 64){
+            //添加一字节标识，用于ECPoint解析
+            formatedPubKey = new byte[65];
+            formatedPubKey[0] = 0x04;
+            System.arraycopy(publicKey,0,formatedPubKey,1,publicKey.length);
+        }
+        else {
+            formatedPubKey = publicKey;
+        }
+
+        ECPoint userKey = curve.decodePoint(formatedPubKey);
+        return userKey;
+    }
+    /**
      * 传输实体类
      *
      * @author Potato
