@@ -52,6 +52,9 @@ public class EventGrpcServer {
      */
     private IEventHubServer eventHubServer;
 
+    public EventGrpcServer() {
+    }
+
     public EventGrpcServer(int port) {
         this.port = port;
     }
@@ -129,7 +132,6 @@ public class EventGrpcServer {
             };
         }
     }
-
 
 
 }
