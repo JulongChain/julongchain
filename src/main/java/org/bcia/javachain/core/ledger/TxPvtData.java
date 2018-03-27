@@ -13,20 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.endorser;
+package org.bcia.javachain.core.ledger;
 
-import org.bcia.javachain.common.exception.NodeException;
-import org.bcia.javachain.protos.node.ProposalPackage;
-import org.bcia.javachain.protos.node.ProposalResponsePackage;
+import org.bcia.javachain.protos.ledger.rwset.Rwset;
 
 /**
- * 背书服务接口定义
+ * 类描述
  *
- * @author
- * @date 2018/3/13
+ * @author wanliangbing
+ * @date 2018/3/27
  * @company Dingxuan
  */
-public interface IEndorserServer {
-    ProposalResponsePackage.ProposalResponse processProposal(ProposalPackage.SignedProposal signedProposal) throws NodeException;
+public class TxPvtData {
 
+    private Long seqInBlock;
+    private Rwset.TxPvtReadWriteSet writeSet;
+
+    public Long getSeqInBlock() {
+        return seqInBlock;
+    }
+
+    public void setSeqInBlock(Long seqInBlock) {
+        this.seqInBlock = seqInBlock;
+    }
+
+    public Rwset.TxPvtReadWriteSet getWriteSet() {
+        return writeSet;
+    }
+
+    public void setWriteSet(Rwset.TxPvtReadWriteSet writeSet) {
+        this.writeSet = writeSet;
+    }
 }

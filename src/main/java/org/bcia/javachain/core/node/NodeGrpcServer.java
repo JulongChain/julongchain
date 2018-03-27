@@ -73,6 +73,9 @@ public class NodeGrpcServer {
         this.port = port;
     }
 
+    public NodeGrpcServer() {
+    }
+
     /**
      * 绑定背书服务
      *
@@ -133,7 +136,12 @@ public class NodeGrpcServer {
         @Override
         public void processProposal(ProposalPackage.SignedProposal request, StreamObserver<ProposalResponsePackage.ProposalResponse> responseObserver) {
             if (endorserServer != null) {
-                ProposalResponsePackage.ProposalResponse proposalResponse = endorserServer.processProposal(request);
+                ProposalResponsePackage.ProposalResponse proposalResponse = null;
+                try {
+                    proposalResponse = endorserServer.processProposal(request);
+                } catch (NodeException e) {
+                    e.printStackTrace();
+                }
                 responseObserver.onNext(proposalResponse);
                 responseObserver.onCompleted();
             } else {
