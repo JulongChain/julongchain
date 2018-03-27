@@ -73,6 +73,9 @@ public class NodeGrpcServer {
         this.port = port;
     }
 
+    public NodeGrpcServer() {
+    }
+
     /**
      * 绑定背书服务
      *
