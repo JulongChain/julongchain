@@ -12,6 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM _BASE_NS_/javachain-baseimage:_BASE_TAG_
+FROM docker.bcia.javachain:5000/baseimage
 COPY payload/chaintool payload/protoc-gen-go /usr/local/bin/
 RUN mkdir -p /chaincode/input /chaincode/output
