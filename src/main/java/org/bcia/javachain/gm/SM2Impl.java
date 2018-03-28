@@ -2,9 +2,8 @@ package org.bcia.javachain.gm;
 
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
-import org.bcia.javachain.consenter.util.LoadYaml;
-import org.bcia.javachain.csp.gm.SM2;
-import org.bcia.javachain.csp.gm.SM2KeyPair;
+import org.bcia.javachain.csp.gm.sm2.SM2;
+import org.bcia.javachain.csp.gm.sm2.SM2KeyPair;
 import org.bcia.javachain.protos.common.Common;
 
 import org.bouncycastle.math.ec.ECPoint;
@@ -25,7 +24,7 @@ public class SM2Impl implements  ISM2Signer{
         Common.SignatureHeader.Builder signatureHeader= Common.SignatureHeader.newBuilder();
         signatureHeader.setCreator(ByteString.copyFrom(publickey));
         signatureHeader.setNodeid(nodeid);
-               // Common.SignatureHeader.newBuilder().setCreator(ByteString.copyFrom(publickey)).build();
+        Common.SignatureHeader.newBuilder().setCreator(ByteString.copyFrom(publickey)).build();
         return  signatureHeader.build();
     }
 

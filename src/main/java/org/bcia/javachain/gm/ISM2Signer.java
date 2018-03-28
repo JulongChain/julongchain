@@ -1,6 +1,6 @@
 package org.bcia.javachain.gm;
 
-import org.bcia.javachain.csp.gm.SM2KeyPair;
+import org.bcia.javachain.csp.gm.sm2.SM2KeyPair;
 import org.bcia.javachain.protos.common.Common;
 
 import org.bouncycastle.math.ec.ECPoint;
