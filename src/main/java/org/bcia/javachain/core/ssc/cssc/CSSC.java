@@ -99,7 +99,7 @@ public class CSSC extends SystemSmartContractBase {
         if(function!=GET_GROUPS && size<2){
             return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
         }
-        log.debug("Invoke function:%s",function);
+        log.debug("Invoke function:{}",function);
         // Handle ACL:
         // 1. get the signed proposal
         ProposalPackage.SignedProposal sp = stub.getSignedProposal();

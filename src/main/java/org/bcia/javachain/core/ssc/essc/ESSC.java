@@ -38,7 +38,7 @@ import java.util.List;
  * @company Dingxuan
  */
 @Component
-public class ESSC  extends SystemSmartContractBase {
+public class ESSC extends SystemSmartContractBase {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ESSC.class);
 
     @Override
@@ -73,7 +73,7 @@ public class ESSC  extends SystemSmartContractBase {
         else if(size>8){
             return newErrorResponse(String.format("Incorrect number of arguments (expected a maximum of 7, provided %d)",args.size()));
         }
-        log.debug("ESSC starts:%d args",args.size());
+        log.debug("ESSC starts:{} args",args.size());
 
         //handle the header
         String strHeader=args.get(1);

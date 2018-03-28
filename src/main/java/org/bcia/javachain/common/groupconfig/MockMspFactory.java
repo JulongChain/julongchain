@@ -13,24 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.ssc.essc;
+package org.bcia.javachain.common.groupconfig;
 
-import com.google.protobuf.ByteString;
+import org.bcia.javachain.msp.IMsp;
+import org.bcia.javachain.msp.IMspFactory;
+import org.bcia.javachain.msp.IMspOpts;
 
 /**
- * 类描述
+ * 对象
  *
- * @author sunianle
- * @date 3/8/18
+ * @author zhouhui
+ * @date 2018/3/27
  * @company Dingxuan
  */
-public class MockSigningIdentity {
-
-    public void sign() {
-
+public class MockMspFactory implements IMspFactory {
+    @Override
+    public String getName() {
+        return null;
     }
 
-    public byte[] serialize() {
-        return ByteString.copyFromUtf8("cert").toByteArray();
+    @Override
+    public IMsp getMsp(IMspOpts mspOpts) {
+        return null;
     }
 }

@@ -13,24 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.ssc.essc;
+package org.bcia.javachain.csp.gm;
 
-import com.google.protobuf.ByteString;
+import org.bcia.javachain.csp.intfs.opts.IRngOpts;
 
 /**
  * 类描述
  *
  * @author sunianle
- * @date 3/8/18
+ * @date 3/27/18
  * @company Dingxuan
  */
-public class MockSigningIdentity {
-
-    public void sign() {
-
-    }
-
-    public byte[] serialize() {
-        return ByteString.copyFromUtf8("cert").toByteArray();
+public class RngOpts implements IRngOpts {
+    @Override
+    public String getAlgorithm() {
+        return "RANDOM";
     }
 }

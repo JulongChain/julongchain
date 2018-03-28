@@ -13,24 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.ssc.essc;
-
-import com.google.protobuf.ByteString;
+package org.bcia.javachain.common.groupconfig;
 
 /**
- * 类描述
+ * 组织接口定义
  *
- * @author sunianle
- * @date 3/8/18
+ * @author zhouhui
+ * @date 2018/3/27
  * @company Dingxuan
  */
-public class MockSigningIdentity {
+public interface IOrganization {
+    String getName();
 
-    public void sign() {
-
-    }
-
-    public byte[] serialize() {
-        return ByteString.copyFromUtf8("cert").toByteArray();
-    }
+    String getMspId();
 }

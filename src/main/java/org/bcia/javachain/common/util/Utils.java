@@ -13,24 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.ssc.essc;
+package org.bcia.javachain.common.util;
 
-import com.google.protobuf.ByteString;
+import com.google.protobuf.Timestamp;
+import com.google.protobuf.util.Timestamps;
+
+import java.util.Calendar;
+import java.util.Date;
 
 /**
  * 类描述
  *
  * @author sunianle
- * @date 3/8/18
+ * @date 3/27/18
  * @company Dingxuan
  */
-public class MockSigningIdentity {
-
-    public void sign() {
-
+public class Utils {
+    public static Timestamp createUtcTimeStamp(){
+        Timestamp timeStamp= Timestamps.fromMillis(new Date().getTime());
+        return timeStamp;
     }
 
-    public byte[] serialize() {
-        return ByteString.copyFromUtf8("cert").toByteArray();
+    public static String getTestGroupID(){
+        return "TEST_GROUP_ID";
     }
 }

@@ -17,15 +17,24 @@ package org.bcia.javachain.common.util.proto;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ssc.essc.MockSigningIdentity;
+import org.bcia.javachain.csp.factory.IFactoryOpts;
+import org.bcia.javachain.csp.gm.GmCspFactory;
+import org.bcia.javachain.csp.gm.GmFactoryOpts;
+import org.bcia.javachain.csp.gm.RngOpts;
+import org.bcia.javachain.csp.intfs.ICsp;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+
+import static org.bcia.javachain.common.util.proto.ProposalUtils.computeProposalTxID;
 
 /**
  * 类描述
