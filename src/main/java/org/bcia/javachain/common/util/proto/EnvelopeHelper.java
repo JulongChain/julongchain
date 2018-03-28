@@ -23,12 +23,15 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
+import org.bcia.javachain.common.localmsp.impl.LocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.FileUtils;
+import org.bcia.javachain.node.common.helper.ConfigChildHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 
 import java.io.IOException;
 import java.util.Map;
@@ -43,6 +46,12 @@ import java.util.Map;
 public class EnvelopeHelper {
     private static JavaChainLog log = JavaChainLogFactory.getLog(EnvelopeHelper.class);
 
+    public static Common.Envelope makeGroupCreateTx(String groupId, LocalSigner signer, Configtx.ConfigChild
+            consenterSystemGroupChild, GenesisConfig.Profile profile) {
+        return null;
+
+    }
+
     public static void sendCreateGroupTransaction() {
 
     }
@@ -52,14 +61,17 @@ public class EnvelopeHelper {
     }
 
     public static Configtx.ConfigUpdate buildConfigUpdate(String groupId, Configtx.ConfigChild
-            consenterSystemChannelChild, Map<String, Object> genesisProfileMap) throws NodeException {
-//        if (genesisProfileMap.get(GenesisConfig.APPLICATION) == null) {
-//            throw new NodeException("No Application in config file");
-//        }
-//
-//        if (genesisProfileMap.get(GenesisConfig.CONSORTIUM) == null) {
-//            throw new NodeException("No Consortium in config file");
-//        }
+            consenterSystemGroupChild, GenesisConfig.Profile profile) throws NodeException {
+        if (profile.getApplication() == null) {
+            throw new NodeException("No Application in profile");
+        }
+
+        if (profile.getConsortium() == null) {
+            throw new NodeException("No Consortium in profile");
+        }
+
+        Configtx.ConfigChild configChild = ConfigChildHelper.buildApplicationChild(profile.getApplication());
+
 
         return null;
     }

@@ -13,35 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.util;
+package org.bcia.javachain.csp.gm.sm4;
 
 /**
- * 公共常量
+ * 类描述
  *
- * @author zhouhui
- * @date 2018/3/19
+ * @author
+ * @date 18-3-27
  * @company Dingxuan
  */
-public class CommConstant {
-    /**
-     * 默认编码
-     */
-    public static final String DEFAULT_CHARSET = "UTF-8";
-    /**
-     * 原数据：版本
-     */
-    public static final String METADATA_VERSION = "development build";
-    /**
-     * 背书系统智能合约
-     */
-    public static final String ESSC = "essc";
-    /**
-     * 生命周期系统智能合约
-     */
-    public static final String LSSC = "lssc";
+public class SM4_Context {
 
-    /**
-     * 成员服务提供者类型
-     */
-    public static final int MSPTYPE_CSP_VALUE = 0;
+    public int mode;
+
+    public long[] sk;
+
+    public boolean isPadding;
+
+    public SM4_Context()
+    {
+        this.mode = 1;
+        this.isPadding = true;
+        this.sk = new long[32];
+    }
 }

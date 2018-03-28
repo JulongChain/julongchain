@@ -40,19 +40,19 @@ public class Node {
      */
     private INodeCmd nodeCmd;
 
-    public void execCmd(String[] args) throws ParseException, NodeException {
+    public INodeCmd execCmd(String[] args) throws ParseException, NodeException {
         log.info("Node Command Start");
 
         if (args.length <= 0) {
             log.warn("Node command need more args-----");
-            return;
+            return null;
         }
 
         int cmdWordCount;//记录命令单词数量
         String command = args[0];
         if (args.length == 1 && !NodeConstant.VERSION.equalsIgnoreCase(command)) {
             log.warn("Node " + command + " need more args-----");
-            return;
+            return null;
         } else if (args.length == 1 && NodeConstant.VERSION.equalsIgnoreCase(command)) {
             //只有version命令只有一个单词，其余都是"命令+子命令"的形式,如"node server start"
             cmdWordCount = 1;
@@ -71,5 +71,7 @@ public class Node {
         }
 
         log.info("Node Command end");
+
+        return nodeCmd;
     }
 }

@@ -1,4 +1,4 @@
-package org.bcia.javachain.csp.gm;
+package org.bcia.javachain.csp.gm.sm3;
 
 /**
  * Copyright BCIA. All Rights Reserved.
@@ -16,32 +16,21 @@ package org.bcia.javachain.csp.gm;
  * limitations under the License.
  */
 
-import org.bcia.javachain.csp.factory.ICspFactory;
-import org.bcia.javachain.csp.factory.IFactoryOpts;
-import org.bcia.javachain.csp.intfs.ICsp;
+import org.bcia.javachain.csp.intfs.opts.IHashOpts;
 
 /**
  * @author zhanglin
- * @purpose Define the class, GmCspFactory
+ * @purpose Define the class, SM3HashOpts
  * @date 2018-01-25
  * @company Dingxuan
  */
 
-public class GmCspFactory implements ICspFactory {
+public class SM3HashOpts implements IHashOpts {
 
-    public GmCspFactory(){
-
-    }
+    public SM3HashOpts(){}
 
     @Override
-    public String getName(){
-        return IFactoryOpts.PROVIDER_GM;
-    }
-
-    @Override
-    public ICsp getCsp(IFactoryOpts opts){
-        IGmFactoryOpts gmOpts=(IGmFactoryOpts) opts;
-        GmCsp gmCsp =new GmCsp(gmOpts);
-        return gmCsp;
+    public String getAlgorithm() {
+        return "SM3";
     }
 }

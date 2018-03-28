@@ -38,30 +38,37 @@ public class GmFactoryOpts implements IGmFactoryOpts {
         this.keyStorePath=keyStorePath;
     }
 
+    @Override
     public int getSecLevel() {
         return secLevel;
     }
 
+    @Override
     public String getHashFamily() {
         return hashFamily;
     }
 
+    @Override
     public boolean isEphemeral() {
         return false;
     }
 
+    @Override
     public String getKeyStorePath() {
         return null;
     }
 
+    @Override
     public boolean isDummyKeystore() {
         return false;
     }
 
+    @Override
     public String getProviderName() {
         return null;
     }
 
+    @Override
     public String getProviderDescription() {
         return null;
     }

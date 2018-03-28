@@ -17,6 +17,7 @@ package org.bcia.javachain.node.entity;
 
 import io.grpc.stub.StreamObserver;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
@@ -86,17 +87,18 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
     }
 
     public void createGroup(String ip, int port, String groupId, String groupFile) throws NodeException {
-        if (!FileUtils.isExists(groupFile)) {
-            log.error("groupFile is not exists");
-            throw new NodeException("Group File is not exists");
-        }
-
         Common.Envelope envelope = null;
-        try {
-            byte[] bytes = FileUtils.readFileBytes(groupFile);
-            envelope = Common.Envelope.parseFrom(bytes);
-        } catch (IOException e) {
-            throw new NodeException("Can not read Group File");
+
+        if (StringUtils.isNotBlank(groupFile) && FileUtils.isExists(groupFile)) {
+            //如果群组文件存在，则直接从文件读取，形成信封对象
+            envelope = EnvelopeHelper.readFromFile(groupFile);
+        } else if (StringUtils.isBlank(groupFile)) {
+            //如果是空文件，则组成一个默认的信封对象
+
+        } else {
+            //不是空文件，反而是一个错误的文件，则直接报异常（要么不指定文件，要么就指定正确的文件）
+            log.error("groupFile is not exists: " + groupFile);
+            throw new NodeException("Group File is not exists");
         }
 
         ILocalSigner signer = new LocalSigner();
@@ -214,7 +216,7 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
     }
 
     /**
-     *  更新群组配置 V0.25
+     * 更新群组配置 V0.25
      */
     public NodeGroup updateGroup(String ip, int port, String groupId) {
         NodeGroup group = new NodeGroup();

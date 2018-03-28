@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.csp.gm;
+package org.bcia.javachain.csp.gm.sm2;
 
-import org.bcia.javachain.csp.intfs.IKey;
-import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
-import org.bouncycastle.crypto.params.ECPublicKeyParameters;
+
+
+
 import org.bouncycastle.math.ec.ECPoint;
 
 import java.math.BigInteger;
+
 
 /**
  * @author zhangmingyang
@@ -28,7 +29,7 @@ import java.math.BigInteger;
  * @company Dingxuan
  */
 public class SM2KeyPair {
-    public   ECPoint publicKey;
+    public ECPoint publicKey;
     public  BigInteger privateKey;
 
     public SM2KeyPair() {

@@ -1,4 +1,4 @@
-package org.bcia.javachain.csp.gm;
+package org.bcia.javachain.csp.gm.sm2;
 
 /**
  * Copyright BCIA. All Rights Reserved.
@@ -16,17 +16,13 @@ package org.bcia.javachain.csp.gm;
  * limitations under the License.
  */
 
+import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bouncycastle.asn1.*;
-import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
-import org.bouncycastle.crypto.CipherParameters;
-import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.crypto.digests.SM3Digest;
-import org.bouncycastle.crypto.generators.ECKeyPairGenerator;
 import org.bouncycastle.crypto.params.*;
-import org.bouncycastle.crypto.signers.SM2Signer;
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
-import org.bouncycastle.util.Strings;
+
 
 import java.io.*;
 import java.math.BigInteger;
@@ -571,7 +567,7 @@ public class SM2 {
      *            签名方密钥对
      * @return 签名
      */
-    public byte[] sign(byte[] M, String IDA, SM2KeyPair keyPair) {
+    public  byte[] sign(byte[] M, String IDA, SM2KeyPair keyPair) {
         byte[] ZA = ZA(IDA, keyPair.getPublicKey());
         byte[] M_ = join(ZA, M);
         BigInteger e = new BigInteger(1, sm3hash(M_));
@@ -677,7 +673,7 @@ public class SM2 {
      * @param publicKey
      * @return
      */
-    public static ECPoint byte2ECpoint(byte[] publicKey){
+    public  static ECPoint byte2ECpoint(byte[] publicKey){
         byte[] formatedPubKey;
         if (publicKey.length == 64){
             //添加一字节标识，用于ECPoint解析
@@ -871,12 +867,12 @@ public class SM2 {
 //		 BigInteger py = new BigInteger("7C0240F8 8F1CD4E1 6352A73C 17B7F16F 07353E53 A176D684 A9FE0C6B B798E857".replace(" ", ""), 16);
 //		 ECPoint publicKey = curve.createPoint(px, py);
 //		 BigInteger privateKey = new BigInteger("128B2FA8 BD433C6C 068C8D80 3DFF7979 2A519A55 171B1B65 0C23661D 15897263".replace(" ", ""), 16);
-
-		 SM2KeyPair keyPair = sm02.generateKeyPair();
-		 ECPoint publicKey=keyPair.getPublicKey();
-		 BigInteger privateKey=keyPair.getPrivateKey();
-		 sm02.exportPublicKey(publicKey, "E:/publickey.pem");
-		 sm02.exportPrivateKey(privateKey, "E:/privatekey.pem");
+//
+//		 SM2KeyPair keyPair = sm02.generateKeyPair();
+//		 ECPoint publicKey=keyPair.getPublicKey();
+//		 BigInteger privateKey=keyPair.getPrivateKey();
+//		 sm02.exportPublicKey(publicKey, "E:/publickey.pem");
+//		 sm02.exportPrivateKey(privateKey, "E:/privatekey.pem");
 
         System.out.println("-----------------公钥加密与解密-----------------");
 //        ECPoint publicKey = sm02.importPublicKey("E:/publickey.pem");
@@ -884,8 +880,11 @@ public class SM2 {
 //        SM2KeyPair keyPair = new SM2KeyPair();
 //        keyPair.setPublicKey(publicKey);
 //        keyPair.setPrivateKey(privateKey);
-     //   ECPoint publicKey = sm02.importPublicKey("E:/publickey.pem");
-       // BigInteger privateKey = sm02.importPrivateKey("E:/privatekey.pem");
+       ECPoint publicKey = sm02.importPublicKey("E:/publickey.pem");
+       BigInteger privateKey = sm02.importPrivateKey("E:/privatekey.pem");
+       SM2KeyPair keyPair=new SM2KeyPair();
+       keyPair.setPrivateKey(privateKey);
+       keyPair.setPublicKey(publicKey);
         //sm02.generateKeyPair()
 //
 //
@@ -919,7 +918,7 @@ public class SM2 {
       //  System.out.println("数字签名:" + signature);
 
         //byte[] signvalue=derEncode(signature.r,signature.s);
-        BigInteger[] rs = decode(signvalue);
+        BigInteger[] rs = sm02.decode(signvalue);
        // System.out.println(Util.getHexString(signvalue));
         System.out.println("签名值1："+rs[0]);
         System.out.println("签名值2："+rs[1]);
@@ -938,7 +937,7 @@ public class SM2 {
 //		TransportEntity entity3 = aKeyExchange.keyExchange_3(entity2);
 //		bKeyExchange.keyExchange_4(entity3);
     }
-    public static BigInteger[] decode(byte[] sig)
+    public  BigInteger[] decode(byte[] sig)
     {
         ASN1Sequence s = ASN1Sequence.getInstance(sig);
 

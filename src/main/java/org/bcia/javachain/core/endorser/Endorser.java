@@ -20,7 +20,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.NodeException;
-import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -47,11 +46,13 @@ import org.bcia.javachain.protos.node.Smartcontract;
  */
 public class Endorser implements IEndorserServer {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Endorser.class);
-
     //TODO:Spring
     private IEndorserSupport endorserSupport = new EndorserSupport();
 
     private IPrivateDataDistributor distributor;
+
+    public Endorser() {
+    }
 
     public Endorser(IPrivateDataDistributor distributor) {
         this.distributor = distributor;
@@ -121,11 +122,10 @@ public class Endorser implements IEndorserServer {
         if (StringUtils.isBlank(scName)) {
             return ProposalResponseUtils.buildProposalResponse(response.getPayload());
         } else {
-            endorseProposal(groupHeader.getGroupId(), groupHeader.getTxId(), signedProposal, proposal, scIdBuilder,
+            ProposalResponsePackage.Response response1 = endorseProposal(groupHeader.getGroupId(), groupHeader.getTxId(), signedProposal, proposal, scIdBuilder,
                     response, simulateResults, scEvent, extension.getPayloadVisibility().toByteArray(), scDefinition);
+            return ProposalResponseUtils.buildProposalResponse(response1.getPayload());
         }
-
-        return null;
     }
 
     /**
