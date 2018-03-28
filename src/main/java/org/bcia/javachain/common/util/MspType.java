@@ -16,32 +16,13 @@
 package org.bcia.javachain.common.util;
 
 /**
- * 公共常量
+ * 对象
  *
  * @author zhouhui
- * @date 2018/3/19
+ * @date 2018/3/27
  * @company Dingxuan
  */
-public class CommConstant {
-    /**
-     * 默认编码
-     */
-    public static final String DEFAULT_CHARSET = "UTF-8";
-    /**
-     * 原数据：版本
-     */
-    public static final String METADATA_VERSION = "development build";
-    /**
-     * 背书系统智能合约
-     */
-    public static final String ESSC = "essc";
-    /**
-     * 生命周期系统智能合约
-     */
-    public static final String LSSC = "lssc";
+public enum MspType {
+    CSP
 
-    /**
-     * 成员服务提供者类型
-     */
-    public static final int MSPTYPE_CSP_VALUE = 0;
 }

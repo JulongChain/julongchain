@@ -15,7 +15,6 @@
  */
 package org.bcia.javachain;
 
-import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
