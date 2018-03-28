@@ -88,7 +88,7 @@ public class QSSC extends SystemSmartContractBase {
         if(targetLedger==null){
             return newErrorResponse(String.format("Invalid group ID %s",groupID));
         }
-        log.debug("Invoke function:%s on group:%s",function,groupID);
+        log.debug("Invoke function:{} on group:{}",function,groupID);
 
         // Handle ACL:
         // 1. get the signed proposal
