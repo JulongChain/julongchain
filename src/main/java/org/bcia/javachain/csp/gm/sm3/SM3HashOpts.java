@@ -1,4 +1,4 @@
-package org.bcia.javachain.csp.gm;
+package org.bcia.javachain.csp.gm.sm3;
 
 /**
  * Copyright BCIA. All Rights Reserved.
@@ -29,6 +29,7 @@ public class SM3HashOpts implements IHashOpts {
 
     public SM3HashOpts(){}
 
+    @Override
     public String getAlgorithm() {
         return "SM3";
     }

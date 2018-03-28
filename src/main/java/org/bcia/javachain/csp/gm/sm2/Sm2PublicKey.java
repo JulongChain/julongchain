@@ -1,7 +1,5 @@
-package org.bcia.javachain.csp.gm;
-
 /**
- * Copyright BCIA. All Rights Reserved.
+ * Copyright DingXuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,33 +13,39 @@ package org.bcia.javachain.csp.gm;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.bcia.javachain.csp.gm.sm2;
 
-import org.bcia.javachain.csp.factory.ICspFactory;
-import org.bcia.javachain.csp.factory.IFactoryOpts;
-import org.bcia.javachain.csp.intfs.ICsp;
+import org.bouncycastle.math.ec.ECPoint;
 
 /**
- * @author zhanglin
- * @purpose Define the class, GmCspFactory
- * @date 2018-01-25
+ * @author zhangmingyang
+ * @Date: 2018/3/27
  * @company Dingxuan
  */
-
-public class GmCspFactory implements ICspFactory {
-
-    public GmCspFactory(){
-
+public class Sm2PublicKey extends SM2Key {
+    private  ECPoint ecPoint;
+    public Sm2PublicKey(ECPoint ecPoint) {
+        this.ecPoint=ecPoint;
     }
 
     @Override
-    public String getName(){
-        return IFactoryOpts.PROVIDER_GM;
+    public byte[] toBytes() {
+        System.out.println("公钥");
+        return  ecPoint.getEncoded();
     }
 
     @Override
-    public ICsp getCsp(IFactoryOpts opts){
-        IGmFactoryOpts gmOpts=(IGmFactoryOpts) opts;
-        GmCsp gmCsp =new GmCsp(gmOpts);
-        return gmCsp;
+    public byte[] ski() {
+        return new byte[0];
+    }
+
+    @Override
+    public boolean isSymmetric() {
+        return false;
+    }
+
+    @Override
+    public boolean isPrivate() {
+        return false;
     }
 }

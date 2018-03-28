@@ -1,4 +1,4 @@
-package org.bcia.javachain.csp.gm;
+package org.bcia.javachain.csp.gm.sm3;
 
 /**
  * Copyright BCIA. All Rights Reserved.

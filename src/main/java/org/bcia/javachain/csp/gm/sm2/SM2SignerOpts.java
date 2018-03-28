@@ -1,7 +1,5 @@
-package org.bcia.javachain.csp.gm;
-
 /**
- * Copyright BCIA. All Rights Reserved.
+ * Copyright DingXuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +13,24 @@ package org.bcia.javachain.csp.gm;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.bcia.javachain.csp.gm.sm2;
+
+import org.bcia.javachain.csp.intfs.IHash;
+import org.bcia.javachain.csp.intfs.opts.ISignerOpts;
 
 /**
- * @author zhanglin
- * @purpose Define the class, SM4
- * @date 2018-01-25
+ * @author zhangmingyang
+ * @Date: 2018/3/27
  * @company Dingxuan
  */
+public class SM2SignerOpts implements ISignerOpts {
+    @Override
+    public IHash hashFunc() {
+        return null;
+    }
 
-public class SM4 {
+    @Override
+    public String getAlgorithm() {
+        return "SM2";
+    }
 }
