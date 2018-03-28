@@ -2,6 +2,7 @@ package org.bcia.javachain.core.ssc.essc;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.CodedInputStream;
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.BaseJunit4Test;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.util.Utils;
@@ -29,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.*;
 
 /**
@@ -68,6 +70,7 @@ public class ESSCTest extends BaseJunit4Test {
                 System.out.printf("Init failded,%s\n", res.getMessage());
             }
 
+
             //success test 1: invocation with mandatory args only
             Smartcontract.SmartContractID smartContractID = Smartcontract.SmartContractID.newBuilder().setName("foo").setVersion("1.0").build();
             Smartcontract.SmartContractInput input = Smartcontract.SmartContractInput.newBuilder().addArgs(ByteString.copyFromUtf8("some"))
@@ -101,7 +104,27 @@ public class ESSCTest extends BaseJunit4Test {
             if (res1.getStatus() != Response.Status.SUCCESS) {
                 System.out.printf("Invoke failded,%s\n", res.getMessage());
             }
+            assertThat(res1.getStatus(),is(Response.Status.SUCCESS));
 
+
+            //Failed path: Not enough parameters
+            List<ByteString> args2 = new LinkedList<ByteString>();
+            args2.add(0, ByteString.copyFromUtf8("test"));
+            Response res2=mockStub.mockInvoke("1", args2);
+            Response.Status status2 = res2.getStatus();
+            assertThat(status2,is(Response.Status.INTERNAL_SERVER_ERROR));
+
+            // Failed path: header is empty
+            List<ByteString> args3 = new LinkedList<ByteString>();
+            args3.add(0, ByteString.copyFromUtf8("test"));
+            args3.add(1,ByteString.copyFromUtf8(""));
+            args3.add(2,proposal.getPayload());
+            args3.add(3,smartContractID.toByteString());
+            args3.add(4,successResponse.toByteString());
+            args3.add(5,ByteString.copyFromUtf8(simRes));
+            Response res3=mockStub.mockInvoke("1", args3);
+            Response.Status status3= res3.getStatus();
+            assertThat(status3,is(Response.Status.INTERNAL_SERVER_ERROR));
         } catch (JavaChainException e) {
             e.printStackTrace();
         }
@@ -113,6 +136,34 @@ public class ESSCTest extends BaseJunit4Test {
         String description = essc.getSmartContractStrDescription();
         String expectedResult = "与背书相关的系统智能合约";
         assertThat(description, is(expectedResult));
+    }
+
+    @Test
+    public void transformProtobuf() {
+        try {
+            ProposalResponsePackage.Response successResponse = ProposalResponsePackage.Response.newBuilder().
+                    setStatus(200).setMessage("OK").setPayload(ByteString.copyFromUtf8("payload")).build();
+            ByteString byteString = successResponse.toByteString();
+            ProposalResponsePackage.Response transformedResponse = ProposalResponsePackage.Response.parseFrom(byteString);
+            assertThat(transformedResponse.getStatus(),is(200));
+
+            ProposalResponsePackage.Response successResponse2 = ProposalResponsePackage.Response.newBuilder().
+                    setStatus(200).setMessage("OK").setPayload(ByteString.copyFromUtf8("payload")).build();
+            ByteString byteString2 = successResponse.toByteString();
+            String string2=byteString2.toStringUtf8();
+            ByteString transformByteString=ByteString.copyFromUtf8(string2);
+            ProposalResponsePackage.Response transformedResponse2 = ProposalResponsePackage.Response.parseFrom(transformByteString);
+            assertThat(transformedResponse2.getStatus(),not(200));
+
+            ProposalResponsePackage.Response successResponse3= ProposalResponsePackage.Response.newBuilder().
+                    setStatus(200).setMessage("OK").setPayload(ByteString.copyFromUtf8("payload")).build();
+            ByteString byteString3 = successResponse.toByteString();
+            byte[] byteArray3 = byteString3.toByteArray();
+            ProposalResponsePackage.Response transformedResponse3 = ProposalResponsePackage.Response.parseFrom(byteArray3);
+            assertThat(transformedResponse3.getStatus(),is(200));
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
     }
 
 

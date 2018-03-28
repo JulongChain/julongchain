@@ -46,22 +46,14 @@ import static org.bcia.javachain.common.util.proto.ProposalUtils.computeProposal
 public class ProtoUtils {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ProtoUtils.class);
 
-    public static Smartcontract.SmartContractID unmarshalSmartcontractID(String strSmartContractID)
+    public static Smartcontract.SmartContractID unmarshalSmartcontractID(byte[] smartContractIDBytes)
             throws UnsupportedEncodingException, InvalidProtocolBufferException {
-        byte[] bytes = strSmartContractID.getBytes("UTF-8");
-        Smartcontract.SmartContractID id = Smartcontract.SmartContractID.parseFrom(bytes);
+        Smartcontract.SmartContractID id = Smartcontract.SmartContractID.parseFrom(smartContractIDBytes);
         return id;
     }
 
-    public static ProposalResponsePackage.Response getResponse(String strResponse)
-            throws UnsupportedEncodingException, InvalidProtocolBufferException {
-        byte[] bytes = strResponse.getBytes("UTF-8");
-        ProposalResponsePackage.Response response = ProposalResponsePackage.Response.parseFrom(bytes);
-        return response;
-    }
-
-    public static ProposalResponsePackage.ProposalResponse createProposalResponse(String header, String payload, ProposalResponsePackage.Response proResponse, String results, String events,
-                                                                                  Smartcontract.SmartContractID scID, String visibility,
+    public static ProposalResponsePackage.ProposalResponse createProposalResponse(byte[] header, byte[] payload, ProposalResponsePackage.Response proResponse, byte[] results, byte[] events,
+                                                                                  Smartcontract.SmartContractID scID, byte[] visibility,
                                                                                   MockSigningIdentity signingEndorser) {
         log.info("Mock create proposalResponse...");
         log.info("Mock sining proposal...");
@@ -99,5 +91,11 @@ public class ProtoUtils {
 
     public static TransactionPackage.Transaction getTransaction(ByteString data) throws InvalidProtocolBufferException {
         return TransactionPackage.Transaction.parseFrom(data);
+    }
+
+    public static ProposalResponsePackage.Response getResponse(byte[] byteResponse)
+                                                   throws InvalidProtocolBufferException {
+        ProposalResponsePackage.Response response = ProposalResponsePackage.Response.parseFrom(byteResponse);
+        return response;
     }
 }

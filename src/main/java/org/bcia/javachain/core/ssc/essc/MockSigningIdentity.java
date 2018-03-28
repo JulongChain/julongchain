@@ -16,6 +16,8 @@
 package org.bcia.javachain.core.ssc.essc;
 
 import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 
 /**
  * 类描述
@@ -26,8 +28,9 @@ import com.google.protobuf.ByteString;
  */
 public class MockSigningIdentity {
 
+    private static JavaChainLog log = JavaChainLogFactory.getLog(MockSigningIdentity.class);
     public void sign() {
-
+         log.debug("I sign...");
     }
 
     public byte[] serialize() {

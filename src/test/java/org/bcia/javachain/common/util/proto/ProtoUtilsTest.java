@@ -27,8 +27,7 @@ public class ProtoUtilsTest {
         Smartcontract.SmartContractID esscID = idBuilder.build();
         ByteString byteString = esscID.toByteString();
         try {
-            String strID=byteString.toString("UTF-8");
-            Smartcontract.SmartContractID id=ProtoUtils.unmarshalSmartcontractID(strID);
+            Smartcontract.SmartContractID id=ProtoUtils.unmarshalSmartcontractID(byteString.toByteArray());
             assertThat(id.getName(),is("ESSC"));
             assertThat(id.getPath(),is("core/ssc/essc"));
             assertThat(id.getVersion(),is("1.0"));
