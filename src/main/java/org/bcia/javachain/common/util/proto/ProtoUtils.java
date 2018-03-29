@@ -17,6 +17,7 @@ package org.bcia.javachain.common.util.proto;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.Message;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -97,5 +98,9 @@ public class ProtoUtils {
                                                    throws InvalidProtocolBufferException {
         ProposalResponsePackage.Response response = ProposalResponsePackage.Response.parseFrom(byteResponse);
         return response;
+    }
+
+    public static byte[] marshalOrPanic(Message message){
+        return message.toByteArray();
     }
 }
