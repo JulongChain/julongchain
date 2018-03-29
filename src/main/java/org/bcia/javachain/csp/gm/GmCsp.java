@@ -16,7 +16,6 @@ package org.bcia.javachain.csp.gm;
  * limitations under the License.
  */
 
-import org.bcia.javachain.csp.factory.CspManager;
 import org.bcia.javachain.csp.gm.sm2.*;
 import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bcia.javachain.csp.gm.sm4.SM4;
@@ -28,7 +27,6 @@ import org.bcia.javachain.common.exception.JavaChainException;
 
 import java.math.BigInteger;
 
-import static org.bcia.javachain.csp.factory.CspManager.getDefaultCsp;
 import static org.bcia.javachain.csp.gm.sm2.SM2.byte2ECpoint;
 
 /**
@@ -43,8 +41,7 @@ public class GmCsp implements ICsp {
 
     // List algorithms to be used.
     //private SM2 sm2;
-    //SM2 sm2=new SM2();
-    private SM2 sm2;
+     SM2 sm2=new SM2();
     private SM3 sm3;
     private SM4 sm4;
 
@@ -54,10 +51,10 @@ public class GmCsp implements ICsp {
     //
     private IGmFactoryOpts gmOpts;
 
+
     GmCsp(IGmFactoryOpts gmOpts) {
         this.gmOpts=gmOpts;
         this.sm3=new SM3();
-        this.sm2=new SM2();
     }
 
 
@@ -104,7 +101,7 @@ public class GmCsp implements ICsp {
         sm2KeyPair.setPublicKey(byte2ECpoint(sm2KeyExport.getPublicKey().toBytes()));
         sm2KeyPair.setPrivateKey( new BigInteger(sm2KeyExport.toBytes()));
         System.out.println(digest.toString());
-        return sm2.sign(digest,"",sm2KeyPair);
+        return sm2.sign(digest,"123",sm2KeyPair);
     }
 
     @Override
@@ -112,7 +109,7 @@ public class GmCsp implements ICsp {
         SM2KeyExport sm2KeyExport=(SM2KeyExport) key;
 
         org.bouncycastle.math.ec.ECPoint ecPoint= byte2ECpoint(sm2KeyExport.getPublicKey().toBytes());
-        return sm2.verify(digest,signature,"",ecPoint);
+        return sm2.verify(digest,signature,"123",ecPoint);
     }
 
     @Override
@@ -147,28 +144,20 @@ public class GmCsp implements ICsp {
     }
 
 public static  void main(String[] args) throws JavaChainException {
-
-    //CspManager cspManager=new CspManager();
-
-   // GmCsp gmCsp=new GmCsp();
+    GmCsp gmCsp=new GmCsp();
 //    Sm2KeyGenOpts sm2KeyGenOpts=new Sm2KeyGenOpts();
 //    IKey sm2Key= gmCsp.keyGen(sm2KeyGenOpts);
 //    SM2Key sm2Key1= (SM2Key) sm2Key;
 //    sm2Key.toBytes();
 //    sm2Key1.getPublicKey().toBytes();
     Sm2KeyGenOpts sm2KeyGenOpts=new Sm2KeyGenOpts();
-    IKey sm2Key= getDefaultCsp().getKey("",sm2KeyGenOpts);
+    IKey sm2Key= gmCsp.getKey("",sm2KeyGenOpts);
     SM2KeyExport sm2Key1= (SM2KeyExport) sm2Key;
     sm2Key1.getPublicKey().toBytes();
     String abc="123";
 
-  // byte[] signValue= gmCsp.sign(sm2Key1,abc.getBytes(),new SM2SignerOpts());
-  // boolean verify=gmCsp.verify(sm2Key1,signValue,abc.getBytes(),new SM2SignerOpts());
-  // System.out.println("验签结果："+verify);
-
-    byte[] signValue=getDefaultCsp().sign(sm2Key1,abc.getBytes(),new SM2SignerOpts());
-    boolean verify=getDefaultCsp().verify(sm2Key1,signValue,abc.getBytes(),new SM2SignerOpts());
-    System.out.println("验签结果："+verify);
-
+   byte[] signValue= gmCsp.sign(sm2Key1,abc.getBytes(),new SM2SignerOpts());
+   boolean verify=gmCsp.verify(sm2Key1,signValue,abc.getBytes(),new SM2SignerOpts());
+   System.out.println("验签结果："+verify);
 }
 }

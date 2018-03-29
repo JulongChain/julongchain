@@ -85,14 +85,7 @@ public class ESSCTest extends BaseJunit4Test {
             MockSigningIdentity sId = MockMspManager.getLocalMSP().getDefaultSigningIdentity();
             byte[] sIdBytes = sId.serialize();
             byte[] nonce = MockCrypto.getRandomNonce();
-
-            long beginTime = System.currentTimeMillis();
-
             String txID=ProposalUtils.computeProposalTxID(sIdBytes, nonce);
-            long endTime = System.currentTimeMillis();
-
-            System.out.println(txID + ",耗时"+ (endTime-beginTime) + "ms");
-
             ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType.ENDORSER_TRANSACTION,
                     Utils.getTestGroupID(), txID, invocationSpec, nonce, sIdBytes, null);
             String simRes="simulation_result";
