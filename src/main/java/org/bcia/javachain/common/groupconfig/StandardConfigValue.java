@@ -20,7 +20,7 @@ import com.google.protobuf.Message;
 /**
  * 类描述
  *
- * @author
+ * @author zhouhui
  * @date 2018/3/9
  * @company Dingxuan
  */
