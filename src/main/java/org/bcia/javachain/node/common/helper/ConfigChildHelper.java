@@ -37,7 +37,7 @@ import static org.bcia.javachain.tools.configtxgen.entity.GenesisConfig.DEFAULT_
 /**
  * 类描述
  *
- * @author
+ * @author zhouhui
  * @date 2018/3/9
  * @company Dingxuan
  */

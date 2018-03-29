@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * 对象
+ * 配置更新对象帮助类
  *
  * @author zhouhui
  * @date 2018/3/28

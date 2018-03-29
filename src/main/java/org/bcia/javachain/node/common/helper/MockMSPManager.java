@@ -29,7 +29,7 @@ import org.bcia.javachain.protos.msp.MspConfigPackage;
 /**
  * 类描述
  *
- * @author
+ * @author zhouhui
  * @date 2018/3/10
  * @company Dingxuan
  */

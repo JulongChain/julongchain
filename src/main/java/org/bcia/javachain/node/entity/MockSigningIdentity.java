@@ -23,7 +23,7 @@ import org.bcia.javachain.protos.common.MspPrincipal;
 /**
  * 类描述
  *
- * @author
+ * @author zhouhui
  * @date 2018/3/13
  * @company Dingxuan
  */
