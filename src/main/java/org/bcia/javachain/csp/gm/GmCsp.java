@@ -41,7 +41,7 @@ public class GmCsp implements ICsp {
 
     // List algorithms to be used.
     //private SM2 sm2;
-     SM2 sm2=new SM2();
+    private SM2 sm2;
     private SM3 sm3;
     private SM4 sm4;
 
@@ -54,7 +54,6 @@ public class GmCsp implements ICsp {
 
     GmCsp(IGmFactoryOpts gmOpts) {
         this.gmOpts=gmOpts;
-        this.sm3=new SM3();
     }
 
 
@@ -96,20 +95,21 @@ public class GmCsp implements ICsp {
 
     @Override
     public byte[] sign(IKey key, byte[] digest, ISignerOpts opts) throws JavaChainException {
+        SM2 mySM2=getSm2();
         SM2KeyExport sm2KeyExport=(SM2KeyExport) key;
         SM2KeyPair sm2KeyPair=new SM2KeyPair();
         sm2KeyPair.setPublicKey(byte2ECpoint(sm2KeyExport.getPublicKey().toBytes()));
         sm2KeyPair.setPrivateKey( new BigInteger(sm2KeyExport.toBytes()));
         System.out.println(digest.toString());
-        return sm2.sign(digest,"123",sm2KeyPair);
+        return mySM2.sign(digest,"123",sm2KeyPair);
     }
 
     @Override
     public boolean verify(IKey key, byte[] signature, byte[] digest, ISignerOpts opts) throws JavaChainException {
+        SM2 mySM2=getSm2();
         SM2KeyExport sm2KeyExport=(SM2KeyExport) key;
-
         org.bouncycastle.math.ec.ECPoint ecPoint= byte2ECpoint(sm2KeyExport.getPublicKey().toBytes());
-        return sm2.verify(digest,signature,"123",ecPoint);
+        return mySM2.verify(digest,signature,"123",ecPoint);
     }
 
     @Override
@@ -141,6 +141,13 @@ public class GmCsp implements ICsp {
             sm3=new SM3();
         }
         return sm3;
+    }
+
+    private SM2 getSm2(){
+        if(sm2==null) {
+            sm2=new SM2();
+        }
+        return sm2;
     }
 
 public static  void main(String[] args) throws JavaChainException {
