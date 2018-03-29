@@ -38,7 +38,7 @@ import java.util.Map;
 public class GenesisConfigFactory {
     private static JavaChainLog log = JavaChainLogFactory.getLog(GenesisConfigFactory.class);
 
-    public static GenesisConfig loadGenesisConfig() throws Exception {
+    public static GenesisConfig loadGenesisConfig() throws IOException {
         Yaml yaml = new Yaml();
         URL url = GenesisConfigFactory.class.getClassLoader().getResource(GenesisConfig.CONFIGTX_FILE_PATH);
 

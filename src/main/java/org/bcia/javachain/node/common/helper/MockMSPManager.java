@@ -20,6 +20,7 @@ import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.IIdentityDeserializer;
 import org.bcia.javachain.msp.IMsp;
 import org.bcia.javachain.msp.ISigningIdentity;
+import org.bcia.javachain.msp.entity.GmSoftConf;
 import org.bcia.javachain.msp.entity.IdentityIdentifier;
 import org.bcia.javachain.protos.common.MspPrincipal;
 import org.bcia.javachain.protos.msp.Identities;
@@ -49,6 +50,11 @@ public class MockMSPManager {
         return new IMsp() {
             @Override
             public void setup(MspConfigPackage.MSPConfig config) {
+
+            }
+
+            @Override
+            public void load(GmSoftConf GmSoftConf) {
 
             }
 

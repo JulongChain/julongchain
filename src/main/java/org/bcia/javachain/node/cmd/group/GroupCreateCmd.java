@@ -109,7 +109,7 @@ public class GroupCreateCmd extends AbstractNodeGroupCmd {
             return;
         }
 
-        nodeGroup.createGroup(ipAndPort[0], port, groupId);
+        nodeGroup.createGroup(ipAndPort[0], port, groupId, groupConfigFile);
 
         log.info("Group created!");
     }
