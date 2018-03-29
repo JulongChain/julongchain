@@ -18,7 +18,9 @@ package org.bcia.javachain.common.util.proto;
 import com.google.protobuf.ByteString;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.csp.factory.CspManager;
 import org.bcia.javachain.csp.gm.GmCspFactory;
+import org.bcia.javachain.csp.intfs.ICsp;
 import org.bcia.javachain.msp.ISigningIdentity;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
@@ -124,7 +126,11 @@ public class ProposalUtils {
      * @throws JavaChainException
      */
     public static String computeProposalTxID(byte[] creator, byte[] nonce) throws JavaChainException {
-        byte[] bytes = new GmCspFactory().getCsp(null).hash(ArrayUtils.addAll(creator, nonce), null);
-        return new String(bytes, Charset.forName("UTF-8"));
+        //ICsp csp = new GmCspFactory().getCsp(null);
+        ICsp csp = CspManager.getDefaultCsp();
+        byte[] bytes1 = ArrayUtils.addAll(creator, nonce);
+        byte[] resultBytes = csp.hash(bytes1, null);
+        String txId = new String(resultBytes, Charset.forName("UTF-8"));
+        return txId;
     }
 }

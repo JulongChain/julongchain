@@ -17,6 +17,7 @@ package org.bcia.javachain.core.smartcontract;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.Message;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.QueryResult;
@@ -34,14 +35,12 @@ import org.bcia.javachain.core.smartcontract.shim.fsm.EventDesc;
 import org.bcia.javachain.core.smartcontract.shim.fsm.FSM;
 import org.bcia.javachain.core.smartcontract.shim.fsm.exceptions.*;
 import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
-import org.bcia.javachain.protos.node.ProposalPackage;
-import org.bcia.javachain.protos.node.SmartContractEventPackage;
-import org.bcia.javachain.protos.node.Smartcontract;
-import org.bcia.javachain.protos.node.SmartcontractShim;
+import org.bcia.javachain.protos.node.*;
 
 import javax.naming.Context;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,20 +88,61 @@ public class Handler {
     private Map<String, Boolean> txidMap;
     private Channel<NextStateInfo> nextState;
 
+    public Handler(){
+        this.chatStream  = null;
+        this.smartContractSupport = null;
+        this.registered = Boolean.FALSE;
+        this.txCtxs = new HashMap<>();
+        this.txidMap = new HashMap<>();
+        this.nextState = new Channel<>();
+        this.fsm = new FSM("created");
+
+        fsm.addEvents(
+                //            Event Name                        From                To
+                new EventDesc(REGISTERED.toString(),            "created",      "established"),
+                new EventDesc(READY.toString(),                 "established",  "ready"),
+                new EventDesc(PUT_STATE.toString(),             "ready",        "ready"),
+                new EventDesc(DEL_STATE.toString(),             "ready",        "ready"),
+                new EventDesc(INVOKE_CHAINCODE.toString(),      "ready",        "ready"),
+                new EventDesc(COMPLETED.toString(),             "ready",        "ready"),
+                new EventDesc(GET_STATE.toString(),             "ready",        "ready"),
+                new EventDesc(GET_STATE_BY_RANGE.toString(),    "ready",        "ready"),
+                new EventDesc(GET_QUERY_RESULT.toString(),      "ready",        "ready"),
+                new EventDesc(GET_HISTORY_FOR_KEY.toString(),   "ready",        "ready"),
+                new EventDesc(QUERY_STATE_NEXT.toString(),      "ready",        "ready"),
+                new EventDesc(QUERY_STATE_CLOSE.toString(),     "ready",        "ready"),
+                new EventDesc(ERROR.toString(),                 "ready",        "ready"),
+                new EventDesc(RESPONSE.toString(),              "ready",        "ready"),
+                new EventDesc(INIT.toString(),                  "ready",        "ready"),
+                new EventDesc(TRANSACTION.toString(),           "ready",        "ready")
+        );
+
+        fsm.addCallbacks(
+                //         Type             Trigger                         ICallbakc
+                new CBDesc(BEFORE_EVENT,    REGISTERED.toString(),          (event) -> beforeRegisterEvent(event, fsm.current())),
+                new CBDesc(BEFORE_EVENT,    COMPLETED.toString(),           (event) -> beforeCompletedEvent(event, fsm.current())),
+                new CBDesc(AFTER_EVENT,     GET_STATE.toString(),           (event) -> afterGetState(event, fsm.current())),
+                new CBDesc(AFTER_EVENT,     GET_STATE_BY_RANGE.toString(),  (event) -> afterGetStateByRange(event, fsm.current())),
+                new CBDesc(AFTER_EVENT,     GET_QUERY_RESULT.toString(),    (event) -> afterGetQueryResult(event, fsm.current())),
+                new CBDesc(AFTER_EVENT,     GET_HISTORY_FOR_KEY.toString(), (event) -> afterGetHistoryForKey(event, fsm.current())),
+                new CBDesc(AFTER_EVENT,     QUERY_STATE_NEXT.toString(),    (event) -> afterQueryStateNext(event, fsm.current())),
+                new CBDesc(AFTER_EVENT,     QUERY_STATE_CLOSE.toString(),   (event) -> afterQueryStateClose(event, fsm.current())),
+                new CBDesc(AFTER_EVENT,     PUT_STATE.toString(),           (event) -> enterBusyState(event, fsm.current())),
+                new CBDesc(AFTER_EVENT,     DEL_STATE.toString(),           (event) -> enterBusyState(event, fsm.current())),
+                new CBDesc(AFTER_EVENT,     INVOKE_CHAINCODE.toString(),    (event) -> enterBusyState(event, fsm.current())),
+                new CBDesc(ENTER_STATE,     ESTABLISHED_STATE,              (event) -> enterEstablishedState(event, fsm.current())),
+                new CBDesc(ENTER_STATE,     READY_STATE,                    (event) -> enterReadyState(event, fsm.current())),
+                new CBDesc(ENTER_STATE,     END_STATE,                      (event) -> enterEndState(event, fsm.current()))
+        );
+    }
     //newChaincodeSupportHandler
     public Handler(SmartContractSupport chaincodeSupport, ISmartContractStream peerChatStream){
         this.chatStream  = peerChatStream;
         this.smartContractSupport = chaincodeSupport;
-
-//        this.smartContractID = Smartcontract.SmartContractID.newBuilder()
-//                .build();
-//        this.smartContractInstance = new SmartContractInstance();
-        this. registered = Boolean.FALSE;
-//        this.readyNotify = Boolean.FALSE;
+        this.registered = Boolean.FALSE;
         this.txCtxs = new HashMap<>();
         this.txidMap = new HashMap<>();
         this.nextState = new Channel<>();
-
         this.fsm = new FSM("created");
 
         fsm.addEvents(
@@ -226,8 +266,6 @@ public class Handler {
 
     /**
      * return firest 8 chars in txid
-     * @param txid
-     * @return
      */
     public static String shorttxid(String txid) {
         if(txid == null){
@@ -241,7 +279,6 @@ public class Handler {
 
     /**
      * set smart contract instance which's id is smartContractID
-     * @param smartContractID
      */
     public void decomposeRegisteredName(Smartcontract.SmartContractID smartContractID) {
         this.setSmartContractInstance(getSmartContractInstance(smartContractID.getName()));
@@ -250,7 +287,6 @@ public class Handler {
     /**
      * get smart contract with smartContractName
      * @param smartContractName name:version/id
-     * @return
      */
     public static SmartContractInstance getSmartContractInstance(String smartContractName) {
         SmartContractInstance instance = new SmartContractInstance();
@@ -281,26 +317,27 @@ public class Handler {
 
     /**
      * get smart contract's name
-     * @return
      */
     public String getSmartContractRootName() {
-        return getSmartContractInstance().getSmartContractName();
+        return smartContractInstance.getSmartContractName();
     }
 
     /**
      * send smart contract message with gRPC channel "chatStream" sychronized
-     * @param msg
      */
     public synchronized void serialSend(SmartcontractShim.SmartContractMessage msg) {
-        chatStream.send(msg);
+        try {
+//            chatStream.send(msg);
+            logger.info(String.format("Serialsend %s", msg.getPayload().toStringUtf8()));
+        } catch (Exception e) {
+            throw new RuntimeException("SerialSend failed");
+        }
     }
 
     /**
      * send smart contract message with gRPC channel "chatStream" asychronized
-     * @param msg
      */
     public void serialSendAsync(SmartcontractShim.SmartContractMessage msg) {
-
         new Thread(() -> {
             serialSend(msg);
         }).start();
@@ -308,13 +345,10 @@ public class Handler {
 
     /**
      * get transaction context id which is chainid + txid
-     * @param chainID
-     * @param txid
-     * @return
      */
-    public String getTxCtxId(String chainID, String txid) {
-        if(chainID != null && txid != null){
-            return chainID + txid;
+    public String getTxCtxId(String groupId, String txId) {
+        if(groupId != null && txId != null){
+            return groupId + txId;
         } else {
             return null;
         }
@@ -322,21 +356,17 @@ public class Handler {
 
     /**
      * create transaction context with following args
-     * @param ctxt
-     * @param chainID
-     * @param txid
-     * @param signedProp
-     * @param prop
-     * @return
      */
     public TransactionContext createTxContext(Context ctxt, String chainID, String txid, ProposalPackage.SignedProposal signedProp, ProposalPackage.Proposal prop) {
         if(txCtxs == null) {
+            logger.error("Cannot create transaction because Map of transaction context is null");
            return null;
         }
 
         String txCtxID = getTxCtxId(chainID, txid);
         //if transaction context which's id is txCtxID is exist
         if(txCtxs.get(txCtxID) != null){
+            logger.error("Cannot create transaction because current transaction context is already exist");
             return null;
         }
 
@@ -349,79 +379,76 @@ public class Handler {
             txctx.setTxSimulator(smartContractSupport.getTxSimulator(ctxt));
             txctx.setHistoryQueryExecutor(smartContractSupport.getHistoryQueryExecutor(ctxt));
         }
-
+        logger.info("Create transaction success");
         return txctx;
     }
 
     /**
      * get transcation context with transcation id "chainID + txid"
-     * @param chainID
-     * @param txid
-     * @return
      */
-    public synchronized TransactionContext getTxContext(String chainID, String txid) {
-        String txCtxID = getTxCtxId(chainID, txid);
+    public synchronized TransactionContext getTxContext(String groupId, String txId) {
+        String txCtxID = getTxCtxId(groupId, txId);
         return txCtxs.get(txCtxID);
     }
 
     /**
      * delete transcation context with transcation id "chainID + txid" if exist
-     * @param chainID
-     * @param txid
      */
     public synchronized void deleteTxContext(String chainID, String txid) {
         String txCtxID = getTxCtxId(chainID, txid);
         if(txCtxID != null) {
+            logger.info(String.format("Remove transaction id %s", txCtxID));
             txCtxs.remove(txCtxID);
+        } else {
+            logger.error("Cannot remove transaction because of null id");
         }
     }
 
     /**
      * put current txContext into txContext's queryIteratorMap for init it.
-     * @param txContext
-     * @param queryID
-     * @param queryIterator
      */
     public synchronized void initializeQueryContext(TransactionContext txContext, String queryID,
                                        ResultsIterator queryIterator) {
-        txContext.getQueryIteratorMap().put(queryID, queryIterator);
+        if(txContext.getQueryIteratorMap() != null && queryID != null){
+            logger.info(String.format("Put queryID: %s", queryID));
+            txContext.getQueryIteratorMap().put(queryID, queryIterator);
+        } else if(txContext.getQueryIteratorMap() == null) {
+            logger.error(String.format("Cannot initialize queryID: %s, because QueryIteratorMap is null", queryID));
+        } else {
+            logger.error("Cannot initialize because queryID is null");
+        }
     }
 
     /**
      * get a transcation context which's query id is "queryID" in cxContext's queryIteratorMap
-     * @param txContext
-     * @param queryID
-     * @return
      */
     public synchronized ResultsIterator getQueryIterator(TransactionContext txContext, String queryID) {
-        return txContext.getQueryIteratorMap().get(queryID);
+        if(txContext.getQueryIteratorMap() != null && queryID != null){
+            return txContext.getQueryIteratorMap().get(queryID);
+        } else {
+            return null;
+        }
     }
 
     /**
      * close and remove current ResultIterator which's query id is "queryID"
-     * @param txContext
-     * @param queryID
-     * @throws LedgerException
      */
     public synchronized void cleanupQueryContext(TransactionContext txContext, String queryID){
         try {
             txContext.getQueryIteratorMap().get(queryID).close();
             txContext.getQueryIteratorMap().remove(queryID);
             txContext.getPendingQueryResults().remove(queryID);
-        } catch (LedgerException e) {
-            throw new RuntimeException("Got error when clean up query context");
+        } catch (NullPointerException | LedgerException e) {
+            logger.error("Got error when clean up query context");
         }
     }
 
     /**
      * Check if the transactor is allow to call this chaincode on this channel
-     * @param signedProp
-     * @param proposal
-     * @param ccIns
      */
-    public void checkACL(ProposalPackage.SignedProposal signedProp, ProposalPackage.Proposal proposal, SmartContractInstance ccIns) {
+    public boolean checkACL(ProposalPackage.SignedProposal signedProp, ProposalPackage.Proposal proposal, SmartContractInstance ccIns) {
 
-        //need syssmartcontractprovider
+        return true;
     }
 
     /**
@@ -429,9 +456,8 @@ public class Handler {
      */
     public void deregister() {
         if(this.getRegistered()){
-            //need ssSupport.deregister
+
         }
-        return;
     }
 
     public void triggerNextState(SmartcontractShim.SmartContractMessage msg, Boolean send) {
@@ -456,7 +482,6 @@ public class Handler {
      */
     public void waitForKeepaliveTimer() {
         //need ssSupport.keepalive
-        return;
     }
 
     /**
@@ -553,10 +578,6 @@ public class Handler {
     }
 
     /** HandleChaincodeStream Main loop for handling the associated Chaincode stream
-     *
-     * @param chaincodeSupport
-     * @param ctxt
-     * @param stream
      */
     public static void handleChaincodeStream(SmartContractSupport chaincodeSupport, Context ctxt, ISmartContractStream stream) {
         //check deadline
@@ -567,9 +588,6 @@ public class Handler {
 
     /**
      * put txCtxID into txidMap
-     * @param GroupId
-     * @param txid
-     * @return
      */
     public synchronized Boolean createTXIDEntry(String GroupId, String txid) {
         if(txidMap == null){
@@ -580,21 +598,15 @@ public class Handler {
             logger.info(String.format("[%s]Transcation context id is null", shorttxid(txid)));
             throw new RuntimeException("Transcation context id is null");
         }
-        if (txidMap.get(txCtxID) == null || txidMap.get(txCtxID)) {
-            return Boolean.FALSE;
-        }
-        txidMap.put(txCtxID, Boolean.TRUE);
-
+        txidMap.putIfAbsent(txCtxID, Boolean.TRUE);
         return txidMap.get(txCtxID);
     }
 
     /**
      * remove teCtxID from txidMap
-     * @param GroupId
-     * @param txid
      */
-    public synchronized void deleteTXIDEntry(String GroupId, String txid) {
-        String txCtxID = getTxCtxId(GroupId, txid);
+    public synchronized void deleteTXIDEntry(String groupId, String txid) {
+        String txCtxID = getTxCtxId(groupId, txid);
         if(txidMap != null){
             txidMap.remove(txCtxID);
         } else {
@@ -604,7 +616,6 @@ public class Handler {
 
     /**
      * notiry READY message as next state
-     * @param val
      */
     public void notifyDuringStartup(Boolean val) {
         if(readyNotify != null){
@@ -632,35 +643,26 @@ public class Handler {
     }
 
     /** beforeRegisterEvent is invoked when chaincode tries to register.
-     *
-     * @param event
-     * @param state
      */
      public void beforeRegisterEvent(Event event, String state) {
          try {
-             logger.info(String.format("Received %s in state %s", event, state));
+             logger.info(String.format("Received event in state %s", state));
+             //在event中提取msg
              SmartcontractShim.SmartContractMessage msg = extractMessageFromEvent(event);
-             //throws InvalidProtocolBufferException
+             //在msg payload中提取id
              Smartcontract.SmartContractID id = Smartcontract.SmartContractID.parseFrom(msg.getPayload());
-
-             //Register with chaincodeSupptort
              smartContractID = id;
-//             requires function smartContractSupport.registerHandler
+             //注册handler
 //             smartContractSupport.registerHandler(this);
-
-//             if catch exception during registerHandler, do notifyDuringStartup(false)
-//             notifyDuringStartup(false);
-
-             //now we have all component sothat we can have root name of chaincode
+             //实例化链码
              decomposeRegisteredName(smartContractID);
              logger.info(String.format("Got %s for chaincodeID = %s, sending back %s", event, id, REGISTERED.toString()));
-
-             //send msg with msgType REGISTED
+             //发送REGISTERED消息
              serialSend(SmartcontractShim.SmartContractMessage.newBuilder()
                      .setType(REGISTERED)
                      .build());
          } catch (InvalidProtocolBufferException | RuntimeException e){
-             final RuntimeException error = new RuntimeException(String.format("error in received %s", REGISTER.toString()));
+             final RuntimeException error = new RuntimeException(String.format("Error in received %s", REGISTER.toString()));
              event.cancel(error);
              throw error;
          }
@@ -668,21 +670,18 @@ public class Handler {
 
     /**
      * notify msg
-     * @param msg
-     * @throws LedgerException
      */
     public synchronized void notify(SmartcontractShim.SmartContractMessage msg) {
         String txCtxId = getTxCtxId(msg.getGroupId(), msg.getTxid());
+        //获取交易
         TransactionContext tctx = txCtxs.get(txCtxId);
         if (tctx == null) {
             logger.info(String.format("Notifier Tid: %s, GroupId: %s does not exist", msg.getTxid(), msg.getGroupId()));
         } else {
             logger.info(String.format("Notifing Tid: %s, GroupId: %s", msg.getTxid(), msg.getGroupId()));
-//            require ResponseNotifier's notify function to notify msg
-//            tctx.getResponseNotifier().notify(msg);
-
-            logger.debug("This is notify()");
-            //clean up queryIteratorMap
+            //发送交易
+            tctx.setResponseNotifier(msg);
+            //发送完成后关闭
             tctx.getQueryIteratorMap().forEach((k, v) -> {
                 try {
                     v.close();
@@ -694,9 +693,6 @@ public class Handler {
     }
 
     /** beforeCompletedEvent is invoked when chaincode has completed execution of init, invoke.
-     *
-     * @param event
-     * @param state
      */
     public void beforeCompletedEvent(Event event, String state) {
         SmartcontractShim.SmartContractMessage msg = extractMessageFromEvent(event);
@@ -704,245 +700,223 @@ public class Handler {
     }
 
     /** afterGetState handles a GET_STATE request from the chaincode.
-     *
-     * @param event
-     * @param state
      */
     public void afterGetState(Event event, String state) {
         SmartcontractShim.SmartContractMessage msg = extractMessageFromEvent(event);
         logger.info(String.format("[%s]Received %s, invoking get state from ledger", shorttxid(msg.getTxid()), GET_STATE.toString()));
         handleGetState(msg);
     }
-    /** is this a txid for which there is a valid txsim
-     *  if this txid for which txsim is not valid, return a msg with error
-     *  else return null
-     * @param GroupId
-     * @param txid
-     * @param fmtStr
-     * @return
-     */
-    public SmartcontractShim.SmartContractMessage isValidTxSim(String GroupId, String txid, String fmtStr) {
-        TransactionContext txContext = getTxContext(GroupId, txid);
-        SmartcontractShim.SmartContractMessage msg = null;
-
-        //if txContext is null or its txSimulator is null, create a SmartContextMessage obj with error message
-        if(txContext == null || txContext.getTxSimulator() == null){
-            msg = newEventMessage(ERROR, GroupId, txid, ByteString.copyFromUtf8(fmtStr), null);
-        }
-
-        //if getTxContext success, return null
-        return msg;
-    }
 
     /** Handles query to ledger to get state
-     *
-     * @param msg
      */
     public void handleGetState(SmartcontractShim.SmartContractMessage msg) {
         new Thread(() -> {
-            //serialSendMsg is used to send error msg
-            SmartcontractShim.SmartContractMessage serialSendMsg = null;
-            //flag of if do "defer function"
-            boolean flag = false;
             TransactionContext txContext = null;
-            String key = null;
             SmartcontractShim.GetState getState = null;
-            String chaincodeID = null;
+            String smartContractId = null;
             ByteString res = null;
+            //创建交易实体
+            boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
+            if (!uniqueReq) {
+                String errStr = String.format("[%s]HandleGetState. Anoter state request pending for this Txid. Cannot process.", shorttxid(msg.getTxid()));
+                logger.error(errStr);
+                return;
+            }
+            //获取交易
+            txContext = getTxContext(msg.getGroupId(), msg.getTxid());
+            //未获取到交易或交易无法模拟执行
+            if (txContext == null || txContext.getTxSimulator() == null) {
+                String errStr = String.format("[%s]HandleGetState. No ledger context for GetState. Sending %s", shorttxid(msg.getTxid()), ERROR.toString());
+                logger.error(errStr);
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //在msg的payload中提取GetState
             try {
-                //judge if put txId into query map is success
-                boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
-                if (!uniqueReq) {
-                    logger.error(String.format("[%s]Anoter state request pending for this Txid. Cannot process.", shorttxid(msg.getTxid())));
-                    return;
-                }
-                // after this, before function return txidEntry should be deleted and send serialSendMsg
-                flag = true;
-                //create transaction context
-                txContext = getTxContext(msg.getGroupId(), msg.getTxid());
-                if (txContext == null || txContext.getTxSimulator() == null) {
-                    String errStr = String.format("[%s]No ledger context for GetState. Sending %s", shorttxid(msg.getTxid()), ERROR.toString());
-                    logger.error(errStr);
-                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(errStr), null);
-                    return;
-                }
-                //create key
-                key = msg.getPayload().toStringUtf8();
-                //create get state
-                try {
-                    getState = SmartcontractShim.GetState.parseFrom(msg.getPayload());
-                } catch (InvalidProtocolBufferException e){
-                    logger.error(String.format("[%s]Failed to create get state. Sending %s", ERROR.toString(), shorttxid(msg.getTxid())));
-                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
-                    return;
-                }
-                //create chaincode id
-                chaincodeID = getSmartContractRootName();
-                logger.info(String.format("[%s] getting state for chaincode %s, key %s, channel %s",
-                        shorttxid(msg.getTxid()), chaincodeID, getState.getKey(), txContext.getChainID()));
-                //create ByteString res
-                try {
-                    if(isCollectionSet(getState.getCollection())){
-//                    if isCollectionSet(getState.Collection) {
-//                        res, err = txContext.txsimulator.GetPrivateData(chaincodeID, getState.Collection, getState.Key)
+                getState = SmartcontractShim.GetState.parseFrom(msg.getPayload());
+            } catch (Exception e){
+                String errStr = String.format("[%s]HandleGetState. Failed to create GetState. Sending %s", ERROR.toString(), shorttxid(msg.getTxid()));
+                logger.error(errStr);
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //获取链码id
+            try {
+                smartContractId = getSmartContractRootName();
+            } catch (Exception e) {
+                String errStr = String.format("[%s]HandleGetState. Failed to create chaincodeID. Sending %s", ERROR.toString(), shorttxid(msg.getTxid()));
+                logger.error(errStr);
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            logger.info(String.format("[%s] getting state for chaincode %s, key %s, channel %s",
+                    shorttxid(msg.getTxid()), smartContractId, getState.getKey(), txContext.getChainID()));
+            //在账本中获取状态
+            try {
+                if(isCollectionSet(getState.getCollection())){
+//                    res = txContext.getTxSimulator().getState(smartContractId, getState.getKey());
 //                    } else {
 //                        res, err = txContext.txsimulator.GetState(chaincodeID, getState.Key)
 //                    }
-                    }
-                    if (res == null) {
-                        //The state object being requested does not exist
-                        logger.info(String.format("[%s]No state associated with key: %s. Sending %s with an empty payload", shorttxid(msg.getTxid()), key, RESPONSE.toString()));
-                        serialSendMsg = newEventMessage(RESPONSE, msg.getGroupId(), msg.getTxid(), res, null);
-                    } else {
-                        //success, send response msg back to chaincode. GetState will not trigger event
-                        logger.info(String.format("[%s]Got state. Sending %s", shorttxid(msg.getTxid()), RESPONSE.toString()));
-                        serialSendMsg = newEventMessage(RESPONSE, msg.getGroupId(), msg.getTxid(), res, null);
-                    }
-                } catch (java.lang.Exception e) {
-                    //Get error when create ByteString res, send error msg back to chaincode. GetState will not trigger event
-                    logger.error(String.format("[%s]Failed to get chaincode state(%s). Sending %s", shorttxid(msg.getTxid()), printStackTrace(e), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(),msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
-                    return;
                 }
-            } finally {
-                if (flag) {
-                    //do followed functions before retun
-                    //delete transaction context
-                    deleteTXIDEntry(msg.getGroupId(), msg.getTxid());
-                    logger.info(String.format("[%s]handlerGetState serial send %s", shorttxid(serialSendMsg.getTxid()), serialSendMsg.getType()));
-                    //send msg
-                    serialSendAsync(serialSendMsg);
+                if (res != null) {
+                    //The state object being requested does not exist
+                    String infoStr = String.format("[%s]HandleGetState. No state associated with key: %s. Sending %s with an empty payload"
+                            , shorttxid(msg.getTxid()), msg.getPayload().toStringUtf8(), RESPONSE.toString());
+                    logger.info(infoStr);
+                    successReturn(msg, res, RESPONSE);
+                } else {
+                    //success, send response msg back to chaincode. GetState will not trigger event
+                    String infoStr = String.format("[%s]HandleGetState. Got state. Sending %s"
+                            , shorttxid(msg.getTxid()), RESPONSE.toString());
+                    logger.info(infoStr);
+                    successReturn(msg, res, RESPONSE);
                 }
+            } catch (Exception e) {
+                //Get error when create ByteString res, send error msg back to chaincode. GetState will not trigger event
+                String errStr = String.format("[%s]HandleGetState. Failed to get chaincode state(%s). Sending %s"
+                        , shorttxid(msg.getTxid()), printStackTrace(e), ERROR.toString());
+                logger.error(errStr);
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
             }
         }).start();
     }
 
     /** afterGetStateByRange handles a GET_STATE_BY_RANGE request from the chaincode.
-     *
-     * @param event
-     * @param state
      */
     public void afterGetStateByRange(Event event, String state) {
         SmartcontractShim.SmartContractMessage msg = extractMessageFromEvent(event);
-        logger.info(String.format("Received %s, invoking get state from ledger", GET_STATE_BY_RANGE.toString()));
+        logger.info(String.format("Received %s, invoking get state from ledger"
+                , GET_STATE_BY_RANGE.toString()));
         //query ledger for state
         handleGetStateByRange(msg);
         logger.info("Exiting GET_STATE_BY_RANGE");
     }
 
     /** Handles query to ledger to rage query state
-     *
-     * @param msg
      */
     public void handleGetStateByRange(SmartcontractShim.SmartContractMessage msg) {
         new Thread(() -> {
-            //serialSendMsg is used to send error msg
-            SmartcontractShim.SmartContractMessage serialSendMsg = null;
-            //flag of if do "defer function"
-            boolean flag = false;
             SmartcontractShim.GetStateByRange getStateByRange = null;
             ResultsIterator rangeIter = null;
-            String chainCodeID = null;
+            String smartContractID = null;
             String iterID = null;
             TransactionContext txContext = null;
             SmartcontractShim.QueryResponse payload = null;
             ByteString payloadBytes = null;
-            try {
-                //judge if put txId into query map is success
-                boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
-                if (!uniqueReq) {
-                    logger.error(String.format("[%s]Anoter state request pending for this Txid. Cannot process.", shorttxid(msg.getTxid())));
-                    return;
-                }
-                // after this, before function return txidEntry should be deleted and send serialSendMsg
-                flag = true;
-                //create get state by range
-                try {
-                    getStateByRange = SmartcontractShim.GetStateByRange.parseFrom(msg.getPayload());
-                } catch (InvalidProtocolBufferException e){
-                    logger.error(String.format("[%s]Fail to create get state by range. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
-                    return;
-                }
-                //create iterId
-                //iteId = util.GenerateUUID();
-                //create transaction context
-                txContext = getTxContext(msg.getGroupId(), msg.getTxid());
-                if (txContext == null || txContext.getTxSimulator() == null){
-                    String errStr = String.format("[%s]No ledger context for GetStateByRange. Sending %s", shorttxid(msg.getTxid()), ERROR.toString());
-                    logger.error(errStr);
-                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(errStr), null);
-                    return;
-                }
-                //create chaincode id
-                chainCodeID = getSmartContractRootName();
-                //create ResultsIterator rangeIter
-                try {
-                    if(isCollectionSet(getStateByRange.getCollection())){
-        //                rangeIter, err = txContext.txsimulator.GetPrivateDataRangeScanIterator(chaincodeID, getStateByRange.Collection, getStateByRange.StartKey, getStateByRange.EndKey)
-                    } else {
-        //                rangeIter, err = txContext.txsimulator.GetStateRangeScanIterator(chaincodeID, getStateByRange.StartKey, getStateByRange.EndKey)
-                    }
-                } catch (Exception e) {
-                    logger.error("[%s]Got error when get ledger scan iterator. Sending %s", shorttxid(msg.getTxid()), ERROR.toString());
-                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
-                    return;
-                }
-                initializeQueryContext(txContext, iterID, rangeIter);
-                //create QueryResponse payload
-                try {
-                    payload = getQueryResponse(this, txContext, rangeIter, iterID);
-                } catch (LedgerException e) {
-                    if(rangeIter != null){
-                        cleanupQueryContext(txContext, iterID);
-                    }
-                    logger.error(String.format("[%s]Failed to get query result in HandlerGetStateByRange. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(RESPONSE, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
-                    return;
-                }
-                //create ByteString payloadBytes
-                payloadBytes = payload.toByteString();
-                //success
-                logger.info(String.format("[%s]Got keys and values. Sending %s", shorttxid(msg.getTxid()), RESPONSE.toString()));
-                serialSendMsg = newEventMessage(RESPONSE, msg.getGroupId(), msg.getTxid(), payloadBytes, null);
-            } finally {
-                if(flag){
-                    //do followed functions before retun
-                    //delete transaction context
-                    deleteTXIDEntry(msg.getGroupId(), msg.getTxid());
-                    logger.info(String.format("[%s]handlerGetStateByRange serial send %s", shorttxid(serialSendMsg.getTxid()), serialSendMsg.getType()));
-                    //send msg
-                    serialSendAsync(serialSendMsg);
-                }
+            //创建交易实体
+            boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
+            if (!uniqueReq) {
+                logger.error(String.format("[%s]Anoter state request pending for this Txid. Cannot process."
+                        , shorttxid(msg.getTxid())));
+                return;
             }
+            //在msg的payload中获取GetStateByRange
+            try {
+                getStateByRange = SmartcontractShim.GetStateByRange.parseFrom(msg.getPayload());
+            } catch (InvalidProtocolBufferException e){
+                String errStr = String.format("[%s]HandleGetStateByRange. Fail to create get state by range. Sending %s"
+                        , shorttxid(msg.getTxid()), ERROR.toString()); logger.error(errStr);
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //获取迭代器id
+            //iteId = util.GenerateUUID();
+            iterID = "iterID";
+            //获取交易
+            txContext = getTxContext(msg.getGroupId(), msg.getTxid());
+            //无法获取交易或交易无法模拟执行
+            if (txContext == null || txContext.getTxSimulator() == null){
+                String errStr = String.format("[%s]HandleGetStateByRange. No ledger context for GetStateByRange. Sending %s"
+                        , shorttxid(msg.getTxid()), ERROR.toString());
+                logger.error(errStr);
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //获取关联的链码ID
+            try {
+                smartContractID = getSmartContractRootName();
+            } catch (Exception e) {
+                String errStr = String.format("[%s]HandleGetStateByRange. Failed to create chaincodeID. Sending %s" , shorttxid(msg.getTxid()), ERROR.toString());
+                logger.error(errStr);
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //获取迭代器
+            try {
+                if(isCollectionSet(getStateByRange.getCollection())){
+    //                rangeIter, err = txContext.txsimulator.GetPrivateDataRangeScanIterator(chaincodeID, getStateByRange.Collection, getStateByRange.StartKey, getStateByRange.EndKey)
+                } else {
+    //                rangeIter, err = txContext.txsimulator.GetStateRangeScanIterator(chaincodeID, getStateByRange.StartKey, getStateByRange.EndKey)
+                }
+                rangeIter = new ResultsIterator() {
+                    @Override
+                    public QueryResult next() throws LedgerException {
+                        return null;
+                    }
+
+                    @Override
+                    public void close() throws LedgerException {
+
+                    }
+                };
+            } catch (Exception e) {
+                String errStr = String.format("[%s]HandleGetStateByRange. Got error when get ledger scan iterator. Sending %s", shorttxid(msg.getTxid()), ERROR.toString());
+                logger.error(errStr);
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+
+            initializeQueryContext(txContext, iterID, rangeIter);
+            //迭代获取State
+            try {
+                payload = getQueryResponse(txContext, rangeIter, iterID);
+            } catch (Exception e) {
+                if(rangeIter != null){
+                    cleanupQueryContext(txContext, iterID);
+                }
+                String errStr = String.format("[%s]HandleGetStateByRange. Failed to get query result in HandlerGetStateByRange. Sending %s", shorttxid(msg.getTxid()), ERROR.toString());
+                logger.error(errStr);
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //讲获取到的State转换为payload
+            try {
+                payloadBytes = payload.toByteString();
+            } catch (Exception e) {
+                if(rangeIter != null){
+                    cleanupQueryContext(txContext, iterID);
+                }
+                String errStr = String.format("[%s]HandleGetStateByRange. Failed to get response in HandlerGetStateByRange. Sending %s", shorttxid(msg.getTxid()), ERROR.toString());
+                logger.error(errStr);
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //转换成功并发送RESPONSE消息
+            logger.info(String.format("[%s]Got keys and values. Sending %s", shorttxid(msg.getTxid()), RESPONSE.toString()));
+            successReturn(msg, payloadBytes, RESPONSE);
         }).start();
     }
 
     public static Integer maxResultLimit = 100;
 
     /** getQueryResponse takes an iterator and fetch state to construct QueryResponse
-     *
-     * @param handler
-     * @param txContext
-     * @param iter
-     * @param iterID
-     * @return
      */
-    public SmartcontractShim.QueryResponse getQueryResponse(Handler handler, TransactionContext txContext, ResultsIterator iter,
-                                                                   String iterID) throws LedgerException {
+    public SmartcontractShim.QueryResponse getQueryResponse(TransactionContext txContext, ResultsIterator iter,
+                                                                   String iterID){
         try {
             PendingQueryResult pendingQueryResults = txContext.getPendingQueryResults().get(iterID);
             while(true){
                 QueryResult queryResult = iter.next();
                 if(queryResult == null){
-                    //no response from iterator sothat it is end of query results
+                    //完成迭代
                     SmartcontractShim.QueryResultBytes[] batch = cut(pendingQueryResults);
                     cleanupQueryContext(txContext, iterID);
                     return setQueryResponseReuslt(SmartcontractShim.QueryResponse.newBuilder()
                             .setId(iterID)
                             .setHasMore(false), batch).build();
                 } else if(maxResultLimit.equals(pendingQueryResults.getCount())){
-                    //max count of results queued up, cut batch, then add current result to pending batch
+                    //超过最大数量
                     SmartcontractShim.QueryResultBytes[] batch = cut(pendingQueryResults);
                     try {
                         add(pendingQueryResults, queryResult);
@@ -964,24 +938,37 @@ public class Handler {
 
     /**
      * get p.batch and set batch as null, count as 0
-     * @param p
-     * @return
      */
     public SmartcontractShim.QueryResultBytes[] cut(PendingQueryResult p) {
-        SmartcontractShim.QueryResultBytes[] batch = p.getBatch();
-        p.setBatch(null);
-        p.setCount(0);
-        return batch;
+        SmartcontractShim.QueryResultBytes[] batch = new SmartcontractShim.QueryResultBytes[0];
+        if (p != null) {
+            batch = p.getBatch();
+            p.setBatch(null);
+            p.setCount(0);
+            return batch;
+        } else {
+            throw new RuntimeException("Got error when cut PendingQueryResult");
+        }
     }
 
-    public void add(PendingQueryResult p, QueryResult q) {
-
+    public void add(PendingQueryResult pendingQueryResult, QueryResult queryResult) {
+        try{
+            ByteString queryResultsBytes = ((Message)queryResult).toByteString();
+            SmartcontractShim.QueryResultBytes[] arr = pendingQueryResult.getBatch();
+            arr = Arrays.copyOf(arr, arr.length + 1);
+            arr[arr.length - 1] = SmartcontractShim.QueryResultBytes.newBuilder()
+                    .setResultBytes(queryResultsBytes)
+                    .build();
+            pendingQueryResult.setBatch(arr);
+            pendingQueryResult.setCount(arr.length);
+        } catch (ClassCastException | ArrayIndexOutOfBoundsException e) {
+            final RuntimeException error = new RuntimeException("No chaincode message found in event", e);
+            logger.error("Failed to get encode query result as bytes");
+            throw error;
+        }
     }
 
     /** afterQueryStateNext handles a QUERY_STATE_NEXT request from the chaincode.
-     *
-     * @param event
-     * @param state
      */
     public void afterQueryStateNext(Event event, String state) {
         SmartcontractShim.SmartContractMessage msg = extractMessageFromEvent(event);
@@ -991,349 +978,342 @@ public class Handler {
     }
 
     /** Handles query to ledger for query state next
-     *
-     * @param msg
      */
     public void handleQueryStateNext(SmartcontractShim.SmartContractMessage msg) {
         new Thread(() -> {
-            //serialSendMsg is used to send error msg
-            SmartcontractShim.SmartContractMessage serialSendMsg = null;
-            //flag of if do "defer function"
-            boolean flag = false;
             SmartcontractShim.QueryStateNext queryStateNext = null;
             TransactionContext txContext = null;
             ResultsIterator queryIter = null;
             SmartcontractShim.QueryResponse payload = null;
             ByteString payloadBytes = null;
-            try {
-                //judge if put txId into query map is success
-                boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
-                if (!uniqueReq) {
-                    logger.error(String.format("[%s]Anoter state request pending for this Txid. Cannot process.", shorttxid(msg.getTxid())));
-                    return;
-                }
-                // after this, before function return txidEntry should be deleted and send serialSendMsg
-                flag = true;
-                //create query state next
-                try{
-                    queryStateNext = SmartcontractShim.QueryStateNext.parseFrom(msg.getPayload());
-                } catch (InvalidProtocolBufferException e){
-                    logger.error(String.format("[%s]Failed to creqte query state next request. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
-                    return;
-                }
-                //creqte transaction context
-                txContext = getTxContext(msg.getGroupId(), msg.getTxid());
-                if(txContext == null){
-                    logger.error(String.format("[%s]Failed to get transaction context. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    String errStr = String.format("[%s]Transcation context cannot found", shorttxid(msg.getTxid()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(errStr), null);
-                    return;
-                }
-                //create ResultIterator query iter
-                queryIter = getQueryIterator(txContext, queryStateNext.getId());
-                if(queryIter == null){
-                    logger.error(String.format("[%s]query iterator no found. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8("Query iterator cannot found"), null);
-                    return;
-                }
-                //create QueryResponse payload
-                try {
-                    payload = getQueryResponse(this, txContext, queryIter, queryStateNext.getId());
-                } catch (LedgerException e) {
-                    cleanupQueryContext(txContext, queryStateNext.getId());
-                    logger.error(String.format("Fail to get query result in HandlerQueryStateNext. Sending %s", ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
-                    return;
-                }
-                //create ByteString payloadBytes
-                payloadBytes = payload.toByteString();
-                logger.info(String.format("Got key and values. Sending %s", RESPONSE));
-                serialSendMsg = newEventMessage(RESPONSE, msg.getGroupId(), msg.getTxid(), payloadBytes, null);
-            } finally {
-                if(flag){
-                    //do followed functions before retun
-                    //delete transaction context
-                    deleteTXIDEntry(msg.getGroupId(), msg.getTxid());
-                    logger.info(String.format("[%s]handlerQueryStateNext serial send %s", shorttxid(serialSendMsg.getTxid()), serialSendMsg.getType()));
-                    //send msg
-                    serialSendAsync(serialSendMsg);
-                }
+            //创建交易实体
+            boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
+            if (!uniqueReq) {
+                String errStr = String.format("[%s]HandleQueryStateNext. Anoter state request pending for this Txid. Cannot process.", shorttxid(msg.getTxid()));
+                logger.error(errStr);
+                return;
             }
+            //在msg的payload中读取QueryStateNext
+            try{
+                queryStateNext = SmartcontractShim.QueryStateNext.parseFrom(msg.getPayload());
+            } catch (InvalidProtocolBufferException e){
+                String errStr = String.format("[%s]HandleQueryStateNext. Failed to create query state next request. Sending %s", shorttxid(msg.getTxid()), ERROR.toString());
+                logger.error(errStr);
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //构建交易
+            txContext = getTxContext(msg.getGroupId(), msg.getTxid());
+            if(txContext == null){
+                String errStr = String.format("[%s]HandleQueryStateNext. Failed to get transaction context. Sending %s", shorttxid(msg.getTxid()), ERROR.toString());
+                logger.error(errStr);
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //获取查询迭代器
+            queryIter = getQueryIterator(txContext, queryStateNext.getId());
+            if(queryIter == null){
+                String errStr = String.format("[%s]HandleQueryStateNext. Query iterator no found. Sending %s", shorttxid(msg.getTxid()), ERROR.toString());
+                logger.error(errStr);
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //执行迭代查询
+            try {
+                payload = getQueryResponse(txContext, queryIter, queryStateNext.getId());
+            } catch (Exception e) {
+                cleanupQueryContext(txContext, queryStateNext.getId());
+                String errStr = String.format("[%s]HandleQueryStateNext. Fail to get query result in HandlerQueryStateNext. Sending %s", shorttxid(msg.getTxid()), ERROR.toString());
+                logger.error(errStr);
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //将查询结果封装到msg的payload中
+            try {
+                payloadBytes = payload.toByteString();
+            } catch (Exception e) {
+                cleanupQueryContext(txContext, queryStateNext.getId());
+                String errStr = String.format("[%s]HandleQueryStateNext. Fail to get response HandlerQueryStateNext. Sending %s",shorttxid(msg.getTxid()), ERROR.toString());
+                logger.error(errStr);
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //成功并返回RESPONSE消息
+            logger.info(String.format("Got key and values. Sending %s", RESPONSE));
+            successReturn(msg, payloadBytes, RESPONSE);
         }).start();
     }
 
     /** afterQueryStateClose handles a QUERY_STATE_CLOSE request from the chaincode.
-     *
-     * @param event
-     * @param state
      */
     public void afterQueryStateClose(Event event, String state) {
         SmartcontractShim.SmartContractMessage msg = extractMessageFromEvent(event);
-        logger.info(String.format("Received %s, invoking query state close from ledger", QUERY_STATE_CLOSE.toString()));
+        logger.info(String.format("Received %s, invoking query state close from ledger"
+                , QUERY_STATE_CLOSE.toString()));
 
         handleQueryStateClose(msg);
         logger.info("Exiting QUERY_STATE_CLOSE");
     }
 
     /** Handles the closing of a state iterator
-     *
-     * @param msg
      */
     public void handleQueryStateClose(SmartcontractShim.SmartContractMessage msg) {
         new Thread(() -> {
-            //serialSendMsg is used to send error msg
-            SmartcontractShim.SmartContractMessage serialSendMsg = null;
-            //flag of if do "defer function"
-            boolean flag = false;
             SmartcontractShim.QueryStateClose queryStateClose = null;
             TransactionContext txContext = null;
             ResultsIterator iter = null;
             SmartcontractShim.QueryResponse payload = null;
             ByteString payloadBytes = null;
-            try {
-                //judge if put txId into query map is success
-                boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
-                if (!uniqueReq) {
-                    logger.error(String.format("[%s]Anoter state request pending for this Txid. Cannot process.", shorttxid(msg.getTxid())));
-                    return;
-                }
-                // after this, before function return txidEntry should be deleted and send serialSendMsg
-                flag = true;
-                //create query state close
-                try {
-                    queryStateClose = SmartcontractShim.QueryStateClose.parseFrom(msg.getPayload());
-                } catch (InvalidProtocolBufferException e) {
-                    logger.error(String.format("[%s]Failed to get state query close request. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
-                    return;
-                }
-                //create transaction context
-                txContext = getTxContext(msg.getGroupId(), msg.getTxid());
-                if(txContext == null){
-                    logger.error(String.format("[%s]Failed to get transaction context. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    String errStr = String.format("[%s]Transaction context not found", shorttxid(msg.getTxid()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(errStr), null);
-                    return;
-                }
-                //create ResultsIterator iter
-                iter = getQueryIterator(txContext, queryStateClose.getId());
-                if(iter == null){
-                    cleanupQueryContext(txContext, queryStateClose.getId());
-                }
-                //create QueryResponse payload
-                payload = SmartcontractShim.QueryResponse.newBuilder()
-                        .setHasMore(false)
-                        .setId(queryStateClose.getId())
-                        .build();
-                //create ByteString payloadByte
-                payloadBytes = payload.toByteString();
-                logger.info(String.format("[%s]Closed. Sending %s", shorttxid(msg.getTxid()), RESPONSE.toString()));
-                serialSendMsg = newEventMessage(RESPONSE, msg.getGroupId(), msg.getTxid(), payloadBytes, null);
-            } finally {
-                //do followed functions before retun
-                //delete transaction context
-                deleteTXIDEntry(msg.getGroupId(), msg.getTxid());
-                logger.info(String.format("[%s]handlerQueryStateClose serial send %s", shorttxid(serialSendMsg.getTxid()), serialSendMsg.getType()));
-                //send msg
-                serialSendAsync(serialSendMsg);
+            //构建交易实体
+            boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
+            if (!uniqueReq) {
+                logger.error(String.format("[%s]HandleQueryStateClose. Anoter state request pending for this Txid. Cannot process."
+                        , shorttxid(msg.getTxid())));
+                return;
             }
+            //在msg的payload中获取QueryStateClose
+            try {
+                queryStateClose = SmartcontractShim.QueryStateClose.parseFrom(msg.getPayload());
+            } catch (InvalidProtocolBufferException e) {
+                String errStr = String.format("[%s]HandleQueryStateClose. Failed to get state query close request. Sending %s"
+                        , shorttxid(msg.getTxid()), ERROR.toString());
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //获取交易
+            txContext = getTxContext(msg.getGroupId(), msg.getTxid());
+            if(txContext == null){
+                String errStr = String.format("[%s]HandleQueryStateClose. Failed to get transaction context. Sending %s"
+                        , shorttxid(msg.getTxid()), ERROR.toString());
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //获取查询迭代器
+            iter = getQueryIterator(txContext, queryStateClose.getId());
+            //关闭查询迭代器
+            if(iter != null){
+                cleanupQueryContext(txContext, queryStateClose.getId());
+            }
+            //构造QueryResponse
+            payload = SmartcontractShim.QueryResponse.newBuilder()
+                    .setHasMore(false)
+                    .setId(queryStateClose.getId())
+                    .build();
+            //封装为msg
+            try {
+               payloadBytes = payload.toByteString();
+            } catch (Exception e) {
+                String errStr = String.format("[%s]HandleQueryStateClose. Failed to get payload. Sending %s"
+                        , shorttxid(msg.getTxid()), ERROR.toString());
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //成功并发送RESPONSE
+            logger.info(String.format("[%s]Closed. Sending %s", shorttxid(msg.getTxid()), RESPONSE.toString()));
+            successReturn(msg, payloadBytes, RESPONSE);
         }).start();
     }
 
     /** afterGetQueryResult handles a GET_QUERY_RESULT request from the chaincode.
-     *
-     * @param event
-     * @param state
      */
     public void afterGetQueryResult(Event event, String state) {
         SmartcontractShim.SmartContractMessage msg = extractMessageFromEvent(event);
-        logger.info(String .format("Received %s, invoking get state from ledger", GET_QUERY_RESULT.toString()));
+        logger.info(String .format("Received %s, invoking get state from ledger"
+                , GET_QUERY_RESULT.toString()));
 
         handleGetQueryResult(msg);
         logger.info("Exiting GET_QUERY_RESULT");
     }
 
     /** Handles query to ledger to execute query state
-     *
-     * @param msg
      */
     public void handleGetQueryResult(SmartcontractShim.SmartContractMessage msg) {
         new Thread(() -> {
-            //serialSendMsg is used to send error msg
-            SmartcontractShim.SmartContractMessage serialSendMsg = null;
-            //flag of if do "defer function"
-            boolean flag = false;
             TransactionContext txContext = null;
             String iterID = null;
             SmartcontractShim.GetQueryResult getQueryResult = null;
-            String chaincodeID = null;
+            String smartContractID = null;
             ResultsIterator executeIter = null;
             SmartcontractShim.QueryResponse payload = null;
             ByteString payloadBytes = null;
-            try {
-                //judge if put txId into query map is success
-                boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
-                if (!uniqueReq) {
-                    logger.error(String.format("[%s]Anoter state request pending for this Txid. Cannot process.", shorttxid(msg.getTxid())));
-                    return;
-                }
-                // after this, before function return txidEntry should be deleted and send serialSendMsg
-                flag = true;
-                //create get query result
-                try {
-                    getQueryResult = SmartcontractShim.GetQueryResult.parseFrom(msg.getPayload());
-                } catch (InvalidProtocolBufferException e) {
-                    logger.error(String.format("[%s]Failed to unmarshall query request. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(),  ByteString.copyFromUtf8(printStackTrace(e)), null);
-                    return;
-                }
-                //create iterID
-                //iterID = util.GenerateUUID();
-                //create transaction context
-                txContext = getTxContext(msg.getGroupId(), msg.getTxid());
-                if(txContext == null || txContext.getTxSimulator() == null){
-                    String errStr = String.format("[%s]No ledger context for GetQueryResult. Sending %s", shorttxid(msg.getTxid()), ERROR.toString());
-                    logger.error(errStr);
-                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(errStr), null);
-                    return;
-                }
-                //create chaincode id
-                chaincodeID = getSmartContractRootName();
-                //create ResultesIterator executerIter
-                try {
-                    if(isCollectionSet(getQueryResult.getCollection())){
-    //                    executeIter, err = txContext.txsimulator.ExecuteQueryOnPrivateData(chaincodeID, getQueryResult.Collection, getQueryResult.Query)
-                    } else {
-    //                    executeIter, err = txContext.txsimulator.ExecuteQuery(chaincodeID, getQueryResult.Query)
-                    }
-                } catch (Exception e) {
-                    logger.error(String.format("[%s]Failed to get ledger query iterator. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
-                    return;
-                }
-                initializeQueryContext(txContext, iterID, executeIter);
-                //create QueryResponse payload
-                try {
-                    payload = getQueryResponse(this, txContext, executeIter, iterID);
-                } catch (LedgerException e) {
-                    if(executeIter != null){
-                        cleanupQueryContext(txContext, iterID);
-                    }
-                    logger.error(String.format("[%s]Failed to get query result in HandlerGetQueryResult. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
-                    return;
-                }
-                //create ByteString payloadBytes
-                payloadBytes = payload.toByteString();
-                logger.info(String.format("[%s]Got keys and values. Send %s", shorttxid(msg.getTxid()), RESPONSE.toString()));
-                serialSendMsg = newEventMessage(RESPONSE, msg.getGroupId(), msg.getTxid(), payloadBytes, null);
-            } finally {
-                if(flag){
-                    //do followed functions before retun
-                    //delete transaction context
-                    deleteTXIDEntry(msg.getGroupId(), msg.getTxid());
-                    logger.info(String.format("[%s]handlerGetQueryResult serial send %s", shorttxid(serialSendMsg.getTxid()), serialSendMsg.getType()));
-                    //send msg
-                    serialSendAsync(serialSendMsg);
-                }
+            //获取交易实体
+            boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
+            if (!uniqueReq) {
+                logger.error(String.format("[%s]HandleGetQueryResult. Anoter state request pending for this Txid. Cannot process."
+                        , shorttxid(msg.getTxid())));
+                return;
             }
+            //在msg的payload中提取GetQueryResult
+            try {
+                getQueryResult = SmartcontractShim.GetQueryResult.parseFrom(msg.getPayload());
+            } catch (Exception e) {
+                String errStr = String.format("[%s]HandleGetQueryResult. Failed to unmarshall query request. Sending %s"
+                        , shorttxid(msg.getTxid()), ERROR.toString());
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //获取迭代器id
+            //iterID = util.GenerateUUID();
+            iterID = "iterID";
+            //获取交易
+            txContext = getTxContext(msg.getGroupId(), msg.getTxid());
+            if(txContext == null || txContext.getTxSimulator() == null){
+                String errStr = String.format("[%s]HandleGetQueryResult. No ledger context for GetQueryResult. Sending %s"
+                        , shorttxid(msg.getTxid()), ERROR.toString());
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //获取链码实例id
+            smartContractID = getSmartContractRootName();
+            //获取查询结果迭代器（ResultIterator）
+            try {
+                if(isCollectionSet(getQueryResult.getCollection())){
+//                    executeIter, err = txContext.txsimulator.ExecuteQueryOnPrivateData(chaincodeID, getQueryResult.Collection, getQueryResult.Query)
+                } else {
+//                    executeIter, err = txContext.txsimulator.ExecuteQuery(chaincodeID, getQueryResult.Query)
+                }
+            } catch (Exception e) {
+                String errStr = String.format("[%s]HandleGetQueryResult. Failed to get ledger query iterator. Sending %s"
+                        , shorttxid(msg.getTxid()), ERROR.toString());
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //for test
+            executeIter = new ResultsIterator() {
+                @Override
+                public QueryResult next() throws LedgerException {
+                    return null;
+                }
+
+                @Override
+                public void close() throws LedgerException {
+
+                }
+            };
+            initializeQueryContext(txContext, iterID, executeIter);
+            //执行查询
+            try {
+                payload = getQueryResponse(txContext, executeIter, iterID);
+            } catch (Exception e) {
+                if(executeIter != null){
+                    cleanupQueryContext(txContext, iterID);
+                }
+                String errStr = String.format("[%s]HandleGetQueryResult. Failed to get query result in HandlerGetQueryResult. Sending %s"
+                        , shorttxid(msg.getTxid()), ERROR.toString());
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //封装为msg
+            try {
+                payloadBytes = payload.toByteString();
+            } catch (Exception e) {
+                String errStr = String.format("[%s]HandleGetQueryResult. Failed to get payload. Sending %s"
+                        , shorttxid(msg.getTxid()), ERROR.toString());
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //成功并发送RESPONSE
+            logger.info(String.format("[%s]HandleGetQueryResult. Got keys and values. Send %s"
+                    , shorttxid(msg.getTxid()), RESPONSE.toString()));
+            successReturn(msg, payloadBytes, RESPONSE);
         }).start();
     }
 
     /** afterGetHistoryForKey handles a GET_HISTORY_FOR_KEY request from the chaincode.
-     *
-     * @param event
-     * @param state
      */
     public void afterGetHistoryForKey(Event event, String state) {
         SmartcontractShim.SmartContractMessage msg = extractMessageFromEvent(event);
         logger.info(String .format("Received %s, invoking get state from ledger", GET_HISTORY_FOR_KEY.toString()));
 
-        handleGetQueryResult(msg);
+        handleGetHistoryForKey(msg);
         logger.info("Exiting GET_HISTORY_FOR_KEY");
     }
 
     /** Handles query to ledger history db
-     *
-     * @param msg
      */
     public void handleGetHistoryForKey(SmartcontractShim.SmartContractMessage msg) {
         new Thread(() -> {
-            //serialSendMsg is used to send error msg
-            SmartcontractShim.SmartContractMessage serialSendMsg = null;
-            //flag of if do "defer function"
-            boolean flag = false;
             TransactionContext txContext = null;
             SmartcontractShim.GetHistoryForKey getHistoryForKey = null;
             String iterID = null;
-            String chaincodeID = null;
+            String smartContractID = null;
             ResultsIterator historyIterator = null;
             SmartcontractShim.QueryResponse payload = null;
             ByteString payloadByte = null;
-            try {
-                //judge if put txId into query map is success
-                boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
-                if (!uniqueReq) {
-                    logger.error(String.format("[%s]Anoter state request pending for this Txid. Cannot process.", shorttxid(msg.getTxid())));
-                    return;
-                }
-                // after this, before function return txidEntry should be deleted and send serialSendMsg
-                flag = true;
-                //create get history for key
-                try {
-                    getHistoryForKey = SmartcontractShim.GetHistoryForKey.parseFrom(msg.getPayload());
-                } catch (InvalidProtocolBufferException e) {
-                    logger.error(String.format("[%s]Failed to create query result. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
-                    return;
-                }
-                //create iterID
-                //iterID = util.GenerateUUID();
-                //create transaction context
-                txContext = getTxContext(msg.getGroupId(), msg.getTxid());
-                if(txContext == null || txContext.getTxSimulator() == null){
-                    String errStr = String.format("[%s]No ledger context for GetHistoryForKey. Sending %s", shorttxid(msg.getTxid()), ERROR.toString());
-                    logger.error(errStr);
-                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(errStr), null);
-                    return;
-                }
-                //create chaincodeID
-                chaincodeID = getSmartContractRootName();
-                //create ResultsIterator history iterator
-                try {
-                    historyIterator = txContext.getHistoryQueryExecutor().getHistoryForKey(chaincodeID, getHistoryForKey.getKey());
-                } catch (LedgerException e) {
-                    logger.info(String.format("[%s]Failed to get ledger history iterator. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
-                    return;
-                }
-                initializeQueryContext(txContext, iterID, historyIterator);
-                //create QueryResponse payload
-                try {
-                    payload = getQueryResponse(this, txContext, historyIterator, iterID);
-                } catch (LedgerException e) {
-                    if(historyIterator != null){
-                        cleanupQueryContext(txContext, iterID);
-                    }
-                    logger.error(String.format("[%s]Failed to get query result in HandleGetHistoryForKey. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                    serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
-                    return;
-                }
-                //create ByteString payloadByte
-                payloadByte = payload.toByteString();
-                logger.info(String.format("[%s]Got keys and values. Sending %s", shorttxid(msg.getTxid()), RESPONSE.toString()));
-                serialSendMsg = newEventMessage(RESPONSE, msg.getGroupId(), msg.getTxid(), payloadByte, null);
-            } finally {
-                if(flag){
-                    //do followed functions before retun
-                    //delete transaction context
-                    deleteTXIDEntry(msg.getGroupId(), msg.getTxid());
-                    logger.info(String.format("[%s]handlerGetHistoryForKey serial send %s", shorttxid(serialSendMsg.getTxid()), serialSendMsg.getType()));
-                    //send msg
-                    serialSendAsync(serialSendMsg);
-                }
+            //获取交易实体
+            boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
+            if (!uniqueReq) {
+                logger.error(String.format("[%s]HandleGetHistoryForKey. Anoter state request pending for this Txid. Cannot process."
+                        , shorttxid(msg.getTxid())));
+                return;
             }
+            //在payload中提取GetHistoryForKey
+            try {
+                getHistoryForKey = SmartcontractShim.GetHistoryForKey.parseFrom(msg.getPayload());
+            } catch (InvalidProtocolBufferException e) {
+                String errStr = String.format("[%s]Failed to create query result. Sending %s"
+                        , shorttxid(msg.getTxid()), ERROR.toString());
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //获取迭代器id
+            //iterID = util.GenerateUUID();
+            iterID = "iterID";
+            //获取交易
+            txContext = getTxContext(msg.getGroupId(), msg.getTxid());
+            if(txContext == null || txContext.getTxSimulator() == null){
+                String errStr = String.format("[%s]HandleGetHistoryForKey. No ledger context for GetHistoryForKey. Sending %s"
+                        , shorttxid(msg.getTxid()), ERROR.toString());
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //获取链码id
+            smartContractID = getSmartContractRootName();
+            //获取查询迭代器
+            try {
+//                historyIterator = txContext.getHistoryQueryExecutor().getHistoryForKey(smartContractID, getHistoryForKey.getKey());
+                historyIterator = new ResultsIterator() {
+                    @Override
+                    public QueryResult next() throws LedgerException {
+                        return null;
+                    }
+
+                    @Override
+                    public void close() throws LedgerException {
+
+                    }
+                };
+            } catch (Exception e) {
+                String errStr = String.format("[%s]HandleGetHistoryForKey. Failed to get ledger history iterator. Sending %s"
+                        , shorttxid(msg.getTxid()), ERROR.toString());
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            initializeQueryContext(txContext, iterID, historyIterator);
+            //获取查询结果
+            try {
+                payload = getQueryResponse(txContext, historyIterator, iterID);
+            } catch (Exception e) {
+                if(historyIterator != null){
+                    cleanupQueryContext(txContext, iterID);
+                }
+                String errStr = String.format("[%s]HandleGetHistoryForKey. Failed to get query result in HandleGetHistoryForKey. Sending %s"
+                        , shorttxid(msg.getTxid()), ERROR.toString());
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            //封装为msg
+            try {
+                payloadByte = payload.toByteString();
+            } catch (Exception e) {
+                String errStr = String.format("[%s]HandleGetHistoryForKey. Failed to get payload. Sending %s"
+                        , shorttxid(msg.getTxid()), ERROR.toString());
+                errorReturn(msg, ByteString.copyFromUtf8(errStr));
+                return;
+            }
+            logger.info(String.format("[%s]HandleGetHistoryForKey. Got keys and values. Sending %s"
+                    , shorttxid(msg.getTxid()), RESPONSE.toString()));
+            successReturn(msg, payloadByte, RESPONSE);
         }).start();
     }
 
@@ -1341,13 +1321,14 @@ public class Handler {
         return StringUtils.isEmpty(collection);
     }
 
-    public SmartcontractShim.SmartContractMessage getSmartContractMessageForMessage(String GroupId, String txid, String msgType, ByteString payload, String errStr) {
-        TransactionContext txContext = getTxContext(GroupId, txid);
+    public SmartcontractShim.SmartContractMessage getSmartContractMessageForMessage(String groupId, String txid
+            , String msgType, ByteString payload, String errStr) {
+        TransactionContext txContext = getTxContext(groupId, txid);
         //if we do not have GroupId or INVOKE_CHAINCODE
-        if(!"".equals(GroupId) || !INVOKE_CHAINCODE.toString().equals(msgType)){
+        if(!"".equals(groupId) || !INVOKE_CHAINCODE.toString().equals(msgType)){
             if (txContext == null || txContext.getTxSimulator() == null){
-                logger.error(String.format(errStr));
-                return newEventMessage(ERROR, GroupId, txid, ByteString.copyFromUtf8(errStr), null);
+                logger.error(errStr);
+                return newEventMessage(ERROR, groupId, txid, ByteString.copyFromUtf8(errStr));
             }
             return null;
         }
@@ -1362,7 +1343,7 @@ public class Handler {
         } catch (InvalidProtocolBufferException e) {
             errStr = String.format("[%s]Unable to decipher payload. Sending %s", shorttxid(txid), ERROR.toString());
             logger.error(errStr);
-            return newEventMessage(ERROR, null, txid, ByteString.copyFromUtf8(errStr), null);
+            return newEventMessage(ERROR, null, txid, ByteString.copyFromUtf8(errStr));
         }
 
         //Got the chaincodeID to invoke. The chaincodeID to be called may
@@ -1372,152 +1353,166 @@ public class Handler {
         if(calledCcIns == null){
             errStr = String.format("[%s]Could not get chaincode name for INVOKE_CHAINCODE. Sending %s", shorttxid(txid), ERROR.toString());
             logger.error(errStr);
-            return newEventMessage(ERROR, null, txid, ByteString.copyFromUtf8(errStr), null);
+            return newEventMessage(ERROR, null, txid, ByteString.copyFromUtf8(errStr));
         }
 
-        boolean isScc = true;
+        boolean isScc = false;
 //      boolean isScc = smartContractSupport.getSystemChaincodeProvider().isSysCC(calledCcIns.ChaincodeName);
         if(!isScc) {
             txContext = getTxContext("", txid);
             if (txContext == null || txContext.getTxSimulator() == null){
                 logger.error(String.format(errStr));
-                return newEventMessage(ERROR, "", txid, ByteString.copyFromUtf8(errStr), null);
+                return newEventMessage(ERROR, "", txid, ByteString.copyFromUtf8(errStr));
             }
             return null;
+        }
+
+        // Calling SCC without a  ChainID, then the assumption this is an external SCC called by the client (special case) and no UCC involved,
+        // so no Transaction Simulator validation needed as there are no commits to the ledger, get the txContext directly if it is not nil
+        txContext = getTxContext(groupId, txid);
+        if(txContext == null){
+            return newEventMessage(ERROR, txid, groupId, ByteString.copyFromUtf8(errStr));
         }
         return null;
     }
 
     /** Handles request to ledger to put state
-     *
-     * @param event
-     * @param state
      */
     public void enterBusyState(Event event, String state) {
-        new Thread(() -> {
+//        new Thread(() -> {
             SmartcontractShim.SmartContractMessage msg = extractMessageFromEvent(event);
             logger.info(String.format("[%s]state i %s", shorttxid(msg.getTxid()), state));
 
             SmartcontractShim.SmartContractMessage triggerNextStateMsg = null;
             TransactionContext txContext = null;
-            boolean flag = false;
             String chaincodeID = null;
+            ByteString res = null;
 
-            try {
-                //judge if put txId into query map is success
-                boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
-                if (!uniqueReq) {
-                    logger.error(String.format("[%s]Anoter state request pending for this CC: %s, Txid: %s. Cannot process."
-                            , shorttxid(msg.getTxid()), smartContractID.getName(), msg.getTxid()));
-                    return;
-                }
-                //check to get triggerNextStateMsg
-                triggerNextStateMsg = getSmartContractMessageForMessage(msg.getGroupId(), msg.getTxid(),msg.getType().toString(), msg.getPayload()
-                        , String.format("[%s]No ledger context for %s. Sending %s", shorttxid(msg.getTxid()), msg.getType().toString(), ERROR.toString()));
-                //if triggerNextStateMsg is null means txContext is vaild
-                if(triggerNextStateMsg == null){
-                    txContext = getTxContext(msg.getGroupId(), msg.getTxid());
-                }
-                // after this, before function return txidEntry should be deleted and send serialSendMsg
-                flag = true;
-                //check transaction context txContext
-                if(txContext == null){
-                    return;
-                }
-                //create chaincodeID
-                chaincodeID = getSmartContractRootName();
-                if(PUT_STATE.equals(msg.getType())){
-                    //handle PUT_STATE
-                    try {
-                        SmartcontractShim.PutState putState = SmartcontractShim.PutState.parseFrom(msg.getPayload());
+            //judge if put txId into query map is success
+            boolean uniqueReq = createTXIDEntry(msg.getGroupId(), msg.getTxid());
+            if (!uniqueReq) {
+                logger.error(String.format("[%s]Anoter state request pending for this CC: %s, Txid: %s. Cannot process."
+                        , shorttxid(msg.getTxid()), smartContractID.getName(), msg.getTxid()));
+                return;
+            }
+            //check to get triggerNextStateMsg
+            triggerNextStateMsg = getSmartContractMessageForMessage(msg.getGroupId(), msg.getTxid(),msg.getType().toString(), msg.getPayload()
+                    , String.format("[%s]No ledger context for %s. Sending %s", shorttxid(msg.getTxid()), msg.getType().toString(), ERROR.toString()));
+            //if triggerNextStateMsg is null means txContext is vaild
+            if(triggerNextStateMsg == null){
+                txContext = getTxContext(msg.getGroupId(), msg.getTxid());
+            }
+            //check transaction context txContext
+            if(txContext == null){
+                String errStr = String.format("[%s]EnterBysySate. No ledger context for GetHistoryForKey. Sending %s", shorttxid(msg.getTxid()), ERROR.toString());
+                triggerNextStateMsg = SmartcontractShim.SmartContractMessage.newBuilder()
+                        .setType(ERROR)
+                        .setPayload(ByteString.copyFromUtf8(errStr))
+                        .setTxid(msg.getTxid())
+                        .setGroupId(msg.getGroupId())
+                        .build();
+                returnTriggerNextState(msg, triggerNextStateMsg);
+                return;
+            }
+            //create chaincodeID
+            chaincodeID = getSmartContractRootName();
+            if(PUT_STATE.equals(msg.getType())){
+                //handle PUT_STATE
+                try {
+                    SmartcontractShim.PutState putState = SmartcontractShim.PutState.parseFrom(msg.getPayload());
 
-                        if(isCollectionSet(putState.getCollection())){
+                    if(isCollectionSet(putState.getCollection())){
 //                        txContext.getTxSimulator().setPrivateDate(chaincodeID, putState.getCollection(), putState.getKey(), putState.getValue());
-                        } else {
-                            txContext.getTxSimulator().setState(chaincodeID, putState.getKey(), putState.getValue().toByteArray());
-                        }
-                    } catch (InvalidProtocolBufferException e) {
-                        logger.error(String.format("[%s]Unable to decipher payload. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                        triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
-                        return;
-                    } catch (LedgerException e){
-                        logger.error(String.format("[%s]Unable to set state. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                        triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
-                        return;
+                    } else {
+                        txContext.getTxSimulator().setState(chaincodeID, putState.getKey(), putState.getValue().toByteArray());
                     }
-                } else if(DEL_STATE.equals(msg.getType())){
-                    //handle DEL_STATE
-                    try {
-                        SmartcontractShim.DelState delState = SmartcontractShim.DelState.parseFrom(msg.getPayload());
+                } catch (InvalidProtocolBufferException e) {
+                    logger.error(String.format("[%s]Unable to decipher payload. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
+                    triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)));
+                    returnTriggerNextState(msg, triggerNextStateMsg);
+                } catch (LedgerException e){
+                    logger.error(String.format("[%s]Unable to set state. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
+                    triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)));
+                    returnTriggerNextState(msg, triggerNextStateMsg);
+                }
+            } else if(DEL_STATE.equals(msg.getType())){
+                //handle DEL_STATE
+                try {
+                    SmartcontractShim.DelState delState = SmartcontractShim.DelState.parseFrom(msg.getPayload());
 
-                        if(isCollectionSet(delState.getCollection())){
+                    if(isCollectionSet(delState.getCollection())){
 //                        txContext.getTxSimulator().deletePrivateDate(chaincodeID, putState.getCollection(), putState.getKey(), putState.getValue());
-                        } else {
-                            txContext.getTxSimulator().deleteState(chaincodeID, delState.getKey());
-                        }
-                    } catch (InvalidProtocolBufferException e) {
-                        logger.error(String.format("[%s]Unable to decipher payload. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                        triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
-                        return;
-                    } catch (LedgerException e){
-                        logger.error(String.format("[%s]Unable to delete state. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                        triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
-                        return;
+                    } else {
+                        txContext.getTxSimulator().deleteState(chaincodeID, delState.getKey());
                     }
-                } else if (INVOKE_CHAINCODE.equals(msg.getType())){
-                    //handle INVOKE_CHAINCODE
-                    Smartcontract.SmartContractSpec chaincodeSpec = null;
-                    SmartContractInstance calledCcIns = null;
-                    Smartcontract.SmartContractID scID = null;
-                    try {
-                        logger.info(String.format("[%s] C-call-C", shorttxid(msg.getTxid())));
-                        chaincodeSpec = Smartcontract.SmartContractSpec.parseFrom(msg.getPayload());
-                    } catch (InvalidProtocolBufferException e) {
-                        logger.error(String.format("[%s]Unable to decipher payload. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
-                        triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
-                        return;
-                    }
-                    // Get the chaincodeID to invoke. The chaincodeID to be called may
-                    // contain composite info like "chaincode-name:version/channel-name"
-                    // We are not using version now but default to the latest
-                    calledCcIns = getSmartContractInstance(chaincodeSpec.getSmartContractId().getName());
-                    scID = chaincodeSpec.getSmartContractId().toBuilder()
-                            .setName(calledCcIns.getSmartContractName())
-                            .build();
-                    chaincodeSpec = chaincodeSpec.toBuilder()
-                            .setSmartContractId(scID)
-                            .build();
-                    if("".equals(calledCcIns.getSmartContractID())){
-                        calledCcIns.setSmartContractID(txContext.getChainID());
-                    }
-                    logger.info(String.format("[%s] C-call-C %s on channel %s"
-                            , shorttxid(msg.getTxid()), calledCcIns.getSmartContractName(), calledCcIns.getSmartContractID()));
-                    try{
-                        //unrealized function, throws RuntionException
-                        checkACL(triggerNextStateMsg.getProposal(), txContext.getProposal(), calledCcIns);
-                    } catch (RuntimeException e){
-                        logger.error(String.format("[%s] C-call-C %s on channel %s failed check ACL [%s]. Sending %s"
-                                , shorttxid(msg.getTxid()), calledCcIns.getSmartContractName(), calledCcIns.getSmartContractID(), txContext.getSignedProp(), printStackTrace(e)));
-                        triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)), null);
-                        return;
-                    }
+                } catch (InvalidProtocolBufferException e) {
+                    logger.error(String.format("[%s]Unable to decipher payload. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
+                    triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)));
+                    returnTriggerNextState(msg, triggerNextStateMsg);
+                } catch (LedgerException e){
+                    logger.error(String.format("[%s]Unable to delete state. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
+                    triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)));
+                    returnTriggerNextState(msg, triggerNextStateMsg);
+                }
+            } else if (INVOKE_CHAINCODE.equals(msg.getType())){
+                //1.构造CS结构
+                Smartcontract.SmartContractSpec chaincodeSpec = null;
+                SmartContractInstance calledCcIns = null;
+                Smartcontract.SmartContractID scID = null;
+                try {
+                    logger.info(String.format("[%s] C-call-C", shorttxid(msg.getTxid())));
+                    chaincodeSpec = Smartcontract.SmartContractSpec.parseFrom(msg.getPayload());
+                } catch (InvalidProtocolBufferException e) {
+                    logger.error(String.format("[%s]Unable to decipher payload. Sending %s", shorttxid(msg.getTxid()), ERROR.toString()));
+                    triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)));
+                    returnTriggerNextState(msg, triggerNextStateMsg);
+                    return;
+                }
+                //2.实例化Chaincode
+                //3.操作账本
+                //4.判断是否为系统链码Scc
+                //5.获取版本version
+                //6.获取timeout
+                //7.封装为res
+                calledCcIns = getSmartContractInstance(chaincodeSpec.getSmartContractId().getName());
+                scID = chaincodeSpec.getSmartContractId().toBuilder()
+                        .setName(calledCcIns.getSmartContractName())
+                        .build();
+                chaincodeSpec = chaincodeSpec.toBuilder()
+                        .setSmartContractId(scID)
+                        .build();
+                if("".equals(calledCcIns.getSmartContractID())){
+                    calledCcIns.setSmartContractID(txContext.getChainID());
+                }
+                logger.info(String.format("[%s] C-call-C %s on channel %s"
+                        , shorttxid(msg.getTxid()), calledCcIns.getSmartContractName(), calledCcIns.getSmartContractID()));
+                try{
+                    //unrealized function, throws RuntionException
+                    checkACL(txContext.getSignedProp(), txContext.getProposal(), calledCcIns);
+                } catch (RuntimeException e){
+                    logger.error(String.format("[%s] C-call-C %s on channel %s failed check ACL [%s]. Sending %s"
+                            , shorttxid(msg.getTxid()), calledCcIns.getSmartContractName(), calledCcIns.getSmartContractID(), txContext.getSignedProp(), printStackTrace(e)));
+                    triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)));
+                    returnTriggerNextState(msg, triggerNextStateMsg);
+                    return;
+                }
 
-                    // Set up a new context for the called chaincode if on a different channel
-                    // We grab the called channel's ledger simulator to hold the new state
-                    TransactionContext ctxt = new TransactionContext();
-                    ITxSimulator txsim = txContext.getTxSimulator();
-                    IHistoryQueryExecutor historyQueryExecutor = txContext.getHistoryQueryExecutor();
+                // Set up a new context for the called chaincode if on a different channel
+                // We grab the called channel's ledger simulator to hold the new state
+                TransactionContext ctxt = new TransactionContext();
+                ITxSimulator txsim = txContext.getTxSimulator();
+                IHistoryQueryExecutor historyQueryExecutor = txContext.getHistoryQueryExecutor();
 
-                    if(calledCcIns.getSmartContractID() != txContext.getChainID()){
+//                if(!calledCcIns.getSmartContractID().equals(txContext.getChainID())){
 //                        lgr := peer.GetLedger(calledCcIns.ChainID)
-                        NodeConfig.Ledger lgr = new NodeConfig.Ledger();
-                        if(lgr == null){
-                            ByteString payload = ByteString.copyFromUtf8("Failed to find ledger for called channel " + calledCcIns.getSmartContractID());
-                            triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), payload, null);
-                            return;
-                        }
+                    NodeConfig.Ledger lgr = new NodeConfig.Ledger();
+                    if(lgr == null){
+                        ByteString payload = ByteString.copyFromUtf8("Failed to find ledger for called channel " + calledCcIns.getSmartContractID());
+                        triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), payload);
+                        return;
+                    }
 
-                        ITxSimulator txsim2 = null;
+                    ITxSimulator txsim2 = null;
 //                        txsim2 = lgr.newTxSimulator(msg.getTxid());
 //                        if err2 != nil {
 //                            triggerNextStateMsg = &pb.ChaincodeMessage{Type: pb.ChaincodeMessage_ERROR,
@@ -1525,18 +1520,18 @@ public class Handler {
 //                            return
 //                        }
 
-                        txsim = txsim2;
-                    }
+                    txsim = txsim2;
+//                }
 //                    ctxt = context.WithValue(ctxt, TXSimulatorKey, txsim)
 //                    ctxt = context.WithValue(ctxt, HistoryQueryExecutorKey, historyQueryExecutor)
-                    logger.info("[%s] getting chaincode data for %s on channel %s",
-                            shorttxid(msg.getTxid()), calledCcIns.getSmartContractName(), calledCcIns.getSmartContractID());
+                logger.info(String.format("[%s] getting chaincode data for %s on channel %s"
+                        , shorttxid(msg.getTxid()), calledCcIns.getSmartContractName(), calledCcIns.getSmartContractID()));
 
-                    boolean isscc = true;
+                boolean isscc = true;
 //                    isscc := sysccprovider.GetSystemChaincodeProvider().IsSysCC(calledCcIns.ChaincodeName)
-                    String version = null;
-                    if(!isscc){
-                        //if its a user chaincode, get the details
+                String version = null;
+                if(!isscc){
+                    //if its a user chaincode, get the details
 //                        cd, err := GetChaincodeDefinition(ctxt, msg.Txid, txContext.signedProp, txContext.proposal, calledCcIns.ChainID, calledCcIns.ChaincodeName)
 //                        if err != nil {
 //                            errHandler([]byte(err.Error()), "[%s]Failed to get chaincode data (%s) for invoked chaincode. Sending %s", shorttxid(msg.Txid), err, pb.ChaincodeMessage_ERROR)
@@ -1550,10 +1545,10 @@ public class Handler {
 //                            errHandler([]byte(err.Error()), "[%s]CheckInstantiationPolicy, error %s. Sending %s", shorttxid(msg.Txid), err, pb.ChaincodeMessage_ERROR)
 //                            return
 //                        }
-                    } else {
+                } else {
 //                        //this is a system cc, just call it directly
 //                        version = util.GetSysCCVersion()
-                    }
+                }
 
 
 //                    cccid := ccprovider.NewCCContext(calledCcIns.ChainID, calledCcIns.ChaincodeName, version, msg.Txid, false, txContext.signedProp, txContext.proposal)
@@ -1584,7 +1579,7 @@ public class Handler {
 //                    } else {
 //                        res, err = proto.Marshal(response)
 //                    }
-                }
+            }
 //                if err != nil {
 //                    errHandler([]byte(err.Error()), "[%s]Failed to handle %s. Sending %s", shorttxid(msg.Txid), msg.Type.String(), pb.ChaincodeMessage_ERROR)
 //                    return
@@ -1593,17 +1588,14 @@ public class Handler {
 //                // Send response msg back to chaincode.
 //                chaincodeLogger.Debugf("[%s]Completed %s. Sending %s", shorttxid(msg.Txid), msg.Type.String(), pb.ChaincodeMessage_RESPONSE)
 //                triggerNextStateMsg = &pb.ChaincodeMessage{Type: pb.ChaincodeMessage_RESPONSE, Payload: res, Txid: msg.Txid, GroupId: msg.GroupId}
-            } finally {
-                if(flag){
-                    //do followed functions before retun
-                    //delete transaction context
-                    deleteTXIDEntry(msg.getGroupId(), msg.getTxid());
-                    logger.info(String.format("[%s]enterBusyState trigger event %s", shorttxid(triggerNextStateMsg.getTxid()), triggerNextStateMsg.getType()));
-                    //trigger next state
-                    triggerNextState(triggerNextStateMsg, true);
-                }
-            }
-        }).start();
+        res = ByteString.copyFromUtf8("");
+        triggerNextStateMsg = SmartcontractShim.SmartContractMessage.newBuilder()
+                .setType(RESPONSE)
+                .setPayload(res)
+                .setGroupId(msg.getGroupId())
+                .setTxid(msg.getTxid())
+                .build();
+//        }).start();
     }
 
     public void enterEstablishedState(Event e, String state) {
@@ -1618,7 +1610,7 @@ public class Handler {
 
     public void enterEndState(Event event, String state) {
         SmartcontractShim.SmartContractMessage msg = extractMessageFromEvent(event);
-            logger.info(String.format("[%s]Entered state %s"), shorttxid(msg.getTxid()), state);
+            logger.info(String.format("[%s]Entered state %s", shorttxid(msg.getTxid()), state));
             notify(msg);
             deregister();
     }
@@ -1638,19 +1630,12 @@ public class Handler {
     }
 
     /**move to ready
-     *
-     * @param ctxt
-     * @param chainID
-     * @param txid
-     * @param signedProp
-     * @param prop
-     * @return
      */
     public SmartcontractShim.SmartContractMessage ready(Context ctxt, String chainID, String txid, ProposalPackage.SignedProposal signedProp, ProposalPackage.Proposal prop) {
         TransactionContext txctx = createTxContext(ctxt, chainID, txid, signedProp, prop);
 
         logger.info("sending READY");
-        SmartcontractShim.SmartContractMessage msg = newEventMessage(READY, chainID, txid, null, null);
+        SmartcontractShim.SmartContractMessage msg = newEventMessage(READY, chainID, txid, null);
 
         msg = setChaincodeProposal(signedProp, prop, msg);
         if(msg == null){
@@ -1665,19 +1650,20 @@ public class Handler {
     }
 
     /** handleMessage is the entrance method for Peer's handling of Chaincode messages.
-     *
-     * @param msg
      */
     public void handleMessage(SmartcontractShim.SmartContractMessage msg) {
         logger.info(String.format("[%s]Handling message of type: %s in state %s", shorttxid(msg.getTxid()), msg.getType(), fsm.current()));
 
+        //msg cannot be null in processStream
         if((COMPLETED.equals(msg.getType()) || ERROR.equals(msg.getType()) && "ready".equals(fsm.current()))){
             logger.info("[%s]Handle message - COMPLETED. Notify", msg.getTxid());
             notify(msg);
+            return;
         }
         if(fsm.eventCannotOccur(msg.getType().toString())){
             logger.error(String.format("[%s]Chaincode handler validator FSM cannot handle message (%s) while in state: %s"
                     , msg.getTxid(), msg.getType(), fsm.current()));
+            return;
         }
         try {
             fsm.raiseEvent(msg.getType().toString(), msg);
@@ -1728,8 +1714,6 @@ public class Handler {
 
     /**
      * get chaincode message from event
-     * @param event
-     * @return
      */
     private SmartcontractShim.SmartContractMessage extractMessageFromEvent(Event event) {
         try {
@@ -1743,21 +1727,14 @@ public class Handler {
 
     /**
      * create new event msg
-     * @param type
-     * @param GroupId
-     * @param txId
-     * @param payload
-     * @param event
-     * @return
      */
     private static SmartcontractShim.SmartContractMessage newEventMessage(final SmartcontractShim.SmartContractMessage.Type type
-            , final  String GroupId, final String txId, final ByteString payload, final SmartContractEventPackage.SmartContractEvent event){
-        if (event == null){
+            , final  String GroupId, final String txId, final ByteString payload){
+        if (payload == null){
             return SmartcontractShim.SmartContractMessage.newBuilder()
                     .setType(type)
                     .setGroupId(GroupId)
                     .setTxid(txId)
-                    .setPayload(payload)
                     .build();
         } else {
             return SmartcontractShim.SmartContractMessage.newBuilder()
@@ -1765,15 +1742,12 @@ public class Handler {
                     .setGroupId(GroupId)
                     .setTxid(txId)
                     .setPayload(payload)
-                    .setSmartcontractEvent(event)
                     .build();
         }
     }
 
     /**
      * throwable to string
-     * @param throwable
-     * @return
      */
     private static String printStackTrace(Throwable throwable) {
         if (throwable == null) return null;
@@ -1784,15 +1758,40 @@ public class Handler {
 
     /**
      * set QueryResponse's results
-     * @param builder
-     * @param batch
-     * @return
      */
     private static SmartcontractShim.QueryResponse.Builder setQueryResponseReuslt(SmartcontractShim.QueryResponse.Builder builder, SmartcontractShim.QueryResultBytes[] batch){
         for (int i = 0; i < builder.getResultsCount(); i++) {
             builder.addResults(batch[i]);
         }
         return builder;
+    }
+
+    private void errorReturn(SmartcontractShim.SmartContractMessage msg, ByteString payload){
+        //do followed functions before retun
+        //delete transaction context
+        deleteTXIDEntry(msg.getGroupId(), msg.getTxid());
+        logger.error(payload.toStringUtf8());
+        //send msg
+        SmartcontractShim.SmartContractMessage serialSendMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), payload);
+        serialSendAsync(serialSendMsg);
+    }
+
+    private void successReturn(SmartcontractShim.SmartContractMessage msg, ByteString payload, SmartcontractShim.SmartContractMessage.Type type){
+        //do followed functions before retun
+        //delete transaction context
+        deleteTXIDEntry(msg.getGroupId(), msg.getTxid());
+        //send msg
+        SmartcontractShim.SmartContractMessage serialSendMsg = newEventMessage(type, msg.getGroupId(), msg.getTxid(), payload);
+        serialSendAsync(serialSendMsg);
+    }
+
+    private void returnTriggerNextState(SmartcontractShim.SmartContractMessage msg, SmartcontractShim.SmartContractMessage triggerNextStateMsg){
+        //do followed functions before retun
+        //delete transaction context
+        deleteTXIDEntry(msg.getGroupId(), msg.getTxid());
+        logger.error(String.format("[%s]enterBusyState trigger event %s", shorttxid(msg.getTxid()), triggerNextStateMsg.getType().toString()));
+        //trigger next state
+        triggerNextState(triggerNextStateMsg, true);
     }
 }
 

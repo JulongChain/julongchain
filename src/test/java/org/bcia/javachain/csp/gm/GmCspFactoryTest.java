@@ -1,6 +1,7 @@
 package org.bcia.javachain.csp.gm;
 
 import org.bcia.javachain.csp.factory.IFactoryOpts;
+import org.bcia.javachain.csp.gm.sm3.SM3HashOpts;
 import org.bcia.javachain.csp.intfs.ICsp;
 import org.bcia.javachain.csp.intfs.opts.IHashOpts;
 import org.bcia.javachain.common.exception.JavaChainException;
@@ -46,7 +47,7 @@ public class GmCspFactoryTest {
     @Test
     public void getCsp() {
         GmCspFactory factory = new GmCspFactory();
-        IFactoryOpts opts = new GmFactoryOpts(256, "SM3", true, true, "");
+        IFactoryOpts opts = new GmFactoryOpts(256, "SM3", true, true, "",true);
         ICsp csp = factory.getCsp(opts);
         Assert.assertNotNull(csp);
         try {

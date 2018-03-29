@@ -38,7 +38,7 @@ import java.util.List;
  * @company Dingxuan
  */
 @Component
-public class ESSC  extends SystemSmartContractBase {
+public class ESSC extends SystemSmartContractBase {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ESSC.class);
 
     @Override
@@ -65,7 +65,8 @@ public class ESSC  extends SystemSmartContractBase {
     @Override
     public Response invoke(ISmartContractStub stub) {
         log.debug("Enter ESSC invoke function");
-        List<String> args = stub.getStringArgs();
+        //List<String> args = stub.getStringArgs();
+        List<byte[]> args = stub.getArgs();
         int size=args.size();
         if(size<6){
             return newErrorResponse(String.format("Incorrect number of arguments (expected a minimum of 5, provided %d)",args.size()));
@@ -73,41 +74,44 @@ public class ESSC  extends SystemSmartContractBase {
         else if(size>8){
             return newErrorResponse(String.format("Incorrect number of arguments (expected a maximum of 7, provided %d)",args.size()));
         }
-        log.debug("ESSC starts:%d args",args.size());
+        log.debug("ESSC starts:{} args",args.size());
 
         //handle the header
-        String strHeader=args.get(1);
-        if(strHeader==null || strHeader.isEmpty()){
-            return newErrorResponse("Serialized header object is null or empty");
+        byte[] headerBytes=args.get(1);
+        if(headerBytes.length==0){
+            return newErrorResponse("Serialized header object is null");
         }
 
         //handle the proposal payload
-        String strPayload=args.get(2);
-        if(strPayload==null || strPayload.isEmpty()){
-            return newErrorResponse("Serialized SmartcontractProposalPayload object is null or empty");
+        byte[] payloadBytes=args.get(2);
+        if(payloadBytes.length==0){
+            return newErrorResponse("Serialized SmartcontractProposalPayload object is null");
         }
 
         //handle the smartcontractID
-        String strSmartContractID=args.get(3);
-        if(strSmartContractID==null || strSmartContractID.isEmpty()){
-            return newErrorResponse("SmartcontractID is null or empty");
+        byte[] smartContractIDBytes=args.get(3);
+        if(smartContractIDBytes.length==0){
+            return newErrorResponse("SmartcontractID is null");
         }
+
         Smartcontract.SmartContractID smartContractID;
         try {
-            smartContractID = ProtoUtils.unmarshalSmartcontractID(strSmartContractID);
+            smartContractID = ProtoUtils.unmarshalSmartcontractID(smartContractIDBytes);
         }catch(Exception e){
-            return newErrorResponse(String.format("Unmarshal SmartcontractID %s failed:%s", strSmartContractID,e.getMessage()));
+            return newErrorResponse(String.format("Unmarshal SmartcontractID failed:%s", e.getMessage()));
         }
 
         // handle executing chaincode result
         // Status code < shim.ERRORTHRESHOLD can be endorsed
-        String strResponse=args.get(4);
-        if(strResponse==null || strResponse.isEmpty()){
-            return newErrorResponse("Response of smartcontract executing is null or empty");
+        //String strResponse=args.get(4);
+        byte[] byteResponse = args.get(4);
+        if(byteResponse.length==0){
+            return newErrorResponse("Response of smartcontract executing is null");
         }
         ProposalResponsePackage.Response proResponse;
         try {
-            proResponse=ProtoUtils.getResponse(strResponse);
+            //proResponse=ProtoUtils.getResponse(strResponse);
+            proResponse=ProtoUtils.getResponse(byteResponse);
         } catch (Exception e) {
             return newErrorResponse(String.format("Failed to get Response of executing smartcontract: %s",e.getMessage()));
         }
@@ -119,17 +123,17 @@ public class ESSC  extends SystemSmartContractBase {
 
 
         //handle simulation results
-        String strResults=args.get(5);
-        if(strResults==null || strResults.isEmpty()){
-            return newErrorResponse("Simulation results is null or empty");
+        byte[] resultBytes=args.get(5);
+        if(resultBytes.length==0){
+            return newErrorResponse("Simulation results is null");
         }
 
         // Handle serialized events if they have been provided
         // they might be nil in case there's no events but there
         // is a visibility field specified as the next arg
-        String strEvents="";
-        if(size>6  && args.get(6)!=null && args.get(6).isEmpty()==false){
-            strEvents=args.get(6);
+        byte[] eventBytes=null;
+        if(size>6  && args.get(6)!=null){
+            eventBytes=args.get(6);
         }
 
         // Handle payload visibility (it's an optional argument)
@@ -140,9 +144,9 @@ public class ESSC  extends SystemSmartContractBase {
         // the fabric may be extended to encode more elaborate visibility
         // mechanisms that shall be encoded in this field (and handled
         // appropriately by the peer)
-        String strVisibility="";
+        byte[] visibilityBytes=null;
         if(size>7){
-            strVisibility=args.get(7);
+            visibilityBytes=args.get(7);
         }
 
         // obtain the default signing identity for this peer; it will be used to sign this proposal response
@@ -156,10 +160,10 @@ public class ESSC  extends SystemSmartContractBase {
         }
         ProposalResponsePackage.ProposalResponse proposalResponse;
         try {
-            proposalResponse = ProtoUtils.createProposalResponse(strHeader, strPayload,
-                    proResponse, strResults,
-                    strEvents, smartContractID,
-                    strVisibility, signingEndorser);
+            proposalResponse = ProtoUtils.createProposalResponse(headerBytes, payloadBytes,
+                    proResponse, resultBytes,
+                    eventBytes, smartContractID,
+                    visibilityBytes, signingEndorser);
         }catch(Exception e){
             return newErrorResponse(String.format("Create ProposalResponse failed:%s",e.getMessage()));
         }

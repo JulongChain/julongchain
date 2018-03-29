@@ -29,40 +29,55 @@ public class GmFactoryOpts implements IGmFactoryOpts {
     private boolean bEphemeral;
     private boolean bDummyKeyStore;
     private String keyStorePath;
+    private boolean bDefaultCsp;
 
-    public GmFactoryOpts(int secLevel,String hashFamily,boolean bEphemeral,boolean bDummyKeyStore,String keyStorePath){
+    public GmFactoryOpts(int secLevel,String hashFamily,boolean bEphemeral,
+                         boolean bDummyKeyStore,String keyStorePath,boolean bDefaultCsp){
         this.secLevel=secLevel;
         this.hashFamily=hashFamily;
         this.bEphemeral=bEphemeral;
         this.bDummyKeyStore=bDummyKeyStore;
         this.keyStorePath=keyStorePath;
+        this.bDefaultCsp=bDefaultCsp;
     }
 
+    @Override
     public int getSecLevel() {
         return secLevel;
     }
 
+    @Override
     public String getHashFamily() {
         return hashFamily;
     }
 
+    @Override
     public boolean isEphemeral() {
         return false;
     }
 
+    @Override
     public String getKeyStorePath() {
         return null;
     }
 
+    @Override
     public boolean isDummyKeystore() {
         return false;
     }
 
+    @Override
     public String getProviderName() {
         return null;
     }
 
+    @Override
     public String getProviderDescription() {
         return null;
+    }
+
+    @Override
+    public boolean isDefaultCsp() {
+        return bDefaultCsp;
     }
 }

@@ -24,6 +24,7 @@ package org.bcia.javachain.common.exception;
  */
 public class SmartContractException extends JavaChainException {
     private static final String MODULE_NAME = "[SmartContract]";
+
     public SmartContractException() {
         super();
     }
@@ -43,8 +44,8 @@ public class SmartContractException extends JavaChainException {
 
 
     protected SmartContractException(String message, Throwable cause,
-                            boolean enableSuppression,
-                            boolean writableStackTrace) {
+                                     boolean enableSuppression,
+                                     boolean writableStackTrace) {
         super(MODULE_NAME + message, cause, enableSuppression, writableStackTrace);
     }
 }

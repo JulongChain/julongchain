@@ -20,7 +20,7 @@ import org.bcia.javachain.protos.common.Policies;
 /**
  * 标准配置策略
  *
- * @author
+ * @author zhouhui
  * @date 2018/3/8
  * @company Dingxuan
  */

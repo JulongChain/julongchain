@@ -33,4 +33,8 @@ public class GroupConfigConstant {
     public static final String CAPABILITIES = "Capabilities";
 
     public static final String MSP_KEY = "MSP";
+
+    public static final String APPLICATION = "Application";
+
+    public static final String ANCHOR_NODES = "AnchorNodes";
 }

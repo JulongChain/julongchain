@@ -18,6 +18,7 @@ package org.bcia.javachain.node.entity;
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.stub.StreamObserver;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
@@ -39,6 +40,8 @@ import org.bcia.javachain.protos.msp.Identities;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Smartcontract;
+import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
+import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -86,20 +89,28 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
     }
 
     public void createGroup(String ip, int port, String groupId, String groupFile) throws NodeException {
-        if (!FileUtils.isExists(groupFile)) {
-            log.error("groupFile is not exists");
+        Common.Envelope envelope = null;
+
+        ILocalSigner signer = new LocalSigner();
+        if (StringUtils.isNotBlank(groupFile) && FileUtils.isExists(groupFile)) {
+            //如果群组文件存在，则直接从文件读取，形成信封对象
+            envelope = EnvelopeHelper.readFromFile(groupFile);
+        } else if (StringUtils.isBlank(groupFile)) {
+            //如果是空文件，则组成一个默认的信封对象
+            try {
+                envelope = EnvelopeHelper.makeGroupCreateTx(groupId, signer, null, GenesisConfigFactory
+                        .loadGenesisConfig().getCompletedProfile("SampleSingleMSPChannel"));
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+                throw new NodeException(e);
+            }
+
+        } else {
+            //不是空文件，反而是一个错误的文件，则直接报异常（要么不指定文件，要么就指定正确的文件）
+            log.error("groupFile is not exists: " + groupFile);
             throw new NodeException("Group File is not exists");
         }
 
-        Common.Envelope envelope = null;
-        try {
-            byte[] bytes = FileUtils.readFileBytes(groupFile);
-            envelope = Common.Envelope.parseFrom(bytes);
-        } catch (IOException e) {
-            throw new NodeException("Can not read Group File");
-        }
-
-        ILocalSigner signer = new LocalSigner();
         Common.Envelope signedEnvelope = EnvelopeHelper.sanityCheckAndSignConfigTx(envelope, groupId, signer);
         IBroadcastClient broadcastClient = new BroadcastClient(ip, port);
         broadcastClient.send(signedEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
@@ -214,7 +225,7 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
     }
 
     /**
-     *  更新群组配置 V0.25
+     * 更新群组配置 V0.25
      */
     public NodeGroup updateGroup(String ip, int port, String groupId) {
         NodeGroup group = new NodeGroup();

@@ -17,7 +17,7 @@ package org.bcia.javachain.csp.factory;
  */
 
 /**
- * @author zhanglin
+ * @author zhanglin,sunianle
  * @purpose Define the interface, IFactoryOpts
  * @date 2018-01-25
  * @company Dingxuan
@@ -28,7 +28,8 @@ public interface IFactoryOpts {
 
     // The values of string type below present providers' names to be implemented.
     String PROVIDER_NIST = "NIST";
-    String PROVIDER_GM = "GM_BOUNCYCASTLE";
+    String PROVIDER_GM = "GM";
+    String PROVIDER_GM_BOUNCYCASTLE = "GM_BOUNCYCASTLE";
     String PROVIDER_PKCS11 = "PKCS11";
     String PROVIDER_GMT0016 = "GMT0016";
     String PROVIDER_GMT0018 = "GMT0018";
@@ -39,5 +40,7 @@ public interface IFactoryOpts {
 
     // The getProviderDescription returns the description of a provider.
     String getProviderDescription();
+
+    boolean isDefaultCsp();
 
 }

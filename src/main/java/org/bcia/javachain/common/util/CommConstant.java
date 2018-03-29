@@ -39,8 +39,9 @@ public class CommConstant {
      * 生命周期系统智能合约
      */
     public static final String LSSC = "lssc";
+
     /**
-     * 配置系统智能合约
+     * 成员服务提供者类型
      */
-    public static final String CSSC = "cssc";
+    public static final int MSPTYPE_CSP_VALUE = 0;
 }

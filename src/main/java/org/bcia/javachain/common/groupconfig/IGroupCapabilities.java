@@ -1,7 +1,5 @@
-package org.bcia.javachain.csp.gm;
-
 /**
- * Copyright BCIA. All Rights Reserved.
+ * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,21 +13,14 @@ package org.bcia.javachain.csp.gm;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import org.bcia.javachain.csp.intfs.opts.IHashOpts;
+package org.bcia.javachain.common.groupconfig;
 
 /**
- * @author zhanglin
- * @purpose Define the class, SM3HashOpts
- * @date 2018-01-25
+ * 对象
+ *
+ * @author zhouhui
+ * @date 2018/3/27
  * @company Dingxuan
  */
-
-public class SM3HashOpts implements IHashOpts {
-
-    public SM3HashOpts(){}
-
-    public String getAlgorithm() {
-        return "SM3";
-    }
+public class IGroupCapabilities {
 }

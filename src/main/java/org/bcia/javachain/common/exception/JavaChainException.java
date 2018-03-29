@@ -15,6 +15,13 @@
  */
 package org.bcia.javachain.common.exception;
 
+/**
+ * JavaChain异常父类
+ *
+ * @author zhouhui
+ * @date 2018/3/29
+ * @company Dingxuan
+ */
 public class JavaChainException extends Exception {
     public JavaChainException() {
         super();
