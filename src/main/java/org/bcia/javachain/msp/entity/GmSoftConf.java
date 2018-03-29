@@ -15,28 +15,37 @@
  */
 package org.bcia.javachain.msp.entity;
 
-
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.jcajce.provider.asymmetric.X509;
-
-import javax.security.cert.X509Certificate;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-
-
 /**
  * @author zhangmingyang
- * @Date: 2018/3/14
+ * @Date: 2018/3/29
  * @company Dingxuan
  */
-public class Identity implements Serializable{
+public class GmSoftConf {
+    private String mspdir;
+    private String mspId;
+    private String mspType;
+    private  CspConfig cspConfig;
 
-    IdentityIdentifier identityIdentifier;
-    Cert cert;
-    CspKey cspKey;
-    CspMsp cspMsp;
+    public GmSoftConf(String mspdir, String mspId, String mspType, CspConfig cspConfig) {
+        this.mspdir = mspdir;
+        this.mspId = mspId;
+        this.mspType = mspType;
+        this.cspConfig = cspConfig;
+    }
 
+    public String getMspdir() {
+        return mspdir;
+    }
+
+    public String getMspId() {
+        return mspId;
+    }
+
+    public String getMspType() {
+        return mspType;
+    }
+
+    public CspConfig getCspConfig() {
+        return cspConfig;
+    }
 }
