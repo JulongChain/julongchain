@@ -18,6 +18,13 @@ package org.bcia.javachain.common.log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * JavaChain日志工厂
+ *
+ * @author zhouhui
+ * @date 2018/3/29
+ * @company Dingxuan
+ */
 public class JavaChainLogFactory {
     public static JavaChainLog getLog(Class<?> clazz) {
         Logger logger = LoggerFactory.getLogger(clazz);

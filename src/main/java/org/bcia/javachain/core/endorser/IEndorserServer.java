@@ -22,7 +22,7 @@ import org.bcia.javachain.protos.node.ProposalResponsePackage;
 /**
  * 背书服务接口定义
  *
- * @author
+ * @author zhouhui
  * @date 2018/3/13
  * @company Dingxuan
  */

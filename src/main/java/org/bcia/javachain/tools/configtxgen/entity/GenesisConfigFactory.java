@@ -28,9 +28,9 @@ import java.net.URL;
 import java.util.Map;
 
 /**
- * 类描述
+ * 创世配置工厂
  *
- * @author
+ * @author zhouhui
  * @date 2018/3/9
  * @company Dingxuan
  */
@@ -38,7 +38,7 @@ import java.util.Map;
 public class GenesisConfigFactory {
     private static JavaChainLog log = JavaChainLogFactory.getLog(GenesisConfigFactory.class);
 
-    public static GenesisConfig loadGenesisConfig() throws Exception {
+    public static GenesisConfig loadGenesisConfig() throws IOException {
         Yaml yaml = new Yaml();
         URL url = GenesisConfigFactory.class.getClassLoader().getResource(GenesisConfig.CONFIGTX_FILE_PATH);
 

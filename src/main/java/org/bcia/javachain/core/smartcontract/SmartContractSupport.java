@@ -21,6 +21,8 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractContext;
 import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.ITxSimulator;
+import org.bcia.javachain.core.smartcontract.client
+        .SmartContractContainerClient;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.bcia.javachain.protos.node.SmartcontractShim;
 
@@ -139,12 +141,21 @@ public class SmartContractSupport {
         return Smartcontract.SmartContractInput.newBuilder().build();
     }
 
-    public SmartcontractShim.SmartContractMessage execute(SmartContractContext scContext, SmartcontractShim
-            .SmartContractMessage scMessage, long timeout) throws SmartContractException {
+    public SmartcontractShim.SmartContractMessage execute
+            (SmartContractContext scContext, SmartcontractShim
+                    .SmartContractMessage scMessage, long timeout) throws
+            SmartContractException {
+
         //TODO:add by zhouhui for test,返回一个空对象，实际处理待万良兵补充
         log.info("call SmartContractSupport execute");
 
-        return SmartcontractShim.SmartContractMessage.newBuilder().build();
+        SmartContractContainerClient client = new
+                SmartContractContainerClient("localhost", 50053);
+
+        SmartcontractShim.SmartContractMessage result = client.invoke
+                (scContext, scMessage, timeout);
+
+        return result;
     }
 
 

@@ -22,6 +22,7 @@ import org.bouncycastle.jcajce.provider.asymmetric.X509;
 import javax.security.cert.X509Certificate;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 
@@ -31,7 +32,7 @@ import java.security.cert.CertificateFactory;
  * @Date: 2018/3/14
  * @company Dingxuan
  */
-public class Identity {
+public class Identity implements Serializable{
 
     IdentityIdentifier identityIdentifier;
     Cert cert;

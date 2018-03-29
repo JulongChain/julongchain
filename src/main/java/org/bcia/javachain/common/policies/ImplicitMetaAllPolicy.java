@@ -18,7 +18,7 @@ package org.bcia.javachain.common.policies;
 import org.bcia.javachain.protos.common.Policies;
 
 /**
- * 策略：表全部子策略需要满足
+ * 策略：全部子策略需要满足
  *
  * @author zhouhui
  * @date 2018/3/8

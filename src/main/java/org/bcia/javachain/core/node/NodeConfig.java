@@ -18,7 +18,7 @@ package org.bcia.javachain.core.node;
 /**
  * 节点配置对象（对应node.yaml文件）
  *
- * @author
+ * @author zhouhui
  * @date 2018/3/15
  * @company Dingxuan
  */

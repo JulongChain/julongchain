@@ -15,8 +15,16 @@
  */
 package org.bcia.javachain.common.exception;
 
+/**
+ * Node节点模块异常
+ *
+ * @author zhouhui
+ * @date 2018/3/29
+ * @company Dingxuan
+ */
 public class NodeException extends JavaChainException {
     private static final String MODULE_NAME = "[Node]";
+
     public NodeException() {
         super();
     }

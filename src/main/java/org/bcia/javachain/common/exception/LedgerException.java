@@ -15,8 +15,16 @@
  */
 package org.bcia.javachain.common.exception;
 
+/**
+ * 账本模块异常
+ *
+ * @author wanliangbing
+ * @date 2018/3/29
+ * @company Dingxuan
+ */
 public class LedgerException extends JavaChainException {
     private static final String MODULE_NAME = "[Ledger]";
+
     public LedgerException() {
         super();
     }

@@ -41,7 +41,7 @@ import org.springframework.stereotype.Component;
 /**
  * 背书节点
  *
- * @author
+ * @author zhouhui
  * @date 2018/3/13
  * @company Dingxuan
  */
