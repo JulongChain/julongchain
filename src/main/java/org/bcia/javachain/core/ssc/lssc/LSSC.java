@@ -104,6 +104,10 @@ public class LSSC  extends SystemSmartContractBase {
 
         switch(function){
             case INSTALL:
+                if(size<2){
+                    return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
+                }
+                // 2. check local MSP Admins policy
                 ;
             case DEPLOY:
                 ;
