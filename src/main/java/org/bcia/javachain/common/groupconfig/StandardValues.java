@@ -16,10 +16,9 @@
 package org.bcia.javachain.common.groupconfig;
 
 import com.google.protobuf.Message;
-import org.bcia.javachain.core.node.NodeConfig;
+import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.common.Configuration;
 import org.bcia.javachain.protos.msp.MspConfigPackage;
-import org.bcia.javachain.protos.peer.Resources;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,61 +34,54 @@ import java.util.Map;
 public class StandardValues {
     private Map<String, Message> lookup;
 
-    public StandardValues(Message[] msgs) {
+    public StandardValues(Message... msgs) {
         lookup = new HashMap<String, Message>();
 
         for (Message msg : msgs) {
-            initialize(msg);
+            add(msg);
         }
 
-        Iterator<Map.Entry<String, Message>> entries = lookup.entrySet().iterator();
+//        Iterator<Map.Entry<String, Message>> entries = lookup.entrySet().iterator();
 
+//        while (entries.hasNext()) {
+//            Map.Entry<String, Message> entry = entries.next();
+//
+//            System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+//
+//        }
+    }
+
+    /**
+     * 增加消息对象
+     *
+     * @param msg
+     */
+    private void add(Message msg) {
+        lookup.put(msg.getClass().getSimpleName(), msg);
+    }
+
+    public static StandardValues valuesFromChild(Configtx.ConfigChild child) {
+        if (child == null || child.getValuesMap() == null) {
+            return null;
+        }
+
+        StandardValues standardValues = new StandardValues();
+
+        Iterator<Map.Entry<String, Configtx.ConfigValue>> entries = child.getValuesMap().entrySet().iterator();
         while (entries.hasNext()) {
-            Map.Entry<String, Message> entry = entries.next();
-
-            System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
-
+            Map.Entry<String, Configtx.ConfigValue> entry = entries.next();
+            standardValues.add(entry.getValue());
+            entry.getValue().getValue();
         }
-    }
 
-    private void initialize(Message msg) {
-        lookup.put(msg.getClass().getName(), msg);
-//        if(msg instanceof Configuration.Capabilities){
-//            lookup.put("Capabilities", msg);
-//        }
+//        Configuration.Capabilities capabilities = Configuration.Capabilities.newBuilder().build();
+//        MspConfigPackage.MSPConfig mspConfig = MspConfigPackage.MSPConfig.newBuilder().build();
 //
-//        if(msg instanceof org.bcia.javachain.protos.node.Configuration.AnchorNodes){
-//            lookup.put("Capabilities", msg);
-//        }
+//        Message[] msgs = new Message[]{capabilities, mspConfig};
 //
-//        if(msg instanceof MspConfigPackage.MSPConfig){
-//            lookup.put("MSP", msg);
-//        }
-//
-//        if(msg instanceof Resources.SmartContractIdentifier){
-//            lookup.put(msg.getClass().getName(), msg);
-//        }
-//
-//        if(msg instanceof Resources.SmartContractValidation){
-//            lookup.put("SmartContractValidation", msg);
-//        }
-//
-//        if(msg instanceof Resources.SmartContractEndorsement){
-//            lookup.put("SmartContractEndorsement", msg);
-//        }
-    }
-
-    public static StandardValues valuesFromChild() {
-
-        Configuration.Capabilities capabilities = Configuration.Capabilities.newBuilder().build();
-        MspConfigPackage.MSPConfig mspConfig = MspConfigPackage.MSPConfig.newBuilder().build();
-
-        Message[] msgs = new Message[]{capabilities, mspConfig};
-
-        StandardValues standardValues = new StandardValues(msgs);
+//        StandardValues standardValues = new StandardValues(msgs);
 
         return standardValues;
-
     }
 
 

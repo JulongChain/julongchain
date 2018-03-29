@@ -36,6 +36,7 @@ import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.SmartContractEventPackage;
 import org.bcia.javachain.protos.node.Smartcontract;
+import org.springframework.stereotype.Component;
 
 /**
  * 背书节点
@@ -44,6 +45,7 @@ import org.bcia.javachain.protos.node.Smartcontract;
  * @date 2018/3/13
  * @company Dingxuan
  */
+@Component
 public class Endorser implements IEndorserServer {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Endorser.class);
     //TODO:Spring
@@ -317,7 +319,7 @@ public class Endorser implements IEndorserServer {
      * @param signedProposal
      * @return
      */
-    private ProposalResponsePackage.Response endorseProposal(String groupId, String txId, ProposalPackage
+    public ProposalResponsePackage.Response endorseProposal(String groupId, String txId, ProposalPackage
             .SignedProposal signedProposal, ProposalPackage.Proposal proposal, Smartcontract.SmartContractID.Builder
                                                                      smartContractIDBuilder, ProposalResponsePackage
                                                                      .Response response, byte[] simulateResults,

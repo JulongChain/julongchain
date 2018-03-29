@@ -16,25 +16,11 @@
 package org.bcia.javachain.common.groupconfig;
 
 /**
- * 群组配置常量
+ * 对象
  *
  * @author zhouhui
- * @date 2018/3/9
+ * @date 2018/3/28
  * @company Dingxuan
  */
-public class GroupConfigConstant {
-
-    public static final String POLICY_READERS = "Readers";
-
-    public static final String POLICY_WRITERS = "Writers";
-
-    public static final String POLICY_ADMINS = "Admins";
-
-    public static final String CAPABILITIES = "Capabilities";
-
-    public static final String MSP_KEY = "MSP";
-
-    public static final String APPLICATION = "Application";
-
-    public static final String ANCHOR_NODES = "AnchorNodes";
+public class GroupConfig {
 }

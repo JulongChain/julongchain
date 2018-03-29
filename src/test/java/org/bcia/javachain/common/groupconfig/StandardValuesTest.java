@@ -25,6 +25,6 @@ public class StandardValuesTest {
 
     @Test
     public void valuesFromChild() {
-        StandardValues.valuesFromChild();
+        StandardValues.valuesFromChild(null);
     }
 }
