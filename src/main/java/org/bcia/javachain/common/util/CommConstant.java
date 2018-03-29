@@ -40,6 +40,7 @@ public class CommConstant {
      */
     public static final String LSSC = "lssc";
 
+
     /**
      * 成员服务提供者类型
      */
