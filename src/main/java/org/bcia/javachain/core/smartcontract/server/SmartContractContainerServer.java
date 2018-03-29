@@ -19,9 +19,7 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.smartcontract.service
-        .SmartContractContainerServiceImpl;
-import org.springframework.stereotype.Component;
+import org.bcia.javachain.core.smartcontract.service.SmartContractContainerServiceImpl;
 
 import java.io.IOException;
 
@@ -32,7 +30,7 @@ import java.io.IOException;
  * @date 2018/3/28
  * @company Dingxuan
  */
-@Component
+// @Component
 public class SmartContractContainerServer {
 
     private static final JavaChainLog log = JavaChainLogFactory.getLog
