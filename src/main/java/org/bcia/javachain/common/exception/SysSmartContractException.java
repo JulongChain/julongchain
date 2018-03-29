@@ -22,8 +22,9 @@ package org.bcia.javachain.common.exception;
  * @date 3/7/18
  * @company Dingxuan
  */
-public class SysSmartContractException  extends JavaChainException {
+public class SysSmartContractException extends JavaChainException {
     private static final String MODULE_NAME = "[SysSmartContract]";
+
     public SysSmartContractException() {
         super();
     }
@@ -43,8 +44,8 @@ public class SysSmartContractException  extends JavaChainException {
 
 
     protected SysSmartContractException(String message, Throwable cause,
-                                     boolean enableSuppression,
-                                     boolean writableStackTrace) {
+                                        boolean enableSuppression,
+                                        boolean writableStackTrace) {
         super(MODULE_NAME + message, cause, enableSuppression, writableStackTrace);
     }
 }
