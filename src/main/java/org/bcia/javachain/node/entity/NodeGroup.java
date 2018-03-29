@@ -25,6 +25,7 @@ import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.localmsp.impl.LocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.common.util.FileUtils;
 import org.bcia.javachain.common.util.proto.ProposalUtils;
 import org.bcia.javachain.consenter.common.broadcast.BroadCastClient;
@@ -32,6 +33,7 @@ import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.core.ssc.cssc.CSSC;
 import org.bcia.javachain.csp.gm.GmCspFactory;
 import org.bcia.javachain.msp.ISigningIdentity;
+import org.bcia.javachain.msp.mgmt.Mgmt;
 import org.bcia.javachain.node.common.client.*;
 import org.bcia.javachain.node.common.helper.SpecHelper;
 import org.bcia.javachain.protos.common.Common;
@@ -139,14 +141,16 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
 
         Smartcontract.SmartContractInvocationSpec spec = null;
         try {
-            spec = SpecHelper.buildInvocationSpec("cssc", "JoinGroup",
+            spec = SpecHelper.buildInvocationSpec(CommConstant.CSSC, CSSC.JOIN_GROUP,
                     FileUtils.readFileBytes(blockPath));
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             throw new NodeException("Can not read block file");
         }
 
-        ISigningIdentity identity = new MockSigningIdentity();
+        ISigningIdentity identity = new Mgmt().getLocalMsp().getDefaultSigningIdentity();
+
+        //ISigningIdentity identity = new MockSigningIdentity();
         byte[] creator = identity.serialize();
 
         byte[] nonce = MockCrypto.getRandomNonce();
@@ -161,7 +165,17 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
 
         ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType.CONFIG,
                 "", txId, spec, nonce, creator, null);
-        ProposalUtils.buildSignedProposal(proposal, identity);
+        ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
+
+        EndorserClient endorserClient = new EndorserClient("localhost", 7051);
+        ProposalResponsePackage.ProposalResponse proposalResponse = endorserClient.sendProcessProposal(signedProposal);
+
+        if (proposalResponse != null && proposalResponse.getResponse() != null && proposalResponse.getResponse()
+                .getStatus() == Common.Status.SUCCESS_VALUE) {
+            log.info("Join group success");
+        } else {
+            log.info("Join group fail:" + proposalResponse);
+        }
 
         return group;
     }
@@ -212,7 +226,7 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
     }
 
     /**
-     *  加入群组列表 V0.25
+     * 加入群组列表 V0.25
      */
     public String listGroup(String smartContractName, String action, byte[] content) throws NodeException {
         //生成proposal  Type=ENDORSER_TRANSACTION
@@ -237,13 +251,13 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //获取背书节点返回信息
-        EndorserClient client = new EndorserClient( CSSC.DEFAULT_HOST, CSSC.DEFAULT_PORT);
+        EndorserClient client = new EndorserClient(CSSC.DEFAULT_HOST, CSSC.DEFAULT_PORT);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
 
         //获取结果中 Payload
         Common.Payload payload = null;
         try {
-            payload = Common.Payload.parseFrom( proposalResponse.getResponse().getPayload() );
+            payload = Common.Payload.parseFrom(proposalResponse.getResponse().getPayload());
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
         }
@@ -251,7 +265,7 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
         //获取Payload 中的groupHeader
         Common.GroupHeader groupHeader = null;
         try {
-            groupHeader = Common.GroupHeader.parseFrom( payload.getHeader().getGroupHeader() );
+            groupHeader = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
         }

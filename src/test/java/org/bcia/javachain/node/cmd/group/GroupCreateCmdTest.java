@@ -1,5 +1,8 @@
 package org.bcia.javachain.node.cmd.group;
 
+import org.apache.commons.cli.ParseException;
+import org.bcia.javachain.BaseJunit4Test;
+import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.node.cmd.INodeCmd;
 import org.hamcrest.Matchers;
 import org.junit.After;
@@ -17,7 +20,7 @@ import static org.junit.Assert.*;
  * @date 2018/3/27
  * @company Dingxuan
  */
-public class GroupCreateCmdTest {
+public class GroupCreateCmdTest extends BaseJunit4Test {
 
     @Autowired
     private GroupCreateCmd groupCreateCmd;
@@ -31,12 +34,14 @@ public class GroupCreateCmdTest {
     }
 
     @Test
-    public void execCmd() {
+    public void execCmd() throws ParseException, NodeException {
         //----------------------------------------正常用例集--------------------------------------------//
-//        String[] caseArgs1 = new String[]{"group", "create", "-c", "localhost:7050", "-g", "mygroup", "-f",
+//        String[] caseArgs1 = new String[]{"-c", "localhost:7050", "-g", "mygroup", "-f",
 //                "/home/javachain/group1.tx"};
-//        INodeCmd nodeCmd1 = node.execCmd(caseArgs1);
-//        Assert.assertThat(nodeCmd1, Matchers.instanceOf(GroupCreateCmd.class));
+//        groupCreateCmd.execCmd(caseArgs1);
+
+        String[] caseArgs2 = new String[]{"-c", "localhost:7050", "-g", "mygroup"};
+        groupCreateCmd.execCmd(caseArgs2);
 //
 //        String[] caseArgs2 = new String[]{"group", "join", "-b", "/home/javachain/mygroup.block"};
 //        INodeCmd nodeCmd2 = node.execCmd(caseArgs2);
@@ -49,7 +54,6 @@ public class GroupCreateCmdTest {
 
         //----------------------------------------异常用例集--------------------------------------------//
 //        String[] caseArgs11 = null;
-//        INodeCmd nodeCmd11 = node.execCmd(caseArgs11);
-//        Assert.assertNull(nodeCmd11);
+//        groupCreateCmd.execCmd(caseArgs11);
     }
 }
