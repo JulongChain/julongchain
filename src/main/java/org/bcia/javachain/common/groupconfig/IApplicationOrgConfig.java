@@ -17,6 +17,8 @@ package org.bcia.javachain.common.groupconfig;
 
 import org.bcia.javachain.protos.node.Configuration;
 
+import java.util.List;
+
 /**
  * 对象
  *
@@ -26,5 +28,5 @@ import org.bcia.javachain.protos.node.Configuration;
  */
 public interface IApplicationOrgConfig extends IOrganization {
 
-    Configuration.AnchorNode[] getAnchorNodes();
+    List<Configuration.AnchorNode> getAnchorNodes();
 }

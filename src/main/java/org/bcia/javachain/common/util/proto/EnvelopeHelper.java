@@ -22,6 +22,10 @@ import com.google.protobuf.Timestamp;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.groupconfig.ApplicationConfig;
+import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
+import org.bcia.javachain.common.groupconfig.MSPConfigHandler;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.localmsp.impl.LocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -61,7 +65,8 @@ public class EnvelopeHelper {
     }
 
     public static Configtx.ConfigUpdate buildConfigUpdate(String groupId, Configtx.ConfigChild
-            consenterSystemGroupChild, GenesisConfig.Profile profile) throws NodeException {
+            consenterSystemGroupChild, GenesisConfig.Profile profile) throws NodeException,
+            InvalidProtocolBufferException, ValidateException {
         if (profile.getApplication() == null) {
             throw new NodeException("No Application in profile");
         }
@@ -70,7 +75,18 @@ public class EnvelopeHelper {
             throw new NodeException("No Consortium in profile");
         }
 
-        Configtx.ConfigChild configChild = ConfigChildHelper.buildApplicationChild(profile.getApplication());
+        //构造应用子树
+        Configtx.ConfigChild appChild = ConfigChildHelper.buildApplicationChild(profile.getApplication());
+        //得到最终的应用配置
+        ApplicationConfig appConfig = new ApplicationConfig(appChild, new MSPConfigHandler(0));
+
+        if(consenterSystemGroupChild != null){
+            //TODO:要实现吗？
+        }else{
+            Configtx.ConfigChild.Builder groupChildBuilder = Configtx.ConfigChild.newBuilder();
+            groupChildBuilder.putChilds(GroupConfigConstant.APPLICATION, appChild);
+            groupChildBuilder.build();
+        }
 
 
         return null;
