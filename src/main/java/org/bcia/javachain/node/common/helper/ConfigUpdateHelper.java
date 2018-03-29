@@ -51,7 +51,7 @@ public class ConfigUpdateHelper {
         configUpdateBuilder.setReadSet(readChild);
         configUpdateBuilder.setWriteSet(writeChild);
 
-        return null;
+        return configUpdateBuilder.build();
     }
 
     /**
