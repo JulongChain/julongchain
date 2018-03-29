@@ -50,7 +50,7 @@ public class ContractInstallCmd extends AbstractNodeContractCmd {
     //参数：超时时间
     private static final String ARG_TIMEOUT = "t";
     //参数：是否使用TLS传输
-    //private static final String ARG_USE_TLS = "tls";
+    private static final String ARG_USE_TLS = "tls";
     //参数：CA文件位置
     //private static final String ARG_CA = "ca";
 
