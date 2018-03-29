@@ -28,6 +28,7 @@ import org.bcia.javachain.protos.node.SmartcontractShim;
  * @date 2018/3/28
  * @company Dingxuan
  */
+// @Component
 public class SmartContractContainerServiceImpl extends
         SmartContractContainerServiceGrpc
                 .SmartContractContainerServiceImplBase {
