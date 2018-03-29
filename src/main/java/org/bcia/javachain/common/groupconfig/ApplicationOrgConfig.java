@@ -23,7 +23,7 @@ import org.bcia.javachain.protos.node.Configuration;
 import java.util.List;
 
 /**
- * 对象
+ * 应用组织配置对象
  *
  * @author zhouhui
  * @date 2018/3/28

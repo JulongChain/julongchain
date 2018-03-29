@@ -15,6 +15,13 @@
  */
 package org.bcia.javachain.common.exception;
 
+/**
+ * 共识节点异常
+ *
+ * @author zhouhui
+ * @date 2018/3/29
+ * @company Dingxuan
+ */
 public class ConsenterException extends JavaChainException {
     private static final String MODULE_NAME = "[Consenter]";
     public ConsenterException() {

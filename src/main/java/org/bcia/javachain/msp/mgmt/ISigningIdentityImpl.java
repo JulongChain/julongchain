@@ -1,5 +1,5 @@
 /**
- * Copyright Dingxuan. All Rights Reserved.
+ * Copyright DingXuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.node.entity;
+package org.bcia.javachain.msp.mgmt;
 
 import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.ISigningIdentity;
@@ -21,15 +21,14 @@ import org.bcia.javachain.msp.entity.OUIdentifier;
 import org.bcia.javachain.protos.common.MspPrincipal;
 
 /**
- * 类描述
- *
- * @author zhouhui
- * @date 2018/3/13
+ * @author zhangmingyang
+ * @Date: 2018/3/27
  * @company Dingxuan
  */
-public class MockSigningIdentity implements ISigningIdentity {
+public class ISigningIdentityImpl implements ISigningIdentity {
     @Override
     public byte[] sign(byte[] msg) {
+        //通过签名算法进行签名
         return new byte[0];
     }
 

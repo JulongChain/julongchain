@@ -18,9 +18,9 @@ package org.bcia.javachain.common.policies;
 import org.bcia.javachain.protos.common.Policies;
 
 /**
- * 类描述
+ * 策略：任一子策略满足即可
  *
- * @author
+ * @author zhouhui
  * @date 2018/3/8
  * @company Dingxuan
  */

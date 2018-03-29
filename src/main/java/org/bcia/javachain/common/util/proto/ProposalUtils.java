@@ -18,6 +18,7 @@ package org.bcia.javachain.common.util.proto;
 import com.google.protobuf.ByteString;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.csp.factory.CspManager;
 import org.bcia.javachain.csp.gm.GmCspFactory;
 import org.bcia.javachain.csp.intfs.ICsp;
 import org.bcia.javachain.msp.ISigningIdentity;
@@ -125,27 +126,11 @@ public class ProposalUtils {
      * @throws JavaChainException
      */
     public static String computeProposalTxID(byte[] creator, byte[] nonce) throws JavaChainException {
-        long beginTime = System.currentTimeMillis();
-        ICsp csp = new GmCspFactory().getCsp(null);
-
-        long time1 = System.currentTimeMillis();
-        System.out.println("1耗时" + (time1 - beginTime) + "ms");
-
+        //ICsp csp = new GmCspFactory().getCsp(null);
+        ICsp csp = CspManager.getDefaultCsp();
         byte[] bytes1 = ArrayUtils.addAll(creator, nonce);
-
-        long time2 = System.currentTimeMillis();
-        System.out.println("2耗时" + (time2 - time1) + "ms");
-
         byte[] resultBytes = csp.hash(bytes1, null);
-
-        long time3 = System.currentTimeMillis();
-        System.out.println("3耗时" + (time3 - time2) + "ms");
-
         String txId = new String(resultBytes, Charset.forName("UTF-8"));
-
-        long time4 = System.currentTimeMillis();
-        System.out.println("4耗时" + (time4 - time3) + "ms");
-
         return txId;
     }
 }

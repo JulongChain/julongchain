@@ -15,28 +15,31 @@
  */
 package org.bcia.javachain.msp.entity;
 
-
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.jcajce.provider.asymmetric.X509;
-
-import javax.security.cert.X509Certificate;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-
-
 /**
  * @author zhangmingyang
- * @Date: 2018/3/14
+ * @Date: 2018/3/29
  * @company Dingxuan
  */
-public class Identity implements Serializable{
+public class CspConfig {
+    private  String hashType;
+    private  String publicKeyPath;
+    private  String privateKeyPath;
 
-    IdentityIdentifier identityIdentifier;
-    Cert cert;
-    CspKey cspKey;
-    CspMsp cspMsp;
+    public CspConfig(String hashType, String publicKeyPath, String privateKeyPath) {
+        this.hashType = hashType;
+        this.publicKeyPath = publicKeyPath;
+        this.privateKeyPath = privateKeyPath;
+    }
 
+    public String getHashType() {
+        return hashType;
+    }
+
+    public String getPublicKeyPath() {
+        return publicKeyPath;
+    }
+
+    public String getPrivateKeyPath() {
+        return privateKeyPath;
+    }
 }

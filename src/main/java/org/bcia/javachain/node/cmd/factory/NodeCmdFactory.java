@@ -18,8 +18,10 @@ package org.bcia.javachain.node.cmd.factory;
 import org.bcia.javachain.node.cmd.INodeCmd;
 import org.bcia.javachain.node.cmd.group.GroupCreateCmd;
 import org.bcia.javachain.node.cmd.group.GroupJoinCmd;
+import org.bcia.javachain.node.cmd.group.GroupUpdateCmd;
 import org.bcia.javachain.node.cmd.sc.ContractInstallCmd;
 import org.bcia.javachain.node.cmd.sc.ContractInstanceCmd;
+import org.bcia.javachain.node.cmd.sc.ContractInvokeCmd;
 import org.bcia.javachain.node.cmd.server.ServerStartCmd;
 import org.bcia.javachain.node.cmd.server.ServerStatusCmd;
 import org.bcia.javachain.node.cmd.util.NodeCmdConstant;
@@ -46,12 +48,16 @@ public class NodeCmdFactory {
                 return new GroupCreateCmd();
             } else if (NodeCmdConstant.JOIN_GROUP.equalsIgnoreCase(subCommand)) {
                 return new GroupJoinCmd();
+            }else if(NodeCmdConstant.UPDATE_GROUP.equalsIgnoreCase(subCommand)) {
+                return new GroupUpdateCmd();
             }
         } else if (NodeConstant.SMART_CONTRACT.equalsIgnoreCase(command)) {
             if (NodeCmdConstant.INSTALL_CONTRACT.equalsIgnoreCase(subCommand)) {
                 return new ContractInstallCmd();
             } else if (NodeCmdConstant.INSTANCE_CONTRACT.equalsIgnoreCase(subCommand)) {
                 return new ContractInstanceCmd();
+            }else if (NodeCmdConstant.INVOKE_CONTRACT.equalsIgnoreCase(subCommand)) {
+                return new ContractInvokeCmd();
             }
         } else if (NodeConstant.VERSION.equalsIgnoreCase(command)) {
             return new VersionCmd();

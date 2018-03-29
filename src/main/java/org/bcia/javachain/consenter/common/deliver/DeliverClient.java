@@ -23,11 +23,7 @@ import static org.bcia.javachain.protos.consenter.AtomicBroadcastGrpc.*;
  */
 @Component
 public class DeliverClient {
-    public static void main(String[] args) throws Exception {
-        String ip="localhost";
-        String message="aba";
-        int port=7050;
-
+    public  void send(String ip,int port,String mess) {
         System.out.println("begin");
 
         ManagedChannel managedChannel= ManagedChannelBuilder.forAddress(ip,port).usePlaintext(true).build();
@@ -63,7 +59,11 @@ public class DeliverClient {
         envelopeStreamObserver.onNext(Common.Envelope.newBuilder().setPayload(payload.toByteString()).build());
 
 
-        Thread.sleep(1000);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
     }
 }

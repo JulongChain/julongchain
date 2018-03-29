@@ -29,13 +29,16 @@ public class GmFactoryOpts implements IGmFactoryOpts {
     private boolean bEphemeral;
     private boolean bDummyKeyStore;
     private String keyStorePath;
+    private boolean bDefaultCsp;
 
-    public GmFactoryOpts(int secLevel,String hashFamily,boolean bEphemeral,boolean bDummyKeyStore,String keyStorePath){
+    public GmFactoryOpts(int secLevel,String hashFamily,boolean bEphemeral,
+                         boolean bDummyKeyStore,String keyStorePath,boolean bDefaultCsp){
         this.secLevel=secLevel;
         this.hashFamily=hashFamily;
         this.bEphemeral=bEphemeral;
         this.bDummyKeyStore=bDummyKeyStore;
         this.keyStorePath=keyStorePath;
+        this.bDefaultCsp=bDefaultCsp;
     }
 
     @Override
@@ -71,5 +74,10 @@ public class GmFactoryOpts implements IGmFactoryOpts {
     @Override
     public String getProviderDescription() {
         return null;
+    }
+
+    @Override
+    public boolean isDefaultCsp() {
+        return bDefaultCsp;
     }
 }

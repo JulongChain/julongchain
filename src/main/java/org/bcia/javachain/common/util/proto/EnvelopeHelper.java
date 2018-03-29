@@ -32,10 +32,12 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.FileUtils;
 import org.bcia.javachain.node.common.helper.ConfigChildHelper;
+import org.bcia.javachain.node.common.helper.ConfigUpdateHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
+import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
 
 import java.io.IOException;
 import java.util.Map;
@@ -50,9 +52,19 @@ import java.util.Map;
 public class EnvelopeHelper {
     private static JavaChainLog log = JavaChainLogFactory.getLog(EnvelopeHelper.class);
 
-    public static Common.Envelope makeGroupCreateTx(String groupId, LocalSigner signer, Configtx.ConfigChild
-            consenterSystemGroupChild, GenesisConfig.Profile profile) {
-        return null;
+    public static Common.Envelope makeGroupCreateTx(String groupId, ILocalSigner signer, Configtx.ConfigChild
+            consenterSystemGroupChild, GenesisConfig.Profile profile) throws InvalidProtocolBufferException,
+            NodeException, ValidateException {
+        Configtx.ConfigUpdate configUpdate = buildConfigUpdate(groupId, consenterSystemGroupChild, profile);
+
+        Configtx.ConfigUpdateEnvelope.Builder envelopeBuilder = Configtx.ConfigUpdateEnvelope.newBuilder();
+        envelopeBuilder.setConfigUpdate(configUpdate.toByteString());
+        Configtx.ConfigUpdateEnvelope envelope = envelopeBuilder.build();
+
+        Configtx.ConfigUpdateEnvelope configUpdateEnvelope = signConfigUpdateEnvelope(envelope, signer);
+
+        return buildSignedEnvelope(Common.HeaderType.CONFIG_UPDATE_VALUE, 0, groupId, signer, configUpdateEnvelope,
+                0);
 
     }
 
@@ -80,16 +92,27 @@ public class EnvelopeHelper {
         //得到最终的应用配置
         ApplicationConfig appConfig = new ApplicationConfig(appChild, new MSPConfigHandler(0));
 
-        if(consenterSystemGroupChild != null){
+        if (consenterSystemGroupChild != null) {
             //TODO:要实现吗？
-        }else{
-            Configtx.ConfigChild.Builder groupChildBuilder = Configtx.ConfigChild.newBuilder();
-            groupChildBuilder.putChilds(GroupConfigConstant.APPLICATION, appChild);
-            groupChildBuilder.build();
+        } else {
+
         }
 
+        Configtx.ConfigChild originalChild = Configtx.ConfigChild.newBuilder().build();
 
-        return null;
+        Configtx.ConfigChild.Builder groupChildBuilder = Configtx.ConfigChild.newBuilder();
+        groupChildBuilder.putChilds(GroupConfigConstant.APPLICATION, appChild);
+        Configtx.ConfigChild pendingChild = groupChildBuilder.build();
+
+        Configtx.Config original = Configtx.Config.newBuilder().setGroupChild(originalChild).build();
+        Configtx.Config pending = Configtx.Config.newBuilder().setGroupChild(pendingChild).build();
+        Configtx.ConfigUpdate configUpdate = ConfigUpdateHelper.compute(original, pending);
+
+        //TODO:
+//        if(appConfig.getCapabilities().)
+
+
+        return configUpdate;
     }
 
     /**

@@ -15,17 +15,19 @@
  */
 package org.bcia.javachain.node.cmd.sc;
 
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.*;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.CommConstant;
 import org.springframework.stereotype.Component;
 
 /**
  * 完成节点安装智能合约的解析
- * node contract install -n mycc -v 1.0 -p /home/javachian/contract_file
+ * node contract install -n mycc -l java -ctor '{"Args":["query","a"]}' -v 1.0 -p /home/javachian/contract_file
+ * 名称 语言 执行信息 版本 路径
  *
- * @author zhouhui
+ * @author zhouhui wanglei
  * @date 2018/2/24
  * @company Dingxuan
  */
@@ -33,11 +35,77 @@ import org.springframework.stereotype.Component;
 public class ContractInstallCmd extends AbstractNodeContractCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ContractInstallCmd.class);
 
+    //参数：smart Contract name
+    private static final String ARG_SC_NAME = "n";
+    //参数：language
+    private static final String ARG_LANGUAGE = "l";
+    //参数：version
+    private static final String ARG_VERSION = "v";
+    //参数：smartContract parameter
+    private static final String ARG_SC_CTOR = "ctor";
+    //参数：path
+    private static final String ARG_PATH = "p";
+
+
+    //参数：超时时间
+    private static final String ARG_TIMEOUT = "t";
+    //参数：是否使用TLS传输
+    private static final String ARG_USE_TLS = "tls";
+    //参数：CA文件位置
+    //private static final String ARG_CA = "ca";
+
     @Override
     public void execCmd(String[] args) throws ParseException, NodeException {
 
+        Options options = new Options();
+        options.addOption(ARG_SC_NAME, true, "Input contract name");
+        options.addOption(ARG_LANGUAGE, true, "Input contract language");
+        options.addOption(ARG_VERSION, true, "Input contract version");
+        options.addOption(ARG_SC_CTOR, true, "Input contract parameter");
+        options.addOption(ARG_PATH, true, "Input contract path");
+
+        CommandLineParser parser = new DefaultParser();
+        CommandLine cmd = parser.parse(options, args);
+
+        String defaultValue = "UnKown";
+
+        //String consenter = null;
+
+        //-----------------------------------解析参数值-------------------------------//
+        //解析出合约名称
+        String scName = null;
+        if (cmd.hasOption(ARG_SC_NAME)) {
+            scName = cmd.getOptionValue(ARG_SC_NAME, defaultValue);
+            log.info("Smart Contract Name-----$" + scName);
+        }
+        //合约语言
+        String scLanguage = null;
+        if (cmd.hasOption(ARG_LANGUAGE)) {
+            scLanguage = cmd.getOptionValue(ARG_LANGUAGE, defaultValue);
+            log.info("Smart Contract language-----$" + scLanguage);
+        }
+        //合约版本
+        String scVersion = null;
+        if (cmd.hasOption(ARG_VERSION)) {
+            scVersion = cmd.getOptionValue(ARG_VERSION, defaultValue);
+            log.info("Smart Contract version-----$" + scVersion);
+        }
+        //合约具体执行参数
+        String scCtor = null;
+        if (cmd.hasOption(ARG_SC_CTOR)) {
+            scCtor = cmd.getOptionValue(ARG_SC_CTOR, defaultValue);
+            log.info("Smart Contract ctor-----$" + scCtor);
+        }
+        //合约路径
+        String scPath = null;
+        if (cmd.hasOption(ARG_PATH)) {
+            scPath = cmd.getOptionValue(ARG_PATH, defaultValue);
+            log.info("Smart Contract path-----$" + scPath);
+        }
+
+
         //TODO 待完成
-        nodeSmartContract.install();
+        nodeSmartContract.install(CommConstant.LSSC, scCtor, scVersion, scLanguage);
     }
 
 }
