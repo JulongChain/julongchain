@@ -58,36 +58,6 @@ import java.nio.charset.Charset;
 public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeGroup.class);
 
-    public NodeGroup createGroup(String ip, int port, String groupId) {
-//        try {
-//            createGroup(ip, port, groupId, null);
-//        } catch (NodeException e) {
-//            e.printStackTrace();
-//        }
-
-        NodeGroup group = new NodeGroup();
-
-
-        BroadCastClient broadCastClient = new BroadCastClient();
-        try {
-            broadCastClient.send(ip, port, Common.Envelope.newBuilder().build(), this);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-//
-////        Block block = Block.newBuilder().build();
-////
-////
-////
-////        Marshaller<Block> marshaller = ProtoUtils.marshaller(Block.getDefaultInstance());
-////        InputStream is = marshaller.stream(block);
-////        is = new ByteArrayInputStream(ByteStreams.toByteArray(is));
-//
-//
-//        return group;
-        return null;
-    }
-
     public void createGroup(String ip, int port, String groupId, String groupFile) throws NodeException {
         Common.Envelope envelope = null;
 

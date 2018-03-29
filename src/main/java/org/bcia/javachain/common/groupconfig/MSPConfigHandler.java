@@ -20,9 +20,12 @@ import org.bcia.javachain.msp.IMsp;
 import org.bcia.javachain.msp.IMspFactory;
 import org.bcia.javachain.msp.IMspManager;
 import org.bcia.javachain.msp.IMspOpts;
+import org.bcia.javachain.msp.gmsoft.GmSoftMsp;
+import org.bcia.javachain.msp.mgmt.Mgmt;
 import org.bcia.javachain.msp.mgmt.MspmgrImpl;
 import org.bcia.javachain.protos.msp.MspConfigPackage;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -65,14 +68,18 @@ public class MSPConfigHandler {
 
     public MSPConfigHandler(int mspVersion) {
         this.mspVersion = mspVersion;
+
+        idMap = new HashMap<String, PendingMSPConfig>();
     }
 
     public IMsp proposeMSP(MspConfigPackage.MSPConfig mspConfig) {
 //        if (mspConfig.getType() == MspType.CSP.ordinal()) {
-        IMspFactory factory = new MockMspFactory();
-        IMspOpts opts = new MockMspOpts();
+//        IMspFactory factory = new MockMspFactory();
+//        IMspOpts opts = new MockMspOpts();
+//
+//        IMsp msp = factory.getMsp(opts);
 
-        IMsp msp = factory.getMsp(opts);
+        IMsp msp = new Mgmt().getLocalMsp();
 
         msp.setup(mspConfig);
         String mspId = msp.getIdentifier();
