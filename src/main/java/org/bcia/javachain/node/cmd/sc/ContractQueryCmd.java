@@ -15,17 +15,12 @@
  */
 package org.bcia.javachain.node.cmd.sc;
 
-import io.grpc.MethodDescriptor;
-import io.grpc.protobuf.ProtoUtils;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.springframework.stereotype.Component;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 完成节点查询智能合约的解析
@@ -67,13 +62,13 @@ public class ContractQueryCmd extends AbstractNodeContractCmd {
         }
 
         //解析出智能合约名称
-        String smartContractName = null;
+        String scName = null;
         if (cmd.hasOption(ARG_SC_NAME)) {
-            smartContractName = cmd.getOptionValue(ARG_SC_NAME, defaultValue);
-            log.info("Smart contract id-----$" + smartContractName);
+            scName = cmd.getOptionValue(ARG_SC_NAME, defaultValue);
+            log.info("Smart contract id-----$" + scName);
         }
 
-        //解析出智能合约名称
+        //解析出智能合约执行参数
         String ctor = null;
         if (cmd.hasOption(ARG_CTOR)) {
             ctor = cmd.getOptionValue(ARG_CTOR, defaultValue);
@@ -86,7 +81,7 @@ public class ContractQueryCmd extends AbstractNodeContractCmd {
             return;
         }
 
-        if (StringUtils.isBlank(smartContractName)) {
+        if (StringUtils.isBlank(scName)) {
             log.error("smartContractName should not be null, Please input it");
             return;
         }
@@ -124,7 +119,7 @@ public class ContractQueryCmd extends AbstractNodeContractCmd {
 
         }
 
-        nodeSmartContract.query(groupId, smartContractName, ctor);
+        nodeSmartContract.query(groupId, scName, ctor);
     }
 
 }

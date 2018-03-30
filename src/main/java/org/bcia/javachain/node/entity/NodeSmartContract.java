@@ -29,6 +29,7 @@ import org.bcia.javachain.core.endorser.Endorser;
 import org.bcia.javachain.core.ssc.cssc.CSSC;
 import org.bcia.javachain.core.ssc.lssc.LSSC;
 import org.bcia.javachain.msp.ISigningIdentity;
+import org.bcia.javachain.msp.mgmt.Mgmt;
 import org.bcia.javachain.node.common.client.EndorserClient;
 import org.bcia.javachain.node.common.helper.SpecHelper;
 import org.bcia.javachain.protos.common.Common;
@@ -82,7 +83,11 @@ public class NodeSmartContract {
             log.info("Query Result: " + proposalResponse.getPayload().toString(Charset.forName(CommConstant.DEFAULT_CHARSET)));
     }
 
-    public void instantiate() {
+    public void instantiate(String scName, String scVersion, String ctor) {
+        Smartcontract.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName, scVersion,
+                ctor.getBytes());
+
+        ISigningIdentity identity = new Mgmt().getLocalMsp().getDefaultSigningIdentity();
 
     }
 

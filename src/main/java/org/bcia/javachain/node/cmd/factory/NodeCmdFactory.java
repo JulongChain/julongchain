@@ -20,7 +20,7 @@ import org.bcia.javachain.node.cmd.group.GroupCreateCmd;
 import org.bcia.javachain.node.cmd.group.GroupJoinCmd;
 import org.bcia.javachain.node.cmd.group.GroupUpdateCmd;
 import org.bcia.javachain.node.cmd.sc.ContractInstallCmd;
-import org.bcia.javachain.node.cmd.sc.ContractInstanceCmd;
+import org.bcia.javachain.node.cmd.sc.ContractInstantiateCmd;
 import org.bcia.javachain.node.cmd.sc.ContractInvokeCmd;
 import org.bcia.javachain.node.cmd.server.ServerStartCmd;
 import org.bcia.javachain.node.cmd.server.ServerStatusCmd;
@@ -55,7 +55,7 @@ public class NodeCmdFactory {
             if (NodeCmdConstant.INSTALL_CONTRACT.equalsIgnoreCase(subCommand)) {
                 return new ContractInstallCmd();
             } else if (NodeCmdConstant.INSTANCE_CONTRACT.equalsIgnoreCase(subCommand)) {
-                return new ContractInstanceCmd();
+                return new ContractInstantiateCmd();
             }else if (NodeCmdConstant.INVOKE_CONTRACT.equalsIgnoreCase(subCommand)) {
                 return new ContractInvokeCmd();
             }
