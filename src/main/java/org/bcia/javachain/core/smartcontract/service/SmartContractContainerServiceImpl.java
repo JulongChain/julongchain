@@ -16,8 +16,12 @@
 package org.bcia.javachain.core.smartcontract.service;
 
 import io.grpc.stub.StreamObserver;
+import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.CommConstant;
+import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractStub;
+import org.bcia.javachain.core.ssc.essc.ESSC;
 import org.bcia.javachain.protos.node.SmartContractContainerServiceGrpc;
 import org.bcia.javachain.protos.node.SmartcontractShim;
 
@@ -28,7 +32,6 @@ import org.bcia.javachain.protos.node.SmartcontractShim;
  * @date 2018/3/28
  * @company Dingxuan
  */
-// @Component
 public class SmartContractContainerServiceImpl extends
         SmartContractContainerServiceGrpc
                 .SmartContractContainerServiceImplBase {
@@ -41,6 +44,22 @@ public class SmartContractContainerServiceImpl extends
                        StreamObserver<SmartcontractShim.SmartContractMessage>
                                responseObserver) {
         log.info("start invoke.");
+
+        //根据传入参数中的链码名称执行相应的程序
+        String smartContractId = request.getSmartcontractEvent()
+                .getSmartContractId();
+
+        //用户链码
+        String mysc = "mysc001";
+
+        if (StringUtils.equals(smartContractId, CommConstant.ESSC)) {
+            //系统链码ESCC
+            SmartContractStub smartContractStub = new SmartContractStub
+                    (null, null, null, null, null);
+            new ESSC().invoke(smartContractStub);
+        } else if (StringUtils.equals(smartContractId, mysc)) {
+            //用户链码
+        }
 
         SmartcontractShim.SmartContractMessage response = SmartcontractShim
                 .SmartContractMessage.newBuilder().setType

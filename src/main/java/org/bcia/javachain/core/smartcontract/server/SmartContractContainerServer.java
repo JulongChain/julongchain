@@ -19,7 +19,8 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.smartcontract.service.SmartContractContainerServiceImpl;
+import org.bcia.javachain.core.smartcontract.service
+        .SmartContractContainerServiceImpl;
 
 import java.io.IOException;
 
@@ -30,19 +31,19 @@ import java.io.IOException;
  * @date 2018/3/28
  * @company Dingxuan
  */
-// @Component
 public class SmartContractContainerServer {
 
     private static final JavaChainLog log = JavaChainLogFactory.getLog
             (SmartContractContainerServer.class);
 
     private Server server;
-    private Integer port = 50053;
+    private Integer port;
 
-    public SmartContractContainerServer() {
+    public SmartContractContainerServer(Integer port) {
+        this.port = port;
         try {
             this.start();
-            log.info("server start success.");
+            log.info("server start success. port[" + port + "]");
             this.blockUntilShutdown();
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -73,10 +74,6 @@ public class SmartContractContainerServer {
         if (server != null) {
             server.awaitTermination();
         }
-    }
-
-    public static void main(String[] args) {
-        new SmartContractContainerServer();
     }
 
 }

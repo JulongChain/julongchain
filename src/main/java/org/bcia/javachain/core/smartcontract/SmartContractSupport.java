@@ -116,7 +116,7 @@ public class SmartContractSupport {
     /**
      * NewChaincodeSupport creates a new ChaincodeSupport instance
      *
-     * @param func
+     * @param
      * @return
      */
     public SmartContractSupport newChaincodeSupport(Boolean userrunsCC, Duration ccstartuptimeout) {
@@ -138,6 +138,12 @@ public class SmartContractSupport {
         //TODO:add by zhouhui for test,返回一个空对象，实际处理待万良兵补充
         log.info("call SmartContractSupport launch");
 
+        if (spec instanceof Smartcontract.SmartContractInvocationSpec) {
+            Smartcontract.SmartContractInvocationSpec invocationSpec =
+                    (Smartcontract.SmartContractInvocationSpec) spec;
+            return invocationSpec.getSmartContractSpec().getInput();
+        }
+
         return Smartcontract.SmartContractInput.newBuilder().build();
     }
 
@@ -149,11 +155,14 @@ public class SmartContractSupport {
         //TODO:add by zhouhui for test,返回一个空对象，实际处理待万良兵补充
         log.info("call SmartContractSupport execute");
 
-        SmartContractContainerClient client = new
-                SmartContractContainerClient("localhost", 50053);
+        String smartContractId = scContext.getName();
 
-        SmartcontractShim.SmartContractMessage result = client.invoke
-                (scContext, scMessage, timeout);
+        SmartContractContainerClient smartContractContainerClient = new
+                SmartContractContainerClient(smartContractId);
+
+        SmartcontractShim.SmartContractMessage result =
+                smartContractContainerClient.invoke(scContext, scMessage,
+                        timeout);
 
         return result;
     }

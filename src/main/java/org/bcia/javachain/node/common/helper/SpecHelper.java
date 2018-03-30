@@ -75,10 +75,10 @@ public class SpecHelper {
         Smartcontract.SmartContractSpec spec = specBuilder.build();
 
         //构造SmartContractInvocationSpec对象
-        Smartcontract.SmartContractInvocationSpec.Builder invocationSpec = Smartcontract.SmartContractInvocationSpec
+        Smartcontract.SmartContractInvocationSpec.Builder invocationSpecBuilder = Smartcontract.SmartContractInvocationSpec
                 .newBuilder();
-        invocationSpec.setSmartContractSpec(spec);
-        return invocationSpec.build();
+        invocationSpecBuilder.setSmartContractSpec(spec);
+        return invocationSpecBuilder.build();
     }
 
 

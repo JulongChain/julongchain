@@ -19,11 +19,17 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.core.common.smartcontractprovider
         .SmartContractContext;
+import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.SmartContractContainerServiceGrpc;
+import org.bcia.javachain.protos.node.SmartContractEventPackage;
 import org.bcia.javachain.protos.node.SmartcontractShim;
+import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -33,6 +39,7 @@ import java.util.concurrent.TimeUnit;
  * @date 2018/3/28
  * @company Dingxuan
  */
+@Component
 public class SmartContractContainerClient {
 
     private static final JavaChainLog log = JavaChainLogFactory.getLog
@@ -42,6 +49,20 @@ public class SmartContractContainerClient {
 
     private final SmartContractContainerServiceGrpc
             .SmartContractContainerServiceBlockingStub blockingStub;
+
+    private String smartContractId;
+
+    private static Map<String, Integer> smartContractIdAndPortMap = new
+            HashMap<String, Integer>();
+
+    static {
+        smartContractIdAndPortMap.put(CommConstant.ESSC, 50053);
+        smartContractIdAndPortMap.put("mysc001", 50054);
+    }
+
+    public SmartContractContainerClient(String smartContractId) {
+        this("localhost", smartContractIdAndPortMap.get(smartContractId));
+    }
 
     public SmartContractContainerClient(String host, Integer port) {
         ManagedChannelBuilder<?> channelBuilder = ManagedChannelBuilder
@@ -59,10 +80,28 @@ public class SmartContractContainerClient {
                                                                  smartContractContext,
                                                          SmartcontractShim
                                                                  .SmartContractMessage smartContractMessage, long timeout) {
+
+        ProposalPackage.Proposal proposal = smartContractContext.getProposal();
+        String smartContractId = smartContractContext.getChainID();
+        String txID = smartContractContext.getTxID();
+        ProposalPackage.SignedProposal signedProposal = smartContractContext
+                .getSignedProposal();
+
+        SmartContractEventPackage.SmartContractEvent smartContractEvent =
+                SmartContractEventPackage.SmartContractEvent.newBuilder()
+                        .setSmartContractId(smartContractId).setTxId(txID)
+                        .build();
+
+        SmartcontractShim.SmartContractMessage request =
+                SmartcontractShim.SmartContractMessage.newBuilder()
+                        .setSmartcontractEvent(smartContractEvent).setType
+                        (SmartcontractShim.SmartContractMessage.Type
+                                .INVOKE_CHAINCODE).setProposal(signedProposal)
+                        .build();
+
         SmartcontractShim.SmartContractMessage result = null;
         try {
-            result = blockingStub
-                    .invoke(smartContractMessage);
+            result = blockingStub.invoke(request);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
