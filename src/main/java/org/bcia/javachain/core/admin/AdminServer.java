@@ -17,6 +17,8 @@ package org.bcia.javachain.core.admin;
 
 import org.bcia.javachain.protos.node.AdminPackage;
 
+import static org.bcia.javachain.protos.node.AdminPackage.ServerStatus.StatusCode.STARTED;
+
 /**
  * 管理服务
  *
@@ -27,7 +29,7 @@ import org.bcia.javachain.protos.node.AdminPackage;
 public class AdminServer implements IAdminServer {
     @Override
     public AdminPackage.ServerStatus getStatus() {
-        return null;
+        return AdminPackage.ServerStatus.newBuilder().setStatus(STARTED).build();
     }
 
     @Override

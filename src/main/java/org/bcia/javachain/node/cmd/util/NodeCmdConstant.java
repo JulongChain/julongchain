@@ -54,7 +54,7 @@ public class NodeCmdConstant {
     /**
      * 实例化智能合约
      */
-    public static final String INSTANCE_CONTRACT = "instance";
+    public static final String INSTANCE_CONTRACT = "instantiate";
     /**
      * 调用智能合约
      */

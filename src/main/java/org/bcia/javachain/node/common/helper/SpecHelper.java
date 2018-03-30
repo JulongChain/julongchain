@@ -53,9 +53,9 @@ public class SpecHelper {
     }
 
     /**
-     * 构造针对scName的执行规格
+     * 构造针对scName的执调用规格
      *
-     * @param scName 要执行的智能合约名称
+     * @param scName 要调用的智能合约名称
      * @param args   参数集合，由操作和参数列表组成
      * @return
      */
@@ -79,6 +79,36 @@ public class SpecHelper {
                 .newBuilder();
         invocationSpecBuilder.setSmartContractSpec(spec);
         return invocationSpecBuilder.build();
+    }
+
+    /**
+     * 构造针对scName的部署规格
+     *
+     * @param scName 要部署的智能合约名称
+     * @param args   参数集合，由操作和参数列表组成
+     * @return
+     */
+    public static Smartcontract.SmartContractDeploymentSpec buildDeploymentSpec(String scName, String scVersion,
+                                                                                byte[]... args) {
+        //构造SmartContractInput对象
+        Smartcontract.SmartContractInput.Builder inputBuilder = Smartcontract.SmartContractInput.newBuilder();
+        for (byte[] bytes : args) {
+            inputBuilder.addArgs(ByteString.copyFrom(bytes));
+        }
+        Smartcontract.SmartContractInput input = inputBuilder.build();
+
+        //构造SmartContractSpec对象
+        Smartcontract.SmartContractSpec.Builder specBuilder = Smartcontract.SmartContractSpec.newBuilder();
+        specBuilder.setType(Smartcontract.SmartContractSpec.Type.JAVA);
+        specBuilder.setSmartContractId(Smartcontract.SmartContractID.newBuilder().setName(scName).setVersion(scVersion));
+        specBuilder.setInput(input);
+        Smartcontract.SmartContractSpec spec = specBuilder.build();
+
+        //构造SmartContractDeploymentSpec对象
+        Smartcontract.SmartContractDeploymentSpec.Builder deploymentSpec = Smartcontract.SmartContractDeploymentSpec
+                .newBuilder();
+        deploymentSpec.setSmartContractSpec(spec);
+        return deploymentSpec.build();
     }
 
 

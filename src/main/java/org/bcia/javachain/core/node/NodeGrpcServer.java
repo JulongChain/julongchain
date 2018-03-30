@@ -237,6 +237,12 @@ public class NodeGrpcServer {
         @Override
         public void getStatus(Empty request, StreamObserver<AdminPackage.ServerStatus>
                 responseObserver) {
+
+            if (adminServer != null) {
+                responseObserver.onNext(adminServer.getStatus());
+            }
+            log.error("adminServer is not ready, but client sent some message");
+            responseObserver.onError(new NodeException("adminServer is not ready"));
         }
 
         @Override
