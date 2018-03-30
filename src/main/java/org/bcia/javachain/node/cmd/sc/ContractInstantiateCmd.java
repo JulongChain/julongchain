@@ -18,23 +18,21 @@ package org.bcia.javachain.node.cmd.sc;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 完成节点实例化智能合约的解析
  * node contract instantiate -c localhost:7050 -g $group_id -n mycc -v 1.0
- * -ctor "{'Args':['init','a','100','b','200']}" -P "OR	('Org1MSP.member','Org2MSP.member')"
+ * -ctor "{'args':['init','a','100','b','200']}" -P "OR	('Org1MSP.member','Org2MSP.member')"
  *
  * @author zhouhui
  * @date 2018/2/24
@@ -56,6 +54,8 @@ public class ContractInstantiateCmd extends AbstractNodeContractCmd {
     private static final String ARG_CTOR = "ctor";
     //参数：背书策略
     private static final String ARG_POLICY = "P";
+    //参数
+    private static final String KEY_ARGS = "args";
 
     @Override
     public void execCmd(String[] args) throws ParseException, NodeException {
@@ -97,38 +97,28 @@ public class ContractInstantiateCmd extends AbstractNodeContractCmd {
             log.info("scVersion-----$" + scVersion);
         }
 
-        String ctor = null;
+        Smartcontract.SmartContractInput input = null;
         if (cmd.hasOption(ARG_CTOR)) {
-            ctor = cmd.getOptionValue(ARG_CTOR, defaultValue);
+            String ctor = cmd.getOptionValue(ARG_CTOR, defaultValue);
             log.info("ctor-----$" + ctor);
-
-//            try {
-            List<byte[]> bytesList = new ArrayList<byte[]>();
+            JSONObject ctorJson = JSONObject.parseObject(ctor);
 
             Smartcontract.SmartContractInput.Builder inputBuilder = Smartcontract.SmartContractInput.newBuilder();
 
-            JSONObject jsonObject = JSONObject.parseObject(ctor);
-            JSONArray argsJSONArray = jsonObject.getJSONArray("Args");
+            JSONArray argsJSONArray = ctorJson.getJSONArray(KEY_ARGS);
             for (int i = 0; i < argsJSONArray.size(); i++) {
-                bytesList.add(argsJSONArray.getString(i).getBytes());
                 inputBuilder.addArgs(ByteString.copyFrom(argsJSONArray.getString(i).getBytes()));
             }
 
-            Smartcontract.SmartContractInput input = inputBuilder.build();
-            for(int i=0;i<input.getArgsCount();i++){
+            input = inputBuilder.build();
+            //打印一下参数，检查是否跟预期一致
+            for (int i = 0; i < input.getArgsCount(); i++) {
                 try {
-                    log.info("input.getArg-----$" + input.getArgs(i).toString("UTF-8"));
+                    log.info("input.getArg-----$" + input.getArgs(i).toString(CommConstant.DEFAULT_CHARSET));
                 } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+                    log.warn(e.getMessage(), e);
                 }
             }
-
-
-//                Smartcontract.SmartContractInput input = Smartcontract.SmartContractInput.parseFrom(ctor.getBytes());
-            log.info("input-----$" + input.getArgsList());
-//            } catch (InvalidProtocolBufferException e) {
-//                e.printStackTrace();
-//            }
         }
 
         String policy = null;
@@ -171,7 +161,7 @@ public class ContractInstantiateCmd extends AbstractNodeContractCmd {
             return;
         }
 
-//        nodeSmartContract.instantiate();
+        nodeSmartContract.instantiate(ipAndPort[0], port, groupId, scName, scVersion, input);
     }
 
 }

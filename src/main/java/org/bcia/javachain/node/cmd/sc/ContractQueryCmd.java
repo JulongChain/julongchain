@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * 完成节点查询智能合约的解析
- * node contract query -g $group_id -n mycc -ctor '{"Args":["query","a"]}'
+ * node contract query -g $group_id -n mycc -ctor "{'Args':['query','a']}"
  *
  * @author zhouhui
  * @date 2018/3/16

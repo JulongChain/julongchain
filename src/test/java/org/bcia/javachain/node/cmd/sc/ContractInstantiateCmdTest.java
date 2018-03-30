@@ -38,7 +38,7 @@ public class ContractInstantiateCmdTest extends BaseJunit4Test {
 
 
         String str = "node contract instantiate -c localhost:7050 -g $group_id -n mycc -v 1.0 -ctor " +
-                "{\"Args\":[\"init\",\"a\",\"100\",\"b\",\"200\"]} -P \"OR	('Org1MSP.member','Org2MSP.member')\"";
+                "{'args':['init','a','100','b','200']} -P \"OR	('Org1MSP.member','Org2MSP.member')\"";
 
         instantiateCmd.execCmd(str.split(" "));
 

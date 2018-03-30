@@ -49,4 +49,14 @@ public class CommConstant {
      * 成员服务提供者类型
      */
     public static final int MSPTYPE_CSP_VALUE = 0;
+
+    /**
+     * 部署
+     */
+    public static final String DEPLOY = "deploy";
+
+    /**
+     * 升级
+     */
+    public static final String UPGRADE = "upgrade";
 }
