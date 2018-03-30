@@ -20,13 +20,11 @@ import io.grpc.ManagedChannelBuilder;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.CommConstant;
-import org.bcia.javachain.core.common.smartcontractprovider
-        .SmartContractContext;
+import org.bcia.javachain.core.common.smartcontractprovider.SmartContractContext;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.SmartContractContainerServiceGrpc;
 import org.bcia.javachain.protos.node.SmartContractEventPackage;
 import org.bcia.javachain.protos.node.SmartcontractShim;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,7 +37,6 @@ import java.util.concurrent.TimeUnit;
  * @date 2018/3/28
  * @company Dingxuan
  */
-@Component
 public class SmartContractContainerClient {
 
     private static final JavaChainLog log = JavaChainLogFactory.getLog

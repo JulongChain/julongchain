@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.core.smartcontract.service;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.stub.StreamObserver;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -23,6 +24,7 @@ import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractStub;
 import org.bcia.javachain.core.ssc.essc.ESSC;
 import org.bcia.javachain.protos.node.SmartContractContainerServiceGrpc;
+import org.bcia.javachain.protos.node.Smartcontract;
 import org.bcia.javachain.protos.node.SmartcontractShim;
 
 /**
@@ -54,9 +56,18 @@ public class SmartContractContainerServiceImpl extends
 
         if (StringUtils.equals(smartContractId, CommConstant.ESSC)) {
             //系统链码ESCC
-            SmartContractStub smartContractStub = new SmartContractStub
-                    (null, null, null, null, null);
-            new ESSC().invoke(smartContractStub);
+
+            try {
+                Smartcontract.SmartContractInput smartContractInput =
+                        Smartcontract.SmartContractInput.parseFrom(request
+                                .getPayload());
+                SmartContractStub smartContractStub = new SmartContractStub
+                        (null, null, null, smartContractInput.getArgsList(), null);
+                new ESSC().invoke(smartContractStub);
+            } catch (InvalidProtocolBufferException e) {
+                log.error(e.getMessage(), e);
+            }
+
         } else if (StringUtils.equals(smartContractId, mysc)) {
             //用户链码
         }
