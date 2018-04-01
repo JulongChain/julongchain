@@ -30,8 +30,8 @@ public class SM2PublicKeyExport extends SM2KeyExport {
     @Override
     public byte[] toBytes() {
         //根据nodeid获取私钥,路径可通过配置文件中读取
-        URL url = SM2PublicKeyExport.class.getClassLoader().getResource("publickey.pem");
-        return sm2.importPublicKey(url.getFile()).getEncoded();
+       // URL url = SM2PublicKeyExport.class.getClassLoader().getResource("publickey.pem");
+        return sm2.importPublicKey("E:/publickey.pem").getEncoded();
     }
 
     @Override

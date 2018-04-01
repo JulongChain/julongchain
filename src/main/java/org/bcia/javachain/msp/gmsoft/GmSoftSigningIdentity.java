@@ -18,7 +18,6 @@ package org.bcia.javachain.msp.gmsoft;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.csp.gm.GmCsp;
 import org.bcia.javachain.csp.gm.sm2.SM2KeyExport;
 import org.bcia.javachain.csp.gm.sm2.SM2SignerOpts;
 import org.bcia.javachain.csp.gm.sm2.Sm2KeyGenOpts;
@@ -45,6 +44,7 @@ public class GmSoftSigningIdentity implements ISigningIdentity {
     @Override
     public byte[] sign(byte[] msg) {
         try {
+            System.out.println("获取配置："+gmSoftConf.getMspId());
             SM2KeyExport sm2KeyExport= (SM2KeyExport) getDefaultCsp().getKey("test", new Sm2KeyGenOpts());
             byte[] signvalue= getDefaultCsp().sign(sm2KeyExport,msg,new SM2SignerOpts());
             log.info("signvalue is ok");
@@ -77,7 +77,7 @@ public class GmSoftSigningIdentity implements ISigningIdentity {
 
     @Override
     public void verify(byte[] msg, byte[] sig) {
-        SM2KeyExport sm2KeyExport= null;
+        SM2KeyExport sm2KeyExport;
         try {
             sm2KeyExport = (SM2KeyExport) getDefaultCsp().getKey("test", new Sm2KeyGenOpts());
             boolean verify= getDefaultCsp().verify(sm2KeyExport,sig,msg,new SM2SignerOpts());

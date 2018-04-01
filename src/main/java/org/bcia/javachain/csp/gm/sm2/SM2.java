@@ -111,8 +111,9 @@ public class SM2 {
      */
     private boolean allZero(byte[] buffer) {
         for (int i = 0; i < buffer.length; i++) {
-            if (buffer[i] != 0)
+            if (buffer[i] != 0) {
                 return false;
+            }
         }
         return true;
     }

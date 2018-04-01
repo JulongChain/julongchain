@@ -15,6 +15,8 @@
  */
 package org.bcia.javachain.msp.entity;
 
+import java.security.spec.ECPoint;
+
 /**
  * @author zhangmingyang
  * @Date: 2018/3/29
@@ -22,6 +24,7 @@ package org.bcia.javachain.msp.entity;
  */
 public class CspConfig {
     private  String hashType;
+    private  String signType;
     private  String publicKeyPath;
     private  String privateKeyPath;
 

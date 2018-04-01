@@ -38,8 +38,8 @@ public class SM2KeyExport implements IKey {
     @Override
     public byte[] toBytes() {
         //根据nodeid获取私钥,路径可通过配置文件中读取
-        URL url = SM2KeyExport.class.getClassLoader().getResource("privatekey.pem");
-        return sm2.importPrivateKey(url.getFile()).toByteArray();
+       // URL url = SM2KeyExport.class.getClassLoader().getResource("privatekey.pem");
+        return sm2.importPrivateKey("E:/privatekey.pem").toByteArray();
     }
 
     @Override

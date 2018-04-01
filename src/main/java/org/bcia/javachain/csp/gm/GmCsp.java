@@ -100,7 +100,6 @@ public class GmCsp implements ICsp {
         SM2KeyPair sm2KeyPair=new SM2KeyPair();
         sm2KeyPair.setPublicKey(byte2ECpoint(sm2KeyExport.getPublicKey().toBytes()));
         sm2KeyPair.setPrivateKey( new BigInteger(sm2KeyExport.toBytes()));
-        System.out.println(digest.toString());
         return sm2.sign(digest,"123",sm2KeyPair);
     }
 
@@ -135,6 +134,16 @@ public class GmCsp implements ICsp {
         return null;
     }
 
+    @Override
+    public void keyFileGen(IKey k, IKeyGenOpts opts) {
+        if(opts instanceof Sm2KeyGenOpts){
+            SM2Key sm2Key= (SM2Key) k;
+            SM2KeyFileGen sm2KeyFileGen=new SM2KeyFileGen(sm2Key);
+            sm2KeyFileGen.privateKeyFileGen();
+            sm2KeyFileGen.publicKeyFileGen();
+        }
+    }
+
 
     private SM3 getSm3(){
         if(sm3==null) {
@@ -145,19 +154,21 @@ public class GmCsp implements ICsp {
 
 public static  void main(String[] args) throws JavaChainException {
     GmCsp gmCsp=new GmCsp();
-//    Sm2KeyGenOpts sm2KeyGenOpts=new Sm2KeyGenOpts();
-//    IKey sm2Key= gmCsp.keyGen(sm2KeyGenOpts);
-//    SM2Key sm2Key1= (SM2Key) sm2Key;
-//    sm2Key.toBytes();
-//    sm2Key1.getPublicKey().toBytes();
     Sm2KeyGenOpts sm2KeyGenOpts=new Sm2KeyGenOpts();
-    IKey sm2Key= gmCsp.getKey("",sm2KeyGenOpts);
-    SM2KeyExport sm2Key1= (SM2KeyExport) sm2Key;
+    IKey sm2Key= gmCsp.keyGen(sm2KeyGenOpts);
+    SM2Key sm2Key1= (SM2Key) sm2Key;
+    sm2Key.toBytes();
     sm2Key1.getPublicKey().toBytes();
-    String abc="123";
 
-   byte[] signValue= gmCsp.sign(sm2Key1,abc.getBytes(),new SM2SignerOpts());
-   boolean verify=gmCsp.verify(sm2Key1,signValue,abc.getBytes(),new SM2SignerOpts());
-   System.out.println("验签结果："+verify);
+    gmCsp.keyFileGen(sm2Key1,sm2KeyGenOpts);
+//    Sm2KeyGenOpts sm2KeyGenOpts=new Sm2KeyGenOpts();
+//    IKey sm2Key= gmCsp.getKey("",sm2KeyGenOpts);
+//    SM2KeyExport sm2Key1= (SM2KeyExport) sm2Key;
+//    sm2Key1.getPublicKey().toBytes();
+//    String abc="123";
+//
+//   byte[] signValue= gmCsp.sign(sm2Key1,abc.getBytes(),new SM2SignerOpts());
+//   boolean verify=gmCsp.verify(sm2Key1,signValue,abc.getBytes(),new SM2SignerOpts());
+//   System.out.println("验签结果："+verify);
 }
 }

@@ -43,8 +43,8 @@ public class GmSoftMsp implements IMsp {
     }
 
     @Override
-    public void load(GmSoftConf gmSoftConf) {
-        new GmSoftMsp(gmSoftConf);
+    public GmSoftMsp load(GmSoftConf gmSoftConf) {
+       return  new GmSoftMsp(gmSoftConf);
     }
 
     @Override

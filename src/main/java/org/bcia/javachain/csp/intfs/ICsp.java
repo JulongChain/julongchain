@@ -79,4 +79,6 @@ public interface ICsp {
      * @throws JavaChainException
      */
     IKey getKey(String nodeId,IKeyGenOpts opts) throws JavaChainException;
+
+    void keyFileGen(IKey k,IKeyGenOpts opts);
 }

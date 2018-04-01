@@ -25,7 +25,7 @@ import org.bouncycastle.math.ec.ECPoint;
  */
 public class SM2Key implements IKey {
     SM2 sm2=new SM2();
-    private static SM2KeyPair sm2KeyPair;
+    private  SM2KeyPair sm2KeyPair;
 
     @Override
     public byte[] toBytes() {

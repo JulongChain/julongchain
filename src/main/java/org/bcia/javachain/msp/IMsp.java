@@ -35,7 +35,7 @@ public interface IMsp extends IIdentityDeserializer{
 
      void setup(MspConfigPackage.MSPConfig config);
 
-     void load(GmSoftConf GmSoftConf);
+     IMsp load(GmSoftConf GmSoftConf);
     /**
      * 返回此msp的版本
      * @return

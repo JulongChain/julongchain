@@ -37,8 +37,8 @@ public class IMspImpl implements IMsp {
     }
 
     @Override
-    public void load(GmSoftConf gmSoftConf) {
-
+    public IMsp load(GmSoftConf gmSoftConf) {
+        return null;
     }
 
     @Override
