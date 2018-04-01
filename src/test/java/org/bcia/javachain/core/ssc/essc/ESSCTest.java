@@ -42,7 +42,7 @@ import static org.junit.Assert.*;
  */
 public class ESSCTest extends BaseJunit4Test {
     @Autowired
-    ESSC essc;
+    private ESSC essc;
     @Mock
     private SmartContractStub stub;
 
@@ -55,8 +55,6 @@ public class ESSCTest extends BaseJunit4Test {
     @Test
     public void invoke() {
         try {
-            //Response successResponse=new Response(Response.Status.SUCCESS,"OK",ByteString.copyFromUtf8("payload").toByteArray());
-            //successResponse.
             ProposalResponsePackage.Response successResponse = ProposalResponsePackage.Response.newBuilder().
                     setStatus(200).setMessage("OK").setPayload(ByteString.copyFromUtf8("payload")).build();
 

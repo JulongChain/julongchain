@@ -55,20 +55,20 @@ public class LSSC  extends SystemSmartContractBase {
     //DEPLOY deploy command
     public final static String DEPLOY="deploy";
     //UPGRADE upgrade smartcontract
-    public final static String UPGRADE = "upgrade";
+    public final static String UPGRADE="upgrade";
     //GET_SC_INFO get smartcontract
-    public final static String GET_SC_INFO = "getid";
+    public final static String GET_SC_INFO="getid";
     //GETCCINFO get smartcontract
-    public final static String GET_DEP_SPEC = "getdepspec";
+    public final static String GET_DEP_SPEC="getdepspec";
     //GET_SC_DATA get SmartcontractData
-    public final static String GET_SC_DATA = "getscdata";
+    public final static String GET_SC_DATA="getscdata";
     //GET_SMART_CONTRACTS gets the instantiated smartcontracts on a group
-    public final static String GET_SMART_CONTRACTS = "getsmartcontracts";
+    public final static String GET_SMART_CONTRACTS="getsmartcontracts";
     //GETINSTALLEDMARTCONTRACTS gets the installed smartcontracts on a node
-    public final static String GET_INSTALLED_SMARTCONTRACTS = "getinstalledsmartcontracts";
+    public final static String GET_INSTALLED_SMARTCONTRACTS="getinstalledsmartcontracts";
 
-    public final static String allowedCharsSmartContractName = "[A-Za-z0-9_-]+";
-    public final static String allowedCharsVersion       = "[A-Za-z0-9_.+-]+";
+    public final static String allowedCharsSmartContractName="[A-Za-z0-9_-]+";
+    public final static String allowedCharsVersion="[A-Za-z0-9_.+-]+";
 
     @Autowired
     private LsscSupport support;
@@ -84,9 +84,14 @@ public class LSSC  extends SystemSmartContractBase {
         return newSuccessResponse();
     }
 
+    // Invoke implements lifecycle functions "deploy", "start", "stop", "upgrade".
+    // Deploy's arguments -  {[]byte("deploy"), []byte(<chainname>), <unmarshalled pb.ChaincodeDeploymentSpec>}
+    //
+    // Invoke also implements some query-like functions
+    // Get chaincode arguments -  {[]byte("getid"), []byte(<chainname>), []byte(<chaincodename>)}
     @Override
     public Response invoke(ISmartContractStub stub) {
-        log.debug("Enter LSCC invoke function");
+        log.debug("Enter LSSC invoke function");
         List<String> args = stub.getStringArgs();
         int size=args.size();
         if(size<1){
@@ -99,6 +104,10 @@ public class LSSC  extends SystemSmartContractBase {
 
         switch(function){
             case INSTALL:
+                if(size<2){
+                    return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
+                }
+                // 2. check local MSP Admins policy
                 ;
             case DEPLOY:
                 ;

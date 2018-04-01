@@ -29,6 +29,7 @@ import org.bcia.javachain.core.endorser.Endorser;
 import org.bcia.javachain.core.ssc.cssc.CSSC;
 import org.bcia.javachain.core.ssc.lssc.LSSC;
 import org.bcia.javachain.msp.ISigningIdentity;
+import org.bcia.javachain.msp.mgmt.Mgmt;
 import org.bcia.javachain.node.common.client.EndorserClient;
 import org.bcia.javachain.node.common.helper.SpecHelper;
 import org.bcia.javachain.protos.common.Common;
@@ -54,41 +55,48 @@ public class NodeSmartContract {
     public void install() {
 
     }
+
     public void install(String scName, String ctor, String scVersion, String scLanguage) throws NodeException {
-            //生成proposal  Type=ENDORSER_TRANSACTION
-            Smartcontract.SmartContractInvocationSpec spec = SpecHelper.buildInvocationSpec(scName, ctor, null);
+        //生成proposal  Type=ENDORSER_TRANSACTION
+        Smartcontract.SmartContractInvocationSpec spec = SpecHelper.buildInvocationSpec(scName, ctor, null);
 
-            ISigningIdentity identity = new MockSigningIdentity();
-            byte[] creator = identity.serialize();
+        ISigningIdentity identity = new MockSigningIdentity();
+        byte[] creator = identity.serialize();
 
-            byte[] nonce = MockCrypto.getRandomNonce();
+        byte[] nonce = MockCrypto.getRandomNonce();
 
-            String txId = null;
-            try {
-                txId = ProposalUtils.computeProposalTxID(creator, nonce);
-            } catch (JavaChainException e) {
-                log.error(e.getMessage(), e);
-                throw new NodeException("Generate txId fail");
-            }
+        String txId = null;
+        try {
+            txId = ProposalUtils.computeProposalTxID(creator, nonce);
+        } catch (JavaChainException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException("Generate txId fail");
+        }
 
-            //生成proposal  Type=ENDORSER_TRANSACTION
-            ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType.ENDORSER_TRANSACTION,
-                    "", txId, spec, nonce, creator, null);
-            ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
+        //生成proposal  Type=ENDORSER_TRANSACTION
+        ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType.ENDORSER_TRANSACTION,
+                "", txId, spec, nonce, creator, null);
+        ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
-            //获取背书节点返回信息
-            EndorserClient client = new EndorserClient( LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
-            ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
-            log.info("Query Result: " + proposalResponse.getPayload().toString(Charset.forName(CommConstant.DEFAULT_CHARSET)));
+        //获取背书节点返回信息
+        EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
+        ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
+        log.info("Query Result: " + proposalResponse.getPayload().toString(Charset.forName(CommConstant.DEFAULT_CHARSET)));
     }
 
-    public void instantiate() {
+    public void instantiate(String ip, int port, String scName, String scVersion, String ctor, Smartcontract
+            .SmartContractInput input) {
+        Smartcontract.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName, scVersion,
+                input);
+
+        ISigningIdentity identity = new Mgmt().getLocalMsp().getDefaultSigningIdentity();
 
     }
 
     public void invoke() {
 
     }
+
     public void invoke(String IP, int port, String groupId, String scName, String ctor, String scLanguage)
             throws NodeException {
         Smartcontract.SmartContractInvocationSpec sciSpec = SpecHelper.buildInvocationSpec(scName, ctor, null);

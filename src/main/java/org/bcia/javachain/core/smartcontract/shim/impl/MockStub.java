@@ -182,7 +182,7 @@ public class MockStub implements ISmartContractStub{
 
     @Override
     public ProposalPackage.SignedProposal getSignedProposal() {
-        return null;
+        return signedProposal;
     }
 
     @Override
@@ -216,6 +216,16 @@ public class MockStub implements ISmartContractStub{
     public Response mockInvoke(String uuid,List<ByteString> args){
         this.args=args;
         mockTransactionStart(uuid);
+        Response response=this.smartContract.invoke(this);
+        mockTransactionEnd(uuid);
+        return response;
+    }
+
+    public Response mockInvokeWithSignedProposal(String uuid, List<ByteString> args,
+                                                 ProposalPackage.SignedProposal proposal){
+        this.args=args;
+        mockTransactionStart(uuid);
+        this.signedProposal=proposal;
         Response response=this.smartContract.invoke(this);
         mockTransactionEnd(uuid);
         return response;

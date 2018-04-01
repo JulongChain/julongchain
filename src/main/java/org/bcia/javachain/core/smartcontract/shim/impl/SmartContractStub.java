@@ -50,7 +50,7 @@ public class SmartContractStub implements ISmartContractStub {
 	private final byte[] binding;
 	private SmartContractEventPackage.SmartContractEvent event;
 
-	SmartContractStub(String groupId, String txId, Handler handler, List<ByteString> args, ProposalPackage.SignedProposal signedProposal) {
+	public SmartContractStub(String groupId, String txId, Handler handler, List<ByteString> args, ProposalPackage.SignedProposal signedProposal) {
 		this.groupId = groupId;
 		this.txId = txId;
 		this.handler = handler;

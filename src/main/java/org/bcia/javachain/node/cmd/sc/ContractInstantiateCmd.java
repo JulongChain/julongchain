@@ -15,25 +15,32 @@
  */
 package org.bcia.javachain.node.cmd.sc;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.google.protobuf.ByteString;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.CommConstant;
+import org.bcia.javachain.protos.node.Smartcontract;
 import org.springframework.stereotype.Component;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * 完成节点实例化智能合约的解析
  * node contract instantiate -c localhost:7050 -g $group_id -n mycc -v 1.0
- * -content '{"Args":["init","a","100","b","200"]}' -P "OR	('Org1MSP.member','Org2MSP.member')"
+ * -ctor "{'args':['init','a','100','b','200']}" -P "OR	('Org1MSP.member','Org2MSP.member')"
  *
  * @author zhouhui
  * @date 2018/2/24
  * @company Dingxuan
  */
 @Component
-public class ContractInstanceCmd extends AbstractNodeContractCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ContractInstanceCmd.class);
+public class ContractInstantiateCmd extends AbstractNodeContractCmd {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(ContractInstantiateCmd.class);
 
     //参数：consenter地址
     private static final String ARG_CONSENTER = "c";
@@ -44,9 +51,11 @@ public class ContractInstanceCmd extends AbstractNodeContractCmd {
     //参数：智能合约的版本
     private static final String ARG_SC_VERSION = "v";
     //参数：内容
-    private static final String ARG_CONTENT = "content";
+    private static final String ARG_CTOR = "ctor";
     //参数：背书策略
-    private static final String ARG_POLICY = "policy";
+    private static final String ARG_POLICY = "P";
+    //参数
+    private static final String KEY_ARGS = "args";
 
     @Override
     public void execCmd(String[] args) throws ParseException, NodeException {
@@ -56,7 +65,7 @@ public class ContractInstanceCmd extends AbstractNodeContractCmd {
         options.addOption(ARG_GROUP_ID, true, "Input group id");
         options.addOption(ARG_SC_NAME, true, "Input smart contract's name");
         options.addOption(ARG_SC_VERSION, true, "Input smart contract's version");
-        options.addOption(ARG_CONTENT, true, "Input content");
+        options.addOption(ARG_CTOR, true, "Input content");
         options.addOption(ARG_POLICY, true, "policy");
 
         CommandLineParser parser = new DefaultParser();
@@ -88,10 +97,28 @@ public class ContractInstanceCmd extends AbstractNodeContractCmd {
             log.info("scVersion-----$" + scVersion);
         }
 
-        String content = null;
-        if (cmd.hasOption(ARG_CONTENT)) {
-            content = cmd.getOptionValue(ARG_CONTENT, defaultValue);
-            log.info("content-----$" + content);
+        Smartcontract.SmartContractInput input = null;
+        if (cmd.hasOption(ARG_CTOR)) {
+            String ctor = cmd.getOptionValue(ARG_CTOR, defaultValue);
+            log.info("ctor-----$" + ctor);
+            JSONObject ctorJson = JSONObject.parseObject(ctor);
+
+            Smartcontract.SmartContractInput.Builder inputBuilder = Smartcontract.SmartContractInput.newBuilder();
+
+            JSONArray argsJSONArray = ctorJson.getJSONArray(KEY_ARGS);
+            for (int i = 0; i < argsJSONArray.size(); i++) {
+                inputBuilder.addArgs(ByteString.copyFrom(argsJSONArray.getString(i).getBytes()));
+            }
+
+            input = inputBuilder.build();
+            //打印一下参数，检查是否跟预期一致
+            for (int i = 0; i < input.getArgsCount(); i++) {
+                try {
+                    log.info("input.getArg-----$" + input.getArgs(i).toString(CommConstant.DEFAULT_CHARSET));
+                } catch (UnsupportedEncodingException e) {
+                    log.warn(e.getMessage(), e);
+                }
+            }
         }
 
         String policy = null;
@@ -120,11 +147,6 @@ public class ContractInstanceCmd extends AbstractNodeContractCmd {
             return;
         }
 
-        if (StringUtils.isBlank(scVersion)) {
-            log.error("Smart contract's version should not be null, Please input it");
-            return;
-        }
-
         String[] ipAndPort = consenter.split(":");
         if (ipAndPort.length <= 1) {
             log.error("Consenter is not valid");
@@ -139,7 +161,7 @@ public class ContractInstanceCmd extends AbstractNodeContractCmd {
             return;
         }
 
-        nodeSmartContract.instantiate();
+        nodeSmartContract.instantiate(ipAndPort[0], port, groupId, scName, scVersion, input);
     }
 
 }

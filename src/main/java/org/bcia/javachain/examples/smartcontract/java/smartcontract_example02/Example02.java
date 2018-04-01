@@ -13,42 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.admin;
+package org.bcia.javachain.examples.smartcontract.java.smartcontract_example02;
 
-import org.bcia.javachain.protos.node.AdminPackage;
-
-import static org.bcia.javachain.protos.node.AdminPackage.ServerStatus.StatusCode.STARTED;
+import org.bcia.javachain.core.smartcontract.shim.impl.Response;
+import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContract;
+import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
 
 /**
- * 管理服务
+ * 类描述
  *
- * @author zhouhui
- * @date 2018/3/21
+ * @author sunianle
+ * @date 3/29/18
  * @company Dingxuan
  */
-public class AdminServer implements IAdminServer {
+public class Example02 implements ISmartContract{
     @Override
-    public AdminPackage.ServerStatus getStatus() {
-        return AdminPackage.ServerStatus.newBuilder().setStatus(STARTED).build();
-    }
-
-    @Override
-    public AdminPackage.ServerStatus startServer() {
+    public Response init(ISmartContractStub stub) {
         return null;
     }
 
     @Override
-    public AdminPackage.LogLevelResponse getModuleLogLevel(AdminPackage.LogLevelRequest request) {
+    public Response invoke(ISmartContractStub stub) {
         return null;
     }
 
     @Override
-    public AdminPackage.LogLevelResponse setModuleLogLevel(AdminPackage.LogLevelRequest request) {
-        return null;
+    public String getSmartContractID() {
+        return "Example02";
     }
 
     @Override
-    public void revertLogLevels() {
-
+    public String getSmartContractStrDescription() {
+        return "An Example";
     }
 }

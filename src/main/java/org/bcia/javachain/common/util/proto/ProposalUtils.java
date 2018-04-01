@@ -100,7 +100,7 @@ public class ProposalUtils {
      * @param transientMap
      * @return
      */
-    public static ProposalPackage.SmartContractProposalPayload buildProposalPayload(Smartcontract.SmartContractInvocationSpec scis, Map<String,
+    public static ProposalPackage.SmartContractProposalPayload buildProposalPayload(Smartcontract.SmartContractInvocationSpec scis,Map<String,
             byte[]> transientMap) {
         //SmartContractProposalPayload构造器
         ProposalPackage.SmartContractProposalPayload.Builder proposalPayloadBuilder = ProposalPackage
@@ -115,6 +115,15 @@ public class ProposalUtils {
         }
 
         return proposalPayloadBuilder.build();
+    }
+
+    public static Smartcontract.SmartContractSpec buildSmartContractSpec(){
+        return null;
+
+    }
+
+    public static Smartcontract.SmartContractInput buildSmartContractInput(){
+        return null;
     }
 
     /**
