@@ -76,7 +76,6 @@ public class Chain implements IChain {
     //调用kafka的客户端，实现kafka生产者
     //enqueue接受信息并返回真或假otheriwse验收
     public void enqueue(Kafka.KafkaMessage kafkaMessage){
-
         String topic = (String)((HashMap)map.get(Constant.COMSUMER)).get(Constant.TOPIC);
         int partitionID = (int)((HashMap)map.get(Constant.COMSUMER)).get(Constant.PARTITION_ID);
         // 获取kafkaInfo，从配置文件获取（现在这里定义，TODO该成全局）
@@ -149,7 +148,7 @@ public class Chain implements IChain {
     //order具体操作
     public void orderHandle(Common.Envelope env, Long configSeq,Long originalOffset) {
         //转换Kafka数据类型
-        Kafka.KafkaMessage kafkaMessage=dataMessageHandle.newNormalMessage(env.toByteString(),configSeq,originalOffset);
+        Kafka.KafkaMessage kafkaMessage=dataMessageHandle.newNormalMessage(env.toByteArray(),configSeq,originalOffset);
         //调用enqueue()方法
         enqueue(kafkaMessage);
 
@@ -157,7 +156,7 @@ public class Chain implements IChain {
     //configure具体操作
     public void configureHandle(Common.Envelope config, long configSeq,Long originalOffset) {
         //转换Kafka数据类型
-        Kafka.KafkaMessage kafkaMessage=dataMessageHandle.newConfigMessage(config.toByteString(),configSeq,originalOffset);
+        Kafka.KafkaMessage kafkaMessage=dataMessageHandle.newConfigMessage(config.toByteArray(),configSeq,originalOffset);
         //调用enqueue()方法
         enqueue(kafkaMessage);
     }
