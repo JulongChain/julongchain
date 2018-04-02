@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.core.ssc.lssc;
 
+import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.common.smartcontractprovider.ISmartContractPackage;
@@ -27,6 +28,7 @@ import org.bcia.javachain.core.policy.PolicyFactory;
 import org.bcia.javachain.core.smartcontract.shim.impl.Response;
 import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
+import org.bcia.javachain.msp.mgmt.Principal;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Smartcontract;
@@ -92,27 +94,40 @@ public class LSSC  extends SystemSmartContractBase {
     @Override
     public Response invoke(ISmartContractStub stub) {
         log.debug("Enter LSSC invoke function");
-        List<String> args = stub.getStringArgs();
+        List<byte[]> args = stub.getArgs();
         int size=args.size();
         if(size<1){
             return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
         }
-        String function=args.get(0);
+        String function= ByteString.copyFrom(args.get(0)).toStringUtf8();
         //Handle ACL:
         //1. get the signed proposal
         ProposalPackage.SignedProposal sp = stub.getSignedProposal();
 
         switch(function){
             case INSTALL:
+                log.debug("Lifecycle Install");
                 if(size<2){
                     return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
                 }
                 // 2. check local MSP Admins policy
-                ;
+                if(checker.checkPolicyNoGroup(Principal.Admins,sp)==false){
+                    return newErrorResponse(String.format("Authorization for INSTALL has been denied (error)"));
+                }
+
+                byte[] depSpec = args.get(1);
+                try {
+                    executeInstall(stub, depSpec);
+                }catch (Exception e){
+                    return newErrorResponse(String.format("Execute install failed, %s",e.getMessage()));
+                }
+                return newSuccessResponse("OK");
             case DEPLOY:
-                ;
+                log.debug("Lifecycle Deploy");
             case UPGRADE:
-                ;
+                log.debug("Lifecycle Deploy/Upgrade");
+
+                return newSuccessResponse("OK");
             case GET_SC_INFO:
                 ;
             case GET_DEP_SPEC:

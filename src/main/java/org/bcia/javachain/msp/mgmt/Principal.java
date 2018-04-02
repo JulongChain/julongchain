@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.policy;
+package org.bcia.javachain.msp.mgmt;
 
-import org.bcia.javachain.protos.node.ProposalPackage; /**
+/**
  * 类描述
  *
  * @author sunianle
- * @date 3/13/18
+ * @date 4/2/18
  * @company Dingxuan
  */
-public interface IPolicyChecker {
-
-    boolean checkPolicyNoGroup(String admins, ProposalPackage.SignedProposal sp);
+public class Principal {
+    public static final String Admins="Admins";
+    public static final String Members="Members";
 }
