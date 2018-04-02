@@ -1,0 +1,75 @@
+/**
+ * Copyright Dingxuan. All Rights Reserved.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.bcia.javachain.core.container.ccintf;
+
+import org.bcia.javachain.protos.node.Smartcontract;
+
+/**
+ * 类描述
+ *
+ * @author wanliangbing
+ * @date 2018/4/2
+ * @company Dingxuan
+ */
+public class CCID {
+
+    private Smartcontract.SmartContractSpec smartContractSpec;
+    private String networkID;
+    private String nodeID;
+    private String chainID;
+    private String version;
+
+    public Smartcontract.SmartContractSpec getSmartContractSpec() {
+        return smartContractSpec;
+    }
+
+    public void setSmartContractSpec(Smartcontract.SmartContractSpec
+                                             smartContractSpec) {
+        this.smartContractSpec = smartContractSpec;
+    }
+
+    public String getNetworkID() {
+        return networkID;
+    }
+
+    public void setNetworkID(String networkID) {
+        this.networkID = networkID;
+    }
+
+    public String getNodeID() {
+        return nodeID;
+    }
+
+    public void setNodeID(String nodeID) {
+        this.nodeID = nodeID;
+    }
+
+    public String getChainID() {
+        return chainID;
+    }
+
+    public void setChainID(String chainID) {
+        this.chainID = chainID;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+}
