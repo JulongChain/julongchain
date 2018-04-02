@@ -87,8 +87,8 @@ public class KafkaProduce {
     //发送消息到kafka服务端
     public void send(ProducerMessage message){
         String key = String.valueOf(message.getKey());
-        String data =message.getValue().toString();
-        producer.send(new KeyedMessage<String, String>(message.getTopic(),key ,data));
+        String dataStr=new String(message.getValue());
+        producer.send(new KeyedMessage<String, String>(message.getTopic(),key ,dataStr));
     }
 
 

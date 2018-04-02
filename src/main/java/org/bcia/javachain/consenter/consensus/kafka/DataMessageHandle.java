@@ -42,11 +42,11 @@ public class DataMessageHandle {
     }
 
     //转换Enqueue（普通）方法所用消息格式
-    public Kafka.KafkaMessage newNormalMessage(ByteString payload, long configSeq, long originalOffset){
+    public Kafka.KafkaMessage newNormalMessage(byte [] payload, long configSeq, long originalOffset){
 
         // 组织KafkaMessageRegular
         Kafka.KafkaMessageRegular.Builder kafkaRegularBuilder=Kafka.KafkaMessageRegular.newBuilder();
-        kafkaRegularBuilder.setPayload(payload);
+        kafkaRegularBuilder.setPayload(ByteString.copyFrom(payload));
         kafkaRegularBuilder.setConfigSeq(configSeq);
         kafkaRegularBuilder.setOriginalOffset(originalOffset);
         kafkaRegularBuilder.setClass_(Kafka.KafkaMessageRegular.Class.NORMAL);
@@ -58,10 +58,10 @@ public class DataMessageHandle {
     }
 
     //转换Enqueue（配置）方法所用消息格式
-    public Kafka.KafkaMessage newConfigMessage(ByteString config, long configSeq, long originalOffset){
+    public Kafka.KafkaMessage newConfigMessage(byte [] config, long configSeq, long originalOffset){
         // 组织KafkaMessageRegular
         Kafka.KafkaMessageRegular.Builder kafkaRegularBuilder=Kafka.KafkaMessageRegular.newBuilder();
-        kafkaRegularBuilder.setPayload(config);
+        kafkaRegularBuilder.setPayload(ByteString.copyFrom(config));
         kafkaRegularBuilder.setConfigSeq(configSeq);
         kafkaRegularBuilder.setOriginalOffset(originalOffset);
         kafkaRegularBuilder.setClass_(Kafka.KafkaMessageRegular.Class.CONFIG);
@@ -83,7 +83,7 @@ public class DataMessageHandle {
     }
 
     //生产者消息转换
-    public ProducerMessage newProducerMessage(KafkaTopicPartitionInfo kafkaInfo,byte[] pld){
+    public ProducerMessage newProducerMessage(KafkaTopicPartitionInfo kafkaInfo,byte [] pld){
         producerMessage.setTopic(kafkaInfo.topic);
         producerMessage.setKey(kafkaInfo.partitionID);
         producerMessage.setValue(pld);
