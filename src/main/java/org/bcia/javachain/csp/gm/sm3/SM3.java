@@ -107,7 +107,7 @@ public class SM3 {
     }
 
     private static byte[] padding(byte[] source) throws IOException {
-        if (source.length >= 0x2000000000000000l) {
+        if (source.length >= 0x2000000000000000L) {
             throw new RuntimeException("src data invalid.");
         }
         long l = source.length * 8;

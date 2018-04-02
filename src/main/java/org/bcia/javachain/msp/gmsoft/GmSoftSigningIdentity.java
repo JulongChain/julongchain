@@ -20,7 +20,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.csp.gm.sm2.SM2KeyExport;
 import org.bcia.javachain.csp.gm.sm2.SM2SignerOpts;
-import org.bcia.javachain.csp.gm.sm2.Sm2KeyGenOpts;
+import org.bcia.javachain.csp.gm.sm2.SM2KeyGenOpts;
 import org.bcia.javachain.csp.gm.sm2.util.SM2KeyUtil;
 import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.ISigningIdentity;
@@ -46,7 +46,7 @@ public class GmSoftSigningIdentity implements ISigningIdentity {
     public byte[] sign(byte[] msg) {
         try {
             log.info("获取配置"+gmSoftConf.getMspId());
-            SM2KeyExport sm2KeyExport= (SM2KeyExport) SM2KeyUtil.getKey(new Sm2KeyGenOpts());
+            SM2KeyExport sm2KeyExport= (SM2KeyExport) SM2KeyUtil.getKey(new SM2KeyGenOpts());
             byte[] signvalue= getDefaultCsp().sign(sm2KeyExport,msg,new SM2SignerOpts());
             log.info("signvalue is ok");
             return signvalue;
@@ -80,7 +80,7 @@ public class GmSoftSigningIdentity implements ISigningIdentity {
     public void verify(byte[] msg, byte[] sig) {
         SM2KeyExport sm2KeyExport;
         try {
-            sm2KeyExport = (SM2KeyExport) SM2KeyUtil.getKey(new Sm2KeyGenOpts());
+            sm2KeyExport = (SM2KeyExport) SM2KeyUtil.getKey(new SM2KeyGenOpts());
 
             boolean verify= getDefaultCsp().verify(sm2KeyExport,sig,msg,new SM2SignerOpts());
             log.info("验证结果："+verify);

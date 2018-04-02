@@ -22,7 +22,7 @@ import org.bcia.javachain.csp.intfs.opts.IKeyGenOpts;
  * @Date: 2018/3/27
  * @company Dingxuan
  */
-public class Sm2KeyGenOpts implements IKeyGenOpts {
+public class SM2KeyGenOpts implements IKeyGenOpts {
     @Override
     public String getAlgorithm() {
         return "SM2";

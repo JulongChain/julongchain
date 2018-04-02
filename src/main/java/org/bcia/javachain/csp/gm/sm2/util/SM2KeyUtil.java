@@ -18,9 +18,15 @@ package org.bcia.javachain.csp.gm.sm2.util;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.csp.gm.sm2.SM2Key;
 import org.bcia.javachain.csp.gm.sm2.SM2KeyExport;
-import org.bcia.javachain.csp.gm.sm2.Sm2KeyGenOpts;
+import org.bcia.javachain.csp.gm.sm2.SM2KeyGenOpts;
 import org.bcia.javachain.csp.intfs.IKey;
 import org.bcia.javachain.csp.intfs.opts.IKeyGenOpts;
+import org.bouncycastle.math.ec.ECPoint;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 
 /**
  * @author zhangmingyang
@@ -36,7 +42,7 @@ public class SM2KeyUtil {
      * @param opts
      */
     public static void keyFileGen(IKey k, String privatePath, String publicKey, IKeyGenOpts opts) {
-        if(opts instanceof Sm2KeyGenOpts){
+        if(opts instanceof SM2KeyGenOpts){
             SM2Key sm2Key= (SM2Key) k;
             SM2KeyFileGen sm2KeyFileGen=new SM2KeyFileGen(sm2Key);
             sm2KeyFileGen.privateKeyFileGen(privatePath);
@@ -51,7 +57,7 @@ public class SM2KeyUtil {
      * @throws JavaChainException
      */
     public static IKey getKey(IKeyGenOpts opts) throws JavaChainException {
-        if(opts instanceof Sm2KeyGenOpts){
+        if(opts instanceof SM2KeyGenOpts){
             return new SM2KeyExport();
         }
         return null;

@@ -24,10 +24,10 @@ import org.bouncycastle.math.ec.ECPoint;
  * @Date: 2018/3/27
  * @company Dingxuan
  */
-public class Sm2PublicKey extends SM2Key {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Sm2PublicKey.class);
+public class SM2PublicKey extends SM2Key {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(SM2PublicKey.class);
     private  ECPoint ecPoint;
-    public Sm2PublicKey(ECPoint ecPoint) {
+    public SM2PublicKey(ECPoint ecPoint) {
         this.ecPoint=ecPoint;
     }
 

@@ -26,20 +26,14 @@ import java.util.HashMap;
  * @company Dingxuan
  */
 public class SM2KeyExport implements IKey {
-    private  String nodeId;
     SM2 sm2=new SM2();
 
     public SM2KeyExport() {
     }
 
-    public SM2KeyExport(String nodeId) {
-     this.nodeId=nodeId;
-    }
-
     @Override
     public byte[] toBytes() {
         //根据nodeid获取私钥,路径可通过配置文件中读取
-       // URL url = SM2KeyExport.class.getClassLoader().getResource("privatekey.pem");
         HashMap map= (HashMap) LoadYaml.readYamlFile("gmcsp.yaml");
         String  privatekey= (String) ((HashMap) ((HashMap)((HashMap)((HashMap) map.get("node")).get("CSP")).get("GM")).get("FileKeyStore")).get("PrivateKeyStore");
         return sm2.importPrivateKey(privatekey).toByteArray();
@@ -47,7 +41,6 @@ public class SM2KeyExport implements IKey {
 
     @Override
     public byte[] ski() {
-
         return new byte[0];
     }
 
@@ -63,6 +56,6 @@ public class SM2KeyExport implements IKey {
 
     @Override
     public IKey getPublicKey() {
-        return new SM2PublicKeyExport(nodeId);
+        return new SM2PublicKeyExport();
     }
 }

@@ -20,7 +20,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.consenter.util.LoadYaml;
 import org.bcia.javachain.csp.gm.sm2.SM2Key;
-import org.bcia.javachain.csp.gm.sm2.Sm2KeyGenOpts;
+import org.bcia.javachain.csp.gm.sm2.SM2KeyGenOpts;
 import org.bcia.javachain.msp.IIdentityDeserializer;
 import org.bcia.javachain.msp.IMsp;
 import org.bcia.javachain.msp.IMspManager;
@@ -68,8 +68,8 @@ private static IMsp loadMsp;
 
         }else {
             try {
-                SM2Key keys= (SM2Key) getDefaultCsp().keyGen(new Sm2KeyGenOpts());
-                keyFileGen(keys,privatekey,publickey,new Sm2KeyGenOpts());
+                SM2Key keys= (SM2Key) getDefaultCsp().keyGen(new SM2KeyGenOpts());
+                keyFileGen(keys,privatekey,publickey,new SM2KeyGenOpts());
             } catch (JavaChainException e) {
                 e.printStackTrace();
             }

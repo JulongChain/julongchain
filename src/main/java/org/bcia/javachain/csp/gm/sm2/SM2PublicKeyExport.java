@@ -26,8 +26,7 @@ import java.util.HashMap;
  * @company Dingxuan
  */
 public class SM2PublicKeyExport extends SM2KeyExport {
-    public SM2PublicKeyExport(String nodeId) {
-        super(nodeId);
+    public SM2PublicKeyExport() {
     }
 
     @Override
