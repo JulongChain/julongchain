@@ -39,10 +39,9 @@ public class KafkaProduce {
     private final Producer<String, String> producer;
    // public final static String TOPIC = "test2";
 
-    @Autowired
-    private LoadYaml loadYaml=new LoadYaml();
 
-    Map map=(HashMap)loadYaml.readYamlFile(Constant.ORDERER_CONFIG).get(Constant.KAFKA);
+
+    Map map=(HashMap)LoadYaml.readYamlFile(Constant.ORDERER_CONFIG).get(Constant.KAFKA);
 
 
 
