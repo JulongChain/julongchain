@@ -71,14 +71,14 @@ public interface ICsp {
     // The rng provides a random number within a specified length, according to the opts whose type is IRngOpts.
     byte[] rng(int len, IRngOpts opts) throws JavaChainException;
 
-    /**
-     * 获取密钥
-     * @param nodeId  节点id
-     * @param opts    选项接口
-     * @return
-     * @throws JavaChainException
-     */
-    IKey getKey(String nodeId,IKeyGenOpts opts) throws JavaChainException;
-
-    void keyFileGen(IKey k,IKeyGenOpts opts);
+//    /**
+//     * 获取密钥
+//     * @param nodeId  节点id
+//     * @param opts    选项接口
+//     * @return
+//     * @throws JavaChainException
+//     */
+//    IKey getKey(String nodeId,IKeyGenOpts opts) throws JavaChainException;
+//
+//    void keyFileGen(IKey k,String privatePath,String publicPath,IKeyGenOpts opts);
 }

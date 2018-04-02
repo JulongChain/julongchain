@@ -20,21 +20,23 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.consenter.consensus.IReceiver;
 import org.bcia.javachain.consenter.entity.BatchesMes;
 import org.bcia.javachain.protos.common.Common;
+import org.springframework.stereotype.Component;
 
 /**
  * @author zhangmingyang
  * @Date: 2018/3/15
  * @company Dingxuan
  */
+@Component
 public class BlockCutter implements IReceiver {
     private static JavaChainLog log = JavaChainLogFactory.getLog(BlockCutter.class);
+    //BlockCutter blockCutter=new BlockCutter();
     @Override
     public BatchesMes ordered(Common.Envelope msg) {
         log.info("this is blockCutter's ordered method!!!");
-        BlockCutter blockCutter=new BlockCutter();
-
-        blockCutter.cut();
-        return null;
+       // blockCutter.cut();
+        BatchesMes mes=new BatchesMes();
+        return  mes;
     }
 
     @Override

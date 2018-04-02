@@ -65,10 +65,10 @@ public class Consenter {
 
     public static void main(String[] args) {
         //引入Spring配置文件
-        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+  //     ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
         Consenter consenter = new Consenter();
-        //String[] version = new String[]{"start"};
-        consenter.execCmd(args);
+        String[] start = new String[]{"start"};
+        consenter.execCmd(start);
     }
 
 }

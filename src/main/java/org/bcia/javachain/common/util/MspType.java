@@ -23,6 +23,7 @@ package org.bcia.javachain.common.util;
  * @company Dingxuan
  */
 public enum MspType {
-    CSP
+    CSP,
+    PPKEY
 
 }

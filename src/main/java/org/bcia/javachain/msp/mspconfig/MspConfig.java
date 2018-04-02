@@ -13,39 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.csp.gm.sm2;
+package org.bcia.javachain.msp.mspconfig;
 
-import org.bouncycastle.math.ec.ECPoint;
+import java.util.Map;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/27
+ * @Date: 2018/3/29
  * @company Dingxuan
  */
-public class Sm2PublicKey extends SM2Key {
-    private  ECPoint ecPoint;
-    public Sm2PublicKey(ECPoint ecPoint) {
-        this.ecPoint=ecPoint;
+public class MspConfig {
+    public static final String MspConfig_FILE_PATH = "node.yaml";
+    private Map<String, Profile> profiles;
+    public static class Profile {
+       private  GMCSP gmcsp;
+       private  String mspConfigPath;
+       private String localMspId;
     }
+    public  static class GMCSP{
 
-    @Override
-    public byte[] toBytes() {
-        System.out.println("公钥");
-        return  ecPoint.getEncoded();
-    }
-
-    @Override
-    public byte[] ski() {
-        return new byte[0];
-    }
-
-    @Override
-    public boolean isSymmetric() {
-        return false;
-    }
-
-    @Override
-    public boolean isPrivate() {
-        return false;
     }
 }
