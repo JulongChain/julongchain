@@ -15,12 +15,20 @@
  */
 package org.bcia.javachain.common.groupconfig;
 
+import org.bcia.javachain.protos.common.Configuration;
+
+import java.util.Map;
+
 /**
- * 对象
+ * 应用配置接口
  *
  * @author zhouhui
  * @date 2018/3/27
  * @company Dingxuan
  */
 public interface IApplicationConfig {
+
+    Map<String, IApplicationOrgConfig> getApplicationOrgConfigs();
+
+    Configuration.Capabilities getCapabilities();
 }

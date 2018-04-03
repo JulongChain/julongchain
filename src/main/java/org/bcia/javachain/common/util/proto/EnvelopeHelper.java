@@ -20,6 +20,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.exception.ValidateException;
@@ -30,17 +31,24 @@ import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.localmsp.impl.LocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.ByteUtils;
 import org.bcia.javachain.common.util.FileUtils;
+import org.bcia.javachain.core.common.validation.MsgValidation;
+import org.bcia.javachain.msp.ISigningIdentity;
 import org.bcia.javachain.node.common.helper.ConfigChildHelper;
 import org.bcia.javachain.node.common.helper.ConfigUpdateHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.ProposalResponsePackage;
+import org.bcia.javachain.protos.node.TransactionPackage;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
+import org.bouncycastle.util.Arrays;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 信封对象帮助类
@@ -113,6 +121,118 @@ public class EnvelopeHelper {
 
 
         return configUpdate;
+    }
+
+    public static Common.Envelope createSignedTxEnvelope(ProposalPackage.Proposal originalProposal, ISigningIdentity
+            identity, ProposalResponsePackage.ProposalResponse... endorserResponses) throws ValidateException {
+        if (originalProposal == null || identity == null || endorserResponses == null) {
+            log.warn("Args should not be null");
+            throw new ValidateException("Args should not be null");
+        }
+
+        //校验并获取Proposal头部
+        Common.Header header = null;
+        try {
+            header = Common.Header.parseFrom(originalProposal.getHeader());
+        } catch (InvalidProtocolBufferException e) {
+            log.error(e.getMessage(), e);
+            throw new ValidateException("Wrong proposal header");
+        }
+
+        //校验并获取Proposal负载，应为SmartContractProposalPayload对象
+        ProposalPackage.SmartContractProposalPayload smartContractProposalPayload = null;
+        try {
+            smartContractProposalPayload = ProposalPackage.SmartContractProposalPayload.parseFrom(
+                    originalProposal.getPayload());
+        } catch (InvalidProtocolBufferException e) {
+            log.error(e.getMessage(), e);
+            throw new ValidateException("Wrong proposal payload");
+        }
+
+        //校验并获取签名头部
+        Common.SignatureHeader signatureHeader = null;
+        try {
+            signatureHeader = Common.SignatureHeader.parseFrom(header.getSignatureHeader());
+        } catch (InvalidProtocolBufferException e) {
+            log.error(e.getMessage(), e);
+            throw new ValidateException("Wrong proposal header signatureHeader");
+        }
+
+        //签名头部的消息创建者字段应与身份一致
+        if (Arrays.compareUnsigned(signatureHeader.getCreator().toByteArray(), identity.serialize()) != 0) {
+            throw new ValidateException("Wrong signatureHeader creator");
+        }
+
+        ProposalPackage.SmartContractHeaderExtension extension = null;
+        try {
+            Common.GroupHeader groupHeader = Common.GroupHeader.parseFrom(header.getGroupHeader());
+            extension = ProposalPackage.SmartContractHeaderExtension.parseFrom(groupHeader.getExtension());
+        } catch (InvalidProtocolBufferException e) {
+            log.error(e.getMessage(), e);
+            //不能成功转化，说明是错误的智能合约头部扩展
+            throw new ValidateException("Wrong SmartContractHeaderExtension");
+        }
+
+        byte[] bytes = null;
+        TransactionPackage.SmartContractEndorsedAction.Builder endorsedActionBuilder = TransactionPackage
+                .SmartContractEndorsedAction.newBuilder();
+
+        ProposalResponsePackage.Endorsement[] endorsements = new ProposalResponsePackage.Endorsement[endorserResponses
+                .length];
+        for (int i = 0; i < endorserResponses.length; i++) {
+            ProposalResponsePackage.ProposalResponse endorserResponse = endorserResponses[i];
+
+            if (endorserResponse.getResponse().getStatus() != 200) {
+                throw new ValidateException("endorserResponse status error: " + endorserResponse);
+            }
+
+            if (i == 0) {
+                bytes = endorserResponse.getPayload().toByteArray();
+                endorsedActionBuilder.setProposalResponsePayload(endorserResponse.getPayload());
+            } else {
+                if (Arrays.compareUnsigned(bytes, endorserResponse.getPayload().toByteArray()) != 0) {
+                    throw new ValidateException("Should be same payload");
+                }
+            }
+
+            endorsements[i] = endorserResponse.getEndorsement();
+            endorsedActionBuilder.addEndorsements(endorserResponse.getEndorsement());
+        }
+        TransactionPackage.SmartContractEndorsedAction endorsedAction = endorsedActionBuilder.build();
+
+        //TODO:为什么要去掉transientMap属性？
+        ProposalPackage.SmartContractProposalPayload.Builder proposalPayloadBuilder = ProposalPackage
+                .SmartContractProposalPayload.newBuilder(smartContractProposalPayload);
+        proposalPayloadBuilder.clearTransientMap();
+        ProposalPackage.SmartContractProposalPayload clearProposalPayload = proposalPayloadBuilder.build();
+
+        TransactionPackage.SmartContractActionPayload.Builder actionPayloadBuilder = TransactionPackage
+                .SmartContractActionPayload.newBuilder();
+        actionPayloadBuilder.setSmartContractProposalPayload(clearProposalPayload.toByteString());
+        actionPayloadBuilder.setAction(endorsedAction);
+        TransactionPackage.SmartContractActionPayload actionPayload = actionPayloadBuilder.build();
+
+        TransactionPackage.TransactionAction.Builder transactionActionBuilder = TransactionPackage.TransactionAction
+                .newBuilder();
+        transactionActionBuilder.setHeader(header.getSignatureHeader());
+        transactionActionBuilder.setPayload(actionPayload.toByteString());
+        TransactionPackage.TransactionAction transactionAction = transactionActionBuilder.build();
+
+        TransactionPackage.Transaction.Builder transactionBuilder = TransactionPackage.Transaction.newBuilder();
+        transactionBuilder.addActions(transactionAction);
+        TransactionPackage.Transaction transaction = transactionBuilder.build();
+
+        Common.Payload.Builder payloadBuilder = Common.Payload.newBuilder();
+        payloadBuilder.setHeader(header);
+        payloadBuilder.setData(transaction.toByteString());
+        Common.Payload payload = payloadBuilder.build();
+
+        byte[] signature = identity.sign(payload.toByteArray());
+
+        Common.Envelope.Builder envelopeBuilder = Common.Envelope.newBuilder();
+        envelopeBuilder.setPayload(payload.toByteString());
+        envelopeBuilder.setSignature(ByteString.copyFrom(signature));
+        return envelopeBuilder.build();
     }
 
     /**

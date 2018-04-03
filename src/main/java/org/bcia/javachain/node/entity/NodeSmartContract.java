@@ -18,6 +18,7 @@ package org.bcia.javachain.node.entity;
 import io.grpc.stub.StreamObserver;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.CommConstant;
@@ -30,7 +31,9 @@ import org.bcia.javachain.core.ssc.cssc.CSSC;
 import org.bcia.javachain.core.ssc.lssc.LSSC;
 import org.bcia.javachain.msp.ISigningIdentity;
 import org.bcia.javachain.msp.mgmt.Mgmt;
+import org.bcia.javachain.node.common.client.BroadcastClient;
 import org.bcia.javachain.node.common.client.EndorserClient;
+import org.bcia.javachain.node.common.client.IBroadcastClient;
 import org.bcia.javachain.node.common.helper.SpecHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.consenter.Ab;
@@ -84,12 +87,64 @@ public class NodeSmartContract {
         log.info("Query Result: " + proposalResponse.getPayload().toString(Charset.forName(CommConstant.DEFAULT_CHARSET)));
     }
 
-    public void instantiate(String ip, int port, String scName, String scVersion, String ctor, Smartcontract
-            .SmartContractInput input) {
+    public void instantiate(String ip, int port, String groupId, String scName, String scVersion, Smartcontract
+            .SmartContractInput input) throws NodeException {
         Smartcontract.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName, scVersion,
                 input);
 
-        ISigningIdentity identity = new Mgmt().getLocalMsp().getDefaultSigningIdentity();
+        ISigningIdentity identity = Mgmt.getLocalMsp().getDefaultSigningIdentity();
+
+        byte[] creator = identity.serialize();
+
+        byte[] nonce = MockCrypto.getRandomNonce();
+
+        String txId = null;
+        try {
+            txId = ProposalUtils.computeProposalTxID(creator, nonce);
+        } catch (JavaChainException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException("Generate txId fail");
+        }
+
+        Smartcontract.SmartContractInvocationSpec lsscSpec = SpecHelper.buildInvocationSpec(CommConstant.LSSC,
+                CommConstant.DEPLOY.getBytes(), groupId.getBytes(), input.toByteArray());
+        //生成proposal  Type=ENDORSER_TRANSACTION
+        ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType
+                .ENDORSER_TRANSACTION, groupId, txId, lsscSpec, nonce, creator, null);
+        ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
+
+        //获取背书节点返回信息
+        EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
+        ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
+
+        try {
+            Common.Envelope signedTxEnvelope = EnvelopeHelper.createSignedTxEnvelope(proposal, identity, proposalResponse);
+            IBroadcastClient broadcastClient = new BroadcastClient(ip, port);
+            broadcastClient.send(signedTxEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
+                @Override
+                public void onNext(Ab.BroadcastResponse value) {
+                    log.info("Broadcast onNext");
+                    //收到响应消息，判断是否是200消息
+                    if (Common.Status.SUCCESS.equals(value.getStatus())) {
+                        log.info("instantiate success");
+                    }
+                }
+
+                @Override
+                public void onError(Throwable t) {
+                    log.error(t.getMessage(), t);
+                }
+
+                @Override
+                public void onCompleted() {
+                    log.info("Broadcast completed");
+                }
+            });
+
+        } catch (ValidateException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException(e);
+        }
 
     }
 
