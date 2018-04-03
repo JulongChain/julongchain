@@ -13,23 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.node;
+package org.bcia.javachain.common.cauthdsl;
 
-import org.bcia.javachain.core.ledger.INodeLedger;
+import org.bcia.javachain.protos.common.Policies;
 
 /**
  * 类描述
  *
  * @author sunianle
- * @date 3/14/18
+ * @date 4/3/18
  * @company Dingxuan
  */
-public class NodeTool {
-    public static INodeLedger getLedger(String groupID){
-        return null;
-    }
-    // getMSPIDs returns the ID of each application MSP defined on this group
-    public static String[] getMspIDs(String groupID){
+public class CAuthDslBuilder {
+    public static Policies.SignaturePolicyEnvelope signedByAnyMember(String[] ids){
         return null;
     }
 }

@@ -67,4 +67,8 @@ public class SmartContractData implements ISmartContractDefinition {
     public String endorsement() {
         return scInfo.getEssc();
     }
+
+    public byte[] marshal() {
+        return null;
+    }
 }
