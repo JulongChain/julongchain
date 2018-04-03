@@ -15,8 +15,6 @@
  */
 package org.bcia.javachain.common.groupconfig;
 
-import org.bcia.javachain.protos.common.Configuration;
-
 import java.util.Map;
 
 /**
@@ -30,5 +28,5 @@ public interface IApplicationConfig {
 
     Map<String, IApplicationOrgConfig> getApplicationOrgConfigs();
 
-    Configuration.Capabilities getCapabilities();
+    IApplicationCapabilities capabilities();
 }

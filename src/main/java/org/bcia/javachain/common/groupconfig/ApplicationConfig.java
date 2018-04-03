@@ -65,8 +65,14 @@ public class ApplicationConfig implements IApplicationConfig {
 
     }
 
+    @Override
     public Map<String, IApplicationOrgConfig> getApplicationOrgConfigs() {
         return applicationOrgConfigs;
+    }
+
+    @Override
+    public IApplicationCapabilities capabilities() {
+        return null;
     }
 
     public void setApplicationOrgConfigs(Map<String, IApplicationOrgConfig> applicationOrgConfigs) {
