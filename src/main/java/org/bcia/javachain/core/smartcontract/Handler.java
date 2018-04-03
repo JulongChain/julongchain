@@ -52,7 +52,7 @@ import static org.bcia.javachain.protos.node.SmartcontractShim.SmartContractMess
 /**
  * Handler responsible for management of Peer's side of chaincode stream
  *
- * @author wanliangbing
+ * @author sunzongyu
  * @date 2018/3/18
  * @company Dingxuan
  */
@@ -61,19 +61,19 @@ public class Handler {
     /**
      * start state
      */
-    public static final String CREATED_STATE     = "created";
+    private static final String CREATED_STATE     = "created";
     /**
      * in: CREATED, rcv:  REGISTER, send: REGISTERED, INIT
      */
-    public static final String ESTABLISHED_STATE = "established";
+    private static final String ESTABLISHED_STATE = "established";
     /**
      * in:ESTABLISHED,TRANSACTION, rcv:COMPLETED
      */
-    public static final String READY_STATE       = "ready";
+    private static final String READY_STATE       = "ready";
     /**
      * in:INIT,ESTABLISHED, rcv: error, terminate container
      */
-    public static final String END_STATE         = "end";
+    private static final String END_STATE         = "end";
 
     private static JavaChainLog logger = JavaChainLogFactory.getLog(Handler.class);
 
@@ -89,80 +89,36 @@ public class Handler {
     private Channel<NextStateInfo> nextState;
 
     public Handler(){
-        this.chatStream  = null;
-        this.smartContractSupport = null;
-        this.registered = Boolean.FALSE;
-        this.txCtxs = new HashMap<>();
-        this.txidMap = new HashMap<>();
-        this.nextState = new Channel<>();
-        this.fsm = new FSM("created");
 
-        fsm.addEvents(
-                //            Event Name                        From                To
-                new EventDesc(REGISTERED.toString(),            "created",      "established"),
-                new EventDesc(READY.toString(),                 "established",  "ready"),
-                new EventDesc(PUT_STATE.toString(),             "ready",        "ready"),
-                new EventDesc(DEL_STATE.toString(),             "ready",        "ready"),
-                new EventDesc(INVOKE_CHAINCODE.toString(),      "ready",        "ready"),
-                new EventDesc(COMPLETED.toString(),             "ready",        "ready"),
-                new EventDesc(GET_STATE.toString(),             "ready",        "ready"),
-                new EventDesc(GET_STATE_BY_RANGE.toString(),    "ready",        "ready"),
-                new EventDesc(GET_QUERY_RESULT.toString(),      "ready",        "ready"),
-                new EventDesc(GET_HISTORY_FOR_KEY.toString(),   "ready",        "ready"),
-                new EventDesc(QUERY_STATE_NEXT.toString(),      "ready",        "ready"),
-                new EventDesc(QUERY_STATE_CLOSE.toString(),     "ready",        "ready"),
-                new EventDesc(ERROR.toString(),                 "ready",        "ready"),
-                new EventDesc(RESPONSE.toString(),              "ready",        "ready"),
-                new EventDesc(INIT.toString(),                  "ready",        "ready"),
-                new EventDesc(TRANSACTION.toString(),           "ready",        "ready")
-        );
-
-        fsm.addCallbacks(
-                //         Type             Trigger                         ICallbakc
-                new CBDesc(BEFORE_EVENT,    REGISTERED.toString(),          (event) -> beforeRegisterEvent(event, fsm.current())),
-                new CBDesc(BEFORE_EVENT,    COMPLETED.toString(),           (event) -> beforeCompletedEvent(event, fsm.current())),
-                new CBDesc(AFTER_EVENT,     GET_STATE.toString(),           (event) -> afterGetState(event, fsm.current())),
-                new CBDesc(AFTER_EVENT,     GET_STATE_BY_RANGE.toString(),  (event) -> afterGetStateByRange(event, fsm.current())),
-                new CBDesc(AFTER_EVENT,     GET_QUERY_RESULT.toString(),    (event) -> afterGetQueryResult(event, fsm.current())),
-                new CBDesc(AFTER_EVENT,     GET_HISTORY_FOR_KEY.toString(), (event) -> afterGetHistoryForKey(event, fsm.current())),
-                new CBDesc(AFTER_EVENT,     QUERY_STATE_NEXT.toString(),    (event) -> afterQueryStateNext(event, fsm.current())),
-                new CBDesc(AFTER_EVENT,     QUERY_STATE_CLOSE.toString(),   (event) -> afterQueryStateClose(event, fsm.current())),
-                new CBDesc(AFTER_EVENT,     PUT_STATE.toString(),           (event) -> enterBusyState(event, fsm.current())),
-                new CBDesc(AFTER_EVENT,     DEL_STATE.toString(),           (event) -> enterBusyState(event, fsm.current())),
-                new CBDesc(AFTER_EVENT,     INVOKE_CHAINCODE.toString(),    (event) -> enterBusyState(event, fsm.current())),
-                new CBDesc(ENTER_STATE,     ESTABLISHED_STATE,              (event) -> enterEstablishedState(event, fsm.current())),
-                new CBDesc(ENTER_STATE,     READY_STATE,                    (event) -> enterReadyState(event, fsm.current())),
-                new CBDesc(ENTER_STATE,     END_STATE,                      (event) -> enterEndState(event, fsm.current()))
-        );
     }
-    //newChaincodeSupportHandler
-    public Handler(SmartContractSupport chaincodeSupport, ISmartContractStream peerChatStream){
+
+    private Handler(SmartContractSupport chaincodeSupport, ISmartContractStream peerChatStream){
         this.chatStream  = peerChatStream;
         this.smartContractSupport = chaincodeSupport;
         this.registered = Boolean.FALSE;
         this.txCtxs = new HashMap<>();
         this.txidMap = new HashMap<>();
         this.nextState = new Channel<>();
-        this.fsm = new FSM("created");
+        this.fsm = new FSM(CREATED_STATE);
 
         fsm.addEvents(
             //            Event Name                        From                To
-            new EventDesc(REGISTERED.toString(),            "created",      "established"),
-            new EventDesc(READY.toString(),                 "established",  "ready"),
-            new EventDesc(PUT_STATE.toString(),             "ready",        "ready"),
-            new EventDesc(DEL_STATE.toString(),             "ready",        "ready"),
-            new EventDesc(INVOKE_CHAINCODE.toString(),      "ready",        "ready"),
-            new EventDesc(COMPLETED.toString(),             "ready",        "ready"),
-            new EventDesc(GET_STATE.toString(),             "ready",        "ready"),
-            new EventDesc(GET_STATE_BY_RANGE.toString(),    "ready",        "ready"),
-            new EventDesc(GET_QUERY_RESULT.toString(),      "ready",        "ready"),
-            new EventDesc(GET_HISTORY_FOR_KEY.toString(),   "ready",        "ready"),
-            new EventDesc(QUERY_STATE_NEXT.toString(),      "ready",        "ready"),
-            new EventDesc(QUERY_STATE_CLOSE.toString(),     "ready",        "ready"),
-            new EventDesc(ERROR.toString(),                 "ready",        "ready"),
-            new EventDesc(RESPONSE.toString(),              "ready",        "ready"),
-            new EventDesc(INIT.toString(),                  "ready",        "ready"),
-            new EventDesc(TRANSACTION.toString(),           "ready",        "ready")
+            new EventDesc(REGISTERED.toString(),            CREATED_STATE,      ESTABLISHED_STATE),
+            new EventDesc(READY.toString(),                 ESTABLISHED_STATE,  READY_STATE),
+            new EventDesc(PUT_STATE.toString(),             READY_STATE,        READY_STATE),
+            new EventDesc(DEL_STATE.toString(),             READY_STATE,        READY_STATE),
+            new EventDesc(INVOKE_CHAINCODE.toString(),      READY_STATE,        READY_STATE),
+            new EventDesc(COMPLETED.toString(),             READY_STATE,        READY_STATE),
+            new EventDesc(GET_STATE.toString(),             READY_STATE,        READY_STATE),
+            new EventDesc(GET_STATE_BY_RANGE.toString(),    READY_STATE,        READY_STATE),
+            new EventDesc(GET_QUERY_RESULT.toString(),      READY_STATE,        READY_STATE),
+            new EventDesc(GET_HISTORY_FOR_KEY.toString(),   READY_STATE,        READY_STATE),
+            new EventDesc(QUERY_STATE_NEXT.toString(),      READY_STATE,        READY_STATE),
+            new EventDesc(QUERY_STATE_CLOSE.toString(),     READY_STATE,        READY_STATE),
+            new EventDesc(ERROR.toString(),                 READY_STATE,        READY_STATE),
+            new EventDesc(RESPONSE.toString(),              READY_STATE,        READY_STATE),
+            new EventDesc(INIT.toString(),                  READY_STATE,        READY_STATE),
+            new EventDesc(TRANSACTION.toString(),           READY_STATE,        READY_STATE)
         );
 
         fsm.addCallbacks(
@@ -265,6 +221,14 @@ public class Handler {
     }
 
     /**
+     * return new handler instance
+     */
+    public static Handler newSmartContractSupportHandler(ISmartContractStream peerChatStream, SmartContractSupport smartContractSupport){
+        return new Handler(smartContractSupport, peerChatStream);
+    }
+
+
+    /**
      * return firest 8 chars in txid
      */
     public static String shorttxid(String txid) {
@@ -327,10 +291,10 @@ public class Handler {
      */
     public synchronized void serialSend(SmartcontractShim.SmartContractMessage msg) {
         try {
-//            chatStream.send(msg);
-            logger.info(String.format("Serialsend %s", msg.getPayload().toStringUtf8()));
+            chatStream.send(msg);
+            logger.info(String.format("[%s]Serialsend %s", msg.getTxid() ,msg.getPayload().toStringUtf8()));
         } catch (Exception e) {
-            throw new RuntimeException("SerialSend failed");
+            logger.error(String.format("[%s]Got error when serial send %s", msg.getTxid(), msg.getPayload()));
         }
     }
 
@@ -455,7 +419,7 @@ public class Handler {
      * deregister this handler if it is registed
      */
     public void deregister() {
-        if(this.getRegistered()){
+        if(this.registered){
 
         }
     }
@@ -596,7 +560,7 @@ public class Handler {
         String txCtxID = getTxCtxId(GroupId, txid);
         if(txCtxID == null){
             logger.info(String.format("[%s]Transcation context id is null", shorttxid(txid)));
-            throw new RuntimeException("Transcation context id is null");
+            return Boolean.FALSE;
         }
         txidMap.putIfAbsent(txCtxID, Boolean.TRUE);
         return txidMap.get(txCtxID);
@@ -645,26 +609,26 @@ public class Handler {
     /** beforeRegisterEvent is invoked when chaincode tries to register.
      */
      public void beforeRegisterEvent(Event event, String state) {
+         //在event中提取msg
+         SmartcontractShim.SmartContractMessage msg = extractMessageFromEvent(event);
          try {
              logger.info(String.format("Received event in state %s", state));
-             //在event中提取msg
-             SmartcontractShim.SmartContractMessage msg = extractMessageFromEvent(event);
              //在msg payload中提取id
-             Smartcontract.SmartContractID id = Smartcontract.SmartContractID.parseFrom(msg.getPayload());
+             Smartcontract.SmartContractID id = null;
+             id = Smartcontract.SmartContractID.parseFrom(msg.getPayload());
              smartContractID = id;
              //注册handler
 //             smartContractSupport.registerHandler(this);
              //实例化链码
              decomposeRegisteredName(smartContractID);
-             logger.info(String.format("Got %s for chaincodeID = %s, sending back %s", event, id, REGISTERED.toString()));
+             logger.info(String.format("[%s]Got %s for chaincodeID = %s, sending back %s", msg.getTxid(), event, id, REGISTERED.toString()));
              //发送REGISTERED消息
              serialSend(SmartcontractShim.SmartContractMessage.newBuilder()
                      .setType(REGISTERED)
                      .build());
-         } catch (InvalidProtocolBufferException | RuntimeException e){
-             final RuntimeException error = new RuntimeException(String.format("Error in received %s", REGISTER.toString()));
-             event.cancel(error);
-             throw error;
+         } catch (Exception e) {
+             event.cancel(e);
+             logger.error(String.format("[%s]Got error when regist handler", msg.getTxid()));
          }
     }
 
@@ -679,16 +643,17 @@ public class Handler {
             logger.info(String.format("Notifier Tid: %s, GroupId: %s does not exist", msg.getTxid(), msg.getGroupId()));
         } else {
             logger.info(String.format("Notifing Tid: %s, GroupId: %s", msg.getTxid(), msg.getGroupId()));
-            //发送交易
             tctx.setResponseNotifier(msg);
-            //发送完成后关闭
-            tctx.getQueryIteratorMap().forEach((k, v) -> {
-                try {
-                    v.close();
-                } catch (LedgerException e){
-                    logger.error("Got error when close iterator");
-                }
-            });
+
+            if (tctx.getQueryIteratorMap() != null && tctx.getQueryIteratorMap().size() > 0) {
+                tctx.getQueryIteratorMap().forEach((k, v) -> {
+                    try {
+                        v.close();
+                    } catch (Exception e){
+                        logger.error("Got error when close iterator");
+                    }
+                });
+            }
         }
     }
 
@@ -697,6 +662,17 @@ public class Handler {
     public void beforeCompletedEvent(Event event, String state) {
         SmartcontractShim.SmartContractMessage msg = extractMessageFromEvent(event);
         logger.info(String.format("[%s]beforeCompleted - not in ready state will notify when in readystate", shorttxid(msg.getTxid())));
+    }
+
+    /**
+     * after fsm receive READY, send INIT to user chaincode
+     */
+    public void afterReady(Event event, String state){
+        //发送INIT给用户链码
+        logger.info("Send INIT to user chaincode");
+        serialSend(SmartcontractShim.SmartContractMessage.newBuilder()
+                .setType(INIT)
+                .build());
     }
 
     /** afterGetState handles a GET_STATE request from the chaincode.
@@ -849,6 +825,7 @@ public class Handler {
                 } else {
     //                rangeIter, err = txContext.txsimulator.GetStateRangeScanIterator(chaincodeID, getStateByRange.StartKey, getStateByRange.EndKey)
                 }
+                //TODO： 测试数据
                 rangeIter = new ResultsIterator() {
                     @Override
                     public QueryResult next() throws LedgerException {
@@ -880,7 +857,7 @@ public class Handler {
                 errorReturn(msg, ByteString.copyFromUtf8(errStr));
                 return;
             }
-            //讲获取到的State转换为payload
+            //将获取到的State转换为payload
             try {
                 payloadBytes = payload.toByteString();
             } catch (Exception e) {
@@ -1178,7 +1155,7 @@ public class Handler {
                 errorReturn(msg, ByteString.copyFromUtf8(errStr));
                 return;
             }
-            //for test
+            //TODO: for test
             executeIter = new ResultsIterator() {
                 @Override
                 public QueryResult next() throws LedgerException {
@@ -1272,6 +1249,7 @@ public class Handler {
             //获取查询迭代器
             try {
 //                historyIterator = txContext.getHistoryQueryExecutor().getHistoryForKey(smartContractID, getHistoryForKey.getKey());
+                //TODO: for test
                 historyIterator = new ResultsIterator() {
                     @Override
                     public QueryResult next() throws LedgerException {
@@ -1321,7 +1299,7 @@ public class Handler {
         return StringUtils.isEmpty(collection);
     }
 
-    public SmartcontractShim.SmartContractMessage getSmartContractMessageForMessage(String groupId, String txid
+    public SmartcontractShim.SmartContractMessage getTxContractForMessage(String groupId, String txid
             , String msgType, ByteString payload, String errStr) {
         TransactionContext txContext = getTxContext(groupId, txid);
         //if we do not have GroupId or INVOKE_CHAINCODE
@@ -1379,7 +1357,7 @@ public class Handler {
     /** Handles request to ledger to put state
      */
     public void enterBusyState(Event event, String state) {
-//        new Thread(() -> {
+        new Thread(() -> {
             SmartcontractShim.SmartContractMessage msg = extractMessageFromEvent(event);
             logger.info(String.format("[%s]state i %s", shorttxid(msg.getTxid()), state));
 
@@ -1396,7 +1374,7 @@ public class Handler {
                 return;
             }
             //check to get triggerNextStateMsg
-            triggerNextStateMsg = getSmartContractMessageForMessage(msg.getGroupId(), msg.getTxid(),msg.getType().toString(), msg.getPayload()
+            triggerNextStateMsg = getTxContractForMessage(msg.getGroupId(), msg.getTxid(),msg.getType().toString(), msg.getPayload()
                     , String.format("[%s]No ledger context for %s. Sending %s", shorttxid(msg.getTxid()), msg.getType().toString(), ERROR.toString()));
             //if triggerNextStateMsg is null means txContext is vaild
             if(triggerNextStateMsg == null){
@@ -1595,7 +1573,7 @@ public class Handler {
                 .setGroupId(msg.getGroupId())
                 .setTxid(msg.getTxid())
                 .build();
-//        }).start();
+        }).start();
     }
 
     public void enterEstablishedState(Event e, String state) {
@@ -1655,7 +1633,7 @@ public class Handler {
         logger.info(String.format("[%s]Handling message of type: %s in state %s", shorttxid(msg.getTxid()), msg.getType(), fsm.current()));
 
         //msg cannot be null in processStream
-        if((COMPLETED.equals(msg.getType()) || ERROR.equals(msg.getType()) && "ready".equals(fsm.current()))){
+        if((COMPLETED.equals(msg.getType()) || ERROR.equals(msg.getType())) && READY_STATE.equals(fsm.current())){
             logger.info("[%s]Handle message - COMPLETED. Notify", msg.getTxid());
             notify(msg);
             return;
