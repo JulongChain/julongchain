@@ -15,7 +15,7 @@
  */
 package org.bcia.javachain.core.common.sysscprovider;
 
-import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
+import org.bcia.javachain.common.groupconfig.IApplicationConfig;
 
 /**
  * 类描述
@@ -25,5 +25,5 @@ import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
  * @company Dingxuan
  */
 public interface ISystemSmartContractProvider {
-    GenesisConfig.Application getApplicationConfig(String groupId);
+    IApplicationConfig getApplicationConfig(String groupId);
 }

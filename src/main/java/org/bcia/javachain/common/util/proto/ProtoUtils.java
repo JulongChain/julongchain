@@ -103,4 +103,10 @@ public class ProtoUtils {
     public static byte[] marshalOrPanic(Message message){
         return message.toByteArray();
     }
+
+    public static Smartcontract.SmartContractDeploymentSpec getSmartContractDeploymentSpec(byte[] code) throws InvalidProtocolBufferException {
+        return Smartcontract.SmartContractDeploymentSpec.parseFrom(code);
+    }
+
+
 }

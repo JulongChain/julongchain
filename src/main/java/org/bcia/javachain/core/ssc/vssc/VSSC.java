@@ -18,6 +18,7 @@ package org.bcia.javachain.core.ssc.vssc;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.cauthdsl.PolicyProvider;
 import org.bcia.javachain.common.channelconfig.ApplicationCapabilities;
+import org.bcia.javachain.common.groupconfig.IApplicationConfig;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policies.IPolicy;
@@ -135,7 +136,7 @@ public class VSSC extends SystemSmartContractBase {
         } catch (InvalidProtocolBufferException e) {
             newErrorResponse(String.format("VSSC error: GetGroupHeader failed, err %s",e.getMessage()));
         }
-        GenesisConfig.Application ac = this.sscProvider.getApplicationConfig(groupHeader.getGroupId());
+        IApplicationConfig ac = this.sscProvider.getApplicationConfig(groupHeader.getGroupId());
 
         Mgmt mgmt=new Mgmt();
         IMspManager manager=mgmt.getManagerForChain(groupHeader.getGroupId());
@@ -193,7 +194,7 @@ public class VSSC extends SystemSmartContractBase {
             ISmartContractStub stub,
             String groupID,
             Common.Envelope envelope,
-            TransactionPackage.ChaincodeActionPayload scap,
+            TransactionPackage.SmartContractActionPayload scap,
             Common.Payload payload,
             ApplicationCapabilities ac
             ){
@@ -204,7 +205,7 @@ public class VSSC extends SystemSmartContractBase {
         return null;
     }
 
-    private SignedData deduplicateIdentity(TransactionPackage.ChaincodeActionPayload scap){
+    private SignedData deduplicateIdentity(TransactionPackage.SmartContractActionPayload scap){
         return null;
     }
 }

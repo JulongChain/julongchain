@@ -16,8 +16,11 @@
 package org.bcia.javachain.core.ssc.lssc;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.groupconfig.IApplicationConfig;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.proto.ProtoUtils;
 import org.bcia.javachain.core.common.smartcontractprovider.ISmartContractPackage;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractCode;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractData;
@@ -32,6 +35,7 @@ import org.bcia.javachain.msp.mgmt.Principal;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Smartcontract;
+import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -126,7 +130,36 @@ public class LSSC  extends SystemSmartContractBase {
                 log.debug("Lifecycle Deploy");
             case UPGRADE:
                 log.debug("Lifecycle Deploy/Upgrade");
-
+                if(size<3){
+                    return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
+                }
+                String groupName= ByteString.copyFrom(args.get(1)).toStringUtf8();
+                if(isValidGroupName(groupName)==false){
+                    return newErrorResponse(String.format("Invalid group name, %s",groupName));
+                }
+                IApplicationConfig ac = sscProvider.getApplicationConfig(groupName);
+                if(ac==null){
+                    return newErrorResponse(String.format("Programming error, non-existent appplication config for group '%s'",groupName));
+                }
+                //the maximum number of arguments depends on the capability of the channel
+                if((ac.getCapabilities().privateGroupData()==false && size>6) ||
+                (ac.getCapabilities().privateGroupData()==true && size>7)){
+                    return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
+                }
+                byte[] depSpec2=args.get(2);
+                Smartcontract.SmartContractDeploymentSpec spec=null;
+                try {
+                    spec=ProtoUtils.getSmartContractDeploymentSpec(depSpec2);
+                }catch (InvalidProtocolBufferException e){
+                    return newErrorResponse(String.format("'%s'",e.getMessage()));
+                }
+                // optional arguments here (they can each be nil and may or may not be present)
+                // args[3] is a marshalled SignaturePolicyEnvelope representing the endorsement policy
+                // args[4] is the name of essc
+                // args[5] is the name of vssc
+                // args[6] is a marshalled CollectionConfigPackage struct
+                byte[] ep=null;
+                //if(size>3)
                 return newSuccessResponse("OK");
             case GET_SC_INFO:
                 ;
