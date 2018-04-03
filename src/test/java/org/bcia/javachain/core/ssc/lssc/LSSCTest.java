@@ -41,6 +41,7 @@ public class LSSCTest extends BaseJunit4Test {
     @Test
     public void testInstalls(){
         MockStub mockStub = new MockStub("LSSC", lssc);
+        mockStub.mockInit("1",new LinkedList<ByteString>());
         String path="/opt/git/javachain/src/main/java/org/bcia/javachain/examples/smartcontract/java/smartcontract_example02";
         testInstall("example02","1.0",path,"","Alice",mockStub);
     }

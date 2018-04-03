@@ -337,7 +337,7 @@ public class LSSC  extends SystemSmartContractBase {
 
     // executeInstall implements the "install" Invoke transaction
     private void executeInstall(ISmartContractStub stub,byte[] scBytes){
-
+        log.debug("Execute install.");
     }
 
     // executeDeployOrUpgrade routes the code path either to executeDeploy or executeUpgrade
