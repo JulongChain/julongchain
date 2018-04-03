@@ -23,6 +23,13 @@ import org.bcia.javachain.csp.intfs.IHash;
  * @company Excelsecu
  */
 public class SHA1 implements IHash {
+
+    int h0 = 0x67452301;
+    int h1 = 0xEFCDAB89;
+    int h2 = 0x98BADCFE;
+    int h3 = 0x10325476;
+    int h4 = 0xC3D2E1F0;
+
     @Override
     public int write(byte[] p) {
         return 0;

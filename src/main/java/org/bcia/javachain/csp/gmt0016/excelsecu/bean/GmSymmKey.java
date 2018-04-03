@@ -35,8 +35,8 @@ public class GmSymmKey extends GmKey {
     @Override
     public byte[] ski() {
         //TLV TLV
-        byte[] tlvContainer = getTLV(TAG_CONTAINER, containerName.length(), containerName.getBytes());
-        byte[] tlvCipherData = getTLV(TAG_KEY_CIPHER_DATA, cipherData.length, cipherData);
+        byte[] tlvContainer = getTLV(GmKey.TAG_CONTAINER, containerName.length(), containerName.getBytes());
+        byte[] tlvCipherData = getTLV(GmKey.TAG_KEY_CIPHER_DATA, cipherData.length, cipherData);
         byte[] skiData = new byte[tlvContainer.length + tlvCipherData.length];
         System.arraycopy(tlvContainer, 0, skiData, 0, tlvContainer.length);
         System.arraycopy(tlvCipherData, 0, skiData, tlvContainer.length, tlvCipherData.length);

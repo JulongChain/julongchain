@@ -21,10 +21,11 @@ import org.bcia.javachain.common.exception.SarException;
 import org.bcia.javachain.csp.gmt0016.excelsecu.algorithm.SHA1;
 import org.bcia.javachain.csp.gmt0016.excelsecu.algorithm.SHA256;
 import org.bcia.javachain.csp.gmt0016.excelsecu.algorithm.SM4;
+import org.bcia.javachain.csp.gmt0016.excelsecu.bean.Properties;
+import org.bcia.javachain.csp.gmt0016.excelsecu.bean.*;
 import org.bcia.javachain.csp.gmt0016.excelsecu.common.*;
 import org.bcia.javachain.csp.gmt0016.excelsecu.security.ECCPublicKeyBlob;
 import org.bcia.javachain.csp.gmt0016.excelsecu.security.RSAPublicKeyBlob;
-import org.bcia.javachain.csp.gmt0016.excelsecu.bean.*;
 import org.bcia.javachain.csp.intfs.ICsp;
 import org.bcia.javachain.csp.intfs.IHash;
 import org.bcia.javachain.csp.intfs.IKey;
@@ -34,10 +35,7 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author chenhao
@@ -50,10 +48,10 @@ public class CspGm0016 implements ICsp {
 
     private Yaml mYaml;
 
-    private Properties mProperties;
+    private org.bcia.javachain.csp.gmt0016.excelsecu.bean.Properties mProperties;
 
     //application handle
-    private long mPhApplication = -1;
+    private long mHApplication = -1;
 
     //dev handle
     private long mHDev = -1;
@@ -88,7 +86,7 @@ public class CspGm0016 implements ICsp {
         System.load(mProperties.getDriverPath());
         try {
             //size is the specified length of device list returned
-            List<String> deviceList = mSkf.SKF_EnumDev(false, ServiceConfig.DEVICE_LIST_LENGTH);
+            List<String> deviceList = mSkf.SKF_EnumDev(true, ServiceConfig.DEVICE_LIST_LENGTH);
             long devHandle = 0L;
             long applicationHandle = 0L;
             String name;
@@ -101,7 +99,7 @@ public class CspGm0016 implements ICsp {
                     applicationHandle = mSkf.SKF_OpenApplication(devHandle, name);
                     mDevName = name;
                     mHDev = devHandle;
-                    mPhApplication = applicationHandle;
+                    mHApplication = applicationHandle;
                     createContainer();
                     break;
                 } catch (SarException e) {
@@ -119,11 +117,11 @@ public class CspGm0016 implements ICsp {
 
     private void createContainer() {
 
-        // TODO: 2018/3/28 初始化逻辑
         try {
             String container2Name = UUID.randomUUID().toString() + "@2";
-            mContainer2Handle = mSkf.SKF_CreateContainer(mPhApplication, container2Name);
+            mContainer2Handle = mSkf.SKF_CreateContainer(mHApplication, container2Name);
             mContainers.put(container2Name, new Container(container2Name, mContainer2Handle));
+            //TODO: 2018/4/2 生成密钥对，导入一对加密密钥对
         } catch (SarException e) {
             e.printStackTrace();
         }
@@ -131,7 +129,8 @@ public class CspGm0016 implements ICsp {
     }
 
     private boolean CheckDevAvailable() {
-        if (mHDev != -1 && mPhApplication != -1 && mDevName != null) {
+
+        if (mHDev != -1 && mHApplication != -1 && mDevName != null) {
             try {
                 switch ((int) mSkf.SKF_GetDevState(mDevName)) {
                     case DeviceState.DEV_ABSENT_STATE:
@@ -165,17 +164,18 @@ public class CspGm0016 implements ICsp {
 
     @Override
     public IKey keyGen(IKeyGenOpts opts) throws JavaChainException {
+
         if (!CheckDevAvailable()) {
             throw new JavaChainException("device is not available");
         }
         try {
-            // lock the pin code if its retry count equals zero
-            if (mSkf.SKF_VerifyPIN(mPhApplication, Constants.USER_TYPE, mProperties.getPinCode()) == 0) {
+            if (mSkf.SKF_VerifyPIN(mHApplication, Constants.USER_TYPE, mProperties.getPinCode()) == 0) {
+                // TODO: 2018/4/2 lock the pin code
                 return null;
             }
 
             String container1Name = UUID.randomUUID().toString() + "@1";
-            long containerHandler = mSkf.SKF_CreateContainer(mPhApplication, container1Name);
+            long containerHandler = mSkf.SKF_CreateContainer(mHApplication, container1Name);
             mContainers.put(container1Name, new Container(container1Name, containerHandler));
 
             //according to the algorithm, generates difference types of keypair with type 1 container
@@ -197,7 +197,7 @@ public class CspGm0016 implements ICsp {
 
             //generates temp asymmetric keypair with type 3 container
             String container3Name = UUID.randomUUID().toString() + "@3";
-            long container3Handle = mSkf.SKF_CreateContainer(mPhApplication, container3Name);
+            long container3Handle = mSkf.SKF_CreateContainer(mHApplication, container3Name);
             mContainers.put(container3Name, new Container(container3Name, container3Handle));
             mSkf.SKF_GenRSAKeyPair(container3Handle, Constants.MAX_RSA_MODULUS_LEN);
 
@@ -213,12 +213,15 @@ public class CspGm0016 implements ICsp {
                 for (String containerName : mContainers.keySet()) {
                     if (containerName.contains("@3")) {
                         try {
-                            mSkf.SKF_DeleteContainer(mPhApplication, containerName);
+                            mSkf.SKF_DeleteContainer(mHApplication, containerName);
                         } catch (SarException e1) {
                             e1.printStackTrace();
                         }
                     }
                 }
+            }
+            if(SarException.SAR_PIN_INCORRECT == e.getErrorCode()) {
+
             }
 
         }
@@ -228,6 +231,7 @@ public class CspGm0016 implements ICsp {
 
     @Override
     public IKey keyDeriv(IKey k, IKeyDerivOpts opts) throws JavaChainException {
+
         if (!CheckDevAvailable()) {
             throw new JavaChainException("device is not available");
         }
@@ -239,7 +243,7 @@ public class CspGm0016 implements ICsp {
     public IKey keyImport(Object raw, IKeyImportOpts opts) throws SarException {
 
         String containerName = UUID.randomUUID().toString() + "@1";
-        long containerHandle = mSkf.SKF_CreateContainer(mPhApplication, containerName);
+        long containerHandle = mSkf.SKF_CreateContainer(mHApplication, containerName);
         Container container = new Container(containerName, containerHandle);
         mContainers.put(containerName, container);
 
@@ -259,6 +263,7 @@ public class CspGm0016 implements ICsp {
 
     @Override
     public IKey getKey(byte[] ski) throws JavaChainException {
+
         if (!CheckDevAvailable()) {
             throw new JavaChainException("device is not available");
         }
@@ -313,7 +318,7 @@ public class CspGm0016 implements ICsp {
                 throw new CspException("tempKeyPair's container doesn't exist in Ram");
             }
 
-            long hContainer = mSkf.SKF_OpenApplication(mPhApplication, containerName);
+            long hContainer = mSkf.SKF_OpenApplication(mHApplication, containerName);
             PublicKeyBlob publicKeyBlob = mSkf.SKF_ExportPublicKey(hContainer, signFlag, blobBufferLen);
 
             if (publicKeyBlob.getType() == PublicKeyBlob.ECC_PUBLIC_KEY_BLOB_TYPE) {
@@ -327,7 +332,7 @@ public class CspGm0016 implements ICsp {
         }
 
         //获取对称密钥：
-        long hContainer = mSkf.SKF_OpenApplication(mPhApplication, containerName);
+        long hContainer = mSkf.SKF_OpenApplication(mHApplication, containerName);
         long hKey = mSkf.SKF_ImportSessionKey(hContainer, AlgorithmID.SGD_SM2_1, cipher, cipher.length);
         return new GmSymmKey(hKey, cipher);
     }
@@ -393,11 +398,11 @@ public class CspGm0016 implements ICsp {
 
         if ("ECC".equals(opts.getAlgorithm())) {
 
-            return mSkf.SKF_ECCSignData(mPhApplication, digest, digest.length);
+            return mSkf.SKF_ECCSignData(mHApplication, digest, digest.length);
 
         } else if ("RSA".equals(opts.getAlgorithm())) {
 
-            return mSkf.SKF_RSASignData(mPhApplication, digest, digest.length);
+            return mSkf.SKF_RSASignData(mHApplication, digest, digest.length);
         }
 
 
@@ -465,10 +470,12 @@ public class CspGm0016 implements ICsp {
             }
         }
 
-        //TODO 2018/4/2 RSA加密
-
+        if (algorithm.equals("RSA")) {
+            throw new JavaChainException("encryption of RSA is not available");
+        }
 
         return new byte[0];
+
     }
 
     @Override
@@ -487,7 +494,7 @@ public class CspGm0016 implements ICsp {
             GmSymmKey sKey = (GmSymmKey) k;
             try {
                 long hSessionKey = sKey.getKeyHandle();
-                mSkf.SKF_EncryptInit(hSessionKey, getDefaultBlockCipherParam(algorithm));
+                mSkf.SKF_DecryptInit(hSessionKey, getDefaultBlockCipherParam(algorithm));
                 return mSkf.SKF_Decrypt(hSessionKey,
                         ciphertext,
                         ciphertext.length,
@@ -496,7 +503,12 @@ public class CspGm0016 implements ICsp {
                 e.printStackTrace();
             }
         }
-        //TODO 2018/4/2 ECC解密，RSA解密
+        if (algorithm.equals("ECC")) {
+            throw new CspException("decryption of ECC is not available");
+        }
+        if (algorithm.equals("RSA")) {
+            throw new CspException("decryption of RSA is not available");
+        }
         return new byte[0];
     }
 
@@ -520,15 +532,6 @@ public class CspGm0016 implements ICsp {
     @Override
     public byte[] rng(int len, IRngOpts opts) throws JavaChainException {
         throw new JavaChainException();
-    }
-
-    @Override
-    public IKey getKey(String nodeId, IKeyGenOpts opts) throws JavaChainException {
-        throw new JavaChainException();
-    }
-
-    @Override
-    public void keyFileGen(IKey k, IKeyGenOpts opts) {
     }
 
 }

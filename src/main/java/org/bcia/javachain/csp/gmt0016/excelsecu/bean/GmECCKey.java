@@ -32,10 +32,10 @@ public class GmECCKey extends GmKey {
 
     @Override
     public byte[] ski() {
-        byte[] tlvContainer = getTLV(TAG_CONTAINER, containerName.length(), containerName.getBytes());
+        byte[] tlvContainer = getTLV(GmKey.TAG_CONTAINER, containerName.length(), containerName.getBytes());
         byte flag[] = new byte[1];
         flag[0] = signFlag ? (byte)1 : 0;
-        byte[] tlvSignFlag = getTLV(TAG_PUBLICK_KEY_SIGN_FLAG, 1, flag);
+        byte[] tlvSignFlag = getTLV(GmKey.TAG_PUBLICK_KEY_SIGN_FLAG, 1, flag);
         byte[] skiData = new byte[tlvContainer.length + tlvSignFlag.length ];
         System.arraycopy(tlvContainer, 0, skiData, 0, tlvContainer.length);
         System.arraycopy(tlvSignFlag, 0, skiData, tlvContainer.length, tlvSignFlag.length);
@@ -50,4 +50,11 @@ public class GmECCKey extends GmKey {
         return yCoordinate;
     }
 
+    public void setSignFlag(boolean signFlag) {
+        this.signFlag = signFlag;
+    }
+
+    public boolean getSignFlag() {
+        return signFlag;
+    }
 }

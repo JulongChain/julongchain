@@ -48,7 +48,7 @@ public class Der {
         byte totalLength=intToByte(s.length+r.length+4);
         // Der编码的签名值 30 length 02 rLength r 02 sLength s
         byte[] rByteArrayBefore = {0x30, totalLength, 0x02, rLength};
-        byte[] betweenRAndS = {0x2, sLength};
+        byte[] betweenRAndS = {0x02, sLength};
 
         return concatArrays(rByteArrayBefore, r, betweenRAndS, s);
     }
@@ -72,7 +72,6 @@ public class Der {
     }
 
 
-    // {0x32,0x50,0x41,0x59}, {0x2e,0x53,0x59,0x53,0x2e,0x44,0x44,0x46,0x30,0x31} --> {0x32,0x50,0x41,0x59,0x2e,0x53,0x59,0x53,0x2e,0x44,0x44,0x46,0x30,0x31}
     private static byte[] concatArrays(byte[] first, byte[]... rest) {
 
         int totalLength = first.length;

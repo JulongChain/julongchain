@@ -15,7 +15,6 @@
  */
 package org.bcia.javachain.csp.gmt0016.excelsecu.bean;
 
-import org.bcia.javachain.common.exception.CspException;
 import org.bcia.javachain.csp.intfs.IKey;
 
 /**
@@ -36,6 +35,14 @@ public class GmKey implements IKey {
     public byte[] ski() {
         //TLV 结构
         return new byte[0];
+    }
+
+    public String getContainerName() {
+        return containerName;
+    }
+
+    public void setContainerName(String containerName) {
+        this.containerName = containerName;
     }
 
     protected byte[] getTLV(int tag, int length, byte[] value) {
