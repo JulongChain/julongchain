@@ -134,7 +134,7 @@ public class LSSC  extends SystemSmartContractBase {
             case DEPLOY:
                 //log.debug("Lifecycle Deploy");
             case UPGRADE:
-                log.debug("Lifecycle Deploy/Upgrade");
+                log.debug("Lifecycle Deploy/Upgrade:{}",function);
                 if(size<3){
                     return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
                 }
@@ -206,7 +206,7 @@ public class LSSC  extends SystemSmartContractBase {
             case GET_DEP_SPEC:
                 ;
             case GET_SC_DATA:
-                log.debug("Lifecycle GetScInfo/GetDepSpec/GetScData");
+                log.debug("Lifecycle GetScInfo/GetDepSpec/GetScData:{}",function);
                 if(size!=3){
                     return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
                 }
