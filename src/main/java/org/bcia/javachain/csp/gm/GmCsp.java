@@ -24,6 +24,7 @@ import org.bcia.javachain.csp.intfs.IHash;
 import org.bcia.javachain.csp.intfs.IKey;
 import org.bcia.javachain.csp.intfs.opts.*;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bouncycastle.math.ec.ECPoint;
 
 import java.math.BigInteger;
 
@@ -38,10 +39,8 @@ import static org.bcia.javachain.csp.gm.sm2.SM2.byte2ECpoint;
 
 // GmCsp provides the Guomi's software implements of the ICsp interface.
 public class GmCsp implements ICsp {
-
     // List algorithms to be used.
-    //private SM2 sm2;
-     SM2 sm2=new SM2();
+    private SM2 sm2;
     private SM3 sm3;
     private SM4 sm4;
 
@@ -55,12 +54,13 @@ public class GmCsp implements ICsp {
     GmCsp(IGmFactoryOpts gmOpts) {
         this.gmOpts=gmOpts;
         this.sm3=new SM3();
+        this.sm2=new SM2();
     }
 
 
     @Override
     public IKey keyGen(IKeyGenOpts opts) throws JavaChainException {
-        if(opts instanceof Sm2KeyGenOpts){
+        if(opts instanceof SM2KeyGenOpts){
             return new SM2Key();
         }
         return null;
@@ -97,17 +97,13 @@ public class GmCsp implements ICsp {
     @Override
     public byte[] sign(IKey key, byte[] digest, ISignerOpts opts) throws JavaChainException {
         SM2KeyExport sm2KeyExport=(SM2KeyExport) key;
-        SM2KeyPair sm2KeyPair=new SM2KeyPair();
-        sm2KeyPair.setPublicKey(byte2ECpoint(sm2KeyExport.getPublicKey().toBytes()));
-        sm2KeyPair.setPrivateKey( new BigInteger(sm2KeyExport.toBytes()));
-        return sm2.sign(digest,"123",sm2KeyPair);
+        return sm2.sign(digest,"123",new SM2KeyPair(byte2ECpoint(sm2KeyExport.getPublicKey().toBytes()),new BigInteger(sm2KeyExport.toBytes())));
     }
 
     @Override
     public boolean verify(IKey key, byte[] signature, byte[] digest, ISignerOpts opts) throws JavaChainException {
         SM2KeyExport sm2KeyExport=(SM2KeyExport) key;
-
-        org.bouncycastle.math.ec.ECPoint ecPoint= byte2ECpoint(sm2KeyExport.getPublicKey().toBytes());
+        ECPoint ecPoint= byte2ECpoint(sm2KeyExport.getPublicKey().toBytes());
         return sm2.verify(digest,signature,"123",ecPoint);
     }
 
@@ -126,25 +122,6 @@ public class GmCsp implements ICsp {
         return new byte[0];
     }
 
-    @Override
-    public IKey getKey(String nodeId, IKeyGenOpts opts) throws JavaChainException {
-        if(opts instanceof Sm2KeyGenOpts){
-            return new SM2KeyExport(nodeId);
-        }
-        return null;
-    }
-
-    @Override
-    public void keyFileGen(IKey k, IKeyGenOpts opts) {
-        if(opts instanceof Sm2KeyGenOpts){
-            SM2Key sm2Key= (SM2Key) k;
-            SM2KeyFileGen sm2KeyFileGen=new SM2KeyFileGen(sm2Key);
-            sm2KeyFileGen.privateKeyFileGen();
-            sm2KeyFileGen.publicKeyFileGen();
-        }
-    }
-
-
     private SM3 getSm3(){
         if(sm3==null) {
             sm3=new SM3();
@@ -152,23 +129,4 @@ public class GmCsp implements ICsp {
         return sm3;
     }
 
-public static  void main(String[] args) throws JavaChainException {
-    GmCsp gmCsp=new GmCsp();
-    Sm2KeyGenOpts sm2KeyGenOpts=new Sm2KeyGenOpts();
-    IKey sm2Key= gmCsp.keyGen(sm2KeyGenOpts);
-    SM2Key sm2Key1= (SM2Key) sm2Key;
-    sm2Key.toBytes();
-    sm2Key1.getPublicKey().toBytes();
-
-    gmCsp.keyFileGen(sm2Key1,sm2KeyGenOpts);
-//    Sm2KeyGenOpts sm2KeyGenOpts=new Sm2KeyGenOpts();
-//    IKey sm2Key= gmCsp.getKey("",sm2KeyGenOpts);
-//    SM2KeyExport sm2Key1= (SM2KeyExport) sm2Key;
-//    sm2Key1.getPublicKey().toBytes();
-//    String abc="123";
-//
-//   byte[] signValue= gmCsp.sign(sm2Key1,abc.getBytes(),new SM2SignerOpts());
-//   boolean verify=gmCsp.verify(sm2Key1,signValue,abc.getBytes(),new SM2SignerOpts());
-//   System.out.println("验签结果："+verify);
-}
 }

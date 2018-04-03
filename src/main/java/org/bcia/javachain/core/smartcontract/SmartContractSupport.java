@@ -158,7 +158,7 @@ public class SmartContractSupport {
         String smartContractId = scContext.getName();
 
         SmartContractContainerClient smartContractContainerClient = new
-                SmartContractContainerClient(smartContractId);
+                SmartContractContainerClient(scContext.getName());
 
         SmartcontractShim.SmartContractMessage result =
                 smartContractContainerClient.invoke(scContext, scMessage,

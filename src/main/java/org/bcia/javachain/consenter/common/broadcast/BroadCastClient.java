@@ -1,11 +1,9 @@
 package org.bcia.javachain.consenter.common.broadcast;
 
-import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import org.bcia.javachain.protos.common.Common;
-
 import org.bcia.javachain.protos.consenter.Ab;
 import org.bcia.javachain.protos.consenter.AtomicBroadcastGrpc;
 import org.springframework.stereotype.Component;
@@ -19,7 +17,13 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class BroadCastClient {
-    public void send(String ip, int port, String message) throws Exception {
+    public static void main(String[] args) throws Exception {
+        String ip="localhost";
+        String message="aba";
+        int port=7050;
+
+        System.out.println("begin");
+
         ManagedChannel managedChannel = ManagedChannelBuilder.forAddress(ip, port).usePlaintext(true).build();
         AtomicBroadcastGrpc.AtomicBroadcastStub stub = AtomicBroadcastGrpc.newStub(managedChannel);
         StreamObserver<Common.Envelope> envelopeStreamObserver = stub.broadcast(new StreamObserver<Ab
@@ -27,6 +31,7 @@ public class BroadCastClient {
             @Override
             public void onNext(Ab.BroadcastResponse broadcastResponse) {
                 System.out.println(broadcastResponse.getStatusValue());
+                //System.out.println(broadcastResponse.getInfo());
             }
 
             @Override
@@ -39,12 +44,22 @@ public class BroadCastClient {
                 System.out.println("onCompled!");
             }
         });
-//        for (int i = 0; i <10 ; i++) {
+
 //            //客户端以流式的形式向服务器发送数据
-        envelopeStreamObserver.onNext(Common.Envelope.newBuilder().setPayload(ByteString.copyFrom(message.getBytes())).build());
-//            Thread.sleep(1000);
-//        }
-//        Thread.sleep(5000);
+     //   ILocalSigner localSigner = new LocalSigner();
+      //  SM2Impl signer=new SM2Impl();
+//        Common.GroupHeader  data = EnvelopeHelper.buildGroupHeader(Common.HeaderType.CONFIG_UPDATE_VALUE, 0,
+//                "myGroup", 30);
+//
+//        Common.Payload payload = EnvelopeHelper.buildPayload(Common.HeaderType.CONFIG_UPDATE_VALUE, 0, "myGroup", signer, data, 30);
+        Ab.SeekInfo.Builder seekInfoBuilder = Ab.SeekInfo.newBuilder();
+        seekInfoBuilder.setBehavior(Ab.SeekInfo.SeekBehavior.BLOCK_UNTIL_READY);
+        Ab.SeekInfo seekInfo = seekInfoBuilder.build();
+      //  Common.Envelope envelope=EnvelopeHelper.buildSignedEnvelope(Common.HeaderType.CONFIG_UPDATE_VALUE, 0, "123",new SM2Impl(),seekInfo,0L);
+        Common.Envelope.Builder envelope= Common.Envelope.newBuilder();
+        envelopeStreamObserver.onNext(envelope.build());
+        
+        Thread.sleep(1000);
 
     }
 

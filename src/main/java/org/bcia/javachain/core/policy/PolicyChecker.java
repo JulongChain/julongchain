@@ -15,6 +15,8 @@
  */
 package org.bcia.javachain.core.policy;
 
+import org.bcia.javachain.protos.node.ProposalPackage;
+
 /**
  * 类描述
  *
@@ -23,5 +25,7 @@ package org.bcia.javachain.core.policy;
  * @company Dingxuan
  */
 public class PolicyChecker implements IPolicyChecker{
-
+    public boolean checkPolicyNoGroup(String admins, ProposalPackage.SignedProposal sp){
+        return true;
+    }
 }

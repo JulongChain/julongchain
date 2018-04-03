@@ -15,6 +15,8 @@
  */
 package org.bcia.javachain.core.container.inproccontroller;
 
+import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContract;
+
 /**
  * 类描述
  *
@@ -23,4 +25,50 @@ package org.bcia.javachain.core.container.inproccontroller;
  * @company Dingxuan
  */
 public class InprocController {
+
+    private ISmartContract smartContract;
+    private Boolean running;
+    private String[] args;
+    private String[] env;
+    private Chan stopChan;
+
+    public ISmartContract getSmartContract() {
+        return smartContract;
+    }
+
+    public void setSmartContract(ISmartContract smartContract) {
+        this.smartContract = smartContract;
+    }
+
+    public Boolean getRunning() {
+        return running;
+    }
+
+    public void setRunning(Boolean running) {
+        this.running = running;
+    }
+
+    public String[] getArgs() {
+        return args;
+    }
+
+    public void setArgs(String[] args) {
+        this.args = args;
+    }
+
+    public String[] getEnv() {
+        return env;
+    }
+
+    public void setEnv(String[] env) {
+        this.env = env;
+    }
+
+    public Chan getStopChan() {
+        return stopChan;
+    }
+
+    public void setStopChan(Chan stopChan) {
+        this.stopChan = stopChan;
+    }
 }

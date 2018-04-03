@@ -15,7 +15,7 @@
  */
 package org.bcia.javachain.core.policy;
 
-/**
+import org.bcia.javachain.protos.node.ProposalPackage; /**
  * 类描述
  *
  * @author sunianle
@@ -24,4 +24,5 @@ package org.bcia.javachain.core.policy;
  */
 public interface IPolicyChecker {
 
+    boolean checkPolicyNoGroup(String admins, ProposalPackage.SignedProposal sp);
 }

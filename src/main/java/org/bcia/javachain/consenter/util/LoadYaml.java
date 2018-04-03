@@ -20,6 +20,7 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,29 +32,8 @@ import java.util.Map;
  */
 public class LoadYaml {
     private static JavaChainLog log = JavaChainLogFactory.getLog(LoadYaml.class);
-    public  void loadyaml() {
-        try {
-            Yaml yaml = new Yaml();
-            URL url = LoadYaml.class.getClassLoader().getResource("orderer.yaml");
-            if (url != null) {
-                //获取test.yaml文件中的配置数据，然后转换为obj，
-                Object obj =yaml.load(new FileInputStream(url.getFile()));
-                System.out.println(obj);
-                //也可以将值转换为Map
-                log.info("Loading the yaml file...");
-                HashMap map =(HashMap)yaml.load(new FileInputStream(url.getFile()));
-               // System.out.println(map.get("General"));
-                //System.out.println(((HashMap) map.get("General")).get("LedgerType"));
-                //System.out.println(((HashMap)((HashMap) map.get("General")).get("TLS")).get("PrivateKey"));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-
-    }
-
-    public Map readYamlFile(String file){
+    public static Map readYamlFile(String file){
         HashMap map=new HashMap();
         try {
             Yaml yaml = new Yaml();
@@ -69,9 +49,5 @@ public class LoadYaml {
         return map;
     }
 
-    public static void main(String[] args) {
-        LoadYaml ll =new LoadYaml();
-        Map map=ll.readYamlFile("orderer.yaml");
-        System.out.println(((HashMap)map.get("Kafka")).get("Comumer"));
-    }
+
 }

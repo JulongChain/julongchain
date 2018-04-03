@@ -17,6 +17,7 @@ package org.bcia.javachain.common.localmsp.impl;
 
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
+import org.bcia.javachain.msp.mgmt.Mgmt;
 import org.bcia.javachain.protos.common.Common;
 import java.io.UnsupportedEncodingException;
 
@@ -39,7 +40,12 @@ public class LocalSigner implements ILocalSigner {
 
     @Override
     public byte[] sign(byte[] message) {
-        String mes="testmessage";
-        return mes.getBytes();
+       //通过获取msp实例,从实例中
+        return  Mgmt.getLocalMsp().getDefaultSigningIdentity().sign(message);
+    }
+    public static  void main(String[] args){
+        LocalSigner localSigner=new LocalSigner();
+        localSigner.sign("123".getBytes());
+
     }
 }

@@ -15,28 +15,19 @@
  */
 package org.bcia.javachain.consenter.common.broadcast;
 
-import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.stub.StreamObserver;
-import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Conf;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.consenter.common.blockcutter.BlockCutter;
 import org.bcia.javachain.consenter.common.multigroup.MultiGroup;
 import org.bcia.javachain.consenter.entity.ConfigMsg;
 import org.bcia.javachain.consenter.util.Constant;
-import org.bcia.javachain.consenter.util.LoadYaml;
+import org.bcia.javachain.csp.gm.sm2.SM2;
+import org.bcia.javachain.gm.SM2Impl;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.consenter.Ab;
-import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
-import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory.loadGenesisConfig;
-import static org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory.loadGenesisConfigMap;
 
 /**
  * @author zhangmingyang
@@ -48,6 +39,7 @@ public class BroadCastHandler {
     private static JavaChainLog log = JavaChainLogFactory.getLog(BroadCastHandler.class);
     BroadCastProcessor processor = new BroadCastProcessor();
     MultiGroup multiGroup = new MultiGroup();
+    SM2Impl sm2impl=new SM2Impl();
     /**
      * 处理发来Envelope格式消息
      *
@@ -74,7 +66,16 @@ public class BroadCastHandler {
             } else {
                 //通过配置更新消息,获取conifg消息和配置序列
                 ConfigMsg configMsg = processor.processConfigUpdateMsg(envelope);
-                log.info(envelope.getSignature().toStringUtf8());
+               // log.info(envelope.getSignature().toStringUtf8());
+               byte[] signData=envelope.getSignature().toByteArray();
+                Common.SignatureHeader signatureHeader=Common.SignatureHeader.parseFrom(payload.getHeader().getSignatureHeader());
+                byte[] creator=signatureHeader.getCreator().toByteArray();
+                String userId=signatureHeader.getNodeid();
+                System.out.println("userId:"+userId);
+                //首先从区块链上查询是否存在相同的公钥,如果不存在,说明该消息不合法,存在相同的可继续对消息进行验证签名
+
+                //boolean verfiy=   sm2impl.verfiy(userId,payload.toByteArray(),SM2.byte2ECpoint(creator),signData);
+                //System.out.println("对消息的验签结果为："+verfiy);
                 //将信封格式数据和排序序列发送给排序服务
                 processor.confgigure(configMsg.getConfig(), configMsg.getConfigSeq());
                 //排序服务对配置消息进行排序,切割成块

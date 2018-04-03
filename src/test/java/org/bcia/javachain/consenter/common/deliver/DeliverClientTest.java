@@ -15,7 +15,7 @@ public class DeliverClientTest extends BaseJunit4Test{
     @Test
     public void send() {
         String ip="localhost";
-        int port=7051;
+        int port=7050;
         String mess="testmessage";
 //        deliverClient.send(ip,port,mess);
     }

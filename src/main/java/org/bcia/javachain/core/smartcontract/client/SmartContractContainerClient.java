@@ -79,7 +79,7 @@ public class SmartContractContainerClient {
                                                                  .SmartContractMessage smartContractMessage, long timeout) {
 
         ProposalPackage.Proposal proposal = smartContractContext.getProposal();
-        String smartContractId = smartContractContext.getChainID();
+        String smartContractId = smartContractContext.getName();
         String txID = smartContractContext.getTxID();
         ProposalPackage.SignedProposal signedProposal = smartContractContext
                 .getSignedProposal();
@@ -94,6 +94,7 @@ public class SmartContractContainerClient {
                         .setSmartcontractEvent(smartContractEvent).setType
                         (SmartcontractShim.SmartContractMessage.Type
                                 .INVOKE_CHAINCODE).setProposal(signedProposal)
+                        .setPayload(smartContractMessage.getPayload())
                         .build();
 
         SmartcontractShim.SmartContractMessage result = null;

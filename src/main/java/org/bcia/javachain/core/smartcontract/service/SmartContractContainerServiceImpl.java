@@ -45,7 +45,7 @@ public class SmartContractContainerServiceImpl extends
     public void invoke(SmartcontractShim.SmartContractMessage request,
                        StreamObserver<SmartcontractShim.SmartContractMessage>
                                responseObserver) {
-        log.info("start invoke.");
+        log.info("start invoke.11");
 
         //根据传入参数中的链码名称执行相应的程序
         String smartContractId = request.getSmartcontractEvent()

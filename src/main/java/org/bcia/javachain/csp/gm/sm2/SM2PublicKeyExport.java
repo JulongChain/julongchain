@@ -15,7 +15,10 @@
  */
 package org.bcia.javachain.csp.gm.sm2;
 
+import org.bcia.javachain.consenter.util.LoadYaml;
+
 import java.net.URL;
+import java.util.HashMap;
 
 /**
  * @author zhangmingyang
@@ -23,15 +26,16 @@ import java.net.URL;
  * @company Dingxuan
  */
 public class SM2PublicKeyExport extends SM2KeyExport {
-    public SM2PublicKeyExport(String nodeId) {
-        super(nodeId);
+    public SM2PublicKeyExport() {
     }
 
     @Override
     public byte[] toBytes() {
         //根据nodeid获取私钥,路径可通过配置文件中读取
        // URL url = SM2PublicKeyExport.class.getClassLoader().getResource("publickey.pem");
-        return sm2.importPublicKey("E:/publickey.pem").getEncoded();
+        HashMap map= (HashMap) LoadYaml.readYamlFile("gmcsp.yaml");
+        String  publickey= (String) ((HashMap) ((HashMap)((HashMap)((HashMap) map.get("node")).get("CSP")).get("GM")).get("FileKeyStore")).get("PublicKeyStore");
+        return sm2.importPublicKey(publickey).getEncoded(false);
     }
 
     @Override

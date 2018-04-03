@@ -16,10 +16,11 @@
 package org.bcia.javachain.msp.mgmt;
 
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.consenter.util.LoadYaml;
 import org.bcia.javachain.csp.gm.sm2.SM2Key;
-import org.bcia.javachain.csp.gm.sm2.Sm2KeyGenOpts;
-import org.bcia.javachain.csp.intfs.IKey;
+import org.bcia.javachain.csp.gm.sm2.SM2KeyGenOpts;
 import org.bcia.javachain.msp.IIdentityDeserializer;
 import org.bcia.javachain.msp.IMsp;
 import org.bcia.javachain.msp.IMspManager;
@@ -28,10 +29,10 @@ import org.bcia.javachain.msp.entity.GmSoftConf;
 import org.bcia.javachain.msp.gmsoft.GmSoftMsp;
 
 import java.io.File;
-import java.net.URL;
 import java.util.HashMap;
 
 import static org.bcia.javachain.csp.factory.CspManager.getDefaultCsp;
+import static org.bcia.javachain.csp.gm.sm2.util.SM2KeyUtil.keyFileGen;
 
 
 /**
@@ -42,6 +43,7 @@ import static org.bcia.javachain.csp.factory.CspManager.getDefaultCsp;
  * @company Dingxuan
  */
 public class Mgmt {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(Mgmt.class);
     //本地的msp
 private static IMsp  localMsp;
     //通过具体配置加载得到的msp
@@ -56,26 +58,24 @@ private static IMsp loadMsp;
     public static IMsp loadLocalMspWithType(String localmspdir, CspConfig bccspconfig, String mspID, String mspType) {
         //构建msp配置
         //根据配置项加载公私钥文件,如果密钥文件存在,则将密钥导入到配置项中
-         HashMap map= (HashMap) LoadYaml.readYamlFile("gmcsp.yaml");
-        String  publickey= (String) ((HashMap) ((HashMap)((HashMap)((HashMap) map.get("node")).get("GMCSP")).get("GM")).get("FileKeyStore")).get("PublicKeyStore");
-       // URL url=IMsp.class.getClassLoader().getResource(publickey);
-        File file=new File("E:/publickey.pem");
-        if(!file.exists()){
-          //  String gm= (String) ((HashMap)((HashMap) map.get("node")).get("GMCSP")).get("GM");
+        HashMap map= (HashMap) LoadYaml.readYamlFile("gmcsp.yaml");
+        String  publickey= (String) ((HashMap) ((HashMap)((HashMap)((HashMap) map.get("node")).get("CSP")).get("GM")).get("FileKeyStore")).get("PublicKeyStore");
+        String  privatekey= (String) ((HashMap) ((HashMap)((HashMap)((HashMap) map.get("node")).get("CSP")).get("GM")).get("FileKeyStore")).get("PrivateKeyStore");
+        File publicKeyfile=new File(publickey);
+        File privateKeyfile=new File(privatekey);
+        if(publicKeyfile.exists()&&privateKeyfile.exists()){
+            log.info("密钥文件已存在");
 
+        }else {
             try {
-                SM2Key keyPairs= (SM2Key) getDefaultCsp().keyGen(new Sm2KeyGenOpts());
-                // keyPairs.toBytes()
-                SM2Key keys= (SM2Key) getDefaultCsp().keyGen(new Sm2KeyGenOpts());
-                getDefaultCsp().keyFileGen(keys,new Sm2KeyGenOpts());
-
+                SM2Key keys= (SM2Key) getDefaultCsp().keyGen(new SM2KeyGenOpts());
+                keyFileGen(keys,privatekey,publickey,new SM2KeyGenOpts());
             } catch (JavaChainException e) {
                 e.printStackTrace();
             }
 
             //将生成的密钥重新组装到配置中
-            System.out.println("the file is not exists!");
-
+            log.info("the file is not exists!");
         }
        // File file=new File(url.getFile());
         //if(!file.exists()){
@@ -104,10 +104,11 @@ private static IMsp loadMsp;
     public static IMsp getLocalMsp() {
         if(localMsp==null){
             //根据配置文件获取不通的msp类型,返回不同的msp实现
-            String localmspdir="local";
-            String mspID="bciamsp";
-            String mspType = "GmSoftMsp";
-            if (mspType.equals("GmSoftMsp")) {
+            HashMap map= (HashMap) LoadYaml.readYamlFile("gmcsp.yaml");
+            String mspType= (String) ((HashMap)map.get("node")).get("localMspType");
+            String localmspdir=(String) ((HashMap)map.get("node")).get("mspConfigPath");
+            String mspID=(String) ((HashMap)map.get("node")).get("localMspId");
+            if (mspType.equalsIgnoreCase("GMMSP")) {
                 localMsp=new GmSoftMsp(new GmSoftConf(localmspdir,mspID,mspType,new CspConfig("SM3","publickey.pem","privateke.pem")));
                 return localMsp;
             }
@@ -143,7 +144,6 @@ private static IMsp loadMsp;
         CspConfig bccspconfig=new CspConfig("SM3","publickey.pem","privateke.pem");
         String mspID="bciamsp";
         String mspType="GmSoftMsp";
-
         loadLocalMspWithType(localmspdir,bccspconfig,mspID,mspType);
         Mgmt.getLocalMsp().getDefaultSigningIdentity().sign("123".getBytes());
 

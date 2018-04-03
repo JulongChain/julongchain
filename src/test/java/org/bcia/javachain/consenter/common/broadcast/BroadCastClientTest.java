@@ -17,6 +17,6 @@ public class BroadCastClientTest extends BaseJunit4Test{
         String ip="localhost";
         int port=7050;
         String mess="testmessage";
-        broadCastClient.send(ip,port,mess);
+        //broadCastClient.send(ip,port,mess);
     }
 }

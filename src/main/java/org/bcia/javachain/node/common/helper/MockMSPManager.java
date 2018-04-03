@@ -54,8 +54,8 @@ public class MockMSPManager {
             }
 
             @Override
-            public void load(GmSoftConf GmSoftConf) {
-
+            public IMsp load(GmSoftConf GmSoftConf) {
+                return null;
             }
 
             @Override

@@ -22,6 +22,8 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.consenter.common.broadcast.BroadCastHandler;
 import org.bcia.javachain.consenter.common.deliver.DeliverHandler;
+import org.bcia.javachain.msp.entity.CspConfig;
+import org.bcia.javachain.msp.mgmt.Mgmt;
 import org.bcia.javachain.protos.common.Common;
 
 import org.bcia.javachain.protos.consenter.Ab;
@@ -30,6 +32,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+
+import static org.bouncycastle.asn1.iana.IANAObjectIdentifiers.mgmt;
 
 /**
  * @author zhangmingyang
@@ -86,7 +90,6 @@ public class ConsenterServer {
 
     // 定义一个实现服务接口的类
     private class ConsenterServerImpl extends AtomicBroadcastGrpc.AtomicBroadcastImplBase {
-
 
         @Override
         public StreamObserver<Common.Envelope> deliver(StreamObserver<Ab.DeliverResponse> responseObserver) {

@@ -50,6 +50,6 @@ public class SM2Key implements IKey {
 
     @Override
     public IKey getPublicKey() {
-        return new Sm2PublicKey(sm2KeyPair.getPublicKey());
+        return new SM2PublicKey(sm2KeyPair.getPublicKey());
     }
 }

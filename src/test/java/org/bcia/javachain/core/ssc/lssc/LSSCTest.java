@@ -66,6 +66,62 @@ public class LSSCTest extends BaseJunit4Test {
         assertThat(res.getStatus(),is(Response.Status.SUCCESS));
     }
 
+    @Test
+    public void testDeploys(){
+        MockStub mockStub = new MockStub("LSSC", lssc);
+        String path="/opt/git/javachain/src/main/java/org/bcia/javachain/examples/smartcontract/java/smartcontract_example02";
+        testDeploy("example02","1.0",path,"","Alice",mockStub);
+    }
+
+    public void testDeploy(String smartcontractName,String version,String path,
+                            String expectErrorMsg,String caller,
+                            MockStub mockStub){
+        List<String> initArgs=new LinkedList<String>();
+        initArgs.add("init");
+        initArgs.add("a");
+        initArgs.add("100");
+        initArgs.add("b");
+        initArgs.add("200");
+
+        Smartcontract.SmartContractDeploymentSpec cds = constructDeploySpec(smartcontractName, path, version, initArgs, false);
+        byte[] cdsBytes = ProtoUtils.marshalOrPanic(cds);
+        List<ByteString> args0 = new LinkedList<ByteString>();
+        args0.add(ByteString.copyFromUtf8(LSSC.DEPLOY));
+        args0.add(ByteString.copyFrom(cdsBytes));
+        Smartcontract.SmartContractSpec spec=Smartcontract.SmartContractSpec.newBuilder().build();
+        ProposalPackage.SignedProposal signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec, caller.getBytes(), "msg1".getBytes());
+        Response res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
+        assertThat(res.getStatus(),is(Response.Status.SUCCESS));
+    }
+
+    @Test
+    public void testUpgrades(){
+        MockStub mockStub = new MockStub("LSSC", lssc);
+        String path="/opt/git/javachain/src/main/java/org/bcia/javachain/examples/smartcontract/java/smartcontract_example02";
+        testUpgrade("example02","1.0",path,"","Alice",mockStub);
+    }
+
+    public void testUpgrade(String smartcontractName,String version,String path,
+                           String expectErrorMsg,String caller,
+                           MockStub mockStub){
+        List<String> initArgs=new LinkedList<String>();
+        initArgs.add("init");
+        initArgs.add("a");
+        initArgs.add("100");
+        initArgs.add("b");
+        initArgs.add("200");
+
+        Smartcontract.SmartContractDeploymentSpec cds = constructDeploySpec(smartcontractName, path, version, initArgs, false);
+        byte[] cdsBytes = ProtoUtils.marshalOrPanic(cds);
+        List<ByteString> args0 = new LinkedList<ByteString>();
+        args0.add(ByteString.copyFromUtf8(LSSC.UPGRADE));
+        args0.add(ByteString.copyFrom(cdsBytes));
+        Smartcontract.SmartContractSpec spec=Smartcontract.SmartContractSpec.newBuilder().build();
+        ProposalPackage.SignedProposal signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec, caller.getBytes(), "msg1".getBytes());
+        Response res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
+        assertThat(res.getStatus(),is(Response.Status.SUCCESS));
+    }
+
     private Smartcontract.SmartContractDeploymentSpec constructDeploySpec(String smartcontractName, String path, String version, List<String> initArgs, boolean bCreateFS) {
         Smartcontract.SmartContractDeploymentSpec spec=Smartcontract.SmartContractDeploymentSpec.newBuilder().
                 setCodePackage(ByteString.copyFromUtf8("testcds")).build();

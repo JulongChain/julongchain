@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.csp.gm.sm2;
+package org.bcia.javachain.csp.gm.sm2.util;
 
+import org.bcia.javachain.csp.gm.sm2.SM2Key;
 import org.bcia.javachain.csp.intfs.IKey;
 
 import java.io.File;
@@ -30,20 +31,17 @@ import java.net.URL;
  * @company Dingxuan
  */
 public class SM2KeyFileGen {
-    private  SM2Key k;
+    private SM2Key k;
     public SM2KeyFileGen( SM2Key k) {
     this.k=k;
     }
-  public   void publicKeyFileGen(){
-        //byte[] publicKey=k.toBytes();
-        //URL url=SM2KeyFileGen.class.getResource("publickey.pem");
-        File file = new File("E:/publickey.pem");
+  public   void publicKeyFileGen(String path){
+        File file = new File(path);
         try {
             if (!file.exists()) {
                 file.createNewFile();
             }
             byte[] buffer=k.getPublicKey().toBytes();
-            //byte buffer[] = publicKey.getEncoded(false);
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(buffer);
             fos.close();
@@ -51,10 +49,9 @@ public class SM2KeyFileGen {
             e.printStackTrace();
         }
     }
-    public  void privateKeyFileGen(){
+    public  void privateKeyFileGen(String path){
         BigInteger privateKey = new BigInteger( k.toBytes());
-      //  URL url=SM2KeyFileGen.class.getResource("privatekey.pem");
-        File file = new File("E:/privatekey.pem");
+        File file = new File(path);
         try {
             if (!file.exists()) {
                 file.createNewFile();

@@ -1,5 +1,5 @@
 /**
- * Copyright DingXuan. All Rights Reserved.
+ * Copyright BCIA. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,39 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.csp.gm.sm2;
+package org.bcia.javachain.csp.gmt0016.excelsecu.algorithm;
 
-import org.bouncycastle.math.ec.ECPoint;
+import org.bcia.javachain.csp.intfs.IHash;
 
 /**
- * @author zhangmingyang
- * @Date: 2018/3/27
- * @company Dingxuan
+ * @author chenhao
+ * @date 2018/4/2
+ * @company Excelsecu
  */
-public class Sm2PublicKey extends SM2Key {
-    private  ECPoint ecPoint;
-    public Sm2PublicKey(ECPoint ecPoint) {
-        this.ecPoint=ecPoint;
+public class SHA256 implements IHash {
+    @Override
+    public int write(byte[] p) {
+        return 0;
     }
 
     @Override
-    public byte[] toBytes() {
-        System.out.println("公钥");
-        return  ecPoint.getEncoded();
-    }
-
-    @Override
-    public byte[] ski() {
+    public byte[] sum(byte[] b) {
         return new byte[0];
     }
 
     @Override
-    public boolean isSymmetric() {
-        return false;
+    public void reset() {
+
     }
 
     @Override
-    public boolean isPrivate() {
-        return false;
+    public int size() {
+        return 0;
+    }
+
+    @Override
+    public int blockSize() {
+        return 0;
     }
 }
