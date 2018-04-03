@@ -28,5 +28,5 @@ public interface IApplicationConfig {
 
     Map<String, IApplicationOrgConfig> getApplicationOrgConfigs();
 
-    IApplicationCapabilities capabilities();
+    IApplicationCapabilities getCapabilities();
 }

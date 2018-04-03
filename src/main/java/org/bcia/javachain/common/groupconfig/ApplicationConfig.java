@@ -71,16 +71,12 @@ public class ApplicationConfig implements IApplicationConfig {
     }
 
     @Override
-    public IApplicationCapabilities capabilities() {
+    public IApplicationCapabilities getCapabilities() {
         return null;
     }
 
     public void setApplicationOrgConfigs(Map<String, IApplicationOrgConfig> applicationOrgConfigs) {
         this.applicationOrgConfigs = applicationOrgConfigs;
-    }
-
-    public Configuration.Capabilities getCapabilities() {
-        return capabilities;
     }
 
     public void setCapabilities(Configuration.Capabilities capabilities) {
