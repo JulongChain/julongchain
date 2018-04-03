@@ -20,7 +20,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.exception.ValidateException;
@@ -28,12 +27,9 @@ import org.bcia.javachain.common.groupconfig.ApplicationConfig;
 import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
 import org.bcia.javachain.common.groupconfig.MSPConfigHandler;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
-import org.bcia.javachain.common.localmsp.impl.LocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.common.util.ByteUtils;
 import org.bcia.javachain.common.util.FileUtils;
-import org.bcia.javachain.core.common.validation.MsgValidation;
 import org.bcia.javachain.msp.ISigningIdentity;
 import org.bcia.javachain.node.common.helper.ConfigChildHelper;
 import org.bcia.javachain.node.common.helper.ConfigUpdateHelper;
@@ -43,12 +39,9 @@ import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.TransactionPackage;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
-import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
 import org.bouncycastle.util.Arrays;
 
 import java.io.IOException;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * 信封对象帮助类
