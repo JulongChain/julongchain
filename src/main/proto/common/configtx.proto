@@ -19,8 +19,8 @@ package common;
 // ConfigType is an enumeration of possible types for the config.  The type field in the config is
 // an int32 for extensibility, but this enum type should generally be used to populate it
 enum ConfigType {
-	GROUP = 0;  // The original and default configuration type, defines parameters for the operation of a group
-	RESOURCE = 1; // Defines a set of resource names, and their mapping to policies which restrict access to those resources
+    GROUP = 0; // The original and default configuration type, defines parameters for the operation of a group
+    RESOURCE = 1; // Defines a set of resource names, and their mapping to policies which restrict access to those resources
 }
 
 // ConfigEnvelope is designed to contain _all_ configuration for a chain with no dependency
@@ -28,8 +28,8 @@ enum ConfigType {
 //
 // It is generated with the following scheme:
 //   1. Retrieve the existing configuration
-//   2. Note the config properties (ConfigValue, IConfigPolicy, ConfigChild) to be modified
-//   3. Add any intermediate ConfigChilds to the ConfigUpdate.read_set (sparsely)
+//   2. Note the config properties (ConfigValue, IConfigPolicy, ConfigTree) to be modified
+//   3. Add any intermediate ConfigTrees to the ConfigUpdate.read_set (sparsely)
 //   4. Add any additional desired dependencies to ConfigUpdate.read_set (sparsely)
 //   5. Modify the config properties, incrementing each version by 1, set them in the ConfigUpdate.write_set
 //      Note: any element not modified but specified should already be in the read_set, so may be specified sparsely
@@ -45,30 +45,33 @@ enum ConfigType {
 //   2. All items in the write_set at a different version than, or not in, the read_set have been appropriately signed according to their mod_policy
 //   3. The new configuration satisfies the ConfigSchema
 message ConfigEnvelope {
-    Config config = 1;        // A marshaled Config structure
+    Config config = 1; // A marshaled Config structure
     Envelope last_update = 2; // The last CONFIG_UPDATE message which generated this current configuration
-                              // Note that CONFIG_UPDATE has a Payload.Data of a Marshaled ConfigUpdate
+    // Note that CONFIG_UPDATE has a Payload.Data of a Marshaled ConfigUpdate
 }
 
-message ConfigChildSchema {
-    map<string, ConfigChildSchema> childs = 1;
+message ConfigTreeSchema {
+    map<string, ConfigTreeSchema> childs = 1;
     map<string, ConfigValueSchema> values = 2;
     map<string, ConfigPolicySchema> policies = 3;
 }
 
-message ConfigValueSchema {}
+message ConfigValueSchema {
+}
 
-message ConfigPolicySchema {}
+message ConfigPolicySchema {
+}
 
 // Config represents the config for a particular group
 message Config {
     uint64 sequence = 1;
-    ConfigChild group_child = 2; // group_child is a bad name for this, it should be changed to root when API breakage is allowed
+    ConfigTree group_tree = 2; // group_tree is a bad name for this, it should be changed to root when API breakage is
+    //allowed
     int32 type = 3;
 }
 
 message ConfigUpdateEnvelope {
-    bytes config_update = 1;                 // A marshaled ConfigUpdate structure
+    bytes config_update = 1; // A marshaled ConfigUpdate structure
     repeated ConfigSignature signatures = 2; // Signatures over the config_update
 }
 
@@ -80,21 +83,21 @@ message ConfigUpdateEnvelope {
 // 2. Any elements in the write_set with the same version as the read_set are ignored.
 // 3. The corresponding mod_policy for every remaining element in the write_set is collected.
 // 4. Each policy is checked against the signatures from the ConfigUpdateEnvelope, any failing to verify are rejected
-// 5. The write_set is applied to the Config and the ConfigChildSchema verifies that the updates were legal
+// 5. The write_set is applied to the Config and the ConfigTreeSchema verifies that the updates were legal
 message ConfigUpdate {
-    string group_id = 1;                // Which group this config update is for
-    ConfigChild read_set = 2;             // ReadSet explicitly lists the portion of the config which was read, this should be sparse with only Version set
-    ConfigChild write_set = 3;            // WriteSet lists the portion of the config which was written, this should included updated Versions
-    int32 type = 4;                       // The type of config this update is intended for (usually a value from ConfigType enum) , must match the type in the Config message
+    string group_id = 1; // Which group this config update is for
+    ConfigTree read_set = 2; // ReadSet explicitly lists the portion of the config which was read, this should be sparse with only Version set
+    ConfigTree write_set = 3; // WriteSet lists the portion of the config which was written, this should included updated Versions
+    int32 type = 4; // The type of config this update is intended for (usually a value from ConfigType enum) , must match the type in the Config message
     map<string, bytes> isolated_data = 5; // Data which is not to be reflected in the resulting Config, but is still needed for some other purpose.  For instance, rscc_seed_data
 }
 
-// ConfigChild is the hierarchical data structure for holding config
-message ConfigChild {
+// ConfigTree is the hierarchical data structure for holding config
+message ConfigTree {
     uint64 version = 1;
-    map<string,ConfigChild> childs = 2;
-    map<string,ConfigValue> values = 3;
-    map<string,ConfigPolicy> policies = 4;
+    map<string, ConfigTree> childs = 2;
+    map<string, ConfigValue> values = 3;
+    map<string, ConfigPolicy> policies = 4;
     string mod_policy = 5;
 }
 
@@ -113,5 +116,5 @@ message ConfigPolicy {
 
 message ConfigSignature {
     bytes signature_header = 1; // A marshaled SignatureHeader
-    bytes signature = 2;        // Signature over the concatenation signatureHeader bytes and config bytes
+    bytes signature = 2; // Signature over the concatenation signatureHeader bytes and config bytes
 }

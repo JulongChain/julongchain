@@ -35,30 +35,27 @@ public class ApplicationConfig implements IApplicationConfig {
     private Map<String, IApplicationOrgConfig> applicationOrgConfigs;
     private Configuration.Capabilities capabilities;
 
-    public ApplicationConfig(Map<String, IApplicationOrgConfig> applicationOrgConfigs, Configuration.Capabilities
-            capabilities) {
-        this.applicationOrgConfigs = applicationOrgConfigs;
-        this.capabilities = capabilities;
+    public ApplicationConfig() {
     }
 
-    public ApplicationConfig(Configtx.ConfigChild appChild, MSPConfigHandler mspConfigHandler) throws
+    public ApplicationConfig(Configtx.ConfigTree appTree, MSPConfigHandler mspConfigHandler) throws
             InvalidProtocolBufferException, ValidateException {
-        if (appChild != null && appChild.getValuesMap() != null) {
-            Configtx.ConfigValue configValue = appChild.getValuesMap().get(GroupConfigConstant.CAPABILITIES);
+        if (appTree != null && appTree.getValuesMap() != null) {
+            Configtx.ConfigValue configValue = appTree.getValuesMap().get(GroupConfigConstant.CAPABILITIES);
             if (configValue != null) {
                 capabilities = Configuration.Capabilities.parseFrom(configValue.getValue());
             }
         }
 
         applicationOrgConfigs = new HashMap<String, IApplicationOrgConfig>();
-        if (appChild != null && appChild.getChildsMap() != null) {
-            Iterator<Map.Entry<String, Configtx.ConfigChild>> entries = appChild.getChildsMap().entrySet().iterator();
+        if (appTree != null && appTree.getChildsMap() != null) {
+            Iterator<Map.Entry<String, Configtx.ConfigTree>> entries = appTree.getChildsMap().entrySet().iterator();
             while (entries.hasNext()) {
-                Map.Entry<String, Configtx.ConfigChild> entry = entries.next();
+                Map.Entry<String, Configtx.ConfigTree> entry = entries.next();
                 String orgName = entry.getKey();
-                Configtx.ConfigChild orgChild = entry.getValue();
+                Configtx.ConfigTree orgTree = entry.getValue();
 
-                ApplicationOrgConfig applicationOrgConfig = new ApplicationOrgConfig(orgName, mspConfigHandler, orgChild);
+                ApplicationOrgConfig applicationOrgConfig = new ApplicationOrgConfig(orgName, mspConfigHandler, orgTree);
                 applicationOrgConfigs.put(orgName, applicationOrgConfig);
             }
         }
@@ -73,13 +70,5 @@ public class ApplicationConfig implements IApplicationConfig {
     @Override
     public IApplicationCapabilities getCapabilities() {
         return null;
-    }
-
-    public void setApplicationOrgConfigs(Map<String, IApplicationOrgConfig> applicationOrgConfigs) {
-        this.applicationOrgConfigs = applicationOrgConfigs;
-    }
-
-    public void setCapabilities(Configuration.Capabilities capabilities) {
-        this.capabilities = capabilities;
     }
 }

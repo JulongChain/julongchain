@@ -25,8 +25,17 @@ import java.util.Map;
  * @company Dingxuan
  */
 public interface IApplicationConfig {
-
+    /**
+     * 获取当前应用下的组织
+     *
+     * @return
+     */
     Map<String, IApplicationOrgConfig> getApplicationOrgConfigs();
 
+    /**
+     * 获取能力集
+     *
+     * @return
+     */
     IApplicationCapabilities getCapabilities();
 }

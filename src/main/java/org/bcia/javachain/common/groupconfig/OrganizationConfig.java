@@ -36,18 +36,18 @@ public class OrganizationConfig {
     private String mspId;
     private String name;
 
-    public OrganizationConfig(String name, MSPConfigHandler mspConfigHandler, Configtx.ConfigChild orgChild) throws
+    public OrganizationConfig(String name, MSPConfigHandler mspConfigHandler, Configtx.ConfigTree orgTree) throws
             ValidateException, InvalidProtocolBufferException {
         this.name = name;
 
         this.mspConfigHandler = mspConfigHandler;
 
-        if (orgChild != null && orgChild.getChildsMap() != null && orgChild.getChildsMap().size() > 0) {
+        if (orgTree != null && orgTree.getChildsMap() != null && orgTree.getChildsMap().size() > 0) {
             throw new ValidateException("Not supported sub organization");
         }
 
-        if (orgChild != null && orgChild.getValuesMap() != null) {
-            Configtx.ConfigValue configValue = orgChild.getValuesMap().get(GroupConfigConstant.MSP_KEY);
+        if (orgTree != null && orgTree.getValuesMap() != null) {
+            Configtx.ConfigValue configValue = orgTree.getValuesMap().get(GroupConfigConstant.MSP_KEY);
             if (configValue != null) {
                 mspConfig = MspConfigPackage.MSPConfig.parseFrom(configValue.getValue());
             }
