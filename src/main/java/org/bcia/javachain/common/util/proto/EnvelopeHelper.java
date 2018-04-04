@@ -31,7 +31,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.FileUtils;
 import org.bcia.javachain.msp.ISigningIdentity;
-import org.bcia.javachain.node.common.helper.ConfigChildHelper;
+import org.bcia.javachain.node.common.helper.ConfigTreeHelper;
 import org.bcia.javachain.node.common.helper.ConfigUpdateHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
@@ -53,7 +53,7 @@ import java.io.IOException;
 public class EnvelopeHelper {
     private static JavaChainLog log = JavaChainLogFactory.getLog(EnvelopeHelper.class);
 
-    public static Common.Envelope makeGroupCreateTx(String groupId, ILocalSigner signer, Configtx.ConfigChild
+    public static Common.Envelope makeGroupCreateTx(String groupId, ILocalSigner signer, Configtx.ConfigTree
             consenterSystemGroupChild, GenesisConfig.Profile profile) throws InvalidProtocolBufferException,
             NodeException, ValidateException {
         Configtx.ConfigUpdate configUpdate = buildConfigUpdate(groupId, consenterSystemGroupChild, profile);
@@ -77,7 +77,7 @@ public class EnvelopeHelper {
 
     }
 
-    public static Configtx.ConfigUpdate buildConfigUpdate(String groupId, Configtx.ConfigChild
+    public static Configtx.ConfigUpdate buildConfigUpdate(String groupId, Configtx.ConfigTree
             consenterSystemGroupChild, GenesisConfig.Profile profile) throws NodeException,
             InvalidProtocolBufferException, ValidateException {
         if (profile.getApplication() == null) {
@@ -89,9 +89,9 @@ public class EnvelopeHelper {
         }
 
         //构造应用子树
-        Configtx.ConfigChild appChild = ConfigChildHelper.buildApplicationChild(profile.getApplication());
+        Configtx.ConfigTree appTree = ConfigTreeHelper.buildApplicationChild(profile.getApplication());
         //得到最终的应用配置
-        ApplicationConfig appConfig = new ApplicationConfig(appChild, new MSPConfigHandler(0));
+        ApplicationConfig appConfig = new ApplicationConfig(appTree, new MSPConfigHandler(0));
 
         if (consenterSystemGroupChild != null) {
             //TODO:要实现吗？
@@ -99,14 +99,14 @@ public class EnvelopeHelper {
 
         }
 
-        Configtx.ConfigChild originalChild = Configtx.ConfigChild.newBuilder().build();
+        Configtx.ConfigTree originalTree = Configtx.ConfigTree.newBuilder().build();
 
-        Configtx.ConfigChild.Builder groupChildBuilder = Configtx.ConfigChild.newBuilder();
-        groupChildBuilder.putChilds(GroupConfigConstant.APPLICATION, appChild);
-        Configtx.ConfigChild pendingChild = groupChildBuilder.build();
+        Configtx.ConfigTree.Builder groupTreeBuilder = Configtx.ConfigTree.newBuilder();
+        groupTreeBuilder.putChilds(GroupConfigConstant.APPLICATION, appTree);
+        Configtx.ConfigTree pendingTree = groupTreeBuilder.build();
 
-        Configtx.Config original = Configtx.Config.newBuilder().setGroupChild(originalChild).build();
-        Configtx.Config pending = Configtx.Config.newBuilder().setGroupChild(pendingChild).build();
+        Configtx.Config original = Configtx.Config.newBuilder().setGroupTree(originalTree).build();
+        Configtx.Config pending = Configtx.Config.newBuilder().setGroupTree(pendingTree).build();
         Configtx.ConfigUpdate configUpdate = ConfigUpdateHelper.compute(original, pending);
 
         //TODO:

@@ -31,19 +31,19 @@ import java.util.Objects;
  * @company Dingxuan
  */
 public class ConfigUpdateHelper {
-    public static Configtx.ConfigUpdate compute(Configtx.Config original, Configtx.Config pending) throws
+    public static Configtx.ConfigUpdate compute(Configtx.Config originalConfig, Configtx.Config pendingConfig) throws
             ValidateException {
-        if (original.getGroupChild() == null) {
-            throw new ValidateException("No group child found in original");
+        if (originalConfig.getGroupTree() == null) {
+            throw new ValidateException("No group tree found in original");
         }
 
-        if (pending.getGroupChild() == null) {
-            throw new ValidateException("No group child found in pending");
+        if (pendingConfig.getGroupTree() == null) {
+            throw new ValidateException("No group tree found in pending");
         }
 
-        Object[] childObjs = computeChildUpdate(original.getGroupChild(), pending.getGroupChild());
-        Configtx.ConfigChild readChild = (Configtx.ConfigChild) childObjs[0];
-        Configtx.ConfigChild writeChild = (Configtx.ConfigChild) childObjs[1];
+        Object[] childObjs = computeTreeUpdate(originalConfig.getGroupTree(), pendingConfig.getGroupTree());
+        Configtx.ConfigTree readChild = (Configtx.ConfigTree) childObjs[0];
+        Configtx.ConfigTree writeChild = (Configtx.ConfigTree) childObjs[1];
         boolean childUpdate = (boolean) childObjs[2];
 
         //开始构造ConfigUpdate对象
@@ -187,63 +187,63 @@ public class ConfigUpdateHelper {
         return new Object[]{readSet, writeSet, sameSet, hasMembersUpdate};
     }
 
-    private static Object[] computeChildsMapUpdate(Map<String, Configtx.ConfigChild> originalMap, Map<String,
-            Configtx.ConfigChild> pendingMap) {
+    private static Object[] computeChildsMapUpdate(Map<String, Configtx.ConfigTree> originalMap, Map<String,
+            Configtx.ConfigTree> pendingMap) {
         //TODO:如果有空的情况
-        Map<String, Configtx.ConfigChild> readSet = new HashMap<String, Configtx.ConfigChild>();
-        Map<String, Configtx.ConfigChild> writeSet = new HashMap<String, Configtx.ConfigChild>();
-        Map<String, Configtx.ConfigChild> sameSet = new HashMap<String, Configtx.ConfigChild>();
+        Map<String, Configtx.ConfigTree> readSet = new HashMap<String, Configtx.ConfigTree>();
+        Map<String, Configtx.ConfigTree> writeSet = new HashMap<String, Configtx.ConfigTree>();
+        Map<String, Configtx.ConfigTree> sameSet = new HashMap<String, Configtx.ConfigTree>();
 
         boolean hasMemberUpdate = false;
 
         //先循环originalMap
-        Iterator<Map.Entry<String, Configtx.ConfigChild>> entries = originalMap.entrySet().iterator();
+        Iterator<Map.Entry<String, Configtx.ConfigTree>> entries = originalMap.entrySet().iterator();
         while (entries.hasNext()) {
-            Map.Entry<String, Configtx.ConfigChild> entry = entries.next();
+            Map.Entry<String, Configtx.ConfigTree> entry = entries.next();
             String childName = entry.getKey();
-            Configtx.ConfigChild originalChild = entry.getValue();
+            Configtx.ConfigTree originalTree = entry.getValue();
 
             //判断在新集合pendingMap有没有对应项
-            Configtx.ConfigChild pendingChild = pendingMap.get(childName);
-            if (pendingChild == null) {
+            Configtx.ConfigTree pendingTree = pendingMap.get(childName);
+            if (pendingTree == null) {
                 //该成员在新集合不存在，很可能被删除，说明集合成员项有更新
                 hasMemberUpdate = true;
                 continue;
             }
 
             //如果存在对应项，相同的并入sameSet，不同的并入writeSet
-            Object[] childObjs = computeChildUpdate(originalChild, pendingChild);
-            Configtx.ConfigChild readChild = (Configtx.ConfigChild) childObjs[0];
-            Configtx.ConfigChild writeChild = (Configtx.ConfigChild) childObjs[1];
+            Object[] childObjs = computeTreeUpdate(originalTree, pendingTree);
+            Configtx.ConfigTree readTree = (Configtx.ConfigTree) childObjs[0];
+            Configtx.ConfigTree writeTree = (Configtx.ConfigTree) childObjs[1];
             boolean childUpdate = (boolean) childObjs[2];
 
             if (!childUpdate) {
-                sameSet.put(childName, readChild);
+                sameSet.put(childName, readTree);
             } else {
-                readSet.put(childName, readChild);
-                writeSet.put(childName, writeChild);
+                readSet.put(childName, readTree);
+                writeSet.put(childName, writeTree);
             }
         }
 
         //再循环pendingMap
-        Iterator<Map.Entry<String, Configtx.ConfigChild>> pendingEntries = pendingMap.entrySet().iterator();
+        Iterator<Map.Entry<String, Configtx.ConfigTree>> pendingEntries = pendingMap.entrySet().iterator();
         while (pendingEntries.hasNext()) {
-            Map.Entry<String, Configtx.ConfigChild> entry = pendingEntries.next();
+            Map.Entry<String, Configtx.ConfigTree> entry = pendingEntries.next();
             String childName = entry.getKey();
-            Configtx.ConfigChild pendingChild = entry.getValue();
+            Configtx.ConfigTree pendingTree = entry.getValue();
 
             //判断在原集合originalMap有没有对应项。有对应项的已经在前面处理过了，只需要再处理不存在的
-            Configtx.ConfigChild originalChild = pendingMap.get(childName);
-            if (originalChild == null) {
+            Configtx.ConfigTree originalTree = pendingMap.get(childName);
+            if (originalTree == null) {
                 //该成员在原集合不存在，很可能是新增项，说明集合成员项有更新
                 hasMemberUpdate = true;
 
                 //基于新集合创建另一个集合，只是版本为0.表示新增项
-                Configtx.ConfigChild.Builder newVersionChildBuilder = Configtx.ConfigChild.newBuilder(pendingChild);
-                newVersionChildBuilder.setVersion(0);
-                Configtx.ConfigChild newVersionChild = newVersionChildBuilder.build();
+                Configtx.ConfigTree.Builder newVersionTreeBuilder = Configtx.ConfigTree.newBuilder(pendingTree);
+                newVersionTreeBuilder.setVersion(0);
+                Configtx.ConfigTree newVersionTree = newVersionTreeBuilder.build();
 
-                writeSet.put(childName, newVersionChild);
+                writeSet.put(childName, newVersionTree);
             }
         }
 
@@ -251,10 +251,10 @@ public class ConfigUpdateHelper {
     }
 
 
-    private static Object[] computeChildUpdate(Configtx.ConfigChild originalChild, Configtx.ConfigChild pendingChild) {
-        Object[] policiesObjs = computePoliciesMapUpdate(originalChild.getPoliciesMap(), pendingChild.getPoliciesMap());
-        Object[] valuesObjs = computeValuesMapUpdate(originalChild.getValuesMap(), pendingChild.getValuesMap());
-        Object[] childsObjs = computeChildsMapUpdate(originalChild.getChildsMap(), pendingChild.getChildsMap());
+    private static Object[] computeTreeUpdate(Configtx.ConfigTree originalTree, Configtx.ConfigTree pendingTree) {
+        Object[] policiesObjs = computePoliciesMapUpdate(originalTree.getPoliciesMap(), pendingTree.getPoliciesMap());
+        Object[] valuesObjs = computeValuesMapUpdate(originalTree.getValuesMap(), pendingTree.getValuesMap());
+        Object[] childsObjs = computeChildsMapUpdate(originalTree.getChildsMap(), pendingTree.getChildsMap());
 
         Map<String, Configtx.ConfigPolicy> policiesReadSet = (Map<String, Configtx.ConfigPolicy>) policiesObjs[0];
         Map<String, Configtx.ConfigPolicy> policiesWriteSet = (Map<String, Configtx.ConfigPolicy>) policiesObjs[1];
@@ -266,29 +266,29 @@ public class ConfigUpdateHelper {
         Map<String, Configtx.ConfigValue> valuesSameSet = (Map<String, Configtx.ConfigValue>) valuesObjs[2];
         boolean valuesMembersUpdate = (boolean) valuesObjs[3];
 
-        Map<String, Configtx.ConfigChild> childsReadSet = (Map<String, Configtx.ConfigChild>) childsObjs[0];
-        Map<String, Configtx.ConfigChild> childsWriteSet = (Map<String, Configtx.ConfigChild>) childsObjs[1];
-        Map<String, Configtx.ConfigChild> childsSameSet = (Map<String, Configtx.ConfigChild>) childsObjs[2];
+        Map<String, Configtx.ConfigTree> childsReadSet = (Map<String, Configtx.ConfigTree>) childsObjs[0];
+        Map<String, Configtx.ConfigTree> childsWriteSet = (Map<String, Configtx.ConfigTree>) childsObjs[1];
+        Map<String, Configtx.ConfigTree> childsSameSet = (Map<String, Configtx.ConfigTree>) childsObjs[2];
         boolean childsMembersUpdate = (boolean) childsObjs[3];
 
-        if (!policiesMembersUpdate && !valuesMembersUpdate && !childsMembersUpdate && Objects.equals(originalChild
-                .getModPolicy(), pendingChild.getModPolicy())) {
+        if (!policiesMembersUpdate && !valuesMembersUpdate && !childsMembersUpdate && Objects.equals(originalTree
+                .getModPolicy(), pendingTree.getModPolicy())) {
             //所有对象都未更新成员，且权限亦未更新
             if (policiesReadSet.size() <= 0 && policiesWriteSet.size() <= 0
                     && valuesReadSet.size() <= 0 && valuesWriteSet.size() <= 0
                     && childsReadSet.size() <= 0 && childsWriteSet.size() <= 0) {
                 //完全未更改
-                Configtx.ConfigChild resultSet = Configtx.ConfigChild.newBuilder().setVersion(originalChild.getVersion())
+                Configtx.ConfigTree resultSet = Configtx.ConfigTree.newBuilder().setVersion(originalTree.getVersion())
                         .build();
-                Configtx.ConfigChild writeSet = Configtx.ConfigChild.newBuilder().setVersion(originalChild.getVersion())
+                Configtx.ConfigTree writeSet = Configtx.ConfigTree.newBuilder().setVersion(originalTree.getVersion())
                         .build();
 
                 return new Object[]{resultSet, writeSet, false};
             } else {
                 //部分更改
-                Configtx.ConfigChild resultSet = Configtx.ConfigChild.newBuilder().setVersion(originalChild.getVersion())
+                Configtx.ConfigTree resultSet = Configtx.ConfigTree.newBuilder().setVersion(originalTree.getVersion())
                         .putAllPolicies(policiesReadSet).putAllValues(valuesReadSet).putAllChilds(childsReadSet).build();
-                Configtx.ConfigChild writeSet = Configtx.ConfigChild.newBuilder().setVersion(originalChild.getVersion())
+                Configtx.ConfigTree writeSet = Configtx.ConfigTree.newBuilder().setVersion(originalTree.getVersion())
                         .putAllPolicies(policiesWriteSet).putAllValues(valuesWriteSet).putAllChilds(childsWriteSet).build();
 
                 return new Object[]{resultSet, writeSet, true};
@@ -305,9 +305,9 @@ public class ConfigUpdateHelper {
         childsWriteSet.putAll(childsSameSet);
 
         //读集合为原版本，写集合新增1
-        Configtx.ConfigChild resultSet = Configtx.ConfigChild.newBuilder().setVersion(originalChild.getVersion())
+        Configtx.ConfigTree resultSet = Configtx.ConfigTree.newBuilder().setVersion(originalTree.getVersion())
                 .putAllPolicies(policiesReadSet).putAllValues(valuesReadSet).putAllChilds(childsReadSet).build();
-        Configtx.ConfigChild writeSet = Configtx.ConfigChild.newBuilder().setVersion(originalChild.getVersion() + 1)
+        Configtx.ConfigTree writeSet = Configtx.ConfigTree.newBuilder().setVersion(originalTree.getVersion() + 1)
                 .putAllPolicies(policiesWriteSet).putAllValues(valuesWriteSet).putAllChilds(childsWriteSet).build();
 
         return new Object[]{resultSet, writeSet, true};

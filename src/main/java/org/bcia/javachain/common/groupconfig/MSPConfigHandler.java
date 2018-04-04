@@ -15,12 +15,8 @@
  */
 package org.bcia.javachain.common.groupconfig;
 
-import org.bcia.javachain.common.util.MspType;
 import org.bcia.javachain.msp.IMsp;
-import org.bcia.javachain.msp.IMspFactory;
 import org.bcia.javachain.msp.IMspManager;
-import org.bcia.javachain.msp.IMspOpts;
-import org.bcia.javachain.msp.gmsoft.GmSoftMsp;
 import org.bcia.javachain.msp.mgmt.Mgmt;
 import org.bcia.javachain.msp.mgmt.MspmgrImpl;
 import org.bcia.javachain.protos.msp.MspConfigPackage;
@@ -79,7 +75,7 @@ public class MSPConfigHandler {
 //
 //        IMsp msp = factory.getMsp(opts);
 
-        IMsp msp = new Mgmt().getLocalMsp();
+        IMsp msp = Mgmt.getLocalMsp();
 
         msp.setup(mspConfig);
         String mspId = msp.getIdentifier();
@@ -94,7 +90,7 @@ public class MSPConfigHandler {
 //        }
     }
 
-    public IMspManager CreateMSPManager() {
+    public IMspManager createMSPManager() {
         IMsp[] mspArray = new IMsp[idMap.size()];
         int i = 0;
         for (PendingMSPConfig pendingMSPConfig : idMap.values()) {

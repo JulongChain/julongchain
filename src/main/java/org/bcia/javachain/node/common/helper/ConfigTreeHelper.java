@@ -41,16 +41,16 @@ import static org.bcia.javachain.tools.configtxgen.entity.GenesisConfig.DEFAULT_
  * @date 2018/3/9
  * @company Dingxuan
  */
-public class ConfigChildHelper {
+public class ConfigTreeHelper {
     /**
-     * 为ConfigChild的构造器增加策略
+     * 为ConfigTree的构造器增加策略
      *
-     * @param configChildBuilder
+     * @param configTreeBuilder
      * @param key
      * @param policy
      * @param modPolicy
      */
-    public static void addPolicy(Configtx.ConfigChild.Builder configChildBuilder, String key, Policies.Policy policy,
+    public static void addPolicy(Configtx.ConfigTree.Builder configTreeBuilder, String key, Policies.Policy policy,
                                  String modPolicy) {
         //首先构造ConfigPolicy
         Configtx.ConfigPolicy.Builder configPolicyBuilder = Configtx.ConfigPolicy.newBuilder();
@@ -58,19 +58,19 @@ public class ConfigChildHelper {
         configPolicyBuilder.setModPolicy(modPolicy);
         Configtx.ConfigPolicy configPolicy = configPolicyBuilder.build();
 
-        //基于原ConfigChild构造新的ConfigChild
-        configChildBuilder.putPolicies(key, configPolicy);
+        //基于原ConfigTree构造新的ConfigTree
+        configTreeBuilder.putPolicies(key, configPolicy);
     }
 
     /**
-     * 为ConfigChild的构造器增加Value
+     * 为ConfigTree的构造器增加Value
      *
-     * @param configChildBuilder
+     * @param configTreeBuilder
      * @param key
      * @param message
      * @param modPolicy
      */
-    public static void addValue(Configtx.ConfigChild.Builder configChildBuilder, String key, Message message,
+    public static void addValue(Configtx.ConfigTree.Builder configTreeBuilder, String key, Message message,
                                 String modPolicy) {
         //首先构造ConfigValue
         Configtx.ConfigValue.Builder configValueBuilder = Configtx.ConfigValue.newBuilder();
@@ -78,7 +78,7 @@ public class ConfigChildHelper {
         configValueBuilder.setModPolicy(modPolicy);
         Configtx.ConfigValue configValue = configValueBuilder.build();
 
-        configChildBuilder.putValues(key, configValue);
+        configTreeBuilder.putValues(key, configValue);
     }
 
     /**
@@ -117,31 +117,31 @@ public class ConfigChildHelper {
      * @param application
      * @return
      */
-    public static Configtx.ConfigChild buildApplicationChild(GenesisConfig.Application application) {
-        //构建最终的应用ConfigChild
-        Configtx.ConfigChild.Builder applicationChildBuilder = Configtx.ConfigChild.newBuilder();
+    public static Configtx.ConfigTree buildApplicationChild(GenesisConfig.Application application) {
+        //构建最终的应用ConfigTree
+        Configtx.ConfigTree.Builder applicationTreeBuilder = Configtx.ConfigTree.newBuilder();
 
         //填充默认的权限体系
-        Map<String, Configtx.ConfigPolicy> defaultPolicies = ConfigChildHelper.getDefaultImplicitMetaPolicy();
-        applicationChildBuilder.putAllPolicies(defaultPolicies);
+        Map<String, Configtx.ConfigPolicy> defaultPolicies = getDefaultImplicitMetaPolicy();
+        applicationTreeBuilder.putAllPolicies(defaultPolicies);
 
         //填充能力集
         if (application.getCapabilities() != null && !application.getCapabilities().isEmpty()) {
             IConfigValue configValue = new CapabilitiesValue(application.getCapabilities());
-            ConfigChildHelper.addValue(applicationChildBuilder, configValue.key(), configValue.value(), GroupConfigConstant.POLICY_ADMINS);
+            addValue(applicationTreeBuilder, configValue.key(), configValue.value(), GroupConfigConstant.POLICY_ADMINS);
         }
 
         //填充子树信息
         if (application.getOrganizations() != null && application.getOrganizations().length > 0) {
             for (GenesisConfig.Organization org : application.getOrganizations()) {
-                applicationChildBuilder.putChilds(org.getName(), buildOrgChild(org));
+                applicationTreeBuilder.putChilds(org.getName(), buildOrgTree(org));
             }
         }
 
         //填充更改策略人
-        applicationChildBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
+        applicationTreeBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
 
-        return applicationChildBuilder.build();
+        return applicationTreeBuilder.build();
     }
 
     /**
@@ -150,33 +150,33 @@ public class ConfigChildHelper {
      * @param org
      * @return
      */
-    public static Configtx.ConfigChild buildOrgChild(GenesisConfig.Organization org) {
-        //构建最终的应用ConfigChild
-        Configtx.ConfigChild.Builder orgChildBuilder = Configtx.ConfigChild.newBuilder();
+    public static Configtx.ConfigTree buildOrgTree(GenesisConfig.Organization org) {
+        //构建最终的应用ConfigTree
+        Configtx.ConfigTree.Builder orgTreeBuilder = Configtx.ConfigTree.newBuilder();
 
         //填充签名策略
-        addSignaturePolicyDefaults(orgChildBuilder, org.getId(), !DEFAULT_ADMIN_PRINCIPAL.equals(org
+        addSignaturePolicyDefaults(orgTreeBuilder, org.getId(), !DEFAULT_ADMIN_PRINCIPAL.equals(org
                 .getAdminPrincipal()));
 
         //填充MSP信息
         MspConfigPackage.MSPConfig mspConfig = MockMSPManager.getVerifyingMspConfig(org.getMspDir(), org.getId(), org.getMspType());
         IConfigValue mspValue = new MSPValue(mspConfig);
-        addValue(orgChildBuilder, mspValue.key(), mspValue.value(), GroupConfigConstant.POLICY_ADMINS);
+        addValue(orgTreeBuilder, mspValue.key(), mspValue.value(), GroupConfigConstant.POLICY_ADMINS);
 
         //填充更改策略人
-        orgChildBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
+        orgTreeBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
 
-        return orgChildBuilder.build();
+        return orgTreeBuilder.build();
     }
 
     /**
      * 增加默认的签名策略
      *
-     * @param configChildBuilder
+     * @param configTreeBuilder
      * @param mspId
      * @param devMode
      */
-    public static void addSignaturePolicyDefaults(Configtx.ConfigChild.Builder configChildBuilder, String mspId, boolean
+    public static void addSignaturePolicyDefaults(Configtx.ConfigTree.Builder configTreeBuilder, String mspId, boolean
             devMode) {
         Policies.SignaturePolicyEnvelope policyEnvelope = null;
         if (devMode) {
@@ -186,12 +186,12 @@ public class ConfigChildHelper {
         }
 
         IConfigPolicy adminPolicy = new SignaturePolicy(GroupConfigConstant.POLICY_ADMINS, policyEnvelope);
-        addPolicy(configChildBuilder, adminPolicy.key(), adminPolicy.value(), GroupConfigConstant.POLICY_ADMINS);
+        addPolicy(configTreeBuilder, adminPolicy.key(), adminPolicy.value(), GroupConfigConstant.POLICY_ADMINS);
 
         IConfigPolicy readerPolicy = new SignaturePolicy(GroupConfigConstant.POLICY_READERS, MockCauthdsl.signedByMspMember(mspId));
-        addPolicy(configChildBuilder, readerPolicy.key(), readerPolicy.value(), GroupConfigConstant.POLICY_ADMINS);
+        addPolicy(configTreeBuilder, readerPolicy.key(), readerPolicy.value(), GroupConfigConstant.POLICY_ADMINS);
 
         IConfigPolicy writerPolicy = new SignaturePolicy(GroupConfigConstant.POLICY_WRITERS, MockCauthdsl.signedByMspMember(mspId));
-        addPolicy(configChildBuilder, writerPolicy.key(), writerPolicy.value(), GroupConfigConstant.POLICY_ADMINS);
+        addPolicy(configTreeBuilder, writerPolicy.key(), writerPolicy.value(), GroupConfigConstant.POLICY_ADMINS);
     }
 }

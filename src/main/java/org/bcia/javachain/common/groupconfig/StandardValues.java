@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * 对象
+ * 标准值对象(该对象仅供辅助读取配置对象，可能后面可以去掉)
  *
  * @author zhouhui
  * @date 2018/3/28
@@ -34,21 +34,18 @@ import java.util.Map;
 public class StandardValues {
     private Map<String, Message> lookup;
 
+    public StandardValues() {
+        lookup = new HashMap<String, Message>();
+    }
+
     public StandardValues(Message... msgs) {
         lookup = new HashMap<String, Message>();
 
-        for (Message msg : msgs) {
-            add(msg);
+        if (msgs != null) {
+            for (Message msg : msgs) {
+                add(msg);
+            }
         }
-
-//        Iterator<Map.Entry<String, Message>> entries = lookup.entrySet().iterator();
-
-//        while (entries.hasNext()) {
-//            Map.Entry<String, Message> entry = entries.next();
-//
-//            System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
-//
-//        }
     }
 
     /**
@@ -60,29 +57,32 @@ public class StandardValues {
         lookup.put(msg.getClass().getSimpleName(), msg);
     }
 
-    public static StandardValues valuesFromChild(Configtx.ConfigChild child) {
-        if (child == null || child.getValuesMap() == null) {
-            return null;
-        }
-
-        StandardValues standardValues = new StandardValues();
-
-        Iterator<Map.Entry<String, Configtx.ConfigValue>> entries = child.getValuesMap().entrySet().iterator();
-        while (entries.hasNext()) {
-            Map.Entry<String, Configtx.ConfigValue> entry = entries.next();
-            standardValues.add(entry.getValue());
-            entry.getValue().getValue();
-        }
-
-//        Configuration.Capabilities capabilities = Configuration.Capabilities.newBuilder().build();
-//        MspConfigPackage.MSPConfig mspConfig = MspConfigPackage.MSPConfig.newBuilder().build();
+//    private void put(String key, Message msg) {
+//        lookup.put(key, msg);
+//    }
 //
-//        Message[] msgs = new Message[]{capabilities, mspConfig};
+//    public static StandardValues valuesFromTree(Configtx.ConfigTree configTree, Class... classes) {
+//        if (configTree == null || configTree.getValuesMap() == null) {
+//            return null;
+//        }
 //
-//        StandardValues standardValues = new StandardValues(msgs);
-
-        return standardValues;
-    }
+//        StandardValues standardValues = new StandardValues();
+//
+//        Iterator<Map.Entry<String, Configtx.ConfigValue>> entries = configTree.getValuesMap().entrySet().iterator();
+//        while (entries.hasNext()) {
+//            Map.Entry<String, Configtx.ConfigValue> entry = entries.next();
+//            standardValues.put(entry.getKey(), entry.getValue().getValue());
+//        }
+//
+////        Configuration.Capabilities capabilities = Configuration.Capabilities.newBuilder().build();
+////        MspConfigPackage.MSPConfig mspConfig = MspConfigPackage.MSPConfig.newBuilder().build();
+////
+////        Message[] msgs = new Message[]{capabilities, mspConfig};
+////
+////        StandardValues standardValues = new StandardValues(msgs);
+//
+//        return standardValues;
+//    }
 
 
 }

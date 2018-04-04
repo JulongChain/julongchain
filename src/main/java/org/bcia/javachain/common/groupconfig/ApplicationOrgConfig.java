@@ -32,12 +32,12 @@ import java.util.List;
 public class ApplicationOrgConfig extends OrganizationConfig implements IApplicationOrgConfig {
     private Configuration.AnchorNodes anchorNodes;
 
-    public ApplicationOrgConfig(String name, MSPConfigHandler mspConfigHandler, Configtx.ConfigChild orgChild) throws
+    public ApplicationOrgConfig(String name, MSPConfigHandler mspConfigHandler, Configtx.ConfigTree orgTree) throws
             InvalidProtocolBufferException, ValidateException {
-        super(name, mspConfigHandler, orgChild);
+        super(name, mspConfigHandler, orgTree);
 
-        if (orgChild != null && orgChild.getValuesMap() != null) {
-            Configtx.ConfigValue configValue = orgChild.getValuesMap().get(GroupConfigConstant.ANCHOR_NODES);
+        if (orgTree != null && orgTree.getValuesMap() != null) {
+            Configtx.ConfigValue configValue = orgTree.getValuesMap().get(GroupConfigConstant.ANCHOR_NODES);
             if (configValue != null) {
                 anchorNodes = Configuration.AnchorNodes.parseFrom(configValue.getValue());
             }
