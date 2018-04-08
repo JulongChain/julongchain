@@ -23,8 +23,8 @@ public class StandardValuesTest {
     public void tearDown() throws Exception {
     }
 
-    @Test
-    public void valuesFromChild() {
-        StandardValues.valuesFromChild(null);
-    }
+//    @Test
+//    public void valuesFromChild() {
+//        StandardValues.valuesFromChild(null);
+//    }
 }

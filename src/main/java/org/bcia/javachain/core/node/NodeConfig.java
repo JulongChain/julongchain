@@ -31,12 +31,38 @@ public class NodeConfig {
     private Metrics metrics;
 
     public static class Logging {
+        private String level;
+        private String cauthdsl;
+        private String gossip;
+        private String grpc;
+        private String ledger;
+        private String msp;
+        private String policies;
+        private String nodeGossip;
+        private String format;
     }
 
     public static class Node {
         private String id;
+        private String networkId;
+        private String listenAddress;
         private String address;
         private String addressAutoDetect;
+        private String gomaxprocs;
+        private KeepAlive keepalive;
+        private Gossip gossip;
+        private Events events;
+        private Tls tls;
+        private Authentication authentication;
+        private String fileSystemPath;
+        private CSP csp;
+        private String mspConfigPath;
+        private String localMspId;
+        private DeliveryClient deliveryclient;
+        private String localMspType;
+        private Profile profile;
+        private Handlers handlers;
+        private String validatorPoolSize;
 
         public String getId() {
             return id;
@@ -64,14 +90,60 @@ public class NodeConfig {
     }
 
     public static class VM {
+        private String endpoint;
+        private Docker docker;
     }
 
     public static class SmartContract {
+        private Id id;
+        private String builder;
+        private String pull;
+        private String endpoint;
+//        private String endpoint;
+//        private String endpoint;
+//        private String endpoint;
+//        private String endpoint;
+//        private String endpoint;
+//        private String endpoint;
+//        private String endpoint;
     }
 
     public static class Ledger {
     }
 
     public static class Metrics {
+    }
+
+    private static class KeepAlive {
+    }
+
+    private static class Gossip {
+    }
+
+    private static class Events {
+    }
+
+    private static class Tls {
+    }
+
+    private static class Authentication {
+    }
+
+    private static class CSP {
+    }
+
+    private static class DeliveryClient {
+    }
+
+    private static class Profile {
+    }
+
+    private static class Handlers {
+    }
+
+    private static class Docker {
+    }
+
+    private static class Id {
     }
 }

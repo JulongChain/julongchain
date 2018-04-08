@@ -15,16 +15,23 @@
  */
 package org.bcia.javachain.core.ssc.cssc;
 
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.config.IConfig;
 import org.bcia.javachain.common.config.IConfigManager;
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.proto.BlockUtils;
+import org.bcia.javachain.core.aclmgmt.AclManagement;
+import org.bcia.javachain.core.aclmgmt.resources.Resources;
 import org.bcia.javachain.core.node.ConfigFactory;
 import org.bcia.javachain.core.policy.IPolicyChecker;
 import org.bcia.javachain.core.policy.PolicyFactory;
 import org.bcia.javachain.core.smartcontract.shim.impl.Response;
 import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
+import org.bcia.javachain.msp.mgmt.Principal;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
@@ -89,13 +96,13 @@ public class CSSC extends SystemSmartContractBase {
     // TODO: Improve the scc interface to avoid marshal/unmarshal args
     @Override
     public Response invoke(ISmartContractStub stub) {
-        log.debug("Enter CSCC invoke function");
-        List<String> args = stub.getStringArgs();
+        log.debug("Enter CSSC invoke function");
+        List<byte[]> args = stub.getArgs();
         int size=args.size();
         if(size<1){
             return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
         }
-        String function=args.get(0);
+        String function= ByteString.copyFrom(args.get(0)).toStringUtf8();
         if(function!=GET_GROUPS && size<2){
             return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
         }
@@ -105,21 +112,60 @@ public class CSSC extends SystemSmartContractBase {
         ProposalPackage.SignedProposal sp = stub.getSignedProposal();
         switch(function){
             case JOIN_GROUP:
-                ;
+                byte[] blockBytes=args.get(1);
+                if(blockBytes.length==0){
+                    return newErrorResponse(String.format("Cannot join the channel <nil> configuration block provided"));
+                }
+                Common.Block block=null;
+                String groupID="";
+                try {
+                    block= BlockUtils.getBlockFromBlockBytes(blockBytes);
+                } catch (InvalidProtocolBufferException e) {
+                    return newErrorResponse(String.format("Get genesis block from block bytes failed,%s",e.getMessage()));
+                }
+                try {
+                    groupID=BlockUtils.getGroupIDFromBlock(block);
+                } catch (JavaChainException e) {
+                    return newErrorResponse(String.format("\"JoinGroup\" request failed to extract group id from the block due to [%s]",e.getMessage()));
+                }
+                if(validateConfigBlock(block)==false){
+                    return newErrorResponse(String.format("\"JoinGroup\" request failed because of validation of configuration block"));
+                }
+                // 2. check local MSP Admins policy
+                if(policyChecker.checkPolicyNoGroup(Principal.Admins,sp)==false){
+                    return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check for group [%s]",groupID));
+                }
+                return joinGroup(groupID,block);
             case GET_CONFIG_BLOCK:
-                ;
+                // 2. check policy
+                String groupName=ByteString.copyFrom(args.get(1)).toStringUtf8();
+                if(AclManagement.getACLProvider().checkACL(Resources.CSSC_GetConfigBlock,groupName,sp)==false){
+                    return newErrorResponse(String.format("\"GET_CONFIG_BLOCK\" Authorization request failed %s: %s",groupName,Resources.CSSC_GetConfigBlock));
+                }
+                return getConfigBlock(groupName);
             case GET_CONFIG_TREE:
-                ;
+                String groupName2=ByteString.copyFrom(args.get(1)).toStringUtf8();
+                if(AclManagement.getACLProvider().checkACL(Resources.CSSC_GetConfigTree,groupName2,sp)==false){
+                    return newErrorResponse(String.format("\"GET_CONFIG_TREE\" Authorization request failed %s: %s",groupName2,Resources.CSSC_GetConfigTree));
+                }
+                return getConfigTree(groupName2);
             case SIMULATE_CONFIG_TREE_UPDATE:
-                ;
+                String groupName3=ByteString.copyFrom(args.get(1)).toStringUtf8();
+                if(AclManagement.getACLProvider().checkACL(Resources.CSSC_SimulateConfigTreeUpdate,groupName3,sp)==false){
+                    return newErrorResponse(String.format("\"GET_CONFIG_TREE\" Authorization request failed %s: %s",groupName3,Resources.CSSC_SimulateConfigTreeUpdate));
+                }
+                return simulateConfigTreeUpdate(groupName3,args.get(2));
             case GET_GROUPS:
-                ;
+                // 2. check local MSP Members policy
+                // TODO: move to ACLProvider once it will support chainless ACLs
+                // 2. check local MSP Admins policy
+                if(policyChecker.checkPolicyNoGroup(Principal.Members,sp)==false){
+                    return newErrorResponse(String.format("\"GetGroups\" request failed authorization check"));
+                }
+                return getGroups();
             default:
-                ;
+                return newErrorResponse(String.format("Invalid Function %s",function));
         }
-
-        log.debug("CSSC exits successfully");
-        return newSuccessResponse();
     }
 
     @Override
@@ -128,31 +174,31 @@ public class CSSC extends SystemSmartContractBase {
     }
 
     //validateConfigBlock validate configuration block to see whenever it's contains valid config transaction
-    private void validateConfigBlock(Common.Block block){
-
+    private boolean validateConfigBlock(Common.Block block){
+         return true;
     }
 
     // joinChain will join the specified chain in the configuration block.
     // Since it is the first block, it is the genesis block containing configuration
     // for this chain, so we want to update the Chain object with this info
-    private ProposalResponsePackage.Response joinGroup(String groupID,Common.Block block){
+    private Response joinGroup(String groupID,Common.Block block){
         return null;
     }
 
     // Return the current configuration block for the specified chainID. If the
     // peer doesn't belong to the chain, return error
-    private ProposalResponsePackage.Response getConfigBlock(byte[] groupID){
+    private Response getConfigBlock(String groupID){
         return null;
     }
 
     // getConfigTree returns the current channel and resources configuration for the specified chainID.
     // If the peer doesn't belong to the chain, returns error
-    private ProposalResponsePackage.Response getConfigTree(byte[] groupID){
+    private Response getConfigTree(String groupID){
         return null;
     }
 
-    private ProposalResponsePackage.Response simulateConfigTreeUpdate(
-            byte[] groupID,byte[] envb
+    private Response simulateConfigTreeUpdate(
+            String groupID,byte[] envb
     ){
         return null;
     }
@@ -162,7 +208,7 @@ public class CSSC extends SystemSmartContractBase {
     }
 
     // getGroups returns information about all channels for this peer
-    private ProposalResponsePackage.Response getGroups(){
+    private Response getGroups(){
         return null;
     }
 }

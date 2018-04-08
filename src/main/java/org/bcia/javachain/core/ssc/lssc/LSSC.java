@@ -265,7 +265,7 @@ public class LSSC  extends SystemSmartContractBase {
                 }
                 return getInstalledSmartContracts();
             default:
-                return newErrorResponse(String.format("Invilid Function %s",function));
+                return newErrorResponse(String.format("Invalid Function %s",function));
         }
     }
 

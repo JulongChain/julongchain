@@ -40,6 +40,18 @@ public class Node {
      */
     private INodeCmd nodeCmd;
 
+    public Node() {
+        init();
+    }
+
+    /**
+     * 执行命令行
+     *
+     * @param args
+     * @return
+     * @throws ParseException
+     * @throws NodeException
+     */
     public INodeCmd execCmd(String[] args) throws ParseException, NodeException {
         log.info("Node Command Start");
 
@@ -73,5 +85,13 @@ public class Node {
         log.info("Node Command end");
 
         return nodeCmd;
+    }
+
+    /**
+     * 初始化
+     */
+    private void init() {
+        //初始化MSP
+
     }
 }
