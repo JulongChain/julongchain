@@ -22,7 +22,6 @@ import org.bcia.javachain.consenter.common.multigroup.MultiGroup;
 import org.bcia.javachain.consenter.entity.ConfigMsg;
 import org.bcia.javachain.consenter.util.Constant;
 import org.bcia.javachain.csp.gm.sm2.SM2;
-import org.bcia.javachain.gm.SM2Impl;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.consenter.Ab;
 import org.springframework.stereotype.Component;
@@ -39,7 +38,6 @@ public class BroadCastHandler {
     private static JavaChainLog log = JavaChainLogFactory.getLog(BroadCastHandler.class);
     BroadCastProcessor processor = new BroadCastProcessor();
     MultiGroup multiGroup = new MultiGroup();
-    SM2Impl sm2impl=new SM2Impl();
     /**
      * 处理发来Envelope格式消息
      *
