@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * 完成节点开启服务命令的解析
- * node group status
+ * node server status
  *
  * @author zhouhui
  * @date 2018/2/24

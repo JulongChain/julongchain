@@ -47,20 +47,20 @@ public class App {
         }
 
         //异步启动Consenter服务
-        new Thread() {
-            @Override
-            public void run() {
-                ConsenterServer server = new ConsenterServer();
-                try {
-                    server.start();
-                    server.blockUntilShutdown();
-                } catch (IOException ex) {
-                    log.error(ex.getMessage(), ex);
-                } catch (InterruptedException ex) {
-                    log.error(ex.getMessage(), ex);
-                }
-            }
-        }.start();
+//        new Thread() {
+//            @Override
+//            public void run() {
+//                ConsenterServer server = new ConsenterServer();
+//                try {
+//                    server.start();
+//                    server.blockUntilShutdown();
+//                } catch (IOException ex) {
+//                    log.error(ex.getMessage(), ex);
+//                } catch (InterruptedException ex) {
+//                    log.error(ex.getMessage(), ex);
+//                }
+//            }
+//        }.start();
 
         //等待1秒，让Consenter服务完成
         try {
