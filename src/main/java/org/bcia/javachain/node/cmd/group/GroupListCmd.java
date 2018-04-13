@@ -21,6 +21,9 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.core.ssc.cssc.CSSC;
+import org.bcia.javachain.protos.node.Query;
+
+import java.util.List;
 
 
 /**
@@ -28,7 +31,7 @@ import org.bcia.javachain.core.ssc.cssc.CSSC;
  * node channel list
  *
  * @author wanglei
- * @date 18-3-22
+ * @date 18/3/22
  * @company Dingxuan
  */
 public class GroupListCmd extends AbstractNodeGroupCmd {
@@ -43,8 +46,12 @@ public class GroupListCmd extends AbstractNodeGroupCmd {
         CommandLine cmd = parser.parse(options, args);
 
         //配置系统智能合约,获取加入群组
-        String groupId = nodeGroup.listGroup(CommConstant.CSSC, CSSC.GET_GROUPS, null);
+        List<Query.GroupInfo> GroupsList = nodeGroup.listGroups(CommConstant.CSSC, CSSC.GET_GROUPS, null);
 
-        log.info("Group List info:" + groupId + "!");
+        int groupSize = GroupsList.size();
+        for(int index = 0; index < groupSize; index++){
+            String groupId = GroupsList.get(index).getGroupId();
+            log.info("Group List info:" + groupId + "!");
+        }
     }
 }

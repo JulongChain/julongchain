@@ -25,7 +25,7 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
  * node group update -c localhost:7050 -g mygroup -f /home/javachain/group.tx
  *
  * @author wanglei
- * @date 18-3-2
+ * @date 18/3/2
  * @company Dingxuan
  */
 public class GroupUpdateCmd extends AbstractNodeGroupCmd {

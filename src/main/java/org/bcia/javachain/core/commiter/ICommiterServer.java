@@ -24,7 +24,7 @@ import java.util.Map;
  * 确认服务接口
  *
  * @author  wanglei
- * @date 18-3-27
+ * @date 18/3/27
  * @company Dingxuan
  */
 public interface ICommiterServer {
@@ -32,13 +32,13 @@ public interface ICommiterServer {
     //TODO :相关对象未定义
     void CommitWithPvtData(BlockAndPvtData blockAndPvtData) throws Exception;
 
-    BlockAndPvtData GetPvtDataAndBlockByNum(Integer seqNumber) throws Exception;
+    BlockAndPvtData GetPvtDataAndBlockByNum(long seqNumber) throws Exception;
 
     TxPvtData GetPvtDataByNum(Integer blockNumber, Map<String, Map<String, Boolean> > filter) throws  Exception;
 
-    Integer  LedgerHeight() throws Exception;
+    long LedgerHeight() throws Exception;
 
-    Common.Block GetBlocks(Integer[] blockSeqs) throws Exception;
+    Common.Block[] GetBlocks(long[] blockSeqs) throws Exception;
 
     void Close();
 }

@@ -41,6 +41,7 @@ import org.bcia.javachain.protos.consenter.Ab;
 import org.bcia.javachain.protos.msp.Identities;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
+import org.bcia.javachain.protos.node.Query;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
@@ -48,6 +49,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.List;
 
 /**
  * 节点群组
@@ -228,7 +230,7 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
     /**
      * 加入群组列表 V0.25
      */
-    public String listGroup(String smartContractName, String action, byte[] content) throws NodeException {
+    public List<Query.GroupInfo> listGroups(String smartContractName, String action, byte[] content) throws NodeException {
         //生成proposal  Type=ENDORSER_TRANSACTION
         Smartcontract.SmartContractInvocationSpec spec = SpecHelper.buildInvocationSpec(smartContractName, action, content);
 
@@ -254,7 +256,7 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
         EndorserClient client = new EndorserClient(CSSC.DEFAULT_HOST, CSSC.DEFAULT_PORT);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
 
-        //获取结果中 Payload
+/*        //获取结果中 Payload
         Common.Payload payload = null;
         try {
             payload = Common.Payload.parseFrom(proposalResponse.getResponse().getPayload());
@@ -269,8 +271,17 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
         }
+        //return groupHeader.getGroupId();
+*/
+        Query.GroupQueryResponse groupQueryResponse = null;
+        try {
+            groupQueryResponse = Query.GroupQueryResponse.parseFrom(proposalResponse.getResponse().getPayload());
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+        return groupQueryResponse.getGroupsList();
 
-        return groupHeader.getGroupId();
+
     }
 
 }

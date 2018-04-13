@@ -26,7 +26,7 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
  * consenter节点 群组 名称 语言 执行信息
  *
  * @author  wanglei
- * @date 18-3-14
+ * @date 18/3/14
  * @company Dingxuan
  */
 public class ContractInvokeCmd extends AbstractNodeContractCmd {
