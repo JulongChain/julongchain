@@ -33,17 +33,17 @@ public class StandardConfigPolicy implements IConfigPolicy {
     }
 
     @Override
-    public String key() {
+    public String getKey() {
         return key;
     }
 
     @Override
-    public Policies.Policy value() {
+    public Policies.Policy getValue() {
         return value;
     }
 
     /**
-     * 构造隐含策略
+     * 构造内置元策略
      *
      * @param subPolicyName
      * @param rule

@@ -15,15 +15,14 @@ import static org.junit.Assert.*;
  * @date 2018/4/13
  * @company Dingxuan
  */
-public class GroupUpdateCmdTest {
+public class GroupListCmdTest {
 
     @Autowired
     private Node node;
 
     @Test
     public void execCmd() throws ParseException, NodeException {
-        GroupUpdateCmd groupUpdateCmd = new GroupUpdateCmd(node);
-        groupUpdateCmd.execCmd(new String[]{"-c", "localhost:7050", "-g", "mygroup", "-f",
-                "/home/javachain/group1.tx"});
+        GroupListCmd groupListCmd = new GroupListCmd(node);
+        groupListCmd.execCmd(new String[0]);
     }
 }

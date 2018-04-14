@@ -19,13 +19,14 @@ import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.node.Node;
 
 /**
  完成更新群组配置命令的解析
  * node group update -c localhost:7050 -g mygroup -f /home/javachain/group.tx
  *
  * @author wanglei
- * @date 18/3/2
+ * @date 2018/3/2
  * @company Dingxuan
  */
 public class GroupUpdateCmd extends AbstractNodeGroupCmd {
@@ -43,6 +44,10 @@ public class GroupUpdateCmd extends AbstractNodeGroupCmd {
     private static final String ARG_USE_TLS = "tls";
     //参数：CA文件位置
     private static final String ARG_CA = "ca";
+
+    public GroupUpdateCmd(Node node) {
+        super(node);
+    }
 
     @Override
     public void execCmd(String[] args) throws ParseException {

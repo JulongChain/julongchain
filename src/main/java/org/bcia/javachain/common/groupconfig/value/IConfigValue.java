@@ -1,5 +1,5 @@
 /**
- * Copyright DingXuan. All Rights Reserved.
+ * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,30 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.node.entity;
+package org.bcia.javachain.common.groupconfig.value;
 
-import org.bcia.javachain.node.Node;
-import org.bcia.javachain.node.util.NodeConstant;
+import com.google.protobuf.Message;
 
 /**
- * 节点版本
+ * 类描述
  *
  * @author zhouhui
- * @date 2018/2/23
+ * @date 2018/3/9
  * @company Dingxuan
  */
-public class NodeVersion {
-    private Node node;
+public interface IConfigValue {
+    String getKey();
 
-    public NodeVersion(Node node) {
-        this.node = node;
-    }
-
-    /**
-     * 获取当前版本
-     * @return
-     */
-    public String getVersion(){
-        return NodeConstant.CURRENT_VERSION;
-    }
+    Message getValue();
 }

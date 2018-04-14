@@ -34,6 +34,7 @@ import org.bcia.javachain.core.smartcontract.shim.SmartContractProvider;
 import org.bcia.javachain.core.ssc.ISystemSmartContractManager;
 import org.bcia.javachain.core.ssc.SystemSmartContractManager;
 import org.bcia.javachain.msp.IMsp;
+import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.common.helper.MockMSPManager;
 import org.bcia.javachain.node.util.NodeConstant;
 import org.springframework.stereotype.Component;
@@ -52,6 +53,15 @@ public class NodeServer {
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeServer.class);
 
     private String cachedEndpoint;
+
+    private Node node;
+
+    public NodeServer() {
+    }
+
+    public NodeServer(Node node) {
+        this.node = node;
+    }
 
     public void start() {
         start(false);
@@ -76,7 +86,9 @@ public class NodeServer {
         IAclProvider aclProvider = AclManagement.getACLProvider();
 
         //初始化账本
-        //ledgermgmt.Initialize(peer.ConfigTxProcessors)
+//        LedgerMgmt.initialize();
+//        ledgermgmt.Initialize(peer.ConfigTxProcessors)
+
 
         String nodeEndpoint = null;
 

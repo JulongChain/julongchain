@@ -19,6 +19,7 @@ import org.apache.commons.cli.*;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.node.Node;
 import org.springframework.stereotype.Component;
 
 /**
@@ -32,6 +33,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class ServerStartCmd extends AbstractNodeServerCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ServerStartCmd.class);
+
+    public ServerStartCmd(Node node) {
+        super(node);
+    }
 
     //参数：开发模式
     private static final String ARG_DEVMODE = "dev";

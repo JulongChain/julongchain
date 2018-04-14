@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig;
+package org.bcia.javachain.common.groupconfig.value;
 
+import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
 import org.bcia.javachain.protos.common.Configuration;
 
 import java.util.Map;

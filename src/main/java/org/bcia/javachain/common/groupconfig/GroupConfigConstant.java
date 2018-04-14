@@ -32,9 +32,29 @@ public class GroupConfigConstant {
 
     public static final String CAPABILITIES = "Capabilities";
 
-    public static final String MSP_KEY = "MSP";
+    public static final String MSP = "MSP";
 
     public static final String APPLICATION = "Application";
 
     public static final String ANCHOR_NODES = "AnchorNodes";
+
+    public static final String CONSORTIUM = "Consortium";
+
+    public static final String HASHING_ALGORITHM = "HashingAlgorithm";
+
+    public static final String BLOCK_DATA_HASHING_STRUCTURE = "BlockDataHashingStructure";
+
+    public static final String CONSENTER_ADDRESSES = "ConsenterAddresses";
+
+    public static final String CONSENSUS_TYPE = "ConsensusType";
+
+    public static final String BATCH_SIZE = "BatchSize";
+
+    public static final String BATCH_TIMEOUT = "BatchTimeout";
+
+    public static final String GROUP_RESTRICTIONS = "GroupRestrictions";
+
+    public static final String KAFKA_BROKERS = "KafkaBrokers";
+
+    public static final String GROUP_CREATION_POLICY = "GroupCreationPolicy";
 }

@@ -1,4 +1,4 @@
-package org.bcia.javachain.node.cmd.group;
+package org.bcia.javachain.node.cmd.server;
 
 import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.common.exception.NodeException;
@@ -15,15 +15,14 @@ import static org.junit.Assert.*;
  * @date 2018/4/13
  * @company Dingxuan
  */
-public class GroupUpdateCmdTest {
+public class ServerStatusCmdTest {
 
     @Autowired
     private Node node;
 
     @Test
     public void execCmd() throws ParseException, NodeException {
-        GroupUpdateCmd groupUpdateCmd = new GroupUpdateCmd(node);
-        groupUpdateCmd.execCmd(new String[]{"-c", "localhost:7050", "-g", "mygroup", "-f",
-                "/home/javachain/group1.tx"});
+        ServerStatusCmd serverStatusCmd = new ServerStatusCmd(node);
+        serverStatusCmd.execCmd(new String[0]);
     }
 }

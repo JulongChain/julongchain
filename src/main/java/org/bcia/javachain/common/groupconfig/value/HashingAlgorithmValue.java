@@ -13,19 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig;
+package org.bcia.javachain.common.groupconfig.value;
 
-import com.google.protobuf.Message;
+import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
+import org.bcia.javachain.protos.common.Configuration;
 
 /**
- * 类描述
+ * 对象
  *
  * @author zhouhui
- * @date 2018/3/9
+ * @date 2018/4/14
  * @company Dingxuan
  */
-public interface IConfigValue {
-    String key();
+public class HashingAlgorithmValue extends StandardConfigValue {
 
-    Message value();
+    public HashingAlgorithmValue() {
+        this.key = GroupConfigConstant.HASHING_ALGORITHM;
+
+        Configuration.HashingAlgorithm hashingAlgorithm = Configuration.HashingAlgorithm.newBuilder().setName
+                ("SHA256").build();
+        this.value = hashingAlgorithm;
+    }
 }

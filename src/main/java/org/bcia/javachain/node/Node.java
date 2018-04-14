@@ -76,11 +76,11 @@ public class Node {
         } else if (args.length == 1 && NodeConstant.VERSION.equalsIgnoreCase(command)) {
             //只有version命令只有一个单词，其余都是"命令+子命令"的形式,如"node server start"
             cmdWordCount = 1;
-            nodeCmd = NodeCmdFactory.getInstance(command, null);
+            nodeCmd = NodeCmdFactory.getInstance(this, command, null);
         } else {
             cmdWordCount = 2;
             String subCommand = args[1];
-            nodeCmd = NodeCmdFactory.getInstance(command, subCommand);
+            nodeCmd = NodeCmdFactory.getInstance(this, command, subCommand);
         }
 
         if (nodeCmd != null) {
@@ -115,7 +115,6 @@ public class Node {
 //        if (!FileUtils.isExists(mspConfigDir)) {
 //            throw new NodeException("MspConfigPath is not exists");
 //        }
-
 
 
 //        CspConfig

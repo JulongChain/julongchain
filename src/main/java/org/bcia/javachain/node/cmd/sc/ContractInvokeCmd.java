@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.node.Node;
 
 /**
  * node contract invoke -c consenter.example.com:7050 -g groupId -n mycc -l java -ctor '{"Args":["query","a"]}'
@@ -50,6 +51,10 @@ public class ContractInvokeCmd extends AbstractNodeContractCmd {
     private static final String ARG_USE_TLS = "tls";
     //参数：CA文件位置
     private static final String ARG_CA = "ca";
+
+    public ContractInvokeCmd(Node node) {
+        super(node);
+    }
 
     @Override
     public void execCmd(String[] args) throws ParseException, NodeException {

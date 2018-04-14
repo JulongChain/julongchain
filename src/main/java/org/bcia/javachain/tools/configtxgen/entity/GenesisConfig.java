@@ -302,7 +302,7 @@ public class GenesisConfig {
         private BatchSize batchSize;
         private Kafka kafka;
         private Organization[] organizations;
-        private long maxChannels;
+        private long maxGroups;
         private Map<String, Boolean> capabilities;
 
         /**
@@ -398,12 +398,12 @@ public class GenesisConfig {
             this.organizations = organizations;
         }
 
-        public long getMaxChannels() {
-            return maxChannels;
+        public long getMaxGroups() {
+            return maxGroups;
         }
 
-        public void setMaxChannels(long maxChannels) {
-            this.maxChannels = maxChannels;
+        public void setMaxGroups(long maxGroups) {
+            this.maxGroups = maxGroups;
         }
 
         public Map<String, Boolean> getCapabilities() {

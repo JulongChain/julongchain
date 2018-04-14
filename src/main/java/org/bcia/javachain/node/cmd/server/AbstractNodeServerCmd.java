@@ -17,6 +17,7 @@ package org.bcia.javachain.node.cmd.server;
 
 import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.cmd.INodeCmd;
 import org.bcia.javachain.node.entity.NodeServer;
 
@@ -29,12 +30,26 @@ import org.bcia.javachain.node.entity.NodeServer;
  */
 public abstract class AbstractNodeServerCmd implements INodeCmd {
 
+	private Node node;
+
 	protected NodeServer nodeServer;
 
-	public AbstractNodeServerCmd(){
-		nodeServer = new NodeServer();
+	public AbstractNodeServerCmd() {
+	}
+
+	public AbstractNodeServerCmd(Node node){
+		this.node = node;
+		nodeServer = new NodeServer(node);
 	}
 
 	@Override
 	public abstract void execCmd(String[] args) throws ParseException, NodeException;
+
+	public Node getNode() {
+		return node;
+	}
+
+	public void setNode(Node node) {
+		this.node = node;
+	}
 }

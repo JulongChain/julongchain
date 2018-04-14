@@ -26,7 +26,7 @@ import org.bcia.javachain.protos.common.Policies;
  */
 public interface IConfigPolicy {
 
-    String key();
+    String getKey();
 
-    Policies.Policy value();
+    Policies.Policy getValue();
 }

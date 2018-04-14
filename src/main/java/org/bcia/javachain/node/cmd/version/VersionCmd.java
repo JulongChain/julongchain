@@ -18,6 +18,7 @@ package org.bcia.javachain.node.cmd.version;
 import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.node.Node;
 import org.springframework.stereotype.Component;
 
 /**
@@ -31,6 +32,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class VersionCmd extends AbstractNodeVersionCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(VersionCmd.class);
+
+    public VersionCmd(Node node) {
+        super(node);
+    }
 
     @Override
     public void execCmd(String[] args) throws ParseException {
