@@ -95,27 +95,25 @@ public class VSSC extends SystemSmartContractBase {
         // args[1] - serialized Envelope
         // args[2] - serialized policy
         log.debug("Enter VSSC invoke function");
-        List<String> args = stub.getStringArgs();
+        List<byte[]> args = stub.getArgs();
         int size=args.size();
         if(size<3){
             return newErrorResponse(String.format("Incorrect number of arguments , %d)",args.size()));
         }
 
-        String block=args.get(1);
-        if(block==null || block.isEmpty()){
+        byte[] blockBytes=args.get(1);
+        if(blockBytes.length==0){
             return newErrorResponse(String.format("No block to validate"));
         }
-        String strPolicy=args.get(2);
-        if(strPolicy==null || strPolicy.isEmpty()){
+        byte[] policyBytes=args.get(2);
+        if(policyBytes.length==0){
             return newErrorResponse(String.format("No policy supplied"));
         }
-
-
 
         // get the envelope...
         Common.Envelope envelope=null;
         try {
-            envelope=ProtoUtils.getEnvelopeFromBlock(block);
+            envelope=ProtoUtils.getEnvelopeFromBlock(blockBytes);
         } catch (Exception e) {
             newErrorResponse(String.format("VSSC error: GetEnvelope failed, err %s",e.getMessage()));
         }
@@ -141,7 +139,7 @@ public class VSSC extends SystemSmartContractBase {
         Mgmt mgmt=new Mgmt();
         IMspManager manager=mgmt.getManagerForChain(groupHeader.getGroupId());
         PolicyProvider policyProvider=new PolicyProvider(manager);
-        IPolicy policy = policyProvider.newPolicy(strPolicy);
+        IPolicy policy = policyProvider.newPolicy(policyBytes);
 
         // validate the payload type
         if(groupHeader.getType()!= Common.HeaderType.ENDORSER_TRANSACTION.getNumber()){

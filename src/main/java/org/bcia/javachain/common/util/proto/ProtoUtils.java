@@ -73,10 +73,9 @@ public class ProtoUtils {
     }
 
     // GetEnvelopeFromBlock gets an envelope from a block's Data field.
-    public static Common.Envelope getEnvelopeFromBlock(String block)
+    public static Common.Envelope getEnvelopeFromBlock(byte[] block)
             throws UnsupportedEncodingException, InvalidProtocolBufferException {
-        byte[] bytes = block.getBytes("UTF-8");
-        return Common.Envelope.parseFrom(bytes);
+        return Common.Envelope.parseFrom(block);
     }
 
     public static Common.Payload getPayload(Common.Envelope envelope)
