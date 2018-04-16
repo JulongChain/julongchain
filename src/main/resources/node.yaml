@@ -51,8 +51,7 @@ logging:
     ledger:     info
     msp:        warning
     policies:   warning
-    node:
-        gossip: warning
+    nodeGossip: warning
 
     # Message format for the node logs
     format: '%{color}%{time:2006-01-02 15:04:05.000 MST} [%{module}] %{shortfunc} -> %{level:.4s} %{id:03x}%{color:reset} %{message}'
@@ -97,7 +96,7 @@ node:
 
     # Setting for runtime.GOMAXPROCS(n). If n < 1, it does not change the
     # current setting
-    gomaxprocs: -1
+    # gomaxprocs: -1
 
     # Keepalive settings for node server and clients
     keepalive:
@@ -105,25 +104,25 @@ node:
         # If clients send pings more frequently, the node server will
         # disconnect them
         minInterval: 60s
+        #client:
         # Client keepalive settings for communicating with other node nodes
-        client:
             # Interval is the time between pings to node nodes.  This must
             # greater than or equal to the minInterval specified by node
             # nodes
-            interval: 60s
+        clientInterval: 60s
             # Timeout is the duration the client waits for a response from
             # node nodes before closing the connection
-            timeout: 20s
+        clientTimeout: 20s
         # DeliveryClient keepalive settings for communication with ordering
         # nodes.
-        deliveryClient:
+        #deliveryClient:
             # Interval is the time between pings to ordering nodes.  This must
             # greater than or equal to the minInterval specified by ordering
             # nodes.
-            interval: 60s
+        deliveryClientInterval: 60s
             # Timeout is the duration the client waits for a response from
             # ordering nodes before closing the connection
-            timeout: 20s
+        deliveryClientTimeout: 20s
 
 
     # Gossip related configuration
@@ -248,11 +247,11 @@ node:
         timewindow: 15m
 
         # Keepalive settings for node server and clients
-        keepalive:
+        # keepalive:
             # MinInterval is the minimum permitted time in seconds which clients
             # can send keepalive pings.  If clients send pings more frequently,
             # the events server will disconnect them
-            minInterval: 60s
+        keepaliveMinInterval: 60s
 
     # TLS Settings
     # Note that node-smartcontract connections through smartcontractListenAddress is
@@ -265,34 +264,34 @@ node:
         # fail to connect to the node.
         clientAuthRequired: false
         # X.509 certificate used for TLS server
-        cert:
-            file: tls/server.crt
+        #cert:
+        certFile: tls/server.crt
         # Private key used for TLS server (and client if clientAuthEnabled
         # is set to true
-        key:
-            file: tls/server.key
+        # key:
+        keyFile: tls/server.key
         # Trusted root certificate chain for tls.cert
-        rootcert:
-            file: tls/ca.crt
+        # rootcert:
+        rootCertFile: tls/ca.crt
         # Set of root certificate authorities used to verify client certificates
-        clientRootCAs:
-            files:
+        # clientRootCAs:
+        clientRootCAsFiles:
               - tls/ca.crt
         # Private key used for TLS when making client connections.  If
         # not set, node.tls.key.file will be used instead
-        clientKey:
-            file:
+        #clientKey:
+        clientKeyFile:
         # X.509 certificate used for TLS when making client connections.
         # If not set, node.tls.cert.file will be used instead
-        clientCert:
-            file:
+        # clientCert:
+        clientCertFile:
 
     # Authentication contains configuration parameters related to authenticating
     # client messages
-    authentication:
+    #authentication:
         # the acceptable difference between the current server time and the
         # client's time as specified in a client request message
-        timewindow: 15m
+    authenticationTimeWindow: 15m
 
     # Path on the file system where node will store data (eg ledger). This
     # location must be access control protected to prevent unintended
@@ -301,19 +300,19 @@ node:
 
     # BCCSP (Blockchain crypto provider): Select which crypto implementation or
     # library to use
-    BCCSP:
-        Default: SW
-        SW:
+    # BCCSP:
+        # Default: SW
+        # SW:
             # TODO: The default Hash and Security level needs refactoring to be
             # fully configurable. Changing these defaults requires coordination
             # SHA2 is hardcoded in several places, not only BCCSP
-            Hash: SHA2
-            Security: 256
+            # Hash: SHA2
+            # Security: 256
             # Location of Key Store
-            FileKeyStore:
+            # FileKeyStore:
                 # If "", defaults to 'mspConfigPath'/keystore
                 # TODO: Ensure this is read with fabric/core/config.GetPath() once ready
-                KeyStore:
+                # KeyStore:
 
     # Path on the file system where node will find MSP local configurations
     mspConfigPath: msp
@@ -328,10 +327,10 @@ node:
     localMspId: DEFAULT
 
     # Delivery service related config
-    deliveryclient:
+    #deliveryclient:
         # It sets the total time the delivery service may spend in reconnection
         # attempts until its retry logic gives up and returns an error
-        reconnectTotalTimeThreshold: 3600s
+    reconnectTotalTimeThreshold: 3600s
 
     # Type for the local MSP - by default it's of type bccsp
     localMspType: bccsp
@@ -509,11 +508,11 @@ smartcontract:
     # whitelist, add "myscc: enable" to the list below, and register in
     # smartcontract/importsysccs.go
     system:
-        cscc: enable
-        lscc: enable
-        escc: enable
-        vscc: enable
-        qscc: enable
+        cssc: enable
+        lssc: enable
+        essc: enable
+        vssc: enable
+        qssc: enable
 
     # System smartcontract plugins: in addition to being imported and compiled
     # into fabric through core/smartcontract/importsysccs.go, system smartcontracts
@@ -609,7 +608,7 @@ metrics:
         # determines frequency of report metrics(unit: second)
         interval: 1s
 
-        statsdReporter:
+        statsReporter:
 
               # statsd server address to connect
               address: 0.0.0.0:8125

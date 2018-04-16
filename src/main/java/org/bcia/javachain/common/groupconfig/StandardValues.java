@@ -57,8 +57,8 @@ public class StandardValues {
         lookup.put(msg.getClass().getSimpleName(), msg);
     }
 
-//    private void put(String key, Message msg) {
-//        lookup.put(key, msg);
+//    private void put(String getKey, Message msg) {
+//        lookup.put(getKey, msg);
 //    }
 //
 //    public static StandardValues valuesFromTree(Configtx.ConfigTree configTree, Class... classes) {

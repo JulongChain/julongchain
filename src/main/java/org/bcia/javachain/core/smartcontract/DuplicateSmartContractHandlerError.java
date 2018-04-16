@@ -13,19 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig;
+package org.bcia.javachain.core.smartcontract;
 
-import com.google.protobuf.Message;
+import org.bcia.javachain.protos.node.Smartcontract;
 
 /**
  * 类描述
  *
- * @author zhouhui
- * @date 2018/3/9
+ * @author wanliangbing
+ * @date 2018/4/3
  * @company Dingxuan
  */
-public interface IConfigValue {
-    String key();
+public class DuplicateSmartContractHandlerError {
 
-    Message value();
+    private Smartcontract.SmartContractID smartContractID;
+
+    public Smartcontract.SmartContractID getSmartContractID() {
+        return smartContractID;
+    }
+
+    public void setSmartContractID(Smartcontract.SmartContractID
+                                           smartContractID) {
+        this.smartContractID = smartContractID;
+    }
 }

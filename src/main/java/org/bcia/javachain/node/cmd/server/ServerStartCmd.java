@@ -19,11 +19,12 @@ import org.apache.commons.cli.*;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.node.Node;
 import org.springframework.stereotype.Component;
 
 /**
  * 完成节点开启服务命令的解析
- * node group start
+ * node server start
  *
  * @author zhouhui
  * @date 2018/2/24
@@ -32,6 +33,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class ServerStartCmd extends AbstractNodeServerCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ServerStartCmd.class);
+
+    public ServerStartCmd(Node node) {
+        super(node);
+    }
 
     //参数：开发模式
     private static final String ARG_DEVMODE = "dev";

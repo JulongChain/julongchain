@@ -17,6 +17,7 @@ package org.bcia.javachain.node.cmd.sc;
 
 import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.cmd.INodeCmd;
 import org.bcia.javachain.node.entity.NodeSmartContract;
 
@@ -29,10 +30,18 @@ import org.bcia.javachain.node.entity.NodeSmartContract;
  */
 public abstract class AbstractNodeContractCmd implements INodeCmd {
 
+	private Node node;
+
 	protected NodeSmartContract nodeSmartContract;
 
 	public AbstractNodeContractCmd(){
 		nodeSmartContract = new NodeSmartContract();
+	}
+
+	public AbstractNodeContractCmd(Node node) {
+		this.node = node;
+
+		nodeSmartContract = new NodeSmartContract(node);
 	}
 
 	@Override

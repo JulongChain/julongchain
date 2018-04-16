@@ -32,8 +32,10 @@ import org.bcia.javachain.consenter.common.broadcast.BroadCastClient;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.core.ssc.cssc.CSSC;
 import org.bcia.javachain.csp.gm.GmCspFactory;
+import org.bcia.javachain.csp.gm.sm2.SM2;
 import org.bcia.javachain.msp.ISigningIdentity;
 import org.bcia.javachain.msp.mgmt.Mgmt;
+import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.common.client.*;
 import org.bcia.javachain.node.common.helper.SpecHelper;
 import org.bcia.javachain.protos.common.Common;
@@ -41,6 +43,7 @@ import org.bcia.javachain.protos.consenter.Ab;
 import org.bcia.javachain.protos.msp.Identities;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
+import org.bcia.javachain.protos.node.Query;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
@@ -48,19 +51,41 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.List;
 
 /**
- * 节点群组
+ * 节点群组能力
  *
- * @author zhouhui
+ * @author zhouhui wanglei
  * @date 2018/2/23
  * @company Dingxuan
  */
 @Component
-public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
+public class NodeGroup {
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeGroup.class);
 
-    public void createGroup(String ip, int port, String groupId, String groupFile) throws NodeException {
+    private static final String PROFILE_CREATE_GROUP = "SampleSingleMSPGroup";
+
+    private Node node;
+
+    public NodeGroup() {
+    }
+
+    public NodeGroup(Node node) {
+        this.node = node;
+    }
+
+    /**
+     * 创建群组
+     *
+     * @param host      共识节点域名或IP
+     * @param port      共识节点端口
+     * @param groupId   群组ID
+     * @param groupFile 群组配置文件
+     * @return
+     * @throws NodeException
+     */
+    public NodeGroup createGroup(String host, int port, String groupId, String groupFile) throws NodeException {
         Common.Envelope envelope = null;
 
         ILocalSigner signer = new LocalSigner();
@@ -71,7 +96,7 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
             //如果是空文件，则组成一个默认的信封对象
             try {
                 envelope = EnvelopeHelper.makeGroupCreateTx(groupId, signer, null, GenesisConfigFactory
-                        .loadGenesisConfig().getCompletedProfile("SampleSingleMSPChannel"));
+                        .loadGenesisConfig().getCompletedProfile(PROFILE_CREATE_GROUP));
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 throw new NodeException(e);
@@ -84,14 +109,14 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
         }
 
         Common.Envelope signedEnvelope = EnvelopeHelper.sanityCheckAndSignConfigTx(envelope, groupId, signer);
-        IBroadcastClient broadcastClient = new BroadcastClient(ip, port);
+        IBroadcastClient broadcastClient = new BroadcastClient(host, port);
         broadcastClient.send(signedEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
             @Override
             public void onNext(Ab.BroadcastResponse value) {
                 log.info("Broadcast onNext");
                 //收到响应消息，判断是否是200消息
                 if (Common.Status.SUCCESS.equals(value.getStatus())) {
-                    getGenesisBlockThenWrite(ip, port, groupId);
+                    getGenesisBlockThenWrite(host, port, groupId);
                 }
             }
 
@@ -105,6 +130,8 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
                 log.info("Broadcast completed");
             }
         });
+
+        return null;
     }
 
     private void getGenesisBlockThenWrite(String ip, int port, String groupId) {
@@ -155,6 +182,7 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
 
         byte[] nonce = MockCrypto.getRandomNonce();
 
+
         String txId = null;
         try {
             txId = ProposalUtils.computeProposalTxID(creator, nonce);
@@ -180,34 +208,6 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
         return group;
     }
 
-    @Override
-    public void onNext(Ab.BroadcastResponse value) {
-        //如果服务器创建成功，则可继续获取创世区块
-        if (Common.Status.SUCCESS.equals(value.getStatus())) {
-            log.info("We got 200. then we can deliver now");
-
-//            DeliverClient deliverClient = new DeliverClient();
-//            try {
-//                deliverClient.send(ip, port, queryMessage);
-//            } catch (Exception e) {
-//                log.error(e.getMessage(), e);
-//            }
-
-        } else {
-            log.info("Wrong broadcast status: " + value.getStatusValue());
-        }
-    }
-
-    @Override
-    public void onError(Throwable t) {
-        log.error(t.getMessage(), t);
-    }
-
-    @Override
-    public void onCompleted() {
-
-    }
-
     /**
      * 更新群组配置 V0.25
      */
@@ -217,7 +217,7 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
         BroadCastClient broadCastClient = new BroadCastClient();
         try {
             //broadCastClient.send(ip, port, groupId, this);
-            broadCastClient.send(ip, port, Common.Envelope.newBuilder().build(), this);
+            broadCastClient.send(ip, port, Common.Envelope.newBuilder().build(), null);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -228,7 +228,7 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
     /**
      * 加入群组列表 V0.25
      */
-    public String listGroup(String smartContractName, String action, byte[] content) throws NodeException {
+    public List<Query.GroupInfo> listGroups(String smartContractName, String action, byte[] content) throws NodeException {
         //生成proposal  Type=ENDORSER_TRANSACTION
         Smartcontract.SmartContractInvocationSpec spec = SpecHelper.buildInvocationSpec(smartContractName, action, content);
 
@@ -254,7 +254,7 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
         EndorserClient client = new EndorserClient(CSSC.DEFAULT_HOST, CSSC.DEFAULT_PORT);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
 
-        //获取结果中 Payload
+/*        //获取结果中 Payload
         Common.Payload payload = null;
         try {
             payload = Common.Payload.parseFrom(proposalResponse.getResponse().getPayload());
@@ -269,8 +269,17 @@ public class NodeGroup implements StreamObserver<Ab.BroadcastResponse> {
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
         }
+        //return groupHeader.getGroupId();
+*/
+        Query.GroupQueryResponse groupQueryResponse = null;
+        try {
+            groupQueryResponse = Query.GroupQueryResponse.parseFrom(proposalResponse.getResponse().getPayload());
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+        return groupQueryResponse.getGroupsList();
 
-        return groupHeader.getGroupId();
+
     }
 
 }

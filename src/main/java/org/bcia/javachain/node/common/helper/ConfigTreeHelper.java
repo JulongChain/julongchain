@@ -16,10 +16,10 @@
 package org.bcia.javachain.node.common.helper;
 
 import com.google.protobuf.Message;
-import org.bcia.javachain.common.groupconfig.CapabilitiesValue;
+import org.bcia.javachain.common.groupconfig.value.CapabilitiesValue;
 import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
-import org.bcia.javachain.common.groupconfig.IConfigValue;
-import org.bcia.javachain.common.groupconfig.MSPValue;
+import org.bcia.javachain.common.groupconfig.value.IConfigValue;
+import org.bcia.javachain.common.groupconfig.value.MSPValue;
 import org.bcia.javachain.common.policies.IConfigPolicy;
 import org.bcia.javachain.common.policies.ImplicitMetaAnyPolicy;
 import org.bcia.javachain.common.policies.ImplicitMetaMajorityPolicy;
@@ -92,19 +92,19 @@ public class ConfigTreeHelper {
 
         //构造管理员的内置策略(需要过半子策略被满足)
         Configtx.ConfigPolicy.Builder adminPolicyBuilder = Configtx.ConfigPolicy.newBuilder();
-        adminPolicyBuilder.setPolicy(new ImplicitMetaMajorityPolicy(GroupConfigConstant.POLICY_ADMINS).value());
+        adminPolicyBuilder.setPolicy(new ImplicitMetaMajorityPolicy(GroupConfigConstant.POLICY_ADMINS).getValue());
         adminPolicyBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
         defaultPolicies.put(GroupConfigConstant.POLICY_ADMINS, adminPolicyBuilder.build());
 
         //构造可读人员的内置策略(任意子策略被满足即可)
         Configtx.ConfigPolicy.Builder readerPolicyBuilder = Configtx.ConfigPolicy.newBuilder();
-        adminPolicyBuilder.setPolicy(new ImplicitMetaAnyPolicy(GroupConfigConstant.POLICY_READERS).value());
+        adminPolicyBuilder.setPolicy(new ImplicitMetaAnyPolicy(GroupConfigConstant.POLICY_READERS).getValue());
         adminPolicyBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
         defaultPolicies.put(GroupConfigConstant.POLICY_READERS, readerPolicyBuilder.build());
 
         //构造可写人员的内置策略(任意子策略被满足即可)
         Configtx.ConfigPolicy.Builder writerPolicyBuilder = Configtx.ConfigPolicy.newBuilder();
-        adminPolicyBuilder.setPolicy(new ImplicitMetaAnyPolicy(GroupConfigConstant.POLICY_WRITERS).value());
+        adminPolicyBuilder.setPolicy(new ImplicitMetaAnyPolicy(GroupConfigConstant.POLICY_WRITERS).getValue());
         adminPolicyBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
         defaultPolicies.put(GroupConfigConstant.POLICY_WRITERS, writerPolicyBuilder.build());
 
@@ -117,7 +117,7 @@ public class ConfigTreeHelper {
      * @param application
      * @return
      */
-    public static Configtx.ConfigTree buildApplicationChild(GenesisConfig.Application application) {
+    public static Configtx.ConfigTree buildApplicationTree(GenesisConfig.Application application) {
         //构建最终的应用ConfigTree
         Configtx.ConfigTree.Builder applicationTreeBuilder = Configtx.ConfigTree.newBuilder();
 
@@ -128,7 +128,7 @@ public class ConfigTreeHelper {
         //填充能力集
         if (application.getCapabilities() != null && !application.getCapabilities().isEmpty()) {
             IConfigValue configValue = new CapabilitiesValue(application.getCapabilities());
-            addValue(applicationTreeBuilder, configValue.key(), configValue.value(), GroupConfigConstant.POLICY_ADMINS);
+            addValue(applicationTreeBuilder, configValue.getKey(), configValue.getValue(), GroupConfigConstant.POLICY_ADMINS);
         }
 
         //填充子树信息
@@ -161,7 +161,7 @@ public class ConfigTreeHelper {
         //填充MSP信息
         MspConfigPackage.MSPConfig mspConfig = MockMSPManager.getVerifyingMspConfig(org.getMspDir(), org.getId(), org.getMspType());
         IConfigValue mspValue = new MSPValue(mspConfig);
-        addValue(orgTreeBuilder, mspValue.key(), mspValue.value(), GroupConfigConstant.POLICY_ADMINS);
+        addValue(orgTreeBuilder, mspValue.getKey(), mspValue.getValue(), GroupConfigConstant.POLICY_ADMINS);
 
         //填充更改策略人
         orgTreeBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
@@ -186,12 +186,12 @@ public class ConfigTreeHelper {
         }
 
         IConfigPolicy adminPolicy = new SignaturePolicy(GroupConfigConstant.POLICY_ADMINS, policyEnvelope);
-        addPolicy(configTreeBuilder, adminPolicy.key(), adminPolicy.value(), GroupConfigConstant.POLICY_ADMINS);
+        addPolicy(configTreeBuilder, adminPolicy.getKey(), adminPolicy.getValue(), GroupConfigConstant.POLICY_ADMINS);
 
         IConfigPolicy readerPolicy = new SignaturePolicy(GroupConfigConstant.POLICY_READERS, MockCauthdsl.signedByMspMember(mspId));
-        addPolicy(configTreeBuilder, readerPolicy.key(), readerPolicy.value(), GroupConfigConstant.POLICY_ADMINS);
+        addPolicy(configTreeBuilder, readerPolicy.getKey(), readerPolicy.getValue(), GroupConfigConstant.POLICY_ADMINS);
 
         IConfigPolicy writerPolicy = new SignaturePolicy(GroupConfigConstant.POLICY_WRITERS, MockCauthdsl.signedByMspMember(mspId));
-        addPolicy(configTreeBuilder, writerPolicy.key(), writerPolicy.value(), GroupConfigConstant.POLICY_ADMINS);
+        addPolicy(configTreeBuilder, writerPolicy.getKey(), writerPolicy.getValue(), GroupConfigConstant.POLICY_ADMINS);
     }
 }

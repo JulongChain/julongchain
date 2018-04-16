@@ -20,7 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.springframework.stereotype.Component;
+import org.bcia.javachain.node.Node;
 
 /**
  * 完成节点创建群组命令的解析
@@ -30,31 +30,32 @@ import org.springframework.stereotype.Component;
  * @date 2018/2/24
  * @company Dingxuan
  */
-@Component
 public class GroupCreateCmd extends AbstractNodeGroupCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(GroupCreateCmd.class);
 
-    //参数：consenter地址
+    /**
+     * consenter地址
+     */
     private static final String ARG_CONSENTER = "c";
-    //参数：groupId
+    /**
+     * groupId
+     */
     private static final String ARG_GROUP_ID = "g";
-    //参数：group配置文件路径
+    /**
+     * group配置文件路径
+     */
     private static final String ARG_FILE_PATH = "f";
-    //参数：超时时间
-    private static final String ARG_TIMEOUT = "t";
-    //参数：是否使用TLS传输
-    private static final String ARG_USE_TLS = "tls";
-    //参数：CA文件位置
-    private static final String ARG_CA = "ca";
+
+    public GroupCreateCmd(Node node) {
+        super(node);
+    }
 
     @Override
     public void execCmd(String[] args) throws ParseException, NodeException {
-
         Options options = new Options();
         options.addOption(ARG_CONSENTER, true, "Input consenter's IP and port");
         options.addOption(ARG_GROUP_ID, true, "Input group id");
         options.addOption(ARG_FILE_PATH, true, "Input group config file path");
-        options.addOption(ARG_TIMEOUT, true, "Input group create timeout");
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
@@ -79,12 +80,6 @@ public class GroupCreateCmd extends AbstractNodeGroupCmd {
             log.info("GroupId config File-----$" + groupConfigFile);
         }
 
-        String timeout = null;
-        if (cmd.hasOption(ARG_TIMEOUT)) {
-            timeout = cmd.getOptionValue(ARG_TIMEOUT, defaultValue);
-            log.info("Timeout-----$" + timeout);
-        }
-
         if (StringUtils.isBlank(groupId)) {
             log.error("GroupId should not be null, Please input it");
             return;
@@ -95,23 +90,23 @@ public class GroupCreateCmd extends AbstractNodeGroupCmd {
             return;
         }
 
-        String[] ipAndPort = consenter.split(":");
-        if (ipAndPort.length <= 1) {
+        String[] hostAndPort = consenter.split(":");
+        if (hostAndPort.length <= 1) {
             log.error("Consenter is not valid");
             return;
         }
 
         int port = 0;
         try {
-            port = Integer.parseInt(ipAndPort[1]);
+            port = Integer.parseInt(hostAndPort[1]);
         } catch (NumberFormatException ex) {
             log.error("Consenter's port is not valid");
             return;
         }
 
-        nodeGroup.createGroup(ipAndPort[0], port, groupId, groupConfigFile);
+        nodeGroup.createGroup(hostAndPort[0], port, groupId, groupConfigFile);
 
-        log.info("Group created!");
+        log.info("Send Group create success");
     }
 
 }

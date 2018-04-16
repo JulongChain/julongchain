@@ -47,7 +47,7 @@ public class OrganizationConfig {
         }
 
         if (orgTree != null && orgTree.getValuesMap() != null) {
-            Configtx.ConfigValue configValue = orgTree.getValuesMap().get(GroupConfigConstant.MSP_KEY);
+            Configtx.ConfigValue configValue = orgTree.getValuesMap().get(GroupConfigConstant.MSP);
             if (configValue != null) {
                 mspConfig = MspConfigPackage.MSPConfig.parseFrom(configValue.getValue());
             }

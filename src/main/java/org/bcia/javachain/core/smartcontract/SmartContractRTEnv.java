@@ -13,21 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig;
-
-import org.bcia.javachain.protos.msp.MspConfigPackage;
+package org.bcia.javachain.core.smartcontract;
 
 /**
  * 类描述
  *
- * @author zhouhui
- * @date 2018/3/10
+ * @author wanliangbing
+ * @date 2018/4/3
  * @company Dingxuan
  */
-public class MSPValue extends StandardConfigValue {
-    public MSPValue(MspConfigPackage.MSPConfig mspConfig) {
-        this.key = GroupConfigConstant.MSP_KEY;
+public class SmartContractRTEnv {
 
-        this.value = mspConfig;
+    private Handler handler;
+
+    public Handler getHandler() {
+        return handler;
+    }
+
+    public void setHandler(Handler handler) {
+        this.handler = handler;
     }
 }

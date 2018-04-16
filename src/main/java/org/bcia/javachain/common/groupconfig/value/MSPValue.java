@@ -13,28 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig;
+package org.bcia.javachain.common.groupconfig.value;
 
-import com.google.protobuf.Message;
+import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
+import org.bcia.javachain.protos.msp.MspConfigPackage;
 
 /**
  * 类描述
  *
  * @author zhouhui
- * @date 2018/3/9
+ * @date 2018/3/10
  * @company Dingxuan
  */
-public class StandardConfigValue implements IConfigValue {
-    protected String key;
-    protected Message value;
+public class MSPValue extends StandardConfigValue {
+    public MSPValue(MspConfigPackage.MSPConfig mspConfig) {
+        this.key = GroupConfigConstant.MSP;
 
-    @Override
-    public String key() {
-        return key;
-    }
-
-    @Override
-    public Message value() {
-        return value;
+        this.value = mspConfig;
     }
 }

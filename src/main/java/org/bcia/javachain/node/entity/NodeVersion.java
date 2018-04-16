@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.node.entity;
 
+import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.util.NodeConstant;
 
 /**
@@ -25,6 +26,12 @@ import org.bcia.javachain.node.util.NodeConstant;
  * @company Dingxuan
  */
 public class NodeVersion {
+    private Node node;
+
+    public NodeVersion(Node node) {
+        this.node = node;
+    }
+
     /**
      * 获取当前版本
      * @return

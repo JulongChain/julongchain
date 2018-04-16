@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 #
+# Modified some contents by Dingxuan on 2018-03-01
+#
 
 ################################################################################
 #
@@ -44,9 +46,9 @@ consenter: &consenterDefaults
         # 512K
         preferredMaxBytes: 524288
 
-    # Max Channels is the maximum number of channels to allow on the ordering
-    # network. When set to 0, this implies no maximum number of channels.
-    maxChannels: 0
+    # Max Groups is the maximum number of groups to allow on the ordering
+    # network. When set to 0, this implies no maximum number of groups.
+    maxGroups: 0
 
     kafka:
         # Brokers: A list of Kafka brokers to which the consenter connects. Edit
@@ -74,7 +76,7 @@ organizations:
     # SampleOrg defines an MSP using the sampleconfig. It should never be used
     # in production but may be used as a template for other definitions.
     - &SampleOrg
-        # Name is the key by which this org will be referenced in channel
+        # Name is the key by which this org will be referenced in group
         # configuration transactions.
         # Name can include alphanumeric characters as well as dots and dashes.
         name: SampleOrg
@@ -125,7 +127,7 @@ application: &ApplicationDefaults
 #   might recognize and validate the signatures from this type, while older
 #   binaries without this support would be unable to validate those
 #   transactions.  This could lead to different versions of the fabric binaries
-#   having different world states.  Instead, defining a capability for a channel
+#   having different world states.  Instead, defining a capability for a group
 #   informs those binaries without this capability that they must cease
 #   processing transactions until they have been upgraded.  For v1.0.x if any
 #   capabilities are defined (including a map with all capabilities turned off)
@@ -133,10 +135,10 @@ application: &ApplicationDefaults
 #
 ################################################################################
 capabilities:
-    # Channel capabilities apply to both the consenters and the nodes and must be
+    # Group capabilities apply to both the consenters and the nodes and must be
     # supported by both.  Set the value of the capability to true to require it.
-    Channel: &ChannelCapabilities
-        # V1.1 for Channel is a catchall flag for behavior which has been
+    Group: &GroupCapabilities
+        # V1.1 for Group is a catchall flag for behavior which has been
         # determined to be desired for all consenters and nodes running v1.0.x,
         # but the modification of which would cause incompatibilities.  Users
         # should leave this flag set to true.
@@ -174,7 +176,7 @@ capabilities:
         # resource-based access control (RBAC). RBAC helps set fine-grained
         # access control on system resources such as the endorser and various
         # system chaincodes. Default is v1.0-based access control based on
-        # CHANNEL_READERS and CHANNEL_WRITERS.
+        # GROUP_READERS and GROUP_WRITERS.
         # NOTE: Use of this feature with non "experimental" binaries on
         # the network may cause a fork.
         V1_1_RESOURCETREE_EXPERIMENTAL: false
@@ -187,7 +189,7 @@ capabilities:
 #   Different configuration profiles may be encoded here to be specified as
 #   parameters to the configtxgen tool. The profiles which specify consortiums
 #   are to be used for generating the consenter genesis block. With the correct
-#   consortium members defined in the consenter genesis block, channel creation
+#   consortium members defined in the consenter genesis block, group creation
 #   requests may be generated with only the org member names and a consortium
 #   name.
 #
@@ -195,7 +197,7 @@ capabilities:
 profiles:
 
     # SampleInsecureSolo defines a configuration which uses the Solo consenter,
-    # contains no MSP definitions, and allows all transactions and channel
+    # contains no MSP definitions, and allows all transactions and group
     # creation requests for the consortium SampleConsortium.
     SampleInsecureSolo:
         consenter:
@@ -217,7 +219,7 @@ profiles:
     # SampleDevModeSolo defines a configuration which uses the Solo consenter,
     # contains the sample MSP as both consenter and consortium member, and
     # requires only basic membership for admin privileges. It also defines
-    # an Application on the ordering system channel, which should usually
+    # an Application on the ordering system group, which should usually
     # be avoided.
     SampleDevModeSolo:
         consenter:
@@ -241,7 +243,7 @@ profiles:
     # mixed v1.0.x v1.1.x network.
     SampleDevModeSoloV1_1:
         capabilities:
-            <<: *ChannelCapabilities
+            <<: *GroupCapabilities
         consenter:
             <<: *consenterDefaults
             organizations:
@@ -287,7 +289,7 @@ profiles:
     # mixed v1.0.x v1.1.x network.
     SampleDevModeKafkaV1_1:
         capabilities:
-            <<: *ChannelCapabilities
+            <<: *GroupCapabilities
         consenter:
             <<: *consenterDefaults
             consenterType: kafka
@@ -340,7 +342,7 @@ profiles:
     # mixed v1.0.x v1.1.x network.
     SampleSingleMSPSoloV1_1:
         capabilities:
-            <<: *ChannelCapabilities
+            <<: *GroupCapabilities
         consenter:
             <<: *consenterDefaults
             organizations:
@@ -356,7 +358,7 @@ profiles:
     # SampleSingleMSPSoloV1_1 one only in that it uses the Kafka-based consenter.
     SampleSingleMSPKafkaV1_1:
         capabilities:
-            <<: *ChannelCapabilities
+            <<: *GroupCapabilities
         consenter:
             <<: *consenterDefaults
             consenterType: kafka
@@ -375,26 +377,26 @@ profiles:
         consenter:
             <<: *consenterDefaults
 
-    # SampleEmptyInsecureChannel defines a channel with no members and
+    # SampleEmptyInsecureGroup defines a group with no members and
     # therefore no access control.
-    SampleEmptyInsecureChannel:
+    SampleEmptyInsecureGroup:
         consortium: SampleConsortium
         application:
             organizations:
 
-    # SampleSingleMSPChannel defines a channel with only the sample org as a
+    # SampleSingleMSPGroup defines a group with only the sample org as a
     # member. It is designed to be used in conjunction with SampleSingleMSPSolo
     # and SampleSingleMSPKafka consenter profiles.
-    SampleSingleMSPChannel:
+    SampleSingleMSPGroup:
         consortium: SampleConsortium
         application:
             organizations:
                 - *SampleOrg
 
-    # SampleSingleMSPChannelV1_1 defines a channel just as
-    # SampleSingleMSPChannel. However, it also defines the capabilities map which
-    # makes this channel incompatible with v1.0.x nodes.
-    SampleSingleMSPChannelV1_1:
+    # SampleSingleMSPGroupV1_1 defines a group just as
+    # SampleSingleMSPGroup. However, it also defines the capabilities map which
+    # makes this group incompatible with v1.0.x nodes.
+    SampleSingleMSPGroupV1_1:
         consortium: SampleConsortium
         application:
             organizations:
