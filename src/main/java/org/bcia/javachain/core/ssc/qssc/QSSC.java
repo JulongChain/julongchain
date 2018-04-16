@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.core.ssc.qssc;
 
+import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
@@ -74,13 +75,13 @@ public class QSSC extends SystemSmartContractBase {
     @Override
     public Response invoke(ISmartContractStub stub) {
         log.debug("Enter QSSC invoke function");
-        List<String> args = stub.getStringArgs();
+        List<byte[]> args = stub.getArgs();
         int size=args.size();
         if(size<2){
             return newErrorResponse(String.format("Incorrect number of arguments, %d)",args.size()));
         }
-        String function=args.get(0);
-        String groupID=args.get(1);
+        String function= ByteString.copyFrom(args.get(0)).toStringUtf8();
+        String groupID=ByteString.copyFrom(args.get(1)).toStringUtf8();
         if(function!=GET_GROUP_INFO && size<3){
             return newErrorResponse(String.format("Missing 3rd argument for %s",function));
         }
@@ -92,7 +93,7 @@ public class QSSC extends SystemSmartContractBase {
 
         // Handle ACL:
         // 1. get the signed proposal
-        ProposalPackage.SignedProposal sp = stub.getSignedProposal();
+        ProposalPackage.SignedProposal sp=stub.getSignedProposal();
 
         // 2. check the channel reader policy
         String res=getACLResource(function);
@@ -100,17 +101,19 @@ public class QSSC extends SystemSmartContractBase {
             newErrorResponse(String.format("Authorization request for [%s][%s] failed",function,groupID));
         }
 
+        byte[] arg2=args.get(2);
+
         switch(function){
             case GET_TRANSACTION_BY_ID:
-                ;
+                return getTransactionByID(targetLedger,arg2);
             case GET_BLOCK_BY_NUMBER:
-                ;
+                return getBlockByNumber(targetLedger,arg2);
             case GET_BLOCK_BY_HASH:
-                ;
+                return getBlockByHash(targetLedger,arg2);
             case GET_GROUP_INFO:
-                ;
+                return getGroupInfo(targetLedger);
             case GET_BLOCK_BY_TX_ID:
-                ;
+                return getBlockByTxID(targetLedger,arg2);
             default:
                 return newErrorResponse(String.format("Request function %s not found",function));
         }
@@ -125,23 +128,25 @@ public class QSSC extends SystemSmartContractBase {
         return "QSSC."+function;
     }
 
-    private ProposalResponsePackage.Response getTransactionByID(INodeLedger vledger,byte[] tid){
+    private Response getTransactionByID(INodeLedger vledger,byte[] tid){
+
         return null;
     }
 
-    private ProposalResponsePackage.Response getBlockByNumber(INodeLedger vledger,byte[] number){
+    private Response getBlockByNumber(INodeLedger vledger,byte[] number){
+
         return null;
     }
 
-    private ProposalResponsePackage.Response getBlockByHash(INodeLedger vledger,byte[] hash){
+    private Response getBlockByHash(INodeLedger vledger,byte[] hash){
         return null;
     }
 
-    private ProposalResponsePackage.Response getGroupInfo(INodeLedger vledger){
+    private Response getGroupInfo(INodeLedger vledger){
         return null;
     }
 
-    private ProposalResponsePackage.Response getBlockByTxID(INodeLedger vledger,byte[] rawTxID){
+    private Response getBlockByTxID(INodeLedger vledger,byte[] rawTxID){
         return null;
     }
 

@@ -34,7 +34,7 @@ import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.*;
 
 /**
- * 类描述
+ * ESSC的单元测试类
  *
  * @author sunianle
  * @date 3/8/18
