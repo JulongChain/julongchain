@@ -18,11 +18,16 @@ package org.bcia.javachain.core.smartcontract;
 import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.common.smartcontractprovider.SmartContractContext;
+import org.bcia.javachain.core.common.smartcontractprovider
+        .SmartContractContext;
+
+import org.bcia.javachain.core.container.api.IBuildSpecFactory;
+import org.bcia.javachain.core.container.scintf.ISmartContractStream;
 import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.core.smartcontract.client
         .SmartContractContainerClient;
+import org.bcia.javachain.core.smartcontract.shim.SmartContractProvider;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.bcia.javachain.protos.node.SmartcontractShim;
 
@@ -37,10 +42,140 @@ import java.time.Duration;
  * @company Dingxuan
  */
 public class SmartContractSupport {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractSupport.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog
+            (SmartContractSupport.class);
+
+    private RunningSmartContract runningSmartContract;
+    private String nodeAddress;
+    private Duration scStartupTimeout;
+    private String nodeNetworkID;
+    private String nodeID;
+    private String nodeTLSCertFile;
+    private String nodeTLSSvrHostOrd;
+    private Duration keepalive;
+    private String smartContractLogLevel;
+    private String shimLogLevel;
+    private String logFormat;
+    private Duration executetimeout;
+    private Boolean userRunsSC;
+    private Boolean nodeTLS;
+
+    public RunningSmartContract getRunningSmartContract() {
+        return runningSmartContract;
+    }
+
+    public void setRunningSmartContract(RunningSmartContract
+                                                runningSmartContract) {
+        this.runningSmartContract = runningSmartContract;
+    }
+
+    public String getNodeAddress() {
+        return nodeAddress;
+    }
+
+    public void setNodeAddress(String nodeAddress) {
+        this.nodeAddress = nodeAddress;
+    }
+
+    public Duration getScStartupTimeout() {
+        return scStartupTimeout;
+    }
+
+    public void setScStartupTimeout(Duration scStartupTimeout) {
+        this.scStartupTimeout = scStartupTimeout;
+    }
+
+    public String getNodeNetworkID() {
+        return nodeNetworkID;
+    }
+
+    public void setNodeNetworkID(String nodeNetworkID) {
+        this.nodeNetworkID = nodeNetworkID;
+    }
+
+    public String getNodeID() {
+        return nodeID;
+    }
+
+    public void setNodeID(String nodeID) {
+        this.nodeID = nodeID;
+    }
+
+    public String getNodeTLSCertFile() {
+        return nodeTLSCertFile;
+    }
+
+    public void setNodeTLSCertFile(String nodeTLSCertFile) {
+        this.nodeTLSCertFile = nodeTLSCertFile;
+    }
+
+    public String getNodeTLSSvrHostOrd() {
+        return nodeTLSSvrHostOrd;
+    }
+
+    public void setNodeTLSSvrHostOrd(String nodeTLSSvrHostOrd) {
+        this.nodeTLSSvrHostOrd = nodeTLSSvrHostOrd;
+    }
+
+    public Duration getKeepalive() {
+        return keepalive;
+    }
+
+    public void setKeepalive(Duration keepalive) {
+        this.keepalive = keepalive;
+    }
+
+    public String getSmartContractLogLevel() {
+        return smartContractLogLevel;
+    }
+
+    public void setSmartContractLogLevel(String smartContractLogLevel) {
+        this.smartContractLogLevel = smartContractLogLevel;
+    }
+
+    public String getShimLogLevel() {
+        return shimLogLevel;
+    }
+
+    public void setShimLogLevel(String shimLogLevel) {
+        this.shimLogLevel = shimLogLevel;
+    }
+
+    public String getLogFormat() {
+        return logFormat;
+    }
+
+    public void setLogFormat(String logFormat) {
+        this.logFormat = logFormat;
+    }
+
+    public Duration getExecutetimeout() {
+        return executetimeout;
+    }
+
+    public void setExecutetimeout(Duration executetimeout) {
+        this.executetimeout = executetimeout;
+    }
+
+    public Boolean getUserRunsSC() {
+        return userRunsSC;
+    }
+
+    public void setUserRunsSC(Boolean userRunsSC) {
+        this.userRunsSC = userRunsSC;
+    }
+
+    public Boolean getNodeTLS() {
+        return nodeTLS;
+    }
+
+    public void setNodeTLS(Boolean nodeTLS) {
+        this.nodeTLS = nodeTLS;
+    }
 
     /**
-     * DevModeUserRunsChaincode property allows user to run chaincode in development environment
+     * DevModeUserRunsChaincode property allows user to run chaincode in
+     * development environment
      */
     public static final String DevModeUserRunsChaincode = "dev";
     public static final Integer chaincodeStartupTimeoutDefault = 5000;
@@ -52,7 +187,8 @@ public class SmartContractSupport {
     public static String TXSimulatorKey = "txsimulatorkey";
 
     /**
-     * HistoryQueryExecutorKey is used to attach ledger history query executor context
+     * HistoryQueryExecutorKey is used to attach ledger history query
+     * executor context
      */
     public static String HistoryQueryExecutorKey = "historyqueryexecutorkey";
 
@@ -67,7 +203,8 @@ public class SmartContractSupport {
     }
 
     /**
-     * use this for ledger access and make sure HistoryQueryExecutor is being used
+     * use this for ledger access and make sure HistoryQueryExecutor is being
+     * used
      *
      * @param context
      * @return
@@ -119,7 +256,8 @@ public class SmartContractSupport {
      * @param
      * @return
      */
-    public SmartContractSupport newChaincodeSupport(Boolean userrunsCC, Duration ccstartuptimeout) {
+    public SmartContractSupport newChaincodeSupport(Boolean userrunsCC,
+                                                    Duration ccstartuptimeout) {
         return null;
     }
 
@@ -133,7 +271,9 @@ public class SmartContractSupport {
         return null;
     }
 
-    public Smartcontract.SmartContractInput launch(SmartContractContext scContext, Object spec) throws
+    public Smartcontract.SmartContractInput launch(SmartContractContext
+                                                           scContext, Object
+            spec) throws
             SmartContractException {
         //TODO:add by zhouhui for test,返回一个空对象，实际处理待万良兵补充
         log.info("call SmartContractSupport launch");
@@ -167,5 +307,62 @@ public class SmartContractSupport {
         return result;
     }
 
+    public void registerHandler(Handler handler) {
+
+    }
+
+    public void deregisterHandler(Handler handler) {
+
+    }
+
+    public void sendReady(Context context, SmartContractContext
+            smartContractContext, Duration timeout) {
+
+    }
+
+    public String[][] getArgsAndEnv(SmartContractContext
+                                            smartContractContext,
+                                    Smartcontract.SmartContractSpec.Type type) {
+        return null;
+    }
+
+    public void launchAndWaitForRegister(Context ctxt, SmartContractProvider
+            smartContractProvider, Smartcontract.SmartContractDeploymentSpec
+            smartContractDeploymentSpec, Smartcontract.SmartContractSpec.Type
+            smartContractLang, IBuildSpecFactory builder) {}
+
+    public void stop(Context context, SmartContractContext
+            smartContractContext, Smartcontract.SmartContractDeploymentSpec
+            smartContractDeploymentSpec) {}
+
+    public String getVMType(Smartcontract.SmartContractDeploymentSpec
+                                    smartContractDeploymentSpec) { return null;}
+
+    public void handleSmartContractStream(Context context,
+                                          ISmartContractStream
+                                                  smartContractStream) {}
+
+    public void register() {
+
+    }
+
+    public SmartcontractShim.SmartContractMessage createSmartContractMessage
+            (SmartcontractShim.SmartContractMessage.Type
+                     smartContractMessageType, String txid, Smartcontract
+                     .SmartContractInput smartContractInput) {
+        return null;
+    }
+
+    public SmartcontractShim.SmartContractMessage execute(Context context,
+                                                          SmartContractContext smartContractContext,
+                                                          SmartcontractShim
+                                                                  .SmartContractMessage smartContractMessage,
+                                                          Duration timeout) {
+        return null;
+    }
+
+    public Boolean isDevMode() {
+        return Boolean.FALSE;
+    }
 
 }
