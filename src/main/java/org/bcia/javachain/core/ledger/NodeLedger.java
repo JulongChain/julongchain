@@ -92,5 +92,4 @@ public class NodeLedger implements INodeLedger {
     public void close() throws LedgerException {
 
     }
-
 }
