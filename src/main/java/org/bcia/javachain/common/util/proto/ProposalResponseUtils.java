@@ -183,6 +183,7 @@ public class ProposalResponseUtils {
                 .SmartContractProposalPayload.parseFrom(payloadBytes);
 
         byte[] proposalPayloadForTxBytes = getBytesProposalPayloadForTx(smartContractProposalPayload, visibility);
+        //TODO:应当用哪个CSP，用哪个HashOpts
         IHash hash = CspManager.getDefaultCsp().getHash(new SM3HashOpts());
 
         hash.write(header.getGroupHeader().toByteArray());
