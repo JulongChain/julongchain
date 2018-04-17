@@ -129,13 +129,13 @@ public class ProposalResponseUtils {
     /**
      * GetBytesProposalResponsePayload gets proposal smartContractResponse payload
      * @param pHashBytes
-     * @param smartContractResponse
+     * @param response
      * @param results
      * @param events
      * @param smartContractID
      * @return
      */
-    private static byte[] getBytesProposalResponsePayload(byte[] pHashBytes, SmartContractResponse smartContractResponse, byte[] results, byte[] events,
+    private static byte[] getBytesProposalResponsePayload(byte[] pHashBytes, ProposalResponsePackage.Response response, byte[] results, byte[] events,
                                                           Smartcontract.SmartContractID smartContractID) {
         //后面实现逻辑
         return new byte[]{3,5,4};
