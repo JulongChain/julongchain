@@ -99,7 +99,7 @@ public class ProposalResponseUtils {
      * @return
      */
     public static ProposalResponsePackage.ProposalResponse buildProposalResponse(
-            byte[] headerBytes, byte[] payloadBytes, SmartContractResponse smartContractResponse,
+            byte[] headerBytes, byte[] payloadBytes, ProposalResponsePackage.Response response,
             byte[] results,
             byte[]events,
             Smartcontract.SmartContractID smartContractID,
@@ -109,7 +109,7 @@ public class ProposalResponseUtils {
         //obtain the proposal hash given proposal header, payload and the requested visibility
         byte []pHashBytes=getProposalHash1(header,payloadBytes,visibility);
         //get the bytes of the proposal smartContractResponse payload - we need to sign them
-        byte []prpBytes=getBytesProposalResponsePayload(pHashBytes, smartContractResponse,results,events,smartContractID);
+        byte []prpBytes=getBytesProposalResponsePayload(pHashBytes, response,results,events,smartContractID);
         byte[] endorser=signingIdentity.serialize();
         // sign the concatenation of the proposal smartContractResponse and the serialized endorser identity with this endorser's key
         byte[] signature=signingIdentity.sign(Utils.appendBytes(prpBytes,endorser));

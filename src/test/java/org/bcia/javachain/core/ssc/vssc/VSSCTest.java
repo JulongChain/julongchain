@@ -104,7 +104,7 @@ public class VSSCTest extends BaseJunit4Test {
                                  Common.HeaderType.ENDORSER_TRANSACTION, groupID,
                                  invokeSpec,creator.getBytes());
         //创建response
-        SmartContractResponse smartContractResponse =new SmartContractResponse(SmartContractResponse.Status.SUCCESS,null,null);
+        ProposalResponsePackage.Response response=ProposalResponsePackage.Response.newBuilder().setStatus(200).build();
         //先使用一个模拟的签名实体，后面和msp对接
         MockMSP localMSP = MockMspManager.getLocalMSP();
         MockSigningIdentity signingEndorser =localMSP.getDefaultSigningIdentity();
@@ -113,7 +113,7 @@ public class VSSCTest extends BaseJunit4Test {
         ProposalResponsePackage.ProposalResponse presp=ProposalResponseUtils.buildProposalResponse(
                 proposal.getHeader().toByteArray(),
                 proposal.getPayload().toByteArray(),
-                smartContractResponse,
+                response,
                 results.getBytes(),
                 null,
                 smartContractID,
