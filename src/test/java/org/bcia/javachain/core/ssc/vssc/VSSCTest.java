@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.*;
 
 /**
@@ -75,7 +76,7 @@ public class VSSCTest extends BaseJunit4Test {
     }
 
     private byte[] getSignedByMSPMemberPolicy(String mspid) {
-        String policy="rw";
+        String policy="(Alice and Bob)";
         return policy.getBytes();
     }
 
