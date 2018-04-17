@@ -126,17 +126,29 @@ public class ProposalResponseUtils {
         return builder.build();
     }
 
-    // GetBytesProposalResponsePayload gets proposal smartContractResponse payload
-    //@author sunianle
+    /**
+     * GetBytesProposalResponsePayload gets proposal smartContractResponse payload
+     * @param pHashBytes
+     * @param smartContractResponse
+     * @param results
+     * @param events
+     * @param smartContractID
+     * @return
+     */
     private static byte[] getBytesProposalResponsePayload(byte[] pHashBytes, SmartContractResponse smartContractResponse, byte[] results, byte[] events,
                                                           Smartcontract.SmartContractID smartContractID) {
         //后面实现逻辑
         return new byte[]{3,5,4};
     }
 
-    // GetProposalHash1 gets the proposal hash bytes after sanitizing the
-    // chaincode proposal payload according to the rules of visibility
-    //@author sunianle
+    /**
+     * GetProposalHash1 gets the proposal hash bytes after sanitizing the
+     * chaincode proposal payload according to the rules of visibility
+     * @param header
+     * @param payloadBytes
+     * @param visibility
+     * @return
+     */
     private static byte[] getProposalHash1(Common.Header header, byte[] payloadBytes, byte[] visibility) {
         //后面实现逻辑
         return new byte[]{2,3,4};
