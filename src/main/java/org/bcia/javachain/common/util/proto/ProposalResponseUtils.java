@@ -16,8 +16,13 @@
 package org.bcia.javachain.common.util.proto;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.util.Utils;
+import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
+import org.bcia.javachain.msp.ISigningIdentity;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
+import org.bcia.javachain.protos.node.Smartcontract;
 
 /**
  * 提案响应工具类
@@ -78,5 +83,62 @@ public class ProposalResponseUtils {
         responseBuilder.setStatus(status.getNumber());
         responseBuilder.setMessage(errorMsg);
         return responseBuilder.build();
+    }
+
+    /**
+     * 创建提案响应
+     * @author sunianle
+     * @param headerBytes
+     * @param payloadBytes
+     * @param smartContractResponse
+     * @param results
+     * @param events
+     * @param smartContractID
+     * @param visibility
+     * @param signingIdentity
+     * @return
+     */
+    public static ProposalResponsePackage.ProposalResponse buildProposalResponse(
+            byte[] headerBytes, byte[] payloadBytes, SmartContractResponse smartContractResponse,
+            byte[] results,
+            byte[]events,
+            Smartcontract.SmartContractID smartContractID,
+            byte[] visibility,
+            ISigningIdentity signingIdentity) throws InvalidProtocolBufferException {
+        Common.Header header=Common.Header.parseFrom(headerBytes);
+        //obtain the proposal hash given proposal header, payload and the requested visibility
+        byte []pHashBytes=getProposalHash1(header,payloadBytes,visibility);
+        //get the bytes of the proposal smartContractResponse payload - we need to sign them
+        byte []prpBytes=getBytesProposalResponsePayload(pHashBytes, smartContractResponse,results,events,smartContractID);
+        byte[] endorser=signingIdentity.serialize();
+        // sign the concatenation of the proposal smartContractResponse and the serialized endorser identity with this endorser's key
+        byte[] signature=signingIdentity.sign(Utils.appendBytes(prpBytes,endorser));
+        ProposalResponsePackage.ProposalResponse.Builder builder = ProposalResponsePackage.ProposalResponse.newBuilder();
+        builder.setVersion(1);
+        ProposalResponsePackage.Endorsement endorsement=ProposalResponsePackage.Endorsement.newBuilder()
+                .setSignature(ByteString.copyFrom(signature))
+                .setEndorser(ByteString.copyFrom(endorser)).build();
+        builder.setEndorsement(endorsement);
+        builder.setPayload(ByteString.copyFrom(prpBytes));
+        ProposalResponsePackage.Response response1 = ProposalResponsePackage.Response.newBuilder().setStatus(200).setMessage("OK").build();
+        builder.setResponse(response1);
+
+        return builder.build();
+    }
+
+    // GetBytesProposalResponsePayload gets proposal smartContractResponse payload
+    //@author sunianle
+    private static byte[] getBytesProposalResponsePayload(byte[] pHashBytes, SmartContractResponse smartContractResponse, byte[] results, byte[] events,
+                                                          Smartcontract.SmartContractID smartContractID) {
+        //后面实现逻辑
+        return new byte[]{3,5,4};
+    }
+
+    // GetProposalHash1 gets the proposal hash bytes after sanitizing the
+    // chaincode proposal payload according to the rules of visibility
+    //@author sunianle
+    private static byte[] getProposalHash1(Common.Header header, byte[] payloadBytes, byte[] visibility) {
+        //后面实现逻辑
+        return new byte[]{2,3,4};
     }
 }

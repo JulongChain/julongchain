@@ -5,9 +5,8 @@ import org.bcia.javachain.BaseJunit4Test;
 import org.bcia.javachain.core.aclmgmt.MockAclProvider;
 import org.bcia.javachain.core.aclmgmt.resources.Resources;
 import org.bcia.javachain.core.smartcontract.shim.impl.MockStub;
-import org.bcia.javachain.core.smartcontract.shim.impl.Response;
+import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
 import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractStub;
-import org.bcia.javachain.core.ssc.essc.ESSC;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.junit.Test;
@@ -36,8 +35,8 @@ public class QSSCTest extends BaseJunit4Test {
 
     @Test
     public void init() {
-        Response response = qssc.init(stub);
-        assertThat(response.getStatus(), is(Response.Status.SUCCESS));
+        SmartContractResponse smartContractResponse = qssc.init(stub);
+        assertThat(smartContractResponse.getStatus(), is(SmartContractResponse.Status.SUCCESS));
     }
 
     @Test
@@ -77,9 +76,9 @@ public class QSSCTest extends BaseJunit4Test {
         args.add(ByteString.copyFromUtf8(groupid));
         args.add(ByteString.copyFromUtf8("1"));
         ProposalPackage.SignedProposal sp=resetProvider(Resources.QSSC_GetTransactionByID,groupid,null);
-        Response res =mockStub.mockInvokeWithSignedProposal("1",args,sp);
+        SmartContractResponse res =mockStub.mockInvokeWithSignedProposal("1",args,sp);
         //因一些对象为空，部分接口尚未调通
-        assertThat(res.getStatus(),not(Response.Status.SUCCESS));
+        assertThat(res.getStatus(),not(SmartContractResponse.Status.SUCCESS));
     }
 
     private ProposalPackage.SignedProposal resetProvider(String qssc_getTransactionByID,

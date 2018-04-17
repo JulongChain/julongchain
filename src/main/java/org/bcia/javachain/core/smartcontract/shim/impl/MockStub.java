@@ -91,7 +91,7 @@ public class MockStub implements ISmartContractStub{
     }
 
     @Override
-    public Response invokeSmartContract(String smartContractName, List<byte[]> args, String group) {
+    public SmartContractResponse invokeSmartContract(String smartContractName, List<byte[]> args, String group) {
         return null;
     }
 
@@ -146,22 +146,22 @@ public class MockStub implements ISmartContractStub{
     }
 
     @Override
-    public Response invokeSmartContract(String smartContractName, List<byte[]> args) {
+    public SmartContractResponse invokeSmartContract(String smartContractName, List<byte[]> args) {
         return null;
     }
 
     @Override
-    public Response invokeSmartContractWithStringArgs(String smartContractName, List<String> args, String group) {
+    public SmartContractResponse invokeSmartContractWithStringArgs(String smartContractName, List<String> args, String group) {
         return null;
     }
 
     @Override
-    public Response invokeSmartContractWithStringArgs(String smartContractName, List<String> args) {
+    public SmartContractResponse invokeSmartContractWithStringArgs(String smartContractName, List<String> args) {
         return null;
     }
 
     @Override
-    public Response invokeSmartContractWithStringArgs(String smartContractName, String... args) {
+    public SmartContractResponse invokeSmartContractWithStringArgs(String smartContractName, String... args) {
         return null;
     }
 
@@ -205,30 +205,30 @@ public class MockStub implements ISmartContractStub{
         return new byte[0];
     }
 
-    public Response mockInit(String uuid,List<ByteString> args){
+    public SmartContractResponse mockInit(String uuid, List<ByteString> args){
         this.args=args;
         mockTransactionStart(uuid);
-        Response response=this.smartContract.init(this);
+        SmartContractResponse smartContractResponse =this.smartContract.init(this);
         mockTransactionEnd(uuid);
-        return response;
+        return smartContractResponse;
     }
 
-    public Response mockInvoke(String uuid,List<ByteString> args){
+    public SmartContractResponse mockInvoke(String uuid, List<ByteString> args){
         this.args=args;
         mockTransactionStart(uuid);
-        Response response=this.smartContract.invoke(this);
+        SmartContractResponse smartContractResponse =this.smartContract.invoke(this);
         mockTransactionEnd(uuid);
-        return response;
+        return smartContractResponse;
     }
 
-    public Response mockInvokeWithSignedProposal(String uuid, List<ByteString> args,
-                                                 ProposalPackage.SignedProposal proposal){
+    public SmartContractResponse mockInvokeWithSignedProposal(String uuid, List<ByteString> args,
+                                                              ProposalPackage.SignedProposal proposal){
         this.args=args;
         mockTransactionStart(uuid);
         this.signedProposal=proposal;
-        Response response=this.smartContract.invoke(this);
+        SmartContractResponse smartContractResponse =this.smartContract.invoke(this);
         mockTransactionEnd(uuid);
-        return response;
+        return smartContractResponse;
     }
 
     private void mockTransactionEnd(String uuid) {

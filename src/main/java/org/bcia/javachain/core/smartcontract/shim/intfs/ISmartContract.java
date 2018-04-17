@@ -15,7 +15,7 @@
  */
 package org.bcia.javachain.core.smartcontract.shim.intfs;
 
-import org.bcia.javachain.core.smartcontract.shim.impl.Response;
+import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
 
 /**
  * 智能合约接口
@@ -29,13 +29,13 @@ public interface ISmartContract {
      * Called during an instantiate transaction after the container has been
      * established, allowing the chaincode to initialize its internal data.
      */
-    Response init(ISmartContractStub stub);
+    SmartContractResponse init(ISmartContractStub stub);
 
     /**
      * Called for every Invoke transaction. The chaincode may change its state
      * variables.
      */
-    Response invoke(ISmartContractStub stub);
+    SmartContractResponse invoke(ISmartContractStub stub);
 
     /**
      * 获取智能合约ＩＤ

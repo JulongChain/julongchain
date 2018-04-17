@@ -37,4 +37,21 @@ public class Utils {
     public static String getTestGroupID(){
         return "TEST_GROUP_ID";
     }
+
+    public static byte[] appendBytes(byte[] bytes1,byte[] bytes2){
+        int size1= bytes1.length;
+        int size2=bytes2.length;
+        int size=size1+size2;
+        byte[] results=new byte[size];
+        int i=0;
+        for(byte bt:bytes1){
+            results[i]=bt;
+            i++;
+        }
+        for(byte bt:bytes2){
+            results[i]=bt;
+            i++;
+        }
+        return results;
+    }
 }

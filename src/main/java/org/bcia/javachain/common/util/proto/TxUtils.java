@@ -16,8 +16,10 @@
 package org.bcia.javachain.common.util.proto;
 
 import com.google.protobuf.ByteString;
+import org.bcia.javachain.msp.ISigningIdentity;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Smartcontract;
 
 /**
@@ -41,5 +43,19 @@ public class TxUtils {
         ProposalPackage.SignedProposal signedProposal = ProposalPackage.SignedProposal.newBuilder().setProposalBytes(ByteString.copyFrom(proBytes))
                 .setSignature(ByteString.copyFrom(signature)).build();
         return signedProposal;
+    }
+
+    public static Common.Envelope createSignedTx(ProposalPackage.Proposal proposal, ISigningIdentity signer,
+                                                 ProposalResponsePackage.ProposalResponse resps){
+        //先占位，后面补充逻辑
+        Common.Envelope.Builder builder=Common.Envelope.newBuilder();
+        builder.setPayload(ByteString.copyFrom("Payload".getBytes()));
+        builder.setSignature(ByteString.copyFrom("Signature".getBytes()));
+        Common.Envelope  envelope=builder.build();
+        return envelope;
+    }
+
+    public static byte[] getBytesEnvelope(Common.Envelope tx) {
+        return tx.toByteArray();
     }
 }
