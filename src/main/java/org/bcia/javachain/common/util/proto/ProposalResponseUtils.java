@@ -17,10 +17,15 @@ package org.bcia.javachain.common.util.proto;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.util.Utils;
-import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
+import org.bcia.javachain.csp.factory.CspManager;
+import org.bcia.javachain.csp.gm.sm3.SM3HashOpts;
+import org.bcia.javachain.csp.intfs.IHash;
 import org.bcia.javachain.msp.ISigningIdentity;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Smartcontract;
 
@@ -87,35 +92,36 @@ public class ProposalResponseUtils {
 
     /**
      * 创建提案响应
-     * @author sunianle
+     *
      * @param headerBytes
      * @param payloadBytes
-     * @param smartContractResponse
+     * @param response
      * @param results
      * @param events
      * @param smartContractID
      * @param visibility
      * @param signingIdentity
      * @return
+     * @author sunianle
      */
     public static ProposalResponsePackage.ProposalResponse buildProposalResponse(
             byte[] headerBytes, byte[] payloadBytes, ProposalResponsePackage.Response response,
             byte[] results,
-            byte[]events,
+            byte[] events,
             Smartcontract.SmartContractID smartContractID,
             byte[] visibility,
-            ISigningIdentity signingIdentity) throws InvalidProtocolBufferException {
-        Common.Header header=Common.Header.parseFrom(headerBytes);
+            ISigningIdentity signingIdentity) throws InvalidProtocolBufferException, JavaChainException {
+        Common.Header header = Common.Header.parseFrom(headerBytes);
         //obtain the proposal hash given proposal header, payload and the requested visibility
-        byte []pHashBytes=getProposalHash1(header,payloadBytes,visibility);
+        byte[] pHashBytes = getProposalHash1(header, payloadBytes, visibility);
         //get the bytes of the proposal smartContractResponse payload - we need to sign them
-        byte []prpBytes=getBytesProposalResponsePayload(pHashBytes, response,results,events,smartContractID);
-        byte[] endorser=signingIdentity.serialize();
+        byte[] prpBytes = getBytesProposalResponsePayload(pHashBytes, response, results, events, smartContractID);
+        byte[] endorser = signingIdentity.serialize();
         // sign the concatenation of the proposal smartContractResponse and the serialized endorser identity with this endorser's key
-        byte[] signature=signingIdentity.sign(Utils.appendBytes(prpBytes,endorser));
+        byte[] signature = signingIdentity.sign(Utils.appendBytes(prpBytes, endorser));
         ProposalResponsePackage.ProposalResponse.Builder builder = ProposalResponsePackage.ProposalResponse.newBuilder();
         builder.setVersion(1);
-        ProposalResponsePackage.Endorsement endorsement=ProposalResponsePackage.Endorsement.newBuilder()
+        ProposalResponsePackage.Endorsement endorsement = ProposalResponsePackage.Endorsement.newBuilder()
                 .setSignature(ByteString.copyFrom(signature))
                 .setEndorser(ByteString.copyFrom(endorser)).build();
         builder.setEndorsement(endorsement);
@@ -128,6 +134,7 @@ public class ProposalResponseUtils {
 
     /**
      * GetBytesProposalResponsePayload gets proposal smartContractResponse payload
+     *
      * @param pHashBytes
      * @param response
      * @param results
@@ -135,22 +142,68 @@ public class ProposalResponseUtils {
      * @param smartContractID
      * @return
      */
-    private static byte[] getBytesProposalResponsePayload(byte[] pHashBytes, ProposalResponsePackage.Response response, byte[] results, byte[] events,
-                                                          Smartcontract.SmartContractID smartContractID) {
-        //后面实现逻辑
-        return new byte[]{3,5,4};
+    private static byte[] getBytesProposalResponsePayload(byte[] pHashBytes, ProposalResponsePackage.Response
+            response, byte[] results, byte[] events, Smartcontract.SmartContractID smartContractID) {
+        //构造SmartContractAction
+        ProposalPackage.SmartContractAction.Builder actionBuilder = ProposalPackage.SmartContractAction.newBuilder();
+        actionBuilder.setEvents(ByteString.copyFrom(events));
+        actionBuilder.setResults(ByteString.copyFrom(results));
+        actionBuilder.setResponse(response);
+        actionBuilder.setSmartContractId(smartContractID);
+        ProposalPackage.SmartContractAction smartContractAction = actionBuilder.build();
+
+        //构造ProposalResponsePayload
+        ProposalResponsePackage.ProposalResponsePayload.Builder responsePayloadBuilder = ProposalResponsePackage
+                .ProposalResponsePayload.newBuilder();
+        responsePayloadBuilder.setExtension(smartContractAction.toByteString());
+        responsePayloadBuilder.setProposalHash(ByteString.copyFrom(pHashBytes));
+        ProposalResponsePackage.ProposalResponsePayload responsePayload = responsePayloadBuilder.build();
+
+        return responsePayload.toByteArray();
     }
 
     /**
      * GetProposalHash1 gets the proposal hash bytes after sanitizing the
      * chaincode proposal payload according to the rules of visibility
+     *
      * @param header
      * @param payloadBytes
      * @param visibility
      * @return
      */
-    private static byte[] getProposalHash1(Common.Header header, byte[] payloadBytes, byte[] visibility) {
-        //后面实现逻辑
-        return new byte[]{2,3,4};
+    private static byte[] getProposalHash1(Common.Header header, byte[] payloadBytes, byte[] visibility) throws
+            InvalidProtocolBufferException, ValidateException, JavaChainException {
+        if (header == null || header.getGroupHeader() == null || header.getSignatureHeader() == null || payloadBytes
+                == null) {
+            throw new ValidateException("Missing arguments");
+        }
+
+        //强制转换，如果失败抛出异常
+        ProposalPackage.SmartContractProposalPayload smartContractProposalPayload = ProposalPackage
+                .SmartContractProposalPayload.parseFrom(payloadBytes);
+
+        byte[] proposalPayloadForTxBytes = getBytesProposalPayloadForTx(smartContractProposalPayload, visibility);
+        IHash hash = CspManager.getDefaultCsp().getHash(new SM3HashOpts());
+
+        hash.write(header.getGroupHeader().toByteArray());
+        hash.write(header.getSignatureHeader().toByteArray());
+        hash.write(proposalPayloadForTxBytes);
+
+        return hash.sum(null);
+    }
+
+    private static byte[] getBytesProposalPayloadForTx(ProposalPackage.SmartContractProposalPayload proposalPayload,
+                                                       byte[] visibility) throws ValidateException {
+        if (proposalPayload == null) {
+            throw new ValidateException("Missing smartContractProposalPayload");
+        }
+
+        //将SmartContractProposalPayload去transientMap属性
+        ProposalPackage.SmartContractProposalPayload.Builder newProposalPayloadBuilder = ProposalPackage
+                .SmartContractProposalPayload.newBuilder(proposalPayload);
+        newProposalPayloadBuilder.clearTransientMap();
+        ProposalPackage.SmartContractProposalPayload newProposalPayload = newProposalPayloadBuilder.build();
+
+        return newProposalPayload.toByteArray();
     }
 }
