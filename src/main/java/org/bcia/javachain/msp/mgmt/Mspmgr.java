@@ -16,54 +16,35 @@
 package org.bcia.javachain.msp.mgmt;
 
 import org.bcia.javachain.msp.IIdentity;
-import org.bcia.javachain.msp.ISigningIdentity;
-import org.bcia.javachain.msp.entity.OUIdentifier;
-import org.bcia.javachain.protos.common.MspPrincipal;
+import org.bcia.javachain.msp.IMsp;
+import org.bcia.javachain.msp.IMspManager;
+import org.bcia.javachain.protos.msp.Identities;
+
+import java.util.Map;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/27
+ * @Date: 2018/3/13
  * @company Dingxuan
  */
-public class ISigningIdentityImpl implements ISigningIdentity {
+public class Mspmgr implements IMspManager{
     @Override
-    public byte[] sign(byte[] msg) {
-        //通过签名算法进行签名
-        return new byte[0];
+    public void setup(IMsp[] msps) {
+
     }
 
     @Override
-    public IIdentity getPublicVersion() {
+    public Map<String, IMsp> getMSPs() {
         return null;
     }
 
     @Override
-    public String getMSPIdentifier() {
+    public IIdentity deserializeIdentity(byte[] serializedIdentity) {
         return null;
     }
 
     @Override
-    public void validate() {
-
-    }
-
-    @Override
-    public OUIdentifier[] getOrganizationalUnits() {
-        return new OUIdentifier[0];
-    }
-
-    @Override
-    public void verify(byte[] msg, byte[] sig) {
-
-    }
-
-    @Override
-    public byte[] serialize() {
-        return new byte[0];
-    }
-
-    @Override
-    public void satisfiesPrincipal(MspPrincipal principal) {
+    public void isWellFormed(Identities.SerializedIdentity identity) {
 
     }
 }
