@@ -40,5 +40,4 @@ public interface TxMgr extends Recoverable {
     void commit() throws LedgerException;
     void rollback() throws LedgerException;
     void shutdown() throws LedgerException;
-
 }
