@@ -13,49 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.ledger.util.leveldbhelper;
+package org.bcia.javachain.core.smartcontract;
+
+import org.bcia.javachain.protos.node.Smartcontract;
 
 /**
  * 类描述
  *
  * @author wanliangbing
- * @date 2018/3/9
+ * @date 2018/4/3
  * @company Dingxuan
  */
-public class Provider {
+public class DuplicateSmartContractHandlerError {
 
-    private DB db;
-    private DBHandle dbHandle;
+    private Smartcontract.SmartContractID smartContractID;
 
-    /** GetDBHandle returns a handle to a named db
-     *
-     * @param dbName
-     * @return
-     */
-    public DBHandle getDBHandle(String dbName) {
-        return null;
+    public Smartcontract.SmartContractID getSmartContractID() {
+        return smartContractID;
     }
 
-    /** Close closes the underlying leveldb
-     *
-     */
-    public void close() {
-
-    }
-
-    public DB getDb() {
-        return db;
-    }
-
-    public void setDb(DB db) {
-        this.db = db;
-    }
-
-    public DBHandle getDbHandle() {
-        return dbHandle;
-    }
-
-    public void setDbHandle(DBHandle dbHandle) {
-        this.dbHandle = dbHandle;
+    public void setSmartContractID(Smartcontract.SmartContractID
+                                           smartContractID) {
+        this.smartContractID = smartContractID;
     }
 }

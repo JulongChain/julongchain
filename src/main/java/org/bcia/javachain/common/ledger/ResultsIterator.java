@@ -27,18 +27,12 @@ import org.bcia.javachain.common.exception.LedgerException;
 public interface ResultsIterator {
 
     /**
-     * Next returns the next item in the result set. The `QueryResult` is expected to be nil when
-     * the iterator gets exhausted
-     *
-     * @return
-     * @throws LedgerException
+     * 返回下一个实体,当全部返回时,返回空
      */
     QueryResult next() throws LedgerException;
 
     /**
-     * Close releases resources occupied by the iterator
-     *
-     * @throws LedgerException
+     * 关闭当前迭代器
      */
     void close() throws LedgerException;
 

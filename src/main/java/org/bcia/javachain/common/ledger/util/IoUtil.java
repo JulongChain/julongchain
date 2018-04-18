@@ -15,6 +15,11 @@
  */
 package org.bcia.javachain.common.ledger.util;
 
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+
+import java.io.File;
+
 /**
  * 类描述
  *
@@ -23,14 +28,24 @@ package org.bcia.javachain.common.ledger.util;
  * @company Dingxuan
  */
 public class IoUtil {
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(IoUtil.class);
 
     /** CreateDirIfMissing creates a dir for dirPath if not already exists. If the dir is empty it returns true
      *
      * @param dirPath
      * @return
      */
-    public Boolean createDirIfMissing(String dirPath) {
-        return Boolean.FALSE;
+    public static Boolean createDirIfMissing(String dirPath) {
+        try {
+            File file = new File(dirPath);
+            if(!file.exists()){
+                file.mkdir();
+            }
+        } catch (Exception e) {
+            logger.debug(String.format("Creating [%s] failed", dirPath));
+            return Boolean.FALSE;
+        }
+        return Boolean.TRUE;
     }
 
     /** DirEmpty returns true if the dir at dirPath is empty
@@ -38,15 +53,16 @@ public class IoUtil {
      * @param dirPath
      * @return
      */
-    public Boolean DirEmpty(String dirPath){
+    public static Boolean DirEmpty(String dirPath){
         return Boolean.FALSE;
     }
 
-    /** FileExists checks whether the given file exists.
-     * If the file exists, this method also returns the size of the file.
+    /**
+     * 返回-1:文件不存在
+     * >=0:文件大小
      */
-    public Boolean fileExists(String filePath) {
-       return Boolean.FALSE;
+    public static long fileExists(String filePath) {
+        return 0;
     }
 
     /** ListSubdirs returns the subdirectories
@@ -54,11 +70,11 @@ public class IoUtil {
      * @param dirPath
      * @return
      */
-    public String[] listSubdirs(String dirPath) {
+    public static String[] listSubdirs(String dirPath) {
         return null;
     }
 
-    public void logDirStatus(String msg, String dirPath) {
+    public static void logDirStatus(String msg, String dirPath) {
         return;
     }
 

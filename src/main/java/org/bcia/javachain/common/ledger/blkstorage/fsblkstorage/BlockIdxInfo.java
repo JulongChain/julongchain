@@ -15,7 +15,15 @@
  */
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
+import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.node.TransactionPackage;
+
+import java.util.List;
 
 /**
  * 类描述
@@ -29,9 +37,10 @@ public class BlockIdxInfo {
     private Long blockNum;
     private byte[] blockHash;
     private FileLocPointer flp;
-    private TxIndexInfo txOffset;
+    private List<TxIndexInfo> txOffsets;
     private Common.BlockMetadata metadata;
 
+    private static final JavaChainLog loogger = JavaChainLogFactory.getLog(BlockIdxInfo.class);
     public Long getBlockNum() {
         return blockNum;
     }
@@ -56,19 +65,24 @@ public class BlockIdxInfo {
         this.flp = flp;
     }
 
-    public TxIndexInfo getTxOffset() {
-        return txOffset;
-    }
-
-    public void setTxOffset(TxIndexInfo txOffset) {
-        this.txOffset = txOffset;
-    }
-
     public Common.BlockMetadata getMetadata() {
         return metadata;
     }
 
     public void setMetadata(Common.BlockMetadata metadata) {
         this.metadata = metadata;
+    }
+
+    public List<TxIndexInfo> getTxOffsets() {
+        return txOffsets;
+    }
+
+    public void setTxOffsets(List<TxIndexInfo> txOffsets) {
+        this.txOffsets = txOffsets;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("blockNum=%d, blockHash length=%d, txOffsets length=%d", blockNum, blockHash.length, txOffsets.size());
     }
 }

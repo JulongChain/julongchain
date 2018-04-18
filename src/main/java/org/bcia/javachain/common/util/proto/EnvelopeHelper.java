@@ -53,10 +53,11 @@ import java.io.IOException;
 public class EnvelopeHelper {
     private static JavaChainLog log = JavaChainLogFactory.getLog(EnvelopeHelper.class);
 
+
     public static Common.Envelope makeGroupCreateTx(String groupId, ILocalSigner signer, Configtx.ConfigTree
-            consenterSystemGroupChild, GenesisConfig.Profile profile) throws InvalidProtocolBufferException,
+            consenterSystemGroupTree, GenesisConfig.Profile profile) throws InvalidProtocolBufferException,
             NodeException, ValidateException {
-        Configtx.ConfigUpdate configUpdate = buildConfigUpdate(groupId, consenterSystemGroupChild, profile);
+        Configtx.ConfigUpdate configUpdate = buildConfigUpdate(groupId, consenterSystemGroupTree, profile);
 
         Configtx.ConfigUpdateEnvelope.Builder envelopeBuilder = Configtx.ConfigUpdateEnvelope.newBuilder();
         envelopeBuilder.setConfigUpdate(configUpdate.toByteString());
@@ -78,22 +79,22 @@ public class EnvelopeHelper {
     }
 
     public static Configtx.ConfigUpdate buildConfigUpdate(String groupId, Configtx.ConfigTree
-            consenterSystemGroupChild, GenesisConfig.Profile profile) throws NodeException,
-            InvalidProtocolBufferException, ValidateException {
+            consenterSystemGroupTree, GenesisConfig.Profile profile) throws InvalidProtocolBufferException,
+            ValidateException {
         if (profile.getApplication() == null) {
-            throw new NodeException("No Application in profile");
+            throw new ValidateException("No Application in profile");
         }
 
         if (profile.getConsortium() == null) {
-            throw new NodeException("No Consortium in profile");
+            throw new ValidateException("No Consortium in profile");
         }
 
         //构造应用子树
-        Configtx.ConfigTree appTree = ConfigTreeHelper.buildApplicationChild(profile.getApplication());
+        Configtx.ConfigTree appTree = ConfigTreeHelper.buildApplicationTree(profile.getApplication());
         //得到最终的应用配置
         ApplicationConfig appConfig = new ApplicationConfig(appTree, new MSPConfigHandler(0));
 
-        if (consenterSystemGroupChild != null) {
+        if (consenterSystemGroupTree != null) {
             //TODO:要实现吗？
         } else {
 

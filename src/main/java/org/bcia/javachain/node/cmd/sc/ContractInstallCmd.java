@@ -20,6 +20,7 @@ import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.CommConstant;
+import org.bcia.javachain.node.Node;
 import org.springframework.stereotype.Component;
 
 /**
@@ -46,13 +47,16 @@ public class ContractInstallCmd extends AbstractNodeContractCmd {
     //参数：path
     private static final String ARG_PATH = "p";
 
-
     //参数：超时时间
     private static final String ARG_TIMEOUT = "t";
     //参数：是否使用TLS传输
     private static final String ARG_USE_TLS = "tls";
     //参数：CA文件位置
     //private static final String ARG_CA = "ca";
+
+    public ContractInstallCmd(Node node) {
+        super(node);
+    }
 
     @Override
     public void execCmd(String[] args) throws ParseException, NodeException {

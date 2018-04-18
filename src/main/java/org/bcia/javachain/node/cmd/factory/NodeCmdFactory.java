@@ -15,13 +15,16 @@
  */
 package org.bcia.javachain.node.cmd.factory;
 
+import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.cmd.INodeCmd;
 import org.bcia.javachain.node.cmd.group.GroupCreateCmd;
 import org.bcia.javachain.node.cmd.group.GroupJoinCmd;
+import org.bcia.javachain.node.cmd.group.GroupListCmd;
 import org.bcia.javachain.node.cmd.group.GroupUpdateCmd;
 import org.bcia.javachain.node.cmd.sc.ContractInstallCmd;
 import org.bcia.javachain.node.cmd.sc.ContractInstantiateCmd;
 import org.bcia.javachain.node.cmd.sc.ContractInvokeCmd;
+import org.bcia.javachain.node.cmd.sc.ContractQueryCmd;
 import org.bcia.javachain.node.cmd.server.ServerStartCmd;
 import org.bcia.javachain.node.cmd.server.ServerStatusCmd;
 import org.bcia.javachain.node.cmd.util.NodeCmdConstant;
@@ -36,31 +39,35 @@ import org.bcia.javachain.node.util.NodeConstant;
  * @company Dingxuan
  */
 public class NodeCmdFactory {
-    public static INodeCmd getInstance(String command, String subCommand) {
+    public static INodeCmd getInstance(Node node, String command, String subCommand) {
         if (NodeConstant.NODE.equalsIgnoreCase(command)) {
             if (NodeCmdConstant.START_SERVER.equalsIgnoreCase(subCommand)) {
-                return new ServerStartCmd();
+                return new ServerStartCmd(node);
             } else if (NodeCmdConstant.SERVER_STATUS.equalsIgnoreCase(subCommand)) {
-                return new ServerStatusCmd();
+                return new ServerStatusCmd(node);
             }
         } else if (NodeConstant.GROUP.equalsIgnoreCase(command)) {
             if (NodeCmdConstant.CREATE_GROUP.equalsIgnoreCase(subCommand)) {
-                return new GroupCreateCmd();
+                return new GroupCreateCmd(node);
             } else if (NodeCmdConstant.JOIN_GROUP.equalsIgnoreCase(subCommand)) {
-                return new GroupJoinCmd();
-            }else if(NodeCmdConstant.UPDATE_GROUP.equalsIgnoreCase(subCommand)) {
-                return new GroupUpdateCmd();
+                return new GroupJoinCmd(node);
+            } else if (NodeCmdConstant.UPDATE_GROUP.equalsIgnoreCase(subCommand)) {
+                return new GroupUpdateCmd(node);
+            } else if (NodeCmdConstant.LIST_GROUP.equalsIgnoreCase(subCommand)) {
+                return new GroupListCmd(node);
             }
         } else if (NodeConstant.SMART_CONTRACT.equalsIgnoreCase(command)) {
             if (NodeCmdConstant.INSTALL_CONTRACT.equalsIgnoreCase(subCommand)) {
-                return new ContractInstallCmd();
+                return new ContractInstallCmd(node);
             } else if (NodeCmdConstant.INSTANCE_CONTRACT.equalsIgnoreCase(subCommand)) {
-                return new ContractInstantiateCmd();
-            }else if (NodeCmdConstant.INVOKE_CONTRACT.equalsIgnoreCase(subCommand)) {
-                return new ContractInvokeCmd();
+                return new ContractInstantiateCmd(node);
+            } else if (NodeCmdConstant.INVOKE_CONTRACT.equalsIgnoreCase(subCommand)) {
+                return new ContractInvokeCmd(node);
+            }else if (NodeCmdConstant.QUERY_CONTRACT.equalsIgnoreCase(subCommand)) {
+                return new ContractQueryCmd(node);
             }
         } else if (NodeConstant.VERSION.equalsIgnoreCase(command)) {
-            return new VersionCmd();
+            return new VersionCmd(node);
         }
 
         return null;

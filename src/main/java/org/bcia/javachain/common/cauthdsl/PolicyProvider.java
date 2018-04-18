@@ -30,7 +30,7 @@ public class PolicyProvider {
 
     }
 
-    public IPolicy newPolicy(String policy) {
+    public IPolicy newPolicy(byte[] policyBytes) {
         return null;
     }
 }

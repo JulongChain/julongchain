@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig;
+package org.bcia.javachain.common.groupconfig.value;
 
 import com.google.protobuf.Message;
 
@@ -24,8 +24,17 @@ import com.google.protobuf.Message;
  * @date 2018/3/9
  * @company Dingxuan
  */
-public interface IConfigValue {
-    String key();
+public class StandardConfigValue implements IConfigValue {
+    protected String key;
+    protected Message value;
 
-    Message value();
+    @Override
+    public String getKey() {
+        return key;
+    }
+
+    @Override
+    public Message getValue() {
+        return value;
+    }
 }

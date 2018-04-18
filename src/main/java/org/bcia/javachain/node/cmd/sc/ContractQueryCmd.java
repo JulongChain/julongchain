@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.node.Node;
 import org.springframework.stereotype.Component;
 
 /**
@@ -40,6 +41,10 @@ public class ContractQueryCmd extends AbstractNodeContractCmd {
     private static final String ARG_SC_NAME = "n";
     //参数：解析出查询主体
     private static final String ARG_CTOR = "ctor";
+
+    public ContractQueryCmd(Node node) {
+        super(node);
+    }
 
     @Override
     public void execCmd(String[] args) throws ParseException, NodeException {

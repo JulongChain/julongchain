@@ -15,13 +15,16 @@
  */
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
-import java.io.File;
+import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.core.node.NodeConfig;
+
+import java.io.*;
 
 /**
- * 类描述
+ * 写入文件
  *
- * @author wanliangbing
- * @date 2018/3/8
+ * @author sunzongyu
+ * @date 2018/04/12
  * @company Dingxuan
  */
 public class BlockfileWriter {
@@ -29,20 +32,48 @@ public class BlockfileWriter {
     private String filePath;
     private File file;
 
-    void truncateFile(Integer targetSize) {
-
+    public static BlockfileWriter newBlockfileWriter(String filePath){
+        BlockfileWriter writer = new BlockfileWriter();
+        writer.setFilePath(filePath);
+        return writer.open();
     }
 
-    byte[] append(byte[] b, Boolean sync) {
-        return null;
+    /**
+     * 截断文件为指定大小
+     */
+    public void truncateFile(Integer targetSize) throws LedgerException {
+        if(file.length() <= targetSize){
+            return;
+        }
+        FileInputStream fis;
+        FileOutputStream fos;
+        try {
+            fis = new FileInputStream(file);
+            byte[] inputBytes = new byte[targetSize];
+            fis.read(inputBytes);
+            fis.close();
+            fos = new FileOutputStream(file);
+            fos.write(inputBytes);
+            fos.close();
+        } catch (Throwable e) {
+            throw new LedgerException(e);
+        }
     }
 
-    void open() {
-
+    public void append(byte[] b, Boolean sync) throws LedgerException {
+        FileOutputStream fos;
+        try {
+            fos = new FileOutputStream(file, true);
+            fos.write(b);
+            fos.close();
+        } catch (IOException e) {
+            throw new LedgerException(e);
+        }
     }
 
-    void close() {
-
+    public BlockfileWriter open() {
+        file = new File(filePath);
+        return this;
     }
 
     public String getFilePath() {

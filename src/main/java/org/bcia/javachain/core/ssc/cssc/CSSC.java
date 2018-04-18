@@ -28,13 +28,12 @@ import org.bcia.javachain.core.aclmgmt.resources.Resources;
 import org.bcia.javachain.core.node.ConfigFactory;
 import org.bcia.javachain.core.policy.IPolicyChecker;
 import org.bcia.javachain.core.policy.PolicyFactory;
-import org.bcia.javachain.core.smartcontract.shim.impl.Response;
+import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
 import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
 import org.bcia.javachain.msp.mgmt.Principal;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
-import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -77,7 +76,7 @@ public class CSSC extends SystemSmartContractBase {
     // This allows the smartcontract to initialize any variables on the ledger prior
     // to any transaction execution on the chain.
     @Override
-    public Response init(ISmartContractStub stub) {
+    public SmartContractResponse init(ISmartContractStub stub) {
         log.info("Init CSSC");
         policyChecker= PolicyFactory.getPolicyChecker();
         configManager= ConfigFactory.getConfigManager();
@@ -95,7 +94,7 @@ public class CSSC extends SystemSmartContractBase {
     // UpdateConfigBlock; otherwise it is the chain id
     // TODO: Improve the scc interface to avoid marshal/unmarshal args
     @Override
-    public Response invoke(ISmartContractStub stub) {
+    public SmartContractResponse invoke(ISmartContractStub stub) {
         log.debug("Enter CSSC invoke function");
         List<byte[]> args = stub.getArgs();
         int size=args.size();
@@ -181,23 +180,23 @@ public class CSSC extends SystemSmartContractBase {
     // joinChain will join the specified chain in the configuration block.
     // Since it is the first block, it is the genesis block containing configuration
     // for this chain, so we want to update the Chain object with this info
-    private Response joinGroup(String groupID,Common.Block block){
+    private SmartContractResponse joinGroup(String groupID, Common.Block block){
         return null;
     }
 
     // Return the current configuration block for the specified chainID. If the
     // peer doesn't belong to the chain, return error
-    private Response getConfigBlock(String groupID){
+    private SmartContractResponse getConfigBlock(String groupID){
         return null;
     }
 
     // getConfigTree returns the current channel and resources configuration for the specified chainID.
     // If the peer doesn't belong to the chain, returns error
-    private Response getConfigTree(String groupID){
+    private SmartContractResponse getConfigTree(String groupID){
         return null;
     }
 
-    private Response simulateConfigTreeUpdate(
+    private SmartContractResponse simulateConfigTreeUpdate(
             String groupID,byte[] envb
     ){
         return null;
@@ -208,7 +207,7 @@ public class CSSC extends SystemSmartContractBase {
     }
 
     // getGroups returns information about all channels for this peer
-    private Response getGroups(){
+    private SmartContractResponse getGroups(){
         return null;
     }
 }

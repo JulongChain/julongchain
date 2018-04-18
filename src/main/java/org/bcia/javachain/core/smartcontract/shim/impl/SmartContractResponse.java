@@ -20,13 +20,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @date 2/28/18
  * @company Dingxuan
  */
-public class Response {
+public class SmartContractResponse {
 
     private final Status status;
     private final String message;
     private final byte[] payload;
 
-    public Response(Status status, String message, byte[] payload) {
+    public SmartContractResponse(Status status, String message, byte[] payload) {
         this.status = status;
         this.message = message;
         this.payload = payload;

@@ -15,22 +15,29 @@
  */
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
-import java.io.File;
-import java.io.Reader;
+import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.util.Util;
+
+import java.io.*;
+import java.util.AbstractMap;
 
 /**
- * 类描述
+ * 操作block文件
  *
- * @author wanliangbing
- * @date 2018/3/8
+ * @author sunzongyu
+ * @date 2018/04/09
  * @company Dingxuan
  */
 public class BlockfileStream {
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockfileStream.class);
 
     private Integer fileNum;
     private File file;
-    private Reader reader;
+    private InputStream reader;
     private Long currentOffset;
+    private boolean init = false;
 
     public Integer getFileNum() {
         return fileNum;
@@ -48,11 +55,11 @@ public class BlockfileStream {
         this.file = file;
     }
 
-    public Reader getReader() {
+    public InputStream getReader() {
         return reader;
     }
 
-    public void setReader(Reader reader) {
+    public void setReader(InputStream reader) {
         this.reader = reader;
     }
 
@@ -62,5 +69,105 @@ public class BlockfileStream {
 
     public void setCurrentOffset(Long currentOffset) {
         this.currentOffset = currentOffset;
+    }
+
+    /**
+     * 初始化
+     */
+    public BlockfileStream newBlockFileStream(String rootDir, int fileNum, long startOffset) throws LedgerException{
+        //根据rootDir获取filePath
+        String filePath = null;
+        this.fileNum = fileNum;
+        this.file = new File(filePath);
+        try {
+            this.reader = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            throw new LedgerException(e);
+        }
+        this.currentOffset = startOffset;
+        if(currentOffset > file.length()){
+            throw new LedgerException("Current offset is out of file");
+        }
+        logger.debug(String.format("newBlockFileStream(): filePath=[%s], startOffset=[%d]", filePath, startOffset));
+        init = true;
+        return this;
+    }
+
+    /**
+     * 读取区块字节
+     */
+    public AbstractMap.SimpleEntry<byte[], BlockPlacementInfo> nextBlockBytesAndPlacementInfo() throws LedgerException{
+        if(!init){
+            throw new LedgerException("Block file stream is not init.");
+        }
+        byte[] lenBytes = new byte[8];
+        boolean moreContentAvailable = true;
+        //当前读取位置为文件结尾
+        if(currentOffset == file.length()){
+            logger.debug(String.format("Finished reading file number [%d]", fileNum));
+            return null;
+        }
+        long remainingBytes = file.length() - currentOffset;
+        //代表block长度的部分占8字节
+        //剩余文件长度<8时抛出异常
+        int peekBytes = 8;
+        if(remainingBytes < peekBytes){
+            moreContentAvailable = false;
+            logger.debug(String.format("Remaining bytes=[%d], nothing to read", remainingBytes));
+            return null;
+        }
+        logger.debug(String.format("Remaining bytes=[%d], Going to peek [%d] bytes", remainingBytes, peekBytes));
+        //读取8字节,并解析为block长度
+        try {
+            reader.read(lenBytes, currentOffset.intValue(), peekBytes);
+        } catch (Throwable e) {
+            throw new LedgerException(e);
+        }
+        long length = Util.bytesToLong(lenBytes, 0, peekBytes);
+        //根据解析的block长度,计算应剩余的文件长度
+        //长度不足则抛出yichang
+        long expectedBytes = length + peekBytes;
+        if(expectedBytes > remainingBytes){
+            logger.debug(String.format("At least [%d] bytes expected. Remaing bytes [%d]", expectedBytes, remainingBytes));
+            throw new LedgerException("unexpected end of blockfile");
+        }
+        //读取block
+        byte[] blockBytes = new byte[(int) length];
+        try {
+            reader.read(blockBytes, currentOffset.intValue() + 8, (int) length);
+        } catch (Throwable e) {
+            throw new LedgerException(e);
+        }
+        //组装BlockPlacementInfo对象
+        BlockPlacementInfo blockPlacementInfo = new BlockPlacementInfo();
+        blockPlacementInfo.setFileNum(fileNum);
+        blockPlacementInfo.setBlockStartOffset(currentOffset);
+        blockPlacementInfo.setBlockBytesOffset(currentOffset + 8);
+        //读取完成后,向后移动
+        currentOffset = 8 + length;
+
+        AbstractMap.SimpleEntry<byte[], BlockPlacementInfo> entry = new AbstractMap.SimpleEntry<>(blockBytes, blockPlacementInfo);
+        return entry;
+    }
+
+    /**
+     * 下一区块
+     */
+    public byte[] nextBlockBytes() throws LedgerException {
+        return nextBlockBytesAndPlacementInfo().getKey();
+    }
+
+    /**
+     * 关闭文件
+     */
+    public void close() throws LedgerException{
+        if(!init){
+            throw new LedgerException("Block file stream is not init.");
+        }
+        try {
+            reader.close();
+        } catch (IOException e) {
+            throw new LedgerException(e);
+        }
     }
 }

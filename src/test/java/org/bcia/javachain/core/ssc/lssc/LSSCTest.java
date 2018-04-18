@@ -5,9 +5,8 @@ import org.bcia.javachain.BaseJunit4Test;
 import org.bcia.javachain.common.util.proto.ProtoUtils;
 import org.bcia.javachain.common.util.proto.TxUtils;
 import org.bcia.javachain.core.smartcontract.shim.impl.MockStub;
-import org.bcia.javachain.core.smartcontract.shim.impl.Response;
+import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
 import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractStub;
-import org.bcia.javachain.core.ssc.essc.ESSC;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.junit.Test;
@@ -34,8 +33,8 @@ public class LSSCTest extends BaseJunit4Test {
     private SmartContractStub stub;
     @Test
     public void init() {
-        Response response=lssc.init(stub);
-        assertThat(response.getStatus(),is(Response.Status.SUCCESS));
+        SmartContractResponse smartContractResponse =lssc.init(stub);
+        assertThat(smartContractResponse.getStatus(),is(SmartContractResponse.Status.SUCCESS));
     }
 
     @Test
@@ -63,8 +62,8 @@ public class LSSCTest extends BaseJunit4Test {
         args0.add(ByteString.copyFrom(cdsBytes));
         Smartcontract.SmartContractSpec spec=Smartcontract.SmartContractSpec.newBuilder().build();
         ProposalPackage.SignedProposal signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec, caller.getBytes(), "msg1".getBytes());
-        Response res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
-        assertThat(res.getStatus(),is(Response.Status.SUCCESS));
+        SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
+        assertThat(res.getStatus(),is(SmartContractResponse.Status.SUCCESS));
     }
 
     @Test
@@ -94,9 +93,9 @@ public class LSSCTest extends BaseJunit4Test {
         Smartcontract.SmartContractSpec spec=Smartcontract.SmartContractSpec.newBuilder().build();
         ProposalPackage.SignedProposal signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec, caller.getBytes(), "msg1".getBytes());
 
-        Response res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
+        SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
         //尚未安全实现调通全部逻辑，返回内部错误
-        assertThat(res.getStatus(),is(Response.Status.INTERNAL_SERVER_ERROR));
+        assertThat(res.getStatus(),is(SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
     }
 
     @Test
@@ -126,9 +125,9 @@ public class LSSCTest extends BaseJunit4Test {
         Smartcontract.SmartContractSpec spec=Smartcontract.SmartContractSpec.newBuilder().build();
         ProposalPackage.SignedProposal signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec, caller.getBytes(), "msg1".getBytes());
 
-        Response res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
+        SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
         //尚未安全实现调通全部逻辑，返回内部错误
-        assertThat(res.getStatus(),is(Response.Status.INTERNAL_SERVER_ERROR));
+        assertThat(res.getStatus(),is(SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
     }
 
     private Smartcontract.SmartContractDeploymentSpec constructDeploySpec(String smartcontractName, String path, String version, List<String> initArgs, boolean bCreateFS) {

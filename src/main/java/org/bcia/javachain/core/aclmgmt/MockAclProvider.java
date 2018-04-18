@@ -13,21 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig;
+package org.bcia.javachain.core.aclmgmt;
 
-import org.bcia.javachain.protos.msp.MspConfigPackage;
+import org.bcia.javachain.protos.node.ProposalPackage;
 
 /**
  * 类描述
  *
- * @author zhouhui
- * @date 2018/3/10
+ * @author sunianle
+ * @date 4/16/18
  * @company Dingxuan
  */
-public class MSPValue extends StandardConfigValue {
-    public MSPValue(MspConfigPackage.MSPConfig mspConfig) {
-        this.key = GroupConfigConstant.MSP_KEY;
+public class MockAclProvider implements IAclProvider {
+    @Override
+    public boolean checkACL(String resName, String groupID, ProposalPackage.SignedProposal idinfo) {
+        return false;
+    }
 
-        this.value = mspConfig;
+    public void reset(){
+
     }
 }

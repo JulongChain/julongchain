@@ -13,26 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.ledger.util.leveldbhelper;
-
-import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Conf;
+package org.bcia.javachain.core.smartcontract;
 
 /**
  * 类描述
  *
  * @author wanliangbing
- * @date 2018/3/9
+ * @date 2018/4/3
  * @company Dingxuan
  */
-public class LevelDbHelper {
+public class SmartContractRTEnv {
 
-    /** CreateDB constructs a `DB`
-     *
-     * @param conf
-     * @return
-     */
-    public static DB CreateDB(Conf conf) {
-        return null;
+    private Handler handler;
+
+    public Handler getHandler() {
+        return handler;
     }
 
+    public void setHandler(Handler handler) {
+        this.handler = handler;
+    }
 }

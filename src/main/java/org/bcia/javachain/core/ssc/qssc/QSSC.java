@@ -15,17 +15,17 @@
  */
 package org.bcia.javachain.core.ssc.qssc;
 
+import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
 import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.node.NodeTool;
-import org.bcia.javachain.core.smartcontract.shim.impl.Response;
+import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
 import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
 import org.bcia.javachain.core.ssc.essc.ESSC;
 import org.bcia.javachain.protos.node.ProposalPackage;
-import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -59,7 +59,7 @@ public class QSSC extends SystemSmartContractBase {
     // This allows the chaincode to initialize any variables on the ledger prior
     // to any transaction execution on the chain.
     @Override
-    public Response init(ISmartContractStub stub) {
+    public SmartContractResponse init(ISmartContractStub stub) {
         log.info("Successfully initialized QSSC");
         return newSuccessResponse();
     }
@@ -72,15 +72,15 @@ public class QSSC extends SystemSmartContractBase {
     // # GetBlockByHash: Return the block specified by block hash in args[2]
     // # GetTransactionByID: Return the transaction specified by ID in args[2]
     @Override
-    public Response invoke(ISmartContractStub stub) {
+    public SmartContractResponse invoke(ISmartContractStub stub) {
         log.debug("Enter QSSC invoke function");
-        List<String> args = stub.getStringArgs();
+        List<byte[]> args = stub.getArgs();
         int size=args.size();
         if(size<2){
             return newErrorResponse(String.format("Incorrect number of arguments, %d)",args.size()));
         }
-        String function=args.get(0);
-        String groupID=args.get(1);
+        String function= ByteString.copyFrom(args.get(0)).toStringUtf8();
+        String groupID=ByteString.copyFrom(args.get(1)).toStringUtf8();
         if(function!=GET_GROUP_INFO && size<3){
             return newErrorResponse(String.format("Missing 3rd argument for %s",function));
         }
@@ -92,7 +92,7 @@ public class QSSC extends SystemSmartContractBase {
 
         // Handle ACL:
         // 1. get the signed proposal
-        ProposalPackage.SignedProposal sp = stub.getSignedProposal();
+        ProposalPackage.SignedProposal sp=stub.getSignedProposal();
 
         // 2. check the channel reader policy
         String res=getACLResource(function);
@@ -100,17 +100,19 @@ public class QSSC extends SystemSmartContractBase {
             newErrorResponse(String.format("Authorization request for [%s][%s] failed",function,groupID));
         }
 
+        byte[] arg2=args.get(2);
+
         switch(function){
             case GET_TRANSACTION_BY_ID:
-                ;
+                return getTransactionByID(targetLedger,arg2);
             case GET_BLOCK_BY_NUMBER:
-                ;
+                return getBlockByNumber(targetLedger,arg2);
             case GET_BLOCK_BY_HASH:
-                ;
+                return getBlockByHash(targetLedger,arg2);
             case GET_GROUP_INFO:
-                ;
+                return getGroupInfo(targetLedger);
             case GET_BLOCK_BY_TX_ID:
-                ;
+                return getBlockByTxID(targetLedger,arg2);
             default:
                 return newErrorResponse(String.format("Request function %s not found",function));
         }
@@ -125,23 +127,25 @@ public class QSSC extends SystemSmartContractBase {
         return "QSSC."+function;
     }
 
-    private ProposalResponsePackage.Response getTransactionByID(INodeLedger vledger,byte[] tid){
+    private SmartContractResponse getTransactionByID(INodeLedger vledger, byte[] tid){
+
         return null;
     }
 
-    private ProposalResponsePackage.Response getBlockByNumber(INodeLedger vledger,byte[] number){
+    private SmartContractResponse getBlockByNumber(INodeLedger vledger, byte[] number){
+
         return null;
     }
 
-    private ProposalResponsePackage.Response getBlockByHash(INodeLedger vledger,byte[] hash){
+    private SmartContractResponse getBlockByHash(INodeLedger vledger, byte[] hash){
         return null;
     }
 
-    private ProposalResponsePackage.Response getGroupInfo(INodeLedger vledger){
+    private SmartContractResponse getGroupInfo(INodeLedger vledger){
         return null;
     }
 
-    private ProposalResponsePackage.Response getBlockByTxID(INodeLedger vledger,byte[] rawTxID){
+    private SmartContractResponse getBlockByTxID(INodeLedger vledger, byte[] rawTxID){
         return null;
     }
 

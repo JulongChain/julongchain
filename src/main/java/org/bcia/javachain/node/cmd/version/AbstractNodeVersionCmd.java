@@ -16,6 +16,7 @@ limitations under the License.
 package org.bcia.javachain.node.cmd.version;
 
 import org.apache.commons.cli.ParseException;
+import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.cmd.INodeCmd;
 import org.bcia.javachain.node.entity.NodeSmartContract;
 import org.bcia.javachain.node.entity.NodeVersion;
@@ -29,10 +30,17 @@ import org.bcia.javachain.node.entity.NodeVersion;
  */
 public abstract class AbstractNodeVersionCmd implements INodeCmd {
 
+	private Node node;
+
 	protected NodeVersion nodeVersion;
 
 	public AbstractNodeVersionCmd(){
-		nodeVersion = new NodeVersion();
+	}
+
+	public AbstractNodeVersionCmd(Node node) {
+		this.node = node;
+
+		nodeVersion = new NodeVersion(node);
 	}
 
 	@Override

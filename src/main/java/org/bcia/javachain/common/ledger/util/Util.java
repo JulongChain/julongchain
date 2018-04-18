@@ -15,6 +15,8 @@
  */
 package org.bcia.javachain.common.ledger.util;
 
+import java.util.*;
+
 /**
  * 类描述
  *
@@ -23,6 +25,30 @@ package org.bcia.javachain.common.ledger.util;
  * @company Dingxuan
  */
 public class Util {
+
+    /**
+     * 获取map key的排序
+     */
+    public static <T> List<String> getSortedKeys(Map<String, T> m){
+        List<String> list = new ArrayList<>();
+        for(String key : m.keySet()){
+            list.add(key);
+        }
+        Collections.sort(list);
+        return list;
+    }
+
+    /**
+     *
+     */
+    public static <T> List<T> getValuesBySortedKeys (Map<String, T> m){
+        List<String> list = getSortedKeys(m);
+        List<T> l = new ArrayList<>();
+        for(String s : list){
+            l.add(m.get(s));
+        }
+        return l;
+    }
 
     /** EncodeOrderPreservingVarUint64 returns a byte-representation for a uint64 number such that
      * all zero-bits starting bytes are trimmed in order to reduce the length of the array

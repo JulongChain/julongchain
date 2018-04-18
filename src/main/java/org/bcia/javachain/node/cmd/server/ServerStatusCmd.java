@@ -19,11 +19,12 @@ import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.node.Node;
 import org.springframework.stereotype.Component;
 
 /**
  * 完成节点开启服务命令的解析
- * node group status
+ * node server status
  *
  * @author zhouhui
  * @date 2018/2/24
@@ -32,6 +33,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class ServerStatusCmd extends AbstractNodeServerCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ServerStatusCmd.class);
+
+    public ServerStatusCmd(Node node) {
+        super(node);
+    }
 
     @Override
     public void execCmd(String[] args) throws ParseException, NodeException {

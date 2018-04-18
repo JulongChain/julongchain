@@ -18,30 +18,61 @@ package org.bcia.javachain.core.commiter;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
+import org.bcia.javachain.core.ledger.ILedger;
+import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.ledger.TxPvtData;
+import org.bcia.javachain.core.node.NodeConfig;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.core.commiter.util.*;
+import org.bcia.javachain.protos.common.Ledger;
+
 import java.util.Map;
 
 /**
- * 确认服务接口
+ * 确认服务实现
  *
  * @author wanglei
- * @date 18-3-27
+ * @date 18/3/27
  * @company Dingxuan
  */
 public class CommitterServer implements ICommiterServer{
     private static JavaChainLog log = JavaChainLogFactory.getLog(CommitterServer.class);
 
-    @Override
-    public void CommitWithPvtData(BlockAndPvtData blockAndPvtData) throws Exception {
-        log.info("Call CommitterServer CommitWithPvtData !");
+    private INodeLedger nodeLedger;
+
+    private void preCommit(Common.Block block) throws  Exception{
+        Boolean resultBool = Utils.IsConfigBlock(block);
+        if(resultBool){
+            // TODO:
+
+        }
+    }
+    public void postCommit(Common.Block block) throws Exception {
     }
 
     @Override
-    public BlockAndPvtData GetPvtDataAndBlockByNum(Integer seqNumber) throws Exception {
+    public void CommitWithPvtData(BlockAndPvtData blockAndPvtData) throws Exception {
+        log.info("Call CommitterServer CommitWithPvtData !");
+
+        preCommit( blockAndPvtData.getBlock() );
+
+        //Committing block
+        //TODO: wait liangbing complete CommitWithPvtData
+        //nodeLedger.CommitWithPvtData( blockAndPvtData );
+
+        //TODO:
+        postCommit(blockAndPvtData.getBlock());
+    }
+
+    @Override
+    public BlockAndPvtData GetPvtDataAndBlockByNum(long seqNumber) throws Exception {
         log.info("Call CommitterServer GetPvtDataAndBlockByNum return BlockAndPvtData=null!");
 
-        return  null;
+        BlockAndPvtData blockAndPvtData = null;
+        //TODO: wait langbing  complete 'getPvtDataAndBlockByNum'
+        //blockAndPvtData = nodeLedger.getPvtDataAndBlockByNum(seqNumber, null);
+
+        return  blockAndPvtData;
     }
 
     @Override
@@ -52,17 +83,28 @@ public class CommitterServer implements ICommiterServer{
     }
 
     @Override
-    public Integer LedgerHeight() throws Exception {
+    public long LedgerHeight() throws Exception {
         log.info("Call CommitterServer LedgerHeight return Integer=0!");
+        Ledger.BlockchainInfo  blockchainInfo = null;
+        //TODO: wait liangbing
+        //blockchainInfo = Ledger.getBlockchainInfo();
 
-        return 0;
+        return blockchainInfo.getHeight();
     }
 
     @Override
-    public Common.Block GetBlocks(Integer[] blockSeqs) throws Exception {
+    public Common.Block[] GetBlocks(long[] blockSeqs) throws Exception {
         log.info("Call CommitterServer GetBlocks return Common.Block=null!");
+        Common.Block blocks[] = null;
+        int bloksSeqsNum = blockSeqs.length;
+        for (int index = 0; index < bloksSeqsNum; index++){
+            Common.Block tempBlock = null;
+            //TODO: wait liangbing
+            //tempBlock = Ledger.GetBlockNumber( blockSeqs[index] );
+            blocks[index] = tempBlock;
+        }
 
-        return null;
+        return blocks;
     }
 
     @Override

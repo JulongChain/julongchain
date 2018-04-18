@@ -34,9 +34,12 @@ import org.bcia.javachain.core.smartcontract.shim.SmartContractProvider;
 import org.bcia.javachain.core.ssc.ISystemSmartContractManager;
 import org.bcia.javachain.core.ssc.SystemSmartContractManager;
 import org.bcia.javachain.msp.IMsp;
+import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.common.helper.MockMSPManager;
 import org.bcia.javachain.node.util.NodeConstant;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 /**
  * 节点服务
@@ -50,6 +53,15 @@ public class NodeServer {
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeServer.class);
 
     private String cachedEndpoint;
+
+    private Node node;
+
+    public NodeServer() {
+    }
+
+    public NodeServer(Node node) {
+        this.node = node;
+    }
 
     public void start() {
         start(false);
@@ -74,7 +86,9 @@ public class NodeServer {
         IAclProvider aclProvider = AclManagement.getACLProvider();
 
         //初始化账本
-        //ledgermgmt.Initialize(peer.ConfigTxProcessors)
+//        LedgerMgmt.initialize();
+//        ledgermgmt.Initialize(peer.ConfigTxProcessors)
+
 
         String nodeEndpoint = null;
 
@@ -89,7 +103,7 @@ public class NodeServer {
 
         //启动Node主服务(Grpc Server1)
         int port = 7051;
-        NodeGrpcServer nodeGrpcServer = new NodeGrpcServer(port);
+        final NodeGrpcServer nodeGrpcServer = new NodeGrpcServer(port);
         //绑定背书服务
         nodeGrpcServer.bindEndorserServer(new Endorser(null));
         //绑定投递事件服务
@@ -112,6 +126,34 @@ public class NodeServer {
         initSysSmartContracts();
 
 //        LedgerMgmt.getLedgerIDs()
+
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    nodeGrpcServer.start();
+                    nodeGrpcServer.blockUntilShutdown();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+
+        new Thread(){
+            @Override
+            public void run() {
+                try {
+                    eventGrpcServer.start();
+                    eventGrpcServer.blockUntilShutdown();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
 
 
     }

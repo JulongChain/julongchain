@@ -19,10 +19,18 @@ import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.FileUtils;
+import org.bcia.javachain.core.node.NodeConfig;
+import org.bcia.javachain.core.node.NodeConfigFactory;
+import org.bcia.javachain.msp.entity.CspConfig;
+import org.bcia.javachain.msp.mgmt.Mgmt;
 import org.bcia.javachain.node.cmd.INodeCmd;
 import org.bcia.javachain.node.cmd.factory.NodeCmdFactory;
 import org.bcia.javachain.node.util.NodeConstant;
+import org.bcia.javachain.protos.msp.MspConfigPackage;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 /**
  * 节点对象
@@ -40,7 +48,7 @@ public class Node {
      */
     private INodeCmd nodeCmd;
 
-    public Node() {
+    public Node() throws NodeException {
         init();
     }
 
@@ -68,11 +76,11 @@ public class Node {
         } else if (args.length == 1 && NodeConstant.VERSION.equalsIgnoreCase(command)) {
             //只有version命令只有一个单词，其余都是"命令+子命令"的形式,如"node server start"
             cmdWordCount = 1;
-            nodeCmd = NodeCmdFactory.getInstance(command, null);
+            nodeCmd = NodeCmdFactory.getInstance(this, command, null);
         } else {
             cmdWordCount = 2;
             String subCommand = args[1];
-            nodeCmd = NodeCmdFactory.getInstance(command, subCommand);
+            nodeCmd = NodeCmdFactory.getInstance(this, command, subCommand);
         }
 
         if (nodeCmd != null) {
@@ -90,8 +98,28 @@ public class Node {
     /**
      * 初始化
      */
-    private void init() {
-        //初始化MSP
+    private void init() throws NodeException {
+//        NodeConfig config = null;
+//        try {
+//            config = NodeConfigFactory.loadNodeConfig();
+//        } catch (IOException e) {
+//            log.error(e.getMessage(), e);
+//            throw new NodeException(e);
+//        }
+//
+//        //初始化MSP
+//        String mspConfigDir = config.getNode().getMspConfigPath();
+//        String mspId = config.getNode().getLocalMspId();
+//        String mspType = config.getNode().getLocalMspType();
+//
+//        if (!FileUtils.isExists(mspConfigDir)) {
+//            throw new NodeException("MspConfigPath is not exists");
+//        }
+
+
+//        CspConfig
+//        Mgmt.loadLocalMspWithType()
+
 
     }
 }

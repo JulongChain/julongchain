@@ -1,34 +1,29 @@
 package org.bcia.javachain.node.cmd.group;
 
 import org.apache.commons.cli.ParseException;
-import org.junit.After;
-import org.junit.Before;
+import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.node.Node;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.Assert.*;
 
 /**
- * 类描述
+ * 对象
  *
- * @author
- * @date 18-3-27
+ * @author zhouhui
+ * @date 2018/4/13
  * @company Dingxuan
  */
 public class GroupUpdateCmdTest {
-    private GroupUpdateCmd groupUpdateCmd;
 
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
+    @Autowired
+    private Node node;
 
     @Test
-    public void TestExecCmd() throws ParseException {
-        String[] caseArgs1 = new String[]{"-c", "localhost:7050", "-g", "mygroup", "-f", "filefile"};
-
-        groupUpdateCmd.execCmd(caseArgs1);
+    public void execCmd() throws ParseException, NodeException {
+        GroupUpdateCmd groupUpdateCmd = new GroupUpdateCmd(node);
+        groupUpdateCmd.execCmd(new String[]{"-c", "localhost:7050", "-g", "mygroup", "-f",
+                "/home/javachain/group1.tx"});
     }
 }

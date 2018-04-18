@@ -22,6 +22,7 @@ import org.bcia.javachain.csp.factory.CspManager;
 import org.bcia.javachain.csp.gm.GmCspFactory;
 import org.bcia.javachain.csp.intfs.ICsp;
 import org.bcia.javachain.msp.ISigningIdentity;
+import org.bcia.javachain.node.entity.MockCrypto;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.Smartcontract;
@@ -141,5 +142,59 @@ public class ProposalUtils {
         byte[] resultBytes = csp.hash(bytes1, null);
         String txId = new String(resultBytes, Charset.forName("UTF-8"));
         return txId;
+    }
+
+    /**
+     * 根据SmartcontractInvocationSpec生成交易提案
+     * @author sunianle
+     * @param type
+     * @param groupID
+     * @param invocationSpec
+     * @param creator
+     * @return
+     */
+    public static ProposalPackage.Proposal createProposalFromInvocationSpec
+                                            (Common.HeaderType type,
+                                             String groupID,
+                                             Smartcontract.SmartContractInvocationSpec invocationSpec,
+                                             byte[] creator)
+                                             throws JavaChainException {
+        return createSmartcontractProposal(type,groupID,invocationSpec,creator);
+    }
+
+    /**
+     * @author sunianle
+     * @param type
+     * @param groupID
+     * @param invocationSpec
+     * @param creator
+     * @return
+     * @throws JavaChainException
+     */
+    private static ProposalPackage.Proposal createSmartcontractProposal(Common.HeaderType type, String groupID,
+                                                                        Smartcontract.SmartContractInvocationSpec invocationSpec,
+                                                                        byte[] creator) throws JavaChainException {
+        return createSmartcontractProposalWithTransient(type,groupID,invocationSpec,creator,null);
+    }
+
+    /**
+     * @author sunianle
+     * @param type
+     * @param groupID
+     * @param invocationSpec
+     * @param creator
+     * @param transientMap
+     * @return
+     * @throws JavaChainException
+     */
+    private static ProposalPackage.Proposal createSmartcontractProposalWithTransient
+            (Common.HeaderType type, String groupID,
+             Smartcontract.SmartContractInvocationSpec invocationSpec,
+             byte[] creator,
+             Map<String,byte[]> transientMap)
+            throws JavaChainException {
+        byte[] nonce = MockCrypto.getRandomNonce();
+        String txID=ProposalUtils.computeProposalTxID(creator, nonce);
+        return buildSmartContractProposal(type,groupID,txID,invocationSpec,nonce,creator,transientMap);
     }
 }

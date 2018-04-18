@@ -31,6 +31,7 @@ import org.bcia.javachain.core.ssc.cssc.CSSC;
 import org.bcia.javachain.core.ssc.lssc.LSSC;
 import org.bcia.javachain.msp.ISigningIdentity;
 import org.bcia.javachain.msp.mgmt.Mgmt;
+import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.common.client.BroadcastClient;
 import org.bcia.javachain.node.common.client.EndorserClient;
 import org.bcia.javachain.node.common.client.IBroadcastClient;
@@ -48,12 +49,21 @@ import java.nio.charset.Charset;
 /**
  * 节点智能合约
  *
- * @author zhouhui
+ * @author zhouhui wanglei
  * @date 2018/2/23
  * @company Dingxuan
  */
 public class NodeSmartContract {
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeSmartContract.class);
+
+    private Node node;
+
+    public NodeSmartContract() {
+    }
+
+    public NodeSmartContract(Node node) {
+        this.node = node;
+    }
 
     public void install() {
 

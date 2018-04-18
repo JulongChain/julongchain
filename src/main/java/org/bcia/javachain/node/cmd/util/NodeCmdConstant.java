@@ -59,4 +59,8 @@ public class NodeCmdConstant {
      * 调用智能合约
      */
     public static final String INVOKE_CONTRACT = "invoke";
+    /**
+     * 调用智能合约
+     */
+    public static final String QUERY_CONTRACT = "query";
 }

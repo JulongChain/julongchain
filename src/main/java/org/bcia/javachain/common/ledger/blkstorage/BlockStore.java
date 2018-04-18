@@ -17,6 +17,7 @@ package org.bcia.javachain.common.ledger.blkstorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.blockledger.FileLedgerBlockStore;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.node.TransactionPackage;
@@ -30,7 +31,13 @@ import org.bcia.javachain.protos.node.TransactionPackage;
  * @date 2018/3/7
  * @company Dingxuan
  */
-public interface BlockStore {
+public interface BlockStore extends FileLedgerBlockStore {
+    static final String INDEXABLE_ATTR_BLOCK_NUM = "BlockNum";
+    static final String INDEXABLE_ATTR_BLOCK_HASH = "BlockHash";
+    static final String INDEXABLE_ATTR_TX_ID = "TxID";
+    static final String INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM = "BlockNumTranNum";
+    static final String INDEXABLE_ATTR_BLOCK_TX_ID = "BlockTxID";
+    static final String INDEXABLE_ATTR_TX_VALIDATION_CODE = "TxValidationCode";
 
     void addBlock(Common.Block block) throws LedgerException;
 

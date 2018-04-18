@@ -24,6 +24,7 @@ import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.CommConstant;
+import org.bcia.javachain.node.Node;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.springframework.stereotype.Component;
 
@@ -56,6 +57,10 @@ public class ContractInstantiateCmd extends AbstractNodeContractCmd {
     private static final String ARG_POLICY = "P";
     //参数
     private static final String KEY_ARGS = "args";
+
+    public ContractInstantiateCmd(Node node) {
+        super(node);
+    }
 
     @Override
     public void execCmd(String[] args) throws ParseException, NodeException {

@@ -3,6 +3,7 @@ package org.bcia.javachain.node.cmd.sc;
 import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.BaseJunit4Test;
 import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.node.Node;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,27 +21,13 @@ import static org.junit.Assert.*;
 public class ContractInstantiateCmdTest extends BaseJunit4Test {
 
     @Autowired
-    private ContractInstantiateCmd instantiateCmd;
-
-    @Before
-    public void setUp() throws Exception {
-    }
-
-    @After
-    public void tearDown() throws Exception {
-    }
+    private Node node;
 
     @Test
     public void execCmd() throws ParseException, NodeException {
-//        String[] caseArgs2 = new String[]{"-c", "localhost:7050", "-g", "mygroup"};
-//        groupCreateCmd.execCmd(caseArgs2);
-
-
-
-        String str = "node contract instantiate -c localhost:7050 -g $group_id -n mycc -v 1.0 -ctor " +
-                "{'args':['init','a','100','b','200']} -P \"OR	('Org1MSP.member','Org2MSP.member')\"";
-
-        instantiateCmd.execCmd(str.split(" "));
-
+        ContractInstantiateCmd contractInstantiateCmd = new ContractInstantiateCmd(node);
+        contractInstantiateCmd.execCmd(new String[]{"-c", "localhost:7050", "-g", "mygroup", "-n", "mycc",
+                "-v", "1.0", "-ctor", "{'args':['init','a','100','b','200']}", "-P", "OR	('Org1MSP.member'," +
+                "'Org2MSP.member')"});
     }
 }

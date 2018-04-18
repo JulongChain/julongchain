@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.node.Node;
 import org.springframework.stereotype.Component;
 
 /**
@@ -30,12 +31,15 @@ import org.springframework.stereotype.Component;
  * @date 2018/2/24
  * @company Dingxuan
  */
-@Component
 public class GroupJoinCmd extends AbstractNodeGroupCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(GroupJoinCmd.class);
 
     //参数：创世区块的地址
     private static final String ARG_BLOCK_PATH = "b";
+
+    public GroupJoinCmd(Node node) {
+        super(node);
+    }
 
     @Override
     public void execCmd(String[] args) throws ParseException, NodeException {
