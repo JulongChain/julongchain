@@ -28,7 +28,7 @@ import org.bcia.javachain.common.util.CommConstant;
  */
 public class MockSmartContractDefinition implements ISmartContractDefinition {
     @Override
-    public String smartContractName() {
+    public String getSmartContractName() {
         return null;
     }
 
@@ -38,7 +38,7 @@ public class MockSmartContractDefinition implements ISmartContractDefinition {
     }
 
     @Override
-    public String smartContractVersion() {
+    public String getSmartContractVersion() {
         return "1.0";
     }
 
@@ -48,7 +48,7 @@ public class MockSmartContractDefinition implements ISmartContractDefinition {
     }
 
     @Override
-    public String endorsement() {
+    public String getEndorsement() {
         return CommConstant.ESSC;
     }
 }
