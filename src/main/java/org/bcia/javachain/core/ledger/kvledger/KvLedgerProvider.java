@@ -114,7 +114,7 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         INodeLedger lgr = openInternal(ledgerID);
         BlockAndPvtData bapd = new BlockAndPvtData();
         bapd.setBlock(genesisBlock);
-        lgr.CommitWithPvtData(bapd);
+        lgr.commitWithPvtData(bapd);
         idStore.createLedgerID(ledgerID, genesisBlock);
         return lgr;
     }
