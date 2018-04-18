@@ -15,9 +15,12 @@
  */
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,87 +31,80 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class UpdateBatch {
-    private Map<String,NsUpdates> map = new HashMap<>();
+    private Map<String, NsUpdates> updates = new HashMap<>();
 
-    /** Get returns the VersionedValue for the given namespace and key
-     *
-     * @param ns
-     * @param key
-     * @return
-     */
-    public VersionedValue get(String ns, String key) {
-        return null;
+    public VersionedValue get(String ns, String key){
+        NsUpdates nsUpdates = updates.get(ns);
+        if(nsUpdates == null){
+            return null;
+        }
+        VersionedValue vv = nsUpdates.getMap().get(key);
+        return vv;
     }
 
-    /** Put adds a VersionedKV
-     *
-     * @param ns
-     * @param key
-     * @param value
-     * @param version
-     */
-    public void put(String ns, String key, byte[] value, Height version) {
-        return;
+    public void put(String ns, String key, byte[] value, Height version) throws LedgerException {
+        if(value == null){
+            throw new LedgerException("Null value not allow");
+        }
+        VersionedValue vv = new VersionedValue();
+        vv.setValue(value);
+        vv.setVersion(version);
+        update(ns, key, vv);
     }
 
-    /** Delete deletes a Key and associated value
-     *
-     * @param ns
-     * @param key
-     * @param version
-     */
-    public void delete(String ns, String key, Height version) {
-        return;
+    public void delete(String ns, String key, Height version){
+        VersionedValue vv = new VersionedValue();
+        vv.setValue(null);
+        vv.setVersion(version);
+        update(ns, key, vv);
     }
 
-    /** Exists checks whether the given key exists in the batch
-     *
-     * @param ns
-     * @param key
-     * @return
-     */
-    public Boolean exists(String ns, String key) {
-        return Boolean.FALSE;
+    public List<String> getUpdatedNamespaces(){
+        List<String> list = new ArrayList<>();
+        for(Map.Entry<String, NsUpdates> entry : updates.entrySet()){
+            list.add(entry.getKey());
+        }
+        return list;
     }
 
-    /** GetUpdatedNamespaces returns the names of the namespaces that are updated
-     *
-     * @return
-     */
-    public String[] getUpdatedNamespaces() {
-        return null;
+    public void update(String ns, String key, VersionedValue vv){
+        getOrCreateNsUpdates(ns).getMap().put(key, vv);
     }
 
-    /** GetUpdates returns all the updates for a namespace
-     *
-     * @param ns
-     * @return
-     */
-    public Map<String,VersionedValue> getUpdates(String ns) {
-        return null;
+    public Map<String, VersionedValue> getUpdates(String ns){
+        NsUpdates nsUpdates = updates.get(ns);
+        if(nsUpdates == null){
+            return null;
+        }
+        return nsUpdates.getMap();
     }
 
-    /** GetRangeScanIterator returns an iterator that iterates over keys of a specific namespace in sorted order
-     * In other word this gives the same functionality over the contents in the `UpdateBatch` as
-     * `VersionedDB.GetStateRangeScanIterator()` method gives over the contents in the statedb
-     * This function can be used for querying the contents in the updateBatch before they are committed to the statedb.
-     * For instance, a validator implementation can used this to verify the validity of a range query of a transaction
-     * where the UpdateBatch represents the union of the modifications performed by the preceding valid transactions in the same block
-     * (Assuming Group commit approach where we commit all the updates caused by a block together).
-     */
-    public ResultsIterator getRangeScanIterator(String ns, String startKey, String endKey) {
-        return null;
+    public ResultsIterator getRangeScanIterator(String ns, String startKey, String endKey){
+        return NsIterator.newNsIterator(ns, startKey, endKey, this);
     }
 
-    public NsUpdates getOrCreateNsUpdates(String ns) {
-        return null;
+    public NsUpdates getOrCreateNsUpdates(String ns){
+        NsUpdates nsUpdates = updates.get(ns);
+        if(ns == null){
+            nsUpdates = new NsUpdates();
+            updates.put(ns, nsUpdates);
+        }
+        return nsUpdates;
     }
 
-    public Map<String, NsUpdates> getMap() {
-        return map;
+    public boolean exists(String ns, String key){
+        NsUpdates nsUpdates = updates.get(ns);
+        if(nsUpdates == null){
+            return false;
+        }
+        return nsUpdates.getMap().get(key) != null;
     }
 
-    public void setMap(Map<String, NsUpdates> map) {
-        this.map = map;
+    public Map<String, NsUpdates> getUpdates() {
+        return updates;
+    }
+
+    public void setUpdates(Map<String, NsUpdates> updates) {
+        this.updates = updates;
     }
 }

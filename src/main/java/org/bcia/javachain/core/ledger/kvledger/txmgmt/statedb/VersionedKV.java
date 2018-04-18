@@ -16,13 +16,13 @@
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 
 /**
- * VersionedKV encloses key and corresponding VersionedValue
  *
- * @author wanliangbing
- * @date 2018/3/9
+ *
+ * @author sunzongyu
+ * @date 2018/04/16
  * @company Dingxuan
  */
-public class VersionedKV {
+public class VersionedKV implements org.bcia.javachain.common.ledger.QueryResult {
 
     private CompositeKey compositeKey;
     private VersionedValue versionedValue;

@@ -15,14 +15,20 @@
  */
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 
+import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.QueryResult;
+import org.bcia.javachain.protos.common.Collection;
+
+import java.util.Map;
+
 /**
  * 类描述
  *
- * @author wanliangbing
- * @date 2018/3/9
+ * @author sunzongyu
+ * @date 2018/04/16
  * @company Dingxuan
  */
-public class NsIterator {
+public class NsIterator implements ResultsIterator{
 
     private String ns;
     private NsUpdates nsUpdates;
@@ -30,11 +36,15 @@ public class NsIterator {
     private Integer nextIndex;
     private Integer lastIndex;
 
+//    public static NsIterator newNsIterator(String ns, String startKey, String endKey, UpdateBatch batch){
+//        Map<String, VersionedValue> nsUpdates = batch.getUpdates(ns);
+//    }
+
     /** Next gives next key and versioned value. It returns a nil when exhausted
      *
      * @return
      */
-    public QueryResult next() {
+    public QueryResult next() throws LedgerException {
         return null;
     }
 
@@ -43,6 +53,10 @@ public class NsIterator {
      */
     public void close() {
 
+    }
+
+    public static NsIterator newNsIterator(String ns, String startKey, String endKey, UpdateBatch batch){
+        return null;
     }
 
     public String getNs() {

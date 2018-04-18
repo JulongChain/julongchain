@@ -18,23 +18,23 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 import org.bcia.javachain.common.exception.LedgerException;
 
 /**
- * VersionedDBProvider provides an instance of an versioned DB
+ * IVersionedDBProvider provides an instance of an versioned DB
  *
  * @author wanliangbing
  * @date 2018/3/9
  * @company Dingxuan
  */
-public interface VersionedDBProvider {
+public interface IVersionedDBProvider {
 
-    /** GetDBHandle returns a handle to a VersionedDB
+    /** GetDBHandle returns a handle to a IVersionedDB
      *
      * @param id
      * @return
      * @throws LedgerException
      */
-    VersionedDB getDBHandle(String id) throws LedgerException;
+    IVersionedDB getDBHandle(String id) throws LedgerException;
 
-    /** Close closes all the VersionedDB instances and releases any resources held by VersionedDBProvider
+    /** Close closes all the IVersionedDB instances and releases any resources held by IVersionedDBProvider
      *
      */
     void close();

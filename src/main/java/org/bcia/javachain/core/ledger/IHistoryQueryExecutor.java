@@ -19,22 +19,17 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.ResultsIterator;
 
 /**
- * HistoryQueryExecutor executes the history queries
+ * HistoryDB查询器
  *
- * @author wanliangbing
- * @date 2018/3/7
+ * @author sunzongyu
+ * @date 2018/04/04
  * @company Dingxuan
  */
 public interface IHistoryQueryExecutor {
 
     /**
-     * GetHistoryForKey retrieves the history of values for a key.
-     * The returned ResultsIterator contains results of type *KeyModification which is defined in protos/ledger/queryresult.
-     *
-     * @param namespace
-     * @param key
-     * @return
-     * @throws LedgerException
+     * 根据key统计HistoryDB中数据
+     * ResultsIterator包含结果, 定义在protos/ledger/queryresult.
      */
     ResultsIterator getHistoryForKey(String namespace, String key) throws LedgerException;
 

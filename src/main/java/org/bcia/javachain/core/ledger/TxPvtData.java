@@ -20,8 +20,8 @@ import org.bcia.javachain.protos.ledger.rwset.Rwset;
 /**
  * 类描述
  *
- * @author wanliangbing
- * @date 2018/3/27
+ * @author sunzongyu
+ * @date 2018/04/09
  * @company Dingxuan
  */
 public class TxPvtData {
@@ -43,5 +43,24 @@ public class TxPvtData {
 
     public void setWriteSet(Rwset.TxPvtReadWriteSet writeSet) {
         this.writeSet = writeSet;
+    }
+
+    /**
+     * 判断writeSet是否含有ns、coll
+     */
+    public boolean has(String ns, String coll){
+       if (writeSet == null){
+           return false;
+       }
+       for(Rwset.NsPvtReadWriteSet nsData : writeSet.getNsPvtRwsetList()){
+           if(ns != null && ns.equals(nsData.getNamespace())){
+               for(Rwset.CollectionPvtReadWriteSet collData : nsData.getCollectionPvtRwsetList()){
+                   if(coll != null && coll.equals(collData)){
+                        return true;
+                   }
+               }
+           }
+       }
+       return false;
     }
 }

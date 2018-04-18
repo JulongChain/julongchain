@@ -22,14 +22,14 @@ import java.util.Map;
 /**
  * 类描述
  *
- * @author wanliangbing
- * @date 2018/3/27
+ * @author sunzongyu
+ * @date 2018/04/09
  * @company Dingxuan
  */
 public class BlockAndPvtData {
 
     private Common.Block block;
-    private Map<Integer, TxPvtData> blockPvtData;
+    private Map<Long, TxPvtData> blockPvtData;
     private MissingPrivateData missing;
 
     public Common.Block getBlock() {
@@ -40,11 +40,11 @@ public class BlockAndPvtData {
         this.block = block;
     }
 
-    public Map<Integer, TxPvtData> getBlockPvtData() {
+    public Map<Long, TxPvtData> getBlockPvtData() {
         return blockPvtData;
     }
 
-    public void setBlockPvtData(Map<Integer, TxPvtData> blockPvtData) {
+    public void setBlockPvtData(Map<Long, TxPvtData> blockPvtData) {
         this.blockPvtData = blockPvtData;
     }
 

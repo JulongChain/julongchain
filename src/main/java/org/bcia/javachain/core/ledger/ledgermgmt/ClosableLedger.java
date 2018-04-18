@@ -15,7 +15,13 @@
  */
 package org.bcia.javachain.core.ledger.ledgermgmt;
 
-import org.bcia.javachain.core.ledger.INodeLedger;
+import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.PrunePolicy;
+import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.core.ledger.*;
+import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Ledger;
+import org.bcia.javachain.protos.node.TransactionPackage;
 
 /**
  * closableLedger extends from actual validated ledger and overwrites the Close method
@@ -24,9 +30,11 @@ import org.bcia.javachain.core.ledger.INodeLedger;
  * @date 2018/3/15
  * @company Dingxuan
  */
-public class ClosableLedger {
+public class ClosableLedger implements INodeLedger{
 
     private String id;
+
+    private INodeLedger nodeLedger;
 
     public String getId() {
         return id;
@@ -44,17 +52,79 @@ public class ClosableLedger {
         this.nodeLedger = nodeLedger;
     }
 
-    private INodeLedger nodeLedger;
+    @Override
+    public Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public Common.Block getBlockByNumber(Long blockNumber) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public ResultsIterator getBlocksIterator(Long startBlockNumber) throws LedgerException {
+        return null;
+    }
 
     /** Close closes the actual ledger and removes the entries from opened ledgers map
      *
      */
-    public void close() {
+    public synchronized void close() throws LedgerException{
+        closeWithoutLock();
+    }
+
+    @Override
+    public void commit(Common.Block block) throws LedgerException {
 
     }
 
-    public void closeWithoutLock() {
+    @Override
+    public void CommitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException {
 
     }
 
+    public void closeWithoutLock() throws LedgerException{
+        nodeLedger.close();
+    }
+
+    @Override
+    public TransactionPackage.ProcessedTransaction getTransactionByID(String txID) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public Common.Block getBlockByHash(byte[] blockHash) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public Common.Block getBlockByTxID(String txID) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public TransactionPackage.TxValidationCode getTxValidationCodeByTxID(String txID) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public ITxSimulator newTxSimulator(String txId) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public IQueryExecutor newQueryExecutor() throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public IHistoryQueryExecutor newHistoryQueryExecutor() throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public void prune(PrunePolicy policy) throws LedgerException {
+
+    }
 }

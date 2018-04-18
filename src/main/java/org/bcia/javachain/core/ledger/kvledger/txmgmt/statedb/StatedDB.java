@@ -15,6 +15,9 @@
  */
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
+
 /**
  * 类描述
  *
@@ -36,8 +39,25 @@ public class StatedDB {
         return null;
     }
 
-    public NsIterator newNsIterator(String ns, String startKey, String endKey, UpdateBatch batch) {
+    public static  NsIterator newNsIterator(String ns, String startKey, String endKey, UpdateBatch batch) {
         return null;
+    }
+
+    public static byte[] encodeValue(byte[] value, Height version){
+        byte[] encodeValue = version.toBytes();
+        if(value != null){
+            encodeValue = ArrayUtils.addAll(encodeValue, value);
+        }
+        return encodeValue;
+    }
+
+    public static Height decodeValueToHeight(byte[] encodeValue){
+        return Height.newHeightFromBytes(encodeValue);
+    }
+    public static byte[] decodeValueToBytes(byte[] encodeValue){
+        byte[] result = new byte[encodeValue.length - 16];
+        System.arraycopy(encodeValue, 16, result, 0, result.length);
+        return result;
     }
 
 }

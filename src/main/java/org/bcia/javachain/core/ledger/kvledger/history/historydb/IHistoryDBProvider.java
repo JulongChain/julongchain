@@ -18,25 +18,25 @@ package org.bcia.javachain.core.ledger.kvledger.history.historydb;
 import org.bcia.javachain.common.exception.LedgerException;
 
 /**
- * HistoryDBProvider provides an instance of a history DB
+ * IHistoryDBProvider provides an instance of a history DB
  *
  * @author wanliangbing
  * @date 2018/3/9
  * @company Dingxuan
  */
-public interface HistoryDBProvider {
+public interface IHistoryDBProvider {
 
-    /** GetDBHandle returns a handle to a HistoryDB
+    /** GetDBHandle returns a handle to a IHistoryDB
      *
      * @param id
      * @return
      * @throws LedgerException
      */
-    HistoryDB getDBHandle(String id) throws LedgerException;
+    IHistoryDB getDBHandle(String id) throws LedgerException;
 
-    /** Close closes all the HistoryDB instances and releases any resources held by HistoryDBProvider
+    /** Close closes all the IHistoryDB instances and releases any resources held by IHistoryDBProvider
      *
      */
-    void close();
+    void close() throws LedgerException;
 
 }

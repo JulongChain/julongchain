@@ -22,18 +22,42 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.protos.common.Common;
 
 /**
- * HistoryDB - an interface that a history database should implement
+ * HistoryDB接口
+ * HistoryDB只储存block中有效交易的Key
  *
- * @author wanliangbing
- * @date 2018/3/9
+ * @author sunzongyu
+ * @date 2018/04/04
  * @company Dingxuan
  */
-public interface HistoryDB {
-
+public interface IHistoryDB {
+    /**
+     * HistoryDB检索器
+     */
     IHistoryQueryExecutor newHistoryQueryExecutor(BlockStore blockStore) throws LedgerException;
+
+    /**
+     * 完成HistoryDB更新
+     */
     void commit(Common.Block block) throws LedgerException;
+
+    /**
+     * 获取最新存储点
+     */
     Height getLastSavepoint() throws LedgerException;
-    Boolean shouldRecover(Long lastAvailableBlock) throws LedgerException;
+
+    /**
+     * 判断是否需要恢复数据库
+     */
+    boolean shouldRecover(Long lastAvailableBlock) throws LedgerException;
+
+    /**
+     * 恢复位置
+     */
+    long recoverPoint(Long lastAvailableBlock) throws LedgerException;
+
+    /**
+     * 提交丢失的区块
+     */
     void commitLostBlock(Common.Block block) throws  LedgerException;
 
 }

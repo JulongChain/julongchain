@@ -29,7 +29,7 @@ import java.util.Map;
  * @date 2018/4/13
  * @company Dingxuan
  */
-public class TxSimulator implements ITxSimulator {
+public abstract class TxSimulator implements ITxSimulator {
 
     private static JavaChainLog log = JavaChainLogFactory.getLog(TxSimulator.class);
 
@@ -75,7 +75,6 @@ public class TxSimulator implements ITxSimulator {
         return new byte[0];
     }
 
-    @Override
     public byte[][] getStateMultipleKeys(String namespace, String[] keys)
             throws LedgerException {
         log.debug("getStateMultipleKeys");
@@ -92,7 +91,6 @@ public class TxSimulator implements ITxSimulator {
         return null;
     }
 
-    @Override
     public ResultsIterator ExecuteQuery(String namespace, String query)
             throws LedgerException {
         log.debug("ExecuteQuery");

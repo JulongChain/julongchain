@@ -17,7 +17,9 @@ package org.bcia.javachain.core.ledger;
 
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.PrunePolicy;
+import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
 /**
@@ -50,7 +52,8 @@ public class NodeLedger implements INodeLedger {
 
     @Override
     public ITxSimulator newTxSimulator(String txId) throws LedgerException {
-        return new TxSimulator();
+//        return new TxSimulator();
+        return null;
     }
 
     @Override
@@ -68,28 +71,49 @@ public class NodeLedger implements INodeLedger {
 
     }
 
-    @Override
     public INodeLedger create(Common.Block genesisBlock) throws LedgerException {
         return null;
     }
 
-    @Override
     public INodeLedger open(String ledgerID) throws LedgerException {
         return null;
     }
 
-    @Override
     public Boolean exists(String ledgerID) throws LedgerException {
         return null;
     }
 
-    @Override
     public String[] list() throws LedgerException {
         return new String[0];
     }
 
     @Override
+    public Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public Common.Block getBlockByNumber(Long blockNumber) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public ResultsIterator getBlocksIterator(Long startBlockNumber) throws LedgerException {
+        return null;
+    }
+
+    @Override
     public void close() throws LedgerException {
+
+    }
+
+    @Override
+    public void commit(Common.Block block) throws LedgerException {
+
+    }
+
+    @Override
+    public void CommitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException {
 
     }
 

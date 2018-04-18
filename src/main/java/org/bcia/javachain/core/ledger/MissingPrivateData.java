@@ -18,8 +18,8 @@ package org.bcia.javachain.core.ledger;
 /**
  * 类描述
  *
- * @author wanliangbing
- * @date 2018/3/27
+ * @author sunzongyu
+ * @date 2018/04/09
  * @company Dingxuan
  */
 public class MissingPrivateData {

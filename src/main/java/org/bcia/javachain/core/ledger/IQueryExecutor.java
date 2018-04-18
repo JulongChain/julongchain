@@ -18,71 +18,56 @@ package org.bcia.javachain.core.ledger;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.ResultsIterator;
 
+import java.util.List;
+
 /**
- * QueryExecutor executes the queries
- * Get* methods are for supporting KV-based data model. ExecuteQuery method is for supporting a rich datamodel and query support
+ * 执行查询
+ * Get*提供基础查询支持
+ * ExecuteQuery提供丰富的查询支持
  *
- * ExecuteQuery method in the case of a rich data model is expected to support queries on
- * latest state, historical state and on the intersection of state and transactions
- *
- * @author wanliangbing
- * @date 2018/3/7
+ * @author sunzongyu
+ * @date 2018/04/08
  * @company Dingxuan
  */
 public interface IQueryExecutor {
 
     /**
-     * GetState gets the value for given namespace and key. For a chaincode, the namespace corresponds to the chaincodeId
-     *
-     * @param namespace
-     * @param key
-     * @return
-     * @throws LedgerException
+     * 通过namespace以及key查询State,对于SmartContract,key为scID
      */
     byte[] getState(String namespace, String key) throws LedgerException;
 
     /**
-     * GetStateMultipleKeys gets the values for multiple keys in a single call
-     *
-     * @param namespace
-     * @param keys
-     * @return
-     * @throws LedgerException
+     * 在一次查询中,查询多个key
      */
-    byte[][] getStateMultipleKeys(String namespace, String[] keys) throws LedgerException;
+    List<byte[]> getStateMultipleKeys(String namespace, List<String> keys) throws LedgerException;
 
     /**
-     * returns an iterator that contains all the key-values between given key ranges.
-     * startKey is included in the results and endKey is excluded. An empty startKey refers to the first available key
-     * and an empty endKey refers to the last available key. For scanning all the keys, both the startKey and the endKey
-     * can be supplied as empty strings. However, a full scan shuold be used judiciously for performance reasons.
-     * The returned ResultsIterator contains results of type *KV which is defined in protos/ledger/queryresult.
-     *
-     * @param namespace
-     * @param startKey
-     * @param endKey
-     * @return
-     * @throws LedgerException
+     * 根据给出的namespace以及[startKey, endKey)返回查询迭代器
      */
     ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException;
 
     /**
-     * executes the given query and returns an iterator that contains results of type specific to the underlying data store.
-     * Only used for state databases that support query
-     * For a chaincode, the namespace corresponds to the chaincodeId
-     * The returned ResultsIterator contains results of type *KV which is defined in protos/ledger/queryresult.
-     *
-     * @param namespace
-     * @param query
-     * @return
-     * @throws LedgerException
+     * 丰富的查询支持,leveldb暂时无法满足
      */
-    ResultsIterator ExecuteQuery(String namespace, String query) throws LedgerException;
+    ResultsIterator executeQuery(String namespace, String query) throws LedgerException;
 
     /**
-     * releases resources occupied by the QueryExecutor
-     *
-     * @throws LedgerException
+     * 根据namespace, collection, key查询private data
+     */
+    byte[] getPrivateData(String namespace, String collection, String key) throws LedgerException;
+
+    /**
+     * 在一次查询中,查询多个key
+     */
+    List<byte[]> getPrivateDataMultipleKeys(String namespace, String collection, List<String> keys) throws LedgerException;
+
+    /**
+     * 根据给出的namespace, collection以及[startKey, endKey)返回查询迭代器
+     */
+    ResultsIterator getPrivateDataRangeScanIterator(String namespace, String collection, String startKey, String endKey)throws LedgerException;
+
+    /**
+     * 结束查询
      */
     void done() throws LedgerException;
 }

@@ -15,11 +15,13 @@
  */
 package org.bcia.javachain.core.ledger;
 
+import java.util.List;
+
 /**
- * 类描述
+ * 账本
  *
- * @author wanliangbing
- * @date 2018/3/7
+ * @author sunzongyu
+ * @date 2018/04/02
  * @company Dingxuan
  */
 public interface ILedger {

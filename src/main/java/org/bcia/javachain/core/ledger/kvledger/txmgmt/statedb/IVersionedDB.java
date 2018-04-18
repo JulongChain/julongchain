@@ -17,14 +17,17 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 
+import java.util.List;
+
 /**
- * VersionedDB lists methods that a db is supposed to implement
+ * VersionDB接口
  *
- * @author wanliangbing
- * @date 2018/3/9
+ *
+ * @author sunzongyu
+ * @date 2018/04/13
  * @company Dingxuan
  */
-public interface VersionedDB {
+public interface IVersionedDB extends BulkOptimizable{
 
     /** GetState gets the value for given namespace and key. For a chaincode, the namespace corresponds to the chaincodeId
      *
@@ -35,6 +38,8 @@ public interface VersionedDB {
      */
     VersionedValue getState(String namespace, String key) throws LedgerException;
 
+    Height getVersion(String namespace, String key) throws LedgerException;
+
     /** GetStateMultipleKeys gets the values for multiple keys in a single call
      *
      * @param namespace
@@ -42,7 +47,7 @@ public interface VersionedDB {
      * @return
      * @throws LedgerException
      */
-    VersionedValue getStateMultipleKeys(String namespace, String[] keys) throws LedgerException;
+    List<VersionedValue> getStateMultipleKeys(String namespace, String[] keys) throws LedgerException;
 
     /** GetStateRangeScanIterator returns an iterator that contains all the key-values between given key ranges.
      * startKey is inclusive
@@ -90,7 +95,7 @@ public interface VersionedDB {
      * @param key
      * @throws LedgerException
      */
-    void validateKey(String key) throws LedgerException;
+    void validateKeyValue(String key, byte[] value) throws LedgerException;
 
     /** Open opens the db
      *
@@ -104,4 +109,8 @@ public interface VersionedDB {
      */
     void close() throws LedgerException;
 
+    /**
+     * BytesKeySuppoted implements method in VersionedDB interface
+     */
+    boolean bytesKeySuppoted();
 }

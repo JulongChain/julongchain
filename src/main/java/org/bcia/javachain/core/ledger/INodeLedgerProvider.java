@@ -18,57 +18,45 @@ package org.bcia.javachain.core.ledger;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.protos.common.Common;
 
+import java.util.List;
+import java.util.Map;
+
 /**
- * provides handle to ledger instances
+ * 账本服务提供者
  *
- * @author wanliangbing
- * @date 2018/3/7
+ * @author sunzongyu
+ * @date 2018/04/02
  * @company Dingxuan
  */
 public interface INodeLedgerProvider {
 
+    void initialize(Map<String, StateListener> stateListeners);
+
     /**
-     * creates a new ledger with the given genesis block.
-     * This function guarantees that the creation of ledger and committing the genesis block would an atomic action
-     * The chain id retrieved from the genesis block is treated as a ledger id
-     *
-     * @param genesisBlock
-     * @return
-     * @throws LedgerException
+     * 根据创世区块创建账本
      */
     INodeLedger create(Common.Block genesisBlock) throws LedgerException;
 
     /**
-     * opens an already created ledger
-     *
-     * @param ledgerID
-     * @return
-     * @throws LedgerException
+     * 打开已经存在的账本
      */
     INodeLedger open(String ledgerID) throws LedgerException;
 
     /**
-     * tells whether the ledger with given id exists
-     *
-     * @param ledgerID
-     * @return
-     * @throws LedgerException
+     * 判断账本是否存在
      */
     Boolean exists(String ledgerID) throws LedgerException;
 
     /**
-     * lists the ids of he existing ledgers
-     *
-     * @return
-     * @throws LedgerException
+     * 列举所有账本
      */
-    String[] list() throws LedgerException;
+    List<String> list() throws LedgerException;
 
     /**
-     * closes the NodeLedgerProvider
-     *
-     * @throws LedgerException
+     * 关闭账本
      */
     void close() throws LedgerException;
+
+    void recoverUnderConstructionLedger() throws LedgerException;
 
 }

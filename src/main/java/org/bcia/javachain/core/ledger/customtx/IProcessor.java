@@ -30,8 +30,8 @@ import org.bcia.javachain.protos.common.Common;
  * In the former case, the transactions processed are expected to be valid and in the latter case, only valid transactions
  * are reprocessed and hence any validation can be skipped.
  *
- * @author wanliangbing
- * @date 2018/3/15
+ * @author sunzongyu
+ * @date 2018/04/09
  * @company Dingxuan
  */
 public interface IProcessor {

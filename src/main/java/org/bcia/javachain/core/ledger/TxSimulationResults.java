@@ -15,13 +15,14 @@
  */
 package org.bcia.javachain.core.ledger;
 
+import com.google.protobuf.ByteString;
 import org.bcia.javachain.protos.ledger.rwset.Rwset;
 
 /**
  * 模拟结果
  *
- * @author zhouhui
- * @date 2018/3/23
+ * @author sunzongyu
+ * @date 2018/04/09
  * @company Dingxuan
  */
 public class TxSimulationResults {
@@ -54,4 +55,26 @@ public class TxSimulationResults {
     public void setBlockHeight(long blockHeight) {
         this.blockHeight = blockHeight;
     }
+
+    /**
+     * 获取序列化公共读写集
+     */
+    public ByteString getPubReadWriteByteString(){
+        return publicReadWriteSet.toByteString();
+    }
+
+    /**
+     * 获取序列化私有读写集
+     */
+    public ByteString getPrivateReadWriteByteString(){
+        return privateReadWriteSet.toByteString();
+    }
+
+    /**
+     * 判断是否存在PvtWrites
+     */
+     public boolean containsPvtWrites(){
+        return privateReadWriteSet != null;
+     }
 }
+
