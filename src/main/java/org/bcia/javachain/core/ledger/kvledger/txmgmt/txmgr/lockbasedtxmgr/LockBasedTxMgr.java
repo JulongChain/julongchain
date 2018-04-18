@@ -42,12 +42,12 @@ public class LockBasedTxMgr implements TxMgr {
     }
 
     @Override
-    public IQueryExecutor newQueryExecutor() throws LedgerException {
+    public IQueryExecutor newQueryExecutor(String txid) throws LedgerException {
         return null;
     }
 
     @Override
-    public ITxSimulator newTxSimulator() throws LedgerException {
+    public ITxSimulator newTxSimulator(String txid) throws LedgerException {
         return null;
     }
 
@@ -62,8 +62,8 @@ public class LockBasedTxMgr implements TxMgr {
     }
 
     @Override
-    public Boolean shouldRecover(Long lastAvailableBlock) throws LedgerException {
-        return null;
+    public long shouldRecover(Long lastAvailableBlock) throws LedgerException {
+        return 0;
     }
 
     @Override

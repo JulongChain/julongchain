@@ -205,6 +205,26 @@ public class KvLedger implements INodeLedger {
         return null;
     }
 
+    @Override
+    public BlockAndPvtData getPvtDataAndBlockByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public List<TxPvtData> getPvtDataByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public void purgePrivateData(long maxBlockNumToRetain) throws LedgerException {
+
+    }
+
+    @Override
+    public long privateDataMinBlockNum() throws LedgerException {
+        return 0;
+    }
+
     /** Commit commits the valid block (returned in the method RemoveInvalidTransactionsAndPrepare) and related state changes
      *
      * @param block
@@ -221,7 +241,7 @@ public class KvLedger implements INodeLedger {
     }
 
     @Override
-    public void CommitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException {
+    public void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException {
 
     }
 

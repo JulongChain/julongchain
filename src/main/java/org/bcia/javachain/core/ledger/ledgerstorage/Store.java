@@ -170,6 +170,11 @@ public class Store implements BlockStore {
         return null;
     }
 
+    @Override
+    public void shutdown() {
+
+    }
+
     public void init() throws LedgerException{
         if(!initPvtdataStoreFromExistingBlockchain()){
             syncPvtdataStoreWithBlockStore();

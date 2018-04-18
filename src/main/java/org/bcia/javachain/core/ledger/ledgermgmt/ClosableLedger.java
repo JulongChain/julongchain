@@ -23,6 +23,8 @@ import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
+import java.util.List;
+
 /**
  * closableLedger extends from actual validated ledger and overwrites the Close method
  *
@@ -70,7 +72,8 @@ public class ClosableLedger implements INodeLedger{
     /** Close closes the actual ledger and removes the entries from opened ledgers map
      *
      */
-    public synchronized void close() throws LedgerException{
+    @Override
+    public synchronized void close(){
         closeWithoutLock();
     }
 
@@ -80,11 +83,11 @@ public class ClosableLedger implements INodeLedger{
     }
 
     @Override
-    public void CommitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException {
+    public void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException {
 
     }
 
-    public void closeWithoutLock() throws LedgerException{
+    public void closeWithoutLock() {
         nodeLedger.close();
     }
 
@@ -121,6 +124,26 @@ public class ClosableLedger implements INodeLedger{
     @Override
     public IHistoryQueryExecutor newHistoryQueryExecutor() throws LedgerException {
         return null;
+    }
+
+    @Override
+    public BlockAndPvtData getPvtDataAndBlockByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public List<TxPvtData> getPvtDataByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public void purgePrivateData(long maxBlockNumToRetain) throws LedgerException {
+
+    }
+
+    @Override
+    public long privateDataMinBlockNum() throws LedgerException {
+        return 0;
     }
 
     @Override

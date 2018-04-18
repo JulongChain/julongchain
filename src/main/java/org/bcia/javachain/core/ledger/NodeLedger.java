@@ -125,7 +125,7 @@ public class NodeLedger implements INodeLedger {
     }
 
     @Override
-    public void close() throws LedgerException {
+    public void close() {
 
     }
 
@@ -135,7 +135,7 @@ public class NodeLedger implements INodeLedger {
     }
 
     @Override
-    public void CommitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException {
+    public void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException {
 
     }
 

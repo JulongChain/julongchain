@@ -81,7 +81,7 @@ public interface INodeLedger extends ILedger {
 
     void prune(PrunePolicy policy) throws LedgerException;
 
-    void close() throws LedgerException;
+    void close();
 
-    void CommitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException;
+    void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException;
 }
