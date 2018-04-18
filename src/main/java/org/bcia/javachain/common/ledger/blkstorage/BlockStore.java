@@ -57,4 +57,5 @@ public interface BlockStore extends FileLedgerBlockStore {
 
     TransactionPackage.TxValidationCode retrieveTxValidationCodeByTxID (String txID) throws LedgerException;
 
+    void shutdown();
 }
