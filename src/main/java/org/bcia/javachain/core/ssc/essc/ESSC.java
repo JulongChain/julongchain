@@ -17,7 +17,9 @@ package org.bcia.javachain.core.ssc.essc;
 
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.proto.ProposalResponseUtils;
 import org.bcia.javachain.common.util.proto.ProtoUtils;
+import org.bcia.javachain.common.util.proto.TxUtils;
 import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
 import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
@@ -29,7 +31,7 @@ import java.util.List;
 
 /**
  * 背书系统智能合约　Endorse System Smart Contract,ESSC
- *
+ * 实现默认的背书策略，对proposal哈希值和读写集合做签名
  * @author sunianle
  * @date 3/5/18
  * @company Dingxuan
@@ -38,6 +40,11 @@ import java.util.List;
 public class ESSC extends SystemSmartContractBase {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ESSC.class);
 
+    /**
+     * Init is called once when the smartcontract started the first time
+     * @param stub
+     * @return
+     */
     @Override
     public SmartContractResponse init(ISmartContractStub stub) {
         log.info("Successfully initialized ESSC");
@@ -57,7 +64,7 @@ public class ESSC extends SystemSmartContractBase {
      * args[6] - serialized events
      * args[7] - payloadVisibility
      * @param stub
-     * @return
+     * @return 整理后的（marshalled）proposal response
      */
     @Override
     public SmartContractResponse invoke(ISmartContractStub stub) {
@@ -76,39 +83,38 @@ public class ESSC extends SystemSmartContractBase {
         //handle the header
         byte[] headerBytes=args.get(1);
         if(headerBytes.length==0){
-            return newErrorResponse("Serialized header object is null");
+            return newErrorResponse("Serialized header object is empty");
         }
 
         //handle the proposal payload
         byte[] payloadBytes=args.get(2);
         if(payloadBytes.length==0){
-            return newErrorResponse("Serialized SmartcontractProposalPayload object is null");
+            return newErrorResponse("Serialized smartcontract proposal payload object is empty");
         }
 
         //handle the smartcontractID
         byte[] smartContractIDBytes=args.get(3);
         if(smartContractIDBytes.length==0){
-            return newErrorResponse("SmartcontractID is null");
+            return newErrorResponse("SmartcontractID is empty");
         }
 
-        Smartcontract.SmartContractID smartContractID;
+        Smartcontract.SmartContractID smartContractID=null;
         try {
             smartContractID = ProtoUtils.unmarshalSmartcontractID(smartContractIDBytes);
         }catch(Exception e){
             return newErrorResponse(String.format("Unmarshal SmartcontractID failed:%s", e.getMessage()));
         }
 
-        // handle executing chaincode result
+        // handle executing smartcontract result
         // Status code < shim.ERRORTHRESHOLD can be endorsed
         //String strResponse=args.get(4);
-        byte[] byteResponse = args.get(4);
-        if(byteResponse.length==0){
-            return newErrorResponse("SmartContractResponse of smartcontract executing is null");
+        byte[] responseBytes = args.get(4);
+        if(responseBytes.length==0){
+            return newErrorResponse("SmartContractResponse of smartcontract executing is empty");
         }
-        ProposalResponsePackage.Response proResponse;
+        ProposalResponsePackage.Response proResponse=null;
         try {
-            //proResponse=ProtoUtils.getResponse(strResponse);
-            proResponse=ProtoUtils.getResponse(byteResponse);
+            proResponse=ProtoUtils.getResponse(responseBytes);
         } catch (Exception e) {
             return newErrorResponse(String.format("Failed to get SmartContractResponse of executing smartcontract: %s",e.getMessage()));
         }
@@ -122,23 +128,23 @@ public class ESSC extends SystemSmartContractBase {
         //handle simulation results
         byte[] resultBytes=args.get(5);
         if(resultBytes.length==0){
-            return newErrorResponse("Simulation results is null");
+            return newErrorResponse("Simulation results is empty");
         }
 
         // Handle serialized events if they have been provided
         // they might be nil in case there's no events but there
         // is a visibility field specified as the next arg
         byte[] eventBytes=null;
-        if(size>6  && args.get(6)!=null){
+        if(size>6  && args.get(6).length!=0){
             eventBytes=args.get(6);
         }
 
         // Handle payload visibility (it's an optional argument)
-        // currently the fabric only supports full visibility: this means that
+        // currently the javachain only supports full visibility: this means that
         // there are no restrictions on which parts of the proposal payload will
         // be visible in the final transaction; this default approach requires
         // no additional instructions in the PayloadVisibility field; however
-        // the fabric may be extended to encode more elaborate visibility
+        // the javachain may be extended to encode more elaborate visibility
         // mechanisms that shall be encoded in this field (and handled
         // appropriately by the peer)
         byte[] visibilityBytes=null;
@@ -149,30 +155,31 @@ public class ESSC extends SystemSmartContractBase {
         // obtain the default signing identity for this peer; it will be used to sign this proposal response
         MockMSP localMSP = MockMspManager.getLocalMSP();
         if(localMSP==null){
-            return newErrorResponse("Local MSP is null");
+            return newErrorResponse("Local MSP is empty");
         }
         MockSigningIdentity signingEndorser =localMSP.getDefaultSigningIdentity();
         if(signingEndorser==null){
             return newErrorResponse("Could not obtain the default signing identity");
         }
-        ProposalResponsePackage.ProposalResponse proposalResponse;
+        ProposalResponsePackage.ProposalResponse proposalResponse=null;
         try {
-            proposalResponse = ProtoUtils.createProposalResponse(headerBytes, payloadBytes,
-                    proResponse, resultBytes,
-                    eventBytes, smartContractID,
-                    visibilityBytes, signingEndorser);
+            proposalResponse= ProposalResponseUtils.buildProposalResponse(headerBytes, payloadBytes,
+                                               proResponse, resultBytes,
+                                               eventBytes, smartContractID,
+                                               visibilityBytes, signingEndorser);
         }catch(Exception e){
             return newErrorResponse(String.format("Create ProposalResponse failed:%s",e.getMessage()));
         }
 
-        byte [] prBytes;
+        byte [] prBytes=null;
         try {
+            // marshall the proposal response so that we return its bytes
             prBytes=ProtoUtils.getBytesProposalResponse(proposalResponse);
         }catch(Exception e){
             return newErrorResponse(String.format("Get bytes proposalResponse failed:%s",e.getMessage()));
         }
 
-        ProposalResponsePackage.ProposalResponse pResp;
+        ProposalResponsePackage.ProposalResponse pResp=null;
         try {
             pResp=ProtoUtils.getProposalResponse(prBytes);
         }catch(Exception e){
@@ -189,7 +196,8 @@ public class ESSC extends SystemSmartContractBase {
 
     @Override
     public String getSmartContractStrDescription() {
-        return "与背书相关的系统智能合约";
+        String description="与背书相关的系统智能合约";
+        return description;
     }
 
 }

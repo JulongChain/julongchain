@@ -113,12 +113,40 @@ public class ProposalResponseUtils {
             ISigningIdentity signingIdentity) throws InvalidProtocolBufferException, JavaChainException {
         Common.Header header = Common.Header.parseFrom(headerBytes);
         //obtain the proposal hash given proposal header, payload and the requested visibility
-        byte[] pHashBytes = getProposalHash1(header, payloadBytes, visibility);
+
+        byte[] pHashBytes=null;
+        try {
+            pHashBytes=getProposalHash1(header, payloadBytes, visibility);
+        }catch (Exception e){
+            String msg=String.format("Could not compute proposal hash: err %s",e.getMessage());
+            JavaChainException exception=new JavaChainException(msg);
+            throw  exception;
+        }
         //get the bytes of the proposal smartContractResponse payload - we need to sign them
-        byte[] prpBytes = getBytesProposalResponsePayload(pHashBytes, response, results, events, smartContractID);
-        byte[] endorser = signingIdentity.serialize();
-        // sign the concatenation of the proposal smartContractResponse and the serialized endorser identity with this endorser's key
-        byte[] signature = signingIdentity.sign(Utils.appendBytes(prpBytes, endorser));
+        byte[] prpBytes=null;
+        try {
+            prpBytes=getBytesProposalResponsePayload(pHashBytes, response, results, events, smartContractID);
+        }catch (Exception e){
+            String msg=String.format("Failure while marshaling the ProposalResponsePayload: err %s",e.getMessage());
+            JavaChainException exception=new JavaChainException(msg);
+            throw exception;
+        }
+
+        byte[] endorser=signingIdentity.serialize();
+        if(endorser==null || endorser.length==0){
+            String msg=String.format("Could not serialize the signing identity for %s",signingIdentity.getMSPIdentifier());
+            JavaChainException exception=new JavaChainException(msg);
+            throw exception;
+        }
+
+        //sign the concatenation of the proposal smartContractResponse and the serialized endorser identity with this endorser's key
+        byte[] signature=signingIdentity.sign(Utils.appendBytes(prpBytes, endorser));
+        if(signature==null || signature.length==0){
+            String msg=String.format("Could not sign the proposal response payload");
+            JavaChainException exception=new JavaChainException(msg);
+            throw exception;
+        }
+
         ProposalResponsePackage.ProposalResponse.Builder builder = ProposalResponsePackage.ProposalResponse.newBuilder();
         builder.setVersion(1);
         ProposalResponsePackage.Endorsement endorsement = ProposalResponsePackage.Endorsement.newBuilder()
