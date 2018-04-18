@@ -17,31 +17,50 @@ package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.protos.common.Common;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static org.bcia.javachain.protos.common.Common.*;
 
 /**
- * 类描述
+ * 序列化区块
  *
- * @author
- * @date 2018/3/7
+ * @author sunzongyu
+ * @date 2018/04/12
  * @company Dingxuan
  */
 public class BlockSerialization {
+    private Common.BlockHeader blockHeader;
+    public static List<TxIndexInfo> txOffsets = new ArrayList<>();
+    private BlockMetadata metadata;
 
-    Map<SerializedBlockInfo, byte[]> serializeBlock(Block block) throws LedgerException {
+    public BlockHeader getBlockHeader() {
+        return blockHeader;
+    }
+
+    public void setBlockHeader(BlockHeader blockHeader) {
+        this.blockHeader = blockHeader;
+    }
+
+    public BlockMetadata getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(BlockMetadata metadata) {
+        this.metadata = metadata;
+    }
+
+    public static AbstractMap.SimpleEntry<SerializedBlockInfo, byte[]> serializeBlock(Block block) {
         SerializedBlockInfo info = new SerializedBlockInfo();
         info.setBlockHeader(block.getHeader());
         info.setMetadata(block.getMetadata());
-        Map<SerializedBlockInfo, byte[]> map = new HashMap<>(1);
-        map.put(info, block.toByteArray());
-        return map;
+        AbstractMap.SimpleEntry<SerializedBlockInfo, byte[]> entry =
+                new AbstractMap.SimpleEntry<SerializedBlockInfo, byte[]>(info, block.toByteArray());
+        return entry;
     }
 
-    Block deserializeBlock(byte[] serializedBlockBytes) throws LedgerException {
+    public static Block deserializeBlock(byte[] serializedBlockBytes) throws LedgerException {
         try {
             Block block = Block.parseFrom(serializedBlockBytes);
             return block;
@@ -50,40 +69,11 @@ public class BlockSerialization {
         }
     }
 
-    SerializedBlockInfo extractSerializedBlockInfo(byte[] serializedBlockBytes) throws LedgerException {
+    public static SerializedBlockInfo extractSerializedBlockInfo(byte[] serializedBlockBytes) throws LedgerException {
         Block block = deserializeBlock(serializedBlockBytes);
         SerializedBlockInfo info = new SerializedBlockInfo();
         info.setBlockHeader(block.getHeader());
         info.setMetadata(block.getMetadata());
         return info;
     }
-
-    void addHeaderBytes(BlockHeader blockHeader, SerializedBlockInfo blockInfo) throws LedgerException {
-        return;
-    }
-
-    TxIndexInfo[] addDataBytes(BlockData blockData, SerializedBlockInfo blockInfo) throws LedgerException {
-        return null;
-    }
-
-    void addMetadataBytes(BlockMetadata blockMetadata, SerializedBlockInfo blockInfo) throws LedgerException {
-        return;
-    }
-
-    BlockHeader extractHeader(SerializedBlockInfo blockInfo) throws LedgerException {
-        return null;
-    }
-
-    Map<BlockData, TxIndexInfo[]> extractData(SerializedBlockInfo blockInfo) throws LedgerException {
-        return null;
-    }
-
-    BlockMetadata extractMetadata(SerializedBlockInfo blockInfo) throws LedgerException {
-        return null;
-    }
-
-    String extractTxID(byte[] txEnvelopBytes) throws LedgerException {
-        return null;
-    }
-
 }

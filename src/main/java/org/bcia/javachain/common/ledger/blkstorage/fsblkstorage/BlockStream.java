@@ -15,14 +15,21 @@
  */
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
+import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+
+import java.util.AbstractMap;
+
 /**
- * 类描述
+ * 操作block数据流
  *
- * @author wanliangbing
- * @date 2018/3/8
+ * @author sunzongyu
+ * @date 2018/04/09
  * @company Dingxuan
  */
 public class BlockStream {
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockStream.class);
 
     private String rootDir;
     private Integer currentFileNum;
@@ -59,5 +66,62 @@ public class BlockStream {
 
     public void setCurrentFileStream(BlockfileStream currentFileStream) {
         this.currentFileStream = currentFileStream;
+    }
+
+    /**
+     * 初始化
+     */
+    public BlockStream newBlockStream(String rootDir, int startFileNum, long startOffset, int endFileNum) throws LedgerException{
+        BlockfileStream startFileStream = new BlockfileStream();
+        startFileStream.newBlockFileStream(rootDir, startFileNum, startOffset);
+        this.rootDir = rootDir;
+        this.currentFileNum = startFileNum;
+        this.endFileNum = endFileNum;
+        this.currentFileStream = startFileStream;
+        return this;
+    }
+
+    /**
+     * 移动到下一个BlockfileStream
+     */
+    public void moveToNextBlockFileStream() throws LedgerException{
+        currentFileStream.close();
+        currentFileNum++;
+        currentFileStream.newBlockFileStream(rootDir, currentFileNum, 0);
+    }
+
+    /**
+     * 下一区块
+     */
+    public byte[] nextBlockBytes() throws LedgerException{
+        byte[] blockBytes = nextBlockBytesAndPlacementInfo().getKey();
+        return blockBytes;
+    }
+
+    /**
+     * 下一区块并返回当前信息
+     */
+    public AbstractMap.SimpleEntry<byte[], BlockPlacementInfo> nextBlockBytesAndPlacementInfo() throws LedgerException{
+        AbstractMap.SimpleEntry<byte[], BlockPlacementInfo> entry = currentFileStream.nextBlockBytesAndPlacementInfo();
+        byte[] blockBytes = entry.getKey();
+        logger.debug(String.format("Blockbytes [%d] read from file [%d]", blockBytes.length, currentFileNum));
+        //当前文件无法读取出block
+        if(blockBytes == null && (currentFileNum < endFileNum || endFileNum < 0)){
+            logger.debug(String.format("Current file [%d] exhausted. Moving to next file"), currentFileNum);
+            moveToNextBlockFileStream();
+            return nextBlockBytesAndPlacementInfo();
+        }
+        return entry;
+    }
+
+    /**
+     * 关闭
+     */
+    public void close() throws LedgerException{
+        try {
+            currentFileStream.close();
+        } catch (LedgerException e) {
+            throw e;
+        }
     }
 }

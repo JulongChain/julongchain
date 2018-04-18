@@ -15,6 +15,9 @@
  */
 package org.bcia.javachain.common.ledger;
 
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.CompositeKey;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedValue;
+
 /**
  * QueryResult - a general interface for supporting different types of query results. Actual types differ for different queries
  *
@@ -24,4 +27,11 @@ package org.bcia.javachain.common.ledger;
  */
 public interface QueryResult {
 
+    public CompositeKey getCompositeKey();
+
+    public void setCompositeKey(CompositeKey compositeKey);
+
+    public VersionedValue getVersionedValue();
+
+    public void setVersionedValue(VersionedValue versionedValue);
 }

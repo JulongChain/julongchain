@@ -16,20 +16,20 @@
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 /**
- * 类描述
+ * 提供区块文件读写方法
  *
- * @author wanliangbing
- * @date 2018/3/9
+ * @author sunzongyu
+ * @date 2018/04/12
  * @company Dingxuan
  */
 public class BlockfileRw {
 
-    BlockfileWriter newBlockfileWriter(String filePath) {
-        return null;
+    public static BlockfileWriter newBlockfileWriter(String filePath) {
+        return BlockfileWriter.newBlockfileWriter(filePath);
     }
 
-    BlockfileReader newBlockfileReader(String filePath) {
-        return null;
+    public static BlockfileReader newBlockfileReader(String filePath) {
+        return BlockfileReader.newBlockfileReader(filePath);
     }
 
 }

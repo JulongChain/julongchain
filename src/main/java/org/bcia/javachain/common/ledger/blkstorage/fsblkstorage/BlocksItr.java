@@ -16,27 +16,42 @@
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 import org.bcia.javachain.common.ledger.QueryResult;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.iq80.leveldb.table.BlockIterator;
 
 /**
- * 类描述
  *
- * @author wanliangbing
- * @date 2018/3/8
+ *
+ * @author sunzongyu
+ * @date 2018/04/12
  * @company Dingxuan
  */
 public class BlocksItr {
 
-    private BlockfileMgr blockfileMgr;
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlocksItr.class);
+
+    private BlockfileMgr mgr;
     private Long maxBlockNumAvailable;
     private Long blockNumToRetrieve;
     private BlockStream stream;
     private Boolean closeMarker;
 
-    BlocksItr newBlockItr(BlockfileMgr mgr, Long startBlockNum) {
-        return null;
+    public static BlocksItr newBlockItr(BlockfileMgr mgr, Long startBlockNum) {
+        BlocksItr itr = new BlocksItr();
+        itr.setMgr(mgr);
+        itr.setMaxBlockNumAvailable(mgr.getCpInfo().getLastBlockNumber());
+        itr.setBlockNumToRetrieve(startBlockNum);
+        itr.setStream(null);
+        itr.setCloseMarker(false);
+        return itr;
     }
 
-    Long waitForBlock(Long blockNum) {
+    public synchronized Long waitForBlock(Long blockNum) {
+//        while(mgr.getCpInfo().getLastBlockNumber() < blockNum && !shouldClose()){
+//            logger.debug(String.format("Going to wait for newer blocks.maxAvailaBlockNumber=[%d], waitForBlockNum=[%d]"
+//                    , mgr.getCpInfo().getLastBlockNumber(), blockNum));
+//        }
         return null;
     }
 
@@ -62,12 +77,12 @@ public class BlocksItr {
 
     }
 
-    public BlockfileMgr getBlockfileMgr() {
-        return blockfileMgr;
+    public BlockfileMgr getMgr() {
+        return mgr;
     }
 
-    public void setBlockfileMgr(BlockfileMgr blockfileMgr) {
-        this.blockfileMgr = blockfileMgr;
+    public void setMgr(BlockfileMgr mgr) {
+        this.mgr = mgr;
     }
 
     public Long getMaxBlockNumAvailable() {

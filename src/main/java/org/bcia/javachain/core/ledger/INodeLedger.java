@@ -16,93 +16,61 @@
 package org.bcia.javachain.core.ledger;
 
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.ILedger;
 import org.bcia.javachain.common.ledger.PrunePolicy;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
 /**
- * INodeLedger differs from the OrdererLedger in that NodeLedger locally maintain a bitmask
- * that tells apart valid transactions from invalid ones
+ * 结点账本
  *
- * @author wanliangbing
- * @date 2018/3/7
+ * @author sunzongyu
+ * @date 2018/04/08
  * @company Dingxuan
  */
-public interface INodeLedger extends INodeLedgerProvider{
+public interface INodeLedger extends ILedger {
 
     /**
-     * getTransactionByID retrieves a transaction by id
-     *
-     * @param txID
-     * @return
-     * @throws LedgerException
+     * 通过id获取交易
      */
     TransactionPackage.ProcessedTransaction getTransactionByID(String txID) throws LedgerException;
 
     /**
-     * getBlockByHash returns a block given it's hash
-     *
-     * @param blockHash
-     * @return
-     * @throws LedgerException
+     * 通过区块hash获取区块
      */
     Common.Block getBlockByHash(byte[] blockHash) throws LedgerException;
 
     /**
-     * getBlockByTxID returns a block which contains a transaction
-     *
-     * @param txID
-     * @return
-     * @throws LedgerException
+     * 通过交易ID获取区块
      */
     Common.Block getBlockByTxID(String txID) throws LedgerException;
 
     /**
-     * getTxValidationCodeByTxID returns reason code of transaction validation
-     *
-     * @param txID
-     * @return
-     * @throws LedgerException
+     * 通过交易Id获取交易可行性代码
      */
     TransactionPackage.TxValidationCode getTxValidationCodeByTxID(String txID) throws LedgerException;
 
     /**
-     * newTxSimulator gives handle to a transaction simulator.
-     * A client can obtain more than one 'TxSimulator's for parallel execution.
-     * Any snapshoting/synchronization should be performed at the implementation level if required
-     *
-     * @return ITxSimulator
-     * @throws LedgerException
-     * @param txId
+     * 处理交易模拟
      */
     ITxSimulator newTxSimulator(String txId) throws LedgerException;
 
     /**
-     * newQueryExecutor gives handle to a query executor.
-     * A client can obtain more than one 'QueryExecutor's for parallel execution.
-     * Any synchronization should be performed at the implementation level if required
-     *
-     * @return
-     * @throws LedgerException
+     * 获取查询器
      */
     IQueryExecutor newQueryExecutor() throws LedgerException;
 
     /**
-     * newHistoryQueryExecutor gives handle to a history query executor.
-     * A client can obtain more than one 'HistoryQueryExecutor's for parallel execution.
-     * Any synchronization should be performed at the implementation level if required
-     *
-     * @return
-     * @throws LedgerException
+     * 获取HistoryDB查询器
      */
     IHistoryQueryExecutor newHistoryQueryExecutor() throws LedgerException;
 
     /**
-     * prune prunes the blocks/transactions that satisfy the given policy
-     *
-     * @param policy
-     * @throws LedgerException
+     * 通过给出的政策修剪区块
      */
     void prune(PrunePolicy policy) throws LedgerException;
 
+    void close() throws LedgerException;
+
+    void CommitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException;
 }

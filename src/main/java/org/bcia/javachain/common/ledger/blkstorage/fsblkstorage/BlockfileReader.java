@@ -15,27 +15,43 @@
  */
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
+import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.core.node.NodeConfig;
+
+import javax.swing.*;
 import java.io.File;
+import java.io.FileInputStream;
 
 /**
- * 类描述
+ * 读取文件
  *
- * @author wanliangbing
- * @date 2018/3/9
+ * @author sunzongyu
+ * @date 2018/04/09
  * @company Dingxuan
  */
 public class BlockfileReader {
 
     private File file;
 
-    byte[] read(Integer offset, Integer length) {
-        return null;
+    public static BlockfileReader newBlockfileReader(String filePath){
+        BlockfileReader reader = new BlockfileReader();
+        reader.file = new File(filePath);
+        return reader;
     }
 
-    void close(){
-
+    public byte[] read(Integer offset, Integer length) throws LedgerException {
+        FileInputStream fis;
+        byte[] result = null;
+        try {
+            result = new byte[(int) file.length()];
+            fis = new FileInputStream(file);
+            fis.read(result);
+            fis.close();
+        } catch (Throwable e){
+            throw new LedgerException(e);
+        }
+        return result;
     }
-
 
     public File getFile() {
         return file;
