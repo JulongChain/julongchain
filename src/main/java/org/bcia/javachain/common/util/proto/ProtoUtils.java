@@ -47,27 +47,36 @@ import static org.bcia.javachain.common.util.proto.ProposalUtils.computeProposal
 public class ProtoUtils {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ProtoUtils.class);
 
+    /**
+     * 从字节流解析出SmartContractID对象
+     * @param smartContractIDBytes
+     * @return
+     * @throws UnsupportedEncodingException
+     * @throws InvalidProtocolBufferException
+     */
     public static Smartcontract.SmartContractID unmarshalSmartcontractID(byte[] smartContractIDBytes)
             throws UnsupportedEncodingException, InvalidProtocolBufferException {
         Smartcontract.SmartContractID id = Smartcontract.SmartContractID.parseFrom(smartContractIDBytes);
         return id;
     }
 
-    public static ProposalResponsePackage.ProposalResponse createProposalResponse(byte[] header, byte[] payload, ProposalResponsePackage.Response proResponse, byte[] results, byte[] events,
-                                                                                  Smartcontract.SmartContractID scID, byte[] visibility,
-                                                                                  MockSigningIdentity signingEndorser) {
-        log.info("Mock create proposalResponse...");
-        log.info("Mock sining proposal...");
-        signingEndorser.sign();
-        ProposalResponsePackage.ProposalResponse.Builder prBuilder=ProposalResponsePackage.ProposalResponse.newBuilder();
-        return prBuilder.build();
-    }
 
+    /**
+     * 将ProposalResponse转化为字节流
+     * @param proposalResponse
+     * @return
+     */
     public static byte[] getBytesProposalResponse(ProposalResponsePackage.ProposalResponse proposalResponse) {
-        log.info("Mock getBytesProposalResponse...");
+        //log.info("Mock getBytesProposalResponse...");
         return proposalResponse.toByteArray();
     }
 
+    /**
+     * 从字节流中解析出ProposalResponse
+     * @param prBytes
+     * @return
+     * @throws InvalidProtocolBufferException
+     */
     public static ProposalResponsePackage.ProposalResponse getProposalResponse(byte[] prBytes) throws InvalidProtocolBufferException {
         return ProposalResponsePackage.ProposalResponse.parseFrom(prBytes);
     }
@@ -93,6 +102,12 @@ public class ProtoUtils {
         return TransactionPackage.Transaction.parseFrom(data);
     }
 
+    /**
+     * 从字节流从解析出ProposalResponsePackage.Response
+     * @param byteResponse
+     * @return
+     * @throws InvalidProtocolBufferException
+     */
     public static ProposalResponsePackage.Response getResponse(byte[] byteResponse)
                                                    throws InvalidProtocolBufferException {
         ProposalResponsePackage.Response response = ProposalResponsePackage.Response.parseFrom(byteResponse);
@@ -103,8 +118,14 @@ public class ProtoUtils {
         return message.toByteArray();
     }
 
-    public static Smartcontract.SmartContractDeploymentSpec getSmartContractDeploymentSpec(byte[] code) throws InvalidProtocolBufferException {
-        return Smartcontract.SmartContractDeploymentSpec.parseFrom(code);
+    /**
+     * 从字节流中解析出SmartContractDeploymentSpec
+     * @param depSpecBytes
+     * @return
+     * @throws InvalidProtocolBufferException
+     */
+    public static Smartcontract.SmartContractDeploymentSpec getSmartContractDeploymentSpec(byte[] depSpecBytes) throws InvalidProtocolBufferException {
+        return Smartcontract.SmartContractDeploymentSpec.parseFrom(depSpecBytes);
     }
 
 

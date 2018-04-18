@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 package org.bcia.javachain.msp;
-
-import org.bcia.javachain.csp.gm.GmCsp;
-import org.bcia.javachain.msp.entity.GmSoftConf;
 import org.bcia.javachain.msp.entity.IdentityIdentifier;
-import org.bcia.javachain.msp.gmsoft.GmSoftMsp;
 import org.bcia.javachain.protos.common.MspPrincipal;
 import org.bcia.javachain.protos.msp.MspConfigPackage;
 
@@ -33,9 +29,9 @@ public interface IMsp extends IIdentityDeserializer{
      * @param config
      */
 
-     void setup(MspConfigPackage.MSPConfig config);
+    IMsp setup(MspConfigPackage.MSPConfig config);
 
-     IMsp load(GmSoftConf GmSoftConf);
+   //  IMsp load(GmSoftConf GmSoftConf);
     /**
      * 返回此msp的版本
      * @return

@@ -13,39 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.msp.entity;
+package org.bcia.javachain.common.util;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/29
+ * @Date: 2018/4/18
  * @company Dingxuan
  */
-public class GmSoftConf {
-    private String mspdir;
-    private String mspId;
-    private String mspType;
-    private  CspConfig cspConfig;
-
-    public GmSoftConf(String mspdir, String mspId, String mspType, CspConfig cspConfig) {
-        this.mspdir = mspdir;
-        this.mspId = mspId;
-        this.mspType = mspType;
-        this.cspConfig = cspConfig;
+public class Convert {
+    /**
+     * 字符数组转换16进制字符串
+     * @param src
+     * @return
+     */
+    public static String bytesToHexString(byte[] src){
+        StringBuilder stringBuilder = new StringBuilder("");
+        if (src == null || src.length <= 0) {
+            return null;
+        }
+        for (int i = 0; i < src.length; i++) {
+            int v = src[i] & 0xFF;
+            String hv = Integer.toHexString(v);
+            if (hv.length() < 2) {
+                stringBuilder.append(0);
+            }
+            stringBuilder.append(hv);
+        }
+        return stringBuilder.toString();
     }
 
-    public String getMspdir() {
-        return mspdir;
-    }
-
-    public String getMspId() {
-        return mspId;
-    }
-
-    public String getMspType() {
-        return mspType;
-    }
-
-    public CspConfig getCspConfig() {
-        return cspConfig;
-    }
 }

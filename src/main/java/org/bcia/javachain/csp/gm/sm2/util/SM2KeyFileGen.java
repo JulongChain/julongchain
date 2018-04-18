@@ -15,13 +15,13 @@
  */
 package org.bcia.javachain.csp.gm.sm2.util;
 
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.csp.gm.sm2.SM2Key;
 import org.bcia.javachain.csp.intfs.IKey;
+import org.bouncycastle.util.encoders.Base64;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.net.URL;
 
@@ -31,36 +31,35 @@ import java.net.URL;
  * @company Dingxuan
  */
 public class SM2KeyFileGen {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(SM2KeyFileGen.class);
     private SM2Key k;
     public SM2KeyFileGen( SM2Key k) {
     this.k=k;
     }
   public   void publicKeyFileGen(String path){
-        File file = new File(path);
-        try {
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-            byte[] buffer=k.getPublicKey().toBytes();
-            FileOutputStream fos = new FileOutputStream(file);
-            fos.write(buffer);
-            fos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+      PrintWriter pw = null;
+      try {
+          pw= new PrintWriter(new FileOutputStream(path));
+        String publiKey=new String(Base64.encode( k.getPublicKey().toBytes()));
+          pw.print(publiKey);
+          pw.close();
+      } catch (FileNotFoundException e) {
+          e.printStackTrace();
+      }
     }
     public  void privateKeyFileGen(String path){
-        BigInteger privateKey = new BigInteger( k.toBytes());
-        File file = new File(path);
+
+        PrintWriter pw= null;
         try {
-            if (!file.exists()) {
-                file.createNewFile();
-            }
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file));
-            oos.writeObject(privateKey);
-            oos.close();
-        } catch (IOException e) {
+            pw = new PrintWriter(new FileOutputStream(path));
+            String privateKey= new String(Base64.encode( k.toBytes()));
+            pw.print(privateKey);
+            pw.close();
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+
     }
+
 }

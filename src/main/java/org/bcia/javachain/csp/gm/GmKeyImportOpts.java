@@ -13,36 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.msp.entity;
+package org.bcia.javachain.csp.gm;
 
-import java.security.spec.ECPoint;
+import org.bcia.javachain.csp.intfs.opts.IKeyImportOpts;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/29
+ * @Date: 2018/4/18
  * @company Dingxuan
  */
-public class CspConfig {
-    private  String hashType;
-    private  String signType;
-    private  String publicKeyPath;
-    private  String privateKeyPath;
-
-    public CspConfig(String hashType, String publicKeyPath, String privateKeyPath) {
-        this.hashType = hashType;
-        this.publicKeyPath = publicKeyPath;
-        this.privateKeyPath = privateKeyPath;
+public class GmKeyImportOpts implements IKeyImportOpts {
+    @Override
+    public String getAlgorithm() {
+        return null;
     }
 
-    public String getHashType() {
-        return hashType;
-    }
-
-    public String getPublicKeyPath() {
-        return publicKeyPath;
-    }
-
-    public String getPrivateKeyPath() {
-        return privateKeyPath;
+    @Override
+    public boolean isEphemeral() {
+        return false;
     }
 }

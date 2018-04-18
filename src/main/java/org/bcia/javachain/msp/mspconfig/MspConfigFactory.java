@@ -41,8 +41,6 @@ public class MspConfigFactory {
         try {
             is = new FileInputStream(url.getFile());
             MspConfig mspConfig= yaml.loadAs(is, MspConfig.class);
-
-            //genesisConfig.completeInstance();
             return mspConfig;
         } catch (FileNotFoundException e) {
             log.error(e.getMessage(), e);

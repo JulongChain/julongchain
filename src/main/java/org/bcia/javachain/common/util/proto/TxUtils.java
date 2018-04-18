@@ -16,6 +16,9 @@
 package org.bcia.javachain.common.util.proto;
 
 import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ssc.essc.MockSigningIdentity;
 import org.bcia.javachain.msp.ISigningIdentity;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
@@ -30,6 +33,8 @@ import org.bcia.javachain.protos.node.Smartcontract;
  * @company Dingxuan
  */
 public class TxUtils {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(TxUtils.class);
+
     // MockSignedEndorserProposalOrPanic creates a SignedProposal with the passed arguments
     public static ProposalPackage.SignedProposal mockSignedEndorserProposalOrPanic(
             String groupID,

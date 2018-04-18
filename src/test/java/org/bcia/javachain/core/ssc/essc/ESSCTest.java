@@ -113,6 +113,23 @@ public class ESSCTest extends BaseJunit4Test {
             SmartContractResponse res3=mockStub.mockInvoke("1", args3);
             SmartContractResponse.Status status3= res3.getStatus();
             assertThat(status3,is(SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
+
+            // Failed path: header is null
+            List<ByteString> args4 = new LinkedList<ByteString>();
+            args4.add(0, ByteString.copyFromUtf8("test"));
+            //预期将在invoke时抛出空指针异常,用户调用不应传入null
+            args4.add(1,null);
+            args4.add(2,proposal.getPayload());
+            args4.add(3,smartContractID.toByteString());
+            args4.add(4,successResponse.toByteString());
+            args4.add(5,ByteString.copyFromUtf8(simRes));
+            try {
+                SmartContractResponse res4 = mockStub.mockInvoke("1", args4);
+            }catch(Exception e){
+                //stub.getArgs()将抛出NullPointerException异常
+                assertThat(e.getClass().toString(),is("class java.lang.NullPointerException"));
+                //e.printStackTrace();
+            }
         } catch (JavaChainException e) {
             e.printStackTrace();
         }

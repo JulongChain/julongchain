@@ -73,7 +73,7 @@ public class GmCsp implements ICsp {
 
     @Override
     public IKey keyImport(Object raw, IKeyImportOpts opts) throws JavaChainException {
-        return null;
+        return new SM2Key();
     }
 
     @Override

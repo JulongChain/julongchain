@@ -22,8 +22,6 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.consenter.common.broadcast.BroadCastHandler;
 import org.bcia.javachain.consenter.common.deliver.DeliverHandler;
-import org.bcia.javachain.msp.entity.CspConfig;
-import org.bcia.javachain.msp.mgmt.Mgmt;
 import org.bcia.javachain.protos.common.Common;
 
 import org.bcia.javachain.protos.consenter.Ab;

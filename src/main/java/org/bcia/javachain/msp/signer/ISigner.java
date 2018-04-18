@@ -13,38 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.msp.mgmt;
+package org.bcia.javachain.msp.signer;
 
-import org.bcia.javachain.msp.IIdentity;
-import org.bcia.javachain.msp.IMsp;
-import org.bcia.javachain.msp.IMspManager;
-import org.bcia.javachain.protos.msp.Identities;
-
-import java.util.Map;
+import org.bcia.javachain.csp.intfs.opts.ISignerOpts;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/13
+ * @Date: 2018/4/18
  * @company Dingxuan
  */
-public class MspmgrImpl  implements IMspManager{
-    @Override
-    public void setup(IMsp[] msps) {
+public interface ISigner {
 
-    }
+    Object publicKey();
 
-    @Override
-    public Map<String, IMsp> getMSPs() {
-        return null;
-    }
+    byte[] Sign(Reader reader,byte[] digest, ISignerOpts opts);
 
-    @Override
-    public IIdentity deserializeIdentity(byte[] serializedIdentity) {
-        return null;
-    }
-
-    @Override
-    public void isWellFormed(Identities.SerializedIdentity identity) {
-
+    interface  Reader{
+        int Read(byte[] p);
     }
 }
