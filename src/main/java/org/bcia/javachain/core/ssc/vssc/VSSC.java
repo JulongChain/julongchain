@@ -31,19 +31,16 @@ import org.bcia.javachain.core.common.privdata.IPrivDataSupport;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractData;
 import org.bcia.javachain.core.common.sysscprovider.ISystemSmartContractProvider;
 import org.bcia.javachain.core.common.sysscprovider.SystemSmartContractFactory;
-import org.bcia.javachain.core.smartcontract.shim.impl.Response;
+import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
 import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
-import org.bcia.javachain.core.ssc.SystemSmartContractDescriptor;
 import org.bcia.javachain.msp.IMspManager;
 import org.bcia.javachain.msp.mgmt.Mgmt;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.javachain.protos.node.TransactionPackage;
-import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 import org.springframework.stereotype.Component;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
@@ -72,7 +69,7 @@ public class VSSC extends SystemSmartContractBase {
     private IPrivDataSupport collectionStoreSupport;
 
     @Override
-    public Response init(ISmartContractStub stub) {
+    public SmartContractResponse init(ISmartContractStub stub) {
         this.sscProvider= SystemSmartContractFactory.getSystemSmartContractProvider();
         this.collectionStoreSupport=new CollectionStoreSupport();
         this.collectionStore= CollectionStoreFactory.getCollectionStore(collectionStoreSupport);
@@ -84,12 +81,12 @@ public class VSSC extends SystemSmartContractBase {
     // This validation system chaincode will check that the transaction in
     // the supplied envelope contains endorsements (that is. signatures
     // from entities) that comply with the supplied endorsement policy.
-    // @return a successful Response (code 200) in case of success, or
+    // @return a successful SmartContractResponse (code 200) in case of success, or
     // an error otherwise
     // Note that Peer calls this function with 3 arguments, where args[0] is the
     // function name, args[1] is the Envelope and args[2] is the validation policy
     @Override
-    public Response invoke(ISmartContractStub stub)  {
+    public SmartContractResponse invoke(ISmartContractStub stub)  {
         // TODO: document the argument in some white paper or design document
         // args[0] - function name (not used now)
         // args[1] - serialized Envelope

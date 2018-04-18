@@ -1,8 +1,7 @@
 package org.bcia.javachain.core.ssc.cssc;
 
-import org.bcia.javachain.core.smartcontract.shim.impl.Response;
+import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
 import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractStub;
-import org.bcia.javachain.core.ssc.essc.ESSC;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +24,8 @@ public class CSSCTest {
 
     @Test
     public void init() {
-        Response response = cssc.init(stub);
-        assertThat(response.getStatus(), is(Response.Status.SUCCESS));
+        SmartContractResponse smartContractResponse = cssc.init(stub);
+        assertThat(smartContractResponse.getStatus(), is(SmartContractResponse.Status.SUCCESS));
     }
 
     @Test

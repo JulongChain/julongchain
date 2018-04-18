@@ -100,9 +100,9 @@ public class Handler {
 		final Channel<SmartcontractShim.SmartContractMessage> channel = new Channel<>();
 		String key = getTxKey(channelId, txId);
 		if (this.responseChannel.putIfAbsent(key, channel) != null) {
-			throw new IllegalStateException(format("[%-8s]Response channel already exists. Another request must be pending.", txId));
+			throw new IllegalStateException(format("[%-8s]SmartContractResponse channel already exists. Another request must be pending.", txId));
 		}
-		if (logger.isTraceEnabled()) logger.trace(format("[%-8s]Response channel created.", txId));
+		if (logger.isTraceEnabled()) logger.trace(format("[%-8s]SmartContractResponse channel created.", txId));
 		return channel;
 	}
 
@@ -133,7 +133,7 @@ public class Handler {
 		String key = getTxKey(channelId, txId);
 		final Channel<SmartcontractShim.SmartContractMessage> channel = responseChannel.remove(key);
 		if (channel != null) channel.close();
-		if (logger.isTraceEnabled()) logger.trace(format("[%-8s]Response channel closed.",txId));
+		if (logger.isTraceEnabled()) logger.trace(format("[%-8s]SmartContractResponse channel closed.",txId));
 	}
 
 	/**
@@ -186,9 +186,9 @@ public class Handler {
 				final ISmartContractStub stub = new SmartContractStub(message.getGroupId(), message.getTxid(), this, input.getArgsList(), message.getProposal());
 
 				// Call chaincode's init
-				final Response result = chaincode.init(stub);
+				final SmartContractResponse result = chaincode.init(stub);
 
-				if (result.getStatus().getCode() >= Response.Status.INTERNAL_SERVER_ERROR.getCode()) {
+				if (result.getStatus().getCode() >= SmartContractResponse.Status.INTERNAL_SERVER_ERROR.getCode()) {
 					// Send ERROR with entire result.Message as payload
 					logger.error(String.format("[%-8s]Init failed. Sending %s", message.getTxid(), ERROR));
 					triggerNextState(newErrorEventMessage(message.getGroupId(), message.getTxid(), result.getMessage(), stub.getEvent()), true);
@@ -236,9 +236,9 @@ public class Handler {
 				final ISmartContractStub stub = new SmartContractStub(message.getGroupId(), message.getTxid(), this, input.getArgsList(), message.getProposal());
 
 				// Call chaincode's invoke
-				final Response result = chaincode.invoke(stub);
+				final SmartContractResponse result = chaincode.invoke(stub);
 
-				if (result.getStatus().getCode() >= Response.Status.INTERNAL_SERVER_ERROR.getCode()) {
+				if (result.getStatus().getCode() >= SmartContractResponse.Status.INTERNAL_SERVER_ERROR.getCode()) {
 					// Send ERROR with entire result.Message as payload
 					logger.error(String.format("[%-8s]Invoke failed. Sending %s", message.getTxid(), ERROR));
 					triggerNextState(newErrorEventMessage(message.getGroupId(), message.getTxid(), result.getMessage(), stub.getEvent()), true);
@@ -406,7 +406,7 @@ public class Handler {
 		}
 	}
 
-	Response invokeSmartContract(String channelId, String txId, String chaincodeName, List<byte[]> args) {
+	SmartContractResponse invokeSmartContract(String channelId, String txId, String chaincodeName, List<byte[]> args) {
 		try {
 			// create invocation specification of the chaincode to invoke
 			final Smartcontract.SmartContractSpec invocationSpec = Smartcontract.SmartContractSpec.newBuilder()
@@ -478,8 +478,8 @@ public class Handler {
 		}
 	}
 
-	private static Response newErrorChaincodeResponse(String message) {
-		return new Response(Response.Status.INTERNAL_SERVER_ERROR, message, null);
+	private static SmartContractResponse newErrorChaincodeResponse(String message) {
+		return new SmartContractResponse(SmartContractResponse.Status.INTERNAL_SERVER_ERROR, message, null);
 	}
 
 	private static SmartcontractShim.SmartContractMessage newGetStateEventMessage(final String channelId, final String txId, final String key) {
@@ -509,8 +509,8 @@ public class Handler {
 		return newEventMessage(ERROR, channelId, txId, ByteString.copyFromUtf8(message), event);
 	}
 
-	private static SmartcontractShim.SmartContractMessage newCompletedEventMessage(final String channelId, final String txId, final Response response, final SmartContractEventPackage.SmartContractEvent event) {
-		return newEventMessage(COMPLETED, channelId, txId, toProtoResponse(response).toByteString(), event);
+	private static SmartcontractShim.SmartContractMessage newCompletedEventMessage(final String channelId, final String txId, final SmartContractResponse smartContractResponse, final SmartContractEventPackage.SmartContractEvent event) {
+		return newEventMessage(COMPLETED, channelId, txId, toProtoResponse(smartContractResponse).toByteString(), event);
 	}
 
 	private static SmartcontractShim.SmartContractMessage newInvokeChaincodeMessage(final String channelId, final String txId, final ByteString payload) {
@@ -540,17 +540,17 @@ public class Handler {
 		}
 	}
 
-	private static ProposalResponsePackage.Response toProtoResponse(Response response) {
+	private static ProposalResponsePackage.Response toProtoResponse(SmartContractResponse smartContractResponse) {
 		final ProposalResponsePackage.Response.Builder builder = ProposalResponsePackage.Response.newBuilder();
-		builder.setStatus(response.getStatus().getCode());
-		if (response.getMessage() != null) builder.setMessage(response.getMessage());
-		if (response.getPayload() != null) builder.setPayload(ByteString.copyFrom(response.getPayload()));
+		builder.setStatus(smartContractResponse.getStatus().getCode());
+		if (smartContractResponse.getMessage() != null) builder.setMessage(smartContractResponse.getMessage());
+		if (smartContractResponse.getPayload() != null) builder.setPayload(ByteString.copyFrom(smartContractResponse.getPayload()));
 		return builder.build();
 	}
 
-	private static Response toChaincodeResponse(ProposalResponsePackage.Response response) {
-		return new Response(
-				Response.Status.forCode(response.getStatus()),
+	private static SmartContractResponse toChaincodeResponse(ProposalResponsePackage.Response response) {
+		return new SmartContractResponse(
+				SmartContractResponse.Status.forCode(response.getStatus()),
 				response.getMessage(),
 				response.getPayload() == null ? null : response.getPayload().toByteArray()
 		);

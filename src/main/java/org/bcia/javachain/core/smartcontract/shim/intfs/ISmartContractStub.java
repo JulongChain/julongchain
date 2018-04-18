@@ -19,7 +19,7 @@ import org.bcia.javachain.core.ledger.CompositeKey;
 import org.bcia.javachain.core.ledger.IKeyModification;
 import org.bcia.javachain.core.ledger.IKeyValue;
 import org.bcia.javachain.core.ledger.IQueryResultsIterator;
-import org.bcia.javachain.core.smartcontract.shim.impl.Response;
+import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
 import org.bcia.javachain.protos.node.SmartContractEventPackage.SmartContractEvent;
 import org.bcia.javachain.protos.node.ProposalPackage.SignedProposal;
 import org.bcia.javachain.core.ledger.CompositeKeyFormatException;
@@ -104,7 +104,7 @@ public interface ISmartContractStub {
      *            If not specified, the caller's group is assumed.
      * @return
      */
-    Response invokeSmartContract(String smartContractName, List<byte[]> args, String group);
+    SmartContractResponse invokeSmartContract(String smartContractName, List<byte[]> args, String group);
 
     /**
      * Returns the byte array value specified by the key, from the ledger.
@@ -220,7 +220,7 @@ public interface ISmartContractStub {
      *            Arguments to pass on to the called smart contract.
      * @return
      */
-    default Response invokeSmartContract(String smartContractName, List<byte[]> args) {
+    default SmartContractResponse invokeSmartContract(String smartContractName, List<byte[]> args) {
         return invokeSmartContract(smartContractName, args, null);
     }
 
@@ -239,7 +239,7 @@ public interface ISmartContractStub {
      *            If not specified, the caller's group is assumed.
      * @return
      */
-    default Response invokeSmartContractWithStringArgs(String smartContractName, List<String> args, String group) {
+    default SmartContractResponse invokeSmartContractWithStringArgs(String smartContractName, List<String> args, String group) {
         return invokeSmartContract(smartContractName, args.stream().map(x -> x.getBytes(UTF_8)).collect(toList()), group);
     }
 
@@ -256,7 +256,7 @@ public interface ISmartContractStub {
      *            Arguments to pass on to the called smart contract.
      * @return
      */
-    default Response invokeSmartContractWithStringArgs(String smartContractName, List<String> args) {
+    default SmartContractResponse invokeSmartContractWithStringArgs(String smartContractName, List<String> args) {
         return invokeSmartContractWithStringArgs(smartContractName, args, null);
     }
 
@@ -273,7 +273,7 @@ public interface ISmartContractStub {
      *            Arguments to pass on to the called smart contract.
      * @return
      */
-    default Response invokeSmartContractWithStringArgs(final String smartContractName, final String... args) {
+    default SmartContractResponse invokeSmartContractWithStringArgs(final String smartContractName, final String... args) {
         return invokeSmartContractWithStringArgs(smartContractName, Arrays.asList(args), null);
     }
 

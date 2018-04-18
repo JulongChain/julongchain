@@ -237,7 +237,7 @@ public class SmartContractStub implements ISmartContractStub {
 	};
 
 	@Override
-	public Response invokeSmartContract(final String chaincodeName, final List<byte[]> args, final String channel) {
+	public SmartContractResponse invokeSmartContract(final String chaincodeName, final List<byte[]> args, final String channel) {
 		// internally we handle chaincode name as a composite name
 		final String compositeName;
 		if (channel != null && channel.trim().length() > 0) {

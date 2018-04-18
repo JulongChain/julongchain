@@ -30,7 +30,7 @@ import "google/protobuf/timestamp.proto";
 // The idea is that this message contains the endorser's response to the
 // request of a client to perform an action over a smart contract (or more
 // generically on the ledger); the response might be success/error (conveyed in
-// the Response field) together with a description of the action and a
+// the SmartContractResponse field) together with a description of the action and a
 // signature over it by that endorser.  If a sufficient number of distinct
 // endorsers agree on the same action and produce signature to that effect, a
 // transaction can be generated and sent for ordering.

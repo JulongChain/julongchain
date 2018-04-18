@@ -473,7 +473,7 @@ public class Handler {
                     logger.info(String.format("[%s]Received message %s from shim", shorttxid(in.getTxid()), in.getType()));
                     //传递信息为KEEPLIVE
                     if(in.getType().equals(KEEPALIVE)){
-                        logger.info("Received KEEPALIVE Response");
+                        logger.info("Received KEEPALIVE SmartContractResponse");
                         continue;
                     }
                     //传递信息为ERROR

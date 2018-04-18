@@ -18,7 +18,7 @@ import io.netty.handler.ssl.SslContext;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.bcia.javachain.core.smartcontract.shim.impl.ChatStream;
-import org.bcia.javachain.core.smartcontract.shim.impl.Response;
+import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
 import org.bcia.javachain.protos.node.Smartcontract.SmartContractID;
 import org.bcia.javachain.protos.node.SmartcontractShim.SmartContractMessage;
 import org.bcia.javachain.protos.node.SmartcontractShim.SmartContractMessage.Type;
@@ -29,8 +29,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 
-import static org.bcia.javachain.core.smartcontract.shim.impl.Response.Status.INTERNAL_SERVER_ERROR;
-import static org.bcia.javachain.core.smartcontract.shim.impl.Response.Status.SUCCESS;
+import static org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse.Status.INTERNAL_SERVER_ERROR;
+import static org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse.Status.SUCCESS;
 
 /**
  * 用于创建智能合约的抽象基类
@@ -41,10 +41,10 @@ import static org.bcia.javachain.core.smartcontract.shim.impl.Response.Status.SU
  */
 public abstract class SmartContractBase implements ISmartContract {
     @Override
-    public abstract Response init(ISmartContractStub stub);
+    public abstract SmartContractResponse init(ISmartContractStub stub);
 
     @Override
-    public abstract Response invoke(ISmartContractStub stub);
+    public abstract SmartContractResponse invoke(ISmartContractStub stub);
 
     @Override
     public abstract String getSmartContractStrDescription();
@@ -187,39 +187,39 @@ public abstract class SmartContractBase implements ISmartContract {
         }
     }
 
-    protected static Response newSuccessResponse(String message, byte[] payload) {
-        return new Response(SUCCESS, message, payload);
+    protected static SmartContractResponse newSuccessResponse(String message, byte[] payload) {
+        return new SmartContractResponse(SUCCESS, message, payload);
     }
 
-    protected static Response newSuccessResponse() {
+    protected static SmartContractResponse newSuccessResponse() {
         return newSuccessResponse(null, null);
     }
 
-    protected static Response newSuccessResponse(String message) {
+    protected static SmartContractResponse newSuccessResponse(String message) {
         return newSuccessResponse(message, null);
     }
 
-    protected static Response newSuccessResponse(byte[] payload) {
+    protected static SmartContractResponse newSuccessResponse(byte[] payload) {
         return newSuccessResponse(null, payload);
     }
 
-    protected static Response newErrorResponse(String message, byte[] payload) {
-        return new Response(INTERNAL_SERVER_ERROR, message, payload);
+    protected static SmartContractResponse newErrorResponse(String message, byte[] payload) {
+        return new SmartContractResponse(INTERNAL_SERVER_ERROR, message, payload);
     }
 
-    protected static Response newErrorResponse() {
+    protected static SmartContractResponse newErrorResponse() {
         return newErrorResponse(null, null);
     }
 
-    protected static Response newErrorResponse(String message) {
+    protected static SmartContractResponse newErrorResponse(String message) {
         return newErrorResponse(message, null);
     }
 
-    protected static Response newErrorResponse(byte[] payload) {
+    protected static SmartContractResponse newErrorResponse(byte[] payload) {
         return newErrorResponse(null, payload);
     }
 
-    protected static Response newErrorResponse(Throwable throwable) {
+    protected static SmartContractResponse newErrorResponse(Throwable throwable) {
         return newErrorResponse(throwable.getMessage(), printStackTrace(throwable));
     }
 

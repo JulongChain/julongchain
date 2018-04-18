@@ -21,12 +21,11 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
 import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.node.NodeTool;
-import org.bcia.javachain.core.smartcontract.shim.impl.Response;
+import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
 import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
 import org.bcia.javachain.core.ssc.essc.ESSC;
 import org.bcia.javachain.protos.node.ProposalPackage;
-import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -60,7 +59,7 @@ public class QSSC extends SystemSmartContractBase {
     // This allows the chaincode to initialize any variables on the ledger prior
     // to any transaction execution on the chain.
     @Override
-    public Response init(ISmartContractStub stub) {
+    public SmartContractResponse init(ISmartContractStub stub) {
         log.info("Successfully initialized QSSC");
         return newSuccessResponse();
     }
@@ -73,7 +72,7 @@ public class QSSC extends SystemSmartContractBase {
     // # GetBlockByHash: Return the block specified by block hash in args[2]
     // # GetTransactionByID: Return the transaction specified by ID in args[2]
     @Override
-    public Response invoke(ISmartContractStub stub) {
+    public SmartContractResponse invoke(ISmartContractStub stub) {
         log.debug("Enter QSSC invoke function");
         List<byte[]> args = stub.getArgs();
         int size=args.size();
@@ -128,25 +127,25 @@ public class QSSC extends SystemSmartContractBase {
         return "QSSC."+function;
     }
 
-    private Response getTransactionByID(INodeLedger vledger,byte[] tid){
+    private SmartContractResponse getTransactionByID(INodeLedger vledger, byte[] tid){
 
         return null;
     }
 
-    private Response getBlockByNumber(INodeLedger vledger,byte[] number){
+    private SmartContractResponse getBlockByNumber(INodeLedger vledger, byte[] number){
 
         return null;
     }
 
-    private Response getBlockByHash(INodeLedger vledger,byte[] hash){
+    private SmartContractResponse getBlockByHash(INodeLedger vledger, byte[] hash){
         return null;
     }
 
-    private Response getGroupInfo(INodeLedger vledger){
+    private SmartContractResponse getGroupInfo(INodeLedger vledger){
         return null;
     }
 
-    private Response getBlockByTxID(INodeLedger vledger,byte[] rawTxID){
+    private SmartContractResponse getBlockByTxID(INodeLedger vledger, byte[] rawTxID){
         return null;
     }
 

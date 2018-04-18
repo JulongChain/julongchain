@@ -15,19 +15,16 @@
  */
 package org.bcia.javachain.core.ssc.essc;
 
-import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.proto.ProtoUtils;
-import org.bcia.javachain.core.smartcontract.shim.impl.Response;
+import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
 import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
-import org.bcia.javachain.core.ssc.SystemSmartContractManager;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.springframework.stereotype.Component;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
@@ -42,7 +39,7 @@ public class ESSC extends SystemSmartContractBase {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ESSC.class);
 
     @Override
-    public Response init(ISmartContractStub stub) {
+    public SmartContractResponse init(ISmartContractStub stub) {
         log.info("Successfully initialized ESSC");
         return newSuccessResponse();
     }
@@ -63,7 +60,7 @@ public class ESSC extends SystemSmartContractBase {
      * @return
      */
     @Override
-    public Response invoke(ISmartContractStub stub) {
+    public SmartContractResponse invoke(ISmartContractStub stub) {
         log.debug("Enter ESSC invoke function");
         //List<String> args = stub.getStringArgs();
         List<byte[]> args = stub.getArgs();
@@ -106,19 +103,19 @@ public class ESSC extends SystemSmartContractBase {
         //String strResponse=args.get(4);
         byte[] byteResponse = args.get(4);
         if(byteResponse.length==0){
-            return newErrorResponse("Response of smartcontract executing is null");
+            return newErrorResponse("SmartContractResponse of smartcontract executing is null");
         }
         ProposalResponsePackage.Response proResponse;
         try {
             //proResponse=ProtoUtils.getResponse(strResponse);
             proResponse=ProtoUtils.getResponse(byteResponse);
         } catch (Exception e) {
-            return newErrorResponse(String.format("Failed to get Response of executing smartcontract: %s",e.getMessage()));
+            return newErrorResponse(String.format("Failed to get SmartContractResponse of executing smartcontract: %s",e.getMessage()));
         }
 
-        if(proResponse.getStatus()>=Response.Status.ERRORTHRESHOLD.getCode()){
+        if(proResponse.getStatus()>= SmartContractResponse.Status.ERRORTHRESHOLD.getCode()){
             return newErrorResponse(String.format("Status code less than %d will be endorsed, received status code: %d",
-                    Response.Status.ERRORTHRESHOLD.getCode(),proResponse.getStatus()));
+                    SmartContractResponse.Status.ERRORTHRESHOLD.getCode(),proResponse.getStatus()));
         }
 
 
@@ -183,7 +180,7 @@ public class ESSC extends SystemSmartContractBase {
         }
 
         if(pResp==null){
-            return newErrorResponse("GetProposalResponse get empty Response");
+            return newErrorResponse("GetProposalResponse get empty SmartContractResponse");
         }
 
         log.debug("ESSC exits successfully");

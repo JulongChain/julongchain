@@ -25,22 +25,19 @@ import org.bcia.javachain.common.util.proto.ProtoUtils;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
 import org.bcia.javachain.core.aclmgmt.resources.Resources;
 import org.bcia.javachain.core.common.smartcontractprovider.ISmartContractPackage;
-import org.bcia.javachain.core.common.smartcontractprovider.SmartContractCode;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractData;
 import org.bcia.javachain.core.common.sysscprovider.ISystemSmartContractProvider;
 import org.bcia.javachain.core.common.sysscprovider.SystemSmartContractFactory;
 import org.bcia.javachain.core.node.NodeTool;
 import org.bcia.javachain.core.policy.IPolicyChecker;
 import org.bcia.javachain.core.policy.PolicyFactory;
-import org.bcia.javachain.core.smartcontract.shim.impl.Response;
+import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
 import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
 import org.bcia.javachain.msp.mgmt.Principal;
 import org.bcia.javachain.protos.common.Policies;
 import org.bcia.javachain.protos.node.ProposalPackage;
-import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Smartcontract;
-import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -88,7 +85,7 @@ public class LSSC  extends SystemSmartContractBase {
 
     private IPolicyChecker checker;
     @Override
-    public Response init(ISmartContractStub stub) {
+    public SmartContractResponse init(ISmartContractStub stub) {
         this.sscProvider=SystemSmartContractFactory.getSystemSmartContractProvider();
         this.checker= PolicyFactory.getPolicyChecker();
         log.info("Successfully initialized LSSC");
@@ -101,7 +98,7 @@ public class LSSC  extends SystemSmartContractBase {
     // Invoke also implements some query-like functions
     // Get chaincode arguments -  {[]byte("getid"), []byte(<chainname>), []byte(<chaincodename>)}
     @Override
-    public Response invoke(ISmartContractStub stub) {
+    public SmartContractResponse invoke(ISmartContractStub stub) {
         log.debug("Enter LSSC invoke function");
         List<byte[]> args = stub.getArgs();
         int size=args.size();
@@ -304,11 +301,11 @@ public class LSSC  extends SystemSmartContractBase {
     }
 
     // getSmartcontracts returns all smartcontracts instantiated on this LSSC's group
-    private Response getSmartContracts(ISmartContractStub stub){
+    private SmartContractResponse getSmartContracts(ISmartContractStub stub){
         return null;
     }
 
-    private Response getInstalledSmartContracts(){
+    private SmartContractResponse getInstalledSmartContracts(){
         return null;
     }
 
