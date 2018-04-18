@@ -17,7 +17,6 @@ package org.bcia.javachain.core.common.smartcontractprovider;
 
 import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
 import org.bcia.javachain.common.resourceconfig.Validation;
-import org.bcia.javachain.core.node.NodeConfig;
 import org.bcia.javachain.protos.node.Query;
 
 /**
@@ -44,7 +43,7 @@ public class SmartContractData implements ISmartContractDefinition {
     }
 
     @Override
-    public String smartContractName() {
+    public String getSmartContractName() {
         return scInfo.getName();
     }
 
@@ -54,7 +53,7 @@ public class SmartContractData implements ISmartContractDefinition {
     }
 
     @Override
-    public String smartContractVersion() {
+    public String getSmartContractVersion() {
         return scInfo.getVersion();
     }
 
@@ -64,7 +63,7 @@ public class SmartContractData implements ISmartContractDefinition {
     }
 
     @Override
-    public String endorsement() {
+    public String getEndorsement() {
         return scInfo.getEssc();
     }
 

@@ -29,7 +29,7 @@ public interface ISmartContractDefinition {
      *
      * @return
      */
-    String smartContractName();
+    String getSmartContractName();
 
     /** Hash returns the hash of the chaincode.
      *
@@ -41,7 +41,7 @@ public interface ISmartContractDefinition {
      *
      * @return
      */
-    String smartContractVersion();
+    String getSmartContractVersion();
 
     /** Validation returns how to validate transactions for this chaincode.
      * The string returned is the name of the validation method (usually 'vscc')
@@ -57,6 +57,6 @@ public interface ISmartContractDefinition {
      *
      * @return
      */
-    String endorsement();
+    String getEndorsement();
 
 }
