@@ -118,8 +118,14 @@ public class ProtoUtils {
         return message.toByteArray();
     }
 
-    public static Smartcontract.SmartContractDeploymentSpec getSmartContractDeploymentSpec(byte[] code) throws InvalidProtocolBufferException {
-        return Smartcontract.SmartContractDeploymentSpec.parseFrom(code);
+    /**
+     * 从字节流中解析出SmartContractDeploymentSpec
+     * @param depSpecBytes
+     * @return
+     * @throws InvalidProtocolBufferException
+     */
+    public static Smartcontract.SmartContractDeploymentSpec getSmartContractDeploymentSpec(byte[] depSpecBytes) throws InvalidProtocolBufferException {
+        return Smartcontract.SmartContractDeploymentSpec.parseFrom(depSpecBytes);
     }
 
 

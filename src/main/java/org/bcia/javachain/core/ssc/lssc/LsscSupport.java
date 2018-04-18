@@ -22,7 +22,7 @@ import org.bcia.javachain.protos.node.Query;
 import org.springframework.stereotype.Component;
 
 /**
- * LSSC的支持类
+ * LSSC的支持类,包含LSSC执行任务所需的函数
  *
  * @author sunianle
  * @date 3/13/18
@@ -30,28 +30,54 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class LsscSupport {
-    // PutSmartcontractToLocalStorage stores the supplied smartcontract
-    // package to local storage (i.e. the file system)
+    /**
+     * putSmartcontractToLocalStorage stores the supplied smartcontract
+     * package to local storage (i.e. the file system)
+     * @param scPackage
+     */
     public void putSmartContractToLocalStorage(ISmartContractPackage scPackage){
 
     }
-    // GetSmartcontractFromLocalStorage retrieves the smartcontract package
-    // for the requested smartcontract, specified by name and version
+
+    /**
+     * getSmartcontractFromLocalStorage retrieves the smartcontract package
+     * for the requested smartcontract, specified by name and version
+     * @param smartcontractName
+     * @param version
+     * @return
+     */
     public ISmartContractPackage getSmartContractFromLocalStorage(String smartcontractName,String version){
         return null;
     }
-    // GetSmartcontractsFromLocalStorage returns an array of all smartcontract
-    // data that have previously been persisted to local storage
+
+    /**
+     * getSmartcontractsFromLocalStorage returns an array of all smartcontract
+     * data that have previously been persisted to local storage
+     * @return
+     */
     public Query.SmartContractQueryResponse getSmartContractsFromLocalStorage(){
         return null;
     }
-    // GetInstantiationPolicy returns the instantiation policy for the
-    // supplied smartcontract (or the channel's default if none was specified)
+
+    /**
+     * getInstantiationPolicy returns the instantiation policy for the
+     * supplied smartcontract (or the channel's default if none was specified)
+     * @param group
+     * @param scPackage
+     * @return
+     */
     byte[] getInstantiationPolicy(String group,ISmartContractPackage scPackage){
         return null;
     }
-    // CheckInstantiationPolicy checks whether the supplied signed proposal
-    // complies with the supplied instantiation policy
+
+
+    /**
+     * checkInstantiationPolicy checks whether the supplied signed proposal
+     * complies with the supplied instantiation policy
+     * @param signedProposal
+     * @param groupName
+     * @param instantiationPolicy
+     */
     void checkInstantiationPolicy(ProposalPackage.SignedProposal signedProposal,
                                   String groupName,
                                   byte[] instantiationPolicy){
