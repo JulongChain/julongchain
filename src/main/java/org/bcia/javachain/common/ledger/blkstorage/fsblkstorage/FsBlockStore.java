@@ -131,7 +131,7 @@ public class FsBlockStore implements BlockStore {
         return null;
     }
 
-    void shutdown() {
+    public void shutdown() {
         return;
     }
 
