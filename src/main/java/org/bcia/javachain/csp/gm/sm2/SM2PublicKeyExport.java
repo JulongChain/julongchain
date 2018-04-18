@@ -16,6 +16,8 @@
 package org.bcia.javachain.csp.gm.sm2;
 
 import org.bcia.javachain.consenter.util.LoadYaml;
+import org.bcia.javachain.csp.gm.sm2.util.SM2KeyUtil;
+import org.bouncycastle.util.encoders.Base64;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -34,8 +36,17 @@ public class SM2PublicKeyExport extends SM2KeyExport {
         //根据nodeid获取私钥,路径可通过配置文件中读取
        // URL url = SM2PublicKeyExport.class.getClassLoader().getResource("publickey.pem");
         HashMap map= (HashMap) LoadYaml.readYamlFile("gmcsp.yaml");
-        String  publickey= (String) ((HashMap) ((HashMap)((HashMap)((HashMap) map.get("node")).get("CSP")).get("GM")).get("FileKeyStore")).get("PublicKeyStore");
-        return sm2.importPublicKey(publickey).getEncoded(false);
+        String  publicKeyPath= (String) ((HashMap) ((HashMap)((HashMap)((HashMap) map.get("node")).get("csp")).get("gm")).get("fileKeyStore")).get("publicKeyStore");
+
+        String publicKeyStr = null;
+        try {
+            publicKeyStr = SM2KeyUtil.readFile(publicKeyPath);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        byte[] publicKey = Base64.decode(publicKeyStr);
+        return publicKey;
+
     }
 
     @Override

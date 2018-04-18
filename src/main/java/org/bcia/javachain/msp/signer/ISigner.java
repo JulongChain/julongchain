@@ -13,30 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.msp.entity;
+package org.bcia.javachain.msp.signer;
 
-
-import org.bouncycastle.asn1.x509.Certificate;
-import org.bouncycastle.jcajce.provider.asymmetric.X509;
-
-import javax.security.cert.X509Certificate;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.Serializable;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-
+import org.bcia.javachain.csp.intfs.opts.ISignerOpts;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/14
+ * @Date: 2018/4/18
  * @company Dingxuan
  */
-public class Identity implements Serializable{
+public interface ISigner {
 
-    IdentityIdentifier identityIdentifier;
-    Cert cert;
-    CspKey cspKey;
-    CspMsp cspMsp;
+    Object publicKey();
 
+    byte[] Sign(Reader reader,byte[] digest, ISignerOpts opts);
+
+    interface  Reader{
+        int Read(byte[] p);
+    }
 }

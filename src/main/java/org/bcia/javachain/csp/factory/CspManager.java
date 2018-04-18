@@ -85,7 +85,8 @@ public class CspManager {
     public static ICsp getDefaultCsp(){
         if(defaultCsp==null){
             log.warn("Before using CSP, please call initCspFactories(). Falling back to bootCsp.");
-            IFactoryOpts opts = new GmFactoryOpts(256, "SM3", true, true, "",true);
+            //IFactoryOpts opts = new GmFactoryOpts(256, "SM3", true, true, "",true);
+            IFactoryOpts opts = new GmFactoryOpts();
             GmCspFactory factory=new GmCspFactory();
             bootCsp=factory.getCsp(opts);
             return bootCsp;

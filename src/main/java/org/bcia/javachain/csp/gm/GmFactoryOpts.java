@@ -24,6 +24,12 @@ package org.bcia.javachain.csp.gm;
  */
 
 public class GmFactoryOpts implements IGmFactoryOpts {
+    private String symmetricKeyType;
+    private String asymmetricKeyType;
+    private String hashType;
+    private String signType;
+    private String publicKeyPath;
+    private String privateKeyPath;
     private int secLevel;
     private String hashFamily;
     private boolean bEphemeral;
@@ -31,24 +37,41 @@ public class GmFactoryOpts implements IGmFactoryOpts {
     private String keyStorePath;
     private boolean bDefaultCsp;
 
-    public GmFactoryOpts(int secLevel,String hashFamily,boolean bEphemeral,
-                         boolean bDummyKeyStore,String keyStorePath,boolean bDefaultCsp){
-        this.secLevel=secLevel;
-        this.hashFamily=hashFamily;
-        this.bEphemeral=bEphemeral;
-        this.bDummyKeyStore=bDummyKeyStore;
-        this.keyStorePath=keyStorePath;
-        this.bDefaultCsp=bDefaultCsp;
+    public GmFactoryOpts() {
+    }
+
+    public GmFactoryOpts(String symmetricKeyType, String asymmetricKeyType, String hashType, String signType, String publicKeyPath, String privateKeyPath) {
+        this.symmetricKeyType = symmetricKeyType;
+        this.asymmetricKeyType = asymmetricKeyType;
+        this.hashType = hashType;
+        this.signType = signType;
+        this.publicKeyPath = publicKeyPath;
+        this.privateKeyPath = privateKeyPath;
+    }
+
+    @Override
+    public String getProviderName() {
+        return "GM";
+    }
+
+    @Override
+    public String getProviderDescription() {
+        return null;
+    }
+
+    @Override
+    public boolean isDefaultCsp() {
+        return bDefaultCsp;
     }
 
     @Override
     public int getSecLevel() {
-        return secLevel;
+        return 0;
     }
 
     @Override
     public String getHashFamily() {
-        return hashFamily;
+        return null;
     }
 
     @Override
@@ -63,21 +86,6 @@ public class GmFactoryOpts implements IGmFactoryOpts {
 
     @Override
     public boolean isDummyKeystore() {
-        return false;
-    }
-
-    @Override
-    public String getProviderName() {
-        return null;
-    }
-
-    @Override
-    public String getProviderDescription() {
-        return null;
-    }
-
-    @Override
-    public boolean isDefaultCsp() {
         return bDefaultCsp;
     }
 }

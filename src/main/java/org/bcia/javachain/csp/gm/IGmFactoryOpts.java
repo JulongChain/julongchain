@@ -28,7 +28,7 @@ import org.bcia.javachain.csp.factory.IFactoryOpts;
 // The IGmFactoryOpts contains options for the GmFactory.
 public interface IGmFactoryOpts extends IFactoryOpts {
 
-    // Algorithm options.
+    //Algorithm options.
     int getSecLevel();
     String getHashFamily();
 
@@ -36,4 +36,5 @@ public interface IGmFactoryOpts extends IFactoryOpts {
     boolean isEphemeral();
     String getKeyStorePath();
     boolean isDummyKeystore();
+
 }

@@ -17,7 +17,9 @@ package org.bcia.javachain.common.localmsp.impl;
 
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
-import org.bcia.javachain.msp.mgmt.Mgmt;
+import org.bcia.javachain.msp.mgmt.Identity;
+import org.bcia.javachain.msp.mgmt.Msp;
+import org.bcia.javachain.msp.mgmt.MspManager;
 import org.bcia.javachain.protos.common.Common;
 import java.io.UnsupportedEncodingException;
 
@@ -30,8 +32,15 @@ public class LocalSigner implements ILocalSigner {
     @Override
     public Common.SignatureHeader newSignatureHeader() {
         try {
-            return Common.SignatureHeader.newBuilder().setCreator(ByteString.copyFrom("zhouhui", "UTF-8")).build();
-        } catch (UnsupportedEncodingException e) {
+            Identity identity= (Identity) MspManager.getLocalMsp().getDefaultSigningIdentity();
+            byte[] creatorIdentityRaw=identity.serialize();
+            Common.SignatureHeader.Builder signatureHeader=Common.SignatureHeader.newBuilder();
+            //TODO 随机数实现
+            byte[] none="test".getBytes();
+            signatureHeader.setNonce(ByteString.copyFrom(none));
+            signatureHeader.setCreator(ByteString.copyFrom(creatorIdentityRaw));
+            return signatureHeader.build();
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -41,11 +50,6 @@ public class LocalSigner implements ILocalSigner {
     @Override
     public byte[] sign(byte[] message) {
        //通过获取msp实例,从实例中
-        return  Mgmt.getLocalMsp().getDefaultSigningIdentity().sign(message);
-    }
-    public static  void main(String[] args){
-        LocalSigner localSigner=new LocalSigner();
-        localSigner.sign("123".getBytes());
-
+        return  MspManager.getLocalMsp().getDefaultSigningIdentity().sign(message);
     }
 }

@@ -35,6 +35,9 @@ public interface IIdentity {
      * 返回此实例的msp id
      * @return
      */
+
+
+
      String getMSPIdentifier();
 
      void validate();

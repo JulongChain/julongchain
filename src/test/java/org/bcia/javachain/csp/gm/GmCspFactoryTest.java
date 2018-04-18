@@ -47,7 +47,8 @@ public class GmCspFactoryTest {
     @Test
     public void getCsp() {
         GmCspFactory factory = new GmCspFactory();
-        IFactoryOpts opts = new GmFactoryOpts(256, "SM3", true, true, "",true);
+       // IFactoryOpts opts = new GmFactoryOpts(256, "SM3", true, true, "",true);
+        IFactoryOpts opts = new GmFactoryOpts();
         ICsp csp = factory.getCsp(opts);
         Assert.assertNotNull(csp);
         try {

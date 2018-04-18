@@ -16,17 +16,21 @@
 package org.bcia.javachain.csp.gm.sm2.util;
 
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.csp.gm.sm2.SM2;
 import org.bcia.javachain.csp.gm.sm2.SM2Key;
 import org.bcia.javachain.csp.gm.sm2.SM2KeyExport;
 import org.bcia.javachain.csp.gm.sm2.SM2KeyGenOpts;
+import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bcia.javachain.csp.intfs.IKey;
 import org.bcia.javachain.csp.intfs.opts.IKeyGenOpts;
+import org.bouncycastle.asn1.*;
 import org.bouncycastle.math.ec.ECPoint;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 
 /**
  * @author zhangmingyang
@@ -34,6 +38,9 @@ import java.io.IOException;
  * @company Dingxuan
  */
 public class SM2KeyUtil {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(SM2KeyUtil.class);
+    private static SecureRandom random = new SecureRandom();
+
     /**
      * 生成非对称密钥文件
      * @param k
@@ -62,4 +69,181 @@ public class SM2KeyUtil {
         }
         return null;
     }
+
+    /**
+     * 以16进制打印字节数组
+     *
+     * @param b
+     */
+    public static void printHexString(byte[] b) {
+        for (int i = 0; i < b.length; i++) {
+            String hex = Integer.toHexString(b[i] & 0xFF);
+            if (hex.length() == 1) {
+                hex = '0' + hex;
+            }
+            System.out.print(hex.toUpperCase());
+        }
+        System.out.println();
+    }
+
+    /**
+     * 将字节数组转换为BigInteger数组
+     * @param sig
+     * @return
+     */
+    public static BigInteger[] decode(byte[] sig) {
+        ASN1Sequence s = ASN1Sequence.getInstance(sig);
+
+        return new BigInteger[]{ASN1Integer.getInstance(s.getObjectAt(0)).getValue(),
+                ASN1Integer.getInstance(s.getObjectAt(1)).getValue()};
+    }
+
+    /**
+     * 转换签名值r和s为字节数组
+     * @param r
+     * @param s
+     * @return
+     * @throws IOException
+     */
+    public static byte[] derEncode(BigInteger r, BigInteger s)
+            throws IOException {
+
+        ASN1EncodableVector v = new ASN1EncodableVector();
+        v.add(new ASN1Integer(r));
+        v.add(new ASN1Integer(s));
+        return new DERSequence(v).getEncoded(ASN1Encoding.DER);
+    }
+
+    /**
+     * 随机数生成器
+     *
+     * @param max
+     * @return
+     */
+    public static BigInteger random(BigInteger max) {
+
+        BigInteger r = new BigInteger(256, random);
+        // int count = 1;
+
+        while (r.compareTo(max) >= 0) {
+            r = new BigInteger(128, random);
+            // count++;
+        }
+        return r;
+    }
+
+
+    /**
+     * 判断字节数组是否全0
+     *
+     * @param buffer
+     * @return
+     */
+    public static boolean allZero(byte[] buffer) {
+        for (int i = 0; i < buffer.length; i++) {
+            if (buffer[i] != 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+
+
+    /**
+     * 密钥派生函数
+     *
+     * @param Z
+     * @param klen 生成klen字节数长度的密钥
+     * @return
+     */
+    public static byte[] KDF(byte[] Z, int klen) {
+        int ct = 1;
+        int end = (int) Math.ceil(klen * 1.0 / 32);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            for (int i = 1; i < end; i++) {
+                baos.write(sm3hash(Z, SM3.toByteArray(ct)));
+                ct++;
+            }
+            byte[] last = sm3hash(Z, SM3.toByteArray(ct));
+            if (klen % 32 == 0) {
+                baos.write(last);
+            } else {
+                baos.write(last, 0, klen % 32);
+            }
+            return baos.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 判断是否在范围内
+     *
+     * @param param
+     * @param min
+     * @param max
+     * @return
+     */
+    public static boolean between(BigInteger param, BigInteger min, BigInteger max) {
+        if (param.compareTo(min) >= 0 && param.compareTo(max) < 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    /**
+     * sm3摘要
+     *
+     * @param params
+     * @return
+     */
+    public  static byte[] sm3hash(byte[]... params) {
+        byte[] res = null;
+        try {
+            res = SM3.hash(join(params));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+
+    /**
+     * 字节数组拼接
+     *
+     * @param params
+     * @return
+     */
+    public static byte[] join(byte[]... params) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        byte[] res = null;
+        try {
+            for (int i = 0; i < params.length; i++) {
+                baos.write(params[i]);
+            }
+            res = baos.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return res;
+    }
+
+    public static String readFile(String filePath) throws Exception {
+        File inFile = new File(filePath);
+        long fileLen = inFile.length();
+        Reader reader = new FileReader(inFile);
+
+        char[] content = new char[(int) fileLen];
+        reader.read(content);
+       // log.info("读取到的内容为：" + new String(content));
+        return new String(content);
+    }
+
 }

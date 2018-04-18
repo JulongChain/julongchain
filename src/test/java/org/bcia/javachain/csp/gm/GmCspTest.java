@@ -46,7 +46,8 @@ public class GmCspTest {
         System.out.println("set up...");
         GmCspFactory factory = new GmCspFactory();
         Assert.assertNotNull(factory);
-        IFactoryOpts opts = new GmFactoryOpts(256, "SM3", true, true, "",true);
+       // IFactoryOpts opts = new GmFactoryOpts(256, "SM3", true, true, "",true);
+        IFactoryOpts opts = new GmFactoryOpts();
         csp=factory.getCsp(opts);
         Assert.assertNotNull(csp);
     }

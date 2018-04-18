@@ -16,6 +16,7 @@ package org.bcia.javachain.csp.gm.sm3;
  * limitations under the License.
  */
 
+import org.bcia.javachain.csp.intfs.IHash;
 import org.bcia.javachain.csp.intfs.opts.IHashOpts;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bouncycastle.crypto.digests.SM3Digest;
@@ -32,12 +33,11 @@ import java.util.Arrays;
  * @company Dingxuan
  */
 
-public class SM3 {
+public class SM3 implements IHash{
     private static char[] hexDigits = {'0', '1', '2', '3', '4', '5', '6', '7', '8',
             '9', 'A', 'B', 'C', 'D', 'E', 'F'};
     private static final String ivHexStr = "7380166f 4914b2b9 172442d7 da8a0600 a96f30bc 163138aa e38dee4d b0fb0e4e";
-    private static final BigInteger IV = new BigInteger(ivHexStr.replaceAll(" ",
-            ""), 16);
+    private static final BigInteger IV = new BigInteger(ivHexStr.replaceAll(" ", ""), 16);
     private static final Integer Tj15 = Integer.valueOf("79cc4519", 16);
     private static final Integer Tj63 = Integer.valueOf("7a879d8a", 16);
     private static final byte[] FirstPadding = {(byte) 0x80};
@@ -247,4 +247,28 @@ public class SM3 {
         return resultSb.toString();
     }
 
+    @Override
+    public int write(byte[] p) {
+        return 0;
+    }
+
+    @Override
+    public byte[] sum(byte[] b) {
+        return new byte[0];
+    }
+
+    @Override
+    public void reset() {
+
+    }
+
+    @Override
+    public int size() {
+        return 0;
+    }
+
+    @Override
+    public int blockSize() {
+        return 0;
+    }
 }

@@ -40,7 +40,7 @@ public class CspKey implements IKey {
 
     @Override
     public boolean isPrivate() {
-        return false;
+        return  false;
     }
 
     @Override

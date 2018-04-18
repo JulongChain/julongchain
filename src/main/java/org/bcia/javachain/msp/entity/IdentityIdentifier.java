@@ -24,6 +24,11 @@ public class IdentityIdentifier {
     public String Mspid;
     public String Id;
 
+    public IdentityIdentifier(String mspid, String id) {
+        Mspid = mspid;
+        Id = id;
+    }
+
     public IdentityIdentifier(String mspid) {
         Mspid = mspid;
     }
