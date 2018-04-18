@@ -15,6 +15,8 @@
  */
 package org.bcia.javachain.common.ledger.blkstorage;
 
+import org.bcia.javachain.common.exception.LedgerException;
+
 /**
  * 类描述
  *
@@ -31,4 +33,6 @@ public class BlockStorage {
     public static final String INDEXABLE_ATTR_BLOCK_TX_ID = "BlockTxID";
     public static final String INDEXABLE_ATTR_TX_VALIDATION_CODE = "TxValidationCode";
 
+    public static final LedgerException ERR_ARRT_NOT_INDEXED = new LedgerException("Attribute not indexed");
+    public static final LedgerException ERR_NOT_FOUND_IN_INDEX = new LedgerException("Entry not found in index");
 }

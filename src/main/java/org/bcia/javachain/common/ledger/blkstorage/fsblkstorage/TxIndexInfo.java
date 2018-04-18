@@ -16,10 +16,10 @@
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 /**
- * 类描述
+ * 封装交易索引信息
  *
- * @author
- * @date 2018/3/7
+ * @author sunzongyu
+ * @date 2018/04/12
  * @company Dingxuan
  */
 public class TxIndexInfo {

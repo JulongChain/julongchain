@@ -15,9 +15,12 @@
  */
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.DBHandle;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBHandle;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.node.TransactionPackage;
@@ -29,18 +32,71 @@ import org.bcia.javachain.protos.node.TransactionPackage;
  * @date 2018/3/9
  * @company Dingxuan
  */
-public class FsBlockStore {
+public class FsBlockStore implements BlockStore {
 
     private String id;
     private Conf conf;
     private BlockfileMgr blockfileMgr;
 
-    public static FsBlockStore newFsBlockStore(String id, Conf conf, IndexConfig indexConfig, DBHandle dbHandle) {
+    public static FsBlockStore newFsBlockStore(String id,
+                                               Conf conf,
+                                               IndexConfig indexConfig,
+                                               LevelDbProvider dbHandle) throws LedgerException {
+        FsBlockStore fsBlockStore = new FsBlockStore();
+        BlockfileMgr mgr = BlockfileMgr.newBlockfileMgr(id, conf, indexConfig, dbHandle);
+        fsBlockStore.setId(id);
+        fsBlockStore.setConf(conf);
+        fsBlockStore.setBlockfileMgr(mgr);
+        return fsBlockStore;
+    }
+
+    public void addBlock(Common.Block block) {
+        return;
+    }
+
+    @Override
+    public Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException {
         return null;
     }
 
-    void addBlock(Common.Block block) {
-        return;
+    @Override
+    public ResultsIterator retrieveBlocks(long startBlockNumber) {
+        return null;
+    }
+
+    @Override
+    public ResultsIterator retrieveBlocks(Long startNum) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public Common.Block retrieveBlockByHash(byte[] blockHash) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public Common.Block retrieveBlockByNumber(Long blockNum) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public Common.Envelope retrieveTxByID(String txID) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public Common.Envelope retrieveTxByBlockNumTranNum(Long blockNum, Long tranNum) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public Common.Block retrieveBlockByTxID(String txID) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public TransactionPackage.TxValidationCode retrieveTxValidationCodeByTxID(String txID) throws LedgerException {
+        return null;
     }
 
     Ledger.BlockchainInfo GetBlockchainInfo() {

@@ -36,7 +36,7 @@ public class Config {
 
     public static final Integer DEFAULT_MAX_BLOCKFILE_SIZE = 64 * 1024 * 1024;
 
-    public Conf newConf(String blockStorageDir, Integer maxBlockfileSize) {
+    public static Conf newConf(String blockStorageDir, Integer maxBlockfileSize) {
         if(maxBlockfileSize <= 0) {
             maxBlockfileSize = DEFAULT_MAX_BLOCKFILE_SIZE;
         }

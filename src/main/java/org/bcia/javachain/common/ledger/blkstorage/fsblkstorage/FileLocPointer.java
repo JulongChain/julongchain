@@ -15,11 +15,14 @@
  */
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.bcia.javachain.core.ledger.util.Util;
+
 /**
  * 类描述
  *
- * @author wanliangbing
- * @date 2018/3/8
+ * @author sunzongyu
+ * @date 2018/04/12
  * @company Dingxuan
  */
 public class FileLocPointer {
@@ -27,12 +30,30 @@ public class FileLocPointer {
     private Integer fileSuffixNum;
     private LocPointer locPointer;
 
+    public static FileLocPointer newFileLocationPointer(Integer fileSuffixNum, Integer beginningOffset, LocPointer relativeLP) {
+        FileLocPointer flp = new FileLocPointer();
+        LocPointer lp = new LocPointer();
+        lp.setOffset(beginningOffset + relativeLP.getOffset());
+        lp.setBytesLength(relativeLP.getBytesLength());
+        flp.setLocPointer(lp);
+        return flp;
+    }
+
     byte[] marshal() {
-        return null;
+        byte[] fileSUffixNumBytes = Util.longToBytes(fileSuffixNum.longValue(), 8);
+        byte[] offsetBytes = Util.longToBytes(locPointer.getOffset().longValue(), 8);
+        byte[] bytesLengthBytes = Util.longToBytes(locPointer.getBytesLength(), 8);
+        byte[] result = ArrayUtils.addAll(fileSUffixNumBytes, offsetBytes);
+        return ArrayUtils.addAll(result, bytesLengthBytes);
     }
 
     void unmarshal(byte[] b) {
-        return;
+        fileSuffixNum = ((int) Util.bytesToLong(b, 0, 8));
+        if(locPointer == null){
+            locPointer = new LocPointer();
+        }
+        locPointer.setOffset(((int) Util.bytesToLong(b, 8, 8)));
+        locPointer.setBytesLength(((int) Util.bytesToLong(b, 16, 8)));
     }
 
     public Integer getFileSuffixNum() {
@@ -49,5 +70,10 @@ public class FileLocPointer {
 
     public void setLocPointer(LocPointer locPointer) {
         this.locPointer = locPointer;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("fielSuffixNum=%d, %s", fileSuffixNum, locPointer);
     }
 }

@@ -17,6 +17,8 @@ package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 import org.bcia.javachain.protos.common.Common;
 
+import java.util.List;
+
 /**
  * 类描述
  *
@@ -27,7 +29,7 @@ import org.bcia.javachain.protos.common.Common;
 public class SerializedBlockInfo {
 
     private Common.BlockHeader blockHeader;
-    private TxIndexInfo txOffsets;
+    private List<TxIndexInfo> txOffsets;
     private Common.BlockMetadata metadata;
 
     public Common.BlockHeader getBlockHeader() {
@@ -38,11 +40,11 @@ public class SerializedBlockInfo {
         this.blockHeader = blockHeader;
     }
 
-    public TxIndexInfo getTxOffsets() {
+    public List<TxIndexInfo> getTxOffsets() {
         return txOffsets;
     }
 
-    public void setTxOffsets(TxIndexInfo txOffsets) {
+    public void setTxOffsets(List<TxIndexInfo> txOffsets) {
         this.txOffsets = txOffsets;
     }
 

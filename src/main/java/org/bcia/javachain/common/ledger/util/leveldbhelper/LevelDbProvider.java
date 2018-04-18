@@ -15,40 +15,120 @@
  */
 package org.bcia.javachain.common.ledger.util.leveldbhelper;
 
-import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Conf;
+import org.apache.commons.lang3.ArrayUtils;
+import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.iq80.leveldb.DBIterator;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
- * 类描述
+ * 提供操作leveldb的方法
  *
- * @author wanliangbing
- * @date 2018/3/9
+ * @author sunzongyu
+ * @date 2018/04/03
  * @company Dingxuan
  */
-public class LevelDbProvider {
+public class LevelDbProvider{
 
-    /** NewProvider constructs a Provider
-     *
-     * @param conf
-     * @return
-     */
-    public static Provider newProvider(Conf conf) {
-        return null;
+    private static JavaChainLog logger = JavaChainLogFactory.getLog(LevelDbProvider.class);
+
+    private LevelDBHandle db = null;
+    private Map<String, LevelDBHandle> dbHandles = null;
+    private byte[] dbNameKeySep = new byte[1];
+    private byte lastKeyIndicator = 0x01;
+    private String dbPath = null;
+    private static LevelDbProvider instance = null;
+
+    private LevelDbProvider() throws LedgerException {
+        this.dbHandles = new HashMap<>();
+        dbNameKeySep[0] = 0x00;
+        db = new LevelDBHandle();
+        db.createDB(dbPath);
     }
 
-    /** NewUpdateBatch constructs an instance of a Batch
-     *
-     * @return
+    public String getDbPath() {
+        return dbPath;
+    }
+
+    public void setDbPath(String dbPath) {
+        this.dbPath = dbPath;
+    }
+
+    public LevelDBHandle getDb() {
+        return db;
+    }
+
+    public void setDb(LevelDBHandle db) {
+        this.db = db;
+    }
+
+    /**
+     * 单例获取provider实例
      */
+    public static synchronized LevelDbProvider newProvider() throws LedgerException {
+        if(instance == null){
+            instance = new LevelDbProvider();
+        }
+        return instance;
+    }
+
+    public LevelDBHandle getDbHandle(String dbName) {
+        LevelDBHandle LevelDBHandle = dbHandles.get(dbName);
+        if(LevelDBHandle == null){
+            LevelDBHandle = new LevelDBHandle();
+            dbHandles.put(dbName, LevelDBHandle);
+        }
+        return LevelDBHandle;
+    }
+
+    public void close() throws LedgerException {
+        db.close();
+    }
+
+    public byte[] get(byte[] key) throws LedgerException {
+        return db.get(key);
+    }
+
+    public void put(byte[] key, byte[] value, boolean sync) throws LedgerException {
+        db.put(key, value, sync);
+    }
+
+    public void delete(byte[] key, boolean sync) throws LedgerException {
+        db.delete(key, sync);
+    }
+
+    public void writeBatch(UpdateBatch batch, boolean sync) throws LedgerException {
+        db.writeBatch(batch, sync);
+    }
+
+    public Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey, byte[] endKey) throws LedgerException {
+        return db.getIterator(startKey, endKey);
+    }
+
     public static UpdateBatch newUpdateBatch() {
-        return null;
+        UpdateBatch batch = new UpdateBatch();
+        batch.setKvs(new HashMap<>());
+        return batch;
     }
 
     public byte[] constructLevelKey(String dbName, byte[] key) {
-        return null;
+        byte[] arr = ArrayUtils.addAll(dbName.getBytes(), dbNameKeySep);
+        arr = ArrayUtils.addAll(arr, key);
+        return arr;
     }
 
     public byte[] retrieveAppKey(byte[] levelKey) {
-        return null;
+        String str = new String(levelKey);
+        String follow = null;
+        int start = 0;
+        while(str.indexOf(new String(dbNameKeySep), start) != -1){
+            start++;
+        }
+        follow = str.substring(start, str.length());
+        return follow.getBytes();
     }
-
 }

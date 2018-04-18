@@ -18,8 +18,8 @@ package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 /**
  * 类描述
  *
- * @author
- * @date 2018/3/7
+ * @author sunzongyu
+ * @date 2018/04/12
  * @company Dingxuan
  */
 public class LocPointer {
@@ -41,5 +41,10 @@ public class LocPointer {
 
     public void setBytesLength(Integer bytesLength) {
         this.bytesLength = bytesLength;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("offset=%d, byteLength=%d", offset, bytesLength);
     }
 }

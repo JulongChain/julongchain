@@ -19,15 +19,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 类描述
+ * 批量操作
  *
- * @author wanliangbing
- * @date 2018/3/9
+ * @author sunzongyu
+ * @date 2018/04/09
  * @company Dingxuan
  */
-public class UpdateBatch {
+public class UpdateBatch  {
 
-    private Map<String,byte[]> kvs = new HashMap<>();
+    private Map<byte[],byte[]> kvs = new HashMap<>();
 
     /** Put adds a KV
      *
@@ -35,7 +35,7 @@ public class UpdateBatch {
      * @param value
      */
     public void put(byte[] key, byte[] value) {
-
+        kvs.put(key, value);
     }
 
     /** Delete deletes a Key and associated value
@@ -43,14 +43,14 @@ public class UpdateBatch {
      * @param key
      */
     public void delete(byte[] key) {
-
+        kvs.remove(key);
     }
 
-    public Map<String, byte[]> getKvs() {
+    public Map<byte[], byte[]> getKvs() {
         return kvs;
     }
 
-    public void setKvs(Map<String, byte[]> kvs) {
+    public void setKvs(Map<byte[], byte[]> kvs) {
         this.kvs = kvs;
     }
 }

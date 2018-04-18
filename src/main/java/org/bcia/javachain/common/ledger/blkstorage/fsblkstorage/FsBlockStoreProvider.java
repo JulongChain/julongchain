@@ -15,39 +15,46 @@
  */
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStoreProvider;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.Provider;
+import org.bcia.javachain.common.ledger.util.IoUtil;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBHandle;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 
 /**
  * 类描述
  *
- * @author wanliangbing
- * @date 2018/3/9
+ * @author sunzongyu
+ * @date 2018/04/17
  * @company Dingxuan
  */
-public class FsBlockStoreProvider {
+public class FsBlockStoreProvider implements BlockStoreProvider {
 
     private Conf conf;
     private IndexConfig indexConfig;
-    private Provider leveldbProvider;
+    private LevelDbProvider leveldbProvider;
 
     /**
      * NewProvider constructs a filesystem based block store provider
      *
      * @return
      */
-    public static BlockStoreProvider newProvider(Conf conf, IndexConfig indexConfig) {
-        return null;
+    public static BlockStoreProvider newProvider(Conf conf, IndexConfig indexConfig) throws LedgerException {
+        BlockStoreProvider provider = new FsBlockStoreProvider();
+        ((FsBlockStoreProvider) provider).setLeveldbProvider(LevelDbProvider.newProvider());
+        ((FsBlockStoreProvider) provider).setConf(conf);
+        ((FsBlockStoreProvider) provider).setIndexConfig(indexConfig);
+        return provider;
     }
 
     /**
      * CreateBlockStore simply calls OpenBlockStore*
      *
      */
-    public BlockStore createBlockStore(String ledgerid) {
-        return null;
+    public BlockStore createBlockStore(String ledgerid) throws LedgerException {
+        return openBlockStore(ledgerid);
     }
 
     /**
@@ -55,29 +62,29 @@ public class FsBlockStoreProvider {
      * If a blockstore is not existing, this method creates one
      * This method should be invoked only once for a particular ledgerid
      */
-    public BlockStore openBlockStore(String ledgerid) {
-        return null;
+    public BlockStore openBlockStore(String ledgerid) throws LedgerException {
+        return FsBlockStore.newFsBlockStore(ledgerid, conf, indexConfig, leveldbProvider);
     }
 
     /**
      * Exists tells whether the BlockStore with given id exists
      */
     public Boolean exists(String ledgerid) {
-        return null;
+         return IoUtil.fileExists(conf.getLedgerBlockDir(ledgerid)) >= 0;
     }
 
     /**
      * List lists the ids of the existing ledgers
      */
     public String[] list() {
-        return null;
+        return IoUtil.listSubdirs(conf.getChainsDir());
     }
 
     /**
      * Close closes the FsBlockstoreProvider
      */
-    void close() {
-
+    public void close() throws LedgerException {
+        leveldbProvider.close();
     }
 
     public Conf getConf() {
@@ -96,11 +103,11 @@ public class FsBlockStoreProvider {
         this.indexConfig = indexConfig;
     }
 
-    public Provider getLeveldbProvider() {
+    public LevelDbProvider getLeveldbProvider() {
         return leveldbProvider;
     }
 
-    public void setLeveldbProvider(Provider leveldbProvider) {
+    public void setLeveldbProvider(LevelDbProvider leveldbProvider) {
         this.leveldbProvider = leveldbProvider;
     }
 }
