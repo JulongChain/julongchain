@@ -21,6 +21,8 @@ import org.bcia.javachain.common.ledger.PrunePolicy;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
+import java.util.List;
+
 /**
  * 结点账本
  *
@@ -68,6 +70,15 @@ public interface INodeLedger extends ILedger {
     /**
      * 通过给出的政策修剪区块
      */
+
+    BlockAndPvtData getPvtDataAndBlockByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException;
+
+    List<TxPvtData> getPvtDataByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException;
+
+    void purgePrivateData(long maxBlockNumToRetain) throws LedgerException;
+
+    long privateDataMinBlockNum() throws LedgerException;
+
     void prune(PrunePolicy policy) throws LedgerException;
 
     void close() throws LedgerException;

@@ -31,7 +31,7 @@ public interface Recoverable {
      * If the recovery is needed, this method also returns the block number to start recovery from.
      * lastAvailableBlock is the max block number that has been committed to the block storage
      */
-    Boolean shouldRecover(Long lastAvailableBlock) throws LedgerException;
+    long shouldRecover(Long lastAvailableBlock) throws LedgerException;
 
     /** CommitLostBlock recommits the block
      *

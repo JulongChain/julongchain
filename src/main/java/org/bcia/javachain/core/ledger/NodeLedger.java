@@ -22,6 +22,8 @@ import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
+import java.util.List;
+
 /**
  * 类描述
  *
@@ -64,6 +66,26 @@ public class NodeLedger implements INodeLedger {
     @Override
     public IHistoryQueryExecutor newHistoryQueryExecutor() throws LedgerException {
         return null;
+    }
+
+    @Override
+    public BlockAndPvtData getPvtDataAndBlockByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public List<TxPvtData> getPvtDataByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public void purgePrivateData(long maxBlockNumToRetain) throws LedgerException {
+
+    }
+
+    @Override
+    public long privateDataMinBlockNum() throws LedgerException {
+        return 0;
     }
 
     @Override
