@@ -17,8 +17,6 @@ package org.bcia.javachain.common.groupconfig;
 
 import org.bcia.javachain.msp.IMsp;
 import org.bcia.javachain.msp.IMspManager;
-import org.bcia.javachain.msp.mgmt.Mgmt;
-import org.bcia.javachain.msp.mgmt.MspmgrImpl;
 import org.bcia.javachain.protos.msp.MspConfigPackage;
 
 import java.util.HashMap;
