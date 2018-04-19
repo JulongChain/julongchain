@@ -254,7 +254,7 @@ public class Endorser implements IEndorserServer {
         } else {
             scDefinition = endorserSupport.getSmartContractDefinition(groupId, scName, txId, signedProposal,
                     proposal, txSimulator);
-            version = scDefinition.smartContractVersion();
+            version = scDefinition.getSmartContractVersion();
 
             //TODO：检查实例化策略
             endorserSupport.checkInstantiationPolicy(scName, version, scDefinition);
@@ -340,8 +340,8 @@ public class Endorser implements IEndorserServer {
             //TODO:应该从某个配置文件里面读取
             smartContractIDBuilder.setVersion(CommConstant.METADATA_VERSION);
         } else {
-            essc = smartContractDefinition.endorsement();
-            smartContractIDBuilder.setVersion(smartContractDefinition.smartContractVersion());
+            essc = smartContractDefinition.getEndorsement();
+            smartContractIDBuilder.setVersion(smartContractDefinition.getSmartContractVersion());
         }
 
         // arguments:
