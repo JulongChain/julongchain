@@ -25,6 +25,7 @@ import org.bcia.javachain.csp.intfs.IKey;
 import org.bcia.javachain.csp.intfs.opts.*;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bouncycastle.math.ec.ECPoint;
+import sun.security.provider.SecureRandom;
 
 import java.math.BigInteger;
 
@@ -119,7 +120,8 @@ public class GmCsp implements ICsp {
 
     @Override
     public byte[] rng(int len, IRngOpts opts) throws JavaChainException {
-        return new byte[0];
+        byte[] none=new SecureRandom().engineGenerateSeed(len);
+        return none;
     }
 
     private SM3 getSm3(){
