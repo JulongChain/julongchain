@@ -47,7 +47,7 @@ public class DeliverEventsServer implements IDeliverEventsServer {
 //            Deliver_DeliverFilteredServer: srv,
 //        }
 //        // getting policy checker based on resources.FILTEREDBLOCKEVENT resource name
-//        return s.dh.LevelDBHandle(deliver.NewDeliverServer(srvSupport, s.policyCheckerProvider(resources.FILTEREDBLOCKEVENT), s.sendProducer(srv)))
+//        return s.dh.Handle(deliver.NewDeliverServer(srvSupport, s.policyCheckerProvider(resources.FILTEREDBLOCKEVENT), s.sendProducer(srv)))
 //    }
 //
 //    // Deliver sends a stream of blocks to a client after commitment
@@ -58,7 +58,7 @@ public class DeliverEventsServer implements IDeliverEventsServer {
 //            Deliver_DeliverServer: srv,
 //        }
 //        // getting policy checker based on resources.BLOCKEVENT resource name
-//        return s.dh.LevelDBHandle(deliver.NewDeliverServer(srvSupport, s.policyCheckerProvider(resources.BLOCKEVENT), s.sendProducer(srv)))
+//        return s.dh.Handle(deliver.NewDeliverServer(srvSupport, s.policyCheckerProvider(resources.BLOCKEVENT), s.sendProducer(srv)))
 //    }
 //
 //    func (s *server) sendProducer(srv peer.Deliver_DeliverFilteredServer) func(msg proto.Message) error {

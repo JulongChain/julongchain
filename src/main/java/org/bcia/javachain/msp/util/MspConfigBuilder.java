@@ -72,7 +72,7 @@ public class MspConfigBuilder {
         mspConfig.setName(mspId);
 
         mspConfig.addRootCerts(ByteString.copyFrom(cacert.get(0).getBytes()));
-       // mspConfig.addIntermediateCerts(ByteString.copyFrom(intermediatecerts.get(0).getBytes()));
+        // mspConfig.addIntermediateCerts(ByteString.copyFrom(intermediatecerts.get(0).getBytes()));
         mspConfig.addAdmins(ByteString.copyFrom(admincert.get(0).getBytes()));
 //        mspConfig.addRevocationList(ByteString.copyFrom(crls.get(0).getBytes()));
         MspConfigPackage.SigningIdentityInfo signingIdentityInfo=buildSigningIdentityInfo(signcert);
@@ -134,11 +134,11 @@ public class MspConfigBuilder {
         String privateKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPrivateKeyStore();
         String publicKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPublicKeyStore();
 
-//        cryptoConfig.setSymmetrickey(symmetrickey);
-//        cryptoConfig.setSign(sign);
-//        cryptoConfig.setHash(hash);
-//        cryptoConfig.setAsymmetric(asymmetric);
-//        cryptoConfig.setFilekeystore(buildFileKeyStore(privateKeyPath, publicKeyPath, keystore));
+        cryptoConfig.setSymmetrickey(symmetrickey);
+        cryptoConfig.setSign(sign);
+        cryptoConfig.setHash(hash);
+        cryptoConfig.setAsymmetric(asymmetric);
+        cryptoConfig.setFilekeystore(buildFileKeyStore(privateKeyPath, publicKeyPath, keystore));
         return cryptoConfig.build();
     }
 
@@ -150,7 +150,7 @@ public class MspConfigBuilder {
     public static MspConfigPackage.SigningIdentityInfo buildSigningIdentityInfo(List<String> signcert) {
         MspConfigPackage.SigningIdentityInfo.Builder signingIdentityInfo = MspConfigPackage.SigningIdentityInfo.newBuilder();
         signingIdentityInfo.setPublicSigner(ByteString.copyFrom(signcert.get(0).getBytes()));
-       //源码中privateSigner为null
+        //源码中privateSigner为null
         signingIdentityInfo.setPrivateSigner(buildKeyInfo());
         return signingIdentityInfo.build();
     }
@@ -177,14 +177,14 @@ public class MspConfigBuilder {
      * @param publicKeyPath
      * @return
      */
-//    public static MspConfigPackage.FileKeyStore buildFileKeyStore(String privateKeyPath, String publicKeyPath, List<String> keystore) {
-//        MspConfigPackage.FileKeyStore.Builder fileKeyStore = MspConfigPackage.FileKeyStore.newBuilder();
-//        fileKeyStore.setPrivateKeyPath(privateKeyPath);
-//        fileKeyStore.setPublicKeyPath(publicKeyPath);
-//        fileKeyStore.setPrivateKeyValue(keystore.get(0));
-//        fileKeyStore.setPublicKeyValue(keystore.get(1));
-//        return fileKeyStore.build();
-//    }
+    public static MspConfigPackage.FileKeyStore buildFileKeyStore(String privateKeyPath, String publicKeyPath, List<String> keystore) {
+        MspConfigPackage.FileKeyStore.Builder fileKeyStore = MspConfigPackage.FileKeyStore.newBuilder();
+        fileKeyStore.setPrivateKeyPath(privateKeyPath);
+        fileKeyStore.setPublicKeyPath(publicKeyPath);
+        fileKeyStore.setPrivateKeyValue(keystore.get(0));
+        fileKeyStore.setPublicKeyValue(keystore.get(1));
+        return fileKeyStore.build();
+    }
 
 
 

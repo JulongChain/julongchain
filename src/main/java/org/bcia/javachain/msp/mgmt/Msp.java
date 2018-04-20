@@ -17,7 +17,6 @@ package org.bcia.javachain.msp.mgmt;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.JavaChainException;
-import org.bcia.javachain.common.exception.MspException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.csp.gm.GmCsp;

@@ -15,7 +15,6 @@
  */
 package org.bcia.javachain.core.smartcontract.shim.intfs;
 
-import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
 
 /**

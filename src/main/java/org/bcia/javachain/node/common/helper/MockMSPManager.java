@@ -52,11 +52,6 @@ public class MockMSPManager {
                 return null;
             }
 
-//            @Override
-//            public IMsp load(GmSoftConf GmSoftConf) {
-//                return null;
-//            }
-
             @Override
             public int getVersion() {
                 return 0;
