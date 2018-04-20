@@ -17,6 +17,7 @@ package org.bcia.javachain.msp.mgmt;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.MspException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.csp.gm.GmCsp;
@@ -176,7 +177,21 @@ public class Msp implements IMsp {
     }
 
     @Override
-    public IIdentity deserializeIdentity(byte[] serializedIdentity) {
+    public IIdentity deserializeIdentity(byte[] serializedIdentity)  {
+
+        try {
+            Identities.SerializedIdentity sId=Identities.SerializedIdentity.parseFrom(serializedIdentity);
+            CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
+            InputStream inputStream = new ByteArrayInputStream( sId.getIdBytes().toByteArray());
+            java.security.cert.Certificate certificate = certificateFactory.generateCertificate(inputStream);
+            SM2KeyExport certPubK=new SM2KeyExport();
+            Identity identity = new Identity(certificate, certPubK.getPublicKey(), this);
+            return identity;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
         return null;
     }
 
@@ -185,6 +200,11 @@ public class Msp implements IMsp {
 
     }
 
+
+    IIdentity deserializeIdentityInternal(byte[] serializedIdentity){
+
+    return null;
+    }
 
     public Msp internalSetupFunc(MspConfigPackage.FabricMSPConfig mspConfig) {
         log.info("通过internalSetupFunc装载配置");
@@ -305,6 +325,7 @@ public class Msp implements IMsp {
         }
         return null;
     }
+
 
     public Certificate sanitizeCert(Certificate certificate) {
 

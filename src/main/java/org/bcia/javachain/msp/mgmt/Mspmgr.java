@@ -15,11 +15,15 @@
  */
 package org.bcia.javachain.msp.mgmt;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.IMsp;
 import org.bcia.javachain.msp.IMspManager;
 import org.bcia.javachain.protos.msp.Identities;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -27,19 +31,36 @@ import java.util.Map;
  * @Date: 2018/3/13
  * @company Dingxuan
  */
-public class Mspmgr implements IMspManager{
+public class Mspmgr implements IMspManager {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(MspManager.class);
+    private static HashMap<String, IMsp> mspsMap = new HashMap<String, IMsp>();
+    private boolean up;
+    private static HashMap<String, IMsp> mspsByProviders = new HashMap<String, IMsp>();
+
     @Override
     public void setup(IMsp[] msps) {
-
+        if(up==true){
+            log.info("MSP manager already up");
+        }
     }
 
     @Override
     public Map<String, IMsp> getMSPs() {
-        return null;
+        return mspsMap;
     }
 
     @Override
-    public IIdentity deserializeIdentity(byte[] serializedIdentity) {
+    public IIdentity deserializeIdentity(byte[] serializedID) {
+        try {
+            Identities.SerializedIdentity sId = Identities.SerializedIdentity.parseFrom(serializedID);
+           // TODO 暂时先用getlocalmsp获取，之后需要通过id获取
+            //IMsp msp = getMSPs().get(sId.getMspid());
+            IMsp msp=MspManager.getLocalMsp();
+            return msp.deserializeIdentity(sId.getIdBytes().toByteArray());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 

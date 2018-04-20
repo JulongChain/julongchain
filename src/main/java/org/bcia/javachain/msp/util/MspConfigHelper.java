@@ -65,7 +65,7 @@ public class MspConfigHelper {
      *
      * @return
      */
-    public static MspConfigPackage.MSPConfig buildMspConfig(String mspPath) {
+    public static MspConfigPackage.MSPConfig buildMspConfig(String mspPath,String mspId) {
 
         //拼接文件路径
         String cacertDir = filePath(mspPath, LoadLocalMspFiles.CACERTS);
@@ -91,7 +91,7 @@ public class MspConfigHelper {
         List<String> tlsintermediatecerts = loadLocalMspFiles.getPemMaterialFromDir(tlsintermediatecertsDir);
 
         //构建mspconfig
-        MspConfigPackage.MSPConfig mspConfig = MspConfigBuilder.buildMspConfig(cacert, keystore, signcert,
+        MspConfigPackage.MSPConfig mspConfig = MspConfigBuilder.buildMspConfig(mspId,cacert, keystore, signcert,
                 admincert, intermediatecerts, crls, configFileContent, tlscacert, tlsintermediatecerts);
         return mspConfig;
     }

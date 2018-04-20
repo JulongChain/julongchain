@@ -27,6 +27,7 @@ import org.bcia.javachain.protos.msp.Identities;
 import org.bcia.javachain.protos.msp.MspConfigPackage;
 
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -56,15 +57,23 @@ public class MspManager implements IMspManager {
      */
     public static String defaultCspValue;
 
+    private  Mspmgr mspmgr;
+
+    private boolean up;
+
+    /**
+     * mspMap
+     */
+    public static HashMap<String,IMspManager> mspManagerHashMap=new HashMap<String, IMspManager>();
     /**
      * 通过类型加载本地msp
      *
      * @param localmspdir
      * @param optsList
-     * @param mspID
+     * @param mspId
      * @param mspType
      */
-    public static IMsp loadLocalMspWithType(String localmspdir, List<IFactoryOpts> optsList, String mspID, String mspType) throws FileNotFoundException {
+    public static IMsp loadLocalMspWithType(String localmspdir, List<IFactoryOpts> optsList, String mspId, String mspType) throws FileNotFoundException {
 
         CspManager.initCspFactories(optsList);
         MspConfig mspConfig = loadMspConfig();
@@ -73,7 +82,7 @@ public class MspManager implements IMspManager {
         if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(defaultCspValue)) {
             //解析配置文件
             log.info("构建mspconfig");
-            MspConfigPackage.MSPConfig buildMspConfig = MspConfigHelper.buildMspConfig(localmspdir);
+            MspConfigPackage.MSPConfig buildMspConfig = MspConfigHelper.buildMspConfig(localmspdir,mspId);
             loadMsp = getLocalMsp().setup(buildMspConfig);
 
         } else if (IFactoryOpts.PROVIDER_GMT0016.equalsIgnoreCase(defaultCspValue)) {
@@ -120,7 +129,7 @@ public class MspManager implements IMspManager {
             if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(defaultCspValue)) {
                 //构建fabricmspconfig
                 // MspConfigPackage.MSPConfig fabricMSPConfig = MspConfigHelper.buildMspConfig( mspConfig.node.getMspConfigPath());
-                MspConfigPackage.MSPConfig buildMspConfig = MspConfigHelper.buildMspConfig(mspConfig.node.getMspConfigPath());
+                MspConfigPackage.MSPConfig buildMspConfig = MspConfigHelper.buildMspConfig(mspConfig.node.getMspConfigPath(),mspConfig.node.getLocalMspId());
                 localMsp = new Msp().setup(buildMspConfig);
                 return localMsp;
 
@@ -137,21 +146,31 @@ public class MspManager implements IMspManager {
     /**
      * 身份序列化
      *
-     * @param chainID
+     * @param groupId
      * @return
      */
-    public IIdentityDeserializer getIdentityDeserializer(String chainID) {
-        return getManagerForChain(chainID);
+    public static IIdentityDeserializer getIdentityDeserializer(String groupId) {
+        if(groupId==""){
+            return  getLocalMsp();
+        }
+        return getManagerForChain(groupId);
     }
 
     /**
      * 从链上获取一个管理者,如果没有这样的管理者,则创建一个
      *
-     * @param chainID
+     * @param groupId
      * @return
      */
-    public IMspManager getManagerForChain(String chainID) {
-        return null;
+    public static IMspManager  getManagerForChain(String groupId) {
+       IMspManager mspManager= mspManagerHashMap.get(groupId);
+        if(mspManager==null){
+            IMspManager mspmgr=  new Mspmgr();
+            mspManagerHashMap.put(groupId,mspmgr);
+            return mspmgr;
+        }
+
+        return   mspManager;
     }
 
     @Override
@@ -166,6 +185,8 @@ public class MspManager implements IMspManager {
 
     @Override
     public IIdentity deserializeIdentity(byte[] serializedIdentity) {
+
+
         return null;
     }
 
