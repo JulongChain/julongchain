@@ -18,12 +18,10 @@ package org.bcia.javachain.common.localmsp.impl;
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.msp.mgmt.Identity;
-import org.bcia.javachain.msp.mgmt.Msp;
 import org.bcia.javachain.msp.mgmt.MspManager;
 import org.bcia.javachain.protos.common.Common;
-import sun.security.provider.SecureRandom;
 
-import java.io.UnsupportedEncodingException;
+import java.security.SecureRandom;
 
 /**
  * @author zhangmingyang
@@ -37,7 +35,7 @@ public class LocalSigner implements ILocalSigner {
             Identity identity= (Identity) MspManager.getLocalMsp().getDefaultSigningIdentity();
             byte[] creatorIdentityRaw=identity.serialize();
             Common.SignatureHeader.Builder signatureHeader=Common.SignatureHeader.newBuilder();
-            byte[] none=new SecureRandom().engineGenerateSeed(24);
+            byte[] none=new SecureRandom().generateSeed(24);
             signatureHeader.setNonce(ByteString.copyFrom(none));
             signatureHeader.setCreator(ByteString.copyFrom(creatorIdentityRaw));
             return signatureHeader.build();

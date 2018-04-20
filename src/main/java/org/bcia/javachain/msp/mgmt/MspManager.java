@@ -165,7 +165,11 @@ public class MspManager implements IMspManager {
     public static IMspManager  getManagerForChain(String groupId) {
        IMspManager mspManager= mspManagerHashMap.get(groupId);
         if(mspManager==null){
-            IMspManager mspmgr=  new Mspmgr();
+            IMsp[] msps = new IMsp[1];
+            for (int i = 0; i < msps.length; i++) {
+                msps[i]=getLocalMsp();
+            }
+            IMspManager mspmgr= new Mspmgr().createMspmgr(msps);
             mspManagerHashMap.put(groupId,mspmgr);
             return mspmgr;
         }
