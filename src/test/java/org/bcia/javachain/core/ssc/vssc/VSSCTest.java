@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.BaseJunit4Test;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.common.util.proto.ProposalResponseUtils;
 import org.bcia.javachain.common.util.proto.ProposalUtils;
@@ -50,7 +51,7 @@ public class VSSCTest extends BaseJunit4Test {
 
     @Test
     public void invoke() {
-        MockStub mockStub = new MockStub("VSSC", vssc);
+        MockStub mockStub = new MockStub(CommConstant.VSSC, vssc);
         SmartContractResponse smartContractResponse =mockStub.mockInit("1",new LinkedList<ByteString>());
         assertThat(smartContractResponse.getStatus(), is(SmartContractResponse.Status.SUCCESS));
 

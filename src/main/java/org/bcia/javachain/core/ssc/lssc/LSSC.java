@@ -138,9 +138,7 @@ public class LSSC  extends SystemSmartContractBase {
                 }
                 // 2. check local MSP Admins policy
                 try{
-                    if(!BooleanUtils.isTrue(policyChecker.checkPolicyNoGroup(Principal.Admins,sp))){
-                        return newErrorResponse(String.format("Authorization for INSTALL has been denied"));
-                    }
+                   policyChecker.checkPolicyNoGroup(Principal.Admins,sp);
                 }catch (JavaChainException e){
                     log.error(e.getMessage(), e);
                     return newErrorResponse(String.format("Authorization for INSTALL has been denied (error-%s)",e.getMessage()));
@@ -229,8 +227,10 @@ public class LSSC  extends SystemSmartContractBase {
                     return newErrorResponse(String.format("ExecuteDeployOrUpgrade failed,%s",e.getMessage()));
                 }
 
-                byte[] cdbytes=scd.marshal();
-                if(cdbytes==null){
+                byte[] cdbytes= new byte[0];
+                try {
+                    cdbytes = scd.marshal();
+                } catch (JavaChainException e) {
                     return newErrorResponse(String.format("Marshal SmartContractData failed"));
                 }
                 return newSuccessResponse(cdbytes);
@@ -297,9 +297,7 @@ public class LSSC  extends SystemSmartContractBase {
                 }
                 //2. check local MSP Admins policy
                 try {
-                    if(!BooleanUtils.isTrue(policyChecker.checkPolicyNoGroup(Principal.Admins,sp))) {
-                        return newErrorResponse(String.format("Authorization for GETSMARTCONTRACTS has been denied"));
-                    }
+                    policyChecker.checkPolicyNoGroup(Principal.Admins,sp);
                 } catch (JavaChainException e) {
                     log.error(e.getMessage(), e);
                     return newErrorResponse(String.format("Authorization for GETSMARTCONTRACTS has been denied with error:%s",e.getMessage()));
@@ -311,9 +309,7 @@ public class LSSC  extends SystemSmartContractBase {
                 }
                 //2. check local MSP Admins policy
                 try {
-                    if(!BooleanUtils.isTrue(policyChecker.checkPolicyNoGroup(Principal.Admins,sp))){
-                        return newErrorResponse(String.format("Authorization for GETINSTALLEDSMARTCONTRACTS has been denied."));
-                    }
+                    policyChecker.checkPolicyNoGroup(Principal.Admins,sp);
                 } catch (JavaChainException e) {
                     log.error(e.getMessage(), e);
                     return newErrorResponse(String.format("Authorization for GETINSTALLEDSMARTCONTRACTS has been denied with error:%s",e.getMessage()));

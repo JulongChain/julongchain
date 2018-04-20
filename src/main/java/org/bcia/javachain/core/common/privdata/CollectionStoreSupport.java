@@ -27,6 +27,8 @@ import org.bcia.javachain.protos.common.Collection;
  * @company Dingxuan
  */
 public class CollectionStoreSupport implements IPrivDataSupport {
+    public final static String collectionSeparator = "~";
+    public final static String collectionSuffix="collection";
 
     @Override
     public IQueryExecutor getQueryExecotorForLedger(String groupID) {
@@ -42,4 +44,11 @@ public class CollectionStoreSupport implements IPrivDataSupport {
     public IIdentityDeserializer getIdentityDeserializer(String groupID) {
         return null;
     }
+
+    @Override
+    public String buildCollectionKVSKey(String smartcontractname) {
+        return smartcontractname+collectionSeparator+collectionSuffix;
+    }
+
+
 }

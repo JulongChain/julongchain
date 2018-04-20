@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.core.common.smartcontractprovider;
 
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
 import org.bcia.javachain.common.resourceconfig.Validation;
 import org.bcia.javachain.protos.node.Query;
@@ -67,7 +68,11 @@ public class SmartContractData implements ISmartContractDefinition {
         return scInfo.getEssc();
     }
 
-    public byte[] marshal() {
+    public byte[] marshal() throws JavaChainException{
         return null;
+    }
+
+    public Query.SmartContractInfo getScInfo() {
+        return scInfo;
     }
 }
