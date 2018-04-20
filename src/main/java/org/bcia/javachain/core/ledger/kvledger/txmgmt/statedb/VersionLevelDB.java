@@ -17,6 +17,7 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;

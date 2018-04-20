@@ -16,14 +16,13 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.QueryResult;
+import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RWSetBuilder;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RangeQueryResultsHelper;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RwSetUtil;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.ResultsIterator;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
-import org.bcia.javachain.protos.ledger.queryresult.KvQueryResult;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
 /**
@@ -78,7 +77,7 @@ public class ResultsItr implements org.bcia.javachain.common.ledger.ResultsItera
         }
         VersionedKV versionedKV = (VersionedKV) queryResult;
         //TODO
-//        rangeQueryResultsHelper.addResult(RwSetUtil.newKVRead(versionedKV.getCompositeKey().getKey(), versionedKV.getVersionedValue().getVersion()));
+        rangeQueryResultsHelper.addResult(RwSetUtil.newKVRead(versionedKV.getCompositeKey().getKey(), versionedKV.getVersionedValue().getVersion()));
         rangeQueryInfo = rangeQueryInfo.toBuilder().setEndKey(versionedKV.getCompositeKey().getKey()).build();
     }
 

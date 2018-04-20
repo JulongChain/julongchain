@@ -16,12 +16,11 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.history.historydb;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.QueryResult;
 import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.iq80.leveldb.DBIterator;
 
-import java.util.Iterator;
 import java.util.Map;
 
 /**

@@ -16,7 +16,10 @@
 package org.bcia.javachain.core.ledger.kvledger;
 
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.core.ledger.BlockAndPvtData;
 import org.bcia.javachain.protos.common.Common;
+
+import java.util.Map;
 
 /**
  * 类描述
@@ -31,13 +34,11 @@ public interface Recoverable {
      * If the recovery is needed, this method also returns the block number to start recovery from.
      * lastAvailableBlock is the max block number that has been committed to the block storage
      */
-    long shouldRecover(Long lastAvailableBlock) throws LedgerException;
+    long shouldRecover() throws LedgerException;
 
     /** CommitLostBlock recommits the block
      *
-     * @param block
-     * @throws LedgerException
      */
-    void commitLostBlock(Common.Block block) throws LedgerException;
+    void commitLostBlock(BlockAndPvtData blockAndPvtData) throws LedgerException;
 
 }

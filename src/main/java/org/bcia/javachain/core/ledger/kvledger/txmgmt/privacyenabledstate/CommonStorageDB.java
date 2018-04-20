@@ -16,6 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate;
 
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.*;
@@ -47,12 +48,12 @@ public class CommonStorageDB implements DB {
     }
 
     @Override
-    public boolean IsBulkOptimizable() {
+    public boolean isBulkOptimizable() {
         return vdb instanceof BulkOptimizable;
     }
 
     @Override
-    public void LoadCommittedVersionsOfPubAndHashedKeys(List<CompositeKey> pubKeys,
+    public void loadCommittedVersionsOfPubAndHashedKeys(List<CompositeKey> pubKeys,
                                                         List<HashedCompositeKey> hashKeys) {
         BulkOptimizable bulkOptimizable = vdb;
 
@@ -77,7 +78,7 @@ public class CommonStorageDB implements DB {
     public Height getCacheKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException{
         String keyHashStr = new String(keyHash);
         if(!bytesKeySuppoted()){
-
+            //TODO encode key
         }
         return getCachedVersion(deriveHashedDataNs(ns, coll), keyHashStr);
     }
@@ -99,19 +100,19 @@ public class CommonStorageDB implements DB {
 
     @Override
     public ISmartContractLifecycleEventListener getSmartcontractEventListener() {
-        return null;
+        return (ISmartContractLifecycleEventListener) vdb;
     }
 
     @Override
-    public VersionedValue getPrivateData(String ns, String coll) throws LedgerException {
-        return getState(ns, coll);
+    public VersionedValue getPrivateData(String ns, String coll, String key) throws LedgerException {
+        return getState(derivePvtDataNs(ns, coll), key);
     }
 
     @Override
     public VersionedValue getValueHash(String ns, String coll, byte[] keyHash) throws LedgerException {
         String keyHashStr = new String(keyHash);
         if(!bytesKeySuppoted()){
-
+            //TODO encode key
         }
         return getState(deriveHashedDataNs(ns, coll), keyHashStr);
     }
@@ -120,7 +121,7 @@ public class CommonStorageDB implements DB {
     public Height getKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException {
         String keyHashStr = new String(keyHash);
         if(!bytesKeySuppoted()){
-
+            //TODO encode key
         }
         return getVersion(deriveHashedDataNs(ns, coll), keyHashStr);
     }
@@ -136,13 +137,15 @@ public class CommonStorageDB implements DB {
     }
 
     @Override
-    public ResultsIterator ExecuteQueryOnPrivateData(String ns, String coll, String query) throws LedgerException{
+    public ResultsIterator executeQueryOnPrivateData(String ns, String coll, String query) throws LedgerException{
         return executeQuery(deriveHashedDataNs(ns, coll), query);
     }
 
     @Override
-    public void applyPrivacyAwareUpdates(UpdateBatch updates, Height height) {
-
+    public void applyPrivacyAwareUpdates(UpdateBatch updates, Height height) throws LedgerException {
+        addPvtUpdates(updates.getPubUpdateBatch(), updates.getPvtUpdateBatch());
+        addHashedUpdates(updates.getPubUpdateBatch(), updates.getHashUpdates(), !bytesKeySuppoted());
+        vdb.applyUpdates(updates.getPubUpdateBatch().getBatch(), height);
     }
 
     private String derivePvtDataNs(String ns, String coll){
@@ -174,7 +177,7 @@ public class CommonStorageDB implements DB {
                     String key = entry1.getKey();
                     VersionedValue vv = entry1.getValue();
                     if(base64Key){
-                        //
+                        //TODO encode key
                     }
                     pubUpdateBatch.getBatch().update(deriveHashedDataNs(ns, coll), key, vv);
                 }

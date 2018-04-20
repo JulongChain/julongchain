@@ -22,7 +22,7 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
  * @date 2018/04/16
  * @company Dingxuan
  */
-public class VersionedKV implements org.bcia.javachain.common.ledger.QueryResult {
+public class VersionedKV implements QueryResult {
 
     private CompositeKey compositeKey;
     private VersionedValue versionedValue;

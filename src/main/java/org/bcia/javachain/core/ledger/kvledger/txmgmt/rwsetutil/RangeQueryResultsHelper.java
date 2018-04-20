@@ -15,9 +15,14 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil;
 
+import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
+import java.util.AbstractMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 类描述
@@ -27,19 +32,61 @@ import java.util.List;
  * @company Dingxuan
  */
 public class RangeQueryResultsHelper {
+    private static final JavaChainLog logger  = JavaChainLogFactory.getLog(RangeQueryResultsHelper.class);
+
     private List<KvRwset.KVRead> pendingResults;
     private MerkleTree mt;
-    int maxDegree;
-    boolean hashingEnable;
+    private int maxDegree;
+    private boolean hashingEnable;
 
-    public static RangeQueryResultsHelper newRangeQueryResultsHelper(boolean enableHashing, int maxDegree){
+    public static RangeQueryResultsHelper newRangeQueryResultsHelper(boolean enableHashing, int maxDegree) throws LedgerException  {
         RangeQueryResultsHelper helper = new RangeQueryResultsHelper();
         helper.setHashingEnable(enableHashing);
         helper.setMaxDegree(maxDegree);
         if(enableHashing){
-            helper.setMt(MerkleTree.newMerkleTree());
+            helper.setMt(MerkleTree.newMerkleTree(maxDegree));
         }
         return helper;
+    }
+
+    public void addResult(KvRwset.KVRead kvRead){
+        logger.debug("Adding a result");
+        pendingResults.add(kvRead);
+        if(hashingEnable && pendingResults.size() > maxDegree){
+            logger.debug("Processing the accumulated results");
+            processPendngResults();
+        }
+    }
+
+    public KvRwset.QueryReadsMerkleSummary getMerkleSummary(){
+        if(!hashingEnable){
+            return null;
+        }
+        return mt.getSummery();
+    }
+
+    public void processPendngResults(){
+        byte[] b = serializeKVReads(pendingResults);
+        pendingResults.clear();
+        //TODO getHash
+        byte[] hash = "hash".getBytes();
+        mt.update(hash);
+    }
+
+    private byte[] serializeKVReads(List<KvRwset.KVRead> list){
+       return setKvReads(KvRwset.QueryReads.newBuilder(), list).build().toByteArray();
+    }
+
+    private KvRwset.QueryReads.Builder setKvReads(KvRwset.QueryReads.Builder builder, List<KvRwset.KVRead> list){
+        for (int i = 0; i < list.size(); i++) {
+            builder.setKvReads(i, list.get(i));
+        }
+        return builder;
+    }
+
+    public Map.Entry<List<KvRwset.KVRead>, KvRwset.QueryReadsMerkleSummary> done(){
+        Map.Entry<List<KvRwset.KVRead>, KvRwset.QueryReadsMerkleSummary> entry = new AbstractMap.SimpleEntry<>(null, null);
+        return entry;
     }
 
     public List<KvRwset.KVRead> getPendingResults() {

@@ -15,6 +15,18 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil;
 
+import com.google.protobuf.ByteString;
+import org.apache.commons.lang3.ArrayUtils;
+import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * 类描述
  *
@@ -23,8 +35,133 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil;
  * @company Dingxuan
  */
 public class MerkleTree {
+    private static final JavaChainLog logger  = JavaChainLogFactory.getLog(MerkleTree.class);
+    private static final int LEAF_LEVEL = 1;
 
-    public static MerkleTree newMerkleTree(){
-        return null;
+    private Map<Integer, List<byte[]>> tree;
+    private int maxLevel;
+    private int maxDegree;
+
+    public static MerkleTree newMerkleTree(int maxDegree) throws LedgerException {
+        if(maxDegree < 2){
+            throw new LedgerException("MerkleTree should not be less than 2 height");
+        }
+        MerkleTree tree = new MerkleTree();
+        tree.setTree(new HashMap<>());
+        tree.setMaxLevel(1);
+        tree.setMaxDegree(maxDegree);
+        return tree;
+    }
+
+    public void update(byte[] nextLeafLevelHash){
+        logger.debug("Before update. Tree's max level is " + tree.size());
+        tree.get(LEAF_LEVEL).add(nextLeafLevelHash);
+        for (int currentLelvel = LEAF_LEVEL;; currentLelvel++) {
+            List<byte[]> currenLevelHashes = tree.get(currentLelvel);
+            if(currenLevelHashes.size() < maxDegree){
+                logger.debug("After update. Tree's max level is " + tree.size());
+                return;
+            }
+            byte[] nextLevelHash = computeCombinedHash(currenLevelHashes);
+            tree.remove(currentLelvel);
+            int nextLevel = currentLelvel + 1;
+            tree.get(nextLevel).add(nextLevelHash);
+            if(nextLevel > maxLevel){
+                maxDegree = nextLevel;
+            }
+            currentLelvel = nextLevel;
+        }
+    }
+
+    public void done(){
+        logger.debug("Before done.");
+        int currentLevel = LEAF_LEVEL;
+        byte[] hash = null;
+        while(currentLevel < maxLevel){
+            List<byte[]> currentLevelHashes = tree.get(currentLevel);
+            switch (currentLevelHashes.size()){
+                case 0:
+                    currentLevel++;
+                    break;
+                case 1:
+                    hash = currentLevelHashes.get(0);
+                    break;
+                default:
+                    hash = computeCombinedHash(currentLevelHashes);
+            }
+            tree.remove(currentLevel);
+            currentLevel++;
+            tree.get(currentLevel).add(hash);
+        }
+        List<byte[]> finalHash = tree.get(maxLevel);
+        if(finalHash.size() > maxDegree){
+           tree.remove(maxLevel);
+           maxLevel++;
+           byte[] combinedHash = computeCombinedHash(finalHash);
+           List<byte[]> l = new ArrayList<>();
+           l.add(combinedHash);
+           tree.put(maxLevel, l);
+        }
+        logger.debug("After done.");
+    }
+
+    public KvRwset.QueryReadsMerkleSummary getSummery(){
+        return setMaxLevelHashes(KvRwset.QueryReadsMerkleSummary.newBuilder(), getMaxLevelHashes())
+                .setMaxDegree(maxDegree)
+                .setMaxLevel(maxLevel)
+                .build();
+    }
+
+    public List<byte[]> getMaxLevelHashes(){
+        return tree.get(maxLevel);
+    }
+
+    public boolean isEmpty(){
+        return maxLevel == 1 && tree.get(maxLevel).size() == 0;
+    }
+
+    @Override
+    public String toString() {
+        return "tree" + tree;
+    }
+
+    public static byte[] computeCombinedHash(List<byte[]> hashes){
+        List<byte[]> result = new ArrayList<>();
+        for(byte[] h : hashes){
+            result.add(h);
+        }
+        //TODO compute hash
+        return new byte[]{0x00, 0x01, 0x01};
+    }
+
+    private KvRwset.QueryReadsMerkleSummary.Builder setMaxLevelHashes(KvRwset.QueryReadsMerkleSummary.Builder builder, List<byte[]> list){
+        for (int i = 0; i < list.size(); i++) {
+            builder.setMaxLevelHashes(i, ByteString.copyFrom(list.get(i)));
+        }
+        return builder;
+    }
+
+    public Map<Integer, List<byte[]>> getTree() {
+        return tree;
+    }
+
+    public void setTree(Map<Integer, List<byte[]>> tree) {
+        this.tree = tree;
+    }
+
+    public int getMaxLevel() {
+        return maxLevel;
+    }
+
+    public void setMaxLevel(int maxLevel) {
+        this.maxLevel = maxLevel;
+    }
+
+    public int getMaxDegree() {
+        return maxDegree;
+    }
+
+    public void setMaxDegree(int maxDegree) {
+        this.maxDegree = maxDegree;
     }
 }

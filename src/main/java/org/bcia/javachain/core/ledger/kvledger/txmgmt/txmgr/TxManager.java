@@ -16,27 +16,30 @@
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr;
 
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.core.ledger.BlockAndPvtData;
 import org.bcia.javachain.core.ledger.IQueryExecutor;
 import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.core.ledger.kvledger.Recoverable;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.protos.common.Common;
 
+import java.util.Map;
+
 /**
  * 类描述
  *
- * @author wanliangbing
- * @date 2018/3/9
+ * @author sunzongyu
+ * @date 2018/04/19
  * @company Dingxuan
  */
-public interface TxMgr extends Recoverable {
+public interface TxManager extends Recoverable {
 
     IQueryExecutor newQueryExecutor(String txid) throws LedgerException;
     ITxSimulator newTxSimulator(String txid) throws LedgerException;
-    void validateAndPrepare(Common.Block block, Boolean doMVCCValidation) throws LedgerException;
-    Height heightGetLastSavepoint() throws LedgerException;
-    long shouldRecover(Long lastAvailableBlock) throws LedgerException;
-    void commitLostBlock(Common.Block block) throws LedgerException;
+    void validateAndPrepare(BlockAndPvtData blockAndPvtData, Boolean doMVCCValidation) throws LedgerException;
+    Height getLastSavepoint() throws LedgerException;
+    long shouldRecover() throws LedgerException;
+    void commitLostBlock(BlockAndPvtData blockAndPvtData) throws LedgerException;
     void commit() throws LedgerException;
     void rollback() throws LedgerException;
     void shutdown() throws LedgerException;

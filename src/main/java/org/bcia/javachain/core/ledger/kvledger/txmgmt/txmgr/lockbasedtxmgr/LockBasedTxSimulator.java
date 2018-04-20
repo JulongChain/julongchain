@@ -17,39 +17,69 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.ResultsIterator;
-import org.bcia.javachain.common.log.JavaChainLog;
-import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.ledger.IQueryExecutor;
+import org.bcia.javachain.core.ledger.ITxSimulator;
+import org.bcia.javachain.core.ledger.TxSimulationResults;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 类描述
  *
  * @author sunzongyu
- * @date 2018/04/18
+ * @date 2018/04/19
  * @company Dingxuan
  */
-public class LockBasedQueryExecutor implements IQueryExecutor {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(LockBasedQueryExecutor.class);
+public class LockBasedTxSimulator implements ITxSimulator {
 
-    private QueryHelper helper;
-    private String txID;
+    public static LockBasedTxSimulator newLockBasedTxSimulator(LockBasedTxManager txMgr, String txid){
+        LockBasedTxSimulator l = new LockBasedTxSimulator();
+        return l;
+    }
 
-    public static LockBasedQueryExecutor newQueryExecutor(LockBasedTxManager txMgr, String txID){
-        LockBasedQueryExecutor executor = new LockBasedQueryExecutor();
-        QueryHelper helper = new QueryHelper();
-        helper.setTxMgr(txMgr);
-        executor.setHelper(helper);
-        executor.setTxID(txID);
-        logger.debug("Constructing new query executor txid = " + txID);
-        return executor;
+    @Override
+    public void setState(String namespace, String key, byte[] value) throws LedgerException {
+
+    }
+
+    @Override
+    public void deleteState(String namespace, String key) throws LedgerException {
+
+    }
+
+    @Override
+    public void setStateMultipleKeys(String namespace, Map<String, byte[]> kvs) throws LedgerException {
+
+    }
+
+    @Override
+    public void executeUPdate(String query) throws LedgerException {
+
+    }
+
+    @Override
+    public TxSimulationResults getTxSimulationResults() throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public void setPrivateData(String namespace, String collection, byte[] value) throws LedgerException {
+
+    }
+
+    @Override
+    public void setPirvateDataMultipleKeys(String namespace, String collection, Map<String, byte[]> kvs) throws LedgerException {
+
+    }
+
+    @Override
+    public void deletePrivateData(String namespace, String collection, String key) throws LedgerException {
+
     }
 
     @Override
     public byte[] getState(String namespace, String key) throws LedgerException {
-        return null;
-
+        return new byte[0];
     }
 
     @Override
@@ -85,21 +115,5 @@ public class LockBasedQueryExecutor implements IQueryExecutor {
     @Override
     public void done() throws LedgerException {
 
-    }
-
-    public QueryHelper getHelper() {
-        return helper;
-    }
-
-    public void setHelper(QueryHelper helper) {
-        this.helper = helper;
-    }
-
-    public String getTxID() {
-        return txID;
-    }
-
-    public void setTxID(String txID) {
-        this.txID = txID;
     }
 }

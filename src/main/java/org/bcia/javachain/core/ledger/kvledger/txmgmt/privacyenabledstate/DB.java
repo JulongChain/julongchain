@@ -16,6 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate;
 
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.*;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.core.ledger.sceventmgmt.ISmartContractLifecycleEventListener;
@@ -30,9 +31,9 @@ import java.util.List;
  * @company Dingxuan
  */
 public interface DB extends IVersionedDB {
-    boolean IsBulkOptimizable();
+    boolean isBulkOptimizable();
 
-    void LoadCommittedVersionsOfPubAndHashedKeys(List<CompositeKey> pubKeys, List<HashedCompositeKey> hashKeys);
+    void loadCommittedVersionsOfPubAndHashedKeys(List<CompositeKey> pubKeys, List<HashedCompositeKey> hashKeys);
 
     Height getCacheKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException;
 
@@ -40,7 +41,7 @@ public interface DB extends IVersionedDB {
 
     ISmartContractLifecycleEventListener getSmartcontractEventListener();
 
-    VersionedValue getPrivateData(String ns, String coll) throws LedgerException;
+    VersionedValue getPrivateData(String ns, String coll, String key) throws LedgerException;
 
     VersionedValue getValueHash(String ns, String coll, byte[] keyHash) throws LedgerException;
 
@@ -50,7 +51,7 @@ public interface DB extends IVersionedDB {
 
     ResultsIterator getPrivateDataRangeScanIterator(String ns, String coll, String startKey, String endKey) throws LedgerException;
 
-    ResultsIterator ExecuteQueryOnPrivateData(String ns, String coll, String query) throws LedgerException;
+    ResultsIterator executeQueryOnPrivateData(String ns, String coll, String query) throws LedgerException;
 
-    void applyPrivacyAwareUpdates(UpdateBatch updates, Height height);
+    void applyPrivacyAwareUpdates(UpdateBatch updates, Height height) throws LedgerException;
 }
