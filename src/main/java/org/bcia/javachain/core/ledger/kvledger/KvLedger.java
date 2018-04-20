@@ -15,26 +15,27 @@
  */
 package org.bcia.javachain.core.ledger.kvledger;
 
+import io.grpc.internal.LogExceptionRunnable;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.PrunePolicy;
 import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
+import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.FsBlockStore;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.*;
 import org.bcia.javachain.core.ledger.kvledger.history.historydb.IHistoryDB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DB;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.TxMgr;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr.LockBasedTxMgr;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.TxManager;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr.LockBasedTxManager;
+import org.bcia.javachain.core.ledger.ledgerstorage.Store;
 import org.bcia.javachain.core.ledger.sceventmgmt.ISmartContractLifecycleEventListener;
 import org.bcia.javachain.core.ledger.sceventmgmt.ScEventMgmt;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 类描述
@@ -49,7 +50,7 @@ public class KvLedger implements INodeLedger {
 
     private String ledgerID;
     private BlockStore blockStore;
-    private TxMgr txtmgmt;
+    private TxManager txtmgmt;
     private IHistoryDB historyDB;
 
     /** NewKVLedger constructs new `KVLedger`
@@ -67,7 +68,7 @@ public class KvLedger implements INodeLedger {
         logger.debug("Creating KVLedger ledgerID = " + ledgerID);
 
         //TODO get txMgr
-        TxMgr  txmgmt = LockBasedTxMgr.newLockBasedTxMgr(ledgerID, versionedDB, stateListeners);
+        TxManager txmgmt = LockBasedTxManager.newLockBasedTxMgr(ledgerID, versionedDB, stateListeners);
 
         KvLedger kvLedger = new KvLedger();
         kvLedger.setLedgerID(ledgerID);
@@ -103,14 +104,48 @@ public class KvLedger implements INodeLedger {
         long lastAvailableBlockNum = info.getHeight() - 1;
         List<Recoverable> recoverables = new ArrayList<>();
         List<Recoverer> recoverers = new ArrayList<>();
-
+        recoverables.add(txtmgmt);
+        recoverables.add(historyDB);
+        for(Recoverable recoverable : recoverables){
+            long firstBlockNum = recoverable.shouldRecover();
+            if(firstBlockNum - 1 != lastAvailableBlockNum){
+                Recoverer recoverer = new Recoverer();
+                recoverer.setFirstBlockNum(firstBlockNum);
+                recoverer.setRecoverable(recoverable);
+                recoverers.add(recoverer);
+            }
+        }
+        if(recoverers.size() == 0){
+            return;
+        } else if(recoverers.size() == 1){
+            recommitLostBlocks(recoverers.get(0).getFirstBlockNum(), lastAvailableBlockNum, recoverers.get(0).getRecoverable());
+        }
+        //小号放前面 升序
+        Collections.sort(recoverers, new Comparator<Recoverer>() {
+            @Override
+            public int compare(Recoverer o1, Recoverer o2) {
+                return o1.getFirstBlockNum() > o2.getFirstBlockNum() ? 1 : -1;
+            }
+        });
+        //小号向大号看齐
+        recommitLostBlocks(recoverers.get(0).getFirstBlockNum(), recoverers.get(1).getFirstBlockNum() - 1,
+                recoverers.get(0).getRecoverable());
+        //大号向正确看齐
+        recommitLostBlocks(recoverers.get(1).getFirstBlockNum(), lastAvailableBlockNum,
+                recoverers.get(0).getRecoverable(), recoverers.get(1).getRecoverable());
     }
 
     /** recommitLostBlocks retrieves blocks in specified range and commit the write set to either
      * state DB or history DB or both
      */
-    public void recommitLostBlocks(Long firstBlockNum, Long lastBlockNum, Recoverable ... Recoverablrecoverables) {
-        return;
+    public void recommitLostBlocks(Long firstBlockNum, Long lastBlockNum, Recoverable ... recoverables) throws LedgerException{
+        BlockAndPvtData blockAndPvtData;
+        for (long blockNumber = firstBlockNum; blockNumber <= lastBlockNum; blockNumber++) {
+            blockAndPvtData = getPvtDataAndBlockByNum(blockNumber, null);
+            for(Recoverable recoverable : recoverables){
+                recoverable.commitLostBlock(blockAndPvtData);
+            }
+        }
     }
 
     /** GetTransactionByID retrieves a transaction by id
@@ -118,31 +153,40 @@ public class KvLedger implements INodeLedger {
      * @param txID
      * @return
      */
-    public TransactionPackage.ProcessedTransaction getTransactionByID(String txID) {
-        return null;
+    @Override
+    public TransactionPackage.ProcessedTransaction getTransactionByID(String txID) throws LedgerException {
+        Common.Envelope tranEvn = blockStore.retrieveTxByID(txID);
+        TransactionPackage.TxValidationCode txVResult = blockStore.retrieveTxValidationCodeByTxID(txID);
+        return TransactionPackage.ProcessedTransaction.newBuilder()
+                .setTransactionEnvelope(tranEvn)
+                .setValidationCode(txVResult.getNumber())
+                .build();
     }
 
     /** GetBlockchainInfo returns basic info about blockchain
      *
      * @return
      */
-    public Ledger.BlockchainInfo getBlockchainInfo() {
-        return null;
+    @Override
+    public Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException {
+        return blockStore.getBlockchainInfo();
     }
 
     /** GetBlockByNumber returns block at a given height
      * blockNumber of  math.MaxUint64 will return last block
      */
-    public Common.Block getBlockByNumber(Long blockNumber) {
-        return null;
+    @Override
+    public Common.Block getBlockByNumber(Long blockNumber) throws LedgerException {
+        return blockStore.retrieveBlockByNumber(blockNumber);
     }
 
     /** GetBlocksIterator returns an iterator that starts from `startBlockNumber`(inclusive).
      * The iterator is a blocking iterator i.e., it blocks till the next block gets available in the ledger
      * ResultsIterator contains type BlockHolder
      */
-    public ResultsIterator getBlocksIterator(Long startBlockNumber) {
-        return null;
+    @Override
+    public ResultsIterator getBlocksIterator(Long startBlockNumber) throws LedgerException{
+        return blockStore.retrieveBlocks(startBlockNumber);
     }
 
     /** GetBlockByHash returns a block given it's hash
@@ -150,8 +194,9 @@ public class KvLedger implements INodeLedger {
      * @param blockHash
      * @return
      */
-    public Common.Block getBlockByHash(byte[] blockHash) {
-        return null;
+    @Override
+    public Common.Block getBlockByHash(byte[] blockHash) throws LedgerException {
+        return blockStore.retrieveBlockByHash(blockHash);
     }
 
     /** GetBlockByTxID returns a block which contains a transaction
@@ -159,41 +204,42 @@ public class KvLedger implements INodeLedger {
      * @param txID
      * @return
      */
-    public Common.Block getBlockByTxID(String txID) {
-        return null;
-    }
-
-    public TransactionPackage.TxValidationCode getTxValidationCodeByTxID(String txID) {
-        return null;
+    @Override
+    public Common.Block getBlockByTxID(String txID) throws LedgerException {
+        return blockStore.retrieveBlockByTxID(txID);
     }
 
     @Override
-    public ITxSimulator newTxSimulator(String txId) throws LedgerException {
-        return null;
-    }
-
-    /** Prune prunes the blocks/transactions that satisfy the given policy
-     *
-     * @param prunePolicy
-     */
-    public void prune(PrunePolicy prunePolicy) {
-        return;
+    public TransactionPackage.TxValidationCode getTxValidationCodeByTxID(String txID) throws LedgerException {
+        return blockStore.retrieveTxValidationCodeByTxID(txID);
     }
 
     /** NewTxSimulator returns new `ledger.TxSimulator`
      *
      * @return
      */
-    public ITxSimulator newTxSimulator() {
-        return null;
+    @Override
+    public ITxSimulator newTxSimulator(String txId) throws LedgerException {
+        return txtmgmt.newTxSimulator(txId);
+    }
+
+    /** Prune prunes the blocks/transactions that satisfy the given policy
+     *
+     * @param prunePolicy
+     */
+    @Override
+    public void prune(PrunePolicy prunePolicy) throws LedgerException {
+        throw new LedgerException("Not yet implement");
     }
 
     /** NewQueryExecutor gives handle to a query executor.
      * A client can obtain more than one 'QueryExecutor's for parallel execution.
      * Any synchronization should be performed at the implementation level if required
      */
-    public IQueryExecutor newQueryExecutor() {
-        return null;
+    @Override
+    public IQueryExecutor newQueryExecutor() throws LedgerException{
+        //TODO uuid
+        return txtmgmt.newQueryExecutor(UUID.randomUUID().toString());
     }
 
     /** NewHistoryQueryExecutor gives handle to a history query executor.
@@ -201,28 +247,29 @@ public class KvLedger implements INodeLedger {
      * Any synchronization should be performed at the implementation level if required
      * Pass the ledger blockstore so that historical values can be looked up from the chain
      */
-    public IHistoryQueryExecutor newHistoryQueryExecutor() {
-        return null;
+    @Override
+    public IHistoryQueryExecutor newHistoryQueryExecutor() throws LedgerException {
+        return historyDB.newHistoryQueryExecutor(blockStore);
     }
 
     @Override
     public BlockAndPvtData getPvtDataAndBlockByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
-        return null;
+        return ((Store) blockStore).getPvtDataAndBlockByNum(blockNum, filter);
     }
 
     @Override
     public List<TxPvtData> getPvtDataByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
-        return null;
+        return ((Store) blockStore).getPvtDataByNum(blockNum, filter);
     }
 
     @Override
     public void purgePrivateData(long maxBlockNumToRetain) throws LedgerException {
-
+        throw new LedgerException("Not yet implement");
     }
 
     @Override
     public long privateDataMinBlockNum() throws LedgerException {
-        return 0;
+        throw new LedgerException("Not yet implement");
     }
 
     /** Commit commits the valid block (returned in the method RemoveInvalidTransactionsAndPrepare) and related state changes
@@ -237,12 +284,32 @@ public class KvLedger implements INodeLedger {
      *
      */
     public void close() {
-
+        blockStore.shutdown();
+        try {
+            txtmgmt.shutdown();
+        } catch (LedgerException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException {
+    public synchronized void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException {
+        Common.Block block = blockAndPvtData.getBlock();
+//        long blockNo = block.getHeader().getNumber();
+        long blockNo = 0;
+        logger.debug(String.format("Channel %s: Validating state for block %d", ledgerID, blockNo));
+        txtmgmt.validateAndPrepare(blockAndPvtData, true);
+        logger.debug(String.format("Channel %s: Committing block %d to storage", ledgerID, blockNo));
+        blockStore.commitWithPvtData(blockAndPvtData);
+        logger.info(String.format("Channel %s: Committed block %d to storage", ledgerID, blockNo));
 
+        logger.debug(String.format("Channel %s: Committing block %d transaction to state db", ledgerID, blockNo));
+        txtmgmt.commit();
+        //TODO history db enable
+        if(true){
+            logger.debug(String.format("Channel %s: Committing block %d transaction to history db", ledgerID, blockNo));
+            historyDB.commit(block);
+        }
     }
 
 
@@ -262,11 +329,11 @@ public class KvLedger implements INodeLedger {
         this.blockStore = blockStore;
     }
 
-    public TxMgr getTxtmgmt() {
+    public TxManager getTxtmgmt() {
         return txtmgmt;
     }
 
-    public void setTxtmgmt(TxMgr txtmgmt) {
+    public void setTxtmgmt(TxManager txtmgmt) {
         this.txtmgmt = txtmgmt;
     }
 

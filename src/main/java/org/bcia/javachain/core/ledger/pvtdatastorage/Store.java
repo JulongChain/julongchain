@@ -15,6 +15,7 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.pvtdatastorage;
 
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.core.ledger.PvtNsCollFilter;
 import org.bcia.javachain.core.ledger.TxPvtData;
 
@@ -28,21 +29,21 @@ import java.util.List;
  * @company Dingxuan
  */
 public interface Store {
-    void initLastCommitedBlock(long blockNum);
+    void initLastCommitedBlock(long blockNum) throws LedgerException;
 
-    List<TxPvtData> getPvtDataByBlockNum(long blockNum, PvtNsCollFilter filter);
+    List<TxPvtData> getPvtDataByBlockNum(long blockNum, PvtNsCollFilter filter) throws LedgerException;
 
-    void prepare(long blockNum, List<TxPvtData> pvtData);
+    void prepare(long blockNum, List<TxPvtData> pvtData) throws LedgerException;
 
-    void commit();
+    void commit() throws LedgerException;
 
-    void rollback();
+    void rollback() throws LedgerException ;
 
-    boolean isEmpty();
+    boolean isEmpty() throws LedgerException ;
 
-    long lastCommitedBlockHeight();
+    long lastCommitedBlockHeight() throws LedgerException ;
 
-    boolean hasPendingBatch();
+    boolean hasPendingBatch() throws LedgerException ;
 
     void shutdown();
 }

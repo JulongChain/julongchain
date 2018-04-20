@@ -16,11 +16,11 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.QueryResult;
+import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RWSetBuilder;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.ResultsIterator;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 
 /**
@@ -55,5 +55,21 @@ public class QueryResultsItr implements org.bcia.javachain.common.ledger.Results
     @Override
     public void close() throws LedgerException {
         dbItr.close();
+    }
+
+    public ResultsIterator getDbItr() {
+        return dbItr;
+    }
+
+    public void setDbItr(ResultsIterator dbItr) {
+        this.dbItr = dbItr;
+    }
+
+    public RWSetBuilder getRwSetBuilder() {
+        return rwSetBuilder;
+    }
+
+    public void setRwSetBuilder(RWSetBuilder rwSetBuilder) {
+        this.rwSetBuilder = rwSetBuilder;
     }
 }

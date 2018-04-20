@@ -20,6 +20,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.StateListener;
 import org.bcia.javachain.core.ledger.StateUpdates;
+import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
 import java.util.HashMap;
 import java.util.List;
@@ -114,7 +115,7 @@ public class ScEventMgmt implements StateListener {
     }
 
     @Override
-    public void HandleStateUpdates(String ledgerID, StateUpdates stateUpdates) {
+    public void handleStateUpdates(String ledgerID, List<KvRwset.KVWrite> stateUpdates) {
 
     }
 }

@@ -17,9 +17,8 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.QueryResult;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.ResultsIterator;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
+import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 
 /**
  * 类描述
@@ -45,5 +44,29 @@ public class PvtdataResultsItr implements org.bcia.javachain.common.ledger.Resul
     @Override
     public void close() throws LedgerException {
         dbItr.close();
+    }
+
+    public String getNs() {
+        return ns;
+    }
+
+    public void setNs(String ns) {
+        this.ns = ns;
+    }
+
+    public String getColl() {
+        return coll;
+    }
+
+    public void setColl(String coll) {
+        this.coll = coll;
+    }
+
+    public ResultsIterator getDbItr() {
+        return dbItr;
+    }
+
+    public void setDbItr(ResultsIterator dbItr) {
+        this.dbItr = dbItr;
     }
 }

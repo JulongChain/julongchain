@@ -22,16 +22,20 @@ import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.BlockAndPvtData;
 import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.util.Util;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.NsRwSet;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.TxRwSet;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.javachain.protos.node.ProposalPackage;
 
+import java.util.AbstractMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * LevelDB实现的HistoryDB
@@ -163,13 +167,13 @@ public class HistoryLevelDB implements IHistoryDB {
     }
 
     @Override
-    public boolean shouldRecover(Long lastAvailableBlock) throws LedgerException {
-        //配置是否开启leveldb
+    public long shouldRecover() throws LedgerException {
+        //TODO 配置是否开启leveldb
         Height savePoint = getLastSavepoint();
         if(savePoint == null){
-            return true;
+            return -1;
         }
-        return !savePoint.getBlockNum().equals(lastAvailableBlock);
+        return savePoint.getBlockNum();
     }
 
     @Override
@@ -183,8 +187,8 @@ public class HistoryLevelDB implements IHistoryDB {
     }
 
     @Override
-    public void commitLostBlock(Common.Block block) throws LedgerException {
-        commit(block);
+    public void commitLostBlock(BlockAndPvtData blockAndPvtData) throws LedgerException {
+        commit(blockAndPvtData.getBlock());
     }
 
     /**

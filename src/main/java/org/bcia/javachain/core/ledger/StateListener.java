@@ -15,6 +15,10 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger;
 
+import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
+
+import java.util.List;
+
 /**
  * 类描述
  *
@@ -23,5 +27,5 @@ package org.bcia.javachain.core.ledger;
  * @company Dingxuan
  */
 public interface StateListener {
-   void HandleStateUpdates(String ledgerID, StateUpdates stateUpdates);
+   void handleStateUpdates(String ledgerID, List<KvRwset.KVWrite> stateUpdates);
 }

@@ -22,6 +22,7 @@ import org.bcia.javachain.common.ledger.blkstorage.BlockStoreProvider;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Conf;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
+import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.FsBlockStore;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.FsBlockStoreProvider;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
 import org.bcia.javachain.core.ledger.PvtNsCollFilter;
@@ -42,7 +43,7 @@ import java.util.Map;
  * @date 2018/04/09
  * @company Dingxuan
  */
-public class Store implements BlockStore {
+public class Store implements BlockStore{
     private org.bcia.javachain.core.ledger.pvtdatastorage.Store pvtdataStore = null;
     private BlockStore blkStorage = null;
 
@@ -75,6 +76,57 @@ public class Store implements BlockStore {
         return provider;
     }
 
+    @Override
+    public void addBlock(Common.Block block) throws LedgerException {
+
+    }
+
+    @Override
+    public Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException {
+        return blkStorage.getBlockchainInfo();
+    }
+
+    @Override
+    public ResultsIterator retrieveBlocks(long startNum) throws LedgerException {
+        return blkStorage.retrieveBlocks(startNum);
+    }
+
+    @Override
+    public Common.Block retrieveBlockByHash(byte[] blockHash) throws LedgerException {
+        return blkStorage.retrieveBlockByHash(blockHash);
+    }
+
+    @Override
+    public Common.Block retrieveBlockByNumber(Long blockNum) throws LedgerException {
+        return blkStorage.retrieveBlockByNumber(blockNum);
+    }
+
+    @Override
+    public Common.Envelope retrieveTxByID(String txID) throws LedgerException {
+        return blkStorage.retrieveTxByID(txID);
+    }
+
+    @Override
+    public Common.Envelope retrieveTxByBlockNumTranNum(Long blockNum, Long tranNum) throws LedgerException {
+        return blkStorage.retrieveTxByBlockNumTranNum(blockNum, tranNum);
+    }
+
+    @Override
+    public Common.Block retrieveBlockByTxID(String txID) throws LedgerException {
+        return blkStorage.retrieveBlockByTxID(txID);
+    }
+
+    @Override
+    public TransactionPackage.TxValidationCode retrieveTxValidationCodeByTxID(String txID) throws LedgerException {
+        return blkStorage.retrieveTxValidationCodeByTxID(txID);
+    }
+
+    @Override
+    public void shutdown() {
+
+    }
+
+    @Override
     public synchronized void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException{
         List<TxPvtData> pvtDatas = new ArrayList<>();
         for(Map.Entry<Long, TxPvtData> entry : blockAndPvtData.getBlockPvtData().entrySet()){
@@ -118,61 +170,6 @@ public class Store implements BlockStore {
             m.put(txPvtData.getSeqInBlock(), txPvtData);
         }
         return m;
-    }
-
-    @Override
-    public void addBlock(Common.Block block) throws LedgerException {
-
-    }
-
-    @Override
-    public Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException {
-        return null;
-    }
-
-    @Override
-    public ResultsIterator retrieveBlocks(long startBlockNumber) {
-        return null;
-    }
-
-    @Override
-    public ResultsIterator retrieveBlocks(Long startNum) throws LedgerException {
-        return null;
-    }
-
-    @Override
-    public Common.Block retrieveBlockByHash(byte[] blockHash) throws LedgerException {
-        return null;
-    }
-
-    @Override
-    public Common.Block retrieveBlockByNumber(Long blockNum) throws LedgerException {
-        return null;
-    }
-
-    @Override
-    public Common.Envelope retrieveTxByID(String txID) throws LedgerException {
-        return null;
-    }
-
-    @Override
-    public Common.Envelope retrieveTxByBlockNumTranNum(Long blockNum, Long tranNum) throws LedgerException {
-        return null;
-    }
-
-    @Override
-    public Common.Block retrieveBlockByTxID(String txID) throws LedgerException {
-        return null;
-    }
-
-    @Override
-    public TransactionPackage.TxValidationCode retrieveTxValidationCodeByTxID(String txID) throws LedgerException {
-        return null;
-    }
-
-    @Override
-    public void shutdown() {
-
     }
 
     public void init() throws LedgerException{

@@ -16,9 +16,9 @@
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.QueryResult;
-import org.bcia.javachain.protos.common.Collection;
+import org.bcia.javachain.common.ledger.ResultsIterator;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,35 +28,67 @@ import java.util.Map;
  * @date 2018/04/16
  * @company Dingxuan
  */
-public class NsIterator implements ResultsIterator{
+public class NsIterator implements ResultsIterator {
 
     private String ns;
     private NsUpdates nsUpdates;
-    private String[] storedKeys;
+    private List<String> sortedKeys;
     private Integer nextIndex;
     private Integer lastIndex;
 
-//    public static NsIterator newNsIterator(String ns, String startKey, String endKey, UpdateBatch batch){
-//        Map<String, VersionedValue> nsUpdates = batch.getUpdates(ns);
-//    }
+    public static NsIterator newNsIterator(String ns, String startKey, String endKey, UpdateBatch batch){
+        NsUpdates nsUpdates = new NsUpdates();
+        nsUpdates.setMap(batch.getUpdates(ns));
+        if(nsUpdates == null){
+            return null;
+        }
+        List<String> sortKeys = org.bcia.javachain.common.ledger.util.Util.getSortedKeys(nsUpdates.getMap());
+        int nextIndex;
+        int lastIndex;
+        if(startKey == null || ("").equals(startKey)){
+            nextIndex = 0;
+        } else {
+            nextIndex = sortKeys.indexOf(startKey);
+        }
+        if(endKey == null || ("").equals(endKey)){
+            lastIndex = sortKeys.size();
+        } else {
+            lastIndex = sortKeys.indexOf(endKey);
+        }
+        NsIterator nsitr = new NsIterator();
+        nsitr.setNs(ns);
+        nsitr.setNsUpdates(nsUpdates);
+        nsitr.setSortedKeys(sortKeys);
+        nsitr.setNextIndex(nextIndex);
+        nsitr.setLastIndex(lastIndex);
+        return nsitr;
+    }
 
     /** Next gives next key and versioned value. It returns a nil when exhausted
      *
      * @return
      */
     public QueryResult next() throws LedgerException {
-        return null;
+        if(nextIndex >= lastIndex){
+            return null;
+        }
+        String key = sortedKeys.get(nextIndex);
+        VersionedValue vv = nsUpdates.getMap().get(key);
+        nextIndex++;
+        VersionedKV vkv = new VersionedKV();
+        CompositeKey ck = new CompositeKey();
+        ck.setNamespace(ns);
+        ck.setKey(key);
+        vkv.setCompositeKey(ck);
+        vkv.setVersionedValue(vv);
+        return vkv;
     }
 
     /** Close implements the method from QueryResult interface
      *
      */
     public void close() {
-
-    }
-
-    public static NsIterator newNsIterator(String ns, String startKey, String endKey, UpdateBatch batch){
-        return null;
+        //nothing to do
     }
 
     public String getNs() {
@@ -75,12 +107,12 @@ public class NsIterator implements ResultsIterator{
         this.nsUpdates = nsUpdates;
     }
 
-    public String[] getStoredKeys() {
-        return storedKeys;
+    public List<String> getSortedKeys() {
+        return sortedKeys;
     }
 
-    public void setStoredKeys(String[] storedKeys) {
-        this.storedKeys = storedKeys;
+    public void setSortedKeys(List<String> sortedKeys) {
+        this.sortedKeys = sortedKeys;
     }
 
     public Integer getNextIndex() {

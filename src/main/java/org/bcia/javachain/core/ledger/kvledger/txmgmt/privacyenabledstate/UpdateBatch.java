@@ -15,19 +15,6 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate;
 
-import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.NsIterator;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.NsUpdates;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.ResultsIterator;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedValue;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
-import org.bcia.javachain.protos.gossip.Message;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 /**
  * 类描述
  *

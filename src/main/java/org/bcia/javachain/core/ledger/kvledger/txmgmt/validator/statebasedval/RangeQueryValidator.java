@@ -13,24 +13,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package org.bcia.javachain.core.ledger.sceventmgmt;
+package org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.statebasedval;
 
-import org.bcia.javachain.core.ledger.StateListener;
-import org.bcia.javachain.core.ledger.StateUpdates;
+import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
-
-import java.util.List;
 
 /**
  * 类描述
  *
  * @author sunzongyu
- * @date 2018/04/16
+ * @date 2018/04/19
  * @company Dingxuan
  */
-public class KVLedgerLSSCStateListener implements StateListener {
-    @Override
-    public void handleStateUpdates(String ledgerID, List<KvRwset.KVWrite> stateUpdates) {
-        
-    }
+public interface RangeQueryValidator {
+    void init(KvRwset.RangeQueryInfo rqInfo, ResultsIterator itr) throws LedgerException ;
+
+    boolean validate()throws LedgerException;
 }

@@ -35,11 +35,23 @@ public class Provider {
         return provider;
     }
 
-    public Store openStore(String id){
-        return  null;
+    public Store openStore(String ledgerID) throws LedgerException{
+        Store store = new StoreImpl();
+        ((StoreImpl) store).setDb(db);
+        ((StoreImpl) store).setLedgerID(ledgerID);
+        ((StoreImpl) store).initState();
+        return store;
     }
 
-    public void close(){
+    public void close() throws LedgerException{
+        db.close();
+    }
 
+    public LevelDbProvider getDb() {
+        return db;
+    }
+
+    public void setDb(LevelDbProvider db) {
+        this.db = db;
     }
 }
