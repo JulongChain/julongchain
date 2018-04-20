@@ -1,5 +1,5 @@
 /**
- * Copyright Dingxuan. All Rights Reserved.
+ * Copyright Feitian. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.smartcontract.service;
+package org.bcia.javachain.csp.pkcs11.entity;
 
 /**
- * 类描述
+ * Class description
  *
- * @author wanliangbing
- * @date 2018/3/28
- * @company Dingxuan
+ * @author
+ * @date 4/19/18
+ * @company FEITIAN
  */
-public class SmartContractNodeServiceImpl {
+public class PKCS11KeyData {
 
+    byte[] rawpub;
+
+    byte[] rawpri;
+
+    public byte[] getRawPub() {
+        return rawpub;
+    }
+
+    public void setRawPub(byte[] raw) {
+        this.rawpub = raw;
+    }
+
+    public byte[] getRawPri() {
+        return rawpri;
+    }
+
+    public void setRawPri(byte[] raw) {
+        this.rawpri = raw;
+    }
 }

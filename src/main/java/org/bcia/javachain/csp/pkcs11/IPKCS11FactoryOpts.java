@@ -1,5 +1,5 @@
 /**
- * Copyright Dingxuan. All Rights Reserved.
+ * Copyright Feitian. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.smartcontract.service;
+package org.bcia.javachain.csp.pkcs11;
+
+import org.bcia.javachain.csp.factory.IFactoryOpts;
+import sun.security.pkcs11.wrapper.PKCS11;
 
 /**
- * 类描述
+ * Class description
  *
- * @author wanliangbing
- * @date 2018/3/28
- * @company Dingxuan
+ * @author
+ * @date 4/19/18
+ * @company FEITIAN
  */
-public class SmartContractNodeServiceImpl {
+public interface IPKCS11FactoryOpts extends IFactoryOpts {
 
+    // get pkcs11
+    public PKCS11 getPKCS11();
+
+    // get session handle
+    public long getSessionhandle();
+
+    // get soft verify flag
+    public boolean getSoftVerify();
+
+    //
+    public boolean getNoImport();
+
+    //
+    public boolean getuseEcX963Encoding();
 }

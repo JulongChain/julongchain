@@ -18,15 +18,11 @@ package org.bcia.javachain.core.smartcontract;
 import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.common.smartcontractprovider
-        .SmartContractContext;
-
+import org.bcia.javachain.core.common.smartcontractprovider.SmartContractContext;
 import org.bcia.javachain.core.container.api.IBuildSpecFactory;
 import org.bcia.javachain.core.container.scintf.ISmartContractStream;
 import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.ITxSimulator;
-import org.bcia.javachain.core.smartcontract.client
-        .SmartContractContainerClient;
 import org.bcia.javachain.core.smartcontract.shim.SmartContractProvider;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.bcia.javachain.protos.node.SmartcontractShim;
@@ -297,14 +293,7 @@ public class SmartContractSupport {
 
         String smartContractId = scContext.getName();
 
-        SmartContractContainerClient smartContractContainerClient = new
-                SmartContractContainerClient(scContext.getName());
-
-        SmartcontractShim.SmartContractMessage result =
-                smartContractContainerClient.invoke(scContext, scMessage,
-                        timeout);
-
-        return result;
+        return SmartcontractShim.SmartContractMessage.newBuilder().build();
     }
 
     public void registerHandler(Handler handler) {

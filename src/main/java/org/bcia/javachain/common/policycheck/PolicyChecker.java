@@ -1,5 +1,5 @@
 /**
- * Copyright Dingxuan. All Rights Reserved.
+ * Copyright Aisino. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.smartcontract.service;
+
+package org.bcia.javachain.common.policycheck;
 
 /**
  * 类描述
- *
- * @author wanliangbing
- * @date 2018/3/28
- * @company Dingxuan
+ * 策略检查器，通过通达及策略名获得策略，并使用此策略对签名进行验证
+ * @author yuanjun
+ * @date 20/04/20
+ * @company Aisino
  */
-public class SmartContractNodeServiceImpl {
-
+public class PolicyChecker {
 }
