@@ -15,15 +15,6 @@
  */
 package org.bcia.javachain.core.smartcontract.server;
 
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
-import org.bcia.javachain.common.log.JavaChainLog;
-import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.smartcontract.service
-        .SmartContractContainerServiceImpl;
-
-import java.io.IOException;
-
 /**
  * 类描述
  *
@@ -32,48 +23,5 @@ import java.io.IOException;
  * @company Dingxuan
  */
 public class SmartContractContainerServer {
-
-    private static final JavaChainLog log = JavaChainLogFactory.getLog
-            (SmartContractContainerServer.class);
-
-    private Server server;
-    private Integer port;
-
-    public SmartContractContainerServer(Integer port) {
-        this.port = port;
-        try {
-            this.start();
-            log.info("server start success. port[" + port + "]");
-            this.blockUntilShutdown();
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-        }
-    }
-
-    private void start() throws IOException {
-        server = ServerBuilder.forPort(port).addService(new
-                SmartContractContainerServiceImpl()).build().start();
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            @Override
-            public void run() {
-                log.error("*** shutting down gRPC server since JVM " +
-                        "is shutting down");
-                SmartContractContainerServer.this.stop();
-                log.error("*** server shut down");
-            }
-        });
-    }
-
-    private void stop() {
-        if (server != null) {
-            server.shutdown();
-        }
-    }
-
-    private void blockUntilShutdown() throws InterruptedException {
-        if (server != null) {
-            server.awaitTermination();
-        }
-    }
 
 }
