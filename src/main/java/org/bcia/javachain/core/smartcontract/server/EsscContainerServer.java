@@ -24,12 +24,4 @@ package org.bcia.javachain.core.smartcontract.server;
  */
 public class EsscContainerServer extends SmartContractContainerServer {
 
-    public EsscContainerServer() {
-        super(50053);
-    }
-
-    public static void main(String[] args) {
-        new EsscContainerServer();
-    }
-
 }

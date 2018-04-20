@@ -303,7 +303,7 @@ public class BlockfileMgr {
     public synchronized void updateCheckpoint(CheckpointInfo cpInfo) {
         this.cpInfo = cpInfo;
         logger.debug(String.format("Brodcasting about update checkpointInfo: %s", cpInfo));
-        //broadcast
+        //todo broadcast
     }
 
     public synchronized void updateBlockchainInfo(byte[] latestBlockHash, Common.Block latestBlock) {

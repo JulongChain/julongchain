@@ -28,17 +28,17 @@ import org.bcia.javachain.core.ledger.util.Util;
  */
 public class CheckpointInfo {
 
-    private Integer lastestFileChunkSuffixNum;
-    private Integer latestFileChunksize;
-    private Boolean isChainEmpty;
-    private Long lastBlockNumber;
+    private int lastestFileChunkSuffixNum;
+    private int latestFileChunksize;
+    private boolean isChainEmpty;
+    private long lastBlockNumber;
 
     byte[] marshal() {
         //4部分共32字节
         //0~7位 lastestFileChunkSuffixNum
-        byte[] bytes0 = Util.longToBytes(lastestFileChunkSuffixNum.longValue(), 8);
+        byte[] bytes0 = Util.longToBytes(lastestFileChunkSuffixNum, 8);
         //8~15位 latestFileChunksize
-        byte[] bytes1 = Util.longToBytes(latestFileChunksize.longValue(), 8);
+        byte[] bytes1 = Util.longToBytes(latestFileChunksize, 8);
         //16~23位 lastBlockNumber
         byte[] bytes2 = Util.longToBytes(lastBlockNumber, 8);
         //24~31位 chainEmptyMarker
