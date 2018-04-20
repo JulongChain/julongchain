@@ -18,7 +18,7 @@ package org.bcia.javachain.core.ssc.vssc;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.cauthdsl.PolicyProvider;
 import org.bcia.javachain.common.channelconfig.ApplicationCapabilities;
-import org.bcia.javachain.common.groupconfig.IApplicationConfig;
+import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policies.IPolicy;
