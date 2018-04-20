@@ -27,6 +27,7 @@ import org.bcia.javachain.core.events.EventHubServer;
 import org.bcia.javachain.core.node.NodeGrpcServer;
 import org.bcia.javachain.core.ssc.ISystemSmartContractManager;
 import org.bcia.javachain.core.ssc.SystemSmartContractManager;
+import org.bcia.javachain.msp.mgmt.MspManager;
 import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.common.helper.MockMSPManager;
 import org.bcia.javachain.node.util.NodeConstant;
@@ -67,7 +68,7 @@ public class NodeServer {
         }
 
         //检查当前的成员服务提供者类型，目前只支持CSP，即密码提供商
-        int mspType = MockMSPManager.getLocalMSP().getType();
+        int mspType = MspManager.getLocalMsp().getType();
         if (mspType != NodeConstant.PROVIDER_CSP) {
             log.error("Unsupported msp type: " + mspType);
             return;

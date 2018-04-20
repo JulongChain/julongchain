@@ -13,14 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig;
+package org.bcia.javachain.common.resourceconfig;
+
+import org.bcia.javachain.common.configtx.IValidator;
+import org.bcia.javachain.common.groupconfig.IConfigResources;
+import org.bcia.javachain.protos.common.Configtx;
 
 /**
  * 对象
  *
  * @author zhouhui
- * @date 2018/3/27
+ * @date 2018/4/17
  * @company Dingxuan
  */
-public interface IConsortium {
+public class Bundle {
+    private String groupId;
+    private Configtx.Config config;
+    private IConfigResources configResources;
+    private IValidator validator;
+
+
+//    channelID string
+//    resConf   *cb.Config
+//    chanConf  channelconfig.Resources
+//    rg        *resourceGroup
+//    cm        configtx.Validator
+//    pm        *policyRouter
 }

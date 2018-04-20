@@ -13,14 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig;
+package org.bcia.javachain.common.policies;
+
+import java.util.Map;
 
 /**
  * 对象
  *
  * @author zhouhui
- * @date 2018/3/27
+ * @date 2018/4/19
  * @company Dingxuan
  */
-public class IConsenterCapabilities {
+public class PolicyRouter implements IPolicyManager {
+    @Override
+    public IPolicy getPolicy(String id) {
+        return null;
+    }
+
+    @Override
+    public IPolicyManager getSubPolicyManager(String[] path) {
+        return null;
+    }
+
+    @Override
+    public Map<String, IPolicy> getPolicies() {
+        return null;
+    }
 }

@@ -28,35 +28,40 @@ import org.bcia.javachain.protos.common.Configtx;
  */
 public interface IValidator {
 
-    /** Validate attempts to apply a configtx to become the new config
+    /**
+     * Validate attempts to apply a configtx to become the new config
      *
      * @param configEnv
      */
     void validate(Configtx.ConfigEnvelope configEnv);
 
-    /** Validate attempts to validate a new configtx against the current config state
+    /**
+     * Validate attempts to validate a new configtx against the current config state
      *
      * @param configtx
      * @return
      */
     Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx);
 
-    /** ChainID retrieves the chain ID associated with this manager
+    /**
+     * retrieves the chain ID associated with this manager
      *
      * @return
      */
-    String chainID();
+    String groupId();
 
-    /** ConfigProto returns the current config as a proto
+    /**
+     * ConfigProto returns the current config as a proto
      *
      * @return
      */
     Configtx.Config configProto();
 
-    /** Sequence returns the current sequence number of the config
+    /**
+     * Sequence returns the current sequence number of the config
      *
      * @return
      */
-    Long sequence();
+    long sequence();
 
 }

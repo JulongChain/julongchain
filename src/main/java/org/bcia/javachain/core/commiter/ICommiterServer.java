@@ -15,30 +15,31 @@
  */
 package org.bcia.javachain.core.commiter;
 
+import org.bcia.javachain.common.exception.CommitterException;
 import org.bcia.javachain.core.ledger.*;
 import org.bcia.javachain.protos.common.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
  * 确认服务接口
  *
- * @author  wanglei
+ * @author wanglei
  * @date 18/3/27
  * @company Dingxuan
  */
 public interface ICommiterServer {
 
-    //TODO :相关对象未定义
-    void CommitWithPvtData(BlockAndPvtData blockAndPvtData) throws Exception;
+    void commitWithPrivateData(BlockAndPvtData blockAndPvtData) throws CommitterException;
 
-    BlockAndPvtData GetPvtDataAndBlockByNum(long seqNumber) throws Exception;
+    BlockAndPvtData getPrivateDataAndBlockByNum(long seqNumber) throws CommitterException;
 
-    TxPvtData GetPvtDataByNum(Integer blockNumber, Map<String, Map<String, Boolean> > filter) throws  Exception;
+    TxPvtData[] getPrivateDataByNum(long blockNumber, Map<String, Map<String, Boolean>> filter) throws CommitterException;
 
-    long LedgerHeight() throws Exception;
+    long ledgerHeight() throws CommitterException;
 
-    Common.Block[] GetBlocks(long[] blockSeqs) throws Exception;
+    List<Common.Block> getBlocks(long[] blockSeqs);
 
-    void Close();
+    void close();
 }

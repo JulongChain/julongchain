@@ -15,6 +15,10 @@
  */
 package org.bcia.javachain.core.commiter;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.CommitterException;
+import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
@@ -26,89 +30,133 @@ import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.core.commiter.util.*;
 import org.bcia.javachain.protos.common.Ledger;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
  * 确认服务实现
  *
- * @author wanglei
+ * @author wanglei zhouhui
  * @date 18/3/27
  * @company Dingxuan
  */
-public class CommitterServer implements ICommiterServer{
+public class CommitterServer implements ICommiterServer {
     private static JavaChainLog log = JavaChainLogFactory.getLog(CommitterServer.class);
 
+    public static interface IConfigBlockEventer {
+        void event(Common.Block block) throws CommitterException;
+    }
+
     private INodeLedger nodeLedger;
+    private IConfigBlockEventer eventer;
 
-    private void preCommit(Common.Block block) throws  Exception{
-        Boolean resultBool = Utils.IsConfigBlock(block);
-        if(resultBool){
-            // TODO:
+    public CommitterServer(INodeLedger nodeLedger) {
+        this.nodeLedger = nodeLedger;
+        this.eventer = new IConfigBlockEventer() {
+            @Override
+            public void event(Common.Block block) throws CommitterException {
 
+            }
+        };
+    }
+
+    public CommitterServer(INodeLedger nodeLedger, IConfigBlockEventer eventer) {
+        this.nodeLedger = nodeLedger;
+        this.eventer = eventer;
+    }
+
+    /**
+     * 预提交区块
+     *
+     * @param block
+     * @throws CommitterException
+     * @throws InvalidProtocolBufferException
+     * @throws ValidateException
+     */
+    private void preCommit(Common.Block block) throws CommitterException, InvalidProtocolBufferException,
+            ValidateException {
+        if (CommitterUtils.isConfigBlock(block)) {
+            log.info("get a config block");
+
+            if (eventer != null) {
+                eventer.event(block);
+            }
         }
     }
-    public void postCommit(Common.Block block) throws Exception {
+
+    @Override
+    public void commitWithPrivateData(BlockAndPvtData blockAndPvtData) throws CommitterException {
+        log.info("commitWithPrivateData");
+        try {
+            //提交前处理
+            preCommit(blockAndPvtData.getBlock());
+
+            //正式提交账本
+            nodeLedger.commitWithPvtData(blockAndPvtData);
+
+            //提交后处理
+            postCommit(blockAndPvtData.getBlock());
+        } catch (InvalidProtocolBufferException e) {
+            log.error(e.getMessage(), e);
+            throw new CommitterException(e);
+        } catch (ValidateException e) {
+            log.error(e.getMessage(), e);
+            throw new CommitterException(e);
+        } catch (LedgerException e) {
+            log.error(e.getMessage(), e);
+            throw new CommitterException(e);
+        }
+    }
+
+    private void postCommit(Common.Block block) throws CommitterException {
+        //TODO：创建区块事件
     }
 
     @Override
-    public void CommitWithPvtData(BlockAndPvtData blockAndPvtData) throws Exception {
-        log.info("Call CommitterServer CommitWithPvtData !");
-
-        preCommit( blockAndPvtData.getBlock() );
-
-        //Committing block
-        //TODO: wait liangbing complete CommitWithPvtData
-        //nodeLedger.CommitWithPvtData( blockAndPvtData );
-
-        //TODO:
-        postCommit(blockAndPvtData.getBlock());
-    }
-
-    @Override
-    public BlockAndPvtData GetPvtDataAndBlockByNum(long seqNumber) throws Exception {
-        log.info("Call CommitterServer GetPvtDataAndBlockByNum return BlockAndPvtData=null!");
-
-        BlockAndPvtData blockAndPvtData = null;
-        //TODO: wait langbing  complete 'getPvtDataAndBlockByNum'
-        //blockAndPvtData = nodeLedger.getPvtDataAndBlockByNum(seqNumber, null);
-
-        return  blockAndPvtData;
-    }
-
-    @Override
-    public TxPvtData GetPvtDataByNum(Integer blockNumber, Map<String, Map<String, Boolean>> filter) throws Exception {
-        log.info("Call CommitterServer GetPvtDataByNum return TxPvtData=null!");
-
+    public BlockAndPvtData getPrivateDataAndBlockByNum(long seqNumber) throws CommitterException {
         return null;
     }
 
     @Override
-    public long LedgerHeight() throws Exception {
-        log.info("Call CommitterServer LedgerHeight return Integer=0!");
-        Ledger.BlockchainInfo  blockchainInfo = null;
-        //TODO: wait liangbing
-        //blockchainInfo = Ledger.getBlockchainInfo();
-
-        return blockchainInfo.getHeight();
+    public TxPvtData[] getPrivateDataByNum(long blockNumber, Map<String, Map<String, Boolean>> filter) throws CommitterException {
+        return new TxPvtData[0];
     }
 
     @Override
-    public Common.Block[] GetBlocks(long[] blockSeqs) throws Exception {
-        log.info("Call CommitterServer GetBlocks return Common.Block=null!");
-        Common.Block blocks[] = null;
-        int bloksSeqsNum = blockSeqs.length;
-        for (int index = 0; index < bloksSeqsNum; index++){
-            Common.Block tempBlock = null;
-            //TODO: wait liangbing
-            //tempBlock = Ledger.GetBlockNumber( blockSeqs[index] );
-            blocks[index] = tempBlock;
+    public long ledgerHeight() throws CommitterException {
+        try {
+            Ledger.BlockchainInfo blockchainInfo = nodeLedger.getBlockchainInfo();
+            return blockchainInfo.getHeight();
+        } catch (LedgerException e) {
+            log.error(e.getMessage(), e);
+            throw new CommitterException(e);
+        }
+    }
+
+    @Override
+    public List<Common.Block> getBlocks(long[] blockSeqs) {
+        List<Common.Block> blockList = new ArrayList<Common.Block>();
+
+        for (long seqNum : blockSeqs) {
+            Common.Block block = null;
+            try {
+                block = nodeLedger.getBlockByNumber(seqNum);
+            } catch (LedgerException e) {
+                log.error(e.getMessage(), e);
+            }
+
+            if (block != null) {
+                blockList.add(block);
+            }
         }
 
-        return blocks;
+        return blockList;
     }
 
     @Override
-    public void Close() {
-
+    public void close() {
+        nodeLedger.close();
     }
+
 }

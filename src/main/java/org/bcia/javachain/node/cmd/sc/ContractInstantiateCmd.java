@@ -39,7 +39,6 @@ import java.io.UnsupportedEncodingException;
  * @date 2018/2/24
  * @company Dingxuan
  */
-@Component
 public class ContractInstantiateCmd extends AbstractNodeContractCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ContractInstantiateCmd.class);
 

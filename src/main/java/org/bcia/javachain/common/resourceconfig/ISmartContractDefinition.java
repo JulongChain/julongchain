@@ -16,8 +16,8 @@
 package org.bcia.javachain.common.resourceconfig;
 
 /**
- * ChaincodeDefinition describes all of the necessary information for a peer to decide whether to endorse
- * a proposal and whether to validate a transaction, for a particular chaincode.
+ * ISmartContractDefinition describes all of the necessary information for a peer to decide whether to endorse
+ * a proposal and whether to validate a transaction, for a particular smart contract.
  *
  * @author wanliangbing
  * @date 2018/3/15
@@ -25,35 +25,40 @@ package org.bcia.javachain.common.resourceconfig;
  */
 public interface ISmartContractDefinition {
 
-    /** smartContractName returns the name of this smart contract (the name it was put in the SmartContractRegistry with).
+    /**
+     * the name of this smart contract (the name it was put in the SmartContractRegistry with).
      *
      * @return
      */
     String getSmartContractName();
 
-    /** Hash returns the hash of the chaincode.
+    /**
+     * the hash of the smart contract.
      *
      * @return
      */
     byte[] hash();
 
-    /** CCVersion returns the version of the chaincode.
+    /**
+     * the version of the smart contract.
      *
      * @return
      */
     String getSmartContractVersion();
 
-    /** Validation returns how to validate transactions for this chaincode.
-     * The string returned is the name of the validation method (usually 'vscc')
+    /**
+     * Validation returns how to validate transactions for this smart contract.
+     * The string returned is the name of the validation method (usually 'vssc')
      * and the bytes returned are the argument to the validation (in the case of
-     * 'vscc', this is a marshaled pb.VSCCArgs message).
+     * 'vssc', this is a marshaled pb.VSSCArgs message).
      *
      * @return
      */
     Validation getValidation();
 
-    /** Endorsement returns how to endorse proposals for this chaincode.
-     * The string returns is the name of the endorsement method (usually 'escc').
+    /**
+     * Endorsement returns how to endorse proposals for this smart contract.
+     * The string returns is the name of the endorsement method (usually 'essc').
      *
      * @return
      */
