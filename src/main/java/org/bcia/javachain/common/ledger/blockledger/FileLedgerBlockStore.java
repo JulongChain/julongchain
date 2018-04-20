@@ -32,5 +32,5 @@ public interface FileLedgerBlockStore {
 
     Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException;
 
-    ResultsIterator retrieveBlocks(long startBlockNumber);
+    ResultsIterator retrieveBlocks(long startBlockNumber) throws LedgerException;
 }

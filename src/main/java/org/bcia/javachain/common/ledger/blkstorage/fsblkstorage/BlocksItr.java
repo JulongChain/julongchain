@@ -15,10 +15,11 @@
  */
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
-import org.bcia.javachain.common.ledger.QueryResult;
+import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.iq80.leveldb.table.BlockIterator;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 
 /**
  *
@@ -27,7 +28,7 @@ import org.iq80.leveldb.table.BlockIterator;
  * @date 2018/04/12
  * @company Dingxuan
  */
-public class BlocksItr {
+public class BlocksItr implements ResultsIterator {
 
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlocksItr.class);
 
@@ -70,10 +71,16 @@ public class BlocksItr {
         return null;
     }
 
+    @Override
+    public QueryResult next() throws LedgerException {
+        return null;
+    }
+
     /**
      * Close releases any resources held by the iterator
      */
-    void close() {
+    @Override
+    public void close() {
 
     }
 

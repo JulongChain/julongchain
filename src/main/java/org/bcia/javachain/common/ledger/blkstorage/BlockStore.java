@@ -18,6 +18,7 @@ package org.bcia.javachain.common.ledger.blkstorage;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.common.ledger.blockledger.FileLedgerBlockStore;
+import org.bcia.javachain.core.ledger.BlockAndPvtData;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.node.TransactionPackage;
@@ -43,7 +44,7 @@ public interface BlockStore extends FileLedgerBlockStore {
 
     Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException;
 
-    ResultsIterator retrieveBlocks(Long startNum) throws LedgerException;
+    ResultsIterator retrieveBlocks(long startNum) throws LedgerException;
 
     Common.Block retrieveBlockByHash(byte[] blockHash) throws LedgerException;
 
@@ -58,4 +59,6 @@ public interface BlockStore extends FileLedgerBlockStore {
     TransactionPackage.TxValidationCode retrieveTxValidationCodeByTxID (String txID) throws LedgerException;
 
     void shutdown();
+
+    void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException;
 }

@@ -16,6 +16,7 @@
 package org.bcia.javachain.common.ledger;
 
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 
 /**
  * ResultsIterator - an iterator for query result set

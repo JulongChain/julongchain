@@ -92,8 +92,8 @@ public class BlockfileMgr {
         mgr.setIndex(BlockIndex.newBlockIndex(indexConfig, indexStore));
         mgr.bcInfo = Ledger.BlockchainInfo.newBuilder()
                 .setHeight(0)
-                .setCurrentBlockHash(null)
-                .setPreviousBlockHash(null)
+                .setCurrentBlockHash(ByteString.EMPTY)
+                .setPreviousBlockHash(ByteString.EMPTY)
                 .build();
 
         if(!mgr.getCpInfo().getChainEmpty()){
