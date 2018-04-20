@@ -17,6 +17,7 @@ package org.bcia.javachain.core.ssc.cssc;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.apache.commons.lang3.BooleanUtils;
 import org.bcia.javachain.common.config.IConfig;
 import org.bcia.javachain.common.config.IConfigManager;
 import org.bcia.javachain.common.exception.JavaChainException;
@@ -94,7 +95,7 @@ public class CSSC extends SystemSmartContractBase {
     // UpdateConfigBlock; otherwise it is the chain id
     // TODO: Improve the scc interface to avoid marshal/unmarshal args
     @Override
-    public SmartContractResponse invoke(ISmartContractStub stub){
+    public SmartContractResponse invoke(ISmartContractStub stub) {
         log.debug("Enter CSSC invoke function");
         List<byte[]> args = stub.getArgs();
         int size=args.size();
@@ -131,9 +132,14 @@ public class CSSC extends SystemSmartContractBase {
                     return newErrorResponse(String.format("\"JoinGroup\" request failed because of validation of configuration block"));
                 }
                 // 2. check local MSP Admins policy
-//                if(policyChecker.checkPolicyNoGroup(Principal.Admins,sp)==false){
-//                    return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check for group [%s]",groupID));
-//                }
+                try {
+                    if(!BooleanUtils.isTrue(policyChecker.checkPolicyNoGroup(Principal.Admins,sp))){
+                        return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check for group [%s]",groupID));
+                    }
+                } catch (JavaChainException e) {
+                    log.error(e.getMessage(), e);
+                    return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check for group [%s]",groupID));
+                }
                 return joinGroup(groupID,block);
             case GET_CONFIG_BLOCK:
                 // 2. check policy
@@ -158,9 +164,14 @@ public class CSSC extends SystemSmartContractBase {
                 // 2. check local MSP Members policy
                 // TODO: move to ACLProvider once it will support chainless ACLs
                 // 2. check local MSP Admins policy
-//                if(policyChecker.checkPolicyNoGroup(Principal.Members,sp)==false){
-//                    return newErrorResponse(String.format("\"GetGroups\" request failed authorization check"));
-//                }
+                try {
+                    if(!BooleanUtils.isTrue(policyChecker.checkPolicyNoGroup(Principal.Members,sp))){
+                        return newErrorResponse(String.format("\"GetGroups\" request failed authorization check"));
+                    }
+                } catch (JavaChainException e) {
+                    log.error(e.getMessage(), e);
+                    return newErrorResponse(String.format("\"GetGroups\" request failed authorization check"));
+                }
                 return getGroups();
             default:
                 return newErrorResponse(String.format("Invalid Function %s",function));
@@ -174,7 +185,7 @@ public class CSSC extends SystemSmartContractBase {
 
     //validateConfigBlock validate configuration block to see whenever it's contains valid config transaction
     private boolean validateConfigBlock(Common.Block block){
-         return true;
+        return true;
     }
 
     // joinChain will join the specified chain in the configuration block.

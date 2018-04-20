@@ -17,7 +17,9 @@ package org.bcia.javachain.core.ssc.lssc;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.apache.commons.lang3.BooleanUtils;
 import org.bcia.javachain.common.cauthdsl.CAuthDslBuilder;
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.SysSmartContractException;
 import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -135,11 +137,15 @@ public class LSSC  extends SystemSmartContractBase {
                     return newErrorResponse(String.format("Incorrect number of arguments, expected a minimum of 2,provided %d",size));
                 }
                 // 2. check local MSP Admins policy
-//                try{
-                    policyChecker.checkPolicyNoGroup(Principal.Admins,sp);
-//                }catch (JavaChainException e){
-//                    return newErrorResponse(String.format("Authorization for INSTALL has been denied (error-%s)",e.getMessage()));
-//                }
+                try{
+                    if(!BooleanUtils.isTrue(policyChecker.checkPolicyNoGroup(Principal.Admins,sp))){
+                        return newErrorResponse(String.format("Authorization for INSTALL has been denied"));
+                    }
+                }catch (JavaChainException e){
+                    log.error(e.getMessage(), e);
+                    return newErrorResponse(String.format("Authorization for INSTALL has been denied (error-%s)",e.getMessage()));
+                }
+
 
                 byte[] depSpecBytes=args.get(1);
                 try {
@@ -168,7 +174,7 @@ public class LSSC  extends SystemSmartContractBase {
                 }
                 //the maximum number of arguments depends on the capability of the group
                 if((ac.getCapabilities().privateGroupData()==false && size>6) ||
-                (ac.getCapabilities().privateGroupData()==true && size>7)){
+                        (ac.getCapabilities().privateGroupData()==true && size>7)){
                     return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
                 }
                 byte[] depSpecBytes2=args.get(2);
@@ -290,22 +296,28 @@ public class LSSC  extends SystemSmartContractBase {
                     return newErrorResponse(String.format("Incorrect number of arguments,expected 1,provided %d",size));
                 }
                 //2. check local MSP Admins policy
-//                try {
-                    policyChecker.checkPolicyNoGroup(Principal.Admins,sp);
-//                } catch (JavaChainException e) {
-//                    return newErrorResponse(String.format("Authorization for GETSMARTCONTRACTS has been denied with error:%s",e.getMessage()));
-//                }
+                try {
+                    if(!BooleanUtils.isTrue(policyChecker.checkPolicyNoGroup(Principal.Admins,sp))) {
+                        return newErrorResponse(String.format("Authorization for GETSMARTCONTRACTS has been denied"));
+                    }
+                } catch (JavaChainException e) {
+                    log.error(e.getMessage(), e);
+                    return newErrorResponse(String.format("Authorization for GETSMARTCONTRACTS has been denied with error:%s",e.getMessage()));
+                }
                 return getSmartContracts(stub);
             case GET_INSTALLED_SMARTCONTRACTS:
                 if(size!=1){
                     return newErrorResponse(String.format("Incorrect number of arguments,expected 1,provided %d",size));
                 }
                 //2. check local MSP Admins policy
-//                try {
-                    policyChecker.checkPolicyNoGroup(Principal.Admins,sp);
-//                } catch (JavaChainException e) {
-//                    return newErrorResponse(String.format("Authorization for GETINSTALLEDSMARTCONTRACTS has been denied with error:%s",e.getMessage()));
-//                }
+                try {
+                    if(!BooleanUtils.isTrue(policyChecker.checkPolicyNoGroup(Principal.Admins,sp))){
+                        return newErrorResponse(String.format("Authorization for GETINSTALLEDSMARTCONTRACTS has been denied."));
+                    }
+                } catch (JavaChainException e) {
+                    log.error(e.getMessage(), e);
+                    return newErrorResponse(String.format("Authorization for GETINSTALLEDSMARTCONTRACTS has been denied with error:%s",e.getMessage()));
+                }
                 return getInstalledSmartContracts();
             default:
                 return newErrorResponse(String.format("Invalid Function %s",function));
@@ -338,7 +350,7 @@ public class LSSC  extends SystemSmartContractBase {
     private void putSmartContractCollectionData(ISmartContractStub stub,
                                                 SmartContractData data,
                                                 byte[] collectionConfigBytes)
-                                                throws  SysSmartContractException{
+            throws  SysSmartContractException{
 
     }
 
@@ -349,8 +361,8 @@ public class LSSC  extends SystemSmartContractBase {
      * @return
      */
     private byte[] getSmartContractInstance(ISmartContractStub stub,
-                                          String contractName)
-                                          throws SysSmartContractException
+                                            String contractName)
+            throws SysSmartContractException
     {
         return null;
     }
@@ -363,7 +375,7 @@ public class LSSC  extends SystemSmartContractBase {
      * @throws SysSmartContractException
      */
     private SmartContractData getSmartContractData(String contractName,byte[] scdBytes)
-                                          throws SysSmartContractException
+            throws SysSmartContractException
     {
         return null;
     }
@@ -468,8 +480,8 @@ public class LSSC  extends SystemSmartContractBase {
                                                      byte [] vscc,
                                                      byte [] collectionConfigBytes,
                                                      String function)
-                                                     throws  SysSmartContractException{
-         return null;
+            throws  SysSmartContractException{
+        return null;
     }
 
 
@@ -496,7 +508,7 @@ public class LSSC  extends SystemSmartContractBase {
             SmartContractData scdata,
             ISmartContractPackage scPackage,
             byte[] collectionConfigBytes
-            )throws SysSmartContractException{
+    )throws SysSmartContractException{
         return null;
     }
 
