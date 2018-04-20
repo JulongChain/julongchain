@@ -13,15 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.policies;
+package org.bcia.javachain.common.groupconfig.config;
+
+import org.bcia.javachain.common.groupconfig.capability.IApplicationCapabilities;
+
+import java.util.Map;
 
 /**
- * 类描述
+ * 应用配置接口
  *
  * @author zhouhui
- * @date 2018/3/9
+ * @date 2018/3/27
  * @company Dingxuan
  */
-public interface IPolicyManagerGetter {
-    IPolicyManager getPolicyManager(String groupId);
+public interface IApplicationConfig {
+    /**
+     * 获取当前应用下的组织
+     *
+     * @return
+     */
+    Map<String, IApplicationOrgConfig> getApplicationOrgConfigs();
+
+    /**
+     * 获取能力集
+     *
+     * @return
+     */
+    IApplicationCapabilities getCapabilities();
 }

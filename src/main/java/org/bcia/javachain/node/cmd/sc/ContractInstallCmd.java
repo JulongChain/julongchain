@@ -15,24 +15,31 @@
  */
 package org.bcia.javachain.node.cmd.sc;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.google.protobuf.ByteString;
 import org.apache.commons.cli.*;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.node.Node;
+import org.bcia.javachain.protos.node.Smartcontract;
 import org.springframework.stereotype.Component;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * 完成节点安装智能合约的解析
  * node contract install -n mycc -l java -ctor '{"Args":["query","a"]}' -v 1.0 -p /home/javachian/contract_file
+ * node contract install -n mycc -v 1.0 -p examples.smartcontract.java.smartcontract_example02.Example02.java
+ * <p>
  * 名称 语言 执行信息 版本 路径
  *
  * @author zhouhui wanglei
  * @date 2018/2/24
  * @company Dingxuan
  */
-@Component
 public class ContractInstallCmd extends AbstractNodeContractCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ContractInstallCmd.class);
 
@@ -47,12 +54,8 @@ public class ContractInstallCmd extends AbstractNodeContractCmd {
     //参数：path
     private static final String ARG_PATH = "p";
 
-    //参数：超时时间
-    private static final String ARG_TIMEOUT = "t";
-    //参数：是否使用TLS传输
-    private static final String ARG_USE_TLS = "tls";
-    //参数：CA文件位置
-    //private static final String ARG_CA = "ca";
+    //参数
+    private static final String KEY_ARGS = "args";
 
     public ContractInstallCmd(Node node) {
         super(node);
@@ -72,8 +75,6 @@ public class ContractInstallCmd extends AbstractNodeContractCmd {
         CommandLine cmd = parser.parse(options, args);
 
         String defaultValue = "UnKown";
-
-        //String consenter = null;
 
         //-----------------------------------解析参数值-------------------------------//
         //解析出合约名称
@@ -95,11 +96,30 @@ public class ContractInstallCmd extends AbstractNodeContractCmd {
             log.info("Smart Contract version-----$" + scVersion);
         }
         //合约具体执行参数
-        String scCtor = null;
+        Smartcontract.SmartContractInput input = null;
         if (cmd.hasOption(ARG_SC_CTOR)) {
-            scCtor = cmd.getOptionValue(ARG_SC_CTOR, defaultValue);
-            log.info("Smart Contract ctor-----$" + scCtor);
+            String ctor = cmd.getOptionValue(ARG_SC_CTOR, defaultValue);
+            log.info("ctor-----$" + ctor);
+            JSONObject ctorJson = JSONObject.parseObject(ctor);
+
+            Smartcontract.SmartContractInput.Builder inputBuilder = Smartcontract.SmartContractInput.newBuilder();
+
+            JSONArray argsJSONArray = ctorJson.getJSONArray(KEY_ARGS);
+            for (int i = 0; i < argsJSONArray.size(); i++) {
+                inputBuilder.addArgs(ByteString.copyFrom(argsJSONArray.getString(i).getBytes()));
+            }
+
+            input = inputBuilder.build();
+            //打印一下参数，检查是否跟预期一致
+            for (int i = 0; i < input.getArgsCount(); i++) {
+                try {
+                    log.info("input.getArg-----$" + input.getArgs(i).toString(CommConstant.DEFAULT_CHARSET));
+                } catch (UnsupportedEncodingException e) {
+                    log.warn(e.getMessage(), e);
+                }
+            }
         }
+
         //合约路径
         String scPath = null;
         if (cmd.hasOption(ARG_PATH)) {
@@ -109,7 +129,7 @@ public class ContractInstallCmd extends AbstractNodeContractCmd {
 
 
         //TODO 待完成
-        nodeSmartContract.install(CommConstant.LSSC, scCtor, scVersion, scLanguage);
+        nodeSmartContract.install(scName, scVersion, scLanguage, input);
     }
 
 }

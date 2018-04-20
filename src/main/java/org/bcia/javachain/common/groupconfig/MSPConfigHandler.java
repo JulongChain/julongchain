@@ -17,6 +17,7 @@ package org.bcia.javachain.common.groupconfig;
 
 import org.bcia.javachain.msp.IMsp;
 import org.bcia.javachain.msp.IMspManager;
+import org.bcia.javachain.msp.mgmt.Msp;
 import org.bcia.javachain.msp.mgmt.MspManager;
 import org.bcia.javachain.protos.msp.MspConfigPackage;
 
@@ -74,7 +75,8 @@ public class MSPConfigHandler {
 //
 //        IMsp msp = factory.getMsp(opts);
 
-        IMsp msp = MspManager.getLocalMsp();
+        //TODO:这里并不是localMsp
+        IMsp msp = new Msp();
 
         msp.setup(mspConfig);
         String mspId = msp.getIdentifier();

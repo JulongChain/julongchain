@@ -29,7 +29,6 @@ import org.springframework.stereotype.Component;
  * @date 2018/2/24
  * @company Dingxuan
  */
-@Component
 public class VersionCmd extends AbstractNodeVersionCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(VersionCmd.class);
 

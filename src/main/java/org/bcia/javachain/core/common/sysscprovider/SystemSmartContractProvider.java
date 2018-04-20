@@ -15,7 +15,7 @@
  */
 package org.bcia.javachain.core.common.sysscprovider;
 
-import org.bcia.javachain.common.groupconfig.IApplicationConfig;
+import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 
 /**

@@ -13,29 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig;
+package org.bcia.javachain.common.groupconfig.config;
 
-import java.util.Map;
+import org.bcia.javachain.protos.node.Configuration;
+
+import java.util.List;
 
 /**
- * 应用配置接口
+ * 对象
  *
  * @author zhouhui
  * @date 2018/3/27
  * @company Dingxuan
  */
-public interface IApplicationConfig {
-    /**
-     * 获取当前应用下的组织
-     *
-     * @return
-     */
-    Map<String, IApplicationOrgConfig> getApplicationOrgConfigs();
+public interface IApplicationOrgConfig extends IOrganizationConfig {
 
-    /**
-     * 获取能力集
-     *
-     * @return
-     */
-    IApplicationCapabilities getCapabilities();
+    List<Configuration.AnchorNode> getAnchorNodes();
 }

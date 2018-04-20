@@ -24,7 +24,7 @@ option java_package = "org.bcia.javachain.protos.consenter";
 package consenter;
 
 
-// The orderer config is specified by the following convention:
+// The consenter config is specified by the following convention:
 //   For a configuration item with key "Key"
 //   the encoded value is a a proto message of type "Key"
 //   For example, for the configuration item of name "ConsensusType"
@@ -60,7 +60,7 @@ message KafkaBrokers {
     repeated string brokers = 1;
 }
 
-// ChannelRestrictions is the mssage which conveys restrictions on channel creation for an orderer
-message ChannelRestrictions {
-    uint64 max_count = 1; // The max count of channels to allow to be created, a value of 0 indicates no limit
+// GroupRestrictions is the mssage which conveys restrictions on group creation for an consenter
+message GroupRestrictions {
+    uint64 max_count = 1; // The max count of groups to allow to be created, a value of 0 indicates no limit
 }

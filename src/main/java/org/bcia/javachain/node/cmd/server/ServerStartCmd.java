@@ -30,7 +30,6 @@ import org.springframework.stereotype.Component;
  * @date 2018/2/24
  * @company Dingxuan
  */
-@Component
 public class ServerStartCmd extends AbstractNodeServerCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ServerStartCmd.class);
 

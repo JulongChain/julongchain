@@ -86,7 +86,7 @@ organizations:
         id: DEFAULT
 
         # MSPDir is the filesystem path which contains the MSP configuration.
-        mspDir: msp
+        mspDir: D:\msp
 
         # AdminPrincipal dictates the type of principal used for an
         # organization's Admins policy. Today, only the values of Role.ADMIN and

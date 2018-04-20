@@ -13,15 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.policies;
+package org.bcia.javachain.common.groupconfig.config;
+
+import org.bcia.javachain.protos.consenter.Configuration;
+
+import java.util.Map;
 
 /**
- * 类描述
+ * 对象
  *
  * @author zhouhui
- * @date 2018/3/9
+ * @date 2018/3/27
  * @company Dingxuan
  */
-public interface IPolicyManagerGetter {
-    IPolicyManager getPolicyManager(String groupId);
+public interface IConsenterConfig {
+    Configuration.ConsensusType getConsensusType();
+
+    Configuration.BatchSize getBatchSize();
+
+    Configuration.BatchTimeout getBatchTimeout();
+
+    Configuration.KafkaBrokers getKafkaBrokers();
+
+    Configuration.GroupRestrictions getGroupRestrictions();
+
+    org.bcia.javachain.protos.common.Configuration.Capabilities getCapabilities();
+
+    Map<String, IOrganizationConfig> getOrganizationConfigMap();
 }

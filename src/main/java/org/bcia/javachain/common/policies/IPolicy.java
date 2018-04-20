@@ -15,12 +15,17 @@
  */
 package org.bcia.javachain.common.policies;
 
+import org.bcia.javachain.common.exception.PolicyException;
+import org.bcia.javachain.common.util.proto.SignedData;
+
 /**
- * 类描述
+ * 策略接口
  *
  * @author zhouhui
  * @date 2018/3/9
  * @company Dingxuan
  */
 public interface IPolicy {
+
+    void evaluate(SignedData[] signatureSet) throws PolicyException;
 }

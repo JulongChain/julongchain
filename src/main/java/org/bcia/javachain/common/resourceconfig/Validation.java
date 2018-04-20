@@ -27,6 +27,14 @@ public class Validation {
     private String method;
     private byte[] args;
 
+    public Validation() {
+    }
+
+    public Validation(String method, byte[] args) {
+        this.method = method;
+        this.args = args;
+    }
+
     public String getMethod() {
         return method;
     }

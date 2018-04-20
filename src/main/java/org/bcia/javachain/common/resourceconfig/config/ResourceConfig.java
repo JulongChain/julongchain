@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.policies;
+package org.bcia.javachain.common.resourceconfig.config;
 
 /**
- * 类描述
+ * 对象
  *
  * @author zhouhui
- * @date 2018/3/9
+ * @date 2018/4/19
  * @company Dingxuan
  */
-public interface IPolicyManagerGetter {
-    IPolicyManager getPolicyManager(String groupId);
+public class ResourceConfig {
 }
