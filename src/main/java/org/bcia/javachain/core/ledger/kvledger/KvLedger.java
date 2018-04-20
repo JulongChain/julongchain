@@ -295,10 +295,11 @@ public class KvLedger implements INodeLedger {
     @Override
     public synchronized void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException {
         Common.Block block = blockAndPvtData.getBlock();
-//        long blockNo = block.getHeader().getNumber();
-        long blockNo = 0;
+        long blockNo = block.getHeader().getNumber();
+//        long blockNo = 0;
         logger.debug(String.format("Channel %s: Validating state for block %d", ledgerID, blockNo));
-        txtmgmt.validateAndPrepare(blockAndPvtData, true);
+        //TODO 验证器
+//        txtmgmt.validateAndPrepare(blockAndPvtData, true);
         logger.debug(String.format("Channel %s: Committing block %d to storage", ledgerID, blockNo));
         blockStore.commitWithPvtData(blockAndPvtData);
         logger.info(String.format("Channel %s: Committed block %d to storage", ledgerID, blockNo));

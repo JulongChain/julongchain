@@ -15,6 +15,8 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valinternal;
 
+import org.bcia.javachain.common.exception.LedgerException;
+
 /**
  * 类描述
  *
@@ -23,5 +25,5 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valinternal;
  * @company Dingxuan
  */
 public interface InternalValidator {
-    PubAndHashUpdates validateAndPrepareBatch(Block block, boolean doMVCCValidation);
+    PubAndHashUpdates validateAndPrepareBatch(Block block, boolean doMVCCValidation) throws LedgerException;
 }

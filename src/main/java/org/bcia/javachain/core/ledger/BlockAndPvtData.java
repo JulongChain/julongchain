@@ -17,6 +17,7 @@ package org.bcia.javachain.core.ledger;
 
 import org.bcia.javachain.protos.common.Common;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -29,7 +30,7 @@ import java.util.Map;
 public class BlockAndPvtData {
 
     private Common.Block block;
-    private Map<Long, TxPvtData> blockPvtData;
+    private Map<Long, TxPvtData> blockPvtData = new HashMap<>();
     private MissingPrivateData missing;
 
     public Common.Block getBlock() {

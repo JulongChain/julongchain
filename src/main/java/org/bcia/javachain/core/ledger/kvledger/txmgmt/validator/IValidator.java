@@ -26,6 +26,6 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.Update
  * @date 2018/04/19
  * @company Dingxuan
  */
-public interface Validator {
+public interface IValidator {
     UpdateBatch validateAndPrepareBatch(BlockAndPvtData blockAndPvtData, boolean doMVCCValidation) throws LedgerException;
 }

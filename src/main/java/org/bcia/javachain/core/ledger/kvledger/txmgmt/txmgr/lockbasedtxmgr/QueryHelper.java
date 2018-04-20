@@ -169,7 +169,7 @@ public class QueryHelper {
         }
     }
 
-    private void checkDone() throws LedgerException{
+    public void checkDone() throws LedgerException{
         if(!doneInvoked){
             throw new LedgerException("This instance should not be used after calling Done()");
         }

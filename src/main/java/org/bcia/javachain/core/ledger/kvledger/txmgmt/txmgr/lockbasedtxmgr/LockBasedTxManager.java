@@ -27,7 +27,8 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.UpdateBatch;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedValue;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.TxManager;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.Validator;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.IValidator;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valimpl.DefaultValidator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
@@ -49,7 +50,7 @@ public class LockBasedTxManager implements TxManager {
 
     private String ledgerID;
     private DB db;
-    private Validator validator;
+    private IValidator IValidator;
     private UpdateBatch batch;
     private Common.Block currentBlock;
     private Map<String, StateListener> stateListeners;
@@ -63,8 +64,7 @@ public class LockBasedTxManager implements TxManager {
         txMgr.setLedgerID(ledgerID);
         txMgr.setDb(db);
         txMgr.setStateListeners(stateListeners);
-        //TODO valimpl
-        txMgr.setValidator(null);
+        txMgr.setValidator(DefaultValidator.newDefaultValidator(txMgr, db));
         txMgr.setLock(new ReentrantReadWriteLock());
         return txMgr;
     }
@@ -88,7 +88,7 @@ public class LockBasedTxManager implements TxManager {
         try {
             Common.Block block = blockAndPvtData.getBlock();
             logger.debug("Validating new block with num trans = " + block.getData().getDataList().size());
-            UpdateBatch b = validator.validateAndPrepareBatch(blockAndPvtData, doMVCCValidation);
+            UpdateBatch b = IValidator.validateAndPrepareBatch(blockAndPvtData, doMVCCValidation);
             currentBlock = block;
             batch = b;
             invokeNamespaceListeners(batch);
@@ -200,12 +200,12 @@ public class LockBasedTxManager implements TxManager {
         this.db = db;
     }
 
-    public Validator getValidator() {
-        return validator;
+    public IValidator getValidator() {
+        return IValidator;
     }
 
-    public void setValidator(Validator validator) {
-        this.validator = validator;
+    public void setValidator(IValidator IValidator) {
+        this.IValidator = IValidator;
     }
 
     public UpdateBatch getBatch() {

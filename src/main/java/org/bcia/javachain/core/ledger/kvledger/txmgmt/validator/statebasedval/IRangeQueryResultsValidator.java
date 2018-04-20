@@ -32,9 +32,9 @@ import java.util.List;
  * @date 2018/04/19
  * @company Dingxuan
  */
-public class RangeQueryResultsValidator implements RangeQueryValidator {
+public class IRangeQueryResultsValidator implements IRangeQueryValidator {
 
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(RangeQueryResultsValidator.class);
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(IRangeQueryResultsValidator.class);
 
     private KvRwset.RangeQueryInfo rqInfo;
     private ResultsIterator itr;
