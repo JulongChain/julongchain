@@ -24,5 +24,5 @@ import org.bcia.javachain.protos.node.ProposalPackage; /**
  * @company Dingxuan
  */
 public interface IPolicyChecker {
-    Boolean checkPolicyNoGroup(String admins, ProposalPackage.SignedProposal sp) throws JavaChainException;
+    void checkPolicyNoGroup(String admins, ProposalPackage.SignedProposal sp)  ;
 }

@@ -134,11 +134,11 @@ public class MspConfigBuilder {
         String privateKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPrivateKeyStore();
         String publicKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPublicKeyStore();
 
-        cryptoConfig.setSymmetrickey(symmetrickey);
-        cryptoConfig.setSign(sign);
-        cryptoConfig.setHash(hash);
-        cryptoConfig.setAsymmetric(asymmetric);
-        cryptoConfig.setFilekeystore(buildFileKeyStore(privateKeyPath, publicKeyPath, keystore));
+//        cryptoConfig.setSymmetrickey(symmetrickey);
+//        cryptoConfig.setSign(sign);
+//        cryptoConfig.setHash(hash);
+//        cryptoConfig.setAsymmetric(asymmetric);
+//        cryptoConfig.setFilekeystore(buildFileKeyStore(privateKeyPath, publicKeyPath, keystore));
         return cryptoConfig.build();
     }
 
@@ -177,14 +177,14 @@ public class MspConfigBuilder {
      * @param publicKeyPath
      * @return
      */
-    public static MspConfigPackage.FileKeyStore buildFileKeyStore(String privateKeyPath, String publicKeyPath, List<String> keystore) {
-        MspConfigPackage.FileKeyStore.Builder fileKeyStore = MspConfigPackage.FileKeyStore.newBuilder();
-        fileKeyStore.setPrivateKeyPath(privateKeyPath);
-        fileKeyStore.setPublicKeyPath(publicKeyPath);
-        fileKeyStore.setPrivateKeyValue(keystore.get(0));
-        fileKeyStore.setPublicKeyValue(keystore.get(1));
-        return fileKeyStore.build();
-    }
+//    public static MspConfigPackage.FileKeyStore buildFileKeyStore(String privateKeyPath, String publicKeyPath, List<String> keystore) {
+//        MspConfigPackage.FileKeyStore.Builder fileKeyStore = MspConfigPackage.FileKeyStore.newBuilder();
+//        fileKeyStore.setPrivateKeyPath(privateKeyPath);
+//        fileKeyStore.setPublicKeyPath(publicKeyPath);
+//        fileKeyStore.setPrivateKeyValue(keystore.get(0));
+//        fileKeyStore.setPublicKeyValue(keystore.get(1));
+//        return fileKeyStore.build();
+//    }
 
 
 

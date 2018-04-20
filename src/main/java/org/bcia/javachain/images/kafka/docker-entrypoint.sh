@@ -24,13 +24,13 @@ KAFKA_HOME=/opt/kafka
 KAFKA_EXE=${KAFKA_HOME}/bin/kafka-server-start.sh
 KAFKA_SERVER_PROPERTIES=${KAFKA_HOME}/config/server.properties
 
-# handle starting the kafka server with an option
+# LevelDBHandle starting the kafka server with an option
 # (genericly handled, but only --override known to me at this time)
 if [ "${1:0:1}" = '-' ]; then
   set -- ${KAFKA_EXE} ${KAFKA_SERVER_PROPERTIES} "$@"
 fi
 
-# handle default (i.e. no custom options or commands)
+# LevelDBHandle default (i.e. no custom options or commands)
 if [ "$1" = "${KAFKA_EXE}" ]; then
 
   # add the server.properties to the command

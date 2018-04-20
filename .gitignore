@@ -8,8 +8,13 @@
 out
 gen
 target
+sun/*
 
 /.idea/*
 /output.log
 /.gitignore
 
+output.log.2018-03-15
+output.log.2018-03-17
+src/main/java/sun/
+/src/main/java/sun/test/

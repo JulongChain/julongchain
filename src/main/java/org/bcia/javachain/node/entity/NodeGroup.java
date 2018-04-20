@@ -17,6 +17,7 @@ package org.bcia.javachain.node.entity;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.stub.StreamObserver;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.NodeException;
@@ -26,25 +27,29 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.common.util.FileUtils;
-import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.common.util.proto.ProposalUtils;
 import org.bcia.javachain.consenter.common.broadcast.BroadCastClient;
+import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.core.ssc.cssc.CSSC;
+import org.bcia.javachain.csp.gm.GmCspFactory;
+import org.bcia.javachain.csp.gm.sm2.SM2;
 import org.bcia.javachain.msp.ISigningIdentity;
-import org.bcia.javachain.msp.mgmt.MspManager;
 import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.common.client.*;
 import org.bcia.javachain.node.common.helper.SpecHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.consenter.Ab;
+import org.bcia.javachain.protos.msp.Identities;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Query;
 import org.bcia.javachain.protos.node.Smartcontract;
+import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.List;
 
 /**
@@ -169,7 +174,7 @@ public class NodeGroup {
             throw new NodeException("Can not read block file");
         }
 
-        ISigningIdentity identity = MspManager.getLocalMsp().getDefaultSigningIdentity();
+        ISigningIdentity identity = null;// new Mgmt().getLocalMsp().getDefaultSigningIdentity();
 
         //ISigningIdentity identity = new MockSigningIdentity();
         byte[] creator = identity.serialize();

@@ -22,13 +22,14 @@ import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.CommConstant;
+import org.bcia.javachain.common.util.FileUtils;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.common.util.proto.ProposalUtils;
 import org.bcia.javachain.consenter.common.broadcast.BroadCastClient;
+import org.bcia.javachain.core.endorser.Endorser;
+import org.bcia.javachain.core.ssc.cssc.CSSC;
 import org.bcia.javachain.core.ssc.lssc.LSSC;
-import org.bcia.javachain.csp.factory.CspManager;
 import org.bcia.javachain.msp.ISigningIdentity;
-import org.bcia.javachain.msp.mgmt.MspManager;
 import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.common.client.BroadcastClient;
 import org.bcia.javachain.node.common.client.EndorserClient;
@@ -39,7 +40,9 @@ import org.bcia.javachain.protos.consenter.Ab;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Smartcontract;
+import org.springframework.expression.spel.ast.NullLiteral;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
@@ -65,21 +68,14 @@ public class NodeSmartContract {
 
     }
 
-    public void install(String scName, String scVersion, String scLanguage, Smartcontract.SmartContractInput input)
-            throws NodeException {
-        Smartcontract.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName, scVersion,
-                input);
+    public void install(String scName, String ctor, String scVersion, String scLanguage) throws NodeException {
+        //生成proposal  Type=ENDORSER_TRANSACTION
+        Smartcontract.SmartContractInvocationSpec spec = SpecHelper.buildInvocationSpec(scName, ctor, null);
 
-        ISigningIdentity identity = MspManager.getLocalMsp().getDefaultSigningIdentity();
-
+        ISigningIdentity identity = new MockSigningIdentity();
         byte[] creator = identity.serialize();
 
-        byte[] nonce = new byte[0];
-        try {
-            nonce = CspManager.getDefaultCsp().rng(24, null);
-        } catch (JavaChainException e) {
-            e.printStackTrace();
-        }
+        byte[] nonce = MockCrypto.getRandomNonce();
 
         String txId = null;
         try {
@@ -89,19 +85,15 @@ public class NodeSmartContract {
             throw new NodeException("Generate txId fail");
         }
 
-        byte[] inputBytes = (input != null ? input.toByteArray() : new byte[0]);
-        Smartcontract.SmartContractInvocationSpec lsscSpec = SpecHelper.buildInvocationSpec(CommConstant.LSSC,
-                LSSC.INSTALL.getBytes(), inputBytes);
         //生成proposal  Type=ENDORSER_TRANSACTION
-        ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType
-                .ENDORSER_TRANSACTION, "", txId, lsscSpec, nonce, creator, null);
+        ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType.ENDORSER_TRANSACTION,
+                "", txId, spec, nonce, creator, null);
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //获取背书节点返回信息
         EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
-        log.info("Install Result: " + proposalResponse.getPayload().toString(Charset.forName(CommConstant
-                .DEFAULT_CHARSET)));
+        log.info("Query Result: " + proposalResponse.getPayload().toString(Charset.forName(CommConstant.DEFAULT_CHARSET)));
     }
 
     public void instantiate(String ip, int port, String groupId, String scName, String scVersion, Smartcontract
@@ -109,7 +101,7 @@ public class NodeSmartContract {
         Smartcontract.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName, scVersion,
                 input);
 
-        ISigningIdentity identity = MspManager.getLocalMsp().getDefaultSigningIdentity();
+        ISigningIdentity identity = null;//Mgmt.getLocalMsp().getDefaultSigningIdentity();
 
         byte[] creator = identity.serialize();
 
