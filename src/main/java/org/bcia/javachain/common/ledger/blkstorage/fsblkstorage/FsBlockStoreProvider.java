@@ -42,10 +42,10 @@ public class FsBlockStoreProvider implements BlockStoreProvider {
      * @return
      */
     public static BlockStoreProvider newProvider(Conf conf, IndexConfig indexConfig) throws LedgerException {
-        BlockStoreProvider provider = new FsBlockStoreProvider();
-        ((FsBlockStoreProvider) provider).setLeveldbProvider(LevelDbProvider.newProvider());
-        ((FsBlockStoreProvider) provider).setConf(conf);
-        ((FsBlockStoreProvider) provider).setIndexConfig(indexConfig);
+        FsBlockStoreProvider provider = new FsBlockStoreProvider();
+        provider.setLeveldbProvider(LevelDbProvider.newProvider());
+        provider.setConf(conf);
+        provider.setIndexConfig(indexConfig);
         return provider;
     }
 
