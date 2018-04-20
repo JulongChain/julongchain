@@ -24,8 +24,6 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RwSetUtil;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
-import java.util.Arrays;
-
 /**
  * 类描述
  *
@@ -33,8 +31,8 @@ import java.util.Arrays;
  * @date 2018/04/19
  * @company Dingxuan
  */
-public class RangeQueryHashValidator implements RangeQueryValidator{
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(RangeQueryHashValidator.class);
+public class IRangeQueryHashValidator implements IRangeQueryValidator {
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(IRangeQueryHashValidator.class);
 
     private KvRwset.RangeQueryInfo rqInfo;
     private ResultsIterator itr;

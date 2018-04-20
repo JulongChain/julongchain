@@ -26,7 +26,7 @@ import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
  * @date 2018/04/19
  * @company Dingxuan
  */
-public interface RangeQueryValidator {
+public interface IRangeQueryValidator {
     void init(KvRwset.RangeQueryInfo rqInfo, ResultsIterator itr) throws LedgerException ;
 
     boolean validate()throws LedgerException;

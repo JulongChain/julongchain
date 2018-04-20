@@ -38,4 +38,8 @@ public class CustomTx {
     public static void initialize(Map<Common.HeaderType, IProcessor> processors){
         CustomTx.processors = processors;
     }
+
+    public static IProcessor getProcessor(Common.HeaderType txType){
+        return processors.get(txType);
+    }
 }

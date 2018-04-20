@@ -17,8 +17,6 @@ package org.bcia.javachain.csp.gm.sm4;
 
 
 
-
-
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 

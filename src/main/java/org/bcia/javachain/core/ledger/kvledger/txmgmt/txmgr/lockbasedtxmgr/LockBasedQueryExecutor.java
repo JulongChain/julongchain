@@ -58,7 +58,7 @@ public class LockBasedQueryExecutor implements IQueryExecutor {
     }
 
     @Override
-    public ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
+    public ResultsIterator getStateRangeScanIterator(String namespace, String collection, String startKey, String endKey) throws LedgerException {
         return null;
     }
 

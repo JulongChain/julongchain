@@ -109,16 +109,7 @@ message QueryResponse {
 // Interface that provides support to smartcontract execution. SmartContractContext
 // provides the context necessary for the server to respond appropriately.
 service SmartContractSupport {
+
     rpc Register(stream SmartContractMessage) returns (stream SmartContractMessage) {}
-}
 
-service SmartContractNodeService {
-    rpc register(SmartContractMessage) returns (SmartContractMessage);
-    rpc getState(SmartContractMessage) returns (SmartContractMessage);
-    rpc putState(SmartContractMessage) returns (SmartContractMessage);
-    rpc deleteState(SmartContractMessage) returns (SmartContractMessage);
-}
-
-service SmartContractContainerService {
-    rpc invoke(SmartContractMessage) returns (SmartContractMessage);
 }

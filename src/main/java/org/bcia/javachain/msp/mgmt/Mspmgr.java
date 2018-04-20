@@ -33,15 +33,32 @@ import java.util.Map;
  */
 public class Mspmgr implements IMspManager {
     private static JavaChainLog log = JavaChainLogFactory.getLog(MspManager.class);
-    private static HashMap<String, IMsp> mspsMap = new HashMap<String, IMsp>();
+    public  HashMap<String, IMsp> mspsMap = new HashMap<String, IMsp>();
     private boolean up;
     private static HashMap<String, IMsp> mspsByProviders = new HashMap<String, IMsp>();
+
+
+    public IMspManager createMspmgr(IMsp[] msps){
+
+        for (IMsp msp: msps) {
+            String mspId= msp.getIdentifier();
+            mspsMap.put(mspId,msp);
+        }
+        return this;
+    }
+
 
     @Override
     public void setup(IMsp[] msps) {
         if(up==true){
             log.info("MSP manager already up");
         }
+
+        for (IMsp msp: msps) {
+           String mspId= msp.getIdentifier();
+           mspsMap.put(mspId,msp);
+        }
+
     }
 
     @Override
@@ -54,8 +71,8 @@ public class Mspmgr implements IMspManager {
         try {
             Identities.SerializedIdentity sId = Identities.SerializedIdentity.parseFrom(serializedID);
            // TODO 暂时先用getlocalmsp获取，之后需要通过id获取
-            //IMsp msp = getMSPs().get(sId.getMspid());
-            IMsp msp=MspManager.getLocalMsp();
+            IMsp msp = getMSPs().get(sId.getMspid());
+            //IMsp msp=MspManager.getLocalMsp();
             return msp.deserializeIdentity(sId.getIdBytes().toByteArray());
         } catch (Exception e) {
             e.printStackTrace();

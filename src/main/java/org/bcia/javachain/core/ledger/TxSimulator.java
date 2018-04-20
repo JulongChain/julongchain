@@ -84,7 +84,7 @@ public abstract class TxSimulator implements ITxSimulator {
 
     @Override
     public ResultsIterator getStateRangeScanIterator(String namespace, String
-            startKey, String endKey) throws LedgerException {
+            startKey,String collection, String endKey) throws LedgerException {
         log.debug("getStateRangeScanIterator");
         log.debug("namespace:" + namespace + " startKey:" + startKey + " " +
                 "endKey:" + endKey);
