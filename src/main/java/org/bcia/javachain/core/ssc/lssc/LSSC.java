@@ -17,6 +17,7 @@ package org.bcia.javachain.core.ssc.lssc;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.apache.commons.lang3.BooleanUtils;
 import org.bcia.javachain.common.cauthdsl.CAuthDslBuilder;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.SysSmartContractException;
@@ -137,10 +138,14 @@ public class LSSC  extends SystemSmartContractBase {
                 }
                 // 2. check local MSP Admins policy
                 try{
-                    policyChecker.checkPolicyNoGroup(Principal.Admins,sp);
+                    if(!BooleanUtils.isTrue(policyChecker.checkPolicyNoGroup(Principal.Admins,sp))){
+                        return newErrorResponse(String.format("Authorization for INSTALL has been denied"));
+                    }
                 }catch (JavaChainException e){
+                    log.error(e.getMessage(), e);
                     return newErrorResponse(String.format("Authorization for INSTALL has been denied (error-%s)",e.getMessage()));
                 }
+
 
                 byte[] depSpecBytes=args.get(1);
                 try {
@@ -274,7 +279,7 @@ public class LSSC  extends SystemSmartContractBase {
                         } catch (SysSmartContractException e) {
                             return newErrorResponse(String.format("%s",e.getMessage()));
                         }
-                        return newSuccessResponse(scd2.smartContractName());
+                        return newSuccessResponse(scd2.getSmartContractName());
                     case GET_SC_DATA:
                         return newSuccessResponse(scbytes);
                     default:
@@ -292,8 +297,11 @@ public class LSSC  extends SystemSmartContractBase {
                 }
                 //2. check local MSP Admins policy
                 try {
-                    policyChecker.checkPolicyNoGroup(Principal.Admins,sp);
+                    if(!BooleanUtils.isTrue(policyChecker.checkPolicyNoGroup(Principal.Admins,sp))) {
+                        return newErrorResponse(String.format("Authorization for GETSMARTCONTRACTS has been denied"));
+                    }
                 } catch (JavaChainException e) {
+                    log.error(e.getMessage(), e);
                     return newErrorResponse(String.format("Authorization for GETSMARTCONTRACTS has been denied with error:%s",e.getMessage()));
                 }
                 return getSmartContracts(stub);
@@ -303,8 +311,11 @@ public class LSSC  extends SystemSmartContractBase {
                 }
                 //2. check local MSP Admins policy
                 try {
-                    policyChecker.checkPolicyNoGroup(Principal.Admins,sp);
+                    if(!BooleanUtils.isTrue(policyChecker.checkPolicyNoGroup(Principal.Admins,sp))){
+                        return newErrorResponse(String.format("Authorization for GETINSTALLEDSMARTCONTRACTS has been denied."));
+                    }
                 } catch (JavaChainException e) {
+                    log.error(e.getMessage(), e);
                     return newErrorResponse(String.format("Authorization for GETINSTALLEDSMARTCONTRACTS has been denied with error:%s",e.getMessage()));
                 }
                 return getInstalledSmartContracts();

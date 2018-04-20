@@ -22,15 +22,12 @@ import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.CommConstant;
-import org.bcia.javachain.common.util.FileUtils;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.common.util.proto.ProposalUtils;
 import org.bcia.javachain.consenter.common.broadcast.BroadCastClient;
-import org.bcia.javachain.core.endorser.Endorser;
-import org.bcia.javachain.core.ssc.cssc.CSSC;
 import org.bcia.javachain.core.ssc.lssc.LSSC;
 import org.bcia.javachain.msp.ISigningIdentity;
-import org.bcia.javachain.msp.mgmt.Mgmt;
+import org.bcia.javachain.msp.mgmt.MspManager;
 import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.common.client.BroadcastClient;
 import org.bcia.javachain.node.common.client.EndorserClient;
@@ -41,9 +38,7 @@ import org.bcia.javachain.protos.consenter.Ab;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Smartcontract;
-import org.springframework.expression.spel.ast.NullLiteral;
 
-import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
@@ -102,7 +97,7 @@ public class NodeSmartContract {
         Smartcontract.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName, scVersion,
                 input);
 
-        ISigningIdentity identity = Mgmt.getLocalMsp().getDefaultSigningIdentity();
+        ISigningIdentity identity = MspManager.getLocalMsp().getDefaultSigningIdentity();
 
         byte[] creator = identity.serialize();
 

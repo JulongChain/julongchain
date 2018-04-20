@@ -19,18 +19,10 @@ import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.common.util.FileUtils;
-import org.bcia.javachain.core.node.NodeConfig;
-import org.bcia.javachain.core.node.NodeConfigFactory;
-import org.bcia.javachain.msp.entity.CspConfig;
-import org.bcia.javachain.msp.mgmt.Mgmt;
 import org.bcia.javachain.node.cmd.INodeCmd;
 import org.bcia.javachain.node.cmd.factory.NodeCmdFactory;
 import org.bcia.javachain.node.util.NodeConstant;
-import org.bcia.javachain.protos.msp.MspConfigPackage;
 import org.springframework.stereotype.Component;
-
-import java.io.IOException;
 
 /**
  * 节点对象

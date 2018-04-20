@@ -16,7 +16,6 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RWSetBuilder;
 
 import java.util.List;
@@ -36,6 +35,7 @@ public class QueryHelper {
 
     public byte[] getState(String ns, String key) throws LedgerException{
         checkDone();
+        return null;
     }
 
     private void checkDone() throws LedgerException{
