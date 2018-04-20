@@ -75,7 +75,7 @@ public class ConfigTreeHelper {
      * @param modPolicy
      */
     private static void addValue(Configtx.ConfigTree.Builder configTreeBuilder, String key, Message message,
-                                String modPolicy) {
+                                 String modPolicy) {
         //首先构造ConfigValue
         Configtx.ConfigValue.Builder configValueBuilder = Configtx.ConfigValue.newBuilder();
         configValueBuilder.setValue(message.toByteString());
@@ -163,7 +163,7 @@ public class ConfigTreeHelper {
                 .getAdminPrincipal()));
 
         //填充MSP信息
-        MspConfigPackage.MSPConfig mspConfig = MspConfigHelper.buildMspConfig(org.getMspDir());
+        MspConfigPackage.MSPConfig mspConfig = MspConfigHelper.buildMspConfig(org.getMspDir(), org.getId());
         IConfigValue mspValue = new MSPValue(mspConfig);
         addValue(orgTreeBuilder, mspValue.getKey(), mspValue.getValue(), GroupConfigConstant.POLICY_ADMINS);
 
