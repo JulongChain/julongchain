@@ -13,17 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig;
+package org.bcia.javachain.common.policies;
+
+import org.bcia.javachain.common.exception.PolicyException;
+import org.bcia.javachain.common.util.proto.SignedData;
+import org.bcia.javachain.protos.common.Policies;
 
 /**
- * 组织接口定义
+ * 对象
  *
  * @author zhouhui
- * @date 2018/3/27
+ * @date 2018/4/18
  * @company Dingxuan
  */
-public interface IOrganization {
-    String getName();
+public class NormalPolicy implements IPolicy {
+    private IPolicy policy;
+    private String policyName;
 
-    String getMspId();
+    public NormalPolicy(IPolicy policy, String policyName) {
+        this.policy = policy;
+        this.policyName = policyName;
+    }
+
+    @Override
+    public void evaluate(SignedData[] signatureSet) throws PolicyException {
+        policy.evaluate(signatureSet);
+    }
 }

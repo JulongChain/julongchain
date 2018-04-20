@@ -16,6 +16,7 @@
 package org.bcia.javachain.node.common.helper;
 
 import com.google.protobuf.Message;
+import org.bcia.javachain.common.groupconfig.value.AnchorNodesValue;
 import org.bcia.javachain.common.groupconfig.value.CapabilitiesValue;
 import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
 import org.bcia.javachain.common.groupconfig.value.IConfigValue;
@@ -24,9 +25,12 @@ import org.bcia.javachain.common.policies.IConfigPolicy;
 import org.bcia.javachain.common.policies.ImplicitMetaAnyPolicy;
 import org.bcia.javachain.common.policies.ImplicitMetaMajorityPolicy;
 import org.bcia.javachain.common.policies.SignaturePolicy;
+import org.bcia.javachain.msp.mgmt.MspManager;
+import org.bcia.javachain.msp.util.MspConfigHelper;
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.common.Policies;
 import org.bcia.javachain.protos.msp.MspConfigPackage;
+import org.bcia.javachain.protos.node.Configuration;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 
 import java.util.HashMap;
@@ -50,8 +54,8 @@ public class ConfigTreeHelper {
      * @param policy
      * @param modPolicy
      */
-    public static void addPolicy(Configtx.ConfigTree.Builder configTreeBuilder, String key, Policies.Policy policy,
-                                 String modPolicy) {
+    private static void addPolicy(Configtx.ConfigTree.Builder configTreeBuilder, String key, Policies.Policy policy,
+                                  String modPolicy) {
         //首先构造ConfigPolicy
         Configtx.ConfigPolicy.Builder configPolicyBuilder = Configtx.ConfigPolicy.newBuilder();
         configPolicyBuilder.setPolicy(policy);
@@ -70,7 +74,7 @@ public class ConfigTreeHelper {
      * @param message
      * @param modPolicy
      */
-    public static void addValue(Configtx.ConfigTree.Builder configTreeBuilder, String key, Message message,
+    private static void addValue(Configtx.ConfigTree.Builder configTreeBuilder, String key, Message message,
                                 String modPolicy) {
         //首先构造ConfigValue
         Configtx.ConfigValue.Builder configValueBuilder = Configtx.ConfigValue.newBuilder();
@@ -86,7 +90,7 @@ public class ConfigTreeHelper {
      *
      * @return
      */
-    public static Map<String, Configtx.ConfigPolicy> getDefaultImplicitMetaPolicy() {
+    private static Map<String, Configtx.ConfigPolicy> getDefaultImplicitMetaPolicy() {
         //首先创建默认的权限体系
         Map<String, Configtx.ConfigPolicy> defaultPolicies = new HashMap<String, Configtx.ConfigPolicy>();
 
@@ -159,9 +163,24 @@ public class ConfigTreeHelper {
                 .getAdminPrincipal()));
 
         //填充MSP信息
-        MspConfigPackage.MSPConfig mspConfig = MockMSPManager.getVerifyingMspConfig(org.getMspDir(), org.getId(), org.getMspType());
+        MspConfigPackage.MSPConfig mspConfig = MspConfigHelper.buildMspConfig(org.getMspDir());
         IConfigValue mspValue = new MSPValue(mspConfig);
         addValue(orgTreeBuilder, mspValue.getKey(), mspValue.getValue(), GroupConfigConstant.POLICY_ADMINS);
+
+        //填充AnchorNodes信息
+        if (org.getAnchorNodes() != null && org.getAnchorNodes().length > 0) {
+            Configuration.AnchorNode[] anchorNodes = new Configuration.AnchorNode[org.getAnchorNodes().length];
+            for (int i = 0; i < org.getAnchorNodes().length; i++) {
+                Configuration.AnchorNode.Builder anchorNodeBuilder = Configuration.AnchorNode.newBuilder();
+                anchorNodeBuilder.setHost(org.getAnchorNodes()[i].getHost());
+                anchorNodeBuilder.setPort(org.getAnchorNodes()[i].getPort());
+
+                anchorNodes[i] = anchorNodeBuilder.build();
+            }
+
+            IConfigValue anchorNodesValue = new AnchorNodesValue(anchorNodes);
+            addValue(orgTreeBuilder, anchorNodesValue.getKey(), anchorNodesValue.getValue(), GroupConfigConstant.POLICY_ADMINS);
+        }
 
         //填充更改策略人
         orgTreeBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
@@ -176,7 +195,7 @@ public class ConfigTreeHelper {
      * @param mspId
      * @param devMode
      */
-    public static void addSignaturePolicyDefaults(Configtx.ConfigTree.Builder configTreeBuilder, String mspId, boolean
+    private static void addSignaturePolicyDefaults(Configtx.ConfigTree.Builder configTreeBuilder, String mspId, boolean
             devMode) {
         Policies.SignaturePolicyEnvelope policyEnvelope = null;
         if (devMode) {

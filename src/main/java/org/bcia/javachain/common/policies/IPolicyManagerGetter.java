@@ -23,4 +23,5 @@ package org.bcia.javachain.common.policies;
  * @company Dingxuan
  */
 public interface IPolicyManagerGetter {
+    IPolicyManager getPolicyManager(String groupId);
 }

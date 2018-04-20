@@ -24,6 +24,7 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.proto.ProposalUtils;
 import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.IIdentityDeserializer;
+import org.bcia.javachain.msp.mgmt.MspManager;
 import org.bcia.javachain.node.common.helper.MockMSPManager;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
@@ -168,7 +169,7 @@ public class MsgValidation {
         }
 
         //获取反序列化器
-        IIdentityDeserializer identityDeserializer = MockMSPManager.getIdentityDeserializer(groupId);
+        IIdentityDeserializer identityDeserializer = MspManager.getIdentityDeserializer(groupId);
 
         //反序列化出身份对象
         IIdentity identity = identityDeserializer.deserializeIdentity(creator);

@@ -37,11 +37,11 @@ public class MspConfigBuilder {
 
 
 
-    public static MspConfigPackage.MSPConfig buildMspConfig(List<String> cacert, List<String> keystore, List<String> signcert,
+    public static MspConfigPackage.MSPConfig buildMspConfig(String mspId,List<String> cacert, List<String> keystore, List<String> signcert,
                                                             List<String> admincert, List<String> intermediatecerts, List<String> crls,
                                                             List<String> configFileContent, List<String> tlscacert, List<String> tlsintermediatecerts) {
         MspConfigPackage.MSPConfig.Builder mspConfig = MspConfigPackage.MSPConfig.newBuilder();
-        MspConfigPackage.FabricMSPConfig fabricMSPConfig = buildFabricMspConfig(cacert, keystore, signcert,
+        MspConfigPackage.FabricMSPConfig fabricMSPConfig = buildFabricMspConfig(mspId,cacert, keystore, signcert,
                 admincert, intermediatecerts, crls,
                 configFileContent, tlscacert, tlsintermediatecerts);
         mspConfig.setType(1);
@@ -63,13 +63,13 @@ public class MspConfigBuilder {
      * @param tlsintermediatecerts
      * @return
      */
-    public static MspConfigPackage.FabricMSPConfig buildFabricMspConfig(List<String> cacert, List<String> keystore, List<String> signcert,
+    public static MspConfigPackage.FabricMSPConfig buildFabricMspConfig(String mspId,List<String> cacert, List<String> keystore, List<String> signcert,
                                                                         List<String> admincert, List<String> intermediatecerts, List<String> crls,
                                                                         List<String> configFileContent, List<String> tlscacert, List<String> tlsintermediatecerts) {
         MspConfigPackage.FabricMSPConfig.Builder mspConfig = MspConfigPackage.FabricMSPConfig.newBuilder();
 
 
-        mspConfig.setName("NodeMsp");
+        mspConfig.setName(mspId);
 
         mspConfig.addRootCerts(ByteString.copyFrom(cacert.get(0).getBytes()));
        // mspConfig.addIntermediateCerts(ByteString.copyFrom(intermediatecerts.get(0).getBytes()));

@@ -31,7 +31,6 @@ import org.springframework.stereotype.Component;
  * @date 2018/3/16
  * @company Dingxuan
  */
-@Component
 public class ContractQueryCmd extends AbstractNodeContractCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ContractQueryCmd.class);
 

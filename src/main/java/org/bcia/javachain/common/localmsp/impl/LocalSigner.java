@@ -21,6 +21,8 @@ import org.bcia.javachain.msp.mgmt.Identity;
 import org.bcia.javachain.msp.mgmt.Msp;
 import org.bcia.javachain.msp.mgmt.MspManager;
 import org.bcia.javachain.protos.common.Common;
+import sun.security.provider.SecureRandom;
+
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -35,8 +37,7 @@ public class LocalSigner implements ILocalSigner {
             Identity identity= (Identity) MspManager.getLocalMsp().getDefaultSigningIdentity();
             byte[] creatorIdentityRaw=identity.serialize();
             Common.SignatureHeader.Builder signatureHeader=Common.SignatureHeader.newBuilder();
-            //TODO 随机数实现
-            byte[] none="test".getBytes();
+            byte[] none=new SecureRandom().engineGenerateSeed(24);
             signatureHeader.setNonce(ByteString.copyFrom(none));
             signatureHeader.setCreator(ByteString.copyFrom(creatorIdentityRaw));
             return signatureHeader.build();

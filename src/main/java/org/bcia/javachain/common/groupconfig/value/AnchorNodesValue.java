@@ -13,14 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig;
+package org.bcia.javachain.common.groupconfig.value;
+
+import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
+import org.bcia.javachain.protos.node.Configuration;
 
 /**
  * 对象
  *
  * @author zhouhui
- * @date 2018/3/27
+ * @date 2018/4/14
  * @company Dingxuan
  */
-public interface IConsortiums {
+public class AnchorNodesValue extends StandardConfigValue {
+    public AnchorNodesValue(Configuration.AnchorNode[] anchorNodes) {
+        this.key = GroupConfigConstant.ANCHOR_NODES;
+
+        Configuration.AnchorNodes.Builder anchorNodesBuilder = Configuration.AnchorNodes.newBuilder();
+        for (Configuration.AnchorNode anchorNode : anchorNodes) {
+            anchorNodesBuilder.addAnchorNodes(anchorNode);
+        }
+
+        this.value = anchorNodesBuilder.build();
+    }
 }

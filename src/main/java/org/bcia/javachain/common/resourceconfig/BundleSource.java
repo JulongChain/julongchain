@@ -13,14 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig;
+package org.bcia.javachain.common.resourceconfig;
 
 /**
  * 对象
  *
  * @author zhouhui
- * @date 2018/3/27
+ * @date 2018/4/16
  * @company Dingxuan
  */
-public interface IGroup {
+public class BundleSource {
+    private Object bundle;
+//    private CallBacks callbacks;
+
+
+
+
 }

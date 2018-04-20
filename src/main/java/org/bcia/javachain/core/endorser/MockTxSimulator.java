@@ -20,6 +20,7 @@ import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.core.ledger.TxSimulationResults;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,6 +31,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class MockTxSimulator implements ITxSimulator {
+
     @Override
     public void setState(String namespace, String key, byte[] value) throws LedgerException {
 
@@ -60,7 +62,6 @@ public class MockTxSimulator implements ITxSimulator {
         return new byte[0];
     }
 
-    @Override
     public byte[][] getStateMultipleKeys(String namespace, String[] keys) throws LedgerException {
         return new byte[0][];
     }
@@ -70,7 +71,6 @@ public class MockTxSimulator implements ITxSimulator {
         return null;
     }
 
-    @Override
     public ResultsIterator ExecuteQuery(String namespace, String query) throws LedgerException {
         return null;
     }
@@ -78,5 +78,47 @@ public class MockTxSimulator implements ITxSimulator {
     @Override
     public void done() throws LedgerException {
 
+    }
+
+    @Override
+    public void setPrivateData(String namespace, String collection, byte[] value) throws LedgerException {
+
+    }
+
+    @Override
+    public void setPirvateDataMultipleKeys(String namespace, String collection, Map<String, byte[]> kvs) throws LedgerException {
+
+    }
+
+    @Override
+    public void deletePrivateData(String namespace, String collection, String key) throws LedgerException {
+
+    }
+
+    @Override
+    public List<byte[]> getStateMultipleKeys(String namespace, List<String> keys) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public ResultsIterator executeQuery(String namespace, String query) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public byte[] getPrivateData(String namespace, String collection, String key) throws LedgerException {
+        return new byte[0];
+    }
+
+    @Override
+    public List<byte[]> getPrivateDataMultipleKeys(String namespace, String collection, List<String> keys) throws
+            LedgerException {
+        return null;
+    }
+
+    @Override
+    public ResultsIterator getPrivateDataRangeScanIterator(String namespace, String collection, String startKey,
+                                                           String endKey) throws LedgerException {
+        return null;
     }
 }

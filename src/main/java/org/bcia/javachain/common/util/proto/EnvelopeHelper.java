@@ -23,7 +23,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.exception.ValidateException;
-import org.bcia.javachain.common.groupconfig.ApplicationConfig;
+import org.bcia.javachain.common.groupconfig.config.ApplicationConfig;
 import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
 import org.bcia.javachain.common.groupconfig.MSPConfigHandler;
 import org.bcia.javachain.common.localmsp.ILocalSigner;

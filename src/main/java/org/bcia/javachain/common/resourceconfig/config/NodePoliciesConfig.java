@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig;
+package org.bcia.javachain.common.resourceconfig.config;
+
+import org.bcia.javachain.protos.common.Configtx;
 
 /**
  * 对象
  *
  * @author zhouhui
- * @date 2018/3/27
+ * @date 2018/4/19
  * @company Dingxuan
  */
-public interface IConsenter {
+public class NodePoliciesConfig {
+    public NodePoliciesConfig(Configtx.ConfigTree tree) {
+    }
 }

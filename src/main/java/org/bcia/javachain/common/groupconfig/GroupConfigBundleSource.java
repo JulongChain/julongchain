@@ -19,8 +19,8 @@ package org.bcia.javachain.common.groupconfig;
  * 对象
  *
  * @author zhouhui
- * @date 2018/3/28
+ * @date 2018/4/18
  * @company Dingxuan
  */
-public class GroupConfig {
+public class GroupConfigBundleSource {
 }

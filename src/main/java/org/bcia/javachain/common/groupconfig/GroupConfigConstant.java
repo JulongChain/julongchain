@@ -36,6 +36,10 @@ public class GroupConfigConstant {
 
     public static final String APPLICATION = "Application";
 
+    public static final String CONSENTER = "Consenter";
+
+    public static final String CONSORTIUMS = "Consortiums";
+
     public static final String ANCHOR_NODES = "AnchorNodes";
 
     public static final String CONSORTIUM = "Consortium";

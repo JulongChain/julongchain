@@ -15,18 +15,39 @@
  */
 package org.bcia.javachain.common.groupconfig;
 
-import org.bcia.javachain.protos.node.Configuration;
-
-import java.util.List;
+import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.groupconfig.capability.IApplicationCapabilities;
 
 /**
  * 对象
  *
  * @author zhouhui
- * @date 2018/3/27
+ * @date 2018/4/16
  * @company Dingxuan
  */
-public interface IApplicationOrgConfig extends IOrganization {
+public class ApplicationProvider implements IApplicationCapabilities {
+    @Override
+    public void supported() throws ValidateException {
 
-    List<Configuration.AnchorNode> getAnchorNodes();
+    }
+
+    @Override
+    public boolean forbidDuplicateTXIdInBlock() {
+        return false;
+    }
+
+    @Override
+    public boolean resourcesTree() {
+        return false;
+    }
+
+    @Override
+    public boolean privateGroupData() {
+        return false;
+    }
+
+    @Override
+    public boolean v1_1Validation() {
+        return false;
+    }
 }

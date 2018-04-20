@@ -17,6 +17,7 @@ package org.bcia.javachain.core.ssc.cssc;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.apache.commons.lang3.BooleanUtils;
 import org.bcia.javachain.common.config.IConfig;
 import org.bcia.javachain.common.config.IConfigManager;
 import org.bcia.javachain.common.exception.JavaChainException;
@@ -131,7 +132,12 @@ public class CSSC extends SystemSmartContractBase {
                     return newErrorResponse(String.format("\"JoinGroup\" request failed because of validation of configuration block"));
                 }
                 // 2. check local MSP Admins policy
-                if(policyChecker.checkPolicyNoGroup(Principal.Admins,sp)==false){
+                try {
+                    if(!BooleanUtils.isTrue(policyChecker.checkPolicyNoGroup(Principal.Admins,sp))){
+                        return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check for group [%s]",groupID));
+                    }
+                } catch (JavaChainException e) {
+                    log.error(e.getMessage(), e);
                     return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check for group [%s]",groupID));
                 }
                 return joinGroup(groupID,block);
@@ -158,7 +164,12 @@ public class CSSC extends SystemSmartContractBase {
                 // 2. check local MSP Members policy
                 // TODO: move to ACLProvider once it will support chainless ACLs
                 // 2. check local MSP Admins policy
-                if(policyChecker.checkPolicyNoGroup(Principal.Members,sp)==false){
+                try {
+                    if(!BooleanUtils.isTrue(policyChecker.checkPolicyNoGroup(Principal.Members,sp))){
+                        return newErrorResponse(String.format("\"GetGroups\" request failed authorization check"));
+                    }
+                } catch (JavaChainException e) {
+                    log.error(e.getMessage(), e);
                     return newErrorResponse(String.format("\"GetGroups\" request failed authorization check"));
                 }
                 return getGroups();

@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig;
+package org.bcia.javachain.common.groupconfig.config;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
+import org.bcia.javachain.common.groupconfig.MSPConfigHandler;
 import org.bcia.javachain.msp.IMsp;
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.msp.MspConfigPackage;
@@ -29,7 +31,7 @@ import org.bcia.javachain.protos.msp.MspConfigPackage;
  * @date 2018/3/28
  * @company Dingxuan
  */
-public class OrganizationConfig {
+public class OrganizationConfig implements IOrganizationConfig {
     private MspConfigPackage.MSPConfig mspConfig;
     private MSPConfigHandler mspConfigHandler;
     private IMsp msp;
@@ -58,16 +60,18 @@ public class OrganizationConfig {
     }
 
     public boolean validate() {
-        msp = mspConfigHandler.proposeMSP(mspConfig);
+//        msp = mspConfigHandler.proposeMSP(mspConfig);
         mspId = msp.getIdentifier();
 
         return StringUtils.isNotBlank(mspId);
     }
 
+    @Override
     public String getMspId() {
         return mspId;
     }
 
+    @Override
     public String getName() {
         return name;
     }

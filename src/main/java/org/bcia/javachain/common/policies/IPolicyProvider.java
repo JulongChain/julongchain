@@ -15,12 +15,15 @@
  */
 package org.bcia.javachain.common.policies;
 
+import org.bcia.javachain.common.exception.PolicyException;
+
 /**
- * 类描述
+ * 策略提供者
  *
  * @author zhouhui
  * @date 2018/3/9
  * @company Dingxuan
  */
 public interface IPolicyProvider {
+    IPolicy makePolicy(byte[] data) throws PolicyException;
 }

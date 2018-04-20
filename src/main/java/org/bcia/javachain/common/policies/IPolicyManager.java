@@ -15,12 +15,25 @@
  */
 package org.bcia.javachain.common.policies;
 
+import java.util.Map;
+
 /**
- * 类描述
+ * 策略管理者接口
  *
  * @author zhouhui
  * @date 2018/3/9
  * @company Dingxuan
  */
 public interface IPolicyManager {
+    IPolicy getPolicy(String id);
+
+    /**
+     * the sub-policy manager for a given path and whether it exists
+     *
+     * @param path
+     * @return
+     */
+    IPolicyManager getSubPolicyManager(String[] path);
+
+    Map<String, IPolicy> getPolicies();
 }
