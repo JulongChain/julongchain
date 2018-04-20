@@ -25,9 +25,9 @@ import org.bcia.javachain.csp.intfs.IKey;
 import org.bcia.javachain.csp.intfs.opts.*;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bouncycastle.math.ec.ECPoint;
-import sun.security.provider.SecureRandom;
 
 import java.math.BigInteger;
+import java.security.SecureRandom;
 
 import static org.bcia.javachain.csp.gm.sm2.SM2.byte2ECpoint;
 
@@ -120,7 +120,7 @@ public class GmCsp implements ICsp {
 
     @Override
     public byte[] rng(int len, IRngOpts opts) throws JavaChainException {
-        byte[] none=new SecureRandom().engineGenerateSeed(len);
+        byte[] none=new SecureRandom().generateSeed(len);
         return none;
     }
 
