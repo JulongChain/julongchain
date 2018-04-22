@@ -66,7 +66,6 @@ public class MockTxSimulator implements ITxSimulator {
         return new byte[0][];
     }
 
-    @Override
     public ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
         return null;
     }
@@ -80,7 +79,6 @@ public class MockTxSimulator implements ITxSimulator {
 
     }
 
-    @Override
     public void setPrivateData(String namespace, String collection, byte[] value) throws LedgerException {
 
     }
@@ -119,6 +117,17 @@ public class MockTxSimulator implements ITxSimulator {
     @Override
     public ResultsIterator getPrivateDataRangeScanIterator(String namespace, String collection, String startKey,
                                                            String endKey) throws LedgerException {
+        return null;
+    }
+
+    @Override
+    public void setPrivateData(String namespace, String collection, String key, byte[] value) throws LedgerException {
+
+    }
+
+    @Override
+    public ResultsIterator getStateRangeScanIterator(String namespace, String collection, String startKey, String
+            endKey) throws LedgerException {
         return null;
     }
 }
