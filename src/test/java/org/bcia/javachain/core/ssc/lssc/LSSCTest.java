@@ -2,6 +2,7 @@ package org.bcia.javachain.core.ssc.lssc;
 
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.BaseJunit4Test;
+import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.common.util.proto.ProtoUtils;
 import org.bcia.javachain.common.util.proto.TxUtils;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
@@ -42,7 +43,7 @@ public class LSSCTest extends BaseJunit4Test {
 
     @Test
     public void testInstalls(){
-        MockStub mockStub = new MockStub("LSSC", lssc);
+        MockStub mockStub = new MockStub(CommConstant.LSSC, lssc);
         mockStub.mockInit("1",new LinkedList<ByteString>());
         String path="/opt/git/javachain/src/main/java/org/bcia/javachain/examples/smartcontract/java/smartcontract_example02";
         testInstall("example02","1.0",path,"","Alice",mockStub);

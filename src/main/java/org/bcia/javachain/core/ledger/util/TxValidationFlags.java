@@ -17,6 +17,7 @@ package org.bcia.javachain.core.ledger.util;
 
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.core.node.NodeConfig;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
 import java.util.ArrayList;
@@ -30,17 +31,24 @@ import java.util.List;
  * @company Dingxuan
  */
 public class TxValidationFlags {
-    List<ByteString> flags;
+    private int[] flags;
 
-    public TxValidationFlags(List<ByteString> list){
-        this.flags = list;
+    public TxValidationFlags(int len){
+        this.flags = new int[len];
+    }
+
+    public static TxValidationFlags fromByteString(ByteString bs) throws LedgerException {
+        byte[] bytes = bs.toByteArray();
+        TxValidationFlags flags = new TxValidationFlags(bytes.length);
+        for (int i = 0; i < bytes.length; i++) {
+            flags.setFlag(i, TransactionPackage.TxValidationCode.forNumber((int) bytes[i]));
+        }
+        return flags;
     }
 
     public void setFlag(int txIndex, TransactionPackage.TxValidationCode flag) throws LedgerException {
         try {
-            byte[] b = new byte[1];
-            b[0] = (byte) flag.getNumber();
-            flags.add(txIndex, ByteString.copyFrom(b));
+            flags[txIndex] = flag.getNumber();
         } catch (Exception e) {
             throw new LedgerException(e);
         }
@@ -48,7 +56,7 @@ public class TxValidationFlags {
 
     public TransactionPackage.TxValidationCode flag(int txIndex) throws LedgerException{
         try {
-            return TransactionPackage.TxValidationCode.forNumber(flags.get(txIndex).byteAt(0));
+            return TransactionPackage.TxValidationCode.forNumber(flags[txIndex]);
         } catch (Exception e) {
             throw new LedgerException("Got error when flag txIndex in flag()");
         }
@@ -63,6 +71,18 @@ public class TxValidationFlags {
     }
 
     public boolean isSetTo(int txIndex, TransactionPackage.TxValidationCode flag){
-        return flag == null || flag.getNumber() == flags.get(txIndex).toByteArray()[0];
+        return flags[txIndex] == flag.getNumber();
+    }
+
+    public int length(){
+        return flags.length;
+    }
+
+    public ByteString toByteString(){
+        byte[] bytes = new byte[flags.length];
+        for (int i = 0; i < flags.length; i++) {
+            bytes[i] = (byte) flags[i];
+        }
+        return ByteString.copyFrom(bytes);
     }
 }

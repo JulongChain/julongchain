@@ -4,6 +4,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.BaseJunit4Test;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.common.util.Utils;
 import org.bcia.javachain.common.util.proto.ProposalUtils;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
@@ -50,7 +51,7 @@ public class ESSCTest extends BaseJunit4Test {
             ProposalResponsePackage.Response successResponse = ProposalResponsePackage.Response.newBuilder().
                     setStatus(200).setMessage("OK").setPayload(ByteString.copyFromUtf8("payload")).build();
 
-            MockStub mockStub = new MockStub("ESSC", essc);
+            MockStub mockStub = new MockStub(CommConstant.ESSC, essc);
             // Initialize ESCC supplying the identity of the signer
             List<ByteString> args0 = new LinkedList<ByteString>();
             args0.add(ByteString.copyFromUtf8("DEFAULT"));

@@ -35,4 +35,6 @@ public interface IPrivDataSupport {
     // GetIdentityDeserializer returns an IdentityDeserializer
     // instance for the specified chain
     IIdentityDeserializer getIdentityDeserializer(String groupID);
+
+    String buildCollectionKVSKey(String smartcontractname);
 }

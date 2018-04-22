@@ -2,6 +2,7 @@ package org.bcia.javachain.core.ssc.qssc;
 
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.BaseJunit4Test;
+import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.core.aclmgmt.MockAclProvider;
 import org.bcia.javachain.core.aclmgmt.resources.Resources;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
@@ -41,7 +42,7 @@ public class QSSCTest extends BaseJunit4Test {
 
     @Test
     public void invoke() {
-        MockStub mockStub = new MockStub("QSSC", qssc);
+        MockStub mockStub = new MockStub(CommConstant.QSSC, qssc);
         mockStub.mockInit("1",new LinkedList<ByteString>());
         testQueryGetTransactionByID(mockStub);
         testQueryGetGroupInfo(mockStub);

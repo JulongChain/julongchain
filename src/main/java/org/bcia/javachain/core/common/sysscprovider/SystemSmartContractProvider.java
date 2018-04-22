@@ -30,4 +30,9 @@ public class SystemSmartContractProvider implements ISystemSmartContractProvider
     public IApplicationConfig getApplicationConfig(String groupId) {
         return null;
     }
+
+    @Override
+    public boolean isSysSmartContract(String essc) {
+        return true;
+    }
 }

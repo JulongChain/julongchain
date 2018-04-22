@@ -78,7 +78,7 @@ public class Store implements BlockStore{
 
     @Override
     public void addBlock(Common.Block block) throws LedgerException {
-
+        blkStorage.addBlock(block);
     }
 
     @Override

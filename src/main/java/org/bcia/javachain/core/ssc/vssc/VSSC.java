@@ -163,7 +163,8 @@ public class VSSC extends SystemSmartContractBase {
 
     @Override
     public String getSmartContractStrDescription() {
-        return "与验证相关的系统智能合约";
+        String description="与验证相关的系统智能合约";
+        return description;
     }
 
     // checkInstantiationPolicy evaluates an instantiation policy against a signed proposal

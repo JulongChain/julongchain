@@ -59,7 +59,7 @@ public interface ITxSimulator extends IQueryExecutor {
     /**
      * 设置private data
      */
-    void setPrivateData(String namespace, String collection, byte[] value) throws LedgerException;
+    void setPrivateData(String namespace, String collection, String key, byte[] value) throws LedgerException;
 
     /**
      * 批量设置private data

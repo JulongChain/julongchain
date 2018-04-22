@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.UnsupportedEncodingException;
+import java.security.SecureRandom;
 
 
 /**
@@ -41,24 +42,26 @@ public class GmCspTest {
     private ICsp csp;
 
     @Before
-    public void setUp() throws Exception{
+    public void setUp() throws Exception {
         System.out.println("before test");
         System.out.println("set up...");
         GmCspFactory factory = new GmCspFactory();
         Assert.assertNotNull(factory);
-       // IFactoryOpts opts = new GmFactoryOpts(256, "SM3", true, true, "",true);
+        // IFactoryOpts opts = new GmFactoryOpts(256, "SM3", true, true, "",true);
         IFactoryOpts opts = new GmFactoryOpts();
-        csp=factory.getCsp(opts);
+        csp = factory.getCsp(opts);
         Assert.assertNotNull(csp);
     }
 
     @After
-    public void finalize(){
+    public void finalize() {
         System.out.println("finalize...");
     }
 
     @Test
-    public void keyGen()  { System.out.println("test keyGen..."); }
+    public void keyGen() {
+        System.out.println("test keyGen...");
+    }
 
     @Test
     public void keyDeriv() {
@@ -76,17 +79,17 @@ public class GmCspTest {
     @Test
     public void hashUnitTest1() {
         try {
-            String message="abc";
-            byte[] msg=message.getBytes("ASCII");
-            String encodedHexMsg= Hex.toHexString(msg);
-            System.out.println("To Hash Message:"+encodedHexMsg);
-            String expectedResult="66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0";
-            byte[] expectedHashMsg=Hex.decode(expectedResult);
+            String message = "abc";
+            byte[] msg = message.getBytes("ASCII");
+            String encodedHexMsg = Hex.toHexString(msg);
+            System.out.println("To Hash Message:" + encodedHexMsg);
+            String expectedResult = "66c7f0f462eeedd9d1f2d46bdc10e4e24167c4875cf2f7a2297da02b8f4ba8e0";
+            byte[] expectedHashMsg = Hex.decode(expectedResult);
             IHashOpts hashOpts = new SM3HashOpts();
             byte[] digests = csp.hash(msg, hashOpts);
-            String encodedHexDigests= Hex.toHexString(digests);
+            String encodedHexDigests = Hex.toHexString(digests);
             System.out.println(encodedHexDigests);
-            Assert.assertArrayEquals(digests,expectedHashMsg);
+            Assert.assertArrayEquals(digests, expectedHashMsg);
             System.out.println("Hash Unit Test 1 passed!");
         } catch (JavaChainException e) {
             e.printStackTrace();
@@ -100,17 +103,17 @@ public class GmCspTest {
     @Test
     public void hashUnitTest2() {
         try {
-            String message="abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd";
-            byte[] msg=message.getBytes("ASCII");
-            String encodedHexMsg=Hex.toHexString(msg);
-            System.out.println("To Hash Message:"+encodedHexMsg);
-            String expectedResult="debe9ff92275b8a138604889c18e5a4d6fdb70e5387e5765293dcba39c0c5732";
-            byte[] expectedHashMsg=Hex.decode(expectedResult);
+            String message = "abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd";
+            byte[] msg = message.getBytes("ASCII");
+            String encodedHexMsg = Hex.toHexString(msg);
+            System.out.println("To Hash Message:" + encodedHexMsg);
+            String expectedResult = "debe9ff92275b8a138604889c18e5a4d6fdb70e5387e5765293dcba39c0c5732";
+            byte[] expectedHashMsg = Hex.decode(expectedResult);
             IHashOpts hashOpts = new SM3HashOpts();
             byte[] digests = csp.hash(msg, hashOpts);
-            String encodedHexDigests= Hex.toHexString(digests);
+            String encodedHexDigests = Hex.toHexString(digests);
             System.out.println(encodedHexDigests);
-            Assert.assertArrayEquals(digests,expectedHashMsg);
+            Assert.assertArrayEquals(digests, expectedHashMsg);
             System.out.println("Hash Unit Test 2 passed!");
         } catch (JavaChainException e) {
             e.printStackTrace();
@@ -123,16 +126,16 @@ public class GmCspTest {
     @Test
     public void hashUnitTestByTester() {
         try {
-            String message="4865243A4EF5FFA94C";
-            byte[] msg=Hex.decode(message);
-            System.out.println("To Hash Message:"+message);
-            String expectedResult="CDB84682A5C8036E692156E635EED508A2B5D41D1AC5A467432C620307DE8184";
-            byte[] expectedHashMsg=Hex.decode(expectedResult);
+            String message = "4865243A4EF5FFA94C";
+            byte[] msg = Hex.decode(message);
+            System.out.println("To Hash Message:" + message);
+            String expectedResult = "CDB84682A5C8036E692156E635EED508A2B5D41D1AC5A467432C620307DE8184";
+            byte[] expectedHashMsg = Hex.decode(expectedResult);
             IHashOpts hashOpts = new SM3HashOpts();
             byte[] digests = csp.hash(msg, hashOpts);
-            String encodedHexDigests= Hex.toHexString(digests);
+            String encodedHexDigests = Hex.toHexString(digests);
             System.out.println(encodedHexDigests);
-            Assert.assertArrayEquals(digests,expectedHashMsg);
+            Assert.assertArrayEquals(digests, expectedHashMsg);
             System.out.println("Hash Unit By Tester passed!");
         } catch (JavaChainException e) {
             e.printStackTrace();
@@ -142,6 +145,8 @@ public class GmCspTest {
 
     @Test
     public void getHash() {
+
+
     }
 
     @Test
@@ -162,5 +167,17 @@ public class GmCspTest {
 
     @Test
     public void rng() {
+
+      //  SecureRandom csprng = new SecureRandom();
+
+      //  byte[] randomBytes = new byte[24];
+       // csprng.engineNextBytes();
+       // byte[] rng = csprng.engineGenerateSeed(24);
+
+        SecureRandom secureRandom=new SecureRandom();
+        byte[] secureSeed=secureRandom.generateSeed(24);
+        String s=new String(secureSeed);
+        System.out.println(s);
+        //csprng.nextBytes(randombytes);
     }
 }

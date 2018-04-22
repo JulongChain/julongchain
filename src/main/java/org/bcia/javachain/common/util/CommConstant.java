@@ -46,6 +46,15 @@ public class CommConstant {
     public static final String CSSC = "cssc";
 
     /**
+     * 查询系统智能合约
+     */
+    public static final String QSSC = "qssc";
+    /**
+     * 验证系统智能合约
+     */
+    public static final String VSSC = "vssc";
+
+    /**
      * 成员服务提供者类型
      */
     public static final int MSPTYPE_CSP_VALUE = 0;

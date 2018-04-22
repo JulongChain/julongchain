@@ -44,7 +44,7 @@ public interface IQueryExecutor {
     /**
      * 根据给出的namespace以及[startKey, endKey)返回查询迭代器
      */
-    ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException;
+    ResultsIterator getStateRangeScanIterator(String namespace, String collection, String startKey, String endKey) throws LedgerException;
 
     /**
      * 丰富的查询支持,leveldb暂时无法满足

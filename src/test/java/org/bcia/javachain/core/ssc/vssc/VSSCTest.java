@@ -4,13 +4,14 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.BaseJunit4Test;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.common.util.proto.ProposalResponseUtils;
 import org.bcia.javachain.common.util.proto.ProposalUtils;
 import org.bcia.javachain.common.util.proto.TxUtils;
-import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
-import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.smartcontract.shim.impl.MockStub;
+import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
+import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractStub;
 import org.bcia.javachain.core.ssc.essc.MockMSP;
 import org.bcia.javachain.core.ssc.essc.MockMspManager;
 import org.bcia.javachain.core.ssc.essc.MockSigningIdentity;
@@ -25,8 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.junit.Assert.*;
 
 /**
  * VSSC单元测试类
@@ -36,24 +38,22 @@ import static org.hamcrest.CoreMatchers.is;
  * @company Dingxuan
  */
 public class VSSCTest extends BaseJunit4Test {
-
     @Autowired
     private VSSC vssc;
-
     @Mock
-    private ISmartContractStub stub;
+    private SmartContractStub stub;
 
     @Test
     public void init() {
-        ISmartContract.SmartContractResponse smartContractResponse = vssc.init(stub);
-        assertThat(smartContractResponse.getStatus(), is(ISmartContract.SmartContractResponse.Status.SUCCESS));
+        SmartContractResponse smartContractResponse = vssc.init(stub);
+        assertThat(smartContractResponse.getStatus(), is(SmartContractResponse.Status.SUCCESS));
     }
 
     @Test
     public void invoke() {
-        MockStub mockStub = new MockStub("VSSC", vssc);
-        ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("1",new LinkedList<ByteString>());
-        assertThat(smartContractResponse.getStatus(), is(ISmartContract.SmartContractResponse.Status.SUCCESS));
+        MockStub mockStub = new MockStub(CommConstant.VSSC, vssc);
+        SmartContractResponse smartContractResponse =mockStub.mockInit("1",new LinkedList<ByteString>());
+        assertThat(smartContractResponse.getStatus(), is(SmartContractResponse.Status.SUCCESS));
 
         Common.Envelope tx= null;
         try {
@@ -72,8 +72,8 @@ public class VSSCTest extends BaseJunit4Test {
         args.add(ByteString.copyFrom(envBytes));
         args.add(ByteString.copyFrom(policyBytes));
 
-        ISmartContract.SmartContractResponse smartContractResponse2 =mockStub.mockInvoke("1",args);
-        assertThat(smartContractResponse2.getStatus(), is(ISmartContract.SmartContractResponse.Status.SUCCESS));
+        SmartContractResponse smartContractResponse2 =mockStub.mockInvoke("1",args);
+        assertThat(smartContractResponse2.getStatus(), is(SmartContractResponse.Status.SUCCESS));
     }
 
     private byte[] getSignedByMSPMemberPolicy(String mspid) {

@@ -119,7 +119,8 @@ public class QSSC extends SystemSmartContractBase {
 
     @Override
     public String getSmartContractStrDescription() {
-        return "与查询相关的系统智能合约";
+        String description="与查询相关的系统智能合约";
+        return description;
     }
 
     private String getACLResource(String function){

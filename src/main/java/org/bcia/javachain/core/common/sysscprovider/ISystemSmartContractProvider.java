@@ -26,4 +26,6 @@ import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
  */
 public interface ISystemSmartContractProvider {
     IApplicationConfig getApplicationConfig(String groupId);
+
+    boolean isSysSmartContract(String essc);
 }

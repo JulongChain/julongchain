@@ -15,10 +15,15 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 
+import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.core.ledger.TxSimulationResults;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RWSetBuilder;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RwSetUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -31,25 +36,51 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class LockBasedTxSimulator implements ITxSimulator {
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(LockBasedTxSimulator.class);
+
+    private LockBasedQueryExecutor queryExecutor;
+    private RWSetBuilder rwSetBuilder;
+    private boolean writePreformed;
+    private boolean pvtdataQueriesPerformed;
 
     public static LockBasedTxSimulator newLockBasedTxSimulator(LockBasedTxManager txMgr, String txid){
         LockBasedTxSimulator l = new LockBasedTxSimulator();
+        RWSetBuilder rwSetBuilder = new RWSetBuilder();
+        l.setRwSetBuilder(rwSetBuilder);
+        QueryHelper queryHelper = new QueryHelper();
+        queryHelper.setTxMgr(txMgr);
+        queryHelper.setRwSetBuilder(rwSetBuilder);
+        LockBasedQueryExecutor lockBasedQueryExecutor = new LockBasedQueryExecutor();
+        lockBasedQueryExecutor.setHelper(queryHelper);
+        lockBasedQueryExecutor.setTxID(txid);
+        LockBasedTxSimulator lockBasedTxSimulator = new LockBasedTxSimulator();
+        lockBasedTxSimulator.setQueryExecutor(lockBasedQueryExecutor);
+        lockBasedTxSimulator.setRwSetBuilder(rwSetBuilder);
+        lockBasedTxSimulator.setWritePreformed(false);
+        lockBasedTxSimulator.setPvtdataQueriesPerformed(false);
         return l;
     }
 
     @Override
     public void setState(String namespace, String key, byte[] value) throws LedgerException {
-
+        queryExecutor.getHelper().checkDone();
+        checkBeforeWrite();
+        queryExecutor.getHelper().getTxMgr().getDb().validateKeyValue(key, value);
+        rwSetBuilder.addToWriteSet(namespace, key, ByteString.copyFrom(value));
     }
 
     @Override
     public void deleteState(String namespace, String key) throws LedgerException {
-
+        setState(namespace, key, null);
     }
 
     @Override
     public void setStateMultipleKeys(String namespace, Map<String, byte[]> kvs) throws LedgerException {
-
+        for(Map.Entry<String, byte[]> entry : kvs.entrySet()){
+            String k = entry.getKey();
+            byte[] v = entry.getValue();
+            setState(namespace, k ,v);
+        }
     }
 
     @Override
@@ -59,27 +90,36 @@ public class LockBasedTxSimulator implements ITxSimulator {
 
     @Override
     public TxSimulationResults getTxSimulationResults() throws LedgerException {
-        return null;
+        done();
+        return rwSetBuilder.getTxSimulationResults();
     }
 
     @Override
-    public void setPrivateData(String namespace, String collection, byte[] value) throws LedgerException {
-
+    public void setPrivateData(String namespace, String collection, String key, byte[] value) throws LedgerException {
+        queryExecutor.getHelper().checkDone();
+        checkBeforeWrite();
+        queryExecutor.getHelper().getTxMgr().getDb().validateKeyValue(key, value);
+        writePreformed = true;
+        rwSetBuilder.addToPvtAndHashedWriteSet(namespace, collection,key, ByteString.copyFrom(value));
     }
 
     @Override
     public void setPirvateDataMultipleKeys(String namespace, String collection, Map<String, byte[]> kvs) throws LedgerException {
-
+        for(Map.Entry<String, byte[]> entry : kvs.entrySet()){
+            String k = entry.getKey();
+            byte[] v = entry.getValue();
+            setPrivateData(namespace, collection, k, v);
+        }
     }
 
     @Override
     public void deletePrivateData(String namespace, String collection, String key) throws LedgerException {
-
+        setPrivateData(namespace, collection, key, null);
     }
 
     @Override
     public byte[] getState(String namespace, String key) throws LedgerException {
-        return new byte[0];
+        return queryExecutor.getHelper().getState(namespace ,key);
     }
 
     @Override
@@ -88,8 +128,9 @@ public class LockBasedTxSimulator implements ITxSimulator {
     }
 
     @Override
-    public ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
-        return null;
+    public ResultsIterator getStateRangeScanIterator(String namespace, String collection, String startKey, String endKey) throws LedgerException {
+        checkBeforePvtdataQueries();
+        return queryExecutor.getPrivateDataRangeScanIterator(namespace, collection, startKey, endKey);
     }
 
     @Override
@@ -115,5 +156,50 @@ public class LockBasedTxSimulator implements ITxSimulator {
     @Override
     public void done() throws LedgerException {
 
+    }
+
+    public void checkBeforeWrite() throws LedgerException {
+        if(pvtdataQueriesPerformed){
+            throw new LedgerException(String.format("Tx %s, Transaction has already performed queries on pvt data. Writes are not allowed", queryExecutor.getTxID()));
+        }
+        writePreformed = true;
+    }
+
+    public void checkBeforePvtdataQueries() throws LedgerException {
+        if(writePreformed){
+            throw new LedgerException(String.format("Tx %s, Queries on pvt data is supported only in a read-only transaction", queryExecutor.getTxID()));
+        }
+    }
+
+    public LockBasedQueryExecutor getQueryExecutor() {
+        return queryExecutor;
+    }
+
+    public void setQueryExecutor(LockBasedQueryExecutor queryExecutor) {
+        this.queryExecutor = queryExecutor;
+    }
+
+    public RWSetBuilder getRwSetBuilder() {
+        return rwSetBuilder;
+    }
+
+    public void setRwSetBuilder(RWSetBuilder rwSetBuilder) {
+        this.rwSetBuilder = rwSetBuilder;
+    }
+
+    public boolean isWritePreformed() {
+        return writePreformed;
+    }
+
+    public void setWritePreformed(boolean writePreformed) {
+        this.writePreformed = writePreformed;
+    }
+
+    public boolean isPvtdataQueriesPerformed() {
+        return pvtdataQueriesPerformed;
+    }
+
+    public void setPvtdataQueriesPerformed(boolean pvtdataQueriesPerformed) {
+        this.pvtdataQueriesPerformed = pvtdataQueriesPerformed;
     }
 }

@@ -132,12 +132,10 @@ public class CSSC extends SystemSmartContractBase {
                 }
                 // 2. check local MSP Admins policy
                 try {
-                    if(!BooleanUtils.isTrue(policyChecker.checkPolicyNoGroup(Principal.Admins,sp))){
-                        return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check for group [%s]",groupID));
-                    }
+                    policyChecker.checkPolicyNoGroup(Principal.Admins,sp);
                 } catch (JavaChainException e) {
                     log.error(e.getMessage(), e);
-                    return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check for group [%s]",groupID));
+                    return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check for group [%s]:%s",groupID,e.getMessage()));
                 }
                 return joinGroup(groupID,block);
             case GET_CONFIG_BLOCK:
@@ -164,12 +162,10 @@ public class CSSC extends SystemSmartContractBase {
                 // TODO: move to ACLProvider once it will support chainless ACLs
                 // 2. check local MSP Admins policy
                 try {
-                    if(!BooleanUtils.isTrue(policyChecker.checkPolicyNoGroup(Principal.Members,sp))){
-                        return newErrorResponse(String.format("\"GetGroups\" request failed authorization check"));
-                    }
+                    policyChecker.checkPolicyNoGroup(Principal.Members,sp);
                 } catch (JavaChainException e) {
                     log.error(e.getMessage(), e);
-                    return newErrorResponse(String.format("\"GetGroups\" request failed authorization check"));
+                    return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check :%s",e.getMessage()));
                 }
                 return getGroups();
             default:
