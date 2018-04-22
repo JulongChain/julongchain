@@ -465,7 +465,7 @@ public class HandlerTest {
 
     @Test
     public void getSmartContractMessageForMessage(){
-        String msgType = INVOKE_CHAINCODE.toString();
+        String msgType = INVOKE_SMARTCONTRACT.toString();
         String errStr = "errStr";
         Smartcontract.SmartContractID id = Smartcontract.SmartContractID.newBuilder()
                 .setName("root1")
@@ -482,7 +482,7 @@ public class HandlerTest {
         args[0] = SmartcontractShim.SmartContractMessage.newBuilder()
                 .setGroupId("GroupId")
                 .setTxid("Txid")
-                .setType(INVOKE_CHAINCODE)
+                .setType(INVOKE_SMARTCONTRACT)
                 .build();
         Smartcontract.SmartContractID id = Smartcontract.SmartContractID.newBuilder()
                 .setName("root")

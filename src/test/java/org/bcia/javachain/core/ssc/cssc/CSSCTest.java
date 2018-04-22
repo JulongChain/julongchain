@@ -1,13 +1,13 @@
 package org.bcia.javachain.core.ssc.cssc;
 
-import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
-import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractStub;
+import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
+import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
 
 /**
  * CSSC的单元测试类
@@ -20,12 +20,12 @@ public class CSSCTest {
     @Autowired
     private CSSC cssc;
     @Mock
-    private SmartContractStub stub;
+    private ISmartContractStub stub;
 
     @Test
     public void init() {
-        SmartContractResponse smartContractResponse = cssc.init(stub);
-        assertThat(smartContractResponse.getStatus(), is(SmartContractResponse.Status.SUCCESS));
+        ISmartContract.SmartContractResponse smartContractResponse = cssc.init(stub);
+        assertThat(smartContractResponse.getStatus(), is(ISmartContract.SmartContractResponse.Status.SUCCESS));
     }
 
     @Test

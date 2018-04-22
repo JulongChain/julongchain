@@ -15,7 +15,7 @@
  */
 package org.bcia.javachain.core.ssc;
 
-import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContract;
+import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
 
 /**
  * 系统智能合约
@@ -24,7 +24,7 @@ import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContract;
  * @date 3/7/18
  * @company Dingxuan
  */
-public interface ISystemSmartContract extends ISmartContract{
+public interface ISystemSmartContract extends ISmartContract {
     void setSystemSmartContractDescriptor(SystemSmartContractDescriptor descriptor);
     SystemSmartContractDescriptor getSystemSmartContractDescriptor();
 }

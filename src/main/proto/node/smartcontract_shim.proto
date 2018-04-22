@@ -30,7 +30,7 @@ message SmartContractMessage {
         GET_STATE = 8;
         PUT_STATE = 9;
         DEL_STATE = 10;
-        INVOKE_CHAINCODE = 11;
+        INVOKE_SMARTCONTRACT = 11;
         RESPONSE = 13;
         GET_STATE_BY_RANGE = 14;
         GET_QUERY_RESULT = 15;

@@ -2,8 +2,6 @@
 Copyright IBM Corp., DTCC All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
-
-Modified by Dingxuan sunianle on 2018-03-01
 */
 
 package org.bcia.javachain.core.smartcontract.shim.impl;
@@ -11,17 +9,23 @@ package org.bcia.javachain.core.smartcontract.shim.impl;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Timestamp;
-import org.bcia.javachain.core.ledger.CompositeKey;
-import org.bcia.javachain.core.ledger.IKeyModification;
-import org.bcia.javachain.core.ledger.IKeyValue;
-import org.bcia.javachain.core.ledger.IQueryResultsIterator;
-import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
+import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
+import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
+import org.bcia.javachain.core.smartcontract.shim.ledger.CompositeKey;
+import org.bcia.javachain.core.smartcontract.shim.ledger.IKeyModification;
+import org.bcia.javachain.core.smartcontract.shim.ledger.IKeyValue;
+import org.bcia.javachain.core.smartcontract.shim.ledger.IQueryResultsIterator;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Common.Header;
+import org.bcia.javachain.protos.common.Common.HeaderType;
+import org.bcia.javachain.protos.common.Common.SignatureHeader;
 import org.bcia.javachain.protos.ledger.queryresult.KvQueryResult;
+import org.bcia.javachain.protos.ledger.queryresult.KvQueryResult.KV;
 import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.ProposalPackage.Proposal;
+import org.bcia.javachain.protos.node.ProposalPackage.SignedProposal;
 import org.bcia.javachain.protos.node.SmartContractEventPackage;
 import org.bcia.javachain.protos.node.SmartcontractShim;
-
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -36,22 +40,22 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
-public class SmartContractStub implements ISmartContractStub {
+class SmartContractStub implements ISmartContractStub {
 
 	private static final String UNSPECIFIED_KEY = new String(Character.toChars(0x000001));
-	private final String groupId;
+	private final String channelId;
 	private final String txId;
 	private final Handler handler;
 	private final List<ByteString> args;
-	private final ProposalPackage.SignedProposal signedProposal;
+	private final SignedProposal signedProposal;
 	private final Instant txTimestamp;
 	private final ByteString creator;
 	private final Map<String, ByteString> transientMap;
 	private final byte[] binding;
 	private SmartContractEventPackage.SmartContractEvent event;
 
-	public SmartContractStub(String groupId, String txId, Handler handler, List<ByteString> args, ProposalPackage.SignedProposal signedProposal) {
-		this.groupId = groupId;
+	SmartContractStub(String channelId, String txId, Handler handler, List<ByteString> args, SignedProposal signedProposal) {
+		this.channelId = channelId;
 		this.txId = txId;
 		this.handler = handler;
 		this.args = Collections.unmodifiableList(args);
@@ -63,43 +67,43 @@ public class SmartContractStub implements ISmartContractStub {
 			this.binding = null;
 		} else {
 			try {
-				final ProposalPackage.Proposal proposal = ProposalPackage.Proposal.parseFrom(signedProposal.getProposalBytes());
-				final Common.Header header = Common.Header.parseFrom(proposal.getHeader());
-				final Common.GroupHeader channelHeader = Common.GroupHeader.parseFrom(header.getGroupHeader());
-				validateProposalType(channelHeader);
-				final Common.SignatureHeader signatureHeader = Common.SignatureHeader.parseFrom(header.getSignatureHeader());
-				final ProposalPackage.SmartContractProposalPayload chaincodeProposalPayload = ProposalPackage.SmartContractProposalPayload.parseFrom(proposal.getPayload());
-				final Timestamp timestamp = channelHeader.getTimestamp();
+				final Proposal proposal = Proposal.parseFrom(signedProposal.getProposalBytes());
+				final Header header = Header.parseFrom(proposal.getHeader());
+				final Common.GroupHeader groupHeader = Common.GroupHeader.parseFrom(header.getGroupHeader());
+				validateProposalType(groupHeader);
+				final SignatureHeader signatureHeader = SignatureHeader.parseFrom(header.getSignatureHeader());
+				final ProposalPackage.SmartContractProposalPayload smartcontractProposalPayload = ProposalPackage.SmartContractProposalPayload.parseFrom(proposal.getPayload());
+				final Timestamp timestamp = groupHeader.getTimestamp();
 
 				this.txTimestamp = Instant.ofEpochSecond(timestamp.getSeconds(), timestamp.getNanos());
 				this.creator = signatureHeader.getCreator();
-				this.transientMap = chaincodeProposalPayload.getTransientMapMap();
-				this.binding = computeBinding(channelHeader, signatureHeader);
+				this.transientMap = smartcontractProposalPayload.getTransientMapMap();
+				this.binding = computeBinding(groupHeader, signatureHeader);
 			} catch (InvalidProtocolBufferException | NoSuchAlgorithmException e) {
 				throw new RuntimeException(e);
 			}
 		}
 	}
 
-	private byte[] computeBinding(final Common.GroupHeader channelHeader, final Common.SignatureHeader signatureHeader) throws NoSuchAlgorithmException {
+	private byte[] computeBinding(final Common.GroupHeader groupHeader, final SignatureHeader signatureHeader) throws NoSuchAlgorithmException {
 		final MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
 		messageDigest.update(signatureHeader.getNonce().asReadOnlyByteBuffer());
 		messageDigest.update(this.creator.asReadOnlyByteBuffer());
 		final ByteBuffer epochBytes = ByteBuffer.allocate(Long.BYTES)
 				.order(ByteOrder.LITTLE_ENDIAN)
-				.putLong(channelHeader.getEpoch());
+				.putLong(groupHeader.getEpoch());
 		epochBytes.flip();
 		messageDigest.update(epochBytes);
 		return messageDigest.digest();
 	}
 
-	private void validateProposalType(Common.GroupHeader channelHeader) {
-		switch (Common.HeaderType.forNumber(channelHeader.getType())) {
+	private void validateProposalType(Common.GroupHeader groupHeader) {
+		switch (Common.HeaderType.forNumber(groupHeader.getType())) {
 		case ENDORSER_TRANSACTION:
 		case CONFIG:
 			return;
 		default:
-			throw new RuntimeException(String.format("Unexpected transaction type: %s", Common.HeaderType.forNumber(channelHeader.getType())));
+			throw new RuntimeException(String.format("Unexpected transaction type: %s", HeaderType.forNumber(groupHeader.getType())));
 		}
 	}
 
@@ -125,7 +129,9 @@ public class SmartContractStub implements ISmartContractStub {
 
 	@Override
 	public void setEvent(String name, byte[] payload) {
-		if (name == null || name.trim().length() == 0) throw new IllegalArgumentException("Event name cannot be null or empty string.");
+		if (name == null || name.trim().length() == 0) {
+			throw new IllegalArgumentException("Event name cannot be null or empty string.");
+		}
 		if (payload != null) {
 			this.event = SmartContractEventPackage.SmartContractEvent.newBuilder()
 					.setEventName(name)
@@ -145,7 +151,7 @@ public class SmartContractStub implements ISmartContractStub {
 
 	@Override
 	public String getGroupId() {
-		return groupId;
+		return channelId;
 	}
 
 	@Override
@@ -155,40 +161,49 @@ public class SmartContractStub implements ISmartContractStub {
 
 	@Override
 	public byte[] getState(String key) {
-		return handler.getState(groupId, txId, key).toByteArray();
+		return handler.getState(channelId, txId, key).toByteArray();
 	}
 
 	@Override
 	public void putState(String key, byte[] value) {
-		if(key == null) throw new NullPointerException("key cannot be null");
-		if(key.length() == 0) throw new IllegalArgumentException("key cannot not be an empty string");
-		handler.putState(groupId, txId, key, ByteString.copyFrom(value));
+		if(key == null) {
+			throw new NullPointerException("key cannot be null");
+		}
+		if(key.length() == 0) {
+			throw new IllegalArgumentException("key cannot not be an empty string");
+		}
+		handler.putState(channelId, txId, key, ByteString.copyFrom(value));
 	}
 
 	@Override
 	public void delState(String key) {
-		handler.deleteState(groupId, txId, key);
+		handler.deleteState(channelId, txId, key);
 	}
 
 	@Override
 	public IQueryResultsIterator<IKeyValue> getStateByRange(String startKey, String endKey) {
-		if (startKey == null || startKey.isEmpty()) startKey = UNSPECIFIED_KEY;
-		if (endKey == null || endKey.isEmpty()) endKey = UNSPECIFIED_KEY;
+		if (startKey == null || startKey.isEmpty()) {
+			startKey = UNSPECIFIED_KEY;
+		}
+		if (endKey == null || endKey.isEmpty()) {
+			endKey = UNSPECIFIED_KEY;
+		}
 		CompositeKey.validateSimpleKeys(startKey, endKey);
 
-		return new QueryResultsIteratorImpl<IKeyValue>(this.handler, getGroupId(), getTxId(),
+		return new QueryResultsIterator<IKeyValue>(this.handler, getGroupId(), getTxId(),
 				handler.getStateByRange(getGroupId(), getTxId(), startKey, endKey),
 				queryResultBytesToKv.andThen(KeyValue::new)
 				);
 	}
 
-	private Function<SmartcontractShim.QueryResultBytes, KvQueryResult.KV> queryResultBytesToKv = new Function<SmartcontractShim.QueryResultBytes, KvQueryResult.KV>() {
-		public KvQueryResult.KV apply(SmartcontractShim.QueryResultBytes queryResultBytes) {
+	private Function<SmartcontractShim.QueryResultBytes, KV> queryResultBytesToKv = new Function<SmartcontractShim.QueryResultBytes, KV>() {
+		public KV apply(SmartcontractShim.QueryResultBytes queryResultBytes) {
 			try {
-				return KvQueryResult.KV.parseFrom(queryResultBytes.getResultBytes());
+				return KV.parseFrom(queryResultBytes.getResultBytes());
 			} catch (InvalidProtocolBufferException e) {
 				throw new RuntimeException(e);
 			}
+
 		};
 	};
 
@@ -212,7 +227,7 @@ public class SmartContractStub implements ISmartContractStub {
 
 	@Override
 	public IQueryResultsIterator<IKeyValue> getQueryResult(String query) {
-		return new QueryResultsIteratorImpl<IKeyValue>(this.handler, getGroupId(), getTxId(),
+		return new QueryResultsIterator<IKeyValue>(this.handler, getGroupId(), getTxId(),
 				handler.getQueryResult(getGroupId(), getTxId(), query),
 				queryResultBytesToKv.andThen(KeyValue::new)
 				);
@@ -220,7 +235,7 @@ public class SmartContractStub implements ISmartContractStub {
 
 	@Override
 	public IQueryResultsIterator<IKeyModification> getHistoryForKey(String key) {
-		return new QueryResultsIteratorImpl<IKeyModification>(this.handler, getGroupId(), getTxId(),
+		return new QueryResultsIterator<IKeyModification>(this.handler, getGroupId(), getTxId(),
 				handler.getHistoryForKey(getGroupId(), getTxId(), key),
 				queryResultBytesToKeyModification.andThen(KeyModification::new)
 				);
@@ -237,19 +252,19 @@ public class SmartContractStub implements ISmartContractStub {
 	};
 
 	@Override
-	public SmartContractResponse invokeSmartContract(final String chaincodeName, final List<byte[]> args, final String channel) {
-		// internally we handle chaincode name as a composite name
+	public ISmartContract.SmartContractResponse invokeSmartContract(final String smartcontractName, final List<byte[]> args, final String channel) {
+		// internally we handle smartcontract name as a composite name
 		final String compositeName;
 		if (channel != null && channel.trim().length() > 0) {
-			compositeName = chaincodeName + "/" + channel;
+			compositeName = smartcontractName + "/" + channel;
 		} else {
-			compositeName = chaincodeName;
+			compositeName = smartcontractName;
 		}
-		return handler.invokeSmartContract(this.groupId, this.txId, compositeName, args);
+		return handler.invokeSmartContract(this.channelId, this.txId, compositeName, args);
 	}
 
 	@Override
-	public ProposalPackage.SignedProposal getSignedProposal() {
+	public SignedProposal getSignedProposal() {
 		return signedProposal;
 	}
 
@@ -260,7 +275,9 @@ public class SmartContractStub implements ISmartContractStub {
 
 	@Override
 	public byte[] getCreator() {
-		if(creator == null) return null;
+		if(creator == null) {
+			return null;
+		}
 		return creator.toByteArray();
 	}
 

@@ -107,7 +107,7 @@ public class Handler {
             new EventDesc(READY.toString(),                 ESTABLISHED_STATE,  READY_STATE),
             new EventDesc(PUT_STATE.toString(),             READY_STATE,        READY_STATE),
             new EventDesc(DEL_STATE.toString(),             READY_STATE,        READY_STATE),
-            new EventDesc(INVOKE_CHAINCODE.toString(),      READY_STATE,        READY_STATE),
+            new EventDesc(INVOKE_SMARTCONTRACT.toString(),      READY_STATE,        READY_STATE),
             new EventDesc(COMPLETED.toString(),             READY_STATE,        READY_STATE),
             new EventDesc(GET_STATE.toString(),             READY_STATE,        READY_STATE),
             new EventDesc(GET_STATE_BY_RANGE.toString(),    READY_STATE,        READY_STATE),
@@ -133,7 +133,7 @@ public class Handler {
             new CBDesc(AFTER_EVENT,     QUERY_STATE_CLOSE.toString(),   (event) -> afterQueryStateClose(event, fsm.current())),
             new CBDesc(AFTER_EVENT,     PUT_STATE.toString(),           (event) -> enterBusyState(event, fsm.current())),
             new CBDesc(AFTER_EVENT,     DEL_STATE.toString(),           (event) -> enterBusyState(event, fsm.current())),
-            new CBDesc(AFTER_EVENT,     INVOKE_CHAINCODE.toString(),    (event) -> enterBusyState(event, fsm.current())),
+            new CBDesc(AFTER_EVENT,     INVOKE_SMARTCONTRACT.toString(),    (event) -> enterBusyState(event, fsm.current())),
             new CBDesc(ENTER_STATE,     ESTABLISHED_STATE,              (event) -> enterEstablishedState(event, fsm.current())),
             new CBDesc(ENTER_STATE,     READY_STATE,                    (event) -> enterReadyState(event, fsm.current())),
             new CBDesc(ENTER_STATE,     END_STATE,                      (event) -> enterEndState(event, fsm.current()))
@@ -1305,7 +1305,7 @@ public class Handler {
             , String msgType, ByteString payload, String errStr) {
         TransactionContext txContext = getTxContext(groupId, txid);
         //if we do not have GroupId or INVOKE_CHAINCODE
-        if(!"".equals(groupId) || !INVOKE_CHAINCODE.toString().equals(msgType)){
+        if(!"".equals(groupId) || !INVOKE_SMARTCONTRACT.toString().equals(msgType)){
             if (txContext == null || txContext.getTxSimulator() == null){
                 logger.error(errStr);
                 return newEventMessage(ERROR, groupId, txid, ByteString.copyFromUtf8(errStr));
@@ -1434,7 +1434,7 @@ public class Handler {
                     triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)));
                     returnTriggerNextState(msg, triggerNextStateMsg);
                 }
-            } else if (INVOKE_CHAINCODE.equals(msg.getType())){
+            } else if (INVOKE_SMARTCONTRACT.equals(msg.getType())){
                 //1.构造CS结构
                 Smartcontract.SmartContractSpec chaincodeSpec = null;
                 SmartContractInstance calledCcIns = null;

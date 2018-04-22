@@ -2,30 +2,29 @@
 Copyright IBM Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
-
-Modified by Dingxuan sunianle on 2018-03-01
 */
 
 package org.bcia.javachain.core.smartcontract.shim.impl;
 
-import org.bcia.javachain.core.ledger.IQueryResultsIterator;
-import org.bcia.javachain.protos.node.SmartcontractShim;
+import org.bcia.javachain.core.smartcontract.shim.ledger.IQueryResultsIterator;
+import org.bcia.javachain.protos.node.SmartcontractShim.QueryResponse;
+import org.bcia.javachain.protos.node.SmartcontractShim.QueryResultBytes;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.function.Function;
 
-class QueryResultsIteratorImpl<T> implements IQueryResultsIterator<T> {
+class QueryResultsIterator<T> implements IQueryResultsIterator<T> {
 
 	private final Handler handler;
 	private final String channelId;
 	private final String txId;
-	private Iterator<SmartcontractShim.QueryResultBytes> currentIterator;
-	private SmartcontractShim.QueryResponse currentQueryResponse;
-	private Function<SmartcontractShim.QueryResultBytes, T> mapper;
+	private Iterator<QueryResultBytes> currentIterator;
+	private QueryResponse currentQueryResponse;
+	private Function<QueryResultBytes, T> mapper;
 
-	public QueryResultsIteratorImpl(final Handler handler, final String channelId, final String txId, final SmartcontractShim.QueryResponse queryResponse, Function<SmartcontractShim.QueryResultBytes, T> mapper) {
+	public QueryResultsIterator(final Handler handler, final String channelId, final String txId, final QueryResponse queryResponse, Function<QueryResultBytes, T> mapper) {
 		this.handler = handler;
 		this.channelId = channelId;
 		this.txId = txId;
@@ -68,7 +67,7 @@ class QueryResultsIteratorImpl<T> implements IQueryResultsIterator<T> {
 	public void close() throws Exception {
 		this.handler.queryStateClose(channelId, txId, currentQueryResponse.getId());
 		this.currentIterator = Collections.emptyIterator();
-		this.currentQueryResponse = SmartcontractShim.QueryResponse.newBuilder().setHasMore(false).build();
+		this.currentQueryResponse = QueryResponse.newBuilder().setHasMore(false).build();
 	}
 
 }

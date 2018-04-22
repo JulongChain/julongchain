@@ -10,7 +10,7 @@ package org.bcia.javachain.core.smartcontract.shim.impl;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Timestamp;
-import org.bcia.javachain.core.ledger.CompositeKey;
+import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.ledger.queryresult.KvQueryResult;
 import org.bcia.javachain.protos.node.ProposalPackage;
@@ -20,32 +20,27 @@ import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import static org.bcia.javachain.protos.common.Common.HeaderType.ENDORSER_TRANSACTION_VALUE;
-import static org.junit.Assert.*;
-
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
 
 import javax.xml.bind.DatatypeConverter;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.bcia.javachain.protos.common.Common.HeaderType.ENDORSER_TRANSACTION_VALUE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.contains;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static java.nio.charset.StandardCharsets.UTF_8;
 /**
  * 智能合约桩单元测试
  *
@@ -225,7 +220,7 @@ public class SmartContractStubTest {
     @Test
     public void createCompositeKey() {
         final SmartContractStub stub = new SmartContractStub("myc", "txId", handler, Collections.emptyList(), null);
-        final CompositeKey key = stub.createCompositeKey("abc", "def", "ghi", "jkl", "mno");
+        final org.bcia.javachain.core.smartcontract.shim.ledger.CompositeKey key = stub.createCompositeKey("abc", "def", "ghi", "jkl", "mno");
         assertThat(key, hasProperty("objectType", equalTo("abc")));
         assertThat(key, hasProperty("attributes", hasSize(4)));
         assertThat(key, Matchers.hasToString(equalTo("\u0000abc\u0000def\u0000ghi\u0000jkl\u0000mno\u0000")));
@@ -235,7 +230,7 @@ public class SmartContractStubTest {
     @Test
     public void splitCompositeKey() {
         final SmartContractStub stub = new SmartContractStub("myc", "txId", handler, Collections.emptyList(), null);
-        final CompositeKey key = stub.splitCompositeKey("\u0000abc\u0000def\u0000ghi\u0000jkl\u0000mno\u0000");
+        final org.bcia.javachain.core.smartcontract.shim.ledger.CompositeKey key = stub.splitCompositeKey("\u0000abc\u0000def\u0000ghi\u0000jkl\u0000mno\u0000");
         assertThat(key, hasProperty("objectType", equalTo("abc")));
         assertThat(key, hasProperty("attributes", contains("def", "ghi", "jkl", "mno")));
         assertThat(key, Matchers.hasToString(equalTo("\u0000abc\u0000def\u0000ghi\u0000jkl\u0000mno\u0000")));
@@ -291,7 +286,7 @@ public class SmartContractStubTest {
     public void invokeSmartContract() {
         final String txId = "txId", chaincodeName = "CHAINCODE_ID", channel = "CHAINCODE_CHANNEL";
         final SmartContractStub stub = new SmartContractStub(channel, txId, handler, Collections.emptyList(), null);
-        final SmartContractResponse expectedSmartContractResponse = new SmartContractResponse(SmartContractResponse.Status.SUCCESS, "MESSAGE", "PAYLOAD".getBytes(UTF_8));
+        final ISmartContract.SmartContractResponse expectedSmartContractResponse = new ISmartContract.SmartContractResponse(ISmartContract.SmartContractResponse.Status.SUCCESS, "MESSAGE", "PAYLOAD".getBytes(UTF_8));
         when(handler.invokeSmartContract(channel, txId, chaincodeName, Collections.emptyList())).thenReturn(expectedSmartContractResponse);
         assertThat(stub.invokeSmartContract(chaincodeName, Collections.emptyList()), is(expectedSmartContractResponse));
 

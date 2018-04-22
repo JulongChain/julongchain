@@ -20,27 +20,30 @@ import com.google.protobuf.Timestamp;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.Utils;
-import org.bcia.javachain.core.ledger.CompositeKey;
-import org.bcia.javachain.core.ledger.IKeyModification;
-import org.bcia.javachain.core.ledger.IKeyValue;
-import org.bcia.javachain.core.ledger.IQueryResultsIterator;
-import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContract;
-import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
+import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
+import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
+import org.bcia.javachain.core.smartcontract.shim.ledger.CompositeKey;
+import org.bcia.javachain.core.smartcontract.shim.ledger.IKeyModification;
+import org.bcia.javachain.core.smartcontract.shim.ledger.IKeyValue;
+import org.bcia.javachain.core.smartcontract.shim.ledger.IQueryResultsIterator;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.SmartContractEventPackage;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * MockStub is an implementation of ChaincodeStubInterface for unit testing chaincode.
-*  Use this instead of ChaincodeStub in your chaincode's unit test calls to Init or Invoke.
+ *  Use this instead of ChaincodeStub in your chaincode's unit test calls to Init or Invoke.
  * @author sunianle
  * @date 3/27/18
  * @company Dingxuan
  */
-public class MockStub implements ISmartContractStub{
+public class MockStub implements ISmartContractStub {
     private static JavaChainLog log = JavaChainLogFactory.getLog(MockStub.class);
     private List<ByteString> args;
     private String name;
@@ -91,7 +94,7 @@ public class MockStub implements ISmartContractStub{
     }
 
     @Override
-    public SmartContractResponse invokeSmartContract(String smartContractName, List<byte[]> args, String group) {
+    public ISmartContract.SmartContractResponse invokeSmartContract(String smartContractName, List<byte[]> args, String group) {
         return null;
     }
 
@@ -146,22 +149,22 @@ public class MockStub implements ISmartContractStub{
     }
 
     @Override
-    public SmartContractResponse invokeSmartContract(String smartContractName, List<byte[]> args) {
+    public ISmartContract.SmartContractResponse invokeSmartContract(String smartContractName, List<byte[]> args) {
         return null;
     }
 
     @Override
-    public SmartContractResponse invokeSmartContractWithStringArgs(String smartContractName, List<String> args, String group) {
+    public ISmartContract.SmartContractResponse invokeSmartContractWithStringArgs(String smartContractName, List<String> args, String group) {
         return null;
     }
 
     @Override
-    public SmartContractResponse invokeSmartContractWithStringArgs(String smartContractName, List<String> args) {
+    public ISmartContract.SmartContractResponse invokeSmartContractWithStringArgs(String smartContractName, List<String> args) {
         return null;
     }
 
     @Override
-    public SmartContractResponse invokeSmartContractWithStringArgs(String smartContractName, String... args) {
+    public ISmartContract.SmartContractResponse invokeSmartContractWithStringArgs(String smartContractName, String... args) {
         return null;
     }
 
@@ -205,28 +208,28 @@ public class MockStub implements ISmartContractStub{
         return new byte[0];
     }
 
-    public SmartContractResponse mockInit(String uuid, List<ByteString> args){
+    public ISmartContract.SmartContractResponse mockInit(String uuid, List<ByteString> args){
         this.args=args;
         mockTransactionStart(uuid);
-        SmartContractResponse smartContractResponse =this.smartContract.init(this);
+        ISmartContract.SmartContractResponse smartContractResponse =this.smartContract.init(this);
         mockTransactionEnd(uuid);
         return smartContractResponse;
     }
 
-    public SmartContractResponse mockInvoke(String uuid, List<ByteString> args){
+    public ISmartContract.SmartContractResponse mockInvoke(String uuid, List<ByteString> args){
         this.args=args;
         mockTransactionStart(uuid);
-        SmartContractResponse smartContractResponse =this.smartContract.invoke(this);
+        ISmartContract.SmartContractResponse smartContractResponse =this.smartContract.invoke(this);
         mockTransactionEnd(uuid);
         return smartContractResponse;
     }
 
-    public SmartContractResponse mockInvokeWithSignedProposal(String uuid, List<ByteString> args,
+    public ISmartContract.SmartContractResponse mockInvokeWithSignedProposal(String uuid, List<ByteString> args,
                                                               ProposalPackage.SignedProposal proposal){
         this.args=args;
         mockTransactionStart(uuid);
         this.signedProposal=proposal;
-        SmartContractResponse smartContractResponse =this.smartContract.invoke(this);
+        ISmartContract.SmartContractResponse smartContractResponse =this.smartContract.invoke(this);
         mockTransactionEnd(uuid);
         return smartContractResponse;
     }

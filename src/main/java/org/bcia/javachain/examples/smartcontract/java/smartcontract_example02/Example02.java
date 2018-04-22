@@ -15,9 +15,8 @@
  */
 package org.bcia.javachain.examples.smartcontract.java.smartcontract_example02;
 
-import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
-import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContract;
-import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
+import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
+import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 
 /**
  * 类描述
@@ -26,7 +25,7 @@ import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContractStub;
  * @date 3/29/18
  * @company Dingxuan
  */
-public class Example02 implements ISmartContract{
+public class Example02 implements ISmartContract {
     @Override
     public SmartContractResponse init(ISmartContractStub stub) {
         return null;

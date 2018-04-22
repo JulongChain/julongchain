@@ -6,9 +6,9 @@ import org.bcia.javachain.BaseJunit4Test;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.util.Utils;
 import org.bcia.javachain.common.util.proto.ProposalUtils;
+import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
+import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.smartcontract.shim.impl.MockStub;
-import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
-import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractStub;
 import org.bcia.javachain.node.entity.MockCrypto;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
@@ -36,12 +36,12 @@ public class ESSCTest extends BaseJunit4Test {
     @Autowired
     private ESSC essc;
     @Mock
-    private SmartContractStub stub;
+    private ISmartContractStub stub;
 
     @Test
     public void init() {
-        SmartContractResponse smartContractResponse = essc.init(stub);
-        assertThat(smartContractResponse.getStatus(), is(SmartContractResponse.Status.SUCCESS));
+        ISmartContract.SmartContractResponse smartContractResponse = essc.init(stub);
+        assertThat(smartContractResponse.getStatus(), is(ISmartContract.SmartContractResponse.Status.SUCCESS));
     }
 
     @Test
@@ -55,8 +55,8 @@ public class ESSCTest extends BaseJunit4Test {
             List<ByteString> args0 = new LinkedList<ByteString>();
             args0.add(ByteString.copyFromUtf8("DEFAULT"));
             args0.add(ByteString.copyFromUtf8("PEER"));
-            SmartContractResponse res = mockStub.mockInit("1", args0);
-            if (res.getStatus() != SmartContractResponse.Status.SUCCESS) {
+            ISmartContract.SmartContractResponse res = mockStub.mockInit("1", args0);
+            if (res.getStatus() != ISmartContract.SmartContractResponse.Status.SUCCESS) {
                 System.out.printf("Init failded,%s\n", res.getMessage());
             }
 
@@ -88,19 +88,19 @@ public class ESSCTest extends BaseJunit4Test {
             args1.add(3,smartContractID.toByteString());
             args1.add(4,successResponse.toByteString());
             args1.add(5,ByteString.copyFromUtf8(simRes));
-            SmartContractResponse res1 = mockStub.mockInvoke("1", args1);
-            if (res1.getStatus() != SmartContractResponse.Status.SUCCESS) {
+            ISmartContract.SmartContractResponse res1 = mockStub.mockInvoke("1", args1);
+            if (res1.getStatus() != ISmartContract.SmartContractResponse.Status.SUCCESS) {
                 System.out.printf("Invoke failded,%s\n", res.getMessage());
             }
-            assertThat(res1.getStatus(),is(SmartContractResponse.Status.SUCCESS));
+            assertThat(res1.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
 
 
             //Failed path: Not enough parameters
             List<ByteString> args2 = new LinkedList<ByteString>();
             args2.add(0, ByteString.copyFromUtf8("test"));
-            SmartContractResponse res2=mockStub.mockInvoke("1", args2);
-            SmartContractResponse.Status status2 = res2.getStatus();
-            assertThat(status2,is(SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
+            ISmartContract.SmartContractResponse res2=mockStub.mockInvoke("1", args2);
+            ISmartContract.SmartContractResponse.Status status2 = res2.getStatus();
+            assertThat(status2,is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
 
             // Failed path: header is empty
             List<ByteString> args3 = new LinkedList<ByteString>();
@@ -110,9 +110,9 @@ public class ESSCTest extends BaseJunit4Test {
             args3.add(3,smartContractID.toByteString());
             args3.add(4,successResponse.toByteString());
             args3.add(5,ByteString.copyFromUtf8(simRes));
-            SmartContractResponse res3=mockStub.mockInvoke("1", args3);
-            SmartContractResponse.Status status3= res3.getStatus();
-            assertThat(status3,is(SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
+            ISmartContract.SmartContractResponse res3=mockStub.mockInvoke("1", args3);
+            ISmartContract.SmartContractResponse.Status status3= res3.getStatus();
+            assertThat(status3,is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
 
             // Failed path: header is null
             List<ByteString> args4 = new LinkedList<ByteString>();
@@ -124,7 +124,7 @@ public class ESSCTest extends BaseJunit4Test {
             args4.add(4,successResponse.toByteString());
             args4.add(5,ByteString.copyFromUtf8(simRes));
             try {
-                SmartContractResponse res4 = mockStub.mockInvoke("1", args4);
+                ISmartContract.SmartContractResponse res4 = mockStub.mockInvoke("1", args4);
             }catch(Exception e){
                 //stub.getArgs()将抛出NullPointerException异常
                 assertThat(e.getClass().toString(),is("class java.lang.NullPointerException"));

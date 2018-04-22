@@ -4,9 +4,9 @@ import com.google.protobuf.ByteString;
 import org.bcia.javachain.BaseJunit4Test;
 import org.bcia.javachain.common.util.proto.ProtoUtils;
 import org.bcia.javachain.common.util.proto.TxUtils;
+import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
+import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.smartcontract.shim.impl.MockStub;
-import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractResponse;
-import org.bcia.javachain.core.smartcontract.shim.impl.SmartContractStub;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.junit.Test;
@@ -16,8 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
 
 /**
  * LSSC系统智能合约的单元测试类
@@ -27,14 +27,17 @@ import static org.junit.Assert.*;
  * @company Dingxuan
  */
 public class LSSCTest extends BaseJunit4Test {
+
     @Autowired
     private LSSC lssc;
+
     @Mock
-    private SmartContractStub stub;
+    private ISmartContractStub stub;
+
     @Test
     public void init() {
-        SmartContractResponse smartContractResponse =lssc.init(stub);
-        assertThat(smartContractResponse.getStatus(),is(SmartContractResponse.Status.SUCCESS));
+        ISmartContract.SmartContractResponse smartContractResponse =lssc.init(stub);
+        assertThat(smartContractResponse.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
     }
 
     @Test
@@ -62,8 +65,8 @@ public class LSSCTest extends BaseJunit4Test {
         args0.add(ByteString.copyFrom(cdsBytes));
         Smartcontract.SmartContractSpec spec=Smartcontract.SmartContractSpec.newBuilder().build();
         ProposalPackage.SignedProposal signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec, caller.getBytes(), "msg1".getBytes());
-        SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
-        assertThat(res.getStatus(),is(SmartContractResponse.Status.SUCCESS));
+        ISmartContract.SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
+        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
     }
 
     @Test
@@ -93,9 +96,9 @@ public class LSSCTest extends BaseJunit4Test {
         Smartcontract.SmartContractSpec spec=Smartcontract.SmartContractSpec.newBuilder().build();
         ProposalPackage.SignedProposal signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec, caller.getBytes(), "msg1".getBytes());
 
-        SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
+        ISmartContract.SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
         //尚未安全实现调通全部逻辑，返回内部错误
-        assertThat(res.getStatus(),is(SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
+        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
     }
 
     @Test
@@ -125,9 +128,9 @@ public class LSSCTest extends BaseJunit4Test {
         Smartcontract.SmartContractSpec spec=Smartcontract.SmartContractSpec.newBuilder().build();
         ProposalPackage.SignedProposal signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec, caller.getBytes(), "msg1".getBytes());
 
-        SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
+        ISmartContract.SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
         //尚未安全实现调通全部逻辑，返回内部错误
-        assertThat(res.getStatus(),is(SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
+        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
     }
 
     private Smartcontract.SmartContractDeploymentSpec constructDeploySpec(String smartcontractName, String path, String version, List<String> initArgs, boolean bCreateFS) {

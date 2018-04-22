@@ -15,7 +15,7 @@
  */
 package org.bcia.javachain.core.ssc;
 
-import org.bcia.javachain.core.smartcontract.shim.intfs.SmartContractBase;
+import org.bcia.javachain.core.smartcontract.shim.SmartContractBase;
 
 /**
  * 系统智能合约的抽象类

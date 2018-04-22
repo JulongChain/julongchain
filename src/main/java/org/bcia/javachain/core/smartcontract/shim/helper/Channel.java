@@ -2,8 +2,6 @@
 Copyright IBM Corp., DTCC All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
-
-Modified by Dingxuan sunianle on 2018-03-01
 */
 
 package org.bcia.javachain.core.smartcontract.shim.helper;
@@ -23,9 +21,7 @@ public class Channel<E> extends LinkedBlockingQueue<E> implements Closeable {
 	@Override
 	public E take() throws InterruptedException {
 		synchronized (waiting) {
-			if (closed) {
-				throw new InterruptedException("Channel closed");
-			}
+			if (closed) throw new InterruptedException("Channel closed");
 			waiting.add(Thread.currentThread());
 		}
 		E e = super.take();

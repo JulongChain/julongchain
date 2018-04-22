@@ -2,13 +2,11 @@
 Copyright IBM Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
-
-Modified by Dingxuan sunianle on 2018-03-01
 */
 package org.bcia.javachain.core.smartcontract.shim.impl;
 
 import com.google.protobuf.ByteString;
-import org.bcia.javachain.core.ledger.IKeyModification;
+import org.bcia.javachain.core.smartcontract.shim.ledger.IKeyModification;
 import org.bcia.javachain.protos.ledger.queryresult.KvQueryResult;
 
 import java.time.Instant;

@@ -15,7 +15,7 @@
  */
 package org.bcia.javachain.core.container.inproccontroller;
 
-import org.bcia.javachain.core.smartcontract.shim.intfs.ISmartContract;
+import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
 
 /**
  * 类描述

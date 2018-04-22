@@ -66,7 +66,7 @@ public class SmartContractMessageGrpcService extends SmartContractSupportGrpc.Sm
         log.debug("message type to string:" + message.getType().toString());
 
         if(StringUtils.equals(message.getTxid(), "invoke")) {
-            responseObserver.onNext(SmartcontractShim.SmartContractMessage.newBuilder().setType(SmartcontractShim.SmartContractMessage.Type.INVOKE_CHAINCODE).build());
+            responseObserver.onNext(SmartcontractShim.SmartContractMessage.newBuilder().setType(SmartcontractShim.SmartContractMessage.Type.INVOKE_SMARTCONTRACT).build());
         }else if(StringUtils.equals(message.getTxid(), "keepalive")) {
             responseObserver.onNext(SmartcontractShim.SmartContractMessage.newBuilder().setType(SmartcontractShim.SmartContractMessage.Type.KEEPALIVE).build());
         }
