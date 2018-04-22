@@ -17,10 +17,13 @@ package org.bcia.javachain.core.smartcontract.node;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
-import org.bcia.javachain.common.log.JavaChainLog;
-import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.node.ProposalPackage;
 
 import java.io.IOException;
+import java.util.Date;
 
 /**
  * 类描述
@@ -31,19 +34,19 @@ import java.io.IOException;
  */
 public class SmartContractSupportServer {
 
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(SmartContractSupportServer.class);
+    private static Log logger = LogFactory.getLog(SmartContractSupportServer.class);
 
     private final int port;
 
     private final Server server;
 
     public SmartContractSupportServer(int port) {
-        this.port = port; server = ServerBuilder.forPort(port).addService(new SmartContractSupportService()).build();
+        this.port = port;
+        server = ServerBuilder.forPort(port).addService(new SmartContractSupportService()).build();
     }
 
     public void start() throws IOException {
         server.start();
-        logger.info("Server started, listening on " + port);
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
@@ -67,9 +70,46 @@ public class SmartContractSupportServer {
     }
 
     public static void main(String[] args) throws Exception {
-        SmartContractSupportServer server = new SmartContractSupportServer(7051);
-        server.start();
-        server.blockUntilShutdown();
+        new Thread() {
+            public void run() {
+                SmartContractSupportServer server = new SmartContractSupportServer(7052);
+                try {
+                    server.start();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    server.blockUntilShutdown();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.start();
+
+
+        while(true) {
+            try {
+                Thread.sleep(5000);
+                logger.info(new Date().toString());
+                Common.GroupHeader groupHeader = Common.GroupHeader.newBuilder().setType(Common.HeaderType
+                        .ENDORSER_TRANSACTION.getNumber()).build();
+
+                Common.Header header = Common.Header.newBuilder().setGroupHeader(groupHeader.toByteString())
+                        .build();
+
+                ProposalPackage.Proposal proposal = ProposalPackage.Proposal.newBuilder().setHeader(header
+                        .toByteString()).build();
+
+                ProposalPackage.SignedProposal signedProposal = ProposalPackage.SignedProposal.newBuilder()
+                        .setProposalBytes
+                                (proposal.toByteString()).build();
+
+                SmartContractSupportService.invoke("MyChaincode1", signedProposal);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+
+        }
     }
 
 }

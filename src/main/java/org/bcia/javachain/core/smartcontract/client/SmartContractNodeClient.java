@@ -15,6 +15,13 @@
  */
 package org.bcia.javachain.core.smartcontract.client;
 
+import com.google.protobuf.ByteString;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
+import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
+import org.bcia.javachain.core.smartcontract.shim.SmartContractBase;
+
 /**
  * 类描述
  *
@@ -22,6 +29,40 @@ package org.bcia.javachain.core.smartcontract.client;
  * @date 2018/3/28
  * @company Dingxuan
  */
-public class SmartContractNodeClient {
+public class SmartContractNodeClient extends SmartContractBase{
+
+    private static Log logger = LogFactory.getLog(SmartContractNodeClient.class);
+
+    @Override
+    public ISmartContract.SmartContractResponse init(ISmartContractStub stub) {
+        logger.info("init");
+        return newSuccessResponse();
+    }
+
+    @Override
+    public ISmartContract.SmartContractResponse invoke(ISmartContractStub stub) {
+        logger.info("invoke");
+
+        String value1 = ByteString.copyFrom(stub.getState("aaa")).toStringUtf8();
+
+        logger.info("-------------------- value1: " + value1);
+
+        String a = "bbb";
+        stub.putState("aaa", a.getBytes());
+        return newSuccessResponse();
+    }
+
+    public static void main(String[] args) {
+        String[] bytes = new String[]{"",""};
+        //bytes[0] = "-a 127.0.0.1:7051";
+        bytes[0] = "-iMyChaincode1";
+        SmartContractNodeClient test = new SmartContractNodeClient();
+        test.start(bytes);
+    }
+
+    @Override
+    public String getSmartContractStrDescription() {
+        return "MySmartContract";
+    }
 
 }
