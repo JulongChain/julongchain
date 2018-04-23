@@ -118,17 +118,23 @@ public class Node {
 //        String mspId = config.getNode().getLocalMspId();
 //        String mspType = config.getNode().getLocalMspType();
 
-        String mspConfigDir = "/opt/msp";
-        String mspId = "myMspId";
-        String mspType = "csp";
+//        String mspConfigDir = "D:\\msp";
+//        String mspId = "myMspId";
+//        String mspType = "csp";
 
 //        if (!FileUtils.isExists(mspConfigDir)) {
 //            throw new NodeException("MspConfigPath is not exists");
 //        }
 
         try {
-            List<IFactoryOpts> optsList=new ArrayList<IFactoryOpts>();
-            MspConfig mspConfig=loadMspConfig();
+            List<IFactoryOpts> optsList = new ArrayList<IFactoryOpts>();
+            MspConfig mspConfig = loadMspConfig();
+            String mspConfigDir = mspConfig.getNode().getMspConfigPath();
+            String mspId = mspConfig.getNode().getLocalMspId();
+            String mspType = mspConfig.getNode().getLocalMspType();
+//        String mspId = "myMspId";
+//        String mspType = "csp";
+
             String symmetrickey = mspConfig.node.getCsp().getGm().getSymmetricKey();
             String sign = mspConfig.node.getCsp().getGm().getSign();
             String hash = mspConfig.node.getCsp().getGm().getHash();
@@ -136,11 +142,12 @@ public class Node {
             String privateKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPrivateKeyStore();
             String publicKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPublicKeyStore();
             //new GmCspConfig(symmetrickey,asymmetric,hash,sign,publicKeyPath,privateKeyPath);
-            optsList.add(new GmFactoryOpts(symmetrickey,asymmetric,hash,sign,publicKeyPath,privateKeyPath));
+            optsList.add(new GmFactoryOpts(symmetrickey, asymmetric, hash, sign, publicKeyPath, privateKeyPath));
 
             MspManager.loadLocalMspWithType(mspConfigDir, optsList, mspId, mspType);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException(e);
         }
 
 

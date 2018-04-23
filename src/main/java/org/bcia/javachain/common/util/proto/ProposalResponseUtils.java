@@ -17,11 +17,13 @@ package org.bcia.javachain.common.util.proto;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.util.Utils;
 import org.bcia.javachain.csp.factory.CspManager;
 import org.bcia.javachain.csp.gm.sm3.SM3HashOpts;
+import org.bcia.javachain.csp.intfs.ICsp;
 import org.bcia.javachain.csp.intfs.IHash;
 import org.bcia.javachain.msp.ISigningIdentity;
 import org.bcia.javachain.protos.common.Common;
@@ -211,14 +213,22 @@ public class ProposalResponseUtils {
                 .SmartContractProposalPayload.parseFrom(payloadBytes);
 
         byte[] proposalPayloadForTxBytes = getBytesProposalPayloadForTx(smartContractProposalPayload, visibility);
-        //TODO:应当用哪个CSP，用哪个HashOpts
-        IHash hash = CspManager.getDefaultCsp().getHash(new SM3HashOpts());
 
-        hash.write(header.getGroupHeader().toByteArray());
-        hash.write(header.getSignatureHeader().toByteArray());
-        hash.write(proposalPayloadForTxBytes);
+        //TODO:应当用哪个CSP
+        ICsp defaultCsp = CspManager.getDefaultCsp();
 
-        return hash.sum(null);
+        byte[] bytes = ArrayUtils.addAll(ArrayUtils.addAll(header.getGroupHeader().toByteArray(), header
+                .getSignatureHeader().toByteArray()), proposalPayloadForTxBytes);
+        return defaultCsp.hash(bytes, null);
+
+//        //TODO:应当用哪个CSP，用哪个HashOpts
+//        IHash hash = CspManager.getDefaultCsp().getHash(new SM3HashOpts());
+//
+//        hash.write(header.getGroupHeader().toByteArray());
+//        hash.write(header.getSignatureHeader().toByteArray());
+//        hash.write(proposalPayloadForTxBytes);
+//
+//        return hash.sum(null);
     }
 
     private static byte[] getBytesProposalPayloadForTx(ProposalPackage.SmartContractProposalPayload proposalPayload,

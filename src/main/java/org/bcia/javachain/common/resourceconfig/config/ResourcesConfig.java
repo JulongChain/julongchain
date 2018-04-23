@@ -22,5 +22,5 @@ package org.bcia.javachain.common.resourceconfig.config;
  * @date 2018/4/19
  * @company Dingxuan
  */
-public class ResourceConfig {
+public class ResourcesConfig {
 }
