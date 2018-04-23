@@ -17,11 +17,13 @@ package org.bcia.javachain.common.util.proto;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.util.Utils;
 import org.bcia.javachain.csp.factory.CspManager;
 import org.bcia.javachain.csp.gm.sm3.SM3HashOpts;
+import org.bcia.javachain.csp.intfs.ICsp;
 import org.bcia.javachain.csp.intfs.IHash;
 import org.bcia.javachain.msp.ISigningIdentity;
 import org.bcia.javachain.protos.common.Common;
@@ -114,36 +116,36 @@ public class ProposalResponseUtils {
         Common.Header header = Common.Header.parseFrom(headerBytes);
         //obtain the proposal hash given proposal header, payload and the requested visibility
 
-        byte[] pHashBytes=null;
+        byte[] pHashBytes = null;
         try {
-            pHashBytes=getProposalHash1(header, payloadBytes, visibility);
-        }catch (Exception e){
-            String msg=String.format("Could not compute proposal hash: err %s",e.getMessage());
-            JavaChainException exception=new JavaChainException(msg);
-            throw  exception;
+            pHashBytes = getProposalHash1(header, payloadBytes, visibility);
+        } catch (Exception e) {
+            String msg = String.format("Could not compute proposal hash: err %s", e.getMessage());
+            JavaChainException exception = new JavaChainException(msg);
+            throw exception;
         }
         //get the bytes of the proposal smartContractResponse payload - we need to sign them
-        byte[] prpBytes=null;
+        byte[] prpBytes = null;
         try {
-            prpBytes=getBytesProposalResponsePayload(pHashBytes, response, results, events, smartContractID);
-        }catch (Exception e){
-            String msg=String.format("Failure while marshaling the ProposalResponsePayload: err %s",e.getMessage());
-            JavaChainException exception=new JavaChainException(msg);
+            prpBytes = getBytesProposalResponsePayload(pHashBytes, response, results, events, smartContractID);
+        } catch (Exception e) {
+            String msg = String.format("Failure while marshaling the ProposalResponsePayload: err %s", e.getMessage());
+            JavaChainException exception = new JavaChainException(msg);
             throw exception;
         }
 
-        byte[] endorser=signingIdentity.serialize();
-        if(endorser==null || endorser.length==0){
-            String msg=String.format("Could not serialize the signing identity for %s",signingIdentity.getMSPIdentifier());
-            JavaChainException exception=new JavaChainException(msg);
+        byte[] endorser = signingIdentity.serialize();
+        if (endorser == null || endorser.length == 0) {
+            String msg = String.format("Could not serialize the signing identity for %s", signingIdentity.getMSPIdentifier());
+            JavaChainException exception = new JavaChainException(msg);
             throw exception;
         }
 
         //sign the concatenation of the proposal smartContractResponse and the serialized endorser identity with this endorser's key
-        byte[] signature=signingIdentity.sign(Utils.appendBytes(prpBytes, endorser));
-        if(signature==null || signature.length==0){
-            String msg=String.format("Could not sign the proposal response payload");
-            JavaChainException exception=new JavaChainException(msg);
+        byte[] signature = signingIdentity.sign(Utils.appendBytes(prpBytes, endorser));
+        if (signature == null || signature.length == 0) {
+            String msg = String.format("Could not sign the proposal response payload");
+            JavaChainException exception = new JavaChainException(msg);
             throw exception;
         }
 
@@ -174,8 +176,12 @@ public class ProposalResponseUtils {
             response, byte[] results, byte[] events, Smartcontract.SmartContractID smartContractID) {
         //构造SmartContractAction
         ProposalPackage.SmartContractAction.Builder actionBuilder = ProposalPackage.SmartContractAction.newBuilder();
-        actionBuilder.setEvents(ByteString.copyFrom(events));
-        actionBuilder.setResults(ByteString.copyFrom(results));
+        if (events != null) {
+            actionBuilder.setEvents(ByteString.copyFrom(events));
+        }
+        if (results != null) {
+            actionBuilder.setResults(ByteString.copyFrom(results));
+        }
         actionBuilder.setResponse(response);
         actionBuilder.setSmartContractId(smartContractID);
         ProposalPackage.SmartContractAction smartContractAction = actionBuilder.build();
@@ -184,7 +190,9 @@ public class ProposalResponseUtils {
         ProposalResponsePackage.ProposalResponsePayload.Builder responsePayloadBuilder = ProposalResponsePackage
                 .ProposalResponsePayload.newBuilder();
         responsePayloadBuilder.setExtension(smartContractAction.toByteString());
-        responsePayloadBuilder.setProposalHash(ByteString.copyFrom(pHashBytes));
+        if (pHashBytes != null) {
+            responsePayloadBuilder.setProposalHash(ByteString.copyFrom(pHashBytes));
+        }
         ProposalResponsePackage.ProposalResponsePayload responsePayload = responsePayloadBuilder.build();
 
         return responsePayload.toByteArray();
@@ -211,14 +219,22 @@ public class ProposalResponseUtils {
                 .SmartContractProposalPayload.parseFrom(payloadBytes);
 
         byte[] proposalPayloadForTxBytes = getBytesProposalPayloadForTx(smartContractProposalPayload, visibility);
-        //TODO:应当用哪个CSP，用哪个HashOpts
-        IHash hash = CspManager.getDefaultCsp().getHash(new SM3HashOpts());
 
-        hash.write(header.getGroupHeader().toByteArray());
-        hash.write(header.getSignatureHeader().toByteArray());
-        hash.write(proposalPayloadForTxBytes);
+        //TODO:应当用哪个CSP
+        ICsp defaultCsp = CspManager.getDefaultCsp();
 
-        return hash.sum(null);
+        byte[] bytes = ArrayUtils.addAll(ArrayUtils.addAll(header.getGroupHeader().toByteArray(), header
+                .getSignatureHeader().toByteArray()), proposalPayloadForTxBytes);
+        return defaultCsp.hash(bytes, null);
+
+//        //TODO:应当用哪个CSP，用哪个HashOpts
+//        IHash hash = CspManager.getDefaultCsp().getHash(new SM3HashOpts());
+//
+//        hash.write(header.getGroupHeader().toByteArray());
+//        hash.write(header.getSignatureHeader().toByteArray());
+//        hash.write(proposalPayloadForTxBytes);
+//
+//        return hash.sum(null);
     }
 
     private static byte[] getBytesProposalPayloadForTx(ProposalPackage.SmartContractProposalPayload proposalPayload,

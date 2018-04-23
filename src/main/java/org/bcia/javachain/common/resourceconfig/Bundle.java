@@ -17,6 +17,7 @@ package org.bcia.javachain.common.resourceconfig;
 
 import org.bcia.javachain.common.configtx.IValidator;
 import org.bcia.javachain.common.groupconfig.IConfigResources;
+import org.bcia.javachain.common.policies.PolicyRouter;
 import org.bcia.javachain.protos.common.Configtx;
 
 /**
@@ -31,6 +32,7 @@ public class Bundle {
     private Configtx.Config config;
     private IConfigResources configResources;
     private IValidator validator;
+    private PolicyRouter policyRouter;
 
 
 //    channelID string

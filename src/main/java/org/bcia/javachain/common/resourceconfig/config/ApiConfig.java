@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * 对象
+ * API配置对象
  *
  * @author zhouhui
  * @date 2018/4/19

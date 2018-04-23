@@ -14,11 +14,13 @@ node:
             fileKeyStore:
                 # If "", defaults to 'mspConfigPath'/keystore
                 # TODO: Ensure this is read with fabric/core/config.GetPath() once ready
-                publicKeyStore: D:\msp\keystore\publickey.pem
-                privateKeyStore: D:\msp\keystore\privatekey.pem
-
+                #publicKeyStore: D:\msp\keystore\publickey.pem
+                publicKeyStore: /opt/msp/keystore/publickey.pem
+                #privateKeyStore: D:\msp\keystore\privatekey.pem
+                privateKeyStore: /opt/msp/keystore/privatekey.pem
     # Path on the file system where node will find MSP local configurations
-    mspConfigPath: D:\msp
+    #mspConfigPath: D:\msp
+    mspConfigPath: /opt/msp
 
     # Identifier of the local MSP
     # ----!!!!IMPORTANT!!!-!!!IMPORTANT!!!-!!!IMPORTANT!!!!----

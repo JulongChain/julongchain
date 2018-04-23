@@ -15,16 +15,12 @@
  */
 package org.bcia.javachain.common.resourceconfig.config;
 
-import org.bcia.javachain.protos.common.Configtx;
-
 /**
- * 节点策略配置对象
+ * API配置接口
  *
  * @author zhouhui
- * @date 2018/4/19
+ * @date 2018/4/23
  * @company Dingxuan
  */
-public class NodePoliciesConfig {
-    public NodePoliciesConfig(Configtx.ConfigTree tree) {
-    }
+public interface IApiConfig {
 }
