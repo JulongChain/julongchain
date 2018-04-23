@@ -16,23 +16,16 @@
 
 package org.bcia.javachain.core.ledger.leveldb;
 
-import com.jcraft.jsch.IO;
-import javafx.fxml.LoadException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.protos.common.Ledger;
 import org.iq80.leveldb.*;
 import org.iq80.leveldb.impl.Iq80DBFactory;
-import sun.security.util.LegacyAlgorithmConstraints;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * 提供操作leveldb的操作方法，如增，删，改，查

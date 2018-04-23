@@ -21,7 +21,6 @@ import org.bcia.javachain.core.ledger.IQueryExecutor;
 import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.core.ledger.kvledger.Recoverable;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
-import org.bcia.javachain.protos.common.Common;
 
 import java.util.Map;
 

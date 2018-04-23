@@ -19,6 +19,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.iq80.leveldb.impl.LookupKey;
 
 /**
@@ -34,24 +35,26 @@ public class VersionLevelDBProvider implements IVersionedDBProvider {
 
     private LevelDbProvider db;
 
-    public VersionLevelDBProvider() throws LedgerException{
-        //根据配置文件获取dbPath
-        this.db = LevelDbProvider.newProvider();
-        logger.debug("constructing VersionedDBProvider dbPath = " + db.getDbHandle(null).getDbName());
-    }
-
     public static IVersionedDBProvider newVersionedDBProvider() throws LedgerException{
-        return new VersionLevelDBProvider();
+        String dbPath = LedgerConfig.getStateLevelDBPath();
+        VersionLevelDBProvider vdbProvider =  new VersionLevelDBProvider();
+        vdbProvider.setDb(LevelDbProvider.newProvider(dbPath));
+        logger.debug("Create vdb using path " + vdbProvider.getDb().getDbPath());
+        return vdbProvider;
     }
 
     @Override
     public IVersionedDB getDBHandle(String id) throws LedgerException {
-        return null;
+        return new VersionLevelDB(db, db.getDb().getDbName());
     }
 
     @Override
     public void close() {
-
+        try {
+            db.close();
+        } catch (LedgerException e) {
+            throw new RuntimeException("Got error when close level db");
+        }
     }
 
     public LevelDbProvider getDb() {

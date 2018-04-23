@@ -27,7 +27,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
  * @date 2018/04/18
  * @company Dingxuan
  */
-public class PvtdataResultsItr implements org.bcia.javachain.common.ledger.ResultsIterator {
+public class PvtdataResultsItr implements ResultsIterator {
     private String ns;
     private String coll;
     private ResultsIterator dbItr;

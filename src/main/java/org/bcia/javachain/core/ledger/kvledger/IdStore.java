@@ -20,6 +20,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.csp.gmt0016.excelsecu.bean.Version;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
@@ -41,20 +44,21 @@ import java.util.logging.Level;
  * @company Dingxuan
  */
 public class IdStore {
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(IdStore.class);
 
     private LevelDbProvider provider = null;
     private static final byte[] UNDER_CONSTRUCTION_LEDGER_KEY = "underConstructionLedgerKey".getBytes();
     private static final byte[] LEDGER_KEY_PREFIX = "l".getBytes();
 
-    public IdStore() throws LedgerException {
-        this.provider = LevelDbProvider.newProvider();
-    }
-
     /**
      * 开启idStore
      */
     public static IdStore openIDStore() throws LedgerException{
-        return new IdStore();
+        IdStore idStore = new IdStore();
+        String dbPath = LedgerConfig.getLedgerProviderPath();
+        idStore.provider = LevelDbProvider.newProvider(dbPath);
+        logger.debug("Create idstore using path = " + idStore.getProvider().getDbPath());
+        return idStore;
     }
 
     /**
@@ -146,4 +150,13 @@ public class IdStore {
         String keyStr = new String(key);
         return keyStr.substring(1, key.length);
     }
+
+    public LevelDbProvider getProvider() {
+        return provider;
+    }
+
+    public void setProvider(LevelDbProvider provider) {
+        this.provider = provider;
+    }
+
 }
