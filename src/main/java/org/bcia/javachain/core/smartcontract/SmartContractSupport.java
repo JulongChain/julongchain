@@ -23,6 +23,7 @@ import org.bcia.javachain.core.container.api.IBuildSpecFactory;
 import org.bcia.javachain.core.container.scintf.ISmartContractStream;
 import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.ITxSimulator;
+import org.bcia.javachain.core.smartcontract.node.SmartContractSupportService;
 import org.bcia.javachain.core.smartcontract.shim.SmartContractProvider;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.bcia.javachain.protos.node.SmartcontractShim;
@@ -293,7 +294,9 @@ public class SmartContractSupport {
 
         String smartContractId = scContext.getName();
 
-        return SmartcontractShim.SmartContractMessage.newBuilder().build();
+        SmartContractSupportService.invoke(smartContractId, scMessage.getProposal());
+
+        return SmartcontractShim.SmartContractMessage.newBuilder().setType(SmartcontractShim.SmartContractMessage.Type.COMPLETED).build();
     }
 
     public void registerHandler(Handler handler) {
