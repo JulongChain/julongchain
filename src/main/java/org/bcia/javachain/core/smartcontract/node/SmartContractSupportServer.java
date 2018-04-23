@@ -71,17 +71,15 @@ public class SmartContractSupportServer {
 
     public static void main(String[] args) throws Exception {
         new Thread() {
+            @Override
             public void run() {
-                SmartContractSupportServer server = new SmartContractSupportServer(7052);
                 try {
+                    SmartContractSupportServer server = new SmartContractSupportServer(7052);
                     server.start();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
                     server.blockUntilShutdown();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+
+                } catch (Exception e) {
+                    logger.error(e.getMessage(), e);
                 }
             }
         }.start();
@@ -104,7 +102,7 @@ public class SmartContractSupportServer {
                         .setProposalBytes
                                 (proposal.toByteString()).build();
 
-                SmartContractSupportService.invoke("MyChaincode1", signedProposal);
+                SmartContractSupportService.invoke("MySmartContract1", signedProposal);
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }

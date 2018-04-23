@@ -15,6 +15,17 @@
  */
 package org.bcia.javachain.core.smartcontract.client;
 
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.CommConstant;
+import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
+import org.bcia.javachain.core.smartcontract.shim.SmartContractBase;
+import org.bcia.javachain.core.ssc.cssc.CSSC;
+import org.bcia.javachain.core.ssc.essc.ESSC;
+import org.bcia.javachain.core.ssc.lssc.LSSC;
+import org.bcia.javachain.core.ssc.qssc.QSSC;
+import org.bcia.javachain.core.ssc.vssc.VSSC;
+
 /**
  * 类描述
  *
@@ -22,6 +33,108 @@ package org.bcia.javachain.core.smartcontract.client;
  * @date 2018/4/17
  * @company Dingxuan
  */
-public class SmartContractSupportClient {
+public class SmartContractSupportClient extends SmartContractBase{
+
+    private static JavaChainLog logger = JavaChainLogFactory.getLog(SmartContractSupportClient.class);
+
+    @Override
+    public SmartContractResponse init(ISmartContractStub stub) {
+        logger.info("init");
+        return newSuccessResponse();
+    }
+
+    @Override
+    public SmartContractResponse invoke(ISmartContractStub stub) {
+        logger.info("invoke");
+        return newSuccessResponse();
+    }
+
+    @Override
+    public String getSmartContractStrDescription() {
+        return null;
+    }
+
+    public static void main(String[] args) {
+
+
+        String[] bytes = new String[]{"", ""};
+
+        new Thread() {
+            @Override
+            public void run() {
+                bytes[0] = "-iMySmartContract1";
+                SmartContractSupportClient client = new SmartContractSupportClient();
+                client.start(bytes);
+            }
+        }.start();
+
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    bytes[0] = CommConstant.LSSC;
+                    LSSC sc = new LSSC();
+                    sc.start(bytes);
+                } catch(Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        }.start();
+
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    bytes[0] = CommConstant.ESSC;
+                    ESSC sc = new ESSC();
+                    sc.start(bytes);
+                } catch(Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        }.start();
+
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    bytes[0] = CommConstant.CSSC;
+                    CSSC sc = new CSSC();
+                    sc.start(bytes);
+                } catch(Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        }.start();
+
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    bytes[0] = CommConstant.QSSC;
+                    QSSC sc = new QSSC();
+                    sc.start(bytes);
+                } catch(Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        }.start();
+
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    bytes[0] = CommConstant.VSSC;
+                    VSSC sc = new VSSC();
+                    sc.start(bytes);
+                } catch(Exception e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+        }.start();
+
+
+
+    }
 
 }
