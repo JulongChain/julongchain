@@ -57,11 +57,10 @@ public class SmartContractSupportClient extends SmartContractBase{
     public static void main(String[] args) {
 
 
-        String[] bytes = new String[]{"", ""};
-
         new Thread() {
             @Override
             public void run() {
+                String[] bytes = new String[]{"", ""};
                 bytes[0] = "-iMySmartContract1";
                 SmartContractSupportClient client = new SmartContractSupportClient();
                 client.start(bytes);
@@ -72,6 +71,7 @@ public class SmartContractSupportClient extends SmartContractBase{
             @Override
             public void run() {
                 try {
+                    String[] bytes = new String[]{"", ""};
                     bytes[0] = "-i" + CommConstant.LSSC;
                     LSSC sc = new LSSC();
                     sc.start(bytes);
@@ -85,6 +85,7 @@ public class SmartContractSupportClient extends SmartContractBase{
             @Override
             public void run() {
                 try {
+                    String[] bytes = new String[]{"", ""};
                     bytes[0] = "-i" + CommConstant.ESSC;
                     ESSC sc = new ESSC();
                     sc.start(bytes);
@@ -98,6 +99,7 @@ public class SmartContractSupportClient extends SmartContractBase{
             @Override
             public void run() {
                 try {
+                    String[] bytes = new String[]{"", ""};
                     bytes[0] = "-i" + CommConstant.CSSC;
                     CSSC sc = new CSSC();
                     sc.start(bytes);
@@ -111,6 +113,7 @@ public class SmartContractSupportClient extends SmartContractBase{
             @Override
             public void run() {
                 try {
+                    String[] bytes = new String[]{"", ""};
                     bytes[0] = "-i" + CommConstant.QSSC;
                     QSSC sc = new QSSC();
                     sc.start(bytes);
@@ -124,6 +127,7 @@ public class SmartContractSupportClient extends SmartContractBase{
             @Override
             public void run() {
                 try {
+                    String[] bytes = new String[]{"", ""};
                     bytes[0] = "-i" + CommConstant.VSSC;
                     VSSC sc = new VSSC();
                     sc.start(bytes);
