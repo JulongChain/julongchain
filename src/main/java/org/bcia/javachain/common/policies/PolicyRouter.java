@@ -25,13 +25,38 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class PolicyRouter implements IPolicyManager {
+    private static final String GROUP = "Group";
+    private static final String RESOURCES = "Resources";
+
+    private IPolicyManager groupPolicyManager;
+    private IPolicyManager resourcesPolicyManager;
+
     @Override
     public IPolicy getPolicy(String id) {
+        if (id.startsWith(GROUP)) {
+            return groupPolicyManager.getPolicy(id);
+        } else if (id.startsWith(RESOURCES)) {
+            return resourcesPolicyManager.getPolicy(id);
+        }
+
         return null;
     }
 
     @Override
     public IPolicyManager getSubPolicyManager(String[] path) {
+        if (path == null || path.length <= 0) {
+            return this;
+        }
+
+        String[] newPath = new String[path.length - 1];
+        System.arraycopy(path, 1, newPath, 0, path.length - 1);
+
+        if (GROUP.equals(path[0])) {
+            return groupPolicyManager.getSubPolicyManager(newPath);
+        } else if (RESOURCES.equals(path[0])) {
+            return resourcesPolicyManager.getSubPolicyManager(newPath);
+        }
+
         return null;
     }
 
