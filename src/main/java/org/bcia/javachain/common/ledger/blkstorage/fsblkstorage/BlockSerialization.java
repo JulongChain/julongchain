@@ -31,7 +31,7 @@ import static org.bcia.javachain.protos.common.Common.*;
  * @company Dingxuan
  */
 public class BlockSerialization {
-    private Common.BlockHeader blockHeader;
+    private BlockHeader blockHeader;
     public static List<TxIndexInfo> txOffsets = new ArrayList<>();
     private BlockMetadata metadata;
 

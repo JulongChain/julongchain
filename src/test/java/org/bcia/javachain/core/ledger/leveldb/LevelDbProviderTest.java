@@ -18,12 +18,16 @@ package org.bcia.javachain.core.ledger.leveldb;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.util.Util;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * 类描述
@@ -36,7 +40,7 @@ public class LevelDbProviderTest {
     LevelDbProvider provider;
     @Before
     public void before() throws LedgerException {
-        provider = LevelDbProvider.newProvider();
+//        provider = LevelDbProvider.newProvider();
     }
 
     @After
@@ -46,7 +50,6 @@ public class LevelDbProviderTest {
 
     @Test
     public void getDbHandler(){
-        Assert.assertNotNull(provider.getDbHandle("hahaha"));
 
     }
 
@@ -71,12 +74,16 @@ public class LevelDbProviderTest {
 
     @Test
     public void get() throws LedgerException {
-        byte[] key = {0x01};
+        provider = LevelDbProvider.newProvider("/home/bcia/javachain-606067328/ledgersData/ledgerProvider");
+//        byte[] key = {0x01};
+//        byte[] value = provider.get(key);
+//        System.out.println(new String(value));
+//        byte[] value1 = provider.get(key);
+//        System.out.println(new String(value));
+//        provider.close();
+        byte[] key = "underConstructionLedgerKey".getBytes();
         byte[] value = provider.get(key);
         System.out.println(new String(value));
-        byte[] value1 = provider.get(key);
-        System.out.println(new String(value));
-        provider.close();
     }
 
     @Test
@@ -89,5 +96,14 @@ public class LevelDbProviderTest {
     public void retrieveAppKey(){
         byte[] bytes = provider.retrieveAppKey(provider.constructLevelKey("123", "key".getBytes()));
         System.out.println(new String(bytes));
+    }
+
+    @Test
+    public void test() throws LedgerException {
+        provider = LevelDbProvider.newProvider(LedgerConfig.getLedgerProviderPath());
+        Iterator<Map.Entry<byte[], byte[]>> itr = provider.getIterator(null, null);
+        while(itr.hasNext()){
+            System.out.println(new String(itr.next().getKey()));
+        }
     }
 }

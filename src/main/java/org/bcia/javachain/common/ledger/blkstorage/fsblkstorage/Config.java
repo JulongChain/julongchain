@@ -15,6 +15,8 @@
  */
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
+import java.util.Random;
+
 /**
  * 类描述
  *
@@ -23,17 +25,9 @@ package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
  * @company Dingxuan
  */
 public class Config {
-
-    /**
-     * ChainsDir is the name of the directory containing the channel ledgers.
-     */
+    public static final String OFFICE_PATH = "/home/bcia/javachain";
     public static final String CHAINS_DIR = "chains";
-
-    /**
-     * IndexDir is the name of the directory containing all block indexes across ledgers.
-     */
     public static final String INDEX_DIR = "index";
-
     public static final Integer DEFAULT_MAX_BLOCKFILE_SIZE = 64 * 1024 * 1024;
 
     public static Conf newConf(String blockStorageDir, Integer maxBlockfileSize) {
@@ -46,4 +40,7 @@ public class Config {
         return conf;
     }
 
+    public static String getPath(){
+        return OFFICE_PATH;
+    }
 }

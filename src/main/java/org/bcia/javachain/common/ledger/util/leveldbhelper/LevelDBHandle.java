@@ -19,10 +19,12 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.leveldb.LevelDBFactory;
-import org.bcia.javachain.core.node.NodeConfig;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.DBIterator;
+import org.iq80.leveldb.Options;
+import org.iq80.leveldb.impl.Iq80DBFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -61,13 +63,8 @@ public class LevelDBHandle {
      * 创建db
      */
     public DB createDB(String dbPath) throws LedgerException{
-        if (dbPath == null || "".equals(dbPath)) {
-            //TODO: 测试使用
-            db = LevelDBFactory.getDB();
-        } else {
-            db = LevelDBFactory.getDB(dbPath);
-        }
-        opened = true;
+        this.db = LevelDBFactory.getDB(dbPath);
+        this.opened = true;
         this.dbName = dbPath;
         return db;
     }
@@ -91,7 +88,7 @@ public class LevelDBHandle {
         if(!opened){
             throw new LedgerException("No db created");
         } else {
-            return LevelDBFactory.get(key ,false);
+            return LevelDBFactory.get(db, key ,false);
         }
     }
 
@@ -102,7 +99,7 @@ public class LevelDBHandle {
         if(!opened){
             logger.error("No db created");
         } else {
-            LevelDBFactory.add(key, value, sync);
+            LevelDBFactory.add(db, key, value, sync);
         }
     }
 
@@ -113,7 +110,7 @@ public class LevelDBHandle {
         if(!opened){
             logger.error("No db created");
         } else {
-            LevelDBFactory.delete(key, sync);
+            LevelDBFactory.delete(db, key, sync);
         }
     }
 
@@ -148,7 +145,7 @@ public class LevelDBHandle {
      */
     public Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey, byte[] endKey) throws LedgerException {
         DBIterator dbItr = null;
-        dbItr = (DBIterator) LevelDBFactory.getIterator();
+        dbItr = (DBIterator) LevelDBFactory.getIterator(db);
         List<Map.Entry<byte[], byte[]>> list = new ArrayList<>();
         if(startKey != null){
             dbItr.seek(startKey);

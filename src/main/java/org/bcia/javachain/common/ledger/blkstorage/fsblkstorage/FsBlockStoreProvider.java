@@ -22,6 +22,8 @@ import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.javachain.common.ledger.util.IoUtil;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBHandle;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 
 /**
  * 类描述
@@ -31,6 +33,7 @@ import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
  * @company Dingxuan
  */
 public class FsBlockStoreProvider implements BlockStoreProvider {
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(FsBlockStoreProvider.class);
 
     private Conf conf;
     private IndexConfig indexConfig;
@@ -43,9 +46,10 @@ public class FsBlockStoreProvider implements BlockStoreProvider {
      */
     public static BlockStoreProvider newProvider(Conf conf, IndexConfig indexConfig) throws LedgerException {
         FsBlockStoreProvider provider = new FsBlockStoreProvider();
-        provider.setLeveldbProvider(LevelDbProvider.newProvider());
+        provider.setLeveldbProvider(LevelDbProvider.newProvider(conf.getIndexDir()));
         provider.setConf(conf);
         provider.setIndexConfig(indexConfig);
+        logger.debug("Createing fsBlockStore using path = " + conf.getChainsDir());
         return provider;
     }
 

@@ -37,17 +37,13 @@ public class LevelDbProvider{
     private static JavaChainLog logger = JavaChainLogFactory.getLog(LevelDbProvider.class);
 
     private LevelDBHandle db = null;
-    private Map<String, LevelDBHandle> dbHandles = null;
     private byte[] dbNameKeySep = new byte[1];
     private byte lastKeyIndicator = 0x01;
     private String dbPath = null;
-    private static LevelDbProvider instance = null;
 
     private LevelDbProvider() throws LedgerException {
-        this.dbHandles = new HashMap<>();
         dbNameKeySep[0] = 0x00;
         db = new LevelDBHandle();
-        db.createDB(dbPath);
     }
 
     public String getDbPath() {
@@ -66,24 +62,21 @@ public class LevelDbProvider{
         this.db = db;
     }
 
-    /**
-     * 单例获取provider实例
-     */
-    public static synchronized LevelDbProvider newProvider() throws LedgerException {
-        if(instance == null){
-            instance = new LevelDbProvider();
-        }
-        return instance;
+    public static synchronized LevelDbProvider newProvider(String dbPath) throws LedgerException {
+        LevelDbProvider provider =  new LevelDbProvider();
+        provider.getDb().createDB(dbPath);
+        provider.setDbPath(dbPath);
+        return provider;
     }
 
-    public LevelDBHandle getDbHandle(String dbName) {
-        LevelDBHandle LevelDBHandle = dbHandles.get(dbName);
-        if(LevelDBHandle == null){
-            LevelDBHandle = new LevelDBHandle();
-            dbHandles.put(dbName, LevelDBHandle);
-        }
-        return LevelDBHandle;
-    }
+//    public LevelDBHandle getDbHandle(String dbName) {
+//        LevelDBHandle LevelDBHandle = dbHandles.get(dbName);
+//        if(LevelDBHandle == null){
+//            LevelDBHandle = new LevelDBHandle();
+//            dbHandles.put(dbName, LevelDBHandle);
+//        }
+//        return LevelDBHandle;
+//    }
 
     public void close() throws LedgerException {
         db.close();
