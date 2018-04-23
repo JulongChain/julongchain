@@ -22,6 +22,7 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.proto.ProposalResponseUtils;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractContext;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.bcia.javachain.protos.node.SmartcontractShim;
@@ -109,6 +110,17 @@ public class SmartContractExecutor {
         scMessageBuilder.setPayload(ByteString.copyFrom(payload));
         scMessageBuilder.setTxid(txId);
         scMessageBuilder.setGroupId(groupId);
+
+
+
+        Common.GroupHeader groupHeader = Common.GroupHeader.newBuilder().setType(Common.HeaderType.ENDORSER_TRANSACTION.getNumber()).build();
+        Common.Header header = Common.Header.newBuilder().setGroupHeader(groupHeader.toByteString()).build();
+        ProposalPackage.Proposal proposal = ProposalPackage.Proposal.newBuilder().setHeader(header
+                .toByteString()).build();
+        ProposalPackage.SignedProposal signedProposal = ProposalPackage.SignedProposal.newBuilder()
+                .setProposalBytes(proposal.toByteString()).build();
+
+        scMessageBuilder.setProposal(signedProposal);
 
         return scMessageBuilder.build();
     }

@@ -20,6 +20,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.stub.StreamObserver;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.SmartContractSupportGrpc;
 import org.bcia.javachain.protos.node.Smartcontract;
@@ -69,8 +70,35 @@ public class SmartContractSupportService extends SmartContractSupportGrpc
                             .setType(SmartcontractShim.SmartContractMessage.Type.REGISTERED).build();
                     responseObserver.onNext(responseMessage);
 
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
                     responseMessage = SmartcontractShim.SmartContractMessage.newBuilder().setType(SmartcontractShim.SmartContractMessage.Type.READY).build();
                     responseObserver.onNext(responseMessage);
+
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    Common.GroupHeader groupHeader = Common.GroupHeader.newBuilder().setType(Common.HeaderType.ENDORSER_TRANSACTION.getNumber()).build();
+                    Common.Header header = Common.Header.newBuilder().setGroupHeader(groupHeader.toByteString()).build();
+                    ProposalPackage.Proposal proposal = ProposalPackage.Proposal.newBuilder().setHeader(header
+                            .toByteString()).build();
+                    ProposalPackage.SignedProposal signedProposal = ProposalPackage.SignedProposal.newBuilder()
+                            .setProposalBytes(proposal.toByteString()).build();
+                    responseMessage = SmartcontractShim.SmartContractMessage.newBuilder().setType(SmartcontractShim.SmartContractMessage.Type.INIT).setProposal(signedProposal).build();
+                    responseObserver.onNext(responseMessage);
+
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
 
                     return;
                 }
@@ -143,6 +171,7 @@ public class SmartContractSupportService extends SmartContractSupportGrpc
         StreamObserver<SmartcontractShim.SmartContractMessage> chaincodeMessageStreamObserver =
                 chaincodeIdAndStreamObserverMap.get(smartcontractId);
         if (chaincodeMessageStreamObserver == null) {
+            logger.info("no stream observer for " + smartcontractId);
             return;
         }
         chaincodeMessageStreamObserver.onNext(message);
@@ -154,6 +183,7 @@ public class SmartContractSupportService extends SmartContractSupportGrpc
     }
 
     public static void invoke(String chaincodeId, ProposalPackage.SignedProposal signedProposal) {
+        logger.info("invoke " + chaincodeId);
         SmartcontractShim.SmartContractMessage message = SmartcontractShim.SmartContractMessage.newBuilder().setType(SmartcontractShim.SmartContractMessage.Type.TRANSACTION).setProposal(signedProposal).build();
         send(chaincodeId, message);
     }

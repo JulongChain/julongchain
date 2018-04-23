@@ -39,13 +39,13 @@ public class SmartContractSupportClient extends SmartContractBase{
 
     @Override
     public SmartContractResponse init(ISmartContractStub stub) {
-        logger.info("init");
+        logger.info("SmartContractSupportClient init");
         return newSuccessResponse();
     }
 
     @Override
     public SmartContractResponse invoke(ISmartContractStub stub) {
-        logger.info("invoke");
+        logger.info("SmartContractSupportClient invoke");
         return newSuccessResponse();
     }
 
@@ -53,6 +53,48 @@ public class SmartContractSupportClient extends SmartContractBase{
     public String getSmartContractStrDescription() {
         return null;
     }
+
+    public void lauch() throws Exception {
+
+        logger.info("aaaaaa");
+
+        logger.info("lauch lssc");
+        String[] bytes1 = new String[]{"", ""};
+        bytes1[0] = "-i" + CommConstant.LSSC;
+        LSSC sc1 = new LSSC();
+        sc1.start(bytes1);
+
+        logger.info("lauch essc");
+        String[] bytes2 = new String[]{"", ""};
+        bytes2[0] = "-i" + CommConstant.ESSC;
+        ESSC sc2 = new ESSC();
+        sc2.start(bytes2);
+
+        logger.info("lauch cssc");
+        String[] bytes3 = new String[]{"", ""};
+        bytes3[0] = "-i" + CommConstant.CSSC;
+        CSSC sc3 = new CSSC();
+        sc3.start(bytes3);
+
+        logger.info("lauch qssc");
+        String[] bytes4 = new String[]{"", ""};
+        bytes4[0] = "-i" + CommConstant.QSSC;
+        QSSC sc4 = new QSSC();
+        sc4.start(bytes4);
+
+        logger.info("lauch vssc");
+        String[] bytes5 = new String[]{"", ""};
+        bytes5[0] = "-i" + CommConstant.VSSC;
+        VSSC sc5 = new VSSC();
+        sc5.start(bytes5);
+
+        logger.info("lauch MySmartContract001");
+        String[] bytes6 = new String[]{"", ""};
+        bytes6[0] = "-iMySmartContract001";
+        SmartContractSupportClient sc6 = new SmartContractSupportClient();
+        sc6.start(bytes6);
+    }
+
 
     public static void main(String[] args) {
 
