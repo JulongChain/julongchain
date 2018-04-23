@@ -118,7 +118,7 @@ public class Node {
 //        String mspId = config.getNode().getLocalMspId();
 //        String mspType = config.getNode().getLocalMspType();
 
-        String mspConfigDir = "D:\\msp";
+        String mspConfigDir = "/opt/msp";
         String mspId = "myMspId";
         String mspType = "csp";
 

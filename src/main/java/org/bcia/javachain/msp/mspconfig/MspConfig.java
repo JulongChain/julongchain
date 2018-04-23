@@ -29,8 +29,10 @@ public class MspConfig {
     private static  final String HASH="SM3";
     private static  final String ASYMMETRIC="SM4";
     private static  final String SECURITY="256";
-    private static  final String PUBLICKEYSTORE="D:/msp/keystore/publickey.pem";
-    private static  final String PRIVATEKEYSTORE="D:/msp/keystore/privatekey.pem";
+    //private static  final String PUBLICKEYSTORE="D:/msp/keystore/publickey.pem";
+    private static  final String PUBLICKEYSTORE="/opt/msp/keystore/publickey.pem";
+    //private static  final String PRIVATEKEYSTORE="D:/msp/keystore/privatekey.pem";
+    private static  final String PRIVATEKEYSTORE="/opt/msp/keystore/privatekey.pem";
     private static  final String MSPCONFIGPATH="msp";
     private static  final String LOCALMSPID="DEFAULT";
     private static  final String LOCALMSPTYPE="GMMSP";
