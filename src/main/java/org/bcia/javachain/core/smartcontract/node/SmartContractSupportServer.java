@@ -19,8 +19,6 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.node.ProposalPackage;
 
 import java.io.IOException;
 import java.util.Date;
@@ -89,20 +87,6 @@ public class SmartContractSupportServer {
             try {
                 Thread.sleep(5000);
                 logger.info(new Date().toString());
-                Common.GroupHeader groupHeader = Common.GroupHeader.newBuilder().setType(Common.HeaderType
-                        .ENDORSER_TRANSACTION.getNumber()).build();
-
-                Common.Header header = Common.Header.newBuilder().setGroupHeader(groupHeader.toByteString())
-                        .build();
-
-                ProposalPackage.Proposal proposal = ProposalPackage.Proposal.newBuilder().setHeader(header
-                        .toByteString()).build();
-
-                ProposalPackage.SignedProposal signedProposal = ProposalPackage.SignedProposal.newBuilder()
-                        .setProposalBytes
-                                (proposal.toByteString()).build();
-
-                SmartContractSupportService.invoke("MySmartContract1", signedProposal);
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }

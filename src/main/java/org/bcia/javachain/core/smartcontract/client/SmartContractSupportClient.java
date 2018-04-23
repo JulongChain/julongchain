@@ -72,7 +72,7 @@ public class SmartContractSupportClient extends SmartContractBase{
             @Override
             public void run() {
                 try {
-                    bytes[0] = CommConstant.LSSC;
+                    bytes[0] = "-i" + CommConstant.LSSC;
                     LSSC sc = new LSSC();
                     sc.start(bytes);
                 } catch(Exception e) {
@@ -85,7 +85,7 @@ public class SmartContractSupportClient extends SmartContractBase{
             @Override
             public void run() {
                 try {
-                    bytes[0] = CommConstant.ESSC;
+                    bytes[0] = "-i" + CommConstant.ESSC;
                     ESSC sc = new ESSC();
                     sc.start(bytes);
                 } catch(Exception e) {
@@ -98,7 +98,7 @@ public class SmartContractSupportClient extends SmartContractBase{
             @Override
             public void run() {
                 try {
-                    bytes[0] = CommConstant.CSSC;
+                    bytes[0] = "-i" + CommConstant.CSSC;
                     CSSC sc = new CSSC();
                     sc.start(bytes);
                 } catch(Exception e) {
@@ -111,7 +111,7 @@ public class SmartContractSupportClient extends SmartContractBase{
             @Override
             public void run() {
                 try {
-                    bytes[0] = CommConstant.QSSC;
+                    bytes[0] = "-i" + CommConstant.QSSC;
                     QSSC sc = new QSSC();
                     sc.start(bytes);
                 } catch(Exception e) {
@@ -124,7 +124,7 @@ public class SmartContractSupportClient extends SmartContractBase{
             @Override
             public void run() {
                 try {
-                    bytes[0] = CommConstant.VSSC;
+                    bytes[0] = "-i" + CommConstant.VSSC;
                     VSSC sc = new VSSC();
                     sc.start(bytes);
                 } catch(Exception e) {
