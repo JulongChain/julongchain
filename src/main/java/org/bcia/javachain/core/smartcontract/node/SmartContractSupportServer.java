@@ -43,7 +43,7 @@ public class SmartContractSupportServer {
         server = ServerBuilder.forPort(port).addService(new SmartContractSupportService()).build();
     }
 
-    public void start() throws IOException {
+    public void start() throws IOException,InterruptedException {
         server.start();
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
@@ -53,6 +53,7 @@ public class SmartContractSupportServer {
                 System.err.println("*** server shut down ");
             }
         });
+        blockUntilShutdown();
     }
 
     public void stop() {
@@ -74,7 +75,6 @@ public class SmartContractSupportServer {
                 try {
                     SmartContractSupportServer server = new SmartContractSupportServer(7052);
                     server.start();
-                    server.blockUntilShutdown();
 
                 } catch (Exception e) {
                     logger.error(e.getMessage(), e);

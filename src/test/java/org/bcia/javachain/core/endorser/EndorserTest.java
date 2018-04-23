@@ -2,7 +2,10 @@ package org.bcia.javachain.core.endorser;
 
 import org.bcia.javachain.BaseJunit4Test;
 import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
+import org.bcia.javachain.core.smartcontract.node.SmartContractSupportServer;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.SmartContractEventPackage;
@@ -12,6 +15,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Date;
+
 /**
  * 对象
  *
@@ -20,11 +25,35 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @company Dingxuan
  */
 public class EndorserTest extends BaseJunit4Test {
+
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(EndorserTest.class);
+
     @Autowired
     private Endorser endorser;
 
     @Before
     public void setUp() throws Exception {
+
+        new Thread(() -> {
+            try {
+                SmartContractSupportServer server = new SmartContractSupportServer(7052);
+                server.start();
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+        }).start();
+
+
+        while(true) {
+            try {
+                Thread.sleep(5000);
+                logger.info(new Date().toString());
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+
+        }
+
     }
 
     @After
@@ -60,4 +89,5 @@ public class EndorserTest extends BaseJunit4Test {
         endorser.endorseProposal(groupId, txId, signedProposal, proposal, smartContractIDBuilder, response,
                 simulateResults, event, visibility, smartContractDefinition);
     }
+
 }
