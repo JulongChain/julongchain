@@ -24,6 +24,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
 import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.util.Util;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.NsRwSet;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.TxRwSet;
@@ -61,16 +62,13 @@ public class HistoryLevelDB implements IHistoryDB {
         this.dbName = dbName;
     }
 
-    public HistoryLevelDB() throws LedgerException {
-        this.provider = LevelDbProvider.newProvider();
-    }
-
     /**
      * 新建historyDBProvider
      */
     public static HistoryLevelDBProvider newHistoryDBProvider() throws LedgerException {
-        //config
+        String dbPath = LedgerConfig.getHistoryLevelDBPath();
         HistoryLevelDBProvider provider = new HistoryLevelDBProvider();
+        provider.setProvider(LevelDbProvider.newProvider(dbPath));
         logger.debug(String.format("Create historyDB using dbPath = %s", provider.getProvider().getDbPath()));
         return provider;
     }
@@ -78,8 +76,11 @@ public class HistoryLevelDB implements IHistoryDB {
     /**
      * 构建HistoryDB
      */
-    public static IHistoryDB newHistroyDB() throws LedgerException {
-        return new HistoryLevelDB();
+    public static IHistoryDB newHistroyDB(LevelDbProvider dbProvider, String dbName) throws LedgerException {
+        HistoryLevelDB db = new HistoryLevelDB();
+        db.setDbName(dbName);
+        db.setProvider(dbProvider);
+        return db;
     }
 
     @Override
@@ -197,5 +198,13 @@ public class HistoryLevelDB implements IHistoryDB {
     private boolean isInvalid(ByteString tx){
 
         return true;
+    }
+
+    public LevelDbProvider getProvider() {
+        return provider;
+    }
+
+    public void setProvider(LevelDbProvider provider) {
+        this.provider = provider;
     }
 }

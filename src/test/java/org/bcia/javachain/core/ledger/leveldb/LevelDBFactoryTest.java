@@ -104,9 +104,9 @@ public class LevelDBFactoryTest {
 //        log.info("query key from level db");
 //        log.info("query string:" + queryString);
 //        Assert.assertEquals(value, queryString);
-        byte[] key = {0x00};
+        byte[] key = "underConstructionLedgerKey".getBytes();
         byte[] value = LevelDBFactory.get(key, true);
-//        System.out.println(new String(value));
+        System.out.println(new String(value));
         byte[] value1 = LevelDBFactory.get(key, true);
 //        System.out.println(new String(value1));
 

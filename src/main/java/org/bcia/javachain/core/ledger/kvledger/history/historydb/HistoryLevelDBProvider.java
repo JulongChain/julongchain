@@ -19,6 +19,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 
 /**
  * HistoryDB操作类
@@ -28,17 +29,13 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
  * @company Dingxuan
  */
 public class HistoryLevelDBProvider implements IHistoryDBProvider {
-
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(HistoryLevelDBProvider.class);
-    private LevelDbProvider provider = null;
-    public HistoryLevelDBProvider() throws LedgerException{
-        this.provider = LevelDbProvider.newProvider();
-    }
 
+    private LevelDbProvider provider = null;
 
     @Override
     public IHistoryDB getDBHandle(String dbName) throws LedgerException {
-        return HistoryLevelDB.newHistroyDB();
+        return HistoryLevelDB.newHistroyDB(provider, dbName);
     }
 
     @Override

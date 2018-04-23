@@ -19,6 +19,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IVersionedDBProvider;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionLevelDBProvider;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 
 /**
  * 类描述
@@ -32,8 +33,8 @@ public class CommonStorageDBProvider implements DBPorvider{
 
     public static CommonStorageDBProvider NewCommonStorageDBProvider() throws LedgerException {
         IVersionedDBProvider vdbProvider = null;
-        if(false){
-
+        if(LedgerConfig.isCouchDBEnable()){
+            //CouchDB is not enable
         } else {
             vdbProvider = VersionLevelDBProvider.newVersionedDBProvider();
         }

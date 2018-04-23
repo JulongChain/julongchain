@@ -90,11 +90,11 @@ public class BlockfileMgr {
         mgr.getCurrentFileWriter().truncateFile(mgr.getCpInfo().getLatestFileChunksize());
 
         mgr.setIndex(BlockIndex.newBlockIndex(indexConfig, indexStore));
-        mgr.bcInfo = Ledger.BlockchainInfo.newBuilder()
+        mgr.setBcInfo(Ledger.BlockchainInfo.newBuilder()
                 .setHeight(0)
                 .setCurrentBlockHash(ByteString.EMPTY)
                 .setPreviousBlockHash(ByteString.EMPTY)
-                .build();
+                .build());
 
         if(!mgr.getCpInfo().getChainEmpty()){
             try {

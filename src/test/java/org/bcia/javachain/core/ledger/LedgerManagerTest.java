@@ -16,9 +16,13 @@ limitations under the License.
 package org.bcia.javachain.core.ledger;
 
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.protos.common.Common;
+import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
 
 /**
  * 类描述
@@ -31,12 +35,14 @@ public class LedgerManagerTest {
 
     LedgerManager lm;
 
+
     @Test
     public void createLedger() throws LedgerException {
         lm = new LedgerManager();
         LedgerManager.initialize(null);
         INodeLedger l = LedgerManager.createLedger(Common.Block.getDefaultInstance());
     }
+
 
 
 }

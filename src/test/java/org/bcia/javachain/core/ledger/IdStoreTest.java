@@ -69,7 +69,9 @@ public class IdStoreTest {
     public void createLedgerID() throws LedgerException {
         idStore.createLedgerID("kql", Common.Block.newBuilder().build());
         idStore.close();
-        provider = LevelDbProvider.newProvider();
+        //TODO dbpath
+        String dbPath = null;
+        provider = LevelDbProvider.newProvider(dbPath);
         System.out.println(provider.get(idStore.encodeLedgerKey("kql")));
     }
 }

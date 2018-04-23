@@ -78,11 +78,8 @@ public class LevelDBFactory {
      * 获取默认的 level db
      */
     public static DB getDB() throws LedgerException {
-        try {
-            if(db == null){
-                db = getInstance().dbFactory.open(new File(path),new Options().createIfMissing(Boolean.TRUE));
-            }
-            return db;
+        try{
+            return getInstance().dbFactory.open(new File(path),new Options().createIfMissing(Boolean.TRUE));
         } catch (Exception e) {
             throw new LedgerException(e);
         }
@@ -93,10 +90,7 @@ public class LevelDBFactory {
      */
     public static DB getDB(String leveldbPath) throws LedgerException {
         try {
-            if(db == null){
-                db = getInstance().dbFactory.open(new File(leveldbPath),new Options().createIfMissing(Boolean.TRUE));
-            }
-            return db;
+            return getInstance().dbFactory.open(new File(leveldbPath),new Options().createIfMissing(Boolean.TRUE));
         } catch (Exception e) {
             throw new LedgerException(e);
         }
@@ -307,8 +301,7 @@ public class LevelDBFactory {
      * 获取指定level db的迭代器
      */
 //    public static Iterator<Map.Entry<byte[], byte[]>> getIterator() throws LedgerException {
-    public static DBIterator getIterator() throws LedgerException {
-        DB db = getDB();
+    public static DBIterator getIterator(DB db) throws LedgerException {
         Snapshot snapshot = db.getSnapshot();
         ReadOptions readOptions = new ReadOptions()
                 .fillCache(false)
