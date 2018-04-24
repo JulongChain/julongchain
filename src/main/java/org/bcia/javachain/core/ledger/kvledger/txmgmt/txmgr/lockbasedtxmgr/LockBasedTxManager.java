@@ -28,7 +28,6 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.Update
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedValue;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.TxManager;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.IValidator;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valimpl.DefaultValidator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
@@ -50,7 +49,7 @@ public class LockBasedTxManager implements TxManager {
 
     private String ledgerID;
     private DB db;
-    private IValidator IValidator;
+    private IValidator validator;
     private UpdateBatch batch;
     private Common.Block currentBlock;
     private Map<String, StateListener> stateListeners;
@@ -64,7 +63,7 @@ public class LockBasedTxManager implements TxManager {
         txMgr.setLedgerID(ledgerID);
         txMgr.setDb(db);
         txMgr.setStateListeners(stateListeners);
-        txMgr.setValidator(DefaultValidator.newDefaultValidator(txMgr, db));
+        txMgr.setValidator(null);
         txMgr.setLock(new ReentrantReadWriteLock());
         return txMgr;
     }
@@ -88,7 +87,7 @@ public class LockBasedTxManager implements TxManager {
         try {
             Common.Block block = blockAndPvtData.getBlock();
             logger.debug("Validating new block with num trans = " + block.getData().getDataList().size());
-            UpdateBatch b = IValidator.validateAndPrepareBatch(blockAndPvtData, doMVCCValidation);
+            UpdateBatch b = validator.validateAndPrepareBatch(blockAndPvtData, doMVCCValidation);
             currentBlock = block;
             batch = b;
             invokeNamespaceListeners(batch);
@@ -201,11 +200,11 @@ public class LockBasedTxManager implements TxManager {
     }
 
     public IValidator getValidator() {
-        return IValidator;
+        return validator;
     }
 
-    public void setValidator(IValidator IValidator) {
-        this.IValidator = IValidator;
+    public void setValidator(IValidator validator) {
+        this.validator = validator;
     }
 
     public UpdateBatch getBatch() {

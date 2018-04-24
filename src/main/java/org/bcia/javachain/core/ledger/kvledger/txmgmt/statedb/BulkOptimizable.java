@@ -29,7 +29,7 @@ import java.util.List;
 public interface BulkOptimizable {
     void loadCommittedVersions(List<CompositeKey> keys);
 
-    Height getCachedVersion (String ns, String key);
+    Height getCachedVersion(String ns, String key);
 
     void clearCachedVersions();
 }

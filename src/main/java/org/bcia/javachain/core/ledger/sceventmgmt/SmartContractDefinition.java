@@ -27,6 +27,12 @@ public class SmartContractDefinition {
     private byte[] hash = null;
     private String version = null;
 
+    public SmartContractDefinition(String name, byte[] hash, String version){
+        this.name = name;
+        this.hash = hash;
+        this.version = version;
+    }
+
     @Override
     public String toString() {
         return String.format("Name=%s, Version=%s, Hash=%s", name, version, getHashString());
@@ -38,5 +44,29 @@ public class SmartContractDefinition {
             hashString += hash[i];
         }
         return hashString;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public byte[] getHash() {
+        return hash;
+    }
+
+    public void setHash(byte[] hash) {
+        this.hash = hash;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 }

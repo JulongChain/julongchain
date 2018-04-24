@@ -18,7 +18,6 @@ package org.bcia.javachain.core.smartcontract.client;
 import com.google.protobuf.ByteString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.smartcontract.shim.SmartContractBase;
 
@@ -34,13 +33,13 @@ public class SmartContractNodeClient extends SmartContractBase{
     private static Log logger = LogFactory.getLog(SmartContractNodeClient.class);
 
     @Override
-    public ISmartContract.SmartContractResponse init(ISmartContractStub stub) {
+    public SmartContractResponse init(ISmartContractStub stub) {
         logger.info("init");
         return newSuccessResponse();
     }
 
     @Override
-    public ISmartContract.SmartContractResponse invoke(ISmartContractStub stub) {
+    public SmartContractResponse invoke(ISmartContractStub stub) {
         logger.info("invoke");
 
         String value1 = ByteString.copyFrom(stub.getState("aaa")).toStringUtf8();

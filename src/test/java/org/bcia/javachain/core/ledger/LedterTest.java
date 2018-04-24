@@ -13,15 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.smartcontract.client;
+package org.bcia.javachain.core.ledger;
+
+import org.bcia.javachain.core.ledger.util.Util;
+import org.junit.Test;
 
 /**
  * 类描述
  *
- * @author wanliangbing
- * @date 2018/3/28
+ * @author sunzongyu
+ * @date 2018/04/02
  * @company Dingxuan
  */
-public class SmartContractContainerClient {
-
+public class LedterTest {
+    @Test
+    public void longl(){
+        String a = "1234567";
+        System.out.println(a.substring(0, 5));
+    }
 }

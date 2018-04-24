@@ -31,6 +31,7 @@ import org.bcia.javachain.core.ledger.kvledger.history.historydb.IHistoryDBProvi
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.CommonStorageDBProvider;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DBPorvider;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.ledgerstorage.Provider;
 import org.bcia.javachain.core.ledger.ledgerstorage.Store;
 import org.bcia.javachain.protos.common.Common;
@@ -48,7 +49,6 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class KvLedgerProvider implements INodeLedgerProvider {
-
     private static final JavaChainLog logger  = JavaChainLogFactory.getLog(KvLedgerProvider.class);
     private static final LedgerException ERR_LEDGER_ID_EXISTS = new LedgerException("LedgerID is already exists");
     private static final LedgerException ERR_NON_EXISTS_LEDGER_ID  = new LedgerException("LedgerID does not exists");
@@ -75,12 +75,12 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         IHistoryDBProvider historyDBProvider = HistoryLevelDB.newHistoryDBProvider();
 
         logger.info("Ledger provider initialized");
-        INodeLedgerProvider provider = new KvLedgerProvider();
-        ((KvLedgerProvider) provider).setIdStore(idStore);
-        ((KvLedgerProvider) provider).setLedgerStoreProvider(ledgerStoreProvider);
-        ((KvLedgerProvider) provider).setVdbProvider(vdbProvider);
-        ((KvLedgerProvider) provider).setHistoryDBProvider(historyDBProvider);
-        ((KvLedgerProvider) provider).setStateListeners(null);
+        KvLedgerProvider provider = new KvLedgerProvider();
+        provider.setIdStore(idStore);
+        provider.setLedgerStoreProvider(ledgerStoreProvider);
+        provider.setVdbProvider(vdbProvider);
+        provider.setHistoryDBProvider(historyDBProvider);
+        provider.setStateListeners(null);
         provider.recoverUnderConstructionLedger();
         return provider;
     }

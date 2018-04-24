@@ -6,12 +6,16 @@ SPDX-License-Identifier: Apache-2.0
 
 package org.bcia.javachain.core.smartcontract.shim.fsm;
 
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.smartcontract.shim.fsm.exceptions.*;
 
 import java.util.HashMap;
 import java.util.HashSet;
 
 public class FSM {
+
+	private static final JavaChainLog logger = JavaChainLogFactory.getLog(FSM.class);
 
 	/** The current state of the FSM */
 	private String current;
@@ -134,13 +138,16 @@ public class FSM {
 		Event event = new Event(this, eventName, current, dst, null, false, false, args);
 		callCallbacks(event, CallbackType.BEFORE_EVENT);
 
+		logger.info("FSM Status info: current," + current + " dst," + dst);
+
 		if (current.equals(dst)) {
-			callCallbacks(event, CallbackType.AFTER_EVENT);
-			throw new NoTransitionException(event.error);
+			// callCallbacks(event, CallbackType.AFTER_EVENT);
+			// throw new NoTransitionException(event.error);
 		}
 
 		// Setup the transition, call it later.
 		transition = () -> {
+			logger.info("set current status, new:" + dst + " old:" + current);
 			current = dst;
 			try {
 				callCallbacks(event, CallbackType.ENTER_STATE);

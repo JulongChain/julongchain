@@ -39,13 +39,13 @@ public class SmartContractSupportClient extends SmartContractBase{
 
     @Override
     public SmartContractResponse init(ISmartContractStub stub) {
-        logger.info("init");
+        logger.info("SmartContractSupportClient init");
         return newSuccessResponse();
     }
 
     @Override
     public SmartContractResponse invoke(ISmartContractStub stub) {
-        logger.info("invoke");
+        logger.info("SmartContractSupportClient invoke");
         return newSuccessResponse();
     }
 
@@ -54,91 +54,45 @@ public class SmartContractSupportClient extends SmartContractBase{
         return null;
     }
 
-    public static void main(String[] args) {
+    public void lauch() throws Exception {
 
+        logger.info("aaaaaa");
 
-        new Thread() {
-            @Override
-            public void run() {
-                String[] bytes = new String[]{"", ""};
-                bytes[0] = "-iMySmartContract1";
-                SmartContractSupportClient client = new SmartContractSupportClient();
-                client.start(bytes);
-            }
-        }.start();
+        logger.info("lauch lssc");
+        String[] bytes1 = new String[]{"", ""};
+        bytes1[0] = "-i" + CommConstant.LSSC;
+        LSSC sc1 = new LSSC();
+        sc1.start(bytes1);
 
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    String[] bytes = new String[]{"", ""};
-                    bytes[0] = "-i" + CommConstant.LSSC;
-                    LSSC sc = new LSSC();
-                    sc.start(bytes);
-                } catch(Exception e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-        }.start();
+        logger.info("lauch essc");
+        String[] bytes2 = new String[]{"", ""};
+        bytes2[0] = "-i" + CommConstant.ESSC;
+        ESSC sc2 = new ESSC();
+        sc2.start(bytes2);
 
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    String[] bytes = new String[]{"", ""};
-                    bytes[0] = "-i" + CommConstant.ESSC;
-                    ESSC sc = new ESSC();
-                    sc.start(bytes);
-                } catch(Exception e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-        }.start();
+        logger.info("lauch cssc");
+        String[] bytes3 = new String[]{"", ""};
+        bytes3[0] = "-i" + CommConstant.CSSC;
+        CSSC sc3 = new CSSC();
+        sc3.start(bytes3);
 
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    String[] bytes = new String[]{"", ""};
-                    bytes[0] = "-i" + CommConstant.CSSC;
-                    CSSC sc = new CSSC();
-                    sc.start(bytes);
-                } catch(Exception e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-        }.start();
+        logger.info("lauch qssc");
+        String[] bytes4 = new String[]{"", ""};
+        bytes4[0] = "-i" + CommConstant.QSSC;
+        QSSC sc4 = new QSSC();
+        sc4.start(bytes4);
 
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    String[] bytes = new String[]{"", ""};
-                    bytes[0] = "-i" + CommConstant.QSSC;
-                    QSSC sc = new QSSC();
-                    sc.start(bytes);
-                } catch(Exception e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-        }.start();
+        logger.info("lauch vssc");
+        String[] bytes5 = new String[]{"", ""};
+        bytes5[0] = "-i" + CommConstant.VSSC;
+        VSSC sc5 = new VSSC();
+        sc5.start(bytes5);
 
-        new Thread() {
-            @Override
-            public void run() {
-                try {
-                    String[] bytes = new String[]{"", ""};
-                    bytes[0] = "-i" + CommConstant.VSSC;
-                    VSSC sc = new VSSC();
-                    sc.start(bytes);
-                } catch(Exception e) {
-                    logger.error(e.getMessage(), e);
-                }
-            }
-        }.start();
-
-
-
+        logger.info("lauch MySmartContract001");
+        String[] bytes6 = new String[]{"", ""};
+        bytes6[0] = "-iMySmartContract001";
+        SmartContractSupportClient sc6 = new SmartContractSupportClient();
+        sc6.start(bytes6);
     }
 
 }

@@ -32,7 +32,7 @@ import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
  * @date 2018/04/18
  * @company Dingxuan
  */
-public class ResultsItr implements org.bcia.javachain.common.ledger.ResultsIterator {
+public class ResultsItr implements ResultsIterator {
     private String ns;
     private String endKey;
     private ResultsIterator dbItr;
