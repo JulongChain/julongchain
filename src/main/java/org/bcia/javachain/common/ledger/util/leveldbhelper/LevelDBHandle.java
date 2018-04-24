@@ -16,6 +16,7 @@
 package org.bcia.javachain.common.ledger.util.leveldbhelper;
 
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.util.DBHandle;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.leveldb.LevelDBFactory;
@@ -40,7 +41,7 @@ import java.util.Map;
  * @date 2018/04/03
  * @company Dingxuan
  */
-public class LevelDBHandle {
+public class LevelDBHandle implements DBHandle {
     private String dbName = null;
     private DB db = null;
     private boolean opened = false;
@@ -97,7 +98,7 @@ public class LevelDBHandle {
     /**
      * 插入当前kv
      */
-    public void put(byte[] key, byte[] value, Boolean sync) throws LedgerException {
+    public void put(byte[] key, byte[] value, boolean sync) throws LedgerException {
         if(!opened){
             logger.error("No db created");
         } else {
@@ -108,7 +109,7 @@ public class LevelDBHandle {
     /**
      * 删除给定key
      */
-    public void delete(byte[] key, Boolean sync) throws LedgerException {
+    public void delete(byte[] key, boolean sync) throws LedgerException {
         if(!opened){
             logger.error("No db created");
         } else {
@@ -119,7 +120,7 @@ public class LevelDBHandle {
     /**
      * 批量执行操作
      */
-    public void writeBatch(UpdateBatch batch, Boolean sync) throws LedgerException {
+    public void writeBatch(UpdateBatch batch, boolean sync) throws LedgerException {
         if(!opened){
             logger.error("No db created");
         } else {

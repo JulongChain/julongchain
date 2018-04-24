@@ -47,7 +47,7 @@ public interface DB extends IVersionedDB {
 
     Height getKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException;
 
-    List<VersionedValue> getPrivateDataMultipleKeys(String ns, String coll, String[] keys) throws LedgerException;
+    List<VersionedValue> getPrivateDataMultipleKeys(String ns, String coll, List<String> keys) throws LedgerException;
 
     ResultsIterator getPrivateDataRangeScanIterator(String ns, String coll, String startKey, String endKey) throws LedgerException;
 

@@ -125,7 +125,7 @@ public class BlockfileStream {
             throw new LedgerException(e);
         }
         long length = Util.bytesToLong(lenBytes, 0, peekBytes);
-        //根据解析的block长度,计算应剩余的文件长度
+        //根据解析的block长度,计算剩余长度
         //长度不足则抛出异常
         long expectedBytes = length + peekBytes;
         if(expectedBytes > remainingBytes){
@@ -135,7 +135,9 @@ public class BlockfileStream {
         //读取block
         byte[] blockBytes = new byte[(int) length];
         try {
-            reader.read(blockBytes, currentOffset.intValue() + 8, (int) length);
+            //从8开始读取
+//            reader.skip(peekBytes);
+            reader.read(blockBytes);
         } catch (Throwable e) {
             throw new LedgerException(e);
         }

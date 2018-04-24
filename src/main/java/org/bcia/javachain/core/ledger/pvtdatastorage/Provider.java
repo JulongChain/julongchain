@@ -16,6 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.pvtdatastorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.util.DBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -32,7 +33,7 @@ import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 public class Provider {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(Provider.class);
 
-    private LevelDbProvider db;
+    private DBProvider db;
 
     public static Provider newProvider() throws LedgerException {
         Provider provider = new Provider();
@@ -54,11 +55,11 @@ public class Provider {
         db.close();
     }
 
-    public LevelDbProvider getDb() {
+    public DBProvider getDb() {
         return db;
     }
 
-    public void setDb(LevelDbProvider db) {
+    public void setDb(DBProvider db) {
         this.db = db;
     }
 }

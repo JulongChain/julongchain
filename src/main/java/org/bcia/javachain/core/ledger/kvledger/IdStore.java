@@ -18,6 +18,7 @@ package org.bcia.javachain.core.ledger.kvledger;
 import com.google.protobuf.ByteString;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.util.DBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -46,7 +47,7 @@ import java.util.logging.Level;
 public class IdStore {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(IdStore.class);
 
-    private LevelDbProvider provider = null;
+    private DBProvider provider = null;
     private static final byte[] UNDER_CONSTRUCTION_LEDGER_KEY = "underConstructionLedgerKey".getBytes();
     private static final byte[] LEDGER_KEY_PREFIX = "l".getBytes();
 
@@ -88,15 +89,17 @@ public class IdStore {
      */
     public void createLedgerID(String ledgerID, Common.Block gb) throws LedgerException {
         byte[] key = encodeLedgerKey(ledgerID);
+        byte[] val = null;
         try {
-            gb.toByteArray();
+            val = gb.toByteArray();
         } catch (Exception e) {
             throw new LedgerException(e);
         }
-        byte[] val = provider.get(key);
+        val = provider.get(key);
         if(val != null && val.length != 0){
             throw new LedgerException("Ledger is already exists!");
         }
+        val = new byte[0];
         UpdateBatch batch = LevelDbProvider.newUpdateBatch();
         batch.put(key, val);
         batch.delete(UNDER_CONSTRUCTION_LEDGER_KEY);
@@ -108,6 +111,7 @@ public class IdStore {
      */
     public boolean ledgerIDExists(String ledgerID) throws LedgerException{
         byte[] key = encodeLedgerKey(ledgerID);
+        System.out.println(new String(key));
         byte[] val = provider.get(key);
         return val != null;
     }
@@ -151,11 +155,11 @@ public class IdStore {
         return keyStr.substring(1, key.length);
     }
 
-    public LevelDbProvider getProvider() {
+    public DBProvider getProvider() {
         return provider;
     }
 
-    public void setProvider(LevelDbProvider provider) {
+    public void setProvider(DBProvider provider) {
         this.provider = provider;
     }
 

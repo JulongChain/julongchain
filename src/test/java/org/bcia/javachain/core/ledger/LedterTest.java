@@ -22,6 +22,9 @@ import org.bcia.javachain.core.ledger.util.Util;
 import org.iq80.leveldb.DBIterator;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -34,9 +37,9 @@ import java.util.Map;
  */
 public class LedterTest {
     @Test
-    public void longl() throws LedgerException {
-        LevelDbProvider provider = LevelDbProvider.newProvider("/tmp/fabric/ledgertests/ledgermgmt/ledgersData/ledgerProvider");
-//        LevelDbProvider provider = LevelDbProvider.newProvider("/home/bcia/javachain/ledgersData/ledgerProvider");
+    public void longl() throws Throwable {
+//        LevelDbProvider provider = LevelDbProvider.newProvider("/tmp/fabric/ledgertests/ledgermgmt/ledgersData/ledgerProvider");
+        LevelDbProvider provider = LevelDbProvider.newProvider("/home/bcia/javachain/ledgersData/ledgerProvider");
         Iterator<Map.Entry<byte[], byte[]>> itr =  provider.getIterator(null, null);
         while(itr.hasNext()){
             Map.Entry<byte[], byte[]> entry = itr.next();

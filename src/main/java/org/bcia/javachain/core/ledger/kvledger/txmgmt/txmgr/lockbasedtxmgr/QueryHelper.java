@@ -20,6 +20,7 @@ import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RWSetBuilder;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedValue;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
 import java.util.ArrayList;
@@ -37,7 +38,8 @@ public class QueryHelper {
     private LockBasedTxManager txMgr;
     private RWSetBuilder rwSetBuilder;
     private List<ResultsItr> itrs;
-    private boolean doneInvoked;
+    //TODO
+    private boolean doneInvoked = true;
 
     public byte[] getState(String ns, String key) throws LedgerException{
         checkDone();
@@ -48,14 +50,14 @@ public class QueryHelper {
         return val;
     }
 
-    public List<byte[]> getStateMultipleKeys(String ns, String[] keys) throws LedgerException{
+    public List<byte[]> getStateMultipleKeys(String ns, List<String> keys) throws LedgerException{
         checkDone();
         List<VersionedValue> versionedValues = txMgr.getDb().getStateMultipleKeys(ns, keys);
         List<byte[]> values = new ArrayList<>();
         for (int i = 0; i < versionedValues.size(); i++) {
             byte[] val = versionedValues.get(i).getValue();
             Height ver = versionedValues.get(i).getVersion();
-            addToReadSet(ns, keys[i], ver);
+            addToReadSet(ns, keys.get(i), ver);
             values.add(val);
         }
         return values;
@@ -63,8 +65,7 @@ public class QueryHelper {
 
     public ResultsIterator getStateRangeScanIterator(String ns, String startKey, String endKey) throws LedgerException{
         checkDone();
-        //TODO ledger config
-        ResultsItr itr = ResultsItr.newResultsItr(ns, startKey, endKey, txMgr.getDb(), rwSetBuilder, false, 50);
+        ResultsItr itr = ResultsItr.newResultsItr(ns, startKey, endKey, txMgr.getDb(), rwSetBuilder, false, LedgerConfig.getMaxDegreeQueryReadsHashing());
         itrs.add(itr);
         return itr;
     }
@@ -94,14 +95,14 @@ public class QueryHelper {
         return val;
     }
 
-    public List<byte[]> getPrivateDataMultipleKeys(String ns, String coll, String[] keys) throws LedgerException {
+    public List<byte[]> getPrivateDataMultipleKeys(String ns, String coll, List<String> keys) throws LedgerException {
         checkDone();
         List<VersionedValue> versionedValues = txMgr.getDb().getPrivateDataMultipleKeys(ns, coll, keys);
         List<byte[]> values = new ArrayList<>();
         for (int i = 0; i < versionedValues.size() ; i++) {
             byte[] val = versionedValues.get(i).getValue();
             Height ver = versionedValues.get(i).getVersion();
-            addToHashedReadSet(ns, coll, keys[i], ver);
+            addToHashedReadSet(ns, coll, keys.get(i), ver);
             values.add(val);
         }
         return values;
@@ -127,24 +128,31 @@ public class QueryHelper {
         return itr;
     }
 
-    public void done(){
+    public void done() throws LedgerException{
         if(doneInvoked){
             return;
         }
-        for(ResultsItr itr : itrs){
-            if (rwSetBuilder != null){
-                Map.Entry<List<KvRwset.KVRead>, KvRwset.QueryReadsMerkleSummary> entry = itr.getRangeQueryResultsHelper().done();
-                if(entry.getKey() != null){
-                    KvRwset.RangeQueryInfo rqi = itr.getRangeQueryInfo();
-                    KvRwset.QueryReads.Builder builder = rqi.getRawReads().toBuilder();
-                    builder = setKvReads(builder, entry.getKey());
-                    rqi.toBuilder().setRawReads(builder);
-                    itr.setRangeQueryInfo(rqi);
+        try {
+            for(ResultsItr itr : itrs){
+                if (rwSetBuilder != null){
+                    Map.Entry<List<KvRwset.KVRead>, KvRwset.QueryReadsMerkleSummary> entry = itr.getRangeQueryResultsHelper().done();
+                    if(entry.getKey() != null){
+                        KvRwset.RangeQueryInfo rqi = itr.getRangeQueryInfo();
+                        KvRwset.QueryReads.Builder builder = rqi.getRawReads().toBuilder();
+                        builder = setKvReads(builder, entry.getKey());
+                        rqi.toBuilder().setRawReads(builder);
+                        itr.setRangeQueryInfo(rqi);
+                    }
+                    if(entry.getValue() != null){
+                        itr.setRangeQueryInfo(itr.getRangeQueryInfo().toBuilder().setReadsMerkleHashes(entry.getValue()).build());
+                    }
+                    rwSetBuilder.addToRangeQuerySet(itr.getNs(), itr.getRangeQueryInfo());
                 }
-                if(entry.getValue() != null){
-                    itr.setRangeQueryInfo(itr.getRangeQueryInfo().toBuilder().setReadsMerkleHashes(entry.getValue()).build());
-                }
-                rwSetBuilder.addToRangeQuerySet(itr.getNs(), itr.getRangeQueryInfo());
+            }
+        } finally {
+            doneInvoked = true;
+            for(ResultsIterator itr : itrs){
+                itr.close();
             }
         }
     }

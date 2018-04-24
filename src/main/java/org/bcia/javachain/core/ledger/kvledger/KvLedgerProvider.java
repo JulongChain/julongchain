@@ -17,6 +17,7 @@ package org.bcia.javachain.core.ledger.kvledger;
 
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.util.DBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -57,7 +58,7 @@ public class KvLedgerProvider implements INodeLedgerProvider {
     private IdStore idStore = null;
     private Provider ledgerStoreProvider = null;
     private DBPorvider vdbProvider = null;
-    private LevelDbProvider provider = null;
+    private DBProvider provider = null;
     private IHistoryDBProvider historyDBProvider = null;
     private Map<String, StateListener> stateListeners = new HashMap<>();
 
@@ -210,11 +211,11 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         this.idStore = idStore;
     }
 
-    public LevelDbProvider getProvider() {
+    public DBProvider getProvider() {
         return provider;
     }
 
-    public void setProvider(LevelDbProvider provider) {
+    public void setProvider(DBProvider provider) {
         this.provider = provider;
     }
 

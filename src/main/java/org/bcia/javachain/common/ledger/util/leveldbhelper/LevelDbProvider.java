@@ -17,8 +17,11 @@ package org.bcia.javachain.common.ledger.util.leveldbhelper;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.util.DBHandle;
+import org.bcia.javachain.common.ledger.util.DBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DBPorvider;
 import org.iq80.leveldb.DBIterator;
 
 import java.util.HashMap;
@@ -32,11 +35,11 @@ import java.util.Map;
  * @date 2018/04/03
  * @company Dingxuan
  */
-public class LevelDbProvider{
+public class LevelDbProvider implements DBProvider {
 
     private static JavaChainLog logger = JavaChainLogFactory.getLog(LevelDbProvider.class);
 
-    private LevelDBHandle db = null;
+    private DBHandle db = null;
     private byte[] dbNameKeySep = new byte[1];
     private byte lastKeyIndicator = 0x01;
     private String dbPath = null;
@@ -44,6 +47,12 @@ public class LevelDbProvider{
     private LevelDbProvider() throws LedgerException {
         dbNameKeySep[0] = 0x00;
         db = new LevelDBHandle();
+    }
+
+    public static UpdateBatch newUpdateBatch() {
+        UpdateBatch batch = new UpdateBatch();
+        batch.setKvs(new HashMap<>());
+        return batch;
     }
 
     public String getDbPath() {
@@ -54,11 +63,11 @@ public class LevelDbProvider{
         this.dbPath = dbPath;
     }
 
-    public LevelDBHandle getDb() {
+    public DBHandle getDb() {
         return db;
     }
 
-    public void setDb(LevelDBHandle db) {
+    public void setDb(DBHandle db) {
         this.db = db;
     }
 
@@ -68,15 +77,6 @@ public class LevelDbProvider{
         provider.setDbPath(dbPath);
         return provider;
     }
-
-//    public LevelDBHandle getDbHandle(String dbName) {
-//        LevelDBHandle LevelDBHandle = dbHandles.get(dbName);
-//        if(LevelDBHandle == null){
-//            LevelDBHandle = new LevelDBHandle();
-//            dbHandles.put(dbName, LevelDBHandle);
-//        }
-//        return LevelDBHandle;
-//    }
 
     public void close() throws LedgerException {
         db.close();
@@ -100,12 +100,6 @@ public class LevelDbProvider{
 
     public Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey, byte[] endKey) throws LedgerException {
         return db.getIterator(startKey, endKey);
-    }
-
-    public static UpdateBatch newUpdateBatch() {
-        UpdateBatch batch = new UpdateBatch();
-        batch.setKvs(new HashMap<>());
-        return batch;
     }
 
     public byte[] constructLevelKey(String dbName, byte[] key) {

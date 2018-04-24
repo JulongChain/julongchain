@@ -19,6 +19,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
+import org.bcia.javachain.common.ledger.util.DBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBHandle;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
@@ -42,7 +43,7 @@ public class FsBlockStore implements BlockStore {
     public static FsBlockStore newFsBlockStore(String id,
                                                Conf conf,
                                                IndexConfig indexConfig,
-                                               LevelDbProvider dbHandle) throws LedgerException {
+                                               DBProvider dbHandle) throws LedgerException {
         FsBlockStore fsBlockStore = new FsBlockStore();
         BlockfileMgr mgr = BlockfileMgr.newBlockfileMgr(id, conf, indexConfig, dbHandle);
         fsBlockStore.setId(id);

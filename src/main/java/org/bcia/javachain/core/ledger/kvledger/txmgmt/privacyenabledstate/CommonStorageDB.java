@@ -127,7 +127,7 @@ public class CommonStorageDB implements DB {
     }
 
     @Override
-    public List<VersionedValue> getPrivateDataMultipleKeys(String ns, String coll, String[] keys) throws LedgerException {
+    public List<VersionedValue> getPrivateDataMultipleKeys(String ns, String coll, List<String> keys) throws LedgerException {
         return getStateMultipleKeys(deriveHashedDataNs(ns, coll), keys);
     }
 
@@ -185,37 +185,29 @@ public class CommonStorageDB implements DB {
         }
     }
 
-    public IVersionedDB getVdb() {
-        return vdb;
-    }
-
-    public void setVdb(IVersionedDB vdb) {
-        this.vdb = vdb;
-    }
-
     @Override
     public VersionedValue getState(String namespace, String key) throws LedgerException {
-        return null;
+        return vdb.getState(namespace, key);
     }
 
     @Override
     public Height getVersion(String namespace, String key) throws LedgerException {
-        return null;
+        return vdb.getVersion(namespace, key);
     }
 
     @Override
-    public List<VersionedValue> getStateMultipleKeys(String namespace, String[] keys) throws LedgerException {
-        return null;
+    public List<VersionedValue> getStateMultipleKeys(String namespace, List<String> keys) throws LedgerException {
+        return vdb.getStateMultipleKeys(namespace, keys);
     }
 
     @Override
     public ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
-        return null;
+        return vdb.getStateRangeScanIterator(namespace, startKey, endKey);
     }
 
     @Override
     public ResultsIterator executeQuery(String namespace, String query) throws LedgerException {
-        return null;
+        return vdb.executeQuery(namespace, query);
     }
 
     @Override
@@ -225,7 +217,7 @@ public class CommonStorageDB implements DB {
 
     @Override
     public Height getLatestSavePoint() throws LedgerException {
-        return null;
+        return vdb.getLatestSavePoint();
     }
 
     @Override
@@ -245,6 +237,14 @@ public class CommonStorageDB implements DB {
 
     @Override
     public boolean bytesKeySuppoted() {
-        return false;
+        return true;
+    }
+
+    public IVersionedDB getVdb() {
+        return vdb;
+    }
+
+    public void setVdb(IVersionedDB vdb) {
+        this.vdb = vdb;
     }
 }

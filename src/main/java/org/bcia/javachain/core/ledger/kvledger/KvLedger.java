@@ -119,20 +119,21 @@ public class KvLedger implements INodeLedger {
             return;
         } else if(recoverers.size() == 1){
             recommitLostBlocks(recoverers.get(0).getFirstBlockNum(), lastAvailableBlockNum, recoverers.get(0).getRecoverable());
+        } else {
+            //小号放前面 升序
+            Collections.sort(recoverers, new Comparator<Recoverer>() {
+                @Override
+                public int compare(Recoverer o1, Recoverer o2) {
+                    return o1.getFirstBlockNum() > o2.getFirstBlockNum() ? 1 : -1;
+                }
+            });
+            //小号向大号看齐
+            recommitLostBlocks(recoverers.get(0).getFirstBlockNum(), recoverers.get(1).getFirstBlockNum() - 1,
+                    recoverers.get(0).getRecoverable());
+            //大号向正确看齐
+            recommitLostBlocks(recoverers.get(1).getFirstBlockNum(), lastAvailableBlockNum,
+                    recoverers.get(0).getRecoverable(), recoverers.get(1).getRecoverable());
         }
-        //小号放前面 升序
-        Collections.sort(recoverers, new Comparator<Recoverer>() {
-            @Override
-            public int compare(Recoverer o1, Recoverer o2) {
-                return o1.getFirstBlockNum() > o2.getFirstBlockNum() ? 1 : -1;
-            }
-        });
-        //小号向大号看齐
-        recommitLostBlocks(recoverers.get(0).getFirstBlockNum(), recoverers.get(1).getFirstBlockNum() - 1,
-                recoverers.get(0).getRecoverable());
-        //大号向正确看齐
-        recommitLostBlocks(recoverers.get(1).getFirstBlockNum(), lastAvailableBlockNum,
-                recoverers.get(0).getRecoverable(), recoverers.get(1).getRecoverable());
     }
 
     /** recommitLostBlocks retrieves blocks in specified range and commit the write set to either

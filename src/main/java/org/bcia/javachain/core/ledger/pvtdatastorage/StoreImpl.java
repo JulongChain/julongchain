@@ -18,6 +18,7 @@ package org.bcia.javachain.core.ledger.pvtdatastorage;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.util.DBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -43,7 +44,7 @@ import java.util.Map;
 public class StoreImpl implements Store {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(StoreImpl.class);
 
-    private LevelDbProvider db;
+    private DBProvider db;
     private String ledgerID;
     private boolean isEmpty;
     private long lastCommittedBlock;
@@ -80,7 +81,7 @@ public class StoreImpl implements Store {
         }
         byte[] startKey = KvEncoding.getStartKeyForRangeScanByBlockNum(blockNum);
         byte[] endKey = KvEncoding.getEndKeyForRangeScanByBlockNum(blockNum);
-        logger.debug(String.format("Querying private data for write sets using startKey %d, endKey %d", startKey, endKey));
+        logger.debug(String.format("Querying private data for write sets using startKey %s, endKey %s", startKey, endKey));
         Iterator<Map.Entry<byte[], byte[]>> itr = db.getIterator(startKey, endKey);
         List<TxPvtData> pvtData = new ArrayList<>();
         while(itr.hasNext()){
@@ -260,11 +261,11 @@ public class StoreImpl implements Store {
     }
 
 
-    public LevelDbProvider getDb() {
+    public DBProvider getDb() {
         return db;
     }
 
-    public void setDb(LevelDbProvider db) {
+    public void setDb(DBProvider db) {
         this.db = db;
     }
 

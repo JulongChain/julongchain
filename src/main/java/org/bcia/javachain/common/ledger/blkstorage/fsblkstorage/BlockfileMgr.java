@@ -17,19 +17,16 @@ package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.apache.activemq.store.memory.MemoryTransactionStore;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
+import org.bcia.javachain.common.ledger.util.DBProvider;
 import org.bcia.javachain.common.ledger.util.IoUtil;
 import org.bcia.javachain.core.ledger.util.Util;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBHandle;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.node.TransactionPackage;
-import sun.security.x509.OIDMap;
 
 import java.util.*;
 import java.util.concurrent.locks.Lock;
@@ -53,7 +50,7 @@ public class BlockfileMgr {
 
     private String rootDir;
     private Conf conf;
-    private LevelDbProvider db;
+    private DBProvider db;
     private Index index;
     private CheckpointInfo cpInfo;
     private BlockfileWriter currentFileWriter;
@@ -63,7 +60,7 @@ public class BlockfileMgr {
     public static BlockfileMgr newBlockfileMgr(String id,
                                                Conf conf,
                                                IndexConfig indexConfig,
-                                               LevelDbProvider indexStore) throws LedgerException {
+                                               DBProvider indexStore) throws LedgerException {
         BlockfileMgr mgr = new BlockfileMgr();
         logger.debug(String.format("newBlockfileMgr() initializing file-based block storage for ledger: %s", id));
         //根据配置文件、id生成rootDir
@@ -537,11 +534,11 @@ public class BlockfileMgr {
         this.conf = conf;
     }
 
-    public LevelDbProvider getDb() {
+    public DBProvider getDb() {
         return db;
     }
 
-    public void setDb(LevelDbProvider db) {
+    public void setDb(DBProvider db) {
         this.db = db;
     }
 

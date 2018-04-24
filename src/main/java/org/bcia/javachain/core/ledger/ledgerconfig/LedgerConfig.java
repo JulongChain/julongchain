@@ -78,6 +78,10 @@ public class LedgerConfig {
         return Config.DEFAULT_MAX_BLOCKFILE_SIZE;
     }
 
+    public static int getMaxDegreeQueryReadsHashing(){
+        return 50;
+    }
+
     private static String join(String... itms){
         StringBuffer buffer = new StringBuffer("");
         for(String itm : itms){

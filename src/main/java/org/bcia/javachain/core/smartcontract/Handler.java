@@ -734,6 +734,7 @@ public class Handler {
 //                    } else {
 //                        res, err = txContext.txsimulator.GetState(chaincodeID, getState.Key)
 //                    }
+
                 }
                 if (res != null) {
                     //The state object being requested does not exist

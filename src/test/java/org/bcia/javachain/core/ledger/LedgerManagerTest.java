@@ -66,6 +66,17 @@ public class LedgerManagerTest {
     }
 
     @Test
+    public void newTxSimulator() throws Exception {
+        LedgerManager.initialize(null);
+        String groupId = BlockUtils.getGroupIDFromBlock(null);
+        l = LedgerManager.openLedger(groupId);
+        ITxSimulator txSimulator = l.newTxSimulator(groupId);
+        String ns = null;
+        String key = null;
+        txSimulator.getState(ns, key);
+    }
+
+    @Test
     public void openLedger() throws Exception{
         LedgerManager.initialize(null);
         l = LedgerManager.openLedger(BlockUtils.getGroupIDFromBlock(null));

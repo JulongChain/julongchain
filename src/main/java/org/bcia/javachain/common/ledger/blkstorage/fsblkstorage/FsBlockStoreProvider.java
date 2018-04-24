@@ -19,6 +19,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStoreProvider;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
+import org.bcia.javachain.common.ledger.util.DBProvider;
 import org.bcia.javachain.common.ledger.util.IoUtil;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBHandle;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
@@ -37,7 +38,7 @@ public class FsBlockStoreProvider implements BlockStoreProvider {
 
     private Conf conf;
     private IndexConfig indexConfig;
-    private LevelDbProvider leveldbProvider;
+    private DBProvider leveldbProvider;
 
     /**
      * NewProvider constructs a filesystem based block store provider
@@ -107,11 +108,11 @@ public class FsBlockStoreProvider implements BlockStoreProvider {
         this.indexConfig = indexConfig;
     }
 
-    public LevelDbProvider getLeveldbProvider() {
+    public DBProvider getLeveldbProvider() {
         return leveldbProvider;
     }
 
-    public void setLeveldbProvider(LevelDbProvider leveldbProvider) {
+    public void setLeveldbProvider(DBProvider leveldbProvider) {
         this.leveldbProvider = leveldbProvider;
     }
 }

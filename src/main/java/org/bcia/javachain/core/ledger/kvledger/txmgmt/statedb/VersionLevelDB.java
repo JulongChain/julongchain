@@ -18,6 +18,7 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.util.DBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -42,10 +43,10 @@ public class VersionLevelDB implements IVersionedDB{
     private static final byte LAST_KEY_INDICATOR = 0x01;
     private static final byte[] SAVE_POINT_KEY = {0x00};
 
-    private LevelDbProvider db;
+    private DBProvider db;
     private String dbName;
 
-    public VersionLevelDB(LevelDbProvider db, String dbName){
+    public VersionLevelDB(DBProvider db, String dbName){
         this.db = db;
         this.dbName = dbName;
     }
@@ -78,7 +79,7 @@ public class VersionLevelDB implements IVersionedDB{
     }
 
     @Override
-    public List<VersionedValue> getStateMultipleKeys(String namespace, String[] keys) throws LedgerException {
+    public List<VersionedValue> getStateMultipleKeys(String namespace, List<String> keys) throws LedgerException {
         List<VersionedValue> vals = new ArrayList<>();
         for (String key : keys) {
             VersionedValue val = getState(namespace, key);
