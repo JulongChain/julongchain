@@ -31,6 +31,7 @@ import org.bcia.javachain.core.common.smartcontractprovider.ISmartContractPackag
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractProvider;
 import org.bcia.javachain.core.common.sysscprovider.ISystemSmartContractProvider;
 import org.bcia.javachain.core.common.sysscprovider.SystemSmartContractFactory;
+import org.bcia.javachain.core.common.sysscprovider.SystemSmartContractProvider;
 import org.bcia.javachain.core.ledger.sceventmgmt.ScEventMgmt;
 import org.bcia.javachain.core.ledger.sceventmgmt.SmartContractDefinition;
 import org.bcia.javachain.core.node.NodeTool;
@@ -332,6 +333,10 @@ public class LSSC  extends SystemSmartContractBase {
      */
     private void putSmartContractData(ISmartContractStub stub,
                                       SmartContractDataPackage.SmartContractData data) throws SysSmartContractException{
+         if(sscProvider.isSysSmartContract(data.getEssc())==false){
+             String msg=String.format("%s is not a valid endorsement system smartcontract",data.getEssc());
+             throw new SysSmartContractException(msg);
+         }
 
     }
 

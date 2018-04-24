@@ -28,7 +28,6 @@ import org.bcia.javachain.core.common.privdata.CollectionStoreFactory;
 import org.bcia.javachain.core.common.privdata.CollectionStoreSupport;
 import org.bcia.javachain.core.common.privdata.ICollectionStore;
 import org.bcia.javachain.core.common.privdata.IPrivDataSupport;
-import org.bcia.javachain.core.common.smartcontractprovider.SmartContractData;
 import org.bcia.javachain.core.common.sysscprovider.ISystemSmartContractProvider;
 import org.bcia.javachain.core.common.sysscprovider.SystemSmartContractFactory;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
@@ -37,6 +36,7 @@ import org.bcia.javachain.msp.IMspManager;
 import org.bcia.javachain.msp.mgmt.MspManager;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
+import org.bcia.javachain.protos.node.SmartContractDataPackage;
 import org.bcia.javachain.protos.node.TransactionPackage;
 import org.springframework.stereotype.Component;
 
@@ -177,7 +177,7 @@ public class VSSC extends SystemSmartContractBase {
     // configuration
     private boolean validateDeployRWSetAndCollection(
             KvRwset.KVRWSet lsccrwset,
-            SmartContractData scdRWSet,
+            SmartContractDataPackage.SmartContractData scdRWSet,
             byte[][] args,
             String groupID,
             String channelID
@@ -196,7 +196,7 @@ public class VSSC extends SystemSmartContractBase {
         return false;
     }
 
-    private SmartContractData getInstantiatedSmartContract(String groupID,String smartcontractID){
+    private SmartContractDataPackage.SmartContractData getInstantiatedSmartContract(String groupID,String smartcontractID){
         return null;
     }
 
