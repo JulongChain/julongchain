@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.core.common.smartcontractprovider;
 
+import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
 import org.bcia.javachain.common.resourceconfig.Validation;
@@ -30,49 +31,125 @@ import org.bcia.javachain.protos.node.Query;
  * @company Dingxuan
  */
 public class SmartContractData implements ISmartContractDefinition {
-    private Query.SmartContractInfo scInfo;
+    //Name of the smartcontract
+    private String name;
+    //Version of the smartcontract
+    private String version;
+    //Essc name for the smartcotract instance
+    private String essc;
+    //Vssc name for the smartcotract instance
+    private String vssc;
+    //Policy endorsement policy for the smartcontract instance
+    private byte[] policy;
+    //Data data specific to the package
+    private byte[] data;
+    //Id of the chaincode that's the unique fingerprint for the CC
+    //This is not currently used anywhere but serves as a good
+    //eyecatcher
+    private byte[] id;
+    //instantiationPolicy for the smartcontract
+    private byte[] instantiationPolicy;
 
-    private Validation scValidation;
+    public SmartContractData(String name, String version, String essc, String vssc,
+                             byte[] policy, byte[] data, byte[] id, byte[] instantiationPolicy) {
+        this.name = name;
+        this.version = version;
+        this.essc = essc;
+        this.vssc = vssc;
+        this.policy = policy;
+        this.data = data;
+        this.id = id;
+        this.instantiationPolicy = instantiationPolicy;
+    }
 
     public SmartContractData(Query.SmartContractInfo scInfo) {
-        this.scInfo = scInfo;
+        this.name=scInfo.getName();
+        this.version=scInfo.getVersion();
+        this.essc=scInfo.getEssc();
+        this.vssc=scInfo.getVssc();
+        this.id=scInfo.getId().toByteArray();
+        this.instantiationPolicy=null;
+        this.policy=null;
 
-        scValidation = new Validation();
-        scValidation.setMethod(scInfo.getVssc());
-        //TODO:如何赋值
-        scValidation.setArgs(new byte[0]);
+    }
+
+    public String getVssc() {
+        return vssc;
+    }
+
+    public void setVssc(String vssc) {
+        this.vssc = vssc;
+    }
+
+    public byte[] getPolicy() {
+        return policy;
+    }
+
+    public void setPolicy(byte[] policy) {
+        this.policy = policy;
+    }
+
+    public byte[] getData() {
+        return data;
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
+    }
+
+    public byte[] getId() {
+        return id;
+    }
+
+    public void setId(byte[] id) {
+        this.id = id;
+    }
+
+    public byte[] getInstantiationPolicy() {
+        return instantiationPolicy;
+    }
+
+    public void setInstantiationPolicy(byte[] instantiationPolicy) {
+        this.instantiationPolicy = instantiationPolicy;
     }
 
     @Override
     public String getSmartContractName() {
-        return scInfo.getName();
+        return this.name;
+    }
+
+    public void setSmartContractName(String name){
+        this.name=name;
     }
 
     @Override
     public byte[] hash() {
-        return scInfo.getId().toByteArray();
+        return this.id;
     }
 
     @Override
     public String getSmartContractVersion() {
-        return scInfo.getVersion();
+        return this.version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     @Override
-    public Validation getValidation() {
+    public Validation getValidation(){
+        Validation scValidation = new Validation();
+        scValidation.setMethod(essc);
+        scValidation.setArgs(policy);
         return scValidation;
     }
 
     @Override
     public String getEndorsement() {
-        return scInfo.getEssc();
+        return essc;
     }
 
-    public byte[] marshal() throws JavaChainException{
-        return null;
-    }
-
-    public Query.SmartContractInfo getScInfo() {
-        return scInfo;
+    public void setEndorsement(String essc) {
+        this.essc = essc;
     }
 }
