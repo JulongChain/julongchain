@@ -16,7 +16,10 @@
 package org.bcia.javachain.common.resourceconfig;
 
 /**
- * 类描述
+ * Validation returns how to validate transactions for this chaincode.
+ * The string returned is the name of the validation method (usually 'vssc')
+ * and the bytes returned are the argument to the validation (in the case of
+ * 'vssc', this is a marshaled pb.VSCCArgs message).
  *
  * @author wanliangbing
  * @date 2018/3/15

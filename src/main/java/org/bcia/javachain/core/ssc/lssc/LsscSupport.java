@@ -15,8 +15,8 @@
  */
 package org.bcia.javachain.core.ssc.lssc;
 
+import org.bcia.javachain.common.exception.SysSmartContractException;
 import org.bcia.javachain.core.common.smartcontractprovider.ISmartContractPackage;
-import org.bcia.javachain.core.common.smartcontractprovider.ISmartContractProvider;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.Query;
 import org.springframework.stereotype.Component;
@@ -35,7 +35,7 @@ public class LsscSupport {
      * package to local storage (i.e. the file system)
      * @param scPackage
      */
-    public void putSmartContractToLocalStorage(ISmartContractPackage scPackage){
+    public void putSmartContractToLocalStorage(ISmartContractPackage scPackage) throws SysSmartContractException{
 
     }
 
@@ -46,7 +46,7 @@ public class LsscSupport {
      * @param version
      * @return
      */
-    public ISmartContractPackage getSmartContractFromLocalStorage(String smartcontractName,String version){
+    public ISmartContractPackage getSmartContractFromLocalStorage(String smartcontractName,String version) throws SysSmartContractException{
         return null;
     }
 
@@ -80,7 +80,7 @@ public class LsscSupport {
      */
     void checkInstantiationPolicy(ProposalPackage.SignedProposal signedProposal,
                                   String groupName,
-                                  byte[] instantiationPolicy){
+                                  byte[] instantiationPolicy) throws SysSmartContractException{
 
     }
 }
