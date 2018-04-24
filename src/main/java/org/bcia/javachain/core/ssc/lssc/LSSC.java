@@ -27,6 +27,7 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.proto.ProtoUtils;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
 import org.bcia.javachain.core.aclmgmt.resources.Resources;
+import org.bcia.javachain.core.common.privdata.CollectionStoreSupport;
 import org.bcia.javachain.core.common.smartcontractprovider.ISmartContractPackage;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractProvider;
 import org.bcia.javachain.core.common.sysscprovider.ISystemSmartContractProvider;
@@ -40,6 +41,7 @@ import org.bcia.javachain.core.policy.PolicyFactory;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
 import org.bcia.javachain.msp.mgmt.Principal;
+import org.bcia.javachain.protos.common.Collection;
 import org.bcia.javachain.protos.common.Policies;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.SmartContractDataPackage;
@@ -283,13 +285,13 @@ public class LSSC  extends SystemSmartContractBase {
                     case GET_SC_DATA:
                         return newSuccessResponse(scbytes);
                     default:
-                        byte[] depSpecByte=null;
+                        SmartContractCode smartContractCode=null;
                         try {
-                            depSpecByte=getSmartContractCode(smartContractName2, scbytes);
+                            smartContractCode=getSmartContractCode(smartContractName2, scbytes);
                         } catch (SysSmartContractException e) {
                             return newErrorResponse(String.format("%s",e.getMessage()));
                         }
-                        return newSuccessResponse(depSpecByte);
+                        return newSuccessResponse(smartContractCode.getDepSpecBytes());
                 }
             case GET_SMART_CONTRACTS:
                 if(size!=1){
@@ -337,7 +339,18 @@ public class LSSC  extends SystemSmartContractBase {
              String msg=String.format("%s is not a valid endorsement system smartcontract",data.getEssc());
              throw new SysSmartContractException(msg);
          }
+        if(sscProvider.isSysSmartContract(data.getVssc())==false){
+            String msg=String.format("%s is not a valid endorsement system smartcontract",data.getVssc());
+            throw new SysSmartContractException(msg);
+        }
 
+        byte[] scdBytes = data.toByteArray();
+        if(scdBytes==null){
+            String msg=String.format("Marshall smartcontractdata %s get null",data.getName());
+            throw new SysSmartContractException(msg);
+        }
+
+        stub.putState(data.getName(),scdBytes);
     }
 
 
@@ -351,7 +364,33 @@ public class LSSC  extends SystemSmartContractBase {
                                                 SmartContractDataPackage.SmartContractData data,
                                                 byte[] collectionConfigBytes)
             throws  SysSmartContractException{
+        if(data==null){
+            String msg=String.format("Null SmartcontractData");
+            throw new SysSmartContractException(msg);
+        }
 
+        if(collectionConfigBytes.length==0){
+            log.debug("No collection configuration specified");
+            return;
+        }
+        Collection.CollectionConfigPackage collectionConfigPackage=null;
+        try {
+            collectionConfigPackage=Collection.CollectionConfigPackage.parseFrom(collectionConfigBytes);
+        } catch (InvalidProtocolBufferException e) {
+            String msg=String.format("Invalid collection configuration supplied for smartcontract %s ,version %s:%s",
+                    data.getName(),data.getVersion(),e.getMessage());
+            throw new SysSmartContractException(msg);
+        }
+
+        CollectionStoreSupport collectionStoreSupport=new CollectionStoreSupport();
+        String key = collectionStoreSupport.buildCollectionKVSKey(data.getName());
+        byte[] existingCollection = stub.getState(key);
+        if(existingCollection!=null){
+            String msg=String.format("collection data should not exist for chaincode %s:%s",data.getName(),data.getVersion());
+            throw new SysSmartContractException(msg);
+        }
+
+        stub.putState(key,collectionConfigBytes);
     }
 
     /**
@@ -364,7 +403,12 @@ public class LSSC  extends SystemSmartContractBase {
                                             String contractName)
             throws SysSmartContractException
     {
-        return null;
+        byte[] scdBytes = stub.getState(contractName);
+        if(scdBytes==null){
+            String msg=String.format("SmartContract Instance not found for %s",contractName);
+            throw new SysSmartContractException(msg);
+        }
+        return scdBytes;
     }
 
     /**
@@ -377,7 +421,18 @@ public class LSSC  extends SystemSmartContractBase {
     private SmartContractDataPackage.SmartContractData getSmartContractData(String contractName, byte[] scdBytes)
             throws SysSmartContractException
     {
-        return null;
+        SmartContractDataPackage.SmartContractData scd=null;
+        try {
+            scd=SmartContractDataPackage.SmartContractData.parseFrom(scdBytes);
+        } catch (InvalidProtocolBufferException e) {
+            String msg=String.format("SmartContractdata for%s unmarshal failed ",contractName);
+            throw new SysSmartContractException(msg);
+        }
+        if(scd.getName()!=contractName){
+            String msg=String.format("SmartContract mismatch:%s!=%s",contractName,scd.getName());
+            throw new SysSmartContractException(msg);
+        }
+        return scd;
     }
 
 
@@ -387,8 +442,20 @@ public class LSSC  extends SystemSmartContractBase {
      * @param scdBytes
      * @return
      */
-    private byte[] getSmartContractCode(String name, byte[] scdBytes)throws SysSmartContractException{
-        return null;
+    private SmartContractCode getSmartContractCode(String name, byte[] scdBytes)throws SysSmartContractException{
+        SmartContractDataPackage.SmartContractData scd = getSmartContractData(name, scdBytes);
+        ISmartContractPackage scPack = support.getSmartContractFromLocalStorage(name, scd.getVersion());
+        try {
+            scPack.validateSC(scd);
+        } catch (JavaChainException e) {
+            String msg=String.format("InvalidSCOnFSError:%s",e.getMessage());
+            throw new SysSmartContractException(msg);
+        }
+        //these are guaranteed to be non-nil because we got a valid scpack
+        Smartcontract.SmartContractDeploymentSpec depSpec = scPack.getDepSpec();
+        byte[] depSpecBytes = scPack.getDepSpecBytes();
+        SmartContractCode smartContractCode=new SmartContractCode(scd,depSpec,depSpecBytes);
+        return smartContractCode;
     }
 
 
