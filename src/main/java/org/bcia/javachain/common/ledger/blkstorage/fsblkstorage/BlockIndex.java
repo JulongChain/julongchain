@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
+import com.google.protobuf.ByteString;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStorage;
@@ -86,20 +87,20 @@ public class BlockIndex implements Index {
         List<TxIndexInfo> txOffsets = blockIdxInfo.getTxOffsets();
         TxValidationFlags txsfltr = new TxValidationFlags(blockIdxInfo.getMetadata().getMetadataList().size());
         UpdateBatch batch = LevelDbProvider.newUpdateBatch();
-        byte[] flpBayte = flp.marshal();
+        byte[] flpBytes = flp.marshal();
 
         //index1
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_HASH) == null){
-            batch.put(constructBlockHashKey(blockIdxInfo.getBlockHash()), flpBayte);
+        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_HASH)){
+            batch.put(constructBlockHashKey(blockIdxInfo.getBlockHash()), flpBytes);
         }
 
         //index2
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM) == null){
-            batch.put(constructBlockNumKey(blockIdxInfo.getBlockNum()), flpBayte);
+        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM)){
+            batch.put(constructBlockNumKey(blockIdxInfo.getBlockNum()), flpBytes);
         }
 
         //index3 用来通过txid获取tx
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_ID) == null){
+        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_ID)){
             for(TxIndexInfo txOffset : txOffsets){
                 FileLocPointer txFlp = FileLocPointer.newFileLocationPointer(flp.getFileSuffixNum(), flp.getLocPointer().getOffset(), txOffset.getLoc());
                 logger.debug(String.format("Adding txLoc [%s] for txID: [%s] to index", txFlp, txOffset.getTxID()));
@@ -109,7 +110,7 @@ public class BlockIndex implements Index {
         }
 
         //index4 查询历史数据
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRANS_NUM) == null){
+        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRANS_NUM)){
             for(int i = 0; i < txOffsets.size(); i++){
                 TxIndexInfo txOffset = txOffsets.get(i);
                 FileLocPointer txFlp = FileLocPointer.newFileLocationPointer(flp.getFileSuffixNum(), flp.getLocPointer().getOffset(), txOffset.getLoc());
@@ -120,19 +121,22 @@ public class BlockIndex implements Index {
         }
 
         //index5 通过txid获取区块
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_TX_ID) == null){
+        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_TX_ID)){
             for(TxIndexInfo txOffset : txOffsets){
-                batch.put(constructBlockTxIDKey(txOffset.getTxID()), flpBayte);
+                batch.put(constructBlockTxIDKey(txOffset.getTxID()), flpBytes);
             }
         }
 
         //index6 根据txid获取交易有效性
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_VALIDATION_CODE) == null){
+        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_VALIDATION_CODE)){
             for (int i = 0; i < txOffsets.size(); i++) {
                 TxIndexInfo txOffset = txOffsets.get(i);
                 batch.put(constructTxValidationCodeIDKey(txOffset.getTxID()), String.valueOf(txsfltr.flag(i).getNumber()).getBytes());
             }
         }
+
+        batch.put(INDEX_CHECKPOINT_KEY, Util.longToBytes(blockIdxInfo.getBlockNum(), 8));
+        db.writeBatch(batch, true);
     }
 
     public FileLocPointer getBlockLocByHash(byte[] blockHash) throws LedgerException{

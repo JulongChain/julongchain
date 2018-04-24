@@ -181,14 +181,19 @@ public class BlockfileMgr {
         //总共添加的长度
         long totalBytesToAppend = blockBytesLen + blockBytesLenEncoded.length;
         //配置的最大文件长度
-        long maxBlockFileSize = 0;
+        long maxBlockFileSize = conf.getMaxBlockfileSize();
         //总长度大于配置的文件长度,重新开启新文件
         if(currentOffset + totalBytesToAppend > maxBlockFileSize){
             moveToNextFile();
             currentOffset = 0;
         }
-        //添加区块长度
-        currentFileWriter.append(blockBytesLenEncoded, false);
+        try {
+            //添加区块长度
+            currentFileWriter.append(blockBytesLenEncoded, false);
+        } catch (LedgerException e) {
+            currentFileWriter.truncateFile(cpInfo.getLatestFileChunksize());
+            logger.error("Got error when appending block to file " + e.getMessage());
+        }
         //添加区块
         currentFileWriter.append(blockBytes, true);
         //设置新的区块信息
@@ -200,6 +205,16 @@ public class BlockfileMgr {
         newCPInfo.setLastBlockNumber(block.getHeader().getNumber());
         //保存
         saveCurrentInfo(newCPInfo, false);
+        FileLocPointer blockFLP = new FileLocPointer();
+        blockFLP.setFileSuffixNum(currentOffset);
+        blockFLP.setLocPointer(new LocPointer(newCPInfo.getLastestFileChunkSuffixNum(), 0));
+        BlockIdxInfo idxInfo = new BlockIdxInfo();
+        idxInfo.setBlockNum(block.getHeader().getNumber());
+        idxInfo.setBlockHash(blockHash.toByteArray());
+        idxInfo.setFlp(blockFLP);
+        idxInfo.setTxOffsets(txOffsets);
+        idxInfo.setMetadata(block.getMetadata());
+        index.indexBlock(idxInfo);
         updateCheckpoint(newCPInfo);
         updateBlockchainInfo(blockHash.toByteArray(), block);
     }
@@ -210,7 +225,7 @@ public class BlockfileMgr {
         try {
             lastBlockIndexed = index.getLastBlockIndexed();
         } catch (LedgerException e) {
-            if(!"NoBlockIndexed".equals(e.getMessage())){
+            if(!"[Ledger]NoBlockIndexed".equals(e.getMessage())){
                 logger.error("Got error when syncIndex");
                 throw e;
             }

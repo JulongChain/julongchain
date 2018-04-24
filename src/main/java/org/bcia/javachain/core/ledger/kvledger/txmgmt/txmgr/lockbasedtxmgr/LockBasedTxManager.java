@@ -28,6 +28,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.Update
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedValue;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.TxManager;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.IValidator;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valimpl.DefaultValidator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
@@ -63,7 +64,7 @@ public class LockBasedTxManager implements TxManager {
         txMgr.setLedgerID(ledgerID);
         txMgr.setDb(db);
         txMgr.setStateListeners(stateListeners);
-        txMgr.setValidator(null);
+        txMgr.setValidator(DefaultValidator.newDefaultValidator(txMgr, db));
         txMgr.setLock(new ReentrantReadWriteLock());
         return txMgr;
     }

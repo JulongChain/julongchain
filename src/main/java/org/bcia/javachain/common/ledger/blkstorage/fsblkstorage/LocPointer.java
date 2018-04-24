@@ -27,6 +27,15 @@ public class LocPointer {
     private Integer offset;
     private Integer bytesLength;
 
+    public LocPointer(){
+
+    }
+
+    public LocPointer(int offset, int bytesLength){
+        this.offset = offset;
+        this.bytesLength = bytesLength;
+    }
+
     public Integer getOffset() {
         return offset;
     }

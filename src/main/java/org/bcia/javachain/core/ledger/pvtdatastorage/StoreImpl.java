@@ -58,7 +58,7 @@ public class StoreImpl implements Store {
 
     @Override
     public void initLastCommitedBlock(long blockNum) throws LedgerException {
-        if(!isEmpty && !batchPending){
+        if(!(isEmpty && !batchPending)){
             throw new LedgerException("The private data store is not empty. InitLastCommittedBlock() function call is not allowed");
         }
         UpdateBatch batch = LevelDbProvider.newUpdateBatch();

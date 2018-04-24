@@ -56,7 +56,7 @@ public class IdStore {
     public static IdStore openIDStore() throws LedgerException{
         IdStore idStore = new IdStore();
         String dbPath = LedgerConfig.getLedgerProviderPath();
-        idStore.provider = LevelDbProvider.newProvider(dbPath);
+        idStore.setProvider(LevelDbProvider.newProvider(dbPath));
         logger.debug("Create idstore using path = " + idStore.getProvider().getDbPath());
         return idStore;
     }

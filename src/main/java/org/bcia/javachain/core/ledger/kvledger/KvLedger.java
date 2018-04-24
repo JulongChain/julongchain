@@ -299,7 +299,7 @@ public class KvLedger implements INodeLedger {
 //        long blockNo = 0;
         logger.debug(String.format("Channel %s: Validating state for block %d", ledgerID, blockNo));
         //TODO 验证器
-//        txtmgmt.validateAndPrepare(blockAndPvtData, true);
+        txtmgmt.validateAndPrepare(blockAndPvtData, true);
         logger.debug(String.format("Channel %s: Committing block %d to storage", ledgerID, blockNo));
         blockStore.commitWithPvtData(blockAndPvtData);
         logger.info(String.format("Channel %s: Committed block %d to storage", ledgerID, blockNo));

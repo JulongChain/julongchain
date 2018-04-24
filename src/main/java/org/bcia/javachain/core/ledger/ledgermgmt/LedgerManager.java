@@ -99,7 +99,7 @@ public class LedgerManager {
         if(!initialized){
             throw ERR_LEDGER_MANAGER_NOT_INITIALIZED;
         }
-        log.info("Opening ledger with id = %s", id);
+        log.info("Opening ledger with id = " + id);
         INodeLedger l = openedLedgers.get(id);
         if(l != null){
             throw ERR_LEDGER_ALREADY_OPENEND;

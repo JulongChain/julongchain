@@ -174,7 +174,11 @@ public class LevelDBFactory {
         WriteBatch writeBatch = db.createWriteBatch();
         WriteOptions writeOptions = new WriteOptions().sync(sync);
         map.forEach((k, v) -> {
-            writeBatch.put(k, v);
+            if (v != null) {
+                writeBatch.put(k, v);
+            } else {
+                writeBatch.delete(k);
+            }
             db.write(writeBatch, writeOptions);
         });
         closeWriteBatch(writeBatch);

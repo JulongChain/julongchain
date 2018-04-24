@@ -27,6 +27,7 @@ import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.FsBlockStoreProv
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
 import org.bcia.javachain.core.ledger.PvtNsCollFilter;
 import org.bcia.javachain.core.ledger.TxPvtData;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.node.TransactionPackage;
@@ -62,7 +63,7 @@ public class Store implements BlockStore{
         IndexConfig indexConfig = new IndexConfig();
         indexConfig.setAttrsToIndex(attrsToIndex);
 
-        Conf conf = Config.newConf("/home/bcia/fsblocksotrage", 10000);
+        Conf conf = Config.newConf(LedgerConfig.getBlockStorePath(), LedgerConfig.getMaxBlockfileSize());
 
         BlockStoreProvider blockStoreProvider = FsBlockStoreProvider.newProvider(conf, indexConfig);
 

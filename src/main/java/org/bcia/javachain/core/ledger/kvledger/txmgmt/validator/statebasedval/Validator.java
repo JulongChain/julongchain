@@ -97,13 +97,22 @@ public class Validator implements InternalValidator {
 
     @Override
     public PubAndHashUpdates validateAndPrepareBatch(Block block, boolean doMVCCValidation) throws LedgerException {
+//        if(db.isBulkOptimizable()){
         preLoadCommittedVersionOfRSet(block);
+//        }
         PubAndHashUpdates updates = PubAndHashUpdates.newPubAndHashUpdates();
         for(Transaction tx : block.getTxs()){
             TransactionPackage.TxValidationCode validationCode = validateEndorserTX(tx.getRwSet(), doMVCCValidation, updates);
-
+            tx.setValidationCode(validationCode);
+            if(TransactionPackage.TxValidationCode.VALID.equals(validationCode)){
+                logger.debug(String.format("Block [%d] Transaction index [%d] txID [%s] marked as valid by state validator", block.getNum(), tx.getIndexInBlock(), tx.getId()));
+                Height committingTxHeight = Height.newHeight(block.getNum(), tx.getIndexInBlock());
+                updates.applyWriteSet(tx.getRwSet(), committingTxHeight);
+            } else {
+                logger.debug(String.format("Block [%d] Transaction id [%d] TxID [%s] marked as invalid by state validator.", block.getNum(), tx.getIndexInBlock(), tx.getId()));
+            }
         }
-        return null;
+        return updates;
     }
 
     private TransactionPackage.TxValidationCode validateEndorserTX(TxRwSet txRwSet, boolean doMVCCValidation, PubAndHashUpdates updates) throws LedgerException{

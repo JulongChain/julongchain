@@ -25,6 +25,7 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
 import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
+import org.bcia.javachain.core.ledger.util.TxValidationFlags;
 import org.bcia.javachain.core.ledger.util.Util;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.NsRwSet;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.TxRwSet;
@@ -95,25 +96,21 @@ public class HistoryLevelDB implements IHistoryDB {
     public void commit(Common.Block block) throws LedgerException {
         long blockNo = block.getHeader().getNumber();
         int tranNo = 0;
-        UpdateBatch dbBatch = new UpdateBatch();
+        UpdateBatch dbBatch = LevelDbProvider.newUpdateBatch();
         logger.debug(String.format("Group [%s]: Updating historyDB for groupNo [%s] with [%d] transactions"
                 , dbName, blockNo, block.getData().getDataCount()));
        //获取失效
-        ByteString txsFilter = null;
-        try {
-            txsFilter = block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber());
-        } catch (Throwable e) {
-            txsFilter = ByteString.copyFrom(new byte[0]);
-        }
+        TxValidationFlags txsFilter = TxValidationFlags.fromByteString(block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
         //没有失效的部分
         //TODO 对于metadata的写入存在Array无法初始化问题
-//        if(txsFilter.isEmpty()){
-////            block.getMetadata().getMetadataList().set(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber(), txsFilter);
-//
-//           Common.BlockMetadata metadata = Common.BlockMetadata.newBuilder().setMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber(), txsFilter).build();
-//           block.getMetadata().toBuilder().setMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber(), txsFilter).
-//            block.toBuilder().setMetadata(metadata);
-//        }
+        if(txsFilter.length() == 0){
+            txsFilter = new TxValidationFlags(block.getData().getDataCount());
+            block = block.toBuilder()
+                    .setMetadata(block.getMetadata().toBuilder()
+                            .setMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber(), txsFilter.toByteString())
+                            .build())
+                    .build();
+        }
         //将每个交易的写集写入HistoryDB
         List<ByteString> list = block.getMetadata().getMetadataList();
         for (; tranNo < list.size(); tranNo++) {

@@ -15,8 +15,15 @@
  */
 package org.bcia.javachain.core.ledger;
 
+import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.util.Util;
+import org.iq80.leveldb.DBIterator;
 import org.junit.Test;
+
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * 类描述
@@ -27,8 +34,15 @@ import org.junit.Test;
  */
 public class LedterTest {
     @Test
-    public void longl(){
-        String a = "1234567";
-        System.out.println(a.substring(0, 5));
+    public void longl() throws LedgerException {
+        LevelDbProvider provider = LevelDbProvider.newProvider("/tmp/fabric/ledgertests/ledgermgmt/ledgersData/ledgerProvider");
+//        LevelDbProvider provider = LevelDbProvider.newProvider("/home/bcia/javachain/ledgersData/ledgerProvider");
+        Iterator<Map.Entry<byte[], byte[]>> itr =  provider.getIterator(null, null);
+        while(itr.hasNext()){
+            Map.Entry<byte[], byte[]> entry = itr.next();
+            System.out.println(new String(entry.getKey()));
+            System.out.println(new String(entry.getValue()));
+            System.out.println("_____________________________________");
+        }
     }
 }

@@ -15,6 +15,7 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valinternal;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,7 +27,7 @@ import java.util.List;
  */
 public class Block {
     private long num;
-    private List<Transaction> txs;
+    private List<Transaction> txs = new ArrayList<>();
 
     public long getNum() {
         return num;

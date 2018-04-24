@@ -15,8 +15,10 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger;
 
+import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
+import org.bcia.javachain.common.util.proto.BlockUtils;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.protos.common.Common;
 import org.junit.Before;
@@ -33,16 +35,39 @@ import java.io.File;
  */
 public class LedgerManagerTest {
 
-    LedgerManager lm;
+    INodeLedger l = null;
 
+    private static boolean deleteDir(File dir) {
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i=0; i<children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+        return dir.delete();
+    }
 
     @Test
     public void createLedger() throws LedgerException {
-        lm = new LedgerManager();
+        deleteDir(new File(Config.getPath()));
         LedgerManager.initialize(null);
-        INodeLedger l = LedgerManager.createLedger(Common.Block.getDefaultInstance());
+        Common.Block block = Common.Block.newBuilder()
+                .setMetadata(Common.BlockMetadata.newBuilder()
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .build())
+                .build();
+        l = LedgerManager.createLedger(block);
     }
 
-
-
+    @Test
+    public void openLedger() throws Exception{
+        LedgerManager.initialize(null);
+        l = LedgerManager.openLedger(BlockUtils.getGroupIDFromBlock(null));
+    }
 }

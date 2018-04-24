@@ -77,6 +77,7 @@ public class BlockfileStream {
     public BlockfileStream newBlockFileStream(String rootDir, int fileNum, long startOffset) throws LedgerException{
         //根据rootDir获取filePath
         String filePath = null;
+        filePath = BlockfileMgr.deriveBlockfilePath(rootDir, fileNum);
         this.fileNum = fileNum;
         this.file = new File(filePath);
         try {
@@ -125,7 +126,7 @@ public class BlockfileStream {
         }
         long length = Util.bytesToLong(lenBytes, 0, peekBytes);
         //根据解析的block长度,计算应剩余的文件长度
-        //长度不足则抛出yichang
+        //长度不足则抛出异常
         long expectedBytes = length + peekBytes;
         if(expectedBytes > remainingBytes){
             logger.debug(String.format("At least [%d] bytes expected. Remaing bytes [%d]", expectedBytes, remainingBytes));

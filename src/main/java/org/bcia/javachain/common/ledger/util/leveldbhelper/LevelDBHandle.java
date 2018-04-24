@@ -22,7 +22,9 @@ import org.bcia.javachain.core.ledger.leveldb.LevelDBFactory;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.DBIterator;
 import org.iq80.leveldb.Options;
+import org.iq80.leveldb.WriteBatch;
 import org.iq80.leveldb.impl.Iq80DBFactory;
+import org.iq80.leveldb.impl.WriteBatchImpl;
 
 import java.io.File;
 import java.io.IOException;
@@ -121,22 +123,7 @@ public class LevelDBHandle {
         if(!opened){
             logger.error("No db created");
         } else {
-            try {
-                Map<byte[], byte[]> kvs = batch.getKvs();
-//                for(Map.Entry<byte[], KeyType> entry : batch.getKts().entrySet()){
-//                    if(KeyType.KEY_TYPE_VAL == entry.getValue().getKeyType()){
-//                        LevelDBFactory.add(db, entry.getKey()
-//                                , kvs.get(entry.getKey()) == null ? "".getBytes() : kvs.get(entry.getKey())
-//                                , sync);
-//                    } else if(KeyType.KEY_TYPE_DEL == entry.getValue().getKeyType()){
-//                        LevelDBFactory.delete(db, entry.getKey(), sync);
-//                    }
-//                }
-            } catch (Exception e) {
-                throw new LedgerException(e);
-//            } finally {
-//                close();
-            }
+            LevelDBFactory.add(db, batch.getKvs(), sync);
         }
     }
 
