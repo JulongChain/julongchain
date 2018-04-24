@@ -22,13 +22,14 @@ import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
+import org.bcia.javachain.common.resourceconfig.config.SmartContractConfig;
 import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractContext;
-import org.bcia.javachain.core.common.smartcontractprovider.SmartContractData;
 import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.ledger.ITxSimulator;
+import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.core.node.NodeTool;
 import org.bcia.javachain.core.smartcontract.SmartContractExecutor;
 import org.bcia.javachain.core.ssc.ISystemSmartContractManager;
@@ -61,8 +62,8 @@ public class EndorserSupport implements IEndorserSupport {
 
     @Override
     public ITxSimulator getTxSimulator(String ledgerName, String txId) throws NodeException {
-        INodeLedger nodeLedger = NodeTool.getLedger(ledgerName);
         try {
+            INodeLedger nodeLedger = LedgerManager.openLedger(ledgerName);
             return nodeLedger.newTxSimulator(txId);
         } catch (LedgerException e) {
             log.error(e.getMessage(), e);
@@ -146,9 +147,15 @@ public class EndorserSupport implements IEndorserSupport {
             if (objs != null && objs.length > 0) {
                 ProposalResponsePackage.Response response = (ProposalResponsePackage.Response) objs[0];
                 if (response.getStatus() == Common.Status.SUCCESS_VALUE) {
-                    Query.SmartContractInfo info = Query.SmartContractInfo.parseFrom(response.getPayload());
-                    SmartContractData data = new SmartContractData(info);
-                    return data;
+                    SmartContractDataPackage.SmartContractData data = SmartContractDataPackage.SmartContractData
+                            .parseFrom(response.getPayload());
+
+                    return new SmartContractConfig(data);
+
+
+//                    Query.SmartContractInfo info = Query.SmartContractInfo.parseFrom(response.getPayload());
+//                    SmartContractData data = new SmartContractData(info);
+//                    return data;
                 } else {
                     throw new NodeException("Execute smart contract fail, get status code: " + response.getStatus());
                 }

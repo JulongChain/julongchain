@@ -26,4 +26,10 @@ public class ResourceConfigConstant {
     public static final String SMART_CONTRACT_IDENTIFIER = "SmartContractIdentifier";
     public static final String SMART_CONTRACT_VALIDATION = "SmartContractValidation";
     public static final String SMART_CONTRACT_ENDORSEMENT = "SmartContractEndorsement";
+
+    public static final String RESOURCES = "Resources";
+    public static final String APIS = "APIs";
+    public static final String NODE_POLICIES = "NodePolicies";
+    public static final String SMART_CONTRACTS = "SmartContracts";
+
 }

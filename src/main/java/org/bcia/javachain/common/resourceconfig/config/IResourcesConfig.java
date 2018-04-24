@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.resourceconfig;
+package org.bcia.javachain.common.resourceconfig.config;
 
 /**
- * 对象
+ * 资源配置接口
  *
  * @author zhouhui
- * @date 2018/4/17
+ * @date 2018/4/23
  * @company Dingxuan
  */
-public class IBundleSourceCallback {
-
+public interface IResourcesConfig {
 }

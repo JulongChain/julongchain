@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * 对象
+ * 多智能合约配置
  *
  * @author zhouhui
  * @date 2018/4/19

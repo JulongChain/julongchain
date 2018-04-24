@@ -82,7 +82,7 @@ public class Endorser implements IEndorserServer {
         //TODO：获取客户端的IP和端口，暂无找到有效方法
         Object[] objs = null;
         try {
-            //预处理，主要是完成检查
+            //预处理，主要是完成验证和检查
             objs = preProcess(signedProposal);
         } catch (NodeException e) {
             log.error(e.getMessage(), e);
@@ -106,28 +106,44 @@ public class Endorser implements IEndorserServer {
                 .getSmartContractId());
         String scName = scIdBuilder.getName();
 
-        Object[] simulateObjs = simulateProposal(groupHeader.getGroupId(), scName, groupHeader.getTxId(),
-                signedProposal, proposal, scIdBuilder);
+//        Object[] simulateObjs = simulateProposal(groupHeader.getGroupId(), scName, groupHeader.getTxId(),
+//                signedProposal, proposal, scIdBuilder);
+//
+//        ProposalResponsePackage.Response response = (ProposalResponsePackage.Response) objs[0];
+//        byte[] simulateResults = (byte[]) simulateObjs[1];
+//        ISmartContractDefinition scDefinition = (ISmartContractDefinition) simulateObjs[2];
+//        SmartContractEventPackage.SmartContractEvent scEvent = (SmartContractEventPackage.SmartContractEvent)
+//                simulateObjs[3];
+//
+//
+//
+//        if (response.getStatus() != Common.Status.SUCCESS_VALUE) {
+//            //TODO:是否要封装错误消息
+//            return buildErrorResponse("simulateProposal fail");
+//        }
 
-        ProposalResponsePackage.Response response = (ProposalResponsePackage.Response) objs[0];
-        byte[] simulateResults = (byte[]) simulateObjs[1];
-        ISmartContractDefinition scDefinition = (ISmartContractDefinition) simulateObjs[2];
-        SmartContractEventPackage.SmartContractEvent scEvent = (SmartContractEventPackage.SmartContractEvent)
-                simulateObjs[3];
+        //TODO:为测试所写的方法
+        ProposalResponsePackage.Response response = ProposalResponsePackage.Response.newBuilder().build();
+        SmartContractEventPackage.SmartContractEvent event = SmartContractEventPackage.SmartContractEvent.newBuilder
+                ().build();
+        byte[] simulateResults = new byte[]{0, 1, 2};
+        byte[] visibility = new byte[]{3, 4, 5};
+        ISmartContractDefinition smartContractDefinition = new MockSmartContractDefinition();
 
-        if (response.getStatus() != Common.Status.SUCCESS_VALUE) {
-            //TODO:是否要封装错误消息
-            return buildErrorResponse("simulateProposal fail");
-        }
+        ProposalResponsePackage.Response esscResponse = endorseProposal(groupHeader.getGroupId(), groupHeader.getTxId(),
+                signedProposal,
+                proposal, scIdBuilder, response, simulateResults, event, visibility,
+                smartContractDefinition);
+        return ProposalResponseUtils.buildProposalResponse(esscResponse.getPayload());
 
         //无合约提案不需要背书，例如cssc
-        if (StringUtils.isBlank(scName)) {
-            return ProposalResponseUtils.buildProposalResponse(response.getPayload());
-        } else {
-            ProposalResponsePackage.Response response1 = endorseProposal(groupHeader.getGroupId(), groupHeader.getTxId(), signedProposal, proposal, scIdBuilder,
-                    response, simulateResults, scEvent, extension.getPayloadVisibility().toByteArray(), scDefinition);
-            return ProposalResponseUtils.buildProposalResponse(response1.getPayload());
-        }
+//        if (StringUtils.isBlank(scName)) {
+//            return ProposalResponseUtils.buildProposalResponse(response.getPayload());
+//        } else {
+//            ProposalResponsePackage.Response response1 = endorseProposal(groupHeader.getGroupId(), groupHeader.getTxId(), signedProposal, proposal, scIdBuilder,
+//                    response, simulateResults, scEvent, extension.getPayloadVisibility().toByteArray(), scDefinition);
+//            return ProposalResponseUtils.buildProposalResponse(response1.getPayload());
+//        }
     }
 
     /**
@@ -321,11 +337,11 @@ public class Endorser implements IEndorserServer {
      */
     public ProposalResponsePackage.Response endorseProposal(String groupId, String txId, ProposalPackage
             .SignedProposal signedProposal, ProposalPackage.Proposal proposal, Smartcontract.SmartContractID.Builder
-                                                                     smartContractIDBuilder, ProposalResponsePackage
-                                                                     .Response response, byte[] simulateResults,
-                                                             SmartContractEventPackage.SmartContractEvent event,
-                                                             byte[] visibility, ISmartContractDefinition
-                                                                     smartContractDefinition) throws NodeException {
+                                                                    smartContractIDBuilder, ProposalResponsePackage
+                                                                    .Response response, byte[] simulateResults,
+                                                            SmartContractEventPackage.SmartContractEvent event,
+                                                            byte[] visibility, ISmartContractDefinition
+                                                                    smartContractDefinition) throws NodeException {
         log.info("begin endorseProposal");
 
         boolean useSysSmartContract = false;

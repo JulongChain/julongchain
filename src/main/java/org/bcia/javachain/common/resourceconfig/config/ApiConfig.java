@@ -31,7 +31,7 @@ import java.util.Map;
  * @date 2018/4/19
  * @company Dingxuan
  */
-public class ApiConfig {
+public class ApiConfig implements IApiConfig {
     private static final String API_PATH_PREFIX = "/Resources/APIs/";
     private Map<String, String> policyRefs;
 

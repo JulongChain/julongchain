@@ -21,17 +21,27 @@ import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
 import org.bcia.javachain.common.resourceconfig.ResourceConfigConstant;
 import org.bcia.javachain.common.resourceconfig.Validation;
 import org.bcia.javachain.protos.common.Configtx;
+import org.bcia.javachain.protos.node.SmartContractDataPackage;
 import org.bcia.javachain.protos.peer.Resources;
 
 /**
- * 对象
+ * 智能合约配置对象
  *
  * @author zhouhui
  * @date 2018/4/19
  * @company Dingxuan
  */
 public class SmartContractConfig implements ISmartContractDefinition {
-    String scName;
+    private String scName;
+    private String scVersion;
+    private String essc;
+    private String vssc;
+    private byte[] policy;
+    private byte[] data;
+    private byte[] id;
+    private byte[] instantiationPolicy;
+    private Validation validation;
+
     private Resources.SmartContractIdentifier smartContractIdentifier;
     private Resources.SmartContractValidation smartContractValidation;
     private Resources.SmartContractEndorsement smartContractEndorsement;
@@ -48,21 +58,37 @@ public class SmartContractConfig implements ISmartContractDefinition {
             Configtx.ConfigValue identifierValue = tree.getValuesMap().get(ResourceConfigConstant.SMART_CONTRACT_IDENTIFIER);
             if (identifierValue != null) {
                 smartContractIdentifier = Resources.SmartContractIdentifier.parseFrom(identifierValue.getValue());
+                id = smartContractIdentifier.getHash().toByteArray();
+                scVersion = smartContractIdentifier.getVersion();
             }
 
             Configtx.ConfigValue validationValue = tree.getValuesMap().get(ResourceConfigConstant
                     .SMART_CONTRACT_VALIDATION);
             if (validationValue != null) {
                 smartContractValidation = Resources.SmartContractValidation.parseFrom(validationValue.getValue());
+
+                this.vssc = smartContractValidation.getName();
+                this.policy = smartContractValidation.getArgument().toByteArray();
+                validation = new Validation(this.vssc, this.policy);
             }
 
             Configtx.ConfigValue endorsementValue = tree.getValuesMap().get
                     (ResourceConfigConstant.SMART_CONTRACT_ENDORSEMENT);
             if (endorsementValue != null) {
                 smartContractEndorsement = Resources.SmartContractEndorsement.parseFrom(endorsementValue.getValue());
+                this.essc = smartContractEndorsement.getName();
             }
         }
+    }
 
+    public SmartContractConfig(SmartContractDataPackage.SmartContractData data) {
+        this.scName = data.getName();
+        this.scVersion = data.getVersion();
+        this.id = data.getId().toByteArray();
+        this.essc = data.getEssc();
+        this.vssc = data.getVssc();
+        this.policy = data.getPolicy().toByteArray();
+        this.validation = new Validation(this.vssc, this.policy);
     }
 
     @Override
@@ -72,21 +98,21 @@ public class SmartContractConfig implements ISmartContractDefinition {
 
     @Override
     public byte[] hash() {
-        return smartContractIdentifier.getHash().toByteArray();
+        return id;
     }
 
     @Override
     public String getSmartContractVersion() {
-        return smartContractIdentifier.getVersion();
+        return scVersion;
     }
 
     @Override
     public Validation getValidation() {
-        return new Validation(smartContractValidation.getName(), smartContractValidation.getArgument().toByteArray());
+        return validation;
     }
 
     @Override
     public String getEndorsement() {
-        return smartContractEndorsement.getName();
+        return essc;
     }
 }

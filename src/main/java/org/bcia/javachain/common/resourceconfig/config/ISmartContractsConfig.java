@@ -13,20 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.resourceconfig;
+package org.bcia.javachain.common.resourceconfig.config;
 
 /**
  * 对象
  *
  * @author zhouhui
- * @date 2018/4/16
+ * @date 2018/4/23
  * @company Dingxuan
  */
-public class BundleSource {
-    private Object bundle;
-//    private CallBacks callbacks;
-
-
-
-
+public interface ISmartContractsConfig {
 }
