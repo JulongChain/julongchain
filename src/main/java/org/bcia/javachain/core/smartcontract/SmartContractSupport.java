@@ -294,7 +294,7 @@ public class SmartContractSupport {
 
         String smartContractId = scContext.getName();
 
-        SmartContractSupportService.invoke(smartContractId, scMessage.getProposal());
+        SmartContractSupportService.invoke(smartContractId, scMessage);
 
         return SmartcontractShim.SmartContractMessage.newBuilder().setType(SmartcontractShim.SmartContractMessage.Type.COMPLETED).build();
     }

@@ -168,15 +168,20 @@ public class SmartContractSupportService extends SmartContractSupportGrpc
         chaincodeMessageStreamObserver.onNext(message);
     }
 
-    public static void init(String chaincodeId, SignedProposal signedProposal) {
+    public static void init(String smartContractId, SignedProposal signedProposal) {
         SmartContractMessage message = SmartContractMessage.newBuilder().setType(SmartContractMessage.Type.INIT).setProposal(signedProposal).build();
-        send(chaincodeId, message);
+        send(smartContractId, message);
     }
 
-    public static void invoke(String chaincodeId, SignedProposal signedProposal) {
-        logger.info("invoke " + chaincodeId);
+    public static void invoke(String smartContractId, SignedProposal signedProposal) {
+        logger.info("invoke " + smartContractId);
         SmartContractMessage message = SmartContractMessage.newBuilder().setType(SmartContractMessage.Type.TRANSACTION).setProposal(signedProposal).build();
-        send(chaincodeId, message);
+        send(smartContractId, message);
+    }
+
+    public static void invoke(String smartContractId, SmartContractMessage smartContractMessage) {
+        logger.info("invoke " + smartContractId);
+        send(smartContractId, smartContractMessage);
     }
 
     private String getChaincodeId(SmartContractMessage message) {
