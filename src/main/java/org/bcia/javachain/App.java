@@ -46,28 +46,28 @@ public class App {
             log.error(ex.getMessage(), ex);
         }
 
-        //异步启动Consenter服务
-        new Thread() {
-            @Override
-            public void run() {
-                ConsenterServer server = new ConsenterServer();
-                try {
-                    server.start();
-                    server.blockUntilShutdown();
-                } catch (IOException ex) {
-                    log.error(ex.getMessage(), ex);
-                } catch (InterruptedException ex) {
-                    log.error(ex.getMessage(), ex);
-                }
-            }
-        }.start();
-
-        //等待1秒，让Consenter服务完成
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException ex) {
-            log.error(ex.getMessage(), ex);
-        }
+//        //异步启动Consenter服务
+//        new Thread() {
+//            @Override
+//            public void run() {
+//                ConsenterServer server = new ConsenterServer();
+//                try {
+//                    server.start();
+//                    server.blockUntilShutdown();
+//                } catch (IOException ex) {
+//                    log.error(ex.getMessage(), ex);
+//                } catch (InterruptedException ex) {
+//                    log.error(ex.getMessage(), ex);
+//                }
+//            }
+//        }.start();
+//
+//        //等待1秒，让Consenter服务完成
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException ex) {
+//            log.error(ex.getMessage(), ex);
+//        }
 
         //引入Spring配置文件
         ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");

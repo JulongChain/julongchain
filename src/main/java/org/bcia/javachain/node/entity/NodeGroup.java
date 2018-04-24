@@ -34,6 +34,7 @@ import org.bcia.javachain.core.ssc.cssc.CSSC;
 import org.bcia.javachain.csp.gm.GmCspFactory;
 import org.bcia.javachain.csp.gm.sm2.SM2;
 import org.bcia.javachain.msp.ISigningIdentity;
+import org.bcia.javachain.msp.mgmt.MspManager;
 import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.common.client.*;
 import org.bcia.javachain.node.common.helper.SpecHelper;
@@ -231,7 +232,7 @@ public class NodeGroup {
         //生成proposal  Type=ENDORSER_TRANSACTION
         Smartcontract.SmartContractInvocationSpec spec = SpecHelper.buildInvocationSpec(smartContractName, action, content);
 
-        ISigningIdentity identity = new MockSigningIdentity();
+        ISigningIdentity identity = MspManager.getLocalMsp().getDefaultSigningIdentity();
         byte[] creator = identity.serialize();
 
         byte[] nonce = MockCrypto.getRandomNonce();

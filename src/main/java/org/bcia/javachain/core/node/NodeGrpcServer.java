@@ -27,6 +27,7 @@ import org.bcia.javachain.core.admin.IAdminServer;
 import org.bcia.javachain.core.endorser.IEndorserServer;
 import org.bcia.javachain.core.events.IDeliverEventsServer;
 import org.bcia.javachain.core.events.IEventHubServer;
+import org.bcia.javachain.core.smartcontract.node.SmartContractSupportService;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.gossip.GossipGrpc;
 import org.bcia.javachain.protos.gossip.Message;
@@ -97,6 +98,8 @@ public class NodeGrpcServer {
     public void start() throws IOException {
         server = ServerBuilder.forPort(port)
                 .addService(new EndorserServerImpl())
+                .addService(new SmartContractSupportService())
+//                .addService()
                 .build()
                 .start();
         log.info("NodeGrpcServer start, port: " + port);
