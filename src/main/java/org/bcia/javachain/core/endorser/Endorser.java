@@ -15,7 +15,6 @@
  */
 package org.bcia.javachain.core.endorser;
 
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -107,45 +106,45 @@ public class Endorser implements IEndorserServer {
                 .getSmartContractId());
         String scName = scIdBuilder.getName();
 
-//        Object[] simulateObjs = simulateProposal(groupHeader.getGroupId(), scName, groupHeader.getTxId(),
-//                signedProposal, proposal, scIdBuilder);
-//
-//        ProposalResponsePackage.Response response = (ProposalResponsePackage.Response) objs[0];
-//        byte[] simulateResults = (byte[]) simulateObjs[1];
-//        ISmartContractDefinition scDefinition = (ISmartContractDefinition) simulateObjs[2];
-//        SmartContractEventPackage.SmartContractEvent scEvent = (SmartContractEventPackage.SmartContractEvent)
-//                simulateObjs[3];
-//
-//
-//
-//        if (response.getStatus() != Common.Status.SUCCESS_VALUE) {
-//            //TODO:是否要封装错误消息
-//            return buildErrorResponse("simulateProposal fail");
-//        }
+        Object[] simulateObjs = simulateProposal(groupHeader.getGroupId(), scName, groupHeader.getTxId(),
+                signedProposal, proposal, scIdBuilder);
+
+        ProposalResponsePackage.Response response = (ProposalResponsePackage.Response) objs[0];
+        byte[] simulateResults = (byte[]) simulateObjs[1];
+        ISmartContractDefinition scDefinition = (ISmartContractDefinition) simulateObjs[2];
+        SmartContractEventPackage.SmartContractEvent scEvent = (SmartContractEventPackage.SmartContractEvent)
+                simulateObjs[3];
+
+
+
+        if (response.getStatus() != Common.Status.SUCCESS_VALUE) {
+            //TODO:是否要封装错误消息
+            return buildErrorResponse("simulateProposal fail");
+        }
 
         //TODO:为测试所写的方法
-        ProposalResponsePackage.Response response = ProposalResponsePackage.Response.newBuilder().
-                setStatus(200).setMessage("OK").setPayload(ByteString.copyFromUtf8("payload")).build();
-        SmartContractEventPackage.SmartContractEvent event = SmartContractEventPackage.SmartContractEvent.newBuilder
-                ().build();
-        byte[] simulateResults = new byte[]{0, 1, 2};
-        byte[] visibility = new byte[]{3, 4, 5};
-        ISmartContractDefinition smartContractDefinition = new MockSmartContractDefinition();
-
-        ProposalResponsePackage.Response esscResponse = endorseProposal(groupHeader.getGroupId(), groupHeader.getTxId(),
-                signedProposal,
-                proposal, scIdBuilder, response, simulateResults, event, visibility,
-                smartContractDefinition);
-        return ProposalResponseUtils.buildProposalResponse(esscResponse.getPayload());
+//        ProposalResponsePackage.Response response = ProposalResponsePackage.Response.newBuilder().
+//                setStatus(200).setMessage("OK").setPayload(ByteString.copyFromUtf8("payload")).build();
+//        SmartContractEventPackage.SmartContractEvent event = SmartContractEventPackage.SmartContractEvent.newBuilder
+//                ().build();
+//        byte[] simulateResults = new byte[]{0, 1, 2};
+//        byte[] visibility = new byte[]{3, 4, 5};
+//        ISmartContractDefinition smartContractDefinition = new MockSmartContractDefinition();
+//
+//        ProposalResponsePackage.Response esscResponse = endorseProposal(groupHeader.getGroupId(), groupHeader.getTxId(),
+//                signedProposal,
+//                proposal, scIdBuilder, response, simulateResults, event, visibility,
+//                smartContractDefinition);
+//        return ProposalResponseUtils.buildProposalResponse(esscResponse.getPayload());
 
         //无合约提案不需要背书，例如cssc
-//        if (StringUtils.isBlank(scName)) {
-//            return ProposalResponseUtils.buildProposalResponse(response.getPayload());
-//        } else {
-//            ProposalResponsePackage.Response response1 = endorseProposal(groupHeader.getGroupId(), groupHeader.getTxId(), signedProposal, proposal, scIdBuilder,
-//                    response, simulateResults, scEvent, extension.getPayloadVisibility().toByteArray(), scDefinition);
-//            return ProposalResponseUtils.buildProposalResponse(response1.getPayload());
-//        }
+        if (StringUtils.isBlank(scName)) {
+            return ProposalResponseUtils.buildProposalResponse(response.getPayload());
+        } else {
+            ProposalResponsePackage.Response response1 = endorseProposal(groupHeader.getGroupId(), groupHeader.getTxId(), signedProposal, proposal, scIdBuilder,
+                    response, simulateResults, scEvent, extension.getPayloadVisibility().toByteArray(), scDefinition);
+            return ProposalResponseUtils.buildProposalResponse(response1.getPayload());
+        }
     }
 
     /**

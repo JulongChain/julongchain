@@ -24,6 +24,7 @@ import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.core.ledger.customtx.IProcessor;
+import org.bcia.javachain.core.node.util.ConfigTxUtils;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 
@@ -74,6 +75,14 @@ public class ConfigtxProcessor implements IProcessor {
         }
     }
 
+    /**
+     * 处理群组配置交易
+     *
+     * @param groupId
+     * @param txEnvelope
+     * @param simulator
+     * @throws LedgerException
+     */
     private void processGroupConfigTx(String groupId, Common.Envelope txEnvelope, ITxSimulator simulator) throws
             LedgerException {
         try {
@@ -83,7 +92,14 @@ public class ConfigtxProcessor implements IProcessor {
 
             persistConfig(simulator, GROUP_CONFIG_KEY, groupConfig);
 
+            boolean resourceConfigCapabilityOn = ConfigTxUtils.isResourceConfigCapabilityOn(groupId, groupConfig);
+            Configtx.Config resourcesConfigSeed = ConfigTxUtils.getConfigFromSeedTx(configEnvelope);
 
+            if (groupConfig.getSequence() == 1L && resourceConfigCapabilityOn) {
+                ValidateUtils.isNotNull(resourcesConfigSeed, "resourcesConfigSeed can not be null");
+
+                persistConfig(simulator, RESOURCES_CONFIG_KEY, resourcesConfigSeed);
+            }
         } catch (InvalidProtocolBufferException e) {
             log.error(e.getMessage(), e);
             throw new LedgerException(e);
@@ -91,15 +107,45 @@ public class ConfigtxProcessor implements IProcessor {
             log.error(e.getMessage(), e);
             throw new LedgerException(e);
         }
-
     }
 
 
     private void processResourceConfigTx(String groupId, Common.Envelope txEnvelope, ITxSimulator simulator, boolean
-            initializingLedger) {
+            initializingLedger) throws LedgerException {
+        if (initializingLedger) {
+            try {
+                Configtx.Config existingResourcesConfig = retrievePersistedConfig(simulator, RESOURCES_CONFIG_KEY);
+                Configtx.Config existingGroupConfig = retrievePersistedConfig(simulator, GROUP_CONFIG_KEY);
+
+                ValidateUtils.isNotNull(existingResourcesConfig, "existingResourcesConfig can not be null");
+                ValidateUtils.isNotNull(existingGroupConfig, "existingGroupConfig can not be null");
+
+                //TODO:要完成群组配置和资源配置
+
+            } catch (InvalidProtocolBufferException e) {
+                log.error(e.getMessage(), e);
+                throw new LedgerException(e);
+            } catch (ValidateException e) {
+                log.error(e.getMessage(), e);
+                throw new LedgerException(e);
+            }
+        }else{
+
+        }
     }
 
     private void persistConfig(ITxSimulator simulator, String key, Configtx.Config groupConfig) throws LedgerException {
         simulator.setState(NODE_NAMESPACE, key, groupConfig.toByteArray());
+    }
+
+    private Configtx.Config retrievePersistedConfig(ITxSimulator simulator, String key) throws LedgerException,
+            InvalidProtocolBufferException {
+        byte[] serializedConfig = simulator.getState(NODE_NAMESPACE, key);
+
+        if (serializedConfig == null) {
+            return null;
+        } else {
+            return Configtx.Config.parseFrom(serializedConfig);
+        }
     }
 }

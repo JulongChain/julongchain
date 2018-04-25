@@ -15,6 +15,15 @@
  */
 package org.bcia.javachain.core.node.util;
 
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.util.ValidateUtils;
+import org.bcia.javachain.common.util.proto.EnvelopeHelper;
+import org.bcia.javachain.protos.common.Configtx;
+
+import java.util.Map;
+
 /**
  * 对象
  *
@@ -23,4 +32,30 @@ package org.bcia.javachain.core.node.util;
  * @company Dingxuan
  */
 public class ConfigTxUtils {
+    private static final String RESOURCE_CONFIG_SEED_DATA = "resource_config_seed_data";
+
+    public static boolean isResourceConfigCapabilityOn(String groupId, Configtx.Config groupConfig) {
+        //TODO
+
+        return true;
+    }
+
+    public static Configtx.Config getConfigFromSeedTx(Configtx.ConfigEnvelope configEnvelope) throws
+            InvalidProtocolBufferException, ValidateException {
+        if (configEnvelope == null || configEnvelope.getLastUpdate() == null) {
+            return null;
+        }
+
+        Configtx.ConfigUpdateEnvelope configUpdateEnvelope = EnvelopeHelper.getConfigUpdateEnvelopeFrom
+                (configEnvelope.getLastUpdate());
+        ValidateUtils.isNotNull(configUpdateEnvelope.getConfigUpdate(), "configUpdate can not be null");
+        Configtx.ConfigUpdate configUpdate = Configtx.ConfigUpdate.parseFrom(configUpdateEnvelope.getConfigUpdate());
+
+        Map<String, ByteString> isolatedDataMap = configUpdate.getIsolatedDataMap();
+        if (isolatedDataMap == null || !isolatedDataMap.containsKey(RESOURCE_CONFIG_SEED_DATA)) {
+            return null;
+        }
+
+        return Configtx.Config.parseFrom(isolatedDataMap.get(RESOURCE_CONFIG_SEED_DATA));
+    }
 }
