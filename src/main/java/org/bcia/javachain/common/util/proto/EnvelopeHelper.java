@@ -22,6 +22,7 @@ import com.google.protobuf.Timestamp;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.config.ApplicationConfig;
@@ -528,5 +529,21 @@ public class EnvelopeHelper {
         //完成秒和纳秒（即10亿分之一秒）的设置
         return Timestamp.newBuilder().setSeconds(millis / 1000)
                 .setNanos((int) ((millis % 1000) * 1000000)).build();
+    }
+
+    /**
+     *
+     * @param envelopeConfig
+     * @param config
+     * @param configEnv
+     * @return
+     * @throws JavaChainException
+     */
+    public static Common.GroupHeader unmarshalEnvelopeOfType(Common.Envelope envelopeConfig,
+                                                             Common.HeaderType config,
+                                                             Configtx.ConfigEnvelope configEnv)
+                                                             throws JavaChainException
+    {
+        return null;
     }
 }

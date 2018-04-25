@@ -17,24 +17,31 @@ package org.bcia.javachain.core.ssc.cssc;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.apache.commons.lang3.BooleanUtils;
 import org.bcia.javachain.common.config.IConfig;
 import org.bcia.javachain.common.config.IConfigManager;
+import org.bcia.javachain.common.exception.EventException;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.SysSmartContractException;
+import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.proto.BlockUtils;
+import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
 import org.bcia.javachain.core.aclmgmt.resources.Resources;
 import org.bcia.javachain.core.node.ConfigFactory;
+import org.bcia.javachain.core.node.util.NodeUtils;
 import org.bcia.javachain.core.policy.IPolicyChecker;
 import org.bcia.javachain.core.policy.PolicyFactory;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
+import org.bcia.javachain.events.producer.BlockEvents;
+import org.bcia.javachain.events.producer.EventHelper;
 import org.bcia.javachain.msp.mgmt.Principal;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.ResourcesPackage;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -188,29 +195,112 @@ public class CSSC extends SystemSmartContractBase {
         return description;
     }
 
-    //validateConfigBlock validate configuration block to see whenever it contains valid config transaction
+    /**
+     * validateConfigBlock validate configuration block to see whenever it contains valid config transaction
+     * @param block
+     * @throws SysSmartContractException
+     */
     private void validateConfigBlock(Common.Block block)throws SysSmartContractException{
+        Common.Envelope envelopeConfig =null;
+        try {
+            envelopeConfig = BlockUtils.extractEnvelope(block, 0);
+        } catch (JavaChainException e) {
+            String msg=String.format("Failed to %s",e.getMessage());
+            throw new SysSmartContractException(msg);
+        }
+        Configtx.ConfigEnvelope configEnv = Configtx.ConfigEnvelope.newBuilder().build();
+        Common.GroupHeader header=null;
+        try {
+            header=EnvelopeHelper.unmarshalEnvelopeOfType(envelopeConfig,Common.HeaderType.CONFIG,configEnv);
+        } catch (JavaChainException e) {
+            String msg=String.format("Bad configuration envelope: %s",e.getMessage());
+            throw new SysSmartContractException(msg);
+        }
+        if(configEnv.getConfig().getGroupTree()==null){
+            String msg=String.format("Nil config tree");
+            throw new SysSmartContractException(msg);
+        }
+        if(configEnv.getConfig().getGroupTree().getChildsMap()==null){
+            String msg=String.format("No child map of config tree  are available");
+            throw new SysSmartContractException(msg);
+        }
 
+        if(configEnv.getConfig().getGroupTree().getChildsMap().get(GroupConfigConstant.APPLICATION)==null){
+            String msg=String.format("Invalid configuration block, missing %s "+
+                    "configuration map",GroupConfigConstant.APPLICATION);
+            throw new SysSmartContractException(msg);
+        }
     }
 
-    // joinChain will join the specified chain in the configuration block.
-    // Since it is the first block, it is the genesis block containing configuration
-    // for this chain, so we want to update the Chain object with this info
+    /**
+     * joinGroup will join the specified group in the configuration block.
+     * Since it is the first block, it is the genesis block containing configuration
+     * for this group, so we want to update the group object with this info
+     * @param groupID
+     * @param block
+     * @return
+     */
     private SmartContractResponse joinGroup(String groupID, Common.Block block){
-
-        return null;
+        try {
+            NodeUtils.createChainFromBlock(block);
+        } catch (JavaChainException e) {
+            return newErrorResponse(e.getMessage());
+        }
+        NodeUtils.initChain(groupID);
+        BlockEvents events=null;
+        boolean bCreated=false;
+        try {
+            events=EventHelper.createBlockEvents(block);
+            bCreated=true;
+            EventHelper.send(events);
+        } catch (EventException e) {
+            String msg="";
+            if(bCreated) {
+                msg = String.format("Error processing block events for block number [%d]: %s",
+                        block.getHeader().getNumber(), e.getMessage());
+                log.error(msg);
+            }
+            else{
+                msg = String.format("Group [%s] Error sending block event for block number [%d]: %s",
+                        groupID,block.getHeader().getNumber(), e.getMessage());
+                log.error(msg);
+            }
+        }
+        return newSuccessResponse();
     }
 
-    // Return the current configuration block for the specified chainID. If the
-    // peer doesn't belong to the chain, return error
+    /**
+     * Return the current configuration block for the specified chainID. If the
+     * peer doesn't belong to the chain, return error
+     * @param groupID
+     * @return
+     */
     private SmartContractResponse getConfigBlock(String groupID){
-
-        return null;
+        Common.Block block =NodeUtils.getCurrentConfigBlock(groupID);
+        if(block==null){
+            String msg=String.format("Unknown group ID,%s",groupID);
+            return newErrorResponse(msg);
+        }
+        byte[] blockBytes = block.toByteArray();
+        return newSuccessResponse(blockBytes);
     }
 
-    // getConfigTree returns the current channel and resources configuration for the specified chainID.
-    // If the peer doesn't belong to the chain, returns error
+    /**
+     * getConfigTree returns the current channel and resources configuration for the specified chainID.
+     * If the peer doesn't belong to the chain, returns error
+     * @param groupID
+     * @return
+     */
     private SmartContractResponse getConfigTree(String groupID){
+        Configtx.Config groupConfig = configManager.getGroupConfig(groupID).getCurrentConfig();
+        if(groupConfig==null){
+            return newErrorResponse(String.format("Unknown group ID,%s",groupID));
+        }
+        Configtx.Config resourceConfig=configManager.getResourceConfig(groupID).getCurrentConfig();
+        if(resourceConfig==null){
+            return newErrorResponse(String.format("Unknown group ID,%s",groupID));
+        }
+        ResourcesPackage.ConfigTree.Builder builder = ResourcesPackage.ConfigTree.newBuilder();
 
         return null;
     }
