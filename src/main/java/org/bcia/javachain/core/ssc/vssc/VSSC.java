@@ -132,8 +132,7 @@ public class VSSC extends SystemSmartContractBase {
         }
         IApplicationConfig ac = this.sscProvider.getApplicationConfig(groupHeader.getGroupId());
 
-        GlobalMspManagement mgmt=new GlobalMspManagement();
-        IMspManager manager=mgmt.getManagerForChain(groupHeader.getGroupId());
+        IMspManager manager=GlobalMspManagement.getManagerForChain(groupHeader.getGroupId());
         PolicyProvider policyProvider=new PolicyProvider(manager);
         IPolicy policy = policyProvider.newPolicy(policyBytes);
 
