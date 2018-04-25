@@ -16,18 +16,16 @@
 package org.bcia.javachain.common.resourceconfig.config;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.cauthdsl.PolicyProvider;
 import org.bcia.javachain.common.configtx.IValidator;
 import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.exception.ValidateException;
-import org.bcia.javachain.common.groupconfig.IConfigResources;
+import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.javachain.common.policies.IPolicyManager;
 import org.bcia.javachain.common.policies.IPolicyProvider;
 import org.bcia.javachain.common.policies.PolicyManager;
 import org.bcia.javachain.common.policies.PolicyRouter;
 import org.bcia.javachain.common.resourceconfig.ResourceConfigConstant;
 import org.bcia.javachain.protos.common.Configtx;
-import org.bcia.javachain.protos.common.Policies;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -48,7 +46,7 @@ public class ResourcesConfig {
 
     private String groupId;
     private Configtx.Config config;
-    private IConfigResources configResources;
+    private IGroupConfigBundle configResources;
     private IValidator validator;
     private PolicyRouter policyRouter;
 
@@ -59,7 +57,7 @@ public class ResourcesConfig {
 
     private List<Callback> callbackList;
 
-    public ResourcesConfig(String groupId, Configtx.Config config, IConfigResources configResources, List<Callback>
+    public ResourcesConfig(String groupId, Configtx.Config config, IGroupConfigBundle configResources, List<Callback>
             callbackList) throws InvalidProtocolBufferException, ValidateException, PolicyException {
         this.groupId = groupId;
         this.config = config;
@@ -89,6 +87,8 @@ public class ResourcesConfig {
         IPolicyManager resourcesPolicyManager = new PolicyManager(ResourceConfigConstant.RESOURCES,
                 policyProviderMap, config.getGroupTree());
         IPolicyManager groupPolicyManager = configResources.getPolicyManager();
+
+
 
 
 
