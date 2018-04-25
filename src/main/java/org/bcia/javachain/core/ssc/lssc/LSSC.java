@@ -601,6 +601,10 @@ public class LSSC  extends SystemSmartContractBase {
         } catch (JavaChainException e) {
             throw new SysSmartContractException(e.getMessage());
         }
+        if(scPack==null){
+            String message="Get Null SC package";
+            throw new SysSmartContractException(message);
+        }
 
         Smartcontract.SmartContractDeploymentSpec scds = scPack.getDepSpec();
         if(scds==null){

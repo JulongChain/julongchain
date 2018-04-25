@@ -16,6 +16,7 @@
 package org.bcia.javachain.core.ssc.qssc;
 
 import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
@@ -95,8 +96,10 @@ public class QSSC extends SystemSmartContractBase {
 
         // 2. check the channel reader policy
         String res=getACLResource(function);
-        if(AclManagement.getACLProvider().checkACL(function,groupID,sp)==false){
-            newErrorResponse(String.format("Authorization request for [%s][%s] failed",function,groupID));
+        try{
+            AclManagement.getACLProvider().checkACL(function,groupID,sp);
+        }catch(JavaChainException e){
+            newErrorResponse(String.format("Authorization request for [%s][%s] failed:%s",function,groupID,e.getMessage()));
         }
 
         byte[] arg2=args.get(2);

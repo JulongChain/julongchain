@@ -26,8 +26,8 @@ import org.bcia.javachain.protos.node.ProposalPackage;
  */
 public class MockAclProvider implements IAclProvider {
     @Override
-    public boolean checkACL(String resName, String groupID, ProposalPackage.SignedProposal idinfo) {
-        return false;
+    public void checkACL(String resName, String groupID, ProposalPackage.SignedProposal idinfo) {
+
     }
 
     public void reset(){

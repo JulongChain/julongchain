@@ -21,6 +21,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.bcia.javachain.common.config.IConfig;
 import org.bcia.javachain.common.config.IConfigManager;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.SysSmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.proto.BlockUtils;
@@ -127,8 +128,10 @@ public class CSSC extends SystemSmartContractBase {
                 } catch (JavaChainException e) {
                     return newErrorResponse(String.format("\"JoinGroup\" request failed to extract group id from the block due to [%s]",e.getMessage()));
                 }
-                if(validateConfigBlock(block)==false){
-                    return newErrorResponse(String.format("\"JoinGroup\" request failed because of validation of configuration block"));
+                try{
+                    validateConfigBlock(block);
+                }catch (SysSmartContractException e) {
+                    return newErrorResponse(String.format("\"JoinGroup\" request failed because of validation of configuration block:%s",e.getMessage()));
                 }
                 // 2. check local MSP Admins policy
                 try {
@@ -141,20 +144,26 @@ public class CSSC extends SystemSmartContractBase {
             case GET_CONFIG_BLOCK:
                 // 2. check policy
                 String groupName=ByteString.copyFrom(args.get(1)).toStringUtf8();
-                if(AclManagement.getACLProvider().checkACL(Resources.CSSC_GetConfigBlock,groupName,sp)==false){
-                    return newErrorResponse(String.format("\"GET_CONFIG_BLOCK\" Authorization request failed %s: %s",groupName,Resources.CSSC_GetConfigBlock));
+                try {
+                    AclManagement.getACLProvider().checkACL(Resources.CSSC_GetConfigBlock, groupName, sp);
+                }catch(JavaChainException e){
+                    return newErrorResponse(String.format("\"GET_CONFIG_BLOCK\" Authorization request failed %s: %s",groupName,e.getMessage()));
                 }
                 return getConfigBlock(groupName);
             case GET_CONFIG_TREE:
                 String groupName2=ByteString.copyFrom(args.get(1)).toStringUtf8();
-                if(AclManagement.getACLProvider().checkACL(Resources.CSSC_GetConfigTree,groupName2,sp)==false){
-                    return newErrorResponse(String.format("\"GET_CONFIG_TREE\" Authorization request failed %s: %s",groupName2,Resources.CSSC_GetConfigTree));
+                try {
+                    AclManagement.getACLProvider().checkACL(Resources.CSSC_GetConfigTree, groupName2, sp);
+                }catch(JavaChainException e){
+                    return newErrorResponse(String.format("\"GET_CONFIG_TREE\" Authorization request failed %s: %s",groupName2,e.getMessage()));
                 }
                 return getConfigTree(groupName2);
             case SIMULATE_CONFIG_TREE_UPDATE:
                 String groupName3=ByteString.copyFrom(args.get(1)).toStringUtf8();
-                if(AclManagement.getACLProvider().checkACL(Resources.CSSC_SimulateConfigTreeUpdate,groupName3,sp)==false){
-                    return newErrorResponse(String.format("\"GET_CONFIG_TREE\" Authorization request failed %s: %s",groupName3,Resources.CSSC_SimulateConfigTreeUpdate));
+                try {
+                    AclManagement.getACLProvider().checkACL(Resources.CSSC_SimulateConfigTreeUpdate, groupName3, sp);
+                }catch(JavaChainException e){
+                    return newErrorResponse(String.format("\"SIMULATE_CONFIG_TREE_UPDATE\" Authorization request failed %s: %s",groupName3,e.getMessage()));
                 }
                 return simulateConfigTreeUpdate(groupName3,args.get(2));
             case GET_GROUPS:
@@ -175,30 +184,34 @@ public class CSSC extends SystemSmartContractBase {
 
     @Override
     public String getSmartContractStrDescription() {
-        return "与配置相关的系统智能合约";
+        String description="与配置相关的系统智能合约";
+        return description;
     }
 
-    //validateConfigBlock validate configuration block to see whenever it's contains valid config transaction
-    private boolean validateConfigBlock(Common.Block block){
-        return true;
+    //validateConfigBlock validate configuration block to see whenever it contains valid config transaction
+    private void validateConfigBlock(Common.Block block)throws SysSmartContractException{
+
     }
 
     // joinChain will join the specified chain in the configuration block.
     // Since it is the first block, it is the genesis block containing configuration
     // for this chain, so we want to update the Chain object with this info
     private SmartContractResponse joinGroup(String groupID, Common.Block block){
+
         return null;
     }
 
     // Return the current configuration block for the specified chainID. If the
     // peer doesn't belong to the chain, return error
     private SmartContractResponse getConfigBlock(String groupID){
+
         return null;
     }
 
     // getConfigTree returns the current channel and resources configuration for the specified chainID.
     // If the peer doesn't belong to the chain, returns error
     private SmartContractResponse getConfigTree(String groupID){
+
         return null;
     }
 
