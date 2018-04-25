@@ -16,11 +16,37 @@
 package org.bcia.javachain.common.util.proto;
 
 /**
- * 类描述
+ * SignedData is used to represent the general triplet required to verify a signature
+* This is intended to be generic across crypto schemes, while most crypto schemes will
+* include the signing identity and a nonce within the Data, this is left to the crypto
+* implementation
  *
  * @author sunianle
  * @date 3/21/18
  * @company Dingxuan
  */
 public class SignedData {
+    private byte[] data;
+    private byte[] identity;
+    private byte[] signature;
+
+    public SignedData(byte[] data, byte[] identity, byte[] signature) {
+        this.data = data;
+        this.identity = identity;
+        this.signature = signature;
+    }
+
+    public byte[] getData() {
+        return data;
+    }
+
+    public byte[] getIdentity() {
+        return identity;
+    }
+
+    public byte[] getSignature() {
+        return signature;
+    }
+
+
 }

@@ -15,16 +15,21 @@
  */
 package org.bcia.javachain.core.ssc.lssc;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.cauthdsl.CAuthDslBuilder;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.exception.SysSmartContractException;
+import org.bcia.javachain.common.policies.IPolicy;
 import org.bcia.javachain.common.policies.IPolicyProvider;
+import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.core.common.smartcontractprovider.ISmartContractPackage;
 import org.bcia.javachain.core.common.smartcontractprovider.SignedSDSPackage;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractProvider;
 import org.bcia.javachain.core.node.NodeTool;
 import org.bcia.javachain.msp.IMspManager;
 import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
+import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Policies;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.Query;
@@ -121,5 +126,35 @@ public class LsscSupport {
             throw new SysSmartContractException(msg);
         }
         IPolicyProvider policyProvider=CAuthDslBuilder.createPolicyProvider(mspManager);
+        IPolicy policy =null;
+        try {
+            policy = policyProvider.makePolicy(instantiationPolicy);
+        } catch (PolicyException e) {
+            throw new SysSmartContractException(e.getMessage());
+        }
+
+        ProposalPackage.Proposal proposal =null;
+        Common.Header header=null;
+        Common.SignatureHeader shdr=null;
+        try {
+            proposal=ProposalPackage.Proposal.parseFrom(signedProposal.getProposalBytes());
+            header = Common.Header.parseFrom(proposal.getHeader());
+            shdr=Common.SignatureHeader.parseFrom(header.getSignatureHeader());
+        } catch (InvalidProtocolBufferException e) {
+            throw new SysSmartContractException(e.getMessage());
+        }
+
+        SignedData signedData=new SignedData(signedProposal.getProposalBytes().toByteArray(),
+                                             shdr.getCreator().toByteArray(),
+                                             signedProposal.getSignature().toByteArray());
+        SignedData[] datas=new SignedData[1];
+        datas[0]=signedData;
+        try {
+            policy.evaluate(datas);
+        } catch (PolicyException e) {
+            String msg=String.format("instantiation policy violation:%s",e.getMessage());
+            throw new SysSmartContractException(msg);
+        }
+
     }
 }
