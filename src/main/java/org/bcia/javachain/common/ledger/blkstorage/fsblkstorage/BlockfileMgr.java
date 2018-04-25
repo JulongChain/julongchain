@@ -117,7 +117,7 @@ public class BlockfileMgr {
         String filePath = deriveBlockfilePath(rootDir, cpInfo.getLastestFileChunkSuffixNum());
         long size = IoUtil.fileExists(filePath);
         logger.debug(String.format("Status of file [%s]: exists=[%s], size=[%d]", filePath, size < 0, size));
-        if(size < 0 || size == cpInfo.getLastBlockNumber()){
+        if(size < 0 || size == cpInfo.getLatestFileChunksize()){
             return;
         }
 

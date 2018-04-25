@@ -28,6 +28,8 @@ import org.bcia.javachain.protos.common.Common;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
+
 /**
  * 类描述
  *
@@ -44,12 +46,14 @@ public class TxSimulatorTest {
 
     @Test
     public void test() throws LedgerException {
-        DB db = CommonStorageDB.newCommonStorageDB(new VersionLevelDB(LevelDbProvider.newProvider("/home/bcia/test"), "test"), "test");
-        LockBasedTxManager mgr = LockBasedTxManager.newLockBasedTxMgr("test", db, null);
-        simulator = LockBasedTxSimulator.newLockBasedTxSimulator(mgr, "test");
-        String ns = "ns";
-        String key = "key";
-        byte[] value = "value".getBytes();
-        simulator.setState(ns, key, value);
+//        DB db = CommonStorageDB.newCommonStorageDB(new VersionLevelDB(LevelDbProvider.newProvider("/home/bcia/test"), "test"), "test");
+//        LockBasedTxManager mgr = LockBasedTxManager.newLockBasedTxMgr("test", db, null);
+//        simulator = LockBasedTxSimulator.newLockBasedTxSimulator(mgr, "test");
+//        String ns = "ns";
+//        String key = "key";
+//        byte[] value = "value".getBytes();
+//        simulator.setState(ns, key, value);
+        long fileSize = new File("/home/asdad.position").length();
+        System.out.println(fileSize);
     }
 }
