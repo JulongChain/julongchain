@@ -98,7 +98,7 @@ public class MSPConfigHandler {
             mspArray[i++] = pendingMSPConfig.getMsp();
         }
 
-        IMspManager mspManager = new GlobalMspManagement();
+        IMspManager mspManager = (IMspManager) new GlobalMspManagement();
         mspManager.setup(mspArray);
         return mspManager;
     }
