@@ -63,6 +63,7 @@ public class LedgerManagerTest {
                         .build())
                 .build();
         l = LedgerManager.createLedger(block);
+        l.newTxSimulator("testGroup");
     }
 
     @Test
