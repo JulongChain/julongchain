@@ -18,6 +18,7 @@ package org.bcia.javachain.common.configtx;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.policies.IPolicyManager;
+import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 
@@ -49,9 +50,8 @@ public class Validator implements IValidator {
         this.namespace = namespace;
         this.policyManager = policyManager;
 
-        if (config == null || config.getGroupTree() == null) {
-            throw new ValidateException("Config or config.tree can not be null");
-        }
+        ValidateUtils.isNotNull(config, "config can not be null");
+        ValidateUtils.isNotNull(config.getGroupTree(), "config.tree can not be null");
 
         validateGroupId(groupId);
 

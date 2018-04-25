@@ -137,7 +137,11 @@ public class NodeGroup {
                 log.info("Deliver onNext");
                 if (value.hasBlock()) {
                     Common.Block block = value.getBlock();
-                    FileUtils.writeFileBytes(groupId + ".block", block.toByteArray());
+                    try {
+                        FileUtils.writeFileBytes(groupId + ".block", block.toByteArray());
+                    } catch (IOException e) {
+                        log.error(e.getMessage(), e);
+                    }
                 } else {
                     log.info("Deliver status:" + value.getStatus().getNumber());
                 }

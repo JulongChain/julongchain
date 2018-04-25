@@ -16,6 +16,7 @@
 package org.bcia.javachain.core.endorser;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.exception.SmartContractException;
@@ -175,7 +176,11 @@ public class EndorserSupport implements IEndorserSupport {
     public void checkACL(ProposalPackage.SignedProposal signedProposal, Common.GroupHeader groupHeader, Common
             .SignatureHeader signatureHeader, ProposalPackage.SmartContractHeaderExtension extension) {
         //TODO：有些参数未使用?
-        AclManagement.getACLProvider().checkACL(null, groupHeader.getGroupId(), signedProposal);
+        try {
+            AclManagement.getACLProvider().checkACL(null, groupHeader.getGroupId(), signedProposal);
+        } catch (JavaChainException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.node.entity;
 
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
@@ -24,6 +25,7 @@ import org.bcia.javachain.core.endorser.Endorser;
 import org.bcia.javachain.core.events.DeliverEventsServer;
 import org.bcia.javachain.core.events.EventGrpcServer;
 import org.bcia.javachain.core.events.EventHubServer;
+import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.core.node.NodeGrpcServer;
 import org.bcia.javachain.core.ssc.ISystemSmartContractManager;
 import org.bcia.javachain.core.ssc.SystemSmartContractManager;
@@ -81,6 +83,11 @@ public class NodeServer {
         //初始化账本
 //        LedgerMgmt.initialize();
 //        ledgermgmt.Initialize(peer.ConfigTxProcessors)
+        try {
+            LedgerManager.initialize(null);
+        } catch (LedgerException e) {
+            e.printStackTrace();
+        }
 
 
         String nodeEndpoint = null;

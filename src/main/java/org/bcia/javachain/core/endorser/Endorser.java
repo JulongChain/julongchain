@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.core.endorser;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -123,7 +124,8 @@ public class Endorser implements IEndorserServer {
 //        }
 
         //TODO:为测试所写的方法
-        ProposalResponsePackage.Response response = ProposalResponsePackage.Response.newBuilder().build();
+        ProposalResponsePackage.Response response = ProposalResponsePackage.Response.newBuilder().
+                setStatus(200).setMessage("OK").setPayload(ByteString.copyFromUtf8("payload")).build();
         SmartContractEventPackage.SmartContractEvent event = SmartContractEventPackage.SmartContractEvent.newBuilder
                 ().build();
         byte[] simulateResults = new byte[]{0, 1, 2};

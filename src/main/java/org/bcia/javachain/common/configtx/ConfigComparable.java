@@ -28,10 +28,16 @@ import java.util.Objects;
  * @date 2018/4/24
  * @company Dingxuan
  */
-public class Comparable<T> {
+public class ConfigComparable<T> {
     private String key;
     private String[] path;
     private T t;
+
+    public ConfigComparable(String key, String[] path, T t) {
+        this.key = key;
+        this.path = path;
+        this.t = t;
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -39,11 +45,11 @@ public class Comparable<T> {
             return true;
         }
 
-        if (obj == null || !(obj instanceof Comparable)) {
+        if (obj == null || !(obj instanceof ConfigComparable)) {
             return false;
         }
 
-        Comparable<T> other = (Comparable<T>) obj;
+        ConfigComparable<T> other = (ConfigComparable<T>) obj;
         T otherT = other.getT();
         if (t instanceof Configtx.ConfigTree && otherT instanceof Configtx.ConfigTree) {
             return equalConfigTree((Configtx.ConfigTree) t, (Configtx.ConfigTree) otherT);

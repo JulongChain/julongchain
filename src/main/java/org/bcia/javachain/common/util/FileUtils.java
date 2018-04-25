@@ -64,18 +64,21 @@ public class FileUtils {
 
     /**
      * 将字节数组写入文件
+     *
      * @param filePath
      * @param bytes
      */
-    public static void writeFileBytes(String filePath, byte[] bytes) {
+    public static void writeFileBytes(String filePath, byte[] bytes) throws IOException {
         OutputStream os = null;
         try {
             os = new FileOutputStream(filePath);
             os.write(bytes);
         } catch (FileNotFoundException e) {
             log.error(e.getMessage(), e);
+            throw e;
         } catch (IOException e) {
             log.error(e.getMessage(), e);
+            throw e;
         } finally {
             if (os != null) {
                 try {
@@ -87,6 +90,12 @@ public class FileUtils {
         }
     }
 
+    /**
+     * 判断文件路径是否存在
+     *
+     * @param filePath
+     * @return
+     */
     public static boolean isExists(String filePath) {
         File file = new File(filePath);
         return file.exists();
