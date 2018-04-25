@@ -13,21 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.aclmgmt;
-
-import org.bcia.javachain.common.exception.JavaChainException;
-import org.bcia.javachain.protos.node.ProposalPackage;
+package org.bcia.javachain.core.node.util;
 
 /**
- * 类描述
+ * 对象
  *
- * @author sunianle
- * @date 3/14/18
+ * @author zhouhui
+ * @date 2018/4/25
  * @company Dingxuan
  */
-public class AclProvider implements IAclProvider{
-    @Override
-    public void checkACL(String resName, String groupID, ProposalPackage.SignedProposal idinfo) throws JavaChainException{
-
-    }
+public class ConfigTxUtils {
 }

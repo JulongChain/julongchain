@@ -19,20 +19,15 @@ import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.common.util.FileUtils;
-import org.bcia.javachain.core.node.NodeConfig;
-import org.bcia.javachain.core.node.NodeConfigFactory;
 import org.bcia.javachain.csp.factory.IFactoryOpts;
 import org.bcia.javachain.csp.gm.GmFactoryOpts;
-import org.bcia.javachain.msp.mgmt.MspManager;
+import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.msp.mspconfig.MspConfig;
 import org.bcia.javachain.node.cmd.INodeCmd;
 import org.bcia.javachain.node.cmd.factory.NodeCmdFactory;
 import org.bcia.javachain.node.util.NodeConstant;
 import org.springframework.stereotype.Component;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -144,7 +139,7 @@ public class Node {
             //new GmCspConfig(symmetrickey,asymmetric,hash,sign,publicKeyPath,privateKeyPath);
             optsList.add(new GmFactoryOpts(symmetrickey, asymmetric, hash, sign, publicKeyPath, privateKeyPath));
 
-            MspManager.loadLocalMspWithType(mspConfigDir, optsList, mspId, mspType);
+            GlobalMspManagement.loadLocalMspWithType(mspConfigDir, optsList, mspId, mspType);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new NodeException(e);

@@ -2,9 +2,6 @@ package org.bcia.javachain.common.localmsp.impl;
 
 import org.junit.Test;
 
-import static org.bcia.javachain.msp.mgmt.MspManager.getLocalMsp;
-import static org.junit.Assert.*;
-
 /**
  * @author zhangmingyang
  * @Date: 2018/4/18

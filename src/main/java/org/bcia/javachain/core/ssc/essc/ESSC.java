@@ -23,7 +23,7 @@ import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
 import org.bcia.javachain.msp.IMsp;
 import org.bcia.javachain.msp.ISigningIdentity;
-import org.bcia.javachain.msp.mgmt.MspManager;
+import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.springframework.stereotype.Component;
@@ -154,7 +154,7 @@ public class ESSC extends SystemSmartContractBase {
         }
 
         // obtain the default signing identity for this peer; it will be used to sign this proposal response
-        IMsp localMSP = MspManager.getLocalMsp();
+        IMsp localMSP = GlobalMspManagement.getLocalMsp();
         if(localMSP==null){
             return newErrorResponse("Local MSP is empty");
         }

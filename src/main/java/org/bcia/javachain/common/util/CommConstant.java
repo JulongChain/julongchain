@@ -68,4 +68,11 @@ public class CommConstant {
      * 升级
      */
     public static final String UPGRADE = "upgrade";
+
+    /**
+     * 路径分隔符
+     */
+    public static final String PATH_SEPARATOR = "/";
+
+
 }

@@ -39,17 +39,24 @@ import org.bcia.javachain.core.node.NodeTool;
 import org.bcia.javachain.core.policy.IPolicyChecker;
 import org.bcia.javachain.core.policy.PolicyFactory;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
+import org.bcia.javachain.core.smartcontract.shim.ledger.IKeyValue;
+import org.bcia.javachain.core.smartcontract.shim.ledger.IQueryResultsIterator;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
 import org.bcia.javachain.msp.mgmt.Principal;
 import org.bcia.javachain.protos.common.Collection;
 import org.bcia.javachain.protos.common.Policies;
 import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.Query;
 import org.bcia.javachain.protos.node.SmartContractDataPackage;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 用于智能合约生命周期管理的系统智能合约　Lifecycle System Smart Contract,LSSC
@@ -444,7 +451,13 @@ public class LSSC  extends SystemSmartContractBase {
      */
     private SmartContractCode getSmartContractCode(String name, byte[] scdBytes)throws SysSmartContractException{
         SmartContractDataPackage.SmartContractData scd = getSmartContractData(name, scdBytes);
-        ISmartContractPackage scPack = support.getSmartContractFromLocalStorage(name, scd.getVersion());
+        ISmartContractPackage scPack =null;
+        try {
+            scPack =support.getSmartContractFromLocalStorage(name, scd.getVersion());
+        } catch (JavaChainException e) {
+            String msg=String.format("Get smartcontract %s from localstorage failed:%s",name ,e.getMessage());
+            throw new SysSmartContractException(msg);
+        }
         try {
             scPack.validateSC(scd);
         } catch (JavaChainException e) {
@@ -465,7 +478,45 @@ public class LSSC  extends SystemSmartContractBase {
      * @return
      */
     private SmartContractResponse getSmartContracts(ISmartContractStub stub){
-        return null;
+        IQueryResultsIterator<IKeyValue> itr = stub.getStateByRange("", "");
+        Iterator<IKeyValue> iterator = itr.iterator();
+        ArrayList<Query.SmartContractInfo> scInfoList=new  ArrayList<Query.SmartContractInfo>();
+        while(iterator.hasNext()){
+            IKeyValue response = iterator.next();
+            SmartContractDataPackage.SmartContractData data=null;
+            try {
+                data=SmartContractDataPackage.SmartContractData.parseFrom(response.getValue());
+            } catch (InvalidProtocolBufferException e) {
+                String msg=String.format("InvalidProtocolBufferException:%s",e.getMessage());
+                return newErrorResponse(msg);
+            }
+            String path="";
+            String input="";
+            ISmartContractPackage scPack =null;
+            //if smartcontract is not installed on the system we won't have
+            //data beyond name and version
+            try {
+                scPack = support.getSmartContractFromLocalStorage(data.getName(), data.getVersion());
+                path=scPack.getDepSpec().getSmartContractSpec().getSmartContractId().getPath();
+                input=scPack.getDepSpec().getSmartContractSpec().getInput().toString();
+            } catch (JavaChainException e) {
+                log.error(e.getMessage());
+            }
+
+            Query.SmartContractInfo.Builder builder = Query.SmartContractInfo.newBuilder();
+            builder.setName(data.getName());
+            builder.setVersion(data.getVersion());
+            builder.setPath(path);
+            builder.setInput(input);
+            builder.setEssc(data.getEssc());
+            builder.setVssc(data.getVssc());
+            Query.SmartContractInfo scInfo=builder.build();
+            scInfoList.add(scInfo);
+        }
+
+        Query.SmartContractQueryResponse scqr = Query.SmartContractQueryResponse.newBuilder().addAllSmartcontracts(scInfoList).build();
+        byte[] scqrBytes = scqr.toByteArray();
+        return newSuccessResponse(scqrBytes);
     }
 
     /**
@@ -473,17 +524,30 @@ public class LSSC  extends SystemSmartContractBase {
      * @return
      */
     private SmartContractResponse getInstalledSmartContracts(){
-        return null;
+        // get smartcontract query response proto which contains information about all
+        // installed smartcontracts
+        Query.SmartContractQueryResponse scqr =null;
+        try {
+            scqr = support.getSmartContractsFromLocalStorage();
+        }catch (JavaChainException e){
+            return newErrorResponse(e.getMessage());
+        }
+        byte[] scqrBytes = scqr.toByteArray();
+
+        return newSuccessResponse(scqrBytes);
     }
 
 
     /**
-     * check validity of chain name
+     * check validity of group name
      * @param group
      * @return
      */
     private void isValidGroupName(String group) throws SysSmartContractException{
-
+         if(group==null || group.isEmpty()){
+             String msg=String.format("EmptyStringErr");
+             throw new SysSmartContractException(msg);
+         }
     }
 
 
@@ -494,7 +558,14 @@ public class LSSC  extends SystemSmartContractBase {
      * @return
      */
     private void checkSmartContractName(String contractName) throws SysSmartContractException{
-
+        if (contractName == "") {
+            String msg=String.format("EmptySmartContractNameErr");
+            throw new SysSmartContractException(msg);
+        }
+        if(isValidSmartContractNameOrVersion(contractName,allowedCharsSmartContractName)==false){
+            String msg=String.format("InvalidChaincodeNameErr:%s",contractName);
+            throw new SysSmartContractException(msg);
+        }
     }
 
 
@@ -512,7 +583,9 @@ public class LSSC  extends SystemSmartContractBase {
 
     private boolean isValidSmartContractNameOrVersion(String scNameOrVersion,
                                                       String regExp){
-        return true;
+        Pattern p= Pattern.compile(regExp);
+        Matcher m=p.matcher(scNameOrVersion);
+        return m.matches();
     }
 
     /**
@@ -527,6 +600,10 @@ public class LSSC  extends SystemSmartContractBase {
             scPack=SmartContractProvider.getSmartContractPackage(scBytes);
         } catch (JavaChainException e) {
             throw new SysSmartContractException(e.getMessage());
+        }
+        if(scPack==null){
+            String message="Get Null SC package";
+            throw new SysSmartContractException(message);
         }
 
         Smartcontract.SmartContractDeploymentSpec scds = scPack.getDepSpec();
@@ -605,8 +682,15 @@ public class LSSC  extends SystemSmartContractBase {
             throw e;
         }
 
-        ISmartContractPackage scPack = support.getSmartContractFromLocalStorage(scds.getSmartContractSpec().getSmartContractId().getName(),
-                scds.getSmartContractSpec().getSmartContractId().getVersion());
+        ISmartContractPackage scPack =null;
+        String name=scds.getSmartContractSpec().getSmartContractId().getName();
+        String version=scds.getSmartContractSpec().getSmartContractId().getVersion();
+        try {
+            scPack=support.getSmartContractFromLocalStorage(name,version);
+        } catch (JavaChainException e) {
+            String msg=String.format("Get smartcontract %s from localstorage failed:%s",name ,e.getMessage());
+            throw new SysSmartContractException(msg);
+        }
         SmartContractDataPackage.SmartContractData smartcontractData = scPack.getSmartContractData();
 
         switch (function){

@@ -15,6 +15,8 @@
  */
 package org.bcia.javachain.common.cauthdsl;
 
+import org.bcia.javachain.common.policies.IPolicyProvider;
+import org.bcia.javachain.msp.IMspManager;
 import org.bcia.javachain.protos.common.Policies;
 
 /**
@@ -27,5 +29,13 @@ import org.bcia.javachain.protos.common.Policies;
 public class CAuthDslBuilder {
     public static Policies.SignaturePolicyEnvelope signedByAnyMember(String[] ids){
         return null;
+    }
+
+    public static Policies.SignaturePolicyEnvelope signedByAnyAdmin(String[] ids){
+        return null;
+    }
+
+    public static IPolicyProvider createPolicyProvider(IMspManager mspManager) {
+         return null;
     }
 }

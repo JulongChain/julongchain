@@ -17,7 +17,6 @@ package org.bcia.javachain.node.entity;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.stub.StreamObserver;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.NodeException;
@@ -31,26 +30,21 @@ import org.bcia.javachain.common.util.proto.ProposalUtils;
 import org.bcia.javachain.consenter.common.broadcast.BroadCastClient;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.core.ssc.cssc.CSSC;
-import org.bcia.javachain.csp.gm.GmCspFactory;
-import org.bcia.javachain.csp.gm.sm2.SM2;
 import org.bcia.javachain.msp.ISigningIdentity;
-import org.bcia.javachain.msp.mgmt.MspManager;
+import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.common.client.*;
 import org.bcia.javachain.node.common.helper.SpecHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.consenter.Ab;
-import org.bcia.javachain.protos.msp.Identities;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Query;
 import org.bcia.javachain.protos.node.Smartcontract;
-import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.List;
 
 /**
@@ -143,7 +137,11 @@ public class NodeGroup {
                 log.info("Deliver onNext");
                 if (value.hasBlock()) {
                     Common.Block block = value.getBlock();
-                    FileUtils.writeFileBytes(groupId + ".block", block.toByteArray());
+                    try {
+                        FileUtils.writeFileBytes(groupId + ".block", block.toByteArray());
+                    } catch (IOException e) {
+                        log.error(e.getMessage(), e);
+                    }
                 } else {
                     log.info("Deliver status:" + value.getStatus().getNumber());
                 }
@@ -232,7 +230,7 @@ public class NodeGroup {
         //生成proposal  Type=ENDORSER_TRANSACTION
         Smartcontract.SmartContractInvocationSpec spec = SpecHelper.buildInvocationSpec(smartContractName, action, content);
 
-        ISigningIdentity identity = MspManager.getLocalMsp().getDefaultSigningIdentity();
+        ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
         byte[] creator = identity.serialize();
 
         byte[] nonce = MockCrypto.getRandomNonce();

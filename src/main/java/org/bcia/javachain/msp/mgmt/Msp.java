@@ -42,7 +42,7 @@ import java.security.cert.CertificateFactory;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.bcia.javachain.msp.mgmt.MspManager.defaultCspValue;
+import static org.bcia.javachain.msp.mgmt.GlobalMspManagement.defaultCspValue;
 
 /**
  * @author zhangmingyang

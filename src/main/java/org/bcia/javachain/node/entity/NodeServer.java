@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.node.entity;
 
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
@@ -24,12 +25,12 @@ import org.bcia.javachain.core.endorser.Endorser;
 import org.bcia.javachain.core.events.DeliverEventsServer;
 import org.bcia.javachain.core.events.EventGrpcServer;
 import org.bcia.javachain.core.events.EventHubServer;
+import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.core.node.NodeGrpcServer;
 import org.bcia.javachain.core.ssc.ISystemSmartContractManager;
 import org.bcia.javachain.core.ssc.SystemSmartContractManager;
-import org.bcia.javachain.msp.mgmt.MspManager;
+import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.node.Node;
-import org.bcia.javachain.node.common.helper.MockMSPManager;
 import org.bcia.javachain.node.util.NodeConstant;
 import org.springframework.stereotype.Component;
 
@@ -68,7 +69,7 @@ public class NodeServer {
         }
 
         //检查当前的成员服务提供者类型，目前只支持CSP，即密码提供商
-        int mspType = MspManager.getLocalMsp().getType();
+        int mspType = GlobalMspManagement.getLocalMsp().getType();
         if (mspType != NodeConstant.PROVIDER_CSP) {
             log.error("Unsupported msp type: " + mspType);
             return;
@@ -82,6 +83,11 @@ public class NodeServer {
         //初始化账本
 //        LedgerMgmt.initialize();
 //        ledgermgmt.Initialize(peer.ConfigTxProcessors)
+        try {
+            LedgerManager.initialize(null);
+        } catch (LedgerException e) {
+            e.printStackTrace();
+        }
 
 
         String nodeEndpoint = null;
