@@ -41,7 +41,7 @@ public class BlockfileWriter {
     /**
      * 截断文件为指定大小
      */
-    public void truncateFile(Integer targetSize) throws LedgerException {
+    public void truncateFile(int targetSize) throws LedgerException {
         if(file.length() <= targetSize){
             return;
         }

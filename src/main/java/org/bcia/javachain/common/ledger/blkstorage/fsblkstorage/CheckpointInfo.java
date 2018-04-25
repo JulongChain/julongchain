@@ -20,7 +20,8 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.UpdateBatch;
 import org.bcia.javachain.core.ledger.util.Util;
 
 /**
- * 类描述
+ * block检查点类
+ * 每在blockfile中存储一个block都在leveldb中添加检查点信息
  *
  * @author
  * @date 2018/3/8
@@ -28,9 +29,13 @@ import org.bcia.javachain.core.ledger.util.Util;
  */
 public class CheckpointInfo {
 
+    //block文件后缀名
     private int lastestFileChunkSuffixNum;
+    //当前block的大小
     private int latestFileChunksize;
+    //当前账本是否为空
     private boolean isChainEmpty;
+    //当前账本最新block序号
     private long lastBlockNumber;
 
     byte[] marshal() {
@@ -65,35 +70,35 @@ public class CheckpointInfo {
         isChainEmpty = Util.bytesToLong(b, 24, 8) == 1;
     }
 
-    public Integer getLastestFileChunkSuffixNum() {
+    public int getLastestFileChunkSuffixNum() {
         return lastestFileChunkSuffixNum;
     }
 
-    public void setLastestFileChunkSuffixNum(Integer lastestFileChunkSuffixNum) {
+    public void setLastestFileChunkSuffixNum(int lastestFileChunkSuffixNum) {
         this.lastestFileChunkSuffixNum = lastestFileChunkSuffixNum;
     }
 
-    public Integer getLatestFileChunksize() {
+    public int getLatestFileChunksize() {
         return latestFileChunksize;
     }
 
-    public void setLatestFileChunksize(Integer latestFileChunksize) {
+    public void setLatestFileChunksize(int latestFileChunksize) {
         this.latestFileChunksize = latestFileChunksize;
     }
 
-    public Boolean getChainEmpty() {
+    public boolean getChainEmpty() {
         return isChainEmpty;
     }
 
-    public void setChainEmpty(Boolean chainEmpty) {
+    public void setChainEmpty(boolean chainEmpty) {
         isChainEmpty = chainEmpty;
     }
 
-    public Long getLastBlockNumber() {
+    public long getLastBlockNumber() {
         return lastBlockNumber;
     }
 
-    public void setLastBlockNumber(Long lastBlockNumber) {
+    public void setLastBlockNumber(long lastBlockNumber) {
         this.lastBlockNumber = lastBlockNumber;
     }
 
