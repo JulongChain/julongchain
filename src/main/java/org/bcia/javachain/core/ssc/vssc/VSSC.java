@@ -33,7 +33,7 @@ import org.bcia.javachain.core.common.sysscprovider.SystemSmartContractFactory;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
 import org.bcia.javachain.msp.IMspManager;
-import org.bcia.javachain.msp.mgmt.MspManager;
+import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.javachain.protos.node.SmartContractDataPackage;
@@ -132,7 +132,7 @@ public class VSSC extends SystemSmartContractBase {
         }
         IApplicationConfig ac = this.sscProvider.getApplicationConfig(groupHeader.getGroupId());
 
-        MspManager mgmt=new MspManager();
+        GlobalMspManagement mgmt=new GlobalMspManagement();
         IMspManager manager=mgmt.getManagerForChain(groupHeader.getGroupId());
         PolicyProvider policyProvider=new PolicyProvider(manager);
         IPolicy policy = policyProvider.newPolicy(policyBytes);

@@ -17,8 +17,8 @@ package org.bcia.javachain.common.groupconfig;
 
 import org.bcia.javachain.msp.IMsp;
 import org.bcia.javachain.msp.IMspManager;
+import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.msp.mgmt.Msp;
-import org.bcia.javachain.msp.mgmt.MspManager;
 import org.bcia.javachain.protos.msp.MspConfigPackage;
 
 import java.util.HashMap;
@@ -98,7 +98,7 @@ public class MSPConfigHandler {
             mspArray[i++] = pendingMSPConfig.getMsp();
         }
 
-        IMspManager mspManager = new MspManager();
+        IMspManager mspManager = new GlobalMspManagement();
         mspManager.setup(mspArray);
         return mspManager;
     }

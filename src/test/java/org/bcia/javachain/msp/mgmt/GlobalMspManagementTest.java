@@ -3,7 +3,6 @@ package org.bcia.javachain.msp.mgmt;
 import org.bcia.javachain.csp.factory.IFactoryOpts;
 import org.bcia.javachain.csp.gm.GmFactoryOpts;
 import org.bcia.javachain.msp.mspconfig.MspConfig;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
@@ -17,7 +16,7 @@ import static org.bcia.javachain.msp.mspconfig.MspConfigFactory.loadMspConfig;
  * @Date: 2018/4/12
  * @company Dingxuan
  */
-public class MspManagerTest {
+public class GlobalMspManagementTest {
 
     @Test
     public void loadLocalMspWithType() throws FileNotFoundException {
@@ -34,8 +33,8 @@ public class MspManagerTest {
         String publicKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPublicKeyStore();
         //new GmCspConfig(symmetrickey,asymmetric,hash,sign,publicKeyPath,privateKeyPath);
         optsList.add(new GmFactoryOpts(symmetrickey,asymmetric,hash,sign,publicKeyPath,privateKeyPath));
-        MspManager.loadLocalMspWithType(localmspdir,optsList,mspID,mspType);
-        MspManager.getLocalMsp().getDefaultSigningIdentity().sign("123".getBytes());
+        GlobalMspManagement.loadLocalMspWithType(localmspdir,optsList,mspID,mspType);
+        GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity().sign("123".getBytes());
     }
 
     @Test
@@ -44,7 +43,7 @@ public class MspManagerTest {
 
     @Test
     public void getLocalMsp() {
-       Identity signer= (Identity) MspManager.getLocalMsp().getDefaultSigningIdentity();
+       Identity signer= (Identity) GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
        byte[] signdata=signer.sign("123".getBytes());
        signer.verify("123".getBytes(), signdata);
     }

@@ -16,6 +16,7 @@
 package org.bcia.javachain.core.common.smartcontractprovider;
 
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.protos.node.Query;
 
 /**
  * 类描述
@@ -47,5 +48,14 @@ public class SmartContractProvider {
 
     public static byte[] extractStateDBArtifactsFromSCPackage(ISmartContractPackage scPack) throws JavaChainException{
         return null;
+    }
+
+    public static ISmartContractPackage getSmartContractFromFS(String name,String version)throws JavaChainException{
+        return null;
+    }
+
+    public static Query.SmartContractQueryResponse getInstalledSmartcontracts()throws JavaChainException {
+        return null;
+
     }
 }

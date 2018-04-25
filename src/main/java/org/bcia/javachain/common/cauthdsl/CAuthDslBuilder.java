@@ -28,4 +28,8 @@ public class CAuthDslBuilder {
     public static Policies.SignaturePolicyEnvelope signedByAnyMember(String[] ids){
         return null;
     }
+
+    public static Policies.SignaturePolicyEnvelope signedByAnyAdmin(String[] ids){
+        return null;
+    }
 }

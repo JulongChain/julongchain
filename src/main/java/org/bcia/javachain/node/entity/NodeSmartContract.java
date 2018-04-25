@@ -28,7 +28,7 @@ import org.bcia.javachain.consenter.common.broadcast.BroadCastClient;
 import org.bcia.javachain.core.ssc.lssc.LSSC;
 import org.bcia.javachain.csp.factory.CspManager;
 import org.bcia.javachain.msp.ISigningIdentity;
-import org.bcia.javachain.msp.mgmt.MspManager;
+import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.common.client.BroadcastClient;
 import org.bcia.javachain.node.common.client.EndorserClient;
@@ -70,7 +70,7 @@ public class NodeSmartContract {
         Smartcontract.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName, scVersion,
                 input);
 
-        ISigningIdentity identity = MspManager.getLocalMsp().getDefaultSigningIdentity();
+        ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
         byte[] creator = identity.serialize();
 
@@ -109,7 +109,7 @@ public class NodeSmartContract {
         Smartcontract.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName, scVersion,
                 input);
 
-        ISigningIdentity identity = MspManager.getLocalMsp().getDefaultSigningIdentity();
+        ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
         byte[] creator = identity.serialize();
 

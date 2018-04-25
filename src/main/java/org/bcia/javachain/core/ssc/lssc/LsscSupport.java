@@ -15,8 +15,14 @@
  */
 package org.bcia.javachain.core.ssc.lssc;
 
+import org.bcia.javachain.common.cauthdsl.CAuthDslBuilder;
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.SysSmartContractException;
 import org.bcia.javachain.core.common.smartcontractprovider.ISmartContractPackage;
+import org.bcia.javachain.core.common.smartcontractprovider.SignedSDSPackage;
+import org.bcia.javachain.core.common.smartcontractprovider.SmartContractProvider;
+import org.bcia.javachain.core.node.NodeTool;
+import org.bcia.javachain.protos.common.Policies;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.Query;
 import org.springframework.stereotype.Component;
@@ -36,7 +42,15 @@ public class LsscSupport {
      * @param scPackage
      */
     public void putSmartContractToLocalStorage(ISmartContractPackage scPackage) throws SysSmartContractException{
-
+        try {
+            scPackage.putSmartcontractToFS();
+        } catch (JavaChainException e) {
+            String msg=String.format("Error installing smartcontract code %s:%s(%s)",
+                    scPackage.getSmartContractData().getName(),
+                    scPackage.getSmartContractData().getVersion(),
+                    e.getMessage());
+            throw new SysSmartContractException(msg);
+        }
     }
 
     /**
@@ -46,8 +60,8 @@ public class LsscSupport {
      * @param version
      * @return
      */
-    public ISmartContractPackage getSmartContractFromLocalStorage(String smartcontractName,String version) throws SysSmartContractException{
-        return null;
+    public ISmartContractPackage getSmartContractFromLocalStorage(String smartcontractName,String version) throws JavaChainException{
+        return SmartContractProvider.getSmartContractFromFS(smartcontractName,version);
     }
 
     /**
@@ -55,8 +69,8 @@ public class LsscSupport {
      * data that have previously been persisted to local storage
      * @return
      */
-    public Query.SmartContractQueryResponse getSmartContractsFromLocalStorage(){
-        return null;
+    public Query.SmartContractQueryResponse getSmartContractsFromLocalStorage()throws JavaChainException{
+        return SmartContractProvider.getInstalledSmartcontracts();
     }
 
     /**
@@ -66,8 +80,24 @@ public class LsscSupport {
      * @param scPackage
      * @return
      */
-    byte[] getInstantiationPolicy(String group,ISmartContractPackage scPackage){
-        return null;
+    byte[] getInstantiationPolicy(String group,ISmartContractPackage scPackage)throws SysSmartContractException{
+        byte[] instantiationPolicy;
+        if(scPackage instanceof SignedSDSPackage){
+            SignedSDSPackage sscPackage=(SignedSDSPackage)scPackage;
+            instantiationPolicy=sscPackage.getInstantiationPolicy();
+            if(instantiationPolicy==null){
+                String msg="Instantiation policy cannot be null for a SignedSCDeploymentSpec";
+                throw new SysSmartContractException(msg);
+            }
+        }
+        else{
+            // the default instantiation policy allows any of the group MSP admins
+            // to be able to instantiate
+            String[] mspIds = NodeTool.getMspIDs(group);
+            Policies.SignaturePolicyEnvelope p = CAuthDslBuilder.signedByAnyAdmin(mspIds);
+            instantiationPolicy=p.toByteArray();
+        }
+        return instantiationPolicy;
     }
 
 
@@ -81,6 +111,7 @@ public class LsscSupport {
     void checkInstantiationPolicy(ProposalPackage.SignedProposal signedProposal,
                                   String groupName,
                                   byte[] instantiationPolicy) throws SysSmartContractException{
+        //create a policy object from the policy bytes
 
     }
 }
