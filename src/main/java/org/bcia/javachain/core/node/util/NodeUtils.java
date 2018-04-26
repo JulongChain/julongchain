@@ -19,6 +19,9 @@ import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.node.Query;
+
+import java.util.List;
 
 /**
  * 类描述
@@ -64,6 +67,10 @@ public class NodeUtils {
      * @return
      */
     public static Common.Block getCurrentConfigBlock(String groupID) {
+        return null;
+    }
+
+    public static List<Query.GroupInfo> getGroupsInfo() {
         return null;
     }
 }

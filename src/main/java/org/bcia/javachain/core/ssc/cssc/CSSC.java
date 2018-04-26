@@ -41,6 +41,7 @@ import org.bcia.javachain.msp.mgmt.Principal;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.Query;
 import org.bcia.javachain.protos.node.ResourcesPackage;
 import org.springframework.stereotype.Component;
 
@@ -301,22 +302,85 @@ public class CSSC extends SystemSmartContractBase {
             return newErrorResponse(String.format("Unknown group ID,%s",groupID));
         }
         ResourcesPackage.ConfigTree.Builder builder = ResourcesPackage.ConfigTree.newBuilder();
-
-        return null;
+        builder.setGroupConfig(groupConfig);
+        builder.setResourcesConfig(resourceConfig);
+        ResourcesPackage.ConfigTree configTree=builder.build();
+        byte[] configTreeBytes = configTree.toByteArray();
+        return newSuccessResponse(configTreeBytes);
     }
 
+    /**
+     * 模拟执行配置树的更新
+     * @param groupID
+     * @param envb
+     * @return
+     */
     private SmartContractResponse simulateConfigTreeUpdate(
             String groupID,byte[] envb
     ){
-        return null;
+        if(groupID==null || groupID.isEmpty()){
+            return newErrorResponse("Group ID must not be nil");
+        }
+        if(envb==null || envb.length==0){
+            return newErrorResponse("Config delta bytes must not be nil");
+        }
+        Common.Envelope envlope =null;
+        IConfig config=null;
+        try {
+            envlope = Common.Envelope.parseFrom(envb);
+            config=supportByType(groupID,envlope);
+            config.updateProposeConfig(envlope);
+        } catch (InvalidProtocolBufferException e) {
+            return newErrorResponse(e.getMessage());
+        }catch (SysSmartContractException e){
+            return newErrorResponse(e.getMessage());
+        } catch (JavaChainException e) {
+            return newErrorResponse(e.getMessage());
+        }
+        return newSuccessResponse("Simulation is successful");
     }
 
-    private IConfig supportByType(byte[] groupID, Common.Envelope env){
-        return null;
+    /**
+     *
+     * @param groupID
+     * @param env
+     * @return
+     * @throws SysSmartContractException
+     */
+    private IConfig supportByType(String groupID, Common.Envelope env)throws SysSmartContractException{
+        Common.Payload payload=null;
+        try {
+            payload=Common.Payload.parseFrom(env.getPayload());
+        } catch (InvalidProtocolBufferException e) {
+            String msg=String.format("Failed unmarshaling payload: %s",e.getMessage());
+            throw new SysSmartContractException(msg);
+        }
+        Common.GroupHeader groupHeader=null;
+        try {
+            groupHeader=Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
+        } catch (InvalidProtocolBufferException e) {
+            String msg=String.format("Failed unmarshaling payload header: %s",e.getMessage());
+            throw new SysSmartContractException(msg);
+        }
+        switch (groupHeader.getType()){
+            case Common.HeaderType.CONFIG_UPDATE_VALUE:
+              return configManager.getGroupConfig(groupID);
+            case Common.HeaderType.NODE_RESOURCE_UPDATE_VALUE:
+              return configManager.getResourceConfig(groupID);
+        }
+        String msg=String.format("Invalid payload header type: %d",groupHeader.getType());
+        throw new SysSmartContractException(msg);
     }
 
-    // getGroups returns information about all channels for this peer
+    /**
+     * getGroups returns information about all groups for this node
+     * @return
+     */
     private SmartContractResponse getGroups(){
-        return null;
+        List<Query.GroupInfo> groupInfoList=NodeUtils.getGroupsInfo();
+        Query.GroupQueryResponse.Builder builder = Query.GroupQueryResponse.newBuilder().addAllGroups(groupInfoList);
+        Query.GroupQueryResponse groupQueryResponse=builder.build();
+        byte[] gqrBytes=groupQueryResponse.toByteArray();
+        return newSuccessResponse(gqrBytes);
     }
 }
