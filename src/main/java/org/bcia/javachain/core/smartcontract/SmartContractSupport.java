@@ -25,11 +25,14 @@ import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.core.smartcontract.node.SmartContractSupportService;
 import org.bcia.javachain.core.smartcontract.shim.SmartContractProvider;
-import org.bcia.javachain.protos.node.Smartcontract;
-import org.bcia.javachain.protos.node.SmartcontractShim;
 
 import javax.naming.Context;
 import java.time.Duration;
+
+import static org.bcia.javachain.protos.node.Smartcontract.*;
+import static org.bcia.javachain.protos.node.SmartcontractShim.SmartContractMessage;
+import static org.bcia.javachain.protos.node.SmartcontractShim.SmartContractMessage.Type;
+import static org.bcia.javachain.protos.node.SmartcontractShim.SmartContractMessage.newBuilder;
 
 /**
  * 类描述
@@ -39,8 +42,8 @@ import java.time.Duration;
  * @company Dingxuan
  */
 public class SmartContractSupport {
-    private static JavaChainLog log = JavaChainLogFactory.getLog
-            (SmartContractSupport.class);
+
+    private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractSupport.class);
 
     private RunningSmartContract runningSmartContract;
     private String nodeAddress;
@@ -268,35 +271,50 @@ public class SmartContractSupport {
         return null;
     }
 
-    public Smartcontract.SmartContractInput launch(SmartContractContext
-                                                           scContext, Object
-            spec) throws
-            SmartContractException {
-        //TODO:add by zhouhui for test,返回一个空对象，实际处理待万良兵补充
+    /**
+     * 启动智能合约
+     *
+     * @param scContext scContext
+     * @param spec smartContractInvocationSpec
+     * @return
+     * @throws SmartContractException
+     */
+    public SmartContractInput launch(SmartContractContext scContext,
+                                     Object spec) throws SmartContractException {
+
         log.info("call SmartContractSupport launch");
 
-        if (spec instanceof Smartcontract.SmartContractInvocationSpec) {
-            Smartcontract.SmartContractInvocationSpec invocationSpec =
-                    (Smartcontract.SmartContractInvocationSpec) spec;
+        // TODO:add by zhouhui for test,返回一个空对象，实际处理待万良兵补充
+
+        if (spec instanceof SmartContractInvocationSpec) {
+            SmartContractInvocationSpec invocationSpec = (SmartContractInvocationSpec) spec;
             return invocationSpec.getSmartContractSpec().getInput();
         }
 
-        return Smartcontract.SmartContractInput.newBuilder().build();
+        return SmartContractInput.newBuilder().build();
     }
 
-    public SmartcontractShim.SmartContractMessage execute
-            (SmartContractContext scContext, SmartcontractShim
-                    .SmartContractMessage scMessage, long timeout) throws
-            SmartContractException {
+    /**
+     * 执行智能合约
+     * @param scContext scContext
+     * @param scMessage scMessage
+     * @param timeout 超时时间
+     * @return
+     * @throws SmartContractException
+     */
+    public SmartContractMessage execute(SmartContractContext scContext,
+                                        SmartContractMessage scMessage,
+                                        long timeout) throws SmartContractException {
 
-        //TODO:add by zhouhui for test,返回一个空对象，实际处理待万良兵补充
         log.info("call SmartContractSupport execute");
+
+        // TODO:add by zhouhui for test,返回一个空对象，实际处理待万良兵补充
 
         String smartContractId = scContext.getName();
 
         SmartContractSupportService.invoke(smartContractId, scMessage);
 
-        return SmartcontractShim.SmartContractMessage.newBuilder().setType(SmartcontractShim.SmartContractMessage.Type.COMPLETED).build();
+        return newBuilder().setType(Type.COMPLETED).build();
     }
 
     public void registerHandler(Handler handler) {
@@ -307,49 +325,53 @@ public class SmartContractSupport {
 
     }
 
-    public void sendReady(Context context, SmartContractContext
-            smartContractContext, Duration timeout) {
+    public void sendReady(Context context,
+                          SmartContractContext smartContractContext,
+                          Duration timeout) {
 
     }
 
-    public String[][] getArgsAndEnv(SmartContractContext
-                                            smartContractContext,
-                                    Smartcontract.SmartContractSpec.Type type) {
+    public String[][] getArgsAndEnv(SmartContractContext smartContractContext,
+                                    SmartContractSpec.Type type) {
         return null;
     }
 
-    public void launchAndWaitForRegister(Context ctxt, SmartContractProvider
-            smartContractProvider, Smartcontract.SmartContractDeploymentSpec
-            smartContractDeploymentSpec, Smartcontract.SmartContractSpec.Type
-            smartContractLang, IBuildSpecFactory builder) {}
+    public void launchAndWaitForRegister(Context ctxt,
+                                         SmartContractProvider smartContractProvider,
+                                         SmartContractDeploymentSpec smartContractDeploymentSpec,
+                                         SmartContractSpec.Type smartContractLang,
+                                         IBuildSpecFactory builder) {
 
-    public void stop(Context context, SmartContractContext
-            smartContractContext, Smartcontract.SmartContractDeploymentSpec
-            smartContractDeploymentSpec) {}
+    }
 
-    public String getVMType(Smartcontract.SmartContractDeploymentSpec
-                                    smartContractDeploymentSpec) { return null;}
+    public void stop(Context context,
+                     SmartContractContext smartContractContext,
+                     SmartContractDeploymentSpec smartContractDeploymentSpec) {
+
+    }
+
+    public String getVMType(SmartContractDeploymentSpec smartContractDeploymentSpec) {
+        return null;
+    }
 
     public void handleSmartContractStream(Context context,
-                                          ISmartContractStream
-                                                  smartContractStream) {}
+                                          ISmartContractStream smartContractStream) {
+
+    }
 
     public void register() {
 
     }
 
-    public SmartcontractShim.SmartContractMessage createSmartContractMessage
-            (SmartcontractShim.SmartContractMessage.Type
-                     smartContractMessageType, String txid, Smartcontract
-                     .SmartContractInput smartContractInput) {
+    public SmartContractMessage createSmartContractMessage(Type smartContractMessageType,
+                                                           String txid,
+                                                           SmartContractInput smartContractInput) {
         return null;
     }
 
-    public SmartcontractShim.SmartContractMessage execute(Context context,
-                                                          SmartContractContext smartContractContext,
-                                                          SmartcontractShim
-                                                                  .SmartContractMessage smartContractMessage,
-                                                          Duration timeout) {
+    public SmartContractMessage execute(Context context, SmartContractContext smartContractContext,
+                                        SmartContractMessage smartContractMessage,
+                                        Duration timeout) {
         return null;
     }
 

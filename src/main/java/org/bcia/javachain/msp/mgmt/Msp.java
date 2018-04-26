@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.msp.mgmt;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -131,7 +132,7 @@ public class Msp implements IMsp {
 
     @Override
     public String getIdentifier() {
-        return null;
+        return this.name;
     }
 
     @Override
@@ -179,12 +180,12 @@ public class Msp implements IMsp {
     public IIdentity deserializeIdentity(byte[] serializedIdentity)  {
 
         try {
-            Identities.SerializedIdentity sId=Identities.SerializedIdentity.parseFrom(serializedIdentity);
+           Identities.SerializedIdentity sId=Identities.SerializedIdentity.parseFrom(serializedIdentity);
             CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
             InputStream inputStream = new ByteArrayInputStream( sId.getIdBytes().toByteArray());
             java.security.cert.Certificate certificate = certificateFactory.generateCertificate(inputStream);
             SM2KeyExport certPubK=new SM2KeyExport();
-            Identity identity = new Identity(certificate, certPubK.getPublicKey(), this);
+            IIdentity identity = new Identity(certificate, certPubK.getPublicKey(), this);
             return identity;
         } catch (Exception e) {
             e.printStackTrace();

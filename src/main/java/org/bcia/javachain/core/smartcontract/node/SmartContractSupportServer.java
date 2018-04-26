@@ -19,12 +19,14 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bcia.javachain.protos.node.SmartcontractShim;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.UUID;
 
 /**
- * 类描述
+ * 智能合约server
  *
  * @author wanliangbing
  * @date 2018/4/17
@@ -87,6 +89,10 @@ public class SmartContractSupportServer {
             try {
                 Thread.sleep(5000);
                 logger.info(new Date().toString());
+
+                SmartContractSupportService.invoke("MySmartContract1", SmartcontractShim.SmartContractMessage.newBuilder().setTxid(UUID.randomUUID().toString()).build());
+                SmartContractSupportService.invoke("MySmartContract1", SmartcontractShim.SmartContractMessage.newBuilder().setTxid(UUID.randomUUID().toString()).build());
+
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }

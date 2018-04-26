@@ -15,23 +15,17 @@
  */
 package org.bcia.javachain.common.ledger.util.leveldbhelper;
 
-import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.exception.LevelDBException;
 import org.bcia.javachain.common.ledger.util.DBHandle;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.leveldb.LevelDB;
 import org.bcia.javachain.core.ledger.leveldb.LevelDBFactory;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.DBIterator;
-import org.iq80.leveldb.Options;
-import org.iq80.leveldb.WriteBatch;
-import org.iq80.leveldb.impl.Iq80DBFactory;
-import org.iq80.leveldb.impl.WriteBatchImpl;
 
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,6 +36,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class LevelDBHandle implements DBHandle {
+
     private String dbName = null;
     private DB db = null;
     private boolean opened = false;
@@ -68,7 +63,7 @@ public class LevelDBHandle implements DBHandle {
      * 创建db
      */
     @Override
-    public DB createDB(String dbPath) throws LedgerException{
+    public DB createDB(String dbPath) throws LevelDBException{
 //        this.db = LevelDBFactory.getDB(dbPath);
         this.opened = true;
         this.dbName = dbPath;
@@ -79,11 +74,11 @@ public class LevelDBHandle implements DBHandle {
      * 关闭db
      */
     @Override
-    public void close() throws LedgerException{
+    public void close() throws LevelDBException{
         try {
             db.close();
         } catch (IOException e) {
-            throw new LedgerException(e);
+            throw new LevelDBException(e);
         }
         opened = false;
     }
@@ -92,59 +87,65 @@ public class LevelDBHandle implements DBHandle {
      * 根据key获取value
      */
     @Override
-    public byte[] get(byte[] key) throws LedgerException {
-        if(!opened){
-            throw new LedgerException("No db created");
-        } else {
-            return LevelDBFactory.get(dbName, key ,false);
+    public byte[] get(byte[] key) throws LevelDBException {
+        if (!opened) {
+            throw new LevelDBException("No db created");
         }
+
+        LevelDB db = LevelDBFactory.getDB(dbName);
+        return LevelDBFactory.get(db, key, false);
     }
 
     /**
      * 插入当前kv
      */
     @Override
-    public void put(byte[] key, byte[] value, boolean sync) throws LedgerException {
-        if(!opened){
+    public void put(byte[] key, byte[] value, boolean sync) throws LevelDBException {
+        if (!opened) {
             logger.error("No db created");
-        } else {
-            LevelDBFactory.add(dbName, key, value, sync);
+            throw new LevelDBException("No db created");
         }
+        LevelDB db = LevelDBFactory.getDB(dbName);
+        LevelDBFactory.add(db, key, value, sync);
     }
 
     /**
      * 删除给定key
      */
     @Override
-    public void delete(byte[] key, boolean sync) throws LedgerException {
-        if(!opened){
+    public void delete(byte[] key, boolean sync) throws LevelDBException {
+        if (!opened) {
             logger.error("No db created");
-        } else {
-            LevelDBFactory.delete(dbName, key, sync);
+            throw new LevelDBException("No db created");
         }
+        LevelDB db = LevelDBFactory.getDB(dbName);
+        LevelDBFactory.delete(db, key, sync);
     }
 
     /**
      * 批量执行操作
      */
     @Override
-    public void writeBatch(UpdateBatch batch, boolean sync) throws LedgerException {
-        if(!opened){
+    public void writeBatch(UpdateBatch batch, boolean sync) throws LevelDBException {
+        if (!opened) {
             logger.error("No db created");
-        } else {
-            LevelDBFactory.add(dbName, batch.getKvs(), sync);
+            throw new LevelDBException("No db created");
         }
+        LevelDB db = LevelDBFactory.getDB(dbName);
+        LevelDBFactory.add(db, batch.getKvs(), sync);
     }
 
     /**
      * 根据给出的开始、结束Key遍历
      */
     @Override
-    public Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey) throws LedgerException {
-        DBIterator dbItr = LevelDBFactory.getIterator(dbName);
+    public Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey) throws LevelDBException {
+        LevelDB db = LevelDBFactory.getDB(dbName);
+        DBIterator dbItr = LevelDBFactory.getIterator(db);
         if(startKey != null){
             dbItr.seek(startKey);
         }
         return dbItr;
     }
+
 }

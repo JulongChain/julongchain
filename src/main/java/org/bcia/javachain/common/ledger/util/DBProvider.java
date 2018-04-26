@@ -15,11 +15,9 @@ limitations under the License.
  */
 package org.bcia.javachain.common.ledger.util;
 
-import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.exception.LevelDBException;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
-import org.iq80.leveldb.DB;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -34,37 +32,37 @@ public interface DBProvider {
     /**
      * 关闭
      */
-    void close() throws LedgerException;
+    void close() throws LevelDBException;
 
     /**
      * 根据key获取value
      */
-    byte[] get(byte[] key) throws LedgerException;
+    byte[] get(byte[] key) throws LevelDBException;
 
     /**
      * 插入kv
      */
-    void put(byte[] key, byte[] value, boolean sync) throws LedgerException;
+    void put(byte[] key, byte[] value, boolean sync) throws LevelDBException;
 
     /**
      * 删除key
      */
-    void delete(byte[] key, boolean sync) throws LedgerException;
+    void delete(byte[] key, boolean sync) throws LevelDBException;
 
     /**
      * 批量写入
      */
-    void writeBatch(UpdateBatch batch, boolean sync) throws LedgerException;
+    void writeBatch(UpdateBatch batch, boolean sync) throws LevelDBException;
 
     /**
      * 迭代
      */
-    Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey) throws LedgerException;
+    Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey) throws LevelDBException;
 
     /**
      * 获取DB路径
      */
-    String getDbPath() throws LedgerException;
+    String getDbPath() throws LevelDBException;
 
     /**
      * 获取DB

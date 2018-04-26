@@ -15,10 +15,9 @@
  */
 package org.bcia.javachain.core.ledger.leveldb;
 
-import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.exception.LevelDBException;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.charset.Charset;
 
 /**
@@ -32,16 +31,19 @@ public class StateLevelDBFactory {
 
     private static final String ROOT_PATH = File.separator + "var" + File.separator + "hyperledger" + File.separator + "production" + File.separator + "ledgersData" + File.separator + "stateLeveldb";
 
-    public static byte[] getState(String smartContractId, String key) throws LedgerException {
-        return LevelDBFactory.get(ROOT_PATH, newKey(smartContractId, key).getBytes(Charset.forName("utf-8")), false);
+    public static byte[] getState(String smartContractId, String key) throws LevelDBException {
+        LevelDB db = LevelDBFactory.getDB(ROOT_PATH);
+        return LevelDBFactory.get(db, newKey(smartContractId, key).getBytes(Charset.forName("utf-8")), false);
     }
 
-    public static void putState(String smartContractId, String key, byte[] value) throws LedgerException {
-        LevelDBFactory.add(ROOT_PATH, newKey(smartContractId, key).getBytes(Charset.forName("utf-8")), value, true);
+    public static void putState(String smartContractId, String key, byte[] value) throws LevelDBException {
+        LevelDB db = LevelDBFactory.getDB(ROOT_PATH);
+        LevelDBFactory.add(db, newKey(smartContractId, key).getBytes(Charset.forName("utf-8")), value, true);
     }
 
-    public static void deleteState(String smartContractId, String key) throws LedgerException {
-        LevelDBFactory.delete(ROOT_PATH, newKey(smartContractId, key).getBytes(Charset.forName("utf-8")), true);
+    public static void deleteState(String smartContractId, String key) throws LevelDBException {
+        LevelDB db = LevelDBFactory.getDB(ROOT_PATH);
+        LevelDBFactory.delete(db, newKey(smartContractId, key).getBytes(Charset.forName("utf-8")), true);
     }
 
     public static String newKey(String smartContractId, String key) {
