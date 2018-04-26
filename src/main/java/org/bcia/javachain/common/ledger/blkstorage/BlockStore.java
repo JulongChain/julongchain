@@ -24,26 +24,20 @@ import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
 /**
- * BlockStore - an interface for persisting and retrieving blocks
- * An implementation of this interface is expected to take an argument
- * of type `IndexConfig` which configures the block store on what items should be indexed
+ * 区块文件接口
  *
- * @author wanliangbing
- * @date 2018/3/7
+ * @author sunzongyu
+ * @date 2018/4/7
  * @company Dingxuan
  */
 public interface BlockStore extends FileLedgerBlockStore {
-    static final String INDEXABLE_ATTR_BLOCK_NUM = "BlockNum";
-    static final String INDEXABLE_ATTR_BLOCK_HASH = "BlockHash";
-    static final String INDEXABLE_ATTR_TX_ID = "TxID";
-    static final String INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM = "BlockNumTranNum";
-    static final String INDEXABLE_ATTR_BLOCK_TX_ID = "BlockTxID";
-    static final String INDEXABLE_ATTR_TX_VALIDATION_CODE = "TxValidationCode";
-
+    @Override
     void addBlock(Common.Block block) throws LedgerException;
 
+    @Override
     Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException;
 
+    @Override
     ResultsIterator retrieveBlocks(long startNum) throws LedgerException;
 
     Common.Block retrieveBlockByHash(byte[] blockHash) throws LedgerException;
