@@ -31,7 +31,7 @@ import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
-import org.bcia.javachain.core.node.NodeTool;
+import org.bcia.javachain.core.node.util.NodeUtils;
 import org.bcia.javachain.core.smartcontract.SmartContractExecutor;
 import org.bcia.javachain.core.ssc.ISystemSmartContractManager;
 import org.bcia.javachain.core.ssc.SystemSmartContractManager;
@@ -74,7 +74,7 @@ public class EndorserSupport implements IEndorserSupport {
 
     @Override
     public IHistoryQueryExecutor getHistoryQueryExecutor(String ledgerName) throws NodeException {
-        INodeLedger nodeLedger = NodeTool.getLedger(ledgerName);
+        INodeLedger nodeLedger = NodeUtils.getLedger(ledgerName);
         try {
             return nodeLedger.newHistoryQueryExecutor();
         } catch (LedgerException e) {
@@ -86,7 +86,7 @@ public class EndorserSupport implements IEndorserSupport {
     @Override
     public TransactionPackage.ProcessedTransaction getTransactionById(String groupId, String txId) throws
             NodeException {
-        INodeLedger nodeLedger = NodeTool.getLedger(groupId);
+        INodeLedger nodeLedger = NodeUtils.getLedger(groupId);
         try {
             return nodeLedger.getTransactionByID(txId);
         } catch (LedgerException e) {

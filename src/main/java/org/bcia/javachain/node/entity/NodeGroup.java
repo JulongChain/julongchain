@@ -20,6 +20,7 @@ import io.grpc.stub.StreamObserver;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.common.genesis.GenesisBlockFactory;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.localmsp.impl.LocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -29,6 +30,7 @@ import org.bcia.javachain.common.util.FileUtils;
 import org.bcia.javachain.common.util.proto.ProposalUtils;
 import org.bcia.javachain.consenter.common.broadcast.BroadCastClient;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
+import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.core.ssc.cssc.CSSC;
 import org.bcia.javachain.msp.ISigningIdentity;
 import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
@@ -36,6 +38,7 @@ import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.common.client.*;
 import org.bcia.javachain.node.common.helper.SpecHelper;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.consenter.Ab;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
@@ -135,6 +138,21 @@ public class NodeGroup {
             @Override
             public void onNext(Ab.DeliverResponse value) {
                 log.info("Deliver onNext");
+
+                //测试用
+                if(true){
+                    try {
+                        Common.Block block = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance())
+                                .getGenesisBlock(groupId);
+                        FileUtils.writeFileBytes(groupId + ".block", block.toByteArray());
+                        LedgerManager.createLedger(block);
+                    } catch (IOException e) {
+                        log.error(e.getMessage(), e);
+                    } catch (JavaChainException e) {
+                        log.error(e.getMessage(), e);
+                    }
+                }
+
                 if (value.hasBlock()) {
                     Common.Block block = value.getBlock();
                     try {

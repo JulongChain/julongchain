@@ -13,28 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.config;
+package org.bcia.javachain.events.producer;
 
-
-import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.EventException;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.common.Configtx;
 
 /**
- * IConfig encapsulates config (group or resource) tree
+ * 类描述
  *
  * @author sunianle
- * @date 3/13/18
+ * @date 4/25/18
  * @company Dingxuan
  */
-public interface IConfig {
+public class EventHelper {
     /**
-     * getCurrentConfig returns the current config
+     * createBlockEvents creates block events for a block. It removes the RW set
+     * and creates a block event and a filtered block event. Sending the events
+     * is the responsibility of the code that calls this function.
+     * @param block
      * @return
+     * @throws EventException
      */
-    Configtx.Config getCurrentConfig();
+    public static BlockEvents createBlockEvents(Common.Block block)throws EventException{
+        return null;
+    }
+
     /**
-     * updateProposeConfig attempts to validate a new configtx against the current config state
+     * send sends the event to interested consumers
+     * @param events
+     * @throws EventException
      */
-    Configtx.ConfigEnvelope updateProposeConfig(Common.Envelope configtx) throws JavaChainException;
+    public static void send(BlockEvents events) throws EventException{
+    }
 }

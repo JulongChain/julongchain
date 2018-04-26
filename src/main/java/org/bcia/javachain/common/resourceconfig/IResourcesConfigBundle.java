@@ -13,23 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.node;
-
-import org.bcia.javachain.core.ledger.INodeLedger;
+package org.bcia.javachain.common.resourceconfig;
 
 /**
- * 类描述
+ * 对象
  *
- * @author sunianle
- * @date 3/14/18
+ * @author zhouhui
+ * @date 2018/4/25
  * @company Dingxuan
  */
-public class NodeTool {
-    public static INodeLedger getLedger(String groupID){
-        return null;
-    }
-    // getMSPIDs returns the ID of each application MSP defined on this group
-    public static String[] getMspIDs(String groupID){
-        return null;
-    }
+public interface IResourcesConfigBundle {
 }

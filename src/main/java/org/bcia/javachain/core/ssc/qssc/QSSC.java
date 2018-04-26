@@ -21,7 +21,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
 import org.bcia.javachain.core.ledger.INodeLedger;
-import org.bcia.javachain.core.node.NodeTool;
+import org.bcia.javachain.core.node.util.NodeUtils;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
 import org.bcia.javachain.core.ssc.essc.ESSC;
@@ -84,7 +84,7 @@ public class QSSC extends SystemSmartContractBase {
         if(function!=GET_GROUP_INFO && size<3){
             return newErrorResponse(String.format("Missing 3rd argument for %s",function));
         }
-        INodeLedger targetLedger = NodeTool.getLedger(groupID);
+        INodeLedger targetLedger = NodeUtils.getLedger(groupID);
         if(targetLedger==null){
             return newErrorResponse(String.format("Invalid group ID %s",groupID));
         }

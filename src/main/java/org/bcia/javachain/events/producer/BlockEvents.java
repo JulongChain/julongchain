@@ -13,28 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.config;
+package org.bcia.javachain.events.producer;
 
-
-import org.bcia.javachain.common.exception.JavaChainException;
-import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.common.Configtx;
+import org.bcia.javachain.protos.node.EventsPackage;
 
 /**
- * IConfig encapsulates config (group or resource) tree
+ * 类描述
  *
  * @author sunianle
- * @date 3/13/18
+ * @date 4/25/18
  * @company Dingxuan
  */
-public interface IConfig {
-    /**
-     * getCurrentConfig returns the current config
-     * @return
-     */
-    Configtx.Config getCurrentConfig();
-    /**
-     * updateProposeConfig attempts to validate a new configtx against the current config state
-     */
-    Configtx.ConfigEnvelope updateProposeConfig(Common.Envelope configtx) throws JavaChainException;
+public class BlockEvents {
+    //block event
+    EventsPackage.Event bevent;
+    //filtered block event
+    EventsPackage.Event fbevent;
+    String groupID;
+
+
+    public BlockEvents(EventsPackage.Event bevent, EventsPackage.Event fbevent, String groupID) {
+        this.bevent = bevent;
+        this.fbevent = fbevent;
+        this.groupID = groupID;
+    }
+
+
 }

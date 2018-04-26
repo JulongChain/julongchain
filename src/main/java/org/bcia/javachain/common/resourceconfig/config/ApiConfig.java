@@ -18,7 +18,7 @@ package org.bcia.javachain.common.resourceconfig.config;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.protos.common.Configtx;
-import org.bcia.javachain.protos.peer.Resources;
+import org.bcia.javachain.protos.node.ResourcesPackage;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -49,7 +49,7 @@ public class ApiConfig implements IApiConfig {
                 String key = entry.getKey();
                 Configtx.ConfigValue value = entry.getValue();
 
-                Resources.APIResource apiResource = Resources.APIResource.parseFrom(value.getValue());
+                ResourcesPackage.APIResource apiResource = ResourcesPackage.APIResource.parseFrom(value.getValue());
                 if (apiResource.getPolicyRef().startsWith("/")) {
                     policyRefs.put(key, apiResource.getPolicyRef());
                 } else {

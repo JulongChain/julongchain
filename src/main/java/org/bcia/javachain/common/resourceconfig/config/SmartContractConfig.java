@@ -22,7 +22,7 @@ import org.bcia.javachain.common.resourceconfig.ResourceConfigConstant;
 import org.bcia.javachain.common.resourceconfig.Validation;
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.node.SmartContractDataPackage;
-import org.bcia.javachain.protos.peer.Resources;
+import org.bcia.javachain.protos.node.ResourcesPackage;
 
 /**
  * 智能合约配置对象
@@ -42,9 +42,9 @@ public class SmartContractConfig implements ISmartContractDefinition {
     private byte[] instantiationPolicy;
     private Validation validation;
 
-    private Resources.SmartContractIdentifier smartContractIdentifier;
-    private Resources.SmartContractValidation smartContractValidation;
-    private Resources.SmartContractEndorsement smartContractEndorsement;
+    private ResourcesPackage.SmartContractIdentifier smartContractIdentifier;
+    private ResourcesPackage.SmartContractValidation smartContractValidation;
+    private ResourcesPackage.SmartContractEndorsement smartContractEndorsement;
 
     public SmartContractConfig(String scName, Configtx.ConfigTree tree) throws InvalidProtocolBufferException,
             ValidateException {
@@ -57,7 +57,7 @@ public class SmartContractConfig implements ISmartContractDefinition {
         if (tree != null && tree.getValuesMap() != null) {
             Configtx.ConfigValue identifierValue = tree.getValuesMap().get(ResourceConfigConstant.SMART_CONTRACT_IDENTIFIER);
             if (identifierValue != null) {
-                smartContractIdentifier = Resources.SmartContractIdentifier.parseFrom(identifierValue.getValue());
+                smartContractIdentifier = ResourcesPackage.SmartContractIdentifier.parseFrom(identifierValue.getValue());
                 id = smartContractIdentifier.getHash().toByteArray();
                 scVersion = smartContractIdentifier.getVersion();
             }
@@ -65,7 +65,7 @@ public class SmartContractConfig implements ISmartContractDefinition {
             Configtx.ConfigValue validationValue = tree.getValuesMap().get(ResourceConfigConstant
                     .SMART_CONTRACT_VALIDATION);
             if (validationValue != null) {
-                smartContractValidation = Resources.SmartContractValidation.parseFrom(validationValue.getValue());
+                smartContractValidation = ResourcesPackage.SmartContractValidation.parseFrom(validationValue.getValue());
 
                 this.vssc = smartContractValidation.getName();
                 this.policy = smartContractValidation.getArgument().toByteArray();
@@ -75,7 +75,7 @@ public class SmartContractConfig implements ISmartContractDefinition {
             Configtx.ConfigValue endorsementValue = tree.getValuesMap().get
                     (ResourceConfigConstant.SMART_CONTRACT_ENDORSEMENT);
             if (endorsementValue != null) {
-                smartContractEndorsement = Resources.SmartContractEndorsement.parseFrom(endorsementValue.getValue());
+                smartContractEndorsement = ResourcesPackage.SmartContractEndorsement.parseFrom(endorsementValue.getValue());
                 this.essc = smartContractEndorsement.getName();
             }
         }

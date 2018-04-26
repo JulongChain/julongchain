@@ -34,4 +34,8 @@ public class BlockUtils {
     public static String getGroupIDFromBlock(Common.Block block) throws JavaChainException{
         return "testGroup";
     }
+
+    public static Common.Envelope extractEnvelope(Common.Block block,int index)throws  JavaChainException{
+        return null;
+    }
 }

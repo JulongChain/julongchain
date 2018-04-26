@@ -13,14 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig;
+package org.bcia.javachain.common.genesis;
+
+import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.protos.common.Common;
 
 /**
- * 对象
+ * 创世区块工厂接口
  *
  * @author zhouhui
- * @date 2018/4/18
+ * @date 2018/4/25
  * @company Dingxuan
  */
-public class GroupConfigBundleSource {
+public interface IGenesisBlockFactory {
+    Common.Block getGenesisBlock(String groupId) throws JavaChainException;
 }

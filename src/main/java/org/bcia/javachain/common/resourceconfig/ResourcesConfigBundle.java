@@ -13,27 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.config;
+package org.bcia.javachain.common.resourceconfig;
 
 /**
- * 配置管理接口
+ * 对象
  *
- * @author sunianle
- * @date 3/13/18
+ * @author zhouhui
+ * @date 2018/4/25
  * @company Dingxuan
  */
-public interface IConfigManager {
-    /**
-     * getGroupConfig defines methods that are related to group configuration
-     * @param groupID
-     * @return
-     */
-    IConfig getGroupConfig(String groupID);
-
-    /**
-     * getResourceConfig defines methods that are related to resource configuration
-     * @param groupID
-     * @return
-     */
-    IConfig getResourceConfig(String groupID);
+public class ResourcesConfigBundle {
 }

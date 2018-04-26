@@ -23,4 +23,13 @@ package org.bcia.javachain.common.config;
  * @company Dingxuan
  */
 public class ConfigManager implements IConfigManager {
+    @Override
+    public IConfig getGroupConfig(String groupID) {
+        return null;
+    }
+
+    @Override
+    public IConfig getResourceConfig(String groupID) {
+        return null;
+    }
 }

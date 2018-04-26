@@ -25,7 +25,7 @@ import org.bcia.javachain.common.policies.IPolicyManager;
  * @date 2018/3/27
  * @company Dingxuan
  */
-public interface IConfigResources {
+public interface IGroupConfigBundle {
     IValidator configtxValidator();
 
     IPolicyManager getPolicyManager();
@@ -33,7 +33,7 @@ public interface IConfigResources {
 
 
     // ConfigtxValidator returns the configtx.Validator for the channel
-//    IConfigResources() configtx.Validator
+//    IGroupConfigBundle() configtx.Validator
 //
 //        // PolicyManager returns the policies.Manager for the channel
 //    PolicyManager() policies.Manager
@@ -43,18 +43,18 @@ public interface IConfigResources {
 //
 //    // OrdererConfig returns the config.Orderer for the channel
 //    // and whether the Orderer config exists
-//    IConfigResources() (Orderer, bool)
+//    IGroupConfigBundle() (Orderer, bool)
 //
 //    // ConsortiumsConfig() returns the config.Consortiums for the channel
 //    // and whether the consortiums config exists
-//    IConfigResources() (Consortiums, bool)
+//    IGroupConfigBundle() (Consortiums, bool)
 //
 //    // ApplicationConfig returns the configtxapplication.SharedConfig for the channel
 //    // and whether the Application config exists
-//    IConfigResources() (Application, bool)
+//    IGroupConfigBundle() (Application, bool)
 //
 //    // MSPManager returns the msp.MSPManager for the chain
-//    IConfigResources() msp.MSPManager
+//    IGroupConfigBundle() msp.MSPManager
 //
 //        // ValidateNew should return an error if a new set of configuration resources is incompatible with the current one
 //    ValidateNew(resources Resources) error

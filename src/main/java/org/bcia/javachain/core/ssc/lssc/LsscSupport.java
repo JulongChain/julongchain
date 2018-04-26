@@ -26,7 +26,7 @@ import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.core.common.smartcontractprovider.ISmartContractPackage;
 import org.bcia.javachain.core.common.smartcontractprovider.SignedSDSPackage;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractProvider;
-import org.bcia.javachain.core.node.NodeTool;
+import org.bcia.javachain.core.node.util.NodeUtils;
 import org.bcia.javachain.msp.IMspManager;
 import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.protos.common.Common;
@@ -101,7 +101,7 @@ public class LsscSupport {
         else{
             // the default instantiation policy allows any of the group MSP admins
             // to be able to instantiate
-            String[] mspIds = NodeTool.getMspIDs(group);
+            String[] mspIds = NodeUtils.getMspIDs(group);
             Policies.SignaturePolicyEnvelope p = CAuthDslBuilder.signedByAnyAdmin(mspIds);
             instantiationPolicy=p.toByteArray();
         }
