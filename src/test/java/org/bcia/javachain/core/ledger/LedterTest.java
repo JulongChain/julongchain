@@ -39,7 +39,8 @@ public class LedterTest {
     @Test
     public void longl() throws Throwable {
 //        LevelDbProvider provider = LevelDbProvider.newProvider("/tmp/fabric/ledgertests/ledgermgmt/ledgersData/ledgerProvider");
-        LevelDbProvider provider = LevelDbProvider.newProvider("/home/bcia/javachain/ledgersData/ledgerProvider");
+//        LevelDbProvider provider = LevelDbProvider.newProvider("/home/bcia/javachain/ledgersData/ledgerProvider");
+        LevelDbProvider provider = LevelDbProvider.newProvider("/home/bcia/javachain/ledgersData/stateLeveldb");
         Iterator<Map.Entry<byte[], byte[]>> itr =  provider.getIterator(null, null);
         while(itr.hasNext()){
             Map.Entry<byte[], byte[]> entry = itr.next();

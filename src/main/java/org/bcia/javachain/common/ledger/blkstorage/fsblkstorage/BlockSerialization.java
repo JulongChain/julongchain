@@ -91,6 +91,7 @@ public class BlockSerialization {
         SerializedBlockInfo info = new SerializedBlockInfo();
         info.setBlockHeader(block.getHeader());
         info.setMetadata(block.getMetadata());
+        info.setTxOffsets(addDataBytes(block));
         return info;
     }
 

@@ -20,10 +20,10 @@ import org.bcia.javachain.protos.common.Common;
 import java.util.List;
 
 /**
- * 类描述
+ * 序列化的区块信息
  *
- * @author wanliangbing
- * @date 2018/3/7
+ * @author sunzongyu
+ * @date 2018/4/7
  * @company Dingxuan
  */
 public class SerializedBlockInfo {

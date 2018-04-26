@@ -26,10 +26,10 @@ import org.bcia.javachain.protos.node.TransactionPackage;
 import java.util.List;
 
 /**
- * 类描述
+ * 用于封装block索引信息
  *
- * @author wanliangbing
- * @date 2018/3/8
+ * @author sunzongyu
+ * @date 2018/04/09
  * @company Dingxuan
  */
 public class BlockIdxInfo {

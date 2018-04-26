@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 操作block索引类
  *
  * @author sunzongyu
  * @date 2018/04/09
@@ -68,6 +69,10 @@ public class BlockIndex implements Index {
         return index;
     }
 
+    /**
+     * 获取最新索引
+     */
+    @Override
     public Long getLastBlockIndexed() throws LedgerException {
         byte[] blockNumBytes = null;
         blockNumBytes = db.get(INDEX_CHECKPOINT_KEY);
@@ -77,6 +82,10 @@ public class BlockIndex implements Index {
         return Util.bytesToLong(blockNumBytes, 0, blockNumBytes.length);
     }
 
+    /**
+     * 设置索引
+     */
+    @Override
     public void indexBlock(BlockIdxInfo blockIdxInfo) throws LedgerException {
         if(indexItemsMap.size() == 0){
            logger.debug("No indexing block, as nothing to index");
@@ -110,7 +119,7 @@ public class BlockIndex implements Index {
         }
 
         //index4 查询历史数据
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRANS_NUM)){
+        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM)){
             for(int i = 0; i < txOffsets.size(); i++){
                 TxIndexInfo txOffset = txOffsets.get(i);
                 FileLocPointer txFlp = FileLocPointer.newFileLocationPointer(flp.getFileSuffixNum(), flp.getLocPointer().getOffset(), txOffset.getLoc());
@@ -139,6 +148,10 @@ public class BlockIndex implements Index {
         db.writeBatch(batch, true);
     }
 
+    /**
+     * 根据blockhash获取区块位置
+     */
+    @Override
     public FileLocPointer getBlockLocByHash(byte[] blockHash) throws LedgerException{
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_HASH) == null){
             throw BlockStorage.ERR_ARRT_NOT_INDEXED;
@@ -152,11 +165,15 @@ public class BlockIndex implements Index {
         return blkLoc;
     }
 
-    public FileLocPointer getBlockLocByBlockNum(Long blockNum) throws LedgerException {
+    /**
+     * 根据blockID获取区块位置信息
+     */
+    @Override
+    public FileLocPointer getBlockLocByBlockNum(long blockID) throws LedgerException {
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM) == null){
             throw BlockStorage.ERR_ARRT_NOT_INDEXED;
         }
-        byte[] b = db.get(constructBlockNumKey(blockNum));
+        byte[] b = db.get(constructBlockNumKey(blockID));
         if(b == null){
             throw BlockStorage.ERR_NOT_FOUND_IN_INDEX;
         }
@@ -165,6 +182,10 @@ public class BlockIndex implements Index {
         return blkLoc;
     }
 
+    /**
+     * 根据交易ID获取交易信息
+     */
+    @Override
     public FileLocPointer getTxLoc(String txID) throws LedgerException {
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_ID) == null){
             throw BlockStorage.ERR_ARRT_NOT_INDEXED;
@@ -178,6 +199,10 @@ public class BlockIndex implements Index {
         return txFLP;
     }
 
+    /**
+     * 根据交易ID获取区块信息
+     */
+    @Override
     public FileLocPointer getBlockLocByTxID(String txID) throws LedgerException{
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_TX_ID) == null){
             throw BlockStorage.ERR_ARRT_NOT_INDEXED;
@@ -191,8 +216,12 @@ public class BlockIndex implements Index {
         return txFLP;
     }
 
-    public FileLocPointer getTXLocByBlockNumTranNum(Long blockNum, Long tranNum) throws LedgerException{
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRANS_NUM) == null){
+    /**
+     * 根据blockID, 交易ID获取交易信息
+     */
+    @Override
+    public FileLocPointer getTXLocByBlockNumTranNum(long blockNum, long tranNum) throws LedgerException{
+        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM) == null){
             throw BlockStorage.ERR_ARRT_NOT_INDEXED;
         }
         byte[] b = db.get(constructBlockNumTranNumKey(blockNum, tranNum));
@@ -204,6 +233,10 @@ public class BlockIndex implements Index {
         return txFLP;
     }
 
+    /**
+     * 获取交易验证结果
+     */
+    @Override
     public TransactionPackage.TxValidationCode getTxValidationCodeByTxID(String txID) throws LedgerException {
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_VALIDATION_CODE) == null){
             throw BlockStorage.ERR_ARRT_NOT_INDEXED;
@@ -217,9 +250,9 @@ public class BlockIndex implements Index {
         return TransactionPackage.TxValidationCode.forNumber((int) raw[0]);
     }
 
-    byte[] constructBlockNumKey(Long blockNum) {
+    byte[] constructBlockNumKey(long blockNum) {
         byte[] blkNumBytes = Util.longToBytes(blockNum, 8);
-        return ArrayUtils.addAll(BLOCK_HASH_IDX_KEY_PREFIX.getBytes(), blkNumBytes);
+        return ArrayUtils.addAll(BLOCK_NUM_IDX_KEY_PREFIX.getBytes(), blkNumBytes);
     }
 
     byte[] constructBlockHashKey(byte[] blockHash) {

@@ -19,10 +19,10 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
 /**
- * 类描述
+ * 索引接口
  *
- * @author wanliangbing
- * @date 2018/3/8
+ * @author sunzongyu
+ * @date 2018/4/9
  * @company Dingxuan
  */
 public interface Index {
@@ -33,11 +33,11 @@ public interface Index {
 
     FileLocPointer getBlockLocByHash(byte[] blockHash) throws LedgerException;
 
-    FileLocPointer getBlockLocByBlockNum(Long blockNum) throws LedgerException;
+    FileLocPointer getBlockLocByBlockNum(long blockID) throws LedgerException;
 
     FileLocPointer getTxLoc(String txID) throws LedgerException;
 
-    FileLocPointer getTXLocByBlockNumTranNum(Long blockNum, Long tranNum) throws LedgerException;
+    FileLocPointer getTXLocByBlockNumTranNum(long blockNum, long tranNum) throws LedgerException;
 
     FileLocPointer getBlockLocByTxID(String txID) throws LedgerException;
 

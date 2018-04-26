@@ -37,7 +37,7 @@ public class BlockfileHelper {
     private static final String BLOCK_FILE_PREFIX = "blockfile_";
 
     /**
-     * 根据区块文件, 组织结点信息
+     * 根据区块文件, 组织检查点信息
      */
     public static CheckpointInfo constructCheckpointInfoFromBlockFiles(String rootDir) throws LedgerException {
         logger.debug("Retrieving checkpoint info from block files");
@@ -49,9 +49,10 @@ public class BlockfileHelper {
         Common.Block lastBlock;
         List<Object> list;
         File fileInfo;
+        //检索最近添加的区块文件
         lastFileNum = retrieveLastFileSuffix(rootDir);
         logger.debug("Last file number found = %d", lastFileNum);
-        //没有找到文件
+        //没有找到文件, 初始化检查点信息
         if(lastFileNum == -1){
             logger.debug("File not found");
             CheckpointInfo cpInfo = new CheckpointInfo();
@@ -61,25 +62,30 @@ public class BlockfileHelper {
             cpInfo.setLastBlockNumber((long) 0);
             return cpInfo;
         }
+        //获取最近添加的区块文件
         fileInfo = getFileInfoOrPanic(rootDir,lastFileNum);
         logger.debug(String.format("Last block file info: Filename=[%s]", fileInfo.getName()));
+        //获取最新区块信息
         list = BlockfileMgr.scanForLastCompleteBlock(rootDir, lastFileNum, (long) 0);
+        //区块信息
         lastBlockBytes = (byte[]) list.get(BlockfileMgr.LAST_BLOCK_BYTES);
+        //位置
         endOffsetLastBlock = (long) list.get(BlockfileMgr.CURRENT_OFFSET);
+        //文件中区块数量
         numBlocksInFile = (int) list.get(BlockfileMgr.NUM_BLOCKS);
-
+        //最新区块文件中没有区块, 则倒数第二区块文件的最新区块为最新区块
         if(numBlocksInFile == 0 && lastFileNum > 0){
             int secondLastFileNum = lastFileNum - 1;
             fileInfo = getFileInfoOrPanic(rootDir, secondLastFileNum);
             logger.debug(String.format("Second last block file info: FileName=[%s]", fileInfo.getName()));
             lastBlockBytes = (byte[]) BlockfileMgr.scanForLastCompleteBlock(rootDir, secondLastFileNum, (long) 0).get(BlockfileMgr.LAST_BLOCK_BYTES);
         }
-
+        //解析区块
         if(lastBlockBytes != null){
             lastBlock = BlockSerialization.deserializeBlock(lastBlockBytes);
             lastBlockNum = lastBlock.getHeader().getNumber();
         }
-        //组装产品Info
+        //组装检查点
         CheckpointInfo cpInfo = new CheckpointInfo();
         cpInfo.setLastBlockNumber(lastBlockNum);
         cpInfo.setLatestFileChunksize((int) endOffsetLastBlock);
@@ -89,13 +95,14 @@ public class BlockfileHelper {
     }
 
     /**
-     * 检索最近的区块文件号
+     * 检索区块文件号最大的文件编号
      */
     public static Integer retrieveLastFileSuffix(String rootDir) throws LedgerException{
         logger.debug("retrieveLastFileSuffix()");
         int biggestFileNum = -1;
         File[] filesInfo;
         try {
+            //获取rootdir中所有文件
             filesInfo = new File(rootDir).listFiles();
         } catch (Exception e) {
             throw new LedgerException("File to list files in " + rootDir);
@@ -103,12 +110,13 @@ public class BlockfileHelper {
         for (int i = 0; filesInfo != null && i < filesInfo.length; i++) {
             File file =  filesInfo[i];
             String name = file.getName();
+            //跳过文件名错误的文件和目录文件
             if(file.isDirectory() || !isBlockFileName(name)){
                 logger.debug("Skipping file name " + name);
                 continue;
             }
-            String fileSuffix = null;
-            fileSuffix = name.substring(0, BLOCK_FILE_PREFIX.length());
+            //截取文件编号
+            String fileSuffix = name.substring(0, BLOCK_FILE_PREFIX.length());
             int fileNum = Integer.valueOf(fileSuffix);
             if(fileNum > biggestFileNum){
                 biggestFileNum = fileNum;
@@ -119,14 +127,14 @@ public class BlockfileHelper {
     }
 
     /**
-     * 判断文件是否以BLOCK_FILE_PREFIX起始
+     * 判断文件是否以BLOCK_FILE_PREFIX(blockfile)起始
      */
     public static Boolean isBlockFileName(String name) {
         return name.startsWith(BLOCK_FILE_PREFIX);
     }
 
     /**
-     * 获取文件
+     * 根据区块文件编号, 获取文件
      */
     public static File getFileInfoOrPanic(String rootDir, Integer fileNum) throws LedgerException{
         String filePath = BlockfileMgr.deriveBlockfilePath(rootDir, fileNum);

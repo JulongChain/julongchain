@@ -24,7 +24,7 @@ import java.io.*;
 import java.util.AbstractMap;
 
 /**
- * 操作block文件
+ * 操作block文件的流方法
  *
  * @author sunzongyu
  * @date 2018/04/09
@@ -120,7 +120,7 @@ public class BlockfileStream {
         logger.debug(String.format("Remaining bytes=[%d], Going to peek [%d] bytes", remainingBytes, peekBytes));
         //读取8字节,并解析为block长度
         try {
-            reader.read(lenBytes, currentOffset.intValue(), peekBytes);
+            reader.read(lenBytes);
         } catch (Throwable e) {
             throw new LedgerException(e);
         }

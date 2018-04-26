@@ -13,23 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
+package org.bcia.javachain.core.ledger.leveldb;
+
+import org.iq80.leveldb.DB;
+import org.iq80.leveldb.Options;
+import org.iq80.leveldb.impl.DbImpl;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
- * 提供初始化区块文件读写方法
+ * 重写LevelDB，增加close方法
  *
- * @author sunzongyu
- * @date 2018/04/12
+ * @author wanliangbing
+ * @date 2018/4/26
  * @company Dingxuan
  */
-public class BlockfileRw {
+public class LevelDB extends DbImpl implements DB {
 
-    public static BlockfileWriter newBlockfileWriter(String filePath) {
-        return BlockfileWriter.newBlockfileWriter(filePath);
+    public LevelDB(Options options, File databaseDir) throws IOException {
+        super(options, databaseDir);
     }
 
-    public static BlockfileReader newBlockfileReader(String filePath) {
-        return BlockfileReader.newBlockfileReader(filePath);
+    @Override
+    public void close() {
+        LevelDBFactory.removeDb(this);
+        super.close();
     }
 
 }

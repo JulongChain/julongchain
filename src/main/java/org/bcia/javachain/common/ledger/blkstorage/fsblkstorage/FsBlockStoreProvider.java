@@ -27,7 +27,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 
 /**
- * 类描述
+ * 操作blockchain文件系统类
  *
  * @author sunzongyu
  * @date 2018/04/17
@@ -41,9 +41,7 @@ public class FsBlockStoreProvider implements BlockStoreProvider {
     private DBProvider leveldbProvider;
 
     /**
-     * NewProvider constructs a filesystem based block store provider
-     *
-     * @return
+     * 创建文件系统操作类
      */
     public static BlockStoreProvider newProvider(Conf conf, IndexConfig indexConfig) throws LedgerException {
         FsBlockStoreProvider provider = new FsBlockStoreProvider();
@@ -55,39 +53,42 @@ public class FsBlockStoreProvider implements BlockStoreProvider {
     }
 
     /**
-     * CreateBlockStore simply calls OpenBlockStore*
-     *
+     * 创建(打开)一个文件系统
      */
+    @Override
     public BlockStore createBlockStore(String ledgerid) throws LedgerException {
         return openBlockStore(ledgerid);
     }
 
     /**
-     * OpenBlockStore opens a block store for given ledgerid.
-     * If a blockstore is not existing, this method creates one
-     * This method should be invoked only once for a particular ledgerid
+     * 打开一个文件系统,不存在则会创建.
+     * 仅调用一次
      */
+    @Override
     public BlockStore openBlockStore(String ledgerid) throws LedgerException {
         return FsBlockStore.newFsBlockStore(ledgerid, conf, indexConfig, leveldbProvider);
     }
 
     /**
-     * Exists tells whether the BlockStore with given id exists
+     * 给出的ledgerid是否存在文件系统
      */
+    @Override
     public Boolean exists(String ledgerid) {
          return IoUtil.fileExists(conf.getLedgerBlockDir(ledgerid)) >= 0;
     }
 
     /**
-     * List lists the ids of the existing ledgers
-     */
+     * 列出存在的文件系统id
+    */
+    @Override
     public String[] list() {
         return IoUtil.listSubdirs(conf.getChainsDir());
     }
 
     /**
-     * Close closes the FsBlockstoreProvider
+     * 关闭文件系统
      */
+    @Override
     public void close() throws LedgerException {
         leveldbProvider.close();
     }

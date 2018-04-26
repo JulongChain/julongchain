@@ -16,23 +16,40 @@
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.UpdateBatch;
 import org.bcia.javachain.core.ledger.util.Util;
 
 /**
- * 类描述
+ * block检查点类
+ * 每在blockfile中存储一个block都在leveldb中添加检查点信息
  *
- * @author
- * @date 2018/3/8
+ * @author sunzongyu
+ * @date 2018/4/8
  * @company Dingxuan
  */
 public class CheckpointInfo {
 
+    /**
+     *block文件后缀名
+     */
     private int lastestFileChunkSuffixNum;
+    /**
+     * 当前block的大小
+     */
     private int latestFileChunksize;
+    /**
+     * 当前账本是否为空
+     */
     private boolean isChainEmpty;
+    /**
+     * 当前账本最新block序号
+     */
     private long lastBlockNumber;
 
+    /**
+     * 序列化检查点
+     */
     byte[] marshal() {
         //4部分共32字节
         //0~7位 lastestFileChunkSuffixNum
@@ -53,7 +70,10 @@ public class CheckpointInfo {
         return result;
     }
 
-    void unmarshal(byte[] b) {
+    /**
+     * 反序列化
+     */
+    void unmarshal(byte[] b) throws LedgerException {
         //4部分共32字节
         //0~7位 lastestFileChunkSuffixNum
         lastestFileChunkSuffixNum = (int) Util.bytesToLong(b, 0, 8);
@@ -65,35 +85,35 @@ public class CheckpointInfo {
         isChainEmpty = Util.bytesToLong(b, 24, 8) == 1;
     }
 
-    public Integer getLastestFileChunkSuffixNum() {
+    public int getLastestFileChunkSuffixNum() {
         return lastestFileChunkSuffixNum;
     }
 
-    public void setLastestFileChunkSuffixNum(Integer lastestFileChunkSuffixNum) {
+    public void setLastestFileChunkSuffixNum(int lastestFileChunkSuffixNum) {
         this.lastestFileChunkSuffixNum = lastestFileChunkSuffixNum;
     }
 
-    public Integer getLatestFileChunksize() {
+    public int getLatestFileChunksize() {
         return latestFileChunksize;
     }
 
-    public void setLatestFileChunksize(Integer latestFileChunksize) {
+    public void setLatestFileChunksize(int latestFileChunksize) {
         this.latestFileChunksize = latestFileChunksize;
     }
 
-    public Boolean getChainEmpty() {
+    public boolean getChainEmpty() {
         return isChainEmpty;
     }
 
-    public void setChainEmpty(Boolean chainEmpty) {
+    public void setChainEmpty(boolean chainEmpty) {
         isChainEmpty = chainEmpty;
     }
 
-    public Long getLastBlockNumber() {
+    public long getLastBlockNumber() {
         return lastBlockNumber;
     }
 
-    public void setLastBlockNumber(Long lastBlockNumber) {
+    public void setLastBlockNumber(long lastBlockNumber) {
         this.lastBlockNumber = lastBlockNumber;
     }
 
