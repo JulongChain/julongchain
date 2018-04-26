@@ -105,7 +105,7 @@ public class LedgerManager {
         log.info("Opening ledger with id = " + id);
         INodeLedger l = openedLedgers.get(id);
         if(l != null){
-            throw ERR_LEDGER_ALREADY_OPENEND;
+            return l;
         }
         l = ledgerProvider.open(id);
 //        l = wrapLedger(id, l);
