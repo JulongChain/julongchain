@@ -33,12 +33,12 @@ public class BlocksItr implements ResultsIterator {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlocksItr.class);
 
     private BlockFileManager mgr;
-    private Long maxBlockNumAvailable;
-    private Long blockNumToRetrieve;
+    private long maxBlockNumAvailable;
+    private long blockNumToRetrieve;
     private BlockStream stream;
     private Boolean closeMarker;
 
-    public static BlocksItr newBlockItr(BlockFileManager mgr, Long startBlockNum) {
+    public static BlocksItr newBlockItr(BlockFileManager mgr, long startBlockNum) {
         BlocksItr itr = new BlocksItr();
         itr.setMgr(mgr);
         itr.setMaxBlockNumAvailable(mgr.getCpInfo().getLastBlockNumber());
@@ -51,7 +51,7 @@ public class BlocksItr implements ResultsIterator {
     /**
      * TODO 读取区块时, 区块长度不足将等待区块的添加
      */
-    public synchronized long waitForBlock(Long blockNum) {
+    public synchronized long waitForBlock(long blockNum) {
 //        while(mgr.getCpInfo().getLastBlockNumber() < blockNum && !shouldClose()){
 //            logger.debug(String.format("Going to wait for newer blocks.maxAvailaBlockNumber=[%d], waitForBlockNum=[%d]"
 //                    , mgr.getCpInfo().getLastBlockNumber(), blockNum));
@@ -112,19 +112,19 @@ public class BlocksItr implements ResultsIterator {
         this.mgr = mgr;
     }
 
-    public Long getMaxBlockNumAvailable() {
+    public long getMaxBlockNumAvailable() {
         return maxBlockNumAvailable;
     }
 
-    public void setMaxBlockNumAvailable(Long maxBlockNumAvailable) {
+    public void setMaxBlockNumAvailable(long maxBlockNumAvailable) {
         this.maxBlockNumAvailable = maxBlockNumAvailable;
     }
 
-    public Long getBlockNumToRetrieve() {
+    public long getBlockNumToRetrieve() {
         return blockNumToRetrieve;
     }
 
-    public void setBlockNumToRetrieve(Long blockNumToRetrieve) {
+    public void setBlockNumToRetrieve(long blockNumToRetrieve) {
         this.blockNumToRetrieve = blockNumToRetrieve;
     }
 

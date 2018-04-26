@@ -58,7 +58,7 @@ public interface IHistoryDB extends Recoverable {
     /**
      * 恢复位置
      */
-    long recoverPoint(Long lastAvailableBlock) throws LedgerException;
+    long recoverPoint(long lastAvailableBlock) throws LedgerException;
 
     /**
      * 提交丢失的区块

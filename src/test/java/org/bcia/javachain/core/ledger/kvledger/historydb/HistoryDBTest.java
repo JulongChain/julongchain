@@ -70,8 +70,8 @@ public class HistoryDBTest {
         Height h = db.getLastSavepoint();
         System.out.println(h.getTxNum());
         System.out.println(h.getBlockNum());
-        Assert.assertEquals(new Long(1000), h.getBlockNum());
-        Assert.assertEquals(new Long(10000), h.getTxNum());
+        Assert.assertEquals(1000, h.getBlockNum());
+        Assert.assertEquals(10000, h.getTxNum());
     }
 
     @Test

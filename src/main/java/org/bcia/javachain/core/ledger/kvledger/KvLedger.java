@@ -139,7 +139,7 @@ public class KvLedger implements INodeLedger {
     /** recommitLostBlocks retrieves blocks in specified range and commit the write set to either
      * state DB or history DB or both
      */
-    public void recommitLostBlocks(Long firstBlockNum, Long lastBlockNum, Recoverable ... recoverables) throws LedgerException{
+    public void recommitLostBlocks(long firstBlockNum, long lastBlockNum, Recoverable ... recoverables) throws LedgerException{
         BlockAndPvtData blockAndPvtData;
         for (long blockNumber = firstBlockNum; blockNumber <= lastBlockNum; blockNumber++) {
             blockAndPvtData = getPvtDataAndBlockByNum(blockNumber, null);
@@ -177,7 +177,7 @@ public class KvLedger implements INodeLedger {
      * blockNumber of  math.MaxUint64 will return last block
      */
     @Override
-    public Common.Block getBlockByNumber(Long blockNumber) throws LedgerException {
+    public Common.Block getBlockByNumber(long blockNumber) throws LedgerException {
         return blockStore.retrieveBlockByNumber(blockNumber);
     }
 
@@ -186,7 +186,7 @@ public class KvLedger implements INodeLedger {
      * ResultsIterator contains type BlockHolder
      */
     @Override
-    public ResultsIterator getBlocksIterator(Long startBlockNumber) throws LedgerException{
+    public ResultsIterator getBlocksIterator(long startBlockNumber) throws LedgerException{
         return blockStore.retrieveBlocks(startBlockNumber);
     }
 

@@ -317,7 +317,7 @@ public class BlockFileManager {
             blockIndexInfo.setBlockNum(info.getBlockHeader().getNumber());
             FileLocPointer flp = new FileLocPointer();
             LocPointer lp = new LocPointer();
-            lp.setOffset(blockPlacementInfo.getBlockStartOffset().intValue());
+            lp.setOffset((int) blockPlacementInfo.getBlockStartOffset());
             flp.setFileSuffixNum(blockPlacementInfo.getFileNum());
             flp.setLocPointer(lp);
             blockIndexInfo.setTxOffsets(info.getTxOffsets());
@@ -362,7 +362,7 @@ public class BlockFileManager {
         return fetchBlock(loc);
     }
 
-    public Common.Block retrieveBlockByNumber(Long blockNum) throws LedgerException {
+    public Common.Block retrieveBlockByNumber(long blockNum) throws LedgerException {
         logger.debug(String.format("retrieveBlockByHash() - blockHash = [%d]", blockNum));
         if(blockNum == Long.MAX_VALUE){
             blockNum = getBlockchainInfo().getHeight() - 1;
@@ -412,7 +412,7 @@ public class BlockFileManager {
         return info.getBlockHeader();
     }
 
-    public BlocksItr retrieveBlocks(Long startNum) {
+    public BlocksItr retrieveBlocks(long startNum) {
         return BlocksItr.newBlockItr(this, startNum);
     }
 
@@ -427,7 +427,7 @@ public class BlockFileManager {
         return fetchTransactionEnvelope(loc);
     }
 
-    public Common.Envelope retrieveTransactionByBlockNumTranNum(Long blockNum, Long tranNum) throws LedgerException{
+    public Common.Envelope retrieveTransactionByBlockNumTranNum(long blockNum, long tranNum) throws LedgerException{
         logger.debug(String.format("retrieveTransactionByBlockNumTranNum() - blockNum = [%d], tranNum = [%d]"
                 , blockNum, tranNum));
         FileLocPointer loc = null;
@@ -504,7 +504,7 @@ public class BlockFileManager {
      *          CURRENT_OFFSET: 位置
      *          NUM_BLOCKS: 区块数量
      */
-    public static List<Object> scanForLastCompleteBlock(String rootDir, Integer fileNum, Long startingOffset) throws LedgerException{
+    public static List<Object> scanForLastCompleteBlock(String rootDir, Integer fileNum, long startingOffset) throws LedgerException{
         BlockFileStream stream = null;
         byte[] blockBytes = null;
         byte[] lastBlockBytes = null;

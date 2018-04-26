@@ -13,21 +13,27 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.statebasedval;
+package org.bcia.javachain.common.ledger.blockledger;
 
-import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
-import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
+import org.bcia.javachain.protos.common.Common;
+
+import java.util.Map;
 
 /**
- * 验证器接口
+ * 迭代器接口
  *
  * @author sunzongyu
- * @date 2018/04/19
+ * @date 2018/04/26
  * @company Dingxuan
  */
-public interface IRangeQueryValidator {
-    void init(KvRwset.RangeQueryInfo rqInfo, ResultsIterator itr) throws LedgerException ;
+public interface Iterator {
 
-    boolean validate()throws LedgerException;
+    /**
+     * 返回下一个block
+     */
+    Map.Entry<Common.Block, Common.Status> next();
+
+    void readyChain();
+
+    void close();
 }

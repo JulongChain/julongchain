@@ -56,15 +56,15 @@ public class Util {
      * The presence of first byte also allows to use the returned bytes as part of other larger byte array such as a
      * composite-key representation in db
      */
-    public static byte[] encodeOrderPreservingVarUint64(Long number) {
+    public static byte[] encodeOrderPreservingVarUint64(long number) {
         return null;
     }
 
     /** DecodeOrderPreservingVarUint64 decodes the number from the bytes obtained from method 'EncodeOrderPreservingVarUint64'.
      * Also, returns the number of bytes that are consumed in the process
      */
-    public static Long decodeOrderPreservingVarUint64(byte[] bytes) {
-        return null;
+    public static long decodeOrderPreservingVarUint64(byte[] bytes) {
+        return 0;
     }
 
 }

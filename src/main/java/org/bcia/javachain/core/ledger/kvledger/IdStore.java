@@ -121,8 +121,7 @@ public class IdStore {
             if(entry.getKey().equals(UNDER_CONSTRUCTION_LEDGER_KEY)){
                 continue;
             }
-            String id = new String(entry.getKey());
-            ids.add(id);
+            ids.add(decodeLedgerID(entry.getKey()));
         }
         return ids;
     }

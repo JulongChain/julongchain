@@ -22,7 +22,10 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.*;
 
 /**
- * 类描述
+ * 组合的迭代器
+ * updatesItr   遍历更新包   A
+ * dbItr        遍历db中的键 B
+ *
  *
  * @author sunzongyu
  * @date 2018/04/19

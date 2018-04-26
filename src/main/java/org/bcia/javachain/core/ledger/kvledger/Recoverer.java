@@ -24,14 +24,14 @@ package org.bcia.javachain.core.ledger.kvledger;
  */
 public class Recoverer {
 
-    private Long firstBlockNum;
+    private long firstBlockNum;
     private Recoverable recoverable;
 
-    public Long getFirstBlockNum() {
+    public long getFirstBlockNum() {
         return firstBlockNum;
     }
 
-    public void setFirstBlockNum(Long firstBlockNum) {
+    public void setFirstBlockNum(long firstBlockNum) {
         this.firstBlockNum = firstBlockNum;
     }
 

@@ -41,3 +41,4 @@ public class NsBatch {
         this.batch = batch;
     }
 }
+

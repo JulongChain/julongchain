@@ -42,11 +42,11 @@ public interface BlockStore extends FileLedgerBlockStore {
 
     Common.Block retrieveBlockByHash(byte[] blockHash) throws LedgerException;
 
-    Common.Block retrieveBlockByNumber(Long blockNum) throws LedgerException;
+    Common.Block retrieveBlockByNumber(long blockNum) throws LedgerException;
 
     Common.Envelope retrieveTxByID(String txID) throws LedgerException;
 
-    Common.Envelope retrieveTxByBlockNumTranNum(Long blockNum, Long tranNum) throws LedgerException;
+    Common.Envelope retrieveTxByBlockNumTranNum(long blockNum, long tranNum) throws LedgerException;
 
     Common.Block retrieveBlockByTxID(String txID) throws LedgerException;
 

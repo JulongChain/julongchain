@@ -93,7 +93,7 @@ public class Store implements BlockStore{
     }
 
     @Override
-    public Common.Block retrieveBlockByNumber(Long blockNum) throws LedgerException {
+    public Common.Block retrieveBlockByNumber(long blockNum) throws LedgerException {
         return blkStorage.retrieveBlockByNumber(blockNum);
     }
 
@@ -103,7 +103,7 @@ public class Store implements BlockStore{
     }
 
     @Override
-    public Common.Envelope retrieveTxByBlockNumTranNum(Long blockNum, Long tranNum) throws LedgerException {
+    public Common.Envelope retrieveTxByBlockNumTranNum(long blockNum, long tranNum) throws LedgerException {
         return blkStorage.retrieveTxByBlockNumTranNum(blockNum, tranNum);
     }
 
