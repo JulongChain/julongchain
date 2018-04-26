@@ -47,6 +47,7 @@ public class LevelDBHandle implements DBHandle {
     private boolean opened = false;
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(LevelDBHandle.class);
 
+    @Override
     public String getDbName() {
         return dbName;
     }
@@ -58,6 +59,7 @@ public class LevelDBHandle implements DBHandle {
     /**
      * 数据库是否开启
      */
+    @Override
     public boolean isOpened() {
         return opened;
     }
@@ -65,8 +67,9 @@ public class LevelDBHandle implements DBHandle {
     /**
      * 创建db
      */
+    @Override
     public DB createDB(String dbPath) throws LedgerException{
-        this.db = LevelDBFactory.getDB(dbPath);
+//        this.db = LevelDBFactory.getDB(dbPath);
         this.opened = true;
         this.dbName = dbPath;
         return db;
@@ -75,6 +78,7 @@ public class LevelDBHandle implements DBHandle {
     /**
      * 关闭db
      */
+    @Override
     public void close() throws LedgerException{
         try {
             db.close();
@@ -87,64 +91,60 @@ public class LevelDBHandle implements DBHandle {
     /**
      * 根据key获取value
      */
+    @Override
     public byte[] get(byte[] key) throws LedgerException {
         if(!opened){
             throw new LedgerException("No db created");
         } else {
-            return LevelDBFactory.get(db, key ,false);
+            return LevelDBFactory.get(dbName, key ,false);
         }
     }
 
     /**
      * 插入当前kv
      */
+    @Override
     public void put(byte[] key, byte[] value, boolean sync) throws LedgerException {
         if(!opened){
             logger.error("No db created");
         } else {
-            LevelDBFactory.add(db, key, value, sync);
+            LevelDBFactory.add(dbName, key, value, sync);
         }
     }
 
     /**
      * 删除给定key
      */
+    @Override
     public void delete(byte[] key, boolean sync) throws LedgerException {
         if(!opened){
             logger.error("No db created");
         } else {
-            LevelDBFactory.delete(db, key, sync);
+            LevelDBFactory.delete(dbName, key, sync);
         }
     }
 
     /**
      * 批量执行操作
      */
+    @Override
     public void writeBatch(UpdateBatch batch, boolean sync) throws LedgerException {
         if(!opened){
             logger.error("No db created");
         } else {
-            LevelDBFactory.add(db, batch.getKvs(), sync);
+            LevelDBFactory.add(dbName, batch.getKvs(), sync);
         }
     }
 
     /**
      * 根据给出的开始、结束Key遍历
      */
-    public Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey, byte[] endKey) throws LedgerException {
-        DBIterator dbItr = null;
-        dbItr = (DBIterator) LevelDBFactory.getIterator(db);
-        List<Map.Entry<byte[], byte[]>> list = new ArrayList<>();
+    @Override
+    public Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey) throws LedgerException {
+        DBIterator dbItr = LevelDBFactory.getIterator(dbName);
         if(startKey != null){
             dbItr.seek(startKey);
         }
-        while(dbItr.hasNext()){
-            Map.Entry<byte[], byte[]> entry = dbItr.next();
-            list.add(entry);
-            if(entry.getKey() == endKey){
-                break;
-            }
-        }
-        return list.iterator();
+        return dbItr;
     }
 }
