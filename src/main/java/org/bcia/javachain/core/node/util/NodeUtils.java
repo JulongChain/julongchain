@@ -24,7 +24,7 @@ import org.bcia.javachain.protos.node.Query;
 import java.util.List;
 
 /**
- * 类描述
+ * 节点提供的一些全局静态函数，可用于创建账本、初始化账本、获取msp id、获取配置区块等，可供系统智能合约等调用。
  *
  * @author sunianle
  * @date 3/14/18
