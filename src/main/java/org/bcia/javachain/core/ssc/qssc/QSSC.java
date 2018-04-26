@@ -17,6 +17,7 @@ package org.bcia.javachain.core.ssc.qssc;
 
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
@@ -24,8 +25,10 @@ import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.node.util.NodeUtils;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
-import org.bcia.javachain.core.ssc.essc.ESSC;
+import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.TransactionPackage;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -43,7 +46,7 @@ import java.util.List;
  */
 @Component
 public class QSSC extends SystemSmartContractBase {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ESSC.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(QSSC.class);
     // These are function names from Invoke first parameter
     public final static String GET_GROUP_INFO="GetGroupInfo";
 
@@ -112,7 +115,7 @@ public class QSSC extends SystemSmartContractBase {
             case GET_BLOCK_BY_HASH:
                 return getBlockByHash(targetLedger,arg2);
             case GET_GROUP_INFO:
-                return getGroupInfo(targetLedger);
+                return getChainInfo(targetLedger);
             case GET_BLOCK_BY_TX_ID:
                 return getBlockByTxID(targetLedger,arg2);
             default:
@@ -130,26 +133,116 @@ public class QSSC extends SystemSmartContractBase {
         return "QSSC."+function;
     }
 
+    /**
+     * 获取交易数据
+     * @param vledger
+     * @param tid
+     * @return
+     */
     private SmartContractResponse getTransactionByID(INodeLedger vledger, byte[] tid){
-
-        return null;
+        if(tid==null || tid.length==0){
+            return newErrorResponse("Transaction ID must not be nil.");
+        }
+        String txID=ByteString.copyFrom(tid).toStringUtf8();
+        TransactionPackage.ProcessedTransaction processedTran;
+        try {
+            processedTran=vledger.getTransactionByID(txID);
+        } catch (LedgerException e) {
+            String msg=String.format("Failed to get transaction with id %s, error %s",txID,e.getMessage());
+            return newErrorResponse(msg);
+        }
+        byte[] tranBytes = processedTran.toByteArray();
+        return newSuccessResponse(tranBytes);
     }
 
+    /**
+     * 获取块
+     * @param vledger
+     * @param number
+     * @return
+     */
     private SmartContractResponse getBlockByNumber(INodeLedger vledger, byte[] number){
+        if(number==null ||number.length==0){
+            return newErrorResponse("Block number must not be nil.");
+        }
+        long bnum=0;
+        try {
+            bnum = Long.parseLong(ByteString.copyFrom(number).toString());
+        }catch(Exception e){
+            String msg=String.format("Failed to parse block number with error %s",e.getMessage());
+            return newErrorResponse(msg);
+        }
+        Common.Block block =null;
+        try {
+            block=vledger.getBlockByNumber(bnum);
+        } catch (LedgerException e) {
+            String msg=String.format("Failed to get block number %d, error %s",bnum,e.getMessage());
+            return newErrorResponse(msg);
+        }
 
-        return null;
+        // TODO: consider trim block content before returning
+        //  Specifically, trim transaction 'data' out of the transaction array Payloads
+        //  This will preserve the transaction Payload header,
+        //  and client can do GetTransactionByID() if they want the full transaction details
+        byte[] blockBytes = block.toByteArray();
+        return newSuccessResponse(blockBytes);
     }
 
+    /**
+     * 根据hash获取块
+     * @param vledger
+     * @param hash
+     * @return
+     */
     private SmartContractResponse getBlockByHash(INodeLedger vledger, byte[] hash){
-        return null;
+        if(hash==null ||hash.length==0){
+            return newErrorResponse("Block hash must not be nil.");
+        }
+        Common.Block block =null;
+        try {
+            block=vledger.getBlockByHash(hash);
+        } catch (LedgerException e) {
+            String msg=String.format("Failed to get block hash %s,error %s",ByteString.copyFrom(hash).toString(),e.getMessage());
+            return newErrorResponse(msg);
+        }
+        byte[] bytes = block.toByteArray();
+        return newSuccessResponse(bytes);
     }
 
-    private SmartContractResponse getGroupInfo(INodeLedger vledger){
-        return null;
+    /**
+     * 获取区块链信息
+     * @param vledger
+     * @return
+     */
+    private SmartContractResponse getChainInfo(INodeLedger vledger){
+        Ledger.BlockchainInfo bcInfo=null;
+        try {
+            bcInfo = vledger.getBlockchainInfo();
+        } catch (LedgerException e) {
+            String msg=String.format("Failed to get block info with error %s",e.getMessage());
+            return newErrorResponse(msg);
+        }
+        byte[] bytes = bcInfo.toByteArray();
+        return newSuccessResponse(bytes);
     }
 
+    /**
+     * 根据交易ID获取块
+     * @param vledger
+     * @param rawTxID
+     * @return
+     */
     private SmartContractResponse getBlockByTxID(INodeLedger vledger, byte[] rawTxID){
-        return null;
+        String txID=ByteString.copyFrom(rawTxID).toString();
+        Common.Block block =null;
+        try {
+            block=vledger.getBlockByTxID(txID);
+        } catch (LedgerException e) {
+            String msg=String.format("Failed to get block for txID %s,error %s",txID,e.getMessage());
+            return newErrorResponse(msg);
+        }
+        byte[] bytes = block.toByteArray();
+        return newSuccessResponse(bytes);
     }
 
 
