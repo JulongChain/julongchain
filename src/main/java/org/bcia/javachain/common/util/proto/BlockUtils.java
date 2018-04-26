@@ -48,13 +48,13 @@ public class BlockUtils {
                 return null;
             }
             gh = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
-            if(gh == null || gh.getTxId() == null){
+            if(gh == null || gh.getGroupId() == null){
                 return null;
             }
         } catch (InvalidProtocolBufferException e) {
             throw new JavaChainException(e);
         }
-        return gh.getTxId();
+        return gh.getGroupId();
     }
 
     public static Common.Envelope extractEnvelope(Common.Block block,int index)throws  JavaChainException{
