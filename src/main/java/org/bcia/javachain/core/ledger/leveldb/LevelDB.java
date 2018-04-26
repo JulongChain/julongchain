@@ -37,7 +37,7 @@ public class LevelDB extends DbImpl implements DB {
 
     @Override
     public void close() {
-        LevelDBFactory.removeDb(this);
+        LevelDBUtil.removeDb(this);
         super.close();
     }
 

@@ -20,7 +20,7 @@ import org.bcia.javachain.common.ledger.util.DBHandle;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.leveldb.LevelDB;
-import org.bcia.javachain.core.ledger.leveldb.LevelDBFactory;
+import org.bcia.javachain.core.ledger.leveldb.LevelDBUtil;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.DBIterator;
 
@@ -92,8 +92,8 @@ public class LevelDBHandle implements DBHandle {
             throw new LevelDBException("No db created");
         }
 
-        LevelDB db = LevelDBFactory.getDB(dbName);
-        return LevelDBFactory.get(db, key, false);
+        LevelDB db = LevelDBUtil.getDB(dbName);
+        return LevelDBUtil.get(db, key, false);
     }
 
     /**
@@ -105,8 +105,8 @@ public class LevelDBHandle implements DBHandle {
             logger.error("No db created");
             throw new LevelDBException("No db created");
         }
-        LevelDB db = LevelDBFactory.getDB(dbName);
-        LevelDBFactory.add(db, key, value, sync);
+        LevelDB db = LevelDBUtil.getDB(dbName);
+        LevelDBUtil.add(db, key, value, sync);
     }
 
     /**
@@ -118,8 +118,8 @@ public class LevelDBHandle implements DBHandle {
             logger.error("No db created");
             throw new LevelDBException("No db created");
         }
-        LevelDB db = LevelDBFactory.getDB(dbName);
-        LevelDBFactory.delete(db, key, sync);
+        LevelDB db = LevelDBUtil.getDB(dbName);
+        LevelDBUtil.delete(db, key, sync);
     }
 
     /**
@@ -131,8 +131,8 @@ public class LevelDBHandle implements DBHandle {
             logger.error("No db created");
             throw new LevelDBException("No db created");
         }
-        LevelDB db = LevelDBFactory.getDB(dbName);
-        LevelDBFactory.add(db, batch.getKvs(), sync);
+        LevelDB db = LevelDBUtil.getDB(dbName);
+        LevelDBUtil.add(db, batch.getKvs(), sync);
     }
 
     /**
@@ -140,8 +140,8 @@ public class LevelDBHandle implements DBHandle {
      */
     @Override
     public Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey) throws LevelDBException {
-        LevelDB db = LevelDBFactory.getDB(dbName);
-        DBIterator dbItr = LevelDBFactory.getIterator(db);
+        LevelDB db = LevelDBUtil.getDB(dbName);
+        DBIterator dbItr = LevelDBUtil.getIterator(db);
         if(startKey != null){
             dbItr.seek(startKey);
         }
