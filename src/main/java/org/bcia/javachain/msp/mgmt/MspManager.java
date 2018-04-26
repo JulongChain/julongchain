@@ -72,7 +72,8 @@ public class MspManager implements IMspManager {
            // TODO 暂时先用getlocalmsp获取，之后需要通过id获取
             IMsp msp = getMSPs().get(sId.getMspid());
             //IMsp msp=GlobalMspManagement.getLocalMsp();
-            return msp.deserializeIdentity(sId.getIdBytes().toByteArray());
+           // return msp.deserializeIdentity(sId.getIdBytes().toByteArray());
+            return msp.deserializeIdentity(serializedID);
         } catch (Exception e) {
             e.printStackTrace();
         }
