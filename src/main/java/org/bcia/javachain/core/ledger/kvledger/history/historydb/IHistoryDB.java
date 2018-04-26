@@ -52,6 +52,7 @@ public interface IHistoryDB extends Recoverable {
     /**
      * 判断是否需要恢复数据库
      */
+    @Override
     long shouldRecover() throws LedgerException;
 
     /**
@@ -62,6 +63,7 @@ public interface IHistoryDB extends Recoverable {
     /**
      * 提交丢失的区块
      */
+    @Override
     void commitLostBlock(BlockAndPvtData blockAndPvtData) throws  LedgerException;
 
 }

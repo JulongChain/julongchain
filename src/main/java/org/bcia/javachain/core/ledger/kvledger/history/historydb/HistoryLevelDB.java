@@ -32,13 +32,10 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.NsRwSet;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.TxRwSet;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.javachain.protos.node.ProposalPackage;
 
-import java.util.AbstractMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * LevelDB实现的HistoryDB
@@ -134,7 +131,7 @@ public class HistoryLevelDB implements IHistoryDB {
                     for(KvRwset.KVWrite kvWrite : nsRwSet.getKvRwSet().getWritesList()){
                        String writeKey = kvWrite.getKey();
                        //key:ns~key~blockNo~tranNo
-                        byte[] compositeHistoryKey = HistmgtHelper.constructCompositeHistoryKey(ns, writeKey, blockNo, tranNo);
+                        byte[] compositeHistoryKey = HistoryDBHelper.constructCompositeHistoryKey(ns, writeKey, blockNo, tranNo);
                         dbBatch.put(compositeHistoryKey, EMPTY_VALUE);
                     }
                 }
