@@ -18,7 +18,7 @@ package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 import java.io.File;
 
 /**
- * 类描述
+ * 封装区块文件信息
  *
  * @author
  * @date 2018/3/7

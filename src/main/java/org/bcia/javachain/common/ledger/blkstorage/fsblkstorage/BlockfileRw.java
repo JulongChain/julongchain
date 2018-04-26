@@ -16,7 +16,7 @@
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 /**
- * 提供区块文件读写方法
+ * 提供初始化区块文件读写方法
  *
  * @author sunzongyu
  * @date 2018/04/12

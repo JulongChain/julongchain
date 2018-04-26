@@ -158,6 +158,9 @@ public class BlockfileMgr {
 
     }
 
+    /**
+     * 写下一文件
+     */
     public synchronized void moveToNextFile() throws LedgerException {
         CheckpointInfo cpInfo = new CheckpointInfo();
         cpInfo.setLastestFileChunkSuffixNum(this.cpInfo.getLastestFileChunkSuffixNum() + 1);
@@ -171,6 +174,9 @@ public class BlockfileMgr {
         updateCheckpoint(cpInfo);
     }
 
+    /**
+     * 添加区块
+     */
     public synchronized void addBlock(Common.Block block) throws LedgerException {
         if(block.getHeader().getNumber() != getBlockchainInfo().getHeight()){
             throw new LedgerException(String.format("Block number should have been %d but was %d", getBlockchainInfo().getHeight(), block.getHeader().getNumber()));
@@ -431,9 +437,7 @@ public class BlockfileMgr {
 
     public Common.Block fetchBlock(FileLocPointer lp ) throws LedgerException{
         byte[] blockBytes = fetchBlockBytes(lp);
-        Common.Block block = null;
-        block = BlockSerialization.deserializeBlock(blockBytes);
-        return block;
+        return BlockSerialization.deserializeBlock(blockBytes);
    }
 
     public Common.Envelope fetchTransactionEnvelope(FileLocPointer lp) throws LedgerException{

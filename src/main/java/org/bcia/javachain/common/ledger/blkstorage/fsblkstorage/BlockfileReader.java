@@ -39,12 +39,15 @@ public class BlockfileReader {
         return reader;
     }
 
+    //从offset位起,读取length字节
     public byte[] read(Integer offset, Integer length) throws LedgerException {
         FileInputStream fis;
         byte[] result = null;
         try {
             result = new byte[(int) file.length()];
             fis = new FileInputStream(file);
+            //移动到制定位置
+            fis.skip(offset.longValue());
             fis.read(result);
             fis.close();
         } catch (Throwable e){

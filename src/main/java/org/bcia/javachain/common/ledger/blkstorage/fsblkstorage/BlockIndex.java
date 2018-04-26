@@ -34,7 +34,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 索引类
+ * 操作block索引类
+ *
  * @author sunzongyu
  * @date 2018/04/09
  * @company Dingxuan
@@ -118,7 +119,7 @@ public class BlockIndex implements Index {
         }
 
         //index4 查询历史数据
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRANS_NUM)){
+        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM)){
             for(int i = 0; i < txOffsets.size(); i++){
                 TxIndexInfo txOffset = txOffsets.get(i);
                 FileLocPointer txFlp = FileLocPointer.newFileLocationPointer(flp.getFileSuffixNum(), flp.getLocPointer().getOffset(), txOffset.getLoc());
@@ -220,7 +221,7 @@ public class BlockIndex implements Index {
      */
     @Override
     public FileLocPointer getTXLocByBlockNumTranNum(long blockNum, long tranNum) throws LedgerException{
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRANS_NUM) == null){
+        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM) == null){
             throw BlockStorage.ERR_ARRT_NOT_INDEXED;
         }
         byte[] b = db.get(constructBlockNumTranNumKey(blockNum, tranNum));

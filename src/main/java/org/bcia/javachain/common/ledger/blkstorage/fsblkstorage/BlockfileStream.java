@@ -24,7 +24,7 @@ import java.io.*;
 import java.util.AbstractMap;
 
 /**
- * 操作block文件
+ * 操作block文件的流方法
  *
  * @author sunzongyu
  * @date 2018/04/09

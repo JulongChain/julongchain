@@ -28,7 +28,7 @@ import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
 /**
- * 类描述
+ * 区块文件系统
  *
  * @author sunzongyu
  * @date 2018/4/19
@@ -125,6 +125,7 @@ public class FsBlockStore implements BlockStore {
         return null;
     }
 
+    @Override
     public void shutdown() {
         blockfileMgr.close();
     }

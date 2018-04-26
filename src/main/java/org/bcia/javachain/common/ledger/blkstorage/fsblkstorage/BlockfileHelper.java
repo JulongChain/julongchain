@@ -127,7 +127,7 @@ public class BlockfileHelper {
     }
 
     /**
-     * 判断文件是否以BLOCK_FILE_PREFIX起始
+     * 判断文件是否以BLOCK_FILE_PREFIX(blockfile)起始
      */
     public static Boolean isBlockFileName(String name) {
         return name.startsWith(BLOCK_FILE_PREFIX);
