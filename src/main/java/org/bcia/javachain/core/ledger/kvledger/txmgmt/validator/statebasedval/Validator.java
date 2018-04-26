@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 类描述
+ * statedb验证器
  *
  * @author sunzongyu
  * @date 2018/04/19
@@ -178,10 +178,10 @@ public class Validator implements InternalValidator {
         IRangeQueryValidator validator;
         if(null != rqi.getReadsMerkleHashes()){
             logger.debug("Hashing results are present in the range query info hence, initiating hashing based validation");
-            validator = new IRangeQueryHashValidator();
+            validator = new RangeQueryHashValidator();
         } else {
             logger.debug("Hashing results are not present in the range query info hence, initiating hashing based validation");
-            validator = new IRangeQueryResultsValidator();
+            validator = new RangeQueryResultsValidator();
         }
         validator.init(rqi, combinedItr);
         combinedItr.close();

@@ -26,14 +26,15 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
 /**
- * 类描述
+ * range query hash 验证器
+ * 用于验证返回读集的hash
  *
  * @author sunzongyu
  * @date 2018/04/19
  * @company Dingxuan
  */
-public class IRangeQueryHashValidator implements IRangeQueryValidator {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(IRangeQueryHashValidator.class);
+public class RangeQueryHashValidator implements IRangeQueryValidator {
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(RangeQueryHashValidator.class);
 
     private KvRwset.RangeQueryInfo rqInfo;
     private ResultsIterator itr;

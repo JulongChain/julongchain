@@ -20,7 +20,7 @@ import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
 /**
- * 类描述
+ * 验证器接口
  *
  * @author sunzongyu
  * @date 2018/04/19

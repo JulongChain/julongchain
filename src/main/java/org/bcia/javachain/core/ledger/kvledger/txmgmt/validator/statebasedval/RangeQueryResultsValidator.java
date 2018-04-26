@@ -27,15 +27,16 @@ import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 import java.util.List;
 
 /**
- * 类描述
+ * range query result 验证器
+ * 用于验证原始范围读集
  *
  * @author sunzongyu
  * @date 2018/04/19
  * @company Dingxuan
  */
-public class IRangeQueryResultsValidator implements IRangeQueryValidator {
+public class RangeQueryResultsValidator implements IRangeQueryValidator {
 
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(IRangeQueryResultsValidator.class);
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(RangeQueryResultsValidator.class);
 
     private KvRwset.RangeQueryInfo rqInfo;
     private ResultsIterator itr;
