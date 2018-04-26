@@ -72,7 +72,7 @@ public class BlockIndex implements Index {
      * 获取最新索引
      */
     @Override
-    public Long getLastBlockIndexed() throws LedgerException {
+    public long getLastBlockIndexed() throws LedgerException {
         byte[] blockNumBytes = null;
         blockNumBytes = db.get(INDEX_CHECKPOINT_KEY);
         if (blockNumBytes == null){
@@ -270,7 +270,7 @@ public class BlockIndex implements Index {
         return ArrayUtils.addAll(TX_VALIDATION_RESULT_IDX_KEY_PREFIX.getBytes(), txID.getBytes());
     }
 
-    byte[] constructBlockNumTranNumKey(Long blockNum, Long txNum) {
+    byte[] constructBlockNumTranNumKey(long blockNum, long txNum) {
         byte[] blkNumBytes = Util.longToBytes(blockNum, 8);
         byte[] txNumBytes = Util.longToBytes(txNum, 8);
         byte[] key = ArrayUtils.addAll(blkNumBytes, txNumBytes);

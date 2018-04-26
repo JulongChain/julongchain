@@ -71,7 +71,7 @@ public class FsBlockStore implements BlockStore {
     }
 
     @Override
-    public Common.Block retrieveBlockByNumber(Long blockNum) throws LedgerException {
+    public Common.Block retrieveBlockByNumber(long blockNum) throws LedgerException {
         return blockFileManager.retrieveBlockByNumber(blockNum);
     }
 
@@ -81,7 +81,7 @@ public class FsBlockStore implements BlockStore {
     }
 
     @Override
-    public Common.Envelope retrieveTxByBlockNumTranNum(Long blockNum, Long tranNum) throws LedgerException {
+    public Common.Envelope retrieveTxByBlockNumTranNum(long blockNum, long tranNum) throws LedgerException {
         return blockFileManager.retrieveTransactionByBlockNumTranNum(blockNum, tranNum);
     }
 
@@ -95,7 +95,7 @@ public class FsBlockStore implements BlockStore {
         return blockFileManager.retrieveTxValidationCodeByTxID(txID);
     }
 
-    ResultsIterator RetrieveBlocks(Long startNum) {
+    ResultsIterator RetrieveBlocks(long startNum) {
         return null;
     }
 
@@ -103,7 +103,7 @@ public class FsBlockStore implements BlockStore {
         return null;
     }
 
-    Common.Block RetrieveBlockByNumber(Long blockNum) {
+    Common.Block RetrieveBlockByNumber(long blockNum) {
         return null;
     }
 
@@ -111,7 +111,7 @@ public class FsBlockStore implements BlockStore {
         return null;
     }
 
-    Common.Envelope RetrieveTxByBlockNumTranNum(Long blockNum, Long tranNum) {
+    Common.Envelope RetrieveTxByBlockNumTranNum(long blockNum, long tranNum) {
         return null;
     }
 

@@ -134,18 +134,11 @@ public class LedgerManager {
             throw ERR_LEDGER_MANAGER_NOT_INITIALIZED;
         }
         for(INodeLedger l : openedLedgers.values()){
-            ((ClosableLedger) l).closeWithoutLock();
+            l.close();
         }
         ledgerProvider.close();
         openedLedgers = new HashMap<>();
         log.info("ledger mgmt closed");
-    }
-
-    public static INodeLedger wrapLedger(String id, INodeLedger l){
-        ClosableLedger cl = new ClosableLedger();
-        cl.setId(id);
-        cl.setNodeLedger(l);
-        return cl;
     }
 
     public void initializeTestEnvWithCustomProcessors(Map<Common.HeaderType, IProcessor> customTxProcessors) throws LedgerException {

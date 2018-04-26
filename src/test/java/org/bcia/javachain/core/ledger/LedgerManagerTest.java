@@ -17,11 +17,13 @@ package org.bcia.javachain.core.ledger;
 
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.util.proto.BlockUtils;
+import org.bcia.javachain.core.ledger.kvledger.KvLedger;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.protos.common.Common;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * 类描述
@@ -75,14 +77,10 @@ public class LedgerManagerTest {
                 .build();
 //        l = LedgerManager.createLedger(block);
         l = LedgerManager.openLedger("testGroup");
-        ITxSimulator simulator = l.newTxSimulator("testGroup");
-
-        for (int i = 0; i < 1; i++) {
-            System.out.println(simulator.getState("ns" + i, "key" + i).length);
-        }
-        long after = System.currentTimeMillis();
-        System.out.println();
-        System.out.println(String.format("耗时: %dms", after - before));
+        List<String> list = LedgerManager.getLedgerIDs();
+        list.forEach((s) -> {
+            System.out.println(s);
+        });
     }
 
     @Test

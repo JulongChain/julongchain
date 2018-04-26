@@ -173,7 +173,7 @@ public class HistoryLevelDB implements IHistoryDB {
     }
 
     @Override
-    public long recoverPoint(Long lastAvailableBlock) throws LedgerException {
+    public long recoverPoint(long lastAvailableBlock) throws LedgerException {
         //配置是否开启leveldb
         Height savePoint = getLastSavepoint();
         if(savePoint == null){

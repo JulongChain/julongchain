@@ -27,7 +27,7 @@ import org.bcia.javachain.protos.node.TransactionPackage;
  */
 public interface Index {
 
-    Long getLastBlockIndexed() throws LedgerException;
+    long getLastBlockIndexed() throws LedgerException;
 
     void indexBlock(BlockIndexInfo blockIndexInfo) throws LedgerException;
 

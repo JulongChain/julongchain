@@ -30,18 +30,18 @@ import java.util.List;
  */
 public class BlockIndexInfo {
 
-    private Long blockNum;
+    private long blockNum;
     private byte[] blockHash;
     private FileLocPointer flp;
     private List<TxIndexInfo> txOffsets;
     private Common.BlockMetadata metadata;
 
     private static final JavaChainLog loogger = JavaChainLogFactory.getLog(BlockIndexInfo.class);
-    public Long getBlockNum() {
+    public long getBlockNum() {
         return blockNum;
     }
 
-    public void setBlockNum(Long blockNum) {
+    public void setBlockNum(long blockNum) {
         this.blockNum = blockNum;
     }
 

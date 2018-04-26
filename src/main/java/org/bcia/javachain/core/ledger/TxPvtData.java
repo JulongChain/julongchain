@@ -26,14 +26,14 @@ import org.bcia.javachain.protos.ledger.rwset.Rwset;
  */
 public class TxPvtData {
 
-    private Long seqInBlock;
+    private long seqInBlock;
     private Rwset.TxPvtReadWriteSet writeSet;
 
-    public Long getSeqInBlock() {
+    public long getSeqInBlock() {
         return seqInBlock;
     }
 
-    public void setSeqInBlock(Long seqInBlock) {
+    public void setSeqInBlock(long seqInBlock) {
         this.seqInBlock = seqInBlock;
     }
 

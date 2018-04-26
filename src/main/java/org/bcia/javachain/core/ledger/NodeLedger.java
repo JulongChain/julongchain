@@ -115,12 +115,12 @@ public class NodeLedger implements INodeLedger {
     }
 
     @Override
-    public Common.Block getBlockByNumber(Long blockNumber) throws LedgerException {
+    public Common.Block getBlockByNumber(long blockNumber) throws LedgerException {
         return null;
     }
 
     @Override
-    public ResultsIterator getBlocksIterator(Long startBlockNumber) throws LedgerException {
+    public ResultsIterator getBlocksIterator(long startBlockNumber) throws LedgerException {
         return null;
     }
 

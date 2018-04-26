@@ -36,7 +36,7 @@ public class BlockFileStream {
     private Integer fileNum;
     private File file;
     private InputStream reader;
-    private Long currentOffset;
+    private long currentOffset;
     private boolean init = false;
 
     public Integer getFileNum() {
@@ -63,11 +63,11 @@ public class BlockFileStream {
         this.reader = reader;
     }
 
-    public Long getCurrentOffset() {
+    public long getCurrentOffset() {
         return currentOffset;
     }
 
-    public void setCurrentOffset(Long currentOffset) {
+    public void setCurrentOffset(long currentOffset) {
         this.currentOffset = currentOffset;
     }
 
