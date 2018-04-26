@@ -304,7 +304,8 @@ public class LevelDBFactory {
     /**
      * 获取指定level db的迭代器
      */
-    public static DBIterator getIterator(DB db) throws LedgerException {
+    public static DBIterator getIterator(String dbPath) throws LedgerException {
+        DB db = getDB(dbPath);
         Snapshot snapshot = db.getSnapshot();
         ReadOptions readOptions = new ReadOptions()
                 .fillCache(false)
