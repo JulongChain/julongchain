@@ -20,8 +20,6 @@ import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.javachain.common.ledger.util.DBProvider;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBHandle;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
@@ -38,63 +36,63 @@ public class FsBlockStore implements BlockStore {
 
     private String id;
     private Conf conf;
-    private BlockfileMgr blockfileMgr;
+    private BlockFileManager blockFileManager;
 
     public static FsBlockStore newFsBlockStore(String id,
                                                Conf conf,
                                                IndexConfig indexConfig,
                                                DBProvider dbHandle) throws LedgerException {
         FsBlockStore fsBlockStore = new FsBlockStore();
-        BlockfileMgr mgr = BlockfileMgr.newBlockfileMgr(id, conf, indexConfig, dbHandle);
+        BlockFileManager mgr = BlockFileManager.newBlockfileMgr(id, conf, indexConfig, dbHandle);
         fsBlockStore.setId(id);
         fsBlockStore.setConf(conf);
-        fsBlockStore.setBlockfileMgr(mgr);
+        fsBlockStore.setBlockFileManager(mgr);
         return fsBlockStore;
     }
 
     @Override
     public void addBlock(Common.Block block) throws LedgerException {
-        blockfileMgr.addBlock(block);
+        blockFileManager.addBlock(block);
     }
 
     @Override
     public Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException {
-        return blockfileMgr.getBlockchainInfo();
+        return blockFileManager.getBlockchainInfo();
     }
 
     @Override
     public ResultsIterator retrieveBlocks(long startBlockNumber) throws LedgerException {
-        return blockfileMgr.retrieveBlocks(startBlockNumber);
+        return blockFileManager.retrieveBlocks(startBlockNumber);
     }
 
     @Override
     public Common.Block retrieveBlockByHash(byte[] blockHash) throws LedgerException {
-        return blockfileMgr.retrieveBlockByHash(blockHash);
+        return blockFileManager.retrieveBlockByHash(blockHash);
     }
 
     @Override
     public Common.Block retrieveBlockByNumber(Long blockNum) throws LedgerException {
-        return blockfileMgr.retrieveBlockByNumber(blockNum);
+        return blockFileManager.retrieveBlockByNumber(blockNum);
     }
 
     @Override
     public Common.Envelope retrieveTxByID(String txID) throws LedgerException {
-        return blockfileMgr.retrieveTransactionByID(txID);
+        return blockFileManager.retrieveTransactionByID(txID);
     }
 
     @Override
     public Common.Envelope retrieveTxByBlockNumTranNum(Long blockNum, Long tranNum) throws LedgerException {
-        return blockfileMgr.retrieveTransactionByBlockNumTranNum(blockNum, tranNum);
+        return blockFileManager.retrieveTransactionByBlockNumTranNum(blockNum, tranNum);
     }
 
     @Override
     public Common.Block retrieveBlockByTxID(String txID) throws LedgerException {
-        return blockfileMgr.retrieveBlockByTxID(txID);
+        return blockFileManager.retrieveBlockByTxID(txID);
     }
 
     @Override
     public TransactionPackage.TxValidationCode retrieveTxValidationCodeByTxID(String txID) throws LedgerException {
-        return blockfileMgr.retrieveTxValidationCodeByTxID(txID);
+        return blockFileManager.retrieveTxValidationCodeByTxID(txID);
     }
 
     ResultsIterator RetrieveBlocks(Long startNum) {
@@ -127,7 +125,7 @@ public class FsBlockStore implements BlockStore {
 
     @Override
     public void shutdown() {
-        blockfileMgr.close();
+        blockFileManager.close();
     }
 
     @Override
@@ -151,11 +149,11 @@ public class FsBlockStore implements BlockStore {
         this.conf = conf;
     }
 
-    public BlockfileMgr getBlockfileMgr() {
-        return blockfileMgr;
+    public BlockFileManager getBlockFileManager() {
+        return blockFileManager;
     }
 
-    public void setBlockfileMgr(BlockfileMgr blockfileMgr) {
-        this.blockfileMgr = blockfileMgr;
+    public void setBlockFileManager(BlockFileManager blockFileManager) {
+        this.blockFileManager = blockFileManager;
     }
 }

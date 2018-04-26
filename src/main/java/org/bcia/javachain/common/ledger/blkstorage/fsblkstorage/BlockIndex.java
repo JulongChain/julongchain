@@ -15,7 +15,6 @@
  */
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
-import com.google.protobuf.ByteString;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStorage;
@@ -86,26 +85,26 @@ public class BlockIndex implements Index {
      * 设置索引
      */
     @Override
-    public void indexBlock(BlockIdxInfo blockIdxInfo) throws LedgerException {
+    public void indexBlock(BlockIndexInfo blockIndexInfo) throws LedgerException {
         if(indexItemsMap.size() == 0){
            logger.debug("No indexing block, as nothing to index");
            return;
         }
-        logger.debug(String.format("Indexing block [%s]", blockIdxInfo));
-        FileLocPointer flp = blockIdxInfo.getFlp();
-        List<TxIndexInfo> txOffsets = blockIdxInfo.getTxOffsets();
-        TxValidationFlags txsfltr = new TxValidationFlags(blockIdxInfo.getMetadata().getMetadataList().size());
+        logger.debug(String.format("Indexing block [%s]", blockIndexInfo));
+        FileLocPointer flp = blockIndexInfo.getFlp();
+        List<TxIndexInfo> txOffsets = blockIndexInfo.getTxOffsets();
+        TxValidationFlags txsfltr = new TxValidationFlags(blockIndexInfo.getMetadata().getMetadataList().size());
         UpdateBatch batch = LevelDbProvider.newUpdateBatch();
         byte[] flpBytes = flp.marshal();
 
         //index1
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_HASH)){
-            batch.put(constructBlockHashKey(blockIdxInfo.getBlockHash()), flpBytes);
+            batch.put(constructBlockHashKey(blockIndexInfo.getBlockHash()), flpBytes);
         }
 
         //index2
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM)){
-            batch.put(constructBlockNumKey(blockIdxInfo.getBlockNum()), flpBytes);
+            batch.put(constructBlockNumKey(blockIndexInfo.getBlockNum()), flpBytes);
         }
 
         //index3 用来通过txid获取tx
@@ -125,7 +124,7 @@ public class BlockIndex implements Index {
                 FileLocPointer txFlp = FileLocPointer.newFileLocationPointer(flp.getFileSuffixNum(), flp.getLocPointer().getOffset(), txOffset.getLoc());
                 logger.debug(String.format("Adding txLoc [%s] for tx num: [%d] ID: [%s] to blockNumTranNum index", txFlp, i, txOffset.getTxID()));
                 byte[] txFlpBytes = txFlp.marshal();
-                batch.put(constructBlockNumTranNumKey(blockIdxInfo.getBlockNum(), (long) i), txFlpBytes);
+                batch.put(constructBlockNumTranNumKey(blockIndexInfo.getBlockNum(), (long) i), txFlpBytes);
             }
         }
 
@@ -144,7 +143,7 @@ public class BlockIndex implements Index {
             }
         }
 
-        batch.put(INDEX_CHECKPOINT_KEY, Util.longToBytes(blockIdxInfo.getBlockNum(), 8));
+        batch.put(INDEX_CHECKPOINT_KEY, Util.longToBytes(blockIndexInfo.getBlockNum(), 8));
         db.writeBatch(batch, true);
     }
 

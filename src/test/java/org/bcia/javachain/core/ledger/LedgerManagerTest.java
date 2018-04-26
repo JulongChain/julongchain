@@ -16,15 +16,20 @@ limitations under the License.
 package org.bcia.javachain.core.ledger;
 
 import com.google.protobuf.ByteString;
+import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 import org.bcia.javachain.common.util.proto.BlockUtils;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.gossip.Message;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 类描述
@@ -34,8 +39,8 @@ import java.io.File;
  * @company Dingxuan
  */
 public class LedgerManagerTest {
-
     INodeLedger l = null;
+    private static final byte[] COMPOSITE_KEY_SEP = {0x00};
 
     private static boolean deleteDir(File dir) {
         if (dir.isDirectory()) {
@@ -51,10 +56,24 @@ public class LedgerManagerTest {
     }
 
     @Test
-    public void createLedger() throws LedgerException {
-        deleteDir(new File(Config.getPath()));
+    public void createLedger() throws Exception {
+//        deleteDir(new File(Config.getPath()));
+        long before = System.currentTimeMillis();
         LedgerManager.initialize(null);
         Common.Block block = Common.Block.newBuilder()
+                .setHeader(Common.BlockHeader.newBuilder()
+                        .setNumber(0)
+                        .setDataHash(ByteString.copyFromUtf8("DataHash"))
+                        .setPreviousHash(ByteString.copyFromUtf8("PreviousHash"))
+                        .build())
+                .setData(Common.BlockData.newBuilder()
+                        .addData(Common.Envelope.newBuilder()
+                                .setPayload(Common.Payload.getDefaultInstance().toByteString())
+                                .build().toByteString())
+                        .addData(Common.Envelope.newBuilder()
+                                .setPayload(Common.Payload.getDefaultInstance().toByteString())
+                                .build().toByteString())
+                        .build())
                 .setMetadata(Common.BlockMetadata.newBuilder()
                         .addMetadata(ByteString.EMPTY)
                         .addMetadata(ByteString.EMPTY)
@@ -62,8 +81,16 @@ public class LedgerManagerTest {
                         .addMetadata(ByteString.EMPTY)
                         .build())
                 .build();
-        l = LedgerManager.createLedger(block);
-        l.newTxSimulator("testGroup");
+//        l = LedgerManager.createLedger(block);
+        l = LedgerManager.openLedger("testGroup");
+        ITxSimulator simulator = l.newTxSimulator("testGroup");
+
+        for (int i = 0; i < 1; i++) {
+            System.out.println(simulator.getState("ns" + i, "key" + i).length);
+        }
+        long after = System.currentTimeMillis();
+        System.out.println();
+        System.out.println(String.format("耗时: %dms", after - before));
     }
 
     @Test
@@ -72,9 +99,9 @@ public class LedgerManagerTest {
         String groupId = BlockUtils.getGroupIDFromBlock(null);
         l = LedgerManager.openLedger(groupId);
         ITxSimulator txSimulator = l.newTxSimulator(groupId);
-        String ns = null;
-        String key = null;
-        txSimulator.getState(ns, key);
+        for (int i = 0; i < 100; i++) {
+            System.out.println(new String(txSimulator.getState("ns" + i, "keys" + i)));
+        }
     }
 
     @Test

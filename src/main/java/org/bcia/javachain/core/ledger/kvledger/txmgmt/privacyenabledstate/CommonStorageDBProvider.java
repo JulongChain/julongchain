@@ -22,7 +22,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionLevelDBProv
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 
 /**
- * 类描述
+ * CommonStorageDB操作类
  *
  * @author sunzongyu
  * @date 2018/04/17

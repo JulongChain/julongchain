@@ -24,7 +24,7 @@ import org.bcia.javachain.core.ledger.IQueryExecutor;
 import java.util.List;
 
 /**
- * 类描述
+ * 交易查询器类
  *
  * @author sunzongyu
  * @date 2018/04/18

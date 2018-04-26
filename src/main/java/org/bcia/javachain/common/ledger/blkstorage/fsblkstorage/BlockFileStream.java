@@ -30,8 +30,8 @@ import java.util.AbstractMap;
  * @date 2018/04/09
  * @company Dingxuan
  */
-public class BlockfileStream {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockfileStream.class);
+public class BlockFileStream {
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockFileStream.class);
 
     private Integer fileNum;
     private File file;
@@ -74,10 +74,10 @@ public class BlockfileStream {
     /**
      * 初始化
      */
-    public BlockfileStream newBlockFileStream(String rootDir, int fileNum, long startOffset) throws LedgerException{
+    public BlockFileStream newBlockFileStream(String rootDir, int fileNum, long startOffset) throws LedgerException{
         //根据rootDir获取filePath
         String filePath = null;
-        filePath = BlockfileMgr.deriveBlockfilePath(rootDir, fileNum);
+        filePath = BlockFileManager.deriveBlockfilePath(rootDir, fileNum);
         this.fileNum = fileNum;
         this.file = new File(filePath);
         try {

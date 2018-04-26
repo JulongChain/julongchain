@@ -37,7 +37,9 @@ public interface TxManager extends Recoverable {
     ITxSimulator newTxSimulator(String txid) throws LedgerException;
     void validateAndPrepare(BlockAndPvtData blockAndPvtData, Boolean doMVCCValidation) throws LedgerException;
     Height getLastSavepoint() throws LedgerException;
+    @Override
     long shouldRecover() throws LedgerException;
+    @Override
     void commitLostBlock(BlockAndPvtData blockAndPvtData) throws LedgerException;
     void commit() throws LedgerException;
     void rollback() throws LedgerException;

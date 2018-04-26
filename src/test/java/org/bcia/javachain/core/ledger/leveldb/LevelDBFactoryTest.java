@@ -2,6 +2,7 @@ package org.bcia.javachain.core.ledger.leveldb;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.util.Util;
@@ -59,12 +60,14 @@ public class LevelDBFactoryTest {
 //        log.info("query value:" + query);
 //        Assert.assertEquals(value, query);
 
+        LevelDbProvider provider = LevelDbProvider.newProvider("/home/bcia/test");
         for (int i = 0; i < 100; i++) {
             byte[] key = String.valueOf(i).getBytes();
             byte[] value1 = Util.longToBytes(1000 + i, 8);
             byte[] value2 = Util.longToBytes(10000 + i, 8);
             byte[] value = ArrayUtils.addAll(value1, value2);
             LevelDBFactory.add(key, value, true);
+            provider.put(key, value, true);
 //            closeDB();
         }
         byte[] key = {0x00};
@@ -114,37 +117,11 @@ public class LevelDBFactoryTest {
 
     @Test
     public void getIterator() throws LedgerException {
-//        try {
-//            DB db = LevelDBFactory.getDB();
-////            LevelDBFactory.add(db, "123".getBytes(), "OneTwoThree".getBytes(), true);
-////            LevelDBFactory.add(db, "456".getBytes(), "FourFiveSix".getBytes(), true);
-////            LevelDBFactory.add(db, "789".getBytes(), "SevenEightNine".getBytes(), true);
-//            DBIterator iterator = LevelDBFactory.getIterator(db);
-//            while(iterator.hasNext()){
-//                String key = new String(iterator.next().getKey());
-////                System.out.println(key.compareTo("123"));
-//                Map.Entry<byte[], byte[]> entry = iterator.next();
-//                System.out.println(new String(entry.getKey()));
-//                System.out.println(new String(entry.getValue()));
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
+//        DBIterator itr = LevelDBFactory.getIterator(LevelDBFactory.getDB("/home/bcia/test"));
+//        itr.seek("18".getBytes());
+//        for (int i = 0; i < 10; i++) {
+//            System.out.println(new String(itr.next().getKey()));
 //        }
-//       DBIterator itr = LevelDBFactory.getIterator();
-//       byte[] startKey = {0x00};
-//
-//       while(itr.hasNext()){
-//           Map.Entry<byte[], byte[]> entry = itr.next();
-//           String s = new String(entry.getKey());
-//           if(String.){
-//
-//           }
-//           for(byte b : entry.getKey()){
-//               System.out.print(b + " ");
-//           }
-//           System.out.println();
-//           System.out.println(entry.getValue());
-//       }
     }
 
     @Test
@@ -153,5 +130,12 @@ public class LevelDBFactoryTest {
         byte[] key = {0x00};
         LevelDBFactory.get(key, false);
         LevelDBFactory.get(key, false);
+    }
+
+    public static void soutByte(byte[] bytes){
+        for (byte aByte : bytes) {
+            System.out.println(aByte + " ");
+        }
+        System.out.println();
     }
 }

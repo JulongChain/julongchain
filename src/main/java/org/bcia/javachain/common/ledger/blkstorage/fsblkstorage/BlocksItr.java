@@ -32,13 +32,13 @@ public class BlocksItr implements ResultsIterator {
 
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlocksItr.class);
 
-    private BlockfileMgr mgr;
+    private BlockFileManager mgr;
     private Long maxBlockNumAvailable;
     private Long blockNumToRetrieve;
     private BlockStream stream;
     private Boolean closeMarker;
 
-    public static BlocksItr newBlockItr(BlockfileMgr mgr, Long startBlockNum) {
+    public static BlocksItr newBlockItr(BlockFileManager mgr, Long startBlockNum) {
         BlocksItr itr = new BlocksItr();
         itr.setMgr(mgr);
         itr.setMaxBlockNumAvailable(mgr.getCpInfo().getLastBlockNumber());
@@ -104,11 +104,11 @@ public class BlocksItr implements ResultsIterator {
         }
     }
 
-    public BlockfileMgr getMgr() {
+    public BlockFileManager getMgr() {
         return mgr;
     }
 
-    public void setMgr(BlockfileMgr mgr) {
+    public void setMgr(BlockFileManager mgr) {
         this.mgr = mgr;
     }
 

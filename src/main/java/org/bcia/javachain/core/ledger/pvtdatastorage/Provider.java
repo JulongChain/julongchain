@@ -24,7 +24,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DBPorv
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 
 /**
- * 类描述
+ * pvtdata操作类
  *
  * @author sunzongyu
  * @date 2018/04/17
@@ -35,6 +35,9 @@ public class Provider {
 
     private DBProvider db;
 
+    /**
+     * 创建pvtdata
+     */
     public static Provider newProvider() throws LedgerException {
         Provider provider = new Provider();
         String dbPath = LedgerConfig.getPvtDataStorePath();
@@ -43,6 +46,9 @@ public class Provider {
         return provider;
     }
 
+    /**
+     * 根据id打开对应pvtdata
+     */
     public Store openStore(String ledgerID) throws LedgerException{
         Store store = new StoreImpl();
         ((StoreImpl) store).setDb(db);
@@ -51,6 +57,9 @@ public class Provider {
         return store;
     }
 
+    /**
+     * 关闭数据库
+     */
     public void close() throws LedgerException{
         db.close();
     }

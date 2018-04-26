@@ -24,7 +24,7 @@ import org.bcia.javachain.core.ledger.sceventmgmt.ISmartContractLifecycleEventLi
 import java.util.List;
 
 /**
- * 类描述
+ * 管理pvtdata方法
  *
  * @author sunzongyu
  * @date 2018/04/17
@@ -37,6 +37,7 @@ public interface DB extends IVersionedDB {
 
     Height getCacheKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException;
 
+    @Override
     void clearCachedVersions();
 
     ISmartContractLifecycleEventListener getSmartcontractEventListener();

@@ -20,6 +20,7 @@ import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
@@ -58,11 +59,11 @@ public class IRangeQueryResultsValidator implements IRangeQueryValidator {
                 logger.debug("Query response null.Key " + kvRead.getKey() + " got deleted");
                 return false;
             }
-            if(!result.getCompositeKey().getKey().equals(kvRead.getKey())){
-                logger.debug(String.format("Key name mismatch: key in rwset = %s, key in query result = %s", kvRead.getKey(), result.getCompositeKey().getKey()));
+            if(!((VersionedKV) result).getCompositeKey().getKey().equals(kvRead.getKey())){
+                logger.debug(String.format("Key name mismatch: key in rwset = %s, key in query result = %s", kvRead.getKey(), ((VersionedKV) result).getCompositeKey().getKey()));
                 return false;
             }
-            if(!Height.areSame(result.getVersionedValue().getVersion(), convertToVersionHeight(kvRead.getVersion()))){
+            if(!Height.areSame(((VersionedKV) result).getVersionedValue().getVersion(), convertToVersionHeight(kvRead.getVersion()))){
                 logger.debug(String.format("Version mismatch: key = %s", kvRead.getKey()));
                 return false;
             }

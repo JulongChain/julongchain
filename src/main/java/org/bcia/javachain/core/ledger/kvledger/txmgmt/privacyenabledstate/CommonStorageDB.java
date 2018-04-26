@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 类描述
+ * 处理pvt、pubdata
  *
  * @author sunzongyu
  * @date 2018/04/17

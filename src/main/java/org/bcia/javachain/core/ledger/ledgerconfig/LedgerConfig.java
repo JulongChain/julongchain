@@ -82,6 +82,10 @@ public class LedgerConfig {
         return 50;
     }
 
+    public static boolean isHistoryDBEnabled(){
+        return true;
+    }
+
     private static String join(String... itms){
         StringBuffer buffer = new StringBuffer("");
         for(String itm : itms){

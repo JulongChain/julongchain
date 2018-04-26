@@ -15,7 +15,6 @@
  */
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
-import com.sun.corba.se.impl.encoding.BufferManagerReadGrow;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -31,9 +30,9 @@ import java.util.List;
  * @date 2018/04/09
  * @company Dingxuan
  */
-public class BlockfileHelper {
+public class BlockFileHelper {
 
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockfileHelper.class);
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockFileHelper.class);
     private static final String BLOCK_FILE_PREFIX = "blockfile_";
 
     /**
@@ -66,19 +65,19 @@ public class BlockfileHelper {
         fileInfo = getFileInfoOrPanic(rootDir,lastFileNum);
         logger.debug(String.format("Last block file info: Filename=[%s]", fileInfo.getName()));
         //获取最新区块信息
-        list = BlockfileMgr.scanForLastCompleteBlock(rootDir, lastFileNum, (long) 0);
+        list = BlockFileManager.scanForLastCompleteBlock(rootDir, lastFileNum, (long) 0);
         //区块信息
-        lastBlockBytes = (byte[]) list.get(BlockfileMgr.LAST_BLOCK_BYTES);
+        lastBlockBytes = (byte[]) list.get(BlockFileManager.LAST_BLOCK_BYTES);
         //位置
-        endOffsetLastBlock = (long) list.get(BlockfileMgr.CURRENT_OFFSET);
+        endOffsetLastBlock = (long) list.get(BlockFileManager.CURRENT_OFFSET);
         //文件中区块数量
-        numBlocksInFile = (int) list.get(BlockfileMgr.NUM_BLOCKS);
+        numBlocksInFile = (int) list.get(BlockFileManager.NUM_BLOCKS);
         //最新区块文件中没有区块, 则倒数第二区块文件的最新区块为最新区块
         if(numBlocksInFile == 0 && lastFileNum > 0){
             int secondLastFileNum = lastFileNum - 1;
             fileInfo = getFileInfoOrPanic(rootDir, secondLastFileNum);
             logger.debug(String.format("Second last block file info: FileName=[%s]", fileInfo.getName()));
-            lastBlockBytes = (byte[]) BlockfileMgr.scanForLastCompleteBlock(rootDir, secondLastFileNum, (long) 0).get(BlockfileMgr.LAST_BLOCK_BYTES);
+            lastBlockBytes = (byte[]) BlockFileManager.scanForLastCompleteBlock(rootDir, secondLastFileNum, (long) 0).get(BlockFileManager.LAST_BLOCK_BYTES);
         }
         //解析区块
         if(lastBlockBytes != null){
@@ -137,7 +136,7 @@ public class BlockfileHelper {
      * 根据区块文件编号, 获取文件
      */
     public static File getFileInfoOrPanic(String rootDir, Integer fileNum) throws LedgerException{
-        String filePath = BlockfileMgr.deriveBlockfilePath(rootDir, fileNum);
+        String filePath = BlockFileManager.deriveBlockfilePath(rootDir, fileNum);
         File fileInfo = new File(filePath);
         if (!fileInfo.exists()){
             throw new LedgerException("Fail to retrieving file for file num " + fileNum);

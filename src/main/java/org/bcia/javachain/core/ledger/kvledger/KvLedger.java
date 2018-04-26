@@ -277,6 +277,7 @@ public class KvLedger implements INodeLedger {
      *
      * @param block
      */
+    @Override
     public void commit(Common.Block block) {
         return;
     }
@@ -284,6 +285,7 @@ public class KvLedger implements INodeLedger {
     /** Close closes `KVLedger`
      *
      */
+    @Override
     public void close() {
         blockStore.shutdown();
         try {

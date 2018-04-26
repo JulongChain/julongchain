@@ -26,7 +26,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
 /**
- * 类描述
+ * 用于getStateRangeScan
  *
  * @author sunzongyu
  * @date 2018/04/18
@@ -73,7 +73,6 @@ public class ResultsItr implements ResultsIterator {
                     .setEndKey(endKey)
                     .setItrExhausted(true)
                     .build();
-            return;
         }
         VersionedKV versionedKV = (VersionedKV) queryResult;
         //TODO

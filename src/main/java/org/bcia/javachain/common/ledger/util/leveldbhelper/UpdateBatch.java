@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 批量操作
+ * 批量操作更新包
  *
  * @author sunzongyu
  * @date 2018/04/09

@@ -39,11 +39,11 @@ import java.util.concurrent.locks.ReentrantLock;
  * @date 2018/04/09
  * @company Dingxuan
  */
-public class BlockfileMgr {
+public class BlockFileManager {
 
     private static final String BLOCKFILE_PREFIX = "blockfile";
     private static final byte[] BLK_MGR_INFO_KEY = "blkMgrInfo".getBytes();
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockfileMgr.class);
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockFileManager.class);
     public static final int LAST_BLOCK_BYTES = 0;
     public static final int CURRENT_OFFSET = 1;
     public static final int NUM_BLOCKS = 2;
@@ -53,18 +53,18 @@ public class BlockfileMgr {
     private DBProvider db;
     private Index index;
     private CheckpointInfo cpInfo;
-    private BlockfileWriter currentFileWriter;
+    private BlockFileWriter currentFileWriter;
     private Ledger.BlockchainInfo bcInfo;
     private Lock lock;
 
     /**
      * 创建新的blockfilemanager对象
      */
-    public static BlockfileMgr newBlockfileMgr(String id,
-                                               Conf conf,
-                                               IndexConfig indexConfig,
-                                               DBProvider indexStore) throws LedgerException {
-        BlockfileMgr mgr = new BlockfileMgr();
+    public static BlockFileManager newBlockfileMgr(String id,
+                                                   Conf conf,
+                                                   IndexConfig indexConfig,
+                                                   DBProvider indexStore) throws LedgerException {
+        BlockFileManager mgr = new BlockFileManager();
         logger.debug(String.format("newBlockfileMgr() initializing file-based block storage for ledger: %s", id));
         //根据配置文件、id生成rootDir
         String rootDir = conf.getLedgerBlockDir(id);
@@ -78,7 +78,7 @@ public class BlockfileMgr {
         //设置检查点信息
         if(mgr.getCpInfo() == null){
             logger.info("Getting block information from block storage");
-            mgr.setCpInfo(BlockfileHelper.constructCheckpointInfoFromBlockFiles(mgr.getRootDir()));
+            mgr.setCpInfo(BlockFileHelper.constructCheckpointInfoFromBlockFiles(mgr.getRootDir()));
             logger.debug(String.format("Info constructed by scanning the blocks dir = %s", mgr.getCpInfo().toString()));
         } else {
             logger.debug("Synching block information from block storage (if needed)");
@@ -88,7 +88,7 @@ public class BlockfileMgr {
         //blkMgrInfoKey-checkpointInfo
         mgr.saveCurrentInfo(mgr.getCpInfo(), true);
         //写入文件 writer类
-        mgr.setCurrentFileWriter(BlockfileRw.newBlockfileWriter(deriveBlockfilePath(mgr.getRootDir(), mgr.getCpInfo().getLastestFileChunkSuffixNum())));
+        mgr.setCurrentFileWriter(BlockFileRw.newBlockfileWriter(deriveBlockfilePath(mgr.getRootDir(), mgr.getCpInfo().getLastestFileChunkSuffixNum())));
         //修剪文件为检查点保存的文件大小
         mgr.getCurrentFileWriter().truncateFile(mgr.getCpInfo().getLatestFileChunksize());
         //设置blockindex对象
@@ -167,7 +167,7 @@ public class BlockfileMgr {
         cpInfo.setLatestFileChunksize(0);
         cpInfo.setLastBlockNumber(this.cpInfo.getLastBlockNumber());
 
-        BlockfileWriter nextFileWriter = BlockfileRw.newBlockfileWriter(deriveBlockfilePath(this.rootDir, cpInfo.getLastestFileChunkSuffixNum()));
+        BlockFileWriter nextFileWriter = BlockFileRw.newBlockfileWriter(deriveBlockfilePath(this.rootDir, cpInfo.getLastestFileChunkSuffixNum()));
 
         saveCurrentInfo(cpInfo, true);
         this.currentFileWriter = nextFileWriter;
@@ -222,7 +222,7 @@ public class BlockfileMgr {
         FileLocPointer blockFLP = new FileLocPointer();
         blockFLP.setFileSuffixNum(currentOffset);
         blockFLP.setLocPointer(new LocPointer(newCPInfo.getLastestFileChunkSuffixNum(), 0));
-        BlockIdxInfo idxInfo = new BlockIdxInfo();
+        BlockIndexInfo idxInfo = new BlockIndexInfo();
         idxInfo.setBlockNum(block.getHeader().getNumber());
         idxInfo.setBlockHash(blockHash.toByteArray());
         idxInfo.setFlp(blockFLP);
@@ -296,7 +296,7 @@ public class BlockfileMgr {
                         " The indexes for the block are already present", lastBlockIndexed));
             }
         }
-        BlockIdxInfo blockIdxInfo = new BlockIdxInfo();
+        BlockIndexInfo blockIndexInfo = new BlockIndexInfo();
         while(true){
             AbstractMap.SimpleEntry<byte[], BlockPlacementInfo> entry = stream.nextBlockBytesAndPlacementInfo();
             blockBytes = entry.getKey();
@@ -313,23 +313,23 @@ public class BlockfileMgr {
             }
 
             //更新blockIndexInfo
-            blockIdxInfo.setBlockHash(info.getBlockHeader().getDataHash().toByteArray());
-            blockIdxInfo.setBlockNum(info.getBlockHeader().getNumber());
+            blockIndexInfo.setBlockHash(info.getBlockHeader().getDataHash().toByteArray());
+            blockIndexInfo.setBlockNum(info.getBlockHeader().getNumber());
             FileLocPointer flp = new FileLocPointer();
             LocPointer lp = new LocPointer();
             lp.setOffset(blockPlacementInfo.getBlockStartOffset().intValue());
             flp.setFileSuffixNum(blockPlacementInfo.getFileNum());
             flp.setLocPointer(lp);
-            blockIdxInfo.setTxOffsets(info.getTxOffsets());
-            blockIdxInfo.setMetadata(info.getMetadata());
+            blockIndexInfo.setTxOffsets(info.getTxOffsets());
+            blockIndexInfo.setMetadata(info.getMetadata());
 
-            logger.debug(String.format("syncIndex() indexing block [%d]", blockIdxInfo.getBlockNum()));
-            index.indexBlock(blockIdxInfo);
-            if(blockIdxInfo.getBlockNum() % 10000 == 0){
-                logger.info(String.format("Indexed block number [%d]", blockIdxInfo.getBlockNum()));
+            logger.debug(String.format("syncIndex() indexing block [%d]", blockIndexInfo.getBlockNum()));
+            index.indexBlock(blockIndexInfo);
+            if(blockIndexInfo.getBlockNum() % 10000 == 0){
+                logger.info(String.format("Indexed block number [%d]", blockIndexInfo.getBlockNum()));
             }
         }
-        logger.info(String.format("Finished building index. Last block indexed [%d]", blockIdxInfo.getBlockNum()));
+        logger.info(String.format("Finished building index. Last block indexed [%d]", blockIndexInfo.getBlockNum()));
     }
 
     public Ledger.BlockchainInfo getBlockchainInfo() {
@@ -458,7 +458,7 @@ public class BlockfileMgr {
     }
 
     public byte[] fetchBlockBytes(FileLocPointer lp) throws LedgerException {
-        BlockfileStream stream = new BlockfileStream();
+        BlockFileStream stream = new BlockFileStream();
         try {
             stream.newBlockFileStream(rootDir, lp.getFileSuffixNum(), (long) (lp.getLocPointer().getOffset()));
             return stream.nextBlockBytes();
@@ -468,9 +468,9 @@ public class BlockfileMgr {
     }
 
     public byte[] fetchRawBytes(FileLocPointer lp) throws LedgerException {
-        BlockfileReader reader = null;
+        BlockFileReader reader = null;
         String filePath = deriveBlockfilePath(rootDir, lp.getFileSuffixNum());
-        reader = BlockfileRw.newBlockfileReader(filePath);
+        reader = BlockFileRw.newBlockfileReader(filePath);
         return reader.read(lp.getLocPointer().getOffset(), lp.getLocPointer().getBytesLength());
     }
 
@@ -505,12 +505,12 @@ public class BlockfileMgr {
      *          NUM_BLOCKS: 区块数量
      */
     public static List<Object> scanForLastCompleteBlock(String rootDir, Integer fileNum, Long startingOffset) throws LedgerException{
-        BlockfileStream stream = null;
+        BlockFileStream stream = null;
         byte[] blockBytes = null;
         byte[] lastBlockBytes = null;
         try {
             int numBlock = 0;
-            stream = new BlockfileStream();
+            stream = new BlockFileStream();
             stream.newBlockFileStream(rootDir, fileNum, startingOffset);
             while (true) {
                 blockBytes = stream.nextBlockBytes();
@@ -584,11 +584,11 @@ public class BlockfileMgr {
         this.cpInfo = cpInfo;
     }
 
-    public BlockfileWriter getCurrentFileWriter() {
+    public BlockFileWriter getCurrentFileWriter() {
         return currentFileWriter;
     }
 
-    public void setCurrentFileWriter(BlockfileWriter currentFileWriter) {
+    public void setCurrentFileWriter(BlockFileWriter currentFileWriter) {
         this.currentFileWriter = currentFileWriter;
     }
 

@@ -22,6 +22,7 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RangeQueryResultsHelper;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RwSetUtil;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
 /**
@@ -61,7 +62,7 @@ public class IRangeQueryHashValidator implements IRangeQueryValidator {
                 logger.debug("Combined interator exhausted.");
                 return equals;
             }
-            resultsHelper.addResult(RwSetUtil.newKVRead(result.getCompositeKey().getKey(), result.getVersionedValue().getVersion()));
+            resultsHelper.addResult(RwSetUtil.newKVRead(((VersionedKV) result).getCompositeKey().getKey(), ((VersionedKV) result).getVersionedValue().getVersion()));
             merkle = resultsHelper.getMerkleSummary();
 
             if(merkle.getMaxLevel() < inMerkle.getMaxLevel()){

@@ -39,7 +39,7 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * 类描述
+ * 交易管理者类
  *
  * @author sunzongyu
  * @date 2018/04/17
@@ -71,7 +71,6 @@ public class LockBasedTxManager implements TxManager {
 
     @Override
     public IQueryExecutor newQueryExecutor(String txid) throws LedgerException {
-        lock.readLock().lock();
         return LockBasedQueryExecutor.newQueryExecutor(this, txid);
     }
 
@@ -79,7 +78,6 @@ public class LockBasedTxManager implements TxManager {
     public ITxSimulator newTxSimulator(String txid) throws LedgerException {
         logger.debug("Constructing new tx simulator");
         LockBasedTxSimulator s = LockBasedTxSimulator.newLockBasedTxSimulator(this, txid);
-        lock.readLock().lock();
         return s;
     }
 

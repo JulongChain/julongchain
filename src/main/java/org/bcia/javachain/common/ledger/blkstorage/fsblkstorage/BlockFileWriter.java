@@ -16,7 +16,6 @@
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.core.node.NodeConfig;
 
 import java.io.*;
 
@@ -27,13 +26,13 @@ import java.io.*;
  * @date 2018/04/12
  * @company Dingxuan
  */
-public class BlockfileWriter {
+public class BlockFileWriter {
 
     private String filePath;
     private File file;
 
-    public static BlockfileWriter newBlockfileWriter(String filePath){
-        BlockfileWriter writer = new BlockfileWriter();
+    public static BlockFileWriter newBlockfileWriter(String filePath){
+        BlockFileWriter writer = new BlockFileWriter();
         writer.setFilePath(filePath);
         return writer.open();
     }
@@ -71,7 +70,7 @@ public class BlockfileWriter {
         }
     }
 
-    public BlockfileWriter open() {
+    public BlockFileWriter open() {
         file = new File(filePath);
         if(!file.exists()){
             try {

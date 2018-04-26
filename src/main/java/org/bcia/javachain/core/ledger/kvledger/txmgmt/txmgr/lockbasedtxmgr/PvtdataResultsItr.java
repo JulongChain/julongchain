@@ -21,7 +21,7 @@ import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 
 /**
- * 类描述
+ * pvtdata查询迭代器
  *
  * @author sunzongyu
  * @date 2018/04/18

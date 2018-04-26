@@ -68,6 +68,7 @@ public class NsIterator implements ResultsIterator {
      *
      * @return
      */
+    @Override
     public QueryResult next() throws LedgerException {
         if(nextIndex >= lastIndex){
             return null;
@@ -87,6 +88,7 @@ public class NsIterator implements ResultsIterator {
     /** Close implements the method from QueryResult interface
      *
      */
+    @Override
     public void close() {
         //nothing to do
     }

@@ -77,8 +77,8 @@ public class KvScanner implements ResultsIterator {
         VersionedValue versionedValue = new VersionedValue();
         versionedValue.setVersion(version);
         versionedValue.setValue(value);
-        kv.setCompositeKey(compositeKey);
-        kv.setVersionedValue(versionedValue);
+        ((VersionedKV) kv).setCompositeKey(compositeKey);
+        ((VersionedKV) kv).setVersionedValue(versionedValue);
         return kv;
     }
 

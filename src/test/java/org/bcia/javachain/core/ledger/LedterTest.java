@@ -15,8 +15,10 @@
  */
 package org.bcia.javachain.core.ledger;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.util.Util;
 import org.iq80.leveldb.DBIterator;
@@ -36,17 +38,38 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class LedterTest {
+    private static final byte[] COMPOSITE_KEY_SEP = {0x00};
     @Test
     public void longl() throws Throwable {
 //        LevelDbProvider provider = LevelDbProvider.newProvider("/tmp/fabric/ledgertests/ledgermgmt/ledgersData/ledgerProvider");
 //        LevelDbProvider provider = LevelDbProvider.newProvider("/home/bcia/javachain/ledgersData/ledgerProvider");
         LevelDbProvider provider = LevelDbProvider.newProvider("/home/bcia/javachain/ledgersData/stateLeveldb");
-        Iterator<Map.Entry<byte[], byte[]>> itr =  provider.getIterator(null, null);
+        for (int i = 0; i < 100; i++) {
+            Height height = new Height();
+            height.setTxNum((long) i);
+            height.setBlockNum((long) i * 10);
+            byte[] value = height.toBytes();
+            provider.put(ArrayUtils.addAll(ArrayUtils.addAll(("ns" + i).getBytes(), COMPOSITE_KEY_SEP), ("key" + i).getBytes()), value, true);
+        }
+        Iterator<Map.Entry<byte[], byte[]>> itr =  provider.getIterator(null);
         while(itr.hasNext()){
             Map.Entry<byte[], byte[]> entry = itr.next();
+//            soutBytes(entry.getKey());
+//            soutBytes(entry.getValue());
+//            System.out.println(Height.newHeightFromBytes(entry.getValue()).getTxNum());
+//            System.out.println(Height.newHeightFromBytes(entry.getValue()).getBlockNum());
             System.out.println(new String(entry.getKey()));
+            soutBytes(entry.getKey());
             System.out.println(new String(entry.getValue()));
             System.out.println("_____________________________________");
         }
+        provider.put("123".getBytes(), new byte[]{}, true);
+        System.out.println(provider.get("123".getBytes()) == null);
+    }
+    public static void soutBytes(byte[] bytes){
+        for(byte b : bytes){
+            System.out.print(b + " ");
+        }
+        System.out.println();
     }
 }

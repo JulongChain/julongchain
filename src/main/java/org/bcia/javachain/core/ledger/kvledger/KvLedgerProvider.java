@@ -67,12 +67,13 @@ public class KvLedgerProvider implements INodeLedgerProvider {
      */
     public static INodeLedgerProvider newProvider() throws LedgerException {
         logger.info("Initializing ledger provider");
+        //初始化idstore(ledgerProvider)
         IdStore idStore = IdStore.openIDStore();
-
+        //初始化文件系统(chains/chains)以及pvtdata(pvtdataStore)
         Provider ledgerStoreProvider = Store.newProvider();
-
+        //初始化versiondb(stateLeveldb)
         CommonStorageDBProvider vdbProvider = CommonStorageDBProvider.NewCommonStorageDBProvider();
-
+        //初始化HistoryDB(historyLeveldb)
         IHistoryDBProvider historyDBProvider = HistoryLevelDB.newHistoryDBProvider();
 
         logger.info("Ledger provider initialized");
@@ -82,6 +83,7 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         provider.setVdbProvider(vdbProvider);
         provider.setHistoryDBProvider(historyDBProvider);
         provider.setStateListeners(null);
+        //修复未完成的db
         provider.recoverUnderConstructionLedger();
         return provider;
     }
@@ -89,13 +91,15 @@ public class KvLedgerProvider implements INodeLedgerProvider {
     /**
      * 初始化
      */
+    @Override
     public void initialize(Map<String, StateListener> stateListeners){
         this.stateListeners = stateListeners;
     }
 
     /**
-     * 创建KvLedgerProvider
+     * 创建账本
      */
+    @Override
     public INodeLedger create(Common.Block genesisBlock) throws LedgerException{
         String ledgerID = null;
         //获取账本id
@@ -111,15 +115,20 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         }
         //设置创建标志
         idStore.setUnderConstructionFlag(ledgerID);
-
+        //打开内部存储
         INodeLedger lgr = openInternal(ledgerID);
         BlockAndPvtData bapd = new BlockAndPvtData();
         bapd.setBlock(genesisBlock);
+        //提交创世区块
         lgr.commitWithPvtData(bapd);
         idStore.createLedgerID(ledgerID, genesisBlock);
         return lgr;
     }
 
+    /**
+     * 打开账本
+     */
+    @Override
     public INodeLedger open(String ledgerID) throws LedgerException{
         logger.debug("Opening kvledger with ledgerid " + ledgerID);
         //没有创建过ledgerid,抛出异常
@@ -129,16 +138,25 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         return openInternal(ledgerID);
     }
 
+    /**
+     * 判断账本是否存在
+     */
     @Override
     public Boolean exists(String ledgerID) throws LedgerException {
         return idStore.ledgerIDExists(ledgerID);
     }
 
+    /**
+     * 列出账本
+     */
     @Override
     public List<String> list() throws LedgerException {
         return idStore.getAllLedgerIDs();
     }
 
+    /**
+     * 关闭账本
+     */
     @Override
     public void close() throws LedgerException {
         idStore.close();
@@ -147,15 +165,19 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         historyDBProvider.close();
     }
 
+    /**
+     * 恢复在建账本(idstore中有UnderConstruction标记)
+     */
+    @Override
     public void recoverUnderConstructionLedger() throws LedgerException{
         logger.debug("Recovering under construction ledger");
         String ledgerID = idStore.getUnderConstructionFlag();
-
+        //不存在有在建标记的账本
         if(ledgerID == null){
             logger.debug("No under construction leder found.");
             return;
         }
-
+        //存在在建标记
         logger.info(String.format("Ledger [%s] found as under construction", ledgerID));
         INodeLedger ledger = openInternal(ledgerID);
         Ledger.BlockchainInfo bcInfo = ledger.getBlockchainInfo();
@@ -179,6 +201,9 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         }
     }
 
+    /**
+     * 打开内部仓库
+     */
     private INodeLedger openInternal(String ledgerID) throws LedgerException{
         //账本的block仓库
         Store blockStore = ledgerStoreProvider.open(ledgerID);

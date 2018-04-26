@@ -20,6 +20,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.util.Util;
+import org.iq80.leveldb.DBIterator;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -40,7 +41,7 @@ public class LevelDbProviderTest {
     LevelDbProvider provider;
     @Before
     public void before() throws LedgerException {
-//        provider = LevelDbProvider.newProvider();
+        provider = LevelDbProvider.newProvider("/home/bcia/test");
     }
 
     @After
@@ -60,16 +61,11 @@ public class LevelDbProviderTest {
 
     @Test
     public void add() throws LedgerException {
-        byte[] key = {0x00};
-//        byte[] key1 = {0x02};
-        byte[] value1 = Util.longToBytes(1000, 8);
-        byte[] value2 = Util.longToBytes(10000, 8);
-
-        provider.put(key, ArrayUtils.addAll(value1, value2), true);
-//        provider.put(key1, value, false);
-//        System.out.println(new String(provider.get(key)));
-//        System.out.println(new String(provider.get(key1)));
-//        provider.close();
+        for (int i = 0; i < 100; i++) {
+            byte[] key = ("key" + i).getBytes();
+            byte[] value = ("value" + i).getBytes();
+            provider.put(key, value, true);
+        }
     }
 
     @Test
@@ -99,11 +95,17 @@ public class LevelDbProviderTest {
     }
 
     @Test
-    public void test() throws LedgerException {
-        provider = LevelDbProvider.newProvider(LedgerConfig.getLedgerProviderPath());
-        Iterator<Map.Entry<byte[], byte[]>> itr = provider.getIterator(null, null);
-        while(itr.hasNext()){
-            System.out.println(new String(itr.next().getKey()));
+    public void getIterator() throws LedgerException {
+        for (int i = 0; i < 10; i++) {
+            byte[] key = ("key" + i).getBytes();
+            soutByte(provider.get(key));
         }
+    }
+
+    public static void soutByte(byte[] bytes){
+        for (byte aByte : bytes) {
+            System.out.print(aByte + " ");
+        }
+        System.out.println();
     }
 }

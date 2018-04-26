@@ -21,10 +21,10 @@ import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
 
 /**
- * 类描述
+ * 区块文件接口
  *
  * @author sunzongyu
- * @date 2018/04/17
+ * @date 2018/04/7
  * @company Dingxuan
  */
 public interface FileLedgerBlockStore {

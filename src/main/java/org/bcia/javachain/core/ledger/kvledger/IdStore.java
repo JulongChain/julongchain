@@ -111,7 +111,6 @@ public class IdStore {
      */
     public boolean ledgerIDExists(String ledgerID) throws LedgerException{
         byte[] key = encodeLedgerKey(ledgerID);
-        System.out.println(new String(key));
         byte[] val = provider.get(key);
         return val != null;
     }
@@ -121,7 +120,8 @@ public class IdStore {
      */
     public List<String> getAllLedgerIDs() throws LedgerException {
         List<String> ids = new ArrayList<>();
-        Iterator<Map.Entry<byte[], byte[]>> itr = provider.getIterator(null, null);
+        //TODO
+        Iterator<Map.Entry<byte[], byte[]>> itr = provider.getIterator(null);
         while(itr.hasNext()){
             Map.Entry<byte[], byte[]> entry = itr.next();
             if(entry.getKey().equals(UNDER_CONSTRUCTION_LEDGER_KEY)){

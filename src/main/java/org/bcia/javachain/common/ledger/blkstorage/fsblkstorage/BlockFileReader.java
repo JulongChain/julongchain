@@ -16,9 +16,7 @@
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.core.node.NodeConfig;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.FileInputStream;
 
@@ -29,12 +27,12 @@ import java.io.FileInputStream;
  * @date 2018/04/09
  * @company Dingxuan
  */
-public class BlockfileReader {
+public class BlockFileReader {
 
     private File file;
 
-    public static BlockfileReader newBlockfileReader(String filePath){
-        BlockfileReader reader = new BlockfileReader();
+    public static BlockFileReader newBlockfileReader(String filePath){
+        BlockFileReader reader = new BlockFileReader();
         reader.file = new File(filePath);
         return reader;
     }

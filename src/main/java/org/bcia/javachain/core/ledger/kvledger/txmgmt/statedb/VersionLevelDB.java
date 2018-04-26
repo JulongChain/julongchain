@@ -46,14 +46,9 @@ public class VersionLevelDB implements IVersionedDB{
     private DBProvider db;
     private String dbName;
 
-    public VersionLevelDB(DBProvider db, String dbName){
-        this.db = db;
-        this.dbName = dbName;
-    }
-
     @Override
     public VersionedValue getState(String namespace, String key) throws LedgerException {
-        logger.debug(String.format("getState() ns = %s, key = %s"), namespace, key);
+        logger.debug(String.format("getState() ns = %s, key = %s", namespace, key));
         byte[] compositeKey = constructCompositeKey(namespace, key);
         byte[] dbVal = db.get(compositeKey);
         if (dbVal == null) {
@@ -92,11 +87,11 @@ public class VersionLevelDB implements IVersionedDB{
     //TODO kvScanner
     public ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
         byte[] compositeStartKey = constructCompositeKey(namespace, startKey);
-        byte[] compositeEndKey = constructCompositeKey(namespace, endKey);
-        if(endKey == null || "".equals(endKey)){
-            compositeEndKey[compositeEndKey.length - 1] = LAST_KEY_INDICATOR;
-        }
-        db.getIterator(compositeStartKey, compositeEndKey);
+//        byte[] compositeEndKey = constructCompositeKey(namespace, endKey);
+//        if(endKey == null || "".equals(endKey)){
+//            compositeEndKey[compositeEndKey.length - 1] = LAST_KEY_INDICATOR;
+//        }
+        db.getIterator(compositeStartKey);
         return null;
     }
 
@@ -105,6 +100,9 @@ public class VersionLevelDB implements IVersionedDB{
         throw new LedgerException("ExecuteQuery is not support for leveldb");
     }
 
+    /**
+     * 批量写操作
+     */
     @Override
     public void applyUpdates(UpdateBatch batch, Height height) throws LedgerException {
         org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch dbBatch = LevelDbProvider.newUpdateBatch();
@@ -187,5 +185,21 @@ public class VersionLevelDB implements IVersionedDB{
     @Override
     public void clearCachedVersions() {
 
+    }
+
+    public DBProvider getDb() {
+        return db;
+    }
+
+    public void setDb(DBProvider db) {
+        this.db = db;
+    }
+
+    public String getDbName() {
+        return dbName;
+    }
+
+    public void setDbName(String dbName) {
+        this.dbName = dbName;
     }
 }

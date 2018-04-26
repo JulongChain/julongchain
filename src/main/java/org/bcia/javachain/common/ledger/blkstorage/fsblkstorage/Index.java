@@ -29,7 +29,7 @@ public interface Index {
 
     Long getLastBlockIndexed() throws LedgerException;
 
-    void indexBlock(BlockIdxInfo blockIdxInfo) throws LedgerException;
+    void indexBlock(BlockIndexInfo blockIndexInfo) throws LedgerException;
 
     FileLocPointer getBlockLocByHash(byte[] blockHash) throws LedgerException;
 

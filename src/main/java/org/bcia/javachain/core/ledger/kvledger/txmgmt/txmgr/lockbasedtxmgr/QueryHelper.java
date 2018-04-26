@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 类描述
+ * 辅助查询statedb
  *
  * @author sunzongyu
  * @date 2018/04/18
@@ -44,6 +44,9 @@ public class QueryHelper {
     public byte[] getState(String ns, String key) throws LedgerException{
         checkDone();
         VersionedValue versionedValue = txMgr.getDb().getState(ns, key);
+        if(versionedValue == null){
+            return null;
+        }
         byte[] val = versionedValue.getValue();
         Height ver = versionedValue.getVersion();
         addToReadSet(ns, key, ver);
@@ -70,6 +73,9 @@ public class QueryHelper {
         return itr;
     }
 
+    /**
+     * 富查询 leveldb不支持
+     */
     public ResultsIterator executeQuery(String ns, String query) throws LedgerException {
         checkDone();
         ResultsIterator dbItr = txMgr.getDb().executeQuery(ns, query);
@@ -118,6 +124,9 @@ public class QueryHelper {
         return itr;
     }
 
+    /**
+     * 针对pvtdata富查询 leveldb不支持
+     */
     public ResultsIterator executeQueryOnPrivateData(String ns, String coll, String query) throws LedgerException {
         checkDone();
         ResultsIterator dbitr = txMgr.getDb().executeQueryOnPrivateData(ns, coll, query);
@@ -157,10 +166,12 @@ public class QueryHelper {
         }
     }
 
-    //grpc set各种list貌似只能一个一个添加:( ...
+    /**
+     * grpc set各种list貌似只能一个一个添加:( ...
+     */
     private KvRwset.QueryReads.Builder setKvReads(KvRwset.QueryReads.Builder builder, List<KvRwset.KVRead> list){
         for (int i = 0; i < list.size(); i++) {
-            builder.setKvReads(i, list.get(i));
+            builder.addKvReads(i, list.get(i));
         }
         return builder;
     }

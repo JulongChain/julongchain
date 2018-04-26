@@ -22,14 +22,14 @@ package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
  * @date 2018/04/12
  * @company Dingxuan
  */
-public class BlockfileRw {
+public class BlockFileRw {
 
-    public static BlockfileWriter newBlockfileWriter(String filePath) {
-        return BlockfileWriter.newBlockfileWriter(filePath);
+    public static BlockFileWriter newBlockfileWriter(String filePath) {
+        return BlockFileWriter.newBlockfileWriter(filePath);
     }
 
-    public static BlockfileReader newBlockfileReader(String filePath) {
-        return BlockfileReader.newBlockfileReader(filePath);
+    public static BlockFileReader newBlockfileReader(String filePath) {
+        return BlockFileReader.newBlockfileReader(filePath);
     }
 
 }

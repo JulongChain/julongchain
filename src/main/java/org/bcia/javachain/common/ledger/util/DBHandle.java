@@ -68,7 +68,7 @@ public interface DBHandle {
     /**
      * 遍历
      */
-    Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey, byte[] endKey) throws LedgerException;
+    Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey) throws LedgerException;
 
     /**
      * 获取dbname

@@ -15,13 +15,9 @@
  */
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
-import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.node.TransactionPackage;
 
 import java.util.List;
 
@@ -32,7 +28,7 @@ import java.util.List;
  * @date 2018/04/09
  * @company Dingxuan
  */
-public class BlockIdxInfo {
+public class BlockIndexInfo {
 
     private Long blockNum;
     private byte[] blockHash;
@@ -40,7 +36,7 @@ public class BlockIdxInfo {
     private List<TxIndexInfo> txOffsets;
     private Common.BlockMetadata metadata;
 
-    private static final JavaChainLog loogger = JavaChainLogFactory.getLog(BlockIdxInfo.class);
+    private static final JavaChainLog loogger = JavaChainLogFactory.getLog(BlockIndexInfo.class);
     public Long getBlockNum() {
         return blockNum;
     }

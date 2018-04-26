@@ -17,6 +17,7 @@ package org.bcia.javachain.core.ledger.ledgerstorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.blkstorage.BlockStorage;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStoreProvider;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
@@ -38,7 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Store
+ * 持有文件系统以及pvtdata
  *
  * @author sunzongyu
  * @date 2018/04/09
@@ -50,29 +51,23 @@ public class Store implements BlockStore{
 
     public static Provider newProvider() throws LedgerException{
         Provider provider = new Provider();
-        //文件系统provider初始化条件
         String[] attrsToIndex = {
-                BlockStore.INDEXABLE_ATTR_BLOCK_HASH,
-                BlockStore.INDEXABLE_ATTR_BLOCK_NUM,
-                BlockStore.INDEXABLE_ATTR_TX_ID,
-                BlockStore.INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM,
-                BlockStore.INDEXABLE_ATTR_BLOCK_TX_ID,
-                BlockStore.INDEXABLE_ATTR_TX_VALIDATION_CODE
+                BlockStorage.INDEXABLE_ATTR_BLOCK_HASH,
+                BlockStorage.INDEXABLE_ATTR_BLOCK_NUM,
+                BlockStorage.INDEXABLE_ATTR_TX_ID,
+                BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM,
+                BlockStorage.INDEXABLE_ATTR_BLOCK_TX_ID,
+                BlockStorage.INDEXABLE_ATTR_TX_VALIDATION_CODE
         };
-        //文件系统provider
         IndexConfig indexConfig = new IndexConfig();
         indexConfig.setAttrsToIndex(attrsToIndex);
-
+        //文件系统初始化参数
         Conf conf = Config.newConf(LedgerConfig.getBlockStorePath(), LedgerConfig.getMaxBlockfileSize());
-
         BlockStoreProvider blockStoreProvider = FsBlockStoreProvider.newProvider(conf, indexConfig);
-
         provider.setBlkStoreProvider(blockStoreProvider);
-
+        //pvtdata初始化
         org.bcia.javachain.core.ledger.pvtdatastorage.Provider pvtDataStoreProvider =
                 org.bcia.javachain.core.ledger.pvtdatastorage.Provider.newProvider();
-
-
         provider.setPvtDataStoreProvider(pvtDataStoreProvider);
         return provider;
     }
@@ -127,13 +122,16 @@ public class Store implements BlockStore{
 
     }
 
+    /**
+     * 提交pvt数据
+     */
     @Override
     public synchronized void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException{
         List<TxPvtData> pvtDatas = new ArrayList<>();
         for(Map.Entry<Long, TxPvtData> entry : blockAndPvtData.getBlockPvtData().entrySet()){
             pvtDatas.add(entry.getValue());
         }
-
+        //提交数据,出现异常则回滚,否则完成提交
         pvtdataStore.prepare(blockAndPvtData.getBlock().getHeader().getNumber(), pvtDatas);
         try {
             addBlock(blockAndPvtData.getBlock());
@@ -179,6 +177,10 @@ public class Store implements BlockStore{
         }
     }
 
+    /**
+     * 通过区块文件初始化pvt数据
+     * 需要则进行初始化
+     */
     private boolean initPvtdataStoreFromExistingBlockchain() throws LedgerException{
         Ledger.BlockchainInfo bcInfo = blkStorage.getBlockchainInfo();
         boolean pvtdataStoreEmpty = pvtdataStore.isEmpty();
@@ -189,6 +191,9 @@ public class Store implements BlockStore{
         return false;
     }
 
+    /**
+     * 同步区块与pvtdata
+     */
     private void syncPvtdataStoreWithBlockStore() throws LedgerException{
         boolean pendingPvtbatch = pvtdataStore.hasPendingBatch();
         if(!pendingPvtbatch){

@@ -46,7 +46,10 @@ public class VersionLevelDBProvider implements IVersionedDBProvider {
 
     @Override
     public IVersionedDB getDBHandle(String id) throws LedgerException {
-        return new VersionLevelDB(db, db.getDb().getDbName());
+        VersionLevelDB vdb = new VersionLevelDB();
+        vdb.setDb(db);
+        vdb.setDbName(db.getDb().getDbName());
+        return vdb;
     }
 
     @Override

@@ -23,12 +23,12 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
  * @company Dingxuan
  */
 public interface QueryResult {
-
-    public CompositeKey getCompositeKey();
-
-    public void setCompositeKey(CompositeKey compositeKey);
-
-    public VersionedValue getVersionedValue();
-
-    public void setVersionedValue(VersionedValue versionedValue);
+//
+//    public CompositeKey getCompositeKey();
+//
+//    public void setCompositeKey(CompositeKey compositeKey);
+//
+//    public VersionedValue getVersionedValue();
+//
+//    public void setVersionedValue(VersionedValue versionedValue);
 }
