@@ -417,7 +417,7 @@ public class BlockFileManager {
     }
 
     public Common.Envelope retrieveTransactionByID(String txID) throws LedgerException {
-        logger.debug(String.format("retrieveTransactionByID() - txID = [%d]", txID));
+        logger.debug(String.format("retrieveTransactionByID() - txID = [%s]", txID));
         FileLocPointer loc = null;
         try {
             loc = index.getTxLoc(txID);
