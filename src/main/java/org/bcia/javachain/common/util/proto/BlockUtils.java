@@ -32,7 +32,29 @@ public class BlockUtils {
     }
 
     public static String getGroupIDFromBlock(Common.Block block) throws JavaChainException{
-        return "testGroup";
+        Common.Envelope envelope = null;
+        Common.Payload payload = null;
+        Common.GroupHeader gh = null;
+        try {
+            if(block == null || block.getData() == null || block.getData().getDataCount() == 0){
+                return null;
+            }
+            envelope = Common.Envelope.parseFrom(block.getData().getData(0));
+            if(envelope == null || envelope.getPayload() == null){
+                return null;
+            }
+            payload = Common.Payload.parseFrom(envelope.getPayload());
+            if(payload.getHeader() == null || payload.getHeader().getGroupHeader() == null){
+                return null;
+            }
+            gh = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
+            if(gh == null || gh.getTxId() == null){
+                return null;
+            }
+        } catch (InvalidProtocolBufferException e) {
+            throw new JavaChainException(e);
+        }
+        return gh.getTxId();
     }
 
     public static Common.Envelope extractEnvelope(Common.Block block,int index)throws  JavaChainException{
