@@ -16,17 +16,10 @@
 package org.bcia.javachain.core.ledger;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
-import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
-import org.bcia.javachain.core.ledger.util.Util;
-import org.iq80.leveldb.DBIterator;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -41,9 +34,9 @@ public class LedterTest {
     private static final byte[] COMPOSITE_KEY_SEP = {0x00};
     @Test
     public void longl() throws Throwable {
-//        LevelDbProvider provider = LevelDbProvider.newProvider("/tmp/fabric/ledgertests/ledgermgmt/ledgersData/ledgerProvider");
-//        LevelDbProvider provider = LevelDbProvider.newProvider("/home/bcia/javachain/ledgersData/ledgerProvider");
-        LevelDbProvider provider = LevelDbProvider.newProvider("/home/bcia/javachain/ledgersData/stateLeveldb");
+//        LevelDBProvider provider = LevelDBProvider.newProvider("/tmp/fabric/ledgertests/ledgermgmt/ledgersData/ledgerProvider");
+//        LevelDBProvider provider = LevelDBProvider.newProvider("/home/bcia/javachain/ledgersData/ledgerProvider");
+        LevelDBProvider provider = LevelDBProvider.newProvider("/home/bcia/javachain/ledgersData/stateLeveldb");
         for (int i = 0; i < 100; i++) {
             Height height = new Height();
             height.setTxNum((long) i);

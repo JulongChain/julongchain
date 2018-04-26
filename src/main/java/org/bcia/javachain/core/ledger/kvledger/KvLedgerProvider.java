@@ -18,7 +18,6 @@ package org.bcia.javachain.core.ledger.kvledger;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.util.DBProvider;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.proto.BlockUtils;
@@ -32,7 +31,6 @@ import org.bcia.javachain.core.ledger.kvledger.history.historydb.IHistoryDBProvi
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.CommonStorageDBProvider;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DBPorvider;
-import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.ledgerstorage.Provider;
 import org.bcia.javachain.core.ledger.ledgerstorage.Store;
 import org.bcia.javachain.protos.common.Common;

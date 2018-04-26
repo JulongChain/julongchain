@@ -2,25 +2,16 @@ package org.bcia.javachain.core.ledger.leveldb;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.util.Util;
 import org.iq80.leveldb.DB;
-import org.iq80.leveldb.DBIterator;
-import org.iq80.leveldb.Options;
-import org.iq80.leveldb.Snapshot;
-import org.iq80.leveldb.impl.Iq80DBFactory;
-import org.iq80.leveldb.impl.SeekingIteratorAdapter;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.swing.*;
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -60,7 +51,7 @@ public class LevelDBFactoryTest {
 //        log.info("query value:" + query);
 //        Assert.assertEquals(value, query);
 
-        LevelDbProvider provider = LevelDbProvider.newProvider("/home/bcia/test");
+        LevelDBProvider provider = LevelDBProvider.newProvider("/home/bcia/test");
         for (int i = 0; i < 100; i++) {
             byte[] key = String.valueOf(i).getBytes();
             byte[] value1 = Util.longToBytes(1000 + i, 8);

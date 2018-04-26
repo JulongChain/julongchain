@@ -15,26 +15,20 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.kvledger;
 
-import com.google.protobuf.ByteString;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.util.DBProvider;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
-import org.bcia.javachain.csp.gmt0016.excelsecu.bean.Version;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.common.Ledger;
-import org.iq80.leveldb.DB;
-import org.iq80.leveldb.DBIterator;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 /**
  * 存储创建的账本ID
@@ -57,7 +51,7 @@ public class IdStore {
     public static IdStore openIDStore() throws LedgerException{
         IdStore idStore = new IdStore();
         String dbPath = LedgerConfig.getLedgerProviderPath();
-        idStore.setProvider(LevelDbProvider.newProvider(dbPath));
+        idStore.setProvider(LevelDBProvider.newProvider(dbPath));
         logger.debug("Create idstore using path = " + idStore.getProvider().getDbPath());
         return idStore;
     }
@@ -100,7 +94,7 @@ public class IdStore {
             throw new LedgerException("Ledger is already exists!");
         }
         val = new byte[0];
-        UpdateBatch batch = LevelDbProvider.newUpdateBatch();
+        UpdateBatch batch = LevelDBProvider.newUpdateBatch();
         batch.put(key, val);
         batch.delete(UNDER_CONSTRUCTION_LEDGER_KEY);
         provider.writeBatch(batch, true);

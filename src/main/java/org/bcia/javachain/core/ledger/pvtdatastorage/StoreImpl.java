@@ -17,16 +17,13 @@ package org.bcia.javachain.core.ledger.pvtdatastorage;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.common.ledger.util.DBProvider;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.PvtNsCollFilter;
 import org.bcia.javachain.core.ledger.TxPvtData;
-import org.bcia.javachain.core.ledger.kvledger.KvLedger;
-import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.ledger.rwset.Rwset;
 
 import java.util.ArrayList;
@@ -65,7 +62,7 @@ public class StoreImpl implements Store {
         if(!(isEmpty && !batchPending)){
             throw new LedgerException("The private data store is not empty. InitLastCommittedBlock() function call is not allowed");
         }
-        UpdateBatch batch = LevelDbProvider.newUpdateBatch();
+        UpdateBatch batch = LevelDBProvider.newUpdateBatch();
         batch.put(KvEncoding.LAST_COMMITTED_BLK_KEY, KvEncoding.encodeBlockNum(blockNum));
         db.writeBatch(batch, true);
         isEmpty = false;
@@ -128,7 +125,7 @@ public class StoreImpl implements Store {
         if(expectedBlockNum != blockNum){
             throw new LedgerException(String.format("Expected block number=%d, recived block number=%d", expectedBlockNum, blockNum));
         }
-        UpdateBatch batch = LevelDbProvider.newUpdateBatch();
+        UpdateBatch batch = LevelDBProvider.newUpdateBatch();
         for(TxPvtData txPvtData : pvtData){
             byte[] key = KvEncoding.encodePK(blockNum, txPvtData.getSeqInBlock());
             byte[] value = txPvtData.getWriteSet().toByteArray();
@@ -154,7 +151,7 @@ public class StoreImpl implements Store {
         }
         long committingBlockNum = nextBlockNum();
         logger.debug("Committing private data for block " + committingBlockNum);
-        UpdateBatch batch = LevelDbProvider.newUpdateBatch();
+        UpdateBatch batch = LevelDBProvider.newUpdateBatch();
         batch.delete(KvEncoding.PENDING_COMMIT_KEY);
         batch.put(KvEncoding.LAST_COMMITTED_BLK_KEY, KvEncoding.encodeBlockNum(committingBlockNum));
         db.writeBatch(batch, true);
@@ -176,7 +173,7 @@ public class StoreImpl implements Store {
         long rollingbackBlockNum = nextBlockNum();
         logger.debug("Rolling back private data for block " + rollingbackBlockNum);
         List<byte[]> pendingBatchKeys = retrievePendingBatchKeys();
-        UpdateBatch batch = LevelDbProvider.newUpdateBatch();
+        UpdateBatch batch = LevelDBProvider.newUpdateBatch();
         for(byte[] key : pendingBatchKeys){
             batch.delete(key);
         }

@@ -15,16 +15,8 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger;
 
-import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.CommonStorageDB;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DB;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionLevelDB;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr.LockBasedTxManager;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr.LockBasedTxSimulator;
-import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
-import org.bcia.javachain.protos.common.Common;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,7 +38,7 @@ public class TxSimulatorTest {
 
     @Test
     public void test() throws LedgerException {
-//        DB db = CommonStorageDB.newCommonStorageDB(new VersionLevelDB(LevelDbProvider.newProvider("/home/bcia/test"), "test"), "test");
+//        DB db = CommonStorageDB.newCommonStorageDB(new VersionLevelDB(LevelDBProvider.newProvider("/home/bcia/test"), "test"), "test");
 //        LockBasedTxManager mgr = LockBasedTxManager.newLockBasedTxMgr("test", db, null);
 //        simulator = LockBasedTxSimulator.newLockBasedTxSimulator(mgr, "test");
 //        String ns = "ns";

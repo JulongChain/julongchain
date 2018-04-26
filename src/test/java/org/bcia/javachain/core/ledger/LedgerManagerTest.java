@@ -16,20 +16,12 @@ limitations under the License.
 package org.bcia.javachain.core.ledger;
 
 import com.google.protobuf.ByteString;
-import org.apache.commons.lang3.ArrayUtils;
-import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
 import org.bcia.javachain.common.util.proto.BlockUtils;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.gossip.Message;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 类描述

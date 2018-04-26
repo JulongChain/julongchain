@@ -19,7 +19,7 @@ import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
 import org.bcia.javachain.common.ledger.util.DBProvider;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -67,7 +67,7 @@ public class HistoryLevelDB implements IHistoryDB {
     public static HistoryLevelDBProvider newHistoryDBProvider() throws LedgerException {
         String dbPath = LedgerConfig.getHistoryLevelDBPath();
         HistoryLevelDBProvider provider = new HistoryLevelDBProvider();
-        provider.setProvider(LevelDbProvider.newProvider(dbPath));
+        provider.setProvider(LevelDBProvider.newProvider(dbPath));
         logger.debug(String.format("Create historyDB using dbPath = %s", provider.getProvider().getDbPath()));
         return provider;
     }
@@ -94,7 +94,7 @@ public class HistoryLevelDB implements IHistoryDB {
     public void commit(Common.Block block) throws LedgerException {
         long blockNo = block.getHeader().getNumber();
         int tranNo = 0;
-        UpdateBatch dbBatch = LevelDbProvider.newUpdateBatch();
+        UpdateBatch dbBatch = LevelDBProvider.newUpdateBatch();
         logger.debug(String.format("Group [%s]: Updating historyDB for groupNo [%s] with [%d] transactions"
                 , dbName, blockNo, block.getData().getDataCount()));
        //获取失效

@@ -17,10 +17,9 @@ package org.bcia.javachain.core.ledger.pvtdatastorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.util.DBProvider;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DBPorvider;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 
 /**
@@ -41,7 +40,7 @@ public class Provider {
     public static Provider newProvider() throws LedgerException {
         Provider provider = new Provider();
         String dbPath = LedgerConfig.getPvtDataStorePath();
-        provider.db = LevelDbProvider.newProvider(dbPath);
+        provider.db = LevelDBProvider.newProvider(dbPath);
         logger.debug("Create pvtprovider using path = " + provider.getDb().getDbPath());
         return provider;
     }

@@ -20,7 +20,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStorage;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.javachain.common.ledger.util.DBProvider;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -94,7 +94,7 @@ public class BlockIndex implements Index {
         FileLocPointer flp = blockIndexInfo.getFlp();
         List<TxIndexInfo> txOffsets = blockIndexInfo.getTxOffsets();
         TxValidationFlags txsfltr = new TxValidationFlags(blockIndexInfo.getMetadata().getMetadataList().size());
-        UpdateBatch batch = LevelDbProvider.newUpdateBatch();
+        UpdateBatch batch = LevelDBProvider.newUpdateBatch();
         byte[] flpBytes = flp.marshal();
 
         //index1

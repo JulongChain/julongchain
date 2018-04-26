@@ -19,11 +19,10 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.common.ledger.util.DBProvider;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
-import org.bcia.javachain.csp.gmt0016.excelsecu.bean.Version;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,7 +104,7 @@ public class VersionLevelDB implements IVersionedDB{
      */
     @Override
     public void applyUpdates(UpdateBatch batch, Height height) throws LedgerException {
-        org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch dbBatch = LevelDbProvider.newUpdateBatch();
+        org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch dbBatch = LevelDBProvider.newUpdateBatch();
         List<String> nameSpaces = batch.getUpdatedNamespaces();
         for(String ns : nameSpaces){
             Map<String,VersionedValue> updates = batch.getUpdates(ns);

@@ -21,8 +21,6 @@ import org.bcia.javachain.common.ledger.util.DBHandle;
 import org.bcia.javachain.common.ledger.util.DBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DBPorvider;
-import org.iq80.leveldb.DBIterator;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,16 +33,16 @@ import java.util.Map;
  * @date 2018/04/03
  * @company Dingxuan
  */
-public class LevelDbProvider implements DBProvider {
+public class LevelDBProvider implements DBProvider {
 
-    private static JavaChainLog logger = JavaChainLogFactory.getLog(LevelDbProvider.class);
+    private static JavaChainLog logger = JavaChainLogFactory.getLog(LevelDBProvider.class);
 
     private DBHandle db = null;
     private byte[] dbNameKeySep = new byte[1];
     private byte lastKeyIndicator = 0x01;
     private String dbPath = null;
 
-    private LevelDbProvider() throws LedgerException {
+    private LevelDBProvider() throws LedgerException {
         dbNameKeySep[0] = 0x00;
         db = new LevelDBHandle();
     }
@@ -55,6 +53,7 @@ public class LevelDbProvider implements DBProvider {
         return batch;
     }
 
+    @Override
     public String getDbPath() {
         return dbPath;
     }
@@ -63,6 +62,7 @@ public class LevelDbProvider implements DBProvider {
         this.dbPath = dbPath;
     }
 
+    @Override
     public DBHandle getDb() {
         return db;
     }
@@ -71,35 +71,41 @@ public class LevelDbProvider implements DBProvider {
         this.db = db;
     }
 
-    public static synchronized LevelDbProvider newProvider(String dbPath) throws LedgerException {
-        LevelDbProvider provider =  new LevelDbProvider();
+    public static synchronized LevelDBProvider newProvider(String dbPath) throws LedgerException {
+        LevelDBProvider provider =  new LevelDBProvider();
         provider.getDb().createDB(dbPath);
         provider.setDbPath(dbPath);
         return provider;
     }
 
+    @Override
     public void close() throws LedgerException {
         db.close();
     }
 
+    @Override
     public byte[] get(byte[] key) throws LedgerException {
         return db.get(key);
     }
 
+    @Override
     public void put(byte[] key, byte[] value, boolean sync) throws LedgerException {
         db.put(key, value, sync);
     }
 
+    @Override
     public void delete(byte[] key, boolean sync) throws LedgerException {
         db.delete(key, sync);
     }
 
+    @Override
     public void writeBatch(UpdateBatch batch, boolean sync) throws LedgerException {
         db.writeBatch(batch, sync);
     }
 
-    public Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey, byte[] endKey) throws LedgerException {
-        return db.getIterator(startKey, endKey);
+    @Override
+    public Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey) throws LedgerException {
+        return db.getIterator(startKey);
     }
 
     public byte[] constructLevelKey(String dbName, byte[] key) {
