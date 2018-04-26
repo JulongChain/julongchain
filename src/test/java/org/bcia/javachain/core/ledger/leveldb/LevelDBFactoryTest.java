@@ -27,7 +27,8 @@ public class LevelDBFactoryTest {
 
     @Test
     public void getDB() throws LedgerException {
-        DB db = LevelDBFactory.getDB();
+        String path = "";
+        DB db = LevelDBFactory.getDB("");
         Assert.assertNotNull(db);
         LevelDBFactory.closeDB(db);
     }
@@ -51,37 +52,41 @@ public class LevelDBFactoryTest {
 //        log.info("query value:" + query);
 //        Assert.assertEquals(value, query);
 
-        LevelDBProvider provider = LevelDBProvider.newProvider("/home/bcia/test");
+        String path = "/home/bcia/test";
+        LevelDBProvider provider = LevelDBProvider.newProvider(path);
+
+        LevelDB db = LevelDBFactory.getDB(path);
         for (int i = 0; i < 100; i++) {
             byte[] key = String.valueOf(i).getBytes();
             byte[] value1 = Util.longToBytes(1000 + i, 8);
             byte[] value2 = Util.longToBytes(10000 + i, 8);
             byte[] value = ArrayUtils.addAll(value1, value2);
-            LevelDBFactory.add(key, value, true);
+            LevelDBFactory.add(db, key, value, true);
             provider.put(key, value, true);
 //            closeDB();
         }
         byte[] key = {0x00};
-        LevelDBFactory.add(key, "askjaklj".getBytes(), true);
+        LevelDBFactory.add(db, key, "askjaklj".getBytes(), true);
 //        for (int i = 0; i < 100; i++) {
 //            String path = "/home/bcia/leveldb";
 //            DB db = Iq80DBFactory.factory.open(new File(path), new Options().createIfMissing(true));
 //        }
 
-
     }
 
     @Test
     public void delete() throws LedgerException {
+        String path = "";
         String key = UUID.randomUUID().toString();
         log.info("key:" + key);
         String value = UUID.randomUUID().toString();
         log.info("value:" + value);
-        LevelDBFactory.add(key.getBytes(Charset.forName("utf-8")), value.getBytes(Charset.forName("utf-8")), true);
+        LevelDB db = LevelDBFactory.getDB(path);
+        LevelDBFactory.add(db, key.getBytes(Charset.forName("utf-8")), value.getBytes(Charset.forName("utf-8")), true);
         log.info("add to level db");
-        Assert.assertEquals(value, new String(LevelDBFactory.get(key.getBytes(Charset.forName("utf-8")), false)));
-        LevelDBFactory.delete(key.getBytes(Charset.forName("utf-8")), true);
-        Assert.assertNull(LevelDBFactory.get(key.getBytes(Charset.forName("utf-8")), false));
+        Assert.assertEquals(value, new String(LevelDBFactory.get(db, key.getBytes(Charset.forName("utf-8")), false)));
+        LevelDBFactory.delete(db, key.getBytes(Charset.forName("utf-8")), true);
+        Assert.assertNull(LevelDBFactory.get(db, key.getBytes(Charset.forName("utf-8")), false));
     }
 
     @Test
@@ -98,10 +103,12 @@ public class LevelDBFactoryTest {
 //        log.info("query key from level db");
 //        log.info("query string:" + queryString);
 //        Assert.assertEquals(value, queryString);
+        String path = "";
         byte[] key = "underConstructionLedgerKey".getBytes();
-        byte[] value = LevelDBFactory.get(key, true);
+        LevelDB db = LevelDBFactory.getDB(path);
+        byte[] value = LevelDBFactory.get(db, key, true);
         System.out.println(new String(value));
-        byte[] value1 = LevelDBFactory.get(key, true);
+        byte[] value1 = LevelDBFactory.get(db, key, true);
 //        System.out.println(new String(value1));
 
     }
@@ -117,13 +124,14 @@ public class LevelDBFactoryTest {
 
     @Test
     public void test() throws Throwable {
-        DB db = LevelDBFactory.getDB();
+        String path = "";
+        DB db = LevelDBFactory.getDB(path);
         byte[] key = {0x00};
-        LevelDBFactory.get(key, false);
-        LevelDBFactory.get(key, false);
+        LevelDBFactory.get(db, key, false);
+        LevelDBFactory.get(db, key, false);
     }
 
-    public static void soutByte(byte[] bytes){
+    public static void soutByte(byte[] bytes) {
         for (byte aByte : bytes) {
             System.out.println(aByte + " ");
         }

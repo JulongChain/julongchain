@@ -27,7 +27,7 @@ import org.bcia.javachain.core.ssc.qssc.QSSC;
 import org.bcia.javachain.core.ssc.vssc.VSSC;
 
 /**
- * 类描述
+ * 智能客户端
  *
  * @author wanliangbing
  * @date 2018/4/17
@@ -39,13 +39,13 @@ public class SmartContractSupportClient extends SmartContractBase{
 
     @Override
     public SmartContractResponse init(ISmartContractStub stub) {
-        logger.info("SmartContractSupportClient init");
+        logger.info("SmartContractSupportClient");
         return newSuccessResponse();
     }
 
     @Override
     public SmartContractResponse invoke(ISmartContractStub stub) {
-        logger.info("SmartContractSupportClient invoke");
+        logger.info("SmartContractSupportClient invoke " + stub.getTxId());
         return newSuccessResponse();
     }
 

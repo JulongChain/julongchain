@@ -16,7 +16,7 @@
 
 package org.bcia.javachain.core.ledger.leveldb;
 
-import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.exception.LevelDBException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.iq80.leveldb.*;
@@ -36,24 +36,15 @@ public class LevelDBFactory {
 
     private static JavaChainLog log = JavaChainLogFactory.getLog(LevelDBFactory.class);
 
-    private static String path = "d:" + File.separator + "leveldb";
-
     /**
      * 保存当前打开的levelDB连接
      */
     private static Map<String, LevelDB> dbMap = Collections.synchronizedMap(new HashMap<String, LevelDB>());
 
     /**
-     * 获取默认的 level db
-     */
-    public static LevelDB getDB() throws LedgerException {
-        return getDB(path);
-    }
-
-    /**
      * 获取指定路径的 level db
      */
-    public static LevelDB getDB(String levelDbPath) throws LedgerException {
+    public static LevelDB getDB(String levelDbPath) throws LevelDBException {
         try {
             LevelDB db = dbMap.get(levelDbPath);
             if (db != null) {
@@ -63,7 +54,7 @@ public class LevelDBFactory {
             dbMap.put(levelDbPath, db);
             return db;
         } catch (Exception e) {
-            throw new LedgerException(e);
+            throw new LevelDBException(e);
         }
     }
 
@@ -84,33 +75,33 @@ public class LevelDBFactory {
     /**
      * 关闭 level db 连接
      */
-    public static void closeDB(DB db) throws LedgerException {
+    public static void closeDB(DB db) throws LevelDBException {
         try {
             db.close();
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-            throw new LedgerException(e);
+            throw new LevelDBException(e);
         }
     }
 
-    public static void closeSnapshot(Snapshot snapshot) throws LedgerException {
+    public static void closeSnapshot(Snapshot snapshot) throws LevelDBException {
         try {
             snapshot.close();
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-            throw new LedgerException(e);
+            throw new LevelDBException(e);
         }
     }
 
     /**
      * 关闭 write batch 对象
      */
-    public static void closeWriteBatch(WriteBatch writeBatch) throws LedgerException {
+    public static void closeWriteBatch(WriteBatch writeBatch) throws LevelDBException {
         try {
             writeBatch.close();
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-            throw new LedgerException();
+            throw new LevelDBException(e);
         }
     }
 
@@ -121,36 +112,9 @@ public class LevelDBFactory {
      * @param key   - 要写入的key
      * @param value - 要写入的value
      */
-    public static void add(DB db, byte[] key, byte[] value, boolean sync) throws LedgerException {
+    public static void add(DB db, byte[] key, byte[] value, boolean sync) throws LevelDBException {
         WriteOptions writeOptions = new WriteOptions().sync(sync);
         db.put(key, value, writeOptions);
-    }
-
-    /**
-     * 向默认的level db中写入数据
-     *
-     * @param key   - 要写入的key
-     * @param value - 要写入的value
-     */
-    public static void add(byte[] key, byte[] value, boolean sync) throws LedgerException {
-        try {
-            DB db = getDB();
-            add(db, key, value, sync);
-        } catch (Exception e) {
-            throw new LedgerException(e);
-        }
-    }
-
-    /**
-     * 向指定的level db中写入数据
-     *
-     * @param path  - level db的安装路径
-     * @param key   - 要写入的key
-     * @param value - 要写入的value
-     */
-    public static void add(String path, byte[] key, byte[] value, boolean sync) throws LedgerException {
-        DB db = getDB(path);
-        add(db, key, value, sync);
     }
 
     /**
@@ -159,7 +123,7 @@ public class LevelDBFactory {
      * @param db  - 要写入的level db数据库
      * @param map - 要批量写入的数据
      */
-    public static void add(DB db, Map<byte[], byte[]> map, boolean sync) throws LedgerException {
+    public static void add(DB db, Map<byte[], byte[]> map, boolean sync) throws LevelDBException {
         WriteBatch writeBatch = db.createWriteBatch();
         WriteOptions writeOptions = new WriteOptions().sync(sync);
         map.forEach((k, v) -> {
@@ -174,57 +138,14 @@ public class LevelDBFactory {
     }
 
     /**
-     * 向默认的level db数据库中批量写入数据
-     *
-     * @param map - 批量写入的数据
-     */
-    public static void add(Map<byte[], byte[]> map, boolean sync) throws LedgerException {
-        DB db = getDB();
-        add(db, map, sync);
-    }
-
-    /**
-     * 向指定的level db数据库中批量写入数据
-     *
-     * @param path - level db的安装路径
-     * @param map  - 要批量写入的数据
-     */
-    public static void add(String path, Map<byte[], byte[]> map, boolean sync) throws LedgerException {
-        DB db = getDB(path);
-        add(db, map, sync);
-    }
-
-    /**
      * 删除level db中的key
      *
      * @param db  - 要删除的level db数据库
      * @param key - 要删除的key
      */
-    public static void delete(DB db, byte[] key, boolean sync) throws LedgerException {
+    public static void delete(DB db, byte[] key, boolean sync) throws LevelDBException {
         WriteOptions writeOptions = new WriteOptions().sync(sync);
         db.delete(key, writeOptions);
-    }
-
-    /**
-     * 删除默认level db中的key
-     *
-     * @param key - 要删除的key
-     * @throws IOException
-     */
-    public static void delete(byte[] key, boolean sync) throws LedgerException {
-        DB db = getDB();
-        delete(db, key, sync);
-    }
-
-    /**
-     * 删除指定level db数据库中的key
-     *
-     * @param path - level db的安装路径
-     * @param key  - 要删除的key
-     */
-    public static void delete(String path, byte[] key, boolean sync) throws LedgerException {
-        DB db = getDB(path);
-        delete(db, key, sync);
     }
 
     /**
@@ -233,7 +154,7 @@ public class LevelDBFactory {
      * @param db   - 要删除keys的level db数据库
      * @param list - 要删除的keys
      */
-    public static void delete(DB db, List<byte[]> list, boolean sync) throws LedgerException {
+    public static void delete(DB db, List<byte[]> list, boolean sync) throws LevelDBException {
         WriteBatch writeBatch = db.createWriteBatch();
         WriteOptions writeOptions = new WriteOptions().sync(sync);
         list.forEach((k) ->
@@ -244,33 +165,12 @@ public class LevelDBFactory {
     }
 
     /**
-     * 批量删除默认level db数据库的keys
-     *
-     * @param list - 要删除的keys
-     */
-    public static void delete(List<byte[]> list, boolean sync) throws LedgerException {
-        DB db = getDB();
-        delete(db, list, sync);
-    }
-
-    /**
-     * 批量删除指定level db数据库的keys
-     *
-     * @param path - level db数据库的安装路径
-     * @param list - 要删除的keys
-     */
-    public static void delete(String path, List<byte[]> list, boolean sync) throws LedgerException {
-        DB db = getDB(path);
-        delete(db, list, sync);
-    }
-
-    /**
      * 查询level db数据库的key
      *
      * @param db  - 要查询的level db
      * @param key - 要查询的key
      */
-    public static byte[] get(DB db, byte[] key, boolean fileCache) throws LedgerException {
+    public static byte[] get(DB db, byte[] key, boolean fileCache) throws LevelDBException {
         Snapshot snapshot = db.getSnapshot();
         ReadOptions readOptions = new ReadOptions();
         readOptions.fillCache(fileCache);
@@ -281,31 +181,9 @@ public class LevelDBFactory {
     }
 
     /**
-     * 查询默认level db数据库的key
-     *
-     * @param key - 要查询的key
-     */
-    public static byte[] get(byte[] key, boolean fileCache) throws LedgerException {
-        DB db = getDB();
-        return get(db, key, fileCache);
-    }
-
-    /**
-     * 查询指定level db的key
-     *
-     * @param path - level db的安装路径
-     * @param key  - 要查询的key
-     */
-    public static byte[] get(String path, byte[] key, boolean fileCache) throws LedgerException {
-        DB db = getDB(path);
-        return get(db, key, fileCache);
-    }
-
-    /**
      * 获取指定level db的迭代器
      */
-    public static DBIterator getIterator(String dbPath) throws LedgerException {
-        DB db = getDB(dbPath);
+    public static DBIterator getIterator(DB db) throws LevelDBException {
         Snapshot snapshot = db.getSnapshot();
         ReadOptions readOptions = new ReadOptions()
                 .fillCache(false)

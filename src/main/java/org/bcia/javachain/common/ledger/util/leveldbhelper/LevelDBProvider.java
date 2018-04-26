@@ -16,7 +16,7 @@
 package org.bcia.javachain.common.ledger.util.leveldbhelper;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.exception.LevelDBException;
 import org.bcia.javachain.common.ledger.util.DBHandle;
 import org.bcia.javachain.common.ledger.util.DBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -42,7 +42,7 @@ public class LevelDBProvider implements DBProvider {
     private byte lastKeyIndicator = 0x01;
     private String dbPath = null;
 
-    private LevelDBProvider() throws LedgerException {
+    private LevelDBProvider() throws LevelDBException {
         dbNameKeySep[0] = 0x00;
         db = new LevelDBHandle();
     }
@@ -71,7 +71,7 @@ public class LevelDBProvider implements DBProvider {
         this.db = db;
     }
 
-    public static synchronized LevelDBProvider newProvider(String dbPath) throws LedgerException {
+    public static synchronized LevelDBProvider newProvider(String dbPath) throws LevelDBException {
         LevelDBProvider provider =  new LevelDBProvider();
         provider.getDb().createDB(dbPath);
         provider.setDbPath(dbPath);
@@ -79,32 +79,32 @@ public class LevelDBProvider implements DBProvider {
     }
 
     @Override
-    public void close() throws LedgerException {
+    public void close() throws LevelDBException {
         db.close();
     }
 
     @Override
-    public byte[] get(byte[] key) throws LedgerException {
+    public byte[] get(byte[] key) throws LevelDBException {
         return db.get(key);
     }
 
     @Override
-    public void put(byte[] key, byte[] value, boolean sync) throws LedgerException {
+    public void put(byte[] key, byte[] value, boolean sync) throws LevelDBException {
         db.put(key, value, sync);
     }
 
     @Override
-    public void delete(byte[] key, boolean sync) throws LedgerException {
+    public void delete(byte[] key, boolean sync) throws LevelDBException {
         db.delete(key, sync);
     }
 
     @Override
-    public void writeBatch(UpdateBatch batch, boolean sync) throws LedgerException {
+    public void writeBatch(UpdateBatch batch, boolean sync) throws LevelDBException {
         db.writeBatch(batch, sync);
     }
 
     @Override
-    public Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey) throws LedgerException {
+    public Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey) throws LevelDBException {
         return db.getIterator(startKey);
     }
 

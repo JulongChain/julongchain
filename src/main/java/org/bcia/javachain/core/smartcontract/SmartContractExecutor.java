@@ -101,8 +101,8 @@ public class SmartContractExecutor {
      * @param groupId 群组ID
      * @return
      */
-    private SmartcontractShim.SmartContractMessage buildSmartContractMessage(int msgType, byte[] payload, String
-            txId, String groupId) {
+    private SmartcontractShim.SmartContractMessage buildSmartContractMessage(int msgType, byte[] payload, String txId, String groupId) {
+
         SmartcontractShim.SmartContractMessage.Builder scMessageBuilder = SmartcontractShim.SmartContractMessage
                 .newBuilder();
 
