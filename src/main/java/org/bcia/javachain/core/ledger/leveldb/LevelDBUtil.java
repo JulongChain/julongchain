@@ -32,9 +32,9 @@ import java.util.*;
  * @date 2018/04/03
  * @company Dingxuan
  */
-public class LevelDBFactory {
+public class LevelDBUtil {
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(LevelDBFactory.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(LevelDBUtil.class);
 
     /**
      * 保存当前打开的levelDB连接

@@ -32,18 +32,18 @@ public class StateLevelDBFactory {
     private static final String ROOT_PATH = File.separator + "var" + File.separator + "hyperledger" + File.separator + "production" + File.separator + "ledgersData" + File.separator + "stateLeveldb";
 
     public static byte[] getState(String smartContractId, String key) throws LevelDBException {
-        LevelDB db = LevelDBFactory.getDB(ROOT_PATH);
-        return LevelDBFactory.get(db, newKey(smartContractId, key).getBytes(Charset.forName("utf-8")), false);
+        LevelDB db = LevelDBUtil.getDB(ROOT_PATH);
+        return LevelDBUtil.get(db, newKey(smartContractId, key).getBytes(Charset.forName("utf-8")), false);
     }
 
     public static void putState(String smartContractId, String key, byte[] value) throws LevelDBException {
-        LevelDB db = LevelDBFactory.getDB(ROOT_PATH);
-        LevelDBFactory.add(db, newKey(smartContractId, key).getBytes(Charset.forName("utf-8")), value, true);
+        LevelDB db = LevelDBUtil.getDB(ROOT_PATH);
+        LevelDBUtil.add(db, newKey(smartContractId, key).getBytes(Charset.forName("utf-8")), value, true);
     }
 
     public static void deleteState(String smartContractId, String key) throws LevelDBException {
-        LevelDB db = LevelDBFactory.getDB(ROOT_PATH);
-        LevelDBFactory.delete(db, newKey(smartContractId, key).getBytes(Charset.forName("utf-8")), true);
+        LevelDB db = LevelDBUtil.getDB(ROOT_PATH);
+        LevelDBUtil.delete(db, newKey(smartContractId, key).getBytes(Charset.forName("utf-8")), true);
     }
 
     public static String newKey(String smartContractId, String key) {
