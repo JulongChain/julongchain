@@ -40,8 +40,8 @@ public class LedterTest {
     @Test
     public void getKVFromLevelDB() throws Throwable {
 //        LevelDBProvider provider = LevelDBProvider.newProvider("/tmp/fabric/ledgertests/ledgermgmt/ledgersData/ledgerProvider");
-//        LevelDBProvider provider = LevelDBProvider.newProvider("/home/bcia/javachain/ledgersData/ledgerProvider");
-        LevelDBProvider provider = LevelDBProvider.newProvider("/home/bcia/javachain/ledgersData/stateLeveldb");
+        LevelDBProvider provider = LevelDBProvider.newProvider("/home/bcia/javachain/ledgersData/ledgerProvider");
+//        LevelDBProvider provider = LevelDBProvider.newProvider("/home/bcia/javachain/ledgersData/stateLeveldb");
 //        for (int i = 0; i < 100; i++) {
 //            Height height = new Height();
 //            height.setTxNum((long) i);
@@ -52,8 +52,8 @@ public class LedterTest {
         Iterator<Map.Entry<byte[], byte[]>> itr =  provider.getIterator(null);
         while(itr.hasNext()){
             Map.Entry<byte[], byte[]> entry = itr.next();
-            soutBytes(entry.getKey());
-            soutBytes(entry.getValue());
+//            soutBytes(entry.getKey());
+//            soutBytes(entry.getValue());
 //            System.out.println(Height.newHeightFromBytes(entry.getValue()).getTxNum());
 //            System.out.println(Height.newHeightFromBytes(entry.getValue()).getBlockNum());
             System.out.println(new String(entry.getKey()));
@@ -65,12 +65,13 @@ public class LedterTest {
     @Test
     public void getValuesFromFS() throws Exception {
         File file = new File("/home/bcia/javachain/ledgersData/chains/chains/MyGroup/blockfile000000");
-        FileInputStream reader = new FileInputStream(file);
+//        FileInputStream reader = new FileInputStream(file);
+//        System.out.println(file.length());
+//        byte[] bytes = new byte[(int) file.length()];
+//        reader.read(bytes);
+//        soutBytes(bytes);
+//        byte[] blockByte = new byte[bytes.length - 8];
         System.out.println(file.length());
-        byte[] bytes = new byte[(int) file.length()];
-        reader.read(bytes);
-        soutBytes(bytes);
-        byte[] blockByte = new byte[bytes.length - 8];
     }
 
     public static void soutBytes(byte[] bytes){

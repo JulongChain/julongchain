@@ -54,6 +54,11 @@ public class LedgerManagerTest {
     }
 
     @Test
+    public void delete(){
+        System.out.println(deleteDir(new File(Config.getPath())));
+    }
+
+    @Test
     public void createLedger() throws Exception {
         GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
         System.out.println(deleteDir(new File(Config.getPath())));
@@ -70,20 +75,9 @@ public class LedgerManagerTest {
     }
 
     @Test
-    public void newTxSimulator() throws Exception {
-        LedgerManager.initialize(null);
-        String groupId = BlockUtils.getGroupIDFromBlock(null);
-        l = LedgerManager.openLedger(groupId);
-        ITxSimulator txSimulator = l.newTxSimulator(groupId);
-        for (int i = 0; i < 100; i++) {
-            System.out.println(new String(txSimulator.getState("ns" + i, "keys" + i)));
-        }
-    }
-
-    @Test
     public void openLedger() throws Exception{
         LedgerManager.initialize(null);
-        l = LedgerManager.openLedger(BlockUtils.getGroupIDFromBlock(null));
+        l = LedgerManager.openLedger("MyGroup");
     }
 
     @Test
@@ -93,7 +87,7 @@ public class LedgerManagerTest {
         BlockAndPvtData bap = new BlockAndPvtData();
         bap.setBlock(Common.Block.newBuilder()
                 .setHeader(Common.BlockHeader.newBuilder()
-                        .setNumber(3)
+                        .setNumber(4)
                         .build())
                 .setMetadata(Common.BlockMetadata.newBuilder()
                         .addMetadata(ByteString.EMPTY)
@@ -103,5 +97,16 @@ public class LedgerManagerTest {
                         .build())
                 .build());
         l.commitWithPvtData(bap);
+    }
+
+    @Test
+    public void newTxSimulator() throws Exception {
+        LedgerManager.initialize(null);
+        String groupId = "MyGroup";
+        l = LedgerManager.openLedger(groupId);
+        ITxSimulator txSimulator = l.newTxSimulator(groupId);
+        for (int i = 0; i < 100; i++) {
+            System.out.println(new String(txSimulator.getState("ns" + i, "keys" + i)));
+        }
     }
 }

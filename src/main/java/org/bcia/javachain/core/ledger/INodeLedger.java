@@ -85,5 +85,8 @@ public interface INodeLedger extends ILedger {
     @Override
     void close();
 
+    /**
+     * 提交区块
+     */
     void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException;
 }
