@@ -28,7 +28,7 @@ import java.util.List;
  * @date 2018/04/13
  * @company Dingxuan
  */
-public interface IVersionedDB extends BulkOptimizable{
+public interface IVersionedDB{
 
     /** GetState gets the value for given namespace and key. For a chaincode, the namespace corresponds to the chaincodeId
      *

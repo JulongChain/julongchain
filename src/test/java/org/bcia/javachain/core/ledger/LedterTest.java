@@ -19,6 +19,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.core.ledger.util.Util;
+import org.bcia.javachain.protos.common.Common;
 import org.junit.Test;
 
 import java.io.File;
@@ -34,6 +35,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class LedterTest {
+    public static final String AKSJDLAD = "aksjdlad";
     private static final byte[] COMPOSITE_KEY_SEP = {0x00};
     @Test
     public void getKVFromLevelDB() throws Throwable {
@@ -67,6 +69,9 @@ public class LedterTest {
         byte[] bytes = new byte[(int) file.length()];
         reader.read(bytes);
         System.out.println(Util.bytesToLong(bytes, 0, 8));
+//        byte[] blockByte = new byte[bytes.length - 8];
+//        System.arraycopy(blockByte, 8, blockByte, 0, blockByte.length);
+//        Common.Block block = Common.Block.parseFrom(blockByte);
     }
 
     public static void soutBytes(byte[] bytes){

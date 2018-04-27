@@ -37,7 +37,6 @@ public interface DB extends IVersionedDB {
 
     Height getCacheKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException;
 
-    @Override
     void clearCachedVersions();
 
     ISmartContractLifecycleEventListener getSmartcontractEventListener();

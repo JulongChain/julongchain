@@ -171,21 +171,6 @@ public class VersionLevelDB implements IVersionedDB{
         return result[1];
     }
 
-    @Override
-    public void loadCommittedVersions(List<CompositeKey> keys) {
-
-    }
-
-    @Override
-    public Height getCachedVersion(String ns, String key) {
-        return null;
-    }
-
-    @Override
-    public void clearCachedVersions() {
-
-    }
-
     public DBProvider getDb() {
         return db;
     }

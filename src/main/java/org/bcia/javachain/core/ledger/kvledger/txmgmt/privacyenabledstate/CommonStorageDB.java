@@ -55,7 +55,7 @@ public class CommonStorageDB implements DB {
     @Override
     public void loadCommittedVersionsOfPubAndHashedKeys(List<CompositeKey> pubKeys,
                                                         List<HashedCompositeKey> hashKeys) {
-        BulkOptimizable bulkOptimizable = vdb;
+        BulkOptimizable bulkOptimizable = (BulkOptimizable) vdb;
 
         for(HashedCompositeKey key : hashKeys){
             String ns = deriveHashedDataNs(key.getNamespace(), key.getCollectionName());
@@ -76,31 +76,35 @@ public class CommonStorageDB implements DB {
 
     @Override
     public Height getCacheKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException{
-        String keyHashStr = new String(keyHash);
-        if(!bytesKeySuppoted()){
-            //TODO encode key
+        try {
+            BulkOptimizable bulkOptimizable = (BulkOptimizable) vdb;
+            String keyHashStr = new String(keyHash);
+            if(!bytesKeySuppoted()){
+                //TODO encode key
+            }
+            return bulkOptimizable.getCachedVersion(deriveHashedDataNs(ns, coll), keyHashStr);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return getCachedVersion(deriveHashedDataNs(ns, coll), keyHashStr);
-    }
-
-    @Override
-    public void loadCommittedVersions(List<CompositeKey> keys) {
-
-    }
-
-    @Override
-    public Height getCachedVersion(String ns, String key) {
-        return null;
     }
 
     @Override
     public void clearCachedVersions() {
-        vdb.clearCachedVersions();
+        try {
+            BulkOptimizable bulkOptimizable = (BulkOptimizable) vdb;
+            bulkOptimizable.clearCachedVersions();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public ISmartContractLifecycleEventListener getSmartcontractEventListener() {
-        return (ISmartContractLifecycleEventListener) vdb;
+        try {
+            return (ISmartContractLifecycleEventListener) vdb;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
