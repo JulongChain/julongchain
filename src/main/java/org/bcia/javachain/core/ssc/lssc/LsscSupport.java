@@ -35,6 +35,9 @@ import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.Query;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * LSSC的支持类,包含LSSC执行任务所需的函数
  *
@@ -147,8 +150,8 @@ public class LsscSupport {
         SignedData signedData=new SignedData(signedProposal.getProposalBytes().toByteArray(),
                                              shdr.getCreator().toByteArray(),
                                              signedProposal.getSignature().toByteArray());
-        SignedData[] datas=new SignedData[1];
-        datas[0]=signedData;
+        List<SignedData> datas=new ArrayList<SignedData>();
+        datas.add(signedData);
         try {
             policy.evaluate(datas);
         } catch (PolicyException e) {
