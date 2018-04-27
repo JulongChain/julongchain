@@ -39,7 +39,7 @@ public abstract class SmartContractBase implements ISmartContract {
 	private static Log logger = LogFactory.getLog(SmartContractBase.class);
 
 	public static final String DEFAULT_HOST = "127.0.0.1";
-	public static final int DEFAULT_PORT = 7052;
+	public static final int DEFAULT_PORT = 7051;
 
 	private String host = DEFAULT_HOST;
 	private int port = DEFAULT_PORT;
