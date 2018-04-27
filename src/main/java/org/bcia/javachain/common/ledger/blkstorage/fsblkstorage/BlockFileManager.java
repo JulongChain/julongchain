@@ -393,7 +393,11 @@ public class BlockFileManager {
 
     public TransactionPackage.TxValidationCode retrieveTxValidationCodeByTxID(String txID) throws LedgerException{
         logger.debug(String.format("retrieveTxValidationCodeByTxID() - txID = [%s]", txID));
-        return index.getTxValidationCodeByTxID(txID);
+        try {
+            return index.getTxValidationCodeByTxID(txID);
+        } catch (LedgerException e) {
+            return null;
+        }
     }
 
     public Common.BlockHeader retrieveBlockHeaderByNumber(long blockNum) throws  LedgerException {
@@ -433,7 +437,11 @@ public class BlockFileManager {
         logger.debug(String.format("retrieveTransactionByBlockNumTranNum() - blockNum = [%d], tranNum = [%d]"
                 , blockNum, tranNum));
         FileLocPointer loc = null;
-        loc = index.getTXLocByBlockNumTranNum(blockNum, tranNum);
+        try {
+            loc = index.getTXLocByBlockNumTranNum(blockNum, tranNum);
+        } catch (LedgerException e) {
+            return null;
+        }
         return fetchTransactionEnvelope(loc);
     }
 

@@ -95,34 +95,6 @@ public class FsBlockStore implements BlockStore {
         return blockFileManager.retrieveTxValidationCodeByTxID(txID);
     }
 
-    ResultsIterator RetrieveBlocks(long startNum) {
-        return null;
-    }
-
-    Common.Block RetrieveBlockByHash(byte[] blockHash) {
-        return null;
-    }
-
-    Common.Block RetrieveBlockByNumber(long blockNum) {
-        return null;
-    }
-
-    Common.Envelope RetrieveTxByID(String txID) {
-        return null;
-    }
-
-    Common.Envelope RetrieveTxByBlockNumTranNum(long blockNum, long tranNum) {
-        return null;
-    }
-
-    Common.Block RetrieveBlockByTxID(String txID) {
-        return null;
-    }
-
-    TransactionPackage.TxValidationCode RetrieveTxValidationCodeByTxID(String txID) {
-        return null;
-    }
-
     @Override
     public void shutdown() {
         blockFileManager.close();

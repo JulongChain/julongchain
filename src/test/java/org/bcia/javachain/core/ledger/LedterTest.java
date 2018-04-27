@@ -69,9 +69,11 @@ public class LedterTest {
         byte[] bytes = new byte[(int) file.length()];
         reader.read(bytes);
         System.out.println(Util.bytesToLong(bytes, 0, 8));
-//        byte[] blockByte = new byte[bytes.length - 8];
-//        System.arraycopy(blockByte, 8, blockByte, 0, blockByte.length);
-//        Common.Block block = Common.Block.parseFrom(blockByte);
+        System.out.println(file.length());
+        System.out.println(bytes.length);
+        byte[] blockByte = new byte[bytes.length - 8];
+        System.arraycopy(blockByte, 7, blockByte, 0, blockByte.length);
+        Common.Block block = Common.Block.parseFrom(blockByte);
     }
 
     public static void soutBytes(byte[] bytes){

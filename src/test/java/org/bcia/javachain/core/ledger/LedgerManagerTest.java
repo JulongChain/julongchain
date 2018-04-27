@@ -59,12 +59,13 @@ public class LedgerManagerTest {
         long before = System.currentTimeMillis();
         LedgerManager.initialize(null);
         l = LedgerManager.createLedger(factory.getGenesisBlock("MyGroup"));
-        List<String> list = LedgerManager.getLedgerIDs();
-        list.forEach((s) -> {
-            System.out.println(s);
-        });
-        ITxSimulator simulator = l.newTxSimulator("MyGroup");
+//        List<String> list = LedgerManager.getLedgerIDs();
+//        list.forEach((s) -> {
+//            System.out.println(s);
+//        });
+//        ITxSimulator simulator = l.newTxSimulator("MyGroup");
 //        simulator.
+        l.getTransactionByID("asdal");
     }
 
     @Test
