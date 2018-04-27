@@ -359,7 +359,7 @@ public class BlockFileManager {
         try {
             loc = index.getBlockLocByHash(blockHash);
         } catch (LedgerException e) {
-            return null;
+            throw e;
         }
         return fetchBlock(loc);
     }
@@ -374,7 +374,7 @@ public class BlockFileManager {
         try {
             loc = index.getBlockLocByBlockNum(blockNum);
         } catch (LedgerException e) {
-            return null;
+            throw e;
         }
         return fetchBlock(loc);
     }
@@ -386,7 +386,7 @@ public class BlockFileManager {
         try {
             loc = index.getBlockLocByTxID(txID);
         } catch (LedgerException e) {
-            return null;
+            throw e;
         }
         return fetchBlock(loc);
     }
@@ -396,7 +396,7 @@ public class BlockFileManager {
         try {
             return index.getTxValidationCodeByTxID(txID);
         } catch (LedgerException e) {
-            return null;
+            throw e;
         }
     }
 
@@ -406,14 +406,14 @@ public class BlockFileManager {
         try {
             loc = index.getBlockLocByBlockNum(blockNum);
         } catch (LedgerException e) {
-            return null;
+            throw e;
         }
         byte[] blockBytes = fetchBlockBytes(loc);
         SerializedBlockInfo info = null;
         try {
             info = BlockSerialization.extractSerializedBlockInfo(blockBytes);
         } catch (LedgerException e) {
-            return null;
+            throw e;
         }
         return info.getBlockHeader();
     }
@@ -428,7 +428,7 @@ public class BlockFileManager {
         try {
             loc = index.getTxLoc(txID);
         } catch (LedgerException e) {
-            return null;
+            throw e;
         }
         return fetchTransactionEnvelope(loc);
     }
@@ -440,7 +440,7 @@ public class BlockFileManager {
         try {
             loc = index.getTXLocByBlockNumTranNum(blockNum, tranNum);
         } catch (LedgerException e) {
-            return null;
+            throw e;
         }
         return fetchTransactionEnvelope(loc);
     }

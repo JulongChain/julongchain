@@ -158,10 +158,13 @@ public class KvLedger implements INodeLedger {
      */
     @Override
     public TransactionPackage.ProcessedTransaction getTransactionByID(String txID) throws LedgerException {
-        Common.Envelope tranEvn = blockStore.retrieveTxByID(txID);
-        TransactionPackage.TxValidationCode txVResult = blockStore.retrieveTxValidationCodeByTxID(txID);
-        if(tranEvn == null || txVResult == null){
-           return null;
+        Common.Envelope tranEvn = null;
+        TransactionPackage.TxValidationCode txVResult = null;
+        try {
+            tranEvn = blockStore.retrieveTxByID(txID);
+            txVResult = blockStore.retrieveTxValidationCodeByTxID(txID);
+        } catch (LedgerException e) {
+            return null;
         }
         return TransactionPackage.ProcessedTransaction.newBuilder()
                 .setTransactionEnvelope(tranEvn)
