@@ -15,6 +15,7 @@ limitations under the License.
  */
 package org.bcia.javachain.common.ledger.blockledger;
 
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.protos.consenter.Ab;
 
 /**
@@ -29,7 +30,7 @@ public interface Reader {
     /**
      * 返回迭代器
      */
-    Iterator iterator(Ab.SeekPosition startType);
+    Iterator iterator(Ab.SeekPosition startType) throws LedgerException;
 
     /**
      * 返回block数量

@@ -49,8 +49,6 @@ public class HistoryDBHelper {
     public static byte[] constructPartialCompositeHistoryKey(String ns, String key, boolean endKey){
         byte[] compositeKey = ns.getBytes();
         ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
-        ArrayUtils.addAll(compositeKey, ns.getBytes());
-        ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
         ArrayUtils.addAll(compositeKey, key.getBytes());
         ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
         if(endKey){
