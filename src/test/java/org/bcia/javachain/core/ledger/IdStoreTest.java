@@ -64,13 +64,13 @@ public class IdStoreTest {
         Assert.assertEquals("1234", idStore.getUnderConstructionFlag());
     }
 
-    @Test
-    public void createLedgerID() throws LedgerException {
-        idStore.createLedgerID("kql", Common.Block.newBuilder().build());
-        idStore.close();
-        //TODO dbpath
-        String dbPath = null;
-        provider = LevelDBProvider.newProvider(dbPath);
-        System.out.println(provider.get(idStore.encodeLedgerKey("kql")));
-    }
+//    @Test
+//    public void createLedgerID() throws LedgerException {
+//        idStore.createLedgerID("kql", Common.Block.newBuilder().build());
+//        idStore.close();
+//        //TODO dbpath
+//        String dbPath = null;
+//        provider = LevelDBProvider.newProvider(dbPath);
+//        System.out.println(provider.get(idStore.encodeLedgerKey("kql")));
+//    }
 }

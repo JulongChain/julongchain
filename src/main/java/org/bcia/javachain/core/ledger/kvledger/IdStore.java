@@ -82,7 +82,7 @@ public class IdStore {
     /**
      * 创建账本索引
      */
-    public void createLedgerID(String ledgerID, Common.Block gb) throws LedgerException {
+    public void createLedgerID(String ledgerID) throws LedgerException {
         byte[] key = encodeLedgerKey(ledgerID);
         byte[] val = null;
         val = provider.get(key);
@@ -134,8 +134,10 @@ public class IdStore {
     public Common.Block getCreatingBlock(String ledgerID) throws LedgerException {
         try {
             byte[] key = encodeLedgerKey(ledgerID);
-            if(provider.get(key) == null){
-                throw new LedgerException("Ledger id" + ledgerID + " is not creating");
+            byte[] val = provider.get(key);
+            if(val != null && val.length == 0){
+                logger.debug("NO CREATING LEDGER EXISTS");
+                return null;
             }
             return Common.Block.parseFrom(provider.get(key));
         } catch (InvalidProtocolBufferException e) {

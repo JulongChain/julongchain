@@ -16,8 +16,11 @@
 package org.bcia.javachain.core.ledger;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
+import org.bcia.javachain.core.ledger.kvledger.history.historydb.HistoryDBHelper;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.util.Util;
 import org.bcia.javachain.protos.common.Common;
 import org.junit.Test;
@@ -37,6 +40,20 @@ import java.util.Map;
 public class LedterTest {
     public static final String AKSJDLAD = "aksjdlad";
     private static final byte[] COMPOSITE_KEY_SEP = {0x00};
+
+    @Test
+    public void historyDBTest() throws LedgerException {
+        LevelDBProvider provider = LevelDBProvider.newProvider(LedgerConfig.getHistoryLevelDBPath());
+        for (int i = 0; i < 100; i++) {
+            String ns = "ns" + i;
+            String key = "key" + i;
+            long blockNum = i * 2;
+            long tranNum = i * 10;
+            byte[] empty = new byte[]{};
+            provider.put(HistoryDBHelper.constructCompositeHistoryKey(ns, key, blockNum, tranNum), empty, true);
+        }
+    }
+
     @Test
     public void getKVFromLevelDB() throws Throwable {
 //        LevelDBProvider provider = LevelDBProvider.newProvider("/tmp/fabric/ledgertests/ledgermgmt/ledgersData/ledgerProvider");
