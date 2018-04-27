@@ -123,6 +123,7 @@ public class NodeServer {
 
         //创建智能合约支持服务
         //创建Gossip服务
+        systemSmartContractManager.registerSysSmartContracts();
 
         //初始化系统智能合约
         initSysSmartContracts();
