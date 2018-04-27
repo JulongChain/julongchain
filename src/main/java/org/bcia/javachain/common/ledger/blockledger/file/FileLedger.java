@@ -15,6 +15,7 @@ limitations under the License.
  */
 package org.bcia.javachain.common.ledger.blockledger.file;
 
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blockledger.FileLedgerBlockStore;
 import org.bcia.javachain.common.ledger.blockledger.Iterator;
 import org.bcia.javachain.common.ledger.blockledger.Reader;
@@ -22,6 +23,7 @@ import org.bcia.javachain.common.ledger.blockledger.Writer;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.consenter.Ab;
 
 /**
@@ -41,8 +43,20 @@ public class FileLedger implements Reader, Writer {
     }
 
     @Override
-    public Iterator iterator(Ab.SeekPosition startType) {
-
+    public Iterator iterator(Ab.SeekPosition startType) throws LedgerException  {
+        long startingBlockNumber;
+        switch (startType.getTypeCase().getNumber()){
+            case Ab.SeekPosition.OLDEST_FIELD_NUMBER:
+                startingBlockNumber = 0;
+                break;
+            case Ab.SeekPosition.NEWEST_FIELD_NUMBER:
+                Ledger.BlockchainInfo info = blockStore.getBlockchainInfo();
+                startingBlockNumber = info.getHeight() - 1;
+                break;
+            case Ab.SeekPosition.SPECIFIED_FIELD_NUMBER:
+//                startingBlockNumber = Specified
+                break;
+        }
         return null;
     }
 
