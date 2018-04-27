@@ -157,7 +157,7 @@ public class BlockIndex implements Index {
         }
         byte[] b = db.get(constructBlockHashKey(blockHash));
         if(b == null){
-            throw BlockStorage.ERR_NOT_FOUND_IN_INDEX;
+            return null;
         }
         FileLocPointer blkLoc = new FileLocPointer();
         blkLoc.unmarshal(b);
@@ -174,7 +174,7 @@ public class BlockIndex implements Index {
         }
         byte[] b = db.get(constructBlockNumKey(blockID));
         if(b == null){
-            throw BlockStorage.ERR_NOT_FOUND_IN_INDEX;
+            return null;
         }
         FileLocPointer blkLoc = new FileLocPointer();
         blkLoc.unmarshal(b);
@@ -191,7 +191,7 @@ public class BlockIndex implements Index {
         }
         byte[] b = db.get(constructTxIDKey(txID));
         if(b == null){
-            throw BlockStorage.ERR_NOT_FOUND_IN_INDEX;
+            return null;
         }
         FileLocPointer txFLP = new FileLocPointer();
         txFLP.unmarshal(b);
@@ -208,7 +208,7 @@ public class BlockIndex implements Index {
         }
         byte[] b = db.get(constructBlockTxIDKey(txID));
         if(b == null){
-            throw BlockStorage.ERR_NOT_FOUND_IN_INDEX;
+            return null;
         }
         FileLocPointer txFLP = new FileLocPointer();
         txFLP.unmarshal(b);
@@ -225,7 +225,7 @@ public class BlockIndex implements Index {
         }
         byte[] b = db.get(constructBlockNumTranNumKey(blockNum, tranNum));
         if(b == null){
-            throw BlockStorage.ERR_NOT_FOUND_IN_INDEX;
+            return null;
         }
         FileLocPointer txFLP = new FileLocPointer();
         txFLP.unmarshal(b);
@@ -242,7 +242,7 @@ public class BlockIndex implements Index {
         }
         byte[] raw = db.get(constructTxValidationCodeIDKey(txID));
         if(raw == null){
-            throw BlockStorage.ERR_NOT_FOUND_IN_INDEX;
+            return null;
         } else if (raw.length != 1){
             throw new LedgerException("Invalid value in indexItems");
         }
