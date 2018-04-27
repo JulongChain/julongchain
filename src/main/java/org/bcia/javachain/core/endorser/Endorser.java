@@ -111,7 +111,11 @@ public class Endorser implements IEndorserServer {
                 signedProposal, proposal, scIdBuilder);
 
         ProposalResponsePackage.Response response = (ProposalResponsePackage.Response) simulateObjs[0];
-        byte[] simulateResults = ((Rwset.TxReadWriteSet) simulateObjs[1]).toByteArray();
+        Rwset.TxReadWriteSet txReadWriteSet = (Rwset.TxReadWriteSet) simulateObjs[1];
+        byte[] simulateResults = new byte[0];
+        if (txReadWriteSet != null) {
+            simulateResults = ((Rwset.TxReadWriteSet) simulateObjs[1]).toByteArray();
+        }
         ISmartContractDefinition scDefinition = (ISmartContractDefinition) simulateObjs[2];
         SmartContractEventPackage.SmartContractEvent scEvent = (SmartContractEventPackage.SmartContractEvent)
                 simulateObjs[3];
@@ -286,7 +290,7 @@ public class Endorser implements IEndorserServer {
         }
 
         TxSimulationResults simulationResults = null;
-        if(groupId != null && txSimulator != null) {
+        if (groupId != null && txSimulator != null) {
 
             try {
                 simulationResults = txSimulator.getTxSimulationResults();

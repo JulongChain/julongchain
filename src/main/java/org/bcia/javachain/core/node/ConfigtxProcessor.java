@@ -22,6 +22,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
+import org.bcia.javachain.core.ledger.IQueryExecutor;
 import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.core.ledger.customtx.IProcessor;
 import org.bcia.javachain.core.node.util.ConfigTxUtils;
@@ -38,8 +39,8 @@ import org.bcia.javachain.protos.common.Configtx;
 public class ConfigtxProcessor implements IProcessor {
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeGrpcServer.class);
 
-    private static final String RESOURCES_CONFIG_KEY = "resourcesconfigtx.RESOURCES_CONFIG_KEY";
-    private static final String GROUP_CONFIG_KEY = "resourcesconfigtx.GROUP_CONFIG_KEY";
+    public static final String RESOURCES_CONFIG_KEY = "resourcesconfigtx.RESOURCES_CONFIG_KEY";
+    public static final String GROUP_CONFIG_KEY = "resourcesconfigtx.GROUP_CONFIG_KEY";
     private static final String NODE_NAMESPACE = "";
 
     @Override
@@ -134,13 +135,14 @@ public class ConfigtxProcessor implements IProcessor {
         }
     }
 
-    private void persistConfig(ITxSimulator simulator, String key, Configtx.Config groupConfig) throws LedgerException {
+    public static void persistConfig(ITxSimulator simulator, String key, Configtx.Config groupConfig) throws
+            LedgerException {
         simulator.setState(NODE_NAMESPACE, key, groupConfig.toByteArray());
     }
 
-    private Configtx.Config retrievePersistedConfig(ITxSimulator simulator, String key) throws LedgerException,
+    public static Configtx.Config retrievePersistedConfig(IQueryExecutor queryExecutor, String key) throws LedgerException,
             InvalidProtocolBufferException {
-        byte[] serializedConfig = simulator.getState(NODE_NAMESPACE, key);
+        byte[] serializedConfig = queryExecutor.getState(NODE_NAMESPACE, key);
 
         if (serializedConfig == null) {
             return null;

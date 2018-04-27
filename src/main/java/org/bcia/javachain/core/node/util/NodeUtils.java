@@ -15,13 +15,25 @@
  */
 package org.bcia.javachain.core.node.util;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.proto.BlockUtils;
 import org.bcia.javachain.core.ledger.INodeLedger;
+import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
+import org.bcia.javachain.node.Node;
+import org.bcia.javachain.node.entity.Group;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.Query;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 节点提供的一些全局静态函数，可用于创建账本、初始化账本、获取msp id、获取配置区块等，可供系统智能合约等调用。
@@ -31,17 +43,59 @@ import java.util.List;
  * @company Dingxuan
  */
 public class NodeUtils {
-    public static INodeLedger getLedger(String groupID) {
+    private static final JavaChainLog log = JavaChainLogFactory.getLog(NodeUtils.class);
+
+    public static INodeLedger getLedger(String groupId) {
+        if (StringUtils.isBlank(groupId)) {
+            return null;
+        }
+
+        Node node = null;
+        try {
+            node = Node.getInstance();
+        } catch (NodeException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        if (node != null) {
+            Map<String, Group> groupMap = node.getGroupMap();
+            Group group = groupMap.get(groupId);
+            if (group != null) {
+                return group.getGroupSupport().getNodeLedger();
+            }
+        }
+
         return null;
     }
 
     /**
      * getMSPIDs returns the ID of each application MSP defined on this group
      *
-     * @param groupID
+     * @param groupId
      * @return
      */
-    public static String[] getMspIDs(String groupID) {
+    public static String[] getMspIDs(String groupId) {
+        if (StringUtils.isBlank(groupId)) {
+            return null;
+        }
+
+        Node node = null;
+        try {
+            node = Node.getInstance();
+        } catch (NodeException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        if (node != null) {
+            Map<String, Group> groupMap = node.getGroupMap();
+            Group group = groupMap.get(groupId);
+            if (group != null) {
+
+                //TODO:是否是取应用--》组织
+                return group.getGroupSupport().getMspIds();
+            }
+        }
+
         return null;
     }
 
@@ -52,29 +106,89 @@ public class NodeUtils {
      * @throws JavaChainException
      */
     public static void createChainFromBlock(Common.Block block) throws JavaChainException {
+        String groupId = BlockUtils.getGroupIDFromBlock(block);
+        INodeLedger ledger = LedgerManager.createLedger(block);
 
+        Node node = null;
+        try {
+            node = Node.getInstance();
+        } catch (NodeException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        if (node != null) {
+            try {
+                node.createGroup(groupId, ledger, block);
+            } catch (InvalidProtocolBufferException e) {
+                log.error(e.getMessage(), e);
+                throw new JavaChainException(e);
+            }
+        }
     }
 
     /**
      * initChain takes care to initialize chain after peer joined, for example deploys system CCs
      *
-     * @param groupID
+     * @param groupId
      */
-    public static void initChain(String groupID) {
+    public static void initChain(String groupId) {
+        Node node = null;
+        try {
+            node = Node.getInstance();
+        } catch (NodeException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        if (node != null && node.getInitializeCallback() != null) {
+            node.getInitializeCallback().onGroupInitialized(groupId);
+        }
     }
 
     /**
      * getCurrConfigBlock returns the cached config block of the specified chain.
      * Note that this call returns nil if chain cid has not been created.
      *
-     * @param groupID
+     * @param groupId
      * @return
      */
-    public static Common.Block getCurrentConfigBlock(String groupID) {
+    public static Common.Block getCurrentConfigBlock(String groupId) {
+        if (StringUtils.isBlank(groupId)) {
+            return null;
+        }
+
+        Node node = null;
+        try {
+            node = Node.getInstance();
+        } catch (NodeException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        if (node != null) {
+            Map<String, Group> groupMap = node.getGroupMap();
+            Group group = groupMap.get(groupId);
+            if (group != null) {
+                return group.getBlock();
+            }
+        }
+
         return null;
     }
 
     public static List<Query.GroupInfo> getGroupsInfo() {
-        return null;
+        List<Query.GroupInfo> groupInfoList = new ArrayList<Query.GroupInfo>();
+
+        try {
+            Node node = Node.getInstance();
+            Map<String, Group> groupMap = node.getGroupMap();
+
+            for (String groupId : groupMap.keySet()) {
+                Query.GroupInfo groupInfo = Query.GroupInfo.newBuilder().setGroupId(groupId).build();
+                groupInfoList.add(groupInfo);
+            }
+        } catch (NodeException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        return groupInfoList;
     }
 }

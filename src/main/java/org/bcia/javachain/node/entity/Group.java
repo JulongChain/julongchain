@@ -32,4 +32,15 @@ public class Group {
     private ICommiterServer commiter;
 
 
+    public GroupSupport getGroupSupport() {
+        return groupSupport;
+    }
+
+    public Common.Block getBlock() {
+        return block;
+    }
+
+    public ICommiterServer getCommiter() {
+        return commiter;
+    }
 }

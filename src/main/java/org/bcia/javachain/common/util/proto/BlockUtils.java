@@ -60,8 +60,32 @@ public class BlockUtils {
         return gh.getGroupId();
     }
 
-    public static Common.Envelope extractEnvelope(Common.Block block, int index) throws JavaChainException {
-        return null;
+    /**
+     * 从区块里面解析出指定的信封对象
+     *
+     * @param block
+     * @param index
+     * @return
+     * @throws ValidateException
+     * @throws InvalidProtocolBufferException
+     */
+    public static Common.Envelope extractEnvelope(Common.Block block, int index) throws ValidateException,
+            InvalidProtocolBufferException {
+        //非空校验
+        ValidateUtils.isNotNull(block, "block can not be null");
+        ValidateUtils.isNotNull(block.getData(), "block.data can not be null");
+
+        if (block.getData().getDataList() == null || block.getData().getDataList().isEmpty()) {
+            throw new ValidateException("block.data.dataList can not be null");
+        }
+
+        //索引值校验
+        if (index < 0 || index > block.getData().getDataCount() - 1) {
+            throw new ValidateException("Wrong Envelope index: " + index);
+        }
+
+        ByteString byteString = block.getData().getData(index);
+        return Common.Envelope.parseFrom(byteString);
     }
 
     /**
@@ -111,5 +135,29 @@ public class BlockUtils {
 
         ByteString byteString = block.getMetadata().getMetadata(blockMetadataIndex);
         return Common.Metadata.parseFrom(byteString);
+    }
+
+    /**
+     * 创建一个空的Block对象，供测试用
+     *
+     * @return
+     */
+    public static Common.Block newEmptyBlock() {
+        Common.BlockMetadata.Builder blockMetadataBuilder = Common.BlockMetadata.newBuilder();
+
+        blockMetadataBuilder.addMetadata(Common.Metadata.getDefaultInstance().toByteString());
+        blockMetadataBuilder.addMetadata(Common.Metadata.getDefaultInstance().toByteString());
+        blockMetadataBuilder.addMetadata(Common.Metadata.getDefaultInstance().toByteString());
+        blockMetadataBuilder.addMetadata(Common.Metadata.getDefaultInstance().toByteString());
+
+        Common.BlockMetadata blockMetadata = blockMetadataBuilder.build();
+
+        Common.Block.Builder blockBuilder = Common.Block.newBuilder();
+        blockBuilder.setHeader(Common.BlockHeader.getDefaultInstance());
+        blockBuilder.setData(Common.BlockData.getDefaultInstance());
+        blockBuilder.setMetadata(blockMetadata);
+        blockBuilder.setMetadata(blockMetadata);
+
+        return blockBuilder.build();
     }
 }
