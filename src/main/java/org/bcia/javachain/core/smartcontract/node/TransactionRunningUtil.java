@@ -15,10 +15,9 @@ package org.bcia.javachain.core.smartcontract.node;
 
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 类描述
@@ -43,6 +42,22 @@ public class TransactionRunningUtil {
   /** 保存交易的状态 */
   private static Map<String, String> txIdAndStatusMap =
       Collections.synchronizedMap(new HashMap<String, String>());
+
+  private static Map<String, List<KvRwset.KVRead>> txIdAndKvReadMap =
+      Collections.synchronizedMap(new HashMap<String, List<KvRwset.KVRead>>());
+
+  public static void addKvRead(String txId, KvRwset.KVRead kvRead) {
+    if (txIdAndKvReadMap.get(txId) == null) {
+      List<KvRwset.KVRead> list = new ArrayList<KvRwset.KVRead>();
+      txIdAndKvReadMap.put(txId, list);
+    } else {
+      txIdAndKvReadMap.get(txId).add(kvRead);
+    }
+  }
+
+  public static List<KvRwset.KVRead> getKvReads(String txId) {
+    return txIdAndKvReadMap.get(txId);
+  }
 
   /**
    * 添加txId对应的smartContractId

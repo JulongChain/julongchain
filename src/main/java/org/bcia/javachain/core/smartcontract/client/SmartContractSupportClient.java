@@ -98,7 +98,6 @@ public class SmartContractSupportClient extends SmartContractBase {
   public static void main(String[] args) throws Exception {
     launch(CommConstant.ESSC);
     while (true) {
-      System.out.println();
     }
   }
 }

@@ -154,7 +154,7 @@ public class VersionLevelDB implements IVersionedDB{
         return true;
     }
 
-    private byte[] constructCompositeKey(String ns, String key){
+    public static byte[] constructCompositeKey(String ns, String key){
         byte[] result = ArrayUtils.addAll(ns.getBytes(), COMPOSITE_KEY_SEP);
         return ArrayUtils.addAll(result, key.getBytes());
     }

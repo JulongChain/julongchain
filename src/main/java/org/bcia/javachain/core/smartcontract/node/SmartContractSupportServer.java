@@ -17,8 +17,18 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bcia.javachain.common.util.CommConstant;
+import org.bcia.javachain.protos.common.Common.GroupHeader;
+import org.bcia.javachain.protos.common.Common.Header;
+import org.bcia.javachain.protos.common.Common.HeaderType;
+import org.bcia.javachain.protos.node.ProposalPackage.Proposal;
+import org.bcia.javachain.protos.node.ProposalPackage.SignedProposal;
+import org.bcia.javachain.protos.node.SmartContractEventPackage.SmartContractEvent;
+import org.bcia.javachain.protos.node.SmartcontractShim.SmartContractMessage;
+import org.bcia.javachain.protos.node.SmartcontractShim.SmartContractMessage.Type;
 
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * 智能合约server
@@ -83,6 +93,26 @@ public class SmartContractSupportServer {
 
     Thread.sleep(5000);
 
-    while (true) {}
+    while (true) {
+      GroupHeader groupHeader =
+          GroupHeader.newBuilder().setType(HeaderType.ENDORSER_TRANSACTION.getNumber()).build();
+      Header header = Header.newBuilder().setGroupHeader(groupHeader.toByteString()).build();
+      Proposal proposal = Proposal.newBuilder().setHeader(header.toByteString()).build();
+      SignedProposal signedProposal =
+          SignedProposal.newBuilder().setProposalBytes(proposal.toByteString()).build();
+      SmartContractEvent smartcontractEvent =
+          SmartContractEvent.newBuilder().setSmartContractId(CommConstant.ESSC).build();
+      SmartContractMessage msg =
+          SmartContractMessage.newBuilder()
+              .setGroupId("groupId " + UUID.randomUUID().toString())
+              .setTxid("txId " + UUID.randomUUID().toString())
+              .setType(Type.TRANSACTION)
+              .setProposal(signedProposal)
+              .setSmartcontractEvent(smartcontractEvent)
+              .build();
+      SmartContractSupportService.invoke(CommConstant.ESSC, msg);
+
+      Thread.sleep(5000);
+    }
   }
 }
