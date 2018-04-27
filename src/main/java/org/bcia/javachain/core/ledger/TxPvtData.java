@@ -18,7 +18,7 @@ package org.bcia.javachain.core.ledger;
 import org.bcia.javachain.protos.ledger.rwset.Rwset;
 
 /**
- * 类描述
+ * 私有交易数据
  *
  * @author sunzongyu
  * @date 2018/04/09

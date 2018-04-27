@@ -16,7 +16,7 @@
 package org.bcia.javachain.core.ledger;
 
 /**
- * 类描述
+ * 丢失的私有数据
  *
  * @author sunzongyu
  * @date 2018/04/09
