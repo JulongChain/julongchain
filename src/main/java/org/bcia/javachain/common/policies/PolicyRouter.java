@@ -31,6 +31,11 @@ public class PolicyRouter implements IPolicyManager {
     private IPolicyManager groupPolicyManager;
     private IPolicyManager resourcesPolicyManager;
 
+    public PolicyRouter(IPolicyManager groupPolicyManager, IPolicyManager resourcesPolicyManager) {
+        this.groupPolicyManager = groupPolicyManager;
+        this.resourcesPolicyManager = resourcesPolicyManager;
+    }
+
     @Override
     public IPolicy getPolicy(String id) {
         if (id.startsWith(GROUP)) {

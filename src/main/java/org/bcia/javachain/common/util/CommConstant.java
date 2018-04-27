@@ -74,5 +74,10 @@ public class CommConstant {
      */
     public static final String PATH_SEPARATOR = "/";
 
+    /**
+     * 默认随机数长度
+     */
+    public static final int DEFAULT_NONCE_LENGTH = 24;
+
 
 }

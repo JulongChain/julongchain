@@ -31,11 +31,11 @@ import java.util.Map;
  * @date 2018/4/19
  * @company Dingxuan
  */
-public class ApiConfig implements IApiConfig {
+public class ApisConfig implements IApisConfig {
     private static final String API_PATH_PREFIX = "/Resources/APIs/";
     private Map<String, String> policyRefs;
 
-    public ApiConfig(Configtx.ConfigTree tree) throws ValidateException, InvalidProtocolBufferException {
+    public ApisConfig(Configtx.ConfigTree tree) throws ValidateException, InvalidProtocolBufferException {
         this.policyRefs = new HashMap<String, String>();
 
         if (tree != null && tree.getChildsCount() > 0) {

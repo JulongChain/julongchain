@@ -22,5 +22,5 @@ package org.bcia.javachain.common.resourceconfig.config;
  * @date 2018/4/23
  * @company Dingxuan
  */
-public interface IApiConfig {
+public interface IApisConfig {
 }

@@ -32,8 +32,10 @@ import org.bcia.javachain.consenter.common.broadcast.BroadCastClient;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.core.ssc.cssc.CSSC;
+import org.bcia.javachain.csp.factory.CspManager;
 import org.bcia.javachain.msp.ISigningIdentity;
 import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
+import org.bcia.javachain.msp.mgmt.MspManager;
 import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.common.client.*;
 import org.bcia.javachain.node.common.helper.SpecHelper;
@@ -72,6 +74,37 @@ public class NodeGroup {
         this.node = node;
     }
 
+    class CreateGroupObserver implements StreamObserver<Ab.BroadcastResponse> {
+        private String host;
+        private int port;
+        private String groupId;
+
+        public CreateGroupObserver(String host, int port, String groupId) {
+            this.host = host;
+            this.port = port;
+            this.groupId = groupId;
+        }
+
+        @Override
+        public void onNext(Ab.BroadcastResponse broadcastResponse) {
+            log.info("Broadcast onNext");
+            //收到响应消息，判断是否是200消息
+            if (Common.Status.SUCCESS.equals(broadcastResponse.getStatus())) {
+                getGenesisBlockThenWrite(host, port, groupId);
+            }
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            log.error(throwable.getMessage(), throwable);
+        }
+
+        @Override
+        public void onCompleted() {
+            log.info("Broadcast completed");
+        }
+    }
+
     /**
      * 创建群组
      *
@@ -107,28 +140,15 @@ public class NodeGroup {
 
         Common.Envelope signedEnvelope = EnvelopeHelper.sanityCheckAndSignConfigTx(envelope, groupId, signer);
         IBroadcastClient broadcastClient = new BroadcastClient(host, port);
-        broadcastClient.send(signedEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
-            @Override
-            public void onNext(Ab.BroadcastResponse value) {
-                log.info("Broadcast onNext");
-                //收到响应消息，判断是否是200消息
-                if (Common.Status.SUCCESS.equals(value.getStatus())) {
-                    getGenesisBlockThenWrite(host, port, groupId);
-                }
-            }
+        broadcastClient.send(signedEnvelope, new CreateGroupObserver(host, port, groupId));
 
-            @Override
-            public void onError(Throwable t) {
-                log.error(t.getMessage(), t);
-            }
+        try {
+            Thread.sleep(15000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-            @Override
-            public void onCompleted() {
-                log.info("Broadcast completed");
-            }
-        });
-
-        return null;
+        return this;
     }
 
     private void getGenesisBlockThenWrite(String ip, int port, String groupId) {
@@ -140,12 +160,14 @@ public class NodeGroup {
                 log.info("Deliver onNext");
 
                 //测试用
-                if(true){
+                if (true) {
                     try {
                         Common.Block block = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance())
                                 .getGenesisBlock(groupId);
-                        FileUtils.writeFileBytes(groupId + ".block", block.toByteArray());
+
+                        LedgerManager.initialize(null);
                         LedgerManager.createLedger(block);
+                        FileUtils.writeFileBytes(groupId + ".block", block.toByteArray());
                     } catch (IOException e) {
                         log.error(e.getMessage(), e);
                     } catch (JavaChainException e) {
@@ -191,13 +213,17 @@ public class NodeGroup {
             throw new NodeException("Can not read block file");
         }
 
-        ISigningIdentity identity = null;// new Mgmt().getLocalMsp().getDefaultSigningIdentity();
+        ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
-        //ISigningIdentity identity = new MockSigningIdentity();
         byte[] creator = identity.serialize();
 
-        byte[] nonce = MockCrypto.getRandomNonce();
-
+        byte[] nonce = new byte[0];
+        try {
+            nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
+        } catch (JavaChainException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException("Can not get nonce");
+        }
 
         String txId = null;
         try {
@@ -211,7 +237,7 @@ public class NodeGroup {
                 "", txId, spec, nonce, creator, null);
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
-        EndorserClient endorserClient = new EndorserClient("localhost", 7051);
+        EndorserClient endorserClient = new EndorserClient(CSSC.DEFAULT_HOST, CSSC.DEFAULT_PORT);
         ProposalResponsePackage.ProposalResponse proposalResponse = endorserClient.sendProcessProposal(signedProposal);
 
         if (proposalResponse != null && proposalResponse.getResponse() != null && proposalResponse.getResponse()
@@ -242,16 +268,22 @@ public class NodeGroup {
     }
 
     /**
-     * 加入群组列表 V0.25
+     * 获取当前节点所在的所有群组列表
      */
-    public List<Query.GroupInfo> listGroups(String smartContractName, String action, byte[] content) throws NodeException {
-        //生成proposal  Type=ENDORSER_TRANSACTION
-        Smartcontract.SmartContractInvocationSpec spec = SpecHelper.buildInvocationSpec(smartContractName, action, content);
+    public List<Query.GroupInfo> listGroups() throws NodeException {
+        Smartcontract.SmartContractInvocationSpec csscSpec = SpecHelper.buildInvocationSpec(CommConstant.CSSC, CSSC
+                .GET_GROUPS, null);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
         byte[] creator = identity.serialize();
 
-        byte[] nonce = MockCrypto.getRandomNonce();
+        byte[] nonce = null;
+        try {
+            nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
+        } catch (JavaChainException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException("Can not get nonce");
+        }
 
         String txId = null;
         try {
@@ -263,30 +295,13 @@ public class NodeGroup {
 
         //生成proposal  Type=ENDORSER_TRANSACTION
         ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType.ENDORSER_TRANSACTION,
-                "", txId, spec, nonce, creator, null);
+                "", txId, csscSpec, nonce, creator, null);
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //获取背书节点返回信息
         EndorserClient client = new EndorserClient(CSSC.DEFAULT_HOST, CSSC.DEFAULT_PORT);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
 
-/*        //获取结果中 Payload
-        Common.Payload payload = null;
-        try {
-            payload = Common.Payload.parseFrom(proposalResponse.getResponse().getPayload());
-        } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
-        }
-
-        //获取Payload 中的groupHeader
-        Common.GroupHeader groupHeader = null;
-        try {
-            groupHeader = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
-        } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
-        }
-        //return groupHeader.getGroupId();
-*/
         Query.GroupQueryResponse groupQueryResponse = null;
         try {
             groupQueryResponse = Query.GroupQueryResponse.parseFrom(proposalResponse.getResponse().getPayload());
@@ -294,8 +309,6 @@ public class NodeGroup {
             e.printStackTrace();
         }
         return groupQueryResponse.getGroupsList();
-
-
     }
 
 }

@@ -13,14 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.resourceconfig.config;
+package org.bcia.javachain.node.entity;
+
+import org.bcia.javachain.core.commiter.ICommiterServer;
+import org.bcia.javachain.core.node.GroupSupport;
+import org.bcia.javachain.protos.common.Common;
 
 /**
- * 智能合约集配置接口
+ * 群组对象
  *
  * @author zhouhui
- * @date 2018/4/23
+ * @date 2018/4/27
  * @company Dingxuan
  */
-public interface ISmartContractsConfig {
+public class Group {
+    private GroupSupport groupSupport;
+    private Common.Block block;
+    private ICommiterServer commiter;
+
+
 }

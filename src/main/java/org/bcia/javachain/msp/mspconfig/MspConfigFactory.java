@@ -33,18 +33,15 @@ import java.net.URL;
  */
 public class MspConfigFactory {
     private static JavaChainLog log = JavaChainLogFactory.getLog(MspConfigFactory.class);
+
     public static MspConfig loadMspConfig() throws FileNotFoundException {
         Yaml yaml = new Yaml();
-        URL url = MspConfigFactory.class.getClassLoader().getResource(MspConfig.MspConfig_FILE_PATH);
 
         InputStream is = null;
         try {
-            is = new FileInputStream(url.getFile());
-            MspConfig mspConfig= yaml.loadAs(is, MspConfig.class);
+            is = MspConfigFactory.class.getClassLoader().getResourceAsStream(MspConfig.MspConfig_FILE_PATH);
+            MspConfig mspConfig = yaml.loadAs(is, MspConfig.class);
             return mspConfig;
-        } catch (FileNotFoundException e) {
-            log.error(e.getMessage(), e);
-            throw e;
         } finally {
             if (is != null) {
                 try {

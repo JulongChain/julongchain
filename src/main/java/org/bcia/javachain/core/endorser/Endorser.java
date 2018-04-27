@@ -32,6 +32,7 @@ import org.bcia.javachain.core.ledger.TxSimulationResults;
 import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.javachain.node.common.helper.SpecHelper;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.ledger.rwset.Rwset;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.SmartContractEventPackage;
@@ -109,12 +110,11 @@ public class Endorser implements IEndorserServer {
         Object[] simulateObjs = simulateProposal(groupHeader.getGroupId(), scName, groupHeader.getTxId(),
                 signedProposal, proposal, scIdBuilder);
 
-        ProposalResponsePackage.Response response = (ProposalResponsePackage.Response) objs[0];
-        byte[] simulateResults = (byte[]) simulateObjs[1];
+        ProposalResponsePackage.Response response = (ProposalResponsePackage.Response) simulateObjs[0];
+        byte[] simulateResults = ((Rwset.TxReadWriteSet) simulateObjs[1]).toByteArray();
         ISmartContractDefinition scDefinition = (ISmartContractDefinition) simulateObjs[2];
         SmartContractEventPackage.SmartContractEvent scEvent = (SmartContractEventPackage.SmartContractEvent)
                 simulateObjs[3];
-
 
 
         if (response.getStatus() != Common.Status.SUCCESS_VALUE) {
@@ -286,23 +286,27 @@ public class Endorser implements IEndorserServer {
         }
 
         TxSimulationResults simulationResults = null;
-        try {
-            simulationResults = txSimulator.getTxSimulationResults();
-        } catch (LedgerException e) {
-            log.error(e.getMessage(), e);
-            throw new NodeException("get TxSimulation fail");
-        }
+        if(groupId != null && txSimulator != null) {
 
-        if (simulationResults.getPrivateReadWriteSet() != null) {
-            if (scIDBuilder.getName().equals(CommConstant.LSSC)) {
-                log.error("should not be lssc here");
-                throw new NodeException("should not be lssc here");
+            try {
+                simulationResults = txSimulator.getTxSimulationResults();
+            } catch (LedgerException e) {
+                log.error(e.getMessage(), e);
+                throw new NodeException("get TxSimulation fail");
             }
 
-            distributor.distributePrivateData(groupId, txId, simulationResults.getPrivateReadWriteSet());
+            if (simulationResults.getPrivateReadWriteSet() != null) {
+                if (scIDBuilder.getName().equals(CommConstant.LSSC)) {
+                    log.error("should not be lssc here");
+                    throw new NodeException("should not be lssc here");
+                }
+
+                distributor.distributePrivateData(groupId, txId, simulationResults.getPrivateReadWriteSet());
+            }
         }
 
-        return new Object[]{response, simulationResults.getPublicReadWriteSet(), scDefinition, scEvent};
+        return new Object[]{response, simulationResults == null ? null : simulationResults.getPublicReadWriteSet(),
+                scDefinition, scEvent};
     }
 
     /**

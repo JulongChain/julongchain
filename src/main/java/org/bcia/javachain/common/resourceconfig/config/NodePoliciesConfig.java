@@ -24,7 +24,7 @@ import org.bcia.javachain.protos.common.Configtx;
  * @date 2018/4/19
  * @company Dingxuan
  */
-public class NodePoliciesConfig {
+public class NodePoliciesConfig implements INodePoliciesConfig {
     public NodePoliciesConfig(Configtx.ConfigTree tree) {
     }
 }

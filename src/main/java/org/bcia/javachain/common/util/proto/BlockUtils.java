@@ -31,24 +31,24 @@ public class BlockUtils {
         return Common.Block.parseFrom(blockBytes);
     }
 
-    public static String getGroupIDFromBlock(Common.Block block) throws JavaChainException{
+    public static String getGroupIDFromBlock(Common.Block block) throws JavaChainException {
         Common.Envelope envelope = null;
         Common.Payload payload = null;
         Common.GroupHeader gh = null;
         try {
-            if(block == null || block.getData() == null || block.getData().getDataCount() == 0){
+            if (block == null || block.getData() == null || block.getData().getDataCount() == 0) {
                 return null;
             }
             envelope = Common.Envelope.parseFrom(block.getData().getData(0));
-            if(envelope == null || envelope.getPayload() == null){
+            if (envelope == null || envelope.getPayload() == null) {
                 return null;
             }
             payload = Common.Payload.parseFrom(envelope.getPayload());
-            if(payload.getHeader() == null || payload.getHeader().getGroupHeader() == null){
+            if (payload.getHeader() == null || payload.getHeader().getGroupHeader() == null) {
                 return null;
             }
             gh = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
-            if(gh == null || gh.getGroupId() == null){
+            if (gh == null || gh.getGroupId() == null) {
                 return null;
             }
         } catch (InvalidProtocolBufferException e) {
@@ -57,7 +57,17 @@ public class BlockUtils {
         return gh.getGroupId();
     }
 
-    public static Common.Envelope extractEnvelope(Common.Block block,int index)throws  JavaChainException{
+    public static Common.Envelope extractEnvelope(Common.Block block, int index) throws JavaChainException {
         return null;
+    }
+
+    public static long getLastConfigIndexFromBlock(Common.Block block) {
+//        getMetadataFromBlock(block, Common.BlockMetadataIndex.LAST_CONFIG_VALUE);
+        return 0L;
+
+
+    }
+
+    private static void getMetadataFromBlock(Common.Block block, int lastConfigValue) {
     }
 }

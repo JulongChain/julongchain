@@ -16,11 +16,11 @@
 package org.bcia.javachain.common.resourceconfig.config;
 
 /**
- * 智能合约集配置接口
+ * 节点策略配置接口
  *
  * @author zhouhui
- * @date 2018/4/23
+ * @date 2018/4/25
  * @company Dingxuan
  */
-public interface ISmartContractsConfig {
+public interface INodePoliciesConfig {
 }
