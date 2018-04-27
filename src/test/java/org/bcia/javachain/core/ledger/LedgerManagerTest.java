@@ -16,6 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger;
 
 import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.genesis.GenesisBlockFactory;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
 import org.bcia.javachain.common.util.proto.BlockUtils;
@@ -83,5 +84,24 @@ public class LedgerManagerTest {
     public void openLedger() throws Exception{
         LedgerManager.initialize(null);
         l = LedgerManager.openLedger(BlockUtils.getGroupIDFromBlock(null));
+    }
+
+    @Test
+    public void commitBlock() throws LedgerException {
+        LedgerManager.initialize(null);
+        l = LedgerManager.openLedger("MyGroup");
+        BlockAndPvtData bap = new BlockAndPvtData();
+        bap.setBlock(Common.Block.newBuilder()
+                .setHeader(Common.BlockHeader.newBuilder()
+                        .setNumber(3)
+                        .build())
+                .setMetadata(Common.BlockMetadata.newBuilder()
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .build())
+                .build());
+        l.commitWithPvtData(bap);
     }
 }

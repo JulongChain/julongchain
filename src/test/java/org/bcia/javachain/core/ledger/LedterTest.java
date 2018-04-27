@@ -41,7 +41,7 @@ public class LedterTest {
     public void getKVFromLevelDB() throws Throwable {
 //        LevelDBProvider provider = LevelDBProvider.newProvider("/tmp/fabric/ledgertests/ledgermgmt/ledgersData/ledgerProvider");
 //        LevelDBProvider provider = LevelDBProvider.newProvider("/home/bcia/javachain/ledgersData/ledgerProvider");
-        LevelDBProvider provider = LevelDBProvider.newProvider("/home/bcia/javachain/ledgersData/pvtdataStore");
+        LevelDBProvider provider = LevelDBProvider.newProvider("/home/bcia/javachain/ledgersData/stateLeveldb");
 //        for (int i = 0; i < 100; i++) {
 //            Height height = new Height();
 //            height.setTxNum((long) i);
@@ -66,20 +66,17 @@ public class LedterTest {
     public void getValuesFromFS() throws Exception {
         File file = new File("/home/bcia/javachain/ledgersData/chains/chains/MyGroup/blockfile000000");
         FileInputStream reader = new FileInputStream(file);
+        System.out.println(file.length());
         byte[] bytes = new byte[(int) file.length()];
         reader.read(bytes);
-        System.out.println(Util.bytesToLong(bytes, 0, 8));
-        System.out.println(file.length());
-        System.out.println(bytes.length);
+        soutBytes(bytes);
         byte[] blockByte = new byte[bytes.length - 8];
-        System.arraycopy(blockByte, 7, blockByte, 0, blockByte.length);
-        Common.Block block = Common.Block.parseFrom(blockByte);
     }
 
     public static void soutBytes(byte[] bytes){
+        int i = 0;
         for(byte b : bytes){
-            System.out.print(b + " ");
+            System.out.println(b + " ");
         }
-        System.out.println();
     }
 }

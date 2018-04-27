@@ -77,7 +77,6 @@ public class LedgerManager {
         if(!initialized){
             throw ERR_LEDGER_MANAGER_NOT_INITIALIZED;
         }
-
         String id = null;
         //获取区块id
         try {
