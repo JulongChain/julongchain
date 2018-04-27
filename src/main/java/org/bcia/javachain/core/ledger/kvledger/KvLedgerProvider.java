@@ -111,6 +111,8 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         if(idStore.ledgerIDExists(ledgerID)) {
             throw ERR_LEDGER_ID_EXISTS;
         }
+        //开始创建账本, 并保存信息
+        idStore.creatingLedgerID(ledgerID, genesisBlock);
         //设置创建标志
         idStore.setUnderConstructionFlag(ledgerID);
         //打开内部存储
@@ -119,7 +121,8 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         bapd.setBlock(genesisBlock);
         //提交创世区块
         lgr.commitWithPvtData(bapd);
-        idStore.createLedgerID(ledgerID, genesisBlock);
+        //完成账本创建
+        idStore.createLedgerID(ledgerID);
         return lgr;
     }
 
@@ -133,11 +136,12 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         if(!idStore.ledgerIDExists(ledgerID)){
             throw ERR_NON_EXISTS_LEDGER_ID;
         }
-        return openInternal(ledgerID);
+        INodeLedger lgr = openInternal(ledgerID);
+        return lgr;
     }
 
     /**
-     * 判断账本是否存在
+     * 判断账本是否存k
      */
     @Override
     public Boolean exists(String ledgerID) throws LedgerException {
@@ -179,24 +183,32 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         logger.info(String.format("Ledger [%s] found as under construction", ledgerID));
         INodeLedger ledger = openInternal(ledgerID);
         Ledger.BlockchainInfo bcInfo = ledger.getBlockchainInfo();
-        ledger.close();
 
         switch ((int) bcInfo.getHeight()){
             case 0:
                 logger.info("Genesis block was not committed.");
                 runCleanup(ledgerID);
+                //重新提交创世区块
+                BlockAndPvtData bapd = new BlockAndPvtData();
+                bapd.setBlock(idStore.getCreatingBlock(ledgerID));
+                //idstore中未发现保存的区块信息
+                if(bapd.getBlock() == null){
+                    break;
+                }
+                ledger.commitWithPvtData(bapd);
                 idStore.unsetUnderConstructionFlag();
                 break;
             case 1:
                 logger.info("Genesis block was committed.");
                 Common.Block genesisBlock = ledger.getBlockByNumber((long) 0);
-                idStore.createLedgerID(ledgerID, genesisBlock);
+                idStore.createLedgerID(ledgerID);
                 break;
             default:
                 throw new LedgerException(String.format(
                         "Under construction flag is set for ledger [%s] while the height of the blockchain is [%d]"
                         , ledgerID, bcInfo.getHeight()));
         }
+        ledger.close();
     }
 
     /**

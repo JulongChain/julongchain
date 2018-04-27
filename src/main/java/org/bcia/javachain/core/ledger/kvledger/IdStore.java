@@ -15,6 +15,7 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.kvledger;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.util.DBProvider;
@@ -81,16 +82,11 @@ public class IdStore {
     /**
      * 创建账本索引
      */
-    public void createLedgerID(String ledgerID, Common.Block gb) throws LedgerException {
+    public void createLedgerID(String ledgerID) throws LedgerException {
         byte[] key = encodeLedgerKey(ledgerID);
         byte[] val = null;
-        try {
-            val = gb.toByteArray();
-        } catch (Exception e) {
-            throw new LedgerException(e);
-        }
         val = provider.get(key);
-        if(val != null && val.length != 0){
+        if(val != null && val.length == 0){
             throw new LedgerException("Ledger is already exists!");
         }
         val = new byte[0];
@@ -99,6 +95,56 @@ public class IdStore {
         batch.delete(UNDER_CONSTRUCTION_LEDGER_KEY);
         provider.writeBatch(batch, true);
     }
+
+    /**
+     * 开始创建账本, 将block完整存入idstore, 以备恢复使用
+     */
+    public void creatingLedgerID(String ledgerID, Common.Block gb) throws LedgerException {
+        byte[] key = encodeLedgerKey(ledgerID);
+        byte[] val = provider.get(key);
+        if(val != null && val.length == 0){
+            throw new LedgerException("Ledger is already exists!");
+        }
+        try {
+            val = gb.toByteArray();
+        } catch (Exception e) {
+            throw new LedgerException(e);
+        }
+        provider.put(key, val, true);
+    }
+
+    /**
+     * 创建完成后, 删除创建标记以及保存的区块信息
+     */
+    public void createdLedgerID(String ledgerID) throws LedgerException {
+        byte[] key = encodeLedgerKey(ledgerID);
+        if(provider.get(key) == null){
+            throw new LedgerException("Ledger id" + ledgerID + " is not creating");
+        }
+        byte[] val = new byte[0];
+        UpdateBatch batch = LevelDBProvider.newUpdateBatch();
+        batch.put(key, val);
+        batch.delete(UNDER_CONSTRUCTION_LEDGER_KEY);
+        provider.writeBatch(batch, true);
+    }
+
+    /**
+     * 获取未完成创建的ledger的block
+     */
+    public Common.Block getCreatingBlock(String ledgerID) throws LedgerException {
+        try {
+            byte[] key = encodeLedgerKey(ledgerID);
+            byte[] val = provider.get(key);
+            if(val != null && val.length == 0){
+                logger.debug("NO CREATING LEDGER EXISTS");
+                return null;
+            }
+            return Common.Block.parseFrom(provider.get(key));
+        } catch (InvalidProtocolBufferException e) {
+            throw new LedgerException(e);
+        }
+    }
+
 
     /**
      * 判断账本是否存在

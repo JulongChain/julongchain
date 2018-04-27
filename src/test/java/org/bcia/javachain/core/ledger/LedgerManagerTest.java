@@ -16,6 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger;
 
 import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.genesis.GenesisBlockFactory;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
 import org.bcia.javachain.common.util.proto.BlockUtils;
@@ -53,6 +54,11 @@ public class LedgerManagerTest {
     }
 
     @Test
+    public void delete(){
+        System.out.println(deleteDir(new File(Config.getPath())));
+    }
+
+    @Test
     public void createLedger() throws Exception {
         GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
         System.out.println(deleteDir(new File(Config.getPath())));
@@ -69,19 +75,38 @@ public class LedgerManagerTest {
     }
 
     @Test
+    public void openLedger() throws Exception{
+        LedgerManager.initialize(null);
+        l = LedgerManager.openLedger("MyGroup");
+    }
+
+    @Test
+    public void commitBlock() throws LedgerException {
+        LedgerManager.initialize(null);
+        l = LedgerManager.openLedger("MyGroup");
+        BlockAndPvtData bap = new BlockAndPvtData();
+        bap.setBlock(Common.Block.newBuilder()
+                .setHeader(Common.BlockHeader.newBuilder()
+                        .setNumber(4)
+                        .build())
+                .setMetadata(Common.BlockMetadata.newBuilder()
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .build())
+                .build());
+        l.commitWithPvtData(bap);
+    }
+
+    @Test
     public void newTxSimulator() throws Exception {
         LedgerManager.initialize(null);
-        String groupId = BlockUtils.getGroupIDFromBlock(null);
+        String groupId = "MyGroup";
         l = LedgerManager.openLedger(groupId);
         ITxSimulator txSimulator = l.newTxSimulator(groupId);
         for (int i = 0; i < 100; i++) {
             System.out.println(new String(txSimulator.getState("ns" + i, "keys" + i)));
         }
-    }
-
-    @Test
-    public void openLedger() throws Exception{
-        LedgerManager.initialize(null);
-        l = LedgerManager.openLedger(BlockUtils.getGroupIDFromBlock(null));
     }
 }

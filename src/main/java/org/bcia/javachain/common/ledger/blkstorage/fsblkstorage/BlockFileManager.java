@@ -222,8 +222,11 @@ public class BlockFileManager {
         //保存
         saveCurrentInfo(newCPInfo, false);
         FileLocPointer blockFLP = new FileLocPointer();
-        blockFLP.setFileSuffixNum(currentOffset);
-        blockFLP.setLocPointer(new LocPointer(newCPInfo.getLastestFileChunkSuffixNum(), 0));
+        blockFLP.setFileSuffixNum(newCPInfo.getLastestFileChunkSuffixNum());
+        blockFLP.setLocPointer(new LocPointer(currentOffset, 0));
+        for(TxIndexInfo txOffset : txOffsets){
+            txOffset.getLoc().setOffset(txOffset.getLoc().getOffset() + 8);
+        }
         BlockIndexInfo idxInfo = new BlockIndexInfo();
         idxInfo.setBlockNum(block.getHeader().getNumber());
         idxInfo.setBlockHash(blockHash.toByteArray());
