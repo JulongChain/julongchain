@@ -20,6 +20,7 @@ import org.bcia.javachain.common.cauthdsl.CAuthDslBuilder;
 import org.bcia.javachain.common.cauthdsl.PolicyProvider;
 import org.bcia.javachain.common.channelconfig.ApplicationCapabilities;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.exception.SysSmartContractException;
 import org.bcia.javachain.common.groupconfig.capability.IApplicationCapabilities;
@@ -33,6 +34,7 @@ import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.core.common.privdata.*;
 import org.bcia.javachain.core.common.sysscprovider.ISystemSmartContractProvider;
 import org.bcia.javachain.core.common.sysscprovider.SystemSmartContractFactory;
+import org.bcia.javachain.core.ledger.IQueryExecutor;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
 import org.bcia.javachain.msp.IMspManager;
@@ -344,6 +346,16 @@ public class VSSC extends SystemSmartContractBase {
         // TODO: FAB-6526 - to add validation of the collections object
     }
 
+    /**
+     *
+     * @param stub
+     * @param groupID
+     * @param envelope
+     * @param scap
+     * @param payload
+     * @param ac
+     * @throws SysSmartContractException
+     */
     private void validateLSSCInvocation(
             ISmartContractStub stub,
             String groupID,
@@ -355,7 +367,26 @@ public class VSSC extends SystemSmartContractBase {
 
     }
 
-    private SmartContractDataPackage.SmartContractData getInstantiatedSmartContract(String groupID,String smartcontractID){
+    /**
+     * 获取实例化的智能合约
+     * @param groupID
+     * @param smartcontractID
+     * @return
+     */
+    private SmartContractDataPackage.SmartContractData getInstantiatedSmartContract(String groupID,String smartcontractID)
+                                                                   throws  SysSmartContractException{
+        IQueryExecutor qe =null;
+        try{
+            qe=this.sscProvider.getQueryExecutorForLedger(groupID);
+        }catch(JavaChainException e){
+            String msg=String.format("Could not retrieve QueryExecutor for group %s, error %s",groupID,e.getMessage());
+            throw new SysSmartContractException(msg);
+        }
+        try {
+            byte[] bytes=qe.getState("lssc", smartcontractID);
+        } catch (LedgerException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 

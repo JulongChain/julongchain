@@ -15,7 +15,9 @@
  */
 package org.bcia.javachain.core.common.sysscprovider;
 
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
+import org.bcia.javachain.core.ledger.IQueryExecutor;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 
 /**
@@ -34,5 +36,10 @@ public class SystemSmartContractProvider implements ISystemSmartContractProvider
     @Override
     public boolean isSysSmartContract(String essc) {
         return true;
+    }
+
+    @Override
+    public IQueryExecutor getQueryExecutorForLedger(String groupID) throws JavaChainException {
+        return null;
     }
 }
