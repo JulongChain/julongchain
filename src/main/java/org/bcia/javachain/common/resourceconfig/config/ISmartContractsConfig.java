@@ -16,7 +16,7 @@
 package org.bcia.javachain.common.resourceconfig.config;
 
 /**
- * 对象
+ * 智能合约集配置接口
  *
  * @author zhouhui
  * @date 2018/4/23

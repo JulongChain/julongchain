@@ -24,13 +24,13 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * 多智能合约配置
+ * 智能合约集配置
  *
  * @author zhouhui
  * @date 2018/4/19
  * @company Dingxuan
  */
-public class SmartContractsConfig {
+public class SmartContractsConfig implements ISmartContractsConfig {
     private Map<String, SmartContractConfig> smartContractConfigMap;
 
     public SmartContractsConfig(Configtx.ConfigTree tree) throws ValidateException, InvalidProtocolBufferException {

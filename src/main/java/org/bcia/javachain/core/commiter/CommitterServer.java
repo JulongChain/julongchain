@@ -21,13 +21,11 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.commiter.util.CommitterUtils;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
-import org.bcia.javachain.core.ledger.ILedger;
 import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.ledger.TxPvtData;
-import org.bcia.javachain.core.node.NodeConfig;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.core.commiter.util.*;
 import org.bcia.javachain.protos.common.Ledger;
 
 import java.util.ArrayList;

@@ -16,6 +16,7 @@
 package org.bcia.javachain.core.endorser;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.NodeException;
@@ -63,6 +64,10 @@ public class EndorserSupport implements IEndorserSupport {
 
     @Override
     public ITxSimulator getTxSimulator(String ledgerName, String txId) throws NodeException {
+        if (StringUtils.isBlank(ledgerName)) {
+            return null;
+        }
+
         try {
             INodeLedger nodeLedger = LedgerManager.openLedger(ledgerName);
             return nodeLedger.newTxSimulator(txId);
@@ -74,8 +79,12 @@ public class EndorserSupport implements IEndorserSupport {
 
     @Override
     public IHistoryQueryExecutor getHistoryQueryExecutor(String ledgerName) throws NodeException {
-        INodeLedger nodeLedger = NodeUtils.getLedger(ledgerName);
+        if (StringUtils.isBlank(ledgerName)) {
+            return null;
+        }
+
         try {
+            INodeLedger nodeLedger = LedgerManager.openLedger(ledgerName);
             return nodeLedger.newHistoryQueryExecutor();
         } catch (LedgerException e) {
             log.error(e.getMessage(), e);
@@ -86,8 +95,8 @@ public class EndorserSupport implements IEndorserSupport {
     @Override
     public TransactionPackage.ProcessedTransaction getTransactionById(String groupId, String txId) throws
             NodeException {
-        INodeLedger nodeLedger = NodeUtils.getLedger(groupId);
         try {
+            INodeLedger nodeLedger = LedgerManager.openLedger(groupId);
             return nodeLedger.getTransactionByID(txId);
         } catch (LedgerException e) {
             log.error(e.getMessage(), e);

@@ -15,8 +15,10 @@
  */
 package org.bcia.javachain.common.util.proto;
 
+import com.google.common.primitives.Bytes;
 import com.google.protobuf.ByteString;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.csp.factory.CspManager;
 import org.bcia.javachain.csp.gm.GmCspFactory;
@@ -26,6 +28,8 @@ import org.bcia.javachain.node.entity.MockCrypto;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.Smartcontract;
+import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.util.encoders.HexEncoder;
 
 import java.nio.charset.Charset;
 import java.util.Map;
@@ -140,8 +144,8 @@ public class ProposalUtils {
         ICsp csp = CspManager.getDefaultCsp();
         byte[] bytes1 = ArrayUtils.addAll(creator, nonce);
         byte[] resultBytes = csp.hash(bytes1, null);
-        String txId = new String(resultBytes, Charset.forName("UTF-8"));
-        return txId;
+//        String txId = new String(resultBytes, Charset.forName("UTF-8"));
+        return Hex.toHexString(resultBytes);
     }
 
     /**

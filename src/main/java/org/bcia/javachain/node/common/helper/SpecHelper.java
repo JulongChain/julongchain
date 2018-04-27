@@ -63,7 +63,11 @@ public class SpecHelper {
         //构造SmartContractInput对象
         Smartcontract.SmartContractInput.Builder inputBuilder = Smartcontract.SmartContractInput.newBuilder();
         for (byte[] bytes : args) {
-            inputBuilder.addArgs(ByteString.copyFrom(bytes));
+            if (bytes != null) {
+                inputBuilder.addArgs(ByteString.copyFrom(bytes));
+            }else{
+                inputBuilder.addArgs(ByteString.copyFrom(new byte[0]));
+            }
         }
         Smartcontract.SmartContractInput input = inputBuilder.build();
 

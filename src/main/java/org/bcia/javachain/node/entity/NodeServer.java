@@ -51,6 +51,8 @@ public class NodeServer {
 
     private Node node;
 
+    private ISystemSmartContractManager systemSmartContractManager;
+
     public NodeServer() {
     }
 
@@ -155,13 +157,20 @@ public class NodeServer {
             }
         }.start();
 
+        node.initialize(new Node.InitializeCallback() {
+            @Override
+            public void onGroupInitialized(String groupId) {
+                systemSmartContractManager.deploySysSmartContracts(groupId);
+            }
+        });
+
 
     }
 
     private void initSysSmartContracts() {
         log.info("Init system smart contracts");
 
-        ISystemSmartContractManager systemSmartContractManager = new SystemSmartContractManager();
+        systemSmartContractManager = new SystemSmartContractManager();
         systemSmartContractManager.deploySysSmartContracts("");
     }
 

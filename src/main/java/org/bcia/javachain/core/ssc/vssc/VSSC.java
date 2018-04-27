@@ -18,6 +18,8 @@ package org.bcia.javachain.core.ssc.vssc;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.cauthdsl.PolicyProvider;
 import org.bcia.javachain.common.channelconfig.ApplicationCapabilities;
+import org.bcia.javachain.common.exception.PolicyException;
+import org.bcia.javachain.common.exception.SysSmartContractException;
 import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -153,7 +155,35 @@ public class VSSC extends SystemSmartContractBase {
         // loop through each of the actions within
         List<TransactionPackage.TransactionAction> list = transaction.getActionsList();
         for (TransactionPackage.TransactionAction action:list) {
-             //待补充
+            TransactionPackage.SmartContractActionPayload scap =null;
+            try {
+                scap=TransactionPackage.SmartContractActionPayload.parseFrom(action.getPayload());
+            } catch (InvalidProtocolBufferException e) {
+                String msg=String.format("VSSC error: GetSmartContractActionPayload failed, err %s",e.getMessage());
+                log.error(msg);
+                return newErrorResponse(msg);
+            }
+            List<SignedData> signatureSet =null;
+            try {
+                signatureSet=deduplicateIdentity(scap);
+            } catch (SysSmartContractException e) {
+                return newErrorResponse(e.getMessage());
+            }
+            try {
+                policy.evaluate(signatureSet);
+            } catch (PolicyException e) {
+                log.warn("Endorsement policy failure for transaction txid={}, err:{}",groupHeader.getTxId(),e.getMessage());
+                if(signatureSet.size()<scap.getAction().getEndorsementsCount()){
+                    // Warning: duplicated identities exist, endorsement failure might be cause by this reason
+                    return newErrorResponse(DUPLICATED_IDENTITY_ERROR);
+                }
+                return newErrorResponse(String.format("VSSC error: policy evaluation failed, err %s",e.getMessage()));
+            }
+
+            groupHeader.getExtension();
+
+
+
         }
 
         log.debug("VSSC exits successfully");
@@ -199,7 +229,8 @@ public class VSSC extends SystemSmartContractBase {
         return null;
     }
 
-    private SignedData deduplicateIdentity(TransactionPackage.SmartContractActionPayload scap){
+    private List<SignedData> deduplicateIdentity(TransactionPackage.SmartContractActionPayload scap)
+                                   throws SysSmartContractException{
         return null;
     }
 }

@@ -31,30 +31,33 @@ import java.util.List;
  * @company Dingxuan
  */
 public class NodeUtils {
-    public static INodeLedger getLedger(String groupID){
+    public static INodeLedger getLedger(String groupID) {
         return null;
     }
 
     /**
-     *  getMSPIDs returns the ID of each application MSP defined on this group
+     * getMSPIDs returns the ID of each application MSP defined on this group
+     *
      * @param groupID
      * @return
      */
-    public static String[] getMspIDs(String groupID){
+    public static String[] getMspIDs(String groupID) {
         return null;
     }
 
     /**
      * CreateChainFromBlock creates a new chain from config block
+     *
      * @param block
      * @throws JavaChainException
      */
-    public static void createChainFromBlock(Common.Block block) throws JavaChainException{
+    public static void createChainFromBlock(Common.Block block) throws JavaChainException {
 
     }
 
     /**
      * initChain takes care to initialize chain after peer joined, for example deploys system CCs
+     *
      * @param groupID
      */
     public static void initChain(String groupID) {
@@ -63,6 +66,7 @@ public class NodeUtils {
     /**
      * getCurrConfigBlock returns the cached config block of the specified chain.
      * Note that this call returns nil if chain cid has not been created.
+     *
      * @param groupID
      * @return
      */

@@ -16,12 +16,14 @@
 package org.bcia.javachain.common.configtx;
 
 import org.apache.commons.lang3.StringUtils;
+import org.bcia.javachain.common.configtx.util.ConfigMapUtils;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.policies.IPolicyManager;
 import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -36,10 +38,10 @@ public class Validator implements IValidator {
     private static final String REGEX_GROUP_ID = "[a-z][a-z0-9.-]*";
     private static final String REGEX_CONFIG_ID = "[a-zA-Z0-9.-]+";
 
-
     private String groupId;
     private long sequence;
     private Configtx.Config config;
+    private Map<String, ConfigComparable> configComparableMap;
     private String namespace;
     private IPolicyManager policyManager;
 
@@ -55,7 +57,8 @@ public class Validator implements IValidator {
 
         validateGroupId(groupId);
 
-
+        //TODO：待补充
+        this.configComparableMap = ConfigMapUtils.mapConfig(config.getGroupTree(), namespace);
     }
 
     private void validateGroupId(String groupId) throws ValidateException {

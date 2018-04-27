@@ -15,21 +15,33 @@
  */
 package org.bcia.javachain.node;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.cli.ParseException;
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.INodeLedger;
+import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
+import org.bcia.javachain.core.node.GroupSupport;
 import org.bcia.javachain.csp.factory.IFactoryOpts;
 import org.bcia.javachain.csp.gm.GmFactoryOpts;
 import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.msp.mspconfig.MspConfig;
 import org.bcia.javachain.node.cmd.INodeCmd;
 import org.bcia.javachain.node.cmd.factory.NodeCmdFactory;
+import org.bcia.javachain.node.entity.Group;
+import org.bcia.javachain.node.util.LedgerUtils;
 import org.bcia.javachain.node.util.NodeConstant;
+import org.bcia.javachain.protos.common.Common;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.bcia.javachain.msp.mspconfig.MspConfigFactory.loadMspConfig;
 
@@ -45,12 +57,37 @@ public class Node {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Node.class);
 
     /**
+     * 单例模式，确保系统智能合约能够调用到独一实例
+     */
+    private static Node instance;
+
+    /**
      * 对命令行的支持
      */
     private INodeCmd nodeCmd;
 
+    private GroupSupport groupSupport;
+
+    private Map<String, Group> groupMap = new ConcurrentHashMap<String, Group>();
+
+    private InitializeCallback initializeCallback;
+
     public Node() throws NodeException {
         init();
+
+        instance = this;
+    }
+
+    public static Node getInstance() throws NodeException {
+        if (instance == null) {
+            synchronized (Node.class) {
+                if (instance == null) {
+                    new Node();
+                }
+            }
+        }
+
+        return instance;
     }
 
     /**
@@ -88,6 +125,7 @@ public class Node {
             String[] cleanArgs = new String[args.length - cmdWordCount];
             System.arraycopy(args, cmdWordCount, cleanArgs, 0, cleanArgs.length);
             //只传给子命令正式的参数值
+            log.info("Node Command begin");
             nodeCmd.execCmd(cleanArgs);
         }
 
@@ -182,4 +220,46 @@ public class Node {
 //        private INodeLedger ledger;
 //        private FileLedger fileLedger;
 //    }
+
+    public void initialize(InitializeCallback callback) {
+        this.initializeCallback = callback;
+
+        try {
+            LedgerManager.initialize(null);
+
+            List<String> ledgerIDs = LedgerManager.getLedgerIDs();
+            if (ledgerIDs != null) {
+                for (String ledgerId : ledgerIDs) {
+                    INodeLedger nodeLedger = LedgerManager.openLedger(ledgerId);
+
+                    log.info("ledgerId-----$" + ledgerId);
+
+                    Common.Block configBlock = LedgerUtils.getConfigBlockFromLedger(nodeLedger);
+
+                    createGroup(ledgerId, nodeLedger, configBlock);
+
+                    if (callback != null) {
+                        callback.onGroupInitialized(ledgerId);
+                    }
+                }
+            }
+        } catch (LedgerException e) {
+            e.printStackTrace();
+        } catch (ValidateException e) {
+            e.printStackTrace();
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createGroup(String groupId, INodeLedger nodeLedger, Common.Block configBlock) {
+
+
+    }
+
+    public interface InitializeCallback {
+        void onGroupInitialized(String groupId);
+    }
+
+
 }

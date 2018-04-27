@@ -13,21 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.policies;
-
-import org.bcia.javachain.common.exception.PolicyException;
-import org.bcia.javachain.common.util.proto.SignedData;
-
-import java.util.List;
+package org.bcia.javachain.common.resourceconfig.config;
 
 /**
- * 策略接口
+ * 节点策略配置接口
  *
  * @author zhouhui
- * @date 2018/3/9
+ * @date 2018/4/25
  * @company Dingxuan
  */
-public interface IPolicy {
-
-    void evaluate(List<SignedData> signatureList) throws PolicyException;
+public interface INodePoliciesConfig {
 }

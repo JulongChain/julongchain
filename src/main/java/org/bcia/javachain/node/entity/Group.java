@@ -13,21 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.policies;
+package org.bcia.javachain.node.entity;
 
-import org.bcia.javachain.common.exception.PolicyException;
-import org.bcia.javachain.common.util.proto.SignedData;
-
-import java.util.List;
+import org.bcia.javachain.core.commiter.ICommiterServer;
+import org.bcia.javachain.core.node.GroupSupport;
+import org.bcia.javachain.protos.common.Common;
 
 /**
- * 策略接口
+ * 群组对象
  *
  * @author zhouhui
- * @date 2018/3/9
+ * @date 2018/4/27
  * @company Dingxuan
  */
-public interface IPolicy {
+public class Group {
+    private GroupSupport groupSupport;
+    private Common.Block block;
+    private ICommiterServer commiter;
 
-    void evaluate(List<SignedData> signatureList) throws PolicyException;
+
 }

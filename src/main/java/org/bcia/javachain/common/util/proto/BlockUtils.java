@@ -15,8 +15,11 @@
  */
 package org.bcia.javachain.common.util.proto;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.protos.common.Common;
 
 /**
@@ -31,24 +34,24 @@ public class BlockUtils {
         return Common.Block.parseFrom(blockBytes);
     }
 
-    public static String getGroupIDFromBlock(Common.Block block) throws JavaChainException{
+    public static String getGroupIDFromBlock(Common.Block block) throws JavaChainException {
         Common.Envelope envelope = null;
         Common.Payload payload = null;
         Common.GroupHeader gh = null;
         try {
-            if(block == null || block.getData() == null || block.getData().getDataCount() == 0){
+            if (block == null || block.getData() == null || block.getData().getDataCount() == 0) {
                 return null;
             }
             envelope = Common.Envelope.parseFrom(block.getData().getData(0));
-            if(envelope == null || envelope.getPayload() == null){
+            if (envelope == null || envelope.getPayload() == null) {
                 return null;
             }
             payload = Common.Payload.parseFrom(envelope.getPayload());
-            if(payload.getHeader() == null || payload.getHeader().getGroupHeader() == null){
+            if (payload.getHeader() == null || payload.getHeader().getGroupHeader() == null) {
                 return null;
             }
             gh = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
-            if(gh == null || gh.getGroupId() == null){
+            if (gh == null || gh.getGroupId() == null) {
                 return null;
             }
         } catch (InvalidProtocolBufferException e) {
@@ -57,7 +60,56 @@ public class BlockUtils {
         return gh.getGroupId();
     }
 
-    public static Common.Envelope extractEnvelope(Common.Block block,int index)throws  JavaChainException{
+    public static Common.Envelope extractEnvelope(Common.Block block, int index) throws JavaChainException {
         return null;
+    }
+
+    /**
+     * 获取最新配置所在的索引
+     *
+     * @param block
+     * @return
+     * @throws InvalidProtocolBufferException
+     * @throws ValidateException
+     */
+    public static long getLastConfigIndexFromBlock(Common.Block block) throws InvalidProtocolBufferException,
+            ValidateException {
+        Common.Metadata lastConfigMetadata = getMetadataFromBlock(block, Common.BlockMetadataIndex
+                .LAST_CONFIG_VALUE);
+
+        //非空校验
+        ValidateUtils.isNotNull(lastConfigMetadata, "lastConfigMetadata can not be null");
+
+        Common.LastConfig lastConfig = Common.LastConfig.parseFrom(lastConfigMetadata.getValue());
+        ValidateUtils.isNotNull(lastConfig, "lastConfig can not be null");
+
+        return lastConfig.getIndex();
+    }
+
+    /**
+     * 从区块中获取元数据
+     *
+     * @param block
+     * @param blockMetadataIndex
+     * @return
+     * @throws InvalidProtocolBufferException
+     * @throws ValidateException
+     */
+    public static Common.Metadata getMetadataFromBlock(Common.Block block, int blockMetadataIndex) throws
+            InvalidProtocolBufferException, ValidateException {
+        //非空校验
+        ValidateUtils.isNotNull(block, "block can not be null");
+        ValidateUtils.isNotNull(block.getMetadata(), "block.metadata can not be null");
+        if (block.getMetadata().getMetadataList() == null || block.getMetadata().getMetadataList().isEmpty()) {
+            throw new ValidateException("block.metadata.metadataList can not be null");
+        }
+
+        //索引值校验
+        if (blockMetadataIndex < 0 || blockMetadataIndex > block.getMetadata().getMetadataCount() - 1) {
+            throw new ValidateException("Wrong blockMetadataIndex: " + blockMetadataIndex);
+        }
+
+        ByteString byteString = block.getMetadata().getMetadata(blockMetadataIndex);
+        return Common.Metadata.parseFrom(byteString);
     }
 }
