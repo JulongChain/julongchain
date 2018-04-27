@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.node.util;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.util.ValidateUtils;
@@ -32,7 +33,7 @@ import org.bcia.javachain.protos.common.Ledger;
  */
 public class LedgerUtils {
     public static Common.Block getConfigBlockFromLedger(INodeLedger nodeLedger) throws LedgerException,
-            ValidateException {
+            ValidateException, InvalidProtocolBufferException {
         Ledger.BlockchainInfo blockchainInfo = nodeLedger.getBlockchainInfo();
         ValidateUtils.isNotNull(blockchainInfo, "blockchainInfo can not be null");
 

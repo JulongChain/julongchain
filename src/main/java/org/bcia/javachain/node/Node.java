@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.node;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.NodeException;
@@ -245,6 +246,8 @@ public class Node {
         } catch (LedgerException e) {
             e.printStackTrace();
         } catch (ValidateException e) {
+            e.printStackTrace();
+        } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
         }
     }

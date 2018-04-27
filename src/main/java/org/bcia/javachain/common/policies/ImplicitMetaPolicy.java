@@ -19,6 +19,7 @@ import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.protos.common.Policies;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -60,7 +61,7 @@ public class ImplicitMetaPolicy implements IPolicy {
 
 
     @Override
-    public void evaluate(SignedData[] signatureSet) throws PolicyException {
+    public void evaluate(List<SignedData> signatureSet) throws PolicyException {
         int remaining = threshold;
 
         for (IPolicy policy : subPolicies) {
