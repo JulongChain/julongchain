@@ -18,10 +18,10 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 
 /**
- * 类描述
+ * 封装版本信息
  *
- * @author wanliangbing
- * @date 2018/3/9
+ * @author sunzongyu
+ * @date 2018/4/9
  * @company Dingxuan
  */
 public class VersionedValue {

@@ -19,7 +19,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.core.ledger.util.Util;
 
 /**
- * 类描述
+ * 封装版本信息
  *
  * @author wanliangbing
  * @date 2018/3/9

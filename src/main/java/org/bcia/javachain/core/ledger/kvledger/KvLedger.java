@@ -24,10 +24,12 @@ import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.FsBlockStore;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.*;
+import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.kvledger.history.historydb.IHistoryDB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.TxManager;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr.LockBasedTxManager;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.ledgerstorage.Store;
 import org.bcia.javachain.core.ledger.sceventmgmt.ISmartContractLifecycleEventListener;
 import org.bcia.javachain.core.ledger.sceventmgmt.ScEventMgmt;
@@ -38,7 +40,7 @@ import org.bcia.javachain.protos.node.TransactionPackage;
 import java.util.*;
 
 /**
- * 类描述
+ * 账本类
  *
  * @author sunzongyu
  * @date 2018/04/13
@@ -244,7 +246,7 @@ public class KvLedger implements INodeLedger {
     }
 
     /** NewHistoryQueryExecutor gives handle to a history query executor.
-     * A client can obtain more than one 'HistoryQueryExecutor's for parallel execution.
+     * A client can obtain more than one 'IHistoryQueryExecutor's for parallel execution.
      * Any synchronization should be performed at the implementation level if required
      * Pass the ledger blockstore so that historical values can be looked up from the chain
      */
@@ -299,7 +301,6 @@ public class KvLedger implements INodeLedger {
     public synchronized void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException {
         Common.Block block = blockAndPvtData.getBlock();
         long blockNo = block.getHeader().getNumber();
-//        long blockNo = 0;
         logger.debug(String.format("Channel %s: Validating state for block %d", ledgerID, blockNo));
         //TODO 验证器
         txtmgmt.validateAndPrepare(blockAndPvtData, true);
@@ -310,7 +311,7 @@ public class KvLedger implements INodeLedger {
         logger.debug(String.format("Channel %s: Committing block %d transaction to state db", ledgerID, blockNo));
         txtmgmt.commit();
         //TODO history db enable
-        if(true){
+        if(LedgerConfig.isHistoryDBEnabled()){
             logger.debug(String.format("Channel %s: Committing block %d transaction to history db", ledgerID, blockNo));
             historyDB.commit(block);
         }

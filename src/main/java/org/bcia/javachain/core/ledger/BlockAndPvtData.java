@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 类描述
+ * 封装block、私有数据
  *
  * @author sunzongyu
  * @date 2018/04/09

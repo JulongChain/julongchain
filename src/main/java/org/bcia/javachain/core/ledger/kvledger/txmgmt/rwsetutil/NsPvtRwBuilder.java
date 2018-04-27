@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 类描述
+ * namespace private rwset 构建
  *
  * @author sunzongyu
  * @date 2018/04/16

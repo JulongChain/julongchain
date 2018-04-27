@@ -16,10 +16,13 @@ limitations under the License.
 package org.bcia.javachain.core.ledger;
 
 import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.genesis.GenesisBlockFactory;
+import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
 import org.bcia.javachain.common.util.proto.BlockUtils;
 import org.bcia.javachain.core.ledger.kvledger.KvLedger;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Configtx;
 import org.junit.Test;
 
 import java.io.File;
@@ -51,36 +54,17 @@ public class LedgerManagerTest {
 
     @Test
     public void createLedger() throws Exception {
-//        deleteDir(new File(Config.getPath()));
+        GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
+        System.out.println(deleteDir(new File(Config.getPath())));
         long before = System.currentTimeMillis();
         LedgerManager.initialize(null);
-        Common.Block block = Common.Block.newBuilder()
-                .setHeader(Common.BlockHeader.newBuilder()
-                        .setNumber(0)
-                        .setDataHash(ByteString.copyFromUtf8("DataHash"))
-                        .setPreviousHash(ByteString.copyFromUtf8("PreviousHash"))
-                        .build())
-                .setData(Common.BlockData.newBuilder()
-                        .addData(Common.Envelope.newBuilder()
-                                .setPayload(Common.Payload.getDefaultInstance().toByteString())
-                                .build().toByteString())
-                        .addData(Common.Envelope.newBuilder()
-                                .setPayload(Common.Payload.getDefaultInstance().toByteString())
-                                .build().toByteString())
-                        .build())
-                .setMetadata(Common.BlockMetadata.newBuilder()
-                        .addMetadata(ByteString.EMPTY)
-                        .addMetadata(ByteString.EMPTY)
-                        .addMetadata(ByteString.EMPTY)
-                        .addMetadata(ByteString.EMPTY)
-                        .build())
-                .build();
-//        l = LedgerManager.createLedger(block);
-        l = LedgerManager.openLedger("testGroup");
+        l = LedgerManager.createLedger(factory.getGenesisBlock("MyGroup"));
         List<String> list = LedgerManager.getLedgerIDs();
         list.forEach((s) -> {
             System.out.println(s);
         });
+        ITxSimulator simulator = l.newTxSimulator("MyGroup");
+//        simulator.
     }
 
     @Test

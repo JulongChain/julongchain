@@ -16,10 +16,10 @@
 package org.bcia.javachain.core.ledger.kvledger;
 
 /**
- * 类描述
+ * 可恢复的数据库接口
  *
- * @author wanliangbing
- * @date 2018/3/9
+ * @author sunzongyu
+ * @date 2018/4/9
  * @company Dingxuan
  */
 public class Recoverer {

@@ -176,6 +176,8 @@ public class BlockFileManager {
 
     /**
      * 添加区块
+     * blockBytesLenEncoded     8
+     * blockbytes               blockBytesLen
      */
     public synchronized void addBlock(Common.Block block) throws LedgerException {
         if(block.getHeader().getNumber() != getBlockchainInfo().getHeight()){

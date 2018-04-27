@@ -20,7 +20,7 @@ import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.ledger.kvledger.history.HistoryQueryExecutor;
+import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.iq80.leveldb.DBIterator;
 
@@ -31,7 +31,7 @@ import org.iq80.leveldb.DBIterator;
  * @date 2018/04/04
  * @company Dingxuan
  */
-public class HistoryLevelDBQueryExecutor implements HistoryQueryExecutor {
+public class HistoryLevelDBQueryExecutor implements IHistoryQueryExecutor {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(HistoryLevelDBQueryExecutor.class);
 
     private HistoryLevelDB historyDB;

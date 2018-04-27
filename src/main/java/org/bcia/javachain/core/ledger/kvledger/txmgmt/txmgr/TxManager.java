@@ -25,7 +25,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import java.util.Map;
 
 /**
- * 类描述
+ * 交易管理者接口
  *
  * @author sunzongyu
  * @date 2018/04/19

@@ -43,7 +43,7 @@ import org.bcia.javachain.protos.node.TransactionPackage;
 import java.util.Map;
 
 /**
- * 类描述
+ * 辅助验证器
  *
  * @author sunzongyu
  * @date 2018/04/20

@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * 类描述
+ * kv查询类
  *
  * @author sunzongyu
  * @date 2018/04/13

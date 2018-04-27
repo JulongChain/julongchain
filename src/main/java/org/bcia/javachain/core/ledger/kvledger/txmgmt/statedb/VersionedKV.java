@@ -16,7 +16,7 @@
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 
 /**
- *
+ * 封装版本信息
  *
  * @author sunzongyu
  * @date 2018/04/16

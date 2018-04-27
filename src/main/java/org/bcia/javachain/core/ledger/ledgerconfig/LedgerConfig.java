@@ -21,7 +21,7 @@ import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
 import java.io.File;
 
 /**
- * 类描述
+ * 账本配置
  *
  * @author sunzongyu
  * @date 2018/04/23

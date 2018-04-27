@@ -24,7 +24,7 @@ import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
-import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
+import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.util.TxValidationFlags;
 import org.bcia.javachain.core.ledger.util.Util;
@@ -84,7 +84,7 @@ public class HistoryLevelDB implements IHistoryDB {
 
     @Override
     public IHistoryQueryExecutor newHistoryQueryExecutor(BlockStore blockStore) throws LedgerException {
-        HistoryLevelQueryExecutor executor = new HistoryLevelQueryExecutor();
+        HistoryLevelDBQueryExecutor executor = new HistoryLevelDBQueryExecutor();
         executor.setBlockStore(blockStore);
         executor.setHistoryDB(this);
         return executor;

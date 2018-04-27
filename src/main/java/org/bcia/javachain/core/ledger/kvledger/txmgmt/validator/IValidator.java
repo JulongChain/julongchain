@@ -20,7 +20,7 @@ import org.bcia.javachain.core.ledger.BlockAndPvtData;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.UpdateBatch;
 
 /**
- * 类描述
+ * 验证器接口
  *
  * @author sunzongyu
  * @date 2018/04/19

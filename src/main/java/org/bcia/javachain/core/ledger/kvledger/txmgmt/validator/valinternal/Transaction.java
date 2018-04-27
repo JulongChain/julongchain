@@ -23,7 +23,7 @@ import org.bcia.javachain.protos.ledger.rwset.Rwset;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
 /**
- * 类描述
+ * 封装交易对象
  *
  * @author sunzongyu
  * @date 2018/04/19

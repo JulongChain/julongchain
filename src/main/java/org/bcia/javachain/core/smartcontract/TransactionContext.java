@@ -16,8 +16,8 @@
 package org.bcia.javachain.core.smartcontract;
 
 import org.bcia.javachain.common.ledger.ResultsIterator;
-import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.ITxSimulator;
+import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.SmartcontractShim;
 

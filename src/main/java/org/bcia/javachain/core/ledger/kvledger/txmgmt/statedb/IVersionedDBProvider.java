@@ -18,10 +18,10 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 import org.bcia.javachain.common.exception.LedgerException;
 
 /**
- * IVersionedDBProvider provides an instance of an versioned DB
+ * 操作versionDB接口
  *
- * @author wanliangbing
- * @date 2018/3/9
+ * @author sunzongyu
+ * @date 2018/4/9
  * @company Dingxuan
  */
 public interface IVersionedDBProvider {

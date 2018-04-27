@@ -16,19 +16,11 @@
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 
 /**
- * 类描述
+ * 所为所有迭代器统一的输出接口
  *
- * @author wanliangbing
- * @date 2018/3/9
+ * @author sunzongyu
+ * @date 2018/4/9
  * @company Dingxuan
  */
 public interface QueryResult {
-//
-//    public CompositeKey getCompositeKey();
-//
-//    public void setCompositeKey(CompositeKey compositeKey);
-//
-//    public VersionedValue getVersionedValue();
-//
-//    public void setVersionedValue(VersionedValue versionedValue);
 }

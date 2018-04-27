@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 类描述
+ * 读写集合
  *
  * @author sunzongyu
  * @date 2018/04/16

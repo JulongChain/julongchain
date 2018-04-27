@@ -22,7 +22,7 @@ import org.bcia.javachain.core.ledger.util.Util;
 import org.bcia.javachain.protos.ledger.rwset.Rwset;
 
 /**
- * 类描述
+ * 序列化kv
  *
  * @author sunzongyu
  * @date 2018/04/18

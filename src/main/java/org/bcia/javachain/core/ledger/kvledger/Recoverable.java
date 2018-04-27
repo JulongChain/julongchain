@@ -22,10 +22,10 @@ import org.bcia.javachain.protos.common.Common;
 import java.util.Map;
 
 /**
- * 类描述
+ * 恢复账本接口
  *
- * @author wanliangbing
- * @date 2018/3/9
+ * @author sunzongyu
+ * @date 2018/4/9
  * @company Dingxuan
  */
 public interface Recoverable {

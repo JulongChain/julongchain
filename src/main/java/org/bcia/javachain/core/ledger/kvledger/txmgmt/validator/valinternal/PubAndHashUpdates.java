@@ -25,7 +25,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
 /**
- * 类描述
+ * 共有hash数据更新包
  *
  * @author sunzongyu
  * @date 2018/04/19

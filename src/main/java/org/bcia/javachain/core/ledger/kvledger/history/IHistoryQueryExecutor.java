@@ -25,6 +25,6 @@ import org.bcia.javachain.common.ledger.ResultsIterator;
  * @date 2018/04/25
  * @company Dingxuan
  */
-public interface HistoryQueryExecutor {
+public interface IHistoryQueryExecutor {
     ResultsIterator getHistoryForKey(String ns, String key) throws LedgerException;
 }

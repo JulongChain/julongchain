@@ -21,8 +21,8 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractContext;
 import org.bcia.javachain.core.container.api.IBuildSpecFactory;
 import org.bcia.javachain.core.container.scintf.ISmartContractStream;
-import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.ITxSimulator;
+import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.javachain.core.smartcontract.node.SmartContractSupportService;
 import org.bcia.javachain.core.smartcontract.shim.SmartContractProvider;
 
@@ -203,7 +203,7 @@ public class SmartContractSupport {
     }
 
     /**
-     * use this for ledger access and make sure HistoryQueryExecutor is being
+     * use this for ledger access and make sure IHistoryQueryExecutor is being
      * used
      *
      * @param context

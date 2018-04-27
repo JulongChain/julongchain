@@ -18,6 +18,7 @@ package org.bcia.javachain.core.ledger;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.ILedger;
 import org.bcia.javachain.common.ledger.PrunePolicy;
+import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
