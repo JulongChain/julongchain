@@ -178,7 +178,11 @@ public class KvLedger implements INodeLedger {
      */
     @Override
     public Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException {
-        return blockStore.getBlockchainInfo();
+        try {
+            return blockStore.getBlockchainInfo();
+        } catch (LedgerException e) {
+            return null;
+        }
     }
 
     /** GetBlockByNumber returns block at a given height
@@ -186,7 +190,11 @@ public class KvLedger implements INodeLedger {
      */
     @Override
     public Common.Block getBlockByNumber(long blockNumber) throws LedgerException {
-        return blockStore.retrieveBlockByNumber(blockNumber);
+        try {
+            return blockStore.retrieveBlockByNumber(blockNumber);
+        } catch (LedgerException e) {
+            return null;
+        }
     }
 
     /** GetBlocksIterator returns an iterator that starts from `startBlockNumber`(inclusive).
@@ -195,7 +203,11 @@ public class KvLedger implements INodeLedger {
      */
     @Override
     public ResultsIterator getBlocksIterator(long startBlockNumber) throws LedgerException{
-        return blockStore.retrieveBlocks(startBlockNumber);
+        try {
+            return blockStore.retrieveBlocks(startBlockNumber);
+        } catch (LedgerException e) {
+            return null;
+        }
     }
 
     /** GetBlockByHash returns a block given it's hash
@@ -205,7 +217,11 @@ public class KvLedger implements INodeLedger {
      */
     @Override
     public Common.Block getBlockByHash(byte[] blockHash) throws LedgerException {
-        return blockStore.retrieveBlockByHash(blockHash);
+        try {
+            return blockStore.retrieveBlockByHash(blockHash);
+        } catch (LedgerException e) {
+            return null;
+        }
     }
 
     /** GetBlockByTxID returns a block which contains a transaction
@@ -215,12 +231,20 @@ public class KvLedger implements INodeLedger {
      */
     @Override
     public Common.Block getBlockByTxID(String txID) throws LedgerException {
-        return blockStore.retrieveBlockByTxID(txID);
+        try {
+            return blockStore.retrieveBlockByTxID(txID);
+        } catch (LedgerException e) {
+            return null;
+        }
     }
 
     @Override
     public TransactionPackage.TxValidationCode getTxValidationCodeByTxID(String txID) throws LedgerException {
-        return blockStore.retrieveTxValidationCodeByTxID(txID);
+        try {
+            return blockStore.retrieveTxValidationCodeByTxID(txID);
+        } catch (LedgerException e) {
+            return null;
+        }
     }
 
     /** NewTxSimulator returns new `ledger.TxSimulator`
@@ -229,7 +253,11 @@ public class KvLedger implements INodeLedger {
      */
     @Override
     public ITxSimulator newTxSimulator(String txId) throws LedgerException {
-        return txtmgmt.newTxSimulator(txId);
+        try {
+            return txtmgmt.newTxSimulator(txId);
+        } catch (LedgerException e) {
+            return null;
+        }
     }
 
     /** Prune prunes the blocks/transactions that satisfy the given policy
@@ -248,7 +276,11 @@ public class KvLedger implements INodeLedger {
     @Override
     public IQueryExecutor newQueryExecutor() throws LedgerException{
         //TODO uuid
-        return txtmgmt.newQueryExecutor(UUID.randomUUID().toString());
+        try {
+            return txtmgmt.newQueryExecutor(UUID.randomUUID().toString());
+        } catch (LedgerException e) {
+            return null;
+        }
     }
 
     /** NewHistoryQueryExecutor gives handle to a history query executor.
@@ -258,17 +290,29 @@ public class KvLedger implements INodeLedger {
      */
     @Override
     public IHistoryQueryExecutor newHistoryQueryExecutor() throws LedgerException {
-        return historyDB.newHistoryQueryExecutor(blockStore);
+        try {
+            return historyDB.newHistoryQueryExecutor(blockStore);
+        } catch (LedgerException e) {
+            return null;
+        }
     }
 
     @Override
     public BlockAndPvtData getPvtDataAndBlockByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
-        return ((Store) blockStore).getPvtDataAndBlockByNum(blockNum, filter);
+        try {
+            return ((Store) blockStore).getPvtDataAndBlockByNum(blockNum, filter);
+        } catch (LedgerException e) {
+            return null;
+        }
     }
 
     @Override
     public List<TxPvtData> getPvtDataByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
-        return ((Store) blockStore).getPvtDataByNum(blockNum, filter);
+        try {
+            return ((Store) blockStore).getPvtDataByNum(blockNum, filter);
+        } catch (LedgerException e) {
+            return null;
+        }
     }
 
     @Override
