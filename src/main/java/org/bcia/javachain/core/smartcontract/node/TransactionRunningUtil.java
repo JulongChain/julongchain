@@ -56,6 +56,9 @@ public class TransactionRunningUtil {
   private static Map<String, SmartcontractShim.SmartContractMessage> txIdAndMessageMap =
       Collections.synchronizedMap(new HashMap<String, SmartcontractShim.SmartContractMessage>());
 
+  private static Map<String, List<KvRwset.KVWrite>> txIdAndKvWriteMap =
+      Collections.synchronizedMap(new HashMap<String, List<KvRwset.KVWrite>>());
+
   public static void addTxMessage(
       String smartContractId,
       String txId,
@@ -87,6 +90,21 @@ public class TransactionRunningUtil {
 
   public static List<KvRwset.KVRead> getKvReads(String smartContractId, String txId) {
     return txIdAndKvReadMap.get(composite(smartContractId, txId));
+  }
+
+  public static void addKvWrite(String smartContractId, String txId, KvRwset.KVWrite kvWrite) {
+    String composite = composite(smartContractId, txId);
+    if (txIdAndKvWriteMap.get(composite) == null) {
+      List<KvRwset.KVWrite> list = new ArrayList<KvRwset.KVWrite>();
+      list.add(kvWrite);
+      txIdAndKvWriteMap.put(composite, list);
+    } else {
+      txIdAndKvWriteMap.get(composite).add(kvWrite);
+    }
+  }
+
+  public static List<KvRwset.KVWrite> getKvWrites(String smartContractId, String txId) {
+    return txIdAndKvWriteMap.get(composite(smartContractId, txId));
   }
 
   /**

@@ -65,13 +65,14 @@ public class SmartContractSupportClient extends SmartContractBase {
   @Override
   public SmartContractResponse invoke(ISmartContractStub stub) {
     logger.info("SmartContractSupportClient invoke " + stub.getTxId());
+    /**
     stub.getState("key1");
     stub.getState("key2");
     stub.getState("key3");
-    /**
-    stub.getState("getKey3");
+     */
 
     stub.putState("putKey1", "putValue1".getBytes());
+    /**
     stub.putState("putKey2", "putValue2".getBytes());
     stub.putState("putKey3", "putValue3".getBytes());
     */

@@ -126,9 +126,11 @@ public class SmartContractSupportServer {
 
     List<KvRwset.KVRead> kvReads = TransactionRunningUtil.getKvReads(scId, txId);
 
-    logger.info("kvReads:" +kvReads);
+    logger.info("kvReads:" + kvReads);
 
-    logger.info("all kv reads:" + TransactionRunningUtil.getTxIdAndKvReadMap());
+    List<KvRwset.KVWrite> kvWrites = TransactionRunningUtil.getKvWrites(scId, txId);
+
+    logger.info("kvWrites:" + kvWrites);
 
     while (true) {
       // GroupHeader groupHeader =

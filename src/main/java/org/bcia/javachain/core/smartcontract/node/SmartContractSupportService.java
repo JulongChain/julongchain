@@ -27,10 +27,7 @@ import org.bcia.javachain.core.ledger.leveldb.LevelDB;
 import org.bcia.javachain.core.ledger.leveldb.LevelDBUtil;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
-import org.bcia.javachain.protos.node.ProposalPackage;
-import org.bcia.javachain.protos.node.SmartContractEventPackage;
-import org.bcia.javachain.protos.node.SmartContractSupportGrpc;
-import org.bcia.javachain.protos.node.Smartcontract;
+import org.bcia.javachain.protos.node.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -244,6 +241,25 @@ public class SmartContractSupportService
 
         // 收到putState信息
         if (message.getType().equals(SmartContractMessage.Type.PUT_STATE)) {
+          try {
+            SmartcontractShim.PutState putState = null;
+            putState = SmartcontractShim.PutState.parseFrom(message.getPayload());
+            logger.info(putState.getKey());
+            logger.info(putState.getValue());
+
+            KvRwset.KVWrite kvWrite =
+                KvRwset.KVWrite.newBuilder()
+                    .setKey(putState.getKey())
+                    .setValue(putState.getValue())
+                    .setIsDelete(false)
+                    .build();
+
+            TransactionRunningUtil.addKvWrite(smartContractId, txId, kvWrite);
+
+          } catch (InvalidProtocolBufferException e) {
+            logger.error(e.getMessage(), e);
+          }
+
           SmartContractMessage responseMessage =
               SmartContractMessage.newBuilder()
                   .mergeFrom(message)
@@ -251,6 +267,7 @@ public class SmartContractSupportService
                   .setTxid(txId)
                   .setGroupId(groupId)
                   .build();
+
           responseObserver.onNext(responseMessage);
           return;
         }
