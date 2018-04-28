@@ -142,7 +142,8 @@ public class Endorser implements IEndorserServer {
 //        return ProposalResponseUtils.buildProposalResponse(esscResponse.getPayload());
 
         //无合约提案不需要背书，例如cssc
-        if (StringUtils.isBlank(scName)) {
+        simulateResults = new byte[]{0, 1, 2};//TODO:for test
+        if (StringUtils.isBlank(scName) || CommConstant.CSSC.equals(scName)) {
             return ProposalResponseUtils.buildProposalResponse(response.getPayload());
         } else {
             ProposalResponsePackage.Response response1 = endorseProposal(groupHeader.getGroupId(), groupHeader.getTxId(), signedProposal, proposal, scIdBuilder,
@@ -358,6 +359,8 @@ public class Endorser implements IEndorserServer {
             useSysSmartContract = true;
         }
 
+        useSysSmartContract = true;//TODO:for test
+
         //背书系统智能合约名称
         String essc = null;
         if (useSysSmartContract) {
@@ -407,7 +410,7 @@ public class Endorser implements IEndorserServer {
      * @param spec
      * @return
      */
-    private Object[] callSmartContract(String groupId, String scName, String scVersion, String txId, ProposalPackage
+    public Object[] callSmartContract(String groupId, String scName, String scVersion, String txId, ProposalPackage
             .SignedProposal signedProposal, ProposalPackage.Proposal proposal, Smartcontract
                                                .SmartContractInvocationSpec spec) throws NodeException {
         log.info("begin callSmartContract");

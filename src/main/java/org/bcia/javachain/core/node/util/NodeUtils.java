@@ -184,6 +184,7 @@ public class NodeUtils {
             for (String groupId : groupMap.keySet()) {
                 Query.GroupInfo groupInfo = Query.GroupInfo.newBuilder().setGroupId(groupId).build();
                 groupInfoList.add(groupInfo);
+                log.info("groupId-----$" + groupId);
             }
         } catch (NodeException e) {
             log.error(e.getMessage(), e);
