@@ -21,6 +21,7 @@ import org.bcia.javachain.common.exception.SysSmartContractException;
 import org.bcia.javachain.common.groupconfig.capability.IApplicationCapabilities;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RwSetUtil;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.TxRwSet;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.ssc.lssc.LSSC;
 import org.bcia.javachain.protos.common.Common;
@@ -129,13 +130,17 @@ public class VSSCSupportForLsscInvocation {
                 } catch (InvalidProtocolBufferException e) {
                     throw new SysSmartContractException(String.format("GetSmartContractAction error %s",e.getMessage()));
                 }
-                Rwset.TxReadWriteSet rwSet=null;
+                Rwset.TxReadWriteSet rwSetProto=null;
                 try {
-                    rwSet=Rwset.TxReadWriteSet.parseFrom(respPayload.getResults());
+                    rwSetProto=Rwset.TxReadWriteSet.parseFrom(respPayload.getResults());
                 } catch (InvalidProtocolBufferException e) {
                     throw new SysSmartContractException(e.getMessage());
                 }
-                //RwSetUtil.txRwSetFromProtoMsg
+                TxRwSet txRwSet=null;
+                txRwSet=RwSetUtil.txRwSetFromProtoMsg(rwSetProto);
+                txRwSet.getNsRwSets();
+
+
 
         }
     }
