@@ -47,7 +47,7 @@ public abstract class SmartContractBase implements ISmartContract {
   private boolean tlsEnabled = false;
   private String rootCertFile = "/etc/hyperledger/fabric/peer.crt";
 
-  private String id;
+  protected String id;
 
   private static final String CORE_SMARTCONTRACT_ID_NAME = "CORE_SMARTCONTRACT_ID_NAME";
   private static final String CORE_PEER_ADDRESS = "CORE_PEER_ADDRESS";
