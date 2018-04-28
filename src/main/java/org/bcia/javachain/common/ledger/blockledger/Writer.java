@@ -15,6 +15,7 @@ limitations under the License.
  */
 package org.bcia.javachain.common.ledger.blockledger;
 
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.protos.common.Common;
 
 /**
@@ -28,5 +29,5 @@ public interface Writer {
     /**
      * 写入区块
      */
-    void append(Common.Block block);
+    void append(Common.Block block) throws LedgerException;
 }
