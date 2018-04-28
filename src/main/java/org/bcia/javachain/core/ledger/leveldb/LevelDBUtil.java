@@ -16,6 +16,7 @@ package org.bcia.javachain.core.ledger.leveldb;
 import org.bcia.javachain.common.exception.LevelDBException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.kvledger.history.historydb.HistoryDBHelper;
 import org.iq80.leveldb.*;
 
 import java.io.File;
@@ -194,7 +195,11 @@ public class LevelDBUtil {
     byte[] lastKey = new byte[] {};
     while (iterator.hasNext()) {
       Map.Entry<byte[], byte[]> next = iterator.next();
-      lastKey = next.getKey();
+      if (HistoryDBHelper.checkStart(next.getKey(), startKey)) {
+        lastKey = next.getKey();
+      } else {
+        break;
+      }
     }
     closeSnapshot(snapshot);
     return lastKey;
