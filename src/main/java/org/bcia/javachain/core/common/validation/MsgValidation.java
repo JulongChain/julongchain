@@ -21,6 +21,7 @@ import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.common.util.proto.ProposalUtils;
 import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.IIdentityDeserializer;
@@ -45,10 +46,9 @@ public class MsgValidation {
      * @return 返回扩展域是为了性能上的考虑，不用再次去读取或转化扩展域
      * @throws ValidateException
      */
-    public static ProposalPackage.SmartContractHeaderExtension validateGroupHeader(Common.GroupHeader groupHeader) throws ValidateException {
-        if (groupHeader == null) {
-            throw new ValidateException("Missing groupHeader");
-        }
+    public static ProposalPackage.SmartContractHeaderExtension validateGroupHeader(Common.GroupHeader groupHeader)
+            throws ValidateException {
+        ValidateUtils.isNotNull(groupHeader, "groupHeader can not be null");
 
         //校验消息类型
         if (groupHeader.getType() != Common.HeaderType.ENDORSER_TRANSACTION_VALUE
@@ -118,13 +118,9 @@ public class MsgValidation {
      * @throws ValidateException
      */
     public static Object[] validateCommonHeader(Common.Header header) throws ValidateException {
-        if (header == null) {
-            throw new ValidateException("Missing header");
-        }
-
-        if (header.getGroupHeader() == null) {
-            throw new ValidateException("Missing groupHeader");
-        }
+        ValidateUtils.isNotNull(header, "header can not be null");
+        ValidateUtils.isNotNull(header.getGroupHeader(), "groupHeader can not be null");
+        ValidateUtils.isNotNull(header.getSignatureHeader(), "signatureHeader can not be null");
 
         Common.GroupHeader groupHeader = null;
         try {

@@ -29,8 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @company Dingxuan
  */
 public class NodeTest extends BaseJunit4Test {
-    @Autowired
-    private Node node;
 
     @Before
     public void setUp() throws Exception {
@@ -44,6 +42,8 @@ public class NodeTest extends BaseJunit4Test {
     @Test
     public void execCmd() throws ParseException, NodeException {
         //----------------------------------------正常用例集--------------------------------------------//
+        Node node = Node.getInstance();
+
         //创建群组
         String[] caseArgs1 = new String[]{"group", "create", "-c", "localhost:7050", "-g", "mygroup", "-f",
                 "/home/javachain/group1.tx"};

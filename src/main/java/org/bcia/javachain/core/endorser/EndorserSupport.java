@@ -40,6 +40,8 @@ import org.bcia.javachain.core.ssc.lssc.LSSC;
 import org.bcia.javachain.node.common.helper.SpecHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * 背书能力支持对象(隔离对其他模块的依赖)
@@ -48,14 +50,15 @@ import org.bcia.javachain.protos.node.*;
  * @date 2018/3/15
  * @company Dingxuan
  */
+@Component
 public class EndorserSupport implements IEndorserSupport {
     private static JavaChainLog log = JavaChainLogFactory.getLog(EndorserSupport.class);
 
-    //TODO:Spring
-    private ISystemSmartContractManager sysSmartContractManager = new SystemSmartContractManager();
+    @Autowired
+    private ISystemSmartContractManager sysSmartContractManager;
 
-    //TODO:Spring
-    private SmartContractExecutor smartContractExecutor = new SmartContractExecutor();
+    @Autowired
+    private SmartContractExecutor smartContractExecutor;
 
     @Override
     public boolean isSysSCAndNotInvokableExternal(String scName) {

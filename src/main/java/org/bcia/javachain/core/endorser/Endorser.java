@@ -25,6 +25,8 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
 import org.bcia.javachain.common.util.CommConstant;
+import org.bcia.javachain.common.util.SpringContext;
+import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.common.util.proto.ProposalResponseUtils;
 import org.bcia.javachain.core.common.validation.MsgValidation;
 import org.bcia.javachain.core.ledger.ITxSimulator;
@@ -59,6 +61,7 @@ public class Endorser implements IEndorserServer {
 
     public Endorser(IPrivateDataDistributor distributor) {
         this.distributor = distributor;
+        endorserSupport = SpringContext.getInstance().getBean(EndorserSupport.class);
     }
 
     /**
@@ -86,6 +89,9 @@ public class Endorser implements IEndorserServer {
             //预处理，主要是完成验证和检查
             objs = preProcess(signedProposal);
         } catch (NodeException e) {
+            log.error(e.getMessage(), e);
+            return buildErrorResponse(e.getMessage());
+        } catch (ValidateException e) {
             log.error(e.getMessage(), e);
             return buildErrorResponse(e.getMessage());
         }
@@ -159,14 +165,9 @@ public class Endorser implements IEndorserServer {
      * @return
      * @throws NodeException
      */
-    private Object[] preProcess(ProposalPackage.SignedProposal signedProposal) throws NodeException {
-        if (signedProposal == null) {
-            throw new NodeException("Missing signed proposal");
-        }
-
-        if (signedProposal.getProposalBytes() == null) {
-            throw new NodeException("Missing proposal");
-        }
+    private Object[] preProcess(ProposalPackage.SignedProposal signedProposal) throws NodeException, ValidateException {
+        ValidateUtils.isNotNull(signedProposal, "signedProposal can not be null");
+        ValidateUtils.isNotNull(signedProposal.getProposalBytes(), "signedProposal.proposal can not be null");
 
         //校验Proposal字段
         ProposalPackage.Proposal proposal = null;
@@ -177,8 +178,10 @@ public class Endorser implements IEndorserServer {
             //转化不成功，说明是错误的Proposal字段
             throw new NodeException("Wrong proposal");
         }
+        ValidateUtils.isNotNull(proposal, "proposal can not be null");
 
         //校验Proposal头部
+        ValidateUtils.isNotNull(proposal.getHeader(), "proposal.header can not be null");
         Common.Header header = null;
         try {
             header = Common.Header.parseFrom(proposal.getHeader());
@@ -412,7 +415,7 @@ public class Endorser implements IEndorserServer {
      */
     public Object[] callSmartContract(String groupId, String scName, String scVersion, String txId, ProposalPackage
             .SignedProposal signedProposal, ProposalPackage.Proposal proposal, Smartcontract
-                                               .SmartContractInvocationSpec spec) throws NodeException {
+                                              .SmartContractInvocationSpec spec) throws NodeException {
         log.info("begin callSmartContract");
 
         boolean isSysSmartContract = endorserSupport.isSysSmartContract(scName);

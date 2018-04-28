@@ -73,10 +73,11 @@ public class App {
         //引入Spring配置文件
 //        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
 //        Node node = context.getBean(Node.class);
-        Node node = SpringContext.getInstance().getBean(Node.class);
+//        Node node = SpringContext.getInstance().getBean(Node.class);
 
         //开始解析执行命令行
         try {
+            Node node = Node.getInstance();
             node.execCmd(args);
         } catch (Exception e) {
             log.error(e.getMessage(), e);

@@ -58,7 +58,7 @@ public class NodeUtils {
         }
 
         if (node != null) {
-            Map<String, Group> groupMap = node.getGroupMap();
+            Map<String, Group> groupMap = Node.getGroupMap();
             Group group = groupMap.get(groupId);
             if (group != null) {
                 return group.getGroupSupport().getNodeLedger();
@@ -87,7 +87,7 @@ public class NodeUtils {
         }
 
         if (node != null) {
-            Map<String, Group> groupMap = node.getGroupMap();
+            Map<String, Group> groupMap = Node.getGroupMap();
             Group group = groupMap.get(groupId);
             if (group != null) {
 
@@ -164,7 +164,7 @@ public class NodeUtils {
         }
 
         if (node != null) {
-            Map<String, Group> groupMap = node.getGroupMap();
+            Map<String, Group> groupMap = Node.getGroupMap();
             Group group = groupMap.get(groupId);
             if (group != null) {
                 return group.getBlock();
@@ -179,7 +179,8 @@ public class NodeUtils {
 
         try {
             Node node = Node.getInstance();
-            Map<String, Group> groupMap = node.getGroupMap();
+            Map<String, Group> groupMap = Node.getGroupMap();
+
 
             for (String groupId : groupMap.keySet()) {
                 Query.GroupInfo groupInfo = Query.GroupInfo.newBuilder().setGroupId(groupId).build();

@@ -26,6 +26,7 @@ import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.bcia.javachain.protos.node.SmartcontractShim;
+import org.springframework.stereotype.Component;
 
 /**
  * 智能合约执行器
@@ -34,6 +35,7 @@ import org.bcia.javachain.protos.node.SmartcontractShim;
  * @date 2018/3/22
  * @company Dingxuan
  */
+@Component
 public class SmartContractExecutor {
     private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractExecutor.class);
 
