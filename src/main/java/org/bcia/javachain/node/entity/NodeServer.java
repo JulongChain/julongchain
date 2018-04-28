@@ -18,6 +18,7 @@ package org.bcia.javachain.node.entity;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.SpringContext;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
 import org.bcia.javachain.core.aclmgmt.IAclProvider;
 import org.bcia.javachain.core.admin.AdminServer;
@@ -58,6 +59,9 @@ public class NodeServer {
 
     public NodeServer(Node node) {
         this.node = node;
+//        this.systemSmartContractManager = new SystemSmartContractManager();
+
+        this.systemSmartContractManager = SpringContext.getInstance().getBean(SystemSmartContractManager.class);
     }
 
     public void start() {
@@ -123,13 +127,14 @@ public class NodeServer {
 
         //创建智能合约支持服务
         //创建Gossip服务
+        systemSmartContractManager.registerSysSmartContracts();
 
         //初始化系统智能合约
         initSysSmartContracts();
 
 //        LedgerMgmt.getLedgerIDs()
 
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 try {
@@ -143,7 +148,7 @@ public class NodeServer {
             }
         }.start();
 
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 try {
@@ -151,7 +156,7 @@ public class NodeServer {
                     eventGrpcServer.blockUntilShutdown();
                 } catch (IOException e) {
                     e.printStackTrace();
-                }catch (InterruptedException e) {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
@@ -170,7 +175,7 @@ public class NodeServer {
     private void initSysSmartContracts() {
         log.info("Init system smart contracts");
 
-        systemSmartContractManager = new SystemSmartContractManager();
+//        systemSmartContractManager = new SystemSmartContractManager();
         systemSmartContractManager.deploySysSmartContracts("");
     }
 

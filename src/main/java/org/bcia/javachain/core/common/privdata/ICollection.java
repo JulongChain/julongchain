@@ -13,34 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.node.entity;
-
-import org.bcia.javachain.core.commiter.ICommiterServer;
-import org.bcia.javachain.core.node.GroupSupport;
-import org.bcia.javachain.protos.common.Common;
+package org.bcia.javachain.core.common.privdata;
 
 /**
- * 群组对象
+ * 类描述
  *
- * @author zhouhui
- * @date 2018/4/27
+ * @author sunianle
+ * @date 4/27/18
  * @company Dingxuan
  */
-public class Group {
-    private GroupSupport groupSupport;
-    private Common.Block block;
-    private ICommiterServer commiter;
-
-
-    public GroupSupport getGroupSupport() {
-        return groupSupport;
-    }
-
-    public Common.Block getBlock() {
-        return block;
-    }
-
-    public ICommiterServer getCommiter() {
-        return commiter;
-    }
+public class ICollection {
 }

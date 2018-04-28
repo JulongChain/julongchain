@@ -305,10 +305,13 @@ public class NodeGroup {
         Query.GroupQueryResponse groupQueryResponse = null;
         try {
             groupQueryResponse = Query.GroupQueryResponse.parseFrom(proposalResponse.getResponse().getPayload());
+            return groupQueryResponse.getGroupsList();
         } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
-        return groupQueryResponse.getGroupsList();
+
+        return null;
+
     }
 
 }

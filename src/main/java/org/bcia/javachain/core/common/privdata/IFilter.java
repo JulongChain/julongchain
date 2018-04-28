@@ -13,34 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.node.entity;
-
-import org.bcia.javachain.core.commiter.ICommiterServer;
-import org.bcia.javachain.core.node.GroupSupport;
-import org.bcia.javachain.protos.common.Common;
+package org.bcia.javachain.core.common.privdata;
 
 /**
- * 群组对象
+ * Filter defines a rule that filters peers according to data signed by them.
+ * The Identity in the SignedData is a SerializedIdentity of a peer.
+ *The Data is a message the peer signed, and the Signature is the corresponding
+ * Signature on that Data.
+ * Returns: True, if the policy holds for the given signed data.
+ *         False otherwise
  *
- * @author zhouhui
- * @date 2018/4/27
+ * @author sunianle
+ * @date 4/27/18
  * @company Dingxuan
  */
-public class Group {
-    private GroupSupport groupSupport;
-    private Common.Block block;
-    private ICommiterServer commiter;
+public interface IFilter {
 
-
-    public GroupSupport getGroupSupport() {
-        return groupSupport;
-    }
-
-    public Common.Block getBlock() {
-        return block;
-    }
-
-    public ICommiterServer getCommiter() {
-        return commiter;
-    }
 }

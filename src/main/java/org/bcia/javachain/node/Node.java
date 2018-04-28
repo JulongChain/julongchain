@@ -20,11 +20,14 @@ import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.groupconfig.GroupConfigBundle;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.proto.BlockUtils;
 import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.core.node.GroupSupport;
+import org.bcia.javachain.core.node.util.ConfigTxUtils;
 import org.bcia.javachain.csp.factory.IFactoryOpts;
 import org.bcia.javachain.csp.gm.GmFactoryOpts;
 import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
@@ -35,10 +38,10 @@ import org.bcia.javachain.node.entity.Group;
 import org.bcia.javachain.node.util.LedgerUtils;
 import org.bcia.javachain.node.util.NodeConstant;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Configtx;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -221,6 +224,11 @@ public class Node {
 //        private FileLedger fileLedger;
 //    }
 
+    /**
+     * 实例化
+     *
+     * @param callback
+     */
     public void initialize(InitializeCallback callback) {
         this.initializeCallback = callback;
 
@@ -228,33 +236,63 @@ public class Node {
             LedgerManager.initialize(null);
 
             List<String> ledgerIDs = LedgerManager.getLedgerIDs();
-            if (ledgerIDs != null) {
+            if (ledgerIDs != null && ledgerIDs.size() > 0) {
                 for (String ledgerId : ledgerIDs) {
-                    INodeLedger nodeLedger = LedgerManager.openLedger(ledgerId);
-
                     log.info("ledgerId-----$" + ledgerId);
 
-                    Common.Block configBlock = LedgerUtils.getConfigBlockFromLedger(nodeLedger);
+                    try {
+                        INodeLedger nodeLedger = LedgerManager.openLedger(ledgerId);
 
-                    createGroup(ledgerId, nodeLedger, configBlock);
 
-                    if (callback != null) {
-                        callback.onGroupInitialized(ledgerId);
+                        Common.Block configBlock = LedgerUtils.getConfigBlockFromLedger(nodeLedger);
+
+                        Group group = createGroup(ledgerId, nodeLedger, configBlock);
+                        groupMap.put(ledgerId, group);
+
+                        if (callback != null) {
+                            callback.onGroupInitialized(ledgerId);
+                        }
+                    } catch (LedgerException e) {
+                        log.error(e.getMessage(), e);
+                    } catch (ValidateException e) {
+                        log.error(e.getMessage(), e);
+                    } catch (InvalidProtocolBufferException e) {
+                        log.error(e.getMessage(), e);
                     }
                 }
             }
         } catch (LedgerException e) {
-            e.printStackTrace();
-        } catch (ValidateException e) {
-            e.printStackTrace();
-        } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
     }
 
-    private void createGroup(String groupId, INodeLedger nodeLedger, Common.Block configBlock) {
+    public Group createGroup(String groupId, INodeLedger nodeLedger, Common.Block configBlock) throws
+            InvalidProtocolBufferException, LedgerException, ValidateException {
+        //从账本中获取群组配置
+        Configtx.Config groupConfig = ConfigTxUtils.retrievePersistedGroupConfig(nodeLedger);
+
+        GroupConfigBundle groupConfigBundle = null;
+        if (groupConfig != null) {
+            groupConfigBundle = new GroupConfigBundle();
+        } else {
+            Common.Envelope envelope = BlockUtils.extractEnvelope(configBlock, 0);
 
 
+        }
+
+        GroupSupport groupSupport = new GroupSupport();
+
+        Group group = new Group();
+
+        return group;
+    }
+
+    public Map<String, Group> getGroupMap() {
+        return groupMap;
+    }
+
+    public InitializeCallback getInitializeCallback() {
+        return initializeCallback;
     }
 
     public interface InitializeCallback {

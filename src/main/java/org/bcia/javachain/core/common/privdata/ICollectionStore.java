@@ -15,6 +15,9 @@
  */
 package org.bcia.javachain.core.common.privdata;
 
+import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.protos.common.Collection;
+
 /**
  * ICollectionStore retrieves stored collections based on the collection's
  * properties. It works as a collection object factory and takes care of
@@ -25,5 +28,33 @@ package org.bcia.javachain.core.common.privdata;
  * @company Dingxuan
  */
 public interface ICollectionStore {
-    //Colletion retrieveColletion(CollectionCriteria );
+    /**
+     *  GetCollection retrieves the collection in the following way:
+     *  If the TxID exists in the ledger, the collection that is returned has the
+     *  latest configuration that was committed into the ledger before this txID
+     *  was committed.
+     *  Else - it's the latest configuration for the collection.
+     * @param collectionCriteria
+     * @return
+     * @throws JavaChainException
+     */
+    ICollection retrieveColletion(Collection.CollectionCriteria collectionCriteria)throws JavaChainException;
+
+    /**
+     * GetCollectionAccessPolicy retrieves a collection's access policy
+     * @param collectionCriteria
+     * @return
+     * @throws JavaChainException
+     */
+    ICollectionAccessPolicy retrieveCollectionAccessPolicy(Collection.CollectionCriteria collectionCriteria)throws JavaChainException;
+
+    /**
+     * RetrieveCollectionConfigPackage retrieves the configuration
+     * for the collection with the supplied criteria
+     * @param collectionCriteria
+     * @return
+     * @throws JavaChainException
+     */
+    ICollectionConfigPackage retriveCollectionConfigPackage(Collection.CollectionCriteria collectionCriteria)throws JavaChainException;
+
 }

@@ -13,12 +13,14 @@
  */
 package org.bcia.javachain.core.smartcontract.node;
 
+import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
+import org.bcia.javachain.protos.node.SmartcontractShim;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 类描述
@@ -43,6 +45,44 @@ public class TransactionRunningUtil {
   /** 保存交易的状态 */
   private static Map<String, String> txIdAndStatusMap =
       Collections.synchronizedMap(new HashMap<String, String>());
+
+  private static Map<String, List<KvRwset.KVRead>> txIdAndKvReadMap =
+      Collections.synchronizedMap(new HashMap<String, List<KvRwset.KVRead>>());
+
+  private static Map<String, SmartcontractShim.SmartContractMessage> txIdAndMessageMap =
+      Collections.synchronizedMap(new HashMap<String, SmartcontractShim.SmartContractMessage>());
+
+  public static void addTxMessage(
+      String smartContractId,
+      String txId,
+      SmartcontractShim.SmartContractMessage smartContractMessage) {
+    txIdAndMessageMap.put(composite(smartContractId, txId), smartContractMessage);
+  }
+
+  public static SmartcontractShim.SmartContractMessage getTxMessage(
+      String smartContractId, String txId) {
+    return txIdAndMessageMap.get(composite(smartContractId, txId));
+  }
+
+  public static String composite(String smartContractId, String txId) {
+    ArrayList<String> strings = Lists.newArrayList(smartContractId, txId);
+    String composite = StringUtils.join(strings, "||");
+    return composite;
+  }
+
+  public static void addKvRead(String smartContractId, String txId, KvRwset.KVRead kvRead) {
+    String composite = composite(smartContractId, txId);
+    if (txIdAndKvReadMap.get(composite) == null) {
+      List<KvRwset.KVRead> list = new ArrayList<KvRwset.KVRead>();
+      txIdAndKvReadMap.put(composite, list);
+    } else {
+      txIdAndKvReadMap.get(composite).add(kvRead);
+    }
+  }
+
+  public static List<KvRwset.KVRead> getKvReads(String smartContractId, String txId) {
+    return txIdAndKvReadMap.get(composite(smartContractId, txId));
+  }
 
   /**
    * 添加txId对应的smartContractId
@@ -71,11 +111,12 @@ public class TransactionRunningUtil {
    * @param txId 交易号
    * @param status 交易运行的状态
    */
-  public static void updateTxStatus(String txId, String status) {
+  public static void updateTxStatus(String smartContractId, String txId, String status) {
     logger.debug(
         String.format(
-            "update txStatus txId[%s] status[%s]->[%s]", txId, getTxStatusById(txId), status));
-    txIdAndStatusMap.put(txId, status);
+            "update txStatus txId[%s] status[%s]->[%s]",
+            txId, getTxStatusById(smartContractId, txId), status));
+    txIdAndStatusMap.put(composite(smartContractId, txId), status);
   }
 
   /**
@@ -83,7 +124,7 @@ public class TransactionRunningUtil {
    *
    * @param txId
    */
-  public static String getTxStatusById(String txId) {
-    return txIdAndStatusMap.get(txId);
+  public static String getTxStatusById(String smartContractId, String txId) {
+    return txIdAndStatusMap.get(composite(smartContractId, txId));
   }
 }

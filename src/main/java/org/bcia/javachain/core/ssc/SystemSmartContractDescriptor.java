@@ -47,32 +47,32 @@ public class SystemSmartContractDescriptor{
 
     //获取系统智能合约的名称
     public String getSSCName(){
-       return "";
+       return this.sscName;
     }
 
     //获取系统智能合约的路径
     public String getSSCPath(){
-        return "";
+        return this.sscPath;
     }
 
     //获取初始化参数
     public String[] getInitArgs(){
-        return null;
+        return this.initArgs;
     }
 
     //是否可以通过发送proposal至节点来调用此系统合约
     public boolean isInvokableExternal(){
-        return true;
+        return this.bInvokableExternal;
     }
 
     //是否可以通过合约-合约(smartcontract-to-smartcontract)方式进行调用
     boolean isInvokaleSC2SC(){
-        return true;
+        return this.bInvokaleSC2SC;
     }
 
     //提供一个开关来启闭智能合约，这样可以不用从系统合约集合中删除合约，就可以使能/使不能系统智能合约
     public boolean isEnabled(){
-        return true;
+        return this.bEnabled;
     }
 
 }

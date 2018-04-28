@@ -205,7 +205,7 @@ public class CSSC extends SystemSmartContractBase {
         Common.Envelope envelopeConfig =null;
         try {
             envelopeConfig = BlockUtils.extractEnvelope(block, 0);
-        } catch (JavaChainException e) {
+        } catch (Exception e) {
             String msg=String.format("Failed to %s",e.getMessage());
             throw new SysSmartContractException(msg);
         }

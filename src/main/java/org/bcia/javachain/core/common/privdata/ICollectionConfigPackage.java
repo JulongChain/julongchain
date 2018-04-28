@@ -13,34 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.node.entity;
+package org.bcia.javachain.core.common.privdata;
 
-import org.bcia.javachain.core.commiter.ICommiterServer;
-import org.bcia.javachain.core.node.GroupSupport;
-import org.bcia.javachain.protos.common.Common;
+import java.util.List;
 
 /**
- * 群组对象
+ * ICollection defines a common interface for collections
  *
- * @author zhouhui
- * @date 2018/4/27
+ * @author sunianle
+ * @date 4/27/18
  * @company Dingxuan
  */
-public class Group {
-    private GroupSupport groupSupport;
-    private Common.Block block;
-    private ICommiterServer commiter;
+public interface ICollectionConfigPackage {
+    /**
+     * returns this collection's ID
+     * @return
+     */
+    String getCollectionID();
 
-
-    public GroupSupport getGroupSupport() {
-        return groupSupport;
-    }
-
-    public Common.Block getBlock() {
-        return block;
-    }
-
-    public ICommiterServer getCommiter() {
-        return commiter;
-    }
+    /**
+     * MemberOrgs returns the collection's members as MSP IDs. This serves as
+     * a human-readable way of quickly identifying who is part of a collection.
+     * @return
+     */
+    List<String> getMemberOrgs();
 }

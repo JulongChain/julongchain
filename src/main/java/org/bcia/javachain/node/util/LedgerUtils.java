@@ -18,6 +18,8 @@ package org.bcia.javachain.node.util;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.common.util.proto.BlockUtils;
 import org.bcia.javachain.core.ledger.INodeLedger;
@@ -32,16 +34,31 @@ import org.bcia.javachain.protos.common.Ledger;
  * @company Dingxuan
  */
 public class LedgerUtils {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(LedgerUtils.class);
+
+    /**
+     * 获取当前账本的最新配置区块
+     *
+     * @param nodeLedger
+     * @return
+     * @throws LedgerException
+     * @throws ValidateException
+     * @throws InvalidProtocolBufferException
+     */
     public static Common.Block getConfigBlockFromLedger(INodeLedger nodeLedger) throws LedgerException,
             ValidateException, InvalidProtocolBufferException {
+        //从账本中获取当前链的信息，如高度等
         Ledger.BlockchainInfo blockchainInfo = nodeLedger.getBlockchainInfo();
         ValidateUtils.isNotNull(blockchainInfo, "blockchainInfo can not be null");
 
+        //从账本中获取最新的区块
         Common.Block lastBlock = nodeLedger.getBlockByNumber(blockchainInfo.getHeight() - 1);
 
-        BlockUtils.getLastConfigIndexFromBlock(lastBlock);
-        return null;
+        //通过最新的区块解析出最新配置区块的索引
+        long configBlockIndex = BlockUtils.getLastConfigIndexFromBlock(lastBlock);
+        //获取最新配置区块
+        Common.Block lastConfigBlock = nodeLedger.getBlockByNumber(configBlockIndex);
 
-
+        return lastConfigBlock;
     }
 }

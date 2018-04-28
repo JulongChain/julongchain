@@ -17,9 +17,14 @@ package org.bcia.javachain.core.node.util;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
+import org.bcia.javachain.core.ledger.INodeLedger;
+import org.bcia.javachain.core.ledger.IQueryExecutor;
+import org.bcia.javachain.core.node.ConfigtxProcessor;
+import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 
 import java.util.Map;
@@ -57,5 +62,20 @@ public class ConfigTxUtils {
         }
 
         return Configtx.Config.parseFrom(isolatedDataMap.get(RESOURCE_CONFIG_SEED_DATA));
+    }
+
+    /**
+     * 获取群组配置
+     *
+     * @param nodeLedger
+     * @return
+     * @throws LedgerException
+     * @throws InvalidProtocolBufferException
+     */
+    public static Configtx.Config retrievePersistedGroupConfig(INodeLedger nodeLedger) throws LedgerException,
+            InvalidProtocolBufferException {
+        IQueryExecutor queryExecutor = nodeLedger.newQueryExecutor();
+
+        return ConfigtxProcessor.retrievePersistedConfig(queryExecutor, ConfigtxProcessor.GROUP_CONFIG_KEY);
     }
 }

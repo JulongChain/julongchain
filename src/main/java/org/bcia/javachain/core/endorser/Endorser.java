@@ -111,7 +111,11 @@ public class Endorser implements IEndorserServer {
                 signedProposal, proposal, scIdBuilder);
 
         ProposalResponsePackage.Response response = (ProposalResponsePackage.Response) simulateObjs[0];
-        byte[] simulateResults = ((Rwset.TxReadWriteSet) simulateObjs[1]).toByteArray();
+        Rwset.TxReadWriteSet txReadWriteSet = (Rwset.TxReadWriteSet) simulateObjs[1];
+        byte[] simulateResults = new byte[0];
+        if (txReadWriteSet != null) {
+            simulateResults = ((Rwset.TxReadWriteSet) simulateObjs[1]).toByteArray();
+        }
         ISmartContractDefinition scDefinition = (ISmartContractDefinition) simulateObjs[2];
         SmartContractEventPackage.SmartContractEvent scEvent = (SmartContractEventPackage.SmartContractEvent)
                 simulateObjs[3];
@@ -138,7 +142,8 @@ public class Endorser implements IEndorserServer {
 //        return ProposalResponseUtils.buildProposalResponse(esscResponse.getPayload());
 
         //无合约提案不需要背书，例如cssc
-        if (StringUtils.isBlank(scName)) {
+        simulateResults = new byte[]{0, 1, 2};//TODO:for test
+        if (StringUtils.isBlank(scName) || CommConstant.CSSC.equals(scName)) {
             return ProposalResponseUtils.buildProposalResponse(response.getPayload());
         } else {
             ProposalResponsePackage.Response response1 = endorseProposal(groupHeader.getGroupId(), groupHeader.getTxId(), signedProposal, proposal, scIdBuilder,
@@ -286,7 +291,7 @@ public class Endorser implements IEndorserServer {
         }
 
         TxSimulationResults simulationResults = null;
-        if(groupId != null && txSimulator != null) {
+        if (groupId != null && txSimulator != null) {
 
             try {
                 simulationResults = txSimulator.getTxSimulationResults();
@@ -354,6 +359,8 @@ public class Endorser implements IEndorserServer {
             useSysSmartContract = true;
         }
 
+        useSysSmartContract = true;//TODO:for test
+
         //背书系统智能合约名称
         String essc = null;
         if (useSysSmartContract) {
@@ -403,7 +410,7 @@ public class Endorser implements IEndorserServer {
      * @param spec
      * @return
      */
-    private Object[] callSmartContract(String groupId, String scName, String scVersion, String txId, ProposalPackage
+    public Object[] callSmartContract(String groupId, String scName, String scVersion, String txId, ProposalPackage
             .SignedProposal signedProposal, ProposalPackage.Proposal proposal, Smartcontract
                                                .SmartContractInvocationSpec spec) throws NodeException {
         log.info("begin callSmartContract");

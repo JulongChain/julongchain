@@ -13,34 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.node.entity;
+package org.bcia.javachain.core.common.privdata;
 
-import org.bcia.javachain.core.commiter.ICommiterServer;
-import org.bcia.javachain.core.node.GroupSupport;
-import org.bcia.javachain.protos.common.Common;
+import java.util.List;
 
 /**
- * 群组对象
+ * ICollectionAccessPolicy encapsulates functions for the access policy of a collection
  *
- * @author zhouhui
- * @date 2018/4/27
+ * @author sunianle
+ * @date 4/27/18
  * @company Dingxuan
  */
-public class Group {
-    private GroupSupport groupSupport;
-    private Common.Block block;
-    private ICommiterServer commiter;
-
-
-    public GroupSupport getGroupSupport() {
-        return groupSupport;
-    }
-
-    public Common.Block getBlock() {
-        return block;
-    }
-
-    public ICommiterServer getCommiter() {
-        return commiter;
-    }
+public interface ICollectionAccessPolicy {
+    IFilter getAccessFilter();
+    int getRequiredNodeCount();
+    int getMaximumNodeCount();
+    List<String> getMemberOrgs();
 }
