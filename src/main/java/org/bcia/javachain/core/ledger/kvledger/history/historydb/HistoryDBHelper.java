@@ -83,12 +83,24 @@ public class HistoryDBHelper {
         return Util.bytesToLong(byteToSplit, length + 9, 8);
     }
 
-    public static void main(String[] args) {
-        byte[] compositeKey = constructCompositeHistoryKey("ns", "key", 100, 1000);
-        System.out.println(compositeKey.length);
-        long blockNum = splitCompositeHistoryKeyForBlockNum(compositeKey, constructPartialCompositeHistoryKey("ns", "key", false).length);
-        System.out.println(blockNum);
-        long tran = splitCompositeHistoryKeyForTranNum(compositeKey, constructPartialCompositeHistoryKey("ns", "key", false).length);
-        System.out.println(tran);
+    /**
+     * 获取History数据头部
+     */
+    public static byte[] splitCompositeHistoryKeyForHeader(byte[] byteToSplit){
+        if(byteToSplit.length <= 17){
+            return null;
+        }
+        byte[] header = new byte[byteToSplit.length - 17];
+        System.arraycopy(byteToSplit, 0, header, 0 , header.length);
+        return header;
+    }
+
+    /**
+     * 检查数据是否以制定字符数组起始
+     * @param bytes 目标数组
+     * @param start 起始数组
+     */
+    public static boolean checkStart(byte[] bytes, byte[] start){
+        return new String(bytes).startsWith(new String(start));
     }
 }
