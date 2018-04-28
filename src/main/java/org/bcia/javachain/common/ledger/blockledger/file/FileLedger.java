@@ -16,12 +16,11 @@ limitations under the License.
 package org.bcia.javachain.common.ledger.blockledger.file;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.blockledger.FileLedgerBlockStore;
-import org.bcia.javachain.common.ledger.blockledger.Iterator;
-import org.bcia.javachain.common.ledger.blockledger.Reader;
-import org.bcia.javachain.common.ledger.blockledger.Writer;
+import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.blockledger.*;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.consenter.Ab;
@@ -33,15 +32,22 @@ import org.bcia.javachain.protos.consenter.Ab;
  * @date 2018/04/26
  * @company Dingxuan
  */
-public class FileLedger implements Reader, Writer {
+public class FileLedger extends ReadWriteBase {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(FileLedger.class);
 
     private FileLedgerBlockStore blockStore;
+    private Channel<Object> channel;
 
-    public void init(){
+    public FileLedger(){}
 
+    public FileLedger(FileLedgerBlockStore blockStore){
+        this.blockStore = blockStore;
+        this.channel = new Channel<>();
     }
 
+    /**
+     * 获取迭代器
+     */
     @Override
     public Iterator iterator(Ab.SeekPosition startType) throws LedgerException  {
         long startingBlockNumber;
@@ -54,20 +60,32 @@ public class FileLedger implements Reader, Writer {
                 startingBlockNumber = info.getHeight() - 1;
                 break;
             case Ab.SeekPosition.SPECIFIED_FIELD_NUMBER:
-//                startingBlockNumber = Specified
+                startingBlockNumber = Ab.SeekSpecified.NUMBER_FIELD_NUMBER;
+                long height = height();
+                if(startingBlockNumber > height){
+                    throw Util.NOT_FOUND_ERROR_ITERATOR;
+                }
                 break;
+            default:
+                throw Util.NOT_FOUND_ERROR_ITERATOR;
         }
-        return null;
+        Iterator iterator = (Iterator) blockStore.retrieveBlocks(startingBlockNumber);
+        return new FileLedgerIterator(this, startingBlockNumber, iterator);
+    }
+
+    /**
+     *
+     */
+    @Override
+    public long height() throws LedgerException {
+        return blockStore.getBlockchainInfo().getHeight();
     }
 
     @Override
-    public long height() {
-        return 0;
-    }
-
-    @Override
-    public void append(Common.Block block) {
-
+    public void append(Common.Block block) throws LedgerException{
+        blockStore.addBlock(block);
+        channel.close();
+        channel = new Channel<>();
     }
 
     public FileLedgerBlockStore getBlockStore() {

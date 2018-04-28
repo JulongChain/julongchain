@@ -15,6 +15,10 @@ limitations under the License.
  */
 package org.bcia.javachain.common.ledger.blockledger;
 
+import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.consenter.Ab;
+
 /**
  * 提供账本读写方法
  *
@@ -22,23 +26,13 @@ package org.bcia.javachain.common.ledger.blockledger;
  * @date 2018/04/26
  * @company Dingxuan
  */
-public class ReaderWriter {
-    private Reader reader;
-    private Writer writer;
+public abstract class ReadWriteBase implements Reader, Writer {
+    @Override
+    public abstract Iterator iterator(Ab.SeekPosition startType) throws LedgerException;
 
-    public Reader getReader() {
-        return reader;
-    }
+    @Override
+    public abstract long height() throws LedgerException;
 
-    public void setReader(Reader reader) {
-        this.reader = reader;
-    }
-
-    public Writer getWriter() {
-        return writer;
-    }
-
-    public void setWriter(Writer writer) {
-        this.writer = writer;
-    }
+    @Override
+    public abstract void append(Common.Block block) throws LedgerException;
 }

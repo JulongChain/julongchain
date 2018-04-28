@@ -15,32 +15,12 @@ limitations under the License.
  */
 package org.bcia.javachain.common.ledger.blockledger;
 
-import org.bcia.javachain.common.exception.LedgerException;
-
-import java.util.List;
-
 /**
- * 创建账本工厂接口
+ * 异常的迭代器
  *
  * @author sunzongyu
- * @date 2018/04/26
+ * @date 2018/04/27
  * @company Dingxuan
  */
-public interface Factory {
-
-    /**
-     * 获取ledger(已存在)
-     * 创建ledger(不存在)
-     */
-    ReadWriteBase getOrCreate(String groupID) throws LedgerException;
-
-    /**
-     * 返回已经创建的groupid
-     */
-    List<String> groupIDs() throws LedgerException;
-
-    /**
-     * 关闭
-     */
-    void close() throws LedgerException;
+public interface NotFoundErrorIterator extends Iterator {
 }
