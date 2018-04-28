@@ -30,6 +30,7 @@ public abstract  class SystemSmartContractBase extends SmartContractBase impleme
         return "系统智能合约";
     }
     public void setSystemSmartContractDescriptor(SystemSmartContractDescriptor descriptor) {
+        
         this.descriptor=descriptor;
     }
 

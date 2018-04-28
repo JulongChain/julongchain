@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.core.ssc.vssc;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.cauthdsl.CAuthDslBuilder;
 import org.bcia.javachain.common.cauthdsl.PolicyProvider;
@@ -35,6 +36,7 @@ import org.bcia.javachain.core.common.privdata.*;
 import org.bcia.javachain.core.common.sysscprovider.ISystemSmartContractProvider;
 import org.bcia.javachain.core.common.sysscprovider.SystemSmartContractFactory;
 import org.bcia.javachain.core.ledger.IQueryExecutor;
+import org.bcia.javachain.core.node.NodeConfig;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
 import org.bcia.javachain.msp.IMspManager;
@@ -44,6 +46,7 @@ import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.SmartContractDataPackage;
+import org.bcia.javachain.protos.node.Smartcontract;
 import org.bcia.javachain.protos.node.TransactionPackage;
 import org.springframework.stereotype.Component;
 
@@ -347,7 +350,7 @@ public class VSSC extends SystemSmartContractBase {
     }
 
     /**
-     *
+     * 验证对LSSC的调用
      * @param stub
      * @param groupID
      * @param envelope
@@ -364,7 +367,7 @@ public class VSSC extends SystemSmartContractBase {
             Common.Payload payload,
             IApplicationCapabilities ac
             )throws SysSmartContractException{
-
+        VSSCSupportForLsscInvocation.validateLSSCInvocation(stub,groupID,envelope,scap,payload,ac,log);
     }
 
     /**
@@ -382,12 +385,26 @@ public class VSSC extends SystemSmartContractBase {
             String msg=String.format("Could not retrieve QueryExecutor for group %s, error %s",groupID,e.getMessage());
             throw new SysSmartContractException(msg);
         }
+        byte[] bytes=null;
         try {
-            byte[] bytes=qe.getState("lssc", smartcontractID);
+            bytes=qe.getState("lssc", smartcontractID);
         } catch (LedgerException e) {
-            e.printStackTrace();
+            String msg=String.format("Could not retrieve state for smartcontract %s on group %s, error %s",
+                    smartcontractID,groupID,e.getMessage());
+            throw new SysSmartContractException(msg);
         }
-        return null;
+
+        if(bytes==null){
+            return null;
+        }
+        SmartContractDataPackage.SmartContractData data=null;
+        try {
+            data=SmartContractDataPackage.SmartContractData.parseFrom(bytes);
+        } catch (InvalidProtocolBufferException e) {
+            String msg=String.format("Unmarshalling SmartContractQueryResponse failed, error %s",e.getMessage());
+            throw new SysSmartContractException(msg);
+        }
+        return data;
     }
 
     private List<SignedData> deduplicateIdentity(TransactionPackage.SmartContractActionPayload scap)
