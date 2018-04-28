@@ -208,6 +208,9 @@ public class SmartContractSupportService
             db = LevelDBUtil.getDB(stateLevelDBPath);
 
             byte[] worldStateBytes = LevelDBUtil.get(db, worldStateKeyByte, true);
+            if (worldStateBytes == null) {
+            	worldStateBytes = new byte[]{};
+            }
 
             // 发送读取结果到shim端
             SmartContractMessage responseMessage =
