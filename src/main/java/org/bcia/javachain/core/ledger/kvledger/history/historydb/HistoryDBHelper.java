@@ -64,7 +64,7 @@ public class HistoryDBHelper {
      * @return blockNum
      */
     public static long splitCompositeHistoryKeyForBlockNum(byte[] byteToSplit, int length){
-        if(length != byteToSplit.length - 16){
+        if(length != byteToSplit.length - 17){
             return -1;
         }
         return Util.bytesToLong(byteToSplit, length, 8);
@@ -77,9 +77,18 @@ public class HistoryDBHelper {
      * @return blockNum
      */
     public static long splitCompositeHistoryKeyForTranNum(byte[] byteToSplit, int length){
-        if(length != byteToSplit.length - 16){
+        if(length != byteToSplit.length - 17){
             return -1;
         }
-        return Util.bytesToLong(byteToSplit, length + 8, 8);
+        return Util.bytesToLong(byteToSplit, length + 9, 8);
+    }
+
+    public static void main(String[] args) {
+        byte[] compositeKey = constructCompositeHistoryKey("ns", "key", 100, 1000);
+        System.out.println(compositeKey.length);
+        long blockNum = splitCompositeHistoryKeyForBlockNum(compositeKey, constructPartialCompositeHistoryKey("ns", "key", false).length);
+        System.out.println(blockNum);
+        long tran = splitCompositeHistoryKeyForTranNum(compositeKey, constructPartialCompositeHistoryKey("ns", "key", false).length);
+        System.out.println(tran);
     }
 }
