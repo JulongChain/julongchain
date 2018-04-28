@@ -22,6 +22,7 @@ import io.grpc.stub.StreamObserver;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.proto.ProposalResponseUtils;
 import org.bcia.javachain.core.admin.AdminServer;
 import org.bcia.javachain.core.admin.IAdminServer;
 import org.bcia.javachain.core.endorser.IEndorserServer;
@@ -143,13 +144,16 @@ public class NodeGrpcServer {
                 try {
                     proposalResponse = endorserServer.processProposal(request);
                 } catch (NodeException e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
+                    proposalResponse = ProposalResponseUtils.buildErrorProposalResponse(Common.Status.UNKNOWN, e
+                            .getMessage());
                 }
                 responseObserver.onNext(proposalResponse);
                 responseObserver.onCompleted();
             } else {
                 log.error("endorserServer is not ready, but client sent some message: " + request);
                 responseObserver.onError(new NodeException("endorserServer is not ready"));
+                responseObserver.onCompleted();
             }
         }
     }

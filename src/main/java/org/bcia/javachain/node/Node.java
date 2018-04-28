@@ -236,7 +236,7 @@ public class Node {
             LedgerManager.initialize(null);
 
             List<String> ledgerIDs = LedgerManager.getLedgerIDs();
-            if (ledgerIDs != null) {
+            if (ledgerIDs != null && ledgerIDs.size() > 0) {
                 for (String ledgerId : ledgerIDs) {
                     log.info("ledgerId-----$" + ledgerId);
 

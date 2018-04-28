@@ -46,10 +46,13 @@ public class GroupListCmd extends AbstractNodeGroupCmd {
 
         if (groupsList != null) {
             int groupSize = groupsList.size();
+            log.info("Group List size: " + groupSize);
             for (int i = 0; i < groupSize; i++) {
                 String groupId = groupsList.get(i).getGroupId();
                 log.info("Group List info: " + groupId + "\n");
             }
+        } else {
+            log.info("Group List : 0");
         }
     }
 }

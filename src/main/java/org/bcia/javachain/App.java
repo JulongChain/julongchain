@@ -18,6 +18,7 @@ package org.bcia.javachain;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.SpringContext;
 import org.bcia.javachain.consenter.common.server.ConsenterServer;
 import org.bcia.javachain.node.Node;
 import org.springframework.context.ApplicationContext;
@@ -70,8 +71,9 @@ public class App {
 //        }
 
         //引入Spring配置文件
-        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-        Node node = context.getBean(Node.class);
+//        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
+//        Node node = context.getBean(Node.class);
+        Node node = SpringContext.getInstance().getBean(Node.class);
 
         //开始解析执行命令行
         try {

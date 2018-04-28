@@ -13,17 +13,6 @@
  */
 package org.bcia.javachain.core.smartcontract;
 
-import static org.bcia.javachain.protos.node.Smartcontract.SmartContractDeploymentSpec;
-import static org.bcia.javachain.protos.node.Smartcontract.SmartContractInput;
-import static org.bcia.javachain.protos.node.Smartcontract.SmartContractInvocationSpec;
-import static org.bcia.javachain.protos.node.Smartcontract.SmartContractSpec;
-import static org.bcia.javachain.protos.node.SmartcontractShim.SmartContractMessage;
-import static org.bcia.javachain.protos.node.SmartcontractShim.SmartContractMessage.Type;
-import static org.bcia.javachain.protos.node.SmartcontractShim.SmartContractMessage.newBuilder;
-
-import java.time.Duration;
-import javax.naming.Context;
-
 import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -36,6 +25,13 @@ import org.bcia.javachain.core.smartcontract.client.SmartContractSupportClient;
 import org.bcia.javachain.core.smartcontract.node.SmartContractRunningUtil;
 import org.bcia.javachain.core.smartcontract.node.SmartContractSupportService;
 import org.bcia.javachain.core.smartcontract.shim.SmartContractProvider;
+
+import javax.naming.Context;
+import java.time.Duration;
+
+import static org.bcia.javachain.protos.node.Smartcontract.*;
+import static org.bcia.javachain.protos.node.SmartcontractShim.SmartContractMessage;
+import static org.bcia.javachain.protos.node.SmartcontractShim.SmartContractMessage.Type;
 
 /**
  * 类描述
@@ -299,29 +295,30 @@ public class SmartContractSupport {
         return SmartContractInput.newBuilder().build();
     }
 
-    /**
-     * 执行智能合约
-     *
-     * @param scContext scContext
-     * @param scMessage scMessage
-     * @param timeout 超时时间
-     * @return
-     * @throws SmartContractException
-     */
-    public SmartContractMessage execute(
-            SmartContractContext scContext, SmartContractMessage scMessage, long timeout)
-            throws SmartContractException {
+  /**
+   * 执行智能合约
+   *
+   * @param scContext scContext
+   * @param scMessage scMessage
+   * @param timeout 超时时间
+   * @return
+   * @throws SmartContractException
+   */
+  public SmartContractMessage execute(
+      SmartContractContext scContext, SmartContractMessage scMessage, long timeout)
+      throws SmartContractException {
 
-        log.info("call SmartContractSupport execute");
+    log.info("call SmartContractSupport execute");
 
-        // TODO:add by zhouhui for test,返回一个空对象，实际处理待万良兵补充
+    // TODO:add by zhouhui for test,返回一个空对象，实际处理待万良兵补充
 
-        String smartContractId = scContext.getName();
+    String smartContractId = scContext.getName();
 
+    SmartContractMessage responseMessage =
         SmartContractSupportService.invoke(smartContractId, scMessage);
 
-        return newBuilder().setType(Type.COMPLETED).build();
-    }
+    return responseMessage;
+  }
 
     public void registerHandler(Handler handler) {
     }
