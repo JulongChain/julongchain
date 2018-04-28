@@ -25,21 +25,19 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionLevelDB;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.leveldb.LevelDB;
 import org.bcia.javachain.core.ledger.leveldb.LevelDBUtil;
+import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
+import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.SmartContractEventPackage;
 import org.bcia.javachain.protos.node.SmartContractSupportGrpc;
 import org.bcia.javachain.protos.node.Smartcontract;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import static org.bcia.javachain.core.smartcontract.node.SmartContractRunningUtil.*;
 import static org.bcia.javachain.core.smartcontract.node.TransactionRunningUtil.*;
-import static org.bcia.javachain.protos.common.Common.*;
-import static org.bcia.javachain.protos.node.ProposalPackage.Proposal;
-import static org.bcia.javachain.protos.node.ProposalPackage.SignedProposal;
-import static org.bcia.javachain.protos.node.SmartContractEventPackage.SmartContractEvent;
 import static org.bcia.javachain.protos.node.SmartcontractShim.SmartContractMessage;
 
 /**
@@ -69,7 +67,7 @@ public class SmartContractSupportService
       SmartContractMessage message, StreamObserver<SmartContractMessage> streamObserver) {
     try {
       // 保存智能合约编号
-      saveChaincodeStreamObserver(message, streamObserver);
+      saveSmartContractStreamObserver(message, streamObserver);
 
       String smartContractId = getSmartContractId(message);
 
@@ -84,24 +82,32 @@ public class SmartContractSupportService
       streamObserver.onNext(responseMessage);
 
       // 发送init命令
-      GroupHeader groupHeader =
-          GroupHeader.newBuilder().setType(HeaderType.ENDORSER_TRANSACTION.getNumber()).build();
-      Header header = Header.newBuilder().setGroupHeader(groupHeader.toByteString()).build();
-      Proposal proposal = Proposal.newBuilder().setHeader(header.toByteString()).build();
-      SignedProposal signedProposal =
-          SignedProposal.newBuilder().setProposalBytes(proposal.toByteString()).build();
-      SmartContractEvent smartcontractEvent =
-          SmartContractEvent.newBuilder().setSmartContractId(smartContractId).build();
+      Common.GroupHeader groupHeader =
+          Common.GroupHeader.newBuilder()
+              .setType(Common.HeaderType.ENDORSER_TRANSACTION.getNumber())
+              .build();
+      Common.Header header =
+          Common.Header.newBuilder().setGroupHeader(groupHeader.toByteString()).build();
+      ProposalPackage.Proposal proposal =
+          ProposalPackage.Proposal.newBuilder().setHeader(header.toByteString()).build();
+      ProposalPackage.SignedProposal signedProposal =
+          ProposalPackage.SignedProposal.newBuilder()
+              .setProposalBytes(proposal.toByteString())
+              .build();
+      SmartContractEventPackage.SmartContractEvent smartContractEvent =
+          SmartContractEventPackage.SmartContractEvent.newBuilder()
+              .setSmartContractId(smartContractId)
+              .build();
       responseMessage =
           SmartContractMessage.newBuilder()
               .setType(SmartContractMessage.Type.INIT)
               .setProposal(signedProposal)
-              .setSmartcontractEvent(smartcontractEvent)
+              .setSmartcontractEvent(smartContractEvent)
               .build();
       streamObserver.onNext(responseMessage);
 
-      // 设置状态send_init
-      updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_READY);
+      // 设置状态ready
+      updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_SEND_INIT);
 
     } catch (InvalidProtocolBufferException e) {
       logger.error(e.getMessage(), e);
@@ -181,6 +187,8 @@ public class SmartContractSupportService
           byte[] historyKeyBytes =
               HistoryDBHelper.constructPartialCompositeHistoryKey(groupId, key, false);
 
+          logger.info(new String(historyKeyBytes));
+
           // 世界状态数据库保存的key
           byte[] worldStateKeyByte = VersionLevelDB.constructCompositeKey(groupId, key);
 
@@ -189,6 +197,7 @@ public class SmartContractSupportService
             LevelDB db = LevelDBUtil.getDB(historyDBPath);
             // 找到历史数据库最大的key
             byte[] lastKey = LevelDBUtil.getLastKey(db, historyKeyBytes);
+            logger.info(new String(lastKey));
             // 解析blockNum
             long blockNum =
                 HistoryDBHelper.splitCompositeHistoryKeyForBlockNum(
@@ -276,7 +285,7 @@ public class SmartContractSupportService
    * @param streamObserver gRPC客户端
    * @throws InvalidProtocolBufferException
    */
-  private void saveChaincodeStreamObserver(
+  private void saveSmartContractStreamObserver(
       SmartContractMessage message, StreamObserver<SmartContractMessage> streamObserver)
       throws InvalidProtocolBufferException {
     // 只有注册时才保存
@@ -307,13 +316,6 @@ public class SmartContractSupportService
    * @param message 消息
    */
   public static void send(String smartContractId, SmartContractMessage message) {
-    String str = "";
-    Set<Map.Entry<String, StreamObserver<SmartContractMessage>>> entries =
-        smartContractIdAndStreamObserverMap.entrySet();
-    for (Map.Entry<String, StreamObserver<SmartContractMessage>> entry : entries) {
-      str = str + " " + entry.getKey();
-    }
-    logger.info("key : " + str);
     StreamObserver<SmartContractMessage> streamObserver =
         smartContractIdAndStreamObserverMap.get(smartContractId);
     if (streamObserver == null) {
@@ -346,24 +348,26 @@ public class SmartContractSupportService
    * @param smartContractId 智能合约编号
    * @param smartContractMessage 消息
    */
-  public static SmartContractMessage invoke(String smartContractId, SmartContractMessage smartContractMessage) {
+  public static SmartContractMessage invoke(
+      String smartContractId, SmartContractMessage smartContractMessage) {
     logger.info("invoke " + smartContractId);
+
     // 修改消息的type为TRANSACTION
     SmartContractMessage message =
         SmartContractMessage.newBuilder()
             .mergeFrom(smartContractMessage)
             .setType(SmartContractMessage.Type.TRANSACTION)
             .build();
-    send(smartContractId, message);
+
     updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_BUSY);
     String txId = smartContractMessage.getTxid();
     addTxId(txId, smartContractId);
     updateTxStatus(smartContractId, txId, TX_STATUS_START);
 
-    while (StringUtils.equals(getTxStatusById(smartContractId, txId), TX_STATUS_COMPLETE)
-        || StringUtils.equals(getTxStatusById(smartContractId, txId), TX_STATUS_ERROR)) {
-      break;
-    }
+    send(smartContractId, message);
+
+    while (!StringUtils.equals(getTxStatusById(smartContractId, txId), TX_STATUS_COMPLETE)
+        && !StringUtils.equals(getTxStatusById(smartContractId, txId), TX_STATUS_ERROR)) {}
 
     SmartContractMessage receiveMessage = getTxMessage(smartContractId, txId);
     return receiveMessage;

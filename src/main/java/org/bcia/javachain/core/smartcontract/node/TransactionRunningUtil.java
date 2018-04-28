@@ -46,6 +46,10 @@ public class TransactionRunningUtil {
   private static Map<String, String> txIdAndStatusMap =
       Collections.synchronizedMap(new HashMap<String, String>());
 
+  public static Map<String, List<KvRwset.KVRead>> getTxIdAndKvReadMap() {
+    return txIdAndKvReadMap;
+  }
+
   private static Map<String, List<KvRwset.KVRead>> txIdAndKvReadMap =
       Collections.synchronizedMap(new HashMap<String, List<KvRwset.KVRead>>());
 
@@ -74,6 +78,7 @@ public class TransactionRunningUtil {
     String composite = composite(smartContractId, txId);
     if (txIdAndKvReadMap.get(composite) == null) {
       List<KvRwset.KVRead> list = new ArrayList<KvRwset.KVRead>();
+      list.add(kvRead);
       txIdAndKvReadMap.put(composite, list);
     } else {
       txIdAndKvReadMap.get(composite).add(kvRead);
