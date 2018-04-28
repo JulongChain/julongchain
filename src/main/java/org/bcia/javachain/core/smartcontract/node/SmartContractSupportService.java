@@ -138,6 +138,7 @@ public class SmartContractSupportService
 
         // 收到error信息
         if (message.getType().equals(SmartContractMessage.Type.ERROR)) {
+          addTxMessage(smartContractId, txId, message);
           updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_ERROR);
           updateTxStatus(smartContractId, txId, TX_STATUS_ERROR);
           return;
@@ -151,6 +152,7 @@ public class SmartContractSupportService
 
         // 收到complete信息
         if (message.getType().equals(SmartContractMessage.Type.COMPLETED)) {
+          addTxMessage(smartContractId, txId, message);
           updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_READY);
           updateTxStatus(smartContractId, txId, TX_STATUS_COMPLETE);
           return;
@@ -202,14 +204,14 @@ public class SmartContractSupportService
                 KvRwset.KVRead.newBuilder().setVersion(version).setKey(key).build();
 
             // 保存所有的读记录
-            TransactionRunningUtil.addKvRead(txId, kvRead);
+            TransactionRunningUtil.addKvRead(smartContractId, txId, kvRead);
 
             // 查询世界状态数据库
             db = LevelDBUtil.getDB(stateLevelDBPath);
 
             byte[] worldStateBytes = LevelDBUtil.get(db, worldStateKeyByte, true);
             if (worldStateBytes == null) {
-            	worldStateBytes = new byte[]{};
+              worldStateBytes = new byte[] {};
             }
 
             // 发送读取结果到shim端
@@ -344,7 +346,7 @@ public class SmartContractSupportService
    * @param smartContractId 智能合约编号
    * @param smartContractMessage 消息
    */
-  public static void invoke(String smartContractId, SmartContractMessage smartContractMessage) {
+  public static SmartContractMessage invoke(String smartContractId, SmartContractMessage smartContractMessage) {
     logger.info("invoke " + smartContractId);
     // 修改消息的type为TRANSACTION
     SmartContractMessage message =
@@ -362,6 +364,9 @@ public class SmartContractSupportService
         || StringUtils.equals(getTxStatusById(smartContractId, txId), TX_STATUS_ERROR)) {
       break;
     }
+
+    SmartContractMessage receiveMessage = getTxMessage(smartContractId, txId);
+    return receiveMessage;
   }
 
   /**
