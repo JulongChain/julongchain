@@ -16,6 +16,7 @@ package org.bcia.javachain.core.smartcontract.node;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.stub.StreamObserver;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bcia.javachain.common.exception.LevelDBException;
@@ -133,12 +134,12 @@ public class SmartContractSupportService
         logger.info(
             String.format(
                 "transaction status: txId[%s] smartContractId[%s] txStatus[%s]",
-                txId, smartContractId, getTxStatusById(txId)));
+                txId, smartContractId, getTxStatusById(smartContractId, txId)));
 
         // 收到error信息
         if (message.getType().equals(SmartContractMessage.Type.ERROR)) {
           updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_ERROR);
-          updateTxStatus(txId, TX_STATUS_ERROR);
+          updateTxStatus(smartContractId, txId, TX_STATUS_ERROR);
           return;
         }
 
@@ -151,7 +152,7 @@ public class SmartContractSupportService
         // 收到complete信息
         if (message.getType().equals(SmartContractMessage.Type.COMPLETED)) {
           updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_READY);
-          updateTxStatus(txId, TX_STATUS_COMPLETE);
+          updateTxStatus(smartContractId, txId, TX_STATUS_COMPLETE);
           return;
         }
 
@@ -352,7 +353,12 @@ public class SmartContractSupportService
     updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_BUSY);
     String txId = smartContractMessage.getTxid();
     addTxId(txId, smartContractId);
-    updateTxStatus(txId, TX_STATUS_START);
+    updateTxStatus(smartContractId, txId, TX_STATUS_START);
+
+    while (StringUtils.equals(getTxStatusById(smartContractId, txId), TX_STATUS_COMPLETE)
+        || StringUtils.equals(getTxStatusById(smartContractId, txId), TX_STATUS_ERROR)) {
+      break;
+    }
   }
 
   /**

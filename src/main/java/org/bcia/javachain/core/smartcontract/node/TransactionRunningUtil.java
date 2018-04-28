@@ -86,11 +86,12 @@ public class TransactionRunningUtil {
    * @param txId 交易号
    * @param status 交易运行的状态
    */
-  public static void updateTxStatus(String txId, String status) {
+  public static void updateTxStatus(String smartContractId, String txId, String status) {
     logger.debug(
         String.format(
-            "update txStatus txId[%s] status[%s]->[%s]", txId, getTxStatusById(txId), status));
-    txIdAndStatusMap.put(txId, status);
+            "update txStatus txId[%s] status[%s]->[%s]",
+            txId, getTxStatusById(smartContractId, txId), status));
+    txIdAndStatusMap.put(smartContractId + "||" + txId, status);
   }
 
   /**
@@ -98,7 +99,7 @@ public class TransactionRunningUtil {
    *
    * @param txId
    */
-  public static String getTxStatusById(String txId) {
-    return txIdAndStatusMap.get(txId);
+  public static String getTxStatusById(String smartContractId, String txId) {
+    return txIdAndStatusMap.get(smartContractId + "||" + txId);
   }
 }
