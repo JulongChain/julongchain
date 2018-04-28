@@ -33,12 +33,12 @@ public class HistoryDBHelper {
      */
     public static byte[] constructCompositeHistoryKey(String ns, String key, long blocNum, long tranNum){
         byte[] compositeKey = ns.getBytes();
-        ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
-        ArrayUtils.addAll(compositeKey, key.getBytes());
-        ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
-        ArrayUtils.addAll(compositeKey, Util.longToBytes(blocNum, 8));
-        ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
-        ArrayUtils.addAll(compositeKey, Util.longToBytes(tranNum, 8));
+        compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
+        compositeKey = ArrayUtils.addAll(compositeKey, key.getBytes());
+        compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
+        compositeKey = ArrayUtils.addAll(compositeKey, Util.longToBytes(blocNum, 8));
+        compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
+        compositeKey = ArrayUtils.addAll(compositeKey, Util.longToBytes(tranNum, 8));
         return compositeKey;
     }
 
@@ -48,11 +48,11 @@ public class HistoryDBHelper {
      */
     public static byte[] constructPartialCompositeHistoryKey(String ns, String key, boolean endKey){
         byte[] compositeKey = ns.getBytes();
-        ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
-        ArrayUtils.addAll(compositeKey, key.getBytes());
-        ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
+        compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
+        compositeKey = ArrayUtils.addAll(compositeKey, key.getBytes());
+        compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
         if(endKey){
-            ArrayUtils.addAll(compositeKey, new byte[]{(byte) 0xff});
+            compositeKey = ArrayUtils.addAll(compositeKey, new byte[]{(byte) 0xff});
         }
         return compositeKey;
     }
