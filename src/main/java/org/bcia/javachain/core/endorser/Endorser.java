@@ -146,7 +146,11 @@ public class Endorser implements IEndorserServer {
         //无合约提案不需要背书，例如cssc
         simulateResults = new byte[]{0, 1, 2};//TODO:for test
         if (StringUtils.isBlank(scName) || CommConstant.CSSC.equals(scName)) {
-            return ProposalResponseUtils.buildProposalResponse(response.getPayload());
+            if (!response.getPayload().isEmpty()) {
+                return ProposalResponseUtils.buildProposalResponse(response.getPayload());
+            } else {
+                return ProposalResponseUtils.buildProposalResponse(response);
+            }
         } else {
             ProposalResponsePackage.Response response1 = endorseProposal(groupHeader.getGroupId(), groupHeader.getTxId(), signedProposal, proposal, scIdBuilder,
                     response, simulateResults, scEvent, extension.getPayloadVisibility().toByteArray(), scDefinition);
@@ -420,21 +424,6 @@ public class Endorser implements IEndorserServer {
                 scVersion, txId, isSysSmartContract, signedProposal, proposal, spec);
         ProposalResponsePackage.Response response = (ProposalResponsePackage.Response) objs[0];
         SmartContractEventPackage.SmartContractEvent scEvent = (SmartContractEventPackage.SmartContractEvent) objs[1];
-
-        //测试代码
-        try {
-            Query.GroupQueryResponse groupQueryResponse = null;
-            try {
-                groupQueryResponse = Query.GroupQueryResponse.parseFrom(response.getPayload());
-                for (Query.GroupInfo groupInfo : groupQueryResponse.getGroupsList()) {
-                    log.info("groupInfo-----" + groupInfo.getGroupId());
-                }
-            } catch (InvalidProtocolBufferException e) {
-                log.error(e.getMessage(), e);
-            }
-        } catch (Exception ex) {
-            log.error(ex.getMessage(), ex);
-        }
 
         if (response.getStatus() >= Common.Status.BAD_REQUEST_VALUE) {
             //大于等于400意味着出错，一般为200 OK

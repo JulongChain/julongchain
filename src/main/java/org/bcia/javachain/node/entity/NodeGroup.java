@@ -21,6 +21,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.genesis.GenesisBlockFactory;
+import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
+import org.bcia.javachain.common.groupconfig.MSPConfigHandler;
+import org.bcia.javachain.common.groupconfig.config.ApplicationConfig;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.localmsp.impl.LocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -31,6 +34,7 @@ import org.bcia.javachain.common.util.proto.ProposalUtils;
 import org.bcia.javachain.consenter.common.broadcast.BroadCastClient;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
+import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
 import org.bcia.javachain.core.ssc.cssc.CSSC;
 import org.bcia.javachain.csp.factory.CspManager;
 import org.bcia.javachain.msp.ISigningIdentity;
@@ -38,6 +42,7 @@ import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.msp.mgmt.MspManager;
 import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.common.client.*;
+import org.bcia.javachain.node.common.helper.ConfigTreeHelper;
 import org.bcia.javachain.node.common.helper.SpecHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
@@ -46,6 +51,7 @@ import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Query;
 import org.bcia.javachain.protos.node.Smartcontract;
+import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
 import org.springframework.stereotype.Component;
 
@@ -162,11 +168,11 @@ public class NodeGroup {
                 //测试用
                 if (true) {
                     try {
-                        Common.Block block = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance())
-                                .getGenesisBlock(groupId);
+                        //模拟建立一个Block
+                        Common.Block block = mockCreateBlock(groupId);
 
-                        LedgerManager.initialize(null);
-                        LedgerManager.createLedger(block);
+//                        LedgerManager.initialize(null);
+//                        LedgerManager.createLedger(block);
                         FileUtils.writeFileBytes(groupId + ".block", block.toByteArray());
                     } catch (IOException e) {
                         log.error(e.getMessage(), e);
@@ -199,6 +205,27 @@ public class NodeGroup {
         });
 
 
+    }
+
+    /**
+     * 模拟创建一个Block,用于测试。正式场景应该从Consenter得到一个Block
+     *
+     * @param groupId
+     * @throws IOException
+     * @throws JavaChainException
+     */
+    private Common.Block mockCreateBlock(String groupId) throws IOException, JavaChainException {
+        GenesisConfig.Profile profile = GenesisConfigFactory.loadGenesisConfig().getCompletedProfile
+                (PROFILE_CREATE_GROUP);
+
+        //构造应用子树
+        Configtx.ConfigTree appTree = ConfigTreeHelper.buildApplicationTree(profile.getApplication());
+
+        Configtx.ConfigTree.Builder groupTreeBuilder = Configtx.ConfigTree.newBuilder();
+        groupTreeBuilder.putChilds(GroupConfigConstant.APPLICATION, appTree);
+        Configtx.ConfigTree groupTree = groupTreeBuilder.build();
+
+        return new GenesisBlockFactory(groupTree).getGenesisBlock(groupId);
     }
 
     public NodeGroup joinGroup(String blockPath) throws NodeException {
@@ -241,7 +268,7 @@ public class NodeGroup {
         ProposalResponsePackage.ProposalResponse proposalResponse = endorserClient.sendProcessProposal(signedProposal);
 
         if (proposalResponse != null && proposalResponse.getResponse() != null && proposalResponse.getResponse()
-                .getStatus() == Common.Status.SUCCESS_VALUE) {
+                .getStatus() == ISmartContract.SmartContractResponse.Status.SUCCESS.getCode()) {
             log.info("Join group success");
         } else {
             log.info("Join group fail:" + proposalResponse);

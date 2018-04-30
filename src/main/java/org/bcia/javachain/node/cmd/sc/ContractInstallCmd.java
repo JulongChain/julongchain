@@ -127,9 +127,8 @@ public class ContractInstallCmd extends AbstractNodeContractCmd {
             log.info("Smart Contract path-----$" + scPath);
         }
 
-
         //TODO 待完成
-        nodeSmartContract.install(scName, scVersion, scLanguage, input);
+        nodeSmartContract.install(scName, scVersion, scPath, scLanguage, input);
     }
 
 }

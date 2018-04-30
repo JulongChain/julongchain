@@ -70,7 +70,7 @@ public class Node {
 
     private GroupSupport groupSupport;
 
-    private static Map<String, Group> groupMap = new ConcurrentHashMap<String, Group>();
+    private Map<String, Group> groupMap = new ConcurrentHashMap<String, Group>();
 
     private InitializeCallback initializeCallback;
 
@@ -281,12 +281,12 @@ public class Node {
         GroupSupport groupSupport = new GroupSupport();
 
         Group group = new Group();
-        Node.groupMap.put(groupId, group);
+        groupMap.put(groupId, group);
 
         return group;
     }
 
-    public static Map<String, Group> getGroupMap() {
+    public Map<String, Group> getGroupMap() {
         return groupMap;
     }
 

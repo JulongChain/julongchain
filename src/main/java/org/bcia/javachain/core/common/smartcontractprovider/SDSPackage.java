@@ -15,8 +15,11 @@
  */
 package org.bcia.javachain.core.common.smartcontractprovider;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.node.SmartContractDataPackage;
 import org.bcia.javachain.protos.node.Smartcontract;
 
@@ -27,9 +30,32 @@ import org.bcia.javachain.protos.node.Smartcontract;
  * @date 4/25/18
  * @company Dingxuan
  */
-public class SDSPackage implements ISmartContractPackage{
+public class SDSPackage implements ISmartContractPackage {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(SDSPackage.class);
+
+    private Smartcontract.SmartContractDeploymentSpec deploymentSpec;
+
+    private void reset() {
+
+    }
+
     @Override
     public SmartContractDataPackage.SmartContractData initFromBuffer(byte[] buf) throws JavaChainException {
+        reset();
+
+        Smartcontract.SmartContractDeploymentSpec deploymentSpec = null;
+        try {
+            deploymentSpec = Smartcontract.SmartContractDeploymentSpec.parseFrom(buf);
+        } catch (InvalidProtocolBufferException e) {
+            log.error(e.getMessage(), e);
+            throw new JavaChainException(e);
+        }
+
+        this.deploymentSpec = deploymentSpec;
+
+        //TODO:逻辑未完全实现，先保证可以测试通过
+
+
         return null;
     }
 
@@ -45,7 +71,7 @@ public class SDSPackage implements ISmartContractPackage{
 
     @Override
     public Smartcontract.SmartContractDeploymentSpec getDepSpec() {
-        return null;
+        return deploymentSpec;
     }
 
     @Override
@@ -65,7 +91,14 @@ public class SDSPackage implements ISmartContractPackage{
 
     @Override
     public SmartContractDataPackage.SmartContractData getSmartContractData() {
-        return null;
+        SmartContractDataPackage.SmartContractData.Builder scDataBuilder = SmartContractDataPackage.SmartContractData
+                .newBuilder();
+        scDataBuilder.setName(deploymentSpec.getSmartContractSpec().getSmartContractId().getName());
+        scDataBuilder.setVersion(deploymentSpec.getSmartContractSpec().getSmartContractId().getVersion());
+
+        //TODO:逻辑未完全实现，先保证可以测试通过
+
+        return scDataBuilder.build();
     }
 
     @Override

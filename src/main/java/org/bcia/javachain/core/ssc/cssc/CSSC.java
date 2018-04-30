@@ -22,6 +22,7 @@ import org.bcia.javachain.common.config.IConfigManager;
 import org.bcia.javachain.common.exception.EventException;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.SysSmartContractException;
+import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -54,6 +55,7 @@ import java.util.List;
  * configuration transactions arrive from the ordering service to the committer
  * who calls this smartcontract. The smartcontract also provides peer configuration
  * services such as joining a chain or getting configuration data.
+ *
  * @author sunianle
  * @date 3/5/18
  * @company Dingxuan
@@ -63,21 +65,21 @@ import java.util.List;
 public class CSSC extends SystemSmartContractBase {
     private static JavaChainLog log = JavaChainLogFactory.getLog(CSSC.class);
 
-    public final static String JOIN_GROUP="JoinGroup";
+    public final static String JOIN_GROUP = "JoinGroup";
 
-    public final static String GET_CONFIG_BLOCK="GetConfigBlock";
+    public final static String GET_CONFIG_BLOCK = "GetConfigBlock";
 
-    public final static String GET_GROUPS="GetGroups";
+    public final static String GET_GROUPS = "GetGroups";
 
-    public final static String GET_CONFIG_TREE="GetConfigTree";
+    public final static String GET_CONFIG_TREE = "GetConfigTree";
 
-    public final static String SIMULATE_CONFIG_TREE_UPDATE="SimulateConfigTreeUpdate";
+    public final static String SIMULATE_CONFIG_TREE_UPDATE = "SimulateConfigTreeUpdate";
 
     private IPolicyChecker policyChecker;
 
     private IConfigManager configManager;
 
-    public CSSC(){
+    public CSSC() {
         log.debug("Construct CSSC");
     }
 
@@ -87,8 +89,8 @@ public class CSSC extends SystemSmartContractBase {
     @Override
     public SmartContractResponse init(ISmartContractStub stub) {
         log.info("Init CSSC");
-        policyChecker= PolicyFactory.getPolicyChecker();
-        configManager= ConfigFactory.getConfigManager();
+        policyChecker = PolicyFactory.getPolicyChecker();
+        configManager = ConfigFactory.getConfigManager();
         return newSuccessResponse();
     }
 
@@ -106,129 +108,151 @@ public class CSSC extends SystemSmartContractBase {
     public SmartContractResponse invoke(ISmartContractStub stub) {
         log.debug("Enter CSSC invoke function");
         List<byte[]> args = stub.getArgs();
-        int size=args.size();
-        if(size<1){
-            return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
+        int size = args.size();
+        if (size < 1) {
+            return newErrorResponse(String.format("Incorrect number of arguments, %d", size));
         }
-        String function= ByteString.copyFrom(args.get(0)).toStringUtf8();
-        if(function!=GET_GROUPS && size<2){
-            return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
+        String function = ByteString.copyFrom(args.get(0)).toStringUtf8();
+        if (!GET_GROUPS.equals(function) && size < 2) {
+            return newErrorResponse(String.format("Incorrect number of arguments, %d, %s", size, function));
         }
-        log.debug("Invoke function:{}",function);
+        log.debug("Invoke function:{}", function);
         // Handle ACL:
         // 1. get the signed proposal
         ProposalPackage.SignedProposal sp = stub.getSignedProposal();
-        switch(function){
+        switch (function) {
             case JOIN_GROUP:
-                byte[] blockBytes=args.get(1);
-                if(blockBytes.length==0){
+                byte[] blockBytes = args.get(1);
+                if (blockBytes.length == 0) {
                     return newErrorResponse(String.format("Cannot join the channel <nil> configuration block provided"));
                 }
-                Common.Block block=null;
-                String groupID="";
+                Common.Block block = null;
+                String groupID = "";
                 try {
-                    block= BlockUtils.getBlockFromBlockBytes(blockBytes);
+                    block = BlockUtils.getBlockFromBlockBytes(blockBytes);
                 } catch (InvalidProtocolBufferException e) {
-                    return newErrorResponse(String.format("Get genesis block from block bytes failed,%s",e.getMessage()));
+                    return newErrorResponse(String.format("Get genesis block from block bytes failed,%s", e.getMessage()));
                 }
                 try {
-                    groupID=BlockUtils.getGroupIDFromBlock(block);
+                    groupID = BlockUtils.getGroupIDFromBlock(block);
                 } catch (JavaChainException e) {
-                    return newErrorResponse(String.format("\"JoinGroup\" request failed to extract group id from the block due to [%s]",e.getMessage()));
+                    return newErrorResponse(String.format("\"JoinGroup\" request failed to extract group id from the block due to [%s]", e.getMessage()));
                 }
-                try{
+                try {
                     validateConfigBlock(block);
-                }catch (SysSmartContractException e) {
-                    return newErrorResponse(String.format("\"JoinGroup\" request failed because of validation of configuration block:%s",e.getMessage()));
+                } catch (SysSmartContractException e) {
+                    return newErrorResponse(String.format("\"JoinGroup\" request failed because of validation of configuration block:%s", e.getMessage()));
                 }
                 // 2. check local MSP Admins policy
                 try {
-                    policyChecker.checkPolicyNoGroup(Principal.Admins,sp);
+                    policyChecker.checkPolicyNoGroup(Principal.Admins, sp);
                 } catch (JavaChainException e) {
                     log.error(e.getMessage(), e);
-                    return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check for group [%s]:%s",groupID,e.getMessage()));
+                    return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check for group [%s]:%s", groupID, e.getMessage()));
                 }
-                return joinGroup(groupID,block);
+                return joinGroup(groupID, block);
             case GET_CONFIG_BLOCK:
                 // 2. check policy
-                String groupName=ByteString.copyFrom(args.get(1)).toStringUtf8();
+                String groupName = ByteString.copyFrom(args.get(1)).toStringUtf8();
                 try {
                     AclManagement.getACLProvider().checkACL(Resources.CSSC_GetConfigBlock, groupName, sp);
-                }catch(JavaChainException e){
-                    return newErrorResponse(String.format("\"GET_CONFIG_BLOCK\" Authorization request failed %s: %s",groupName,e.getMessage()));
+                } catch (JavaChainException e) {
+                    return newErrorResponse(String.format("\"GET_CONFIG_BLOCK\" Authorization request failed %s: %s", groupName, e.getMessage()));
                 }
                 return getConfigBlock(groupName);
             case GET_CONFIG_TREE:
-                String groupName2=ByteString.copyFrom(args.get(1)).toStringUtf8();
+                String groupName2 = ByteString.copyFrom(args.get(1)).toStringUtf8();
                 try {
                     AclManagement.getACLProvider().checkACL(Resources.CSSC_GetConfigTree, groupName2, sp);
-                }catch(JavaChainException e){
-                    return newErrorResponse(String.format("\"GET_CONFIG_TREE\" Authorization request failed %s: %s",groupName2,e.getMessage()));
+                } catch (JavaChainException e) {
+                    return newErrorResponse(String.format("\"GET_CONFIG_TREE\" Authorization request failed %s: %s", groupName2, e.getMessage()));
                 }
                 return getConfigTree(groupName2);
             case SIMULATE_CONFIG_TREE_UPDATE:
-                String groupName3=ByteString.copyFrom(args.get(1)).toStringUtf8();
+                String groupName3 = ByteString.copyFrom(args.get(1)).toStringUtf8();
                 try {
                     AclManagement.getACLProvider().checkACL(Resources.CSSC_SimulateConfigTreeUpdate, groupName3, sp);
-                }catch(JavaChainException e){
-                    return newErrorResponse(String.format("\"SIMULATE_CONFIG_TREE_UPDATE\" Authorization request failed %s: %s",groupName3,e.getMessage()));
+                } catch (JavaChainException e) {
+                    return newErrorResponse(String.format("\"SIMULATE_CONFIG_TREE_UPDATE\" Authorization request failed %s: %s", groupName3, e.getMessage()));
                 }
-                return simulateConfigTreeUpdate(groupName3,args.get(2));
+                return simulateConfigTreeUpdate(groupName3, args.get(2));
             case GET_GROUPS:
                 // 2. check local MSP Members policy
                 // TODO: move to ACLProvider once it will support chainless ACLs
                 // 2. check local MSP Admins policy
                 try {
-                    policyChecker.checkPolicyNoGroup(Principal.Members,sp);
+                    policyChecker.checkPolicyNoGroup(Principal.Members, sp);
                 } catch (JavaChainException e) {
                     log.error(e.getMessage(), e);
-                    return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check :%s",e.getMessage()));
+                    return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check :%s", e.getMessage()));
                 }
-                return getGroups();
+                SmartContractResponse groups = getGroups();
+                return groups;
             default:
-                return newErrorResponse(String.format("Invalid Function %s",function));
+                return newErrorResponse(String.format("Invalid Function %s", function));
         }
     }
 
     @Override
     public String getSmartContractStrDescription() {
-        String description="与配置相关的系统智能合约";
+        String description = "与配置相关的系统智能合约";
         return description;
     }
 
     /**
      * validateConfigBlock validate configuration block to see whenever it contains valid config transaction
+     *
      * @param block
      * @throws SysSmartContractException
      */
-    private void validateConfigBlock(Common.Block block)throws SysSmartContractException{
-        Common.Envelope envelopeConfig =null;
+    private void validateConfigBlock(Common.Block block) throws SysSmartContractException {
+        Common.Envelope envelopeConfig = null;
         try {
             envelopeConfig = BlockUtils.extractEnvelope(block, 0);
         } catch (Exception e) {
-            String msg=String.format("Failed to %s",e.getMessage());
-            throw new SysSmartContractException(msg);
-        }
-        Configtx.ConfigEnvelope configEnv = Configtx.ConfigEnvelope.newBuilder().build();
-        Common.GroupHeader header=null;
-        try {
-            header=EnvelopeHelper.unmarshalEnvelopeOfType(envelopeConfig,Common.HeaderType.CONFIG,configEnv);
-        } catch (JavaChainException e) {
-            String msg=String.format("Bad configuration envelope: %s",e.getMessage());
-            throw new SysSmartContractException(msg);
-        }
-        if(configEnv.getConfig().getGroupTree()==null){
-            String msg=String.format("Nil config tree");
-            throw new SysSmartContractException(msg);
-        }
-        if(configEnv.getConfig().getGroupTree().getChildsMap()==null){
-            String msg=String.format("No child map of config tree  are available");
+            String msg = String.format("Failed to %s", e.getMessage());
             throw new SysSmartContractException(msg);
         }
 
-        if(configEnv.getConfig().getGroupTree().getChildsMap().get(GroupConfigConstant.APPLICATION)==null){
-            String msg=String.format("Invalid configuration block, missing %s "+
-                    "configuration map",GroupConfigConstant.APPLICATION);
+        //TODO:modified by zhouhui for test
+        //TODO:由于unmarshalEnvelopeOfType不好实现，临时将其修改为具体的ConfigEnvelope读取以便测试通过----------begin
+        Configtx.ConfigEnvelope configEnv = null;
+        try {
+            configEnv = EnvelopeHelper.getConfigEnvelopeFrom(envelopeConfig);
+        } catch (InvalidProtocolBufferException e) {
+            String msg = String.format("Bad configuration envelope: %s", e.getMessage());
+            throw new SysSmartContractException(msg);
+        } catch (ValidateException e) {
+            String msg = String.format("Bad configuration envelope: %s", e.getMessage());
+            throw new SysSmartContractException(msg);
+        }
+//        Configtx.ConfigEnvelope configEnv = Configtx.ConfigEnvelope.newBuilder().build();
+//        Common.GroupHeader header = null;
+//        try {
+//            header = EnvelopeHelper.unmarshalEnvelopeOfType(envelopeConfig, Common.HeaderType.CONFIG, configEnv);
+//        } catch (JavaChainException e) {
+//            String msg = String.format("Bad configuration envelope: %s", e.getMessage());
+//            throw new SysSmartContractException(msg);
+//        }
+        //TODO:modified by zhouhui for test
+        //TODO:由于unmarshalEnvelopeOfType不好实现，临时将其修改为具体的ConfigEnvelope读取以便测试通过----------end
+
+        if (configEnv.getConfig() == null) {
+            String msg = String.format("Nil config");
+            throw new SysSmartContractException(msg);
+        }
+        if (configEnv.getConfig().getGroupTree() == null) {
+            String msg = String.format("Nil config tree");
+            throw new SysSmartContractException(msg);
+        }
+        if (configEnv.getConfig().getGroupTree().getChildsMap() == null) {
+            String msg = String.format("No child map of config tree  are available");
+            throw new SysSmartContractException(msg);
+        }
+
+        if (configEnv.getConfig().getGroupTree().getChildsMap().get(GroupConfigConstant.APPLICATION) == null) {
+            String msg = String.format("Invalid configuration block, missing %s " +
+                    "configuration map", GroupConfigConstant.APPLICATION);
             throw new SysSmartContractException(msg);
         }
     }
@@ -237,33 +261,33 @@ public class CSSC extends SystemSmartContractBase {
      * joinGroup will join the specified group in the configuration block.
      * Since it is the first block, it is the genesis block containing configuration
      * for this group, so we want to update the group object with this info
+     *
      * @param groupID
      * @param block
      * @return
      */
-    private SmartContractResponse joinGroup(String groupID, Common.Block block){
+    private SmartContractResponse joinGroup(String groupID, Common.Block block) {
         try {
             NodeUtils.createChainFromBlock(block);
         } catch (JavaChainException e) {
             return newErrorResponse(e.getMessage());
         }
         NodeUtils.initChain(groupID);
-        BlockEvents events=null;
-        boolean bCreated=false;
+        BlockEvents events = null;
+        boolean bCreated = false;
         try {
-            events=EventHelper.createBlockEvents(block);
-            bCreated=true;
+            events = EventHelper.createBlockEvents(block);
+            bCreated = true;
             EventHelper.send(events);
         } catch (EventException e) {
-            String msg="";
-            if(bCreated) {
+            String msg = "";
+            if (bCreated) {
                 msg = String.format("Error processing block events for block number [%d]: %s",
                         block.getHeader().getNumber(), e.getMessage());
                 log.error(msg);
-            }
-            else{
+            } else {
                 msg = String.format("Group [%s] Error sending block event for block number [%d]: %s",
-                        groupID,block.getHeader().getNumber(), e.getMessage());
+                        groupID, block.getHeader().getNumber(), e.getMessage());
                 log.error(msg);
             }
         }
@@ -273,13 +297,14 @@ public class CSSC extends SystemSmartContractBase {
     /**
      * Return the current configuration block for the specified chainID. If the
      * peer doesn't belong to the chain, return error
+     *
      * @param groupID
      * @return
      */
-    private SmartContractResponse getConfigBlock(String groupID){
-        Common.Block block =NodeUtils.getCurrentConfigBlock(groupID);
-        if(block==null){
-            String msg=String.format("Unknown group ID,%s",groupID);
+    private SmartContractResponse getConfigBlock(String groupID) {
+        Common.Block block = NodeUtils.getCurrentConfigBlock(groupID);
+        if (block == null) {
+            String msg = String.format("Unknown group ID,%s", groupID);
             return newErrorResponse(msg);
         }
         byte[] blockBytes = block.toByteArray();
@@ -289,50 +314,52 @@ public class CSSC extends SystemSmartContractBase {
     /**
      * getConfigTree returns the current channel and resources configuration for the specified chainID.
      * If the peer doesn't belong to the chain, returns error
+     *
      * @param groupID
      * @return
      */
-    private SmartContractResponse getConfigTree(String groupID){
+    private SmartContractResponse getConfigTree(String groupID) {
         Configtx.Config groupConfig = configManager.getGroupConfig(groupID).getCurrentConfig();
-        if(groupConfig==null){
-            return newErrorResponse(String.format("Unknown group ID,%s",groupID));
+        if (groupConfig == null) {
+            return newErrorResponse(String.format("Unknown group ID,%s", groupID));
         }
-        Configtx.Config resourceConfig=configManager.getResourceConfig(groupID).getCurrentConfig();
-        if(resourceConfig==null){
-            return newErrorResponse(String.format("Unknown group ID,%s",groupID));
+        Configtx.Config resourceConfig = configManager.getResourceConfig(groupID).getCurrentConfig();
+        if (resourceConfig == null) {
+            return newErrorResponse(String.format("Unknown group ID,%s", groupID));
         }
         ResourcesPackage.ConfigTree.Builder builder = ResourcesPackage.ConfigTree.newBuilder();
         builder.setGroupConfig(groupConfig);
         builder.setResourcesConfig(resourceConfig);
-        ResourcesPackage.ConfigTree configTree=builder.build();
+        ResourcesPackage.ConfigTree configTree = builder.build();
         byte[] configTreeBytes = configTree.toByteArray();
         return newSuccessResponse(configTreeBytes);
     }
 
     /**
      * 模拟执行配置树的更新
+     *
      * @param groupID
      * @param envb
      * @return
      */
     private SmartContractResponse simulateConfigTreeUpdate(
-            String groupID,byte[] envb
-    ){
-        if(groupID==null || groupID.isEmpty()){
+            String groupID, byte[] envb
+    ) {
+        if (groupID == null || groupID.isEmpty()) {
             return newErrorResponse("Group ID must not be nil");
         }
-        if(envb==null || envb.length==0){
+        if (envb == null || envb.length == 0) {
             return newErrorResponse("Config delta bytes must not be nil");
         }
-        Common.Envelope envlope =null;
-        IConfig config=null;
+        Common.Envelope envlope = null;
+        IConfig config = null;
         try {
             envlope = Common.Envelope.parseFrom(envb);
-            config=supportByType(groupID,envlope);
+            config = supportByType(groupID, envlope);
             config.updateProposeConfig(envlope);
         } catch (InvalidProtocolBufferException e) {
             return newErrorResponse(e.getMessage());
-        }catch (SysSmartContractException e){
+        } catch (SysSmartContractException e) {
             return newErrorResponse(e.getMessage());
         } catch (JavaChainException e) {
             return newErrorResponse(e.getMessage());
@@ -341,46 +368,46 @@ public class CSSC extends SystemSmartContractBase {
     }
 
     /**
-     *
      * @param groupID
      * @param env
      * @return
      * @throws SysSmartContractException
      */
-    private IConfig supportByType(String groupID, Common.Envelope env)throws SysSmartContractException{
-        Common.Payload payload=null;
+    private IConfig supportByType(String groupID, Common.Envelope env) throws SysSmartContractException {
+        Common.Payload payload = null;
         try {
-            payload=Common.Payload.parseFrom(env.getPayload());
+            payload = Common.Payload.parseFrom(env.getPayload());
         } catch (InvalidProtocolBufferException e) {
-            String msg=String.format("Failed unmarshaling payload: %s",e.getMessage());
+            String msg = String.format("Failed unmarshaling payload: %s", e.getMessage());
             throw new SysSmartContractException(msg);
         }
-        Common.GroupHeader groupHeader=null;
+        Common.GroupHeader groupHeader = null;
         try {
-            groupHeader=Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
+            groupHeader = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
         } catch (InvalidProtocolBufferException e) {
-            String msg=String.format("Failed unmarshaling payload header: %s",e.getMessage());
+            String msg = String.format("Failed unmarshaling payload header: %s", e.getMessage());
             throw new SysSmartContractException(msg);
         }
-        switch (groupHeader.getType()){
+        switch (groupHeader.getType()) {
             case Common.HeaderType.CONFIG_UPDATE_VALUE:
-              return configManager.getGroupConfig(groupID);
+                return configManager.getGroupConfig(groupID);
             case Common.HeaderType.NODE_RESOURCE_UPDATE_VALUE:
-              return configManager.getResourceConfig(groupID);
+                return configManager.getResourceConfig(groupID);
         }
-        String msg=String.format("Invalid payload header type: %d",groupHeader.getType());
+        String msg = String.format("Invalid payload header type: %d", groupHeader.getType());
         throw new SysSmartContractException(msg);
     }
 
     /**
      * getGroups returns information about all groups for this node
+     *
      * @return
      */
-    private SmartContractResponse getGroups(){
-        List<Query.GroupInfo> groupInfoList=NodeUtils.getGroupsInfo();
+    private SmartContractResponse getGroups() {
+        List<Query.GroupInfo> groupInfoList = NodeUtils.getGroupsInfo();
         Query.GroupQueryResponse.Builder builder = Query.GroupQueryResponse.newBuilder().addAllGroups(groupInfoList);
-        Query.GroupQueryResponse groupQueryResponse=builder.build();
-        byte[] gqrBytes=groupQueryResponse.toByteArray();
+        Query.GroupQueryResponse groupQueryResponse = builder.build();
+        byte[] gqrBytes = groupQueryResponse.toByteArray();
         return newSuccessResponse(gqrBytes);
     }
 }
