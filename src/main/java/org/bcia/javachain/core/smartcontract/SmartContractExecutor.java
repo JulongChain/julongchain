@@ -16,16 +16,15 @@
 package org.bcia.javachain.core.smartcontract;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.proto.ProposalResponseUtils;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractContext;
+import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.node.ProposalPackage;
-import org.bcia.javachain.protos.node.ProposalResponsePackage;
-import org.bcia.javachain.protos.node.Smartcontract;
-import org.bcia.javachain.protos.node.SmartcontractShim;
+import org.bcia.javachain.protos.node.*;
 import org.springframework.stereotype.Component;
 
 /**
@@ -80,11 +79,32 @@ public class SmartContractExecutor {
         //执行智能合约
         SmartcontractShim.SmartContractMessage responseMessage = scSupport.execute(scContext, scMessage, timeout);
 
+//        try {
+//            Query.GroupQueryResponse groupQueryResponse = null;
+//            try {
+//                groupQueryResponse = Query.GroupQueryResponse.parseFrom(responseMessage.getPayload());
+//                for(Query.GroupInfo groupInfo : groupQueryResponse.getGroupsList()){
+//                    log.info("groupInfo-----" + groupInfo.getGroupId());
+//                }
+//            } catch (InvalidProtocolBufferException e) {
+//                log.error(e.getMessage(), e);
+//            }
+//        }catch (Exception ex){
+//            log.error(ex.getMessage(), ex);
+//        }
+
         //判断返回结果
         if (responseMessage != null) {
             //完成时返回负载
             if (responseMessage.getType().equals(SmartcontractShim.SmartContractMessage.Type.COMPLETED)) {
-                ProposalResponsePackage.Response response = ProposalResponseUtils.buildResponse(responseMessage.getPayload());
+//                ProposalResponsePackage.Response response = ProposalResponseUtils.buildResponse(responseMessage.getPayload());
+                ProposalResponsePackage.Response response = null;
+                try {
+                    response = ProposalResponsePackage.Response.parseFrom(responseMessage.getPayload());
+                } catch (InvalidProtocolBufferException e) {
+                    log.error(e.getMessage(), e);
+                    throw new SmartContractException("Wrong Response");
+                }
                 return new Object[]{response, responseMessage.getSmartcontractEvent()};
             } else {
                 throw new SmartContractException("execute smart contract fail: " + responseMessage.getPayload());
@@ -112,7 +132,6 @@ public class SmartContractExecutor {
         scMessageBuilder.setPayload(ByteString.copyFrom(payload));
         scMessageBuilder.setTxid(txId);
         scMessageBuilder.setGroupId(groupId);
-
 
 
         Common.GroupHeader groupHeader = Common.GroupHeader.newBuilder().setType(Common.HeaderType.ENDORSER_TRANSACTION.getNumber()).build();

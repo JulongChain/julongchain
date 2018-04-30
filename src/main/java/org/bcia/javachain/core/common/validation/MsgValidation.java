@@ -65,7 +65,9 @@ public class MsgValidation {
 
         //校验扩展域
         if (groupHeader.getType() == Common.HeaderType.ENDORSER_TRANSACTION_VALUE
-                || groupHeader.getType() != Common.HeaderType.CONFIG_VALUE) {
+                || groupHeader.getType() == Common.HeaderType.CONFIG_VALUE) {
+            ValidateUtils.isNotNull(groupHeader.getExtension(), "SmartContractHeaderExtension can not be null");
+
             ProposalPackage.SmartContractHeaderExtension extension = null;
             try {
                 extension = ProposalPackage.SmartContractHeaderExtension.parseFrom(groupHeader.getExtension());
@@ -75,10 +77,8 @@ public class MsgValidation {
                 throw new ValidateException("Wrong SmartContractHeaderExtension");
             }
 
-            if (extension.getSmartContractId() == null) {
-                //智能合约标识为空
-                throw new ValidateException("Missing SmartContractHeaderExtension SmartContractId");
-            }
+            //确保智能合约标识不为空
+            ValidateUtils.isNotNull(extension.getSmartContractId(), "SmartContractId can not be null");
 
             return extension;
 
@@ -95,9 +95,7 @@ public class MsgValidation {
      * @throws ValidateException
      */
     public static void validateSignatureHeader(Common.SignatureHeader signatureHeader) throws ValidateException {
-        if (signatureHeader == null) {
-            throw new ValidateException("Missing signatureHeader");
-        }
+        ValidateUtils.isNotNull(signatureHeader, "signatureHeader can not be null");
 
         //校验随机数，应存在且有效
         if (signatureHeader.getNonce() == null || signatureHeader.getNonce().isEmpty()) {
@@ -158,16 +156,20 @@ public class MsgValidation {
      * @param groupId
      * @throws ValidateException
      */
-    public static void checkSignature(byte[] signature, byte[] message, byte[] creator, String groupId) throws ValidateException {
+    public static void checkSignature(byte[] signature, byte[] message, byte[] creator, String groupId) throws
+            ValidateException {
         if (ArrayUtils.isEmpty(signature) || ArrayUtils.isEmpty(message) || ArrayUtils.isEmpty(creator)) {
             throw new ValidateException("Missing arguments");
         }
 
         //获取反序列化器
         IIdentityDeserializer identityDeserializer = GlobalMspManagement.getIdentityDeserializer(groupId);
+        ValidateUtils.isNotNull(identityDeserializer, "identityDeserializer can not be null");
 
         //反序列化出身份对象
         IIdentity identity = identityDeserializer.deserializeIdentity(creator);
+        ValidateUtils.isNotNull(identity, "identity can not be null");
+
         //校验自身
         identity.validate();
         //校验签名
@@ -182,16 +184,16 @@ public class MsgValidation {
      * @param nonce
      * @throws ValidateException
      */
-    public static void checkProposalTxID(String txId, byte[] creator, byte[] nonce) throws ValidateException {
-        String expectTxID = null;
+    public static void checkProposalTxId(String txId, byte[] creator, byte[] nonce) throws ValidateException {
+        String expectTxId = null;
         try {
-            expectTxID = ProposalUtils.computeProposalTxID(creator, nonce);
+            expectTxId = ProposalUtils.computeProposalTxID(creator, nonce);
         } catch (JavaChainException e) {
             log.error(e.getMessage(), e);
-            throw new ValidateException("Can not validate txId");
+            throw new ValidateException("Can not get expectTxId");
         }
 
-        if (!expectTxID.equals(txId)) {
+        if (!expectTxId.equals(txId)) {
             throw new ValidateException("Wrong txId");
         }
     }

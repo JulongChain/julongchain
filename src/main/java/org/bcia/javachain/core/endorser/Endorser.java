@@ -35,10 +35,7 @@ import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.javachain.node.common.helper.SpecHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.ledger.rwset.Rwset;
-import org.bcia.javachain.protos.node.ProposalPackage;
-import org.bcia.javachain.protos.node.ProposalResponsePackage;
-import org.bcia.javachain.protos.node.SmartContractEventPackage;
-import org.bcia.javachain.protos.node.Smartcontract;
+import org.bcia.javachain.protos.node.*;
 import org.springframework.stereotype.Component;
 
 /**
@@ -98,8 +95,7 @@ public class Endorser implements IEndorserServer {
 
         ProposalPackage.Proposal proposal = (ProposalPackage.Proposal) objs[0];
         Common.GroupHeader groupHeader = (Common.GroupHeader) objs[1];
-        Common.SignatureHeader signatureHeader = (Common.SignatureHeader) objs[2];
-        ProposalPackage.SmartContractHeaderExtension extension = (ProposalPackage.SmartContractHeaderExtension) objs[3];
+        ProposalPackage.SmartContractHeaderExtension extension = (ProposalPackage.SmartContractHeaderExtension) objs[2];
 
         ITxSimulator txSimulator = null;
         IHistoryQueryExecutor historyQueryExecutor = null;
@@ -168,6 +164,7 @@ public class Endorser implements IEndorserServer {
     private Object[] preProcess(ProposalPackage.SignedProposal signedProposal) throws NodeException, ValidateException {
         ValidateUtils.isNotNull(signedProposal, "signedProposal can not be null");
         ValidateUtils.isNotNull(signedProposal.getProposalBytes(), "signedProposal.proposal can not be null");
+        ValidateUtils.isNotNull(signedProposal.getSignature(), "signedProposal.signature can not be null");
 
         //校验Proposal字段
         ProposalPackage.Proposal proposal = null;
@@ -195,37 +192,35 @@ public class Endorser implements IEndorserServer {
             objs = MsgValidation.validateCommonHeader(header);
         } catch (ValidateException e) {
             log.error(e.getMessage(), e);
-            throw new NodeException(e.getMessage());
+            throw new NodeException(e);
         }
 
         Common.GroupHeader groupHeader = (Common.GroupHeader) objs[0];
         Common.SignatureHeader signatureHeader = (Common.SignatureHeader) objs[1];
         ProposalPackage.SmartContractHeaderExtension extension = (ProposalPackage.SmartContractHeaderExtension) objs[2];
 
-        //校验签名
+        //校验签名(验签)
         try {
             MsgValidation.checkSignature(signedProposal.getSignature().toByteArray(), signedProposal.getProposalBytes()
                     .toByteArray(), signatureHeader.getCreator().toByteArray(), groupHeader.getGroupId());
         } catch (ValidateException e) {
             log.error(e.getMessage(), e);
-            throw new NodeException(e.getMessage());
+            throw new NodeException(e);
         }
 
         //校验交易ID
-        if (StringUtils.isBlank(groupHeader.getTxId())) {
-            throw new NodeException("Missing proposal groupHeader txId");
-        }
+        ValidateUtils.isNotBlank(groupHeader.getTxId(), "txId can not be empty");
         try {
-            MsgValidation.checkProposalTxID(groupHeader.getTxId(), signatureHeader.getCreator().toByteArray(),
+            MsgValidation.checkProposalTxId(groupHeader.getTxId(), signatureHeader.getCreator().toByteArray(),
                     signatureHeader.getNonce().toByteArray());
         } catch (ValidateException e) {
             log.error(e.getMessage(), e);
-            throw new NodeException(e.getMessage());
+            throw new NodeException(e);
         }
 
-        //校验智能合约ID
-        //TODO:似乎有逻辑漏洞，如何确保extension及里面的SmartContractId不会为空，虽然前面有所校验，但仅针对其中两个消息
-        if (endorserSupport.isSysSCAndNotInvokableExternal(extension.getSmartContractId().getName())) {
+        //当包含智能合约ID时，校验智能合约ID,是否允许执行
+        if (extension != null && extension.getSmartContractId() != null && endorserSupport
+                .isSysSCAndNotInvokableExternal(extension.getSmartContractId().getName())) {
             throw new NodeException("isSysCCAndNotInvokableExternal");
         }
 
@@ -236,12 +231,13 @@ public class Endorser implements IEndorserServer {
             }
 
             //校验权限:仅应用智能合约校验
-            if (!endorserSupport.isSysSmartContract(extension.getSmartContractId().getName())) {
+            if (extension != null && extension.getSmartContractId() != null && !endorserSupport.isSysSmartContract
+                    (extension.getSmartContractId().getName())) {
                 endorserSupport.checkACL(signedProposal, groupHeader, signatureHeader, extension);
             }
         }
 
-        return new Object[]{proposal, groupHeader, signatureHeader, extension};
+        return new Object[]{proposal, groupHeader, extension};
     }
 
     public IEndorserSupport getEndorserSupport() {
@@ -424,6 +420,21 @@ public class Endorser implements IEndorserServer {
                 scVersion, txId, isSysSmartContract, signedProposal, proposal, spec);
         ProposalResponsePackage.Response response = (ProposalResponsePackage.Response) objs[0];
         SmartContractEventPackage.SmartContractEvent scEvent = (SmartContractEventPackage.SmartContractEvent) objs[1];
+
+        //测试代码
+        try {
+            Query.GroupQueryResponse groupQueryResponse = null;
+            try {
+                groupQueryResponse = Query.GroupQueryResponse.parseFrom(response.getPayload());
+                for (Query.GroupInfo groupInfo : groupQueryResponse.getGroupsList()) {
+                    log.info("groupInfo-----" + groupInfo.getGroupId());
+                }
+            } catch (InvalidProtocolBufferException e) {
+                log.error(e.getMessage(), e);
+            }
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+        }
 
         if (response.getStatus() >= Common.Status.BAD_REQUEST_VALUE) {
             //大于等于400意味着出错，一般为200 OK
