@@ -96,7 +96,7 @@ public class NodeSmartContract {
         //获取背书节点返回信息
         EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
-        log.info("Install Result: " + proposalResponse.getResponse().getMessage());
+        log.info("Install Result: " + proposalResponse.getResponse().getStatus());
     }
 
     public void instantiate(String ip, int port, String groupId, String scName, String scVersion, Smartcontract
