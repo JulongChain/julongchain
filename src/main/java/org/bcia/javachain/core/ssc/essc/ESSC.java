@@ -21,6 +21,9 @@ import org.bcia.javachain.common.util.proto.ProposalResponseUtils;
 import org.bcia.javachain.common.util.proto.ProtoUtils;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
+import org.bcia.javachain.msp.IMsp;
+import org.bcia.javachain.msp.ISigningIdentity;
+import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.springframework.stereotype.Component;
@@ -151,11 +154,11 @@ public class ESSC extends SystemSmartContractBase {
         }
 
         // obtain the default signing identity for this peer; it will be used to sign this proposal response
-        MockMSP localMSP = MockMspManager.getLocalMSP();
+        IMsp localMSP = GlobalMspManagement.getLocalMsp();
         if(localMSP==null){
             return newErrorResponse("Local MSP is empty");
         }
-        MockSigningIdentity signingEndorser =localMSP.getDefaultSigningIdentity();
+        ISigningIdentity signingEndorser =localMSP.getDefaultSigningIdentity();
         if(signingEndorser==null){
             return newErrorResponse("Could not obtain the default signing identity");
         }

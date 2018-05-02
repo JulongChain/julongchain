@@ -19,7 +19,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.core.ledger.util.Util;
 
 /**
- * 类描述
+ * 封装读取的区块文件位置
  *
  * @author sunzongyu
  * @date 2018/04/12

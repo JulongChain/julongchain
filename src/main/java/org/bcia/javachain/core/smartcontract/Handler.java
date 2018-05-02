@@ -25,8 +25,8 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.common.sysscprovider.SmartContractInstance;
 import org.bcia.javachain.core.container.scintf.ISmartContractStream;
-import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.ITxSimulator;
+import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.node.NodeConfig;
 import org.bcia.javachain.core.smartcontract.shim.fsm.CBDesc;
@@ -107,7 +107,7 @@ public class Handler {
             new EventDesc(READY.toString(),                 ESTABLISHED_STATE,  READY_STATE),
             new EventDesc(PUT_STATE.toString(),             READY_STATE,        READY_STATE),
             new EventDesc(DEL_STATE.toString(),             READY_STATE,        READY_STATE),
-            new EventDesc(INVOKE_SMARTCONTRACT.toString(),      READY_STATE,        READY_STATE),
+            new EventDesc(INVOKE_SMARTCONTRACT.toString(),  READY_STATE,        READY_STATE),
             new EventDesc(COMPLETED.toString(),             READY_STATE,        READY_STATE),
             new EventDesc(GET_STATE.toString(),             READY_STATE,        READY_STATE),
             new EventDesc(GET_STATE_BY_RANGE.toString(),    READY_STATE,        READY_STATE),
@@ -133,7 +133,7 @@ public class Handler {
             new CBDesc(AFTER_EVENT,     QUERY_STATE_CLOSE.toString(),   (event) -> afterQueryStateClose(event, fsm.current())),
             new CBDesc(AFTER_EVENT,     PUT_STATE.toString(),           (event) -> enterBusyState(event, fsm.current())),
             new CBDesc(AFTER_EVENT,     DEL_STATE.toString(),           (event) -> enterBusyState(event, fsm.current())),
-            new CBDesc(AFTER_EVENT,     INVOKE_SMARTCONTRACT.toString(),    (event) -> enterBusyState(event, fsm.current())),
+            new CBDesc(AFTER_EVENT,     INVOKE_SMARTCONTRACT.toString(),(event) -> enterBusyState(event, fsm.current())),
             new CBDesc(ENTER_STATE,     ESTABLISHED_STATE,              (event) -> enterEstablishedState(event, fsm.current())),
             new CBDesc(ENTER_STATE,     READY_STATE,                    (event) -> enterReadyState(event, fsm.current())),
             new CBDesc(ENTER_STATE,     END_STATE,                      (event) -> enterEndState(event, fsm.current()))
@@ -734,6 +734,7 @@ public class Handler {
 //                    } else {
 //                        res, err = txContext.txsimulator.GetState(chaincodeID, getState.Key)
 //                    }
+
                 }
                 if (res != null) {
                     //The state object being requested does not exist

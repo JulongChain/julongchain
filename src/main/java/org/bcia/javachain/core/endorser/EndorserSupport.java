@@ -16,20 +16,23 @@
 package org.bcia.javachain.core.endorser;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.apache.commons.lang3.StringUtils;
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
+import org.bcia.javachain.common.resourceconfig.config.SmartContractConfig;
 import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractContext;
-import org.bcia.javachain.core.common.smartcontractprovider.SmartContractData;
-import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.ledger.ITxSimulator;
-import org.bcia.javachain.core.node.NodeTool;
+import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
+import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
+import org.bcia.javachain.core.node.util.NodeUtils;
 import org.bcia.javachain.core.smartcontract.SmartContractExecutor;
 import org.bcia.javachain.core.ssc.ISystemSmartContractManager;
 import org.bcia.javachain.core.ssc.SystemSmartContractManager;
@@ -37,6 +40,8 @@ import org.bcia.javachain.core.ssc.lssc.LSSC;
 import org.bcia.javachain.node.common.helper.SpecHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * 背书能力支持对象(隔离对其他模块的依赖)
@@ -45,14 +50,15 @@ import org.bcia.javachain.protos.node.*;
  * @date 2018/3/15
  * @company Dingxuan
  */
+@Component
 public class EndorserSupport implements IEndorserSupport {
     private static JavaChainLog log = JavaChainLogFactory.getLog(EndorserSupport.class);
 
-    //TODO:Spring
-    private ISystemSmartContractManager sysSmartContractManager = new SystemSmartContractManager();
+    @Autowired
+    private ISystemSmartContractManager sysSmartContractManager;
 
-    //TODO:Spring
-    private SmartContractExecutor smartContractExecutor = new SmartContractExecutor();
+    @Autowired
+    private SmartContractExecutor smartContractExecutor;
 
     @Override
     public boolean isSysSCAndNotInvokableExternal(String scName) {
@@ -61,8 +67,12 @@ public class EndorserSupport implements IEndorserSupport {
 
     @Override
     public ITxSimulator getTxSimulator(String ledgerName, String txId) throws NodeException {
-        INodeLedger nodeLedger = NodeTool.getLedger(ledgerName);
+        if (StringUtils.isBlank(ledgerName)) {
+            return null;
+        }
+
         try {
+            INodeLedger nodeLedger = LedgerManager.openLedger(ledgerName);
             return nodeLedger.newTxSimulator(txId);
         } catch (LedgerException e) {
             log.error(e.getMessage(), e);
@@ -72,8 +82,12 @@ public class EndorserSupport implements IEndorserSupport {
 
     @Override
     public IHistoryQueryExecutor getHistoryQueryExecutor(String ledgerName) throws NodeException {
-        INodeLedger nodeLedger = NodeTool.getLedger(ledgerName);
+        if (StringUtils.isBlank(ledgerName)) {
+            return null;
+        }
+
         try {
+            INodeLedger nodeLedger = LedgerManager.openLedger(ledgerName);
             return nodeLedger.newHistoryQueryExecutor();
         } catch (LedgerException e) {
             log.error(e.getMessage(), e);
@@ -84,8 +98,8 @@ public class EndorserSupport implements IEndorserSupport {
     @Override
     public TransactionPackage.ProcessedTransaction getTransactionById(String groupId, String txId) throws
             NodeException {
-        INodeLedger nodeLedger = NodeTool.getLedger(groupId);
         try {
+            INodeLedger nodeLedger = LedgerManager.openLedger(groupId);
             return nodeLedger.getTransactionByID(txId);
         } catch (LedgerException e) {
             log.error(e.getMessage(), e);
@@ -146,9 +160,15 @@ public class EndorserSupport implements IEndorserSupport {
             if (objs != null && objs.length > 0) {
                 ProposalResponsePackage.Response response = (ProposalResponsePackage.Response) objs[0];
                 if (response.getStatus() == Common.Status.SUCCESS_VALUE) {
-                    Query.SmartContractInfo info = Query.SmartContractInfo.parseFrom(response.getPayload());
-                    SmartContractData data = new SmartContractData(info);
-                    return data;
+                    SmartContractDataPackage.SmartContractData data = SmartContractDataPackage.SmartContractData
+                            .parseFrom(response.getPayload());
+
+                    return new SmartContractConfig(data);
+
+
+//                    Query.SmartContractInfo info = Query.SmartContractInfo.parseFrom(response.getPayload());
+//                    SmartContractData data = new SmartContractData(info);
+//                    return data;
                 } else {
                     throw new NodeException("Execute smart contract fail, get status code: " + response.getStatus());
                 }
@@ -168,7 +188,11 @@ public class EndorserSupport implements IEndorserSupport {
     public void checkACL(ProposalPackage.SignedProposal signedProposal, Common.GroupHeader groupHeader, Common
             .SignatureHeader signatureHeader, ProposalPackage.SmartContractHeaderExtension extension) {
         //TODO：有些参数未使用?
-        AclManagement.getACLProvider().checkACL(null, groupHeader.getGroupId(), signedProposal);
+        try {
+            AclManagement.getACLProvider().checkACL(null, groupHeader.getGroupId(), signedProposal);
+        } catch (JavaChainException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

@@ -15,6 +15,9 @@
  */
 package org.bcia.javachain.core.common.privdata;
 
+import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.protos.common.Collection;
+
 /**
  * 类描述
  *
@@ -23,4 +26,18 @@ package org.bcia.javachain.core.common.privdata;
  * @company Dingxuan
  */
 public class SimpleCollectionStore implements ICollectionStore{
+    @Override
+    public ICollection retrieveColletion(Collection.CollectionCriteria collectionCriteria) throws JavaChainException {
+        return null;
+    }
+
+    @Override
+    public ICollectionAccessPolicy retrieveCollectionAccessPolicy(Collection.CollectionCriteria collectionCriteria) throws JavaChainException {
+        return null;
+    }
+
+    @Override
+    public ICollectionConfigPackage retriveCollectionConfigPackage(Collection.CollectionCriteria collectionCriteria) throws JavaChainException {
+        return null;
+    }
 }

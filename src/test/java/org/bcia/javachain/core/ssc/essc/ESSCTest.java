@@ -10,6 +10,8 @@ import org.bcia.javachain.common.util.proto.ProposalUtils;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.smartcontract.shim.impl.MockStub;
+import org.bcia.javachain.msp.ISigningIdentity;
+import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.node.entity.MockCrypto;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
@@ -73,7 +75,7 @@ public class ESSCTest extends BaseJunit4Test {
                     build();
             Smartcontract.SmartContractInvocationSpec invocationSpec = Smartcontract.SmartContractInvocationSpec.newBuilder().
                     setSmartContractSpec(smartContractSpec).build();
-            MockSigningIdentity sId = MockMspManager.getLocalMSP().getDefaultSigningIdentity();
+            ISigningIdentity sId = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
             byte[] sIdBytes = sId.serialize();
             byte[] nonce = MockCrypto.getRandomNonce();
             String txID=ProposalUtils.computeProposalTxID(sIdBytes, nonce);

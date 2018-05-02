@@ -22,7 +22,7 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 
 /**
- *
+ *  区块迭代器
  *
  * @author sunzongyu
  * @date 2018/04/12
@@ -32,13 +32,13 @@ public class BlocksItr implements ResultsIterator {
 
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlocksItr.class);
 
-    private BlockfileMgr mgr;
-    private Long maxBlockNumAvailable;
-    private Long blockNumToRetrieve;
+    private BlockFileManager mgr;
+    private long maxBlockNumAvailable;
+    private long blockNumToRetrieve;
     private BlockStream stream;
     private Boolean closeMarker;
 
-    public static BlocksItr newBlockItr(BlockfileMgr mgr, Long startBlockNum) {
+    public static BlocksItr newBlockItr(BlockFileManager mgr, long startBlockNum) {
         BlocksItr itr = new BlocksItr();
         itr.setMgr(mgr);
         itr.setMaxBlockNumAvailable(mgr.getCpInfo().getLastBlockNumber());
@@ -48,63 +48,83 @@ public class BlocksItr implements ResultsIterator {
         return itr;
     }
 
-    public synchronized Long waitForBlock(Long blockNum) {
+    /**
+     * TODO 读取区块时, 区块长度不足将等待区块的添加
+     */
+    public synchronized long waitForBlock(long blockNum) {
 //        while(mgr.getCpInfo().getLastBlockNumber() < blockNum && !shouldClose()){
 //            logger.debug(String.format("Going to wait for newer blocks.maxAvailaBlockNumber=[%d], waitForBlockNum=[%d]"
 //                    , mgr.getCpInfo().getLastBlockNumber(), blockNum));
 //        }
-        return null;
-    }
-
-    void initStream() {
-        return;
-    }
-
-    Boolean shouldClose() {
-        return null;
+        return 0;
     }
 
     /**
-     * Next moves the cursor to next block and returns true iff the iterator is not exhausted
-      */
-    QueryResult Next() {
-        return null;
-    }
-
-    @Override
-    public QueryResult next() throws LedgerException {
-        return null;
+     * 初始化区块文件流
+     */
+    public void initStream() throws LedgerException{
+        FileLocPointer lp = mgr.getIndex().getBlockLocByBlockNum(blockNumToRetrieve);
+        stream.newBlockStream(mgr.getRootDir(), lp.getFileSuffixNum(), lp.getLocPointer().getOffset(), -1);
     }
 
     /**
-     * Close releases any resources held by the iterator
+     * 区块文件迭代器是否可以关闭
+     */
+    public synchronized boolean shouldClose() {
+        return closeMarker;
+    }
+
+    /**
+     * 迭代区块文件
+     * @return block转成的byteString
      */
     @Override
-    public void close() {
-
+    public synchronized QueryResult next() throws LedgerException {
+        //当区块长度不足时等待
+        if(maxBlockNumAvailable < blockNumToRetrieve){
+            maxBlockNumAvailable = waitForBlock(blockNumToRetrieve);
+        }
+        if(closeMarker){
+            return null;
+        }
+        if(stream == null){
+            logger.debug("Initializing block stream for iterator, maxBlockNumAvaliable = " + maxBlockNumAvailable);
+            initStream();
+        }
+        byte[] nextBlockBytes = stream.nextBlockBytes();
+        blockNumToRetrieve++;
+        return (QueryResult) BlockSerialization.deserializeBlock(nextBlockBytes).toByteString();
     }
 
-    public BlockfileMgr getMgr() {
+    @Override
+    public synchronized void close() throws LedgerException{
+        closeMarker = true;
+        if(stream != null){
+            stream.close();
+        }
+    }
+
+    public BlockFileManager getMgr() {
         return mgr;
     }
 
-    public void setMgr(BlockfileMgr mgr) {
+    public void setMgr(BlockFileManager mgr) {
         this.mgr = mgr;
     }
 
-    public Long getMaxBlockNumAvailable() {
+    public long getMaxBlockNumAvailable() {
         return maxBlockNumAvailable;
     }
 
-    public void setMaxBlockNumAvailable(Long maxBlockNumAvailable) {
+    public void setMaxBlockNumAvailable(long maxBlockNumAvailable) {
         this.maxBlockNumAvailable = maxBlockNumAvailable;
     }
 
-    public Long getBlockNumToRetrieve() {
+    public long getBlockNumToRetrieve() {
         return blockNumToRetrieve;
     }
 
-    public void setBlockNumToRetrieve(Long blockNumToRetrieve) {
+    public void setBlockNumToRetrieve(long blockNumToRetrieve) {
         this.blockNumToRetrieve = blockNumToRetrieve;
     }
 

@@ -36,12 +36,12 @@ public interface ILedger {
     /**
      * 返回给定的block
      */
-    Common.Block getBlockByNumber(Long blockNumber) throws LedgerException;
+    Common.Block getBlockByNumber(long blockNumber) throws LedgerException;
 
     /**
      * 返回起始位置为startBlockNumber的迭代器ResultIterator
      */
-    ResultsIterator getBlocksIterator(Long startBlockNumber) throws LedgerException;
+    ResultsIterator getBlocksIterator(long startBlockNumber) throws LedgerException;
 
     /**
      * 关闭账本

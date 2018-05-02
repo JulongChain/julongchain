@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 类描述
+ * namespace迭代器
  *
  * @author sunzongyu
  * @date 2018/04/16
@@ -68,6 +68,7 @@ public class NsIterator implements ResultsIterator {
      *
      * @return
      */
+    @Override
     public QueryResult next() throws LedgerException {
         if(nextIndex >= lastIndex){
             return null;
@@ -87,6 +88,7 @@ public class NsIterator implements ResultsIterator {
     /** Close implements the method from QueryResult interface
      *
      */
+    @Override
     public void close() {
         //nothing to do
     }

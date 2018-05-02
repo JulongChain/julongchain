@@ -18,6 +18,8 @@ package org.bcia.javachain.common.policies;
 import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.util.proto.SignedData;
 
+import java.util.List;
+
 /**
  * 对象
  *
@@ -26,8 +28,9 @@ import org.bcia.javachain.common.util.proto.SignedData;
  * @company Dingxuan
  */
 public class RejectPolicy implements IPolicy {
+
     @Override
-    public void evaluate(SignedData[] signatureSet) throws PolicyException {
+    public void evaluate(List<SignedData> signatureList) throws PolicyException {
         throw new PolicyException("No such policy");
     }
 }

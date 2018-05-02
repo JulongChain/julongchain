@@ -18,10 +18,10 @@ package org.bcia.javachain.common.ledger.blkstorage;
 import org.bcia.javachain.common.exception.LedgerException;
 
 /**
- * BlockStoreProvider provides an handle to a BlockStore
+ * 操作区块文件接口
  *
- * @author wanliangbing
- * @date 2018/3/7
+ * @author sunzongyu
+ * @date 2018/4/7
  * @company Dingxuan
  */
 public interface BlockStoreProvider {

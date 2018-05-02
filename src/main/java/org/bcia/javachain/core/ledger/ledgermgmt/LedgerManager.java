@@ -53,6 +53,9 @@ public class LedgerManager {
     private static INodeLedgerProvider ledgerProvider = null;
     private static boolean initialized = false;
 
+    /**
+     * 初始化
+     */
     public static synchronized void initialize(Map<Common.HeaderType, IProcessor> processors) throws LedgerException {
         log.info("Initializing ledger mgmt");
         initialized = true;
@@ -74,7 +77,6 @@ public class LedgerManager {
         if(!initialized){
             throw ERR_LEDGER_MANAGER_NOT_INITIALIZED;
         }
-
         String id = null;
         //获取区块id
         try {
@@ -84,7 +86,7 @@ public class LedgerManager {
         }
         log.info(String.format("Creating ledger [%s] with genesis block", id));
         INodeLedger l = ledgerProvider.create(genesisBlock);
-        l = wrapLedger(id, l);
+//        l = wrapLedger(id, l);
         openedLedgers.put(id, l);
         log.info(String.format("Created ledger [%s] with genesis block", id));
         return l;
@@ -99,15 +101,15 @@ public class LedgerManager {
         if(!initialized){
             throw ERR_LEDGER_MANAGER_NOT_INITIALIZED;
         }
-        log.info("Opening ledger with id = %s", id);
+        log.info("Opening ledger with id = " + id);
         INodeLedger l = openedLedgers.get(id);
         if(l != null){
-            throw ERR_LEDGER_ALREADY_OPENEND;
+            return l;
         }
         l = ledgerProvider.open(id);
-        l = wrapLedger(id, l);
+//        l = wrapLedger(id, l);
         openedLedgers.put(id, l);
-        log.info("Opened ledger with id = %s" + id);
+        log.info(String.format("Opened ledger with id = %s", id));
         return l;
     }
 
@@ -131,18 +133,11 @@ public class LedgerManager {
             throw ERR_LEDGER_MANAGER_NOT_INITIALIZED;
         }
         for(INodeLedger l : openedLedgers.values()){
-            ((ClosableLedger) l).closeWithoutLock();
+            l.close();
         }
         ledgerProvider.close();
         openedLedgers = new HashMap<>();
         log.info("ledger mgmt closed");
-    }
-
-    public static INodeLedger wrapLedger(String id, INodeLedger l){
-        ClosableLedger cl = new ClosableLedger();
-        cl.setId(id);
-        cl.setNodeLedger(l);
-        return cl;
     }
 
     public void initializeTestEnvWithCustomProcessors(Map<Common.HeaderType, IProcessor> customTxProcessors) throws LedgerException {

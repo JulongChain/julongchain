@@ -15,26 +15,36 @@
  */
 package org.bcia.javachain.node;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.cli.ParseException;
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.groupconfig.GroupConfigBundle;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.common.util.FileUtils;
-import org.bcia.javachain.core.node.NodeConfig;
-import org.bcia.javachain.core.node.NodeConfigFactory;
+import org.bcia.javachain.common.util.proto.BlockUtils;
+import org.bcia.javachain.core.ledger.INodeLedger;
+import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
+import org.bcia.javachain.core.node.GroupSupport;
+import org.bcia.javachain.core.node.util.ConfigTxUtils;
 import org.bcia.javachain.csp.factory.IFactoryOpts;
 import org.bcia.javachain.csp.gm.GmFactoryOpts;
-import org.bcia.javachain.msp.mgmt.MspManager;
+import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.msp.mspconfig.MspConfig;
 import org.bcia.javachain.node.cmd.INodeCmd;
 import org.bcia.javachain.node.cmd.factory.NodeCmdFactory;
+import org.bcia.javachain.node.entity.Group;
+import org.bcia.javachain.node.util.LedgerUtils;
 import org.bcia.javachain.node.util.NodeConstant;
+import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Configtx;
 import org.springframework.stereotype.Component;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.bcia.javachain.msp.mspconfig.MspConfigFactory.loadMspConfig;
 
@@ -45,17 +55,39 @@ import static org.bcia.javachain.msp.mspconfig.MspConfigFactory.loadMspConfig;
  * @date 2018/2/23
  * @company Dingxuan
  */
-@Component
 public class Node {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Node.class);
+
+    /**
+     * 单例模式，确保系统智能合约能够调用到独一实例
+     */
+    private static Node instance;
 
     /**
      * 对命令行的支持
      */
     private INodeCmd nodeCmd;
 
-    public Node() throws NodeException {
+    private GroupSupport groupSupport;
+
+    private Map<String, Group> groupMap = new ConcurrentHashMap<String, Group>();
+
+    private InitializeCallback initializeCallback;
+
+    private Node() throws NodeException {
         init();
+    }
+
+    public static Node getInstance() throws NodeException {
+        if (instance == null) {
+            synchronized (Node.class) {
+                if (instance == null) {
+                    instance = new Node();
+                }
+            }
+        }
+
+        return instance;
     }
 
     /**
@@ -93,6 +125,7 @@ public class Node {
             String[] cleanArgs = new String[args.length - cmdWordCount];
             System.arraycopy(args, cmdWordCount, cleanArgs, 0, cleanArgs.length);
             //只传给子命令正式的参数值
+            log.info("Node Command begin");
             nodeCmd.execCmd(cleanArgs);
         }
 
@@ -118,17 +151,23 @@ public class Node {
 //        String mspId = config.getNode().getLocalMspId();
 //        String mspType = config.getNode().getLocalMspType();
 
-        String mspConfigDir = "D:\\msp";
-        String mspId = "myMspId";
-        String mspType = "csp";
+//        String mspConfigDir = "D:\\msp";
+//        String mspId = "myMspId";
+//        String mspType = "csp";
 
 //        if (!FileUtils.isExists(mspConfigDir)) {
 //            throw new NodeException("MspConfigPath is not exists");
 //        }
 
         try {
-            List<IFactoryOpts> optsList=new ArrayList<IFactoryOpts>();
-            MspConfig mspConfig=loadMspConfig();
+            List<IFactoryOpts> optsList = new ArrayList<IFactoryOpts>();
+            MspConfig mspConfig = loadMspConfig();
+            String mspConfigDir = mspConfig.getNode().getMspConfigPath();
+            String mspId = mspConfig.getNode().getLocalMspId();
+            String mspType = mspConfig.getNode().getLocalMspType();
+//        String mspId = "myMspId";
+//        String mspType = "csp";
+
             String symmetrickey = mspConfig.node.getCsp().getGm().getSymmetricKey();
             String sign = mspConfig.node.getCsp().getGm().getSign();
             String hash = mspConfig.node.getCsp().getGm().getHash();
@@ -136,11 +175,12 @@ public class Node {
             String privateKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPrivateKeyStore();
             String publicKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPublicKeyStore();
             //new GmCspConfig(symmetrickey,asymmetric,hash,sign,publicKeyPath,privateKeyPath);
-            optsList.add(new GmFactoryOpts(symmetrickey,asymmetric,hash,sign,publicKeyPath,privateKeyPath));
+            optsList.add(new GmFactoryOpts(symmetrickey, asymmetric, hash, sign, publicKeyPath, privateKeyPath));
 
-            MspManager.loadLocalMspWithType(mspConfigDir, optsList, mspId, mspType);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            GlobalMspManagement.loadLocalMspWithType(mspConfigDir, optsList, mspId, mspType);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException(e);
         }
 
 
@@ -180,4 +220,83 @@ public class Node {
 //        private INodeLedger ledger;
 //        private FileLedger fileLedger;
 //    }
+
+    /**
+     * 实例化
+     *
+     * @param callback
+     */
+    public void initialize(InitializeCallback callback) {
+        this.initializeCallback = callback;
+
+        try {
+            LedgerManager.initialize(null);
+
+            List<String> ledgerIDs = LedgerManager.getLedgerIDs();
+            if (ledgerIDs != null && ledgerIDs.size() > 0) {
+                for (String ledgerId : ledgerIDs) {
+                    log.info("ledgerId-----$" + ledgerId);
+
+                    try {
+                        INodeLedger nodeLedger = LedgerManager.openLedger(ledgerId);
+
+
+                        Common.Block configBlock = LedgerUtils.getConfigBlockFromLedger(nodeLedger);
+
+                        Group group = createGroup(ledgerId, nodeLedger, configBlock);
+                        groupMap.put(ledgerId, group);
+                        log.info("ledgerId-----$" + ledgerId);
+
+                        if (callback != null) {
+                            callback.onGroupInitialized(ledgerId);
+                        }
+                    } catch (LedgerException e) {
+                        log.error(e.getMessage(), e);
+                    } catch (ValidateException e) {
+                        log.error(e.getMessage(), e);
+                    } catch (InvalidProtocolBufferException e) {
+                        log.error(e.getMessage(), e);
+                    }
+                }
+            }
+        } catch (LedgerException e) {
+            log.error(e.getMessage(), e);
+        }
+    }
+
+    public Group createGroup(String groupId, INodeLedger nodeLedger, Common.Block configBlock) throws
+            InvalidProtocolBufferException, LedgerException, ValidateException {
+        //从账本中获取群组配置
+        Configtx.Config groupConfig = ConfigTxUtils.retrievePersistedGroupConfig(nodeLedger);
+
+        GroupConfigBundle groupConfigBundle = null;
+        if (groupConfig != null) {
+            groupConfigBundle = new GroupConfigBundle();
+        } else {
+            Common.Envelope envelope = BlockUtils.extractEnvelope(configBlock, 0);
+
+
+        }
+
+        GroupSupport groupSupport = new GroupSupport();
+
+        Group group = new Group();
+        groupMap.put(groupId, group);
+
+        return group;
+    }
+
+    public Map<String, Group> getGroupMap() {
+        return groupMap;
+    }
+
+    public InitializeCallback getInitializeCallback() {
+        return initializeCallback;
+    }
+
+    public interface InitializeCallback {
+        void onGroupInitialized(String groupId);
+    }
+
+
 }

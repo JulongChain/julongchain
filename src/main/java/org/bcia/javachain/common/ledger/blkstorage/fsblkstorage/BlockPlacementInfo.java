@@ -16,17 +16,17 @@
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 /**
- * 类描述
+ * 封装block位置信息
  *
- * @author wanliangbing
+ * @author sunzongyu
  * @date 2018/3/8
  * @company Dingxuan
  */
 public class BlockPlacementInfo {
 
     private Integer fileNum;
-    private Long blockStartOffset;
-    private Long blockBytesOffset;
+    private long blockStartOffset;
+    private long blockBytesOffset;
 
     public Integer getFileNum() {
         return fileNum;
@@ -36,19 +36,19 @@ public class BlockPlacementInfo {
         this.fileNum = fileNum;
     }
 
-    public Long getBlockStartOffset() {
+    public long getBlockStartOffset() {
         return blockStartOffset;
     }
 
-    public void setBlockStartOffset(Long blockStartOffset) {
+    public void setBlockStartOffset(long blockStartOffset) {
         this.blockStartOffset = blockStartOffset;
     }
 
-    public Long getBlockBytesOffset() {
+    public long getBlockBytesOffset() {
         return blockBytesOffset;
     }
 
-    public void setBlockBytesOffset(Long blockBytesOffset) {
+    public void setBlockBytesOffset(long blockBytesOffset) {
         this.blockBytesOffset = blockBytesOffset;
     }
 }

@@ -15,8 +15,20 @@
  */
 package org.bcia.javachain.core.common.sysscprovider;
 
+import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.groupconfig.ApplicationProvider;
+import org.bcia.javachain.common.groupconfig.MSPConfigHandler;
+import org.bcia.javachain.common.groupconfig.capability.IApplicationCapabilities;
+import org.bcia.javachain.common.groupconfig.config.ApplicationConfig;
 import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
+import org.bcia.javachain.core.ledger.IQueryExecutor;
+import org.bcia.javachain.node.common.helper.ConfigTreeHelper;
+import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
+import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
+
+import java.io.IOException;
 
 /**
  * 类描述
@@ -26,13 +38,37 @@ import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
  * @company Dingxuan
  */
 public class SystemSmartContractProvider implements ISystemSmartContractProvider {
+    private static final String PROFILE_CREATE_GROUP = "SampleSingleMSPGroup";
+
     @Override
     public IApplicationConfig getApplicationConfig(String groupId) {
+        //TODO: add by zhouhui 使测试通过
+        //构造应用子树
+        GenesisConfig.Profile profile = null;
+        try {
+            profile = GenesisConfigFactory.loadGenesisConfig().getCompletedProfile(PROFILE_CREATE_GROUP);
+            Configtx.ConfigTree appTree = ConfigTreeHelper.buildApplicationTree(profile.getApplication());
+            //得到最终的应用配置
+            ApplicationConfig appConfig = new ApplicationConfig(appTree, new MSPConfigHandler(0));
+            IApplicationCapabilities applicationCapabilities = new ApplicationProvider();
+            return appConfig;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ValidateException e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 
     @Override
     public boolean isSysSmartContract(String essc) {
         return true;
+    }
+
+    @Override
+    public IQueryExecutor getQueryExecutorForLedger(String groupID) throws JavaChainException {
+        return null;
     }
 }

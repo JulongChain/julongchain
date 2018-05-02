@@ -39,7 +39,7 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * 类描述
+ * 交易管理者类
  *
  * @author sunzongyu
  * @date 2018/04/17
@@ -50,7 +50,7 @@ public class LockBasedTxManager implements TxManager {
 
     private String ledgerID;
     private DB db;
-    private IValidator IValidator;
+    private IValidator validator;
     private UpdateBatch batch;
     private Common.Block currentBlock;
     private Map<String, StateListener> stateListeners;
@@ -71,7 +71,6 @@ public class LockBasedTxManager implements TxManager {
 
     @Override
     public IQueryExecutor newQueryExecutor(String txid) throws LedgerException {
-        lock.readLock().lock();
         return LockBasedQueryExecutor.newQueryExecutor(this, txid);
     }
 
@@ -79,7 +78,6 @@ public class LockBasedTxManager implements TxManager {
     public ITxSimulator newTxSimulator(String txid) throws LedgerException {
         logger.debug("Constructing new tx simulator");
         LockBasedTxSimulator s = LockBasedTxSimulator.newLockBasedTxSimulator(this, txid);
-        lock.readLock().lock();
         return s;
     }
 
@@ -88,7 +86,7 @@ public class LockBasedTxManager implements TxManager {
         try {
             Common.Block block = blockAndPvtData.getBlock();
             logger.debug("Validating new block with num trans = " + block.getData().getDataList().size());
-            UpdateBatch b = IValidator.validateAndPrepareBatch(blockAndPvtData, doMVCCValidation);
+            UpdateBatch b = validator.validateAndPrepareBatch(blockAndPvtData, doMVCCValidation);
             currentBlock = block;
             batch = b;
             invokeNamespaceListeners(batch);
@@ -201,11 +199,11 @@ public class LockBasedTxManager implements TxManager {
     }
 
     public IValidator getValidator() {
-        return IValidator;
+        return validator;
     }
 
-    public void setValidator(IValidator IValidator) {
-        this.IValidator = IValidator;
+    public void setValidator(IValidator validator) {
+        this.validator = validator;
     }
 
     public UpdateBatch getBatch() {

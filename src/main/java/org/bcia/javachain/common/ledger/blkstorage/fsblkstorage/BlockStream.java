@@ -34,7 +34,7 @@ public class BlockStream {
     private String rootDir;
     private Integer currentFileNum;
     private Integer endFileNum;
-    private BlockfileStream currentFileStream;
+    private BlockFileStream currentFileStream;
 
     public String getRootDir() {
         return rootDir;
@@ -60,11 +60,11 @@ public class BlockStream {
         this.endFileNum = endFileNum;
     }
 
-    public BlockfileStream getCurrentFileStream() {
+    public BlockFileStream getCurrentFileStream() {
         return currentFileStream;
     }
 
-    public void setCurrentFileStream(BlockfileStream currentFileStream) {
+    public void setCurrentFileStream(BlockFileStream currentFileStream) {
         this.currentFileStream = currentFileStream;
     }
 
@@ -72,7 +72,7 @@ public class BlockStream {
      * 初始化
      */
     public BlockStream newBlockStream(String rootDir, int startFileNum, long startOffset, int endFileNum) throws LedgerException{
-        BlockfileStream startFileStream = new BlockfileStream();
+        BlockFileStream startFileStream = new BlockFileStream();
         startFileStream.newBlockFileStream(rootDir, startFileNum, startOffset);
         this.rootDir = rootDir;
         this.currentFileNum = startFileNum;

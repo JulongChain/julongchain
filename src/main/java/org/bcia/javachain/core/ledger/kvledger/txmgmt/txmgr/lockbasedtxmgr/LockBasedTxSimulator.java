@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 类描述
+ * 交易模拟器
  *
  * @author sunzongyu
  * @date 2018/04/19
@@ -45,19 +45,21 @@ public class LockBasedTxSimulator implements ITxSimulator {
 
     public static LockBasedTxSimulator newLockBasedTxSimulator(LockBasedTxManager txMgr, String txid){
         LockBasedTxSimulator l = new LockBasedTxSimulator();
+
         RWSetBuilder rwSetBuilder = new RWSetBuilder();
-        l.setRwSetBuilder(rwSetBuilder);
+
         QueryHelper queryHelper = new QueryHelper();
         queryHelper.setTxMgr(txMgr);
         queryHelper.setRwSetBuilder(rwSetBuilder);
+
         LockBasedQueryExecutor lockBasedQueryExecutor = new LockBasedQueryExecutor();
         lockBasedQueryExecutor.setHelper(queryHelper);
         lockBasedQueryExecutor.setTxID(txid);
-        LockBasedTxSimulator lockBasedTxSimulator = new LockBasedTxSimulator();
-        lockBasedTxSimulator.setQueryExecutor(lockBasedQueryExecutor);
-        lockBasedTxSimulator.setRwSetBuilder(rwSetBuilder);
-        lockBasedTxSimulator.setWritePreformed(false);
-        lockBasedTxSimulator.setPvtdataQueriesPerformed(false);
+
+        l.setQueryExecutor(lockBasedQueryExecutor);
+        l.setRwSetBuilder(rwSetBuilder);
+        l.setWritePreformed(false);
+        l.setPvtdataQueriesPerformed(false);
         return l;
     }
 
@@ -128,9 +130,9 @@ public class LockBasedTxSimulator implements ITxSimulator {
     }
 
     @Override
-    public ResultsIterator getStateRangeScanIterator(String namespace, String collection, String startKey, String endKey) throws LedgerException {
+    public ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
         checkBeforePvtdataQueries();
-        return queryExecutor.getPrivateDataRangeScanIterator(namespace, collection, startKey, endKey);
+        return queryExecutor.getStateRangeScanIterator(namespace, startKey, endKey);
     }
 
     @Override

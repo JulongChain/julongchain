@@ -27,6 +27,12 @@ public class SmartContractDefinition {
     private byte[] hash = null;
     private String version = null;
 
+    public SmartContractDefinition(String smartContractName, String smartContractVersion, byte[] id) {
+        this.name=smartContractName;
+        this.version=smartContractVersion;
+        this.hash=id;
+    }
+
     @Override
     public String toString() {
         return String.format("Name=%s, Version=%s, Hash=%s", name, version, getHashString());

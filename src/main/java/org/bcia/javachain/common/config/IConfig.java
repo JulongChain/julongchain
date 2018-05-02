@@ -15,12 +15,26 @@
  */
 package org.bcia.javachain.common.config;
 
+
+import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Configtx;
+
 /**
- * 类描述
+ * IConfig encapsulates config (group or resource) tree
  *
  * @author sunianle
  * @date 3/13/18
  * @company Dingxuan
  */
 public interface IConfig {
+    /**
+     * getCurrentConfig returns the current config
+     * @return
+     */
+    Configtx.Config getCurrentConfig();
+    /**
+     * updateProposeConfig attempts to validate a new configtx against the current config state
+     */
+    Configtx.ConfigEnvelope updateProposeConfig(Common.Envelope configtx) throws JavaChainException;
 }

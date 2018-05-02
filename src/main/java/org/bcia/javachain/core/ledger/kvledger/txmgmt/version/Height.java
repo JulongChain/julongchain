@@ -19,7 +19,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.core.ledger.util.Util;
 
 /**
- * 类描述
+ * 封装版本信息
  *
  * @author wanliangbing
  * @date 2018/3/9
@@ -27,22 +27,22 @@ import org.bcia.javachain.core.ledger.util.Util;
  */
 public class Height {
 
-    private Long blockNum;
-    private Long txNum;
+    private long blockNum;
+    private long txNum;
 
-    public Long getBlockNum() {
+    public long getBlockNum() {
         return blockNum;
     }
 
-    public void setBlockNum(Long blockNum) {
+    public void setBlockNum(long blockNum) {
         this.blockNum = blockNum;
     }
 
-    public Long getTxNum() {
+    public long getTxNum() {
         return txNum;
     }
 
-    public void setTxNum(Long txNum) {
+    public void setTxNum(long txNum) {
         this.txNum = txNum;
     }
 
@@ -67,9 +67,9 @@ public class Height {
 
     public int compare(Height h){
         int res = 0;
-        if(!this.blockNum.equals(h.blockNum)){
+        if(this.blockNum != h.blockNum){
             res = (int) (this.blockNum - h.blockNum);
-        } else if(!this.txNum.equals(h.txNum)) {
+        } else if(this.txNum != h.txNum) {
             res = (int) (this.txNum - h.txNum);
         } else {
             return 0;

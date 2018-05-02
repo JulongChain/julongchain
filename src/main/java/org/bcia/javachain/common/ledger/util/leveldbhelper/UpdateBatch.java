@@ -15,17 +15,21 @@
  */
 package org.bcia.javachain.common.ledger.util.leveldbhelper;
 
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 批量操作
+ * 批量操作更新包
  *
  * @author sunzongyu
  * @date 2018/04/09
  * @company Dingxuan
  */
 public class UpdateBatch  {
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(UpdateBatch.class);
 
     private Map<byte[],byte[]> kvs = new HashMap<>();
 
@@ -35,6 +39,10 @@ public class UpdateBatch  {
      * @param value
      */
     public void put(byte[] key, byte[] value) {
+        if(value == null){
+            logger.error("Can not put [null] value into update batch");
+            throw new RuntimeException("Can not put [null] value into update batch");
+        }
         kvs.put(key, value);
     }
 
@@ -43,7 +51,7 @@ public class UpdateBatch  {
      * @param key
      */
     public void delete(byte[] key) {
-        kvs.remove(key);
+        kvs.put(key, null);
     }
 
     public Map<byte[], byte[]> getKvs() {

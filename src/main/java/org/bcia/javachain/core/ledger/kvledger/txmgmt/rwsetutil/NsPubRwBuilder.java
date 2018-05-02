@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 类描述
+ * NamespacePublicRWset 构建
  *
  * @author sunzongyu
  * @date 2018/04/16

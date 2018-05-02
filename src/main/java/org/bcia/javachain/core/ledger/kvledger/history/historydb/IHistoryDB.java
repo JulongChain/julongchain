@@ -18,12 +18,10 @@ package org.bcia.javachain.core.ledger.kvledger.history.historydb;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
-import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.kvledger.Recoverable;
+import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.protos.common.Common;
-
-import java.util.Map;
 
 /**
  * HistoryDB接口
@@ -52,16 +50,18 @@ public interface IHistoryDB extends Recoverable {
     /**
      * 判断是否需要恢复数据库
      */
+    @Override
     long shouldRecover() throws LedgerException;
 
     /**
      * 恢复位置
      */
-    long recoverPoint(Long lastAvailableBlock) throws LedgerException;
+    long recoverPoint(long lastAvailableBlock) throws LedgerException;
 
     /**
      * 提交丢失的区块
      */
+    @Override
     void commitLostBlock(BlockAndPvtData blockAndPvtData) throws  LedgerException;
 
 }

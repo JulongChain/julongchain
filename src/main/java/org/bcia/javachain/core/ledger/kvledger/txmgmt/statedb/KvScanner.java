@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * 类描述
+ * kv查询类
  *
  * @author sunzongyu
  * @date 2018/04/13
@@ -77,8 +77,8 @@ public class KvScanner implements ResultsIterator {
         VersionedValue versionedValue = new VersionedValue();
         versionedValue.setVersion(version);
         versionedValue.setValue(value);
-        kv.setCompositeKey(compositeKey);
-        kv.setVersionedValue(versionedValue);
+        ((VersionedKV) kv).setCompositeKey(compositeKey);
+        ((VersionedKV) kv).setVersionedValue(versionedValue);
         return kv;
     }
 

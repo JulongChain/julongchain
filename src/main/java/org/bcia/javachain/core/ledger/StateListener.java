@@ -20,7 +20,7 @@ import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 import java.util.List;
 
 /**
- * 类描述
+ * 状态监听器
  *
  * @author sunzongyu
  * @date 2018/04/16

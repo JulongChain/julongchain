@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import static java.util.stream.Collectors.joining;
 
+
 public class CompositeKey {
 
 	private static final String DELIMITER = new String(Character.toChars(Character.MIN_CODE_POINT));

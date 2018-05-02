@@ -20,7 +20,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.UpdateBatch;
 import java.util.List;
 
 /**
- * 类描述
+ * Ns数据更新包
  *
  * @author sunzongyu
  * @date 2018/04/17
@@ -41,3 +41,4 @@ public class NsBatch {
         this.batch = batch;
     }
 }
+

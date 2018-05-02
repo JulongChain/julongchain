@@ -16,10 +16,10 @@
 package org.bcia.javachain.common.ledger.blkstorage;
 
 /**
- * 类描述
+ * 索引信息
  *
- * @author wanliangbing
- * @date 2018/3/7
+ * @author sunzongyu
+ * @date 2018/4/7
  * @company Dingxuan
  */
 public class IndexConfig {

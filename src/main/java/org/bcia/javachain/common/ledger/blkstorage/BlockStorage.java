@@ -18,9 +18,9 @@ package org.bcia.javachain.common.ledger.blkstorage;
 import org.bcia.javachain.common.exception.LedgerException;
 
 /**
- * 类描述
+ * 提供索引前缀
  *
- * @author wanliangbing
+ * @author sunzongyu
  * @date 2018/3/7
  * @company Dingxuan
  */
@@ -29,7 +29,7 @@ public class BlockStorage {
     public static final String INDEXABLE_ATTR_BLOCK_NUM = "BlockNum";
     public static final String INDEXABLE_ATTR_BLOCK_HASH = "BlockHash";
     public static final String INDEXABLE_ATTR_TX_ID = "TxID";
-    public static final String INDEXABLE_ATTR_BLOCK_NUM_TRANS_NUM = "BlockNumTranNum";
+    public static final String INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM = "BlockNumTranNum";
     public static final String INDEXABLE_ATTR_BLOCK_TX_ID = "BlockTxID";
     public static final String INDEXABLE_ATTR_TX_VALIDATION_CODE = "TxValidationCode";
 

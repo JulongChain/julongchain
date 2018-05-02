@@ -18,7 +18,7 @@ package org.bcia.javachain.common.localmsp.impl;
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.msp.mgmt.Identity;
-import org.bcia.javachain.msp.mgmt.MspManager;
+import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.protos.common.Common;
 
 import java.security.SecureRandom;
@@ -32,7 +32,7 @@ public class LocalSigner implements ILocalSigner {
     @Override
     public Common.SignatureHeader newSignatureHeader() {
         try {
-            Identity identity= (Identity) MspManager.getLocalMsp().getDefaultSigningIdentity();
+            Identity identity= (Identity) GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
             byte[] creatorIdentityRaw=identity.serialize();
             Common.SignatureHeader.Builder signatureHeader=Common.SignatureHeader.newBuilder();
             byte[] none=new SecureRandom().generateSeed(24);
@@ -49,6 +49,6 @@ public class LocalSigner implements ILocalSigner {
     @Override
     public byte[] sign(byte[] message) {
        //通过获取msp实例,从实例中
-        return  MspManager.getLocalMsp().getDefaultSigningIdentity().sign(message);
+        return  GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity().sign(message);
     }
 }

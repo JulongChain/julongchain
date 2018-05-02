@@ -17,15 +17,13 @@ package org.bcia.javachain.core.ledger.pvtdatastorage;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.common.ledger.util.DBProvider;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.PvtNsCollFilter;
 import org.bcia.javachain.core.ledger.TxPvtData;
-import org.bcia.javachain.core.ledger.kvledger.KvLedger;
-import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.ledger.rwset.Rwset;
 
 import java.util.ArrayList;
@@ -34,7 +32,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 类描述
+ * 实现pvt数据与blockchain同步写入
+ * 主要方法为prepare、commit和rollback
  *
  * @author sunzongyu
  * @date 2018/04/19
@@ -43,7 +42,7 @@ import java.util.Map;
 public class StoreImpl implements Store {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(StoreImpl.class);
 
-    private LevelDbProvider db;
+    private DBProvider db;
     private String ledgerID;
     private boolean isEmpty;
     private long lastCommittedBlock;
@@ -55,13 +54,15 @@ public class StoreImpl implements Store {
         batchPending = hasPendingCommit();
     }
 
-
+    /**
+     * 根据给出的blockid初始化
+     */
     @Override
     public void initLastCommitedBlock(long blockNum) throws LedgerException {
-        if(!isEmpty && !batchPending){
+        if(!(isEmpty && !batchPending)){
             throw new LedgerException("The private data store is not empty. InitLastCommittedBlock() function call is not allowed");
         }
-        UpdateBatch batch = LevelDbProvider.newUpdateBatch();
+        UpdateBatch batch = LevelDBProvider.newUpdateBatch();
         batch.put(KvEncoding.LAST_COMMITTED_BLK_KEY, KvEncoding.encodeBlockNum(blockNum));
         db.writeBatch(batch, true);
         isEmpty = false;
@@ -69,19 +70,23 @@ public class StoreImpl implements Store {
         logger.debug("InitLastCommittedBlock set to block " + blockNum);
     }
 
+    /**
+     * 根据blockid获取pvtdata
+     */
     @Override
     public List<TxPvtData> getPvtDataByBlockNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
         logger.debug("Getting private data for block " + blockNum);
         if (isEmpty){
             throw new LedgerException("Thr store is empty");
         }
+        //对于提供的blockid不正确情况抛出异常
         if(blockNum > lastCommittedBlock){
             throw new LedgerException("Last committed block " + lastCommittedBlock + " block reuqested " + blockNum);
         }
         byte[] startKey = KvEncoding.getStartKeyForRangeScanByBlockNum(blockNum);
-        byte[] endKey = KvEncoding.getEndKeyForRangeScanByBlockNum(blockNum);
-        logger.debug(String.format("Querying private data for write sets using startKey %d, endKey %d", startKey, endKey));
-        Iterator<Map.Entry<byte[], byte[]>> itr = db.getIterator(startKey, endKey);
+//        byte[] endKey = KvEncoding.getEndKeyForRangeScanByBlockNum(blockNum);
+        logger.debug(String.format("Querying private data for write sets using startKey %s", startKey));
+        Iterator<Map.Entry<byte[], byte[]>> itr = db.getIterator(startKey);
         List<TxPvtData> pvtData = new ArrayList<>();
         while(itr.hasNext()){
             Map.Entry<byte[], byte[]> entry = itr.next();
@@ -96,6 +101,7 @@ public class StoreImpl implements Store {
                 throw new LedgerException(e);
             }
             logger.debug(String.format("Retrieved private data write set for block %d, tran %d", bNum, tNum));
+            //过滤无效的rwset
             Rwset.TxPvtReadWriteSet fileteredWSet = trimPvtWSet(pvtRWSet, filter);
             TxPvtData data = new TxPvtData();
             data.setSeqInBlock(tNum);
@@ -105,28 +111,39 @@ public class StoreImpl implements Store {
         return pvtData;
     }
 
+    /**
+     * 写入pvtdata数据
+     */
     @Override
     public void prepare(long blockNum, List<TxPvtData> pvtData) throws LedgerException{
         if(batchPending){
             throw new LedgerException("A pending batch exists as as result of last invoke to 'Prepare' call." +
                     " Invoke 'Commit' or 'Rollback' on the pending batch before invoking 'Prepare' function");
         }
+        //区块写入异常
         long expectedBlockNum = nextBlockNum();
         if(expectedBlockNum != blockNum){
             throw new LedgerException(String.format("Expected block number=%d, recived block number=%d", expectedBlockNum, blockNum));
         }
-        UpdateBatch batch = LevelDbProvider.newUpdateBatch();
+        UpdateBatch batch = LevelDBProvider.newUpdateBatch();
         for(TxPvtData txPvtData : pvtData){
             byte[] key = KvEncoding.encodePK(blockNum, txPvtData.getSeqInBlock());
             byte[] value = txPvtData.getWriteSet().toByteArray();
             batch.put(key, value);
         }
+        //设置pending_commit_key(为commit或rollback准备)
         batch.put(KvEncoding.PENDING_COMMIT_KEY, KvEncoding.EMPTY_VALUE);
+        //执行写入
         db.writeBatch(batch, true);
         batchPending = true;
         logger.debug(String.format("Saved %d private data write sets for block [%d]", pvtData.size(), blockNum));
     }
 
+    /**
+     * 完成写入
+     * 删除pending_commit_key
+     * 插入last_committed_blk_key
+     */
     @Override
     public void commit() throws LedgerException{
         if(!batchPending){
@@ -134,7 +151,7 @@ public class StoreImpl implements Store {
         }
         long committingBlockNum = nextBlockNum();
         logger.debug("Committing private data for block " + committingBlockNum);
-        UpdateBatch batch = LevelDbProvider.newUpdateBatch();
+        UpdateBatch batch = LevelDBProvider.newUpdateBatch();
         batch.delete(KvEncoding.PENDING_COMMIT_KEY);
         batch.put(KvEncoding.LAST_COMMITTED_BLK_KEY, KvEncoding.encodeBlockNum(committingBlockNum));
         db.writeBatch(batch, true);
@@ -144,6 +161,10 @@ public class StoreImpl implements Store {
         logger.debug("Committed private data for block " + committingBlockNum);
     }
 
+    /**
+     * 回滚
+     * 删除pending_commit_key及数据
+     */
     @Override
     public void rollback() throws LedgerException {
         if(!batchPending){
@@ -152,7 +173,7 @@ public class StoreImpl implements Store {
         long rollingbackBlockNum = nextBlockNum();
         logger.debug("Rolling back private data for block " + rollingbackBlockNum);
         List<byte[]> pendingBatchKeys = retrievePendingBatchKeys();
-        UpdateBatch batch = LevelDbProvider.newUpdateBatch();
+        UpdateBatch batch = LevelDBProvider.newUpdateBatch();
         for(byte[] key : pendingBatchKeys){
             batch.delete(key);
         }
@@ -164,7 +185,7 @@ public class StoreImpl implements Store {
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return isEmpty;
     }
 
     @Override
@@ -185,6 +206,9 @@ public class StoreImpl implements Store {
         //do nothing
     }
 
+    /**
+     * 过滤屌filter中不包含的namespace
+     */
     private Rwset.TxPvtReadWriteSet trimPvtWSet(Rwset.TxPvtReadWriteSet pvtWSet, PvtNsCollFilter filter){
         if(filter == null){
             return pvtWSet;
@@ -212,16 +236,22 @@ public class StoreImpl implements Store {
         return filteredTxPvtRwSet;
     }
 
+    /**
+     * grpc中list数据插入只能一个一个cha如:)
+     */
     private Rwset.NsPvtReadWriteSet.Builder setCollectionPvtRwset(Rwset.NsPvtReadWriteSet.Builder builder, List<Rwset.CollectionPvtReadWriteSet> list){
         for (int i = 0; i < list.size(); i++) {
-            builder.setCollectionPvtRwset(i, list.get(i));
+            builder.addCollectionPvtRwset(i, list.get(i));
         }
         return builder;
     }
 
+    /**
+     * grpc中list数据插入只能一个一个cha如:)
+     */
     private Rwset.TxPvtReadWriteSet.Builder setNsPvtRwset(Rwset.TxPvtReadWriteSet.Builder builder, List<Rwset.NsPvtReadWriteSet> list){
         for (int i = 0; i < list.size(); i++) {
-            builder.setNsPvtRwset(i, list.get(i));
+            builder.addNsPvtRwset(i, list.get(i));
         }
         return builder;
     }
@@ -252,7 +282,7 @@ public class StoreImpl implements Store {
 
     private List<byte[]> retrievePendingBatchKeys() throws LedgerException{
         List<byte[]> pendingBatchKeys = new ArrayList<>();
-        Iterator<Map.Entry<byte[], byte[]>> itr = db.getIterator(KvEncoding.encodePK(nextBlockNum(), 0), null);
+        Iterator<Map.Entry<byte[], byte[]>> itr = db.getIterator(KvEncoding.encodePK(nextBlockNum(), 0));
         while(itr.hasNext()){
             pendingBatchKeys.add(itr.next().getKey());
         }
@@ -260,11 +290,11 @@ public class StoreImpl implements Store {
     }
 
 
-    public LevelDbProvider getDb() {
+    public DBProvider getDb() {
         return db;
     }
 
-    public void setDb(LevelDbProvider db) {
+    public void setDb(DBProvider db) {
         this.db = db;
     }
 

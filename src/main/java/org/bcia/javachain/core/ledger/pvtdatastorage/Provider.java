@@ -16,25 +16,38 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.pvtdatastorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DBPorvider;
+import org.bcia.javachain.common.ledger.util.DBProvider;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 
 /**
- * 类描述
+ * pvtdata操作类
  *
  * @author sunzongyu
  * @date 2018/04/17
  * @company Dingxuan
  */
 public class Provider {
-    private LevelDbProvider db;
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(Provider.class);
 
+    private DBProvider db;
+
+    /**
+     * 创建pvtdata
+     */
     public static Provider newProvider() throws LedgerException {
         Provider provider = new Provider();
-        provider.db = LevelDbProvider.newProvider();
+        String dbPath = LedgerConfig.getPvtDataStorePath();
+        provider.db = LevelDBProvider.newProvider(dbPath);
+        logger.debug("Create pvtprovider using path = " + provider.getDb().getDbPath());
         return provider;
     }
 
+    /**
+     * 根据id打开对应pvtdata
+     */
     public Store openStore(String ledgerID) throws LedgerException{
         Store store = new StoreImpl();
         ((StoreImpl) store).setDb(db);
@@ -43,15 +56,18 @@ public class Provider {
         return store;
     }
 
+    /**
+     * 关闭数据库
+     */
     public void close() throws LedgerException{
         db.close();
     }
 
-    public LevelDbProvider getDb() {
+    public DBProvider getDb() {
         return db;
     }
 
-    public void setDb(LevelDbProvider db) {
+    public void setDb(DBProvider db) {
         this.db = db;
     }
 }

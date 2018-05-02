@@ -18,11 +18,11 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.ResultsIterator;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.common.ledger.util.DBProvider;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
-import org.bcia.javachain.csp.gmt0016.excelsecu.bean.Version;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,17 +42,12 @@ public class VersionLevelDB implements IVersionedDB{
     private static final byte LAST_KEY_INDICATOR = 0x01;
     private static final byte[] SAVE_POINT_KEY = {0x00};
 
-    private LevelDbProvider db;
+    private DBProvider db;
     private String dbName;
-
-    public VersionLevelDB(LevelDbProvider db, String dbName){
-        this.db = db;
-        this.dbName = dbName;
-    }
 
     @Override
     public VersionedValue getState(String namespace, String key) throws LedgerException {
-        logger.debug(String.format("getState() ns = %s, key = %s"), namespace, key);
+        logger.debug(String.format("getState() ns = %s, key = %s", namespace, key));
         byte[] compositeKey = constructCompositeKey(namespace, key);
         byte[] dbVal = db.get(compositeKey);
         if (dbVal == null) {
@@ -78,7 +73,7 @@ public class VersionLevelDB implements IVersionedDB{
     }
 
     @Override
-    public List<VersionedValue> getStateMultipleKeys(String namespace, String[] keys) throws LedgerException {
+    public List<VersionedValue> getStateMultipleKeys(String namespace, List<String> keys) throws LedgerException {
         List<VersionedValue> vals = new ArrayList<>();
         for (String key : keys) {
             VersionedValue val = getState(namespace, key);
@@ -91,11 +86,11 @@ public class VersionLevelDB implements IVersionedDB{
     //TODO kvScanner
     public ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
         byte[] compositeStartKey = constructCompositeKey(namespace, startKey);
-        byte[] compositeEndKey = constructCompositeKey(namespace, endKey);
-        if(endKey == null || "".equals(endKey)){
-            compositeEndKey[compositeEndKey.length - 1] = LAST_KEY_INDICATOR;
-        }
-        db.getIterator(compositeStartKey, compositeEndKey);
+//        byte[] compositeEndKey = constructCompositeKey(namespace, endKey);
+//        if(endKey == null || "".equals(endKey)){
+//            compositeEndKey[compositeEndKey.length - 1] = LAST_KEY_INDICATOR;
+//        }
+        db.getIterator(compositeStartKey);
         return null;
     }
 
@@ -104,9 +99,12 @@ public class VersionLevelDB implements IVersionedDB{
         throw new LedgerException("ExecuteQuery is not support for leveldb");
     }
 
+    /**
+     * 批量写操作
+     */
     @Override
     public void applyUpdates(UpdateBatch batch, Height height) throws LedgerException {
-        org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch dbBatch = LevelDbProvider.newUpdateBatch();
+        org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch dbBatch = LevelDBProvider.newUpdateBatch();
         List<String> nameSpaces = batch.getUpdatedNamespaces();
         for(String ns : nameSpaces){
             Map<String,VersionedValue> updates = batch.getUpdates(ns);
@@ -156,7 +154,7 @@ public class VersionLevelDB implements IVersionedDB{
         return true;
     }
 
-    private byte[] constructCompositeKey(String ns, String key){
+    public static byte[] constructCompositeKey(String ns, String key){
         byte[] result = ArrayUtils.addAll(ns.getBytes(), COMPOSITE_KEY_SEP);
         return ArrayUtils.addAll(result, key.getBytes());
     }
@@ -173,18 +171,19 @@ public class VersionLevelDB implements IVersionedDB{
         return result[1];
     }
 
-    @Override
-    public void loadCommittedVersions(List<CompositeKey> keys) {
-
+    public DBProvider getDb() {
+        return db;
     }
 
-    @Override
-    public Height getCachedVersion(String ns, String key) {
-        return null;
+    public void setDb(DBProvider db) {
+        this.db = db;
     }
 
-    @Override
-    public void clearCachedVersions() {
+    public String getDbName() {
+        return dbName;
+    }
 
+    public void setDbName(String dbName) {
+        this.dbName = dbName;
     }
 }

@@ -68,4 +68,16 @@ public class CommConstant {
      * 升级
      */
     public static final String UPGRADE = "upgrade";
+
+    /**
+     * 路径分隔符
+     */
+    public static final String PATH_SEPARATOR = "/";
+
+    /**
+     * 默认随机数长度
+     */
+    public static final int DEFAULT_NONCE_LENGTH = 24;
+
+
 }

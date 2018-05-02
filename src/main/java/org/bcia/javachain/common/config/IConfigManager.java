@@ -23,4 +23,17 @@ package org.bcia.javachain.common.config;
  * @company Dingxuan
  */
 public interface IConfigManager {
+    /**
+     * getGroupConfig defines methods that are related to group configuration
+     * @param groupID
+     * @return
+     */
+    IConfig getGroupConfig(String groupID);
+
+    /**
+     * getResourceConfig defines methods that are related to resource configuration
+     * @param groupID
+     * @return
+     */
+    IConfig getResourceConfig(String groupID);
 }

@@ -18,24 +18,24 @@ package org.bcia.javachain.core.ledger.kvledger.history.historydb;
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.common.ledger.util.DBProvider;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
-import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
+import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
+import org.bcia.javachain.core.ledger.util.TxValidationFlags;
 import org.bcia.javachain.core.ledger.util.Util;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.NsRwSet;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.TxRwSet;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.javachain.protos.node.ProposalPackage;
 
-import java.util.AbstractMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * LevelDB实现的HistoryDB
@@ -47,7 +47,7 @@ import java.util.Map;
 public class HistoryLevelDB implements IHistoryDB {
 
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(HistoryLevelDB.class);
-    private LevelDbProvider provider = null;
+    private DBProvider provider = null;
     private String dbName = null;
 
     private static final byte[] EMPTY_VALUE = {};
@@ -61,16 +61,13 @@ public class HistoryLevelDB implements IHistoryDB {
         this.dbName = dbName;
     }
 
-    public HistoryLevelDB() throws LedgerException {
-        this.provider = LevelDbProvider.newProvider();
-    }
-
     /**
      * 新建historyDBProvider
      */
     public static HistoryLevelDBProvider newHistoryDBProvider() throws LedgerException {
-        //config
+        String dbPath = LedgerConfig.getHistoryLevelDBPath();
         HistoryLevelDBProvider provider = new HistoryLevelDBProvider();
+        provider.setProvider(LevelDBProvider.newProvider(dbPath));
         logger.debug(String.format("Create historyDB using dbPath = %s", provider.getProvider().getDbPath()));
         return provider;
     }
@@ -78,13 +75,16 @@ public class HistoryLevelDB implements IHistoryDB {
     /**
      * 构建HistoryDB
      */
-    public static IHistoryDB newHistroyDB() throws LedgerException {
-        return new HistoryLevelDB();
+    public static IHistoryDB newHistroyDB(DBProvider dbProvider, String dbName) throws LedgerException {
+        HistoryLevelDB db = new HistoryLevelDB();
+        db.setDbName(dbName);
+        db.setProvider(dbProvider);
+        return db;
     }
 
     @Override
     public IHistoryQueryExecutor newHistoryQueryExecutor(BlockStore blockStore) throws LedgerException {
-        HistoryLevelQueryExecutor executor = new HistoryLevelQueryExecutor();
+        HistoryLevelDBQueryExecutor executor = new HistoryLevelDBQueryExecutor();
         executor.setBlockStore(blockStore);
         executor.setHistoryDB(this);
         return executor;
@@ -94,25 +94,21 @@ public class HistoryLevelDB implements IHistoryDB {
     public void commit(Common.Block block) throws LedgerException {
         long blockNo = block.getHeader().getNumber();
         int tranNo = 0;
-        UpdateBatch dbBatch = new UpdateBatch();
+        UpdateBatch dbBatch = LevelDBProvider.newUpdateBatch();
         logger.debug(String.format("Group [%s]: Updating historyDB for groupNo [%s] with [%d] transactions"
                 , dbName, blockNo, block.getData().getDataCount()));
        //获取失效
-        ByteString txsFilter = null;
-        try {
-            txsFilter = block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber());
-        } catch (Throwable e) {
-            txsFilter = ByteString.copyFrom(new byte[0]);
-        }
+        TxValidationFlags txsFilter = TxValidationFlags.fromByteString(block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
         //没有失效的部分
         //TODO 对于metadata的写入存在Array无法初始化问题
-//        if(txsFilter.isEmpty()){
-////            block.getMetadata().getMetadataList().set(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber(), txsFilter);
-//
-//           Common.BlockMetadata metadata = Common.BlockMetadata.newBuilder().setMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber(), txsFilter).build();
-//           block.getMetadata().toBuilder().setMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber(), txsFilter).
-//            block.toBuilder().setMetadata(metadata);
-//        }
+        if(txsFilter.length() == 0){
+            txsFilter = new TxValidationFlags(block.getData().getDataCount());
+            block = block.toBuilder()
+                    .setMetadata(block.getMetadata().toBuilder()
+                            .setMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber(), txsFilter.toByteString())
+                            .build())
+                    .build();
+        }
         //将每个交易的写集写入HistoryDB
         List<ByteString> list = block.getMetadata().getMetadataList();
         for (; tranNo < list.size(); tranNo++) {
@@ -135,7 +131,7 @@ public class HistoryLevelDB implements IHistoryDB {
                     for(KvRwset.KVWrite kvWrite : nsRwSet.getKvRwSet().getWritesList()){
                        String writeKey = kvWrite.getKey();
                        //key:ns~key~blockNo~tranNo
-                        byte[] compositeHistoryKey = HistmgtHelper.constructCompositeHistoryKey(ns, writeKey, blockNo, tranNo);
+                        byte[] compositeHistoryKey = HistoryDBHelper.constructCompositeHistoryKey(ns, writeKey, blockNo, tranNo);
                         dbBatch.put(compositeHistoryKey, EMPTY_VALUE);
                     }
                 }
@@ -177,7 +173,7 @@ public class HistoryLevelDB implements IHistoryDB {
     }
 
     @Override
-    public long recoverPoint(Long lastAvailableBlock) throws LedgerException {
+    public long recoverPoint(long lastAvailableBlock) throws LedgerException {
         //配置是否开启leveldb
         Height savePoint = getLastSavepoint();
         if(savePoint == null){
@@ -197,5 +193,13 @@ public class HistoryLevelDB implements IHistoryDB {
     private boolean isInvalid(ByteString tx){
 
         return true;
+    }
+
+    public DBProvider getProvider() {
+        return provider;
+    }
+
+    public void setProvider(DBProvider provider) {
+        this.provider = provider;
     }
 }

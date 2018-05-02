@@ -21,12 +21,11 @@ import org.bcia.javachain.core.ledger.IQueryExecutor;
 import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.core.ledger.kvledger.Recoverable;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
-import org.bcia.javachain.protos.common.Common;
 
 import java.util.Map;
 
 /**
- * 类描述
+ * 交易管理者接口
  *
  * @author sunzongyu
  * @date 2018/04/19
@@ -38,7 +37,9 @@ public interface TxManager extends Recoverable {
     ITxSimulator newTxSimulator(String txid) throws LedgerException;
     void validateAndPrepare(BlockAndPvtData blockAndPvtData, Boolean doMVCCValidation) throws LedgerException;
     Height getLastSavepoint() throws LedgerException;
+    @Override
     long shouldRecover() throws LedgerException;
+    @Override
     void commitLostBlock(BlockAndPvtData blockAndPvtData) throws LedgerException;
     void commit() throws LedgerException;
     void rollback() throws LedgerException;

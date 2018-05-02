@@ -15,10 +15,17 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger;
 
+import com.google.protobuf.ByteString;
+import com.google.protobuf.util.JsonFormat;
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.genesis.GenesisBlockFactory;
+import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Configtx;
 import org.junit.Test;
+
+import java.io.File;
 
 /**
  * 类描述
@@ -28,15 +35,82 @@ import org.junit.Test;
  * @company Dingxuan
  */
 public class LedgerManagerTest {
+    INodeLedger l = null;
+    private static final byte[] COMPOSITE_KEY_SEP = {0x00};
 
-    LedgerManager lm;
-
-    @Test
-    public void createLedger() throws LedgerException {
-        lm = new LedgerManager();
-        LedgerManager.initialize(null);
-        INodeLedger l = LedgerManager.createLedger(Common.Block.getDefaultInstance());
+    private static boolean deleteDir(File dir) {
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i=0; i<children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+        return dir.delete();
     }
 
+    @Test
+    public void delete(){
+        System.out.println(deleteDir(new File(Config.getPath())));
+    }
 
+    @Test
+    public void createLedger() throws Exception {
+        GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
+        System.out.println(deleteDir(new File(Config.getPath())));
+        long before = System.currentTimeMillis();
+        LedgerManager.initialize(null);
+        Common.Block block = factory.getGenesisBlock("MyGroup");
+        System.out.println();
+        Common.Block.Builder block1 = Common.Block.newBuilder();
+        System.out.println(block1.getMetadata().getMetadataList().size());
+        JsonFormat.parser().merge(JsonFormat.printer().print(block), block1);
+        System.out.println(block1.getMetadata().getMetadataList().size());
+        l = LedgerManager.createLedger(block);
+//        List<String> list = LedgerManager.getLedgerIDs();
+//        list.forEach((s) -> {
+//            System.out.println(s);
+//        });
+//        ITxSimulator simulator = l.newTxSimulator("MyGroup");
+//        simulator.
+        l.getTransactionByID("asdal");
+    }
+
+    @Test
+    public void openLedger() throws Exception{
+        LedgerManager.initialize(null);
+        l = LedgerManager.openLedger("MyGroup");
+    }
+
+    @Test
+    public void commitBlock() throws LedgerException {
+        LedgerManager.initialize(null);
+        l = LedgerManager.openLedger("MyGroup");
+        BlockAndPvtData bap = new BlockAndPvtData();
+        bap.setBlock(Common.Block.newBuilder()
+                .setHeader(Common.BlockHeader.newBuilder()
+                        .setNumber(4)
+                        .build())
+                .setMetadata(Common.BlockMetadata.newBuilder()
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .build())
+                .build());
+        l.commitWithPvtData(bap);
+    }
+
+    @Test
+    public void newTxSimulator() throws Exception {
+        LedgerManager.initialize(null);
+        String groupId = "MyGroup";
+        l = LedgerManager.openLedger(groupId);
+        ITxSimulator txSimulator = l.newTxSimulator(groupId);
+        for (int i = 0; i < 100; i++) {
+            System.out.println(new String(txSimulator.getState("ns" + i, "keys" + i)));
+        }
+    }
 }

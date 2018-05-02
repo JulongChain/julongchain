@@ -22,7 +22,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 
 /**
- * 类描述
+ * 提供文件系统以及pvtdata操作类
  *
  * @author sunzongyu
  * @date 2018/04/17

@@ -21,6 +21,8 @@ import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.config.ApplicationConfig;
@@ -30,6 +32,7 @@ import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.FileUtils;
+import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.msp.ISigningIdentity;
 import org.bcia.javachain.node.common.helper.ConfigTreeHelper;
 import org.bcia.javachain.node.common.helper.ConfigUpdateHelper;
@@ -68,6 +71,46 @@ public class EnvelopeHelper {
         return buildSignedEnvelope(Common.HeaderType.CONFIG_UPDATE_VALUE, 0, groupId, signer, configUpdateEnvelope,
                 0);
 
+    }
+
+    public static Configtx.ConfigEnvelope getConfigEnvelopeFrom(Common.Envelope envelope) throws
+            InvalidProtocolBufferException, ValidateException {
+        ValidateUtils.isNotNull(envelope, "envelope can not be null");
+        ValidateUtils.isNotNull(envelope.getPayload(), "envelope.Payload can not be null");
+
+        Common.Payload payload = Common.Payload.parseFrom(envelope.getPayload());
+
+        ValidateUtils.isNotNull(payload.getHeader(), "envelope.Payload.header can not be null");
+        ValidateUtils.isNotNull(payload.getHeader().getGroupHeader(), "envelope.groupHeader can not be null");
+        ValidateUtils.isNotNull(payload.getData(), "envelope.Payload.data can not be null");
+
+        Common.GroupHeader groupHeader = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
+
+        if (groupHeader.getType() != Common.HeaderType.CONFIG_VALUE) {
+            throw new ValidateException("Wrong groupHeader type");
+        }
+
+        return Configtx.ConfigEnvelope.parseFrom(payload.getData());
+    }
+
+    public static Configtx.ConfigUpdateEnvelope getConfigUpdateEnvelopeFrom(Common.Envelope envelope) throws
+            InvalidProtocolBufferException, ValidateException {
+        ValidateUtils.isNotNull(envelope, "envelope can not be null");
+        ValidateUtils.isNotNull(envelope.getPayload(), "envelope.Payload can not be null");
+
+        Common.Payload payload = Common.Payload.parseFrom(envelope.getPayload());
+
+        ValidateUtils.isNotNull(payload.getHeader(), "envelope.Payload.header can not be null");
+        ValidateUtils.isNotNull(payload.getHeader().getGroupHeader(), "envelope.groupHeader can not be null");
+        ValidateUtils.isNotNull(payload.getData(), "envelope.Payload.data can not be null");
+
+        Common.GroupHeader groupHeader = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
+
+        if (groupHeader.getType() != Common.HeaderType.CONFIG_UPDATE_VALUE) {
+            throw new ValidateException("Wrong groupHeader type");
+        }
+
+        return Configtx.ConfigUpdateEnvelope.parseFrom(payload.getData());
     }
 
     public static void sendCreateGroupTransaction() {
@@ -177,7 +220,7 @@ public class EnvelopeHelper {
             ProposalResponsePackage.ProposalResponse endorserResponse = endorserResponses[i];
 
             if (endorserResponse.getResponse().getStatus() != 200) {
-                throw new ValidateException("endorserResponse status error: " + endorserResponse);
+                throw new ValidateException("endorserResponse status error: " + endorserResponse.getResponse());
             }
 
             if (i == 0) {
@@ -476,7 +519,9 @@ public class EnvelopeHelper {
         groupHeaderBuilder.setGroupId(groupId);
         groupHeaderBuilder.setTxId(txId);
         groupHeaderBuilder.setEpoch(epoch);
-        groupHeaderBuilder.setExtension(extension.toByteString());
+        if (extension != null) {
+            groupHeaderBuilder.setExtension(extension.toByteString());
+        }
 
         return groupHeaderBuilder.build();
     }
@@ -506,5 +551,21 @@ public class EnvelopeHelper {
         //完成秒和纳秒（即10亿分之一秒）的设置
         return Timestamp.newBuilder().setSeconds(millis / 1000)
                 .setNanos((int) ((millis % 1000) * 1000000)).build();
+    }
+
+    /**
+     *
+     * @param envelopeConfig
+     * @param config
+     * @param configEnv
+     * @return
+     * @throws JavaChainException
+     */
+    public static Common.GroupHeader unmarshalEnvelopeOfType(Common.Envelope envelopeConfig,
+                                                             Common.HeaderType config,
+                                                             Configtx.ConfigEnvelope configEnv)
+                                                             throws JavaChainException
+    {
+        return null;
     }
 }

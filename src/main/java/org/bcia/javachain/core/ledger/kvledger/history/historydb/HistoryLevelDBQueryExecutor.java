@@ -15,12 +15,52 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.kvledger.history.historydb;
 
+import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
+import org.iq80.leveldb.DBIterator;
+
 /**
- * 类描述
+ * HistoryDB查询器
  *
  * @author sunzongyu
  * @date 2018/04/04
  * @company Dingxuan
  */
-public class HistoryLevelDBQueryExecutor {
+public class HistoryLevelDBQueryExecutor implements IHistoryQueryExecutor {
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(HistoryLevelDBQueryExecutor.class);
+
+    private HistoryLevelDB historyDB;
+    private BlockStore blockStore;
+
+    @Override
+    public ResultsIterator getHistoryForKey(String ns, String key) throws LedgerException{
+        if(!LedgerConfig.isHistoryDBEnabled()){
+            throw new LedgerException("History db is not avilable");
+        }
+        byte[] compositeStartKey = HistoryDBHelper.constructPartialCompositeHistoryKey(ns, key, false);
+
+        DBIterator iterator = (DBIterator) historyDB.getProvider().getIterator(compositeStartKey);
+        return HistoryScanner.newHistoryScanner(compositeStartKey, ns, key, iterator, blockStore);
+    }
+
+    public HistoryLevelDB getHistoryDB() {
+        return historyDB;
+    }
+
+    public void setHistoryDB(HistoryLevelDB historyDB) {
+        this.historyDB = historyDB;
+    }
+
+    public BlockStore getBlockStore() {
+        return blockStore;
+    }
+
+    public void setBlockStore(BlockStore blockStore) {
+        this.blockStore = blockStore;
+    }
 }

@@ -19,7 +19,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 
 /**
- * 类描述
+ * hash更新包
  *
  * @author sunzongyu
  * @date 2018/04/17

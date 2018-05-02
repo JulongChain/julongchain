@@ -24,7 +24,7 @@ import org.bcia.javachain.core.ledger.IQueryExecutor;
 import java.util.List;
 
 /**
- * 类描述
+ * 交易查询器类
  *
  * @author sunzongyu
  * @date 2018/04/18
@@ -48,43 +48,43 @@ public class LockBasedQueryExecutor implements IQueryExecutor {
 
     @Override
     public byte[] getState(String namespace, String key) throws LedgerException {
-        return null;
-
+        return helper.getState(namespace, key);
     }
 
     @Override
     public List<byte[]> getStateMultipleKeys(String namespace, List<String> keys) throws LedgerException {
-        return null;
+        return helper.getStateMultipleKeys(namespace, keys);
     }
 
     @Override
-    public ResultsIterator getStateRangeScanIterator(String namespace, String collection, String startKey, String endKey) throws LedgerException {
-        return null;
+    public ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
+        return helper.getStateRangeScanIterator(namespace, startKey, endKey);
     }
 
     @Override
     public ResultsIterator executeQuery(String namespace, String query) throws LedgerException {
-        return null;
+        return helper.executeQuery(namespace, query);
     }
 
     @Override
     public byte[] getPrivateData(String namespace, String collection, String key) throws LedgerException {
-        return new byte[0];
+        return helper.getPrivateData(namespace, collection, key);
     }
 
     @Override
     public List<byte[]> getPrivateDataMultipleKeys(String namespace, String collection, List<String> keys) throws LedgerException {
-        return null;
+        return helper.getPrivateDataMultipleKeys(namespace, collection, keys);
     }
 
     @Override
     public ResultsIterator getPrivateDataRangeScanIterator(String namespace, String collection, String startKey, String endKey) throws LedgerException {
-        return null;
+        return helper.getPrivateDataRangeScanIterator(namespace, collection, startKey, endKey);
     }
 
     @Override
     public void done() throws LedgerException {
-
+        logger.debug("Done with transaction simulation " + txID);
+        helper.done();
     }
 
     public QueryHelper getHelper() {

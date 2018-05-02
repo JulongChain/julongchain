@@ -62,7 +62,11 @@ public class IoUtil {
      * >=0:文件大小
      */
     public static long fileExists(String filePath) {
-        return 0;
+        File file = new File(filePath);
+        if(!file.exists()){
+            return -1;
+        }
+        return file.length();
     }
 
     /** ListSubdirs returns the subdirectories

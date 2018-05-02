@@ -32,7 +32,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valinternal.PubA
 import org.bcia.javachain.protos.common.Common;
 
 /**
- * 类描述
+ * 默认的验证器
  *
  * @author sunzongyu
  * @date 2018/04/20

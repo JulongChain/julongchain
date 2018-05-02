@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.history.historydb;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.common.ledger.util.DBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 
@@ -28,17 +28,13 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
  * @company Dingxuan
  */
 public class HistoryLevelDBProvider implements IHistoryDBProvider {
-
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(HistoryLevelDBProvider.class);
-    private LevelDbProvider provider = null;
-    public HistoryLevelDBProvider() throws LedgerException{
-        this.provider = LevelDbProvider.newProvider();
-    }
 
+    private DBProvider provider = null;
 
     @Override
     public IHistoryDB getDBHandle(String dbName) throws LedgerException {
-        return HistoryLevelDB.newHistroyDB();
+        return HistoryLevelDB.newHistroyDB(provider, dbName);
     }
 
     @Override
@@ -50,11 +46,11 @@ public class HistoryLevelDBProvider implements IHistoryDBProvider {
         return logger;
     }
 
-    public LevelDbProvider getProvider() {
+    public DBProvider getProvider() {
         return provider;
     }
 
-    public void setProvider(LevelDbProvider provider) {
+    public void setProvider(DBProvider provider) {
         this.provider = provider;
     }
 }

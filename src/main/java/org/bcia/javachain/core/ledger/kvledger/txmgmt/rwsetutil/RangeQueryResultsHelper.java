@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 类描述
+ * 范围查询辅助类
  *
  * @author sunzongyu
  * @date 2018/04/18

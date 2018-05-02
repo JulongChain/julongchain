@@ -24,7 +24,7 @@ import org.bcia.javachain.core.ledger.sceventmgmt.ISmartContractLifecycleEventLi
 import java.util.List;
 
 /**
- * 类描述
+ * 管理pvtdata方法
  *
  * @author sunzongyu
  * @date 2018/04/17
@@ -47,7 +47,7 @@ public interface DB extends IVersionedDB {
 
     Height getKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException;
 
-    List<VersionedValue> getPrivateDataMultipleKeys(String ns, String coll, String[] keys) throws LedgerException;
+    List<VersionedValue> getPrivateDataMultipleKeys(String ns, String coll, List<String> keys) throws LedgerException;
 
     ResultsIterator getPrivateDataRangeScanIterator(String ns, String coll, String startKey, String endKey) throws LedgerException;
 

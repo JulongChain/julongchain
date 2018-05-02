@@ -39,16 +39,12 @@ public class NodeConfigFactory {
 
     public static NodeConfig loadNodeConfig() throws IOException {
         Yaml yaml = new Yaml();
-        URL url = NodeConfigFactory.class.getClassLoader().getResource(NodeConfig.NODECONFIG_FILE_PATH);
 
         InputStream is = null;
         try {
-            is = new FileInputStream(url.getFile());
+            is = NodeConfigFactory.class.getClassLoader().getResourceAsStream(NodeConfig.NODECONFIG_FILE_PATH);
             NodeConfig nodeConfig = yaml.loadAs(is, NodeConfig.class);
             return nodeConfig;
-        } catch (FileNotFoundException e) {
-            log.error(e.getMessage(), e);
-            throw e;
         } finally {
             if (is != null) {
                 try {

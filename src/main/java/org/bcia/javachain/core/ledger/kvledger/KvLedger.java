@@ -24,10 +24,12 @@ import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.FsBlockStore;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.*;
+import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.kvledger.history.historydb.IHistoryDB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.TxManager;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr.LockBasedTxManager;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.ledgerstorage.Store;
 import org.bcia.javachain.core.ledger.sceventmgmt.ISmartContractLifecycleEventListener;
 import org.bcia.javachain.core.ledger.sceventmgmt.ScEventMgmt;
@@ -38,7 +40,7 @@ import org.bcia.javachain.protos.node.TransactionPackage;
 import java.util.*;
 
 /**
- * 类描述
+ * 账本类
  *
  * @author sunzongyu
  * @date 2018/04/13
@@ -119,26 +121,27 @@ public class KvLedger implements INodeLedger {
             return;
         } else if(recoverers.size() == 1){
             recommitLostBlocks(recoverers.get(0).getFirstBlockNum(), lastAvailableBlockNum, recoverers.get(0).getRecoverable());
+        } else {
+            //小号放前面 升序
+            Collections.sort(recoverers, new Comparator<Recoverer>() {
+                @Override
+                public int compare(Recoverer o1, Recoverer o2) {
+                    return o1.getFirstBlockNum() > o2.getFirstBlockNum() ? 1 : -1;
+                }
+            });
+            //小号向大号看齐
+            recommitLostBlocks(recoverers.get(0).getFirstBlockNum(), recoverers.get(1).getFirstBlockNum() - 1,
+                    recoverers.get(0).getRecoverable());
+            //大号向正确看齐
+            recommitLostBlocks(recoverers.get(1).getFirstBlockNum(), lastAvailableBlockNum,
+                    recoverers.get(0).getRecoverable(), recoverers.get(1).getRecoverable());
         }
-        //小号放前面 升序
-        Collections.sort(recoverers, new Comparator<Recoverer>() {
-            @Override
-            public int compare(Recoverer o1, Recoverer o2) {
-                return o1.getFirstBlockNum() > o2.getFirstBlockNum() ? 1 : -1;
-            }
-        });
-        //小号向大号看齐
-        recommitLostBlocks(recoverers.get(0).getFirstBlockNum(), recoverers.get(1).getFirstBlockNum() - 1,
-                recoverers.get(0).getRecoverable());
-        //大号向正确看齐
-        recommitLostBlocks(recoverers.get(1).getFirstBlockNum(), lastAvailableBlockNum,
-                recoverers.get(0).getRecoverable(), recoverers.get(1).getRecoverable());
     }
 
     /** recommitLostBlocks retrieves blocks in specified range and commit the write set to either
      * state DB or history DB or both
      */
-    public void recommitLostBlocks(Long firstBlockNum, Long lastBlockNum, Recoverable ... recoverables) throws LedgerException{
+    public void recommitLostBlocks(long firstBlockNum, long lastBlockNum, Recoverable ... recoverables) throws LedgerException{
         BlockAndPvtData blockAndPvtData;
         for (long blockNumber = firstBlockNum; blockNumber <= lastBlockNum; blockNumber++) {
             blockAndPvtData = getPvtDataAndBlockByNum(blockNumber, null);
@@ -155,8 +158,15 @@ public class KvLedger implements INodeLedger {
      */
     @Override
     public TransactionPackage.ProcessedTransaction getTransactionByID(String txID) throws LedgerException {
-        Common.Envelope tranEvn = blockStore.retrieveTxByID(txID);
-        TransactionPackage.TxValidationCode txVResult = blockStore.retrieveTxValidationCodeByTxID(txID);
+        Common.Envelope tranEvn = null;
+        TransactionPackage.TxValidationCode txVResult = null;
+        try {
+            tranEvn = blockStore.retrieveTxByID(txID);
+            txVResult = blockStore.retrieveTxValidationCodeByTxID(txID);
+        } catch (LedgerException e) {
+            logger.debug(String.format("Fail to get transaction using id = [%s]", txID));
+            return null;
+        }
         return TransactionPackage.ProcessedTransaction.newBuilder()
                 .setTransactionEnvelope(tranEvn)
                 .setValidationCode(txVResult.getNumber())
@@ -169,15 +179,25 @@ public class KvLedger implements INodeLedger {
      */
     @Override
     public Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException {
-        return blockStore.getBlockchainInfo();
+        try {
+            return blockStore.getBlockchainInfo();
+        } catch (LedgerException e) {
+            logger.debug("Fail to get blockchain info");
+            return null;
+        }
     }
 
     /** GetBlockByNumber returns block at a given height
      * blockNumber of  math.MaxUint64 will return last block
      */
     @Override
-    public Common.Block getBlockByNumber(Long blockNumber) throws LedgerException {
-        return blockStore.retrieveBlockByNumber(blockNumber);
+    public Common.Block getBlockByNumber(long blockNumber) throws LedgerException {
+        try {
+            return blockStore.retrieveBlockByNumber(blockNumber);
+        } catch (LedgerException e) {
+            logger.debug(String.format("Fail to get block using block num = [%d]", blockNumber));
+            return null;
+        }
     }
 
     /** GetBlocksIterator returns an iterator that starts from `startBlockNumber`(inclusive).
@@ -185,8 +205,13 @@ public class KvLedger implements INodeLedger {
      * ResultsIterator contains type BlockHolder
      */
     @Override
-    public ResultsIterator getBlocksIterator(Long startBlockNumber) throws LedgerException{
-        return blockStore.retrieveBlocks(startBlockNumber);
+    public ResultsIterator getBlocksIterator(long startBlockNumber) throws LedgerException{
+        try {
+            return blockStore.retrieveBlocks(startBlockNumber);
+        } catch (LedgerException e) {
+            logger.debug(String.format("Fail to get blocks iterator using start block num = [%d]", startBlockNumber));
+            return null;
+        }
     }
 
     /** GetBlockByHash returns a block given it's hash
@@ -196,7 +221,12 @@ public class KvLedger implements INodeLedger {
      */
     @Override
     public Common.Block getBlockByHash(byte[] blockHash) throws LedgerException {
-        return blockStore.retrieveBlockByHash(blockHash);
+        try {
+            return blockStore.retrieveBlockByHash(blockHash);
+        } catch (LedgerException e) {
+            logger.debug("fail to get block by hash");
+            return null;
+        }
     }
 
     /** GetBlockByTxID returns a block which contains a transaction
@@ -206,12 +236,22 @@ public class KvLedger implements INodeLedger {
      */
     @Override
     public Common.Block getBlockByTxID(String txID) throws LedgerException {
-        return blockStore.retrieveBlockByTxID(txID);
+        try {
+            return blockStore.retrieveBlockByTxID(txID);
+        } catch (LedgerException e) {
+            logger.debug(String.format("Fail to get block by txid = [%s]", txID));
+            return null;
+        }
     }
 
     @Override
     public TransactionPackage.TxValidationCode getTxValidationCodeByTxID(String txID) throws LedgerException {
-        return blockStore.retrieveTxValidationCodeByTxID(txID);
+        try {
+            return blockStore.retrieveTxValidationCodeByTxID(txID);
+        } catch (LedgerException e) {
+            logger.debug(String.format("Fail to get tx validation code by txid = [%s]", txID));
+            return null;
+        }
     }
 
     /** NewTxSimulator returns new `ledger.TxSimulator`
@@ -220,7 +260,12 @@ public class KvLedger implements INodeLedger {
      */
     @Override
     public ITxSimulator newTxSimulator(String txId) throws LedgerException {
-        return txtmgmt.newTxSimulator(txId);
+        try {
+            return txtmgmt.newTxSimulator(txId);
+        } catch (LedgerException e) {
+            logger.debug(String.format("fail to get new tx simulator using txid = [%s]", txId));
+            return null;
+        }
     }
 
     /** Prune prunes the blocks/transactions that satisfy the given policy
@@ -239,27 +284,47 @@ public class KvLedger implements INodeLedger {
     @Override
     public IQueryExecutor newQueryExecutor() throws LedgerException{
         //TODO uuid
-        return txtmgmt.newQueryExecutor(UUID.randomUUID().toString());
+        try {
+            return txtmgmt.newQueryExecutor(UUID.randomUUID().toString());
+        } catch (LedgerException e) {
+            logger.debug("Fail to get query executor");
+            return null;
+        }
     }
 
     /** NewHistoryQueryExecutor gives handle to a history query executor.
-     * A client can obtain more than one 'HistoryQueryExecutor's for parallel execution.
+     * A client can obtain more than one 'IHistoryQueryExecutor's for parallel execution.
      * Any synchronization should be performed at the implementation level if required
      * Pass the ledger blockstore so that historical values can be looked up from the chain
      */
     @Override
     public IHistoryQueryExecutor newHistoryQueryExecutor() throws LedgerException {
-        return historyDB.newHistoryQueryExecutor(blockStore);
+        try {
+            return historyDB.newHistoryQueryExecutor(blockStore);
+        } catch (LedgerException e) {
+            logger.debug("Faile to get history query executor");
+            return null;
+        }
     }
 
     @Override
     public BlockAndPvtData getPvtDataAndBlockByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
-        return ((Store) blockStore).getPvtDataAndBlockByNum(blockNum, filter);
+        try {
+            return ((Store) blockStore).getPvtDataAndBlockByNum(blockNum, filter);
+        } catch (LedgerException e) {
+            logger.debug(String.format("fail to get pvtdata block by block num = [%d]", blockNum));
+            return null;
+        }
     }
 
     @Override
     public List<TxPvtData> getPvtDataByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
-        return ((Store) blockStore).getPvtDataByNum(blockNum, filter);
+        try {
+            return ((Store) blockStore).getPvtDataByNum(blockNum, filter);
+        } catch (LedgerException e) {
+            logger.debug(String.format("fail to get pvtdata block by block num = [%d]", blockNum));
+            return null;
+        }
     }
 
     @Override
@@ -276,6 +341,7 @@ public class KvLedger implements INodeLedger {
      *
      * @param block
      */
+    @Override
     public void commit(Common.Block block) {
         return;
     }
@@ -283,6 +349,7 @@ public class KvLedger implements INodeLedger {
     /** Close closes `KVLedger`
      *
      */
+    @Override
     public void close() {
         blockStore.shutdown();
         try {
@@ -296,10 +363,9 @@ public class KvLedger implements INodeLedger {
     public synchronized void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException {
         Common.Block block = blockAndPvtData.getBlock();
         long blockNo = block.getHeader().getNumber();
-//        long blockNo = 0;
         logger.debug(String.format("Channel %s: Validating state for block %d", ledgerID, blockNo));
         //TODO 验证器
-//        txtmgmt.validateAndPrepare(blockAndPvtData, true);
+        txtmgmt.validateAndPrepare(blockAndPvtData, true);
         logger.debug(String.format("Channel %s: Committing block %d to storage", ledgerID, blockNo));
         blockStore.commitWithPvtData(blockAndPvtData);
         logger.info(String.format("Channel %s: Committed block %d to storage", ledgerID, blockNo));
@@ -307,7 +373,7 @@ public class KvLedger implements INodeLedger {
         logger.debug(String.format("Channel %s: Committing block %d transaction to state db", ledgerID, blockNo));
         txtmgmt.commit();
         //TODO history db enable
-        if(true){
+        if(LedgerConfig.isHistoryDBEnabled()){
             logger.debug(String.format("Channel %s: Committing block %d transaction to history db", ledgerID, blockNo));
             historyDB.commit(block);
         }

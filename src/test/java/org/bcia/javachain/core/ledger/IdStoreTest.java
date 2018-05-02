@@ -16,13 +16,12 @@ limitations under the License.
 package org.bcia.javachain.core.ledger;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.core.ledger.kvledger.IdStore;
 import org.bcia.javachain.protos.common.Common;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 类描述
@@ -34,7 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class IdStoreTest {
 
     IdStore idStore;
-    LevelDbProvider provider;
+    LevelDBProvider provider;
 
     @Before
     public void before() throws LedgerException  {
@@ -65,11 +64,13 @@ public class IdStoreTest {
         Assert.assertEquals("1234", idStore.getUnderConstructionFlag());
     }
 
-    @Test
-    public void createLedgerID() throws LedgerException {
-        idStore.createLedgerID("kql", Common.Block.newBuilder().build());
-        idStore.close();
-        provider = LevelDbProvider.newProvider();
-        System.out.println(provider.get(idStore.encodeLedgerKey("kql")));
-    }
+//    @Test
+//    public void createLedgerID() throws LedgerException {
+//        idStore.createLedgerID("kql", Common.Block.newBuilder().build());
+//        idStore.close();
+//        //TODO dbpath
+//        String dbPath = null;
+//        provider = LevelDBProvider.newProvider(dbPath);
+//        System.out.println(provider.get(idStore.encodeLedgerKey("kql")));
+//    }
 }

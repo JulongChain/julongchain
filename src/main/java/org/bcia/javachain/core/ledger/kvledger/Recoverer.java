@@ -16,22 +16,22 @@
 package org.bcia.javachain.core.ledger.kvledger;
 
 /**
- * 类描述
+ * 可恢复的数据库接口
  *
- * @author wanliangbing
- * @date 2018/3/9
+ * @author sunzongyu
+ * @date 2018/4/9
  * @company Dingxuan
  */
 public class Recoverer {
 
-    private Long firstBlockNum;
+    private long firstBlockNum;
     private Recoverable recoverable;
 
-    public Long getFirstBlockNum() {
+    public long getFirstBlockNum() {
         return firstBlockNum;
     }
 
-    public void setFirstBlockNum(Long firstBlockNum) {
+    public void setFirstBlockNum(long firstBlockNum) {
         this.firstBlockNum = firstBlockNum;
     }
 

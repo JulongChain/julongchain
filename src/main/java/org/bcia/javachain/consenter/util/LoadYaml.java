@@ -37,12 +37,14 @@ public class LoadYaml {
         HashMap map=new HashMap();
         try {
             Yaml yaml = new Yaml();
-            URL url = LoadYaml.class.getClassLoader().getResource(file);
-            if (url != null) {
-                //可以将值转换为Map
-                log.info("Loading the yaml file...");
-                 map =(HashMap)yaml.load(new FileInputStream(url.getFile()));
-            }
+//            URL url = LoadYaml.class.getClassLoader().getResource(file);
+//            if (url != null) {
+//                //可以将值转换为Map
+//                log.info("Loading the yaml file...");
+//                 map =(HashMap)yaml.load(new FileInputStream(url.getFile()));
+//            }
+
+            map =(HashMap)yaml.load(LoadYaml.class.getClassLoader().getResourceAsStream(file));
         } catch (Exception e) {
             e.printStackTrace();
         }

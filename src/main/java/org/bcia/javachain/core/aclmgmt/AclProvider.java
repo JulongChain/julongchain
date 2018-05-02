@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.core.aclmgmt;
 
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.protos.node.ProposalPackage;
 
 /**
@@ -26,7 +27,7 @@ import org.bcia.javachain.protos.node.ProposalPackage;
  */
 public class AclProvider implements IAclProvider{
     @Override
-    public boolean checkACL(String resName, String groupID, ProposalPackage.SignedProposal idinfo) {
-        return false;
+    public void checkACL(String resName, String groupID, ProposalPackage.SignedProposal idinfo) throws JavaChainException{
+
     }
 }

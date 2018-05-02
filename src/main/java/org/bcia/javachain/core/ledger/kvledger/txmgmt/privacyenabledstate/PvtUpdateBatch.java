@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate;
 
 /**
- * 类描述
+ * 私有数据更新包
  *
  * @author sunzongyu
  * @date 2018/04/17

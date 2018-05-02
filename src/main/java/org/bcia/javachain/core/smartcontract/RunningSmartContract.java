@@ -36,8 +36,7 @@ public class RunningSmartContract extends RWMutex{
         return smartContractRTEnvMap;
     }
 
-    public void setSmartContractRTEnvMap(Map<String, SmartContractRTEnv>
-                                                 smartContractRTEnvMap) {
+    public void setSmartContractRTEnvMap(Map<String, SmartContractRTEnv> smartContractRTEnvMap) {
         this.smartContractRTEnvMap = smartContractRTEnvMap;
     }
 

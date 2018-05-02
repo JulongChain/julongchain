@@ -16,10 +16,10 @@
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 
 /**
- * 类描述
+ * 封装查询namespace、key
  *
- * @author wanliangbing
- * @date 2018/3/9
+ * @author sunzongyu
+ * @date 2018/4/9
  * @company Dingxuan
  */
 public class CompositeKey {

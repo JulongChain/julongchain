@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 类描述
+ * namespace private rwset 构建
  *
  * @author sunzongyu
  * @date 2018/04/16
@@ -29,7 +29,7 @@ import java.util.Map;
  */
 public class NsPvtRwBuilder {
     private String collectionName;
-    private Map<String, KvRwset.KVWrite> writeMap = new HashMap<>();
+    private Map<String, CollPvtRwBuilder> collPvtRwBuilders = new HashMap<>();
 
     public NsPvtRwSet build(){
        return null;
@@ -43,11 +43,11 @@ public class NsPvtRwBuilder {
         this.collectionName = collectionName;
     }
 
-    public Map<String, KvRwset.KVWrite> getWriteMap() {
-        return writeMap;
+    public Map<String, CollPvtRwBuilder> getCollPvtRwBuilders() {
+        return collPvtRwBuilders;
     }
 
-    public void setWriteMap(Map<String, KvRwset.KVWrite> writeMap) {
-        this.writeMap = writeMap;
+    public void setCollPvtRwBuilders(Map<String, CollPvtRwBuilder> collPvtRwBuilders) {
+        this.collPvtRwBuilders = collPvtRwBuilders;
     }
 }

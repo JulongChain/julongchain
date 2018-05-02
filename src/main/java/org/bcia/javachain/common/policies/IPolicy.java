@@ -18,6 +18,8 @@ package org.bcia.javachain.common.policies;
 import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.util.proto.SignedData;
 
+import java.util.List;
+
 /**
  * 策略接口
  *
@@ -27,5 +29,5 @@ import org.bcia.javachain.common.util.proto.SignedData;
  */
 public interface IPolicy {
 
-    void evaluate(SignedData[] signatureSet) throws PolicyException;
+    void evaluate(List<SignedData> signatureList) throws PolicyException;
 }

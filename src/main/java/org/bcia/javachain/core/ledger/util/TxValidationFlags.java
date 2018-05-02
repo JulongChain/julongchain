@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 类描述
+ * 交易验证器标志
  *
  * @author sunzongyu
  * @date 2018/04/09

@@ -2,24 +2,16 @@ package org.bcia.javachain.core.ledger.leveldb;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.util.Util;
 import org.iq80.leveldb.DB;
-import org.iq80.leveldb.DBIterator;
-import org.iq80.leveldb.Options;
-import org.iq80.leveldb.Snapshot;
-import org.iq80.leveldb.impl.Iq80DBFactory;
-import org.iq80.leveldb.impl.SeekingIteratorAdapter;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.swing.*;
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -35,9 +27,10 @@ public class LevelDBFactoryTest {
 
     @Test
     public void getDB() throws LedgerException {
-        DB db = LevelDBFactory.getDB();
+        String path = "";
+        DB db = LevelDBUtil.getDB("");
         Assert.assertNotNull(db);
-        LevelDBFactory.closeDB(db);
+        LevelDBUtil.closeDB(db);
     }
 
     @Test
@@ -59,35 +52,41 @@ public class LevelDBFactoryTest {
 //        log.info("query value:" + query);
 //        Assert.assertEquals(value, query);
 
+        String path = "/home/bcia/test";
+        LevelDBProvider provider = LevelDBProvider.newProvider(path);
+
+        LevelDB db = LevelDBUtil.getDB(path);
         for (int i = 0; i < 100; i++) {
             byte[] key = String.valueOf(i).getBytes();
             byte[] value1 = Util.longToBytes(1000 + i, 8);
             byte[] value2 = Util.longToBytes(10000 + i, 8);
             byte[] value = ArrayUtils.addAll(value1, value2);
-            LevelDBFactory.add(key, value, true);
+            LevelDBUtil.add(db, key, value, true);
+            provider.put(key, value, true);
 //            closeDB();
         }
         byte[] key = {0x00};
-        LevelDBFactory.add(key, "askjaklj".getBytes(), true);
+        LevelDBUtil.add(db, key, "askjaklj".getBytes(), true);
 //        for (int i = 0; i < 100; i++) {
 //            String path = "/home/bcia/leveldb";
 //            DB db = Iq80DBFactory.factory.open(new File(path), new Options().createIfMissing(true));
 //        }
 
-
     }
 
     @Test
     public void delete() throws LedgerException {
+        String path = "";
         String key = UUID.randomUUID().toString();
         log.info("key:" + key);
         String value = UUID.randomUUID().toString();
         log.info("value:" + value);
-        LevelDBFactory.add(key.getBytes(Charset.forName("utf-8")), value.getBytes(Charset.forName("utf-8")), true);
+        LevelDB db = LevelDBUtil.getDB(path);
+        LevelDBUtil.add(db, key.getBytes(Charset.forName("utf-8")), value.getBytes(Charset.forName("utf-8")), true);
         log.info("add to level db");
-        Assert.assertEquals(value, new String(LevelDBFactory.get(key.getBytes(Charset.forName("utf-8")), false)));
-        LevelDBFactory.delete(key.getBytes(Charset.forName("utf-8")), true);
-        Assert.assertNull(LevelDBFactory.get(key.getBytes(Charset.forName("utf-8")), false));
+        Assert.assertEquals(value, new String(LevelDBUtil.get(db, key.getBytes(Charset.forName("utf-8")), false)));
+        LevelDBUtil.delete(db, key.getBytes(Charset.forName("utf-8")), true);
+        Assert.assertNull(LevelDBUtil.get(db, key.getBytes(Charset.forName("utf-8")), false));
     }
 
     @Test
@@ -104,54 +103,38 @@ public class LevelDBFactoryTest {
 //        log.info("query key from level db");
 //        log.info("query string:" + queryString);
 //        Assert.assertEquals(value, queryString);
-        byte[] key = {0x00};
-        byte[] value = LevelDBFactory.get(key, true);
-//        System.out.println(new String(value));
-        byte[] value1 = LevelDBFactory.get(key, true);
+        String path = "";
+        byte[] key = "underConstructionLedgerKey".getBytes();
+        LevelDB db = LevelDBUtil.getDB(path);
+        byte[] value = LevelDBUtil.get(db, key, true);
+        System.out.println(new String(value));
+        byte[] value1 = LevelDBUtil.get(db, key, true);
 //        System.out.println(new String(value1));
 
     }
 
     @Test
     public void getIterator() throws LedgerException {
-//        try {
-//            DB db = LevelDBFactory.getDB();
-////            LevelDBFactory.add(db, "123".getBytes(), "OneTwoThree".getBytes(), true);
-////            LevelDBFactory.add(db, "456".getBytes(), "FourFiveSix".getBytes(), true);
-////            LevelDBFactory.add(db, "789".getBytes(), "SevenEightNine".getBytes(), true);
-//            DBIterator iterator = LevelDBFactory.getIterator(db);
-//            while(iterator.hasNext()){
-//                String key = new String(iterator.next().getKey());
-////                System.out.println(key.compareTo("123"));
-//                Map.Entry<byte[], byte[]> entry = iterator.next();
-//                System.out.println(new String(entry.getKey()));
-//                System.out.println(new String(entry.getValue()));
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
+//        DBIterator itr = LevelDBFactory.getIterator(LevelDBFactory.getDB("/home/bcia/test"));
+//        itr.seek("18".getBytes());
+//        for (int i = 0; i < 10; i++) {
+//            System.out.println(new String(itr.next().getKey()));
 //        }
-//       DBIterator itr = LevelDBFactory.getIterator();
-//       byte[] startKey = {0x00};
-//
-//       while(itr.hasNext()){
-//           Map.Entry<byte[], byte[]> entry = itr.next();
-//           String s = new String(entry.getKey());
-//           if(String.){
-//
-//           }
-//           for(byte b : entry.getKey()){
-//               System.out.print(b + " ");
-//           }
-//           System.out.println();
-//           System.out.println(entry.getValue());
-//       }
     }
 
     @Test
     public void test() throws Throwable {
-        DB db = LevelDBFactory.getDB();
+        String path = "";
+        DB db = LevelDBUtil.getDB(path);
         byte[] key = {0x00};
-        LevelDBFactory.get(key, false);
-        LevelDBFactory.get(key, false);
+        LevelDBUtil.get(db, key, false);
+        LevelDBUtil.get(db, key, false);
+    }
+
+    public static void soutByte(byte[] bytes) {
+        for (byte aByte : bytes) {
+            System.out.println(aByte + " ");
+        }
+        System.out.println();
     }
 }

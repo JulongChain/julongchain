@@ -18,7 +18,7 @@ package org.bcia.javachain.core.ledger;
 import org.bcia.javachain.protos.ledger.rwset.Rwset;
 
 /**
- * 类描述
+ * 私有交易数据
  *
  * @author sunzongyu
  * @date 2018/04/09
@@ -26,14 +26,14 @@ import org.bcia.javachain.protos.ledger.rwset.Rwset;
  */
 public class TxPvtData {
 
-    private Long seqInBlock;
+    private long seqInBlock;
     private Rwset.TxPvtReadWriteSet writeSet;
 
-    public Long getSeqInBlock() {
+    public long getSeqInBlock() {
         return seqInBlock;
     }
 
-    public void setSeqInBlock(Long seqInBlock) {
+    public void setSeqInBlock(long seqInBlock) {
         this.seqInBlock = seqInBlock;
     }
 

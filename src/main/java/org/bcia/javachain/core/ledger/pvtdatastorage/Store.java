@@ -22,7 +22,7 @@ import org.bcia.javachain.core.ledger.TxPvtData;
 import java.util.List;
 
 /**
- * 类描述
+ * pvt接口
  *
  * @author sunzongyu
  * @date 2018/04/09

@@ -15,7 +15,10 @@
  */
 package org.bcia.javachain.core.common.sysscprovider;
 
+import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.SysSmartContractException;
 import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
+import org.bcia.javachain.core.ledger.IQueryExecutor;
 
 /**
  * 类描述
@@ -28,4 +31,6 @@ public interface ISystemSmartContractProvider {
     IApplicationConfig getApplicationConfig(String groupId);
 
     boolean isSysSmartContract(String essc);
+
+    IQueryExecutor getQueryExecutorForLedger(String groupID) throws JavaChainException;
 }

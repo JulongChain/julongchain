@@ -63,8 +63,7 @@ public class Handler {
 
 		fsm.addEvents(
 				//            Event Name              From           To
-				new EventDesc(REGISTERED.toString(),  "created",
-						"established"),
+				new EventDesc(REGISTERED.toString(),  "created",     "established"),
 				new EventDesc(READY.toString(),       "established", "ready"),
 				new EventDesc(ERROR.toString(),       "init",        "established"),
 				new EventDesc(RESPONSE.toString(),    "init",        "init"),

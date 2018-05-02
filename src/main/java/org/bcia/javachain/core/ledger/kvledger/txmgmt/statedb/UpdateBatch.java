@@ -25,10 +25,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 类描述
+ * versiondb 更新包
  *
- * @author
- * @date 2018/3/9
+ * @author sunzongyu
+ * @date 2018/4/9
  * @company Dingxuan
  */
 public class UpdateBatch {

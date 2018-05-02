@@ -19,14 +19,13 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStorage;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBHandle;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.common.ledger.util.DBProvider;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.util.TxValidationFlags;
 import org.bcia.javachain.core.ledger.util.Util;
-import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
 import java.util.HashMap;
@@ -34,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 操作block索引类
  *
  * @author sunzongyu
  * @date 2018/04/09
@@ -44,7 +44,7 @@ public class BlockIndex implements Index {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockIndex.class);
 
     private Map<String, Boolean> indexItemsMap = new HashMap<>();
-    private LevelDbProvider db;
+    private DBProvider db;
 
     public static final String BLOCK_NUM_IDX_KEY_PREFIX           = "n";
     public static final String BLOCK_HASH_IDX_KEY_PREFIX          = "h";
@@ -55,7 +55,7 @@ public class BlockIndex implements Index {
     public static final String INDEX_CHECK_POINT_KEY_STR          = "indexCheckpointKey";
     private static final byte[] INDEX_CHECKPOINT_KEY  = INDEX_CHECK_POINT_KEY_STR.getBytes();
 
-    public static BlockIndex newBlockIndex(IndexConfig indexConfig, LevelDbProvider db) {
+    public static BlockIndex newBlockIndex(IndexConfig indexConfig, DBProvider db) {
         String[] indexItems = indexConfig.getAttrsToIndex();
         logger.debug(String.format("newBlockIndex() - indexItems length: [%d]", indexItems.length));
         Map<String, Boolean> indexItemMap = new HashMap<>();
@@ -68,7 +68,11 @@ public class BlockIndex implements Index {
         return index;
     }
 
-    public Long getLastBlockIndexed() throws LedgerException {
+    /**
+     * 获取最新索引
+     */
+    @Override
+    public long getLastBlockIndexed() throws LedgerException {
         byte[] blockNumBytes = null;
         blockNumBytes = db.get(INDEX_CHECKPOINT_KEY);
         if (blockNumBytes == null){
@@ -77,31 +81,34 @@ public class BlockIndex implements Index {
         return Util.bytesToLong(blockNumBytes, 0, blockNumBytes.length);
     }
 
-    public void indexBlock(BlockIdxInfo blockIdxInfo) throws LedgerException {
+    /**
+     * 设置索引
+     */
+    @Override
+    public void indexBlock(BlockIndexInfo blockIndexInfo) throws LedgerException {
         if(indexItemsMap.size() == 0){
            logger.debug("No indexing block, as nothing to index");
            return;
         }
-        logger.debug(String.format("Indexing block [%s]", blockIdxInfo));
-        FileLocPointer flp = blockIdxInfo.getFlp();
-        List<TxIndexInfo> txOffsets = blockIdxInfo.getTxOffsets();
-        TxValidationFlags txsfltr = TxValidationFlags.fromByteString(blockIdxInfo.getMetadata()
-                .getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
-        UpdateBatch batch = LevelDbProvider.newUpdateBatch();
-        byte[] flpBayte = flp.marshal();
+        logger.debug(String.format("Indexing block [%s]", blockIndexInfo));
+        FileLocPointer flp = blockIndexInfo.getFlp();
+        List<TxIndexInfo> txOffsets = blockIndexInfo.getTxOffsets();
+        TxValidationFlags txsfltr = new TxValidationFlags(blockIndexInfo.getMetadata().getMetadataList().size());
+        UpdateBatch batch = LevelDBProvider.newUpdateBatch();
+        byte[] flpBytes = flp.marshal();
 
         //index1
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_HASH) == null){
-            batch.put(constructBlockHashKey(blockIdxInfo.getBlockHash()), flpBayte);
+        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_HASH)){
+            batch.put(constructBlockHashKey(blockIndexInfo.getBlockHash()), flpBytes);
         }
 
         //index2
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM) == null){
-            batch.put(constructBlockNumKey(blockIdxInfo.getBlockNum()), flpBayte);
+        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM)){
+            batch.put(constructBlockNumKey(blockIndexInfo.getBlockNum()), flpBytes);
         }
 
         //index3 用来通过txid获取tx
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_ID) == null){
+        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_ID)){
             for(TxIndexInfo txOffset : txOffsets){
                 FileLocPointer txFlp = FileLocPointer.newFileLocationPointer(flp.getFileSuffixNum(), flp.getLocPointer().getOffset(), txOffset.getLoc());
                 logger.debug(String.format("Adding txLoc [%s] for txID: [%s] to index", txFlp, txOffset.getTxID()));
@@ -111,32 +118,39 @@ public class BlockIndex implements Index {
         }
 
         //index4 查询历史数据
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRANS_NUM) == null){
+        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM)){
             for(int i = 0; i < txOffsets.size(); i++){
                 TxIndexInfo txOffset = txOffsets.get(i);
                 FileLocPointer txFlp = FileLocPointer.newFileLocationPointer(flp.getFileSuffixNum(), flp.getLocPointer().getOffset(), txOffset.getLoc());
                 logger.debug(String.format("Adding txLoc [%s] for tx num: [%d] ID: [%s] to blockNumTranNum index", txFlp, i, txOffset.getTxID()));
                 byte[] txFlpBytes = txFlp.marshal();
-                batch.put(constructBlockNumTranNumKey(blockIdxInfo.getBlockNum(), (long) i), txFlpBytes);
+                batch.put(constructBlockNumTranNumKey(blockIndexInfo.getBlockNum(), (long) i), txFlpBytes);
             }
         }
 
         //index5 通过txid获取区块
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_TX_ID) == null){
+        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_TX_ID)){
             for(TxIndexInfo txOffset : txOffsets){
-                batch.put(constructBlockTxIDKey(txOffset.getTxID()), flpBayte);
+                batch.put(constructBlockTxIDKey(txOffset.getTxID()), flpBytes);
             }
         }
 
         //index6 根据txid获取交易有效性
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_VALIDATION_CODE) == null){
+        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_VALIDATION_CODE)){
             for (int i = 0; i < txOffsets.size(); i++) {
                 TxIndexInfo txOffset = txOffsets.get(i);
                 batch.put(constructTxValidationCodeIDKey(txOffset.getTxID()), String.valueOf(txsfltr.flag(i).getNumber()).getBytes());
             }
         }
+
+        batch.put(INDEX_CHECKPOINT_KEY, Util.longToBytes(blockIndexInfo.getBlockNum(), 8));
+        db.writeBatch(batch, true);
     }
 
+    /**
+     * 根据blockhash获取区块位置
+     */
+    @Override
     public FileLocPointer getBlockLocByHash(byte[] blockHash) throws LedgerException{
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_HASH) == null){
             throw BlockStorage.ERR_ARRT_NOT_INDEXED;
@@ -150,11 +164,15 @@ public class BlockIndex implements Index {
         return blkLoc;
     }
 
-    public FileLocPointer getBlockLocByBlockNum(Long blockNum) throws LedgerException {
+    /**
+     * 根据blockID获取区块位置信息
+     */
+    @Override
+    public FileLocPointer getBlockLocByBlockNum(long blockID) throws LedgerException {
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM) == null){
             throw BlockStorage.ERR_ARRT_NOT_INDEXED;
         }
-        byte[] b = db.get(constructBlockNumKey(blockNum));
+        byte[] b = db.get(constructBlockNumKey(blockID));
         if(b == null){
             throw BlockStorage.ERR_NOT_FOUND_IN_INDEX;
         }
@@ -163,6 +181,10 @@ public class BlockIndex implements Index {
         return blkLoc;
     }
 
+    /**
+     * 根据交易ID获取交易信息
+     */
+    @Override
     public FileLocPointer getTxLoc(String txID) throws LedgerException {
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_ID) == null){
             throw BlockStorage.ERR_ARRT_NOT_INDEXED;
@@ -176,6 +198,10 @@ public class BlockIndex implements Index {
         return txFLP;
     }
 
+    /**
+     * 根据交易ID获取区块信息
+     */
+    @Override
     public FileLocPointer getBlockLocByTxID(String txID) throws LedgerException{
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_TX_ID) == null){
             throw BlockStorage.ERR_ARRT_NOT_INDEXED;
@@ -189,8 +215,12 @@ public class BlockIndex implements Index {
         return txFLP;
     }
 
-    public FileLocPointer getTXLocByBlockNumTranNum(Long blockNum, Long tranNum) throws LedgerException{
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRANS_NUM) == null){
+    /**
+     * 根据blockID, 交易ID获取交易信息
+     */
+    @Override
+    public FileLocPointer getTXLocByBlockNumTranNum(long blockNum, long tranNum) throws LedgerException{
+        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM) == null){
             throw BlockStorage.ERR_ARRT_NOT_INDEXED;
         }
         byte[] b = db.get(constructBlockNumTranNumKey(blockNum, tranNum));
@@ -202,6 +232,10 @@ public class BlockIndex implements Index {
         return txFLP;
     }
 
+    /**
+     * 获取交易验证结果
+     */
+    @Override
     public TransactionPackage.TxValidationCode getTxValidationCodeByTxID(String txID) throws LedgerException {
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_VALIDATION_CODE) == null){
             throw BlockStorage.ERR_ARRT_NOT_INDEXED;
@@ -215,9 +249,9 @@ public class BlockIndex implements Index {
         return TransactionPackage.TxValidationCode.forNumber((int) raw[0]);
     }
 
-    byte[] constructBlockNumKey(Long blockNum) {
+    byte[] constructBlockNumKey(long blockNum) {
         byte[] blkNumBytes = Util.longToBytes(blockNum, 8);
-        return ArrayUtils.addAll(BLOCK_HASH_IDX_KEY_PREFIX.getBytes(), blkNumBytes);
+        return ArrayUtils.addAll(BLOCK_NUM_IDX_KEY_PREFIX.getBytes(), blkNumBytes);
     }
 
     byte[] constructBlockHashKey(byte[] blockHash) {
@@ -236,7 +270,7 @@ public class BlockIndex implements Index {
         return ArrayUtils.addAll(TX_VALIDATION_RESULT_IDX_KEY_PREFIX.getBytes(), txID.getBytes());
     }
 
-    byte[] constructBlockNumTranNumKey(Long blockNum, Long txNum) {
+    byte[] constructBlockNumTranNumKey(long blockNum, long txNum) {
         byte[] blkNumBytes = Util.longToBytes(blockNum, 8);
         byte[] txNumBytes = Util.longToBytes(txNum, 8);
         byte[] key = ArrayUtils.addAll(blkNumBytes, txNumBytes);
@@ -251,11 +285,11 @@ public class BlockIndex implements Index {
         this.indexItemsMap = indexItemsMap;
     }
 
-    public LevelDbProvider getDb() {
+    public DBProvider getDb() {
         return db;
     }
 
-    public void setDb(LevelDbProvider db) {
+    public void setDb(DBProvider db) {
         this.db = db;
     }
 }

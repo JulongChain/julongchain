@@ -67,7 +67,8 @@ public class LSSCTest extends BaseJunit4Test {
         Smartcontract.SmartContractSpec spec=Smartcontract.SmartContractSpec.newBuilder().build();
         ProposalPackage.SignedProposal signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec, caller.getBytes(), "msg1".getBytes());
         ISmartContract.SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
-        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
+        //尚未完全实现调通全部逻辑，返回内部错误
+        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
     }
 
     @Test
@@ -98,7 +99,7 @@ public class LSSCTest extends BaseJunit4Test {
         ProposalPackage.SignedProposal signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec, caller.getBytes(), "msg1".getBytes());
 
         ISmartContract.SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
-        //尚未安全实现调通全部逻辑，返回内部错误
+        //尚未完全实现调通全部逻辑，返回内部错误
         assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
     }
 

@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.core.aclmgmt;
 
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.protos.node.ProposalPackage;
 
 /**
@@ -28,5 +29,5 @@ public interface IAclProvider {
     //CheckACL checks the ACL for the resource for the channel using the
     //idinfo. idinfo is an object such as SignedProposal from which an
     //id can be extracted for testing against a policy
-    boolean checkACL(String resName,String groupID,ProposalPackage.SignedProposal idinfo);
+    void checkACL(String resName,String groupID,ProposalPackage.SignedProposal idinfo) throws JavaChainException;
 }

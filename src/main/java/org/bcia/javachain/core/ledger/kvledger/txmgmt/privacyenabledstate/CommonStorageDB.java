@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 类描述
+ * 处理pvt、pubdata
  *
  * @author sunzongyu
  * @date 2018/04/17
@@ -55,7 +55,7 @@ public class CommonStorageDB implements DB {
     @Override
     public void loadCommittedVersionsOfPubAndHashedKeys(List<CompositeKey> pubKeys,
                                                         List<HashedCompositeKey> hashKeys) {
-        BulkOptimizable bulkOptimizable = vdb;
+        BulkOptimizable bulkOptimizable = (BulkOptimizable) vdb;
 
         for(HashedCompositeKey key : hashKeys){
             String ns = deriveHashedDataNs(key.getNamespace(), key.getCollectionName());
@@ -76,31 +76,35 @@ public class CommonStorageDB implements DB {
 
     @Override
     public Height getCacheKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException{
-        String keyHashStr = new String(keyHash);
-        if(!bytesKeySuppoted()){
-            //TODO encode key
+        try {
+            BulkOptimizable bulkOptimizable = (BulkOptimizable) vdb;
+            String keyHashStr = new String(keyHash);
+            if(!bytesKeySuppoted()){
+                //TODO encode key
+            }
+            return bulkOptimizable.getCachedVersion(deriveHashedDataNs(ns, coll), keyHashStr);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return getCachedVersion(deriveHashedDataNs(ns, coll), keyHashStr);
-    }
-
-    @Override
-    public void loadCommittedVersions(List<CompositeKey> keys) {
-
-    }
-
-    @Override
-    public Height getCachedVersion(String ns, String key) {
-        return null;
     }
 
     @Override
     public void clearCachedVersions() {
-        vdb.clearCachedVersions();
+        try {
+            BulkOptimizable bulkOptimizable = (BulkOptimizable) vdb;
+            bulkOptimizable.clearCachedVersions();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public ISmartContractLifecycleEventListener getSmartcontractEventListener() {
-        return (ISmartContractLifecycleEventListener) vdb;
+        try {
+            return (ISmartContractLifecycleEventListener) vdb;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -127,7 +131,7 @@ public class CommonStorageDB implements DB {
     }
 
     @Override
-    public List<VersionedValue> getPrivateDataMultipleKeys(String ns, String coll, String[] keys) throws LedgerException {
+    public List<VersionedValue> getPrivateDataMultipleKeys(String ns, String coll, List<String> keys) throws LedgerException {
         return getStateMultipleKeys(deriveHashedDataNs(ns, coll), keys);
     }
 
@@ -185,37 +189,29 @@ public class CommonStorageDB implements DB {
         }
     }
 
-    public IVersionedDB getVdb() {
-        return vdb;
-    }
-
-    public void setVdb(IVersionedDB vdb) {
-        this.vdb = vdb;
-    }
-
     @Override
     public VersionedValue getState(String namespace, String key) throws LedgerException {
-        return null;
+        return vdb.getState(namespace, key);
     }
 
     @Override
     public Height getVersion(String namespace, String key) throws LedgerException {
-        return null;
+        return vdb.getVersion(namespace, key);
     }
 
     @Override
-    public List<VersionedValue> getStateMultipleKeys(String namespace, String[] keys) throws LedgerException {
-        return null;
+    public List<VersionedValue> getStateMultipleKeys(String namespace, List<String> keys) throws LedgerException {
+        return vdb.getStateMultipleKeys(namespace, keys);
     }
 
     @Override
     public ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
-        return null;
+        return vdb.getStateRangeScanIterator(namespace, startKey, endKey);
     }
 
     @Override
     public ResultsIterator executeQuery(String namespace, String query) throws LedgerException {
-        return null;
+        return vdb.executeQuery(namespace, query);
     }
 
     @Override
@@ -225,7 +221,7 @@ public class CommonStorageDB implements DB {
 
     @Override
     public Height getLatestSavePoint() throws LedgerException {
-        return null;
+        return vdb.getLatestSavePoint();
     }
 
     @Override
@@ -245,6 +241,14 @@ public class CommonStorageDB implements DB {
 
     @Override
     public boolean bytesKeySuppoted() {
-        return false;
+        return true;
+    }
+
+    public IVersionedDB getVdb() {
+        return vdb;
+    }
+
+    public void setVdb(IVersionedDB vdb) {
+        this.vdb = vdb;
     }
 }

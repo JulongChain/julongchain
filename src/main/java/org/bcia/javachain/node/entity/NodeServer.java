@@ -15,8 +15,10 @@
  */
 package org.bcia.javachain.node.entity;
 
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.SpringContext;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
 import org.bcia.javachain.core.aclmgmt.IAclProvider;
 import org.bcia.javachain.core.admin.AdminServer;
@@ -24,12 +26,12 @@ import org.bcia.javachain.core.endorser.Endorser;
 import org.bcia.javachain.core.events.DeliverEventsServer;
 import org.bcia.javachain.core.events.EventGrpcServer;
 import org.bcia.javachain.core.events.EventHubServer;
+import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.core.node.NodeGrpcServer;
 import org.bcia.javachain.core.ssc.ISystemSmartContractManager;
 import org.bcia.javachain.core.ssc.SystemSmartContractManager;
-import org.bcia.javachain.msp.mgmt.MspManager;
+import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.node.Node;
-import org.bcia.javachain.node.common.helper.MockMSPManager;
 import org.bcia.javachain.node.util.NodeConstant;
 import org.springframework.stereotype.Component;
 
@@ -50,11 +52,16 @@ public class NodeServer {
 
     private Node node;
 
+    private ISystemSmartContractManager systemSmartContractManager;
+
     public NodeServer() {
     }
 
     public NodeServer(Node node) {
         this.node = node;
+//        this.systemSmartContractManager = new SystemSmartContractManager();
+
+        this.systemSmartContractManager = SpringContext.getInstance().getBean(SystemSmartContractManager.class);
     }
 
     public void start() {
@@ -68,7 +75,7 @@ public class NodeServer {
         }
 
         //检查当前的成员服务提供者类型，目前只支持CSP，即密码提供商
-        int mspType = MspManager.getLocalMsp().getType();
+        int mspType = GlobalMspManagement.getLocalMsp().getType();
         if (mspType != NodeConstant.PROVIDER_CSP) {
             log.error("Unsupported msp type: " + mspType);
             return;
@@ -82,6 +89,11 @@ public class NodeServer {
         //初始化账本
 //        LedgerMgmt.initialize();
 //        ledgermgmt.Initialize(peer.ConfigTxProcessors)
+        try {
+            LedgerManager.initialize(null);
+        } catch (LedgerException e) {
+            e.printStackTrace();
+        }
 
 
         String nodeEndpoint = null;
@@ -110,18 +122,19 @@ public class NodeServer {
         //绑定事件服务
         eventGrpcServer.bindEventHubServer(new EventHubServer());
 
-//        ISmartContractProvider smartContractProvider = new SmartContractProvider();
+//        SmartContractProvider smartContractProvider = new SmartContractProvider();
 //        smartContractProvider
 
         //创建智能合约支持服务
         //创建Gossip服务
+        systemSmartContractManager.registerSysSmartContracts();
 
         //初始化系统智能合约
         initSysSmartContracts();
 
 //        LedgerMgmt.getLedgerIDs()
 
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 try {
@@ -135,7 +148,7 @@ public class NodeServer {
             }
         }.start();
 
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 try {
@@ -143,11 +156,18 @@ public class NodeServer {
                     eventGrpcServer.blockUntilShutdown();
                 } catch (IOException e) {
                     e.printStackTrace();
-                }catch (InterruptedException e) {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }.start();
+
+        node.initialize(new Node.InitializeCallback() {
+            @Override
+            public void onGroupInitialized(String groupId) {
+                systemSmartContractManager.deploySysSmartContracts(groupId);
+            }
+        });
 
 
     }
@@ -155,7 +175,7 @@ public class NodeServer {
     private void initSysSmartContracts() {
         log.info("Init system smart contracts");
 
-        ISystemSmartContractManager systemSmartContractManager = new SystemSmartContractManager();
+//        systemSmartContractManager = new SystemSmartContractManager();
         systemSmartContractManager.deploySysSmartContracts("");
     }
 

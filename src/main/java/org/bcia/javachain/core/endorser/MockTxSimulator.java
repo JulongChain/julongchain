@@ -124,10 +124,4 @@ public class MockTxSimulator implements ITxSimulator {
     public void setPrivateData(String namespace, String collection, String key, byte[] value) throws LedgerException {
 
     }
-
-    @Override
-    public ResultsIterator getStateRangeScanIterator(String namespace, String collection, String startKey, String
-            endKey) throws LedgerException {
-        return null;
-    }
 }

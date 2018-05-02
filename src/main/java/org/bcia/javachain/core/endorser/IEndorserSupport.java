@@ -16,10 +16,9 @@
 package org.bcia.javachain.core.endorser;
 
 import org.bcia.javachain.common.exception.NodeException;
-import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
-import org.bcia.javachain.core.ledger.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.ITxSimulator;
+import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.Smartcontract;

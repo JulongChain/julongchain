@@ -18,7 +18,7 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valinternal;
 import org.bcia.javachain.common.exception.LedgerException;
 
 /**
- * 类描述
+ * 内部验证器接口
  *
  * @author sunzongyu
  * @date 2018/04/19

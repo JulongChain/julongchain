@@ -36,6 +36,6 @@ import org.bcia.javachain.protos.common.Common;
  */
 public interface IProcessor {
 
-    void generateSimulationResults(Common.Envelope txEnvelop, ITxSimulator simulator, Boolean initializingLedger) throws LedgerException;
+    void generateSimulationResults(Common.Envelope txEnvelop, ITxSimulator simulator, boolean initializingLedger) throws LedgerException;
 
 }

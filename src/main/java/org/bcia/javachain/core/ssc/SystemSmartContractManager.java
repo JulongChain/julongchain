@@ -123,6 +123,11 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
     @Override
     public void registerSysSmartContracts() {
         log.info("Register system contracts");
+        registerSysSmartContract(essc);
+        registerSysSmartContract(lssc);
+        registerSysSmartContract(cssc);
+        registerSysSmartContract(qssc);
+        registerSysSmartContract(vssc);
     }
 
     /**
@@ -151,6 +156,9 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
 
     @Override
     public boolean isSysSmartContract(String smartContractID) {
+        ISystemSmartContract sysSmartContract = map.get(smartContractID);
+        if(sysSmartContract!=null)
+            return true;
         return false;
     }
 

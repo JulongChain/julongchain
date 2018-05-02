@@ -28,7 +28,7 @@ import org.bcia.javachain.consenter.common.broadcast.BroadCastClient;
 import org.bcia.javachain.core.ssc.lssc.LSSC;
 import org.bcia.javachain.csp.factory.CspManager;
 import org.bcia.javachain.msp.ISigningIdentity;
-import org.bcia.javachain.msp.mgmt.MspManager;
+import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.common.client.BroadcastClient;
 import org.bcia.javachain.node.common.client.EndorserClient;
@@ -61,16 +61,12 @@ public class NodeSmartContract {
         this.node = node;
     }
 
-    public void install() {
-
-    }
-
-    public void install(String scName, String scVersion, String scLanguage, Smartcontract.SmartContractInput input)
-            throws NodeException {
+    public void install(String scName, String scVersion, String scPath, String scLanguage, Smartcontract
+            .SmartContractInput input) throws NodeException {
         Smartcontract.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName, scVersion,
-                input);
+                scPath, input);
 
-        ISigningIdentity identity = MspManager.getLocalMsp().getDefaultSigningIdentity();
+        ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
         byte[] creator = identity.serialize();
 
@@ -91,7 +87,7 @@ public class NodeSmartContract {
 
         byte[] inputBytes = (input != null ? input.toByteArray() : new byte[0]);
         Smartcontract.SmartContractInvocationSpec lsscSpec = SpecHelper.buildInvocationSpec(CommConstant.LSSC,
-                LSSC.INSTALL.getBytes(), inputBytes);
+                LSSC.INSTALL.getBytes(), deploymentSpec.toByteArray());
         //生成proposal  Type=ENDORSER_TRANSACTION
         ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType
                 .ENDORSER_TRANSACTION, "", txId, lsscSpec, nonce, creator, null);
@@ -100,16 +96,15 @@ public class NodeSmartContract {
         //获取背书节点返回信息
         EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
-        log.info("Install Result: " + proposalResponse.getPayload().toString(Charset.forName(CommConstant
-                .DEFAULT_CHARSET)));
+        log.info("Install Result: " + proposalResponse.getResponse().getStatus());
     }
 
     public void instantiate(String ip, int port, String groupId, String scName, String scVersion, Smartcontract
             .SmartContractInput input) throws NodeException {
         Smartcontract.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName, scVersion,
-                input);
+                null, input);
 
-        ISigningIdentity identity = MspManager.getLocalMsp().getDefaultSigningIdentity();
+        ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
         byte[] creator = identity.serialize();
 

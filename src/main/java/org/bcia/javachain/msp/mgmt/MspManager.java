@@ -17,179 +17,66 @@ package org.bcia.javachain.msp.mgmt;
 
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.csp.factory.CspManager;
-import org.bcia.javachain.csp.factory.IFactoryOpts;
-import org.bcia.javachain.csp.intfs.ICsp;
-import org.bcia.javachain.msp.*;
-import org.bcia.javachain.msp.mspconfig.MspConfig;
-import org.bcia.javachain.msp.util.MspConfigHelper;
+import org.bcia.javachain.msp.IIdentity;
+import org.bcia.javachain.msp.IMsp;
+import org.bcia.javachain.msp.IMspManager;
 import org.bcia.javachain.protos.msp.Identities;
-import org.bcia.javachain.protos.msp.MspConfigPackage;
 
-import java.io.FileNotFoundException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-
-import static org.bcia.javachain.msp.mspconfig.MspConfigFactory.loadMspConfig;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/4/12
+ * @Date: 2018/3/13
  * @company Dingxuan
  */
 public class MspManager implements IMspManager {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(MspManager.class);
-    /**
-     * 直接读取配置文件获取的本地的msp
-     */
-    public static IMsp localMsp;
-    /**
-     * 通过node节点传入的参数获取的msp
-     */
-    public static IMsp loadMsp;
-    /**
-     * 默认的csp
-     */
-    public static ICsp defaultCsp;
-    /**
-     * csp默认配置
-     */
-    public static String defaultCspValue;
-
-    private  Mspmgr mspmgr;
-
+    private static JavaChainLog log = JavaChainLogFactory.getLog(GlobalMspManagement.class);
+    public  HashMap<String, IMsp> mspsMap = new HashMap<String, IMsp>();
     private boolean up;
+    private static HashMap<String, IMsp> mspsByProviders = new HashMap<String, IMsp>();
 
-    /**
-     * mspMap
-     */
-    public static HashMap<String,IMspManager> mspManagerHashMap=new HashMap<String, IMspManager>();
-    /**
-     * 通过类型加载本地msp
-     *
-     * @param localmspdir
-     * @param optsList
-     * @param mspId
-     * @param mspType
-     */
-    public static IMsp loadLocalMspWithType(String localmspdir, List<IFactoryOpts> optsList, String mspId, String mspType) throws FileNotFoundException {
 
-        CspManager.initCspFactories(optsList);
-        MspConfig mspConfig = loadMspConfig();
-        defaultCspValue = mspConfig.node.getCsp().getDefaultValue();
-        defaultCsp = CspManager.getCsp(defaultCspValue);
-        if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(defaultCspValue)) {
-            //解析配置文件
-            log.info("构建mspconfig");
-            MspConfigPackage.MSPConfig buildMspConfig = MspConfigHelper.buildMspConfig(localmspdir,mspId);
-            loadMsp = getLocalMsp().setup(buildMspConfig);
+    public IMspManager createMspmgr(IMsp[] msps){
 
-        } else if (IFactoryOpts.PROVIDER_GMT0016.equalsIgnoreCase(defaultCspValue)) {
-
-        } else if (IFactoryOpts.PROVIDER_GMT0018.equalsIgnoreCase(defaultCspValue)) {
-
+        for (IMsp msp: msps) {
+            String mspId= msp.getIdentifier();
+            mspsMap.put(mspId,msp);
         }
-
-        return loadMsp;
+        return this;
     }
 
-    /**
-     * 加载本地msp
-     *
-     * @param localmspdir 本地msp目录
-     * @param optsList    bccsp配置
-     * @param mspID       mspid
-     */
-    public static IMsp loadlocalMsp(String localmspdir, List<IFactoryOpts> optsList, String mspID) {
-
-
-        return null;
-    }
-
-    /**
-     * 获取本地msp
-     *
-     * @return
-     */
-    public static IMsp getLocalMsp() {
-        if (localMsp == null) {
-            //读取配置文件构造选项集合
-            List<IFactoryOpts> optsList = MspConfigHelper.buildFactoryOpts();
-            CspManager.initCspFactories(optsList);
-
-            MspConfig mspConfig = null;
-            try {
-                mspConfig = loadMspConfig();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            defaultCspValue = mspConfig.node.getCsp().getDefaultValue();
-            defaultCsp = CspManager.getCsp(defaultCspValue);
-            if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(defaultCspValue)) {
-                //构建fabricmspconfig
-                // MspConfigPackage.MSPConfig fabricMSPConfig = MspConfigHelper.buildMspConfig( mspConfig.node.getMspConfigPath());
-                MspConfigPackage.MSPConfig buildMspConfig = MspConfigHelper.buildMspConfig(mspConfig.node.getMspConfigPath(),mspConfig.node.getLocalMspId());
-                localMsp = new Msp().setup(buildMspConfig);
-                return localMsp;
-
-            } else if (IFactoryOpts.PROVIDER_GMT0016.equalsIgnoreCase(defaultCspValue)) {
-
-            } else if (IFactoryOpts.PROVIDER_GMT0018.equalsIgnoreCase(defaultCspValue)) {
-
-            }
-            return localMsp;
-        }
-        return localMsp;
-    }
-
-    /**
-     * 身份序列化
-     *
-     * @param groupId
-     * @return
-     */
-    public static IIdentityDeserializer getIdentityDeserializer(String groupId) {
-        if(groupId==""){
-            return  getLocalMsp();
-        }
-        return getManagerForChain(groupId);
-    }
-
-    /**
-     * 从链上获取一个管理者,如果没有这样的管理者,则创建一个
-     *
-     * @param groupId
-     * @return
-     */
-    public static IMspManager  getManagerForChain(String groupId) {
-       IMspManager mspManager= mspManagerHashMap.get(groupId);
-        if(mspManager==null){
-            IMsp[] msps = new IMsp[1];
-            for (int i = 0; i < msps.length; i++) {
-                msps[i]=getLocalMsp();
-            }
-            IMspManager mspmgr= new Mspmgr().createMspmgr(msps);
-            mspManagerHashMap.put(groupId,mspmgr);
-            return mspmgr;
-        }
-
-        return   mspManager;
-    }
 
     @Override
     public void setup(IMsp[] msps) {
+        if(up==true){
+            log.info("MSP manager already up");
+        }
+
+        for (IMsp msp: msps) {
+           String mspId= msp.getIdentifier();
+           mspsMap.put(mspId,msp);
+        }
 
     }
 
     @Override
     public Map<String, IMsp> getMSPs() {
-        return null;
+        return mspsMap;
     }
 
     @Override
-    public IIdentity deserializeIdentity(byte[] serializedIdentity) {
-
+    public IIdentity deserializeIdentity(byte[] serializedID) {
+        try {
+            Identities.SerializedIdentity sId = Identities.SerializedIdentity.parseFrom(serializedID);
+           // TODO 暂时先用getlocalmsp获取，之后需要通过id获取
+            IMsp msp = getMSPs().get(sId.getMspid());
+            //IMsp msp=GlobalMspManagement.getLocalMsp();
+           // return msp.deserializeIdentity(sId.getIdBytes().toByteArray());
+            return msp.deserializeIdentity(serializedID);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return null;
     }

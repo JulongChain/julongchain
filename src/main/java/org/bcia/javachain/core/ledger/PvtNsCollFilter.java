@@ -19,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 类描述
+ * 私有namespace Collection过滤器
  *
  * @author sunzongyu
  * @date 2018/04/09

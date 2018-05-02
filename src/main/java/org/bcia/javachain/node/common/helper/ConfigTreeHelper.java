@@ -25,7 +25,6 @@ import org.bcia.javachain.common.policies.IConfigPolicy;
 import org.bcia.javachain.common.policies.ImplicitMetaAnyPolicy;
 import org.bcia.javachain.common.policies.ImplicitMetaMajorityPolicy;
 import org.bcia.javachain.common.policies.SignaturePolicy;
-import org.bcia.javachain.msp.mgmt.MspManager;
 import org.bcia.javachain.msp.util.MspConfigHelper;
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.common.Policies;

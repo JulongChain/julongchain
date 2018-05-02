@@ -16,10 +16,11 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.common.ledger.util.DBProvider;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.iq80.leveldb.impl.LookupKey;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 
 /**
  * 提供leveldb实现的VersionDB辅助
@@ -32,33 +33,38 @@ public class VersionLevelDBProvider implements IVersionedDBProvider {
 
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(VersionLevelDBProvider.class);
 
-    private LevelDbProvider db;
-
-    public VersionLevelDBProvider() throws LedgerException{
-        //根据配置文件获取dbPath
-        this.db = LevelDbProvider.newProvider();
-        logger.debug("constructing VersionedDBProvider dbPath = " + db.getDbHandle(null).getDbName());
-    }
+    private DBProvider db;
 
     public static IVersionedDBProvider newVersionedDBProvider() throws LedgerException{
-        return new VersionLevelDBProvider();
+        String dbPath = LedgerConfig.getStateLevelDBPath();
+        VersionLevelDBProvider vdbProvider =  new VersionLevelDBProvider();
+        vdbProvider.setDb(LevelDBProvider.newProvider(dbPath));
+        logger.debug("Create vdb using path " + vdbProvider.getDb().getDbPath());
+        return vdbProvider;
     }
 
     @Override
     public IVersionedDB getDBHandle(String id) throws LedgerException {
-        return null;
+        VersionLevelDB vdb = new VersionLevelDB();
+        vdb.setDb(db);
+        vdb.setDbName(db.getDb().getDbName());
+        return vdb;
     }
 
     @Override
     public void close() {
-
+        try {
+            db.close();
+        } catch (LedgerException e) {
+            throw new RuntimeException("Got error when close level db");
+        }
     }
 
-    public LevelDbProvider getDb() {
+    public DBProvider getDb() {
         return db;
     }
 
-    public void setDb(LevelDbProvider db) {
+    public void setDb(DBProvider db) {
         this.db = db;
     }
 }

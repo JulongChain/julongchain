@@ -102,7 +102,7 @@ public class Identity implements ISigningIdentity {
     public byte[] sign(byte[] msg) {
         //通过签名算法进行签名
         byte[] signvalue;
-        if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(MspManager.defaultCspValue)) {
+        if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(GlobalMspManagement.defaultCspValue)) {
             try {
                 //  log.info("消息配置对称密钥："+mspConfig.getConfig());
                 SM2KeyExport sm2KeyExport = (SM2KeyExport) SM2KeyUtil.getKey(new SM2KeyGenOpts());
@@ -112,7 +112,7 @@ public class Identity implements ISigningIdentity {
             } catch (JavaChainException e) {
                 e.printStackTrace();
             }
-        } else if (IFactoryOpts.PROVIDER_GMT0016.equalsIgnoreCase(MspManager.defaultCspValue)) {
+        } else if (IFactoryOpts.PROVIDER_GMT0016.equalsIgnoreCase(GlobalMspManagement.defaultCspValue)) {
 
         }
 
@@ -141,7 +141,7 @@ public class Identity implements ISigningIdentity {
 
     @Override
     public void verify(byte[] msg, byte[] sig) {
-        if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(MspManager.defaultCspValue)) {
+        if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(GlobalMspManagement.defaultCspValue)) {
             SM2KeyExport sm2KeyExport;
             try {
                 sm2KeyExport = (SM2KeyExport) SM2KeyUtil.getKey(new SM2KeyGenOpts());
@@ -151,7 +151,7 @@ public class Identity implements ISigningIdentity {
             } catch (JavaChainException e) {
                 e.printStackTrace();
             }
-        } else if (IFactoryOpts.PROVIDER_GMT0016.equalsIgnoreCase(MspManager.defaultCspValue)) {
+        } else if (IFactoryOpts.PROVIDER_GMT0016.equalsIgnoreCase(GlobalMspManagement.defaultCspValue)) {
 
         }
     }

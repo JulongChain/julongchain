@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 类描述
+ * CollectionHashRWSet
  *
  * @author sunzongyu
  * @date 2018/04/16

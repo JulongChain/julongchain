@@ -40,18 +40,14 @@ public class GenesisConfigFactory {
 
     public static GenesisConfig loadGenesisConfig() throws IOException {
         Yaml yaml = new Yaml();
-        URL url = GenesisConfigFactory.class.getClassLoader().getResource(GenesisConfig.CONFIGTX_FILE_PATH);
 
         InputStream is = null;
         try {
-            is = new FileInputStream(url.getFile());
+            is = GenesisConfigFactory.class.getClassLoader().getResourceAsStream(GenesisConfig.CONFIGTX_FILE_PATH);
             GenesisConfig genesisConfig = yaml.loadAs(is, GenesisConfig.class);
 
             genesisConfig.completeInstance();
             return genesisConfig;
-        } catch (FileNotFoundException e) {
-            log.error(e.getMessage(), e);
-            throw e;
         } finally {
             if (is != null) {
                 try {

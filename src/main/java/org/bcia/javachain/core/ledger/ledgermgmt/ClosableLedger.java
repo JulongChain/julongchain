@@ -19,6 +19,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.PrunePolicy;
 import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.core.ledger.*;
+import org.bcia.javachain.core.ledger.kvledger.KvLedger;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.node.TransactionPackage;
@@ -32,7 +33,7 @@ import java.util.List;
  * @date 2018/3/15
  * @company Dingxuan
  */
-public class ClosableLedger implements INodeLedger{
+public class ClosableLedger extends KvLedger {
 
     private String id;
 
@@ -54,100 +55,7 @@ public class ClosableLedger implements INodeLedger{
         this.nodeLedger = nodeLedger;
     }
 
-    @Override
-    public Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException {
-        return null;
-    }
-
-    @Override
-    public Common.Block getBlockByNumber(Long blockNumber) throws LedgerException {
-        return null;
-    }
-
-    @Override
-    public ResultsIterator getBlocksIterator(Long startBlockNumber) throws LedgerException {
-        return null;
-    }
-
-    /** Close closes the actual ledger and removes the entries from opened ledgers map
-     *
-     */
-    @Override
-    public synchronized void close(){
-        closeWithoutLock();
-    }
-
-    @Override
-    public void commit(Common.Block block) throws LedgerException {
-
-    }
-
-    @Override
-    public void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException {
-
-    }
-
     public void closeWithoutLock() {
         nodeLedger.close();
-    }
-
-    @Override
-    public TransactionPackage.ProcessedTransaction getTransactionByID(String txID) throws LedgerException {
-        return null;
-    }
-
-    @Override
-    public Common.Block getBlockByHash(byte[] blockHash) throws LedgerException {
-        return null;
-    }
-
-    @Override
-    public Common.Block getBlockByTxID(String txID) throws LedgerException {
-        return null;
-    }
-
-    @Override
-    public TransactionPackage.TxValidationCode getTxValidationCodeByTxID(String txID) throws LedgerException {
-        return null;
-    }
-
-    @Override
-    public ITxSimulator newTxSimulator(String txId) throws LedgerException {
-        return null;
-    }
-
-    @Override
-    public IQueryExecutor newQueryExecutor() throws LedgerException {
-        return null;
-    }
-
-    @Override
-    public IHistoryQueryExecutor newHistoryQueryExecutor() throws LedgerException {
-        return null;
-    }
-
-    @Override
-    public BlockAndPvtData getPvtDataAndBlockByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
-        return null;
-    }
-
-    @Override
-    public List<TxPvtData> getPvtDataByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
-        return null;
-    }
-
-    @Override
-    public void purgePrivateData(long maxBlockNumToRetain) throws LedgerException {
-
-    }
-
-    @Override
-    public long privateDataMinBlockNum() throws LedgerException {
-        return 0;
-    }
-
-    @Override
-    public void prune(PrunePolicy policy) throws LedgerException {
-
     }
 }

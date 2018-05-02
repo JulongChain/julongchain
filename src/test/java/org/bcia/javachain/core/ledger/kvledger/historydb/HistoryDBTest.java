@@ -15,29 +15,20 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.kvledger.historydb;
 
-import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBHandle;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDbProvider;
+import org.bcia.javachain.core.ledger.kvledger.history.historydb.HistoryDBHelper;
 import org.bcia.javachain.core.ledger.kvledger.history.historydb.HistoryLevelDB;
 import org.bcia.javachain.core.ledger.kvledger.history.historydb.IHistoryDB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
-import org.bcia.javachain.core.smartcontract.shim.impl.Handler;
 import org.bcia.javachain.protos.common.Common;
-import org.iq80.leveldb.DB;
-import org.iq80.leveldb.Options;
-import org.iq80.leveldb.impl.Iq80DBFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.quality.Strictness;
-
-import java.io.File;
 
 /**
  * 类描述
@@ -80,8 +71,8 @@ public class HistoryDBTest {
         Height h = db.getLastSavepoint();
         System.out.println(h.getTxNum());
         System.out.println(h.getBlockNum());
-        Assert.assertEquals(new Long(1000), h.getBlockNum());
-        Assert.assertEquals(new Long(10000), h.getTxNum());
+        Assert.assertEquals(1000, h.getBlockNum());
+        Assert.assertEquals(10000, h.getTxNum());
     }
 
     @Test
@@ -94,6 +85,4 @@ public class HistoryDBTest {
     public void recoverPoint() throws LedgerException {
         Assert.assertEquals(new Long(1001), new Long(db.recoverPoint((long)1)));
     }
-
-
 }

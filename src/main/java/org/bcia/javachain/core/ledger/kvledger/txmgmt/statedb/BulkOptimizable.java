@@ -20,7 +20,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import java.util.List;
 
 /**
- * 类描述
+ * 提供额外批量操作数据库接口
  *
  * @author sunzongyu
  * @date 2018/04/17
@@ -29,7 +29,7 @@ import java.util.List;
 public interface BulkOptimizable {
     void loadCommittedVersions(List<CompositeKey> keys);
 
-    Height getCachedVersion (String ns, String key);
+    Height getCachedVersion(String ns, String key);
 
     void clearCachedVersions();
 }

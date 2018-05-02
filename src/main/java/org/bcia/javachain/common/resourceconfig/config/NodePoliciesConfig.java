@@ -18,13 +18,13 @@ package org.bcia.javachain.common.resourceconfig.config;
 import org.bcia.javachain.protos.common.Configtx;
 
 /**
- * 对象
+ * 节点策略配置对象
  *
  * @author zhouhui
  * @date 2018/4/19
  * @company Dingxuan
  */
-public class NodePoliciesConfig {
+public class NodePoliciesConfig implements INodePoliciesConfig {
     public NodePoliciesConfig(Configtx.ConfigTree tree) {
     }
 }

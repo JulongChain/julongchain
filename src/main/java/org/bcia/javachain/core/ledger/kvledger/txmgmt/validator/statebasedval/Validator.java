@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 类描述
+ * statedb验证器
  *
  * @author sunzongyu
  * @date 2018/04/19
@@ -97,13 +97,22 @@ public class Validator implements InternalValidator {
 
     @Override
     public PubAndHashUpdates validateAndPrepareBatch(Block block, boolean doMVCCValidation) throws LedgerException {
+//        if(db.isBulkOptimizable()){
         preLoadCommittedVersionOfRSet(block);
+//        }
         PubAndHashUpdates updates = PubAndHashUpdates.newPubAndHashUpdates();
         for(Transaction tx : block.getTxs()){
             TransactionPackage.TxValidationCode validationCode = validateEndorserTX(tx.getRwSet(), doMVCCValidation, updates);
-
+            tx.setValidationCode(validationCode);
+            if(TransactionPackage.TxValidationCode.VALID.equals(validationCode)){
+                logger.debug(String.format("Block [%d] Transaction index [%d] txID [%s] marked as valid by state validator", block.getNum(), tx.getIndexInBlock(), tx.getId()));
+                Height committingTxHeight = Height.newHeight(block.getNum(), tx.getIndexInBlock());
+                updates.applyWriteSet(tx.getRwSet(), committingTxHeight);
+            } else {
+                logger.debug(String.format("Block [%d] Transaction id [%d] TxID [%s] marked as invalid by state validator.", block.getNum(), tx.getIndexInBlock(), tx.getId()));
+            }
         }
-        return null;
+        return updates;
     }
 
     private TransactionPackage.TxValidationCode validateEndorserTX(TxRwSet txRwSet, boolean doMVCCValidation, PubAndHashUpdates updates) throws LedgerException{
@@ -169,10 +178,10 @@ public class Validator implements InternalValidator {
         IRangeQueryValidator validator;
         if(null != rqi.getReadsMerkleHashes()){
             logger.debug("Hashing results are present in the range query info hence, initiating hashing based validation");
-            validator = new IRangeQueryHashValidator();
+            validator = new RangeQueryHashValidator();
         } else {
             logger.debug("Hashing results are not present in the range query info hence, initiating hashing based validation");
-            validator = new IRangeQueryResultsValidator();
+            validator = new RangeQueryResultsValidator();
         }
         validator.init(rqi, combinedItr);
         combinedItr.close();

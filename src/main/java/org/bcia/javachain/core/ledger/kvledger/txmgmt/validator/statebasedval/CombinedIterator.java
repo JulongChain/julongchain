@@ -22,7 +22,10 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.*;
 
 /**
- * 类描述
+ * 组合的迭代器
+ * updatesItr   遍历更新包   A
+ * dbItr        遍历db中的键 B
+ *
  *
  * @author sunzongyu
  * @date 2018/04/19
@@ -114,7 +117,7 @@ public class CombinedIterator implements ResultsIterator {
     }
 
     private boolean isDelete(QueryResult itm){
-        return itm.getVersionedValue().getValue() == null;
+        return ((VersionedKV) itm).getVersionedValue().getValue() == null;
     }
 
     private int compareKey(QueryResult o1, QueryResult o2){
@@ -127,8 +130,8 @@ public class CombinedIterator implements ResultsIterator {
         if(o2 == null){
             return -1;
         }
-        return o1.getCompositeKey().getKey()
-                .compareTo(o2.getCompositeKey().getKey());
+        return ((VersionedKV) o1).getCompositeKey().getKey()
+                .compareTo(((VersionedKV) o2).getCompositeKey().getKey());
     }
 
     private QueryResult serveEndKeyIfNeeded() throws LedgerException {

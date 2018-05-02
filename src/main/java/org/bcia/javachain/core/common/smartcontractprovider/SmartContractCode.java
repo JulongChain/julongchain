@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.core.common.smartcontractprovider;
 
+import org.bcia.javachain.protos.node.SmartContractDataPackage;
 import org.bcia.javachain.protos.node.Smartcontract;
 
 /**
@@ -25,7 +26,7 @@ import org.bcia.javachain.protos.node.Smartcontract;
  * @company Dingxuan
  */
 public class SmartContractCode {
-    SmartContractData data;
+    SmartContractDataPackage.SmartContractData data;
     Smartcontract.SmartContractDeploymentSpec spec;
     byte [] depspecbytes;
 }

@@ -18,7 +18,7 @@ package org.bcia.javachain.common.ledger.util.leveldbhelper;
 import java.security.Key;
 
 /**
- * 类描述
+ * 索引更新包
  *
  * @author sunzongyu
  * @date 2018/04/13

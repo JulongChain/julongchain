@@ -18,7 +18,7 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate;
 import org.bcia.javachain.common.exception.LedgerException;
 
 /**
- * 类描述
+ * DB提供者接口
  *
  * @author sunzongyu
  * @date 2018/04/17

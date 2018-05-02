@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 类描述
+ * 读写集合
  *
  * @author sunzongyu
  * @date 2018/04/16
@@ -154,20 +154,54 @@ public class RWSetBuilder {
         return txPvtRwSet;
     }
 
+    /**
+     * 根据ns获取nsPubRwBuilder
+     */
     public NsPubRwBuilder getOrCreateNsPubRwBuilder(String ns){
-        return null;
+        NsPubRwBuilder nsPubRwBuilder = pubRwBuilderMap.get(ns);
+        if(nsPubRwBuilder == null){
+            nsPubRwBuilder = new NsPubRwBuilder();
+            nsPubRwBuilder.setNameSpace(ns);
+            nsPubRwBuilder.setRangeQueryKeys(null);
+            pubRwBuilderMap.put(ns, nsPubRwBuilder);
+        }
+        return nsPubRwBuilder;
     }
 
+    /**
+     * 根据ns获取nsPvtRwBuilder
+     */
     public NsPvtRwBuilder getOrCreateNsPvtRwBuilder(String ns){
-        return null;
+        NsPvtRwBuilder nsPvtRwBuilder = pvtRwBuilderMap.get(ns);
+        if(nsPvtRwBuilder == null){
+            nsPvtRwBuilder = new NsPvtRwBuilder();
+            nsPvtRwBuilder.setCollectionName(ns);
+            pvtRwBuilderMap.put(ns, nsPvtRwBuilder);
+        }
+        return nsPvtRwBuilder;
     }
 
     public CollHashRwBuilder getOrCreateCollHashedRwBuilder(String ns, String coll){
-        return null;
+        NsPubRwBuilder nsPubRwBuilder = getOrCreateNsPubRwBuilder(ns);
+        CollHashRwBuilder collHashRwBuilder = nsPubRwBuilder.getCollHashRwBuilders().get(coll);
+        if(collHashRwBuilder == null){
+            collHashRwBuilder = new CollHashRwBuilder();
+            collHashRwBuilder.setCollName(coll);
+            collHashRwBuilder.setPvtDataHash(null);
+            nsPubRwBuilder.getCollHashRwBuilders().put(coll, collHashRwBuilder);
+        }
+        return collHashRwBuilder;
     }
 
     public CollPvtRwBuilder getOrCreateCollPvtRwBuilder(String ns, String coll){
-        return null;
+        NsPvtRwBuilder nsPvtRwBuilder = getOrCreateNsPvtRwBuilder(ns);
+        CollPvtRwBuilder collHashRwBuilder = nsPvtRwBuilder.getCollPvtRwBuilders().get(coll);
+        if(collHashRwBuilder == null){
+            collHashRwBuilder = new CollPvtRwBuilder();
+            collHashRwBuilder.setCollectionName(coll);
+            nsPvtRwBuilder.getCollPvtRwBuilders().put(coll, collHashRwBuilder);
+        }
+        return collHashRwBuilder;
     }
 
     public Map<String, NsPubRwBuilder> getPubRwBuilderMap() {

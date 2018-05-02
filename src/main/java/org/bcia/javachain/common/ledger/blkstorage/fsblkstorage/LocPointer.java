@@ -16,7 +16,7 @@
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 /**
- * 类描述
+ * 封装读写点
  *
  * @author sunzongyu
  * @date 2018/04/12
@@ -26,6 +26,15 @@ public class LocPointer {
 
     private Integer offset;
     private Integer bytesLength;
+
+    public LocPointer(){
+
+    }
+
+    public LocPointer(int offset, int bytesLength){
+        this.offset = offset;
+        this.bytesLength = bytesLength;
+    }
 
     public Integer getOffset() {
         return offset;

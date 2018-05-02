@@ -24,13 +24,14 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 
 /**
- * 类描述
+ * 富查询迭代器
+ * leveldb不支持
  *
  * @author sunzongyu
  * @date 2018/04/18
  * @company Dingxuan
  */
-public class QueryResultsItr implements org.bcia.javachain.common.ledger.ResultsIterator {
+public class QueryResultsItr implements ResultsIterator {
     private static final JavaChainLog loggger  = JavaChainLogFactory.getLog(QueryResultsItr.class);
 
     private ResultsIterator dbItr;

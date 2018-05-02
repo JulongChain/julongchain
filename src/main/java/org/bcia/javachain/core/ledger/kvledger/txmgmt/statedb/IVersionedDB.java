@@ -28,7 +28,7 @@ import java.util.List;
  * @date 2018/04/13
  * @company Dingxuan
  */
-public interface IVersionedDB extends BulkOptimizable{
+public interface IVersionedDB{
 
     /** GetState gets the value for given namespace and key. For a chaincode, the namespace corresponds to the chaincodeId
      *
@@ -48,7 +48,7 @@ public interface IVersionedDB extends BulkOptimizable{
      * @return
      * @throws LedgerException
      */
-    List<VersionedValue> getStateMultipleKeys(String namespace, String[] keys) throws LedgerException;
+    List<VersionedValue> getStateMultipleKeys(String namespace, List<String> keys) throws LedgerException;
 
     /** GetStateRangeScanIterator returns an iterator that contains all the key-values between given key ranges.
      * startKey is inclusive
