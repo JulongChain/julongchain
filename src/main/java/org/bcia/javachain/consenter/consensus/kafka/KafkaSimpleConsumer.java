@@ -161,7 +161,6 @@ public class KafkaSimpleConsumer {
 
                     // 获取下一个读取数据开始的偏移量
                     readOffSet = messageAndOffset.nextOffset();
-
                     // 读取数据的value
                     ByteBuffer payload = messageAndOffset.message().payload();
 
@@ -169,7 +168,7 @@ public class KafkaSimpleConsumer {
                     payload.get(bytes);
                     System.out.println("value:"+currentOffset + ": " + new String(bytes, "UTF-8"));
                     //传给业务处理
-                    chain.processMessagesToBlocks(bytes);
+                    chain.processMessagesToBlocks(bytes,currentOffset);
                     numRead++;
                     maxReads--;
                 }

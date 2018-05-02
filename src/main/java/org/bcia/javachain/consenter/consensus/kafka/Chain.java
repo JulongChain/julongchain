@@ -15,13 +15,16 @@
  */
 package org.bcia.javachain.consenter.consensus.kafka;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.bcia.javachain.consenter.consensus.IChain;
+import org.bcia.javachain.consenter.entity.ChainEntity;
 import org.bcia.javachain.consenter.util.Constant;
 import org.bcia.javachain.consenter.util.LoadYaml;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.consenter.Kafka;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -42,7 +45,8 @@ public class Chain implements IChain {
     private KafkaSimpleConsumer kafkaSimpleConsumer=new KafkaSimpleConsumer();
     @Autowired
     private LoadYaml loadYaml=new LoadYaml();
-
+    //TODO 不知如何获取
+    private ChainEntity chain=new ChainEntity();
     Map map=(HashMap)LoadYaml.readYamlFile(Constant.ORDERER_CONFIG).get(Constant.KAFKA);
 
 
@@ -88,17 +92,114 @@ public class Chain implements IChain {
 
     }
    //实现kafka消费者，start调用该方法
-    public void processMessagesToBlocks(byte[] message){
+    public void processMessagesToBlocks(byte[] message,Long offset) throws IOException {
 
-    //解析数据，分类处理
+
+        //解析数据，分类处理
+        String json=new String(message);
+        ObjectMapper mapper = new ObjectMapper();
+        //1.转换ProducerMessage
+        ProducerMessage producerMessage = mapper.readValue(json, ProducerMessage.class);
+        //2.转换kafkaMessageByte字节数组
+        byte[] kafkaMessageByte=producerMessage.getValue();
+        //3.转换Kafka.KafkaMessage
+        Kafka.KafkaMessage kafkaMessage=Kafka.KafkaMessage.parseFrom(kafkaMessageByte);
+
+        //解压消费消息所携带的数据的类型，进入不同分支，处理消息
+        switch(kafkaMessage.getTypeCase()){
+            case REGULAR:        //orderer的正常消息
+                processRegular(kafkaMessage.getRegular(),offset);
+            case CONNECT:        //KAFKA与Orderer的连接消息
+                processConnect();
+            case TIME_TO_CUT:   //orderer的生产块事件消息
+                processTimeToCut();
+        }
+
+
+
+
 
 
     }
+
+    private Object processConnect(){
+        return null;
+    }
+
+
+
     //处理消息（重发消息，切块等）区分值三种（未知，配置，正常）的消息类型
     //processMessagesToBlocks()调用该方法
-    public void processRegular(){
+    public void processRegular(Kafka.KafkaMessageRegular  kafkaMessageRegular,Long receivedOffset){
+          int seq = chain.sequence();
+          Common.Envelope env= Common.Envelope.newBuilder().build();
+        //TODO env赋值
+
+        //处理NORMAL消息
+        if(Kafka.KafkaMessageRegular.Class.NORMAL==kafkaMessageRegular.getClass_()){
+
+            //校验偏移量
+            if(Kafka.KafkaMessageRegular.newBuilder().getOriginalOffset()!=0){
+                //TODO 考虑offset
+                if(Kafka.KafkaMessageRegular.newBuilder().getOriginalOffset()<= chain.getLastOriginalOffsetProcessed()){
+                    }
+            }
+          //校验seq
+            if(Kafka.KafkaMessageRegular.newBuilder().getConfigSeq()<seq){
+            Long configSeq= chain.processNormalMsg(env);
+                orderHandle(env, configSeq, receivedOffset);
+            }
+
+            //这里的任何消息可能已经或可能没有被重新验证和重新排序，但它们在这里是绝对有效的
+            //如果消息是预先lastoriginaloffsetprocessed重新验证，重新排序
+            long offset= Kafka.KafkaMessageRegular.newBuilder().getOriginalOffset();
+            if(offset == 0 ) {
+                offset = chain.getLastOriginalOffsetProcessed();
+            }
+            //提交批处理
+            commitNormalMsg(env, offset);
+            //处理CONFIG消息
+        }else if(Kafka.KafkaMessageRegular.Class.CONFIG==kafkaMessageRegular.getClass_()){
+            //校验偏移量
+            if(Kafka.KafkaMessageRegular.newBuilder().getOriginalOffset()!=0){
+                //TODO 考虑offset
+                if(Kafka.KafkaMessageRegular.newBuilder().getOriginalOffset()<= chain.getLastOriginalOffsetProcessed()){
+                }
+            }
+            //校验seq
+            if(Kafka.KafkaMessageRegular.newBuilder().getConfigSeq()<seq){
+                Long configSeq= chain.processNormalMsg(env);
+                configureHandle(env,configSeq, receivedOffset);
+            }
+
+            //这里的任何消息可能已经或可能没有被重新验证和重新排序，但它们在这里是绝对有效的
+            //如果消息是预先lastoriginaloffsetprocessed重新验证，重新排序
+            long offset= Kafka.KafkaMessageRegular.newBuilder().getOriginalOffset();
+            if(offset == 0 ) {
+                offset = chain.getLastOriginalOffsetProcessed();
+            }
+            //提交批处理
+            commitConfigMsg(env, offset);
+            //处理UNKNOWN消息
+        }else if(Kafka.KafkaMessageRegular.Class.UNKNOWN==kafkaMessageRegular.getClass_()){
+                //TODO 执行util.ChannelHeader()
+
+        }
+    }
+
+    //批量处理Normal消息
+    private void commitNormalMsg(Common.Envelope message,long newOffset){
+        //计算当批消息的offset值（即最后一条消息的offset值+1）
 
     }
+    //批量处理config消息
+    private void commitConfigMsg(Common.Envelope message,long newOffset){
+        //计算当批消息的offset值（即最后一条消息的offset值+1）
+
+    }
+
+
+
     //到时间切块方法
     //processMessagesToBlocks()调用该方法
     public void sendTimeToCut(){
