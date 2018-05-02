@@ -42,28 +42,16 @@ import java.util.Objects;
 
 public class MspHelperTest {
 
-    public static final String testCAOrg = "example.com";
-    public static final String testCAName = "ca" + "." + testCAOrg;
-    public static final String testName = "peer0";
-    public static final String testCountry = "China";
-    public static final String testProvince = "Guangdong";
-    public static final String testLocality = "Shen Zhen";
-    public static final String testOrganizationUnit = "BCIA";
-    public static final String testStreetAddress = "testStreetAddress";
-    public static final String testPostalCode = "123456";
-
-    public static final String CACERTS = "cacerts";
-    public static final String ADMINCERTS = "admincerts";
-    public static final String SIGNCERTS = "signcerts";
-    public static final String KEYSTORE = "keystore";
-    public static final String INTERMEDIATECRTS = "intermediatecerts";
-    public static final String CRLSFOLDER = "crls";
-    public static final String CONFIGFILENAME = "config.yaml";
-    public static final String TLSCACERTS = "tlscacerts";
-    public static final String TLSINTERMEDIATECERTS = "tlsintermediatecerts";
-
-
-    String testDir;
+    private static final String testCAOrg = "example.com";
+    private static final String testCAName = "ca" + "." + testCAOrg;
+    private static final String testName = "peer0";
+    private static final String testCountry = "China";
+    private static final String testProvince = "Guangdong";
+    private static final String testLocality = "ShenZhen";
+    private static final String testOrganizationUnit = "BCIA";
+    private static final String testStreetAddress = "testStreetAddress";
+    private static final String testPostalCode = "123456";
+    private String testDir;
 
     {
         try {
