@@ -86,6 +86,7 @@ public class Chain implements IChain {
     //调用kafka的客户端，实现kafka生产者
     //enqueue接受信息并返回真或假otheriwse验收
     public void enqueue(Kafka.KafkaMessage kafkaMessage){
+        log.debug("[channel: %s] Enqueueing envelope...", chain.getChainID());
         String topic = (String)((HashMap)map.get(Constant.COMSUMER)).get(Constant.TOPIC);
         int partitionID = (int)((HashMap)map.get(Constant.COMSUMER)).get(Constant.PARTITION_ID);
         // 获取kafkaInfo，从配置文件获取（现在这里定义，TODO该成全局）
@@ -118,13 +119,8 @@ public class Chain implements IChain {
                 processConnect(chain.getChainID());
             case TIME_TO_CUT:   //orderer的生产块事件消息
                 processTimeToCut(kafkaMessage.getTimeToCut(),offset);
+                log.debug("[channel: %s] Consenter for channel exiting", chain.getChainID());
         }
-
-
-
-
-
-
     }
 
     private Object processConnect(String channelName){
