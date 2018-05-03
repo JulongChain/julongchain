@@ -27,7 +27,34 @@ import org.bcia.javachain.protos.common.Common;
 
 public class ChainEntity {
     private long lastOriginalOffsetProcessed;
+    private String chainID;
+    private int lastCutBlockNumber;
+    private String timer;
 
+
+    public String getTimer() {
+        return timer;
+    }
+
+    public void setTimer(String timer) {
+        this.timer = timer;
+    }
+
+    public int getLastCutBlockNumber() {
+        return lastCutBlockNumber;
+    }
+
+    public void setLastCutBlockNumber(int lastCutBlockNumber) {
+        this.lastCutBlockNumber = lastCutBlockNumber;
+    }
+
+    public String getChainID() {
+        return chainID;
+    }
+
+    public void setChainID(String chainID) {
+        this.chainID = chainID;
+    }
 
     public long getLastOriginalOffsetProcessed() {
         return lastOriginalOffsetProcessed;

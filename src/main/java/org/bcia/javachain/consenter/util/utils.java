@@ -16,6 +16,7 @@
 package org.bcia.javachain.consenter.util;
 
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.consenter.Kafka;
 
 /**
  * 类描述
@@ -25,7 +26,7 @@ import org.bcia.javachain.protos.common.Common;
  * @company Shudun
  */
 
-public class utils {
+public  class utils {
 
     public void ChannelHeader(Common.Envelope env){
         Common.Payload envPayload=UnmarshalPayload(env.toByteArray());
@@ -41,5 +42,9 @@ public class utils {
         //TODO payload进行赋值
         return payload;
 
+    }
+    public static byte[] MarshalOrPanic(Kafka.KafkaMetadata kafkaMetadata){
+        byte[] data=kafkaMetadata.toByteArray();
+        return data;
     }
 }
