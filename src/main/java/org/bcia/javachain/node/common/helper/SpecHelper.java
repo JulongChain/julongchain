@@ -16,6 +16,7 @@
 package org.bcia.javachain.node.common.helper;
 
 import com.google.protobuf.ByteString;
+import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.protos.node.Smartcontract;
 
@@ -65,7 +66,7 @@ public class SpecHelper {
         for (byte[] bytes : args) {
             if (bytes != null) {
                 inputBuilder.addArgs(ByteString.copyFrom(bytes));
-            }else{
+            } else {
                 inputBuilder.addArgs(ByteString.copyFrom(new byte[0]));
             }
         }
@@ -94,11 +95,23 @@ public class SpecHelper {
      * @return
      */
     public static Smartcontract.SmartContractDeploymentSpec buildDeploymentSpec(String scName, String scVersion,
-                                                                                Smartcontract.SmartContractInput input) {
+                                                                                String scPath, Smartcontract
+                                                                                        .SmartContractInput input) {
+        //构造SmartContractID对象
+        Smartcontract.SmartContractID.Builder scIdBuilder = Smartcontract.SmartContractID.newBuilder();
+        scIdBuilder.setName(scName);
+        if (StringUtils.isNotBlank(scVersion)) {
+            scIdBuilder.setVersion(scVersion);
+        }
+        if (StringUtils.isNotBlank(scPath)) {
+            scIdBuilder.setPath(scPath);
+        }
+        Smartcontract.SmartContractID scId = scIdBuilder.build();
+
         //构造SmartContractSpec对象
         Smartcontract.SmartContractSpec.Builder specBuilder = Smartcontract.SmartContractSpec.newBuilder();
         specBuilder.setType(Smartcontract.SmartContractSpec.Type.JAVA);
-        specBuilder.setSmartContractId(Smartcontract.SmartContractID.newBuilder().setName(scName).setVersion(scVersion));
+        specBuilder.setSmartContractId(scId);
         if (input != null) {
             specBuilder.setInput(input);
         }

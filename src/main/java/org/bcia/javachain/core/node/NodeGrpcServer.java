@@ -145,8 +145,8 @@ public class NodeGrpcServer {
                     proposalResponse = endorserServer.processProposal(request);
                 } catch (NodeException e) {
                     log.error(e.getMessage(), e);
-                    proposalResponse = ProposalResponseUtils.buildErrorProposalResponse(Common.Status.UNKNOWN, e
-                            .getMessage());
+                    proposalResponse = ProposalResponseUtils.buildErrorProposalResponse(Common.Status
+                            .INTERNAL_SERVER_ERROR, e.getMessage());
                 }
                 responseObserver.onNext(proposalResponse);
                 responseObserver.onCompleted();

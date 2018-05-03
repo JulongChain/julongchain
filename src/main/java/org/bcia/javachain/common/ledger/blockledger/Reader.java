@@ -35,5 +35,5 @@ public interface Reader {
     /**
      * 返回block数量
      */
-    long height();
+    long height() throws LedgerException;
 }

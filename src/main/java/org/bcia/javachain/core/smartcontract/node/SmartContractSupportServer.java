@@ -17,17 +17,14 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bcia.javachain.common.util.CommConstant;
-import org.bcia.javachain.protos.common.Common.GroupHeader;
-import org.bcia.javachain.protos.common.Common.Header;
-import org.bcia.javachain.protos.common.Common.HeaderType;
-import org.bcia.javachain.protos.node.ProposalPackage.Proposal;
-import org.bcia.javachain.protos.node.ProposalPackage.SignedProposal;
-import org.bcia.javachain.protos.node.SmartContractEventPackage.SmartContractEvent;
-import org.bcia.javachain.protos.node.SmartcontractShim.SmartContractMessage;
-import org.bcia.javachain.protos.node.SmartcontractShim.SmartContractMessage.Type;
+import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
+import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.SmartContractEventPackage;
+import org.bcia.javachain.protos.node.SmartcontractShim;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -91,28 +88,70 @@ public class SmartContractSupportServer {
       }
     }.start();
 
-    Thread.sleep(5000);
+    Thread.sleep(10000);
+
+    Common.GroupHeader groupHeader =
+        Common.GroupHeader.newBuilder()
+            .setType(Common.HeaderType.ENDORSER_TRANSACTION.getNumber())
+            .build();
+
+    Common.Header header =
+        Common.Header.newBuilder().setGroupHeader(groupHeader.toByteString()).build();
+
+    ProposalPackage.Proposal proposal =
+        ProposalPackage.Proposal.newBuilder().setHeader(header.toByteString()).build();
+
+    ProposalPackage.SignedProposal signedProposal =
+        ProposalPackage.SignedProposal.newBuilder()
+            .setProposalBytes(proposal.toByteString())
+            .build();
+
+    String scId = "MySmartContract001";
+    String txId = "txId " + UUID.randomUUID().toString();
+    String groupId = "MyGroup";
+
+    SmartContractEventPackage.SmartContractEvent smartContractEvent =
+        SmartContractEventPackage.SmartContractEvent.newBuilder().setSmartContractId(scId).build();
+
+    SmartcontractShim.SmartContractMessage msg =
+        SmartcontractShim.SmartContractMessage.newBuilder()
+            .setGroupId(groupId)
+            .setTxid(txId)
+            .setType(SmartcontractShim.SmartContractMessage.Type.TRANSACTION)
+            .setProposal(signedProposal)
+            .setSmartcontractEvent(smartContractEvent)
+            .build();
+
+    SmartcontractShim.SmartContractMessage scMsg = SmartContractSupportService.invoke(scId, msg);
+
+    List<KvRwset.KVRead> kvReads = TransactionRunningUtil.getKvReads(scId, txId);
+
+    logger.info("kvReads:" + kvReads);
+
+    List<KvRwset.KVWrite> kvWrites = TransactionRunningUtil.getKvWrites(scId, txId);
+
+    logger.info("kvWrites:" + kvWrites);
 
     while (true) {
-      GroupHeader groupHeader =
-          GroupHeader.newBuilder().setType(HeaderType.ENDORSER_TRANSACTION.getNumber()).build();
-      Header header = Header.newBuilder().setGroupHeader(groupHeader.toByteString()).build();
-      Proposal proposal = Proposal.newBuilder().setHeader(header.toByteString()).build();
-      SignedProposal signedProposal =
-          SignedProposal.newBuilder().setProposalBytes(proposal.toByteString()).build();
-      SmartContractEvent smartcontractEvent =
-          SmartContractEvent.newBuilder().setSmartContractId(CommConstant.ESSC).build();
-      SmartContractMessage msg =
-          SmartContractMessage.newBuilder()
-              .setGroupId("groupId " + UUID.randomUUID().toString())
-              .setTxid("txId " + UUID.randomUUID().toString())
-              .setType(Type.TRANSACTION)
-              .setProposal(signedProposal)
-              .setSmartcontractEvent(smartcontractEvent)
-              .build();
-      SmartContractSupportService.invoke(CommConstant.ESSC, msg);
-
-      Thread.sleep(5000);
+      // GroupHeader groupHeader =
+      //     GroupHeader.newBuilder().setType(HeaderType.ENDORSER_TRANSACTION.getNumber()).build();
+      // Header header = Header.newBuilder().setGroupHeader(groupHeader.toByteString()).build();
+      // Proposal proposal = Proposal.newBuilder().setHeader(header.toByteString()).build();
+      // SignedProposal signedProposal =
+      //     SignedProposal.newBuilder().setProposalBytes(proposal.toByteString()).build();
+      // SmartContractEvent smartcontractEvent =
+      //     SmartContractEvent.newBuilder().setSmartContractId(CommConstant.ESSC).build();
+      // SmartContractMessage msg =
+      //     SmartContractMessage.newBuilder()
+      //         .setGroupId("groupId " + UUID.randomUUID().toString())
+      //         .setTxid("txId " + UUID.randomUUID().toString())
+      //         .setType(Type.TRANSACTION)
+      //         .setProposal(signedProposal)
+      //         .setSmartcontractEvent(smartcontractEvent)
+      //         .build();
+      // SmartContractSupportService.invoke(CommConstant.ESSC, msg);
+      //
+      // Thread.sleep(5000);
     }
   }
 }

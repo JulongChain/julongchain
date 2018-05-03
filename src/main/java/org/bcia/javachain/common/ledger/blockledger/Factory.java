@@ -32,7 +32,7 @@ public interface Factory {
      * 获取ledger(已存在)
      * 创建ledger(不存在)
      */
-    ReaderWriter getOrCreate(String groupID) throws LedgerException;
+    ReadWriteBase getOrCreate(String groupID) throws LedgerException;
 
     /**
      * 返回已经创建的groupid

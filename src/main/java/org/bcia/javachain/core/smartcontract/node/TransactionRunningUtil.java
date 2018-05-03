@@ -46,11 +46,18 @@ public class TransactionRunningUtil {
   private static Map<String, String> txIdAndStatusMap =
       Collections.synchronizedMap(new HashMap<String, String>());
 
+  public static Map<String, List<KvRwset.KVRead>> getTxIdAndKvReadMap() {
+    return txIdAndKvReadMap;
+  }
+
   private static Map<String, List<KvRwset.KVRead>> txIdAndKvReadMap =
       Collections.synchronizedMap(new HashMap<String, List<KvRwset.KVRead>>());
 
   private static Map<String, SmartcontractShim.SmartContractMessage> txIdAndMessageMap =
       Collections.synchronizedMap(new HashMap<String, SmartcontractShim.SmartContractMessage>());
+
+  private static Map<String, List<KvRwset.KVWrite>> txIdAndKvWriteMap =
+      Collections.synchronizedMap(new HashMap<String, List<KvRwset.KVWrite>>());
 
   public static void addTxMessage(
       String smartContractId,
@@ -74,6 +81,7 @@ public class TransactionRunningUtil {
     String composite = composite(smartContractId, txId);
     if (txIdAndKvReadMap.get(composite) == null) {
       List<KvRwset.KVRead> list = new ArrayList<KvRwset.KVRead>();
+      list.add(kvRead);
       txIdAndKvReadMap.put(composite, list);
     } else {
       txIdAndKvReadMap.get(composite).add(kvRead);
@@ -82,6 +90,21 @@ public class TransactionRunningUtil {
 
   public static List<KvRwset.KVRead> getKvReads(String smartContractId, String txId) {
     return txIdAndKvReadMap.get(composite(smartContractId, txId));
+  }
+
+  public static void addKvWrite(String smartContractId, String txId, KvRwset.KVWrite kvWrite) {
+    String composite = composite(smartContractId, txId);
+    if (txIdAndKvWriteMap.get(composite) == null) {
+      List<KvRwset.KVWrite> list = new ArrayList<KvRwset.KVWrite>();
+      list.add(kvWrite);
+      txIdAndKvWriteMap.put(composite, list);
+    } else {
+      txIdAndKvWriteMap.get(composite).add(kvWrite);
+    }
+  }
+
+  public static List<KvRwset.KVWrite> getKvWrites(String smartContractId, String txId) {
+    return txIdAndKvWriteMap.get(composite(smartContractId, txId));
   }
 
   /**

@@ -55,7 +55,6 @@ import static org.bcia.javachain.msp.mspconfig.MspConfigFactory.loadMspConfig;
  * @date 2018/2/23
  * @company Dingxuan
  */
-@Component
 public class Node {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Node.class);
 
@@ -75,17 +74,15 @@ public class Node {
 
     private InitializeCallback initializeCallback;
 
-    public Node() throws NodeException {
+    private Node() throws NodeException {
         init();
-
-        instance = this;
     }
 
     public static Node getInstance() throws NodeException {
         if (instance == null) {
             synchronized (Node.class) {
                 if (instance == null) {
-                    new Node();
+                    instance = new Node();
                 }
             }
         }
@@ -248,6 +245,7 @@ public class Node {
 
                         Group group = createGroup(ledgerId, nodeLedger, configBlock);
                         groupMap.put(ledgerId, group);
+                        log.info("ledgerId-----$" + ledgerId);
 
                         if (callback != null) {
                             callback.onGroupInitialized(ledgerId);
@@ -283,6 +281,7 @@ public class Node {
         GroupSupport groupSupport = new GroupSupport();
 
         Group group = new Group();
+        groupMap.put(groupId, group);
 
         return group;
     }

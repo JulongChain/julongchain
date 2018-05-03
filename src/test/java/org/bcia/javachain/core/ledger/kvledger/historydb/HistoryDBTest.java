@@ -16,6 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.historydb;
 
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.core.ledger.kvledger.history.historydb.HistoryDBHelper;
 import org.bcia.javachain.core.ledger.kvledger.history.historydb.HistoryLevelDB;
 import org.bcia.javachain.core.ledger.kvledger.history.historydb.IHistoryDB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
@@ -84,6 +85,4 @@ public class HistoryDBTest {
     public void recoverPoint() throws LedgerException {
         Assert.assertEquals(new Long(1001), new Long(db.recoverPoint((long)1)));
     }
-
-
 }

@@ -389,7 +389,9 @@ public class LSSC  extends SystemSmartContractBase {
 
         CollectionStoreSupport collectionStoreSupport=new CollectionStoreSupport();
         String key = collectionStoreSupport.buildCollectionKVSKey(data.getName());
+        log.info("begin=========>" + key);
         byte[] existingCollection = stub.getState(key);
+        log.info("=========>" + existingCollection);
         if(existingCollection!=null){
             String msg=String.format("collection data should not exist for chaincode %s:%s",data.getName(),data.getVersion());
             throw new SysSmartContractException(msg);
@@ -641,6 +643,11 @@ public class LSSC  extends SystemSmartContractBase {
         // that is, if there are errors deploying the indexes the chaincode install can safely be re-attempted later.
         ScEventMgmt.getMgr().handleSmartContractInstall(smartContractDefinition,statedbArtifactsTar);
         // Finally, if everything is good above, install the chaincode to local peer file system so that endorsements can start
+
+        //TODO:add by zhouhui for test,保证测试通过，因正式环境未使用Spring,所以未自动填充值，导致值为null
+        if(support == null){
+            support = new LsscSupport();
+        }
         support.putSmartContractToLocalStorage(scPack);
 
         log.info("Installed Smartcontract [%s] Version [%s] to node",

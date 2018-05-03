@@ -15,8 +15,10 @@
  */
 package org.bcia.javachain.core.ledger;
 
+import com.google.protobuf.util.JsonFormat;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.blockledger.json.JsonLedger;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.core.ledger.kvledger.history.historydb.HistoryDBHelper;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
@@ -56,8 +58,8 @@ public class LedterTest {
 
     @Test
     public void getKVFromLevelDB() throws Throwable {
-//        LevelDBProvider provider = LevelDBProvider.newProvider("/tmp/fabric/ledgertests/ledgermgmt/ledgersData/ledgerProvider");
-        LevelDBProvider provider = LevelDBProvider.newProvider("/home/bcia/javachain/ledgersData/ledgerProvider");
+        LevelDBProvider provider = LevelDBProvider.newProvider(LedgerConfig.getHistoryLevelDBPath());
+//        LevelDBProvider provider = LevelDBProvider.newProvider("/home/bcia/javachain/ledgersData/ledgerProvider");
 //        LevelDBProvider provider = LevelDBProvider.newProvider("/home/bcia/javachain/ledgersData/stateLeveldb");
 //        for (int i = 0; i < 100; i++) {
 //            Height height = new Height();
@@ -66,17 +68,18 @@ public class LedterTest {
 //            byte[] value = height.toBytes();
 //            provider.put(ArrayUtils.addAll(ArrayUtils.addAll(("ns" + i).getBytes(), COMPOSITE_KEY_SEP), ("key" + i).getBytes()), value, true);
 //        }
-        Iterator<Map.Entry<byte[], byte[]>> itr =  provider.getIterator(null);
-        while(itr.hasNext()){
-            Map.Entry<byte[], byte[]> entry = itr.next();
-//            soutBytes(entry.getKey());
-//            soutBytes(entry.getValue());
-//            System.out.println(Height.newHeightFromBytes(entry.getValue()).getTxNum());
-//            System.out.println(Height.newHeightFromBytes(entry.getValue()).getBlockNum());
-            System.out.println(new String(entry.getKey()));
-            System.out.println(new String(entry.getValue()));
-            System.out.println("_____________________________________");
-        }
+//        Iterator<Map.Entry<byte[], byte[]>> itr =  provider.getIterator(null);
+//        while(itr.hasNext()){
+//            Map.Entry<byte[], byte[]> entry = itr.next();
+////            soutBytes(entry.getKey());
+////            soutBytes(entry.getValue());
+////            System.out.println(Height.newHeightFromBytes(entry.getValue()).getTxNum());
+////            System.out.println(Height.newHeightFromBytes(entry.getValue()).getBlockNum());
+//            System.out.println(new String(entry.getKey()));
+//            System.out.println(new String(entry.getValue()));
+//            System.out.println("_____________________________________");
+//        }
+
     }
 
     @Test
@@ -89,6 +92,10 @@ public class LedterTest {
 //        soutBytes(bytes);
 //        byte[] blockByte = new byte[bytes.length - 8];
         System.out.println(file.length());
+        String s = "chain_ajlkfjalkfj;alsjflkajsdlkfj";
+        System.out.println(s.substring(JsonLedger.GROUP_DIRECTORY_FORMAT_STRING.length(), s.length()));
+        System.out.println(64 * 1024 * 1024);
+        System.out.println(Integer.MAX_VALUE);
     }
 
     public static void soutBytes(byte[] bytes){

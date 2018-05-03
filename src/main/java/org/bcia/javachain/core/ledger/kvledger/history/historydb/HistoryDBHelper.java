@@ -33,12 +33,12 @@ public class HistoryDBHelper {
      */
     public static byte[] constructCompositeHistoryKey(String ns, String key, long blocNum, long tranNum){
         byte[] compositeKey = ns.getBytes();
-        ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
-        ArrayUtils.addAll(compositeKey, key.getBytes());
-        ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
-        ArrayUtils.addAll(compositeKey, Util.longToBytes(blocNum, 8));
-        ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
-        ArrayUtils.addAll(compositeKey, Util.longToBytes(tranNum, 8));
+        compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
+        compositeKey = ArrayUtils.addAll(compositeKey, key.getBytes());
+        compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
+        compositeKey = ArrayUtils.addAll(compositeKey, Util.longToBytes(blocNum, 8));
+        compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
+        compositeKey = ArrayUtils.addAll(compositeKey, Util.longToBytes(tranNum, 8));
         return compositeKey;
     }
 
@@ -48,11 +48,11 @@ public class HistoryDBHelper {
      */
     public static byte[] constructPartialCompositeHistoryKey(String ns, String key, boolean endKey){
         byte[] compositeKey = ns.getBytes();
-        ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
-        ArrayUtils.addAll(compositeKey, key.getBytes());
-        ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
+        compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
+        compositeKey = ArrayUtils.addAll(compositeKey, key.getBytes());
+        compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
         if(endKey){
-            ArrayUtils.addAll(compositeKey, new byte[]{(byte) 0xff});
+            compositeKey = ArrayUtils.addAll(compositeKey, new byte[]{(byte) 0xff});
         }
         return compositeKey;
     }
@@ -64,7 +64,7 @@ public class HistoryDBHelper {
      * @return blockNum
      */
     public static long splitCompositeHistoryKeyForBlockNum(byte[] byteToSplit, int length){
-        if(length != byteToSplit.length - 16){
+        if(length != byteToSplit.length - 17){
             return -1;
         }
         return Util.bytesToLong(byteToSplit, length, 8);
@@ -77,9 +77,30 @@ public class HistoryDBHelper {
      * @return blockNum
      */
     public static long splitCompositeHistoryKeyForTranNum(byte[] byteToSplit, int length){
-        if(length != byteToSplit.length - 16){
+        if(length != byteToSplit.length - 17){
             return -1;
         }
-        return Util.bytesToLong(byteToSplit, length + 8, 8);
+        return Util.bytesToLong(byteToSplit, length + 9, 8);
+    }
+
+    /**
+     * 获取History数据头部
+     */
+    public static byte[] splitCompositeHistoryKeyForHeader(byte[] byteToSplit){
+        if(byteToSplit.length <= 17){
+            return null;
+        }
+        byte[] header = new byte[byteToSplit.length - 17];
+        System.arraycopy(byteToSplit, 0, header, 0 , header.length);
+        return header;
+    }
+
+    /**
+     * 检查数据是否以制定字符数组起始
+     * @param bytes 目标数组
+     * @param start 起始数组
+     */
+    public static boolean checkStart(byte[] bytes, byte[] start){
+        return new String(bytes).startsWith(new String(start));
     }
 }

@@ -21,10 +21,9 @@ import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStoreProvider;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
-import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.FsBlockStore;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.FsBlockStoreProvider;
 import org.bcia.javachain.common.ledger.blockledger.Factory;
-import org.bcia.javachain.common.ledger.blockledger.ReaderWriter;
+import org.bcia.javachain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 
@@ -41,7 +40,7 @@ public class FileLedgerFactory implements Factory {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(FileLedgerFactory.class);
 
     private BlockStoreProvider blkStorageProvider;
-    private Map<String, ReaderWriter> ledgers;
+    private Map<String, ReadWriteBase> ledgers;
 
     public FileLedgerFactory(String directory) throws LedgerException {
         IndexConfig indexConfig = new IndexConfig();
@@ -51,18 +50,16 @@ public class FileLedgerFactory implements Factory {
     }
 
     @Override
-    public ReaderWriter getOrCreate(String groupID) throws LedgerException {
-        String key = groupID;
-
+    public synchronized ReadWriteBase getOrCreate(String groupID) throws LedgerException {
         //已存在账本,直接返回
-        ReaderWriter ledger = ledgers.get(key);
+        ReadWriteBase ledger = ledgers.get(groupID);
         if(ledger != null){
             return ledger;
         }
-        BlockStore blkStore = blkStorageProvider.openBlockStore(key);
-//        ledger = FileLedger.NewFileLedger(blkStore);
-        ledgers.put(key, ledger);
-        return null;
+        BlockStore blkStore = blkStorageProvider.openBlockStore(groupID);
+        ledger = new FileLedger(blkStore);
+        ledgers.put(groupID, ledger);
+        return ledger;
     }
 
     @Override

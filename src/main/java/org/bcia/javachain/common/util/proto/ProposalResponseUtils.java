@@ -52,6 +52,14 @@ public class ProposalResponseUtils {
         return proposalResponseBuilder.build();
     }
 
+    public static ProposalResponsePackage.ProposalResponse buildProposalResponse(ProposalResponsePackage.Response response) {
+        //构造提案响应
+        ProposalResponsePackage.ProposalResponse.Builder proposalResponseBuilder = ProposalResponsePackage
+                .ProposalResponse.newBuilder();
+        proposalResponseBuilder.setResponse(response);
+        return proposalResponseBuilder.build();
+    }
+
     public static ProposalResponsePackage.Response buildResponse(ByteString payload) {
         ProposalResponsePackage.Response.Builder responseBuilder = ProposalResponsePackage.Response.newBuilder();
         responseBuilder.setStatus(Common.Status.SUCCESS_VALUE);

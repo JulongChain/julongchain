@@ -181,6 +181,7 @@ public class NodeUtils {
             Node node = Node.getInstance();
             Map<String, Group> groupMap = node.getGroupMap();
 
+
             for (String groupId : groupMap.keySet()) {
                 Query.GroupInfo groupInfo = Query.GroupInfo.newBuilder().setGroupId(groupId).build();
                 groupInfoList.add(groupInfo);

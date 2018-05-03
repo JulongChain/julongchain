@@ -16,18 +16,16 @@ limitations under the License.
 package org.bcia.javachain.core.ledger;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.util.JsonFormat;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.genesis.GenesisBlockFactory;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
-import org.bcia.javachain.common.util.proto.BlockUtils;
-import org.bcia.javachain.core.ledger.kvledger.KvLedger;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.List;
 
 /**
  * 类描述
@@ -64,7 +62,13 @@ public class LedgerManagerTest {
         System.out.println(deleteDir(new File(Config.getPath())));
         long before = System.currentTimeMillis();
         LedgerManager.initialize(null);
-        l = LedgerManager.createLedger(factory.getGenesisBlock("MyGroup"));
+        Common.Block block = factory.getGenesisBlock("MyGroup");
+        System.out.println();
+        Common.Block.Builder block1 = Common.Block.newBuilder();
+        System.out.println(block1.getMetadata().getMetadataList().size());
+        JsonFormat.parser().merge(JsonFormat.printer().print(block), block1);
+        System.out.println(block1.getMetadata().getMetadataList().size());
+        l = LedgerManager.createLedger(block);
 //        List<String> list = LedgerManager.getLedgerIDs();
 //        list.forEach((s) -> {
 //            System.out.println(s);

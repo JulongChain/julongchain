@@ -16,6 +16,8 @@
 package org.bcia.javachain.core.common.smartcontractprovider;
 
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.node.Query;
 
 /**
@@ -26,35 +28,48 @@ import org.bcia.javachain.protos.node.Query;
  * @company Dingxuan
  */
 public class SmartContractProvider {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractProvider.class);
+
     /**
      * getSmartContractPackage tries each known package implementation one by one
      * till the right package is found
+     *
      * @param buf
      * @return
      * @throws JavaChainException
      */
-    public static ISmartContractPackage getSmartContractPackage(byte[] buf) throws JavaChainException{
+    public static ISmartContractPackage getSmartContractPackage(byte[] buf) throws JavaChainException {
+        ISmartContractPackage smartContractPackage = new SDSPackage();
 
-        return null;
+        try {
+            smartContractPackage.initFromBuffer(buf);
+        } catch (JavaChainException e) {
+            log.warn("try signed CDS");
+            smartContractPackage = new SignedSDSPackage();
+            smartContractPackage.initFromBuffer(buf);
+        }
+
+        return smartContractPackage;
     }
 
     /**
      * ExtractStatedbArtifactsFromCCPackage extracts the statedb artifacts from the code package tar and create a statedb artifact tar.
      * The state db artifacts are expected to contain state db specific artifacts such as index specification in the case of couchdb.
      * This function is called during chaincode instantiate/upgrade (from above), and from install, so that statedb artifacts can be created.
+     *
      * @param scPack
      * @return
      */
 
-    public static byte[] extractStateDBArtifactsFromSCPackage(ISmartContractPackage scPack) throws JavaChainException{
+    public static byte[] extractStateDBArtifactsFromSCPackage(ISmartContractPackage scPack) throws JavaChainException {
         return null;
     }
 
-    public static ISmartContractPackage getSmartContractFromFS(String name,String version)throws JavaChainException{
+    public static ISmartContractPackage getSmartContractFromFS(String name, String version) throws JavaChainException {
         return null;
     }
 
-    public static Query.SmartContractQueryResponse getInstalledSmartcontracts()throws JavaChainException {
+    public static Query.SmartContractQueryResponse getInstalledSmartcontracts() throws JavaChainException {
         return null;
 
     }
