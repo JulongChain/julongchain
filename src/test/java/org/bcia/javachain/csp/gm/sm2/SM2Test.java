@@ -27,21 +27,21 @@ public class SM2Test {
         SM2 sm02 = new SM2();
 
 
-         SM2KeyPair keyPair = sm02.generateKeyPair();
-		 ECPoint publicKey=keyPair.getPublicKey();
-		 BigInteger privateKey=keyPair.getPrivateKey();
-		byte[] publicKeyEncoded= publicKey.getEncoded(false);
-		byte[]  privateKeyArray=privateKey.toByteArray();
-		//printHexString(publicKeyEncoded);
-        String publickeyString= new String(Base64.encode(publicKeyEncoded));
-        String privatekeyString= new String(Base64.encode(privateKeyArray));
-        System.out.println("公钥字符串："+publickeyString);
-        PrintWriter pw1 = new PrintWriter(new FileOutputStream("D:/publicKey.txt"));
-        PrintWriter pw2 = new PrintWriter(new FileOutputStream("D:/privateKey.txt"));
-        pw1.print(publickeyString);
-        pw2.print(privatekeyString);
-        pw1.close();
-        pw2.close();
+//         SM2KeyPair keyPair = sm02.generateKeyPair();
+//		 ECPoint publicKey=keyPair.getPublicKey();
+//		 BigInteger privateKey=keyPair.getPrivateKey();
+//		byte[] publicKeyEncoded= publicKey.getEncoded(false);
+//		byte[]  privateKeyArray=privateKey.toByteArray();
+//		//printHexString(publicKeyEncoded);
+//        String publickeyString= new String(Base64.encode(publicKeyEncoded));
+//        String privatekeyString= new String(Base64.encode(privateKeyArray));
+//        System.out.println("公钥字符串："+publickeyString);
+//        PrintWriter pw1 = new PrintWriter(new FileOutputStream("D:/publicKey.txt"));
+//        PrintWriter pw2 = new PrintWriter(new FileOutputStream("D:/privateKey.txt"));
+//        pw1.print(publickeyString);
+//        pw2.print(privatekeyString);
+//        pw1.close();
+//        pw2.close();
 
 
        // writeFileBytes("E:/public.txt",publicKeyEncoded);

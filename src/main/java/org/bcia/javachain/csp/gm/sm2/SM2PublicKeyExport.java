@@ -18,6 +18,7 @@ package org.bcia.javachain.csp.gm.sm2;
 import org.bcia.javachain.consenter.util.LoadYaml;
 import org.bcia.javachain.csp.gm.sm2.util.SM2KeyUtil;
 import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -45,6 +46,7 @@ public class SM2PublicKeyExport extends SM2KeyExport {
             e.printStackTrace();
         }
         byte[] publicKey = Base64.decode(publicKeyStr);
+        System.out.println("publicKey："+ Hex.toHexString(publicKey));
         return publicKey;
 
     }

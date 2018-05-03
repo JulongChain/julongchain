@@ -17,6 +17,7 @@ package org.bcia.javachain.csp.gm.sm2;
 
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bouncycastle.math.ec.ECPoint;
 
 /**
@@ -26,20 +27,23 @@ import org.bouncycastle.math.ec.ECPoint;
  */
 public class SM2PublicKey extends SM2Key {
     private static JavaChainLog log = JavaChainLogFactory.getLog(SM2PublicKey.class);
-    private  ECPoint ecPoint;
-    public SM2PublicKey(ECPoint ecPoint) {
-        this.ecPoint=ecPoint;
+    private  byte[]  publicKey;
+    private SM3 sm3;
+
+    public SM2PublicKey(byte[] publicKey) {
+        this.publicKey = publicKey;
+        this.sm3=new SM3();
     }
 
     @Override
     public byte[] toBytes() {
-        log.info("返回公钥");
-        return  ecPoint.getEncoded(false);
+        log.info("return the publicKey");
+        return  publicKey;
     }
 
     @Override
     public byte[] ski() {
-        return new byte[0];
+        return sm3.hash(publicKey);
     }
 
     @Override

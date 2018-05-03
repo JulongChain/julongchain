@@ -5,22 +5,22 @@ node:
             # TODO: The default Hash and Security level needs refactoring to be
             # fully configurable. Changing these defaults requires coordination
             # SHA2 is hardcoded in several places, not only BCCSP
-            symmetricKey: SM2
+            symmetricKey: SM4
             sign: SM2
             hash: SM3
-            asymmetric: SM4
+            asymmetric: SM2
             security: 256
             # Location of Key Store
             fileKeyStore:
                 # If "", defaults to 'mspConfigPath'/keystore
                 # TODO: Ensure this is read with fabric/core/config.GetPath() once ready
-                #publicKeyStore: D:\msp\keystore\publickey.pem
-                publicKeyStore: /opt/msp/keystore/publickey.pem
-                #privateKeyStore: D:\msp\keystore\privatekey.pem
-                privateKeyStore: /opt/msp/keystore/privatekey.pem
+                publicKeyStore: D:\msp\keystore\publickey.pem
+                #publicKeyStore: /opt/msp/keystore/publickey.pem
+                privateKeyStore: D:\msp\keystore\privatekey.pem
+                 #privateKeyStore: /opt/msp/keystore/privatekey.pem
     # Path on the file system where node will find MSP local configurations
-    #mspConfigPath: D:\msp
-    mspConfigPath: /opt/msp
+    mspConfigPath: D:\msp
+    #mspConfigPath: /opt/msp
 
     # Identifier of the local MSP
     # ----!!!!IMPORTANT!!!-!!!IMPORTANT!!!-!!!IMPORTANT!!!!----

@@ -1,5 +1,5 @@
 /**
- * Copyright Dingxuan. All Rights Reserved.
+ * Copyright DingXuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,56 +16,44 @@
 package org.bcia.javachain.csp.gm.sm4;
 
 import org.bcia.javachain.csp.gm.sm3.SM3;
-import org.bouncycastle.util.encoders.Hex;
-
-
-import java.io.IOException;
-import java.math.BigInteger;
-import java.security.SecureRandom;
+import org.bcia.javachain.csp.intfs.IKey;
 
 /**
- * 类描述
- *
- * @author
- * @date 18-3-27
+ * @author zhangmingyang
+ * @Date: 2018/4/28
  * @company Dingxuan
  */
-public class SM4Key {
+public class SM4Key implements IKey {
+    private SM3 sm3;
+    private byte[] sm4Key;
 
-    public static final int SM4KeyLength = 128;
-
-    public static void main(String[] args) throws IOException {
-
-        System.out.println(getKey());
-
-        System.out.println((getKeyByRaw("testkey")));
+    public SM4Key() {
+        this.sm3 = sm3;
     }
 
-    /**
-     * 随机生成密钥
-     */
-    public static String getKey() throws IOException {
-
-        SecureRandom random = new SecureRandom();
-
-        BigInteger r = new BigInteger(128, random);
-        String key = Hex.toHexString(SM3.hash((r.toByteArray()))).substring(0, SM4KeyLength / 4);
-
-        return key;
-
+    @Override
+    public byte[] toBytes() {
+        this.sm4Key = SM4.generateKey();
+        return sm4Key;
     }
 
-
-    /**
-     * 使用指定的字符串生成秘钥
-     */
-    public static String getKeyByRaw(String SM2KeyByRaw) throws IOException {
-
-        BigInteger r = new BigInteger(128, new SecureRandom(SM2KeyByRaw.getBytes()));
-        String key = Hex.toHexString(SM3.hash((r.toByteArray()))).substring(0, SM4KeyLength / 4);
-
-        return key;
-
+    @Override
+    public byte[] ski() {
+        return sm3.hash(sm4Key);
     }
 
+    @Override
+    public boolean isSymmetric() {
+        return true;
+    }
+
+    @Override
+    public boolean isPrivate() {
+        return false;
+    }
+
+    @Override
+    public IKey getPublicKey() {
+        return null;
+    }
 }

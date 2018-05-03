@@ -1,4 +1,4 @@
-package org.bcia.javachain.csp.gm.sm2; /**
+/**
  * Copyright DingXuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,26 +13,18 @@ package org.bcia.javachain.csp.gm.sm2; /**
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.bcia.javachain.csp.gm.sm4;
+
+import org.bcia.javachain.csp.intfs.opts.IDecrypterOpts;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/4/24
+ * @Date: 2018/4/28
  * @company Dingxuan
  */
-public class SM2KeyPair {
-    private byte[] publickey;
-    private byte[] privatekey;
-
-    public SM2KeyPair(byte[] publickey, byte[] privatekey) {
-        this.publickey = publickey;
-        this.privatekey = privatekey;
-    }
-
-    public byte[] getPublickey() {
-        return publickey;
-    }
-
-    public byte[] getPrivatekey() {
-        return privatekey;
+public class SM4DecrypterOpts implements IDecrypterOpts {
+    @Override
+    public String getAlgorithm() {
+        return "SM4";
     }
 }

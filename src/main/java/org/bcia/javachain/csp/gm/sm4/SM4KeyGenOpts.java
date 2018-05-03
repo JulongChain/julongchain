@@ -1,5 +1,5 @@
 /**
- * Copyright Dingxuan. All Rights Reserved.
+ * Copyright DingXuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,25 +15,21 @@
  */
 package org.bcia.javachain.csp.gm.sm4;
 
+import org.bcia.javachain.csp.intfs.opts.IKeyGenOpts;
+
 /**
- * 类描述
- *
- * @author
- * @date 18-3-27
+ * @author zhangmingyang
+ * @Date: 2018/4/28
  * @company Dingxuan
  */
-public class SM4_Context {
+public class SM4KeyGenOpts implements IKeyGenOpts {
+    @Override
+    public String getAlgorithm() {
+        return "SM4";
+    }
 
-    public int mode;
-
-    public long[] sk;
-
-    public boolean isPadding;
-
-    public SM4_Context()
-    {
-        this.mode = 1;
-        this.isPadding = true;
-        this.sk = new long[32];
+    @Override
+    public boolean isEphemeral() {
+        return false;
     }
 }
