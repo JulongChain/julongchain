@@ -23,7 +23,12 @@ import org.bcia.javachain.common.exception.SysSmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policies.IPolicy;
+import org.bcia.javachain.common.policycheck.bean.MSPPrincipal;
+import org.bcia.javachain.common.policycheck.bean.PolicyBean;
+import org.bcia.javachain.common.policycheck.bean.Provider;
+import org.bcia.javachain.common.policycheck.bean.SignaturePolicyEnvelope;
 import org.bcia.javachain.common.util.proto.SignedData;
+import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.mgmt.Msp;
 import org.bcia.javachain.msp.mgmt.MspManager;
 
@@ -38,19 +43,36 @@ import java.util.List;
  * @company Aisino
  */
 public class Policy implements IPolicy{
-
+    //在policy.go中实现了Policy接口，定义和实现了策略对象提供者provider，
     private static JavaChainLog log = JavaChainLogFactory.getLog(Policy.class);
+
     @Override
     public void evaluate(List<SignedData> signatureList) throws PolicyException {
         List<SignedData> signedDatas = Cauthdsl.deduplicate(signatureList);   //删除重复身份
         Msp msp = new Msp();
-        MspManager mspManager = new MspManager();
+        MSPPrincipal identities = new MSPPrincipal();
         try {
-            boolean b = Cauthdsl.compile(signedDatas,mspManager,msp);                                        //评估这组签名是否满足策略
+            //TODO 待完善     //评估这组签名是否满足策略
         }catch (Exception e){
             log.info("Failed to authenticate policy");
             throw new PolicyException(e);
         }
 
+    }
+    public IIdentity NewPolicyProvider(Msp msp,byte[] data){
+        return msp.deserializeIdentity(data);
+
+    }
+    public PolicyBean NewPolicy(byte[] data){
+        SignaturePolicyEnvelope sigPolicy = new SignaturePolicyEnvelope();
+        Provider provider = new Provider();
+        Msp msp = new Msp();
+        if(sigPolicy.version != 0){
+            log.info("Error unmarshaling to SignaturePolicy");
+            return null;
+        }
+        boolean compile = Cauthdsl.compile(sigPolicy.rule,sigPolicy.iIdentity,msp);
+        //TODO 待完善
+        return new PolicyBean(compile,provider.deserializer);
     }
 }
