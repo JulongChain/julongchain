@@ -18,6 +18,8 @@ package org.bcia.javachain.common.policycheck.cauthdsl;
 
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.policies.SignaturePolicy;
+import org.bcia.javachain.common.policycheck.bean.MSPPrincipal;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.mgmt.Msp;
@@ -37,7 +39,7 @@ import java.util.Map;
  */
 public class Cauthdsl {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Cauthdsl.class);
-
+    private int MSPPrincipal_Classification;
 
     /**
      * 删除重复身份，保留身份顺序
@@ -50,16 +52,21 @@ public class Cauthdsl {
         for (SignedData signedData : signedDatas) {
             return null;
         }
+        //TODO 待完善
         return null;
     }
 
     /**
      * 评估函数方法
-     * @param signedDatas
+     * @param policy
      * @return
      */
-    public static boolean compile(List<SignedData> signedDatas,MspManager mspManager,Msp msp){
+    public static boolean compile(SignaturePolicy policy, MSPPrincipal identities, Msp msp){
 
+    if(policy==null){
+        log.info("Empty policy element");
+    }
+        //TODO 待完善
         return false;
     }
 
