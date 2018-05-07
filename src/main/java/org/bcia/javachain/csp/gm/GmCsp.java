@@ -16,20 +16,19 @@ package org.bcia.javachain.csp.gm;
  * limitations under the License.
  */
 
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.csp.gm.sm2.*;
 import org.bcia.javachain.csp.gm.sm3.SM3;
-import org.bcia.javachain.csp.gm.sm4.SM4;
+import org.bcia.javachain.csp.gm.sm4.*;
+import org.bcia.javachain.csp.gm.util.CryptoUtil;
 import org.bcia.javachain.csp.intfs.ICsp;
 import org.bcia.javachain.csp.intfs.IHash;
 import org.bcia.javachain.csp.intfs.IKey;
 import org.bcia.javachain.csp.intfs.opts.*;
 import org.bcia.javachain.common.exception.JavaChainException;
-import org.bouncycastle.math.ec.ECPoint;
-
-import java.math.BigInteger;
+import org.bouncycastle.util.encoders.Hex;
 import java.security.SecureRandom;
-
-import static org.bcia.javachain.csp.gm.sm2.SM2.byte2ECpoint;
 
 /**
  * @author zhanglin
@@ -40,29 +39,50 @@ import static org.bcia.javachain.csp.gm.sm2.SM2.byte2ECpoint;
 
 // GmCsp provides the Guomi's software implements of the ICsp interface.
 public class GmCsp implements ICsp {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(GmCsp.class);
     // List algorithms to be used.
     private SM2 sm2;
     private SM3 sm3;
     private SM4 sm4;
 
     public GmCsp() {
+        this.sm3 = new SM3();
+        this.sm2 = new SM2();
+        this.sm4 = new SM4();
     }
 
-    //
     private IGmFactoryOpts gmOpts;
 
 
     GmCsp(IGmFactoryOpts gmOpts) {
-        this.gmOpts=gmOpts;
-        this.sm3=new SM3();
-        this.sm2=new SM2();
+        this.gmOpts = gmOpts;
+        this.sm3 = new SM3();
+        this.sm2 = new SM2();
+        this.sm4 = new SM4();
     }
 
 
     @Override
     public IKey keyGen(IKeyGenOpts opts) throws JavaChainException {
-        if(opts instanceof SM2KeyGenOpts){
-            return new SM2Key();
+        if (opts == null) {
+            log.error("Invalid Opts parameter. It must not be null.");
+            throw new JavaChainException("Invalid Opts parameter. It must not be null.");
+        }
+        if (opts instanceof SM2KeyGenOpts) {
+
+            SM2Key sm2Key=new SM2Key(sm2.generateKeyPair());
+
+            if (!opts.isEphemeral()) {
+                //TODO  实现密钥存储接口
+                CryptoUtil.publicKeyFileGen(Hex.toHexString(sm2Key.getPublicKey().ski()),sm2Key.getPublicKey().toBytes());
+                CryptoUtil.privateKeyFileGen(Hex.toHexString(sm2Key.ski()),sm2Key.toBytes());
+            }
+            return sm2Key;
+        }
+        if (opts instanceof SM4KeyGenOpts) {
+
+            return new SM4Key();
+
         }
         return null;
     }
@@ -84,9 +104,12 @@ public class GmCsp implements ICsp {
 
     @Override
     public byte[] hash(byte[] msg, IHashOpts opts) throws JavaChainException {
-        //System.out.println("To hash:"+msg);
-        SM3 mySM3=getSm3();
-        byte []results=mySM3.hash(msg,opts);
+        if (msg.length == 0) {
+            log.error("Invalid msg. Cannot be empty.");
+            throw new JavaChainException("Invalid msg. Cannot be empty.");
+        }
+
+        byte[] results = sm3.hash(msg);
         return results;
     }
 
@@ -97,38 +120,82 @@ public class GmCsp implements ICsp {
 
     @Override
     public byte[] sign(IKey key, byte[] digest, ISignerOpts opts) throws JavaChainException {
-        SM2KeyExport sm2KeyExport=(SM2KeyExport) key;
-        return sm2.sign(digest,"123",new SM2KeyPair(byte2ECpoint(sm2KeyExport.getPublicKey().toBytes()),new BigInteger(sm2KeyExport.toBytes())));
+        if (key == null) {
+            log.error("Invalid Key. It must not be nil.");
+            throw new JavaChainException("Invalid Key. It must not be nil.");
+        }
+        if (digest.length == 0) {
+            log.error("Invalid digest. Cannot be empty.");
+            throw new JavaChainException("Invalid digest. Cannot be empty.");
+        }
+        if (opts instanceof SM2SignerOpts) {
+            System.out.println("privateKey:"+Hex.toHexString(key.toBytes()));
+            return sm2.sign(key.toBytes(), digest);
+        }
+        //  SM2KeyExport sm2KeyExport = (SM2KeyExport) key;
+        //    return sm2.sign(digest, "123", new SM2KeyPair(byte2ECpoint(sm2KeyExport.getPublicKey().toBytes()), new BigInteger(sm2KeyExport.toBytes())));
+        return null;
     }
 
     @Override
     public boolean verify(IKey key, byte[] signature, byte[] digest, ISignerOpts opts) throws JavaChainException {
-        SM2KeyExport sm2KeyExport=(SM2KeyExport) key;
-        ECPoint ecPoint= byte2ECpoint(sm2KeyExport.getPublicKey().toBytes());
-        return sm2.verify(digest,signature,"123",ecPoint);
+        boolean verify = false;
+        if (key == null) {
+            log.error("Invalid Key. It must not be nil.");
+            throw new JavaChainException("Invalid Key. It must not be nil.");
+        }
+        if (signature.length == 0) {
+            log.error("Invalid signature. It must not be nil.");
+            throw new JavaChainException("Invalid signature. It must not be nil.");
+        }
+        if (opts instanceof SM2SignerOpts) {
+            verify = sm2.verify(key.getPublicKey().toBytes(), signature, digest);
+        }
+
+
+//        SM2KeyExport sm2KeyExport = (SM2KeyExport) key;
+//
+//        ECPoint ecPoint = byte2ECpoint(sm2KeyExport.getPublicKey().toBytes());
+        //return sm2.verify(digest, signature, "123", ecPoint);
+        return verify;
     }
 
     @Override
     public byte[] encrypt(IKey key, byte[] plaintext, IEncrypterOpts opts) throws JavaChainException {
-        return new byte[0];
+        if (key == null) {
+            log.error("Invalid Key. It must not be nil.");
+            throw new JavaChainException("Invalid Key. It must not be nil.");
+        }
+        if (opts instanceof SM4EncrypterOpts) {
+            return sm4.encryptECB(plaintext, key.toBytes());
+        }
+        return null;
     }
 
     @Override
     public byte[] decrypt(IKey key, byte[] ciphertext, IDecrypterOpts opts) throws JavaChainException {
-        return new byte[0];
+        if (key == null) {
+            log.error("Invalid Key. It must not be nil.");
+            throw new JavaChainException("Invalid Key. It must not be nil.");
+        }
+        if (ciphertext.length == 0) {
+            log.error("Invalid ciphertext. Cannot be empty.");
+            throw new JavaChainException("Invalid ciphertext. Cannot be empty.");
+        }
+        if (opts instanceof SM4DecrypterOpts) {
+            return sm4.decryptECB(ciphertext, key.toBytes());
+        }
+        return null;
     }
 
     @Override
     public byte[] rng(int len, IRngOpts opts) throws JavaChainException {
-        byte[] none=new SecureRandom().generateSeed(len);
-        return none;
-    }
-
-    private SM3 getSm3(){
-        if(sm3==null) {
-            sm3=new SM3();
+        if (len <= 0) {
+            log.error("The random length is less than Zero! ");
+            throw new JavaChainException("The random length is less than Zero! ");
         }
-        return sm3;
+        byte[] none = new SecureRandom().generateSeed(len);
+        return none;
     }
 
 }

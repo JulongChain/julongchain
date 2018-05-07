@@ -24,10 +24,10 @@ public class MspConfig {
     public static final String MspConfig_FILE_PATH = "gmcsp.yaml";
     private static final MspConfig DEFAULT_INSTANCE;
     private static  final String DEFAULT="GM";
-    private static  final String SYMMETRIKEY="SM2";
+    private static  final String SYMMETRIKEY="SM4";
     private static  final String SIGN="SM2";
     private static  final String HASH="SM3";
-    private static  final String ASYMMETRIC="SM4";
+    private static  final String ASYMMETRIC="SM2";
     private static  final String SECURITY="256";
     //private static  final String PUBLICKEYSTORE="D:/msp/keystore/publickey.pem";
     private static  final String PUBLICKEYSTORE="/opt/msp/keystore/publickey.pem";

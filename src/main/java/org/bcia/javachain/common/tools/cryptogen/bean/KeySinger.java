@@ -1,5 +1,5 @@
 /**
- * Copyright Dingxuan. All Rights Reserved.
+ * Copyright BCIA. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.csp.gm.sm4;
+package org.bcia.javachain.common.tools.cryptogen.bean;
 
-/**
- * 类描述
- *
- * @author
- * @date 18-3-27
- * @company Dingxuan
- */
-public class SM4_Context {
+import org.bcia.javachain.csp.intfs.IKey;
 
-    public int mode;
+public class KeySinger {
+    private IKey mIkey;
+    private Object mISigner;
 
-    public long[] sk;
 
-    public boolean isPadding;
+    public KeySinger(IKey mIkey, Object mISigner) {
+        this.mIkey = mIkey;
+        this.mISigner = mISigner;
+    }
 
-    public SM4_Context()
-    {
-        this.mode = 1;
-        this.isPadding = true;
-        this.sk = new long[32];
+    public IKey getmIkey() {
+        return mIkey;
+    }
+
+    public Object getmISigner() {
+        return mISigner;
     }
 }

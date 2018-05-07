@@ -147,39 +147,6 @@ public class SM2KeyUtil {
         }
         return true;
     }
-
-
-
-
-    /**
-     * 密钥派生函数
-     *
-     * @param Z
-     * @param klen 生成klen字节数长度的密钥
-     * @return
-     */
-    public static byte[] KDF(byte[] Z, int klen) {
-        int ct = 1;
-        int end = (int) Math.ceil(klen * 1.0 / 32);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
-            for (int i = 1; i < end; i++) {
-                baos.write(sm3hash(Z, SM3.toByteArray(ct)));
-                ct++;
-            }
-            byte[] last = sm3hash(Z, SM3.toByteArray(ct));
-            if (klen % 32 == 0) {
-                baos.write(last);
-            } else {
-                baos.write(last, 0, klen % 32);
-            }
-            return baos.toByteArray();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     /**
      * 判断是否在范围内
      *
@@ -195,25 +162,6 @@ public class SM2KeyUtil {
             return false;
         }
     }
-
-
-    /**
-     * sm3摘要
-     *
-     * @param params
-     * @return
-     */
-    public  static byte[] sm3hash(byte[]... params) {
-        byte[] res = null;
-        try {
-            res = SM3.hash(join(params));
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return res;
-    }
-
 
     /**
      * 字节数组拼接
@@ -242,7 +190,6 @@ public class SM2KeyUtil {
 
         char[] content = new char[(int) fileLen];
         reader.read(content);
-       // log.info("读取到的内容为：" + new String(content));
         return new String(content);
     }
 

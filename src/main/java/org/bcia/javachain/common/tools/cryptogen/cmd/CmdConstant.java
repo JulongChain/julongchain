@@ -1,5 +1,5 @@
-package org.bcia.javachain.csp.gm.sm2; /**
- * Copyright DingXuan. All Rights Reserved.
+/**
+ * Copyright BCIA. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,20 @@ package org.bcia.javachain.csp.gm.sm2; /**
  * limitations under the License.
  */
 
+package org.bcia.javachain.common.tools.cryptogen.cmd;
+
 /**
- * @author zhangmingyang
- * @Date: 2018/4/24
- * @company Dingxuan
+ * @author chenhao, liuxifeng
+ * @date 2018/4/16
+ * @company Excelsecu
  */
-public class SM2KeyPair {
-    private byte[] publickey;
-    private byte[] privatekey;
+public class CmdConstant {
 
-    public SM2KeyPair(byte[] publickey, byte[] privatekey) {
-        this.publickey = publickey;
-        this.privatekey = privatekey;
-    }
+    public static final String GENERATE = "generate";
 
-    public byte[] getPublickey() {
-        return publickey;
-    }
+    public static final String SHOW_TEMPLATE = "showtemplate";
 
-    public byte[] getPrivatekey() {
-        return privatekey;
-    }
+    public static final String VERSION = "version";
+
+    public static final String EXTEND = "extend";
 }

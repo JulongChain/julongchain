@@ -1,18 +1,35 @@
 package org.bcia.javachain.csp.gm;
 
+import io.netty.handler.ssl.PemPrivateKey;
 import org.bcia.javachain.csp.factory.IFactoryOpts;
+import org.bcia.javachain.csp.gm.sm2.SM2KeyGenOpts;
 import org.bcia.javachain.csp.gm.sm3.SM3HashOpts;
+import org.bcia.javachain.csp.gm.sm4.SM4EncrypterOpts;
+import org.bcia.javachain.csp.gm.sm4.SM4Key;
+import org.bcia.javachain.csp.gm.sm4.SM4KeyGenOpts;
 import org.bcia.javachain.csp.intfs.ICsp;
+import org.bcia.javachain.csp.intfs.IKey;
 import org.bcia.javachain.csp.intfs.opts.IHashOpts;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bouncycastle.util.encoders.Hex;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemObjectParser;
+import org.bouncycastle.util.io.pem.PemReader;
+import org.bouncycastle.util.io.pem.PemWriter;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import sun.security.pkcs.PKCS8Key;
+import sun.security.util.Pem;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
+import java.security.spec.PKCS8EncodedKeySpec;
+
+import static org.bcia.javachain.csp.factory.CspManager.getDefaultCsp;
 
 
 /**
@@ -61,6 +78,19 @@ public class GmCspTest {
     @Test
     public void keyGen() {
         System.out.println("test keyGen...");
+        try {
+         IKey sm2key=getDefaultCsp().keyGen(new SM2KeyGenOpts());
+
+         System.out.println("SM2 Privatekey:"+Hex.toHexString(sm2key.toBytes()));
+         System.out.println("SM2 PublicKey:"+Hex.toHexString(sm2key.getPublicKey().toBytes()));
+         IKey sm4key=getDefaultCsp().keyGen(new SM4KeyGenOpts());
+         System.out.println("SM4 Key:"+Hex.toHexString(sm4key.toBytes()));
+
+        } catch (JavaChainException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     @Test
@@ -151,6 +181,7 @@ public class GmCspTest {
 
     @Test
     public void sign() {
+
     }
 
     @Test
@@ -158,25 +189,47 @@ public class GmCspTest {
     }
 
     @Test
-    public void encrypt() {
+    public void encrypt() throws JavaChainException {
+        GmFactoryOpts opts = new GmFactoryOpts();
+        GmCsp gmCsp = new GmCsp(opts);
+        SM4Key sm4Key = new SM4Key();
+        gmCsp.encrypt(sm4Key, "abc".getBytes(), new SM4EncrypterOpts());
     }
 
     @Test
-    public void decrypt() {
+    public void decrypt() throws IOException {
+        // PemObject pemObject=new PemObject("privatekey","123".getBytes());
+        //PemWriter pemWriter=new PemWriter();
+
+        // new PemWriter().writeObject(pemObject);
+        // PKCS8EncodedKeySpec pkcs8EncodedKeySpec=new PKCS8EncodedKeySpec();
+        PKCS8Key pkcs8Key = new PKCS8Key();
+        PemObject pemObject = new PemObject("privatekey", "123".getBytes());
+        StringWriter str = new StringWriter();
+        PemWriter pemWriter = new PemWriter(str);
+        pemWriter.writeObject(pemObject);
+        //pemWriter.writeObject(pemObject);
+        pemWriter.close();
+        str.close();
+
+        System.out.println(str.toString());
+        //return str.toString();
+        PemReader pemReader;
+        PemObjectParser pemObjectParser;
     }
 
     @Test
     public void rng() {
 
-      //  SecureRandom csprng = new SecureRandom();
+        //  SecureRandom csprng = new SecureRandom();
 
-      //  byte[] randomBytes = new byte[24];
-       // csprng.engineNextBytes();
-       // byte[] rng = csprng.engineGenerateSeed(24);
+        //  byte[] randomBytes = new byte[24];
+        // csprng.engineNextBytes();
+        // byte[] rng = csprng.engineGenerateSeed(24);
 
-        SecureRandom secureRandom=new SecureRandom();
-        byte[] secureSeed=secureRandom.generateSeed(24);
-        String s=new String(secureSeed);
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] secureSeed = secureRandom.generateSeed(24);
+        String s = new String(secureSeed);
         System.out.println(s);
         //csprng.nextBytes(randombytes);
     }
