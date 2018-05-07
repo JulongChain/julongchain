@@ -28,6 +28,7 @@ import org.bcia.javachain.csp.intfs.IKey;
 import org.bcia.javachain.csp.intfs.opts.*;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bouncycastle.util.encoders.Hex;
+
 import java.security.SecureRandom;
 
 /**
@@ -70,19 +71,17 @@ public class GmCsp implements ICsp {
         }
         if (opts instanceof SM2KeyGenOpts) {
 
-            SM2Key sm2Key=new SM2Key(sm2.generateKeyPair());
+            SM2Key sm2Key = new SM2Key(sm2.generateKeyPair());
 
             if (!opts.isEphemeral()) {
                 //TODO  实现密钥存储接口
-                CryptoUtil.publicKeyFileGen(Hex.toHexString(sm2Key.getPublicKey().ski()),sm2Key.getPublicKey().toBytes());
-                CryptoUtil.privateKeyFileGen(Hex.toHexString(sm2Key.ski()),sm2Key.toBytes());
+                // CryptoUtil.publicKeyFileGen(Hex.toHexString(sm2Key.getPublicKey().ski()), sm2Key.getPublicKey().toBytes());
+                CryptoUtil.privateKeyFileGen(Hex.toHexString(sm2Key.ski()), sm2Key.toBytes());
             }
             return sm2Key;
         }
         if (opts instanceof SM4KeyGenOpts) {
-
             return new SM4Key();
-
         }
         return null;
     }
@@ -94,7 +93,23 @@ public class GmCsp implements ICsp {
 
     @Override
     public IKey keyImport(Object raw, IKeyImportOpts opts) throws JavaChainException {
-        return new SM2Key();
+        if (raw == null) {
+            log.error("Invalid raw. It must not be nil.");
+            throw new JavaChainException("Invalid raw. It must not be nil.");
+        }
+        if (opts == null) {
+            log.error("Invalid opts. It must not be nil.");
+            throw new JavaChainException("Invalid opts. It must not be nil.");
+        }
+        if (opts instanceof SM2KeyImportOpts) {
+            IKey sm2PrivateKey = new SM2PrivateKey(raw);
+            if (!opts.isEphemeral()) {
+                CryptoUtil.privateKeyFileGen(Hex.toHexString(sm2PrivateKey.ski()), sm2PrivateKey.toBytes());
+            }
+            return sm2PrivateKey;
+        }
+
+        return null;
     }
 
     @Override
@@ -129,11 +144,9 @@ public class GmCsp implements ICsp {
             throw new JavaChainException("Invalid digest. Cannot be empty.");
         }
         if (opts instanceof SM2SignerOpts) {
-            System.out.println("privateKey:"+Hex.toHexString(key.toBytes()));
+            log.info("privateKey:" + Hex.toHexString(key.toBytes()));
             return sm2.sign(key.toBytes(), digest);
         }
-        //  SM2KeyExport sm2KeyExport = (SM2KeyExport) key;
-        //    return sm2.sign(digest, "123", new SM2KeyPair(byte2ECpoint(sm2KeyExport.getPublicKey().toBytes()), new BigInteger(sm2KeyExport.toBytes())));
         return null;
     }
 
@@ -151,12 +164,6 @@ public class GmCsp implements ICsp {
         if (opts instanceof SM2SignerOpts) {
             verify = sm2.verify(key.getPublicKey().toBytes(), signature, digest);
         }
-
-
-//        SM2KeyExport sm2KeyExport = (SM2KeyExport) key;
-//
-//        ECPoint ecPoint = byte2ECpoint(sm2KeyExport.getPublicKey().toBytes());
-        //return sm2.verify(digest, signature, "123", ecPoint);
         return verify;
     }
 
