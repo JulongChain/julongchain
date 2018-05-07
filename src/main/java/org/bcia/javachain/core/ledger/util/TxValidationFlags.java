@@ -71,7 +71,7 @@ public class TxValidationFlags {
     }
 
     public boolean isSetTo(int txIndex, TransactionPackage.TxValidationCode flag){
-        return flags[txIndex] == flag.getNumber();
+        return flags.length <= txIndex || flags[txIndex] == flag.getNumber();
     }
 
     public int length(){

@@ -20,8 +20,11 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
+import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -126,12 +129,17 @@ public class MerkleTree {
     }
 
     public static byte[] computeCombinedHash(List<byte[]> hashes){
-        List<byte[]> result = new ArrayList<>();
+        byte[] combinedHash = new byte[]{};
         for(byte[] h : hashes){
-            result.add(h);
+            combinedHash = ArrayUtils.addAll(combinedHash, h);
         }
         //TODO compute hash
-        return new byte[]{0x00, 0x01, 0x01};
+        //TODO SM3 Hash
+        try {
+            return SM3.hash(combinedHash);
+        } catch (IOException e) {
+            throw new RuntimeException("Error when getting combined hash by SM3", e);
+        }
     }
 
     private KvRwset.QueryReadsMerkleSummary.Builder setMaxLevelHashes(KvRwset.QueryReadsMerkleSummary.Builder builder, List<byte[]> list){

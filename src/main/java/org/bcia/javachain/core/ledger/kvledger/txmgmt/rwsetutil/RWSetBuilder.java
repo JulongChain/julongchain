@@ -19,9 +19,11 @@ import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.ledger.util.Util;
 import org.bcia.javachain.core.ledger.TxSimulationResults;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bcia.javachain.protos.ledger.rwset.Rwset;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -119,8 +121,12 @@ public class RWSetBuilder {
 
     public void setPvtCollectionHash(String ns, String coll, ByteString pvtDataProto){
         CollHashRwBuilder collHashBuilder = getOrCreateCollHashedRwBuilder(ns, coll);
-        //TODO 获取pvtDataProto Hash
-        collHashBuilder.setPvtDataHash(null);
+        //TODO SM3 Hash
+        try {
+            collHashBuilder.setPvtDataHash(SM3.hash(pvtDataProto.toByteArray()));
+        } catch (IOException e) {
+            throw new RuntimeException("Error when getting pvtDataProto hash by SM3", e);
+        }
     }
 
     /**

@@ -22,7 +22,9 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.*;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.core.ledger.sceventmgmt.ISmartContractLifecycleEventListener;
+import org.bcia.javachain.csp.gm.sm3.SM3;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -61,7 +63,12 @@ public class CommonStorageDB implements DB {
             String ns = deriveHashedDataNs(key.getNamespace(), key.getCollectionName());
             String keyHashStr = null;
             if(!bytesKeySuppoted()){
-                //TODO 获取keyhash
+                //TODO SM3 Hash
+                try {
+                    keyHashStr = new String(SM3.hash(key.getKeyHash().getBytes()));
+                } catch (IOException e) {
+                    throw new RuntimeException("Error when getting hash key by SM3", e);
+                }
             } else {
                 keyHashStr = key.getKeyHash();
             }
@@ -80,7 +87,12 @@ public class CommonStorageDB implements DB {
             BulkOptimizable bulkOptimizable = (BulkOptimizable) vdb;
             String keyHashStr = new String(keyHash);
             if(!bytesKeySuppoted()){
-                //TODO encode key
+                //TODO SM3 Hash
+                try {
+                    keyHashStr = new String(SM3.hash(keyHash));
+                } catch (IOException e) {
+                    throw new RuntimeException("Error when getting hash key by SM3", e);
+                }
             }
             return bulkOptimizable.getCachedVersion(deriveHashedDataNs(ns, coll), keyHashStr);
         } catch (Exception e) {
@@ -103,7 +115,7 @@ public class CommonStorageDB implements DB {
         try {
             return (ISmartContractLifecycleEventListener) vdb;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            return null;
         }
     }
 
@@ -116,7 +128,12 @@ public class CommonStorageDB implements DB {
     public VersionedValue getValueHash(String ns, String coll, byte[] keyHash) throws LedgerException {
         String keyHashStr = new String(keyHash);
         if(!bytesKeySuppoted()){
-            //TODO encode key
+            //TODO SM3 Hash
+            try {
+                keyHashStr = new String(SM3.hash(keyHash));
+            } catch (IOException e) {
+                throw new RuntimeException("Error when getting hash key by SM3", e);
+            }
         }
         return getState(deriveHashedDataNs(ns, coll), keyHashStr);
     }
@@ -125,7 +142,12 @@ public class CommonStorageDB implements DB {
     public Height getKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException {
         String keyHashStr = new String(keyHash);
         if(!bytesKeySuppoted()){
-            //TODO encode key
+            //TODO SM3 Hash
+            try {
+                keyHashStr = new String(SM3.hash(keyHash));
+            } catch (IOException e) {
+                throw new RuntimeException("Error when getting hash key by SM3", e);
+            }
         }
         return getVersion(deriveHashedDataNs(ns, coll), keyHashStr);
     }
@@ -172,7 +194,7 @@ public class CommonStorageDB implements DB {
         }
     }
 
-    private void addHashedUpdates(PubUpdateBatch pubUpdateBatch, HashedUpdateBatch hashedUpdateBatch, boolean base64Key){
+    private void addHashedUpdates(PubUpdateBatch pubUpdateBatch, HashedUpdateBatch hashedUpdateBatch, boolean SM3Key){
         for(Map.Entry<String, NsBatch> entry : hashedUpdateBatch.getMap().getMap().entrySet()){
             String ns = entry.getKey();
             NsBatch nsBatch = entry.getValue();
@@ -180,8 +202,13 @@ public class CommonStorageDB implements DB {
                 for(Map.Entry<String, VersionedValue> entry1 : nsBatch.getBatch().getUpdates(coll).entrySet()){
                     String key = entry1.getKey();
                     VersionedValue vv = entry1.getValue();
-                    if(base64Key){
-                        //TODO encode key
+                    if(SM3Key){
+                        //TODO SM3 Hash
+                        try {
+                            key = new String(SM3.hash(key.getBytes()));
+                        } catch (IOException e) {
+                            throw new RuntimeException("Error when getting hash key by SM3", e);
+                        }
                     }
                     pubUpdateBatch.getBatch().update(deriveHashedDataNs(ns, coll), key, vv);
                 }

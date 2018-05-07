@@ -50,7 +50,7 @@ public class BlockFileHelper {
         File fileInfo;
         //检索最近添加的区块文件
         lastFileNum = retrieveLastFileSuffix(rootDir);
-        logger.debug("Last file number found = %d", lastFileNum);
+        logger.debug(String.format("Last file number found = %d", lastFileNum));
         //没有找到文件, 初始化检查点信息
         if(lastFileNum == -1){
             logger.debug("File not found");

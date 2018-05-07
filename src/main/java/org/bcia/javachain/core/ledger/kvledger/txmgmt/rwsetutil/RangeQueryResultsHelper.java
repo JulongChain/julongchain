@@ -18,8 +18,10 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
+import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +56,7 @@ public class RangeQueryResultsHelper {
         pendingResults.add(kvRead);
         if(hashingEnable && pendingResults.size() > maxDegree){
             logger.debug("Processing the accumulated results");
-            processPendngResults();
+            processPendingResults();
         }
     }
 
@@ -65,11 +67,16 @@ public class RangeQueryResultsHelper {
         return mt.getSummery();
     }
 
-    public void processPendngResults(){
+    public void processPendingResults(){
         byte[] b = serializeKVReads(pendingResults);
         pendingResults.clear();
-        //TODO getHash
-        byte[] hash = "hash".getBytes();
+        //TODO SM3 Hash
+        byte[] hash = new byte[]{};
+        try {
+            hash = SM3.hash(b);
+        } catch (IOException e) {
+            throw new RuntimeException("Error when getting hash by SM3", e);
+        }
         mt.update(hash);
     }
 

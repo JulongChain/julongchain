@@ -41,6 +41,10 @@ public class RamLedgerFactory implements Factory {
     private int maxSize;
     private Map<String, ReadWriteBase> ledgers;
 
+    public RamLedgerFactory(){
+        this.ledgers = new HashMap<>();
+    }
+
     @Override
     public synchronized ReadWriteBase getOrCreate(String groupID) throws LedgerException {
         ReadWriteBase l = ledgers.get(groupID);
@@ -52,8 +56,12 @@ public class RamLedgerFactory implements Factory {
         return l;
     }
 
-    public ReadWriteBase newGroup(int maxSize){
-        Common.Block preGenesis = Common.Block.getDefaultInstance();
+    private ReadWriteBase newGroup(int maxSize){
+        Common.Block preGenesis = Common.Block.newBuilder()
+                .setHeader(Common.BlockHeader.newBuilder()
+                        .setNumber(~(long) 0)
+                        .build())
+                .build();
         RamLedger rl = new RamLedger(maxSize, 1, new SimpleList(null, new Channel<>(), preGenesis), null);
         rl.setNewest(rl.getOldest());
         return rl;

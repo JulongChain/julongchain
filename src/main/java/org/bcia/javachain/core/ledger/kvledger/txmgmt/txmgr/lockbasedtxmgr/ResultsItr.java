@@ -75,7 +75,6 @@ public class ResultsItr implements ResultsIterator {
                     .build();
         }
         VersionedKV versionedKV = (VersionedKV) queryResult;
-        //TODO
         rangeQueryResultsHelper.addResult(RwSetUtil.newKVRead(versionedKV.getCompositeKey().getKey(), versionedKV.getVersionedValue().getVersion()));
         rangeQueryInfo = rangeQueryInfo.toBuilder().setEndKey(versionedKV.getCompositeKey().getKey()).build();
     }
