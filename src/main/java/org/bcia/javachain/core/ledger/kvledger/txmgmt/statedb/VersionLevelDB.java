@@ -25,6 +25,7 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -86,12 +87,12 @@ public class VersionLevelDB implements IVersionedDB{
     //TODO kvScanner
     public ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
         byte[] compositeStartKey = constructCompositeKey(namespace, startKey);
-//        byte[] compositeEndKey = constructCompositeKey(namespace, endKey);
-//        if(endKey == null || "".equals(endKey)){
-//            compositeEndKey[compositeEndKey.length - 1] = LAST_KEY_INDICATOR;
-//        }
-        db.getIterator(compositeStartKey);
-        return null;
+        byte[] compositeEndKey = constructCompositeKey(namespace, endKey);
+        if(endKey == null || "".equals(endKey)){
+            compositeEndKey[compositeEndKey.length - 1] = LAST_KEY_INDICATOR;
+        }
+        Iterator dbItr = db.getIterator(compositeStartKey);
+        return KvScanner.newKVScanner(namespace, dbItr);
     }
 
     @Override
@@ -111,7 +112,7 @@ public class VersionLevelDB implements IVersionedDB{
             int i = 0;
             for(Map.Entry<String, VersionedValue> entry : updates.entrySet()){
                 byte[] compositeKey = constructCompositeKey(ns, String.valueOf(i));
-                logger.debug(String.format("Channel [%s]: Applying key(String)=[%s] key(bytes) length=[%d]"
+                logger.debug(String.format("Gtoup [%s]: Applying key(String)=[%s] key(bytes) length=[%d]"
                         , dbName, new String(compositeKey), compositeKey.length));
 
                 if(entry.getValue() == null){

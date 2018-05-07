@@ -35,7 +35,7 @@ public class KvScanner implements ResultsIterator {
     private String nameSpace;
     private Iterator dbItr;
 
-    public static KvScanner KVScanner(String nameSpace, Iterator dbItr){
+    public static KvScanner newKVScanner(String nameSpace, Iterator dbItr){
         KvScanner kvScanner = new KvScanner();
         kvScanner.setNameSpace(nameSpace);
         kvScanner.setDbItr(dbItr);

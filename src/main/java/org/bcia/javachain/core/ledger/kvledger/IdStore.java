@@ -26,10 +26,7 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.protos.common.Common;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 存储创建的账本ID
@@ -164,7 +161,8 @@ public class IdStore {
         Iterator<Map.Entry<byte[], byte[]>> itr = provider.getIterator(null);
         while(itr.hasNext()){
             Map.Entry<byte[], byte[]> entry = itr.next();
-            if(entry.getKey().equals(UNDER_CONSTRUCTION_LEDGER_KEY)){
+//            if(entry.getKey().equals(UNDER_CONSTRUCTION_LEDGER_KEY)){
+            if(Arrays.equals(entry.getKey(), UNDER_CONSTRUCTION_LEDGER_KEY)){
                 continue;
             }
             ids.add(decodeLedgerID(entry.getKey()));

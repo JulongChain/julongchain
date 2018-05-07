@@ -86,14 +86,14 @@ public class ScEventMgmt implements StateListener {
         scLifecycleListeners.put(ledgerID, l);
     }
 
-    public synchronized void handleSmartContactDeploy(String legetID, SmartContractDefinition[] smartContractDefinitions){
+    public synchronized void handleSmartContractDeploy(String legetID, SmartContractDefinition[] smartContractDefinitions){
         latesSmartContractDeploys.put(legetID, smartContractDefinitions);
         for(SmartContractDefinition smartContractDefinition : smartContractDefinitions){
             byte[] dbArtifacts = infoProvider.retrieveSmartContractArtifacts(smartContractDefinition);
             //TODO !installed
 
             invokeHandler(legetID, smartContractDefinition, dbArtifacts);
-           logger.debug(String.format("Channel [%s]: Handle smartcontract deploy event for smartcontract [%s]", legetID, smartContractDefinition));
+           logger.debug(String.format("Gtoup [%s]: Handle smartcontract deploy event for smartcontract [%s]", legetID, smartContractDefinition));
         }
     }
 
@@ -101,7 +101,7 @@ public class ScEventMgmt implements StateListener {
         logger.debug("handleSmartContractInstall() - smartContractDefinition= " + smartContractDefinition);
         for(Map.Entry<String, ISmartContractLifecycleEventListener> entry : scLifecycleListeners.entrySet()){
             String ledgerID = entry.getKey();
-            logger.debug(String.format("Channel [%s]: Handling smartcontract install event for smartcontract [%s]", ledgerID, smartContractDefinition));
+            logger.debug(String.format("Gtoup [%s]: Handling smartcontract install event for smartcontract [%s]", ledgerID, smartContractDefinition));
 
         }
     }

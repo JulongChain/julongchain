@@ -19,6 +19,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.util.JsonFormat;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.genesis.GenesisBlockFactory;
+import org.bcia.javachain.common.ledger.ILedger;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.protos.common.Common;
@@ -88,19 +89,32 @@ public class LedgerManagerTest {
     public void commitBlock() throws LedgerException {
         LedgerManager.initialize(null);
         l = LedgerManager.openLedger("MyGroup");
-        BlockAndPvtData bap = new BlockAndPvtData();
-        bap.setBlock(Common.Block.newBuilder()
-                .setHeader(Common.BlockHeader.newBuilder()
-                        .setNumber(4)
-                        .build())
-                .setMetadata(Common.BlockMetadata.newBuilder()
-                        .addMetadata(ByteString.EMPTY)
-                        .addMetadata(ByteString.EMPTY)
-                        .addMetadata(ByteString.EMPTY)
-                        .addMetadata(ByteString.EMPTY)
-                        .build())
-                .build());
-        l.commitWithPvtData(bap);
+        long startTime = System.currentTimeMillis();
+        long i = 0;
+        while(true){
+            if(l.getBlockByNumber(i) == null){
+                break;
+            }
+            i++;
+        }
+        System.out.println("Start Block Number is " + i);
+        for (int j = 0; j < 100000; j++) {
+            BlockAndPvtData bap = new BlockAndPvtData();
+            bap.setBlock(Common.Block.newBuilder()
+                    .setHeader(Common.BlockHeader.newBuilder()
+                            .setNumber(i + j)
+                            .build())
+                    .setMetadata(Common.BlockMetadata.newBuilder()
+                            .addMetadata(ByteString.EMPTY)
+                            .addMetadata(ByteString.EMPTY)
+                            .addMetadata(ByteString.EMPTY)
+                            .addMetadata(ByteString.EMPTY)
+                            .build())
+                    .build());
+            l.commitWithPvtData(bap);
+        }
+        long endTime = System.currentTimeMillis();
+        System.out.println("耗时: " + (int) (endTime - startTime) + "ms");
     }
 
     @Test

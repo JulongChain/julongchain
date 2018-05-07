@@ -16,10 +16,15 @@
 package org.bcia.javachain.consenter.consensus.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.consenter.common.blockcutter.BlockCutter;
 import org.bcia.javachain.consenter.consensus.IChain;
 import org.bcia.javachain.consenter.entity.ChainEntity;
 import org.bcia.javachain.consenter.util.Constant;
 import org.bcia.javachain.consenter.util.LoadYaml;
+import org.bcia.javachain.consenter.util.utils;
+import org.bcia.javachain.gossip.Node1;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.consenter.Kafka;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +42,7 @@ import java.util.Map;
  */
 public class Chain implements IChain {
 
+    private static JavaChainLog log = JavaChainLogFactory.getLog(Node1.class);
     //TODO 使用自动注入报错，暂时new方式
     private DataMessageHandle dataMessageHandle=new DataMessageHandle();
     @Autowired
@@ -48,7 +54,7 @@ public class Chain implements IChain {
     //TODO 不知如何获取
     private ChainEntity chain=new ChainEntity();
     Map map=(HashMap)LoadYaml.readYamlFile(Constant.ORDERER_CONFIG).get(Constant.KAFKA);
-
+    BlockCutter blockCutter=new BlockCutter();
 
     @Override
     public void order(Common.Envelope env, long configSeq) {
@@ -80,6 +86,7 @@ public class Chain implements IChain {
     //调用kafka的客户端，实现kafka生产者
     //enqueue接受信息并返回真或假otheriwse验收
     public void enqueue(Kafka.KafkaMessage kafkaMessage){
+        log.debug("[channel: %s] Enqueueing envelope...", chain.getChainID());
         String topic = (String)((HashMap)map.get(Constant.COMSUMER)).get(Constant.TOPIC);
         int partitionID = (int)((HashMap)map.get(Constant.COMSUMER)).get(Constant.PARTITION_ID);
         // 获取kafkaInfo，从配置文件获取（现在这里定义，TODO该成全局）
@@ -93,7 +100,6 @@ public class Chain implements IChain {
     }
    //实现kafka消费者，start调用该方法
     public void processMessagesToBlocks(byte[] message,Long offset) throws IOException {
-
 
         //解析数据，分类处理
         String json=new String(message);
@@ -110,19 +116,15 @@ public class Chain implements IChain {
             case REGULAR:        //orderer的正常消息
                 processRegular(kafkaMessage.getRegular(),offset);
             case CONNECT:        //KAFKA与Orderer的连接消息
-                processConnect();
+                processConnect(chain.getChainID());
             case TIME_TO_CUT:   //orderer的生产块事件消息
-                processTimeToCut();
+                processTimeToCut(kafkaMessage.getTimeToCut(),offset);
+                log.debug("[channel: %s] Consenter for channel exiting", chain.getChainID());
         }
-
-
-
-
-
-
     }
 
-    private Object processConnect(){
+    private Object processConnect(String channelName){
+        log.debug("[channel: %s] It's a connect message - ignoring", channelName);
         return null;
     }
 
@@ -189,12 +191,95 @@ public class Chain implements IChain {
 
     //批量处理Normal消息
     private void commitNormalMsg(Common.Envelope message,long newOffset){
-        //计算当批消息的offset值（即最后一条消息的offset值+1）
+        Common.Envelope []  batches={};
+        boolean pending=false;
+        //TODO orderer提供方法（go中返回值应该是两个数组类型和布尔类型）
+       // Common.Envelope [] batches=blockCutter.ordered(message);
+        log.debug("[channel: %s] Ordering results: items in batch = %d, pending = %v", chain.getChainID(), batches.length, pending);
+        if (batches.length==0){
+            chain.setLastOriginalOffsetProcessed(newOffset);
+            if(chain.getTimer()==null){
+                //TODO 等待一段时间
+                //go中  chain.timer = time.After(chain.SharedConfig().BatchTimeout())
+            }
+        }
+            chain.setTimer(null);
+            long offset = newOffset;
+            if(pending || batches.length>2  ){
+                offset--;
+            }else{
+                chain.setLastOriginalOffsetProcessed(offset);
+            }
+            Common.Envelope [] block={};
+            //TODO orderer提供方法(为block赋值)
+            //block = chain.CreateNextBlock(batches[0])
+            Kafka.KafkaMetadata.Builder kafkaMetadataBuilder=Kafka.KafkaMetadata.newBuilder();
+            kafkaMetadataBuilder.setLastOffsetPersisted(newOffset);
+            kafkaMetadataBuilder.setLastOriginalOffsetProcessed(chain.getLastOriginalOffsetProcessed());
+            byte[]  metadata= utils.MarshalOrPanic(kafkaMetadataBuilder.build());
 
-    }
+            //TODO orderer提供方法(WriteBlock写块)
+            //chain.WriteBlock(block, metadata)
+            int lastCutBlockNumber= chain.getLastCutBlockNumber();
+            lastCutBlockNumber++;
+            log.debug("[channel: %s] Batch filled, just cut block %d - last persisted offset is now %d", chain.getChainID(), chain.getLastCutBlockNumber(), offset);
+
+            if(batches.length==2){
+                chain.setLastOriginalOffsetProcessed(newOffset);
+                offset++;
+                //TODO orderer提供方法(为block赋值)
+                //block = chain.CreateNextBlock(batches[1]);
+                 kafkaMetadataBuilder=Kafka.KafkaMetadata.newBuilder();
+                kafkaMetadataBuilder.setLastOffsetPersisted(newOffset);
+                kafkaMetadataBuilder.setLastOriginalOffsetProcessed(chain.getLastOriginalOffsetProcessed());
+                metadata= utils.MarshalOrPanic(kafkaMetadataBuilder.build());
+
+                //TODO orderer提供方法(WriteBlock写块)
+                //chain.WriteBlock(block, metadata)
+                 lastCutBlockNumber= chain.getLastCutBlockNumber();
+                lastCutBlockNumber++;
+                log.debug("[channel: %s] Batch filled, just cut block %d - last persisted offset is now %d", chain.getChainID(), chain.getLastCutBlockNumber(), offset);
+            }
+        }
+
+
+
     //批量处理config消息
     private void commitConfigMsg(Common.Envelope message,long newOffset){
-        //计算当批消息的offset值（即最后一条消息的offset值+1）
+        log.debug("[channel: %s] Received config message", chain.getChainID());
+        Common.Envelope [] batch={};
+        //TODO orderer提供方法(为batch赋值)
+        //batch = chain.BlockCutter().Cut()
+        if(batch !=null){
+            log.debug("[channel: %s] Cut pending messages into block", chain.getChainID());
+            Common.Envelope [] block={};
+            //TODO orderer提供方法(为block赋值)
+            //block = chain.CreateNextBlock(batch)
+            Kafka.KafkaMetadata.Builder kafkaMetadataBuilder=Kafka.KafkaMetadata.newBuilder();
+            kafkaMetadataBuilder.setLastOffsetPersisted(newOffset);
+            kafkaMetadataBuilder.setLastOriginalOffsetProcessed(chain.getLastOriginalOffsetProcessed());
+            byte[]  metadata= utils.MarshalOrPanic(kafkaMetadataBuilder.build());
+
+            //TODO orderer提供方法(WriteBlock写块)
+            //chain.WriteBlock(block, metadata)
+            int lastCutBlockNumber= chain.getLastCutBlockNumber();
+            lastCutBlockNumber++;
+        }
+        log.debug("[channel: %s] Creating isolated block for config message", chain.getChainID());
+        chain.setLastOriginalOffsetProcessed(newOffset);
+        Common.Envelope [] block={};
+        //TODO orderer提供方法(为block赋值)
+        //block = chain.CreateNextBlock(batch)
+        Kafka.KafkaMetadata.Builder kafkaMetadataBuilder=Kafka.KafkaMetadata.newBuilder();
+        kafkaMetadataBuilder.setLastOffsetPersisted(newOffset);
+        kafkaMetadataBuilder.setLastOriginalOffsetProcessed(chain.getLastOriginalOffsetProcessed());
+        byte[]  metadata= utils.MarshalOrPanic(kafkaMetadataBuilder.build());
+
+        //TODO orderer提供方法(WriteBlock写块)
+        //chain.WriteBlock(block, metadata)
+        int lastCutBlockNumber= chain.getLastCutBlockNumber();
+        lastCutBlockNumber++;
+        chain.setTimer(null);
 
     }
 
@@ -212,8 +297,37 @@ public class Chain implements IChain {
     }
    //到时间切块
    //processMessagesToBlocks()调用该方法
-   public void  processTimeToCut(){
+   public void processTimeToCut(Kafka.KafkaMessageTimeToCut kafkaMessageTimeToCut,Long receivedOffset){
+       long ttcNumber= kafkaMessageTimeToCut.getBlockNumber();
+       log.debug("[channel: %s] It's a time-to-cut message for block %d", chain.getChainID(), ttcNumber);
+       if(ttcNumber==chain.getLastCutBlockNumber()+1){
+           chain.setTimer(null);
+           log.debug("[channel: %s] Nil'd the timer", chain.getChainID());
+           Common.Envelope [] batch={};
+           //TODO orderer提供方法(为batch赋值)
+            //batch=chain.BlockCutter().Cut();
+            if(batch.length==0){
+                 log.error("got right time-to-cut message (for block %d),"+
+                        " no pending requests though; this might indicate a bug", chain.getLastCutBlockNumber()+1);
+            }
+           Common.Envelope [] block={};
+           //TODO orderer提供方法(为block赋值)
+           //block = chain.CreateNextBlock(batch)
+           Kafka.KafkaMetadata.Builder kafkaMetadataBuilder=Kafka.KafkaMetadata.newBuilder();
+           kafkaMetadataBuilder.setLastOffsetPersisted(receivedOffset);
+           kafkaMetadataBuilder.setLastOriginalOffsetProcessed(chain.getLastOriginalOffsetProcessed());
+           byte[]  metadata= utils.MarshalOrPanic(kafkaMetadataBuilder.build());
 
+           //TODO orderer提供方法(WriteBlock写块)
+           //chain.WriteBlock(block, metadata)
+           int lastCutBlockNumber= chain.getLastCutBlockNumber();
+           lastCutBlockNumber++;
+            log.debug("[channel: %s] Proper time-to-cut received, just cut block %d", chain.getChainID(), chain.getLastCutBlockNumber());
+       }else if(ttcNumber > chain.getLastCutBlockNumber()+1){
+           log.error("got larger time-to-cut message (%d) than allowed/expected (%d)"+
+                           " - this might indicate a bug", ttcNumber, chain.getLastCutBlockNumber()+1);
+       }
+        log.debug("[channel: %s] Ignoring stale time-to-cut-message for block %d", chain.getChainID(), ttcNumber);
    }
     //1.创建生产者，消费者，分区消费者，父类消费者，2.调用消费者方法，调用方法
     //start方法调用该方法

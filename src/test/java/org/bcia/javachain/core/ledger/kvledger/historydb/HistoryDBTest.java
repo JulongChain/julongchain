@@ -52,7 +52,6 @@ public class HistoryDBTest {
     }
 
     @Test
-    //TODO 添加BlockMetadata
     public void commit() throws Throwable{
         Common.Block block = Common.Block.newBuilder()
                 //Header
