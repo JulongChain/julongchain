@@ -64,11 +64,7 @@ public class CommonStorageDB implements DB {
             String keyHashStr = null;
             if(!bytesKeySuppoted()){
                 //TODO SM3 Hash
-                try {
-                    keyHashStr = new String(SM3.hash(key.getKeyHash().getBytes()));
-                } catch (IOException e) {
-                    throw new RuntimeException("Error when getting hash key by SM3", e);
-                }
+                keyHashStr = new String(new SM3().hash(key.getKeyHash().getBytes()));
             } else {
                 keyHashStr = key.getKeyHash();
             }
@@ -88,11 +84,7 @@ public class CommonStorageDB implements DB {
             String keyHashStr = new String(keyHash);
             if(!bytesKeySuppoted()){
                 //TODO SM3 Hash
-                try {
-                    keyHashStr = new String(SM3.hash(keyHash));
-                } catch (IOException e) {
-                    throw new RuntimeException("Error when getting hash key by SM3", e);
-                }
+                keyHashStr = new String(new SM3().hash(keyHash));
             }
             return bulkOptimizable.getCachedVersion(deriveHashedDataNs(ns, coll), keyHashStr);
         } catch (Exception e) {
@@ -129,11 +121,7 @@ public class CommonStorageDB implements DB {
         String keyHashStr = new String(keyHash);
         if(!bytesKeySuppoted()){
             //TODO SM3 Hash
-            try {
-                keyHashStr = new String(SM3.hash(keyHash));
-            } catch (IOException e) {
-                throw new RuntimeException("Error when getting hash key by SM3", e);
-            }
+            keyHashStr = new String(new SM3().hash(keyHash));
         }
         return getState(deriveHashedDataNs(ns, coll), keyHashStr);
     }
@@ -143,11 +131,7 @@ public class CommonStorageDB implements DB {
         String keyHashStr = new String(keyHash);
         if(!bytesKeySuppoted()){
             //TODO SM3 Hash
-            try {
-                keyHashStr = new String(SM3.hash(keyHash));
-            } catch (IOException e) {
-                throw new RuntimeException("Error when getting hash key by SM3", e);
-            }
+            keyHashStr = new String(new SM3().hash(keyHash));
         }
         return getVersion(deriveHashedDataNs(ns, coll), keyHashStr);
     }
@@ -204,11 +188,7 @@ public class CommonStorageDB implements DB {
                     VersionedValue vv = entry1.getValue();
                     if(SM3Key){
                         //TODO SM3 Hash
-                        try {
-                            key = new String(SM3.hash(key.getBytes()));
-                        } catch (IOException e) {
-                            throw new RuntimeException("Error when getting hash key by SM3", e);
-                        }
+                        key = new String(new SM3().hash(key.getBytes()));
                     }
                     pubUpdateBatch.getBatch().update(deriveHashedDataNs(ns, coll), key, vv);
                 }

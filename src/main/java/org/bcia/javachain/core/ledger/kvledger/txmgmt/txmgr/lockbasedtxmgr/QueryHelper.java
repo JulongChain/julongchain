@@ -94,11 +94,7 @@ public class QueryHelper {
         Height ver = versionedValue.getVersion();
         //TODO 获取keyhash
         byte[] keyHash = new byte[0];
-        try {
-            keyHash = SM3.hash(key.getBytes());
-        } catch (IOException e) {
-            throw new RuntimeException("Error when getting key hash by SM3", e);
-        }
+        keyHash = new SM3().hash(key.getBytes());
         Height hashVersion = txMgr.getDb().getKeyHashVersion(ns, coll, keyHash);
         if(!Height.areSame(ver, hashVersion)){
             throw new LedgerException(String.format("Private data matching public hash version is not available.Pub version %s. Pvt version %s",

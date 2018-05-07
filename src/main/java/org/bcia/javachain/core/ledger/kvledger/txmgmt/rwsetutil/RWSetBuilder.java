@@ -122,11 +122,7 @@ public class RWSetBuilder {
     public void setPvtCollectionHash(String ns, String coll, ByteString pvtDataProto){
         CollHashRwBuilder collHashBuilder = getOrCreateCollHashedRwBuilder(ns, coll);
         //TODO SM3 Hash
-        try {
-            collHashBuilder.setPvtDataHash(SM3.hash(pvtDataProto.toByteArray()));
-        } catch (IOException e) {
-            throw new RuntimeException("Error when getting pvtDataProto hash by SM3", e);
-        }
+        collHashBuilder.setPvtDataHash(new SM3().hash(pvtDataProto.toByteArray()));
     }
 
     /**

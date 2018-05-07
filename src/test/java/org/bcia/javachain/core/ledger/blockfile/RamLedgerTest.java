@@ -51,7 +51,7 @@ public class RamLedgerTest {
 
     @Test
     public void iterator() throws Exception {
-        byte[] bytes = SM3.hash(Common.BlockHeader.getDefaultInstance().toByteArray());
+        byte[] bytes = new SM3().hash(Common.BlockHeader.getDefaultInstance().toByteArray());
         for (int i = 0; i < bytes.length; i++) {
             System.out.println(bytes[i]);
         }

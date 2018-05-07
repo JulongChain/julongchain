@@ -71,13 +71,7 @@ public class RangeQueryResultsHelper {
         byte[] b = serializeKVReads(pendingResults);
         pendingResults.clear();
         //TODO SM3 Hash
-        byte[] hash = new byte[]{};
-        try {
-            hash = SM3.hash(b);
-        } catch (IOException e) {
-            throw new RuntimeException("Error when getting hash by SM3", e);
-        }
-        mt.update(hash);
+        mt.update(new SM3().hash(b));
     }
 
     private byte[] serializeKVReads(List<KvRwset.KVRead> list){

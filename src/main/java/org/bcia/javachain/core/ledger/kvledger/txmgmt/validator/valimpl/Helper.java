@@ -88,11 +88,7 @@ public class Helper {
             for(Rwset.CollectionPvtReadWriteSet collPvtdata : nsPvtRwSet.getCollectionPvtRwsetList()){
                 //TODO 计算Hash
                 ByteString collPvtdataHash = null;
-                try {
-                    collPvtdataHash = ByteString.copyFrom(SM3.hash(collPvtdata.getRwset().toByteArray()));
-                } catch (IOException e) {
-                    throw new RuntimeException("Error when getting collPvtdataHash by SM3", e);
-                }
+                collPvtdataHash = ByteString.copyFrom(new SM3().hash(collPvtdata.getRwset().toByteArray()));
                 ByteString hashInPubdata = tx.retrieveHash(nsPvtRwSet.getNamespace(), collPvtdata.getCollectionName());
                 if(!collPvtdataHash.equals(hashInPubdata)){
                     throw new LedgerException("Hash of pvt data mismatch corresponding hash in pub data");

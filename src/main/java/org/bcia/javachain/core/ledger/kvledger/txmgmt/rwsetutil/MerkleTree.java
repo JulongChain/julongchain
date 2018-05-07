@@ -135,11 +135,7 @@ public class MerkleTree {
         }
         //TODO compute hash
         //TODO SM3 Hash
-        try {
-            return SM3.hash(combinedHash);
-        } catch (IOException e) {
-            throw new RuntimeException("Error when getting combined hash by SM3", e);
-        }
+        return new SM3().hash(combinedHash);
     }
 
     private KvRwset.QueryReadsMerkleSummary.Builder setMaxLevelHashes(KvRwset.QueryReadsMerkleSummary.Builder builder, List<byte[]> list){
