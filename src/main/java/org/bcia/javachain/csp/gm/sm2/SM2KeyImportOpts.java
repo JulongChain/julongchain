@@ -23,6 +23,11 @@ import org.bcia.javachain.csp.intfs.opts.IKeyImportOpts;
  * @company Dingxuan
  */
 public class SM2KeyImportOpts implements IKeyImportOpts{
+    private boolean isEphemeral;
+    public SM2KeyImportOpts(boolean isEphemeral) {
+    this.isEphemeral=isEphemeral;
+    }
+
     @Override
     public String getAlgorithm() {
         return "SM2";
@@ -30,6 +35,6 @@ public class SM2KeyImportOpts implements IKeyImportOpts{
 
     @Override
     public boolean isEphemeral() {
-        return false;
+        return isEphemeral;
     }
 }
