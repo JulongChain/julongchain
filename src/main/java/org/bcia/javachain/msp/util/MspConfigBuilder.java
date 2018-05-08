@@ -77,7 +77,10 @@ public class MspConfigBuilder {
 //        mspConfig.addRevocationList(ByteString.copyFrom(crls.get(0).getBytes()));
         MspConfigPackage.SigningIdentityInfo signingIdentityInfo=buildSigningIdentityInfo(signcert);
         mspConfig.setSigningIdentity(signingIdentityInfo);
-        mspConfig.addTlsIntermediateCerts(ByteString.copyFrom(tlsintermediatecerts.get(0).getBytes()));
+        if(tlsintermediatecerts==null||tlsintermediatecerts.size()==0){
+        }else {
+            mspConfig.addTlsIntermediateCerts(ByteString.copyFrom(tlsintermediatecerts.get(0).getBytes()));
+        }
         mspConfig.addTlsRootCerts(ByteString.copyFrom(tlscacert.get(0).getBytes()));
 
         mspConfig.setFabricNodeOUs(buildFabricNodeOUs());
