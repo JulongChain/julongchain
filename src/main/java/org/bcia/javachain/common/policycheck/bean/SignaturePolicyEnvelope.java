@@ -28,8 +28,8 @@ import org.bcia.javachain.msp.IIdentity;
  */
 public class SignaturePolicyEnvelope {
     public int version;
-    public MSPPrincipal iIdentity;
     public SignaturePolicy rule;
+    public MSPPrincipal iIdentity;
 
 
     public SignaturePolicy getRule() {
