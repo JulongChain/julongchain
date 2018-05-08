@@ -67,12 +67,16 @@ public class Policy implements IPolicy{
         SignaturePolicyEnvelope sigPolicy = new SignaturePolicyEnvelope();
         Provider provider = new Provider();
         Msp msp = new Msp();
+        boolean flag = Cauthdsl.compile(sigPolicy.rule,sigPolicy.iIdentity,msp);//进行策略评估
+        PolicyBean policyBean = new PolicyBean();
         if(sigPolicy.version != 0){
             log.info("Error unmarshaling to SignaturePolicy");
             return null;
         }
         boolean compile = Cauthdsl.compile(sigPolicy.rule,sigPolicy.iIdentity,msp);
         //TODO 待完善
-        return new PolicyBean(compile,provider.deserializer);
+        policyBean.setEvalutor(flag);
+        policyBean.setDeserializer(msp.deserializeIdentity(data));
+        return policyBean;
     }
 }
