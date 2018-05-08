@@ -32,8 +32,9 @@ import org.bcia.javachain.msp.entity.OUIdentifier;
 import org.bcia.javachain.msp.signer.Signer;
 import org.bcia.javachain.protos.common.MspPrincipal;
 import org.bcia.javachain.protos.msp.Identities;
+import org.bouncycastle.asn1.x509.Certificate;
 
-import java.security.cert.Certificate;
+import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 
 import static org.bcia.javachain.common.util.Convert.bytesToHexString;
@@ -80,7 +81,7 @@ public class Identity implements ISigningIdentity {
 
         Certificate cert = msp.sanitizeCert(certificate);
         try {
-            byte[] certEncoded = cert.getEncoded();
+        //    byte[] certEncoded = cert.getEncoded();
             byte[] digest="123".getBytes();
             // byte[] digest = msp.csp.hash(certEncoded, new SM3HashOpts());
             IdentityIdentifier identityIdentifier=new IdentityIdentifier(msp.name, bytesToHexString(digest));
@@ -158,16 +159,18 @@ public class Identity implements ISigningIdentity {
 
     @Override
     public byte[] serialize() {
-        try {
+
             Identities.SerializedIdentity.Builder serializedIdentity=Identities.SerializedIdentity.newBuilder();
-            this.certificate.getEncoded();
             serializedIdentity.setMspid(this.identityIdentifier.Mspid);
+        try {
             serializedIdentity.setIdBytes(ByteString.copyFrom(this.certificate.getEncoded()));
             return serializedIdentity.build().toByteArray();
-        } catch (CertificateEncodingException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
+
         return null;
+
     }
 
     @Override
