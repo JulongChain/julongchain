@@ -34,12 +34,14 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valinternal.Tran
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.core.ledger.util.TxValidationFlags;
 import org.bcia.javachain.core.ledger.util.Util;
+import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.ledger.rwset.Rwset;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -85,10 +87,10 @@ public class Helper {
         for(Rwset.NsPvtReadWriteSet nsPvtRwSet : pvtData.getWriteSet().getNsPvtRwsetList()){
             for(Rwset.CollectionPvtReadWriteSet collPvtdata : nsPvtRwSet.getCollectionPvtRwsetList()){
                 //TODO 计算Hash
-                ByteString collPvtdataHash = collPvtdata.getRwset();
+                ByteString collPvtdataHash = null;
+                collPvtdataHash = ByteString.copyFrom(new SM3().hash(collPvtdata.getRwset().toByteArray()));
                 ByteString hashInPubdata = tx.retrieveHash(nsPvtRwSet.getNamespace(), collPvtdata.getCollectionName());
-                //TODO byte.equals
-                if(!collPvtdata.equals(hashInPubdata)){
+                if(!collPvtdataHash.equals(hashInPubdata)){
                     throw new LedgerException("Hash of pvt data mismatch corresponding hash in pub data");
                 }
             }
@@ -117,7 +119,7 @@ public class Helper {
                 throw new LedgerException(e);
             }
             if(txsFilter.isInValid(i)){
-                logger.debug(String.format("Channel [%s]: Block [%d] Transaction index [%d] TxID [%d]" +
+                logger.debug(String.format("Gtoup [%s]: Block [%d] Transaction index [%d] TxID [%d]" +
                         " marked as invalid by committer. Reason code [%s]", gh.getGroupId(),
                         block.getHeader().getNumber(),
                         i,
@@ -149,6 +151,8 @@ public class Helper {
                     rwSetProto = processNonEndorserTx(env, gh.getTxId(), txType, txMgr, !doMVCCValidation);
                 } catch (Exception e) {
                     //todo catch invalidException
+                    txsFilter.setFlag(i, TransactionPackage.TxValidationCode.INVALID_OTHER_REASON);
+                    continue;
                 }
                 if(rwSetProto != null){
                     txRwSet = RwSetUtil.txRwSetFromProtoMsg(rwSetProto);

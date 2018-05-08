@@ -97,10 +97,11 @@ public class HistoryLevelDB implements IHistoryDB {
         UpdateBatch dbBatch = LevelDBProvider.newUpdateBatch();
         logger.debug(String.format("Group [%s]: Updating historyDB for groupNo [%s] with [%d] transactions"
                 , dbName, blockNo, block.getData().getDataCount()));
-       //获取失效
+        //获取失效
         TxValidationFlags txsFilter = TxValidationFlags.fromByteString(block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
         //没有失效的部分
         //TODO 对于metadata的写入存在Array无法初始化问题
+        //对于正常的完整的block不存在setMetadata报错问题
         if(txsFilter.length() == 0){
             txsFilter = new TxValidationFlags(block.getData().getDataCount());
             block = block.toBuilder()
@@ -110,34 +111,42 @@ public class HistoryLevelDB implements IHistoryDB {
                     .build();
         }
         //将每个交易的写集写入HistoryDB
-        List<ByteString> list = block.getMetadata().getMetadataList();
+        List<ByteString> list = block.getData().getDataList();
+        int i = 0;
         for (; tranNo < list.size(); tranNo++) {
             ByteString evnByte = list.get(tranNo);
-            if (isInvalid(list.get(tranNo))){
-               logger.debug(String.format("Group [%s]: Skipping write into historyDB for invalid transaction number %d."
-                       , dbName, tranNo));
-               continue;
+            //TODO txsFilter.isInvalid
+//            if (isInvalid(list.get(tranNo))){
+            if(txsFilter.isInValid(tranNo)){
+                logger.debug(String.format("Group [%s]: Skipping write into historyDB for invalid transaction number %d."
+                        , dbName, tranNo));
+                continue;
             }
             Common.Envelope env = Util.getEnvelopFromBlock(evnByte);
             Common.Payload payload = Util.getPayload(env);
             Common.GroupHeader header = Util.getGroupHeader(payload.getHeader().getGroupHeader());
+            //经过背书的交易写入HistoryDB
             if(Common.HeaderType.ENDORSER_TRANSACTION.getNumber() == header.getType()){
                 ProposalPackage.SmartContractAction respPayload = null;
-                TxRwSet txRWSet = null;
+                TxRwSet txRWSet = new TxRwSet();
                 respPayload = Util.getActionFromEnvelope(evnByte);
+                if(respPayload == null){
+                    logger.debug("Got null respPayload from env");
+                    continue;
+                }
                 txRWSet.fromProtoBytes(respPayload.getResults());
                 for(NsRwSet nsRwSet : txRWSet.getNsRwSets()){
                     String ns = nsRwSet.getNameSpace();
                     for(KvRwset.KVWrite kvWrite : nsRwSet.getKvRwSet().getWritesList()){
-                       String writeKey = kvWrite.getKey();
-                       //key:ns~key~blockNo~tranNo
+                        String writeKey = kvWrite.getKey();
+                        //key:ns~key~blockNo~tranNo
                         byte[] compositeHistoryKey = HistoryDBHelper.constructCompositeHistoryKey(ns, writeKey, blockNo, tranNo);
                         dbBatch.put(compositeHistoryKey, EMPTY_VALUE);
                     }
                 }
             } else {
                 logger.debug(String.format("Group [%s]: Skipping transaction [%d] since it is not an endorsement transaction"
-                        , tranNo));
+                        , dbName, tranNo));
             }
         }
 
@@ -162,19 +171,26 @@ public class HistoryLevelDB implements IHistoryDB {
         return height;
     }
 
+    /**
+     * @return 返回应添加的blocknumber, 0为未配置HistoryDB, -1为保存点为空(既需要恢复)
+     */
     @Override
     public long shouldRecover() throws LedgerException {
-        //TODO 配置是否开启leveldb
+        if(!LedgerConfig.isHistoryDBEnabled()){
+            return 0;
+        }
         Height savePoint = getLastSavepoint();
         if(savePoint == null){
             return -1;
         }
-        return savePoint.getBlockNum();
+        return savePoint.getBlockNum() + 1;
     }
 
     @Override
     public long recoverPoint(long lastAvailableBlock) throws LedgerException {
-        //配置是否开启leveldb
+        if(!LedgerConfig.isHistoryDBEnabled()){
+            return 0;
+        }
         Height savePoint = getLastSavepoint();
         if(savePoint == null){
             return 0;

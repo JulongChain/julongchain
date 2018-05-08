@@ -17,37 +17,28 @@ package org.bcia.javachain.csp.gm.sm2;
 
 import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bcia.javachain.csp.intfs.IKey;
-import org.bouncycastle.math.ec.ECPoint;
 
 /**
- * SM2Key 实现IKey接口
- *
  * @author zhangmingyang
- * @Date: 2018/3/27
+ * @Date: 2018/5/4
  * @company Dingxuan
  */
-public class SM2Key implements IKey {
-    private SM2KeyPair sm2KeyPair;
+public class SM2PrivateKey implements IKey {
+    private byte[] privateKey;
     private SM3 sm3;
-
-
-    public SM2Key() {
+    public SM2PrivateKey(Object privateKey) {
+        this.privateKey= (byte[]) privateKey;
+        sm3=new SM3();
     }
-
-    public SM2Key(SM2KeyPair sm2KeyPair) {
-        this.sm2KeyPair = sm2KeyPair;
-        this.sm3 = new SM3();
-    }
-
 
     @Override
     public byte[] toBytes() {
-        return sm2KeyPair.getPrivatekey();
+        return privateKey;
     }
 
     @Override
     public byte[] ski() {
-        return sm3.hash(sm2KeyPair.getPrivatekey());
+        return sm3.hash(privateKey);
     }
 
     @Override
@@ -62,6 +53,6 @@ public class SM2Key implements IKey {
 
     @Override
     public IKey getPublicKey() {
-        return new SM2PublicKey(sm2KeyPair.getPublickey());
+        return null;
     }
 }

@@ -84,8 +84,8 @@ public class SM2 {
         ECPublicKeyParameters ecpub = (ECPublicKeyParameters) kp.getPublic();
         BigInteger privateKey = ecpriv.getD();
         ECPoint publicKey = ecpub.getQ();
-        System.out.println("publicKey: " + Hex.toHexString(publicKey.getEncoded(false)));
-        System.out.println("privateKey: " + Hex.toHexString(privateKey.toByteArray()));
+        log.info("publicKey: " + Hex.toHexString(publicKey.getEncoded(false)));
+        log.info("privateKey: " + Hex.toHexString(privateKey.toByteArray()));
 
         return new SM2KeyPair(publicKey.getEncoded(false), privateKey.toByteArray());
     }
@@ -141,8 +141,6 @@ public class SM2 {
     public boolean verify(byte[] publicKey, byte[] signValue, byte[] msg) {
         SM2Signer signer = new SM2Signer();
         BigInteger[] rs = decode(signValue);
-        System.out.println(rs[0]);
-        System.out.println(rs[1]);
         ECPublicKeyParameters ecPub = new ECPublicKeyParameters(byte2ECpoint(publicKey), ecc_bc_spec);
         signer.init(false, ecPub);
         signer.update(msg, 0, msg.length);
@@ -222,32 +220,5 @@ public class SM2 {
         }
         ECPoint userKey = curve.decodePoint(formatedPubKey);
         return userKey;
-    }
-
-
-    public static void main(String[] args) {
-        SM2 sm2 = new SM2();
-        SM2KeyPair sm2KeyPair = sm2.generateKeyPair();
-        sm2KeyPair.getPrivatekey();
-        long t1 = System.currentTimeMillis();
-        byte[] signValue = sm2.sign(sm2KeyPair.getPrivatekey(), " a  this is a message sdfdee".getBytes());
-
-        long t2 = System.currentTimeMillis();
-        System.out.println("签名时间为：" + (t2 - t1));
-        System.out.println(Hex.toHexString(signValue));
-        long t3 = System.currentTimeMillis();
-        boolean verify = sm2.verify(sm2KeyPair.getPublickey(), signValue, " a  this is a message sdfdee".getBytes());
-
-        long t4 = System.currentTimeMillis();
-        System.out.println("验签时间为：" + (t4 - t3));
-        System.out.println("总时间为：" + (t4 - t1));
-        System.out.println(verify);
-        System.out.println("-------------------数据加密----------------");
-        System.out.println("加密前的数据" + Hex.toHexString("12389897979".getBytes()));
-        byte[] enc = sm2.encrypt("12389897979".getBytes(), sm2KeyPair.getPublickey());
-        System.out.println("加密后的数据" + Hex.toHexString(enc));
-        byte[] dec = sm2.decrypt(enc, sm2KeyPair.getPrivatekey());
-        System.out.println("解密后的数据：" + Hex.toHexString(dec));
-
     }
 }

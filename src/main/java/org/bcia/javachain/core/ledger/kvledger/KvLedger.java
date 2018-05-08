@@ -80,7 +80,7 @@ public class KvLedger implements INodeLedger {
 
         //TODO get scEventListener
 
-        ISmartContractLifecycleEventListener scEventListener = null;
+        ISmartContractLifecycleEventListener scEventListener = versionedDB.getSmartcontractEventListener();
         logger.debug("Register state db for smartcontract lifecycle event " + (scEventListener != null));
 
         if(scEventListener != null){
@@ -108,9 +108,10 @@ public class KvLedger implements INodeLedger {
         List<Recoverer> recoverers = new ArrayList<>();
         recoverables.add(txtmgmt);
         recoverables.add(historyDB);
+        //循环添加需要恢复的db
         for(Recoverable recoverable : recoverables){
             long firstBlockNum = recoverable.shouldRecover();
-            if(firstBlockNum - 1 != lastAvailableBlockNum){
+            if(firstBlockNum  == -1 || firstBlockNum - 1 != lastAvailableBlockNum){
                 Recoverer recoverer = new Recoverer();
                 recoverer.setFirstBlockNum(firstBlockNum);
                 recoverer.setRecoverable(recoverable);
@@ -195,7 +196,7 @@ public class KvLedger implements INodeLedger {
         try {
             return blockStore.retrieveBlockByNumber(blockNumber);
         } catch (LedgerException e) {
-            logger.debug(String.format("Fail to get block using block num = [%d]", blockNumber));
+            logger.info(String.format("Fail to get block using block num = [%d]", blockNumber));
             return null;
         }
     }
@@ -363,18 +364,18 @@ public class KvLedger implements INodeLedger {
     public synchronized void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException {
         Common.Block block = blockAndPvtData.getBlock();
         long blockNo = block.getHeader().getNumber();
-        logger.debug(String.format("Channel %s: Validating state for block %d", ledgerID, blockNo));
+        logger.debug(String.format("Group %s: Validating state for block %d", ledgerID, blockNo));
         //TODO 验证器
         txtmgmt.validateAndPrepare(blockAndPvtData, true);
-        logger.debug(String.format("Channel %s: Committing block %d to storage", ledgerID, blockNo));
+        logger.debug(String.format("Group %s: Committing block %d to storage", ledgerID, blockNo));
         blockStore.commitWithPvtData(blockAndPvtData);
-        logger.info(String.format("Channel %s: Committed block %d to storage", ledgerID, blockNo));
+        logger.info(String.format("Group %s: Committed block %d to storage", ledgerID, blockNo));
 
-        logger.debug(String.format("Channel %s: Committing block %d transaction to state db", ledgerID, blockNo));
+        logger.debug(String.format("Group %s: Committing block %d transaction to state db", ledgerID, blockNo));
         txtmgmt.commit();
         //TODO history db enable
         if(LedgerConfig.isHistoryDBEnabled()){
-            logger.debug(String.format("Channel %s: Committing block %d transaction to history db", ledgerID, blockNo));
+            logger.debug(String.format("Group %s: Committing block %d transaction to history db", ledgerID, blockNo));
             historyDB.commit(block);
         }
     }

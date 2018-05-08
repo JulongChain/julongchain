@@ -176,7 +176,7 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         String ledgerID = idStore.getUnderConstructionFlag();
         //不存在有在建标记的账本
         if(ledgerID == null){
-            logger.debug("No under construction leder found.");
+            logger.debug("No under construction ledger found.");
             return;
         }
         //存在在建标记

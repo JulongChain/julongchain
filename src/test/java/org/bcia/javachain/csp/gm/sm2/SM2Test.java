@@ -3,6 +3,7 @@ package org.bcia.javachain.csp.gm.sm2;
 import org.bcia.javachain.csp.gm.sm2.util.SM2KeyUtil;
 import org.bouncycastle.math.ec.ECPoint;
 import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.Test;
 
 import java.io.FileNotFoundException;
@@ -23,51 +24,6 @@ public class SM2Test {
 
     @Test
     public void encrypt() throws FileNotFoundException {
-
-        SM2 sm02 = new SM2();
-
-
-//         SM2KeyPair keyPair = sm02.generateKeyPair();
-//		 ECPoint publicKey=keyPair.getPublicKey();
-//		 BigInteger privateKey=keyPair.getPrivateKey();
-//		byte[] publicKeyEncoded= publicKey.getEncoded(false);
-//		byte[]  privateKeyArray=privateKey.toByteArray();
-//		//printHexString(publicKeyEncoded);
-//        String publickeyString= new String(Base64.encode(publicKeyEncoded));
-//        String privatekeyString= new String(Base64.encode(privateKeyArray));
-//        System.out.println("公钥字符串："+publickeyString);
-//        PrintWriter pw1 = new PrintWriter(new FileOutputStream("D:/publicKey.txt"));
-//        PrintWriter pw2 = new PrintWriter(new FileOutputStream("D:/privateKey.txt"));
-//        pw1.print(publickeyString);
-//        pw2.print(privatekeyString);
-//        pw1.close();
-//        pw2.close();
-
-
-       // writeFileBytes("E:/public.txt",publicKeyEncoded);
-        //writeFileBytes("E:/private.txt",privateKeyArray);
-        System.out.println("-----------------公钥加密与解密-----------------");
-
-//        ECPoint publicKey = sm02.importPublicKey("E:/publickey.pem");
-//        BigInteger privateKey = sm02.importPrivateKey("E:/privatekey.pem");
-//        SM2KeyPair keyPair = new SM2KeyPair();
-//        keyPair.setPrivateKey(privateKey);
-//        keyPair.setPublicKey(publicKey);
-//        System.out.println("公钥：" + publicKey.getEncoded(false));
-//        byte[] data = sm02.encrypt("测试加密aaaaaaaaaaa123aabb", publicKey);
-//        System.out.print("密文:");
-//        System.out.println("解密后明文:" + sm02.decrypt(data, privateKey));
-        System.out.println("-----------------签名与验签-----------------");
-//        String IDA = "Heartbeats";
-//        String msg = "要签名的信息";
-//        byte[] M = msg.getBytes();
-//        byte[] signvalue = sm02.sign(M, IDA, keyPair);
-//        System.out.println("用户标识:" + IDA);
-//        System.out.println("签名信息:" + M);
-//        BigInteger[] rs = SM2KeyUtil.decode(signvalue);
-//        System.out.println("签名值1：" + rs[0]);
-//        System.out.println("签名值2：" + rs[1]);
-//        System.out.println("验证签名:" + sm02.verify(M, signvalue, IDA, publicKey));
     }
 
     @Test
@@ -77,6 +33,7 @@ public class SM2Test {
 
     @Test
     public void generateKeyPair() {
+
     }
 
     @Test
@@ -93,6 +50,28 @@ public class SM2Test {
 
     @Test
     public void sign() {
+        SM2 sm2 = new SM2();
+        SM2KeyPair sm2KeyPair = sm2.generateKeyPair();
+        sm2KeyPair.getPrivatekey();
+        long t1 = System.currentTimeMillis();
+        byte[] signValue = sm2.sign(sm2KeyPair.getPrivatekey(), " a  this is a message sdfdee".getBytes());
+
+        long t2 = System.currentTimeMillis();
+        System.out.println("签名时间为：" + (t2 - t1));
+        System.out.println(Hex.toHexString(signValue));
+        long t3 = System.currentTimeMillis();
+        boolean verify = sm2.verify(sm2KeyPair.getPublickey(), signValue, " a  this is a message sdfdee".getBytes());
+
+        long t4 = System.currentTimeMillis();
+        System.out.println("验签时间为：" + (t4 - t3));
+        System.out.println("总时间为：" + (t4 - t1));
+        System.out.println(verify);
+        System.out.println("-------------------数据加密----------------");
+        System.out.println("加密前的数据" + Hex.toHexString("12389897979".getBytes()));
+        byte[] enc = sm2.encrypt("12389897979".getBytes(), sm2KeyPair.getPublickey());
+        System.out.println("加密后的数据" + Hex.toHexString(enc));
+        byte[] dec = sm2.decrypt(enc, sm2KeyPair.getPrivatekey());
+        System.out.println("解密后的数据：" + Hex.toHexString(dec));
     }
 
     @Test

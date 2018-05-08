@@ -20,11 +20,11 @@ public class GlobalMspManagementTest {
 
     @Test
     public void loadLocalMspWithType() throws FileNotFoundException {
-        String localmspdir="E:\\msp";
-        String mspID="bciamsp";
-        String mspType="GmSoftMsp";
-        List<IFactoryOpts> optsList=new ArrayList<IFactoryOpts>();
-        MspConfig mspConfig=loadMspConfig();
+        String localmspdir = "D:\\msp";
+        String mspID = "DEFAULT";
+        String mspType = "GMMSP";
+        List<IFactoryOpts> optsList = new ArrayList<IFactoryOpts>();
+        MspConfig mspConfig = loadMspConfig();
         String symmetrickey = mspConfig.node.getCsp().getGm().getSymmetricKey();
         String sign = mspConfig.node.getCsp().getGm().getSign();
         String hash = mspConfig.node.getCsp().getGm().getHash();
@@ -32,9 +32,11 @@ public class GlobalMspManagementTest {
         String privateKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPrivateKeyStore();
         String publicKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPublicKeyStore();
         //new GmCspConfig(symmetrickey,asymmetric,hash,sign,publicKeyPath,privateKeyPath);
-        optsList.add(new GmFactoryOpts(symmetrickey,asymmetric,hash,sign,publicKeyPath,privateKeyPath));
-        GlobalMspManagement.loadLocalMspWithType(localmspdir,optsList,mspID,mspType);
-        GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity().sign("123".getBytes());
+        optsList.add(new GmFactoryOpts(symmetrickey, asymmetric, hash, sign, publicKeyPath, privateKeyPath));
+        GlobalMspManagement.loadLocalMspWithType(localmspdir, optsList, mspID, mspType);
+        byte[] signData = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity().sign("123".getBytes());
+        GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity().verify("123".getBytes(), signData);
+
     }
 
     @Test
@@ -43,9 +45,9 @@ public class GlobalMspManagementTest {
 
     @Test
     public void getLocalMsp() {
-       Identity signer= (Identity) GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
-       byte[] signdata=signer.sign("123".getBytes());
-       signer.verify("123".getBytes(), signdata);
+        Identity signer = (Identity) GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
+        byte[] signdata = signer.sign("123".getBytes());
+        signer.verify("123".getBytes(), signdata);
     }
 
     @Test

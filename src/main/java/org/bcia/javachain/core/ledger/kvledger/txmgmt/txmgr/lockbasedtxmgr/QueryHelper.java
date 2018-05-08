@@ -21,8 +21,10 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RWSetBuilder;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedValue;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
+import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +93,8 @@ public class QueryHelper {
         byte[] val = versionedValue.getValue();
         Height ver = versionedValue.getVersion();
         //TODO 获取keyhash
-        byte[] keyHash = "KeyHash".getBytes();
+        byte[] keyHash = new byte[0];
+        keyHash = new SM3().hash(key.getBytes());
         Height hashVersion = txMgr.getDb().getKeyHashVersion(ns, coll, keyHash);
         if(!Height.areSame(ver, hashVersion)){
             throw new LedgerException(String.format("Private data matching public hash version is not available.Pub version %s. Pvt version %s",
