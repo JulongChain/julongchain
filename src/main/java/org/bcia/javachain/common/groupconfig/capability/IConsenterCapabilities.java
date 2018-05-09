@@ -22,5 +22,19 @@ package org.bcia.javachain.common.groupconfig.capability;
  * @date 2018/3/27
  * @company Dingxuan
  */
-public class IConsenterCapabilities {
+public interface IConsenterCapabilities {
+    // PredictableChannelTemplate specifies whether the v1.0 undesirable behavior of setting the /Channel
+    // group's mod_policy to "" and copy versions from the orderer system channel config should be fixed or not.
+    boolean predictableGroupTemplate();
+
+    // Resubmission specifies whether the v1.0 non-deterministic commitment of tx should be fixed by re-submitting
+    // the re-validated tx.
+    boolean resubmission();
+
+    // Supported returns an error if there are unknown capabilities in this channel which are required
+    void supported();
+
+    // ExpirationCheck specifies whether the orderer checks for identity expiration checks
+    // when validating messages
+    boolean expirationCheck();
 }
