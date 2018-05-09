@@ -17,8 +17,9 @@ package org.bcia.javachain.common.ledger.util;
 
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.common.smartcontractprovider.SDSData;
 
-import java.io.File;
+import java.io.*;
 
 /**
  * 类描述
@@ -82,4 +83,68 @@ public class IoUtil {
         return;
     }
 
+    /**
+     * 创建文件
+     * @param filePath
+     * @return
+     */
+    public static boolean createFileIfMissing(String filePath) throws Exception{
+        boolean result = false;
+        File file = new File(filePath);
+        if(file.exists()){
+            return true;
+        }
+        String fileDir = filePath.substring(0, filePath.lastIndexOf(File.separator));
+        File dir = new File(fileDir);
+        if(!dir.exists()){
+            dir.mkdir();
+        }
+        result = file.createNewFile();
+        return result;
+    }
+
+    /**
+     * 序列化对象
+     * @param serializable
+     * @return
+     * @throws IOException
+     */
+    public static byte[] obj2ByteArray(Serializable serializable) {
+        ByteArrayOutputStream baos = null;
+        ObjectOutputStream oos = null;
+        try {
+            baos = new ByteArrayOutputStream();
+            oos = new ObjectOutputStream(baos);
+            oos.writeObject(serializable);
+            oos.flush();
+            byte[] result = baos.toByteArray();
+            baos.close();
+            oos.close();
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 反序列化对象
+     * @param bytes
+     * @return
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    public static Object byteArray2Obj(byte[] bytes){
+        ByteArrayInputStream bais = null;
+        ObjectInputStream ois = null;
+        try {
+            bais = new ByteArrayInputStream(bytes);
+            ois = new ObjectInputStream(bais);
+            Object obj = ois.readObject();
+            bais.close();
+            ois.close();
+            return obj;
+        } catch (Exception e){
+            throw new RuntimeException(e);
+        }
+    }
 }

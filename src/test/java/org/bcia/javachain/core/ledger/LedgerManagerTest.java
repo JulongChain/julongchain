@@ -22,11 +22,14 @@ import org.bcia.javachain.common.genesis.GenesisBlockFactory;
 import org.bcia.javachain.common.ledger.ILedger;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
+import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 import org.junit.Test;
+import scala.Byte;
 
 import java.io.File;
+import java.util.Random;
 
 /**
  * 类描述
@@ -64,11 +67,6 @@ public class LedgerManagerTest {
         long before = System.currentTimeMillis();
         LedgerManager.initialize(null);
         Common.Block block = factory.getGenesisBlock("MyGroup");
-        System.out.println();
-        Common.Block.Builder block1 = Common.Block.newBuilder();
-        System.out.println(block1.getMetadata().getMetadataList().size());
-        JsonFormat.parser().merge(JsonFormat.printer().print(block), block1);
-        System.out.println(block1.getMetadata().getMetadataList().size());
         l = LedgerManager.createLedger(block);
 //        List<String> list = LedgerManager.getLedgerIDs();
 //        list.forEach((s) -> {
@@ -89,7 +87,6 @@ public class LedgerManagerTest {
     public void commitBlock() throws LedgerException {
         LedgerManager.initialize(null);
         l = LedgerManager.openLedger("MyGroup");
-        long startTime = System.currentTimeMillis();
         long i = 0;
         while(true){
             if(l.getBlockByNumber(i) == null){
@@ -98,12 +95,19 @@ public class LedgerManagerTest {
             i++;
         }
         System.out.println("Start Block Number is " + i);
-        for (int j = 0; j < 100000; j++) {
+        long startTime = System.currentTimeMillis();
+        Common.BlockData data = null;
+        ByteString preHash = ByteString.copyFrom(new SM3().hash(l.getBlockByNumber(i - 1).getData().toByteArray()));
+        for (int j = 0; j < 2; j++) {
             BlockAndPvtData bap = new BlockAndPvtData();
+            data = Common.BlockData.getDefaultInstance();
             bap.setBlock(Common.Block.newBuilder()
                     .setHeader(Common.BlockHeader.newBuilder()
                             .setNumber(i + j)
+                            .setDataHash(ByteString.copyFrom(new SM3().hash(data.toByteArray())))
+                            .setPreviousHash(preHash)
                             .build())
+                    .setData(data)
                     .setMetadata(Common.BlockMetadata.newBuilder()
                             .addMetadata(ByteString.EMPTY)
                             .addMetadata(ByteString.EMPTY)
@@ -112,9 +116,24 @@ public class LedgerManagerTest {
                             .build())
                     .build());
             l.commitWithPvtData(bap);
+            preHash = ByteString.copyFrom(new SM3().hash(data.toByteArray()));
         }
         long endTime = System.currentTimeMillis();
-        System.out.println("耗时: " + (int) (endTime - startTime) + "ms");
+        System.out.println("耗时: " + String.valueOf(endTime - startTime) + "ms");
+    }
+
+    @Test
+    public void showBlocks() throws Exception{
+        LedgerManager.initialize(null);
+        String groupId = "MyGroup";
+        l = LedgerManager.openLedger(groupId);
+        for (int i = 0;; i++) {
+            Common.Block block = l.getBlockByNumber(i);
+            if(block == null){
+                break;
+            }
+            System.out.println(block);
+        }
     }
 
     @Test
@@ -122,9 +141,14 @@ public class LedgerManagerTest {
         LedgerManager.initialize(null);
         String groupId = "MyGroup";
         l = LedgerManager.openLedger(groupId);
-        ITxSimulator txSimulator = l.newTxSimulator(groupId);
-        for (int i = 0; i < 100; i++) {
-            System.out.println(new String(txSimulator.getState("ns" + i, "keys" + i)));
+        System.out.println(l.getBlockchainInfo());
+    }
+
+    private static void soutBytes(byte[] bytes){
+        int i = 0;
+        for(byte b : bytes){
+            System.out.print(b + " ");
         }
+        System.out.println();
     }
 }
