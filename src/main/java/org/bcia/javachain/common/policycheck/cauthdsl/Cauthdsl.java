@@ -19,16 +19,15 @@ package org.bcia.javachain.common.policycheck.cauthdsl;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policies.SignaturePolicy;
+import org.bcia.javachain.common.policycheck.SignaturePolicy_NOutOf;
+import org.bcia.javachain.common.policycheck.SignaturePolicy_SignedBy;
 import org.bcia.javachain.common.policycheck.bean.MSPPrincipal;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.mgmt.Msp;
 import org.bcia.javachain.msp.mgmt.MspManager;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 类描述
@@ -62,11 +61,23 @@ public class Cauthdsl {
      * @return
      */
     public static boolean compile(SignaturePolicy policy, MSPPrincipal identities, Msp msp){
+    List<SignedData> signedDatas = new ArrayList<SignedData>();
 
     if(policy==null){
         log.info("Empty policy element");
     }
+    if(policy.isSignaturePolicy_type instanceof SignaturePolicy_NOutOf){
+
+    }
+    if(policy.isSignaturePolicy_type instanceof SignaturePolicy_SignedBy){
+
+    }
         //TODO 待完善
+        return false;
+    }
+
+    public boolean confirmSignedData(List<SignedData> signedDatas,List<Boolean> bool){
+        Long grepkey = new Date().getTime();
         return false;
     }
 
