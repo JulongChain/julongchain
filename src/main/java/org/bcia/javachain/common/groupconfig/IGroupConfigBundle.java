@@ -16,7 +16,9 @@
 package org.bcia.javachain.common.groupconfig;
 
 import org.bcia.javachain.common.configtx.IValidator;
+import org.bcia.javachain.common.groupconfig.config.IGroupConfig;
 import org.bcia.javachain.common.policies.IPolicyManager;
+import org.bcia.javachain.msp.IMspManager;
 
 /**
  * 对象
@@ -26,37 +28,12 @@ import org.bcia.javachain.common.policies.IPolicyManager;
  * @company Dingxuan
  */
 public interface IGroupConfigBundle {
-    IValidator configtxValidator();
 
     IPolicyManager getPolicyManager();
 
+    IMspManager getMspManager();
 
+    IGroupConfig getGroupConfig();
 
-    // ConfigtxValidator returns the configtx.Validator for the channel
-//    IGroupConfigBundle() configtx.Validator
-//
-//        // PolicyManager returns the policies.Manager for the channel
-//    PolicyManager() policies.Manager
-//
-//        // ChannelConfig returns the config.Channel for the chain
-//    ChannelConfig() Channel
-//
-//    // OrdererConfig returns the config.Orderer for the channel
-//    // and whether the Orderer config exists
-//    IGroupConfigBundle() (Orderer, bool)
-//
-//    // ConsortiumsConfig() returns the config.Consortiums for the channel
-//    // and whether the consortiums config exists
-//    IGroupConfigBundle() (Consortiums, bool)
-//
-//    // ApplicationConfig returns the configtxapplication.SharedConfig for the channel
-//    // and whether the Application config exists
-//    IGroupConfigBundle() (Application, bool)
-//
-//    // MSPManager returns the msp.MSPManager for the chain
-//    IGroupConfigBundle() msp.MSPManager
-//
-//        // ValidateNew should return an error if a new set of configuration resources is incompatible with the current one
-//    ValidateNew(resources Resources) error
-
+    IValidator getValidator();
 }

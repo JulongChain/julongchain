@@ -136,14 +136,17 @@ public class GroupConfig implements IGroupConfig {
         return mspManager;
     }
 
+    @Override
     public IApplicationConfig getApplicationConfig() {
         return applicationConfig;
     }
 
+    @Override
     public IConsenterConfig getConsenterConfig() {
         return consenterConfig;
     }
 
+    @Override
     public IConsortiumsConfig getConsortiumsConfig() {
         return consortiumsConfig;
     }
