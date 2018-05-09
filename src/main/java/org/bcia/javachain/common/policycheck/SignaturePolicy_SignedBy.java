@@ -25,10 +25,7 @@ import org.bcia.javachain.common.policycheck.common.IsSignaturePolicy_Type;
  * @date 09/05/18
  * @company Aisino
  */
-public class SignaturePolicy_SignedBy implements IsSignaturePolicy_Type{
+public class SignaturePolicy_SignedBy extends IsSignaturePolicy_Type{
     public int SignedBy;
-    @Override
-    public void isSignaturePolicy_Type() {
 
-    }
 }
