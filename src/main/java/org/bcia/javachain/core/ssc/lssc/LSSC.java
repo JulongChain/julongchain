@@ -181,8 +181,8 @@ public class LSSC  extends SystemSmartContractBase {
                     return newErrorResponse(String.format("Programming error, non-existent appplication config for group '%s'",groupName));
                 }
                 //the maximum number of arguments depends on the capability of the group
-                if((ac.getCapabilities().privateGroupData()==false && size>6) ||
-                        (ac.getCapabilities().privateGroupData()==true && size>7)){
+                if((ac.getCapabilities().isPrivateGroupData()==false && size>6) ||
+                        (ac.getCapabilities().isPrivateGroupData()==true && size>7)){
                     return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
                 }
                 byte[] depSpecBytes2=args.get(2);
@@ -226,7 +226,7 @@ public class LSSC  extends SystemSmartContractBase {
                 byte[] collectionsConfig=null;
                 // we proceed with a non-nil collection configuration only if
                 // we support the PrivateChannelData capability
-                if(ac.getCapabilities().privateGroupData()==true  && size>6){
+                if(ac.getCapabilities().isPrivateGroupData()==true  && size>6){
                     collectionsConfig=args.get(6);
                 }
 

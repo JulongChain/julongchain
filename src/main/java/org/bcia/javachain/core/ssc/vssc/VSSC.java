@@ -220,136 +220,6 @@ public class VSSC extends SystemSmartContractBase {
     }
 
     /**
-     *checkInstantiationPolicy evaluates an instantiation policy against a signed proposal
-     * @param groupID
-     * @param env
-     * @param instantiationPolicy
-     * @param payload
-     * @return
-     */
-    private void checkInstantiationPolicy(String groupID, Common.Envelope env, byte []instantiationPolicy,
-                                             Common.Payload payload)throws SysSmartContractException{
-        IMspManager mspManager = GlobalMspManagement.getManagerForChain(groupID);
-        if(mspManager==null){
-            String msg=String.format("MSP manager for group %s is null, aborting",groupID);
-            throw new SysSmartContractException(msg);
-        }
-        IPolicyProvider policyProvider = CAuthDslBuilder.createPolicyProvider(mspManager);
-        IPolicy policy=null;
-        try {
-            policy= policyProvider.makePolicy(instantiationPolicy);
-        } catch (PolicyException e) {
-            throw new SysSmartContractException(e.getMessage());
-        }
-        log.debug("VSSC info:check instantiationPolicy starts");
-        //get the signature header
-        Common.SignatureHeader signatureHeader =null;
-        try {
-            signatureHeader=Common.SignatureHeader.parseFrom(payload.getHeader().getSignatureHeader());
-        } catch (InvalidProtocolBufferException e) {
-            throw new SysSmartContractException(e.getMessage());
-        }
-        SignedData signedData=new SignedData(env.getPayload().toByteArray(),
-                signatureHeader.getCreator().toByteArray(),
-                env.getSignature().toByteArray());
-        List<SignedData> datas=new ArrayList<SignedData>();
-        datas.add(signedData);
-        try {
-            policy.evaluate(datas);
-        } catch (PolicyException e) {
-            String msg=String.format("instantiation policy violation:%s",e.getMessage());
-            throw new SysSmartContractException(msg);
-        }
-    }
-
-    /**
-     * validateDeployRWSetAndCollection performs validation of the rwset
-     * of an LSSC deploy operation and then it validates any collection
-     * configuration
-     * @param lsscrwset
-     * @param scdRWSet
-     * @param lsscArgs
-     * @param groupID
-     * @param smartcontractName
-     * @return
-     */
-    private void validateDeployRWSetAndCollection(
-            KvRwset.KVRWSet lsscrwset,
-            SmartContractDataPackage.SmartContractData scdRWSet,
-            List<byte[]> lsscArgs,
-            String groupID,
-            String smartcontractName
-            ) throws SysSmartContractException{
-        /********************************************/
-        /* security check 0.a - validation of rwset */
-        /********************************************/
-        // there can only be one or two writes
-        if(lsscrwset.getWritesCount()>2){
-            throw new SysSmartContractException("LSSC can only issue one or two putState upon deploy");
-        }
-        /**********************************************************/
-        /* security check 0.b - validation of the collection data */
-        /**********************************************************/
-        byte[] collectionsConfigArgs=null;
-        if(lsscArgs.size()>5){
-            collectionsConfigArgs=lsscArgs.get(5);
-        }
-        byte[] collectionsConfigLedger=null;
-        if(lsscrwset.getWritesCount()==2){
-            CollectionStoreSupport support=new CollectionStoreSupport();
-            String key=support.buildCollectionKVSKey(smartcontractName);
-            if(lsscrwset.getWrites(1).getKey()!=key){
-                String msg=String.format("invalid key for the collection of smartcontract %s:%s; expected '%s', received '%s'",
-                        scdRWSet.getName(),scdRWSet.getVersion(),key,lsscrwset.getWrites(1).getKey());
-                throw new SysSmartContractException(msg);
-            }
-            collectionsConfigLedger=lsscrwset.getWrites(1).getValue().toByteArray();
-        }
-
-        if(Arrays.equals(collectionsConfigArgs,collectionsConfigLedger)==false){
-            String msg=String.format("collection configuration mismatch for chaincode %s:%s",
-                    scdRWSet.getName(),scdRWSet.getVersion());
-            throw new SysSmartContractException(msg);
-        }
-
-        Collection.CollectionCriteria cc =Collection.CollectionCriteria.newBuilder().
-                            setChannel(groupID).setNamespace(smartcontractName).build();
-        ICollectionConfigPackage ccp =null;
-        try {
-            ccp = collectionStore.retriveCollectionConfigPackage(cc);
-        } catch (JavaChainException e) {
-            String msg=e.getMessage();
-            // fail if we get any error other than NoSuchCollectionError
-            // because it means something went wrong while looking up the
-            // older collection
-            if(!msg.equals("NoSuchCollectionError")){
-                String message=String.format("unable to check whether collection existed earlier for smartcontract %s:%s",
-                        scdRWSet.getName(),scdRWSet.getVersion());
-                throw new SysSmartContractException(message);
-            }
-            e.printStackTrace();
-        }
-        if(ccp!=null){
-            String msg=String.format("collection data should not exist for smartcontract %s:%s",
-                    scdRWSet.getName(),scdRWSet.getVersion());
-            throw new SysSmartContractException(msg);
-        }
-
-        if(collectionsConfigArgs!=null){
-            Collection.CollectionConfigPackage collectionConfigPackage =null;
-            try {
-                collectionConfigPackage=Collection.CollectionConfigPackage.parseFrom(collectionsConfigArgs);
-            } catch (InvalidProtocolBufferException e) {
-                String msg=String.format("invalid collection configuration supplied for smartcontract %s:%s",
-                        scdRWSet.getName(),scdRWSet.getVersion());
-                throw new SysSmartContractException(msg);
-            }
-        }
-
-        // TODO: FAB-6526 - to add validation of the collections object
-    }
-
-    /**
      * 验证对LSSC的调用
      * @param stub
      * @param groupID
@@ -367,7 +237,8 @@ public class VSSC extends SystemSmartContractBase {
             Common.Payload payload,
             IApplicationCapabilities ac
             )throws SysSmartContractException{
-        VSSCSupportForLsscInvocation.validateLSSCInvocation(stub,groupID,envelope,scap,payload,ac,log);
+        VSSCSupportForLsscInvocation.validateLSSCInvocation(stub,groupID,envelope,scap,payload,ac,
+                collectionStore,sscProvider,log);
     }
 
     /**
