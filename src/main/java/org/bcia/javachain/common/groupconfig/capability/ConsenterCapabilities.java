@@ -13,32 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig.config;
-
-import org.bcia.javachain.common.groupconfig.capability.IConsenterCapabilities;
-import org.bcia.javachain.protos.consenter.Configuration;
-
-import java.util.Map;
+package org.bcia.javachain.common.groupconfig.capability;
 
 /**
  * 对象
  *
  * @author zhouhui
- * @date 2018/3/27
+ * @date 2018/5/9
  * @company Dingxuan
  */
-public interface IConsenterConfig {
-    Configuration.ConsensusType getConsensusType();
+public class ConsenterCapabilities implements IConsenterCapabilities {
+    private boolean supported;
+    private boolean predictableChannelTemplate;
+    private boolean resubmission;
+    private boolean expiration;
 
-    Configuration.BatchSize getBatchSize();
+    @Override
+    public boolean isSupported() {
+        return supported;
+    }
 
-    Configuration.BatchTimeout getBatchTimeout();
+    @Override
+    public boolean isPredictableChannelTemplate() {
+        return predictableChannelTemplate;
+    }
 
-    Configuration.KafkaBrokers getKafkaBrokers();
+    @Override
+    public boolean isResubmission() {
+        return resubmission;
+    }
 
-    Configuration.GroupRestrictions getGroupRestrictions();
-
-    IConsenterCapabilities getCapabilities();
-
-    Map<String, IOrganizationConfig> getOrganizationConfigMap();
+    @Override
+    public boolean isExpiration() {
+        return expiration;
+    }
 }

@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
 import org.bcia.javachain.common.groupconfig.MSPConfigHandler;
+import org.bcia.javachain.common.groupconfig.capability.IConsenterCapabilities;
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.consenter.Configuration;
 
@@ -123,8 +124,8 @@ public class ConsenterConfig implements IConsenterConfig {
     }
 
     @Override
-    public org.bcia.javachain.protos.common.Configuration.Capabilities getCapabilities() {
-        return capabilities;
+    public IConsenterCapabilities getCapabilities() {
+        return null;
     }
 
     @Override
@@ -159,18 +160,18 @@ public class ConsenterConfig implements IConsenterConfig {
     }
 
     private void validateKafkaBrokers() throws ValidateException {
-        for(String broker : kafkaBrokers.getBrokersList()){
+        for (String broker : kafkaBrokers.getBrokersList()) {
             validateKafkaBroker(broker);
         }
     }
 
-    private void validateKafkaBroker(String broker) throws ValidateException{
-        if(StringUtils.isBlank(broker)){
+    private void validateKafkaBroker(String broker) throws ValidateException {
+        if (StringUtils.isBlank(broker)) {
             throw new ValidateException("broker is null");
         }
 
         String[] hostAndPort = broker.split(":");
-        if(hostAndPort.length != 2){
+        if (hostAndPort.length != 2) {
             throw new ValidateException("Wrong hostAndPort");
         }
 
@@ -182,7 +183,7 @@ public class ConsenterConfig implements IConsenterConfig {
             throw new ValidateException("Wrong port");
         }
 
-        if(!Pattern.matches("^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9.-]*[a-zA-Z0-9])$", host)){
+        if (!Pattern.matches("^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9.-]*[a-zA-Z0-9])$", host)) {
             throw new ValidateException("Wrong host");
         }
     }
