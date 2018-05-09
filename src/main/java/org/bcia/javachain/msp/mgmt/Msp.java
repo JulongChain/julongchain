@@ -33,13 +33,14 @@ import org.bcia.javachain.msp.signer.Signer;
 import org.bcia.javachain.protos.common.MspPrincipal;
 import org.bcia.javachain.protos.msp.Identities;
 import org.bcia.javachain.protos.msp.MspConfigPackage;
+import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.CertificateList;
+import org.bouncycastle.util.io.pem.PemReader;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -112,7 +113,7 @@ public class Msp implements IMsp {
         try {
             MspConfigPackage.FabricMSPConfig fabricMSPConfig = MspConfigPackage.FabricMSPConfig.parseFrom(config.getConfig());
             this.name = fabricMSPConfig.getName();
-          return   internalSetupFunc(fabricMSPConfig);
+            return internalSetupFunc(fabricMSPConfig);
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
         }
@@ -146,9 +147,9 @@ public class Msp implements IMsp {
         if (defaultCspValue.equalsIgnoreCase("gm")) {
 
 
-           // return new SigningIdentity(mspConfig);
+            // return new SigningIdentity(mspConfig);
 
-            return  this.signer;
+            return this.signer;
 
         } else if (defaultCspValue.equalsIgnoreCase("gmt0016")) {
             return null;
@@ -177,14 +178,15 @@ public class Msp implements IMsp {
     }
 
     @Override
-    public IIdentity deserializeIdentity(byte[] serializedIdentity)  {
+    public IIdentity deserializeIdentity(byte[] serializedIdentity) {
 
         try {
-           Identities.SerializedIdentity sId=Identities.SerializedIdentity.parseFrom(serializedIdentity);
-            CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-            InputStream inputStream = new ByteArrayInputStream( sId.getIdBytes().toByteArray());
-            java.security.cert.Certificate certificate = certificateFactory.generateCertificate(inputStream);
-            SM2KeyExport certPubK=new SM2KeyExport();
+            Identities.SerializedIdentity sId = Identities.SerializedIdentity.parseFrom(serializedIdentity);
+
+            // Certificate.getInstance(new PemReader(new InputStreamReader(new ByteArrayInputStream(idBytes))).readPemObject().content);
+            Certificate certificate = Certificate.getInstance(new PemReader(new InputStreamReader(new ByteArrayInputStream(sId.getIdBytes().toByteArray()))).readPemObject().getContent());
+
+            SM2KeyExport certPubK = new SM2KeyExport();
             IIdentity identity = new Identity(certificate, certPubK.getPublicKey(), this);
             return identity;
         } catch (Exception e) {
@@ -201,9 +203,9 @@ public class Msp implements IMsp {
     }
 
 
-    IIdentity deserializeIdentityInternal(byte[] serializedIdentity){
+    IIdentity deserializeIdentityInternal(byte[] serializedIdentity) {
 
-    return null;
+        return null;
     }
 
     public Msp internalSetupFunc(MspConfigPackage.FabricMSPConfig mspConfig) {
@@ -302,11 +304,12 @@ public class Msp implements IMsp {
 
     public HashMap<String, Object> getIdentityFromConf(byte[] idBytes) throws JavaChainException {
         HashMap<String, Object> map = new HashMap<String, Object>();
-        java.security.cert.Certificate certificate = getCertFromPem(idBytes);
-        certificate.getPublicKey();
+        Certificate certificate = getCertFromPem(idBytes);
+
+        // certificate.getPublicKey();
 
 //        IKey certPubK = (SM2Key) this.csp.keyImport(certificate, new GmKeyImportOpts());
-        SM2KeyExport certPubK=new SM2KeyExport();
+        SM2KeyExport certPubK = new SM2KeyExport();
         map.put("publickey", certPubK);
 
         Identity identity = new Identity(certificate, certPubK.getPublicKey(), this);
@@ -314,15 +317,15 @@ public class Msp implements IMsp {
         return map;
     }
 
-    public java.security.cert.Certificate getCertFromPem(byte[] idBytes) {
+    public Certificate getCertFromPem(byte[] idBytes) {
+
         try {
-            CertificateFactory certificateFactory = CertificateFactory.getInstance("X.509");
-            InputStream inputStream = new ByteArrayInputStream(idBytes);
-            java.security.cert.Certificate certificate = certificateFactory.generateCertificate(inputStream);
+            Certificate certificate = Certificate.getInstance(new PemReader(new InputStreamReader(new ByteArrayInputStream(idBytes))).readPemObject().getContent());
             return certificate;
-        } catch (CertificateException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
+
         return null;
     }
 
