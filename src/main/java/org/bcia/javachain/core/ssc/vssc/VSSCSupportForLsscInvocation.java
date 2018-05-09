@@ -110,8 +110,8 @@ public class VSSCSupportForLsscInvocation {
                     String msg=String.format("Wrong number of arguments for invocation lssc(%s): expected at least 2, received %d",lsscFunc,size);
                     throw new SysSmartContractException(msg);
                 }
-                if((ac.privateGroupData()==false && size>5  ||
-                        (ac.privateGroupData()==true) && size>6 )){
+                if((ac.isPrivateGroupData()==false && size>5  ||
+                        (ac.isPrivateGroupData()==true) && size>6 )){
                     String msg=String.format("Wrong number of arguments for invocation lssc(%s): expected at least 2, received %d",lsscFunc,size);
                     throw new SysSmartContractException(msg);
                 }
@@ -226,7 +226,7 @@ public class VSSCSupportForLsscInvocation {
                         /****************************************************************************/
                         /* security check 0.a - validation of rwset (and of collections if enabled) */
                         /****************************************************************************/
-                        if(ac.privateGroupData()){
+                        if(ac.isPrivateGroupData()){
                             //do extra validation for collections
                             validateDeployRWSetAndCollection(lsscRwSet,cdRwSet,argsListWithoutFunction,groupID,
                                     scds.getSmartContractSpec().getSmartContractId().getName(),collectionStore);
@@ -305,7 +305,7 @@ public class VSSCSupportForLsscInvocation {
                         /******************************************************************/
                         /* security check 4 - check the instantiation policy in the rwset */
                         /******************************************************************/
-                        if(ac.v1_1Validation()){
+                        if(ac.isValidation()){
                             ByteString polNew = cdRwSet.getInstantiationPolicy();
                             if(polNew==null){
                                 throw new SysSmartContractException("No instantiation policy was specified");
