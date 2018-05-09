@@ -22,6 +22,6 @@ package org.bcia.javachain.common.policycheck.common;
  * @date 26/04/18
  * @company Aisino
  */
-public interface IsSignaturePolicy_Type {
-    void isSignaturePolicy_Type();
+public abstract class IsSignaturePolicy_Type {
+    void isSignaturePolicy_Type(){}
 }
