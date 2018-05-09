@@ -22,11 +22,14 @@ import org.bcia.javachain.common.policies.SignaturePolicy;
 import org.bcia.javachain.common.policycheck.SignaturePolicy_NOutOf;
 import org.bcia.javachain.common.policycheck.SignaturePolicy_SignedBy;
 import org.bcia.javachain.common.policycheck.bean.MSPPrincipal;
+import org.bcia.javachain.common.policycheck.common.IsSignaturePolicy_Type;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.mgmt.Msp;
 import org.bcia.javachain.msp.mgmt.MspManager;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -60,23 +63,38 @@ public class Cauthdsl {
      * @param policy
      * @return
      */
-    public static boolean compile(SignaturePolicy policy, MSPPrincipal identities, Msp msp){
+    public static boolean compile(IsSignaturePolicy_Type policy, MSPPrincipal identities, Msp msp) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     List<SignedData> signedDatas = new ArrayList<SignedData>();
 
     if(policy==null){
         log.info("Empty policy element");
     }
-    if(policy.isSignaturePolicy_type instanceof SignaturePolicy_NOutOf){
+    if(policy instanceof SignaturePolicy_NOutOf){
+
+        List<Boolean> policies = new ArrayList<Boolean>();
+        Method rules = policy.getClass().getMethod("getRules");
+        List<IsSignaturePolicy_Type> policys = (List<IsSignaturePolicy_Type>) rules.invoke(policy);
+        for (int i =0;i<policys.size();i++){
+            boolean compiledPolicy = compile(policys.get(i),identities,msp);
+            policies.add(compiledPolicy);
+        }
+        return Cauthdsl.confirmSignedData(signedDatas,policies);
 
     }
-    if(policy.isSignaturePolicy_type instanceof SignaturePolicy_SignedBy){
+    if(policy instanceof SignaturePolicy_SignedBy){
 
     }
         //TODO 待完善
         return false;
     }
 
-    public boolean confirmSignedData(List<SignedData> signedDatas,List<Boolean> bool){
+    /**
+     * 参照fabric里compile里的返回函数
+     * @param signedDatas
+     * @param bool
+     * @return
+     */
+    public static boolean confirmSignedData(List<SignedData> signedDatas,List<Boolean> bool){
         Long grepkey = new Date().getTime();
         return false;
     }
