@@ -18,6 +18,8 @@ package org.bcia.javachain.common.policycheck;
 
 import org.bcia.javachain.common.policycheck.common.IsSignaturePolicy_Type;
 
+import java.util.List;
+
 /**
  * 类描述
  *
@@ -25,12 +27,25 @@ import org.bcia.javachain.common.policycheck.common.IsSignaturePolicy_Type;
  * @date 28/04/18
  * @company Aisino
  */
-public class SignaturePolicy_NOutOf implements IsSignaturePolicy_Type{
-    public static final String N = "protobuf:'varint,1,opt,name=n' json:'n,omitempty'";
-    public static final String Rule = "protobuf:'bytes,2,rep,name=rules' json:'rules,omitempty'";
+public class SignaturePolicy_NOutOf extends IsSignaturePolicy_Type {
+    //public static final String N = "protobuf:'varint,1,opt,name=n' json:'n,omitempty'";
+    //public static final String Rule = "protobuf:'bytes,2,rep,name=rules' json:'rules,omitempty'";
+    private int N;
+    private List<IsSignaturePolicy_Type> Rules;
 
-    @Override
-    public void isSignaturePolicy_Type() {
+    public int getN() {
+        return N;
+    }
 
+    public void setN(int n) {
+        N = n;
+    }
+
+    public List<IsSignaturePolicy_Type> getRules() {
+        return Rules;
+    }
+
+    public void setRules(List<IsSignaturePolicy_Type> rules) {
+        Rules = rules;
     }
 }
