@@ -16,7 +16,7 @@
 package org.bcia.javachain.common.groupconfig.capability;
 
 /**
- * 对象
+ * 群组支持能力对象
  *
  * @author zhouhui
  * @date 2018/4/18

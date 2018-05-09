@@ -16,7 +16,7 @@
 package org.bcia.javachain.common.groupconfig.capability;
 
 /**
- * 对象
+ * 共识节点支持能力接口
  *
  * @author zhouhui
  * @date 2018/3/27
