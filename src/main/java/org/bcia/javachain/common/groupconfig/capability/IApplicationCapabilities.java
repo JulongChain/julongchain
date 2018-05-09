@@ -15,8 +15,6 @@
  */
 package org.bcia.javachain.common.groupconfig.capability;
 
-import org.bcia.javachain.common.exception.ValidateException;
-
 /**
  * 应用支持能力接口
  *
