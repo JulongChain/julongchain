@@ -16,15 +16,18 @@
 package org.bcia.javachain.common.groupconfig.capability;
 
 /**
- * 群组支持能力对象
+ * 应用支持能力对象
  *
  * @author zhouhui
- * @date 2018/4/18
+ * @date 2018/5/9
  * @company Dingxuan
  */
-public class GroupCapabilities implements IGroupCapabilities {
+public class ApplicationCapabilities implements IApplicationCapabilities {
     private boolean supported;
-    private int mspVersion;
+    private boolean forbidDuplicateTxId;
+    private boolean resourcesTree;
+    private boolean privateGroupData;
+    private boolean validation;
 
     @Override
     public boolean isSupported() {
@@ -32,7 +35,22 @@ public class GroupCapabilities implements IGroupCapabilities {
     }
 
     @Override
-    public int getMspVersion() {
-        return mspVersion;
+    public boolean isForbidDuplicateTxId() {
+        return forbidDuplicateTxId;
+    }
+
+    @Override
+    public boolean isResourcesTree() {
+        return resourcesTree;
+    }
+
+    @Override
+    public boolean isPrivateGroupData() {
+        return privateGroupData;
+    }
+
+    @Override
+    public boolean isValidation() {
+        return validation;
     }
 }

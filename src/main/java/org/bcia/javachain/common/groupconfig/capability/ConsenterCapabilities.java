@@ -16,20 +16,35 @@
 package org.bcia.javachain.common.groupconfig.capability;
 
 /**
- * 应用支持能力接口
+ * 共识支持能力对象
  *
  * @author zhouhui
- * @date 2018/3/27
+ * @date 2018/5/9
  * @company Dingxuan
  */
-public interface IApplicationCapabilities {
-    boolean isSupported();
+public class ConsenterCapabilities implements IConsenterCapabilities {
+    private boolean supported;
+    private boolean predictableChannelTemplate;
+    private boolean resubmission;
+    private boolean expiration;
 
-    boolean isForbidDuplicateTxId();
+    @Override
+    public boolean isSupported() {
+        return supported;
+    }
 
-    boolean isResourcesTree();
+    @Override
+    public boolean isPredictableChannelTemplate() {
+        return predictableChannelTemplate;
+    }
 
-    boolean isPrivateGroupData();
+    @Override
+    public boolean isResubmission() {
+        return resubmission;
+    }
 
-    boolean isValidation();
+    @Override
+    public boolean isExpiration() {
+        return expiration;
+    }
 }
