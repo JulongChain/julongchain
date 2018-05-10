@@ -16,13 +16,34 @@
 package org.bcia.javachain.common.groupconfig.config;
 
 /**
- * 对象
+ * 群组配置接口
  *
  * @author zhouhui
  * @date 2018/3/27
  * @company Dingxuan
  */
 public interface IGroupConfig {
+    /**
+     * 获取应用配置对象
+     *
+     * @return
+     */
+    IApplicationConfig getApplicationConfig();
+
+    /**
+     * 获取共识节点配置对象
+     *
+     * @return
+     */
+    IConsenterConfig getConsenterConfig();
+
+    /**
+     * 获取联盟配置对象
+     *
+     * @return
+     */
+    IConsortiumsConfig getConsortiumsConfig();
+
     interface HashingAlgorithm {
         byte[] hash(byte[] bytes);
     }

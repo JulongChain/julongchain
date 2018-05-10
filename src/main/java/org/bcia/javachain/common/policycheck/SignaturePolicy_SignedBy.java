@@ -1,5 +1,5 @@
 /**
- * Copyright Dingxuan. All Rights Reserved.
+ * Copyright Aisino. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig.capability;
+
+package org.bcia.javachain.common.policycheck;
+
+import org.bcia.javachain.common.policycheck.common.IsSignaturePolicy_Type;
 
 /**
- * 应用支持能力接口
+ * 类描述
  *
- * @author zhouhui
- * @date 2018/3/27
- * @company Dingxuan
+ * @author yuanjun
+ * @date 09/05/18
+ * @company Aisino
  */
-public interface IApplicationCapabilities {
-    boolean isSupported();
+public class SignaturePolicy_SignedBy extends IsSignaturePolicy_Type{
+    public int SignedBy;
 
-    boolean isForbidDuplicateTxId();
-
-    boolean isResourcesTree();
-
-    boolean isPrivateGroupData();
-
-    boolean isValidation();
 }

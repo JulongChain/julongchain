@@ -1,5 +1,5 @@
 /**
- * Copyright Dingxuan. All Rights Reserved.
+ * Copyright Aisino. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig.capability;
+
+package org.bcia.javachain.common.policycheck.bean;
+
+import org.bcia.javachain.common.policies.SignaturePolicy;
+import org.bcia.javachain.msp.IIdentity;
 
 /**
- * 群组支持能力对象
+ * 类描述
  *
- * @author zhouhui
- * @date 2018/4/18
- * @company Dingxuan
+ * @author yuanjun
+ * @date 02/05/18
+ * @company Aisino
  */
-public class GroupCapabilities implements IGroupCapabilities {
-    private boolean supported;
-    private int mspVersion;
+public class SignaturePolicyEnvelope {
+    public int version;
+    public SignaturePolicy rule;
+    public MSPPrincipal iIdentity;
 
-    @Override
-    public boolean isSupported() {
-        return supported;
+
+    public SignaturePolicy getRule() {
+        return rule;
+
     }
 
-    @Override
-    public int getMspVersion() {
-        return mspVersion;
+    public int getVersion() {
+        return version;
+
+    }
+
+    public MSPPrincipal getiIdentity() {
+        return iIdentity;
     }
 }

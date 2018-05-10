@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.common.groupconfig.config;
 
+import org.bcia.javachain.common.groupconfig.capability.IConsenterCapabilities;
 import org.bcia.javachain.protos.consenter.Configuration;
 
 import java.util.Map;
@@ -37,7 +38,7 @@ public interface IConsenterConfig {
 
     Configuration.GroupRestrictions getGroupRestrictions();
 
-    org.bcia.javachain.protos.common.Configuration.Capabilities getCapabilities();
+    IConsenterCapabilities getCapabilities();
 
     Map<String, IOrganizationConfig> getOrganizationConfigMap();
 }
