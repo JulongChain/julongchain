@@ -18,15 +18,19 @@ package org.bcia.javachain.common.policycheck.cauthdsl;
 
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.policies.SignaturePolicy;
+import org.bcia.javachain.common.policycheck.SignaturePolicy_NOutOf;
+import org.bcia.javachain.common.policycheck.SignaturePolicy_SignedBy;
+import org.bcia.javachain.common.policycheck.bean.MSPPrincipal;
+import org.bcia.javachain.common.policycheck.common.IsSignaturePolicy_Type;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.mgmt.Msp;
 import org.bcia.javachain.msp.mgmt.MspManager;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
 
 /**
  * 类描述
@@ -37,7 +41,7 @@ import java.util.Map;
  */
 public class Cauthdsl {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Cauthdsl.class);
-
+    private int MSPPrincipal_Classification;
 
     /**
      * 删除重复身份，保留身份顺序
@@ -50,16 +54,48 @@ public class Cauthdsl {
         for (SignedData signedData : signedDatas) {
             return null;
         }
+        //TODO 待完善
         return null;
     }
 
     /**
      * 评估函数方法
-     * @param signedDatas
+     * @param policy
      * @return
      */
-    public static boolean compile(List<SignedData> signedDatas,MspManager mspManager,Msp msp){
+    public static boolean compile(IsSignaturePolicy_Type policy, MSPPrincipal identities, Msp msp) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    List<SignedData> signedDatas = new ArrayList<SignedData>();
 
+    if(policy==null){
+        log.info("Empty policy element");
+    }
+    if(policy instanceof SignaturePolicy_NOutOf){
+
+        List<Boolean> policies = new ArrayList<Boolean>();
+        Method rules = policy.getClass().getMethod("getRules");
+        List<IsSignaturePolicy_Type> policys = (List<IsSignaturePolicy_Type>) rules.invoke(policy);
+        for (int i =0;i<policys.size();i++){
+            boolean compiledPolicy = compile(policys.get(i),identities,msp);
+            policies.add(compiledPolicy);
+        }
+        return Cauthdsl.confirmSignedData(signedDatas,policies);
+
+    }
+    if(policy instanceof SignaturePolicy_SignedBy){
+
+    }
+        //TODO 待完善
+        return false;
+    }
+
+    /**
+     * 参照fabric里compile里的返回函数
+     * @param signedDatas
+     * @param bool
+     * @return
+     */
+    public static boolean confirmSignedData(List<SignedData> signedDatas,List<Boolean> bool){
+        Long grepkey = new Date().getTime();
         return false;
     }
 
