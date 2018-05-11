@@ -15,7 +15,7 @@
  */
 package org.bcia.javachain.node.entity;
 
-import org.bcia.javachain.core.commiter.ICommiterServer;
+import org.bcia.javachain.core.commiter.ICommitter;
 import org.bcia.javachain.core.node.GroupSupport;
 import org.bcia.javachain.protos.common.Common;
 
@@ -29,18 +29,29 @@ import org.bcia.javachain.protos.common.Common;
 public class Group {
     private GroupSupport groupSupport;
     private Common.Block block;
-    private ICommiterServer commiter;
-
+    private ICommitter commiter;
 
     public GroupSupport getGroupSupport() {
         return groupSupport;
+    }
+
+    public void setGroupSupport(GroupSupport groupSupport) {
+        this.groupSupport = groupSupport;
     }
 
     public Common.Block getBlock() {
         return block;
     }
 
-    public ICommiterServer getCommiter() {
+    public void setBlock(Common.Block block) {
+        this.block = block;
+    }
+
+    public ICommitter getCommiter() {
         return commiter;
+    }
+
+    public void setCommiter(ICommitter commiter) {
+        this.commiter = commiter;
     }
 }

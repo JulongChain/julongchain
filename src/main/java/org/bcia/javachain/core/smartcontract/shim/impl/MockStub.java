@@ -27,6 +27,7 @@ import org.bcia.javachain.core.smartcontract.shim.ledger.IKeyModification;
 import org.bcia.javachain.core.smartcontract.shim.ledger.IKeyValue;
 import org.bcia.javachain.core.smartcontract.shim.ledger.IQueryResultsIterator;
 import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.SmartContractDataPackage;
 import org.bcia.javachain.protos.node.SmartContractEventPackage;
 
 import java.time.Instant;
@@ -100,7 +101,11 @@ public class MockStub implements ISmartContractStub {
 
     @Override
     public byte[] getState(String key) {
-        return new byte[0];
+        //TODO implement by sunzongyu, support for lssc. date: 2018-05-10
+        SmartContractDataPackage.SmartContractData data = SmartContractDataPackage.SmartContractData.newBuilder()
+                .setName(key)
+                .build();
+        return data.toByteArray();
     }
 
     @Override

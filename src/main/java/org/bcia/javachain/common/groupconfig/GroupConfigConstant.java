@@ -51,6 +51,8 @@ public class GroupConfigConstant {
     public static final String CONSENTER_ADDRESSES = "ConsenterAddresses";
 
     public static final String CONSENSUS_TYPE = "ConsensusType";
+    public static final String CONSENSUS_TYPE_SINGLETON = "singleton";
+    public static final String CONSENSUS_TYPE_KAFKA = "kafka";
 
     public static final String BATCH_SIZE = "BatchSize";
 
@@ -75,4 +77,8 @@ public class GroupConfigConstant {
 
     public static final String CONSENTER_ADMINS_POLICY_NAME = "/Group/Consenter/Admins";
     public static final String DEFAULT_HASHING_ALGORITHM_NAME = "SM3";
+
+    public static final String BLOCK_VALIDATION_POLICY = "BlockValidation";
+
+
 }

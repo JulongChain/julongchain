@@ -30,6 +30,7 @@ import org.bcia.javachain.protos.node.Configuration;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import static org.bcia.javachain.tools.configtxgen.entity.GenesisConfig.DEFAULT_ADMIN_PRINCIPAL;
@@ -143,27 +144,108 @@ public class ConfigTreeHelper {
         IConfigValue consenterAddressesValue = new ConsenterAddressesValue(profile.getConsenter().getAddresses());
         addValue(groupTreeBuilder, consenterAddressesValue, GroupConfigConstant.CONSENTER_ADMINS_POLICY_NAME);
 
-        if(profile.getConsortium() != null){
-
+        if (profile.getConsortium() != null) {
+            addValue(groupTreeBuilder, new ConsortiumValue(profile.getConsortium()), GroupConfigConstant.POLICY_ADMINS);
         }
 
-//        //填充能力集
-//        if (application.getCapabilities() != null && !application.getCapabilities().isEmpty()) {
-//            IConfigValue configValue = new CapabilitiesValue(application.getCapabilities());
-//            addValue(applicationTreeBuilder, configValue.getKey(), configValue.getValue(), GroupConfigConstant.POLICY_ADMINS);
-//        }
-//
-//        //填充子树信息
-//        if (application.getOrganizations() != null && application.getOrganizations().length > 0) {
-//            for (GenesisConfig.Organization org : application.getOrganizations()) {
-//                applicationTreeBuilder.putChilds(org.getName(), buildOrgTree(org));
-//            }
-//        }
-//
-//        //填充更改策略人
-//        applicationTreeBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
-//
+        if (profile.getCapabilities() != null && profile.getCapabilities().size() > 0) {
+            addValue(groupTreeBuilder, new CapabilitiesValue(profile.getCapabilities()), GroupConfigConstant.POLICY_ADMINS);
+        }
+
+        groupTreeBuilder.putChilds(GroupConfigConstant.CONSENTER, buildConsenterTree(profile.getConsenter()));
+
+        if (profile.getApplication() != null) {
+            groupTreeBuilder.putChilds(GroupConfigConstant.APPLICATION, buildApplicationTree(profile.getApplication()));
+        }
+
+        if (profile.getConsortiums() != null) {
+            groupTreeBuilder.putChilds(GroupConfigConstant.CONSORTIUMS, buildConsortiumsTree(profile.getConsortiums()));
+        }
+
+        //填充更改策略人
+        groupTreeBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
+
         return groupTreeBuilder.build();
+    }
+
+    /**
+     * 构造共识节点级别的子树
+     *
+     * @param consenter
+     * @return
+     */
+    public static Configtx.ConfigTree buildConsenterTree(GenesisConfig.Consenter consenter) {
+        //构建最终的应用ConfigTree
+        Configtx.ConfigTree.Builder consenterTreeBuilder = Configtx.ConfigTree.newBuilder();
+
+        //填充默认的权限体系
+        Map<String, Configtx.ConfigPolicy> defaultPolicies = getDefaultImplicitMetaPolicy();
+        consenterTreeBuilder.putAllPolicies(defaultPolicies);
+
+        IConfigPolicy implicitMetaAnyPolicy = new ImplicitMetaAnyPolicy(GroupConfigConstant.POLICY_WRITERS);
+        addPolicy(consenterTreeBuilder, GroupConfigConstant.BLOCK_VALIDATION_POLICY, implicitMetaAnyPolicy.getValue(),
+                GroupConfigConstant.POLICY_ADMINS);
+
+        addValue(consenterTreeBuilder, new ConsensusTypeValue(consenter.getConsenterType()), GroupConfigConstant
+                .POLICY_ADMINS);
+
+        IConfigValue batchSizeValue = new BatchSizeValue(consenter.getBatchSize().getMaxMessageCount(), consenter
+                .getBatchSize().getAbsoluteMaxBytes(), consenter.getBatchSize().getPreferredMaxBytes());
+        addValue(consenterTreeBuilder, batchSizeValue, GroupConfigConstant.POLICY_ADMINS);
+
+        IConfigValue batchTimeoutValue = new BatchTimeoutValue(String.valueOf(consenter.getBatchTimeout()));
+        addValue(consenterTreeBuilder, batchTimeoutValue, GroupConfigConstant.POLICY_ADMINS);
+
+        IConfigValue groupRestrictionsValue = new GroupRestrictionsValue(consenter.getMaxGroups());
+        addValue(consenterTreeBuilder, groupRestrictionsValue, GroupConfigConstant.POLICY_ADMINS);
+
+        if (consenter.getCapabilities() != null && consenter.getCapabilities().size() > 0) {
+            IConfigValue capabilitiesValue = new CapabilitiesValue(consenter.getCapabilities());
+            addValue(consenterTreeBuilder, capabilitiesValue, GroupConfigConstant.POLICY_ADMINS);
+        }
+
+        if (GroupConfigConstant.CONSENSUS_TYPE_SINGLETON.equals(consenter.getConsenterType()) || GroupConfigConstant
+                .CONSENSUS_TYPE_KAFKA.equals(consenter.getConsenterType())) {
+            IConfigValue kafkaBrokersValue = new KafkaBrokersValue(consenter.getKafka().getBrokers());
+            addValue(consenterTreeBuilder, kafkaBrokersValue, GroupConfigConstant.POLICY_ADMINS);
+        }
+
+        //填充子树信息
+        if (consenter.getOrganizations() != null && consenter.getOrganizations().length > 0) {
+            for (GenesisConfig.Organization org : consenter.getOrganizations()) {
+                consenterTreeBuilder.putChilds(org.getName(), buildConsenterOrgTree(org));
+            }
+        }
+
+        //填充更改策略人
+        consenterTreeBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
+
+        return consenterTreeBuilder.build();
+    }
+
+    /**
+     * 构造共识组织级别的子树
+     *
+     * @param org
+     * @return
+     */
+    public static Configtx.ConfigTree buildConsenterOrgTree(GenesisConfig.Organization org) {
+        //构建最终的应用ConfigTree
+        Configtx.ConfigTree.Builder orgTreeBuilder = Configtx.ConfigTree.newBuilder();
+
+        //填充签名策略
+        addSignaturePolicyDefaults(orgTreeBuilder, org.getId(), !DEFAULT_ADMIN_PRINCIPAL.equals(org
+                .getAdminPrincipal()));
+
+        //填充MSP信息
+        MspConfigPackage.MSPConfig mspConfig = MspConfigHelper.buildMspConfig(org.getMspDir(), org.getId());
+        IConfigValue mspValue = new MspValue(mspConfig);
+        addValue(orgTreeBuilder, mspValue.getKey(), mspValue.getValue(), GroupConfigConstant.POLICY_ADMINS);
+
+        //填充更改策略人
+        orgTreeBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
+
+        return orgTreeBuilder.build();
     }
 
     /**
@@ -200,7 +282,7 @@ public class ConfigTreeHelper {
     }
 
     /**
-     * 构造组织级别的子树
+     * 构造应用组织级别的子树
      *
      * @param org
      * @return
@@ -263,5 +345,64 @@ public class ConfigTreeHelper {
 
         IConfigPolicy writerPolicy = new SignaturePolicy(GroupConfigConstant.POLICY_WRITERS, MockCauthdsl.signedByMspMember(mspId));
         addPolicy(configTreeBuilder, writerPolicy.getKey(), writerPolicy.getValue(), GroupConfigConstant.POLICY_ADMINS);
+    }
+
+    /**
+     * 构造多联盟级别的子树
+     *
+     * @param consortiumMap
+     * @return
+     */
+    public static Configtx.ConfigTree buildConsortiumsTree(Map<String, GenesisConfig.Consortium> consortiumMap) {
+        //构建最终的应用ConfigTree
+        Configtx.ConfigTree.Builder consortiumsTreeBuilder = Configtx.ConfigTree.newBuilder();
+
+        //TODO:要换成Cauthdsl里面的命令
+        SignaturePolicy signaturePolicy = new SignaturePolicy(GroupConfigConstant.POLICY_ADMINS, MockCauthdsl
+                .signedByMspAdmin("Default"));
+        addPolicy(consortiumsTreeBuilder, GroupConfigConstant.POLICY_ADMINS, signaturePolicy.getValue(), GroupConfigConstant
+                .CONSENTER_ADMINS_POLICY_NAME);
+
+        //填充子树信息
+        if (consortiumMap != null && consortiumMap.size() > 0) {
+            Iterator<Map.Entry<String, GenesisConfig.Consortium>> iterator = consortiumMap.entrySet().iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<String, GenesisConfig.Consortium> entry = iterator.next();
+                String consortiumName = entry.getKey();
+                consortiumsTreeBuilder.putChilds(consortiumName, buildConsortiumTree(entry.getValue()));
+            }
+        }
+
+        //填充更改策略人
+        consortiumsTreeBuilder.setModPolicy(GroupConfigConstant.CONSENTER_ADMINS_POLICY_NAME);
+
+        return consortiumsTreeBuilder.build();
+    }
+
+    /**
+     * 构造联盟级别的子树
+     *
+     * @param consortium
+     * @return
+     */
+    public static Configtx.ConfigTree buildConsortiumTree(GenesisConfig.Consortium consortium) {
+        //构建最终的应用ConfigTree
+        Configtx.ConfigTree.Builder consortiumTreeBuilder = Configtx.ConfigTree.newBuilder();
+
+        Policies.Policy implicitMetaAnyPolicy = new ImplicitMetaAnyPolicy(GroupConfigConstant.POLICY_ADMINS).getValue();
+        IConfigValue groupCreationPolicyValue = new GroupCreationPolicyValue(implicitMetaAnyPolicy);
+        addValue(consortiumTreeBuilder, groupCreationPolicyValue, GroupConfigConstant.CONSENTER_ADMINS_POLICY_NAME);
+
+        //填充子树信息
+        if (consortium.getOrganizations() != null && consortium.getOrganizations().length > 0) {
+            for (GenesisConfig.Organization org : consortium.getOrganizations()) {
+                consortiumTreeBuilder.putChilds(org.getName(), buildConsenterOrgTree(org));
+            }
+        }
+
+        //填充更改策略人
+        consortiumTreeBuilder.setModPolicy(GroupConfigConstant.CONSENTER_ADMINS_POLICY_NAME);
+
+        return consortiumTreeBuilder.build();
     }
 }

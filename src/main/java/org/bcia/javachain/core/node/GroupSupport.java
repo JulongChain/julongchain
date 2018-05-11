@@ -18,6 +18,7 @@ package org.bcia.javachain.core.node;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
+import org.bcia.javachain.common.ledger.blockledger.file.FileLedger;
 import org.bcia.javachain.common.resourceconfig.IResourcesConfigBundle;
 import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.protos.common.Configtx;
@@ -34,25 +35,57 @@ public class GroupSupport {
     private IGroupConfigBundle groupConfigBundle;
     private IApplicationConfig applicationConfig;
     private INodeLedger nodeLedger;
+    private FileLedger fileLedger;
 
-    //TODO:需要加入
-    //private FileLedger fileLedger;
+    public void apply(Configtx.ConfigEnvelope configEnvelope) throws NodeException {
 
-    public void apply(Configtx.ConfigEnvelope configEnvelope) throws NodeException{
+    }
 
+    public String[] getMspIds() {
+        return null;
+    }
+
+    public long sequence() {
+        return 0;
+    }
+
+    public IResourcesConfigBundle getResourcesConfigBundle() {
+        return resourcesConfigBundle;
+    }
+
+    public void setResourcesConfigBundle(IResourcesConfigBundle resourcesConfigBundle) {
+        this.resourcesConfigBundle = resourcesConfigBundle;
+    }
+
+    public IGroupConfigBundle getGroupConfigBundle() {
+        return groupConfigBundle;
+    }
+
+    public void setGroupConfigBundle(IGroupConfigBundle groupConfigBundle) {
+        this.groupConfigBundle = groupConfigBundle;
+    }
+
+    public IApplicationConfig getApplicationConfig() {
+        return applicationConfig;
+    }
+
+    public void setApplicationConfig(IApplicationConfig applicationConfig) {
+        this.applicationConfig = applicationConfig;
     }
 
     public INodeLedger getNodeLedger() {
         return nodeLedger;
     }
 
-    public String[] getMspIds(){
-        return null;
+    public void setNodeLedger(INodeLedger nodeLedger) {
+        this.nodeLedger = nodeLedger;
     }
 
-    public long sequence(){
-        return 0;
+    public FileLedger getFileLedger() {
+        return fileLedger;
     }
 
-
+    public void setFileLedger(FileLedger fileLedger) {
+        this.fileLedger = fileLedger;
+    }
 }

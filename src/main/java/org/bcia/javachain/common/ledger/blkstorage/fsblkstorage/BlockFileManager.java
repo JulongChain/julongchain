@@ -183,7 +183,8 @@ public class BlockFileManager {
         if(block.getHeader().getNumber() != getBlockchainInfo().getHeight()){
             throw new LedgerException(String.format("Block number should have been %d but was %d", getBlockchainInfo().getHeight(), block.getHeader().getNumber()));
         }
-        Map.Entry<SerializedBlockInfo, byte[]> entry = BlockSerialization.serializeBlock(block);
+        //本次提交区块位置应为之前提交区块位置后8位
+        Map.Entry<SerializedBlockInfo, byte[]> entry = BlockSerialization.serializeBlock(block, cpInfo.getLatestFileChunksize() + 8);
         SerializedBlockInfo info = entry.getKey();
         byte[] blockBytes = entry.getValue();
 
@@ -224,9 +225,9 @@ public class BlockFileManager {
         FileLocPointer blockFLP = new FileLocPointer();
         blockFLP.setFileSuffixNum(newCPInfo.getLastestFileChunkSuffixNum());
         blockFLP.setLocPointer(new LocPointer(currentOffset, 0));
-        for(TxIndexInfo txOffset : txOffsets){
-            txOffset.getLoc().setOffset(txOffset.getLoc().getOffset() + 8);
-        }
+//        for(TxIndexInfo txOffset : txOffsets){
+//            txOffset.getLoc().setOffset(txOffset.getLoc().getOffset() + 8);
+//        }
         BlockIndexInfo idxInfo = new BlockIndexInfo();
         idxInfo.setBlockNum(block.getHeader().getNumber());
         idxInfo.setBlockHash(blockHash.toByteArray());
@@ -310,7 +311,7 @@ public class BlockFileManager {
                 break;
             }
             //解码block
-            SerializedBlockInfo info = BlockSerialization.extractSerializedBlockInfo(blockBytes);
+            SerializedBlockInfo info = BlockSerialization.extractSerializedBlockInfo(blockBytes, cpInfo.getLatestFileChunksize() + 8);
 
             int numBytesToShift = (int) (blockPlacementInfo.getBlockBytesOffset() - blockPlacementInfo.getBlockStartOffset());
             for(TxIndexInfo offset : info.getTxOffsets()){
@@ -414,7 +415,7 @@ public class BlockFileManager {
         byte[] blockBytes = fetchBlockBytes(loc);
         SerializedBlockInfo info = null;
         try {
-            info = BlockSerialization.extractSerializedBlockInfo(blockBytes);
+            info = BlockSerialization.extractSerializedBlockInfo(blockBytes, loc.getLocPointer().getOffset() + 8);
         } catch (LedgerException e) {
             throw e;
         }
@@ -448,21 +449,32 @@ public class BlockFileManager {
         return fetchTransactionEnvelope(loc);
     }
 
-    public Common.Block fetchBlock(FileLocPointer lp ) throws LedgerException{
+    public Common.Block fetchBlock(FileLocPointer lp) throws LedgerException{
         byte[] blockBytes = fetchBlockBytes(lp);
+        if (blockBytes == null){
+            throw new LedgerException(String.format("Fail to fetch block by [%s]", lp));
+        }
+        if(blockBytes[0] != (byte) 10){
+            throw new LedgerException(String.format("Fetch error block by [%s]", lp));
+        }
         return BlockSerialization.deserializeBlock(blockBytes);
    }
 
     public Common.Envelope fetchTransactionEnvelope(FileLocPointer lp) throws LedgerException{
-        logger.debug(String.format("Entering fetchTransactionEnvelope() %d", lp));
-        byte[] txEnvelopeBytes = null;
-        txEnvelopeBytes = fetchRawBytes(lp);
-        long txEnvelopeBytesLen = Util.bytesToLong(txEnvelopeBytes, 0, txEnvelopeBytes.length);
-        byte[] blockBytes = new byte[(int) (txEnvelopeBytes.length - txEnvelopeBytesLen)];
-        System.arraycopy(txEnvelopeBytes, (int) txEnvelopeBytesLen, blockBytes, 0, (int) (txEnvelopeBytes.length - txEnvelopeBytesLen));
+        logger.debug(String.format("Entering fetchTransactionEnvelope() %s", lp));
+        byte[] txEnvelopeBytes = fetchRawBytes(lp);
+        if (txEnvelopeBytes == null){
+            throw new LedgerException(String.format("Fail to fetch envelope by [%s]", lp));
+        }
+        if(txEnvelopeBytes[0] != (byte) 10){
+            throw new LedgerException(String.format("Fetch error envelope by [%s]", lp));
+        }
+//        long txEnvelopeBytesLen = Util.bytesToLong(txEnvelopeBytes, 0, txEnvelopeBytes.length);
+//        byte[] blockBytes = new byte[(int) (txEnvelopeBytes.length - txEnvelopeBytesLen)];
+//        System.arraycopy(txEnvelopeBytes, (int) txEnvelopeBytesLen, blockBytes, 0, (int) (txEnvelopeBytes.length - txEnvelopeBytesLen));
         Common.Envelope envelope = null;
         try {
-            envelope = Common.Envelope.parseFrom(blockBytes);
+            envelope = Common.Envelope.parseFrom(txEnvelopeBytes);
         } catch (InvalidProtocolBufferException e) {
             logger.error("Got error when getting envelope from block bytes");
             throw new LedgerException(e);

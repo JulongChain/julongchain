@@ -63,12 +63,12 @@ public class BlockSerialization {
     /**
      * 序列化block
      */
-    public static AbstractMap.SimpleEntry<SerializedBlockInfo, byte[]> serializeBlock(Block block) {
+    public static AbstractMap.SimpleEntry<SerializedBlockInfo, byte[]> serializeBlock(Block block, long blockPosition) {
         SerializedBlockInfo info = new SerializedBlockInfo();
         info.setBlockHeader(block.getHeader());
         info.setMetadata(block.getMetadata());
         //序列化Data
-        info.setTxOffsets(addDataBytes(block));
+        info.setTxOffsets(addDataBytes(block, blockPosition));
         AbstractMap.SimpleEntry<SerializedBlockInfo, byte[]> entry =
                 new AbstractMap.SimpleEntry<>(info, block.toByteArray());
         return entry;
@@ -86,12 +86,12 @@ public class BlockSerialization {
         }
     }
 
-    public static SerializedBlockInfo extractSerializedBlockInfo(byte[] serializedBlockBytes) throws LedgerException {
+    public static SerializedBlockInfo extractSerializedBlockInfo(byte[] serializedBlockBytes, long blockPosition) throws LedgerException {
         Block block = deserializeBlock(serializedBlockBytes);
         SerializedBlockInfo info = new SerializedBlockInfo();
         info.setBlockHeader(block.getHeader());
         info.setMetadata(block.getMetadata());
-        info.setTxOffsets(addDataBytes(block));
+        info.setTxOffsets(addDataBytes(block, blockPosition));
         return info;
     }
 
@@ -114,35 +114,50 @@ public class BlockSerialization {
 
     /**
      * 序列化Data并将data信息封装到TxIndexInfo中
+     * 在block中解析出Envelope,并确定起始位置
+     * 获取所有Envelope的长度和起始位置
      */
-    private static List<TxIndexInfo> addDataBytes(Block block){
+    private static List<TxIndexInfo> addDataBytes(Block block, long blockPosition){
         //获取头部序列化长度
-        int headerLen = block.getHeader().getSerializedSize();
-        List<TxIndexInfo> list = new ArrayList<>();
-        BlockData data = block.getData();
-        for(ByteString txEnvelopeBytes : data.getDataList()){
+        int headerSerializedLen = block.getHeader().getSerializedSize();
+        //序列化长度给出序列化之后的长度，还应加上标头部识位长度2, 尾部标识位长度2
+        //序列化长度为0时，没有尾部标识位
+        int headerLen = headerSerializedLen + (headerSerializedLen == 0 ? 2 : 4);
+        //头部结束后为Data起始位置
+        int envPosition = headerLen + (int) blockPosition;
+        //迭代Data
+        for(ByteString txEnvelopeBytes : block.getData().getDataList()){
             //记录当前位置
-            int offset = headerLen;
+            int offset = envPosition;
+            Envelope txEnvelope;
+            Payload txPayload;
             GroupHeader gh = null;
+            int txEvnelopeLength = 0;
             //解析并获取TxID
             try {
-                Envelope txEnvelope = Envelope.parseFrom(txEnvelopeBytes);
-                Payload txPayload = Payload.parseFrom(txEnvelope.getPayload());
+                txEnvelope = Envelope.parseFrom(txEnvelopeBytes);
+                txPayload = Payload.parseFrom(txEnvelope.getPayload());
                 gh = GroupHeader.parseFrom(txPayload.getHeader().getGroupHeader());
+                txEvnelopeLength = txEnvelope.toByteArray().length + 2;
             } catch (InvalidProtocolBufferException e) {
                 logger.error("Got error when resolve object from byteString");
                 return null;
             }
             //构造locpointer对象
-            LocPointer locPointer = new LocPointer(offset, txEnvelopeBytes.toByteArray().length);
+            //offset        Envelope起始位置
+            //bytesLength   Envelope长度, 应包含头部长度2
+            LocPointer locPointer = new LocPointer(offset, txEvnelopeLength);
             //构造txIndexInfo对象
             TxIndexInfo indexInfo = new TxIndexInfo();
             indexInfo.setTxID(gh.getTxId());
             indexInfo.setLoc(locPointer);
-            list.add(indexInfo);
+            txOffsets.add(indexInfo);
+
+            //Envelope起始位置相应移动
+            envPosition += txEvnelopeLength;
         }
 
-        return list;
+        return txOffsets;
     }
 
     /**

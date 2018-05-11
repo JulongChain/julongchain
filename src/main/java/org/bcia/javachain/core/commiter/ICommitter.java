@@ -29,7 +29,7 @@ import java.util.Map;
  * @date 18/3/27
  * @company Dingxuan
  */
-public interface ICommiterServer {
+public interface ICommitter {
 
     void commitWithPrivateData(BlockAndPvtData blockAndPvtData) throws CommitterException;
 
