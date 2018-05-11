@@ -27,11 +27,13 @@ import org.bcia.javachain.common.policycheck.bean.MSPPrincipal;
 import org.bcia.javachain.common.policycheck.bean.PolicyBean;
 import org.bcia.javachain.common.policycheck.bean.Provider;
 import org.bcia.javachain.common.policycheck.bean.SignaturePolicyEnvelope;
+import org.bcia.javachain.common.policycheck.common.IsSignaturePolicy_Type;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.mgmt.Msp;
 import org.bcia.javachain.msp.mgmt.MspManager;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 
@@ -48,8 +50,8 @@ public class Policy implements IPolicy{
 
     @Override
     public void evaluate(List<SignedData> signatureList) throws PolicyException {
-        List<SignedData> signedDatas = Cauthdsl.deduplicate(signatureList);   //删除重复身份
         Msp msp = new Msp();
+        List<SignedData> signedDatas = Cauthdsl.deduplicate(signatureList,msp);   //删除重复身份
         MSPPrincipal identities = new MSPPrincipal();
         try {
             //TODO 待完善     //评估这组签名是否满足策略
@@ -64,18 +66,29 @@ public class Policy implements IPolicy{
 
     }
     public PolicyBean NewPolicy(byte[] data){
+
         SignaturePolicyEnvelope sigPolicy = new SignaturePolicyEnvelope();
+
         Provider provider = new Provider();
         Msp msp = new Msp();
-        boolean flag = Cauthdsl.compile(sigPolicy.rule,sigPolicy.iIdentity,msp);//进行策略评估
+        boolean compiled = false;//进行策略评估
+
         PolicyBean policyBean = new PolicyBean();
         if(sigPolicy.version != 0){
             log.info("Error unmarshaling to SignaturePolicy");
             return null;
         }
-        boolean compile = Cauthdsl.compile(sigPolicy.rule,sigPolicy.iIdentity,msp);
+        try {
+            compiled = Cauthdsl.compile(sigPolicy.rule.isSignaturePolicy_type,sigPolicy.iIdentitys,msp);
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
         //TODO 待完善
-        policyBean.setEvalutor(flag);
+        policyBean.setEvalutor(compiled);
         policyBean.setDeserializer(msp.deserializeIdentity(data));
         return policyBean;
     }
