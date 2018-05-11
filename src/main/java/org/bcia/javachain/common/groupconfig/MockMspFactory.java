@@ -25,6 +25,7 @@ import org.bcia.javachain.msp.IMspOpts;
  * @author zhouhui
  * @date 2018/3/27
  * @company Dingxuan
+ * @deprecated 已经有实现，不再需要Mock
  */
 public class MockMspFactory implements IMspFactory {
     @Override

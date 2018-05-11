@@ -23,6 +23,7 @@ import org.bcia.javachain.common.groupconfig.capability.IApplicationCapabilities
  * @author zhouhui
  * @date 2018/4/16
  * @company Dingxuan
+ * @deprecated 由org.bcia.javachain.common.groupconfig.capability.ApplicationProvider代替
  */
 public class ApplicationProvider implements IApplicationCapabilities {
 

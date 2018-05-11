@@ -30,6 +30,7 @@ import java.util.Map;
  * @author zhouhui
  * @date 2018/3/28
  * @company Dingxuan
+ * @deprecated 已经不需要
  */
 public class StandardValues {
     private Map<String, Message> lookup;

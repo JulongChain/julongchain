@@ -23,6 +23,7 @@ import org.bcia.javachain.msp.IMspOpts;
  * @author zhouhui
  * @date 2018/3/27
  * @company Dingxuan
+ * @deprecated 已经有实现，无需Mock
  */
 public class MockMspOpts implements IMspOpts {
     @Override
