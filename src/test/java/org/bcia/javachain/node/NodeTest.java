@@ -2,6 +2,7 @@ package org.bcia.javachain.node;
 
 import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.BaseJunit4Test;
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.node.cmd.INodeCmd;
 import org.bcia.javachain.node.cmd.group.GroupCreateCmd;
@@ -20,6 +21,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.IOException;
 
 /**
  * 节点对象单元测试
@@ -115,5 +118,11 @@ public class NodeTest extends BaseJunit4Test {
         Assert.assertNull(nodeCmd13);
 
 
+    }
+
+    @Test
+    public void testMockCreateGroup() throws JavaChainException {
+        Node.getInstance().mockInitialize();
+        Node.getInstance().mockCreateGroup("myGroup");
     }
 }

@@ -17,6 +17,7 @@ package org.bcia.javachain.node;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.cli.ParseException;
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.exception.ValidateException;
@@ -35,6 +36,7 @@ import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.msp.mspconfig.MspConfig;
 import org.bcia.javachain.node.cmd.INodeCmd;
 import org.bcia.javachain.node.cmd.factory.NodeCmdFactory;
+import org.bcia.javachain.node.common.helper.ConfigTreeHelper;
 import org.bcia.javachain.node.entity.Group;
 import org.bcia.javachain.node.util.LedgerUtils;
 import org.bcia.javachain.node.util.NodeConstant;
@@ -305,7 +307,7 @@ public class Node {
     }
 
     //MockInitialize resets chains for test env
-    public void MockInitialize() {
+    public void mockInitialize() {
         try {
             new LedgerManager().initializeTestEnvWithCustomProcessors(null);
         } catch (LedgerException e) {
@@ -316,52 +318,37 @@ public class Node {
 //        chainInitializer = func(string) { return }
     }
 
-    public void MockCreateGroup(String groupId) throws IOException {
-//        Group group = groupMap.get(groupId);
-//        INodeLedger nodeLedger = group.getGroupSupport().getNodeLedger();
-//
-//        if (nodeLedger == null) {
-//            GenesisConfig.Profile profile = GenesisConfigFactory.loadGenesisConfig().getCompletedProfile
-//                    (SAMPLE_DEVMODE_SOLO_PROFILE);
-//
-//            GenesisBlockFactory genesisBlockFactory = new GenesisBlockFactory(GenesisConfigFactory.loadGenesisConfig
-//            )
-//
-//        }
-//
-//
-//        var ledger ledger.PeerLedger
-//        var err error
-//
-//        if ledger = GetLedger(cid);
-//        ledger == nil {
-//            gb, _ :=configtxtest.MakeGenesisBlock(cid)
-//            if ledger, err = ledgermgmt.CreateLedger(gb);
-//            err != nil {
-//                return err
-//            }
-//        }
-//
-//        chains.Lock()
-//        defer chains.Unlock()
-//
-//        chains.list[cid] = &chain {
-//            cs: &chainSupport {
-//                Resources: &mockchannelconfig.Resources {
-//                    PolicyManagerVal: &mockpolicies.Manager {
-//                        Policy: &mockpolicies.Policy {
-//                        },
-//                    },
-//                    ConfigtxValidatorVal: &mockconfigtx.Validator {
-//                    },
-//                },
-//                ledger:
-//                ledger
-//            },
-//        }
-//
-//        return nil
-    }
+    public void mockCreateGroup(String groupId) throws NodeException {
+        Group group = groupMap.get(groupId);
 
+        if (group == null || group.getGroupSupport() == null || group.getGroupSupport().getNodeLedger() == null) {
+            GenesisConfig.Profile profile = null;
+            try {
+                profile = GenesisConfigFactory.loadGenesisConfig().getCompletedProfile
+                        (SAMPLE_DEVMODE_SOLO_PROFILE);
+                Configtx.ConfigTree groupTree = ConfigTreeHelper.buildGroupTree(profile);
+
+                GenesisBlockFactory genesisBlockFactory = new GenesisBlockFactory(groupTree);
+                Common.Block genesisBlock = genesisBlockFactory.getGenesisBlock(groupId);
+
+                INodeLedger nodeLedger = LedgerManager.createLedger(genesisBlock);
+
+                Group newGroup = new Group();
+                GroupSupport groupSupport = new GroupSupport();
+                groupSupport.setNodeLedger(nodeLedger);
+                newGroup.setGroupSupport(groupSupport);
+                groupMap.put(groupId, newGroup);
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+                throw new NodeException(e);
+            } catch (LedgerException e) {
+                log.error(e.getMessage(), e);
+                throw new NodeException(e);
+            } catch (JavaChainException e) {
+                log.error(e.getMessage(), e);
+                throw new NodeException(e);
+            }
+        }
+    }
 
 }

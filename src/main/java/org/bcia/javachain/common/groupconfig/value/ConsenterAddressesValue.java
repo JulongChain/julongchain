@@ -37,5 +37,7 @@ public class ConsenterAddressesValue extends StandardConfigValue {
                 consenterAddressesBuilder.addAddresses(address);
             }
         }
+
+        this.value = consenterAddressesBuilder.build();
     }
 }
