@@ -27,7 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 类描述
+ * 使用docker-java client连接和运行docker命令, docker要以dockerd -H tcp://0.0.0.0:2375方式运行,
+ * 参考：https://github.com/docker-java/docker-java/wiki
  *
  * @author wanliangbing
  * @date 2018/5/11
@@ -46,6 +47,14 @@ public class DockerUtil {
     DockerClient dockerClient =
         DockerClientBuilder.getInstance("tcp://" + DOCKER_HOST_IP + ":" + DOCKER_HOST_PORT).build();
     return dockerClient;
+  }
+
+  private static void closeDockerClient(DockerClient dockerClient) {
+    try {
+      dockerClient.close();
+    } catch (IOException e) {
+      logger.error(e.getMessage(), e);
+    }
   }
 
   /**
@@ -75,11 +84,7 @@ public class DockerUtil {
             .exec(callback)
             .awaitImageId();
 
-    try {
-      dockerClient.close();
-    } catch (IOException e) {
-      logger.error(e.getMessage(), e);
-    }
+    closeDockerClient(dockerClient);
 
     logger.info("build image success, imageId:" + imageId);
 
@@ -103,11 +108,7 @@ public class DockerUtil {
       searchImageNameList.add(searchItem.getName());
     }
 
-    try {
-      dockerClient.close();
-    } catch (IOException e) {
-      logger.error(e.getMessage(), e);
-    }
+    closeDockerClient(dockerClient);
 
     return searchImageNameList;
   }
