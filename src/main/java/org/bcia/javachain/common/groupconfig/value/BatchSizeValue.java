@@ -15,26 +15,25 @@
  */
 package org.bcia.javachain.common.groupconfig.value;
 
-import com.google.protobuf.Message;
+import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
+import org.bcia.javachain.protos.consenter.Configuration;
 
 /**
- * 标准配置值
+ * 对象
  *
  * @author zhouhui
- * @date 2018/3/9
+ * @date 2018/5/11
  * @company Dingxuan
  */
-public class StandardConfigValue implements IConfigValue {
-    protected String key;
-    protected Message value;
+public class BatchSizeValue extends StandardConfigValue {
+    public BatchSizeValue(int maxMessages, int absoluteMaxBytes, int preferredMaxBytes) {
+        this.key = GroupConfigConstant.BATCH_SIZE;
 
-    @Override
-    public String getKey() {
-        return key;
-    }
+        Configuration.BatchSize.Builder batchSizeBuilder = Configuration.BatchSize.newBuilder();
+        batchSizeBuilder.setMaxMessageCount(maxMessages);
+        batchSizeBuilder.setAbsoluteMaxBytes(absoluteMaxBytes);
+        batchSizeBuilder.setPreferredMaxBytes(preferredMaxBytes);
 
-    @Override
-    public Message getValue() {
-        return value;
+        this.value = batchSizeBuilder.build();
     }
 }

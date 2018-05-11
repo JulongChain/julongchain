@@ -25,7 +25,7 @@ package org.bcia.javachain.common.groupconfig.capability;
 public interface IConsenterCapabilities {
     boolean isSupported();
 
-    boolean isPredictableChannelTemplate();
+    boolean isPredictableGroupTemplate();
 
     boolean isResubmission();
 

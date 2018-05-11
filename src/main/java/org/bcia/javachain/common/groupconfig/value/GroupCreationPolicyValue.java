@@ -13,15 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.channelconfig;
+package org.bcia.javachain.common.groupconfig.value;
+
+import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
+import org.bcia.javachain.protos.common.Policies;
 
 /**
- * 类描述
+ * 对象
  *
- * @author sunianle
- * @date 3/21/18
+ * @author zhouhui
+ * @date 2018/5/11
  * @company Dingxuan
- * @deprecated 使用ApplicationProvider代替，已经移植到groupconfig包名
  */
-public class ApplicationCapabilities {
+public class GroupCreationPolicyValue extends StandardConfigValue {
+    public GroupCreationPolicyValue(Policies.Policy policy) {
+        this.key = GroupConfigConstant.GROUP_CREATION_POLICY;
+        this.value = policy;
+    }
 }

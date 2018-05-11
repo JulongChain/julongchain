@@ -31,6 +31,7 @@ import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
  * @author wanliangbing
  * @date 2018/3/15
  * @company Dingxuan
+ * @deprecated 使用IGroupConfigBundle代替，已经移植到groupconfig包名
  */
 public interface IResources {
 

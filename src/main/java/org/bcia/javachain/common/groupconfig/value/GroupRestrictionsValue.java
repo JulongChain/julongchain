@@ -16,19 +16,22 @@
 package org.bcia.javachain.common.groupconfig.value;
 
 import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
-import org.bcia.javachain.protos.msp.MspConfigPackage;
+import org.bcia.javachain.protos.consenter.Configuration;
 
 /**
- * 类描述
+ * 对象
  *
  * @author zhouhui
- * @date 2018/3/10
+ * @date 2018/5/11
  * @company Dingxuan
  */
-public class MSPValue extends StandardConfigValue {
-    public MSPValue(MspConfigPackage.MSPConfig mspConfig) {
-        this.key = GroupConfigConstant.MSP;
+public class GroupRestrictionsValue extends StandardConfigValue {
+    public GroupRestrictionsValue(long maxChannelCount) {
+        this.key = GroupConfigConstant.GROUP_RESTRICTIONS;
 
-        this.value = mspConfig;
+        Configuration.GroupRestrictions.Builder groupRestrictionsBuilder = Configuration.GroupRestrictions.newBuilder();
+        groupRestrictionsBuilder.setMaxCount(maxChannelCount);
+
+        this.value = groupRestrictionsBuilder.build();
     }
 }

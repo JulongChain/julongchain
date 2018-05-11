@@ -13,15 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.channelconfig;
+package org.bcia.javachain.common.groupconfig.value;
+
+import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
+import org.bcia.javachain.protos.msp.MspConfigPackage;
 
 /**
  * 类描述
  *
- * @author sunianle
- * @date 3/21/18
+ * @author zhouhui
+ * @date 2018/3/10
  * @company Dingxuan
- * @deprecated 使用ApplicationProvider代替，已经移植到groupconfig包名
  */
-public class ApplicationCapabilities {
+public class MspValue extends StandardConfigValue {
+    public MspValue(MspConfigPackage.MSPConfig mspConfig) {
+        this.key = GroupConfigConstant.MSP;
+
+        this.value = mspConfig;
+    }
 }

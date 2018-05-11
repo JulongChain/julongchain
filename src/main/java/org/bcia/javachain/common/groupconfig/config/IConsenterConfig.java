@@ -18,25 +18,26 @@ package org.bcia.javachain.common.groupconfig.config;
 import org.bcia.javachain.common.groupconfig.capability.IConsenterCapabilities;
 import org.bcia.javachain.protos.consenter.Configuration;
 
+import java.util.List;
 import java.util.Map;
 
 /**
- * 对象
+ * 共识节点配置接口
  *
  * @author zhouhui
  * @date 2018/3/27
  * @company Dingxuan
  */
 public interface IConsenterConfig {
-    Configuration.ConsensusType getConsensusType();
+    String getConsensusType();
 
     Configuration.BatchSize getBatchSize();
 
-    Configuration.BatchTimeout getBatchTimeout();
+    long getBatchTimeout();
 
-    Configuration.KafkaBrokers getKafkaBrokers();
+    List<String> getKafkaBrokers();
 
-    Configuration.GroupRestrictions getGroupRestrictions();
+    long getMaxChannelsCount();
 
     IConsenterCapabilities getCapabilities();
 

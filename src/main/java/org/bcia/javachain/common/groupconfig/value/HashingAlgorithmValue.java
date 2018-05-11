@@ -31,7 +31,7 @@ public class HashingAlgorithmValue extends StandardConfigValue {
         this.key = GroupConfigConstant.HASHING_ALGORITHM;
 
         Configuration.HashingAlgorithm hashingAlgorithm = Configuration.HashingAlgorithm.newBuilder().setName
-                ("SHA256").build();
+                (GroupConfigConstant.DEFAULT_HASHING_ALGORITHM_NAME).build();
         this.value = hashingAlgorithm;
     }
 }
