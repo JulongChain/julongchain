@@ -25,8 +25,10 @@ import org.bcia.javachain.protos.node.Smartcontract;
 import java.io.*;
 
 /**
- * 类描述
- *
+ * SmartContractProvider provides an abstraction layer that is
+* used for different packages to interact with code in the
+ * smartcontract package without importing it; more methods
+* should be added below if necessary
  * @author sunianle
  * @date 3/7/18
  * @company Dingxuan

@@ -13,24 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.aclmgmt;
-
-import org.bcia.javachain.protos.node.ProposalPackage;
+package org.bcia.javachain.core.ledger;
 
 /**
- * AclProvider的模拟测试类,用于部分单元用例
+ * ISmartContractProvider接口getContext函数的返回类型
  *
  * @author sunianle
- * @date 4/16/18
+ * @date 5/11/18
  * @company Dingxuan
  */
-public class MockAclProvider implements IAclProvider {
-    @Override
-    public void checkACL(String resName, String groupID, ProposalPackage.SignedProposal idinfo) {
-
-    }
-
-    public void reset(){
-
-    }
+public class LedgerContext {
 }

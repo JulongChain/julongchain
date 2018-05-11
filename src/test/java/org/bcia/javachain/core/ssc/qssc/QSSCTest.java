@@ -92,6 +92,7 @@ public class QSSCTest extends BaseJunit4Test {
         MockAclProvider aclProvider=new MockAclProvider();
         aclProvider.reset();
         //待与周辉的接口进行对接，需要建立账本，以支持后续的查询
+
     }
 
     private Common.Block addBlockForTesting(){
