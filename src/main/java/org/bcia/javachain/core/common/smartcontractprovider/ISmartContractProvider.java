@@ -15,10 +15,16 @@
  */
 package org.bcia.javachain.core.common.smartcontractprovider;
 
+import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.ledger.LedgerContext;
 import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.ProposalResponsePackage;
+import org.bcia.javachain.protos.node.SmartContractEventPackage;
+import org.bcia.javachain.protos.node.Smartcontract;
+
+import java.util.List;
 
 /**
  * ISmartContractProvider provides an abstraction layer that is
@@ -51,5 +57,53 @@ public interface ISmartContractProvider {
                                       ProposalPackage.SignedProposal signedProposal,
                                       ProposalPackage.Proposal prop);
 
+    /**
+     * executeSmartContract executes the chaincode given context and args
+     * @param ctxt
+     * @param scContext
+     * @param args
+     * @return
+     * @throws SmartContractException
+     */
+    SmartContractExecuteResult executeSmartContract(LedgerContext ctxt,
+                                                    SmartContractContext scContext,
+                                                    List<ByteString> args)throws SmartContractException;
 
+    /**
+     * SmartContractExecuteResult executes the smartcontract given context and spec (invocation or deploy)
+     * @param ctxt
+     * @param scContext
+     * @param spec
+     * @return
+     * @throws SmartContractException
+     */
+    SmartContractExecuteResult execute(LedgerContext ctxt,
+            SmartContractContext scContext,Object spec)throws SmartContractException;
+
+    /**
+     * executeWithErrorFilter executes the chaincode given context and spec and returns payload
+     * @param ctxt
+     * @param scContext
+     * @param spec
+     * @return
+     * @throws SmartContractException
+     */
+    SmartContractExecuteWithFilterResult executeWithErrorFilter(LedgerContext ctxt,
+                           SmartContractContext scContext,Object spec)throws SmartContractException;
+
+    void stop(LedgerContext ctxt,
+         SmartContractContext scContext,
+         Smartcontract.SmartContractDeploymentSpec spec)throws SmartContractException;
+
+
+
+    class SmartContractExecuteResult{
+        ProposalResponsePackage.Response response;
+        SmartContractEventPackage.SmartContractEvent event;
+    }
+
+    class SmartContractExecuteWithFilterResult{
+        byte[] data;
+        SmartContractEventPackage.SmartContractEvent event;
+    }
 }
