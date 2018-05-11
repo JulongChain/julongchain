@@ -30,6 +30,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policies.IPolicy;
 import org.bcia.javachain.common.policies.IPolicyProvider;
+import org.bcia.javachain.common.util.Utils;
 import org.bcia.javachain.common.util.proto.ProtoUtils;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.core.common.privdata.*;
@@ -44,15 +45,11 @@ import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.protos.common.Collection;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
-import org.bcia.javachain.protos.node.ProposalPackage;
-import org.bcia.javachain.protos.node.SmartContractDataPackage;
-import org.bcia.javachain.protos.node.Smartcontract;
-import org.bcia.javachain.protos.node.TransactionPackage;
+import org.bcia.javachain.protos.msp.Identities;
+import org.bcia.javachain.protos.node.*;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * 验证系统智能合约　Validator System Smart Contract,VSSC
@@ -280,6 +277,37 @@ public class VSSC extends SystemSmartContractBase {
 
     private List<SignedData> deduplicateIdentity(TransactionPackage.SmartContractActionPayload scap)
                                    throws SysSmartContractException{
-        return null;
+        // this is the first part of the signed message
+        ByteString prespBytes = scap.getAction().getProposalResponsePayload();
+        // build the signature set for the evaluation
+        Map<String,SignedData> signatureMap=new HashMap<String,SignedData>();
+        List<SignedData> signatureSet=new LinkedList<SignedData>();
+        for(ProposalResponsePackage.Endorsement endorsement:scap.getAction().getEndorsementsList()){
+            //unmarshal endorser bytes
+            Identities.SerializedIdentity serializedIdentity=null;
+            try {
+                serializedIdentity=Identities.SerializedIdentity.parseFrom(endorsement.getEndorser());
+            } catch (InvalidProtocolBufferException e) {
+                String msg=String.format("Unmarshal endorser error: %s",e.getMessage());
+                throw new SysSmartContractException(msg);
+            }
+            String identity = serializedIdentity.getMspid() + serializedIdentity.getIdBytes().toString();
+            SignedData value = signatureMap.get(identity);
+            if(value!=null){
+                log.warn("Ignoring duplicated identity, Mspid: {}, pem:{}",
+                        serializedIdentity.getMspid(),serializedIdentity.getIdBytes().toString());
+                continue;
+            }
+
+            byte[] data=Utils.appendBytes(prespBytes.toByteArray(),endorsement.getEndorser().toByteArray());
+            SignedData signedData=new SignedData(data,endorsement.getEndorser().toByteArray(),
+                    endorsement.getSignature().toByteArray());
+            signatureSet.add(signedData);
+            signatureMap.put(identity,signedData);
+        }
+
+        log.debug("Signature set is of size {} out of {} endorsement(s)",
+                signatureSet.size(),scap.getAction().getEndorsementsCount());
+        return signatureSet;
     }
 }
