@@ -204,6 +204,6 @@ public class EndorserSupport implements IEndorserSupport {
     @Override
     public void checkInstantiationPolicy(String name, String version, ISmartContractDefinition scDefinition) {
         //TODO：未实现
-        //new SmartContractProvider()
+        //new SmartContractExecuteProvider()
     }
 }
