@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.common.policies;
 
+import org.bcia.javachain.common.policycheck.common.IsSignaturePolicy_Type;
 import org.bcia.javachain.protos.common.Policies;
 
 /**
@@ -38,4 +39,9 @@ public class SignaturePolicy extends StandardConfigPolicy {
         policyBuilder.setValue(envelope.toByteString());
         return policyBuilder.build();
     }
+
+
+    public IsSignaturePolicy_Type isSignaturePolicy_type;
+
+
 }
