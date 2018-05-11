@@ -74,7 +74,6 @@ public class MSPConfigHandler {
 //        IMspOpts opts = new MockMspOpts();
 //
 //        IMsp msp = factory.getMsp(opts);
-
         //TODO:这里并不是localMsp
         IMsp msp = new Msp();
 

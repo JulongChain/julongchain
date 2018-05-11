@@ -21,6 +21,7 @@ package org.bcia.javachain.common.groupconfig.capability;
  * @author zhouhui
  * @date 2018/4/18
  * @company Dingxuan
+ * @deprecated 使用GroupProvider代替
  */
 public class GroupCapabilities implements IGroupCapabilities {
     private boolean supported;

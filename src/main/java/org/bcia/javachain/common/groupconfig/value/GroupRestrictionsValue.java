@@ -15,26 +15,23 @@
  */
 package org.bcia.javachain.common.groupconfig.value;
 
-import com.google.protobuf.Message;
+import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
+import org.bcia.javachain.protos.consenter.Configuration;
 
 /**
- * 标准配置值
+ * 对象
  *
  * @author zhouhui
- * @date 2018/3/9
+ * @date 2018/5/11
  * @company Dingxuan
  */
-public class StandardConfigValue implements IConfigValue {
-    protected String key;
-    protected Message value;
+public class GroupRestrictionsValue extends StandardConfigValue {
+    public GroupRestrictionsValue(long maxChannelCount) {
+        this.key = GroupConfigConstant.GROUP_RESTRICTIONS;
 
-    @Override
-    public String getKey() {
-        return key;
-    }
+        Configuration.GroupRestrictions.Builder groupRestrictionsBuilder = Configuration.GroupRestrictions.newBuilder();
+        groupRestrictionsBuilder.setMaxCount(maxChannelCount);
 
-    @Override
-    public Message getValue() {
-        return value;
+        this.value = groupRestrictionsBuilder.build();
     }
 }

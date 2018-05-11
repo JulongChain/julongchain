@@ -25,8 +25,8 @@ import org.bcia.javachain.protos.msp.MspConfigPackage;
  * @date 2018/3/10
  * @company Dingxuan
  */
-public class MSPValue extends StandardConfigValue {
-    public MSPValue(MspConfigPackage.MSPConfig mspConfig) {
+public class MspValue extends StandardConfigValue {
+    public MspValue(MspConfigPackage.MSPConfig mspConfig) {
         this.key = GroupConfigConstant.MSP;
 
         this.value = mspConfig;

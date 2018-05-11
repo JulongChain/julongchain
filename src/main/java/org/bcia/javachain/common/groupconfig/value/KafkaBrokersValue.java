@@ -15,26 +15,27 @@
  */
 package org.bcia.javachain.common.groupconfig.value;
 
-import com.google.protobuf.Message;
+import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
+import org.bcia.javachain.protos.consenter.Configuration;
 
 /**
- * 标准配置值
+ * 对象
  *
  * @author zhouhui
- * @date 2018/3/9
+ * @date 2018/5/11
  * @company Dingxuan
  */
-public class StandardConfigValue implements IConfigValue {
-    protected String key;
-    protected Message value;
+public class KafkaBrokersValue extends StandardConfigValue {
+    public KafkaBrokersValue(String[] brokers) {
+        this.key = GroupConfigConstant.KAFKA_BROKERS;
 
-    @Override
-    public String getKey() {
-        return key;
-    }
+        Configuration.KafkaBrokers.Builder kafkaBrokersBuilder = Configuration.KafkaBrokers.newBuilder();
+        if (brokers != null && brokers.length > 0) {
+            for (String broker : brokers) {
+                kafkaBrokersBuilder.addBrokers(broker);
+            }
+        }
 
-    @Override
-    public Message getValue() {
-        return value;
+        this.value = kafkaBrokersBuilder.build();
     }
 }
