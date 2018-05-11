@@ -18,6 +18,7 @@ package org.bcia.javachain.common.policycheck.bean;
 
 import org.bcia.javachain.common.policies.SignaturePolicy;
 import org.bcia.javachain.msp.IIdentity;
+import org.bcia.javachain.protos.common.MspPrincipal;
 
 /**
  * 类描述
@@ -29,20 +30,29 @@ import org.bcia.javachain.msp.IIdentity;
 public class SignaturePolicyEnvelope {
     public int version;
     public SignaturePolicy rule;
-    public MSPPrincipal iIdentity;
-
-
-    public SignaturePolicy getRule() {
-        return rule;
-
-    }
+    public MspPrincipal[] iIdentitys;
 
     public int getVersion() {
         return version;
-
     }
 
-    public MSPPrincipal getiIdentity() {
-        return iIdentity;
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
+    public SignaturePolicy getRule() {
+        return rule;
+    }
+
+    public void setRule(SignaturePolicy rule) {
+        this.rule = rule;
+    }
+
+    public MspPrincipal[] getiIdentitys() {
+        return iIdentitys;
+    }
+
+    public void setiIdentitys(MspPrincipal[] iIdentitys) {
+        this.iIdentitys = iIdentitys;
     }
 }
