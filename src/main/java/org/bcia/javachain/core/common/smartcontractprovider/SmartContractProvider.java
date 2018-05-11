@@ -33,7 +33,8 @@ import java.io.*;
  */
 public class SmartContractProvider {
     private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractProvider.class);
-    public static String smartContractInstallPath;
+
+    public static String smartContractInstallPath = "/home/bcia/javachain/lssc";
 
     /**
      * 给静态变量smartContractInstallPath设置值为智能合约路径
@@ -41,6 +42,7 @@ public class SmartContractProvider {
      * @return
      */
     public static String getSmartContractPath(String path){
+        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
         File file = new File(path);
         //不存在则创建mkdir
         if(!file.exists()){
@@ -62,6 +64,7 @@ public class SmartContractProvider {
      * @return 文件系统中存储的SmartContract
      */
     public static byte[] getSmartContractPackage(String scName, String scVersion) throws JavaChainException{
+        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
         //获取文件路径
         String path = String.format("%s/%s.%s", smartContractInstallPath, scName, scVersion);
         InputStream is = null;
@@ -90,6 +93,7 @@ public class SmartContractProvider {
      * @throws JavaChainException
      */
     public static boolean smartContractPackageExists(String scName, String scVersion) throws JavaChainException{
+        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
         String path = String.format("%s/%s.%s", smartContractInstallPath, scName, scVersion);
         File file = new File(path);
         if(file.exists()){
@@ -136,7 +140,20 @@ public class SmartContractProvider {
     }
 
     public static ISmartContractPackage getSmartContractFromFS(String name, String version) throws JavaChainException {
-        return null;
+        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
+        ISmartContractPackage pack = null;
+        try {
+            pack = new SDSPackage();
+            pack.initFromFS(name, version);
+        } catch (JavaChainException e) {
+            try {
+                pack = new SignedSDSPackage();
+                pack.initFromFS(name, version);
+            } catch (JavaChainException e1) {
+                throw e;
+            }
+        }
+        return pack;
     }
 
     public static Query.SmartContractQueryResponse getInstalledSmartcontracts() throws JavaChainException {
