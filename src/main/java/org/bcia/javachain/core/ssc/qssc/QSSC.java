@@ -151,6 +151,7 @@ public class QSSC extends SystemSmartContractBase {
             String msg=String.format("Failed to get transaction with id %s, error %s",txID,e.getMessage());
             return newErrorResponse(msg);
         }
+        //TODO 查询失败时 processedTran为null 抛出空指针异常
         byte[] tranBytes = processedTran.toByteArray();
         return newSuccessResponse(tranBytes);
     }

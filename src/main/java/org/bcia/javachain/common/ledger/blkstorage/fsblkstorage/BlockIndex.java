@@ -113,7 +113,7 @@ public class BlockIndex implements Index {
                 FileLocPointer txFlp = FileLocPointer.newFileLocationPointer(flp.getFileSuffixNum(), flp.getLocPointer().getOffset(), txOffset.getLoc());
                 logger.debug(String.format("Adding txLoc [%s] for txID: [%s] to index", txFlp, txOffset.getTxID()));
                 byte[] txFlpBytes = txFlp.marshal();
-                batch.put(constructBlockTxIDKey(txOffset.getTxID()), txFlpBytes);
+                batch.put(constructTxIDKey(txOffset.getTxID()), txFlpBytes);
             }
         }
 
@@ -190,6 +190,7 @@ public class BlockIndex implements Index {
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_ID) == null){
             throw BlockStorage.ERR_ARRT_NOT_INDEXED;
         }
+        byte[] bytes = constructTxIDKey(txID);
         byte[] b = db.get(constructTxIDKey(txID));
         if(b == null){
             throw BlockStorage.ERR_NOT_FOUND_IN_INDEX;
@@ -247,7 +248,7 @@ public class BlockIndex implements Index {
         } else if (raw.length != 1){
             throw new LedgerException("Invalid value in indexItems");
         }
-        return TransactionPackage.TxValidationCode.forNumber((int) raw[0]);
+        return TransactionPackage.TxValidationCode.forNumber(Integer.valueOf(new String(raw)));
     }
 
     byte[] constructBlockNumKey(long blockNum) {

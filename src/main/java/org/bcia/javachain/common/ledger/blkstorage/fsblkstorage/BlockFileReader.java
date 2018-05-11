@@ -42,7 +42,7 @@ public class BlockFileReader {
         FileInputStream fis;
         byte[] result = null;
         try {
-            result = new byte[(int) file.length()];
+            result = new byte[length];
             fis = new FileInputStream(file);
             //移动到制定位置
             fis.skip(offset.longValue());
