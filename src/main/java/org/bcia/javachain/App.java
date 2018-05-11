@@ -41,11 +41,11 @@ public class App {
         System.out.println("JavaChain begin, This is a wrong log");
 
         //示例异常日志的打印方式
-        try {
-            throw new NodeException("I make a node exception");
-        } catch (Exception ex) {
-            log.error(ex.getMessage(), ex);
-        }
+//        try {
+//            throw new NodeException("I make a node exception");
+//        } catch (Exception ex) {
+//            log.error(ex.getMessage(), ex);
+//        }
 
         //异步启动Consenter服务
 //        new Thread() {

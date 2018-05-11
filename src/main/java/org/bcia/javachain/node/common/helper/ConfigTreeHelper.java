@@ -16,11 +16,8 @@
 package org.bcia.javachain.node.common.helper;
 
 import com.google.protobuf.Message;
-import org.bcia.javachain.common.groupconfig.value.AnchorNodesValue;
-import org.bcia.javachain.common.groupconfig.value.CapabilitiesValue;
+import org.bcia.javachain.common.groupconfig.value.*;
 import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
-import org.bcia.javachain.common.groupconfig.value.IConfigValue;
-import org.bcia.javachain.common.groupconfig.value.MSPValue;
 import org.bcia.javachain.common.policies.IConfigPolicy;
 import org.bcia.javachain.common.policies.ImplicitMetaAnyPolicy;
 import org.bcia.javachain.common.policies.ImplicitMetaMajorityPolicy;
@@ -85,6 +82,18 @@ public class ConfigTreeHelper {
     }
 
     /**
+     * 为ConfigTree的构造器增加Value
+     *
+     * @param configTreeBuilder
+     * @param configValue
+     * @param modPolicy
+     */
+    private static void addValue(Configtx.ConfigTree.Builder configTreeBuilder, IConfigValue configValue, String
+            modPolicy) {
+        addValue(configTreeBuilder, configValue.getKey(), configValue.getValue(), modPolicy);
+    }
+
+    /**
      * 获取默认的权限体系
      *
      * @return
@@ -112,6 +121,49 @@ public class ConfigTreeHelper {
         defaultPolicies.put(GroupConfigConstant.POLICY_WRITERS, writerPolicyBuilder.build());
 
         return defaultPolicies;
+    }
+
+    /**
+     * 构造群组级别的子树
+     *
+     * @param profile
+     * @return
+     */
+    public static Configtx.ConfigTree buildGroupTree(GenesisConfig.Profile profile) {
+        //构建最终的应用ConfigTree
+        Configtx.ConfigTree.Builder groupTreeBuilder = Configtx.ConfigTree.newBuilder();
+
+        //填充默认的权限体系
+        Map<String, Configtx.ConfigPolicy> defaultPolicies = getDefaultImplicitMetaPolicy();
+        groupTreeBuilder.putAllPolicies(defaultPolicies);
+
+        addValue(groupTreeBuilder, new HashingAlgorithmValue(), GroupConfigConstant.POLICY_ADMINS);
+        addValue(groupTreeBuilder, new BlockDataHashingStructureValue(), GroupConfigConstant.POLICY_ADMINS);
+
+        IConfigValue consenterAddressesValue = new ConsenterAddressesValue(profile.getConsenter().getAddresses());
+        addValue(groupTreeBuilder, consenterAddressesValue, GroupConfigConstant.CONSENTER_ADMINS_POLICY_NAME);
+
+        if(profile.getConsortium() != null){
+
+        }
+
+//        //填充能力集
+//        if (application.getCapabilities() != null && !application.getCapabilities().isEmpty()) {
+//            IConfigValue configValue = new CapabilitiesValue(application.getCapabilities());
+//            addValue(applicationTreeBuilder, configValue.getKey(), configValue.getValue(), GroupConfigConstant.POLICY_ADMINS);
+//        }
+//
+//        //填充子树信息
+//        if (application.getOrganizations() != null && application.getOrganizations().length > 0) {
+//            for (GenesisConfig.Organization org : application.getOrganizations()) {
+//                applicationTreeBuilder.putChilds(org.getName(), buildOrgTree(org));
+//            }
+//        }
+//
+//        //填充更改策略人
+//        applicationTreeBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
+//
+        return groupTreeBuilder.build();
     }
 
     /**
@@ -163,7 +215,7 @@ public class ConfigTreeHelper {
 
         //填充MSP信息
         MspConfigPackage.MSPConfig mspConfig = MspConfigHelper.buildMspConfig(org.getMspDir(), org.getId());
-        IConfigValue mspValue = new MSPValue(mspConfig);
+        IConfigValue mspValue = new MspValue(mspConfig);
         addValue(orgTreeBuilder, mspValue.getKey(), mspValue.getValue(), GroupConfigConstant.POLICY_ADMINS);
 
         //填充AnchorNodes信息
