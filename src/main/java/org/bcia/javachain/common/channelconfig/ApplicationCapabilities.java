@@ -21,6 +21,7 @@ package org.bcia.javachain.common.channelconfig;
  * @author sunianle
  * @date 3/21/18
  * @company Dingxuan
+ * @deprecated 使用ApplicationProvider代替，已经移植到groupconfig包名
  */
 public class ApplicationCapabilities {
 }

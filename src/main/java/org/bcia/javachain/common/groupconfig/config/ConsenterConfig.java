@@ -16,42 +16,47 @@
 package org.bcia.javachain.common.groupconfig.config;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
 import org.bcia.javachain.common.groupconfig.MSPConfigHandler;
 import org.bcia.javachain.common.groupconfig.capability.IConsenterCapabilities;
+import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.consenter.Configuration;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
- * 对象
+ * 共识节点配置对象
  *
  * @author zhouhui
  * @date 2018/4/18
  * @company Dingxuan
  */
 public class ConsenterConfig implements IConsenterConfig {
-    private Configuration.ConsensusType consensusType;
+    private Configuration.ConsensusType consensusTypeProto;
     private Configuration.BatchSize batchSize;
-    private Configuration.BatchTimeout batchTimeout;
-    private Configuration.KafkaBrokers kafkaBrokers;
+    private Configuration.BatchTimeout batchTimeoutProto;
+    private Configuration.KafkaBrokers kafkaBrokersProto;
     private Configuration.GroupRestrictions groupRestrictions;
-    private org.bcia.javachain.protos.common.Configuration.Capabilities capabilities;
+    private org.bcia.javachain.protos.common.Configuration.Capabilities capabilitiesProto;
 
     private Map<String, IOrganizationConfig> organizationConfigMap;
+    private String consensusType;
+    private long batchTimeout;
+    private List<String> kafkaBrokers;
+    private long maxChannelsCount;
+    private IConsenterCapabilities capabilities;
 
     public ConsenterConfig(Configtx.ConfigTree consenterTree, MSPConfigHandler mspConfigHandler) throws
             InvalidProtocolBufferException, ValidateException {
         if (consenterTree != null && consenterTree.getValuesMap() != null) {
-            Configtx.ConfigValue consensusTypeValue = consenterTree.getValuesMap().get(GroupConfigConstant.CONSENSUS_TYPE);
+            Configtx.ConfigValue consensusTypeValue = consenterTree.getValuesMap().get(GroupConfigConstant
+                    .CONSENSUS_TYPE);
             if (consensusTypeValue != null) {
-                consensusType = Configuration.ConsensusType.parseFrom(consensusTypeValue.getValue());
+                consensusTypeProto = Configuration.ConsensusType.parseFrom(consensusTypeValue.getValue());
+                consensusType = consensusTypeProto.getType();
             }
 
             Configtx.ConfigValue batchSizeValue = consenterTree.getValuesMap().get(GroupConfigConstant.BATCH_SIZE);
@@ -59,34 +64,40 @@ public class ConsenterConfig implements IConsenterConfig {
                 batchSize = Configuration.BatchSize.parseFrom(batchSizeValue.getValue());
             }
 
-            Configtx.ConfigValue batchTimeoutValue = consenterTree.getValuesMap().get(GroupConfigConstant.BATCH_TIMEOUT);
+            Configtx.ConfigValue batchTimeoutValue = consenterTree.getValuesMap().get(GroupConfigConstant
+                    .BATCH_TIMEOUT);
             if (batchTimeoutValue != null) {
-                batchTimeout = Configuration.BatchTimeout.parseFrom(batchTimeoutValue.getValue());
+                batchTimeoutProto = Configuration.BatchTimeout.parseFrom(batchTimeoutValue.getValue());
             }
 
-            Configtx.ConfigValue kafkaBrokersValue = consenterTree.getValuesMap().get(GroupConfigConstant.KAFKA_BROKERS);
+            Configtx.ConfigValue kafkaBrokersValue = consenterTree.getValuesMap().get(GroupConfigConstant
+                    .KAFKA_BROKERS);
             if (kafkaBrokersValue != null) {
-                kafkaBrokers = Configuration.KafkaBrokers.parseFrom(kafkaBrokersValue.getValue());
+                kafkaBrokersProto = Configuration.KafkaBrokers.parseFrom(kafkaBrokersValue.getValue());
             }
 
-            Configtx.ConfigValue groupRestrictionsValue = consenterTree.getValuesMap().get(GroupConfigConstant.GROUP_RESTRICTIONS);
+            Configtx.ConfigValue groupRestrictionsValue = consenterTree.getValuesMap().get(GroupConfigConstant
+                    .GROUP_RESTRICTIONS);
             if (groupRestrictionsValue != null) {
                 groupRestrictions = Configuration.GroupRestrictions.parseFrom(groupRestrictionsValue.getValue());
+                maxChannelsCount = groupRestrictions.getMaxCount();
             }
 
             Configtx.ConfigValue capabilitiesValue = consenterTree.getValuesMap().get(GroupConfigConstant.CAPABILITIES);
             if (capabilitiesValue != null) {
-                capabilities = org.bcia.javachain.protos.common.Configuration.Capabilities.parseFrom(capabilitiesValue.getValue());
+                capabilitiesProto = org.bcia.javachain.protos.common.Configuration.Capabilities.parseFrom
+                        (capabilitiesValue.getValue());
             }
 
             validateBatchSize();
-            validateBatchTimeout();
+            batchTimeout = validateBatchTimeout();
             validateKafkaBrokers();
         }
 
         organizationConfigMap = new HashMap<String, IOrganizationConfig>();
         if (consenterTree != null && consenterTree.getChildsMap() != null) {
-            Iterator<Map.Entry<String, Configtx.ConfigTree>> entries = consenterTree.getChildsMap().entrySet().iterator();
+            Iterator<Map.Entry<String, Configtx.ConfigTree>> entries = consenterTree.getChildsMap().entrySet()
+                    .iterator();
             while (entries.hasNext()) {
                 Map.Entry<String, Configtx.ConfigTree> entry = entries.next();
                 String orgName = entry.getKey();
@@ -96,41 +107,6 @@ public class ConsenterConfig implements IConsenterConfig {
                 organizationConfigMap.put(orgName, organizationConfig);
             }
         }
-    }
-
-    @Override
-    public Configuration.ConsensusType getConsensusType() {
-        return consensusType;
-    }
-
-    @Override
-    public Configuration.BatchSize getBatchSize() {
-        return batchSize;
-    }
-
-    @Override
-    public Configuration.BatchTimeout getBatchTimeout() {
-        return batchTimeout;
-    }
-
-    @Override
-    public Configuration.KafkaBrokers getKafkaBrokers() {
-        return kafkaBrokers;
-    }
-
-    @Override
-    public Configuration.GroupRestrictions getGroupRestrictions() {
-        return groupRestrictions;
-    }
-
-    @Override
-    public IConsenterCapabilities getCapabilities() {
-        return null;
-    }
-
-    @Override
-    public Map<String, IOrganizationConfig> getOrganizationConfigMap() {
-        return organizationConfigMap;
     }
 
     private void validateBatchSize() throws ValidateException {
@@ -151,24 +127,26 @@ public class ConsenterConfig implements IConsenterConfig {
         }
     }
 
-    private void validateBatchTimeout() throws ValidateException {
+    private long validateBatchTimeout() throws ValidateException {
         try {
-            Long.parseLong(batchTimeout.getTimeout());
+            return Long.parseLong(batchTimeoutProto.getTimeout());
         } catch (Exception ex) {
             throw new ValidateException("Wrong batchTimeout");
         }
     }
 
-    private void validateKafkaBrokers() throws ValidateException {
-        for (String broker : kafkaBrokers.getBrokersList()) {
+    private List<String> validateKafkaBrokers() throws ValidateException {
+        List<String> brokerList = new ArrayList<String>();
+        for (String broker : kafkaBrokersProto.getBrokersList()) {
             validateKafkaBroker(broker);
+            brokerList.add(broker);
         }
+
+        return brokerList;
     }
 
     private void validateKafkaBroker(String broker) throws ValidateException {
-        if (StringUtils.isBlank(broker)) {
-            throw new ValidateException("broker is null");
-        }
+        ValidateUtils.isNotBlank(broker, "broker can not be empty");
 
         String[] hostAndPort = broker.split(":");
         if (hostAndPort.length != 2) {
@@ -186,5 +164,40 @@ public class ConsenterConfig implements IConsenterConfig {
         if (!Pattern.matches("^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9.-]*[a-zA-Z0-9])$", host)) {
             throw new ValidateException("Wrong host");
         }
+    }
+
+    @Override
+    public String getConsensusType() {
+        return consensusType;
+    }
+
+    @Override
+    public Configuration.BatchSize getBatchSize() {
+        return batchSize;
+    }
+
+    @Override
+    public long getBatchTimeout() {
+        return batchTimeout;
+    }
+
+    @Override
+    public List<String> getKafkaBrokers() {
+        return kafkaBrokers;
+    }
+
+    @Override
+    public long getMaxChannelsCount() {
+        return maxChannelsCount;
+    }
+
+    @Override
+    public IConsenterCapabilities getCapabilities() {
+        return capabilities;
+    }
+
+    @Override
+    public Map<String, IOrganizationConfig> getOrganizationConfigMap() {
+        return organizationConfigMap;
     }
 }
