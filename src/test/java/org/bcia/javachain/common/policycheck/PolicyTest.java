@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.policycheck.common;
+
+package org.bcia.javachain.common.policycheck;
 
 /**
  * 类描述
  *
  * @author yuanjun
- * @date 26/04/18
+ * @date 11/05/18
  * @company Aisino
  */
-public abstract class IsSignaturePolicy_Type {
-    void isSignaturePolicy_Type(){}
+public class PolicyTest {
 }

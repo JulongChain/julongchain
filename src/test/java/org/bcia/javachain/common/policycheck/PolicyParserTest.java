@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package org.bcia.javachain.common.policycheck.cauthdsl;
+package org.bcia.javachain.common.policycheck;
 
 /**
  * 类描述
  *
  * @author yuanjun
- * @date 26/04/18
+ * @date 11/05/18
  * @company Aisino
  */
-public class PolicyParser_test {
+public class PolicyParserTest {
 }

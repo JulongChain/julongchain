@@ -155,6 +155,7 @@ public class BlockIndex implements Index {
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_HASH) == null){
             throw BlockStorage.ERR_ARRT_NOT_INDEXED;
         }
+        byte[] a = constructBlockHashKey(blockHash);
         byte[] b = db.get(constructBlockHashKey(blockHash));
         if(b == null){
             throw BlockStorage.ERR_NOT_FOUND_IN_INDEX;

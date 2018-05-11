@@ -15,10 +15,14 @@
  */
 package org.bcia.javachain.core.common.smartcontractprovider;
 
+import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.node.Query;
+import org.bcia.javachain.protos.node.Smartcontract;
+
+import java.io.*;
 
 /**
  * 类描述
@@ -29,6 +33,74 @@ import org.bcia.javachain.protos.node.Query;
  */
 public class SmartContractProvider {
     private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractProvider.class);
+
+    public static String smartContractInstallPath = "/home/bcia/javachain/lssc";
+
+    /**
+     * 给静态变量smartContractInstallPath设置值为智能合约路径
+     * @param path
+     * @return
+     */
+    public static String getSmartContractPath(String path){
+        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
+        File file = new File(path);
+        //不存在则创建mkdir
+        if(!file.exists()){
+            if(file.mkdir()){
+                throw new RuntimeException("Fail to create smartcontract install path " + path);
+            }
+        }
+        if(!file.isDirectory()){
+            throw new RuntimeException("Smartcontract install path is exists but not a dir: " + path);
+        }
+        smartContractInstallPath = path;
+        return path;
+    }
+
+    /**
+     * 根据SmartContract name、SmartContract version获取到文件系统中存储的SmartContract
+     * @param scName SmartContract name
+     * @param scVersion SmartContract version
+     * @return 文件系统中存储的SmartContract
+     */
+    public static byte[] getSmartContractPackage(String scName, String scVersion) throws JavaChainException{
+        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
+        //获取文件路径
+        String path = String.format("%s/%s.%s", smartContractInstallPath, scName, scVersion);
+        InputStream is = null;
+        File file = new File(path);
+        try {
+            is = new FileInputStream(path);
+        } catch (FileNotFoundException e) {
+            log.error(e.getMessage(), e);
+            throw new JavaChainException(e);
+        }
+        byte[] scBytes = new byte[(int) file.length()];
+        try {
+            is.read(scBytes);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+            throw new JavaChainException(e);
+        }
+        return scBytes;
+    }
+
+    /**
+     * 根据SmartContract name、SmartContract version判断智能合约是否存在
+     * @param scName SmartContract name
+     * @param scVersion SmartContract version
+     * @return 智能合约存在性
+     * @throws JavaChainException
+     */
+    public static boolean smartContractPackageExists(String scName, String scVersion) throws JavaChainException{
+        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
+        String path = String.format("%s/%s.%s", smartContractInstallPath, scName, scVersion);
+        File file = new File(path);
+        if(file.exists()){
+            return true;
+        }
+        return false;
+    }
 
     /**
      * getSmartContractPackage tries each known package implementation one by one
@@ -62,11 +134,26 @@ public class SmartContractProvider {
      */
 
     public static byte[] extractStateDBArtifactsFromSCPackage(ISmartContractPackage scPack) throws JavaChainException {
+        Smartcontract.SmartContractDeploymentSpec sds = scPack.getDepSpec();
+        ByteString bytes = sds.getCodePackage();
         return null;
     }
 
     public static ISmartContractPackage getSmartContractFromFS(String name, String version) throws JavaChainException {
-        return null;
+        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
+        ISmartContractPackage pack = null;
+        try {
+            pack = new SDSPackage();
+            pack.initFromFS(name, version);
+        } catch (JavaChainException e) {
+            try {
+                pack = new SignedSDSPackage();
+                pack.initFromFS(name, version);
+            } catch (JavaChainException e1) {
+                throw e;
+            }
+        }
+        return pack;
     }
 
     public static Query.SmartContractQueryResponse getInstalledSmartcontracts() throws JavaChainException {

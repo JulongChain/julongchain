@@ -16,10 +16,7 @@
 
 package org.bcia.javachain.common.policycheck.cauthdsl;
 
-import org.apache.commons.logging.Log;
-import org.apache.zookeeper.proto.ErrorResponse;
 import org.bcia.javachain.common.exception.PolicyException;
-import org.bcia.javachain.common.exception.SysSmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policies.IPolicy;
@@ -27,11 +24,9 @@ import org.bcia.javachain.common.policycheck.bean.MSPPrincipal;
 import org.bcia.javachain.common.policycheck.bean.PolicyBean;
 import org.bcia.javachain.common.policycheck.bean.Provider;
 import org.bcia.javachain.common.policycheck.bean.SignaturePolicyEnvelope;
-import org.bcia.javachain.common.policycheck.common.IsSignaturePolicy_Type;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.mgmt.Msp;
-import org.bcia.javachain.msp.mgmt.MspManager;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;

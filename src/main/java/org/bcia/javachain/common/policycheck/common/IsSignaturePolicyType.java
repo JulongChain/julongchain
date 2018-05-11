@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.bcia.javachain.common.policycheck.cauthdsl;
+package org.bcia.javachain.common.policycheck.common;
 
 /**
  * 类描述
@@ -23,5 +22,6 @@ package org.bcia.javachain.common.policycheck.cauthdsl;
  * @date 26/04/18
  * @company Aisino
  */
-public class Cauthdsl_test {
+public abstract class IsSignaturePolicyType {
+    void isSignaturePolicy_Type(){}
 }

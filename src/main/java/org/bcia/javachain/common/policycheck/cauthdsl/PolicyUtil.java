@@ -25,7 +25,7 @@ import org.bcia.javachain.common.policycheck.bean.SignaturePolicyEnvelope;
  * @date 26/04/18
  * @company Aisino
  */
-public class Policy_util {
+public class PolicyUtil {
     public void TemplatePolicy(String key, SignaturePolicyEnvelope sigPolicyEnv){
 
     }

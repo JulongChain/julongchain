@@ -58,7 +58,8 @@ public class LedterTest {
 
     @Test
     public void getKVFromLevelDB() throws Throwable {
-        LevelDBProvider provider = LevelDBProvider.newProvider(LedgerConfig.getHistoryLevelDBPath());
+        LevelDBProvider provider = LevelDBProvider.newProvider("/home/bcia/javachain/ledgersData/chains/index");
+//        LevelDBProvider provider = LevelDBProvider.newProvider(LedgerConfig.getHistoryLevelDBPath());
 //        LevelDBProvider provider = LevelDBProvider.newProvider("/home/bcia/javachain/ledgersData/ledgerProvider");
 //        LevelDBProvider provider = LevelDBProvider.newProvider("/home/bcia/javachain/ledgersData/stateLeveldb");
 //        for (int i = 0; i < 100; i++) {
@@ -68,17 +69,19 @@ public class LedterTest {
 //            byte[] value = height.toBytes();
 //            provider.put(ArrayUtils.addAll(ArrayUtils.addAll(("ns" + i).getBytes(), COMPOSITE_KEY_SEP), ("key" + i).getBytes()), value, true);
 //        }
-//        Iterator<Map.Entry<byte[], byte[]>> itr =  provider.getIterator(null);
-//        while(itr.hasNext()){
-//            Map.Entry<byte[], byte[]> entry = itr.next();
-////            soutBytes(entry.getKey());
-////            soutBytes(entry.getValue());
-////            System.out.println(Height.newHeightFromBytes(entry.getValue()).getTxNum());
-////            System.out.println(Height.newHeightFromBytes(entry.getValue()).getBlockNum());
+        Iterator<Map.Entry<byte[], byte[]>> itr =  provider.getIterator(null);
+        while(itr.hasNext()){
+            Map.Entry<byte[], byte[]> entry = itr.next();
+//            soutBytes(entry.getKey());
+//            soutBytes(entry.getValue());
+//            System.out.println(Height.newHeightFromBytes(entry.getValue()).getTxNum());
+//            System.out.println(Height.newHeightFromBytes(entry.getValue()).getBlockNum());
 //            System.out.println(new String(entry.getKey()));
 //            System.out.println(new String(entry.getValue()));
-//            System.out.println("_____________________________________");
-//        }
+            soutBytes(entry.getKey());
+            soutBytes(entry.getValue());
+            System.out.println("_____________________________________");
+        }
 
     }
 
@@ -101,7 +104,8 @@ public class LedterTest {
     public static void soutBytes(byte[] bytes){
         int i = 0;
         for(byte b : bytes){
-            System.out.println(b + " ");
+            System.out.print(b + " ");
         }
+        System.out.println();
     }
 }
