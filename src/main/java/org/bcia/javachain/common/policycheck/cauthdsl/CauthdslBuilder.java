@@ -26,7 +26,7 @@ import org.bcia.javachain.common.policycheck.bean.SignaturePolicyEnvelope;
  * @date 26/04/18
  * @company Aisino
  */
-public class Cauthdsl_builder {
+public class CauthdslBuilder {
     private SignaturePolicyEnvelope AcceptAllPolicy;
     private byte[] MarshaledAcceptAllPolicy;
     private SignaturePolicyEnvelope RejectAllPolicy;

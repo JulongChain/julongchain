@@ -16,7 +16,7 @@
 
 package org.bcia.javachain.common.policycheck;
 
-import org.bcia.javachain.common.policycheck.common.IsSignaturePolicy_Type;
+import org.bcia.javachain.common.policycheck.common.IsSignaturePolicyType;
 
 /**
  * 类描述
@@ -25,7 +25,7 @@ import org.bcia.javachain.common.policycheck.common.IsSignaturePolicy_Type;
  * @date 09/05/18
  * @company Aisino
  */
-public class SignaturePolicy_SignedBy extends IsSignaturePolicy_Type{
+public class SignaturePolicySignedBy extends IsSignaturePolicyType {
     public int SignedBy;
 
 }

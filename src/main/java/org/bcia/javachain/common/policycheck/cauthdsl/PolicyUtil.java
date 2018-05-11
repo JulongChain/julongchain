@@ -16,6 +16,8 @@
 
 package org.bcia.javachain.common.policycheck.cauthdsl;
 
+import org.bcia.javachain.common.policycheck.bean.SignaturePolicyEnvelope;
+
 /**
  * 类描述
  *
@@ -23,5 +25,10 @@ package org.bcia.javachain.common.policycheck.cauthdsl;
  * @date 26/04/18
  * @company Aisino
  */
-public class PolicyParser_test {
+public class PolicyUtil {
+    public void TemplatePolicy(String key, SignaturePolicyEnvelope sigPolicyEnv){
+
+    }
+
 }
+

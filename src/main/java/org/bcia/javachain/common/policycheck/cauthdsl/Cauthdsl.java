@@ -16,18 +16,15 @@
 
 package org.bcia.javachain.common.policycheck.cauthdsl;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.common.policies.SignaturePolicy;
-import org.bcia.javachain.common.policycheck.SignaturePolicy_NOutOf;
-import org.bcia.javachain.common.policycheck.SignaturePolicy_SignedBy;
-import org.bcia.javachain.common.policycheck.common.IsSignaturePolicy_Type;
+import org.bcia.javachain.common.policycheck.SignaturePolicyNOutOf;
+import org.bcia.javachain.common.policycheck.SignaturePolicySignedBy;
+import org.bcia.javachain.common.policycheck.common.IsSignaturePolicyType;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.mgmt.Identity;
 import org.bcia.javachain.msp.mgmt.Msp;
-import org.bcia.javachain.msp.mgmt.MspManager;
 import org.bcia.javachain.protos.common.MspPrincipal;
 
 import java.lang.reflect.InvocationTargetException;
@@ -70,18 +67,18 @@ public class Cauthdsl {
      * @param policy
      * @return
      */
-    public static boolean compile(IsSignaturePolicy_Type policy, MspPrincipal[] identities, Msp msp) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public static boolean compile(IsSignaturePolicyType policy, MspPrincipal[] identities, Msp msp) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
     List<SignedData> signedDatas = new ArrayList<SignedData>();
     List<Boolean> policies = new ArrayList<Boolean>();
     if(policy==null){
         log.info("Empty policy element");
     }
-    if(policy instanceof SignaturePolicy_NOutOf){
+    if(policy instanceof SignaturePolicyNOutOf){
 
 
 
         Method rules = policy.getClass().getMethod("getRules");
-        List<IsSignaturePolicy_Type> policys = (List<IsSignaturePolicy_Type>) rules.invoke(policy);
+        List<IsSignaturePolicyType> policys = (List<IsSignaturePolicyType>) rules.invoke(policy);
         for (int i =0;i<policys.size();i++){
             boolean compiledPolicy = compile(policys.get(i),identities,msp);
             policies.add(compiledPolicy);
@@ -89,11 +86,11 @@ public class Cauthdsl {
         return Cauthdsl.confirmSignedData(signedDatas,policies,policy);
 
     }
-    if(policy instanceof SignaturePolicy_SignedBy){
-        if(((SignaturePolicy_SignedBy) policy).SignedBy<0 ||((SignaturePolicy_SignedBy) policy).SignedBy>=identities.length){
-            log.info("identity index out of range, requested "+((SignaturePolicy_SignedBy) policy).SignedBy+", but identies length is"+identities.length);
+    if(policy instanceof SignaturePolicySignedBy){
+        if(((SignaturePolicySignedBy) policy).SignedBy<0 ||((SignaturePolicySignedBy) policy).SignedBy>=identities.length){
+            log.info("identity index out of range, requested "+((SignaturePolicySignedBy) policy).SignedBy+", but identies length is"+identities.length);
         }
-        MspPrincipal signedByID = identities[((SignaturePolicy_SignedBy) policy).SignedBy];
+        MspPrincipal signedByID = identities[((SignaturePolicySignedBy) policy).SignedBy];
         return Cauthdsl.confirmSignedData1(signedDatas,policies,signedByID,msp);
     }
         //TODO 待完善
@@ -106,7 +103,7 @@ public class Cauthdsl {
      * @param policies
      * @return
      */
-    public static boolean confirmSignedData(List<SignedData> signedDatas,List<Boolean> policies,IsSignaturePolicy_Type policy) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public static boolean confirmSignedData(List<SignedData> signedDatas,List<Boolean> policies,IsSignaturePolicyType policy) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Long grepKey = new Date().getTime();
         log.info(signedDatas+"gate"+grepKey+" evaluation starts");
         int verified = 0;
