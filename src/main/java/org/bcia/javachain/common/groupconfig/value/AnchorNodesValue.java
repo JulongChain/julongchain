@@ -30,8 +30,10 @@ public class AnchorNodesValue extends StandardConfigValue {
         this.key = GroupConfigConstant.ANCHOR_NODES;
 
         Configuration.AnchorNodes.Builder anchorNodesBuilder = Configuration.AnchorNodes.newBuilder();
-        for (Configuration.AnchorNode anchorNode : anchorNodes) {
-            anchorNodesBuilder.addAnchorNodes(anchorNode);
+        if (anchorNodes != null && anchorNodes.length > 0) {
+            for (Configuration.AnchorNode anchorNode : anchorNodes) {
+                anchorNodesBuilder.addAnchorNodes(anchorNode);
+            }
         }
 
         this.value = anchorNodesBuilder.build();

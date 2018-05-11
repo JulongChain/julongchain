@@ -16,8 +16,8 @@
 package org.bcia.javachain.core.common.smartcontractprovider;
 
 /**
- * 类描述
- *
+ * SmartContractProviderFactory defines a factory interface so
+* that the actual implementation can be injected
  * @author sunianle
  * @date 3/7/18
  * @company Dingxuan

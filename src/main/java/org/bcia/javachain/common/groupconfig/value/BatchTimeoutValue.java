@@ -13,15 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.channelconfig;
+package org.bcia.javachain.common.groupconfig.value;
+
+import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
+import org.bcia.javachain.protos.consenter.Configuration;
 
 /**
- * 类描述
+ * 对象
  *
- * @author sunianle
- * @date 3/21/18
+ * @author zhouhui
+ * @date 2018/5/11
  * @company Dingxuan
- * @deprecated 使用ApplicationProvider代替，已经移植到groupconfig包名
  */
-public class ApplicationCapabilities {
+public class BatchTimeoutValue extends StandardConfigValue {
+    public BatchTimeoutValue(String timeout) {
+        this.key = GroupConfigConstant.BATCH_TIMEOUT;
+
+        Configuration.BatchTimeout.Builder batchTimeoutBuilder = Configuration.BatchTimeout.newBuilder();
+        batchTimeoutBuilder.setTimeout(timeout);
+
+        this.value = batchTimeoutBuilder.build();
+    }
 }

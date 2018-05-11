@@ -15,26 +15,27 @@
  */
 package org.bcia.javachain.common.groupconfig.value;
 
-import com.google.protobuf.Message;
+import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
+import org.bcia.javachain.protos.common.Configuration;
 
 /**
- * 标准配置值
+ * 对象
  *
  * @author zhouhui
- * @date 2018/3/9
+ * @date 2018/5/10
  * @company Dingxuan
  */
-public class StandardConfigValue implements IConfigValue {
-    protected String key;
-    protected Message value;
+public class ConsenterAddressesValue extends StandardConfigValue {
 
-    @Override
-    public String getKey() {
-        return key;
-    }
+    public ConsenterAddressesValue(String[] addresses) {
+        this.key = GroupConfigConstant.CONSENTER_ADDRESSES;
 
-    @Override
-    public Message getValue() {
-        return value;
+        Configuration.ConsenterAddresses.Builder consenterAddressesBuilder = Configuration.ConsenterAddresses
+                .newBuilder();
+        if (addresses != null && addresses.length > 0) {
+            for (String address : addresses) {
+                consenterAddressesBuilder.addAddresses(address);
+            }
+        }
     }
 }

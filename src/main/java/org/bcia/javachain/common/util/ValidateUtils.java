@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.ValidateException;
 
 /**
- * 对象
+ * 验证工具类
  *
  * @author zhouhui
  * @date 2018/4/25
@@ -42,6 +42,7 @@ public class ValidateUtils {
 
     /**
      * 确保字符串不为空，否则抛出异常
+     * 举例：ValidateUtils.isNotBlank(broker, "broker can not be empty");
      *
      * @param str
      * @param errorMessage

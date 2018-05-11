@@ -15,20 +15,36 @@
  */
 package org.bcia.javachain.common.groupconfig.capability;
 
+import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
+import org.bcia.javachain.protos.common.Configuration;
+
+import java.util.Map;
+
 /**
- * 应用支持能力对象
+ * 应用提供者
  *
  * @author zhouhui
  * @date 2018/5/9
  * @company Dingxuan
- * @deprecated 使用ApplicationProvider代替
  */
-public class ApplicationCapabilities implements IApplicationCapabilities {
+public class ApplicationProvider implements IApplicationCapabilities {
+    private Map<String, Configuration.Capability> capabilityMap;
+
     private boolean supported;
     private boolean forbidDuplicateTxId;
     private boolean resourcesTree;
     private boolean privateGroupData;
     private boolean validation;
+
+    public ApplicationProvider(Map<String, Configuration.Capability> capabilityMap) {
+        this.capabilityMap = capabilityMap;
+
+        this.supported = true;
+        this.forbidDuplicateTxId = capabilityMap.containsKey(GroupConfigConstant.APP_FORBID_DUPLICATE_TXID);
+        this.resourcesTree = capabilityMap.containsKey(GroupConfigConstant.APP_RESOURCE_TREE_EXPERIMENTAL);
+        this.privateGroupData = capabilityMap.containsKey(GroupConfigConstant.APP_PRIVATE_DATA_EXPERIMENTAL);
+        this.validation = capabilityMap.containsKey(GroupConfigConstant.APP_VALIDATION);
+    }
 
     @Override
     public boolean isSupported() {

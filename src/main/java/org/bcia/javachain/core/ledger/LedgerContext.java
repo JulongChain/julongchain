@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.channelconfig;
+package org.bcia.javachain.core.ledger;
 
 /**
- * 类描述
+ * ISmartContractProvider接口getContext函数的返回类型
  *
  * @author sunianle
- * @date 3/21/18
+ * @date 5/11/18
  * @company Dingxuan
- * @deprecated 使用ApplicationProvider代替，已经移植到groupconfig包名
  */
-public class ApplicationCapabilities {
+public class LedgerContext {
 }

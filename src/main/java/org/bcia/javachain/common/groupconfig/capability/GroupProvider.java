@@ -13,28 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig.value;
+package org.bcia.javachain.common.groupconfig.capability;
 
-import com.google.protobuf.Message;
+import org.bcia.javachain.protos.common.Configuration;
+
+import java.util.Map;
 
 /**
- * 标准配置值
+ * 对象
  *
  * @author zhouhui
- * @date 2018/3/9
+ * @date 2018/5/10
  * @company Dingxuan
  */
-public class StandardConfigValue implements IConfigValue {
-    protected String key;
-    protected Message value;
+public class GroupProvider implements IGroupCapabilities {
+    private Map<String, Configuration.Capability> capabilityMap;
 
-    @Override
-    public String getKey() {
-        return key;
+    private boolean supported;
+    private int mspVersion;
+
+    public GroupProvider(Map<String, Configuration.Capability> capabilityMap) {
+        this.capabilityMap = capabilityMap;
+
+        this.supported = true;
+        this.mspVersion = 0;
     }
 
     @Override
-    public Message getValue() {
-        return value;
+    public boolean isSupported() {
+        return supported;
+    }
+
+    @Override
+    public int getMspVersion() {
+        return mspVersion;
     }
 }

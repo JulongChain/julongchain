@@ -29,7 +29,7 @@ import org.bcia.javachain.protos.node.Smartcontract;
 import java.io.*;
 
 /**
- * 类描述
+ * SDSPackage encapsulates SmartcontractDeploymentSpec.
  *
  * @author sunianle
  * @date 4/25/18

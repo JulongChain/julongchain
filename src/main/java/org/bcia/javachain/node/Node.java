@@ -20,6 +20,7 @@ import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.genesis.GenesisBlockFactory;
 import org.bcia.javachain.common.groupconfig.GroupConfigBundle;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -39,8 +40,11 @@ import org.bcia.javachain.node.util.LedgerUtils;
 import org.bcia.javachain.node.util.NodeConstant;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
+import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
+import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +61,8 @@ import static org.bcia.javachain.msp.mspconfig.MspConfigFactory.loadMspConfig;
  */
 public class Node {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Node.class);
+
+    private static final String SAMPLE_DEVMODE_SOLO_PROFILE = "SampleDevModeSolo";
 
     /**
      * 单例模式，确保系统智能合约能够调用到独一实例
@@ -296,6 +302,65 @@ public class Node {
 
     public interface InitializeCallback {
         void onGroupInitialized(String groupId);
+    }
+
+    //MockInitialize resets chains for test env
+    public void MockInitialize() {
+        try {
+            new LedgerManager().initializeTestEnvWithCustomProcessors(null);
+        } catch (LedgerException e) {
+            e.printStackTrace();
+        }
+//        chains.list = nil
+//        chains.list = make(map[string]*chain)
+//        chainInitializer = func(string) { return }
+    }
+
+    public void MockCreateGroup(String groupId) throws IOException {
+//        Group group = groupMap.get(groupId);
+//        INodeLedger nodeLedger = group.getGroupSupport().getNodeLedger();
+//
+//        if (nodeLedger == null) {
+//            GenesisConfig.Profile profile = GenesisConfigFactory.loadGenesisConfig().getCompletedProfile
+//                    (SAMPLE_DEVMODE_SOLO_PROFILE);
+//
+//            GenesisBlockFactory genesisBlockFactory = new GenesisBlockFactory(GenesisConfigFactory.loadGenesisConfig
+//            )
+//
+//        }
+//
+//
+//        var ledger ledger.PeerLedger
+//        var err error
+//
+//        if ledger = GetLedger(cid);
+//        ledger == nil {
+//            gb, _ :=configtxtest.MakeGenesisBlock(cid)
+//            if ledger, err = ledgermgmt.CreateLedger(gb);
+//            err != nil {
+//                return err
+//            }
+//        }
+//
+//        chains.Lock()
+//        defer chains.Unlock()
+//
+//        chains.list[cid] = &chain {
+//            cs: &chainSupport {
+//                Resources: &mockchannelconfig.Resources {
+//                    PolicyManagerVal: &mockpolicies.Manager {
+//                        Policy: &mockpolicies.Policy {
+//                        },
+//                    },
+//                    ConfigtxValidatorVal: &mockconfigtx.Validator {
+//                    },
+//                },
+//                ledger:
+//                ledger
+//            },
+//        }
+//
+//        return nil
     }
 
 

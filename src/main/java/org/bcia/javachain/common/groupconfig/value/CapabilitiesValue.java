@@ -32,11 +32,13 @@ public class CapabilitiesValue extends StandardConfigValue {
         this.key = GroupConfigConstant.CAPABILITIES;
 
         Configuration.Capabilities.Builder capabilitiesBuilder = Configuration.Capabilities.newBuilder();
-        for (String str : capabilities.keySet()) {
-            if (capabilities.get(str)) {
-                //如果为true才需要加入列表
-                Configuration.Capability newCapability = Configuration.Capability.newBuilder().build();
-                capabilitiesBuilder.putCapabilities(str, newCapability);
+        if (capabilities != null && capabilities.size() > 0) {
+            for (String str : capabilities.keySet()) {
+                if (capabilities.get(str)) {
+                    //如果为true才需要加入列表
+                    Configuration.Capability newCapability = Configuration.Capability.newBuilder().build();
+                    capabilitiesBuilder.putCapabilities(str, newCapability);
+                }
             }
         }
 

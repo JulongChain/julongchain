@@ -13,18 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.smartcontract;
+package org.bcia.javachain.core.common.smartcontractprovider;
 
 /**
- * ChaincodeProvider provides an abstraction layer that is
- *used for different packages to interact with code in the
- * chaincode package without importing it; more methods
- * should be added below if necessary
+ * 类描述
  *
- * @author wanliangbing
- * @date 2018/3/22
+ * @author sunianle
+ * @date 5/11/18
  * @company Dingxuan
  */
-public interface ISmartContractProvider {
-
+public interface ISmartContractCacheSupport {
+    /**
+     * 获取智能合约
+     * @param name
+     * @param version
+     * @return
+     */
+    ISmartContractPackage getSmartContract(String name,String version);
 }

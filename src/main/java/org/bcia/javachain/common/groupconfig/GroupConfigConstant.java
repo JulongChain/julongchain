@@ -61,4 +61,18 @@ public class GroupConfigConstant {
     public static final String KAFKA_BROKERS = "KafkaBrokers";
 
     public static final String GROUP_CREATION_POLICY = "GroupCreationPolicy";
+
+    public static final String APP_PRIVATE_DATA_EXPERIMENTAL = "appPrivateDataExperimental";
+    public static final String APP_RESOURCE_TREE_EXPERIMENTAL = "appResourceTreeExperimental";
+    public static final String APP_FORBID_DUPLICATE_TXID = "appForbidDuplicateTxid";
+    public static final String APP_VALIDATION = "appValidation";
+
+    public static final String CONSENTER_PREDICTABLE_GROUP_TEMPLATE = "consenterPredictableGroupTemplate";
+    public static final String CONSENTER_RESUBMISSION = "consenterResubmission";
+    public static final String CONSENTER_EXPIRATION = "consenterExpiration";
+
+    public static final int DEFAULT_BLOCK_DATA_HASHING_WIDTH = Integer.MAX_VALUE;
+
+    public static final String CONSENTER_ADMINS_POLICY_NAME = "/Group/Consenter/Admins";
+    public static final String DEFAULT_HASHING_ALGORITHM_NAME = "SM3";
 }

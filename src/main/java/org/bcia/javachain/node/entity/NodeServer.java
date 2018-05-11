@@ -122,7 +122,7 @@ public class NodeServer {
         //绑定事件服务
         eventGrpcServer.bindEventHubServer(new EventHubServer());
 
-//        SmartContractProvider smartContractProvider = new SmartContractProvider();
+//        SmartContractExecuteProvider smartContractProvider = new SmartContractExecuteProvider();
 //        smartContractProvider
 
         //创建智能合约支持服务

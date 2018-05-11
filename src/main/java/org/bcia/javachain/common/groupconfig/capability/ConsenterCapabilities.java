@@ -21,10 +21,11 @@ package org.bcia.javachain.common.groupconfig.capability;
  * @author zhouhui
  * @date 2018/5/9
  * @company Dingxuan
+ * @deprecated 使用ConsenterProvider代替
  */
 public class ConsenterCapabilities implements IConsenterCapabilities {
     private boolean supported;
-    private boolean predictableChannelTemplate;
+    private boolean predictableGroupTemplate;
     private boolean resubmission;
     private boolean expiration;
 
@@ -34,8 +35,8 @@ public class ConsenterCapabilities implements IConsenterCapabilities {
     }
 
     @Override
-    public boolean isPredictableChannelTemplate() {
-        return predictableChannelTemplate;
+    public boolean isPredictableGroupTemplate() {
+        return predictableGroupTemplate;
     }
 
     @Override

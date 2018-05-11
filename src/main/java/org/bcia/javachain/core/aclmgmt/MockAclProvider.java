@@ -18,7 +18,7 @@ package org.bcia.javachain.core.aclmgmt;
 import org.bcia.javachain.protos.node.ProposalPackage;
 
 /**
- * 类描述
+ * AclProvider的模拟测试类,用于部分单元用例
  *
  * @author sunianle
  * @date 4/16/18

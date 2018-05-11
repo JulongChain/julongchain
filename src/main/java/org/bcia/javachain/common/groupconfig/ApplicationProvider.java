@@ -15,7 +15,6 @@
  */
 package org.bcia.javachain.common.groupconfig;
 
-import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.capability.IApplicationCapabilities;
 
 /**
