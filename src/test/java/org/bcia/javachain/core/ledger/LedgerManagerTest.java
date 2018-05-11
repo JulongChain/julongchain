@@ -21,14 +21,17 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.genesis.GenesisBlockFactory;
 import org.bcia.javachain.common.ledger.ILedger;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
+import org.bcia.javachain.protos.node.TransactionPackage;
 import org.junit.Test;
 import scala.Byte;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.Random;
 
 /**
@@ -39,6 +42,8 @@ import java.util.Random;
  * @company Dingxuan
  */
 public class LedgerManagerTest {
+    public static byte[] b1 = null;
+    public static byte[] b2 = null;
     INodeLedger l = null;
     private static final byte[] COMPOSITE_KEY_SEP = {0x00};
 
@@ -81,10 +86,17 @@ public class LedgerManagerTest {
     public void openLedger() throws Exception{
         LedgerManager.initialize(null);
         l = LedgerManager.openLedger("MyGroup");
+        System.out.println(l.getTransactionByID("2"));
     }
 
     @Test
-    public void commitBlock() throws LedgerException {
+    public void commitBlock() throws Exception {
+//        GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
+//        System.out.println(deleteDir(new File(Config.getPath())));
+//        long before = System.currentTimeMillis();
+//        LedgerManager.initialize(null);
+//        Common.Block block = factory.getGenesisBlock("MyGroup");
+//        l = LedgerManager.createLedger(block);
         LedgerManager.initialize(null);
         l = LedgerManager.openLedger("MyGroup");
         long i = 0;
@@ -98,9 +110,38 @@ public class LedgerManagerTest {
         long startTime = System.currentTimeMillis();
         Common.BlockData data = null;
         ByteString preHash = ByteString.copyFrom(new SM3().hash(l.getBlockByNumber(i - 1).getData().toByteArray()));
-        for (int j = 0; j < 2; j++) {
+        for (int j = 0; j < 1; j++) {
             BlockAndPvtData bap = new BlockAndPvtData();
-            data = Common.BlockData.getDefaultInstance();
+
+            Common.Envelope envelope = Common.Envelope.newBuilder()
+                    .setPayload(Common.Payload.newBuilder()
+                            .setHeader(Common.Header.newBuilder()
+                                    .setGroupHeader(Common.GroupHeader.newBuilder()
+                                            .setTxId(String.valueOf(i))
+                                            .build().toByteString())
+                                    .build())
+                            .build().toByteString())
+                    .build();
+            System.out.println();
+            System.out.println("Enter envelope " + String.valueOf(i));
+            System.out.println();
+            Common.Envelope envelope2 = Common.Envelope.newBuilder()
+                    .setPayload(Common.Payload.newBuilder()
+                            .setHeader(Common.Header.newBuilder()
+                                    .setGroupHeader(Common.GroupHeader.newBuilder()
+                                            .setTxId(String.valueOf(i + 1))
+                                            .build().toByteString())
+                                    .build())
+                            .build().toByteString())
+                    .build();
+            System.out.println();
+            System.out.println("Enter envelope " + String.valueOf(i + 1));
+            System.out.println();
+            data = Common.BlockData.newBuilder()
+                    .addData(envelope.toByteString())
+                    .addData(envelope2.toByteString())
+                    .build();
+
             bap.setBlock(Common.Block.newBuilder()
                     .setHeader(Common.BlockHeader.newBuilder()
                             .setNumber(i + j)
@@ -115,8 +156,9 @@ public class LedgerManagerTest {
                             .addMetadata(ByteString.EMPTY)
                             .build())
                     .build());
-            l.commitWithPvtData(bap);
+            soutBytes(bap.getBlock().toByteArray());
             preHash = ByteString.copyFrom(new SM3().hash(data.toByteArray()));
+            l.commitWithPvtData(bap);
         }
         long endTime = System.currentTimeMillis();
         System.out.println("耗时: " + String.valueOf(endTime - startTime) + "ms");
@@ -144,11 +186,52 @@ public class LedgerManagerTest {
         System.out.println(l.getBlockchainInfo());
     }
 
+    @Test
+    public void getTxById()throws Exception{
+        LedgerManager.initialize(null);
+        String groupId = "MyGroup";
+        l = LedgerManager.openLedger(groupId);
+        Common.Payload payload = Common.Payload.parseFrom(l.getTransactionByID("4").getTransactionEnvelope().getPayload());
+        Common.GroupHeader header = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
+        System.out.println(header);
+        System.out.println(header.getTxId());
+    }
+
+    @Test
+    public void getBlockByNumber() throws Exception{
+        LedgerManager.initialize(null);
+        String groupId = "MyGroup";
+        l = LedgerManager.openLedger(groupId);
+        System.out.println(l.getBlockByNumber(3));
+    }
+
+    @Test
+    public void getChainInfo() throws Exception{
+        LedgerManager.initialize(null);
+        String groupId = "MyGroup";
+        l = LedgerManager.openLedger(groupId);
+        System.out.println(l.getBlockchainInfo());
+    }
+
+    @Test
+    public void showfs() throws Exception{
+        File file = new File(LedgerConfig.getBlockStorePath() + File.separator + "chains/MyGroup/blockfile000000");
+        FileInputStream is = new FileInputStream(file);
+        byte[] b = new byte[(int) file.length()];
+        is.read(b);
+        soutBytes(b);
+//        byte[] b = new byte[70];
+//        is.skip(46);
+//        is.read(b);
+//        System.out.println(b[0]);
+//        Common.Envelope envelope = Common.Envelope.parseFrom(b);
+//        System.out.println(envelope);
+    }
+
     private static void soutBytes(byte[] bytes){
         int i = 0;
         for(byte b : bytes){
             System.out.print(b + " ");
         }
-        System.out.println();
     }
 }

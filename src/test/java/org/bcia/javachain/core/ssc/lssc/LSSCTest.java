@@ -5,6 +5,7 @@ import org.bcia.javachain.BaseJunit4Test;
 import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.common.util.proto.ProtoUtils;
 import org.bcia.javachain.common.util.proto.TxUtils;
+import org.bcia.javachain.core.node.NodeConfig;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.smartcontract.shim.impl.MockStub;
@@ -14,6 +15,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -45,7 +47,7 @@ public class LSSCTest extends BaseJunit4Test {
     public void testInstalls(){
         MockStub mockStub = new MockStub(CommConstant.LSSC, lssc);
         mockStub.mockInit("1",new LinkedList<ByteString>());
-        String path="/opt/git/javachain/src/main/java/org/bcia/javachain/examples/smartcontract/java/smartcontract_example02";
+        String path="src/main/java/org/bcia/javachain/examples/smartcontract/java/smartcontract_example02";
         testInstall("example02","1.0",path,"","Alice",mockStub);
     }
 
@@ -68,14 +70,16 @@ public class LSSCTest extends BaseJunit4Test {
         ProposalPackage.SignedProposal signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec, caller.getBytes(), "msg1".getBytes());
         ISmartContract.SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
         //尚未完全实现调通全部逻辑，返回内部错误
-        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
+//        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
+        //TODO write by sunzongyu. Create file $SmartContractInstallPath(/home/bica/javachain/lssc)/example02.1.0 success
+        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
     }
 
     @Test
     public void testDeploys(){
         MockStub mockStub = new MockStub("LSSC", lssc);
         mockStub.mockInit("1",new LinkedList<ByteString>());
-        String path="/opt/git/javachain/src/main/java/org/bcia/javachain/examples/smartcontract/java/smartcontract_example02";
+        String path="src/main/java/org/bcia/javachain/examples/smartcontract/java/smartcontract_example02";
         testDeploy("example02","1.0",path,"","Alice",mockStub);
     }
 
@@ -107,7 +111,7 @@ public class LSSCTest extends BaseJunit4Test {
     public void testUpgrades(){
         MockStub mockStub = new MockStub("LSSC", lssc);
         mockStub.mockInit("1",new LinkedList<ByteString>());
-        String path="/opt/git/javachain/src/main/java/org/bcia/javachain/examples/smartcontract/java/smartcontract_example02";
+        String path="src/main/java/org/bcia/javachain/examples/smartcontract/java/smartcontract_example02";
         testUpgrade("example02","1.0",path,"","Alice",mockStub);
     }
 
@@ -136,14 +140,40 @@ public class LSSCTest extends BaseJunit4Test {
     }
 
     private Smartcontract.SmartContractDeploymentSpec constructDeploySpec(String smartcontractName, String path, String version, List<String> initArgs, boolean bCreateFS) {
-        Smartcontract.SmartContractDeploymentSpec spec=Smartcontract.SmartContractDeploymentSpec.newBuilder().
-                setCodePackage(ByteString.copyFromUtf8("testcds")).build();
-        return spec;
+//        Smartcontract.SmartContractDeploymentSpec spec=Smartcontract.SmartContractDeploymentSpec.newBuilder().
+//                setCodePackage(ByteString.copyFromUtf8("testcds")).build();
+        Smartcontract.SmartContractInput input = null;
+        for (String initArg : initArgs) {
+            ByteString arg = ByteString.copyFromUtf8(initArg);
+            input = Smartcontract.SmartContractInput.newBuilder()
+                    .addArgs(arg)
+                    .build();
+        }
+        Smartcontract.SmartContractDeploymentSpec depSpec = Smartcontract.SmartContractDeploymentSpec.newBuilder()
+                .setSmartContractSpec(Smartcontract.SmartContractSpec.newBuilder()
+                        .setTypeValue(1)
+                        .setSmartContractId(Smartcontract.SmartContractID.newBuilder()
+                                .setName(smartcontractName)
+                                .setPath(path)
+                                .setVersion(version)
+                                .build())
+                        .setInput(input)
+                        .build())
+                .build();
+
+        return depSpec;
     }
 
 
     @Test
-    public void invoke() {
+    public void invoke() throws Exception{
+        File file = new File("testFile12112121231312313131");
+        if(!file.exists()){
+            System.out.println(file.createNewFile());
+        }
+    }
+
+    public void putSC2FS(){
 
     }
 }

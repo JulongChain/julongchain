@@ -33,8 +33,9 @@ public class FileLocPointer {
     public static FileLocPointer newFileLocationPointer(Integer fileSuffixNum, Integer beginningOffset, LocPointer relativeLP) {
         FileLocPointer flp = new FileLocPointer();
         LocPointer lp = new LocPointer();
-        lp.setOffset(beginningOffset + relativeLP.getOffset());
+        lp.setOffset(relativeLP.getOffset());
         lp.setBytesLength(relativeLP.getBytesLength());
+        flp.setFileSuffixNum(fileSuffixNum);
         flp.setLocPointer(lp);
         return flp;
     }
