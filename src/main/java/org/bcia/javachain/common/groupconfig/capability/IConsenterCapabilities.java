@@ -16,11 +16,18 @@
 package org.bcia.javachain.common.groupconfig.capability;
 
 /**
- * 对象
+ * 共识节点支持能力接口
  *
  * @author zhouhui
  * @date 2018/3/27
  * @company Dingxuan
  */
-public class IConsenterCapabilities {
+public interface IConsenterCapabilities {
+    boolean isSupported();
+
+    boolean isPredictableChannelTemplate();
+
+    boolean isResubmission();
+
+    boolean isExpiration();
 }

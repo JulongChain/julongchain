@@ -20,6 +20,7 @@ import org.bcia.javachain.common.policies.IManager;
 import org.bcia.javachain.consenter.consensus.IOrderer;
 import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
 import org.bcia.javachain.msp.IMspManager;
+import org.bcia.javachain.protos.common.Configuration;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 
 /**
@@ -60,7 +61,7 @@ public interface IResources {
      * and whether the consortiums config exists
      * @return
      */
-    GenesisConfig.Consortium consortiumsConfig();
+    Configuration.Consortium consortiumsConfig();
 
     /** ApplicationConfig returns the configtxapplication.SharedConfig for the channel
      * and whether the Application config exists

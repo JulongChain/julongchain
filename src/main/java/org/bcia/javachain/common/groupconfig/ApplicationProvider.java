@@ -26,28 +26,29 @@ import org.bcia.javachain.common.groupconfig.capability.IApplicationCapabilities
  * @company Dingxuan
  */
 public class ApplicationProvider implements IApplicationCapabilities {
-    @Override
-    public void supported() throws ValidateException {
-
-    }
 
     @Override
-    public boolean forbidDuplicateTXIdInBlock() {
+    public boolean isSupported() {
         return false;
     }
 
     @Override
-    public boolean resourcesTree() {
+    public boolean isForbidDuplicateTxId() {
         return false;
     }
 
     @Override
-    public boolean privateGroupData() {
+    public boolean isResourcesTree() {
         return false;
     }
 
     @Override
-    public boolean v1_1Validation() {
+    public boolean isPrivateGroupData() {
+        return false;
+    }
+
+    @Override
+    public boolean isValidation() {
         return false;
     }
 }
