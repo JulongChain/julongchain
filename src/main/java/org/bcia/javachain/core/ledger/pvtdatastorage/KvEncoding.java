@@ -29,8 +29,8 @@ import org.bcia.javachain.protos.ledger.rwset.Rwset;
  * @company Dingxuan
  */
 public class KvEncoding  {
-    public static final byte[] PENDING_COMMIT_KEY = {0};
-    public static final byte[] LAST_COMMITTED_BLK_KEY = {1};
+//    public static final byte[] PENDING_COMMIT_KEY = {0};
+//    public static final byte[] LAST_COMMITTED_BLK_KEY = {1};
     public static final byte[] PVT_DATA_KEY_PREFIX = {2};
     public static final byte[] EMPTY_VALUE = {};
 
@@ -62,5 +62,13 @@ public class KvEncoding  {
 
     public static long decodeBlockNum(byte[] blockNumBytes){
         return Util.bytesToLong(blockNumBytes, 0, 8);
+    }
+
+    public static byte[] getPendingCommitKey(String ledgerId){
+        return ArrayUtils.addAll(new byte[]{0}, ledgerId.getBytes());
+    }
+
+    public static byte[] getLastCommittedBlkKey(String ledgerId){
+        return ArrayUtils.addAll(new byte[]{1}, ledgerId.getBytes());
     }
 }

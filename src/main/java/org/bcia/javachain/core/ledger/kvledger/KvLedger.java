@@ -52,6 +52,7 @@ public class KvLedger implements INodeLedger {
     private BlockStore blockStore;
     private TxManager txtmgmt;
     private IHistoryDB historyDB;
+    private LedgerConfig ledgerConfig;
 
     /** NewKVLedger constructs new `KVLedger`
      *
@@ -410,4 +411,11 @@ public class KvLedger implements INodeLedger {
         this.historyDB = historyDB;
     }
 
+    public LedgerConfig getLedgerConfig() {
+        return ledgerConfig;
+    }
+//
+//    public void setLedgerConfig(String ledgerID) {
+//        this.ledgerConfig = new LedgerConfig(ledgerID);
+//    }
 }

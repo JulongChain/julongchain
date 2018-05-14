@@ -20,12 +20,15 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.genesis.GenesisBlockFactory;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
 import org.bcia.javachain.core.ledger.kvledger.KvLedger;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.KvScanner;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
+import org.bcia.javachain.protos.common.Ledger;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
@@ -39,6 +42,7 @@ import java.io.FileInputStream;
  * @company Dingxuan
  */
 public class LedgerManagerTest {
+    public static String groupID = "mytestgroupid2";
     public static byte[] b1 = null;
     public static byte[] b2 = null;
     INodeLedger l = null;
@@ -73,8 +77,13 @@ public class LedgerManagerTest {
         System.out.println(deleteDir(new File(Config.getPath())));
         long before = System.currentTimeMillis();
         LedgerManager.initialize(null);
-        Common.Block block = factory.getGenesisBlock("MyGroup");
+        Common.Block block = factory.getGenesisBlock("mytestgroupid1");
         l = LedgerManager.createLedger(block);
+        block = factory.getGenesisBlock("mytestgroupid2");
+        l = LedgerManager.createLedger(block);
+        long after = System.currentTimeMillis();
+        System.out.println("耗时： " + (after - before));
+//        l = LedgerManager.createLedger(block);
 //        List<String> list = LedgerManager.getLedgerIDs();
 //        list.forEach((s) -> {
 //            System.out.println(s);
@@ -86,8 +95,12 @@ public class LedgerManagerTest {
     @Test
     public void openLedger() throws Exception{
         LedgerManager.initialize(null);
-        l = LedgerManager.openLedger("MyGroup");
-        System.out.println(l.getTransactionByID("2"));
+        String ledgerId1 = "mytestgroupid1";
+        String ledgerId2 = "mytestgroupid2";
+        l = LedgerManager.openLedger(ledgerId1);
+        Assert.assertEquals(ledgerId1, ((KvLedger) l).getLedgerID());
+        l = LedgerManager.openLedger(ledgerId2);
+        Assert.assertEquals(ledgerId2, ((KvLedger) l).getLedgerID());
     }
 
     @Test
@@ -99,7 +112,7 @@ public class LedgerManagerTest {
 //        Common.Block block = factory.getGenesisBlock("MyGroup");
 //        l = LedgerManager.createLedger(block);
         LedgerManager.initialize(null);
-        l = LedgerManager.openLedger("MyGroup");
+        l = LedgerManager.openLedger("mytestgroupid1");
         long i = 0;
         while(true){
             if(l.getBlockByNumber(i) == null){
@@ -168,8 +181,7 @@ public class LedgerManagerTest {
     @Test
     public void showBlocks() throws Exception{
         LedgerManager.initialize(null);
-        String groupId = "MyGroup";
-        l = LedgerManager.openLedger(groupId);
+        l = LedgerManager.openLedger(groupID);
         for (int i = 0;; i++) {
             Common.Block block = l.getBlockByNumber(i);
             if(block == null){
@@ -182,16 +194,14 @@ public class LedgerManagerTest {
     @Test
     public void newTxSimulator() throws Exception {
         LedgerManager.initialize(null);
-        String groupId = "MyGroup";
-        l = LedgerManager.openLedger(groupId);
+        l = LedgerManager.openLedger(groupID);
         System.out.println(l.getBlockchainInfo());
     }
 
     @Test
     public void getTxById()throws Exception{
         LedgerManager.initialize(null);
-        String groupId = "MyGroup";
-        l = LedgerManager.openLedger(groupId);
+        l = LedgerManager.openLedger(groupID);
         Common.Payload payload = Common.Payload.parseFrom(l.getTransactionByID("4").getTransactionEnvelope().getPayload());
         Common.GroupHeader header = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
         System.out.println(header);
@@ -201,16 +211,14 @@ public class LedgerManagerTest {
     @Test
     public void getBlockByNumber() throws Exception{
         LedgerManager.initialize(null);
-        String groupId = "MyGroup";
-        l = LedgerManager.openLedger(groupId);
+        l = LedgerManager.openLedger(groupID);
         System.out.println(l.getBlockByNumber(3));
     }
 
     @Test
     public void getChainInfo() throws Exception{
         LedgerManager.initialize(null);
-        String groupId = "MyGroup";
-        l = LedgerManager.openLedger(groupId);
+        l = LedgerManager.openLedger(groupID);
         System.out.println(l.getBlockchainInfo());
     }
 
@@ -232,8 +240,7 @@ public class LedgerManagerTest {
     @Test
     public void getBlockByTxId() throws Exception {
         LedgerManager.initialize(null);
-        String groupId = "MyGroup";
-        l = LedgerManager.openLedger(groupId);
+        l = LedgerManager.openLedger(groupID);
         System.out.println("Result " + l.getBlockByTxID("80"));
     }
 

@@ -15,13 +15,24 @@
  */
 package org.bcia.javachain.common.groupconfig;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.apache.commons.collections4.MapUtils;
+import org.bcia.javachain.common.cauthdsl.PolicyProvider;
 import org.bcia.javachain.common.configtx.IValidator;
 import org.bcia.javachain.common.exception.ValidateException;
-import org.bcia.javachain.common.groupconfig.config.IConsenterConfig;
-import org.bcia.javachain.common.groupconfig.config.IGroupConfig;
+import org.bcia.javachain.common.groupconfig.config.*;
 import org.bcia.javachain.common.policies.IPolicyManager;
+import org.bcia.javachain.common.policycheck.bean.Policy;
 import org.bcia.javachain.common.util.ValidateUtils;
+import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.msp.IMspManager;
+import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Configtx;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * 群组配置集
@@ -48,6 +59,68 @@ public class GroupConfigBundle implements IGroupConfigBundle {
      */
     private IValidator validator;
 
+    public GroupConfigBundle(Common.Envelope envelope) throws ValidateException, InvalidProtocolBufferException {
+        ValidateUtils.isNotNull(envelope, "envelope can not be null");
+        ValidateUtils.isNotNull(envelope.getPayload(), "envelope.Payload can not be null");
+
+        Common.Payload payload = Common.Payload.parseFrom(envelope.getPayload());
+
+        ValidateUtils.isNotNull(payload.getHeader(), "envelope.Payload.header can not be null");
+        ValidateUtils.isNotNull(payload.getHeader().getGroupHeader(), "envelope.groupHeader can not be null");
+        ValidateUtils.isNotNull(payload.getData(), "envelope.Payload.data can not be null");
+
+        Common.GroupHeader groupHeader = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
+
+        if (groupHeader.getType() != Common.HeaderType.CONFIG_VALUE) {
+            throw new ValidateException("Wrong groupHeader type");
+        }
+
+        Configtx.ConfigEnvelope configEnvelope = Configtx.ConfigEnvelope.parseFrom(payload.getData());
+//        this(groupHeader.getGroupId(), configEnvelope.getConfig());
+    }
+
+    public GroupConfigBundle(String groupId, Configtx.Config config) throws ValidateException,
+            InvalidProtocolBufferException {
+        preValidate(config);
+
+        IGroupConfig groupConfig = new GroupConfig(config.getGroupTree());
+
+//        policyProviderMap = new HashMap<Integer, PolicyProvider>()
+
+
+    }
+
+    /**
+     * 预验证配置对象
+     *
+     * @param config
+     * @throws ValidateException
+     */
+    private void preValidate(Configtx.Config config) throws ValidateException {
+        ValidateUtils.isNotNull(config, "config can not be null");
+        ValidateUtils.isNotNull(config.getGroupTree(), "GroupTree can not be null");
+        ValidateUtils.isNotNull(config.getGroupTree().getChildsMap(), "GroupTree's child can not be null");
+
+        Configtx.ConfigTree groupTree = config.getGroupTree();
+        if (groupTree.getChildsMap().containsKey(GroupConfigConstant.CONSENTER)) {
+            Configtx.ConfigTree consenterTree = groupTree.getChildsMap().get(GroupConfigConstant.CONSENTER);
+            if (consenterTree.getChildsMap() != null && !consenterTree.getValuesMap().containsKey(GroupConfigConstant
+                    .CAPABILITIES)) {
+                if (groupTree.getValuesMap().containsKey(GroupConfigConstant.CAPABILITIES)) {
+                    //如果群组级别配置树具备某项能力，但共识级别配置树却不具备，则抛出异常
+                    throw new ValidateException("group have capabilities, but consenter hasn't");
+                }
+
+                Configtx.ConfigTree appTree = groupTree.getChildsMap().get(GroupConfigConstant.APPLICATION);
+                if (appTree != null && appTree.getValuesMap() != null && appTree.getValuesMap().containsKey
+                        (GroupConfigConstant.CAPABILITIES)) {
+                    //如果应用级别配置树具备某项能力，但共识级别配置树却不具备，则抛出异常
+                    throw new ValidateException("app have capabilities, but consenter hasn't");
+                }
+            }
+        }
+    }
+
     public void validateNew(IGroupConfigBundle otherBundle) throws ValidateException {
         ValidateUtils.isNotNull(otherBundle, "GroupConfigBundle can not be null");
         ValidateUtils.isNotNull(otherBundle.getGroupConfig(), "GroupConfig can not be null");
@@ -57,14 +130,80 @@ public class GroupConfigBundle implements IGroupConfigBundle {
             IConsenterConfig otherConsenterConfig = otherBundle.getGroupConfig().getConsenterConfig();
             ValidateUtils.isNotNull(otherConsenterConfig, "ConsenterConfig can not be null");
 
-//            consenterConfig.getConsensusType()
+            if (!Objects.equals(consenterConfig.getConsensusType(), otherConsenterConfig.getConsensusType())) {
+                throw new ValidateException("Different consensus type");
+            }
 
-
-//            if (bundle.getGroupConfig())
-
+            itemSameInOtherWhenExists(consenterConfig.getOrganizationConfigMap(), otherConsenterConfig
+                    .getOrganizationConfigMap());
         }
 
+        IApplicationConfig applicationConfig = groupConfig.getApplicationConfig();
+        if (applicationConfig != null) {
+            IApplicationConfig otherApplicationConfig = otherBundle.getGroupConfig().getApplicationConfig();
+            ValidateUtils.isNotNull(otherApplicationConfig, "ApplicationConfig can not be null");
 
+            itemSameInOtherWhenExists(applicationConfig.getApplicationOrgConfigs(), otherApplicationConfig
+                    .getApplicationOrgConfigs());
+        }
+
+        IConsortiumsConfig consortiumsConfig = groupConfig.getConsortiumsConfig();
+        if (consortiumsConfig != null) {
+            IConsortiumsConfig otherConsortiumsConfig = otherBundle.getGroupConfig().getConsortiumsConfig();
+            ValidateUtils.isNotNull(otherConsortiumsConfig, "otherConsortiumsConfig can not be null");
+
+            if (consortiumsConfig.getConsortiumConfigMap() != null && consortiumsConfig.getConsortiumConfigMap().size
+                    () > 0) {
+                if (otherConsortiumsConfig.getConsortiumConfigMap() != null && otherConsortiumsConfig
+                        .getConsortiumConfigMap().size() > 0) {
+                    Iterator<Map.Entry<String, IConsortiumConfig>> iterator = consortiumsConfig
+                            .getConsortiumConfigMap().entrySet().iterator();
+                    while (iterator.hasNext()) {
+                        Map.Entry<String, IConsortiumConfig> entry = iterator.next();
+                        String consortiumsName = entry.getKey();
+                        IConsortiumConfig consortiumConfig = entry.getValue();
+
+                        IConsortiumConfig otherConsortiumConfig = otherConsortiumsConfig.getConsortiumConfigMap().get
+                                (consortiumsName);
+                        if (otherConsortiumConfig != null) {
+                            itemSameInOtherWhenExists(consortiumConfig.getOrganizationConfigMap(),
+                                    otherConsortiumConfig.getOrganizationConfigMap());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * 当另一个集合存在相应元素时，则是否相同
+     *
+     * @param map
+     * @param otherMap
+     * @return
+     */
+    private boolean itemSameInOtherWhenExists(Map<String, ? extends IOrganizationConfig> map, Map<String, ? extends
+            IOrganizationConfig> otherMap) throws ValidateException {
+        if (map != null && map.size() > 0) {
+            if (otherMap != null && otherMap.size() > 0) {
+                Iterator<? extends Map.Entry<String, ? extends IOrganizationConfig>> iterator = map.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    Map.Entry<String, ? extends IOrganizationConfig> entry = iterator.next();
+                    String orgName = entry.getKey();
+                    IOrganizationConfig organizationConfig = entry.getValue();
+
+                    IOrganizationConfig otherOrganizationConfig = otherMap.get(orgName);
+                    if (otherOrganizationConfig != null && !Objects.equals(organizationConfig.getMspId(),
+                            otherOrganizationConfig.getMspId())) {
+                        //如果要比较的Map也存在对应的组织，但MSP却不相同,则抛出异常
+                        throw new ValidateException("Different org msp-----" + orgName + "," + organizationConfig
+                                .getMspId() + "," + otherOrganizationConfig.getMspId());
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     @Override

@@ -15,6 +15,8 @@
  */
 package org.bcia.javachain.common.groupconfig.config;
 
+import java.util.Map;
+
 /**
  * 对象
  *
@@ -23,4 +25,5 @@ package org.bcia.javachain.common.groupconfig.config;
  * @company Dingxuan
  */
 public interface IConsortiumsConfig {
+    Map<String, IConsortiumConfig> getConsortiumConfigMap();
 }
