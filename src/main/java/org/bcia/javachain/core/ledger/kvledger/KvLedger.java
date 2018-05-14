@@ -96,7 +96,7 @@ public class KvLedger implements INodeLedger {
         logger.debug("Evtering revocerDBs()");
         Ledger.BlockchainInfo info = blockStore.getBlockchainInfo();
         if(info.getHeight() == 0){
-            logger.debug("Block storage is empty");
+            logger.info("Block storage is empty");
             return;
         }
         long lastAvailableBlockNum = info.getHeight() - 1;
@@ -161,7 +161,7 @@ public class KvLedger implements INodeLedger {
             tranEvn = blockStore.retrieveTxByID(txID);
             txVResult = blockStore.retrieveTxValidationCodeByTxID(txID);
         } catch (LedgerException e) {
-            logger.debug(String.format("Fail to get transaction using id = [%s]", txID));
+            logger.info(String.format("Fail to get transaction using id = [%s]", txID));
             return null;
         }
         return TransactionPackage.ProcessedTransaction.newBuilder()
@@ -179,7 +179,7 @@ public class KvLedger implements INodeLedger {
         try {
             return blockStore.getBlockchainInfo();
         } catch (LedgerException e) {
-            logger.debug("Fail to get blockchain info");
+            logger.info("Fail to get blockchain info");
             return null;
         }
     }
@@ -206,7 +206,7 @@ public class KvLedger implements INodeLedger {
         try {
             return blockStore.retrieveBlocks(startBlockNumber);
         } catch (LedgerException e) {
-            logger.debug(String.format("Fail to get blocks iterator using start block num = [%d]", startBlockNumber));
+            logger.info(String.format("Fail to get blocks iterator using start block num = [%d]", startBlockNumber));
             return null;
         }
     }
@@ -221,7 +221,7 @@ public class KvLedger implements INodeLedger {
         try {
             return blockStore.retrieveBlockByHash(blockHash);
         } catch (LedgerException e) {
-            logger.debug("fail to get block by hash");
+            logger.info("fail to get block by hash");
             return null;
         }
     }
@@ -236,7 +236,7 @@ public class KvLedger implements INodeLedger {
         try {
             return blockStore.retrieveBlockByTxID(txID);
         } catch (LedgerException e) {
-            logger.debug(String.format("Fail to get block by txid = [%s]", txID));
+            logger.info(String.format("Fail to get block by txid = [%s]", txID));
             return null;
         }
     }
@@ -246,7 +246,7 @@ public class KvLedger implements INodeLedger {
         try {
             return blockStore.retrieveTxValidationCodeByTxID(txID);
         } catch (LedgerException e) {
-            logger.debug(String.format("Fail to get tx validation code by txid = [%s]", txID));
+            logger.info(String.format("Fail to get tx validation code by txid = [%s]", txID));
             return null;
         }
     }
@@ -260,7 +260,7 @@ public class KvLedger implements INodeLedger {
         try {
             return txtmgmt.newTxSimulator(txId);
         } catch (LedgerException e) {
-            logger.debug(String.format("fail to get new tx simulator using txid = [%s]", txId));
+            logger.info(String.format("fail to get new tx simulator using txid = [%s]", txId));
             return null;
         }
     }
@@ -284,7 +284,7 @@ public class KvLedger implements INodeLedger {
         try {
             return txtmgmt.newQueryExecutor(UUID.randomUUID().toString());
         } catch (LedgerException e) {
-            logger.debug("Fail to get query executor");
+            logger.info("Fail to get query executor");
             return null;
         }
     }
@@ -299,7 +299,7 @@ public class KvLedger implements INodeLedger {
         try {
             return historyDB.newHistoryQueryExecutor(blockStore);
         } catch (LedgerException e) {
-            logger.debug("Faile to get history query executor");
+            logger.info("Faile to get history query executor");
             return null;
         }
     }
@@ -309,7 +309,7 @@ public class KvLedger implements INodeLedger {
         try {
             return ((Store) blockStore).getPvtDataAndBlockByNum(blockNum, filter);
         } catch (LedgerException e) {
-            logger.debug(String.format("fail to get pvtdata block by block num = [%d]", blockNum));
+            logger.info(String.format("fail to get pvtdata block by block num = [%d]", blockNum));
             return null;
         }
     }
@@ -319,7 +319,7 @@ public class KvLedger implements INodeLedger {
         try {
             return ((Store) blockStore).getPvtDataByNum(blockNum, filter);
         } catch (LedgerException e) {
-            logger.debug(String.format("fail to get pvtdata block by block num = [%d]", blockNum));
+            logger.info(String.format("fail to get pvtdata block by block num = [%d]", blockNum));
             return null;
         }
     }
@@ -364,10 +364,11 @@ public class KvLedger implements INodeLedger {
         //执行校验工作
         txtmgmt.validateAndPrepare(blockAndPvtData, true);
         logger.debug(String.format("Group %s: Committing block %d to storage", ledgerID, blockNo));
+        //提交区块私有信息
         blockStore.commitWithPvtData(blockAndPvtData);
         logger.info(String.format("Group %s: Committed block %d to storage", ledgerID, blockNo));
-
         logger.debug(String.format("Group %s: Committing block %d transaction to state db", ledgerID, blockNo));
+        //提交区块
         txtmgmt.commit();
         //在HistoryDB允许的情况下提交历史信息
         if(LedgerConfig.isHistoryDBEnabled()){

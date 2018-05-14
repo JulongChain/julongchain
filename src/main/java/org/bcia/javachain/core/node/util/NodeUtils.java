@@ -47,33 +47,25 @@ public class NodeUtils {
     private static final JavaChainLog log = JavaChainLogFactory.getLog(NodeUtils.class);
 
     public static INodeLedger getLedger(String groupId) {
-//        if (StringUtils.isBlank(groupId)) {
-//            return null;
-//        }
-//
-//        Node node = null;
-//        try {
-//            node = Node.getInstance();
-//        } catch (NodeException e) {
-//            log.error(e.getMessage(), e);
-//        }
-//
-//        if (node != null) {
-//            Map<String, Group> groupMap = node.getGroupMap();
-//            Group group = groupMap.get(groupId);
-//            if (group != null) {
-//                return group.getGroupSupport().getNodeLedger();
-//            }
-//        }
-        //TODO test Qssc, modify by sunzongyu, date 2018-05-10
-        try {
-            LedgerManager.initialize(null);
-            return LedgerManager.openLedger(groupId);
-        } catch (LedgerException e) {
-            log.error(e.getMessage(), e);
-            throw new RuntimeException(e);
+        if (StringUtils.isBlank(groupId)) {
+            return null;
         }
-//        return null;
+
+        Node node = null;
+        try {
+            node = Node.getInstance();
+        } catch (NodeException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        if (node != null) {
+            Map<String, Group> groupMap = node.getGroupMap();
+            Group group = groupMap.get(groupId);
+            if (group != null) {
+                return group.getGroupSupport().getNodeLedger();
+            }
+        }
+        return null;
     }
 
     /**

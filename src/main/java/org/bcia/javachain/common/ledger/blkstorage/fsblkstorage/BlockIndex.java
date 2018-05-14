@@ -98,17 +98,17 @@ public class BlockIndex implements Index {
         UpdateBatch batch = LevelDBProvider.newUpdateBatch();
         byte[] flpBytes = flp.marshal();
 
-        //index1
+        //index1 blockHash数据 - getBlockByHash()
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_HASH)){
             batch.put(constructBlockHashKey(blockIndexInfo.getBlockHash()), flpBytes);
         }
 
-        //index2
+        //index2 blockNum数据 - getBlockByNum()
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM)){
             batch.put(constructBlockNumKey(blockIndexInfo.getBlockNum()), flpBytes);
         }
 
-        //index3 用来通过txid获取tx
+        //index3 用来通过txid获取tx - getTxById()
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_ID)){
             for(TxIndexInfo txOffset : txOffsets){
                 FileLocPointer txFlp = FileLocPointer.newFileLocationPointer(flp.getFileSuffixNum(), flp.getLocPointer().getOffset(), txOffset.getLoc());
@@ -129,7 +129,7 @@ public class BlockIndex implements Index {
             }
         }
 
-        //index5 通过txid获取区块
+        //index5 通过txid获取区块 getBlockByTxId()
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_TX_ID)){
             for(TxIndexInfo txOffset : txOffsets){
                 batch.put(constructBlockTxIDKey(txOffset.getTxID()), flpBytes);

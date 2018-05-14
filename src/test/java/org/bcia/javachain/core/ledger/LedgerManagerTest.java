@@ -16,6 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger;
 
 import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.genesis.GenesisBlockFactory;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
 import org.bcia.javachain.core.ledger.kvledger.KvLedger;
@@ -123,7 +124,7 @@ public class LedgerManagerTest {
                             .build().toByteString())
                     .build();
             System.out.println();
-            System.out.println("Enter envelope " + String.valueOf(j));
+            System.out.println("Enter envelope " + String.valueOf(j) + " with txID " + j);
             System.out.println();
             Common.Envelope envelope2 = Common.Envelope.newBuilder()
                     .setPayload(Common.Payload.newBuilder()
@@ -135,7 +136,7 @@ public class LedgerManagerTest {
                             .build().toByteString())
                     .build();
             System.out.println();
-            System.out.println("Enter envelope " + String.valueOf(j + 1));
+            System.out.println("Enter envelope " + String.valueOf(j + 1) + " with txID " + j * 10);
             System.out.println();
             data = Common.BlockData.newBuilder()
                     .addData(envelope.toByteString())
@@ -226,6 +227,14 @@ public class LedgerManagerTest {
 //        System.out.println(b[0]);
 //        Common.Envelope envelope = Common.Envelope.parseFrom(b);
 //        System.out.println(envelope);
+    }
+
+    @Test
+    public void getBlockByTxId() throws Exception {
+        LedgerManager.initialize(null);
+        String groupId = "MyGroup";
+        l = LedgerManager.openLedger(groupId);
+        System.out.println("Result " + l.getBlockByTxID("80"));
     }
 
     private static void soutBytes(byte[] bytes){
