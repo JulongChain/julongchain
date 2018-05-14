@@ -279,7 +279,7 @@ public class Node {
 
         GroupConfigBundle groupConfigBundle = null;
         if (groupConfig != null) {
-            groupConfigBundle = new GroupConfigBundle();
+            groupConfigBundle = new GroupConfigBundle(groupId, groupConfig);
         } else {
             Common.Envelope envelope = BlockUtils.extractEnvelope(configBlock, 0);
 

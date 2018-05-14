@@ -50,6 +50,7 @@ public class ConsortiumsConfig implements IConsortiumsConfig {
         }
     }
 
+    @Override
     public Map<String, IConsortiumConfig> getConsortiumConfigMap() {
         return consortiumConfigMap;
     }
