@@ -16,23 +16,20 @@ limitations under the License.
 package org.bcia.javachain.core.ledger;
 
 import com.google.protobuf.ByteString;
-import com.google.protobuf.util.JsonFormat;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.genesis.GenesisBlockFactory;
-import org.bcia.javachain.common.ledger.ILedger;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
+import org.bcia.javachain.core.ledger.kvledger.KvLedger;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
-import org.bcia.javachain.protos.node.TransactionPackage;
+import org.junit.After;
 import org.junit.Test;
-import scala.Byte;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.util.Random;
 
 /**
  * 类描述
@@ -60,6 +57,11 @@ public class LedgerManagerTest {
         return dir.delete();
     }
 
+    @After
+    public void after(){
+        System.out.println(((KvLedger) l).getLedgerID());
+    }
+
     @Test
     public void delete(){
         System.out.println(deleteDir(new File(Config.getPath())));
@@ -79,7 +81,6 @@ public class LedgerManagerTest {
 //        });
 //        ITxSimulator simulator = l.newTxSimulator("MyGroup");
 //        simulator.
-        l.getTransactionByID("asdal");
     }
 
     @Test
@@ -110,32 +111,32 @@ public class LedgerManagerTest {
         long startTime = System.currentTimeMillis();
         Common.BlockData data = null;
         ByteString preHash = ByteString.copyFrom(new SM3().hash(l.getBlockByNumber(i - 1).getData().toByteArray()));
-        for (int j = 0; j < 1; j++) {
+        for (int j = 0; j < 9; j++) {
             BlockAndPvtData bap = new BlockAndPvtData();
 
             Common.Envelope envelope = Common.Envelope.newBuilder()
                     .setPayload(Common.Payload.newBuilder()
                             .setHeader(Common.Header.newBuilder()
                                     .setGroupHeader(Common.GroupHeader.newBuilder()
-                                            .setTxId(String.valueOf(i))
+                                            .setTxId(String.valueOf(j))
                                             .build().toByteString())
                                     .build())
                             .build().toByteString())
                     .build();
             System.out.println();
-            System.out.println("Enter envelope " + String.valueOf(i));
+            System.out.println("Enter envelope " + String.valueOf(j) + " with txID " + j);
             System.out.println();
             Common.Envelope envelope2 = Common.Envelope.newBuilder()
                     .setPayload(Common.Payload.newBuilder()
                             .setHeader(Common.Header.newBuilder()
                                     .setGroupHeader(Common.GroupHeader.newBuilder()
-                                            .setTxId(String.valueOf(i + 1))
+                                            .setTxId(String.valueOf(j * 10))
                                             .build().toByteString())
                                     .build())
                             .build().toByteString())
                     .build();
             System.out.println();
-            System.out.println("Enter envelope " + String.valueOf(i + 1));
+            System.out.println("Enter envelope " + String.valueOf(j + 1) + " with txID " + j * 10);
             System.out.println();
             data = Common.BlockData.newBuilder()
                     .addData(envelope.toByteString())
@@ -226,6 +227,14 @@ public class LedgerManagerTest {
 //        System.out.println(b[0]);
 //        Common.Envelope envelope = Common.Envelope.parseFrom(b);
 //        System.out.println(envelope);
+    }
+
+    @Test
+    public void getBlockByTxId() throws Exception {
+        LedgerManager.initialize(null);
+        String groupId = "MyGroup";
+        l = LedgerManager.openLedger(groupId);
+        System.out.println("Result " + l.getBlockByTxID("80"));
     }
 
     private static void soutBytes(byte[] bytes){

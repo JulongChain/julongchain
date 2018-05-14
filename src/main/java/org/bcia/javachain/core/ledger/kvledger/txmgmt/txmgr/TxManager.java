@@ -33,15 +33,68 @@ import java.util.Map;
  */
 public interface TxManager extends Recoverable {
 
+    /**
+     * 创建查询器
+     * @param txid 交易id
+     * @return 查询器
+     * @throws LedgerException
+     */
     IQueryExecutor newQueryExecutor(String txid) throws LedgerException;
+
+    /**
+     * 创建交易模拟器
+     * @param txid 交易id
+     * @return 交易模拟器
+     * @throws LedgerException
+     */
     ITxSimulator newTxSimulator(String txid) throws LedgerException;
+
+    /**
+     * 校验数据
+     * @param blockAndPvtData
+     * @param doMVCCValidation
+     * @throws LedgerException
+     */
     void validateAndPrepare(BlockAndPvtData blockAndPvtData, Boolean doMVCCValidation) throws LedgerException;
+
+    /**
+     * 获取保存点信息
+     * @return
+     * @throws LedgerException
+     */
     Height getLastSavepoint() throws LedgerException;
+
+    /**
+     * 账本是否需要被恢复
+     * @return
+     * @throws LedgerException
+     */
     @Override
     long shouldRecover() throws LedgerException;
+
+    /**
+     * 提交丢失的区块
+     * @param blockAndPvtData
+     * @throws LedgerException
+     */
     @Override
     void commitLostBlock(BlockAndPvtData blockAndPvtData) throws LedgerException;
+
+    /**
+     * 提交区块
+     * @throws LedgerException
+     */
     void commit() throws LedgerException;
+
+    /**
+     * 回滚
+     * @throws LedgerException
+     */
     void rollback() throws LedgerException;
+
+    /**
+     * 关闭
+     * @throws LedgerException
+     */
     void shutdown() throws LedgerException;
 }

@@ -26,6 +26,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.util.TxValidationFlags;
 import org.bcia.javachain.core.ledger.util.Util;
+import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
 import java.util.HashMap;
@@ -93,21 +94,21 @@ public class BlockIndex implements Index {
         logger.debug(String.format("Indexing block [%s]", blockIndexInfo));
         FileLocPointer flp = blockIndexInfo.getFlp();
         List<TxIndexInfo> txOffsets = blockIndexInfo.getTxOffsets();
-        TxValidationFlags txsfltr = new TxValidationFlags(blockIndexInfo.getMetadata().getMetadataList().size());
+        TxValidationFlags txsfltr = new TxValidationFlags(blockIndexInfo.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER_VALUE).size());
         UpdateBatch batch = LevelDBProvider.newUpdateBatch();
         byte[] flpBytes = flp.marshal();
 
-        //index1
+        //index1 blockHash数据 - getBlockByHash()
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_HASH)){
             batch.put(constructBlockHashKey(blockIndexInfo.getBlockHash()), flpBytes);
         }
 
-        //index2
+        //index2 blockNum数据 - getBlockByNum()
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM)){
             batch.put(constructBlockNumKey(blockIndexInfo.getBlockNum()), flpBytes);
         }
 
-        //index3 用来通过txid获取tx
+        //index3 用来通过txid获取tx - getTxById()
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_ID)){
             for(TxIndexInfo txOffset : txOffsets){
                 FileLocPointer txFlp = FileLocPointer.newFileLocationPointer(flp.getFileSuffixNum(), flp.getLocPointer().getOffset(), txOffset.getLoc());
@@ -128,7 +129,7 @@ public class BlockIndex implements Index {
             }
         }
 
-        //index5 通过txid获取区块
+        //index5 通过txid获取区块 getBlockByTxId()
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_TX_ID)){
             for(TxIndexInfo txOffset : txOffsets){
                 batch.put(constructBlockTxIDKey(txOffset.getTxID()), flpBytes);

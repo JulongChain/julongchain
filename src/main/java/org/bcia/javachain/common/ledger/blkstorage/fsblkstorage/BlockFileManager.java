@@ -189,7 +189,7 @@ public class BlockFileManager {
         byte[] blockBytes = entry.getValue();
 
         ByteString blockHash = block.getHeader().getDataHash();
-        List<TxIndexInfo> txOffsets = BlockSerialization.txOffsets;
+        List<TxIndexInfo> txOffsets = info.getTxOffsets();
         int currentOffset = cpInfo.getLatestFileChunksize();
         //区块长度(尾部)
         long blockBytesLen = blockBytes.length;

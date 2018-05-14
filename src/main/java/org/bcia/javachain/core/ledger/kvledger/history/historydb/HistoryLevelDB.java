@@ -100,7 +100,6 @@ public class HistoryLevelDB implements IHistoryDB {
         //获取失效
         TxValidationFlags txsFilter = TxValidationFlags.fromByteString(block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
         //没有失效的部分
-        //TODO 对于metadata的写入存在Array无法初始化问题
         //对于正常的完整的block不存在setMetadata报错问题
         if(txsFilter.length() == 0){
             txsFilter = new TxValidationFlags(block.getData().getDataCount());
@@ -115,8 +114,6 @@ public class HistoryLevelDB implements IHistoryDB {
         int i = 0;
         for (; tranNo < list.size(); tranNo++) {
             ByteString evnByte = list.get(tranNo);
-            //TODO txsFilter.isInvalid
-//            if (isInvalid(list.get(tranNo))){
             if(txsFilter.isInValid(tranNo)){
                 logger.debug(String.format("Group [%s]: Skipping write into historyDB for invalid transaction number %d."
                         , dbName, tranNo));
