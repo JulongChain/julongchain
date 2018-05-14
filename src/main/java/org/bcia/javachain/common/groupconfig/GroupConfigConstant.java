@@ -34,6 +34,8 @@ public class GroupConfigConstant {
 
     public static final String MSP = "MSP";
 
+    public static final String GROUP = "Group";
+
     public static final String APPLICATION = "Application";
 
     public static final String CONSENTER = "Consenter";

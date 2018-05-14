@@ -16,18 +16,19 @@
 package org.bcia.javachain.common.groupconfig;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.apache.commons.collections4.MapUtils;
-import org.bcia.javachain.common.cauthdsl.PolicyProvider;
 import org.bcia.javachain.common.configtx.IValidator;
+import org.bcia.javachain.common.configtx.Validator;
+import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.config.*;
 import org.bcia.javachain.common.policies.IPolicyManager;
-import org.bcia.javachain.common.policycheck.bean.Policy;
+import org.bcia.javachain.common.policies.IPolicyProvider;
+import org.bcia.javachain.common.policies.PolicyManager;
 import org.bcia.javachain.common.util.ValidateUtils;
-import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.msp.IMspManager;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
+import org.bcia.javachain.protos.common.Policies;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -59,7 +60,8 @@ public class GroupConfigBundle implements IGroupConfigBundle {
      */
     private IValidator validator;
 
-    public GroupConfigBundle(Common.Envelope envelope) throws ValidateException, InvalidProtocolBufferException {
+    public static GroupConfigBundle parseFrom(Common.Envelope envelope) throws ValidateException,
+            InvalidProtocolBufferException, PolicyException {
         ValidateUtils.isNotNull(envelope, "envelope can not be null");
         ValidateUtils.isNotNull(envelope.getPayload(), "envelope.Payload can not be null");
 
@@ -76,18 +78,22 @@ public class GroupConfigBundle implements IGroupConfigBundle {
         }
 
         Configtx.ConfigEnvelope configEnvelope = Configtx.ConfigEnvelope.parseFrom(payload.getData());
-//        this(groupHeader.getGroupId(), configEnvelope.getConfig());
+        return new GroupConfigBundle(groupHeader.getGroupId(), configEnvelope.getConfig());
     }
 
     public GroupConfigBundle(String groupId, Configtx.Config config) throws ValidateException,
-            InvalidProtocolBufferException {
+            InvalidProtocolBufferException, PolicyException {
         preValidate(config);
 
-        IGroupConfig groupConfig = new GroupConfig(config.getGroupTree());
+        this.groupConfig = new GroupConfig(config.getGroupTree());
 
-//        policyProviderMap = new HashMap<Integer, PolicyProvider>()
+        HashMap<Integer, IPolicyProvider> policyProviderMap = new HashMap<>();
+        policyProviderMap.put(Policies.Policy.PolicyType.SIGNATURE_VALUE, new org.bcia.javachain.common.policycheck
+                .policies.PolicyProvider());
 
+        this.policyManager = new PolicyManager(GroupConfigConstant.GROUP, policyProviderMap, config.getGroupTree());
 
+        this.validator = new Validator(groupId, config, GroupConfigConstant.GROUP, policyManager);
     }
 
     /**
