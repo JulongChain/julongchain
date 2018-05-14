@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.sceventmgmt;
 
 /**
- * 类描述
+ * 智能合约信息提供者
  *
  * @author sunzongyu
  * @date 2018/04/09

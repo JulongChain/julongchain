@@ -17,6 +17,7 @@ package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.javachain.common.ledger.util.DBProvider;
@@ -56,6 +57,7 @@ public class BlockFileManager {
     private BlockFileWriter currentFileWriter;
     private Ledger.BlockchainInfo bcInfo;
     private Lock lock;
+    private String ledgerId;
 
     /**
      * 创建新的blockfilemanager对象
@@ -68,6 +70,7 @@ public class BlockFileManager {
         logger.debug(String.format("newBlockfileMgr() initializing file-based block storage for ledger: %s", id));
         //根据配置文件、id生成rootDir
         String rootDir = conf.getLedgerBlockDir(id);
+        mgr.setLedgerId(id);
         mgr.setRootDir(rootDir);
         mgr.setConf(conf);
         mgr.setDb(indexStore);
@@ -92,7 +95,7 @@ public class BlockFileManager {
         //修剪文件为检查点保存的文件大小
         mgr.getCurrentFileWriter().truncateFile(mgr.getCpInfo().getLatestFileChunksize());
         //设置blockindex对象
-        mgr.setIndex(BlockIndex.newBlockIndex(indexConfig, indexStore));
+        mgr.setIndex(BlockIndex.newBlockIndex(indexConfig, indexStore, id));
         //设置blockchainINfo对象
         mgr.setBcInfo(Ledger.BlockchainInfo.newBuilder()
                 .setHeight(0)
@@ -262,7 +265,7 @@ public class BlockFileManager {
         //获取最新block文件编号
         int endFileNum = cpInfo.getLastestFileChunkSuffixNum();
         long startingBlockNum = 0;
-        //没有索引
+        //索引不为空
         if(!indexEmpty){
             //索引和区块序号同时为0, 完成同步
             if(lastBlockIndexed == cpInfo.getLastBlockNumber()){
@@ -486,7 +489,8 @@ public class BlockFileManager {
         BlockFileStream stream = new BlockFileStream();
         try {
             stream.newBlockFileStream(rootDir, lp.getFileSuffixNum(), (long) (lp.getLocPointer().getOffset()));
-            return stream.nextBlockBytes();
+            byte[] bytes = stream.nextBlockBytes();
+            return bytes;
         } finally {
             stream.close();
         }
@@ -505,9 +509,9 @@ public class BlockFileManager {
      */
     public CheckpointInfo loadCurrentInfo() throws LedgerException{
         byte[] b = null;
-        b = db.get(BLK_MGR_INFO_KEY);
+        b = db.get(compositeBlockManagerInfoKey(ledgerId));
         if(b == null){
-            logger.debug("Fail to got " + BLK_MGR_INFO_KEY);
+            logger.debug("Fail to got BLK_MGR_INFO_KEY with " + ledgerId);
             return null;
         }
         CheckpointInfo checkpointInfo = new CheckpointInfo();
@@ -520,7 +524,7 @@ public class BlockFileManager {
      */
     public void saveCurrentInfo(CheckpointInfo checkpointInfo, Boolean sync) throws LedgerException {
         byte[] b = checkpointInfo.marshal();
-        db.put(BLK_MGR_INFO_KEY, b, sync);
+        db.put(compositeBlockManagerInfoKey(ledgerId), b, sync);
     }
 
     /**
@@ -555,6 +559,10 @@ public class BlockFileManager {
                 stream.close();
             }
         }
+    }
+
+    private byte[] compositeBlockManagerInfoKey(String ledgerid){
+        return ArrayUtils.addAll(BLK_MGR_INFO_KEY, ledgerid.getBytes());
     }
 
     public Lock getLock() {
@@ -623,5 +631,13 @@ public class BlockFileManager {
 
     public void setBcInfo(Ledger.BlockchainInfo bcInfo) {
         this.bcInfo = bcInfo;
+    }
+
+    public String getLedgerId() {
+        return ledgerId;
+    }
+
+    public void setLedgerId(String ledgerId) {
+        this.ledgerId = ledgerId;
     }
 }

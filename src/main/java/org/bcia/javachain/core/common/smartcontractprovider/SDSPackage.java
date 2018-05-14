@@ -31,7 +31,7 @@ import java.io.*;
 /**
  * SDSPackage encapsulates SmartcontractDeploymentSpec.
  *
- * @author sunianle
+ * @author sunianle, sunzongyu
  * @date 4/25/18
  * @company Dingxuan
  */

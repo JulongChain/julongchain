@@ -25,6 +25,7 @@ import org.bcia.javachain.core.ledger.INodeLedgerProvider;
 import org.bcia.javachain.core.ledger.StateListener;
 import org.bcia.javachain.core.ledger.customtx.CustomTx;
 import org.bcia.javachain.core.ledger.customtx.IProcessor;
+import org.bcia.javachain.core.ledger.kvledger.KvLedger;
 import org.bcia.javachain.core.ledger.kvledger.KvLedgerProvider;
 import org.bcia.javachain.core.ledger.sceventmgmt.KVLedgerLSSCStateListener;
 import org.bcia.javachain.core.ledger.sceventmgmt.ScEventManager;
@@ -92,6 +93,7 @@ public class LedgerManager {
         }
         log.info(String.format("Creating ledger [%s] with genesis block", id));
         INodeLedger l = ledgerProvider.create(genesisBlock);
+//        ((KvLedger) l).setLedgerConfig(id);
         openedLedgers.put(id, l);
         log.info(String.format("Created ledger [%s] with genesis block", id));
         return l;

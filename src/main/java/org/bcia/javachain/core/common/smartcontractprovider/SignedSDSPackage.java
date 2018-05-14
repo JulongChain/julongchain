@@ -34,7 +34,7 @@ import java.io.*;
 /**
  * SignedSDSPackage encapsulates SignedSmartContractDeploymentSpec.
  *
- * @author sunianle
+ * @author sunianle, sunzongyu
  * @date 4/25/18
  * @company Dingxuan
  */

@@ -63,7 +63,7 @@ public class StoreImpl implements Store {
             throw new LedgerException("The private data store is not empty. InitLastCommittedBlock() function call is not allowed");
         }
         UpdateBatch batch = LevelDBProvider.newUpdateBatch();
-        batch.put(KvEncoding.LAST_COMMITTED_BLK_KEY, KvEncoding.encodeBlockNum(blockNum));
+        batch.put(KvEncoding.getLastCommittedBlkKey(ledgerID), KvEncoding.encodeBlockNum(blockNum));
         db.writeBatch(batch, true);
         isEmpty = false;
         lastCommittedBlock = blockNum;
@@ -132,7 +132,7 @@ public class StoreImpl implements Store {
             batch.put(key, value);
         }
         //设置pending_commit_key(为commit或rollback准备)
-        batch.put(KvEncoding.PENDING_COMMIT_KEY, KvEncoding.EMPTY_VALUE);
+        batch.put(KvEncoding.getPendingCommitKey(ledgerID), KvEncoding.EMPTY_VALUE);
         //执行写入
         db.writeBatch(batch, true);
         batchPending = true;
@@ -152,8 +152,8 @@ public class StoreImpl implements Store {
         long committingBlockNum = nextBlockNum();
         logger.debug("Committing private data for block " + committingBlockNum);
         UpdateBatch batch = LevelDBProvider.newUpdateBatch();
-        batch.delete(KvEncoding.PENDING_COMMIT_KEY);
-        batch.put(KvEncoding.LAST_COMMITTED_BLK_KEY, KvEncoding.encodeBlockNum(committingBlockNum));
+        batch.delete(KvEncoding.getPendingCommitKey(ledgerID));
+        batch.put(KvEncoding.getLastCommittedBlkKey(ledgerID), KvEncoding.encodeBlockNum(committingBlockNum));
         db.writeBatch(batch, true);
         batchPending = false;
         isEmpty = false;
@@ -177,7 +177,7 @@ public class StoreImpl implements Store {
         for(byte[] key : pendingBatchKeys){
             batch.delete(key);
         }
-        batch.delete(KvEncoding.PENDING_COMMIT_KEY);
+        batch.delete(KvEncoding.getPendingCommitKey(ledgerID));
         db.writeBatch(batch, true);
         batchPending = false;
         logger.debug("Rolled back private data for block " + rollingbackBlockNum);
@@ -257,7 +257,7 @@ public class StoreImpl implements Store {
     }
 
     private boolean hasPendingCommit() throws LedgerException{
-        byte[] v = db.get(KvEncoding.PENDING_COMMIT_KEY);
+        byte[] v = db.get(KvEncoding.getPendingCommitKey(ledgerID));
         return v != null;
     }
 
@@ -266,7 +266,7 @@ public class StoreImpl implements Store {
      * !0 false
      */
     private long getLastCommittedBlockNum() throws LedgerException {
-        byte[] v = db.get(KvEncoding.LAST_COMMITTED_BLK_KEY);
+        byte[] v = db.get(KvEncoding.getLastCommittedBlkKey(ledgerID));
         if(v == null){
             return 0;
         }

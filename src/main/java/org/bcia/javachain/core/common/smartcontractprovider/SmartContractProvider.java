@@ -29,7 +29,7 @@ import java.io.*;
 * used for different packages to interact with code in the
  * smartcontract package without importing it; more methods
 * should be added below if necessary
- * @author sunianle
+ * @author sunianle, sunzongyu
  * @date 3/7/18
  * @company Dingxuan
  */

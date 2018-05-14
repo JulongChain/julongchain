@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 类描述
+ * 智能合约事件管理
  *
  * @author sunzongyu
  * @date 2018/04/09

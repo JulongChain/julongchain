@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.sceventmgmt;
 
 /**
- * 类描述
+ * 智能合约信息提供者接口
  *
  * @author sunzongyu
  * @date 2018/04/09
@@ -24,7 +24,18 @@ package org.bcia.javachain.core.ledger.sceventmgmt;
  */
 public interface ISmartContractInfoProvider {
 
+    /**
+     * 智能合约是否配置
+     * @param groupID
+     * @param smartContractDefinition
+     * @return
+     */
     boolean isSmartContractDeployed(String groupID, SmartContractDefinition smartContractDefinition);
 
+    /**
+     * 查询智能合约实体
+     * @param smartContractDefinition
+     * @return
+     */
     byte[] retrieveSmartContractArtifacts(SmartContractDefinition smartContractDefinition);
 }
