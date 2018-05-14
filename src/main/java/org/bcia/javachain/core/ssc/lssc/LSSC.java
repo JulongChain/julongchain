@@ -31,7 +31,7 @@ import org.bcia.javachain.core.common.smartcontractprovider.ISmartContractPackag
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractProvider;
 import org.bcia.javachain.core.common.sysscprovider.ISystemSmartContractProvider;
 import org.bcia.javachain.core.common.sysscprovider.SystemSmartContractFactory;
-import org.bcia.javachain.core.ledger.sceventmgmt.ScEventMgmt;
+import org.bcia.javachain.core.ledger.sceventmgmt.ScEventManager;
 import org.bcia.javachain.core.ledger.sceventmgmt.SmartContractDefinition;
 import org.bcia.javachain.core.node.util.NodeUtils;
 import org.bcia.javachain.core.policy.IPolicyChecker;
@@ -641,7 +641,7 @@ public class LSSC  extends SystemSmartContractBase {
         // any channel's statedb where the chaincode is already instantiated
         // Note - this step is done prior to PutChaincodeToLocalStorage() since this step is idempotent and harmless until endorsements start,
         // that is, if there are errors deploying the indexes the chaincode install can safely be re-attempted later.
-        ScEventMgmt.getMgr().handleSmartContractInstall(smartContractDefinition,statedbArtifactsTar);
+        ScEventManager.getMgr().handleSmartContractInstall(smartContractDefinition,statedbArtifactsTar);
         // Finally, if everything is good above, install the chaincode to local peer file system so that endorsements can start
 
         //TODO:add by zhouhui for test,保证测试通过，因正式环境未使用Spring,所以未自动填充值，导致值为null

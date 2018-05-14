@@ -26,6 +26,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.util.TxValidationFlags;
 import org.bcia.javachain.core.ledger.util.Util;
+import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
 import java.util.HashMap;
@@ -45,6 +46,7 @@ public class BlockIndex implements Index {
 
     private Map<String, Boolean> indexItemsMap = new HashMap<>();
     private DBProvider db;
+    private String ledgerId;
 
     public static final String BLOCK_NUM_IDX_KEY_PREFIX           = "n";
     public static final String BLOCK_HASH_IDX_KEY_PREFIX          = "h";
@@ -53,9 +55,9 @@ public class BlockIndex implements Index {
     public static final String BLOCK_TX_ID_IDX_KEY_PREFIX          = "b";
     public static final String TX_VALIDATION_RESULT_IDX_KEY_PREFIX = "v";
     public static final String INDEX_CHECK_POINT_KEY_STR          = "indexCheckpointKey";
-    private static final byte[] INDEX_CHECKPOINT_KEY  = INDEX_CHECK_POINT_KEY_STR.getBytes();
+//    private static final byte[] INDEX_CHECKPOINT_KEY  = INDEX_CHECK_POINT_KEY_STR.getBytes();
 
-    public static BlockIndex newBlockIndex(IndexConfig indexConfig, DBProvider db) {
+    public static BlockIndex newBlockIndex(IndexConfig indexConfig, DBProvider db, String id) {
         String[] indexItems = indexConfig.getAttrsToIndex();
         logger.debug(String.format("newBlockIndex() - indexItems length: [%d]", indexItems.length));
         Map<String, Boolean> indexItemMap = new HashMap<>();
@@ -65,6 +67,7 @@ public class BlockIndex implements Index {
         BlockIndex index = new BlockIndex();
         index.setIndexItemsMap(indexItemMap);
         index.setDb(db);
+        index.setLedgerId(id);
         return index;
     }
 
@@ -74,7 +77,7 @@ public class BlockIndex implements Index {
     @Override
     public long getLastBlockIndexed() throws LedgerException {
         byte[] blockNumBytes = null;
-        blockNumBytes = db.get(INDEX_CHECKPOINT_KEY);
+        blockNumBytes = db.get(constructIndexCheckpointKey());
         if (blockNumBytes == null){
             throw new LedgerException("NoBlockIndexed");
         }
@@ -93,21 +96,21 @@ public class BlockIndex implements Index {
         logger.debug(String.format("Indexing block [%s]", blockIndexInfo));
         FileLocPointer flp = blockIndexInfo.getFlp();
         List<TxIndexInfo> txOffsets = blockIndexInfo.getTxOffsets();
-        TxValidationFlags txsfltr = new TxValidationFlags(blockIndexInfo.getMetadata().getMetadataList().size());
+        TxValidationFlags txsfltr = new TxValidationFlags(blockIndexInfo.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER_VALUE).size());
         UpdateBatch batch = LevelDBProvider.newUpdateBatch();
         byte[] flpBytes = flp.marshal();
 
-        //index1
+        //index1 blockHash数据 - getBlockByHash()
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_HASH)){
             batch.put(constructBlockHashKey(blockIndexInfo.getBlockHash()), flpBytes);
         }
 
-        //index2
+        //index2 blockNum数据 - getBlockByNum()
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM)){
             batch.put(constructBlockNumKey(blockIndexInfo.getBlockNum()), flpBytes);
         }
 
-        //index3 用来通过txid获取tx
+        //index3 用来通过txid获取tx - getTxById()
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_ID)){
             for(TxIndexInfo txOffset : txOffsets){
                 FileLocPointer txFlp = FileLocPointer.newFileLocationPointer(flp.getFileSuffixNum(), flp.getLocPointer().getOffset(), txOffset.getLoc());
@@ -128,7 +131,7 @@ public class BlockIndex implements Index {
             }
         }
 
-        //index5 通过txid获取区块
+        //index5 通过txid获取区块 getBlockByTxId()
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_TX_ID)){
             for(TxIndexInfo txOffset : txOffsets){
                 batch.put(constructBlockTxIDKey(txOffset.getTxID()), flpBytes);
@@ -143,7 +146,7 @@ public class BlockIndex implements Index {
             }
         }
 
-        batch.put(INDEX_CHECKPOINT_KEY, Util.longToBytes(blockIndexInfo.getBlockNum(), 8));
+        batch.put(constructIndexCheckpointKey(), Util.longToBytes(blockIndexInfo.getBlockNum(), 8));
         db.writeBatch(batch, true);
     }
 
@@ -253,30 +256,68 @@ public class BlockIndex implements Index {
 
     byte[] constructBlockNumKey(long blockNum) {
         byte[] blkNumBytes = Util.longToBytes(blockNum, 8);
-        return ArrayUtils.addAll(BLOCK_NUM_IDX_KEY_PREFIX.getBytes(), blkNumBytes);
+        byte[] result = new byte[0];
+        result = ArrayUtils.addAll(result, BLOCK_NUM_IDX_KEY_PREFIX.getBytes());
+        result = ArrayUtils.addAll(result, ledgerId.getBytes());
+        result = ArrayUtils.addAll(result, blkNumBytes);
+        return result;
+//        return ArrayUtils.addAll(BLOCK_NUM_IDX_KEY_PREFIX.getBytes(), blockNum);
     }
 
     byte[] constructBlockHashKey(byte[] blockHash) {
-        return ArrayUtils.addAll(BLOCK_HASH_IDX_KEY_PREFIX.getBytes(), blockHash);
+        byte[] result = new byte[0];
+        result = ArrayUtils.addAll(result, BLOCK_HASH_IDX_KEY_PREFIX.getBytes());
+        result = ArrayUtils.addAll(result, ledgerId.getBytes());
+        result = ArrayUtils.addAll(result, blockHash);
+        return result;
+//        return ArrayUtils.addAll(BLOCK_HASH_IDX_KEY_PREFIX.getBytes(), blockHash);
     }
 
     byte[] constructTxIDKey(String txID) {
-        return ArrayUtils.addAll(TX_ID_IDX_KEY_PREFIX.getBytes(), txID.getBytes());
+        byte[] result = new byte[0];
+        result = ArrayUtils.addAll(result, TX_ID_IDX_KEY_PREFIX.getBytes());
+        result = ArrayUtils.addAll(result, ledgerId.getBytes());
+        result = ArrayUtils.addAll(result, txID.getBytes());
+        return result;
+//        return ArrayUtils.addAll(TX_ID_IDX_KEY_PREFIX.getBytes(), txID.getBytes());
     }
 
     byte[] constructBlockTxIDKey(String txID) {
-        return ArrayUtils.addAll(BLOCK_TX_ID_IDX_KEY_PREFIX.getBytes(), txID.getBytes());
+        byte[] result = new byte[0];
+        result = ArrayUtils.addAll(result, BLOCK_TX_ID_IDX_KEY_PREFIX.getBytes());
+        result = ArrayUtils.addAll(result, ledgerId.getBytes());
+        result = ArrayUtils.addAll(result, txID.getBytes());
+        return result;
+//        return ArrayUtils.addAll(BLOCK_TX_ID_IDX_KEY_PREFIX.getBytes(), txID.getBytes());
     }
 
     byte[] constructTxValidationCodeIDKey(String txID) {
-        return ArrayUtils.addAll(TX_VALIDATION_RESULT_IDX_KEY_PREFIX.getBytes(), txID.getBytes());
+        byte[] result = new byte[0];
+        result = ArrayUtils.addAll(result, TX_VALIDATION_RESULT_IDX_KEY_PREFIX.getBytes());
+        result = ArrayUtils.addAll(result, ledgerId.getBytes());
+        result = ArrayUtils.addAll(result, txID.getBytes());
+        return result;
+//        return ArrayUtils.addAll(TX_VALIDATION_RESULT_IDX_KEY_PREFIX.getBytes(), txID.getBytes());
     }
 
     byte[] constructBlockNumTranNumKey(long blockNum, long txNum) {
         byte[] blkNumBytes = Util.longToBytes(blockNum, 8);
         byte[] txNumBytes = Util.longToBytes(txNum, 8);
         byte[] key = ArrayUtils.addAll(blkNumBytes, txNumBytes);
-        return ArrayUtils.addAll(BLOCK_NUM_TRAN_NUM_IDX_KEY_PREFIX.getBytes(), key);
+        byte[] result = new byte[0];
+        result = ArrayUtils.addAll(result, BLOCK_NUM_TRAN_NUM_IDX_KEY_PREFIX.getBytes());
+        result = ArrayUtils.addAll(result, ledgerId.getBytes());
+        result = ArrayUtils.addAll(result, blkNumBytes);
+        result = ArrayUtils.addAll(result, txNumBytes);
+        return result;
+//        return ArrayUtils.addAll(BLOCK_NUM_TRAN_NUM_IDX_KEY_PREFIX.getBytes(), key);
+    }
+
+    byte[] constructIndexCheckpointKey(){
+        byte[] result = new byte[0];
+        result = ArrayUtils.addAll(result, INDEX_CHECK_POINT_KEY_STR.getBytes());
+        result = ArrayUtils.addAll(result, ledgerId.getBytes());
+        return result;
     }
 
     public Map<String, Boolean> getIndexItemsMap() {
@@ -293,5 +334,13 @@ public class BlockIndex implements Index {
 
     public void setDb(DBProvider db) {
         this.db = db;
+    }
+
+    public String getLedgerId() {
+        return ledgerId;
+    }
+
+    public void setLedgerId(String ledgerId) {
+        this.ledgerId = ledgerId;
     }
 }

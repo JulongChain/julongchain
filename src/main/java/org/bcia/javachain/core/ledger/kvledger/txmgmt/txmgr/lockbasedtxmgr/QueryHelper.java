@@ -40,7 +40,6 @@ public class QueryHelper {
     private LockBasedTxManager txMgr;
     private RWSetBuilder rwSetBuilder;
     private List<ResultsItr> itrs;
-    //TODO
     private boolean doneInvoked = true;
 
     public byte[] getState(String ns, String key) throws LedgerException{
@@ -92,9 +91,7 @@ public class QueryHelper {
         VersionedValue versionedValue = txMgr.getDb().getPrivateData(ns, coll, key);
         byte[] val = versionedValue.getValue();
         Height ver = versionedValue.getVersion();
-        //TODO 获取keyhash
-        byte[] keyHash = new byte[0];
-        keyHash = new SM3().hash(key.getBytes());
+        byte[] keyHash = new SM3().hash(key.getBytes());
         Height hashVersion = txMgr.getDb().getKeyHashVersion(ns, coll, keyHash);
         if(!Height.areSame(ver, hashVersion)){
             throw new LedgerException(String.format("Private data matching public hash version is not available.Pub version %s. Pvt version %s",

@@ -41,7 +41,6 @@ import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -86,9 +85,7 @@ public class Helper {
         }
         for(Rwset.NsPvtReadWriteSet nsPvtRwSet : pvtData.getWriteSet().getNsPvtRwsetList()){
             for(Rwset.CollectionPvtReadWriteSet collPvtdata : nsPvtRwSet.getCollectionPvtRwsetList()){
-                //TODO 计算Hash
-                ByteString collPvtdataHash = null;
-                collPvtdataHash = ByteString.copyFrom(new SM3().hash(collPvtdata.getRwset().toByteArray()));
+                ByteString collPvtdataHash = ByteString.copyFrom(new SM3().hash(collPvtdata.getRwset().toByteArray()));
                 ByteString hashInPubdata = tx.retrieveHash(nsPvtRwSet.getNamespace(), collPvtdata.getCollectionName());
                 if(!collPvtdataHash.equals(hashInPubdata)){
                     throw new LedgerException("Hash of pvt data mismatch corresponding hash in pub data");

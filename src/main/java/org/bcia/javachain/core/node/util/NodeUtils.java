@@ -18,6 +18,7 @@ package org.bcia.javachain.core.node.util;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -64,7 +65,6 @@ public class NodeUtils {
                 return group.getGroupSupport().getNodeLedger();
             }
         }
-
         return null;
     }
 

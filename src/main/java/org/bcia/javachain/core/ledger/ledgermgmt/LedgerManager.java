@@ -25,10 +25,11 @@ import org.bcia.javachain.core.ledger.INodeLedgerProvider;
 import org.bcia.javachain.core.ledger.StateListener;
 import org.bcia.javachain.core.ledger.customtx.CustomTx;
 import org.bcia.javachain.core.ledger.customtx.IProcessor;
+import org.bcia.javachain.core.ledger.kvledger.KvLedger;
 import org.bcia.javachain.core.ledger.kvledger.KvLedgerProvider;
 import org.bcia.javachain.core.ledger.sceventmgmt.KVLedgerLSSCStateListener;
+import org.bcia.javachain.core.ledger.sceventmgmt.ScEventManager;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.common.Ledger;
 
 import java.util.HashMap;
 import java.util.List;
@@ -56,14 +57,20 @@ public class LedgerManager {
     /**
      * 初始化
      */
-    public static synchronized void initialize(Map<Common.HeaderType, IProcessor> processors) throws LedgerException {
+    public static synchronized void initialize(Map<Common.HeaderType, IProcessor> processors) throws LedgerException{
         log.info("Initializing ledger mgmt");
         initialized = true;
         CustomTx.initialize(processors);
 
-        //TODO sceventmgmt.initialize()
+        ScEventManager.initialize();
 
-        INodeLedgerProvider provider = KvLedgerProvider.newProvider();
+        INodeLedgerProvider provider;
+        try {
+            provider = KvLedgerProvider.newProvider();
+        } catch (LedgerException e) {
+            log.error(String.format("Got error [%s] in initializing LedgerManager", e.getMessage()));
+            throw e;
+        }
         provider.initialize(KV_LEDGER_STATE_LISTENERS);
 
         ledgerProvider = provider;
@@ -77,7 +84,7 @@ public class LedgerManager {
         if(!initialized){
             throw ERR_LEDGER_MANAGER_NOT_INITIALIZED;
         }
-        String id = null;
+        String id;
         //获取区块id
         try {
             id = BlockUtils.getGroupIDFromBlock(genesisBlock);
@@ -86,7 +93,7 @@ public class LedgerManager {
         }
         log.info(String.format("Creating ledger [%s] with genesis block", id));
         INodeLedger l = ledgerProvider.create(genesisBlock);
-//        l = wrapLedger(id, l);
+//        ((KvLedger) l).setLedgerConfig(id);
         openedLedgers.put(id, l);
         log.info(String.format("Created ledger [%s] with genesis block", id));
         return l;
@@ -107,7 +114,6 @@ public class LedgerManager {
             return l;
         }
         l = ledgerProvider.open(id);
-//        l = wrapLedger(id, l);
         openedLedgers.put(id, l);
         log.info(String.format("Opened ledger with id = %s", id));
         return l;

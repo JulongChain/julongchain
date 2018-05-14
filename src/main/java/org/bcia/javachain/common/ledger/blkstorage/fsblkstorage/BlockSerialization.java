@@ -41,24 +41,8 @@ public class BlockSerialization {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockSerialization.class);
 
     private BlockHeader blockHeader;
-    public static List<TxIndexInfo> txOffsets = new ArrayList<>();
+    public List<TxIndexInfo> txOffsets = new ArrayList<>();
     private BlockMetadata metadata;
-
-    public BlockHeader getBlockHeader() {
-        return blockHeader;
-    }
-
-    public void setBlockHeader(BlockHeader blockHeader) {
-        this.blockHeader = blockHeader;
-    }
-
-    public BlockMetadata getMetadata() {
-        return metadata;
-    }
-
-    public void setMetadata(BlockMetadata metadata) {
-        this.metadata = metadata;
-    }
 
     /**
      * 序列化block
@@ -118,6 +102,7 @@ public class BlockSerialization {
      * 获取所有Envelope的长度和起始位置
      */
     private static List<TxIndexInfo> addDataBytes(Block block, long blockPosition){
+        List<TxIndexInfo> txOffsets = new ArrayList<>();
         //获取头部序列化长度
         int headerSerializedLen = block.getHeader().getSerializedSize();
         //序列化长度给出序列化之后的长度，还应加上标头部识位长度2, 尾部标识位长度2
@@ -176,5 +161,29 @@ public class BlockSerialization {
             //将metadata添加到结果中
             result = ArrayUtils.addAll(result, b.toByteArray());
         }
+    }
+
+    public BlockHeader getBlockHeader() {
+        return blockHeader;
+    }
+
+    public void setBlockHeader(BlockHeader blockHeader) {
+        this.blockHeader = blockHeader;
+    }
+
+    public BlockMetadata getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(BlockMetadata metadata) {
+        this.metadata = metadata;
+    }
+
+    public List<TxIndexInfo> getTxOffsets() {
+        return txOffsets;
+    }
+
+    public void setTxOffsets(List<TxIndexInfo> txOffsets) {
+        this.txOffsets = txOffsets;
     }
 }

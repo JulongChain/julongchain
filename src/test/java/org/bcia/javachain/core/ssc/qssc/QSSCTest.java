@@ -168,7 +168,7 @@ public class QSSCTest extends BaseJunit4Test {
         List<ByteString> args= new LinkedList<ByteString>();
         args.add(ByteString.copyFromUtf8(QSSC.GET_TRANSACTION_BY_ID));
         args.add(ByteString.copyFromUtf8(groupid));
-        args.add(ByteString.copyFromUtf8("1"));
+        args.add(ByteString.copyFromUtf8("100"));
         ProposalPackage.SignedProposal sp=resetProvider(Resources.QSSC_GetTransactionByID,groupid,null);
         ISmartContract.SmartContractResponse res =mockStub.mockInvokeWithSignedProposal("1",args,sp);
         //因一些对象为空，部分接口尚未调通
@@ -177,7 +177,8 @@ public class QSSCTest extends BaseJunit4Test {
         List<ByteString> args2= new LinkedList<ByteString>();
         args2.add(ByteString.copyFromUtf8(QSSC.GET_TRANSACTION_BY_ID));
         args2.add(ByteString.copyFromUtf8(groupid));
-        args2.add(ByteString.copyFromUtf8(null));
+        //TODO modify by sunzongyu, change "null" to "ByteString.EMPTY". date 2018-05-14
+        args2.add(ByteString.EMPTY);
         ISmartContract.SmartContractResponse res2 =mockStub.mockInvoke("2",args2);
         //因一些对象为空，部分接口尚未调通
         assertThat(res2.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));

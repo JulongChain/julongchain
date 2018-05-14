@@ -84,11 +84,10 @@ public class VersionLevelDB implements IVersionedDB{
     }
 
     @Override
-    //TODO kvScanner
     public ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
         byte[] compositeStartKey = constructCompositeKey(namespace, startKey);
         byte[] compositeEndKey = constructCompositeKey(namespace, endKey);
-        if(endKey == null || "".equals(endKey)){
+        if("".equals(endKey)){
             compositeEndKey[compositeEndKey.length - 1] = LAST_KEY_INDICATOR;
         }
         Iterator dbItr = db.getIterator(compositeStartKey);
