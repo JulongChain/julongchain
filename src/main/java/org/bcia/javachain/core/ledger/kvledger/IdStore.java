@@ -157,11 +157,9 @@ public class IdStore {
      */
     public List<String> getAllLedgerIDs() throws LedgerException {
         List<String> ids = new ArrayList<>();
-        //TODO
         Iterator<Map.Entry<byte[], byte[]>> itr = provider.getIterator(null);
         while(itr.hasNext()){
             Map.Entry<byte[], byte[]> entry = itr.next();
-//            if(entry.getKey().equals(UNDER_CONSTRUCTION_LEDGER_KEY)){
             if(Arrays.equals(entry.getKey(), UNDER_CONSTRUCTION_LEDGER_KEY)){
                 continue;
             }

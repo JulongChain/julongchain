@@ -26,6 +26,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.util.TxValidationFlags;
 import org.bcia.javachain.core.ledger.util.Util;
+import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
 import java.util.HashMap;
@@ -93,7 +94,7 @@ public class BlockIndex implements Index {
         logger.debug(String.format("Indexing block [%s]", blockIndexInfo));
         FileLocPointer flp = blockIndexInfo.getFlp();
         List<TxIndexInfo> txOffsets = blockIndexInfo.getTxOffsets();
-        TxValidationFlags txsfltr = new TxValidationFlags(blockIndexInfo.getMetadata().getMetadataList().size());
+        TxValidationFlags txsfltr = new TxValidationFlags(blockIndexInfo.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER_VALUE).size());
         UpdateBatch batch = LevelDBProvider.newUpdateBatch();
         byte[] flpBytes = flp.marshal();
 

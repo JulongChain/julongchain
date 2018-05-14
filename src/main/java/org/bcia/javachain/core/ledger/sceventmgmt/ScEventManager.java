@@ -15,13 +15,10 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.sceventmgmt;
 
-import jdk.nashorn.internal.runtime.regexp.joni.constants.EncloseType;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.StateListener;
-import org.bcia.javachain.core.ledger.StateUpdates;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
-import org.bcia.javachain.protos.node.ProposalPackage;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,26 +32,26 @@ import java.util.Map;
  * @date 2018/04/09
  * @company Dingxuan
  */
-public class ScEventMgmt implements StateListener {
-    private static final JavaChainLog logger  = JavaChainLogFactory.getLog(ScEventMgmt.class);
-    private ISmartContractInfoProvider infoProvider = null;
+public class ScEventManager implements StateListener {
+    private static final JavaChainLog logger  = JavaChainLogFactory.getLog(ScEventManager.class);
+    private ISmartContractInfoProvider infoProvider = new SmartContractInfoProviderImpl();
     private Map<String, ISmartContractLifecycleEventListener> scLifecycleListeners = new HashMap<>();
     private Map<String, SmartContractDefinition[]> latesSmartContractDeploys = new HashMap<>();
-    private static ScEventMgmt mgmt = null;
+    private static ScEventManager mgmt = null;
 
     /**
      * 单例获取Mgr实例
      */
-    public static ScEventMgmt getMgr(){
+    public static ScEventManager getMgr(){
         if(mgmt == null){
-            mgmt = new ScEventMgmt();
+            mgmt = new ScEventManager();
             mgmt.setInfoProvider(new SmartContractInfoProviderImpl());
         }
         return mgmt;
     }
 
-    public void initialize(){
-        this.infoProvider = new SmartContractInfoProviderImpl();
+    public static void initialize(){
+        ScEventManager.mgmt = new ScEventManager();
     }
 
     /**

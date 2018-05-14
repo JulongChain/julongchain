@@ -15,12 +15,10 @@
  */
 package org.bcia.javachain.core.ledger.kvledger;
 
-import io.grpc.internal.LogExceptionRunnable;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.PrunePolicy;
 import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
-import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.FsBlockStore;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.*;
@@ -32,7 +30,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr.LockB
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.ledgerstorage.Store;
 import org.bcia.javachain.core.ledger.sceventmgmt.ISmartContractLifecycleEventListener;
-import org.bcia.javachain.core.ledger.sceventmgmt.ScEventMgmt;
+import org.bcia.javachain.core.ledger.sceventmgmt.ScEventManager;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.node.TransactionPackage;
@@ -69,7 +67,6 @@ public class KvLedger implements INodeLedger {
                                        Map<String, StateListener> stateListeners) throws LedgerException {
         logger.debug("Creating KVLedger ledgerID = " + ledgerID);
 
-        //TODO get txMgr
         TxManager txmgmt = LockBasedTxManager.newLockBasedTxMgr(ledgerID, versionedDB, stateListeners);
 
         KvLedger kvLedger = new KvLedger();
@@ -84,10 +81,9 @@ public class KvLedger implements INodeLedger {
         logger.debug("Register state db for smartcontract lifecycle event " + (scEventListener != null));
 
         if(scEventListener != null){
-            ScEventMgmt.getMgr().register(ledgerID, scEventListener);
+            ScEventManager.getMgr().register(ledgerID, scEventListener);
         }
 
-        //TODO recover state DB & history DB
         kvLedger.recoverDBs();
 
         return kvLedger;
@@ -365,7 +361,7 @@ public class KvLedger implements INodeLedger {
         Common.Block block = blockAndPvtData.getBlock();
         long blockNo = block.getHeader().getNumber();
         logger.debug(String.format("Group %s: Validating state for block %d", ledgerID, blockNo));
-        //TODO 验证器
+        //执行校验工作
         txtmgmt.validateAndPrepare(blockAndPvtData, true);
         logger.debug(String.format("Group %s: Committing block %d to storage", ledgerID, blockNo));
         blockStore.commitWithPvtData(blockAndPvtData);
@@ -373,7 +369,7 @@ public class KvLedger implements INodeLedger {
 
         logger.debug(String.format("Group %s: Committing block %d transaction to state db", ledgerID, blockNo));
         txtmgmt.commit();
-        //TODO history db enable
+        //在HistoryDB允许的情况下提交历史信息
         if(LedgerConfig.isHistoryDBEnabled()){
             logger.debug(String.format("Group %s: Committing block %d transaction to history db", ledgerID, blockNo));
             historyDB.commit(block);
@@ -412,4 +408,5 @@ public class KvLedger implements INodeLedger {
     public void setHistoryDB(IHistoryDB historyDB) {
         this.historyDB = historyDB;
     }
+
 }
