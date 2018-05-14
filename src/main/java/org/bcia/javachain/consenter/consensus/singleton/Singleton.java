@@ -15,6 +15,8 @@
  */
 package org.bcia.javachain.consenter.consensus.singleton;
 
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.consenter.consensus.IChain;
 import org.bcia.javachain.consenter.consensus.IConsensue;
 import org.bcia.javachain.consenter.consensus.IConsenterSupport;
@@ -25,7 +27,18 @@ import org.bcia.javachain.protos.common.Common;
  * @Date: 2018/3/7
  * @company Dingxuan
  */
-public class Singleton implements  IChain{
+public class Singleton implements IChain, IConsensue{
+    private static JavaChainLog log = JavaChainLogFactory.getLog(Singleton.class);
+    private IConsenterSupport support;
+
+    private Message sendChan;
+
+    class Message {
+        long configSeq;
+        Common.Envelope normalMsg;
+        Common.Envelope configMsg;
+    }
+
     @Override
     public void order(Common.Envelope env, long configSeq) {
 
@@ -37,8 +50,13 @@ public class Singleton implements  IChain{
     }
 
     @Override
-    public void start() {
+    public void waitReady() {
 
+    }
+
+    @Override
+    public void start() {
+        main();
     }
 
     @Override
@@ -46,11 +64,18 @@ public class Singleton implements  IChain{
 
     }
 
-    public static void main(String[] args) throws InterruptedException {
-        for (;;){
+    public static void main()  {
+        for (; ; ) {
             //获取configMsg,判断是否为配置消息
-
-
         }
+    }
+
+    @Override
+    public IChain handleChain(IConsenterSupport consenterSupport, Common.Metadata metadata) {
+        return new Singleton(consenterSupport);
+    }
+
+    public Singleton(IConsenterSupport support) {
+        this.support = support;
     }
 }

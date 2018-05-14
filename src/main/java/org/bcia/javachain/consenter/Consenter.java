@@ -38,7 +38,6 @@ public class Consenter {
             log.warn("Node command need more args-----");
             return;
         }
-        int cmdWordCount;//记录命令单词数量
         String command = args[0];
         if (args.length == 1 && Constant.VERSION.equalsIgnoreCase(command)) {
             log.info("Consentor version is V0.25!..");
@@ -57,18 +56,24 @@ public class Consenter {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-        }else{
+        }else if (args.length == 1 && Constant.BENCHMARK.equalsIgnoreCase(command)) {
+            iConsenterCmd = ConsenterCmdFactory.getInstance(command);
+            String[] argment = new String[]{command};
+            try {
+                iConsenterCmd.execCmd(argment);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
             log.info("args is error!");
         }
         return;
     }
 
     public static void main(String[] args) {
-        //引入Spring配置文件
-  //     ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
         Consenter consenter = new Consenter();
-        String[] start = new String[]{"start"};
-        consenter.execCmd(start);
+        consenter.execCmd(args);
     }
 
 }

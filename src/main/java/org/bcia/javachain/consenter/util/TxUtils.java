@@ -13,18 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.consensus;
+package org.bcia.javachain.consenter.util;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.consenter.Configuration;
-import org.springframework.core.annotation.Order;
-import java.util.Map;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/1 *
+ * @Date: 2018/5/10
  * @company Dingxuan
  */
-public interface IConsensue {
-     IChain handleChain(IConsenterSupport consenterSupport, Common.Metadata metadata);
+public class TxUtils {
+    public static Common.Envelope GetEnvelopeFromBlock(byte[] data){
+        Common.Envelope.Builder envelope=Common.Envelope.newBuilder();
+        try {
+            envelope.mergeFrom(data);
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+        return envelope.build();
+    }
+
 }

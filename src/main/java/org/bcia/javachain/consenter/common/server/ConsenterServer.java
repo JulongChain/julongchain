@@ -38,7 +38,6 @@ import static org.bouncycastle.asn1.iana.IANAObjectIdentifiers.mgmt;
  * @Date: 2/27/18 5:14 PM *
  * @company Dingxuan
  */
-@Component
 public class ConsenterServer {
     private int port = 7050;
     private Server server;
@@ -48,14 +47,14 @@ public class ConsenterServer {
                 .addService(new ConsenterServerImpl())
                 .build()
                 .start();
-        log.info("consenter service start...");
+        log.info("consenter service start, port: 7050");
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
             @Override
             public void run() {
 
-               log.info("*** shutting down gRPC server since JVM is shutting down");
+                log.info("*** shutting down gRPC server since JVM is shutting down");
                 ConsenterServer.this.stop();
                 log.error("***consenter server shut down");
             }
@@ -77,11 +76,9 @@ public class ConsenterServer {
 
 
     public static void main(String[] args) throws IOException, InterruptedException {
-
-     ConsenterServer server = new ConsenterServer();
-      server.start();
-      server.blockUntilShutdown();
-
+        ConsenterServer server = new ConsenterServer();
+        server.start();
+        server.blockUntilShutdown();
 
 
     }
@@ -92,12 +89,13 @@ public class ConsenterServer {
         @Override
         public StreamObserver<Common.Envelope> deliver(StreamObserver<Ab.DeliverResponse> responseObserver) {
             return new StreamObserver<Common.Envelope>() {
-                DeliverHandler deliverHandler=new DeliverHandler();
+                DeliverHandler deliverHandler = new DeliverHandler();
+
                 @Override
                 public void onNext(Common.Envelope envelope) {
-                    log.info("envelop:"+envelope.getPayload().toStringUtf8());
+                    log.info("envelop:" + envelope.getPayload().toStringUtf8());
                     deliverHandler.handle(envelope);
-                    responseObserver.onNext(Ab.DeliverResponse.newBuilder().setStatusValue(500).build());
+                    responseObserver.onNext(Ab.DeliverResponse.newBuilder().setStatusValue(200).build());
                     //封装处理消息的方法
                 }
 
@@ -112,14 +110,16 @@ public class ConsenterServer {
                 }
             };
         }
+
         @Override
         public StreamObserver<Common.Envelope> broadcast(StreamObserver<Ab.BroadcastResponse> responseObserver) {
-            return new StreamObserver<Common.Envelope>(){
-                 BroadCastHandler broadCastHandle=new BroadCastHandler();
+            return new StreamObserver<Common.Envelope>() {
+                BroadCastHandler broadCastHandle = new BroadCastHandler();
+
                 @Override
                 public void onNext(Common.Envelope envelope) {
                     try {
-                        broadCastHandle.handle(envelope,responseObserver);
+                        broadCastHandle.handle(envelope, responseObserver);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

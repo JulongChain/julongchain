@@ -24,6 +24,8 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.consenter.common.cmd.IConsenterCmd;
 import org.bcia.javachain.consenter.common.server.ConsenterServer;
 
+import java.io.IOException;
+
 /**
  * @author zhangmingyang
  * @Date: 2018/3/2
@@ -32,7 +34,6 @@ import org.bcia.javachain.consenter.common.server.ConsenterServer;
 public class StartCmd implements IConsenterCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(StartCmd.class);
     public ConsenterServer consenterServer;
-    //private static final String START = "start";
 
     public StartCmd() {
         consenterServer=new ConsenterServer();
@@ -43,25 +44,24 @@ public class StartCmd implements IConsenterCmd {
         for (String str : args) {
             log.info("arg-----$" + str);
         }
-        Options options = new Options();
-        //需要支持peer node start, 无需参数
-//        options.addOption(START, false, "start peer node");
-//        //需要支持peer node start/peer node status
-//        //options.addOption(CMD_STATUS, false, "display peer node status");
-//
-//        CommandLineParser parser = new NodeCLIParser();
-//        CommandLine cmd = parser.parse(options, args);
-
-            log.info("peer node start !!!");
             try {
-                consenterServer.start();
-                consenterServer.blockUntilShutdown();
+                new Thread() {
+                    @Override
+                    public void run() {
+                       ConsenterServer server = new ConsenterServer();
+                        try {
+                            server.start();
+                            server.blockUntilShutdown();
+                        } catch (IOException ex) {
+                            log.error(ex.getMessage(), ex);
+                        } catch (InterruptedException ex) {
+                            log.error(ex.getMessage(), ex);
+                        }
+                    }
+                }.start();
+                Thread.sleep(1000);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-
-
-
     }
 }

@@ -15,48 +15,50 @@
  */
 package org.bcia.javachain.consenter.common.cmd.impl;
 
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.consenter.common.cmd.IConsenterCmd;
 import org.bcia.javachain.consenter.common.server.ConsenterServer;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/2
+ * @Date: 2018/5/7
  * @company Dingxuan
  */
-public class VersionCmd implements IConsenterCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(VersionCmd.class);
-    //   @Autowired
+public class BenchMarkCmd implements IConsenterCmd {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(BenchMarkCmd.class);
     public ConsenterServer consenterServer;
-    private static final String VERSION = "version";
 
-    public VersionCmd() {
-        //consenterServer= new VersionCmd();
-        //VersionCmd versionCmd=new VersionCmd();
-        consenterServer = new ConsenterServer();
+    public BenchMarkCmd() {
+        consenterServer=new ConsenterServer();
     }
-
     @Override
     public void execCmd(String[] args) throws ParseException {
         for (String str : args) {
             log.info("arg-----$" + str);
         }
-        Options options = new Options();
-        //需要支持peer node start, 无需参数
-        options.addOption(VERSION, false, "start peer node");
-        //需要支持peer node start/peer node status
-        CommandLineParser parser = new DefaultParser();
-        CommandLine cmd = parser.parse(options, args);
-        String defaultValue = "UnKown";
-        if (cmd.hasOption(VERSION)) {
-            log.info("consnter version is V0.25!");
+        log.info("consenter node start by BenchMark mode!!!");
+        try {
+            new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        consenterServer.start();
+                        consenterServer.blockUntilShutdown();
+                    } catch (IOException ex) {
+                        log.error(ex.getMessage(), ex);
+                    } catch (InterruptedException ex) {
+                        log.error(ex.getMessage(), ex);
+                    }
+                }
+            }.start();
+            Thread.sleep(1000);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-
     }
+
 }
