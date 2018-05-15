@@ -97,6 +97,7 @@ public class Cauthdsl {
             SignaturePolicySignedBy spolicy = (SignaturePolicySignedBy) policy;
             return Cauthdsl.confirmSignedData1(signedDatas,used,signedByID,deserializer,spolicy);
         }else{
+            log.info("Unknown type");
             return null;
         }
 
@@ -167,11 +168,6 @@ public class Cauthdsl {
         }
         return false;
     }
-
-   public static boolean func1(SignedData[] signedData,Boolean[] used){
-        Boolean[] _used = new Boolean[used.length];
-        return false;
-   }
 
 
 }
