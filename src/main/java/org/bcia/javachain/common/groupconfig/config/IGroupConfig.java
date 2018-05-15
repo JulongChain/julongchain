@@ -15,6 +15,8 @@
  */
 package org.bcia.javachain.common.groupconfig.config;
 
+import org.bcia.javachain.common.groupconfig.capability.IGroupCapabilities;
+
 /**
  * 群组配置接口
  *
@@ -23,6 +25,13 @@ package org.bcia.javachain.common.groupconfig.config;
  * @company Dingxuan
  */
 public interface IGroupConfig {
+    /**
+     * 获取能力集
+     *
+     * @return
+     */
+    IGroupCapabilities getCapabilities();
+
     /**
      * 获取应用配置对象
      *
