@@ -17,10 +17,7 @@ package org.bcia.javachain.node;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.cli.ParseException;
-import org.bcia.javachain.common.exception.JavaChainException;
-import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.exception.NodeException;
-import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.exception.*;
 import org.bcia.javachain.common.genesis.GenesisBlockFactory;
 import org.bcia.javachain.common.groupconfig.GroupConfigBundle;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -264,6 +261,8 @@ public class Node {
                         log.error(e.getMessage(), e);
                     } catch (InvalidProtocolBufferException e) {
                         log.error(e.getMessage(), e);
+                    } catch (PolicyException e) {
+                        log.error(e.getMessage(), e);
                     }
                 }
             }
@@ -273,7 +272,7 @@ public class Node {
     }
 
     public Group createGroup(String groupId, INodeLedger nodeLedger, Common.Block configBlock) throws
-            InvalidProtocolBufferException, LedgerException, ValidateException {
+            InvalidProtocolBufferException, LedgerException, ValidateException, PolicyException {
         //从账本中获取群组配置
         Configtx.Config groupConfig = ConfigTxUtils.retrievePersistedGroupConfig(nodeLedger);
 

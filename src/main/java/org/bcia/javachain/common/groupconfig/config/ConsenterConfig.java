@@ -19,6 +19,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
 import org.bcia.javachain.common.groupconfig.MSPConfigHandler;
+import org.bcia.javachain.common.groupconfig.capability.ConsenterProvider;
 import org.bcia.javachain.common.groupconfig.capability.IConsenterCapabilities;
 import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.protos.common.Configtx;
@@ -87,11 +88,12 @@ public class ConsenterConfig implements IConsenterConfig {
             if (capabilitiesValue != null) {
                 capabilitiesProto = org.bcia.javachain.protos.common.Configuration.Capabilities.parseFrom
                         (capabilitiesValue.getValue());
+                capabilities = new ConsenterProvider(capabilitiesProto.getCapabilitiesMap());
             }
 
             validateBatchSize();
             batchTimeout = validateBatchTimeout();
-            validateKafkaBrokers();
+            kafkaBrokers = validateKafkaBrokers();
         }
 
         organizationConfigMap = new HashMap<String, IOrganizationConfig>();
