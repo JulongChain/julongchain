@@ -23,9 +23,11 @@ import org.bcia.javachain.common.policycheck.SignaturePolicySignedBy;
 import org.bcia.javachain.common.policycheck.common.IsSignaturePolicyType;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.msp.IIdentity;
+import org.bcia.javachain.msp.IIdentityDeserializer;
 import org.bcia.javachain.msp.mgmt.Identity;
 import org.bcia.javachain.msp.mgmt.Msp;
 import org.bcia.javachain.protos.common.MspPrincipal;
+import org.bcia.javachain.protos.common.Policies;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -47,73 +49,84 @@ public class Cauthdsl {
      * @param signedDatas
      * @return
      */
-    public static List<SignedData> deduplicate(List<SignedData> signedDatas,Msp msp){
-        List<SignedData> result = new ArrayList<SignedData>();
+    public static SignedData[] deduplicate(SignedData[] signedDatas,IIdentityDeserializer deserializer){
+
+        SignedData[] result = new SignedData[signedDatas.length];
+        Map<String,Object> ids = new HashMap<String,Object>();
+       // List<SignedData> result = new ArrayList<SignedData>();
         IIdentity identity = new Identity();
-        for(int i=0;i<signedDatas.size();i++){
-            identity = msp.deserializeIdentity(signedDatas.get(i).getIdentity());
-            //key := identity.GetIdentifier().Mspid + identity.GetIdentifier().Id
+        for(int i=0;i<signedDatas.length;i++){
+            identity = deserializer.deserializeIdentity(signedDatas[i].getIdentity());
+            String key = identity.getMSPIdentifier();
+            if(ids.get(key) != null){
+                log.warn("De-duplicating identity "+identity+" at index "+i+" in signature set");
+            }else{
+                for(int j=0;i<result.length;i++){
+                    result[j] = signedDatas[i];
+                }
+                ids.put(key,new Object());
+            }
         }
-        String key = "";
-        for (SignedData signedData : signedDatas) {
-            return null;
-        }
-        //TODO 待完善
-        return null;
+        return result;
     }
 
     /**
-     * 评估函数方法
+     * 评估函数方法，判断策略类型
      * @param policy
      * @return
      */
-    public static boolean compile(IsSignaturePolicyType policy, MspPrincipal[] identities, Msp msp) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-    List<SignedData> signedDatas = new ArrayList<SignedData>();
-    List<Boolean> policies = new ArrayList<Boolean>();
-    if(policy==null){
-        log.info("Empty policy element");
-    }
-    if(policy instanceof SignaturePolicyNOutOf){
-
-
-
-        Method rules = policy.getClass().getMethod("getRules");
-        List<IsSignaturePolicyType> policys = (List<IsSignaturePolicyType>) rules.invoke(policy);
-        for (int i =0;i<policys.size();i++){
-            boolean compiledPolicy = compile(policys.get(i),identities,msp);
-            policies.add(compiledPolicy);
+    public static Boolean compile(IsSignaturePolicyType policy,MspPrincipal[] identities,IIdentityDeserializer deserializer) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        SignedData[] signedDatas = new SignedData[0];//先写成0
+        Boolean[] used = new Boolean[0];
+        if(policy == null){
+            log.info("Empty policy element");
         }
-        return Cauthdsl.confirmSignedData(signedDatas,policies,policy);
+        if(policy instanceof SignaturePolicyNOutOf){
+            Boolean[] polices = new Boolean[((SignaturePolicyNOutOf) policy).getRules().length];
+            for(int i=0;i<polices.length;i++){
+                Boolean compiledPolicy = compile(policy,identities,deserializer);
+                polices[i] = compiledPolicy;
+            }
+            return Cauthdsl.confirmSignedData(signedDatas,used,polices,policy);
+        }
+        if(policy instanceof SignaturePolicySignedBy){
+            if(((SignaturePolicySignedBy) policy).SignedBy<0 ||((SignaturePolicySignedBy) policy).SignedBy>=identities.length){
+                log.info("identity index out of range, requested "+((SignaturePolicySignedBy) policy).SignedBy+", but identies length is"+identities.length);
+            }
+            MspPrincipal signedByID = identities[((SignaturePolicySignedBy) policy).SignedBy];
+            SignaturePolicySignedBy spolicy = (SignaturePolicySignedBy) policy;
+            return Cauthdsl.confirmSignedData1(signedDatas,used,signedByID,deserializer,spolicy);
+        }else{
+            return null;
+        }
 
     }
-    if(policy instanceof SignaturePolicySignedBy){
-        if(((SignaturePolicySignedBy) policy).SignedBy<0 ||((SignaturePolicySignedBy) policy).SignedBy>=identities.length){
-            log.info("identity index out of range, requested "+((SignaturePolicySignedBy) policy).SignedBy+", but identies length is"+identities.length);
-        }
-        MspPrincipal signedByID = identities[((SignaturePolicySignedBy) policy).SignedBy];
-        return Cauthdsl.confirmSignedData1(signedDatas,policies,signedByID,msp);
-    }
-        //TODO 待完善
-        return false;
-    }
+
 
     /**
      * 参照fabric里compile里的返回函数
      * @param signedDatas
      * @param policies
+     * @param policy
      * @return
+     * @throws NoSuchMethodException
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
      */
-    public static boolean confirmSignedData(List<SignedData> signedDatas,List<Boolean> policies,IsSignaturePolicyType policy) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public static boolean confirmSignedData(SignedData[] signedDatas,Boolean[] used,Boolean[] policies,IsSignaturePolicyType policy) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Long grepKey = new Date().getTime();
-        log.info(signedDatas+"gate"+grepKey+" evaluation starts");
+        log.debug(signedDatas+"gate"+grepKey+" evaluation starts");
         int verified = 0;
-        List<Boolean> _used = new ArrayList<Boolean>();
+        Boolean[] _used = new Boolean[used.length];
+        for(int i=0;i<policies.length;i++){
+            System.arraycopy(used,0,_used,0,used.length);
+            if(policies[i]){       //TODO 待定
+                verified++;
+                System.arraycopy(_used,0,used,0,used.length);
+            }
+        }
         Method getN = policy.getClass().getMethod("getN");
         int N = (int) getN.invoke(policy);
-        for (Boolean polocy: policies) {
-            //TODO 待完善
-        }
-
         if(verified>=N){
            log.info(signedDatas+"gate"+ grepKey+"evaluation succeeds");
         }else{
@@ -122,20 +135,43 @@ public class Cauthdsl {
         return verified>=N;
     }
 
-    public static boolean confirmSignedData1(List<SignedData> signedDatas, List<Boolean> used, MspPrincipal signedByID, Msp msp){
-        for(int i=0;i<signedDatas.size();i++){
-            if(used.get(i)){
-                log.info(signedDatas.get(i)+"skipping identity"+i+"because it has already been used");
+    public static boolean confirmSignedData1(SignedData[] signedDatas, Boolean[] used, MspPrincipal signedByID, IIdentityDeserializer deserializer,SignaturePolicySignedBy policy){
+        log.debug(signedDatas+"signed by "+policy.SignedBy+" principal evaluation starts (used %v)");
+
+        for(int i=0;i<signedDatas.length;i++){
+            if(used[i]){
+                log.info(signedDatas[i]+"skipping identity"+i+"because it has already been used");
                 continue;
             }
            // identity, err := deserializer.DeserializeIdentity(sd.Identity)
-            IIdentity iIdentity = msp.deserializeIdentity(signedDatas.get(i).getIdentity());
-            iIdentity.satisfiesPrincipal(signedByID);
-            iIdentity.verify(signedDatas.get(i).getData(),signedDatas.get(i).getSignature());
-            used.set(i,true);
+            IIdentity iIdentity = null;
+            try {
+                iIdentity = deserializer.deserializeIdentity(signedDatas[i].getIdentity());
+            }catch (Exception e){
+                log.info("Principal deserialization failure  for identity "+signedDatas[i].getIdentity());
+            }
+            try {
+                iIdentity.satisfiesPrincipal(signedByID);
+            }catch (Exception e){
+                log.info(signedDatas+"identity %d does not satisfy principal: "+i);
+            }
+            log.debug(signedDatas+" principal matched by identity "+i);
+            try {
+                iIdentity.verify(signedDatas[i].getData(),signedDatas[i].getSignature());
+            }catch (Exception e){
+                log.info(signedDatas+"signature for identity "+i+" is invalid: ");
+            }
+            log.debug(signedDatas+" principal evaluation succeeds for identity "+i);
+            used[i] = true;
             return true;
         }
         return false;
     }
+
+   public static boolean func1(SignedData[] signedData,Boolean[] used){
+        Boolean[] _used = new Boolean[used.length];
+        return false;
+   }
+
 
 }
