@@ -98,7 +98,7 @@ public class LedgerManagerTest {
         String ledgerId1 = "mytestgroupid1";
         String ledgerId2 = "mytestgroupid2";
         l = LedgerManager.openLedger(ledgerId1);
-        l.getTransactionByID("12313131");
+        System.out.println(l.getTransactionByID("8"));
     }
 
     @Test

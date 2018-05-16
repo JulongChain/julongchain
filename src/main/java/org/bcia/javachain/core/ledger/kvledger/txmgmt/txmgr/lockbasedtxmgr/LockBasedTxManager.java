@@ -77,8 +77,7 @@ public class LockBasedTxManager implements TxManager {
     @Override
     public ITxSimulator newTxSimulator(String txid) throws LedgerException {
         logger.debug("Constructing new tx simulator");
-        LockBasedTxSimulator s = LockBasedTxSimulator.newLockBasedTxSimulator(this, txid);
-        return s;
+        return LockBasedTxSimulator.newLockBasedTxSimulator(this, txid);
     }
 
     @Override
