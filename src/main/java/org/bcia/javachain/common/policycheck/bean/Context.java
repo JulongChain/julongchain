@@ -13,17 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.policycheck.policies;
 
-import org.bcia.javachain.common.policies.PolicyManager;
+package org.bcia.javachain.common.policycheck.bean;
+
+import org.bcia.javachain.protos.common.MspPrincipal;
 
 /**
  * 类描述
  *
  * @author yuanjun
- * @date 26/04/18
+ * @date 11/05/18
  * @company Aisino
  */
-public interface ChannelPolicyManagerGetter {
-    PolicyManager Manager(String channelID );
+public class Context {
+    private int IDNum;
+    private MspPrincipal[] principals;
+
+    public int getIDNum() {
+        return IDNum;
+    }
+
+    public void setIDNum(int IDNum) {
+        this.IDNum = IDNum;
+    }
+
+    public MspPrincipal[] getPrincipals() {
+        return principals;
+    }
+
+    public void setPrincipals(MspPrincipal[] principals) {
+        this.principals = principals;
+    }
+
+
 }
