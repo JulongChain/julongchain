@@ -75,6 +75,11 @@ public class NodeLedger implements INodeLedger {
     }
 
     @Override
+    public String getLedgerID() {
+        return null;
+    }
+
+    @Override
     public List<TxPvtData> getPvtDataByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
         return null;
     }

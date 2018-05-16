@@ -15,6 +15,11 @@
  */
 package org.bcia.javachain.common.resourceconfig;
 
+import org.bcia.javachain.common.configtx.IValidator;
+import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
+import org.bcia.javachain.common.policies.IPolicyManager;
+import org.bcia.javachain.common.resourceconfig.config.IResourcesConfig;
+
 /**
  * 对象
  *
@@ -23,4 +28,11 @@ package org.bcia.javachain.common.resourceconfig;
  * @company Dingxuan
  */
 public interface IResourcesConfigBundle {
+    IGroupConfigBundle getGroupConfigBundle();
+
+    IResourcesConfig getResourcesConfig();
+
+    IValidator getValidator();
+
+    IPolicyManager getPolicyManager();
 }

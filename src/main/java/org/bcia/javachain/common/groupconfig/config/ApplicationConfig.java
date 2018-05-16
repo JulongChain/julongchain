@@ -17,9 +17,9 @@ package org.bcia.javachain.common.groupconfig.config;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.ValidateException;
-import org.bcia.javachain.common.groupconfig.ApplicationProvider;
 import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
 import org.bcia.javachain.common.groupconfig.MSPConfigHandler;
+import org.bcia.javachain.common.groupconfig.capability.ApplicationProvider;
 import org.bcia.javachain.common.groupconfig.capability.IApplicationCapabilities;
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.common.Configuration;
@@ -37,7 +37,8 @@ import java.util.Map;
  */
 public class ApplicationConfig implements IApplicationConfig {
     private Map<String, IApplicationOrgConfig> applicationOrgConfigs;
-    private Configuration.Capabilities capabilities;
+    private Configuration.Capabilities capabilitiesProto;
+    private IApplicationCapabilities capabilities;
 
     public ApplicationConfig() {
     }
@@ -47,7 +48,8 @@ public class ApplicationConfig implements IApplicationConfig {
         if (appTree != null && appTree.getValuesMap() != null) {
             Configtx.ConfigValue configValue = appTree.getValuesMap().get(GroupConfigConstant.CAPABILITIES);
             if (configValue != null) {
-                capabilities = Configuration.Capabilities.parseFrom(configValue.getValue());
+                capabilitiesProto = Configuration.Capabilities.parseFrom(configValue.getValue());
+                capabilities = new ApplicationProvider(capabilitiesProto.getCapabilitiesMap());
             }
         }
 
@@ -73,7 +75,6 @@ public class ApplicationConfig implements IApplicationConfig {
 
     @Override
     public IApplicationCapabilities getCapabilities() {
-        //TODO:仅仅使测试通过
-        return new ApplicationProvider();
+        return capabilities;
     }
 }

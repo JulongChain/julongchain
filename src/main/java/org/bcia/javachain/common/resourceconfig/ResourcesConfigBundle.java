@@ -40,7 +40,7 @@ import java.util.Map;
  * @date 2018/4/25
  * @company Dingxuan
  */
-public class ResourcesConfigBundle {
+public class ResourcesConfigBundle implements IResourcesConfigBundle {
     interface Callback {
         void call(IResourcesConfig resourcesConfig);
     }
@@ -50,7 +50,7 @@ public class ResourcesConfigBundle {
     private IGroupConfigBundle groupConfigBundle;
     private IResourcesConfig resourcesConfig;
     private IValidator validator;
-    private PolicyRouter policyRouter;
+    private IPolicyManager policyManager;
 
     private List<Callback> callbackList;
 
@@ -72,9 +72,29 @@ public class ResourcesConfigBundle {
                 policyProviderMap, config.getGroupTree());
         IPolicyManager groupPolicyManager = groupConfigBundle.getPolicyManager();
 
-        this.policyRouter = new PolicyRouter(groupPolicyManager, resourcesPolicyManager);
+        this.policyManager = new PolicyRouter(groupPolicyManager, resourcesPolicyManager);
 
-        new Validator(groupId, config, ResourceConfigConstant.RESOURCES, policyRouter);
+        new Validator(groupId, config, ResourceConfigConstant.RESOURCES, policyManager);
 
+    }
+
+    @Override
+    public IGroupConfigBundle getGroupConfigBundle() {
+        return groupConfigBundle;
+    }
+
+    @Override
+    public IResourcesConfig getResourcesConfig() {
+        return resourcesConfig;
+    }
+
+    @Override
+    public IValidator getValidator() {
+        return validator;
+    }
+
+    @Override
+    public IPolicyManager getPolicyManager() {
+        return policyManager;
     }
 }

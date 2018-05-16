@@ -15,9 +15,11 @@
  */
 package org.bcia.javachain.core.ledger.kvledger;
 
+import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.PrunePolicy;
 import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.blkstorage.BlockStorage;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -155,15 +157,18 @@ public class KvLedger implements INodeLedger {
      * @return
      */
     @Override
-    public TransactionPackage.ProcessedTransaction getTransactionByID(String txID) throws LedgerException {
+    public synchronized TransactionPackage.ProcessedTransaction getTransactionByID(String txID) throws LedgerException {
         Common.Envelope tranEvn = null;
         TransactionPackage.TxValidationCode txVResult = null;
         try {
             tranEvn = blockStore.retrieveTxByID(txID);
             txVResult = blockStore.retrieveTxValidationCodeByTxID(txID);
         } catch (LedgerException e) {
-            logger.info(String.format("Fail to get transaction using id = [%s]", txID));
-            return null;
+            if(e.equals(BlockStorage.ERR_NOT_FOUND_IN_INDEX)){
+                logger.info(String.format("Transaction not found, using id = [%s]", txID));
+                return null;
+            }
+            throw e;
         }
         return TransactionPackage.ProcessedTransaction.newBuilder()
                 .setTransactionEnvelope(tranEvn)
@@ -176,12 +181,16 @@ public class KvLedger implements INodeLedger {
      * @return
      */
     @Override
-    public Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException {
+    public synchronized Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException {
         try {
             return blockStore.getBlockchainInfo();
         } catch (LedgerException e) {
-            logger.info("Fail to get blockchain info");
-            return null;
+            if (e.equals(BlockStorage.ERR_NOT_FOUND_IN_INDEX)) {
+                logger.info("Blockchain info not found");
+                return null;
+            }
+            logger.error(e.getMessage(), e);
+            throw e;
         }
     }
 
@@ -189,12 +198,16 @@ public class KvLedger implements INodeLedger {
      * blockNumber of  math.MaxUint64 will return last block
      */
     @Override
-    public Common.Block getBlockByNumber(long blockNumber) throws LedgerException {
+    public synchronized Common.Block getBlockByNumber(long blockNumber) throws LedgerException {
         try {
             return blockStore.retrieveBlockByNumber(blockNumber);
         } catch (LedgerException e) {
-            logger.info(String.format("Fail to get block using block num = [%d]", blockNumber));
-            return null;
+            if (e.equals(BlockStorage.ERR_NOT_FOUND_IN_INDEX)) {
+                logger.info(String.format("block not found, using block num = [%d]", blockNumber));
+                return null;
+            }
+            logger.error(e.getMessage(), e);
+            throw e;
         }
     }
 
@@ -207,8 +220,12 @@ public class KvLedger implements INodeLedger {
         try {
             return blockStore.retrieveBlocks(startBlockNumber);
         } catch (LedgerException e) {
-            logger.info(String.format("Fail to get blocks iterator using start block num = [%d]", startBlockNumber));
-            return null;
+            if (e.equals(BlockStorage.ERR_NOT_FOUND_IN_INDEX)) {
+                logger.info(String.format("Blocks iterator not found, using start block num = [%d]", startBlockNumber));
+                return null;
+            }
+            logger.error(e.getMessage(), e);
+            throw e;
         }
     }
 
@@ -218,12 +235,16 @@ public class KvLedger implements INodeLedger {
      * @return
      */
     @Override
-    public Common.Block getBlockByHash(byte[] blockHash) throws LedgerException {
+    public synchronized Common.Block getBlockByHash(byte[] blockHash) throws LedgerException {
         try {
             return blockStore.retrieveBlockByHash(blockHash);
         } catch (LedgerException e) {
-            logger.info("fail to get block by hash");
-            return null;
+            if (e.equals(BlockStorage.ERR_NOT_FOUND_IN_INDEX)) {
+                logger.info("Block not found");
+                return null;
+            }
+            logger.error(e.getMessage(), e);
+            throw e;
         }
     }
 
@@ -233,22 +254,30 @@ public class KvLedger implements INodeLedger {
      * @return
      */
     @Override
-    public Common.Block getBlockByTxID(String txID) throws LedgerException {
+    public synchronized Common.Block getBlockByTxID(String txID) throws LedgerException {
         try {
             return blockStore.retrieveBlockByTxID(txID);
         } catch (LedgerException e) {
-            logger.info(String.format("Fail to get block by txid = [%s]", txID));
-            return null;
+            if (e.equals(BlockStorage.ERR_NOT_FOUND_IN_INDEX)) {
+                logger.info(String.format("Block not found, using txid = [%s]", txID));
+                return null;
+            }
+            logger.error(e.getMessage(), e);
+            throw e;
         }
     }
 
     @Override
-    public TransactionPackage.TxValidationCode getTxValidationCodeByTxID(String txID) throws LedgerException {
+    public synchronized TransactionPackage.TxValidationCode getTxValidationCodeByTxID(String txID) throws LedgerException {
         try {
             return blockStore.retrieveTxValidationCodeByTxID(txID);
         } catch (LedgerException e) {
-            logger.info(String.format("Fail to get tx validation code by txid = [%s]", txID));
-            return null;
+            if (e.equals(BlockStorage.ERR_NOT_FOUND_IN_INDEX)) {
+                logger.info(String.format("Tx validation code not found, using txid = [%s]", txID));
+                return null;
+            }
+            logger.error(e.getMessage(), e);
+            throw e;
         }
     }
 
@@ -258,12 +287,7 @@ public class KvLedger implements INodeLedger {
      */
     @Override
     public ITxSimulator newTxSimulator(String txId) throws LedgerException {
-        try {
-            return txtmgmt.newTxSimulator(txId);
-        } catch (LedgerException e) {
-            logger.info(String.format("fail to get new tx simulator using txid = [%s]", txId));
-            return null;
-        }
+        return txtmgmt.newTxSimulator(txId);
     }
 
     /** Prune prunes the blocks/transactions that satisfy the given policy
@@ -282,12 +306,7 @@ public class KvLedger implements INodeLedger {
     @Override
     public IQueryExecutor newQueryExecutor() throws LedgerException{
         //TODO uuid
-        try {
-            return txtmgmt.newQueryExecutor(UUID.randomUUID().toString());
-        } catch (LedgerException e) {
-            logger.info("Fail to get query executor");
-            return null;
-        }
+        return txtmgmt.newQueryExecutor(UUID.randomUUID().toString());
     }
 
     /** NewHistoryQueryExecutor gives handle to a history query executor.
@@ -297,31 +316,34 @@ public class KvLedger implements INodeLedger {
      */
     @Override
     public IHistoryQueryExecutor newHistoryQueryExecutor() throws LedgerException {
-        try {
-            return historyDB.newHistoryQueryExecutor(blockStore);
-        } catch (LedgerException e) {
-            logger.info("Faile to get history query executor");
-            return null;
-        }
+        return historyDB.newHistoryQueryExecutor(blockStore);
     }
 
     @Override
-    public BlockAndPvtData getPvtDataAndBlockByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
+    public synchronized BlockAndPvtData getPvtDataAndBlockByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
         try {
             return ((Store) blockStore).getPvtDataAndBlockByNum(blockNum, filter);
         } catch (LedgerException e) {
-            logger.info(String.format("fail to get pvtdata block by block num = [%d]", blockNum));
-            return null;
+            if (e.equals(BlockStorage.ERR_NOT_FOUND_IN_INDEX)) {
+                logger.info(String.format("Pvtdata block not found, suing block num = [%d]", blockNum));
+                return null;
+            }
+            logger.error(e.getMessage(), e);
+            throw e;
         }
     }
 
     @Override
-    public List<TxPvtData> getPvtDataByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
+    public synchronized List<TxPvtData> getPvtDataByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
         try {
             return ((Store) blockStore).getPvtDataByNum(blockNum, filter);
         } catch (LedgerException e) {
-            logger.info(String.format("fail to get pvtdata block by block num = [%d]", blockNum));
-            return null;
+            if (e.equals(BlockStorage.ERR_NOT_FOUND_IN_INDEX)) {
+                logger.info(String.format("Pvtdata block not found, using block num = [%d]", blockNum));
+                return null;
+            }
+            logger.error(e.getMessage(), e);
+            throw e;
         }
     }
 
@@ -378,7 +400,7 @@ public class KvLedger implements INodeLedger {
         }
     }
 
-
+    @Override
     public String getLedgerID() {
         return ledgerID;
     }
