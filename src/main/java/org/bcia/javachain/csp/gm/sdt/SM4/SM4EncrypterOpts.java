@@ -1,5 +1,5 @@
 /**
- * Copyright Aisino. All Rights Reserved.
+ * Copyright SDT. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.policycheck.policies;
+package org.bcia.javachain.csp.gm.sdt.SM4;
+import org.bcia.javachain.csp.intfs.opts.IEncrypterOpts;
 
-import org.bcia.javachain.common.policies.PolicyManager;
 
 /**
- * 类描述
+ * GM SM4EncrypterOpts
  *
- * @author yuanjun
- * @date 26/04/18
- * @company Aisino
+ * @author tengxiumin
+ * @date 5/8/18
+ * @company SDT
  */
-public interface ChannelPolicyManagerGetter {
-    PolicyManager Manager(String channelID );
+public class SM4EncrypterOpts implements IEncrypterOpts {
+    @Override
+    public String getAlgorithm() {
+        return "SM4";
+    }
 }

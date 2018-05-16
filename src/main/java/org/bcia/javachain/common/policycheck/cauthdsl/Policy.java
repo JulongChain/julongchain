@@ -16,10 +16,7 @@
 
 package org.bcia.javachain.common.policycheck.cauthdsl;
 
-import org.apache.commons.logging.Log;
-import org.apache.zookeeper.proto.ErrorResponse;
 import org.bcia.javachain.common.exception.PolicyException;
-import org.bcia.javachain.common.exception.SysSmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policies.IPolicy;
@@ -29,9 +26,11 @@ import org.bcia.javachain.common.policycheck.bean.Provider;
 import org.bcia.javachain.common.policycheck.bean.SignaturePolicyEnvelope;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.msp.IIdentity;
+import org.bcia.javachain.msp.IIdentityDeserializer;
 import org.bcia.javachain.msp.mgmt.Msp;
-import org.bcia.javachain.msp.mgmt.MspManager;
+import org.bcia.javachain.protos.common.MspPrincipal;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 
@@ -47,9 +46,12 @@ public class Policy implements IPolicy{
     private static JavaChainLog log = JavaChainLogFactory.getLog(Policy.class);
 
     @Override
+    /**
+     * 签名策略评估
+     */
     public void evaluate(List<SignedData> signatureList) throws PolicyException {
-        List<SignedData> signedDatas = Cauthdsl.deduplicate(signatureList);   //删除重复身份
         Msp msp = new Msp();
+           //删除重复身份
         MSPPrincipal identities = new MSPPrincipal();
         try {
             //TODO 待完善     //评估这组签名是否满足策略
@@ -59,23 +61,44 @@ public class Policy implements IPolicy{
         }
 
     }
+
+    /**
+     * 生成策略提供者
+     * @param msp
+     * @param data
+     * @return
+     */
     public IIdentity NewPolicyProvider(Msp msp,byte[] data){
         return msp.deserializeIdentity(data);
 
     }
+
+    /**
+     * 生成新策略
+     * @param data
+     * @return
+     */
     public PolicyBean NewPolicy(byte[] data){
+
         SignaturePolicyEnvelope sigPolicy = new SignaturePolicyEnvelope();
+
         Provider provider = new Provider();
         Msp msp = new Msp();
-        boolean flag = Cauthdsl.compile(sigPolicy.rule,sigPolicy.iIdentity,msp);//进行策略评估
+
+
+
+        boolean compiled = false;//进行策略评估
+
         PolicyBean policyBean = new PolicyBean();
         if(sigPolicy.version != 0){
             log.info("Error unmarshaling to SignaturePolicy");
             return null;
         }
-        boolean compile = Cauthdsl.compile(sigPolicy.rule,sigPolicy.iIdentity,msp);
+
+            //compiled = Cauthdsl.compile(sigPolicy.rule.isSignaturePolicy_type,sigPolicy.iIdentitys,);
+
         //TODO 待完善
-        policyBean.setEvalutor(flag);
+        policyBean.setEvalutor(compiled);
         policyBean.setDeserializer(msp.deserializeIdentity(data));
         return policyBean;
     }

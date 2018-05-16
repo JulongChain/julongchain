@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.csp.gm.sdt;
 
+import org.bcia.javachain.csp.gm.sdt.random.RandomGen;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
