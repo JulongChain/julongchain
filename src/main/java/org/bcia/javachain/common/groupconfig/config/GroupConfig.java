@@ -19,6 +19,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
 import org.bcia.javachain.common.groupconfig.MSPConfigHandler;
+import org.bcia.javachain.common.groupconfig.capability.GroupProvider;
+import org.bcia.javachain.common.groupconfig.capability.IGroupCapabilities;
 import org.bcia.javachain.msp.IMspManager;
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.common.Configuration;
@@ -39,7 +41,9 @@ public class GroupConfig implements IGroupConfig {
     private Configuration.BlockDataHashingStructure blockDataHashingStructure;
     private Configuration.ConsenterAddresses consenterAddresses;
     private Configuration.Consortium consortium;
-    private Configuration.Capabilities capabilities;
+    private Configuration.Capabilities capabilitiesProto;
+
+    private IGroupCapabilities capabilities;
 
     private HashingAlgorithm hashingAlgorithm;
 
@@ -74,7 +78,8 @@ public class GroupConfig implements IGroupConfig {
 
             Configtx.ConfigValue capabilitiesValue = groupTree.getValuesMap().get(GroupConfigConstant.CAPABILITIES);
             if (capabilitiesValue != null) {
-                capabilities = Configuration.Capabilities.parseFrom(capabilitiesValue.getValue());
+                capabilitiesProto = Configuration.Capabilities.parseFrom(capabilitiesValue.getValue());
+                capabilities = new GroupProvider(capabilitiesProto.getCapabilitiesMap());
             }
 
             validateHashingAlgorithm();
@@ -124,7 +129,8 @@ public class GroupConfig implements IGroupConfig {
         return consortium;
     }
 
-    public Configuration.Capabilities getCapabilities() {
+    @Override
+    public IGroupCapabilities getCapabilities() {
         return capabilities;
     }
 
