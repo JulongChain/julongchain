@@ -98,9 +98,7 @@ public class LedgerManagerTest {
         String ledgerId1 = "mytestgroupid1";
         String ledgerId2 = "mytestgroupid2";
         l = LedgerManager.openLedger(ledgerId1);
-        Assert.assertEquals(ledgerId1, ((KvLedger) l).getLedgerID());
-        l = LedgerManager.openLedger(ledgerId2);
-        Assert.assertEquals(ledgerId2, ((KvLedger) l).getLedgerID());
+        l.getTransactionByID("12313131");
     }
 
     @Test

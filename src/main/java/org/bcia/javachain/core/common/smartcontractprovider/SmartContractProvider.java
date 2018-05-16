@@ -17,6 +17,7 @@ package org.bcia.javachain.core.common.smartcontractprovider;
 
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.node.Query;
@@ -161,5 +162,40 @@ public class SmartContractProvider {
     public static Query.SmartContractQueryResponse getInstalledSmartcontracts() throws JavaChainException {
         return null;
 
+    }
+
+    /**
+     * isSmartContractDeployed returns true if the smartcontract with given name and version is deployed
+     * @param groupID
+     * @param smartContractName
+     * @param smartContractVersion
+     * @param smartContractHash
+     * @return
+     * @throws SmartContractException
+     */
+    public static boolean isSmartContractDeployed(String groupID,String smartContractName,
+                                                  String smartContractVersion,
+                                                  byte[] smartContractHash)throws SmartContractException {
+        return true;
+    }
+
+    /**
+     * ExtractStatedbArtifactsAsTarbytes extracts the statedb artifacts from the code package tar and create a statedb artifact tar.
+     * The state db artifacts are expected to contain state db specific artifacts such as index specification in the case of couchdb.
+     * This function is intented to be used during chaincode instantiate/upgrade so that statedb artifacts can be created.
+     * @param scName
+     * @param scVersion
+     * @return
+     * @throws SmartContractException
+     */
+    public static byte[] extractStatedbArtifactsForSmartContract(String scName, String scVersion) throws JavaChainException {
+        ISmartContractPackage scPackage;
+        try {
+            scPackage = getSmartContractFromFS(scName, scVersion);
+        } catch (JavaChainException e) {
+            log.info("Error while loading installation package for scname {}, scversion {}. Err {}", scName, scVersion, e.getMessage());
+            return null;
+        }
+        return extractStateDBArtifactsFromSCPackage(scPackage);
     }
 }
