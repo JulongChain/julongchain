@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.csp.gm.sdt;
+package org.bcia.javachain.csp.gm.sdt.random;
 
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -30,7 +30,7 @@ import org.bcia.javachain.csp.intfs.opts.IRngOpts;
 public class RandomGen {
 
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(RandomGen.class);
-    public static final SMJniApi smJniApi = new SMJniApi();
+    private static final SMJniApi smJniApi = new SMJniApi();
 
     public byte[] rng(int len, IRngOpts opts) {
 
@@ -46,14 +46,5 @@ public class RandomGen {
         }
         return result;
     }
-/*
-    private byte[] genHexRandom(int len)  {
-        byte[] random = new byte[len];
 
-        for(int i=0; i<len; i++) {
-            random[i] = (byte) (new Random().nextInt(16));
-        }
-        return random;
-    }
-*/
 }
