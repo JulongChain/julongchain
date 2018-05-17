@@ -148,12 +148,16 @@ public class SM4 {
             logger.error("Invalid plainData. It must not be nil or empty.");
             return null;
         }
-        if(null == sm4Key) {
-            logger.error("Invalid key. It must not be nil.");
+        if(null == sm4Key || 0 == sm4Key.length) {
+            logger.error("Invalid key. It must not be nil or empty.");
             return null;
         }
-        if(null == iv) {
-            logger.error("Invalid iv. It must not be nil.");
+        if(null == iv || 0 == iv.length) {
+            logger.error("Invalid iv. It must not be nil or empty.");
+            return null;
+        }
+        if(Constants.SM4_IV_LEN != iv.length) {
+            logger.error("Invalid iv length.");
             return null;
         }
         //填充数据
@@ -173,12 +177,16 @@ public class SM4 {
             logger.error("Invalid cipherData. It must not be nil or empty.");
             return null;
         }
-        if(null == sm4Key) {
-            logger.error("Invalid key. It must not be nil.");
+        if(null == sm4Key || 0 == sm4Key.length) {
+            logger.error("Invalid key. It must not be nil or empty.");
             return null;
         }
-        if(null == iv) {
-            logger.error("Invalid iv. It must not be nil.");
+        if(null == iv || 0 == iv.length) {
+            logger.error("Invalid iv. It must not be nil or empty.");
+            return null;
+        }
+        if(Constants.SM4_IV_LEN != iv.length) {
+            logger.error("Invalid iv length.");
             return null;
         }
         //分包处理(每包长度为Constants.SM4_PACKAGE_LEN)
