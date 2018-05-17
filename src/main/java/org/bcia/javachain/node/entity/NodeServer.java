@@ -16,8 +16,12 @@
 package org.bcia.javachain.node.entity;
 
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.Convert;
+import org.bcia.javachain.common.util.NetAddress;
 import org.bcia.javachain.common.util.SpringContext;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
 import org.bcia.javachain.core.aclmgmt.IAclProvider;
@@ -27,12 +31,15 @@ import org.bcia.javachain.core.events.DeliverEventsServer;
 import org.bcia.javachain.core.events.EventGrpcServer;
 import org.bcia.javachain.core.events.EventHubServer;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
+import org.bcia.javachain.core.node.NodeConfig;
+import org.bcia.javachain.core.node.NodeConfigFactory;
 import org.bcia.javachain.core.node.NodeGrpcServer;
 import org.bcia.javachain.core.ssc.ISystemSmartContractManager;
 import org.bcia.javachain.core.ssc.SystemSmartContractManager;
 import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.util.NodeConstant;
+import org.bouncycastle.util.IPAddress;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -64,15 +71,17 @@ public class NodeServer {
         this.systemSmartContractManager = SpringContext.getInstance().getBean(SystemSmartContractManager.class);
     }
 
-    public void start() {
+    public void start() throws NodeException {
         start(false);
     }
 
-    public void start(boolean devMode) {
+    public void start(boolean devMode) throws NodeException {
         log.info("node server start-----");
         if (devMode) {
             log.info("start by devMode");
         }
+
+        NodeConfig nodeConfig = NodeConfigFactory.getNodeConfig();
 
         //检查当前的成员服务提供者类型，目前只支持CSP，即密码提供商
         int mspType = GlobalMspManagement.getLocalMsp().getType();
@@ -118,7 +127,15 @@ public class NodeServer {
         nodeGrpcServer.bindAdminServer(new AdminServer());
 
         //启动事件处理服务(Grpc Server2)
-        EventGrpcServer eventGrpcServer = new EventGrpcServer(7053);
+        String eventGrpcServerAddress = nodeConfig.getNode().getEvents().getAddress();
+        NetAddress address = null;
+        try {
+            address = new NetAddress(eventGrpcServerAddress);
+        } catch (ValidateException e) {
+            throw new NodeException(e);
+        }
+
+        EventGrpcServer eventGrpcServer = new EventGrpcServer(address.getPort());
         //绑定事件服务
         eventGrpcServer.bindEventHubServer(new EventHubServer());
 

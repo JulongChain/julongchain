@@ -15,10 +15,15 @@
  */
 package org.bcia.javachain.core.common.smartcontractprovider.metadata;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 
+import java.io.File;
+import java.lang.reflect.Array;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -31,70 +36,19 @@ import java.util.Map;
  */
 public class Validators {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Validators.class);
+
+    private static Map<String, FileValidator> fileValidators = new HashMap<>();
+
     /**
      * ValidateMetadataFile checks that metadata files are valid
      * according to the validation rules of the metadata directory (metadataType)
-     * @param srcPath
-     * @param metadataType
-     * @throws ValidateException
      */
-    public static void validateMetadataFile(String srcPath,String metadataType) throws ValidateException {
-
+    public static void validateMetadataFile(String fileName, byte[] fileBytes, String metadataType) throws ValidateException {
+        if (fileValidators.containsKey(metadataType)) {
+            throw new ValidateException("Metadata not supported in directory " + metadataType);
+        }
+        FileValidator fileValidator = fileValidators.get(metadataType);
+        fileValidator.handle(fileName, fileBytes);
     }
 
-    /**
-     * couchdbIndexFileValidator implements fileValidator
-     * @param fileName
-     * @param fileBytes
-     * @throws ValidateException
-     */
-    public static void couchdbIndexFileValidator(String fileName, byte[] fileBytes) throws ValidateException {
-
-    }
-
-    /**
-     *
-     * @param srcPath
-     * @throws ValidateException
-     */
-    public static void validateCouchdbIndexFile(String srcPath)throws ValidateException {
-
-    }
-
-    /**
-     * isJSON tests a string to determine if it can be parsed as valid JSON
-     * @param s
-     * @return
-     */
-    public static boolean isJSON(byte[] s){
-
-        return true;
-    }
-
-    /**
-     *
-     * @param indexDefinition
-     * @throws ValidateException
-     */
-    public static void validateIndexJSON(Map<String,Object> indexDefinition)throws ValidateException {
-
-    }
-
-    /**
-     *
-     * @param jsonFragment
-     * @throws ValidateException
-     */
-    public static void processIndexMap(Map<String,Object> jsonFragment)throws ValidateException {
-
-    }
-
-    /**
-     *
-     * @param jsonFragment
-     * @throws ValidateException
-     */
-    public static void validateFieldMap(Map<String,Object> jsonFragment)throws ValidateException{
-
-    }
 }

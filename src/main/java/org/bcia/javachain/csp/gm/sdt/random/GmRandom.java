@@ -18,21 +18,20 @@ package org.bcia.javachain.csp.gm.sdt.random;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.csp.gm.sdt.jni.SMJniApi;
-import org.bcia.javachain.csp.intfs.opts.IRngOpts;
 
 /**
  * Generate Random Data
  *
  * @author tengxiumin
- * @date 4/23/18
+ * @date 18/5/16
  * @company SDT
  */
-public class RandomGen {
+public class GmRandom {
 
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(RandomGen.class);
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(GmRandom.class);
     private static final SMJniApi smJniApi = new SMJniApi();
 
-    public byte[] rng(int len, IRngOpts opts) {
+    public byte[] rng(int len) {
 
         //判断随机数长度是否为非负整数
         if(len <= 0) {

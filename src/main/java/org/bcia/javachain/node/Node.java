@@ -26,6 +26,8 @@ import org.bcia.javachain.common.util.proto.BlockUtils;
 import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.core.node.GroupSupport;
+import org.bcia.javachain.core.node.NodeConfig;
+import org.bcia.javachain.core.node.NodeConfigFactory;
 import org.bcia.javachain.core.node.util.ConfigTxUtils;
 import org.bcia.javachain.csp.factory.IFactoryOpts;
 import org.bcia.javachain.csp.gm.GmFactoryOpts;
@@ -143,9 +145,9 @@ public class Node {
      * 初始化
      */
     private void init() throws NodeException {
-//        NodeConfig config = null;
+        NodeConfig config = NodeConfigFactory.getNodeConfig();
 //        try {
-//            config = NodeConfigFactory.loadNodeConfig();
+//            config = NodeConfigFactory.getNodeConfig();
 //        } catch (IOException e) {
 //            log.error(e.getMessage(), e);
 //            throw new NodeException(e);

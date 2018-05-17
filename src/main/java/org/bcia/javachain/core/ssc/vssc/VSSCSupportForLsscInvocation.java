@@ -460,9 +460,10 @@ public class VSSCSupportForLsscInvocation {
 
         Collection.CollectionCriteria cc =Collection.CollectionCriteria.newBuilder().
                 setChannel(groupID).setNamespace(smartcontractName).build();
-        ICollectionConfigPackage ccp =null;
+
+        Collection.CollectionConfigPackage ccp=null;
         try {
-            ccp = collectionStore.retriveCollectionConfigPackage(cc);
+            ccp = collectionStore.retrieveCollectionConfigPackage(cc);
         } catch (JavaChainException e) {
             String msg=e.getMessage();
             // fail if we get any error other than NoSuchCollectionError

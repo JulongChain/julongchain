@@ -20,20 +20,32 @@ import org.bcia.javachain.msp.IIdentityDeserializer;
 import org.bcia.javachain.protos.common.Collection;
 
 /**
- * 类描述
- *  IPrivDataSupport is an interface used to inject dependencies
- * @author sunianle
+ * IPrivDataSupport is an interface used to inject dependencies
+ * @author sunianle, sunzongyu
  * @date 3/15/18
  * @company Dingxuan
  */
 public interface IPrivDataSupport {
-    //getQueryExecotorForLedger returns a query executor for the specified group
+    /**
+     * getQueryExecotorForLedger returns a query executor for the specified group
+     */
     IQueryExecutor getQueryExecotorForLedger(String groupID);
-    // GetCollectionKVSKey returns the name of the collection
-    // given the collection criteria
+
+    /**
+     *
+     * GetCollectionKVSKey returns the name of the collection
+     * given the collection criteria
+     * @param cc
+     * @return
+     */
     String getCollectionKVSKey(Collection.CollectionCriteria cc);
-    // GetIdentityDeserializer returns an IdentityDeserializer
-    // instance for the specified chain
+
+    /**
+     * GetIdentityDeserializer returns an IdentityDeserializer
+     * instance for the specified chain
+     * @param groupID
+     * @return
+     */
     IIdentityDeserializer getIdentityDeserializer(String groupID);
 
     String buildCollectionKVSKey(String smartcontractname);

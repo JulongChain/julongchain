@@ -27,7 +27,7 @@ public class CollectionStoreFactory {
 
     public static synchronized ICollectionStore getCollectionStore(IPrivDataSupport collectionStoreSupport){
         if(collectionStore==null){
-            collectionStore=new SimpleCollectionStore();
+            collectionStore = new SimpleCollectionStore(collectionStoreSupport);
         }
         return collectionStore;
     }

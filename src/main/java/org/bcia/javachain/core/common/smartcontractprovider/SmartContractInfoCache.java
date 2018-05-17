@@ -18,6 +18,7 @@ package org.bcia.javachain.core.common.smartcontractprovider;
 import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.protos.node.SmartContractDataPackage;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -25,7 +26,7 @@ import java.util.Map;
 * needed by endorser to verify if the local instantiation policy
 * matches the instantiation policy on a channel before honoring
 * an invoke
- * @author sunianle
+ * @author sunianle, sunzongyu
  * @date 5/10/18
  * @company Dingxuan
  */
@@ -34,10 +35,46 @@ public class SmartContractInfoCache {
     private ISmartContractCacheSupport cacheSuppot;
 
     public SmartContractInfoCache(ISmartContractCacheSupport cacheSuppot) {
+        cache = new HashMap<>();
         this.cacheSuppot = cacheSuppot;
     }
 
-    SmartContractDataPackage.SmartContractData getSmartContractData(String name,String version) throws SmartContractException{
-        return null;
+    /**
+     * cache中存在相应smartcontractData, 直接返回。
+     * 不存在创建并缓存如cache中返回
+     * @param name
+     * @param version
+     * @return
+     * @throws SmartContractException
+     */
+    public synchronized SmartContractDataPackage.SmartContractData getSmartContractData(String name,String version) throws SmartContractException{
+        String key = name + "/" + version;
+        if(cache.containsKey(key)){
+            return cache.get(key);
+        } else {
+            ISmartContractPackage smartContract = cacheSuppot.getSmartContract(name, version);
+            if(smartContract == null){
+                return null;
+            }
+            SmartContractDataPackage.SmartContractData smartContractData = smartContract.getSmartContractData();
+            cache.put(key, smartContractData);
+            return smartContractData;
+        }
+    }
+
+    public Map<String, SmartContractDataPackage.SmartContractData> getCache() {
+        return cache;
+    }
+
+    public void setCache(Map<String, SmartContractDataPackage.SmartContractData> cache) {
+        this.cache = cache;
+    }
+
+    public ISmartContractCacheSupport getCacheSuppot() {
+        return cacheSuppot;
+    }
+
+    public void setCacheSuppot(ISmartContractCacheSupport cacheSuppot) {
+        this.cacheSuppot = cacheSuppot;
     }
 }

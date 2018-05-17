@@ -55,6 +55,6 @@ public interface ICollectionStore {
      * @return
      * @throws JavaChainException
      */
-    ICollectionConfigPackage retriveCollectionConfigPackage(Collection.CollectionCriteria collectionCriteria)throws JavaChainException;
+    Collection.CollectionConfigPackage retrieveCollectionConfigPackage(Collection.CollectionCriteria collectionCriteria)throws JavaChainException;
 
 }
