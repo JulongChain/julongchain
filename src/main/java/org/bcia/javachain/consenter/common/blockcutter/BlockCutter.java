@@ -46,6 +46,8 @@ public class BlockCutter implements IReceiver {
 
 
     public BlockCutter() {
+        log.error("this is a log");
+        log.error("this is a log");
     }
 
     public BlockCutter(IConsenterConfig sharedConfigManager) {
