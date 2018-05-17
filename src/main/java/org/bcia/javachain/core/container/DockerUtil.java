@@ -175,6 +175,7 @@ public class DockerUtil {
     // while (lastBuild.details().getResult() == null) {}
     //
     // System.out.println("-====================end===================-");
+
   }
 
   public static void main(String[] args) throws Exception {
@@ -195,5 +196,6 @@ public class DockerUtil {
     //         "/var/lib/jenkins/workspace/test/src/main/java/org/bcia/javachain/core/smartcontract/client/");
     //
     // ssh.close();
+
   }
 }
