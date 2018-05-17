@@ -17,18 +17,19 @@ package org.bcia.javachain.csp.gm.sdt.SM2;
 
 import org.bcia.javachain.csp.intfs.opts.IKeyImportOpts;
 
-
 /**
- * GM SM2 IKeyImportOpts implementation
+ * SM2 公钥导入
  *
  * @author tengxiumin
- * @date 5/14/18
+ * @date 2018/05/17
  * @company SDT
  */
-public class SM2KeyImportOpts implements IKeyImportOpts{
+public class SM2PublicKeyImportOpts implements IKeyImportOpts {
+
     private boolean isEphemeral;
-    public SM2KeyImportOpts(boolean isEphemeral) {
-    this.isEphemeral=isEphemeral;
+
+    public SM2PublicKeyImportOpts(boolean isEphemeral) {
+        this.isEphemeral=isEphemeral;
     }
 
     @Override
