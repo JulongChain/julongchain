@@ -46,11 +46,6 @@ public class BlockCutter implements IReceiver {
 
 
     public BlockCutter() {
-        log.info("this is a log 111");
-        System.out.println("this is a log 222");
-        log.info("this is a log 555");
-        log.info("this is a log 666");
-        log.error("this is a log 333");
     }
 
     public BlockCutter(IConsenterConfig sharedConfigManager) {
