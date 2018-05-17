@@ -39,7 +39,7 @@ import java.util.Map;
  * @date 2018/04/02
  * @company Dingxuan
  */
-public class LedterTest {
+public class LedgerTest {
     public static final String AKSJDLAD = "aksjdlad";
     private static final byte[] COMPOSITE_KEY_SEP = {0x00};
 

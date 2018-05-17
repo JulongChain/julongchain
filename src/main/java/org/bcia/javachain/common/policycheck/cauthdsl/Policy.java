@@ -26,7 +26,9 @@ import org.bcia.javachain.common.policycheck.bean.Provider;
 import org.bcia.javachain.common.policycheck.bean.SignaturePolicyEnvelope;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.msp.IIdentity;
+import org.bcia.javachain.msp.IIdentityDeserializer;
 import org.bcia.javachain.msp.mgmt.Msp;
+import org.bcia.javachain.protos.common.MspPrincipal;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
@@ -44,9 +46,12 @@ public class Policy implements IPolicy{
     private static JavaChainLog log = JavaChainLogFactory.getLog(Policy.class);
 
     @Override
+    /**
+     * 签名策略评估
+     */
     public void evaluate(List<SignedData> signatureList) throws PolicyException {
         Msp msp = new Msp();
-        List<SignedData> signedDatas = Cauthdsl.deduplicate(signatureList,msp);   //删除重复身份
+           //删除重复身份
         MSPPrincipal identities = new MSPPrincipal();
         try {
             //TODO 待完善     //评估这组签名是否满足策略
@@ -56,16 +61,32 @@ public class Policy implements IPolicy{
         }
 
     }
+
+    /**
+     * 生成策略提供者
+     * @param msp
+     * @param data
+     * @return
+     */
     public IIdentity NewPolicyProvider(Msp msp,byte[] data){
         return msp.deserializeIdentity(data);
 
     }
+
+    /**
+     * 生成新策略
+     * @param data
+     * @return
+     */
     public PolicyBean NewPolicy(byte[] data){
 
         SignaturePolicyEnvelope sigPolicy = new SignaturePolicyEnvelope();
 
         Provider provider = new Provider();
         Msp msp = new Msp();
+
+
+
         boolean compiled = false;//进行策略评估
 
         PolicyBean policyBean = new PolicyBean();
@@ -73,15 +94,9 @@ public class Policy implements IPolicy{
             log.info("Error unmarshaling to SignaturePolicy");
             return null;
         }
-        try {
-            compiled = Cauthdsl.compile(sigPolicy.rule.isSignaturePolicy_type,sigPolicy.iIdentitys,msp);
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
+
+            //compiled = Cauthdsl.compile(sigPolicy.rule.isSignaturePolicy_type,sigPolicy.iIdentitys,);
+
         //TODO 待完善
         policyBean.setEvalutor(compiled);
         policyBean.setDeserializer(msp.deserializeIdentity(data));

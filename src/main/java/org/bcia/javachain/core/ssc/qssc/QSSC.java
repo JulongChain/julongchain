@@ -84,7 +84,7 @@ public class QSSC extends SystemSmartContractBase {
         }
         String function= ByteString.copyFrom(args.get(0)).toStringUtf8();
         String groupID=ByteString.copyFrom(args.get(1)).toStringUtf8();
-        if(function!=GET_GROUP_INFO && size<3){
+        if(function.equals(GET_GROUP_INFO)==false && size<3){
             return newErrorResponse(String.format("Missing 3rd argument for %s",function));
         }
         INodeLedger targetLedger = NodeUtils.getLedger(groupID);
@@ -105,19 +105,17 @@ public class QSSC extends SystemSmartContractBase {
             newErrorResponse(String.format("Authorization request for [%s][%s] failed:%s",function,groupID,e.getMessage()));
         }
 
-        byte[] arg2=args.get(2);
-
         switch(function){
             case GET_TRANSACTION_BY_ID:
-                return getTransactionByID(targetLedger,arg2);
+                return getTransactionByID(targetLedger,args.get(2));
             case GET_BLOCK_BY_NUMBER:
-                return getBlockByNumber(targetLedger,arg2);
+                return getBlockByNumber(targetLedger,args.get(2));
             case GET_BLOCK_BY_HASH:
-                return getBlockByHash(targetLedger,arg2);
+                return getBlockByHash(targetLedger,args.get(2));
             case GET_GROUP_INFO:
                 return getChainInfo(targetLedger);
             case GET_BLOCK_BY_TX_ID:
-                return getBlockByTxID(targetLedger,arg2);
+                return getBlockByTxID(targetLedger,args.get(2));
             default:
                 return newErrorResponse(String.format("Request function %s not found",function));
         }
@@ -141,7 +139,7 @@ public class QSSC extends SystemSmartContractBase {
      */
     private SmartContractResponse getTransactionByID(INodeLedger vledger, byte[] tid){
         if(tid==null || tid.length==0){
-            return newErrorResponse("Transaction ID must not be nil.");
+            return newErrorResponse("Transaction ID must not be empty.");
         }
         String txID=ByteString.copyFrom(tid).toStringUtf8();
         TransactionPackage.ProcessedTransaction processedTran;
@@ -151,7 +149,10 @@ public class QSSC extends SystemSmartContractBase {
             String msg=String.format("Failed to get transaction with id %s, error %s",txID,e.getMessage());
             return newErrorResponse(msg);
         }
-        //TODO 查询失败时 processedTran为null 抛出空指针异常
+        if(processedTran==null){
+            String msg=String.format("Transaction with id %s not found",txID);
+            return newErrorResponse(msg);
+        }
         byte[] tranBytes = processedTran.toByteArray();
         return newSuccessResponse(tranBytes);
     }
@@ -164,11 +165,12 @@ public class QSSC extends SystemSmartContractBase {
      */
     private SmartContractResponse getBlockByNumber(INodeLedger vledger, byte[] number){
         if(number==null ||number.length==0){
-            return newErrorResponse("Block number must not be nil.");
+            return newErrorResponse("Block number must not be empty.");
         }
         long bnum=0;
         try {
-            bnum = Long.parseLong(ByteString.copyFrom(number).toString());
+            String str=ByteString.copyFrom(number).toStringUtf8();
+            bnum = Long.parseLong(str);
         }catch(Exception e){
             String msg=String.format("Failed to parse block number with error %s",e.getMessage());
             return newErrorResponse(msg);
@@ -178,6 +180,10 @@ public class QSSC extends SystemSmartContractBase {
             block=vledger.getBlockByNumber(bnum);
         } catch (LedgerException e) {
             String msg=String.format("Failed to get block number %d, error %s",bnum,e.getMessage());
+            return newErrorResponse(msg);
+        }
+        if(block==null){
+            String msg=String.format("Block number %d not found",bnum);
             return newErrorResponse(msg);
         }
 
@@ -197,13 +203,17 @@ public class QSSC extends SystemSmartContractBase {
      */
     private SmartContractResponse getBlockByHash(INodeLedger vledger, byte[] hash){
         if(hash==null ||hash.length==0){
-            return newErrorResponse("Block hash must not be nil.");
+            return newErrorResponse("Block hash must not be empty.");
         }
         Common.Block block =null;
         try {
             block=vledger.getBlockByHash(hash);
         } catch (LedgerException e) {
-            String msg=String.format("Failed to get block hash %s,error %s",ByteString.copyFrom(hash).toString(),e.getMessage());
+            String msg=String.format("Failed to get block hash %s,error %s",ByteString.copyFrom(hash).toStringUtf8(),e.getMessage());
+            return newErrorResponse(msg);
+        }
+        if(block==null){
+            String msg=String.format("Block with hash %s not found",ByteString.copyFrom(hash).toStringUtf8());
             return newErrorResponse(msg);
         }
         byte[] bytes = block.toByteArray();
@@ -223,6 +233,10 @@ public class QSSC extends SystemSmartContractBase {
             String msg=String.format("Failed to get block info with error %s",e.getMessage());
             return newErrorResponse(msg);
         }
+        if(bcInfo==null){
+            String msg=String.format("Block info not found");
+            return newErrorResponse(msg);
+        }
         byte[] bytes = bcInfo.toByteArray();
         return newSuccessResponse(bytes);
     }
@@ -234,12 +248,19 @@ public class QSSC extends SystemSmartContractBase {
      * @return
      */
     private SmartContractResponse getBlockByTxID(INodeLedger vledger, byte[] rawTxID){
-        String txID=ByteString.copyFrom(rawTxID).toString();
+        if(rawTxID==null ||rawTxID.length==0){
+            return newErrorResponse("Raw TxID must not be empty.");
+        }
+        String txID=ByteString.copyFrom(rawTxID).toStringUtf8();
         Common.Block block =null;
         try {
             block=vledger.getBlockByTxID(txID);
         } catch (LedgerException e) {
-            String msg=String.format("Failed to get block for txID %s,error %s",txID,e.getMessage());
+            String msg=String.format("Failed to get block for txID %s,error %s",ByteString.copyFrom(rawTxID).toString(),e.getMessage());
+            return newErrorResponse(msg);
+        }
+        if(block==null) {
+            String msg = String.format("Block with rawTxID %s not found",ByteString.copyFrom(rawTxID).toString());
             return newErrorResponse(msg);
         }
         byte[] bytes = block.toByteArray();
