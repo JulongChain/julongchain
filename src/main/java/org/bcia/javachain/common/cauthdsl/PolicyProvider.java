@@ -16,6 +16,7 @@
 package org.bcia.javachain.common.cauthdsl;
 
 import org.bcia.javachain.common.policies.IPolicy;
+import org.bcia.javachain.msp.IIdentityDeserializer;
 import org.bcia.javachain.msp.IMspManager;
 
 /**
@@ -26,9 +27,11 @@ import org.bcia.javachain.msp.IMspManager;
  * @company Dingxuan
  */
 public class PolicyProvider {
-    public PolicyProvider(IMspManager manager){
 
-    }
+    public PolicyProvider(IIdentityDeserializer deserializer){}
+//    public PolicyProvider(IMspManager manager){
+//
+//    }
 
     public IPolicy newPolicy(byte[] policyBytes) {
         return null;
