@@ -15,60 +15,22 @@
  */
 package org.bcia.javachain.core.container.inproccontroller;
 
-import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 类描述
  *
  * @author sunianle
- * @date 3/7/18
+ * @date @date 2018/05/17
  * @company Dingxuan
  */
 public class InprocController {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(InprocContainer.class);
+    private Map<String,InprocContainer> typeRegistry=new HashMap<String,InprocContainer>();
+    private Map<String,InprocContainer>  instRegistry=new HashMap<String,InprocContainer>();
 
-    private ISmartContract smartContract;
-    private Boolean running;
-    private String[] args;
-    private String[] env;
-    private Chan stopChan;
-
-    public ISmartContract getSmartContract() {
-        return smartContract;
-    }
-
-    public void setSmartContract(ISmartContract smartContract) {
-        this.smartContract = smartContract;
-    }
-
-    public Boolean getRunning() {
-        return running;
-    }
-
-    public void setRunning(Boolean running) {
-        this.running = running;
-    }
-
-    public String[] getArgs() {
-        return args;
-    }
-
-    public void setArgs(String[] args) {
-        this.args = args;
-    }
-
-    public String[] getEnv() {
-        return env;
-    }
-
-    public void setEnv(String[] env) {
-        this.env = env;
-    }
-
-    public Chan getStopChan() {
-        return stopChan;
-    }
-
-    public void setStopChan(Chan stopChan) {
-        this.stopChan = stopChan;
-    }
 }

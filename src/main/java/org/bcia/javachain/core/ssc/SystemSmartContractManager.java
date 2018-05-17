@@ -18,6 +18,8 @@ package org.bcia.javachain.core.ssc;
 import org.bcia.javachain.common.exception.SysSmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.node.NodeConfig;
+import org.bcia.javachain.core.node.NodeConfigFactory;
 import org.bcia.javachain.core.ssc.cssc.CSSC;
 import org.bcia.javachain.core.ssc.essc.ESSC;
 import org.bcia.javachain.core.ssc.lssc.LSSC;
@@ -137,6 +139,15 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
      * @return 是否注册成功
      */
     private boolean registerSysSmartContract(ISystemSmartContract contract) {
+        if(contract.getSystemSmartContractDescriptor().isEnabled()==false||
+                isWhitelisted(contract)==false){
+            log.info("System Smartcontract ({},{},{}) disabled",
+                    contract.getSystemSmartContractDescriptor().getSSCName(),
+                    contract.getSystemSmartContractDescriptor().getSSCPath(),
+                    contract.getSystemSmartContractDescriptor().isEnabled());
+            return false;
+        }
+
         String contractID = contract.getSmartContractID();
         log.info("Register system contract [%s]", contractID);
         map.put(contractID, contract);
@@ -164,6 +175,13 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
 
     @Override
     public boolean isWhitelisted(ISystemSmartContract contract) {
+        NodeConfig nodeConfig = NodeConfigFactory.getNodeConfig();
+        NodeConfig.SmartContract smartcontractConfig = nodeConfig.getSmartContract();
+        Map<String, String> sscMap = smartcontractConfig.getSystem();
+        String value=sscMap.get(contract.getSmartContractID());
+        if(value.equals("enable")||value.equals("true")||value.equals("yes")){
+            return true;
+        }
         return false;
     }
 

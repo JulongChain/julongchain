@@ -271,12 +271,10 @@ public class LSSC  extends SystemSmartContractBase {
                     return newErrorResponse(String.format("Authorization request for resource %s failed %s: %s",resource,groupName2,e.getMessage()));
                 }
 
-                byte[] scbytes=null;
-                try {
-                    scbytes=getSmartContractInstance(stub, smartContractName2);
-                } catch (SysSmartContractException e) {
-                    log.error("Error getting smartcontract {} on group {}:{}",smartContractName2,groupName2,e.getMessage());
-                    return newErrorResponse(String.format("Error getting smartcontract %s on group %s:%s",groupName2,resource,e.getMessage()));
+                byte[] scbytes=getSmartContractInstance(stub, smartContractName2);
+               if(scbytes==null){
+                    log.error("Error getting smartcontract {} on group {}",smartContractName2,groupName2);
+                    return newErrorResponse(String.format("Error getting smartcontract %s on group %s",groupName2,resource));
                 }
                 switch (function){
                     case GET_SC_INFO:
@@ -408,13 +406,8 @@ public class LSSC  extends SystemSmartContractBase {
      */
     private byte[] getSmartContractInstance(ISmartContractStub stub,
                                             String contractName)
-            throws SysSmartContractException
     {
         byte[] scdBytes = stub.getState(contractName);
-        if(scdBytes==null){
-            String msg=String.format("SmartContract Instance not found for %s",contractName);
-            throw new SysSmartContractException(msg);
-        }
         return scdBytes;
     }
 
