@@ -145,13 +145,13 @@ public class Node {
      * 初始化
      */
     private void init() throws NodeException {
-        NodeConfig config = null;
-        try {
-            config = NodeConfigFactory.loadNodeConfig();
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-            throw new NodeException(e);
-        }
+        NodeConfig config = NodeConfigFactory.getNodeConfig();
+//        try {
+//            config = NodeConfigFactory.getNodeConfig();
+//        } catch (IOException e) {
+//            log.error(e.getMessage(), e);
+//            throw new NodeException(e);
+//        }
 
         //初始化MSP
 //        String mspConfigDir = config.getNode().getMspConfigPath();

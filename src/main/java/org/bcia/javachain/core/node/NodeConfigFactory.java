@@ -37,7 +37,21 @@ import java.net.URL;
 public class NodeConfigFactory {
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeConfigFactory.class);
 
-    public static NodeConfig loadNodeConfig() throws IOException {
+    private static NodeConfig nodeConfig;
+
+    public static NodeConfig getNodeConfig() {
+        if (nodeConfig == null) {
+            synchronized (NodeConfig.class) {
+                if (nodeConfig == null) {
+                    nodeConfig = loadNodeConfig();
+                }
+            }
+        }
+
+        return nodeConfig;
+    }
+
+    private static NodeConfig loadNodeConfig() {
         Yaml yaml = new Yaml();
 
         InputStream is = null;
