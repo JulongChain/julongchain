@@ -116,7 +116,7 @@ public class SM2 {
             return 1;
         }
         if(null == sign || 0 == sign.length) {
-            logger.error("Invalid pubKey. It must not be nil or empty.");
+            logger.error("Invalid sign. It must not be nil or empty.");
             return 1;
         }
         int result = 0;
