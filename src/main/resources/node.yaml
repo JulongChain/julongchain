@@ -1,6 +1,7 @@
 # Copyright IBM Corp. All Rights Reserved.
 #
 # SPDX-License-Identifier: Apache-2.0
+# Modified some contents by Dingxuan on 2018-05-17
 #
 
 ###############################################################################
@@ -175,7 +176,7 @@ node:
         # Determines frequency of pushing state info messages to nodes(unit: second)
         publishStateInfoInterval: 4000
         # Maximum time a stateInfo message is kept until expired
-        stateInfoRetentionInterval:
+        stateInfoRetentionInterval: 0
         # Time from startup certificates are included in Alive messages(unit: second)
         publishCertPeriod: 10000
         # Should we skip verifying block messages or not (currently not in use)
@@ -431,7 +432,7 @@ vm:
 #    Smartcontract section
 #
 ###############################################################################
-smartcontract:
+smartContract:
 
     # The id is used by the Smartcontract stub to register the executing Smartcontract
     # ID with the Node and is generally supplied through ENV variables

@@ -37,8 +37,8 @@ public class App {
     private static JavaChainLog log = JavaChainLogFactory.getLog(App.class);
 
     public static void main(String[] args) {
-        log.info("JavaChain begin, This is a right log");
-        System.out.println("JavaChain begin, This is a wrong log");
+//        log.info("JavaChain begin, This is a right log");
+//        System.out.println("JavaChain begin, This is a wrong log");
 
         //示例异常日志的打印方式
 //        try {
