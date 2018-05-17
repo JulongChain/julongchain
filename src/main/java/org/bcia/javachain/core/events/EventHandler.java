@@ -15,21 +15,34 @@
  */
 package org.bcia.javachain.core.events;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.protos.node.EventsPackage;
 
+import java.util.Map;
+
 /**
- * 对象
+ * 类描述
  *
  * @author zhouhui
- * @date 2018/3/20
+ * @date 2018/05/17
  * @company Dingxuan
  */
-public class EventHubServer implements IEventHubServer {
+public class EventHandler {
+    private Map<String, EventsPackage.Interest> interestedEvents;
+
+    public void handleMessage(EventsPackage.SignedEvent signedEvent){
+//        validateEventMessage(signedEvent);
 
 
 
-    @Override
-    public EventsPackage.Event chat(EventsPackage.SignedEvent value) {
-        return null;
     }
+
+    private void validateEventMessage(EventsPackage.SignedEvent signedEvent) throws InvalidProtocolBufferException {
+        EventsPackage.Event event = EventsPackage.Event.parseFrom(signedEvent.getEventBytes());
+
+//        event.getCreator()
+
+    }
+
+
 }

@@ -127,10 +127,10 @@ public class NodeServer {
         nodeGrpcServer.bindAdminServer(new AdminServer());
 
         //启动事件处理服务(Grpc Server2)
-        String eventGrpcServerAddress = nodeConfig.getNode().getEvents().getAddress();
+        String eventAddress = nodeConfig.getNode().getEvents().getAddress();
         NetAddress address = null;
         try {
-            address = new NetAddress(eventGrpcServerAddress);
+            address = new NetAddress(eventAddress);
         } catch (ValidateException e) {
             throw new NodeException(e);
         }

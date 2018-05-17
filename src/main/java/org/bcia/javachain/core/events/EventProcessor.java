@@ -15,21 +15,15 @@
  */
 package org.bcia.javachain.core.events;
 
-import org.bcia.javachain.protos.node.EventsPackage;
+import java.util.Map;
 
 /**
- * 对象
+ * 类描述
  *
  * @author zhouhui
- * @date 2018/3/20
+ * @date 2018/05/17
  * @company Dingxuan
  */
-public class EventHubServer implements IEventHubServer {
-
-
-
-    @Override
-    public EventsPackage.Event chat(EventsPackage.SignedEvent value) {
-        return null;
-    }
+public class EventProcessor {
+//    private Map<Integer, >
 }

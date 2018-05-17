@@ -24,10 +24,8 @@ import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.consenter.common.msgprocessor.IGroupConfigTemplator;
-import org.bcia.javachain.consenter.common.msgprocessor.MsgProcessor;
 import org.bcia.javachain.consenter.consensus.IChain;
 import org.bcia.javachain.protos.common.Common;
-import sun.plugin2.jvm.RemoteJVMLauncher;
 
 import java.util.Map;
 
