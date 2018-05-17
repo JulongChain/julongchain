@@ -74,6 +74,8 @@ public interface INodeLedger extends ILedger {
 
     BlockAndPvtData getPvtDataAndBlockByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException;
 
+    String getLedgerID();
+
     List<TxPvtData> getPvtDataByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException;
 
     void purgePrivateData(long maxBlockNumToRetain) throws LedgerException;

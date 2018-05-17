@@ -1,5 +1,5 @@
 /**
- * Copyright Aisino. All Rights Reserved.
+ * Copyright SDT. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.policycheck.policies;
-
-import org.bcia.javachain.common.policies.PolicyManager;
+package org.bcia.javachain.csp.gm.sdt.common;
 
 /**
- * 类描述
+ * Constant
  *
- * @author yuanjun
- * @date 26/04/18
- * @company Aisino
+ * @author tengxiumin
+ * @date 5/14/18
+ * @company SDT
  */
-public interface ChannelPolicyManagerGetter {
-    PolicyManager Manager(String channelID );
+public class Constants {
+    public static final int SM2_SK_LEN = 32;
+    public static final int SM2_PK_LEN = 64;
+    public static final int SM2_SIGN_RANDOM_LEN = 32;
+    public static final int SM3_DIGEST_LEN = 32;
+    public static final int SM4_KEY_LEN = 16;
+    public static final int SM4_BLOCK_LEN = 16;
+    public static final int SM4_IV_LEN = 16;
+    public static final int SM4_PACKAGE_LEN = 512;
 }

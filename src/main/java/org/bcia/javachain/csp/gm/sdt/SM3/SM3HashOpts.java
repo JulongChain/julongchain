@@ -1,5 +1,5 @@
 /**
- * Copyright Aisino. All Rights Reserved.
+ * Copyright SDT. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.policycheck.policies;
+package org.bcia.javachain.csp.gm.sdt.SM3;
 
-import org.bcia.javachain.common.policies.PolicyManager;
+import org.bcia.javachain.csp.intfs.opts.IHashOpts;
 
 /**
- * 类描述
+ * GM SM3HashOpts
  *
- * @author yuanjun
- * @date 26/04/18
- * @company Aisino
+ * @author tengxiumin
+ * @date 5/14/18
+ * @company SDT
  */
-public interface ChannelPolicyManagerGetter {
-    PolicyManager Manager(String channelID );
+public class SM3HashOpts implements IHashOpts {
+
+    public SM3HashOpts(){}
+
+    @Override
+    public String getAlgorithm() {
+        return "SM3";
+    }
 }

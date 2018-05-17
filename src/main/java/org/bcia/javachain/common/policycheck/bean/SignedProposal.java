@@ -13,17 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.policycheck.policies;
 
-import org.bcia.javachain.common.policies.PolicyManager;
+package org.bcia.javachain.common.policycheck.bean;
 
 /**
  * 类描述
  *
  * @author yuanjun
- * @date 26/04/18
+ * @date 14/05/18
  * @company Aisino
  */
-public interface ChannelPolicyManagerGetter {
-    PolicyManager Manager(String channelID );
+public class SignedProposal {
+    private byte[] ProposalBytes;
+    private byte[] Signature;
+
+    public byte[] getProposalBytes() {
+        return ProposalBytes;
+    }
+
+    public void setProposalBytes(byte[] proposalBytes) {
+        ProposalBytes = proposalBytes;
+    }
+
+    public byte[] getSignature() {
+        return Signature;
+    }
+
+    public void setSignature(byte[] signature) {
+        Signature = signature;
+    }
 }

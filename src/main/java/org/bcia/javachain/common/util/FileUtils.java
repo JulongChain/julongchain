@@ -101,4 +101,22 @@ public class FileUtils {
         return file.exists();
     }
 
+    /**
+     * 删除文件夹
+     * @param dir
+     * @return 删除是否成功
+     */
+    public static boolean deleteDir(File dir) {
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i=0; i<children.length; i++) {
+                boolean success = deleteDir(new File(dir, children[i]));
+                if (!success) {
+                    return false;
+                }
+            }
+        }
+        return dir.delete();
+    }
+
 }

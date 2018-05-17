@@ -28,4 +28,11 @@ import org.bcia.javachain.common.policycheck.common.IsSignaturePolicyType;
 public class SignaturePolicySignedBy extends IsSignaturePolicyType {
     public int SignedBy;
 
+    public int getSignedBy() {
+        return SignedBy;
+    }
+
+    public void setSignedBy(int signedBy) {
+        SignedBy = signedBy;
+    }
 }

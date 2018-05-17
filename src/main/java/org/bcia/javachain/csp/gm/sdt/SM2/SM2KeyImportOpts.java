@@ -1,5 +1,5 @@
 /**
- * Copyright Aisino. All Rights Reserved.
+ * Copyright SDT. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.policycheck.policies;
+package org.bcia.javachain.csp.gm.sdt.SM2;
 
-import org.bcia.javachain.common.policies.PolicyManager;
+import org.bcia.javachain.csp.intfs.opts.IKeyImportOpts;
+
 
 /**
- * 类描述
+ * GM SM2 IKeyImportOpts implementation
  *
- * @author yuanjun
- * @date 26/04/18
- * @company Aisino
+ * @author tengxiumin
+ * @date 5/14/18
+ * @company SDT
  */
-public interface ChannelPolicyManagerGetter {
-    PolicyManager Manager(String channelID );
+public class SM2KeyImportOpts implements IKeyImportOpts{
+    private boolean isEphemeral;
+    public SM2KeyImportOpts(boolean isEphemeral) {
+    this.isEphemeral=isEphemeral;
+    }
+
+    @Override
+    public String getAlgorithm() {
+        return "SM2";
+    }
+
+    @Override
+    public boolean isEphemeral() {
+        return isEphemeral;
+    }
 }

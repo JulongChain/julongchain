@@ -31,7 +31,7 @@ public class SignaturePolicyNOutOf extends IsSignaturePolicyType {
     //public static final String N = "protobuf:'varint,1,opt,name=n' json:'n,omitempty'";
     //public static final String Rule = "protobuf:'bytes,2,rep,name=rules' json:'rules,omitempty'";
     private int N;
-    private List<IsSignaturePolicyType> Rules;
+    private IsSignaturePolicyType[] Rules;
 
     public int getN() {
         return N;
@@ -41,11 +41,11 @@ public class SignaturePolicyNOutOf extends IsSignaturePolicyType {
         N = n;
     }
 
-    public List<IsSignaturePolicyType> getRules() {
+    public IsSignaturePolicyType[] getRules() {
         return Rules;
     }
 
-    public void setRules(List<IsSignaturePolicyType> rules) {
+    public void setRules(IsSignaturePolicyType[] rules) {
         Rules = rules;
     }
 }
