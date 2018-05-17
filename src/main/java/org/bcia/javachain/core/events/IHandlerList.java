@@ -1,5 +1,5 @@
 /**
- * Copyright DingXuan. All Rights Reserved.
+ * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.consensus;
+package org.bcia.javachain.core.events;
 
-import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.consenter.Configuration;
-import org.springframework.core.annotation.Order;
-import java.util.Map;
+import org.bcia.javachain.protos.node.EventsPackage;
 
 /**
- * @author zhangmingyang
- * @Date: 2018/3/1 *
+ * 类描述
+ *
+ * @author zhouhui
+ * @date 2018/05/17
  * @company Dingxuan
  */
-public interface IConsensue {
-     IChain handleChain(IConsenterSupport consenterSupport, Common.Metadata metadata);
+public interface IHandlerList {
+//    boolean add(EventsPackage.Interest interest, )
 }

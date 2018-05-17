@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.consensus;
+package org.bcia.javachain.consenter.common.broadcast;
 
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.consenter.Configuration;
-import org.springframework.core.annotation.Order;
+
 import java.util.Map;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/1 *
+ * @Date: 2018/5/8
  * @company Dingxuan
  */
-public interface IConsensue {
-     IChain handleChain(IConsenterSupport consenterSupport, Common.Metadata metadata);
+public interface IGroupSupportRegistrar {
+    Map<String,Object> broadcastGroupSupport(Common.Envelope msg);
 }

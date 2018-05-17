@@ -13,18 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.consensus;
+package org.bcia.javachain.csp.gm;
 
-import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.consenter.Configuration;
-import org.springframework.core.annotation.Order;
-import java.util.Map;
+import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.csp.intfs.IKey;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/1 *
+ * @Date: 2018/4/28
  * @company Dingxuan
  */
-public interface IConsensue {
-     IChain handleChain(IConsenterSupport consenterSupport, Common.Metadata metadata);
+public interface IKeyStore {
+    // ReadOnly returns true if this KeyStore is read only, false otherwise.
+    // If ReadOnly is true then StoreKey will fail.
+    boolean readOnly();
+    // GetKey returns a key object whose SKI is the one passed.
+    IKey getKey(byte[] ski) throws JavaChainException;
+    // StoreKey stores the key k in this KeyStore.
+    // If this KeyStore is read only then the method will fail.
+    void storeKey(IKey ikey);
 }

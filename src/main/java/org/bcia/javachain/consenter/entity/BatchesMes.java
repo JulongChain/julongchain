@@ -23,8 +23,8 @@ import org.bcia.javachain.protos.common.Common;
  * @company Dingxuan
  */
 public class BatchesMes {
-    private Common.Envelope[][] messageBatches;
-    private boolean pending;
+    public Common.Envelope[][] messageBatches;
+    public boolean pending;
 
     public Common.Envelope[][] getMessageBatches() {
         return messageBatches;

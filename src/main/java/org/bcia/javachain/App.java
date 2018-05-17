@@ -47,7 +47,7 @@ public class App {
 //            log.error(ex.getMessage(), ex);
 //        }
 
-        //异步启动Consenter服务
+      //  异步启动Consenter服务
 //        new Thread() {
 //            @Override
 //            public void run() {

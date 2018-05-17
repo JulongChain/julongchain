@@ -16,6 +16,7 @@
 package org.bcia.javachain.consenter.common.cmd.factory;
 
 import org.bcia.javachain.consenter.common.cmd.IConsenterCmd;
+import org.bcia.javachain.consenter.common.cmd.impl.BenchMarkCmd;
 import org.bcia.javachain.consenter.common.cmd.impl.StartCmd;
 import org.bcia.javachain.consenter.common.cmd.impl.VersionCmd;
 import org.bcia.javachain.consenter.util.Constant;
@@ -32,6 +33,8 @@ public class ConsenterCmdFactory {
         return new VersionCmd();
     }else if(Constant.START.equalsIgnoreCase(command)){
         return new StartCmd();
+    }else if(Constant.BENCHMARK.equalsIgnoreCase(command)){
+        return new BenchMarkCmd();
     }
         return null;
     }
