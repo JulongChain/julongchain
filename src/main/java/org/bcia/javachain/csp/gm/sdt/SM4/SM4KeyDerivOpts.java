@@ -13,23 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.csp.gm.sdt.SM2;
+package org.bcia.javachain.csp.gm.sdt.SM4;
 
 import org.bcia.javachain.csp.intfs.opts.IKeyDerivOpts;
 
 /**
- * GM SM2KeyDerivOpts
+ * GM SM4KeyDerivOpts
  *
  * @author tengxiumin
- * @date 18/5/16
+ * @date 2018/05/17
  * @company SDT
  */
-
-public class SM2KeyDerivOpts implements IKeyDerivOpts {
+public class SM4KeyDerivOpts implements IKeyDerivOpts {
 
     @Override
     public String getAlgorithm() {
-        return "SM2";
+        return "SM4";
     }
 
     @Override
