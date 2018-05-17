@@ -15,6 +15,8 @@
  */
 package org.bcia.javachain.core.common.privdata;
 
+import java.util.List;
+
 /**
  * 类描述
  *
@@ -22,5 +24,23 @@ package org.bcia.javachain.core.common.privdata;
  * @date 4/27/18
  * @company Dingxuan
  */
-public class ICollection {
+public interface ICollection {
+    /**
+     * SetTxContext configures the tx-specific ephemeral collection info, such
+     * as txid, nonce, creator -- for future use
+     * SetTxContext(parameters ...interface{})
+     *
+     * CollectionID returns this collection's
+     */
+    String collectionID();
+
+    /**
+     * GetEndorsementPolicy returns the endorsement policy for validation -- for
+     * future use
+     * GetEndorsementPolicy() string
+     *
+     * MemberOrgs returns the collection's members as MSP IDs. This serves as
+     * a human-readable way of quickly identifying who is part of a collection.
+     */
+    List<String> memberOrgs();
 }

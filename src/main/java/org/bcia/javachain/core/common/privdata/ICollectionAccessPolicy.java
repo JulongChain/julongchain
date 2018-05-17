@@ -15,18 +15,40 @@
  */
 package org.bcia.javachain.core.common.privdata;
 
+import org.bcia.javachain.common.util.proto.SignedData;
+import org.bcia.javachain.protos.common.Common;
+
 import java.util.List;
 
 /**
  * ICollectionAccessPolicy encapsulates functions for the access policy of a collection
  *
- * @author sunianle
+ * @author sunianle, sunzongyu
  * @date 4/27/18
  * @company Dingxuan
  */
 public interface ICollectionAccessPolicy {
-    IFilter getAccessFilter();
+    /**
+     * AccessFilter returns a member filter function for a collection
+     */
+    boolean getAccessFilter(SignedData sd);
+
+    /**
+     * The minimum number of peers private data will be sent to upon
+     * endorsement. The endorsement would fail if dissemination to at least
+     * this number of peers is not achieved.
+     */
     int getRequiredNodeCount();
+
+    /**
+     * The maximum number of peers that private data will be sent to
+     * upon endorsement. This number has to be bigger than RequiredPeerCount().
+     */
     int getMaximumNodeCount();
-    List<String> getMemberOrgs();
+
+    /**
+     * MemberOrgs returns the collection's members as MSP IDs. This serves as
+     * a human-readable way of quickly identifying who is part of a collection.
+     */
+    List<String> memberOrgs();
 }

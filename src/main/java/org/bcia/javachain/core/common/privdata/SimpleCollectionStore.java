@@ -15,29 +15,85 @@
  */
 package org.bcia.javachain.core.common.privdata;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.IQueryExecutor;
 import org.bcia.javachain.protos.common.Collection;
 
 /**
- * 类描述
+ * a stored backed
+ * by a ledger supplied by the specified ledgerGetter with
+ * an internal name formed as specified by the supplied
+ * collectionNamer function
  *
- * @author sunianle
+ * @author sunianle, sunzongyu
  * @date 3/20/18
  * @company Dingxuan
  */
 public class SimpleCollectionStore implements ICollectionStore{
+
+    private static final JavaChainLog log = JavaChainLogFactory.getLog(SimpleCollectionStore.class);
+
+    private IPrivDataSupport s;
+
+    public SimpleCollectionStore(IPrivDataSupport s){
+        this.s = s;
+    }
+
     @Override
     public ICollection retrieveColletion(Collection.CollectionCriteria collectionCriteria) throws JavaChainException {
-        return null;
+        return retrieveSimpleCollection(collectionCriteria);
     }
 
     @Override
     public ICollectionAccessPolicy retrieveCollectionAccessPolicy(Collection.CollectionCriteria collectionCriteria) throws JavaChainException {
-        return null;
+        return retrieveSimpleCollection(collectionCriteria);
     }
 
     @Override
-    public ICollectionConfigPackage retriveCollectionConfigPackage(Collection.CollectionCriteria collectionCriteria) throws JavaChainException {
-        return null;
+    public Collection.CollectionConfigPackage retrieveCollectionConfigPackage(Collection.CollectionCriteria cc) throws JavaChainException {
+        IQueryExecutor qe = s.getQueryExecotorForLedger(cc.getChannel());
+        try {
+            byte[] cb = qe.getState("lssc", s.getCollectionKVSKey(cc));
+            if(cb == null){
+                throw noSuchCollectionError(cc);
+            }
+            Collection.CollectionConfigPackage collections = null;
+            try {
+                collections = Collection.CollectionConfigPackage.parseFrom(cb);
+            } catch (InvalidProtocolBufferException e) {
+                throw new JavaChainException("Invalid configuration for collection criteria " + cc);
+            }
+            return collections;
+        } finally {
+            qe.done();
+        }
+    }
+
+    private SimpleCollection retrieveSimpleCollection(Collection.CollectionCriteria cc) throws JavaChainException{
+        Collection.CollectionConfigPackage collections = retrieveCollectionConfigPackage(cc);
+        if(collections == null){
+            return null;
+        }
+        for(Collection.CollectionConfig cconf : collections.getConfigList()){
+            switch (cconf.getPayloadCase().getNumber()){
+                case Collection.CollectionConfig
+                        .STATIC_COLLECTION_CONFIG_FIELD_NUMBER:
+                    SimpleCollection sc = new SimpleCollection();
+                    sc.setUp(cconf.getStaticCollectionConfig(), s.getIdentityDeserializer(cc.getChannel()));
+                    return sc;
+                default:
+                    throw new JavaChainException("Unexpected collection type");
+            }
+        }
+        throw noSuchCollectionError(cc);
+    }
+
+    private JavaChainException noSuchCollectionError(Collection.CollectionCriteria cc){
+        String errorMsg = String.format("collection %s/%s/%s could not be found", cc.getChannel(), cc.getNamespace(), cc.getCollection());
+        log.error(errorMsg);
+        return new JavaChainException(errorMsg);
     }
 }
