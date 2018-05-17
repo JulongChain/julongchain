@@ -18,18 +18,16 @@ package org.bcia.javachain.common.channelconfig;
 import org.bcia.javachain.common.configtx.IValidator;
 import org.bcia.javachain.common.groupconfig.config.GroupConfig;
 import org.bcia.javachain.common.policies.IManager;
-import org.bcia.javachain.consenter.consensus.IOrderer;
-import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
+import org.bcia.javachain.common.resourceconfig.IPolicyMapper;
+import org.bcia.javachain.common.resourceconfig.ISmartContractRegistry;
 import org.bcia.javachain.msp.IMspManager;
-import org.bcia.javachain.protos.common.Configuration;
-import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 
 /**
  * @author zhangmingyang
  * @Date: 2018/5/10
  * @company Dingxuan
  */
-public class Bundle implements IResources {
+public class Bundle implements org.bcia.javachain.common.resourceconfig.IResources {
 
     private final static String ROOTGROUP = "GROUP";
     private IManager policyManager;
@@ -48,44 +46,29 @@ public class Bundle implements IResources {
         this.configtxManager = configtxManager;
     }
 
+
     @Override
     public IValidator configtxValidator() {
-        return configtxManager;
-    }
-
-    @Override
-    public IManager policyManager() {
-        return policyManager;
-    }
-
-    @Override
-    public Channel channelConfig() {
         return null;
     }
 
     @Override
-    public IOrderer ordererConfig() {
+    public IManager managerPolicyManager() {
         return null;
     }
 
     @Override
-    public Configuration.Consortium consortiumsConfig() {
-        return null;
-    }
-
-
-    @Override
-    public GenesisConfig.Application applicationConfig() {
+    public IPolicyMapper APIPolicyMapper() {
         return null;
     }
 
     @Override
-    public IMspManager mspManager() {
-        return groupConfig.getMspManager();
+    public ISmartContractRegistry chaincodeRegistry() {
+        return null;
     }
 
     @Override
-    public void validateNew(IResources resources) {
-
+    public IResources resourcesChannelConfig() {
+        return null;
     }
 }

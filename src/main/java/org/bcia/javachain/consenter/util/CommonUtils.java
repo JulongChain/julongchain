@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.consenter.util;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -53,5 +54,30 @@ public class CommonUtils {
         }
         byte[] sigma=signer.sign(msg);
         return sigma;
+    }
+
+    public static  Common.Envelope extractEnvelopeOrPanic(Common.Block block,int index){
+        Common.Envelope envelope=extractEnvelop(block,index);
+        return envelope;
+    }
+
+    public static Common.Payload unmarshalPayload(byte[] encoded){
+        Common.Payload payload=null;
+        try {
+            payload =Common.Payload.parseFrom(encoded);
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+        return payload;
+    }
+
+    public static Common.GroupHeader unmarshalGroupHeader(byte[] bytes){
+        Common.GroupHeader groupHeader=null;
+        try {
+            groupHeader=Common.GroupHeader.parseFrom(bytes);
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+        return groupHeader;
     }
 }

@@ -15,16 +15,21 @@
  */
 package org.bcia.javachain.consenter.common.msgprocessor;
 
-
 import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.javachain.common.resourceconfig.IResources;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Configtx;
+
 
 /**
  * @author zhangmingyang
- * @Date: 2018/5/8
+ * @Date: 2018/5/14
  * @company Dingxuan
  */
-public interface IGroupConfigTemplator {
-    IGroupConfigBundle newGroupConfig(Common.Envelope envelope);
+public interface IChainCreator {
+    IGroupConfigBundle newGroupConfig(Common.Envelope envConfigUpdate);
+
+    IGroupConfigBundle createBundle(String groupId, Configtx.Config  config);
+
+   int groupCount();
 }

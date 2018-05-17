@@ -1,5 +1,5 @@
 /**
- * Copyright Aisino. All Rights Reserved.
+ * Copyright DingXuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.bcia.javachain.consenter.common.multigroup;
 
-package org.bcia.javachain.common.policycheck;
+import org.bcia.javachain.common.localmsp.ILocalSigner;
+import org.bcia.javachain.protos.common.Common;
 
 /**
- * 类描述
- *
- * @author yuanjun
- * @date 11/05/18
- * @company Aisino
+ * @author zhangmingyang
+ * @Date: 2018/5/17
+ * @company Dingxuan
  */
-public class CauthdslTest {
+public interface IStandardGroupSupport {
+    long sequence();
+    String chainId();
+    ILocalSigner signer();
+    Common.Envelope proposeConfigUpdate(Common.Envelope configtx);
 }

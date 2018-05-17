@@ -1,5 +1,5 @@
 /**
- * Copyright Aisino. All Rights Reserved.
+ * Copyright DingXuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.bcia.javachain.consenter.common.deliver;
 
-package org.bcia.javachain.common.policycheck;
+import org.bcia.javachain.common.ledger.blockledger.Reader;
+import org.bcia.javachain.common.policies.IManager;
+import org.bcia.javachain.common.policies.IPolicy;
 
 /**
- * 类描述
- *
- * @author yuanjun
- * @date 11/05/18
- * @company Aisino
+ * @author zhangmingyang
+ * @Date: 2018/5/17
+ * @company Dingxuan
  */
-public class PolicyTest {
+public interface ISupport {
+    long sequence();
+
+    IManager poclicyManager();
+
+    Reader reader();
 }

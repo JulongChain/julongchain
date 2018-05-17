@@ -15,7 +15,10 @@
  */
 package org.bcia.javachain.consenter.util;
 
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang.ArrayUtils;
+import org.bcia.javachain.protos.common.Common;
 
 /**
  * @author zhangmingyang
@@ -25,10 +28,26 @@ import org.apache.commons.lang.ArrayUtils;
 public class BlockUtils {
 
 
-    public static void main(String[] args) {
-        String[][] first = {};
-        String[] second ={"678", "910"};
-        String[][] both = (String[][]) ArrayUtils.add(first, second);
+    public static Common.Metadata getMetadataFromBlock(Common.Block block, int index) {
 
+        Common.Metadata md = null;
+        try {
+            md = Common.Metadata.parseFrom(block.getMetadata().getMetadata(index));
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+        return md;
     }
+
+    public static long getLastConfigIndexFromBlock(Common.Block block) {
+        Common.Metadata md = getMetadataFromBlock(block, Common.BlockMetadataIndex.LAST_CONFIG_VALUE);
+        Common.LastConfig lc = null;
+        try {
+            lc = Common.LastConfig.parseFrom(md.getValue());
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+        return lc.getIndex();
+    }
+
 }
