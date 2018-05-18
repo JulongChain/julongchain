@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.events;
+package org.bcia.javachain.events.producer;
 
 import java.util.Map;
 
@@ -21,9 +21,14 @@ import java.util.Map;
  * 类描述
  *
  * @author zhouhui
- * @date 2018/05/18
+ * @date 2018/05/17
  * @company Dingxuan
  */
-public interface IEventProcessor {
-    Map<Integer, IHandlerList> getEventConsumers();
+public class EventProcessor implements IEventProcessor {
+    private Map<Integer, IHandlerList> eventConsumers;
+
+    @Override
+    public Map<Integer, IHandlerList> getEventConsumers() {
+        return eventConsumers;
+    }
 }

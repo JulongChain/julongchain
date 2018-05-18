@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.events;
+package org.bcia.javachain.events.producer;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.protos.node.EventsPackage;
-
-import java.util.Map;
 
 /**
  * 类描述
@@ -26,23 +26,7 @@ import java.util.Map;
  * @date 2018/05/18
  * @company Dingxuan
  */
-public class GenericHandlerList implements IHandlerList {
-    private Map<IEventHandler, Boolean> handlers;
-
-    @Override
-    public boolean add(EventsPackage.Interest interest, EventHandler eventHandler) {
-        return false;
-
-    }
-
-    @Override
-    public boolean delete(EventsPackage.Interest interest, EventHandler eventHandler) {
-        return false;
-
-    }
-
-    @Override
-    public void foreach(EventsPackage.Event event, IHandlerAction action) {
-
-    }
+public interface IEventHandler {
+    EventsPackage.Event handleMessage(EventsPackage.SignedEvent signedEvent) throws
+            InvalidProtocolBufferException, ValidateException;
 }
