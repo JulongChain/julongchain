@@ -15,24 +15,34 @@
  */
 package org.bcia.javachain.core.events;
 
-import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.protos.node.EventsPackage;
+
+import java.util.Map;
 
 /**
  * 类描述
  *
  * @author zhouhui
- * @date 2018/05/17
+ * @date 2018/05/18
  * @company Dingxuan
  */
-public interface IHandlerList {
-    public interface IHandlerAction {
-        void doAction(IEventHandler handler);
+public class GenericHandlerList implements IHandlerList {
+    private Map<IEventHandler, Boolean> handlers;
+
+    @Override
+    public boolean add(EventsPackage.Interest interest, EventHandler eventHandler) {
+        return false;
+
     }
 
-    boolean add(EventsPackage.Interest interest, EventHandler eventHandler) throws ValidateException;
+    @Override
+    public boolean delete(EventsPackage.Interest interest, EventHandler eventHandler) {
+        return false;
 
-    boolean delete(EventsPackage.Interest interest, EventHandler eventHandler);
+    }
 
-    void foreach(EventsPackage.Event event, IHandlerAction action);
+    @Override
+    public void foreach(EventsPackage.Event event, IHandlerAction action) {
+
+    }
 }

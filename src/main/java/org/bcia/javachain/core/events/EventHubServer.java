@@ -15,6 +15,10 @@
  */
 package org.bcia.javachain.core.events;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.node.EventsPackage;
 
 /**
@@ -25,11 +29,19 @@ import org.bcia.javachain.protos.node.EventsPackage;
  * @company Dingxuan
  */
 public class EventHubServer implements IEventHubServer {
-
-
+    private static JavaChainLog log = JavaChainLogFactory.getLog(EventGrpcServer.class);
 
     @Override
-    public EventsPackage.Event chat(EventsPackage.SignedEvent value) {
+    public EventsPackage.Event chat(EventsPackage.SignedEvent signedEvent) {
+        IEventHandler eventHandler = new EventHandler();
+        try {
+            return eventHandler.handleMessage(signedEvent);
+        } catch (InvalidProtocolBufferException e) {
+            log.error(e.getMessage(), e);
+        } catch (ValidateException e) {
+            log.error(e.getMessage(), e);
+        }
+
         return null;
     }
 }

@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.core.events;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.protos.node.EventsPackage;
 
@@ -22,17 +23,10 @@ import org.bcia.javachain.protos.node.EventsPackage;
  * 类描述
  *
  * @author zhouhui
- * @date 2018/05/17
+ * @date 2018/05/18
  * @company Dingxuan
  */
-public interface IHandlerList {
-    public interface IHandlerAction {
-        void doAction(IEventHandler handler);
-    }
-
-    boolean add(EventsPackage.Interest interest, EventHandler eventHandler) throws ValidateException;
-
-    boolean delete(EventsPackage.Interest interest, EventHandler eventHandler);
-
-    void foreach(EventsPackage.Event event, IHandlerAction action);
+public interface IEventHandler {
+    EventsPackage.Event handleMessage(EventsPackage.SignedEvent signedEvent) throws
+            InvalidProtocolBufferException, ValidateException;
 }
