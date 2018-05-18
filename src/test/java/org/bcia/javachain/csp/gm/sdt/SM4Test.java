@@ -59,15 +59,24 @@ public class SM4Test {
             System.out.println(e.getMessage());
         }
     }
+    private byte[] TEST_KEY = {(byte)0x01, (byte)0x23, (byte)0x45, (byte)0x67,
+            (byte)0x89, (byte)0xAB, (byte)0xCD, (byte)0xEF,
+            (byte)0xFE, (byte)0xDC, (byte)0xBA, (byte)0x98,
+            (byte)0x76, (byte)0x54, (byte)0x32, (byte)0x10};
+    private byte[] TEST_IV = {(byte)0xA2, (byte)0x45, (byte)0x1D, (byte)0x5F,
+            (byte)0x34, (byte)0xA6, (byte)0xEA, (byte)0xD2,
+            (byte)0x4E, (byte)0xDA, (byte)0xA3, (byte)0x98,
+            (byte)0x6B, (byte)0x02, (byte)0xB1, (byte)0xF2};
+    private byte[] TEST_MSG = {(byte) 0xF1, (byte) 0x5D, (byte) 0x12, (byte) 0x7A,
+            (byte) 0x02, (byte) 0xBC, (byte) 0x65, (byte) 0x89,
+            (byte) 0x60, (byte) 0xA0, (byte) 0x71, (byte) 0x6B,
+            (byte) 0x3F, (byte) 0x8E, (byte) 0x3C, (byte) 0xA1};
 
     @Test
     public void testSM4EncDec() {
-        byte[] key = {(byte)0x01, (byte)0x23, (byte)0x45, (byte)0x67, (byte)0x89, (byte)0xab, (byte)0xcd, (byte)0xef,
-                (byte)0xfe, (byte)0xdc, (byte)0xba, (byte)0x98, (byte)0x76, (byte)0x54, (byte)0x32, (byte)0x10 };
-        byte[] iv = {(byte)0x01, (byte)0x23, (byte)0x45, (byte)0x67, (byte)0x89, (byte)0xab, (byte)0xcd, (byte)0xef,
-                (byte)0xfe, (byte)0xdc, (byte)0xba, (byte)0x98, (byte)0x76, (byte)0x54, (byte)0x32, (byte)0x10 };
+        System.out.println("============ SM4 encryptECB decryptECB encryptCBC decryptCBC test ============ ");
         int[] messageLenList = {1, 16, 240, 360, 2048};
-        unitTest(key, iv, messageLenList);
+        unitTest(TEST_KEY, TEST_IV, messageLenList);
     }
 
     private void unitTest(byte[] key, byte[] iv, int[] lists) {
@@ -123,315 +132,595 @@ public class SM4Test {
     }
 
     @Test
-    public void testSM4ECBInvalidParams() {
-        byte[] key = sm4.SM4KeyGen();
-        System.out.println("===== key data : " + Convert.bytesToHexString(key));
-        byte[] msg = {(byte)0xF1, (byte)0x5D, (byte)0x12, (byte)0x7A, (byte)0x02, (byte)0xBC, (byte)0x65, (byte)0x89,
-                (byte)0x60, (byte)0xA0, (byte)0x71, (byte)0x6B, (byte)0x3F, (byte)0x8E, (byte)0x3C, (byte)0xA1};
-        System.out.println("===== msg data : " + Convert.bytesToHexString(msg));
-
-        byte[] encryptResult = null;
-        byte[] decryptResult = null;
+    public void testSM4ECBEncInvalidKeyParams() {
+        System.out.println("============= SM4 encryptECB invalid parameters test =============");
         int caseIndex = 1;
-
-        byte[] tmpkey0 = new byte[0];
-        byte[] tmpkey15 = new byte[15];
-        System.arraycopy(key, 0, tmpkey15, 0, 15);
-        byte[] tmpkey32 = new byte[32];
-        System.arraycopy(key, 0, tmpkey32, 0, 16);
-        System.arraycopy(key, 0, tmpkey32, 16, 16);
-
-        byte[] tmpPlainData0 = new byte[0];
-
         try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" : ecb encrypt msg is null");
-            encryptResult = sm4.encryptECB(null, key);
-            System.out.println("    ECB cipher data : " + Convert.bytesToHexString(encryptResult));
+            System.out.println("\n**** case " + caseIndex++ + ": encryptECB key is null ****");
+            System.out.println("[input data] message data : " + Convert.bytesToHexString(TEST_MSG));
+            System.out.println("[input data] key data: null");
+            byte[] cipherData = sm4.encryptECB(TEST_MSG,null);
+            if (null != cipherData) {
+                System.out.println("[output data] encryptECB cipher data : " + Convert.bytesToHexString(cipherData));
+            } else {
+                System.out.println("[**Error**] encryptECB cipher data failed");
+            }
         } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
+            System.out.println("Exception: " + e.getMessage());
         }
 
         try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :ecb encrypt msg length is 0");
-            encryptResult = sm4.encryptECB(tmpPlainData0, key);
-            System.out.println("    ECB cipher data : " + Convert.bytesToHexString(encryptResult));
+            System.out.println("\n**** case " + caseIndex++ + ": encryptECB key length is 0 ****");
+            byte[] key0 = new byte[0];
+            System.out.println("[input data] message data : " + Convert.bytesToHexString(TEST_MSG));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(key0));
+            byte[] cipherData = sm4.encryptECB(TEST_MSG, key0);
+            if (null != cipherData) {
+                System.out.println("[output data] encryptECB cipher data : " + Convert.bytesToHexString(cipherData));
+            } else {
+                System.out.println("[**Error**] encryptECB cipher data failed");
+            }
         } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
+            System.out.println("Exception: " + e.getMessage());
         }
 
         try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" : ecb encrypt key is null");
-            encryptResult = sm4.encryptECB(msg, null);
-            System.out.println("   ECB cipher data : " + Convert.bytesToHexString(encryptResult));
+            System.out.println("\n**** case " + caseIndex++ + ": encryptECB key length is 15 ****");
+            byte[] key15 = new byte[15];
+            System.arraycopy(TEST_KEY, 0, key15, 0, 15);
+            System.out.println("[input data] message data : " + Convert.bytesToHexString(TEST_MSG));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(key15));
+            byte[] cipherData = sm4.encryptECB(TEST_MSG, key15);
+            if (null != cipherData) {
+                System.out.println("[output data] encryptECB cipher data : " + Convert.bytesToHexString(cipherData));
+            } else {
+                System.out.println("[**Error**] encryptECB cipher data failed");
+            }
         } catch (Exception e) {
-            System.out.println("   Exception: " + e.getMessage());
+            System.out.println("Exception: " + e.getMessage());
         }
 
         try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :ecb  encrypt key length is 0");
-            encryptResult = sm4.encryptECB(msg, tmpkey0);
-            System.out.println("   ECB cipher data : " + Convert.bytesToHexString(encryptResult));
+            System.out.println("\n**** case " + caseIndex++ + ": encryptECB key length is 17 ****");
+            byte[] key17 = new byte[17];
+            System.arraycopy(TEST_KEY, 0, key17, 0, 16);
+            key17[16] = 0x17;
+            System.out.println("[input data] message data : " + Convert.bytesToHexString(TEST_MSG));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(key17));
+            byte[] cipherData = sm4.encryptECB(TEST_MSG, key17);
+            if (null != cipherData) {
+                System.out.println("[output data] encryptECB cipher data : " + Convert.bytesToHexString(cipherData));
+            } else {
+                System.out.println("[**Error**] encryptECB cipher data failed");
+            }
         } catch (Exception e) {
-            System.out.println("   Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" : ecb encrypt key length is 15");
-            encryptResult = sm4.encryptECB(msg, tmpkey15);
-            System.out.println("   ECB cipher data : " + Convert.bytesToHexString(encryptResult));
-        } catch (Exception e) {
-            System.out.println("   Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" : ecb encrypt key length is 32");
-            encryptResult = sm4.encryptECB(msg, tmpkey32);
-            System.out.println("   ECB cipher data : " + Convert.bytesToHexString(encryptResult));
-        } catch (Exception e) {
-            System.out.println("   Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" : ecb  decrypt msg is null");
-            decryptResult = sm4.decryptECB(null, key);
-            System.out.println("   ECB plain data : " + Convert.bytesToHexString(decryptResult));
-        } catch (Exception e) {
-            System.out.println("   Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" : ecb decrypt msg length is 0");
-            decryptResult = sm4.decryptECB(tmpPlainData0, key);
-            System.out.println("   ECB plain data : " + Convert.bytesToHexString(decryptResult));
-        } catch (Exception e) {
-            System.out.println("   Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :ecb decrypt key is null");
-            decryptResult = sm4.decryptECB(msg, null);
-            System.out.println("   ECB plain data : " + Convert.bytesToHexString(decryptResult));
-        } catch (Exception e) {
-            System.out.println("   Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" : ecb decrypt key length is 0");
-            decryptResult = sm4.decryptECB(msg, tmpkey0);
-            System.out.println("   ECB plain data : " + Convert.bytesToHexString(decryptResult));
-        } catch (Exception e) {
-            System.out.println("   Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" : ecb decrypt key length is 15");
-            decryptResult = sm4.decryptECB(msg, tmpkey15);
-            System.out.println("   ECB plain data : " + Convert.bytesToHexString(decryptResult));
-        } catch (Exception e) {
-            System.out.println("   Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :   ecb decrypt key length is 32");
-            decryptResult = sm4.decryptECB(msg, tmpkey32);
-            System.out.println("   ECB plain data : " + Convert.bytesToHexString(decryptResult));
-        } catch (Exception e) {
-            System.out.println("   Exception: " + e.getMessage());
+            System.out.println("Exception: " + e.getMessage());
         }
     }
 
     @Test
-    public void testSM4CBCInvalidParams() {
-        /*****************  异常用例集  **************/
-        byte[] key = sm4.SM4KeyGen();
-        System.out.println("===== key data : " + Convert.bytesToHexString(key));
-        byte[] msg = {(byte)0xF1, (byte)0x5D, (byte)0x12, (byte)0x7A, (byte)0x02, (byte)0xBC, (byte)0x65, (byte)0x89,
-                (byte)0x60, (byte)0xA0, (byte)0x71, (byte)0x6B, (byte)0x3F, (byte)0x8E, (byte)0x3C, (byte)0xA1};
-        System.out.println("===== msg data : " + Convert.bytesToHexString(msg));
-        byte[] iv = {(byte)0xF1,(byte)0x5D,(byte)0x12,(byte)0x7A,(byte)0x02,(byte)0xBC,(byte)0x65,(byte)0x89,
-                (byte)0xF1,(byte)0x5D,(byte)0x12,(byte)0x7A,(byte)0x02,(byte)0xBC,(byte)0x65,(byte)0x89,};
-        System.out.println("===== iv data : " + Convert.bytesToHexString(iv));
-
-        byte[] encryptResult = null;
-        byte[] decryptResult = null;
+    public void testSM4ECBEncInvalidMsgParams() {
+        System.out.println("============= SM4 encryptECB invalid parameters test =============");
         int caseIndex = 1;
-
-        byte[] tmpkey0 = new byte[0];
-        byte[] tmpkey15 = new byte[15];
-        System.arraycopy(key, 0, tmpkey15, 0, 15);
-        byte[] tmpkey32 = new byte[32];
-        System.arraycopy(key, 0, tmpkey32, 0, 16);
-        System.arraycopy(key, 0, tmpkey32, 16, 16);
-
-        byte[] tmpPlainData0 = new byte[0];
-
-        byte[] tmpiv0 = new byte[0];
-        byte[] tmpiv15 = new byte[15];
-        System.arraycopy(iv, 0, tmpiv15, 0, 15);
-        byte[] tmpiv32 = new byte[32];
-        System.arraycopy(iv, 0, tmpiv32, 0, 16);
-        System.arraycopy(iv, 0, tmpiv32, 16, 16);
-
-
         try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  cbc encrypt msg is null");
-            encryptResult = sm4.encryptCBC(null, key,iv);
-            System.out.println("    CBC cipher data : " + Convert.bytesToHexString(encryptResult));
+            System.out.println("\n**** case " + caseIndex++ + ": encryptECB message is null ****");
+            System.out.println("[input data] message data : null");
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(TEST_KEY));
+            byte[] cipherData = sm4.encryptECB(null,TEST_KEY);
+            if (null != cipherData) {
+                System.out.println("[output data] encryptECB cipher data : " + Convert.bytesToHexString(cipherData));
+            } else {
+                System.out.println("[**Error**] encryptECB cipher data failed");
+            }
         } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
+            System.out.println("Exception: " + e.getMessage());
         }
 
         try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  cbc encrypt msg is 0");
-            encryptResult = sm4.encryptCBC(tmpPlainData0, key,iv);
-            System.out.println("    CBC cipher data : " + Convert.bytesToHexString(encryptResult));
+            System.out.println("\n**** case " + caseIndex++ + ": encryptECB message length is 0 ****");
+            byte[] msg0 = new byte[0];
+            System.out.println("[input data] message data : " + Convert.bytesToHexString(msg0));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(TEST_KEY));
+            byte[] cipherData = sm4.encryptECB(msg0, TEST_KEY);
+            if (null != cipherData) {
+                System.out.println("[output data] encryptECB cipher data : " + Convert.bytesToHexString(cipherData));
+            } else {
+                System.out.println("[**Error**] encryptECB cipher data failed");
+            }
         } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  cbc encrypt key is null");
-            encryptResult = sm4.encryptCBC(msg, null,iv);
-            System.out.println("    CBC cipher data : " + Convert.bytesToHexString(encryptResult));
-        } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  cbc encrypt key is 0");
-            encryptResult = sm4.encryptCBC(msg, tmpkey0,iv);
-            System.out.println("    CBC cipher data : " + Convert.bytesToHexString(encryptResult));
-        } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  cbc encrypt key is 15");
-            encryptResult = sm4.encryptCBC(msg, tmpkey15,iv);
-            System.out.println("    CBC cipher data : " + Convert.bytesToHexString(encryptResult));
-        } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  cbc encrypt key is 32");
-            encryptResult = sm4.encryptCBC(msg, tmpkey32,iv);
-            System.out.println("    CBC cipher data : " + Convert.bytesToHexString(encryptResult));
-        } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  cbc encrypt iv is null");
-            encryptResult = sm4.encryptCBC(msg, key,null);
-            System.out.println("    CBC cipher data : " + Convert.bytesToHexString(encryptResult));
-        } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  cbc encrypt iv is 0");
-            encryptResult = sm4.encryptCBC(msg, key,tmpiv0);
-            System.out.println("    CBC cipher data : " + Convert.bytesToHexString(encryptResult));
-        } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  cbc encrypt iv is 15");
-            encryptResult = sm4.encryptCBC(msg, key,tmpiv15);
-            System.out.println("    CBC cipher data : " + Convert.bytesToHexString(encryptResult));
-        } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  cbc encrypt iv is 32");
-            encryptResult = sm4.encryptCBC(msg, key,tmpiv32);
-            System.out.println("    CBC cipher data : " + Convert.bytesToHexString(encryptResult));
-        } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  cbc decrypt msg is null");
-            encryptResult = sm4.decryptCBC(null, key,iv);
-            System.out.println("    CBC plain data : " + Convert.bytesToHexString(encryptResult));
-        } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  cbc decrypt msg is 0");
-            decryptResult = sm4.decryptCBC(tmpPlainData0, key,iv);
-            System.out.println("    CBC plain data : " + Convert.bytesToHexString(decryptResult));
-        } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  cbc decrypt key is null");
-            decryptResult = sm4.decryptCBC(msg, null,iv);
-            System.out.println("    CBC plain data : " + Convert.bytesToHexString(decryptResult));
-        } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  cbc decrypt key is 0");
-            decryptResult = sm4.decryptCBC(msg, tmpkey0,iv);
-            System.out.println("    CBC plain data : " + Convert.bytesToHexString(decryptResult));
-        } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  cbc decrypt key is 15");
-            decryptResult = sm4.decryptCBC(msg, tmpkey15,iv);
-            System.out.println("    CBC plain data : " + Convert.bytesToHexString(decryptResult));
-        } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  cbc decrypt key is 32");
-            decryptResult = sm4.decryptCBC(msg, tmpkey32,iv);
-            System.out.println("    CBC plain data : " + Convert.bytesToHexString(decryptResult));
-        } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  cbc decrypt iv is null");
-            decryptResult = sm4.decryptCBC(msg, key,null);
-            System.out.println("    CBC plain data : " + Convert.bytesToHexString(decryptResult));
-        } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  cbc decrypt iv is 0");
-            decryptResult = sm4.decryptCBC(msg, key,tmpiv0);
-            System.out.println("    CBC plain data : " + Convert.bytesToHexString(decryptResult));
-        } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  cbc decrypt iv is 15");
-            decryptResult = sm4.decryptCBC(msg, key,tmpiv15);
-            System.out.println("    CBC plain data : " + Convert.bytesToHexString(decryptResult));
-        } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  cbc decrypt iv is 32");
-            decryptResult = sm4.decryptCBC(msg, key,tmpiv32);
-            System.out.println("    CBC plain data : " + Convert.bytesToHexString(decryptResult));
-        } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
+            System.out.println("Exception: " + e.getMessage());
         }
     }
 
+    @Test
+    public void testSM4ECBDecInvalidKeyParams() {
+        System.out.println("============= SM4 decryptECB invalid parameters test =============");
+        byte[] cipherData = null;
+        try {
+            cipherData = sm4.encryptECB(TEST_MSG, TEST_KEY);
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+            return;
+        }
+        int caseIndex = 1;
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": decryptECB key is null ****");
+            System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData));
+            System.out.println("[input data] key data: null");
+            byte[] plainData = sm4.decryptECB(cipherData,null);
+            if (null != plainData) {
+                System.out.println("[output data] decryptECB plain data : " + Convert.bytesToHexString(plainData));
+            } else {
+                System.out.println("[**Error**] decryptECB plain data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": decryptECB key length is 0 ****");
+            byte[] key0 = new byte[0];
+            System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(key0));
+            byte[] plainData = sm4.decryptECB(cipherData, key0);
+            if (null != plainData) {
+                System.out.println("[output data] decryptECB plain data : " + Convert.bytesToHexString(plainData));
+            } else {
+                System.out.println("[**Error**] decryptECB plain data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": encryptECB key length is 15 ****");
+            byte[] key15 = new byte[15];
+            System.arraycopy(TEST_KEY, 0, key15, 0, 15);
+            System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(key15));
+            byte[] plainData = sm4.decryptECB(cipherData, key15);
+            if (null != plainData) {
+                System.out.println("[output data] decryptECB plain data : " + Convert.bytesToHexString(plainData));
+            } else {
+                System.out.println("[**Error**] decryptECB plain data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": encryptECB key length is 17 ****");
+            byte[] key17 = new byte[17];
+            System.arraycopy(TEST_KEY, 0, key17, 0, 16);
+            key17[16] = 0x17;
+            System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(key17));
+            byte[] plainData = sm4.decryptECB(cipherData, key17);
+            if (null != plainData) {
+                System.out.println("[output data] decryptECB plain data : " + Convert.bytesToHexString(plainData));
+            } else {
+                System.out.println("[**Error**] decryptECB plain data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testSM4ECBDecInvalidCipherDataParams() {
+        System.out.println("============= SM4 decryptECB invalid parameters test =============");
+        byte[] cipherData = null;
+        try {
+            cipherData = sm4.encryptECB(TEST_MSG, TEST_KEY);
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+            return;
+        }
+        int caseIndex = 1;
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": decryptECB cipher data is null ****");
+            System.out.println("[input data] cipher data : null");
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(TEST_KEY));
+            byte[] plainData = sm4.decryptECB(null,TEST_KEY);
+            if (null != plainData) {
+                System.out.println("[output data] decryptECB plain data : " + Convert.bytesToHexString(plainData));
+            } else {
+                System.out.println("[**Error**] decryptECB plain data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": decryptECB key length is 0 ****");
+            byte[] cipherData0 = new byte[0];
+            System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData0));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(TEST_KEY));
+            byte[] plainData = sm4.decryptECB(cipherData0, TEST_KEY);
+            if (null != plainData) {
+                System.out.println("[output data] decryptECB plain data : " + Convert.bytesToHexString(plainData));
+            } else {
+                System.out.println("[**Error**] decryptECB plain data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testSM4CBCEncInvalidKeyParams() {
+        System.out.println("============= SM4 encryptCBC invalid parameters test =============");
+        int caseIndex = 1;
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": encryptCBC key is null ****");
+            System.out.println("[input data] message data : " + Convert.bytesToHexString(TEST_MSG));
+            System.out.println("[input data] iv data : " + Convert.bytesToHexString(TEST_IV));
+            System.out.println("[input data] key data: null");
+            byte[] cipherData = sm4.encryptCBC(TEST_MSG,null, TEST_IV);
+            if (null != cipherData) {
+                System.out.println("[output data] encryptCBC cipher data : " + Convert.bytesToHexString(cipherData));
+            } else {
+                System.out.println("[**Error**] encryptCBC cipher data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": encryptCBC key length is 0 ****");
+            byte[] key0 = new byte[0];
+            System.out.println("[input data] message data : " + Convert.bytesToHexString(TEST_MSG));
+            System.out.println("[input data] iv data : " + Convert.bytesToHexString(TEST_IV));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(key0));
+            byte[] cipherData = sm4.encryptCBC(TEST_MSG, key0, TEST_IV);
+            if (null != cipherData) {
+                System.out.println("[output data] encryptCBC cipher data : " + Convert.bytesToHexString(cipherData));
+            } else {
+                System.out.println("[**Error**] encryptCBC cipher data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": encryptCBC key length is 15 ****");
+            byte[] key15 = new byte[15];
+            System.arraycopy(TEST_KEY, 0, key15, 0, 15);
+            System.out.println("[input data] message data : " + Convert.bytesToHexString(TEST_MSG));
+            System.out.println("[input data] iv data : " + Convert.bytesToHexString(TEST_IV));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(key15));
+            byte[] cipherData = sm4.encryptCBC(TEST_MSG, key15, TEST_IV);
+            if (null != cipherData) {
+                System.out.println("[output data] encryptCBC cipher data : " + Convert.bytesToHexString(cipherData));
+            } else {
+                System.out.println("[**Error**] encryptCBC cipher data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": encryptCBC key length is 17 ****");
+            byte[] key17 = new byte[17];
+            System.arraycopy(TEST_KEY, 0, key17, 0, 16);
+            key17[16] = 0x17;
+            System.out.println("[input data] message data : " + Convert.bytesToHexString(TEST_MSG));
+            System.out.println("[input data] iv data : " + Convert.bytesToHexString(TEST_IV));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(key17));
+            byte[] cipherData = sm4.encryptCBC(TEST_MSG, key17, TEST_IV);
+            if (null != cipherData) {
+                System.out.println("[output data] encryptCBC cipher data : " + Convert.bytesToHexString(cipherData));
+            } else {
+                System.out.println("[**Error**] encryptCBC cipher data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testSM4CBCEncInvalidIvParams() {
+        System.out.println("============= SM4 encryptCBC invalid parameters test =============");
+        int caseIndex = 1;
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": encryptCBC iv is null ****");
+            System.out.println("[input data] message data : " + Convert.bytesToHexString(TEST_MSG));
+            System.out.println("[input data] iv data : null");
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(TEST_KEY));
+            byte[] cipherData = sm4.encryptCBC(TEST_MSG,TEST_KEY, null);
+            if (null != cipherData) {
+                System.out.println("[output data] encryptCBC cipher data : " + Convert.bytesToHexString(cipherData));
+            } else {
+                System.out.println("[**Error**] encryptCBC cipher data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": encryptCBC iv length is 0 ****");
+            byte[] iv0 = new byte[0];
+            System.out.println("[input data] message data : " + Convert.bytesToHexString(TEST_MSG));
+            System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv0));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(TEST_KEY));
+            byte[] cipherData = sm4.encryptCBC(TEST_MSG, TEST_KEY, iv0);
+            if (null != cipherData) {
+                System.out.println("[output data] encryptCBC cipher data : " + Convert.bytesToHexString(cipherData));
+            } else {
+                System.out.println("[**Error**] encryptCBC cipher data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": encryptCBC iv length is 15 ****");
+            byte[] iv15 = new byte[15];
+            System.arraycopy(TEST_IV, 0, iv15, 0, 15);
+            System.out.println("[input data] message data : " + Convert.bytesToHexString(TEST_MSG));
+            System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv15));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(TEST_KEY));
+            byte[] cipherData = sm4.encryptCBC(TEST_MSG, TEST_KEY, iv15);
+            if (null != cipherData) {
+                System.out.println("[output data] encryptCBC cipher data : " + Convert.bytesToHexString(cipherData));
+            } else {
+                System.out.println("[**Error**] encryptCBC cipher data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": encryptCBC iv length is 17 ****");
+            byte[] iv17 = new byte[17];
+            System.arraycopy(TEST_IV, 0, iv17, 0, 16);
+            iv17[16] = 0x17;
+            System.out.println("[input data] message data : " + Convert.bytesToHexString(TEST_MSG));
+            System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv17));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(TEST_KEY));
+            byte[] cipherData = sm4.encryptCBC(TEST_MSG, TEST_KEY, iv17);
+            if (null != cipherData) {
+                System.out.println("[output data] encryptCBC cipher data : " + Convert.bytesToHexString(cipherData));
+            } else {
+                System.out.println("[**Error**] encryptCBC cipher data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testSM4CBCEncInvalidMsgParams() {
+        System.out.println("============= SM4 encryptCBC invalid parameters test =============");
+        int caseIndex = 1;
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": encryptCBC message is null ****");
+            System.out.println("[input data] message data : null");
+            System.out.println("[input data] iv data : " + Convert.bytesToHexString(TEST_IV));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(TEST_KEY));
+            byte[] cipherData = sm4.encryptCBC(null,TEST_KEY, TEST_IV);
+            if (null != cipherData) {
+                System.out.println("[output data] encryptCBC cipher data : " + Convert.bytesToHexString(cipherData));
+            } else {
+                System.out.println("[**Error**] encryptCBC cipher data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": encryptCBC message length is 0 ****");
+            byte[] msg0 = new byte[0];
+            System.out.println("[input data] message data : " + Convert.bytesToHexString(msg0));
+            System.out.println("[input data] iv data : " + Convert.bytesToHexString(TEST_IV));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(TEST_KEY));
+            byte[] cipherData = sm4.encryptCBC(msg0, TEST_KEY, TEST_IV);
+            if (null != cipherData) {
+                System.out.println("[output data] encryptCBC cipher data : " + Convert.bytesToHexString(cipherData));
+            } else {
+                System.out.println("[**Error**] encryptCBC cipher data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testSM4CBCDecInvalidKeyParams() {
+        System.out.println("============= SM4 decryptCBC invalid parameters test =============");
+        byte[] cipherData = null;
+        try {
+            cipherData = sm4.encryptCBC(TEST_MSG, TEST_KEY, TEST_IV);
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+            return;
+        }
+        int caseIndex = 1;
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": decryptCBC key is null ****");
+            System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData));
+            System.out.println("[input data] iv data : " + Convert.bytesToHexString(TEST_IV));
+            System.out.println("[input data] key data: null");
+            byte[] plainData = sm4.decryptCBC(cipherData,null, TEST_IV);
+            if (null != plainData) {
+                System.out.println("[output data] decryptCBC plain data : " + Convert.bytesToHexString(plainData));
+            } else {
+                System.out.println("[**Error**] decryptCBC plain data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": decryptCBC key length is 0 ****");
+            byte[] key0 = new byte[0];
+            System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData));
+            System.out.println("[input data] iv data : " + Convert.bytesToHexString(TEST_IV));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(key0));
+            byte[] plainData = sm4.decryptCBC(cipherData, key0, TEST_IV);
+            if (null != plainData) {
+                System.out.println("[output data] decryptCBC plain data : " + Convert.bytesToHexString(plainData));
+            } else {
+                System.out.println("[**Error**] decryptCBC plain data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": decryptCBC key length is 15 ****");
+            byte[] key15 = new byte[15];
+            System.arraycopy(TEST_KEY, 0, key15, 0, 15);
+            System.out.println("[input data] cipher data : " + Convert.bytesToHexString(TEST_MSG));
+            System.out.println("[input data] iv data : " + Convert.bytesToHexString(TEST_IV));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(key15));
+            byte[] plainData = sm4.decryptCBC(cipherData, key15, TEST_IV);
+            if (null != plainData) {
+                System.out.println("[output data] decryptCBC plain data : " + Convert.bytesToHexString(plainData));
+            } else {
+                System.out.println("[**Error**] decryptCBC plain data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": decryptCBC key length is 17 ****");
+            byte[] key17 = new byte[17];
+            System.arraycopy(TEST_KEY, 0, key17, 0, 16);
+            key17[16] = 0x17;
+            System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData));
+            System.out.println("[input data] iv data : " + Convert.bytesToHexString(TEST_IV));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(key17));
+            byte[] plainData = sm4.decryptCBC(cipherData, key17, TEST_IV);
+            if (null != plainData) {
+                System.out.println("[output data] decryptCBC plain data : " + Convert.bytesToHexString(plainData));
+            } else {
+                System.out.println("[**Error**] decryptCBC plain data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testSM4CBCDecInvalidIvParams() {
+        System.out.println("============= SM4 decryptCBC invalid parameters test =============");
+        byte[] cipherData = null;
+        try {
+            cipherData = sm4.encryptCBC(TEST_MSG, TEST_KEY, TEST_IV);
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+            return;
+        }
+        int caseIndex = 1;
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": decryptCBC iv is null ****");
+            System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData));
+            System.out.println("[input data] iv data : null");
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(TEST_KEY));
+            byte[] plainData = sm4.decryptCBC(cipherData,TEST_KEY, null);
+            if (null != plainData) {
+                System.out.println("[output data] decryptCBC plain data : " + Convert.bytesToHexString(plainData));
+            } else {
+                System.out.println("[**Error**] decryptCBC plain data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": decryptCBC iv length is 0 ****");
+            byte[] iv0 = new byte[0];
+            System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData));
+            System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv0));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(TEST_KEY));
+            byte[] plainData = sm4.decryptCBC(cipherData, TEST_KEY, iv0);
+            if (null != plainData) {
+                System.out.println("[output data] decryptCBC plain data : " + Convert.bytesToHexString(plainData));
+            } else {
+                System.out.println("[**Error**] decryptCBC plain data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": decryptCBC iv length is 15 ****");
+            byte[] iv15 = new byte[15];
+            System.arraycopy(TEST_IV, 0, iv15, 0, 15);
+            System.out.println("[input data] cipher data : " + Convert.bytesToHexString(TEST_MSG));
+            System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv15));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(TEST_KEY));
+            byte[] plainData = sm4.decryptCBC(cipherData, TEST_KEY, iv15);
+            if (null != plainData) {
+                System.out.println("[output data] decryptCBC plain data : " + Convert.bytesToHexString(plainData));
+            } else {
+                System.out.println("[**Error**] decryptCBC plain data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": decryptCBC iv length is 17 ****");
+            byte[] iv17 = new byte[17];
+            System.arraycopy(TEST_IV, 0, iv17, 0, 16);
+            iv17[16] = 0x17;
+            System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData));
+            System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv17));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(TEST_KEY));
+            byte[] plainData = sm4.decryptCBC(cipherData, TEST_KEY, iv17);
+            if (null != plainData) {
+                System.out.println("[output data] decryptCBC plain data : " + Convert.bytesToHexString(plainData));
+            } else {
+                System.out.println("[**Error**] decryptCBC plain data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+    }
+
+    @Test
+    public void testSM4CBCDecInvalidCipherDataParams() {
+        System.out.println("============= SM4 decryptCBC invalid parameters test =============");
+        byte[] cipherData = null;
+        try {
+            cipherData = sm4.encryptCBC(TEST_MSG, TEST_KEY, TEST_IV);
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+            return;
+        }
+        int caseIndex = 1;
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": decryptCBC cipher data is null ****");
+            System.out.println("[input data] cipher data : null");
+            System.out.println("[input data] iv data : " + Convert.bytesToHexString(TEST_IV));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(TEST_KEY));
+            byte[] plainData = sm4.decryptCBC(null,TEST_KEY, TEST_IV);
+            if (null != plainData) {
+                System.out.println("[output data] decryptCBC plain data : " + Convert.bytesToHexString(plainData));
+            } else {
+                System.out.println("[**Error**] decryptCBC plain data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n**** case " + caseIndex++ + ": decryptCBC cipher data length is 0 ****");
+            byte[] cipherData0 = new byte[0];
+            System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData0));
+            System.out.println("[input data] iv data : " + Convert.bytesToHexString(TEST_IV));
+            System.out.println("[input data] key data: " + Convert.bytesToHexString(TEST_KEY));
+            byte[] plainData = sm4.decryptCBC(cipherData0, TEST_KEY, TEST_IV);
+            if (null != plainData) {
+                System.out.println("[output data] decryptCBC plain data : " + Convert.bytesToHexString(plainData));
+            } else {
+                System.out.println("[**Error**] decryptCBC plain data failed");
+            }
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+        }
+    }
 }
