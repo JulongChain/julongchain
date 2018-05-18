@@ -16,7 +16,7 @@
 package org.bcia.javachain.csp.gm.sdt.config;
 
 /**
- * 配置信息
+ * sdtgm配置信息
  *
  * @author tengxiumin
  * @date 2018/05/17

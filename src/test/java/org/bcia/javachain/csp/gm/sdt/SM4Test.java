@@ -17,7 +17,6 @@ package org.bcia.javachain.csp.gm.sdt;
 
 import org.bcia.javachain.common.util.Convert;
 import org.bcia.javachain.csp.gm.sdt.SM4.SM4;
-import org.bcia.javachain.csp.gm.sdt.common.Constants;
 import org.bcia.javachain.csp.gm.sdt.jni.SMJniApi;
 import org.junit.After;
 import org.junit.Before;
@@ -27,7 +26,7 @@ import org.junit.Test;
  * SM4算法单元测试
  *
  * @author tengxiumin
- * @date 5/16/18
+ * @date 2018/05/16
  * @company SDT
  */
 public class SM4Test {
@@ -37,7 +36,6 @@ public class SM4Test {
 
     @Before
     public void setUp() {
-
         System.out.println("setup...");
     }
 
@@ -48,149 +46,84 @@ public class SM4Test {
     }
 
     @Test
-    public void testSM4EncDec() throws Exception {
-        System.out.println("Symm encrypt and decrypt test case :");
-        /*****************  正常用例集  **************/
-        byte[] msg1 = jni.RandomGen(1);
-        byte[] msg16 = jni.RandomGen(16);
-        byte[] msg32 = jni.RandomGen(32);
-        byte[] msg64 = jni.RandomGen(64);
-        byte[] msg128 = jni.RandomGen(128);
-        byte[] msg1024 = jni.RandomGen(1024);
+    public void testSM4KeyGen() {
+        System.out.println("============ SM4 KeyGen test ============ ");
+        try {
+            byte[] key = sm4.SM4KeyGen();
+            if (null != key) {
+                System.out.println("[output data] key data : " + Convert.bytesToHexString(key));
+            } else {
+                System.out.println("[**Error**] compute hash data failed");
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testSM4EncDec() {
+        byte[] key = {(byte)0x01, (byte)0x23, (byte)0x45, (byte)0x67, (byte)0x89, (byte)0xab, (byte)0xcd, (byte)0xef,
+                (byte)0xfe, (byte)0xdc, (byte)0xba, (byte)0x98, (byte)0x76, (byte)0x54, (byte)0x32, (byte)0x10 };
+        byte[] iv = {(byte)0x01, (byte)0x23, (byte)0x45, (byte)0x67, (byte)0x89, (byte)0xab, (byte)0xcd, (byte)0xef,
+                (byte)0xfe, (byte)0xdc, (byte)0xba, (byte)0x98, (byte)0x76, (byte)0x54, (byte)0x32, (byte)0x10 };
+        int[] messageLenList = {1, 16, 240, 360, 2048};
+        unitTest(key, iv, messageLenList);
+    }
+
+    private void unitTest(byte[] key, byte[] iv, int[] lists) {
         int caseIndex = 1;
-        try {
-            System.out.println("\n===== case A-"+ caseIndex++ +" : SM4 EncDec msg is 1");
-            /*byte[] msg = {(byte) 0xF1, (byte) 0x5D, (byte) 0x12, (byte) 0x7A, (byte) 0x02, (byte) 0xBC, (byte) 0x65, (byte) 0x89,
-                    (byte) 0x60, (byte) 0xA0, (byte) 0x71, (byte) 0x6B, (byte) 0x3F, (byte) 0x8E, (byte) 0x3C, (byte) 0xA1,
-                    (byte) 0x60, (byte) 0xA0, (byte) 0x71, (byte) 0x6B};*/
-            System.out.println("  ===== plain data : " + Convert.bytesToHexString(msg1));
-            byte[] key = sm4.SM4KeyGen();
-            System.out.println("  ===== key data : " + Convert.bytesToHexString(key));
-
-            byte[] ecbCipherData = sm4.encryptECB(msg1, key);
-            System.out.println("  ===== ECB cipher data : " + Convert.bytesToHexString(ecbCipherData));
-            byte[] ecbPlainData = sm4.decryptECB(ecbCipherData, key);
-            System.out.println("  ===== ECB plain data : " + Convert.bytesToHexString(ecbPlainData));
-
-            byte[] iv = jni.RandomGen(Constants.SM4_IV_LEN);
-            System.out.println("  ===== ECB iv data : " + Convert.bytesToHexString(iv));
-            byte[] cbcCipherData = sm4.encryptCBC(msg1, key, iv);
-            System.out.println("  ===== CBC cipher data : " + Convert.bytesToHexString(cbcCipherData));
-            byte[] cbcPlainData = sm4.decryptCBC(cbcCipherData, key, iv);
-            System.out.println("  ===== CBC plain data : " + Convert.bytesToHexString(cbcPlainData));
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case A-"+ caseIndex++ +" : SM4 EncDec msg is 16");
-            System.out.println("  ===== plain data : " + Convert.bytesToHexString(msg16));
-            byte[] key = sm4.SM4KeyGen();
-            System.out.println("  ===== key data : " + Convert.bytesToHexString(key));
-
-            byte[] ecbCipherData = sm4.encryptECB(msg16, key);
-            System.out.println("  ===== ECB cipher data : " + Convert.bytesToHexString(ecbCipherData));
-            byte[] ecbPlainData = sm4.decryptECB(ecbCipherData, key);
-            System.out.println("  ===== ECB plain data : " + Convert.bytesToHexString(ecbPlainData));
-
-            byte[] iv = jni.RandomGen(Constants.SM4_IV_LEN);
-            System.out.println("  ===== ECB iv data : " + Convert.bytesToHexString(iv));
-            byte[] cbcCipherData = sm4.encryptCBC(msg16, key, iv);
-            System.out.println("  ===== CBC cipher data : " + Convert.bytesToHexString(cbcCipherData));
-            byte[] cbcPlainData = sm4.decryptCBC(cbcCipherData, key, iv);
-            System.out.println("  ===== CBC plain data : " + Convert.bytesToHexString(cbcPlainData));
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case A-"+ caseIndex++ +" : SM4 EncDec msg is 32");
-            System.out.println("  ===== plain data : " + Convert.bytesToHexString(msg32));
-            byte[] key = sm4.SM4KeyGen();
-            System.out.println("  ===== key data : " + Convert.bytesToHexString(key));
-
-            byte[] ecbCipherData = sm4.encryptECB(msg32, key);
-            System.out.println("  ===== ECB cipher data : " + Convert.bytesToHexString(ecbCipherData));
-            byte[] ecbPlainData = sm4.decryptECB(ecbCipherData, key);
-            System.out.println("  ===== ECB plain data : " + Convert.bytesToHexString(ecbPlainData));
-
-            byte[] iv = jni.RandomGen(Constants.SM4_IV_LEN);
-            System.out.println("  ===== ECB iv data : " + Convert.bytesToHexString(iv));
-            byte[] cbcCipherData = sm4.encryptCBC(msg32, key, iv);
-            System.out.println("  ===== CBC cipher data : " + Convert.bytesToHexString(cbcCipherData));
-            byte[] cbcPlainData = sm4.decryptCBC(cbcCipherData, key, iv);
-            System.out.println("  ===== CBC plain data : " + Convert.bytesToHexString(cbcPlainData));
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case A-"+ caseIndex++ +" : SM4 EncDec msg is 64");
-            System.out.println("  ===== plain data : " + Convert.bytesToHexString(msg64));
-            byte[] key = sm4.SM4KeyGen();
-            System.out.println("  ===== key data : " + Convert.bytesToHexString(key));
-
-            byte[] ecbCipherData = sm4.encryptECB(msg64, key);
-            System.out.println("  ===== ECB cipher data : " + Convert.bytesToHexString(ecbCipherData));
-            byte[] ecbPlainData = sm4.decryptECB(ecbCipherData, key);
-            System.out.println("  ===== ECB plain data : " + Convert.bytesToHexString(ecbPlainData));
-
-            byte[] iv = jni.RandomGen(Constants.SM4_IV_LEN);
-            System.out.println("  ===== ECB iv data : " + Convert.bytesToHexString(iv));
-            byte[] cbcCipherData = sm4.encryptCBC(msg64, key, iv);
-            System.out.println("  ===== CBC cipher data : " + Convert.bytesToHexString(cbcCipherData));
-            byte[] cbcPlainData = sm4.decryptCBC(cbcCipherData, key, iv);
-            System.out.println("  ===== CBC plain data : " + Convert.bytesToHexString(cbcPlainData));
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case A-"+ caseIndex++ +" : SM4 EncDec msg is 128");
-            System.out.println("  ===== plain data : " + Convert.bytesToHexString(msg128));
-            byte[] key = sm4.SM4KeyGen();
-            System.out.println("  ===== key data : " + Convert.bytesToHexString(key));
-
-            byte[] ecbCipherData = sm4.encryptECB(msg128, key);
-            System.out.println("  ===== ECB cipher data : " + Convert.bytesToHexString(ecbCipherData));
-            byte[] ecbPlainData = sm4.decryptECB(ecbCipherData, key);
-            System.out.println("  ===== ECB plain data : " + Convert.bytesToHexString(ecbPlainData));
-
-            byte[] iv = jni.RandomGen(Constants.SM4_IV_LEN);
-            System.out.println("  ===== ECB iv data : " + Convert.bytesToHexString(iv));
-            byte[] cbcCipherData = sm4.encryptCBC(msg128, key, iv);
-            System.out.println("  ===== CBC cipher data : " + Convert.bytesToHexString(cbcCipherData));
-            byte[] cbcPlainData = sm4.decryptCBC(cbcCipherData, key, iv);
-            System.out.println("  ===== CBC plain data : " + Convert.bytesToHexString(cbcPlainData));
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case A-"+ caseIndex++ +" : SM4 EncDec msg is 1024");
-            System.out.println("  ===== plain data : " + Convert.bytesToHexString(msg1024));
-            byte[] key = sm4.SM4KeyGen();
-            System.out.println("  ===== key data : " + Convert.bytesToHexString(key));
-
-            byte[] ecbCipherData = sm4.encryptECB(msg1024, key);
-            System.out.println("  ===== ECB cipher data : " + Convert.bytesToHexString(ecbCipherData));
-            byte[] ecbPlainData = sm4.decryptECB(ecbCipherData, key);
-            System.out.println("  ===== ECB plain data : " + Convert.bytesToHexString(ecbPlainData));
-
-            byte[] iv = jni.RandomGen(Constants.SM4_IV_LEN);
-            System.out.println("  ===== ECB iv data : " + Convert.bytesToHexString(iv));
-            byte[] cbcCipherData = sm4.encryptCBC(msg1024, key, iv);
-            System.out.println("  ===== CBC cipher data : " + Convert.bytesToHexString(cbcCipherData));
-            byte[] cbcPlainData = sm4.decryptCBC(cbcCipherData, key, iv);
-            System.out.println("  ===== CBC plain data : " + Convert.bytesToHexString(cbcPlainData));
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+        for(int i = 0; i < lists.length; i++) {
+            try {
+                int msgLen = lists[i];
+                System.out.println("\n===== case "+ caseIndex++ +" :  message length is " + msgLen);
+                byte[] msg = new byte[msgLen];
+                if(msgLen > 1024) {
+                    int leftLen = msgLen;
+                    while (leftLen > 0) {
+                        int len = leftLen;
+                        if(len > 1024) {
+                            len = 1024;
+                        }
+                        byte[] randomData = jni.RandomGen(len);
+                        System.arraycopy(randomData, 0, msg, msgLen-leftLen, len);
+                        leftLen = leftLen - len;
+                    }
+                } else {
+                    msg = jni.RandomGen(msgLen);
+                }
+                System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
+                byte[] ecbCipherData = sm4.encryptECB(msg, key);
+                if (null != ecbCipherData) {
+                    System.out.println("[output data] SM4 ECB cipher data : " + Convert.bytesToHexString(ecbCipherData));
+                } else {
+                    System.out.println("[**Error**] SM4 ECB cipher data failed");
+                }
+                byte[] ecbPlainData = sm4.decryptECB(ecbCipherData, key);
+                if (null != ecbPlainData) {
+                    System.out.println("[output data] SM4 ECB plain data : " + Convert.bytesToHexString(ecbPlainData));
+                } else {
+                    System.out.println("[**Error**] SM4 ECB plain data failed");
+                }
+                byte[] cbcCipherData = sm4.encryptCBC(msg, key, iv);
+                if (null != cbcCipherData) {
+                    System.out.println("[output data] SM4 CBC cipher data : " + Convert.bytesToHexString(cbcCipherData));
+                } else {
+                    System.out.println("[**Error**] SM4 CBC cipher data failed");
+                }
+                byte[] cbcPlainData = sm4.decryptCBC(cbcCipherData, key, iv);
+                if (null != cbcPlainData) {
+                    System.out.println("[output data] SM4 CBC plain data : " + Convert.bytesToHexString(cbcPlainData));
+                } else {
+                    System.out.println("[**Error**] SM4 CBC plain data failed");
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 
     @Test
     public void testSM4ECBInvalidParams() {
-        /*****************  异常用例集  **************/
         byte[] key = sm4.SM4KeyGen();
         System.out.println("===== key data : " + Convert.bytesToHexString(key));
         byte[] msg = {(byte)0xF1, (byte)0x5D, (byte)0x12, (byte)0x7A, (byte)0x02, (byte)0xBC, (byte)0x65, (byte)0x89,

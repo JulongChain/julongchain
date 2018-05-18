@@ -24,7 +24,7 @@ import org.bcia.javachain.csp.gm.sdt.jni.SMJniApi;
  * GM SM3 algorithm
  *
  * @author tengxiumin
- * @date 5/14/18
+ * @date 2018/05/14
  * @company SDT
  */
 public class SM3 {
@@ -45,7 +45,7 @@ public class SM3 {
             logger.error("Invalid message. It must not be nil.");
             return null;
         }
-        byte[] result = new byte[digestSize];
+        byte[] result = null;
         try {
             result = smJniApi.SM3Hash(message);
         } catch (Exception e) {

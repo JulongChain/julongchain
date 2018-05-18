@@ -21,7 +21,7 @@ import org.bcia.javachain.csp.intfs.opts.IKeyDerivOpts;
  * GM SM2KeyDerivOpts
  *
  * @author tengxiumin
- * @date 18/5/16
+ * @date 2018/5/16
  * @company SDT
  */
 

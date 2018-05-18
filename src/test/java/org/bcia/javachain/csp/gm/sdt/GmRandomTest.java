@@ -15,16 +15,17 @@
  */
 package org.bcia.javachain.csp.gm.sdt;
 
+import org.bcia.javachain.common.util.Convert;
 import org.bcia.javachain.csp.gm.sdt.random.GmRandom;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * Unit Test
+ * 产生随机数 单元测试
  *
  * @author tengxiumin
- * @date 4/23/18
+ * @date 2018/05/18
  * @company SDT
  */
 public class GmRandomTest {
@@ -39,66 +40,36 @@ public class GmRandomTest {
     }
 
     @Test
-    public void testRng()  {
-        GmRandom randomGen = new GmRandom();
-        /*****************  正常用例集  **************/
-        /******   case A-1 : length = 1   ******/
-        int randomLength = 1;
-        byte[] randomBytesA1 = randomGen.rng(randomLength);
-        System.out.println("RandomGen test case :");
-        System.out.println("   ===== data length : "+randomLength);
-        System.out.println("   ===== random data : "+bytesToHexString(randomBytesA1));
-        /******   case A-2 : length = 16   ******/
-        randomLength = 16;
-        byte[] randomBytesA2 = randomGen.rng(randomLength);
-        System.out.println("RandomGen test case :");
-        System.out.println("   ===== data length : "+randomLength);
-        System.out.println("   ===== random data : "+bytesToHexString(randomBytesA2));
-        /******   case A-3 : length = 32   ******/
-        randomLength = 32;
-        byte[] randomBytesA3 = randomGen.rng(randomLength);
-        System.out.println("RandomGen test case :");
-        System.out.println("   ===== data length : "+randomLength);
-        System.out.println("   ===== random data : "+bytesToHexString(randomBytesA3));
-        /******   case A-4 : length = 64   ******/
-        randomLength = 64;
-        byte[] randomBytesA4 = randomGen.rng(randomLength);
-        System.out.println("RandomGen test case :");
-        System.out.println("   ===== data length : "+randomLength);
-        System.out.println("   ===== random data : "+bytesToHexString(randomBytesA4));
-        /******   case A-5 : length = 128   ******/
-        randomLength = 128;
-        byte[] randomBytesA5 = randomGen.rng(randomLength);
-        System.out.println("RandomGen test case :");
-        System.out.println("   ===== data length : "+randomLength);
-        System.out.println("   ===== random data : "+bytesToHexString(randomBytesA5));
-
-        /*****************  异常用例集  **************/
-        /******   case B-1 : length = 0   ******/
-        randomLength = 0;
-        byte[] randomBytesB1 = randomGen.rng(randomLength);
-        System.out.println("RandomGen test case :");
-        System.out.println("   ===== data length : "+randomLength);
-        System.out.println("   ===== random data : "+bytesToHexString(randomBytesB1));
-        /******   case B-2 : length = 16   ******/
-        randomLength = -1;
-        byte[] randomBytesB2 = randomGen.rng(randomLength);
-        System.out.println("RandomGen test case :");
-        System.out.println("   ===== data length : "+randomLength);
-        System.out.println("   ===== random data : "+bytesToHexString(randomBytesB2));
+    public void testRng() {
+        System.out.println("============= GmRandom rng test =============");
+        int[] randomLen = {1, 16, 32, 128, 240, 1024};
+        unitTest(randomLen);
     }
 
+    @Test
+    public void testRngInvalidParams() {
+        System.out.println("============= GmRandom rng invalid parameters test =============");
+        int[] invalidRandomLens = {0, -1, 1025};
+        unitTest(invalidRandomLens);
 
-    private  String bytesToHexString(byte[] bArray) {
-        if(bArray == null) {
-            return "byte array is null";
+    }
+
+    private void unitTest(int[] lists) {
+        GmRandom randomGen = new GmRandom();
+        int caseIndex = 1;
+        for (int index = 0; index < lists.length; index++) {
+            try {
+                int len = lists[index];
+                System.out.println("\n**** case " + caseIndex++ + ": generate random length = " + len + "  ****");
+                byte[] random = randomGen.rng(len);
+                if (null != random) {
+                    System.out.println("[output data] random data : " + Convert.bytesToHexString(random));
+                } else {
+                    System.out.println("[**Error**] generate random data failed");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-        StringBuffer sb = new StringBuffer(bArray.length);
-        String sTemp;
-        for (int i = 0; i < bArray.length; i++) {
-            sTemp = Integer.toHexString(0xFF & bArray[i]);
-            sb.append(sTemp.toUpperCase());
-        }
-        return sb.toString();
     }
 }

@@ -24,7 +24,7 @@ import org.bcia.javachain.csp.gm.sdt.jni.SMJniApi;
  * GM SM2 algorithm
  *
  * @author tengxiumin
- * @date 5/16/18
+ * @date 2018/05/16
  * @company SDT
  */
 
@@ -32,7 +32,6 @@ public class SM2 {
 
     private static JavaChainLog logger = JavaChainLogFactory.getLog( SM2.class);
     private static final SMJniApi smJniApi = new SMJniApi();
-    public static final String YamlFile = "gmcsp.yaml";
 
     public SM2() { }
 
@@ -50,7 +49,6 @@ public class SM2 {
             publicKey = smJniApi.SM2MakeKey(privateKey);
         } catch (Exception e) {
             logger.error("SM2KeyPair error: generate key pair failed.");
-            e.printStackTrace();
         }
 
         if (null == privateKey || Constants.SM2_SK_LEN != privateKey.length
@@ -73,10 +71,9 @@ public class SM2 {
     /**
      * 对数据进行签名
      *
-     * @param
-     * @param
-     * @return
-     * @throws
+     * @param hash 消息哈希值
+     * @param priKey 私钥数据
+     * @return 签名值
      */
     public static byte[] sign(byte[] hash, byte[] priKey) {
         if(null == hash || 0 == hash.length) {
@@ -87,12 +84,12 @@ public class SM2 {
             logger.error("Invalid priKey. It must not be nil or empty.");
             return null;
         }
-        byte[] result = new byte[0];
+        byte[] result = null;
         try {
             byte[] random = smJniApi.RandomGen(Constants.SM2_SIGN_RANDOM_LEN);
             result = smJniApi.SM2Sign(hash, random, priKey);
         } catch (Exception e) {
-            logger.error( "SM2 signature error: sign data failed" );
+            logger.error( "SM2 sign data failed." );
         }
         return result;
     }
@@ -101,9 +98,9 @@ public class SM2 {
     /**
      * 验证签名值
      *
-     * @param
-     * @param
-     * @param
+     * @param hash 消息哈希值
+     * @param pubKey 公钥数据
+     * @param sign 签名值
      * @return
      */
     public static int verify(byte[] hash, byte[] pubKey, byte[] sign) {
@@ -119,11 +116,11 @@ public class SM2 {
             logger.error("Invalid sign. It must not be nil or empty.");
             return 1;
         }
-        int result = 0;
+        int result = 1;
         try {
             result = smJniApi.SM2Verify(hash, pubKey, sign);
         } catch (Exception e) {
-            logger.error( "SM2 verify signature error: SM2Verify failed" );
+            logger.error( "SM2 verify signature failed." );
         }
         return result;
     }

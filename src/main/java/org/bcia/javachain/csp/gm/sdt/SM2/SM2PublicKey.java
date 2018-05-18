@@ -21,7 +21,7 @@ import org.bcia.javachain.csp.gm.sdt.SM3.SM3;
  * GM SM2公钥
  *
  * @author tengxiumin
- * @date 5/16/18
+ * @date 2018/05/16
  * @company SDT
  */
 public class SM2PublicKey extends SM2Key {

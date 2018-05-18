@@ -19,7 +19,7 @@ package org.bcia.javachain.csp.gm.sdt.common;
  * Constant
  *
  * @author tengxiumin
- * @date 5/14/18
+ * @date 2018/05/14
  * @company SDT
  */
 public class Constants {

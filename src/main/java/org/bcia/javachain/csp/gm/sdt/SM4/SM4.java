@@ -25,7 +25,7 @@ import org.bcia.javachain.csp.gm.sdt.jni.SMJniApi;
  * GM SM4 algorithm
  *
  * @author tengxiumin
- * @date 5/14/18
+ * @date 2018/05/14
  * @company SDT
  */
 public class SM4 {
@@ -35,10 +35,11 @@ public class SM4 {
 
     private static final int TYPE_ENCRYPT = 0;
     private static final int TYPE_DECRYPT = 1;
+
     /**
      * sm4密钥生成
      *
-     * @return
+     * @return 密钥
      */
     public static byte[] SM4KeyGen(){
         byte[] result = null;
@@ -53,9 +54,9 @@ public class SM4 {
     /**
      * ECB模式对数据进行加密
      *
-     * @param plainData
-     * @param sm4Key
-     * @return
+     * @param plainData 明文数据
+     * @param sm4Key 密钥
+     * @return 密文数据
      */
     public byte[] encryptECB(byte[] plainData, byte[] sm4Key){
         if(null == plainData || 0 == plainData.length) {
@@ -72,11 +73,11 @@ public class SM4 {
     }
 
     /**
-     * ECB模式对加密的数据进行解密
+     * ECB模式对密文数据进行解密
      *
-     * @param cipherData 加密的数据
+     * @param cipherData 密文数据
      * @param sm4Key 密钥
-     * @return
+     * @return 明文数据
      */
     public byte[] decryptECB(byte[] cipherData, byte[] sm4Key) {
         if(null == cipherData || 0 == cipherData.length) {
@@ -139,9 +140,10 @@ public class SM4 {
     /**
      * CBC模式对数据进行加密
      *
-     * @param plainData
-     * @param sm4Key
-     * @return
+     * @param plainData 明文数据
+     * @param sm4Key 密钥
+     * @param iv 初始化向量
+     * @return 密文数据
      */
     public byte[] encryptCBC(byte[] plainData, byte[] sm4Key, byte[] iv) {
         if(null == plainData || 0 == plainData.length) {
@@ -166,11 +168,12 @@ public class SM4 {
     }
 
     /**
-     * ECB模式对加密的数据进行解密
+     * CBC模式对密文数据进行解密
      *
-     * @param cipherData 加密的数据
+     * @param cipherData 密文数据
      * @param sm4Key 密钥
-     * @return
+     * @param iv 初始化向量
+     * @return 明文数据
      */
     public byte[] decryptCBC(byte[] cipherData, byte[] sm4Key, byte[] iv) {
         if(null == cipherData || 0 == cipherData.length) {

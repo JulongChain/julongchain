@@ -23,7 +23,7 @@ import org.bcia.javachain.csp.gm.sdt.common.Constants;
  * JNI interface definition
  *
  * @author tengxiumin
- * @date 4/24/18
+ * @date 2018/04/24
  * @company SDT
  */
 public class SMJniApi {

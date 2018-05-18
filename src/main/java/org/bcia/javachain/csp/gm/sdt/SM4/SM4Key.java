@@ -22,7 +22,7 @@ import org.bcia.javachain.csp.intfs.IKey;
  * GM SM4Key
  *
  * @author tengxiumin
- * @date 5/8/18
+ * @date 2018/05/08
  * @company SDT
  */
 public class SM4Key implements IKey {

@@ -20,10 +20,10 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.csp.gm.sdt.jni.SMJniApi;
 
 /**
- * Generate Random Data
+ * 产生随机数
  *
  * @author tengxiumin
- * @date 18/5/16
+ * @date 2018/05/16
  * @company SDT
  */
 public class GmRandom {

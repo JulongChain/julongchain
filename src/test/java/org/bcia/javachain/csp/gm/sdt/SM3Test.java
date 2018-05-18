@@ -26,12 +26,13 @@ import org.junit.Test;
  * SM3 算法单元测试
  *
  * @author tengxiumin
- * @date 5/16/18
+ * @date 2018/05/16
  * @company SDT
  */
 public class SM3Test {
     private SM3 sm3 = new SM3();
     private SMJniApi jni = new SMJniApi();
+
     @Before
     public void setUp() {
 
@@ -45,141 +46,73 @@ public class SM3Test {
     }
 
     @Test
-    public void testSM3Hash() throws Exception {
+    public void testSM3Hash() {
         System.out.println("============ SM3 Hash test ============ ");
-        /*****************  正常用例集  **************/
-        byte[] msg1 = jni.RandomGen(1);
-        byte[] msg16 = jni.RandomGen(16);
-        byte[] msg32 = jni.RandomGen(32);
-        byte[] msg64 = jni.RandomGen(64);
-        byte[] msg128 = jni.RandomGen(128);
-        byte[] msg256 = jni.RandomGen(256);
-        byte[] msg512 = jni.RandomGen(512);
-        byte[] msg1024 = jni.RandomGen(1024);
-        byte[] msg2048 = new byte[2048];
-        System.arraycopy(msg1024, 0, msg2048, 0, 1024);
-        System.arraycopy(msg1024, 0, msg2048, 1024, 1024);
+        int[] messageLenList = {1, 16, 32, 64, 128, 256, 512, 1024, 4096};
+        hashUnitTest(messageLenList);
+    }
 
-
+    private void hashUnitTest(int[] lists) {
         int caseIndex = 1;
-        try {
-            System.out.println("\n===== case A-"+ caseIndex++ +" :  SM3 msg is 1");
-            byte[] buff = sm3.hash(msg1);
-            System.out.println("   ===== hash data : " + Convert.bytesToHexString(buff));
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case A-"+ caseIndex++ +" :  SM3 msg is 16");
-            byte[] buff = sm3.hash(msg16);
-            System.out.println("   ===== hash data : " + Convert.bytesToHexString(buff));
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case A-"+ caseIndex++ +" :  SM3 msg is 32");
-            byte[] buff = sm3.hash(msg32);
-            System.out.println("   ===== hash data : " + Convert.bytesToHexString(buff));
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case A-"+ caseIndex++ +" :  SM3 msg is 64");
-            byte[] buff = sm3.hash(msg64);
-            System.out.println("   ===== hash data : " + Convert.bytesToHexString(buff));
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case A-"+ caseIndex++ +" :  SM3 msg is 128");
-            byte[] buff = sm3.hash(msg128);
-            System.out.println("   ===== hash data : " + Convert.bytesToHexString(buff));
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case A-"+ caseIndex++ +" :  SM3 msg is 256");
-            byte[] buff = sm3.hash(msg256);
-            System.out.println("   ===== hash data : " + Convert.bytesToHexString(buff));
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case A-"+ caseIndex++ +" :  SM3 msg is 512");
-            byte[] buff = sm3.hash(msg512);
-            System.out.println("   ===== hash data : " + Convert.bytesToHexString(buff));
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case A-"+ caseIndex++ +" :  SM3 msg is 1024");
-            byte[] buff = sm3.hash(msg1024);
-            System.out.println("   ===== hash data : " + Convert.bytesToHexString(buff));
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case A-"+ caseIndex++ +" :  SM3 msg is 2048");
-            byte[] buff = sm3.hash(msg2048);
-            System.out.println("   ===== hash data : " + Convert.bytesToHexString(buff));
-        } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+        for(int i = 0; i < lists.length; i++) {
+            try {
+                int msgLen = lists[i];
+                System.out.println("\n===== case "+ caseIndex++ +" :  message length is " + msgLen);
+                byte[] msg = new byte[msgLen];
+                if(msgLen > 1024) {
+                    int leftLen = msgLen;
+                    while (leftLen > 0) {
+                        int len = leftLen;
+                        if(len > 1024) {
+                            len = 1024;
+                        }
+                        byte[] randomData = jni.RandomGen(len);
+                        System.arraycopy(randomData, 0, msg, msgLen-leftLen, len);
+                        leftLen = leftLen - len;
+                    }
+                } else {
+                    msg = jni.RandomGen(msgLen);
+                }
+                System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
+                byte[] hash = sm3.hash(msg);
+                if (null != hash) {
+                    System.out.println("[output data] hash data : " + Convert.bytesToHexString(hash));
+                } else {
+                    System.out.println("[**Error**] compute hash data failed");
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 
     @Test
-    public void testSM3HashInvalidParameters() throws Exception {
+    public void testSM3HashInvalidParameters() {
 
         byte[] msg0 = new byte[0];
-        byte[] msg1024 = jni.RandomGen(1024);
-        byte[] msg4096 = new byte[4096];
-        System.arraycopy(msg1024, 0, msg4096, 0, 1024);
-        System.arraycopy(msg1024, 0, msg4096, 1024, 1024);
-        System.arraycopy(msg1024, 0, msg4096, 2048, 1024);
-        System.arraycopy(msg1024, 0, msg4096, 3072, 1024);
-        byte[] msg8192 = new byte[8192];
-        System.arraycopy(msg4096, 0, msg8192, 0, 4096);
-        System.arraycopy(msg4096, 0, msg8192, 4096, 4096);
         int caseIndex = 1;
-        /*****************  异常用例集  **************/
         try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  SM3 hash msg is null");
-            byte[] buff = sm3.hash(null);
-            System.out.println("    signature data : " + Convert.bytesToHexString(buff));
+            System.out.println("\n===== case B-"+ caseIndex++ +" :  SM3 hash message is null");
+            byte[] hash = sm3.hash(null);
+            if (null != hash) {
+                System.out.println("[output data] hash data : " + Convert.bytesToHexString(hash));
+            } else {
+                System.out.println("[**Error**] compute hash data failed");
+            }
         } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
+            System.out.println("Exception: " + e.getMessage());
         }
 
         try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  SM3 hash msg is 0");
-            byte[] buff = sm3.hash(msg0);
-            System.out.println("    signature data : " + Convert.bytesToHexString(buff));
+            System.out.println("\n===== case B-"+ caseIndex++ +" :  SM3 hash message length is 0");
+            byte[] hash = sm3.hash(msg0);
+            if (null != hash) {
+                System.out.println("[output data] hash data : " + Convert.bytesToHexString(hash));
+            } else {
+                System.out.println("[**Error**] compute hash data failed");
+            }
         } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  SM3 hash msg is 4096");
-            byte[] buff = sm3.hash(msg4096);
-            System.out.println("    signature data : " + Convert.bytesToHexString(buff));
-        } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
-        }
-
-        try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  SM3 hash msg is 8192");
-            byte[] buff = sm3.hash(msg8192);
-            System.out.println("    signature data : " + Convert.bytesToHexString(buff));
-        } catch (Exception e) {
-            System.out.println("    Exception: " + e.getMessage());
+            System.out.println("Exception: " + e.getMessage());
         }
     }
 }

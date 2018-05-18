@@ -19,7 +19,7 @@
  * GM SM2 公私钥对
  *
  * @author tengxiumin
- * @date 5/16/18
+ * @date 2016/05/16
  * @company SDT
  */
 public class SM2KeyPair {
