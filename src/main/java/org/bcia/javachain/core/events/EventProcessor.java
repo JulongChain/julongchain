@@ -24,6 +24,11 @@ import java.util.Map;
  * @date 2018/05/17
  * @company Dingxuan
  */
-public class EventProcessor {
-//    private Map<Integer, >
+public class EventProcessor implements IEventProcessor {
+    private Map<Integer, IHandlerList> eventConsumers;
+
+    @Override
+    public Map<Integer, IHandlerList> getEventConsumers() {
+        return eventConsumers;
+    }
 }
