@@ -332,7 +332,7 @@ public class SM4Test {
         }
 
         try {
-            System.out.println("\n**** case " + caseIndex++ + ": decryptECB key length is 0 ****");
+            System.out.println("\n**** case " + caseIndex++ + ": decryptECB cipher data length is 0 ****");
             byte[] cipherData0 = new byte[0];
             System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData0));
             System.out.println("[input data] key data: " + Convert.bytesToHexString(TEST_KEY));
