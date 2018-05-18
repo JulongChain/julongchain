@@ -74,6 +74,7 @@ public class SdtGmCsp implements ICsp {
         this.sm4 = new SM4();
         this.gmRandom = new GmRandom();
         this.config = new Config();
+        loadConfig();
     }
 
     private void loadConfig() {
@@ -95,22 +96,40 @@ public class SdtGmCsp implements ICsp {
         if (opts instanceof SM2KeyGenOpts) {
 
             IKey sm2Key = new SM2Key(sm2.generateKeyPair());
-
+            //if not ephemeral, then save it
             if (!opts.isEphemeral()) {
                 String path = KEY_STORE_PATH;
+                String configPrivateKeyPath = config.getNode().getCsp().getSdtgm().getFileKeyStore().getPrivateKeyStore();
+                String configPublicKeyPath = config.getNode().getCsp().getSdtgm().getFileKeyStore().getPublicKeyStore();
+                //save SM2 private key
                 if(null != sdtGmOpts.getPrivateKeyPath() && !"".equals(sdtGmOpts.getPrivateKeyPath())) {
                     path = sdtGmOpts.getPrivateKeyPath();
+                } else if(null != configPrivateKeyPath && !"".equals(configPrivateKeyPath)) {
+                    path = configPrivateKeyPath;
                 }
                 KeysStore.storeKey(path, null, sm2Key, KeysStore.KEY_TYPE_SK);
+                //save SM2 public key
+                path = KEY_STORE_PATH;
+                if(null != sdtGmOpts.getPublicKeyPath() && !"".equals(sdtGmOpts.getPublicKeyPath())) {
+                    path = sdtGmOpts.getPublicKeyPath();
+                } else if(null != configPublicKeyPath && !"".equals(configPublicKeyPath)) {
+                    path = configPublicKeyPath;
+                }
+                KeysStore.storeKey(path, null, sm2Key.getPublicKey(), KeysStore.KEY_TYPE_PK);
             }
             return sm2Key;
         }
         if (opts instanceof SM4KeyGenOpts) {
             IKey sm4Key = new SM4Key();
+            //if not ephemeral, then save it
             if (!opts.isEphemeral()) {
+                //save SM4 key
                 String path = KEY_STORE_PATH;
+                String configKeyPath = config.getNode().getCsp().getSdtgm().getFileKeyStore().getKeyStore();
                 if(null != sdtGmOpts.getKeyPath() && !"".equals(sdtGmOpts.getKeyPath())) {
                     path = sdtGmOpts.getKeyPath();
+                } else if(null != configKeyPath && !"".equals(configKeyPath)) {
+                    path = configKeyPath;
                 }
                 KeysStore.storeKey(path, null, sm4Key, KeysStore.KEY_TYPE_KEY);
             }
@@ -146,6 +165,7 @@ public class SdtGmCsp implements ICsp {
         }
         if (opts instanceof SM2PrivateKeyImportOpts) {
             IKey sm2PrivateKey = new SM2PrivateKey((byte[])raw);
+            //if not ephemeral, then save it
             if (!opts.isEphemeral()) {
                 String path = KEY_STORE_PATH;
                 if(null != sdtGmOpts.getPrivateKeyPath() && !"".equals(sdtGmOpts.getPrivateKeyPath())) {
@@ -158,6 +178,7 @@ public class SdtGmCsp implements ICsp {
 
         if (opts instanceof SM2PublicKeyImportOpts) {
             IKey sm2PublicKey = new SM2PublicKey((byte[])raw);
+            //if not ephemeral, then save it
             if (!opts.isEphemeral()) {
                 String path = KEY_STORE_PATH;
                 if(null != sdtGmOpts.getPublicKeyPath() && !"".equals(sdtGmOpts.getPublicKeyPath())) {
@@ -170,6 +191,7 @@ public class SdtGmCsp implements ICsp {
 
         if (opts instanceof SM4KeyImportOpts) {
             IKey sm4Key = new SM4Key((byte[])raw);
+            //if not ephemeral, then save it
             if (!opts.isEphemeral()) {
                 String path = KEY_STORE_PATH;
                 if(null != sdtGmOpts.getKeyPath() && !"".equals(sdtGmOpts.getKeyPath())) {
