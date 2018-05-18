@@ -27,11 +27,16 @@ import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
  * @company Dingxuan
  */
 public class InprocContainer {
+
     private ISmartContract smartContract;
     private Boolean running;
     private String[] args;
     private String[] env;
     private Chan stopChan;
+
+    public InprocContainer(ISmartContract smartContract) {
+        this.smartContract = smartContract;
+    }
 
     public ISmartContract getSmartContract() {
         return smartContract;

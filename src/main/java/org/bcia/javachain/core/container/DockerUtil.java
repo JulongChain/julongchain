@@ -21,11 +21,17 @@ import com.github.dockerjava.api.model.SearchItem;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.command.BuildImageResultCallback;
 import com.google.common.collect.Sets;
+import com.offbytwo.jenkins.JenkinsServer;
+import com.offbytwo.jenkins.model.Build;
+import com.offbytwo.jenkins.model.JobWithDetails;
+import net.schmizz.sshj.SSHClient;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -163,6 +169,72 @@ public class DockerUtil {
     }
   }
 
+  public static void uploadSmartContractFile(String smartContractFilePath) {
+    SSHClient ssh = new SSHClient();
+    try {
+      ssh.loadKnownHosts();
+      ssh.connect("192.168.1.211", 22);
+      ssh.authPassword("jenkins", "10141516");
+      ssh.newSCPFileTransfer()
+          .upload(
+              smartContractFilePath,
+              "/var/lib/jenkins/workspace/test/src/main/java/org/bcia/javachain/core/smartcontract/client/");
+    } catch (IOException e) {
+      logger.error(e.getMessage(), e);
+    } finally {
+      try {
+        ssh.close();
+      } catch (IOException e) {
+        logger.error(e.getMessage(), e);
+      }
+    }
+  }
+
+  public static void downloadJar() {
+    SSHClient ssh = new SSHClient();
+    try {
+      ssh.loadKnownHosts();
+      ssh.connect("192.168.1.211", 22);
+      ssh.authPassword("jenkins", "10141516");
+      ssh.newSCPFileTransfer()
+          .download(
+              "/var/lib/jenkins/workspace/test/target/javachain-jar-with-dependencies.jar", "D:\\");
+    } catch (IOException e) {
+      logger.error(e.getMessage(), e);
+    } finally {
+      try {
+        ssh.close();
+      } catch (IOException e) {
+        logger.error(e.getMessage(), e);
+      }
+    }
+  }
+
+  public synchronized static void uploadAndGetJar(String smartContractFilePath) throws IOException, URISyntaxException {
+    // 上传SC
+    uploadSmartContractFile(smartContractFilePath);
+
+    // 执行jenkins build
+    JenkinsServer jenkinsServer =
+        new JenkinsServer(new URI("http://192.168.1.211:8080"), "root", "10141516");
+    JobWithDetails testJob = jenkinsServer.getJob("test");
+    testJob.build();
+
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {
+      logger.error(e.getMessage(), e);
+    }
+
+    JobWithDetails details = testJob.details();
+    Build lastBuild = details.getLastBuild();
+
+    while (lastBuild.details().getResult() == null) {}
+
+    // 下载jar包
+    downloadJar();
+  }
+
   public static void main1(String[] args) throws Exception {
     // JenkinsServer jenkinsServer =
     //     new JenkinsServer(new URI("http://192.168.1.211:8080"), "root", "10141516");
@@ -179,23 +251,10 @@ public class DockerUtil {
   }
 
   public static void main(String[] args) throws Exception {
-    // SSHClient ssh = new SSHClient();
-    // ssh.loadKnownHosts();
-    // ssh.connect("192.168.1.211", 22);
-    // // ssh.authPublickey("root");
-    // ssh.authPublickey("wanliangbing");
-    //
-    // // ssh.newSCPFileTransfer()
-    // //     .download(
-    // //         "/var/lib/jenkins/workspace/test/src/main/java/org/bcia/javachain/core/smartcontract/client/aaa.txt",
-    // //         "D:\\javachain");
-    //
-    // ssh.newSCPFileTransfer()
-    //     .upload(
-    //         "D:\\javachain\\pom.xml",
-    //         "/var/lib/jenkins/workspace/test/src/main/java/org/bcia/javachain/core/smartcontract/client/");
-    //
-    // ssh.close();
+    // uploadSmartContractFile("D:\\Dockerfile");
 
+    // downloadJar();
+
+    uploadAndGetJar("D:\\abcd.txt");
   }
 }

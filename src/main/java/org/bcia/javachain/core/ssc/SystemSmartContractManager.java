@@ -15,9 +15,11 @@
  */
 package org.bcia.javachain.core.ssc;
 
+import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.exception.SysSmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.container.inproccontroller.InprocController;
 import org.bcia.javachain.core.node.NodeConfig;
 import org.bcia.javachain.core.node.NodeConfigFactory;
 import org.bcia.javachain.core.ssc.cssc.CSSC;
@@ -52,7 +54,7 @@ import java.util.Map;
 @Component
 public class SystemSmartContractManager implements ISystemSmartContractManager {
     private SystemSmartContractDescriptor[] embedContractDescriptors = new SystemSmartContractDescriptor[5];
-    private Map<String, ISystemSmartContract> map = new HashMap<String, ISystemSmartContract>();
+    private Map<String, ISystemSmartContract> sysSCMap = new HashMap<String, ISystemSmartContract>();
     private static JavaChainLog log = JavaChainLogFactory.getLog(SystemSmartContractManager.class);
     @Autowired
     private CSSC cssc;
@@ -64,6 +66,8 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
     private QSSC qssc;
     @Autowired
     private VSSC vssc;
+    @Autowired
+    private InprocController controller;
 
     @Autowired
     public SystemSmartContractManager() {
@@ -138,7 +142,7 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
      * @param contract 要注册的系统合约
      * @return 是否注册成功
      */
-    private boolean registerSysSmartContract(ISystemSmartContract contract) {
+    private boolean registerSysSmartContract(ISystemSmartContract contract){
         if(contract.getSystemSmartContractDescriptor().isEnabled()==false||
                 isWhitelisted(contract)==false){
             log.info("System Smartcontract ({},{},{}) disabled",
@@ -148,9 +152,16 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
             return false;
         }
 
+        try {
+            controller.register(contract.getSystemSmartContractDescriptor().getSSCPath(),contract);
+        } catch (SmartContractException e) {
+            log.error("Register system contract {} failed:{}",contract.getSmartContractID(),e.getMessage());
+            return false;
+        }
+
         String contractID = contract.getSmartContractID();
         log.info("Register system contract [%s]", contractID);
-        map.put(contractID, contract);
+        sysSCMap.put(contractID, contract);
         return true;
     }
 
@@ -167,7 +178,7 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
 
     @Override
     public boolean isSysSmartContract(String smartContractID) {
-        ISystemSmartContract sysSmartContract = map.get(smartContractID);
+        ISystemSmartContract sysSmartContract= sysSCMap.get(smartContractID);
         if(sysSmartContract!=null)
             return true;
         return false;

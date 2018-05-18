@@ -16,21 +16,13 @@
 
 package org.bcia.javachain.common.policycheck.cauthdsl;
 
+import org.bcia.javachain.common.cauthdsl.PolicyProvider;
 import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policies.IPolicy;
-import org.bcia.javachain.common.policycheck.bean.MSPPrincipal;
-import org.bcia.javachain.common.policycheck.bean.PolicyBean;
-import org.bcia.javachain.common.policycheck.bean.Provider;
-import org.bcia.javachain.common.policycheck.bean.SignaturePolicyEnvelope;
 import org.bcia.javachain.common.util.proto.SignedData;
-import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.IIdentityDeserializer;
-import org.bcia.javachain.msp.mgmt.Msp;
-import org.bcia.javachain.protos.common.MspPrincipal;
-
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 
@@ -42,64 +34,56 @@ import java.util.List;
  * @company Aisino
  */
 public class Policy implements IPolicy{
-    //在policy.go中实现了Policy接口，定义和实现了策略对象提供者provider，
     private static JavaChainLog log = JavaChainLogFactory.getLog(Policy.class);
+
+    private IIdentityDeserializer deserializer;
+    private Boolean evalutor;
+
+    public IIdentityDeserializer getDeserializer() {
+        return deserializer;
+    }
+
+    public void setDeserializer(IIdentityDeserializer deserializer) {
+        this.deserializer = deserializer;
+    }
+
+    public Boolean getEvalutor() {
+        return evalutor;
+    }
+
+    public void setEvalutor(Boolean evalutor) {
+        this.evalutor = evalutor;
+    }
 
     @Override
     /**
      * 签名策略评估
      */
     public void evaluate(List<SignedData> signatureList) throws PolicyException {
-        Msp msp = new Msp();
-           //删除重复身份
-        MSPPrincipal identities = new MSPPrincipal();
-        try {
-            //TODO 待完善     //评估这组签名是否满足策略
-        }catch (Exception e){
-            log.info("Failed to authenticate policy");
-            throw new PolicyException(e);
+        Boolean[] bool = new Boolean[signatureList.size()];
+        if(this == null){
+            log.info("No sEvaluateuch policy");
         }
-
+            Boolean ok = this.evalutor(Cauthdsl.deduplicate(signatureList,this.deserializer),bool);//评估这组签名是否满足策略
+            if(!ok){
+                log.info("Failed to authenticate policy");
+            }
+    }
+    public Boolean evalutor(List<SignedData> signedDatas,Boolean[] bools){
+        return true;
     }
 
     /**
-     * 生成策略提供者
-     * @param msp
-     * @param data
+     * 为cauthdsl类型策略提供策略生成器
+     * @param deserializer
      * @return
      */
-    public IIdentity NewPolicyProvider(Msp msp,byte[] data){
-        return msp.deserializeIdentity(data);
+    public PolicyProvider NewPolicyProvider(IIdentityDeserializer deserializer){
+        PolicyProvider policyProvider = new PolicyProvider();
+        policyProvider.setDeserializer(deserializer);
+        return policyProvider;
 
     }
 
-    /**
-     * 生成新策略
-     * @param data
-     * @return
-     */
-    public PolicyBean NewPolicy(byte[] data){
 
-        SignaturePolicyEnvelope sigPolicy = new SignaturePolicyEnvelope();
-
-        Provider provider = new Provider();
-        Msp msp = new Msp();
-
-
-
-        boolean compiled = false;//进行策略评估
-
-        PolicyBean policyBean = new PolicyBean();
-        if(sigPolicy.version != 0){
-            log.info("Error unmarshaling to SignaturePolicy");
-            return null;
-        }
-
-            //compiled = Cauthdsl.compile(sigPolicy.rule.isSignaturePolicy_type,sigPolicy.iIdentitys,);
-
-        //TODO 待完善
-        policyBean.setEvalutor(compiled);
-        policyBean.setDeserializer(msp.deserializeIdentity(data));
-        return policyBean;
-    }
 }

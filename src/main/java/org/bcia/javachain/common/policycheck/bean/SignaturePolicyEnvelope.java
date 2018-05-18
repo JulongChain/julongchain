@@ -28,9 +28,9 @@ import org.bcia.javachain.protos.common.MspPrincipal;
  * @company Aisino
  */
 public class SignaturePolicyEnvelope {
-    public int version;
-    public SignaturePolicy rule;
-    public MspPrincipal[] iIdentitys;
+    private int version;
+    private SignaturePolicy rule;
+    private MspPrincipal[] iIdentitys;
 
     public int getVersion() {
         return version;

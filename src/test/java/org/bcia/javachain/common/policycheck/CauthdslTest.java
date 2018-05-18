@@ -16,6 +16,10 @@
 
 package org.bcia.javachain.common.policycheck;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 /**
  * 类描述
  *
@@ -24,4 +28,18 @@ package org.bcia.javachain.common.policycheck;
  * @company Aisino
  */
 public class CauthdslTest {
+    @Before
+    public void setUp() {
+        System.out.println("setup...");
+    }
+
+    @After
+    public void finalize(){
+        System.out.println("finalize...");
+    }
+
+    @Test
+    public void Testdeduplicate(){
+        System.out.println("hh");
+    }
 }

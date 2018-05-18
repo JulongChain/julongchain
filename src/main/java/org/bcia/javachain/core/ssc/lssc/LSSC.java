@@ -213,14 +213,14 @@ public class LSSC  extends SystemSmartContractBase {
                 if(size>4 && args.get(4).length!=0){
                     essc=args.get(4);
                 }else{
-                    essc=ByteString.copyFromUtf8("ESSC").toByteArray();
+                    essc=ByteString.copyFromUtf8("essc").toByteArray();
                 }
 
                 byte[] vssc=null;
                 if(size>5 && args.get(5).length!=0){
                     vssc=args.get(5);
                 }else{
-                    vssc=ByteString.copyFromUtf8("VSSC").toByteArray();
+                    vssc=ByteString.copyFromUtf8("vssc").toByteArray();
                 }
 
                 byte[] collectionsConfig=null;
@@ -801,8 +801,8 @@ public class LSSC  extends SystemSmartContractBase {
         support.checkInstantiationPolicy(sp,groupName,scdLedger.getInstantiationPolicy().toByteArray());
         //retain chaincode specific data and fill channel specific ones
         SmartContractDataPackage.SmartContractData.Builder builder = scdata.toBuilder();
-        builder.setEssc(ByteString.copyFrom(essc).toString());
-        builder.setVssc(ByteString.copyFrom(vssc).toString());
+        builder.setEssc(ByteString.copyFrom(essc).toStringUtf8());
+        builder.setVssc(ByteString.copyFrom(vssc).toStringUtf8());
         builder.setPolicy(ByteString.copyFrom(policy));
         builder.setInstantiationPolicy(ByteString.copyFrom(support.getInstantiationPolicy(groupName,scPackage)));
         SmartContractDataPackage.SmartContractData builtScData=builder.build();
