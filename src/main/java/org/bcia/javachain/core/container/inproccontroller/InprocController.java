@@ -15,8 +15,10 @@
  */
 package org.bcia.javachain.core.container.inproccontroller;
 
+import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ssc.ISystemSmartContract;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,8 +31,26 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class InprocController {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(InprocContainer.class);
+    private JavaChainLog log = JavaChainLogFactory.getLog(InprocContainer.class);
+
     private Map<String,InprocContainer> typeRegistry=new HashMap<String,InprocContainer>();
     private Map<String,InprocContainer>  instRegistry=new HashMap<String,InprocContainer>();
 
+    public void register(String sscPath, ISystemSmartContract contract) throws SmartContractException{
+        InprocContainer tmp=typeRegistry.get(sscPath);
+        if(tmp!=null){
+             String msg=String.format("%s already registered",sscPath);
+             throw new SmartContractException(msg);
+        }
+        InprocContainer container=new InprocContainer(contract);
+        typeRegistry.put(sscPath,container);
+    }
+
+    public Map<String, InprocContainer> getTypeRegistry() {
+        return typeRegistry;
+    }
+
+    public Map<String, InprocContainer> getInstRegistry() {
+        return instRegistry;
+    }
 }
