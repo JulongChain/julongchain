@@ -32,7 +32,7 @@ public interface IHandlerList {
 
     boolean add(EventsPackage.Interest interest, EventHandler eventHandler) throws ValidateException;
 
-    boolean delete(EventsPackage.Interest interest, EventHandler eventHandler);
+    boolean delete(EventsPackage.Interest interest, EventHandler eventHandler) throws ValidateException;
 
     void foreach(EventsPackage.Event event, IHandlerAction action);
 }

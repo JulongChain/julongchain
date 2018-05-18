@@ -37,7 +37,7 @@ public class EventsUtils {
     }
 
     public static void deRegisterHandler(IEventProcessor eventProcessor, EventsPackage.Interest interest,
-                                         EventHandler eventHandler) {
+                                         EventHandler eventHandler) throws ValidateException {
         synchronized (eventProcessor) {
             IHandlerList handlerList = eventProcessor.getEventConsumers().get(interest.getEventTypeValue());
             if (handlerList != null) {

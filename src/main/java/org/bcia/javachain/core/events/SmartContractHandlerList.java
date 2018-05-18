@@ -15,11 +15,14 @@
  */
 package org.bcia.javachain.core.events;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.protos.node.EventsPackage;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,7 +33,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class SmartContractHandlerList implements IHandlerList {
-    private Map<String, Map<String, IEventHandler>> handlers = new HashMap<String, Map<String, IEventHandler>>();
+    private Map<String, Map<String, List<IEventHandler>>> handlers = new HashMap<>();
 
     @Override
     public boolean add(EventsPackage.Interest interest, EventHandler eventHandler) throws ValidateException {
@@ -45,16 +48,24 @@ public class SmartContractHandlerList implements IHandlerList {
         ValidateUtils.isNotBlank(eventName, "eventName can not be empty");
 
         synchronized (this) {
-            Map<String, IEventHandler> eventHandlerMap = null;
+            Map<String, List<IEventHandler>> eventHandlerMap = null;
             if (!handlers.containsKey(scId)) {
-                eventHandlerMap = new HashMap<String, IEventHandler>();
+                eventHandlerMap = new HashMap<String, List<IEventHandler>>();
                 handlers.put(scId, eventHandlerMap);
             } else {
                 eventHandlerMap = handlers.get(scId);
             }
 
+            List<IEventHandler> eventHandlerList = null;
             if (!eventHandlerMap.containsKey(eventName)) {
-                eventHandlerMap.put(eventName, eventHandler);
+                eventHandlerList = new ArrayList<>();
+                eventHandlerMap.put(eventName, eventHandlerList);
+            } else {
+                eventHandlerList = eventHandlerMap.get(eventName);
+            }
+
+            if (!eventHandlerList.contains(eventHandler)) {
+                eventHandlerList.add(eventHandler);
                 return true;
             } else {
                 return false;
@@ -63,12 +74,65 @@ public class SmartContractHandlerList implements IHandlerList {
     }
 
     @Override
-    public boolean delete(EventsPackage.Interest interest, EventHandler eventHandler) {
-        return false;
+    public boolean delete(EventsPackage.Interest interest, EventHandler eventHandler) throws ValidateException {
+        ValidateUtils.isNotNull(interest, "interest can not be null");
+        ValidateUtils.isNotNull(eventHandler, "eventHandler can not be null");
+        ValidateUtils.isNotNull(interest.getSmartcontractRegInfo(), "smartcontractRegInfo can not be null");
+
+        String scId = interest.getSmartcontractRegInfo().getSmartcontractId();
+        ValidateUtils.isNotBlank(scId, "smartcontractId can not be empty");
+
+        String eventName = interest.getSmartcontractRegInfo().getEventName();
+        ValidateUtils.isNotBlank(eventName, "eventName can not be empty");
+
+        synchronized (this) {
+            Map<String, List<IEventHandler>> eventHandlerMap = null;
+            if (!handlers.containsKey(scId)) {
+                return false;
+            } else {
+                eventHandlerMap = handlers.get(scId);
+            }
+
+            List<IEventHandler> eventHandlerList = null;
+            if (!eventHandlerMap.containsKey(eventName)) {
+                return false;
+            } else {
+                eventHandlerList = eventHandlerMap.get(eventName);
+            }
+
+            if (!eventHandlerList.contains(eventHandler)) {
+                return false;
+            } else {
+                eventHandlerList.remove(eventHandler);
+
+                if (eventHandlerList.size() <= 0) {
+                    eventHandlerMap.remove(eventName);
+                }
+
+                if (eventHandlerMap.size() <= 0) {
+                    handlers.remove(scId);
+                }
+
+                return true;
+            }
+        }
     }
 
     @Override
     public void foreach(EventsPackage.Event event, IHandlerAction action) {
+        if (event.getSmartcontractEvent() != null && action != null) {
+            String scId = event.getSmartcontractEvent().getSmartContractId();
+            String eventName = event.getSmartcontractEvent().getEventName();
+            if (StringUtils.isNotBlank(scId) && StringUtils.isNotBlank(eventName) && handlers.containsKey(scId)) {
+                Map<String, List<IEventHandler>> eventHandlerMap = handlers.get(scId);
 
+                if (eventHandlerMap.containsKey(eventName)) {
+                    List<IEventHandler> eventHandlerList = eventHandlerMap.get(eventName);
+                    for (IEventHandler eventHandler : eventHandlerList) {
+                        action.doAction(eventHandler);
+                    }
+                }
+            }
+        }
     }
 }
