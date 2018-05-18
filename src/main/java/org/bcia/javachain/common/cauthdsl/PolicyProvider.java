@@ -15,16 +15,9 @@
  */
 package org.bcia.javachain.common.cauthdsl;
 
-import org.bcia.javachain.common.log.JavaChainLog;
-import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policies.IPolicy;
-import org.bcia.javachain.common.policycheck.bean.SignaturePolicyEnvelope;
-import org.bcia.javachain.common.policycheck.cauthdsl.Cauthdsl;
-import org.bcia.javachain.common.policycheck.cauthdsl.Policy;
 import org.bcia.javachain.msp.IIdentityDeserializer;
 import org.bcia.javachain.msp.IMspManager;
-
-import java.lang.reflect.InvocationTargetException;
 
 /**
  * 类描述
@@ -34,40 +27,13 @@ import java.lang.reflect.InvocationTargetException;
  * @company Dingxuan
  */
 public class PolicyProvider {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(PolicyProvider.class);
-    private IIdentityDeserializer deserializer;
 
-    public IIdentityDeserializer getDeserializer() {
-        return deserializer;
-    }
+    public PolicyProvider(IIdentityDeserializer deserializer){}
+//    public PolicyProvider(IMspManager manager){
+//
+//    }
 
-    public void setDeserializer(IIdentityDeserializer deserializer) {
-        this.deserializer = deserializer;
-    }
-
-    /*public PolicyProvider(IMspManager manager){
-
-    }*/
-
-    /**
-     * 根据字节传创建一个新策略
-     * @param policyBytes
-     * @return
-     * @throws NoSuchMethodException
-     * @throws IllegalAccessException
-     * @throws InvocationTargetException
-     */
-    public IPolicy newPolicy(byte[] policyBytes) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        Policy policy = new Policy();
-        SignaturePolicyEnvelope sigPolicy = new SignaturePolicyEnvelope();
-        //proto.Unmarshal(data, sigPolicy)
-        if(sigPolicy.getVersion() != 0){
-            log.info("Error unmarshaling to SignaturePolicy");
-            return null;
-        }
-        Boolean compiled = Cauthdsl.compile(sigPolicy.getRule().isSignaturePolicy_type,sigPolicy.getiIdentitys(),deserializer);
-        policy.setEvalutor(compiled);
-        policy.setDeserializer(this.deserializer);
-        return policy;
+    public IPolicy newPolicy(byte[] policyBytes) {
+        return null;
     }
 }
