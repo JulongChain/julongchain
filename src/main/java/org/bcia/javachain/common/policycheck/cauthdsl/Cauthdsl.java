@@ -117,7 +117,7 @@ public class Cauthdsl {
         log.debug(signedDatas+"gate"+grepKey+" evaluation starts");
         int verified = 0;
         Boolean[] _used = new Boolean[used.length];
-        for(int i=0;i<policies.length;i++){
+        for(int i = 0; i < policies.length; i++){
             System.arraycopy(used,0,_used,0,used.length);
             if(policies[i]){       //TODO 待定
                 verified++;
