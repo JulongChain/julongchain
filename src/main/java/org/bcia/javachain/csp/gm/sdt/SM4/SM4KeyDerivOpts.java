@@ -15,52 +15,24 @@
  */
 package org.bcia.javachain.csp.gm.sdt.SM4;
 
-import org.bcia.javachain.csp.gm.sdt.SM3.SM3;
-import org.bcia.javachain.csp.intfs.IKey;
+import org.bcia.javachain.csp.intfs.opts.IKeyDerivOpts;
 
 /**
- * GM SM4Key
+ * GM SM4KeyDerivOpts
  *
  * @author tengxiumin
- * @date 5/8/18
+ * @date 2018/05/17
  * @company SDT
  */
-public class SM4Key implements IKey {
+public class SM4KeyDerivOpts implements IKeyDerivOpts {
 
-    private SM3 sm3;
-    private byte[] sm4Key;
-
-    public SM4Key() {
-        this.sm3 = new SM3();
-        this.sm4Key = SM4.SM4KeyGen();
-    }
-
-    public SM4Key(byte[] sm4Key) {
-        this.sm3 = new SM3();
-        this.sm4Key = sm4Key;
-    }
-
-    public byte[] toBytes() {
-        return sm4Key;
+    @Override
+    public String getAlgorithm() {
+        return "SM4";
     }
 
     @Override
-    public byte[] ski() {
-        return sm3.hash(sm4Key);
-    }
-
-    @Override
-    public boolean isSymmetric() {
+    public boolean isEphemeral() {
         return true;
-    }
-
-    @Override
-    public boolean isPrivate() {
-        return false;
-    }
-
-    @Override
-    public IKey getPublicKey() {
-        return null;
     }
 }

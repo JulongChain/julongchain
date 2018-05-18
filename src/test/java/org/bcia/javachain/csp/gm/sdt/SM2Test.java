@@ -125,6 +125,14 @@ public class SM2Test {
         System.arraycopy(keyPair.getPublicKey(), 0, pk65, 0, 64);
         pk65[64] = (byte)0x89;
 
+        signData = sm2.sign(hash, keyPair.getPrivateKey());
+        byte[] signData0 = new byte[0];
+        byte[] signData63 = new byte[63];
+        System.arraycopy(signData, 0, signData63, 0, 63);
+        byte[] signData65 = new byte[65];
+        System.arraycopy(signData, 0, signData65, 0, 64);
+        signData65[64] = (byte)0x89;
+
         int caseIndex = 1;
         /*****************  异常用例集  **************/
         try {
@@ -192,6 +200,7 @@ public class SM2Test {
         }
 
         signData = sm2.sign(hash, keyPair.getPrivateKey());
+
         try {
             System.out.println("\n===== case B-"+ caseIndex++ +" :  SM2 verify hash is null");
             verifyResult = sm2.verify(null, keyPair.getPublicKey(), signData);
@@ -199,10 +208,99 @@ public class SM2Test {
         } catch (Exception e) {
             System.out.println("    Exception: " + e.getMessage());
         }
+
+        try {
+            System.out.println("\n===== case B-"+ caseIndex++ +" :  SM2 verify hash is 0");
+            verifyResult = sm2.verify(hash0, keyPair.getPublicKey(), signData);
+            System.out.println("    signature verify return : " + verifyResult);
+        } catch (Exception e) {
+            System.out.println("    Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n===== case B-"+ caseIndex++ +" :  SM2 verify hash is 31");
+            verifyResult = sm2.verify(hash31, keyPair.getPublicKey(), signData);
+            System.out.println("    signature verify return : " + verifyResult);
+        } catch (Exception e) {
+            System.out.println("    Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n===== case B-"+ caseIndex++ +" :  SM2 verify hash is 33");
+            verifyResult = sm2.verify(hash33, keyPair.getPublicKey(), signData);
+            System.out.println("    signature verify return : " + verifyResult);
+        } catch (Exception e) {
+            System.out.println("    Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n===== case B-"+ caseIndex++ +" :  SM2 verify pk is null");
+            verifyResult = sm2.verify(hash, null, signData);
+            System.out.println("    signature verify return : " + verifyResult);
+        } catch (Exception e) {
+            System.out.println("    Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n===== case B-"+ caseIndex++ +" :  SM2 verify pk is 0");
+            verifyResult = sm2.verify(hash, pk0, signData);
+            System.out.println("    signature verify return : " + verifyResult);
+        } catch (Exception e) {
+            System.out.println("    Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n===== case B-"+ caseIndex++ +" :  SM2 verify pk is 63");
+            verifyResult = sm2.verify(hash, pk63, signData);
+            System.out.println("    signature verify return : " + verifyResult);
+        } catch (Exception e) {
+            System.out.println("    Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n===== case B-"+ caseIndex++ +" :  SM2 verify pk is 65");
+            verifyResult = sm2.verify(hash, pk65, signData);
+            System.out.println("    signature verify return : " + verifyResult);
+        } catch (Exception e) {
+            System.out.println("    Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n===== case B-"+ caseIndex++ +" :  SM2 verify signData is null");
+            verifyResult = sm2.verify(hash, keyPair.getPublicKey(), null);
+            System.out.println("    signature verify return : " + verifyResult);
+        } catch (Exception e) {
+            System.out.println("    Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n===== case B-"+ caseIndex++ +" :  SM2 verify signData is 0");
+            verifyResult = sm2.verify(hash, keyPair.getPublicKey(), signData0);
+            System.out.println("    signature verify return : " + verifyResult);
+        } catch (Exception e) {
+            System.out.println("    Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n===== case B-"+ caseIndex++ +" :  SM2 verify signData is 63");
+            verifyResult = sm2.verify(hash, keyPair.getPublicKey(), signData63);
+            System.out.println("    signature verify return : " + verifyResult);
+        } catch (Exception e) {
+            System.out.println("    Exception: " + e.getMessage());
+        }
+
+        try {
+            System.out.println("\n===== case B-"+ caseIndex++ +" :  SM2 verify signData is 65");
+            verifyResult = sm2.verify(hash, keyPair.getPublicKey(), signData65);
+            System.out.println("    signature verify return : " + verifyResult);
+        } catch (Exception e) {
+            System.out.println("    Exception: " + e.getMessage());
+        }
+
     }
 
     @Test
-    public void SM2KeyExportTest()  {
+    public void testSM2KeyExport()  {
 
         SM2KeyExport sm2KeyExport = new SM2KeyExport();
         File file = new File( YamlFile );
@@ -218,7 +316,7 @@ public class SM2Test {
     }
 
     @Test
-    public void SM2PublicKeyExportTest() {
+    public void testSM2PublicKeyExport() {
         SM2PublicKeyExport SM2PublicKeyExport = new SM2PublicKeyExport();
         File file = new File( YamlFile );
 

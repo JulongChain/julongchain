@@ -13,27 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.csp.gm.sdt.SM2;
+package org.bcia.javachain.csp.gm.sdt;
 
-import org.bcia.javachain.csp.intfs.opts.IKeyDerivOpts;
+import org.bcia.javachain.csp.factory.ICspFactory;
+import org.bcia.javachain.csp.factory.IFactoryOpts;
+import org.bcia.javachain.csp.intfs.ICsp;
 
 /**
- * GM SM2KeyDerivOpts
+ * SDT GM算法服务工厂
  *
  * @author tengxiumin
- * @date 18/5/16
+ * @date 2018/05/16
  * @company SDT
  */
+public class SdtGmCspFactory implements ICspFactory {
 
-public class SM2KeyDerivOpts implements IKeyDerivOpts {
+    public SdtGmCspFactory(){ }
 
     @Override
-    public String getAlgorithm() {
-        return "SM2";
+    public String getName() {
+        return "SDTGM";
     }
 
     @Override
-    public boolean isEphemeral() {
-        return true;
+    public ICsp getCsp(IFactoryOpts opts) {
+        ISdtGmFactoryOpts sdtGmOpts = (ISdtGmFactoryOpts) opts;
+        SdtGmCsp sdtGmCsp = new SdtGmCsp(sdtGmOpts);
+        return sdtGmCsp;
     }
 }

@@ -15,17 +15,22 @@
  */
 package org.bcia.javachain.csp.gm.sdt.SM2;
 
-import org.bcia.javachain.csp.intfs.opts.IKeyDerivOpts;
+import org.bcia.javachain.csp.intfs.opts.IKeyImportOpts;
 
 /**
- * GM SM2KeyDerivOpts
+ * SM2 私钥导入
  *
  * @author tengxiumin
- * @date 18/5/16
+ * @date 2018/05/17
  * @company SDT
  */
+public class SM2PrivateKeyImportOpts implements IKeyImportOpts {
 
-public class SM2KeyDerivOpts implements IKeyDerivOpts {
+    private boolean isEphemeral;
+
+    public SM2PrivateKeyImportOpts(boolean isEphemeral) {
+        this.isEphemeral=isEphemeral;
+    }
 
     @Override
     public String getAlgorithm() {
@@ -34,6 +39,6 @@ public class SM2KeyDerivOpts implements IKeyDerivOpts {
 
     @Override
     public boolean isEphemeral() {
-        return true;
+        return isEphemeral;
     }
 }

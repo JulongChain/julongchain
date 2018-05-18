@@ -13,27 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.csp.gm.sdt.SM2;
-
-import org.bcia.javachain.csp.intfs.opts.IKeyDerivOpts;
+package org.bcia.javachain.csp.gm.sdt.config;
 
 /**
- * GM SM2KeyDerivOpts
+ * 配置信息
  *
  * @author tengxiumin
- * @date 18/5/16
+ * @date 2018/05/17
  * @company SDT
  */
+public class Config {
 
-public class SM2KeyDerivOpts implements IKeyDerivOpts {
+    private NodeConfig node;
 
-    @Override
-    public String getAlgorithm() {
-        return "SM2";
+    public NodeConfig getNode() {
+        return node;
     }
 
-    @Override
-    public boolean isEphemeral() {
-        return true;
+    public void setNode(NodeConfig node) {
+        this.node = node;
     }
 }

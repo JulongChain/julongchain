@@ -116,6 +116,9 @@ public class SMJniApi {
         } catch (Exception e) {
             throw new JavaChainException(getErrorMsg(Integer.parseInt(e.getMessage())));
         }
+        if(0 != result) {
+            throw new JavaChainException(getErrorMsg(result));
+        }
         return result;
     }
 
