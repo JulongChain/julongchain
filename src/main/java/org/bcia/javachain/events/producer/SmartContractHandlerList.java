@@ -123,13 +123,15 @@ public class SmartContractHandlerList implements IHandlerList {
         if (event.getSmartcontractEvent() != null && action != null) {
             String scId = event.getSmartcontractEvent().getSmartContractId();
             String eventName = event.getSmartcontractEvent().getEventName();
-            if (StringUtils.isNotBlank(scId) && StringUtils.isNotBlank(eventName) && handlers.containsKey(scId)) {
-                Map<String, List<IEventHandler>> eventHandlerMap = handlers.get(scId);
+            synchronized (this) {
+                if (StringUtils.isNotBlank(scId) && StringUtils.isNotBlank(eventName) && handlers.containsKey(scId)) {
+                    Map<String, List<IEventHandler>> eventHandlerMap = handlers.get(scId);
 
-                if (eventHandlerMap.containsKey(eventName)) {
-                    List<IEventHandler> eventHandlerList = eventHandlerMap.get(eventName);
-                    for (IEventHandler eventHandler : eventHandlerList) {
-                        action.doAction(eventHandler);
+                    if (eventHandlerMap.containsKey(eventName)) {
+                        List<IEventHandler> eventHandlerList = eventHandlerMap.get(eventName);
+                        for (IEventHandler eventHandler : eventHandlerList) {
+                            action.doAction(eventHandler);
+                        }
                     }
                 }
             }
