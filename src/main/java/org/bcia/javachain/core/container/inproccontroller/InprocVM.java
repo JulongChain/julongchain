@@ -67,7 +67,7 @@ public class InprocVM implements VM {
         return null;
     }
 
-    public InprocController getInstance(Context context, InprocController
+    public InprocVM getInstance(Context context, InprocContainer
             ipctemplate, String instName, String[] args, String[] env) {
         return null;
     }

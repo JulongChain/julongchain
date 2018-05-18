@@ -28,15 +28,17 @@ import java.io.IOException;
  * @author zhangmingyang
  * @Date: 2018/3/2
  * @company Dingxuan
- */public class VersionCmd implements IConsenterCmd{
+ */
+public class VersionCmd implements IConsenterCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(VersionCmd.class);
- //   @Autowired
-    public   ConsenterServer consenterServer;
+    //   @Autowired
+    public ConsenterServer consenterServer;
     private static final String VERSION = "version";
-     public VersionCmd() {
-         //consenterServer= new VersionCmd();
-         //VersionCmd versionCmd=new VersionCmd();
-         consenterServer=new ConsenterServer();
+
+    public VersionCmd() {
+        //consenterServer= new VersionCmd();
+        //VersionCmd versionCmd=new VersionCmd();
+        consenterServer = new ConsenterServer();
     }
 
     @Override
@@ -48,7 +50,7 @@ import java.io.IOException;
         //需要支持peer node start, 无需参数
         options.addOption(VERSION, false, "start peer node");
         //需要支持peer node start/peer node status
-       CommandLineParser parser = new DefaultParser();
+        CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
         String defaultValue = "UnKown";
         if (cmd.hasOption(VERSION)) {

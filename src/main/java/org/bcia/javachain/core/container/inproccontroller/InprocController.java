@@ -15,60 +15,42 @@
  */
 package org.bcia.javachain.core.container.inproccontroller;
 
-import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
+import org.bcia.javachain.common.exception.SmartContractException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ssc.ISystemSmartContract;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 类描述
  *
  * @author sunianle
- * @date 3/7/18
+ * @date @date 2018/05/17
  * @company Dingxuan
  */
 public class InprocController {
+    private JavaChainLog log = JavaChainLogFactory.getLog(InprocContainer.class);
 
-    private ISmartContract smartContract;
-    private Boolean running;
-    private String[] args;
-    private String[] env;
-    private Chan stopChan;
+    private Map<String,InprocContainer> typeRegistry=new HashMap<String,InprocContainer>();
+    private Map<String,InprocContainer>  instRegistry=new HashMap<String,InprocContainer>();
 
-    public ISmartContract getSmartContract() {
-        return smartContract;
+    public void register(String sscPath, ISystemSmartContract contract) throws SmartContractException{
+        InprocContainer tmp=typeRegistry.get(sscPath);
+        if(tmp!=null){
+             String msg=String.format("%s already registered",sscPath);
+             throw new SmartContractException(msg);
+        }
+        InprocContainer container=new InprocContainer(contract);
+        typeRegistry.put(sscPath,container);
     }
 
-    public void setSmartContract(ISmartContract smartContract) {
-        this.smartContract = smartContract;
+    public Map<String, InprocContainer> getTypeRegistry() {
+        return typeRegistry;
     }
 
-    public Boolean getRunning() {
-        return running;
-    }
-
-    public void setRunning(Boolean running) {
-        this.running = running;
-    }
-
-    public String[] getArgs() {
-        return args;
-    }
-
-    public void setArgs(String[] args) {
-        this.args = args;
-    }
-
-    public String[] getEnv() {
-        return env;
-    }
-
-    public void setEnv(String[] env) {
-        this.env = env;
-    }
-
-    public Chan getStopChan() {
-        return stopChan;
-    }
-
-    public void setStopChan(Chan stopChan) {
-        this.stopChan = stopChan;
+    public Map<String, InprocContainer> getInstRegistry() {
+        return instRegistry;
     }
 }

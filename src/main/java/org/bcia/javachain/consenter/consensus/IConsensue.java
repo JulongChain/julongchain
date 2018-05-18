@@ -26,5 +26,5 @@ import java.util.Map;
  * @company Dingxuan
  */
 public interface IConsensue {
-     IChain handleChain(IConsenterSupport consenterSupport, Common.Metadata metadata) throws IllegalAccessException, InstantiationException;
+     IChain handleChain(IConsenterSupport consenterSupport, Common.Metadata metadata);
 }

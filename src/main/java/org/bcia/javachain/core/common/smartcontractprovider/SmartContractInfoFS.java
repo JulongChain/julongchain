@@ -15,17 +15,23 @@
  */
 package org.bcia.javachain.core.common.smartcontractprovider;
 
+import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.node.Smartcontract;
 
 /**
  * SmartContractInfoFS provides the implementation for SC on the FS and the access to it
  * It implements ISmartContractCacheSupport
  *
- * @author sunianle
+ * @author sunianle, sunzongyu
  * @date 5/11/18
  * @company Dingxuan
  */
 public class SmartContractInfoFS implements ISmartContractCacheSupport {
+
+    private static final JavaChainLog log = JavaChainLogFactory.getLog(SmartContractInfoFS.class);
 
     /**
      * GetSmartContractFromFS  this is a wrapper for hiding package implementation.
@@ -35,7 +41,23 @@ public class SmartContractInfoFS implements ISmartContractCacheSupport {
      */
     @Override
     public ISmartContractPackage getSmartContract(String name, String version) {
-        return null;
+        SDSPackage scsdsPackage = new SDSPackage();
+        try {
+            scsdsPackage.initFromFS(name, version);
+        } catch (JavaChainException e) {
+            log.info(e.getMessage(), e);
+            log.info("Trying SignedSDSPackage");
+            SignedSDSPackage sscsdsPackage= new SignedSDSPackage();
+            try {
+                sscsdsPackage.initFromFS(name, version);
+            } catch (JavaChainException e1) {
+                log.info(e1.getMessage(), e1);
+                log.info("Can not init from fs");
+                return null;
+            }
+            return sscsdsPackage;
+        }
+        return scsdsPackage;
     }
 
     /**
@@ -44,8 +66,11 @@ public class SmartContractInfoFS implements ISmartContractCacheSupport {
      * @param deploymentSpec
      * @return
      */
-    public ISmartContractPackage putSmartContract(Smartcontract.SmartContractDeploymentSpec deploymentSpec){
-        return null;
+    public ISmartContractPackage putSmartContract(Smartcontract.SmartContractDeploymentSpec deploymentSpec) throws JavaChainException{
+        SDSPackage sdsPackage = new SDSPackage();
+        sdsPackage.initFromBuffer(deploymentSpec.toByteArray());
+        sdsPackage.putSmartcontractToFS();
+        return sdsPackage;
     }
 
 

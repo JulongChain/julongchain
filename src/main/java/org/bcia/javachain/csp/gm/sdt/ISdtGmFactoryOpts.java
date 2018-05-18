@@ -18,13 +18,13 @@ package org.bcia.javachain.csp.gm.sdt;
 import org.bcia.javachain.csp.factory.IFactoryOpts;
 
 /**
- * GM algorithm IGmFactoryOpts
+ * SDT GM algorithm IGmFactoryOpts
  *
  * @author tengxiumin
- * @date 18/5/16
+ * @date 2018/05/16
  * @company SDT
  */
-public interface IGmFactoryOpts extends IFactoryOpts {
+public interface ISdtGmFactoryOpts extends IFactoryOpts {
     //Algorithm options.
     int getSecLevel();
     String getHashFamily();
@@ -33,4 +33,17 @@ public interface IGmFactoryOpts extends IFactoryOpts {
     boolean isEphemeral();
     String getKeyStorePath();
     boolean isDummyKeystore();
+
+    String getSymmetricKeyType();
+    String getAsymmetricKeyType();
+    String getHashType();
+    String getSignType();
+    String getPublicKeyPath();
+    String getPrivateKeyPath();
+    String getKeyPath();
+    boolean isbEphemeral();
+    boolean isbDummyKeyStore();
+    boolean isbDefaultCsp();
+
+
 }

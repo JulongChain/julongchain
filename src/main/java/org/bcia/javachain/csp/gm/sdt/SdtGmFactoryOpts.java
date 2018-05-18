@@ -16,13 +16,13 @@
 package org.bcia.javachain.csp.gm.sdt;
 
 /**
- * GM algorithm factory options
+ * SDT GM algorithm factory options
  *
  * @author tengxiumin
- * @date 18/5/16
+ * @date 2018/05/16
  * @company SDT
  */
-public class GmFactoryOpts implements IGmFactoryOpts {
+public class SdtGmFactoryOpts implements ISdtGmFactoryOpts {
 
     private String symmetricKeyType;
     private String asymmetricKeyType;
@@ -30,6 +30,7 @@ public class GmFactoryOpts implements IGmFactoryOpts {
     private String signType;
     private String publicKeyPath;
     private String privateKeyPath;
+    private String keyPath;
     private int secLevel;
     private String hashFamily;
     private boolean bEphemeral;
@@ -37,21 +38,25 @@ public class GmFactoryOpts implements IGmFactoryOpts {
     private String keyStorePath;
     private boolean bDefaultCsp;
 
-    public GmFactoryOpts() {
+    public SdtGmFactoryOpts() {
     }
 
-    public GmFactoryOpts(String symmetricKeyType, String asymmetricKeyType, String hashType, String signType, String publicKeyPath, String privateKeyPath) {
+    public SdtGmFactoryOpts(String symmetricKeyType, String asymmetricKeyType,
+                            String hashType, String signType,
+                            String publicKeyPath, String privateKeyPath,
+                            String keyPath) {
         this.symmetricKeyType = symmetricKeyType;
         this.asymmetricKeyType = asymmetricKeyType;
         this.hashType = hashType;
         this.signType = signType;
         this.publicKeyPath = publicKeyPath;
         this.privateKeyPath = privateKeyPath;
+        this.keyPath = keyPath;
     }
 
     @Override
     public String getProviderName() {
-        return "GM";
+        return "SDTGM";
     }
 
     @Override
@@ -66,12 +71,12 @@ public class GmFactoryOpts implements IGmFactoryOpts {
 
     @Override
     public int getSecLevel() {
-        return 0;
+        return 256;
     }
 
     @Override
     public String getHashFamily() {
-        return null;
+        return "SM3";
     }
 
     @Override
@@ -80,13 +85,50 @@ public class GmFactoryOpts implements IGmFactoryOpts {
     }
 
     @Override
-    public String getKeyStorePath() {
-        return null;
-    }
+    public String getKeyStorePath() { return keyStorePath; }
 
     @Override
     public boolean isDummyKeystore() {
         return bDefaultCsp;
     }
 
+    public String getSymmetricKeyType() {
+        return symmetricKeyType;
+    }
+
+    public String getAsymmetricKeyType() {
+        return asymmetricKeyType;
+    }
+
+    public String getHashType() {
+        return hashType;
+    }
+
+    public String getSignType() {
+        return signType;
+    }
+
+    public String getPublicKeyPath() {
+        return publicKeyPath;
+    }
+
+    public String getPrivateKeyPath() {
+        return privateKeyPath;
+    }
+
+    public String getKeyPath() {
+        return keyPath;
+    }
+
+    public boolean isbEphemeral() {
+        return bEphemeral;
+    }
+
+    public boolean isbDummyKeyStore() {
+        return bDummyKeyStore;
+    }
+
+    public boolean isbDefaultCsp() {
+        return bDefaultCsp;
+    }
 }

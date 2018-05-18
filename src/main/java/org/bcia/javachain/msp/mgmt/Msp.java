@@ -35,6 +35,7 @@ import org.bcia.javachain.protos.msp.Identities;
 import org.bcia.javachain.protos.msp.MspConfigPackage;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.CertificateList;
+import org.bouncycastle.asn1.x509.Time;
 import org.bouncycastle.util.io.pem.PemReader;
 
 import java.io.ByteArrayInputStream;

@@ -25,6 +25,9 @@ import org.bcia.javachain.protos.node.EventsPackage;
  * @company Dingxuan
  */
 public class EventHubServer implements IEventHubServer {
+
+
+
     @Override
     public EventsPackage.Event chat(EventsPackage.SignedEvent value) {
         return null;
