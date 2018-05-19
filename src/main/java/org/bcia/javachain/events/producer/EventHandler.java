@@ -158,4 +158,15 @@ public class EventHandler implements IEventHandler {
 
         return event;
     }
+
+    @Override
+    public Date getSessionEndDate() {
+        return sessionEndDate;
+    }
+
+    @Override
+    public void sendMessage(EventsPackage.Event event) {
+
+
+    }
 }

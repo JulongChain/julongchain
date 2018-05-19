@@ -13,26 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.events.producer;
+package org.bcia.javachain.events.consumer;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.protos.node.EventsPackage;
 
-import java.util.Date;
+import java.util.List;
 
 /**
  * 类描述
  *
  * @author zhouhui
- * @date 2018/05/18
+ * @date 2018/05/19
  * @company Dingxuan
  */
-public interface IEventHandler {
-    EventsPackage.Event handleMessage(EventsPackage.SignedEvent signedEvent) throws
-            InvalidProtocolBufferException, ValidateException;
+public interface IEventAdapter {
+    List<EventsPackage.Interest> getInterestedEvents();
 
-    Date getSessionEndDate();
+    boolean receive(EventsPackage.Event event);
 
-    void sendMessage(EventsPackage.Event event);
+    void disconnected();
 }

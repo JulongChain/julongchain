@@ -133,7 +133,8 @@ public class NodeGrpcServer {
 
     private class EndorserServerImpl extends EndorserGrpc.EndorserImplBase {
         @Override
-        public void processProposal(ProposalPackage.SignedProposal request, StreamObserver<ProposalResponsePackage.ProposalResponse> responseObserver) {
+        public void processProposal(ProposalPackage.SignedProposal request, StreamObserver<ProposalResponsePackage
+                .ProposalResponse> responseObserver) {
             if (endorserServer != null) {
                 ProposalResponsePackage.ProposalResponse proposalResponse = null;
                 try {
@@ -181,7 +182,8 @@ public class NodeGrpcServer {
         }
 
         @Override
-        public StreamObserver<Common.Envelope> deliverFiltered(StreamObserver<EventsPackage.DeliverResponse> responseObserver) {
+        public StreamObserver<Common.Envelope> deliverFiltered(StreamObserver<EventsPackage.DeliverResponse>
+                                                                               responseObserver) {
             return new StreamObserver<Common.Envelope>() {
                 @Override
                 public void onNext(Common.Envelope value) {
@@ -253,12 +255,14 @@ public class NodeGrpcServer {
         }
 
         @Override
-        public void getModuleLogLevel(AdminPackage.LogLevelRequest request, StreamObserver<AdminPackage.LogLevelResponse> responseObserver) {
+        public void getModuleLogLevel(AdminPackage.LogLevelRequest request, StreamObserver<AdminPackage
+                .LogLevelResponse> responseObserver) {
 
         }
 
         @Override
-        public void setModuleLogLevel(AdminPackage.LogLevelRequest request, StreamObserver<AdminPackage.LogLevelResponse> responseObserver) {
+        public void setModuleLogLevel(AdminPackage.LogLevelRequest request, StreamObserver<AdminPackage
+                .LogLevelResponse> responseObserver) {
 
         }
 

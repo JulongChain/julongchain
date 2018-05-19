@@ -18,6 +18,8 @@ package org.bcia.javachain.events.producer;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.protos.node.EventsPackage;
 
+import java.util.Date;
+
 /**
  * 类描述
  *
@@ -44,5 +46,15 @@ public class EventsUtils {
                 handlerList.delete(interest, eventHandler);
             }
         }
+    }
+
+    /**
+     * 是否过期
+     *
+     * @param sessionEndDate
+     * @return
+     */
+    public static boolean hasSessionExpired(Date sessionEndDate) {
+        return sessionEndDate != null && new Date().after(sessionEndDate);
     }
 }
