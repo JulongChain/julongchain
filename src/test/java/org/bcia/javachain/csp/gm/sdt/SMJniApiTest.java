@@ -1892,13 +1892,9 @@ public class SMJniApiTest {
 
     @Test
     public void SM2EncryptCompareWithStandardData() {
-        System.out.println("============= SMJniApi SM2 Encrypt compare with GM/T 0003.5-2013 =============");
+        System.out.println("============= SMJniApi SM2 Encrypt compare with GM/T 0003.5-2012 =============");
         try {
-            //04ebfc71 8e8d1798 62043226 8e77feb6 415e2ede 0e073c0f 4f640ecd 2e149a73
-            //e858f9d8 1e5430a5 7b36daab 8f950a3c 64e6ee6a 63094d99 283aff76 7e124df0
-            //21886ca9 89ca9c7d 58087307 ca93092d 651efa59 983c18f8 09e26292 3c53aec2
-            //95d30383 b54e39d6 09d160af cb1908d0 bd8766
-            byte[] GBEncryptData = {(byte)0x04, (byte)0xeb, (byte)0xfc, (byte)0x71, (byte)0x8e, (byte)0x8d, (byte)0x17, (byte)0x98,
+            byte[] GBCipherData = {(byte)0x04, (byte)0xeb, (byte)0xfc, (byte)0x71, (byte)0x8e, (byte)0x8d, (byte)0x17, (byte)0x98,
                     (byte)0x62, (byte)0x04, (byte)0x32, (byte)0x26, (byte)0x8e, (byte)0x77, (byte)0xfe, (byte)0xb6,
                     (byte)0x41, (byte)0x5e, (byte)0x2e, (byte)0xde, (byte)0x0e, (byte)0x07, (byte)0x3c, (byte)0x0f,
                     (byte)0x4f, (byte)0x64, (byte)0x0e, (byte)0xcd, (byte)0x2e, (byte)0x14, (byte)0x9a, (byte)0x73,
@@ -1928,12 +1924,12 @@ public class SMJniApiTest {
                     (byte)0x2D, (byte)0xC6, (byte)0xEA, (byte)0x71, (byte)0x8C, (byte)0xC1, (byte)0xAA, (byte)0x60,
                     (byte)0x0A, (byte)0xED, (byte)0x05, (byte)0xFB, (byte)0xF3, (byte)0x5E, (byte)0x08, (byte)0x4A,
                     (byte)0x66, (byte)0x32, (byte)0xF6, (byte)0x07, (byte)0x2D, (byte)0xA9, (byte)0xAD, (byte)0x13};
-            byte[] encryptData = jni.SM2Encrypt(plaintext, random, pk);
-            System.out.println("[output data] cipher data : " + bytesToHexString(encryptData));
-            if(Arrays.equals(encryptData, GBEncryptData)) {
-                System.out.println("[compare result equal] SM2 encrypt data is equal with GM/T 0003.5-2013");
+            byte[] cipherData = jni.SM2Encrypt(plaintext, random, pk);
+            System.out.println("[output data] cipher data : " + bytesToHexString(cipherData));
+            if(Arrays.equals(cipherData, GBCipherData)) {
+                System.out.println("[compare result equal] SM2 encrypt data is equal with GM/T 0003.5-2012");
             } else {
-                System.out.println("[compare result not equal] SM2 encrypt data is not equal with GM/T 0003.5-2013");
+                System.out.println("[compare result not equal] SM2 encrypt data is not equal with GM/T 0003.5-2012");
             }
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
@@ -1942,12 +1938,12 @@ public class SMJniApiTest {
 
     @Test
     public void SM2DecryptCompareWithStandardData() {
-        System.out.println("============= SMJniApi SM2 Decrypt compare with GM/T 0003.5-2013 =============");
+        System.out.println("============= SMJniApi SM2 Decrypt compare with GM/T 0003.5-2012 =============");
         try {
             byte[] GBPlainData ={(byte)0x65, (byte)0x6e, (byte)0x63, (byte)0x72, (byte)0x79, (byte)0x70, (byte)0x74, (byte)0x69,
                     (byte)0x6f, (byte)0x6e, (byte)0x20, (byte)0x73, (byte)0x74, (byte)0x61, (byte)0x6e, (byte)0x64,
                     (byte)0x61, (byte)0x72, (byte)0x64};
-            byte[] GBEncryptData = {(byte)0x04, (byte)0xeb, (byte)0xfc, (byte)0x71, (byte)0x8e, (byte)0x8d, (byte)0x17, (byte)0x98,
+            byte[] GBCipherData = {(byte)0x04, (byte)0xeb, (byte)0xfc, (byte)0x71, (byte)0x8e, (byte)0x8d, (byte)0x17, (byte)0x98,
                     (byte)0x62, (byte)0x04, (byte)0x32, (byte)0x26, (byte)0x8e, (byte)0x77, (byte)0xfe, (byte)0xb6,
                     (byte)0x41, (byte)0x5e, (byte)0x2e, (byte)0xde, (byte)0x0e, (byte)0x07, (byte)0x3c, (byte)0x0f,
                     (byte)0x4f, (byte)0x64, (byte)0x0e, (byte)0xcd, (byte)0x2e, (byte)0x14, (byte)0x9a, (byte)0x73,
@@ -1966,12 +1962,12 @@ public class SMJniApiTest {
                     (byte)0x3F, (byte)0x36, (byte)0xE3, (byte)0x8A, (byte)0xC6, (byte)0xD3, (byte)0x9F, (byte)0x95,
                     (byte)0x88, (byte)0x93, (byte)0x93, (byte)0x69, (byte)0x28, (byte)0x60, (byte)0xB5, (byte)0x1A,
                     (byte)0x42, (byte)0xFB, (byte)0x81, (byte)0xEF, (byte)0x4D, (byte)0xF7, (byte)0xC5, (byte)0xB8};
-            byte[] decryptData = jni.SM2Decrypt(GBEncryptData, sk);
-            System.out.println("[output data] plain data : " + bytesToHexString(decryptData));
-            if(Arrays.equals(decryptData, GBPlainData)) {
-                System.out.println("[compare result equal] SM2 decrypt data is equal with GM/T 0003.5-2013");
+            byte[] plainData = jni.SM2Decrypt(GBCipherData, sk);
+            System.out.println("[output data] plain data : " + bytesToHexString(plainData));
+            if(Arrays.equals(plainData, GBPlainData)) {
+                System.out.println("[compare result equal] SM2 decrypt data is equal with GM/T 0003.5-2012");
             } else {
-                System.out.println("[compare result not equal] SM2 decrypt data is not equal with GM/T 0003.5-2013");
+                System.out.println("[compare result not equal] SM2 decrypt data is not equal with GM/T 0003.5-2012");
             }
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
@@ -1980,14 +1976,14 @@ public class SMJniApiTest {
 
     @Test
     public void SM2SignDataCompareWithStandardData() {
-        System.out.println("============= SMJniApi SM2 Sign data compare with GM/T 0003.5-2013 =============");
+        System.out.println("============= SMJniApi SM2 Sign data compare with GM/T 0003.5-2012 =============");
         try {
             byte[] signData = jni.SM2Sign(GMHash, GMRandom, GMSk);
             System.out.println("[output data] signature data : " + bytesToHexString(signData));
             if(Arrays.equals(signData, GMSignData)) {
-                System.out.println("[compare result equal] SM2 signature data is equal with GM/T 0003.5-2013");
+                System.out.println("[compare result equal] SM2 signature data is equal with GM/T 0003.5-2012");
             } else {
-                System.out.println("[compare result not equal] SM2 signature data is not equal with GM/T 0003.5-2013");
+                System.out.println("[compare result not equal] SM2 signature data is not equal with GM/T 0003.5-2012");
             }
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
@@ -2014,8 +2010,8 @@ public class SMJniApiTest {
     }
 
     @Test
-    public void SM2VerityDataCompareWithStandardData() {
-        System.out.println("============= SMJniApi SM2 verify use GM/T 0003.5-2013 data =============");
+    public void SM2VerityDataUseStandardData() {
+        System.out.println("============= SMJniApi SM2 verify use GM/T 0003.5-2012 data =============");
         try {
             System.out.println("[input data] hash : " + Convert.bytesToHexString(GMHash));
             System.out.println("[input data] pk : " + Convert.bytesToHexString(GMPk));
@@ -2054,7 +2050,7 @@ public class SMJniApiTest {
     public void SM3HashDataCompareWithStandardData() {
         System.out.println("============= SMJniApi SM3 hash data compare with GM/T 0004-2012 =============");
         System.out.println("**** case 1: ****");
-        try {   //66c7f0f4 62eeedd9 d1f2d46b dc10e4e2 4167c487 5cf2f7a2 297da02b 8f4ba8e0
+        try {
             byte[] GMHashData = {(byte)0x66, (byte)0xC7, (byte)0xF0, (byte)0xF4, (byte)0x62, (byte)0xEE, (byte)0xED, (byte)0xD9,
                     (byte)0xD1, (byte)0xF2, (byte)0xD4, (byte)0x6B, (byte)0xDC, (byte)0x10, (byte)0xE4, (byte)0xE2,
                     (byte)0x41, (byte)0x67, (byte)0xC4, (byte)0x87, (byte)0x5C, (byte)0xF2, (byte)0xF7, (byte)0xA2,
@@ -2074,7 +2070,7 @@ public class SMJniApiTest {
         }
 
         System.out.println("**** case 2: ****");
-        try {   //debe9ff9 2275b8a1 38604889 c18e5a4d 6fdb70e5 387e5765 293dcba3 9c0c5732
+        try {
             byte[] GMHashData = {(byte)0xde, (byte)0xbe, (byte)0x9f, (byte)0xf9, (byte)0x22, (byte)0x75, (byte)0xb8, (byte)0xa1,
                     (byte)0x38, (byte)0x60, (byte)0x48, (byte)0x89, (byte)0xc1, (byte)0x8e, (byte)0x5a, (byte)0x4d,
                     (byte)0x6f, (byte)0xdb, (byte)0x70, (byte)0xe5, (byte)0x38, (byte)0x7e, (byte)0x57, (byte)0x65,
@@ -2099,46 +2095,18 @@ public class SMJniApiTest {
     public void testSM3HashSpeed() {
         System.out.println("============= SMJniApi SM3 hash speed test =============");
         try {
-            byte[] msg ={'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d'};
-            byte[] buff = null;
-            long starTtime = System.currentTimeMillis();
+            byte[] testMsg = new byte[1024];
+            for(int i = 0; i < 1024; i++) {
+                testMsg[i] = (byte)((i+1)%255);
+            }
+            byte[] hash = null;
+            long startTime = System.currentTimeMillis();
             for(int i = 0;i < 1024*100; i++) {
-                buff = jni.SM3Hash(msg);
+                hash = jni.SM3Hash(testMsg);
             }
             long endTime = System.currentTimeMillis();
-            float speed = (float) (100.00/ ((endTime - starTtime)/1000.00));
-            System.out.println("[total time] SM3 hash 100M data need : " + (float) (endTime - starTtime)/1000.00 + "s");
+            float speed = (float) (100.00/ ((endTime - startTime)/1000.00));
+            System.out.println("[total time] SM3 hash 100M data need : " + (float) (endTime - startTime)/1000.00 + "s");
             System.out.println("[speed] SM3 hash speed : " + speed + "MB/s");
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
@@ -2150,7 +2118,6 @@ public class SMJniApiTest {
         System.out.println("============= SMJniApi SM4 ECB encrypt data compare with GM/T 0002-2012 =============");
         System.out.println("**** case 1: one round ****");
         try {
-            // 68 1e df 34 d2 06 96 5e 86 b3 e9 4f 53 6e 42 46
             byte[] GMEcbCipherData = {(byte)0x68, (byte)0x1E, (byte)0xDF, (byte)0x34, (byte)0xD2, (byte)0x06, (byte)0x96, (byte)0x5E,
                     (byte)0x86, (byte)0xB3, (byte)0xE9, (byte)0x4F, (byte)0x53, (byte)0x6E, (byte)0x42, (byte)0x46};
             byte[] msg = {(byte)0x01, (byte)0x23, (byte)0x45, (byte)0x67, (byte)0x89, (byte)0xab, (byte)0xcd, (byte)0xef,
@@ -2173,7 +2140,6 @@ public class SMJniApiTest {
 
         System.out.println("**** case 2: 1000000 rounds  ****");
         try {
-            //59 52 98 c7 c6 fd 27 1f 04 02 f8 04 c3 3d 3f 66
             byte[] GMEcbCipherData = {(byte)0x59, (byte)0x52, (byte)0x98, (byte)0xc7, (byte)0xc6, (byte)0xfd, (byte)0x27, (byte)0x1f,
                     (byte)0x04, (byte)0x02, (byte)0xf8, (byte)0x04, (byte)0xc3, (byte)0x3d, (byte)0x3f, (byte)0x66};
             byte[] msg = {(byte)0x01, (byte)0x23, (byte)0x45, (byte)0x67, (byte)0x89, (byte)0xab, (byte)0xcd, (byte)0xef,
@@ -2203,49 +2169,22 @@ public class SMJniApiTest {
     public void testSM4ECBEncryptSpeed() {
         System.out.println("============= SMJniApi SM4 ECB encrypt speed test =============");
         try {
-            byte[] msg = {'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d' };
+            byte[] testPlainData = new byte[1024];
+            for(int i = 0; i < 1024; i++) {
+                testPlainData[i] = (byte)((i+1)%255);
+            }
             byte[] key = {(byte)0x01, (byte)0x23, (byte)0x45, (byte)0x67, (byte)0x89, (byte)0xab, (byte)0xcd, (byte)0xef,
                     (byte)0xfe, (byte)0xdc, (byte)0xba, (byte)0x98, (byte)0x76, (byte)0x54, (byte)0x32, (byte)0x10 };
 
             byte[] ecbCipherData = null;
+            int num = 5;
             long startTime = System.currentTimeMillis();
-            for(int i = 0;i < 1024*100; i++) {
-                ecbCipherData = jni.SM4ECBEncrypt(key, msg);
+            for(int i = 0;i < 1024*100*num; i++) {
+                ecbCipherData = jni.SM4ECBEncrypt(key, testPlainData);
             }
             long endTime = System.currentTimeMillis();
-            float speed = (float) (100.00/ ((endTime - startTime)/1000.00));
-            System.out.println("[total time] SM4 ECB encrypt 100M data need : " + (float) (endTime - startTime)/1000.00 + "s");
+            float speed = (float) (100*num/ ((endTime - startTime)/1000.00));
+            System.out.println("[total time] SM4 ECB encrypt " + (100*num) + "MB data need : " + (float) (endTime - startTime)/1000.00 + "s");
             System.out.println("[speed] SM4 ECB encrypt speed : " + speed + "MB/s");
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
@@ -2257,7 +2196,6 @@ public class SMJniApiTest {
         System.out.println("============= SMJniApi SM4 ECB decrypt data compare with GM/T 0002-2012 =============");
         System.out.println("**** case 1: one round ****");
         try {
-            // 68 1e df 34 d2 06 96 5e 86 b3 e9 4f 53 6e 42 46
             byte[] GMEcbCipherData = {(byte)0x68, (byte)0x1E, (byte)0xDF, (byte)0x34, (byte)0xD2, (byte)0x06, (byte)0x96, (byte)0x5E,
                     (byte)0x86, (byte)0xB3, (byte)0xE9, (byte)0x4F, (byte)0x53, (byte)0x6E, (byte)0x42, (byte)0x46};
             byte[] msg = {(byte)0x01, (byte)0x23, (byte)0x45, (byte)0x67, (byte)0x89, (byte)0xab, (byte)0xcd, (byte)0xef,
@@ -2282,7 +2220,6 @@ public class SMJniApiTest {
         System.out.println("**** case 2: 1000000 round ****");
         try {
             System.out.println("SM4 ECB decrypt data 1000000 round compare with GM/T 0002-2012 :");
-            // 68 1e df 34 d2 06 96 5e 86 b3 e9 4f 53 6e 42 46
             byte[] GMEcbCipherData = {(byte)0x59, (byte)0x52, (byte)0x98, (byte)0xc7, (byte)0xc6, (byte)0xfd, (byte)0x27, (byte)0x1f,
                     (byte)0x04, (byte)0x02, (byte)0xf8, (byte)0x04, (byte)0xc3, (byte)0x3d, (byte)0x3f, (byte)0x66};
             byte[] msg = {(byte)0x01, (byte)0x23, (byte)0x45, (byte)0x67, (byte)0x89, (byte)0xab, (byte)0xcd, (byte)0xef,
@@ -2313,49 +2250,23 @@ public class SMJniApiTest {
     public void testSM4ECBDecryptSpeed() {
         System.out.println("============= SMJniApi SM4 ECB decrypt speed test =============");
         try {
-            byte[] GMEcbCipherData = {'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d' };
+            byte[] testPlainData = new byte[1024];
+            for(int i = 0; i < 1024; i++) {
+                testPlainData[i] = (byte)((i+1)%255);
+            }
             byte[] key = {(byte)0x01, (byte)0x23, (byte)0x45, (byte)0x67, (byte)0x89, (byte)0xab, (byte)0xcd, (byte)0xef,
                     (byte)0xfe, (byte)0xdc, (byte)0xba, (byte)0x98, (byte)0x76, (byte)0x54, (byte)0x32, (byte)0x10 };
+            byte[] ecbCipherData = jni.SM4ECBEncrypt(key, testPlainData);
 
-            byte[] plaintext = null;
+            byte[] ecbPlainData = null;
             long startTime = System.currentTimeMillis();
-            for(int i = 0; i < 1024*100; i++) {
-                plaintext = jni.SM4ECBDecrypt(key, GMEcbCipherData);
+            int num = 5;
+            for(int i = 0; i < 1024*100*num; i++) {
+                ecbPlainData = jni.SM4ECBDecrypt(key, ecbCipherData);
             }
             long endTime = System.currentTimeMillis();
-            float speed = (float) (100.00/ ((endTime - startTime)/1000.00));
-            System.out.println("[total time] SM4 ECB decrypt 100M data need : " + (float) (endTime - startTime)/1000.00 + "s");
+            float speed = (float) (100*num/ ((endTime - startTime)/1000.00));
+            System.out.println("[total time] SM4 ECB decrypt " + (100*num) + "MB data need : " + (float) (endTime - startTime)/1000.00 + "s");
             System.out.println("[speed] SM4 ECB decrypt speed : " + speed + "MB/s");
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
@@ -2366,7 +2277,6 @@ public class SMJniApiTest {
     public void SM4CBCEncryptDataCompareWithStandardData() {
         System.out.println("============= SMJniApi SM4 ECB encrypt data compare with third party software =============");
         try {
-            //2F6E9981 953F273F 94E91EFD 3B52A25C 39FDB686 A512A610 C0FD1890 F3EB6766
             byte[] RefCipherData = {(byte)0x2F, (byte)0x6E, (byte)0x99, (byte)0x81, (byte)0x95, (byte)0x3F, (byte)0x27, (byte)0x3F,
                     (byte)0x94, (byte)0xE9, (byte)0x1E, (byte)0xFD, (byte)0x3B, (byte)0x52, (byte)0xA2, (byte)0x5C,
                     (byte)0x39, (byte)0xFD, (byte)0xB6, (byte)0x86, (byte)0xA5, (byte)0x12, (byte)0xA6, (byte)0x10,
@@ -2394,57 +2304,29 @@ public class SMJniApiTest {
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
         }
-
     }
 
     @Test
     public void testSM4CBCEncryptSpeed() {
         System.out.println("============= SMJniApi SM4 CBC encrypt speed test =============");
         try {
-            byte[] msg = {'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d' };
+            byte[] testPlainData = new byte[1024];
+            for(int i = 0; i < 1024; i++) {
+                testPlainData[i] = (byte)((i+1)%255);
+            }
             byte[] key = {(byte)0x48,(byte)0x0e,(byte)0x6f,(byte)0x3a,(byte)0xc7,(byte)0x58,(byte)0x0e,(byte)0x67,
                     (byte)0x74,(byte)0xad,(byte)0xdc,(byte)0x42,(byte)0xd7,(byte)0x3c,(byte)0xfb,(byte)0x4c};
             byte[] iv = {(byte)0xF1,(byte)0x5D,(byte)0x12,(byte)0x7A,(byte)0x02,(byte)0xBC,(byte)0x65,(byte)0x89,
                     (byte)0xF1,(byte)0x5D,(byte)0x12,(byte)0x7A,(byte)0x02,(byte)0xBC,(byte)0x65,(byte)0x89,};
-            SM4CBCResult cbcCipherResult ;
+            SM4CBCResult cbcCipherResult = null;
+            int num = 5;
             long startTime = System.currentTimeMillis();
-            for(int i = 0;i < 1024*100;i++) {
-                cbcCipherResult = jni.SM4CBCEncrypt( key, iv, msg );
+            for(int i = 0;i < 1024*100*num; i++) {
+                cbcCipherResult = jni.SM4CBCEncrypt(key, iv, testPlainData);
             }
             long endTime = System.currentTimeMillis();
-            float speed = (float) (100.00/ ((endTime - startTime)/1000.00));
-            System.out.println("[total time] SM4 CBC encrypt 100M data need : " + (float) (endTime - startTime)/1000.00 + "s");
+            float speed = (float) (100*num/ ((endTime - startTime)/1000.00));
+            System.out.println("[total time] SM4 CBC encrypt " + (100*num) + "MB data need : " + (float) (endTime - startTime)/1000.00 + "s");
             System.out.println("[speed] SM4 CBC encrypt speed : " + speed + "MB/s");
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
@@ -2485,50 +2367,24 @@ public class SMJniApiTest {
     public void testSM4CBCDecryptSpeed() {
         System.out.println("============= SMJniApi SM4 CBC decrypt speed test =============");
         try {
-            byte[] msg = {'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d' };
+            byte[] testPlainData = new byte[1024];
+            for(int i = 0; i < 1024; i++) {
+                testPlainData[i] = (byte)((i+1)%255);
+            }
             byte[] key = {(byte)0x48,(byte)0x0e,(byte)0x6f,(byte)0x3a,(byte)0xc7,(byte)0x58,(byte)0x0e,(byte)0x67,
                     (byte)0x74,(byte)0xad,(byte)0xdc,(byte)0x42,(byte)0xd7,(byte)0x3c,(byte)0xfb,(byte)0x4c};
             byte[] iv = {(byte)0xF1,(byte)0x5D,(byte)0x12,(byte)0x7A,(byte)0x02,(byte)0xBC,(byte)0x65,(byte)0x89,
                     (byte)0xF1,(byte)0x5D,(byte)0x12,(byte)0x7A,(byte)0x02,(byte)0xBC,(byte)0x65,(byte)0x89,};
-            SM4CBCResult cbcPlainResult ;
+            SM4CBCResult cbcCipherResult = jni.SM4CBCEncrypt(key, iv, testPlainData);
+            SM4CBCResult cbcPlainResult = null;
+            int num = 5;
             long startTime = System.currentTimeMillis();
-            for(int i = 0;i < 1024*100; i++) {
-                cbcPlainResult = jni.SM4CBCDecrypt( key, iv, msg );
+            for(int i = 0;i < 1024*100*num; i++) {
+                cbcPlainResult = jni.SM4CBCDecrypt(key, iv, cbcCipherResult.getData());
             }
             long endTime = System.currentTimeMillis();
-            float speed = (float) (100.00/ ((endTime - startTime)/1000.00));
-            System.out.println("[total time] SM4 CBC decrypt 100M data need : " + (float) (endTime - startTime)/1000.00 + "s");
+            float speed = (float) (100*num/ ((endTime - startTime)/1000.00));
+            System.out.println("[total time] SM4 CBC decrypt " + (100*num) + "MB data need : " + (float) (endTime - startTime)/1000.00 + "s");
             System.out.println("[speed] SM4 CBC decrypt speed : " + speed + "MB/s");
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
