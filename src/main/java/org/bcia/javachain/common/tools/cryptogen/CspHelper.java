@@ -134,7 +134,6 @@ public class CspHelper {
     }
 
     public static ECPublicKey getSM2PublicKey(IKey priv) throws JavaChainException {
-        // TODO wait GmCsp fix
         IKey pubKey;
         try {
             pubKey = priv.getPublicKey();

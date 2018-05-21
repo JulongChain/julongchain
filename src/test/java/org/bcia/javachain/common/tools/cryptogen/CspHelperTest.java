@@ -58,7 +58,6 @@ public class CspHelperTest {
         assertTrue(pkFile.exists());
 
         IKey loadedPriv = CspHelper.loadPrivateKey(filePath);
-        // TODO wait GmCsp.importKey
         assertNotNull(loadedPriv);
         assertEquals(Hex.toHexString(priv.ski()), Hex.toHexString(loadedPriv.ski()));
 

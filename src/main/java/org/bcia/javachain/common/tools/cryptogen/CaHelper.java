@@ -132,13 +132,11 @@ public class CaHelper {
 
             if (sans != null && sans.size() > 0) {
                 GeneralNames generalNames = new GeneralNames();
-
                 for (String san : sans) {
                     // try to parse as an IP address first
                     if (IPAddress.isValid(san)) {
                         generalNames.add(new GeneralName(new IPAddressName(san)));
                     } else {
-                        // TODO: 2018/4/20  SANS的值添加有误
                         generalNames.add(new GeneralName(new DNSName(san)));
                     }
                 }
