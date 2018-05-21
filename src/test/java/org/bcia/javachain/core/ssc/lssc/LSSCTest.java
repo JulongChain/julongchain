@@ -164,6 +164,37 @@ public class LSSCTest extends BaseJunit4Test {
         return depSpec;
     }
 
+//    @Test
+//    public void testStarts(){
+//        MockStub mockStub = new MockStub("LSSC", lssc);
+//        mockStub.mockInit("1",new LinkedList<ByteString>());
+//        String path="src/main/java/org/bcia/javachain/examples/smartcontract/java/smartcontract_example02";
+//        testUpgrade("example02","1.0",path,"","Alice",mockStub);
+//    }
+//
+//    public void testStart(String smartcontractName,String version,String path,
+//                            String expectErrorMsg,String caller,
+//                            MockStub mockStub){
+//        List<String> initArgs=new LinkedList<String>();
+//        initArgs.add("init");
+//        initArgs.add("a");
+//        initArgs.add("100");
+//        initArgs.add("b");
+//        initArgs.add("200");
+//
+//        Smartcontract.SmartContractDeploymentSpec cds = constructDeploySpec(smartcontractName, path, version, initArgs, false);
+//        byte[] cdsBytes = ProtoUtils.marshalOrPanic(cds);
+//        List<ByteString> args0 = new LinkedList<ByteString>();
+//        args0.add(ByteString.copyFromUtf8(LSSC.UPGRADE));
+//        args0.add(ByteString.copyFromUtf8("test"));
+//        args0.add(ByteString.copyFrom(cdsBytes));
+//        Smartcontract.SmartContractSpec spec=Smartcontract.SmartContractSpec.newBuilder().build();
+//        ProposalPackage.SignedProposal signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec, caller.getBytes(), "msg1".getBytes());
+//
+//        ISmartContract.SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
+//        //尚未安全实现调通全部逻辑，返回内部错误
+//        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
+//    }
 
     @Test
     public void invoke() throws Exception{

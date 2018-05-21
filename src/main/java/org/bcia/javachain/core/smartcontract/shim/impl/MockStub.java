@@ -101,11 +101,7 @@ public class MockStub implements ISmartContractStub {
 
     @Override
     public byte[] getState(String key) {
-        //TODO implement by sunzongyu, support for lssc. date: 2018-05-10
-        SmartContractDataPackage.SmartContractData data = SmartContractDataPackage.SmartContractData.newBuilder()
-                .setName(key)
-                .build();
-        return data.toByteArray();
+        return null;
     }
 
     @Override

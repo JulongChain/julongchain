@@ -17,6 +17,7 @@ package org.bcia.javachain.common.cauthdsl;
 
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.policies.IPolicyProvider;
+import org.bcia.javachain.common.policies.MockPolicyProvider;
 import org.bcia.javachain.common.policies.SignaturePolicy;
 import org.bcia.javachain.common.util.proto.ProtoUtils;
 import org.bcia.javachain.msp.IMspManager;
@@ -53,7 +54,8 @@ public class CAuthDslBuilder {
     public static IPolicyProvider createPolicyProvider(IMspManager mspManager) {
         //TODO implement by sunzongyu, support for lssc. data: 2018-05-10
         //TODO policy not completed
-         return null;
+        //TODO for test lssc, return MockPolicyProvider
+         return new MockPolicyProvider();
     }
 
     private static Policies.SignaturePolicyEnvelope signedByAnyOfGivenRole(MspPrincipal.MSPRole.MSPRoleType role, String[] ids){

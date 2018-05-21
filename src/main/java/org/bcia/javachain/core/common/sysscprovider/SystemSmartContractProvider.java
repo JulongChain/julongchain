@@ -22,7 +22,13 @@ import org.bcia.javachain.common.groupconfig.MSPConfigHandler;
 import org.bcia.javachain.common.groupconfig.capability.IApplicationCapabilities;
 import org.bcia.javachain.common.groupconfig.config.ApplicationConfig;
 import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
+import org.bcia.javachain.common.policies.IManager;
+import org.bcia.javachain.common.util.SpringContext;
+import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.ledger.IQueryExecutor;
+import org.bcia.javachain.core.node.util.NodeUtils;
+import org.bcia.javachain.core.ssc.ISystemSmartContractManager;
+import org.bcia.javachain.core.ssc.SystemSmartContractManager;
 import org.bcia.javachain.node.common.helper.ConfigTreeHelper;
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
@@ -39,6 +45,11 @@ import java.io.IOException;
  */
 public class SystemSmartContractProvider implements ISystemSmartContractProvider {
     private static final String PROFILE_CREATE_GROUP = "SampleSingleMSPGroup";
+    private ISystemSmartContractManager sscManager;
+
+    public SystemSmartContractProvider(){
+        this.sscManager = SpringContext.getInstance().getBean(SystemSmartContractManager.class);
+    }
 
     @Override
     public IApplicationConfig getApplicationConfig(String groupId) {
@@ -63,12 +74,32 @@ public class SystemSmartContractProvider implements ISystemSmartContractProvider
     }
 
     @Override
-    public boolean isSysSmartContract(String essc) {
-        return true;
+    public IManager policyManager(String groupID) {
+        return null;
+    }
+
+    @Override
+    public boolean isSysSmartContract(String name) {
+        return sscManager.isSysSmartContract(name);
+    }
+
+    @Override
+    public boolean isSysSCAndNotInvokableSC2SC(String name) {
+        return false;
+//        return sscManager.isSysSmartContractAndNotInvokableSC2SC(name);
+    }
+
+    @Override
+    public boolean isSysSCAndNotInvkeableExternal(String name) {
+        return sscManager.isSysSmartContractAndNotInvokableExternal(name);
     }
 
     @Override
     public IQueryExecutor getQueryExecutorForLedger(String groupID) throws JavaChainException {
-        return null;
+        INodeLedger l = NodeUtils.getLedger(groupID);
+        if(l == null){
+            throw new JavaChainException("Can not get ledger for group " + groupID);
+        }
+        return l.newQueryExecutor();
     }
 }

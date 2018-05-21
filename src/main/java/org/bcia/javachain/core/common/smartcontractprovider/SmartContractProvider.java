@@ -160,8 +160,45 @@ public class SmartContractProvider {
     }
 
     public static Query.SmartContractQueryResponse getInstalledSmartcontracts() throws JavaChainException {
-        return null;
-
+        File scInstallDir = new File(smartContractInstallPath);
+        File[] files = scInstallDir.listFiles();
+        Query.SmartContractQueryResponse.Builder builder = Query.SmartContractQueryResponse.newBuilder();
+        for(File file : files){
+            String[] fileNameArray = file.getName().split("\\.", 2);
+            if(fileNameArray.length == 2){
+                String scName = fileNameArray[0];
+                String scVersion = fileNameArray[1];
+                ISmartContractPackage scPackage;
+                try {
+                    scPackage = getSmartContractFromFS(scName, scVersion);
+                } catch (JavaChainException e) {
+                    log.error("Unreadable smartcontract file found on filesystem: " + file.getName());
+                    continue;
+                }
+                Smartcontract.SmartContractDeploymentSpec scds = scPackage.getDepSpec();
+                String name = scds.getSmartContractSpec().getSmartContractId().getName();
+                String version = scds.getSmartContractSpec().getSmartContractId().getVersion();
+                if(!name.equals(scName) || !version.equals(scVersion)){
+                    log.error("Smartcontract file's name/version has been modified on the file system: " + file.getName());
+                    continue;
+                }
+                String path = scds.getSmartContractSpec().getSmartContractId().getPath();
+                String input = "";
+                String essc = "";
+                String vssc = "";
+                Query.SmartContractInfo scInfo = Query.SmartContractInfo.newBuilder()
+                        .setName(name)
+                        .setVersion(version)
+                        .setPath(path)
+                        .setInput(input)
+                        .setEssc(essc)
+                        .setVssc(vssc)
+                        .setId(ByteString.copyFrom(scPackage.getId()))
+                        .build();
+                builder.addSmartcontracts(scInfo);
+            }
+        }
+        return builder.build();
     }
 
     /**
