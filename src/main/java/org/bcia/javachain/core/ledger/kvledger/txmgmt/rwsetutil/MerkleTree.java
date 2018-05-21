@@ -20,6 +20,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.Util;
 import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
@@ -135,7 +136,7 @@ public class MerkleTree {
         }
         //TODO compute hash
         //TODO SM3 Hash
-        return new SM3().hash(combinedHash);
+        return Util.getHashBytes(combinedHash);
     }
 
     private KvRwset.QueryReadsMerkleSummary.Builder setMaxLevelHashes(KvRwset.QueryReadsMerkleSummary.Builder builder, List<byte[]> list){

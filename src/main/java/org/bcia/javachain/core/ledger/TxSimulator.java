@@ -56,8 +56,8 @@ public abstract class TxSimulator implements ITxSimulator {
     }
 
     @Override
-    public void executeUPdate(String query) throws LedgerException {
-        log.debug("executeUPdate");
+    public void executeUpdate(String query) throws LedgerException {
+        log.debug("executeUpdate");
         log.debug("query:" + query);
     }
 

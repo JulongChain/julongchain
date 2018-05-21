@@ -49,7 +49,7 @@ public interface ITxSimulator extends IQueryExecutor {
      * 提供丰富修改功能
      * leveldb不支持
      */
-    void executeUPdate(String query) throws LedgerException;
+    void executeUpdate(String query) throws LedgerException;
 
     /**
      * 获得模拟交易结果

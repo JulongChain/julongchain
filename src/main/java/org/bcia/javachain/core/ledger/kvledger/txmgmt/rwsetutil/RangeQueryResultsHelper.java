@@ -18,6 +18,7 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.Util;
 import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
@@ -71,7 +72,7 @@ public class RangeQueryResultsHelper {
         byte[] b = serializeKVReads(pendingResults);
         pendingResults.clear();
         //TODO SM3 Hash
-        mt.update(new SM3().hash(b));
+        mt.update(Util.getHashBytes(b));
     }
 
     private byte[] serializeKVReads(List<KvRwset.KVRead> list){

@@ -16,6 +16,7 @@
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.javachain.csp.gm.sm3.SM3;
 
 import java.util.Map;
 
@@ -48,4 +49,11 @@ public class Util {
     }
 
 
+    /**
+     * 进行hash运算
+     */
+    public static byte[] getHashBytes(byte[] bytes){
+        byte[] target = new SM3().hash(bytes);
+        return target;
+    }
 }

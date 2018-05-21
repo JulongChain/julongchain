@@ -48,7 +48,7 @@ public class MockTxSimulator implements ITxSimulator {
     }
 
     @Override
-    public void executeUPdate(String query) throws LedgerException {
+    public void executeUpdate(String query) throws LedgerException {
 
     }
 

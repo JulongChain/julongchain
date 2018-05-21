@@ -85,7 +85,8 @@ public class Helper {
         }
         for(Rwset.NsPvtReadWriteSet nsPvtRwSet : pvtData.getWriteSet().getNsPvtRwsetList()){
             for(Rwset.CollectionPvtReadWriteSet collPvtdata : nsPvtRwSet.getCollectionPvtRwsetList()){
-                ByteString collPvtdataHash = ByteString.copyFrom(new SM3().hash(collPvtdata.getRwset().toByteArray()));
+                //TODO SM3 hash
+                ByteString collPvtdataHash = ByteString.copyFrom(org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.Util.getHashBytes(collPvtdata.getRwset().toByteArray()));
                 ByteString hashInPubdata = tx.retrieveHash(nsPvtRwSet.getNamespace(), collPvtdata.getCollectionName());
                 if(!collPvtdataHash.equals(hashInPubdata)){
                     throw new LedgerException("Hash of pvt data mismatch corresponding hash in pub data");

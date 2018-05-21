@@ -64,7 +64,7 @@ public class CommonStorageDB implements DB {
             String keyHashStr = null;
             if(!bytesKeySuppoted()){
                 //TODO SM3 Hash
-                keyHashStr = new String(new SM3().hash(key.getKeyHash().getBytes()));
+                keyHashStr = new String(Util.getHashBytes(key.getKeyHash().getBytes()));
             } else {
                 keyHashStr = key.getKeyHash();
             }
@@ -84,7 +84,7 @@ public class CommonStorageDB implements DB {
             String keyHashStr = new String(keyHash);
             if(!bytesKeySuppoted()){
                 //TODO SM3 Hash
-                keyHashStr = new String(new SM3().hash(keyHash));
+                keyHashStr = new String(Util.getHashBytes(keyHash));
             }
             return bulkOptimizable.getCachedVersion(deriveHashedDataNs(ns, coll), keyHashStr);
         } catch (Exception e) {
@@ -121,7 +121,7 @@ public class CommonStorageDB implements DB {
         String keyHashStr = new String(keyHash);
         if(!bytesKeySuppoted()){
             //TODO SM3 Hash
-            keyHashStr = new String(new SM3().hash(keyHash));
+            keyHashStr = new String(Util.getHashBytes(keyHash));
         }
         return getState(deriveHashedDataNs(ns, coll), keyHashStr);
     }
@@ -131,7 +131,7 @@ public class CommonStorageDB implements DB {
         String keyHashStr = new String(keyHash);
         if(!bytesKeySuppoted()){
             //TODO SM3 Hash
-            keyHashStr = new String(new SM3().hash(keyHash));
+            keyHashStr = new String(Util.getHashBytes(keyHash));
         }
         return getVersion(deriveHashedDataNs(ns, coll), keyHashStr);
     }
@@ -188,7 +188,7 @@ public class CommonStorageDB implements DB {
                     VersionedValue vv = entry1.getValue();
                     if(SM3Key){
                         //TODO SM3 Hash
-                        key = new String(new SM3().hash(key.getBytes()));
+                        key = new String(Util.getHashBytes(key.getBytes()));
                     }
                     pubUpdateBatch.getBatch().update(deriveHashedDataNs(ns, coll), key, vv);
                 }

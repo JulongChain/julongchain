@@ -122,7 +122,7 @@ public class RWSetBuilder {
     public void setPvtCollectionHash(String ns, String coll, ByteString pvtDataProto){
         CollHashRwBuilder collHashBuilder = getOrCreateCollHashedRwBuilder(ns, coll);
         //TODO SM3 Hash
-        collHashBuilder.setPvtDataHash(new SM3().hash(pvtDataProto.toByteArray()));
+        collHashBuilder.setPvtDataHash(org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.Util.getHashBytes(pvtDataProto.toByteArray()));
     }
 
     /**
