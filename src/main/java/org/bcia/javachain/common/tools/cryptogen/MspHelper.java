@@ -55,8 +55,6 @@ public class MspHelper {
 
     public static void generateLocalMSP(String baseDir, String name, List<String> sans, CaHelper signCA,
                                         CaHelper tlsCA, int nodeType, boolean nodeOUs) throws JavaChainException {
-
-
         //create folder structure
         String mspDir = Paths.get(baseDir, "msp").toString();
         String tlsDir = Paths.get(baseDir, "tls").toString();
@@ -147,7 +145,6 @@ public class MspHelper {
     }
 
     public static void generateVerifyingMSP(String baseDir, CaHelper signCA, CaHelper tlsCA, boolean nodeOUs) throws JavaChainException {
-
         // create folder structure and write artifacts to proper locations
         createFolderStructure(baseDir, false);
 
@@ -171,11 +168,9 @@ public class MspHelper {
                 ecPublickey,
                 KeyUsage.digitalSignature,
                 new int[]{});
-
     }
 
     private static void createFolderStructure(String rootDir, boolean local) throws JavaChainException {
-
         // create admincerts, cacerts, keystore and signcerts folders
         List<Path> folders = new ArrayList<>();
         folders.add(Paths.get(rootDir, "admincerts"));
