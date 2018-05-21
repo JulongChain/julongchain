@@ -1,5 +1,5 @@
 /**
- * Copyright Dingxuan. All Rights Reserved.
+ * Copyright SDT. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.events;
+package org.bcia.javachain.csp.gm.sdt.SM2;
 
-import java.util.Map;
+import org.bcia.javachain.csp.intfs.opts.IKeyImportOpts;
 
 /**
- * 类描述
+ * SM2 公钥导入
  *
- * @author zhouhui
+ * @author tengxiumin
  * @date 2018/05/17
- * @company Dingxuan
+ * @company SDT
  */
-public class EventProcessor {
-//    private Map<Integer, >
+public class SM2PublicKeyImportOpts implements IKeyImportOpts {
+
+    private boolean isEphemeral;
+
+    public SM2PublicKeyImportOpts(boolean isEphemeral) {
+        this.isEphemeral=isEphemeral;
+    }
+
+    @Override
+    public String getAlgorithm() {
+        return "SM2";
+    }
+
+    @Override
+    public boolean isEphemeral() {
+        return isEphemeral;
+    }
 }

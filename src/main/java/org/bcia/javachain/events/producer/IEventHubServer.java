@@ -13,23 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.events;
+package org.bcia.javachain.events.producer;
 
-import org.bcia.javachain.protos.node.EventsPackage;
-
-/**
+import org.bcia.javachain.protos.node.EventsPackage; /**
  * 对象
  *
  * @author zhouhui
  * @date 2018/3/20
  * @company Dingxuan
  */
-public class EventHubServer implements IEventHubServer {
+public interface IEventHubServer {
+    /**
+     * 通讯
+     * @param value
+     * @return
+     */
+    EventsPackage.Event chat(EventsPackage.SignedEvent value);
 
-
-
-    @Override
-    public EventsPackage.Event chat(EventsPackage.SignedEvent value) {
-        return null;
-    }
 }

@@ -23,7 +23,7 @@ import org.bcia.javachain.csp.intfs.opts.ISignerOpts;
  * GM SM2SignerOpts
  *
  * @author tengxiumin
- * @date 5/16/18
+ * @date 2018/05/16
  * @company SDT
  */
 public class SM2SignerOpts implements ISignerOpts {

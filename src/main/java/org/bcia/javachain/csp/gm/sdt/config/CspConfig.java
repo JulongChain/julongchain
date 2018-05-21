@@ -1,5 +1,5 @@
 /**
- * Copyright Dingxuan. All Rights Reserved.
+ * Copyright SDT. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.events;
+package org.bcia.javachain.csp.gm.sdt.config;
 
-import org.bcia.javachain.protos.node.EventsPackage; /**
- * 对象
+/**
+ * CSP配置信息
  *
- * @author zhouhui
- * @date 2018/3/20
- * @company Dingxuan
+ * @author tengxiumin
+ * @date 2018/05/17
+ * @company SDT
  */
-public interface IEventHubServer {
-    /**
-     * 通讯
-     * @param value
-     * @return
-     */
-    EventsPackage.Event chat(EventsPackage.SignedEvent value);
+public class CspConfig {
 
+    private String defaultValue;
+    private SdtgmConfig sdtgm;
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+
+    public SdtgmConfig getSdtgm() {
+        return sdtgm;
+    }
+
+    public void setSdtgm(SdtgmConfig sdtgm) {
+        this.sdtgm = sdtgm;
+    }
 }

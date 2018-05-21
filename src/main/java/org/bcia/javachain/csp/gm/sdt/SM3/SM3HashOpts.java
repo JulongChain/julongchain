@@ -21,7 +21,7 @@ import org.bcia.javachain.csp.intfs.opts.IHashOpts;
  * GM SM3HashOpts
  *
  * @author tengxiumin
- * @date 5/14/18
+ * @date 2018/05/14
  * @company SDT
  */
 public class SM3HashOpts implements IHashOpts {

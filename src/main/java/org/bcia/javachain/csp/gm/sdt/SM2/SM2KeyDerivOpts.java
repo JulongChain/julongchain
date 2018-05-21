@@ -18,12 +18,13 @@ package org.bcia.javachain.csp.gm.sdt.SM2;
 import org.bcia.javachain.csp.intfs.opts.IKeyDerivOpts;
 
 /**
- *
+ * GM SM2KeyDerivOpts
  *
  * @author tengxiumin
- * @date 5/16/18
+ * @date 2018/5/16
  * @company SDT
  */
+
 public class SM2KeyDerivOpts implements IKeyDerivOpts {
 
     @Override

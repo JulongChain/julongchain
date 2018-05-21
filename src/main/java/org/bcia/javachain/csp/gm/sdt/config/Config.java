@@ -13,31 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.csp.gm.sdt.SM2;
-
-import org.bcia.javachain.csp.intfs.opts.IKeyImportOpts;
-
+package org.bcia.javachain.csp.gm.sdt.config;
 
 /**
- * GM SM2 IKeyImportOpts implementation
+ * 配置信息
  *
  * @author tengxiumin
- * @date 5/14/18
+ * @date 2018/05/17
  * @company SDT
  */
-public class SM2KeyImportOpts implements IKeyImportOpts{
-    private boolean isEphemeral;
-    public SM2KeyImportOpts(boolean isEphemeral) {
-    this.isEphemeral=isEphemeral;
+public class Config {
+
+    private NodeConfig node;
+
+    public NodeConfig getNode() {
+        return node;
     }
 
-    @Override
-    public String getAlgorithm() {
-        return "SM2";
-    }
-
-    @Override
-    public boolean isEphemeral() {
-        return isEphemeral;
+    public void setNode(NodeConfig node) {
+        this.node = node;
     }
 }

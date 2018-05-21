@@ -23,11 +23,9 @@ import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.proto.ProposalResponseUtils;
-import org.bcia.javachain.core.admin.AdminServer;
 import org.bcia.javachain.core.admin.IAdminServer;
 import org.bcia.javachain.core.endorser.IEndorserServer;
 import org.bcia.javachain.core.events.IDeliverEventsServer;
-import org.bcia.javachain.core.events.IEventHubServer;
 import org.bcia.javachain.core.smartcontract.node.SmartContractSupportService;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.gossip.GossipGrpc;
@@ -36,9 +34,6 @@ import org.bcia.javachain.protos.node.*;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-
-import static io.grpc.stub.ServerCalls.asyncUnimplementedStreamingCall;
-import static org.bcia.javachain.protos.gossip.GossipGrpc.getPingMethod;
 
 /**
  * 节点GRPC服务
@@ -138,7 +133,8 @@ public class NodeGrpcServer {
 
     private class EndorserServerImpl extends EndorserGrpc.EndorserImplBase {
         @Override
-        public void processProposal(ProposalPackage.SignedProposal request, StreamObserver<ProposalResponsePackage.ProposalResponse> responseObserver) {
+        public void processProposal(ProposalPackage.SignedProposal request, StreamObserver<ProposalResponsePackage
+                .ProposalResponse> responseObserver) {
             if (endorserServer != null) {
                 ProposalResponsePackage.ProposalResponse proposalResponse = null;
                 try {
@@ -186,7 +182,8 @@ public class NodeGrpcServer {
         }
 
         @Override
-        public StreamObserver<Common.Envelope> deliverFiltered(StreamObserver<EventsPackage.DeliverResponse> responseObserver) {
+        public StreamObserver<Common.Envelope> deliverFiltered(StreamObserver<EventsPackage.DeliverResponse>
+                                                                               responseObserver) {
             return new StreamObserver<Common.Envelope>() {
                 @Override
                 public void onNext(Common.Envelope value) {
@@ -258,12 +255,14 @@ public class NodeGrpcServer {
         }
 
         @Override
-        public void getModuleLogLevel(AdminPackage.LogLevelRequest request, StreamObserver<AdminPackage.LogLevelResponse> responseObserver) {
+        public void getModuleLogLevel(AdminPackage.LogLevelRequest request, StreamObserver<AdminPackage
+                .LogLevelResponse> responseObserver) {
 
         }
 
         @Override
-        public void setModuleLogLevel(AdminPackage.LogLevelRequest request, StreamObserver<AdminPackage.LogLevelResponse> responseObserver) {
+        public void setModuleLogLevel(AdminPackage.LogLevelRequest request, StreamObserver<AdminPackage
+                .LogLevelResponse> responseObserver) {
 
         }
 

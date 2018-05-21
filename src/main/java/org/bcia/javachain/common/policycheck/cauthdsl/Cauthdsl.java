@@ -49,21 +49,19 @@ public class Cauthdsl {
      * @param signedDatas
      * @return
      */
-    public static SignedData[] deduplicate(SignedData[] signedDatas,IIdentityDeserializer deserializer){
+    public static List<SignedData> deduplicate(List<SignedData> signedDatas,IIdentityDeserializer deserializer){
 
-        SignedData[] result = new SignedData[signedDatas.length];
+        //SignedData[] result = new SignedData[signedDatas.length];
         Map<String,Object> ids = new HashMap<String,Object>();
-       // List<SignedData> result = new ArrayList<SignedData>();
+        List<SignedData> result = new ArrayList<SignedData>();
         IIdentity identity = new Identity();
-        for(int i=0;i<signedDatas.length;i++){
-            identity = deserializer.deserializeIdentity(signedDatas[i].getIdentity());
+        for(int i=0;i<signedDatas.size();i++){
+            identity = deserializer.deserializeIdentity(signedDatas.get(i).getIdentity());
             String key = identity.getMSPIdentifier();
             if(ids.get(key) != null){
                 log.warn("De-duplicating identity "+identity+" at index "+i+" in signature set");
             }else{
-                for(int j=0;i<result.length;i++){
-                    result[j] = signedDatas[i];
-                }
+                result.add(signedDatas.get(i));
                 ids.put(key,new Object());
             }
         }
@@ -119,7 +117,7 @@ public class Cauthdsl {
         log.debug(signedDatas+"gate"+grepKey+" evaluation starts");
         int verified = 0;
         Boolean[] _used = new Boolean[used.length];
-        for(int i=0;i<policies.length;i++){
+        for(int i = 0; i < policies.length; i++){
             System.arraycopy(used,0,_used,0,used.length);
             if(policies[i]){       //TODO 待定
                 verified++;

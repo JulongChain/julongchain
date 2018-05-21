@@ -22,8 +22,6 @@ package protos;
 option java_package = "org.bcia.javachain.protos.node";
 option java_outer_classname = "SmartContractDataPackage";
 option go_package = "github.com/hyperledger/fabric/protos/peer";
-import "google/protobuf/timestamp.proto";
-
 
 //SmartcontractData defines the datastructure for chaincodes to be serialized by proto
 //Type provides an additional check by directing to use a specific package after instantiation

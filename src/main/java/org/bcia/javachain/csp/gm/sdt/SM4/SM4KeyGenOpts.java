@@ -22,7 +22,7 @@ import org.bcia.javachain.csp.intfs.opts.IKeyGenOpts;
  * GM SM4KeyGenOpts
  *
  * @author tengxiumin
- * @date 5/8/18
+ * @date 2018/05/08
  * @company SDT
  */
 public class SM4KeyGenOpts implements IKeyGenOpts {

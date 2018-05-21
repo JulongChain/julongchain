@@ -19,7 +19,7 @@ package org.bcia.javachain.csp.gm.sdt.jni;
  * SM4 CBC模式加密结果
  *
  * @author tengxiumin
- * @date 5/15/18
+ * @date 2018/05/15
  * @company SDT
  */
 public class SM4CBCResult {

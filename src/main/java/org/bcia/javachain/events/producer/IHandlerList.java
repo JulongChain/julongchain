@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.events;
+package org.bcia.javachain.events.producer;
 
-import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.protos.node.EventsPackage;
-
-import java.util.Map;
 
 /**
  * 类描述
@@ -27,22 +25,14 @@ import java.util.Map;
  * @date 2018/05/17
  * @company Dingxuan
  */
-public class EventHandler {
-    private Map<String, EventsPackage.Interest> interestedEvents;
-
-    public void handleMessage(EventsPackage.SignedEvent signedEvent){
-//        validateEventMessage(signedEvent);
-
-
-
+public interface IHandlerList {
+    public interface IHandlerAction {
+        void doAction(IEventHandler handler);
     }
 
-    private void validateEventMessage(EventsPackage.SignedEvent signedEvent) throws InvalidProtocolBufferException {
-        EventsPackage.Event event = EventsPackage.Event.parseFrom(signedEvent.getEventBytes());
+    boolean add(EventsPackage.Interest interest, EventHandler eventHandler) throws ValidateException;
 
-//        event.getCreator()
+    boolean delete(EventsPackage.Interest interest, EventHandler eventHandler) throws ValidateException;
 
-    }
-
-
+    void foreach(EventsPackage.Event event, IHandlerAction action);
 }

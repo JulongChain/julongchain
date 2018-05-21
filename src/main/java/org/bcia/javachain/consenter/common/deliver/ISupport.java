@@ -1,5 +1,5 @@
 /**
- * Copyright DingXuan. All Rights Reserved.
+ * Copyright Aisino. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.common.deliver;
 
-import org.bcia.javachain.common.ledger.blockledger.Reader;
-import org.bcia.javachain.common.policies.IManager;
-import org.bcia.javachain.common.policies.IPolicy;
+package org.bcia.javachain.common.policycheck;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
- * @author zhangmingyang
- * @Date: 2018/5/17
- * @company Dingxuan
+ * 类描述
+ *
+ * @author yuanjun
+ * @date 11/05/18
+ * @company Aisino
  */
-public interface ISupport {
-    long sequence();
+public class CauthdslTest {
+    @Before
+    public void setUp() {
+        System.out.println("setup...");
+    }
 
-    IManager poclicyManager();
+    @After
+    public void finalize(){
+        System.out.println("finalize...");
+    }
 
-    Reader reader();
+    @Test
+    public void Testdeduplicate(){
+        System.out.println("hh");
+    }
 }

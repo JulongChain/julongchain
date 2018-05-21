@@ -1,5 +1,5 @@
 /**
- * Copyright Dingxuan. All Rights Reserved.
+ * Copyright SDT. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.events;
+package org.bcia.javachain.csp.gm.sdt.SM4;
 
-import org.bcia.javachain.protos.node.EventsPackage;
+import org.bcia.javachain.csp.intfs.opts.IKeyDerivOpts;
 
 /**
- * 类描述
+ * GM SM4KeyDerivOpts
  *
- * @author zhouhui
+ * @author tengxiumin
  * @date 2018/05/17
- * @company Dingxuan
+ * @company SDT
  */
-public interface IHandlerList {
-//    boolean add(EventsPackage.Interest interest, )
+public class SM4KeyDerivOpts implements IKeyDerivOpts {
+
+    @Override
+    public String getAlgorithm() {
+        return "SM4";
+    }
+
+    @Override
+    public boolean isEphemeral() {
+        return true;
+    }
 }

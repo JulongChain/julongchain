@@ -22,7 +22,7 @@ import org.bcia.javachain.csp.intfs.IKey;
  * GM SM2 密钥
  *
  * @author tengxiumin
- * @date 5/16/18
+ * @date 2018/05/16
  * @company SDT
  */
 

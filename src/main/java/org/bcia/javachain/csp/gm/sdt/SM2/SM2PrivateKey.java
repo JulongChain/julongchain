@@ -22,7 +22,7 @@ import org.bcia.javachain.csp.intfs.IKey;
  * GM SM2私钥
  *
  * @author tengxiumin
- * @date 5/16/18
+ * @date 2016/05/16
  * @company SDT
  */
 public class SM2PrivateKey implements IKey {

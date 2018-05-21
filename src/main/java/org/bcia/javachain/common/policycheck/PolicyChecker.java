@@ -16,13 +16,28 @@
 
 package org.bcia.javachain.common.policycheck;
 
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.policies.IPolicy;
 import org.bcia.javachain.common.policies.PolicyManager;
 import org.bcia.javachain.common.policycheck.bean.SignedProposal;
+import org.bcia.javachain.common.policycheck.policies.ChannelPolicyManagerGetter;
+import org.bcia.javachain.common.util.proto.ProposalUtils;
+import org.bcia.javachain.common.util.proto.ProtoUtils;
 import org.bcia.javachain.common.util.proto.SignedData;
+import org.bcia.javachain.msp.IIdentity;
+import org.bcia.javachain.msp.IIdentityDeserializer;
+import org.bcia.javachain.msp.mgmt.Msp;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.MspPrincipal;
 import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.ProposalResponsePackage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 类描述
@@ -33,7 +48,23 @@ import org.bcia.javachain.protos.node.ProposalPackage;
  */
 public class PolicyChecker implements IPolicyChecker{
     private static JavaChainLog log = JavaChainLogFactory.getLog(PolicyChecker.class);
-    private org.bcia.javachain.common.policycheck.bean.PolicyChecker policyChecker;
+
+    private ChannelPolicyManagerGetter channelPolicyManagerGetter;
+    private IIdentityDeserializer localMSP;
+    private MspPrincipal.MSPPrincipal principalGetter;
+
+
+    public PolicyChecker(ChannelPolicyManagerGetter channelPolicyManagerGetter, IIdentityDeserializer localMSP, MspPrincipal.MSPPrincipal principalGetter) {
+        this.channelPolicyManagerGetter = channelPolicyManagerGetter;
+        this.localMSP = localMSP;
+        this.principalGetter = principalGetter;
+    }
+
+    /**
+     * @param channelID
+     * @param policyName
+     * @param signedProposal
+     */
     @Override
     public void CheckPolicy(String channelID, String policyName, SignedProposal signedProposal) {
          if(channelID == ""){
@@ -47,14 +78,36 @@ public class PolicyChecker implements IPolicyChecker{
              log.info("Invalid signed proposal during check policy on channel ["+channelID+"] with policy ["+policyName+"]");
         }
         //get policy
-        PolicyManager policyManager = policyChecker.getChannelPolicyManagerGetter().Manager(channelID);
+         PolicyManager policyManager = channelPolicyManagerGetter.Manager(channelID);
          if(policyManager == null){
              log.info("Failed to get policy manager for channel ["+channelID+"]");
          }
-        Common.Header header = Common.Header.getDefaultInstance();
+        ProposalPackage.Proposal proposal = null;
+        try {
+           proposal = ProposalPackage.Proposal.parseFrom(signedProposal.getProposalBytes());
+        } catch (InvalidProtocolBufferException e) {
+             log.info("Failing extracting proposal during check policy on channel ["+channelID+"] with policy ["+policyName+"]");
+            e.printStackTrace();
+        }
+        //ProposalResponsePackage.ProposalResponse proposal = ProtoUtils.getProposalResponse(signedProposal.getProposalBytes());
+
+        Common.Header header = null; //Common.Header.newBuilder();
+        try {
+            header = Common.Header.parseFrom(proposal.getHeader());
+        } catch (InvalidProtocolBufferException e) {
+            log.info("Failing extracting header during check policy on channel ["+channelID+"] with policy ["+policyName+"]");
+            e.printStackTrace();
+        };
+        Common.SignatureHeader shdr = Common.SignatureHeader.getDefaultInstance();//.getCreator();
+        SignedData[] sd = new SignedData[1];
+        sd[0] = new SignedData(signedProposal.getProposalBytes(),shdr.getCreator().toByteArray(),signedProposal.getSignature());
+        this.CheckPolicyBySignedData(channelID,policyName,sd);
     }
 
     @Override
+    /**
+     * 检车传入的签名是否有效
+     */
     public void CheckPolicyBySignedData(String channelID, String policyName, SignedData[] signedDatas) {
 
         if(channelID == ""){
@@ -65,6 +118,21 @@ public class PolicyChecker implements IPolicyChecker{
         }
         if(signedDatas == null){
             log.info("Invalid signed data during check policy on channel ["+channelID+"] with policy ["+policyName+"]");
+        }
+        PolicyManager policyManager = this.channelPolicyManagerGetter.Manager(channelID);
+        if(policyManager == null){
+            log.info("Failed to get policy manager for channel ["+channelID+"]");
+        }
+        IPolicy policy = policyManager.getPolicy(policyName);
+        List<SignedData> sd = new ArrayList<SignedData>();
+        for(int i=0;i<signedDatas.length;i++){
+            sd.add(signedDatas[i]);
+        }
+        try {
+            policy.evaluate(sd);
+        } catch (PolicyException e) {
+            log.info("Failed evaluating policy on signed data during check policy on channel ["+channelID+"] with policy ["+policyName+"]");
+            e.printStackTrace();
         }
 
     }
@@ -77,50 +145,37 @@ public class PolicyChecker implements IPolicyChecker{
         if(signedProposal == null){
             log.info("Invalid signed proposal during channelless check policy with policy ["+policyName+"]");
         }
-        //获取提案
-        //如果提案为空则打印
-        ProposalPackage proposal;
-        if(signedProposal == null){
+        ProposalPackage.Proposal proposal = null;
+        try {
+            proposal = ProposalPackage.Proposal.parseFrom(signedProposal.getProposalBytes());
+        } catch (InvalidProtocolBufferException e) {
             log.info("Failing extracting proposal during channelless check policy with policy ["+policyName+"]");
+            e.printStackTrace();
         }
-        Common.Header header = Common.Header.getDefaultInstance();
-
-
-        /**
-         *
-
-         header, err := utils.GetHeader(proposal.Header)
-         if err != nil {
-         return fmt.Errorf("Failing extracting header during channelless check policy with policy [%s]: [%s]", policyName, err)
-         }
-
-         shdr, err := utils.GetSignatureHeader(header.SignatureHeader)
-         if err != nil {
-         return fmt.Errorf("Invalid Proposal's SignatureHeader during channelless check policy with policy [%s]: [%s]", policyName, err)
-         }
-
-         // Deserialize proposal's creator with the local MSP
-         id, err := p.localMSP.DeserializeIdentity(shdr.Creator)
-         if err != nil {
-         return fmt.Errorf("Failed deserializing proposal creator during channelless check policy with policy [%s]: [%s]", policyName, err)
-         }
-
-         // Load MSPPrincipal for policy
-         principal, err := p.principalGetter.Get(policyName)
-         if err != nil {
-         return fmt.Errorf("Failed getting local MSP principal during channelless check policy with policy [%s]: [%s]", policyName, err)
-         }
-
-         // Verify that proposal's creator satisfies the principal
-         err = id.SatisfiesPrincipal(principal)
-         if err != nil {
-         return fmt.Errorf("Failed verifying that proposal's creator satisfies local MSP principal during channelless check policy with policy [%s]: [%s]", policyName, err)
-         }
-
-         // Verify the signature
-         return id.Verify(signedProp.ProposalBytes, signedProp.Signature)
-         */
-
+        try {
+            Common.Header header = Common.Header.parseFrom(proposal.getHeader());
+        } catch (InvalidProtocolBufferException e) {
+            log.info("Failing extracting header during channelless check policy with policy ["+policyName+"]");
+            e.printStackTrace();
+        }
+        Common.SignatureHeader shdr = Common.SignatureHeader.getDefaultInstance();
+        IIdentity id = null;
+        try {
+           id = this.localMSP.deserializeIdentity(shdr.getCreator().toByteArray());
+        }catch (Exception e){
+            log.info("Failed deserializing proposal creator during channelless check policy with policy ["+policyName+"]");
+            e.printStackTrace();
+        }
+        MspPrincipal.MSPPrincipal principal = null;
+        try {
+         principal = this.principalGetter.getDefaultInstanceForType();
+        }catch (Exception e){
+            log.info("Failed getting local MSP principal during channelless check policy with policy ["+policyName+"]");
+            e.printStackTrace();
+        }
+        MspPrincipal m = null; //TODO 待完善
+        id.satisfiesPrincipal(m);
+        id.verify(signedProposal.getProposalBytes(),signedProposal.getSignature());
 
 
     }
