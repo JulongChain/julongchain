@@ -13,17 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.common.multigroup;
-import org.bcia.javachain.common.ledger.blockledger.Reader;
-import org.bcia.javachain.common.ledger.blockledger.Writer;
+package org.bcia.javachain.consenter.common.msgprocessor;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/5/17
+ * @Date: 2018/5/18
  * @company Dingxuan
  */
-public class LedgerResources {
-    IMutableResources mutableResources;
-    Reader reader;
-    Writer writer;
+public class SizeFilter {
+
 }

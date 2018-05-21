@@ -18,6 +18,8 @@ package org.bcia.javachain.consenter.common.multigroup;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.exception.PolicyException;
+import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -70,7 +72,7 @@ public class BlockWriter {
         return block;
     }
 
-    public void writeConfigBlock(Common.Block block, byte[] encodedMetadataValue) {
+    public void writeConfigBlock(Common.Block block, byte[] encodedMetadataValue) throws InvalidProtocolBufferException, LedgerException, ValidateException, PolicyException {
         Common.Envelope ctx = CommonUtils.extractEnvelop(block, 0);
         Common.Payload payload = Utils.unmarshalPayload(ctx.getPayload().toByteArray());
         if (payload.getHeader() == null) {
@@ -80,7 +82,7 @@ public class BlockWriter {
         switch (groupHeader.getType()) {
             case Common.HeaderType.CONSENTER_TRANSACTION_VALUE:
                 Common.Envelope groupConfig = Utils.unmarshalEnvelope(payload.getData().toByteArray());
-                //TODO 注册新的 bw.registrar.newChain(newChannelConfig)
+                registrar.newChain(groupConfig);
                 break;
             case Common.HeaderType.CONFIG_VALUE:
                 Configtx.ConfigEnvelope configEnvelope = Utils.unmarshalConfigEnvelope(payload.getData().toByteArray());
@@ -95,7 +97,7 @@ public class BlockWriter {
         writeBlock(block, encodedMetadataValue);
     }
 
-    public void writeBlock(Common.Block block, byte[] encodedMetadataValue) {
+    public synchronized void writeBlock(Common.Block block, byte[] encodedMetadataValue) {
         //TODO 开启线程锁
         lastBlock = block;
         commitBlock(encodedMetadataValue);

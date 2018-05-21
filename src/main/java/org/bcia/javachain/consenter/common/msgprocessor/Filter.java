@@ -23,8 +23,16 @@ import org.bcia.javachain.protos.common.Common;
  * @company Dingxuan
  */
 public class Filter implements IRule {
+    private  IRule[] rules;
+
+    public Filter(IRule[] rules) {
+        this.rules=rules;
+    }
+
     @Override
     public void apply(Common.Envelope message) {
-
+        for (IRule rule: rules) {
+            rule.apply(message);
+        }
     }
 }

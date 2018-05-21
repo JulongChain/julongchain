@@ -17,6 +17,7 @@ package org.bcia.javachain.consenter.common.multigroup;
 
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Configtx;
 
 /**
  * @author zhangmingyang
@@ -27,5 +28,5 @@ public interface IStandardGroupSupport {
     long sequence();
     String chainId();
     ILocalSigner signer();
-    Common.Envelope proposeConfigUpdate(Common.Envelope configtx);
+    Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx);
 }

@@ -52,8 +52,8 @@ public class BroadCastHandler {
 
         if (Constant.SINGLETON.equals(loadGenesisConfig().getConsenter().getConsenterType())) {
             log.info("进入Singleton方式排序处理");
-            boolean configMes = processor.classfiyMsg(groupHeader);
-            if (!configMes) {
+            boolean isconfigMes = processor.classfiyMsg(groupHeader);
+            if (!isconfigMes) {
                 long configSeq = processor.processNormalMsg(envelope);
                 //排序并生成区块写入账本
                 processor.order(envelope, configSeq);

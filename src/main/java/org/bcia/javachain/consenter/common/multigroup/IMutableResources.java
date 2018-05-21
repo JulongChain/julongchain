@@ -16,6 +16,7 @@
 package org.bcia.javachain.consenter.common.multigroup;
 
 import org.bcia.javachain.common.groupconfig.GroupConfigBundle;
+import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.javachain.common.resourceconfig.IResources;
 
 /**
@@ -23,6 +24,6 @@ import org.bcia.javachain.common.resourceconfig.IResources;
  * @Date: 2018/5/17
  * @company Dingxuan
  */
-public interface IMutableResources extends IResources{
+public interface IMutableResources extends IGroupConfigBundle {
     GroupConfigBundle  update();
 }

@@ -15,7 +15,11 @@
  */
 package org.bcia.javachain.consenter.common.multigroup;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.exception.PolicyException;
+import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.groupconfig.GroupConfigBundle;
 import org.bcia.javachain.common.ledger.blockledger.Reader;
 import org.bcia.javachain.common.ledger.blockledger.Util;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
@@ -41,6 +45,10 @@ public class ChainSupport implements IStandardGroupSupport, ISupport {
     IReceiver cutter;
     ILocalSigner localSigner;
 
+
+    public ChainSupport() {
+    }
+
     public ChainSupport(LedgerResources ledgerResources, IProcessor processor, BlockWriter blockWriter, IChain iChain, IReceiver cutter, ILocalSigner localSigner) {
         this.ledgerResources = ledgerResources;
         this.processor = processor;
@@ -51,7 +59,7 @@ public class ChainSupport implements IStandardGroupSupport, ISupport {
     }
 
 
-    public ChainSupport newChainSupport(Registrar registrar, LedgerResources ledgerResources, Map<String, IConsensue> consenters, ILocalSigner signer) {
+    public  ChainSupport newChainSupport(Registrar registrar, LedgerResources ledgerResources, Map<String, IConsensue> consenters, ILocalSigner signer) {
         Common.Block lastBlock=null;
         Common.Metadata metadata=null;
         try {
@@ -62,13 +70,16 @@ public class ChainSupport implements IStandardGroupSupport, ISupport {
         }
         this.ledgerResources=ledgerResources;
 
-        return ;
+        return  new ChainSupport(ledgerResources,processor,blockWriter,iChain,cutter,localSigner);
     }
 
+    public void  start(){
+        iChain.start();
+    }
 
     @Override
     public long sequence() {
-        return ledgerResources.mutableResources.configtxValidator().sequence();
+        return ledgerResources.mutableResources.getValidator().sequence();
     }
 
     @Override
@@ -83,7 +94,7 @@ public class ChainSupport implements IStandardGroupSupport, ISupport {
 
     @Override
     public String chainId() {
-        return ledgerResources.mutableResources.configtxValidator().groupId();
+        return ledgerResources.mutableResources.getValidator().groupId();
     }
 
     @Override
@@ -92,9 +103,19 @@ public class ChainSupport implements IStandardGroupSupport, ISupport {
     }
 
     @Override
-    public Common.Envelope proposeConfigUpdate(Common.Envelope configtx) {
-        Configtx.ConfigEnvelope env = ledgerResources.mutableResources.configtxValidator().proposeConfigUpdate(configtx);
-
-        return null;
+    public Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx) {
+        Configtx.ConfigEnvelope env = ledgerResources.mutableResources.getValidator().proposeConfigUpdate(configtx);
+        try {
+            GroupConfigBundle bundle=new GroupConfigBundle(this.chainId(),env.getConfig());
+            //TODO fabric中通过接口调用
+            bundle.validateNew(bundle);
+        } catch (ValidateException e) {
+            e.printStackTrace();
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        } catch (PolicyException e) {
+            e.printStackTrace();
+        }
+        return env;
     }
 }

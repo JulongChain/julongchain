@@ -28,6 +28,14 @@ public class ConfigMsg implements Serializable{
     private Common.Envelope config;
     private long configSeq;
 
+    public ConfigMsg() {
+    }
+
+    public ConfigMsg(Common.Envelope config, long configSeq) {
+        this.config = config;
+        this.configSeq = configSeq;
+    }
+
     public Common.Envelope getConfig() {
         return config;
     }

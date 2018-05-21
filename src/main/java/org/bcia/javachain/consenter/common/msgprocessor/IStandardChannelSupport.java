@@ -13,17 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.common.multigroup;
-import org.bcia.javachain.common.ledger.blockledger.Reader;
-import org.bcia.javachain.common.ledger.blockledger.Writer;
+package org.bcia.javachain.consenter.common.msgprocessor;
+
+import org.bcia.javachain.common.localmsp.ILocalSigner;
+import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Configtx;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/5/17
+ * @Date: 2018/5/18
  * @company Dingxuan
  */
-public class LedgerResources {
-    IMutableResources mutableResources;
-    Reader reader;
-    Writer writer;
+public interface IStandardChannelSupport {
+    long sequence();
+
+    String chainId();
+
+    ILocalSigner signer();
+
+    Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx);
 }
+
