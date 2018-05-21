@@ -14,32 +14,21 @@
  * limitations under the License.
  */
 
-package org.bcia.javachain.common.policycheck;
+package org.bcia.javachain.consenter.common.deliver;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+
+import org.bcia.javachain.common.ledger.blockledger.Reader;
+import org.bcia.javachain.common.policies.IManager;
 
 /**
- * 类描述
- *
- * @author yuanjun
- * @date 11/05/18
- * @company Aisino
+ * @author zhangmingyang
+ * @Date: 2018/5/17
+ * @company Dingxuan
  */
-public class CauthdslTest {
-    @Before
-    public void setUp() {
-        System.out.println("setup...");
-    }
+public interface ISupport {
+    long sequence() ;
 
-    @After
-    public void finalize(){
-        System.out.println("finalize...");
-    }
+    IManager poclicyManager();
 
-    @Test
-    public void Testdeduplicate(){
-        System.out.println("hh");
-    }
+    Reader reader();
 }
