@@ -185,36 +185,13 @@ public class Msp implements IMsp {
         try {
             Identities.SerializedIdentity sId = Identities.SerializedIdentity.parseFrom(serializedIdentity);
             sId.getMspidBytes();
-         //   Certificate.getInstance(new PemReader(new InputStreamReader(new ByteArrayInputStream(serializedIdentity))).readPemObject());
-            Certificate certificate = Certificate.getInstance(new PemReader(new InputStreamReader(new ByteArrayInputStream(sId.getIdBytes().toByteArray()))).readPemObject().generate());
-
-//            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-//            InputStream stream= new ByteArrayInputStream(sId.getIdBytes().toByteArray());
-//            X509Certificate certificate = (X509Certificate) cf
-//                    .generateCertificate(stream);
-
-//            Certificate certificate=null;
-//            InputStream inStream = new ByteArrayInputStream(sId.getIdBytes().toByteArray());
-//            ASN1Sequence seq = null;
-//            ASN1InputStream aIn;
-//            aIn = new ASN1InputStream(inStream);
-//
-//            try {
-//                seq = (ASN1Sequence) aIn.readObject();
-//                certificate=Certificate.getInstance(seq);
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-
+            Certificate certificate = Certificate.getInstance(new PemReader(new InputStreamReader(new ByteArrayInputStream(sId.getIdBytes().toByteArray()))).readPemObject().getContent());
             SM2KeyExport certPubK = new SM2KeyExport();
             IIdentity identity = new Identity(certificate, certPubK.getPublicKey(), this);
             return identity;
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-
         return null;
     }
 
@@ -339,44 +316,13 @@ public class Msp implements IMsp {
     }
 
     public Certificate getCertFromPem(byte[] idBytes) {
-
-//        CertificateFactory cf = null;
-//        X509Certificate certificate=null;
-//        try {
-//            cf = CertificateFactory.getInstance("X.509");
-//            InputStream stream= new ByteArrayInputStream(idBytes);
-//            certificate  = (X509Certificate) cf.generateCertificate(stream);
-//        } catch (CertificateException e) {
-//            e.printStackTrace();
-//        }
-
         Certificate certificate = null;
         try {
             certificate = Certificate.getInstance(new PemReader(new InputStreamReader(new ByteArrayInputStream(idBytes))).readPemObject().getContent());
         } catch (IOException e) {
             e.printStackTrace();
         }
-//        Certificate certificate = null;
-//        try {
-//            certificate = Certificate.getInstance(new PemReader(new InputStreamReader(new ByteArrayInputStream(idBytes))).readPemObject().getContent());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        Certificate certificate=null;
-//
-//        InputStream inStream = new ByteArrayInputStream(idBytes);
-//            ASN1Sequence seq = null;
-//            ASN1InputStream aIn;
-//            aIn = new ASN1InputStream(inStream);
-//
-//        try {
-//            seq = (ASN1Sequence) aIn.readObject();
-//            certificate=Certificate.getInstance(seq);
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-       return certificate;
+        return certificate;
     }
 
 
