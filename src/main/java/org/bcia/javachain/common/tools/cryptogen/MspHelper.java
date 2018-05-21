@@ -159,7 +159,12 @@ public class MspHelper {
         }
 
         ICsp csp = CspHelper.getCsp();
-        IKey priv = csp.keyGen(new SM2KeyGenOpts());
+        IKey priv = csp.keyGen(new SM2KeyGenOpts() {
+            @Override
+            public boolean isEphemeral() {
+                return true;
+            }
+        });
         ECPublicKey ecPublickey = CspHelper.getSM2PublicKey(priv);
         signCA.signCertificate(Paths.get(baseDir, "admincerts").toString(),
                 signCA.getName(),

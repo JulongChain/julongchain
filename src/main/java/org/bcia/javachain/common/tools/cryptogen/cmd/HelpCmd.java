@@ -13,25 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.bcia.javachain.common.tools.cryptogen.cmd;
 
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.common.tools.cryptogen.bean.MetaData;
 
 /**
- * @author chenhao, liuxifeng
- * @date 2018/4/4
+ * @author chenhao
+ * @date 2018/5/21
  * @company Excelsecu
  */
-
-public class VersionCmd implements ICryptoGenCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(VersionCmd.class);
+public class HelpCmd implements ICryptoGenCmd  {
 
     @Override
     public void execCmd(String[] args) throws JavaChainException {
-        System.out.println(MetaData.getVersionInfo());
+        System.out.println("Utility for generating BCIA key material\n" +
+                "Flags:\n" +
+                "  --help  Show context-sensitive help. e.g. generate --help\n" +
+                "Commands:\n" +
+                "  help\n" +
+                "    Show help\n" +
+                "  generate [opts]\n" +
+                "    Generate key material\n" +
+                "  extend\n" +
+                "    Extend existing network\n" +
+                "  showtemplate\n" +
+                "    Show the default configuration template\n" +
+                "  version\n" +
+                "    Show version information");
     }
 }

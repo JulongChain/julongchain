@@ -21,13 +21,12 @@ package org.bcia.javachain.common.tools.cryptogen.cmd;
  * @date 2018/4/16
  * @company Excelsecu
  */
+@SuppressWarnings("WeakerAccess")
 public class CmdConstant {
-
     public static final String GENERATE = "generate";
-
     public static final String SHOW_TEMPLATE = "showtemplate";
-
     public static final String VERSION = "version";
-
     public static final String EXTEND = "extend";
+    public static final String HELP = "help";
+    public static final String HELP_OPT = "--help";
 }

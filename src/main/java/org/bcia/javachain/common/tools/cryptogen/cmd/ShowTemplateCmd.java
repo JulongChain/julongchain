@@ -30,11 +30,10 @@ public class ShowTemplateCmd implements ICryptoGenCmd {
 
     @Override
     public void execCmd(String[] args) {
-
-        log.info(DEFAULT_TEMPLATE);
+        System.out.println(DEFAULT_TEMPLATE);
     }
 
-    public static final String DEFAULT_TEMPLATE =
+    private static final String DEFAULT_TEMPLATE =
             "# ---------------------------------------------------------------------------\n" +
             "# \"ConsenterOrgs\" - Definition of organizations managing consenter nodes\n" +
             "# ---------------------------------------------------------------------------\n" +
@@ -102,13 +101,16 @@ public class ShowTemplateCmd implements ICryptoGenCmd {
             "    #                     - {{ .CommonName }}\n" +
             "    #                     - {{ .Hostname }}\n" +
             "    # ---------------------------------------------------------------------------\n" +
-            "#    specs:\n" +
-            "#       - hostname: foo # implicitly \"foo.org1.example.com\"\n" +
-            "#         commonName: foo27.org5.example.com # overrides Hostname-based FQDN set above\n" +
-            "#         SANS:\n" +
-            "#           - 172.16.10.31\n" +
-            "#       - hostname: bar\n" +
-            "#       - hostname: baz\n" +
+            "    # Specs:\n" +
+            "    #   - Hostname: foo # implicitly \"foo.org1.example.com\"\n" +
+            "    #     CommonName: foo27.org5.example.com # overrides Hostname-based FQDN set above\n" +
+            "    #     SANS:\n" +
+            "    #       - \"bar.{{.Domain}}\"\n" +
+            "    #       - \"altfoo.{{.Domain}}\"\n" +
+            "    #       - \"{{.Hostname}}.org6.net\"\n" +
+            "    #       - 172.16.10.31\n" +
+            "    #   - Hostname: bar\n" +
+            "    #   - Hostname: baz\n" +
             "\n" +
             "    # ---------------------------------------------------------------------------\n" +
             "    # \"Template\"\n" +

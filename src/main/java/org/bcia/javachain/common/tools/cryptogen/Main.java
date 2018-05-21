@@ -20,7 +20,8 @@ package org.bcia.javachain.common.tools.cryptogen;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.common.tools.cryptogen.cmd.CryptogenCmdFactory;
+import org.bcia.javachain.common.tools.cryptogen.cmd.CryptoGenCmdFactory;
+import org.bcia.javachain.common.tools.cryptogen.cmd.HelpCmd;
 import org.bcia.javachain.common.tools.cryptogen.cmd.ICryptoGenCmd;
 
 /**
@@ -34,19 +35,16 @@ public class Main {
 
     public static void main(String[] args) throws JavaChainException {
         if (args.length == 0) {
-            System.out.println("please input command");
+            new HelpCmd().execCmd(args);
             return;
         }
 
-        ICryptoGenCmd cryptoGenCmd = CryptogenCmdFactory.getInstance(args[0]);
+        // TODO CommandLine replace CryptoGenCmdFactory
+        ICryptoGenCmd cryptoGenCmd = CryptoGenCmdFactory.getInstance(args[0]);
         if (cryptoGenCmd == null) {
-            log.error(args[0] + " command not found");
+            log.error(" expected command but got \"" + args[0] + "\", try --help");
             return;
         }
-
-        String[] destArgs = new String[args.length - 1];
-        System.arraycopy(args, args.length == 1 ? 0 : 1, destArgs, 0, destArgs.length);
-        cryptoGenCmd.execCmd(destArgs);
+        cryptoGenCmd.execCmd(args);
     }
-
 }
