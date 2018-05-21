@@ -13,26 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.common.msgprocessor;
+package org.bcia.javachain.consenter.common.multigroup;
 
-import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Configtx;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/5/9
+ * @Date: 2018/5/18
  * @company Dingxuan
  */
-public class Filter implements IRule {
-    private  IRule[] rules;
-
-    public Filter(IRule[] rules) {
-        this.rules=rules;
-    }
-
-    @Override
-    public void apply(Common.Envelope message) {
-        for (IRule rule: rules) {
-            rule.apply(message);
-        }
-    }
+public interface IVlidator {
+  void  validate(Configtx.ConfigEnvelope configEnvelope);
+  Configtx.ConfigEnvelope proposeConfigUpdate();
 }

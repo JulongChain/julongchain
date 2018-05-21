@@ -127,7 +127,7 @@ public class ConsenterServer {
 
                 @Override
                 public void onError(Throwable throwable) {
-                    System.out.println(throwable.getMessage());
+                   log.error(throwable.getMessage());
                 }
 
                 @Override

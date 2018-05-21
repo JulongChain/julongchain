@@ -15,30 +15,40 @@
  */
 package org.bcia.javachain.consenter.common.multigroup;
 
-import org.bcia.javachain.common.channelconfig.IResources;
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.exception.PolicyException;
+import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.groupconfig.GroupConfigBundle;
+import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.javachain.common.ledger.blockledger.Factory;
 import org.bcia.javachain.common.ledger.blockledger.Reader;
 import org.bcia.javachain.common.ledger.blockledger.Util;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.consenter.common.msgprocessor.IChainCreator;
 import org.bcia.javachain.consenter.common.msgprocessor.IGroupConfigTemplator;
-import org.bcia.javachain.consenter.consensus.IChain;
+import org.bcia.javachain.consenter.consensus.IConsensue;
+import org.bcia.javachain.consenter.util.BlockUtils;
+import org.bcia.javachain.consenter.util.CommonUtils;
+import org.bcia.javachain.consenter.util.ConfigTxUtil;
 import org.bcia.javachain.protos.common.Common;
 
-import java.util.Map;
+import org.bcia.javachain.protos.common.Configtx;
+
+import java.util.*;
 
 /**
  * @author zhangmingyang
  * @Date: 2018/5/8
  * @company Dingxuan
  */
-public class Registrar {
+public class Registrar implements IChainCreator {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Registrar.class);
-    Map<String, ChainSupport> chains;
+    Map<String, ChainSupport> chains = new HashMap<>();
 
-    Map<String, IChain> consenters;
+    Map<String, IConsensue> consenters;
 
     ILocalSigner signer;
 
@@ -51,22 +61,111 @@ public class Registrar {
     IGroupConfigTemplator templator;
 
 
-    //TODO 资源检查
-    public void checkResources(IResources resources) {
+    //TODO 资源配置检查
+    public void checkResources(IGroupConfigBundle resources) {
 
 
     }
 
+
+
+   public void checkResourcesOrPanic(IGroupConfigBundle res){
+
+        if(true){
+            log.error(String.format("[channel %s] ",res.getValidator().groupId()));
+        }
+   }
+
+    public GroupConfigBundle newBundle(String groupId, Configtx.Config config) throws ValidateException, PolicyException, InvalidProtocolBufferException {
+
+        return  new GroupConfigBundle(groupId,config);
+    }
     private Common.Envelope getConfigTx(Reader blockLedgerReader) {
+        Common.Block configBlock = null;
         try {
             Common.Block lastBlock = Util.getBlock(blockLedgerReader, blockLedgerReader.height() - 1);
-
-
+            long index = BlockUtils.getLastConfigIndexFromBlock(lastBlock);
+            configBlock = Util.getBlock(blockLedgerReader, index);
+            if (configBlock == null) {
+                log.error("Config block does not exist");
+            }
         } catch (LedgerException e) {
             e.printStackTrace();
         }
-        return null;
+        return CommonUtils.extractEnvelopeOrPanic(configBlock, 0);
 
     }
 
+
+    public Object broadcastGroupSupport(Common.Envelope msg){
+       Common.GroupHeader chdr= CommonUtils.groupHeader(msg);
+       //chains
+        return null;
+    }
+
+
+    public LedgerResources newLedgerResources(Common.Envelope configTx) throws ValidateException, PolicyException, InvalidProtocolBufferException, LedgerException {
+        Common.Payload payload = CommonUtils.unmarshalPayload(configTx.getPayload().toByteArray());
+        if (payload.getHeader() == null) {
+            log.error("Missing group header");
+        }
+        Common.GroupHeader chdr = CommonUtils.unmarshalGroupHeader(payload.getHeader().getGroupHeader().toByteArray());
+
+        Configtx.ConfigEnvelope configEnvelope = ConfigTxUtil.unmarshalConfigEnvelope(payload.getData().toByteArray());
+
+        GroupConfigBundle bundle= new  GroupConfigBundle(chdr.getGroupId(),configEnvelope.getConfig());
+
+        ledgerFactory.getOrCreate(chdr.getGroupId());
+
+
+        return null;
+    }
+
+    public void newChain(Common.Envelope configtx) throws ValidateException, PolicyException, InvalidProtocolBufferException, LedgerException {
+        LedgerResources ledgerResources = newLedgerResources(configtx);
+
+        List<Common.Envelope> envelopes = Arrays.asList(new Common.Envelope[]{configtx});
+
+        try {
+            ledgerResources.writer.append(Util.createNextBlock(ledgerResources.reader, envelopes));
+        } catch (LedgerException e) {
+            e.printStackTrace();
+        }
+        Map<String, ChainSupport> newChains = new HashMap<>();
+
+        for (Iterator entries=chains.keySet().iterator();entries.hasNext();) {
+            String key=  entries.next().toString();
+            newChains.put(key,chains.get(key));
+        }
+        ChainSupport chainSupport=new ChainSupport();
+        ChainSupport cs=chainSupport.newChainSupport(this,ledgerResources,consenters,signer);
+        String chainId=ledgerResources.mutableResources.getValidator().groupId();
+        newChains.put(chainId,cs);
+        cs.start();
+        chains=newChains;
+    }
+
+    @Override
+    public IGroupConfigBundle newGroupConfig(Common.Envelope envConfigUpdate) {
+        return templator.newGroupConfig(envConfigUpdate);
+    }
+
+    @Override
+    public IGroupConfigBundle createBundle(String groupId, Configtx.Config config) {
+        try {
+            return new  GroupConfigBundle(groupId,config);
+        } catch (ValidateException e) {
+            e.printStackTrace();
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        } catch (PolicyException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public int groupCount() {
+        return chains.size();
+    }
 }

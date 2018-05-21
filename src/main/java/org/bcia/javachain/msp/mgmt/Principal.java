@@ -15,6 +15,12 @@
  */
 package org.bcia.javachain.msp.mgmt;
 
+import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.exception.MspException;
+import org.bcia.javachain.protos.common.MspPrincipal;
+
+import static org.bcia.javachain.msp.mgmt.GlobalMspManagement.getLocalMsp;
+
 /**
  * 类描述
  *
@@ -22,7 +28,38 @@ package org.bcia.javachain.msp.mgmt;
  * @date 4/2/18
  * @company Dingxuan
  */
-public class Principal {
-    public static final String Admins="Admins";
-    public static final String Members="Members";
+public class Principal implements IMspPrincipalGetter {
+    public static final String Admins = "Admins";
+    public static final String Members = "Members";
+
+    public Principal() {
+    }
+
+    @Override
+    public MspPrincipal.MSPPrincipal get(String role) throws MspException {
+        String mspid = getLocalMsp().getIdentifier();
+
+        switch (role) {
+            case Admins:
+                MspPrincipal.MSPRole mspAdmin = MspPrincipal.MSPRole.newBuilder()
+                        .setMspIdentifier(mspid)
+                        .setRole(MspPrincipal.MSPRole.MSPRoleType.ADMIN).build();
+                byte[] principalBytes = mspAdmin.toByteArray();
+                MspPrincipal.MSPPrincipal mspPrincipal = MspPrincipal.MSPPrincipal.newBuilder()
+                        .setPrincipalClassification(MspPrincipal.MSPPrincipal.Classification.ROLE)
+                        .setPrincipal(ByteString.copyFrom(principalBytes)).build();
+                return mspPrincipal;
+            case Members:
+                MspPrincipal.MSPRole mspMembers = MspPrincipal.MSPRole.newBuilder()
+                        .setMspIdentifier(mspid)
+                        .setRole(MspPrincipal.MSPRole.MSPRoleType.ADMIN).build();
+                byte[] principalMemberBytes = mspMembers.toByteArray();
+                MspPrincipal.MSPPrincipal mspMembersPrincipal = MspPrincipal.MSPPrincipal.newBuilder()
+                        .setPrincipalClassification(MspPrincipal.MSPPrincipal.Classification.ROLE)
+                        .setPrincipal(ByteString.copyFrom(principalMemberBytes)).build();
+                return mspMembersPrincipal;
+            default:
+                throw new MspException(String.format("MSP Principal role [%s] not recognized",role));
+        }
+    }
 }

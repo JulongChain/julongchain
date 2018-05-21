@@ -16,7 +16,8 @@
 package org.bcia.javachain.consenter.common.msgprocessor;
 
 
-import org.bcia.javachain.common.channelconfig.IResources;
+import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
+import org.bcia.javachain.common.resourceconfig.IResources;
 import org.bcia.javachain.protos.common.Common;
 
 /**
@@ -25,5 +26,5 @@ import org.bcia.javachain.protos.common.Common;
  * @company Dingxuan
  */
 public interface IGroupConfigTemplator {
-    IResources newGroupConfig(Common.Envelope envelope);
+    IGroupConfigBundle newGroupConfig(Common.Envelope envelope);
 }
