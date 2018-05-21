@@ -46,10 +46,10 @@ import java.util.List;
 public class MspHelper {
 
     public static final int CLIENT = 0;
-    public static final int ORDERER = 1;
+    public static final int CONSENTER = 1;
     public static final int PEER = 2;
-    public static final String CLIENTOU = "client";
-    public static final String PEEROU = "peer";
+    public static final String CLIENT_OU = "client";
+    public static final String PEER_OU = "peer";
 
     private static String[] nodeOUMap = {null, "client", "peer"};
 
@@ -224,11 +224,11 @@ public class MspHelper {
 
         OrgUnitIdentifiersConfig clientOUIdentifier = new OrgUnitIdentifiersConfig();
         clientOUIdentifier.setCertificate(caFile);
-        clientOUIdentifier.setOrganizationalUnitIdentifier(CLIENTOU);
+        clientOUIdentifier.setOrganizationalUnitIdentifier(CLIENT_OU);
 
         OrgUnitIdentifiersConfig peerOUIdentifier = new OrgUnitIdentifiersConfig();
         peerOUIdentifier.setCertificate(caFile);
-        peerOUIdentifier.setOrganizationalUnitIdentifier(PEEROU);
+        peerOUIdentifier.setOrganizationalUnitIdentifier(PEER_OU);
 
         NodeOUs nodeOUs = new NodeOUs();
         nodeOUs.setClientOUIdentifier(clientOUIdentifier);

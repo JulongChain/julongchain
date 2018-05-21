@@ -61,10 +61,6 @@ public class CaHelper {
         this.mName = name;
     }
 
-    public CaHelper() {
-
-    }
-
     public CaHelper(String name,
                     String country,
                     String province,
@@ -298,7 +294,6 @@ public class CaHelper {
             PemObject pemObject = pemReader.readPemObject();
             reader.close();
             byte[] certBytes = pemObject.getContent();
-            // TODO 2018/4/20 new X509CertImpl报异常
             return Certificate.getInstance(certBytes);
         } catch (Exception e) {
             throw new JavaChainException("An error occurred :" + e.getMessage());

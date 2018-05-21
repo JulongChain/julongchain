@@ -24,6 +24,7 @@ import org.bcia.javachain.csp.factory.IFactoryOpts;
 import org.bcia.javachain.csp.gm.GmCspFactory;
 import org.bcia.javachain.csp.gm.GmFactoryOpts;
 import org.bcia.javachain.csp.gm.sm2.SM2KeyGenOpts;
+import org.bcia.javachain.csp.gm.sm2.SM2KeyImportOpts;
 import org.bcia.javachain.csp.gm.sm2.SM2PublicKey;
 import org.bcia.javachain.csp.intfs.ICsp;
 import org.bcia.javachain.csp.intfs.IKey;
@@ -70,20 +71,8 @@ public class CspHelper {
 
                 byte[] encodedData = pemObject.getContent();
                 List<Object> list = decodePrivateKeyPKCS8(encodedData);
-                //AlgorithmId algId = (AlgorithmId) list.get(0);
                 Object rawKey = list.get(1);
-                //TODO 2018/4/20 IKeyImportOpts参数,KeyImport等待GmCsp完成
-                IKey priv = gmCsp.keyImport(rawKey, new IKeyImportOpts() {
-                    @Override
-                    public String getAlgorithm() {
-                        return "SM2";
-                    }
-
-                    @Override
-                    public boolean isEphemeral() {
-                        return true;
-                    }
-                });
+                IKey priv = gmCsp.keyImport(rawKey,  new SM2KeyImportOpts(true));
                 return priv;
             } catch (Exception e) {
                 log.error("An error occurred on loadPrivateKey: {}", e.getMessage());

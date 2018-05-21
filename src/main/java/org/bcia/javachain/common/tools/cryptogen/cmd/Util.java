@@ -314,7 +314,7 @@ public class Util {
             System.exit(1);
         }
 
-        generateNodes(consenterDir, orgSpec.getSpecs(), signCA, tlsCA, MspHelper.ORDERER, false);
+        generateNodes(consenterDir, orgSpec.getSpecs(), signCA, tlsCA, MspHelper.CONSENTER, false);
 
         List<NodeSpec> users = new ArrayList<>();
 
