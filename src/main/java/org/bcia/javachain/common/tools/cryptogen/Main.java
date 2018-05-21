@@ -33,14 +33,12 @@ public class Main {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Main.class);
 
     public static void main(String[] args) throws JavaChainException {
-
         if (args.length == 0) {
-            log.error("please input command");
+            System.out.println("please input command");
             return;
         }
 
         ICryptoGenCmd cryptoGenCmd = CryptogenCmdFactory.getInstance(args[0]);
-
         if (cryptoGenCmd == null) {
             log.error(args[0] + " command not found");
             return;

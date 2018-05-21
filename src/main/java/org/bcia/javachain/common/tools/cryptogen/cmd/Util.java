@@ -94,7 +94,7 @@ public class Util {
 
         NodeTemplate nodeTemplate = orgSpec.getTemplate();
         int tempCount = nodeTemplate.getCount();
-        // First process all of our templated nodes
+        // First process all of our template nodes
         for (int i = 0; i < tempCount; i++) {
 
             HostNameData data = new HostNameData(prefix, i + nodeTemplate.getStart(), orgSpec.getDomain());
@@ -111,7 +111,6 @@ public class Util {
         List<NodeSpec> nodeSpec =orgSpec.getSpecs();
         int size = nodeSpec.size();
         for (int i = 0; i < size; i++) {
-
             renderNodeSpec(orgSpec.getDomain(), nodeSpec.get(i));
             nodeSpec.set(i, nodeSpec.get(i));
         }
@@ -149,7 +148,10 @@ public class Util {
         // Set our implicit SANS entries for CN/Hostname
         List<String> newSans = new ArrayList<>();
         newSans.add(cn);
-        newSans.add(spec.getHostname());
+        String hostName = spec.getHostname();
+        if (hostName != null && hostName.length() != 0) {
+            newSans.add(spec.getHostname());
+        }
         spec.setSANS(newSans);
 
         // Finally, process any remaining SANS entries
@@ -188,10 +190,9 @@ public class Util {
 
 
     static void generatePeerOrg(String baseDir, OrgSpec orgSpec) {
-
         String orgName = orgSpec.getDomain();
         System.out.println(orgName);
-        //generate CAs
+        // generate CAs
         String orgDir = Paths.get(baseDir, "peerOrganizations", orgName).toString();
         String caDir = Paths.get(orgDir, "ca").toString();
         String tlsCADir = Paths.get(orgDir, "tlsca").toString();
@@ -203,11 +204,11 @@ public class Util {
         CaHelper signCA;
         CaHelper tlsCA;
 
-        //generate signing CaHelper
+        // generate signing CaHelper
         NodeSpec caSpec = orgSpec.getCa();
         signCA = Util.generateCA(caDir, orgName, caSpec.getCommonName(), caSpec);
 
-        //generate TLS CaHelper
+        // generate TLS CaHelper
         tlsCA = Util.generateCA(tlsCADir, orgName, "tls" + caSpec.getCommonName(), caSpec);
 
         try {
@@ -217,9 +218,7 @@ public class Util {
             e.printStackTrace();
             System.exit(1);
         }
-
         generateNodes(peerDir, orgSpec.getSpecs(), signCA, tlsCA, MspHelper.PEER, orgSpec.isEnableNodeOUs());
-
 
         List<NodeSpec> users = new ArrayList<>();
         int count = orgSpec.getUsers().getCount();
@@ -229,14 +228,14 @@ public class Util {
             users.add(user);
         }
 
-        //add an admin user
+        // add an admin user
         NodeSpec adminUser = new NodeSpec();
         adminUser.setCommonName(ADMIN_BASE_NAME + "@" + orgName);
         users.add(adminUser);
 
         generateNodes(userDir, users, signCA, tlsCA, MspHelper.CLIENT, orgSpec.isEnableNodeOUs());
 
-        //copy the admin cert to the org's MSP admincerts
+        // copy the admin cert to the org's MSP admincerts
         try {
 
             copyAdminCert(userDir, adminCertDir, adminUser.getCommonName());
@@ -249,7 +248,7 @@ public class Util {
 
         copyAllAdminCerts(userDir, peerDir, orgName, orgSpec, adminUser);
 
-        //copy the admin cert to each of the org's peer's MSP admincerts
+        // copy the admin cert to each of the org's peer's MSP admincerts
         for (NodeSpec spec : orgSpec.getSpecs()) {
             try {
                 copyAdminCert(userDir, Paths.get(peerDir, spec.getCommonName(), "msp", "admincerts").toString(), adminUser.getCommonName());
@@ -264,9 +263,7 @@ public class Util {
     }
 
     static void generateNodes(String baseDir, List<NodeSpec> nodes, CaHelper signCA, CaHelper tlsCA, int nodeType, boolean nodeOUs) {
-
         for (NodeSpec node : nodes) {
-
             String nodeDir = Paths.get(baseDir,node.getCommonName()).toString();
             File file = new File(nodeDir);
 
@@ -282,11 +279,10 @@ public class Util {
     }
 
 
-    static void generateConstenerOrgs(String baseDir, OrgSpec orgSpec) {
-
-        String orgName =orgSpec.getDomain();
+    static void generateConsenterOrgs(String baseDir, OrgSpec orgSpec) {
+        String orgName = orgSpec.getDomain();
         System.out.println(orgName);
-        //generate CAs
+        // generate CAs
         String orgDir = Paths.get(baseDir, "consenterOrganizations", orgName).toString();
         String caDir = Paths.get(orgDir, "ca").toString();
         String tlsCADir = Paths.get(orgDir, "tlsca").toString();

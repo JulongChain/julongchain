@@ -40,6 +40,7 @@ import sun.security.x509.AlgorithmId;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.file.Paths;
+import java.security.KeyStore;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECPoint;
 import java.util.ArrayList;
@@ -59,11 +60,18 @@ public class CspHelper {
         return CspManager.getDefaultCsp();
     }
 
-    public static IKey loadPrivateKey(String keystorePath) {
-
-        if (keystorePath.endsWith("_sk")) {
+    public static IKey loadPrivateKey(String keystorePath) throws JavaChainException {
+        File keyStoreDir = new File(keystorePath);
+        File[] files = keyStoreDir.listFiles();
+        if (!keyStoreDir.isDirectory() || files == null) {
+            log.error("invalid directory for keystorePath " + keystorePath);
+            return null;
+        }
+        for (File file: files) {
+            if (!file.getName().endsWith("_sk")) {
+                continue;
+            }
             try {
-                File file = new File(keystorePath);
                 InputStreamReader reader = new InputStreamReader(new FileInputStream(file));
                 PemReader pemReader = new PemReader(reader);
                 PemObject pemObject = pemReader.readPemObject();
@@ -72,13 +80,12 @@ public class CspHelper {
                 byte[] encodedData = pemObject.getContent();
                 List<Object> list = decodePrivateKeyPKCS8(encodedData);
                 Object rawKey = list.get(1);
-                IKey priv = gmCsp.keyImport(rawKey,  new SM2KeyImportOpts(true));
-                return priv;
+                return gmCsp.keyImport(rawKey,  new SM2KeyImportOpts(true));
             } catch (Exception e) {
                 log.error("An error occurred on loadPrivateKey: {}", e.getMessage());
             }
         }
-        return null;
+        throw new JavaChainException("no pem file found");
     }
 
     private static byte[] encodePrivateKeyPKCS8(byte[] privateKey, AlgorithmId algId) throws JavaChainException {

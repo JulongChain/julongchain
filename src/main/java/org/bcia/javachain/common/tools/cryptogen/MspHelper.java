@@ -118,7 +118,7 @@ public class MspHelper {
         //get public key
         ECPublicKey tlsPubKey = CspHelper.getSM2PublicKey(tlsPrivKey);
 
-        //generate X509 certficate using TLS CaHelper
+        //generate X509 certificate using TLS CaHelper
         tlsCA.signCertificate(Paths.get(tlsDir).toString(),
                 name,
                 null,

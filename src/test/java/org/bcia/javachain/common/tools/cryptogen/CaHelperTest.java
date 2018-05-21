@@ -164,7 +164,7 @@ public class CaHelperTest {
             certDir += File.separator;
         }
         Certificate bcCert = Certificate.getInstance(cert.getEncoded());
-        Certificate loadedCert = CaHelper.loadCertificateSM2(certDir + testName3 + "-cert.pem");
+        Certificate loadedCert = CaHelper.loadCertificateSM2(certDir);
         Assert.assertNotNull(loadedCert);
         Assert.assertEquals(bcCert.getSerialNumber(), loadedCert.getSerialNumber());
         Assert.assertEquals(X509CertificateUtil.getSubject(cert.getSubjectDN().getName()).getCommonName(),

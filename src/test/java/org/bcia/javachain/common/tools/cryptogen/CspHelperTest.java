@@ -51,13 +51,12 @@ public class CspHelperTest {
 
     @Test
     public void loadPrivateKey() throws JavaChainException {
-
         IKey priv = CspHelper.generatePrivateKey(testDir);
         String filePath = Paths.get(testDir, Hex.toHexString(priv.ski()) + "_sk").toString();
         File pkFile = new File(filePath);
         assertTrue(pkFile.exists());
 
-        IKey loadedPriv = CspHelper.loadPrivateKey(filePath);
+        IKey loadedPriv = CspHelper.loadPrivateKey(testDir);
         assertNotNull(loadedPriv);
         assertEquals(Hex.toHexString(priv.ski()), Hex.toHexString(loadedPriv.ski()));
 
