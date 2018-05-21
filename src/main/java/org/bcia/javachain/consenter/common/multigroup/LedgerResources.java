@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.util;
-
-import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.common.Configtx;
+package org.bcia.javachain.consenter.common.multigroup;
+import org.bcia.javachain.common.ledger.blockledger.Reader;
+import org.bcia.javachain.common.ledger.blockledger.Writer;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/5/10
+ * @Date: 2018/5/17
  * @company Dingxuan
  */
-public class ConfigTx {
-
+public class LedgerResources {
+    IMutableResources mutableResources;
+    Reader reader;
+    Writer writer;
 }

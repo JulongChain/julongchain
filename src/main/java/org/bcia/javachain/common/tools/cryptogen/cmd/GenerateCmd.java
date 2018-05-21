@@ -22,7 +22,6 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.tools.cryptogen.bean.Config;
 import org.bcia.javachain.common.tools.cryptogen.bean.OrgSpec;
-import org.bcia.javachain.consenter.util.LoadYaml;
 
 import static org.bcia.javachain.common.tools.cryptogen.cmd.Util.*;
 
@@ -74,7 +73,6 @@ public class GenerateCmd implements ICryptoGenCmd {
             log.error(e.getMessage());
             System.exit(-1);
         }
-        initConfig(config);
         for (OrgSpec orgSpec : config.getPeerOrgs()) {
             try {
                 renderOrgSpec(orgSpec, "peer");
@@ -91,13 +89,7 @@ public class GenerateCmd implements ICryptoGenCmd {
                 log.error("Error processing consenter configuration: " + e.getMessage());
                 System.exit(-1);
             }
-            generateConstenerOrgs(outputDir, orgSpec);
+            generateConsenterOrgs(outputDir, orgSpec);
         }
-    }
-
-    private void initConfig(Config config) {
-
-
-
     }
 }

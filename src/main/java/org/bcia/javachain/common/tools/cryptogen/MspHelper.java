@@ -46,17 +46,15 @@ import java.util.List;
 public class MspHelper {
 
     public static final int CLIENT = 0;
-    public static final int ORDERER = 1;
+    public static final int CONSENTER = 1;
     public static final int PEER = 2;
-    public static final String CLIENTOU = "client";
-    public static final String PEEROU = "peer";
+    public static final String CLIENT_OU = "client";
+    public static final String PEER_OU = "peer";
 
     private static String[] nodeOUMap = {null, "client", "peer"};
 
     public static void generateLocalMSP(String baseDir, String name, List<String> sans, CaHelper signCA,
                                         CaHelper tlsCA, int nodeType, boolean nodeOUs) throws JavaChainException {
-
-
         //create folder structure
         String mspDir = Paths.get(baseDir, "msp").toString();
         String tlsDir = Paths.get(baseDir, "tls").toString();
@@ -120,7 +118,7 @@ public class MspHelper {
         //get public key
         ECPublicKey tlsPubKey = CspHelper.getSM2PublicKey(tlsPrivKey);
 
-        //generate X509 certficate using TLS CaHelper
+        //generate X509 certificate using TLS CaHelper
         tlsCA.signCertificate(Paths.get(tlsDir).toString(),
                 name,
                 null,
@@ -147,7 +145,6 @@ public class MspHelper {
     }
 
     public static void generateVerifyingMSP(String baseDir, CaHelper signCA, CaHelper tlsCA, boolean nodeOUs) throws JavaChainException {
-
         // create folder structure and write artifacts to proper locations
         createFolderStructure(baseDir, false);
 
@@ -171,11 +168,9 @@ public class MspHelper {
                 ecPublickey,
                 KeyUsage.digitalSignature,
                 new int[]{});
-
     }
 
     private static void createFolderStructure(String rootDir, boolean local) throws JavaChainException {
-
         // create admincerts, cacerts, keystore and signcerts folders
         List<Path> folders = new ArrayList<>();
         folders.add(Paths.get(rootDir, "admincerts"));
@@ -224,11 +219,11 @@ public class MspHelper {
 
         OrgUnitIdentifiersConfig clientOUIdentifier = new OrgUnitIdentifiersConfig();
         clientOUIdentifier.setCertificate(caFile);
-        clientOUIdentifier.setOrganizationalUnitIdentifier(CLIENTOU);
+        clientOUIdentifier.setOrganizationalUnitIdentifier(CLIENT_OU);
 
         OrgUnitIdentifiersConfig peerOUIdentifier = new OrgUnitIdentifiersConfig();
         peerOUIdentifier.setCertificate(caFile);
-        peerOUIdentifier.setOrganizationalUnitIdentifier(PEEROU);
+        peerOUIdentifier.setOrganizationalUnitIdentifier(PEER_OU);
 
         NodeOUs nodeOUs = new NodeOUs();
         nodeOUs.setClientOUIdentifier(clientOUIdentifier);

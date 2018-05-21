@@ -38,6 +38,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
 
+/**
+ * @author chenhao, yegangcheng
+ * @date 2018/4/9
+ * @company Excelsecu
+ */
 @SuppressWarnings("WeakerAccess")
 public class Util {
 

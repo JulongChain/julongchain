@@ -24,6 +24,7 @@ import org.bcia.javachain.csp.factory.IFactoryOpts;
 import org.bcia.javachain.csp.gm.GmCspFactory;
 import org.bcia.javachain.csp.gm.GmFactoryOpts;
 import org.bcia.javachain.csp.gm.sm2.SM2KeyGenOpts;
+import org.bcia.javachain.csp.gm.sm2.SM2KeyImportOpts;
 import org.bcia.javachain.csp.gm.sm2.SM2PublicKey;
 import org.bcia.javachain.csp.intfs.ICsp;
 import org.bcia.javachain.csp.intfs.IKey;
@@ -39,6 +40,7 @@ import sun.security.x509.AlgorithmId;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.file.Paths;
+import java.security.KeyStore;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECPoint;
 import java.util.ArrayList;
@@ -58,11 +60,18 @@ public class CspHelper {
         return CspManager.getDefaultCsp();
     }
 
-    public static IKey loadPrivateKey(String keystorePath) {
-
-        if (keystorePath.endsWith("_sk")) {
+    public static IKey loadPrivateKey(String keystorePath) throws JavaChainException {
+        File keyStoreDir = new File(keystorePath);
+        File[] files = keyStoreDir.listFiles();
+        if (!keyStoreDir.isDirectory() || files == null) {
+            log.error("invalid directory for keystorePath " + keystorePath);
+            return null;
+        }
+        for (File file: files) {
+            if (!file.getName().endsWith("_sk")) {
+                continue;
+            }
             try {
-                File file = new File(keystorePath);
                 InputStreamReader reader = new InputStreamReader(new FileInputStream(file));
                 PemReader pemReader = new PemReader(reader);
                 PemObject pemObject = pemReader.readPemObject();
@@ -70,26 +79,13 @@ public class CspHelper {
 
                 byte[] encodedData = pemObject.getContent();
                 List<Object> list = decodePrivateKeyPKCS8(encodedData);
-                //AlgorithmId algId = (AlgorithmId) list.get(0);
                 Object rawKey = list.get(1);
-                //TODO 2018/4/20 IKeyImportOpts参数,KeyImport等待GmCsp完成
-                IKey priv = gmCsp.keyImport(rawKey, new IKeyImportOpts() {
-                    @Override
-                    public String getAlgorithm() {
-                        return "SM2";
-                    }
-
-                    @Override
-                    public boolean isEphemeral() {
-                        return true;
-                    }
-                });
-                return priv;
+                return gmCsp.keyImport(rawKey,  new SM2KeyImportOpts(true));
             } catch (Exception e) {
                 log.error("An error occurred on loadPrivateKey: {}", e.getMessage());
             }
         }
-        return null;
+        throw new JavaChainException("no pem file found");
     }
 
     private static byte[] encodePrivateKeyPKCS8(byte[] privateKey, AlgorithmId algId) throws JavaChainException {
@@ -145,7 +141,6 @@ public class CspHelper {
     }
 
     public static ECPublicKey getSM2PublicKey(IKey priv) throws JavaChainException {
-        // TODO wait GmCsp fix
         IKey pubKey;
         try {
             pubKey = priv.getPublicKey();

@@ -19,6 +19,7 @@ package org.bcia.javachain.common.tools.cryptogen;
 import org.apache.commons.io.FileUtils;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.tools.cryptogen.bean.Configuration;
+import org.bcia.javachain.msp.mgmt.Msp;
 import org.bcia.javachain.msp.util.MspConfigBuilder;
 import org.bcia.javachain.protos.msp.MspConfigPackage;
 import org.junit.Assert;
@@ -38,6 +39,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static org.junit.Assert.*;
 
 
 public class MspHelperTest {
@@ -63,22 +66,17 @@ public class MspHelperTest {
     }
 
     @Rule
-    public ExpectedException expectedRule=ExpectedException.none();
+    public ExpectedException expectedRule = ExpectedException.none();
 
     @Test
     public void generateLocalMSP() throws JavaChainException, IOException {
-
         FileUtil.removeAll(testDir);
-
-        expectedRule.expect(JavaChainException.class);
-        expectedRule.expectMessage("An error occurred on signCertificate");
-        MspHelper.generateLocalMSP(testDir, testName, null, new CaHelper(), new CaHelper(), MspHelper.PEER, true);
 
         String caDir = Paths.get(testDir, "ca").toString();
         String tlsCADir = Paths.get(testDir, "tlsca").toString();
         String mspDir = Paths.get(testDir, "msp").toString();
         String tlsDir = Paths.get(testDir, "tls").toString();
-        //generate  CaHelper
+        // generate  CaHelper
         CaHelper signCA = CaHelper.newCA(caDir, testCAOrg, testCAName, testCountry, testProvince, testLocality, testOrganizationUnit, testStreetAddress, testPostalCode);
         CaHelper tlsCA = CaHelper.newCA(tlsCADir, testCAOrg, testCAName, testCountry, testProvince, testLocality, testOrganizationUnit, testStreetAddress, testPostalCode);
 
@@ -88,9 +86,9 @@ public class MspHelperTest {
         Assert.assertEquals(testLocality, X509CertificateUtil.getSubject(subjectDN).getLocality().get(0));
         Assert.assertEquals(testOrganizationUnit, X509CertificateUtil.getSubject(subjectDN).getOrganizationalUnit().get(0));
         Assert.assertEquals(testStreetAddress, X509CertificateUtil.getSubject(subjectDN).getStreetAddress().get(0));
-        //generate local MSP for nodeType=PEER
+        // generate local MSP for nodeType=PEER
         MspHelper.generateLocalMSP(testDir, testName, null, signCA, tlsCA, MspHelper.PEER, true);
-        //check to see that the right files were generated/saved
+        // check to see that the right files were generated/saved
         List<String> mspFiles = new ArrayList<>();
         mspFiles.add(Paths.get(mspDir, "admincerts", testName + "-cert.pem").toString());
         mspFiles.add(Paths.get(mspDir, "cacerts", testCAName + "-cert.pem").toString());
@@ -105,12 +103,12 @@ public class MspHelperTest {
         tlsFiles.add(Paths.get(tlsDir, "server.crt").toString());
 
         for (String mspFile : mspFiles) {
-            Assert.assertTrue(new File(mspFile).exists());
+            assertTrue(new File(mspFile).exists());
         }
         for (String tlsFile : tlsFiles) {
-            Assert.assertTrue(new File(tlsFile).exists());
+            assertTrue(new File(tlsFile).exists());
         }
-        //generate local MSP for nodeType=CLENT
+        // generate local MSP for nodeType = CLIENT
         MspHelper.generateLocalMSP(testDir, testName, null, signCA, tlsCA, MspHelper.CLIENT, true);
         tlsFiles = new ArrayList<>();
         tlsFiles.add(Paths.get(tlsDir, "ca.crt").toString());
@@ -118,17 +116,14 @@ public class MspHelperTest {
         tlsFiles.add(Paths.get(tlsDir, "client.crt").toString());
 
         for (String tlsFile : tlsFiles) {
-            Assert.assertTrue(new File(tlsFile).exists());
+            assertTrue(new File(tlsFile).exists());
         }
-        //finally check to see if we can load this as a local MSP config
+        // finally check to see if we can load this as a local MSP config
         setupMspConfig(mspDir);
-
-
     }
 
     @Test
     public void generateVerifyingMSP() throws JavaChainException, IOException {
-
         System.out.println("testDir=" + testDir);
 
         String caDir = Paths.get(testDir, "ca").toString();
@@ -153,7 +148,6 @@ public class MspHelperTest {
                 testOrganizationUnit,
                 testStreetAddress,
                 testPostalCode);
-
         MspHelper.generateVerifyingMSP(mspDir, signCA, tlsCA, true);
 
         List<String> files = new ArrayList<>();
@@ -162,13 +156,10 @@ public class MspHelperTest {
         files.add(Paths.get(mspDir, "tlscacerts", testCAName + "-cert.pem").toString());
         files.add(Paths.get(mspDir, "config.yaml").toString());
 
-
-
-
         for (String file : files) {
-            Assert.assertTrue(new File(file).exists());
+            assertTrue(new File(file).exists());
         }
-        //finally check to see if we can load this as a verifying MSP config
+        // finally check to see if we can load this as a verifying MSP config
         expectedRule.expect(JavaChainException.class);
         expectedRule.expectMessage("the name is illegal");
         tlsCA.setName("test/fail");
@@ -202,26 +193,18 @@ public class MspHelperTest {
         } catch (FileNotFoundException e) {
             throw new JavaChainException(configFile + " is not found");
         }
-        Assert.assertTrue(configuration.getNodeOUs().getEnable());
-
+        assertTrue(configuration.getNodeOUs().getEnable());
         Assert.assertEquals(caFile, configuration.getNodeOUs().getClientOUIdentifier().getCertificate());
-
-        Assert.assertEquals(MspHelper.CLIENTOU, configuration.getNodeOUs().getClientOUIdentifier().getOrganizationalUnitIdentifier());
-
+        Assert.assertEquals(MspHelper.CLIENT_OU, configuration.getNodeOUs().getClientOUIdentifier().getOrganizationalUnitIdentifier());
         Assert.assertEquals(caFile, configuration.getNodeOUs().getPeerOUIdentifier().getCertificate());
-
-        Assert.assertEquals(MspHelper.PEEROU, configuration.getNodeOUs().getPeerOUIdentifier().getOrganizationalUnitIdentifier());
-
-
+        Assert.assertEquals(MspHelper.PEER_OU, configuration.getNodeOUs().getPeerOUIdentifier().getOrganizationalUnitIdentifier());
     }
 
-    public void setupMspConfig(String mspDir) throws IOException {
-
+    private void setupMspConfig(String mspDir) throws IOException {
         List<String> caCert = new ArrayList<>();
-        File cacertFile = new File(Paths.get(mspDir, "cacerts").toString());
-        for (File file : Objects.requireNonNull(cacertFile.listFiles())) {
+        File caCertFile = new File(Paths.get(mspDir, "cacerts").toString());
+        for (File file : Objects.requireNonNull(caCertFile.listFiles())) {
             caCert.add(FileUtils.readFileToString(file, Charset.forName("UTF-8")));
-
         }
 
         List<String> adminCert = new ArrayList<>();
@@ -242,27 +225,9 @@ public class MspHelperTest {
             tlsCaCert.add(FileUtils.readFileToString(file, Charset.forName("UTF-8")));
         }
 
-        List<String> intermediateCerts = new ArrayList<>();
-        File intermediateCertFile = new File(Paths.get(mspDir, "intermediatecerts").toString());
-        for (File file : Objects.requireNonNull(intermediateCertFile.listFiles())) {
-            intermediateCerts.add(FileUtils.readFileToString(file, Charset.forName("UTF-8")));
-        }
-
-        List<String> crls = new ArrayList<>();
-        File crlsFile = new File(Paths.get(mspDir, "crls").toString());
-        for (File file : Objects.requireNonNull(crlsFile.listFiles())) {
-            crls.add(FileUtils.readFileToString(file, Charset.forName("UTF-8")));
-        }
-
         List<String> configContent = new ArrayList<>();
         File configFile = new File(Paths.get(mspDir, "config.yaml").toString());
         configContent.add(FileUtils.readFileToString(configFile, Charset.forName("UTF-8")));
-
-        List<String> tlsintermediatecCerts = new ArrayList<>();
-        File tlsintermediateCertsFile = new File(Paths.get(mspDir, "tlsintermediatecerts").toString());
-        for (File file : Objects.requireNonNull(tlsintermediateCertsFile.listFiles())) {
-            tlsintermediatecCerts.add(FileUtils.readFileToString(file, Charset.forName("UTF-8")));
-        }
 
         List<String> signCert = new ArrayList<>();
         File signCertFile = new File(Paths.get(mspDir, "signcerts").toString());
@@ -270,9 +235,9 @@ public class MspHelperTest {
             signCert.add(FileUtils.readFileToString(file, Charset.forName("UTF-8")));
         }
 
-//        MspConfigPackage.FabricMSPConfig mspConfig = MspConfigBuilder.buildFabricMspConfig(caCert, keyStore, signCert, adminCert, intermediateCerts, crls, configContent, tlsCacert, tlsintermediatecCerts);
-//        CspMsp cspMsp = new CspMsp();
-        // TODO: 2018/4/20 setupV11未完善
-//        cspMsp.setupV11(mspConfig);
+        MspConfigPackage.MSPConfig mspConfig = MspConfigBuilder.buildMspConfig(
+                "testMsp", caCert, keyStore, signCert, adminCert, new ArrayList<>(), new ArrayList<>(), configContent, tlsCaCert, new ArrayList<>());
+        Msp msp = new Msp();
+        msp.setup(mspConfig);
     }
 }

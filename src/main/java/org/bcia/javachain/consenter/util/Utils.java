@@ -15,8 +15,10 @@
  */
 package org.bcia.javachain.consenter.util;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
+import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.common.Common;
@@ -118,5 +120,8 @@ public class Utils {
         }
         return all_byte;
     }
+
+
+
 
 }

@@ -26,6 +26,8 @@ import org.bouncycastle.util.Times;
 import java.sql.Date;
 import java.sql.Time;
 
+import static org.bcia.javachain.common.util.Expiration.expiresAt;
+
 /**
  * @author zhangmingyang
  * @Date: 2018/5/9
@@ -59,7 +61,7 @@ public class Expiration implements IRule {
         java.util.Date date=new java.util.Date();
 
         org.bouncycastle.asn1.x509.Time time=new org.bouncycastle.asn1.x509.Time(date);
-        org.bouncycastle.asn1.x509.Time expirationTime=org.bcia.javachain.consenter.util.Expiration.expiresAt(signData.getIdentity());
+        org.bouncycastle.asn1.x509.Time expirationTime=expiresAt(signData.getIdentity());
 //        if(expirationTime>){
 //
 //        }

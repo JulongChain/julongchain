@@ -34,7 +34,9 @@ import org.bcia.javachain.protos.common.MspPrincipal;
 import org.bcia.javachain.protos.msp.Identities;
 import org.bouncycastle.asn1.x509.Certificate;
 
+
 import java.io.IOException;
+
 import java.security.cert.CertificateEncodingException;
 
 import static org.bcia.javachain.common.util.Convert.bytesToHexString;
@@ -163,9 +165,9 @@ public class Identity implements ISigningIdentity {
             Identities.SerializedIdentity.Builder serializedIdentity=Identities.SerializedIdentity.newBuilder();
             serializedIdentity.setMspid(this.identityIdentifier.Mspid);
         try {
-            serializedIdentity.setIdBytes(ByteString.copyFrom(this.certificate.getEncoded()));
+            serializedIdentity.setIdBytes(ByteString.copyFrom(certificate.getEncoded()));
             return serializedIdentity.build().toByteArray();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

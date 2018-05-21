@@ -164,7 +164,7 @@ public class CaHelperTest {
             certDir += File.separator;
         }
         Certificate bcCert = Certificate.getInstance(cert.getEncoded());
-        Certificate loadedCert = CaHelper.loadCertificateSM2(certDir + testName3 + "-cert.pem");
+        Certificate loadedCert = CaHelper.loadCertificateSM2(certDir);
         Assert.assertNotNull(loadedCert);
         Assert.assertEquals(bcCert.getSerialNumber(), loadedCert.getSerialNumber());
         Assert.assertEquals(X509CertificateUtil.getSubject(cert.getSubjectDN().getName()).getCommonName(),
@@ -251,13 +251,12 @@ public class CaHelperTest {
         boolean containIPAddress = false;
         try {
             Collection altName = cert.getSubjectAlternativeNames();
-            Iterator itAltName = altName.iterator();
-            while (itAltName.hasNext()) {
-                List list = (List) itAltName.next();
-                if(list.contains(testName2)) {
+            for (Object anAltName : altName) {
+                List list = (List) anAltName;
+                if (list.contains(testName2)) {
                     containDNSName = true;
                 }
-                if(list.contains(testIP)) {
+                if (list.contains(testIP)) {
                     containIPAddress = true;
                 }
             }
@@ -274,7 +273,7 @@ public class CaHelperTest {
 
         boolean finishSign;
         try {
-            cert = rootCA.signCertificate(certDir,
+            rootCA.signCertificate(certDir,
                     "empty/CaHelper",
                     null,
                     sans,
@@ -287,18 +286,6 @@ public class CaHelperTest {
         }
         Assert.assertFalse(finishSign);
 
-        // use an empty CaHelper to test error path
-        CaHelper badCA = new CaHelper();
-        try {
-            badCA.signCertificate(certDir, testName, null, null, ecPubKey, KeyUsage.keyEncipherment, new int[]{Util.extKeyUsageAny});
-            finishSign = true;
-        } catch (JavaChainException e) {
-            finishSign = false;
-        }
-        Assert.assertFalse(finishSign);
-
         FileUtil.removeAll(testDir);
     }
-
-
 }

@@ -36,7 +36,7 @@ public class MetaDataTest {
                 System.getProperty("os.name") +
                 "/" +
                 System.getProperty("os.arch");
-        Assert.assertEquals(expected,MetaData.getVersionInfo());
+        Assert.assertEquals(expected, MetaData.getVersionInfo());
 
     }
 }

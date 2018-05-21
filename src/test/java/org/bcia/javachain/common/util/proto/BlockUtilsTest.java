@@ -4,7 +4,6 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.genesis.GenesisBlockFactory;
-import org.bcia.javachain.node.cmd.group.GroupJoinCmd;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 import org.hamcrest.Matchers;
@@ -12,8 +11,6 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import static org.junit.Assert.*;
 
 /**
  * 对象

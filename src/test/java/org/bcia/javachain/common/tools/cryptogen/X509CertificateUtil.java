@@ -19,7 +19,8 @@ package org.bcia.javachain.common.tools.cryptogen;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.tools.cryptogen.bean.Subject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author chenhao, liuxifeng

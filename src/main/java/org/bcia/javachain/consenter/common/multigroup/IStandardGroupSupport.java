@@ -13,42 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.entity;
+package org.bcia.javachain.consenter.common.multigroup;
 
+import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.protos.common.Common;
-
-import java.io.Serializable;
+import org.bcia.javachain.protos.common.Configtx;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/15
+ * @Date: 2018/5/17
  * @company Dingxuan
  */
-public class ConfigMsg implements Serializable{
-    private Common.Envelope config;
-    private long configSeq;
-
-    public ConfigMsg() {
-    }
-
-    public ConfigMsg(Common.Envelope config, long configSeq) {
-        this.config = config;
-        this.configSeq = configSeq;
-    }
-
-    public Common.Envelope getConfig() {
-        return config;
-    }
-
-    public void setConfig(Common.Envelope config) {
-        this.config = config;
-    }
-
-    public long getConfigSeq() {
-        return configSeq;
-    }
-
-    public void setConfigSeq(long configSeq) {
-        this.configSeq = configSeq;
-    }
+public interface IStandardGroupSupport {
+    long sequence();
+    String chainId();
+    ILocalSigner signer();
+    Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx);
 }

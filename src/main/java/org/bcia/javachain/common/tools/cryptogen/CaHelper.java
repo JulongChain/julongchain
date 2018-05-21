@@ -61,10 +61,6 @@ public class CaHelper {
         this.mName = name;
     }
 
-    public CaHelper() {
-
-    }
-
     public CaHelper(String name,
                     String country,
                     String province,
@@ -136,13 +132,11 @@ public class CaHelper {
 
             if (sans != null && sans.size() > 0) {
                 GeneralNames generalNames = new GeneralNames();
-
                 for (String san : sans) {
                     // try to parse as an IP address first
                     if (IPAddress.isValid(san)) {
                         generalNames.add(new GeneralName(new IPAddressName(san)));
                     } else {
-                        // TODO: 2018/4/20  SANS的值添加有误
                         generalNames.add(new GeneralName(new DNSName(san)));
                     }
                 }
@@ -287,22 +281,28 @@ public class CaHelper {
     }
 
     public static Certificate loadCertificateSM2(String certPath) throws JavaChainException {
-
-        if (!certPath.endsWith(".pem")) {
-            throw new JavaChainException("The file is not a 'pem' file");
+        File certDir = new File(certPath);
+        File[] files = certDir.listFiles();
+        if (!certDir.isDirectory() || files == null) {
+            log.error("invalid directory for certPath " + certPath);
+            return null;
         }
-        try {
-            File file = new File(certPath);
-            InputStreamReader reader = new InputStreamReader(new FileInputStream(file));
-            PemReader pemReader = new PemReader(reader);
-            PemObject pemObject = pemReader.readPemObject();
-            reader.close();
-            byte[] certBytes = pemObject.getContent();
-            // TODO 2018/4/20 new X509CertImpl报异常
-            return Certificate.getInstance(certBytes);
-        } catch (Exception e) {
-            throw new JavaChainException("An error occurred :" + e.getMessage());
+        for (File file : files) {
+            if (!file.getName().endsWith(".pem")) {
+                continue;
+            }
+            try {
+                InputStreamReader reader = new InputStreamReader(new FileInputStream(file));
+                PemReader pemReader = new PemReader(reader);
+                PemObject pemObject = pemReader.readPemObject();
+                reader.close();
+                byte[] certBytes = pemObject.getContent();
+                return Certificate.getInstance(certBytes);
+            } catch (Exception e) {
+                throw new JavaChainException("An error occurred :" + e.getMessage());
+            }
         }
+        throw new JavaChainException("no pem file found");
     }
 
     public String getName() {

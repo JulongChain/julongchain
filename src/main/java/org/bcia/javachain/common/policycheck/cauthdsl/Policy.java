@@ -79,8 +79,8 @@ public class Policy implements IPolicy{
      * @return
      */
     public PolicyProvider NewPolicyProvider(IIdentityDeserializer deserializer){
-        PolicyProvider policyProvider = new PolicyProvider();
-        policyProvider.setDeserializer(deserializer);
+        PolicyProvider policyProvider = new PolicyProvider(deserializer);
+        //policyProvider.setDeserializer(deserializer);
         return policyProvider;
 
     }

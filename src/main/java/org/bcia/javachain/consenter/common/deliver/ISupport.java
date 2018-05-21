@@ -1,5 +1,5 @@
 /**
- * Copyright DingXuan. All Rights Reserved.
+ * Copyright Aisino. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.common.msgprocessor;
 
-import org.bcia.javachain.protos.common.Common;
+package org.bcia.javachain.consenter.common.deliver;
+
+
+import org.bcia.javachain.common.ledger.blockledger.Reader;
+import org.bcia.javachain.common.policies.IManager;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/5/9
+ * @Date: 2018/5/17
  * @company Dingxuan
  */
-public class Filter implements IRule {
-    private  IRule[] rules;
+public interface ISupport {
+    long sequence() ;
 
-    public Filter(IRule[] rules) {
-        this.rules=rules;
-    }
+    IManager poclicyManager();
 
-    @Override
-    public void apply(Common.Envelope message) {
-        for (IRule rule: rules) {
-            rule.apply(message);
-        }
-    }
+    Reader reader();
 }

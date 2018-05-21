@@ -31,7 +31,6 @@ import org.bouncycastle.asn1.x509.Certificate;
 
 import java.io.File;
 import java.nio.file.Paths;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,7 +63,7 @@ public class ExtendCmd implements ICryptoGenCmd {
 
         File file = new File(orgDir);
         if (!file.exists()) {
-            generateConstenerOrgs(inputDir, orgSpec);
+            generateConsenterOrgs(inputDir, orgSpec);
             return;
         }
         CaHelper signCA = getCA(caDir, orgSpec, orgSpec.getCa().getCommonName());
@@ -122,7 +121,6 @@ public class ExtendCmd implements ICryptoGenCmd {
 
     private CaHelper getCA(String caDir, OrgSpec spec, String name) throws JavaChainException {
         IKey privKey = CspHelper.loadPrivateKey(caDir);
-
         Certificate cert = CaHelper.loadCertificateSM2(caDir);
         NodeSpec ca = spec.getCa();
         return new CaHelper(
