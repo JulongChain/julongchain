@@ -97,6 +97,5 @@ public class EventProcessor implements IEventProcessor {
         ValidateUtils.isNotNull(event, "event can not be null");
 
 
-
     }
 }
