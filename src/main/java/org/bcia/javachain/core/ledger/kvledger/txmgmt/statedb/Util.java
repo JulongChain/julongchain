@@ -16,7 +16,7 @@
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
-import org.bcia.javachain.csp.gm.sm3.SM3;
+import org.bcia.javachain.csp.gm.dxct.sm3.SM3;
 
 import java.util.Map;
 

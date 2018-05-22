@@ -18,7 +18,7 @@ package org.bcia.javachain.csp.gm.sdt;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.util.Convert;
 import org.bcia.javachain.csp.factory.IFactoryOpts;
-import org.bcia.javachain.csp.gm.RngOpts;
+import org.bcia.javachain.csp.gm.dxct.RngOpts;
 import org.bcia.javachain.csp.gm.sdt.SM2.*;
 import org.bcia.javachain.csp.gm.sdt.SM3.SM3HashOpts;
 import org.bcia.javachain.csp.gm.sdt.SM4.*;

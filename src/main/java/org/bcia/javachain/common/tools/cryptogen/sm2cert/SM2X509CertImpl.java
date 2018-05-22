@@ -19,10 +19,9 @@ import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.tools.cryptogen.CspHelper;
-import org.bcia.javachain.csp.gm.sm3.SM3HashOpts;
+import org.bcia.javachain.csp.gm.dxct.sm3.SM3HashOpts;
 import org.bcia.javachain.csp.intfs.IKey;
 import sun.security.util.DerOutputStream;
-import sun.security.util.DerValue;
 import sun.security.util.ObjectIdentifier;
 import sun.security.x509.AlgorithmId;
 import sun.security.x509.X509CertImpl;
@@ -32,7 +31,6 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateParsingException;
 
 /**
  * @author chenhao

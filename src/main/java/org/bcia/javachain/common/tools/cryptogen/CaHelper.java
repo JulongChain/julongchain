@@ -19,7 +19,7 @@ import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.tools.cryptogen.sm2cert.SM2X509CertImpl;
-import org.bcia.javachain.csp.gm.sm2.SM2Key;
+import org.bcia.javachain.csp.gm.dxct.sm2.SM2Key;
 import org.bcia.javachain.csp.intfs.IKey;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.KeyUsage;

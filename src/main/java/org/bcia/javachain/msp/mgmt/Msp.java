@@ -19,8 +19,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.csp.gm.GmCsp;
-import org.bcia.javachain.csp.gm.sm2.SM2KeyExport;
+import org.bcia.javachain.csp.gm.dxct.GmCsp;
+import org.bcia.javachain.csp.gm.dxct.sm2.SM2KeyExport;
 import org.bcia.javachain.csp.intfs.IKey;
 import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.IMsp;
@@ -32,15 +32,12 @@ import org.bcia.javachain.msp.signer.Signer;
 import org.bcia.javachain.protos.common.MspPrincipal;
 import org.bcia.javachain.protos.msp.Identities;
 import org.bcia.javachain.protos.msp.MspConfigPackage;
-import org.bouncycastle.asn1.ASN1InputStream;
-import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.CertificateList;
 import org.bouncycastle.util.io.pem.PemReader;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import java.util.HashMap;

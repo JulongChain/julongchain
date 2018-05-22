@@ -16,12 +16,10 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.blockfile;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.genesis.GenesisBlockFactory;
 import org.bcia.javachain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.javachain.common.ledger.blockledger.ram.RamLedgerFactory;
-import org.bcia.javachain.csp.gm.sm3.SM3;
+import org.bcia.javachain.csp.gm.dxct.sm3.SM3;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.common.Configtx;
 import org.junit.Before;
 import org.junit.Test;
 

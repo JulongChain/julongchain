@@ -30,7 +30,7 @@ import org.bcia.javachain.core.node.NodeConfig;
 import org.bcia.javachain.core.node.NodeConfigFactory;
 import org.bcia.javachain.core.node.util.ConfigTxUtils;
 import org.bcia.javachain.csp.factory.IFactoryOpts;
-import org.bcia.javachain.csp.gm.GmFactoryOpts;
+import org.bcia.javachain.csp.gm.dxct.GmFactoryOpts;
 import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.msp.mspconfig.MspConfig;
 import org.bcia.javachain.node.cmd.INodeCmd;
@@ -43,7 +43,6 @@ import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.ArrayList;

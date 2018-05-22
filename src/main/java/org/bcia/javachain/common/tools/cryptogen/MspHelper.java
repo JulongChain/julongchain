@@ -19,7 +19,7 @@ import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.tools.cryptogen.bean.Configuration;
 import org.bcia.javachain.common.tools.cryptogen.bean.NodeOUs;
 import org.bcia.javachain.common.tools.cryptogen.bean.OrgUnitIdentifiersConfig;
-import org.bcia.javachain.csp.gm.sm2.SM2KeyGenOpts;
+import org.bcia.javachain.csp.gm.dxct.sm2.SM2KeyGenOpts;
 import org.bcia.javachain.csp.intfs.ICsp;
 import org.bcia.javachain.csp.intfs.IKey;
 import org.bouncycastle.asn1.x509.Certificate;

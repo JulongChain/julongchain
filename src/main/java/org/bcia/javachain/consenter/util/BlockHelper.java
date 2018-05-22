@@ -17,7 +17,7 @@ package org.bcia.javachain.consenter.util;
 
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.JavaChainException;
-import org.bcia.javachain.csp.gm.sm3.SM3HashOpts;
+import org.bcia.javachain.csp.gm.dxct.sm3.SM3HashOpts;
 import org.bcia.javachain.protos.common.Common;
 
 import static org.bcia.javachain.csp.factory.CspManager.getDefaultCsp;

@@ -1,7 +1,9 @@
 package org.bcia.javachain.csp.gm;
 
 import org.bcia.javachain.csp.factory.IFactoryOpts;
-import org.bcia.javachain.csp.gm.sm3.SM3HashOpts;
+import org.bcia.javachain.csp.gm.dxct.GmCspFactory;
+import org.bcia.javachain.csp.gm.dxct.GmFactoryOpts;
+import org.bcia.javachain.csp.gm.dxct.sm3.SM3HashOpts;
 import org.bcia.javachain.csp.intfs.ICsp;
 import org.bcia.javachain.csp.intfs.opts.IHashOpts;
 import org.bcia.javachain.common.exception.JavaChainException;

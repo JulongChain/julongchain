@@ -19,10 +19,8 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.Util;
-import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
-import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.List;
 import java.util.Map;

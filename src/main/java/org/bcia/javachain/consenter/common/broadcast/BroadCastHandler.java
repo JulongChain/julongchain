@@ -21,7 +21,6 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.consenter.common.multigroup.MultiGroup;
 import org.bcia.javachain.consenter.entity.ConfigMsg;
 import org.bcia.javachain.consenter.util.Constant;
-import org.bcia.javachain.csp.gm.sm2.SM2;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.consenter.Ab;
 import org.springframework.stereotype.Component;

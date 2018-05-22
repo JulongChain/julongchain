@@ -1,12 +1,14 @@
 package org.bcia.javachain.csp.gm;
 
-import io.netty.handler.ssl.PemPrivateKey;
 import org.bcia.javachain.csp.factory.IFactoryOpts;
-import org.bcia.javachain.csp.gm.sm2.SM2KeyGenOpts;
-import org.bcia.javachain.csp.gm.sm3.SM3HashOpts;
-import org.bcia.javachain.csp.gm.sm4.SM4EncrypterOpts;
-import org.bcia.javachain.csp.gm.sm4.SM4Key;
-import org.bcia.javachain.csp.gm.sm4.SM4KeyGenOpts;
+import org.bcia.javachain.csp.gm.dxct.GmCsp;
+import org.bcia.javachain.csp.gm.dxct.GmCspFactory;
+import org.bcia.javachain.csp.gm.dxct.GmFactoryOpts;
+import org.bcia.javachain.csp.gm.dxct.sm2.SM2KeyGenOpts;
+import org.bcia.javachain.csp.gm.dxct.sm3.SM3HashOpts;
+import org.bcia.javachain.csp.gm.dxct.sm4.SM4EncrypterOpts;
+import org.bcia.javachain.csp.gm.dxct.sm4.SM4Key;
+import org.bcia.javachain.csp.gm.dxct.sm4.SM4KeyGenOpts;
 import org.bcia.javachain.csp.intfs.ICsp;
 import org.bcia.javachain.csp.intfs.IKey;
 import org.bcia.javachain.csp.intfs.opts.IHashOpts;
@@ -21,13 +23,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import sun.security.pkcs.PKCS8Key;
-import sun.security.util.Pem;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
-import java.security.spec.PKCS8EncodedKeySpec;
 
 import static org.bcia.javachain.csp.factory.CspManager.getDefaultCsp;
 
