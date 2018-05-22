@@ -279,7 +279,7 @@ public class CSSC extends SystemSmartContractBase {
             events = EventHelper.createBlockEvents(block);
             bCreated = true;
             EventHelper.send(events);
-        } catch (EventException e) {
+        } catch (Exception e) {
             String msg = "";
             if (bCreated) {
                 msg = String.format("Error processing block events for block number [%d]: %s",
