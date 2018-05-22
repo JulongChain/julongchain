@@ -20,10 +20,10 @@ import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.csp.factory.IFactoryOpts;
-import org.bcia.javachain.csp.gm.sm2.SM2KeyExport;
-import org.bcia.javachain.csp.gm.sm2.SM2KeyGenOpts;
-import org.bcia.javachain.csp.gm.sm2.SM2SignerOpts;
-import org.bcia.javachain.csp.gm.sm2.util.SM2KeyUtil;
+import org.bcia.javachain.csp.gm.dxct.sm2.SM2KeyExport;
+import org.bcia.javachain.csp.gm.dxct.sm2.SM2KeyGenOpts;
+import org.bcia.javachain.csp.gm.dxct.sm2.SM2SignerOpts;
+import org.bcia.javachain.csp.gm.dxct.sm2.util.SM2KeyUtil;
 import org.bcia.javachain.csp.intfs.IKey;
 import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.ISigningIdentity;
@@ -34,10 +34,6 @@ import org.bcia.javachain.protos.common.MspPrincipal;
 import org.bcia.javachain.protos.msp.Identities;
 import org.bouncycastle.asn1.x509.Certificate;
 
-
-import java.io.IOException;
-
-import java.security.cert.CertificateEncodingException;
 
 import static org.bcia.javachain.common.util.Convert.bytesToHexString;
 import static org.bcia.javachain.csp.factory.CspManager.getDefaultCsp;

@@ -1,7 +1,7 @@
 package org.bcia.javachain.msp.mgmt;
 
 import org.bcia.javachain.csp.factory.IFactoryOpts;
-import org.bcia.javachain.csp.gm.GmFactoryOpts;
+import org.bcia.javachain.csp.gm.dxct.GmFactoryOpts;
 import org.bcia.javachain.msp.mspconfig.MspConfig;
 import org.junit.Test;
 

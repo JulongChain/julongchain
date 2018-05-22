@@ -21,7 +21,7 @@ import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
 import org.bcia.javachain.core.ledger.kvledger.KvLedger;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
-import org.bcia.javachain.csp.gm.sm3.SM3;
+import org.bcia.javachain.csp.gm.dxct.sm3.SM3;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 import org.junit.After;

@@ -338,21 +338,13 @@ public class Util {
         try {
             InputStream in;
             if (filePath == null) {
-                in = new ByteArrayInputStream(ShowTemplateCmd.DEFAULT_TEMPLATE.getBytes());
+                in = new ByteArrayInputStream(ShowTemplateCmd.template.getBytes());
             } else {
-                File file = new File(filePath);
-                if (!file.exists()) {
-                    URL url = LoadYaml.class.getClassLoader().getResource(filePath);
-                    if (url == null) {
-                        throw new JavaChainException("file not found in file system nor jar while loading yaml, path: " + file);
-                    }
-                    file = new File(url.getFile());
-                }
-                in = new FileInputStream(file);
+                in = new FileInputStream(new File(filePath));
             }
             return new Yaml().loadAs(in, tClass);
         } catch (FileNotFoundException e) {
-            throw new JavaChainException("file not found while loading yaml, path: " + filePath);
+            throw new JavaChainException("file not found in file system while loading yaml, path: " + filePath);
         }
     }
 }

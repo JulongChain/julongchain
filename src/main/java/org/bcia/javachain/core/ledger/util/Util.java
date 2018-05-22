@@ -19,7 +19,6 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;

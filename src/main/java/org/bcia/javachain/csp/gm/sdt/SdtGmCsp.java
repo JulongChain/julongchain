@@ -244,7 +244,7 @@ public class SdtGmCsp implements ICsp {
 
     @Override
     public byte[] hash(byte[] msg, IHashOpts opts) throws JavaChainException {
-        if (msg.length == 0) {
+        if (null == msg || 0 == msg.length) {
             logger.error("Invalid msg. Cannot be empty.");
             throw new JavaChainException("Invalid msg. Cannot be empty.");
         }
@@ -260,13 +260,17 @@ public class SdtGmCsp implements ICsp {
 
     @Override
     public byte[] sign(IKey key, byte[] digest, ISignerOpts opts) throws JavaChainException {
-        if (key == null) {
+        if (null == key) {
             logger.error("Invalid Key. It must not be nil.");
             throw new JavaChainException("Invalid Key. It must not be nil.");
         }
-        if (digest.length == 0) {
+        if (null == digest || 0 == digest.length) {
             logger.error("Invalid digest. Cannot be empty.");
             throw new JavaChainException("Invalid digest. Cannot be empty.");
+        }
+        if (null == opts) {
+            logger.error("Invalid opts. It must not be nil.");
+            throw new JavaChainException("Invalid opts. It must not be nil.");
         }
         if (opts instanceof SM2SignerOpts) {
             return sm2.sign(digest, key.toBytes());
@@ -277,13 +281,17 @@ public class SdtGmCsp implements ICsp {
     @Override
     public boolean verify(IKey key, byte[] signature, byte[] digest, ISignerOpts opts) throws JavaChainException {
         boolean verify = false;
-        if (key == null) {
+        if (null == key) {
             logger.error("Invalid Key. It must not be nil.");
             throw new JavaChainException("Invalid Key. It must not be nil.");
         }
-        if (signature.length == 0) {
+        if (null == signature || 0 == signature.length) {
             logger.error("Invalid signature. It must not be nil.");
             throw new JavaChainException("Invalid signature. It must not be nil.");
+        }
+        if (null == opts) {
+            logger.error("Invalid opts. It must not be nil.");
+            throw new JavaChainException("Invalid opts. It must not be nil.");
         }
         if (opts instanceof SM2SignerOpts) {
             if(0 == sm2.verify(digest, key.getPublicKey().toBytes(), signature)) {
@@ -295,9 +303,13 @@ public class SdtGmCsp implements ICsp {
 
     @Override
     public byte[] encrypt(IKey key, byte[] plaintext, IEncrypterOpts opts) throws JavaChainException {
-        if (key == null) {
+        if (null == key) {
             logger.error("Invalid Key. It must not be nil.");
             throw new JavaChainException("Invalid Key. It must not be nil.");
+        }
+        if (null == opts) {
+            logger.error("Invalid opts. It must not be nil.");
+            throw new JavaChainException("Invalid opts. It must not be nil.");
         }
         if (opts instanceof SM4EncrypterOpts) {
             return sm4.encryptECB(plaintext, key.toBytes());
@@ -307,13 +319,17 @@ public class SdtGmCsp implements ICsp {
 
     @Override
     public byte[] decrypt(IKey key, byte[] ciphertext, IDecrypterOpts opts) throws JavaChainException {
-        if (key == null) {
+        if (null == key) {
             logger.error("Invalid Key. It must not be nil.");
             throw new JavaChainException("Invalid Key. It must not be nil.");
         }
-        if (ciphertext.length == 0) {
+        if (null == ciphertext || 0 == ciphertext.length) {
             logger.error("Invalid ciphertext. Cannot be empty.");
             throw new JavaChainException("Invalid ciphertext. Cannot be empty.");
+        }
+        if (null == opts) {
+            logger.error("Invalid opts. It must not be nil.");
+            throw new JavaChainException("Invalid opts. It must not be nil.");
         }
         if (opts instanceof SM4DecrypterOpts) {
             return sm4.decryptECB(ciphertext, key.toBytes());

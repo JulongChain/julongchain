@@ -17,7 +17,7 @@ package org.bcia.javachain.msp.util;
 
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.csp.gm.sm2.util.SM2KeyUtil;
+import org.bcia.javachain.csp.gm.dxct.sm2.util.SM2KeyUtil;
 
 import java.io.File;
 import java.util.ArrayList;

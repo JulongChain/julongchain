@@ -17,8 +17,8 @@ package org.bcia.javachain.csp.factory;
 
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.csp.gm.GmCspFactory;
-import org.bcia.javachain.csp.gm.GmFactoryOpts;
+import org.bcia.javachain.csp.gm.dxct.GmCspFactory;
+import org.bcia.javachain.csp.gm.dxct.GmFactoryOpts;
 import org.bcia.javachain.csp.intfs.ICsp;
 
 import java.util.HashMap;

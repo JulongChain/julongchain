@@ -19,11 +19,9 @@ import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.ledger.util.Util;
 import org.bcia.javachain.core.ledger.TxSimulationResults;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
-import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bcia.javachain.protos.ledger.rwset.Rwset;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

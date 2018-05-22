@@ -16,7 +16,6 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valimpl;
 
 import com.google.protobuf.ByteString;
-import com.google.rpc.Help;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -34,7 +33,6 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valinternal.Tran
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.core.ledger.util.TxValidationFlags;
 import org.bcia.javachain.core.ledger.util.Util;
-import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.ledger.rwset.Rwset;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;

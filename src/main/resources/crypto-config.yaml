@@ -65,13 +65,16 @@ peerOrgs:
     #                     - {{ .CommonName }}
     #                     - {{ .Hostname }}
     # ---------------------------------------------------------------------------
-#    specs:
-#       - hostname: foo # implicitly "foo.org1.example.com"
-#         commonName: foo27.org5.example.com # overrides Hostname-based FQDN set above
-#         SANS:
-#           - 172.16.10.31
-#       - hostname: bar
-#       - hostname: baz
+    # Specs:
+    #   - Hostname: foo # implicitly "foo.org1.example.com"
+    #     CommonName: foo27.org5.example.com # overrides Hostname-based FQDN set above
+    #     SANS:
+    #       - "bar.{{.Domain}}"
+    #       - "altfoo.{{.Domain}}"
+    #       - "{{.Hostname}}.org6.net"
+    #       - 172.16.10.31
+    #   - Hostname: bar
+    #   - Hostname: baz
 
     # ---------------------------------------------------------------------------
     # "Template"

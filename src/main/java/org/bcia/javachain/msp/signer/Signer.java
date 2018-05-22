@@ -16,8 +16,6 @@
 package org.bcia.javachain.msp.signer;
 
 import org.bcia.javachain.common.exception.JavaChainException;
-import org.bcia.javachain.csp.gm.GmCsp;
-import org.bcia.javachain.csp.gmt0016.excelsecu.bean.GmKey;
 import org.bcia.javachain.csp.intfs.ICsp;
 import org.bcia.javachain.csp.intfs.IKey;
 import org.bcia.javachain.csp.intfs.opts.ISignerOpts;
