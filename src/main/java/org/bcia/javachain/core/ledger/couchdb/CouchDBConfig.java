@@ -1,5 +1,5 @@
 /**
- * Copyright Turing. All Rights Reserved.
+ * Copyright ShanghaiGeer. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,27 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.bcia.javachain.core.ledger.couchdb;
 
-import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.log.JavaChainLog;
-import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DB;
+import org.bcia.javachain.core.node.NodeConfig;
+import org.bcia.javachain.core.node.NodeConfigFactory;
+
+import java.util.Map;
 
 /**
- * 提供操作couchdb的操作方法，如增，删，改，查
+ * read couchdb config
  *
- * @author zhangdazhi
- * @date 2018/04/20
- * @company Turing
+ * @author zhaiyihua
+ * @date 2018/05/20
+ * @company ShanghaiGeer
  */
-public class CouchDBFactory {
+public class CouchDBConfig {
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CouchDBFactory.class);
-
-   public static DB getDB() throws LedgerException{
-       return null;
-   }
-
+    public static Map getCouchDBDefinition(){
+        NodeConfig config = NodeConfigFactory.getNodeConfig();
+        NodeConfig.Ledger ledger = config.getLedger();
+        NodeConfig.State state = ledger.getState();
+        Map<String, String> couchDBConfig = state.getCouchDBConfig();
+        return couchDBConfig;
+    }
 }
