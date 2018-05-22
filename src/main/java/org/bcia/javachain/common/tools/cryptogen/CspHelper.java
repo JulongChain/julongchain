@@ -28,7 +28,6 @@ import org.bcia.javachain.csp.gm.sm2.SM2KeyImportOpts;
 import org.bcia.javachain.csp.gm.sm2.SM2PublicKey;
 import org.bcia.javachain.csp.intfs.ICsp;
 import org.bcia.javachain.csp.intfs.IKey;
-import org.bcia.javachain.csp.intfs.opts.IKeyImportOpts;
 import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
@@ -40,7 +39,6 @@ import sun.security.x509.AlgorithmId;
 import java.io.*;
 import java.math.BigInteger;
 import java.nio.file.Paths;
-import java.security.KeyStore;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECPoint;
 import java.util.ArrayList;
@@ -53,7 +51,7 @@ import java.util.List;
  */
 public class CspHelper {
     private static JavaChainLog log = JavaChainLogFactory.getLog(CspHelper.class);
-    private static final ICsp gmCsp = newCsp();
+    private static final ICsp csp = newCsp();
 
 
     public static ICsp getCsp() {
@@ -80,7 +78,7 @@ public class CspHelper {
                 byte[] encodedData = pemObject.getContent();
                 List<Object> list = decodePrivateKeyPKCS8(encodedData);
                 Object rawKey = list.get(1);
-                return gmCsp.keyImport(rawKey,  new SM2KeyImportOpts(true));
+                return csp.keyImport(rawKey,  new SM2KeyImportOpts(true));
             } catch (Exception e) {
                 log.error("An error occurred on loadPrivateKey: {}", e.getMessage());
             }
@@ -130,7 +128,12 @@ public class CspHelper {
     public static IKey generatePrivateKey(String keystorePath) throws JavaChainException {
 
         try {
-            IKey priv = gmCsp.keyGen(new SM2KeyGenOpts());
+            IKey priv = csp.keyGen(new SM2KeyGenOpts() {
+                @Override
+                public boolean isEphemeral() {
+                    return true;
+                }
+            });
             byte[] encodedData = encodePrivateKeyPKCS8(priv.toBytes(), new AlgorithmId(SM2PublicKeyImpl.SM2_OID));
             String path = Paths.get(keystorePath, Hex.toHexString(priv.ski()) + "_sk").toString();
             Util.pemExport(path, "PRIVATE KEY", encodedData);

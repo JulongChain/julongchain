@@ -24,5 +24,5 @@ import org.bcia.javachain.common.exception.JavaChainException;
  */
 public interface ICryptoGenCmd {
 
-    void  execCmd(String[] args) throws JavaChainException;
+    void execCmd(String[] args) throws JavaChainException;
 }

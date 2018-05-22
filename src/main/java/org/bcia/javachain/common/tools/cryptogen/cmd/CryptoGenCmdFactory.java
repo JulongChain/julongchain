@@ -21,7 +21,7 @@ package org.bcia.javachain.common.tools.cryptogen.cmd;
  * @date 2018/4/16
  * @company Excelsecu
  */
-public class CryptogenCmdFactory {
+public class CryptoGenCmdFactory {
 
     public static ICryptoGenCmd getInstance(String command) {
 
@@ -33,6 +33,10 @@ public class CryptogenCmdFactory {
             return new GenerateCmd();
         } else if (CmdConstant.EXTEND.equalsIgnoreCase(command)) {
             return new ExtendCmd();
+        } else if (CmdConstant.HELP.equalsIgnoreCase(command)) {
+            return new HelpCmd();
+        } else if (CmdConstant.HELP_OPT.equalsIgnoreCase(command)) {
+            return new HelpCmd();
         }
         return null;
     }

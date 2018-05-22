@@ -41,8 +41,8 @@ import java.util.List;
  * @date 2018/4/17
  * @company Excelsecu
  */
+@SuppressWarnings("WeakerAccess")
 public class Util {
-
     private static final String defaultHostnameTemplate = "{{.Prefix}}{{.Index}}";
     private static final String defaultCNTemplate = "{{.Hostname}}.{{.Domain}}";
     static String ADMIN_BASE_NAME = "Admin";
@@ -52,11 +52,8 @@ public class Util {
 
     //copy the admin cert to each of the org's peer's or consenter's MSP admincerts
     static void copyAllAdminCerts(String usersDir, String dstDir, String orgName, OrgSpec orgSpec, NodeSpec adminUser) {
-
         String dir = dstDir.contains("peers") ? "peers" : "consenter";
-
         for (NodeSpec spec : orgSpec.getSpecs()) {
-
             try {
                 copyAdminCert(usersDir, Paths.get(dstDir, spec.getCommonName(), "msp", "admincerts").toString(), adminUser.getCommonName());
             } catch (JavaChainException e) {
@@ -68,17 +65,14 @@ public class Util {
     }
 
     private static void copyAdminCert(String usersDir, String adminCertDir, String adminUserName) throws JavaChainException {
-
         File file = new File(Paths.get(adminCertDir, adminUserName + "-cert.pem").toString());
         if (file.exists()) {
             return;
         }
-
         FileUtil.removeAll(adminCertDir);
 
         // recreate the admincerts directory
         File adminCertFile = new File(adminCertDir);
-
         FileUtil.mkdirAll(Paths.get(adminCertFile.getAbsolutePath()));
         try {
             File srcFile = new File(Paths.get(usersDir, adminUserName, "msp", "signcerts", adminUserName + "-cert.pem").toString());
@@ -96,7 +90,6 @@ public class Util {
         int tempCount = nodeTemplate.getCount();
         // First process all of our template nodes
         for (int i = 0; i < tempCount; i++) {
-
             HostNameData data = new HostNameData(prefix, i + nodeTemplate.getStart(), orgSpec.getDomain());
             String hostName = parseTemplateWithDefault(nodeTemplate.getHostname(), defaultHostnameTemplate, data);
 
@@ -237,15 +230,12 @@ public class Util {
 
         // copy the admin cert to the org's MSP admincerts
         try {
-
             copyAdminCert(userDir, adminCertDir, adminUser.getCommonName());
         } catch (JavaChainException e) {
             log.error("Error copying admin cert for org " + orgName, e);
 
             System.exit(1);
         }
-
-
         copyAllAdminCerts(userDir, peerDir, orgName, orgSpec, adminUser);
 
         // copy the admin cert to each of the org's peer's MSP admincerts
@@ -258,8 +248,6 @@ public class Util {
                 System.exit(1);
             }
         }
-
-
     }
 
     static void generateNodes(String baseDir, List<NodeSpec> nodes, CaHelper signCA, CaHelper tlsCA, int nodeType, boolean nodeOUs) {
@@ -334,7 +322,6 @@ public class Util {
 
 
     private static CaHelper generateCA(String caDir, String orgName, String commonName, NodeSpec caSpec) {
-
         try {
             return CaHelper.newCA(caDir, orgName, commonName,
                     caSpec.getCountry(), caSpec.getProvince(), caSpec.getLocality(),
@@ -349,15 +336,19 @@ public class Util {
         return null;
     }
 
-    public static <T extends Object> T loadAs(String file, Class<T> tClass) throws JavaChainException {
+    public static <T> T loadAs(String filePath, Class<T> tClass) throws JavaChainException {
         try {
-            URL url = LoadYaml.class.getClassLoader().getResource(file);
-            if (url != null) {
-                return new Yaml().loadAs(new FileInputStream(url.getFile()), tClass);
+            File file = new File(filePath);
+            if (!file.exists()) {
+                URL url = LoadYaml.class.getClassLoader().getResource(filePath);
+                if (url == null) {
+                    throw new JavaChainException("file not found in file system nor jar while loading yaml, path: " + file);
+                }
+                file = new File(url.getFile());
             }
-            throw new JavaChainException("URL null while loading yaml, path: " + file);
+            return new Yaml().loadAs(new FileInputStream(file), tClass);
         } catch (FileNotFoundException e) {
-            throw new JavaChainException("file not found while loading yaml, path: " + file);
+            throw new JavaChainException("file not found while loading yaml, path: " + filePath);
         }
     }
 }

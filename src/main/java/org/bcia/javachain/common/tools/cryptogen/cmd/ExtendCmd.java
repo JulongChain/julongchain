@@ -42,8 +42,6 @@ import static org.bcia.javachain.common.tools.cryptogen.cmd.Util.*;
  * @company Excelsecu
  */
 public class ExtendCmd implements ICryptoGenCmd {
-
-
     private static JavaChainLog log = JavaChainLogFactory.getLog(ExtendCmd.class);
 
     //the value of "input" commandline option
@@ -52,8 +50,40 @@ public class ExtendCmd implements ICryptoGenCmd {
     //the value of "configFile" commandline option
     private String configFile;
 
-    private void extendConsenterOrg(OrgSpec orgSpec) throws JavaChainException {
+    @Override
+    public void execCmd(String[] args) throws JavaChainException {
+        Options options = new Options();
+        options.addOption(Option.builder()
+                .longOpt("input")
+                .desc("The input directory in which existing network place, default \"crypto-config\"")
+                .hasArg()
+                .argName("crypto-config")
+                .build());
+        options.addOption(Option.builder()
+                .longOpt("config")
+                .desc("The configuration template to use, default using \"cryptogen template\"")
+                .hasArg()
+                .argName("file name")
+                .build());
+        options.addOption(null, "help", false, "Print this message");
 
+        CommandLineParser parser = new DefaultParser();
+        try {
+            CommandLine commandLine = parser.parse(options, args);
+            if (commandLine.hasOption("help")) {
+                HelpFormatter helpFormatter = new HelpFormatter();
+                helpFormatter.printHelp("extend", options);
+                return;
+            }
+            inputDir = commandLine.getOptionValue("input", "crypto-config");
+            configFile = commandLine.getOptionValue("config", "crypto-config.yaml");
+            extend();
+        } catch (ParseException e) {
+            throw new JavaChainException(e.getMessage());
+        }
+    }
+
+    private void extendConsenterOrg(OrgSpec orgSpec) throws JavaChainException {
         String orgName = orgSpec.getDomain();
         String orgDir = Paths.get(inputDir, "consenterOrganizations", orgName).toString();
         String peersDir = Paths.get(orgDir, "consenters").toString();
@@ -75,12 +105,9 @@ public class ExtendCmd implements ICryptoGenCmd {
         adminUser.setCommonName(ADMIN_BASE_NAME + "@" + orgName);
 
         copyAllAdminCerts(usersDir, peersDir, orgName, orgSpec, adminUser);
-
-
     }
 
     private void extendPeerOrg(OrgSpec orgSpec) throws JavaChainException {
-
         String orgName = orgSpec.getDomain();
         String orgDir = Paths.get(inputDir, "peerOrganizations", orgName).toString();
 
@@ -97,7 +124,7 @@ public class ExtendCmd implements ICryptoGenCmd {
 
 
         CaHelper signCA = getCA(caDir, orgSpec, orgSpec.getCa().getCommonName());
-        CaHelper tlsCA = getCA(tlscaDir, orgSpec, "tls" +orgSpec.getCa().getCommonName());
+        CaHelper tlsCA = getCA(tlscaDir, orgSpec, "tls" + orgSpec.getCa().getCommonName());
 
         generateNodes(peersDir, orgSpec.getSpecs(), signCA, tlsCA, MspHelper.PEER, orgSpec.isEnableNodeOUs());
 
@@ -107,9 +134,8 @@ public class ExtendCmd implements ICryptoGenCmd {
         copyAllAdminCerts(usersDir, peersDir, orgName, orgSpec, adminUser);
         List<NodeSpec> users = new ArrayList<>();
 
-        int userCount =orgSpec.getUsers().getCount();
+        int userCount = orgSpec.getUsers().getCount();
         for (int i = 1; i <= userCount; i++) {
-
             NodeSpec user = new NodeSpec();
             user.setCommonName(USER_BASE_NAME + i + "@" + orgName);
             users.add(user);
@@ -135,33 +161,8 @@ public class ExtendCmd implements ICryptoGenCmd {
                 cert);
     }
 
-
-    @Override
-    public void execCmd(String[] args) throws JavaChainException {
-
-        Options options = new Options();
-        options.addOption("input", true, "the input directory in which existing network place");
-        options.addOption("config", true, "the configuration template to use");
-        options.addOption("help", false, "print this message");
-
-        CommandLineParser parser = new DefaultParser();
-        try {
-            CommandLine commandLine = parser.parse(options, args);
-            if (commandLine.hasOption("help")) {
-                HelpFormatter helpFormatter = new HelpFormatter();
-                helpFormatter.printHelp("extend", options);
-            }
-            inputDir = commandLine.getOptionValue("input", "crypto-config");
-            configFile = commandLine.getOptionValue("config", "crypto-config.yaml");
-            extend();
-        } catch (ParseException e) {
-            throw new JavaChainException(e.getMessage());
-        }
-
-    }
-
     private void extend() throws JavaChainException {
-
+        // TODO fallback when failed
         Config config = Util.loadAs(configFile, Config.class);
 
         for (OrgSpec orgSpec : config.getPeerOrgs()) {

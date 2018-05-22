@@ -16,6 +16,10 @@
 
 package org.bcia.javachain.common.tools.cryptogen;
 
+import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
@@ -30,15 +34,14 @@ import java.util.Set;
  * @company Excelsecu
  */
 public class FileUtil {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(FileUtil.class);
 
-    public static void removeAll(String filePath) {
-
+    public static boolean removeAll(String filePath) {
         if (!new File(filePath).exists()){
-            return;
+            return true;
         }
         try {
             Files.walkFileTree(Paths.get(filePath), new SimpleFileVisitor<Path>() {
-
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                     Files.delete(file);
@@ -47,33 +50,41 @@ public class FileUtil {
 
                 @Override
                 public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-
                     Files.delete(dir);
                     return FileVisitResult.CONTINUE;
                 }
             });
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("remove " + filePath + " failed");
+            return false;
         }
+        return true;
     }
 
 
     public static void mkdirAll(final Path path) {
-
         try {
-
             Files.createDirectories(path);
             Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-
-                    setPermission(file);
+                    try {
+                        setPermission(file);
+                    } catch (JavaChainException e) {
+                        log.error(e.getMessage());
+                        return FileVisitResult.TERMINATE;
+                    }
                     return FileVisitResult.CONTINUE;
                 }
 
                 @Override
                 public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                    setPermission(dir);
+                    try {
+                        setPermission(dir);
+                    } catch (JavaChainException e) {
+                        log.error(e.getMessage());
+                        return FileVisitResult.TERMINATE;
+                    }
                     return FileVisitResult.CONTINUE;
                 }
             });
@@ -83,8 +94,7 @@ public class FileUtil {
     }
 
     // recursively set directory and its child directory or file permission 755
-    private static void setPermission(Path path) {
-
+    private static void setPermission(Path path) throws JavaChainException {
         if(System.getProperty("os.name").contains("Windows")) {
             return;
         }
@@ -100,9 +110,8 @@ public class FileUtil {
         try {
             Files.setPosixFilePermissions(path, filePermissions);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new JavaChainException("set directory" + path + " permission failed " + e.getMessage());
         }
-
     }
 
 }
