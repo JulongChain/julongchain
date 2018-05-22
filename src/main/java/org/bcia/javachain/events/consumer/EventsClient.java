@@ -36,7 +36,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * 类描述
+ * 事件客户端
  *
  * @author zhouhui
  * @date 2018/05/19
@@ -45,21 +45,42 @@ import java.util.List;
 public class EventsClient {
     private static JavaChainLog log = JavaChainLogFactory.getLog(EventsClient.class);
 
+    /**
+     * 最小注册时间(100ms)
+     */
     private static final long MIN_REGISTER_TIME = 100L;
+    /**
+     * 最大注册时间(60s)
+     */
     private static final long MAX_REGISTER_TIME = 60000L;
 
     /**
-     * IP地址或主机地址
+     * 事件服务端的IP地址或主机地址
      */
     private String host;
     /**
-     * 端口
+     * 事件服务端端口
      */
     private int port;
 
+    /**
+     * TODO
+     * 注册时间(因gRPC的特殊性，暂未投入使用)
+     */
     private long registerTimeout;
+    /**
+     * 事件适配器
+     */
     private IEventAdapter eventAdapter;
 
+    /**
+     * 构造函数
+     *
+     * @param host            服务器主机名或IP
+     * @param port            服务器端口
+     * @param registerTimeout 注册超时时间
+     * @param eventAdapter    事件适配器
+     */
     public EventsClient(String host, int port, long registerTimeout, IEventAdapter eventAdapter) {
         //确保事件在100ms和60s之间
         if (registerTimeout < MIN_REGISTER_TIME) {
@@ -74,11 +95,18 @@ public class EventsClient {
         this.registerTimeout = registerTimeout;
     }
 
+    /**
+     * 发送通讯消息
+     *
+     * @param signedEvent      发送消息内容：加密事件
+     * @param responseObserver 对响应的观察者
+     */
     private void sendChat(EventsPackage.SignedEvent signedEvent, StreamObserver<EventsPackage.Event> responseObserver) {
-        //TODO
+        //TODO：去明文
         ManagedChannel managedChannel = ManagedChannelBuilder.forAddress(host, port).usePlaintext(true).build();
         EventsGrpc.EventsStub stub = EventsGrpc.newStub(managedChannel);
         StreamObserver<EventsPackage.SignedEvent> streamObserver = stub.chat(responseObserver);
+        //调用服务器对端的onNext方法
         streamObserver.onNext(signedEvent);
     }
 
@@ -125,6 +153,11 @@ public class EventsClient {
         return signedEventBuilder.build();
     }
 
+    /**
+     * 异步注册
+     *
+     * @param config
+     */
     public void registerAsync(RegistrationConfig config) {
         IMsp localMsp = GlobalMspManagement.getLocalMsp();
         ISigningIdentity signingIdentity = localMsp.getDefaultSigningIdentity();
@@ -145,7 +178,7 @@ public class EventsClient {
             byte[] hashBytes = CspManager.getDefaultCsp().hash(contentBytes, null);
             eventBuilder.setTlsCertHash(ByteString.copyFrom(hashBytes));
         } catch (IOException e) {
-            //TODO
+            //TODO 是否要抛出该异常
             log.error(e.getMessage(), e);
         } catch (JavaChainException e) {
             //TODO
@@ -170,6 +203,13 @@ public class EventsClient {
         });
     }
 
+    /**
+     * 构造gRPC需要的时间戳
+     *
+     * @param second 秒，从1970-01-01T00:00:00Z开始算
+     * @param nano   纳秒，仅包含尾数
+     * @return
+     */
     private Timestamp buildTimestamp(long second, int nano) {
         Timestamp.Builder timestampBuilder = Timestamp.newBuilder();
         timestampBuilder.setSeconds(second);
@@ -177,6 +217,11 @@ public class EventsClient {
         return timestampBuilder.build();
     }
 
+    /**
+     * 异步反注册
+     *
+     * @param config
+     */
     public void unRegisterAsync(RegistrationConfig config) {
         IMsp localMsp = GlobalMspManagement.getLocalMsp();
         ISigningIdentity signingIdentity = localMsp.getDefaultSigningIdentity();
@@ -194,12 +239,22 @@ public class EventsClient {
         sendChat(signedEvent, null);
     }
 
+    /**
+     * 处理事件
+     *
+     * @param event
+     */
     private void processEvent(EventsPackage.Event event) {
         if (eventAdapter != null) {
             eventAdapter.receive(event);
         }
     }
 
+    /**
+     * 启动
+     *
+     * @throws ValidateException
+     */
     public void start() throws ValidateException {
         ValidateUtils.isNotNull(eventAdapter, "eventAdapter can not be null");
 
