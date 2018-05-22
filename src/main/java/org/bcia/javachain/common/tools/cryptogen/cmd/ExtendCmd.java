@@ -76,7 +76,7 @@ public class ExtendCmd implements ICryptoGenCmd {
                 return;
             }
             inputDir = commandLine.getOptionValue("input", "crypto-config");
-            configFile = commandLine.getOptionValue("config", "crypto-config.yaml");
+            configFile = commandLine.getOptionValue("config", null);
             extend();
         } catch (ParseException e) {
             throw new JavaChainException(e.getMessage());

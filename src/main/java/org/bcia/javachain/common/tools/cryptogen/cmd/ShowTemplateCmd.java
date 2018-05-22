@@ -33,7 +33,7 @@ public class ShowTemplateCmd implements ICryptoGenCmd {
         System.out.println(DEFAULT_TEMPLATE);
     }
 
-    private static final String DEFAULT_TEMPLATE =
+    static final String DEFAULT_TEMPLATE =
             "# ---------------------------------------------------------------------------\n" +
             "# \"ConsenterOrgs\" - Definition of organizations managing consenter nodes\n" +
             "# ---------------------------------------------------------------------------\n" +

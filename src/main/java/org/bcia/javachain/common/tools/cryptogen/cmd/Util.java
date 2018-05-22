@@ -28,9 +28,7 @@ import org.bcia.javachain.common.tools.cryptogen.bean.*;
 import org.bcia.javachain.consenter.util.LoadYaml;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -338,15 +336,21 @@ public class Util {
 
     public static <T> T loadAs(String filePath, Class<T> tClass) throws JavaChainException {
         try {
-            File file = new File(filePath);
-            if (!file.exists()) {
-                URL url = LoadYaml.class.getClassLoader().getResource(filePath);
-                if (url == null) {
-                    throw new JavaChainException("file not found in file system nor jar while loading yaml, path: " + file);
+            InputStream in;
+            if (filePath == null) {
+                in = new ByteArrayInputStream(ShowTemplateCmd.DEFAULT_TEMPLATE.getBytes());
+            } else {
+                File file = new File(filePath);
+                if (!file.exists()) {
+                    URL url = LoadYaml.class.getClassLoader().getResource(filePath);
+                    if (url == null) {
+                        throw new JavaChainException("file not found in file system nor jar while loading yaml, path: " + file);
+                    }
+                    file = new File(url.getFile());
                 }
-                file = new File(url.getFile());
+                in = new FileInputStream(file);
             }
-            return new Yaml().loadAs(new FileInputStream(file), tClass);
+            return new Yaml().loadAs(in, tClass);
         } catch (FileNotFoundException e) {
             throw new JavaChainException("file not found while loading yaml, path: " + filePath);
         }

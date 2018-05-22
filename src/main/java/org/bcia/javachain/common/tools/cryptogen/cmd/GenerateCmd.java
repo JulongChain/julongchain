@@ -64,7 +64,7 @@ public class GenerateCmd implements ICryptoGenCmd {
                 return;
             }
             outputDir = commandLine.getOptionValue("output", "crypto-config");
-            configFile = commandLine.getOptionValue("config", "crypto-config.yaml");
+            configFile = commandLine.getOptionValue("config", null);
             deleteAllFiles();
             generate();
         } catch (ParseException e) {
