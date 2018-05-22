@@ -13,24 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
-
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.CompositeKey;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
-
-import java.util.List;
+package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.statecouchdb;
 
 /**
- * 提供额外批量操作数据库接口
+ * 批量处理数据的doc
  *
  * @author sunzongyu
- * @date 2018/04/17
+ * @date 2018/05/22
  * @company Dingxuan
  */
-public interface BulkOptimizable {
-    void loadCommittedVersions(List<CompositeKey> keys);
-
-    Height getCachedVersion(String ns, String key);
-
-    void clearCachedVersions();
+public class BatchableDocument {
 }

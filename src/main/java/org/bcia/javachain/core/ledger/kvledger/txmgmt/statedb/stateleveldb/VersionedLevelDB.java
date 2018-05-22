@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
+package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
@@ -22,6 +22,8 @@ import org.bcia.javachain.common.ledger.util.DBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.StatedDB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 
 import java.util.ArrayList;
@@ -36,9 +38,9 @@ import java.util.Map;
  * @date 2018/04/13
  * @company Dingxuan
  */
-public class VersionLevelDB implements IVersionedDB{
+public class VersionedLevelDB implements IVersionedDB {
 
-    private static final JavaChainLog logger  = JavaChainLogFactory.getLog(VersionLevelDB.class);
+    private static final JavaChainLog logger  = JavaChainLogFactory.getLog(VersionedLevelDB.class);
     private static final byte[] COMPOSITE_KEY_SEP = {0x00};
     private static final byte LAST_KEY_INDICATOR = 0x01;
     private static final byte[] SAVE_POINT_KEY = {0x00};

@@ -18,7 +18,7 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IVersionedDBProvider;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionLevelDBProvider;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedLevelDBProvider;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 
 /**
@@ -36,7 +36,7 @@ public class CommonStorageDBProvider implements DBPorvider{
         if(LedgerConfig.isCouchDBEnable()){
             //CouchDB is not enable
         } else {
-            vdbProvider = VersionLevelDBProvider.newVersionedDBProvider();
+            vdbProvider = VersionedLevelDBProvider.newVersionedDBProvider();
         }
         CommonStorageDBProvider provider = new CommonStorageDBProvider();
         provider.setVdbProvider(vdbProvider);

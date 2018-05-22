@@ -15,6 +15,10 @@
  */
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.CompositeKey;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
+
 /**
  * 封装版本信息
  *

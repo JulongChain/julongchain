@@ -16,8 +16,8 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.UpdateBatch;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedValue;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.UpdateBatch;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 
 import java.util.HashMap;

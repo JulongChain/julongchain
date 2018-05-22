@@ -13,10 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
+package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.StatedDB;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 
 import java.util.Arrays;
@@ -67,7 +70,7 @@ public class KvScanner implements ResultsIterator {
         byte[] dbKey = iterator.getKey();
         byte[] dbVal = iterator.getValue();
         byte[] dbValCpy = Arrays.copyOf(dbVal, dbVal.length);
-        String key = VersionLevelDB.splitCompositeKeyToKey(dbKey);
+        String key = VersionedLevelDB.splitCompositeKeyToKey(dbKey);
         byte[] value = StatedDB.decodeValueToBytes(dbValCpy);
         Height version = StatedDB.decodeValueToHeight(dbValCpy);
         QueryResult kv = new VersionedKV();

@@ -13,13 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
+package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.util.DBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IVersionedDBProvider;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 
 /**
@@ -29,15 +31,15 @@ import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
  * @date 2018/04/13
  * @company Dingxuan
  */
-public class VersionLevelDBProvider implements IVersionedDBProvider {
+public class VersionedLevelDBProvider implements IVersionedDBProvider {
 
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(VersionLevelDBProvider.class);
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(VersionedLevelDBProvider.class);
 
     private DBProvider db;
 
     public static IVersionedDBProvider newVersionedDBProvider() throws LedgerException{
         String dbPath = LedgerConfig.getStateLevelDBPath();
-        VersionLevelDBProvider vdbProvider =  new VersionLevelDBProvider();
+        VersionedLevelDBProvider vdbProvider =  new VersionedLevelDBProvider();
         vdbProvider.setDb(LevelDBProvider.newProvider(dbPath));
         logger.debug("Create vdb using path " + vdbProvider.getDb().getDbPath());
         return vdbProvider;
@@ -45,7 +47,7 @@ public class VersionLevelDBProvider implements IVersionedDBProvider {
 
     @Override
     public IVersionedDB getDBHandle(String id) throws LedgerException {
-        VersionLevelDB vdb = new VersionLevelDB();
+        VersionedLevelDB vdb = new VersionedLevelDB();
         vdb.setDb(db);
         vdb.setDbName(db.getDb().getDbName());
         return vdb;

@@ -13,43 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
-
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
+package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 
 /**
- * 封装版本信息
+ * 封装查询namespace、key
  *
  * @author sunzongyu
  * @date 2018/4/9
  * @company Dingxuan
  */
-public class VersionedValue {
+public class CompositeKey {
 
-    private Height version;
-    private byte[] value;
+    private String namespace;
+    private String key;
 
-    public VersionedValue(){
+    public String getNamespace() {
+        return namespace;
     }
 
-    public VersionedValue(Height version, byte[] value){
-        this.version = version;
-        this.value = value;
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
     }
 
-    public Height getVersion() {
-        return version;
+    public String getKey() {
+        return key;
     }
 
-    public void setVersion(Height version) {
-        this.version = version;
-    }
-
-    public byte[] getValue() {
-        return value;
-    }
-
-    public void setValue(byte[] value) {
-        this.value = value;
+    public void setKey(String key) {
+        this.key = key;
     }
 }

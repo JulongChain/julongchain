@@ -46,4 +46,6 @@ public interface ISystemSmartContractManager {
     // is a system chaincode and *CANNOT* be invoked through
     // a proposal to this peer
     boolean isSysSmartContractAndNotInvokableExternal(String smartContractID);
+
+    boolean isSysSmartContractAndNotInvokableSC2SC(String smartContractID);
 }

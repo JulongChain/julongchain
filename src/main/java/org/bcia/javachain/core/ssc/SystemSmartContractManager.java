@@ -178,9 +178,11 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
 
     @Override
     public boolean isSysSmartContract(String smartContractID) {
-        ISystemSmartContract sysSmartContract= sysSCMap.get(smartContractID);
-        if(sysSmartContract!=null)
-            return true;
+        for (SystemSmartContractDescriptor smartcontract : embedContractDescriptors) {
+            if (smartContractID.equals(smartcontract.getSSCName())) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -203,6 +205,16 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
 
     @Override
     public boolean isSysSmartContractAndNotInvokableExternal(String smartContractID) {
+        return false;
+    }
+
+    @Override
+    public boolean isSysSmartContractAndNotInvokableSC2SC(String smartContractID) {
+        for(SystemSmartContractDescriptor sscd : embedContractDescriptors){
+            if(smartContractID.equals(sscd.getSSCName())){
+                return sscd.isInvokaleSC2SC();
+            }
+        }
         return false;
     }
 

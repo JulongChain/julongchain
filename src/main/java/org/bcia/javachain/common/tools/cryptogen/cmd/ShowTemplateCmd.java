@@ -18,6 +18,11 @@ package org.bcia.javachain.common.tools.cryptogen.cmd;
 
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.FileUtils;
+import org.bcia.javachain.consenter.util.LoadYaml;
+
+import java.io.IOException;
+import java.net.URL;
 
 /**
  * @author chenhao, liuxifeng
@@ -25,13 +30,7 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
  * @company Excelsecu
  */
 public class ShowTemplateCmd implements ICryptoGenCmd {
-
     private static JavaChainLog log = JavaChainLogFactory.getLog(ShowTemplateCmd.class);
-
-    @Override
-    public void execCmd(String[] args) {
-        System.out.println(DEFAULT_TEMPLATE);
-    }
 
     private static final String DEFAULT_TEMPLATE =
             "# ---------------------------------------------------------------------------\n" +
@@ -150,4 +149,26 @@ public class ShowTemplateCmd implements ICryptoGenCmd {
             "    users:\n" +
             "      count: 1";
 
+    static final String template;
+
+    @Override
+    public void execCmd(String[] args) {
+        System.out.println(template);
+    }
+
+    static {
+        String temp = DEFAULT_TEMPLATE;
+        URL url = LoadYaml.class.getClassLoader().getResource("crypto-config.yaml");
+        if (url == null) {
+            log.warn("crypto-config.yaml not found in jar, use default template");
+        } else {
+            try {
+                temp = new String(FileUtils.readFileBytes(url.getPath()));
+            } catch (IOException e) {
+                log.warn("read crypto-config.yaml in jar failed, use default template");
+                temp = DEFAULT_TEMPLATE;
+            }
+        }
+        template = temp;
+    }
 }

@@ -27,7 +27,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.CollHashedRwSet;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.NsRwSet;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RwSetUtil;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.TxRwSet;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.CompositeKey;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.CompositeKey;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valinternal.Block;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valinternal.InternalValidator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valinternal.PubAndHashUpdates;

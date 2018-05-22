@@ -13,6 +13,7 @@
  */
 package org.bcia.javachain.core.ledger.leveldb;
 
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.LevelDBException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;

@@ -101,7 +101,7 @@ public class MockStub implements ISmartContractStub {
 
     @Override
     public byte[] getState(String key) {
-        return null;
+        return "getState".getBytes();
     }
 
     @Override

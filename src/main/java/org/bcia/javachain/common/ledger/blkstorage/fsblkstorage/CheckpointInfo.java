@@ -17,7 +17,6 @@ package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.UpdateBatch;
 import org.bcia.javachain.core.ledger.util.Util;
 
 /**
