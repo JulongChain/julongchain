@@ -55,7 +55,7 @@ public class GmCsp implements ICsp {
     private IGmFactoryOpts gmOpts;
 
 
-    GmCsp(IGmFactoryOpts gmOpts) {
+    public GmCsp(IGmFactoryOpts gmOpts) {
         this.gmOpts = gmOpts;
         this.sm3 = new SM3();
         this.sm2 = new SM2();
