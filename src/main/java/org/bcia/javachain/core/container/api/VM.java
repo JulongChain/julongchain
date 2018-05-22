@@ -15,7 +15,7 @@
  */
 package org.bcia.javachain.core.container.api;
 
-import org.bcia.javachain.core.container.ccintf.CCID;
+import org.bcia.javachain.core.container.ccintf.SCID;
 
 import javax.naming.Context;
 import java.io.Reader;
@@ -30,18 +30,18 @@ import java.util.Map;
  */
 public interface VM {
 
-    void deploy(Context ctxt, CCID ccid, String[] args, String[] env, Reader
+    void deploy(Context ctxt, SCID ccid, String[] args, String[] env, Reader
             reader);
 
-    void start(Context ctxt, CCID ccid, String[] args, String[] env,
+    void start(Context ctxt, SCID ccid, String[] args, String[] env,
                Map<String, byte[]> filesToUpload, IBuildSpecFactory build,
                IPrelaunchFunc preLaunchFunc);
 
-    void stop(Context ctxt, CCID ccid, Long timeout, Boolean dontkill,
+    void stop(Context ctxt, SCID ccid, Long timeout, Boolean dontkill,
               Boolean dontremove);
 
-    void destroy(Context ctxt, CCID ccid, Boolean force, Boolean noprune);
+    void destroy(Context ctxt, SCID ccid, Boolean force, Boolean noprune);
 
-    String getVMName(CCID ccID, IFormat format);
+    String getVMName(SCID ccID, IFormat format);
 
 }
