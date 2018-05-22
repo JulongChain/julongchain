@@ -13,27 +13,43 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
+package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 
 /**
- * namespace更新包
+ * 封装版本信息
  *
  * @author sunzongyu
  * @date 2018/4/9
  * @company Dingxuan
  */
-public class NsUpdates {
+public class VersionedValue {
 
-    private Map<String, VersionedValue> map = new HashMap<>();
+    private Height version;
+    private byte[] value;
 
-    public Map<String, VersionedValue> getMap() {
-        return map;
+    public VersionedValue(){
     }
 
-    public void setMap(Map<String, VersionedValue> map) {
-        this.map = map;
+    public VersionedValue(Height version, byte[] value){
+        this.version = version;
+        this.value = value;
+    }
+
+    public Height getVersion() {
+        return version;
+    }
+
+    public void setVersion(Height version) {
+        this.version = version;
+    }
+
+    public byte[] getValue() {
+        return value;
+    }
+
+    public void setValue(byte[] value) {
+        this.value = value;
     }
 }

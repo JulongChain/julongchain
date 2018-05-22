@@ -181,10 +181,11 @@ public class LSSC  extends SystemSmartContractBase {
                     return newErrorResponse(String.format("Programming error, non-existent appplication config for group '%s'",groupName));
                 }
                 //the maximum number of arguments depends on the capability of the group
-                if((ac.getCapabilities().isPrivateGroupData()==false && size>6) ||
-                        (ac.getCapabilities().isPrivateGroupData()==true && size>7)){
-                    return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
-                }
+                // TODO: 5/21/18  ac.getCapabilities() == null
+//                if((ac.getCapabilities().isPrivateGroupData()==false && size>6) ||
+//                        (ac.getCapabilities().isPrivateGroupData()==true && size>7)){
+//                    return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
+//                }
                 byte[] depSpecBytes2=args.get(2);
                 Smartcontract.SmartContractDeploymentSpec spec=null;
                 try {
@@ -226,9 +227,10 @@ public class LSSC  extends SystemSmartContractBase {
                 byte[] collectionsConfig=null;
                 // we proceed with a non-nil collection configuration only if
                 // we support the PrivateChannelData capability
-                if(ac.getCapabilities().isPrivateGroupData()==true  && size>6){
-                    collectionsConfig=args.get(6);
-                }
+                // TODO: 5/21/18  ac.getCapabilities() == null
+//                if(ac.getCapabilities().isPrivateGroupData()==true  && size>6){
+//                    collectionsConfig=args.get(6);
+//                }
 
                 SmartContractDataPackage.SmartContractData scd=null;
                 try {
@@ -372,10 +374,12 @@ public class LSSC  extends SystemSmartContractBase {
             throw new SysSmartContractException(msg);
         }
 
-        if(collectionConfigBytes.length==0){
+        // TODO: 5/21/18  collectionConfigBytes == null
+        if(collectionConfigBytes == null || collectionConfigBytes.length==0){
             log.debug("No collection configuration specified");
             return;
         }
+        // TODO: 5/21/18 没有测试的部分
         Collection.CollectionConfigPackage collectionConfigPackage=null;
         try {
             collectionConfigPackage=Collection.CollectionConfigPackage.parseFrom(collectionConfigBytes);
@@ -734,8 +738,8 @@ public class LSSC  extends SystemSmartContractBase {
             throw new SysSmartContractException(msg);
         }
         SmartContractDataPackage.SmartContractData.Builder builder = scdata.toBuilder();
-        builder.setEssc(ByteString.copyFrom(essc).toString());
-        builder.setVssc(ByteString.copyFrom(vssc).toString());
+        builder.setEsscBytes(ByteString.copyFrom(essc));
+        builder.setVsscBytes(ByteString.copyFrom(vssc));
         builder.setPolicy(ByteString.copyFrom(policy));
         builder.setInstantiationPolicy(ByteString.copyFrom(support.getInstantiationPolicy(groupName,scPackage)));
         SmartContractDataPackage.SmartContractData builtScData=builder.build();
@@ -744,8 +748,9 @@ public class LSSC  extends SystemSmartContractBase {
         support.checkInstantiationPolicy(signedProposal,groupName,builtScData.getInstantiationPolicy().toByteArray());
 
         putSmartContractData(stub,builtScData);
+        // TODO: 5/21/18 modify return scdata to builtScData
         putSmartContractCollectionData(stub,builtScData,collectionConfigBytes);
-        return scdata;
+        return builtScData;
     }
 
 

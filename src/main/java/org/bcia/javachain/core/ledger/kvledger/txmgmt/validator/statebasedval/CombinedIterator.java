@@ -20,6 +20,10 @@ import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.*;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.CompositeKey;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.UpdateBatch;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
 
 /**
  * 组合的迭代器

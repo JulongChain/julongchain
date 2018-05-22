@@ -16,19 +16,15 @@ limitations under the License.
 package org.bcia.javachain.core.ledger;
 
 import com.google.protobuf.ByteString;
-import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.genesis.GenesisBlockFactory;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
 import org.bcia.javachain.core.ledger.kvledger.KvLedger;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.KvScanner;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
-import org.bcia.javachain.protos.common.Ledger;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;

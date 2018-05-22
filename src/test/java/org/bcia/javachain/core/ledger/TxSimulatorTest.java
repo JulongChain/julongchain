@@ -38,7 +38,7 @@ public class TxSimulatorTest {
 
     @Test
     public void test() throws LedgerException {
-//        DB db = CommonStorageDB.newCommonStorageDB(new VersionLevelDB(LevelDBProvider.newProvider("/home/bcia/test"), "test"), "test");
+//        DB db = CommonStorageDB.newCommonStorageDB(new VersionedLevelDB(LevelDBProvider.newProvider("/home/bcia/test"), "test"), "test");
 //        LockBasedTxManager mgr = LockBasedTxManager.newLockBasedTxMgr("test", db, null);
 //        simulator = LockBasedTxSimulator.newLockBasedTxSimulator(mgr, "test");
 //        String ns = "ns";

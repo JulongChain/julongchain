@@ -20,11 +20,11 @@ import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.*;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.CompositeKey;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.core.ledger.sceventmgmt.ISmartContractLifecycleEventListener;
-import org.bcia.javachain.csp.gm.sm3.SM3;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -222,7 +222,7 @@ public class CommonStorageDB implements DB {
     }
 
     @Override
-    public void applyUpdates(org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.UpdateBatch batch, Height height) throws LedgerException {
+    public void applyUpdates(org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.UpdateBatch batch, Height height) throws LedgerException {
         throw new LedgerException("this fun should not be invoke on this type. Please invoke fun applyPrivacyAwareUpdates()");
     }
 

@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
+package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * namespace迭代器

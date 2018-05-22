@@ -13,33 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
+package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * 封装查询namespace、key
+ * namespace更新包
  *
  * @author sunzongyu
  * @date 2018/4/9
  * @company Dingxuan
  */
-public class CompositeKey {
+public class NsUpdates {
 
-    private String namespace;
-    private String key;
+    private Map<String, VersionedValue> map = new HashMap<>();
 
-    public String getNamespace() {
-        return namespace;
+    public Map<String, VersionedValue> getMap() {
+        return map;
     }
 
-    public void setNamespace(String namespace) {
-        this.namespace = namespace;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
+    public void setMap(Map<String, VersionedValue> map) {
+        this.map = map;
     }
 }

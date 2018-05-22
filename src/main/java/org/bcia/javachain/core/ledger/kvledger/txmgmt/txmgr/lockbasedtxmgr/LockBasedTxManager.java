@@ -25,7 +25,7 @@ import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.core.ledger.StateListener;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.UpdateBatch;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedValue;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.TxManager;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.IValidator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valimpl.DefaultValidator;

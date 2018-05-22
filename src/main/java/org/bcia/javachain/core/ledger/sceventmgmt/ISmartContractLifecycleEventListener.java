@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.sceventmgmt;
 
 /**
- * 类描述
+ * 用于分类账本组件以及监听智能合约生命周期
  *
  * @author sunzongyu
  * @date 2018/04/09

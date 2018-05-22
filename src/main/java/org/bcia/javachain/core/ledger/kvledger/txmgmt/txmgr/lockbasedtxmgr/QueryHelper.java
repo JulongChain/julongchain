@@ -19,13 +19,11 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RWSetBuilder;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.Util;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedValue;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
-import org.bcia.javachain.csp.gm.sm3.SM3;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

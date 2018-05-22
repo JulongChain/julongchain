@@ -16,6 +16,8 @@
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.UpdateBatch;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 
 import java.util.List;
