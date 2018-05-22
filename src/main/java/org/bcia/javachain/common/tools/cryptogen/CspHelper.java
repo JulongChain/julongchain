@@ -28,6 +28,8 @@ import org.bcia.javachain.csp.gm.sm2.SM2KeyImportOpts;
 import org.bcia.javachain.csp.gm.sm2.SM2PublicKey;
 import org.bcia.javachain.csp.intfs.ICsp;
 import org.bcia.javachain.csp.intfs.IKey;
+import org.bcia.javachain.msp.mspconfig.MspConfig;
+import org.bcia.javachain.msp.mspconfig.MspConfigFactory;
 import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
@@ -51,8 +53,37 @@ import java.util.List;
  */
 public class CspHelper {
     private static JavaChainLog log = JavaChainLogFactory.getLog(CspHelper.class);
-    private static final ICsp csp = newCsp();
+    private static final ICsp csp = getCsp();
 
+    static {
+        List<IFactoryOpts> list = new ArrayList<>();
+        IFactoryOpts opts = new GmFactoryOpts() {
+            @Override
+            public boolean isDefaultCsp() {
+                return true;
+            }
+        };
+        try {
+            MspConfig mspConfig = MspConfigFactory.loadMspConfig();
+            String symmetricKey = mspConfig.node.getCsp().getGm().getSymmetricKey();
+            String sign = mspConfig.node.getCsp().getGm().getSign();
+            String hash = mspConfig.node.getCsp().getGm().getHash();
+            String asymmetric = mspConfig.node.getCsp().getGm().getAsymmetric();
+            String privateKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPrivateKeyStore();
+            String publicKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPublicKeyStore();
+            //new GmCspConfig(symmetrickey,asymmetric,hash,sign,publicKeyPath,privateKeyPath);
+            list.add(new GmFactoryOpts(symmetricKey, asymmetric, hash, sign, publicKeyPath, privateKeyPath) {
+                @Override
+                public boolean isDefaultCsp() {
+                    return true;
+                }
+            });
+        } catch (FileNotFoundException e) {
+            log.error(e.getMessage());
+        }
+        list.add(opts);
+        CspManager.initCspFactories(list);
+    }
 
     public static ICsp getCsp() {
         return CspManager.getDefaultCsp();
@@ -173,13 +204,5 @@ public class CspHelper {
         } catch (Exception e) {
             throw new JavaChainException("an error occurred on getECPublicKey: " + e.getMessage());
         }
-    }
-
-    private static ICsp newCsp() {
-        GmCspFactory factory = new GmCspFactory();
-        // TODO 该工具需依赖配置文件？
-        IFactoryOpts opts = new GmFactoryOpts("SM4", "SM2", "SM3", "SM2",
-                "/opt/msp/keystore/publickey.pem", "/opt/msp/keystore/privatekey.pem");
-        return factory.getCsp(opts);
     }
 }
