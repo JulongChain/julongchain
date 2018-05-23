@@ -174,7 +174,7 @@ public class Validator implements InternalValidator {
         logger.debug(String.format("validateRangeQueryL ns = %s, rangQueryInfo = %s", ns, rqi));
         boolean includeEndKey = !rqi.getItrExhausted();
 
-        CombinedIterator combinedItr = CombinedIterator.newCombinedIterator(db, updates.getBatch(), ns, rqi.getStartKey(), rqi.getEndKey(), includeEndKey);
+        CombinedIteratorI combinedItr = CombinedIteratorI.newCombinedIterator(db, updates.getBatch(), ns, rqi.getStartKey(), rqi.getEndKey(), includeEndKey);
         IRangeQueryValidator validator;
         if(null != rqi.getReadsMerkleHashes()){
             logger.debug("Hashing results are present in the range query info hence, initiating hashing based validation");

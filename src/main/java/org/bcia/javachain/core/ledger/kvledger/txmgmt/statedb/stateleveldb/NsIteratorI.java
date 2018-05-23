@@ -16,7 +16,7 @@
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 
@@ -29,7 +29,7 @@ import java.util.List;
  * @date 2018/04/16
  * @company Dingxuan
  */
-public class NsIterator implements ResultsIterator {
+public class NsIteratorI implements IResultsIterator {
 
     private String ns;
     private NsUpdates nsUpdates;
@@ -37,7 +37,7 @@ public class NsIterator implements ResultsIterator {
     private Integer nextIndex;
     private Integer lastIndex;
 
-    public static NsIterator newNsIterator(String ns, String startKey, String endKey, UpdateBatch batch){
+    public static NsIteratorI newNsIterator(String ns, String startKey, String endKey, UpdateBatch batch){
         NsUpdates nsUpdates = new NsUpdates();
         nsUpdates.setMap(batch.getUpdates(ns));
         if(nsUpdates == null){
@@ -56,7 +56,7 @@ public class NsIterator implements ResultsIterator {
         } else {
             lastIndex = sortKeys.indexOf(endKey);
         }
-        NsIterator nsitr = new NsIterator();
+        NsIteratorI nsitr = new NsIteratorI();
         nsitr.setNs(ns);
         nsitr.setNsUpdates(nsUpdates);
         nsitr.setSortedKeys(sortKeys);

@@ -15,17 +15,12 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.kvledger.history.historydb;
 
-import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
-import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
+import org.bcia.javachain.common.ledger.IResultsIterator;
+import org.bcia.javachain.common.ledger.blkstorage.IBlockStore;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.common.util.proto.ProtoUtils;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valinternal.Transaction;
-import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.node.TransactionPackage;
 import org.iq80.leveldb.DBIterator;
 
 import java.util.Map;
@@ -37,7 +32,7 @@ import java.util.Map;
  * @date 2018/04/04
  * @company Dingxuan
  */
-public class HistoryScanner implements ResultsIterator {
+public class HistoryScanner implements IResultsIterator {
     private static final JavaChainLog  logger = JavaChainLogFactory.getLog(HistoryScanner.class);
 
     /**
@@ -47,7 +42,7 @@ public class HistoryScanner implements ResultsIterator {
     private String nameSpace = null;
     private String key = null;
     private DBIterator dbIter = null;
-    private BlockStore blockStore = null;
+    private IBlockStore blockStore = null;
     private long blockNum;
     private long tranNum;
 
@@ -55,7 +50,7 @@ public class HistoryScanner implements ResultsIterator {
                                                    String nameSpace,
                                                    String key,
                                                    DBIterator dbIter,
-                                                   BlockStore blockStore){
+                                                   IBlockStore blockStore){
         HistoryScanner scanner = new HistoryScanner();
         scanner.compositePartialKey = compositePartialKey;
         scanner.nameSpace = nameSpace;
@@ -116,11 +111,11 @@ public class HistoryScanner implements ResultsIterator {
         this.dbIter = dbIter;
     }
 
-    public BlockStore getBlockStore() {
+    public IBlockStore getBlockStore() {
         return blockStore;
     }
 
-    public void setBlockStore(BlockStore blockStore) {
+    public void setBlockStore(IBlockStore blockStore) {
         this.blockStore = blockStore;
     }
 

@@ -17,7 +17,7 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 
 /**
@@ -27,10 +27,10 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
  * @date 2018/04/18
  * @company Dingxuan
  */
-public class PvtdataResultsItr implements ResultsIterator {
+public class PvtdataIResultsItr implements IResultsIterator {
     private String ns;
     private String coll;
-    private ResultsIterator dbItr;
+    private IResultsIterator dbItr;
 
     @Override
     public QueryResult next() throws LedgerException {
@@ -62,11 +62,11 @@ public class PvtdataResultsItr implements ResultsIterator {
         this.coll = coll;
     }
 
-    public ResultsIterator getDbItr() {
+    public IResultsIterator getDbItr() {
         return dbItr;
     }
 
-    public void setDbItr(ResultsIterator dbItr) {
+    public void setDbItr(IResultsIterator dbItr) {
         this.dbItr = dbItr;
     }
 }

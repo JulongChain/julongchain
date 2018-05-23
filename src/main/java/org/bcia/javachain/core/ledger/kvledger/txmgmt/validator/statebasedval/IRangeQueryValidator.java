@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.statebasedval;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
 /**
@@ -27,7 +27,7 @@ import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
  * @company Dingxuan
  */
 public interface IRangeQueryValidator {
-    void init(KvRwset.RangeQueryInfo rqInfo, ResultsIterator itr) throws LedgerException ;
+    void init(KvRwset.RangeQueryInfo rqInfo, IResultsIterator itr) throws LedgerException ;
 
     boolean validate()throws LedgerException;
 }

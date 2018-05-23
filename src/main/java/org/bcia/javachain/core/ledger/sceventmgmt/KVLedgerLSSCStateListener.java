@@ -15,22 +15,59 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.sceventmgmt;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import javassist.compiler.Javac;
+import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.common.privdata.CollectionStoreSupport;
+import org.bcia.javachain.core.common.privdata.IPrivDataSupport;
 import org.bcia.javachain.core.ledger.StateListener;
 import org.bcia.javachain.core.ledger.StateUpdates;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
+import org.bcia.javachain.protos.node.SmartContractDataPackage;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
- * 类描述
+ * kv账本监听
  *
  * @author sunzongyu
  * @date 2018/04/16
  * @company Dingxuan
  */
 public class KVLedgerLSSCStateListener implements StateListener {
+    private static final JavaChainLog log = JavaChainLogFactory.getLog(KVLedgerLSSCStateListener.class);
+
+    private IPrivDataSupport privdata = new CollectionStoreSupport();
+
     @Override
-    public void handleStateUpdates(String ledgerID, List<KvRwset.KVWrite> stateUpdates) {
-        
+    public void handleStateUpdates(String ledgerID, List<KvRwset.KVWrite> stateUpdates) throws JavaChainException {
+        log.debug("Group [{}]: Handling state updates in LSSC namespace - stateUpdate", ledgerID);
+        List<SmartContractDefinition> scDefinitions = new ArrayList<>();
+        for(KvRwset.KVWrite kvWrite : stateUpdates){
+            // There are LSCC entries for the chaincode and for the chaincode collections.
+            // We need to ignore changes to chaincode collections, and handle changes to chaincode
+            // We can detect collections based on the presence of a CollectionSeparator, which never exists in chaincode names
+            if (privdata.isCollectionConfigKey(kvWrite.getKey())) {
+                continue;
+            }
+            // Ignore delete event
+            if (kvWrite.getIsDelete()) {
+                continue;
+            }
+            log.info("Group [{}]: Handling LSSC state update for smartcontract {}", ledgerID, kvWrite.getKey());
+            SmartContractDataPackage.SmartContractData smartContractData = null;
+            try {
+                smartContractData = SmartContractDataPackage.SmartContractData.parseFrom(kvWrite.getValue());
+            } catch (InvalidProtocolBufferException e) {
+                log.error(e.getMessage(), e);
+                throw new JavaChainException(e);
+            }
+            scDefinitions.add(new SmartContractDefinition(smartContractData.getName(), smartContractData.getVersion(), smartContractData.getId().toByteArray()));
+        }
+        ScEventManager.getMgr().handleSmartContractDeploy(ledgerID, (SmartContractDefinition[]) scDefinitions.toArray());
     }
 }

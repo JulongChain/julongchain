@@ -16,14 +16,13 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.ledgerstorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStorage;
-import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
-import org.bcia.javachain.common.ledger.blkstorage.BlockStoreProvider;
+import org.bcia.javachain.common.ledger.blkstorage.IBlockStore;
+import org.bcia.javachain.common.ledger.blkstorage.IBlockStoreProvider;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Conf;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
-import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.FsBlockStore;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.FsBlockStoreProvider;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
 import org.bcia.javachain.core.ledger.PvtNsCollFilter;
@@ -45,9 +44,9 @@ import java.util.Map;
  * @date 2018/04/09
  * @company Dingxuan
  */
-public class Store implements BlockStore{
+public class StoreIBlockStore implements IBlockStore {
     private org.bcia.javachain.core.ledger.pvtdatastorage.Store pvtdataStore = null;
-    private BlockStore blkStorage = null;
+    private IBlockStore blkStorage = null;
 
     public static Provider newProvider() throws LedgerException{
         Provider provider = new Provider();
@@ -63,8 +62,8 @@ public class Store implements BlockStore{
         indexConfig.setAttrsToIndex(attrsToIndex);
         //文件系统初始化参数
         Conf conf = Config.newConf(LedgerConfig.getBlockStorePath(), LedgerConfig.getMaxBlockfileSize());
-        BlockStoreProvider blockStoreProvider = FsBlockStoreProvider.newProvider(conf, indexConfig);
-        provider.setBlkStoreProvider(blockStoreProvider);
+        IBlockStoreProvider IBlockStoreProvider = FsBlockStoreProvider.newProvider(conf, indexConfig);
+        provider.setBlkStoreProvider(IBlockStoreProvider);
         //pvtdata初始化
         org.bcia.javachain.core.ledger.pvtdatastorage.Provider pvtDataStoreProvider =
                 org.bcia.javachain.core.ledger.pvtdatastorage.Provider.newProvider();
@@ -83,7 +82,7 @@ public class Store implements BlockStore{
     }
 
     @Override
-    public ResultsIterator retrieveBlocks(long startNum) throws LedgerException {
+    public IResultsIterator retrieveBlocks(long startNum) throws LedgerException {
         return blkStorage.retrieveBlocks(startNum);
     }
 
@@ -212,11 +211,11 @@ public class Store implements BlockStore{
                 , bcInfo.getHeight(), pvtdataStoreHt));
     }
 
-    public BlockStore getBlkStorage() {
+    public IBlockStore getBlkStorage() {
         return blkStorage;
     }
 
-    public void setBlkStorage(BlockStore blkStorage) {
+    public void setBlkStorage(IBlockStore blkStorage) {
         this.blkStorage = blkStorage;
     }
 

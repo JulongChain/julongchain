@@ -13,27 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.ledger.blkstorage;
+package org.bcia.javachain.common.ledger;
 
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 
 /**
- * 操作区块文件接口
+ * IResultsIterator - an iterator for query result set
  *
- * @author sunzongyu
- * @date 2018/4/7
+ * @author wanliangbing
+ * @date 2018/3/7
  * @company Dingxuan
  */
-public interface BlockStoreProvider {
+public interface IResultsIterator {
 
-    BlockStore createBlockStore(String ledgerid) throws LedgerException;
+    /**
+     * 返回下一个实体,当全部返回时,返回空
+     */
+    QueryResult next() throws LedgerException;
 
-    BlockStore openBlockStore(String ledgerid) throws LedgerException;
-
-    Boolean exists(String ledgerid) throws LedgerException;
-
-    String[] list() throws LedgerException;
-
+    /**
+     * 关闭当前迭代器
+     */
     void close() throws LedgerException;
 
 }

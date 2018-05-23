@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RWSetBuilder;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.Util;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
@@ -38,7 +38,7 @@ import java.util.Map;
 public class QueryHelper {
     private LockBasedTxManager txMgr;
     private RWSetBuilder rwSetBuilder;
-    private List<ResultsItr> itrs;
+    private List<IResultsItr> itrs;
     private boolean doneInvoked = true;
 
     public byte[] getState(String ns, String key) throws LedgerException{
@@ -66,9 +66,9 @@ public class QueryHelper {
         return values;
     }
 
-    public ResultsIterator getStateRangeScanIterator(String ns, String startKey, String endKey) throws LedgerException{
+    public IResultsIterator getStateRangeScanIterator(String ns, String startKey, String endKey) throws LedgerException{
         checkDone();
-        ResultsItr itr = ResultsItr.newResultsItr(ns, startKey, endKey, txMgr.getDb(), rwSetBuilder, false, LedgerConfig.getMaxDegreeQueryReadsHashing());
+        IResultsItr itr = IResultsItr.newResultsItr(ns, startKey, endKey, txMgr.getDb(), rwSetBuilder, false, LedgerConfig.getMaxDegreeQueryReadsHashing());
         itrs.add(itr);
         return itr;
     }
@@ -76,10 +76,10 @@ public class QueryHelper {
     /**
      * 富查询 leveldb不支持
      */
-    public ResultsIterator executeQuery(String ns, String query) throws LedgerException {
+    public IResultsIterator executeQuery(String ns, String query) throws LedgerException {
         checkDone();
-        ResultsIterator dbItr = txMgr.getDb().executeQuery(ns, query);
-        QueryResultsItr itr = new QueryResultsItr();
+        IResultsIterator dbItr = txMgr.getDb().executeQuery(ns, query);
+        QueryIResultsItr itr = new QueryIResultsItr();
         itr.setDbItr(dbItr);
         itr.setRwSetBuilder(rwSetBuilder);
         return itr;
@@ -114,10 +114,10 @@ public class QueryHelper {
         return values;
     }
 
-    public ResultsIterator getPrivateDataRangeScanIterator(String ns, String coll, String startKey, String endKey) throws LedgerException {
+    public IResultsIterator getPrivateDataRangeScanIterator(String ns, String coll, String startKey, String endKey) throws LedgerException {
         checkDone();
-        ResultsIterator dbitr = txMgr.getDb().getPrivateDataRangeScanIterator(ns, coll, startKey, endKey);
-        PvtdataResultsItr itr = new PvtdataResultsItr();
+        IResultsIterator dbitr = txMgr.getDb().getPrivateDataRangeScanIterator(ns, coll, startKey, endKey);
+        PvtdataIResultsItr itr = new PvtdataIResultsItr();
         itr.setNs(ns);
         itr.setColl(coll);
         itr.setDbItr(dbitr);
@@ -127,10 +127,10 @@ public class QueryHelper {
     /**
      * 针对pvtdata富查询 leveldb不支持
      */
-    public ResultsIterator executeQueryOnPrivateData(String ns, String coll, String query) throws LedgerException {
+    public IResultsIterator executeQueryOnPrivateData(String ns, String coll, String query) throws LedgerException {
         checkDone();
-        ResultsIterator dbitr = txMgr.getDb().executeQueryOnPrivateData(ns, coll, query);
-        PvtdataResultsItr itr = new PvtdataResultsItr();
+        IResultsIterator dbitr = txMgr.getDb().executeQueryOnPrivateData(ns, coll, query);
+        PvtdataIResultsItr itr = new PvtdataIResultsItr();
         itr.setNs(ns);
         itr.setColl(coll);
         itr.setDbItr(dbitr);
@@ -142,7 +142,7 @@ public class QueryHelper {
             return;
         }
         try {
-            for(ResultsItr itr : itrs){
+            for(IResultsItr itr : itrs){
                 if (rwSetBuilder != null){
                     Map.Entry<List<KvRwset.KVRead>, KvRwset.QueryReadsMerkleSummary> entry = itr.getRangeQueryResultsHelper().done();
                     if(entry.getKey() != null){
@@ -160,7 +160,7 @@ public class QueryHelper {
             }
         } finally {
             doneInvoked = true;
-            for(ResultsIterator itr : itrs){
+            for(IResultsIterator itr : itrs){
                 itr.close();
             }
         }
@@ -210,11 +210,11 @@ public class QueryHelper {
         this.rwSetBuilder = rwSetBuilder;
     }
 
-    public List<ResultsItr> getItrs() {
+    public List<IResultsItr> getItrs() {
         return itrs;
     }
 
-    public void setItrs(List<ResultsItr> itrs) {
+    public void setItrs(List<IResultsItr> itrs) {
         this.itrs = itrs;
     }
 

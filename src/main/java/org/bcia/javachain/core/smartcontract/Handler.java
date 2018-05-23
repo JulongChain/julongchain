@@ -20,7 +20,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.common.sysscprovider.SmartContractInstance;
@@ -372,7 +372,7 @@ public class Handler {
      * put current txContext into txContext's queryIteratorMap for init it.
      */
     public synchronized void initializeQueryContext(TransactionContext txContext, String queryID,
-                                       ResultsIterator queryIterator) {
+                                       IResultsIterator queryIterator) {
         if(txContext.getQueryIteratorMap() != null && queryID != null){
             logger.info(String.format("Put queryID: %s", queryID));
             txContext.getQueryIteratorMap().put(queryID, queryIterator);
@@ -386,7 +386,7 @@ public class Handler {
     /**
      * get a transcation context which's query id is "queryID" in cxContext's queryIteratorMap
      */
-    public synchronized ResultsIterator getQueryIterator(TransactionContext txContext, String queryID) {
+    public synchronized IResultsIterator getQueryIterator(TransactionContext txContext, String queryID) {
         if(txContext.getQueryIteratorMap() != null && queryID != null){
             return txContext.getQueryIteratorMap().get(queryID);
         } else {
@@ -775,7 +775,7 @@ public class Handler {
     public void handleGetStateByRange(SmartcontractShim.SmartContractMessage msg) {
         new Thread(() -> {
             SmartcontractShim.GetStateByRange getStateByRange = null;
-            ResultsIterator rangeIter = null;
+            IResultsIterator rangeIter = null;
             String smartContractID = null;
             String iterID = null;
             TransactionContext txContext = null;
@@ -827,7 +827,7 @@ public class Handler {
     //                rangeIter, err = txContext.txsimulator.GetStateRangeScanIterator(chaincodeID, getStateByRange.StartKey, getStateByRange.EndKey)
                 }
                 //TODO： 测试数据
-                rangeIter = new ResultsIterator() {
+                rangeIter = new IResultsIterator() {
                     @Override
                     public QueryResult next() throws LedgerException {
                         return null;
@@ -882,7 +882,7 @@ public class Handler {
 
     /** getQueryResponse takes an iterator and fetch state to construct QueryResponse
      */
-    public SmartcontractShim.QueryResponse getQueryResponse(TransactionContext txContext, ResultsIterator iter,
+    public SmartcontractShim.QueryResponse getQueryResponse(TransactionContext txContext, IResultsIterator iter,
                                                                    String iterID){
         try {
             PendingQueryResult pendingQueryResults = txContext.getPendingQueryResults().get(iterID);
@@ -963,7 +963,7 @@ public class Handler {
         new Thread(() -> {
             SmartcontractShim.QueryStateNext queryStateNext = null;
             TransactionContext txContext = null;
-            ResultsIterator queryIter = null;
+            IResultsIterator queryIter = null;
             SmartcontractShim.QueryResponse payload = null;
             ByteString payloadBytes = null;
             //创建交易实体
@@ -1041,7 +1041,7 @@ public class Handler {
         new Thread(() -> {
             SmartcontractShim.QueryStateClose queryStateClose = null;
             TransactionContext txContext = null;
-            ResultsIterator iter = null;
+            IResultsIterator iter = null;
             SmartcontractShim.QueryResponse payload = null;
             ByteString payloadBytes = null;
             //构建交易实体
@@ -1113,7 +1113,7 @@ public class Handler {
             String iterID = null;
             SmartcontractShim.GetQueryResult getQueryResult = null;
             String smartContractID = null;
-            ResultsIterator executeIter = null;
+            IResultsIterator executeIter = null;
             SmartcontractShim.QueryResponse payload = null;
             ByteString payloadBytes = null;
             //获取交易实体
@@ -1159,7 +1159,7 @@ public class Handler {
                 return;
             }
             //TODO: for test
-            executeIter = new ResultsIterator() {
+            executeIter = new IResultsIterator() {
                 @Override
                 public QueryResult next() throws LedgerException {
                     return null;
@@ -1217,7 +1217,7 @@ public class Handler {
             SmartcontractShim.GetHistoryForKey getHistoryForKey = null;
             String iterID = null;
             String smartContractID = null;
-            ResultsIterator historyIterator = null;
+            IResultsIterator historyIterator = null;
             SmartcontractShim.QueryResponse payload = null;
             ByteString payloadByte = null;
             //获取交易实体
@@ -1253,7 +1253,7 @@ public class Handler {
             try {
 //                historyIterator = txContext.getHistoryQueryExecutor().getHistoryForKey(smartContractID, getHistoryForKey.getKey());
                 //TODO: for test
-                historyIterator = new ResultsIterator() {
+                historyIterator = new IResultsIterator() {
                     @Override
                     public QueryResult next() throws LedgerException {
                         return null;

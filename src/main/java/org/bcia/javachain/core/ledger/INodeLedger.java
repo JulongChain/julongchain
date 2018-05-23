@@ -17,7 +17,7 @@ package org.bcia.javachain.core.ledger;
 
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.ILedger;
-import org.bcia.javachain.common.ledger.PrunePolicy;
+import org.bcia.javachain.common.ledger.IPrunePolicy;
 import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.TransactionPackage;
@@ -82,7 +82,7 @@ public interface INodeLedger extends ILedger {
 
     long privateDataMinBlockNum() throws LedgerException;
 
-    void prune(PrunePolicy policy) throws LedgerException;
+    void prune(IPrunePolicy policy) throws LedgerException;
 
     @Override
     void close();

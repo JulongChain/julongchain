@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.statecouchdb;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
@@ -28,7 +28,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
  * @date 2018/05/22
  * @company Dingxuan
  */
-public class KvScanner implements ResultsIterator {
+public class KvScanner implements IResultsIterator {
     private static final JavaChainLog log = JavaChainLogFactory.getLog(KvScanner.class);
 
     private int cursor;

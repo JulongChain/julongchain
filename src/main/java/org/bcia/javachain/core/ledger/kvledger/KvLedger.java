@@ -15,12 +15,11 @@
  */
 package org.bcia.javachain.core.ledger.kvledger;
 
-import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.PrunePolicy;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IPrunePolicy;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStorage;
-import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
+import org.bcia.javachain.common.ledger.blkstorage.IBlockStore;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.*;
@@ -30,7 +29,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.TxManager;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr.LockBasedTxManager;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
-import org.bcia.javachain.core.ledger.ledgerstorage.Store;
+import org.bcia.javachain.core.ledger.ledgerstorage.StoreIBlockStore;
 import org.bcia.javachain.core.ledger.sceventmgmt.ISmartContractLifecycleEventListener;
 import org.bcia.javachain.core.ledger.sceventmgmt.ScEventManager;
 import org.bcia.javachain.protos.common.Common;
@@ -51,7 +50,7 @@ public class KvLedger implements INodeLedger {
     private static final JavaChainLog logger  = JavaChainLogFactory.getLog(KvLedger.class);
 
     private String ledgerID;
-    private BlockStore blockStore;
+    private IBlockStore blockStore;
     private TxManager txtmgmt;
     private IHistoryDB historyDB;
     private LedgerConfig ledgerConfig;
@@ -64,7 +63,7 @@ public class KvLedger implements INodeLedger {
      * @return
      */
     public static KvLedger newKVLedger(String ledgerID,
-                                       BlockStore blockStore,
+                                       IBlockStore blockStore,
                                        DB versionedDB,
                                        IHistoryDB historyDB,
                                        Map<String, StateListener> stateListeners) throws LedgerException {
@@ -213,10 +212,10 @@ public class KvLedger implements INodeLedger {
 
     /** GetBlocksIterator returns an iterator that starts from `startBlockNumber`(inclusive).
      * The iterator is a blocking iterator i.e., it blocks till the next block gets available in the ledger
-     * ResultsIterator contains type BlockHolder
+     * IResultsIterator contains type BlockHolder
      */
     @Override
-    public ResultsIterator getBlocksIterator(long startBlockNumber) throws LedgerException{
+    public IResultsIterator getBlocksIterator(long startBlockNumber) throws LedgerException{
         try {
             return blockStore.retrieveBlocks(startBlockNumber);
         } catch (LedgerException e) {
@@ -292,10 +291,10 @@ public class KvLedger implements INodeLedger {
 
     /** Prune prunes the blocks/transactions that satisfy the given policy
      *
-     * @param prunePolicy
+     * @param IPrunePolicy
      */
     @Override
-    public void prune(PrunePolicy prunePolicy) throws LedgerException {
+    public void prune(IPrunePolicy IPrunePolicy) throws LedgerException {
         throw new LedgerException("Not yet implement");
     }
 
@@ -322,7 +321,7 @@ public class KvLedger implements INodeLedger {
     @Override
     public synchronized BlockAndPvtData getPvtDataAndBlockByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
         try {
-            return ((Store) blockStore).getPvtDataAndBlockByNum(blockNum, filter);
+            return ((StoreIBlockStore) blockStore).getPvtDataAndBlockByNum(blockNum, filter);
         } catch (LedgerException e) {
             if (e.equals(BlockStorage.ERR_NOT_FOUND_IN_INDEX)) {
                 logger.info(String.format("Pvtdata block not found, suing block num = [%d]", blockNum));
@@ -336,7 +335,7 @@ public class KvLedger implements INodeLedger {
     @Override
     public synchronized List<TxPvtData> getPvtDataByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
         try {
-            return ((Store) blockStore).getPvtDataByNum(blockNum, filter);
+            return ((StoreIBlockStore) blockStore).getPvtDataByNum(blockNum, filter);
         } catch (LedgerException e) {
             if (e.equals(BlockStorage.ERR_NOT_FOUND_IN_INDEX)) {
                 logger.info(String.format("Pvtdata block not found, using block num = [%d]", blockNum));
@@ -409,11 +408,11 @@ public class KvLedger implements INodeLedger {
         this.ledgerID = ledgerID;
     }
 
-    public BlockStore getBlockStore() {
+    public IBlockStore getBlockStore() {
         return blockStore;
     }
 
-    public void setBlockStore(BlockStore blockStore) {
+    public void setBlockStore(IBlockStore blockStore) {
         this.blockStore = blockStore;
     }
 

@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.statebasedval;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.*;
@@ -35,8 +35,8 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.Versi
  * @date 2018/04/19
  * @company Dingxuan
  */
-public class CombinedIterator implements ResultsIterator {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(CombinedIterator.class);
+public class CombinedIteratorI implements IResultsIterator {
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(CombinedIteratorI.class);
 
     private String ns;
     private IVersionedDB db;
@@ -45,24 +45,24 @@ public class CombinedIterator implements ResultsIterator {
     private boolean includeEndKey;
 
 
-    private ResultsIterator dbItr;
-    private ResultsIterator updatesItr;
+    private IResultsIterator dbItr;
+    private IResultsIterator updatesItr;
     private QueryResult dbItm;
     private QueryResult updatesItm;
     private boolean endKeyServed;
 
-    public static CombinedIterator newCombinedIterator(IVersionedDB db,
-                                                       UpdateBatch updates,
-                                                       String ns,
-                                                       String startKey,
-                                                       String endKey,
-                                                       boolean includeEndKey) throws LedgerException {
-        ResultsIterator dbItr = db.getStateRangeScanIterator(ns, startKey, endKey);
-        ResultsIterator updatesItr = updates.getRangeScanIterator(ns, startKey, endKey);
+    public static CombinedIteratorI newCombinedIterator(IVersionedDB db,
+                                                        UpdateBatch updates,
+                                                        String ns,
+                                                        String startKey,
+                                                        String endKey,
+                                                        boolean includeEndKey) throws LedgerException {
+        IResultsIterator dbItr = db.getStateRangeScanIterator(ns, startKey, endKey);
+        IResultsIterator updatesItr = updates.getRangeScanIterator(ns, startKey, endKey);
         QueryResult dbItm = dbItr.next();
         QueryResult updatesItm = updatesItr.next();
         logger.debug("Combined iterator initialized");
-        CombinedIterator itr = new CombinedIterator();
+        CombinedIteratorI itr = new CombinedIteratorI();
         itr.setNs(ns);
         itr.setDb(db);
         itr.setUpdates(updates);
@@ -203,19 +203,19 @@ public class CombinedIterator implements ResultsIterator {
         this.includeEndKey = includeEndKey;
     }
 
-    public ResultsIterator getDbItr() {
+    public IResultsIterator getDbItr() {
         return dbItr;
     }
 
-    public void setDbItr(ResultsIterator dbItr) {
+    public void setDbItr(IResultsIterator dbItr) {
         this.dbItr = dbItr;
     }
 
-    public ResultsIterator getUpdatesItr() {
+    public IResultsIterator getUpdatesItr() {
         return updatesItr;
     }
 
-    public void setUpdatesItr(ResultsIterator updatesItr) {
+    public void setUpdatesItr(IResultsIterator updatesItr) {
         this.updatesItr = updatesItr;
     }
 

@@ -635,7 +635,7 @@ public class LSSC  extends SystemSmartContractBase {
         try {
             statedbArtifactsTar=SmartContractProvider.extractStateDBArtifactsFromSCPackage(scPack);
         } catch (JavaChainException e) {
-            new SysSmartContractException(e.getMessage());
+            throw new SysSmartContractException(e.getMessage());
         }
 
         SmartContractDefinition smartContractDefinition=new SmartContractDefinition(
@@ -646,7 +646,11 @@ public class LSSC  extends SystemSmartContractBase {
         // any channel's statedb where the chaincode is already instantiated
         // Note - this step is done prior to PutChaincodeToLocalStorage() since this step is idempotent and harmless until endorsements start,
         // that is, if there are errors deploying the indexes the chaincode install can safely be re-attempted later.
-        ScEventManager.getMgr().handleSmartContractInstall(smartContractDefinition,statedbArtifactsTar);
+        try {
+            ScEventManager.getMgr().handleSmartContractInstall(smartContractDefinition,statedbArtifactsTar);
+        } catch (JavaChainException e) {
+            throw new SysSmartContractException(e);
+        }
         // Finally, if everything is good above, install the chaincode to local peer file system so that endorsements can start
 
         //TODO:add by zhouhui for test,保证测试通过，因正式环境未使用Spring,所以未自动填充值，导致值为null

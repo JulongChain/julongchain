@@ -15,7 +15,6 @@ limitations under the License.
  */
 package org.bcia.javachain.common.ledger.blockledger.json;
 
-import org.apache.commons.math.linear.QRDecomposition;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blockledger.Iterator;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -23,12 +22,10 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.node.Query;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.AbstractMap;
-import java.util.Map;
 
 /**
  * json账本迭代器

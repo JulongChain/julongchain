@@ -16,7 +16,6 @@ limitations under the License.
 package org.bcia.javachain.common.ledger.blockledger.file;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.common.ledger.blockledger.*;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -35,12 +34,12 @@ import org.bcia.javachain.protos.consenter.Ab;
 public class FileLedger extends ReadWriteBase {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(FileLedger.class);
 
-    private FileLedgerBlockStore blockStore;
+    private IFileLedgerBlockStore blockStore;
     private Channel<Object> channel;
 
     public FileLedger(){}
 
-    public FileLedger(FileLedgerBlockStore blockStore){
+    public FileLedger(IFileLedgerBlockStore blockStore){
         this.blockStore = blockStore;
         this.channel = new Channel<>();
     }
@@ -88,11 +87,11 @@ public class FileLedger extends ReadWriteBase {
         channel = new Channel<>();
     }
 
-    public FileLedgerBlockStore getBlockStore() {
+    public IFileLedgerBlockStore getBlockStore() {
         return blockStore;
     }
 
-    public void setBlockStore(FileLedgerBlockStore blockStore) {
+    public void setBlockStore(IFileLedgerBlockStore blockStore) {
         this.blockStore = blockStore;
     }
 }

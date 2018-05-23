@@ -16,8 +16,8 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.history.historydb;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
-import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
+import org.bcia.javachain.common.ledger.IResultsIterator;
+import org.bcia.javachain.common.ledger.blkstorage.IBlockStore;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
@@ -35,10 +35,10 @@ public class HistoryLevelDBQueryExecutor implements IHistoryQueryExecutor {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(HistoryLevelDBQueryExecutor.class);
 
     private HistoryLevelDB historyDB;
-    private BlockStore blockStore;
+    private IBlockStore blockStore;
 
     @Override
-    public ResultsIterator getHistoryForKey(String ns, String key) throws LedgerException{
+    public IResultsIterator getHistoryForKey(String ns, String key) throws LedgerException{
         if(!LedgerConfig.isHistoryDBEnabled()){
             throw new LedgerException("History db is not avilable");
         }
@@ -56,11 +56,11 @@ public class HistoryLevelDBQueryExecutor implements IHistoryQueryExecutor {
         this.historyDB = historyDB;
     }
 
-    public BlockStore getBlockStore() {
+    public IBlockStore getBlockStore() {
         return blockStore;
     }
 
-    public void setBlockStore(BlockStore blockStore) {
+    public void setBlockStore(IBlockStore blockStore) {
         this.blockStore = blockStore;
     }
 }

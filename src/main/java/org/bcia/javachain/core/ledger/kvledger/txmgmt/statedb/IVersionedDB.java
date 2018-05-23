@@ -15,7 +15,7 @@
  */
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.UpdateBatch;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
@@ -55,7 +55,7 @@ public interface IVersionedDB{
     /** GetStateRangeScanIterator returns an iterator that contains all the key-values between given key ranges.
      * startKey is inclusive
      * endKey is exclusive
-     * The returned ResultsIterator contains results of type *VersionedKV
+     * The returned IResultsIterator contains results of type *VersionedKV
      *
      * @param namespace
      * @param startKey
@@ -63,7 +63,7 @@ public interface IVersionedDB{
      * @return
      * @throws LedgerException
      */
-    ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException;
+    IResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException;
 
     /** ExecuteQuery executes the given query and returns an iterator that contains results of type *VersionedKV.
      *
@@ -72,7 +72,7 @@ public interface IVersionedDB{
      * @return
      * @throws LedgerException
      */
-    ResultsIterator executeQuery(String namespace, String query) throws LedgerException;
+    IResultsIterator executeQuery(String namespace, String query) throws LedgerException;
 
     /** ApplyUpdates applies the batch to the underlying db.
      * height is the height of the highest transaction in the Batch that

@@ -17,7 +17,7 @@ package org.bcia.javachain.core.ledger.kvledger.history.historydb;
 
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
+import org.bcia.javachain.common.ledger.blkstorage.IBlockStore;
 import org.bcia.javachain.common.ledger.util.DBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
@@ -83,7 +83,7 @@ public class HistoryLevelDB implements IHistoryDB {
     }
 
     @Override
-    public IHistoryQueryExecutor newHistoryQueryExecutor(BlockStore blockStore) throws LedgerException {
+    public IHistoryQueryExecutor newHistoryQueryExecutor(IBlockStore blockStore) throws LedgerException {
         HistoryLevelDBQueryExecutor executor = new HistoryLevelDBQueryExecutor();
         executor.setBlockStore(blockStore);
         executor.setHistoryDB(this);

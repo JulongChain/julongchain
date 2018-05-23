@@ -15,6 +15,7 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.sceventmgmt;
 
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.StateListener;
@@ -67,14 +68,15 @@ public class ScEventManager implements StateListener {
      * @param ledgerID
      * @param smartContractDefinitions
      */
-    public synchronized void handleSmartContractDeploy(String ledgerID, SmartContractDefinition[] smartContractDefinitions){
+    public synchronized void handleSmartContractDeploy(String ledgerID, SmartContractDefinition[] smartContractDefinitions) throws JavaChainException{
         logger.debug("handleSmartContractDeploy() - ledgerID = " + ledgerID);
         //设置最后部署的智能合约
         latesSmartContractDeploys.put(ledgerID, smartContractDefinitions);
         for(SmartContractDefinition smartContractDefinition : smartContractDefinitions){
             logger.debug(String.format("Group [%s]: Handling smartContract deploy event for smartContract [%s]", ledgerID, smartContractDefinition));
             //获取db实例,
-            byte[] dbArtifacts = infoProvider.retrieveSmartContractArtifacts(smartContractDefinition);
+            byte[] dbArtifacts = new byte[0];
+            dbArtifacts = infoProvider.retrieveSmartContractArtifacts(smartContractDefinition);
             //!installed, 无需完成智能合约实例
             if(dbArtifacts != null){
                 logger.info(String.format("Group [%s]: SmartContract [%s] is not installed so that no need to create SmartContract artifact", ledgerID, smartContractDefinition));
@@ -91,7 +93,7 @@ public class ScEventManager implements StateListener {
      * @param smartContractDefinition
      * @param dbArtifacts
      */
-    public synchronized void handleSmartContractInstall(SmartContractDefinition smartContractDefinition, byte[] dbArtifacts){
+    public synchronized void handleSmartContractInstall(SmartContractDefinition smartContractDefinition, byte[] dbArtifacts) throws JavaChainException{
         logger.debug("handleSmartContractInstall() - smartContractDefinition= " + smartContractDefinition);
         for(Map.Entry<String, ISmartContractLifecycleEventListener> entry : scLifecycleListeners.entrySet()){
             String ledgerID = entry.getKey();

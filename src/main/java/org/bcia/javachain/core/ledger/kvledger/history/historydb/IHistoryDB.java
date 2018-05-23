@@ -16,7 +16,7 @@
 package org.bcia.javachain.core.ledger.kvledger.history.historydb;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
+import org.bcia.javachain.common.ledger.blkstorage.IBlockStore;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
 import org.bcia.javachain.core.ledger.kvledger.Recoverable;
 import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
@@ -35,7 +35,7 @@ public interface IHistoryDB extends Recoverable {
     /**
      * HistoryDB检索器
      */
-    IHistoryQueryExecutor newHistoryQueryExecutor(BlockStore blockStore) throws LedgerException;
+    IHistoryQueryExecutor newHistoryQueryExecutor(IBlockStore blockStore) throws LedgerException;
 
     /**
      * 完成HistoryDB更新

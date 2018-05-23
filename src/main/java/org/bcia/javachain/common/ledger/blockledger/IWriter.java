@@ -16,24 +16,18 @@ limitations under the License.
 package org.bcia.javachain.common.ledger.blockledger;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.protos.consenter.Ab;
+import org.bcia.javachain.protos.common.Common;
 
 /**
- * 文件读取接口
+ * 文件写入接口
  *
  * @author sunzongyu
  * @date 2018/04/26
  * @company Dingxuan
  */
-public interface Reader {
-
+public interface IWriter {
     /**
-     * 返回迭代器
+     * 写入区块
      */
-    Iterator iterator(Ab.SeekPosition startType) throws LedgerException;
-
-    /**
-     * 返回block数量
-     */
-    long height() throws LedgerException;
+    void append(Common.Block block) throws LedgerException;
 }

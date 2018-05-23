@@ -17,14 +17,13 @@ package org.bcia.javachain.common.ledger.blockledger.json;
 
 import com.google.protobuf.util.JsonFormat;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.blockledger.Factory;
+import org.bcia.javachain.common.ledger.blockledger.IFactory;
 import org.bcia.javachain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +36,7 @@ import java.util.Map;
  * @date 2018/04/27
  * @company Dingxuan
  */
-public class JsonLedgerFactory implements Factory {
+public class JsonLedgerFactory implements IFactory {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(JsonLedgerFactory.class);
 
     private String directory;

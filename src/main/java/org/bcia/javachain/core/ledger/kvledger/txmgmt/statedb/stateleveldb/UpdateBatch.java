@@ -16,7 +16,7 @@
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 
 import java.util.ArrayList;
@@ -80,8 +80,8 @@ public class UpdateBatch {
         return nsUpdates.getMap();
     }
 
-    public ResultsIterator getRangeScanIterator(String ns, String startKey, String endKey){
-        return NsIterator.newNsIterator(ns, startKey, endKey, this);
+    public IResultsIterator getRangeScanIterator(String ns, String startKey, String endKey){
+        return NsIteratorI.newNsIterator(ns, startKey, endKey, this);
     }
 
     public NsUpdates getOrCreateNsUpdates(String ns){

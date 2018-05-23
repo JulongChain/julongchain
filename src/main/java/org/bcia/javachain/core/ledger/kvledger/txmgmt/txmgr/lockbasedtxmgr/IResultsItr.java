@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RWSetBuilder;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RangeQueryResultsHelper;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RwSetUtil;
@@ -32,23 +32,23 @@ import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
  * @date 2018/04/18
  * @company Dingxuan
  */
-public class ResultsItr implements ResultsIterator {
+public class IResultsItr implements IResultsIterator {
     private String ns;
     private String endKey;
-    private ResultsIterator dbItr;
+    private IResultsIterator dbItr;
     private RWSetBuilder rwSetBuilder;
     private KvRwset.RangeQueryInfo rangeQueryInfo;
     private RangeQueryResultsHelper rangeQueryResultsHelper;
 
-    public static ResultsItr newResultsItr(String ns,
-                                           String startKey,
-                                           String endKey,
-                                           IVersionedDB db,
-                                           RWSetBuilder rwSetBuilder,
-                                           boolean enableHashing,
-                                           int maxDegree) throws LedgerException {
-        ResultsIterator dbItr = db.getStateRangeScanIterator(ns, startKey, endKey);
-        ResultsItr itr = new ResultsItr();
+    public static IResultsItr newResultsItr(String ns,
+                                            String startKey,
+                                            String endKey,
+                                            IVersionedDB db,
+                                            RWSetBuilder rwSetBuilder,
+                                            boolean enableHashing,
+                                            int maxDegree) throws LedgerException {
+        IResultsIterator dbItr = db.getStateRangeScanIterator(ns, startKey, endKey);
+        IResultsItr itr = new IResultsItr();
         itr.setNs(ns);
         itr.setDbItr(dbItr);
         if(rwSetBuilder != null){
@@ -110,11 +110,11 @@ public class ResultsItr implements ResultsIterator {
         this.endKey = endKey;
     }
 
-    public ResultsIterator getDbItr() {
+    public IResultsIterator getDbItr() {
         return dbItr;
     }
 
-    public void setDbItr(ResultsIterator dbItr) {
+    public void setDbItr(IResultsIterator dbItr) {
         this.dbItr = dbItr;
     }
 

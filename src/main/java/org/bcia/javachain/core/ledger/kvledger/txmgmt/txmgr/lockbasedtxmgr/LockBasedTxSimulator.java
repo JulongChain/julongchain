@@ -17,13 +17,12 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.core.ledger.TxSimulationResults;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RWSetBuilder;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RwSetUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -130,13 +129,13 @@ public class LockBasedTxSimulator implements ITxSimulator {
     }
 
     @Override
-    public ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
+    public IResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
         checkBeforePvtdataQueries();
         return queryExecutor.getStateRangeScanIterator(namespace, startKey, endKey);
     }
 
     @Override
-    public ResultsIterator executeQuery(String namespace, String query) throws LedgerException {
+    public IResultsIterator executeQuery(String namespace, String query) throws LedgerException {
         return null;
     }
 
@@ -151,12 +150,12 @@ public class LockBasedTxSimulator implements ITxSimulator {
     }
 
     @Override
-    public ResultsIterator getPrivateDataRangeScanIterator(String namespace, String collection, String startKey, String endKey) throws LedgerException {
+    public IResultsIterator getPrivateDataRangeScanIterator(String namespace, String collection, String startKey, String endKey) throws LedgerException {
         return null;
     }
 
     @Override
-    public void done() throws LedgerException {
+    public void done() {
 
     }
 

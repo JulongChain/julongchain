@@ -16,12 +16,9 @@ limitations under the License.
 package org.bcia.javachain.common.ledger.blockledger;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
-import org.bcia.javachain.protos.common.Common;
-
-import java.util.Map;
 
 /**
  * 迭代器接口
@@ -30,7 +27,7 @@ import java.util.Map;
  * @date 2018/04/26
  * @company Dingxuan
  */
-public interface Iterator extends ResultsIterator {
+public interface Iterator extends IResultsIterator {
 
     /**
      * 返回下一个block

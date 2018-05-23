@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RWSetBuilder;
@@ -31,10 +31,10 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
  * @date 2018/04/18
  * @company Dingxuan
  */
-public class QueryResultsItr implements ResultsIterator {
-    private static final JavaChainLog loggger  = JavaChainLogFactory.getLog(QueryResultsItr.class);
+public class QueryIResultsItr implements IResultsIterator {
+    private static final JavaChainLog loggger  = JavaChainLogFactory.getLog(QueryIResultsItr.class);
 
-    private ResultsIterator dbItr;
+    private IResultsIterator dbItr;
     private RWSetBuilder rwSetBuilder;
 
     @Override
@@ -58,11 +58,11 @@ public class QueryResultsItr implements ResultsIterator {
         dbItr.close();
     }
 
-    public ResultsIterator getDbItr() {
+    public IResultsIterator getDbItr() {
         return dbItr;
     }
 
-    public void setDbItr(ResultsIterator dbItr) {
+    public void setDbItr(IResultsIterator dbItr) {
         this.dbItr = dbItr;
     }
 

@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.*;
@@ -142,12 +142,12 @@ public class CommonStorageDB implements DB {
     }
 
     @Override
-    public ResultsIterator getPrivateDataRangeScanIterator(String ns, String coll, String startKey, String endKey) throws LedgerException{
+    public IResultsIterator getPrivateDataRangeScanIterator(String ns, String coll, String startKey, String endKey) throws LedgerException{
         return getStateRangeScanIterator(deriveHashedDataNs(ns, coll), startKey, endKey);
     }
 
     @Override
-    public ResultsIterator executeQueryOnPrivateData(String ns, String coll, String query) throws LedgerException{
+    public IResultsIterator executeQueryOnPrivateData(String ns, String coll, String query) throws LedgerException{
         return executeQuery(deriveHashedDataNs(ns, coll), query);
     }
 
@@ -212,12 +212,12 @@ public class CommonStorageDB implements DB {
     }
 
     @Override
-    public ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
+    public IResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
         return vdb.getStateRangeScanIterator(namespace, startKey, endKey);
     }
 
     @Override
-    public ResultsIterator executeQuery(String namespace, String query) throws LedgerException {
+    public IResultsIterator executeQuery(String namespace, String query) throws LedgerException {
         return vdb.executeQuery(namespace, query);
     }
 

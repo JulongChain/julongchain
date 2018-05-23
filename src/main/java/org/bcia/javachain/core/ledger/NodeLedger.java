@@ -16,8 +16,8 @@
 package org.bcia.javachain.core.ledger;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.PrunePolicy;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IPrunePolicy;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
@@ -95,7 +95,7 @@ public class NodeLedger implements INodeLedger {
     }
 
     @Override
-    public void prune(PrunePolicy policy) throws LedgerException {
+    public void prune(IPrunePolicy policy) throws LedgerException {
 
     }
 
@@ -126,7 +126,7 @@ public class NodeLedger implements INodeLedger {
     }
 
     @Override
-    public ResultsIterator getBlocksIterator(long startBlockNumber) throws LedgerException {
+    public IResultsIterator getBlocksIterator(long startBlockNumber) throws LedgerException {
         return null;
     }
 

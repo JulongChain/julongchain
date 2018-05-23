@@ -41,7 +41,7 @@ public interface ILedger {
     /**
      * 返回起始位置为startBlockNumber的迭代器ResultIterator
      */
-    ResultsIterator getBlocksIterator(long startBlockNumber) throws LedgerException;
+    IResultsIterator getBlocksIterator(long startBlockNumber) throws LedgerException;
 
     /**
      * 关闭账本

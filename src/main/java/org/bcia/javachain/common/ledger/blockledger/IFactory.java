@@ -16,21 +16,31 @@ limitations under the License.
 package org.bcia.javachain.common.ledger.blockledger;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
-import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.common.Ledger;
+
+import java.util.List;
 
 /**
- * 区块文件接口
+ * 创建账本工厂接口
  *
  * @author sunzongyu
- * @date 2018/04/7
+ * @date 2018/04/26
  * @company Dingxuan
  */
-public interface FileLedgerBlockStore {
-    void addBlock(Common.Block block) throws LedgerException;
+public interface IFactory {
 
-    Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException;
+    /**
+     * 获取ledger(已存在)
+     * 创建ledger(不存在)
+     */
+    ReadWriteBase getOrCreate(String groupID) throws LedgerException;
 
-    ResultsIterator retrieveBlocks(long startBlockNumber) throws LedgerException;
+    /**
+     * 返回已经创建的groupid
+     */
+    List<String> groupIDs() throws LedgerException;
+
+    /**
+     * 关闭
+     */
+    void close() throws LedgerException;
 }

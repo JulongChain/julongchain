@@ -17,7 +17,7 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.ledger.util.DBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -86,7 +86,7 @@ public class VersionedLevelDB implements IVersionedDB {
     }
 
     @Override
-    public ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
+    public IResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
         byte[] compositeStartKey = constructCompositeKey(namespace, startKey);
         byte[] compositeEndKey = constructCompositeKey(namespace, endKey);
         if("".equals(endKey)){
@@ -97,7 +97,7 @@ public class VersionedLevelDB implements IVersionedDB {
     }
 
     @Override
-    public ResultsIterator executeQuery(String namespace, String query) throws LedgerException {
+    public IResultsIterator executeQuery(String namespace, String query) throws LedgerException {
         throw new LedgerException("ExecuteQuery is not support for leveldb");
     }
 

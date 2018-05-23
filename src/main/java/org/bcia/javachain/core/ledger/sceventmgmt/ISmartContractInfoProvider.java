@@ -15,6 +15,8 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.sceventmgmt;
 
+import org.bcia.javachain.common.exception.JavaChainException;
+
 /**
  * 智能合约信息提供者接口
  *
@@ -30,12 +32,12 @@ public interface ISmartContractInfoProvider {
      * @param smartContractDefinition
      * @return
      */
-    boolean isSmartContractDeployed(String groupID, SmartContractDefinition smartContractDefinition);
+    boolean isSmartContractDeployed(String groupID, SmartContractDefinition smartContractDefinition) throws JavaChainException;
 
     /**
      * 查询智能合约实体
      * @param smartContractDefinition
      * @return
      */
-    byte[] retrieveSmartContractArtifacts(SmartContractDefinition smartContractDefinition);
+    byte[] retrieveSmartContractArtifacts(SmartContractDefinition smartContractDefinition) throws JavaChainException;
 }

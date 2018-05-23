@@ -23,7 +23,6 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.consenter.Ab;
 
 /**

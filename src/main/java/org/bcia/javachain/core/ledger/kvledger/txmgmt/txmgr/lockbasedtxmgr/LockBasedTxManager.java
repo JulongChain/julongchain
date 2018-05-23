@@ -16,6 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 
 import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -157,7 +158,7 @@ public class LockBasedTxManager implements TxManager {
         }
     }
 
-    private void invokeNamespaceListeners(UpdateBatch batch){
+    private void invokeNamespaceListeners(UpdateBatch batch) throws JavaChainException {
         List<String> namespaces = batch.getPubUpdateBatch().getBatch().getUpdatedNamespaces();
         for(String ns : namespaces){
             StateListener listener = stateListeners.get(ns);

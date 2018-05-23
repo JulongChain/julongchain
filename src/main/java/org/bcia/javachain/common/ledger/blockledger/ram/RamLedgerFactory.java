@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.common.ledger.blockledger.ram;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.blockledger.Factory;
+import org.bcia.javachain.common.ledger.blockledger.IFactory;
 import org.bcia.javachain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -35,7 +35,7 @@ import java.util.Map;
  * @date 2018/04/28
  * @company Dingxuan
  */
-public class RamLedgerFactory implements Factory {
+public class RamLedgerFactory implements IFactory {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(RamLedgerFactory.class);
 
     private int maxSize;

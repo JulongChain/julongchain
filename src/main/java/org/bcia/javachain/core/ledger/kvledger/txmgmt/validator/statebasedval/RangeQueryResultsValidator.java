@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.statebasedval;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
@@ -39,10 +39,10 @@ public class RangeQueryResultsValidator implements IRangeQueryValidator {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(RangeQueryResultsValidator.class);
 
     private KvRwset.RangeQueryInfo rqInfo;
-    private ResultsIterator itr;
+    private IResultsIterator itr;
 
     @Override
-    public void init(KvRwset.RangeQueryInfo rqInfo, ResultsIterator itr) {
+    public void init(KvRwset.RangeQueryInfo rqInfo, IResultsIterator itr) {
         this.rqInfo = rqInfo;
         this.itr = itr;
     }

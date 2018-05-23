@@ -49,4 +49,6 @@ public interface IPrivDataSupport {
     IIdentityDeserializer getIdentityDeserializer(String groupID);
 
     String buildCollectionKVSKey(String smartcontractname);
+
+    boolean isCollectionConfigKey(String key);
 }

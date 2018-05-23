@@ -17,10 +17,9 @@ package org.bcia.javachain.consenter.common.multigroup;
 
 import org.bcia.javachain.common.configtx.IValidator;
 import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
-import org.bcia.javachain.common.ledger.blockledger.Reader;
-import org.bcia.javachain.common.ledger.blockledger.Writer;
+import org.bcia.javachain.common.ledger.blockledger.IReader;
+import org.bcia.javachain.common.ledger.blockledger.IWriter;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
-import org.bcia.javachain.consenter.consensus.IReceiver;
 import org.bcia.javachain.protos.common.Configtx;
 
 /**
@@ -28,7 +27,7 @@ import org.bcia.javachain.protos.common.Configtx;
  * @Date: 2018/5/10
  * @company Dingxuan
  */
-public interface IBlockWriterSupport extends ILocalSigner,IValidator,Reader,Writer {
+public interface IBlockWriterSupport extends ILocalSigner,IValidator,IReader,IWriter {
     void update(IGroupConfigBundle iGroupConfigBundle);
     IGroupConfigBundle createBundle(String groupId, Configtx.Config config);
 }

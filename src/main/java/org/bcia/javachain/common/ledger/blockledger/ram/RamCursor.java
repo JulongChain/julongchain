@@ -22,7 +22,6 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.node.Query;
 
 import java.util.AbstractMap;
 

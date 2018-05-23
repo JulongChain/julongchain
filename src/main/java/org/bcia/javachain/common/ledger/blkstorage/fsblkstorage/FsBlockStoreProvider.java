@@ -16,8 +16,8 @@
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
-import org.bcia.javachain.common.ledger.blkstorage.BlockStoreProvider;
+import org.bcia.javachain.common.ledger.blkstorage.IBlockStore;
+import org.bcia.javachain.common.ledger.blkstorage.IBlockStoreProvider;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.javachain.common.ledger.util.DBProvider;
 import org.bcia.javachain.common.ledger.util.IoUtil;
@@ -32,7 +32,7 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
  * @date 2018/04/17
  * @company Dingxuan
  */
-public class FsBlockStoreProvider implements BlockStoreProvider {
+public class FsBlockStoreProvider implements IBlockStoreProvider {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(FsBlockStoreProvider.class);
 
     private Conf conf;
@@ -42,7 +42,7 @@ public class FsBlockStoreProvider implements BlockStoreProvider {
     /**
      * 创建文件系统操作类
      */
-    public static BlockStoreProvider newProvider(Conf conf, IndexConfig indexConfig) throws LedgerException {
+    public static IBlockStoreProvider newProvider(Conf conf, IndexConfig indexConfig) throws LedgerException {
         FsBlockStoreProvider provider = new FsBlockStoreProvider();
         provider.setLeveldbProvider(LevelDBProvider.newProvider(conf.getIndexDir()));
         provider.setConf(conf);
@@ -55,7 +55,7 @@ public class FsBlockStoreProvider implements BlockStoreProvider {
      * 创建(打开)一个文件系统
      */
     @Override
-    public BlockStore createBlockStore(String ledgerid) throws LedgerException {
+    public IBlockStore createBlockStore(String ledgerid) throws LedgerException {
         return openBlockStore(ledgerid);
     }
 
@@ -64,7 +64,7 @@ public class FsBlockStoreProvider implements BlockStoreProvider {
      * 仅调用一次
      */
     @Override
-    public BlockStore openBlockStore(String ledgerid) throws LedgerException {
+    public IBlockStore openBlockStore(String ledgerid) throws LedgerException {
         return FsBlockStore.newFsBlockStore(ledgerid, conf, indexConfig, leveldbProvider);
     }
 

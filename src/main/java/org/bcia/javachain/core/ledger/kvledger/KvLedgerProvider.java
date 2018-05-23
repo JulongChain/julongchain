@@ -32,7 +32,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.Common
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DBPorvider;
 import org.bcia.javachain.core.ledger.ledgerstorage.Provider;
-import org.bcia.javachain.core.ledger.ledgerstorage.Store;
+import org.bcia.javachain.core.ledger.ledgerstorage.StoreIBlockStore;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
 
@@ -68,7 +68,7 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         //初始化idstore(ledgerProvider)
         IdStore idStore = IdStore.openIDStore();
         //初始化文件系统(chains/chains)以及pvtdata(pvtdataStore)
-        Provider ledgerStoreProvider = Store.newProvider();
+        Provider ledgerStoreProvider = StoreIBlockStore.newProvider();
         //初始化versiondb(stateLeveldb)
         CommonStorageDBProvider vdbProvider = CommonStorageDBProvider.NewCommonStorageDBProvider();
         //初始化HistoryDB(historyLeveldb)
@@ -216,7 +216,7 @@ public class KvLedgerProvider implements INodeLedgerProvider {
      */
     private INodeLedger openInternal(String ledgerID) throws LedgerException{
         //账本的block仓库
-        Store blockStore = ledgerStoreProvider.open(ledgerID);
+        StoreIBlockStore blockStore = ledgerStoreProvider.open(ledgerID);
         //账本的状态db
         DB vdb = vdbProvider.getDBHandle(ledgerID);
         //账本的历史db

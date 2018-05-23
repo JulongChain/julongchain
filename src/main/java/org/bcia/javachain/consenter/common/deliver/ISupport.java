@@ -17,7 +17,7 @@
 package org.bcia.javachain.consenter.common.deliver;
 
 
-import org.bcia.javachain.common.ledger.blockledger.Reader;
+import org.bcia.javachain.common.ledger.blockledger.IReader;
 import org.bcia.javachain.common.policies.IManager;
 
 /**
@@ -30,5 +30,5 @@ public interface ISupport {
 
     IManager poclicyManager();
 
-    Reader reader();
+    IReader reader();
 }

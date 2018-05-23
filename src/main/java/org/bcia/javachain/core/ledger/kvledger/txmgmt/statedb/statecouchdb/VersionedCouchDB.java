@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.statecouchdb;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
@@ -77,12 +77,12 @@ public class VersionedCouchDB implements IVersionedDB, ISmartContractLifecycleEv
     }
 
     @Override
-    public ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
+    public IResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
         return null;
     }
 
     @Override
-    public ResultsIterator executeQuery(String namespace, String query) throws LedgerException {
+    public IResultsIterator executeQuery(String namespace, String query) throws LedgerException {
         return null;
     }
 

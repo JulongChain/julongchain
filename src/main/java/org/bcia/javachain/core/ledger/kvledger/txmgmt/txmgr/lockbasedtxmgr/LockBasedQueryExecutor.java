@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.IQueryExecutor;
@@ -57,12 +57,12 @@ public class LockBasedQueryExecutor implements IQueryExecutor {
     }
 
     @Override
-    public ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
+    public IResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
         return helper.getStateRangeScanIterator(namespace, startKey, endKey);
     }
 
     @Override
-    public ResultsIterator executeQuery(String namespace, String query) throws LedgerException {
+    public IResultsIterator executeQuery(String namespace, String query) throws LedgerException {
         return helper.executeQuery(namespace, query);
     }
 
@@ -77,14 +77,20 @@ public class LockBasedQueryExecutor implements IQueryExecutor {
     }
 
     @Override
-    public ResultsIterator getPrivateDataRangeScanIterator(String namespace, String collection, String startKey, String endKey) throws LedgerException {
+    public IResultsIterator getPrivateDataRangeScanIterator(String namespace, String collection, String startKey, String endKey) throws LedgerException {
         return helper.getPrivateDataRangeScanIterator(namespace, collection, startKey, endKey);
     }
 
     @Override
-    public void done() throws LedgerException {
+    public void done(){
         logger.debug("Done with transaction simulation " + txID);
-        helper.done();
+        try {
+            helper.done();
+        } catch (LedgerException e) {
+            logger.error("Can not done query helper");
+            logger.error(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
     }
 
     public QueryHelper getHelper() {

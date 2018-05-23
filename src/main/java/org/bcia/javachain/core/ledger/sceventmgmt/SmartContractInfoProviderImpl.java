@@ -15,6 +15,19 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.sceventmgmt;
 
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.common.smartcontractprovider.SmartContractProvider;
+import org.bcia.javachain.core.common.sysscprovider.SystemSmartContractProvider;
+import org.bcia.javachain.core.ledger.IQueryExecutor;
+import org.bcia.javachain.protos.node.SmartContractDataPackage;
+
+import java.util.Arrays;
+
 /**
  * 智能合约信息提供者
  *
@@ -23,15 +36,44 @@ package org.bcia.javachain.core.ledger.sceventmgmt;
  * @company Dingxuan
  */
 public class SmartContractInfoProviderImpl implements ISmartContractInfoProvider{
+    private static final JavaChainLog log = JavaChainLogFactory.getLog(SmartContractInfoProviderImpl.class);
 
     @Override
-    public boolean isSmartContractDeployed(String groupID, SmartContractDefinition smartContractDefinition) {
+    public boolean isSmartContractDeployed(String groupID, SmartContractDefinition smartContractDefinition) throws JavaChainException{
+        return isSmartContractDeployed(groupID, smartContractDefinition.getName(), smartContractDefinition.getVersion(), smartContractDefinition.getHash());
+    }
 
-        return false;
+    private boolean isSmartContractDeployed(String groupID, String scName, String scVersion, byte[] scHash) throws JavaChainException{
+        SystemSmartContractProvider sscProvider = new SystemSmartContractProvider();
+        IQueryExecutor qe = null;
+        try {
+            qe = sscProvider.getQueryExecutorForLedger(groupID);
+        } catch (JavaChainException e) {
+            log.error(e.getMessage(), e);
+            throw e;
+        }
+        try {
+            byte[] scDataBytes = qe.getState("lssc", scName);
+            if (scDataBytes == null) {
+                log.info("Got null scData");
+                return false;
+            }
+            SmartContractDataPackage.SmartContractData scData = SmartContractDataPackage.SmartContractData.parseFrom(scDataBytes);
+            return scData.getVersion().equals(scVersion) && scData.getId().equals(scHash);
+        } catch (InvalidProtocolBufferException e){
+            log.error("Got wrong scData");
+            log.error(e.getMessage(), e);
+            throw new JavaChainException(e);
+        } catch (LedgerException e) {
+            log.error(e.getMessage(), e);
+            throw e;
+        } finally {
+            qe.done();
+        }
     }
 
     @Override
-    public byte[] retrieveSmartContractArtifacts(SmartContractDefinition smartContractDefinition) {
-        return new byte[0];
+    public byte[] retrieveSmartContractArtifacts(SmartContractDefinition smartContractDefinition) throws JavaChainException{
+        return SmartContractProvider.extractStatedbArtifactsForSmartContract(smartContractDefinition.getName(), smartContractDefinition.getVersion());
     }
 }

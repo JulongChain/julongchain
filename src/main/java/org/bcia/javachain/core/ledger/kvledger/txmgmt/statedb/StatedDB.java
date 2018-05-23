@@ -16,7 +16,7 @@
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.NsIterator;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.NsIteratorI;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.NsUpdates;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.UpdateBatch;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
@@ -42,7 +42,7 @@ public class StatedDB {
         return null;
     }
 
-    public static NsIterator newNsIterator(String ns, String startKey, String endKey, UpdateBatch batch) {
+    public static NsIteratorI newNsIterator(String ns, String startKey, String endKey, UpdateBatch batch) {
         return null;
     }
 

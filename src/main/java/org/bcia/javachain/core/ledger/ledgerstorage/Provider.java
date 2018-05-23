@@ -16,8 +16,8 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.ledgerstorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
-import org.bcia.javachain.common.ledger.blkstorage.BlockStoreProvider;
+import org.bcia.javachain.common.ledger.blkstorage.IBlockStore;
+import org.bcia.javachain.common.ledger.blkstorage.IBlockStoreProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 
@@ -31,13 +31,13 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 public class Provider {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(Provider.class);
 
-    private BlockStoreProvider blkStoreProvider;
+    private IBlockStoreProvider blkStoreProvider;
     private org.bcia.javachain.core.ledger.pvtdatastorage.Provider pvtDataStoreProvider;
 
-    public Store open(String ledgerID) throws LedgerException {
-        BlockStore blockStore = blkStoreProvider.openBlockStore(ledgerID);
+    public StoreIBlockStore open(String ledgerID) throws LedgerException {
+        IBlockStore blockStore = blkStoreProvider.openBlockStore(ledgerID);
         org.bcia.javachain.core.ledger.pvtdatastorage.Store pvtDataStore = pvtDataStoreProvider.openStore(ledgerID);
-        Store store = new Store();
+        StoreIBlockStore store = new StoreIBlockStore();
         store.setBlkStorage(blockStore);
         store.setPvtdataStore(pvtDataStore);
         store.init();
@@ -49,11 +49,11 @@ public class Provider {
         pvtDataStoreProvider.close();
     }
 
-    public BlockStoreProvider getBlkStoreProvider() {
+    public IBlockStoreProvider getBlkStoreProvider() {
         return blkStoreProvider;
     }
 
-    public void setBlkStoreProvider(BlockStoreProvider blkStoreProvider) {
+    public void setBlkStoreProvider(IBlockStoreProvider blkStoreProvider) {
         this.blkStoreProvider = blkStoreProvider;
     }
 

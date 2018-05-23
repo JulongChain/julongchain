@@ -15,26 +15,13 @@
  */
 package org.bcia.javachain.common.ledger;
 
-import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
-
 /**
- * ResultsIterator - an iterator for query result set
+ * IPrunePolicy - a general interface for supporting different pruning policies
  *
  * @author wanliangbing
  * @date 2018/3/7
  * @company Dingxuan
  */
-public interface ResultsIterator {
-
-    /**
-     * 返回下一个实体,当全部返回时,返回空
-     */
-    QueryResult next() throws LedgerException;
-
-    /**
-     * 关闭当前迭代器
-     */
-    void close() throws LedgerException;
+public interface IPrunePolicy {
 
 }

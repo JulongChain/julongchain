@@ -210,7 +210,12 @@ public class IoUtil {
             logger.debug("Input must be a directory, but file {} is not", path);
             return null;
         }
-        Map<String, File> result = new HashMap<>();
+        Map<String, File> result = new TreeMap<>(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return o1.compareTo(o2);
+            }
+        });
         Queue<File> queue = new LinkedList<>();
         queue.add(file);
         while(queue.size() > 0){
@@ -379,18 +384,6 @@ public class IoUtil {
     }
 
     public static void main(String[] args) throws Exception  {
-        File file = new File("/home/bcia/test/12345.tar.gz");
-        FileInputStream fis = new FileInputStream(file);
-        byte[] bytes = new byte[1024];
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        int num = 0;
-        while((num = fis.read(bytes)) > 0){
-            baos.write(bytes, 0, num);
-        }
-        byte[] bytes1 = gzipReader(baos.toByteArray(), 1024);
-        Map<String, byte[]> stringMap = tarReader(bytes1, 1024);
-        stringMap.forEach((k, v) -> {
-            System.out.println(k);
-        });
+
     }
 }

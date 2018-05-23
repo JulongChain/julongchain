@@ -17,7 +17,7 @@ package org.bcia.javachain.core.smartcontract;
 
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.core.common.sysscprovider.SmartContractInstance;
 import org.bcia.javachain.core.container.scintf.ISmartContractStream;
 import org.bcia.javachain.core.endorser.MockTxSimulator;
@@ -144,7 +144,7 @@ public class HandlerTest {
         TransactionContext txContext = new TransactionContext();
         txContext.setQueryIteratorMap(new HashMap<>());
         String queryID = "queryID";
-        ResultsIterator queryIterator = new ResultsIterator() {
+        IResultsIterator queryIterator = new IResultsIterator() {
             @Override
             public QueryResult next() throws LedgerException {
                 return null;
@@ -166,7 +166,7 @@ public class HandlerTest {
         TransactionContext txContext = new TransactionContext();
         txContext.setQueryIteratorMap(new HashMap<>());
         String queryID = "queryID";
-        ResultsIterator queryIterator = new ResultsIterator() {
+        IResultsIterator queryIterator = new IResultsIterator() {
             @Override
             public QueryResult next() throws LedgerException {
                 return null;
@@ -178,7 +178,7 @@ public class HandlerTest {
             }
         };
         handler.initializeQueryContext(txContext, queryID, queryIterator);
-        ResultsIterator expected = handler.getQueryIterator(txContext, queryID);
+        IResultsIterator expected = handler.getQueryIterator(txContext, queryID);
         Assert.assertNotNull(expected);
     }
 
@@ -187,7 +187,7 @@ public class HandlerTest {
         TransactionContext txContext = new TransactionContext();
         txContext.setQueryIteratorMap(new HashMap<>());
         txContext.setPendingQueryResults(new HashMap<>());
-        txContext.getQueryIteratorMap().put("123", new ResultsIterator() {
+        txContext.getQueryIteratorMap().put("123", new IResultsIterator() {
             @Override
             public QueryResult next() throws LedgerException {
                 return null;
@@ -357,7 +357,7 @@ public class HandlerTest {
         txContext.setQueryIteratorMap(new HashMap<>());
         txContext.setPendingQueryResults(new HashMap<>());
         txContext.getPendingQueryResults().put(iterID, pendingQueryResult);
-        ResultsIterator iter = new ResultsIterator() {
+        IResultsIterator iter = new IResultsIterator() {
             @Override
             public QueryResult next() throws LedgerException {
                 return null;
@@ -381,7 +381,7 @@ public class HandlerTest {
     @Test
     public void getQueryResponse() throws LedgerException {
         String iterID = "iterID";
-        ResultsIterator iter = new ResultsIterator() {
+        IResultsIterator iter = new IResultsIterator() {
             @Override
             public QueryResult next() throws LedgerException {
                 return null;

@@ -13,15 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.ledger;
+package org.bcia.javachain.common.ledger.blkstorage;
+
+import org.bcia.javachain.common.exception.LedgerException;
 
 /**
- * PrunePolicy - a general interface for supporting different pruning policies
+ * 操作区块文件接口
  *
- * @author wanliangbing
- * @date 2018/3/7
+ * @author sunzongyu
+ * @date 2018/4/7
  * @company Dingxuan
  */
-public interface PrunePolicy {
+public interface IBlockStoreProvider {
+
+    IBlockStore createBlockStore(String ledgerid) throws LedgerException;
+
+    IBlockStore openBlockStore(String ledgerid) throws LedgerException;
+
+    Boolean exists(String ledgerid) throws LedgerException;
+
+    String[] list() throws LedgerException;
+
+    void close() throws LedgerException;
 
 }

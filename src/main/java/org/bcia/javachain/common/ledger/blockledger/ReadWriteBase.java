@@ -26,7 +26,7 @@ import org.bcia.javachain.protos.consenter.Ab;
  * @date 2018/04/26
  * @company Dingxuan
  */
-public abstract class ReadWriteBase implements Reader, Writer {
+public abstract class ReadWriteBase implements IReader, IWriter {
     @Override
     public abstract Iterator iterator(Ab.SeekPosition startType) throws LedgerException;
 

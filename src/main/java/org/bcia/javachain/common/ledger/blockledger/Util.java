@@ -20,13 +20,10 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.consenter.Ab;
-import org.iq80.leveldb.table.BlockBuilder;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 /**
  * 提供文件读写工具
@@ -38,11 +35,11 @@ import java.util.Queue;
 public class Util {
     public static final LedgerException NOT_FOUND_ERROR_ITERATOR = new LedgerException("Not found iterator");
 
-    public static Common.Block createNextBlock(Reader reader, List<Common.Envelope> messages) throws LedgerException{
+    public static Common.Block createNextBlock(IReader IReader, List<Common.Envelope> messages) throws LedgerException{
         long nextBlockNumber = 0;
         ByteString previousBlockHash = null;
-        if(reader.height() > 0){
-            Iterator itr = reader.iterator(Ab.SeekPosition.getDefaultInstance());
+        if(IReader.height() > 0){
+            Iterator itr = IReader.iterator(Ab.SeekPosition.getDefaultInstance());
             try {
                 itr.readyChain().take();
             } catch (InterruptedException e) {
@@ -78,8 +75,8 @@ public class Util {
         return block;
     }
 
-    public static Common.Block getBlock(Reader reader, long index) throws LedgerException{
-        Iterator i = reader.iterator(Ab.SeekPosition.newBuilder()
+    public static Common.Block getBlock(IReader IReader, long index) throws LedgerException{
+        Iterator i = IReader.iterator(Ab.SeekPosition.newBuilder()
                 .setSpecified(Ab.SeekSpecified.newBuilder()
                         .setNumber(index)
                         .build())

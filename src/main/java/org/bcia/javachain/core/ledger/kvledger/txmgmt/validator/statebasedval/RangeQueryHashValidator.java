@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.statebasedval;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RangeQueryResultsHelper;
@@ -37,11 +37,11 @@ public class RangeQueryHashValidator implements IRangeQueryValidator {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(RangeQueryHashValidator.class);
 
     private KvRwset.RangeQueryInfo rqInfo;
-    private ResultsIterator itr;
+    private IResultsIterator itr;
     private RangeQueryResultsHelper resultsHelper;
 
     @Override
-    public void init(KvRwset.RangeQueryInfo rqInfo, ResultsIterator itr) throws LedgerException {
+    public void init(KvRwset.RangeQueryInfo rqInfo, IResultsIterator itr) throws LedgerException {
         this.rqInfo = rqInfo;
         this.itr = itr;
         this.resultsHelper = RangeQueryResultsHelper.newRangeQueryResultsHelper(true, rqInfo.getReadsMerkleHashes().getMaxDegree());

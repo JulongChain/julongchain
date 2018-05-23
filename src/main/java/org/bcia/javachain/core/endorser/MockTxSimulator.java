@@ -16,7 +16,7 @@
 package org.bcia.javachain.core.endorser;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.core.ledger.TxSimulationResults;
 
@@ -66,16 +66,16 @@ public class MockTxSimulator implements ITxSimulator {
         return new byte[0][];
     }
 
-    public ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
+    public IResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
         return null;
     }
 
-    public ResultsIterator ExecuteQuery(String namespace, String query) throws LedgerException {
+    public IResultsIterator ExecuteQuery(String namespace, String query) throws LedgerException {
         return null;
     }
 
     @Override
-    public void done() throws LedgerException {
+    public void done() {
 
     }
 
@@ -99,7 +99,7 @@ public class MockTxSimulator implements ITxSimulator {
     }
 
     @Override
-    public ResultsIterator executeQuery(String namespace, String query) throws LedgerException {
+    public IResultsIterator executeQuery(String namespace, String query) throws LedgerException {
         return null;
     }
 
@@ -115,8 +115,8 @@ public class MockTxSimulator implements ITxSimulator {
     }
 
     @Override
-    public ResultsIterator getPrivateDataRangeScanIterator(String namespace, String collection, String startKey,
-                                                           String endKey) throws LedgerException {
+    public IResultsIterator getPrivateDataRangeScanIterator(String namespace, String collection, String startKey,
+                                                            String endKey) throws LedgerException {
         return null;
     }
 

@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.*;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.CompositeKey;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
@@ -51,9 +51,9 @@ public interface DB extends IVersionedDB {
 
     List<VersionedValue> getPrivateDataMultipleKeys(String ns, String coll, List<String> keys) throws LedgerException;
 
-    ResultsIterator getPrivateDataRangeScanIterator(String ns, String coll, String startKey, String endKey) throws LedgerException;
+    IResultsIterator getPrivateDataRangeScanIterator(String ns, String coll, String startKey, String endKey) throws LedgerException;
 
-    ResultsIterator executeQueryOnPrivateData(String ns, String coll, String query) throws LedgerException;
+    IResultsIterator executeQueryOnPrivateData(String ns, String coll, String query) throws LedgerException;
 
     void applyPrivacyAwareUpdates(UpdateBatch updates, Height height) throws LedgerException;
 }

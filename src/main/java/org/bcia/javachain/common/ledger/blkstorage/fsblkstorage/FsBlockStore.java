@@ -16,8 +16,8 @@
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
-import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
+import org.bcia.javachain.common.ledger.IResultsIterator;
+import org.bcia.javachain.common.ledger.blkstorage.IBlockStore;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.javachain.common.ledger.util.DBProvider;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
@@ -32,7 +32,7 @@ import org.bcia.javachain.protos.node.TransactionPackage;
  * @date 2018/4/19
  * @company Dingxuan
  */
-public class FsBlockStore implements BlockStore {
+public class FsBlockStore implements IBlockStore {
 
     private String id;
     private Conf conf;
@@ -61,7 +61,7 @@ public class FsBlockStore implements BlockStore {
     }
 
     @Override
-    public ResultsIterator retrieveBlocks(long startBlockNumber) throws LedgerException {
+    public IResultsIterator retrieveBlocks(long startBlockNumber) throws LedgerException {
         return blockFileManager.retrieveBlocks(startBlockNumber);
     }
 

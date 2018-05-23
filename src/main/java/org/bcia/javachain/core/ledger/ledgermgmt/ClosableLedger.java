@@ -15,16 +15,8 @@
  */
 package org.bcia.javachain.core.ledger.ledgermgmt;
 
-import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.PrunePolicy;
-import org.bcia.javachain.common.ledger.ResultsIterator;
 import org.bcia.javachain.core.ledger.*;
 import org.bcia.javachain.core.ledger.kvledger.KvLedger;
-import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.common.Ledger;
-import org.bcia.javachain.protos.node.TransactionPackage;
-
-import java.util.List;
 
 /**
  * closableLedger extends from actual validated ledger and overwrites the Close method

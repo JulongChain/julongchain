@@ -15,6 +15,7 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger;
 
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
 import java.util.List;
@@ -27,5 +28,5 @@ import java.util.List;
  * @company Dingxuan
  */
 public interface StateListener {
-   void handleStateUpdates(String ledgerID, List<KvRwset.KVWrite> stateUpdates);
+   void handleStateUpdates(String ledgerID, List<KvRwset.KVWrite> stateUpdates) throws JavaChainException;
 }

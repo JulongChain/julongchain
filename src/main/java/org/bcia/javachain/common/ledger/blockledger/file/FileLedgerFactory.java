@@ -17,12 +17,12 @@ package org.bcia.javachain.common.ledger.blockledger.file;
 
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStorage;
-import org.bcia.javachain.common.ledger.blkstorage.BlockStore;
-import org.bcia.javachain.common.ledger.blkstorage.BlockStoreProvider;
+import org.bcia.javachain.common.ledger.blkstorage.IBlockStore;
+import org.bcia.javachain.common.ledger.blkstorage.IBlockStoreProvider;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.FsBlockStoreProvider;
-import org.bcia.javachain.common.ledger.blockledger.Factory;
+import org.bcia.javachain.common.ledger.blockledger.IFactory;
 import org.bcia.javachain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -36,10 +36,10 @@ import java.util.*;
  * @date 2018/04/26
  * @company Dingxuan
  */
-public class FileLedgerFactory implements Factory {
+public class FileLedgerFactory implements IFactory {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(FileLedgerFactory.class);
 
-    private BlockStoreProvider blkStorageProvider;
+    private IBlockStoreProvider blkStorageProvider;
     private Map<String, ReadWriteBase> ledgers;
 
     public FileLedgerFactory(String directory) throws LedgerException {
@@ -56,7 +56,7 @@ public class FileLedgerFactory implements Factory {
         if(ledger != null){
             return ledger;
         }
-        BlockStore blkStore = blkStorageProvider.openBlockStore(groupID);
+        IBlockStore blkStore = blkStorageProvider.openBlockStore(groupID);
         ledger = new FileLedger(blkStore);
         ledgers.put(groupID, ledger);
         return ledger;

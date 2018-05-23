@@ -15,7 +15,7 @@
  */
 package org.bcia.javachain.core.smartcontract;
 
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.javachain.protos.node.ProposalPackage;
@@ -36,7 +36,7 @@ public class TransactionContext {
     private ProposalPackage.SignedProposal signedProp;
     private ProposalPackage.Proposal proposal;
     private SmartcontractShim.SmartContractMessage responseNotifier;
-    private Map<String, ResultsIterator> queryIteratorMap;
+    private Map<String, IResultsIterator> queryIteratorMap;
     private Map<String, PendingQueryResult> pendingQueryResults;
     private ITxSimulator txSimulator;
     private IHistoryQueryExecutor historyQueryExecutor;
@@ -73,11 +73,11 @@ public class TransactionContext {
         this.responseNotifier = responseNotifier;
     }
 
-    public Map<String, ResultsIterator> getQueryIteratorMap() {
+    public Map<String, IResultsIterator> getQueryIteratorMap() {
         return queryIteratorMap;
     }
 
-    public void setQueryIteratorMap(Map<String, ResultsIterator> queryIteratorMap) {
+    public void setQueryIteratorMap(Map<String, IResultsIterator> queryIteratorMap) {
         this.queryIteratorMap = queryIteratorMap;
     }
 

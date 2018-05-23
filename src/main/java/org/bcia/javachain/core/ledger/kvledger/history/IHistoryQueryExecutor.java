@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.history;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 
 /**
  * 历史查询器接口
@@ -26,5 +26,5 @@ import org.bcia.javachain.common.ledger.ResultsIterator;
  * @company Dingxuan
  */
 public interface IHistoryQueryExecutor {
-    ResultsIterator getHistoryForKey(String ns, String key) throws LedgerException;
+    IResultsIterator getHistoryForKey(String ns, String key) throws LedgerException;
 }

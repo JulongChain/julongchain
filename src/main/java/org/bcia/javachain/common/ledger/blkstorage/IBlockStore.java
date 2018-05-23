@@ -16,8 +16,8 @@
 package org.bcia.javachain.common.ledger.blkstorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
-import org.bcia.javachain.common.ledger.blockledger.FileLedgerBlockStore;
+import org.bcia.javachain.common.ledger.IResultsIterator;
+import org.bcia.javachain.common.ledger.blockledger.IFileLedgerBlockStore;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
@@ -30,7 +30,7 @@ import org.bcia.javachain.protos.node.TransactionPackage;
  * @date 2018/4/7
  * @company Dingxuan
  */
-public interface BlockStore extends FileLedgerBlockStore {
+public interface IBlockStore extends IFileLedgerBlockStore {
 
     /**
      * 在区块文件中添加block
@@ -55,7 +55,7 @@ public interface BlockStore extends FileLedgerBlockStore {
      * @throws LedgerException
      */
     @Override
-    ResultsIterator retrieveBlocks(long startNum) throws LedgerException;
+    IResultsIterator retrieveBlocks(long startNum) throws LedgerException;
 
     /**
      * 根据区块Hash查询区块

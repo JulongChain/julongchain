@@ -20,7 +20,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.GroupConfigBundle;
-import org.bcia.javachain.common.ledger.blockledger.Reader;
+import org.bcia.javachain.common.ledger.blockledger.IReader;
 import org.bcia.javachain.common.ledger.blockledger.Util;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.policies.IManager;
@@ -88,7 +88,7 @@ public class ChainSupport implements IStandardGroupSupport, ISupport {
     }
 
     @Override
-    public Reader reader() {
+    public IReader reader() {
         return null;
     }
 

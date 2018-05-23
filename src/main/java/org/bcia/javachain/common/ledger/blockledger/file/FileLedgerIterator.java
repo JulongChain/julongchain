@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.common.ledger.blockledger.file;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.ledger.blockledger.Iterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
@@ -35,12 +35,12 @@ import java.util.Map;
 public class FileLedgerIterator implements Iterator {
     private FileLedger ledger;
     private long blockNum;
-    private ResultsIterator commonIterator;
+    private IResultsIterator commonIterator;
     private Channel<Object> channel;
 
     public FileLedgerIterator(){}
 
-    public FileLedgerIterator(FileLedger fl, long blockNum, ResultsIterator itr){
+    public FileLedgerIterator(FileLedger fl, long blockNum, IResultsIterator itr){
         this.ledger = fl;
         this.blockNum = blockNum;
         this.commonIterator = itr;
@@ -96,11 +96,11 @@ public class FileLedgerIterator implements Iterator {
         this.blockNum = blockNum;
     }
 
-    public ResultsIterator getCommonIterator() {
+    public IResultsIterator getCommonIterator() {
         return commonIterator;
     }
 
-    public void setCommonIterator(ResultsIterator commonIterator) {
+    public void setCommonIterator(IResultsIterator commonIterator) {
         this.commonIterator = commonIterator;
     }
 }

@@ -21,8 +21,8 @@ import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.GroupConfigBundle;
 import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
-import org.bcia.javachain.common.ledger.blockledger.Factory;
-import org.bcia.javachain.common.ledger.blockledger.Reader;
+import org.bcia.javachain.common.ledger.blockledger.IFactory;
+import org.bcia.javachain.common.ledger.blockledger.IReader;
 import org.bcia.javachain.common.ledger.blockledger.Util;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -56,7 +56,7 @@ public class Registrar implements IChainCreator {
 
     ChainSupport systemGroup;
 
-    Factory ledgerFactory;
+    IFactory ledgerFactory;
 
     IGroupConfigTemplator templator;
 
@@ -80,7 +80,7 @@ public class Registrar implements IChainCreator {
 
         return  new GroupConfigBundle(groupId,config);
     }
-    private Common.Envelope getConfigTx(Reader blockLedgerReader) {
+    private Common.Envelope getConfigTx(IReader blockLedgerReader) {
         Common.Block configBlock = null;
         try {
             Common.Block lastBlock = Util.getBlock(blockLedgerReader, blockLedgerReader.height() - 1);

@@ -16,7 +16,7 @@
 package org.bcia.javachain.core.ledger;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 
 import java.util.List;
 
@@ -44,12 +44,12 @@ public interface IQueryExecutor {
     /**
      * 根据给出的namespace以及[startKey, endKey)返回查询迭代器
      */
-    ResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException;
+    IResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException;
 
     /**
      * 丰富的查询支持,leveldb暂时无法满足
      */
-    ResultsIterator executeQuery(String namespace, String query) throws LedgerException;
+    IResultsIterator executeQuery(String namespace, String query) throws LedgerException;
 
     /**
      * 根据namespace, collection, key查询private data
@@ -64,10 +64,10 @@ public interface IQueryExecutor {
     /**
      * 根据给出的namespace, collection以及[startKey, endKey)返回查询迭代器
      */
-    ResultsIterator getPrivateDataRangeScanIterator(String namespace, String collection, String startKey, String endKey)throws LedgerException;
+    IResultsIterator getPrivateDataRangeScanIterator(String namespace, String collection, String startKey, String endKey)throws LedgerException;
 
     /**
      * 结束查询
      */
-    void done() throws LedgerException;
+    void done();
 }

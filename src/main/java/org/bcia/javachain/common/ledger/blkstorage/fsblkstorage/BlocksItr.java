@@ -16,7 +16,7 @@
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
@@ -28,7 +28,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
  * @date 2018/04/12
  * @company Dingxuan
  */
-public class BlocksItr implements ResultsIterator {
+public class BlocksItr implements IResultsIterator {
 
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlocksItr.class);
 

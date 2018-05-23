@@ -16,7 +16,7 @@
 package org.bcia.javachain.core.ledger;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.ResultsIterator;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 
@@ -83,7 +83,7 @@ public abstract class TxSimulator implements ITxSimulator {
     }
 
     @Override
-    public ResultsIterator getStateRangeScanIterator(String namespace, String
+    public IResultsIterator getStateRangeScanIterator(String namespace, String
             startKey, String endKey) throws LedgerException {
         log.debug("getStateRangeScanIterator");
         log.debug("namespace:" + namespace + " startKey:" + startKey + " " +
@@ -91,7 +91,7 @@ public abstract class TxSimulator implements ITxSimulator {
         return null;
     }
 
-    public ResultsIterator ExecuteQuery(String namespace, String query)
+    public IResultsIterator ExecuteQuery(String namespace, String query)
             throws LedgerException {
         log.debug("ExecuteQuery");
         log.debug("namespace:" + namespace + " query:" + query);
@@ -99,7 +99,7 @@ public abstract class TxSimulator implements ITxSimulator {
     }
 
     @Override
-    public void done() throws LedgerException {
+    public void done() {
 
     }
 }

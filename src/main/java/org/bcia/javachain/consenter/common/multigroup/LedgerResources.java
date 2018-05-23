@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 package org.bcia.javachain.consenter.common.multigroup;
-import org.bcia.javachain.common.ledger.blockledger.Reader;
-import org.bcia.javachain.common.ledger.blockledger.Writer;
+import org.bcia.javachain.common.ledger.blockledger.IReader;
+import org.bcia.javachain.common.ledger.blockledger.IWriter;
 
 /**
  * @author zhangmingyang
@@ -24,6 +24,6 @@ import org.bcia.javachain.common.ledger.blockledger.Writer;
  */
 public class LedgerResources {
     IMutableResources mutableResources;
-    Reader reader;
-    Writer writer;
+    IReader reader;
+    IWriter writer;
 }
