@@ -39,7 +39,7 @@ import java.util.Map;
 public class SmartContractProvider {
     private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractProvider.class);
 
-    public static String smartContractInstallPath = "/var/javachain/product";
+    public static String smartContractInstallPath = "/var/javachain/Product";
 
     /**
      * 给静态变量smartContractInstallPath设置值为智能合约路径
