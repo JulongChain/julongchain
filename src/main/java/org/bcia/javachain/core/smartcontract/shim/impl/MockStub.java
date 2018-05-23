@@ -125,7 +125,14 @@ public class MockStub implements ISmartContractStub {
 
     @Override
     public void delState(String key) {
-
+        log.debug("MockStub {} Deleting {} {}",this.name,key,state.get(key));
+        state.remove(key);
+        for(int i=0;i<keys.size();i++){
+            if(keys.get(i).compareTo(key)==0){
+                keys.remove(i);
+                break;
+            }
+        }
     }
 
     @Override
