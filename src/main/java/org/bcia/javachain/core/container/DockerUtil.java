@@ -31,6 +31,7 @@ import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -50,7 +51,7 @@ public class DockerUtil {
   private static JavaChainLog logger = JavaChainLogFactory.getLog(DockerUtil.class);
 
   /** docker host ip */
-  private static final String DOCKER_HOST_IP = "localhost";
+  private static final String DOCKER_HOST_IP = "192.168.1.50";
 
   /** docker host port */
   private static final String DOCKER_HOST_PORT = "2375";
@@ -104,7 +105,7 @@ public class DockerUtil {
     String imageId =
         dockerClient
             .buildImageCmd()
-            .withDockerfilePath(dockerFilePath)
+            .withDockerfile(new File(dockerFilePath))
             .withTags(Sets.newHashSet(tag))
             .exec(callback)
             .awaitImageId();
@@ -286,6 +287,7 @@ public class DockerUtil {
   public static void main(String[] args) throws Exception {
     // uploadSmartContractFile("D:\\Dockerfile");
     // downloadJar();
-    uploadAndGetJar("D:\\abcd.txt");
+    // uploadAndGetJar("D:\\abcd.txt");
+    buildImage("D:" + File.separator + "docker" + File.separator + "Dockerfile", "test");
   }
 }
