@@ -28,6 +28,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class Receiver {
+    public static  ObjectMessage message;
     public static void main(String[] args) {
         // ConnectionFactory ：连接工厂，JMS 用它创建连接
         ConnectionFactory connectionFactory;
@@ -41,7 +42,7 @@ public class Receiver {
         MessageConsumer consumer;
         connectionFactory = new ActiveMQConnectionFactory(
                 ActiveMQConnection.DEFAULT_USER,
-                ActiveMQConnection.DEFAULT_PASSWORD, "tcp://localhost:61616");
+                ActiveMQConnection.DEFAULT_PASSWORD, "tcp://192.168.1.107:61616");
         try {
             // 构造从工厂得到连接对象
             connection = connectionFactory.createConnection();
@@ -56,14 +57,14 @@ public class Receiver {
             while (true) {
                 // 设置接收者接收消息的时间，为了便于测试，这里谁定为100s
 
-                ObjectMessage message = (ObjectMessage) consumer.receive(100000);
-                if (null != message) {
-                //  Map<> en=(Common.Envelope)message.getObject();
-                    // Common.Envelope en=(Common.Envelope)message.getObject();
-                    System.out.println("收到消息" +(Common.Envelope)message.getObject());
-                } else {
-                    break;
-                }
+                 message = (ObjectMessage) consumer.receive(100000);
+//                if (null != message) {
+//                //  Map<> en=(Common.Envelope)message.getObject();
+//                    // Common.Envelope en=(Common.Envelope)message.getObject();
+//                    System.out.println("收到消息" +(Common.Envelope)message.getObject());
+//                } else {
+//                    break;
+//                }
             }
         } catch (Exception e) {
             e.printStackTrace();
