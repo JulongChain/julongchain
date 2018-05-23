@@ -257,4 +257,21 @@ public class ProposalResponseUtils {
 
         return newProposalPayload.toByteArray();
     }
+
+    public static ProposalResponsePackage.ProposalResponsePayload buildProposalResponsePayload(
+            ByteString event, ByteString result, ProposalResponsePackage.Response response, Smartcontract
+            .SmartContractID smartContractId, ByteString hash) {
+        ProposalPackage.SmartContractAction.Builder actionBuilder = ProposalPackage.SmartContractAction.newBuilder();
+        actionBuilder.setEvents(event);
+        actionBuilder.setResults(result);
+        actionBuilder.setResponse(response);
+        actionBuilder.setSmartContractId(smartContractId);
+        ProposalPackage.SmartContractAction action = actionBuilder.build();
+
+        ProposalResponsePackage.ProposalResponsePayload.Builder payloadBuilder = ProposalResponsePackage
+                .ProposalResponsePayload.newBuilder();
+        payloadBuilder.setExtension(action.toByteString());
+        payloadBuilder.setProposalHash(hash);
+        return payloadBuilder.build();
+    }
 }

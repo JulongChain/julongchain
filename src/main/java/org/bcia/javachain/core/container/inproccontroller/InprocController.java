@@ -19,6 +19,7 @@ import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ssc.ISystemSmartContract;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +31,7 @@ import java.util.Map;
  * @date @date 2018/05/17
  * @company Dingxuan
  */
+@Component
 public class InprocController {
     private JavaChainLog log = JavaChainLogFactory.getLog(InprocContainer.class);
 

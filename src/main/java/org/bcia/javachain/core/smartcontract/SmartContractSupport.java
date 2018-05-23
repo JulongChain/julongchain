@@ -17,6 +17,7 @@ import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractContext;
+import org.bcia.javachain.core.container.DockerUtil;
 import org.bcia.javachain.core.container.api.IBuildSpecFactory;
 import org.bcia.javachain.core.container.scintf.ISmartContractStream;
 import org.bcia.javachain.core.ledger.ITxSimulator;
@@ -260,40 +261,44 @@ public class SmartContractSupport {
         return null;
     }
 
-    /**
-     * 启动智能合约
-     *
-     * @param scContext scContext
-     * @param spec smartContractInvocationSpec
-     * @return
-     * @throws SmartContractException
-     */
-    public SmartContractInput launch(SmartContractContext scContext, Object spec)
-            throws SmartContractException {
+  /**
+   * 启动智能合约
+   *
+   * @param scContext scContext
+   * @param spec smartContractInvocationSpec
+   * @return
+   * @throws SmartContractException
+   */
+  public SmartContractInput launch(SmartContractContext scContext, Object spec)
+      throws SmartContractException {
 
-        log.info("call SmartContractSupport launch");
+    log.info("call SmartContractSupport launch");
 
-        // TODO:add by zhouhui for test,返回一个空对象，实际处理待万良兵补充
+    // TODO:add by zhouhui for test,返回一个空对象，实际处理待万良兵补充
 
-        String smartContractId = scContext.getName();
-        boolean scRunning = SmartContractRunningUtil.checkSmartContractRunning(smartContractId);
-        if (!scRunning) {
-            SmartContractSupportClient.launch(smartContractId);
-        }
+    String smartContractId = scContext.getName();
+    boolean scRunning = SmartContractRunningUtil.checkSmartContractRunning(smartContractId);
+    if (!scRunning) {
+      SmartContractSupportClient.launch(smartContractId);
 
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+      DockerUtil.buildImage("", smartContractId);
 
-        if (spec instanceof SmartContractInvocationSpec) {
-            SmartContractInvocationSpec invocationSpec = (SmartContractInvocationSpec) spec;
-            return invocationSpec.getSmartContractSpec().getInput();
-        }
-
-        return SmartContractInput.newBuilder().build();
+      DockerUtil.uploadAndGetJar("");
     }
+
+    try {
+      Thread.sleep(5000);
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+
+    if (spec instanceof SmartContractInvocationSpec) {
+      SmartContractInvocationSpec invocationSpec = (SmartContractInvocationSpec) spec;
+      return invocationSpec.getSmartContractSpec().getInput();
+    }
+
+    return SmartContractInput.newBuilder().build();
+  }
 
   /**
    * 执行智能合约

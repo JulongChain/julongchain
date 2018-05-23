@@ -27,9 +27,11 @@ import com.offbytwo.jenkins.model.JobWithDetails;
 import net.schmizz.sshj.SSHClient;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -49,7 +51,7 @@ public class DockerUtil {
   private static JavaChainLog logger = JavaChainLogFactory.getLog(DockerUtil.class);
 
   /** docker host ip */
-  private static final String DOCKER_HOST_IP = "localhost";
+  private static final String DOCKER_HOST_IP = "192.168.1.50";
 
   /** docker host port */
   private static final String DOCKER_HOST_PORT = "2375";
@@ -103,7 +105,7 @@ public class DockerUtil {
     String imageId =
         dockerClient
             .buildImageCmd()
-            .withDockerfilePath(dockerFilePath)
+            .withDockerfile(new File(dockerFilePath))
             .withTags(Sets.newHashSet(tag))
             .exec(callback)
             .awaitImageId();
@@ -185,6 +187,9 @@ public class DockerUtil {
    * @param smartContractFilePath
    */
   public static void uploadSmartContractFile(String smartContractFilePath) {
+    if (StringUtils.isEmpty(smartContractFilePath)) {
+      return;
+    }
     SSHClient ssh = new SSHClient();
     try {
       ssh.loadKnownHosts();
@@ -209,27 +214,34 @@ public class DockerUtil {
    * @throws URISyntaxException
    * @throws JavaChainException
    */
-  public static void execBuild() throws IOException, URISyntaxException, JavaChainException {
-    JenkinsServer jenkinsServer =
-        new JenkinsServer(new URI("http://localhost:8080"), "jenkins", "jenkins");
-    JobWithDetails jenkinsJob = jenkinsServer.getJob(BUILD_NAME);
-    jenkinsJob.build();
+  public static void execBuild() throws SmartContractException {
 
     try {
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {
+      JenkinsServer jenkinsServer =
+          new JenkinsServer(new URI("http://localhost:8080"), "jenkins", "jenkins");
+      JobWithDetails jenkinsJob = jenkinsServer.getJob(BUILD_NAME);
+      jenkinsJob.build();
+
+      try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {
+        logger.error(e.getMessage(), e);
+      }
+
+      JobWithDetails details = jenkinsJob.details();
+      Build lastBuild = details.getLastBuild();
+
+      while (lastBuild.details().getResult() == null) {}
+
+      String success = "SUCCESS";
+
+      if (!StringUtils.equals(lastBuild.details().getResult().toString(), success)) {
+        throw new JavaChainException("build jar error.");
+      }
+
+    } catch (Exception e) {
       logger.error(e.getMessage(), e);
-    }
-
-    JobWithDetails details = jenkinsJob.details();
-    Build lastBuild = details.getLastBuild();
-
-    while (lastBuild.details().getResult() == null) {}
-
-    String success = "SUCCESS";
-
-    if (!StringUtils.equals(lastBuild.details().getResult().toString(), success)) {
-      throw new JavaChainException("build jar error.");
+      throw new SmartContractException(e.getMessage(), e);
     }
   }
 
@@ -261,7 +273,7 @@ public class DockerUtil {
    * @throws JavaChainException
    */
   public static synchronized void uploadAndGetJar(String smartContractFilePath)
-      throws IOException, URISyntaxException, JavaChainException {
+      throws SmartContractException {
     // 上传SC
     uploadSmartContractFile(smartContractFilePath);
 
@@ -269,12 +281,13 @@ public class DockerUtil {
     execBuild();
 
     // 下载jar包
-    downloadJar();
+    // downloadJar();
   }
 
   public static void main(String[] args) throws Exception {
     // uploadSmartContractFile("D:\\Dockerfile");
     // downloadJar();
-    uploadAndGetJar("D:\\abcd.txt");
+    // uploadAndGetJar("D:\\abcd.txt");
+    buildImage("D:" + File.separator + "docker" + File.separator + "Dockerfile", "test");
   }
 }
