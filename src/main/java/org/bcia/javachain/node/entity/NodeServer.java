@@ -135,7 +135,7 @@ public class NodeServer {
 
         EventGrpcServer eventGrpcServer = new EventGrpcServer(address.getPort());
         //绑定事件服务
-        eventGrpcServer.bindEventHubServer(new EventHubServer());
+        eventGrpcServer.bindEventHubServer(new EventHubServer(null));
 
 //        SmartContractExecuteProvider smartContractProvider = new SmartContractExecuteProvider();
 //        smartContractProvider

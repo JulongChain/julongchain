@@ -27,11 +27,12 @@ import java.util.concurrent.BlockingQueue;
  * @date 2018/05/19
  * @company Dingxuan
  */
-public class Consumer<T> implements Runnable {
+public abstract class Consumer<T> extends Thread {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Consumer.class);
     private BlockingQueue<T> queue;
 
     public Consumer(BlockingQueue<T> queue) {
+        super("eventsConsumer");
         this.queue = queue;
     }
 
@@ -57,8 +58,6 @@ public class Consumer<T> implements Runnable {
      * @param t
      * @return
      */
-    public boolean consume(T t) {
-        return true;
-    }
+    public abstract boolean consume(T t);
 
 }
