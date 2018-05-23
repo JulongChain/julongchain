@@ -211,5 +211,23 @@ public class EventHelper {
      * @throws EventException
      */
     public static void send(BlockEvents events) throws EventException {
+        EventProcessor processor = EventProcessor.getInstance();
+        if (processor == null) {
+            throw new EventException("processor is null, may be node has not started");
+        }
+
+        if (events == null || events.getBlockEvent() == null) {
+            throw new EventException("BlockEvent is null");
+        }
+
+        try {
+            boolean isSend = processor.send(events.getBlockEvent());
+            if (!isSend) {
+                throw new EventException("Can not send a event");
+            }
+        } catch (ValidateException e) {
+            log.error(e.getMessage(), e);
+        }
+
     }
 }

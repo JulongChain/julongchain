@@ -21,22 +21,36 @@ import org.bcia.javachain.protos.node.EventsPackage;
  * 类描述
  *
  * @author sunianle
- * @date 4/25/18
+ * @date 2018/04/25
  * @company Dingxuan
  */
 public class BlockEvents {
-    //block event
-    EventsPackage.Event bevent;
-    //filtered block event
-    EventsPackage.Event fbevent;
-    String groupID;
+    /**
+     *
+     */
+    private EventsPackage.Event blockEvent;
+    /**
+     *
+     */
+    private EventsPackage.Event filteredBlockEvent;
 
+    private String groupId;
 
-    public BlockEvents(EventsPackage.Event bevent, EventsPackage.Event fbevent, String groupID) {
-        this.bevent = bevent;
-        this.fbevent = fbevent;
-        this.groupID = groupID;
+    public BlockEvents(EventsPackage.Event blockEvent, EventsPackage.Event filteredBlockEvent, String groupId) {
+        this.blockEvent = blockEvent;
+        this.filteredBlockEvent = filteredBlockEvent;
+        this.groupId = groupId;
     }
 
+    public EventsPackage.Event getBlockEvent() {
+        return blockEvent;
+    }
 
+    public EventsPackage.Event getFilteredBlockEvent() {
+        return filteredBlockEvent;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
 }

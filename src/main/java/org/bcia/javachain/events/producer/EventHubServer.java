@@ -31,6 +31,10 @@ import org.bcia.javachain.protos.node.EventsPackage;
 public class EventHubServer implements IEventHubServer {
     private static JavaChainLog log = JavaChainLogFactory.getLog(EventHubServer.class);
 
+    public EventHubServer(EventsServerConfig config) {
+        EventProcessor eventProcessor = new EventProcessor(config);
+    }
+
     @Override
     public EventsPackage.Event chat(EventsPackage.SignedEvent signedEvent) {
         IEventHandler eventHandler = new EventHandler();

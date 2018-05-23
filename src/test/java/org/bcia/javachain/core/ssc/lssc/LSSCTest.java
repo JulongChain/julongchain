@@ -31,7 +31,7 @@ import static org.hamcrest.CoreMatchers.is;
 /**
  * LSSC系统智能合约的单元测试类
  *
- * @author sunianle
+ * @author sunianle,liuxiong
  * @date 3/29/18
  * @company Dingxuan
  */
@@ -177,7 +177,7 @@ public class LSSCTest extends BaseJunit4Test {
         builder.setInput(input);
         Smartcontract.SmartContractSpec spec=builder.build();
 
-        Map<String, File> map = IoUtil.getFileRelativePath("src/main/java/org/bcia/javachain/examples/smartcontract/java/smartcontract_example02");
+        Map<String, File> map = IoUtil.getFileRelativePath(path);
         byte[] tarBytes=null;
         try {
             tarBytes= IoUtil.tarWriter(map, 1024);

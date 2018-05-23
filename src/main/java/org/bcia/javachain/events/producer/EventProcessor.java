@@ -17,11 +17,17 @@ package org.bcia.javachain.events.producer;
 
 import org.bcia.javachain.common.exception.EventException;
 import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.ValidateUtils;
+import org.bcia.javachain.common.util.producer.Consumer;
+import org.bcia.javachain.common.util.producer.Producer;
 import org.bcia.javachain.protos.node.EventsPackage;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * 类描述
@@ -31,19 +37,48 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class EventProcessor implements IEventProcessor {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(EventProcessor.class);
+
     private Map<Integer, IHandlerList> eventConsumers;
     private EventsServerConfig eventsServerConfig;
 
+    private BlockingQueue<EventsPackage.Event> blockingQueue;
+    private Producer<EventsPackage.Event> producer;
+    private Consumer<EventsPackage.Event> consumer;
+
+    private static EventProcessor instance;
+
+    public static EventProcessor getInstance() {
+        return instance;
+    }
+
     public EventProcessor(EventsServerConfig eventsServerConfig) {
+        instance = this;
+
         this.eventsServerConfig = eventsServerConfig;
 
         this.eventConsumers = new HashMap<>();
         //TODO:注册类消息不需要？
-        eventConsumers.put(EventsPackage.EventType.REGISTER_VALUE, new GenericHandlerList());
+        //eventConsumers.put(EventsPackage.EventType.REGISTER_VALUE, new GenericHandlerList());
         eventConsumers.put(EventsPackage.EventType.BLOCK_VALUE, new GenericHandlerList());
         eventConsumers.put(EventsPackage.EventType.SMART_CONTRACT_VALUE, new SmartContractHandlerList());
         eventConsumers.put(EventsPackage.EventType.REJECTION_VALUE, new GenericHandlerList());
         eventConsumers.put(EventsPackage.EventType.FILTEREDBLOCK_VALUE, new GenericHandlerList());
+
+        blockingQueue = new LinkedBlockingQueue<>();
+        producer = new Producer<>(blockingQueue);
+        consumer = new Consumer<EventsPackage.Event>(blockingQueue) {
+            @Override
+            public boolean consume(EventsPackage.Event event) {
+                try {
+                    doProcess(event);
+                    return true;
+                } catch (EventException e) {
+                    log.error(e.getMessage(), e);
+                    return false;
+                }
+            }
+        };
     }
 
     @Override
@@ -93,9 +128,15 @@ public class EventProcessor implements IEventProcessor {
         return eventType;
     }
 
-    public void send(EventsPackage.Event event) throws ValidateException {
+    public boolean send(EventsPackage.Event event) throws ValidateException {
         ValidateUtils.isNotNull(event, "event can not be null");
+        return producer.produce(event);
+    }
 
+    public void start() {
+        //
+        consumer.start();
 
     }
+
 }
