@@ -107,10 +107,10 @@ public class SDSPackage implements ISmartContractPackage {
      * @param sds
      * @return
      */
-    private SDSData getSDSData(Smartcontract.SmartContractDeploymentSpec sds){
+    private SDSData getSDSData(Smartcontract.SmartContractDeploymentSpec sds) throws JavaChainException{
         //检查是否为空
         if(sds == null){
-            throw new RuntimeException("Null sds");
+            throw new JavaChainException("Null sds");
         }
         SDSData sdsData = new SDSData();
         sdsData.setCodeHash(sds.getCodePackage().toByteArray());
@@ -155,6 +155,7 @@ public class SDSPackage implements ISmartContractPackage {
         try {
             IoUtil.createFileIfMissing(file.getPath());
         } catch (Exception e){
+            log.error(e.getMessage(), e);
             throw new JavaChainException(e);
         }
         //写入文件
@@ -162,11 +163,13 @@ public class SDSPackage implements ISmartContractPackage {
         try {
             os = new FileOutputStream(file);
         } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            log.error(e.getMessage(), e);
+            throw new JavaChainException(e);
         }
         try {
             os.write(buf);
         } catch (IOException e) {
+            log.error(e.getMessage(), e);
             throw new JavaChainException(e);
         }
     }

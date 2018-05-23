@@ -18,12 +18,14 @@ package org.bcia.javachain.core.common.smartcontractprovider;
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.SmartContractException;
+import org.bcia.javachain.common.ledger.util.IoUtil;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.node.Query;
 import org.bcia.javachain.protos.node.Smartcontract;
 
 import java.io.*;
+import java.util.Map;
 
 /**
  * SmartContractExecuteProvider provides an abstraction layer that is
@@ -37,7 +39,7 @@ import java.io.*;
 public class SmartContractProvider {
     private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractProvider.class);
 
-    public static String smartContractInstallPath = "/home/bcia/javachain/lssc";
+    public static String smartContractInstallPath = "/var/javachain/product";
 
     /**
      * 给静态变量smartContractInstallPath设置值为智能合约路径
@@ -139,7 +141,7 @@ public class SmartContractProvider {
     public static byte[] extractStateDBArtifactsFromSCPackage(ISmartContractPackage scPack) throws JavaChainException {
         Smartcontract.SmartContractDeploymentSpec sds = scPack.getDepSpec();
         ByteString bytes = sds.getCodePackage();
-        return null;
+        return bytes.toByteArray();
     }
 
     public static ISmartContractPackage getSmartContractFromFS(String name, String version) throws JavaChainException {

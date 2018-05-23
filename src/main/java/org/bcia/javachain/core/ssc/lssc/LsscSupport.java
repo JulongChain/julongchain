@@ -95,7 +95,11 @@ public class LsscSupport {
         byte[] instantiationPolicy;
         if(scPackage instanceof SignedSDSPackage){
             SignedSDSPackage sscPackage=(SignedSDSPackage)scPackage;
-            instantiationPolicy=sscPackage.getInstantiationPolicy();
+            try {
+                instantiationPolicy=sscPackage.getInstantiationPolicy();
+            } catch (JavaChainException e) {
+                throw new SysSmartContractException(e);
+            }
             if(instantiationPolicy==null){
                 String msg="Instantiation policy cannot be null for a SignedSCDeploymentSpec";
                 throw new SysSmartContractException(msg);

@@ -340,11 +340,11 @@ public class LSSC  extends SystemSmartContractBase {
      */
     private void putSmartContractData(ISmartContractStub stub,
                                       SmartContractDataPackage.SmartContractData data) throws SysSmartContractException{
-         if(sscProvider.isSysSmartContract(data.getEssc())==false){
-             String msg=String.format("%s is not a valid endorsement system smartcontract",data.getEssc());
-             throw new SysSmartContractException(msg);
-         }
-        if(sscProvider.isSysSmartContract(data.getVssc())==false){
+        if(!sscProvider.isSysSmartContract(data.getEssc())){
+            String msg=String.format("%s is not a valid endorsement system smartcontract",data.getEssc());
+            throw new SysSmartContractException(msg);
+        }
+        if(!sscProvider.isSysSmartContract(data.getVssc())){
             String msg=String.format("%s is not a valid endorsement system smartcontract",data.getVssc());
             throw new SysSmartContractException(msg);
         }

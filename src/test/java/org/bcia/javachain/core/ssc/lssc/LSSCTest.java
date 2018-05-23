@@ -2,6 +2,8 @@ package org.bcia.javachain.core.ssc.lssc;
 
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.BaseJunit4Test;
+import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.ledger.util.IoUtil;
 import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.common.util.proto.ProtoUtils;
 import org.bcia.javachain.common.util.proto.TxUtils;
@@ -149,6 +151,12 @@ public class LSSCTest extends BaseJunit4Test {
                     .addArgs(arg)
                     .build();
         }
+        ByteString codePackage = null;
+        try {
+            codePackage = ByteString.copyFrom(IoUtil.gzipWriter(IoUtil.tarWriter(IoUtil.getFileRelativePath(path), 1024)));
+        } catch (JavaChainException e) {
+            e.printStackTrace();
+        }
         Smartcontract.SmartContractDeploymentSpec depSpec = Smartcontract.SmartContractDeploymentSpec.newBuilder()
                 .setSmartContractSpec(Smartcontract.SmartContractSpec.newBuilder()
                         .setTypeValue(1)
@@ -159,6 +167,7 @@ public class LSSCTest extends BaseJunit4Test {
                                 .build())
                         .setInput(input)
                         .build())
+                .setCodePackage(codePackage)
                 .build();
 
         return depSpec;
