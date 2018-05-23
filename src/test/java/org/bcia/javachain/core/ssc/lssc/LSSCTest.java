@@ -31,7 +31,7 @@ import static org.hamcrest.CoreMatchers.is;
 /**
  * LSSC系统智能合约的单元测试类
  *
- * @author sunianle
+ * @author sunianle,liuxiong
  * @date 3/29/18
  * @company Dingxuan
  */
