@@ -41,8 +41,8 @@ public class CouchDBTest {
 
     public CouchDbClient creatConnectionDB() throws LedgerException {
         CouchDbProperties properties = new CouchDbProperties();
-        String url = "192.168.3.167";
-        int port = 5984;
+        String url = "192.168.122.128";
+        int port = 9000;
         int requestTimeout = 1000;
         int maxConnections = 5;
         String username = "admin";

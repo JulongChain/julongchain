@@ -16,6 +16,7 @@
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.util.IoUtil;
 
 import java.io.*;
 
@@ -72,23 +73,10 @@ public class BlockFileWriter {
 
     public BlockFileWriter open() {
         file = new File(filePath);
-        if(!file.exists()){
-            try {
-                createDir(filePath);
-                file.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException("Can not create file");
-            }
+        if (!IoUtil.createFileIfMissing(filePath)) {
+            throw new RuntimeException("Can not create file");
         }
         return this;
-    }
-
-    private void createDir(String filePath){
-        filePath = filePath.substring(0, filePath.lastIndexOf("/"));
-        File file = new File(filePath);
-        if(!file.exists()){
-            file.mkdirs();
-        }
     }
 
     public String getFilePath() {

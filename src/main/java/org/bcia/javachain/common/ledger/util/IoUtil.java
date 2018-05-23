@@ -115,7 +115,6 @@ public class IoUtil {
         File dir = new File(dirPath);
         if(dir.exists()){
             logger.info("File {} is already exists", dirPath);
-            chmod(dir, 644);
             return true;
         }
         if (dir.mkdirs()) {
@@ -134,7 +133,6 @@ public class IoUtil {
         File file = new File(filePath);
         if(file.exists()){
             logger.info("File {} is already exists", filePath);
-            chmod(file, 755);
             return true;
         }
         File dir = file.getParentFile();
