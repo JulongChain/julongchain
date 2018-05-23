@@ -15,15 +15,14 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valimpl;
 
-import org.apache.commons.lang3.Validate;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DB;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.IDB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.PvtUpdateBatch;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.UpdateBatch;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.TxManager;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.ITxManager;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.IValidator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.statebasedval.Validator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valinternal.Block;
@@ -41,10 +40,10 @@ import org.bcia.javachain.protos.common.Common;
 public class DefaultValidator implements IValidator {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(DefaultValidator.class);
 
-    private TxManager txMgr;
+    private ITxManager txMgr;
     private InternalValidator val;
 
-    public static DefaultValidator newDefaultValidator(TxManager txMgr, DB db){
+    public static DefaultValidator newDefaultValidator(ITxManager txMgr, IDB db){
         DefaultValidator dVal = new DefaultValidator();
         dVal.setTxMgr(txMgr);
         dVal.setVal(Validator.newValidator(db));
@@ -67,11 +66,11 @@ public class DefaultValidator implements IValidator {
         return UpdateBatch.newUpdateBatch(pubAndHashUpdates.getPubUpdates(), pubAndHashUpdates.getHashedUpdates(), pvtUpdates);
     }
 
-    public TxManager getTxMgr() {
+    public ITxManager getTxMgr() {
         return txMgr;
     }
 
-    public void setTxMgr(TxManager txMgr) {
+    public void setTxMgr(ITxManager txMgr) {
         this.txMgr = txMgr;
     }
 

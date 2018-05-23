@@ -17,8 +17,8 @@ package org.bcia.javachain.common.ledger.util.leveldbhelper;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LevelDBException;
-import org.bcia.javachain.common.ledger.util.DBHandle;
-import org.bcia.javachain.common.ledger.util.DBProvider;
+import org.bcia.javachain.common.ledger.util.IDBHandle;
+import org.bcia.javachain.common.ledger.util.IDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 
@@ -33,11 +33,11 @@ import java.util.Map;
  * @date 2018/04/03
  * @company Dingxuan
  */
-public class LevelDBProvider implements DBProvider {
+public class LevelDBProvider implements IDBProvider {
 
     private static JavaChainLog logger = JavaChainLogFactory.getLog(LevelDBProvider.class);
 
-    private DBHandle db = null;
+    private IDBHandle db = null;
     private byte[] dbNameKeySep = new byte[1];
     private byte lastKeyIndicator = 0x01;
     private String dbPath = null;
@@ -63,11 +63,11 @@ public class LevelDBProvider implements DBProvider {
     }
 
     @Override
-    public DBHandle getDb() {
+    public IDBHandle getDb() {
         return db;
     }
 
-    public void setDb(DBHandle db) {
+    public void setDb(IDBHandle db) {
         this.db = db;
     }
 

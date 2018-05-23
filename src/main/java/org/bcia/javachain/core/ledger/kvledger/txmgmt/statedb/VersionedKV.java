@@ -15,7 +15,6 @@
  */
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.CompositeKey;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
 
@@ -26,7 +25,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.Versi
  * @date 2018/04/16
  * @company Dingxuan
  */
-public class VersionedKV implements QueryResult {
+public class VersionedKV implements IQueryResult {
 
     private CompositeKey compositeKey;
     private VersionedValue versionedValue;

@@ -19,7 +19,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
@@ -50,7 +50,7 @@ public class RangeQueryResultsValidator implements IRangeQueryValidator {
     @Override
     public boolean validate() throws LedgerException {
         List<KvRwset.KVRead> rqResults = rqInfo.getRawReads().getKvReadsList();
-        QueryResult result = itr.next();
+        IQueryResult result = itr.next();
         if(rqResults == null){
             return result == null;
         }

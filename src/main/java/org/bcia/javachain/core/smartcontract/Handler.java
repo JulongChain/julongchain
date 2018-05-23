@@ -27,7 +27,7 @@ import org.bcia.javachain.core.common.sysscprovider.SmartContractInstance;
 import org.bcia.javachain.core.container.scintf.ISmartContractStream;
 import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
 import org.bcia.javachain.core.node.NodeConfig;
 import org.bcia.javachain.core.smartcontract.shim.fsm.CBDesc;
 import org.bcia.javachain.core.smartcontract.shim.fsm.Event;
@@ -829,7 +829,7 @@ public class Handler {
                 //TODO： 测试数据
                 rangeIter = new IResultsIterator() {
                     @Override
-                    public QueryResult next() throws LedgerException {
+                    public IQueryResult next() throws LedgerException {
                         return null;
                     }
 
@@ -887,7 +887,7 @@ public class Handler {
         try {
             PendingQueryResult pendingQueryResults = txContext.getPendingQueryResults().get(iterID);
             while(true){
-                QueryResult queryResult = iter.next();
+                IQueryResult queryResult = iter.next();
                 if(queryResult == null){
                     //完成迭代
                     SmartcontractShim.QueryResultBytes[] batch = cut(pendingQueryResults);
@@ -931,7 +931,7 @@ public class Handler {
         }
     }
 
-    public void add(PendingQueryResult pendingQueryResult, QueryResult queryResult) {
+    public void add(PendingQueryResult pendingQueryResult, IQueryResult queryResult) {
         try{
             ByteString queryResultsBytes = ((Message)queryResult).toByteString();
             SmartcontractShim.QueryResultBytes[] arr = pendingQueryResult.getBatch();
@@ -1161,7 +1161,7 @@ public class Handler {
             //TODO: for test
             executeIter = new IResultsIterator() {
                 @Override
-                public QueryResult next() throws LedgerException {
+                public IQueryResult next() throws LedgerException {
                     return null;
                 }
 
@@ -1255,7 +1255,7 @@ public class Handler {
                 //TODO: for test
                 historyIterator = new IResultsIterator() {
                     @Override
-                    public QueryResult next() throws LedgerException {
+                    public IQueryResult next() throws LedgerException {
                         return null;
                     }
 

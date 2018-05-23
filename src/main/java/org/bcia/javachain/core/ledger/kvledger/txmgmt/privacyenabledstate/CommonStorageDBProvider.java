@@ -28,7 +28,7 @@ import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
  * @date 2018/04/17
  * @company Dingxuan
  */
-public class CommonStorageDBProvider implements DBPorvider{
+public class CommonStorageDBProvider implements IDBPorvider {
     private IVersionedDBProvider vdbProvider;
 
     public static CommonStorageDBProvider NewCommonStorageDBProvider() throws LedgerException {
@@ -44,7 +44,7 @@ public class CommonStorageDBProvider implements DBPorvider{
     }
 
     @Override
-    public DB getDBHandle(String id) throws LedgerException {
+    public IDB getDBHandle(String id) throws LedgerException {
         IVersionedDB vdb = vdbProvider.getDBHandle(id);
         return CommonStorageDB.newCommonStorageDB(vdb, id);
     }

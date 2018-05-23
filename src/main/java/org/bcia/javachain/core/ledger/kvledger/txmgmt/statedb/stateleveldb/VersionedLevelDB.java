@@ -18,7 +18,7 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.IResultsIterator;
-import org.bcia.javachain.common.ledger.util.DBProvider;
+import org.bcia.javachain.common.ledger.util.IDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -45,7 +45,7 @@ public class VersionedLevelDB implements IVersionedDB {
     private static final byte LAST_KEY_INDICATOR = 0x01;
     private static final byte[] SAVE_POINT_KEY = {0x00};
 
-    private DBProvider db;
+    private IDBProvider db;
     private String dbName;
 
     @Override
@@ -173,11 +173,11 @@ public class VersionedLevelDB implements IVersionedDB {
         return result[1];
     }
 
-    public DBProvider getDb() {
+    public IDBProvider getDb() {
         return db;
     }
 
-    public void setDb(DBProvider db) {
+    public void setDb(IDBProvider db) {
         this.db = db;
     }
 

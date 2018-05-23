@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.pvtdatastorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.util.DBProvider;
+import org.bcia.javachain.common.ledger.util.IDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -32,7 +32,7 @@ import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 public class Provider {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(Provider.class);
 
-    private DBProvider db;
+    private IDBProvider db;
 
     /**
      * 创建pvtdata
@@ -48,8 +48,8 @@ public class Provider {
     /**
      * 根据id打开对应pvtdata
      */
-    public Store openStore(String ledgerID) throws LedgerException{
-        Store store = new StoreImpl();
+    public IStore openStore(String ledgerID) throws LedgerException{
+        IStore store = new StoreImpl();
         ((StoreImpl) store).setDb(db);
         ((StoreImpl) store).setLedgerID(ledgerID);
         ((StoreImpl) store).initState();
@@ -63,11 +63,11 @@ public class Provider {
         db.close();
     }
 
-    public DBProvider getDb() {
+    public IDBProvider getDb() {
         return db;
     }
 
-    public void setDb(DBProvider db) {
+    public void setDb(IDBProvider db) {
         this.db = db;
     }
 }

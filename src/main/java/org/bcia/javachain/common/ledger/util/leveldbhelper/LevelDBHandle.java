@@ -16,7 +16,7 @@
 package org.bcia.javachain.common.ledger.util.leveldbhelper;
 
 import org.bcia.javachain.common.exception.LevelDBException;
-import org.bcia.javachain.common.ledger.util.DBHandle;
+import org.bcia.javachain.common.ledger.util.IDBHandle;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.leveldb.LevelDB;
@@ -35,7 +35,7 @@ import java.util.Map;
  * @date 2018/04/03
  * @company Dingxuan
  */
-public class LevelDBHandle implements DBHandle {
+public class LevelDBHandle implements IDBHandle {
 
     private String dbName = null;
     private DB db = null;

@@ -19,7 +19,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
 
 /**
  * 类描述
@@ -29,7 +29,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
  * @company Dingxuan
  */
 public class QueryScanner implements IResultsIterator {
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(QueryResult.class);
+    private static final JavaChainLog log = JavaChainLogFactory.getLog(IQueryResult.class);
 
     private int cursor;
     private String ns;
@@ -42,7 +42,7 @@ public class QueryScanner implements IResultsIterator {
     }
 
     @Override
-    public QueryResult next() throws LedgerException {
+    public IQueryResult next() throws LedgerException {
         return null;
     }
 

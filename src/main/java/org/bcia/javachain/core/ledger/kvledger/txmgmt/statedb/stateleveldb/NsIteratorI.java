@@ -17,7 +17,7 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.IResultsIterator;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 
 import java.util.List;
@@ -70,7 +70,7 @@ public class NsIteratorI implements IResultsIterator {
      * @return
      */
     @Override
-    public QueryResult next() throws LedgerException {
+    public IQueryResult next() throws LedgerException {
         if(nextIndex >= lastIndex){
             return null;
         }
@@ -86,7 +86,7 @@ public class NsIteratorI implements IResultsIterator {
         return vkv;
     }
 
-    /** Close implements the method from QueryResult interface
+    /** Close implements the method from IQueryResult interface
      *
      */
     @Override

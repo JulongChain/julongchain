@@ -30,7 +30,7 @@ import java.util.Map;
  */
 public interface INodeLedgerProvider {
 
-    void initialize(Map<String, StateListener> stateListeners);
+    void initialize(Map<String, IStateListener> stateListeners);
 
     /**
      * 根据创世区块创建账本

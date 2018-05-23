@@ -28,7 +28,7 @@ import java.util.Map;
  * @date 2018/4/9
  * @company Dingxuan
  */
-public interface Recoverable {
+public interface IRecoverable {
 
     /** ShouldRecover return whether recovery is need.
      * If the recovery is needed, this method also returns the block number to start recovery from.

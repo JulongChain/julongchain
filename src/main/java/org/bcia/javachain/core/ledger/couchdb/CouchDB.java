@@ -91,7 +91,7 @@ public class CouchDB {
     }
 
     /**
-     * delete DB
+     * delete IDB
      * @param db
      * @param dbName
      */

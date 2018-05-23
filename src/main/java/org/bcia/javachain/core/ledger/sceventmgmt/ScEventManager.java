@@ -18,7 +18,7 @@ package org.bcia.javachain.core.ledger.sceventmgmt;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.ledger.StateListener;
+import org.bcia.javachain.core.ledger.IStateListener;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
 import java.util.Arrays;
@@ -33,7 +33,7 @@ import java.util.Map;
  * @date 2018/04/09
  * @company Dingxuan
  */
-public class ScEventManager implements StateListener {
+public class ScEventManager implements IStateListener {
     private static final JavaChainLog logger  = JavaChainLogFactory.getLog(ScEventManager.class);
     private ISmartContractInfoProvider infoProvider = new SmartContractInfoProviderImpl();
     private Map<String, ISmartContractLifecycleEventListener> scLifecycleListeners = new HashMap<>();

@@ -20,6 +20,7 @@ import org.bcia.javachain.common.ledger.blkstorage.IBlockStore;
 import org.bcia.javachain.common.ledger.blkstorage.IBlockStoreProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.pvtdatastorage.IStore;
 
 /**
  * 提供文件系统以及pvtdata操作类
@@ -36,7 +37,7 @@ public class Provider {
 
     public StoreIBlockStore open(String ledgerID) throws LedgerException {
         IBlockStore blockStore = blkStoreProvider.openBlockStore(ledgerID);
-        org.bcia.javachain.core.ledger.pvtdatastorage.Store pvtDataStore = pvtDataStoreProvider.openStore(ledgerID);
+        IStore pvtDataStore = pvtDataStoreProvider.openStore(ledgerID);
         StoreIBlockStore store = new StoreIBlockStore();
         store.setBlkStorage(blockStore);
         store.setPvtdataStore(pvtDataStore);

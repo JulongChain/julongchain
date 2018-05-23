@@ -22,10 +22,9 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.proto.BlockUtils;
 import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.ledger.INodeLedgerProvider;
-import org.bcia.javachain.core.ledger.StateListener;
+import org.bcia.javachain.core.ledger.IStateListener;
 import org.bcia.javachain.core.ledger.customtx.CustomTx;
 import org.bcia.javachain.core.ledger.customtx.IProcessor;
-import org.bcia.javachain.core.ledger.kvledger.KvLedger;
 import org.bcia.javachain.core.ledger.kvledger.KvLedgerProvider;
 import org.bcia.javachain.core.ledger.sceventmgmt.KVLedgerLSSCStateListener;
 import org.bcia.javachain.core.ledger.sceventmgmt.ScEventManager;
@@ -45,7 +44,7 @@ import java.util.Map;
 public class LedgerManager {
     private static final LedgerException ERR_LEDGER_MANAGER_NOT_INITIALIZED = new LedgerException("ledger mgmt should be initialized before using");
     private static final LedgerException ERR_LEDGER_ALREADY_OPENEND = new LedgerException("ledger already openend");
-    private static final Map<String, StateListener> KV_LEDGER_STATE_LISTENERS = new HashMap<String, StateListener>(){{
+    private static final Map<String, IStateListener> KV_LEDGER_STATE_LISTENERS = new HashMap<String, IStateListener>(){{
         put("lscc", new KVLedgerLSSCStateListener());
     }};
 

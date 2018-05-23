@@ -19,7 +19,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.IBlockStore;
 import org.bcia.javachain.common.ledger.blkstorage.IBlockStoreProvider;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
-import org.bcia.javachain.common.ledger.util.DBProvider;
+import org.bcia.javachain.common.ledger.util.IDBProvider;
 import org.bcia.javachain.common.ledger.util.IoUtil;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -37,7 +37,7 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
 
     private Conf conf;
     private IndexConfig indexConfig;
-    private DBProvider leveldbProvider;
+    private IDBProvider leveldbProvider;
 
     /**
      * 创建文件系统操作类
@@ -108,11 +108,11 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
         this.indexConfig = indexConfig;
     }
 
-    public DBProvider getLeveldbProvider() {
+    public IDBProvider getLeveldbProvider() {
         return leveldbProvider;
     }
 
-    public void setLeveldbProvider(DBProvider leveldbProvider) {
+    public void setLeveldbProvider(IDBProvider leveldbProvider) {
         this.leveldbProvider = leveldbProvider;
     }
 }

@@ -27,7 +27,7 @@ import org.bcia.javachain.core.ledger.customtx.CustomTx;
 import org.bcia.javachain.core.ledger.customtx.IProcessor;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.PvtUpdateBatch;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.*;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.TxManager;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.ITxManager;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valinternal.Block;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valinternal.Transaction;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
@@ -93,7 +93,7 @@ public class Helper {
         }
     }
 
-    public static Block preprocessProtoBlock(TxManager txMgr, Common.Block block, boolean doMVCCValidation) throws LedgerException {
+    public static Block preprocessProtoBlock(ITxManager txMgr, Common.Block block, boolean doMVCCValidation) throws LedgerException {
         Block b = new Block();
         b.setNum(block.getHeader().getNumber());
         TxValidationFlags txsFilter = TxValidationFlags.fromByteString(block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
@@ -165,7 +165,7 @@ public class Helper {
         return b;
     }
 
-    public static Rwset.TxReadWriteSet processNonEndorserTx(Common.Envelope txEnv, String txID, Common.HeaderType txType, TxManager txMgr, boolean synchingState) throws LedgerException {
+    public static Rwset.TxReadWriteSet processNonEndorserTx(Common.Envelope txEnv, String txID, Common.HeaderType txType, ITxManager txMgr, boolean synchingState) throws LedgerException {
         logger.debug(String.format("Performing custom processing for transaction [txid=%s], [txtype=%s]", txID, txType));
         IProcessor processor = CustomTx.getProcessor(txType);
         logger.debug("Processor for custom tx processing " + processor);

@@ -22,5 +22,5 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
  * @date 2018/4/9
  * @company Dingxuan
  */
-public interface QueryResult {
+public interface IQueryResult {
 }

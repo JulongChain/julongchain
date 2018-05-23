@@ -17,7 +17,7 @@ package org.bcia.javachain.core.ledger.pvtdatastorage;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.util.DBProvider;
+import org.bcia.javachain.common.ledger.util.IDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -39,10 +39,10 @@ import java.util.Map;
  * @date 2018/04/19
  * @company Dingxuan
  */
-public class StoreImpl implements Store {
+public class StoreImpl implements IStore {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(StoreImpl.class);
 
-    private DBProvider db;
+    private IDBProvider db;
     private String ledgerID;
     private boolean isEmpty;
     private long lastCommittedBlock;
@@ -290,11 +290,11 @@ public class StoreImpl implements Store {
     }
 
 
-    public DBProvider getDb() {
+    public IDBProvider getDb() {
         return db;
     }
 
-    public void setDb(DBProvider db) {
+    public void setDb(IDBProvider db) {
         this.db = db;
     }
 

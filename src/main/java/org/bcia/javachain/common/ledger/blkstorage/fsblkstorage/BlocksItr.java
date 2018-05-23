@@ -19,7 +19,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
 
 /**
  *  区块迭代器
@@ -79,7 +79,7 @@ public class BlocksItr implements IResultsIterator {
      * @return block转成的byteString
      */
     @Override
-    public synchronized QueryResult next() throws LedgerException {
+    public synchronized IQueryResult next() throws LedgerException {
         //当区块长度不足时等待
         if(maxBlockNumAvailable < blockNumToRetrieve){
             maxBlockNumAvailable = waitForBlock(blockNumToRetrieve);
@@ -93,7 +93,7 @@ public class BlocksItr implements IResultsIterator {
         }
         byte[] nextBlockBytes = stream.nextBlockBytes();
         blockNumToRetrieve++;
-        return (QueryResult) BlockSerialization.deserializeBlock(nextBlockBytes).toByteString();
+        return (IQueryResult) BlockSerialization.deserializeBlock(nextBlockBytes).toByteString();
     }
 
     @Override

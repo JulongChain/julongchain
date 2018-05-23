@@ -32,7 +32,7 @@ import java.util.List;
  * @date 2018/04/17
  * @company Dingxuan
  */
-public interface DB extends IVersionedDB {
+public interface IDB extends IVersionedDB {
     boolean isBulkOptimizable();
 
     void loadCommittedVersionsOfPubAndHashedKeys(List<CompositeKey> pubKeys, List<HashedCompositeKey> hashKeys);

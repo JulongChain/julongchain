@@ -23,11 +23,11 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
 import org.bcia.javachain.core.ledger.IQueryExecutor;
 import org.bcia.javachain.core.ledger.ITxSimulator;
-import org.bcia.javachain.core.ledger.StateListener;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DB;
+import org.bcia.javachain.core.ledger.IStateListener;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.IDB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.UpdateBatch;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.TxManager;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.ITxManager;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.IValidator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valimpl.DefaultValidator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
@@ -46,20 +46,20 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @date 2018/04/17
  * @company Dingxuan
  */
-public class LockBasedTxManager implements TxManager {
+public class LockBasedTxManager implements ITxManager {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(LockBasedTxManager.class);
 
     private String ledgerID;
-    private DB db;
+    private IDB db;
     private IValidator validator;
     private UpdateBatch batch;
     private Common.Block currentBlock;
-    private Map<String, StateListener> stateListeners;
+    private Map<String, IStateListener> stateListeners;
     private ReentrantReadWriteLock lock;
 
     public static LockBasedTxManager newLockBasedTxMgr(String ledgerID,
-                                                       DB db,
-                                                       Map<String, StateListener> stateListeners) throws LedgerException{
+                                                       IDB db,
+                                                       Map<String, IStateListener> stateListeners) throws LedgerException{
         db.open();  //open will do nothing
         LockBasedTxManager txMgr = new LockBasedTxManager();
         txMgr.setLedgerID(ledgerID);
@@ -161,7 +161,7 @@ public class LockBasedTxManager implements TxManager {
     private void invokeNamespaceListeners(UpdateBatch batch) throws JavaChainException {
         List<String> namespaces = batch.getPubUpdateBatch().getBatch().getUpdatedNamespaces();
         for(String ns : namespaces){
-            StateListener listener = stateListeners.get(ns);
+            IStateListener listener = stateListeners.get(ns);
             if(listener == null){
                 continue;
             }
@@ -190,11 +190,11 @@ public class LockBasedTxManager implements TxManager {
         this.ledgerID = ledgerID;
     }
 
-    public DB getDb() {
+    public IDB getDb() {
         return db;
     }
 
-    public void setDb(DB db) {
+    public void setDb(IDB db) {
         this.db = db;
     }
 
@@ -222,11 +222,11 @@ public class LockBasedTxManager implements TxManager {
         this.currentBlock = currentBlock;
     }
 
-    public Map<String, StateListener> getStateListeners() {
+    public Map<String, IStateListener> getStateListeners() {
         return stateListeners;
     }
 
-    public void setStateListeners(Map<String, StateListener> stateListeners) {
+    public void setStateListeners(Map<String, IStateListener> stateListeners) {
         this.stateListeners = stateListeners;
     }
 

@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.util.DBProvider;
+import org.bcia.javachain.common.ledger.util.IDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -35,7 +35,7 @@ public class VersionedLevelDBProvider implements IVersionedDBProvider {
 
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(VersionedLevelDBProvider.class);
 
-    private DBProvider db;
+    private IDBProvider db;
 
     public static IVersionedDBProvider newVersionedDBProvider() throws LedgerException{
         String dbPath = LedgerConfig.getStateLevelDBPath();
@@ -62,11 +62,11 @@ public class VersionedLevelDBProvider implements IVersionedDBProvider {
         }
     }
 
-    public DBProvider getDb() {
+    public IDBProvider getDb() {
         return db;
     }
 
-    public void setDb(DBProvider db) {
+    public void setDb(IDBProvider db) {
         this.db = db;
     }
 }

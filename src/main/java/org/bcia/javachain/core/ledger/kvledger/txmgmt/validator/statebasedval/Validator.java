@@ -19,7 +19,7 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.statebasedval;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DB;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.IDB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.HashedCompositeKey;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.HashedUpdateBatch;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.PubUpdateBatch;
@@ -51,9 +51,9 @@ import java.util.Map;
 public class Validator implements InternalValidator {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(Validator.class);
 
-    private DB db;
+    private IDB db;
 
-    public static Validator newValidator(DB db){
+    public static Validator newValidator(IDB db){
         Validator validator = new Validator();
         validator.setDb(db);
         return validator;
@@ -218,11 +218,11 @@ public class Validator implements InternalValidator {
         return true;
     }
 
-    public DB getDb() {
+    public IDB getDb() {
         return db;
     }
 
-    public void setDb(DB db) {
+    public void setDb(IDB db) {
         this.db = db;
     }
 }

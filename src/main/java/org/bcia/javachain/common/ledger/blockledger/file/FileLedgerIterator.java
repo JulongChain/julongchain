@@ -18,7 +18,7 @@ package org.bcia.javachain.common.ledger.blockledger.file;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.ledger.blockledger.Iterator;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
 import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
 import org.bcia.javachain.protos.common.Common;
 
@@ -50,9 +50,9 @@ public class FileLedgerIterator implements Iterator {
      * 返回block的ByteString形式
      */
     @Override
-    public QueryResult next() throws LedgerException {
-        Map.Entry<QueryResult, Common.Status> map = null;
-        QueryResult result = null;
+    public IQueryResult next() throws LedgerException {
+        Map.Entry<IQueryResult, Common.Status> map = null;
+        IQueryResult result = null;
         try {
             result = commonIterator.next();
         } catch (LedgerException e) {
@@ -62,7 +62,7 @@ public class FileLedgerIterator implements Iterator {
             map = new AbstractMap.SimpleEntry<>(null, Common.Status.SERVICE_UNAVAILABLE);
         }
         map = new AbstractMap.SimpleEntry<>(result, Common.Status.SUCCESS);
-        return (QueryResult) map;
+        return (IQueryResult) map;
     }
 
     @Override

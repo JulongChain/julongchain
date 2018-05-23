@@ -25,7 +25,7 @@ package org.bcia.javachain.core.ledger.kvledger;
 public class Recoverer {
 
     private long firstBlockNum;
-    private Recoverable recoverable;
+    private IRecoverable recoverable;
 
     public long getFirstBlockNum() {
         return firstBlockNum;
@@ -35,11 +35,11 @@ public class Recoverer {
         this.firstBlockNum = firstBlockNum;
     }
 
-    public Recoverable getRecoverable() {
+    public IRecoverable getRecoverable() {
         return recoverable;
     }
 
-    public void setRecoverable(Recoverable recoverable) {
+    public void setRecoverable(IRecoverable recoverable) {
         this.recoverable = recoverable;
     }
 }

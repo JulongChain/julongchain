@@ -20,7 +20,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
-import org.bcia.javachain.common.ledger.util.DBProvider;
+import org.bcia.javachain.common.ledger.util.IDBProvider;
 import org.bcia.javachain.common.ledger.util.IoUtil;
 import org.bcia.javachain.core.ledger.util.Util;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -51,7 +51,7 @@ public class BlockFileManager {
 
     private String rootDir;
     private Conf conf;
-    private DBProvider db;
+    private IDBProvider db;
     private Index index;
     private CheckpointInfo cpInfo;
     private BlockFileWriter currentFileWriter;
@@ -65,7 +65,7 @@ public class BlockFileManager {
     public static BlockFileManager newBlockfileMgr(String id,
                                                    Conf conf,
                                                    IndexConfig indexConfig,
-                                                   DBProvider indexStore) throws LedgerException {
+                                                   IDBProvider indexStore) throws LedgerException {
         BlockFileManager mgr = new BlockFileManager();
         logger.debug(String.format("newBlockfileMgr() initializing file-based block storage for ledger: %s", id));
         //根据配置文件、id生成rootDir
@@ -593,11 +593,11 @@ public class BlockFileManager {
         this.conf = conf;
     }
 
-    public DBProvider getDb() {
+    public IDBProvider getDb() {
         return db;
     }
 
-    public void setDb(DBProvider db) {
+    public void setDb(IDBProvider db) {
         this.db = db;
     }
 

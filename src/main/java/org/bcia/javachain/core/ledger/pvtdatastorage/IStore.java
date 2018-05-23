@@ -28,7 +28,7 @@ import java.util.List;
  * @date 2018/04/09
  * @company Dingxuan
  */
-public interface Store {
+public interface IStore {
     void initLastCommitedBlock(long blockNum) throws LedgerException;
 
     List<TxPvtData> getPvtDataByBlockNum(long blockNum, PvtNsCollFilter filter) throws LedgerException;

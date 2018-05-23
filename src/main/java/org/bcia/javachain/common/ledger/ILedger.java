@@ -20,7 +20,7 @@ import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
 
 /**
- * Ledger captures the methods that are common across the 'PeerLedger', 'OrdererLedger', and 'ValidatedLedger'
+ * Ledger captures the methods that are common across the 'PeerLedger', 'OrdererLedger', and 'IValidatedLedger'
  *
  * @author sunzongyu
  * @date 2018/04/03

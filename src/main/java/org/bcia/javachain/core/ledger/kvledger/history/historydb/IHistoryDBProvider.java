@@ -18,7 +18,7 @@ package org.bcia.javachain.core.ledger.kvledger.history.historydb;
 import org.bcia.javachain.common.exception.LedgerException;
 
 /**
- * IHistoryDBProvider provides an instance of a history DB
+ * IHistoryDBProvider provides an instance of a history IDB
  *
  * @author wanliangbing
  * @date 2018/3/9

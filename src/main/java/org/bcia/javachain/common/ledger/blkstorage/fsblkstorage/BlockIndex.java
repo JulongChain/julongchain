@@ -19,7 +19,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStorage;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
-import org.bcia.javachain.common.ledger.util.DBProvider;
+import org.bcia.javachain.common.ledger.util.IDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -45,7 +45,7 @@ public class BlockIndex implements Index {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockIndex.class);
 
     private Map<String, Boolean> indexItemsMap = new HashMap<>();
-    private DBProvider db;
+    private IDBProvider db;
     private String ledgerId;
 
     public static final String BLOCK_NUM_IDX_KEY_PREFIX           = "n";
@@ -57,7 +57,7 @@ public class BlockIndex implements Index {
     public static final String INDEX_CHECK_POINT_KEY_STR          = "indexCheckpointKey";
 //    private static final byte[] INDEX_CHECKPOINT_KEY  = INDEX_CHECK_POINT_KEY_STR.getBytes();
 
-    public static BlockIndex newBlockIndex(IndexConfig indexConfig, DBProvider db, String id) {
+    public static BlockIndex newBlockIndex(IndexConfig indexConfig, IDBProvider db, String id) {
         String[] indexItems = indexConfig.getAttrsToIndex();
         logger.debug(String.format("newBlockIndex() - indexItems length: [%d]", indexItems.length));
         Map<String, Boolean> indexItemMap = new HashMap<>();
@@ -328,11 +328,11 @@ public class BlockIndex implements Index {
         this.indexItemsMap = indexItemsMap;
     }
 
-    public DBProvider getDb() {
+    public IDBProvider getDb() {
         return db;
     }
 
-    public void setDb(DBProvider db) {
+    public void setDb(IDBProvider db) {
         this.db = db;
     }
 

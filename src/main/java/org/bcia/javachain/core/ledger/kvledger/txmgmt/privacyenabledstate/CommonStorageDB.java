@@ -35,7 +35,7 @@ import java.util.Map;
  * @date 2018/04/17
  * @company Dingxuan
  */
-public class CommonStorageDB implements DB {
+public class CommonStorageDB implements IDB {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(CommonStorageDB.class);
     private static final String NS_JOINER  = "$$";
     private static final String PVT_DATA_PREFIX  = "p";
@@ -51,13 +51,13 @@ public class CommonStorageDB implements DB {
 
     @Override
     public boolean isBulkOptimizable() {
-        return vdb instanceof BulkOptimizable;
+        return vdb instanceof IBulkOptimizable;
     }
 
     @Override
     public void loadCommittedVersionsOfPubAndHashedKeys(List<CompositeKey> pubKeys,
                                                         List<HashedCompositeKey> hashKeys) {
-        BulkOptimizable bulkOptimizable = (BulkOptimizable) vdb;
+        IBulkOptimizable bulkOptimizable = (IBulkOptimizable) vdb;
 
         for(HashedCompositeKey key : hashKeys){
             String ns = deriveHashedDataNs(key.getNamespace(), key.getCollectionName());
@@ -80,7 +80,7 @@ public class CommonStorageDB implements DB {
     @Override
     public Height getCacheKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException{
         try {
-            BulkOptimizable bulkOptimizable = (BulkOptimizable) vdb;
+            IBulkOptimizable bulkOptimizable = (IBulkOptimizable) vdb;
             String keyHashStr = new String(keyHash);
             if(!bytesKeySuppoted()){
                 //TODO SM3 Hash
@@ -95,7 +95,7 @@ public class CommonStorageDB implements DB {
     @Override
     public void clearCachedVersions() {
         try {
-            BulkOptimizable bulkOptimizable = (BulkOptimizable) vdb;
+            IBulkOptimizable bulkOptimizable = (IBulkOptimizable) vdb;
             bulkOptimizable.clearCachedVersions();
         } catch (Exception e) {
             throw new RuntimeException(e);

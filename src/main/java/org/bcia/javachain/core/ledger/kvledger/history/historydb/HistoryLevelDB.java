@@ -18,7 +18,7 @@ package org.bcia.javachain.core.ledger.kvledger.history.historydb;
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.IBlockStore;
-import org.bcia.javachain.common.ledger.util.DBProvider;
+import org.bcia.javachain.common.ledger.util.IDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -47,7 +47,7 @@ import java.util.List;
 public class HistoryLevelDB implements IHistoryDB {
 
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(HistoryLevelDB.class);
-    private DBProvider provider = null;
+    private IDBProvider provider = null;
     private String dbName = null;
 
     private static final byte[] EMPTY_VALUE = {};
@@ -75,7 +75,7 @@ public class HistoryLevelDB implements IHistoryDB {
     /**
      * 构建HistoryDB
      */
-    public static IHistoryDB newHistroyDB(DBProvider dbProvider, String dbName) throws LedgerException {
+    public static IHistoryDB newHistroyDB(IDBProvider dbProvider, String dbName) throws LedgerException {
         HistoryLevelDB db = new HistoryLevelDB();
         db.setDbName(dbName);
         db.setProvider(dbProvider);
@@ -208,11 +208,11 @@ public class HistoryLevelDB implements IHistoryDB {
         return true;
     }
 
-    public DBProvider getProvider() {
+    public IDBProvider getProvider() {
         return provider;
     }
 
-    public void setProvider(DBProvider provider) {
+    public void setProvider(IDBProvider provider) {
         this.provider = provider;
     }
 }

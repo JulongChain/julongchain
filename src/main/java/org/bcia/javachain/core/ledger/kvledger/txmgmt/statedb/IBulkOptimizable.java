@@ -13,20 +13,24 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package org.bcia.javachain.core.ledger;
+package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 
-import org.bcia.javachain.common.exception.JavaChainException;
-import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.CompositeKey;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 
 import java.util.List;
 
 /**
- * 状态监听器
+ * 提供额外批量操作数据库接口
  *
  * @author sunzongyu
- * @date 2018/04/16
+ * @date 2018/04/17
  * @company Dingxuan
  */
-public interface StateListener {
-   void handleStateUpdates(String ledgerID, List<KvRwset.KVWrite> stateUpdates) throws JavaChainException;
+public interface IBulkOptimizable {
+    void loadCommittedVersions(List<CompositeKey> keys);
+
+    Height getCachedVersion(String ns, String key);
+
+    void clearCachedVersions();
 }

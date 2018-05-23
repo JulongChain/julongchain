@@ -16,7 +16,7 @@
 package org.bcia.javachain.common.ledger;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
 
 /**
  * IResultsIterator - an iterator for query result set
@@ -30,7 +30,7 @@ public interface IResultsIterator {
     /**
      * 返回下一个实体,当全部返回时,返回空
      */
-    QueryResult next() throws LedgerException;
+    IQueryResult next() throws LedgerException;
 
     /**
      * 关闭当前迭代器

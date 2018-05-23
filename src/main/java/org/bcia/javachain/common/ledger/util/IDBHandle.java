@@ -17,20 +17,31 @@ package org.bcia.javachain.common.ledger.util;
 
 import org.bcia.javachain.common.exception.LevelDBException;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
+import org.iq80.leveldb.DB;
 
 import java.util.Iterator;
 import java.util.Map;
 
 /**
- * 操作数据库辅助类接口
+ * 操作DB接口
  *
  * @author sunzongyu
  * @date 2018/04/24
  * @company Dingxuan
  */
-public interface DBProvider {
+public interface IDBHandle {
     /**
-     * 关闭
+     * db是否开启
+     */
+    boolean isOpened();
+
+    /**
+     * 创建db
+     */
+    DB createDB(String dbPath) throws LevelDBException;
+
+    /**
+     * 关闭db
      */
     void close() throws LevelDBException;
 
@@ -40,32 +51,27 @@ public interface DBProvider {
     byte[] get(byte[] key) throws LevelDBException;
 
     /**
-     * 插入kv
+     * 插入当前kv
      */
     void put(byte[] key, byte[] value, boolean sync) throws LevelDBException;
 
     /**
-     * 删除key
+     * 删除给定key
      */
     void delete(byte[] key, boolean sync) throws LevelDBException;
 
     /**
-     * 批量写入
+     * 批量执行操作
      */
     void writeBatch(UpdateBatch batch, boolean sync) throws LevelDBException;
 
     /**
-     * 迭代
+     * 遍历
      */
     Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey) throws LevelDBException;
 
     /**
-     * 获取DB路径
+     * 获取dbname
      */
-    String getDbPath() throws LevelDBException;
-
-    /**
-     * 获取DB
-     */
-    DBHandle getDb();
+    String getDbName();
 }

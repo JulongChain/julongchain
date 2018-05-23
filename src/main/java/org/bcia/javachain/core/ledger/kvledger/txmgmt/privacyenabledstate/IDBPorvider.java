@@ -13,17 +13,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package org.bcia.javachain.common.ledger.util.leveldbhelper;
+package org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate;
+
+import org.bcia.javachain.common.exception.LedgerException;
 
 /**
- * 类描述
+ * DB提供者接口
  *
  * @author sunzongyu
- * @date 2018/04/13
+ * @date 2018/04/17
  * @company Dingxuan
  */
-public interface BatchReplay {
-    void put(byte[] key, byte[] value);
+public interface IDBPorvider {
 
-    void delete(byte[] key);
+    IDB getDBHandle(String id) throws LedgerException;
+
+    void close() throws LedgerException;
 }

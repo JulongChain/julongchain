@@ -19,10 +19,8 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
 import org.bcia.javachain.core.ledger.IQueryExecutor;
 import org.bcia.javachain.core.ledger.ITxSimulator;
-import org.bcia.javachain.core.ledger.kvledger.Recoverable;
+import org.bcia.javachain.core.ledger.kvledger.IRecoverable;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
-
-import java.util.Map;
 
 /**
  * 交易管理者接口
@@ -31,7 +29,7 @@ import java.util.Map;
  * @date 2018/04/19
  * @company Dingxuan
  */
-public interface TxManager extends Recoverable {
+public interface ITxManager extends IRecoverable {
 
     /**
      * 创建查询器

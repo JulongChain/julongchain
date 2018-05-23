@@ -21,7 +21,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RangeQueryResultsHelper;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RwSetUtil;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
@@ -54,7 +54,7 @@ public class RangeQueryHashValidator implements IRangeQueryValidator {
         KvRwset.QueryReadsMerkleSummary merkle = null;
         logger.debug("inMerkle");
         while(true){
-            QueryResult result = null;
+            IQueryResult result = null;
             result = itr.next();
             logger.debug("Processing result = " + result);
             if(result == null){

@@ -35,7 +35,7 @@ public class LevelDBFactoryTest {
 
     @Test
     public void closeDB() throws IOException {
-//        DB db = LevelDBFactory.getDB();
+//        IDB db = LevelDBFactory.getDB();
 //        LevelDBFactory.closeDB(db);
     }
 
@@ -69,7 +69,7 @@ public class LevelDBFactoryTest {
         LevelDBUtil.add(db, key, "askjaklj".getBytes(), true);
 //        for (int i = 0; i < 100; i++) {
 //            String path = "/home/bcia/leveldb";
-//            DB db = Iq80DBFactory.factory.open(new File(path), new Options().createIfMissing(true));
+//            IDB db = Iq80DBFactory.factory.open(new File(path), new Options().createIfMissing(true));
 //        }
 
     }

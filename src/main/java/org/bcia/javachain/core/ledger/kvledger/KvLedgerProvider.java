@@ -17,20 +17,20 @@ package org.bcia.javachain.core.ledger.kvledger;
 
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.util.DBProvider;
+import org.bcia.javachain.common.ledger.util.IDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.proto.BlockUtils;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
 import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.ledger.INodeLedgerProvider;
-import org.bcia.javachain.core.ledger.StateListener;
+import org.bcia.javachain.core.ledger.IStateListener;
 import org.bcia.javachain.core.ledger.kvledger.history.historydb.HistoryLevelDB;
 import org.bcia.javachain.core.ledger.kvledger.history.historydb.IHistoryDB;
 import org.bcia.javachain.core.ledger.kvledger.history.historydb.IHistoryDBProvider;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.CommonStorageDBProvider;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DB;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DBPorvider;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.IDB;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.IDBPorvider;
 import org.bcia.javachain.core.ledger.ledgerstorage.Provider;
 import org.bcia.javachain.core.ledger.ledgerstorage.StoreIBlockStore;
 import org.bcia.javachain.protos.common.Common;
@@ -55,10 +55,10 @@ public class KvLedgerProvider implements INodeLedgerProvider {
 
     private IdStore idStore = null;
     private Provider ledgerStoreProvider = null;
-    private DBPorvider vdbProvider = null;
-    private DBProvider provider = null;
+    private IDBPorvider vdbProvider = null;
+    private IDBProvider provider = null;
     private IHistoryDBProvider historyDBProvider = null;
-    private Map<String, StateListener> stateListeners = new HashMap<>();
+    private Map<String, IStateListener> stateListeners = new HashMap<>();
 
     /**
      * 新建Provider
@@ -90,7 +90,7 @@ public class KvLedgerProvider implements INodeLedgerProvider {
      * 初始化
      */
     @Override
-    public void initialize(Map<String, StateListener> stateListeners){
+    public void initialize(Map<String, IStateListener> stateListeners){
         this.stateListeners = stateListeners;
     }
 
@@ -218,7 +218,7 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         //账本的block仓库
         StoreIBlockStore blockStore = ledgerStoreProvider.open(ledgerID);
         //账本的状态db
-        DB vdb = vdbProvider.getDBHandle(ledgerID);
+        IDB vdb = vdbProvider.getDBHandle(ledgerID);
         //账本的历史db
         IHistoryDB historyDB = historyDBProvider.getDBHandle(ledgerID);
 
@@ -246,11 +246,11 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         this.idStore = idStore;
     }
 
-    public DBProvider getProvider() {
+    public IDBProvider getProvider() {
         return provider;
     }
 
-    public void setProvider(DBProvider provider) {
+    public void setProvider(IDBProvider provider) {
         this.provider = provider;
     }
 
@@ -262,19 +262,19 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         this.historyDBProvider = historyDBProvider;
     }
 
-    public Map<String, StateListener> getStateListeners() {
+    public Map<String, IStateListener> getStateListeners() {
         return stateListeners;
     }
 
-    public void setStateListeners(Map<String, StateListener> stateListeners) {
+    public void setStateListeners(Map<String, IStateListener> stateListeners) {
         this.stateListeners = stateListeners;
     }
 
-    public DBPorvider getVdbProvider() {
+    public IDBPorvider getVdbProvider() {
         return vdbProvider;
     }
 
-    public void setVdbProvider(DBPorvider vdbProvider) {
+    public void setVdbProvider(IDBPorvider vdbProvider) {
         this.vdbProvider = vdbProvider;
     }
 }

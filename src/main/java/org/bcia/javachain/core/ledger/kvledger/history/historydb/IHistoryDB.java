@@ -18,7 +18,7 @@ package org.bcia.javachain.core.ledger.kvledger.history.historydb;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.IBlockStore;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
-import org.bcia.javachain.core.ledger.kvledger.Recoverable;
+import org.bcia.javachain.core.ledger.kvledger.IRecoverable;
 import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.protos.common.Common;
@@ -31,7 +31,7 @@ import org.bcia.javachain.protos.common.Common;
  * @date 2018/04/04
  * @company Dingxuan
  */
-public interface IHistoryDB extends Recoverable {
+public interface IHistoryDB extends IRecoverable {
     /**
      * HistoryDB检索器
      */

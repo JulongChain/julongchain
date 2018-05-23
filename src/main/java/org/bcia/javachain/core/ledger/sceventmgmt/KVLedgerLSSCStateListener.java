@@ -16,19 +16,16 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.sceventmgmt;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import javassist.compiler.Javac;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.common.privdata.CollectionStoreSupport;
 import org.bcia.javachain.core.common.privdata.IPrivDataSupport;
-import org.bcia.javachain.core.ledger.StateListener;
-import org.bcia.javachain.core.ledger.StateUpdates;
+import org.bcia.javachain.core.ledger.IStateListener;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.javachain.protos.node.SmartContractDataPackage;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -38,7 +35,7 @@ import java.util.List;
  * @date 2018/04/16
  * @company Dingxuan
  */
-public class KVLedgerLSSCStateListener implements StateListener {
+public class KVLedgerLSSCStateListener implements IStateListener {
     private static final JavaChainLog log = JavaChainLogFactory.getLog(KVLedgerLSSCStateListener.class);
 
     private IPrivDataSupport privdata = new CollectionStoreSupport();

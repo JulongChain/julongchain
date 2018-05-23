@@ -25,8 +25,8 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.*;
 import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.kvledger.history.historydb.IHistoryDB;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.DB;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.TxManager;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.IDB;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.ITxManager;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr.LockBasedTxManager;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.ledgerstorage.StoreIBlockStore;
@@ -51,7 +51,7 @@ public class KvLedger implements INodeLedger {
 
     private String ledgerID;
     private IBlockStore blockStore;
-    private TxManager txtmgmt;
+    private ITxManager txtmgmt;
     private IHistoryDB historyDB;
     private LedgerConfig ledgerConfig;
 
@@ -64,12 +64,12 @@ public class KvLedger implements INodeLedger {
      */
     public static KvLedger newKVLedger(String ledgerID,
                                        IBlockStore blockStore,
-                                       DB versionedDB,
+                                       IDB versionedDB,
                                        IHistoryDB historyDB,
-                                       Map<String, StateListener> stateListeners) throws LedgerException {
+                                       Map<String, IStateListener> stateListeners) throws LedgerException {
         logger.debug("Creating KVLedger ledgerID = " + ledgerID);
 
-        TxManager txmgmt = LockBasedTxManager.newLockBasedTxMgr(ledgerID, versionedDB, stateListeners);
+        ITxManager txmgmt = LockBasedTxManager.newLockBasedTxMgr(ledgerID, versionedDB, stateListeners);
 
         KvLedger kvLedger = new KvLedger();
         kvLedger.setLedgerID(ledgerID);
@@ -102,12 +102,12 @@ public class KvLedger implements INodeLedger {
             return;
         }
         long lastAvailableBlockNum = info.getHeight() - 1;
-        List<Recoverable> recoverables = new ArrayList<>();
+        List<IRecoverable> recoverables = new ArrayList<>();
         List<Recoverer> recoverers = new ArrayList<>();
         recoverables.add(txtmgmt);
         recoverables.add(historyDB);
         //循环添加需要恢复的db
-        for(Recoverable recoverable : recoverables){
+        for(IRecoverable recoverable : recoverables){
             long firstBlockNum = recoverable.shouldRecover();
             if(firstBlockNum  == -1 || firstBlockNum - 1 != lastAvailableBlockNum){
                 Recoverer recoverer = new Recoverer();
@@ -138,13 +138,13 @@ public class KvLedger implements INodeLedger {
     }
 
     /** recommitLostBlocks retrieves blocks in specified range and commit the write set to either
-     * state DB or history DB or both
+     * state IDB or history IDB or both
      */
-    public void recommitLostBlocks(long firstBlockNum, long lastBlockNum, Recoverable ... recoverables) throws LedgerException{
+    public void recommitLostBlocks(long firstBlockNum, long lastBlockNum, IRecoverable... recoverables) throws LedgerException{
         BlockAndPvtData blockAndPvtData;
         for (long blockNumber = firstBlockNum; blockNumber <= lastBlockNum; blockNumber++) {
             blockAndPvtData = getPvtDataAndBlockByNum(blockNumber, null);
-            for(Recoverable recoverable : recoverables){
+            for(IRecoverable recoverable : recoverables){
                 recoverable.commitLostBlock(blockAndPvtData);
             }
         }
@@ -416,11 +416,11 @@ public class KvLedger implements INodeLedger {
         this.blockStore = blockStore;
     }
 
-    public TxManager getTxtmgmt() {
+    public ITxManager getTxtmgmt() {
         return txtmgmt;
     }
 
-    public void setTxtmgmt(TxManager txtmgmt) {
+    public void setTxtmgmt(ITxManager txtmgmt) {
         this.txtmgmt = txtmgmt;
     }
 

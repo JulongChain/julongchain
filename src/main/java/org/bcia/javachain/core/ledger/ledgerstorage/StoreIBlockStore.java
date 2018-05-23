@@ -28,6 +28,7 @@ import org.bcia.javachain.core.ledger.BlockAndPvtData;
 import org.bcia.javachain.core.ledger.PvtNsCollFilter;
 import org.bcia.javachain.core.ledger.TxPvtData;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
+import org.bcia.javachain.core.ledger.pvtdatastorage.IStore;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.node.TransactionPackage;
@@ -45,7 +46,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class StoreIBlockStore implements IBlockStore {
-    private org.bcia.javachain.core.ledger.pvtdatastorage.Store pvtdataStore = null;
+    private IStore pvtdataStore = null;
     private IBlockStore blkStorage = null;
 
     public static Provider newProvider() throws LedgerException{
@@ -219,11 +220,11 @@ public class StoreIBlockStore implements IBlockStore {
         this.blkStorage = blkStorage;
     }
 
-    public org.bcia.javachain.core.ledger.pvtdatastorage.Store getPvtdataStore() {
+    public IStore getPvtdataStore() {
         return pvtdataStore;
     }
 
-    public void setPvtdataStore(org.bcia.javachain.core.ledger.pvtdatastorage.Store pvtdataStore) {
+    public void setPvtdataStore(IStore pvtdataStore) {
         this.pvtdataStore = pvtdataStore;
     }
 }

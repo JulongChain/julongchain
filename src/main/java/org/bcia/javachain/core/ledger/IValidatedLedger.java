@@ -18,13 +18,13 @@ package org.bcia.javachain.core.ledger;
 import org.bcia.javachain.common.ledger.ILedger;
 
 /**
- * ValidatedLedger represents the 'final ledger' after filtering out invalid transactions from PeerLedger.
+ * IValidatedLedger represents the 'final ledger' after filtering out invalid transactions from PeerLedger.
  * Post-v1
  *
  * @author
  * @date 2018/3/7
  * @company Dingxuan
  */
-public interface ValidatedLedger extends ILedger {
+public interface IValidatedLedger extends ILedger {
 
 }

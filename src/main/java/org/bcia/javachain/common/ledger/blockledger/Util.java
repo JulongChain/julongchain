@@ -18,7 +18,7 @@ package org.bcia.javachain.common.ledger.blockledger;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.consenter.Ab;
 
@@ -45,7 +45,7 @@ public class Util {
             } catch (InterruptedException e) {
                 throw new LedgerException(e);
             }
-            Map.Entry<QueryResult, Common.Status> entry = (Map.Entry<QueryResult, Common.Status>) itr.next();
+            Map.Entry<IQueryResult, Common.Status> entry = (Map.Entry<IQueryResult, Common.Status>) itr.next();
             Common.Block block = null;
             try {
                 block = Common.Block.parseFrom(((ByteString) entry.getKey()));
@@ -88,7 +88,7 @@ public class Util {
             throw new LedgerException(e);
         }
         if(token != null){
-            Map.Entry<QueryResult, Common.Status> entry = (Map.Entry<QueryResult, Common.Status>) i.next();
+            Map.Entry<IQueryResult, Common.Status> entry = (Map.Entry<IQueryResult, Common.Status>) i.next();
             ByteString blockByteString = (ByteString) entry.getKey();
             Common.Status status = entry.getValue();
             if(!status.equals(Common.Status.SUCCESS)){

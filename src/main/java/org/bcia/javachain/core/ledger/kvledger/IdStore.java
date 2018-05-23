@@ -18,7 +18,7 @@ package org.bcia.javachain.core.ledger.kvledger;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.util.DBProvider;
+import org.bcia.javachain.common.ledger.util.IDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -39,7 +39,7 @@ import java.util.*;
 public class IdStore {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(IdStore.class);
 
-    private DBProvider provider = null;
+    private IDBProvider provider = null;
     private static final byte[] UNDER_CONSTRUCTION_LEDGER_KEY = "underConstructionLedgerKey".getBytes();
     private static final byte[] LEDGER_KEY_PREFIX = "l".getBytes();
 
@@ -190,11 +190,11 @@ public class IdStore {
         return keyStr.substring(1, key.length);
     }
 
-    public DBProvider getProvider() {
+    public IDBProvider getProvider() {
         return provider;
     }
 
-    public void setProvider(DBProvider provider) {
+    public void setProvider(IDBProvider provider) {
         this.provider = provider;
     }
 
