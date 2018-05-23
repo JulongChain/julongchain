@@ -91,6 +91,7 @@ public class LSSCTest extends BaseJunit4Test {
     @Test
     public void testDeploys(){
         String path="src/main/java/org/bcia/javachain/examples/smartcontract/java/smartcontract_example02";
+        ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("1",new LinkedList<ByteString>());
         testDeploy("example02","1.0",path,"","Alice",mockStub);
     }
 
@@ -127,6 +128,7 @@ public class LSSCTest extends BaseJunit4Test {
     @Test
     public void testUpgrades(){
         String path="src/main/java/org/bcia/javachain/examples/smartcontract/java/smartcontract_example02";
+        ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("1",new LinkedList<ByteString>());
         testUpgrade("example02","1.0",path,"","Alice",mockStub);
     }
 
@@ -202,6 +204,7 @@ public class LSSCTest extends BaseJunit4Test {
     @Test
     public void testStarts(){
         String path="src/main/java/org/bcia/javachain/examples/smartcontract/java/smartcontract_example02";
+        ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("1",new LinkedList<ByteString>());
         testStart("example02","1.0",path,"","Alice",mockStub);
     }
 
