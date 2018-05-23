@@ -122,7 +122,7 @@ public class LSSCTest extends BaseJunit4Test {
 
         ISmartContract.SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
         //尚未完全实现调通全部逻辑，返回内部错误
-        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
+        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
     }
 
     @Test
@@ -183,10 +183,10 @@ public class LSSCTest extends BaseJunit4Test {
         byte[] tarBytes=null;
         try {
             tarBytes= IoUtil.tarWriter(map, 1024);
-            File file=new File("/opt/2.tar");
-            FileOutputStream stream=new FileOutputStream(file);
-            stream.write(tarBytes);
-            stream.close();
+            //File file=new File("/opt/2.tar");
+            //FileOutputStream stream=new FileOutputStream(file);
+            //stream.write(tarBytes);
+            //stream.close();
         } catch (Exception e) {
             String msg=String.format("Create tar file for %s failed:%s",smartcontractName,e.getMessage());
             throw new SysSmartContractException(msg);

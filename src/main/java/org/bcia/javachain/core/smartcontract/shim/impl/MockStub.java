@@ -26,15 +26,13 @@ import org.bcia.javachain.core.smartcontract.shim.ledger.CompositeKey;
 import org.bcia.javachain.core.smartcontract.shim.ledger.IKeyModification;
 import org.bcia.javachain.core.smartcontract.shim.ledger.IKeyValue;
 import org.bcia.javachain.core.smartcontract.shim.ledger.IQueryResultsIterator;
+import org.bcia.javachain.protos.common.Collection;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.SmartContractDataPackage;
 import org.bcia.javachain.protos.node.SmartContractEventPackage;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -49,8 +47,8 @@ public class MockStub implements ISmartContractStub {
     private List<ByteString> args;
     private String name;
     private ISmartContract smartContract;
-    private HashMap<String,Object> state;
-    private List keys;
+    private HashMap<String,byte[]> state;
+    private List<String> keys;
     String txID;
     Timestamp txTimeStamp;
     ProposalPackage.SignedProposal signedProposal;
@@ -60,8 +58,8 @@ public class MockStub implements ISmartContractStub {
         log.debug("MockStub({},{})",name,smartContract.getSmartContractID());
         this.name=name;
         this.smartContract=smartContract;
-        state=new HashMap<String,Object>();
-        keys=new LinkedList();
+        state=new HashMap<String,byte[]>();
+        keys=new ArrayList<String>();
     }
 
     @Override
@@ -99,14 +97,30 @@ public class MockStub implements ISmartContractStub {
         return null;
     }
 
+    /**
+     * GetState retrieves the value for a given key from the ledger
+     * @param key
+     * @return
+     */
     @Override
     public byte[] getState(String key) {
-        return "getState".getBytes();
+        byte[] value=state.get(key);
+        log.debug("MockStub {} Getting {} {}",this.name,key,value);
+        return value;
     }
 
     @Override
     public void putState(String key, byte[] value) {
-
+        if(this.txID.equals("")){
+            String msg=String.format("cannot PutState without a transactions - call stub.MockTransactionStart()?");
+            log.error(msg);
+            throw new RuntimeException(msg);
+        }
+        log.debug("MockStub {} Putting {} {}",this.name,key,value);
+        state.put(key,value);
+        // insert key into ordered list of keys
+        keys.add(key);
+        Collections.sort(keys);
     }
 
     @Override
