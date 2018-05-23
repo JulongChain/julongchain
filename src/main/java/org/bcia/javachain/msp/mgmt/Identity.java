@@ -32,8 +32,9 @@ import org.bcia.javachain.msp.entity.OUIdentifier;
 import org.bcia.javachain.msp.signer.Signer;
 import org.bcia.javachain.protos.common.MspPrincipal;
 import org.bcia.javachain.protos.msp.Identities;
-import org.bouncycastle.asn1.x509.Certificate;
 
+
+import java.security.cert.Certificate;
 
 import static org.bcia.javachain.common.util.Convert.bytesToHexString;
 import static org.bcia.javachain.csp.factory.CspManager.getDefaultCsp;

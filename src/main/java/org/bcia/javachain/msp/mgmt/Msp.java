@@ -32,14 +32,17 @@ import org.bcia.javachain.msp.signer.Signer;
 import org.bcia.javachain.protos.common.MspPrincipal;
 import org.bcia.javachain.protos.msp.Identities;
 import org.bcia.javachain.protos.msp.MspConfigPackage;
-import org.bouncycastle.asn1.x509.Certificate;
+
 import org.bouncycastle.asn1.x509.CertificateList;
-import org.bouncycastle.util.io.pem.PemReader;
+
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
+import java.io.InputStream;
+
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -181,10 +184,14 @@ public class Msp implements IMsp {
 
         try {
             Identities.SerializedIdentity sId = Identities.SerializedIdentity.parseFrom(serializedIdentity);
-            sId.getMspidBytes();
-            Certificate certificate = Certificate.getInstance(new PemReader(new InputStreamReader(new ByteArrayInputStream(sId.getIdBytes().toByteArray()))).readPemObject().getContent());
+
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            InputStream stream= new ByteArrayInputStream(sId.getIdBytes().toByteArray());
+            X509Certificate cert = (X509Certificate) cf .generateCertificate(stream);
+
+            //Certificate cert = Certificate.getInstance(new PemReader(new InputStreamReader(new ByteArrayInputStream(sId.getIdBytes().toByteArray()))).readPemObject().getContent());
             SM2KeyExport certPubK = new SM2KeyExport();
-            IIdentity identity = new Identity(certificate, certPubK.getPublicKey(), this);
+            IIdentity identity = new Identity(cert, certPubK.getPublicKey(), this);
             return identity;
         } catch (Exception e) {
             e.printStackTrace();
@@ -313,10 +320,14 @@ public class Msp implements IMsp {
     }
 
     public Certificate getCertFromPem(byte[] idBytes) {
-        Certificate certificate = null;
+        X509Certificate certificate = null;
         try {
-            certificate = Certificate.getInstance(new PemReader(new InputStreamReader(new ByteArrayInputStream(idBytes))).readPemObject().getContent());
-        } catch (IOException e) {
+
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            InputStream stream= new ByteArrayInputStream(idBytes);
+            certificate = (X509Certificate) cf .generateCertificate(stream);
+          //  certificate = Certificate.getInstance(new PemReader(new InputStreamReader(new ByteArrayInputStream(idBytes))).readPemObject().getContent());
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return certificate;
