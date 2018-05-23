@@ -25,6 +25,7 @@ import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 
+import javax.management.monitor.StringMonitor;
 import java.io.*;
 import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -41,24 +42,6 @@ import java.util.zip.GZIPOutputStream;
 public class IoUtil {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(IoUtil.class);
     private static final int BUFFER = 1024;
-
-    /** CreateDirIfMissing creates a dir for dirPath if not already exists. If the dir is empty it returns true
-     *
-     * @param dirPath
-     * @return
-     */
-    public static Boolean createDirIfMissing(String dirPath) {
-        try {
-            File file = new File(dirPath);
-            if(!file.exists()){
-                file.mkdir();
-            }
-        } catch (Exception e) {
-            logger.debug(String.format("Creating [%s] failed", dirPath));
-            return Boolean.FALSE;
-        }
-        return Boolean.TRUE;
-    }
 
     /** DirEmpty returns true if the dir at dirPath is empty
      *
@@ -95,33 +78,77 @@ public class IoUtil {
     }
 
     /**
+     * 修改文件权限 755
+     * 默认文件存在
+     */
+    public static void chmod(File file, int perm){
+        int uMod = perm / 100;
+        int gMod = (perm % 100) / 10;
+        int oMod = perm % 10;
+        if(uMod > 7 || uMod < 0){
+            logger.error("Wrong mod type " + perm);
+            return;
+        }
+        if(gMod > 7 || gMod < 0){
+            logger.error("Wrong mod type " + perm);
+            return;
+        }
+        if(oMod > 7 || oMod < 0){
+            logger.error("Wrong mod type " + perm);
+            return;
+        }
+        if (!file.setWritable(uMod >= 4, (uMod > 0 && uMod < 5))) {
+            logger.error("Can not set write permission to dir " + file.getAbsolutePath());
+        }
+        if (!file.setReadable(gMod >= 4, (uMod > 0 && uMod < 5))) {
+            logger.error("Can not set read permission to dir " + file.getAbsolutePath());
+        }
+        if (!file.setExecutable(oMod >= 4, (uMod > 0 && uMod < 5))) {
+            logger.error("Can not set execute permission to dir " + file.getAbsolutePath());
+        }
+    }
+
+    /**
+     * 创建目录
+     */
+    public static boolean createDirIfMissing(String dirPath){
+        File dir = new File(dirPath);
+        if(dir.exists()){
+            logger.info("File {} is already exists", dirPath);
+            chmod(dir, 644);
+            return true;
+        }
+        if (dir.mkdirs()) {
+            logger.info("Can not create dir " + dirPath);
+            return false;
+        }
+        chmod(dir, 644);
+        return true;
+    }
+
+    /**
      * 创建文件
-     * @param filePath
-     * @return
      */
     public static boolean createFileIfMissing(String filePath){
         boolean result = false;
         File file = new File(filePath);
         if(file.exists()){
             logger.info("File {} is already exists", filePath);
+            chmod(file, 755);
             return true;
         }
         File dir = file.getParentFile();
-        if(!dir.exists()){
-            if (!dir.mkdirs()) {
-                logger.error("Can not create dir " + dir.getAbsolutePath());
-                return false;
-            }
-        }
+        createDirIfMissing(dir.getAbsolutePath());
         try {
             result = file.createNewFile();
         } catch (IOException e) {
             logger.error("Got error error:{} when createing file:{},  ", e.getMessage(), filePath);
-            return false;
+            return result;
         }
         if(!result){
             logger.error("Can not create file " + filePath);
         }
+        chmod(file, 755);
         return result;
     }
 
@@ -353,8 +380,19 @@ public class IoUtil {
         return baos.toByteArray();
     }
 
-    public static void main(String[] args) throws JavaChainException {
-        createFileIfMissing("/home/12345/1.txt");
-        System.out.println(1);
+    public static void main(String[] args) throws Exception  {
+        File file = new File("/home/bcia/test/12345.tar.gz");
+        FileInputStream fis = new FileInputStream(file);
+        byte[] bytes = new byte[1024];
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        int num = 0;
+        while((num = fis.read(bytes)) > 0){
+            baos.write(bytes, 0, num);
+        }
+        byte[] bytes1 = gzipReader(baos.toByteArray(), 1024);
+        Map<String, byte[]> stringMap = tarReader(bytes1, 1024);
+        stringMap.forEach((k, v) -> {
+            System.out.println(k);
+        });
     }
 }
