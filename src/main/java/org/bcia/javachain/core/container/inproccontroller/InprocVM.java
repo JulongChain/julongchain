@@ -15,7 +15,7 @@
  */
 package org.bcia.javachain.core.container.inproccontroller;
 
-import org.bcia.javachain.core.container.ccintf.CCID;
+import org.bcia.javachain.core.container.ccintf.SCID;
 import org.bcia.javachain.core.container.ccintf.ICCSupport;
 import org.bcia.javachain.core.container.api.IBuildSpecFactory;
 import org.bcia.javachain.core.container.api.IFormat;
@@ -38,32 +38,32 @@ public class InprocVM implements VM {
     private String id;
 
     @Override
-    public void deploy(Context ctxt, CCID ccid, String[] args, String[] env,
+    public void deploy(Context ctxt, SCID ccid, String[] args, String[] env,
                        Reader reader) {
 
     }
 
     @Override
-    public void start(Context ctxt, CCID ccid, String[] args, String[] env,
+    public void start(Context ctxt, SCID ccid, String[] args, String[] env,
                       Map<String, byte[]> filesToUpload, IBuildSpecFactory
                                   build, IPrelaunchFunc preLaunchFunc) {
 
     }
 
     @Override
-    public void stop(Context ctxt, CCID ccid, Long timeout, Boolean dontkill,
+    public void stop(Context ctxt, SCID ccid, Long timeout, Boolean dontkill,
                      Boolean dontremove) {
 
     }
 
     @Override
-    public void destroy(Context ctxt, CCID ccid, Boolean force, Boolean
+    public void destroy(Context ctxt, SCID ccid, Boolean force, Boolean
             noprune) {
 
     }
 
     @Override
-    public String getVMName(CCID ccID, IFormat format) {
+    public String getVMName(SCID ccID, IFormat format) {
         return null;
     }
 

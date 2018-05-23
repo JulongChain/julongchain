@@ -122,18 +122,21 @@ public class SignedSDSPackage implements ISmartContractPackage {
         try {
             IoUtil.createFileIfMissing(path);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error(e.getMessage(), e);
+            throw new JavaChainException(e);
         }
 
         OutputStream os = null;
         try {
             os = new FileOutputStream(file);
         } catch (FileNotFoundException e) {
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
         try {
             os.write(buf);
         } catch (IOException e) {
+            log.error(e.getMessage(), e);
             throw new JavaChainException(e);
         }
     }
@@ -154,9 +157,9 @@ public class SignedSDSPackage implements ISmartContractPackage {
         return depSpec;
     }
 
-    public byte[] getInstantiationPolicy() {
+    public byte[] getInstantiationPolicy() throws JavaChainException {
         if(sDepSpec == null){
-            throw new RuntimeException("GetInstantiationPolicy called on uninitialized package");
+            throw new JavaChainException("GetInstantiationPolicy called on uninitialized package");
         }
         return sDepSpec.getInstantiationPolicy().toByteArray();
     }

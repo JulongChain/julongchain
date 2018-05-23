@@ -15,7 +15,7 @@
  */
 package org.bcia.javachain.core.container.dockercontroller;
 
-import org.bcia.javachain.core.container.ccintf.CCID;
+import org.bcia.javachain.core.container.ccintf.SCID;
 import org.bcia.javachain.core.container.api.IBuildSpecFactory;
 import org.bcia.javachain.core.container.api.IFormat;
 import org.bcia.javachain.core.container.api.IPrelaunchFunc;
@@ -91,20 +91,20 @@ public class DockerVM implements VM{
 
     }
 
-    public void deployImage(IDockerClient client, CCID ccid, String[] args,
+    public void deployImage(IDockerClient client, SCID ccid, String[] args,
                             String[] env, Reader reader) {
 
     }
 
     @Override
-    public void start(Context context, CCID ccid, String[] args, String[]
+    public void start(Context context, SCID ccid, String[] args, String[]
             env, Map<String, byte[]> filesToUpload, IBuildSpecFactory
             builder, IPrelaunchFunc prelaunchFunc) {
 
     }
 
     @Override
-    public void stop(Context context, CCID ccid, Long timeout, Boolean
+    public void stop(Context context, SCID ccid, Long timeout, Boolean
             dontkill, Boolean dontremove) {
 
     }
@@ -116,13 +116,13 @@ public class DockerVM implements VM{
     }
 
     @Override
-    public void destroy(Context context, CCID ccid, Boolean force, Boolean
+    public void destroy(Context context, SCID ccid, Boolean force, Boolean
             noprune) {
 
     }
 
     @Override
-    public String getVMName(CCID ccid, IFormat format) {
+    public String getVMName(SCID ccid, IFormat format) {
         return "";
     }
 
@@ -131,7 +131,7 @@ public class DockerVM implements VM{
     }
 
     @Override
-    public void deploy(Context ctxt, CCID ccid, String[] args, String[] env, Reader reader) {
+    public void deploy(Context ctxt, SCID ccid, String[] args, String[] env, Reader reader) {
 
     }
 }

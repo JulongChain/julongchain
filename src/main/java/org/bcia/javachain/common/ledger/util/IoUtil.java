@@ -99,18 +99,29 @@ public class IoUtil {
      * @param filePath
      * @return
      */
-    public static boolean createFileIfMissing(String filePath) throws Exception{
+    public static boolean createFileIfMissing(String filePath){
         boolean result = false;
         File file = new File(filePath);
         if(file.exists()){
+            logger.info("File {} is already exists", filePath);
             return true;
         }
-        String fileDir = filePath.substring(0, filePath.lastIndexOf(File.separator));
-        File dir = new File(fileDir);
+        File dir = file.getParentFile();
         if(!dir.exists()){
-            dir.mkdir();
+            if (!dir.mkdirs()) {
+                logger.error("Can not create dir " + dir.getAbsolutePath());
+                return false;
+            }
         }
-        result = file.createNewFile();
+        try {
+            result = file.createNewFile();
+        } catch (IOException e) {
+            logger.error("Got error error:{} when createing file:{},  ", e.getMessage(), filePath);
+            return false;
+        }
+        if(!result){
+            logger.error("Can not create file " + filePath);
+        }
         return result;
     }
 
@@ -133,6 +144,7 @@ public class IoUtil {
             oos.close();
             return result;
         } catch (Exception e) {
+            logger.error(e.getMessage(), e);
             throw new JavaChainException(e);
         }
     }
@@ -154,6 +166,7 @@ public class IoUtil {
             ois.close();
             return obj;
         } catch (Exception e){
+            logger.error(e.getMessage(), e);
             throw new JavaChainException(e);
         }
     }
@@ -165,11 +178,11 @@ public class IoUtil {
     public static Map<String, File> getFileRelativePath(String path){
         File file = new File(path);
         if(!file.exists()){
-            // TODO: 5/22/18 need log
+            logger.debug("File {} is not exists", path);
             return null;
         }
         if(!file.isDirectory()){
-            // TODO: 5/22/18 need log
+            logger.debug("Input must be a directory, but file {} is not", path);
             return null;
         }
         Map<String, File> result = new HashMap<>();
@@ -200,6 +213,7 @@ public class IoUtil {
     public static byte[] tarWriter(Map<String, File> files, int cache) throws JavaChainException{
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         TarArchiveOutputStream taos = new TarArchiveOutputStream(baos);
+        taos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
         FileInputStream fis = null;
         TarArchiveEntry tae = null;
         try {
@@ -218,7 +232,7 @@ public class IoUtil {
                 taos.closeArchiveEntry();
             }
         } catch (IOException e) {
-            // TODO: 5/22/18 log needed
+            logger.error(e.getMessage(), e);
             throw new JavaChainException(e);
         } finally {
             try {
@@ -226,7 +240,7 @@ public class IoUtil {
                 taos.close();
                 fis.close();
             } catch (IOException e) {
-                // TODO: 5/22/18 log needed
+                logger.error(e.getMessage(), e);
                 throw new JavaChainException(e);
             }
         }
@@ -248,14 +262,14 @@ public class IoUtil {
             gzos.finish();
             gzos.flush();
         } catch (IOException e) {
-            // TODO: 5/22/18 log needed
+            logger.error(e.getMessage(), e);
             throw new JavaChainException(e);
         } finally {
             try {
                 baos.close();
                 gzos.close();
             } catch (IOException e) {
-                // TODO: 5/22/18 log needed
+                logger.error(e.getMessage(), e);
                 throw new JavaChainException(e);
             }
         }
@@ -289,7 +303,7 @@ public class IoUtil {
                 result.put(tae.getName(), baos.toByteArray());
             }
         } catch (IOException e) {
-            // TODO: 5/22/18 log needed
+            logger.error(e.getMessage(), e);
             throw new JavaChainException(e);
         } finally {
             try {
@@ -297,7 +311,7 @@ public class IoUtil {
                 bais.close();
                 tais.close();
             } catch (IOException e) {
-                // TODO: 5/22/18 log needed
+                logger.error(e.getMessage(), e);
                 throw new JavaChainException(e);
             }
         }
@@ -324,7 +338,7 @@ public class IoUtil {
                 baos.write(buff, 0, num);
             }
         } catch (IOException e) {
-            // TODO: 5/22/18 log needed
+            logger.error(e.getMessage(), e);
             throw new JavaChainException(e);
         } finally {
             try {
@@ -332,7 +346,7 @@ public class IoUtil {
                 gzis.close();
                 baos.close();
             } catch (IOException e) {
-                // TODO: 5/22/18 log needed
+                logger.error(e.getMessage(), e);
                 throw new JavaChainException(e);
             }
         }
@@ -340,7 +354,7 @@ public class IoUtil {
     }
 
     public static void main(String[] args) throws JavaChainException {
-//        tarGzWriter("/home/bcia/123/4-11", "/home/bcia/123", "4-1.tar.gz");
-//        tarGzReader("/home/bcia/123/4-1.tar.gz", "/home/bcia/4-111");
+        createFileIfMissing("/home/12345/1.txt");
+        System.out.println(1);
     }
 }

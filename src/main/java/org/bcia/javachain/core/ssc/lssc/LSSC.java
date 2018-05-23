@@ -340,11 +340,11 @@ public class LSSC  extends SystemSmartContractBase {
      */
     private void putSmartContractData(ISmartContractStub stub,
                                       SmartContractDataPackage.SmartContractData data) throws SysSmartContractException{
-         if(sscProvider.isSysSmartContract(data.getEssc())==false){
-             String msg=String.format("%s is not a valid endorsement system smartcontract",data.getEssc());
-             throw new SysSmartContractException(msg);
-         }
-        if(sscProvider.isSysSmartContract(data.getVssc())==false){
+        if(!sscProvider.isSysSmartContract(data.getEssc())){
+            String msg=String.format("%s is not a valid endorsement system smartcontract",data.getEssc());
+            throw new SysSmartContractException(msg);
+        }
+        if(!sscProvider.isSysSmartContract(data.getVssc())){
             String msg=String.format("%s is not a valid endorsement system smartcontract",data.getVssc());
             throw new SysSmartContractException(msg);
         }
@@ -575,6 +575,14 @@ public class LSSC  extends SystemSmartContractBase {
      * @return
      */
     private void checkSmartContractVersion(String contractName,String version) throws SysSmartContractException{
+        if (version == "") {
+            String msg=String.format("EmptySmartContractVersionErr");
+            throw new SysSmartContractException(msg);
+        }
+        if(isValidSmartContractNameOrVersion(version,allowedCharsVersion)==false){
+            String msg=String.format("InvalidChaincodeVersionErr:%s",version);
+            throw new SysSmartContractException(msg);
+        }
 
     }
 
@@ -647,7 +655,7 @@ public class LSSC  extends SystemSmartContractBase {
         }
         support.putSmartContractToLocalStorage(scPack);
 
-        log.info("Installed Smartcontract [%s] Version [%s] to node",
+        log.info("Installed Smartcontract {} Version {} to node",
                 scPack.getSmartContractData().getName(),
                 scPack.getSmartContractData().getVersion());
     }
