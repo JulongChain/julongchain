@@ -13,11 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
  */
-package org.bcia.javachain.common.ledger.file;
+package org.bcia.javachain.common.ledger.blockledger.file;
 
+import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.genesis.GenesisBlockFactory;
 import org.bcia.javachain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.javachain.common.ledger.blockledger.file.FileLedgerFactory;
+import org.bcia.javachain.common.ledger.util.IoUtil;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 import org.junit.After;
@@ -25,7 +28,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.util.Map;
 
 /**
  * 类描述
@@ -35,12 +41,11 @@ import java.io.File;
  * @company Dingxuan
  */
 public class FileLedgerTest {
-    String dir;
+    static final String dir = LedgerConfig.getRootPath();
     FileLedgerFactory fileLedgerFactory;
     ReadWriteBase fileLedger;
     @Before
     public void before() throws Exception{
-        dir = "/tmp/javachain";
         //重置目录
         System.out.println(deleteDir(new File(dir)));
         //重新生成fileLedgerFactory
@@ -53,18 +58,52 @@ public class FileLedgerTest {
     public void testGetOrCreate() throws Exception{
         Assert.assertNotNull(fileLedger);
         Assert.assertTrue(new File(dir).exists());
-        Assert.assertSame(new File(dir).listFiles().length, 2);
+        Assert.assertSame(new File(dir).listFiles().length, 1);
         Assert.assertSame(fileLedger.height(), (long) 0);
         Assert.assertEquals(fileLedgerFactory.groupIDs().get(0), "myGroup");
     }
 
     @Test
     public void testAppend() throws Exception{
+        Map<String, File> fileRelativePath;
         GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
         Common.Block block = factory.getGenesisBlock("myGroup");
-        Assert.assertSame(new File(dir).length(), 0);
+        fileRelativePath = IoUtil.getFileRelativePath(dir);
+        Assert.assertSame(fileRelativePath.get("chains/chains/myGroup/blockfile000000").length(), (long) 0);
         fileLedger.append(block);
-        Assert.assertNotSame(new File(dir).length(), 0);
+        fileRelativePath = IoUtil.getFileRelativePath(dir);
+        Assert.assertNotSame(fileRelativePath.get("chains/chains/myGroup/blockfile000001").length(), (long) 0);
+        byte[] bytes = new byte[1024];
+        FileInputStream fis = new FileInputStream(fileRelativePath.get("chains/chains/myGroup/blockfile000001"));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        int num = 0;
+        while((num = fis.read(bytes)) != -1){
+            baos.write(bytes, 0, num);
+        }
+        soutBytes(baos.toByteArray());
+    }
+
+    @Test
+    public void testHeight() throws Exception{
+        Common.Block block;
+        Assert.assertSame(fileLedger.height(), (long) 0);
+        GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
+        block = factory.getGenesisBlock("myGroup");
+        fileLedger.append(block);
+        Assert.assertSame(fileLedger.height(), (long) 1);
+        block = Common.Block.newBuilder()
+                .setHeader(Common.BlockHeader.newBuilder()
+                        .setNumber(1)
+                        .build())
+                .setMetadata(Common.BlockMetadata.newBuilder()
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .build())
+                .build();
+        fileLedger.append(block);
+        Assert.assertSame(fileLedger.height(), (long) 2);
     }
 
     @After
@@ -81,5 +120,17 @@ public class FileLedgerTest {
             }
         }
         return dir.delete();
+    }
+
+    private void soutBytes(byte[] bytes) throws Exception{
+        int i = 0;
+        for (byte aByte : bytes) {
+            i++;
+            System.out.print(aByte + "\t");
+            if(i > 30){
+                System.out.println();
+                i = 0;
+            }
+        }
     }
 }

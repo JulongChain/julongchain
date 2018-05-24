@@ -40,7 +40,7 @@ public class Provider {
      */
     public static Provider newProvider() throws LedgerException {
         Provider provider = new Provider();
-        String dbPath = KvLedger.getConfig().getPvtDataStorePath();
+        String dbPath = LedgerConfig.getPvtDataStorePath();
         provider.db = LevelDBProvider.newProvider(dbPath);
         logger.debug("Create pvtprovider using path = " + provider.getDb().getDbPath());
         return provider;

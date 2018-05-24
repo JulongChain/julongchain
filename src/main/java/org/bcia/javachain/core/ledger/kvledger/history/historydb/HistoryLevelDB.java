@@ -66,7 +66,7 @@ public class HistoryLevelDB implements IHistoryDB {
      * 新建historyDBProvider
      */
     public static HistoryLevelDBProvider newHistoryDBProvider() throws LedgerException {
-        String dbPath = KvLedger.getConfig().getHistoryDBPath();
+        String dbPath = LedgerConfig.getHistoryLevelDBPath();
         HistoryLevelDBProvider provider = new HistoryLevelDBProvider();
         provider.setProvider(LevelDBProvider.newProvider(dbPath));
         logger.debug(String.format("Create historyDB using dbPath = %s", provider.getProvider().getDbPath()));

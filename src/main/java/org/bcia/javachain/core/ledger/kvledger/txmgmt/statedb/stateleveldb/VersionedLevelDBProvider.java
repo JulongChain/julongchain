@@ -40,7 +40,7 @@ public class VersionedLevelDBProvider implements IVersionedDBProvider {
     private IDBProvider db;
 
     public static IVersionedDBProvider newVersionedDBProvider() throws LedgerException{
-        String dbPath = KvLedger.getConfig().getVersionedDBPath();
+        String dbPath = LedgerConfig.getStateLevelDBPath();
         VersionedLevelDBProvider vdbProvider =  new VersionedLevelDBProvider();
         vdbProvider.setDb(LevelDBProvider.newProvider(dbPath));
         logger.debug("Create vdb using path " + vdbProvider.getDb().getDbPath());

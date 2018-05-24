@@ -71,7 +71,7 @@ public class BlockFileManager {
         logger.debug(String.format("newBlockfileMgr() initializing file-based block storage for ledger: %s", id));
         //根据配置文件、id生成rootDir
         mgr.setLedgerId(id);
-        mgr.setBlockFileDir(KvLedger.getConfig().getChainPath() + File.separator + id);
+        mgr.setBlockFileDir(LedgerConfig.getChainsPath() + File.separator + id);
         mgr.setDb(indexStore);
         mgr.setLock(new ReentrantLock());
         mgr.setCpInfo(mgr.loadCurrentInfo());
@@ -200,7 +200,7 @@ public class BlockFileManager {
         //总共添加的长度
         long totalBytesToAppend = blockBytesLen + blockBytesLenEncoded.length;
         //配置的最大文件长度
-        long maxBlockFileSize = KvLedger.getConfig().getMaxBlockfileSize();
+        long maxBlockFileSize = LedgerConfig.getMaxBlockfileSize();
         //总长度大于配置的文件长度,重新开启新文件
         if(currentOffset + totalBytesToAppend > maxBlockFileSize){
             moveToNextFile();

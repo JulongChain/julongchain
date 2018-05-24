@@ -48,9 +48,9 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
      */
     public static IBlockStoreProvider newProvider(IndexConfig indexConfig) throws LedgerException {
         FsBlockStoreProvider provider = new FsBlockStoreProvider();
-        provider.setLeveldbProvider(LevelDBProvider.newProvider(KvLedger.getConfig().getIndexPath()));
+        provider.setLeveldbProvider(LevelDBProvider.newProvider(LedgerConfig.getIndexPath()));
         provider.setIndexConfig(indexConfig);
-        logger.debug("Createing fsBlockStore using path = " + KvLedger.getConfig().getChainPath());
+        logger.debug("Createing fsBlockStore using path = " + LedgerConfig.getChainsPath());
         return provider;
     }
 
@@ -76,7 +76,7 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
      */
     @Override
     public Boolean exists(String ledgerid) {
-         return IoUtil.fileExists(KvLedger.getConfig().getChainPath() + ledgerid) >= 0;
+         return IoUtil.fileExists(LedgerConfig.getChainsPath() + ledgerid) >= 0;
     }
 
     /**
@@ -84,7 +84,7 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
     */
     @Override
     public List<String> list() {
-        return IoUtil.listSubdirs(KvLedger.getConfig().getChainPath());
+        return IoUtil.listSubdirs(LedgerConfig.getChainsPath());
     }
 
     /**

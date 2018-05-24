@@ -54,7 +54,7 @@ public class KvLedger implements INodeLedger {
     private IBlockStore blockStore;
     private ITxManager txtmgmt;
     private IHistoryDB historyDB;
-    private final static Config config = new Config();
+//    private final static Config config = new Config();
 
     /** NewKVLedger constructs new `KVLedger`
      *
@@ -431,9 +431,5 @@ public class KvLedger implements INodeLedger {
 
     public void setHistoryDB(IHistoryDB historyDB) {
         this.historyDB = historyDB;
-    }
-
-    public static Config getConfig() {
-        return config;
     }
 }
