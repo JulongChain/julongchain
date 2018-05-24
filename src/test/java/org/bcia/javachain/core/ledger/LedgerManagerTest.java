@@ -106,7 +106,7 @@ public class LedgerManagerTest {
 //        Common.Block block = factory.getGenesisBlock("MyGroup");
 //        l = LedgerManager.createLedger(block);
         LedgerManager.initialize(null);
-        l = LedgerManager.openLedger("mytestgroupid1");
+        l = LedgerManager.openLedger("mytestgroupid2");
         long i = 0;
         while(true){
             if(l.getBlockByNumber(i) == null){
@@ -175,7 +175,7 @@ public class LedgerManagerTest {
     @Test
     public void showBlocks() throws Exception{
         LedgerManager.initialize(null);
-        l = LedgerManager.openLedger(groupID);
+        l = LedgerManager.openLedger("mytestgroupid2");
         for (int i = 0;; i++) {
             Common.Block block = l.getBlockByNumber(i);
             if(block == null){
