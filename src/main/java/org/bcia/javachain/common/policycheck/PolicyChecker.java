@@ -29,6 +29,7 @@ import org.bcia.javachain.common.policycheck.policies.IChannelPolicyManagerGette
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.IIdentityDeserializer;
+import org.bcia.javachain.msp.mgmt.IMspPrincipalGetter;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.MspPrincipal;
 import org.bcia.javachain.protos.node.ProposalPackage;
@@ -48,10 +49,10 @@ public class PolicyChecker implements IPolicyChecker{
 
     private IChannelPolicyManagerGetter IChannelPolicyManagerGetter;
     private IIdentityDeserializer localMSP;
-    private MspPrincipal.MSPPrincipal principalGetter;
+    private IMspPrincipalGetter principalGetter;
 
 
-    public PolicyChecker(IChannelPolicyManagerGetter IChannelPolicyManagerGetter, IIdentityDeserializer localMSP, MspPrincipal.MSPPrincipal principalGetter) {
+    public PolicyChecker(org.bcia.javachain.common.policycheck.policies.IChannelPolicyManagerGetter IChannelPolicyManagerGetter, IIdentityDeserializer localMSP, IMspPrincipalGetter principalGetter) {
         this.IChannelPolicyManagerGetter = IChannelPolicyManagerGetter;
         this.localMSP = localMSP;
         this.principalGetter = principalGetter;
@@ -144,7 +145,7 @@ public class PolicyChecker implements IPolicyChecker{
         }
         MspPrincipal.MSPPrincipal principal = null;
         try {
-            principal = this.principalGetter.getDefaultInstanceForType();
+            principal = this.principalGetter.get(policyName);
         }catch (Exception e){
             log.info("Failed getting local MSP principal during channelless check policy with policy ["+policyName+"]");
             e.printStackTrace();
