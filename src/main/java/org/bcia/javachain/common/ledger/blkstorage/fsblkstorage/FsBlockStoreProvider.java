@@ -24,6 +24,11 @@ import org.bcia.javachain.common.ledger.util.IoUtil;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.kvledger.KvLedger;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
+import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
+
+import java.util.List;
 
 /**
  * 操作blockchain文件系统类
@@ -35,19 +40,17 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 public class FsBlockStoreProvider implements IBlockStoreProvider {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(FsBlockStoreProvider.class);
 
-    private Conf conf;
     private IndexConfig indexConfig;
     private IDBProvider leveldbProvider;
 
     /**
      * 创建文件系统操作类
      */
-    public static IBlockStoreProvider newProvider(Conf conf, IndexConfig indexConfig) throws LedgerException {
+    public static IBlockStoreProvider newProvider(IndexConfig indexConfig) throws LedgerException {
         FsBlockStoreProvider provider = new FsBlockStoreProvider();
-        provider.setLeveldbProvider(LevelDBProvider.newProvider(conf.getIndexDir()));
-        provider.setConf(conf);
+        provider.setLeveldbProvider(LevelDBProvider.newProvider(KvLedger.getConfig().getIndexPath()));
         provider.setIndexConfig(indexConfig);
-        logger.debug("Createing fsBlockStore using path = " + conf.getChainsDir());
+        logger.debug("Createing fsBlockStore using path = " + KvLedger.getConfig().getChainPath());
         return provider;
     }
 
@@ -65,7 +68,7 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
      */
     @Override
     public IBlockStore openBlockStore(String ledgerid) throws LedgerException {
-        return FsBlockStore.newFsBlockStore(ledgerid, conf, indexConfig, leveldbProvider);
+        return FsBlockStore.newFsBlockStore(ledgerid, indexConfig, leveldbProvider);
     }
 
     /**
@@ -73,15 +76,15 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
      */
     @Override
     public Boolean exists(String ledgerid) {
-         return IoUtil.fileExists(conf.getLedgerBlockDir(ledgerid)) >= 0;
+         return IoUtil.fileExists(KvLedger.getConfig().getChainPath() + ledgerid) >= 0;
     }
 
     /**
      * 列出存在的文件系统id
     */
     @Override
-    public String[] list() {
-        return IoUtil.listSubdirs(conf.getChainsDir());
+    public List<String> list() {
+        return IoUtil.listSubdirs(KvLedger.getConfig().getChainPath());
     }
 
     /**
@@ -90,14 +93,6 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
     @Override
     public void close() throws LedgerException {
         leveldbProvider.close();
-    }
-
-    public Conf getConf() {
-        return conf;
-    }
-
-    public void setConf(Conf conf) {
-        this.conf = conf;
     }
 
     public IndexConfig getIndexConfig() {

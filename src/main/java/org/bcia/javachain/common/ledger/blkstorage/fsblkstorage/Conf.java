@@ -26,34 +26,37 @@ import java.io.File;
  */
 public class Conf {
 
-    private String blockStorageDir;
-    private Integer maxBlockfileSize;
+//    private String blockStorageDir;
+//    private Integer maxBlockfileSize;
+//
+//    public String getIndexDir() {
+//        return blockStorageDir + File.separator + Config.INDEX_DIR;
+//    }
+//
+//    public String getChainsDir() {
+//        return blockStorageDir + File.separator + Config.CHAINS_DIR;
+//    }
+//
+//    public String getLedgerBlockDir(String ledgerid) {
+//        return getChainsDir() + File.separator + ledgerid;
+//    }
+//
+//    public String getBlockStorageDir() {
+//        return blockStorageDir;
+//    }
+//
+//    public void setBlockStorageDir(String blockStorageDir) {
+//        this.blockStorageDir = blockStorageDir;
+//    }
+//
+//    public Integer getMaxBlockfileSize() {
+//        return maxBlockfileSize;
+//    }
+//
+//    public void setMaxBlockfileSize(Integer maxBlockfileSize) {
+//        this.maxBlockfileSize = maxBlockfileSize;
+//    }
+    public Conf(String a){
 
-    public String getIndexDir() {
-        return blockStorageDir + File.separator + Config.INDEX_DIR;
-    }
-
-    public String getChainsDir() {
-        return blockStorageDir + File.separator + Config.CHAINS_DIR;
-    }
-
-    public String getLedgerBlockDir(String ledgerid) {
-        return getChainsDir() + File.separator + ledgerid;
-    }
-
-    public String getBlockStorageDir() {
-        return blockStorageDir;
-    }
-
-    public void setBlockStorageDir(String blockStorageDir) {
-        this.blockStorageDir = blockStorageDir;
-    }
-
-    public Integer getMaxBlockfileSize() {
-        return maxBlockfileSize;
-    }
-
-    public void setMaxBlockfileSize(Integer maxBlockfileSize) {
-        this.maxBlockfileSize = maxBlockfileSize;
     }
 }

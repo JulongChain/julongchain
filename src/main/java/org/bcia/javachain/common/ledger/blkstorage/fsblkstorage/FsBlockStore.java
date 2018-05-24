@@ -35,17 +35,14 @@ import org.bcia.javachain.protos.node.TransactionPackage;
 public class FsBlockStore implements IBlockStore {
 
     private String id;
-    private Conf conf;
     private BlockFileManager blockFileManager;
 
     public static FsBlockStore newFsBlockStore(String id,
-                                               Conf conf,
                                                IndexConfig indexConfig,
                                                IDBProvider dbHandle) throws LedgerException {
         FsBlockStore fsBlockStore = new FsBlockStore();
-        BlockFileManager mgr = BlockFileManager.newBlockfileMgr(id, conf, indexConfig, dbHandle);
+        BlockFileManager mgr = BlockFileManager.newBlockfileMgr(id, indexConfig, dbHandle);
         fsBlockStore.setId(id);
-        fsBlockStore.setConf(conf);
         fsBlockStore.setBlockFileManager(mgr);
         return fsBlockStore;
     }
@@ -111,14 +108,6 @@ public class FsBlockStore implements IBlockStore {
 
     public void setId(String id) {
         this.id = id;
-    }
-
-    public Conf getConf() {
-        return conf;
-    }
-
-    public void setConf(Conf conf) {
-        this.conf = conf;
     }
 
     public BlockFileManager getBlockFileManager() {

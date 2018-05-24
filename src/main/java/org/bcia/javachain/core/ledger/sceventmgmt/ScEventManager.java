@@ -15,7 +15,9 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.sceventmgmt;
 
+import javassist.compiler.Javac;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.IStateListener;
@@ -33,8 +35,9 @@ import java.util.Map;
  * @date 2018/04/09
  * @company Dingxuan
  */
-public class ScEventManager implements IStateListener {
+public class ScEventManager {
     private static final JavaChainLog logger  = JavaChainLogFactory.getLog(ScEventManager.class);
+
     private ISmartContractInfoProvider infoProvider = new SmartContractInfoProviderImpl();
     private Map<String, ISmartContractLifecycleEventListener> scLifecycleListeners = new HashMap<>();
     private Map<String, SmartContractDefinition[]> latesSmartContractDeploys = new HashMap<>();
@@ -117,7 +120,7 @@ public class ScEventManager implements IStateListener {
      * @param smartContractDefinition
      * @param dbArtifactsTar
      */
-    private void invokeHandler(String ledgerID, SmartContractDefinition smartContractDefinition, byte[] dbArtifactsTar){
+    private void invokeHandler(String ledgerID, SmartContractDefinition smartContractDefinition, byte[] dbArtifactsTar) throws JavaChainException {
         ISmartContractLifecycleEventListener listener = scLifecycleListeners.get(ledgerID);
         if(listener == null){
             return;
@@ -143,11 +146,6 @@ public class ScEventManager implements IStateListener {
             }
         }
         return false;
-    }
-
-    @Override
-    public void handleStateUpdates(String ledgerID, List<KvRwset.KVWrite> stateUpdates) {
-
     }
 
     public ISmartContractInfoProvider getInfoProvider() {

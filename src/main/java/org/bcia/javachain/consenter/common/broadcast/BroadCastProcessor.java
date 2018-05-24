@@ -15,7 +15,6 @@
  */
 package org.bcia.javachain.consenter.common.broadcast;
 
-import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Conf;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.consenter.Consenter;

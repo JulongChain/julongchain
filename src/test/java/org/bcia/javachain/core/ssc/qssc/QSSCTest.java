@@ -12,6 +12,7 @@ import org.bcia.javachain.core.aclmgmt.MockAclProvider;
 import org.bcia.javachain.core.aclmgmt.resources.Resources;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
 import org.bcia.javachain.core.ledger.INodeLedger;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.node.util.NodeUtils;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
 import org.bcia.javachain.core.smartcontract.shim.impl.MockStub;
@@ -296,7 +297,7 @@ public class QSSCTest extends BaseJunit4Test {
         MockAclProvider aclProvider=new MockAclProvider();
         aclProvider.reset();
         //先删除账本
-        FileUtils.deleteDir(new File(Config.getPath()));
+        FileUtils.deleteDir(new File(LedgerConfig.getRootPath()));
         //待与周辉的接口进行对接，需要建立账本，以支持后续的查询
         try {
             Node.getInstance().mockInitialize();

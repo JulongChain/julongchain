@@ -29,6 +29,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Optional;
 
 /**
  * 类描述
@@ -47,7 +48,7 @@ public class LedgerManagerTest {
     private static boolean deleteDir(File dir) {
         if (dir.isDirectory()) {
             String[] children = dir.list();
-            for (int i=0; i<children.length; i++) {
+            for (int i = 0; i < children.length; i++) {
                 boolean success = deleteDir(new File(dir, children[i]));
                 if (!success) {
                     return false;
@@ -59,21 +60,21 @@ public class LedgerManagerTest {
 
     @After
     public void after(){
-        System.out.println(((KvLedger) l).getLedgerID());
+//        System.out.println(((KvLedger) l).getLedgerID());
     }
 
     @Test
     public void delete(){
-        System.out.println(deleteDir(new File(Config.getPath())));
+        System.out.println(deleteDir(new File(LedgerConfig.getRootPath())));
     }
 
     @Test
     public void createLedger() throws Exception {
         GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
-        System.out.println(deleteDir(new File(Config.getPath())));
+        System.out.println(deleteDir(new File(LedgerConfig.getRootPath())));
         long before = System.currentTimeMillis();
         LedgerManager.initialize(null);
-        Common.Block block = factory.getGenesisBlock("mytestgroupid1");
+        Common.Block block = factory.getGenesisBlock("myGroup");
         l = LedgerManager.createLedger(block);
         block = factory.getGenesisBlock("mytestgroupid2");
         l = LedgerManager.createLedger(block);
@@ -91,10 +92,10 @@ public class LedgerManagerTest {
     @Test
     public void openLedger() throws Exception{
         LedgerManager.initialize(null);
-        String ledgerId1 = "mytestgroupid1";
+        String ledgerId1 = "myGroup";
         String ledgerId2 = "mytestgroupid2";
         l = LedgerManager.openLedger(ledgerId1);
-        System.out.println(l.getTransactionByID("8"));
+//        System.out.println(l.getTransactionByID("8"));
     }
 
     @Test

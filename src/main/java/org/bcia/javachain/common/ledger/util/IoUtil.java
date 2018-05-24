@@ -69,8 +69,19 @@ public class IoUtil {
      * @param dirPath
      * @return
      */
-    public static String[] listSubdirs(String dirPath) {
-        return null;
+    public static List<String> listSubdirs(String dirPath) {
+        List<String> list = new ArrayList<>();
+        File dir = new File(dirPath);
+        if(!dir.exists()){
+            logger.debug("Dir {} is not exists", dir);
+            return null;
+        }
+        for (File file : dir.listFiles()) {
+            if(file.isDirectory()){
+                list.add(file.getName());
+            }
+        }
+        return list;
     }
 
     public static void logDirStatus(String msg, String dirPath) {
@@ -210,12 +221,7 @@ public class IoUtil {
             logger.debug("Input must be a directory, but file {} is not", path);
             return null;
         }
-        Map<String, File> result = new TreeMap<>(new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) {
-                return o1.compareTo(o2);
-            }
-        });
+        Map<String, File> result = new TreeMap<>(Comparator.naturalOrder());
         Queue<File> queue = new LinkedList<>();
         queue.add(file);
         while(queue.size() > 0){
@@ -230,6 +236,48 @@ public class IoUtil {
             }
         }
         return result;
+    }
+
+    /**
+     * 关闭流
+     */
+    private static void closeStream(FileInputStream fis,
+                             FileOutputStream fos,
+                             TarArchiveInputStream tais,
+                             TarArchiveOutputStream taos,
+                             ByteArrayInputStream bais,
+                             ByteArrayOutputStream baos,
+                             GZIPInputStream gzis,
+                             GZIPOutputStream gzos) throws JavaChainException{
+        try {
+            if(fis != null){
+                fis.close();
+            }
+            if(fos != null){
+                fos.close();
+            }
+            if(tais != null){
+                tais.close();
+            }
+            if(taos != null){
+                taos.close();
+            }
+            if(bais != null){
+                bais.close();
+            }
+            if(baos != null){
+                baos.close();
+            }
+            if(gzis != null){
+                gzis.close();
+            }
+            if(gzos != null){
+                gzos.close();
+            }
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+            throw new JavaChainException(e);
+        }
     }
 
     /**
@@ -265,14 +313,7 @@ public class IoUtil {
             logger.error(e.getMessage(), e);
             throw new JavaChainException(e);
         } finally {
-            try {
-                baos.close();
-                taos.close();
-                fis.close();
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-                throw new JavaChainException(e);
-            }
+            closeStream(fis, null, null, taos, null, baos, null, null);
         }
         return baos.toByteArray();
     }
@@ -295,13 +336,7 @@ public class IoUtil {
             logger.error(e.getMessage(), e);
             throw new JavaChainException(e);
         } finally {
-            try {
-                baos.close();
-                gzos.close();
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-                throw new JavaChainException(e);
-            }
+            closeStream(null, null, null, null, null, baos, null, gzos);
         }
         return baos.toByteArray();
     }
@@ -336,14 +371,7 @@ public class IoUtil {
             logger.error(e.getMessage(), e);
             throw new JavaChainException(e);
         } finally {
-            try {
-                baos.close();
-                bais.close();
-                tais.close();
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-                throw new JavaChainException(e);
-            }
+            closeStream(null, null, tais, null, bais, baos, null, null);
         }
         return result;
     }
@@ -371,14 +399,7 @@ public class IoUtil {
             logger.error(e.getMessage(), e);
             throw new JavaChainException(e);
         } finally {
-            try {
-                bais.close();
-                gzis.close();
-                baos.close();
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-                throw new JavaChainException(e);
-            }
+            closeStream(null, null, null, null, bais, baos, gzis, null);
         }
         return baos.toByteArray();
     }

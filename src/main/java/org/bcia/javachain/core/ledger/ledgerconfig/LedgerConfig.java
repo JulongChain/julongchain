@@ -34,56 +34,81 @@ public class LedgerConfig {
     private static final String CONF_STATE_LEVELDB = "stateLeveldb";
     private static final String CONF_HISTORY_LEVELDB = "historyLeveldb";
     private static final String CONF_PVT_WRITESET_STORE = "pvtWritesetStore";
-    private static final String CONF_CHAINS = "chains";
+    private static final String CONF_CHAINS = "chains" + File.separator + "chains";
+    private static final String CONF_INDEX = "chains" + File.separator + "index";
     private static final String CONF_PVTDATA_STORE = "pvtdataStore";
     private static final String CONF_QUERY_LIMIT = "ledger.state.couchDBconfig.queryLimit";
     private static final String CONF_ENABLE_HISTORY_DATABASE = "ledger.history.enableHistoryDatabase";
     private static final String CONF_MAX_BATCH_SIZE = "ledger.state.couchDBconfig.maxBatchUpdateSize";
     private static final String CONF_AUTO_WARM_INDEXES = "ledger.state.couchDBconfig.autoWarmIndexes";
     private static final String CONF_WARM_INDEXES_AFTER_N_BLOCKS = "ledger.state.couchDBConfig.warmIndexesAfterNBlocks";
+    private static final String DEFAULT_ROOT_DIR = "/var/javachain";
+    private static String ROOT_DIR = DEFAULT_ROOT_DIR;
+    private static final int DEFAULT_MAX_BLOCKFILE_SIZE = 64 * 1024 * 1024;
+    private static int MAX_BLOCKFILE_SIZE;
 
     public static boolean isCouchDBEnable(){
         return false;
     }
 
+    public static boolean isHistoryDBEnabled(){
+        return true;
+    }
+
     public static String getRootPath(){
-        return join(Config.getPath(), CONF_LEDGERS_DATA);
+        return ROOT_DIR;
     }
 
     public static String getLedgerProviderPath(){
-        return join(getRootPath(), CONF_LEDGER_PROVIDER);
+        return join(ROOT_DIR, CONF_LEDGER_PROVIDER);
     }
 
     public static String getStateLevelDBPath(){
-        return join(getRootPath(), CONF_STATE_LEVELDB);
+        return join(ROOT_DIR, CONF_STATE_LEVELDB);
     }
 
     public static String getHistoryLevelDBPath(){
-        return join(getRootPath(), CONF_HISTORY_LEVELDB);
+        return join(ROOT_DIR, CONF_HISTORY_LEVELDB);
     }
 
     public static String getPvtWritesetStorePath(){
-        return join(getRootPath(), CONF_PVT_WRITESET_STORE);
+        return join(ROOT_DIR, CONF_PVT_WRITESET_STORE);
     }
 
     public static String getBlockStorePath(){
-        return join(getRootPath(), CONF_CHAINS);
+        return join(ROOT_DIR, CONF_CHAINS);
     }
 
     public static String getPvtDataStorePath(){
-        return join(getRootPath(), CONF_PVTDATA_STORE);
+        return join(ROOT_DIR, CONF_PVTDATA_STORE);
+    }
+
+    public static String getIndexPath(){
+        return join(ROOT_DIR, CONF_INDEX);
+    }
+
+    public static String getChainsPath(){
+        return join(ROOT_DIR, CONF_CHAINS);
     }
 
     public static int getMaxBlockfileSize(){
-        return Config.DEFAULT_MAX_BLOCKFILE_SIZE;
+        return MAX_BLOCKFILE_SIZE;
     }
 
     public static int getMaxDegreeQueryReadsHashing(){
         return 50;
     }
 
-    public static boolean isHistoryDBEnabled(){
-        return true;
+    public static void setMaxBlockfileSize(int maxBlockfileSize){
+        MAX_BLOCKFILE_SIZE = maxBlockfileSize;
+    }
+
+    public static void setRootPath(String rootPath){
+        if(rootPath == null){
+            ROOT_DIR = DEFAULT_ROOT_DIR;
+        } else {
+            ROOT_DIR = rootPath;
+        }
     }
 
     private static String join(String... itms){

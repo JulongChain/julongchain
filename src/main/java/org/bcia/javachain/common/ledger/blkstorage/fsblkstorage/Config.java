@@ -25,7 +25,7 @@ import java.util.Random;
  * @company Dingxuan
  */
 public class Config {
-    public static final String OFFICE_PATH = "/var/javachain";
+//    public static final String OFFICE_PATH = "/var/javachain";
     public static final String CHAINS_DIR = "chains";
     public static final String INDEX_DIR = "index";
     public static final Integer DEFAULT_MAX_BLOCKFILE_SIZE = 64 * 1024 * 1024;
@@ -34,13 +34,13 @@ public class Config {
         if(maxBlockfileSize <= 0) {
             maxBlockfileSize = DEFAULT_MAX_BLOCKFILE_SIZE;
         }
-        Conf conf = new Conf();
-        conf.setBlockStorageDir(blockStorageDir);
-        conf.setMaxBlockfileSize(maxBlockfileSize);
-        return conf;
+//        Conf conf = new Conf();
+//        conf.setBlockStorageDir(blockStorageDir);
+//        conf.setMaxBlockfileSize(maxBlockfileSize);
+        return null;
     }
 
     public static String getPath(){
-        return OFFICE_PATH;
+        return null;
     }
 }

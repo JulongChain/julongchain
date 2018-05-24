@@ -20,6 +20,7 @@ import org.bcia.javachain.common.ledger.util.IDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.kvledger.KvLedger;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 
 /**
@@ -39,7 +40,7 @@ public class Provider {
      */
     public static Provider newProvider() throws LedgerException {
         Provider provider = new Provider();
-        String dbPath = LedgerConfig.getPvtDataStorePath();
+        String dbPath = KvLedger.getConfig().getPvtDataStorePath();
         provider.db = LevelDBProvider.newProvider(dbPath);
         logger.debug("Create pvtprovider using path = " + provider.getDb().getDbPath());
         return provider;

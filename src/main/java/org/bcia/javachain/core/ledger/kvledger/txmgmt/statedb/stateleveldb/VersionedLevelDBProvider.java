@@ -20,9 +20,11 @@ import org.bcia.javachain.common.ledger.util.IDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.kvledger.KvLedger;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IVersionedDBProvider;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
+import org.bcia.javachain.core.ledger.sceventmgmt.KVLedgerLSSCStateListener;
 
 /**
  * 提供leveldb实现的VersionDB辅助
@@ -38,7 +40,7 @@ public class VersionedLevelDBProvider implements IVersionedDBProvider {
     private IDBProvider db;
 
     public static IVersionedDBProvider newVersionedDBProvider() throws LedgerException{
-        String dbPath = LedgerConfig.getStateLevelDBPath();
+        String dbPath = KvLedger.getConfig().getVersionedDBPath();
         VersionedLevelDBProvider vdbProvider =  new VersionedLevelDBProvider();
         vdbProvider.setDb(LevelDBProvider.newProvider(dbPath));
         logger.debug("Create vdb using path " + vdbProvider.getDb().getDbPath());

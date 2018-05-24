@@ -45,7 +45,7 @@ import java.util.Map;
  * @date 2018/04/09
  * @company Dingxuan
  */
-public class StoreIBlockStore implements IBlockStore {
+public class Store implements IBlockStore {
     private IStore pvtdataStore = null;
     private IBlockStore blkStorage = null;
 
@@ -62,8 +62,7 @@ public class StoreIBlockStore implements IBlockStore {
         IndexConfig indexConfig = new IndexConfig();
         indexConfig.setAttrsToIndex(attrsToIndex);
         //文件系统初始化参数
-        Conf conf = Config.newConf(LedgerConfig.getBlockStorePath(), LedgerConfig.getMaxBlockfileSize());
-        IBlockStoreProvider IBlockStoreProvider = FsBlockStoreProvider.newProvider(conf, indexConfig);
+        IBlockStoreProvider IBlockStoreProvider = FsBlockStoreProvider.newProvider(indexConfig);
         provider.setBlkStoreProvider(IBlockStoreProvider);
         //pvtdata初始化
         org.bcia.javachain.core.ledger.pvtdatastorage.Provider pvtDataStoreProvider =

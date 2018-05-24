@@ -15,6 +15,7 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.statecouchdb;
 
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -49,12 +50,13 @@ public class VersionedCouchDB implements IVersionedDB, ISmartContractLifecycleEv
             BINARY_WRAPPER, ID_FIELD, REV_FIELD, VERSION_FIELD, DELETED_FIELD
     };
     private static final Map<String, Boolean> dbArtifactsDirFilter = new HashMap<>();
+    private final int QUERY_SKIP = 0;
 
     static{
         dbArtifactsDirFilter.put("META-INF/statedb/couchdb/indexes", true);
     }
 
-    private final int QUERY_SKIP = 0;
+    private String groupName;
 
     public VersionedCouchDB newVersionedCouchDB(){
 
@@ -117,8 +119,11 @@ public class VersionedCouchDB implements IVersionedDB, ISmartContractLifecycleEv
     }
 
     @Override
-    public void handleSmartContractDeploy(SmartContractDefinition smartContractDefinition, byte[] dbArtifactsTar) {
-
+    public void handleSmartContractDeploy(SmartContractDefinition smartContractDefinition, byte[] dbArtifactsTar) throws JavaChainException {
+        log.debug("Enterint handleSmartContractDeploy()");
+        if(smartContractDefinition == null){
+            throw new JavaChainException("Found null smartContractDefinition while creating couchdb index on group " + groupName);
+        }
     }
 
     public static String getBinaryWrapper() {

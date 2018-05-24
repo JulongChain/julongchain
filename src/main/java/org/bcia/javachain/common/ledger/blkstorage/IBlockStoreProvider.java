@@ -17,6 +17,8 @@ package org.bcia.javachain.common.ledger.blkstorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
 
+import java.util.List;
+
 /**
  * 操作区块文件接口
  *
@@ -32,7 +34,7 @@ public interface IBlockStoreProvider {
 
     Boolean exists(String ledgerid) throws LedgerException;
 
-    String[] list() throws LedgerException;
+    List<String> list() throws LedgerException;
 
     void close() throws LedgerException;
 

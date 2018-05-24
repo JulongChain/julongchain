@@ -48,7 +48,7 @@ public class IdStore {
      */
     public static IdStore openIDStore() throws LedgerException{
         IdStore idStore = new IdStore();
-        String dbPath = LedgerConfig.getLedgerProviderPath();
+        String dbPath = KvLedger.getConfig().getIdStorePath();
         idStore.setProvider(LevelDBProvider.newProvider(dbPath));
         logger.debug("Create idstore using path = " + idStore.getProvider().getDbPath());
         return idStore;

@@ -24,6 +24,7 @@ import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
+import org.bcia.javachain.core.ledger.kvledger.KvLedger;
 import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.util.TxValidationFlags;
@@ -65,7 +66,7 @@ public class HistoryLevelDB implements IHistoryDB {
      * 新建historyDBProvider
      */
     public static HistoryLevelDBProvider newHistoryDBProvider() throws LedgerException {
-        String dbPath = LedgerConfig.getHistoryLevelDBPath();
+        String dbPath = KvLedger.getConfig().getHistoryDBPath();
         HistoryLevelDBProvider provider = new HistoryLevelDBProvider();
         provider.setProvider(LevelDBProvider.newProvider(dbPath));
         logger.debug(String.format("Create historyDB using dbPath = %s", provider.getProvider().getDbPath()));

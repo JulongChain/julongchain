@@ -15,6 +15,8 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.sceventmgmt;
 
+import org.bcia.javachain.common.exception.JavaChainException;
+
 /**
  * 用于分类账本组件以及监听智能合约生命周期
  *
@@ -23,5 +25,5 @@ package org.bcia.javachain.core.ledger.sceventmgmt;
  * @company Dingxuan
  */
 public interface ISmartContractLifecycleEventListener {
-    void handleSmartContractDeploy(SmartContractDefinition smartContractDefinition, byte[] dbArtifactsTar);
+    void handleSmartContractDeploy(SmartContractDefinition smartContractDefinition, byte[] dbArtifactsTar) throws JavaChainException;
 }

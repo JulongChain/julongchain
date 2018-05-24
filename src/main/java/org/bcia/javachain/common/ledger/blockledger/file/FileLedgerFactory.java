@@ -26,6 +26,7 @@ import org.bcia.javachain.common.ledger.blockledger.IFactory;
 import org.bcia.javachain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 
 import java.util.*;
 
@@ -45,7 +46,9 @@ public class FileLedgerFactory implements IFactory {
     public FileLedgerFactory(String directory) throws LedgerException {
         IndexConfig indexConfig = new IndexConfig();
         indexConfig.setAttrsToIndex(new String[]{BlockStorage.INDEXABLE_ATTR_BLOCK_NUM});
-        this.blkStorageProvider = FsBlockStoreProvider.newProvider(Config.newConf(directory, -1), indexConfig);
+        LedgerConfig.setRootPath(directory);
+        LedgerConfig.setMaxBlockfileSize(-1);
+        this.blkStorageProvider = FsBlockStoreProvider.newProvider(indexConfig);
         ledgers = new HashMap<>();
     }
 

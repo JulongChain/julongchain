@@ -35,10 +35,10 @@ public class Provider {
     private IBlockStoreProvider blkStoreProvider;
     private org.bcia.javachain.core.ledger.pvtdatastorage.Provider pvtDataStoreProvider;
 
-    public StoreIBlockStore open(String ledgerID) throws LedgerException {
+    public Store open(String ledgerID) throws LedgerException {
         IBlockStore blockStore = blkStoreProvider.openBlockStore(ledgerID);
         IStore pvtDataStore = pvtDataStoreProvider.openStore(ledgerID);
-        StoreIBlockStore store = new StoreIBlockStore();
+        Store store = new Store();
         store.setBlkStorage(blockStore);
         store.setPvtdataStore(pvtDataStore);
         store.init();
