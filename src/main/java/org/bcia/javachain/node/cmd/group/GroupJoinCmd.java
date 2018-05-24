@@ -50,7 +50,7 @@ public class GroupJoinCmd extends AbstractNodeGroupCmd {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
-        String defaultValue = "UnKown";
+        String defaultValue = "unknown";
 
         String blockPath = null;
         if (cmd.hasOption(ARG_BLOCK_PATH)) {

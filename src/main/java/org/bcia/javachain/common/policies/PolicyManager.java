@@ -56,6 +56,7 @@ public class PolicyManager implements IPolicyManager {
             childManagers.put(childName, childPolicyManager);
         }
 
+        policies = new HashMap<>();
         Iterator<Map.Entry<String, Configtx.ConfigPolicy>> policiesIterator = rootTree.getPoliciesMap().entrySet().iterator();
         while (policiesIterator.hasNext()) {
             Map.Entry<String, Configtx.ConfigPolicy> entry = policiesIterator.next();

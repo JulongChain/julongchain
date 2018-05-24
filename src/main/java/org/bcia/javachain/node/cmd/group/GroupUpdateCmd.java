@@ -60,7 +60,7 @@ public class GroupUpdateCmd extends AbstractNodeGroupCmd {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
-        String defaultValue = "UnKown";
+        String defaultValue = "unknown";
 
         String consenter = null;
         if (cmd.hasOption(ARG_CONSENTER)) {

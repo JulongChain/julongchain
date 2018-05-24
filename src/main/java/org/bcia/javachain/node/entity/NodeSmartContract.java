@@ -165,7 +165,46 @@ public class NodeSmartContract {
 
     }
 
-    public void invoke() {
+    public void invoke(String ip, int port, String groupId, String scName, String scLanguage, Smartcontract
+            .SmartContractInput input) throws NodeException {
+        Smartcontract.SmartContractInvocationSpec sciSpec = SpecHelper.buildInvocationSpec(scName, input.toByteArray());
+
+        ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
+
+        byte[] creator = identity.serialize();
+
+        byte[] nonce = new byte[0];
+        try {
+            nonce = CspManager.getDefaultCsp().rng(24, null);
+        } catch (JavaChainException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        String txId = null;
+        try {
+            txId = ProposalUtils.computeProposalTxID(creator, nonce);
+        } catch (JavaChainException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException("Generate txId fail");
+        }
+
+        //build proposal
+        ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType.ENDORSER_TRANSACTION,
+                groupId, txId, sciSpec, nonce, creator, null);
+        //build signedProposal
+        ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
+
+        //背书
+        EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
+        ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
+
+        //envelop V0.25
+        BroadCastClient broadCastClient = new BroadCastClient();
+        try {
+            broadCastClient.send(ip, port, Common.Envelope.newBuilder().build(), (StreamObserver<Ab.BroadcastResponse>) this);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
 
     }
 

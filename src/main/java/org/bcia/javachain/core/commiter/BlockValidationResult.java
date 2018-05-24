@@ -31,4 +31,44 @@ public class BlockValidationResult {
     private SmartContractInstance smartContractInstance;
     private SmartContractInstance smartContractUpdateInstance;
     private String txId;
+
+    public int getTxIndex() {
+        return txIndex;
+    }
+
+    public void setTxIndex(int txIndex) {
+        this.txIndex = txIndex;
+    }
+
+    public TransactionPackage.TxValidationCode getTxValidationCode() {
+        return txValidationCode;
+    }
+
+    public void setTxValidationCode(TransactionPackage.TxValidationCode txValidationCode) {
+        this.txValidationCode = txValidationCode;
+    }
+
+    public SmartContractInstance getSmartContractInstance() {
+        return smartContractInstance;
+    }
+
+    public void setSmartContractInstance(SmartContractInstance smartContractInstance) {
+        this.smartContractInstance = smartContractInstance;
+    }
+
+    public SmartContractInstance getSmartContractUpdateInstance() {
+        return smartContractUpdateInstance;
+    }
+
+    public void setSmartContractUpdateInstance(SmartContractInstance smartContractUpdateInstance) {
+        this.smartContractUpdateInstance = smartContractUpdateInstance;
+    }
+
+    public String getTxId() {
+        return txId;
+    }
+
+    public void setTxId(String txId) {
+        this.txId = txId;
+    }
 }

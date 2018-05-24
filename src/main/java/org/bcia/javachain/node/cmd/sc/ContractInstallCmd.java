@@ -74,7 +74,7 @@ public class ContractInstallCmd extends AbstractNodeContractCmd {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
-        String defaultValue = "UnKown";
+        String defaultValue = "unknown";
 
         //-----------------------------------解析参数值-------------------------------//
         //解析出合约名称
