@@ -64,5 +64,5 @@ public interface IIdentity {
      序列化身份）或可能需要MSP验证
      * @param principal
      */
-     void satisfiesPrincipal(MspPrincipal principal);
+     void satisfiesPrincipal(MspPrincipal.MSPPrincipal principal);
 }

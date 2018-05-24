@@ -13,17 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.bcia.javachain.common.policycheck.policies;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.PolicyException;
+import org.bcia.javachain.common.policies.IPolicyProvider;
 import org.bcia.javachain.common.policies.PolicyManager;
+import org.bcia.javachain.protos.common.Configtx;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 类描述
- *
+ * 提供通道策略管理
  * @author yuanjun
- * @date 26/04/18
+ * @date 21/05/18
  * @company Aisino
  */
-public interface ChannelPolicyManagerGetter {
-    PolicyManager Manager(String channelID );
+public class ChannelPolicyManager implements IChannelPolicyManagerGetter{
+    @Override
+    public PolicyManager Manager(String channelID) throws InvalidProtocolBufferException, PolicyException {
+        Map<Integer, IPolicyProvider> providers = new HashMap<Integer, IPolicyProvider>();
+        Configtx.ConfigTree rootTree = Configtx.ConfigTree.getDefaultInstance();
+        return new PolicyManager("",providers,rootTree);
+    }
 }

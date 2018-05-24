@@ -27,6 +27,11 @@ public class SignedProposal {
     private byte[] ProposalBytes;
     private byte[] Signature;
 
+    public SignedProposal(byte[] proposalBytes, byte[] signature) {
+        ProposalBytes = proposalBytes;
+        Signature = signature;
+    }
+
     public byte[] getProposalBytes() {
         return ProposalBytes;
     }
