@@ -74,7 +74,7 @@ public class Cauthdsl {
      * @param policy
      * @return
      */
-    public static Boolean compile(Policies.SignaturePolicy policy,MspPrincipal[] identities,IIdentityDeserializer deserializer) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public static Boolean compile(Policies.SignaturePolicy policy,List<MspPrincipal.MSPPrincipal> identities,IIdentityDeserializer deserializer) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         SignedData[] signedDatas = new SignedData[policy.getNOutOf().getRulesList().size()];
         Boolean[] used = new Boolean[policy.getNOutOf().getRulesList().size()];
         if(policy == null){
@@ -88,10 +88,10 @@ public class Cauthdsl {
             }
             return Cauthdsl.confirmSignedData(signedDatas,used,polices,policy);
         }else{
-            if(policy.getSignedBy()<0 || policy.getSignedBy()>identities.length){
-                log.info("identity index out of range, requested "+policy.getSignedBy()+", but identies length is"+identities.length);
+            if(policy.getSignedBy()<0 || policy.getSignedBy()>identities.size()){
+                log.info("identity index out of range, requested "+policy.getSignedBy()+", but identies length is"+identities.size());
             }
-            MspPrincipal signedByID = identities[policy.getSignedBy()];
+            MspPrincipal.MSPPrincipal signedByID = identities.get(policy.getSignedBy());
             return Cauthdsl.confirmSignedData1(signedDatas,used,signedByID,deserializer,policy);
         }
 
@@ -129,7 +129,7 @@ public class Cauthdsl {
         return verified>=N;
     }
 
-    public static boolean confirmSignedData1(SignedData[] signedDatas, Boolean[] used, MspPrincipal signedByID, IIdentityDeserializer deserializer,Policies.SignaturePolicy policy){
+    public static boolean confirmSignedData1(SignedData[] signedDatas, Boolean[] used, MspPrincipal.MSPPrincipal signedByID, IIdentityDeserializer deserializer,Policies.SignaturePolicy policy){
         log.debug(signedDatas+"signed by "+policy.getSignedBy()+" principal evaluation starts (used %v)");
 
         for(int i=0;i<signedDatas.length;i++){
