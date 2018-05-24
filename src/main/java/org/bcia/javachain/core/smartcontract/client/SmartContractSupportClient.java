@@ -65,17 +65,12 @@ public class SmartContractSupportClient extends SmartContractBase {
   @Override
   public SmartContractResponse invoke(ISmartContractStub stub) {
     logger.info("SmartContractSupportClient invoke " + stub.getTxId());
-    /**
-    stub.getState("key1");
-    stub.getState("key2");
-    stub.getState("key3");
-     */
-
+    /** stub.getState("key1"); stub.getState("key2"); stub.getState("key3"); */
     stub.putState("putKey1", "putValue1".getBytes());
     /**
-    stub.putState("putKey2", "putValue2".getBytes());
-    stub.putState("putKey3", "putValue3".getBytes());
-    */
+     * stub.putState("putKey2", "putValue2".getBytes()); stub.putState("putKey3",
+     * "putValue3".getBytes());
+     */
     return newSuccessResponse();
   }
 
@@ -100,11 +95,13 @@ public class SmartContractSupportClient extends SmartContractBase {
     }
   }
 
+  public static Boolean checkSystemSmartContract(String smartContractId) {
+    return map.get(smartContractId) != null;
+  }
+
   public static void main(String[] args) throws Exception {
     // launch(CommConstant.ESSC);
     launch(CommConstant.QSSC);
-    while (true) {
-
-    }
+    while (true) {}
   }
 }
