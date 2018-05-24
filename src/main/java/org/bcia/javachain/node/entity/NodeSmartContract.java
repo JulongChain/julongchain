@@ -251,10 +251,16 @@ public class NodeSmartContract {
     public void query(String groupId, String smartContractName, String ctor) throws NodeException {
         Smartcontract.SmartContractInvocationSpec spec = SpecHelper.buildInvocationSpec(smartContractName, ctor, null);
 
-        ISigningIdentity identity = new MockSigningIdentity();
+        ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
+
         byte[] creator = identity.serialize();
 
-        byte[] nonce = MockCrypto.getRandomNonce();
+        byte[] nonce = new byte[0];
+        try {
+            nonce = CspManager.getDefaultCsp().rng(24, null);
+        } catch (JavaChainException e) {
+            log.error(e.getMessage(), e);
+        }
 
         String txId = null;
         try {
@@ -264,14 +270,14 @@ public class NodeSmartContract {
             throw new NodeException("Generate txId fail");
         }
 
-        ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType.ENDORSER_TRANSACTION,
-                "", txId, spec, nonce, creator, null);
+        ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType
+                .ENDORSER_TRANSACTION, "", txId, spec, nonce, creator, null);
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         EndorserClient client = new EndorserClient("127.0.0.1", 7015);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
 
-        log.info("Query Result: " + proposalResponse.getPayload().toString(Charset.forName(CommConstant.DEFAULT_CHARSET)));
-
+        log.info("Query Result: " + proposalResponse.getPayload().toString(Charset.forName(CommConstant
+                .DEFAULT_CHARSET)));
     }
 }

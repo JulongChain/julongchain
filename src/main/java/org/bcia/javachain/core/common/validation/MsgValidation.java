@@ -223,8 +223,43 @@ public class MsgValidation {
             return new Object[]{TransactionPackage.TxValidationCode.BAD_COMMON_HEADER};
         }
 
+        Common.GroupHeader groupHeader = (Common.GroupHeader) commonHeaderObjs[0];
+        Common.SignatureHeader signatureHeader = (Common.SignatureHeader) commonHeaderObjs[1];
+
+        //校验签名(验签)
+        try {
+            MsgValidation.checkSignature(envelope.getSignature().toByteArray(), envelope.getPayload().toByteArray(),
+                    signatureHeader.getCreator().toByteArray(), groupHeader.getGroupId());
+        } catch (ValidateException e) {
+            log.error(e.getMessage(), e);
+            return new Object[]{TransactionPackage.TxValidationCode.BAD_CREATOR_SIGNATURE};
+        }
+
+        switch (groupHeader.getType()) {
+            case Common.HeaderType.ENDORSER_TRANSACTION_VALUE:
+                try {
+                    checkProposalTxId(groupHeader.getTxId(), signatureHeader.getCreator().toByteArray(), signatureHeader
+                            .getNonce().toByteArray());
+                } catch (ValidateException e) {
+                    log.error(e.getMessage(), e);
+                    return new Object[]{TransactionPackage.TxValidationCode.BAD_PROPOSAL_TXID};
+                }
+                break;
+
+            case Common.HeaderType.NODE_RESOURCE_UPDATE_VALUE:
+                break;
+
+            case Common.HeaderType.CONFIG_VALUE:
+                break;
+        }
+
 
         return null;
+
+
+    }
+
+    public static void validateEndorserTransaction(Common.Payload payload){
 
 
     }
