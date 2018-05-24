@@ -74,7 +74,7 @@ public class NodeSmartContract {
         try {
             nonce = CspManager.getDefaultCsp().rng(24, null);
         } catch (JavaChainException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
 
         String txId = null;
@@ -108,7 +108,12 @@ public class NodeSmartContract {
 
         byte[] creator = identity.serialize();
 
-        byte[] nonce = MockCrypto.getRandomNonce();
+        byte[] nonce = new byte[0];
+        try {
+            nonce = CspManager.getDefaultCsp().rng(24, null);
+        } catch (JavaChainException e) {
+            log.error(e.getMessage(), e);
+        }
 
         String txId = null;
         try {
@@ -119,7 +124,7 @@ public class NodeSmartContract {
         }
 
         Smartcontract.SmartContractInvocationSpec lsscSpec = SpecHelper.buildInvocationSpec(CommConstant.LSSC,
-                CommConstant.DEPLOY.getBytes(), groupId.getBytes(), input.toByteArray());
+                CommConstant.DEPLOY.getBytes(), groupId.getBytes(), deploymentSpec.toByteArray());
         //生成proposal  Type=ENDORSER_TRANSACTION
         ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType
                 .ENDORSER_TRANSACTION, groupId, txId, lsscSpec, nonce, creator, null);
