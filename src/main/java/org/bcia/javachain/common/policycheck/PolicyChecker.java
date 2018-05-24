@@ -149,8 +149,8 @@ public class PolicyChecker implements IPolicyChecker{
             log.info("Failed getting local MSP principal during channelless check policy with policy ["+policyName+"]");
             e.printStackTrace();
         }
-        MspPrincipal m = null; //TODO 待完善
-        id.satisfiesPrincipal(m);
+        //MspPrincipal.MSPPrincipal m = MspPrincipal.MSPPrincipal.newBuilder().build();
+        id.satisfiesPrincipal(principal);
         id.verify(signedProposal.getProposalBytes(),signedProposal.getSignature());
 
     }
