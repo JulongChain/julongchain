@@ -41,10 +41,6 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class ResourcesConfigBundle implements IResourcesConfigBundle {
-    interface Callback {
-        void call(IResourcesConfig resourcesConfig);
-    }
-
     private String groupId;
     private Configtx.Config config;
     private IGroupConfigBundle groupConfigBundle;

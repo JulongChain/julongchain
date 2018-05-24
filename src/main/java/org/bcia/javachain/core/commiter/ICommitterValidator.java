@@ -13,23 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.commiter.util;
+package org.bcia.javachain.core.commiter;
 
+import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.protos.common.Common;
 
 /**
  * 类描述
  *
- * @author
- * @date 18-3-28
+ * @author zhouhui
+ * @date 2018/05/23
  * @company Dingxuan
  */
-public class Utils {
-
-    public static Boolean IsConfigBlock(Common.Block block) throws Exception{
-
-        return false;
-    }
+public interface ICommitterValidator {
+    void validate(Common.Block block) throws ValidateException;
 }
-
-

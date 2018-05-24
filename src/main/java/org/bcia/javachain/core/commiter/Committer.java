@@ -42,7 +42,7 @@ import java.util.Map;
 public class Committer implements ICommitter {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Committer.class);
 
-    public static interface IConfigBlockEventer {
+    public interface IConfigBlockEventer {
         void event(Common.Block block) throws CommitterException;
     }
 

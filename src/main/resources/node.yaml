@@ -379,7 +379,7 @@ node:
     # variable to override that choice.
     # NOTE: overriding this value might negatively influence the performance of
     # the node so please change this value only if you know what you're doing
-    validatorPoolSize:
+    # validatorPoolSize:
 
 ###############################################################################
 #

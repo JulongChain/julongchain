@@ -15,11 +15,15 @@
  */
 package org.bcia.javachain.node.entity;
 
+import org.apache.commons.io.IOUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.tools.cryptogen.FileUtil;
+import org.bcia.javachain.common.util.CommConstant;
+import org.bcia.javachain.common.util.FileUtils;
 import org.bcia.javachain.common.util.NetAddress;
 import org.bcia.javachain.common.util.SpringContext;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
@@ -40,7 +44,9 @@ import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.util.NodeConstant;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 
 /**
  * 节点服务
@@ -184,7 +190,16 @@ public class NodeServer {
             }
         });
 
-
+        //
+        String fileSystemPath = nodeConfig.getNode().getFileSystemPath();
+        File file = new File(fileSystemPath);
+        file.mkdirs();
+        try {
+            FileUtils.writeFileBytes(fileSystemPath + CommConstant.PATH_SEPARATOR + "/node.pid", getProcessId()
+                    .getBytes());
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     private void initSysSmartContracts() {
@@ -194,8 +209,17 @@ public class NodeServer {
         systemSmartContractManager.deploySysSmartContracts("");
     }
 
+    private String getProcessId() {
+        // get name representing the running Java virtual machine.
+        String processName = ManagementFactory.getRuntimeMXBean().getName();
+        log.info("process name: " + processName);
+
+        String processId = processName.split("@")[0];
+        log.info("process id: " + processId);
+        return processId;
+    }
+
     public void status() {
 
     }
-
 }

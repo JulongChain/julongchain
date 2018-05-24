@@ -13,30 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.resourceconfig;
+package org.bcia.javachain.core.node;
 
-import org.bcia.javachain.common.configtx.IValidator;
-import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
-import org.bcia.javachain.common.policies.IPolicyManager;
-import org.bcia.javachain.common.resourceconfig.config.IResourcesConfig;
+import org.bcia.javachain.core.ledger.INodeLedger;
 
 /**
- * 对象
+ * 类描述
  *
  * @author zhouhui
- * @date 2018/4/25
+ * @date 2018/05/23
  * @company Dingxuan
  */
-public interface IResourcesConfigBundle {
-    interface Callback {
-        void call(IResourcesConfigBundle bundle);
+public class FileLedgerBlockStore {
+    private INodeLedger nodeLedger;
+
+    public FileLedgerBlockStore(INodeLedger nodeLedger) {
+        this.nodeLedger = nodeLedger;
     }
-
-    IGroupConfigBundle getGroupConfigBundle();
-
-    IResourcesConfig getResourcesConfig();
-
-    IValidator getValidator();
-
-    IPolicyManager getPolicyManager();
 }

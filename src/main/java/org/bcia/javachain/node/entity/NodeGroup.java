@@ -338,7 +338,5 @@ public class NodeGroup {
         }
 
         return null;
-
     }
-
 }

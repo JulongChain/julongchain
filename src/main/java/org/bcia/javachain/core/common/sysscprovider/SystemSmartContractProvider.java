@@ -17,8 +17,8 @@ package org.bcia.javachain.core.common.sysscprovider;
 
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.ValidateException;
-import org.bcia.javachain.common.groupconfig.ApplicationProvider;
 import org.bcia.javachain.common.groupconfig.MSPConfigHandler;
+import org.bcia.javachain.common.groupconfig.capability.ApplicationProvider;
 import org.bcia.javachain.common.groupconfig.capability.IApplicationCapabilities;
 import org.bcia.javachain.common.groupconfig.config.ApplicationConfig;
 import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
@@ -61,7 +61,7 @@ public class SystemSmartContractProvider implements ISystemSmartContractProvider
             Configtx.ConfigTree appTree = ConfigTreeHelper.buildApplicationTree(profile.getApplication());
             //得到最终的应用配置
             ApplicationConfig appConfig = new ApplicationConfig(appTree, new MSPConfigHandler(0));
-            IApplicationCapabilities applicationCapabilities = new ApplicationProvider();
+            IApplicationCapabilities applicationCapabilities = appConfig.getCapabilities();
             return appConfig;
 
         } catch (IOException e) {
