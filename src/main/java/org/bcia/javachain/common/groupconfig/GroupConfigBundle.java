@@ -24,6 +24,7 @@ import org.bcia.javachain.common.groupconfig.config.*;
 import org.bcia.javachain.common.policies.IPolicyManager;
 import org.bcia.javachain.common.policies.IPolicyProvider;
 import org.bcia.javachain.common.policies.PolicyManager;
+import org.bcia.javachain.common.policycheck.policies.PolicyProvider;
 import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.msp.IMspManager;
 import org.bcia.javachain.protos.common.Common;
@@ -88,8 +89,8 @@ public class GroupConfigBundle implements IGroupConfigBundle {
         this.groupConfig = new GroupConfig(config.getGroupTree());
 
         HashMap<Integer, IPolicyProvider> policyProviderMap = new HashMap<>();
-        policyProviderMap.put(Policies.Policy.PolicyType.SIGNATURE_VALUE, new org.bcia.javachain.common.policycheck
-                .policies.PolicyProvider());
+        policyProviderMap.put(Policies.Policy.PolicyType.SIGNATURE_VALUE, new PolicyProvider(groupConfig
+                .getMspManager()));
 
         this.policyManager = new PolicyManager(GroupConfigConstant.GROUP, policyProviderMap, config.getGroupTree());
 

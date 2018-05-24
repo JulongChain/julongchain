@@ -19,6 +19,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.groupconfig.capability.IApplicationCapabilities;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.ValidateUtils;
@@ -28,6 +29,7 @@ import org.bcia.javachain.msp.IIdentityDeserializer;
 import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.TransactionPackage;
 
 /**
  * 校验消息
@@ -197,4 +199,70 @@ public class MsgValidation {
             throw new ValidateException("Wrong txId");
         }
     }
+
+    public static Object[] validateTransaction(Common.Envelope envelope, IApplicationCapabilities
+            applicationCapabilities) {
+        if (envelope == null || envelope.getPayload() == null) {
+            log.warn("Envelope is null");
+            return new Object[]{TransactionPackage.TxValidationCode.NIL_ENVELOPE};
+        }
+
+        Common.Payload payload = null;
+        try {
+            payload = Common.Payload.parseFrom(envelope.getPayload());
+        } catch (InvalidProtocolBufferException e) {
+            log.warn(e.getMessage(), e);
+            return new Object[]{TransactionPackage.TxValidationCode.BAD_PAYLOAD};
+        }
+
+        Object[] commonHeaderObjs = null;
+        try {
+            commonHeaderObjs = validateCommonHeader(payload.getHeader());
+        } catch (ValidateException e) {
+            log.warn(e.getMessage(), e);
+            return new Object[]{TransactionPackage.TxValidationCode.BAD_COMMON_HEADER};
+        }
+
+        Common.GroupHeader groupHeader = (Common.GroupHeader) commonHeaderObjs[0];
+        Common.SignatureHeader signatureHeader = (Common.SignatureHeader) commonHeaderObjs[1];
+
+        //校验签名(验签)
+        try {
+            MsgValidation.checkSignature(envelope.getSignature().toByteArray(), envelope.getPayload().toByteArray(),
+                    signatureHeader.getCreator().toByteArray(), groupHeader.getGroupId());
+        } catch (ValidateException e) {
+            log.error(e.getMessage(), e);
+            return new Object[]{TransactionPackage.TxValidationCode.BAD_CREATOR_SIGNATURE};
+        }
+
+        switch (groupHeader.getType()) {
+            case Common.HeaderType.ENDORSER_TRANSACTION_VALUE:
+                try {
+                    checkProposalTxId(groupHeader.getTxId(), signatureHeader.getCreator().toByteArray(), signatureHeader
+                            .getNonce().toByteArray());
+                } catch (ValidateException e) {
+                    log.error(e.getMessage(), e);
+                    return new Object[]{TransactionPackage.TxValidationCode.BAD_PROPOSAL_TXID};
+                }
+                break;
+
+            case Common.HeaderType.NODE_RESOURCE_UPDATE_VALUE:
+                break;
+
+            case Common.HeaderType.CONFIG_VALUE:
+                break;
+        }
+
+
+        return null;
+
+
+    }
+
+    public static void validateEndorserTransaction(Common.Payload payload){
+
+
+    }
+
+
 }

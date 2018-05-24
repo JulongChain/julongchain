@@ -84,7 +84,7 @@ public class GroupConfig implements IGroupConfig {
 
             validateHashingAlgorithm();
             validateBlockDataHashingStructure();
-            validateOrdererAddresses();
+            validateConsenterAddresses();
         }
 
         MSPConfigHandler mspConfigHandler = new MSPConfigHandler(0);
@@ -138,6 +138,7 @@ public class GroupConfig implements IGroupConfig {
         return hashingAlgorithm;
     }
 
+    @Override
     public IMspManager getMspManager() {
         return mspManager;
     }
@@ -163,15 +164,18 @@ public class GroupConfig implements IGroupConfig {
     }
 
     private void validateBlockDataHashingStructure() throws ValidateException {
-        if (blockDataHashingStructure.getWidth() != Integer.MAX_VALUE) {
+        //TODO:
+        if (blockDataHashingStructure != null && blockDataHashingStructure.getWidth() != Integer.MAX_VALUE) {
             throw new ValidateException("blockDataHashingStructure.width is wrong");
         }
     }
 
-    private void validateOrdererAddresses() throws ValidateException {
-        if (consenterAddresses.getAddressesCount() == 0) {
+    private void validateConsenterAddresses() throws ValidateException {
+        if (consenterAddresses != null && consenterAddresses.getAddressesCount() == 0) {
             throw new ValidateException("consenterAddresses.size can not be zero");
         }
     }
+
+
 
 }

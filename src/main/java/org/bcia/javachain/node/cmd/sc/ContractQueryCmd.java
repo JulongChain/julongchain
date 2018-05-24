@@ -55,7 +55,7 @@ public class ContractQueryCmd extends AbstractNodeContractCmd {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
-        String defaultValue = "UnKown";
+        String defaultValue = "unknown";
 
         //-----------------------------------解析参数值-------------------------------//
         //解析出群组ID

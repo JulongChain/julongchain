@@ -15,10 +15,13 @@
  */
 package org.bcia.javachain.core.commiter;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.util.ValidateUtils;
+import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.core.ledger.util.TxValidationFlags;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.node.TransactionPackage;
 
 /**
  * 类描述
@@ -57,6 +60,23 @@ public class CommitterValidator implements ICommitterValidator {
     }
 
     private void validateTx(BlockValidationRequest request, BlockValidationResult result) {
+        if (request.getData() == null) {
+            result.setTxIndex(request.getTxIndex());
+            return;
+        }
+
+        Common.Envelope envelope = null;
+        try {
+            envelope = Common.Envelope.parseFrom(request.getData());
+        } catch (InvalidProtocolBufferException e) {
+            result.setTxIndex(request.getTxIndex());
+            result.setTxValidationCode(TransactionPackage.TxValidationCode.INVALID_OTHER_REASON);
+            return;
+        }
+
+
+
+
     }
 
     private boolean chainExists(String chain) {
