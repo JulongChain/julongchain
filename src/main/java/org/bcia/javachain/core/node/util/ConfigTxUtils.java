@@ -78,4 +78,19 @@ public class ConfigTxUtils {
 
         return ConfigtxProcessor.retrievePersistedConfig(queryExecutor, ConfigtxProcessor.GROUP_CONFIG_KEY);
     }
+
+    /**
+     * 获取群组配置
+     *
+     * @param nodeLedger
+     * @return
+     * @throws LedgerException
+     * @throws InvalidProtocolBufferException
+     */
+    public static Configtx.Config retrievePersistedResourceConfig(INodeLedger nodeLedger) throws LedgerException,
+            InvalidProtocolBufferException {
+        IQueryExecutor queryExecutor = nodeLedger.newQueryExecutor();
+
+        return ConfigtxProcessor.retrievePersistedConfig(queryExecutor, ConfigtxProcessor.RESOURCES_CONFIG_KEY);
+    }
 }

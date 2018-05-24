@@ -182,10 +182,10 @@ public class LSSC  extends SystemSmartContractBase {
                 }
                 //the maximum number of arguments depends on the capability of the group
                 // TODO: 5/21/18  ac.getCapabilities() == null
-//                if((ac.getCapabilities().isPrivateGroupData()==false && size>6) ||
-//                        (ac.getCapabilities().isPrivateGroupData()==true && size>7)){
-//                    return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
-//                }
+                if((ac.getCapabilities().isPrivateGroupData()==false && size>6) ||
+                        (ac.getCapabilities().isPrivateGroupData()==true && size>7)){
+                    return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
+                }
                 byte[] depSpecBytes2=args.get(2);
                 Smartcontract.SmartContractDeploymentSpec spec=null;
                 try {
@@ -228,9 +228,9 @@ public class LSSC  extends SystemSmartContractBase {
                 // we proceed with a non-nil collection configuration only if
                 // we support the PrivateChannelData capability
                 // TODO: 5/21/18  ac.getCapabilities() == null
-//                if(ac.getCapabilities().isPrivateGroupData()==true  && size>6){
-//                    collectionsConfig=args.get(6);
-//                }
+                if(ac.getCapabilities().isPrivateGroupData()==true  && size>6){
+                    collectionsConfig=args.get(6);
+                }
 
                 SmartContractDataPackage.SmartContractData scd=null;
                 try {

@@ -13,30 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.resourceconfig;
+package org.bcia.javachain.core.commiter;
 
-import org.bcia.javachain.common.configtx.IValidator;
-import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
-import org.bcia.javachain.common.policies.IPolicyManager;
-import org.bcia.javachain.common.resourceconfig.config.IResourcesConfig;
+import org.bcia.javachain.core.common.sysscprovider.SmartContractInstance;
+import org.bcia.javachain.protos.node.TransactionPackage;
 
 /**
- * 对象
+ * 类描述
  *
  * @author zhouhui
- * @date 2018/4/25
+ * @date 2018/05/23
  * @company Dingxuan
  */
-public interface IResourcesConfigBundle {
-    interface Callback {
-        void call(IResourcesConfigBundle bundle);
-    }
-
-    IGroupConfigBundle getGroupConfigBundle();
-
-    IResourcesConfig getResourcesConfig();
-
-    IValidator getValidator();
-
-    IPolicyManager getPolicyManager();
+public class BlockValidationResult {
+    private int txIndex;
+    private TransactionPackage.TxValidationCode txValidationCode;
+    private SmartContractInstance smartContractInstance;
+    private SmartContractInstance smartContractUpdateInstance;
+    private String txId;
 }

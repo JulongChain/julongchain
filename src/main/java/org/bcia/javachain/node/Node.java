@@ -20,11 +20,18 @@ import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.common.exception.*;
 import org.bcia.javachain.common.genesis.GenesisBlockFactory;
 import org.bcia.javachain.common.groupconfig.GroupConfigBundle;
+import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
+import org.bcia.javachain.common.groupconfig.LogSanityChecks;
+import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.resourceconfig.IResourcesConfigBundle;
+import org.bcia.javachain.common.resourceconfig.ResourcesConfigBundle;
 import org.bcia.javachain.common.util.proto.BlockUtils;
 import org.bcia.javachain.core.ledger.INodeLedger;
+import org.bcia.javachain.core.ledger.customtx.IProcessor;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
+import org.bcia.javachain.core.node.ConfigtxProcessor;
 import org.bcia.javachain.core.node.GroupSupport;
 import org.bcia.javachain.core.node.NodeConfig;
 import org.bcia.javachain.core.node.NodeConfigFactory;
@@ -46,6 +53,7 @@ import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -188,44 +196,7 @@ public class Node {
             log.error(e.getMessage(), e);
             throw new NodeException(e);
         }
-
-
-//        CspConfig
-//        Mgmt.loadLocalMspWithType()
-
-
     }
-
-//    public void mockInitialize() {
-//        LedgerMgmt.InitializeTestEnvWithCustomProcessors();
-//    }
-//
-//    private Map<String, Chain>
-//
-//
-//    func MockInitialize() {
-//        ledgermgmt.InitializeTestEnvWithCustomProcessors(null);
-//        chains.list = nil
-//        chains.list = make(map[string] * chain)
-//        chainInitializer = func(string) {
-//            return
-//        }
-//    }
-//
-//    private static class Chain {
-//        private chainSupport cs;
-//        private Common.Block block;
-//        private Committer committer;
-//
-//    }
-//
-//    private static class chainSupport {
-//        private BundleSource bundleSource;
-//        private IResourcesConfig resources;
-//        private IApplicationConfig applicationConfig;
-//        private INodeLedger ledger;
-//        private FileLedger fileLedger;
-//    }
 
     /**
      * 实例化
@@ -236,7 +207,12 @@ public class Node {
         this.initializeCallback = callback;
 
         try {
-            LedgerManager.initialize(null);
+            IProcessor configtxProcessor = new ConfigtxProcessor();
+            Map<Common.HeaderType, IProcessor> configtxProcessorMap = new HashMap<>();
+            configtxProcessorMap.put(Common.HeaderType.CONFIG, configtxProcessor);
+            configtxProcessorMap.put(Common.HeaderType.NODE_RESOURCE_UPDATE, configtxProcessor);
+
+            LedgerManager.initialize(configtxProcessorMap);
 
             List<String> ledgerIDs = LedgerManager.getLedgerIDs();
             if (ledgerIDs != null && ledgerIDs.size() > 0) {
@@ -245,7 +221,6 @@ public class Node {
 
                     try {
                         INodeLedger nodeLedger = LedgerManager.openLedger(ledgerId);
-
 
                         Common.Block configBlock = LedgerUtils.getConfigBlockFromLedger(nodeLedger);
 
@@ -277,25 +252,76 @@ public class Node {
         //从账本中获取群组配置
         Configtx.Config groupConfig = ConfigTxUtils.retrievePersistedGroupConfig(nodeLedger);
 
-        GroupConfigBundle groupConfigBundle = null;
+        IGroupConfigBundle groupConfigBundle = null;
         if (groupConfig != null) {
             try {
                 groupConfigBundle = new GroupConfigBundle(groupId, groupConfig);
             } catch (PolicyException e) {
-                e.printStackTrace();
+                log.error(e.getMessage(), e);
+                throw e;
             }
         } else {
             Common.Envelope envelope = BlockUtils.extractEnvelope(configBlock, 0);
-
-
+            groupConfigBundle = GroupConfigBundle.parseFrom(envelope);
         }
 
-        GroupSupport groupSupport = new GroupSupport();
+        LogSanityChecks.logPolicy(groupConfigBundle);
+
+        //Gossip TODO
+
+        IResourcesConfigBundle.Callback trustedRootsCallback = new IResourcesConfigBundle.Callback() {
+            @Override
+            public void call(IResourcesConfigBundle bundle) {
+                updateTrustedRoots(bundle);
+            }
+        };
+
+        IResourcesConfigBundle.Callback mspCallback = new IResourcesConfigBundle.Callback() {
+            @Override
+            public void call(IResourcesConfigBundle bundle) {
+//                GlobalMspManagement.
+            }
+        };
+
+        IApplicationConfig applicationConfig = groupConfigBundle.getGroupConfig().getApplicationConfig();
+
+        final GroupSupport groupSupport = new GroupSupport();
+        groupSupport.setApplicationConfig(applicationConfig);
+        groupSupport.setNodeLedger(nodeLedger);
+
+//        FileLedgerBlockStore blockStore = new File
+//        groupSupport.setFileLedger(new FileLedger());
+
+        IResourcesConfigBundle.Callback nodeSingletonCallback = new IResourcesConfigBundle.Callback() {
+            @Override
+            public void call(IResourcesConfigBundle bundle) {
+                IApplicationConfig config = bundle.getGroupConfigBundle().getGroupConfig().getApplicationConfig();
+                groupSupport.setApplicationConfig(config);
+                groupSupport.setGroupConfigBundle(bundle.getGroupConfigBundle());
+            }
+        };
+
+        Configtx.Config resConfig = Configtx.Config.getDefaultInstance();
+        if (applicationConfig != null && applicationConfig.getCapabilities().isResourcesTree()) {
+            //从账本中获取群组配置
+            resConfig = ConfigTxUtils.retrievePersistedGroupConfig(nodeLedger);
+        }
+
+        List<IResourcesConfigBundle.Callback> callbackList = new ArrayList<>();
+        callbackList.add(trustedRootsCallback);
+
+        callbackList.add(nodeSingletonCallback);
+        ResourcesConfigBundle resourcesConfigBundle = new ResourcesConfigBundle(groupId, resConfig,
+                groupConfigBundle, callbackList);
+
 
         Group group = new Group();
         groupMap.put(groupId, group);
 
         return group;
+    }
+
+    private void updateTrustedRoots(IResourcesConfigBundle bundle) {
     }
 
     public Map<String, Group> getGroupMap() {

@@ -48,8 +48,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class Endorser implements IEndorserServer {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Endorser.class);
-    //TODO:Spring
-    private IEndorserSupport endorserSupport = new EndorserSupport();
+
+    private IEndorserSupport endorserSupport;
 
     private IPrivateDataDistributor distributor;
 
@@ -119,8 +119,8 @@ public class Endorser implements IEndorserServer {
 
         //无合约提案不需要背书，例如cssc
 //        simulateResults = new byte[]{0, 1, 2};//TODO:for test 使得测试通过
-        if(txReadWriteSetBytes == null || txReadWriteSetBytes.length <= 0){
-            txReadWriteSetBytes= new byte[]{0, 1, 2};
+        if (txReadWriteSetBytes == null || txReadWriteSetBytes.length <= 0) {
+            txReadWriteSetBytes = new byte[]{0, 1, 2};
         }
 
         if (StringUtils.isBlank(scName) || CommConstant.CSSC.equals(scName)) {
