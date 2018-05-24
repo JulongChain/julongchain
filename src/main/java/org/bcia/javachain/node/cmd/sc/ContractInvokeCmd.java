@@ -15,19 +15,27 @@
  */
 package org.bcia.javachain.node.cmd.sc;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.google.protobuf.ByteString;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.node.Node;
+import org.bcia.javachain.protos.node.Smartcontract;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * node contract invoke -c consenter.example.com:7050 -g groupId -n mycc -l java -ctor '{"Args":["query","a"]}'
+ * contract invoke -c 127.0.0.1:7050 -g myGroup -n mycc -l java -ctor "{'Args':['query','a']}"
  * consenter节点 群组 名称 语言 执行信息
  *
- * @author  wanglei
- * @date 18/3/14
+ * @author wanglei zhouhui
+ * @date 2018/03/14
  * @company Dingxuan
  */
 public class ContractInvokeCmd extends AbstractNodeContractCmd {
@@ -43,7 +51,8 @@ public class ContractInvokeCmd extends AbstractNodeContractCmd {
     private static final String ARG_SC_CTOR = "ctor";
     //参数：language
     private static final String ARG_LANGUAGE = "l";
-
+    //参数
+    private static final String KEY_ARGS = "args";
 
     //参数：超时时间
     private static final String ARG_TIMEOUT = "t";
@@ -65,11 +74,10 @@ public class ContractInvokeCmd extends AbstractNodeContractCmd {
         options.addOption(ARG_SC_CTOR, true, "Input contract parameter");
         options.addOption(ARG_LANGUAGE, true, "Input contract language");
 
-
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
-        String defaultValue = "UnKown";
+        String defaultValue = "unknown";
         //consenter 信息  ip:port
         String consenter = null;
         if (cmd.hasOption(ARG_CONSENTER)) {
@@ -78,27 +86,69 @@ public class ContractInvokeCmd extends AbstractNodeContractCmd {
         }
         //群组信息
         String groupId = null;
-        if(cmd.hasOption(ARG_GROUP_ID)){
+        if (cmd.hasOption(ARG_GROUP_ID)) {
             groupId = cmd.getOptionValue(ARG_GROUP_ID, defaultValue);
             log.info("Grout ID-----$" + groupId);
         }
         //解析出合约名称
-        String name = null;
-        if(cmd.hasOption(ARG_SC_NAME)){
-            name = cmd.getOptionValue(ARG_SC_NAME, defaultValue);
-            log.info("Contract name-----$" + name);
+        String scName = null;
+        if (cmd.hasOption(ARG_SC_NAME)) {
+            scName = cmd.getOptionValue(ARG_SC_NAME, defaultValue);
+            log.info("Contract name-----$" + scName);
         }
+
         //合约具体执行参数
-        String ctor = null;
-        if(cmd.hasOption(ARG_SC_CTOR)){
-            ctor = cmd.getOptionValue(ARG_SC_CTOR, defaultValue);
-            log.info("Contract ctor-----$" + ctor);
+//        String ctor = null;
+//        if (cmd.hasOption(ARG_SC_CTOR)) {
+//            ctor = cmd.getOptionValue(ARG_SC_CTOR, defaultValue);
+//            log.info("Contract ctor-----$" + ctor);
+//        }
+
+        Smartcontract.SmartContractInput input = null;
+        if (cmd.hasOption(ARG_SC_CTOR)) {
+            String ctor = cmd.getOptionValue(ARG_SC_CTOR, defaultValue);
+            log.info("ctor-----$" + ctor);
+            JSONObject ctorJson = JSONObject.parseObject(ctor);
+
+            Smartcontract.SmartContractInput.Builder inputBuilder = Smartcontract.SmartContractInput.newBuilder();
+
+            JSONArray argsJSONArray = ctorJson.getJSONArray(KEY_ARGS);
+            for (int i = 0; i < argsJSONArray.size(); i++) {
+                inputBuilder.addArgs(ByteString.copyFrom(argsJSONArray.getString(i).getBytes()));
+            }
+
+            input = inputBuilder.build();
+            //打印一下参数，检查是否跟预期一致
+            for (int i = 0; i < input.getArgsCount(); i++) {
+                try {
+                    log.info("input.getArg-----$" + input.getArgs(i).toString(CommConstant.DEFAULT_CHARSET));
+                } catch (UnsupportedEncodingException e) {
+                    log.warn(e.getMessage(), e);
+                }
+            }
         }
+
         //合约语言
         String scLanguage = null;
         if (cmd.hasOption(ARG_LANGUAGE)) {
             scLanguage = cmd.getOptionValue(ARG_LANGUAGE, defaultValue);
             log.info("Smart Contract language-----$" + scLanguage);
+        }
+
+        //-----------------------------------校验入参--------------------------------//
+        if (StringUtils.isBlank(groupId)) {
+            log.error("GroupId should not be null, Please input it");
+            return;
+        }
+
+        if (StringUtils.isBlank(consenter)) {
+            log.error("Consenter should not be null, Please input it");
+            return;
+        }
+
+        if (StringUtils.isBlank(scName)) {
+            log.error("Smart contract's name should not be null, Please input it");
+            return;
         }
 
         String[] ipAndPort = consenter.split(":");
@@ -115,24 +165,7 @@ public class ContractInvokeCmd extends AbstractNodeContractCmd {
             return;
         }
 
-        //-----------------------------------参数校验--------------------------------//
-        if (StringUtils.isBlank(groupId)) {
-            log.error("groupId should not be null, Please input it");
-            return;
-        }
-        if (StringUtils.isBlank(name)) {
-            log.error("smart contract name should not be null, Please input it");
-            return;
-        }
-        if (StringUtils.isBlank(ctor)) {
-            log.error("smart contract ctor should not be null, Please input it");
-            return;
-        }
-
         //
-        nodeSmartContract.invoke(ipAndPort[0], port, groupId, name, ctor, scLanguage);
-
+        nodeSmartContract.invoke(ipAndPort[0], port, groupId, scName, scLanguage, input);
     }
-
 }
-

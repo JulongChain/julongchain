@@ -62,7 +62,7 @@ public class MockSigningIdentity implements ISigningIdentity{
     }
 
     @Override
-    public void satisfiesPrincipal(MspPrincipal principal) {
+    public void satisfiesPrincipal(MspPrincipal.MSPPrincipal principal) {
 
     }
 
