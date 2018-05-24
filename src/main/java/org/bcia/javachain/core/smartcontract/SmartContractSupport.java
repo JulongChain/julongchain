@@ -279,11 +279,14 @@ public class SmartContractSupport {
     String smartContractId = scContext.getName();
     boolean scRunning = SmartContractRunningUtil.checkSmartContractRunning(smartContractId);
     if (!scRunning) {
-      SmartContractSupportClient.launch(smartContractId);
-
-      DockerUtil.buildImage("", smartContractId);
-
-      DockerUtil.uploadAndGetJar("");
+      if (SmartContractSupportClient.checkSystemSmartContract(smartContractId)) {
+        SmartContractSupportClient.launch(smartContractId);
+        log.info("launch system smart contract success:" + smartContractId);
+      } else {
+        // DockerUtil.buildImage("/root/javachain/images/scenv/Dockerfile.in", smartContractId);
+        // DockerUtil.uploadAndGetJar("");
+        log.info("launch user smart contract.");
+      }
     }
 
     try {
