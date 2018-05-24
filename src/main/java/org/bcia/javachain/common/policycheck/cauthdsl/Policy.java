@@ -73,17 +73,17 @@ public class Policy implements IPolicy{
         return true;
     }
 
-    /**
+    /*  *//**
      * 为cauthdsl类型策略提供策略生成器
      * @param deserializer
      * @return
-     */
+     *//*
     public PolicyProvider NewPolicyProvider(IIdentityDeserializer deserializer){
         PolicyProvider policyProvider = new PolicyProvider(deserializer);
         //policyProvider.setDeserializer(deserializer);
         return policyProvider;
 
-    }
+    }*/
 
 
 }

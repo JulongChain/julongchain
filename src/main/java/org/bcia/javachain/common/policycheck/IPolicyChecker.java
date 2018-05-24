@@ -26,7 +26,7 @@ import org.bcia.javachain.common.util.proto.SignedData;
  * @company Aisino
  */
 public interface IPolicyChecker {
-    public void CheckPolicy(String channelID, String policyName, SignedProposal signedProposal);
-    public void CheckPolicyBySignedData(String channelID, String policyName, SignedData[] signedDatas);
-    public void CheckPolicyNoChannel(String policyName,SignedProposal signedProposal);
+    void CheckPolicy(String channelID, String policyName, SignedProposal signedProposal);
+    void CheckPolicyBySignedData(String channelID, String policyName, SignedData[] signedDatas);
+    void CheckPolicyNoChannel(String policyName,SignedProposal signedProposal);
 }
