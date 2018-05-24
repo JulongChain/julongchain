@@ -16,6 +16,7 @@
 package org.bcia.javachain.common.groupconfig.config;
 
 import org.bcia.javachain.common.groupconfig.capability.IGroupCapabilities;
+import org.bcia.javachain.msp.IMspManager;
 
 /**
  * 群组配置接口
@@ -31,6 +32,8 @@ public interface IGroupConfig {
      * @return
      */
     IGroupCapabilities getCapabilities();
+
+    IMspManager getMspManager();
 
     /**
      * 获取应用配置对象

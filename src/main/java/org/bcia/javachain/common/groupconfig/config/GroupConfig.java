@@ -138,6 +138,7 @@ public class GroupConfig implements IGroupConfig {
         return hashingAlgorithm;
     }
 
+    @Override
     public IMspManager getMspManager() {
         return mspManager;
     }
@@ -174,5 +175,7 @@ public class GroupConfig implements IGroupConfig {
             throw new ValidateException("consenterAddresses.size can not be zero");
         }
     }
+
+
 
 }
