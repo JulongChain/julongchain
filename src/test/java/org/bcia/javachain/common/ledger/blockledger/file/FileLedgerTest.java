@@ -41,7 +41,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class FileLedgerTest {
-    static final String dir = LedgerConfig.getRootPath();
+    static final String dir = "/tmp/javachain";
     FileLedgerFactory fileLedgerFactory;
     ReadWriteBase fileLedger;
     @Before
@@ -58,7 +58,7 @@ public class FileLedgerTest {
     public void testGetOrCreate() throws Exception{
         Assert.assertNotNull(fileLedger);
         Assert.assertTrue(new File(dir).exists());
-        Assert.assertSame(new File(dir).listFiles().length, 1);
+        Assert.assertSame(new File(dir).listFiles().length, 2);
         Assert.assertSame(fileLedger.height(), (long) 0);
         Assert.assertEquals(fileLedgerFactory.groupIDs().get(0), "myGroup");
     }
@@ -69,7 +69,7 @@ public class FileLedgerTest {
         GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
         Common.Block block = factory.getGenesisBlock("myGroup");
         fileRelativePath = IoUtil.getFileRelativePath(dir);
-        Assert.assertSame(fileRelativePath.get("chains/chains/myGroup/blockfile000000").length(), (long) 0);
+        Assert.assertSame(fileRelativePath.get("chains/myGroup/blockfile000000").length(), (long) 0);
         fileLedger.append(block);
         fileRelativePath = IoUtil.getFileRelativePath(dir);
         Assert.assertNotSame(fileRelativePath.get("chains/chains/myGroup/blockfile000001").length(), (long) 0);

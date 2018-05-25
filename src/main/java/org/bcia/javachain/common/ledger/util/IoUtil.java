@@ -241,38 +241,10 @@ public class IoUtil {
     /**
      * 关闭流
      */
-    private static void closeStream(FileInputStream fis,
-                             FileOutputStream fos,
-                             TarArchiveInputStream tais,
-                             TarArchiveOutputStream taos,
-                             ByteArrayInputStream bais,
-                             ByteArrayOutputStream baos,
-                             GZIPInputStream gzis,
-                             GZIPOutputStream gzos) throws JavaChainException{
+    public static void closeStream(Closeable... closeables) throws JavaChainException{
         try {
-            if(fis != null){
-                fis.close();
-            }
-            if(fos != null){
-                fos.close();
-            }
-            if(tais != null){
-                tais.close();
-            }
-            if(taos != null){
-                taos.close();
-            }
-            if(bais != null){
-                bais.close();
-            }
-            if(baos != null){
-                baos.close();
-            }
-            if(gzis != null){
-                gzis.close();
-            }
-            if(gzos != null){
-                gzos.close();
+            for (Closeable closeable : closeables) {
+                closeable.close();
             }
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
@@ -313,7 +285,7 @@ public class IoUtil {
             logger.error(e.getMessage(), e);
             throw new JavaChainException(e);
         } finally {
-            closeStream(fis, null, null, taos, null, baos, null, null);
+            closeStream(fis, taos, baos);
         }
         return baos.toByteArray();
     }
@@ -336,7 +308,7 @@ public class IoUtil {
             logger.error(e.getMessage(), e);
             throw new JavaChainException(e);
         } finally {
-            closeStream(null, null, null, null, null, baos, null, gzos);
+            closeStream(baos, gzos);
         }
         return baos.toByteArray();
     }
@@ -371,7 +343,7 @@ public class IoUtil {
             logger.error(e.getMessage(), e);
             throw new JavaChainException(e);
         } finally {
-            closeStream(null, null, tais, null, bais, baos, null, null);
+            closeStream( tais, bais, baos);
         }
         return result;
     }
@@ -399,7 +371,7 @@ public class IoUtil {
             logger.error(e.getMessage(), e);
             throw new JavaChainException(e);
         } finally {
-            closeStream(null, null, null, null, bais, baos, gzis, null);
+            closeStream( bais, baos, gzis);
         }
         return baos.toByteArray();
     }

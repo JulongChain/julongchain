@@ -42,14 +42,16 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
 
     private IndexConfig indexConfig;
     private IDBProvider leveldbProvider;
+    private Config config;
 
     /**
      * 创建文件系统操作类
      */
-    public static IBlockStoreProvider newProvider(IndexConfig indexConfig) throws LedgerException {
+    public static IBlockStoreProvider newProvider(Config config, IndexConfig indexConfig) throws LedgerException {
         FsBlockStoreProvider provider = new FsBlockStoreProvider();
-        provider.setLeveldbProvider(LevelDBProvider.newProvider(LedgerConfig.getIndexPath()));
+        provider.setLeveldbProvider(LevelDBProvider.newProvider(config.getIndexDir()));
         provider.setIndexConfig(indexConfig);
+        provider.setConfig(config);
         logger.debug("Createing fsBlockStore using path = " + LedgerConfig.getChainsPath());
         return provider;
     }
@@ -68,7 +70,7 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
      */
     @Override
     public IBlockStore openBlockStore(String ledgerid) throws LedgerException {
-        return FsBlockStore.newFsBlockStore(ledgerid, indexConfig, leveldbProvider);
+        return FsBlockStore.newFsBlockStore(ledgerid, config, indexConfig, leveldbProvider);
     }
 
     /**
@@ -76,7 +78,7 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
      */
     @Override
     public Boolean exists(String ledgerid) {
-         return IoUtil.fileExists(LedgerConfig.getChainsPath() + ledgerid) >= 0;
+         return IoUtil.fileExists(config.getLedgerBlockDir(ledgerid)) >= 0;
     }
 
     /**
@@ -84,7 +86,7 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
     */
     @Override
     public List<String> list() {
-        return IoUtil.listSubdirs(LedgerConfig.getChainsPath());
+        return IoUtil.listSubdirs(config.getChainsDir());
     }
 
     /**
@@ -109,5 +111,13 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
 
     public void setLeveldbProvider(IDBProvider leveldbProvider) {
         this.leveldbProvider = leveldbProvider;
+    }
+
+    public Config getConfig() {
+        return config;
+    }
+
+    public void setConfig(Config config) {
+        this.config = config;
     }
 }
