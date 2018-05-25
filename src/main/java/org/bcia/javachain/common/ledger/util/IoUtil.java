@@ -33,9 +33,9 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * 类描述
+ * io操作辅助类
  *
- * @author wanliangbing
+ * @author wanliangbing, sunzongyu
  * @date 2018/3/9
  * @company Dingxuan
  */
@@ -244,7 +244,9 @@ public class IoUtil {
     public static void closeStream(Closeable... closeables) throws JavaChainException{
         try {
             for (Closeable closeable : closeables) {
-                closeable.close();
+                if(closeable != null){
+                    closeable.close();
+                }
             }
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
@@ -376,7 +378,47 @@ public class IoUtil {
         return baos.toByteArray();
     }
 
+    /**
+     * 输出解压缩的文件
+     * @param files
+     * @param outputPath
+     * @throws JavaChainException
+     */
+    public static void fileWriter(Map<String, byte[]> files, String outputPath) throws JavaChainException {
+        outputPath = outputPath.endsWith(File.separator) ? outputPath : outputPath + File.separator;
+        FileOutputStream fos = null;
+        try {
+            for (Map.Entry<String, byte[]> entry : files.entrySet()) {
+                String fileRelativePath = entry.getKey();
+                byte[] fileBytes = entry.getValue();
+                File file = new File(outputPath + fileRelativePath);
+                File dir = file.getParentFile();
+                if (!createDirIfMissing(dir.getAbsolutePath())) {
+                    throw new JavaChainException("Can not create dir " + dir.getAbsolutePath());
+                }
+                fos = new FileOutputStream(file);
+                fos.write(fileBytes);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw new JavaChainException(e);
+        } finally {
+            closeStream(fos);
+        }
+    }
+
     public static void main(String[] args) throws Exception  {
+        File file = new File("/home/bcia/test/12345.tar.gz");
+        FileInputStream fis = new FileInputStream(file);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        int num = 0;
+        byte[] bytes = new byte[1024];
+        while((num = fis.read(bytes)) > 0){
+            baos.write(bytes, 0, num);
+        }
+        byte[] gzipBytes = gzipReader(baos.toByteArray(), 1024);
+        Map<String, byte[]> tarMap = tarReader(gzipBytes, 1024);
+        fileWriter(tarMap, "/home/bcia/test/123");
 
     }
 }

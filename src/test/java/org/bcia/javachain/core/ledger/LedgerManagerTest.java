@@ -17,6 +17,7 @@ package org.bcia.javachain.core.ledger;
 
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.genesis.GenesisBlockFactory;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.core.ledger.kvledger.KvLedger;
@@ -218,6 +219,14 @@ public class LedgerManagerTest {
         LedgerManager.initialize(null);
         l = LedgerManager.openLedger(groupID);
         System.out.println(l.getBlockchainInfo());
+    }
+    
+    @Test
+    public void getBlockIterator() throws Exception{
+        LedgerManager.initialize(null);
+        l = LedgerManager.openLedger("myGroup");
+        IResultsIterator blocksIterator = l.getBlocksIterator(0);
+        System.out.println(blocksIterator.next());
     }
 
     @Test

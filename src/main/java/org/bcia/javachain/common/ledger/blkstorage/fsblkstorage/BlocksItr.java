@@ -31,6 +31,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
 public class BlocksItr implements IResultsIterator {
 
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlocksItr.class);
+    private static final Object lock = BlockFileManager.lock;
 
     private BlockFileManager mgr;
     private long maxBlockNumAvailable;
@@ -43,20 +44,28 @@ public class BlocksItr implements IResultsIterator {
         itr.setMgr(mgr);
         itr.setMaxBlockNumAvailable(mgr.getCpInfo().getLastBlockNumber());
         itr.setBlockNumToRetrieve(startBlockNum);
-        itr.setStream(null);
+        itr.setStream(new BlockStream());
         itr.setCloseMarker(false);
         return itr;
     }
 
     /**
-     * TODO 读取区块时, 区块长度不足将等待区块的添加
+     * 读取区块时, 区块长度不足将等待区块的添加
      */
-    public synchronized long waitForBlock(long blockNum) {
-//        while(mgr.getCpInfo().getLastBlockNumber() < blockNum && !shouldClose()){
-//            logger.debug(String.format("Going to wait for newer blocks.maxAvailaBlockNumber=[%d], waitForBlockNum=[%d]"
-//                    , mgr.getCpInfo().getLastBlockNumber(), blockNum));
-//        }
-        return 0;
+    public long waitForBlock(long blockNum) throws LedgerException {
+        synchronized (lock){
+            while(mgr.getCpInfo().getLastBlockNumber() < blockNum && !shouldClose()){
+                logger.debug(String.format("Going to wait for newer blocks.maxAvailaBlockNumber=[%d], waitForBlockNum=[%d]", mgr.getCpInfo().getLastBlockNumber(), blockNum));
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    logger.error(e.getMessage(), e);
+                    throw new LedgerException(e);
+                }
+                logger.debug("Coming out of wait. MaxAvailaBlockNumber=[{}]", mgr.getCpInfo().getLastBlockNumber());
+            }
+            return mgr.getCpInfo().getLastBlockNumber();
+        }
     }
 
     /**
@@ -99,8 +108,11 @@ public class BlocksItr implements IResultsIterator {
     @Override
     public synchronized void close() throws LedgerException{
         closeMarker = true;
-        if(stream != null){
-            stream.close();
+        synchronized (lock){
+            lock.notifyAll();
+            if(stream != null){
+                        stream.close();
+                    }
         }
     }
 

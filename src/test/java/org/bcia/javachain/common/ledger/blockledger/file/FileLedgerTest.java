@@ -72,9 +72,9 @@ public class FileLedgerTest {
         Assert.assertSame(fileRelativePath.get("chains/myGroup/blockfile000000").length(), (long) 0);
         fileLedger.append(block);
         fileRelativePath = IoUtil.getFileRelativePath(dir);
-        Assert.assertNotSame(fileRelativePath.get("chains/chains/myGroup/blockfile000001").length(), (long) 0);
+        Assert.assertNotSame(fileRelativePath.get("chains/myGroup/blockfile000000").length(), (long) 0);
         byte[] bytes = new byte[1024];
-        FileInputStream fis = new FileInputStream(fileRelativePath.get("chains/chains/myGroup/blockfile000001"));
+        FileInputStream fis = new FileInputStream(fileRelativePath.get("chains/myGroup/blockfile000000"));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         int num = 0;
         while((num = fis.read(bytes)) != -1){

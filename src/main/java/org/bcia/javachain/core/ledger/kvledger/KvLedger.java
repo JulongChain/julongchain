@@ -391,7 +391,7 @@ public class KvLedger implements INodeLedger {
         blockStore.commitWithPvtData(blockAndPvtData);
         logger.info(String.format("Group %s: Committed block %d to storage", ledgerID, blockNo));
         logger.debug(String.format("Group %s: Committing block %d transaction to state db", ledgerID, blockNo));
-        //提交区块
+        //提交stateDB数据
         txtmgmt.commit();
         //在HistoryDB允许的情况下提交历史信息
         if(LedgerConfig.isHistoryDBEnabled()){

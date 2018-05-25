@@ -22,7 +22,6 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.javachain.common.ledger.util.IDBProvider;
 import org.bcia.javachain.common.ledger.util.IoUtil;
-import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.util.Util;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -30,10 +29,7 @@ import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
-import java.io.File;
 import java.util.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 管理block file
@@ -47,9 +43,11 @@ public class BlockFileManager {
     private static final String BLOCKFILE_PREFIX = "blockfile";
     private static final byte[] BLK_MGR_INFO_KEY = "blkMgrInfo".getBytes();
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockFileManager.class);
+
     public static final int LAST_BLOCK_BYTES = 0;
     public static final int CURRENT_OFFSET = 1;
     public static final int NUM_BLOCKS = 2;
+    public static final Object lock = new Object();
 
     private String rootDir;
     private Config config;
@@ -58,7 +56,6 @@ public class BlockFileManager {
     private CheckpointInfo cpInfo;
     private BlockFileWriter currentFileWriter;
     private Ledger.BlockchainInfo bcInfo;
-    private Lock lock;
     private String ledgerId;
 
     /**
@@ -75,7 +72,6 @@ public class BlockFileManager {
         mgr.setConfig(config);
         mgr.setRootDir(config.getLedgerBlockDir(id));
         mgr.setDb(indexStore);
-        mgr.setLock(new ReentrantLock());
         mgr.setCpInfo(mgr.loadCurrentInfo());
         //创建rootdir
         IoUtil.createDirIfMissing(mgr.getRootDir());
@@ -125,7 +121,7 @@ public class BlockFileManager {
     /**
      * 更新检查点信息
      */
-    public synchronized void syncCpInfoFromFS(String rootDir, CheckpointInfo cpInfo) throws LedgerException {
+    public void syncCpInfoFromFS(String rootDir, CheckpointInfo cpInfo) throws LedgerException {
         logger.debug(String.format("Starting checkpoint [%s]", cpInfo));
         //组装区块文件名
         String filePath = deriveBlockfilePath(rootDir, cpInfo.getLastestFileChunkSuffixNum());
@@ -165,7 +161,7 @@ public class BlockFileManager {
     /**
      * 写下一文件
      */
-    public synchronized void moveToNextFile() throws LedgerException {
+    public void moveToNextFile() throws LedgerException {
         CheckpointInfo cpInfo = new CheckpointInfo();
         cpInfo.setLastestFileChunkSuffixNum(this.cpInfo.getLastestFileChunkSuffixNum() + 1);
         cpInfo.setLatestFileChunksize(0);
@@ -183,7 +179,7 @@ public class BlockFileManager {
      * blockBytesLenEncoded     8
      * blockbytes               blockBytesLen
      */
-    public synchronized void addBlock(Common.Block block) throws LedgerException {
+    public void addBlock(Common.Block block) throws LedgerException {
         if(block.getHeader().getNumber() != getBlockchainInfo().getHeight()){
             throw new LedgerException(String.format("Block number should have been %d but was %d", getBlockchainInfo().getHeight(), block.getHeader().getNumber()));
         }
@@ -246,7 +242,7 @@ public class BlockFileManager {
     /**
      * 同步索引
      */
-    public synchronized void syncIndex() throws LedgerException{
+    public void syncIndex() throws LedgerException{
         long lastBlockIndexed = 0;
         boolean indexEmpty = false;
         //获取最新索引
@@ -346,13 +342,16 @@ public class BlockFileManager {
         return bcInfo;
     }
 
-    public synchronized void updateCheckpoint(CheckpointInfo cpInfo) {
-        this.cpInfo = cpInfo;
-        logger.debug(String.format("Brodcasting about update checkpointInfo: %s", cpInfo));
-        //todo broadcast
+    public void updateCheckpoint(CheckpointInfo cpInfo) {
+        synchronized (lock){
+            this.cpInfo = cpInfo;
+            logger.debug(String.format("Brodcasting about update checkpointInfo: %s", cpInfo));
+            //通知所有等待区块的线程
+            lock.notifyAll();
+        }
     }
 
-    public synchronized void updateBlockchainInfo(byte[] latestBlockHash, Common.Block latestBlock) {
+    public void updateBlockchainInfo(byte[] latestBlockHash, Common.Block latestBlock) {
         Ledger.BlockchainInfo currentBCInfo = getBlockchainInfo();
         bcInfo = Ledger.BlockchainInfo.newBuilder()
                 .setHeight(currentBCInfo.getHeight() + 1)
@@ -564,14 +563,6 @@ public class BlockFileManager {
 
     private byte[] compositeBlockManagerInfoKey(String ledgerid){
         return ArrayUtils.addAll(BLK_MGR_INFO_KEY, ledgerid.getBytes());
-    }
-
-    public Lock getLock() {
-        return lock;
-    }
-
-    public void setLock(Lock lock) {
-        this.lock = lock;
     }
 
     public static String getBlockfilePrefix() {

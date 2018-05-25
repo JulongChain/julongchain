@@ -53,7 +53,7 @@ public class LSSCTest extends BaseJunit4Test {
 
     @Test
     public void testInstalls(){
-        String path="src/main/java/org/bcia/javachain/examples/smartcontract/java/smartcontract_example02";
+        String path="example";
         ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("1",new LinkedList<ByteString>());
         testInstall("example02","1.0",path,"","Alice",mockStub);
     }
@@ -181,8 +181,10 @@ public class LSSCTest extends BaseJunit4Test {
 
         Map<String, File> map = IoUtil.getFileRelativePath(path);
         byte[] tarBytes=null;
+        byte[] gzipBytes = null;
         try {
             tarBytes= IoUtil.tarWriter(map, 1024);
+            gzipBytes = IoUtil.gzipWriter(tarBytes);
             //File file=new File("/opt/2.tar");
             //FileOutputStream stream=new FileOutputStream(file);
             //stream.write(tarBytes);
@@ -194,7 +196,7 @@ public class LSSCTest extends BaseJunit4Test {
 
 
         Smartcontract.SmartContractDeploymentSpec depSpec = Smartcontract.SmartContractDeploymentSpec.newBuilder()
-             .setSmartContractSpec(spec).setCodePackage(ByteString.copyFrom(tarBytes)).build();
+             .setSmartContractSpec(spec).setCodePackage(ByteString.copyFrom(gzipBytes)).build();
         if(bCreateFS){
             //后面填充
         }
