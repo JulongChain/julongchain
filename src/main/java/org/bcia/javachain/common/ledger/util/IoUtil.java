@@ -128,7 +128,7 @@ public class IoUtil {
             logger.info("File {} is already exists", dirPath);
             return true;
         }
-        if (dir.mkdirs()) {
+        if (!dir.mkdirs()) {
             logger.info("Can not create dir " + dirPath);
             return false;
         }
@@ -380,9 +380,10 @@ public class IoUtil {
 
     /**
      * 输出解压缩的文件
-     * @param files
-     * @param outputPath
-     * @throws JavaChainException
+     * @param files 文件集合
+     *              key: 文件相对路径
+     *              value: 文件流
+     * @param outputPath 输出路径
      */
     public static void fileWriter(Map<String, byte[]> files, String outputPath) throws JavaChainException {
         outputPath = outputPath.endsWith(File.separator) ? outputPath : outputPath + File.separator;
@@ -407,16 +408,40 @@ public class IoUtil {
         }
     }
 
-    public static void main(String[] args) throws Exception  {
-        File file = new File("/home/bcia/test/12345.tar.gz");
-        FileInputStream fis = new FileInputStream(file);
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        int num = 0;
-        byte[] bytes = new byte[1024];
-        while((num = fis.read(bytes)) > 0){
-            baos.write(bytes, 0, num);
+    /**
+     * 将文件读取为流形式
+     * @param filePath 文件路径
+     * @param cache 缓冲大小
+     */
+    public static byte[] fileReader(String filePath, int cache) throws JavaChainException{
+        File file = new File(filePath);
+        if (!file.exists()) {
+            logger.debug("File {} not found", filePath);
+            return null;
         }
-        byte[] gzipBytes = gzipReader(baos.toByteArray(), 1024);
+        FileInputStream fis = null;
+        ByteArrayOutputStream baos = null;
+        try{
+            fis = new FileInputStream(file);
+            baos = new ByteArrayOutputStream();
+            int num = 0;
+            byte[] bytes = new byte[cache];
+            while((num = fis.read(bytes)) > 0){
+                baos.write(bytes, 0, num);
+            }
+            return baos.toByteArray();
+        } catch (Exception e){
+            logger.error(e.getMessage(), e);
+            throw new JavaChainException(e);
+        } finally {
+            closeStream(fis, baos);
+        }
+    }
+
+    public static void main(String[] args) throws Exception  {
+        String s = "/home/bcia/test/12345.tar.gz";
+        byte[] fileBytes = fileReader(s, 1024);
+        byte[] gzipBytes = gzipReader(fileBytes, 1024);
         Map<String, byte[]> tarMap = tarReader(gzipBytes, 1024);
         fileWriter(tarMap, "/home/bcia/test/123");
 
