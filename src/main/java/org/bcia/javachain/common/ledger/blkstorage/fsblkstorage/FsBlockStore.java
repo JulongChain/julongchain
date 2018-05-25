@@ -36,13 +36,16 @@ public class FsBlockStore implements IBlockStore {
 
     private String id;
     private BlockFileManager blockFileManager;
+    private Config config;
 
     public static FsBlockStore newFsBlockStore(String id,
+                                               Config config,
                                                IndexConfig indexConfig,
                                                IDBProvider dbHandle) throws LedgerException {
         FsBlockStore fsBlockStore = new FsBlockStore();
-        BlockFileManager mgr = BlockFileManager.newBlockfileMgr(id, indexConfig, dbHandle);
+        BlockFileManager mgr = BlockFileManager.newBlockfileMgr(id, config, indexConfig, dbHandle);
         fsBlockStore.setId(id);
+        fsBlockStore.setConfig(config);
         fsBlockStore.setBlockFileManager(mgr);
         return fsBlockStore;
     }
@@ -116,5 +119,13 @@ public class FsBlockStore implements IBlockStore {
 
     public void setBlockFileManager(BlockFileManager blockFileManager) {
         this.blockFileManager = blockFileManager;
+    }
+
+    public Config getConfig() {
+        return config;
+    }
+
+    public void setConfig(Config config) {
+        this.config = config;
     }
 }

@@ -134,6 +134,7 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         logger.debug("Opening kvledger with ledgerid " + ledgerID);
         //没有创建过ledgerid,抛出异常
         if(!idStore.ledgerIDExists(ledgerID)){
+            logger.error("Ledger {} does not exists", ledgerID);
             throw ERR_NON_EXISTS_LEDGER_ID;
         }
         INodeLedger lgr = openInternal(ledgerID);

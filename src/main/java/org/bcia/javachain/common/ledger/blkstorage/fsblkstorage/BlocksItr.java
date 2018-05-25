@@ -64,7 +64,7 @@ public class BlocksItr implements IResultsIterator {
      */
     public void initStream() throws LedgerException{
         FileLocPointer lp = mgr.getIndex().getBlockLocByBlockNum(blockNumToRetrieve);
-        stream.newBlockStream(mgr.getBlockFileDir(), lp.getFileSuffixNum(), lp.getLocPointer().getOffset(), -1);
+        stream.newBlockStream(mgr.getRootDir(), lp.getFileSuffixNum(), lp.getLocPointer().getOffset(), -1);
     }
 
     /**

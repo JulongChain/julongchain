@@ -22,7 +22,6 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.javachain.common.ledger.util.IDBProvider;
 import org.bcia.javachain.common.ledger.util.IoUtil;
-import org.bcia.javachain.core.ledger.kvledger.KvLedger;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.util.Util;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -52,7 +51,8 @@ public class BlockFileManager {
     public static final int CURRENT_OFFSET = 1;
     public static final int NUM_BLOCKS = 2;
 
-    private String blockFileDir;
+    private String rootDir;
+    private Config config;
     private IDBProvider db;
     private Index index;
     private CheckpointInfo cpInfo;
@@ -65,32 +65,34 @@ public class BlockFileManager {
      * 创建新的blockfilemanager对象
      */
     public static BlockFileManager newBlockfileMgr(String id,
+                                                   Config config,
                                                    IndexConfig indexConfig,
                                                    IDBProvider indexStore) throws LedgerException {
         BlockFileManager mgr = new BlockFileManager();
         logger.debug(String.format("newBlockfileMgr() initializing file-based block storage for ledger: %s", id));
         //根据配置文件、id生成rootDir
         mgr.setLedgerId(id);
-        mgr.setBlockFileDir(LedgerConfig.getChainsPath() + File.separator + id);
+        mgr.setConfig(config);
+        mgr.setRootDir(config.getLedgerBlockDir(id));
         mgr.setDb(indexStore);
         mgr.setLock(new ReentrantLock());
         mgr.setCpInfo(mgr.loadCurrentInfo());
         //创建rootdir
-        IoUtil.createDirIfMissing(mgr.getBlockFileDir());
+        IoUtil.createDirIfMissing(mgr.getRootDir());
         //设置检查点信息
         if(mgr.getCpInfo() == null){
             logger.info("Getting block information from block storage");
-            mgr.setCpInfo(BlockFileHelper.constructCheckpointInfoFromBlockFiles(mgr.getBlockFileDir()));
+            mgr.setCpInfo(BlockFileHelper.constructCheckpointInfoFromBlockFiles(mgr.getRootDir()));
             logger.debug(String.format("Info constructed by scanning the blocks dir = %s", mgr.getCpInfo().toString()));
         } else {
             logger.debug("Synching block information from block storage (if needed)");
-            mgr.syncCpInfoFromFS(mgr.getBlockFileDir(), mgr.getCpInfo());
+            mgr.syncCpInfoFromFS(mgr.getRootDir(), mgr.getCpInfo());
         }
         //保存检查点信息到leveldb中
         //blkMgrInfoKey-checkpointInfo
         mgr.saveCurrentInfo(mgr.getCpInfo(), true);
         //写入文件 writer类
-        mgr.setCurrentFileWriter(BlockFileRw.newBlockfileWriter(deriveBlockfilePath(mgr.getBlockFileDir(), mgr.getCpInfo().getLastestFileChunkSuffixNum())));
+        mgr.setCurrentFileWriter(BlockFileRw.newBlockfileWriter(deriveBlockfilePath(mgr.getRootDir(), mgr.getCpInfo().getLastestFileChunkSuffixNum())));
         //修剪文件为检查点保存的文件大小
         mgr.getCurrentFileWriter().truncateFile(mgr.getCpInfo().getLatestFileChunksize());
         //设置blockindex对象
@@ -151,7 +153,7 @@ public class BlockFileManager {
     }
 
     //组装区块文件名
-    //  blockFileDir/blockfile000000
+    //  rootDir/blockfile000000
     public static String deriveBlockfilePath(String rootDir, Integer suffixNum) {
         return String.format("%s/%s%06d", rootDir, BLOCKFILE_PREFIX, suffixNum);
     }
@@ -169,7 +171,7 @@ public class BlockFileManager {
         cpInfo.setLatestFileChunksize(0);
         cpInfo.setLastBlockNumber(this.cpInfo.getLastBlockNumber());
 
-        BlockFileWriter nextFileWriter = BlockFileRw.newBlockfileWriter(deriveBlockfilePath(this.blockFileDir, cpInfo.getLastestFileChunkSuffixNum()));
+        BlockFileWriter nextFileWriter = BlockFileRw.newBlockfileWriter(deriveBlockfilePath(this.rootDir, cpInfo.getLastestFileChunkSuffixNum()));
 
         saveCurrentInfo(cpInfo, true);
         this.currentFileWriter = nextFileWriter;
@@ -200,7 +202,7 @@ public class BlockFileManager {
         //总共添加的长度
         long totalBytesToAppend = blockBytesLen + blockBytesLenEncoded.length;
         //配置的最大文件长度
-        long maxBlockFileSize = LedgerConfig.getMaxBlockfileSize();
+        long maxBlockFileSize = config.getMaxBlockFileSize();
         //总长度大于配置的文件长度,重新开启新文件
         if(currentOffset + totalBytesToAppend > maxBlockFileSize){
             moveToNextFile();
@@ -293,7 +295,7 @@ public class BlockFileManager {
                 , startingBlockNum, cpInfo.getLastBlockNumber()));
         //初始化block流
         BlockStream stream = new BlockStream();
-        stream.newBlockStream(blockFileDir, startFileNum, startOffset, endFileNum);
+        stream.newBlockStream(rootDir, startFileNum, startOffset, endFileNum);
         byte[] blockBytes = null;
         BlockPlacementInfo blockPlacementInfo = null;
         //读取区块文件
@@ -487,7 +489,7 @@ public class BlockFileManager {
     public byte[] fetchBlockBytes(FileLocPointer lp) throws LedgerException {
         BlockFileStream stream = new BlockFileStream();
         try {
-            stream.newBlockFileStream(blockFileDir, lp.getFileSuffixNum(), (long) (lp.getLocPointer().getOffset()));
+            stream.newBlockFileStream(rootDir, lp.getFileSuffixNum(), (long) (lp.getLocPointer().getOffset()));
             byte[] bytes = stream.nextBlockBytes();
             return bytes;
         } finally {
@@ -497,7 +499,7 @@ public class BlockFileManager {
 
     public byte[] fetchRawBytes(FileLocPointer lp) throws LedgerException {
         BlockFileReader reader = null;
-        String filePath = deriveBlockfilePath(blockFileDir, lp.getFileSuffixNum());
+        String filePath = deriveBlockfilePath(rootDir, lp.getFileSuffixNum());
         reader = BlockFileRw.newBlockfileReader(filePath);
         return reader.read(lp.getLocPointer().getOffset(), lp.getLocPointer().getBytesLength());
     }
@@ -576,12 +578,12 @@ public class BlockFileManager {
         return BLOCKFILE_PREFIX;
     }
 
-    public String getBlockFileDir() {
-        return blockFileDir;
+    public String getRootDir() {
+        return rootDir;
     }
 
-    public void setBlockFileDir(String blockFileDir) {
-        this.blockFileDir = blockFileDir;
+    public void setRootDir(String rootDir) {
+        this.rootDir = rootDir;
     }
 
     public IDBProvider getDb() {
@@ -630,5 +632,13 @@ public class BlockFileManager {
 
     public void setLedgerId(String ledgerId) {
         this.ledgerId = ledgerId;
+    }
+
+    public Config getConfig() {
+        return config;
+    }
+
+    public void setConfig(Config config) {
+        this.config = config;
     }
 }

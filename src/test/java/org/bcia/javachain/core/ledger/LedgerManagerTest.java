@@ -18,6 +18,7 @@ package org.bcia.javachain.core.ledger;
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.genesis.GenesisBlockFactory;
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.core.ledger.kvledger.KvLedger;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
@@ -29,6 +30,8 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -237,6 +240,19 @@ public class LedgerManagerTest {
         LedgerManager.initialize(null);
         l = LedgerManager.openLedger(groupID);
         System.out.println("Result " + l.getBlockByTxID("80"));
+    }
+
+    @Test
+    public void showStates() throws Exception{
+        LevelDBProvider provider = LevelDBProvider.newProvider(LedgerConfig.getStateLevelDBPath());
+        Iterator<Map.Entry<byte[], byte[]>> iterator = provider.getIterator(null);
+        while(iterator.hasNext()){
+            Map.Entry<byte[], byte[]> entry = iterator.next();
+            byte[] key = entry.getKey();
+            byte[] value = entry.getValue();
+            System.out.println(new String(key));
+            System.out.println(new String(value));
+        }
     }
 
     private static void soutBytes(byte[] bytes){

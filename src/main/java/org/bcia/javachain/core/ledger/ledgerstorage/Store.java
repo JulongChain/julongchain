@@ -62,8 +62,8 @@ public class Store implements IBlockStore {
         IndexConfig indexConfig = new IndexConfig();
         indexConfig.setAttrsToIndex(attrsToIndex);
         //文件系统初始化参数
-        IBlockStoreProvider IBlockStoreProvider = FsBlockStoreProvider.newProvider(indexConfig);
-        provider.setBlkStoreProvider(IBlockStoreProvider);
+        IBlockStoreProvider blockStoreProvider = FsBlockStoreProvider.newProvider(new Config(LedgerConfig.getBlockStorePath(), LedgerConfig.getMaxBlockfileSize()), indexConfig);
+        provider.setBlkStoreProvider(blockStoreProvider);
         //pvtdata初始化
         org.bcia.javachain.core.ledger.pvtdatastorage.Provider pvtDataStoreProvider =
                 org.bcia.javachain.core.ledger.pvtdatastorage.Provider.newProvider();

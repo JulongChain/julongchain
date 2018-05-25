@@ -15,32 +15,58 @@
  */
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
+import org.bcia.javachain.core.ledger.INodeLedger;
+
+import java.io.File;
 import java.util.Random;
 
 /**
- * 封装区块文件信息
+ * 封装区块文件及索引数据库位置
  *
  * @author sunzongyu
  * @date 2018/4/7
  * @company Dingxuan
  */
 public class Config {
-//    public static final String OFFICE_PATH = "/var/javachain";
     public static final String CHAINS_DIR = "chains";
     public static final String INDEX_DIR = "index";
     public static final Integer DEFAULT_MAX_BLOCKFILE_SIZE = 64 * 1024 * 1024;
 
-    public static Conf newConf(String blockStorageDir, Integer maxBlockfileSize) {
-        if(maxBlockfileSize <= 0) {
-            maxBlockfileSize = DEFAULT_MAX_BLOCKFILE_SIZE;
-        }
-//        Conf conf = new Conf();
-//        conf.setBlockStorageDir(blockStorageDir);
-//        conf.setMaxBlockfileSize(maxBlockfileSize);
-        return null;
+    private String blockStorageDir;
+    private int maxBlockFileSize;
+
+    public Config(){}
+
+    public Config(String blockStorageDir, int maxBlockFileSize){
+        this.blockStorageDir = blockStorageDir;
+        this.maxBlockFileSize = maxBlockFileSize <=0 ? DEFAULT_MAX_BLOCKFILE_SIZE : maxBlockFileSize;
     }
 
-    public static String getPath(){
-        return null;
+    public String getIndexDir(){
+        return blockStorageDir + File.separator + INDEX_DIR;
+    }
+
+    public String getChainsDir(){
+        return blockStorageDir + File.separator + CHAINS_DIR;
+    }
+
+    public String getLedgerBlockDir(String ledgerID){
+        return getChainsDir() + File.separator + ledgerID;
+    }
+
+    public String getBlockStorageDir() {
+        return blockStorageDir;
+    }
+
+    public void setBlockStorageDir(String blockStorageDir) {
+        this.blockStorageDir = blockStorageDir;
+    }
+
+    public int getMaxBlockFileSize() {
+        return maxBlockFileSize;
+    }
+
+    public void setMaxBlockFileSize(int maxBlockFileSize) {
+        this.maxBlockFileSize = maxBlockFileSize;
     }
 }

@@ -48,7 +48,7 @@ public class FileLedgerFactory implements IFactory {
         indexConfig.setAttrsToIndex(new String[]{BlockStorage.INDEXABLE_ATTR_BLOCK_NUM});
         LedgerConfig.setRootPath(directory);
         LedgerConfig.setMaxBlockfileSize(-1);
-        this.blkStorageProvider = FsBlockStoreProvider.newProvider(indexConfig);
+        this.blkStorageProvider = FsBlockStoreProvider.newProvider(new Config(directory, -1), indexConfig);
         ledgers = new HashMap<>();
     }
 
