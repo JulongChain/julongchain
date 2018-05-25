@@ -419,7 +419,7 @@ public class Endorser implements IEndorserServer {
             Smartcontract.SmartContractInput input = spec.getSmartContractSpec().getInput();
             //参数必须3个及以上，并且第3个参数不为空
             if (input != null && input.getArgsCount() >= 3 && input.getArgs(2) != null) {
-                String action = input.getArgs(0).toString();
+                String action = input.getArgs(0).toStringUtf8();
                 if (isDeployAction(action)) {
                     try {
                         Smartcontract.SmartContractDeploymentSpec deploymentSpec = Smartcontract
