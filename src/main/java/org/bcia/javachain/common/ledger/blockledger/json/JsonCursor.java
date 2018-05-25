@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.common.ledger.blockledger.json;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.blockledger.Iterator;
+import org.bcia.javachain.common.ledger.blockledger.IIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
@@ -34,7 +34,7 @@ import java.util.AbstractMap;
  * @date 2018/04/28
  * @company Dingxuan
  */
-public class JsonCursor implements Iterator {
+public class JsonCursor implements IIterator {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(JsonCursor.class);
 
     private JsonLedger jl;
@@ -46,6 +46,7 @@ public class JsonCursor implements Iterator {
     public JsonCursor(JsonLedger jl, long blockNum){
         this.blockNum = blockNum;
         this.jl = jl;
+        this.channel = new Channel<>();
     }
 
     @Override

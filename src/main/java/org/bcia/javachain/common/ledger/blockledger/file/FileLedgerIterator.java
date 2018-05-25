@@ -17,7 +17,7 @@ package org.bcia.javachain.common.ledger.blockledger.file;
 
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.IResultsIterator;
-import org.bcia.javachain.common.ledger.blockledger.Iterator;
+import org.bcia.javachain.common.ledger.blockledger.IIterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
 import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
 import org.bcia.javachain.protos.common.Common;
@@ -32,7 +32,7 @@ import java.util.Map;
  * @date 2018/04/27
  * @company Dingxuan
  */
-public class FileLedgerIterator implements Iterator {
+public class FileLedgerIterator implements IIterator {
     private FileLedger ledger;
     private long blockNum;
     private IResultsIterator commonIterator;
@@ -44,6 +44,7 @@ public class FileLedgerIterator implements Iterator {
         this.ledger = fl;
         this.blockNum = blockNum;
         this.commonIterator = itr;
+        this.channel = new Channel<>();
     }
 
     /**
@@ -102,5 +103,13 @@ public class FileLedgerIterator implements Iterator {
 
     public void setCommonIterator(IResultsIterator commonIterator) {
         this.commonIterator = commonIterator;
+    }
+
+    public Channel<Object> getChannel() {
+        return channel;
+    }
+
+    public void setChannel(Channel<Object> channel) {
+        this.channel = channel;
     }
 }

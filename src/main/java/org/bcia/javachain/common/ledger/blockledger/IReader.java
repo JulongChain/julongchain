@@ -30,7 +30,7 @@ public interface IReader {
     /**
      * 返回迭代器
      */
-    Iterator iterator(Ab.SeekPosition startType) throws LedgerException;
+    IIterator iterator(Ab.SeekPosition startType) throws LedgerException;
 
     /**
      * 返回block数量

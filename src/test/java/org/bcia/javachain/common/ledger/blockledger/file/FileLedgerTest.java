@@ -16,13 +16,16 @@ limitations under the License.
 package org.bcia.javachain.common.ledger.blockledger.file;
 
 import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.genesis.GenesisBlockFactory;
+import org.bcia.javachain.common.ledger.blockledger.IIterator;
 import org.bcia.javachain.common.ledger.blockledger.ReadWriteBase;
-import org.bcia.javachain.common.ledger.blockledger.file.FileLedgerFactory;
+import org.bcia.javachain.common.ledger.blockledger.Util;
 import org.bcia.javachain.common.ledger.util.IoUtil;
-import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
+import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
+import org.bcia.javachain.protos.consenter.Ab;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -70,9 +73,11 @@ public class FileLedgerTest {
         Common.Block block = factory.getGenesisBlock("myGroup");
         fileRelativePath = IoUtil.getFileRelativePath(dir);
         Assert.assertSame(fileRelativePath.get("chains/myGroup/blockfile000000").length(), (long) 0);
+
         fileLedger.append(block);
         fileRelativePath = IoUtil.getFileRelativePath(dir);
         Assert.assertNotSame(fileRelativePath.get("chains/myGroup/blockfile000000").length(), (long) 0);
+
         byte[] bytes = new byte[1024];
         FileInputStream fis = new FileInputStream(fileRelativePath.get("chains/myGroup/blockfile000000"));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -87,10 +92,12 @@ public class FileLedgerTest {
     public void testHeight() throws Exception{
         Common.Block block;
         Assert.assertSame(fileLedger.height(), (long) 0);
+
         GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
         block = factory.getGenesisBlock("myGroup");
         fileLedger.append(block);
         Assert.assertSame(fileLedger.height(), (long) 1);
+
         block = Common.Block.newBuilder()
                 .setHeader(Common.BlockHeader.newBuilder()
                         .setNumber(1)
@@ -104,6 +111,73 @@ public class FileLedgerTest {
                 .build();
         fileLedger.append(block);
         Assert.assertSame(fileLedger.height(), (long) 2);
+
+        block = Common.Block.newBuilder()
+                .setHeader(Common.BlockHeader.newBuilder()
+                        .setNumber(2)
+                        .build())
+                .setMetadata(Common.BlockMetadata.newBuilder()
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .build())
+                .build();
+        fileLedger.append(block);
+        Assert.assertSame(fileLedger.height(), (long) 3);
+    }
+
+    @Test
+    public void testIterator() throws Exception {
+        IIterator itr = null;
+
+        itr = fileLedger.iterator(Ab.SeekPosition.newBuilder().setOldest(Ab.SeekOldest.getDefaultInstance()).build());
+        Assert.assertNotNull(itr);
+
+        itr = fileLedger.iterator(Ab.SeekPosition.newBuilder().setNewest(Ab.SeekNewest.getDefaultInstance()).build());
+        Assert.assertNotNull(itr);
+
+        try {
+            fileLedger.iterator(Ab.SeekPosition.newBuilder().setSpecified(Ab.SeekSpecified.getDefaultInstance()).build());
+        } catch (LedgerException e) {
+            Assert.assertEquals(e, Util.NOT_FOUND_ERROR_ITERATOR);
+        }
+
+        GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
+        Common.Block block = factory.getGenesisBlock("myGroup");
+        fileLedger.append(block);
+        itr = fileLedger.iterator(Ab.SeekPosition.newBuilder().setSpecified(Ab.SeekSpecified.getDefaultInstance()).build());
+        Assert.assertNotNull(itr);
+    }
+
+    @Test
+    public void testReadyChain() throws Exception {
+        IIterator itr = fileLedger.iterator(Ab.SeekPosition.newBuilder().setOldest(Ab.SeekOldest.getDefaultInstance()).build());
+        Channel<Object> channel = itr.readyChain();
+        Assert.assertNotNull(channel);
+    }
+
+    @Test
+    public void testNext() throws Exception{
+        Common.Block block = null;
+        GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
+        block = factory.getGenesisBlock("myGroup");
+        fileLedger.append(block);
+        block = Common.Block.newBuilder()
+                .setHeader(Common.BlockHeader.newBuilder()
+                        .setNumber(1)
+                        .build())
+                .setMetadata(Common.BlockMetadata.newBuilder()
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .build())
+                .build();
+        fileLedger.append(block);
+        Assert.assertEquals(fileLedger.height(), (long) 2);
+        IIterator itr = fileLedger.iterator(Ab.SeekPosition.newBuilder().setOldest(Ab.SeekOldest.getDefaultInstance()).build());
+        Assert.assertTrue(itr.next() instanceof Map);
     }
 
     @After

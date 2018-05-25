@@ -27,7 +27,7 @@ import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
  * @date 2018/04/26
  * @company Dingxuan
  */
-public interface Iterator extends IResultsIterator {
+public interface IIterator extends IResultsIterator {
 
     /**
      * 返回下一个block

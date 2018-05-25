@@ -16,6 +16,7 @@ limitations under the License.
 package org.bcia.javachain.common.ledger.blockledger.file;
 
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.ledger.blockledger.*;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -48,7 +49,7 @@ public class FileLedger extends ReadWriteBase {
      * 获取迭代器
      */
     @Override
-    public Iterator iterator(Ab.SeekPosition startType) throws LedgerException  {
+    public IIterator iterator(Ab.SeekPosition startType) throws LedgerException  {
         long startingBlockNumber;
         switch (startType.getTypeCase().getNumber()){
             case Ab.SeekPosition.OLDEST_FIELD_NUMBER:
@@ -68,7 +69,7 @@ public class FileLedger extends ReadWriteBase {
             default:
                 throw Util.NOT_FOUND_ERROR_ITERATOR;
         }
-        Iterator iterator = (Iterator) blockStore.retrieveBlocks(startingBlockNumber);
+        IResultsIterator iterator = blockStore.retrieveBlocks(startingBlockNumber);
         return new FileLedgerIterator(this, startingBlockNumber, iterator);
     }
 

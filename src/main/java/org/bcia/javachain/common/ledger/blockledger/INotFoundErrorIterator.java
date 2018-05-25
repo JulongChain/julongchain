@@ -22,5 +22,5 @@ package org.bcia.javachain.common.ledger.blockledger;
  * @date 2018/04/27
  * @company Dingxuan
  */
-public interface INotFoundErrorIterator extends Iterator {
+public interface INotFoundErrorIterator extends IIterator {
 }

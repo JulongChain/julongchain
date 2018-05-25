@@ -55,7 +55,7 @@ public class LSSCTest extends BaseJunit4Test {
     public void testInstalls(){
         String path="example";
         ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("1",new LinkedList<ByteString>());
-        testInstall("example02","1.0",path,"","Alice",mockStub);
+        testInstall("mycc","1.0",path,"","Alice",mockStub);
     }
 
     public void testInstall(String smartcontractName,String version,String path,

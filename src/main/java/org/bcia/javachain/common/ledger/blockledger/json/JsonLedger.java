@@ -18,7 +18,7 @@ package org.bcia.javachain.common.ledger.blockledger.json;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.util.JsonFormat;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.blockledger.Iterator;
+import org.bcia.javachain.common.ledger.blockledger.IIterator;
 import org.bcia.javachain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.javachain.common.ledger.blockledger.Util;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -105,7 +105,7 @@ public class JsonLedger extends ReadWriteBase {
     }
 
     @Override
-    public Iterator iterator(Ab.SeekPosition startPosition) throws LedgerException {
+    public IIterator iterator(Ab.SeekPosition startPosition) throws LedgerException {
         switch (startPosition.getTypeCase().getNumber()){
             case Ab.SeekPosition.OLDEST_FIELD_NUMBER:
                 return new JsonCursor(this, 0);

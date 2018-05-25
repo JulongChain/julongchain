@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.common.ledger.blockledger.ram;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.blockledger.Iterator;
+import org.bcia.javachain.common.ledger.blockledger.IIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
@@ -32,7 +32,7 @@ import java.util.AbstractMap;
  * @date 2018/04/28
  * @company Dingxuan
  */
-public class RamCursor implements Iterator {
+public class RamCursor implements IIterator {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(RamCursor.class);
 
     private SimpleList list;

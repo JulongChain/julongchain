@@ -38,7 +38,7 @@ public class BlockFileReader {
     }
 
     //从offset位起,读取length字节
-    public byte[] read(Integer offset, Integer length) throws LedgerException {
+    public byte[] read(Integer offset, int length) throws LedgerException {
         FileInputStream fis;
         byte[] result = null;
         try {

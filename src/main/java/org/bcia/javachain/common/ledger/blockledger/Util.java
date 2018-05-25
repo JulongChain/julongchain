@@ -39,7 +39,7 @@ public class Util {
         long nextBlockNumber = 0;
         ByteString previousBlockHash = null;
         if(IReader.height() > 0){
-            Iterator itr = IReader.iterator(Ab.SeekPosition.getDefaultInstance());
+            IIterator itr = IReader.iterator(Ab.SeekPosition.getDefaultInstance());
             try {
                 itr.readyChain().take();
             } catch (InterruptedException e) {
@@ -76,7 +76,7 @@ public class Util {
     }
 
     public static Common.Block getBlock(IReader IReader, long index) throws LedgerException{
-        Iterator i = IReader.iterator(Ab.SeekPosition.newBuilder()
+        IIterator i = IReader.iterator(Ab.SeekPosition.newBuilder()
                 .setSpecified(Ab.SeekSpecified.newBuilder()
                         .setNumber(index)
                         .build())

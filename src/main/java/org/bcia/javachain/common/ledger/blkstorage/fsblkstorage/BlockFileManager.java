@@ -180,7 +180,7 @@ public class BlockFileManager {
      * blockbytes               blockBytesLen
      */
     public void addBlock(Common.Block block) throws LedgerException {
-        if(block.getHeader().getNumber() != getBlockchainInfo().getHeight()){
+        if(block.getHeader().getNumber() != bcInfo.getHeight()){
             throw new LedgerException(String.format("Block number should have been %d but was %d", getBlockchainInfo().getHeight(), block.getHeader().getNumber()));
         }
         //本次提交区块位置应为之前提交区块位置后8位

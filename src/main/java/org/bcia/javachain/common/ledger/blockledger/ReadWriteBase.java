@@ -28,7 +28,7 @@ import org.bcia.javachain.protos.consenter.Ab;
  */
 public abstract class ReadWriteBase implements IReader, IWriter {
     @Override
-    public abstract Iterator iterator(Ab.SeekPosition startType) throws LedgerException;
+    public abstract IIterator iterator(Ab.SeekPosition startType) throws LedgerException;
 
     @Override
     public abstract long height() throws LedgerException;

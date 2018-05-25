@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.common.ledger.blockledger.ram;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.blockledger.Iterator;
+import org.bcia.javachain.common.ledger.blockledger.IIterator;
 import org.bcia.javachain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.javachain.common.ledger.blockledger.Util;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -50,7 +50,7 @@ public class RamLedger extends ReadWriteBase {
     }
 
     @Override
-    public Iterator iterator(Ab.SeekPosition startPosition) throws LedgerException {
+    public IIterator iterator(Ab.SeekPosition startPosition) throws LedgerException {
         SimpleList list = null;
         switch (startPosition.getTypeCase().getNumber()){
             case Ab.SeekPosition.OLDEST_FIELD_NUMBER:
