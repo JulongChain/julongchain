@@ -13,10 +13,18 @@
  */
 package org.bcia.javachain.core.smartcontract;
 
+import com.google.protobuf.ByteString;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.SmartContractException;
+import org.bcia.javachain.common.ledger.util.IoUtil;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.common.smartcontractprovider.ISmartContractPackage;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractContext;
+import org.bcia.javachain.core.common.smartcontractprovider.SmartContractProvider;
 import org.bcia.javachain.core.container.DockerUtil;
 import org.bcia.javachain.core.container.api.IBuildSpecFactory;
 import org.bcia.javachain.core.container.scintf.ISmartContractStream;
@@ -25,10 +33,11 @@ import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.javachain.core.smartcontract.client.SmartContractSupportClient;
 import org.bcia.javachain.core.smartcontract.node.SmartContractRunningUtil;
 import org.bcia.javachain.core.smartcontract.node.SmartContractSupportService;
-import org.bcia.javachain.core.smartcontract.shim.SmartContractProvider;
 
 import javax.naming.Context;
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 
 import static org.bcia.javachain.protos.node.Smartcontract.*;
 import static org.bcia.javachain.protos.node.SmartcontractShim.SmartContractMessage;
@@ -277,25 +286,44 @@ public class SmartContractSupport {
     // TODO:add by zhouhui for test,返回一个空对象，实际处理待万良兵补充
 
     String smartContractId = scContext.getName();
+    String version = scContext.getVersion();
     boolean scRunning = SmartContractRunningUtil.checkSmartContractRunning(smartContractId);
     if (!scRunning) {
       if (SmartContractSupportClient.checkSystemSmartContract(smartContractId)) {
         SmartContractSupportClient.launch(smartContractId);
+        try {
+          Thread.sleep(5000);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
         log.info("launch system smart contract success:" + smartContractId);
       } else {
-        // DockerUtil.buildImage("/root/javachain/images/scenv/Dockerfile.in", smartContractId);
-        // DockerUtil.uploadAndGetJar("");
-        log.info("launch user smart contract.");
+        try {
+          List<String> images = DockerUtil.listImages(smartContractId + "-" + version);
+          if (CollectionUtils.isEmpty(images)) {
+            ISmartContractPackage smartContractPackage =
+                SmartContractProvider.getSmartContractFromFS(smartContractId, version);
+            ByteString codePackage = smartContractPackage.getDepSpec().getCodePackage();
+            byte[] gzipBytes = IoUtil.gzipReader(codePackage.toByteArray(), 1024);
+            Map<String, byte[]> scFileBytesMap = IoUtil.tarReader(gzipBytes, 1024);
+            IoUtil.fileWriter(scFileBytesMap, "/root/instantiate");
+            String imageId = DockerUtil.buildImage("/root/instantiate/Dockerfile", smartContractId + "-" + version);
+            String containerId = DockerUtil.createContainer(imageId, smartContractId + "-" + version);
+            DockerUtil.startContainer(containerId);
+          }
+        } catch (Exception e) {
+          throw new SmartContractException(e);
+        }
       }
     }
 
-    try {
-      Thread.sleep(5000);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
+    if (spec instanceof SmartContractDeploymentSpec) {
+      log.info("================ deployment");
+      log.info(version);
     }
 
     if (spec instanceof SmartContractInvocationSpec) {
+      log.info("================ invocation");
       SmartContractInvocationSpec invocationSpec = (SmartContractInvocationSpec) spec;
       return invocationSpec.getSmartContractSpec().getInput();
     }

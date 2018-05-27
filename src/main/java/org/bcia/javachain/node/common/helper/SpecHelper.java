@@ -17,10 +17,15 @@ package org.bcia.javachain.node.common.helper;
 
 import com.google.protobuf.ByteString;
 import org.apache.commons.lang3.StringUtils;
+import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.common.ledger.util.IoUtil;
 import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.protos.node.Smartcontract;
 
+import java.io.File;
 import java.nio.charset.Charset;
+import java.util.Map;
 
 /**
  * 对Spec对象的一些操作
@@ -96,7 +101,7 @@ public class SpecHelper {
      */
     public static Smartcontract.SmartContractDeploymentSpec buildDeploymentSpec(String scName, String scVersion,
                                                                                 String scPath, Smartcontract
-                                                                                        .SmartContractInput input) {
+                                                                                        .SmartContractInput input) throws NodeException{
         //构造SmartContractID对象
         Smartcontract.SmartContractID.Builder scIdBuilder = Smartcontract.SmartContractID.newBuilder();
         scIdBuilder.setName(scName);
@@ -121,6 +126,18 @@ public class SpecHelper {
         Smartcontract.SmartContractDeploymentSpec.Builder deploymentSpec = Smartcontract.SmartContractDeploymentSpec
                 .newBuilder();
         deploymentSpec.setSmartContractSpec(spec);
+
+        if (StringUtils.isNotEmpty(scPath)) {
+            try {
+                Map<String, File> scFileMap = IoUtil.getFileRelativePath(scPath);
+                byte[] tarBytes = IoUtil.tarWriter(scFileMap, 1024);
+                byte[] codePackage = IoUtil.gzipWriter(tarBytes);
+                deploymentSpec.setCodePackage(ByteString.copyFrom(codePackage));
+            } catch (JavaChainException e) {
+                throw new NodeException(e);
+            }
+        }
+
         return deploymentSpec.build();
     }
 

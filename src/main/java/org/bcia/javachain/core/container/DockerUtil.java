@@ -14,6 +14,8 @@
 package org.bcia.javachain.core.container;
 
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.CreateContainerCmd;
+import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.BuildResponseItem;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.Image;
@@ -51,7 +53,7 @@ public class DockerUtil {
   private static JavaChainLog logger = JavaChainLogFactory.getLog(DockerUtil.class);
 
   /** docker host ip */
-  private static final String DOCKER_HOST_IP = "192.168.1.50";
+  private static final String DOCKER_HOST_IP = "localhost";
 
   /** docker host port */
   private static final String DOCKER_HOST_PORT = "2375";
@@ -174,11 +176,24 @@ public class DockerUtil {
     return result;
   }
 
-  public static void createContainer(String imageId) {
-    List<Image> imageList = getDockerClient().listImagesCmd().exec();
-    for (Image image : imageList) {
-      logger.info(image.getId() + " " + image.getRepoTags()[0]);
-    }
+  public static String createContainer(String imageId, String containerName) {
+    String containerId =
+        getDockerClient()
+            .createContainerCmd(imageId)
+            .withName(containerName)
+            // .withCmd("")
+            .withCmd("touch", "/test")
+            .exec()
+            .getId();
+    return containerId;
+  }
+
+  public static void startContainer(String containerId) {
+    getDockerClient().startContainerCmd(containerId).exec();
+  }
+
+  public static void stopContainer(String containerId) {
+    getDockerClient().stopContainerCmd(containerId).exec();
   }
 
   /**
@@ -187,7 +202,11 @@ public class DockerUtil {
    * @param smartContractFilePath
    */
   public static void uploadSmartContractFile(String smartContractFilePath) {
-    if (StringUtils.isEmpty(smartContractFilePath)) {
+    uploadFile(smartContractFilePath, SOURCE_PATH);
+  }
+
+  public static void uploadFile(String localPath, String remotePath) {
+    if (StringUtils.isEmpty(localPath) || StringUtils.isEmpty(remotePath)) {
       return;
     }
     SSHClient ssh = new SSHClient();
@@ -195,7 +214,7 @@ public class DockerUtil {
       ssh.loadKnownHosts();
       ssh.connect("localhost", 22);
       ssh.authPassword("jenkins", "jenkins");
-      ssh.newSCPFileTransfer().upload(smartContractFilePath, SOURCE_PATH);
+      ssh.newSCPFileTransfer().upload(localPath, remotePath);
     } catch (IOException e) {
       logger.error(e.getMessage(), e);
     } finally {
@@ -285,9 +304,9 @@ public class DockerUtil {
   }
 
   public static void main(String[] args) throws Exception {
-    // uploadSmartContractFile("D:\\Dockerfile");
-    // downloadJar();
-    // uploadAndGetJar("D:\\abcd.txt");
-    buildImage("D:" + File.separator + "docker" + File.separator + "Dockerfile", "test");
+    // buildImage("/root/javachain/images/scenv/Dockerfile", "javachain-baseimage1");
+    // buildImage("/root/instantiate/Dockerfile", "javachain-baseimage4");
+    DockerClient dockerClient = getDockerClient();
+    CreateContainerResponse container = dockerClient.createContainerCmd("mycc-1.0").withAttachStderr(true).withCmd("/bin/bash").exec();
   }
 }

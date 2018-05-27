@@ -219,7 +219,7 @@ public class EnvelopeHelper {
         for (int i = 0; i < endorserResponses.length; i++) {
             ProposalResponsePackage.ProposalResponse endorserResponse = endorserResponses[i];
 
-            if (endorserResponse.getResponse().getStatus() != 200) {
+            if (endorserResponse.getResponse().getStatus() != 200 &&  endorserResponse.getResponse().getStatus() != 0) {
                 throw new ValidateException("endorserResponse status error: " + endorserResponse.getResponse());
             }
 
