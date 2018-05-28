@@ -232,7 +232,7 @@ public class NodeSmartContract {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //背书
-        EndorserClient client = new EndorserClient("127.0.0.1", 7015);
+        EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
 
         //envelop V0.25
@@ -274,10 +274,9 @@ public class NodeSmartContract {
                 .ENDORSER_TRANSACTION, "", txId, spec, nonce, creator, null);
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
-        EndorserClient client = new EndorserClient("127.0.0.1", 7015);
+        EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
 
-        log.info("Query Result: " + proposalResponse.getPayload().toString(Charset.forName(CommConstant
-                .DEFAULT_CHARSET)));
+        log.info("Query Result: " + proposalResponse.getPayload().toStringUtf8());
     }
 }

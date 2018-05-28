@@ -101,7 +101,8 @@ public class SpecHelper {
      */
     public static Smartcontract.SmartContractDeploymentSpec buildDeploymentSpec(String scName, String scVersion,
                                                                                 String scPath, Smartcontract
-                                                                                        .SmartContractInput input) throws NodeException{
+                                                                                        .SmartContractInput input)
+            throws NodeException {
         //构造SmartContractID对象
         Smartcontract.SmartContractID.Builder scIdBuilder = Smartcontract.SmartContractID.newBuilder();
         scIdBuilder.setName(scName);
@@ -140,6 +141,4 @@ public class SpecHelper {
 
         return deploymentSpec.build();
     }
-
-
 }

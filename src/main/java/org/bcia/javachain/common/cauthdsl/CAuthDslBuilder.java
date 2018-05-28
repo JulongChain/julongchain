@@ -32,6 +32,7 @@ import java.util.Arrays;
  * @author sunianle
  * @date 4/3/18
  * @company Dingxuan
+ * @deprecated hangtianxinxi weihu
  */
 public class CAuthDslBuilder {
     public static Policies.SignaturePolicy signedBy(int index){
