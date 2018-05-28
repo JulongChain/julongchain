@@ -27,5 +27,5 @@ import org.bcia.javachain.common.policies.PolicyManager;
  * @company Aisino
  */
 public interface IChannelPolicyManagerGetter {
-    PolicyManager Manager(String channelID ) throws InvalidProtocolBufferException, PolicyException;
+    PolicyManager manager(String channelID ) throws InvalidProtocolBufferException, PolicyException;
 }

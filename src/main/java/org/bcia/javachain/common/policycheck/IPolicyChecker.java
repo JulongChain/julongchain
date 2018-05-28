@@ -28,7 +28,7 @@ import java.util.List;
  * @company Aisino
  */
 public interface IPolicyChecker {
-    void CheckPolicy(String channelID, String policyName, SignedProposal signedProposal);
-    void CheckPolicyBySignedData(String channelID, String policyName, List<SignedData> signedDatas);
-    void CheckPolicyNoChannel(String policyName,SignedProposal signedProposal);
+    void checkPolicy(String channelID, String policyName, SignedProposal signedProposal);
+    void checkPolicyBySignedData(String channelID, String policyName, List<SignedData> signedDatas);
+    void checkPolicyNoChannel(String policyName,SignedProposal signedProposal);
 }
