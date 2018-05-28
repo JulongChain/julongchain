@@ -24,12 +24,16 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.common.util.proto.ProposalUtils;
+import org.bcia.javachain.csp.factory.CspManager;
+import org.bcia.javachain.csp.intfs.ICsp;
 import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.IIdentityDeserializer;
 import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.TransactionPackage;
+import org.bouncycastle.util.Arrays;
 
 /**
  * 校验消息
@@ -225,6 +229,8 @@ public class MsgValidation {
 
         Common.GroupHeader groupHeader = (Common.GroupHeader) commonHeaderObjs[0];
         Common.SignatureHeader signatureHeader = (Common.SignatureHeader) commonHeaderObjs[1];
+        ProposalPackage.SmartContractHeaderExtension extension = (ProposalPackage.SmartContractHeaderExtension)
+                commonHeaderObjs[2];
 
         //校验签名(验签)
         try {
@@ -235,6 +241,7 @@ public class MsgValidation {
             return new Object[]{TransactionPackage.TxValidationCode.BAD_CREATOR_SIGNATURE};
         }
 
+        ProposalResponsePackage.ProposalResponsePayload proposalResponsePayload = null;
         switch (groupHeader.getType()) {
             case Common.HeaderType.ENDORSER_TRANSACTION_VALUE:
                 try {
@@ -244,24 +251,91 @@ public class MsgValidation {
                     log.error(e.getMessage(), e);
                     return new Object[]{TransactionPackage.TxValidationCode.BAD_PROPOSAL_TXID};
                 }
+
+                try {
+                    proposalResponsePayload = validateEndorserTransaction(payload);
+                } catch (JavaChainException e) {
+                    log.error(e.getMessage(), e);
+                    return new Object[]{TransactionPackage.TxValidationCode.INVALID_ENDORSER_TRANSACTION};
+                } catch (InvalidProtocolBufferException e) {
+                    log.error(e.getMessage(), e);
+                    return new Object[]{TransactionPackage.TxValidationCode.INVALID_ENDORSER_TRANSACTION};
+                }
                 break;
 
             case Common.HeaderType.NODE_RESOURCE_UPDATE_VALUE:
-                break;
+                if (!applicationCapabilities.isResourcesTree()) {
+                    return new Object[]{TransactionPackage.TxValidationCode.UNSUPPORTED_TX_PAYLOAD};
+                }
+
+                //jixu
 
             case Common.HeaderType.CONFIG_VALUE:
+                try {
+                    validateConfigTransaction(payload);
+                } catch (ValidateException e) {
+                    log.error(e.getMessage(), e);
+                    return new Object[]{TransactionPackage.TxValidationCode.INVALID_CONFIG_TRANSACTION};
+                }
                 break;
+            default:
+                return new Object[]{TransactionPackage.TxValidationCode.UNSUPPORTED_TX_PAYLOAD};
         }
 
-
-        return null;
-
-
+        return new Object[]{TransactionPackage.TxValidationCode.VALID, payload, groupHeader, extension,
+                proposalResponsePayload};
     }
 
-    public static void validateEndorserTransaction(Common.Payload payload){
+    private static ProposalResponsePackage.ProposalResponsePayload validateEndorserTransaction(Common.Payload payload)
+            throws JavaChainException, InvalidProtocolBufferException {
+        ValidateUtils.isNotNull(payload, "payload can not be null");
+        ValidateUtils.isNotNull(payload.getHeader(), "payload.header can not be null");
+        ValidateUtils.isNotNull(payload.getData(), "payload.data can not be null");
 
+        TransactionPackage.Transaction transaction = TransactionPackage.Transaction.parseFrom(payload.getData());
 
+        // TODO: validate transaction.Version
+        // TODO: validate SmartContractHeaderExtension
+
+        if (transaction.getActionsCount() != 1) {
+            throw new ValidateException("transaction.getActionsCount should be 1");
+        }
+
+        for (TransactionPackage.TransactionAction action : transaction.getActionsList()) {
+            ValidateUtils.isNotNull(action, "action can not be null");
+
+            Common.SignatureHeader signatureHeader = Common.SignatureHeader.parseFrom(action.getHeader());
+            validateSignatureHeader(signatureHeader);
+
+            TransactionPackage.SmartContractActionPayload actionPayload = TransactionPackage
+                    .SmartContractActionPayload.parseFrom(action.getPayload());
+
+            ProposalResponsePackage.ProposalResponsePayload proposalResponsePayload = ProposalResponsePackage
+                    .ProposalResponsePayload.parseFrom(actionPayload.getAction().getProposalResponsePayload());
+
+            //TODO:应当用哪个CSP
+            ICsp defaultCsp = CspManager.getDefaultCsp();
+
+            byte[] bytes = ArrayUtils.addAll(ArrayUtils.addAll(payload.getHeader().getGroupHeader().toByteArray(),
+                    signatureHeader.toByteArray()), actionPayload.getSmartContractProposalPayload().toByteArray());
+            byte[] hash = defaultCsp.hash(bytes, null);
+
+            if (Arrays.compareUnsigned(hash, proposalResponsePayload.getProposalHash().toByteArray()) != 0) {
+                throw new ValidateException("Wrong proposalResponsePayload.proposalHash");
+            }
+
+            return proposalResponsePayload;
+        }
+
+        return null;
+    }
+
+    private static void validateConfigTransaction(Common.Payload payload) throws ValidateException {
+        ValidateUtils.isNotNull(payload, "payload can not be null");
+        ValidateUtils.isNotNull(payload.getHeader(), "payload.header can not be null");
+        ValidateUtils.isNotNull(payload.getData(), "payload.data can not be null");
+
+        //
     }
 
 

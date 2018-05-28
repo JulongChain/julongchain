@@ -47,15 +47,17 @@ public interface ISmartContractProvider {
      * @throws SmartContractException
      */
     LedgerContext getContext(INodeLedger ledger, String txID)throws SmartContractException;
+
     /**
      * GetSCContext returns an opaque smartcontract context
      */
-    SmartContractContext getSCContext(String groupID,
+    SmartContractContext getSCContext(String groupId,
                                       String name,
-                                      String txID,
-                                      boolean bSysSC,
+                                      String version,
+                                      String txId,
+                                      boolean isSysSC,
                                       ProposalPackage.SignedProposal signedProposal,
-                                      ProposalPackage.Proposal prop);
+                                      ProposalPackage.Proposal proposal);
 
     /**
      * executeSmartContract executes the chaincode given context and args
@@ -67,7 +69,7 @@ public interface ISmartContractProvider {
      */
     SmartContractExecuteResult executeSmartContract(LedgerContext ctxt,
                                                     SmartContractContext scContext,
-                                                    List<ByteString> args)throws SmartContractException;
+                                                    byte[][] args)throws SmartContractException;
 
     /**
      * SmartContractExecuteResult executes the smartcontract given context and spec (invocation or deploy)

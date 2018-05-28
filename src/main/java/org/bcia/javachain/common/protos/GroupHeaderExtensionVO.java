@@ -13,28 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.cauthdsl;
-
-import org.bcia.javachain.common.policies.IPolicy;
-import org.bcia.javachain.msp.IIdentityDeserializer;
-import org.bcia.javachain.msp.IMspManager;
+package org.bcia.javachain.common.protos;
 
 /**
  * 类描述
  *
- * @author sunianle
- * @date 3/21/18
+ * @author zhouhui
+ * @date 2018/05/26
  * @company Dingxuan
- * @deprecated hangtianxinxi weihu
  */
-public class PolicyProvider {
-
-    public PolicyProvider(IIdentityDeserializer deserializer){}
-//    public PolicyProvider(IMspManager manager){
-//
-//    }
-
-    public IPolicy newPolicy(byte[] policyBytes) {
-        return null;
-    }
+public class GroupHeaderExtensionVO {
 }

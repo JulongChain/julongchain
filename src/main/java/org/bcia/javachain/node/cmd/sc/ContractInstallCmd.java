@@ -112,11 +112,7 @@ public class ContractInstallCmd extends AbstractNodeContractCmd {
             input = inputBuilder.build();
             //打印一下参数，检查是否跟预期一致
             for (int i = 0; i < input.getArgsCount(); i++) {
-                try {
-                    log.info("input.getArg-----$" + input.getArgs(i).toString(CommConstant.DEFAULT_CHARSET));
-                } catch (UnsupportedEncodingException e) {
-                    log.warn(e.getMessage(), e);
-                }
+                log.info("input.getArg-----$" + input.getArgs(i).toStringUtf8());
             }
         }
 

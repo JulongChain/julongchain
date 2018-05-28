@@ -13,28 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.cauthdsl;
+package org.bcia.javachain.common.protos;
 
-import org.bcia.javachain.common.policies.IPolicy;
-import org.bcia.javachain.msp.IIdentityDeserializer;
-import org.bcia.javachain.msp.IMspManager;
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.ValidateException;
 
 /**
  * 类描述
  *
- * @author sunianle
- * @date 3/21/18
+ * @author zhouhui
+ * @date 2018/05/26
  * @company Dingxuan
- * @deprecated hangtianxinxi weihu
  */
-public class PolicyProvider {
+public interface IProtoVO<T> {
+    void parseFrom(T t) throws InvalidProtocolBufferException, ValidateException;
 
-    public PolicyProvider(IIdentityDeserializer deserializer){}
-//    public PolicyProvider(IMspManager manager){
-//
-//    }
-
-    public IPolicy newPolicy(byte[] policyBytes) {
-        return null;
-    }
+    T toProto();
 }

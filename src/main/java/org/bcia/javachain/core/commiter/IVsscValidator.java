@@ -15,8 +15,9 @@
  */
 package org.bcia.javachain.core.commiter;
 
-import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
 /**
@@ -27,6 +28,9 @@ import org.bcia.javachain.protos.node.TransactionPackage;
  * @company Dingxuan
  */
 public interface IVsscValidator {
-    TransactionPackage.TxValidationCode vsscValidateTx(Common.Payload payload, byte[] envBytes, Common.Envelope
-            envelope) throws ValidateException;
+    TransactionPackage.TxValidationCode vsscValidateTx(Common.GroupHeader groupHeader,
+                                                       ProposalPackage.SmartContractHeaderExtension extension,
+                                                       byte[] envelopeBytes,
+                                                       ProposalResponsePackage.ProposalResponsePayload
+                                                               proposalResponsePayload);
 }

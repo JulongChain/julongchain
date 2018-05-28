@@ -33,19 +33,22 @@ import java.util.List;
  * @date 5/11/18
  * @company Dingxuan
  */
-public class SmartContractExecuteProvider implements ISmartContractProvider{
+public class SmartContractExecuteProvider implements ISmartContractProvider {
     @Override
     public LedgerContext getContext(INodeLedger ledger, String txID) throws SmartContractException {
         return null;
     }
 
     @Override
-    public SmartContractContext getSCContext(String groupID, String name, String txID, boolean bSysSC, ProposalPackage.SignedProposal signedProposal, ProposalPackage.Proposal prop) {
+    public SmartContractContext getSCContext(String groupId, String name, String version, String txId, boolean isSysSC,
+                                             ProposalPackage.SignedProposal signedProposal, ProposalPackage.Proposal
+                                                     proposal) {
         return null;
     }
 
     @Override
-    public SmartContractExecuteResult executeSmartContract(LedgerContext ctxt, SmartContractContext scContext, List<ByteString> args) throws SmartContractException {
+    public SmartContractExecuteResult executeSmartContract(LedgerContext ctxt, SmartContractContext scContext,
+                                                           byte[][] args) throws SmartContractException {
         return null;
     }
 
