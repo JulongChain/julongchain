@@ -340,6 +340,7 @@ public class IoUtil {
                     baos.write(buff, 0, len);
                 }
                 result.put(tae.getName(), baos.toByteArray());
+                baos.reset();
             }
         } catch (IOException e) {
             logger.error(e.getMessage(), e);

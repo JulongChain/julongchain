@@ -15,20 +15,14 @@
  */
 package org.bcia.javachain.core.ledger;
 
-import com.google.protobuf.util.JsonFormat;
-import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blockledger.json.JsonLedger;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.core.ledger.kvledger.history.historydb.HistoryDBHelper;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
-import org.bcia.javachain.core.ledger.util.Util;
-import org.bcia.javachain.protos.common.Common;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.Iterator;
 import java.util.Map;
 
