@@ -24,16 +24,16 @@ package org.bcia.javachain.core.common.sysscprovider;
  */
 public class SmartContractInstance {
 
-    private String smartContractID;
+    private String groupId;
     private String smartContractName;
     private String smartContractVersion;
 
-    public String getSmartContractID() {
-        return smartContractID;
+    public String getGroupId() {
+        return groupId;
     }
 
-    public void setSmartContractID(String smartContractID) {
-        this.smartContractID = smartContractID;
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 
     public String getSmartContractName() {
