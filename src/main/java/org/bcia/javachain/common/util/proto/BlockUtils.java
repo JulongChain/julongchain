@@ -160,4 +160,28 @@ public class BlockUtils {
 
         return blockBuilder.build();
     }
+
+    /**
+     * 填充元数据
+     *
+     * @param blockBuilder
+     */
+    public static void initBlockMetadata(Common.Block.Builder blockBuilder) {
+        Common.BlockMetadata.Builder blockMetadataBuilder = null;
+
+        if (blockBuilder.getMetadata() == null) {
+            blockMetadataBuilder = Common.BlockMetadata.newBuilder();
+            blockBuilder.setMetadata(blockMetadataBuilder);
+        } else {
+            blockMetadataBuilder = blockBuilder.getMetadataBuilder();
+        }
+
+        int metaCount = blockBuilder.getMetadata().getMetadataCount();
+        int metaMaxCount = Common.BlockMetadataIndex.CONSENTER_VALUE + 1;
+        if (metaCount < metaMaxCount) {
+            for (int i = metaCount; i < metaMaxCount; i++) {
+                blockMetadataBuilder.addMetadata(Common.BlockMetadata.getDefaultInstance().toByteString());
+            }
+        }
+    }
 }

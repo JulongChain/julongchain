@@ -26,19 +26,20 @@ import org.bcia.javachain.common.protos.PayloadVO;
 import org.bcia.javachain.common.protos.TransactionVO;
 import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.common.util.ValidateUtils;
-import org.bcia.javachain.common.util.proto.EnvelopeHelper;
+import org.bcia.javachain.common.util.proto.BlockUtils;
 import org.bcia.javachain.core.common.sysscprovider.SmartContractInstance;
 import org.bcia.javachain.core.common.validation.MsgValidation;
 import org.bcia.javachain.core.ledger.util.TxValidationFlags;
-import org.bcia.javachain.node.common.helper.SpecHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
+import java.util.*;
+
 /**
- * 类描述
+ * Committer节点校验器
  *
  * @author zhouhui
  * @date 2018/05/23
@@ -57,22 +58,140 @@ public class CommitterValidator implements ICommitterValidator {
     }
 
     @Override
-    public void validate(Common.Block block) throws ValidateException {
+    public Common.Block validate(Common.Block block) throws ValidateException {
         ValidateUtils.isNotNull(block, "block can not be null");
         ValidateUtils.isNotNull(block.getData(), "block.data can not be null");
+        ValidateUtils.isNotNull(block.getData().getDataList(), "block.data.dataList can not be null");
 
-        TxValidationFlags txValidationFlags = new TxValidationFlags(block.getData().getDataCount());
+        //该区块中交易的数量
+        int txCount = block.getData().getDataCount();
+        if (txCount <= 0) {
+            //如果交易数量少于1，该区块无效
+            throw new ValidateException("txCount should bigger than 0");
+        }
+
+        //交易验证器标识，对Block里面每一项交易打标记，到底是有效还是无效
+        TxValidationFlags txValidationFlags = new TxValidationFlags(txCount);
+
+        //有效的交易id集合(没有去重)
+        String[] txIdArray = new String[txCount];
+
+        Map<Integer, SmartContractInstance> txInvokedSCInstances = new HashMap<>();
+        Map<Integer, SmartContractInstance> txUpgradedSCInstances = new HashMap<>();
 
         BlockValidationResult result = new BlockValidationResult();
-        if (block.getData().getDataList() != null && block.getData().getDataCount() > 0) {
-            for (int i = 0; i < block.getData().getDataCount(); i++) {
-                BlockValidationRequest request = new BlockValidationRequest(block, block.getData().getData(i)
-                        .toByteArray(), i, this);
-                validateTx(request, result);
+        for (int i = 0; i < txCount; i++) {
+            BlockValidationRequest request = new BlockValidationRequest(block, block.getData().getData(i)
+                    .toByteArray(), i, this);
+            validateTx(request, result);
+
+            if (result.getTxValidationCode().equals(TransactionPackage.TxValidationCode.VALID)) {
+                txIdArray[i] = result.getTxId();
+
+                if (result.getSmartContractInstance() != null) {
+                    txInvokedSCInstances.put(i, result.getSmartContractInstance());
+                }
+
+                if (result.getSmartContractUpdateInstance() != null) {
+                    txUpgradedSCInstances.put(i, result.getSmartContractUpdateInstance());
+                }
             }
         }
 
+        if (committerSupport.getCapabilities().isForbidDuplicateTxId()) {
+            markTxIdDuplicates(txIdArray, txValidationFlags);
+        }
 
+        invalidTxsForUpgradeSC(txInvokedSCInstances, txUpgradedSCInstances, txValidationFlags);
+
+        Common.Block.Builder newBlockBuilder = block.toBuilder();
+        BlockUtils.initBlockMetadata(newBlockBuilder);
+        newBlockBuilder.getMetadataBuilder().setMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER_VALUE,
+                txValidationFlags.toByteString());
+        return newBlockBuilder.build();
+    }
+
+    private TxValidationFlags invalidTxsForUpgradeSC(Map<Integer, SmartContractInstance> txInvokedSCInstances,
+                                                     Map<Integer, SmartContractInstance> txUpgradedSCInstances,
+                                                     TxValidationFlags txValidationFlags) {
+        if (txInvokedSCInstances.size() <= 0) {
+            return txValidationFlags;
+        }
+
+        Map<String, Integer> finalValidUpgradeTxs = new HashMap<>();
+        Map<String, SmartContractInstance> upgradedSCInstances = new HashMap<>();
+
+        Iterator<Map.Entry<Integer, SmartContractInstance>> upgradedIterator = txUpgradedSCInstances.entrySet()
+                .iterator();
+        while (upgradedIterator.hasNext()) {
+            Map.Entry<Integer, SmartContractInstance> entry = upgradedIterator.next();
+            Integer txIndex = entry.getKey();
+            SmartContractInstance smartContractInstance = entry.getValue();
+
+            String upgradedSCKey = generateSCKey(smartContractInstance.getSmartContractName(), smartContractInstance
+                    .getGroupId());
+
+            if (!finalValidUpgradeTxs.containsKey(upgradedSCKey)) {
+                finalValidUpgradeTxs.put(upgradedSCKey, txIndex);
+                upgradedSCInstances.put(upgradedSCKey, smartContractInstance);
+            } else {
+                int finalIndex = finalValidUpgradeTxs.get(upgradedSCKey);
+                if (txIndex > finalIndex) {
+                    txValidationFlags.setFlag(finalIndex, TransactionPackage.TxValidationCode
+                            .SMARTCONTRACT_VERSION_CONFLICT);
+
+                    finalValidUpgradeTxs.put(upgradedSCKey, txIndex);
+                    upgradedSCInstances.put(upgradedSCKey, smartContractInstance);
+                } else {
+                    log.info("Invalid transaction with index {}: was upgraded by latter tx", txIndex);
+                    txValidationFlags.setFlag(txIndex, TransactionPackage.TxValidationCode
+                            .SMARTCONTRACT_VERSION_CONFLICT);
+                }
+            }
+        }
+
+        Iterator<Map.Entry<Integer, SmartContractInstance>> invokedIterator = txInvokedSCInstances.entrySet()
+                .iterator();
+        while (invokedIterator.hasNext()) {
+            Map.Entry<Integer, SmartContractInstance> entry = invokedIterator.next();
+            Integer txIndex = entry.getKey();
+            SmartContractInstance smartContractInstance = entry.getValue();
+
+            String sCKey = generateSCKey(smartContractInstance.getSmartContractName(), smartContractInstance
+                    .getGroupId());
+
+            if (upgradedSCInstances.containsKey(sCKey)) {
+                if (txValidationFlags.isValid(txIndex)) {
+                    txValidationFlags.setFlag(txIndex, TransactionPackage.TxValidationCode
+                            .SMARTCONTRACT_VERSION_CONFLICT);
+                }
+            }
+        }
+
+        return txValidationFlags;
+    }
+
+    private String generateSCKey(String smartContractName, String groupId) {
+        return smartContractName + CommConstant.PATH_SEPARATOR + groupId;
+    }
+
+    /**
+     * 标记交易id是否重复
+     *
+     * @param txIdArray
+     * @param txValidationFlags
+     */
+    private void markTxIdDuplicates(String[] txIdArray, TxValidationFlags txValidationFlags) {
+        List<String> existedTxList = new ArrayList<>();
+        for (int i = 0; i < txIdArray.length; i++) {
+            String txId = txIdArray[i];
+
+            if (existedTxList.contains(txId)) {
+                txValidationFlags.setFlag(i, TransactionPackage.TxValidationCode.DUPLICATE_TXID);
+            } else {
+                existedTxList.add(txId);
+            }
+        }
     }
 
     private void validateTx(BlockValidationRequest request, BlockValidationResult result) {

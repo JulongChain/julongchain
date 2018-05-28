@@ -19,12 +19,12 @@ import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.protos.common.Common;
 
 /**
- * 类描述
+ * Committer节点校验器接口
  *
  * @author zhouhui
  * @date 2018/05/23
  * @company Dingxuan
  */
 public interface ICommitterValidator {
-    void validate(Common.Block block) throws ValidateException;
+    Common.Block validate(Common.Block block) throws ValidateException;
 }
