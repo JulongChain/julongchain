@@ -14,12 +14,10 @@
 package org.bcia.javachain.core.container;
 
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.command.CreateContainerCmd;
 import com.github.dockerjava.api.command.CreateContainerResponse;
-import com.github.dockerjava.api.model.BuildResponseItem;
-import com.github.dockerjava.api.model.Container;
-import com.github.dockerjava.api.model.Image;
-import com.github.dockerjava.api.model.SearchItem;
+import com.github.dockerjava.api.model.*;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.command.BuildImageResultCallback;
 import com.google.common.collect.Sets;
@@ -33,12 +31,12 @@ import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 使用docker-java client连接和运行docker命令, docker要以dockerd -H tcp://0.0.0.0:2375方式运行,
@@ -180,15 +178,16 @@ public class DockerUtil {
     String containerId =
         getDockerClient()
             .createContainerCmd(imageId)
-            .withName(containerName)
-            // .withCmd("")
-            .withCmd("touch", "/test")
+            .withName("mycc")
+            .withCmd("/bin/sh", "-c", "java -jar /root/javachain/target/javachain-smartcontract-java-jar-with-dependencies.jar -i mycc")
             .exec()
             .getId();
+    logger.info("container ID:" + containerId);
     return containerId;
   }
 
   public static void startContainer(String containerId) {
+    logger.info("start container, ID:" + containerId);
     getDockerClient().startContainerCmd(containerId).exec();
   }
 
@@ -306,7 +305,34 @@ public class DockerUtil {
   public static void main(String[] args) throws Exception {
     // buildImage("/root/javachain/images/scenv/Dockerfile", "javachain-baseimage1");
     // buildImage("/root/instantiate/Dockerfile", "javachain-baseimage4");
+    // DockerClient dockerClient = getDockerClient();
+    // CreateContainerResponse container =
+    //     dockerClient
+    //         .createContainerCmd("mycc-1.0")
+    //         .withAttachStdin(true)
+    //         .withCmd("/bin/bash")
+    //         .exec();
+
     DockerClient dockerClient = getDockerClient();
-    CreateContainerResponse container = dockerClient.createContainerCmd("mycc-1.0").withAttachStderr(true).withCmd("/bin/bash").exec();
+
+    String containerId =
+        dockerClient
+            .createContainerCmd("mycc-1.0")
+            .withCmd("/bin/sh", "-c", "java -jar /root/javachain/target/javachain-smartcontract-java-jar-with-dependencies.jar -i mycc")
+            // .withRestartPolicy(RestartPolicy.alwaysRestart())
+            .withName("mycc-1.0-" + UUID.randomUUID().toString())
+            .exec()
+            .getId();
+
+    // dockerClient.startContainerCmd(containerId).exec();
+
+
+    // String s = "java -jar /root/javachain/target/javachain-smartcontract-java-jar-with-dependencies.jar -i mycc\r\n";
+    //
+    // getDockerClient().attachContainerCmd(containerId).withStdIn(new ByteArrayInputStream(s.getBytes()));
+
+    System.out.println(containerId);
+
   }
+
 }

@@ -308,8 +308,15 @@ public class SmartContractSupport {
             Map<String, byte[]> scFileBytesMap = IoUtil.tarReader(gzipBytes, 1024);
             IoUtil.fileWriter(scFileBytesMap, "/root/instantiate");
             String imageId = DockerUtil.buildImage("/root/instantiate/Dockerfile", smartContractId + "-" + version);
+            log.info("image ID:" + imageId);
             String containerId = DockerUtil.createContainer(imageId, smartContractId + "-" + version);
+            log.info("container ID:" + containerId);
             DockerUtil.startContainer(containerId);
+            try {
+              Thread.sleep(5000);
+            } catch (InterruptedException e) {
+              e.printStackTrace();
+            }
           }
         } catch (Exception e) {
           throw new SmartContractException(e);
