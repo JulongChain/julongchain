@@ -45,7 +45,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class FileLedgerTest {
-    static final String dir = "/tmp/javachain";
+    static final String dir = "/tmp/javachain/fileLedger";
     FileLedgerFactory fileLedgerFactory;
     ReadWriteBase fileLedger;
     @Before

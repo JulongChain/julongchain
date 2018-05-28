@@ -19,6 +19,7 @@ import com.google.protobuf.util.JsonFormat;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blockledger.IFactory;
 import org.bcia.javachain.common.ledger.blockledger.ReadWriteBase;
+import org.bcia.javachain.common.ledger.util.IoUtil;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
@@ -77,9 +78,13 @@ public class JsonLedgerFactory implements IFactory {
         if(l != null){
             return l;
         }
-        String directory = this.directory + String.format(JsonLedger.GROUP_DIRECTORY_FORMAT_STRING, groupID);
+        String directory = this.directory + File.separator + JsonLedger.GROUP_DIRECTORY_FORMAT_STRING + groupID;
         logger.debug(String.format("Initializing group %s at: %s", groupID, directory));
-        new File(directory).mkdir();
+        if (!IoUtil.createDirIfMissing(directory)) {
+            String errMsg = "Can not create dir " + directory;
+            logger.error(errMsg);
+            throw new LedgerException(errMsg);
+        }
         ReadWriteBase group = newGroup(directory);
         ledgers.put(groupID, group);
         return group;

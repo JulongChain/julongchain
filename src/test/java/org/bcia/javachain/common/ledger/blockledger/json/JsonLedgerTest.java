@@ -15,8 +15,17 @@ limitations under the License.
  */
 package org.bcia.javachain.common.ledger.blockledger.json;
 
+import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.genesis.GenesisBlockFactory;
+import org.bcia.javachain.common.ledger.blockledger.IFactory;
+import org.bcia.javachain.common.ledger.blockledger.ReadWriteBase;
+import org.bcia.javachain.csp.gm.dxct.sm3.SM3;
+import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Configtx;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
 
@@ -28,8 +37,74 @@ import java.io.File;
  * @company Dingxuan
  */
 public class JsonLedgerTest {
+    static final String dir = "/tmp/javachain/jsonLedger";
+    IFactory jsonLedgerFactory;
+    ReadWriteBase jsonLedger;
     @Before
-    public void before() throws Exception{}
+    public void before() throws Exception{
+        //重置目录
+        System.out.println(deleteDir(new File(dir)));
+        //重新生成fileLedgerFactory
+        jsonLedgerFactory = new JsonLedgerFactory(dir);
+        //创建file ledger
+        jsonLedger = jsonLedgerFactory.getOrCreate("myGroup");
+    }
+
+    @Test
+    public void testGetOrCreate() throws Exception{
+        Assert.assertNotNull(jsonLedger);
+        Assert.assertTrue(new File(dir).exists());
+        Assert.assertSame(new File(dir).listFiles().length, 1);
+        Assert.assertSame(jsonLedger.height(), (long) 0);
+        Assert.assertEquals(jsonLedgerFactory.groupIDs().get(0), "myGroup");
+    }
+
+    @Test
+    public void testGroupIDS() throws Exception{
+        Assert.assertSame(jsonLedgerFactory.groupIDs().size(), 1);
+        jsonLedgerFactory.getOrCreate("myGroup1");
+        Assert.assertSame(jsonLedgerFactory.groupIDs().size(), 2);
+        jsonLedgerFactory.getOrCreate("myGroup2");
+        Assert.assertSame(jsonLedgerFactory.groupIDs().size(), 3);
+    }
+
+    @Test
+    public void testAppend() throws Exception{
+        Assert.assertSame(jsonLedger.height(), (long) 0);
+        GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
+        Common.Block block = factory.getGenesisBlock("myGroup");
+        jsonLedger.append(block);
+        Assert.assertSame(jsonLedger.height(), (long) 1);
+
+        block = Common.Block.newBuilder()
+                .setHeader(Common.BlockHeader.newBuilder()
+                        .setPreviousHash(ByteString.copyFrom(new SM3().hash(block.getData().toByteArray())))
+                        .setNumber(1)
+                        .build())
+                .setMetadata(Common.BlockMetadata.newBuilder()
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .build())
+                .build();
+        jsonLedger.append(block);
+        Assert.assertSame(jsonLedger.height(), (long) 2);
+
+        block = Common.Block.newBuilder()
+                .setHeader(Common.BlockHeader.newBuilder()
+                        .setNumber(2)
+                        .build())
+                .setMetadata(Common.BlockMetadata.newBuilder()
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .build())
+                .build();
+        jsonLedger.append(block);
+        Assert.assertSame(jsonLedger.height(), (long) 3);
+    }
 
     @After
     public void after() throws Exception{}
