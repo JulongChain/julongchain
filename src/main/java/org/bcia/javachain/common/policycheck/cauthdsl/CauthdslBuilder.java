@@ -17,13 +17,19 @@
 package org.bcia.javachain.common.policycheck.cauthdsl;
 
 import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policies.SignaturePolicy;
 import org.bcia.javachain.common.policycheck.bean.SignaturePolicyEnvelope;
 import org.bcia.javachain.common.util.proto.ProtoUtils;
+import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.protos.common.MspPrincipal;
 import org.bcia.javachain.protos.common.Policies;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * 类描述
@@ -33,20 +39,78 @@ import java.util.Arrays;
  * @company Aisino
  */
 public class CauthdslBuilder {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(CauthdslBuilder.class);
+    // AcceptAllPolicy always evaluates to true
+    //AcceptAllPolicy总是评估为true
     private Policies.SignaturePolicyEnvelope AcceptAllPolicy;
+    // MarshaledAcceptAllPolicy is the Marshaled version of AcceptAllPolicy.
+    // arshaledAcceptAllPolicy是AcceptAllPolicy的Marshaled版本
     private byte[] MarshaledAcceptAllPolicy;
+    // RejectAllPolicy always evaluates to false
     private Policies.SignaturePolicyEnvelope RejectAllPolicy;
+    // MarshaledRejectAllPolicy is the Marshaled version of RejectAllPolicy
+    // RejectAllPolicy总是评估为false
     private byte[] MarshaledRejectAllPolicy;
 
 
-    public void init(){}
-    public Policies.SignaturePolicy envelope(SignaturePolicy policy,byte[][] identities){
-       // identities.length;
-        return null;
+    public void init(){
+        Policies.SignaturePolicy[] signaturePolicy = {};
+        byte[][] b = {};
+
+        try {
+            AcceptAllPolicy = CauthdslBuilder.envelope(nOutOf(0,signaturePolicy),b);
+            MarshaledAcceptAllPolicy = ProtoUtils.marshalOrPanic(AcceptAllPolicy);
+        }catch (Exception e){
+            log.error("Error marshaling trueEnvelope");
+            e.printStackTrace();
+        }
+        try {
+            RejectAllPolicy = CauthdslBuilder.envelope(nOutOf(1,signaturePolicy),b);
+            MarshaledRejectAllPolicy = ProtoUtils.marshalOrPanic(RejectAllPolicy);
+        }catch (Exception e){
+            log.error("marshaling falseEnvelope");
+            e.printStackTrace();
+        }
+
+
     }
+    // Envelope builds an envelope message embedding a SignaturePolicy
+    // 信封生成嵌入SignaturePolicy的信封消息
+    public static Policies.SignaturePolicyEnvelope envelope(Policies.SignaturePolicy policy,byte[][] identities){
+        MspPrincipal.MSPPrincipal[] ids = new MspPrincipal.MSPPrincipal[identities.length];
+        MspPrincipal.MSPPrincipal.Builder builder = MspPrincipal.MSPPrincipal.newBuilder();
+        Policies.SignaturePolicyEnvelope.Builder speBuilder = Policies.SignaturePolicyEnvelope.newBuilder();
+        for (int i = 0; i<ids.length; i++){
+            builder.setPrincipalClassification(MspPrincipal.MSPPrincipal.Classification.IDENTITY);
+            builder.setPrincipal(ByteString.copyFrom(identities[i]));
+            ids[i] = builder.build();
+            speBuilder.addIdentities(ids[i]);
+        }
+
+        speBuilder.setVersion(0);
+        speBuilder.setRule(policy);
+        return speBuilder.build();
+    }
+
+    /**
+     *  SignedBy creates a SignaturePolicy requiring a given signer's signature
+        SignedBy创建一个需要给定签名者签名的SignaturePolicy
+     * @param index
+     * @return
+     */
+
     public static Policies.SignaturePolicy signedBy(int index){
         return Policies.SignaturePolicy.newBuilder().setSignedBy(index).build();
     }
+
+    /**
+     * SignedByMspMember creates a SignaturePolicyEnvelope
+      requiring 1 signature from any member of the specified MSP
+     SignedByMspMember创建一个SignaturePolicyEnvelope
+     需要来自指定MSP的任何成员的1个签名
+     * @param mspId
+     * @return
+     */
     public static Policies.SignaturePolicyEnvelope signedByMspMember(String mspId){
         //构建MspPrincipal.MSPRole对象
         MspPrincipal.MSPRole.Builder mspRoleBuild = MspPrincipal.MSPRole.newBuilder();
@@ -57,12 +121,49 @@ public class CauthdslBuilder {
         MspPrincipal.MSPPrincipal.Builder builder = MspPrincipal.MSPPrincipal.newBuilder();
         builder.setPrincipalClassification(MspPrincipal.MSPPrincipal.Classification.ROLE);
         builder.setPrincipal(mspRole.toByteString());
-        return null;
-    }
-    public static Policies.SignaturePolicyEnvelope signedByMspAdmin(String mspId){
-        return null;
+        MspPrincipal.MSPPrincipal principal = builder.build();
+        Policies.SignaturePolicyEnvelope.Builder speBuilder = Policies.SignaturePolicyEnvelope.newBuilder();
+        Policies.SignaturePolicy[] sps = {CauthdslBuilder.signedBy(0)};
+        speBuilder.setVersion(0);
+        speBuilder.setRule(CauthdslBuilder.nOutOf(1,sps));
+        speBuilder.setIdentities(0,principal);
+        return speBuilder.build();
     }
 
+    /**
+     *  SignedByMspAdmin creates a SignaturePolicyEnvelope
+      requiring 1 signature from any admin of the specified MSP
+      SignedByMspAdmin创建一个SignaturePolicyEnvelope
+     需要来自指定MSP的任何管理员的1个签名
+     * @param mspId
+     * @return
+     */
+    public static Policies.SignaturePolicyEnvelope signedByMspAdmin(String mspId){
+        //构建MspPrincipal.MSPRole对象
+        MspPrincipal.MSPRole.Builder mspRoleBuild = MspPrincipal.MSPRole.newBuilder();
+        mspRoleBuild.setRole(MspPrincipal.MSPRole.MSPRoleType.ADMIN);
+        mspRoleBuild.setMspIdentifier(mspId);
+        MspPrincipal.MSPRole mspRole = mspRoleBuild.build();
+        //构建MspPrincipal.MSPPrincipal对象
+        MspPrincipal.MSPPrincipal.Builder builder = MspPrincipal.MSPPrincipal.newBuilder();
+        builder.setPrincipalClassification(MspPrincipal.MSPPrincipal.Classification.ROLE);
+        builder.setPrincipal(mspRole.toByteString());
+        MspPrincipal.MSPPrincipal principal = builder.build();
+        Policies.SignaturePolicyEnvelope.Builder speBuilder = Policies.SignaturePolicyEnvelope.newBuilder();
+        Policies.SignaturePolicy[] sps = {CauthdslBuilder.signedBy(0)};
+        speBuilder.setVersion(0);
+        speBuilder.setRule(CauthdslBuilder.nOutOf(1,sps));
+        speBuilder.setIdentities(0,principal);
+        return speBuilder.build();
+    }
+
+    /**
+     * wrapper for generating "any of a given role" type policies
+     用于生成“任何给定角色”类型策略的包装器
+     * @param role
+     * @param ids
+     * @return
+     */
     private static Policies.SignaturePolicyEnvelope signedByAnyOfGivenRole(MspPrincipal.MSPRole.MSPRoleType role, String[] ids){
         if(ids == null){
             return Policies.SignaturePolicyEnvelope.getDefaultInstance();
@@ -89,26 +190,66 @@ public class CauthdslBuilder {
         return builder.build();
     }
 
+    /**
+     *
+      SignedByAnyMember returns a policy that requires one valid
+      signature from a member of any of the orgs whose ids are
+      listed in the supplied string array
+      SignedByAnyMember返回一个需要一个有效的策略
+     从任何id的组织的成员签名
+     列在提供的字符串数组中
+     * @param ids
+     * @return
+     */
     public static Policies.SignaturePolicyEnvelope signedByAnyMember(String[] ids){
         return CauthdslBuilder.signedByAnyOfGivenRole(MspPrincipal.MSPRole.MSPRoleType.MEMBER,ids);
     }
 
+    /**
+     * SignedByAnyAdmin returns a policy that requires one valid
+       signature from a admin of any of the orgs whose ids are
+      listed in the supplied string array
+      SignedByAnyAdmin返回一个需要一个有效的策略
+     从任何id的组织的管理员签名
+     列在提供的字符串数组中
+     * @param ids
+     * @return
+     */
     public static Policies.SignaturePolicyEnvelope signedByAnyAdmin(String[] ids){
         return CauthdslBuilder.signedByAnyOfGivenRole(MspPrincipal.MSPRole.MSPRoleType.ADMIN,ids);
     }
 
-    public static Policies.SignaturePolicy and(SignaturePolicy lhs,SignaturePolicy rhs){
-        SignaturePolicy[] signaturePolicies = new SignaturePolicy[2];
-        signaturePolicies[0] = lhs;
-        signaturePolicies[1] = rhs;
-        return null;
+    /**
+     * And is a convenience method which utilizes NOutOf to produce And equivalent behavior
+     是一种利用NOutOf生成等价行为的方便方法
+     * @param lhs
+     * @param rhs
+     * @return
+     */
+    public static Policies.SignaturePolicy and(Policies.SignaturePolicy lhs,Policies.SignaturePolicy rhs){
+        Policies.SignaturePolicy[] sps = {lhs,rhs};
+        return CauthdslBuilder.nOutOf(2,sps);
     }
-    public static Policies.SignaturePolicy or(SignaturePolicy lhs,SignaturePolicy rhs){
-        SignaturePolicy[] signaturePolicies = new SignaturePolicy[2];
-        signaturePolicies[0] = lhs;
-        signaturePolicies[1] = rhs;
-        return null;
+
+    /**
+     *  Or is a convenience method which utilizes NOutOf to produce Or equivalent behavior
+      or是一种利用NOutOf产生或等同行为的便利方法
+     * @param lhs
+     * @param rhs
+     * @return
+     */
+    public static Policies.SignaturePolicy or(Policies.SignaturePolicy lhs,Policies.SignaturePolicy rhs){
+        Policies.SignaturePolicy[] sps = {lhs,rhs};
+        return CauthdslBuilder.nOutOf(1,sps);
     }
+
+    /**
+     *  NOutOf creates a policy which requires N out of the slice of policies to evaluate to true
+      NOutOf创建一个策略，要求N从策略切片中评估为true
+     * @param n
+     * @param policies
+     * @return
+     */
     public static Policies.SignaturePolicy nOutOf(int n, Policies.SignaturePolicy[] policies){
         Policies.SignaturePolicy.NOutOf.Builder builder = Policies.SignaturePolicy.NOutOf.newBuilder();
         for (Policies.SignaturePolicy policy : policies) {
