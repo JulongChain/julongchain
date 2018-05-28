@@ -21,7 +21,7 @@ import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.core.common.sysscprovider.SmartContractInstance;
 import org.bcia.javachain.core.container.scintf.ISmartContractStream;
 import org.bcia.javachain.core.endorser.MockTxSimulator;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.smartcontract.shim.fsm.Event;
 import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
 import org.bcia.javachain.protos.node.Smartcontract;
@@ -146,7 +146,7 @@ public class HandlerTest {
         String queryID = "queryID";
         IResultsIterator queryIterator = new IResultsIterator() {
             @Override
-            public IQueryResult next() throws LedgerException {
+            public QueryResult next() throws LedgerException {
                 return null;
             }
 
@@ -168,7 +168,7 @@ public class HandlerTest {
         String queryID = "queryID";
         IResultsIterator queryIterator = new IResultsIterator() {
             @Override
-            public IQueryResult next() throws LedgerException {
+            public QueryResult next() throws LedgerException {
                 return null;
             }
 
@@ -189,7 +189,7 @@ public class HandlerTest {
         txContext.setPendingQueryResults(new HashMap<>());
         txContext.getQueryIteratorMap().put("123", new IResultsIterator() {
             @Override
-            public IQueryResult next() throws LedgerException {
+            public QueryResult next() throws LedgerException {
                 return null;
             }
 
@@ -359,7 +359,7 @@ public class HandlerTest {
         txContext.getPendingQueryResults().put(iterID, pendingQueryResult);
         IResultsIterator iter = new IResultsIterator() {
             @Override
-            public IQueryResult next() throws LedgerException {
+            public QueryResult next() throws LedgerException {
                 return null;
             }
 
@@ -383,7 +383,7 @@ public class HandlerTest {
         String iterID = "iterID";
         IResultsIterator iter = new IResultsIterator() {
             @Override
-            public IQueryResult next() throws LedgerException {
+            public QueryResult next() throws LedgerException {
                 return null;
             }
 

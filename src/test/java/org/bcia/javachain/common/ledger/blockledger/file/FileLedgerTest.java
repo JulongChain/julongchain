@@ -22,6 +22,7 @@ import org.bcia.javachain.common.ledger.blockledger.IIterator;
 import org.bcia.javachain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.javachain.common.ledger.blockledger.Util;
 import org.bcia.javachain.common.ledger.util.IoUtil;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
@@ -177,7 +178,11 @@ public class FileLedgerTest {
         fileLedger.append(block);
         Assert.assertEquals(fileLedger.height(), (long) 2);
         IIterator itr = fileLedger.iterator(Ab.SeekPosition.newBuilder().setOldest(Ab.SeekOldest.getDefaultInstance()).build());
-        Assert.assertTrue(itr.next() instanceof Map);
+        while (true) {
+            QueryResult qr = itr.next();
+            Assert.assertTrue(qr.getObj() instanceof Map.Entry);
+            Assert.assertEquals(((Map.Entry) qr.getObj()).getValue(), Common.Status.SUCCESS);
+        }
     }
 
     @After
