@@ -21,8 +21,10 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blockledger.IIterator;
 import org.bcia.javachain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.javachain.common.ledger.blockledger.Util;
+import org.bcia.javachain.common.ledger.util.IoUtil;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.BytesHexStrTranslate;
 import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.consenter.Ab;
@@ -44,7 +46,7 @@ public class JsonLedger extends ReadWriteBase {
 
     private String directory;
     private long height;
-    private ByteString lashHash;
+    private ByteString lastHash;
     private Channel<Object> channle;
     private JsonFormat.Printer printer;
 
@@ -81,7 +83,7 @@ public class JsonLedger extends ReadWriteBase {
         if(block == null){
             logger.error("Error reading block " + (height - 1));
         }
-        lashHash = block.getHeader().getDataHash();
+        lastHash = block.getHeader().getDataHash();
     }
 
     public synchronized Common.Block readBlock(long number) throws FileNotFoundException{
@@ -131,22 +133,26 @@ public class JsonLedger extends ReadWriteBase {
         if(block.getHeader().getNumber() != height){
             throw new LedgerException("Block number should have been " + height + " but was " + block.getHeader().getNumber());
         }
-        if(!lashHash.equals(block.getHeader().getDataHash())){
-            throw new LedgerException("Block number should have right hash");
+        if(lastHash != null && !lastHash.equals(block.getHeader().getPreviousHash())){
+            throw new LedgerException(String.format("Block should's previous hash is [%s]\n but last hash is [%s]", BytesHexStrTranslate.bytesToHexFun1(block.getHeader().getPreviousHash().toByteArray()), BytesHexStrTranslate.bytesToHexFun1(lastHash.toByteArray())));
         }
         writeBlock(block);
-        lashHash = block.getHeader().getDataHash();
+        lastHash = block.getHeader().getDataHash();
         height++;
         channle.close();
         channle = new Channel<>();
     }
 
-    public synchronized void writeBlock(Common.Block block) throws LedgerException{
+    private synchronized void writeBlock(Common.Block block) throws LedgerException{
         String name = blockFileName(block.getHeader().getNumber());
         File file = new File(name);
         BufferedWriter writer = null;
         try {
-            file.createNewFile();
+            if (!IoUtil.createFileIfMissing(name)) {
+                String errMsg = "Can not create file " + name;
+                logger.error(errMsg);
+                throw new LedgerException(errMsg);
+            }
             writer = new BufferedWriter(new FileWriter(file));
             writer.write(JsonFormat.printer().print(block));
             writer.flush();
@@ -177,12 +183,12 @@ public class JsonLedger extends ReadWriteBase {
         this.height = height;
     }
 
-    public ByteString getLashHash() {
-        return lashHash;
+    public ByteString getLastHash() {
+        return lastHash;
     }
 
-    public void setLashHash(ByteString lashHash) {
-        this.lashHash = lashHash;
+    public void setLastHash(ByteString lastHash) {
+        this.lastHash = lastHash;
     }
 
     public JsonFormat.Printer getPrinter() {

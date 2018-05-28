@@ -16,12 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.util;
 
 import com.google.protobuf.ByteString;
-import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.core.node.NodeConfig;
 import org.bcia.javachain.protos.node.TransactionPackage;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 交易验证器标志
@@ -37,7 +32,7 @@ public class TxValidationFlags {
         this.flags = new int[len];
     }
 
-    public static TxValidationFlags fromByteString(ByteString bs) throws LedgerException {
+    public static TxValidationFlags fromByteString(ByteString bs) {
         byte[] bytes = bs.toByteArray();
         TxValidationFlags flags = new TxValidationFlags(bytes.length);
         for (int i = 0; i < bytes.length; i++) {
@@ -46,22 +41,14 @@ public class TxValidationFlags {
         return flags;
     }
 
-    public void setFlag(int txIndex, TransactionPackage.TxValidationCode flag) throws LedgerException {
-        try {
-            flags[txIndex] = flag.getNumber();
-        } catch (Exception e) {
-            throw new LedgerException(e);
-        }
+    public void setFlag(int txIndex, TransactionPackage.TxValidationCode flag) {
+        flags[txIndex] = flag.getNumber();
     }
 
-    public TransactionPackage.TxValidationCode flag(int txIndex) throws LedgerException{
-        try {
-            //TODO metadata filter位应有数据 才可以flag, 测试阶段没有正常的block
-            return TransactionPackage.TxValidationCode.forNumber(0);
+    public TransactionPackage.TxValidationCode flag(int txIndex) {
+        //TODO metadata filter位应有数据 才可以flag, 测试阶段没有正常的block
+        return TransactionPackage.TxValidationCode.forNumber(0);
 //            return TransactionPackage.TxValidationCode.forNumber(flags[txIndex]);
-        } catch (Exception e) {
-            throw new LedgerException("Got error when flag txIndex in flag()");
-        }
     }
 
     public boolean isValid(int txIndex){
