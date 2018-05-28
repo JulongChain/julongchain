@@ -27,7 +27,7 @@ import org.bcia.javachain.core.common.sysscprovider.SmartContractInstance;
 import org.bcia.javachain.core.container.scintf.ISmartContractStream;
 import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.node.NodeConfig;
 import org.bcia.javachain.core.smartcontract.shim.fsm.CBDesc;
 import org.bcia.javachain.core.smartcontract.shim.fsm.Event;
@@ -259,7 +259,7 @@ public class Handler {
         int i = smartContractName.indexOf("/");
         if(i >= 0){
             if(i < smartContractName.length() - 1){
-                instance.setSmartContractID(smartContractName.substring(i + 1, smartContractName.length()));
+                instance.setGroupId(smartContractName.substring(i + 1, smartContractName.length()));
             }
             smartContractName = smartContractName.substring(0, i);
         }
@@ -829,7 +829,7 @@ public class Handler {
                 //TODO： 测试数据
                 rangeIter = new IResultsIterator() {
                     @Override
-                    public IQueryResult next() throws LedgerException {
+                    public QueryResult next() throws LedgerException {
                         return null;
                     }
 
@@ -887,7 +887,7 @@ public class Handler {
         try {
             PendingQueryResult pendingQueryResults = txContext.getPendingQueryResults().get(iterID);
             while(true){
-                IQueryResult queryResult = iter.next();
+                QueryResult queryResult = iter.next();
                 if(queryResult == null){
                     //完成迭代
                     SmartcontractShim.QueryResultBytes[] batch = cut(pendingQueryResults);
@@ -931,7 +931,7 @@ public class Handler {
         }
     }
 
-    public void add(PendingQueryResult pendingQueryResult, IQueryResult queryResult) {
+    public void add(PendingQueryResult pendingQueryResult, QueryResult queryResult) {
         try{
             ByteString queryResultsBytes = ((Message)queryResult).toByteString();
             SmartcontractShim.QueryResultBytes[] arr = pendingQueryResult.getBatch();
@@ -1161,7 +1161,7 @@ public class Handler {
             //TODO: for test
             executeIter = new IResultsIterator() {
                 @Override
-                public IQueryResult next() throws LedgerException {
+                public QueryResult next() throws LedgerException {
                     return null;
                 }
 
@@ -1255,7 +1255,7 @@ public class Handler {
                 //TODO: for test
                 historyIterator = new IResultsIterator() {
                     @Override
-                    public IQueryResult next() throws LedgerException {
+                    public QueryResult next() throws LedgerException {
                         return null;
                     }
 
@@ -1462,17 +1462,17 @@ public class Handler {
                 chaincodeSpec = chaincodeSpec.toBuilder()
                         .setSmartContractId(scID)
                         .build();
-                if("".equals(calledCcIns.getSmartContractID())){
-                    calledCcIns.setSmartContractID(txContext.getChainID());
+                if("".equals(calledCcIns.getGroupId())){
+                    calledCcIns.setGroupId(txContext.getChainID());
                 }
                 logger.info(String.format("[%s] C-call-C %s on channel %s"
-                        , shorttxid(msg.getTxid()), calledCcIns.getSmartContractName(), calledCcIns.getSmartContractID()));
+                        , shorttxid(msg.getTxid()), calledCcIns.getSmartContractName(), calledCcIns.getGroupId()));
                 try{
                     //unrealized function, throws RuntionException
                     checkACL(txContext.getSignedProp(), txContext.getProposal(), calledCcIns);
                 } catch (RuntimeException e){
                     logger.error(String.format("[%s] C-call-C %s on channel %s failed check ACL [%s]. Sending %s"
-                            , shorttxid(msg.getTxid()), calledCcIns.getSmartContractName(), calledCcIns.getSmartContractID(), txContext.getSignedProp(), printStackTrace(e)));
+                            , shorttxid(msg.getTxid()), calledCcIns.getSmartContractName(), calledCcIns.getGroupId(), txContext.getSignedProp(), printStackTrace(e)));
                     triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), ByteString.copyFromUtf8(printStackTrace(e)));
                     returnTriggerNextState(msg, triggerNextStateMsg);
                     return;
@@ -1488,7 +1488,7 @@ public class Handler {
 //                        lgr := peer.GetLedger(calledCcIns.ChainID)
                     NodeConfig.Ledger lgr = new NodeConfig.Ledger();
                     if(lgr == null){
-                        ByteString payload = ByteString.copyFromUtf8("Failed to find ledger for called channel " + calledCcIns.getSmartContractID());
+                        ByteString payload = ByteString.copyFromUtf8("Failed to find ledger for called channel " + calledCcIns.getGroupId());
                         triggerNextStateMsg = newEventMessage(ERROR, msg.getGroupId(), msg.getTxid(), payload);
                         return;
                     }
@@ -1506,7 +1506,7 @@ public class Handler {
 //                    ctxt = context.WithValue(ctxt, TXSimulatorKey, txsim)
 //                    ctxt = context.WithValue(ctxt, HistoryQueryExecutorKey, historyQueryExecutor)
                 logger.info(String.format("[%s] getting chaincode data for %s on channel %s"
-                        , shorttxid(msg.getTxid()), calledCcIns.getSmartContractName(), calledCcIns.getSmartContractID()));
+                        , shorttxid(msg.getTxid()), calledCcIns.getSmartContractName(), calledCcIns.getGroupId()));
 
                 boolean isscc = true;
 //                    isscc := sysccprovider.GetSystemChaincodeProvider().IsSysCC(calledCcIns.ChaincodeName)
