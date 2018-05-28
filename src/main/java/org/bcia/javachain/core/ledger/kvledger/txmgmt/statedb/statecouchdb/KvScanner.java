@@ -19,7 +19,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 
 /**
  * kv查询类
@@ -35,7 +35,7 @@ public class KvScanner implements IResultsIterator {
     private String ns;
 
     @Override
-    public IQueryResult next() throws LedgerException {
+    public QueryResult next() throws LedgerException {
         return null;
     }
 

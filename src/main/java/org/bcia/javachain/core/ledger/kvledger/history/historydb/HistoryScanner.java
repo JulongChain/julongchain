@@ -20,7 +20,7 @@ import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.ledger.blkstorage.IBlockStore;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.iq80.leveldb.DBIterator;
 
 import java.util.Map;
@@ -61,7 +61,7 @@ public class HistoryScanner implements IResultsIterator {
     }
 
     @Override
-    public IQueryResult next() throws LedgerException {
+    public QueryResult next() throws LedgerException {
         if(!dbIter.hasNext()){
             return null;
         }
@@ -71,7 +71,7 @@ public class HistoryScanner implements IResultsIterator {
         tranNum = HistoryDBHelper.splitCompositeHistoryKeyForTranNum(historyKey, compositePartialKey.length);
         logger.debug(String.format("Found history record for namespace: %s, key: %s. BlockNum: %d, TranNum: %d", nameSpace, key, blockNum, tranNum));
 
-        return (IQueryResult) this;
+        return new QueryResult(this);
     }
 
     @Override

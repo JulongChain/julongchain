@@ -19,7 +19,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blockledger.IIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
 import org.bcia.javachain.protos.common.Common;
 
@@ -44,11 +44,11 @@ public class RamCursor implements IIterator {
     }
 
     @Override
-    public IQueryResult next() throws LedgerException {
+    public QueryResult next() throws LedgerException {
         while (true) {
             if(list.getNext() != null){
                 list = list.getNext();
-                return (IQueryResult) new AbstractMap.SimpleImmutableEntry<IQueryResult, Common.Status>((IQueryResult) list.getBlock().toByteString(), Common.Status.SUCCESS);
+                return new QueryResult(new AbstractMap.SimpleImmutableEntry<QueryResult, Common.Status>(new QueryResult(list.getBlock()), Common.Status.SUCCESS));
             }
             try {
                 list.getChannel().take();

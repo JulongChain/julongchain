@@ -20,7 +20,7 @@ import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RWSetBuilder;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 
 /**
@@ -38,12 +38,12 @@ public class QueryIResultsItr implements IResultsIterator {
     private RWSetBuilder rwSetBuilder;
 
     @Override
-    public IQueryResult next() throws LedgerException {
-        IQueryResult queryResult = dbItr.next();
+    public QueryResult next() throws LedgerException {
+        QueryResult queryResult = dbItr.next();
         if(queryResult == null){
             return null;
         }
-        VersionedKV versionedQueyrRecord = (VersionedKV) queryResult;
+        VersionedKV versionedQueyrRecord = (VersionedKV) queryResult.getObj();
         loggger.debug("queryResultItr.Next() returned a record " + new String(versionedQueyrRecord.getVersionedValue().getValue()));
         if(rwSetBuilder != null){
             rwSetBuilder.addToReadSet(versionedQueyrRecord.getCompositeKey().getNamespace(),

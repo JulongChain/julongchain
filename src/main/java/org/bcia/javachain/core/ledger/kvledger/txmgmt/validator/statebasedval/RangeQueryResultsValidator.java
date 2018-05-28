@@ -19,7 +19,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
@@ -50,7 +50,7 @@ public class RangeQueryResultsValidator implements IRangeQueryValidator {
     @Override
     public boolean validate() throws LedgerException {
         List<KvRwset.KVRead> rqResults = rqInfo.getRawReads().getKvReadsList();
-        IQueryResult result = itr.next();
+        QueryResult result = itr.next();
         if(rqResults == null){
             return result == null;
         }
@@ -60,11 +60,11 @@ public class RangeQueryResultsValidator implements IRangeQueryValidator {
                 logger.debug("Query response null.Key " + kvRead.getKey() + " got deleted");
                 return false;
             }
-            if(!((VersionedKV) result).getCompositeKey().getKey().equals(kvRead.getKey())){
-                logger.debug(String.format("Key name mismatch: key in rwset = %s, key in query result = %s", kvRead.getKey(), ((VersionedKV) result).getCompositeKey().getKey()));
+            if(!((VersionedKV) result.getObj()).getCompositeKey().getKey().equals(kvRead.getKey())){
+                logger.debug(String.format("Key name mismatch: key in rwset = %s, key in query result = %s", kvRead.getKey(), ((VersionedKV) result.getObj()).getCompositeKey().getKey()));
                 return false;
             }
-            if(!Height.areSame(((VersionedKV) result).getVersionedValue().getVersion(), convertToVersionHeight(kvRead.getVersion()))){
+            if(!Height.areSame(((VersionedKV) result.getObj()).getVersionedValue().getVersion(), convertToVersionHeight(kvRead.getVersion()))){
                 logger.debug(String.format("Version mismatch: key = %s", kvRead.getKey()));
                 return false;
             }

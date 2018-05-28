@@ -22,5 +22,18 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
  * @date 2018/4/9
  * @company Dingxuan
  */
-public interface IQueryResult {
+public class QueryResult {
+    private Object obj;
+
+    public QueryResult(Object obj){
+        this.obj = obj;
+    }
+
+    public Object getObj() {
+        return obj;
+    }
+
+    public void setObj(Object obj) {
+        this.obj = obj;
+    }
 }

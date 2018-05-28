@@ -19,7 +19,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 
 /**
  *  区块迭代器
@@ -44,7 +44,6 @@ public class BlocksItr implements IResultsIterator {
         itr.setMgr(mgr);
         itr.setMaxBlockNumAvailable(mgr.getCpInfo().getLastBlockNumber());
         itr.setBlockNumToRetrieve(startBlockNum);
-        itr.setStream(new BlockStream());
         itr.setCloseMarker(false);
         return itr;
     }
@@ -88,7 +87,7 @@ public class BlocksItr implements IResultsIterator {
      * @return block转成的byteString
      */
     @Override
-    public synchronized IQueryResult next() throws LedgerException {
+    public synchronized QueryResult next() throws LedgerException {
         //当区块长度不足时等待
         if(maxBlockNumAvailable < blockNumToRetrieve){
             maxBlockNumAvailable = waitForBlock(blockNumToRetrieve);
@@ -98,11 +97,12 @@ public class BlocksItr implements IResultsIterator {
         }
         if(stream == null){
             logger.debug("Initializing block stream for iterator, maxBlockNumAvaliable = " + maxBlockNumAvailable);
+            this.stream = new BlockStream();
             initStream();
         }
         byte[] nextBlockBytes = stream.nextBlockBytes();
         blockNumToRetrieve++;
-        return (IQueryResult) BlockSerialization.deserializeBlock(nextBlockBytes).toByteString();
+        return new QueryResult(BlockSerialization.deserializeBlock(nextBlockBytes));
     }
 
     @Override

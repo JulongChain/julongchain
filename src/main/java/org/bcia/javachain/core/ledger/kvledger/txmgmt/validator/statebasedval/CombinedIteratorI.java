@@ -47,8 +47,8 @@ public class CombinedIteratorI implements IResultsIterator {
 
     private IResultsIterator dbItr;
     private IResultsIterator updatesItr;
-    private IQueryResult dbItm;
-    private IQueryResult updatesItm;
+    private QueryResult dbItm;
+    private QueryResult updatesItm;
     private boolean endKeyServed;
 
     public static CombinedIteratorI newCombinedIterator(IVersionedDB db,
@@ -59,8 +59,8 @@ public class CombinedIteratorI implements IResultsIterator {
                                                         boolean includeEndKey) throws LedgerException {
         IResultsIterator dbItr = db.getStateRangeScanIterator(ns, startKey, endKey);
         IResultsIterator updatesItr = updates.getRangeScanIterator(ns, startKey, endKey);
-        IQueryResult dbItm = dbItr.next();
-        IQueryResult updatesItm = updatesItr.next();
+        QueryResult dbItm = dbItr.next();
+        QueryResult updatesItm = updatesItr.next();
         logger.debug("Combined iterator initialized");
         CombinedIteratorI itr = new CombinedIteratorI();
         itr.setNs(ns);
@@ -77,13 +77,13 @@ public class CombinedIteratorI implements IResultsIterator {
     }
 
     @Override
-    public IQueryResult next() throws LedgerException {
+    public QueryResult next() throws LedgerException {
         if(dbItm == null && updatesItm == null){
             logger.debug("dbItm and updatesItm both are null");
             return serveEndKeyIfNeeded();
         }
         int compareResult = compareKey(dbItm, updatesItm);
-        IQueryResult selectedItm = null;
+        QueryResult selectedItm = null;
         boolean moveDBItr = false;
         boolean moveUpdatesItr = false;
         logger.debug("compareResult = " + compareResult);
@@ -120,11 +120,11 @@ public class CombinedIteratorI implements IResultsIterator {
         dbItr.close();
     }
 
-    private boolean isDelete(IQueryResult itm){
-        return ((VersionedKV) itm).getVersionedValue().getValue() == null;
+    private boolean isDelete(QueryResult itm){
+        return  ((VersionedKV) itm.getObj()).getVersionedValue().getValue() == null;
     }
 
-    private int compareKey(IQueryResult o1, IQueryResult o2){
+    private int compareKey(QueryResult o1, QueryResult o2){
         if(o1 == null){
             if(o2 == null){
                 return 0;
@@ -134,11 +134,11 @@ public class CombinedIteratorI implements IResultsIterator {
         if(o2 == null){
             return -1;
         }
-        return ((VersionedKV) o1).getCompositeKey().getKey()
-                .compareTo(((VersionedKV) o2).getCompositeKey().getKey());
+        return ((VersionedKV) o1.getObj()).getCompositeKey().getKey()
+                .compareTo(((VersionedKV) o2.getObj()).getCompositeKey().getKey());
     }
 
-    private IQueryResult serveEndKeyIfNeeded() throws LedgerException {
+    private QueryResult serveEndKeyIfNeeded() throws LedgerException {
         if(!includeEndKey || endKeyServed){
             logger.debug("Endkey not be served... Returning null");
             return null;
@@ -160,7 +160,7 @@ public class CombinedIteratorI implements IResultsIterator {
         key.setNamespace(ns);
         vkv.setVersionedValue(vv);
         vkv.setCompositeKey(key);
-        return vkv;
+        return new QueryResult(vkv);
     }
 
     public String getNs() {
@@ -219,19 +219,19 @@ public class CombinedIteratorI implements IResultsIterator {
         this.updatesItr = updatesItr;
     }
 
-    public IQueryResult getDbItm() {
+    public QueryResult getDbItm() {
         return dbItm;
     }
 
-    public void setDbItm(IQueryResult dbItm) {
+    public void setDbItm(QueryResult dbItm) {
         this.dbItm = dbItm;
     }
 
-    public IQueryResult getUpdatesItm() {
+    public QueryResult getUpdatesItm() {
         return updatesItm;
     }
 
-    public void setUpdatesItm(IQueryResult updatesItm) {
+    public void setUpdatesItm(QueryResult updatesItm) {
         this.updatesItm = updatesItm;
     }
 

@@ -20,7 +20,7 @@ import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RWSetBuilder;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RangeQueryResultsHelper;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RwSetUtil;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
@@ -64,7 +64,7 @@ public class IResultsItr implements IResultsIterator {
         return itr;
     }
 
-    private void updateRangeQueryInfo(IQueryResult queryResult){
+    private void updateRangeQueryInfo(QueryResult queryResult){
         if(rwSetBuilder == null){
             return;
         }
@@ -74,14 +74,14 @@ public class IResultsItr implements IResultsIterator {
                     .setItrExhausted(true)
                     .build();
         }
-        VersionedKV versionedKV = (VersionedKV) queryResult;
+        VersionedKV versionedKV = (VersionedKV) queryResult.getObj();
         rangeQueryResultsHelper.addResult(RwSetUtil.newKVRead(versionedKV.getCompositeKey().getKey(), versionedKV.getVersionedValue().getVersion()));
         rangeQueryInfo = rangeQueryInfo.toBuilder().setEndKey(versionedKV.getCompositeKey().getKey()).build();
     }
 
     @Override
-    public IQueryResult next() throws LedgerException {
-        IQueryResult queryResult = dbItr.next();
+    public QueryResult next() throws LedgerException {
+        QueryResult queryResult = dbItr.next();
         updateRangeQueryInfo(queryResult);
         if(queryResult == null){
             return null;

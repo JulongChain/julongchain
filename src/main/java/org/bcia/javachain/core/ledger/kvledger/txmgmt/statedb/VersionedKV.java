@@ -25,7 +25,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.Versi
  * @date 2018/04/16
  * @company Dingxuan
  */
-public class VersionedKV implements IQueryResult {
+public class VersionedKV {
 
     private CompositeKey compositeKey;
     private VersionedValue versionedValue;

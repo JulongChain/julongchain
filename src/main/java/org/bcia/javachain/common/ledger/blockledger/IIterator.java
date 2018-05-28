@@ -17,7 +17,7 @@ package org.bcia.javachain.common.ledger.blockledger;
 
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.IResultsIterator;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
 
 /**
@@ -33,7 +33,7 @@ public interface IIterator extends IResultsIterator {
      * 返回下一个block
      */
     @Override
-    IQueryResult next() throws LedgerException;
+    QueryResult next() throws LedgerException;
 
     Channel<Object> readyChain() throws LedgerException;
 

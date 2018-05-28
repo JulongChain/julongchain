@@ -19,7 +19,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blockledger.IIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
 import org.bcia.javachain.protos.common.Common;
 
@@ -50,15 +50,15 @@ public class JsonCursor implements IIterator {
     }
 
     @Override
-    public IQueryResult next() throws LedgerException {
+    public QueryResult next() throws LedgerException {
         while (true) {
             try {
                 Common.Block block = jl.readBlock(blockNum);
                 if(block == null){
-                    return (IQueryResult) new AbstractMap.SimpleImmutableEntry<IQueryResult, Common.Status>(null, Common.Status.SERVICE_UNAVAILABLE);
+                    return new QueryResult(new AbstractMap.SimpleImmutableEntry<QueryResult, Common.Status>(null, Common.Status.SERVICE_UNAVAILABLE));
                 }
                 blockNum++;
-                return (IQueryResult) new AbstractMap.SimpleImmutableEntry<IQueryResult, Common.Status>((IQueryResult) block.toByteString(), Common.Status.SUCCESS);
+                return new QueryResult(new AbstractMap.SimpleImmutableEntry<QueryResult, Common.Status>( new QueryResult(block), Common.Status.SUCCESS));
             } catch (FileNotFoundException e) {
                 if (channel != null) {
                     channel.add(new Object());

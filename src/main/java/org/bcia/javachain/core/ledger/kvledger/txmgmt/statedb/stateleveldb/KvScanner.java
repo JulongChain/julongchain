@@ -17,7 +17,7 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.IResultsIterator;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IQueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.StatedDB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
@@ -62,7 +62,7 @@ public class KvScanner implements IResultsIterator {
     }
 
     @Override
-    public IQueryResult next() throws LedgerException {
+    public QueryResult next() throws LedgerException {
         if(dbItr.hasNext()){
             return null;
         }
@@ -73,16 +73,16 @@ public class KvScanner implements IResultsIterator {
         String key = VersionedLevelDB.splitCompositeKeyToKey(dbKey);
         byte[] value = StatedDB.decodeValueToBytes(dbValCpy);
         Height version = StatedDB.decodeValueToHeight(dbValCpy);
-        IQueryResult kv = new VersionedKV();
         CompositeKey compositeKey = new CompositeKey();
         compositeKey.setKey(key);
         compositeKey.setNamespace(nameSpace);
         VersionedValue versionedValue = new VersionedValue();
         versionedValue.setVersion(version);
         versionedValue.setValue(value);
-        ((VersionedKV) kv).setCompositeKey(compositeKey);
-        ((VersionedKV) kv).setVersionedValue(versionedValue);
-        return kv;
+        VersionedKV kv = new VersionedKV();
+        kv.setCompositeKey(compositeKey);
+        kv.setVersionedValue(versionedValue);
+        return new QueryResult(kv);
     }
 
     @Override
