@@ -16,8 +16,14 @@
 
 package org.bcia.javachain.common.policycheck.cauthdsl;
 
+import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.policies.SignaturePolicy;
 import org.bcia.javachain.common.policycheck.bean.SignaturePolicyEnvelope;
+import org.bcia.javachain.common.util.proto.ProtoUtils;
+import org.bcia.javachain.protos.common.MspPrincipal;
+import org.bcia.javachain.protos.common.Policies;
+
+import java.util.Arrays;
 
 /**
  * 类描述
@@ -27,38 +33,91 @@ import org.bcia.javachain.common.policycheck.bean.SignaturePolicyEnvelope;
  * @company Aisino
  */
 public class CauthdslBuilder {
-    private SignaturePolicyEnvelope AcceptAllPolicy;
+    private Policies.SignaturePolicyEnvelope AcceptAllPolicy;
     private byte[] MarshaledAcceptAllPolicy;
-    private SignaturePolicyEnvelope RejectAllPolicy;
+    private Policies.SignaturePolicyEnvelope RejectAllPolicy;
     private byte[] MarshaledRejectAllPolicy;
+
+
     public void init(){}
-    public void Envelope(SignaturePolicy policy,byte[][] identities){
-
+    public Policies.SignaturePolicy envelope(SignaturePolicy policy,byte[][] identities){
+       // identities.length;
+        return null;
     }
-    public void SignedBy(int index){}
-    public void SignedByMspMember(String mspId){}
-    public void SignedByMspAdmin(String mspId){}
-    public void signedByAnyOfGivenRole(){
-
+    public static Policies.SignaturePolicy signedBy(int index){
+        return Policies.SignaturePolicy.newBuilder().setSignedBy(index).build();
     }
-    public void SignedByAnyMember(){}
-    public void SignedByAnyAdmin(String[] ids){
-
+    public static Policies.SignaturePolicyEnvelope signedByMspMember(String mspId){
+        //构建MspPrincipal.MSPRole对象
+        MspPrincipal.MSPRole.Builder mspRoleBuild = MspPrincipal.MSPRole.newBuilder();
+        mspRoleBuild.setRole(MspPrincipal.MSPRole.MSPRoleType.MEMBER);
+        mspRoleBuild.setMspIdentifier(mspId);
+        MspPrincipal.MSPRole mspRole = mspRoleBuild.build();
+        //构建MspPrincipal.MSPPrincipal对象
+        MspPrincipal.MSPPrincipal.Builder builder = MspPrincipal.MSPPrincipal.newBuilder();
+        builder.setPrincipalClassification(MspPrincipal.MSPPrincipal.Classification.ROLE);
+        builder.setPrincipal(mspRole.toByteString());
+        return null;
     }
-    public SignaturePolicy And(SignaturePolicy lhs,SignaturePolicy rhs){
+    public static Policies.SignaturePolicyEnvelope signedByMspAdmin(String mspId){
+        return null;
+    }
+
+    private static Policies.SignaturePolicyEnvelope signedByAnyOfGivenRole(MspPrincipal.MSPRole.MSPRoleType role, String[] ids){
+        if(ids == null){
+            return Policies.SignaturePolicyEnvelope.getDefaultInstance();
+        }
+        Arrays.sort(ids);
+        MspPrincipal.MSPPrincipal[] principals = new MspPrincipal.MSPPrincipal[ids.length];
+        Policies.SignaturePolicy[] sigspolicy = new Policies.SignaturePolicy[ids.length];
+        for (int i = 0; i < ids.length; i++) {
+            principals[i] = MspPrincipal.MSPPrincipal.newBuilder()
+                    .setPrincipalClassification(MspPrincipal.MSPPrincipal.Classification.ROLE)
+                    .setPrincipal(ByteString.copyFrom(ProtoUtils.marshalOrPanic(MspPrincipal.MSPRole.newBuilder()
+                            .setRole(role)
+                            .setMspIdentifier(ids[i])
+                            .build())))
+                    .build();
+            sigspolicy[i] = signedBy(i);
+        }
+        Policies.SignaturePolicyEnvelope.Builder builder = Policies.SignaturePolicyEnvelope.newBuilder()
+                .setVersion(0)
+                .setRule(nOutOf(1, sigspolicy));
+        for (MspPrincipal.MSPPrincipal principal : principals) {
+            builder.addIdentities(principal);
+        }
+        return builder.build();
+    }
+
+    public static Policies.SignaturePolicyEnvelope signedByAnyMember(String[] ids){
+        return CauthdslBuilder.signedByAnyOfGivenRole(MspPrincipal.MSPRole.MSPRoleType.MEMBER,ids);
+    }
+
+    public static Policies.SignaturePolicyEnvelope signedByAnyAdmin(String[] ids){
+        return CauthdslBuilder.signedByAnyOfGivenRole(MspPrincipal.MSPRole.MSPRoleType.ADMIN,ids);
+    }
+
+    public static Policies.SignaturePolicy and(SignaturePolicy lhs,SignaturePolicy rhs){
         SignaturePolicy[] signaturePolicies = new SignaturePolicy[2];
         signaturePolicies[0] = lhs;
         signaturePolicies[1] = rhs;
-        return NOutOf(2,signaturePolicies);
+        return null;
     }
-    public SignaturePolicy Or(SignaturePolicy lhs,SignaturePolicy rhs){
+    public static Policies.SignaturePolicy or(SignaturePolicy lhs,SignaturePolicy rhs){
         SignaturePolicy[] signaturePolicies = new SignaturePolicy[2];
         signaturePolicies[0] = lhs;
         signaturePolicies[1] = rhs;
-        return NOutOf(1,signaturePolicies);
+        return null;
     }
-    public SignaturePolicy NOutOf(int n, SignaturePolicy[] signaturePolicys){
-        return signaturePolicys[0];
+    public static Policies.SignaturePolicy nOutOf(int n, Policies.SignaturePolicy[] policies){
+        Policies.SignaturePolicy.NOutOf.Builder builder = Policies.SignaturePolicy.NOutOf.newBuilder();
+        for (Policies.SignaturePolicy policy : policies) {
+            builder.addRules(policy);
+        }
+        builder.setN(n);
+        return Policies.SignaturePolicy.newBuilder()
+                .setNOutOf(builder)
+                .build();
     }
 
 }

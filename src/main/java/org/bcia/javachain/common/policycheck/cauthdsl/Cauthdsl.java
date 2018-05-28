@@ -121,12 +121,12 @@ public class Cauthdsl {
             }
         }
         int N = policy.getNOutOf().getN();
-        if(verified>=N){
+        if(verified >= N){
            log.info(signedDatas+"gate"+ grepKey+"evaluation succeeds");
         }else{
             log.info(signedDatas+"gate"+ grepKey+"evaluation  fails");
         }
-        return verified>=N;
+        return verified >= N;
     }
 
     public static boolean confirmSignedData1(SignedData[] signedDatas, Boolean[] used, MspPrincipal.MSPPrincipal signedByID, IIdentityDeserializer deserializer,Policies.SignaturePolicy policy){

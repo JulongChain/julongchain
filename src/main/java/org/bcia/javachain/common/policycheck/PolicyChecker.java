@@ -20,11 +20,9 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.common.policies.IPolicy;
 import org.bcia.javachain.common.policies.PolicyManager;
 import org.bcia.javachain.common.policycheck.bean.SignedProposal;
 import org.bcia.javachain.common.policycheck.cauthdsl.Policy;
-import org.bcia.javachain.common.policycheck.policies.ChannelPolicyManager;
 import org.bcia.javachain.common.policycheck.policies.IChannelPolicyManagerGetter;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.msp.IIdentity;
@@ -52,7 +50,7 @@ public class PolicyChecker implements IPolicyChecker{
     private IMspPrincipalGetter principalGetter;
 
 
-    public PolicyChecker(org.bcia.javachain.common.policycheck.policies.IChannelPolicyManagerGetter IChannelPolicyManagerGetter, IIdentityDeserializer localMSP, IMspPrincipalGetter principalGetter) {
+    public PolicyChecker(IChannelPolicyManagerGetter IChannelPolicyManagerGetter, IIdentityDeserializer localMSP, IMspPrincipalGetter principalGetter) {
         this.IChannelPolicyManagerGetter = IChannelPolicyManagerGetter;
         this.localMSP = localMSP;
         this.principalGetter = principalGetter;
@@ -106,9 +104,15 @@ public class PolicyChecker implements IPolicyChecker{
             log.info("Failing extracting header during check policy on channel ["+channelID+"] with policy ["+policyName+"]");
             e.printStackTrace();
         };
-        Common.SignatureHeader shdr = Common.SignatureHeader.getDefaultInstance();//.getCreator();
-        SignedData[] sd = new SignedData[1];
-        sd[0] = new SignedData(signedProposal.getProposalBytes(),shdr.getCreator().toByteArray(),signedProposal.getSignature());
+        Common.SignatureHeader shdr = null;
+        try {
+            shdr = Common.SignatureHeader.parseFrom(header.getSignatureHeader());
+        } catch (InvalidProtocolBufferException e) {
+            log.info("Invalid Proposal's SignatureHeader during check policy on channel ["+channelID+"] with policy ["+policyName+"]");
+            e.printStackTrace();
+        }
+        List<SignedData> sd = new ArrayList<SignedData>();
+        sd.add(new SignedData(signedProposal.getProposalBytes(),shdr.getCreator().toByteArray(),signedProposal.getSignature()));
         this.CheckPolicyBySignedData(channelID,policyName,sd);
     }
 
@@ -128,14 +132,21 @@ public class PolicyChecker implements IPolicyChecker{
             log.info("Failing extracting proposal during channelless check policy with policy ["+policyName+"]");
             e.printStackTrace();
         }
+        Common.Header header = null;
         try {
-            Common.SignatureHeader header = Common.SignatureHeader.parseFrom(proposal.getHeader().toByteArray());
+            header = Common.Header.parseFrom(proposal.getHeader());
 
         } catch (InvalidProtocolBufferException e) {
             log.info("Failing extracting header during channelless check policy with policy ["+policyName+"]");
             e.printStackTrace();
         }
-        Common.SignatureHeader shdr = Common.SignatureHeader.getDefaultInstance();
+        Common.SignatureHeader shdr = null;
+        try {
+            shdr = Common.SignatureHeader.parseFrom(header.getSignatureHeader());
+        } catch (InvalidProtocolBufferException e) {
+            log.info("Invalid Proposal's SignatureHeader during channelless check policy with policy ["+policyName+"]");
+            e.printStackTrace();
+        }
         IIdentity id = null;
         try {
             id = this.localMSP.deserializeIdentity(shdr.getCreator().toByteArray());
@@ -160,7 +171,7 @@ public class PolicyChecker implements IPolicyChecker{
     /**
      * 检查传入的签名是否有效
      */
-    public void CheckPolicyBySignedData(String channelID, String policyName, SignedData[] signedDatas) {
+    public void CheckPolicyBySignedData(String channelID, String policyName, List<SignedData> signedDatas) {
 
         if(channelID == ""){
             log.info("Invalid channel ID name during check policy on signed data. Name must be different from nil");
@@ -179,17 +190,12 @@ public class PolicyChecker implements IPolicyChecker{
         } catch (PolicyException e) {
             e.printStackTrace();
         }
-
         if(policyManager == null){
             log.info("Failed to get policy manager for channel ["+channelID+"]");
         }
         Policy policy = (Policy) policyManager.getPolicy(policyName);
-        List<SignedData> sd = new ArrayList<SignedData>();
-        for(int i=0;i<signedDatas.length;i++){
-            sd.add(signedDatas[i]);
-        }
         try {
-            policy.evaluate(sd);
+            policy.evaluate(signedDatas);
         } catch (PolicyException e) {
             log.info("Failed evaluating policy on signed data during check policy on channel ["+channelID+"] with policy ["+policyName+"]");
             e.printStackTrace();

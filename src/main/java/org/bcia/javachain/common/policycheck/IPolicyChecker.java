@@ -18,6 +18,8 @@ package org.bcia.javachain.common.policycheck;
 import org.bcia.javachain.common.policycheck.bean.SignedProposal;
 import org.bcia.javachain.common.util.proto.SignedData;
 
+import java.util.List;
+
 /**
  * 类描述
  *
@@ -27,6 +29,6 @@ import org.bcia.javachain.common.util.proto.SignedData;
  */
 public interface IPolicyChecker {
     void CheckPolicy(String channelID, String policyName, SignedProposal signedProposal);
-    void CheckPolicyBySignedData(String channelID, String policyName, SignedData[] signedDatas);
+    void CheckPolicyBySignedData(String channelID, String policyName, List<SignedData> signedDatas);
     void CheckPolicyNoChannel(String policyName,SignedProposal signedProposal);
 }
