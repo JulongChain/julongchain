@@ -17,6 +17,8 @@
 package org.bcia.javachain.common.policycheck.cauthdsl;
 
 import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policies.SignaturePolicy;
 import org.bcia.javachain.common.policycheck.bean.SignaturePolicyEnvelope;
 import org.bcia.javachain.common.util.proto.ProtoUtils;
@@ -37,6 +39,7 @@ import java.util.List;
  * @company Aisino
  */
 public class CauthdslBuilder {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(CauthdslBuilder.class);
     // AcceptAllPolicy always evaluates to true
     //AcceptAllPolicy总是评估为true
     private Policies.SignaturePolicyEnvelope AcceptAllPolicy;
@@ -50,10 +53,30 @@ public class CauthdslBuilder {
     private byte[] MarshaledRejectAllPolicy;
 
 
-    public void init(){}
+    public void init(){
+        Policies.SignaturePolicy[] signaturePolicy = {};
+        byte[][] b = {};
+
+        try {
+            AcceptAllPolicy = CauthdslBuilder.envelope(nOutOf(0,signaturePolicy),b);
+            MarshaledAcceptAllPolicy = ProtoUtils.marshalOrPanic(AcceptAllPolicy);
+        }catch (Exception e){
+            log.error("Error marshaling trueEnvelope");
+            e.printStackTrace();
+        }
+        try {
+            RejectAllPolicy = CauthdslBuilder.envelope(nOutOf(1,signaturePolicy),b);
+            MarshaledRejectAllPolicy = ProtoUtils.marshalOrPanic(RejectAllPolicy);
+        }catch (Exception e){
+            log.error("marshaling falseEnvelope");
+            e.printStackTrace();
+        }
+
+
+    }
     // Envelope builds an envelope message embedding a SignaturePolicy
     // 信封生成嵌入SignaturePolicy的信封消息
-    public Policies.SignaturePolicyEnvelope envelope(Policies.SignaturePolicy policy,byte[][] identities){
+    public static Policies.SignaturePolicyEnvelope envelope(Policies.SignaturePolicy policy,byte[][] identities){
         MspPrincipal.MSPPrincipal[] ids = new MspPrincipal.MSPPrincipal[identities.length];
         MspPrincipal.MSPPrincipal.Builder builder = MspPrincipal.MSPPrincipal.newBuilder();
         Policies.SignaturePolicyEnvelope.Builder speBuilder = Policies.SignaturePolicyEnvelope.newBuilder();
