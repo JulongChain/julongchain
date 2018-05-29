@@ -198,12 +198,41 @@ public class NodeSmartContract {
         EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
 
-        //envelop V0.25
-        BroadCastClient broadCastClient = new BroadCastClient();
+//        //envelop V0.25
+//        BroadCastClient broadCastClient = new BroadCastClient();
+//        try {
+//            broadCastClient.send(ip, port, Common.Envelope.newBuilder().build(), (StreamObserver<Ab.BroadcastResponse>) this);
+//        } catch (Exception e) {
+//            log.error(e.getMessage(), e);
+//        }
+
         try {
-            broadCastClient.send(ip, port, Common.Envelope.newBuilder().build(), (StreamObserver<Ab.BroadcastResponse>) this);
-        } catch (Exception e) {
+            Common.Envelope signedTxEnvelope = EnvelopeHelper.createSignedTxEnvelope(proposal, identity, proposalResponse);
+            IBroadcastClient broadcastClient = new BroadcastClient(ip, port);
+            broadcastClient.send(signedTxEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
+                @Override
+                public void onNext(Ab.BroadcastResponse value) {
+                    log.info("Broadcast onNext");
+                    //收到响应消息，判断是否是200消息
+                    if (Common.Status.SUCCESS.equals(value.getStatus())) {
+                        log.info("invoke success");
+                    }
+                }
+
+                @Override
+                public void onError(Throwable t) {
+                    log.error(t.getMessage(), t);
+                }
+
+                @Override
+                public void onCompleted() {
+                    log.info("Broadcast completed");
+                }
+            });
+
+        } catch (ValidateException e) {
             log.error(e.getMessage(), e);
+            throw new NodeException(e);
         }
 
     }
