@@ -307,6 +307,10 @@ public class SdtGmCsp implements ICsp {
             logger.error("Invalid Key. It must not be nil.");
             throw new JavaChainException("Invalid Key. It must not be nil.");
         }
+        if (null == plaintext || 0 == plaintext.length) {
+            logger.error("Invalid plaintext. It must not be nil.");
+            throw new JavaChainException("Invalid plaintext. It must not be nil.");
+        }
         if (null == opts) {
             logger.error("Invalid opts. It must not be nil.");
             throw new JavaChainException("Invalid opts. It must not be nil.");
