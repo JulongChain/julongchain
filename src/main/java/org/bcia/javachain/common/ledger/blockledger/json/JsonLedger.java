@@ -25,11 +25,13 @@ import org.bcia.javachain.common.ledger.util.IoUtil;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.BytesHexStrTranslate;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valinternal.Block;
 import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.consenter.Ab;
 
 import java.io.*;
+import java.util.AbstractMap;
 
 /**
  * Json账本
@@ -43,11 +45,11 @@ public class JsonLedger extends ReadWriteBase {
     public static final String BLOCK_FILE_FORMAT_STRING  = "block_%020d.json";
 
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(JavaChainLog.class);
+    private final Object lock = new Object();
 
     private String directory;
     private long height;
     private ByteString lastHash;
-    private Channel<Object> channle;
     private JsonFormat.Printer printer;
 
     public void initializeBlockHeight(){
@@ -74,10 +76,10 @@ public class JsonLedger extends ReadWriteBase {
         if(height == 0){
             return;
         }
-        Common.Block block = null;
-        try {
-            block = readBlock(height - 1);
-        } catch (FileNotFoundException e) {
+        AbstractMap.SimpleImmutableEntry<Common.Block, Boolean> entry = readBlock(height - 1);
+        Common.Block block = entry.getKey();
+        boolean found = entry.getValue();
+        if (!found) {
             logger.error(String.format("Block %d was in directory listing but error reading", height - 1));
         }
         if(block == null){
@@ -86,10 +88,17 @@ public class JsonLedger extends ReadWriteBase {
         lastHash = block.getHeader().getDataHash();
     }
 
-    public synchronized Common.Block readBlock(long number) throws FileNotFoundException{
+    public synchronized AbstractMap.SimpleImmutableEntry<Common.Block, Boolean> readBlock(long number){
         String name = blockFileName(number);
+        BufferedReader reader = null;
+        //没有对应文件，返回null, false
         try{
-            BufferedReader reader = new BufferedReader(new FileReader(name));
+            reader = new BufferedReader(new FileReader(name));
+        } catch (FileNotFoundException e) {
+            return new AbstractMap.SimpleImmutableEntry(null, false);
+        }
+
+        try{
             StringBuffer blockJsonBuffer = new StringBuffer("");
             String s = "";
             while((s = reader.readLine()) != null){
@@ -98,11 +107,18 @@ public class JsonLedger extends ReadWriteBase {
             Common.Block.Builder builder = Common.Block.newBuilder();
             JsonFormat.parser().merge(blockJsonBuffer.toString(), builder);
             logger.debug("Read block " + builder.getHeader().getNumber());
-            return builder.build();
-        } catch (FileNotFoundException e){
-            throw e;
+            //成功读取，返回true
+            return new AbstractMap.SimpleImmutableEntry(builder.build(), true);
         } catch (Exception e){
-            return null;
+            //读取时出现异常，返回null, true
+            return new AbstractMap.SimpleImmutableEntry(null, true);
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+                return new AbstractMap.SimpleImmutableEntry(null, true);
+            }
         }
     }
 
@@ -139,8 +155,9 @@ public class JsonLedger extends ReadWriteBase {
         writeBlock(block);
         lastHash = block.getHeader().getDataHash();
         height++;
-        channle.close();
-        channle = new Channel<>();
+        synchronized (lock) {
+            lock.notifyAll();
+        }
     }
 
     private synchronized void writeBlock(Common.Block block) throws LedgerException{
@@ -199,11 +216,7 @@ public class JsonLedger extends ReadWriteBase {
         this.printer = printer;
     }
 
-    public Channel<Object> getChannle() {
-        return channle;
-    }
-
-    public void setChannle(Channel<Object> channle) {
-        this.channle = channle;
+    public Object getLock() {
+        return lock;
     }
 }

@@ -33,10 +33,10 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class FileLedgerIterator implements IIterator {
+    private Object lock;
     private FileLedger ledger;
     private long blockNum;
     private IResultsIterator commonIterator;
-    private Channel<Object> channel;
 
     public FileLedgerIterator(){}
 
@@ -44,7 +44,7 @@ public class FileLedgerIterator implements IIterator {
         this.ledger = fl;
         this.blockNum = blockNum;
         this.commonIterator = itr;
-        this.channel = new Channel<>();
+        this.lock = this.ledger.getLock();
     }
 
     /**
@@ -65,18 +65,26 @@ public class FileLedgerIterator implements IIterator {
     }
 
     @Override
-    public Channel<Object> readyChain() throws LedgerException{
-        if(blockNum > ledger.height() - 1){
-            return channel;
+    public void readyChain() throws LedgerException{
+        synchronized (lock) {
+            if (blockNum > ledger.height() - 1) {
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    throw new LedgerException(e);
+                }
+            }
         }
-        Channel<Object> closedChannel = new Channel<>();
-        closedChannel.close();
-        return closedChannel;
     }
 
     @Override
     public void close() throws LedgerException{
         commonIterator.close();
+    }
+
+    @Override
+    public Object getLock() {
+        return this.lock;
     }
 
     public FileLedger getLedger() {
@@ -101,13 +109,5 @@ public class FileLedgerIterator implements IIterator {
 
     public void setCommonIterator(IResultsIterator commonIterator) {
         this.commonIterator = commonIterator;
-    }
-
-    public Channel<Object> getChannel() {
-        return channel;
-    }
-
-    public void setChannel(Channel<Object> channel) {
-        this.channel = channel;
     }
 }

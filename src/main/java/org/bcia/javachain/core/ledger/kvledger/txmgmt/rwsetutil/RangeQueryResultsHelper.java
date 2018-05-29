@@ -50,7 +50,7 @@ public class RangeQueryResultsHelper {
         return helper;
     }
 
-    public void addResult(KvRwset.KVRead kvRead){
+    public void addResult(KvRwset.KVRead kvRead) throws LedgerException{
         logger.debug("Adding a result");
         pendingResults.add(kvRead);
         if(hashingEnable && pendingResults.size() > maxDegree){
@@ -66,7 +66,7 @@ public class RangeQueryResultsHelper {
         return mt.getSummery();
     }
 
-    public void processPendingResults(){
+    public void processPendingResults() throws LedgerException{
         byte[] b = serializeKVReads(pendingResults);
         pendingResults.clear();
         //TODO SM3 Hash

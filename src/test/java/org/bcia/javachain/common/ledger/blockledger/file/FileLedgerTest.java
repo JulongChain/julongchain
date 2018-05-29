@@ -151,12 +151,12 @@ public class FileLedgerTest {
         Assert.assertNotNull(itr);
     }
 
-    @Test
-    public void testReadyChain() throws Exception {
-        IIterator itr = fileLedger.iterator(Ab.SeekPosition.newBuilder().setOldest(Ab.SeekOldest.getDefaultInstance()).build());
-        Channel<Object> channel = itr.readyChain();
-        Assert.assertNotNull(channel);
-    }
+//    @Test
+//    public void testReadyChain() throws Exception {
+//        IIterator itr = fileLedger.iterator(Ab.SeekPosition.newBuilder().setOldest(Ab.SeekOldest.getDefaultInstance()).build());
+//        Channel<Object> channel = itr.readyChain();
+//        Assert.assertNotNull(channel);
+//    }
 
     @Test
     public void testNext() throws Exception{

@@ -26,6 +26,7 @@ import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.csp.gm.dxct.sm3.SM3;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
+import org.bcia.javachain.protos.common.Ledger;
 import org.junit.After;
 import org.junit.Test;
 
@@ -98,7 +99,11 @@ public class LedgerManagerTest {
         LedgerManager.initialize(null);
         String ledgerId1 = "myGroup";
         String ledgerId2 = "mytestgroupid2";
-        l = LedgerManager.openLedger(ledgerId1);
+        l = LedgerManager.openLedger(ledgerId2);
+        Ledger.BlockchainInfo bcInfo = l.getBlockchainInfo();
+        Common.Block lastBlock = l.getBlockByNumber(bcInfo.getHeight() - 1);
+        System.out.println(bcInfo.getHeight() - 1);
+        System.out.println(lastBlock);
 //        System.out.println(l.getTransactionByID("8"));
     }
 

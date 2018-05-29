@@ -52,7 +52,7 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
         provider.setLeveldbProvider(LevelDBProvider.newProvider(config.getIndexDir()));
         provider.setIndexConfig(indexConfig);
         provider.setConfig(config);
-        logger.debug("Createing fsBlockStore using path = " + LedgerConfig.getChainsPath());
+        logger.debug("Createing fsBlockStore using path = " + config.getChainsDir());
         return provider;
     }
 

@@ -54,7 +54,7 @@ public class MerkleTree {
         return tree;
     }
 
-    public void update(byte[] nextLeafLevelHash){
+    public void update(byte[] nextLeafLevelHash) throws LedgerException{
         logger.debug("Before update. Tree's max level is " + tree.size());
         tree.get(LEAF_LEVEL).add(nextLeafLevelHash);
         for (int currentLelvel = LEAF_LEVEL;; currentLelvel++) {
@@ -74,7 +74,7 @@ public class MerkleTree {
         }
     }
 
-    public void done(){
+    public void done() throws LedgerException{
         logger.debug("Before done.");
         int currentLevel = LEAF_LEVEL;
         byte[] hash = null;
@@ -126,7 +126,7 @@ public class MerkleTree {
         return "tree" + tree;
     }
 
-    public static byte[] computeCombinedHash(List<byte[]> hashes){
+    public static byte[] computeCombinedHash(List<byte[]> hashes) throws LedgerException{
         byte[] combinedHash = new byte[]{};
         for(byte[] h : hashes){
             combinedHash = ArrayUtils.addAll(combinedHash, h);

@@ -16,12 +16,18 @@ limitations under the License.
 package org.bcia.javachain.common.ledger.blockledger.json;
 
 import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.genesis.GenesisBlockFactory;
 import org.bcia.javachain.common.ledger.blockledger.IFactory;
+import org.bcia.javachain.common.ledger.blockledger.IIterator;
 import org.bcia.javachain.common.ledger.blockledger.ReadWriteBase;
+import org.bcia.javachain.common.ledger.blockledger.Util;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
+import org.bcia.javachain.csp.factory.CspManager;
 import org.bcia.javachain.csp.gm.dxct.sm3.SM3;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
+import org.bcia.javachain.protos.consenter.Ab;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -78,7 +84,7 @@ public class JsonLedgerTest {
 
         block = Common.Block.newBuilder()
                 .setHeader(Common.BlockHeader.newBuilder()
-                        .setPreviousHash(ByteString.copyFrom(new SM3().hash(block.getData().toByteArray())))
+                        .setPreviousHash(ByteString.copyFrom(CspManager.getDefaultCsp().hash(block.getData().toByteArray(), null)))
                         .setNumber(1)
                         .build())
                 .setMetadata(Common.BlockMetadata.newBuilder()
@@ -93,6 +99,7 @@ public class JsonLedgerTest {
 
         block = Common.Block.newBuilder()
                 .setHeader(Common.BlockHeader.newBuilder()
+                        .setPreviousHash(ByteString.copyFrom(CspManager.getDefaultCsp().hash(block.getData().toByteArray(), null)))
                         .setNumber(2)
                         .build())
                 .setMetadata(Common.BlockMetadata.newBuilder()
@@ -105,6 +112,47 @@ public class JsonLedgerTest {
         jsonLedger.append(block);
         Assert.assertSame(jsonLedger.height(), (long) 3);
     }
+
+    @Test
+    public void testIterator() throws Exception{
+        IIterator itr = null;
+
+        itr = jsonLedger.iterator(Ab.SeekPosition.newBuilder().setOldest(Ab.SeekOldest.getDefaultInstance()).build());
+        Assert.assertNotNull(itr);
+
+        itr = jsonLedger.iterator(Ab.SeekPosition.newBuilder().setNewest(Ab.SeekNewest.getDefaultInstance()).build());
+        Assert.assertNotNull(itr);
+
+        try {
+            jsonLedger.iterator(Ab.SeekPosition.newBuilder().setSpecified(Ab.SeekSpecified.getDefaultInstance()).build());
+        } catch (LedgerException e) {
+            Assert.assertEquals(e, Util.NOT_FOUND_ERROR_ITERATOR);
+        }
+        GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
+        Common.Block block = factory.getGenesisBlock("testGroup");
+        jsonLedger.append(block);
+        itr = jsonLedger.iterator(Ab.SeekPosition.newBuilder().setSpecified(Ab.SeekSpecified.getDefaultInstance()).build());
+        Assert.assertNotNull(itr);
+    }
+
+    @Test
+    public void testNext() throws Exception{
+        GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
+        Common.Block block = factory.getGenesisBlock("testGroup");
+        jsonLedger.append(block);
+        JsonCursor cursor = new JsonCursor((JsonLedger) jsonLedger, jsonLedger.height() - 1);
+        Assert.assertNotNull(cursor);
+
+        QueryResult qr = cursor.next();
+        Assert.assertNotNull(qr);
+    }
+
+//    @Test public void testReadyChain() throws Exception{
+//        GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
+//        Common.Block block = factory.getGenesisBlock("testGroup");
+//        jsonLedger.append(block);
+//        Assert.assertNotNull(new JsonCursor((JsonLedger) jsonLedger, jsonLedger.height() - 1).readyChain());
+//    }
 
     @After
     public void after() throws Exception{}

@@ -94,7 +94,6 @@ public class JsonLedgerFactory implements IFactory {
         JsonLedger jl = new JsonLedger();
         jl.setDirectory(directory);
         jl.setPrinter(JsonFormat.printer());
-        jl.setChannle(new Channel<>());
         jl.initializeBlockHeight();
         logger.debug("Initialized to block height " + (jl.getHeight() - 1));
         return jl;

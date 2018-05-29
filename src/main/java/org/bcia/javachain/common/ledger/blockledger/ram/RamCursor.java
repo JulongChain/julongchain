@@ -41,6 +41,7 @@ public class RamCursor implements IIterator {
 
     public RamCursor(SimpleList list){
         this.list = list;
+
     }
 
     @Override
@@ -48,24 +49,31 @@ public class RamCursor implements IIterator {
         while (true) {
             if(list.getNext() != null){
                 list = list.getNext();
-                return new QueryResult(new AbstractMap.SimpleImmutableEntry<QueryResult, Common.Status>(new QueryResult(list.getBlock()), Common.Status.SUCCESS));
+                return new QueryResult(new AbstractMap.SimpleImmutableEntry(new QueryResult(list.getBlock()), Common.Status.SUCCESS));
             }
-            try {
-                list.getChannel().take();
-            } catch (InterruptedException e) {
-                throw new LedgerException(e);
+            synchronized (list.getLock()){
+                try {
+                    list.getLock().wait();
+                } catch (InterruptedException e) {
+                    throw new LedgerException(e);
+                }
             }
         }
     }
 
     @Override
-    public Channel<Object> readyChain() throws LedgerException {
-        return list.getChannel();
+    public void readyChain() throws LedgerException {
+
     }
 
     @Override
     public void close() throws LedgerException {
         //nothing to do
+    }
+
+    @Override
+    public Object getLock() {
+        return this.list.getLock();
     }
 
     public SimpleList getList() {
@@ -75,4 +83,5 @@ public class RamCursor implements IIterator {
     public void setList(SimpleList list) {
         this.list = list;
     }
+
 }

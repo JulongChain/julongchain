@@ -16,6 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil;
 
 import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.util.Util;
 import org.bcia.javachain.core.ledger.TxSimulationResults;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
@@ -93,7 +94,7 @@ public class RWSetBuilder {
      * 获取共有数据(public data + hashed private data)
      * 获取私有rwset
      */
-    public TxSimulationResults getTxSimulationResults(){
+    public TxSimulationResults getTxSimulationResults() throws LedgerException{
         TxPvtRwSet pvtData = getTxPvtReadWriteSet();
         Rwset.TxReadWriteSet pubDataProto = null;
         Rwset.TxPvtReadWriteSet pvtDataProto = null;
@@ -117,7 +118,7 @@ public class RWSetBuilder {
         return results;
     }
 
-    public void setPvtCollectionHash(String ns, String coll, ByteString pvtDataProto){
+    public void setPvtCollectionHash(String ns, String coll, ByteString pvtDataProto) throws LedgerException {
         CollHashRwBuilder collHashBuilder = getOrCreateCollHashedRwBuilder(ns, coll);
         //TODO SM3 Hash
         collHashBuilder.setPvtDataHash(org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.Util.getHashBytes(pvtDataProto.toByteArray()));

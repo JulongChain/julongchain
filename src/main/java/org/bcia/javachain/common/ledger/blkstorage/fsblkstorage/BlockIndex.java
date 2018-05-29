@@ -101,17 +101,17 @@ public class BlockIndex implements Index {
         byte[] flpBytes = flp.marshal();
 
         //index1 blockHash数据 - getBlockByHash()
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_HASH) == Boolean.TRUE){
+        if(Boolean.TRUE.equals(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_HASH))){
             batch.put(constructBlockHashKey(blockIndexInfo.getBlockHash()), flpBytes);
         }
 
         //index2 blockNum数据 - getBlockByNum()
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM) == Boolean.TRUE){
+        if(Boolean.TRUE.equals(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM))){
             batch.put(constructBlockNumKey(blockIndexInfo.getBlockNum()), flpBytes);
         }
 
         //index3 用来通过txid获取tx - getTxById()
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_ID) == Boolean.TRUE){
+        if(Boolean.TRUE.equals(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_ID))){
             for(TxIndexInfo txOffset : txOffsets){
                 FileLocPointer txFlp = FileLocPointer.newFileLocationPointer(flp.getFileSuffixNum(), flp.getLocPointer().getOffset(), txOffset.getLoc());
                 logger.debug(String.format("Adding txLoc [%s] for txID: [%s] to index", txFlp, txOffset.getTxID()));
@@ -121,7 +121,7 @@ public class BlockIndex implements Index {
         }
 
         //index4 查询历史数据
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM) == Boolean.TRUE){
+        if(Boolean.TRUE.equals(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM))){
             for(int i = 0; i < txOffsets.size(); i++){
                 TxIndexInfo txOffset = txOffsets.get(i);
                 FileLocPointer txFlp = FileLocPointer.newFileLocationPointer(flp.getFileSuffixNum(), flp.getLocPointer().getOffset(), txOffset.getLoc());
@@ -132,14 +132,14 @@ public class BlockIndex implements Index {
         }
 
         //index5 通过txid获取区块 getBlockByTxId()
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_TX_ID) == Boolean.TRUE){
+        if(Boolean.TRUE.equals(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_TX_ID))){
             for(TxIndexInfo txOffset : txOffsets){
                 batch.put(constructBlockTxIDKey(txOffset.getTxID()), flpBytes);
             }
         }
 
         //index6 根据txid获取交易有效性
-        if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_VALIDATION_CODE) == Boolean.TRUE){
+        if(Boolean.TRUE.equals(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_VALIDATION_CODE))){
             for (int i = 0; i < txOffsets.size(); i++) {
                 TxIndexInfo txOffset = txOffsets.get(i);
                 batch.put(constructTxValidationCodeIDKey(txOffset.getTxID()), String.valueOf(txsfltr.flag(i).getNumber()).getBytes());

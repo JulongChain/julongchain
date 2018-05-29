@@ -59,7 +59,7 @@ public class Validator implements InternalValidator {
         return validator;
     }
 
-    public void preLoadCommittedVersionOfRSet(Block block){
+    public void preLoadCommittedVersionOfRSet(Block block) throws LedgerException{
         List<CompositeKey> pubKeys = new ArrayList<>();
         List<HashedCompositeKey> hashedKeys = new ArrayList<>();
         Map<CompositeKey, Object> pubKeysMap = new HashMap<>();

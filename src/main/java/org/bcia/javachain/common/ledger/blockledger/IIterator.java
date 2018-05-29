@@ -35,8 +35,10 @@ public interface IIterator extends IResultsIterator {
     @Override
     QueryResult next() throws LedgerException;
 
-    Channel<Object> readyChain() throws LedgerException;
+    void readyChain() throws LedgerException;
 
     @Override
     void close() throws LedgerException;
+
+    Object getLock();
 }

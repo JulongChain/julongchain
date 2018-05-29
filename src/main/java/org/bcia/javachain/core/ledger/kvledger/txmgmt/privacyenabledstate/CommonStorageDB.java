@@ -56,7 +56,7 @@ public class CommonStorageDB implements IDB {
 
     @Override
     public void loadCommittedVersionsOfPubAndHashedKeys(List<CompositeKey> pubKeys,
-                                                        List<HashedCompositeKey> hashKeys) {
+                                                        List<HashedCompositeKey> hashKeys) throws LedgerException{
         IBulkOptimizable bulkOptimizable = (IBulkOptimizable) vdb;
 
         for(HashedCompositeKey key : hashKeys){
@@ -178,7 +178,7 @@ public class CommonStorageDB implements IDB {
         }
     }
 
-    private void addHashedUpdates(PubUpdateBatch pubUpdateBatch, HashedUpdateBatch hashedUpdateBatch, boolean SM3Key){
+    private void addHashedUpdates(PubUpdateBatch pubUpdateBatch, HashedUpdateBatch hashedUpdateBatch, boolean SM3Key) throws LedgerException{
         for(Map.Entry<String, NsBatch> entry : hashedUpdateBatch.getMap().getMap().entrySet()){
             String ns = entry.getKey();
             NsBatch nsBatch = entry.getValue();

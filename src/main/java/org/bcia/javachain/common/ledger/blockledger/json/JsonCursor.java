@@ -36,55 +36,64 @@ import java.util.AbstractMap;
  */
 public class JsonCursor implements IIterator {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(JsonCursor.class);
+    private Object lock;
 
     private JsonLedger jl;
     private long blockNum;
-    private Channel<Object> channel;
 
     public JsonCursor(){}
 
     public JsonCursor(JsonLedger jl, long blockNum){
         this.blockNum = blockNum;
         this.jl = jl;
-        this.channel = new Channel<>();
+        this.lock = this.jl.getLock();
     }
 
     @Override
     public QueryResult next() throws LedgerException {
         while (true) {
-            try {
-                Common.Block block = jl.readBlock(blockNum);
+            AbstractMap.SimpleImmutableEntry<Common.Block, Boolean> entry = jl.readBlock(blockNum);
+            Common.Block block = entry.getKey();
+            boolean found = entry.getValue();
+            if(found){
                 if(block == null){
                     return new QueryResult(new AbstractMap.SimpleImmutableEntry<QueryResult, Common.Status>(null, Common.Status.SERVICE_UNAVAILABLE));
                 }
                 blockNum++;
-                return new QueryResult(new AbstractMap.SimpleImmutableEntry<QueryResult, Common.Status>( new QueryResult(block), Common.Status.SUCCESS));
-            } catch (FileNotFoundException e) {
-                if (channel != null) {
-                    channel.add(new Object());
-                }
+                return new QueryResult(new AbstractMap.SimpleImmutableEntry( new QueryResult(block), Common.Status.SUCCESS));
             }
-            try {
-                channel.take();
-            } catch (InterruptedException e) {
-                throw new LedgerException(e);
+            synchronized (lock) {
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    throw new LedgerException(e);
+                }
             }
         }
     }
 
     @Override
-    public Channel<Object> readyChain() {
-        if(!new File(jl.blockFileName(blockNum)).exists()){
-            return this.channel;
+    public void readyChain() throws LedgerException {
+        synchronized (lock) {
+            if(!new File(jl.blockFileName(blockNum)).exists()){
+                try {
+                    lock.wait();
+                } catch (InterruptedException e) {
+                    throw new LedgerException(e);
+                }
+            }
+
         }
-        Channel<Object> channel = new Channel<>();
-        channel.close();
-        return channel;
     }
 
     @Override
     public void close() throws LedgerException {
         //nothing to do
+    }
+
+    @Override
+    public Object getLock() {
+        return this.lock;
     }
 
     public JsonLedger getJl() {
@@ -103,11 +112,4 @@ public class JsonCursor implements IIterator {
         this.blockNum = blockNum;
     }
 
-    public Channel<Object> getChannel() {
-        return channel;
-    }
-
-    public void setChannel(Channel<Object> channel) {
-        this.channel = channel;
-    }
 }

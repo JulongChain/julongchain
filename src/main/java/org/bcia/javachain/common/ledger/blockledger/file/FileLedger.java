@@ -34,15 +34,14 @@ import org.bcia.javachain.protos.consenter.Ab;
  */
 public class FileLedger extends ReadWriteBase {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(FileLedger.class);
+    private final Object lock = new Object();
 
     private IFileLedgerBlockStore blockStore;
-    private Channel<Object> channel;
 
     public FileLedger(){}
 
     public FileLedger(IFileLedgerBlockStore blockStore){
         this.blockStore = blockStore;
-        this.channel = new Channel<>();
     }
 
     /**
@@ -60,7 +59,7 @@ public class FileLedger extends ReadWriteBase {
                 startingBlockNumber = info.getHeight() - 1;
                 break;
             case Ab.SeekPosition.SPECIFIED_FIELD_NUMBER:
-                startingBlockNumber = Ab.SeekSpecified.NUMBER_FIELD_NUMBER;
+                startingBlockNumber = startType.getSpecified().getNumber();
                 long height = height();
                 if(startingBlockNumber > height){
                     throw Util.NOT_FOUND_ERROR_ITERATOR;
@@ -84,8 +83,9 @@ public class FileLedger extends ReadWriteBase {
     @Override
     public void append(Common.Block block) throws LedgerException{
         blockStore.addBlock(block);
-        channel.close();
-        channel = new Channel<>();
+        synchronized (lock){
+            lock.notifyAll();
+        }
     }
 
     public IFileLedgerBlockStore getBlockStore() {
@@ -94,5 +94,9 @@ public class FileLedger extends ReadWriteBase {
 
     public void setBlockStore(IFileLedgerBlockStore blockStore) {
         this.blockStore = blockStore;
+    }
+
+    public Object getLock() {
+        return lock;
     }
 }

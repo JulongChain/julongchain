@@ -64,7 +64,7 @@ public class IResultsItr implements IResultsIterator {
         return itr;
     }
 
-    private void updateRangeQueryInfo(QueryResult queryResult){
+    private void updateRangeQueryInfo(QueryResult queryResult) throws LedgerException{
         if(rwSetBuilder == null){
             return;
         }

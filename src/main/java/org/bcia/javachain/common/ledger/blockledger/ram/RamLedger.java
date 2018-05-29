@@ -60,7 +60,9 @@ public class RamLedger extends ReadWriteBase {
                                 .setNumber(oldest.getBlock().getHeader().getNumber() - 1)
                                 .build())
                         .build());
-                list.getChannel().close();
+                synchronized (list.getLock()){
+                    oldest.getLock().notifyAll();
+                }
                 break;
             case Ab.SeekPosition.NEWEST_FIELD_NUMBER:
                 SimpleList newest = this.newest;
@@ -69,7 +71,9 @@ public class RamLedger extends ReadWriteBase {
                                 .setNumber(newest.getBlock().getHeader().getNumber() - 1)
                                 .build())
                         .build());
-                list.getChannel().close();
+                synchronized (list.getLock()){
+                    list.getLock().notifyAll();
+                }
                 break;
             case Ab.SeekPosition.SPECIFIED_FIELD_NUMBER:
                 oldest = this.oldest;
@@ -89,7 +93,9 @@ public class RamLedger extends ReadWriteBase {
                                     .setNumber(oldest.getBlock().getHeader().getNumber() - 1)
                                     .build())
                             .build());
-                    list.getChannel().close();
+                    synchronized (list.getLock()){
+                        list.getLock().notifyAll();
+                    }
                     break;
                 }
 
@@ -123,9 +129,8 @@ public class RamLedger extends ReadWriteBase {
         if(block.getHeader().getNumber() != this.newest.getBlock().getHeader().getNumber() + 1){
             throw new LedgerException(String.format("Block number should have been %d but was %d", this.newest.getBlock().getHeader().getNumber() + 1, block.getHeader().getNumber()));
         }
-        //TODO 测试时暂时取消对preHash的校验
         if(this.newest.getBlock().getHeader().getNumber() + 1 != 0){
-            if(!block.getHeader().getPreviousHash().equals(this.newest.getBlock().getHeader().getPreviousHash())){
+            if(!block.getHeader().getPreviousHash().equals(this.newest.getBlock().getHeader().getDataHash())){
                 throw new LedgerException("Block have had wrong previous hash");
             }
         }
@@ -135,15 +140,16 @@ public class RamLedger extends ReadWriteBase {
 
     private void appendBlock(Common.Block block){
         this.newest.setNext(new SimpleList(null, new Channel<>(), block));
-        Channel<Object> lastChannel = this.newest.getChannel();
         logger.debug("Sending signal that block " + this.newest.getBlock().getHeader().getNumber() + " has a successor");
         this.newest = this.newest.getNext();
-        lastChannel.close();
         this.size++;
         if(this.size > this.maxSize){
             logger.debug("RAM ledger max size about to be exceeded, removing oldest itm: " + this.oldest.getBlock().getHeader().getNumber());
             this.oldest = oldest.getNext();
             this.size--;
+        }
+        synchronized (this.newest.getLock()){
+            this.newest.getLock().notifyAll();
         }
     }
 

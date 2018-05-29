@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 提供文件读写工具
+ * 提供账本读写工具
  *
  * @author sunzongyu
  * @date 2018/04/26
@@ -34,20 +34,23 @@ import java.util.Map;
  */
 public class Util {
     public static final LedgerException NOT_FOUND_ERROR_ITERATOR = new LedgerException("Not found iterator");
+    public static final Object CLOSED_CHAIN = "closed chain";
+    public static final Object READY_CHAIN = "ready chain";
 
     public static Common.Block createNextBlock(IReader IReader, List<Common.Envelope> messages) throws LedgerException{
         long nextBlockNumber = 0;
         ByteString previousBlockHash = null;
         if(IReader.height() > 0){
             IIterator itr = IReader.iterator(Ab.SeekPosition.getDefaultInstance());
-            try {
-                itr.readyChain().take();
-            } catch (InterruptedException e) {
-                throw new LedgerException(e);
+            synchronized (itr.getLock()){
+                try {
+                    itr.getLock().wait();
+                } catch (InterruptedException e) {
+                    throw new LedgerException(e);
+                }
             }
             Map.Entry<QueryResult, Common.Status> entry = (Map.Entry<QueryResult, Common.Status>) itr.next();
-            Common.Block block = null;
-            block =  (Common.Block) entry.getKey().getObj();
+            Common.Block block =  (Common.Block) entry.getKey().getObj();
             Common.Status status = entry.getValue();
             if(!status.equals(Common.Status.SUCCESS)){
                 throw new LedgerException("Error seeking to newest block for group with non-zero height");
@@ -58,41 +61,44 @@ public class Util {
 
         Common.BlockData.Builder dataBuilder = Common.BlockData.newBuilder();
 
-        messages.forEach((msg) -> {
-            dataBuilder.addData(msg.toByteString());
-        });
+        if (messages != null) {
+            messages.forEach((msg) -> {
+                dataBuilder.addData(msg.toByteString());
+            });
+        }
+
         Common.Block block = Common.Block.newBuilder()
                 .setHeader(Common.BlockHeader.newBuilder()
                         .setNumber(nextBlockNumber)
-                        .setPreviousHash(previousBlockHash)
+                        .setPreviousHash(previousBlockHash == null ? ByteString.EMPTY : previousBlockHash)
                         .build())
                 .setData(dataBuilder)
+                .setMetadata(Common.BlockMetadata.newBuilder()
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .addMetadata(ByteString.EMPTY)
+                        .build())
                 .build();
+
         return block;
     }
 
-    public static Common.Block getBlock(IReader IReader, long index) throws LedgerException{
+    public static Common.Block getBlock(IReader IReader, long index) throws LedgerException {
         IIterator i = IReader.iterator(Ab.SeekPosition.newBuilder()
                 .setSpecified(Ab.SeekSpecified.newBuilder()
                         .setNumber(index)
                         .build())
                 .build());
         Object token = null;
-        try {
-            token = i.readyChain().take();
-        } catch (InterruptedException e) {
-            throw new LedgerException(e);
-        }
-        if(token != null){
-            Map.Entry<QueryResult, Common.Status> entry = (Map.Entry<QueryResult, Common.Status>) i.next();
-            Common.Block block = (Common.Block) entry.getKey().getObj();
-            Common.Status status = entry.getValue();
-            if(!status.equals(Common.Status.SUCCESS)){
-                return null;
-            }
-            return block;
-        } else {
+        //判断是否需要阻塞进程
+        i.readyChain();
+        Map.Entry<QueryResult, Common.Status> entry = (Map.Entry<QueryResult, Common.Status>) i.next().getObj();
+        Common.Block block = (Common.Block) entry.getKey().getObj();
+        Common.Status status = entry.getValue();
+        if (!Common.Status.SUCCESS.equals(status)) {
             return null;
         }
+        return block;
     }
 }

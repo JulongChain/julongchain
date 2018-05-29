@@ -15,7 +15,10 @@
  */
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb;
 
+import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.javachain.csp.factory.CspManager;
 import org.bcia.javachain.csp.gm.dxct.sm3.SM3;
 
 import java.util.Map;
@@ -52,8 +55,13 @@ public class Util {
     /**
      * 进行hash运算
      */
-    public static byte[] getHashBytes(byte[] bytes){
-        byte[] target = new SM3().hash(bytes);
+    public static byte[] getHashBytes(byte[] bytes) throws LedgerException{
+        byte[] target = null;
+        try {
+            target = CspManager.getDefaultCsp().hash(bytes, null);
+        } catch (JavaChainException e) {
+            throw new LedgerException(e);
+        }
         return target;
     }
 }

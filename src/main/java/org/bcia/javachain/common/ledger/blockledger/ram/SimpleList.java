@@ -29,16 +29,15 @@ import org.bcia.javachain.protos.common.Common;
  */
 public class SimpleList {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(SimpleList.class);
+    private final Object lock = new Object();
 
     private SimpleList next;
-    private Channel<Object> channel;
     private Common.Block block;
 
     public SimpleList(){}
 
     public SimpleList(SimpleList next, Channel<Object> channel, Common.Block block){
         this.next = next;
-        this.channel = channel;
         this.block = block;
     }
 
@@ -50,19 +49,15 @@ public class SimpleList {
         this.next = next;
     }
 
-    public Channel<Object> getChannel() {
-        return channel;
-    }
-
-    public void setChannel(Channel<Object> channel) {
-        this.channel = channel;
-    }
-
     public Common.Block getBlock() {
         return block;
     }
 
     public void setBlock(Common.Block block) {
         this.block = block;
+    }
+
+    public Object getLock() {
+        return lock;
     }
 }
