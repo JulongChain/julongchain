@@ -20,7 +20,7 @@ import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.SarException;
 import org.bcia.javachain.csp.gmt0016.excelsecu.algorithm.SHA1;
 import org.bcia.javachain.csp.gmt0016.excelsecu.algorithm.SHA256;
-import org.bcia.javachain.csp.gmt0016.excelsecu.algorithm.SM4;
+import org.bcia.javachain.csp.gmt0016.excelsecu.algorithm.SM3;
 import org.bcia.javachain.csp.gmt0016.excelsecu.bean.Properties;
 import org.bcia.javachain.csp.gmt0016.excelsecu.bean.*;
 import org.bcia.javachain.csp.gmt0016.excelsecu.common.*;
@@ -365,8 +365,8 @@ public class CspGm0016 implements ICsp {
             throw new JavaChainException("device is not available");
         }
 
-        if ("SM4".equals(opts.getAlgorithm())) {
-            return new SM4();
+        if ("SM3".equals(opts.getAlgorithm())) {
+            return new SM3();
         } else if ("SHA1".equals(opts.getAlgorithm())) {
             return new SHA1();
         }
@@ -383,9 +383,9 @@ public class CspGm0016 implements ICsp {
         byte[] digest = new byte[0];
 
 
-        if (opts.hashFunc() instanceof SM4) {
-            SM4 sm4 = new SM4();
-            digest = sm4.sum(data);
+        if (opts.hashFunc() instanceof SM3) {
+            SM3 sm3 = new SM3();
+            digest = sm3.sum(data);
 
         } else if (opts.hashFunc() instanceof SHA1) {
             SHA1 sha1 = new SHA1();

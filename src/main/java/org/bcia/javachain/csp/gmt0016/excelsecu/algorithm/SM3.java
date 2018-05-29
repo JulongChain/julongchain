@@ -22,7 +22,7 @@ import org.bcia.javachain.csp.intfs.IHash;
  * @date 2018/4/2
  * @company Excelsecu
  */
-public class SM4 implements IHash {
+public class SM3 implements IHash {
     @Override
     public int write(byte[] p) {
         return 0;
