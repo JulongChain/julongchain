@@ -52,7 +52,7 @@ public class RamLedgerTest {
         //重置目录
         System.out.println(deleteDir(new File(dir)));
         //重新生成fileLedgerFactory
-        ramLedgerFactory = new RamLedgerFactory();
+        ramLedgerFactory = new RamLedgerFactory(10);
         //创建file ledger
         ramLedger = ramLedgerFactory.getOrCreate("myGroup");
     }

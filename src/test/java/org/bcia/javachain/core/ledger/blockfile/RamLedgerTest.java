@@ -36,7 +36,7 @@ public class RamLedgerTest {
 
     @Before
     public void before() throws LedgerException {
-        factory = new RamLedgerFactory();
+        factory = new RamLedgerFactory(10);
         this.factory.setMaxSize(3);
         ledger = factory.getOrCreate("123");
     }

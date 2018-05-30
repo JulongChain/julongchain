@@ -34,7 +34,7 @@ import org.bcia.javachain.protos.consenter.Ab;
  */
 public class FileLedger extends ReadWriteBase {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(FileLedger.class);
-    private final Object lock = new Object();
+    private static final Object lock = new Object();
 
     private IFileLedgerBlockStore blockStore;
 
@@ -96,7 +96,7 @@ public class FileLedger extends ReadWriteBase {
         this.blockStore = blockStore;
     }
 
-    public Object getLock() {
+    public static Object getLock() {
         return lock;
     }
 }
