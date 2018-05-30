@@ -56,13 +56,10 @@ public class PolicyProvider implements IPolicyProvider{
             compiled = Cauthdsl.compile(sigPolicy.getRule(),sigPolicy.getIdentitiesList(),deserializer);
         } catch (NoSuchMethodException e) {
             e.printStackTrace();
-            return null;
         } catch (IllegalAccessException e) {
             e.printStackTrace();
-            return null;
         } catch (InvocationTargetException e) {
             e.printStackTrace();
-            return null;
         }
         policy.setEvalutor(compiled);
         policy.setDeserializer(this.deserializer);

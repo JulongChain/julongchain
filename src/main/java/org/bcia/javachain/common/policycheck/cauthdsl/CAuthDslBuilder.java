@@ -17,19 +17,14 @@
 package org.bcia.javachain.common.policycheck.cauthdsl;
 
 import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.common.policies.SignaturePolicy;
-import org.bcia.javachain.common.policycheck.bean.SignaturePolicyEnvelope;
 import org.bcia.javachain.common.util.proto.ProtoUtils;
-import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.protos.common.MspPrincipal;
 import org.bcia.javachain.protos.common.Policies;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * 类描述
@@ -38,8 +33,8 @@ import java.util.List;
  * @date 26/04/18
  * @company Aisino
  */
-public class CauthdslBuilder {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CauthdslBuilder.class);
+public class CAuthDslBuilder {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(CAuthDslBuilder.class);
     // AcceptAllPolicy always evaluates to true
     //AcceptAllPolicy总是评估为true
     private Policies.SignaturePolicyEnvelope AcceptAllPolicy;
@@ -53,23 +48,24 @@ public class CauthdslBuilder {
     private byte[] MarshaledRejectAllPolicy;
 
 
-    public void init(){
+    public void init() throws PolicyException {
         Policies.SignaturePolicy[] signaturePolicy = {};
         byte[][] b = {};
 
         try {
-            AcceptAllPolicy = CauthdslBuilder.envelope(nOutOf(0,signaturePolicy),b);
+            AcceptAllPolicy = CAuthDslBuilder.envelope(nOutOf(0,signaturePolicy),b);
             MarshaledAcceptAllPolicy = ProtoUtils.marshalOrPanic(AcceptAllPolicy);
         }catch (Exception e){
             log.error("Error marshaling trueEnvelope");
-            e.printStackTrace();
+            throw new PolicyException(e);
+            //或者throw new PolicyException(e.getMessage());
         }
         try {
-            RejectAllPolicy = CauthdslBuilder.envelope(nOutOf(1,signaturePolicy),b);
+            RejectAllPolicy = CAuthDslBuilder.envelope(nOutOf(1,signaturePolicy),b);
             MarshaledRejectAllPolicy = ProtoUtils.marshalOrPanic(RejectAllPolicy);
         }catch (Exception e){
             log.error("marshaling falseEnvelope");
-            e.printStackTrace();
+            throw new PolicyException(e);
         }
 
 
@@ -123,9 +119,9 @@ public class CauthdslBuilder {
         builder.setPrincipal(mspRole.toByteString());
         MspPrincipal.MSPPrincipal principal = builder.build();
         Policies.SignaturePolicyEnvelope.Builder speBuilder = Policies.SignaturePolicyEnvelope.newBuilder();
-        Policies.SignaturePolicy[] sps = {CauthdslBuilder.signedBy(0)};
+        Policies.SignaturePolicy[] signaturePolicies = {CAuthDslBuilder.signedBy(0)};
         speBuilder.setVersion(0);
-        speBuilder.setRule(CauthdslBuilder.nOutOf(1,sps));
+        speBuilder.setRule(CAuthDslBuilder.nOutOf(1,signaturePolicies));
         speBuilder.setIdentities(0,principal);
         return speBuilder.build();
     }
@@ -150,9 +146,9 @@ public class CauthdslBuilder {
         builder.setPrincipal(mspRole.toByteString());
         MspPrincipal.MSPPrincipal principal = builder.build();
         Policies.SignaturePolicyEnvelope.Builder speBuilder = Policies.SignaturePolicyEnvelope.newBuilder();
-        Policies.SignaturePolicy[] sps = {CauthdslBuilder.signedBy(0)};
+        Policies.SignaturePolicy[] signaturePolicies = {CAuthDslBuilder.signedBy(0)};
         speBuilder.setVersion(0);
-        speBuilder.setRule(CauthdslBuilder.nOutOf(1,sps));
+        speBuilder.setRule(CAuthDslBuilder.nOutOf(1,signaturePolicies));
         speBuilder.setIdentities(0,principal);
         return speBuilder.build();
     }
@@ -202,7 +198,7 @@ public class CauthdslBuilder {
      * @return
      */
     public static Policies.SignaturePolicyEnvelope signedByAnyMember(String[] ids){
-        return CauthdslBuilder.signedByAnyOfGivenRole(MspPrincipal.MSPRole.MSPRoleType.MEMBER,ids);
+        return CAuthDslBuilder.signedByAnyOfGivenRole(MspPrincipal.MSPRole.MSPRoleType.MEMBER,ids);
     }
 
     /**
@@ -216,7 +212,7 @@ public class CauthdslBuilder {
      * @return
      */
     public static Policies.SignaturePolicyEnvelope signedByAnyAdmin(String[] ids){
-        return CauthdslBuilder.signedByAnyOfGivenRole(MspPrincipal.MSPRole.MSPRoleType.ADMIN,ids);
+        return CAuthDslBuilder.signedByAnyOfGivenRole(MspPrincipal.MSPRole.MSPRoleType.ADMIN,ids);
     }
 
     /**
@@ -228,7 +224,7 @@ public class CauthdslBuilder {
      */
     public static Policies.SignaturePolicy and(Policies.SignaturePolicy lhs,Policies.SignaturePolicy rhs){
         Policies.SignaturePolicy[] sps = {lhs,rhs};
-        return CauthdslBuilder.nOutOf(2,sps);
+        return CAuthDslBuilder.nOutOf(2,sps);
     }
 
     /**
@@ -240,7 +236,7 @@ public class CauthdslBuilder {
      */
     public static Policies.SignaturePolicy or(Policies.SignaturePolicy lhs,Policies.SignaturePolicy rhs){
         Policies.SignaturePolicy[] sps = {lhs,rhs};
-        return CauthdslBuilder.nOutOf(1,sps);
+        return CAuthDslBuilder.nOutOf(1,sps);
     }
 
     /**
