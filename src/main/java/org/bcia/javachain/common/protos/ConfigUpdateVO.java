@@ -13,25 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.events.producer;
+package org.bcia.javachain.common.protos;
 
-import io.grpc.stub.StreamObserver;
-import org.bcia.javachain.protos.node.EventsPackage;
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.protos.common.Configtx;
 
 /**
- * 对象
+ * 类描述
  *
  * @author zhouhui
- * @date 2018/3/20
+ * @date 2018/05/29
  * @company Dingxuan
  */
-public interface IEventHubServer {
-    /**
-     * 通讯
-     *
-     * @param value
-     * @return
-     */
-    EventsPackage.Event chat(EventsPackage.SignedEvent value, StreamObserver<EventsPackage.Event> responseObserver);
+public class ConfigUpdateVO implements IProtoVO<Configtx.ConfigUpdate> {
+    @Override
+    public void parseFrom(Configtx.ConfigUpdate configUpdate) throws InvalidProtocolBufferException, ValidateException {
 
+
+    }
+
+    @Override
+    public Configtx.ConfigUpdate toProto() {
+        return null;
+    }
 }

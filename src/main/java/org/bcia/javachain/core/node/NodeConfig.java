@@ -835,7 +835,6 @@ public class NodeConfig {
         private int buffersize;
         private int timeout;
         private int timewindow;
-        private int keepaliveMinInterval;
 
         public String getAddress() {
             return address;
@@ -867,14 +866,6 @@ public class NodeConfig {
 
         public void setTimewindow(int timewindow) {
             this.timewindow = timewindow;
-        }
-
-        public int getKeepaliveMinInterval() {
-            return keepaliveMinInterval;
-        }
-
-        public void setKeepaliveMinInterval(int keepaliveMinInterval) {
-            this.keepaliveMinInterval = keepaliveMinInterval;
         }
     }
 

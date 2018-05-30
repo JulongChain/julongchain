@@ -19,7 +19,6 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.EventException;
-import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -63,10 +62,8 @@ public class EventHelper {
         blockForEventBuilder.setHeader(block.getHeader());
         blockForEventBuilder.setMetadata(block.getMetadata());
 
-        TxValidationFlags txValidationFlags = null;
         ByteString metadata = block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER_VALUE);
-        txValidationFlags = TxValidationFlags.fromByteString(metadata);
-
+        TxValidationFlags txValidationFlags = TxValidationFlags.fromByteString(metadata);
 
         String groupId = null;
         List<EventsPackage.FilteredTransaction> filteredTransactionList = new ArrayList<>();
@@ -188,9 +185,9 @@ public class EventHelper {
             String txId, TxValidationFlags txValidationFlags, int txIndex, int type) throws EventException {
         EventsPackage.FilteredTransaction.Builder filteredTransactionBuilder = EventsPackage.FilteredTransaction
                 .newBuilder();
+
         filteredTransactionBuilder.setTxid(txId);
         filteredTransactionBuilder.setTxValidationCode(txValidationFlags.flag(txIndex));
-
         filteredTransactionBuilder.setTypeValue(type);
 
         return filteredTransactionBuilder;

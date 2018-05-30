@@ -147,4 +147,8 @@ public class EventProcessor implements IEventProcessor {
 
     }
 
+    @Override
+    public EventsServerConfig getEventsServerConfig() {
+        return eventsServerConfig;
+    }
 }

@@ -26,44 +26,42 @@ import com.google.protobuf.Message;
  * @company Dingxuan
  */
 public class EventsServerConfig {
+    private static final long DEFAULT_TIME_WINDOW = 900000;//900秒，15分钟
+
     public interface IBindingInspector {
         void bind(Message protoMessage);
     }
 
-    private long BufferSize;
-    private long Timeout;
-    private long TimeWindow;
+    private long bufferSize;
+    private long timeout;
+    private long timeWindow;
     private IBindingInspector bindingInspector;
 
-    public long getBufferSize() {
-        return BufferSize;
+    public EventsServerConfig(long bufferSize, long timeout, long timeWindow, IBindingInspector bindingInspector) {
+        this.bufferSize = bufferSize;
+        this.timeout = timeout;
+
+        if (timeWindow == 0L) {
+            timeWindow = DEFAULT_TIME_WINDOW;
+        }
+        this.timeWindow = timeWindow;
+
+        this.bindingInspector = bindingInspector;
     }
 
-    public void setBufferSize(long bufferSize) {
-        BufferSize = bufferSize;
+    public long getBufferSize() {
+        return bufferSize;
     }
 
     public long getTimeout() {
-        return Timeout;
-    }
-
-    public void setTimeout(long timeout) {
-        Timeout = timeout;
+        return timeout;
     }
 
     public long getTimeWindow() {
-        return TimeWindow;
-    }
-
-    public void setTimeWindow(long timeWindow) {
-        TimeWindow = timeWindow;
+        return timeWindow;
     }
 
     public IBindingInspector getBindingInspector() {
         return bindingInspector;
-    }
-
-    public void setBindingInspector(IBindingInspector bindingInspector) {
-        this.bindingInspector = bindingInspector;
     }
 }
