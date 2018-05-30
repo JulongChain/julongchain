@@ -16,6 +16,7 @@
 package org.bcia.javachain.consenter.consensus;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.protos.common.Common;
 
@@ -45,7 +46,7 @@ public interface IProcessor {
      * @param env
      * @return
      */
-     Object processConfigUpdateMsg(Common.Envelope env) throws InvalidProtocolBufferException, ValidateException;
+     Object processConfigUpdateMsg(Common.Envelope env) throws InvalidProtocolBufferException, ValidateException, PolicyException;
 
     /**
      * 接收'ORDERER_TX'或'CONFIG`类型的消息，解压嵌入其中的ConfigUpdate信封，

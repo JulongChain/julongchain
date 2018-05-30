@@ -103,19 +103,12 @@ public class ChainSupport implements IStandardGroupSupport, ISupport {
     }
 
     @Override
-    public Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx) throws InvalidProtocolBufferException, ValidateException {
+    public Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx) throws InvalidProtocolBufferException, ValidateException, PolicyException {
         Configtx.ConfigEnvelope env = ledgerResources.mutableResources.getValidator().proposeConfigUpdate(configtx);
-        try {
-            GroupConfigBundle bundle=new GroupConfigBundle(this.chainId(),env.getConfig());
-            //TODO fabric中通过接口调用
-            bundle.validateNew(bundle);
-        } catch (ValidateException e) {
-          throw new ValidateException(e);
-        } catch (InvalidProtocolBufferException e) {
-          throw new InvalidProtocolBufferException(e);
-        } catch (PolicyException e) {
-            e.printStackTrace();
-        }
+        GroupConfigBundle bundle=new GroupConfigBundle(this.chainId(),env.getConfig());
+        //TODO fabric中通过接口调用
+        bundle.validateNew(bundle);
+
         return env;
     }
 }

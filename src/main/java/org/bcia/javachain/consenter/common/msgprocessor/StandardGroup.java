@@ -16,6 +16,7 @@
 package org.bcia.javachain.consenter.common.msgprocessor;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
@@ -94,7 +95,7 @@ public class StandardGroup implements IStandardGroupSupport, org.bcia.javachain.
     }
 
     @Override
-    public Object processConfigUpdateMsg(Common.Envelope env) throws InvalidProtocolBufferException, ValidateException {
+    public Object processConfigUpdateMsg(Common.Envelope env) throws InvalidProtocolBufferException, ValidateException, PolicyException {
 
         long seq = support.sequence();
         //TODO 通过apply过滤
