@@ -23,14 +23,22 @@ package org.bcia.javachain.csp.intfs.opts;
  * @company Dingxuan
  */
 public class HashFunConstant {
+    public static final String SM3="SM3";
     public static final String MD4="MD4";
     public static final String MD5="MD5";
+    public static final String SHA1="SHA1";
     public static final String SHA224="SHA224";
+    public static final String SHA256="SHA256";
     public static final String SHA384="SHA384";
-    public static final String MD5SHA1="MD5SHA1";
+    public static final String SHA512="SHA512";
     public static final String SHA3_224="SHA3_224";
+    public static final String SHA3_256="SHA3_256";
     public static final String SHA3_384="SHA3_384";
+    public static final String SHA3_512="SHA3_512";
+    public static final String MD5SHA1="MD5SHA1";
+    public static final String RIPEMD160="RIPEMD160";
     public static final String SHA512_224="SHA512_224";
     public static final String BLAKE2s_256="BLAKE2s_256";
     public static final String BLAKE2b_384="BLAKE2b_384";
+
 }
