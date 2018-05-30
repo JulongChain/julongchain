@@ -27,7 +27,7 @@ import org.junit.Test;
  * @date 11/05/18
  * @company Aisino
  */
-public class CauthdslTest {
+public class CAuthDslTest {
     @Before
     public void setUp() {
         System.out.println("setup...");

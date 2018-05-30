@@ -28,6 +28,12 @@ public class ConfigPolicy {
     private Policy Policy;
     private String ModPolicy;
 
+    public ConfigPolicy(Long version, org.bcia.javachain.common.policycheck.bean.Policy policy, String modPolicy) {
+        Version = version;
+        Policy = policy;
+        ModPolicy = modPolicy;
+    }
+
     public Long getVersion() {
         return Version;
     }

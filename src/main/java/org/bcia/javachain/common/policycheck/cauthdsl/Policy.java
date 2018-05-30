@@ -16,7 +16,6 @@
 
 package org.bcia.javachain.common.policycheck.cauthdsl;
 
-import org.bcia.javachain.common.cauthdsl.PolicyProvider;
 import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -64,7 +63,7 @@ public class Policy implements IPolicy{
         if(this == null){
             log.info("No sEvaluateuch policy");
         }
-            Boolean ok = this.evalutor(Cauthdsl.deduplicate(signatureList,this.deserializer),bool);//评估这组签名是否满足策略
+            Boolean ok = this.evalutor(CAuthDsl.deduplicate(signatureList,this.deserializer),bool);//评估这组签名是否满足策略
             if(!ok){
                 log.info("Failed to authenticate policy");
             }
