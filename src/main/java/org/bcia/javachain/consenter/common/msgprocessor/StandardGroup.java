@@ -15,6 +15,8 @@
  */
 package org.bcia.javachain.consenter.common.msgprocessor;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -74,12 +76,15 @@ public class StandardGroup implements IStandardGroupSupport, org.bcia.javachain.
 
     @Override
     public boolean classfiyMsg(Common.GroupHeader chdr) {
-        switch (chdr.getType()) {
-            case Common.HeaderType.CONFIG_UPDATE_VALUE:
-                break;
+        if (Common.HeaderType.CONFIG_VALUE == chdr.getType()) {
+            return  true;
+        }else if(Common.HeaderType.CONFIG_UPDATE_VALUE == chdr.getType()){
+            return  true;
+        }else if(Common.HeaderType.CONSENTER_TRANSACTION_VALUE == chdr.getType()){
+            return  true;
+        }else {
+            return false;
         }
-
-        return false;
     }
 
     @Override
@@ -89,7 +94,7 @@ public class StandardGroup implements IStandardGroupSupport, org.bcia.javachain.
     }
 
     @Override
-    public Object processConfigUpdateMsg(Common.Envelope env) {
+    public Object processConfigUpdateMsg(Common.Envelope env) throws InvalidProtocolBufferException, ValidateException {
 
         long seq = support.sequence();
         //TODO 通过apply过滤
