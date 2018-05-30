@@ -43,9 +43,8 @@ import java.util.*;
  */
 public class Cauthdsl {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Cauthdsl.class);
-    private int MSPPrincipal_Classification;
 
-    /**
+    /**signedProposal
      * 删除重复身份，保留身份顺序
      * @param signedDatas
      * @return
@@ -55,15 +54,14 @@ public class Cauthdsl {
         //SignedData[] result = new SignedData[signedDatas.length];
         Map<String,Object> ids = new HashMap<String,Object>();
         List<SignedData> result = new ArrayList<SignedData>();
-        IIdentity identity = new Identity();
         for(int i=0;i<signedDatas.size();i++){
-            identity = deserializer.deserializeIdentity(signedDatas.get(i).getIdentity());
+            IIdentity identity = deserializer.deserializeIdentity(signedDatas.get(i).getIdentity());
             String key = identity.getMSPIdentifier();
             if(ids.get(key) != null){
                 log.warn("De-duplicating identity "+identity+" at index "+i+" in signature set");
             }else{
                 result.add(signedDatas.get(i));
-                ids.put(key,new Object());
+                ids.put(key,null);
             }
         }
         return result;
@@ -80,20 +78,29 @@ public class Cauthdsl {
         if(policy == null){
             log.info("Empty policy element");
         }
-        if(policy.hasNOutOf()){
-            Boolean[] polices = new Boolean[policy.getNOutOf().getRulesList().size()];
-            for(int i=0;i<polices.length;i++){
-                Boolean compiledPolicy = compile(policy,identities,deserializer);
-                polices[i] = compiledPolicy;
-            }
-            return Cauthdsl.confirmSignedData(signedDatas,used,polices,policy);
-        }else{
-            if(policy.getSignedBy()<0 || policy.getSignedBy()>identities.size()){
-                log.info("identity index out of range, requested "+policy.getSignedBy()+", but identies length is"+identities.size());
-            }
-            MspPrincipal.MSPPrincipal signedByID = identities.get(policy.getSignedBy());
-            return Cauthdsl.confirmSignedData1(signedDatas,used,signedByID,deserializer,policy);
+        switch (policy.getTypeCase()) {
+            case N_OUT_OF:
+                Boolean[] polices = new Boolean[policy.getNOutOf().getRulesList().size()];
+                Policies.SignaturePolicy signaturePolicy = null;
+                for(int i=0;i<polices.length;i++){
+                    signaturePolicy = policy.getNOutOf().getRulesList().get(i);
+                    Boolean compiledPolicy = compile(signaturePolicy,identities,deserializer);
+                    polices[i] = compiledPolicy;
+                }
+                return Cauthdsl.confirmSignedData(signedDatas,used,polices,policy);
+            case SIGNED_BY:
+                if(policy.getSignedBy() < 0 || policy.getSignedBy()>identities.size()){
+                    log.info("identity index out of range, requested "+policy.getSignedBy()+", but identies length is"+identities.size());
+                }
+                MspPrincipal.MSPPrincipal signedByID = identities.get(policy.getSignedBy());
+                return Cauthdsl.confirmSignedData1(signedDatas,used,signedByID,deserializer,policy);
+             default:
+                 log.error("Unknown type");
+                 return null;
+
         }
+
+
 
 
     }

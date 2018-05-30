@@ -383,15 +383,15 @@ public class CspGm0016 implements ICsp {
         byte[] digest = new byte[0];
 
 
-        if (opts.hashFunc() instanceof SM3) {
+        if (opts.hashFunc().equalsIgnoreCase(HashFunConstant.SM3) ) {
             SM3 sm3 = new SM3();
             digest = sm3.sum(data);
 
-        } else if (opts.hashFunc() instanceof SHA1) {
+        } else if (opts.hashFunc().equalsIgnoreCase(HashFunConstant.SHA1)) {
             SHA1 sha1 = new SHA1();
             digest = sha1.sum(data);
 
-        } else if (opts.hashFunc() instanceof SHA256) {
+        } else if (opts.hashFunc().equalsIgnoreCase(HashFunConstant.SHA256)) {
             SHA256 sha256 = new SHA256();
             digest = sha256.sum(data);
         }

@@ -17,6 +17,8 @@ package org.bcia.javachain.core.node;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -37,7 +39,7 @@ import org.bcia.javachain.protos.common.Configtx;
  * @company Dingxuan
  */
 public class ConfigtxProcessor implements IProcessor {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(NodeGrpcServer.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(ConfigtxProcessor.class);
 
     public static final String RESOURCES_CONFIG_KEY = "resourcesconfigtx.RESOURCES_CONFIG_KEY";
     public static final String GROUP_CONFIG_KEY = "resourcesconfigtx.GROUP_CONFIG_KEY";
@@ -107,6 +109,9 @@ public class ConfigtxProcessor implements IProcessor {
         } catch (ValidateException e) {
             log.error(e.getMessage(), e);
             throw new LedgerException(e);
+        } catch (PolicyException e) {
+            log.error(e.getMessage(), e);
+            throw new LedgerException(e);
         }
     }
 
@@ -130,7 +135,19 @@ public class ConfigtxProcessor implements IProcessor {
                 log.error(e.getMessage(), e);
                 throw new LedgerException(e);
             }
-        }else{
+        } else {
+            try {
+                ConfigTxUtils.validateAndApplyResourceConfig(groupId, txEnvelope);
+            } catch (NodeException e) {
+                log.error(e.getMessage(), e);
+                throw new LedgerException(e);
+            } catch (ValidateException e) {
+                log.error(e.getMessage(), e);
+                throw new LedgerException(e);
+            } catch (InvalidProtocolBufferException e) {
+                log.error(e.getMessage(), e);
+                throw new LedgerException(e);
+            }
 
         }
     }

@@ -18,9 +18,13 @@ package org.bcia.javachain.common.policycheck.policies;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.PolicyException;
+import org.bcia.javachain.common.policies.IManager;
 import org.bcia.javachain.common.policies.IPolicyProvider;
 import org.bcia.javachain.common.policies.PolicyConstant;
 import org.bcia.javachain.common.policies.PolicyManager;
+import org.bcia.javachain.consenter.common.multigroup.ChainSupport;
+import org.bcia.javachain.consenter.consensus.kafka.Chain;
+import org.bcia.javachain.consenter.entity.ChainEntity;
 import org.bcia.javachain.protos.common.Configtx;
 
 import java.util.HashMap;
@@ -40,4 +44,6 @@ public class ChannelPolicyManager implements IChannelPolicyManagerGetter{
         Configtx.ConfigTree rootTree = Configtx.ConfigTree.getDefaultInstance();
         return new PolicyManager(PolicyConstant.GROUP_APP_ADMINS,providers,rootTree);
     }
+
+
 }

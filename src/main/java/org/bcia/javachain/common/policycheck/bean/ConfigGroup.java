@@ -26,29 +26,57 @@ import java.util.Map;
  * @company Aisino
  */
 public class ConfigGroup {
-    private Long Version;
-    private Map  Groups;
-    private Map Values;
-    private Map Policies;
-    private String ModPolicy;
+    private Long version;
+    private Map groups;
+    private Map values;
+    private Map policies;
+    private String modPolicy;
+
+    public ConfigGroup(Long version, Map groups, Map values, Map policies, String modPolicy) {
+        this.version = version;
+        this.groups = groups;
+        this.values = values;
+        this.policies = policies;
+        this.modPolicy = modPolicy;
+    }
 
     public Long getVersion() {
-        return Version;
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     public Map getGroups() {
-        return Groups;
+        return groups;
+    }
+
+    public void setGroups(Map groups) {
+        this.groups = groups;
     }
 
     public Map getValues() {
-        return Values;
+        return values;
+    }
+
+    public void setValues(Map values) {
+        this.values = values;
     }
 
     public Map getPolicies() {
-        return Policies;
+        return policies;
+    }
+
+    public void setPolicies(Map policies) {
+        this.policies = policies;
     }
 
     public String getModPolicy() {
-        return ModPolicy;
+        return modPolicy;
+    }
+
+    public void setModPolicy(String modPolicy) {
+        this.modPolicy = modPolicy;
     }
 }

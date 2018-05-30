@@ -112,6 +112,11 @@ public class ConsenterConfig implements IConsenterConfig {
     }
 
     private void validateBatchSize() throws ValidateException {
+        //TODO：是否允许为空
+        if (batchSize == null) {
+            return;
+        }
+
         if (batchSize.getAbsoluteMaxBytes() == 0) {
             throw new ValidateException("AbsoluteMaxBytes is 0");
         }
@@ -130,6 +135,10 @@ public class ConsenterConfig implements IConsenterConfig {
     }
 
     private long validateBatchTimeout() throws ValidateException {
+        //TODO：是否允许为空
+        if (batchTimeoutProto == null) {
+            return 0;
+        }
         try {
             return Long.parseLong(batchTimeoutProto.getTimeout());
         } catch (Exception ex) {
@@ -139,9 +148,11 @@ public class ConsenterConfig implements IConsenterConfig {
 
     private List<String> validateKafkaBrokers() throws ValidateException {
         List<String> brokerList = new ArrayList<String>();
-        for (String broker : kafkaBrokersProto.getBrokersList()) {
-            validateKafkaBroker(broker);
-            brokerList.add(broker);
+        if (kafkaBrokersProto != null && kafkaBrokersProto.getBrokersList() != null) {
+            for (String broker : kafkaBrokersProto.getBrokersList()) {
+                validateKafkaBroker(broker);
+                brokerList.add(broker);
+            }
         }
 
         return brokerList;

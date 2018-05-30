@@ -15,6 +15,8 @@
  */
 package org.bcia.javachain.common.configtx;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 
@@ -41,7 +43,7 @@ public interface IValidator {
      * @param configtx
      * @return
      */
-    Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx);
+    Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx) throws InvalidProtocolBufferException, ValidateException;
 
     /**
      * retrieves the chain ID associated with this manager

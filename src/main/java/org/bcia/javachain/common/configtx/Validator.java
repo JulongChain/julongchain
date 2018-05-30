@@ -15,11 +15,13 @@
  */
 package org.bcia.javachain.common.configtx;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.configtx.util.ConfigMapUtils;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.policies.IPolicyManager;
 import org.bcia.javachain.common.util.ValidateUtils;
+import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 
@@ -81,7 +83,12 @@ public class Validator implements IValidator {
     }
 
     @Override
-    public Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx) {
+    public Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx) throws
+            InvalidProtocolBufferException, ValidateException {
+        Configtx.ConfigUpdateEnvelope configUpdateEnvelope = EnvelopeHelper.getConfigUpdateEnvelopeFrom(configtx);
+
+//        if(configUpdateEnvelope.get)
+
         return null;
     }
 

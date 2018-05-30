@@ -15,6 +15,9 @@
  */
 package org.bcia.javachain.consenter.common.multigroup;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.PolicyException;
+import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
@@ -28,5 +31,5 @@ public interface IStandardGroupSupport {
     long sequence();
     String chainId();
     ILocalSigner signer();
-    Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx);
+    Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx) throws InvalidProtocolBufferException, ValidateException, PolicyException;
 }

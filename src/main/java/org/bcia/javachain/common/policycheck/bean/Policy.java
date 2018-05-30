@@ -24,22 +24,22 @@ package org.bcia.javachain.common.policycheck.bean;
  * @company Aisino
  */
 public class Policy {
-    private int Type;
-    private byte[] Value;
+    private int type;
+    private byte[] value;
 
     public int getType() {
-        return Type;
+        return type;
     }
 
     public void setType(int type) {
-        Type = type;
+        type = type;
     }
 
     public byte[] getValue() {
-        return Value;
+        return value;
     }
 
     public void setValue(byte[] value) {
-        Value = value;
+        value = value;
     }
 }

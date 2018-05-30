@@ -17,6 +17,7 @@ package org.bcia.javachain.common.policycheck.policies;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.PolicyException;
+import org.bcia.javachain.common.policies.IPolicyManager;
 import org.bcia.javachain.common.policies.PolicyManager;
 
 /**
@@ -27,5 +28,5 @@ import org.bcia.javachain.common.policies.PolicyManager;
  * @company Aisino
  */
 public interface IChannelPolicyManagerGetter {
-    PolicyManager manager(String channelID ) throws InvalidProtocolBufferException, PolicyException;
+    IPolicyManager manager(String channelID ) throws InvalidProtocolBufferException, PolicyException;
 }

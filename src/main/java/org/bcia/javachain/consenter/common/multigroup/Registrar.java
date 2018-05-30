@@ -23,6 +23,7 @@ import org.bcia.javachain.common.groupconfig.GroupConfigBundle;
 import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.javachain.common.ledger.blockledger.IFactory;
 import org.bcia.javachain.common.ledger.blockledger.IReader;
+import org.bcia.javachain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.javachain.common.ledger.blockledger.Util;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -75,6 +76,21 @@ public class Registrar implements IChainCreator {
             log.error(String.format("[channel %s] ",res.getValidator().groupId()));
         }
    }
+
+    //TODO  增加回调函数
+    public void newRegistrar(IFactory ledgerFactory, Map<String, IConsensue> consenters, ILocalSigner signer) throws LedgerException, ValidateException, PolicyException, InvalidProtocolBufferException {
+        List<String>existingChains= ledgerFactory.groupIDs();
+        for (String chainId: existingChains) {
+            ReadWriteBase rl= ledgerFactory.getOrCreate(chainId);
+            Common.Envelope configTx=   getConfigTx(rl);
+            if(configTx==null){
+                log.error("Programming error, configTx should never be nil here");
+            }
+            LedgerResources ledgerResources=newLedgerResources(configTx);
+
+        }
+
+    }
 
     public GroupConfigBundle newBundle(String groupId, Configtx.Config config) throws ValidateException, PolicyException, InvalidProtocolBufferException {
 
