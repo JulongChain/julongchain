@@ -64,4 +64,12 @@ public class ConfigUpdateEnvelopeVO implements IProtoVO<Configtx.ConfigUpdateEnv
 
         return builder.build();
     }
+
+    public Configtx.ConfigUpdate getConfigUpdate() {
+        return configUpdate;
+    }
+
+    public List<ConfigSignatureVO> getConfigSignatureVOList() {
+        return configSignatureVOList;
+    }
 }

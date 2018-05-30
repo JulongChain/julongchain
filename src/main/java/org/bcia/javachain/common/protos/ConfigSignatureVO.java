@@ -53,4 +53,12 @@ public class ConfigSignatureVO implements IProtoVO<Configtx.ConfigSignature> {
 
         return builder.build();
     }
+
+    public Common.SignatureHeader getSignatureHeader() {
+        return signatureHeader;
+    }
+
+    public ByteString getSignature() {
+        return signature;
+    }
 }

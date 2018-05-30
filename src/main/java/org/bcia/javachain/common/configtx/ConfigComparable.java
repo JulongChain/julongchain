@@ -161,4 +161,36 @@ public class ConfigComparable<T> {
     public T getT() {
         return t;
     }
+
+    public long getVersion() {
+        if (t instanceof Configtx.ConfigTree) {
+            return ((Configtx.ConfigTree) t).getVersion();
+        }
+
+        if (t instanceof Configtx.ConfigValue) {
+            return ((Configtx.ConfigValue) t).getVersion();
+        }
+
+        if (t instanceof Configtx.ConfigPolicy) {
+            return ((Configtx.ConfigPolicy) t).getVersion();
+        }
+
+        return 0;
+    }
+
+    public String getModPolicy() {
+        if (t instanceof Configtx.ConfigTree) {
+            return ((Configtx.ConfigTree) t).getModPolicy();
+        }
+
+        if (t instanceof Configtx.ConfigValue) {
+            return ((Configtx.ConfigValue) t).getModPolicy();
+        }
+
+        if (t instanceof Configtx.ConfigPolicy) {
+            return ((Configtx.ConfigPolicy) t).getModPolicy();
+        }
+
+        return null;
+    }
 }
