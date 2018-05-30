@@ -1,6 +1,7 @@
 package org.bcia.javachain.core.ssc.cssc;
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.BaseJunit4Test;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.LedgerException;
@@ -18,6 +19,7 @@ import org.bcia.javachain.core.ssc.lssc.LSSC;
 import org.bcia.javachain.node.common.helper.ConfigTreeHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
+import org.bcia.javachain.protos.node.Query;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
 import org.junit.Before;
@@ -62,8 +64,8 @@ public class CSSCTest extends BaseJunit4Test {
     }
 
     @Test
-    public void testJoinChains(){
-        ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("1",new LinkedList<ByteString>());
+    public void testJoinGroupsWithCorrectParams(){
+        ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("0",new LinkedList<ByteString>());
         List<ByteString> args0 = new LinkedList<ByteString>();
         //先删除账本
         FileUtils.deleteDir(new File(LedgerConfig.getRootPath()));
@@ -85,29 +87,58 @@ public class CSSCTest extends BaseJunit4Test {
         }
         args0.add(ByteString.copyFromUtf8(CSSC.JOIN_GROUP));
         args0.add(ByteString.copyFrom(blockBytes));
-        ISmartContract.SmartContractResponse res = mockStub.mockInvoke("2", args0);
+        ISmartContract.SmartContractResponse res = mockStub.mockInvoke("0", args0);
+        //2018年5月30日,org.bcia.javachain.common.policies.PolicyManager.<init>(PolicyManager.java:72),java.lang.NullPointerException
+        //加入组失败,等航天信息更改后,执行后续代码
         assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
+
+        List<ByteString> args1 = new LinkedList<ByteString>();
+        args1.add(ByteString.copyFromUtf8(CSSC.GET_CONFIG_BLOCK));
+        args1.add(ByteString.copyFromUtf8("mytestchainid"));
+        ISmartContract.SmartContractResponse res1 = mockStub.mockInvoke("1", args1);
+        assertThat(res1.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
+        try {
+            Common.Block block = Common.Block.parseFrom(res1.getPayload());
+            assertNotNull(block);
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+
+        List<ByteString> args2 = new LinkedList<ByteString>();
+        args2.add(ByteString.copyFromUtf8(CSSC.GET_GROUPS));
+        ISmartContract.SmartContractResponse res2 = mockStub.mockInvoke("2", args2);
+        assertThat(res2.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
+        try {
+            Query.GroupQueryResponse groups = Query.GroupQueryResponse.parseFrom(res2.getPayload());
+            assertNotNull(groups);
+            assertThat(groups.getGroupsCount(),is(1));
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    @Test
+    public void testJoinGroupsWithWrongParams(){
+
     }
 
     @Test
-    public void testGetConfigBlock(){
+    public void testJoinGroupsMissingParams(){
 
     }
 
     @Test
-    public void testGetGroups(){
+    public void testInvokeWithInvalidParams(){
 
     }
 
     @Test
-    public void testGetConfigTree(){
+    public void testSubmittingOrdererGenesis(){
 
     }
 
-    @Test
-    public void testSimulateConfigTreeUpdate(){
-
-    }
 
 
     private byte[] mockConfigBlock() throws IOException, ValidateException,JavaChainException {
