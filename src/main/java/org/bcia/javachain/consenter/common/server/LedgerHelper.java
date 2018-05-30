@@ -61,7 +61,7 @@ public class LedgerHelper {
                 break;
                 default:
                     //TODO fabric源码中传入conf.RAMLedger.HistorySize
-                lf=new RamLedgerFactory();
+                lf=new RamLedgerFactory(consenterConfig.getRamLedger().getHistorySize());
         }
         return lf;
     }
