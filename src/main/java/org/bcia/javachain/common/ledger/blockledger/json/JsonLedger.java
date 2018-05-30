@@ -45,7 +45,7 @@ public class JsonLedger extends ReadWriteBase {
     public static final String BLOCK_FILE_FORMAT_STRING  = "block_%020d.json";
 
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(JavaChainLog.class);
-    private final Object lock = new Object();
+    private static final Object lock = new Object();
 
     private String directory;
     private long height;
@@ -130,10 +130,10 @@ public class JsonLedger extends ReadWriteBase {
             case Ab.SeekPosition.NEWEST_FIELD_NUMBER:
                 return new JsonCursor(this, height - 1);
             case Ab.SeekPosition.SPECIFIED_FIELD_NUMBER:
-                if(Ab.SeekSpecified.NUMBER_FIELD_NUMBER > height){
+                if(startPosition.getSpecified().getNumber() > height){
                     throw Util.NOT_FOUND_ERROR_ITERATOR;
                 }
-                return new JsonCursor(this, Ab.SeekSpecified.NUMBER_FIELD_NUMBER);
+                return new JsonCursor(this, startPosition.getSpecified().getNumber());
             default:
                 throw Util.NOT_FOUND_ERROR_ITERATOR;
         }
@@ -216,7 +216,7 @@ public class JsonLedger extends ReadWriteBase {
         this.printer = printer;
     }
 
-    public Object getLock() {
+    public static Object getLock() {
         return lock;
     }
 }

@@ -16,9 +16,15 @@ limitations under the License.
 package org.bcia.javachain.common.ledger.blockledger;
 
 import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.genesis.GenesisBlockFactory;
 import org.bcia.javachain.common.ledger.blockledger.file.FileLedger;
 import org.bcia.javachain.common.ledger.blockledger.file.FileLedgerFactory;
+import org.bcia.javachain.common.ledger.blockledger.json.JsonLedgerFactory;
+import org.bcia.javachain.common.ledger.blockledger.ram.RamLedgerFactory;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Configtx;
+import org.bcia.javachain.protos.consenter.Ab;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,6 +32,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 类描述
@@ -47,7 +54,7 @@ public class UtilTest {
     }
 
     @Test
-    public void testCreateNextBlock() throws Exception{
+    public void testCreateNextBlockUsingFile() throws Exception{
         IFactory factory = new FileLedgerFactory(dir);
         IReader reader = factory.getOrCreate(groupID);
         Common.Block block = Util.createNextBlock(reader, new ArrayList<Common.Envelope>(){{
@@ -60,14 +67,117 @@ public class UtilTest {
     }
 
     @Test
-    public void testGetBlock() throws Exception{
+    public void testGetBlockUsingFile() throws Exception{
         IFactory factory = new FileLedgerFactory(dir);
         IReader reader = factory.getOrCreate(groupID);
-        ((ReadWriteBase) reader).append(Util.createNextBlock(reader, null));
-        Common.Block block = Util.getBlock(reader, 0);
-        Assert.assertNotNull(block);
+        final Common.Block block = Util.createNextBlock(reader, null);
+//        ((ReadWriteBase) reader).append(block);
+        new Thread(() -> {
+            try {
+                Thread.sleep(1001);
+                ((ReadWriteBase) reader).append(block);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+        new Thread(() -> {
+            try {
+                IFactory factory1 = new FileLedgerFactory(dir);
+                IReader reader1 = factory1.getOrCreate(groupID);
+                Assert.assertEquals(Util.getBlock(reader1, 0), block);
+            } catch (LedgerException e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 
+    @Test
+    public void testCreateNextBlockUsingJson() throws Exception{
+        IFactory factory = new JsonLedgerFactory(dir);
+        IReader reader = factory.getOrCreate(groupID);
+        Common.Block block = Util.createNextBlock(reader, new ArrayList<Common.Envelope>(){{
+            add(Common.Envelope.newBuilder()
+                    .setPayload(ByteString.copyFromUtf8("My Group"))
+                    .build());
+        }});
+        Assert.assertNotNull(block);
+        System.out.println(block);
+        Assert.assertSame(block.getHeader().getNumber(), (long) 0);
+    }
+
+    @Test
+    public void testGetBlockUsingJson() throws Exception{
+        IFactory factory = new JsonLedgerFactory(dir);
+        IReader reader = factory.getOrCreate(groupID);
+        final Common.Block block = Util.createNextBlock(reader, null);
+        new Thread(() -> {
+            try {
+                Thread.sleep(1002);
+                ((ReadWriteBase) reader).append(block);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+        new Thread(() -> {
+            try {
+                IFactory factory1 = new JsonLedgerFactory(dir);
+                IReader reader1 = factory1.getOrCreate(groupID);
+                Assert.assertEquals(Util.getBlock(reader1, 0), block);
+            } catch (LedgerException e) {
+                e.printStackTrace();
+            }
+        }).start();
+        System.out.println(1);
+    }
+
+    @Test
+    public void testCreateNextBlockUsingRam() throws Exception{
+        IFactory factory = new RamLedgerFactory(10);
+        IReader reader = factory.getOrCreate(groupID);
+        Common.Block block = Util.createNextBlock(reader, new ArrayList<Common.Envelope>(){{
+            add(Common.Envelope.newBuilder()
+                    .setPayload(ByteString.copyFromUtf8("My Group"))
+                    .build());
+        }});
+        Assert.assertNotNull(block);
+        System.out.println(block);
+        Assert.assertSame(block.getHeader().getNumber(), (long) 0);
+    }
+
+    @Test
+    public void testGetBlockUsingRam() throws Exception{
+        IFactory factory = new RamLedgerFactory(10);
+        IReader reader = factory.getOrCreate(groupID);
+        List<Common.Envelope> messages = new ArrayList<>();
+        messages.add(Common.Envelope.newBuilder()
+                .setPayload(ByteString.copyFromUtf8("Test Ram"))
+                .build());
+        Common.Block myGroup = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance()).getGenesisBlock("MyGroup");
+        ((ReadWriteBase) reader).append(myGroup);
+        new Thread(() -> {
+            try {
+                Common.Block tmpBlock = null;
+                while (true) {
+                    Thread.sleep(500);
+                    tmpBlock = Util.createNextBlock(reader, messages);
+                    ((ReadWriteBase) reader).append(tmpBlock);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+        new Thread(() -> {
+            try {
+                Common.Envelope envelope = null;
+                Common.Envelope.parseFrom(Util.getBlock(reader, 0).getData().getData(0));
+                envelope = Common.Envelope.parseFrom(Util.getBlock(reader, 1).getData().getData(0));
+                Assert.assertEquals(envelope.getPayload().toStringUtf8(), "Test Ram");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+        System.out.println(1);
+    }
     @After
     public void after() throws Exception{}
 

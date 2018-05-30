@@ -36,7 +36,6 @@ import java.util.AbstractMap;
  */
 public class JsonCursor implements IIterator {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(JsonCursor.class);
-    private Object lock;
 
     private JsonLedger jl;
     private long blockNum;
@@ -46,7 +45,6 @@ public class JsonCursor implements IIterator {
     public JsonCursor(JsonLedger jl, long blockNum){
         this.blockNum = blockNum;
         this.jl = jl;
-        this.lock = this.jl.getLock();
     }
 
     @Override
@@ -62,9 +60,9 @@ public class JsonCursor implements IIterator {
                 blockNum++;
                 return new QueryResult(new AbstractMap.SimpleImmutableEntry( new QueryResult(block), Common.Status.SUCCESS));
             }
-            synchronized (lock) {
+            synchronized (JsonLedger.getLock()) {
                 try {
-                    lock.wait();
+                    JsonLedger.getLock().wait();
                 } catch (InterruptedException e) {
                     throw new LedgerException(e);
                 }
@@ -74,10 +72,10 @@ public class JsonCursor implements IIterator {
 
     @Override
     public void readyChain() throws LedgerException {
-        synchronized (lock) {
+        synchronized (JsonLedger.getLock()) {
             if(!new File(jl.blockFileName(blockNum)).exists()){
                 try {
-                    lock.wait();
+                    JsonLedger.getLock().wait();
                 } catch (InterruptedException e) {
                     throw new LedgerException(e);
                 }
@@ -89,11 +87,6 @@ public class JsonCursor implements IIterator {
     @Override
     public void close() throws LedgerException {
         //nothing to do
-    }
-
-    @Override
-    public Object getLock() {
-        return this.lock;
     }
 
     public JsonLedger getJl() {

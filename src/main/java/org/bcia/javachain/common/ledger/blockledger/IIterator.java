@@ -39,6 +39,4 @@ public interface IIterator extends IResultsIterator {
 
     @Override
     void close() throws LedgerException;
-
-    Object getLock();
 }

@@ -46,14 +46,16 @@ public class RamCursor implements IIterator {
 
     @Override
     public QueryResult next() throws LedgerException {
+        //当存在next时，返回next
+        //当不存在next时阻塞进程，等待append block
         while (true) {
             if(list.getNext() != null){
                 list = list.getNext();
                 return new QueryResult(new AbstractMap.SimpleImmutableEntry(new QueryResult(list.getBlock()), Common.Status.SUCCESS));
             }
-            synchronized (list.getLock()){
+            synchronized (RamLedger.getLock()){
                 try {
-                    list.getLock().wait();
+                    RamLedger.getLock().wait();
                 } catch (InterruptedException e) {
                     throw new LedgerException(e);
                 }
@@ -63,17 +65,12 @@ public class RamCursor implements IIterator {
 
     @Override
     public void readyChain() throws LedgerException {
-
+        //RamLedger中在next时进行了判断是否长度足够，故nothing to do
     }
 
     @Override
     public void close() throws LedgerException {
         //nothing to do
-    }
-
-    @Override
-    public Object getLock() {
-        return this.list.getLock();
     }
 
     public SimpleList getList() {
