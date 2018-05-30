@@ -28,6 +28,8 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.resourceconfig.IResourcesConfigBundle;
 import org.bcia.javachain.common.resourceconfig.ResourcesConfigBundle;
 import org.bcia.javachain.common.util.proto.BlockUtils;
+import org.bcia.javachain.core.commiter.Committer;
+import org.bcia.javachain.core.commiter.ICommitter;
 import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.ledger.customtx.IProcessor;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
@@ -315,8 +317,18 @@ public class Node {
         ResourcesConfigBundle resourcesConfigBundle = new ResourcesConfigBundle(groupId, resConfig,
                 groupConfigBundle, callbackList);
 
+        ICommitter committer = new Committer(nodeLedger, new Committer.IConfigBlockEventer() {
+            @Override
+            public void event(Common.Block block) throws CommitterException {
+
+            }
+        });
 
         Group group = new Group();
+        group.setGroupSupport(groupSupport);
+        group.setBlock(configBlock);
+        group.setCommiter(committer);
+
         groupMap.put(groupId, group);
 
         return group;
