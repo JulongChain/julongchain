@@ -15,18 +15,25 @@
  */
 package org.bcia.javachain.consenter.common.msgprocessor;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.exception.ConsenterException;
-import org.bcia.javachain.common.exception.PolicyException;
-import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.protos.common.Common;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/5/9
+ * @Date: 2018/5/25
  * @company Dingxuan
  */
-public interface IRule {
-    // Apply applies the rule to the given Envelope, either successfully or returns error
-    void apply(Common.Envelope message) throws ConsenterException;
+public class AcceptRule implements IRule {
+    private IRule acceptRule;
+    @Override
+    public void apply(Common.Envelope message) {
+        return;
+    }
+
+    public IRule getAcceptRule() {
+        return acceptRule;
+    }
+
+    public void setAcceptRule(IRule acceptRule) {
+        this.acceptRule = acceptRule;
+    }
 }

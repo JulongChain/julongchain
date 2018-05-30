@@ -16,17 +16,24 @@
 package org.bcia.javachain.consenter.common.msgprocessor;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.exception.ConsenterException;
 import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
+import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Configtx;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/5/9
+ * @Date: 2018/5/17
  * @company Dingxuan
  */
-public interface IRule {
-    // Apply applies the rule to the given Envelope, either successfully or returns error
-    void apply(Common.Envelope message) throws ConsenterException;
+public interface IStandardGroupSupport {
+    long sequence();
+
+    String groupId();
+
+    ILocalSigner signer();
+
+    Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx) throws InvalidProtocolBufferException, ValidateException, PolicyException;
 }

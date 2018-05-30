@@ -23,10 +23,29 @@ import org.bcia.javachain.protos.common.Common;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/5/9
+ * @Date: 2018/5/25
  * @company Dingxuan
  */
-public interface IRule {
-    // Apply applies the rule to the given Envelope, either successfully or returns error
-    void apply(Common.Envelope message) throws ConsenterException;
+public class RuleSet implements IRule {
+    private IRule[] rules;
+
+    @Override
+    public void apply(Common.Envelope message) throws ConsenterException {
+        for (IRule rule : rules) {
+            rule.apply(message);
+        }
+    }
+
+    public IRule[] getRules() {
+        return rules;
+    }
+
+    public void setRules(IRule[] rules) {
+        this.rules = rules;
+    }
+
+    public RuleSet(IRule[] rules) {
+        this.rules = rules;
+    }
+
 }

@@ -13,23 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.common.multigroup;
+package org.bcia.javachain.common.deliver;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.exception.PolicyException;
-import org.bcia.javachain.common.exception.ValidateException;
-import org.bcia.javachain.common.localmsp.ILocalSigner;
-import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.common.Configtx;
+import org.bcia.javachain.common.ledger.blockledger.IReader;
+import org.bcia.javachain.common.policies.IPolicyManager;
+import org.bcia.javachain.common.policies.PolicyManager;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/5/17
+ * @Date: 2018/5/29
  * @company Dingxuan
  */
-public interface IStandardGroupSupport {
+public interface ISupport {
     long sequence();
-    String chainId();
-    ILocalSigner signer();
-    Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx) throws InvalidProtocolBufferException, ValidateException, PolicyException;
+    IPolicyManager policyManager();
+    IReader reader();
 }

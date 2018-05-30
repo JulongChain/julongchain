@@ -22,6 +22,7 @@ import com.google.protobuf.Timestamp;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.proto.TxUtils;
 import org.bcia.javachain.protos.common.Common;
 
 /**
@@ -31,6 +32,13 @@ import org.bcia.javachain.protos.common.Common;
  */
 public class CommonUtils {
     private static JavaChainLog log = JavaChainLogFactory.getLog(CommonUtils.class);
+
+    public static byte[] marshlOrPanic(Message message){
+        return marshal(message);
+    }
+    public static byte[] marshal(Message message){
+        return  message.toByteArray();
+    }
 
     public static Common.Envelope extractEnvelop(Common.Block block, int index) {
         if (block.getData() == null) {
@@ -143,4 +151,19 @@ public class CommonUtils {
                 .setNanos((int) ((millis % 1000) * 1000000)).build();
     }
 
+    public static String groupId(Common.Envelope env){
+        Common.GroupHeader chdr=groupHeader(env);
+        return chdr.getGroupId();
+    }
+
+
+    public static Common.Envelope unmarshalEnvelope(byte[] encoded ){
+        Common.Envelope envelope=null;
+        try {
+          envelope=Common.Envelope.parseFrom(encoded);
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        }
+        return envelope;
+    }
 }

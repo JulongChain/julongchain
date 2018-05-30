@@ -13,20 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.common.msgprocessor;
+package org.bcia.javachain.common.deliver;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.exception.ConsenterException;
-import org.bcia.javachain.common.exception.PolicyException;
-import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.protos.common.Common;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/5/9
+ * @Date: 2018/5/29
  * @company Dingxuan
  */
-public interface IRule {
-    // Apply applies the rule to the given Envelope, either successfully or returns error
-    void apply(Common.Envelope message) throws ConsenterException;
+public interface IPolicyChecker {
+    void policyChecker(Common.Envelope envelope,String groupId);
 }

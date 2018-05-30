@@ -37,4 +37,7 @@ public class Constant {
     public static final String  MAX_RETRY_TIMES ="maxRetryTimes";
     public static final String  RETRY_INTERVAL_MILLIS="retryIntervalMillis";
     public static final String  ZOOKEEPER = "Zookeeper";
+
+    public final static int MSGVERSION = 0;
+    public final static int EPOCH = 0;
 }

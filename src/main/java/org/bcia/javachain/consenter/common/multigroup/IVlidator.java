@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.consenter.common.multigroup;
 
+import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 
 /**
@@ -23,6 +24,9 @@ import org.bcia.javachain.protos.common.Configtx;
  * @company Dingxuan
  */
 public interface IVlidator {
-  void  validate(Configtx.ConfigEnvelope configEnvelope);
-  Configtx.ConfigEnvelope proposeConfigUpdate();
+    void  validate(Configtx.ConfigEnvelope configEnvelope);
+    Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx);
+    String chainId();
+    Configtx.Config  configProto();
+    long sequence();
 }
