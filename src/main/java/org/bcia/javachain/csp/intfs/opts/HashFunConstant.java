@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.csp.gm.dxct.sm2;
-
-import org.bcia.javachain.csp.intfs.IHash;
-import org.bcia.javachain.csp.intfs.opts.ISignerOpts;
+package org.bcia.javachain.csp.intfs.opts;
 
 /**
+ * 类描述
+ *
  * @author zhangmingyang
- * @Date: 2018/3/27
+ * @date 2018/05/30
  * @company Dingxuan
  */
-public class SM2SignerOpts implements ISignerOpts {
-    @Override
-    public String hashFunc() {
-        return null;
-    }
-
-    @Override
-    public String getAlgorithm() {
-        return "SM2";
-    }
+public class HashFunConstant {
+    public static final String MD4="MD4";
+    public static final String MD5="MD5";
+    public static final String SHA224="SHA224";
+    public static final String SHA384="SHA384";
+    public static final String MD5SHA1="MD5SHA1";
+    public static final String SHA3_224="SHA3_224";
+    public static final String SHA3_384="SHA3_384";
+    public static final String SHA512_224="SHA512_224";
+    public static final String BLAKE2s_256="BLAKE2s_256";
+    public static final String BLAKE2b_384="BLAKE2b_384";
 }
