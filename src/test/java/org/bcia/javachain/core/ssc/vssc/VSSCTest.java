@@ -5,6 +5,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.BaseJunit4Test;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.SysSmartContractException;
+import org.bcia.javachain.common.policycheck.cauthdsl.CAuthDslBuilder;
 import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.common.util.proto.ProposalResponseUtils;
@@ -77,7 +78,7 @@ public class VSSCTest extends BaseJunit4Test {
             return;
         }
         byte[] envBytes=TxUtils.getBytesEnvelope(tx);
-        String mspid="snl";
+        String mspid="DEFAULT";
         byte[] policyBytes=getSignedByMSPMemberPolicy(mspid);
 
         List<ByteString> args= new LinkedList<ByteString>();
@@ -164,8 +165,8 @@ public class VSSCTest extends BaseJunit4Test {
     }
 
     private byte[] getSignedByMSPMemberPolicy(String mspid) {
-        String policy="(Alice and Bob)";
-        return policy.getBytes();
+        Policies.SignaturePolicyEnvelope p = CAuthDslBuilder.signedByMspMember(mspid);
+        return p.toByteArray();
     }
 
     /**

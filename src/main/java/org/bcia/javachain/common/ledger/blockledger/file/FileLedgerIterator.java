@@ -33,7 +33,6 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class FileLedgerIterator implements IIterator {
-    private Object lock;
     private FileLedger ledger;
     private long blockNum;
     private IResultsIterator commonIterator;
@@ -44,7 +43,6 @@ public class FileLedgerIterator implements IIterator {
         this.ledger = fl;
         this.blockNum = blockNum;
         this.commonIterator = itr;
-        this.lock = this.ledger.getLock();
     }
 
     /**
@@ -66,10 +64,10 @@ public class FileLedgerIterator implements IIterator {
 
     @Override
     public void readyChain() throws LedgerException{
-        synchronized (lock) {
+        synchronized (FileLedger.getLock()) {
             if (blockNum > ledger.height() - 1) {
                 try {
-                    lock.wait();
+                    FileLedger.getLock().wait();
                 } catch (InterruptedException e) {
                     throw new LedgerException(e);
                 }
@@ -80,11 +78,6 @@ public class FileLedgerIterator implements IIterator {
     @Override
     public void close() throws LedgerException{
         commonIterator.close();
-    }
-
-    @Override
-    public Object getLock() {
-        return this.lock;
     }
 
     public FileLedger getLedger() {

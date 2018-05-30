@@ -29,14 +29,13 @@ import org.bcia.javachain.protos.common.Common;
  */
 public class SimpleList {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(SimpleList.class);
-    private final Object lock = new Object();
 
     private SimpleList next;
     private Common.Block block;
 
     public SimpleList(){}
 
-    public SimpleList(SimpleList next, Channel<Object> channel, Common.Block block){
+    public SimpleList(SimpleList next, Common.Block block){
         this.next = next;
         this.block = block;
     }
@@ -57,7 +56,7 @@ public class SimpleList {
         this.block = block;
     }
 
-    public Object getLock() {
-        return lock;
-    }
+//    public Object getLock() {
+//        return lock;
+//    }
 }
