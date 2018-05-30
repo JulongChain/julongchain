@@ -64,13 +64,9 @@ public class EventHelper {
         blockForEventBuilder.setMetadata(block.getMetadata());
 
         TxValidationFlags txValidationFlags = null;
-        try {
-            ByteString metadata = block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER_VALUE);
-            txValidationFlags = TxValidationFlags.fromByteString(metadata);
-        } catch (LedgerException e) {
-            log.error(e.getMessage(), e);
-            throw new EventException(e);
-        }
+        ByteString metadata = block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER_VALUE);
+        txValidationFlags = TxValidationFlags.fromByteString(metadata);
+
 
         String groupId = null;
         List<EventsPackage.FilteredTransaction> filteredTransactionList = new ArrayList<>();
@@ -193,12 +189,8 @@ public class EventHelper {
         EventsPackage.FilteredTransaction.Builder filteredTransactionBuilder = EventsPackage.FilteredTransaction
                 .newBuilder();
         filteredTransactionBuilder.setTxid(txId);
-        try {
-            filteredTransactionBuilder.setTxValidationCode(txValidationFlags.flag(txIndex));
-        } catch (LedgerException e) {
-            log.error(e.getMessage(), e);
-            throw new EventException(e);
-        }
+        filteredTransactionBuilder.setTxValidationCode(txValidationFlags.flag(txIndex));
+
         filteredTransactionBuilder.setTypeValue(type);
 
         return filteredTransactionBuilder;

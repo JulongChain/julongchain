@@ -19,6 +19,7 @@ import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.Smartcontract;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,18 +40,21 @@ import static org.junit.Assert.assertThat;
 public class VSSCTest extends BaseJunit4Test {
     @Autowired
     private VSSC vssc;
-    @Mock
-    private ISmartContractStub stub;
+    private MockStub mockStub;
+
+    @Before
+    public void beforeTest(){
+        mockStub = new MockStub(CommConstant.VSSC, vssc);
+    }
 
     @Test
     public void init() {
-        ISmartContract.SmartContractResponse smartContractResponse = vssc.init(stub);
+        ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("1",new LinkedList<ByteString>());
         assertThat(smartContractResponse.getStatus(), is(ISmartContract.SmartContractResponse.Status.SUCCESS));
     }
 
     @Test
     public void invoke() {
-        MockStub mockStub = new MockStub(CommConstant.VSSC, vssc);
         ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("1",new LinkedList<ByteString>());
         assertThat(smartContractResponse.getStatus(), is(ISmartContract.SmartContractResponse.Status.SUCCESS));
 
