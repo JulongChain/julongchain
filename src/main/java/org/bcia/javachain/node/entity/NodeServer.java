@@ -15,13 +15,11 @@
  */
 package org.bcia.javachain.node.entity;
 
-import org.apache.commons.io.IOUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.common.tools.cryptogen.FileUtil;
 import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.common.util.FileUtils;
 import org.bcia.javachain.common.util.NetAddress;
@@ -31,14 +29,15 @@ import org.bcia.javachain.core.aclmgmt.IAclProvider;
 import org.bcia.javachain.core.admin.AdminServer;
 import org.bcia.javachain.core.endorser.Endorser;
 import org.bcia.javachain.core.events.DeliverEventsServer;
-import org.bcia.javachain.core.events.EventGrpcServer;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.core.node.NodeConfig;
 import org.bcia.javachain.core.node.NodeConfigFactory;
-import org.bcia.javachain.core.node.NodeGrpcServer;
+import org.bcia.javachain.core.node.grpc.EventGrpcServer;
+import org.bcia.javachain.core.node.grpc.NodeGrpcServer;
 import org.bcia.javachain.core.ssc.ISystemSmartContractManager;
 import org.bcia.javachain.core.ssc.SystemSmartContractManager;
 import org.bcia.javachain.events.producer.EventHubServer;
+import org.bcia.javachain.events.producer.EventsServerConfig;
 import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.util.NodeConstant;
@@ -55,8 +54,9 @@ import java.lang.management.ManagementFactory;
  * @date 2018/2/23
  * @company Dingxuan
  */
-@Component
 public class NodeServer {
+    private static final String PID_FILE_NAME = "node.pid";
+
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeServer.class);
 
     private String cachedEndpoint;
@@ -65,12 +65,8 @@ public class NodeServer {
 
     private ISystemSmartContractManager systemSmartContractManager;
 
-    public NodeServer() {
-    }
-
     public NodeServer(Node node) {
         this.node = node;
-//        this.systemSmartContractManager = new SystemSmartContractManager();
 
         this.systemSmartContractManager = SpringContext.getInstance().getBean(SystemSmartContractManager.class);
     }
@@ -121,30 +117,10 @@ public class NodeServer {
         //TODO:如何将Grpc服务与serverConfig关联
 
         //启动Node主服务(Grpc Server1)
-        int port = 7051;
-        final NodeGrpcServer nodeGrpcServer = new NodeGrpcServer(port);
-        //绑定背书服务
-        nodeGrpcServer.bindEndorserServer(new Endorser(null));
-        //绑定投递事件服务
-        nodeGrpcServer.bindDeliverEventsServer(new DeliverEventsServer());
-        //绑定管理服务
-        nodeGrpcServer.bindAdminServer(new AdminServer());
+        startNodeGrpcServer(nodeConfig);
 
         //启动事件处理服务(Grpc Server2)
-        String eventAddress = nodeConfig.getNode().getEvents().getAddress();
-        NetAddress address = null;
-        try {
-            address = new NetAddress(eventAddress);
-        } catch (ValidateException e) {
-            throw new NodeException(e);
-        }
-
-        EventGrpcServer eventGrpcServer = new EventGrpcServer(address.getPort());
-        //绑定事件服务
-        eventGrpcServer.bindEventHubServer(new EventHubServer(null));
-
-//        SmartContractExecuteProvider smartContractProvider = new SmartContractExecuteProvider();
-//        smartContractProvider
+        startEventGrpcServer(nodeConfig);
 
         //创建智能合约支持服务
         //创建Gossip服务
@@ -153,7 +129,45 @@ public class NodeServer {
         //初始化系统智能合约
         initSysSmartContracts();
 
-//        LedgerMgmt.getLedgerIDs()
+        node.initialize(new Node.InitializeCallback() {
+            @Override
+            public void onGroupInitialized(String groupId) {
+                systemSmartContractManager.deploySysSmartContracts(groupId);
+            }
+        });
+
+        //记录进程号到文件
+        recordPid(nodeConfig);
+    }
+
+    private void initSysSmartContracts() {
+        log.info("Init system smart contracts");
+        systemSmartContractManager.deploySysSmartContracts("");
+    }
+
+    /**
+     * 开启Node节点主Grpc服务
+     *
+     * @param nodeConfig
+     * @throws NodeException
+     */
+    private void startNodeGrpcServer(NodeConfig nodeConfig) throws NodeException {
+        //从配置中获取要监听的地址和端口
+        NetAddress address = null;
+        try {
+            String listenAddress = nodeConfig.getNode().getListenAddress();
+            address = new NetAddress(listenAddress);
+        } catch (Exception e) {
+            throw new NodeException(e);
+        }
+
+        final NodeGrpcServer nodeGrpcServer = new NodeGrpcServer(address.getPort());
+        //绑定背书服务
+        nodeGrpcServer.bindEndorserServer(new Endorser(null));
+        //绑定投递事件服务
+        nodeGrpcServer.bindDeliverEventsServer(new DeliverEventsServer());
+        //绑定管理服务
+        nodeGrpcServer.bindAdminServer(new AdminServer());
 
         new Thread() {
             @Override
@@ -162,12 +176,38 @@ public class NodeServer {
                     nodeGrpcServer.start();
                     nodeGrpcServer.blockUntilShutdown();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                 }
             }
         }.start();
+    }
+
+    /**
+     * 开启事件Grpc服务
+     *
+     * @param nodeConfig
+     * @throws NodeException
+     */
+    private void startEventGrpcServer(NodeConfig nodeConfig) throws NodeException {
+        //从配置中获取要监听的地址和端口
+        NodeConfig.Events eventsConfig = null;
+        NetAddress address = null;
+        try {
+            eventsConfig = nodeConfig.getNode().getEvents();
+            String eventAddress = eventsConfig.getAddress();
+            address = new NetAddress(eventAddress);
+        } catch (Exception e) {
+            throw new NodeException(e);
+        }
+
+        EventGrpcServer eventGrpcServer = new EventGrpcServer(address.getPort());
+
+        EventsServerConfig serverConfig = new EventsServerConfig(eventsConfig.getBuffersize(), eventsConfig
+                .getTimeout(), eventsConfig.getTimewindow(), null);
+        //绑定事件服务
+        eventGrpcServer.bindEventHubServer(new EventHubServer(serverConfig));
 
         new Thread() {
             @Override
@@ -176,39 +216,39 @@ public class NodeServer {
                     eventGrpcServer.start();
                     eventGrpcServer.blockUntilShutdown();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                 }
             }
         }.start();
+    }
 
-        node.initialize(new Node.InitializeCallback() {
-            @Override
-            public void onGroupInitialized(String groupId) {
-                systemSmartContractManager.deploySysSmartContracts(groupId);
-            }
-        });
 
-        //
+    /**
+     * 记录进程号
+     *
+     * @param nodeConfig
+     */
+    private void recordPid(NodeConfig nodeConfig) {
+        //从配置中获取系统路径
         String fileSystemPath = nodeConfig.getNode().getFileSystemPath();
         File file = new File(fileSystemPath);
         file.mkdirs();
         try {
-            FileUtils.writeFileBytes(fileSystemPath + CommConstant.PATH_SEPARATOR + "/node.pid", getProcessId()
-                    .getBytes());
+            FileUtils.writeFileBytes(fileSystemPath + CommConstant.PATH_SEPARATOR + PID_FILE_NAME, getProcessId()
+                    .getBytes(CommConstant.DEFAULT_CHARSET));
         } catch (IOException e) {
+            //TODO 如果没写成功，影响业务吗?暂时不抛异常
             log.error(e.getMessage(), e);
         }
     }
 
-    private void initSysSmartContracts() {
-        log.info("Init system smart contracts");
-
-//        systemSmartContractManager = new SystemSmartContractManager();
-        systemSmartContractManager.deploySysSmartContracts("");
-    }
-
+    /**
+     * 获取当前进程id
+     *
+     * @return
+     */
     private String getProcessId() {
         // get name representing the running Java virtual machine.
         String processName = ManagementFactory.getRuntimeMXBean().getName();
