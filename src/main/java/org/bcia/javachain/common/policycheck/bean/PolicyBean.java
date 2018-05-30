@@ -29,6 +29,10 @@ public class PolicyBean {
     public boolean evalutor;
     public IIdentity deserializer;
 
+    public PolicyBean(boolean evalutor, IIdentity deserializer) {
+        this.evalutor = evalutor;
+        this.deserializer = deserializer;
+    }
 
     public boolean isEvalutor() {
         return evalutor;
