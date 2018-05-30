@@ -28,6 +28,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policies.IPolicy;
 import org.bcia.javachain.common.policycheck.policies.PolicyProvider;
+import org.bcia.javachain.common.util.BytesHexStrTranslate;
 import org.bcia.javachain.common.util.Utils;
 import org.bcia.javachain.common.util.proto.ProtoUtils;
 import org.bcia.javachain.common.util.proto.SignedData;
@@ -296,7 +297,7 @@ public class VSSC extends SystemSmartContractBase {
                 String msg=String.format("Unmarshal endorser error: %s",e.getMessage());
                 throw new SysSmartContractException(msg);
             }
-            String identity = serializedIdentity.getMspid() + serializedIdentity.getIdBytes().toString();
+            String identity = serializedIdentity.getMspid()+BytesHexStrTranslate.bytesToHexFun1(serializedIdentity.getIdBytes().toByteArray());
             SignedData value = signatureMap.get(identity);
             if(value!=null){
                 log.warn("Ignoring duplicated identity, Mspid: {}, pem:{}",
