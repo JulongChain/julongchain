@@ -65,7 +65,6 @@ public class BlockWriter {
         Common.Block block = BlockHelper.createBlock(lastBlock.getHeader().getNumber() + 1, previousBlockHash);
         Common.BlockHeader.Builder header = Common.BlockHeader.newBuilder()
                 .setDataHash(ByteString.copyFrom(BlockHelper.hash(data.build().toByteArray())));
-
         block.toBuilder()
                 .setData(data)
                 .setHeader(header);
@@ -130,15 +129,15 @@ public class BlockWriter {
 
             Common.SignatureHeader signatureHeader = Common.SignatureHeader.parseFrom(Utils.marshalOrPanic(CommonUtils.newSignatureHeaderOrPanic(support)));
 
-            Common.MetadataSignature blockSignature=Common.MetadataSignature.newBuilder().setSignatureHeader(signatureHeader.toByteString()).build();
+            Common.MetadataSignature blockSignature = Common.MetadataSignature.newBuilder().setSignatureHeader(signatureHeader.toByteString()).build();
             byte[] blockSignatureValue = new byte[0];
             //TODO toByteArray转换为Bytes
             blockSignature.toBuilder().setSignature(ByteString.copyFrom(
-                    CommonUtils.signOrPanic(support, Utils.concatenateBytes(blockSignatureValue,blockSignature.getSignatureHeader().toByteArray(),
+                    CommonUtils.signOrPanic(support, Utils.concatenateBytes(blockSignatureValue, blockSignature.getSignatureHeader().toByteArray(),
                             block.getHeader().toByteArray()))));
 
-            Common.MetadataSignature metadataSignature=Common.MetadataSignature.parseFrom(blockSignature.toByteArray());
-            Common.Metadata metadata=Common.Metadata.newBuilder()
+            Common.MetadataSignature metadataSignature = Common.MetadataSignature.parseFrom(blockSignature.toByteArray());
+            Common.Metadata metadata = Common.Metadata.newBuilder()
                     .addSignatures(metadataSignature)
                     .setValue(ByteString.copyFrom(blockSignatureValue)).build();
             block.getMetadata().toBuilder().setMetadata(Common.BlockMetadataIndex.SIGNATURES_VALUE, ByteString.copyFrom(Utils.marshalOrPanic(metadata)));
@@ -149,29 +148,75 @@ public class BlockWriter {
 
     }
 
-    public void   addLastConfigSignature(Common.Block block){
-        long configSeq= support.sequence();
-        if(configSeq>lastConfigSeq){
+    public void addLastConfigSignature(Common.Block block) {
+        long configSeq = support.sequence();
+        if (configSeq > lastConfigSeq) {
             log.debug(String.format("[channel: %s] Detected lastConfigSeq transitioning from %d to %d, setting lastConfigBlockNum from %d to %d",
-                    support.groupId(),lastConfigSeq, configSeq, lastConfigBlockNum, block.getHeader().getNumber()));
-            lastConfigBlockNum=block.getHeader().getNumber();
-            lastConfigSeq=configSeq;
+                    support.groupId(), lastConfigSeq, configSeq, lastConfigBlockNum, block.getHeader().getNumber()));
+            lastConfigBlockNum = block.getHeader().getNumber();
+            lastConfigSeq = configSeq;
         }
         try {
-            Common.LastConfig lastConfig=Common.LastConfig.newBuilder().setIndex(lastConfigBlockNum).build();
-            byte[] lastConfigValue= Utils.marshalOrPanic(lastConfig);
+            Common.LastConfig lastConfig = Common.LastConfig.newBuilder().setIndex(lastConfigBlockNum).build();
+            byte[] lastConfigValue = Utils.marshalOrPanic(lastConfig);
 
-            Common.MetadataSignature lastConfigSignature=Common.MetadataSignature.parseFrom(Utils.marshalOrPanic(CommonUtils.newSignatureHeaderOrPanic(support)));
-            Common.MetadataSignature metadataSignature=Common.MetadataSignature.parseFrom(lastConfigSignature.toByteArray());
-            Common.Metadata metadata=Common.Metadata.newBuilder()
+            Common.MetadataSignature lastConfigSignature = Common.MetadataSignature.parseFrom(Utils.marshalOrPanic(CommonUtils.newSignatureHeaderOrPanic(support)));
+            Common.MetadataSignature metadataSignature = Common.MetadataSignature.parseFrom(lastConfigSignature.toByteArray());
+            Common.Metadata metadata = Common.Metadata.newBuilder()
                     .addSignatures(metadataSignature)
                     .setValue(ByteString.copyFrom(lastConfigValue)).build();
-            block.getMetadata().toBuilder().setMetadata(Common.BlockMetadataIndex.LAST_CONFIG_VALUE,ByteString.copyFrom(Utils.marshalOrPanic(metadata)));
+            block.getMetadata().toBuilder().setMetadata(Common.BlockMetadataIndex.LAST_CONFIG_VALUE, ByteString.copyFrom(Utils.marshalOrPanic(metadata)));
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
         }
     }
 
 
+    public static JavaChainLog getLog() {
+        return log;
+    }
 
+    public static void setLog(JavaChainLog log) {
+        BlockWriter.log = log;
+    }
+
+    public IBlockWriterSupport getSupport() {
+        return support;
+    }
+
+    public void setSupport(IBlockWriterSupport support) {
+        this.support = support;
+    }
+
+    public Registrar getRegistrar() {
+        return registrar;
+    }
+
+    public void setRegistrar(Registrar registrar) {
+        this.registrar = registrar;
+    }
+
+    public long getLastConfigBlockNum() {
+        return lastConfigBlockNum;
+    }
+
+    public void setLastConfigBlockNum(long lastConfigBlockNum) {
+        this.lastConfigBlockNum = lastConfigBlockNum;
+    }
+
+    public long getLastConfigSeq() {
+        return lastConfigSeq;
+    }
+
+    public void setLastConfigSeq(long lastConfigSeq) {
+        this.lastConfigSeq = lastConfigSeq;
+    }
+
+    public Common.Block getLastBlock() {
+        return lastBlock;
+    }
+
+    public void setLastBlock(Common.Block lastBlock) {
+        this.lastBlock = lastBlock;
+    }
 }

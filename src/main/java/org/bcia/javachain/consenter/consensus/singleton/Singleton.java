@@ -75,6 +75,9 @@ public class Singleton implements IChain, IConsensue{
         return new Singleton(consenterSupport);
     }
 
+    public Singleton() {
+    }
+
     public Singleton(IConsenterSupport support) {
         this.support = support;
     }

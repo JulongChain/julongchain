@@ -15,17 +15,30 @@
  */
 package org.bcia.javachain.common.util.proto;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.consenter.common.msgprocessor.SigFilter;
+import org.bcia.javachain.consenter.util.Utils;
+import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Configtx;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * SignedData is used to represent the general triplet required to verify a signature
-* This is intended to be generic across crypto schemes, while most crypto schemes will
-* include the signing identity and a nonce within the Data, this is left to the crypto
-* implementation
+ * This is intended to be generic across crypto schemes, while most crypto schemes will
+ * include the signing identity and a nonce within the Data, this is left to the crypto
+ * implementation
  *
  * @author sunianle
  * @date 3/21/18
  * @company Dingxuan
  */
 public class SignedData {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(SigFilter.class);
     private byte[] data;
     private byte[] identity;
     private byte[] signature;
@@ -34,6 +47,40 @@ public class SignedData {
         this.data = data;
         this.identity = identity;
         this.signature = signature;
+    }
+
+
+    public static List<SignedData> asSingedData(Configtx.ConfigUpdateEnvelope ce) throws ValidateException {
+        if (ce == null) {
+            throw new ValidateException("No signatures for nil SignedConfigItem");
+        }
+        List<SignedData> result = new ArrayList<>();
+        for (int i = 0; i < ce.getSignaturesCount(); i++) {
+            Configtx.ConfigSignature configSignature = ce.getSignatures(i);
+            try {
+                Common.SignatureHeader signatureHeader = Common.SignatureHeader.parseFrom(configSignature.getSignatureHeader());
+                result.add(new SignedData(Utils.concatenateBytes(configSignature.toByteArray(), ce.getConfigUpdate().toByteArray()), signatureHeader.getCreator().toByteArray(), configSignature.toByteArray()));
+            } catch (InvalidProtocolBufferException e) {
+                e.printStackTrace();
+            }
+        }
+        return result;
+    }
+
+    public static List<SignedData> asSignedData(Common.Envelope envelope) throws ValidateException, InvalidProtocolBufferException {
+        List<SignedData> result = new ArrayList<>();
+        if (envelope == null) {
+            log.error("No signatures for nil Envelope");
+            throw new ValidateException("No signatures for nil Envelope");
+        }
+        Common.Payload payload = Common.Payload.parseFrom(envelope.getPayload());
+        if (payload.getHeader() == null) {
+            throw new ValidateException("Missing Header");
+        }
+        Common.SignatureHeader signatureHeader = Common.SignatureHeader.parseFrom(payload.getHeader().getSignatureHeader());
+        result.add(new SignedData(payload.toByteArray(), signatureHeader.getCreator().toByteArray(), envelope.getSignature().toByteArray()));
+
+        return result;
     }
 
     public byte[] getData() {

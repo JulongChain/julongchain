@@ -13,24 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.common.msgprocessor;
-
-import org.bcia.javachain.common.localmsp.ILocalSigner;
-import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.common.Configtx;
+package org.bcia.javachain.common.util.proto;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/5/18
+ * @Date: 2018/5/28
  * @company Dingxuan
  */
-public interface IStandardChannelSupport {
-    long sequence();
+public class ConfigGroup {
 
-    String chainId();
-
-    ILocalSigner signer();
-
-    Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx);
 }
-

@@ -104,4 +104,28 @@ public class BlockCutter implements IReceiver {
     private static int messageSizeBytes(Common.Envelope message) {
         return message.getPayload().size() + message.getSignature().size();
     }
+
+    public IConsenterConfig getSharedConfigManager() {
+        return sharedConfigManager;
+    }
+
+    public void setSharedConfigManager(IConsenterConfig sharedConfigManager) {
+        this.sharedConfigManager = sharedConfigManager;
+    }
+
+    public Common.Envelope[] getPendingBatch() {
+        return pendingBatch;
+    }
+
+    public void setPendingBatch(Common.Envelope[] pendingBatch) {
+        this.pendingBatch = pendingBatch;
+    }
+
+    public int getPendingBatchSizeBytes() {
+        return pendingBatchSizeBytes;
+    }
+
+    public void setPendingBatchSizeBytes(int pendingBatchSizeBytes) {
+        this.pendingBatchSizeBytes = pendingBatchSizeBytes;
+    }
 }
