@@ -18,6 +18,8 @@ package org.bcia.javachain.common.policies;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.PolicyException;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.common.Policies;
 
@@ -33,6 +35,8 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class PolicyManager implements IPolicyManager {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(PolicyManager.class);
+
     private String path;
     private Map<String, IPolicy> policies;
     private Map<String, IPolicyManager> childManagers;
@@ -41,18 +45,16 @@ public class PolicyManager implements IPolicyManager {
             InvalidProtocolBufferException, PolicyException {
         this.path = path;
 
-        IPolicyProvider policyProvider = providers.get(Policies.Policy.PolicyType.IMPLICIT_META_VALUE);
-
         childManagers = new HashMap<String, IPolicyManager>();
         Iterator<Map.Entry<String, Configtx.ConfigTree>> childsIterator = rootTree.getChildsMap().entrySet().iterator();
         while (childsIterator.hasNext()) {
             Map.Entry<String, Configtx.ConfigTree> entry = childsIterator.next();
             String childName = entry.getKey();
-            Configtx.ConfigTree configTree = entry.getValue();
+            Configtx.ConfigTree childTree = entry.getValue();
 
             //递归构造子组织策略管理器
             IPolicyManager childPolicyManager = new PolicyManager(path + PolicyConstant.PATH_SEPARATOR + childName,
-                    providers, configTree);
+                    providers, childTree);
             childManagers.put(childName, childPolicyManager);
         }
 
@@ -62,6 +64,9 @@ public class PolicyManager implements IPolicyManager {
             Map.Entry<String, Configtx.ConfigPolicy> entry = policiesIterator.next();
             String policyName = entry.getKey();
             Configtx.ConfigPolicy configPolicy = entry.getValue();
+            if (configPolicy.getPolicy() == null) {
+                throw new PolicyException("Policy can not be null");
+            }
 
             if (configPolicy.getPolicy().getType() == Policies.Policy.PolicyType.IMPLICIT_META_VALUE) {
                 Policies.ImplicitMetaPolicy policy = Policies.ImplicitMetaPolicy.parseFrom(configPolicy.getPolicy()
@@ -69,8 +74,13 @@ public class PolicyManager implements IPolicyManager {
                 policies.put(policyName, new ImplicitMetaPolicy(policy, childManagers));
             } else {
                 IPolicyProvider provider = providers.get(configPolicy.getPolicy().getType());
-                IPolicy policy = provider.makePolicy(configPolicy.getPolicy().getValue().toByteArray());
-                policies.put(policyName, policy);
+                if (provider == null) {
+                    log.warn("provider is null: " + configPolicy.getPolicy().getType());
+                } else {
+                    //TODO:
+                    IPolicy policy = provider.makePolicy(configPolicy.getPolicy().getValue().toByteArray());
+                    policies.put(policyName, policy);
+                }
             }
         }
 

@@ -302,7 +302,8 @@ public class Node {
         };
 
         Configtx.Config resConfig = Configtx.Config.getDefaultInstance();
-        if (applicationConfig != null && applicationConfig.getCapabilities().isResourcesTree()) {
+        if (applicationConfig != null && applicationConfig.getCapabilities() != null && applicationConfig
+                .getCapabilities().isResourcesTree()) {
             //从账本中获取群组配置
             resConfig = ConfigTxUtils.retrievePersistedGroupConfig(nodeLedger);
         }
