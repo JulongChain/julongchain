@@ -32,7 +32,7 @@ public class EventHubServer implements IEventHubServer {
     private static JavaChainLog log = JavaChainLogFactory.getLog(EventHubServer.class);
 
     public EventHubServer(EventsServerConfig config) {
-        EventProcessor eventProcessor = new EventProcessor(config);
+        EventProcessor eventProcessor = EventProcessor.getInstance(config);
     }
 
     @Override

@@ -48,11 +48,19 @@ public class EventProcessor implements IEventProcessor {
 
     private static EventProcessor instance;
 
-    public static EventProcessor getInstance() {
+    public static EventProcessor getInstance(EventsServerConfig eventsServerConfig) {
+        if (instance == null) {
+            synchronized (EventProcessor.class) {
+                if (instance == null) {
+                    instance = new EventProcessor(eventsServerConfig);
+                }
+            }
+        }
+
         return instance;
     }
 
-    public EventProcessor(EventsServerConfig eventsServerConfig) {
+    private EventProcessor(EventsServerConfig eventsServerConfig) {
         instance = this;
 
         this.eventsServerConfig = eventsServerConfig;

@@ -203,7 +203,7 @@ public class EventHelper {
      * @throws EventException
      */
     public static void send(BlockEvents events) throws EventException {
-        EventProcessor processor = EventProcessor.getInstance();
+        EventProcessor processor = EventProcessor.getInstance(null);
         if (processor == null) {
             throw new EventException("processor is null, may be node has not started");
         }
