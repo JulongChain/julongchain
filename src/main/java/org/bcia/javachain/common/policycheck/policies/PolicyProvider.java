@@ -16,6 +16,7 @@
 
 package org.bcia.javachain.common.policycheck.policies;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -46,20 +47,26 @@ public class PolicyProvider implements IPolicyProvider{
     @Override
     public IPolicy makePolicy(byte[] data) throws PolicyException {
         Policy policy = new Policy();
-        Policies.SignaturePolicyEnvelope sigPolicy = Policies.SignaturePolicyEnvelope.newBuilder().build();
-        if(sigPolicy.getVersion() != 0){
-            log.info("Error unmarshaling to SignaturePolicy");
+        Policies.SignaturePolicyEnvelope signaturePolicyEnvelope = null;
+        try {
+            signaturePolicyEnvelope = Policies.SignaturePolicyEnvelope.parseFrom(data);
+        } catch (InvalidProtocolBufferException e) {
+            log.error("Error unmarshaling to SignaturePolicy");
+            throw new PolicyException(e);
+        }
+        if(signaturePolicyEnvelope.getVersion() != 0){
+            log.error("This evaluator only understands messages of version 0, but version was "+signaturePolicyEnvelope.getVersion());
             return null;
         }
         Boolean compiled = null;
         try {
-            compiled = Cauthdsl.compile(sigPolicy.getRule(),sigPolicy.getIdentitiesList(),deserializer);
+            compiled = Cauthdsl.compile(signaturePolicyEnvelope.getRule(),signaturePolicyEnvelope.getIdentitiesList(),deserializer);
         } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+            throw new PolicyException(e);
         } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            throw new PolicyException(e);
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            throw new PolicyException(e);
         }
         policy.setEvalutor(compiled);
         policy.setDeserializer(this.deserializer);
