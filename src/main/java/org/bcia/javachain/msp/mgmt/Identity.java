@@ -17,6 +17,7 @@ package org.bcia.javachain.msp.mgmt;
 
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.VerifyException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.csp.factory.IFactoryOpts;
@@ -140,19 +141,24 @@ public class Identity implements ISigningIdentity {
     }
 
     @Override
-    public void verify(byte[] msg, byte[] sig) {
+    public void verify(byte[] msg, byte[] sig) throws VerifyException {
         if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(GlobalMspManagement.defaultCspValue)) {
-            SM2KeyExport sm2KeyExport;
+            SM2KeyExport sm2KeyExport = null;
             try {
                 sm2KeyExport = (SM2KeyExport) SM2KeyUtil.getKey(new SM2KeyGenOpts());
-
-                boolean verify = getDefaultCsp().verify(sm2KeyExport, sig, msg, new SM2SignerOpts());
-                log.info("验证结果：" + verify);
             } catch (JavaChainException e) {
-                e.printStackTrace();
+                throw new VerifyException(e.getMessage());
+            }
+            boolean verify = false;
+            try {
+                verify = getDefaultCsp().verify(sm2KeyExport, sig, msg, new SM2SignerOpts());
+                if(verify==false){
+                    throw new VerifyException("veify the sign is fail");
+                }
+            } catch (JavaChainException e) {
+               throw new VerifyException(e.getMessage());
             }
         } else if (IFactoryOpts.PROVIDER_GMT0016.equalsIgnoreCase(GlobalMspManagement.defaultCspValue)) {
-
         }
     }
 
