@@ -16,22 +16,15 @@
 
 package org.bcia.javachain.common.policycheck.cauthdsl;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.common.policycheck.SignaturePolicyNOutOf;
-import org.bcia.javachain.common.policycheck.SignaturePolicySignedBy;
-import org.bcia.javachain.common.policycheck.common.IsSignaturePolicyType;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.IIdentityDeserializer;
-import org.bcia.javachain.msp.mgmt.Identity;
-import org.bcia.javachain.msp.mgmt.Msp;
 import org.bcia.javachain.protos.common.MspPrincipal;
 import org.bcia.javachain.protos.common.Policies;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -41,8 +34,8 @@ import java.util.*;
  * @date 26/04/18
  * @company Aisino
  */
-public class Cauthdsl {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Cauthdsl.class);
+public class CAuthDsl {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(CAuthDsl.class);
 
     /**signedProposal
      * 删除重复身份，保留身份顺序
@@ -73,7 +66,8 @@ public class Cauthdsl {
      * @return
      */
     public static Boolean compile(Policies.SignaturePolicy policy,List<MspPrincipal.MSPPrincipal> identities,IIdentityDeserializer deserializer) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        SignedData[] signedDatas = new SignedData[policy.getNOutOf().getRulesList().size()];
+        //SignedData[] signedDatas = new SignedData[policy.getNOutOf().getRulesList().size()];
+        List<SignedData> signedDatas = new ArrayList<SignedData>();
         Boolean[] used = new Boolean[policy.getNOutOf().getRulesList().size()];
         if(policy == null){
             log.info("Empty policy element");
@@ -87,13 +81,13 @@ public class Cauthdsl {
                     Boolean compiledPolicy = compile(signaturePolicy,identities,deserializer);
                     polices[i] = compiledPolicy;
                 }
-                return Cauthdsl.confirmSignedData(signedDatas,used,polices,policy);
+                return CAuthDsl.confirmSignedData(signedDatas,used,polices,policy);
             case SIGNED_BY:
                 if(policy.getSignedBy() < 0 || policy.getSignedBy()>identities.size()){
                     log.info("identity index out of range, requested "+policy.getSignedBy()+", but identies length is"+identities.size());
                 }
                 MspPrincipal.MSPPrincipal signedByID = identities.get(policy.getSignedBy());
-                return Cauthdsl.confirmSignedData1(signedDatas,used,signedByID,deserializer,policy);
+                return CAuthDsl.confirmSignedData1(signedDatas,used,signedByID,deserializer,policy);
              default:
                  log.error("Unknown type");
                  return null;
@@ -105,9 +99,10 @@ public class Cauthdsl {
 
     }
 
+
     /**
      * 参照fabric里compile里的返回函数
-     * @param signedDatas
+     * @param signedDataList
      * @param policies
      * @param policy
      * @return
@@ -115,9 +110,9 @@ public class Cauthdsl {
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      */
-    public static boolean confirmSignedData(SignedData[] signedDatas,Boolean[] used,Boolean[] policies,Policies.SignaturePolicy policy) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public static boolean confirmSignedData(List<SignedData> signedDataList,Boolean[] used,Boolean[] policies,Policies.SignaturePolicy policy) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Long grepKey = new Date().getTime();
-        log.debug(signedDatas+"gate"+grepKey+" evaluation starts");
+        log.debug(signedDataList+"gate"+grepKey+" evaluation starts");
         int verified = 0;
         Boolean[] _used = new Boolean[used.length];
         for(int i = 0; i < policies.length; i++){
@@ -129,40 +124,42 @@ public class Cauthdsl {
         }
         int N = policy.getNOutOf().getN();
         if(verified >= N){
-           log.info(signedDatas+"gate"+ grepKey+"evaluation succeeds");
+           log.info(signedDataList+"gate"+ grepKey+"evaluation succeeds");
         }else{
-            log.info(signedDatas+"gate"+ grepKey+"evaluation  fails");
+            log.info(signedDataList+"gate"+ grepKey+"evaluation  fails");
         }
         return verified >= N;
     }
 
-    public static boolean confirmSignedData1(SignedData[] signedDatas, Boolean[] used, MspPrincipal.MSPPrincipal signedByID, IIdentityDeserializer deserializer,Policies.SignaturePolicy policy){
-        log.debug(signedDatas+"signed by "+policy.getSignedBy()+" principal evaluation starts (used %v)");
 
-        for(int i=0;i<signedDatas.length;i++){
+
+    public static boolean confirmSignedData1(List<SignedData> signedDataList, Boolean[] used, MspPrincipal.MSPPrincipal signedByID, IIdentityDeserializer deserializer,Policies.SignaturePolicy policy){
+        log.debug(signedDataList+"signed by "+policy.getSignedBy()+" principal evaluation starts (used %v)");
+
+        for(int i=0;i<signedDataList.size();i++){
             if(used[i]){
-                log.info(signedDatas[i]+"skipping identity"+i+"because it has already been used");
+                log.info(signedDataList.get(i)+"skipping identity"+i+"because it has already been used");
                 continue;
             }
            // identity, err := deserializer.DeserializeIdentity(sd.Identity)
             IIdentity iIdentity = null;
             try {
-                iIdentity = deserializer.deserializeIdentity(signedDatas[i].getIdentity());
+                iIdentity = deserializer.deserializeIdentity(signedDataList.get(i).getIdentity());
             }catch (Exception e){
-                log.info("Principal deserialization failure  for identity "+signedDatas[i].getIdentity());
+                log.info("Principal deserialization failure  for identity "+signedDataList.get(i).getIdentity());
             }
             try {
                 iIdentity.satisfiesPrincipal(signedByID);
             }catch (Exception e){
-                log.info(signedDatas+"identity %d does not satisfy principal: "+i);
+                log.info(signedDataList+"identity %d does not satisfy principal: "+i);
             }
-            log.debug(signedDatas+" principal matched by identity "+i);
+            log.debug(signedDataList+" principal matched by identity "+i);
             try {
-                iIdentity.verify(signedDatas[i].getData(),signedDatas[i].getSignature());
+                iIdentity.verify(signedDataList.get(i).getData(),signedDataList.get(i).getSignature());
             }catch (Exception e){
-                log.info(signedDatas+"signature for identity "+i+" is invalid: ");
+                log.info(signedDataList+"signature for identity "+i+" is invalid: ");
             }
-            log.debug(signedDatas+" principal evaluation succeeds for identity "+i);
+            log.debug(signedDataList+" principal evaluation succeeds for identity "+i);
             used[i] = true;
             return true;
         }
