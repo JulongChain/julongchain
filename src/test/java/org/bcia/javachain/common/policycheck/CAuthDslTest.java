@@ -16,9 +16,17 @@
 
 package org.bcia.javachain.common.policycheck;
 
+import org.bcia.javachain.common.policycheck.cauthdsl.CAuthDsl;
+import org.bcia.javachain.common.util.proto.SignedData;
+import org.bcia.javachain.msp.IIdentityDeserializer;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.mockito.Mockito.mock;
 
 /**
  * 类描述
@@ -27,7 +35,7 @@ import org.junit.Test;
  * @date 11/05/18
  * @company Aisino
  */
-public class CauthdslTest {
+public class CAuthDslTest {
     @Before
     public void setUp() {
         System.out.println("setup...");
@@ -40,6 +48,14 @@ public class CauthdslTest {
 
     @Test
     public void Testdeduplicate(){
-        System.out.println("hh");
+        List<SignedData> sds = new ArrayList<SignedData>();
+        SignedData sd1 = new SignedData("A".getBytes(),"id1".getBytes(),"A".getBytes());
+        SignedData sd2 = new SignedData("B".getBytes(),"id2".getBytes(),"B".getBytes());
+        SignedData sd3 = new SignedData("C".getBytes(),"id3".getBytes(),"C".getBytes());
+        sds.add(sd1);
+        sds.add(sd2);
+        sds.add(sd3);
+        IIdentityDeserializer deserializer = mock(IIdentityDeserializer.class);
+        CAuthDsl.deduplicate(sds,deserializer);
     }
 }
