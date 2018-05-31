@@ -48,12 +48,15 @@ public class RamLedgerFactory implements IFactory {
 
     @Override
     public synchronized ReadWriteBase getOrCreate(String groupID) throws LedgerException {
+        logger.debug("Starting create ledger using group id " + groupID);
         ReadWriteBase l = ledgers.get(groupID);
         if(l != null){
+            logger.debug("Group " + groupID + " is already exists");
             return l;
         }
         l = newGroup(maxSize);
         ledgers.put(groupID, l);
+        logger.debug("Finished create ledger");
         return l;
     }
 
@@ -65,6 +68,7 @@ public class RamLedgerFactory implements IFactory {
                 .build();
         RamLedger rl = new RamLedger(maxSize, 1, new SimpleList(null, preGenesis), null);
         rl.setNewest(rl.getOldest());
+        logger.debug("Creating new group, pre genesis block num is " + preGenesis.getHeader().getNumber());
         return rl;
     }
 

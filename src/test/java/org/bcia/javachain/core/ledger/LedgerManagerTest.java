@@ -69,7 +69,7 @@ public class LedgerManagerTest {
     }
 
     @Test
-    public void delete(){
+    public void delete() throws Exception{
         System.out.println(deleteDir(new File(LedgerConfig.getRootPath())));
     }
 

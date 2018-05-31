@@ -53,7 +53,7 @@ public class DefaultValidator implements IValidator {
     @Override
     public UpdateBatch validateAndPrepareBatch(BlockAndPvtData blockAndPvtData, boolean doMVCCValidation) throws LedgerException {
         Common.Block block = blockAndPvtData.getBlock();
-        logger.debug("validateAndPrepareBatch() for block No " + block.getHeader().getNumber());
+        logger.debug("validateAndPrepareBatch() for block No." + block.getHeader().getNumber());
         logger.debug("preprocessing block");
         Block internalBlock = Helper.preprocessProtoBlock(txMgr, block, doMVCCValidation);
         PubAndHashUpdates pubAndHashUpdates = val.validateAndPrepareBatch(internalBlock, doMVCCValidation);

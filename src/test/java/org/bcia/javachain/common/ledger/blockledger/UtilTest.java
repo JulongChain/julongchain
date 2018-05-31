@@ -70,25 +70,47 @@ public class UtilTest {
     public void testGetBlockUsingFile() throws Exception{
         IFactory factory = new FileLedgerFactory(dir);
         IReader reader = factory.getOrCreate(groupID);
-        final Common.Block block = Util.createNextBlock(reader, null);
-//        ((ReadWriteBase) reader).append(block);
+        List<Common.Envelope> messages = new ArrayList<>();
+        Common.Envelope envelope = Common.Envelope.newBuilder()
+                .setPayload(Common.Payload.newBuilder()
+                        .setHeader(Common.Header.newBuilder()
+                                .setGroupHeader(Common.GroupHeader.newBuilder()
+                                        .setTxId(String.valueOf("File Test"))
+                                        .build().toByteString())
+                                .build())
+                        .build().toByteString())
+                .build();
+        messages.add(envelope);
         new Thread(() -> {
             try {
-                Thread.sleep(1001);
-                ((ReadWriteBase) reader).append(block);
+                while (true) {
+                    Thread.sleep(1001);
+                    ((ReadWriteBase) reader).append(Util.createNextBlock(reader, messages));
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }).start();
         new Thread(() -> {
             try {
-                IFactory factory1 = new FileLedgerFactory(dir);
-                IReader reader1 = factory1.getOrCreate(groupID);
-                Assert.assertEquals(Util.getBlock(reader1, 0), block);
+                Common.Block block = null;
+                block = Util.createNextBlock(reader, messages);
+                System.out.println(block);
+                System.out.println(Util.getBlock(reader, 0));
+                Assert.assertEquals(Util.getBlock(reader, 0), block);
+                block = Util.createNextBlock(reader, messages);
+                Assert.assertEquals(Util.getBlock(reader, 1), block);
+                block = Util.createNextBlock(reader, messages);
+                Assert.assertEquals(Util.getBlock(reader, 2), block);
+                block = Util.createNextBlock(reader, messages);
+                Assert.assertEquals(Util.getBlock(reader, 3), block);
+                block = Util.createNextBlock(reader, messages);
+                Assert.assertEquals(Util.getBlock(reader, 4), block);
             } catch (LedgerException e) {
                 e.printStackTrace();
             }
         }).start();
+        System.out.println(1);
     }
 
     @Test

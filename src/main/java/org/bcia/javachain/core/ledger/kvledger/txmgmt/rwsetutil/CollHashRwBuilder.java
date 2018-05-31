@@ -15,9 +15,12 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil;
 
+import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.ledger.util.Util;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,6 +35,17 @@ public class CollHashRwBuilder {
     private Map<String, KvRwset.KVReadHash> readMap = new HashMap<>();
     private Map<String, KvRwset.KVWriteHash> writeMap = new HashMap<>();
     private byte[] pvtDataHash;
+
+    public CollHashedRwSet build(){
+        List<KvRwset.KVReadHash> readSet = Util.getValuesBySortedKeys(readMap);
+        List<KvRwset.KVWriteHash> writeSet = Util.getValuesBySortedKeys(writeMap);
+
+        CollHashedRwSet collHashedRwSet = new CollHashedRwSet();
+        collHashedRwSet.setCollectionName(collName);
+        collHashedRwSet.setHashedRwSet(RwSetUtil.newHashedRWSet(readSet, writeSet));
+        collHashedRwSet.setPvtRwSetHash(ByteString.copyFrom(pvtDataHash));
+        return collHashedRwSet;
+    }
 
     public String getCollName() {
         return collName;

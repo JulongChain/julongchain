@@ -72,7 +72,7 @@ public class LockBasedTxSimulator implements ITxSimulator {
 
     @Override
     public void deleteState(String namespace, String key) throws LedgerException {
-        setState(namespace, key, null);
+        setState(namespace, key, new byte[0]);
     }
 
     @Override

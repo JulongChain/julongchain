@@ -18,6 +18,8 @@ package org.bcia.javachain.common.ledger.blockledger.file;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.ledger.blockledger.IIterator;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
 import org.bcia.javachain.protos.common.Common;
@@ -33,6 +35,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class FileLedgerIterator implements IIterator {
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(FileLedger.class);
     private FileLedger ledger;
     private long blockNum;
     private IResultsIterator commonIterator;
@@ -55,6 +58,7 @@ public class FileLedgerIterator implements IIterator {
         try {
             result = commonIterator.next();
         } catch (LedgerException e) {
+            logger.error(e.getMessage(), e);
             map = new AbstractMap.SimpleEntry<>(null, Common.Status.SERVICE_UNAVAILABLE);
         }
         map = new AbstractMap.SimpleEntry<>(result
@@ -67,6 +71,7 @@ public class FileLedgerIterator implements IIterator {
         synchronized (FileLedger.getLock()) {
             if (blockNum > ledger.height() - 1) {
                 try {
+                    logger.debug("Require block num is [{}], ledger height is[{}], wait block append", blockNum, ledger.height() - 1);
                     FileLedger.getLock().wait();
                 } catch (InterruptedException e) {
                     throw new LedgerException(e);

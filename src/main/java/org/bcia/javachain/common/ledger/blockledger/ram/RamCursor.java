@@ -54,6 +54,7 @@ public class RamCursor implements IIterator {
                 return new QueryResult(new AbstractMap.SimpleImmutableEntry(new QueryResult(list.getBlock()), Common.Status.SUCCESS));
             }
             synchronized (RamLedger.getLock()){
+                logger.debug("Waiting for block number append");
                 try {
                     RamLedger.getLock().wait();
                 } catch (InterruptedException e) {

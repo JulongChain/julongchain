@@ -17,6 +17,7 @@ package org.bcia.javachain.core.ledger;
 
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr.LockBasedTxSimulator;
+import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,22 +31,24 @@ import java.io.File;
  * @company Dingxuan
  */
 public class TxSimulatorTest {
-    LockBasedTxSimulator simulator = null;
+    ITxSimulator simulator = null;
+    INodeLedger ledger = null;
+    TxSimulationResults txSimulationResults = null;
+    final String ns = "mytestgroupid2";
 
     @Before
     public void before() throws LedgerException  {
+        LedgerManager.initialize(null);
+        ledger = LedgerManager.openLedger(ns);
+        simulator = ledger.newTxSimulator("5");
     }
 
     @Test
     public void test() throws LedgerException {
-//        IDB db = CommonStorageDB.newCommonStorageDB(new VersionedLevelDB(LevelDBProvider.newProvider("/home/bcia/test"), "test"), "test");
-//        LockBasedTxManager mgr = LockBasedTxManager.newLockBasedTxMgr("test", db, null);
-//        simulator = LockBasedTxSimulator.newLockBasedTxSimulator(mgr, "test");
-//        String ns = "ns";
-//        String key = "key";
-//        byte[] value = "value".getBytes();
-//        simulator.setState(ns, key, value);
-        long fileSize = new File("/home/asdad.position").length();
-        System.out.println(fileSize);
+        simulator.setState(ns, "key", "test set state".getBytes());
+        txSimulationResults = simulator.getTxSimulationResults();
+        simulator.deleteState(ns, "key");
+        txSimulationResults = simulator.getTxSimulationResults();
+        System.out.println(txSimulationResults);
     }
 }
