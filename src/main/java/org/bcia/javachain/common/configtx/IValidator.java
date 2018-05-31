@@ -46,7 +46,7 @@ public interface IValidator {
     Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx) throws InvalidProtocolBufferException, ValidateException;
 
     /**
-     * retrieves the chain ID associated with this manager
+     * retrieves the chain ID associated with this getPolicyManager
      *
      * @return
      */

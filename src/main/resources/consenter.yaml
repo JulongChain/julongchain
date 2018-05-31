@@ -75,7 +75,7 @@ general:
     localMspDir: msp
 
     # LocalMSPID is the identity to register the local MSP material with the MSP
-    # manager. IMPORTANT: The local MSP ID of an orderer needs to match the MSP
+    # getPolicyManager. IMPORTANT: The local MSP ID of an orderer needs to match the MSP
     # ID of one of the organizations defined in the orderer system channel's
     # /Channel/Orderer configuration. The sample organization defined in the
     # sample configuration provided has an MSP ID of "DEFAULT".

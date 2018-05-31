@@ -30,7 +30,7 @@ import org.bcia.javachain.msp.IMspManager;
 public class PolicyProvider {
 
     public PolicyProvider(IIdentityDeserializer deserializer){}
-//    public PolicyProvider(IMspManager manager){
+//    public PolicyProvider(IMspManager getPolicyManager){
 //
 //    }
 

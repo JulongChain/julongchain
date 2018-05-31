@@ -1,5 +1,5 @@
 /**
- * Copyright Dingxuan. All Rights Reserved.
+ * Copyright Aisino. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,30 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.policy;
+package org.bcia.javachain.common.policycheck.policies;
 
-import org.bcia.javachain.common.exception.JavaChainException;
-import org.bcia.javachain.protos.node.ProposalPackage;
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.PolicyException;
+import org.bcia.javachain.common.policies.IPolicyManager;
+import org.bcia.javachain.common.policies.PolicyManager;
 
 /**
  * 类描述
  *
- * @author sunianle
- * @date 3/13/18
- * @company Dingxuan
- * @deprecated
+ * @author yuanjun
+ * @date 26/04/18
+ * @company Aisino
  */
-public class PolicyChecker implements IPolicyChecker{
-
-    /**
-     *
-     * @param admins
-     * @param sp
-     * @throws JavaChainException
-     */
-    @Override
-    public void checkPolicyNoGroup(String admins, ProposalPackage.SignedProposal sp) throws JavaChainException{
-
-    }
-
+public interface IGroupPolicyManagerGetter {
+    IPolicyManager getPolicyManager(String channelID ) throws InvalidProtocolBufferException, PolicyException;
 }

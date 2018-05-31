@@ -40,7 +40,7 @@ import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.smartcontract.shim.ledger.IKeyValue;
 import org.bcia.javachain.core.smartcontract.shim.ledger.IQueryResultsIterator;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
-import org.bcia.javachain.msp.mgmt.Principal;
+import org.bcia.javachain.msp.mgmt.MSPPrincipalGetter;
 import org.bcia.javachain.protos.common.Collection;
 import org.bcia.javachain.protos.common.Policies;
 import org.bcia.javachain.protos.node.ProposalPackage;
@@ -148,7 +148,7 @@ public class LSSC  extends SystemSmartContractBase {
                 }
                 // 2. check local MSP Admins policy
                 try{
-                   policyChecker.checkPolicyNoGroup(Principal.Admins,sp);
+                   policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.Admins,sp);
                 }catch (JavaChainException e){
                     log.error(e.getMessage(), e);
                     return newErrorResponse(String.format("Authorization for INSTALL has been denied (error-%s)",e.getMessage()));
@@ -304,7 +304,7 @@ public class LSSC  extends SystemSmartContractBase {
                 }
                 //2. check local MSP Admins policy
                 try {
-                    policyChecker.checkPolicyNoGroup(Principal.Admins,sp);
+                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.Admins,sp);
                 } catch (JavaChainException e) {
                     log.error(e.getMessage(), e);
                     return newErrorResponse(String.format("Authorization for GETSMARTCONTRACTS has been denied with error:%s",e.getMessage()));
@@ -316,7 +316,7 @@ public class LSSC  extends SystemSmartContractBase {
                 }
                 //2. check local MSP Admins policy
                 try {
-                    policyChecker.checkPolicyNoGroup(Principal.Admins,sp);
+                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.Admins,sp);
                 } catch (JavaChainException e) {
                     log.error(e.getMessage(), e);
                     return newErrorResponse(String.format("Authorization for GETINSTALLEDSMARTCONTRACTS has been denied with error:%s",e.getMessage()));

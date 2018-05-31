@@ -336,7 +336,7 @@ public class VSSCSupportForLsscInvocation {
                                           Common.Payload payload,JavaChainLog log)throws SysSmartContractException{
         IMspManager mspManager = GlobalMspManagement.getManagerForChain(groupID);
         if(mspManager==null){
-            String msg=String.format("MSP manager for group %s is null, aborting",groupID);
+            String msg=String.format("MSP getPolicyManager for group %s is null, aborting",groupID);
             throw new SysSmartContractException(msg);
         }
         IPolicyProvider policyProvider = CAuthDslBuilder.createPolicyProvider(mspManager);

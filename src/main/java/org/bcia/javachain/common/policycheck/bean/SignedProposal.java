@@ -17,11 +17,12 @@
 package org.bcia.javachain.common.policycheck.bean;
 
 /**
- * 类描述
+ * 用ProposalPackage.SignedProposal替代,苏年乐
  *
  * @author yuanjun
  * @date 14/05/18
  * @company Aisino
+ * @deprecated sunianle
  */
 public class SignedProposal {
     private byte[] ProposalBytes;

@@ -60,6 +60,7 @@ public class MockStub implements ISmartContractStub {
         this.smartContract=smartContract;
         state=new HashMap<String,byte[]>();
         keys=new ArrayList<String>();
+        signedProposal=null;
     }
 
     @Override

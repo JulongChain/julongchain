@@ -129,7 +129,7 @@ public class LsscSupport {
         //create a policy object from the policy bytes
         IMspManager mspManager = GlobalMspManagement.getManagerForChain(groupName);
         if(mspManager==null){
-            String msg=String.format("Error checking smartcontract instantiation policy: MSP manager for group %s not found",groupName);
+            String msg=String.format("Error checking smartcontract instantiation policy: MSP getPolicyManager for group %s not found",groupName);
             throw new SysSmartContractException(msg);
         }
         IPolicyProvider policyProvider=CAuthDslBuilder.createPolicyProvider(mspManager);

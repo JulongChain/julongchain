@@ -33,20 +33,20 @@ public interface IManager {
      */
     Policies.Policy getPolicy(String id);
 
-    /** Manager returns the sub-policy manager for a given path and whether it exists
+    /** Manager returns the sub-policy getPolicyManager for a given path and whether it exists
      *
      * @param path
      * @return
      */
     IManager Manager(String[] path);
 
-    /** Basepath returns the basePath the manager was instantiated with
+    /** Basepath returns the basePath the getPolicyManager was instantiated with
      *
      * @return
      */
     String basePath();
 
-    /** Policies returns all policy names defined in the manager
+    /** Policies returns all policy names defined in the getPolicyManager
      *
      * @return
      */
