@@ -194,5 +194,51 @@ public class RwSetUtil {
                 .setIsDelete(kvWrite.getIsDelete())
                 .build();
     }
+
+    /**
+     * 构建KVRWSet对象
+     */
+    public static KvRwset.KVRWSet newKVRWSet(List<KvRwset.KVRead> reads, List<KvRwset.KVWrite> writes, List<KvRwset.RangeQueryInfo> rangeQueriesInfo){
+        KvRwset.KVRWSet.Builder builder = KvRwset.KVRWSet.newBuilder();
+
+        if (reads != null) {
+            for(KvRwset.KVRead read : reads){
+                builder.addReads(read);
+            }
+        }
+
+        if (writes != null) {
+            for(KvRwset.KVWrite write : writes){
+                builder.addWrites(write);
+            }
+        }
+
+        if (rangeQueriesInfo != null) {
+            for(KvRwset.RangeQueryInfo info : rangeQueriesInfo){
+                builder.addRangeQueriesInfo(info);
+            }
+        }
+
+        return builder.build();
+    }
+
+    public static KvRwset.HashedRWSet newHashedRWSet(List<KvRwset.KVReadHash> readSet, List<KvRwset.KVWriteHash> writeSet){
+        KvRwset.HashedRWSet.Builder builder = KvRwset.HashedRWSet.newBuilder();
+
+        if (readSet != null) {
+            for(KvRwset.KVReadHash read : readSet){
+                builder.addHashedReads(read);
+            }
+        }
+
+        if (writeSet != null) {
+            for(KvRwset.KVWriteHash write : writeSet){
+                builder.addHashedWrites(write);
+            }
+        }
+
+        return builder.build();
+    }
+
 }
 

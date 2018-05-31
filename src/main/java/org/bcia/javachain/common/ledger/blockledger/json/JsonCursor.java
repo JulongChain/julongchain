@@ -61,6 +61,7 @@ public class JsonCursor implements IIterator {
                 return new QueryResult(new AbstractMap.SimpleImmutableEntry( new QueryResult(block), Common.Status.SUCCESS));
             }
             synchronized (JsonLedger.getLock()) {
+                logger.debug("Waiting for block append");
                 try {
                     JsonLedger.getLock().wait();
                 } catch (InterruptedException e) {

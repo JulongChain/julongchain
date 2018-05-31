@@ -46,7 +46,7 @@ public class JsonLedgerFactory implements IFactory {
     public JsonLedgerFactory(){}
 
     public JsonLedgerFactory(String directory) throws LedgerException{
-        logger.debug("Initializing ledger at: " + directory);
+        logger.debug("Initializing json ledger at: " + directory);
         //创建目录
         File file = new File(directory);
         if (!file.exists()){
@@ -76,8 +76,10 @@ public class JsonLedgerFactory implements IFactory {
 
     @Override
     public synchronized ReadWriteBase getOrCreate(String groupID) throws LedgerException {
+        logger.debug("Starting create json ledger using group id " + groupID);
         ReadWriteBase l = ledgers.get(groupID);
         if(l != null){
+            logger.debug("Group id " + groupID + " is already exists");
             return l;
         }
         String directory = this.directory + File.separator + JsonLedger.GROUP_DIRECTORY_FORMAT_STRING + groupID;
@@ -89,6 +91,7 @@ public class JsonLedgerFactory implements IFactory {
         }
         ReadWriteBase group = newGroup(directory);
         ledgers.put(groupID, group);
+        logger.debug("Finished create json ledger");
         return group;
     }
 

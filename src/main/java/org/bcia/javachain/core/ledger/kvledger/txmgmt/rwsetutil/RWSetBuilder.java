@@ -176,7 +176,7 @@ public class RWSetBuilder {
         NsPvtRwBuilder nsPvtRwBuilder = pvtRwBuilderMap.get(ns);
         if(nsPvtRwBuilder == null){
             nsPvtRwBuilder = new NsPvtRwBuilder();
-            nsPvtRwBuilder.setCollectionName(ns);
+            nsPvtRwBuilder.setNamespace(ns);
             pvtRwBuilderMap.put(ns, nsPvtRwBuilder);
         }
         return nsPvtRwBuilder;
