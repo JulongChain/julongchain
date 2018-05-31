@@ -182,7 +182,7 @@ public class PolicyChecker implements IPolicyChecker{
         try {
             id.verify(signedProposal.getProposalBytes().toByteArray(), signedProposal.getSignature().toByteArray());
         }catch(VerifyException e){
-            String msg=String.format("Verify signature failed:%s",e.getMessage);
+            String msg=String.format("Verify signature failed:%s",e.getMessage());
             throw new PolicyException(msg);
         }
     }
