@@ -63,10 +63,10 @@ public class Policy implements IPolicy{
         if(this == null){
             log.info("No sEvaluateuch policy");
         }
-            // Boolean ok = this.evalutor(CAuthDsl.deduplicate(signatureList,this.deserializer),bool);//评估这组签名是否满足策略
-            // if(!ok){
-            //     log.info("Failed to authenticate policy");
-            // }
+            Boolean ok = this.evalutor(CAuthDsl.deduplicate(signatureList,this.deserializer),bool);//评估这组签名是否满足策略
+            if(!ok){
+                log.info("Failed to authenticate policy");
+            }
     }
     public Boolean evalutor(List<SignedData> signedDatas,Boolean[] bools){
         return true;
