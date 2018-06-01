@@ -188,7 +188,7 @@ public class Endorser implements IEndorserServer {
         try {
             MsgValidation.checkSignature(signedProposal.getSignature().toByteArray(), signedProposal.getProposalBytes()
                     .toByteArray(), signatureHeader.getCreator().toByteArray(), groupHeader.getGroupId());
-        } catch (ValidateException e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new NodeException(e);
         }

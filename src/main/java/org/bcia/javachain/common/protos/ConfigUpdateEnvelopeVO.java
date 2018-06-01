@@ -16,8 +16,10 @@
 package org.bcia.javachain.common.protos;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.util.ValidateUtils;
+import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.protos.common.Configtx;
 
 import java.util.ArrayList;
@@ -71,5 +73,19 @@ public class ConfigUpdateEnvelopeVO implements IProtoVO<Configtx.ConfigUpdateEnv
 
     public List<ConfigSignatureVO> getConfigSignatureVOList() {
         return configSignatureVOList;
+    }
+
+    public void toSignedDatas() {
+        List<SignedData> signedDataList = new ArrayList<>();
+
+        for (ConfigSignatureVO configSignatureVO : configSignatureVOList) {
+            byte[] data = ArrayUtils.addAll(configSignatureVO.getSignatureHeader().toByteArray(),
+                    configUpdate.toByteArray());
+            byte[] identity = configSignatureVO.getSignatureHeader().getCreator().toByteArray();
+            byte[] signature = configSignatureVO.getSignature().toByteArray();
+
+            SignedData signedData = new SignedData(data, identity, signature);
+            signedDataList.add(signedData);
+        }
     }
 }

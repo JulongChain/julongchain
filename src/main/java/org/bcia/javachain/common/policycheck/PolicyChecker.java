@@ -19,6 +19,7 @@ package org.bcia.javachain.common.policycheck;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.MspException;
 import org.bcia.javachain.common.exception.PolicyException;
+import org.bcia.javachain.common.exception.VerifyException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policies.IPolicy;
