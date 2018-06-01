@@ -16,6 +16,7 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.core.smartcontract.shim.impl.ChatStream;
 import org.bcia.javachain.protos.node.SmartcontractShim;
 
@@ -133,7 +134,8 @@ public abstract class SmartContractBase implements ISmartContract {
   }
 
   public ManagedChannel newPeerClientConnection() {
-    final NettyChannelBuilder builder = NettyChannelBuilder.forAddress(host, port);
+    final NettyChannelBuilder builder =
+            NettyChannelBuilder.forAddress(host, port).maxInboundMessageSize(CommConstant.MAX_GRPC_MESSAGE_SIZE);
     logger.info("Configuring channel connection to peer.");
 
     if (tlsEnabled) {
