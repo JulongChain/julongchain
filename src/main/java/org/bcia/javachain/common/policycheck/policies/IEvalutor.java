@@ -15,6 +15,10 @@
  */
 package org.bcia.javachain.common.policycheck.policies;
 
+import org.bcia.javachain.common.util.proto.SignedData;
+
+import java.util.List;
+
 /**
  * 类描述
  *
@@ -23,4 +27,5 @@ package org.bcia.javachain.common.policycheck.policies;
  * @company Aisino
  */
 public interface IEvalutor {
+    boolean evalutor(List<SignedData> signedDatas,Boolean[] bool);
 }

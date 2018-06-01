@@ -58,17 +58,8 @@ public class PolicyProvider implements IPolicyProvider{
             log.error("This evaluator only understands messages of version 0, but version was "+signaturePolicyEnvelope.getVersion());
             return null;
         }
-        Boolean compiled = null;
-        try {
-            compiled = CAuthDsl.compile(signaturePolicyEnvelope.getRule(),signaturePolicyEnvelope.getIdentitiesList(),deserializer);
-        } catch (NoSuchMethodException e) {
-            throw new PolicyException(e);
-        } catch (IllegalAccessException e) {
-            throw new PolicyException(e);
-        } catch (InvocationTargetException e) {
-            throw new PolicyException(e);
-        }
-        Policy policy = new Policy(compiled,deserializer);
+        IEvalutor compiled = CAuthDsl.compile(signaturePolicyEnvelope.getRule(),signaturePolicyEnvelope.getIdentitiesList(),deserializer);
+        Policy policy = new Policy(deserializer,compiled);
         return policy;
     }
 }

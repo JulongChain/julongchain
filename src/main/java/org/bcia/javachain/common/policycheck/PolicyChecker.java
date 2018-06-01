@@ -17,6 +17,8 @@
 package org.bcia.javachain.common.policycheck;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.apache.zookeeper.server.quorum.Leader;
+import org.bcia.javachain.common.exception.MspException;
 import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -65,7 +67,7 @@ public class PolicyChecker implements IPolicyChecker{
      * @param signedProposal
      */
     @Override
-    public void checkPolicy(String channelID, String policyName, SignedProposal signedProposal) {
+    public void checkPolicy(String channelID, String policyName, SignedProposal signedProposal) throws MspException {
          if(channelID == ""){
              checkPolicyNoChannel(policyName,signedProposal);
          }
@@ -120,7 +122,7 @@ public class PolicyChecker implements IPolicyChecker{
 
 
     @Override
-    public void checkPolicyNoChannel(String policyName, SignedProposal signedProposal) {
+    public void checkPolicyNoChannel(String policyName, SignedProposal signedProposal) throws MspException {
         if(policyName == ""){
             log.info("Invalid policy name during channelless check policy. Name must be different from nil.");
         }
@@ -129,7 +131,9 @@ public class PolicyChecker implements IPolicyChecker{
         }
         ProposalPackage.Proposal proposal = null;
         try {
+
             proposal = ProposalPackage.Proposal.parseFrom(signedProposal.getProposalBytes());
+            //proposal = ProposalPackage.Proposal.parseFrom(signedProposal.getProposalBytes());
         } catch (InvalidProtocolBufferException e) {
             log.info("Failing extracting proposal during channelless check policy with policy ["+policyName+"]");
             e.printStackTrace();
@@ -162,11 +166,11 @@ public class PolicyChecker implements IPolicyChecker{
             principal = this.principalGetter.get(policyName);
         }catch (Exception e){
             log.info("Failed getting local MSP principal during channelless check policy with policy ["+policyName+"]");
-            e.printStackTrace();
+            throw new MspException(e);
         }
         //MspPrincipal.MSPPrincipal m = MspPrincipal.MSPPrincipal.newBuilder().build();
-        //id.satisfiesPrincipal(principal);
-        //id.verify(signedProposal.getProposalBytes(),signedProposal.getSignature());
+        id.satisfiesPrincipal(principal);
+        id.verify(signedProposal.getProposalBytes(),signedProposal.getSignature());
 
     }
 

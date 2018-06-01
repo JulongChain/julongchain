@@ -24,37 +24,37 @@ package org.bcia.javachain.common.policycheck.bean;
  * @company Aisino
  */
 public class ConfigPolicy {
-    private Long Version;
-    private Policy Policy;
-    private String ModPolicy;
+    private Long version;
+    private Policy policy;
+    private String modPolicy;
 
-    public ConfigPolicy(Long version, org.bcia.javachain.common.policycheck.bean.Policy policy, String modPolicy) {
-        Version = version;
-        Policy = policy;
-        ModPolicy = modPolicy;
+    public ConfigPolicy(Long version, Policy policy, String modPolicy) {
+        this.version = version;
+        this.policy = policy;
+        this.modPolicy = modPolicy;
     }
 
     public Long getVersion() {
-        return Version;
+        return version;
     }
 
     public void setVersion(Long version) {
-        Version = version;
+        this.version = version;
     }
 
-    public org.bcia.javachain.common.policycheck.bean.Policy getPolicy() {
-        return Policy;
+    public Policy getPolicy() {
+        return policy;
     }
 
-    public void setPolicy(org.bcia.javachain.common.policycheck.bean.Policy policy) {
-        Policy = policy;
+    public void setPolicy(Policy policy) {
+        this.policy = policy;
     }
 
     public String getModPolicy() {
-        return ModPolicy;
+        return modPolicy;
     }
 
     public void setModPolicy(String modPolicy) {
-        ModPolicy = modPolicy;
+        this.modPolicy = modPolicy;
     }
 }
