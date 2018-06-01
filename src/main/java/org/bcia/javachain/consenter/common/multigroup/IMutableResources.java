@@ -17,7 +17,6 @@ package org.bcia.javachain.consenter.common.multigroup;
 
 import org.bcia.javachain.common.groupconfig.GroupConfigBundle;
 import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
-import org.bcia.javachain.common.resourceconfig.IResources;
 
 /**
  * @author zhangmingyang
