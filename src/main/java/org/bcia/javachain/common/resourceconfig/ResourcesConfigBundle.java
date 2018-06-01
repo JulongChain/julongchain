@@ -71,7 +71,7 @@ public class ResourcesConfigBundle implements IResourcesConfigBundle {
 
         this.policyManager = new PolicyRouter(groupPolicyManager, resourcesPolicyManager);
 
-        new Validator(groupId, config, ResourceConfigConstant.RESOURCES, policyManager);
+        this.validator = new Validator(groupId, config, ResourceConfigConstant.RESOURCES, policyManager);
 
     }
 
