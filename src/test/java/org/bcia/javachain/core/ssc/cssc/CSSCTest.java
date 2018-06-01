@@ -131,6 +131,20 @@ public class CSSCTest extends BaseJunit4Test {
             return;
         }
 
+
+        List<ByteString> args3 = new LinkedList<ByteString>();
+        args3.add(ByteString.copyFromUtf8(CSSC.GET_CONFIG_TREE));
+        args3.add(ByteString.copyFromUtf8("mytestchainid"));
+        ISmartContract.SmartContractResponse res3 = mockStub.mockInvokeWithSignedProposal("3", args3,sp);
+        assertThat(res3.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
+        try {
+            Query.GroupQueryResponse groups = Query.GroupQueryResponse.parseFrom(res3.getPayload());
+            assertNotNull(groups);
+            assertThat(groups.getGroupsCount(),is(1));
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+            return;
+        }
     }
 
 
