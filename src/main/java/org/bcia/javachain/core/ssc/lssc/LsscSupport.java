@@ -16,12 +16,13 @@
 package org.bcia.javachain.core.ssc.lssc;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.cauthdsl.CAuthDslBuilder;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.exception.SysSmartContractException;
 import org.bcia.javachain.common.policies.IPolicy;
 import org.bcia.javachain.common.policies.IPolicyProvider;
+import org.bcia.javachain.common.policycheck.cauthdsl.CAuthDslBuilder;
+import org.bcia.javachain.common.policycheck.policies.PolicyProvider;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.core.common.smartcontractprovider.ISmartContractPackage;
 import org.bcia.javachain.core.common.smartcontractprovider.SignedSDSPackage;
@@ -132,7 +133,7 @@ public class LsscSupport {
             String msg=String.format("Error checking smartcontract instantiation policy: MSP getPolicyManager for group %s not found",groupName);
             throw new SysSmartContractException(msg);
         }
-        IPolicyProvider policyProvider=CAuthDslBuilder.createPolicyProvider(mspManager);
+        IPolicyProvider policyProvider=new PolicyProvider(mspManager);
         IPolicy policy =null;
         try {
             policy = policyProvider.makePolicy(instantiationPolicy);

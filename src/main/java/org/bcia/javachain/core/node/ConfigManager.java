@@ -30,7 +30,7 @@ import org.bcia.javachain.node.entity.Group;
  * @date 2018/05/31
  * @company Dingxuan
  */
-public class ConfigSupport implements IConfigManager {
+public class ConfigManager implements IConfigManager {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Node.class);
 
     @Override

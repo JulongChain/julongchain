@@ -17,7 +17,6 @@ package org.bcia.javachain.core.ssc.lssc;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.cauthdsl.CAuthDslBuilder;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.SysSmartContractException;
 import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
@@ -25,6 +24,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policycheck.IPolicyChecker;
 import org.bcia.javachain.common.policycheck.PolicyChecker;
+import org.bcia.javachain.common.policycheck.cauthdsl.CAuthDslBuilder;
 import org.bcia.javachain.common.policycheck.policies.GroupPolicyManager;
 import org.bcia.javachain.common.util.proto.ProtoUtils;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
@@ -207,7 +207,7 @@ public class LSSC  extends SystemSmartContractBase {
                 if(size>3 && args.get(3).length!=0){
                     ep=args.get(3);
                 }else{
-                    Policies.SignaturePolicyEnvelope signaturePolicyEnvelope=CAuthDslBuilder.signedByAnyMember(NodeUtils.getMspIDs(groupName));
+                    Policies.SignaturePolicyEnvelope signaturePolicyEnvelope= CAuthDslBuilder.signedByAnyMember(NodeUtils.getMspIDs(groupName));
                     try {
                         ep = ProtoUtils.marshalOrPanic(signaturePolicyEnvelope);
                     }catch (Exception e){

@@ -16,12 +16,12 @@ limitations under the License.
 package org.bcia.javachain.core.common.privdata;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.cauthdsl.PolicyProvider;
 import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policies.IPolicy;
 import org.bcia.javachain.common.policycheck.cauthdsl.PolicyUtil;
+import org.bcia.javachain.common.policycheck.policies.PolicyProvider;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.IIdentityDeserializer;
@@ -76,7 +76,7 @@ public class SimpleCollection implements ICollection, ICollectionAccessPolicy {
         //在Envelope中获取accessPolicy
         PolicyProvider npp = new PolicyProvider(deserializer);
         byte[] polBytes = accessPolicyEnvelope.toByteArray();
-        this.accessPolicy = npp.newPolicy(polBytes);
+        this.accessPolicy = npp.makePolicy(polBytes);
 
         //获取成员参数
         for(MspPrincipal.MSPPrincipal principal : accessPolicyEnvelope.getIdentitiesList()){
