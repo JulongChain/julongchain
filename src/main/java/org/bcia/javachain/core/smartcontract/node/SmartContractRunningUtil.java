@@ -101,8 +101,10 @@ public class SmartContractRunningUtil {
   }
 
   public static boolean checkSmartContractRunning(String smartContractId) {
+    logger.info(
+        SmartContractSupportService.smartContractIdAndStreamObserverMap.keySet().toString());
     StreamObserver<SmartContractMessage> smartContractMessageStreamObserver =
-        smartContractIdAndStreamObserverMap.get(smartContractId);
+        SmartContractSupportService.smartContractIdAndStreamObserverMap.get(smartContractId);
     return smartContractMessageStreamObserver != null;
   }
 }

@@ -20,12 +20,15 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.common.util.proto.ProposalResponseUtils;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractContext;
-import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.node.*;
+import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.ProposalResponsePackage;
+import org.bcia.javachain.protos.node.Smartcontract;
+import org.bcia.javachain.protos.node.SmartcontractShim;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * 智能合约执行器
@@ -72,10 +75,16 @@ public class SmartContractExecutor {
             throw new SmartContractException("launch smart contract fail");
         }
 
+        List<ByteString> argsList = scInput.getArgsList();
+
+        for (ByteString byteString : argsList) {
+            System.out.println(byteString.toStringUtf8());
+        }
+
         //TODO:SmartContractInput是否需要再处理?
 
         SmartcontractShim.SmartContractMessage scMessage = buildSmartContractMessage(msgType, scInput.toByteArray(),
-                scContext.getTxID(), scContext.getChainID());
+                scContext.getTxID(), scContext.getChainID(), scContext.getProposal());
         //执行智能合约
         SmartcontractShim.SmartContractMessage responseMessage = scSupport.execute(scContext, scMessage, timeout);
 
@@ -123,7 +132,7 @@ public class SmartContractExecutor {
      * @param groupId 群组ID
      * @return
      */
-    private SmartcontractShim.SmartContractMessage buildSmartContractMessage(int msgType, byte[] payload, String txId, String groupId) {
+    private SmartcontractShim.SmartContractMessage buildSmartContractMessage(int msgType, byte[] payload, String txId, String groupId, ProposalPackage.Proposal proposal) {
 
         SmartcontractShim.SmartContractMessage.Builder scMessageBuilder = SmartcontractShim.SmartContractMessage
                 .newBuilder();
@@ -136,8 +145,8 @@ public class SmartContractExecutor {
 
         Common.GroupHeader groupHeader = Common.GroupHeader.newBuilder().setType(Common.HeaderType.ENDORSER_TRANSACTION.getNumber()).build();
         Common.Header header = Common.Header.newBuilder().setGroupHeader(groupHeader.toByteString()).build();
-        ProposalPackage.Proposal proposal = ProposalPackage.Proposal.newBuilder().setHeader(header
-                .toByteString()).build();
+        // ProposalPackage.Proposal proposal = ProposalPackage.Proposal.newBuilder().setHeader(header
+        //         .toByteString()).build();
         ProposalPackage.SignedProposal signedProposal = ProposalPackage.SignedProposal.newBuilder()
                 .setProposalBytes(proposal.toByteString()).build();
 
