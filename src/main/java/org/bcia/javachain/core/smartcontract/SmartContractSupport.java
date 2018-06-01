@@ -15,9 +15,6 @@ package org.bcia.javachain.core.smartcontract;
 
 import com.google.protobuf.ByteString;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.ledger.util.IoUtil;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -292,7 +289,7 @@ public class SmartContractSupport {
       if (SmartContractSupportClient.checkSystemSmartContract(smartContractId)) {
         SmartContractSupportClient.launch(smartContractId);
         try {
-          Thread.sleep(5000);
+          Thread.sleep(1000);
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
