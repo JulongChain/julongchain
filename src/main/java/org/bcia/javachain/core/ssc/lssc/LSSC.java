@@ -23,6 +23,9 @@ import org.bcia.javachain.common.exception.SysSmartContractException;
 import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.policycheck.IPolicyChecker;
+import org.bcia.javachain.common.policycheck.PolicyChecker;
+import org.bcia.javachain.common.policycheck.policies.GroupPolicyManager;
 import org.bcia.javachain.common.util.proto.ProtoUtils;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
 import org.bcia.javachain.core.aclmgmt.resources.Resources;
@@ -34,12 +37,13 @@ import org.bcia.javachain.core.common.sysscprovider.SystemSmartContractFactory;
 import org.bcia.javachain.core.ledger.sceventmgmt.ScEventManager;
 import org.bcia.javachain.core.ledger.sceventmgmt.SmartContractDefinition;
 import org.bcia.javachain.core.node.util.NodeUtils;
-import org.bcia.javachain.core.policy.IPolicyChecker;
 import org.bcia.javachain.core.policy.PolicyFactory;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.smartcontract.shim.ledger.IKeyValue;
 import org.bcia.javachain.core.smartcontract.shim.ledger.IQueryResultsIterator;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
+import org.bcia.javachain.msp.IMsp;
+import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.msp.mgmt.MSPPrincipalGetter;
 import org.bcia.javachain.protos.common.Collection;
 import org.bcia.javachain.protos.common.Policies;
@@ -109,7 +113,8 @@ public class LSSC  extends SystemSmartContractBase {
     @Override
     public SmartContractResponse init(ISmartContractStub stub) {
         this.sscProvider=SystemSmartContractFactory.getSystemSmartContractProvider();
-        this.policyChecker = PolicyFactory.getPolicyChecker();
+        IMsp localMSP = GlobalMspManagement.getLocalMsp();
+        policyChecker=new PolicyChecker(new GroupPolicyManager(),localMSP,new MSPPrincipalGetter());
         log.info("Successfully initialized LSSC");
         return newSuccessResponse();
     }
