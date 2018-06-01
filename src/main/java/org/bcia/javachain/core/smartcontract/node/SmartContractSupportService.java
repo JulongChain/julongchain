@@ -16,6 +16,7 @@ package org.bcia.javachain.core.smartcontract.node;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.stub.StreamObserver;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,6 +26,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.Versi
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.leveldb.LevelDB;
 import org.bcia.javachain.core.ledger.leveldb.LevelDBUtil;
+import org.bcia.javachain.core.smartcontract.client.SmartContractSupportClient;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.javachain.protos.node.*;
@@ -50,66 +52,69 @@ public class SmartContractSupportService
     private static Log logger = LogFactory.getLog(SmartContractSupportService.class);
 
     /** 以smartContractId为key,保存gRPC客户端 */
-    private static Map<String, StreamObserver<SmartContractMessage>>
+    public static Map<String, StreamObserver<SmartContractMessage>>
             smartContractIdAndStreamObserverMap =
             Collections.synchronizedMap(new HashMap<String, StreamObserver<SmartContractMessage>>());
 
-    /**
-     * 处理智能合约register信息（命令）
-     *
-     * @param message 智能合约发送过来的信息（命令）
-     * @param streamObserver 智能合约gRPC通道
-     */
-    private void handleRegister(
-            SmartContractMessage message, StreamObserver<SmartContractMessage> streamObserver) {
-        try {
-            // 保存智能合约编号
-            saveSmartContractStreamObserver(message, streamObserver);
+  /**
+   * 处理智能合约register信息（命令）
+   *
+   * @param message 智能合约发送过来的信息（命令）
+   * @param streamObserver 智能合约gRPC通道
+   */
+  private void handleRegister(
+      SmartContractMessage message, StreamObserver<SmartContractMessage> streamObserver) {
+    try {
+      // 保存智能合约编号
+      saveSmartContractStreamObserver(message, streamObserver);
 
-            String smartContractId = getSmartContractId(message);
+      String smartContractId = getSmartContractId(message);
 
-            // 发送注册成功命令
-            SmartContractMessage responseMessage =
-                    SmartContractMessage.newBuilder().setType(SmartContractMessage.Type.REGISTERED).build();
-            streamObserver.onNext(responseMessage);
+      // 发送注册成功命令
+      SmartContractMessage responseMessage =
+          SmartContractMessage.newBuilder().setType(SmartContractMessage.Type.REGISTERED).build();
+      streamObserver.onNext(responseMessage);
 
-            // 发送ready命令
-            responseMessage =
-                    SmartContractMessage.newBuilder().setType(SmartContractMessage.Type.READY).build();
-            streamObserver.onNext(responseMessage);
+      // 发送ready命令
+      responseMessage =
+          SmartContractMessage.newBuilder().setType(SmartContractMessage.Type.READY).build();
+      streamObserver.onNext(responseMessage);
 
-            // 发送init命令
-            Common.GroupHeader groupHeader =
-                    Common.GroupHeader.newBuilder()
-                            .setType(Common.HeaderType.ENDORSER_TRANSACTION.getNumber())
-                            .build();
-            Common.Header header =
-                    Common.Header.newBuilder().setGroupHeader(groupHeader.toByteString()).build();
-            ProposalPackage.Proposal proposal =
-                    ProposalPackage.Proposal.newBuilder().setHeader(header.toByteString()).build();
-            ProposalPackage.SignedProposal signedProposal =
-                    ProposalPackage.SignedProposal.newBuilder()
-                            .setProposalBytes(proposal.toByteString())
-                            .build();
-            SmartContractEventPackage.SmartContractEvent smartContractEvent =
-                    SmartContractEventPackage.SmartContractEvent.newBuilder()
-                            .setSmartContractId(smartContractId)
-                            .build();
-            responseMessage =
-                    SmartContractMessage.newBuilder()
-                            .setType(SmartContractMessage.Type.INIT)
-                            .setProposal(signedProposal)
-                            .setSmartcontractEvent(smartContractEvent)
-                            .build();
-            streamObserver.onNext(responseMessage);
+      // 发送init命令
+      if (BooleanUtils.isTrue(
+          SmartContractSupportClient.checkSystemSmartContract(smartContractId))) {
+        Common.GroupHeader groupHeader =
+            Common.GroupHeader.newBuilder()
+                .setType(Common.HeaderType.ENDORSER_TRANSACTION.getNumber())
+                .build();
+        Common.Header header =
+            Common.Header.newBuilder().setGroupHeader(groupHeader.toByteString()).build();
+        ProposalPackage.Proposal proposal =
+            ProposalPackage.Proposal.newBuilder().setHeader(header.toByteString()).build();
+        ProposalPackage.SignedProposal signedProposal =
+            ProposalPackage.SignedProposal.newBuilder()
+                .setProposalBytes(proposal.toByteString())
+                .build();
+        SmartContractEventPackage.SmartContractEvent smartContractEvent =
+            SmartContractEventPackage.SmartContractEvent.newBuilder()
+                .setSmartContractId(smartContractId)
+                .build();
+        responseMessage =
+            SmartContractMessage.newBuilder()
+                .setType(SmartContractMessage.Type.INIT)
+                .setProposal(signedProposal)
+                .setSmartcontractEvent(smartContractEvent)
+                .build();
+        streamObserver.onNext(responseMessage);
+      }
 
-            // 设置状态ready
-            updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_SEND_INIT);
+      // 设置状态ready
+      updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_SEND_INIT);
 
-        } catch (InvalidProtocolBufferException e) {
-            logger.error(e.getMessage(), e);
-        }
+    } catch (InvalidProtocolBufferException e) {
+      logger.error(e.getMessage(), e);
     }
+  }
 
     @Override
     public StreamObserver<SmartContractMessage> register(
@@ -373,7 +378,7 @@ public class SmartContractSupportService
         SmartContractMessage message =
                 SmartContractMessage.newBuilder()
                         .mergeFrom(smartContractMessage)
-                        .setType(SmartContractMessage.Type.TRANSACTION)
+                        // .setType(SmartContractMessage.Type.TRANSACTION)
                         .build();
 
         updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_BUSY);

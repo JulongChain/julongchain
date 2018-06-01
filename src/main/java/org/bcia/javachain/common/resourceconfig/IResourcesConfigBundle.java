@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.common.resourceconfig;
 
+import org.bcia.javachain.common.config.IConfig;
 import org.bcia.javachain.common.configtx.IValidator;
 import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.javachain.common.policies.IPolicyManager;
@@ -27,7 +28,7 @@ import org.bcia.javachain.common.resourceconfig.config.IResourcesConfig;
  * @date 2018/4/25
  * @company Dingxuan
  */
-public interface IResourcesConfigBundle {
+public interface IResourcesConfigBundle extends IConfig {
     interface Callback {
         void call(IResourcesConfigBundle bundle);
     }

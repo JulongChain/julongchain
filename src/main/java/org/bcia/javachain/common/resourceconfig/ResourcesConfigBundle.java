@@ -27,6 +27,7 @@ import org.bcia.javachain.common.policies.PolicyManager;
 import org.bcia.javachain.common.policies.PolicyRouter;
 import org.bcia.javachain.common.resourceconfig.config.IResourcesConfig;
 import org.bcia.javachain.common.resourceconfig.config.ResourcesConfig;
+import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 
 import java.util.HashMap;
@@ -70,7 +71,7 @@ public class ResourcesConfigBundle implements IResourcesConfigBundle {
 
         this.policyManager = new PolicyRouter(groupPolicyManager, resourcesPolicyManager);
 
-        new Validator(groupId, config, ResourceConfigConstant.RESOURCES, policyManager);
+        this.validator = new Validator(groupId, config, ResourceConfigConstant.RESOURCES, policyManager);
 
     }
 
@@ -92,5 +93,15 @@ public class ResourcesConfigBundle implements IResourcesConfigBundle {
     @Override
     public IPolicyManager getPolicyManager() {
         return policyManager;
+    }
+
+    @Override
+    public Configtx.Config getCurrentConfig() {
+        return config;
+    }
+
+    @Override
+    public Configtx.ConfigEnvelope updateProposeConfig(Common.Envelope configtx) throws InvalidProtocolBufferException, ValidateException {
+        return validator.proposeConfigUpdate(configtx);
     }
 }

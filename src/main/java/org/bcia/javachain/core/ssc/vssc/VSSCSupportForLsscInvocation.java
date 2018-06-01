@@ -17,7 +17,6 @@ package org.bcia.javachain.core.ssc.vssc;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.cauthdsl.CAuthDslBuilder;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.PolicyException;
@@ -26,6 +25,8 @@ import org.bcia.javachain.common.groupconfig.capability.IApplicationCapabilities
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.policies.IPolicy;
 import org.bcia.javachain.common.policies.IPolicyProvider;
+import org.bcia.javachain.common.policycheck.cauthdsl.CAuthDslBuilder;
+import org.bcia.javachain.common.policycheck.policies.PolicyProvider;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.core.common.privdata.CollectionStoreSupport;
 import org.bcia.javachain.core.common.privdata.ICollectionConfigPackage;
@@ -339,7 +340,7 @@ public class VSSCSupportForLsscInvocation {
             String msg=String.format("MSP getPolicyManager for group %s is null, aborting",groupID);
             throw new SysSmartContractException(msg);
         }
-        IPolicyProvider policyProvider = CAuthDslBuilder.createPolicyProvider(mspManager);
+        IPolicyProvider policyProvider =new PolicyProvider(mspManager);
         IPolicy policy=null;
         try {
             policy= policyProvider.makePolicy(instantiationPolicy);

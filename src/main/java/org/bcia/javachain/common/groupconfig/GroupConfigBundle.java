@@ -61,6 +61,8 @@ public class GroupConfigBundle implements IGroupConfigBundle {
      */
     private IValidator validator;
 
+    private Configtx.Config config;
+
     public static GroupConfigBundle parseFrom(Common.Envelope envelope) throws ValidateException,
             InvalidProtocolBufferException, PolicyException {
         ValidateUtils.isNotNull(envelope, "envelope can not be null");
@@ -86,6 +88,7 @@ public class GroupConfigBundle implements IGroupConfigBundle {
             InvalidProtocolBufferException, PolicyException {
         preValidate(config);
 
+        this.config = config;
         this.groupConfig = new GroupConfig(config.getGroupTree());
 
         HashMap<Integer, IPolicyProvider> policyProviderMap = new HashMap<>();
@@ -231,5 +234,15 @@ public class GroupConfigBundle implements IGroupConfigBundle {
     @Override
     public IValidator getValidator() {
         return validator;
+    }
+
+    @Override
+    public Configtx.Config getCurrentConfig() {
+        return config;
+    }
+
+    @Override
+    public Configtx.ConfigEnvelope updateProposeConfig(Common.Envelope configtx) throws InvalidProtocolBufferException, ValidateException{
+        return validator.proposeConfigUpdate(configtx);
     }
 }

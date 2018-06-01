@@ -16,7 +16,6 @@
 package org.bcia.javachain.consenter.common.msgprocessor;
 
 import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
-import org.bcia.javachain.common.resourceconfig.IResources;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 

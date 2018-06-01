@@ -324,6 +324,9 @@ public class Node {
             }
         });
 
+        groupSupport.setGroupConfigBundle(groupConfigBundle);
+        groupSupport.setResourcesConfigBundle(resourcesConfigBundle);
+
         Group group = new Group();
         group.setGroupSupport(groupSupport);
         group.setBlock(configBlock);

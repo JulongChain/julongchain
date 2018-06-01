@@ -55,6 +55,7 @@ import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -173,7 +174,11 @@ public class NodeGroup {
 
 //                        LedgerManager.initialize(null);
 //                        LedgerManager.createLedger(block);
+
                         FileUtils.writeFileBytes(groupId + ".block", block.toByteArray());
+
+                        File file = new File(groupId + ".block");
+                        log.info("file is generated1-----$" + file.getCanonicalPath());
                     } catch (IOException e) {
                         log.error(e.getMessage(), e);
                     } catch (JavaChainException e) {
@@ -185,6 +190,9 @@ public class NodeGroup {
                     Common.Block block = value.getBlock();
                     try {
                         FileUtils.writeFileBytes(groupId + ".block", block.toByteArray());
+
+                        File file = new File(groupId + ".block");
+                        log.info("file is generated2-----$" + file.getCanonicalPath());
                     } catch (IOException e) {
                         log.error(e.getMessage(), e);
                     }

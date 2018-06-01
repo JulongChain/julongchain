@@ -12,6 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM docker.bcia.javachain:5000/baseimage
-ENV MAVEN_VERSION=3.3.9
-ENV USER_HOME_DIR="/root"
+FROM ubuntu
+RUN apt-get update
+RUN apt-get -y install openjdk-8-jdk
+RUN apt-get -y install maven
+RUN apt-get -y install net-tools
+RUN apt-get -y install iputils-ping
+RUN mkdir -p /root/javachain
+WORKDIR /root/javachain
+

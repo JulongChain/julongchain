@@ -16,6 +16,7 @@
 package org.bcia.javachain.core.endorser;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.LedgerException;
@@ -32,11 +33,17 @@ import org.bcia.javachain.core.common.validation.MsgValidation;
 import org.bcia.javachain.core.ledger.ITxSimulator;
 import org.bcia.javachain.core.ledger.TxSimulationResults;
 import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.NsRwSet;
+import org.bcia.javachain.core.smartcontract.node.TransactionRunningUtil;
 import org.bcia.javachain.node.common.helper.SpecHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.ledger.rwset.Rwset;
+import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.javachain.protos.node.*;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 背书节点
@@ -299,6 +306,25 @@ public class Endorser implements IEndorserServer {
                 publicSimulateBytes = readWriteSet.toByteArray();
             }
         }
+
+        List<KvRwset.KVRead> kvReads = TransactionRunningUtil.getKvReads(scName, txId);
+        if (CollectionUtils.isEmpty(kvReads)) {
+            kvReads = new ArrayList<>();
+        }
+        List<KvRwset.KVWrite> kvWrites = TransactionRunningUtil.getKvWrites(scName, txId);
+        if(CollectionUtils.isEmpty(kvWrites)){
+            kvWrites = new ArrayList<>();
+        }
+
+        KvRwset.KVRWSet kvRwSet = KvRwset.KVRWSet.newBuilder().addAllReads(kvReads).addAllWrites(kvWrites).build();
+
+        Rwset.NsReadWriteSet nsReadWriteSet = Rwset.NsReadWriteSet.newBuilder().setNamespace(scName).setRwset(kvRwSet
+            .toByteString()).build();
+
+        Rwset.TxReadWriteSet txReadWriteSet = Rwset.TxReadWriteSet.newBuilder().addNsRwset(nsReadWriteSet).setDataModel(Rwset
+            .TxReadWriteSet.DataModel.KV).build();
+
+        publicSimulateBytes = txReadWriteSet.toByteArray();
 
         return new Object[]{response, publicSimulateBytes, scDefinition, scEvent};
     }

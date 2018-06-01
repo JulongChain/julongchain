@@ -12,6 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM docker.bcia.javachain:5000/baseimage
-COPY payload/chaintool payload/protoc-gen-go /usr/local/bin/
-RUN mkdir -p /chaincode/input /chaincode/output
+FROM javachain-baseimage
+COPY pom.xml /root/javachain
+COPY src/ /root/javachain/src
+WORKDIR /root/javachain
+RUN mvn package
+RUN rm -rf /root/javachain/pom.xml
+RUN rm -rf /root/javachain/src/*dock
+

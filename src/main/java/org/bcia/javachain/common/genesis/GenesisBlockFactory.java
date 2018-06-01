@@ -20,6 +20,9 @@ import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.common.util.proto.ProposalUtils;
 import org.bcia.javachain.csp.factory.CspManager;
+import org.bcia.javachain.msp.IMsp;
+import org.bcia.javachain.msp.ISigningIdentity;
+import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 
@@ -44,7 +47,10 @@ public class GenesisBlockFactory implements IGenesisBlockFactory {
     @Override
     public Common.Block getGenesisBlock(String groupId) throws JavaChainException {
         byte[] nonce = CspManager.getDefaultCsp().rng(NONCE_LENGTH, null);
-        byte[] creator = new byte[0];
+
+        IMsp localMsp = GlobalMspManagement.getLocalMsp();
+        ISigningIdentity signingIdentity = localMsp.getDefaultSigningIdentity();
+        byte[] creator = signingIdentity.serialize();
 
         //计算交易ID
         String txId = ProposalUtils.computeProposalTxID(creator, nonce);

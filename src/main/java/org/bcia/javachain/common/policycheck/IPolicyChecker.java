@@ -30,7 +30,7 @@ import java.util.List;
  * @company Aisino
  */
 public interface IPolicyChecker {
-    void checkPolicy(String channelID, String policyName, ProposalPackage.SignedProposal signedProposal)throws PolicyException;
-    void checkPolicyBySignedData(String channelID, String policyName, List<SignedData> signedDatas)throws PolicyException;
+    void checkPolicy(String groupID, String policyName, ProposalPackage.SignedProposal signedProposal)throws PolicyException;
+    void checkPolicyBySignedData(String groupID, String policyName, List<SignedData> signedDatas)throws PolicyException;
     void checkPolicyNoGroup(String policyName, ProposalPackage.SignedProposal signedProposal)throws PolicyException;
 }
