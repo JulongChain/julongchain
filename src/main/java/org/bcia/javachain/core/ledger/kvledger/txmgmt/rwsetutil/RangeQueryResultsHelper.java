@@ -18,7 +18,7 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.Util;
+import org.bcia.javachain.core.ledger.util.Util;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
 import java.util.AbstractMap;

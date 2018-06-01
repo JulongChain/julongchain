@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil;
 
 import com.google.protobuf.ByteString;
-import org.bcia.javachain.common.ledger.util.Util;
+import org.bcia.javachain.core.ledger.util.Util;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
 import java.util.HashMap;

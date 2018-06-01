@@ -18,10 +18,10 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.RWSetBuilder;
-import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.Util;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
+import org.bcia.javachain.core.ledger.util.Util;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
 import java.util.ArrayList;
@@ -159,6 +159,7 @@ public class QueryHelper {
                 }
             }
         } finally {
+//            txMgr.getLock().readLock().unlock();
             doneInvoked = true;
             for(IResultsIterator itr : itrs){
                 itr.close();
@@ -182,7 +183,7 @@ public class QueryHelper {
         }
     }
 
-    private void addToHashedReadSet(String ns, String coll, String key, Height ver){
+    private void addToHashedReadSet(String ns, String coll, String key, Height ver) throws LedgerException{
         if(rwSetBuilder != null){
             rwSetBuilder.addToHashedReadSet(ns, coll, key, ver);
         }

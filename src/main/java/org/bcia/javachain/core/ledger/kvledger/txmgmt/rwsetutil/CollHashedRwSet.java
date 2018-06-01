@@ -59,17 +59,10 @@ public class CollHashedRwSet {
      * 将CollHashedRwSet转换为proto中CollectionHashedReadWriteSet
      */
     public Rwset.CollectionHashedReadWriteSet toProtoMsg(){
-        Rwset.CollectionHashedReadWriteSet protoMsg = null;
-        try {
-            protoMsg = Rwset.CollectionHashedReadWriteSet.newBuilder()
-                    .setCollectionName(collectionName)
-                    .setPvtRwsetHash(pvtRwSetHash)
-                    .setHashedRwset(hashedRwSet.toByteString())
-                    .build();
-        } catch (Exception e) {
-            RuntimeException error = new RuntimeException("Got error when getting protoMsg from collHashedRwSet: " + e);
-            throw error;
-        }
-        return protoMsg;
+        Rwset.CollectionHashedReadWriteSet.Builder builder = Rwset.CollectionHashedReadWriteSet.newBuilder()
+                .setCollectionName(collectionName)
+                .setPvtRwsetHash(pvtRwSetHash)
+                .setHashedRwset(hashedRwSet.toByteString());
+        return builder.build();
     }
 }

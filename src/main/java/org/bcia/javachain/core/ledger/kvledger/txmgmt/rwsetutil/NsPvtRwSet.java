@@ -51,14 +51,13 @@ public class NsPvtRwSet {
      * 将NsPvtRwSet转换为proto中NsPvtReadWriteSet
      */
     public Rwset.NsPvtReadWriteSet toProtoMsg(){
-        Rwset.NsPvtReadWriteSet protoMsg = Rwset.NsPvtReadWriteSet.newBuilder()
-                .setNamespace(nameSpace)
-                .build();
+        Rwset.NsPvtReadWriteSet.Builder builder = Rwset.NsPvtReadWriteSet.newBuilder()
+                .setNamespace(nameSpace);
         Rwset.CollectionPvtReadWriteSet collPvtRwSetProtoMsg = null;
         for(CollPvtRwSet collPvtRwSet : collPvtRwSets){
             collPvtRwSetProtoMsg = collPvtRwSet.toProtoMsg();
-            protoMsg.getCollectionPvtRwsetList().add(collPvtRwSetProtoMsg);
+            builder.addCollectionPvtRwset(collPvtRwSetProtoMsg);
         }
-        return protoMsg;
+        return builder.build();
     }
 }

@@ -19,6 +19,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
+import org.bcia.javachain.core.ledger.util.Util;
 
 import java.util.List;
 
@@ -43,7 +44,7 @@ public class NsIteratorI implements IResultsIterator {
         if(nsUpdates == null){
             return null;
         }
-        List<String> sortKeys = org.bcia.javachain.common.ledger.util.Util.getSortedKeys(nsUpdates.getMap());
+        List<String> sortKeys = Util.getSortedKeys(nsUpdates.getMap());
         int nextIndex;
         int lastIndex;
         if(startKey == null || ("").equals(startKey)){

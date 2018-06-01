@@ -62,21 +62,12 @@ public class NsRwSet {
      * 将NsRwSet转换为proto中NsReadWriteSet
      */
     public Rwset.NsReadWriteSet toProtoMsg(){
-        Rwset.NsReadWriteSet protoMsg = null;
-        Rwset.CollectionHashedReadWriteSet collHashedRwSetProtoMsg = null;
-        try {
-            protoMsg = Rwset.NsReadWriteSet.newBuilder()
+        Rwset.NsReadWriteSet.Builder builder = Rwset.NsReadWriteSet.newBuilder()
                     .setNamespace(nameSpace)
-                    .setRwset(kvRwSet.toByteString())
-                    .build();
-        } catch (Exception e) {
-            RuntimeException error = new RuntimeException("Got error when getting protoMsg from nsRwSet: " + e);
-            throw error;
+                    .setRwset(kvRwSet.toByteString());
+        for(CollHashedRwSet collHashedRwSet : collHashedRwSets) {
+            builder.addCollectionHashedRwset(collHashedRwSet.toProtoMsg());
         }
-        for(CollHashedRwSet collHashedRwSet : collHashedRwSets){
-            collHashedRwSetProtoMsg = collHashedRwSet.toProtoMsg();
-            protoMsg.getCollectionHashedRwsetList().add(collHashedRwSetProtoMsg);
-        }
-        return protoMsg;
+        return builder.build();
     }
 }
