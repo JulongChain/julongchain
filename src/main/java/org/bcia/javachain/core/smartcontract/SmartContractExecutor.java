@@ -84,7 +84,7 @@ public class SmartContractExecutor {
         //TODO:SmartContractInput是否需要再处理?
 
         SmartcontractShim.SmartContractMessage scMessage = buildSmartContractMessage(msgType, scInput.toByteArray(),
-                scContext.getTxID(), scContext.getChainID(), scContext.getProposal());
+                scContext.getTxID(), scContext.getChainID(), scContext.getSignedProposal());
         //执行智能合约
         SmartcontractShim.SmartContractMessage responseMessage = scSupport.execute(scContext, scMessage, timeout);
 
@@ -132,7 +132,7 @@ public class SmartContractExecutor {
      * @param groupId 群组ID
      * @return
      */
-    private SmartcontractShim.SmartContractMessage buildSmartContractMessage(int msgType, byte[] payload, String txId, String groupId, ProposalPackage.Proposal proposal) {
+    private SmartcontractShim.SmartContractMessage buildSmartContractMessage(int msgType, byte[] payload, String txId, String groupId, ProposalPackage.SignedProposal signedProposal) {
 
         SmartcontractShim.SmartContractMessage.Builder scMessageBuilder = SmartcontractShim.SmartContractMessage
                 .newBuilder();
@@ -143,12 +143,12 @@ public class SmartContractExecutor {
         scMessageBuilder.setGroupId(groupId);
 
 
-        Common.GroupHeader groupHeader = Common.GroupHeader.newBuilder().setType(Common.HeaderType.ENDORSER_TRANSACTION.getNumber()).build();
-        Common.Header header = Common.Header.newBuilder().setGroupHeader(groupHeader.toByteString()).build();
+        // Common.GroupHeader groupHeader = Common.GroupHeader.newBuilder().setType(Common.HeaderType.ENDORSER_TRANSACTION.getNumber()).build();
+        // Common.Header header = Common.Header.newBuilder().setGroupHeader(groupHeader.toByteString()).build();
         // ProposalPackage.Proposal proposal = ProposalPackage.Proposal.newBuilder().setHeader(header
         //         .toByteString()).build();
-        ProposalPackage.SignedProposal signedProposal = ProposalPackage.SignedProposal.newBuilder()
-                .setProposalBytes(proposal.toByteString()).build();
+        // ProposalPackage.SignedProposal signedProposal = ProposalPackage.SignedProposal.newBuilder()
+        //         .setProposalBytes(proposal.toByteString()).build();
 
         scMessageBuilder.setProposal(signedProposal);
 
