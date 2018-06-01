@@ -73,8 +73,8 @@ public interface ISystemSmartContractProvider {
     IApplicationConfig getApplicationConfig(String groupId);
 
     /**
-     * Returns the policy manager associated to the passed channel
-     * and whether the policy manager exists
+     * Returns the policy getPolicyManager associated to the passed channel
+     * and whether the policy getPolicyManager exists
      * @param groupID
      * @return
      */

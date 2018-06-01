@@ -16,7 +16,7 @@
 
 package org.bcia.javachain.common.policycheck.bean;
 
-import org.bcia.javachain.common.policycheck.policies.IChannelPolicyManagerGetter;
+import org.bcia.javachain.common.policycheck.policies.IGroupPolicyManagerGetter;
 import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.protos.common.MspPrincipal;
 
@@ -28,16 +28,16 @@ import org.bcia.javachain.protos.common.MspPrincipal;
  * @company Aisino
  */
 public class PolicyChecker {
-    IChannelPolicyManagerGetter IChannelPolicyManagerGetter;
+    IGroupPolicyManagerGetter IGroupPolicyManagerGetter;
     IIdentity localMSP;
     MspPrincipal principalGetter;
 
-    public IChannelPolicyManagerGetter getIChannelPolicyManagerGetter() {
-        return IChannelPolicyManagerGetter;
+    public IGroupPolicyManagerGetter getIGroupPolicyManagerGetter() {
+        return IGroupPolicyManagerGetter;
     }
 
-    public void setIChannelPolicyManagerGetter(IChannelPolicyManagerGetter IChannelPolicyManagerGetter) {
-        this.IChannelPolicyManagerGetter = IChannelPolicyManagerGetter;
+    public void setIGroupPolicyManagerGetter(IGroupPolicyManagerGetter IGroupPolicyManagerGetter) {
+        this.IGroupPolicyManagerGetter = IGroupPolicyManagerGetter;
     }
 
     public IIdentity getLocalMSP() {

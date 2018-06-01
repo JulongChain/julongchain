@@ -17,6 +17,7 @@ package org.bcia.javachain.events.producer;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.exception.VerifyException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.Expiration;
@@ -64,7 +65,7 @@ public class EventHandler implements IEventHandler {
 
     @Override
     public EventsPackage.Event handleMessage(EventsPackage.SignedEvent signedEvent) throws
-            InvalidProtocolBufferException, ValidateException {
+            InvalidProtocolBufferException, ValidateException, VerifyException {
         EventsPackage.Event event = validateEventMessage(signedEvent);
         if (event.hasRegister()) {
             EventsPackage.Register eventRegister = event.getRegister();
@@ -126,7 +127,7 @@ public class EventHandler implements IEventHandler {
     }
 
     private EventsPackage.Event validateEventMessage(EventsPackage.SignedEvent signedEvent) throws
-            InvalidProtocolBufferException, ValidateException {
+            InvalidProtocolBufferException, ValidateException, VerifyException {
         ValidateUtils.isNotNull(signedEvent, "signedEvent can not be null");
         ValidateUtils.isNotNull(signedEvent.getEventBytes(), "event can not be null");
         ValidateUtils.isNotNull(signedEvent.getSignature(), "signature can not be null");

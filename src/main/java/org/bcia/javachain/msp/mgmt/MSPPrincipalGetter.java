@@ -28,11 +28,11 @@ import static org.bcia.javachain.msp.mgmt.GlobalMspManagement.getLocalMsp;
  * @date 4/2/18
  * @company Dingxuan
  */
-public class Principal implements IMspPrincipalGetter {
+public class MSPPrincipalGetter implements IMspPrincipalGetter {
     public static final String Admins = "Admins";
     public static final String Members = "Members";
 
-    public Principal() {
+    public MSPPrincipalGetter() {
     }
 
     @Override
@@ -59,7 +59,7 @@ public class Principal implements IMspPrincipalGetter {
                         .setPrincipal(ByteString.copyFrom(principalMemberBytes)).build();
                 return mspMembersPrincipal;
             default:
-                throw new MspException(String.format("MSP Principal role [%s] not recognized",role));
+                throw new MspException(String.format("MSP MSPPrincipalGetter role [%s] not recognized",role));
         }
     }
 }

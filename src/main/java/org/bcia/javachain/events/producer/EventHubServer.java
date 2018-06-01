@@ -18,6 +18,7 @@ package org.bcia.javachain.events.producer;
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.stub.StreamObserver;
 import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.exception.VerifyException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.node.EventsPackage;
@@ -60,6 +61,8 @@ public class EventHubServer implements IEventHubServer {
         } catch (InvalidProtocolBufferException e) {
             log.error(e.getMessage(), e);
         } catch (ValidateException e) {
+            log.error(e.getMessage(), e);
+        } catch (VerifyException e) {
             log.error(e.getMessage(), e);
         }
 

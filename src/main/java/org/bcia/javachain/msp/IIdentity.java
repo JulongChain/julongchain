@@ -15,6 +15,9 @@
  */
 package org.bcia.javachain.msp;
 
+import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.MspException;
+import org.bcia.javachain.common.exception.VerifyException;
 import org.bcia.javachain.msp.entity.OUIdentifier;
 import org.bcia.javachain.protos.common.MspPrincipal;
 
@@ -49,7 +52,7 @@ public interface IIdentity {
      * @param msg
      * @param sig
      */
-     void verify(byte[] msg, byte[] sig);
+     void verify(byte[] msg, byte[] sig) throws VerifyException;
 
     /**
      * 将身份转换为字节
@@ -64,5 +67,5 @@ public interface IIdentity {
      序列化身份）或可能需要MSP验证
      * @param principal
      */
-     void satisfiesPrincipal(MspPrincipal.MSPPrincipal principal);
+     void satisfiesPrincipal(MspPrincipal.MSPPrincipal principal) throws MspException;
 }

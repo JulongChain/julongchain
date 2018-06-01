@@ -28,7 +28,7 @@ public interface IPolicyManager {
     IPolicy getPolicy(String id);
 
     /**
-     * the sub-policy manager for a given path and whether it exists
+     * the sub-policy getPolicyManager for a given path and whether it exists
      *
      * @param path
      * @return

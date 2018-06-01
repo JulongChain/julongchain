@@ -19,26 +19,30 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.config.IConfig;
 import org.bcia.javachain.common.config.IConfigManager;
-import org.bcia.javachain.common.exception.EventException;
 import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.exception.SysSmartContractException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.policycheck.IPolicyChecker;
+import org.bcia.javachain.common.policycheck.PolicyChecker;
+import org.bcia.javachain.common.policycheck.policies.GroupPolicyManager;
+import org.bcia.javachain.common.policycheck.policies.Policy;
 import org.bcia.javachain.common.util.proto.BlockUtils;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
 import org.bcia.javachain.core.aclmgmt.resources.Resources;
 import org.bcia.javachain.core.node.ConfigFactory;
 import org.bcia.javachain.core.node.util.NodeUtils;
-import org.bcia.javachain.core.policy.IPolicyChecker;
-import org.bcia.javachain.core.policy.PolicyFactory;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
 import org.bcia.javachain.events.producer.BlockEvents;
 import org.bcia.javachain.events.producer.EventHelper;
-import org.bcia.javachain.msp.mgmt.Principal;
+import org.bcia.javachain.msp.IMsp;
+import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
+import org.bcia.javachain.msp.mgmt.MSPPrincipalGetter;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.node.ProposalPackage;
@@ -89,8 +93,9 @@ public class CSSC extends SystemSmartContractBase {
     @Override
     public SmartContractResponse init(ISmartContractStub stub) {
         log.info("Init CSSC");
-        policyChecker = PolicyFactory.getPolicyChecker();
-        configManager = ConfigFactory.getConfigManager();
+        IMsp localMSP = GlobalMspManagement.getLocalMsp();
+        policyChecker=new PolicyChecker(new GroupPolicyManager(),localMSP,new MSPPrincipalGetter());
+        configManager=ConfigFactory.getConfigManager();
         return newSuccessResponse();
     }
 
@@ -145,9 +150,9 @@ public class CSSC extends SystemSmartContractBase {
                 }
                 // 2. check local MSP Admins policy
                 try {
-                    policyChecker.checkPolicyNoGroup(Principal.Admins, sp);
-                } catch (JavaChainException e) {
-                    log.error(e.getMessage(), e);
+                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.Admins, sp);
+                } catch (PolicyException e) {
+                    log.error(e.getMessage());
                     return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check for group [%s]:%s", groupID, e.getMessage()));
                 }
                 return joinGroup(groupID, block);
@@ -181,9 +186,9 @@ public class CSSC extends SystemSmartContractBase {
                 // TODO: move to ACLProvider once it will support chainless ACLs
                 // 2. check local MSP Admins policy
                 try {
-                    policyChecker.checkPolicyNoGroup(Principal.Members, sp);
+                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.Members, sp);
                 } catch (JavaChainException e) {
-                    log.error(e.getMessage(), e);
+                    log.error(e.getMessage());
                     return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check :%s", e.getMessage()));
                 }
                 SmartContractResponse groups = getGroups();

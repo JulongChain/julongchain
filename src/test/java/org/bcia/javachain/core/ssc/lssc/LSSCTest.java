@@ -80,7 +80,13 @@ public class LSSCTest extends BaseJunit4Test {
         args0.add(ByteString.copyFromUtf8(LSSC.INSTALL));
         args0.add(ByteString.copyFrom(cdsBytes));
         Smartcontract.SmartContractSpec spec=Smartcontract.SmartContractSpec.newBuilder().build();
-        ProposalPackage.SignedProposal signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec, caller.getBytes(), "msg1".getBytes());
+        ProposalPackage.SignedProposal signedProp = null;
+        try {
+            signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec);
+        } catch (JavaChainException e) {
+            e.printStackTrace();
+            return;
+        }
         ISmartContract.SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
         //尚未完全实现调通全部逻辑，返回内部错误
 //        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
@@ -118,7 +124,13 @@ public class LSSCTest extends BaseJunit4Test {
         args0.add(ByteString.copyFromUtf8("test"));
         args0.add(ByteString.copyFrom(cdsBytes));
         Smartcontract.SmartContractSpec spec=Smartcontract.SmartContractSpec.newBuilder().build();
-        ProposalPackage.SignedProposal signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec, caller.getBytes(), "msg1".getBytes());
+        ProposalPackage.SignedProposal signedProp = null;
+        try {
+            signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec);
+        } catch (JavaChainException e) {
+            e.printStackTrace();
+            return;
+        }
 
         ISmartContract.SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
         //尚未完全实现调通全部逻辑，返回内部错误
@@ -155,7 +167,13 @@ public class LSSCTest extends BaseJunit4Test {
         args0.add(ByteString.copyFromUtf8("test"));
         args0.add(ByteString.copyFrom(cdsBytes));
         Smartcontract.SmartContractSpec spec=Smartcontract.SmartContractSpec.newBuilder().build();
-        ProposalPackage.SignedProposal signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec, caller.getBytes(), "msg1".getBytes());
+        ProposalPackage.SignedProposal signedProp = null;
+        try {
+            signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec);
+        } catch (JavaChainException e) {
+            e.printStackTrace();
+            return;
+        }
 
         ISmartContract.SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
         //尚未安全实现调通全部逻辑，返回内部错误
@@ -234,7 +252,13 @@ public class LSSCTest extends BaseJunit4Test {
         args0.add(ByteString.copyFromUtf8("test"));
 //        args0.add(ByteString.copyFrom(cdsBytes));
         Smartcontract.SmartContractSpec spec=Smartcontract.SmartContractSpec.newBuilder().build();
-        ProposalPackage.SignedProposal signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec, caller.getBytes(), "msg1".getBytes());
+        ProposalPackage.SignedProposal signedProp = null;
+        try {
+            signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec);
+        } catch (JavaChainException e) {
+            e.printStackTrace();
+            return;
+        }
 
         ISmartContract.SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
         //尚未安全实现调通全部逻辑，返回内部错误

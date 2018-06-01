@@ -19,8 +19,10 @@ import com.google.protobuf.ByteString;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.csp.factory.CspManager;
+import org.bcia.javachain.csp.gm.dxct.RngOpts;
 import org.bcia.javachain.csp.intfs.ICsp;
 import org.bcia.javachain.msp.ISigningIdentity;
+import org.bcia.javachain.msp.mspconfig.MspConfig;
 import org.bcia.javachain.node.entity.MockCrypto;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
@@ -188,13 +190,13 @@ public class ProposalUtils {
      * @return
      * @throws JavaChainException
      */
-    private static ProposalPackage.Proposal createSmartcontractProposalWithTransient
+    public static ProposalPackage.Proposal createSmartcontractProposalWithTransient
             (Common.HeaderType type, String groupID,
              Smartcontract.SmartContractInvocationSpec invocationSpec,
              byte[] creator,
              Map<String,byte[]> transientMap)
             throws JavaChainException {
-        byte[] nonce = MockCrypto.getRandomNonce();
+        byte[] nonce =CspManager.getDefaultCsp().rng(24,new RngOpts());
         String txID=ProposalUtils.computeProposalTxID(creator, nonce);
         return buildSmartContractProposal(type,groupID,txID,invocationSpec,nonce,creator,transientMap);
     }

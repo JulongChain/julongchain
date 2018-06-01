@@ -19,6 +19,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.exception.VerifyException;
 import org.bcia.javachain.common.groupconfig.capability.IApplicationCapabilities;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -163,7 +164,7 @@ public class MsgValidation {
      * @throws ValidateException
      */
     public static void checkSignature(byte[] signature, byte[] message, byte[] creator, String groupId) throws
-            ValidateException {
+            ValidateException, VerifyException {
         if (ArrayUtils.isEmpty(signature) || ArrayUtils.isEmpty(message) || ArrayUtils.isEmpty(creator)) {
             throw new ValidateException("Missing arguments");
         }
@@ -236,7 +237,7 @@ public class MsgValidation {
         try {
             MsgValidation.checkSignature(envelope.getSignature().toByteArray(), envelope.getPayload().toByteArray(),
                     signatureHeader.getCreator().toByteArray(), groupHeader.getGroupId());
-        } catch (ValidateException e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             return new Object[]{TransactionPackage.TxValidationCode.BAD_CREATOR_SIGNATURE};
         }

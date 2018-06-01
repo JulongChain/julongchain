@@ -1,5 +1,6 @@
 package org.bcia.javachain.msp.mgmt;
 
+import org.bcia.javachain.common.exception.VerifyException;
 import org.bcia.javachain.csp.factory.IFactoryOpts;
 import org.bcia.javachain.csp.gm.dxct.GmFactoryOpts;
 import org.bcia.javachain.msp.mspconfig.MspConfig;
@@ -19,7 +20,7 @@ import static org.bcia.javachain.msp.mspconfig.MspConfigFactory.loadMspConfig;
 public class GlobalMspManagementTest {
 
     @Test
-    public void loadLocalMspWithType() throws FileNotFoundException {
+    public void loadLocalMspWithType() throws FileNotFoundException, VerifyException {
         String localmspdir = "D:\\msp";
         String mspID = "DEFAULT";
         String mspType = "GMMSP";
@@ -44,7 +45,7 @@ public class GlobalMspManagementTest {
     }
 
     @Test
-    public void getLocalMsp() {
+    public void getLocalMsp() throws VerifyException {
         Identity signer = (Identity) GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
         byte[] signdata = signer.sign("123".getBytes());
         signer.verify("123".getBytes(), signdata);
