@@ -54,8 +54,8 @@ public class MspManager implements IMspManager {
         }
 
         for (IMsp msp: msps) {
-           String mspId= msp.getIdentifier();
-           mspsMap.put(mspId,msp);
+            String mspId= msp.getIdentifier();
+            mspsMap.put(mspId,msp);
         }
 
     }
@@ -68,12 +68,11 @@ public class MspManager implements IMspManager {
     @Override
     public IIdentity deserializeIdentity(byte[] serializedID) {
         try {
-            serializedID = new byte[]{30, 23, 56, 98, 45};
             Identities.SerializedIdentity sId = Identities.SerializedIdentity.parseFrom(serializedID);
-           // TODO 暂时先用getlocalmsp获取，之后需要通过id获取
+            // TODO 暂时先用getlocalmsp获取，之后需要通过id获取
             IMsp msp = getMSPs().get(sId.getMspid());
             //IMsp msp=GlobalMspManagement.getLocalMsp();
-           // return msp.deserializeIdentity(sId.getIdBytes().toByteArray());
+            // return msp.deserializeIdentity(sId.getIdBytes().toByteArray());
             return msp.deserializeIdentity(serializedID);
         } catch (Exception e) {
             e.printStackTrace();
