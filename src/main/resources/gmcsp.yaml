@@ -17,7 +17,7 @@ node:
                 #publicKeyStore: D:\msp\keystore\publickey.pem
                 publicKeyStore: /opt/msp/keystore/publickey.pem
                 #privateKeyStore: D:\msp\keystore\privatekey.pem
-                privateKeyStore: /opt/msp/keystore/publickey.pem
+                privateKeyStore: /opt/msp/keystore/privatekey.pem
     # Path on the file system where node will find MSP local configurations
     #mspConfigPath: D:\msp
     mspConfigPath: /opt/msp
