@@ -10,6 +10,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.util.JsonFormat;
 import io.grpc.ManagedChannel;
 import io.grpc.stub.StreamObserver;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
@@ -80,7 +81,13 @@ public class ChatStream implements StreamObserver<SmartcontractShim.SmartContrac
 
 	static String toJsonString(SmartcontractShim.SmartContractMessage message) {
 		try {
-			return JsonFormat.printer().print(message);
+			String result =  JsonFormat.printer().print(message);
+			int start = 0;
+			int end = result.length();
+			if(end > 100) {
+				end = 100;
+			}
+      return StringUtils.substring(result, start, end);
 		} catch (InvalidProtocolBufferException e) {
 			return String.format("{ Type: %s, TxId: %s }", message.getType(), message.getTxid());
 		}
