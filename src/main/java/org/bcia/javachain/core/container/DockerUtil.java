@@ -69,7 +69,7 @@ public class DockerUtil {
   private static final String JAR_PATH =
       "/var/lib/jenkins/workspace/" + BUILD_NAME + "/target/javachain-jar-with-dependencies.jar";
 
-  private static DockerClient getDockerClient() {
+  public static DockerClient getDockerClient() {
     DockerClient dockerClient =
         DockerClientBuilder.getInstance("tcp://" + DOCKER_HOST_IP + ":" + DOCKER_HOST_PORT).build();
     return dockerClient;
@@ -115,6 +115,14 @@ public class DockerUtil {
     logger.info("build image success, imageId:" + imageId);
 
     return imageId;
+  }
+
+  public void test(){
+
+  }
+
+  public void aaa(){
+
   }
 
   /**
@@ -178,7 +186,7 @@ public class DockerUtil {
     String containerId =
         getDockerClient()
             .createContainerCmd(imageId)
-            .withName("mycc")
+            .withName(containerName)
             .withCmd("/bin/sh", "-c", "java -jar /root/javachain/target/javachain-smartcontract-java-jar-with-dependencies.jar -i mycc")
             .exec()
             .getId();

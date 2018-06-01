@@ -95,8 +95,7 @@ public class LSSC  extends SystemSmartContractBase {
     public final static String allowedCharsSmartContractName="[A-Za-z0-9_-]+";
     public final static String allowedCharsVersion="[A-Za-z0-9_.+-]+";
 
-    @Autowired
-    private LsscSupport support;
+    private LsscSupport support = new LsscSupport();
     // sscprovider is the interface with which we call
     // methods of the system smartcontract package without
     // import cycles
@@ -187,10 +186,10 @@ public class LSSC  extends SystemSmartContractBase {
                 }
                 //the maximum number of arguments depends on the capability of the group
                 // TODO: 5/21/18  ac.getCapabilities() == null
-                if((ac.getCapabilities().isPrivateGroupData()==false && size>6) ||
-                        (ac.getCapabilities().isPrivateGroupData()==true && size>7)){
-                    return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
-                }
+                // if((ac.getCapabilities().isPrivateGroupData()==false && size>6) ||
+                //         (ac.getCapabilities().isPrivateGroupData()==true && size>7)){
+                //     return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
+                // }
                 byte[] depSpecBytes2=args.get(2);
                 Smartcontract.SmartContractDeploymentSpec spec=null;
                 try {
@@ -233,7 +232,7 @@ public class LSSC  extends SystemSmartContractBase {
                 // we proceed with a non-nil collection configuration only if
                 // we support the PrivateChannelData capability
                 // TODO: 5/21/18  ac.getCapabilities() == null
-                if(ac.getCapabilities().isPrivateGroupData()==true  && size>6){
+                if(size > 6 && ac.getCapabilities().isPrivateGroupData()==true){
                     collectionsConfig=args.get(6);
                 }
 
@@ -750,7 +749,7 @@ public class LSSC  extends SystemSmartContractBase {
     )throws SysSmartContractException{
         //just test for existence of the smartcontract in the LSSC
         byte[] instanceBytes=getSmartContractInstance(stub, scds.getSmartContractSpec().getSmartContractId().getName());
-        if(instanceBytes!=null){
+        if(instanceBytes!=null && instanceBytes.length>0){
             String msg=String.format("The smartcontract %s has existed",scds.getSmartContractSpec().getSmartContractId().getName());
             throw new SysSmartContractException(msg);
         }
