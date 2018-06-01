@@ -64,34 +64,36 @@ public class KeysStore {
     }
 
     public static void storeKey(String path, byte[] pwd, IKey key, int keyType) {
-        String fileName = getFileNameByType(key.ski(), keyType);
-        String pemObjectType = getPemObjectByType(keyType);
-
-        String fullPath = fileName;
-        if(null != path && !"".equals(path)) {
-            File dir = new File(path);
-            if(!dir.exists()) {
-                dir.mkdirs();
-            }
-            fullPath = path + File.separator + fullPath;
-        }
-        PemObject pemObject = null;
-        byte[] keyContent = key.toBytes();
-        //如果输入口令 则对密钥文件内容进行加密
-        if(null != pwd && !"".equals(pwd)) {
-            byte[] iv = gmRandom.rng(Constants.SM4_IV_LEN);
-            byte[] cipherKey = deriveKey(pwd, iv);
-            byte[] cipherContent = sm4.encryptCBC(keyContent, cipherKey, iv);
-            byte[] content = new byte[Constants.SM4_IV_LEN+cipherContent.length];
-            System.arraycopy(iv, 0, content, 0, Constants.SM4_IV_LEN);
-            System.arraycopy(cipherContent, 0, content, Constants.SM4_IV_LEN, cipherContent.length);
-            pemObject = new PemObject(pemObjectType, content);
-        } else {
-            pemObject = new PemObject(pemObjectType, keyContent);
-        }
-        StringWriter str = new StringWriter();
-        PemWriter pemWriter = new PemWriter(str);
         try {
+            String fileName = getFileNameByType(key.ski(), keyType);
+            String pemObjectType = getPemObjectByType(keyType);
+
+            String fullPath = fileName;
+            if(null != path && !"".equals(path)) {
+                File dir = new File(path);
+                if(!dir.exists()) {
+                    dir.mkdirs();
+                }
+                fullPath = path + File.separator + fullPath;
+            }
+
+            PemObject pemObject = null;
+            byte[] keyContent = key.toBytes();
+            //如果输入口令 则对密钥文件内容进行加密
+            if(null != pwd && !"".equals(pwd)) {
+                byte[] iv = gmRandom.rng(Constants.SM4_IV_LEN);
+                byte[] cipherKey = deriveKey(pwd, iv);
+                byte[] cipherContent = sm4.encryptCBC(keyContent, cipherKey, iv);
+                byte[] content = new byte[Constants.SM4_IV_LEN+cipherContent.length];
+                System.arraycopy(iv, 0, content, 0, Constants.SM4_IV_LEN);
+                System.arraycopy(cipherContent, 0, content, Constants.SM4_IV_LEN, cipherContent.length);
+                pemObject = new PemObject(pemObjectType, content);
+            } else {
+                pemObject = new PemObject(pemObjectType, keyContent);
+            }
+
+            StringWriter str = new StringWriter();
+            PemWriter pemWriter = new PemWriter(str);
             pemWriter.writeObject(pemObject);
             pemWriter.close();
             str.close();
@@ -99,8 +101,9 @@ public class KeysStore {
             String keyString = new String(str.toString());
             pw.print(keyString);
             pw.close();
-
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -152,13 +155,18 @@ public class KeysStore {
     }
 
     private static byte[] deriveKey(byte[] pwd, byte[] iv) {
-        byte[] pwdBuf = new byte[pwd.length+8];
-        System.arraycopy(pwd, 0, pwdBuf, 0, pwd.length);
-        System.arraycopy(iv, 0, pwdBuf, pwd.length, 8);
-        byte[] hash = sm3.hash(pwdBuf);
-        byte[] cipherKey = new byte[Constants.SM4_KEY_LEN];
-        System.arraycopy(hash, 0, cipherKey, 0, Constants.SM4_KEY_LEN);
-        return cipherKey;
+        try {
+            byte[] pwdBuf = new byte[pwd.length+8];
+            System.arraycopy(pwd, 0, pwdBuf, 0, pwd.length);
+            System.arraycopy(iv, 0, pwdBuf, pwd.length, 8);
+            byte[] hash = sm3.hash(pwdBuf);
+            byte[] cipherKey = new byte[Constants.SM4_KEY_LEN];
+            System.arraycopy(hash, 0, cipherKey, 0, Constants.SM4_KEY_LEN);
+            return cipherKey;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     private static String getFileNameByType(byte[] ski, int keyType) {

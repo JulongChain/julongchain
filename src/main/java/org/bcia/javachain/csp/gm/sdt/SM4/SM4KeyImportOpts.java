@@ -26,10 +26,10 @@ import org.bcia.javachain.csp.intfs.opts.IKeyImportOpts;
  */
 public class SM4KeyImportOpts implements IKeyImportOpts {
 
-    private boolean isEphemeral;
+    private boolean ephemeral;
 
-    public SM4KeyImportOpts(boolean isEphemeral) {
-        this.isEphemeral=isEphemeral;
+    public SM4KeyImportOpts(boolean ephemeral) {
+        this.ephemeral = ephemeral;
     }
 
     @Override
@@ -39,6 +39,6 @@ public class SM4KeyImportOpts implements IKeyImportOpts {
 
     @Override
     public boolean isEphemeral() {
-        return isEphemeral;
+        return ephemeral;
     }
 }

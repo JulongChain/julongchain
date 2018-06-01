@@ -16,6 +16,7 @@
 package org.bcia.javachain.csp.gm.sdt;
 
 
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.util.Convert;
 import org.bcia.javachain.csp.gm.sdt.SM2.SM2;
 import org.bcia.javachain.csp.gm.sdt.SM2.SM2KeyPair;
@@ -89,10 +90,19 @@ public class SM2Test {
         byte[] msg = {(byte) 0xF1, (byte) 0x5D, (byte) 0x12, (byte) 0x7A, (byte) 0x02, (byte) 0xBC, (byte) 0x65, (byte) 0x89,
                 (byte) 0x60, (byte) 0xA0, (byte) 0x71, (byte) 0x6B, (byte) 0x3F, (byte) 0x8E, (byte) 0x3C, (byte) 0xA1};
 
-        SM2KeyPair keyPair = sm2.generateKeyPair();
-        byte[] hash = sm3.hash(msg);
+        SM2KeyPair keyPair = null;
+        byte[] hash = null;
         byte[] signData = null;
         int verifyResult = 1;
+
+        try {
+            keyPair= sm2.generateKeyPair();
+            hash = sm3.hash(msg);
+        } catch (Exception e) {
+            System.out.println("generate SM2 key pair and hash data error.");
+            return;
+        }
+
 
         byte[] hash0 = new byte[0];
         byte[] hash31 = new byte[31];
@@ -115,7 +125,13 @@ public class SM2Test {
         System.arraycopy(keyPair.getPublicKey(), 0, pk65, 0, 64);
         pk65[64] = (byte)0x89;
 
-        signData = sm2.sign(hash, keyPair.getPrivateKey());
+        try {
+            signData = sm2.sign(hash, keyPair.getPrivateKey());
+        } catch (Exception e) {
+            System.out.println("sign data error.");
+            return;
+        }
+
         byte[] signData0 = new byte[0];
         byte[] signData63 = new byte[63];
         System.arraycopy(signData, 0, signData63, 0, 63);
@@ -189,7 +205,12 @@ public class SM2Test {
             System.out.println("Exception: " + e.getMessage());
         }
 
-        signData = sm2.sign(hash, keyPair.getPrivateKey());
+        try {
+            signData = sm2.sign(hash, keyPair.getPrivateKey());
+        } catch (Exception e) {
+            System.out.println("sign data error.");
+            return;
+        }
 
         try {
             System.out.println("\n===== case B-"+ caseIndex++ +" :  SM2 verify hash is null");

@@ -26,7 +26,7 @@ import org.bcia.javachain.csp.intfs.opts.IHashOpts;
  */
 public class SM3HashOpts implements IHashOpts {
 
-    public SM3HashOpts(){}
+    public SM3HashOpts() {}
 
     @Override
     public String getAlgorithm() {
