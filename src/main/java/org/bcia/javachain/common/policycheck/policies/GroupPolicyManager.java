@@ -18,9 +18,9 @@ package org.bcia.javachain.common.policycheck.policies;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.PolicyException;
-import org.bcia.javachain.common.policies.IPolicyProvider;
-import org.bcia.javachain.common.policies.PolicyConstant;
-import org.bcia.javachain.common.policies.PolicyManager;
+import org.bcia.javachain.common.policies.*;
+import org.bcia.javachain.consenter.common.multigroup.ChainSupport;
+import org.bcia.javachain.consenter.consensus.IChain;
 import org.bcia.javachain.protos.common.Configtx;
 
 import java.util.HashMap;
@@ -35,7 +35,9 @@ import java.util.Map;
  */
 public class GroupPolicyManager implements IGroupPolicyManagerGetter {
     @Override
-    public PolicyManager getPolicyManager(String channelID) throws InvalidProtocolBufferException, PolicyException {
+    public PolicyManager getPolicyManager(String groupId) throws InvalidProtocolBufferException, PolicyException {
+
+
         Map<Integer, IPolicyProvider> providers = new HashMap<Integer, IPolicyProvider>();
         Configtx.ConfigTree rootTree = Configtx.ConfigTree.getDefaultInstance();
         return new PolicyManager(PolicyConstant.GROUP_APP_ADMINS,providers,rootTree);

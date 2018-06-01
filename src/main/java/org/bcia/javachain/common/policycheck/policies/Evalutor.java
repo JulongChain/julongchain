@@ -16,6 +16,7 @@
 
 package org.bcia.javachain.common.policycheck.policies;
 
+import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.proto.SignedData;
@@ -49,10 +50,10 @@ public class Evalutor implements IEvalutor{
     }
 
     @Override
-    public boolean evalutor(List<SignedData> signedDatas, Boolean[] used) {
+    public boolean evalutor(List<SignedData> signedDatas, Boolean[] used) throws PolicyException {
         if(policy.getTypeCase().getNumber() == 2){
             Long grepKey = new Date().getTime();
-            log.debug(signedDatas+"gate"+grepKey+" evaluation starts");
+            log.debug("[%s] gate [%s] evaluation starts",signedDatas,grepKey);
             int verified = 0;
             Boolean[] _used = new Boolean[used.length];
             for(int i = 0; i < policies.size(); i++){
@@ -64,18 +65,18 @@ public class Evalutor implements IEvalutor{
             }
             int N = policy.getNOutOf().getN();
             if(verified >= N){
-                log.info(signedDatas+"gate"+ grepKey+"evaluation succeeds");
+                log.debug("[%p] gate [%s] evaluation succeeds",signedDatas,grepKey);
             }else{
-                log.info(signedDatas+"gate"+ grepKey+"evaluation  fails");
+                log.debug("[%p] gate [%s] evaluation  fails",signedDatas,grepKey);
             }
             return verified >= N;
         }
         else{
-            log.debug(signedDatas+"signed by "+policy.getSignedBy()+" principal evaluation starts (used %v)");
+            log.debug("[%p] signed by [%d] principal evaluation starts (used %v)",signedDatas,policy.getSignedBy(),used);
 
             for(int i=0;i<signedDatas.size();i++){
                 if(used[i]){
-                    log.info(signedDatas.get(i)+"skipping identity"+i+"because it has already been used");
+                    log.debug("[%p] skipping identity [%d] because it has already been used", signedDatas, i);
                     continue;
                 }
                 // identity, err := deserializer.DeserializeIdentity(sd.Identity)
@@ -83,20 +84,23 @@ public class Evalutor implements IEvalutor{
                 try {
                     iIdentity = deserializer.deserializeIdentity(signedDatas.get(i).getIdentity());
                 }catch (Exception e){
-                    log.info("Principal deserialization failure  for identity "+signedDatas.get(i).getIdentity());
+                    String msg=String.format("Principal deserialization failure  %s for [%s]",e.getMessage(),signedDatas.get(i).getIdentity());
+                    throw new PolicyException(msg);
                 }
                 try {
                     iIdentity.satisfiesPrincipal(signedByID);
                 }catch (Exception e){
-                    log.info(signedDatas+"identity %d does not satisfy principal: "+i);
+                    String msg=String.format("%p identity %d does not satisfy principal: %s",signedDatas,i,e.getMessage());
+                    throw new PolicyException(msg);
                 }
-                log.debug(signedDatas+" principal matched by identity "+i);
+                log.debug("%p principal matched by identity %d",signedDatas,i);
                 try {
                     iIdentity.verify(signedDatas.get(i).getData(),signedDatas.get(i).getSignature());
                 }catch (Exception e){
-                    log.info(signedDatas+"signature for identity "+i+" is invalid: ");
+                    String msg=String.format("%p signature for identity %d is invalid: %s",signedDatas,i,e.getMessage());
+                    throw new PolicyException(msg);
                 }
-                log.debug(signedDatas+" principal evaluation succeeds for identity "+i);
+                log.debug("%p principal evaluation succeeds for identity %d",signedDatas,i);
                 used[i] = true;
                 return true;
             }

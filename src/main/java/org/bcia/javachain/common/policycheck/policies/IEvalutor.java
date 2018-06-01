@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.common.policycheck.policies;
 
+import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.util.proto.SignedData;
 
 import java.util.List;
@@ -27,5 +28,5 @@ import java.util.List;
  * @company Aisino
  */
 public interface IEvalutor {
-    boolean evalutor(List<SignedData> signedDatas,Boolean[] bool);
+    boolean evalutor(List<SignedData> signedDatas,Boolean[] bool) throws PolicyException;
 }

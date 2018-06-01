@@ -16,6 +16,7 @@
 
 package org.bcia.javachain.common.policycheck.cauthdsl;
 
+import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policycheck.policies.Evalutor;
@@ -23,6 +24,9 @@ import org.bcia.javachain.common.policycheck.policies.IEvalutor;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.msp.IIdentity;
 import org.bcia.javachain.msp.IIdentityDeserializer;
+
+import org.bcia.javachain.msp.entity.IdentityIdentifier;
+import org.bcia.javachain.msp.mgmt.Identity;
 import org.bcia.javachain.protos.common.MspPrincipal;
 import org.bcia.javachain.protos.common.Policies;
 
@@ -45,14 +49,20 @@ public class CAuthDsl {
      * @param signedDatas
      * @return
      */
-    public static List<SignedData> deduplicate(List<SignedData> signedDatas, IIdentityDeserializer deserializer){
+    public static List<SignedData> deduplicate(List<SignedData> signedDatas, IIdentityDeserializer deserializer) throws PolicyException {
         Map<String,Object> ids = new HashMap<String,Object>();
         List<SignedData> result = new ArrayList<SignedData>();
         for(int i=0;i<signedDatas.size();i++){
-            IIdentity identity = deserializer.deserializeIdentity(signedDatas.get(i).getIdentity());
-            String key = identity.getMSPIdentifier();
+            Identity identity = null;
+            try {
+                identity = (Identity) deserializer.deserializeIdentity(signedDatas.get(i).getIdentity());
+            }catch (Exception e){
+                String msg=String.format("Principal deserialization failure  %s for [%s]",e.getMessage(),signedDatas.get(i).getIdentity());
+                throw new PolicyException(msg);
+            }
+            String key = identity.identityIdentifier.Mspid+identity.identityIdentifier.Id;
             if(ids.get(key) != null){
-                log.warn("De-duplicating identity "+identity+" at index "+i+" in signature set");
+                log.warn("De-duplicating identity [%s] at index [%s] in signature set",signedDatas.get(i).getIdentity(),i);
             }else{
                 result.add(signedDatas.get(i));
                 ids.put(key,null);
@@ -63,7 +73,7 @@ public class CAuthDsl {
 
     public static IEvalutor compile(Policies.SignaturePolicy policy, List<MspPrincipal.MSPPrincipal> identities, IIdentityDeserializer deserializer){
         if(policy == null){
-            log.info("Empty policy element");
+            log.error("Empty policy element");
         }
         switch (policy.getTypeCase()) {
             case N_OUT_OF:
@@ -77,12 +87,12 @@ public class CAuthDsl {
                 return new Evalutor(polices,policy,deserializer,null);
             case SIGNED_BY:
                 if(policy.getSignedBy() < 0 || policy.getSignedBy()>identities.size()){
-                    log.info("identity index out of range, requested "+policy.getSignedBy()+", but identies length is"+identities.size());
+                    log.error("identity index out of range, requested [%s], but identies length is [%s]",policy.getSignedBy(),identities.size());
                 }
                 MspPrincipal.MSPPrincipal signedByID = identities.get(policy.getSignedBy());
                 return new Evalutor(null,policy,deserializer,signedByID);
             default:
-                log.error("Unknown type");
+                log.error("Unknown type : [%s]",policy);
                 return null;
 
         }
