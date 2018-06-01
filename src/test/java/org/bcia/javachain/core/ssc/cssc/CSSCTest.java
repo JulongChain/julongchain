@@ -88,14 +88,14 @@ public class CSSCTest extends BaseJunit4Test {
         args0.add(ByteString.copyFromUtf8(CSSC.JOIN_GROUP));
         args0.add(ByteString.copyFrom(blockBytes));
         ISmartContract.SmartContractResponse res = mockStub.mockInvoke("0", args0);
-        //2018年5月30日,org.bcia.javachain.common.policies.PolicyManager.<init>(PolicyManager.java:72),java.lang.NullPointerException
-        //加入组失败,等航天信息更改后,执行后续代码
+        //已调通，20180530
         assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
 
         List<ByteString> args1 = new LinkedList<ByteString>();
         args1.add(ByteString.copyFromUtf8(CSSC.GET_CONFIG_BLOCK));
         args1.add(ByteString.copyFromUtf8("mytestchainid"));
         ISmartContract.SmartContractResponse res1 = mockStub.mockInvoke("1", args1);
+        //未调通，20180530，Group.java的getBlock()返回空值
         assertThat(res1.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
         try {
             Common.Block block = Common.Block.parseFrom(res1.getPayload());

@@ -15,6 +15,10 @@
  */
 package org.bcia.javachain.consenter.common.msgprocessor;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.ConsenterException;
+import org.bcia.javachain.common.exception.PolicyException;
+import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.protos.common.Common;
 
 /**
@@ -24,5 +28,5 @@ import org.bcia.javachain.protos.common.Common;
  */
 public interface IRule {
     // Apply applies the rule to the given Envelope, either successfully or returns error
-    void apply(Common.Envelope message);
+    void apply(Common.Envelope message) throws ConsenterException;
 }

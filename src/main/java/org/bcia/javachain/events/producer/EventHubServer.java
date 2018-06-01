@@ -16,13 +16,14 @@
 package org.bcia.javachain.events.producer;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import io.grpc.stub.StreamObserver;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.node.EventsPackage;
 
 /**
- * 对象
+ * 事件中心服务
  *
  * @author zhouhui
  * @date 2018/3/20
@@ -30,15 +31,31 @@ import org.bcia.javachain.protos.node.EventsPackage;
  */
 public class EventHubServer implements IEventHubServer {
     private static JavaChainLog log = JavaChainLogFactory.getLog(EventHubServer.class);
+    private IEventProcessor eventProcessor;
+
+    public interface Callback {
+        void sendMessage(EventsPackage.Event event);
+    }
 
     public EventHubServer(EventsServerConfig config) {
-        EventProcessor eventProcessor = new EventProcessor(config);
+        eventProcessor = EventProcessor.getInstance(config);
     }
 
     @Override
-    public EventsPackage.Event chat(EventsPackage.SignedEvent signedEvent) {
-        IEventHandler eventHandler = new EventHandler();
+    public EventsPackage.Event chat(EventsPackage.SignedEvent signedEvent, StreamObserver<EventsPackage.Event>
+            responseObserver) {
+        IEventHandler eventHandler = new EventHandler(eventProcessor, new Callback() {
+            @Override
+            public void sendMessage(EventsPackage.Event event) {
+                //往客户端发送一个消息
+                if (responseObserver != null) {
+                    responseObserver.onNext(event);
+                }
+            }
+        });
+
         try {
+            //处理消息，其实是客户端向服务器注册订阅某一类消息
             return eventHandler.handleMessage(signedEvent);
         } catch (InvalidProtocolBufferException e) {
             log.error(e.getMessage(), e);

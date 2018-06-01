@@ -30,5 +30,5 @@ public interface ISignerOpts extends IAlgorithmOpts {
 
     // The hashFunc returns an identifier for the hash function used to produce a digest for signing,
     // or else zero to indicate that no hashing was done.
-    IHash hashFunc();
+    String hashFunc();
 }

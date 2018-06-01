@@ -15,96 +15,119 @@
  */
 package org.bcia.javachain.consenter.common.msgprocessor;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.ConsenterException;
+import org.bcia.javachain.common.exception.PolicyException;
+import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
-import org.bcia.javachain.common.localmsp.ILocalSigner;
+import org.bcia.javachain.common.groupconfig.config.IConsenterConfig;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.consenter.common.multigroup.IStandardGroupSupport;
+import org.bcia.javachain.common.policycheck.policies.Policy;
+import org.bcia.javachain.common.util.proto.TxUtils;
+import org.bcia.javachain.consenter.consensus.IProcessor;
 import org.bcia.javachain.consenter.entity.ConfigMsg;
 import org.bcia.javachain.consenter.util.CommonUtils;
-import org.bcia.javachain.consenter.util.TxUtils;
+import org.bcia.javachain.consenter.util.Constant;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author zhangmingyang
  * @Date: 2018/5/18
  * @company Dingxuan
  */
-public class StandardGroup implements IStandardGroupSupport, org.bcia.javachain.consenter.consensus.IProcessor {
+public class StandardGroup implements IProcessor {
     private static JavaChainLog log = JavaChainLogFactory.getLog(StandardGroup.class);
-    private final static int MSGVERSION = 0;
-    private final static int EPOCH = 0;
-    IStandardGroupSupport support;
 
-    IRule[] filters;
+    private IStandardGroupSupport standardGroupSupport;
 
-    public StandardGroup(IStandardGroupSupport support, IRule[] filters) {
-        this.support = support;
+    private RuleSet filters;
+
+    public StandardGroup() {
+    }
+
+    public StandardGroup(IStandardGroupSupport standardGroupSupport, RuleSet filters) {
+        this.standardGroupSupport = standardGroupSupport;
         this.filters = filters;
     }
 
-    public IRule[] createStandardChannelFilters(IGroupConfigBundle filterSupport) {
-        //filterSupport.getGroupConfig();
-        return null;
-    }
-
-    @Override
-    public long sequence() {
-        return 0;
-    }
-
-    @Override
-    public String chainId() {
-        return null;
-    }
-
-    @Override
-    public ILocalSigner signer() {
-        return null;
-    }
-
-    @Override
-    public Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx) {
-        return null;
+    public RuleSet createStandardGroupFilters(IGroupConfigBundle filterSupport) {
+        IConsenterConfig consenterConfig = filterSupport.getGroupConfig().getConsenterConfig();
+        if (consenterConfig == null) {
+            try {
+                throw new ConsenterException("Missing Consenter config");
+            } catch (ConsenterException e) {
+                log.error(e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        //TODO EmptyRejectRule 待确定是否为无参构函数
+          filters =new RuleSet(new IRule[]{new EmptyRejectRule(), new ExpirationRejectRule(filterSupport), new SizeFilter(consenterConfig), new SigFilter(Policy.ChannelWriters, filterSupport.getPolicyManager())});
+        return filters;
     }
 
     @Override
     public boolean classfiyMsg(Common.GroupHeader chdr) {
-        switch (chdr.getType()) {
-            case Common.HeaderType.CONFIG_UPDATE_VALUE:
-                break;
+        //配置类型返回true
+        if (Common.HeaderType.CONFIG_VALUE == chdr.getType()) {
+            return true;
+        } else if (Common.HeaderType.CONFIG_UPDATE_VALUE == chdr.getType()) {
+            return true;
+        } else if (Common.HeaderType.CONSENTER_TRANSACTION_VALUE == chdr.getType()) {
+            return true;
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     @Override
     public long processNormalMsg(Common.Envelope env) {
-        long configSeq = support.sequence();
+        long configSeq = standardGroupSupport.sequence();
         return configSeq;
     }
 
     @Override
-    public Object processConfigUpdateMsg(Common.Envelope env) {
-
-        long seq = support.sequence();
+    public Object processConfigUpdateMsg(Common.Envelope env) throws InvalidProtocolBufferException, ValidateException, PolicyException {
+        long seq = standardGroupSupport.sequence();
         //TODO 通过apply过滤
-        Configtx.ConfigEnvelope configEnvelope = support.proposeConfigUpdate(env);
-
+        Configtx.ConfigEnvelope configEnvelope = standardGroupSupport.proposeConfigUpdate(env);
         int headerType = 0;
-        Common.Envelope config = TxUtils.createSignedEnvelope(headerType, support.chainId(), support.signer(), configEnvelope, MSGVERSION, EPOCH);
-
-        return new ConfigMsg(config,seq);
+        Common.Envelope config = TxUtils.createSignedEnvelope(headerType, standardGroupSupport.groupId(), standardGroupSupport.signer(), configEnvelope, Constant.MSGVERSION, Constant.EPOCH);
+        return new ConfigMsg(config, seq);
     }
 
     @Override
-    public Object processConfigMsg(Common.Envelope env) {
+    public Object processConfigMsg(Common.Envelope env) throws InvalidProtocolBufferException, ValidateException, PolicyException {
         Configtx.ConfigEnvelope configEnvelope = null;
         CommonUtils.unmarshalEnvelopeOfType(env, Common.HeaderType.CONFIG, configEnvelope);
-        return null;
+        //根据Envelope中groupHeader中的type,将data转换为ConfigEnvelop
+        try {
+            Common.GroupHeader groupHeader = Common.GroupHeader.parseFrom(env.getPayload().toByteArray());
+            if (groupHeader.getType() == Common.HeaderType.CONFIG_VALUE) {
+                Common.Payload payload = Common.Payload.parseFrom(env.getPayload().toByteArray());
+                configEnvelope = Configtx.ConfigEnvelope.parseFrom(payload.getData());
+            }
+        } catch (InvalidProtocolBufferException e) {
+            log.error(e.getMessage());
+            e.printStackTrace();
+        }
+        return processConfigUpdateMsg(configEnvelope.getLastUpdate());
+    }
+
+    public IStandardGroupSupport getSupport() {
+        return standardGroupSupport;
+    }
+
+    public void setSupport(IStandardGroupSupport support) {
+        this.standardGroupSupport = support;
+    }
+
+    public RuleSet getFilters() {
+        return filters;
+    }
+
+    public void setFilters(RuleSet filters) {
+        this.filters = filters;
     }
 }

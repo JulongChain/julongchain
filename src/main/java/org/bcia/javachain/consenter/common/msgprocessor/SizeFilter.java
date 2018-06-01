@@ -15,11 +15,44 @@
  */
 package org.bcia.javachain.consenter.common.msgprocessor;
 
+import org.bcia.javachain.common.exception.ConsenterException;
+import org.bcia.javachain.common.groupconfig.config.IConsenterConfig;
+import org.bcia.javachain.common.groupconfig.config.IGroupConfig;
+import org.bcia.javachain.protos.common.Common;
+
 /**
  * @author zhangmingyang
  * @Date: 2018/5/18
  * @company Dingxuan
  */
-public class SizeFilter {
+public class SizeFilter implements IRule {
+    private IConsenterConfig support;
 
+    public SizeFilter(IConsenterConfig support) {
+        this.support = support;
+    }
+
+    public IConsenterConfig getSupport() {
+        return support;
+    }
+
+    public void setSupport(IConsenterConfig support) {
+        this.support = support;
+    }
+    @Override
+    public void apply(Common.Envelope message) {
+       int maxBytes= support.getBatchSize().getAbsoluteMaxBytes();
+          int size=  messageByteSize(message);
+        if (size>maxBytes){
+            try {
+                throw new ConsenterException(String.format("message payload is %d bytes and exceeds maximum allowed %d bytes", size, maxBytes));
+            } catch (ConsenterException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static int messageByteSize(Common.Envelope message){
+        return message.getPayload().size()+message.getSignature().size();
+    }
 }

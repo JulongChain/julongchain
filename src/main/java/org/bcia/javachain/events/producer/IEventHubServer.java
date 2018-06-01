@@ -15,7 +15,10 @@
  */
 package org.bcia.javachain.events.producer;
 
-import org.bcia.javachain.protos.node.EventsPackage; /**
+import io.grpc.stub.StreamObserver;
+import org.bcia.javachain.protos.node.EventsPackage;
+
+/**
  * 对象
  *
  * @author zhouhui
@@ -25,9 +28,10 @@ import org.bcia.javachain.protos.node.EventsPackage; /**
 public interface IEventHubServer {
     /**
      * 通讯
+     *
      * @param value
      * @return
      */
-    EventsPackage.Event chat(EventsPackage.SignedEvent value);
+    EventsPackage.Event chat(EventsPackage.SignedEvent value, StreamObserver<EventsPackage.Event> responseObserver);
 
 }

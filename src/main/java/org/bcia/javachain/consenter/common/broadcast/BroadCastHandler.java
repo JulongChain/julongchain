@@ -25,6 +25,8 @@ import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.consenter.Ab;
 import org.springframework.stereotype.Component;
 
+import java.util.concurrent.LinkedBlockingQueue;
+
 import static org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory.loadGenesisConfig;
 
 /**
@@ -48,7 +50,8 @@ public class BroadCastHandler {
         //解析处理消息,获取消息head,是否为配置消息,
         Common.Payload payload = Common.Payload.parseFrom(envelope.getPayload());
         Common.GroupHeader groupHeader = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
-
+        LinkedBlockingQueue<Common.Envelope> queue = new LinkedBlockingQueue<>();
+        queue.put(envelope);
         if (Constant.SINGLETON.equals(loadGenesisConfig().getConsenter().getConsenterType())) {
             log.info("进入Singleton方式排序处理");
             boolean isconfigMes = processor.classfiyMsg(groupHeader);

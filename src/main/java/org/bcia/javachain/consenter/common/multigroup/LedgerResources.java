@@ -26,4 +26,28 @@ public class LedgerResources {
     IMutableResources mutableResources;
     IReader reader;
     IWriter writer;
+
+    public IMutableResources getMutableResources() {
+        return mutableResources;
+    }
+
+    public void setMutableResources(IMutableResources mutableResources) {
+        this.mutableResources = mutableResources;
+    }
+
+    public IReader getReader() {
+        return reader;
+    }
+
+    public void setReader(IReader reader) {
+        this.reader = reader;
+    }
+
+    public IWriter getWriter() {
+        return writer;
+    }
+
+    public void setWriter(IWriter writer) {
+        this.writer = writer;
+    }
 }

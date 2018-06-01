@@ -26,4 +26,6 @@ import java.util.Map;
  */
 public interface IEventProcessor {
     Map<Integer, IHandlerList> getEventConsumers();
+
+    EventsServerConfig getEventsServerConfig();
 }

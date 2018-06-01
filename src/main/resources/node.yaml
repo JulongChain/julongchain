@@ -104,7 +104,7 @@ node:
         # MinInterval is the minimum permitted time between client pings.
         # If clients send pings more frequently, the node server will
         # disconnect them
-        minInterval: 60000
+        # minInterval: 60000
         #client:
         # Client keepalive settings for communicating with other node nodes
             # Interval is the time between pings to node nodes.  This must
@@ -252,7 +252,7 @@ node:
             # MinInterval is the minimum permitted time in seconds which clients
             # can send keepalive pings.  If clients send pings more frequently,
             # the events server will disconnect them
-        keepaliveMinInterval: 60000
+        #keepaliveMinInterval: 60000
 
     # TLS Settings
     # Note that node-smartcontract connections through smartcontractListenAddress is
@@ -297,7 +297,7 @@ node:
     # Path on the file system where node will store data (eg ledger). This
     # location must be access control protected to prevent unintended
     # modification that might corrupt the node operations.
-    fileSystemPath: /var/hyperledger/production
+    fileSystemPath: /var/julongchain/production
 
     # BCCSP (Blockchain crypto provider): Select which crypto implementation or
     # library to use

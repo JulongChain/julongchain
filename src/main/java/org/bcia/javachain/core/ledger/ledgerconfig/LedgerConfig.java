@@ -34,7 +34,7 @@ public class LedgerConfig {
     private static final String CONF_STATE_LEVELDB = "stateLeveldb";
     private static final String CONF_HISTORY_LEVELDB = "historyLeveldb";
     private static final String CONF_PVT_WRITESET_STORE = "pvtWritesetStore";
-    private static final String CONF_CHAINS = "chains" + File.separator + "chains";
+    private static final String CONF_CHAINS = "chains";
     private static final String CONF_INDEX = "chains" + File.separator + "index";
     private static final String CONF_PVTDATA_STORE = "pvtdataStore";
     private static final String CONF_QUERY_LIMIT = "ledger.state.couchDBconfig.queryLimit";

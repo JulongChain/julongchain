@@ -56,6 +56,11 @@ public class PayloadVO implements IProtoVO<Common.Payload> {
             this.dataVO = new ConfigEnvelopeVO();
             Configtx.ConfigEnvelope configEnvelope = Configtx.ConfigEnvelope.parseFrom(payload.getData());
             this.dataVO.parseFrom(configEnvelope);
+        } else if (groupHeaderVO.getType() == Common.HeaderType.CONFIG_UPDATE_VALUE) {
+            this.dataVO = new ConfigUpdateEnvelopeVO();
+            Configtx.ConfigUpdateEnvelope configUpdateEnvelope = Configtx.ConfigUpdateEnvelope.parseFrom(payload
+                    .getData());
+            this.dataVO.parseFrom(configUpdateEnvelope);
         }
     }
 

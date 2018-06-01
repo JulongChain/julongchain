@@ -16,7 +16,6 @@ limitations under the License.
 package org.bcia.javachain.common.ledger.blockledger;
 
 import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.protos.common.Common;
@@ -34,39 +33,39 @@ import java.util.Map;
  */
 public class Util {
     public static final LedgerException NOT_FOUND_ERROR_ITERATOR = new LedgerException("Not found iterator");
-    public static final Object CLOSED_CHAIN = "closed chain";
-    public static final Object READY_CHAIN = "ready chain";
 
-    public static Common.Block createNextBlock(IReader IReader, List<Common.Envelope> messages) throws LedgerException{
+    /**
+     * 获取新的区块
+     * 根据当前账本中最新区块的编号获取下一个区块编号
+     * @param reader 账本
+     * @param messages 区块Data
+     */
+    public static Common.Block createNextBlock(IReader reader, List<Common.Envelope> messages) throws LedgerException{
         long nextBlockNumber = 0;
         ByteString previousBlockHash = null;
-        if(IReader.height() > 0){
-            IIterator itr = IReader.iterator(Ab.SeekPosition.getDefaultInstance());
-            synchronized (itr.getLock()){
-                try {
-                    itr.getLock().wait();
-                } catch (InterruptedException e) {
-                    throw new LedgerException(e);
-                }
-            }
-            Map.Entry<QueryResult, Common.Status> entry = (Map.Entry<QueryResult, Common.Status>) itr.next();
+        if(reader.height() > 0){
+            //当当前账本中有数据时，应从最新的区块开始读取
+            Ab.SeekPosition startPosition = Ab.SeekPosition.newBuilder()
+                    .setNewest(Ab.SeekNewest.getDefaultInstance())
+                    .build();
+            IIterator itr = reader.iterator(startPosition);
+            Map.Entry<QueryResult, Common.Status> entry = (Map.Entry<QueryResult, Common.Status>) itr.next().getObj();
             Common.Block block =  (Common.Block) entry.getKey().getObj();
             Common.Status status = entry.getValue();
             if(!status.equals(Common.Status.SUCCESS)){
                 throw new LedgerException("Error seeking to newest block for group with non-zero height");
             }
             nextBlockNumber = block.getHeader().getNumber() + 1;
-            previousBlockHash = block.getHeader().getPreviousHash();
+            previousBlockHash = block.getHeader().getDataHash();
         }
-
+        //添加区块Data
         Common.BlockData.Builder dataBuilder = Common.BlockData.newBuilder();
-
         if (messages != null) {
             messages.forEach((msg) -> {
                 dataBuilder.addData(msg.toByteString());
             });
         }
-
+        //组装区块
         Common.Block block = Common.Block.newBuilder()
                 .setHeader(Common.BlockHeader.newBuilder()
                         .setNumber(nextBlockNumber)
@@ -80,10 +79,16 @@ public class Util {
                         .addMetadata(ByteString.EMPTY)
                         .build())
                 .build();
-
         return block;
     }
 
+    /**
+     * 获取区块
+     * 当前账本中存在所需区块，直接返回
+     * 当前账本中不存在所需区块，阻塞进程并等待append
+     * @param IReader 账本
+     * @param index 区块编号
+     */
     public static Common.Block getBlock(IReader IReader, long index) throws LedgerException {
         IIterator i = IReader.iterator(Ab.SeekPosition.newBuilder()
                 .setSpecified(Ab.SeekSpecified.newBuilder()

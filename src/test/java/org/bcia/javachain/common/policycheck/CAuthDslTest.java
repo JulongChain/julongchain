@@ -19,6 +19,7 @@ package org.bcia.javachain.common.policycheck;
 import org.bcia.javachain.common.policycheck.cauthdsl.CAuthDsl;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.msp.IIdentityDeserializer;
+import org.bcia.javachain.msp.mgmt.MspManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +56,7 @@ public class CAuthDslTest {
         sds.add(sd1);
         sds.add(sd2);
         sds.add(sd3);
-        IIdentityDeserializer deserializer = mock(IIdentityDeserializer.class);
+        MspManager deserializer = new MspManager();//mock(MspManager.class);
         CAuthDsl.deduplicate(sds,deserializer);
     }
 }

@@ -25,7 +25,7 @@ import org.bcia.javachain.csp.intfs.opts.ISignerOpts;
  */
 public class SM2SignerOpts implements ISignerOpts {
     @Override
-    public IHash hashFunc() {
+    public String hashFunc() {
         return null;
     }
 

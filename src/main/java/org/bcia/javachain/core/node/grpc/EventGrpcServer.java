@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.events;
+package org.bcia.javachain.core.node.grpc;
 
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
@@ -35,13 +35,12 @@ import java.io.IOException;
  * @Date: 2018/3/21
  * @company Dingxuan
  */
-@Component
 public class EventGrpcServer {
     private static JavaChainLog log = JavaChainLogFactory.getLog(EventGrpcServer.class);
     /**
      * 监听的端口
      */
-    private int port = 7053;
+    private int port;
     /**
      * grpc框架定义的服务器抽象
      */
@@ -50,9 +49,6 @@ public class EventGrpcServer {
      * 业务服务1:事件处理服务
      */
     private IEventHubServer eventHubServer;
-
-    public EventGrpcServer() {
-    }
 
     public EventGrpcServer(int port) {
         this.port = port;
@@ -111,8 +107,8 @@ public class EventGrpcServer {
                 @Override
                 public void onNext(EventsPackage.SignedEvent value) {
                     if (eventHubServer != null) {
-                        EventsPackage.Event resultEvent = eventHubServer.chat(value);
-                        responseObserver.onNext(resultEvent);
+                        EventsPackage.Event resultEvent = eventHubServer.chat(value, responseObserver);
+//                        responseObserver.onNext(resultEvent);
                     } else {
                         log.error("eventHubServer is not ready, but client sent some message: " + value);
                         responseObserver.onError(new NodeException("eventHubServer is not ready"));

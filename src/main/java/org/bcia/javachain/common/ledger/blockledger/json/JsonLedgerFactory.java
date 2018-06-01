@@ -57,18 +57,20 @@ public class JsonLedgerFactory implements IFactory {
         this.ledgers = new HashMap<>();
 
         File[] infos = file.listFiles();
-        for(File info : infos){
-            if(!info.isDirectory()){
-                continue;
+        if (infos != null) {
+            for(File info : infos){
+                if(!info.isDirectory()){
+                    continue;
+                }
+                String name = info.getName();
+                String groupID;
+                if(name.startsWith(JsonLedger.GROUP_DIRECTORY_FORMAT_STRING)){
+                     groupID = info.getName().substring(JsonLedger.GROUP_DIRECTORY_FORMAT_STRING.length(), info.getName().length());
+                } else {
+                    continue;
+                }
+                getOrCreate(groupID);
             }
-            String name = info.getName();
-            String groupID;
-            if(name.startsWith(JsonLedger.GROUP_DIRECTORY_FORMAT_STRING)){
-                 groupID = info.getName().substring(JsonLedger.GROUP_DIRECTORY_FORMAT_STRING.length(), info.getName().length());
-            } else {
-                continue;
-            }
-            getOrCreate(groupID);
         }
     }
 

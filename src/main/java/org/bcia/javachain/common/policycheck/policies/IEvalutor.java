@@ -1,5 +1,5 @@
 /**
- * Copyright DingXuan. All Rights Reserved.
+ * Copyright Aisino. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.common.msgprocessor;
-
-import org.bcia.javachain.common.localmsp.ILocalSigner;
-import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.common.Configtx;
+package org.bcia.javachain.common.policycheck.policies;
 
 /**
- * @author zhangmingyang
- * @Date: 2018/5/18
- * @company Dingxuan
+ * 类描述
+ *
+ * @author yuanjun
+ * @date 31/05/18
+ * @company Aisino
  */
-public interface IStandardChannelSupport {
-    long sequence();
-
-    String chainId();
-
-    ILocalSigner signer();
-
-    Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx);
+public interface IEvalutor {
 }
-

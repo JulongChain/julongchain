@@ -152,7 +152,7 @@ public class PolicyChecker implements IPolicyChecker{
         }
         IIdentity id = null;
         try {
-            id = localMSP.deserializeIdentity(signatureHeader.getCreator().toByteArray());//
+            id = localMSP.deserializeIdentity(signatureHeader.getCreator().toByteArray());
         }catch (Exception e){
             log.info("Failed deserializing proposal creator during channelless check policy with policy ["+policyName+"]");
             e.printStackTrace();
@@ -165,8 +165,8 @@ public class PolicyChecker implements IPolicyChecker{
             e.printStackTrace();
         }
         //MspPrincipal.MSPPrincipal m = MspPrincipal.MSPPrincipal.newBuilder().build();
-        id.satisfiesPrincipal(principal);
-        id.verify(signedProposal.getProposalBytes(),signedProposal.getSignature());
+        //id.satisfiesPrincipal(principal);
+        //id.verify(signedProposal.getProposalBytes(),signedProposal.getSignature());
 
     }
 

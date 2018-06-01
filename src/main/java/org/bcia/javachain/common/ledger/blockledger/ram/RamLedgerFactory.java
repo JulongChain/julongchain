@@ -41,7 +41,8 @@ public class RamLedgerFactory implements IFactory {
     private int maxSize;
     private Map<String, ReadWriteBase> ledgers;
 
-    public RamLedgerFactory(){
+    public RamLedgerFactory(int maxSize){
+        this.maxSize = maxSize;
         this.ledgers = new HashMap<>();
     }
 
@@ -62,7 +63,7 @@ public class RamLedgerFactory implements IFactory {
                         .setNumber(~(long) 0)
                         .build())
                 .build();
-        RamLedger rl = new RamLedger(maxSize, 1, new SimpleList(null, new Channel<>(), preGenesis), null);
+        RamLedger rl = new RamLedger(maxSize, 1, new SimpleList(null, preGenesis), null);
         rl.setNewest(rl.getOldest());
         return rl;
     }

@@ -18,12 +18,21 @@ package org.bcia.javachain.core.node.util;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.groupconfig.GroupConfigBundle;
+import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
+import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
+import org.bcia.javachain.common.resourceconfig.IResourcesConfigBundle;
 import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.ledger.IQueryExecutor;
 import org.bcia.javachain.core.node.ConfigtxProcessor;
+import org.bcia.javachain.core.node.GroupSupport;
+import org.bcia.javachain.node.Node;
+import org.bcia.javachain.node.entity.Group;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 
@@ -39,10 +48,35 @@ import java.util.Map;
 public class ConfigTxUtils {
     private static final String RESOURCE_CONFIG_SEED_DATA = "resource_config_seed_data";
 
-    public static boolean isResourceConfigCapabilityOn(String groupId, Configtx.Config groupConfig) {
-        //TODO
+    public static void validateAndApplyResourceConfig(String groupId, Common.Envelope txEnvelope) throws
+            NodeException, ValidateException, InvalidProtocolBufferException {
+        Map<String, Group> groupMap = Node.getInstance().getGroupMap();
+        ValidateUtils.isNotNull(groupMap, "groupMap can not be null");
 
-        return true;
+        Group group = groupMap.get(groupId);
+        ValidateUtils.isNotNull(group, "group can not be null");
+
+        GroupSupport groupSupport = group.getGroupSupport();
+        ValidateUtils.isNotNull(groupSupport, "groupSupport can not be null");
+
+        IResourcesConfigBundle resourcesConfigBundle = groupSupport.getResourcesConfigBundle();
+        computeFullConfig(resourcesConfigBundle, txEnvelope);
+
+    }
+
+    private static void computeFullConfig(IResourcesConfigBundle resourcesConfigBundle, Common.Envelope txEnvelope)
+            throws InvalidProtocolBufferException, ValidateException {
+        resourcesConfigBundle.getValidator().proposeConfigUpdate(txEnvelope);
+    }
+
+    public static boolean isResourceConfigCapabilityOn(String groupId, Configtx.Config groupConfig) throws
+            ValidateException, PolicyException, InvalidProtocolBufferException {
+        IGroupConfigBundle groupConfigBundle = new GroupConfigBundle(groupId, groupConfig);
+
+        IApplicationConfig applicationConfig = groupConfigBundle.getGroupConfig().getApplicationConfig();
+
+        return applicationConfig != null && applicationConfig.getCapabilities() != null && applicationConfig
+                .getCapabilities().isResourcesTree();
     }
 
     public static Configtx.Config getConfigFromSeedTx(Configtx.ConfigEnvelope configEnvelope) throws
@@ -93,4 +127,6 @@ public class ConfigTxUtils {
 
         return ConfigtxProcessor.retrievePersistedConfig(queryExecutor, ConfigtxProcessor.RESOURCES_CONFIG_KEY);
     }
+
+
 }

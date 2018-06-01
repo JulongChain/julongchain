@@ -28,6 +28,7 @@ import org.bcia.javachain.protos.node.EventsPackage;
 import org.bouncycastle.asn1.x509.Time;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,10 +46,21 @@ public class EventHandler implements IEventHandler {
 
     private Map<String, EventsPackage.Interest> interestedEvents;
     private Date sessionEndDate;
+
+    private IEventProcessor eventProcessor;
     private EventsServerConfig eventsServerConfig;
 
-    private IEventHubServer eventHubServer;
-    private IEventProcessor eventProcessor;
+    private EventHubServer.Callback callback;
+
+    public EventHandler(IEventProcessor eventProcessor, EventHubServer.Callback callback) {
+        this.eventProcessor = eventProcessor;
+        this.eventsServerConfig = eventProcessor.getEventsServerConfig();
+
+        this.callback = callback;
+
+        this.interestedEvents = new HashMap<>();
+
+    }
 
     @Override
     public EventsPackage.Event handleMessage(EventsPackage.SignedEvent signedEvent) throws
@@ -166,7 +178,8 @@ public class EventHandler implements IEventHandler {
 
     @Override
     public void sendMessage(EventsPackage.Event event) {
-
-
+        if (callback != null) {
+            callback.sendMessage(event);
+        }
     }
 }

@@ -174,7 +174,6 @@ public class Identity implements ISigningIdentity {
 
     @Override
     public void satisfiesPrincipal(MspPrincipal.MSPPrincipal principal) {
-
     }
 
 }

@@ -15,11 +15,10 @@
  */
 package org.bcia.javachain.common.util;
 
-import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.exception.ValidateException;
 
 /**
- * 类描述
+ * 网络地址
  *
  * @author zhouhui
  * @date 2018/05/16

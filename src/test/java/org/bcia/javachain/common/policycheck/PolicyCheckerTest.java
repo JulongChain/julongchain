@@ -2,6 +2,7 @@ package org.bcia.javachain.common.policycheck;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.MspException;
 import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.policies.PolicyConstant;
 import org.bcia.javachain.common.policies.PolicyManager;
@@ -12,6 +13,7 @@ import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.msp.IIdentityDeserializer;
 import org.bcia.javachain.msp.mgmt.IMspPrincipalGetter;
 import org.bcia.javachain.msp.mgmt.MspManager;
+import org.bcia.javachain.msp.mgmt.Principal;
 import org.bcia.javachain.protos.common.MspPrincipal;
 import org.junit.Assert;
 import org.junit.Before;
@@ -52,7 +54,7 @@ public class PolicyCheckerTest {
     }
 
     @Test
-    public void checkPolicy() throws InvalidProtocolBufferException, PolicyException, UnsupportedEncodingException {
+    public void checkPolicy() throws InvalidProtocolBufferException, PolicyException, UnsupportedEncodingException, MspException {
         IIdentityDeserializer localMSP = mock(IIdentityDeserializer.class);
         IMspPrincipalGetter principalGetter = mock(IMspPrincipalGetter.class);
         PolicyChecker policyChecker = new PolicyChecker(new ChannelPolicyManager(),localMSP,principalGetter);
@@ -74,14 +76,15 @@ public class PolicyCheckerTest {
     }
 
     @Test
-    public void checkPolicyNoChannel() {
-        String reader = "readers";
+    public void checkPolicyNoChannel() throws MspException {
+        String reader = "Admins";
         IIdentityDeserializer localMSP = mock(IIdentityDeserializer.class);
         MspManager mspManager = new MspManager();
         IMspPrincipalGetter principalGetter = mock(IMspPrincipalGetter.class);
-        PolicyChecker policyChecker = new PolicyChecker(new ChannelPolicyManager(),mspManager,principalGetter);
-        SignedProposal signedProposal = new SignedProposal("Alicesaaa".getBytes(),"msg1".getBytes());
-        policyChecker.checkPolicyNoChannel(reader,signedProposal);
+        IMspPrincipalGetter principalGetter1 = new Principal();
+        PolicyChecker policyChecker = new PolicyChecker(new ChannelPolicyManager(),mspManager,principalGetter1);
+
+        policyChecker.checkPolicyNoChannel(reader,new SignedProposal("Alicesaaa".getBytes(),"msg1".getBytes()));
     }
 
 

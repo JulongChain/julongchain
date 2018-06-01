@@ -27,6 +27,11 @@ public class Policy {
     private int type;
     private byte[] value;
 
+    public Policy(int type, byte[] value) {
+        this.type = type;
+        this.value = value;
+    }
+
     public int getType() {
         return type;
     }

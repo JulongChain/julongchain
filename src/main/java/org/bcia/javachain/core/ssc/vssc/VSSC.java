@@ -17,8 +17,6 @@ package org.bcia.javachain.core.ssc.vssc;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.cauthdsl.CAuthDslBuilder;
-import org.bcia.javachain.common.cauthdsl.PolicyProvider;
 import org.bcia.javachain.common.channelconfig.ApplicationCapabilities;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.LedgerException;
@@ -29,7 +27,8 @@ import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policies.IPolicy;
-import org.bcia.javachain.common.policies.IPolicyProvider;
+import org.bcia.javachain.common.policycheck.policies.PolicyProvider;
+import org.bcia.javachain.common.util.BytesHexStrTranslate;
 import org.bcia.javachain.common.util.Utils;
 import org.bcia.javachain.common.util.proto.ProtoUtils;
 import org.bcia.javachain.common.util.proto.SignedData;
@@ -143,7 +142,14 @@ public class VSSC extends SystemSmartContractBase {
 
         IMspManager manager=GlobalMspManagement.getManagerForChain(groupHeader.getGroupId());
         PolicyProvider policyProvider=new PolicyProvider(manager);
-        IPolicy policy = policyProvider.newPolicy(policyBytes);
+        IPolicy policy = null;
+        try {
+            policy = policyProvider.makePolicy(policyBytes);
+        } catch (PolicyException e) {
+            String msg=String.format("VSSC error:make policy failed,err %s",e.getMessage());
+            log.error(msg);
+            return newErrorResponse(msg);
+        }
 
         // validate the payload type
         if(groupHeader.getType()!= Common.HeaderType.ENDORSER_TRANSACTION.getNumber()){
@@ -291,7 +297,7 @@ public class VSSC extends SystemSmartContractBase {
                 String msg=String.format("Unmarshal endorser error: %s",e.getMessage());
                 throw new SysSmartContractException(msg);
             }
-            String identity = serializedIdentity.getMspid() + serializedIdentity.getIdBytes().toString();
+            String identity = serializedIdentity.getMspid()+BytesHexStrTranslate.bytesToHexFun1(serializedIdentity.getIdBytes().toByteArray());
             SignedData value = signatureMap.get(identity);
             if(value!=null){
                 log.warn("Ignoring duplicated identity, Mspid: {}, pem:{}",

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.core.node;
+package org.bcia.javachain.core.node.grpc;
 
 import com.google.protobuf.Empty;
 import io.grpc.Server;
@@ -42,13 +42,12 @@ import java.io.IOException;
  * @Date: 2018/3/13
  * @company Dingxuan
  */
-@Component
 public class NodeGrpcServer {
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeGrpcServer.class);
     /**
      * 监听的端口
      */
-    private int port = 7051;
+    private int port;
     /**
      * grpc框架定义的服务器抽象
      */
@@ -68,9 +67,6 @@ public class NodeGrpcServer {
 
     public NodeGrpcServer(int port) {
         this.port = port;
-    }
-
-    public NodeGrpcServer() {
     }
 
     /**
@@ -95,7 +91,7 @@ public class NodeGrpcServer {
         server = ServerBuilder.forPort(port)
                 .addService(new EndorserServerImpl())
                 .addService(new SmartContractSupportService())
-//                .addService()
+                .addService(new AdminServerImpl())
                 .build()
                 .start();
         log.info("NodeGrpcServer start, port: " + port);
@@ -162,48 +158,54 @@ public class NodeGrpcServer {
                 public void onNext(Common.Envelope value) {
                     if (deliverEventsServer != null) {
                         responseObserver.onNext(deliverEventsServer.deliver(value));
-                        return;
+                        responseObserver.onCompleted();
+                    } else {
+                        log.error("deliverEventsServer is not ready, but client sent some message: " + value);
+                        responseObserver.onError(new NodeException("deliverEventsServer is not ready"));
+                        responseObserver.onCompleted();
                     }
-
-                    log.error("deliverEventsServer is not ready, but client sent some message: " + value);
-                    responseObserver.onError(new NodeException("deliverEventsServer is not ready"));
                 }
 
                 @Override
                 public void onError(Throwable t) {
-
+                    log.error(t.getMessage(), t);
+                    responseObserver.onError(t);
                 }
 
                 @Override
                 public void onCompleted() {
-
+                    log.info("DeliverGrpc.Deliver onCompleted");
+                    responseObserver.onCompleted();
                 }
             };
         }
 
         @Override
         public StreamObserver<Common.Envelope> deliverFiltered(StreamObserver<EventsPackage.DeliverResponse>
-                                                                               responseObserver) {
+                                                                       responseObserver) {
             return new StreamObserver<Common.Envelope>() {
                 @Override
                 public void onNext(Common.Envelope value) {
                     if (deliverEventsServer != null) {
                         responseObserver.onNext(deliverEventsServer.deliverFiltered(value));
-                        return;
+                        responseObserver.onCompleted();
+                    } else {
+                        log.error("deliverEventsServer is not ready, but client sent some message: " + value);
+                        responseObserver.onError(new NodeException("deliverEventsServer is not ready"));
+                        responseObserver.onCompleted();
                     }
-
-                    log.error("deliverEventsServer is not ready, but client sent some message: " + value);
-                    responseObserver.onError(new NodeException("deliverEventsServer is not ready"));
                 }
 
                 @Override
                 public void onError(Throwable t) {
-
+                    log.error(t.getMessage(), t);
+                    responseObserver.onError(t);
                 }
 
                 @Override
                 public void onCompleted() {
-
+                    log.info("DeliverGrpc.deliverFiltered onCompleted");
+                    responseObserver.onCompleted();
                 }
             };
         }
@@ -241,12 +243,14 @@ public class NodeGrpcServer {
         @Override
         public void getStatus(Empty request, StreamObserver<AdminPackage.ServerStatus>
                 responseObserver) {
-
             if (adminServer != null) {
                 responseObserver.onNext(adminServer.getStatus());
+                responseObserver.onCompleted();
+            } else {
+                log.error("adminServer is not ready, but client sent some message");
+                responseObserver.onError(new NodeException("adminServer is not ready"));
+                responseObserver.onCompleted();
             }
-            log.error("adminServer is not ready, but client sent some message");
-            responseObserver.onError(new NodeException("adminServer is not ready"));
         }
 
         @Override
