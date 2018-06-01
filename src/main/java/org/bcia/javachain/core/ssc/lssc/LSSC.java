@@ -95,7 +95,8 @@ public class LSSC  extends SystemSmartContractBase {
     public final static String allowedCharsSmartContractName="[A-Za-z0-9_-]+";
     public final static String allowedCharsVersion="[A-Za-z0-9_.+-]+";
 
-    private LsscSupport support = new LsscSupport();
+    @Autowired
+    private LsscSupport support;
     // sscprovider is the interface with which we call
     // methods of the system smartcontract package without
     // import cycles
@@ -186,10 +187,10 @@ public class LSSC  extends SystemSmartContractBase {
                 }
                 //the maximum number of arguments depends on the capability of the group
                 // TODO: 5/21/18  ac.getCapabilities() == null
-                // if((ac.getCapabilities().isPrivateGroupData()==false && size>6) ||
-                //         (ac.getCapabilities().isPrivateGroupData()==true && size>7)){
-                //     return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
-                // }
+                if((ac.getCapabilities().isPrivateGroupData()==false && size>6) ||
+                        (ac.getCapabilities().isPrivateGroupData()==true && size>7)){
+                    return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
+                }
                 byte[] depSpecBytes2=args.get(2);
                 Smartcontract.SmartContractDeploymentSpec spec=null;
                 try {
