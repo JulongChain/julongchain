@@ -22,6 +22,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policies.IPolicy;
 import org.bcia.javachain.common.policies.IPolicyProvider;
+import org.bcia.javachain.common.policycheck.cauthdsl.CAuthDsl;
 import org.bcia.javachain.common.policycheck.cauthdsl.Policy;
 import org.bcia.javachain.msp.IIdentityDeserializer;
 import org.bcia.javachain.protos.common.Policies;
@@ -58,15 +59,15 @@ public class PolicyProvider implements IPolicyProvider{
             return null;
         }
         Boolean compiled = null;
-        // try {
-            // compiled = CAuthDsl.compile(signaturePolicyEnvelope.getRule(),signaturePolicyEnvelope.getIdentitiesList(),deserializer);
-        // } catch (NoSuchMethodException e) {
-        //     throw new PolicyException(e);
-        // } catch (IllegalAccessException e) {
-        //     throw new PolicyException(e);
-        // } catch (InvocationTargetException e) {
-        //     throw new PolicyException(e);
-        // }
+        try {
+            compiled = CAuthDsl.compile(signaturePolicyEnvelope.getRule(),signaturePolicyEnvelope.getIdentitiesList(),deserializer);
+        } catch (NoSuchMethodException e) {
+            throw new PolicyException(e);
+        } catch (IllegalAccessException e) {
+            throw new PolicyException(e);
+        } catch (InvocationTargetException e) {
+            throw new PolicyException(e);
+        }
         policy.setEvalutor(compiled);
         policy.setDeserializer(this.deserializer);
         return policy;
