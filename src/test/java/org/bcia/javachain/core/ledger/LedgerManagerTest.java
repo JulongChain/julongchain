@@ -28,6 +28,7 @@ import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.common.Ledger;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.File;
@@ -69,7 +70,7 @@ public class LedgerManagerTest {
     }
 
     @Test
-    public void delete(){
+    public void delete() throws Exception{
         System.out.println(deleteDir(new File(LedgerConfig.getRootPath())));
     }
 
@@ -236,7 +237,7 @@ public class LedgerManagerTest {
 
     @Test
     public void showfs() throws Exception{
-        File file = new File(LedgerConfig.getBlockStorePath() + File.separator + "chains/MyGroup/blockfile000000");
+        File file = new File(LedgerConfig.getBlockStorePath() + File.separator + "chains/myGroup/blockfile000000");
         FileInputStream is = new FileInputStream(file);
         byte[] b = new byte[(int) file.length()];
         is.read(b);
@@ -267,6 +268,14 @@ public class LedgerManagerTest {
             System.out.println(new String(key));
             System.out.println(new String(value));
         }
+    }
+
+    @Test
+    public void testGetLedgerIDs() throws Exception{
+        LedgerManager.initialize(null);
+        Assert.assertSame(LedgerManager.getLedgerIDs().size(), 2);
+        Assert.assertEquals(LedgerManager.getLedgerIDs().get(0), "myGroup");
+        Assert.assertEquals(LedgerManager.getLedgerIDs().get(1), groupID);
     }
 
     private static void soutBytes(byte[] bytes){

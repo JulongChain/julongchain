@@ -33,9 +33,9 @@ public interface IResources {
      */
     IValidator configtxValidator();
 
-    /** PolicyManager returns a policy manager which can resolve names both in the /Channel and /Resources namespaces.
+    /** PolicyManager returns a policy getPolicyManager which can resolve names both in the /Channel and /Resources namespaces.
      * Note, the result of this method is almost definitely the one you want.  Calling ChannelConfig().PolicyManager()
-     * will return a policy manager which can only resolve policies in the /Channel namespace.
+     * will return a policy getPolicyManager which can only resolve policies in the /Channel namespace.
      * @return
      */
     IManager managerPolicyManager();

@@ -15,9 +15,11 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil;
 
-import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
+import org.bcia.javachain.core.ledger.util.Util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,19 +30,30 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class NsPvtRwBuilder {
-    private String collectionName;
+    private String namespace;
     private Map<String, CollPvtRwBuilder> collPvtRwBuilders = new HashMap<>();
 
     public NsPvtRwSet build(){
-       return null;
+        List<CollPvtRwBuilder> sortedCollBuilders = Util.getValuesBySortedKeys(collPvtRwBuilders);
+        List<CollPvtRwSet> collPvtRwSets = new ArrayList<>();
+
+        if (sortedCollBuilders != null) {
+            for(CollPvtRwBuilder builder : sortedCollBuilders){
+                collPvtRwSets.add(builder.build());
+            }
+        }
+        NsPvtRwSet nsPvtRwSet = new NsPvtRwSet();
+        nsPvtRwSet.setNameSpace(namespace);
+        nsPvtRwSet.setCollPvtRwSets(collPvtRwSets);
+        return nsPvtRwSet;
     }
 
-    public String getCollectionName() {
-        return collectionName;
+    public String getNamespace() {
+        return namespace;
     }
 
-    public void setCollectionName(String collectionName) {
-        this.collectionName = collectionName;
+    public void setNamespace(String namespace) {
+        this.namespace = namespace;
     }
 
     public Map<String, CollPvtRwBuilder> getCollPvtRwBuilders() {

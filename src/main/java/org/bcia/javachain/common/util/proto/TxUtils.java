@@ -18,6 +18,7 @@ package org.bcia.javachain.common.util.proto;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -25,6 +26,7 @@ import org.bcia.javachain.consenter.util.CommonUtils;
 import org.bcia.javachain.consenter.util.Utils;
 import org.bcia.javachain.core.ssc.essc.MockSigningIdentity;
 import org.bcia.javachain.msp.ISigningIdentity;
+import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
@@ -43,13 +45,15 @@ public class TxUtils {
     // MockSignedEndorserProposalOrPanic creates a SignedProposal with the passed arguments
     public static ProposalPackage.SignedProposal mockSignedEndorserProposalOrPanic(
             String groupID,
-            Smartcontract.SmartContractSpec spec,
-            byte[] creator,
-            byte[] signature
-    ){
-        ProposalPackage.Proposal.Builder proposalBuilder = ProposalPackage.Proposal.newBuilder();
-        ProposalPackage.Proposal proposal = proposalBuilder.build();
-        byte[] proBytes = ProtoUtils.marshalOrPanic(proposal);
+            Smartcontract.SmartContractSpec spec
+    ) throws JavaChainException {
+        ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
+        byte[] creator = identity.serialize();
+        Smartcontract.SmartContractInvocationSpec invocationSpec=Smartcontract.SmartContractInvocationSpec.newBuilder().build();
+        ProposalPackage.Proposal proposal = ProposalUtils.createSmartcontractProposalWithTransient(Common.HeaderType.ENDORSER_TRANSACTION,
+                groupID,invocationSpec,creator,null);
+        byte[] proBytes =proposal.toByteArray();
+        byte[] signature=identity.sign(proBytes);
         ProposalPackage.SignedProposal signedProposal = ProposalPackage.SignedProposal.newBuilder().setProposalBytes(ByteString.copyFrom(proBytes))
                 .setSignature(ByteString.copyFrom(signature)).build();
         return signedProposal;

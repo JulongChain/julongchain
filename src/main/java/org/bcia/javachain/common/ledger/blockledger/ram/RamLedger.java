@@ -52,10 +52,12 @@ public class RamLedger extends ReadWriteBase {
 
     @Override
     public IIterator iterator(Ab.SeekPosition startPosition) throws LedgerException {
+        logger.debug("Starting get cursor");
         SimpleList list = null;
         Common.Block block = null;
         switch (startPosition.getTypeCase().getNumber()){
             case Ab.SeekPosition.OLDEST_FIELD_NUMBER:
+                logger.debug("Getting OLDEST block");
                 SimpleList oldest = this.oldest;
                 block = Common.Block.newBuilder()
                         .setHeader(Common.BlockHeader.newBuilder()
@@ -65,6 +67,7 @@ public class RamLedger extends ReadWriteBase {
                 list = new SimpleList(oldest, block);
                 break;
             case Ab.SeekPosition.NEWEST_FIELD_NUMBER:
+                logger.debug("Getting NEWEST block");
                 SimpleList newest = this.newest;
                 block = Common.Block.newBuilder()
                         .setHeader(Common.BlockHeader.newBuilder()
@@ -107,9 +110,11 @@ public class RamLedger extends ReadWriteBase {
         long blockNum = list.getBlock().getHeader().getNumber() + 1;
 
         if(blockNum == ~(long) 0){
+            logger.debug("Pass pre genesis block");
             cursor.next();
             blockNum++;
         }
+        logger.debug("Finished create ram ledger cursor");
         return cursor;
     }
 

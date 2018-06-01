@@ -44,15 +44,14 @@ public class TxRwSet {
      * 将TxRwSet转换为proto中TxReadWriteSet
      */
     public Rwset.TxReadWriteSet toProtoMsg(){
-        Rwset.TxReadWriteSet protoMsg = Rwset.TxReadWriteSet.newBuilder()
-                .setDataModel(Rwset.TxReadWriteSet.DataModel.KV)
-                .build();
+        Rwset.TxReadWriteSet.Builder builder = Rwset.TxReadWriteSet.newBuilder()
+                .setDataModel(Rwset.TxReadWriteSet.DataModel.KV);
         Rwset.NsReadWriteSet nsRwSetProtoMsg = null;
         for(NsRwSet nsRwSet : nsRwSets){
             nsRwSetProtoMsg = nsRwSet.toProtoMsg();
-            protoMsg.getNsRwsetList().add(nsRwSetProtoMsg);
+            builder.addNsRwset(nsRwSetProtoMsg);
         }
-        return protoMsg;
+        return builder.build();
     }
 
     /**

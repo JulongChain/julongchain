@@ -115,7 +115,7 @@ public class BlockFileHelper {
                 continue;
             }
             //截取文件编号
-            String fileSuffix = name.substring(0, BLOCK_FILE_PREFIX.length());
+            String fileSuffix = name.substring(BLOCK_FILE_PREFIX.length());
             int fileNum = Integer.valueOf(fileSuffix);
             if(fileNum > biggestFileNum){
                 biggestFileNum = fileNum;

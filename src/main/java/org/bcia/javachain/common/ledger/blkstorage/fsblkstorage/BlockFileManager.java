@@ -149,9 +149,9 @@ public class BlockFileManager {
     }
 
     //组装区块文件名
-    //  rootDir/blockfile000000
+    //  rootDir/blockfile_000000
     public static String deriveBlockfilePath(String rootDir, Integer suffixNum) {
-        return String.format("%s/%s%06d", rootDir, BLOCKFILE_PREFIX, suffixNum);
+        return String.format("%s/%s_%06d", rootDir, BLOCKFILE_PREFIX, suffixNum);
     }
 
     public void close() {

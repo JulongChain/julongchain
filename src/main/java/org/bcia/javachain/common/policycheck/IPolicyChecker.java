@@ -15,9 +15,10 @@
  */
 package org.bcia.javachain.common.policycheck;
 
-import org.bcia.javachain.common.exception.MspException;
+import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.policycheck.bean.SignedProposal;
 import org.bcia.javachain.common.util.proto.SignedData;
+import org.bcia.javachain.protos.node.ProposalPackage;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ import java.util.List;
  * @company Aisino
  */
 public interface IPolicyChecker {
-    void checkPolicy(String channelID, String policyName, SignedProposal signedProposal) throws MspException;
-    void checkPolicyBySignedData(String channelID, String policyName, List<SignedData> signedDatas);
-    void checkPolicyNoChannel(String policyName,SignedProposal signedProposal) throws MspException;
+    void checkPolicy(String channelID, String policyName, ProposalPackage.SignedProposal signedProposal)throws PolicyException;
+    void checkPolicyBySignedData(String channelID, String policyName, List<SignedData> signedDatas)throws PolicyException;
+    void checkPolicyNoGroup(String policyName, ProposalPackage.SignedProposal signedProposal)throws PolicyException;
 }

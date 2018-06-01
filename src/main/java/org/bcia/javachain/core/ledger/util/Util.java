@@ -17,14 +17,21 @@ package org.bcia.javachain.core.ledger.util;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.csp.factory.CspManager;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.TransactionPackage;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Ledger工具类
@@ -161,4 +168,43 @@ public class Util {
         return buffer.putLong(longNum).array();
     }
 
+    /**
+     * 进行hash运算
+     */
+    public static byte[] getHashBytes(byte[] bytes) throws LedgerException {
+        byte[] target = null;
+        if (bytes != null) {
+            try {
+                target = CspManager.getDefaultCsp().hash(bytes, null);
+            } catch (JavaChainException e) {
+                throw new LedgerException(e);
+            }
+        }
+        return target;
+    }
+
+
+    /**
+     * 获取map key的排序
+     */
+    public static <T> List<String> getSortedKeys(Map<String, T> m){
+        List<String> list = new ArrayList<>();
+        for(String key : m.keySet()){
+            list.add(key);
+        }
+        Collections.sort(list);
+        return list;
+    }
+
+    /**
+     *
+     */
+    public static <T> List<T> getValuesBySortedKeys (Map<String, T> m){
+        List<String> list = getSortedKeys(m);
+        List<T> l = new ArrayList<>();
+        for(String s : list){
+            l.add(m.get(s));
+        }
+        return l;
+    }
 }

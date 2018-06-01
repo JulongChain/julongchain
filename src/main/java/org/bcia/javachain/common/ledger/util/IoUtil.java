@@ -125,14 +125,15 @@ public class IoUtil {
     public static boolean createDirIfMissing(String dirPath){
         File dir = new File(dirPath);
         if(dir.exists()){
-            logger.info("File {} is already exists", dirPath);
+            logger.debug("Dir [{}] is already exists", dirPath);
             return true;
         }
         if (!dir.mkdirs()) {
-            logger.info("Can not create dir " + dirPath);
+            logger.debug("Can not create dir [" + dirPath + "]");
             return false;
         }
         chmod(dir, 644);
+        logger.debug("Create dir [{}] success", dir.getAbsolutePath());
         return true;
     }
 
@@ -140,25 +141,29 @@ public class IoUtil {
      * 创建文件
      */
     public static boolean createFileIfMissing(String filePath){
-        boolean result = false;
         File file = new File(filePath);
         if(file.exists()){
-            logger.info("File {} is already exists", filePath);
+            logger.debug("File [{}] is already exists", filePath);
             return true;
         }
         File dir = file.getParentFile();
-        createDirIfMissing(dir.getAbsolutePath());
+        if (!createDirIfMissing(dir.getAbsolutePath())) {
+            logger.debug("Can not create dir [" + dir.getAbsolutePath() + "]");
+            return false;
+        }
         try {
-            result = file.createNewFile();
+            if (file.createNewFile()) {
+                chmod(file, 755);
+                logger.debug("Create file [{}] success", filePath);
+                return true;
+            } else {
+                logger.debug("Can not create file [" + filePath + "]");
+                return false;
+            }
         } catch (IOException e) {
-            logger.error("Got error error:{} when createing file:{},  ", e.getMessage(), filePath);
-            return result;
+            logger.error("Got error error:{} when createing file:[{}]", e.getMessage(), filePath);
+            return false;
         }
-        if(!result){
-            logger.error("Can not create file " + filePath);
-        }
-        chmod(file, 755);
-        return result;
     }
 
     /**

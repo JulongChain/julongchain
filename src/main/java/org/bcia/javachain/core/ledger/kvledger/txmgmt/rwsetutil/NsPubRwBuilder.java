@@ -15,7 +15,7 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil;
 
-import org.bcia.javachain.common.ledger.util.Util;
+import org.bcia.javachain.core.ledger.util.Util;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
 import java.util.ArrayList;
@@ -44,11 +44,28 @@ public class NsPubRwBuilder {
      */
     public NsRwSet build(){
         List<KvRwset.KVRead> readSet = Util.getValuesBySortedKeys(readMap);
-        List<KvRwset.KVWrite> writeSet = new ArrayList<>();
+        List<KvRwset.KVWrite> writeSet = Util.getValuesBySortedKeys(writeMap);
         List<KvRwset.RangeQueryInfo> rangeQueriesInfo = new ArrayList<>();
         List<CollHashedRwSet> collHashedRwSet = new ArrayList<>();
+        List<CollHashRwBuilder> sortedCollBuilders = Util.getValuesBySortedKeys(collHashRwBuilders);
 
-        return null;
+        if (rangeQueryKeys != null) {
+            for(RangeQueryKey key : rangeQueryKeys){
+                rangeQueriesInfo.add(rangeQueriesMap.get(key));
+            }
+        }
+
+        if (sortedCollBuilders != null) {
+            for(CollHashRwBuilder collBuilder : sortedCollBuilders){
+                collHashedRwSet.add(collBuilder.build());
+            }
+        }
+
+        NsRwSet nsRwSet = new NsRwSet();
+        nsRwSet.setNameSpace(nameSpace);
+        nsRwSet.setKvRwSet(RwSetUtil.newKVRWSet(readSet, writeSet, rangeQueriesInfo));
+        nsRwSet.setCollHashedRwSets(collHashedRwSet);
+        return nsRwSet;
     }
 
     public String getNameSpace() {

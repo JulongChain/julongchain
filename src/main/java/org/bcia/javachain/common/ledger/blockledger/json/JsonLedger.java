@@ -41,22 +41,26 @@ import java.util.AbstractMap;
  * @company Dingxuan
  */
 public class JsonLedger extends ReadWriteBase {
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(JsonLedger.class);
+    private static final Object lock = new Object();
     public static final String GROUP_DIRECTORY_FORMAT_STRING  = "chain_";
     public static final String BLOCK_FILE_FORMAT_STRING  = "block_%020d.json";
-
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(JavaChainLog.class);
-    private static final Object lock = new Object();
 
     private String directory;
     private long height;
     private ByteString lastHash;
     private JsonFormat.Printer printer;
 
+    /**
+     * 初始化链
+     */
     public void initializeBlockHeight(){
         File dir = new File(directory);
-        File[] infos = dir.listFiles();
+        File[] infoes = dir.listFiles();
         long nextNumber = 0;
-        for(File info : infos){
+        //迭代目录中所有文件
+        //排除不合法文件并获取最大区块号
+        for(File info : infoes){
             if(info.isDirectory()){
                 continue;
             }
@@ -72,10 +76,12 @@ public class JsonLedger extends ReadWriteBase {
             }
             nextNumber++;
         }
+        //没有区块时直接返回
         height = nextNumber;
         if(height == 0){
             return;
         }
+        //读取最大的区块
         AbstractMap.SimpleImmutableEntry<Common.Block, Boolean> entry = readBlock(height - 1);
         Common.Block block = entry.getKey();
         boolean found = entry.getValue();
@@ -84,9 +90,11 @@ public class JsonLedger extends ReadWriteBase {
         }
         if(block == null){
             logger.error("Error reading block " + (height - 1));
+        } else {
+            lastHash = block.getHeader().getDataHash();
         }
-        lastHash = block.getHeader().getDataHash();
     }
+
 
     public synchronized AbstractMap.SimpleImmutableEntry<Common.Block, Boolean> readBlock(long number){
         String name = blockFileName(number);

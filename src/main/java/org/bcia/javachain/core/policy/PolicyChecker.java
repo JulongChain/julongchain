@@ -24,6 +24,7 @@ import org.bcia.javachain.protos.node.ProposalPackage;
  * @author sunianle
  * @date 3/13/18
  * @company Dingxuan
+ * @deprecated
  */
 public class PolicyChecker implements IPolicyChecker{
 

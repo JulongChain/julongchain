@@ -13,15 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.bcia.javachain.common.policycheck.policies;
 
-package org.bcia.javachain.common.policycheck;
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.PolicyException;
+import org.bcia.javachain.common.policies.IPolicyManager;
+import org.bcia.javachain.common.policies.PolicyManager;
 
 /**
  * 类描述
  *
  * @author yuanjun
- * @date 11/05/18
+ * @date 26/04/18
  * @company Aisino
  */
-public class PolicyTest {
+public interface IGroupPolicyManagerGetter {
+    IPolicyManager getPolicyManager(String channelID ) throws InvalidProtocolBufferException, PolicyException;
 }

@@ -21,6 +21,7 @@ package org.bcia.javachain.core.policy;
  * @author sunianle
  * @date 3/13/18
  * @company Dingxuan
+ * @deprecated
  */
 public class PolicyFactory {
     private static IPolicyChecker checker;

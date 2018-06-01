@@ -17,10 +17,12 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
-import org.bcia.javachain.protos.common.Collection;
+import org.bcia.javachain.core.ledger.util.Util;
 import org.bcia.javachain.protos.ledger.rwset.Rwset;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
+import org.bcia.javachain.protos.node.ProposalResponsePackage;
 
 import java.util.List;
 
@@ -159,7 +161,7 @@ public class RwSetUtil {
     public static KvRwset.KVWrite newKVWrite(String key, ByteString value){
         return KvRwset.KVWrite.newBuilder()
                 .setKey(key)
-                .setIsDelete(value == null)
+                .setIsDelete(value.size() == 0)
                 .setValue(value)
                 .build();
     }
@@ -167,10 +169,10 @@ public class RwSetUtil {
     /**
      * 构建KVReadHash
      */
-    public static KvRwset.KVReadHash newPvtKVReadHash(String key, Height version){
+    public static KvRwset.KVReadHash newPvtKVReadHash(String key, Height version) throws LedgerException {
         return KvRwset.KVReadHash.newBuilder()
-//                获取key的Hash
-//                .setKeyHash()
+                // TODO: 5/31/18 SM3 Hash
+                .setKeyHash(ByteString.copyFrom(Util.getHashBytes(key.getBytes())))
                 .setVersion(newProtoVersion(version))
                 .build();
     }
@@ -178,21 +180,68 @@ public class RwSetUtil {
     /**
      * 构建KVWriteHash
      */
-    public static KvRwset.KVWriteHash newPvtKVWriteHash(String key, ByteString value){
-        KvRwset.KVWrite kvWrite = newKVWrite(key, value);
+    public static KvRwset.KVWriteHash newPvtKVWriteHash(String key, ByteString value) throws LedgerException{
         KvRwset.KVWriteHash.Builder builder = KvRwset.KVWriteHash.newBuilder();
-//        获取key的Hash
-        ByteString keyHash = null;
-        ByteString valueHash = null;
-        if(!kvWrite.getIsDelete()){
-//        获取value的Hash
-            builder.setValueHash(valueHash);
+        // TODO: 5/31/18 SM3 Hash
+        ByteString keyHash = ByteString.copyFrom(Util.getHashBytes(key.getBytes()));
+        ByteString valueHash = ByteString.EMPTY;
+        if (value.size() != 0) {
+            valueHash = ByteString.copyFrom(Util.getHashBytes(value.toByteArray()));
+        }
+        if(value.size() != 0){
+            valueHash = ByteString.copyFrom(Util.getHashBytes(value.toByteArray()));
         }
         return builder
                 .setKeyHash(keyHash)
                 .setValueHash(valueHash)
-                .setIsDelete(kvWrite.getIsDelete())
+                .setIsDelete(value.size() == 0)
                 .build();
     }
+
+    /**
+     * 构建KVRWSet对象
+     */
+    public static KvRwset.KVRWSet newKVRWSet(List<KvRwset.KVRead> reads, List<KvRwset.KVWrite> writes, List<KvRwset.RangeQueryInfo> rangeQueriesInfo){
+        KvRwset.KVRWSet.Builder builder = KvRwset.KVRWSet.newBuilder();
+
+        if (reads != null) {
+            for(KvRwset.KVRead read : reads){
+                builder.addReads(read);
+            }
+        }
+
+        if (writes != null) {
+            for(KvRwset.KVWrite write : writes){
+                builder.addWrites(write);
+            }
+        }
+
+        if (rangeQueriesInfo != null) {
+            for(KvRwset.RangeQueryInfo info : rangeQueriesInfo){
+                builder.addRangeQueriesInfo(info);
+            }
+        }
+
+        return builder.build();
+    }
+
+    public static KvRwset.HashedRWSet newHashedRWSet(List<KvRwset.KVReadHash> readSet, List<KvRwset.KVWriteHash> writeSet){
+        KvRwset.HashedRWSet.Builder builder = KvRwset.HashedRWSet.newBuilder();
+
+        if (readSet != null) {
+            for(KvRwset.KVReadHash read : readSet){
+                builder.addHashedReads(read);
+            }
+        }
+
+        if (writeSet != null) {
+            for(KvRwset.KVWriteHash write : writeSet){
+                builder.addHashedWrites(write);
+            }
+        }
+
+        return builder.build();
+    }
+
 }
 

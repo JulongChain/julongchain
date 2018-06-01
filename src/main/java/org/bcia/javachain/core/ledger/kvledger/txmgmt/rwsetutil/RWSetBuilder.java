@@ -17,9 +17,9 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil;
 
 import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.ledger.util.Util;
 import org.bcia.javachain.core.ledger.TxSimulationResults;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.javachain.core.ledger.util.Util;
 import org.bcia.javachain.protos.ledger.rwset.Rwset;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
@@ -73,7 +73,7 @@ public class RWSetBuilder {
     /**
      * 向Hash读集合添加
      */
-    public void addToHashedReadSet(String ns, String coll, String key, Height version){
+    public void addToHashedReadSet(String ns, String coll, String key, Height version) throws LedgerException{
         KvRwset.KVReadHash kvReadHash = RwSetUtil.newPvtKVReadHash(key, version);
         CollHashRwBuilder chrwb = getOrCreateCollHashedRwBuilder(ns, coll);
         chrwb.getReadMap().put(key, kvReadHash);
@@ -82,12 +82,11 @@ public class RWSetBuilder {
     /**
      * 向私有且Hash写集合添加
      */
-    public void addToPvtAndHashedWriteSet(String ns, String coll, String key, ByteString value){
+    public void addToPvtAndHashedWriteSet(String ns, String coll, String key, ByteString value) throws LedgerException{
         KvRwset.KVWrite kvWrite = RwSetUtil.newKVWrite(key, value);
         KvRwset.KVWriteHash kvWriteHash = RwSetUtil.newPvtKVWriteHash(key, value);
-        CollPvtRwBuilder cprwb = getOrCreateCollPvtRwBuilder(ns, coll);
-        CollHashRwBuilder chrwb = getOrCreateCollHashedRwBuilder(ns, coll);
-        cprwb.getWriteMap().put(key, kvWrite);
+        getOrCreateCollPvtRwBuilder(ns, coll).getWriteMap().put(key, kvWrite);
+        getOrCreateCollHashedRwBuilder(ns, coll).getWriteMap().put(key, kvWriteHash);
     }
 
     /**
@@ -121,7 +120,7 @@ public class RWSetBuilder {
     public void setPvtCollectionHash(String ns, String coll, ByteString pvtDataProto) throws LedgerException {
         CollHashRwBuilder collHashBuilder = getOrCreateCollHashedRwBuilder(ns, coll);
         //TODO SM3 Hash
-        collHashBuilder.setPvtDataHash(org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.Util.getHashBytes(pvtDataProto.toByteArray()));
+        collHashBuilder.setPvtDataHash(Util.getHashBytes(pvtDataProto.toByteArray()));
     }
 
     /**
@@ -176,7 +175,7 @@ public class RWSetBuilder {
         NsPvtRwBuilder nsPvtRwBuilder = pvtRwBuilderMap.get(ns);
         if(nsPvtRwBuilder == null){
             nsPvtRwBuilder = new NsPvtRwBuilder();
-            nsPvtRwBuilder.setCollectionName(ns);
+            nsPvtRwBuilder.setNamespace(ns);
             pvtRwBuilderMap.put(ns, nsPvtRwBuilder);
         }
         return nsPvtRwBuilder;

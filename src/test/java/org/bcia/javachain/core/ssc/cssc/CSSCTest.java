@@ -10,16 +10,21 @@ import org.bcia.javachain.common.genesis.GenesisBlockFactory;
 import org.bcia.javachain.common.groupconfig.config.GroupConfig;
 import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.common.util.FileUtils;
+import org.bcia.javachain.common.util.proto.TxUtils;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.smartcontract.shim.impl.MockStub;
 import org.bcia.javachain.core.ssc.lssc.LSSC;
+import org.bcia.javachain.msp.ISigningIdentity;
+import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.node.common.helper.ConfigTreeHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
+import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.Query;
+import org.bcia.javachain.protos.node.Smartcontract;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
 import org.junit.Before;
@@ -85,9 +90,17 @@ public class CSSCTest extends BaseJunit4Test {
             e.printStackTrace();
             return;
         }
+        ProposalPackage.SignedProposal sp= null;
+        try {
+            sp = TxUtils.mockSignedEndorserProposalOrPanic("",
+                    Smartcontract.SmartContractSpec.newBuilder().build());
+        } catch (JavaChainException e) {
+            e.printStackTrace();
+            return;
+        }
         args0.add(ByteString.copyFromUtf8(CSSC.JOIN_GROUP));
         args0.add(ByteString.copyFrom(blockBytes));
-        ISmartContract.SmartContractResponse res = mockStub.mockInvoke("0", args0);
+        ISmartContract.SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("0", args0,sp);
         //已调通，20180530
         assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
 
@@ -102,11 +115,12 @@ public class CSSCTest extends BaseJunit4Test {
             assertNotNull(block);
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
+            return;
         }
 
         List<ByteString> args2 = new LinkedList<ByteString>();
         args2.add(ByteString.copyFromUtf8(CSSC.GET_GROUPS));
-        ISmartContract.SmartContractResponse res2 = mockStub.mockInvoke("2", args2);
+        ISmartContract.SmartContractResponse res2 = mockStub.mockInvokeWithSignedProposal("2", args2,sp);
         assertThat(res2.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
         try {
             Query.GroupQueryResponse groups = Query.GroupQueryResponse.parseFrom(res2.getPayload());
@@ -114,6 +128,7 @@ public class CSSCTest extends BaseJunit4Test {
             assertThat(groups.getGroupsCount(),is(1));
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
+            return;
         }
 
     }

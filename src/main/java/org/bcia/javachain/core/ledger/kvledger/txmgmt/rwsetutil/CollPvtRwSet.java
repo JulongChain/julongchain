@@ -49,16 +49,9 @@ public class CollPvtRwSet {
      * 将collPvtSet转换为proto中CollectionPvtReadWriteSet
      */
     public Rwset.CollectionPvtReadWriteSet toProtoMsg(){
-        Rwset.CollectionPvtReadWriteSet protoMsg = null;
-        try {
-            protoMsg = Rwset.CollectionPvtReadWriteSet.newBuilder()
-                    .setCollectionName(collectionName)
-                    .setRwset(kvRwSet.toByteString())
-                    .build();
-        } catch (Exception e) {
-            RuntimeException error = new RuntimeException("Got errir when getting protoMsg from kvRwSet: " + e);
-            throw error;
-        }
-        return protoMsg;
+        Rwset.CollectionPvtReadWriteSet.Builder builder = Rwset.CollectionPvtReadWriteSet.newBuilder()
+                .setCollectionName(collectionName)
+                .setRwset(kvRwSet.toByteString());
+        return builder.build();
     }
 }

@@ -15,9 +15,11 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil;
 
+import org.bcia.javachain.core.ledger.util.Util;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,6 +32,15 @@ import java.util.Map;
 public class CollPvtRwBuilder {
     private String collectionName;
     private Map<String, KvRwset.KVWrite> writeMap = new HashMap<>();
+
+    public CollPvtRwSet build(){
+        List<KvRwset.KVWrite> writeSet = Util.getValuesBySortedKeys(writeMap);
+
+        CollPvtRwSet collPvtRwSet = new CollPvtRwSet();
+        collPvtRwSet.setCollectionName(collectionName);
+        collPvtRwSet.setKvRwSet(RwSetUtil.newKVRWSet(null, writeSet, null));
+        return collPvtRwSet;
+    }
 
     public String getCollectionName() {
         return collectionName;

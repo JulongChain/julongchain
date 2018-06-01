@@ -50,7 +50,7 @@ public class MspManager implements IMspManager {
     @Override
     public void setup(IMsp[] msps) {
         if(up==true){
-            log.info("MSP manager already up");
+            log.info("MSP getPolicyManager already up");
         }
 
         for (IMsp msp: msps) {
