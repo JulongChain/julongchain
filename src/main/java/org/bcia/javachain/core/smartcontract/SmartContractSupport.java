@@ -15,6 +15,7 @@ package org.bcia.javachain.core.smartcontract;
 
 import com.google.protobuf.ByteString;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.ledger.util.IoUtil;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -32,6 +33,7 @@ import org.bcia.javachain.core.smartcontract.node.SmartContractRunningUtil;
 import org.bcia.javachain.core.smartcontract.node.SmartContractSupportService;
 
 import javax.naming.Context;
+import java.io.File;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -280,39 +282,73 @@ public class SmartContractSupport {
 
     log.info("call SmartContractSupport launch");
 
-    // TODO:add by zhouhui for test,返回一个空对象，实际处理待万良兵补充
-
     String smartContractId = scContext.getName();
+
     String version = scContext.getVersion();
+
     boolean scRunning = SmartContractRunningUtil.checkSmartContractRunning(smartContractId);
+
+    Boolean isSystemContract = SmartContractSupportClient.checkSystemSmartContract(smartContractId);
+
     if (!scRunning) {
-      if (SmartContractSupportClient.checkSystemSmartContract(smartContractId)) {
+
+      if (isSystemContract) {
+
         SmartContractSupportClient.launch(smartContractId);
-        try {
-          Thread.sleep(1000);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
+        while (!SmartContractRunningUtil.checkSmartContractRunning(smartContractId)) {
+          try {
+            log.info("wait smart contract register[" + smartContractId + "]");
+            Thread.sleep(1000);
+          } catch (Exception e) {
+            log.error(e.getMessage(), e);
+          }
         }
-        log.info("launch system smart contract success:" + smartContractId);
       } else {
         try {
           List<String> images = DockerUtil.listImages(smartContractId + "-" + version);
           if (CollectionUtils.isEmpty(images)) {
+
+            // 清空instantiate目录
+            String basePath = "/root/javachain/instantiate/" + smartContractId + "-" + version;
+            File basePathFile = new File(basePath);
+            if (!basePathFile.exists()) {
+              FileUtils.forceMkdir(basePathFile);
+            } else {
+              File pomFile = new File(basePath + File.separator + "pom.xml");
+              if (pomFile.exists()) {
+                FileUtils.forceDelete(pomFile);
+              }
+              File srcFile = new File(basePath + File.separator + "src");
+              if (srcFile.exists()) {
+                FileUtils.deleteDirectory(srcFile);
+              }
+            }
+
+            // 从文件系统读取安装的文件
             ISmartContractPackage smartContractPackage =
                 SmartContractProvider.getSmartContractFromFS(smartContractId, version);
             ByteString codePackage = smartContractPackage.getDepSpec().getCodePackage();
+            // 压缩文件
             byte[] gzipBytes = IoUtil.gzipReader(codePackage.toByteArray(), 1024);
+            // 读取文件目录和文件内容
             Map<String, byte[]> scFileBytesMap = IoUtil.tarReader(gzipBytes, 1024);
-            IoUtil.fileWriter(scFileBytesMap, "/root/instantiate");
-            String imageId = DockerUtil.buildImage("/root/instantiate/Dockerfile", smartContractId + "-" + version);
-            log.info("image ID:" + imageId);
-            String containerId = DockerUtil.createContainer(imageId, smartContractId + "-" + version);
-            log.info("container ID:" + containerId);
+            // 保存文件到instantiate目录
+            IoUtil.fileWriter(scFileBytesMap, basePath);
+            // 复制Dockerfile文件
+            FileUtils.copyFileToDirectory(
+                new File("src/main/java/org/bcia/javachain/images/scenv/Dockerfile.in"),
+                new File(basePath));
+            // build镜像
+            String imageId =
+                DockerUtil.buildImage(basePath + "/Dockerfile.in", smartContractId + "-" + version);
+            // 创建容器
+            String containerId = DockerUtil.createContainer(imageId, smartContractId);
+            // 启动容器
             DockerUtil.startContainer(containerId);
-            try {
-              Thread.sleep(5000);
-            } catch (InterruptedException e) {
-              e.printStackTrace();
+
+            while (!SmartContractRunningUtil.checkSmartContractRunning(smartContractId)) {
+              log.info("wait smart contract register[" + smartContractId + "]");
+              Thread.sleep(1000);
             }
           }
         } catch (Exception e) {
