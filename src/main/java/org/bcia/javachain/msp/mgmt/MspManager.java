@@ -31,11 +31,19 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class MspManager implements IMspManager {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(GlobalMspManagement.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(MspManager.class);
     public  HashMap<String, IMsp> mspsMap = new HashMap<String, IMsp>();
+    private IMspManager mspManager;
     private boolean up;
     private static HashMap<String, IMsp> mspsByProviders = new HashMap<String, IMsp>();
 
+    public MspManager() {
+    }
+
+    public MspManager(IMspManager mspManager, boolean up) {
+        this.mspManager = mspManager;
+        this.up = up;
+    }
 
     public IMspManager createMspmgr(IMsp[] msps){
 
@@ -84,5 +92,13 @@ public class MspManager implements IMspManager {
     @Override
     public void isWellFormed(Identities.SerializedIdentity identity) {
 
+    }
+
+    public boolean isUp() {
+        return up;
+    }
+
+    public IMspManager getMspManager() {
+        return mspManager;
     }
 }
