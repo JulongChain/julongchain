@@ -31,7 +31,7 @@ import org.bcia.javachain.node.entity.Group;
  * @company Dingxuan
  */
 public class ConfigManager implements IConfigManager {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Node.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(ConfigManager.class);
 
     @Override
     public IConfig getGroupConfig(String groupID) {

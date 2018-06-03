@@ -46,8 +46,8 @@ import java.util.regex.Pattern;
  * @date 2018/4/24
  * @company Dingxuan
  */
-public class Validator implements IValidator {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Validator.class);
+public class ConfigtxValidator implements IConfigtxValidator {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(ConfigtxValidator.class);
 
     private static final int MAX_LENGTH = 249;
     private static final String REGEX_GROUP_ID = "[a-zA-Z][a-zA-Z0-9.-]*";
@@ -61,7 +61,7 @@ public class Validator implements IValidator {
     private String namespace;
     private IPolicyManager policyManager;
 
-    public Validator(String groupId, Configtx.Config config, String namespace, IPolicyManager policyManager) throws
+    public ConfigtxValidator(String groupId, Configtx.Config config, String namespace, IPolicyManager policyManager) throws
             ValidateException {
         this.groupId = groupId;
         this.config = config;
@@ -118,14 +118,16 @@ public class Validator implements IValidator {
     public Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx) throws
             InvalidProtocolBufferException, ValidateException {
         Configtx.ConfigUpdateEnvelope configUpdateEnvelope = EnvelopeHelper.getConfigUpdateEnvelopeFrom(configtx);
-        authorizeUpdate(configUpdateEnvelope);
+        Map<String, ConfigComparable> proposedFullConfig = authorizeUpdate(configUpdateEnvelope);
+
+//        ConfigMapUtils.mapConfig(proposedFullConfig, namespace);
 
 //        if(configUpdateEnvelope.get)
 
         return null;
     }
 
-    private void authorizeUpdate(Configtx.ConfigUpdateEnvelope configUpdateEnvelope) throws
+    private Map<String, ConfigComparable> authorizeUpdate(Configtx.ConfigUpdateEnvelope configUpdateEnvelope) throws
             InvalidProtocolBufferException, ValidateException {
         ConfigUpdateEnvelopeVO configUpdateEnvelopeVO = new ConfigUpdateEnvelopeVO();
         configUpdateEnvelopeVO.parseFrom(configUpdateEnvelope);
@@ -148,24 +150,17 @@ public class Validator implements IValidator {
         List<SignedData> signedDataList = SignedData.asSingedData(configUpdateEnvelope);
         verifyDeltaSet(deltaSet, signedDataList);
 
+        Map<String, ConfigComparable> proposedFullConfig = computeUpdateResult(deltaSet);
+        verifyFullProposedConfig(writeSet, proposedFullConfig);
 
-//        writeSet, err :=mapConfig(configUpdate.WriteSet, vi.namespace)
-//        if err != nil {
-//            return nil,errors.Wrapf(err, "error mapping WriteSet")
-//        }
-//
-//        deltaSet:=computeDeltaSet(readSet, writeSet)
-//        signedData, err :=configUpdateEnv.AsSignedData()
-//        if err != nil {
-//            return nil,err
-//        }
-//
-//        if err = vi.verifyDeltaSet(deltaSet, signedData);
-//        err != nil {
-//            return nil,errors.Wrapf(err, "error validating DeltaSet")
-//        }
+        return proposedFullConfig;
+    }
 
-
+    private Map<String, ConfigComparable> computeUpdateResult(Map<String, ConfigComparable> deltaSet) {
+        Map<String, ConfigComparable> newConfigMap = new HashMap<>();
+        newConfigMap.putAll(configComparableMap);
+        newConfigMap.putAll(deltaSet);
+        return newConfigMap;
     }
 
     private void verifyDeltaSet(Map<String, ConfigComparable> deltaSet, List<SignedData> signedDataList)
@@ -207,10 +202,40 @@ public class Validator implements IValidator {
     }
 
     private IPolicy policyForItem(ConfigComparable itemConfig) {
-//        this.policyManager =
+        String modPolicy = itemConfig.getModPolicy();
 
-        return null;
+        if (StringUtils.isNotBlank(modPolicy) && !modPolicy.startsWith(CommConstant.PATH_SEPARATOR)
+                && ArrayUtils.isNotEmpty(itemConfig.getPath())) {
+            String[] paths = itemConfig.getPath();
+            String[] newPaths = new String[itemConfig.getPath().length - 1];
+            System.arraycopy(paths, 1, newPaths, 0, paths.length - 1);
 
+            IPolicyManager subPolicyManager = this.policyManager.getSubPolicyManager(newPaths);
+            if (subPolicyManager == null) {
+                log.warn("Could not find subPolicyManager-----$" + newPaths);
+                return null;
+            }
+
+            if (itemConfig.getT() instanceof Configtx.ConfigTree) {
+                subPolicyManager = this.policyManager.getSubPolicyManager(new String[]{itemConfig.getKey()});
+                if (subPolicyManager == null) {
+                    log.warn("Could not find subPolicyManager-----$" + itemConfig.getKey());
+                    return null;
+                }
+            }
+        }
+
+        return this.policyManager.getPolicy(itemConfig.getModPolicy());
+    }
+
+
+    private void verifyFullProposedConfig(Map<String, ConfigComparable> writeSet,
+                                          Map<String, ConfigComparable> fullProposedConfig) throws ValidateException {
+        for (String key : writeSet.keySet()) {
+            if (!fullProposedConfig.containsKey(key)) {
+                throw new ValidateException("is not in fullProposedConfig-----$" + key);
+            }
+        }
     }
 
     private void validateModPolicy(String modPolicy) throws ValidateException {
@@ -267,17 +292,17 @@ public class Validator implements IValidator {
     }
 
     @Override
-    public String groupId() {
+    public String getGroupId() {
         return groupId;
     }
 
     @Override
-    public Configtx.Config configProto() {
-        return null;
+    public long getSequence() {
+        return sequence;
     }
 
     @Override
-    public long sequence() {
-        return sequence;
+    public Configtx.Config getConfig() {
+        return config;
     }
 }

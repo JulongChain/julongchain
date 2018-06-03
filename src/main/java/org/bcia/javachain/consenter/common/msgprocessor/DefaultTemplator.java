@@ -100,7 +100,7 @@ public class DefaultTemplator implements IGroupConfigTemplator {
         applicationGroup.toBuilder().setModPolicy(GroupConfigConstant.GROUP_CREATION_POLICY);
 
         //获取当前的系统通道配置
-        Configtx.ConfigTree systemGroupTree = groupConfigBundle.getValidator().configProto().getGroupTree();
+        Configtx.ConfigTree systemGroupTree = groupConfigBundle.getConfigtxValidator().getConfig().getGroupTree();
         if (systemGroupTree.getChildsMap().get(GroupConfigConstant.CONSORTIUM).getChildsMap().get(consortium.getName()).getChildsMap().size() > 0 &&
                 configUpdate.getWriteSet().getChildsMap().get(GroupConfigConstant.APPLICATION).getChildsMap().size() == 0) {
             try {

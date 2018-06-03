@@ -66,7 +66,7 @@ public class ConfigTxUtils {
 
     private static void computeFullConfig(IResourcesConfigBundle resourcesConfigBundle, Common.Envelope txEnvelope)
             throws InvalidProtocolBufferException, ValidateException {
-        resourcesConfigBundle.getValidator().proposeConfigUpdate(txEnvelope);
+        resourcesConfigBundle.getConfigtxValidator().proposeConfigUpdate(txEnvelope);
     }
 
     public static boolean isResourceConfigCapabilityOn(String groupId, Configtx.Config groupConfig) throws

@@ -109,7 +109,7 @@ public class SystemGroupFilter implements IRule {
         IGroupConfigBundle res = chainCreator.newGroupConfig(configEnvelope.getLastUpdate());
         Configtx.ConfigEnvelope newGroupConfigEnv = null;
         try {
-            newGroupConfigEnv = res.getValidator().proposeConfigUpdate(configEnvelope.getLastUpdate());
+            newGroupConfigEnv = res.getConfigtxValidator().proposeConfigUpdate(configEnvelope.getLastUpdate());
         } catch (InvalidProtocolBufferException e) {
             throw new ConsenterException(e);
         } catch (ValidateException e) {
@@ -118,9 +118,10 @@ public class SystemGroupFilter implements IRule {
         if (!configEnvelope.equals(newGroupConfigEnv)) {
             throw new ConsenterException("config proposed by the channel creation request did not match the config received with the channel creation request");
         }
-        IGroupConfigBundle bundle = chainCreator.createBundle(res.getValidator().groupId(), newGroupConfigEnv.getConfig());
+        IGroupConfigBundle bundle = chainCreator.createBundle(res.getConfigtxValidator().getGroupId(),
+                newGroupConfigEnv.getConfig());
         try {
-            new GroupConfigBundle(res.getValidator().groupId(), newGroupConfigEnv.getConfig()).validateNew(bundle);
+            new GroupConfigBundle(res.getConfigtxValidator().getGroupId(), newGroupConfigEnv.getConfig()).validateNew(bundle);
         } catch (ValidateException e) {
             e.printStackTrace();
         } catch (InvalidProtocolBufferException e) {

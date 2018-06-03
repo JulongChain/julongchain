@@ -13,28 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.groupconfig;
+package org.bcia.javachain.common.configtx;
 
-import org.bcia.javachain.common.config.IConfig;
-import org.bcia.javachain.common.configtx.IConfigtxValidator;
-import org.bcia.javachain.common.groupconfig.config.IGroupConfig;
-import org.bcia.javachain.common.policies.IPolicyManager;
-import org.bcia.javachain.msp.IMspManager;
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Configtx;
 
 /**
- * 对象
+ * 类描述
  *
  * @author zhouhui
- * @date 2018/3/27
+ * @date 2018/06/01
  * @company Dingxuan
  */
-public interface IGroupConfigBundle extends IConfig {
+public interface IConfigtxValidator {
+    void validate(Configtx.ConfigEnvelope configEnv);
 
-    IPolicyManager getPolicyManager();
+    Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx) throws
+            InvalidProtocolBufferException, ValidateException;
 
-    IMspManager getMspManager();
+    String getGroupId();
 
-    IGroupConfig getGroupConfig();
+    long getSequence();
 
-    IConfigtxValidator getConfigtxValidator();
+    Configtx.Config getConfig();
 }
