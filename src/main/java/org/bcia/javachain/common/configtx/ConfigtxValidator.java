@@ -33,10 +33,7 @@ import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -110,8 +107,22 @@ public class ConfigtxValidator implements IConfigtxValidator {
     }
 
     @Override
-    public void validate(Configtx.ConfigEnvelope configEnv) {
+    public void validate(Configtx.ConfigEnvelope configEnv) throws ValidateException, InvalidProtocolBufferException {
+        ValidateUtils.isNotNull(configEnv, "configEnv can not be null");
+        ValidateUtils.isNotNull(configEnv.getConfig(), "configEnv.getConfig can not be null");
+        if (configEnv.getConfig().getSequence() != sequence + 1) {
+            throw new ValidateException("configEnv.getConfig.getSequence should be current sequence + 1");
+        }
 
+        Configtx.ConfigUpdateEnvelope configUpdateEnvelope =
+                EnvelopeHelper.getConfigUpdateEnvelopeFrom(configEnv.getLastUpdate());
+        Map<String, ConfigComparable> proposedFullConfig = authorizeUpdate(configUpdateEnvelope);
+
+        Configtx.ConfigTree configTree = ConfigMapUtils.configMapToConfig(proposedFullConfig, namespace);
+
+        if (!Arrays.equals(configTree.toByteArray(), configEnv.getConfig().getGroupTree().toByteArray())) {
+            throw new ValidateException("configEnv.getConfig.getGroupTree don't match");
+        }
     }
 
     @Override
@@ -120,11 +131,14 @@ public class ConfigtxValidator implements IConfigtxValidator {
         Configtx.ConfigUpdateEnvelope configUpdateEnvelope = EnvelopeHelper.getConfigUpdateEnvelopeFrom(configtx);
         Map<String, ConfigComparable> proposedFullConfig = authorizeUpdate(configUpdateEnvelope);
 
-//        ConfigMapUtils.mapConfig(proposedFullConfig, namespace);
+        Configtx.ConfigTree configTree = ConfigMapUtils.configMapToConfig(proposedFullConfig, namespace);
 
-//        if(configUpdateEnvelope.get)
+        Configtx.ConfigEnvelope.Builder builder = Configtx.ConfigEnvelope.newBuilder();
+        builder.setLastUpdate(configtx);
+        builder.getConfigBuilder().setGroupTree(configTree);
+        builder.getConfigBuilder().setSequence(sequence + 1);
 
-        return null;
+        return builder.build();
     }
 
     private Map<String, ConfigComparable> authorizeUpdate(Configtx.ConfigUpdateEnvelope configUpdateEnvelope) throws

@@ -213,7 +213,7 @@ public class VsscValidator implements IVsscValidator {
             scInstance.setSmartContractVersion(CommConstant.METADATA_VERSION);
 
             vsscInstance.setSmartContractName(CommConstant.VSSC);
-            policy = CAuthDslBuilder.signedByAnyAdmin(committerSupport.getMSPIDs(groupId)).toByteArray();
+            policy = CAuthDslBuilder.signedByAnyAdmin(committerSupport.getMspIds(groupId)).toByteArray();
         }
 
         vsscInstance.setSmartContractVersion(CommConstant.METADATA_VERSION);

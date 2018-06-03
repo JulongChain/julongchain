@@ -17,11 +17,14 @@ package org.bcia.javachain.core.node;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.groupconfig.GroupConfigBundle;
+import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.resourceconfig.IResourcesConfigBundle;
+import org.bcia.javachain.common.resourceconfig.ResourcesConfigBundle;
 import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.core.ledger.IQueryExecutor;
@@ -126,29 +129,24 @@ public class ConfigtxProcessor implements IProcessor {
                 ValidateUtils.isNotNull(existingResourcesConfig, "existingResourcesConfig can not be null");
                 ValidateUtils.isNotNull(existingGroupConfig, "existingGroupConfig can not be null");
 
-                //TODO:要完成群组配置和资源配置
+                IGroupConfigBundle groupConfigBundle = new GroupConfigBundle(groupId, existingGroupConfig);
+                IResourcesConfigBundle resourcesConfigBundle = new ResourcesConfigBundle(groupId,
+                        existingResourcesConfig, groupConfigBundle, null);
 
-            } catch (InvalidProtocolBufferException e) {
-                log.error(e.getMessage(), e);
-                throw new LedgerException(e);
-            } catch (ValidateException e) {
+                Configtx.Config fullResourceConfig = ConfigTxUtils.computeFullConfig(resourcesConfigBundle, txEnvelope);
+                persistConfig(simulator, RESOURCES_CONFIG_KEY, fullResourceConfig);
+            } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 throw new LedgerException(e);
             }
         } else {
             try {
-                ConfigTxUtils.validateAndApplyResourceConfig(groupId, txEnvelope);
-            } catch (NodeException e) {
-                log.error(e.getMessage(), e);
-                throw new LedgerException(e);
-            } catch (ValidateException e) {
-                log.error(e.getMessage(), e);
-                throw new LedgerException(e);
-            } catch (InvalidProtocolBufferException e) {
+                Configtx.Config fullResourceConfig = ConfigTxUtils.validateAndApplyResourceConfig(groupId, txEnvelope);
+                persistConfig(simulator, RESOURCES_CONFIG_KEY, fullResourceConfig);
+            } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 throw new LedgerException(e);
             }
-
         }
     }
 

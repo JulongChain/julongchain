@@ -98,7 +98,7 @@ public class ChainSupport implements IStandardGroupSupport {
     }
 
     @Override
-    public void validate(Configtx.ConfigEnvelope configEnv) {
+    public void validate(Configtx.ConfigEnvelope configEnv) throws InvalidProtocolBufferException, ValidateException {
         ledgerResources.mutableResources.getConfigtxValidator().validate(configEnv);
     }
 

@@ -25,6 +25,7 @@ import org.bcia.javachain.common.groupconfig.GroupConfigBundle;
 import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
 import org.bcia.javachain.common.resourceconfig.IResourcesConfigBundle;
+import org.bcia.javachain.common.resourceconfig.ResourcesConfigBundle;
 import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.core.ledger.INodeLedger;
@@ -48,8 +49,8 @@ import java.util.Map;
 public class ConfigTxUtils {
     private static final String RESOURCE_CONFIG_SEED_DATA = "resource_config_seed_data";
 
-    public static void validateAndApplyResourceConfig(String groupId, Common.Envelope txEnvelope) throws
-            NodeException, ValidateException, InvalidProtocolBufferException {
+    public static Configtx.Config validateAndApplyResourceConfig(String groupId, Common.Envelope txEnvelope) throws
+            NodeException, ValidateException, InvalidProtocolBufferException, PolicyException {
         Map<String, Group> groupMap = Node.getInstance().getGroupMap();
         ValidateUtils.isNotNull(groupMap, "groupMap can not be null");
 
@@ -60,13 +61,21 @@ public class ConfigTxUtils {
         ValidateUtils.isNotNull(groupSupport, "groupSupport can not be null");
 
         IResourcesConfigBundle resourcesConfigBundle = groupSupport.getResourcesConfigBundle();
-        computeFullConfig(resourcesConfigBundle, txEnvelope);
+        Configtx.Config fullResourceConfig = computeFullConfig(resourcesConfigBundle, txEnvelope);
 
+        IResourcesConfigBundle bundle = new ResourcesConfigBundle(groupId, fullResourceConfig,
+                groupSupport.getGroupConfigBundle(), null);
+        groupSupport.setResourcesConfigBundle(bundle);
+
+        return fullResourceConfig;
     }
 
-    private static void computeFullConfig(IResourcesConfigBundle resourcesConfigBundle, Common.Envelope txEnvelope)
+    public static Configtx.Config computeFullConfig(IResourcesConfigBundle resourcesConfigBundle,
+                                                     Common.Envelope txEnvelope)
             throws InvalidProtocolBufferException, ValidateException {
-        resourcesConfigBundle.getConfigtxValidator().proposeConfigUpdate(txEnvelope);
+        Configtx.ConfigEnvelope configEnvelope =
+                resourcesConfigBundle.getConfigtxValidator().proposeConfigUpdate(txEnvelope);
+        return configEnvelope.getConfig();
     }
 
     public static boolean isResourceConfigCapabilityOn(String groupId, Configtx.Config groupConfig) throws

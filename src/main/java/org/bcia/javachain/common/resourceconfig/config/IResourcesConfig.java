@@ -23,4 +23,9 @@ package org.bcia.javachain.common.resourceconfig.config;
  * @company Dingxuan
  */
 public interface IResourcesConfig {
+    IApisConfig getApiConfig();
+
+    NodePoliciesConfig getNodePoliciesConfig();
+
+    ISmartContractsConfig getSmartContractsConfig();
 }

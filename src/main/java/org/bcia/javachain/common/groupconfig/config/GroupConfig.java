@@ -121,6 +121,7 @@ public class GroupConfig implements IGroupConfig {
         return blockDataHashingStructure;
     }
 
+    @Override
     public Configuration.ConsenterAddresses getConsenterAddresses() {
         return consenterAddresses;
     }

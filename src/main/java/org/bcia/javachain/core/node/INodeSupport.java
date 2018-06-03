@@ -13,29 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.configtx;
+package org.bcia.javachain.core.node;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.exception.ValidateException;
-import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.common.Configtx;
+import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
+import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
 
 /**
  * 类描述
  *
  * @author zhouhui
- * @date 2018/06/01
+ * @date 2018/06/03
  * @company Dingxuan
  */
-public interface IConfigtxValidator {
-    void validate(Configtx.ConfigEnvelope configEnv) throws ValidateException, InvalidProtocolBufferException;
+public interface INodeSupport {
+    IApplicationConfig getApplicationConfig(String groupId);
 
-    Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx) throws InvalidProtocolBufferException,
-            ValidateException;
-
-    String getGroupId();
-
-    long getSequence();
-
-    Configtx.Config getConfig();
+    ISmartContractDefinition getSmartContractByName(String groupId, String scName);
 }
