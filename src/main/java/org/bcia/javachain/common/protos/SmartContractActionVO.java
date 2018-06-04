@@ -17,6 +17,7 @@ package org.bcia.javachain.common.protos;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil.TxRwSet;
@@ -43,7 +44,11 @@ public class SmartContractActionVO implements IProtoVO<ProposalPackage.SmartCont
         ValidateUtils.isNotNull(smartContractAction, "smartContractAction can not be null");
 
         this.results = new TxRwSet();
-        this.results.fromProtoBytes(smartContractAction.getResults());
+        try {
+            this.results.fromProtoBytes(smartContractAction.getResults());
+        } catch (LedgerException e) {
+            throw new ValidateException(e);
+        }
 
         this.events = smartContractAction.getEvents();
 

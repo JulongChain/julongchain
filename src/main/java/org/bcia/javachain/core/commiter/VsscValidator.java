@@ -81,7 +81,13 @@ public class VsscValidator implements IVsscValidator {
         boolean writesToNonInvokableSSC = false;
 
         TxRwSet txRwSet = new TxRwSet();
-        txRwSet.fromProtoBytes(action.getResults());
+        try {
+            txRwSet.fromProtoBytes(action.getResults());
+        } catch (LedgerException e) {
+            log.error(e.getMessage(), e);
+            return TransactionPackage.TxValidationCode.BAD_RESPONSE_PAYLOAD;
+        }
+
         List<String> namespaceList = new ArrayList<>();
         for (NsRwSet nsRwSet : txRwSet.getNsRwSets()) {
             if (txWritesToNamespace(nsRwSet)) {
