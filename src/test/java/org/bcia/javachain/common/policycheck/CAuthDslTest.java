@@ -17,10 +17,7 @@
 package org.bcia.javachain.common.policycheck;
 
 import org.bcia.javachain.common.exception.PolicyException;
-import org.bcia.javachain.common.policycheck.cauthdsl.CAuthDsl;
 import org.bcia.javachain.common.util.proto.SignedData;
-import org.bcia.javachain.core.ssc.essc.MockMspManager;
-import org.bcia.javachain.msp.IIdentityDeserializer;
 import org.bcia.javachain.msp.mgmt.MspManager;
 import org.junit.After;
 import org.junit.Before;
@@ -28,8 +25,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.mockito.Mockito.mock;
 
 /**
  * 类描述
