@@ -58,8 +58,8 @@ public class UpdateBatch {
 
     public List<String> getUpdatedNamespaces(){
         List<String> list = new ArrayList<>();
-        for(Map.Entry<String, NsUpdates> entry : updates.entrySet()){
-            list.add(entry.getKey());
+        if (updates.keySet().size() != 0) {
+            list.addAll(updates.keySet());
         }
         return list;
     }

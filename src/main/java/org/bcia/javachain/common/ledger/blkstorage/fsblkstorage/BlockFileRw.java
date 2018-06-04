@@ -15,6 +15,8 @@
  */
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
+import org.bcia.javachain.common.exception.LedgerException;
+
 /**
  * 提供初始化区块文件读写方法
  *
@@ -24,7 +26,7 @@ package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
  */
 public class BlockFileRw {
 
-    public static BlockFileWriter newBlockfileWriter(String filePath) {
+    public static BlockFileWriter newBlockfileWriter(String filePath) throws LedgerException {
         return BlockFileWriter.newBlockfileWriter(filePath);
     }
 

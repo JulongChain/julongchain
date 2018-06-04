@@ -73,7 +73,7 @@ public class TxRwSet {
         try {
             protoMsg = Rwset.TxReadWriteSet.parseFrom(protoBytes);
         } catch (InvalidProtocolBufferException e) {
-            throw new RuntimeException("Got error when getting TxReadWriteSet from protoBytes: " + e);
+            throw new LedgerException("Got error when getting TxReadWriteSet from protoBytes: " + e);
         }
         txRwSetTemp = RwSetUtil.txRwSetFromProtoMsg(protoMsg);
         nsRwSets = txRwSetTemp.getNsRwSets();
