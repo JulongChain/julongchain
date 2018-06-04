@@ -16,12 +16,12 @@
 package org.bcia.javachain.core.commiter;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.cauthdsl.CAuthDslBuilder;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.SmartContractException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.policycheck.cauthdsl.CAuthDslBuilder;
 import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.core.common.smartcontractprovider.SmartContractContext;
@@ -213,7 +213,7 @@ public class VsscValidator implements IVsscValidator {
             scInstance.setSmartContractVersion(CommConstant.METADATA_VERSION);
 
             vsscInstance.setSmartContractName(CommConstant.VSSC);
-            policy = CAuthDslBuilder.signedByAnyAdmin(committerSupport.getMSPIDs(groupId)).toByteArray();
+            policy = CAuthDslBuilder.signedByAnyAdmin(committerSupport.getMspIds(groupId)).toByteArray();
         }
 
         vsscInstance.setSmartContractVersion(CommConstant.METADATA_VERSION);

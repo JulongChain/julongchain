@@ -123,7 +123,7 @@ public class Registrar implements IChainCreator {
                 log.error("Programming error, configTx should never be nil here");
             }
             LedgerResources ledgerResources = newLedgerResources(configTx);
-            String groupId = ledgerResources.mutableResources.getValidator().groupId();
+            String groupId = ledgerResources.mutableResources.getConfigtxValidator().getGroupId();
 
             if (ledgerResources.mutableResources.getGroupConfig().getConsortiumsConfig() != null) {
                 ChainSupport chain = new ChainSupport(this, ledgerResources, consenters, signer);
@@ -227,7 +227,7 @@ public class Registrar implements IChainCreator {
             newChains.put(key, chains.get(key));
         }
         ChainSupport cs = new ChainSupport(this, ledgerResources, consenters, signer);
-        String chainId = ledgerResources.mutableResources.getValidator().groupId();
+        String chainId = ledgerResources.mutableResources.getConfigtxValidator().getGroupId();
         newChains.put(chainId, cs);
         cs.start();
         chains = newChains;

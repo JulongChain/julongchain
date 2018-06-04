@@ -16,7 +16,6 @@
 package org.bcia.javachain.consenter.common.multigroup;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.configtx.IValidator;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.exception.ValidateException;
@@ -38,7 +37,7 @@ import java.util.Map;
  * @Date: 2018/5/8
  * @company Dingxuan
  */
-public class ChainSupport implements IValidator, IStandardGroupSupport {
+public class ChainSupport implements IStandardGroupSupport {
     LedgerResources ledgerResources;
     IProcessor processor;
     BlockWriter blockWriter;
@@ -99,16 +98,16 @@ public class ChainSupport implements IValidator, IStandardGroupSupport {
     }
 
     @Override
-    public void validate(Configtx.ConfigEnvelope configEnv) {
-        ledgerResources.mutableResources.getValidator().validate(configEnv);
+    public void validate(Configtx.ConfigEnvelope configEnv) throws InvalidProtocolBufferException, ValidateException {
+        ledgerResources.mutableResources.getConfigtxValidator().validate(configEnv);
     }
 
     @Override
     public Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx) throws InvalidProtocolBufferException, ValidateException {
-        Configtx.ConfigEnvelope env = ledgerResources.mutableResources.getValidator().proposeConfigUpdate(configtx);
+        Configtx.ConfigEnvelope env = ledgerResources.mutableResources.getConfigtxValidator().proposeConfigUpdate(configtx);
         GroupConfigBundle bundle = null;
         try {
-            bundle = new GroupConfigBundle(this.groupId(), env.getConfig());
+            bundle = new GroupConfigBundle(this.getGroupId(), env.getConfig());
         } catch (PolicyException e) {
             e.printStackTrace();
         }
@@ -117,20 +116,19 @@ public class ChainSupport implements IValidator, IStandardGroupSupport {
     }
 
     @Override
-    public String groupId() {
-        return ledgerResources.mutableResources.getValidator().groupId();
+    public String getGroupId() {
+        return ledgerResources.mutableResources.getConfigtxValidator().getGroupId();
     }
 
     @Override
-    public Configtx.Config configProto() {
-        return ledgerResources.mutableResources.getValidator().configProto();
+    public long getSequence() {
+        return ledgerResources.mutableResources.getConfigtxValidator().getSequence();
     }
 
     @Override
-    public long sequence() {
-        return ledgerResources.mutableResources.getValidator().sequence();
+    public Configtx.Config getConfig() {
+        return ledgerResources.mutableResources.getConfigtxValidator().getConfig();
     }
-
 
     @Override
     public ILocalSigner signer() {

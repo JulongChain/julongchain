@@ -1,5 +1,5 @@
 /**
- * Copyright Dingxuan. All Rights Reserved.
+ * Copyright Aisino. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.channelconfig;
+package org.bcia.javachain.common.policycheck.policies;
+
+import org.bcia.javachain.common.exception.PolicyException;
+import org.bcia.javachain.common.util.proto.SignedData;
+
+import java.util.List;
 
 /**
  * 类描述
  *
- * @author sunianle
- * @date 3/21/18
- * @company Dingxuan
- * @deprecated 使用ApplicationProvider代替，已经移植到groupconfig包名
+ * @author yuanjun
+ * @date 31/05/18
+ * @company Aisino
  */
-public class ApplicationCapabilities {
+public interface IEvalutor {
+    boolean evalutor(List<SignedData> signedDatas,Boolean[] bool) throws PolicyException;
 }

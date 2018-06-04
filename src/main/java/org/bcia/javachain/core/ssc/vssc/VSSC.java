@@ -17,7 +17,6 @@ package org.bcia.javachain.core.ssc.vssc;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.channelconfig.ApplicationCapabilities;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.PolicyException;

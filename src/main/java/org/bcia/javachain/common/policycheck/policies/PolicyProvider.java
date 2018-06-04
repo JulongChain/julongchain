@@ -46,7 +46,7 @@ public class PolicyProvider implements IPolicyProvider{
 
     @Override
     public IPolicy makePolicy(byte[] data) throws PolicyException {
-        Policy policy = new Policy();
+
         Policies.SignaturePolicyEnvelope signaturePolicyEnvelope = null;
         try {
             signaturePolicyEnvelope = Policies.SignaturePolicyEnvelope.parseFrom(data);
@@ -55,21 +55,11 @@ public class PolicyProvider implements IPolicyProvider{
             throw new PolicyException(e);
         }
         if(signaturePolicyEnvelope.getVersion() != 0){
-            log.error("This evaluator only understands messages of version 0, but version was "+signaturePolicyEnvelope.getVersion());
+            log.error("This evaluator only understands messages of version 0, but version was %d",signaturePolicyEnvelope.getVersion());
             return null;
         }
-        Boolean compiled = null;
-        try {
-            compiled = CAuthDsl.compile(signaturePolicyEnvelope.getRule(),signaturePolicyEnvelope.getIdentitiesList(),deserializer);
-        } catch (NoSuchMethodException e) {
-            throw new PolicyException(e);
-        } catch (IllegalAccessException e) {
-            throw new PolicyException(e);
-        } catch (InvocationTargetException e) {
-            throw new PolicyException(e);
-        }
-        policy.setEvalutor(compiled);
-        policy.setDeserializer(this.deserializer);
+        IEvalutor compiled = CAuthDsl.compile(signaturePolicyEnvelope.getRule(),signaturePolicyEnvelope.getIdentitiesList(),deserializer);
+        Policy policy = new Policy(deserializer,compiled);
         return policy;
     }
 }

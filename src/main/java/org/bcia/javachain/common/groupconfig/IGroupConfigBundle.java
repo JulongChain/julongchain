@@ -15,7 +15,8 @@
  */
 package org.bcia.javachain.common.groupconfig;
 
-import org.bcia.javachain.common.configtx.IValidator;
+import org.bcia.javachain.common.config.IConfig;
+import org.bcia.javachain.common.configtx.IConfigtxValidator;
 import org.bcia.javachain.common.groupconfig.config.IGroupConfig;
 import org.bcia.javachain.common.policies.IPolicyManager;
 import org.bcia.javachain.msp.IMspManager;
@@ -27,7 +28,7 @@ import org.bcia.javachain.msp.IMspManager;
  * @date 2018/3/27
  * @company Dingxuan
  */
-public interface IGroupConfigBundle {
+public interface IGroupConfigBundle extends IConfig {
 
     IPolicyManager getPolicyManager();
 
@@ -35,5 +36,5 @@ public interface IGroupConfigBundle {
 
     IGroupConfig getGroupConfig();
 
-    IValidator getValidator();
+    IConfigtxValidator getConfigtxValidator();
 }

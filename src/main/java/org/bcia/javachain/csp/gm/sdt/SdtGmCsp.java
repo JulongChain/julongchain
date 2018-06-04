@@ -239,7 +239,7 @@ public class SdtGmCsp implements ICsp {
             IKey sm4Key = new SM4Key(keyData);
             return sm4Key;
         }
-        return null;
+        throw new JavaChainException("Cannot find the key");
     }
 
     @Override

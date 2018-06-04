@@ -23,13 +23,15 @@ import org.bcia.javachain.common.groupconfig.GroupConfigBundle;
 import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.javachain.common.groupconfig.LogSanityChecks;
 import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
+import org.bcia.javachain.common.ledger.IResultsIterator;
+import org.bcia.javachain.common.ledger.blockledger.IFileLedgerBlockStore;
+import org.bcia.javachain.common.ledger.blockledger.file.FileLedger;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.resourceconfig.IResourcesConfigBundle;
 import org.bcia.javachain.common.resourceconfig.ResourcesConfigBundle;
 import org.bcia.javachain.common.util.proto.BlockUtils;
-import org.bcia.javachain.core.commiter.Committer;
-import org.bcia.javachain.core.commiter.ICommitter;
+import org.bcia.javachain.core.commiter.*;
 import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.ledger.customtx.IProcessor;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
@@ -50,6 +52,8 @@ import org.bcia.javachain.node.util.LedgerUtils;
 import org.bcia.javachain.node.util.NodeConstant;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
+import org.bcia.javachain.protos.common.Configuration;
+import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
 
@@ -281,7 +285,8 @@ public class Node {
         IResourcesConfigBundle.Callback mspCallback = new IResourcesConfigBundle.Callback() {
             @Override
             public void call(IResourcesConfigBundle bundle) {
-//                GlobalMspManagement.
+//                GlobalMspManagement
+                //TODO:
             }
         };
 
@@ -290,9 +295,21 @@ public class Node {
         final GroupSupport groupSupport = new GroupSupport();
         groupSupport.setApplicationConfig(applicationConfig);
         groupSupport.setNodeLedger(nodeLedger);
+        groupSupport.setFileLedger(new FileLedger(new IFileLedgerBlockStore() {
+            @Override
+            public void addBlock(Common.Block block) throws LedgerException {
+            }
 
-//        FileLedgerBlockStore blockStore = new File
-//        groupSupport.setFileLedger(new FileLedger());
+            @Override
+            public Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException {
+                return nodeLedger.getBlockchainInfo();
+            }
+
+            @Override
+            public IResultsIterator retrieveBlocks(long startBlockNumber) throws LedgerException {
+                return nodeLedger.getBlocksIterator(startBlockNumber);
+            }
+        }));
 
         IResourcesConfigBundle.Callback nodeSingletonCallback = new IResourcesConfigBundle.Callback() {
             @Override
@@ -312,17 +329,37 @@ public class Node {
 
         List<IResourcesConfigBundle.Callback> callbackList = new ArrayList<>();
         callbackList.add(trustedRootsCallback);
-
+        callbackList.add(mspCallback);
         callbackList.add(nodeSingletonCallback);
+
         ResourcesConfigBundle resourcesConfigBundle = new ResourcesConfigBundle(groupId, resConfig,
                 groupConfigBundle, callbackList);
+
+        ICommitterValidator committerValidator = new CommitterValidator(new CommitterSupport(groupSupport));
 
         ICommitter committer = new Committer(nodeLedger, new Committer.IConfigBlockEventer() {
             @Override
             public void event(Common.Block block) throws CommitterException {
-
+                try {
+                    String groupIDFromBlock = BlockUtils.getGroupIDFromBlock(block);
+                    onConfigBlockChanged(groupIDFromBlock, block);
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    throw new CommitterException(e);
+                }
             }
         });
+
+        //TODO
+        Configuration.ConsenterAddresses consenterAddresses = groupConfigBundle.getGroupConfig().getConsenterAddresses();
+        if (consenterAddresses == null || consenterAddresses.getAddressesCount() <= 0) {
+            throw new ValidateException("consenterAddresses can not be null");
+        }
+
+        //TODO:Gossip
+
+        groupSupport.setGroupConfigBundle(groupConfigBundle);
+        groupSupport.setResourcesConfigBundle(resourcesConfigBundle);
 
         Group group = new Group();
         group.setGroupSupport(groupSupport);
@@ -334,7 +371,15 @@ public class Node {
         return group;
     }
 
+    private void onConfigBlockChanged(String groupIDFromBlock, Common.Block newBlock) {
+        Group group = groupMap.get(groupIDFromBlock);
+        if (group != null) {
+            group.setBlock(newBlock);
+        }
+    }
+
     private void updateTrustedRoots(IResourcesConfigBundle bundle) {
+        //TODO:
     }
 
     public Map<String, Group> getGroupMap() {

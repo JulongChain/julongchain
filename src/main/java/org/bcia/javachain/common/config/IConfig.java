@@ -16,7 +16,8 @@
 package org.bcia.javachain.common.config;
 
 
-import org.bcia.javachain.common.exception.JavaChainException;
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 
@@ -30,11 +31,14 @@ import org.bcia.javachain.protos.common.Configtx;
 public interface IConfig {
     /**
      * getCurrentConfig returns the current config
+     *
      * @return
      */
     Configtx.Config getCurrentConfig();
+
     /**
      * updateProposeConfig attempts to validate a new configtx against the current config state
      */
-    Configtx.ConfigEnvelope updateProposeConfig(Common.Envelope configtx) throws JavaChainException;
+    Configtx.ConfigEnvelope updateProposeConfig(Common.Envelope configtx) throws InvalidProtocolBufferException,
+            ValidateException;
 }

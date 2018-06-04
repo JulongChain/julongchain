@@ -13,19 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.common.resourceconfig.config;
+package org.bcia.javachain.common.configtx;
+
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.common.Configtx;
 
 /**
- * 资源配置接口
+ * 类描述
  *
  * @author zhouhui
- * @date 2018/4/23
+ * @date 2018/06/01
  * @company Dingxuan
  */
-public interface IResourcesConfig {
-    IApisConfig getApiConfig();
+public interface IConfigtxValidator {
+    void validate(Configtx.ConfigEnvelope configEnv) throws ValidateException, InvalidProtocolBufferException;
 
-    NodePoliciesConfig getNodePoliciesConfig();
+    Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx) throws InvalidProtocolBufferException,
+            ValidateException;
 
-    ISmartContractsConfig getSmartContractsConfig();
+    String getGroupId();
+
+    long getSequence();
+
+    Configtx.Config getConfig();
 }

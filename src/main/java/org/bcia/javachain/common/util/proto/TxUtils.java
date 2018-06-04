@@ -24,7 +24,6 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.consenter.util.CommonUtils;
 import org.bcia.javachain.consenter.util.Utils;
-import org.bcia.javachain.core.ssc.essc.MockSigningIdentity;
 import org.bcia.javachain.msp.ISigningIdentity;
 import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
 import org.bcia.javachain.protos.common.Common;

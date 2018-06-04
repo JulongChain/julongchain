@@ -25,9 +25,12 @@ import org.bcia.javachain.msp.mspconfig.MspConfig;
 import org.bcia.javachain.msp.util.MspConfigHelper;
 import org.bcia.javachain.protos.msp.MspConfigPackage;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.bcia.javachain.msp.mspconfig.MspConfigFactory.loadMspConfig;
 
@@ -62,7 +65,8 @@ public class GlobalMspManagement {
     /**
      * mspMap
      */
-    public static HashMap<String,IMspManager> mspManagerHashMap=new HashMap<String, IMspManager>();
+    public static HashMap<String, IMspManager> mspManagerHashMap = new HashMap<String, IMspManager>();
+
     /**
      * 通过类型加载本地msp
      *
@@ -79,8 +83,11 @@ public class GlobalMspManagement {
         defaultCsp = CspManager.getCsp(defaultCspValue);
         if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(defaultCspValue)) {
             //解析配置文件
-            log.info("构建mspconfig");
-            MspConfigPackage.MSPConfig buildMspConfig = MspConfigHelper.buildMspConfig(localmspdir,mspId);
+            log.info("build the mspconfig");
+            if (!new File(localmspdir).exists()) {
+                throw new FileNotFoundException(String.format("the %s dir is not find", localmspdir));
+            }
+            MspConfigPackage.MSPConfig buildMspConfig = MspConfigHelper.buildMspConfig(localmspdir, mspId);
             loadMsp = getLocalMsp().setup(buildMspConfig);
 
         } else if (IFactoryOpts.PROVIDER_GMT0016.equalsIgnoreCase(defaultCspValue)) {
@@ -100,9 +107,7 @@ public class GlobalMspManagement {
      * @param mspID       mspid
      */
     public static IMsp loadlocalMsp(String localmspdir, List<IFactoryOpts> optsList, String mspID) {
-
-
-        return null;
+        return getLocalMsp();
     }
 
     /**
@@ -115,7 +120,6 @@ public class GlobalMspManagement {
             //读取配置文件构造选项集合
             List<IFactoryOpts> optsList = MspConfigHelper.buildFactoryOpts();
             CspManager.initCspFactories(optsList);
-
             MspConfig mspConfig = null;
             try {
                 mspConfig = loadMspConfig();
@@ -127,7 +131,7 @@ public class GlobalMspManagement {
             if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(defaultCspValue)) {
                 //构建fabricmspconfig
                 // MspConfigPackage.MSPConfig fabricMSPConfig = MspConfigHelper.buildMspConfig( mspConfig.node.getMspConfigPath());
-                MspConfigPackage.MSPConfig buildMspConfig = MspConfigHelper.buildMspConfig(mspConfig.node.getMspConfigPath(),mspConfig.node.getLocalMspId());
+                MspConfigPackage.MSPConfig buildMspConfig = MspConfigHelper.buildMspConfig(mspConfig.node.getMspConfigPath(), mspConfig.node.getLocalMspId());
                 localMsp = new Msp().setup(buildMspConfig);
                 return localMsp;
 
@@ -141,6 +145,13 @@ public class GlobalMspManagement {
         return localMsp;
     }
 
+
+    public void setMspManager(String groupId, IMspManager manager) {
+        MspManager mspManager = new MspManager(manager, true);
+        Map map = new ConcurrentHashMap<String, MspManager>();
+        map.put(groupId, mspManager);
+    }
+
     /**
      * 身份序列化
      *
@@ -148,8 +159,8 @@ public class GlobalMspManagement {
      * @return
      */
     public static IIdentityDeserializer getIdentityDeserializer(String groupId) {
-        if(groupId==""){
-            return  getLocalMsp();
+        if (groupId == "") {
+            return getLocalMsp();
         }
         return getManagerForChain(groupId);
     }
@@ -160,18 +171,17 @@ public class GlobalMspManagement {
      * @param groupId
      * @return
      */
-    public static IMspManager  getManagerForChain(String groupId) {
-       IMspManager mspManager= mspManagerHashMap.get(groupId);
-        if(mspManager==null){
+    public static IMspManager getManagerForChain(String groupId) {
+        IMspManager mspManager = mspManagerHashMap.get(groupId);
+        if (mspManager == null) {
             IMsp[] msps = new IMsp[1];
             for (int i = 0; i < msps.length; i++) {
-                msps[i]=getLocalMsp();
+                msps[i] = getLocalMsp();
             }
-            IMspManager mspmgr= new MspManager().createMspmgr(msps);
-            mspManagerHashMap.put(groupId,mspmgr);
+            IMspManager mspmgr = new MspManager().createMspmgr(msps);
+            mspManagerHashMap.put(groupId, mspmgr);
             return mspmgr;
         }
-
-        return   mspManager;
+        return mspManager;
     }
 }

@@ -21,6 +21,7 @@ node:
     # Path on the file system where node will find MSP local configurations
     #mspConfigPath: D:\msp
     mspConfigPath: /opt/msp
+    #mspConfigPath: /root/IdeaProjects/javachain/src/main/resources/msp
 
     # Identifier of the local MSP
     # ----!!!!IMPORTANT!!!-!!!IMPORTANT!!!-!!!IMPORTANT!!!!----

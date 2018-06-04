@@ -16,7 +16,8 @@
 package org.bcia.javachain.node.common.client;
 
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.netty.NettyChannelBuilder;
+import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.protos.node.EndorserGrpc;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
@@ -45,7 +46,9 @@ public class EndorserClient implements IEndorserClient {
 
     @Override
     public ProposalResponsePackage.ProposalResponse sendProcessProposal(ProposalPackage.SignedProposal signedProposal) {
-        ManagedChannel managedChannel = ManagedChannelBuilder.forAddress(ip, port).usePlaintext(true).build();
+        ManagedChannel managedChannel =
+                NettyChannelBuilder.forAddress(ip, port).maxInboundMessageSize(CommConstant.MAX_GRPC_MESSAGE_SIZE)
+                        .usePlaintext(true).build();
         EndorserGrpc.EndorserBlockingStub stub = EndorserGrpc.newBlockingStub(managedChannel);
         return stub.processProposal(signedProposal);
     }

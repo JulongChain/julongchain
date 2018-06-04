@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.csp.gm.sdt.SM2;
 
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.csp.gm.sdt.common.Constants;
@@ -40,7 +41,7 @@ public class SM2 {
      *
      * @return SM2KeyPair
      */
-    public static SM2KeyPair generateKeyPair() {
+    public static SM2KeyPair generateKeyPair() throws JavaChainException{
 
         byte[] privateKey = new byte[Constants.SM2_SK_LEN];
         byte[] publicKey = new byte[Constants.SM2_PK_LEN];
@@ -49,11 +50,12 @@ public class SM2 {
             publicKey = smJniApi.SM2MakeKey(privateKey);
         } catch (Exception e) {
             logger.error("SM2KeyPair error: generate key pair failed.");
+            throw new JavaChainException("SM2KeyPair error: generate key pair failed.");
         }
 
         if (null == privateKey || Constants.SM2_SK_LEN != privateKey.length
             || null == publicKey || Constants.SM2_PK_LEN != publicKey.length) {
-            return null;
+            throw new JavaChainException("SM2KeyPair error: generate key pair failed.");
         }
         return new SM2KeyPair(publicKey, privateKey);
     }
@@ -63,7 +65,7 @@ public class SM2 {
      *
      * @return
      */
-    public static byte[] SM2KeyDerive(byte[] key, int length) {
+    public static byte[] SM2KeyDerive(byte[] key, int length) throws JavaChainException{
         //TODO: 待实现
         return null;
     }
@@ -75,14 +77,14 @@ public class SM2 {
      * @param priKey 私钥数据
      * @return 签名值
      */
-    public static byte[] sign(byte[] hash, byte[] priKey) {
+    public static byte[] sign(byte[] hash, byte[] priKey) throws JavaChainException{
         if(null == hash || 0 == hash.length) {
             logger.error("Invalid hash. It must not be nil or empty.");
-            return null;
+            throw new JavaChainException("Invalid hash. It must not be nil or empty.");
         }
         if(null == priKey || 0 == priKey.length) {
             logger.error("Invalid priKey. It must not be nil or empty.");
-            return null;
+            throw new JavaChainException("Invalid priKey. It must not be nil or empty.");
         }
         byte[] result = null;
         try {
@@ -90,6 +92,7 @@ public class SM2 {
             result = smJniApi.SM2Sign(hash, random, priKey);
         } catch (Exception e) {
             logger.error( "SM2 sign data failed." );
+            throw new JavaChainException("SM2 sign data failed.");
         }
         return result;
     }
@@ -103,24 +106,25 @@ public class SM2 {
      * @param sign 签名值
      * @return
      */
-    public static int verify(byte[] hash, byte[] pubKey, byte[] sign) {
+    public static int verify(byte[] hash, byte[] pubKey, byte[] sign) throws JavaChainException {
         if(null == hash || 0 == hash.length) {
             logger.error("Invalid hash. It must not be nil or empty.");
-            return 1;
+            throw new JavaChainException("Invalid hash. It must not be nil or empty.");
         }
         if(null == pubKey || 0 == pubKey.length) {
             logger.error("Invalid pubKey. It must not be nil or empty.");
-            return 1;
+            throw new JavaChainException("Invalid pubKey. It must not be nil or empty.");
         }
         if(null == sign || 0 == sign.length) {
-            logger.error("Invalid sign. It must not be nil or empty.");
-            return 1;
+            logger.error("Invalid signature data. It must not be nil or empty.");
+            throw new JavaChainException("Invalid signature data. It must not be nil or empty.");
         }
         int result = 1;
         try {
             result = smJniApi.SM2Verify(hash, pubKey, sign);
         } catch (Exception e) {
             logger.error( "SM2 verify signature failed." );
+            throw new JavaChainException("SM2 verify signature failed.");
         }
         return result;
     }

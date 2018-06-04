@@ -31,11 +31,19 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class MspManager implements IMspManager {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(GlobalMspManagement.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(MspManager.class);
     public  HashMap<String, IMsp> mspsMap = new HashMap<String, IMsp>();
+    private IMspManager mspManager;
     private boolean up;
     private static HashMap<String, IMsp> mspsByProviders = new HashMap<String, IMsp>();
 
+    public MspManager() {
+    }
+
+    public MspManager(IMspManager mspManager, boolean up) {
+        this.mspManager = mspManager;
+        this.up = up;
+    }
 
     public IMspManager createMspmgr(IMsp[] msps){
 
@@ -54,8 +62,8 @@ public class MspManager implements IMspManager {
         }
 
         for (IMsp msp: msps) {
-           String mspId= msp.getIdentifier();
-           mspsMap.put(mspId,msp);
+            String mspId= msp.getIdentifier();
+            mspsMap.put(mspId,msp);
         }
 
     }
@@ -69,10 +77,10 @@ public class MspManager implements IMspManager {
     public IIdentity deserializeIdentity(byte[] serializedID) {
         try {
             Identities.SerializedIdentity sId = Identities.SerializedIdentity.parseFrom(serializedID);
-           // TODO 暂时先用getlocalmsp获取，之后需要通过id获取
+            // TODO 暂时先用getlocalmsp获取，之后需要通过id获取
             IMsp msp = getMSPs().get(sId.getMspid());
             //IMsp msp=GlobalMspManagement.getLocalMsp();
-           // return msp.deserializeIdentity(sId.getIdBytes().toByteArray());
+            // return msp.deserializeIdentity(sId.getIdBytes().toByteArray());
             return msp.deserializeIdentity(serializedID);
         } catch (Exception e) {
             e.printStackTrace();
@@ -84,5 +92,13 @@ public class MspManager implements IMspManager {
     @Override
     public void isWellFormed(Identities.SerializedIdentity identity) {
 
+    }
+
+    public boolean isUp() {
+        return up;
+    }
+
+    public IMspManager getMspManager() {
+        return mspManager;
     }
 }

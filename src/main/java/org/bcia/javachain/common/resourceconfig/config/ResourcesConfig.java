@@ -16,7 +16,6 @@
 package org.bcia.javachain.common.resourceconfig.config;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.resourceconfig.ResourceConfigConstant;
 import org.bcia.javachain.protos.common.Configtx;
@@ -53,5 +52,20 @@ public class ResourcesConfig implements IResourcesConfig {
                 }
             }
         }
+    }
+
+    @Override
+    public IApisConfig getApiConfig() {
+        return apiConfig;
+    }
+
+    @Override
+    public NodePoliciesConfig getNodePoliciesConfig() {
+        return nodePoliciesConfig;
+    }
+
+    @Override
+    public ISmartContractsConfig getSmartContractsConfig() {
+        return smartContractsConfig;
     }
 }

@@ -41,7 +41,11 @@ public class SM2PublicKey extends SM2Key {
 
     @Override
     public byte[] ski() {
-        return sm3.hash(publicKey);
+        try {
+            return sm3.hash(publicKey);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override

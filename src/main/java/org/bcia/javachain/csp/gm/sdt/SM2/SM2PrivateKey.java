@@ -42,7 +42,11 @@ public class SM2PrivateKey implements IKey {
 
     @Override
     public byte[] ski() {
-        return sm3.hash(privateKey);
+        try {
+            return sm3.hash(privateKey);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override

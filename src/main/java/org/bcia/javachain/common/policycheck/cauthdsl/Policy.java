@@ -20,6 +20,7 @@ import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policies.IPolicy;
+import org.bcia.javachain.common.policycheck.policies.IEvalutor;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.msp.IIdentityDeserializer;
 import java.util.List;
@@ -36,7 +37,12 @@ public class Policy implements IPolicy{
     private static JavaChainLog log = JavaChainLogFactory.getLog(Policy.class);
 
     private IIdentityDeserializer deserializer;
-    private Boolean evalutor;
+    private IEvalutor evalutor;
+
+    public Policy(IIdentityDeserializer deserializer, IEvalutor evalutor) {
+        this.deserializer = deserializer;
+        this.evalutor = evalutor;
+    }
 
     public IIdentityDeserializer getDeserializer() {
         return deserializer;
@@ -46,11 +52,11 @@ public class Policy implements IPolicy{
         this.deserializer = deserializer;
     }
 
-    public Boolean getEvalutor() {
+    public IEvalutor getEvalutor() {
         return evalutor;
     }
 
-    public void setEvalutor(Boolean evalutor) {
+    public void setEvalutor(IEvalutor evalutor) {
         this.evalutor = evalutor;
     }
 
@@ -63,26 +69,13 @@ public class Policy implements IPolicy{
         if(this == null){
             log.info("No sEvaluateuch policy");
         }
-            Boolean ok = this.evalutor(CAuthDsl.deduplicate(signatureList,this.deserializer),bool);//评估这组签名是否满足策略
+            List<SignedData> signedDataList = CAuthDsl.deduplicate(signatureList,this.deserializer);
+            Boolean ok = evalutor.evalutor(signedDataList,bool);
             if(!ok){
                 log.info("Failed to authenticate policy");
             }
     }
-    public Boolean evalutor(List<SignedData> signedDatas,Boolean[] bools){
-        return true;
-    }
 
-    /*  *//**
-     * 为cauthdsl类型策略提供策略生成器
-     * @param deserializer
-     * @return
-     *//*
-    public PolicyProvider NewPolicyProvider(IIdentityDeserializer deserializer){
-        PolicyProvider policyProvider = new PolicyProvider(deserializer);
-        //policyProvider.setDeserializer(deserializer);
-        return policyProvider;
-
-    }*/
 
 
 }

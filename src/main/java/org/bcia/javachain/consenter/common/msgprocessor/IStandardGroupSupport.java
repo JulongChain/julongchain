@@ -15,25 +15,15 @@
  */
 package org.bcia.javachain.consenter.common.msgprocessor;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.exception.PolicyException;
-import org.bcia.javachain.common.exception.ValidateException;
-import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
+import org.bcia.javachain.common.configtx.IConfigtxValidator;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
-import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.common.Configtx;
 
 /**
  * @author zhangmingyang
  * @Date: 2018/5/17
  * @company Dingxuan
  */
-public interface IStandardGroupSupport {
-    long sequence();
-
-    String groupId();
+public interface IStandardGroupSupport extends IConfigtxValidator {
 
     ILocalSigner signer();
-
-    Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx) throws InvalidProtocolBufferException, ValidateException, PolicyException;
 }

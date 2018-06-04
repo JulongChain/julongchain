@@ -71,8 +71,6 @@ public class PolicyCheckerTest {
         MspManager mspManager = new MspManager();
         IMspPrincipalGetter principalGetter = mock(IMspPrincipalGetter.class);
         PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManager(),mspManager,principalGetter);
-        //SignedProposal signedProposal = new SignedProposal("Alicesaaa".getBytes(),"msg1".getBytes());
-        //policyChecker.checkPolicyNoGroup(reader,signedProposal);
     }
 
 

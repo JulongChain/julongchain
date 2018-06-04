@@ -29,12 +29,11 @@ import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policycheck.IPolicyChecker;
 import org.bcia.javachain.common.policycheck.PolicyChecker;
 import org.bcia.javachain.common.policycheck.policies.GroupPolicyManager;
-import org.bcia.javachain.common.policycheck.policies.Policy;
 import org.bcia.javachain.common.util.proto.BlockUtils;
 import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.core.aclmgmt.AclManagement;
 import org.bcia.javachain.core.aclmgmt.resources.Resources;
-import org.bcia.javachain.core.node.ConfigFactory;
+import org.bcia.javachain.core.node.ConfigManager;
 import org.bcia.javachain.core.node.util.NodeUtils;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.javachain.core.ssc.SystemSmartContractBase;
@@ -95,7 +94,7 @@ public class CSSC extends SystemSmartContractBase {
         log.info("Init CSSC");
         IMsp localMSP = GlobalMspManagement.getLocalMsp();
         policyChecker=new PolicyChecker(new GroupPolicyManager(),localMSP,new MSPPrincipalGetter());
-        configManager=ConfigFactory.getConfigManager();
+        configManager =new ConfigManager();
         return newSuccessResponse();
     }
 

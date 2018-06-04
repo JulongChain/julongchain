@@ -15,11 +15,12 @@
  */
 package org.bcia.javachain.csp.gm.sdt.SM4;
 
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.csp.gm.sdt.SM3.SM3;
 import org.bcia.javachain.csp.intfs.IKey;
 
 /**
- * GM SM4Key
+ * GM SM4密钥
  *
  * @author tengxiumin
  * @date 2018/05/08
@@ -30,7 +31,7 @@ public class SM4Key implements IKey {
     private SM3 sm3;
     private byte[] sm4Key;
 
-    public SM4Key() {
+    public SM4Key() throws JavaChainException {
         this.sm3 = new SM3();
         this.sm4Key = SM4.SM4KeyGen();
     }
@@ -46,7 +47,11 @@ public class SM4Key implements IKey {
 
     @Override
     public byte[] ski() {
-        return sm3.hash(sm4Key);
+        try {
+            return sm3.hash(sm4Key);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     @Override

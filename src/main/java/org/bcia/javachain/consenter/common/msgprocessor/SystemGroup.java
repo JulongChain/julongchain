@@ -84,7 +84,7 @@ public class SystemGroup  implements IProcessor, IGroupConfigTemplator {
     @Override
     public long processNormalMsg(Common.Envelope env) {
         String groupId = CommonUtils.groupId(env);
-        if (groupId != standardGroup.getSupport().groupId()) {
+        if (groupId != standardGroup.getSupport().getGroupId()) {
             return 0;
         }
         return standardGroup.processNormalMsg(env);
@@ -94,21 +94,25 @@ public class SystemGroup  implements IProcessor, IGroupConfigTemplator {
     public Object processConfigUpdateMsg(Common.Envelope envConfigUpdate) throws ConsenterException, InvalidProtocolBufferException, ValidateException, PolicyException {
         String groupId = CommonUtils.groupId(envConfigUpdate);
         log.debug(String.format("Processing config update tx with system channel message processor for channel ID %s", groupId));
-        if (groupId == standardGroup.getSupport().groupId()) {
+        if (groupId == standardGroup.getSupport().getGroupId()) {
             return standardGroup.processConfigUpdateMsg(envConfigUpdate);
         }
-        log.debug(String.format("Processing group create tx for group %s on system group %s", groupId, standardGroup.getSupport().groupId()));
+        log.debug(String.format("Processing group create tx for group %s on system group %s", groupId,
+                standardGroup.getSupport().getGroupId()));
         IGroupConfigBundle bundle = groupConfigTemplator.newGroupConfig(envConfigUpdate);
 
-        Configtx.ConfigEnvelope newGroupConfigEnv = bundle.getValidator().proposeConfigUpdate(envConfigUpdate);
+        Configtx.ConfigEnvelope newGroupConfigEnv = bundle.getConfigtxValidator().proposeConfigUpdate(envConfigUpdate);
 
         Common.Envelope newChannelEnvConfig = TxUtils.createSignedEnvelope(Common.HeaderType.CONFIG_VALUE, groupId, standardGroup.getSupport().signer(), newGroupConfigEnv, Constant.MSGVERSION, Constant.EPOCH);
 
-        Common.Envelope wrappedOrdererTransaction = TxUtils.createSignedEnvelope(Common.HeaderType.CONSENTER_TRANSACTION_VALUE, standardGroup.getSupport().groupId(), standardGroup.getSupport().signer(), newChannelEnvConfig, Constant.MSGVERSION, Constant.EPOCH);
+        Common.Envelope wrappedOrdererTransaction =
+                TxUtils.createSignedEnvelope(Common.HeaderType.CONSENTER_TRANSACTION_VALUE,
+                        standardGroup.getSupport().getGroupId(), standardGroup.getSupport().signer(), newChannelEnvConfig,
+                        Constant.MSGVERSION, Constant.EPOCH);
 
         new RuleSet(standardGroup.getFilters().getRules()).apply(wrappedOrdererTransaction);
 
-        return new ConfigMsg(wrappedOrdererTransaction, standardGroup.getSupport().sequence());
+        return new ConfigMsg(wrappedOrdererTransaction, standardGroup.getSupport().getSequence());
     }
 
     @Override
