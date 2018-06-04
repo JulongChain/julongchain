@@ -89,7 +89,7 @@ public class CommonStorageDB implements IDB {
             }
             return bulkOptimizable.getCachedVersion(deriveHashedDataNs(ns, coll), keyHashStr);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new LedgerException(e);
         }
     }
 

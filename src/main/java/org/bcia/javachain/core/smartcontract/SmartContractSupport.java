@@ -360,6 +360,8 @@ public class SmartContractSupport {
     if (spec instanceof SmartContractDeploymentSpec) {
       log.info("================ deployment");
       log.info(version);
+      SmartContractDeploymentSpec deploymentSpec = (SmartContractDeploymentSpec) spec;
+      return deploymentSpec.getSmartContractSpec().getInput();
     }
 
     if (spec instanceof SmartContractInvocationSpec) {

@@ -66,12 +66,12 @@ public class LedgerTest {
         Iterator<Map.Entry<byte[], byte[]>> itr =  provider.getIterator(null);
         while(itr.hasNext()){
             Map.Entry<byte[], byte[]> entry = itr.next();
-//            soutBytes(entry.getKey());
-//            soutBytes(entry.getValue());
+            soutBytes(entry.getKey());
+            soutBytes(entry.getValue());
 //            System.out.println(Height.newHeightFromBytes(entry.getValue()).getTxNum());
 //            System.out.println(Height.newHeightFromBytes(entry.getValue()).getBlockNum());
-            System.out.println(new String(entry.getKey()));
-            System.out.println(new String(entry.getValue()));
+//            System.out.println(new String(entry.getKey()));
+//            System.out.println(new String(entry.getValue()));
 //            soutBytes(entry.getKey());
 //            soutBytes(entry.getValue());
             System.out.println("_____________________________________");

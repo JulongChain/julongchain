@@ -123,7 +123,20 @@ public class LedgerManagerTest {
         Common.Block block = constructBlock(l.getBlockByNumber(0));
         BlockAndPvtData bap = new BlockAndPvtData();
         bap.setBlock(block);
+        bap.getBlockPvtData().put((long) 1, constructTxPvtData());
         l.commitWithPvtData(bap);
+    }
+
+    private TxPvtData constructTxPvtData() throws Exception{
+        TxPvtData txPvtData = new TxPvtData();
+        ITxSimulator simulator = l.newTxSimulator("txid");
+        simulator.setPrivateData("myGroup", "coll", "key", "value1".getBytes());
+        TxSimulationResults txSimulationResults = simulator.getTxSimulationResults();
+        ByteString rwset = txSimulationResults.getPrivateReadWriteSet().getNsPvtRwset(0).getCollectionPvtRwset(0).getRwset();
+        Rwset.TxPvtReadWriteSet writeSet = Rwset.TxPvtReadWriteSet.parseFrom(rwset);
+        txPvtData.setSeqInBlock(0);
+        txPvtData.setWriteSet(writeSet);
+        return txPvtData;
     }
 
     public Common.Block constructBlock(Common.Block preBlock) throws Exception {

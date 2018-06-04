@@ -32,7 +32,7 @@ public class BlockFileWriter {
     private String filePath;
     private File file;
 
-    public static BlockFileWriter newBlockfileWriter(String filePath){
+    public static BlockFileWriter newBlockfileWriter(String filePath) throws LedgerException{
         BlockFileWriter writer = new BlockFileWriter();
         writer.setFilePath(filePath);
         return writer.open();
@@ -71,10 +71,10 @@ public class BlockFileWriter {
         }
     }
 
-    public BlockFileWriter open() {
+    public BlockFileWriter open() throws LedgerException{
         file = new File(filePath);
         if (!IoUtil.createFileIfMissing(filePath)) {
-            throw new RuntimeException("Can not create file");
+            throw new LedgerException("Can not create file");
         }
         return this;
     }
