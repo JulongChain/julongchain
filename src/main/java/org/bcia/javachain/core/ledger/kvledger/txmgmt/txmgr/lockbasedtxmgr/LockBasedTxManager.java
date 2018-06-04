@@ -72,12 +72,14 @@ public class LockBasedTxManager implements ITxManager {
 
     @Override
     public IQueryExecutor newQueryExecutor(String txid) throws LedgerException {
+        lock.readLock().lock();
         return LockBasedQueryExecutor.newQueryExecutor(this, txid);
     }
 
     @Override
     public ITxSimulator newTxSimulator(String txid) throws LedgerException {
         logger.debug("Constructing new tx simulator");
+        lock.readLock().lock();
         return LockBasedTxSimulator.newLockBasedTxSimulator(this, txid);
     }
 

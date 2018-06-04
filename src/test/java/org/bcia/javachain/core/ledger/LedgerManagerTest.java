@@ -23,10 +23,16 @@ import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.core.ledger.kvledger.KvLedger;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
+import org.bcia.javachain.core.ledger.util.Util;
+import org.bcia.javachain.core.ssc.SystemSmartContractDescriptor;
 import org.bcia.javachain.csp.gm.dxct.sm3.SM3;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.common.Ledger;
+import org.bcia.javachain.protos.ledger.rwset.Rwset;
+import org.bcia.javachain.protos.node.ProposalPackage;
+import org.bcia.javachain.protos.node.ProposalResponsePackage;
+import org.bcia.javachain.protos.node.TransactionPackage;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -109,78 +115,104 @@ public class LedgerManagerTest {
     }
 
     @Test
-    public void commitBlock() throws Exception {
-//        GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
-//        System.out.println(deleteDir(new File(Config.getPath())));
-//        long before = System.currentTimeMillis();
-//        LedgerManager.initialize(null);
-//        Common.Block block = factory.getGenesisBlock("MyGroup");
-//        l = LedgerManager.createLedger(block);
+    public void commitBlock() throws Exception{
+        System.out.println(deleteDir(new File(LedgerConfig.getRootPath())));
         LedgerManager.initialize(null);
-        l = LedgerManager.openLedger("mytestgroupid2");
-        long i = 0;
-        while(true){
-            if(l.getBlockByNumber(i) == null){
-                break;
-            }
-            i++;
-        }
-        System.out.println("Start Block Number is " + i);
-        long startTime = System.currentTimeMillis();
-        Common.BlockData data = null;
-        ByteString preHash = ByteString.copyFrom(new SM3().hash(l.getBlockByNumber(i - 1).getData().toByteArray()));
-        for (int j = 0; j < 9; j++) {
-            BlockAndPvtData bap = new BlockAndPvtData();
+        GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
+        l = LedgerManager.createLedger(factory.getGenesisBlock("myGroup"));
+        Common.Block block = constructBlock(l.getBlockByNumber(0));
+        BlockAndPvtData bap = new BlockAndPvtData();
+        bap.setBlock(block);
+        l.commitWithPvtData(bap);
+    }
 
-            Common.Envelope envelope = Common.Envelope.newBuilder()
-                    .setPayload(Common.Payload.newBuilder()
-                            .setHeader(Common.Header.newBuilder()
-                                    .setGroupHeader(Common.GroupHeader.newBuilder()
-                                            .setTxId(String.valueOf(j))
-                                            .build().toByteString())
-                                    .build())
-                            .build().toByteString())
-                    .build();
-            System.out.println();
-            System.out.println("Enter envelope " + String.valueOf(j) + " with txID " + j);
-            System.out.println();
-            Common.Envelope envelope2 = Common.Envelope.newBuilder()
-                    .setPayload(Common.Payload.newBuilder()
-                            .setHeader(Common.Header.newBuilder()
-                                    .setGroupHeader(Common.GroupHeader.newBuilder()
-                                            .setTxId(String.valueOf(j * 10))
-                                            .build().toByteString())
-                                    .build())
-                            .build().toByteString())
-                    .build();
-            System.out.println();
-            System.out.println("Enter envelope " + String.valueOf(j + 1) + " with txID " + j * 10);
-            System.out.println();
-            data = Common.BlockData.newBuilder()
-                    .addData(envelope.toByteString())
-                    .addData(envelope2.toByteString())
-                    .build();
+    public Common.Block constructBlock(Common.Block preBlock) throws Exception {
+        Common.GroupHeader groupHeader = Common.GroupHeader.newBuilder()
+                .setType(Common.HeaderType.ENDORSER_TRANSACTION_VALUE)
+                .setTxId("1")
+                .setVersion(1)
+                .setGroupId("myGroup")
+                .build();
 
-            bap.setBlock(Common.Block.newBuilder()
-                    .setHeader(Common.BlockHeader.newBuilder()
-                            .setNumber(i + j)
-                            .setDataHash(ByteString.copyFrom(new SM3().hash(data.toByteArray())))
-                            .setPreviousHash(preHash)
-                            .build())
-                    .setData(data)
-                    .setMetadata(Common.BlockMetadata.newBuilder()
-                            .addMetadata(ByteString.EMPTY)
-                            .addMetadata(ByteString.EMPTY)
-                            .addMetadata(ByteString.EMPTY)
-                            .addMetadata(ByteString.EMPTY)
-                            .build())
-                    .build());
-            soutBytes(bap.getBlock().toByteArray());
-            preHash = ByteString.copyFrom(new SM3().hash(data.toByteArray()));
-            l.commitWithPvtData(bap);
-        }
-        long endTime = System.currentTimeMillis();
-        System.out.println("耗时: " + String.valueOf(endTime - startTime) + "ms");
+        Common.SignatureHeader signatureHeader = Common.SignatureHeader.newBuilder()
+                .setNonce(ByteString.copyFromUtf8("nonce"))
+                .setCreator(ByteString.copyFromUtf8("creator"))
+                .build();
+
+        Common.Header header = Common.Header.newBuilder()
+                .setGroupHeader(groupHeader.toByteString())
+                .setSignatureHeader(signatureHeader.toByteString())
+                .build();
+
+        ITxSimulator simulator = l.newTxSimulator("txid");
+        simulator.setState("myGroup", "key", "value".getBytes());
+        TxSimulationResults txSimulationResults = simulator.getTxSimulationResults();
+        Rwset.TxReadWriteSet rwset = txSimulationResults.getPublicReadWriteSet();
+
+        ProposalResponsePackage.Response response = ProposalResponsePackage.Response.newBuilder()
+
+                .build();
+
+        ProposalPackage.SmartContractAction resPayload = ProposalPackage.SmartContractAction.newBuilder()
+                .setEvents(ByteString.copyFromUtf8("ProposalPackage.SmartContractAction Event"))
+                .setResults(rwset.toByteString())
+                .setResponse(response)
+                .build();
+
+        ProposalResponsePackage.ProposalResponsePayload prPayload = ProposalResponsePackage.ProposalResponsePayload.newBuilder()
+                .setExtension(resPayload.toByteString())
+                .build();
+
+        TransactionPackage.SmartContractEndorsedAction sceaPayload = TransactionPackage.SmartContractEndorsedAction.newBuilder()
+                .setProposalResponsePayload(prPayload.toByteString())
+                .build();
+
+        TransactionPackage.SmartContractActionPayload scaPayload = TransactionPackage.SmartContractActionPayload.newBuilder()
+                .setAction(sceaPayload)
+                .build();
+
+        TransactionPackage.TransactionAction transactionAction = TransactionPackage.TransactionAction.newBuilder()
+                .setHeader(ByteString.copyFromUtf8("Transaction Header"))
+                .setPayload(scaPayload.toByteString())
+                .build();
+
+        TransactionPackage.Transaction transaction = TransactionPackage.Transaction.newBuilder()
+                .addActions(transactionAction)
+                .build();
+
+        Common.Payload payload = Common.Payload.newBuilder()
+                .setHeader(header)
+                .setData(transaction.toByteString())
+                .build();
+
+        Common.Envelope envelope = Common.Envelope.newBuilder()
+                .setPayload(payload.toByteString())
+                .setSignature(ByteString.copyFromUtf8("Envelope Signature"))
+                .build();
+
+        Common.BlockData data = Common.BlockData.newBuilder()
+                .addData(envelope.toByteString())
+                .build();
+
+        Common.BlockHeader blockHeader = Common.BlockHeader.newBuilder()
+                .setPreviousHash(preBlock.getHeader().getDataHash())
+                .setNumber(preBlock.getHeader().getNumber() + 1)
+                .setDataHash(ByteString.copyFrom(Util.getHashBytes(data.toByteArray())))
+                .build();
+
+        Common.BlockMetadata metadata = Common.BlockMetadata.newBuilder()
+                .addMetadata(ByteString.EMPTY)
+                .addMetadata(ByteString.EMPTY)
+                .addMetadata(ByteString.EMPTY)
+                .addMetadata(ByteString.EMPTY)
+                .build();
+
+        Common.Block block = Common.Block.newBuilder()
+                .setHeader(blockHeader)
+                .setData(data)
+                .setMetadata(metadata)
+                .build();
+        return block;
     }
 
     @Test
@@ -232,7 +264,11 @@ public class LedgerManagerTest {
         LedgerManager.initialize(null);
         l = LedgerManager.openLedger("myGroup");
         IResultsIterator blocksIterator = l.getBlocksIterator(0);
-        System.out.println(blocksIterator.next());
+        int i = 0;
+        while (true) {
+            System.out.println(++i);
+            System.out.println(blocksIterator.next());
+        }
     }
 
     @Test

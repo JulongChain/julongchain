@@ -27,6 +27,14 @@ public class RangeQueryKey {
     private String endKey;
     private boolean itrExhausted;
 
+    public RangeQueryKey(){}
+
+    public RangeQueryKey(String startKey, String endKey, boolean itrExhausted){
+        this.startKey = startKey;
+        this.endKey = endKey;
+        this.itrExhausted = itrExhausted;
+    }
+
     public String getEndKey() {
         return endKey;
     }
@@ -50,5 +58,42 @@ public class RangeQueryKey {
 
     public void setStartKey(String startKey) {
         this.startKey = startKey;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        RangeQueryKey key = null;
+        try {
+            key = (RangeQueryKey) obj;
+        } catch (Exception e) {
+            return false;
+        }
+        if (startKey == null){
+            if(key.getStartKey() != null){
+                return false;
+            }
+        } else {
+            if(!startKey.equals(key.getStartKey())){
+                return false;
+            }
+        }
+        if (endKey == null) {
+            if(key.getEndKey() != null){
+                return false;
+            }
+        } else {
+            if (!endKey.equals(key.getEndKey())) {
+                return false;
+            }
+        }
+        if (itrExhausted != key.isItrExhausted()) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return (startKey + endKey + (itrExhausted ? "true" : "false")).hashCode();
     }
 }

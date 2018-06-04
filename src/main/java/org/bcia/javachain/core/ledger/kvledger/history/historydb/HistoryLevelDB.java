@@ -112,7 +112,6 @@ public class HistoryLevelDB implements IHistoryDB {
         }
         //将每个交易的写集写入HistoryDB
         List<ByteString> list = block.getData().getDataList();
-        int i = 0;
         for (; tranNo < list.size(); tranNo++) {
             ByteString evnByte = list.get(tranNo);
             if(txsFilter.isInValid(tranNo)){
@@ -128,7 +127,7 @@ public class HistoryLevelDB implements IHistoryDB {
                 ProposalPackage.SmartContractAction respPayload = null;
                 TxRwSet txRWSet = new TxRwSet();
                 respPayload = Util.getActionFromEnvelope(evnByte);
-                if(respPayload == null){
+                if(respPayload == null || !respPayload.hasResponse()){
                     logger.debug("Got null respPayload from env");
                     continue;
                 }

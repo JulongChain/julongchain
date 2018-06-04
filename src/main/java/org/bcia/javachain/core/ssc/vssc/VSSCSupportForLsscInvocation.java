@@ -154,7 +154,13 @@ public class VSSCSupportForLsscInvocation {
                     throw new SysSmartContractException(e.getMessage());
                 }
                 TxRwSet txRwSet=null;
-                txRwSet=RwSetUtil.txRwSetFromProtoMsg(rwSetProto);
+                // TODO: 6/4/18 modify by sunzongyu, catch exception when get TxRwSet from proto message.
+                try {
+                    txRwSet=RwSetUtil.txRwSetFromProtoMsg(rwSetProto);
+                } catch (LedgerException e) {
+                    String msg=String.format("Could not unmarshal from reSetProto, with error %s" + e.getMessage());
+                    throw new SysSmartContractException(msg);
+                }
                 List<NsRwSet> nsSet = txRwSet.getNsRwSets();
 
                 //extract the rwset for lscc

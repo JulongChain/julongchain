@@ -28,10 +28,17 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class BlockAndPvtData {
-
     private Common.Block block;
     private Map<Long, TxPvtData> blockPvtData = new HashMap<>();
     private MissingPrivateData missing;
+
+    public BlockAndPvtData(){}
+
+    public BlockAndPvtData(Common.Block block, Map<Long, TxPvtData> blockPvtData, MissingPrivateData missing){
+        this.block = block;
+        this.blockPvtData = blockPvtData;
+        this.missing = missing;
+    }
 
     public Common.Block getBlock() {
         return block;

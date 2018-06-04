@@ -159,7 +159,7 @@ public class QueryHelper {
                 }
             }
         } finally {
-//            txMgr.getLock().readLock().unlock();
+            txMgr.getLock().readLock().unlock();
             doneInvoked = true;
             for(IResultsIterator itr : itrs){
                 itr.close();
