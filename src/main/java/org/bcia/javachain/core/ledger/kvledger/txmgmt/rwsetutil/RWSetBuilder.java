@@ -36,8 +36,8 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class RWSetBuilder {
-    Map<String, NsPubRwBuilder> pubRwBuilderMap = new HashMap<>();
-    Map<String, NsPvtRwBuilder> pvtRwBuilderMap = new HashMap<>();
+    private Map<String, NsPubRwBuilder> pubRwBuilderMap = new HashMap<>();
+    private Map<String, NsPvtRwBuilder> pvtRwBuilderMap = new HashMap<>();
 
     /**
      * 向读集合添加
@@ -117,7 +117,7 @@ public class RWSetBuilder {
         return results;
     }
 
-    public void setPvtCollectionHash(String ns, String coll, ByteString pvtDataProto) throws LedgerException {
+    private void setPvtCollectionHash(String ns, String coll, ByteString pvtDataProto) throws LedgerException {
         CollHashRwBuilder collHashBuilder = getOrCreateCollHashedRwBuilder(ns, coll);
         //TODO SM3 Hash
         collHashBuilder.setPvtDataHash(Util.getHashBytes(pvtDataProto.toByteArray()));
@@ -126,7 +126,7 @@ public class RWSetBuilder {
     /**
      * 返回RWSet
      */
-    public TxRwSet getTxReadWriteSet(){
+    private TxRwSet getTxReadWriteSet(){
         List<NsPubRwBuilder> sortedNsPubBuilders = Util.getValuesBySortedKeys(pubRwBuilderMap);
         List<NsRwSet> nsPubRwSets = new ArrayList<>();
         for(NsPubRwBuilder nsPubRwBuilder : sortedNsPubBuilders){
@@ -140,7 +140,7 @@ public class RWSetBuilder {
     /**
      * 返回私有RWSet
      */
-    public TxPvtRwSet getTxPvtReadWriteSet(){
+    private TxPvtRwSet getTxPvtReadWriteSet(){
         List<NsPvtRwBuilder> sortedNsPvtBuliders = Util.getValuesBySortedKeys(pvtRwBuilderMap);
         List<NsPvtRwSet> nsPvtRwSets = new ArrayList<>();
         for(NsPvtRwBuilder nsPvtRwBuilder : sortedNsPvtBuliders){
@@ -157,7 +157,7 @@ public class RWSetBuilder {
     /**
      * 根据ns获取nsPubRwBuilder
      */
-    public NsPubRwBuilder getOrCreateNsPubRwBuilder(String ns){
+    private NsPubRwBuilder getOrCreateNsPubRwBuilder(String ns){
         NsPubRwBuilder nsPubRwBuilder = pubRwBuilderMap.get(ns);
         if(nsPubRwBuilder == null){
             nsPubRwBuilder = new NsPubRwBuilder();
@@ -171,7 +171,7 @@ public class RWSetBuilder {
     /**
      * 根据ns获取nsPvtRwBuilder
      */
-    public NsPvtRwBuilder getOrCreateNsPvtRwBuilder(String ns){
+    private NsPvtRwBuilder getOrCreateNsPvtRwBuilder(String ns){
         NsPvtRwBuilder nsPvtRwBuilder = pvtRwBuilderMap.get(ns);
         if(nsPvtRwBuilder == null){
             nsPvtRwBuilder = new NsPvtRwBuilder();
@@ -181,7 +181,7 @@ public class RWSetBuilder {
         return nsPvtRwBuilder;
     }
 
-    public CollHashRwBuilder getOrCreateCollHashedRwBuilder(String ns, String coll){
+    private CollHashRwBuilder getOrCreateCollHashedRwBuilder(String ns, String coll){
         NsPubRwBuilder nsPubRwBuilder = getOrCreateNsPubRwBuilder(ns);
         CollHashRwBuilder collHashRwBuilder = nsPubRwBuilder.getCollHashRwBuilders().get(coll);
         if(collHashRwBuilder == null){
@@ -193,7 +193,7 @@ public class RWSetBuilder {
         return collHashRwBuilder;
     }
 
-    public CollPvtRwBuilder getOrCreateCollPvtRwBuilder(String ns, String coll){
+    private CollPvtRwBuilder getOrCreateCollPvtRwBuilder(String ns, String coll){
         NsPvtRwBuilder nsPvtRwBuilder = getOrCreateNsPvtRwBuilder(ns);
         CollPvtRwBuilder collHashRwBuilder = nsPvtRwBuilder.getCollPvtRwBuilders().get(coll);
         if(collHashRwBuilder == null){

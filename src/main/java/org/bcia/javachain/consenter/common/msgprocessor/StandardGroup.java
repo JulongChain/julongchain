@@ -63,7 +63,7 @@ public class StandardGroup implements IProcessor {
             }
         }
         //TODO EmptyRejectRule 待确定是否为无参构函数
-          filters =new RuleSet(new IRule[]{new EmptyRejectRule(), new ExpirationRejectRule(filterSupport), new SizeFilter(consenterConfig), new SigFilter(Policy.ChannelWriters, filterSupport.getPolicyManager())});
+        filters = new RuleSet(new IRule[]{new EmptyRejectRule(), new ExpirationRejectRule(filterSupport), new SizeFilter(consenterConfig), new SigFilter(Policy.ChannelWriters, filterSupport.getPolicyManager())});
         return filters;
     }
 
@@ -83,17 +83,18 @@ public class StandardGroup implements IProcessor {
 
     @Override
     public long processNormalMsg(Common.Envelope env) {
-        long configSeq = standardGroupSupport.sequence();
+        long configSeq = standardGroupSupport.getSequence();
         return configSeq;
     }
 
     @Override
     public Object processConfigUpdateMsg(Common.Envelope env) throws InvalidProtocolBufferException, ValidateException, PolicyException {
-        long seq = standardGroupSupport.sequence();
+        long seq = standardGroupSupport.getSequence();
         //TODO 通过apply过滤
         Configtx.ConfigEnvelope configEnvelope = standardGroupSupport.proposeConfigUpdate(env);
         int headerType = 0;
-        Common.Envelope config = TxUtils.createSignedEnvelope(headerType, standardGroupSupport.groupId(), standardGroupSupport.signer(), configEnvelope, Constant.MSGVERSION, Constant.EPOCH);
+        Common.Envelope config = TxUtils.createSignedEnvelope(headerType, standardGroupSupport.getGroupId(),
+                standardGroupSupport.signer(), configEnvelope, Constant.MSGVERSION, Constant.EPOCH);
         return new ConfigMsg(config, seq);
     }
 

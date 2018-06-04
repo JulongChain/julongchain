@@ -15,6 +15,10 @@
  */
 package org.bcia.javachain.common.policies;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.PolicyException;
+import org.bcia.javachain.common.exception.ValidateException;
+
 /**
  * 类描述
  *
@@ -23,5 +27,5 @@ package org.bcia.javachain.common.policies;
  * @company Dingxuan
  */
 public interface IPolicyManagerGetter {
-    IPolicyManager getPolicyManager(String groupId);
+    IPolicyManager getPolicyManager(String groupId) throws InvalidProtocolBufferException, PolicyException, ValidateException;
 }

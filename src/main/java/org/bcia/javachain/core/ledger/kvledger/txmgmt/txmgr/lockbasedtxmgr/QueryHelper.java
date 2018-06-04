@@ -38,7 +38,7 @@ import java.util.Map;
 public class QueryHelper {
     private LockBasedTxManager txMgr;
     private RWSetBuilder rwSetBuilder;
-    private List<IResultsItr> itrs;
+    private List<IResultsItr> itrs = new ArrayList<>();
     private boolean doneInvoked = true;
 
     public byte[] getState(String ns, String key) throws LedgerException{
@@ -159,7 +159,7 @@ public class QueryHelper {
                 }
             }
         } finally {
-//            txMgr.getLock().readLock().unlock();
+            txMgr.getLock().readLock().unlock();
             doneInvoked = true;
             for(IResultsIterator itr : itrs){
                 itr.close();

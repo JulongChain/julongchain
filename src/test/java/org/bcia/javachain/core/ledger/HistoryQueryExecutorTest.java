@@ -30,7 +30,7 @@ import org.junit.Test;
  * @company Dingxuan
  */
 public class HistoryQueryExecutorTest {
-    String ns = "Default";
+    String ns = "myGroup";
     IHistoryQueryExecutor queryExecutor;
 
     @Before

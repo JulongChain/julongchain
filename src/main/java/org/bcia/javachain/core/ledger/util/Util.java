@@ -110,6 +110,7 @@ public class Util {
             scaPayload = TransactionPackage.SmartContractActionPayload.parseFrom(txAction.getPayload());
         } catch (InvalidProtocolBufferException e) {
             logger.error("Got error when getting SmartContractActionPayload");
+            logger.error(e.getMessage(), e);
             return null;
         }
         if(scaPayload.getAction() == null || scaPayload.getAction().getProposalResponsePayload() == null){
@@ -120,6 +121,7 @@ public class Util {
             prPayload = ProposalResponsePackage.ProposalResponsePayload.parseFrom(scaPayload.getAction().getProposalResponsePayload());
         } catch (InvalidProtocolBufferException e) {
             logger.error("Got error when getting ProposalResponsePayload");
+            logger.error(e.getMessage(), e);
             return null;
         }
         if(prPayload.getExtension() == null){
@@ -130,6 +132,7 @@ public class Util {
             respPayload = ProposalPackage.SmartContractAction.parseFrom(prPayload.getExtension());
         } catch (InvalidProtocolBufferException e) {
             logger.error("Got error when getting SmartContractAction");
+            logger.error(e.getMessage(), e);
             return null;
         }
         return respPayload;

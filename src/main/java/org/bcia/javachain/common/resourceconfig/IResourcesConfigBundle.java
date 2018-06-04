@@ -16,7 +16,7 @@
 package org.bcia.javachain.common.resourceconfig;
 
 import org.bcia.javachain.common.config.IConfig;
-import org.bcia.javachain.common.configtx.IValidator;
+import org.bcia.javachain.common.configtx.IConfigtxValidator;
 import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.javachain.common.policies.IPolicyManager;
 import org.bcia.javachain.common.resourceconfig.config.IResourcesConfig;
@@ -37,7 +37,7 @@ public interface IResourcesConfigBundle extends IConfig {
 
     IResourcesConfig getResourcesConfig();
 
-    IValidator getValidator();
+    IConfigtxValidator getConfigtxValidator();
 
     IPolicyManager getPolicyManager();
 }

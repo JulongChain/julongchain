@@ -1,5 +1,5 @@
 /**
- * Copyright SDT. All Rights Reserved.
+ * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.csp.gm.sdt.SM3;
+package org.bcia.javachain.core.node;
 
-import org.bcia.javachain.csp.intfs.opts.IHashOpts;
+import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
+import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
 
 /**
- * GM SM3HashOpts
+ * 类描述
  *
- * @author tengxiumin
- * @date 2018/05/14
- * @company SDT
+ * @author zhouhui
+ * @date 2018/06/03
+ * @company Dingxuan
  */
-public class SM3HashOpts implements IHashOpts {
+public interface INodeSupport {
+    IApplicationConfig getApplicationConfig(String groupId);
 
-    public SM3HashOpts() {}
-
-    @Override
-    public String getAlgorithm() {
-        return "SM3";
-    }
+    ISmartContractDefinition getSmartContractByName(String groupId, String scName);
 }

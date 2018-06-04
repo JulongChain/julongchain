@@ -15,11 +15,11 @@
  */
 package org.bcia.javachain.core.node;
 
-import org.bcia.javachain.common.config.IConfig;
-import org.bcia.javachain.common.config.IConfigManager;
 import org.bcia.javachain.common.exception.NodeException;
+import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
 import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.entity.Group;
 
@@ -27,18 +27,18 @@ import org.bcia.javachain.node.entity.Group;
  * 类描述
  *
  * @author zhouhui
- * @date 2018/05/31
+ * @date 2018/06/03
  * @company Dingxuan
  */
-public class ConfigManager implements IConfigManager {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ConfigManager.class);
+public class NodeSupport implements INodeSupport {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(NodeSupport.class);
 
     @Override
-    public IConfig getGroupConfig(String groupID) {
+    public IApplicationConfig getApplicationConfig(String groupId) {
         try {
-            Group group = Node.getInstance().getGroupMap().get(groupID);
+            Group group = Node.getInstance().getGroupMap().get(groupId);
             if (group != null) {
-                return group.getGroupSupport().getGroupConfigBundle();
+                return group.getGroupSupport().getApplicationConfig();
             }
         } catch (NodeException ex) {
             log.error(ex.getMessage(), ex);
@@ -48,13 +48,14 @@ public class ConfigManager implements IConfigManager {
     }
 
     @Override
-    public IConfig getResourceConfig(String groupID) {
+    public ISmartContractDefinition getSmartContractByName(String groupId, String scName) {
         try {
-            Group group = Node.getInstance().getGroupMap().get(groupID);
+            Group group = Node.getInstance().getGroupMap().get(groupId);
             if (group != null) {
-                return group.getGroupSupport().getResourcesConfigBundle();
+                return group.getGroupSupport().getResourcesConfigBundle().getResourcesConfig().getSmartContractsConfig()
+                        .getSmartContractByName(scName);
             }
-        } catch (NodeException ex) {
+        } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
         }
 

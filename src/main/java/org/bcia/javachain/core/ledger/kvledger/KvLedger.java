@@ -381,8 +381,7 @@ public class KvLedger implements INodeLedger {
 
     @Override
     public synchronized void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException {
-        Common.Block block = blockAndPvtData.getBlock();
-        long blockNo = block.getHeader().getNumber();
+        long blockNo = blockAndPvtData.getBlock().getHeader().getNumber();
         logger.debug(String.format("Group %s: Validating state for block %d", ledgerID, blockNo));
         //执行校验工作
         txtmgmt.validateAndPrepare(blockAndPvtData, true);
@@ -396,7 +395,7 @@ public class KvLedger implements INodeLedger {
         //在HistoryDB允许的情况下提交历史信息
         if(LedgerConfig.isHistoryDBEnabled()){
             logger.debug(String.format("Group %s: Committing block %d transaction to history db", ledgerID, blockNo));
-            historyDB.commit(block);
+            historyDB.commit(blockAndPvtData.getBlock());
         }
     }
 

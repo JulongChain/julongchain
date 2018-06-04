@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bcia.javachain.common.configtx.ConfigComparable;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.util.CommConstant;
+import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.protos.common.Configtx;
 
 import java.util.HashMap;
@@ -162,4 +163,79 @@ public class ConfigMapUtils {
         }
     }
 
+    public static Configtx.ConfigTree configMapToConfig(Map<String, ConfigComparable> configComparableMap,
+                                                        String namespace) throws ValidateException {
+        String rootPath = CommConstant.PATH_SEPARATOR + namespace;
+        return recurseConfigMap(rootPath, configComparableMap);
+    }
+
+    private static Configtx.ConfigTree recurseConfigMap(String path, Map<String, ConfigComparable> configComparableMap)
+            throws ValidateException {
+        String childPath = CHILD_PREFIX + path;
+        ConfigComparable childConfigComparable = configComparableMap.get(childPath);
+
+        ValidateUtils.isNotNull(childConfigComparable, "childConfigComparable can not be null");
+        if (!(childConfigComparable.getT() instanceof Configtx.ConfigTree)) {
+            throw new ValidateException("must be configTree");
+        }
+
+        Configtx.ConfigTree configTree = (Configtx.ConfigTree) childConfigComparable.getT();
+        Configtx.ConfigTree.Builder newConfigTreeBuilder = configTree.toBuilder();
+
+        //遍历所有的子树
+        Iterator<Map.Entry<String, Configtx.ConfigTree>> childIterator = configTree.getChildsMap().entrySet()
+                .iterator();
+        while (childIterator.hasNext()) {
+            Map.Entry<String, Configtx.ConfigTree> entry = childIterator.next();
+            String childName = entry.getKey();
+
+            Configtx.ConfigTree newChildTree = recurseConfigMap(path + CommConstant.PATH_SEPARATOR + childName,
+                    configComparableMap);
+            newConfigTreeBuilder.putChilds(childName, newChildTree);
+        }
+
+        //遍历所有的值
+        Iterator<Map.Entry<String, Configtx.ConfigValue>> valueIterator = configTree.getValuesMap().entrySet()
+                .iterator();
+        while (valueIterator.hasNext()) {
+            Map.Entry<String, Configtx.ConfigValue> entry = valueIterator.next();
+            String valueName = entry.getKey();
+
+            String valuePath = VALUE_PREFIX + path + CommConstant.PATH_SEPARATOR + valueName;
+
+            ConfigComparable configComparable = configComparableMap.get(valuePath);
+            if (configComparable == null || configComparable.getT() == null) {
+                throw new ValidateException("value can not be null");
+            }
+
+            if (!(configComparable.getT() instanceof Configtx.ConfigValue)) {
+                throw new ValidateException("should be value");
+            }
+
+            newConfigTreeBuilder.putValues(valuePath, (Configtx.ConfigValue) configComparable.getT());
+        }
+
+        //遍历所有的策略
+        Iterator<Map.Entry<String, Configtx.ConfigPolicy>> policyIterator = configTree.getPoliciesMap().entrySet()
+                .iterator();
+        while (policyIterator.hasNext()) {
+            Map.Entry<String, Configtx.ConfigPolicy> entry = policyIterator.next();
+            String policyName = entry.getKey();
+
+            String policyPath = POLICY_PREFIX + path + CommConstant.PATH_SEPARATOR + policyName;
+
+            ConfigComparable configComparable = configComparableMap.get(policyPath);
+            if (configComparable == null || configComparable.getT() == null) {
+                throw new ValidateException("value can not be null");
+            }
+
+            if (!(configComparable.getT() instanceof Configtx.ConfigPolicy)) {
+                throw new ValidateException("should be value");
+            }
+
+            newConfigTreeBuilder.putPolicies(policyPath, (Configtx.ConfigPolicy) configComparable.getT());
+        }
+
+        return newConfigTreeBuilder.build();
+    }
 }

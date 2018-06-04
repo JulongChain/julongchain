@@ -8,6 +8,7 @@ import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.msp.IIdentityDeserializer;
 import org.bcia.javachain.msp.mgmt.IMspPrincipalGetter;
 import org.bcia.javachain.msp.mgmt.MspManager;
+import org.bcia.javachain.protos.node.ProposalPackage;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,7 +48,8 @@ public class PolicyCheckerTest {
         IIdentityDeserializer localMSP = mock(IIdentityDeserializer.class);
         IMspPrincipalGetter principalGetter = mock(IMspPrincipalGetter.class);
         PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManager(),localMSP,principalGetter);
-        //policyChecker.checkPolicy("A", "Admins",new SignedProposal("Alicesaaa".getBytes(),"msg1".getBytes()));
+        ProposalPackage.SignedProposal signedProposal = ProposalPackage.SignedProposal.newBuilder().build();
+        policyChecker.checkPolicy("A", "Admins",signedProposal);
 
 
     }

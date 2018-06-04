@@ -16,8 +16,8 @@
 package org.bcia.javachain.common.groupconfig;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.configtx.IValidator;
-import org.bcia.javachain.common.configtx.Validator;
+import org.bcia.javachain.common.configtx.ConfigtxValidator;
+import org.bcia.javachain.common.configtx.IConfigtxValidator;
 import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.config.*;
@@ -59,7 +59,7 @@ public class GroupConfigBundle implements IGroupConfigBundle {
     /**
      * 校验者
      */
-    private IValidator validator;
+    private IConfigtxValidator configtxValidator;
 
     private Configtx.Config config;
 
@@ -97,7 +97,7 @@ public class GroupConfigBundle implements IGroupConfigBundle {
 
         this.policyManager = new PolicyManager(GroupConfigConstant.GROUP, policyProviderMap, config.getGroupTree());
 
-        this.validator = new Validator(groupId, config, GroupConfigConstant.GROUP, policyManager);
+        this.configtxValidator = new ConfigtxValidator(groupId, config, GroupConfigConstant.GROUP, policyManager);
     }
 
     /**
@@ -232,8 +232,8 @@ public class GroupConfigBundle implements IGroupConfigBundle {
     }
 
     @Override
-    public IValidator getValidator() {
-        return validator;
+    public IConfigtxValidator getConfigtxValidator() {
+        return configtxValidator;
     }
 
     @Override
@@ -242,7 +242,7 @@ public class GroupConfigBundle implements IGroupConfigBundle {
     }
 
     @Override
-    public Configtx.ConfigEnvelope updateProposeConfig(Common.Envelope configtx) throws InvalidProtocolBufferException, ValidateException{
-        return validator.proposeConfigUpdate(configtx);
+    public Configtx.ConfigEnvelope updateProposeConfig(Common.Envelope configtx) throws InvalidProtocolBufferException, ValidateException {
+        return configtxValidator.proposeConfigUpdate(configtx);
     }
 }

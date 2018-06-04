@@ -50,4 +50,42 @@ public class HashedCompositeKey {
     public void setKeyHash(String keyHash) {
         this.keyHash = keyHash;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        HashedCompositeKey hcKey = null;
+        try {
+            hcKey = (HashedCompositeKey) obj;
+        } catch (Exception e) {
+            return false;
+        }
+        if (namespace==null) {
+            if (hcKey.getNamespace() != null) {
+                return false;
+            }
+        } else {
+            if (!namespace.equals(hcKey.getNamespace())) {
+                return false;
+            }
+        }
+        if (collectionName==null) {
+            if (hcKey.getCollectionName() != null) {
+                return false;
+            }
+        } else {
+            if (!collectionName.equals(hcKey.getCollectionName())) {
+                return false;
+            }
+        }
+        if (keyHash==null) {
+            return hcKey.getKeyHash() == null;
+        } else {
+            return keyHash.equals(hcKey.getKeyHash());
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return (namespace + collectionName + keyHash).hashCode();
+    }
 }

@@ -41,9 +41,9 @@ public interface ICommitterSupport {
 
     void apply(Configtx.ConfigEnvelope configtx) throws CommitterException;
 
-    String[] getMSPIDs(String groupId);
+    String[] getMspIds(String groupId);
 
     IApplicationCapabilities getCapabilities();
 
-    ISmartContractDefinition getSmartContractByName(String chainname, String ccname);
+    ISmartContractDefinition getSmartContractByName(String groupId, String scName);
 }

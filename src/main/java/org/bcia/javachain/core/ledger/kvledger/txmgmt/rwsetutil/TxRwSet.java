@@ -17,6 +17,7 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.rwsetutil;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.protos.ledger.rwset.Rwset;
 
 import java.util.ArrayList;
@@ -66,13 +67,13 @@ public class TxRwSet {
     /**
      * 将ByteString转换为TxRwSet
      */
-    public void fromProtoBytes(ByteString protoBytes){
+    public void fromProtoBytes(ByteString protoBytes) throws LedgerException {
         Rwset.TxReadWriteSet protoMsg = null;
         TxRwSet txRwSetTemp = null;
         try {
             protoMsg = Rwset.TxReadWriteSet.parseFrom(protoBytes);
         } catch (InvalidProtocolBufferException e) {
-            throw new RuntimeException("Got error when getting TxReadWriteSet from protoBytes: " + e);
+            throw new LedgerException("Got error when getting TxReadWriteSet from protoBytes: " + e);
         }
         txRwSetTemp = RwSetUtil.txRwSetFromProtoMsg(protoMsg);
         nsRwSets = txRwSetTemp.getNsRwSets();

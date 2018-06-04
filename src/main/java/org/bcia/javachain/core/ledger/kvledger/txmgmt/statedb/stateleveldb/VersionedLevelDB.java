@@ -22,6 +22,7 @@ import org.bcia.javachain.common.ledger.util.IDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.BytesHexStrTranslate;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.StatedDB;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
@@ -89,7 +90,7 @@ public class VersionedLevelDB implements IVersionedDB {
     public IResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
         byte[] compositeStartKey = constructCompositeKey(namespace, startKey);
         byte[] compositeEndKey = constructCompositeKey(namespace, endKey);
-        if("".equals(endKey)){
+        if(endKey == null || "".equals(endKey)){
             compositeEndKey[compositeEndKey.length - 1] = LAST_KEY_INDICATOR;
         }
         Iterator dbItr = db.getIterator(compositeStartKey);
@@ -110,11 +111,11 @@ public class VersionedLevelDB implements IVersionedDB {
         List<String> nameSpaces = batch.getUpdatedNamespaces();
         for(String ns : nameSpaces){
             Map<String,VersionedValue> updates = batch.getUpdates(ns);
-            int i = 0;
             for(Map.Entry<String, VersionedValue> entry : updates.entrySet()){
-                byte[] compositeKey = constructCompositeKey(ns, String.valueOf(i));
-                logger.debug(String.format("Gtoup [%s]: Applying key(String)=[%s] key(bytes) length=[%d]"
-                        , dbName, new String(compositeKey), compositeKey.length));
+                String key = entry.getKey();
+                byte[] compositeKey = constructCompositeKey(ns, key);
+                logger.debug(String.format("Group [%s]: Applying key(String)=[%s] key(bytes)=[%s]"
+                        , dbName, new String(compositeKey), BytesHexStrTranslate.bytesToHexFun1(compositeKey )));
 
                 if(entry.getValue() == null){
                     dbBatch.delete(compositeKey);
@@ -158,19 +159,23 @@ public class VersionedLevelDB implements IVersionedDB {
 
     public static byte[] constructCompositeKey(String ns, String key){
         byte[] result = ArrayUtils.addAll(ns.getBytes(), COMPOSITE_KEY_SEP);
-        return ArrayUtils.addAll(result, key.getBytes());
+        if(key == null){
+            return ArrayUtils.addAll(result, new byte[0]);
+        } else {
+            return ArrayUtils.addAll(result, key.getBytes());
+        }
     }
 
     public static String splitCompositeKeyToKey(byte[] compositeKey){
        String tmp = new String(compositeKey);
        String[] result = tmp.split(new String(COMPOSITE_KEY_SEP));
-       return result[0];
+       return result[1];
     }
 
     public static String splitCompositeKeyToNs(byte[] compositeKey){
         String tmp = new String(compositeKey);
         String[] result = tmp.split(new String(COMPOSITE_KEY_SEP));
-        return result[1];
+        return result[0];
     }
 
     public IDBProvider getDb() {

@@ -16,8 +16,8 @@
 package org.bcia.javachain.common.resourceconfig;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.configtx.IValidator;
-import org.bcia.javachain.common.configtx.Validator;
+import org.bcia.javachain.common.configtx.ConfigtxValidator;
+import org.bcia.javachain.common.configtx.IConfigtxValidator;
 import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
@@ -46,7 +46,7 @@ public class ResourcesConfigBundle implements IResourcesConfigBundle {
     private Configtx.Config config;
     private IGroupConfigBundle groupConfigBundle;
     private IResourcesConfig resourcesConfig;
-    private IValidator validator;
+    private IConfigtxValidator configtxValidator;
     private IPolicyManager policyManager;
 
     private List<Callback> callbackList;
@@ -71,7 +71,7 @@ public class ResourcesConfigBundle implements IResourcesConfigBundle {
 
         this.policyManager = new PolicyRouter(groupPolicyManager, resourcesPolicyManager);
 
-        this.validator = new Validator(groupId, config, ResourceConfigConstant.RESOURCES, policyManager);
+        this.configtxValidator = new ConfigtxValidator(groupId, config, ResourceConfigConstant.RESOURCES, policyManager);
 
     }
 
@@ -86,8 +86,8 @@ public class ResourcesConfigBundle implements IResourcesConfigBundle {
     }
 
     @Override
-    public IValidator getValidator() {
-        return validator;
+    public IConfigtxValidator getConfigtxValidator() {
+        return configtxValidator;
     }
 
     @Override
@@ -101,7 +101,8 @@ public class ResourcesConfigBundle implements IResourcesConfigBundle {
     }
 
     @Override
-    public Configtx.ConfigEnvelope updateProposeConfig(Common.Envelope configtx) throws InvalidProtocolBufferException, ValidateException {
-        return validator.proposeConfigUpdate(configtx);
+    public Configtx.ConfigEnvelope updateProposeConfig(Common.Envelope configtx) throws InvalidProtocolBufferException,
+            ValidateException {
+        return configtxValidator.proposeConfigUpdate(configtx);
     }
 }

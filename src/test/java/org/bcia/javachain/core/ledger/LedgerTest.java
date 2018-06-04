@@ -15,19 +15,11 @@
  */
 package org.bcia.javachain.core.ledger;
 
-import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.genesis.GenesisBlockFactory;
 import org.bcia.javachain.common.ledger.blockledger.json.JsonLedger;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.core.ledger.kvledger.history.historydb.HistoryDBHelper;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
-import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
-import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.common.Configtx;
-import org.bcia.javachain.protos.node.ProposalResponsePackage;
-import org.bcia.javachain.protos.node.Smartcontract;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -42,43 +34,8 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class LedgerTest {
-    String ledgerID = "Default";
-    INodeLedger ledger;
-    ITxSimulator txSimulator;
-
-    @Before
-    public void before() throws Exception{
-        System.out.println(deleteDir(new File(LedgerConfig.getRootPath())));
-        GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
-        Common.Block block = factory.getGenesisBlock("myGroup");
-        ledger = LedgerManager.createLedger(block);
-    }
-
-//    private Common.Envelope init(Map<String, Integer> initialBalances) throws Exception{
-//        txSimulator =  ledger.newTxSimulator("txid");
-//        initialBalances.forEach((k, v) -> {
-//            try {
-//                txSimulator.setState(ledgerID, k, v.toString().getBytes());
-//            } catch (LedgerException e) {
-//                e.printStackTrace();
-//            }
-//        });
-//        TxSimulationResults txSimulationResults = txSimulator.getTxSimulationResults();
-//        ByteString pubSimBytes = txSimulationResults.getPubReadWriteByteString();
-//        pubSimBytes
-//    }
-
-    private Common.Envelope constructTransaction(ByteString simulationResults) throws Exception{
-        Smartcontract.SmartContractID scid = Smartcontract.SmartContractID.newBuilder()
-                .setName("foo")
-                .setVersion("v1")
-                .build();
-        ProposalResponsePackage.Response response = ProposalResponsePackage.Response.newBuilder()
-                .setStatus(200)
-                .build();
-
-        return null;
-    }
+    public static final String AKSJDLAD = "aksjdlad";
+    private static final byte[] COMPOSITE_KEY_SEP = {0x00};
 
     @Test
     public void historyDBTest() throws LedgerException {
@@ -109,12 +66,12 @@ public class LedgerTest {
         Iterator<Map.Entry<byte[], byte[]>> itr =  provider.getIterator(null);
         while(itr.hasNext()){
             Map.Entry<byte[], byte[]> entry = itr.next();
-//            soutBytes(entry.getKey());
-//            soutBytes(entry.getValue());
+            soutBytes(entry.getKey());
+            soutBytes(entry.getValue());
 //            System.out.println(Height.newHeightFromBytes(entry.getValue()).getTxNum());
 //            System.out.println(Height.newHeightFromBytes(entry.getValue()).getBlockNum());
-            System.out.println(new String(entry.getKey()));
-            System.out.println(new String(entry.getValue()));
+//            System.out.println(new String(entry.getKey()));
+//            System.out.println(new String(entry.getValue()));
 //            soutBytes(entry.getKey());
 //            soutBytes(entry.getValue());
             System.out.println("_____________________________________");
@@ -144,18 +101,5 @@ public class LedgerTest {
             System.out.print(b + " ");
         }
         System.out.println();
-    }
-
-    private static boolean deleteDir(File dir) {
-        if (dir.isDirectory()) {
-            String[] children = dir.list();
-            for (int i = 0; i < children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
-                if (!success) {
-                    return false;
-                }
-            }
-        }
-        return dir.delete();
     }
 }

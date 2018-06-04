@@ -15,6 +15,8 @@
  */
 package org.bcia.javachain.common.resourceconfig.config;
 
+import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
+
 /**
  * 智能合约集配置接口
  *
@@ -23,4 +25,5 @@ package org.bcia.javachain.common.resourceconfig.config;
  * @company Dingxuan
  */
 public interface ISmartContractsConfig {
+    ISmartContractDefinition getSmartContractByName(String scName);
 }

@@ -42,4 +42,33 @@ public class CompositeKey {
     public void setKey(String key) {
         this.key = key;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        CompositeKey cKey = null;
+        try {
+            cKey = (CompositeKey) obj;
+        } catch (Exception e) {
+            return false;
+        }
+        if(namespace == null){
+            if(cKey.getNamespace() != null){
+                return false;
+            }
+        } else {
+            if(!namespace.equals(cKey.getNamespace())){
+                return false;
+            }
+        }
+        if (key == null) {
+            return cKey.getKey() == null;
+        } else {
+            return key.equals(cKey.getKey());
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return (namespace + key).hashCode();
+    }
 }

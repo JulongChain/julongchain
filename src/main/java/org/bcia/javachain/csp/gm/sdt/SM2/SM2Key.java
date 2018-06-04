@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.csp.gm.sdt.SM2;
 
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.csp.gm.sdt.SM3.SM3;
 import org.bcia.javachain.csp.intfs.IKey;
 
@@ -46,7 +47,13 @@ public class SM2Key implements IKey {
 
     @Override
     public byte[] ski() {
-        return sm3.hash(sm2KeyPair.getPrivateKey());
+
+        try {
+            return sm3.hash(sm2KeyPair.getPrivateKey());
+        } catch (Exception e) {
+            return null;
+        }
+
     }
 
     @Override

@@ -79,5 +79,10 @@ public class CommConstant {
      */
     public static final int DEFAULT_NONCE_LENGTH = 24;
 
+    /**
+     * gRPC最大消息大小(512M)
+     */
+    public static final int MAX_GRPC_MESSAGE_SIZE = 1 << 29;
+
 
 }

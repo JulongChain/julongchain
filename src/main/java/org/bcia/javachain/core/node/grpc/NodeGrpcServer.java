@@ -17,11 +17,12 @@ package org.bcia.javachain.core.node.grpc;
 
 import com.google.protobuf.Empty;
 import io.grpc.Server;
-import io.grpc.ServerBuilder;
+import io.grpc.netty.NettyServerBuilder;
 import io.grpc.stub.StreamObserver;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.common.util.proto.ProposalResponseUtils;
 import org.bcia.javachain.core.admin.IAdminServer;
 import org.bcia.javachain.core.endorser.IEndorserServer;
@@ -31,7 +32,6 @@ import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.gossip.GossipGrpc;
 import org.bcia.javachain.protos.gossip.Message;
 import org.bcia.javachain.protos.node.*;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
@@ -88,7 +88,8 @@ public class NodeGrpcServer {
     }
 
     public void start() throws IOException {
-        server = ServerBuilder.forPort(port)
+        server = NettyServerBuilder.forPort(port).maxMessageSize(CommConstant.MAX_GRPC_MESSAGE_SIZE)
+//        server = ServerBuilder.forPort(port)
                 .addService(new EndorserServerImpl())
                 .addService(new SmartContractSupportService())
                 .addService(new AdminServerImpl())

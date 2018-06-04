@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.csp.gm.sdt.SM3;
 
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.csp.gm.sdt.common.Constants;
@@ -40,16 +41,17 @@ public class SM3 {
         digestSize = Constants.SM3_DIGEST_LEN;
     }
 
-    public byte[] hash(byte[] message) {
+    public byte[] hash(byte[] message) throws JavaChainException{
         if(null == message) {
             logger.error("Invalid message. It must not be nil.");
-            return null;
+            throw new JavaChainException("Invalid message. It must not be nil.");
         }
         byte[] result = null;
         try {
             result = smJniApi.SM3Hash(message);
         } catch (Exception e) {
             logger.error(e.getMessage());
+            throw new JavaChainException("SM3Hash error: compute message hash failed.");
         }
         return result;
     }

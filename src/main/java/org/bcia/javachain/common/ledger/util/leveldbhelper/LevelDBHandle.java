@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.common.ledger.util.leveldbhelper;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LevelDBException;
 import org.bcia.javachain.common.ledger.util.IDBHandle;
 import org.bcia.javachain.common.log.JavaChainLog;
@@ -146,6 +147,16 @@ public class LevelDBHandle implements IDBHandle {
             dbItr.seek(startKey);
         }
         return dbItr;
+    }
+
+    public static void main(String[] args) throws Exception{
+        LevelDBHandle handle = new LevelDBHandle();
+        handle.setDbName("/var/javachain/stateLeveldb");
+        String ns = "myGroup";
+        byte[] start = ns.getBytes();
+        start = ArrayUtils.addAll(start, new byte[]{0});
+        start = ArrayUtils.addAll(start, "k".getBytes());
+        System.out.println(handle.getIterator(start).hasNext());
     }
 
 }

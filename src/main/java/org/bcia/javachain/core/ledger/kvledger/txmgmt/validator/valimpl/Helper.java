@@ -93,13 +93,16 @@ public class Helper {
         }
     }
 
-    public static Block preprocessProtoBlock(ITxManager txMgr, Common.Block block, boolean doMVCCValidation) throws LedgerException {
+    public static Block preprocessProtoBlock(ITxManager txMgr, Common.Block.Builder blockBuilder, boolean doMVCCValidation) throws LedgerException {
+        Common.Block block = blockBuilder.build();
         Block b = new Block();
         b.setNum(block.getHeader().getNumber());
         TxValidationFlags txsFilter = TxValidationFlags.fromByteString(block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
         if(txsFilter.length() == 0){
             txsFilter = new TxValidationFlags(block.getData().getDataList().size());
-            block.getMetadata().toBuilder().setMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber(), txsFilter.toByteString());
+            Common.BlockMetadata.Builder blockMetadataBuilder = block.getMetadata().toBuilder().setMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber(), txsFilter.toByteString());
+            blockBuilder.setMetadata(blockMetadataBuilder);
+            block = blockBuilder.build();
         }
         int i = 0;
         for (; i < block.getData().getDataList().size(); i++) {
@@ -136,7 +139,7 @@ public class Helper {
                 }
                 txRwSet = new TxRwSet();
                 try {
-                    txRwSet.fromProtoBytes(respPayload.toByteString());
+                    txRwSet.fromProtoBytes(respPayload.getResults());
                 } catch (Exception e) {
                     txsFilter.setFlag(i, TransactionPackage.TxValidationCode.INVALID_OTHER_REASON);
                     continue;
@@ -184,12 +187,14 @@ public class Helper {
         return simRes.getPublicReadWriteSet();
     }
 
-    public static void postprocessProtoBlock(Common.Block block, Block validatedBlock) throws LedgerException {
-        TxValidationFlags txsFilter = TxValidationFlags.fromByteString(block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
+    public static void postprocessProtoBlock(Common.Block.Builder blockBuilder, Block validatedBlock) throws LedgerException {
+        TxValidationFlags txsFilter = TxValidationFlags.fromByteString(blockBuilder.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
         for(Transaction tx : validatedBlock.getTxs()){
             txsFilter.setFlag(tx.getIndexInBlock(), tx.getValidationCode());
         }
-        block.getMetadata().toBuilder().setMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber(), txsFilter.toByteString());
+        Common.BlockMetadata.Builder blockMetadataBuilder = blockBuilder.getMetadata().toBuilder();
+        blockMetadataBuilder.setMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber(), txsFilter.toByteString());
+        blockBuilder.setMetadata(blockMetadataBuilder);
     }
 
     public static void addPvtRWSetToPvtUpdateBatch(TxPvtRwSet pvtRwSet, PvtUpdateBatch pvtUpdateBatch, Height ver) throws LedgerException {

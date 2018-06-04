@@ -17,6 +17,7 @@ package org.bcia.javachain.common.resourceconfig.config;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
 import org.bcia.javachain.protos.common.Configtx;
 
 import java.util.HashMap;
@@ -31,14 +32,14 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class SmartContractsConfig implements ISmartContractsConfig {
-    private Map<String, SmartContractConfig> smartContractConfigMap;
+    private Map<String, ISmartContractDefinition> smartContractConfigMap;
 
     public SmartContractsConfig(Configtx.ConfigTree tree) throws ValidateException, InvalidProtocolBufferException {
         if (tree != null && tree.getValuesCount() > 0) {
             throw new ValidateException("SmartContracts does not support value");
         }
 
-        smartContractConfigMap = new HashMap<String, SmartContractConfig>();
+        smartContractConfigMap = new HashMap<String, ISmartContractDefinition>();
         if (tree != null && tree.getChildsMap() != null) {
             Iterator<Map.Entry<String, Configtx.ConfigTree>> entries = tree.getChildsMap().entrySet().iterator();
             while (entries.hasNext()) {
@@ -46,10 +47,15 @@ public class SmartContractsConfig implements ISmartContractsConfig {
                 String childName = entry.getKey();
                 Configtx.ConfigTree childTree = entry.getValue();
 
-                SmartContractConfig smartContractConfig = new SmartContractConfig(childName, childTree);
+                ISmartContractDefinition smartContractConfig = new SmartContractConfig(childName, childTree);
                 smartContractConfigMap.put(childName, smartContractConfig);
             }
         }
 
+    }
+
+    @Override
+    public ISmartContractDefinition getSmartContractByName(String scName) {
+        return smartContractConfigMap.get(scName);
     }
 }

@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.csp.gm.sdt.random;
 
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.csp.gm.sdt.jni.SMJniApi;
@@ -31,17 +32,19 @@ public class GmRandom {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(GmRandom.class);
     private static final SMJniApi smJniApi = new SMJniApi();
 
-    public byte[] rng(int len) {
+    public byte[] rng(int len) throws JavaChainException{
 
         //判断随机数长度是否为非负整数
         if(len <= 0) {
-            return null;
+            logger.error("SM RandomGen error: the length must be bigger than 0.");
+            throw new JavaChainException("SM RandomGen error: the length must be bigger than 0.");
         }
         byte[] result = null;
         try {
             result = smJniApi.RandomGen(len);
         } catch (Exception e) {
             logger.error("SM RandomGen error: generate random failed");
+            throw new JavaChainException("SM RandomGen error: generate random failed");
         }
         return result;
     }

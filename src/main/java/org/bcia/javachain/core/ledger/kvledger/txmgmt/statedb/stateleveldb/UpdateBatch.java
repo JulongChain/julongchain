@@ -47,23 +47,19 @@ public class UpdateBatch {
         if(value == null){
             throw new LedgerException("Null value not allow");
         }
-        VersionedValue vv = new VersionedValue();
-        vv.setValue(value);
-        vv.setVersion(version);
+        VersionedValue vv = new VersionedValue(version, value);
         update(ns, key, vv);
     }
 
     public void delete(String ns, String key, Height version){
-        VersionedValue vv = new VersionedValue();
-        vv.setValue(null);
-        vv.setVersion(version);
+        VersionedValue vv = new VersionedValue(version, null);
         update(ns, key, vv);
     }
 
     public List<String> getUpdatedNamespaces(){
         List<String> list = new ArrayList<>();
-        for(Map.Entry<String, NsUpdates> entry : updates.entrySet()){
-            list.add(entry.getKey());
+        if (updates.keySet().size() != 0) {
+            list.addAll(updates.keySet());
         }
         return list;
     }
@@ -86,7 +82,7 @@ public class UpdateBatch {
 
     public NsUpdates getOrCreateNsUpdates(String ns){
         NsUpdates nsUpdates = updates.get(ns);
-        if(ns == null){
+        if(nsUpdates == null){
             nsUpdates = new NsUpdates();
             updates.put(ns, nsUpdates);
         }

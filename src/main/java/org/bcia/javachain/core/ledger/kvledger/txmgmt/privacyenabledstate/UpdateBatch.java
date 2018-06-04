@@ -27,12 +27,16 @@ public class UpdateBatch {
     private HashedUpdateBatch hashUpdates;
     private PvtUpdateBatch pvtUpdateBatch;
 
-    public static UpdateBatch newUpdateBatch(PubUpdateBatch pubUpdateBatch, HashedUpdateBatch hashUpdates, PvtUpdateBatch pvtUpdateBatch){
-        UpdateBatch updateBatch = new UpdateBatch();
-        updateBatch.setHashUpdates(HashedUpdateBatch.newHashedUpdateBatch());
-        updateBatch.setPubUpdateBatch(PubUpdateBatch.newPubUpdateBatch());
-        updateBatch.setPvtUpdateBatch(PvtUpdateBatch.newPvtUpdateBatch());
-        return updateBatch;
+    public UpdateBatch(){
+        this.hashUpdates = HashedUpdateBatch.newHashedUpdateBatch();
+        this.pubUpdateBatch = PubUpdateBatch.newPubUpdateBatch();
+        this.pvtUpdateBatch = PvtUpdateBatch.newPvtUpdateBatch();
+    }
+
+    public UpdateBatch(PubUpdateBatch pubUpdateBatch, HashedUpdateBatch hashUpdates, PvtUpdateBatch pvtUpdateBatch){
+        this.pubUpdateBatch = pubUpdateBatch;
+        this.hashUpdates = hashUpdates;
+        this.pvtUpdateBatch = pvtUpdateBatch;
     }
 
     public PubUpdateBatch getPubUpdateBatch() {
