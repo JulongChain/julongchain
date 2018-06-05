@@ -13,6 +13,7 @@
  */
 package org.bcia.javachain.core.smartcontract;
 
+import com.github.dockerjava.api.DockerClient;
 import com.google.protobuf.ByteString;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
@@ -346,6 +347,12 @@ public class SmartContractSupport {
             // 启动容器
             DockerUtil.startContainer(containerId);
 
+            while (!SmartContractRunningUtil.checkSmartContractRunning(smartContractId)) {
+              log.info("wait smart contract register[" + smartContractId + "]");
+              Thread.sleep(1000);
+            }
+          }else{
+            DockerUtil.startContainer(smartContractId);
             while (!SmartContractRunningUtil.checkSmartContractRunning(smartContractId)) {
               log.info("wait smart contract register[" + smartContractId + "]");
               Thread.sleep(1000);
