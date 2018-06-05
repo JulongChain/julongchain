@@ -18,6 +18,8 @@ package org.bcia.javachain.common.policycheck.bean;
 
 import org.bcia.javachain.protos.common.MspPrincipal;
 
+import java.util.List;
+
 /**
  * 类描述
  *
@@ -27,7 +29,7 @@ import org.bcia.javachain.protos.common.MspPrincipal;
  */
 public class Context {
     private int IDNum;
-    private MspPrincipal[] principals;
+    private List<MspPrincipal.MSPPrincipal> principals;
 
     public int getIDNum() {
         return IDNum;
@@ -37,13 +39,11 @@ public class Context {
         this.IDNum = IDNum;
     }
 
-    public MspPrincipal[] getPrincipals() {
+    public List<MspPrincipal.MSPPrincipal> getPrincipals() {
         return principals;
     }
 
-    public void setPrincipals(MspPrincipal[] principals) {
+    public void setPrincipals(List<MspPrincipal.MSPPrincipal> principals) {
         this.principals = principals;
     }
-
-
 }

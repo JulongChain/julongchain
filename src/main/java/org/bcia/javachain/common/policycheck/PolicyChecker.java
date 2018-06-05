@@ -81,6 +81,9 @@ public class PolicyChecker implements IPolicyChecker{
 
         try {
             policyManager = groupPolicyManagerGetter.getPolicyManager(groupID);
+            if(policyManager == null){
+                log.error("Failed to get policy manager for channel [%s]",groupID);
+            }
         } catch (InvalidProtocolBufferException e) {
             String msg=String.format("Failed to get policy getPolicyManager for group [%s]:%s",groupID,e.getMessage());
             throw new PolicyException(msg);
@@ -209,6 +212,9 @@ public class PolicyChecker implements IPolicyChecker{
         IPolicyManager policyManager = null;
         try {
             policyManager = this.groupPolicyManagerGetter.getPolicyManager(groupID);
+            if(policyManager == null){
+                log.error("Failed to get policy manager for channel [%s]",groupID);
+            }
         } catch (InvalidProtocolBufferException e) {
             String msg=String.format("Get policymanager error:%s",e.getMessage());
             throw new PolicyException(msg);

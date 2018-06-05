@@ -15,13 +15,16 @@
  */
 
 package org.bcia.javachain.common.policycheck.cauthdsl;
+import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.policies.SignaturePolicy;
 import org.bcia.javachain.common.policycheck.bean.Context;
 import org.bcia.javachain.common.policycheck.bean.SignaturePolicyEnvelope;
+import org.bcia.javachain.common.util.proto.ProtoUtils;
 import org.bcia.javachain.msp.mgmt.Msp;
 import org.bcia.javachain.protos.common.MspPrincipal;
+import org.bcia.javachain.protos.common.Policies;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,8 +38,8 @@ import java.util.regex.*;
  */
 public class PolicyParser {
     private static JavaChainLog log = JavaChainLogFactory.getLog(PolicyParser.class);
-    String regex="";
-    String regexErr="";
+    String regex = "^([[:alnum:]]+)([.])(member|admin)$";
+    String regexErr = "^No parameter '([^']+)' found[.]$";
     public Object and(Object ...args){
 
         String toret = "outof("+args.length;
@@ -49,7 +52,7 @@ public class PolicyParser {
                     toret +=args[i].toString();
                 }
             }else{
-                log.info("Unexpected type "+args[i].getClass());
+                log.error("Unexpected type %s",args[i].getClass());
                 return null;
             }
         }
@@ -67,7 +70,7 @@ public class PolicyParser {
                     toret += args[i].toString();
                 }
             }else{
-                log.info("Unexpected type "+args[i].getClass());
+                log.error("Unexpected type %s",args[i].getClass());
                 return null;
             }
         }
@@ -88,21 +91,21 @@ public class PolicyParser {
                 toret += (int)args[i];
             }
             else{
-                log.info("Unexpected type "+args[i].getClass());
+                log.error("Unexpected type %s",args[i].getClass());
                 return null;
             }
         }
         return toret+")";
     }
-    public Object secondPass(Object ...args){
+    public Policies.SignaturePolicy secondPass(Object ...args){
         if(args.length<3){
-            log.info("At least 3 arguments expected, got"+args.length);
+            log.info("At least 3 arguments expected, got %d",args.length);
         }
         Context context = new Context();
         if(args[0] instanceof Context){
             context = (Context)args[0];
         }else{
-            log.info("Unrecognized type, expected the context, got"+args[0].getClass());
+            log.error("Unrecognized type, expected the context, got %s",args[0].getClass());
             return null;
         }
         int t;
@@ -110,39 +113,82 @@ public class PolicyParser {
             t = (int)args[1];
         }
         else{
-            log.info("Unrecognized type, expected the context, got"+args[1].getClass());
+            log.error("Unrecognized type, expected the context, got %s",args[1].getClass());
             return null;
         }
         int n = args.length-1;
         if(t>n){
-            log.info("Invalid"+t+"-out-of-"+n+" predicate");
+            log.error("Invalid t-out-of-n predicate, t %d, n %d", t, n);
             return null;
         }
-        List<SignaturePolicy > policies = new ArrayList<SignaturePolicy>();
+        List<Policies.SignaturePolicy> policies = new ArrayList<Policies.SignaturePolicy>();
         for (int i=2;i<args.length;i++){
             if(args[i] instanceof String){
-                /**
-                 * subm := regex.FindAllStringSubmatch(t, -1)
-                 if subm == nil || len(subm) != 1 || len(subm[0]) != 4 {
-                 return nil, fmt.Errorf("Error parsing principal %s", t)
-                 }
-                 */
+                Pattern pattern = Pattern.compile(regex);
+                Matcher matchPattern = pattern.matcher((CharSequence) args[i]);
+                List<String> subm = new ArrayList<String>();
+                while(matchPattern.find()){
+                    subm.add(matchPattern.group());
+                }
+                if(subm == null || subm.size() != 1 || subm.get(0).length() != 4){
+                    log.error("Error parsing principal %s",t);
+                    return null;
+                }
+               MspPrincipal.MSPRole.MSPRoleType role = null;
+                if(subm.get(3) == "member"){
+                    role = MspPrincipal.MSPRole.MSPRoleType.MEMBER;
+                }else{
+                    role = MspPrincipal.MSPRole.MSPRoleType.ADMIN;
+                }
+                MspPrincipal.MSPPrincipal.Builder builder = MspPrincipal.MSPPrincipal.newBuilder();
+                builder.setPrincipalClassification(MspPrincipal.MSPPrincipal.Classification.ROLE);
+                MspPrincipal.MSPRole.Builder roleBuilder = MspPrincipal.MSPRole.newBuilder();
+                //build MspRole
+                roleBuilder.setRole(role);
+                roleBuilder.setMspIdentifier(subm.get(1));
+                roleBuilder.build();
+                builder.setPrincipal(ByteString.copyFrom(ProtoUtils.marshalOrPanic(roleBuilder.build())));
+                MspPrincipal.MSPPrincipal mspPrincipal = builder.build();
+                context.getPrincipals().add(mspPrincipal);
+                context.setPrincipals(context.getPrincipals());
+                Policies.SignaturePolicy dapolicy = CAuthDslBuilder.signedBy(context.getIDNum());
+                policies.add(dapolicy);
+                int num = context.getIDNum();
+                num++;
+                context.setIDNum(num);
+            }
+            if(args[i] instanceof Policies.SignaturePolicy){
+                policies.add((Policies.SignaturePolicy) args[i]);
+            }else{
+                log.error("Unrecognized type, expected a principal or a policy, got %s",args[i]);
             }
 
         }
-        return "";
+        Policies.SignaturePolicy[] policys = new Policies.SignaturePolicy[policies.size()];
+        for(int i=0;i<policys.length;i++){
+            policys[i] = policies.get(i);
+        }
+        return CAuthDslBuilder.nOutOf(t,policys);
     }
-    public SignaturePolicyEnvelope fromString(String policy){
+    public Policies.SignaturePolicyEnvelope fromString(String policy){
+        /*intermediate, err := govaluate.NewEvaluableExpressionWithFunctions(policy, map[string]govaluate.ExpressionFunction{"AND": and, "and": and, "OR": or, "or": or})
+        if err != nil {
+            return nil, err
+        }
+
+        intermediateRes, err := intermediate.Evaluate(map[string]interface{}{})
+        if err != nil {
+            // attempt to produce a meaningful error
+            if regexErr.MatchString(err.Error()) {
+                sm := regexErr.FindStringSubmatch(err.Error())
+                if len(sm) == 2 {
+                    return nil, fmt.Errorf("unrecognized token '%s' in policy string", sm[1])
+                }
+            }
+
+            return nil, err*/
         return null;
     }
 
-    public Context newContext(){
-        //return &context{IDNum: 0, principals: make([]*msp.MSPPrincipal, 0)}
-        Context context = new Context();
-        context.setIDNum(0);
-        MspPrincipal[] principals = new MspPrincipal[0];
-        context.setPrincipals(principals);
-        return context;
 
-    }
 }
