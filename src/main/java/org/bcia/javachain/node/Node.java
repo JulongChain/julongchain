@@ -351,10 +351,10 @@ public class Node {
         });
 
         //TODO
-        Configuration.ConsenterAddresses consenterAddresses = groupConfigBundle.getGroupConfig().getConsenterAddresses();
-        if (consenterAddresses == null || consenterAddresses.getAddressesCount() <= 0) {
-            throw new ValidateException("consenterAddresses can not be null");
-        }
+//        Configuration.ConsenterAddresses consenterAddresses = groupConfigBundle.getGroupConfig().getConsenterAddresses();
+//        if (consenterAddresses == null || consenterAddresses.getAddressesCount() <= 0) {
+//            throw new ValidateException("consenterAddresses can not be null");
+//        }
 
         //TODO:Gossip
 
