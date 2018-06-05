@@ -171,22 +171,7 @@ public class PolicyParser {
         return CAuthDslBuilder.nOutOf(t,policys);
     }
     public Policies.SignaturePolicyEnvelope fromString(String policy){
-        /*intermediate, err := govaluate.NewEvaluableExpressionWithFunctions(policy, map[string]govaluate.ExpressionFunction{"AND": and, "and": and, "OR": or, "or": or})
-        if err != nil {
-            return nil, err
-        }
 
-        intermediateRes, err := intermediate.Evaluate(map[string]interface{}{})
-        if err != nil {
-            // attempt to produce a meaningful error
-            if regexErr.MatchString(err.Error()) {
-                sm := regexErr.FindStringSubmatch(err.Error())
-                if len(sm) == 2 {
-                    return nil, fmt.Errorf("unrecognized token '%s' in policy string", sm[1])
-                }
-            }
-
-            return nil, err*/
         return null;
     }
 
