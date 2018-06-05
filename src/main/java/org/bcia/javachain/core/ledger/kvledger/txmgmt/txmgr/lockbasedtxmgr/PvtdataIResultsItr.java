@@ -16,9 +16,12 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 
 
+import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
+import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
+import org.bcia.javachain.protos.ledger.queryresult.KvQueryResult;
 
 /**
  * pvtdata查询迭代器
@@ -38,6 +41,13 @@ public class PvtdataIResultsItr implements IResultsIterator {
         if(queryResult == null){
             return null;
         }
+        VersionedKV versionedQueryRecord = (VersionedKV) queryResult.getObj();
+        KvQueryResult.KV kv = KvQueryResult.KV.newBuilder()
+                .setNamespace(ns)
+                .setKey(versionedQueryRecord.getCompositeKey().getKey())
+                .setValue(ByteString.copyFrom(versionedQueryRecord.getVersionedValue().getValue()))
+                .build();
+        queryResult.setObj(kv);
         return queryResult;
     }
 

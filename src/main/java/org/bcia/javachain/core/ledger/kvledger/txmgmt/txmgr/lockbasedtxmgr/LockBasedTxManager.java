@@ -37,6 +37,7 @@ import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -55,7 +56,7 @@ public class LockBasedTxManager implements ITxManager {
     private UpdateBatch batch;
     private Common.Block currentBlock;
     private Map<String, IStateListener> stateListeners;
-    private ReentrantReadWriteLock lock;
+    private ReentrantLock lock;
 
     public static LockBasedTxManager newLockBasedTxMgr(String ledgerID,
                                                        IDB db,
@@ -66,20 +67,20 @@ public class LockBasedTxManager implements ITxManager {
         txMgr.setDb(db);
         txMgr.setStateListeners(stateListeners);
         txMgr.setValidator(DefaultValidator.newDefaultValidator(txMgr, db));
-        txMgr.setLock(new ReentrantReadWriteLock());
+        txMgr.setLock(new ReentrantLock());
         return txMgr;
     }
 
     @Override
     public IQueryExecutor newQueryExecutor(String txid) throws LedgerException {
-        lock.readLock().lock();
+        lock.lock();
         return LockBasedQueryExecutor.newQueryExecutor(this, txid);
     }
 
     @Override
     public ITxSimulator newTxSimulator(String txid) throws LedgerException {
         logger.debug("Constructing new tx simulator");
-        lock.readLock().lock();
+        lock.lock();
         return LockBasedTxSimulator.newLockBasedTxSimulator(this, txid);
     }
 
@@ -232,11 +233,11 @@ public class LockBasedTxManager implements ITxManager {
         this.stateListeners = stateListeners;
     }
 
-    public ReentrantReadWriteLock getLock() {
+    public ReentrantLock getLock() {
         return lock;
     }
 
-    public void setLock(ReentrantReadWriteLock lock) {
+    public void setLock(ReentrantLock lock) {
         this.lock = lock;
     }
 }

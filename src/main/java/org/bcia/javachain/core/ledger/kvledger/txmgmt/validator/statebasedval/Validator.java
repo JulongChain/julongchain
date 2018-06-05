@@ -97,9 +97,9 @@ public class Validator implements InternalValidator {
 
     @Override
     public PubAndHashUpdates validateAndPrepareBatch(Block block, boolean doMVCCValidation) throws LedgerException {
-//        if(db.isBulkOptimizable()){
-        preLoadCommittedVersionOfRSet(block);
-//        }
+        if(db.isBulkOptimizable()){
+            preLoadCommittedVersionOfRSet(block);
+        }
         PubAndHashUpdates updates = PubAndHashUpdates.newPubAndHashUpdates();
         for(Transaction tx : block.getTxs()){
             TransactionPackage.TxValidationCode validationCode = validateEndorserTX(tx.getRwSet(), doMVCCValidation, updates);

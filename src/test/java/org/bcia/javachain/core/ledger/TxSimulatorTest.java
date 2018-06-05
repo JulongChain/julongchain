@@ -40,7 +40,7 @@ public class TxSimulatorTest {
     ITxSimulator simulator = null;
     INodeLedger ledger = null;
     TxSimulationResults txSimulationResults = null;
-    final String ns = "mytestgroupid2";
+    final String ns = "myGroup";
     final String coll = "coll";
 
     @Before
@@ -124,7 +124,7 @@ public class TxSimulatorTest {
     }
 
     @Test
-    public void testsetProvateData() throws Exception{
+    public void testsetPrivateData() throws Exception{
         ByteString rwset = null;
         KvRwset.KVRWSet kvRWSet = null;
         Rwset.CollectionPvtReadWriteSet CollRWSet = null;

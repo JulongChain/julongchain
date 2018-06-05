@@ -15,11 +15,13 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger;
 
+import com.google.protobuf.ByteString;
 import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
+import org.bcia.javachain.protos.ledger.queryresult.KvQueryResult;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,6 +29,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * 类描述
@@ -50,14 +53,14 @@ public class QueryExecutorTest {
 
     @Test
     public void testGetState() throws Exception{
-        Assert.assertTrue(Arrays.equals(queryExecutor.getState(ns, "key"), "value".getBytes()));
+        Assert.assertTrue(Arrays.equals(queryExecutor.getState(ns, "key"), "value pub".getBytes()));
     }
 
     @Test
     public void testGetStateMultipleKeys() throws Exception{
         Assert.assertTrue(Arrays.equals(queryExecutor.getStateMultipleKeys(ns, new ArrayList<String>(){{
             add("key");
-        }}).get(0), "value".getBytes()));
+        }}).get(0), "value pub".getBytes()));
     }
 
     @Test
@@ -70,7 +73,30 @@ public class QueryExecutorTest {
         Assert.assertEquals(kv.getCompositeKey().getNamespace(), "myGroup");
         Assert.assertSame(kv.getVersionedValue().getVersion().getBlockNum(), (long) 1);
         Assert.assertSame(kv.getVersionedValue().getVersion().getTxNum(), (long) 0);
-        Assert.assertTrue(Arrays.equals(kv.getVersionedValue().getValue(), "value".getBytes()));
+        Assert.assertTrue(Arrays.equals(kv.getVersionedValue().getValue(), "value pub".getBytes()));
+    }
+
+    @Test
+    public void testGetPrivateData() throws Exception{
+        byte[] privateData = queryExecutor.getPrivateData(ns, "coll", "key");
+        Assert.assertTrue(Arrays.equals(privateData, "value pvt".getBytes()));
+    }
+
+    @Test
+    public void testGetPrivateDataMultipleKeys() throws Exception{
+        List<byte[]> privateDatas = queryExecutor.getPrivateDataMultipleKeys(ns, "coll", new ArrayList<String>() {{
+            add("key");
+        }});
+        Assert.assertTrue(Arrays.equals(privateDatas.get(0), "value pvt".getBytes()));
+    }
+
+    @Test
+    public void testGetPrivateDataRangeScanIterator() throws Exception{
+        IResultsIterator itr = queryExecutor.getPrivateDataRangeScanIterator(ns, "coll", "key", "l");
+        KvQueryResult.KV kv = (KvQueryResult.KV) itr.next().getObj();
+        Assert.assertEquals(kv.getNamespace(), "myGroup");
+        Assert.assertEquals(kv.getKey(), "key");
+        Assert.assertEquals(kv.getValue(),ByteString.copyFromUtf8("value pvt"));
     }
 
     @After

@@ -52,7 +52,7 @@ public class Transaction {
         }
         for(NsRwSet nsData : rwSet.getNsRwSets()){
             for(CollHashedRwSet collData : nsData.getCollHashedRwSets()){
-                if(collData.getCollectionName() == coll){
+                if(coll.equals(collData.getCollectionName())){
                     return collData.getPvtRwSetHash();
                 }
             }
