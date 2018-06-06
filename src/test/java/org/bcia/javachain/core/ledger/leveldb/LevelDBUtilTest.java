@@ -45,7 +45,14 @@ public class LevelDBUtilTest {
   public void add1() {}
 
   @Test
-  public void delete() {}
+  public void delete() {
+    try {
+      LevelDB db = LevelDBUtil.getDB("/var/javachain/stateLeveldb");
+      LevelDBUtil.delete(db, "aaa".getBytes(), false);
+    } catch (LevelDBException e) {
+      e.printStackTrace();
+    }
+  }
 
   @Test
   public void delete1() {}

@@ -39,6 +39,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
@@ -116,35 +117,73 @@ public class LedgerManagerTest {
 
     @Test
     public void commitBlock() throws Exception{
+        //重置路径
         System.out.println(deleteDir(new File(LedgerConfig.getRootPath())));
+        //初始化账本
         LedgerManager.initialize(null);
         GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
         l = LedgerManager.createLedger(factory.getGenesisBlock("myGroup"));
-        Common.Block block = constructBlock(l.getBlockByNumber(0));
+        //构建交易模拟集
+        TxSimulationResults results = constructTxSimulationResults();
+        //构建区块
+        Common.Block block = constructBlock(l.getBlockByNumber(0), results);
+        //构建私有数据集
+        TxPvtData txPvtData = new TxPvtData();
+        txPvtData.setSeqInBlock(0);
+        txPvtData.setWriteSet(results.getPrivateReadWriteSet());
         BlockAndPvtData bap = new BlockAndPvtData();
         bap.setBlock(block);
-        bap.getBlockPvtData().put((long) 1, constructTxPvtData());
+        bap.setBlockPvtData(new HashMap<Long, TxPvtData>(){{
+            put((long) 0, txPvtData);
+        }});
+        //提交区块及私有数据
         l.commitWithPvtData(bap);
     }
 
-    private TxPvtData constructTxPvtData() throws Exception{
+    private TxSimulationResults constructTxSimulationResults() throws Exception{
         TxPvtData txPvtData = new TxPvtData();
+
         ITxSimulator simulator = l.newTxSimulator("txid");
-        simulator.setPrivateData("myGroup", "coll", "key", "value1".getBytes());
-        TxSimulationResults txSimulationResults = simulator.getTxSimulationResults();
-        ByteString rwset = txSimulationResults.getPrivateReadWriteSet().getNsPvtRwset(0).getCollectionPvtRwset(0).getRwset();
-        Rwset.TxPvtReadWriteSet writeSet = Rwset.TxPvtReadWriteSet.parseFrom(rwset);
-        txPvtData.setSeqInBlock(0);
-        txPvtData.setWriteSet(writeSet);
-        return txPvtData;
+        simulator.setState("myGroup", "key", "value pub".getBytes());
+        simulator.setPrivateData("myGroup", "coll", "key", "value pvt".getBytes());
+        return simulator.getTxSimulationResults();
     }
 
-    public Common.Block constructBlock(Common.Block preBlock) throws Exception {
+    private Common.Block constructBlock(Common.Block preBlock, TxSimulationResults txSimulationResults) throws Exception{
+        Rwset.TxReadWriteSet rwset = txSimulationResults.getPublicReadWriteSet();
+
+        Common.BlockData data = Common.BlockData.newBuilder()
+                //pub
+                .addData(constructEnvelope(rwset.toByteString(), "1", 1, "myGroup").toByteString())
+                .build();
+
+        Common.BlockHeader blockHeader = Common.BlockHeader.newBuilder()
+                .setPreviousHash(preBlock.getHeader().getDataHash())
+                .setNumber(preBlock.getHeader().getNumber() + 1)
+                .setDataHash(ByteString.copyFrom(Util.getHashBytes(data.toByteArray())))
+                .build();
+
+        Common.BlockMetadata metadata = Common.BlockMetadata.newBuilder()
+                .addMetadata(ByteString.EMPTY)
+                .addMetadata(ByteString.EMPTY)
+                .addMetadata(ByteString.EMPTY)
+                .addMetadata(ByteString.EMPTY)
+                .build();
+
+        Common.Block block = Common.Block.newBuilder()
+                .setHeader(blockHeader)
+                .setData(data)
+                .setMetadata(metadata)
+                .build();
+        return block;
+    }
+
+    private Common.Envelope constructEnvelope(ByteString rwset, String txID, int version, String groupID) throws Exception {
         Common.GroupHeader groupHeader = Common.GroupHeader.newBuilder()
                 .setType(Common.HeaderType.ENDORSER_TRANSACTION_VALUE)
-                .setTxId("1")
-                .setVersion(1)
-                .setGroupId("myGroup")
+                .setTxId(txID)
+                .setVersion(version)
+                .setGroupId(groupID)
                 .build();
 
         Common.SignatureHeader signatureHeader = Common.SignatureHeader.newBuilder()
@@ -157,18 +196,12 @@ public class LedgerManagerTest {
                 .setSignatureHeader(signatureHeader.toByteString())
                 .build();
 
-        ITxSimulator simulator = l.newTxSimulator("txid");
-        simulator.setState("myGroup", "key", "value".getBytes());
-        TxSimulationResults txSimulationResults = simulator.getTxSimulationResults();
-        Rwset.TxReadWriteSet rwset = txSimulationResults.getPublicReadWriteSet();
-
         ProposalResponsePackage.Response response = ProposalResponsePackage.Response.newBuilder()
-
                 .build();
 
         ProposalPackage.SmartContractAction resPayload = ProposalPackage.SmartContractAction.newBuilder()
                 .setEvents(ByteString.copyFromUtf8("ProposalPackage.SmartContractAction Event"))
-                .setResults(rwset.toByteString())
+                .setResults(rwset)
                 .setResponse(response)
                 .build();
 
@@ -203,29 +236,7 @@ public class LedgerManagerTest {
                 .setSignature(ByteString.copyFromUtf8("Envelope Signature"))
                 .build();
 
-        Common.BlockData data = Common.BlockData.newBuilder()
-                .addData(envelope.toByteString())
-                .build();
-
-        Common.BlockHeader blockHeader = Common.BlockHeader.newBuilder()
-                .setPreviousHash(preBlock.getHeader().getDataHash())
-                .setNumber(preBlock.getHeader().getNumber() + 1)
-                .setDataHash(ByteString.copyFrom(Util.getHashBytes(data.toByteArray())))
-                .build();
-
-        Common.BlockMetadata metadata = Common.BlockMetadata.newBuilder()
-                .addMetadata(ByteString.EMPTY)
-                .addMetadata(ByteString.EMPTY)
-                .addMetadata(ByteString.EMPTY)
-                .addMetadata(ByteString.EMPTY)
-                .build();
-
-        Common.Block block = Common.Block.newBuilder()
-                .setHeader(blockHeader)
-                .setData(data)
-                .setMetadata(metadata)
-                .build();
-        return block;
+        return envelope;
     }
 
     @Test

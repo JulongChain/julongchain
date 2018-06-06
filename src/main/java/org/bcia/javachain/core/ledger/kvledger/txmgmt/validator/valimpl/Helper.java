@@ -60,7 +60,7 @@ public class Helper {
             if(!tx.containsPvtWrites()){
                 continue;
             }
-            TxPvtData txPvData = pvtData.get(tx.getIndexInBlock());
+            TxPvtData txPvData = pvtData.get((long) tx.getIndexInBlock());
             if(txPvData == null){
                 continue;
             }
@@ -104,9 +104,9 @@ public class Helper {
             blockBuilder.setMetadata(blockMetadataBuilder);
             block = blockBuilder.build();
         }
-        int i = 0;
-        for (; i < block.getData().getDataList().size(); i++) {
-            byte[] envBytes = block.getData().getDataList().get(i).toByteArray();
+        int txIndex = 0;
+        for (; txIndex < block.getData().getDataList().size(); txIndex++) {
+            byte[] envBytes = block.getData().getDataList().get(txIndex).toByteArray();
             Common.Envelope env;
             Common.GroupHeader gh;
             Common.Payload payload;
@@ -117,13 +117,13 @@ public class Helper {
             } catch (Exception e) {
                 throw new LedgerException(e);
             }
-            if(txsFilter.isInValid(i)){
+            if(txsFilter.isInValid(txIndex)){
                 logger.debug(String.format("Gtoup [%s]: Block [%d] Transaction index [%d] TxID [%d]" +
                         " marked as invalid by committer. Reason code [%s]", gh.getGroupId(),
                         block.getHeader().getNumber(),
-                        i,
+                        txIndex,
                         gh.getTxId(),
-                        txsFilter.flag(i)));
+                        txsFilter.flag(txIndex)));
                 continue;
             }
             TxRwSet txRwSet = null;
@@ -134,14 +134,14 @@ public class Helper {
                 try {
                     respPayload = Util.getActionFromEnvelope(ByteString.copyFrom(envBytes));
                 } catch (Exception e) {
-                    txsFilter.setFlag(i, TransactionPackage.TxValidationCode.NIL_TXACTION);
+                    txsFilter.setFlag(txIndex, TransactionPackage.TxValidationCode.NIL_TXACTION);
                     continue;
                 }
                 txRwSet = new TxRwSet();
                 try {
                     txRwSet.fromProtoBytes(respPayload.getResults());
                 } catch (Exception e) {
-                    txsFilter.setFlag(i, TransactionPackage.TxValidationCode.INVALID_OTHER_REASON);
+                    txsFilter.setFlag(txIndex, TransactionPackage.TxValidationCode.INVALID_OTHER_REASON);
                     continue;
                 }
             } else {
@@ -150,7 +150,7 @@ public class Helper {
                     rwSetProto = processNonEndorserTx(env, gh.getTxId(), txType, txMgr, !doMVCCValidation);
                 } catch (Exception e) {
                     //todo catch invalidException
-                    txsFilter.setFlag(i, TransactionPackage.TxValidationCode.INVALID_OTHER_REASON);
+                    txsFilter.setFlag(txIndex, TransactionPackage.TxValidationCode.INVALID_OTHER_REASON);
                     continue;
                 }
                 if(rwSetProto != null){
@@ -159,7 +159,7 @@ public class Helper {
             }
             if(txRwSet != null){
                 Transaction tx = new Transaction();
-                tx.setIndexInBlock(i);
+                tx.setIndexInBlock(txIndex);
                 tx.setId(gh.getTxId());
                 tx.setRwSet(txRwSet);
                 b.getTxs().add(tx);
@@ -184,6 +184,7 @@ public class Helper {
         } catch (LedgerException e) {
             sim.done();
         }
+        sim.done();
         return simRes.getPublicReadWriteSet();
     }
 

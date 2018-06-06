@@ -42,7 +42,6 @@ public class KvScanner implements IResultsIterator {
         KvScanner kvScanner = new KvScanner();
         kvScanner.setNameSpace(nameSpace);
         kvScanner.setDbItr(dbItr);
-        System.out.println(dbItr.hasNext());
         return kvScanner;
     }
 

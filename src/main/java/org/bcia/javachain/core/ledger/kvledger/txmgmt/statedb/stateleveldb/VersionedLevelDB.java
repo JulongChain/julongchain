@@ -54,6 +54,7 @@ public class VersionedLevelDB implements IVersionedDB {
         logger.debug(String.format("getState() ns = %s, key = %s", namespace, key));
         byte[] compositeKey = constructCompositeKey(namespace, key);
         byte[] dbVal = db.get(compositeKey);
+        System.out.println(new String(compositeKey));
         if (dbVal == null) {
             return null;
         }
@@ -73,7 +74,12 @@ public class VersionedLevelDB implements IVersionedDB {
 
     @Override
     public Height getVersion(String namespace, String key) throws LedgerException {
-        return null;
+        VersionedValue versionedValue = getState(namespace, key);
+        if (versionedValue == null) {
+            return null;
+        } else {
+            return versionedValue.getVersion();
+        }
     }
 
     @Override

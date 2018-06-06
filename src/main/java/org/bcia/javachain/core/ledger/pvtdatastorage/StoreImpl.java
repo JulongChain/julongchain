@@ -22,14 +22,12 @@ import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.BytesHexStrTranslate;
 import org.bcia.javachain.core.ledger.PvtNsCollFilter;
 import org.bcia.javachain.core.ledger.TxPvtData;
 import org.bcia.javachain.protos.ledger.rwset.Rwset;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 实现pvt数据与blockchain同步写入
@@ -84,8 +82,7 @@ public class StoreImpl implements IStore {
             throw new LedgerException("Last committed block " + lastCommittedBlock + " block reuqested " + blockNum);
         }
         byte[] startKey = KvEncoding.getStartKeyForRangeScanByBlockNum(blockNum);
-//        byte[] endKey = KvEncoding.getEndKeyForRangeScanByBlockNum(blockNum);
-        logger.debug(String.format("Querying private data for write sets using startKey %s", startKey));
+        logger.debug(String.format("Querying private data for write sets using startKey %s", BytesHexStrTranslate.bytesToHexFun1(startKey)));
         Iterator<Map.Entry<byte[], byte[]>> itr = db.getIterator(startKey);
         List<TxPvtData> pvtData = new ArrayList<>();
         while(itr.hasNext()){
@@ -256,9 +253,12 @@ public class StoreImpl implements IStore {
         return builder;
     }
 
+    /**
+     * 是否未完成的提交
+     */
     private boolean hasPendingCommit() throws LedgerException{
         byte[] v = db.get(KvEncoding.getPendingCommitKey(ledgerID));
-        return v != null;
+        return Arrays.equals(v, KvEncoding.EMPTY_VALUE);
     }
 
     /**

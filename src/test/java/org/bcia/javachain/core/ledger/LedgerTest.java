@@ -55,7 +55,7 @@ public class LedgerTest {
         LevelDBProvider provider = LevelDBProvider.newProvider(LedgerConfig.getStateLevelDBPath());
 //        LevelDBProvider provider = LevelDBProvider.newProvider(LedgerConfig.getHistoryLevelDBPath());
 //        LevelDBProvider provider = LevelDBProvider.newProvider(LedgerConfig.getLedgerProviderPath());
-//        LevelDBProvider provider = LevelDBProvider.newProvider("/home/bcia/javachain/ledgersData/stateLeveldb");
+//        LevelDBProvider provider = LevelDBProvider.newProvider(LedgerConfig.getPvtDataStorePath());
 //        for (int i = 0; i < 100; i++) {
 //            Height height = new Height();
 //            height.setTxNum((long) i);
@@ -66,12 +66,12 @@ public class LedgerTest {
         Iterator<Map.Entry<byte[], byte[]>> itr =  provider.getIterator(null);
         while(itr.hasNext()){
             Map.Entry<byte[], byte[]> entry = itr.next();
-            soutBytes(entry.getKey());
-            soutBytes(entry.getValue());
 //            System.out.println(Height.newHeightFromBytes(entry.getValue()).getTxNum());
 //            System.out.println(Height.newHeightFromBytes(entry.getValue()).getBlockNum());
-//            System.out.println(new String(entry.getKey()));
+            System.out.println(new String(entry.getKey()));
 //            System.out.println(new String(entry.getValue()));
+            soutBytes(entry.getKey());
+//            soutBytes(entry.getValue());
 //            soutBytes(entry.getKey());
 //            soutBytes(entry.getValue());
             System.out.println("_____________________________________");
@@ -99,6 +99,9 @@ public class LedgerTest {
         int i = 0;
         for(byte b : bytes){
             System.out.print(b + " ");
+            if (i++ % 30 == 29) {
+                System.out.println();
+            }
         }
         System.out.println();
     }

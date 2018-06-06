@@ -101,7 +101,7 @@ public class LockBasedTxSimulator implements ITxSimulator {
         checkBeforeWrite();
         queryExecutor.getHelper().getTxMgr().getDb().validateKeyValue(key, value);
         writePreformed = true;
-        rwSetBuilder.addToPvtAndHashedWriteSet(namespace, collection,key, ByteString.copyFrom(value));
+        rwSetBuilder.addToPvtAndHashedWriteSet(namespace, collection, key, ByteString.copyFrom(value));
     }
 
     @Override

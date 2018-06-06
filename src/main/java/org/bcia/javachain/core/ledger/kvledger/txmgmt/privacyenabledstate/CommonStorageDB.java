@@ -19,6 +19,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.BytesHexStrTranslate;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.*;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.CompositeKey;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
@@ -139,17 +140,17 @@ public class CommonStorageDB implements IDB {
 
     @Override
     public List<VersionedValue> getPrivateDataMultipleKeys(String ns, String coll, List<String> keys) throws LedgerException {
-        return getStateMultipleKeys(deriveHashedDataNs(ns, coll), keys);
+        return getStateMultipleKeys(derivePvtDataNs(ns, coll), keys);
     }
 
     @Override
     public IResultsIterator getPrivateDataRangeScanIterator(String ns, String coll, String startKey, String endKey) throws LedgerException{
-        return getStateRangeScanIterator(deriveHashedDataNs(ns, coll), startKey, endKey);
+        return getStateRangeScanIterator(derivePvtDataNs(ns, coll), startKey, endKey);
     }
 
     @Override
     public IResultsIterator executeQueryOnPrivateData(String ns, String coll, String query) throws LedgerException{
-        return executeQuery(deriveHashedDataNs(ns, coll), query);
+        return executeQuery(derivePvtDataNs(ns, coll), query);
     }
 
     @Override
@@ -173,7 +174,7 @@ public class CommonStorageDB implements IDB {
             String ns = entry.getKey();
             for(String coll : nsBatch.getCollectionNames()){
                 for(Map.Entry<String, VersionedValue> entry1 : nsBatch.getBatch().getUpdates(coll).entrySet()){
-                    pubUpdateBatch.getBatch().update(deriveHashedDataNs(ns, coll), entry1.getKey(), entry1.getValue());
+                    pubUpdateBatch.getBatch().update(derivePvtDataNs(ns, coll), entry1.getKey(), entry1.getValue());
                 }
             }
         }
