@@ -23,10 +23,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.protos.common.Collection;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.node.ProposalResponsePackage;
-import org.bcia.javachain.protos.node.SmartContractDataPackage;
-import org.bcia.javachain.protos.node.Smartcontract;
-import org.bcia.javachain.protos.node.TransactionPackage;
+import org.bcia.javachain.protos.node.*;
 
 import java.io.UnsupportedEncodingException;
 
@@ -131,5 +128,25 @@ public class ProtoUtils {
 
     public static SmartContractDataPackage.SmartContractData unMarshalSmartContractData(byte[] scdBytes) throws InvalidProtocolBufferException{
         return null;
+    }
+
+    /**
+     * 从TxAction中解析出SCAction
+     * @param txActions
+     * @return
+     * @throws InvalidProtocolBufferException
+     */
+    public static ProposalPackage.SmartContractAction getSCAction(TransactionPackage.TransactionAction txActions) throws InvalidProtocolBufferException {
+        TransactionPackage.SmartContractActionPayload scPayload = TransactionPackage.SmartContractActionPayload.parseFrom(txActions.getPayload());
+        if (scPayload.getAction() == null || scPayload.getAction().getProposalResponsePayload() == null) {
+            log.error("No payload in SCActionPayload");
+            return null;
+        }
+        ProposalResponsePackage.ProposalResponsePayload pResPayload = ProposalResponsePackage.ProposalResponsePayload.parseFrom(scPayload.getAction().getProposalResponsePayload());
+        if (pResPayload.getExtension() == null) {
+            log.error("Response payload is missing extension");
+            return null;
+        }
+        return ProposalPackage.SmartContractAction.parseFrom(pResPayload.getExtension());
     }
 }

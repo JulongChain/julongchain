@@ -39,12 +39,16 @@ public class KvEncoding  {
     }
 
     public static long decodePKToBlockNum(byte[] key) {
-        Height height = Height.newHeightFromBytes(key);
+        byte[] heightBytes = new byte[16];
+        System.arraycopy(key, 1, heightBytes, 0, 16);
+        Height height = Height.newHeightFromBytes(heightBytes);
         return height.getBlockNum();
     }
 
     public static long decodePKToTranNum(byte[] key) {
-        Height height = Height.newHeightFromBytes(key);
+        byte[] heightBytes = new byte[16];
+        System.arraycopy(key, 1, heightBytes, 0, 16);
+        Height height = Height.newHeightFromBytes(heightBytes);
         return height.getTxNum();
     }
 

@@ -122,7 +122,9 @@ public class LedgerManagerTest {
         //初始化账本
         LedgerManager.initialize(null);
         GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
-        l = LedgerManager.createLedger(factory.getGenesisBlock("myGroup"));
+        Common.Block genesisBlock = factory.getGenesisBlock("myGroup");
+        soutBytes(genesisBlock.getHeader().toByteArray());
+        l = LedgerManager.createLedger(genesisBlock);
         //构建交易模拟集
         TxSimulationResults results = constructTxSimulationResults();
         //构建区块
@@ -141,7 +143,6 @@ public class LedgerManagerTest {
     }
 
     private TxSimulationResults constructTxSimulationResults() throws Exception{
-        TxPvtData txPvtData = new TxPvtData();
 
         ITxSimulator simulator = l.newTxSimulator("txid");
         simulator.setState("myGroup", "key", "value pub".getBytes());
@@ -175,6 +176,7 @@ public class LedgerManagerTest {
                 .setData(data)
                 .setMetadata(metadata)
                 .build();
+
         return block;
     }
 
@@ -338,10 +340,15 @@ public class LedgerManagerTest {
         Assert.assertEquals(LedgerManager.getLedgerIDs().get(1), groupID);
     }
 
-    private static void soutBytes(byte[] bytes){
+    public static void soutBytes(byte[] bytes){
         int i = 0;
         for(byte b : bytes){
-            System.out.print(b + " ");
+            System.out.print(b + ",");
+            if (i++ % 30 == 29) {
+                System.out.println();
+                System.out.println(i);
+            }
         }
+        System.out.println();
     }
 }

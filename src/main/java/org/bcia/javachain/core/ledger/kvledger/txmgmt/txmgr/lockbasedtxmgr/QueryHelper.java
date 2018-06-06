@@ -79,7 +79,7 @@ public class QueryHelper {
     public IResultsIterator executeQuery(String ns, String query) throws LedgerException {
         checkDone();
         IResultsIterator dbItr = txMgr.getDb().executeQuery(ns, query);
-        QueryIResultsItr itr = new QueryIResultsItr();
+        QueryResultsItr itr = new QueryResultsItr();
         itr.setDbItr(dbItr);
         itr.setRwSetBuilder(rwSetBuilder);
         return itr;

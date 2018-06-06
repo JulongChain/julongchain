@@ -23,6 +23,7 @@ import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -52,8 +53,8 @@ public class LedgerTest {
 
     @Test
     public void getKVFromLevelDB() throws Throwable {
-        LevelDBProvider provider = LevelDBProvider.newProvider(LedgerConfig.getStateLevelDBPath());
-//        LevelDBProvider provider = LevelDBProvider.newProvider(LedgerConfig.getHistoryLevelDBPath());
+//        LevelDBProvider provider = LevelDBProvider.newProvider(LedgerConfig.getStateLevelDBPath());
+        LevelDBProvider provider = LevelDBProvider.newProvider(LedgerConfig.getHistoryLevelDBPath());
 //        LevelDBProvider provider = LevelDBProvider.newProvider(LedgerConfig.getLedgerProviderPath());
 //        LevelDBProvider provider = LevelDBProvider.newProvider(LedgerConfig.getPvtDataStorePath());
 //        for (int i = 0; i < 100; i++) {
@@ -71,7 +72,7 @@ public class LedgerTest {
             System.out.println(new String(entry.getKey()));
 //            System.out.println(new String(entry.getValue()));
             soutBytes(entry.getKey());
-//            soutBytes(entry.getValue());
+            soutBytes(entry.getValue());
 //            soutBytes(entry.getKey());
 //            soutBytes(entry.getValue());
             System.out.println("_____________________________________");
@@ -81,26 +82,22 @@ public class LedgerTest {
 
     @Test
     public void getValuesFromFS() throws Exception {
-        File file = new File("/home/bcia/javachain/ledgersData/chains/chains/MyGroup/blockfile000000");
-//        FileInputStream reader = new FileInputStream(file);
-//        System.out.println(file.length());
-//        byte[] bytes = new byte[(int) file.length()];
-//        reader.read(bytes);
-//        soutBytes(bytes);
-//        byte[] blockByte = new byte[bytes.length - 8];
+        File file = new File(LedgerConfig.getBlockStorePath() + "/chains/myGroup/blockfile_000000");
+        FileInputStream reader = new FileInputStream(file);
         System.out.println(file.length());
-        String s = "chain_ajlkfjalkfj;alsjflkajsdlkfj";
-        System.out.println(s.substring(JsonLedger.GROUP_DIRECTORY_FORMAT_STRING.length(), s.length()));
-        System.out.println(64 * 1024 * 1024);
-        System.out.println(Integer.MAX_VALUE);
+        byte[] bytes = new byte[(int) file.length()];
+        reader.read(bytes);
+        soutBytes(bytes);
+        byte[] blockByte = new byte[bytes.length - 8];
     }
 
     public static void soutBytes(byte[] bytes){
         int i = 0;
         for(byte b : bytes){
             System.out.print(b + " ");
-            if (i++ % 30 == 29) {
+            if (i++ % 10 == 9) {
                 System.out.println();
+                System.out.println(i);
             }
         }
         System.out.println();

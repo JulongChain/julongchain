@@ -17,6 +17,7 @@ package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 
@@ -37,17 +38,26 @@ public class BlockFileReader {
         return reader;
     }
 
-    //从offset位起,读取length字节
-    public byte[] read(Integer offset, int length) throws LedgerException {
+    /**
+     * 从offset位起,读取length字节
+     */
+    public byte[] read(long offset, long length) throws LedgerException {
         FileInputStream fis;
+        ByteArrayOutputStream baos;
+        byte[] buff = new byte[1024];
         byte[] result = null;
         try {
-            result = new byte[length];
+            baos = new ByteArrayOutputStream();
             fis = new FileInputStream(file);
             //移动到制定位置
-            fis.skip(offset.longValue());
-            fis.read(result);
+            fis.skip(offset);
+            int i = 0;
+            while ((i = fis.read(buff)) > 0) {
+                baos.write(buff, 0, i);
+            }
+            result = baos.toByteArray();
             fis.close();
+            baos.close();
         } catch (Throwable e){
             throw new LedgerException(e);
         }

@@ -31,8 +31,8 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
  * @date 2018/04/18
  * @company Dingxuan
  */
-public class QueryIResultsItr implements IResultsIterator {
-    private static final JavaChainLog loggger  = JavaChainLogFactory.getLog(QueryIResultsItr.class);
+public class QueryResultsItr implements IResultsIterator {
+    private static final JavaChainLog loggger  = JavaChainLogFactory.getLog(QueryResultsItr.class);
 
     private IResultsIterator dbItr;
     private RWSetBuilder rwSetBuilder;
