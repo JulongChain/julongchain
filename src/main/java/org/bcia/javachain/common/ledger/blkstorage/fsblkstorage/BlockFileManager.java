@@ -500,7 +500,7 @@ public class BlockFileManager {
         BlockFileReader reader = null;
         String filePath = deriveBlockfilePath(rootDir, lp.getFileSuffixNum());
         reader = BlockFileRw.newBlockfileReader(filePath);
-        return reader.read(lp.getLocPointer().getOffset(), lp.getLocPointer().getBytesLength());
+        return reader.read(lp.getLocPointer().getOffset() - 1, lp.getLocPointer().getBytesLength());
     }
 
     /** Get the current checkpoint information that is stored in the database

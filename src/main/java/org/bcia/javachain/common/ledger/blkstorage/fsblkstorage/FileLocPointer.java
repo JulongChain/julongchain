@@ -27,10 +27,10 @@ import org.bcia.javachain.core.ledger.util.Util;
  */
 public class FileLocPointer {
 
-    private Integer fileSuffixNum;
+    private int fileSuffixNum;
     private LocPointer locPointer;
 
-    public static FileLocPointer newFileLocationPointer(Integer fileSuffixNum, Integer beginningOffset, LocPointer relativeLP) {
+    public static FileLocPointer newFileLocationPointer(Integer fileSuffixNum, long beginningOffset, LocPointer relativeLP) {
         FileLocPointer flp = new FileLocPointer();
         LocPointer lp = new LocPointer();
         lp.setOffset(relativeLP.getOffset());
@@ -41,8 +41,8 @@ public class FileLocPointer {
     }
 
     byte[] marshal() {
-        byte[] fileSUffixNumBytes = Util.longToBytes(fileSuffixNum.longValue(), 8);
-        byte[] offsetBytes = Util.longToBytes(locPointer.getOffset().longValue(), 8);
+        byte[] fileSUffixNumBytes = Util.longToBytes(fileSuffixNum, 8);
+        byte[] offsetBytes = Util.longToBytes(locPointer.getOffset(), 8);
         byte[] bytesLengthBytes = Util.longToBytes(locPointer.getBytesLength(), 8);
         byte[] result = ArrayUtils.addAll(fileSUffixNumBytes, offsetBytes);
         return ArrayUtils.addAll(result, bytesLengthBytes);

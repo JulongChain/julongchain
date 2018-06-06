@@ -16,9 +16,12 @@ limitations under the License.
 package org.bcia.javachain.core.ledger;
 
 import org.bcia.javachain.core.ledger.kvledger.history.IHistoryQueryExecutor;
+import org.bcia.javachain.core.ledger.kvledger.history.historydb.HistoryScanner;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
+import org.bcia.javachain.protos.ledger.queryresult.KvQueryResult;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,7 +45,8 @@ public class HistoryQueryExecutorTest {
     @Test
     public void testGetHistoryForKey() throws Exception{
         QueryResult qr = queryExecutor.getHistoryForKey(ns, "key").next();
-        System.out.println(qr);
+        KvQueryResult.KeyModification result = (KvQueryResult.KeyModification) qr.getObj();
+        Assert.assertEquals(result.getTxId(), "1");
     }
 
     @After

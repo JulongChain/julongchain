@@ -23,6 +23,7 @@ import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.util.Util;
 import org.bcia.javachain.protos.common.Common;
+import org.iq80.leveldb.table.BlockBuilder;
 
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
@@ -97,36 +98,48 @@ public class BlockSerialization {
     }
 
     /**
-     * 序列化Data并将data信息封装到TxIndexInfo中
-     * 在block中解析出Envelope,并确定起始位置
-     * 获取所有Envelope的长度和起始位置
+     * 确定并封装区块中每个Envelope的位置
      */
-    private static List<TxIndexInfo> addDataBytes(Block block, long blockPosition){
+    public static List<TxIndexInfo> addDataBytes(Block block, long blockPosition){
+        //block为blockHeader + blockData + blockMetadata结构
+        //envelope在blockData中, 先跳过blockHeader
         List<TxIndexInfo> txOffsets = new ArrayList<>();
         //获取头部序列化长度
-        int headerSerializedLen = block.getHeader().getSerializedSize();
-        //序列化长度给出序列化之后的长度，还应加上标头部识位长度2, 尾部标识位长度2
-        //序列化长度为0时，没有尾部标识位
-        int headerLen = headerSerializedLen + (headerSerializedLen == 0 ? 2 : 4);
+        long headerSerializedLen = block.getHeader().getSerializedSize();
+        //获取Data序列化长度
+        long dataSerializedLen = block.getData().getSerializedSize();
+        //序列化后首部为1位标识位 + headerLen
+        //序列化后尾部为1位表示位 + dataLen
+        //headerLen、dataLen为每7位2进制位长度+1
+        long headerLen = headerSerializedLen + 2 + computeLength(headerSerializedLen) + computeLength(dataSerializedLen);
         //头部结束后为Data起始位置
-        int envPosition = headerLen + (int) blockPosition;
-        //迭代Data
+        long envPosition = headerLen + blockPosition;
+
+        //进入BlockData
+        //blockData每一项为envelope
+        //当envelope只有signature或payload中一个时, blockData没有起始标识位
+        //当envelope同事包含signature和payload时，blockData包含1位标识位 + n位data长度
         for(ByteString txEnvelopeBytes : block.getData().getDataList()){
             //记录当前位置
-            int offset = envPosition;
+            long offset = envPosition;
             Envelope txEnvelope;
             Payload txPayload;
             GroupHeader gh = null;
-            int txEvnelopeLength = 0;
+            long txEvnelopeLength = 0;
             //解析并获取TxID
             try {
                 txEnvelope = Envelope.parseFrom(txEnvelopeBytes);
                 txPayload = Payload.parseFrom(txEnvelope.getPayload());
                 gh = GroupHeader.parseFrom(txPayload.getHeader().getGroupHeader());
-                txEvnelopeLength = txEnvelope.toByteArray().length + 2;
+                txEvnelopeLength = txEnvelope.getSerializedSize();
             } catch (InvalidProtocolBufferException e) {
                 logger.error("Got error when resolve object from byteString");
                 return null;
+            }
+            //判断payload和signature长度，确定是否同时存在二者
+            if(txEnvelope.getSignature().size() != 0 && txEnvelope.getPayload().size() != 0){
+                //同时存在时跳过标识位
+                offset += (2 + computeLength(txEvnelopeLength));
             }
             //构造locpointer对象
             //offset        Envelope起始位置
@@ -143,6 +156,22 @@ public class BlockSerialization {
         }
 
         return txOffsets;
+    }
+
+    /**
+     * 用于计算protobuf对象序列化后长度位长度
+     * protobuf对象序列化后，byte[]长度增加128倍，长度位长度增加1
+     * 既    0~127          1
+     *      128~16383       2
+     *      16384~2097152   3
+     *      ...
+     */
+    private static int computeLength(long i){
+        int result = 0;
+        while ((i >>= 7) > 0){
+            result++;
+        }
+        return ++result;
     }
 
     /**
@@ -185,5 +214,23 @@ public class BlockSerialization {
 
     public void setTxOffsets(List<TxIndexInfo> txOffsets) {
         this.txOffsets = txOffsets;
+    }
+
+    public static String longer(StringBuffer buffer, int length){
+        while(buffer.length() < length){
+            buffer.append(1);
+        }
+        return buffer.toString();
+    }
+
+    public static void soutBytes(byte[] bytes){
+        int i = 0;
+        for(byte b : bytes){
+            System.out.print(b + ",");
+            if (i++ % 30 == 29) {
+                System.out.println();
+            }
+        }
+        System.out.println();
     }
 }

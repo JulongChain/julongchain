@@ -24,31 +24,31 @@ package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
  */
 public class LocPointer {
 
-    private Integer offset;
-    private Integer bytesLength;
+    private long offset;
+    private long bytesLength;
 
     public LocPointer(){
 
     }
 
-    public LocPointer(int offset, int bytesLength){
+    public LocPointer(long offset, long bytesLength){
         this.offset = offset;
         this.bytesLength = bytesLength;
     }
 
-    public Integer getOffset() {
+    public long getOffset() {
         return offset;
     }
 
-    public void setOffset(Integer offset) {
+    public void setOffset(long offset) {
         this.offset = offset;
     }
 
-    public Integer getBytesLength() {
+    public long getBytesLength() {
         return bytesLength;
     }
 
-    public void setBytesLength(Integer bytesLength) {
+    public void setBytesLength(long bytesLength) {
         this.bytesLength = bytesLength;
     }
 
