@@ -66,7 +66,7 @@ public class PolicyCheckerTest {
         List<SignedData> sd = new ArrayList<SignedData>();
         //policyChecker.checkPolicyBySignedData("","admin",sd);
         //policyChecker.checkPolicyBySignedData("A","",sd);
-        //policyChecker.checkPolicyBySignedData("A","admin",null);
+
 
     }
 
