@@ -64,9 +64,6 @@ public class PolicyCheckerTest {
         IMspPrincipalGetter principalGetter = mock(IMspPrincipalGetter.class);
         PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManager(),localMSP,principalGetter);
         List<SignedData> sd = new ArrayList<SignedData>();
-        //policyChecker.checkPolicyBySignedData("","admin",sd);
-        //policyChecker.checkPolicyBySignedData("A","",sd);
-
 
     }
 
