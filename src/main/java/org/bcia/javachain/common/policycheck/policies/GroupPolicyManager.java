@@ -18,14 +18,19 @@ package org.bcia.javachain.common.policycheck.policies;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.netty.channel.ChannelConfig;
+import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.GroupConfigBundle;
 import org.bcia.javachain.common.policies.*;
 import org.bcia.javachain.consenter.common.multigroup.ChainSupport;
 import org.bcia.javachain.consenter.consensus.IChain;
+import org.bcia.javachain.consenter.consensus.kafka.Chain;
 import org.bcia.javachain.consenter.entity.ChainEntity;
+import org.bcia.javachain.core.node.GroupSupport;
 import org.bcia.javachain.core.smartcontract.shim.helper.Channel;
+import org.bcia.javachain.node.Node;
+import org.bcia.javachain.node.entity.Group;
 import org.bcia.javachain.protos.common.Configtx;
 
 import java.util.HashMap;
@@ -42,15 +47,14 @@ import java.util.ResourceBundle;
 public class GroupPolicyManager implements IGroupPolicyManagerGetter {
     @Override
     public IPolicyManager getPolicyManager(String groupId) throws InvalidProtocolBufferException, PolicyException {
-        Configtx.Config config =  Configtx.Config.newBuilder().build();
-        GroupConfigBundle groupConfigBundle = null;
+        Group group = null;
         try {
-            groupConfigBundle = new GroupConfigBundle(groupId,config);
-        } catch (ValidateException e) {
+            group = Node.getInstance().getGroupMap().get(groupId);
+        } catch (NodeException e) {
             e.printStackTrace();
         }
-        return groupConfigBundle.getPolicyManager();
-    }
+        return group.getGroupSupport().getGroupConfigBundle().getPolicyManager();
 
+    }
 
 }
