@@ -97,7 +97,7 @@ public class ScEventManager {
      * @param dbArtifacts
      */
     public synchronized void handleSmartContractInstall(SmartContractDefinition smartContractDefinition, byte[] dbArtifacts) throws JavaChainException{
-        logger.debug("handleSmartContractInstall() - smartContractDefinition= " + smartContractDefinition);
+        //logger.debug("handleSmartContractInstall() - smartContractDefinition= " + smartContractDefinition);
         for(Map.Entry<String, ISmartContractLifecycleEventListener> entry : scLifecycleListeners.entrySet()){
             String ledgerID = entry.getKey();
             logger.debug(String.format("Group [%s]: Handling smartcontract install event for smartcontract [%s]", ledgerID, smartContractDefinition));

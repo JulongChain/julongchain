@@ -23,7 +23,7 @@ public class VersionCmdTest {
 
     @Test
     public void execCmd() throws ParseException, NodeException {
-        VersionCmd versionCmd = new VersionCmd(node);
+        NodeVersionCmd versionCmd = new NodeVersionCmd(node);
         versionCmd.execCmd(new String[0]);
     }
 }

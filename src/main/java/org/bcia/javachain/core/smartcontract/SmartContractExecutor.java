@@ -75,11 +75,11 @@ public class SmartContractExecutor {
             throw new SmartContractException("launch smart contract fail");
         }
 
-        List<ByteString> argsList = scInput.getArgsList();
-
-        for (ByteString byteString : argsList) {
-            System.out.println(byteString.toStringUtf8());
-        }
+//        List<ByteString> argsList = scInput.getArgsList();
+//
+//        for (ByteString byteString : argsList) {
+//            System.out.println(byteString.toStringUtf8());
+//        }
 
         //TODO:SmartContractInput是否需要再处理?
 
@@ -106,7 +106,6 @@ public class SmartContractExecutor {
         if (responseMessage != null) {
             //完成时返回负载
             if (responseMessage.getType().equals(SmartcontractShim.SmartContractMessage.Type.COMPLETED)) {
-//                ProposalResponsePackage.Response response = ProposalResponseUtils.buildResponse(responseMessage.getPayload());
                 ProposalResponsePackage.Response response = null;
                 try {
                     response = ProposalResponsePackage.Response.parseFrom(responseMessage.getPayload());
@@ -120,7 +119,7 @@ public class SmartContractExecutor {
             }
         }
 
-        throw new SmartContractException("Unknow error");
+        throw new SmartContractException("Unknown error");
     }
 
     /**

@@ -20,6 +20,6 @@ public class GenesisConfigFactoryTest extends BaseJunit4Test {
 
     @Test
     public void loadGenesisConfig() throws Exception {
-        GenesisConfigFactory.loadGenesisConfig();
+        GenesisConfigFactory.getGenesisConfig();
     }
 }

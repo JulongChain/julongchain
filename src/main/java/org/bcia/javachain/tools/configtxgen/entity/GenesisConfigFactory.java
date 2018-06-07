@@ -36,7 +36,21 @@ import java.util.Map;
 public class GenesisConfigFactory {
     private static JavaChainLog log = JavaChainLogFactory.getLog(GenesisConfigFactory.class);
 
-    public static GenesisConfig loadGenesisConfig() throws IOException {
+    private static GenesisConfig genesisConfig;
+
+    public static GenesisConfig getGenesisConfig() {
+        if (genesisConfig == null) {
+            synchronized (GenesisConfig.class) {
+                if (genesisConfig == null) {
+                    genesisConfig = loadGenesisConfig();
+                }
+            }
+        }
+
+        return genesisConfig;
+    }
+
+    public static GenesisConfig loadGenesisConfig() {
         Yaml yaml = new Yaml();
 
         InputStream is = null;
@@ -55,10 +69,6 @@ public class GenesisConfigFactory {
                 }
             }
         }
-    }
-
-    public static void main(String[] args) throws Exception {
-        GenesisConfigFactory.loadGenesisConfig();
     }
 
     public static Map<String, Object> loadGenesisConfigMap() throws FileNotFoundException {

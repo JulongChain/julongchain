@@ -28,7 +28,7 @@ import org.bcia.javachain.node.cmd.sc.ContractQueryCmd;
 import org.bcia.javachain.node.cmd.server.ServerStartCmd;
 import org.bcia.javachain.node.cmd.server.ServerStatusCmd;
 import org.bcia.javachain.node.cmd.util.NodeCmdConstant;
-import org.bcia.javachain.node.cmd.version.VersionCmd;
+import org.bcia.javachain.node.cmd.version.NodeVersionCmd;
 import org.bcia.javachain.node.util.NodeConstant;
 
 /**
@@ -67,7 +67,7 @@ public class NodeCmdFactory {
                 return new ContractQueryCmd(node);
             }
         } else if (NodeConstant.VERSION.equalsIgnoreCase(command)) {
-            return new VersionCmd(node);
+            return new NodeVersionCmd(node);
         }
 
         return null;

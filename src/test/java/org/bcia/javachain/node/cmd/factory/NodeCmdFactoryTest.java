@@ -13,15 +13,11 @@ import org.bcia.javachain.node.cmd.sc.ContractInvokeCmd;
 import org.bcia.javachain.node.cmd.sc.ContractQueryCmd;
 import org.bcia.javachain.node.cmd.server.ServerStartCmd;
 import org.bcia.javachain.node.cmd.server.ServerStatusCmd;
-import org.bcia.javachain.node.cmd.version.VersionCmd;
-import org.bcia.javachain.node.entity.NodeVersion;
+import org.bcia.javachain.node.cmd.version.NodeVersionCmd;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import static org.junit.Assert.*;
 
 /**
  * 节点命令工厂单元测试
@@ -79,7 +75,7 @@ public class NodeCmdFactoryTest extends BaseJunit4Test {
 
         //服务状态命令
         INodeCmd nodeCmd20 = NodeCmdFactory.getInstance(node, "version", null);
-        Assert.assertThat(nodeCmd20, Matchers.instanceOf(VersionCmd.class));
+        Assert.assertThat(nodeCmd20, Matchers.instanceOf(NodeVersionCmd.class));
 
         //----------------------------------------异常用例集--------------------------------------------//
         INodeCmd nodeCmd11 = NodeCmdFactory.getInstance(node, "group", null);
