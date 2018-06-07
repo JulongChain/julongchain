@@ -1,5 +1,5 @@
 /**
- * Copyright Feitian. All Rights Reserved.
+ * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,34 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.csp.pkcs11.entity;
+
+package org.bcia.javachain.csp.pkcs11;
+
+import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.csp.intfs.ICsp;
 
 /**
- * Class description
+ * interface description
  *
- * @author
- * @date 4/19/18
+ * @author xuying
+ * @date 2018/05/21
  * @company FEITIAN
  */
-public class PKCS11KeyData {
+public interface IPKCS11Csp extends ICsp {
 
-    private byte[] rawpub;
-
-    private byte[] rawpri;
-
-    public byte[] getRawPub() {
-        return rawpub;
-    }
-
-    public void setRawPub(byte[] raw) {
-        this.rawpub = raw;
-    }
-
-    public byte[] getRawPri() {
-        return rawpri;
-    }
-
-    public void setRawPri(byte[] raw) {
-        this.rawpri = raw;
-    }
+    public void finalized() throws JavaChainException;
 }
