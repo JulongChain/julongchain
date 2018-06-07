@@ -32,4 +32,5 @@ import org.bcia.javachain.common.policies.PolicyManager;
  */
 public interface IGroupPolicyManagerGetter extends IPolicyManagerGetter {
     IPolicyManager getPolicyManager(String groupId ) throws InvalidProtocolBufferException, PolicyException;
+
 }

@@ -29,4 +29,5 @@ import java.util.List;
  */
 public interface IEvalutor {
     boolean evalutor(List<SignedData> signedDatas,Boolean[] bool) throws PolicyException;
+
 }
