@@ -20,6 +20,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.config.GroupConfig;
 import org.bcia.javachain.common.policycheck.bean.SignaturePolicyEnvelope;
+import org.bcia.javachain.common.util.proto.ConfigGroup;
+import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.common.Policies;
 
 /**
@@ -31,6 +33,7 @@ import org.bcia.javachain.protos.common.Policies;
  */
 public class PolicyUtil {
     public void templatePolicy(String key, Policies.SignaturePolicyEnvelope  sigPolicyEnv) throws InvalidProtocolBufferException, ValidateException {
+        Configtx.Config c = Configtx.Config.newBuilder().build();
 
 
     }
