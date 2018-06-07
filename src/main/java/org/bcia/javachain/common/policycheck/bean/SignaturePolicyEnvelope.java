@@ -26,7 +26,9 @@ import org.bcia.javachain.protos.common.MspPrincipal;
  * @author yuanjun
  * @date 02/05/18
  * @company Aisino
+ *
  */
+@Deprecated
 public class SignaturePolicyEnvelope {
     private int version;
     private SignaturePolicy rule;

@@ -15,11 +15,12 @@
  */
 package org.bcia.javachain.csp.pkcs11;
 
+import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.csp.factory.IFactoryOpts;
 import sun.security.pkcs11.wrapper.PKCS11;
 
 /**
- * Class description
+ * interface description
  *
  * @author
  * @date 4/19/18
@@ -40,5 +41,5 @@ public interface IPKCS11FactoryOpts extends IFactoryOpts {
     public boolean getNoImport();
 
     //
-    public boolean getuseEcX963Encoding();
+    public void optFinalized() throws JavaChainException;
 }

@@ -44,6 +44,7 @@ public class PolicyProvider implements IPolicyProvider{
         this.deserializer = deserializer;
     }
 
+
     @Override
     public IPolicy makePolicy(byte[] data) throws PolicyException {
 

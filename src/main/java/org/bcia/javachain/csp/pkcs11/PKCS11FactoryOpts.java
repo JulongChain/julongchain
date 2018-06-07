@@ -18,6 +18,7 @@ package org.bcia.javachain.csp.pkcs11;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.csp.pkcs11.entity.PKCS11Config;
 import org.bcia.javachain.csp.pkcs11.entity.PKCS11Lib;
+import org.bcia.javachain.csp.pkcs11.sw.IPKCS11SwFactoryOpts;
 import sun.security.pkcs11.wrapper.PKCS11;
 import sun.security.pkcs11.wrapper.PKCS11Constants;
 import sun.security.pkcs11.wrapper.PKCS11Exception;
@@ -32,7 +33,7 @@ import java.io.IOException;
  * @date 4/19/18
  * @company FEITIAN
  */
-public class PKCS11FactoryOpts implements IPKCS11FactoryOpts{
+public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOpts {
 
     private boolean bSensitive;
     private boolean bSoftVerify;
@@ -41,15 +42,25 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts{
     private long sessionhandle;
     private PKCS11 p11;
     private long slot;
+    private char[] pin;
+
+    private String path;
+
+
+    public PKCS11FactoryOpts(PKCS11Config pkcsConf) {
+        this.bSoftVerify = pkcsConf.getSoftVerify();
+        this.bSensitive = pkcsConf.getnoKImport();
+        this.path = pkcsConf.getPath();
+    }
 
     public PKCS11FactoryOpts(PKCS11Lib pkcslib, PKCS11Config pkcsConf) throws JavaChainException {
 
         this.bSoftVerify = pkcsConf.getSoftVerify();
         this.bSensitive = pkcsConf.getnoKImport();
-        this.bUseEcX963Encodeing = pkcsConf.getUseEcX963Encodeing();
 
         boolean bfind = false;
         try {
+
             p11 = PKCS11.getInstance(pkcslib.getLibrary(), "C_GetFunctionList", null, false);
             long[] slots = p11.C_GetSlotList(true);
             int i=0;
@@ -71,38 +82,45 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts{
             if(!bfind)
             {
                 String str=null;
-                str=String.format("Could not find token with label %s and serialNumber %s", pkcslib.getKeyLabel(),pkcslib.getKeySN());          // 格式化字符串
+                str=String.format("[JC_PKCS]:Could not find token with label %s and serialNumber %s", pkcslib.getKeyLabel(),pkcslib.getKeySN());
                 throw new JavaChainException(str);
             }
 
-
             this.sessionhandle = p11.C_OpenSession(slot,
                     PKCS11Constants.CKF_SERIAL_SESSION|PKCS11Constants.CKF_RW_SESSION, null, null);
-
-            char[] pin = pkcslib.getKeyPin().toCharArray();
+            pin = pkcslib.getKeyPin().toCharArray();
             p11.C_Login(sessionhandle, PKCS11Constants.CKU_USER, pin);
-        }
-        catch (PKCS11Exception|IOException ex){
-            //need add return value
-            throw new JavaChainException("error!");
+
+        }catch (IOException/*|KeyStoreException|CertificateException|NoSuchAlgorithmException*/ ex){
+            String err = String.format("[JC_PKCS]:IOException ErrMessage:", ex.getMessage());
+            throw new JavaChainException(err, ex.getCause());
+        }catch(PKCS11Exception ex) {
+            if(ex.getErrorCode() == PKCS11Constants.CKR_USER_ALREADY_LOGGED_IN)
+            {
+                ;
+            }else
+            {
+                String err = String.format("[JC_PKCS]:PKCS11Exception code: 0x%08x", ex.getErrorCode());
+                throw new JavaChainException(err, ex.getCause());
+            }
         }
     }
 
 
 
-    public void optFinalized(){
+    public void optFinalized() throws JavaChainException{
         try {
             p11.C_CloseSession(sessionhandle);
         }
         catch (PKCS11Exception ex){
-            //need add return value
-            ;
+            String err = String.format("[JC_PKCS]:PKCS11Exception code: 0x%08x", ex.getErrorCode());
+            throw new JavaChainException(err, ex.getCause());
         }
     }
 
     @Override
     public String getProviderName() {
-        return "PKCS11";
+        return PROVIDER_PKCS11;
     }
 
     @Override
@@ -130,14 +148,14 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts{
         return bSoftVerify;
     }
 
-
     @Override
     public boolean getNoImport() {
         return bSensitive;
     }
 
     @Override
-    public boolean getuseEcX963Encoding() {
-        return bUseEcX963Encodeing;
+    public String getPath() {
+        return path;
     }
+
 }

@@ -54,7 +54,6 @@ public class CAuthDslTest {
         sds.add(sd2);
         sds.add(sd3);
         MspManager deserializer = new MspManager();//mock(MspManager.class);
-        //CAuthDsl.deduplicate(sds,deserializer);
     }
     @Test
     public void compile() throws PolicyException {

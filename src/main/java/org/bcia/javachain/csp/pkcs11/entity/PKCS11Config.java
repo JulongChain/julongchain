@@ -29,9 +29,10 @@ public class PKCS11Config {
     private String hashFamily;
     private boolean sfVer;
     private boolean noKImport;
-    private boolean useecx963encodeing;
+    //private boolean useecx963encodeing;
+    private String path;
 
-    public PKCS11Config(int level, String hashfamily, boolean softVerify, boolean noKeyImport, boolean useecx963encodeing)  throws JavaChainException {
+    public PKCS11Config(int level, String hashfamily, boolean softVerify, boolean noKeyImport)  throws JavaChainException {
 
         switch (level){
             case 1:
@@ -57,7 +58,14 @@ public class PKCS11Config {
 
         this.sfVer = softVerify;
         this.noKImport = noKeyImport;
-        this.useecx963encodeing = useecx963encodeing;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    public String getPath() {
+        return path;
     }
 
     public int getLevel() {
@@ -74,10 +82,6 @@ public class PKCS11Config {
 
     public boolean getnoKImport() {
         return noKImport;
-    }
-
-    public boolean getUseEcX963Encodeing() {
-        return useecx963encodeing;
     }
 
 }

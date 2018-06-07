@@ -34,6 +34,7 @@ public class ConfigPolicy {
         this.modPolicy = modPolicy;
     }
 
+
     public Long getVersion() {
         return version;
     }

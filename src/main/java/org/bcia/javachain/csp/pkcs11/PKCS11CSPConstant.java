@@ -29,6 +29,7 @@ public class PKCS11CSPConstant {
     // Each CSP may or may not support default security level. If not supported than
     // an error will be returned.
     public static final String ECDSA = "ECDSA";
+    public static final String ECDSA192 = "ECDSA192";
     // ECDSA Elliptic Curve Digital Signature Algorithm over P-256 curve
     public static final String ECDSA256 = "ECDSA256";
     // ECDSA Elliptic Curve Digital Signature Algorithm over P-384 curve
@@ -85,6 +86,7 @@ public class PKCS11CSPConstant {
     public static final String SHA3_384 = "SHA3_384";
 
     public static final String MD5 = "MD5";
+    public static final String MD2 = "MD2";
 
     // X509Certificate Label for X509 certificate related operation
     public static final String X509Certificate = "X509Certificate";
@@ -92,4 +94,5 @@ public class PKCS11CSPConstant {
 
     public static final long CKM_SHA3_256_RSA_PKCS = 0x00000060L;
     public static final long CKM_SHA3_384_RSA_PKCS = 0x00000061L;
+    public static final long CKM_DERIVEECCKEY = 0x80000002L;
 }

@@ -31,22 +31,25 @@ public class PKCS11Lib {
 
     public PKCS11Lib(String lib, String Label, String Sn, String Pin) {
         if (lib == null || lib.equals(""))
-            this.Library = "";
+            this.Library = "/root/Desktop/libcastle.so.1.0.0";
         else
             this.Library = lib;
 
         if (Label == null || Label.equals(""))
-            this.KeyLabel = "KEY";
+            this.KeyLabel = "ePass2003";
+        	//this.KeyLabel = "ePass Token";
         else
             this.KeyLabel = Label;
 
         if (Sn == null || Sn.equals(""))
-            this.KeySn = "249181BB80750017";
+            this.KeySn = "249188990075001B";
+        	//this.KeySn = "0328470216020518";
         else
             this.KeySn = Sn;
 
         if (Pin == null)
             this.KeyPin = "12345678";
+        	//this.KeyPin = "123456";
         else
             this.KeyPin = Pin;
     }

@@ -67,12 +67,12 @@ public class Policy implements IPolicy{
     public void evaluate(List<SignedData> signatureList) throws PolicyException {
         Boolean[] bool = new Boolean[signatureList.size()];
         if(this == null){
-            log.info("No sEvaluateuch policy");
+            log.error("No sEvaluateuch policy");
         }
             List<SignedData> signedDataList = CAuthDsl.deduplicate(signatureList,this.deserializer);
             Boolean ok = evalutor.evalutor(signedDataList,bool);
             if(!ok){
-                log.info("Failed to authenticate policy");
+                log.error("Failed to authenticate policy");
             }
     }
 

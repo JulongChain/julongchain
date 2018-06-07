@@ -17,8 +17,10 @@ package org.bcia.javachain.common.policycheck.policies;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.PolicyException;
+import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.policies.IManager;
 import org.bcia.javachain.common.policies.IPolicyManager;
+import org.bcia.javachain.common.policies.IPolicyManagerGetter;
 import org.bcia.javachain.common.policies.PolicyManager;
 
 /**
@@ -28,6 +30,7 @@ import org.bcia.javachain.common.policies.PolicyManager;
  * @date 26/04/18
  * @company Aisino
  */
-public interface IGroupPolicyManagerGetter {
+public interface IGroupPolicyManagerGetter extends IPolicyManagerGetter {
     IPolicyManager getPolicyManager(String groupId ) throws InvalidProtocolBufferException, PolicyException;
+
 }
