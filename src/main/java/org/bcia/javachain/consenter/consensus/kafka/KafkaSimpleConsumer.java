@@ -17,7 +17,7 @@ package org.bcia.javachain.consenter.consensus.kafka;
 
 import kafka.api.FetchRequestBuilder;
 import kafka.api.PartitionOffsetRequestInfo;
-import kafka.cluster.Broker;
+import kafka.cluster.BrokerEndPoint;
 import kafka.common.ErrorMapping;
 import kafka.common.OffsetAndMetadata;
 import kafka.common.OffsetMetadataAndError;
@@ -272,7 +272,7 @@ public class KafkaSimpleConsumer {
                                         brokerInfos.clear();
                                     }
 
-                                    for (Broker replica : returnMetadata.replicas()) {
+                                    for (BrokerEndPoint replica : returnMetadata.replicas()) {
                                         brokerInfos.add(new KafkaBrokerInfo(replica.host(), replica.port()));
                                     }
 
@@ -361,7 +361,7 @@ public class KafkaSimpleConsumer {
         if (returnOffsetMetadata != null && !returnOffsetMetadata.isEmpty()) {
             // 获取当前分区对应的偏移量信息
             OffsetMetadataAndError offset = returnOffsetMetadata.get(topicAndPartition);
-            if (offset.error() == ErrorMapping.NoError()) {
+            if (offset.error().equals(ErrorMapping.NoError())) {
                 // 没有异常，表示是正常的，获取偏移量
                 return offset.offset();
             } else {
@@ -431,7 +431,7 @@ public class KafkaSimpleConsumer {
         // 构建请求对象
         Map<TopicAndPartition, OffsetAndMetadata> requestInfoMap = new HashMap<TopicAndPartition, OffsetAndMetadata>();
         TopicAndPartition topicAndPartition = new TopicAndPartition(topic, partitionID);
-        requestInfoMap.put(topicAndPartition, new OffsetAndMetadata(readOffSet, OffsetAndMetadata.NoMetadata(), -1));
+//        requestInfoMap.put(topicAndPartition, new OffsetAndMetadata(readOffSet, OffsetAndMetadata.NoMetadata(), -1));
         kafka.javaapi.OffsetCommitRequest ocRequest = new OffsetCommitRequest(groupId, requestInfoMap, 0, clientName);
         // 提交修改偏移量的请求，并获取返回值
         kafka.javaapi.OffsetCommitResponse response = consumer.commitOffsets(ocRequest);

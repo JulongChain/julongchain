@@ -28,6 +28,7 @@ import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.config.ApplicationConfig;
 import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
 import org.bcia.javachain.common.groupconfig.MSPConfigHandler;
+import org.bcia.javachain.common.groupconfig.value.AnchorNodesValue;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -38,6 +39,7 @@ import org.bcia.javachain.node.common.helper.ConfigTreeHelper;
 import org.bcia.javachain.node.common.helper.ConfigUpdateHelper;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
+import org.bcia.javachain.protos.node.Configuration;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.ProposalResponsePackage;
 import org.bcia.javachain.protos.node.TransactionPackage;
@@ -59,18 +61,19 @@ public class EnvelopeHelper {
 
     public static Common.Envelope makeGroupCreateTx(String groupId, ILocalSigner signer, Configtx.ConfigTree
             consenterSystemGroupTree, GenesisConfig.Profile profile) throws InvalidProtocolBufferException,
-            NodeException, ValidateException {
+            ValidateException {
         Configtx.ConfigUpdate configUpdate = buildConfigUpdate(groupId, consenterSystemGroupTree, profile);
 
         Configtx.ConfigUpdateEnvelope.Builder envelopeBuilder = Configtx.ConfigUpdateEnvelope.newBuilder();
         envelopeBuilder.setConfigUpdate(configUpdate.toByteString());
-        Configtx.ConfigUpdateEnvelope envelope = envelopeBuilder.build();
+        Configtx.ConfigUpdateEnvelope configUpdateEnvelope = envelopeBuilder.build();
 
-        Configtx.ConfigUpdateEnvelope configUpdateEnvelope = signConfigUpdateEnvelope(envelope, signer);
+        if (signer != null) {
+            configUpdateEnvelope = signConfigUpdateEnvelope(configUpdateEnvelope, signer);
+        }
 
         return buildSignedEnvelope(Common.HeaderType.CONFIG_UPDATE_VALUE, 0, groupId, signer, configUpdateEnvelope,
                 0);
-
     }
 
     public static Configtx.ConfigEnvelope getConfigEnvelopeFrom(Common.Envelope envelope) throws
@@ -160,6 +163,61 @@ public class EnvelopeHelper {
         return configUpdate;
     }
 
+    public static Configtx.ConfigUpdate makeConfigUpdate(String groupId, String orgName,
+                                                         Configuration.AnchorNode[] anchorNodes) {
+        Configtx.ConfigUpdate.Builder configUpdateBuilder = Configtx.ConfigUpdate.newBuilder();
+        configUpdateBuilder.setGroupId(groupId);
+
+        configUpdateBuilder.setReadSet(makeReadSet(orgName));
+        configUpdateBuilder.setWriteSet(makeWriteSet(orgName, anchorNodes));
+
+        return configUpdateBuilder.build();
+    }
+
+    private static Configtx.ConfigTree makeReadSet(String orgName) {
+        Configtx.ConfigTree.Builder readSetBuilder = Configtx.ConfigTree.newBuilder();
+
+        Configtx.ConfigTree.Builder orgTreeBuilder = Configtx.ConfigTree.newBuilder();
+        orgTreeBuilder.putValues(GroupConfigConstant.MSP, Configtx.ConfigValue.getDefaultInstance());
+        orgTreeBuilder.putPolicies(GroupConfigConstant.POLICY_READERS, Configtx.ConfigPolicy.getDefaultInstance());
+        orgTreeBuilder.putPolicies(GroupConfigConstant.POLICY_WRITERS, Configtx.ConfigPolicy.getDefaultInstance());
+        orgTreeBuilder.putPolicies(GroupConfigConstant.POLICY_ADMINS, Configtx.ConfigPolicy.getDefaultInstance());
+
+        Configtx.ConfigTree.Builder appBuilder = Configtx.ConfigTree.newBuilder();
+        appBuilder.putChilds(orgName, orgTreeBuilder.build());
+        appBuilder.setVersion(1);
+        appBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
+
+        readSetBuilder.putChilds(GroupConfigConstant.APPLICATION, appBuilder.build());
+        return readSetBuilder.build();
+    }
+
+    private static Configtx.ConfigTree makeWriteSet(String orgName, Configuration.AnchorNode[] anchorNodes) {
+        Configtx.ConfigTree.Builder writeSetBuilder = Configtx.ConfigTree.newBuilder();
+
+        Configtx.ConfigTree.Builder orgTreeBuilder = Configtx.ConfigTree.newBuilder();
+        orgTreeBuilder.putValues(GroupConfigConstant.MSP, Configtx.ConfigValue.getDefaultInstance());
+        orgTreeBuilder.putPolicies(GroupConfigConstant.POLICY_READERS, Configtx.ConfigPolicy.getDefaultInstance());
+        orgTreeBuilder.putPolicies(GroupConfigConstant.POLICY_WRITERS, Configtx.ConfigPolicy.getDefaultInstance());
+        orgTreeBuilder.putPolicies(GroupConfigConstant.POLICY_ADMINS, Configtx.ConfigPolicy.getDefaultInstance());
+        orgTreeBuilder.setVersion(1);
+        orgTreeBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
+
+        Configtx.ConfigValue.Builder anchorNodesBuilder = Configtx.ConfigValue.newBuilder();
+        anchorNodesBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
+        AnchorNodesValue anchorNodesValue = new AnchorNodesValue(anchorNodes);
+        anchorNodesBuilder.setValue(anchorNodesValue.getValue().toByteString());
+        orgTreeBuilder.putValues(GroupConfigConstant.ANCHOR_NODES, anchorNodesBuilder.build());
+
+        Configtx.ConfigTree.Builder appBuilder = Configtx.ConfigTree.newBuilder();
+        appBuilder.putChilds(orgName, orgTreeBuilder.build());
+        appBuilder.setVersion(1);
+        appBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
+
+        writeSetBuilder.putChilds(GroupConfigConstant.APPLICATION, appBuilder.build());
+        return writeSetBuilder.build();
+    }
+
     public static Common.Envelope createSignedTxEnvelope(ProposalPackage.Proposal originalProposal, ISigningIdentity
             identity, ProposalResponsePackage.ProposalResponse... endorserResponses) throws ValidateException {
         if (originalProposal == null || identity == null || endorserResponses == null) {
@@ -219,7 +277,7 @@ public class EnvelopeHelper {
         for (int i = 0; i < endorserResponses.length; i++) {
             ProposalResponsePackage.ProposalResponse endorserResponse = endorserResponses[i];
 
-            if (endorserResponse.getResponse().getStatus() != 200 &&  endorserResponse.getResponse().getStatus() != 0) {
+            if (endorserResponse.getResponse().getStatus() != 200 && endorserResponse.getResponse().getStatus() != 0) {
                 throw new ValidateException("endorserResponse status error: " + endorserResponse.getResponse());
             }
 
@@ -406,12 +464,13 @@ public class EnvelopeHelper {
 
         //构造Payload
         Common.Payload payload = buildPayload(type, version, groupId, signer, data, epoch);
-
-        //Signature字段由Payload字段签名而成
-        byte[] signatureBytes = signer.sign(payload.toByteArray());
-
         envelopeBuilder.setPayload(payload.toByteString());
-        envelopeBuilder.setSignature(ByteString.copyFrom(signatureBytes));
+
+        if (signer != null) {
+            //Signature字段由Payload字段签名而成
+            byte[] signatureBytes = signer.sign(payload.toByteArray());
+            envelopeBuilder.setSignature(ByteString.copyFrom(signatureBytes));
+        }
 
         return envelopeBuilder.build();
     }
@@ -435,11 +494,14 @@ public class EnvelopeHelper {
 
         //构造头部,包含GroupHeader和SignatureHeader两个字段
         Common.GroupHeader groupHeader = buildGroupHeader(type, version, groupId, epoch);
-        Common.SignatureHeader signatureHeader = signer.newSignatureHeader();
 
         Common.Header.Builder headerBuilder = Common.Header.newBuilder();
         headerBuilder.setGroupHeader(groupHeader.toByteString());
-        headerBuilder.setSignatureHeader(signatureHeader.toByteString());
+
+        if (signer != null) {
+            Common.SignatureHeader signatureHeader = signer.newSignatureHeader();
+            headerBuilder.setSignatureHeader(signatureHeader.toByteString());
+        }
         Common.Header header = headerBuilder.build();
 
         //Payload对象包含头部Header和Data两个字段
@@ -554,7 +616,6 @@ public class EnvelopeHelper {
     }
 
     /**
-     *
      * @param envelopeConfig
      * @param config
      * @param configEnv
@@ -564,8 +625,7 @@ public class EnvelopeHelper {
     public static Common.GroupHeader unmarshalEnvelopeOfType(Common.Envelope envelopeConfig,
                                                              Common.HeaderType config,
                                                              Configtx.ConfigEnvelope configEnv)
-                                                             throws JavaChainException
-    {
+            throws JavaChainException {
         return null;
     }
 }

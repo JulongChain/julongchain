@@ -19,7 +19,6 @@ import org.apache.commons.cli.ParseException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.node.Node;
-import org.springframework.stereotype.Component;
 
 /**
  * 完成节点安装智能合约的解析
@@ -29,16 +28,16 @@ import org.springframework.stereotype.Component;
  * @date 2018/2/24
  * @company Dingxuan
  */
-public class VersionCmd extends AbstractNodeVersionCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(VersionCmd.class);
+public class NodeVersionCmd extends AbstractNodeVersionCmd {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(NodeVersionCmd.class);
 
-    public VersionCmd(Node node) {
+    public NodeVersionCmd(Node node) {
         super(node);
     }
 
     @Override
     public void execCmd(String[] args) throws ParseException {
-        log.info("Version: " + nodeVersion.getVersion());
+        log.info("Node version: " + nodeVersion.getVersion());
     }
 
 }

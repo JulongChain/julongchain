@@ -15,7 +15,6 @@ limitations under the License.
  */
 package org.bcia.javachain.core.ledger.sceventmgmt;
 
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.LedgerException;
@@ -25,8 +24,6 @@ import org.bcia.javachain.core.common.smartcontractprovider.SmartContractProvide
 import org.bcia.javachain.core.common.sysscprovider.SystemSmartContractProvider;
 import org.bcia.javachain.core.ledger.IQueryExecutor;
 import org.bcia.javachain.protos.node.SmartContractDataPackage;
-
-import java.util.Arrays;
 
 /**
  * 智能合约信息提供者

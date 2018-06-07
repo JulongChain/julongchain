@@ -133,7 +133,7 @@ public class NodeGroup {
             //如果是空文件，则组成一个默认的信封对象
             try {
                 envelope = EnvelopeHelper.makeGroupCreateTx(groupId, signer, null, GenesisConfigFactory
-                        .loadGenesisConfig().getCompletedProfile(PROFILE_CREATE_GROUP));
+                        .getGenesisConfig().getCompletedProfile(PROFILE_CREATE_GROUP));
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 throw new NodeException(e);
@@ -223,7 +223,7 @@ public class NodeGroup {
      * @throws JavaChainException
      */
     private Common.Block mockCreateBlock(String groupId) throws IOException, JavaChainException {
-        GenesisConfig.Profile profile = GenesisConfigFactory.loadGenesisConfig().getCompletedProfile
+        GenesisConfig.Profile profile = GenesisConfigFactory.getGenesisConfig().getCompletedProfile
                 (PROFILE_CREATE_GROUP);
 
         //构造应用子树

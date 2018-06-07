@@ -52,12 +52,10 @@ import org.bcia.javachain.node.util.LedgerUtils;
 import org.bcia.javachain.node.util.NodeConstant;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
-import org.bcia.javachain.protos.common.Configuration;
 import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -158,7 +156,7 @@ public class Node {
      * 初始化
      */
     private void init() throws NodeException {
-        NodeConfig config = NodeConfigFactory.getNodeConfig();
+//        NodeConfig config = NodeConfigFactory.getNodeConfig();
 //        try {
 //            config = NodeConfigFactory.getNodeConfig();
 //        } catch (IOException e) {
@@ -412,8 +410,7 @@ public class Node {
         if (group == null || group.getGroupSupport() == null || group.getGroupSupport().getNodeLedger() == null) {
             GenesisConfig.Profile profile = null;
             try {
-                profile = GenesisConfigFactory.loadGenesisConfig().getCompletedProfile
-                        (SAMPLE_DEVMODE_SOLO_PROFILE);
+                profile = GenesisConfigFactory.getGenesisConfig().getCompletedProfile(SAMPLE_DEVMODE_SOLO_PROFILE);
                 Configtx.ConfigTree groupTree = ConfigTreeHelper.buildGroupTree(profile);
 
                 GenesisBlockFactory genesisBlockFactory = new GenesisBlockFactory(groupTree);
@@ -426,13 +423,7 @@ public class Node {
                 groupSupport.setNodeLedger(nodeLedger);
                 newGroup.setGroupSupport(groupSupport);
                 groupMap.put(groupId, newGroup);
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-                throw new NodeException(e);
-            } catch (LedgerException e) {
-                log.error(e.getMessage(), e);
-                throw new NodeException(e);
-            } catch (JavaChainException e) {
+            } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 throw new NodeException(e);
             }

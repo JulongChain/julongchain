@@ -57,7 +57,7 @@ public class SystemSmartContractProvider implements ISystemSmartContractProvider
         //构造应用子树
         GenesisConfig.Profile profile = null;
         try {
-            profile = GenesisConfigFactory.loadGenesisConfig().getCompletedProfile(PROFILE_CREATE_GROUP);
+            profile = GenesisConfigFactory.getGenesisConfig().getCompletedProfile(PROFILE_CREATE_GROUP);
             Configtx.ConfigTree appTree = ConfigTreeHelper.buildApplicationTree(profile.getApplication());
             //得到最终的应用配置
             ApplicationConfig appConfig = new ApplicationConfig(appTree, new MSPConfigHandler(0));
