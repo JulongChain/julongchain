@@ -42,17 +42,14 @@ import java.util.ResourceBundle;
 public class GroupPolicyManager implements IGroupPolicyManagerGetter {
     @Override
     public IPolicyManager getPolicyManager(String groupId) throws InvalidProtocolBufferException, PolicyException {
-        /*Configtx.Config config =  Configtx.Config.newBuilder().build();
+        Configtx.Config config =  Configtx.Config.newBuilder().build();
         GroupConfigBundle groupConfigBundle = null;
         try {
             groupConfigBundle = new GroupConfigBundle(groupId,config);
         } catch (ValidateException e) {
             e.printStackTrace();
         }
-        return groupConfigBundle.getPolicyManager();*/
-        Map<Integer, IPolicyProvider> providers = new HashMap<Integer, IPolicyProvider>();
-        Configtx.ConfigTree rootTree = Configtx.ConfigTree.getDefaultInstance();
-        return new PolicyManager(PolicyConstant.GROUP_APP_ADMINS,providers,rootTree);
+        return groupConfigBundle.getPolicyManager();
     }
 
 
