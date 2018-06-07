@@ -17,6 +17,7 @@ package org.bcia.javachain.core.ledger.ledgerconfig;
 
 
 import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
+import org.bcia.javachain.core.node.NodeConfigFactory;
 
 import java.io.File;
 
@@ -42,7 +43,7 @@ public class LedgerConfig {
     private static final String CONF_MAX_BATCH_SIZE = "ledger.state.couchDBconfig.maxBatchUpdateSize";
     private static final String CONF_AUTO_WARM_INDEXES = "ledger.state.couchDBconfig.autoWarmIndexes";
     private static final String CONF_WARM_INDEXES_AFTER_N_BLOCKS = "ledger.state.couchDBConfig.warmIndexesAfterNBlocks";
-    private static final String DEFAULT_ROOT_DIR = "/var/javachain";
+    private static final String DEFAULT_ROOT_DIR = NodeConfigFactory.getNodeConfig().getNode().getFileSystemPath();
     private static String ROOT_DIR = DEFAULT_ROOT_DIR;
     private static final int DEFAULT_MAX_BLOCKFILE_SIZE = 64 * 1024 * 1024;
     private static int MAX_BLOCKFILE_SIZE;
