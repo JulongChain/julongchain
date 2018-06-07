@@ -36,7 +36,7 @@ public class CommonStorageDBProvider implements IDBPorvider {
         if(LedgerConfig.isCouchDBEnable()){
             //CouchDB is not enable
         } else {
-            vdbProvider = VersionedLevelDBProvider.newVersionedDBProvider();
+            vdbProvider = new VersionedLevelDBProvider();
         }
         CommonStorageDBProvider provider = new CommonStorageDBProvider();
         provider.setVdbProvider(vdbProvider);
@@ -46,7 +46,7 @@ public class CommonStorageDBProvider implements IDBPorvider {
     @Override
     public IDB getDBHandle(String id) throws LedgerException {
         IVersionedDB vdb = vdbProvider.getDBHandle(id);
-        return CommonStorageDB.newCommonStorageDB(vdb, id);
+        return new CommonStorageDB(vdb);
     }
 
     @Override

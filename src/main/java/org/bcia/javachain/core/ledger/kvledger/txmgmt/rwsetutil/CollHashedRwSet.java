@@ -31,6 +31,12 @@ public class CollHashedRwSet {
     private KvRwset.HashedRWSet hashedRwSet = null;
     private ByteString pvtRwSetHash = null;
 
+    public CollHashedRwSet(String collectionName, ByteString pvtRwSetHash, KvRwset.HashedRWSet hashedRwSet) {
+        this.collectionName = collectionName;
+        this.hashedRwSet = hashedRwSet;
+        this.pvtRwSetHash = pvtRwSetHash;
+    }
+
     public String getCollectionName() {
         return collectionName;
     }

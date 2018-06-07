@@ -33,7 +33,9 @@ public class CompositeKey {
 	}
 
 	public CompositeKey(String objectType, List<String> attributes) {
-		if (objectType == null) throw new NullPointerException("objectType cannot be null");
+		if (objectType == null) {
+			throw new NullPointerException("objectType cannot be null");
+		}
 		this.objectType = objectType;
 		this.attributes = attributes;
 		this.compositeKey = generateCompositeKeyString(objectType, attributes);
@@ -53,8 +55,12 @@ public class CompositeKey {
 	}
 
 	public static CompositeKey parseCompositeKey(String compositeKey) {
-		if (compositeKey == null) return null;
-		if (!compositeKey.startsWith(NAMESPACE)) throw CompositeKeyFormatException.forInputString(compositeKey, compositeKey, 0);
+		if (compositeKey == null) {
+			return null;
+		}
+		if (!compositeKey.startsWith(NAMESPACE)) {
+			throw CompositeKeyFormatException.forInputString(compositeKey, compositeKey, 0);
+		}
 		// relying on the fact that NAMESPACE == DELIMETER
 		final String[] segments = compositeKey.split(DELIMITER, 0);
 		return new CompositeKey(segments[1], Arrays.stream(segments).skip(2).toArray(String[]::new));

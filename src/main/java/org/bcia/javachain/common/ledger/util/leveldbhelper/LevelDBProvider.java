@@ -42,15 +42,11 @@ public class LevelDBProvider implements IDBProvider {
     private byte lastKeyIndicator = 0x01;
     private String dbPath = null;
 
-    private LevelDBProvider() throws LevelDBException {
+    public LevelDBProvider(String dbPath) throws LevelDBException {
+        this.dbPath = dbPath;
         dbNameKeySep[0] = 0x00;
         db = new LevelDBHandle();
-    }
-
-    public static UpdateBatch newUpdateBatch() {
-        UpdateBatch batch = new UpdateBatch();
-        batch.setKvs(new HashMap<>());
-        return batch;
+        db.createDB(dbPath);
     }
 
     @Override
@@ -69,13 +65,6 @@ public class LevelDBProvider implements IDBProvider {
 
     public void setDb(IDBHandle db) {
         this.db = db;
-    }
-
-    public static synchronized LevelDBProvider newProvider(String dbPath) throws LevelDBException {
-        LevelDBProvider provider =  new LevelDBProvider();
-        provider.getDb().createDB(dbPath);
-        provider.setDbPath(dbPath);
-        return provider;
     }
 
     @Override

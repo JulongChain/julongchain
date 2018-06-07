@@ -37,6 +37,11 @@ public class HistoryLevelDBQueryExecutor implements IHistoryQueryExecutor {
     private HistoryLevelDB historyDB;
     private IBlockStore blockStore;
 
+    public HistoryLevelDBQueryExecutor(HistoryLevelDB historyDB, IBlockStore blockStore) {
+        this.historyDB = historyDB;
+        this.blockStore = blockStore;
+    }
+
     @Override
     public IResultsIterator getHistoryForKey(String ns, String key) throws LedgerException{
         if(!LedgerConfig.isHistoryDBEnabled()){
@@ -45,7 +50,7 @@ public class HistoryLevelDBQueryExecutor implements IHistoryQueryExecutor {
         byte[] compositeStartKey = HistoryDBHelper.constructPartialCompositeHistoryKey(ns, key, false);
 
         DBIterator iterator = (DBIterator) historyDB.getProvider().getIterator(compositeStartKey);
-        return HistoryScanner.newHistoryScanner(compositeStartKey, ns, key, iterator, blockStore);
+        return new HistoryScanner(compositeStartKey, ns, key, iterator, blockStore);
     }
 
     public HistoryLevelDB getHistoryDB() {

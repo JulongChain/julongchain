@@ -32,6 +32,15 @@ public class SerializedBlockInfo {
     private List<TxIndexInfo> txOffsets;
     private Common.BlockMetadata metadata;
 
+    public SerializedBlockInfo() {
+    }
+
+    public SerializedBlockInfo(Common.BlockHeader blockHeader, List<TxIndexInfo> txOffsets, Common.BlockMetadata metadata) {
+        this.blockHeader = blockHeader;
+        this.txOffsets = txOffsets;
+        this.metadata = metadata;
+    }
+
     public Common.BlockHeader getBlockHeader() {
         return blockHeader;
     }

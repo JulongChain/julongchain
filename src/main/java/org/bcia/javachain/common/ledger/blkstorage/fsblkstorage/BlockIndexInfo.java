@@ -36,6 +36,16 @@ public class BlockIndexInfo {
     private List<TxIndexInfo> txOffsets;
     private Common.BlockMetadata metadata;
 
+    public BlockIndexInfo(){}
+
+    public BlockIndexInfo(long blockNum, byte[] blockHash, FileLocPointer flp, List<TxIndexInfo> txIndexInfos, Common.BlockMetadata metadata){
+        this.blockNum = blockNum;
+        this.blockHash = blockHash;
+        this.flp = flp;
+        this.txOffsets = txIndexInfos;
+        this.metadata = metadata;
+    }
+
     private static final JavaChainLog loogger = JavaChainLogFactory.getLog(BlockIndexInfo.class);
     public long getBlockNum() {
         return blockNum;

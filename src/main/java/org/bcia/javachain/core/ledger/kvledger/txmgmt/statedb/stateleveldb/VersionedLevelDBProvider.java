@@ -39,20 +39,15 @@ public class VersionedLevelDBProvider implements IVersionedDBProvider {
 
     private IDBProvider db;
 
-    public static IVersionedDBProvider newVersionedDBProvider() throws LedgerException{
+    public VersionedLevelDBProvider() throws LedgerException {
         String dbPath = LedgerConfig.getStateLevelDBPath();
-        VersionedLevelDBProvider vdbProvider =  new VersionedLevelDBProvider();
-        vdbProvider.setDb(LevelDBProvider.newProvider(dbPath));
-        logger.debug("Create vdb using path " + vdbProvider.getDb().getDbPath());
-        return vdbProvider;
+        this.db = new LevelDBProvider(dbPath);
+        logger.debug("Create vdb using path " + this.db.getDbPath());
     }
 
     @Override
     public IVersionedDB getDBHandle(String id) throws LedgerException {
-        VersionedLevelDB vdb = new VersionedLevelDB();
-        vdb.setDb(db);
-        vdb.setDbName(db.getDb().getDbName());
-        return vdb;
+        return new VersionedLevelDB(db, db.getDb().getDbName());
     }
 
     @Override

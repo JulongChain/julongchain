@@ -27,9 +27,7 @@ public class LocPointer {
     private long offset;
     private long bytesLength;
 
-    public LocPointer(){
-
-    }
+    public LocPointer(){}
 
     public LocPointer(long offset, long bytesLength){
         this.offset = offset;

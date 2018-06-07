@@ -27,10 +27,8 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.Updat
 public class PubUpdateBatch {
     UpdateBatch batch;
 
-    public static PubUpdateBatch newPubUpdateBatch(){
-        PubUpdateBatch batch = new PubUpdateBatch();
-        batch.setBatch(new UpdateBatch());
-        return batch;
+    public PubUpdateBatch() {
+        this.batch = new UpdateBatch();
     }
 
     public UpdateBatch getBatch() {

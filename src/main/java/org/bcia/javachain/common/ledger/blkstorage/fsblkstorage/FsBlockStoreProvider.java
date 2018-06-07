@@ -47,13 +47,11 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
     /**
      * 创建文件系统操作类
      */
-    public static IBlockStoreProvider newProvider(Config config, IndexConfig indexConfig) throws LedgerException {
-        FsBlockStoreProvider provider = new FsBlockStoreProvider();
-        provider.setLeveldbProvider(LevelDBProvider.newProvider(config.getIndexDir()));
-        provider.setIndexConfig(indexConfig);
-        provider.setConfig(config);
+    public FsBlockStoreProvider(Config config, IndexConfig indexConfig) throws LedgerException {
+        this.indexConfig = indexConfig;
+        this.leveldbProvider = new LevelDBProvider(config.getIndexDir());
+        this.config = config;
         logger.debug("Createing fsBlockStore using path = " + config.getChainsDir());
-        return provider;
     }
 
     /**

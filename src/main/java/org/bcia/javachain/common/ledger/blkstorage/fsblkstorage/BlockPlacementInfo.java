@@ -28,6 +28,15 @@ public class BlockPlacementInfo {
     private long blockStartOffset;
     private long blockBytesOffset;
 
+    public BlockPlacementInfo() {
+    }
+
+    public BlockPlacementInfo(Integer fileNum, long blockStartOffset, long blockBytesOffset) {
+        this.fileNum = fileNum;
+        this.blockStartOffset = blockStartOffset;
+        this.blockBytesOffset = blockBytesOffset;
+    }
+
     public Integer getFileNum() {
         return fileNum;
     }

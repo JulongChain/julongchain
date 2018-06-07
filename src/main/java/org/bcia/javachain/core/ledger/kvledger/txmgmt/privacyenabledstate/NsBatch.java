@@ -29,6 +29,10 @@ import java.util.List;
 public class NsBatch {
     private UpdateBatch batch;
 
+    public NsBatch() {
+        this.batch = new UpdateBatch();
+    }
+
     public List<String> getCollectionNames(){
         return batch.getUpdatedNamespaces();
     }

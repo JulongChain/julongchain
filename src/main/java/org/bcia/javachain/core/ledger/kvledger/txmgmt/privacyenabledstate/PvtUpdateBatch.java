@@ -25,10 +25,8 @@ package org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate;
 public class PvtUpdateBatch {
     private UpdateMap map;
 
-    public static PvtUpdateBatch newPvtUpdateBatch(){
-        PvtUpdateBatch batch = new PvtUpdateBatch();
-        batch.setMap(new UpdateMap());
-        return batch;
+    public PvtUpdateBatch() {
+        this.map = new UpdateMap();
     }
 
     public UpdateMap getMap() {

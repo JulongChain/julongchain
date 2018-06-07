@@ -29,6 +29,13 @@ public class MissingPrivateData {
     private String namespace;
     private String collection;
 
+    public MissingPrivateData(String txId, Integer seqInBlock, String namespace, String collection) {
+        this.txId = txId;
+        this.seqInBlock = seqInBlock;
+        this.namespace = namespace;
+        this.collection = collection;
+    }
+
     public String getTxId() {
         return txId;
     }

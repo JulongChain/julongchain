@@ -29,6 +29,10 @@ public class Block {
     private long num;
     private List<Transaction> txs = new ArrayList<>();
 
+    public Block(long num) {
+        this.num = num;
+    }
+
     public long getNum() {
         return num;
     }

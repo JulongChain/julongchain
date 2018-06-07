@@ -60,10 +60,7 @@ public class RWSetBuilder {
      */
     public void addToRangeQuerySet(String ns, KvRwset.RangeQueryInfo rqi){
         NsPubRwBuilder nsPubRwBuilder = getOrCreateNsPubRwBuilder(ns);
-        RangeQueryKey key = new RangeQueryKey();
-        key.setStartKey(rqi.getStartKey());
-        key.setEndKey(rqi.getEndKey());
-        key.setItrExhausted(rqi.getItrExhausted());
+        RangeQueryKey key = new RangeQueryKey(rqi.getStartKey(), rqi.getEndKey(), rqi.getItrExhausted());
         if(nsPubRwBuilder.getRangeQueriesMap().get(key) == null){
             nsPubRwBuilder.getRangeQueriesMap().put(key, rqi);
             nsPubRwBuilder.getRangeQueryKeys().add(key);
@@ -111,10 +108,7 @@ public class RWSetBuilder {
         if(pubSet != null){
              pubDataProto = pubSet.toProtoMsg();
         }
-        TxSimulationResults results = new TxSimulationResults();
-        results.setPublicReadWriteSet(pubDataProto);
-        results.setPrivateReadWriteSet(pvtDataProto);
-        return results;
+        return new TxSimulationResults(pubDataProto, pvtDataProto, 0);
     }
 
     private void setPvtCollectionHash(String ns, String coll, ByteString pvtDataProto) throws LedgerException {
@@ -160,8 +154,7 @@ public class RWSetBuilder {
     private NsPubRwBuilder getOrCreateNsPubRwBuilder(String ns){
         NsPubRwBuilder nsPubRwBuilder = pubRwBuilderMap.get(ns);
         if(nsPubRwBuilder == null){
-            nsPubRwBuilder = new NsPubRwBuilder();
-            nsPubRwBuilder.setNameSpace(ns);
+            nsPubRwBuilder = new NsPubRwBuilder(ns);
             nsPubRwBuilder.setRangeQueryKeys(null);
             pubRwBuilderMap.put(ns, nsPubRwBuilder);
         }
@@ -174,8 +167,7 @@ public class RWSetBuilder {
     private NsPvtRwBuilder getOrCreateNsPvtRwBuilder(String ns){
         NsPvtRwBuilder nsPvtRwBuilder = pvtRwBuilderMap.get(ns);
         if(nsPvtRwBuilder == null){
-            nsPvtRwBuilder = new NsPvtRwBuilder();
-            nsPvtRwBuilder.setNamespace(ns);
+            nsPvtRwBuilder = new NsPvtRwBuilder(ns);
             pvtRwBuilderMap.put(ns, nsPvtRwBuilder);
         }
         return nsPvtRwBuilder;
@@ -185,9 +177,7 @@ public class RWSetBuilder {
         NsPubRwBuilder nsPubRwBuilder = getOrCreateNsPubRwBuilder(ns);
         CollHashRwBuilder collHashRwBuilder = nsPubRwBuilder.getCollHashRwBuilders().get(coll);
         if(collHashRwBuilder == null){
-            collHashRwBuilder = new CollHashRwBuilder();
-            collHashRwBuilder.setCollName(coll);
-            collHashRwBuilder.setPvtDataHash(null);
+            collHashRwBuilder = new CollHashRwBuilder(coll, null);
             nsPubRwBuilder.getCollHashRwBuilders().put(coll, collHashRwBuilder);
         }
         return collHashRwBuilder;
@@ -197,8 +187,7 @@ public class RWSetBuilder {
         NsPvtRwBuilder nsPvtRwBuilder = getOrCreateNsPvtRwBuilder(ns);
         CollPvtRwBuilder collHashRwBuilder = nsPvtRwBuilder.getCollPvtRwBuilders().get(coll);
         if(collHashRwBuilder == null){
-            collHashRwBuilder = new CollPvtRwBuilder();
-            collHashRwBuilder.setCollectionName(coll);
+            collHashRwBuilder = new CollPvtRwBuilder(coll);
             nsPvtRwBuilder.getCollPvtRwBuilders().put(coll, collHashRwBuilder);
         }
         return collHashRwBuilder;

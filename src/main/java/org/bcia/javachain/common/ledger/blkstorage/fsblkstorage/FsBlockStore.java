@@ -43,7 +43,7 @@ public class FsBlockStore implements IBlockStore {
                                                IndexConfig indexConfig,
                                                IDBProvider dbHandle) throws LedgerException {
         FsBlockStore fsBlockStore = new FsBlockStore();
-        BlockFileManager mgr = BlockFileManager.newBlockfileMgr(id, config, indexConfig, dbHandle);
+        BlockFileManager mgr = new BlockFileManager(id, config, indexConfig, dbHandle);
         fsBlockStore.setId(id);
         fsBlockStore.setConfig(config);
         fsBlockStore.setBlockFileManager(mgr);

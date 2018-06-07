@@ -27,6 +27,11 @@ public class CompositeKey {
     private String namespace;
     private String key;
 
+    public CompositeKey(String namespace, String key) {
+        this.namespace = namespace;
+        this.key = key;
+    }
+
     public String getNamespace() {
         return namespace;
     }

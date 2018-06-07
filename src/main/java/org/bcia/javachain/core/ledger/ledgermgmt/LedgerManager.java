@@ -65,7 +65,7 @@ public class LedgerManager {
 
         INodeLedgerProvider provider;
         try {
-            provider = KvLedgerProvider.newProvider();
+            provider = new KvLedgerProvider();
         } catch (LedgerException e) {
             log.error(String.format("Got error [%s] in initializing LedgerManager", e.getMessage()));
             throw e;

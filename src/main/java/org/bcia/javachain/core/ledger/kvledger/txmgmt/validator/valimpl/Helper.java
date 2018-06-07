@@ -52,7 +52,7 @@ public class Helper {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(Helper.class);
 
     public static PvtUpdateBatch validateAndPreparePvtBatch(Block block, Map<Long, TxPvtData> pvtData) throws LedgerException{
-        PvtUpdateBatch pvtUpdates = PvtUpdateBatch.newPvtUpdateBatch();
+        PvtUpdateBatch pvtUpdates = new PvtUpdateBatch();
         for(Transaction tx : block.getTxs()){
             if(!TransactionPackage.TxValidationCode.VALID.equals(tx.getValidationCode())){
                 continue;
@@ -68,7 +68,7 @@ public class Helper {
                 validatePvtdata(tx, txPvData);
             }
             TxPvtRwSet pvtRwSet = RwSetUtil.txPvtRwSetFromProtoMsg(txPvData.getWriteSet());
-            addPvtRWSetToPvtUpdateBatch(pvtRwSet, pvtUpdates, Height.newHeight(block.getNum(), tx.getIndexInBlock()));
+            addPvtRWSetToPvtUpdateBatch(pvtRwSet, pvtUpdates, new Height(block.getNum(), tx.getIndexInBlock()));
         }
         return pvtUpdates;
     }
@@ -95,8 +95,7 @@ public class Helper {
 
     public static Block preprocessProtoBlock(ITxManager txMgr, Common.Block.Builder blockBuilder, boolean doMVCCValidation) throws LedgerException {
         Common.Block block = blockBuilder.build();
-        Block b = new Block();
-        b.setNum(block.getHeader().getNumber());
+        Block b = new Block(block.getHeader().getNumber());
         TxValidationFlags txsFilter = TxValidationFlags.fromByteString(block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
         if(txsFilter.length() == 0){
             txsFilter = new TxValidationFlags(block.getData().getDataList().size());
@@ -158,7 +157,7 @@ public class Helper {
                 }
             }
             if(txRwSet != null){
-                Transaction tx = new Transaction();
+                Transaction tx = new Transaction(txIndex, gh.getTxId(), txRwSet, null);
                 tx.setIndexInBlock(txIndex);
                 tx.setId(gh.getTxId());
                 tx.setRwSet(txRwSet);

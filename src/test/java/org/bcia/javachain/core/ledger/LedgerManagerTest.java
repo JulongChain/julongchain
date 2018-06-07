@@ -130,9 +130,7 @@ public class LedgerManagerTest {
         //构建区块
         Common.Block block = constructBlock(l.getBlockByNumber(0), results);
         //构建私有数据集
-        TxPvtData txPvtData = new TxPvtData();
-        txPvtData.setSeqInBlock(0);
-        txPvtData.setWriteSet(results.getPrivateReadWriteSet());
+        TxPvtData txPvtData = new TxPvtData(0, results.getPrivateReadWriteSet());
         BlockAndPvtData bap = new BlockAndPvtData();
         bap.setBlock(block);
         bap.setBlockPvtData(new HashMap<Long, TxPvtData>(){{
@@ -156,6 +154,7 @@ public class LedgerManagerTest {
         Common.BlockData data = Common.BlockData.newBuilder()
                 //pub
                 .addData(constructEnvelope(rwset.toByteString(), "1", 1, "myGroup").toByteString())
+                .addData(constructEnvelope(rwset.toByteString(), "2", 1, "myGroup").toByteString())
                 .build();
 
         Common.BlockHeader blockHeader = Common.BlockHeader.newBuilder()
@@ -321,7 +320,7 @@ public class LedgerManagerTest {
 
     @Test
     public void showStates() throws Exception{
-        LevelDBProvider provider = LevelDBProvider.newProvider(LedgerConfig.getStateLevelDBPath());
+        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getStateLevelDBPath());
         Iterator<Map.Entry<byte[], byte[]>> iterator = provider.getIterator(null);
         while(iterator.hasNext()){
             Map.Entry<byte[], byte[]> entry = iterator.next();

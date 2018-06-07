@@ -35,45 +35,41 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.Versi
  * @date 2018/04/19
  * @company Dingxuan
  */
-public class CombinedIteratorI implements IResultsIterator {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(CombinedIteratorI.class);
+public class CombinedIterator implements IResultsIterator {
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(CombinedIterator.class);
 
     private String ns;
     private IVersionedDB db;
     private UpdateBatch updates;
     private String endKey;
     private boolean includeEndKey;
-
-
     private IResultsIterator dbItr;
     private IResultsIterator updatesItr;
     private QueryResult dbItm;
     private QueryResult updatesItm;
     private boolean endKeyServed;
 
-    public static CombinedIteratorI newCombinedIterator(IVersionedDB db,
-                                                        UpdateBatch updates,
-                                                        String ns,
-                                                        String startKey,
-                                                        String endKey,
-                                                        boolean includeEndKey) throws LedgerException {
+    public CombinedIterator(IVersionedDB db,
+                            UpdateBatch updates,
+                            String ns,
+                            String startKey,
+                            String endKey,
+                            boolean includeEndKey) throws LedgerException {
         IResultsIterator dbItr = db.getStateRangeScanIterator(ns, startKey, endKey);
         IResultsIterator updatesItr = updates.getRangeScanIterator(ns, startKey, endKey);
         QueryResult dbItm = dbItr.next();
         QueryResult updatesItm = updatesItr.next();
         logger.debug("Combined iterator initialized");
-        CombinedIteratorI itr = new CombinedIteratorI();
-        itr.setNs(ns);
-        itr.setDb(db);
-        itr.setUpdates(updates);
-        itr.setEndKey(endKey);
-        itr.setIncludeEndKey(includeEndKey);
-        itr.setDbItr(dbItr);
-        itr.setUpdatesItr(updatesItr);
-        itr.setDbItm(dbItm);
-        itr.setUpdatesItm(updatesItm);
-        itr.setEndKeyServed(false);
-        return itr;
+        this.ns = ns;
+        this.db = db;
+        this.updates = updates;
+        this.endKey = endKey;
+        this.includeEndKey = includeEndKey;
+        this.dbItr = dbItr;
+        this.updatesItr = updatesItr;
+        this.dbItm = dbItm;
+        this.updatesItm = updatesItm;
+        this.endKeyServed = false;
     }
 
     @Override
@@ -154,13 +150,7 @@ public class CombinedIteratorI implements IResultsIterator {
         if(vv == null){
             return null;
         }
-        VersionedKV vkv = new VersionedKV();
-        CompositeKey key = new CompositeKey();
-        key.setKey(endKey);
-        key.setNamespace(ns);
-        vkv.setVersionedValue(vv);
-        vkv.setCompositeKey(key);
-        return new QueryResult(vkv);
+        return new QueryResult(new VersionedKV(new CompositeKey(ns, endKey), vv));
     }
 
     public String getNs() {

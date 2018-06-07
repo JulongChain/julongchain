@@ -58,30 +58,28 @@ public class LockBasedTxManager implements ITxManager {
     private Map<String, IStateListener> stateListeners;
     private ReentrantLock lock;
 
-    public static LockBasedTxManager newLockBasedTxMgr(String ledgerID,
-                                                       IDB db,
-                                                       Map<String, IStateListener> stateListeners) throws LedgerException{
+    public LockBasedTxManager(String ledgerID,
+                              IDB db,
+                              Map<String, IStateListener> stateListeners) throws LedgerException{
         db.open();  //open will do nothing
-        LockBasedTxManager txMgr = new LockBasedTxManager();
-        txMgr.setLedgerID(ledgerID);
-        txMgr.setDb(db);
-        txMgr.setStateListeners(stateListeners);
-        txMgr.setValidator(DefaultValidator.newDefaultValidator(txMgr, db));
-        txMgr.setLock(new ReentrantLock());
-        return txMgr;
+        this.ledgerID = ledgerID;
+        this.db = db;
+        this.stateListeners = stateListeners;
+        this.validator = new DefaultValidator(this, db);
+        this.lock = new ReentrantLock();
     }
 
     @Override
     public IQueryExecutor newQueryExecutor(String txid) throws LedgerException {
         lock.lock();
-        return LockBasedQueryExecutor.newQueryExecutor(this, txid);
+        return new LockBasedQueryExecutor(this, txid);
     }
 
     @Override
     public ITxSimulator newTxSimulator(String txid) throws LedgerException {
         logger.debug("Constructing new tx simulator");
         lock.lock();
-        return LockBasedTxSimulator.newLockBasedTxSimulator(this, txid);
+        return new LockBasedTxSimulator(this, txid);
     }
 
     @Override
@@ -136,7 +134,7 @@ public class LockBasedTxManager implements ITxManager {
                 throw new LedgerException("validateAndPrepare() method should have been called before calling commit()");
             }
             db.applyPrivacyAwareUpdates(batch,
-                    Height.newHeight(currentBlock.getHeader().getNumber(), (long) (currentBlock.getData().getDataList().size() - 1)));
+                    new Height(currentBlock.getHeader().getNumber(), (long) (currentBlock.getData().getDataList().size() - 1)));
             logger.debug("Update committed to state db");
         } finally {
             clearCache();

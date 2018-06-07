@@ -54,48 +54,21 @@ public class HistoryLevelDB implements IHistoryDB {
     private static final byte[] EMPTY_VALUE = {};
     private static final byte[] SAVE_POINT_KEY = {0x00};
 
-    public String getDbName() {
-        return dbName;
-    }
-
-    public void setDbName(String dbName) {
+    public HistoryLevelDB(IDBProvider dbProvider, String dbName) throws LedgerException {
         this.dbName = dbName;
-    }
-
-    /**
-     * 新建historyDBProvider
-     */
-    public static HistoryLevelDBProvider newHistoryDBProvider() throws LedgerException {
-        String dbPath = LedgerConfig.getHistoryLevelDBPath();
-        HistoryLevelDBProvider provider = new HistoryLevelDBProvider();
-        provider.setProvider(LevelDBProvider.newProvider(dbPath));
-        logger.debug(String.format("Create historyDB using dbPath = %s", provider.getProvider().getDbPath()));
-        return provider;
-    }
-
-    /**
-     * 构建HistoryDB
-     */
-    public static IHistoryDB newHistroyDB(IDBProvider dbProvider, String dbName) throws LedgerException {
-        HistoryLevelDB db = new HistoryLevelDB();
-        db.setDbName(dbName);
-        db.setProvider(dbProvider);
-        return db;
+        this.provider = dbProvider;
     }
 
     @Override
     public IHistoryQueryExecutor newHistoryQueryExecutor(IBlockStore blockStore) throws LedgerException {
-        HistoryLevelDBQueryExecutor executor = new HistoryLevelDBQueryExecutor();
-        executor.setBlockStore(blockStore);
-        executor.setHistoryDB(this);
-        return executor;
+        return new HistoryLevelDBQueryExecutor(this, blockStore);
     }
 
     @Override
     public void commit(Common.Block block) throws LedgerException {
         long blockNo = block.getHeader().getNumber();
         int tranNo = 0;
-        UpdateBatch dbBatch = LevelDBProvider.newUpdateBatch();
+        UpdateBatch dbBatch = new UpdateBatch();
         logger.debug(String.format("Group [%s]: Updating historyDB for groupNo [%s] with [%d] transactions"
                 , dbName, blockNo, block.getData().getDataCount()));
         //获取失效
@@ -148,7 +121,7 @@ public class HistoryLevelDB implements IHistoryDB {
         }
 
         //添加保存点
-        Height height = Height.newHeight(blockNo,tranNo);
+        Height height = new Height(blockNo,tranNo);
         dbBatch.put(SAVE_POINT_KEY, height.toBytes());
 
         //同步写入leveldb
@@ -164,7 +137,7 @@ public class HistoryLevelDB implements IHistoryDB {
         if(versionBytes == null){
             return null;
         }
-        Height height = Height.newHeightFromBytes(versionBytes);
+        Height height = new Height(versionBytes);
         return height;
     }
 
@@ -214,5 +187,13 @@ public class HistoryLevelDB implements IHistoryDB {
 
     public void setProvider(IDBProvider provider) {
         this.provider = provider;
+    }
+
+    public String getDbName() {
+        return dbName;
+    }
+
+    public void setDbName(String dbName) {
+        this.dbName = dbName;
     }
 }

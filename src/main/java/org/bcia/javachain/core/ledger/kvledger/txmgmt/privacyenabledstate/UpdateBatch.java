@@ -28,9 +28,9 @@ public class UpdateBatch {
     private PvtUpdateBatch pvtUpdateBatch;
 
     public UpdateBatch(){
-        this.hashUpdates = HashedUpdateBatch.newHashedUpdateBatch();
-        this.pubUpdateBatch = PubUpdateBatch.newPubUpdateBatch();
-        this.pvtUpdateBatch = PvtUpdateBatch.newPvtUpdateBatch();
+        this.hashUpdates = new HashedUpdateBatch();
+        this.pubUpdateBatch = new PubUpdateBatch();
+        this.pvtUpdateBatch = new PvtUpdateBatch();
     }
 
     public UpdateBatch(PubUpdateBatch pubUpdateBatch, HashedUpdateBatch hashUpdates, PvtUpdateBatch pvtUpdateBatch){

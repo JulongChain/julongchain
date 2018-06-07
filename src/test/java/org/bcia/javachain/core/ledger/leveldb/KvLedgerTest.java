@@ -48,6 +48,8 @@ public class KvLedgerTest {
     public void testGetTransactionByID() throws Exception{
         TransactionPackage.ProcessedTransaction tx = l.getTransactionByID("1");
         Assert.assertNotNull(tx);
+        tx = l.getTransactionByID("2");
+        Assert.assertNotNull(tx);
     }
 
     @Test

@@ -39,45 +39,9 @@ public class BlockFileStream {
     private long currentOffset;
     private boolean init = false;
 
-    public Integer getFileNum() {
-        return fileNum;
-    }
-
-    public void setFileNum(Integer fileNum) {
-        this.fileNum = fileNum;
-    }
-
-    public File getFile() {
-        return file;
-    }
-
-    public void setFile(File file) {
-        this.file = file;
-    }
-
-    public InputStream getReader() {
-        return reader;
-    }
-
-    public void setReader(InputStream reader) {
-        this.reader = reader;
-    }
-
-    public long getCurrentOffset() {
-        return currentOffset;
-    }
-
-    public void setCurrentOffset(long currentOffset) {
-        this.currentOffset = currentOffset;
-    }
-
-    /**
-     * 初始化
-     */
-    public BlockFileStream newBlockFileStream(String rootDir, int fileNum, long startOffset) throws LedgerException{
+    public BlockFileStream(String rootDir, int fileNum, long startOffset) throws LedgerException{
         //根据rootDir获取filePath
-        String filePath = null;
-        filePath = BlockFileManager.deriveBlockfilePath(rootDir, fileNum);
+        String filePath = BlockFileManager.deriveBlockfilePath(rootDir, fileNum);
         this.fileNum = fileNum;
         this.file = new File(filePath);
         try {
@@ -86,12 +50,11 @@ public class BlockFileStream {
             throw new LedgerException(e);
         }
         this.currentOffset = startOffset;
-        if(currentOffset > file.length()){
+        if(this.currentOffset > this.file.length()){
             throw new LedgerException("Current offset is out of file");
         }
         logger.debug(String.format("newBlockFileStream(): filePath=[%s], startOffset=[%d]", filePath, startOffset));
-        init = true;
-        return this;
+        this.init = true;
     }
 
     /**
@@ -137,16 +100,12 @@ public class BlockFileStream {
         byte[] blockBytes = new byte[(int) length];
         try {
             //从8开始读取
-//            reader.skip(peekBytes);
             reader.read(blockBytes);
         } catch (Throwable e) {
             throw new LedgerException(e);
         }
         //组装BlockPlacementInfo对象
-        BlockPlacementInfo blockPlacementInfo = new BlockPlacementInfo();
-        blockPlacementInfo.setFileNum(fileNum);
-        blockPlacementInfo.setBlockStartOffset(currentOffset);
-        blockPlacementInfo.setBlockBytesOffset(currentOffset + 8);
+        BlockPlacementInfo blockPlacementInfo = new BlockPlacementInfo(fileNum, currentOffset, currentOffset + 8);
         //读取完成后,向后移动
         currentOffset = 8 + length;
 
@@ -173,5 +132,37 @@ public class BlockFileStream {
         } catch (IOException e) {
             throw new LedgerException(e);
         }
+    }
+
+    public Integer getFileNum() {
+        return fileNum;
+    }
+
+    public void setFileNum(Integer fileNum) {
+        this.fileNum = fileNum;
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public void setFile(File file) {
+        this.file = file;
+    }
+
+    public InputStream getReader() {
+        return reader;
+    }
+
+    public void setReader(InputStream reader) {
+        this.reader = reader;
+    }
+
+    public long getCurrentOffset() {
+        return currentOffset;
+    }
+
+    public void setCurrentOffset(long currentOffset) {
+        this.currentOffset = currentOffset;
     }
 }

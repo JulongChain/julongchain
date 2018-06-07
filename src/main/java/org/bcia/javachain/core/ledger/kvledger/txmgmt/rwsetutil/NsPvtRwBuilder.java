@@ -33,6 +33,10 @@ public class NsPvtRwBuilder {
     private String namespace;
     private Map<String, CollPvtRwBuilder> collPvtRwBuilders = new HashMap<>();
 
+    public NsPvtRwBuilder(String namespace) {
+        this.namespace = namespace;
+    }
+
     public NsPvtRwSet build(){
         List<CollPvtRwBuilder> sortedCollBuilders = Util.getValuesBySortedKeys(collPvtRwBuilders);
         List<CollPvtRwSet> collPvtRwSets = new ArrayList<>();
@@ -42,8 +46,7 @@ public class NsPvtRwBuilder {
                 collPvtRwSets.add(builder.build());
             }
         }
-        NsPvtRwSet nsPvtRwSet = new NsPvtRwSet();
-        nsPvtRwSet.setNameSpace(namespace);
+        NsPvtRwSet nsPvtRwSet = new NsPvtRwSet(namespace);
         nsPvtRwSet.setCollPvtRwSets(collPvtRwSets);
         return nsPvtRwSet;
     }

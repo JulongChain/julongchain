@@ -49,7 +49,7 @@ public class IdStore {
     public static IdStore openIDStore() throws LedgerException{
         IdStore idStore = new IdStore();
         String dbPath = LedgerConfig.getLedgerProviderPath();
-        idStore.setProvider(LevelDBProvider.newProvider(dbPath));
+        idStore.setProvider(new LevelDBProvider(dbPath));
         logger.debug("Create idstore using path = " + idStore.getProvider().getDbPath());
         return idStore;
     }
@@ -87,7 +87,7 @@ public class IdStore {
             throw new LedgerException("Ledger is already exists!");
         }
         val = new byte[0];
-        UpdateBatch batch = LevelDBProvider.newUpdateBatch();
+        UpdateBatch batch = new UpdateBatch();
         batch.put(key, val);
         batch.delete(UNDER_CONSTRUCTION_LEDGER_KEY);
         provider.writeBatch(batch, true);
@@ -119,7 +119,7 @@ public class IdStore {
             throw new LedgerException("Ledger id" + ledgerID + " is not creating");
         }
         byte[] val = new byte[0];
-        UpdateBatch batch = LevelDBProvider.newUpdateBatch();
+        UpdateBatch batch = new UpdateBatch();
         batch.put(key, val);
         batch.delete(UNDER_CONSTRUCTION_LEDGER_KEY);
         provider.writeBatch(batch, true);

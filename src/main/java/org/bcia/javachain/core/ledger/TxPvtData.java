@@ -29,6 +29,11 @@ public class TxPvtData {
     private long seqInBlock;
     private Rwset.TxPvtReadWriteSet writeSet;
 
+    public TxPvtData(long seqInBlock, Rwset.TxPvtReadWriteSet writeSet) {
+        this.seqInBlock = seqInBlock;
+        this.writeSet = writeSet;
+    }
+
     public long getSeqInBlock() {
         return seqInBlock;
     }

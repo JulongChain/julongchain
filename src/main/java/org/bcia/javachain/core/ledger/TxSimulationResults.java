@@ -27,10 +27,17 @@ import org.bcia.javachain.protos.ledger.rwset.Rwset;
  */
 public class TxSimulationResults {
     private Rwset.TxReadWriteSet publicReadWriteSet;
-
     private Rwset.TxPvtReadWriteSet privateReadWriteSet;
-
     private long blockHeight;
+
+    public TxSimulationResults() {
+    }
+
+    public TxSimulationResults(Rwset.TxReadWriteSet publicReadWriteSet, Rwset.TxPvtReadWriteSet privateReadWriteSet, long blockHeight) {
+        this.publicReadWriteSet = publicReadWriteSet;
+        this.privateReadWriteSet = privateReadWriteSet;
+        this.blockHeight = blockHeight;
+    }
 
     public Rwset.TxReadWriteSet getPublicReadWriteSet() {
         return publicReadWriteSet;
@@ -67,7 +74,11 @@ public class TxSimulationResults {
      * 获取序列化私有读写集
      */
     public ByteString getPrivateReadWriteByteString(){
-        return privateReadWriteSet.toByteString();
+        if (containsPvtWrites()) {
+        	return null;
+        } else {
+            return privateReadWriteSet.toByteString();
+        }
     }
 
     /**

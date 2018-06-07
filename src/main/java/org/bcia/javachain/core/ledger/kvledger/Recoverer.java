@@ -27,6 +27,11 @@ public class Recoverer {
     private long firstBlockNum;
     private IRecoverable recoverable;
 
+    public Recoverer(long firstBlockNum, IRecoverable recoverable) {
+        this.firstBlockNum = firstBlockNum;
+        this.recoverable = recoverable;
+    }
+
     public long getFirstBlockNum() {
         return firstBlockNum;
     }

@@ -17,6 +17,7 @@ package org.bcia.javachain.core.ledger.leveldb;
 
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.iq80.leveldb.DBIterator;
 import org.junit.After;
 import org.junit.Assert;
@@ -36,7 +37,7 @@ public class LevelDBProviderTest {
     LevelDBProvider provider;
     @Before
     public void before() throws LedgerException {
-        provider = LevelDBProvider.newProvider("/home/bcia/test");
+        provider = new LevelDBProvider("/home/bcia/test");
     }
 
     @After
@@ -51,7 +52,7 @@ public class LevelDBProviderTest {
 
     @Test
     public void newUpdateBatch(){
-        Assert.assertNotNull(LevelDBProvider.newUpdateBatch());
+        Assert.assertNotNull(new UpdateBatch());
     }
 
     @Test

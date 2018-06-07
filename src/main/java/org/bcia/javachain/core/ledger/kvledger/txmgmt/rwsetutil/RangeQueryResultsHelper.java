@@ -40,14 +40,12 @@ public class RangeQueryResultsHelper {
     private int maxDegree;
     private boolean hashingEnable;
 
-    public static RangeQueryResultsHelper newRangeQueryResultsHelper(boolean enableHashing, int maxDegree) throws LedgerException  {
-        RangeQueryResultsHelper helper = new RangeQueryResultsHelper();
-        helper.setHashingEnable(enableHashing);
-        helper.setMaxDegree(maxDegree);
-        if(enableHashing){
-            helper.setMt(MerkleTree.newMerkleTree(maxDegree));
+    public RangeQueryResultsHelper(boolean hashingEnable, int maxDegree) throws LedgerException {
+        this.maxDegree = maxDegree;
+        this.hashingEnable = hashingEnable;
+        if(hashingEnable){
+            this.mt = new MerkleTree(maxDegree);
         }
-        return helper;
     }
 
     public void addResult(KvRwset.KVRead kvRead) throws LedgerException{

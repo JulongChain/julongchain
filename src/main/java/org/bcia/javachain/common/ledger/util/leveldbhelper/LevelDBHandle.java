@@ -43,6 +43,15 @@ public class LevelDBHandle implements IDBHandle {
     private boolean opened = false;
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(LevelDBHandle.class);
 
+    public LevelDBHandle() {
+    }
+
+    public LevelDBHandle(String dbName, DB db, boolean opened) {
+        this.dbName = dbName;
+        this.db = db;
+        this.opened = opened;
+    }
+
     @Override
     public String getDbName() {
         return dbName;
@@ -148,15 +157,4 @@ public class LevelDBHandle implements IDBHandle {
         }
         return dbItr;
     }
-
-    public static void main(String[] args) throws Exception{
-        LevelDBHandle handle = new LevelDBHandle();
-        handle.setDbName("/var/javachain/stateLeveldb");
-        String ns = "myGroup";
-        byte[] start = ns.getBytes();
-        start = ArrayUtils.addAll(start, new byte[]{0});
-        start = ArrayUtils.addAll(start, "k".getBytes());
-        System.out.println(handle.getIterator(start).hasNext());
-    }
-
 }

@@ -36,15 +36,18 @@ public class CollHashRwBuilder {
     private Map<String, KvRwset.KVWriteHash> writeMap = new HashMap<>();
     private byte[] pvtDataHash;
 
+    public CollHashRwBuilder(String collName, byte[] pvtDataHash){
+        this.collName = collName;
+        this.pvtDataHash = pvtDataHash;
+    }
+
     public CollHashedRwSet build(){
         List<KvRwset.KVReadHash> readSet = Util.getValuesBySortedKeys(readMap);
         List<KvRwset.KVWriteHash> writeSet = Util.getValuesBySortedKeys(writeMap);
 
-        CollHashedRwSet collHashedRwSet = new CollHashedRwSet();
-        collHashedRwSet.setCollectionName(collName);
-        collHashedRwSet.setHashedRwSet(RwSetUtil.newHashedRWSet(readSet, writeSet));
-        collHashedRwSet.setPvtRwSetHash(ByteString.copyFrom(pvtDataHash));
-        return collHashedRwSet;
+        return new CollHashedRwSet(collName,
+                ByteString.copyFrom(pvtDataHash),
+                RwSetUtil.newHashedRWSet(readSet, writeSet));
     }
 
     public String getCollName() {

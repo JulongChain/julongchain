@@ -35,6 +35,12 @@ public class PvtdataIResultsItr implements IResultsIterator {
     private String coll;
     private IResultsIterator dbItr;
 
+    public PvtdataIResultsItr(String ns, String coll, IResultsIterator dbItr) {
+        this.ns = ns;
+        this.coll = coll;
+        this.dbItr = dbItr;
+    }
+
     @Override
     public QueryResult next() throws LedgerException {
         QueryResult queryResult = dbItr.next();

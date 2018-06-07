@@ -53,7 +53,7 @@ public class LevelDBFactoryTest {
 //        Assert.assertEquals(value, query);
 
         String path = "/home/bcia/test";
-        LevelDBProvider provider = LevelDBProvider.newProvider(path);
+        LevelDBProvider provider = new LevelDBProvider(path);
 
         LevelDB db = LevelDBUtil.getDB(path);
         for (int i = 0; i < 100; i++) {

@@ -37,6 +37,11 @@ public class QueryResultsItr implements IResultsIterator {
     private IResultsIterator dbItr;
     private RWSetBuilder rwSetBuilder;
 
+    public QueryResultsItr(IResultsIterator dbItr, RWSetBuilder rwSetBuilder) {
+        this.dbItr = dbItr;
+        this.rwSetBuilder = rwSetBuilder;
+    }
+
     @Override
     public QueryResult next() throws LedgerException {
         QueryResult queryResult = dbItr.next();

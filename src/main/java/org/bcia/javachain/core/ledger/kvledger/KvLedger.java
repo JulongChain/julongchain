@@ -40,7 +40,7 @@ import org.bcia.javachain.protos.node.TransactionPackage;
 import java.util.*;
 
 /**
- * 账本类
+ * kv账本
  *
  * @author sunzongyu
  * @date 2018/04/13
@@ -54,42 +54,33 @@ public class KvLedger implements INodeLedger {
     private IBlockStore blockStore;
     private ITxManager txtmgmt;
     private IHistoryDB historyDB;
-//    private final static Config config = new Config();
 
-    /** NewKVLedger constructs new `KVLedger`
-     *
-     * @param ledgerID
-     * @param blockStore
-     * @param historyDB
-     * @return
-     */
-    public static KvLedger newKVLedger(String ledgerID,
-                                       IBlockStore blockStore,
-                                       IDB versionedDB,
-                                       IHistoryDB historyDB,
-                                       Map<String, IStateListener> stateListeners) throws LedgerException {
-        logger.debug("Creating KVLedger ledgerID = " + ledgerID);
+	/**
+	 * Create new ledger call `kvLedger`
+	 */
+	public KvLedger(String ledgerID,
+					IBlockStore blockStore,
+					IDB versionedDB,
+					IHistoryDB historyDB,
+					Map<String, IStateListener> stateListeners) throws LedgerException {
+		logger.debug("Creating KVLedger ledgerID = " + ledgerID);
 
-        ITxManager txmgmt = LockBasedTxManager.newLockBasedTxMgr(ledgerID, versionedDB, stateListeners);
+		ITxManager txmgmt = new LockBasedTxManager(ledgerID, versionedDB, stateListeners);
 
-        KvLedger kvLedger = new KvLedger();
-        kvLedger.setLedgerID(ledgerID);
-        kvLedger.setBlockStore(blockStore);
-        kvLedger.setTxtmgmt(txmgmt);
-        kvLedger.setHistoryDB(historyDB);
+		this.ledgerID = ledgerID;
+		this.blockStore = blockStore;
+		this.txtmgmt = txmgmt;
+		this.historyDB = historyDB;
 
-        //TODO get scEventListener
+		//TODO get scEventListener
+		ISmartContractLifecycleEventListener scEventListener = versionedDB.getSmartcontractEventListener();
+		logger.debug("Register state db for smartcontract lifecycle event " + (scEventListener != null));
 
-        ISmartContractLifecycleEventListener scEventListener = versionedDB.getSmartcontractEventListener();
-        logger.debug("Register state db for smartcontract lifecycle event " + (scEventListener != null));
+		if(scEventListener != null){
+			ScEventManager.getMgr().register(ledgerID, scEventListener);
+		}
 
-        if(scEventListener != null){
-            ScEventManager.getMgr().register(ledgerID, scEventListener);
-        }
-
-        kvLedger.recoverDBs();
-
-        return kvLedger;
+		recoverDBs();
     }
 
     /** Recover the state database and history database (if exist)
@@ -111,9 +102,7 @@ public class KvLedger implements INodeLedger {
         for(IRecoverable recoverable : recoverables){
             long firstBlockNum = recoverable.shouldRecover();
             if(firstBlockNum  == -1 || firstBlockNum - 1 != lastAvailableBlockNum){
-                Recoverer recoverer = new Recoverer();
-                recoverer.setFirstBlockNum(firstBlockNum);
-                recoverer.setRecoverable(recoverable);
+                Recoverer recoverer = new Recoverer(firstBlockNum, recoverable);
                 recoverers.add(recoverer);
             }
         }

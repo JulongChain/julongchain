@@ -26,6 +26,7 @@ import org.bcia.javachain.core.ledger.INodeLedger;
 import org.bcia.javachain.core.ledger.INodeLedgerProvider;
 import org.bcia.javachain.core.ledger.IStateListener;
 import org.bcia.javachain.core.ledger.kvledger.history.historydb.HistoryLevelDB;
+import org.bcia.javachain.core.ledger.kvledger.history.historydb.HistoryLevelDBProvider;
 import org.bcia.javachain.core.ledger.kvledger.history.historydb.IHistoryDB;
 import org.bcia.javachain.core.ledger.kvledger.history.historydb.IHistoryDBProvider;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.privacyenabledstate.CommonStorageDBProvider;
@@ -60,31 +61,29 @@ public class KvLedgerProvider implements INodeLedgerProvider {
     private IHistoryDBProvider historyDBProvider = null;
     private Map<String, IStateListener> stateListeners = new HashMap<>();
 
-    /**
-     * 新建Provider
-     */
-    public static INodeLedgerProvider newProvider() throws LedgerException {
-        logger.info("Initializing ledger provider");
-        //初始化idstore(ledgerProvider)
-        IdStore idStore = IdStore.openIDStore();
-        //初始化文件系统(chains/chains)以及pvtdata(pvtdataStore)
-        Provider ledgerStoreProvider = Store.newProvider();
-        //初始化versiondb(stateLeveldb)
-        CommonStorageDBProvider vdbProvider = CommonStorageDBProvider.NewCommonStorageDBProvider();
-        //初始化HistoryDB(historyLeveldb)
-        IHistoryDBProvider historyDBProvider = HistoryLevelDB.newHistoryDBProvider();
+	/**
+	 * 新建Provider
+	 */
+	public KvLedgerProvider() throws LedgerException{
+		logger.info("Initializing ledger provider");
+		//初始化idstore(ledgerProvider)
+		IdStore idStore = IdStore.openIDStore();
+		//初始化文件系统(chains/chains)以及pvtdata(pvtdataStore)
+		Provider ledgerStoreProvider = new Provider();
+		//初始化versiondb(stateLeveldb)
+		CommonStorageDBProvider vdbProvider = CommonStorageDBProvider.NewCommonStorageDBProvider();
+		//初始化HistoryDB(historyLeveldb)
+		IHistoryDBProvider historyDBProvider = new HistoryLevelDBProvider();
 
-        logger.info("Ledger provider initialized");
-        KvLedgerProvider provider = new KvLedgerProvider();
-        provider.setIdStore(idStore);
-        provider.setLedgerStoreProvider(ledgerStoreProvider);
-        provider.setVdbProvider(vdbProvider);
-        provider.setHistoryDBProvider(historyDBProvider);
-        provider.setStateListeners(null);
-        //修复未完成的db
-        provider.recoverUnderConstructionLedger();
-        return provider;
-    }
+		logger.info("Ledger provider initialized");
+		this.idStore = idStore;
+		this.ledgerStoreProvider = ledgerStoreProvider;
+		this.vdbProvider = vdbProvider;
+		this.historyDBProvider = historyDBProvider;
+		this.stateListeners = null;
+		//修复未完成的db
+		recoverUnderConstructionLedger();
+	}
 
     /**
      * 初始化
@@ -223,7 +222,7 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         //账本的历史db
         IHistoryDB historyDB = historyDBProvider.getDBHandle(ledgerID);
 
-        KvLedger kvLedger = KvLedger.newKVLedger(ledgerID, blockStore, vdb, historyDB, stateListeners);
+        KvLedger kvLedger = new KvLedger(ledgerID, blockStore, vdb, historyDB, stateListeners);
         return kvLedger;
     }
 

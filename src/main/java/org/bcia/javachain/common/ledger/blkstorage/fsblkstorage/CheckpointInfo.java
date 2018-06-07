@@ -47,6 +47,21 @@ public class CheckpointInfo {
     private long lastBlockNumber;
 
     /**
+     * 默认构造方法
+     */
+    public CheckpointInfo(){}
+
+    public CheckpointInfo(int lastestFileChunkSuffixNum,
+                          int latestFileChunksize,
+                          boolean isChainEmpty,
+                          long lastBlockNumber){
+        this.lastestFileChunkSuffixNum = lastestFileChunkSuffixNum;
+        this.latestFileChunksize = latestFileChunksize;
+        this.isChainEmpty = isChainEmpty;
+        this.lastBlockNumber = lastBlockNumber;
+    }
+
+    /**
      * 序列化检查点
      */
     byte[] marshal() {

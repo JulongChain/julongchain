@@ -17,8 +17,10 @@ package org.bcia.javachain.core.ledger.kvledger.history.historydb;
 
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.util.IDBProvider;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 
 /**
  * HistoryDB操作类
@@ -32,9 +34,15 @@ public class HistoryLevelDBProvider implements IHistoryDBProvider {
 
     private IDBProvider provider = null;
 
+    public HistoryLevelDBProvider() throws LedgerException{
+        String dbPath = LedgerConfig.getHistoryLevelDBPath();
+        this.provider = new LevelDBProvider(dbPath);
+        logger.debug(String.format("Create historyDB using dbPath = %s", this.provider.getDbPath()));
+    }
+
     @Override
     public IHistoryDB getDBHandle(String dbName) throws LedgerException {
-        return HistoryLevelDB.newHistroyDB(provider, dbName);
+        return new HistoryLevelDB(provider, dbName);
     }
 
     @Override

@@ -30,6 +30,16 @@ public class Height {
     private long blockNum;
     private long txNum;
 
+    public Height(long blockNum, long txNum) {
+        this.blockNum = blockNum;
+        this.txNum = txNum;
+    }
+
+    public Height(byte[] b){
+        this.blockNum = Util.bytesToLong(b, 0, 8);
+        this.txNum = Util.bytesToLong(b, 8, 8);
+    }
+
     public long getBlockNum() {
         return blockNum;
     }
@@ -44,19 +54,6 @@ public class Height {
 
     public void setTxNum(long txNum) {
         this.txNum = txNum;
-    }
-
-    public static Height newHeight(long blockNum, long txNum){
-        Height height = new Height();
-        height.setTxNum(txNum);
-        height.setBlockNum(blockNum);
-        return height;
-    }
-
-    public static Height newHeightFromBytes(byte[] b){
-        long blockNum = Util.bytesToLong(b, 0, 8);
-        long txNum = Util.bytesToLong(b, 8, 8);
-        return newHeight(blockNum, txNum);
     }
 
     public byte[] toBytes(){

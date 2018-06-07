@@ -29,6 +29,11 @@ public class CollPvtRwSet {
     private String collectionName = null;
     private KvRwset.KVRWSet kvRwSet = null;
 
+    public CollPvtRwSet(String collectionName, KvRwset.KVRWSet kvRwSet) {
+        this.collectionName = collectionName;
+        this.kvRwSet = kvRwSet;
+    }
+
     public String getCollectionName() {
         return collectionName;
     }

@@ -57,7 +57,6 @@ public class UpdateMap {
         NsBatch batch = map.get(ns);
         if(batch == null){
             batch = new NsBatch();
-            batch.setBatch(new UpdateBatch());
             map.put(ns, batch);
         }
         return batch;

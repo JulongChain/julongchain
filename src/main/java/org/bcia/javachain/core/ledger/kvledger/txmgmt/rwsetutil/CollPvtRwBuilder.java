@@ -33,13 +33,14 @@ public class CollPvtRwBuilder {
     private String collectionName;
     private Map<String, KvRwset.KVWrite> writeMap = new HashMap<>();
 
+    public CollPvtRwBuilder(String collectionName) {
+        this.collectionName = collectionName;
+    }
+
     public CollPvtRwSet build(){
         List<KvRwset.KVWrite> writeSet = Util.getValuesBySortedKeys(writeMap);
 
-        CollPvtRwSet collPvtRwSet = new CollPvtRwSet();
-        collPvtRwSet.setCollectionName(collectionName);
-        collPvtRwSet.setKvRwSet(RwSetUtil.newKVRWSet(null, writeSet, null));
-        return collPvtRwSet;
+        return new CollPvtRwSet(collectionName, RwSetUtil.newKVRWSet(null, writeSet, null));
     }
 
     public String getCollectionName() {

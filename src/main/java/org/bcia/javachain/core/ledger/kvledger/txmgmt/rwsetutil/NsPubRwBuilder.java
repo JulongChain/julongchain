@@ -38,6 +38,10 @@ public class NsPubRwBuilder {
     private List<RangeQueryKey> rangeQueryKeys = new ArrayList<>();
     private Map<String, CollHashRwBuilder> collHashRwBuilders = new HashMap<>();
 
+    public NsPubRwBuilder(String nameSpace) {
+        this.nameSpace = nameSpace;
+    }
+
     /**
      *
      * @return
@@ -61,9 +65,8 @@ public class NsPubRwBuilder {
             }
         }
 
-        NsRwSet nsRwSet = new NsRwSet();
+        NsRwSet nsRwSet = new NsRwSet(nameSpace, RwSetUtil.newKVRWSet(readSet, writeSet, rangeQueriesInfo));
         nsRwSet.setNameSpace(nameSpace);
-        nsRwSet.setKvRwSet(RwSetUtil.newKVRWSet(readSet, writeSet, rangeQueriesInfo));
         nsRwSet.setCollHashedRwSets(collHashedRwSet);
         return nsRwSet;
     }

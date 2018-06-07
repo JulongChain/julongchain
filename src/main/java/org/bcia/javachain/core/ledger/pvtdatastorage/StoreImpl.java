@@ -46,10 +46,16 @@ public class StoreImpl implements IStore {
     private long lastCommittedBlock;
     private boolean batchPending;
 
-    public void initState() throws LedgerException {
+    public StoreImpl(IDBProvider db, String ledgerID) {
+        this.db = db;
+        this.ledgerID = ledgerID;
+    }
+
+    public StoreImpl initState() throws LedgerException {
         lastCommittedBlock = getLastCommittedBlockNum();
         isEmpty = lastCommittedBlock == 0;
         batchPending = hasPendingCommit();
+        return this;
     }
 
     /**
@@ -60,7 +66,7 @@ public class StoreImpl implements IStore {
         if(!(isEmpty && !batchPending)){
             throw new LedgerException("The private data store is not empty. InitLastCommittedBlock() function call is not allowed");
         }
-        UpdateBatch batch = LevelDBProvider.newUpdateBatch();
+        UpdateBatch batch = new UpdateBatch();
         batch.put(KvEncoding.getLastCommittedBlkKey(ledgerID), KvEncoding.encodeBlockNum(blockNum));
         db.writeBatch(batch, true);
         isEmpty = false;
@@ -100,9 +106,7 @@ public class StoreImpl implements IStore {
             logger.debug(String.format("Retrieved private data write set for block %d, tran %d", bNum, tNum));
             //过滤无效的rwset
             Rwset.TxPvtReadWriteSet fileteredWSet = trimPvtWSet(pvtRWSet, filter);
-            TxPvtData data = new TxPvtData();
-            data.setSeqInBlock(tNum);
-            data.setWriteSet(fileteredWSet);
+            TxPvtData data = new TxPvtData(tNum, fileteredWSet);
             pvtData.add(data);
         }
         return pvtData;
@@ -122,7 +126,7 @@ public class StoreImpl implements IStore {
         if(expectedBlockNum != blockNum){
             throw new LedgerException(String.format("Expected block number=%d, recived block number=%d", expectedBlockNum, blockNum));
         }
-        UpdateBatch batch = LevelDBProvider.newUpdateBatch();
+        UpdateBatch batch = new UpdateBatch();
         for(TxPvtData txPvtData : pvtData){
             byte[] key = KvEncoding.encodePK(blockNum, txPvtData.getSeqInBlock());
             byte[] value = txPvtData.getWriteSet().toByteArray();
@@ -148,7 +152,7 @@ public class StoreImpl implements IStore {
         }
         long committingBlockNum = nextBlockNum();
         logger.debug("Committing private data for block " + committingBlockNum);
-        UpdateBatch batch = LevelDBProvider.newUpdateBatch();
+        UpdateBatch batch = new UpdateBatch();
         batch.delete(KvEncoding.getPendingCommitKey(ledgerID));
         batch.put(KvEncoding.getLastCommittedBlkKey(ledgerID), KvEncoding.encodeBlockNum(committingBlockNum));
         db.writeBatch(batch, true);
@@ -170,7 +174,7 @@ public class StoreImpl implements IStore {
         long rollingbackBlockNum = nextBlockNum();
         logger.debug("Rolling back private data for block " + rollingbackBlockNum);
         List<byte[]> pendingBatchKeys = retrievePendingBatchKeys();
-        UpdateBatch batch = LevelDBProvider.newUpdateBatch();
+        UpdateBatch batch = new UpdateBatch();
         for(byte[] key : pendingBatchKeys){
             batch.delete(key);
         }

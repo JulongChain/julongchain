@@ -40,11 +40,20 @@ public class RangeQueryHashValidator implements IRangeQueryValidator {
     private IResultsIterator itr;
     private RangeQueryResultsHelper resultsHelper;
 
+    public RangeQueryHashValidator() {
+    }
+
+    public RangeQueryHashValidator(KvRwset.RangeQueryInfo rqInfo, IResultsIterator itr, RangeQueryResultsHelper resultsHelper) {
+        this.rqInfo = rqInfo;
+        this.itr = itr;
+        this.resultsHelper = resultsHelper;
+    }
+
     @Override
     public void init(KvRwset.RangeQueryInfo rqInfo, IResultsIterator itr) throws LedgerException {
         this.rqInfo = rqInfo;
         this.itr = itr;
-        this.resultsHelper = RangeQueryResultsHelper.newRangeQueryResultsHelper(true, rqInfo.getReadsMerkleHashes().getMaxDegree());
+        this.resultsHelper = new RangeQueryResultsHelper(true, rqInfo.getReadsMerkleHashes().getMaxDegree());
     }
 
     @Override

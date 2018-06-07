@@ -31,6 +31,10 @@ public class NsPvtRwSet {
     private String nameSpace = null;
     private List<CollPvtRwSet> collPvtRwSets = new ArrayList<>();
 
+    public NsPvtRwSet(String nameSpace) {
+        this.nameSpace = nameSpace;
+    }
+
     public String getNameSpace() {
         return nameSpace;
     }

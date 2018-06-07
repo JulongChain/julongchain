@@ -28,12 +28,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class HeightTest {
 
-    Height height = new Height();
+    Height height;
 
     @Test
     public void toBytes(){
-        height.setBlockNum((long)100000000);
-        height.setTxNum((long)200000000);
+        height = new Height(100000000, 20000000);
         byte[] bytes = height.toBytes();
         for(int i = 0; i < bytes.length; i++){
             System.out.print(bytes[i] + " ");
@@ -42,14 +41,13 @@ public class HeightTest {
 
     @Test
     public void newHeightFromBytes(){
-        height.setBlockNum((long)100000000);
-        height.setTxNum((long)200000000);
+        height = new Height(100000000, 20000000);
         byte[] bytes = height.toBytes();
         for(int i = 0; i < bytes.length; i++){
             System.out.print(bytes[i] + " ");
         }
         System.out.println();
-        Height height1 = Height.newHeightFromBytes(bytes);
+        Height height1 = new Height(bytes);
         System.out.println(height1.getTxNum());
         System.out.println(height1.getBlockNum());
     }

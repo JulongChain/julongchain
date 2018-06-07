@@ -30,7 +30,7 @@ import java.util.List;
  * @date 2018/04/16
  * @company Dingxuan
  */
-public class NsIteratorI implements IResultsIterator {
+public class NsIterator implements IResultsIterator {
 
     private String ns;
     private NsUpdates nsUpdates;
@@ -38,12 +38,9 @@ public class NsIteratorI implements IResultsIterator {
     private Integer nextIndex;
     private Integer lastIndex;
 
-    public static NsIteratorI newNsIterator(String ns, String startKey, String endKey, UpdateBatch batch){
+    public NsIterator(String ns, String startKey, String endKey, UpdateBatch batch){
         NsUpdates nsUpdates = new NsUpdates();
         nsUpdates.setMap(batch.getUpdates(ns));
-        if(nsUpdates == null){
-            return null;
-        }
         List<String> sortKeys = Util.getSortedKeys(nsUpdates.getMap());
         int nextIndex;
         int lastIndex;
@@ -57,13 +54,11 @@ public class NsIteratorI implements IResultsIterator {
         } else {
             lastIndex = sortKeys.indexOf(endKey);
         }
-        NsIteratorI nsitr = new NsIteratorI();
-        nsitr.setNs(ns);
-        nsitr.setNsUpdates(nsUpdates);
-        nsitr.setSortedKeys(sortKeys);
-        nsitr.setNextIndex(nextIndex);
-        nsitr.setLastIndex(lastIndex);
-        return nsitr;
+        this.ns = ns;
+        this.nsUpdates = nsUpdates;
+        this.sortedKeys = sortKeys;
+        this.nextIndex = nextIndex;
+        this.lastIndex = lastIndex;
     }
 
     /** Next gives next key and versioned value. It returns a nil when exhausted
@@ -78,13 +73,7 @@ public class NsIteratorI implements IResultsIterator {
         String key = sortedKeys.get(nextIndex);
         VersionedValue vv = nsUpdates.getMap().get(key);
         nextIndex++;
-        VersionedKV vkv = new VersionedKV();
-        CompositeKey ck = new CompositeKey();
-        ck.setNamespace(ns);
-        ck.setKey(key);
-        vkv.setCompositeKey(ck);
-        vkv.setVersionedValue(vv);
-        return new QueryResult(vkv);
+        return new QueryResult(new VersionedKV(new CompositeKey(ns, key), vv));
     }
 
     /** Close implements the method from QueryResult interface

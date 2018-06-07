@@ -54,15 +54,10 @@ public class BlockFileHelper {
         //没有找到文件, 初始化检查点信息
         if(lastFileNum == -1){
             logger.debug("File not found");
-            CheckpointInfo cpInfo = new CheckpointInfo();
-            cpInfo.setLastestFileChunkSuffixNum(0);
-            cpInfo.setLatestFileChunksize(0);
-            cpInfo.setChainEmpty(true);
-            cpInfo.setLastBlockNumber((long) 0);
-            return cpInfo;
+            return new CheckpointInfo(0, 0, true, 0);
         }
         //获取最近添加的区块文件
-        fileInfo = getFileInfoOrPanic(rootDir,lastFileNum);
+        fileInfo = getFileInfo(rootDir,lastFileNum);
         logger.debug(String.format("Last block file info: Filename=[%s]", fileInfo.getName()));
         //获取最新区块信息
         list = BlockFileManager.scanForLastCompleteBlock(rootDir, lastFileNum, (long) 0);
@@ -75,7 +70,7 @@ public class BlockFileHelper {
         //最新区块文件中没有区块, 则倒数第二区块文件的最新区块为最新区块
         if(numBlocksInFile == 0 && lastFileNum > 0){
             int secondLastFileNum = lastFileNum - 1;
-            fileInfo = getFileInfoOrPanic(rootDir, secondLastFileNum);
+            fileInfo = getFileInfo(rootDir, secondLastFileNum);
             logger.debug(String.format("Second last block file info: FileName=[%s]", fileInfo.getName()));
             lastBlockBytes = (byte[]) BlockFileManager.scanForLastCompleteBlock(rootDir, secondLastFileNum, (long) 0).get(BlockFileManager.LAST_BLOCK_BYTES);
         }
@@ -85,12 +80,7 @@ public class BlockFileHelper {
             lastBlockNum = lastBlock.getHeader().getNumber();
         }
         //组装检查点
-        CheckpointInfo cpInfo = new CheckpointInfo();
-        cpInfo.setLastBlockNumber(lastBlockNum);
-        cpInfo.setLatestFileChunksize((int) endOffsetLastBlock);
-        cpInfo.setLastestFileChunkSuffixNum(lastFileNum);
-        cpInfo.setChainEmpty(lastFileNum == 0 && numBlocksInFile == 0);
-        return cpInfo;
+        return new CheckpointInfo(lastFileNum, (int) endOffsetLastBlock, lastFileNum == 0 && numBlocksInFile == 0, lastBlockNum);
     }
 
     /**
@@ -135,7 +125,7 @@ public class BlockFileHelper {
     /**
      * 根据区块文件编号, 获取文件
      */
-    public static File getFileInfoOrPanic(String rootDir, Integer fileNum) throws LedgerException{
+    public static File getFileInfo(String rootDir, Integer fileNum) throws LedgerException{
         String filePath = BlockFileManager.deriveBlockfilePath(rootDir, fileNum);
         File fileInfo = new File(filePath);
         if (!fileInfo.exists()){

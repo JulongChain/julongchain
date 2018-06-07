@@ -30,6 +30,11 @@ public class VersionedKV {
     private CompositeKey compositeKey;
     private VersionedValue versionedValue;
 
+    public VersionedKV(CompositeKey compositeKey, VersionedValue versionedValue) {
+        this.compositeKey = compositeKey;
+        this.versionedValue = versionedValue;
+    }
+
     public CompositeKey getCompositeKey() {
         return compositeKey;
     }

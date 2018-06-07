@@ -31,6 +31,17 @@ public class BatchIndex {
     private int valuePos;
     private int valueLen;
 
+    public BatchIndex() {
+    }
+
+    public BatchIndex(KeyType keyType, int keyPos, int kenLen, int valuePos, int valueLen) {
+        this.keyType = keyType;
+        this.keyPos = keyPos;
+        this.kenLen = kenLen;
+        this.valuePos = valuePos;
+        this.valueLen = valueLen;
+    }
+
     public byte[] k(byte[] data){
         byte[] result = new byte[kenLen];
         System.arraycopy(data, keyPos, result, 0 , keyPos + kenLen);

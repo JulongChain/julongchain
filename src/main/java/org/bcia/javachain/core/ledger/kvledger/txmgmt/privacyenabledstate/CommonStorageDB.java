@@ -45,10 +45,8 @@ public class CommonStorageDB implements IDB {
 
     private IVersionedDB vdb;
 
-    public static CommonStorageDB newCommonStorageDB(IVersionedDB vdb, String id){
-        CommonStorageDB db = new CommonStorageDB();
-        db.setVdb(vdb);
-        return db;
+    public CommonStorageDB(IVersionedDB vdb) {
+        this.vdb = vdb;
     }
 
     @Override
@@ -70,9 +68,7 @@ public class CommonStorageDB implements IDB {
             } else {
                 keyHashStr = key.getKeyHash();
             }
-            CompositeKey compositeKey = new CompositeKey();
-            compositeKey.setNamespace(ns);
-            compositeKey.setKey(keyHashStr);
+            CompositeKey compositeKey = new CompositeKey(ns, keyHashStr);
             pubKeys.add(compositeKey);
         }
 

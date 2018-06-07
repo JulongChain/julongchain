@@ -48,27 +48,24 @@ public class BlockIndex implements Index {
     private IDBProvider db;
     private String ledgerId;
 
-    public static final String BLOCK_NUM_IDX_KEY_PREFIX           = "n";
-    public static final String BLOCK_HASH_IDX_KEY_PREFIX          = "h";
-    public static final String TX_ID_IDX_KEY_PREFIX               = "t";
-    public static final String BLOCK_NUM_TRAN_NUM_IDX_KEY_PREFIX    = "a";
-    public static final String BLOCK_TX_ID_IDX_KEY_PREFIX          = "b";
-    public static final String TX_VALIDATION_RESULT_IDX_KEY_PREFIX = "v";
-    public static final String INDEX_CHECK_POINT_KEY_STR          = "indexCheckpointKey";
-//    private static final byte[] INDEX_CHECKPOINT_KEY  = INDEX_CHECK_POINT_KEY_STR.getBytes();
+    private static final String BLOCK_NUM_IDX_KEY_PREFIX           = "n";
+    private static final String BLOCK_HASH_IDX_KEY_PREFIX          = "h";
+    private static final String TX_ID_IDX_KEY_PREFIX               = "t";
+    private static final String BLOCK_NUM_TRAN_NUM_IDX_KEY_PREFIX    = "a";
+    private static final String BLOCK_TX_ID_IDX_KEY_PREFIX          = "b";
+    private static final String TX_VALIDATION_RESULT_IDX_KEY_PREFIX = "v";
+    private static final String INDEX_CHECK_POINT_KEY_STR          = "indexCheckpointKey";
 
-    public static BlockIndex newBlockIndex(IndexConfig indexConfig, IDBProvider db, String id) {
+    public BlockIndex(IndexConfig indexConfig, IDBProvider db, String id) {
         String[] indexItems = indexConfig.getAttrsToIndex();
         logger.debug(String.format("newBlockIndex() - indexItems length: [%d]", indexItems.length));
         Map<String, Boolean> indexItemMap = new HashMap<>();
         for(String indexItem : indexItems){
-           indexItemMap.put(indexItem, true);
+            indexItemMap.put(indexItem, true);
         }
-        BlockIndex index = new BlockIndex();
-        index.setIndexItemsMap(indexItemMap);
-        index.setDb(db);
-        index.setLedgerId(id);
-        return index;
+        this.indexItemsMap = indexItemMap;
+        this.db = db;
+        this.ledgerId = id;
     }
 
     /**
@@ -97,7 +94,7 @@ public class BlockIndex implements Index {
         FileLocPointer flp = blockIndexInfo.getFlp();
         List<TxIndexInfo> txOffsets = blockIndexInfo.getTxOffsets();
         TxValidationFlags txsfltr = new TxValidationFlags(blockIndexInfo.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER_VALUE).size());
-        UpdateBatch batch = LevelDBProvider.newUpdateBatch();
+        UpdateBatch batch = new UpdateBatch();
         byte[] flpBytes = flp.marshal();
 
         //index1 blockHash数据 - getBlockByHash()
@@ -113,7 +110,7 @@ public class BlockIndex implements Index {
         //index3 用来通过txid获取tx - getTxById()
         if(Boolean.TRUE.equals(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_ID))){
             for(TxIndexInfo txOffset : txOffsets){
-                FileLocPointer txFlp = FileLocPointer.newFileLocationPointer(flp.getFileSuffixNum(), flp.getLocPointer().getOffset(), txOffset.getLoc());
+                FileLocPointer txFlp = new FileLocPointer(flp.getFileSuffixNum(), txOffset.getLoc());
                 logger.debug(String.format("Adding txLoc [%s] for txID: [%s] to index", txFlp, txOffset.getTxID()));
                 byte[] txFlpBytes = txFlp.marshal();
                 batch.put(constructTxIDKey(txOffset.getTxID()), txFlpBytes);
@@ -124,7 +121,7 @@ public class BlockIndex implements Index {
         if(Boolean.TRUE.equals(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM))){
             for(int i = 0; i < txOffsets.size(); i++){
                 TxIndexInfo txOffset = txOffsets.get(i);
-                FileLocPointer txFlp = FileLocPointer.newFileLocationPointer(flp.getFileSuffixNum(), flp.getLocPointer().getOffset(), txOffset.getLoc());
+                FileLocPointer txFlp = new FileLocPointer(flp.getFileSuffixNum(), txOffset.getLoc());
                 logger.debug(String.format("Adding txLoc [%s] for tx num: [%d] ID: [%s] to blockNumTranNum index", txFlp, i, txOffset.getTxID()));
                 byte[] txFlpBytes = txFlp.marshal();
                 batch.put(constructBlockNumTranNumKey(blockIndexInfo.getBlockNum(), (long) i), txFlpBytes);

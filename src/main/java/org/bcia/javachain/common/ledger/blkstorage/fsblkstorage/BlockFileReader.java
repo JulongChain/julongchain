@@ -32,10 +32,8 @@ public class BlockFileReader {
 
     private File file;
 
-    public static BlockFileReader newBlockfileReader(String filePath){
-        BlockFileReader reader = new BlockFileReader();
-        reader.file = new File(filePath);
-        return reader;
+    public BlockFileReader(String filePath){
+        this.file = new File(filePath);
     }
 
     /**
@@ -49,7 +47,7 @@ public class BlockFileReader {
         try {
             baos = new ByteArrayOutputStream();
             fis = new FileInputStream(file);
-            //移动到制定位置
+            //移动到指定位置
             fis.skip(offset);
             int i = 0;
             while ((i = fis.read(buff)) > 0) {

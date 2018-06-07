@@ -41,6 +41,14 @@ public class RangeQueryResultsValidator implements IRangeQueryValidator {
     private KvRwset.RangeQueryInfo rqInfo;
     private IResultsIterator itr;
 
+    public RangeQueryResultsValidator() {
+    }
+
+    public RangeQueryResultsValidator(KvRwset.RangeQueryInfo rqInfo, IResultsIterator itr) {
+        this.rqInfo = rqInfo;
+        this.itr = itr;
+    }
+
     @Override
     public void init(KvRwset.RangeQueryInfo rqInfo, IResultsIterator itr) {
         this.rqInfo = rqInfo;
@@ -78,6 +86,6 @@ public class RangeQueryResultsValidator implements IRangeQueryValidator {
     }
 
     private Height convertToVersionHeight(KvRwset.Version v){
-        return Height.newHeight(v.getBlockNum(), v.getTxNum());
+        return new Height(v.getBlockNum(), v.getTxNum());
     }
 }

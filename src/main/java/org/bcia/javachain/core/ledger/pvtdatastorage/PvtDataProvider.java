@@ -20,7 +20,6 @@ import org.bcia.javachain.common.ledger.util.IDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
-import org.bcia.javachain.core.ledger.kvledger.KvLedger;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 
 /**
@@ -30,31 +29,25 @@ import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
  * @date 2018/04/17
  * @company Dingxuan
  */
-public class Provider {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(Provider.class);
+public class PvtDataProvider {
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(PvtDataProvider.class);
 
     private IDBProvider db;
 
     /**
      * 创建pvtdata
      */
-    public static Provider newProvider() throws LedgerException {
-        Provider provider = new Provider();
-        String dbPath = LedgerConfig.getPvtDataStorePath();
-        provider.db = LevelDBProvider.newProvider(dbPath);
-        logger.debug("Create pvtprovider using path = " + provider.getDb().getDbPath());
-        return provider;
-    }
+    public PvtDataProvider() throws LedgerException{
+		String dbPath = LedgerConfig.getPvtDataStorePath();
+		this.db = new LevelDBProvider(dbPath);
+		logger.debug("Create pvtprovider using path = " + this.db.getDbPath());
+	}
 
     /**
      * 根据id打开对应pvtdata
      */
     public IStore openStore(String ledgerID) throws LedgerException{
-        IStore store = new StoreImpl();
-        ((StoreImpl) store).setDb(db);
-        ((StoreImpl) store).setLedgerID(ledgerID);
-        ((StoreImpl) store).initState();
-        return store;
+        return new StoreImpl(db, ledgerID).initState();
     }
 
     /**

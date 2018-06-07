@@ -28,10 +28,8 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 public class HashedUpdateBatch {
     private UpdateMap map;
 
-    public static HashedUpdateBatch newHashedUpdateBatch(){
-        HashedUpdateBatch batch = new HashedUpdateBatch();
-        batch.setMap(new UpdateMap());
-        return batch;
+    public HashedUpdateBatch() {
+        this.map = new UpdateMap();
     }
 
     public boolean contains(String ns, String coll, byte[] keyHash){

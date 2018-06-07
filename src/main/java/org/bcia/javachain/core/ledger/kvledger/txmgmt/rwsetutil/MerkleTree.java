@@ -43,15 +43,13 @@ public class MerkleTree {
     private int maxLevel;
     private int maxDegree;
 
-    public static MerkleTree newMerkleTree(int maxDegree) throws LedgerException {
+    public MerkleTree(int maxDegree) throws LedgerException{
         if(maxDegree < 2){
             throw new LedgerException("MerkleTree should not be less than 2 height");
         }
-        MerkleTree tree = new MerkleTree();
-        tree.setTree(new HashMap<>());
-        tree.setMaxLevel(1);
-        tree.setMaxDegree(maxDegree);
-        return tree;
+        this.tree = new HashMap<>();
+        this.maxLevel = 1;
+        this.maxLevel = maxDegree;
     }
 
     public void update(byte[] nextLeafLevelHash) throws LedgerException{

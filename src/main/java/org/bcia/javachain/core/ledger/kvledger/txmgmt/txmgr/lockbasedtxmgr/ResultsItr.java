@@ -32,7 +32,7 @@ import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
  * @date 2018/04/18
  * @company Dingxuan
  */
-public class IResultsItr implements IResultsIterator {
+public class ResultsItr implements IResultsIterator {
     private String ns;
     private String endKey;
     private IResultsIterator dbItr;
@@ -40,28 +40,26 @@ public class IResultsItr implements IResultsIterator {
     private KvRwset.RangeQueryInfo rangeQueryInfo;
     private RangeQueryResultsHelper rangeQueryResultsHelper;
 
-    public static IResultsItr newResultsItr(String ns,
-                                            String startKey,
-                                            String endKey,
-                                            IVersionedDB db,
-                                            RWSetBuilder rwSetBuilder,
-                                            boolean enableHashing,
-                                            int maxDegree) throws LedgerException {
+    public ResultsItr(String ns,
+                      String startKey,
+                      String endKey,
+                      IVersionedDB db,
+                      RWSetBuilder rwSetBuilder,
+                      boolean enableHashing,
+                      int maxDegree) throws LedgerException {
         IResultsIterator dbItr = db.getStateRangeScanIterator(ns, startKey, endKey);
-        IResultsItr itr = new IResultsItr();
-        itr.setNs(ns);
-        itr.setDbItr(dbItr);
+        this.ns = ns;
+        this.dbItr = dbItr;
         if(rwSetBuilder != null){
-            itr.setRwSetBuilder(rwSetBuilder);
-            itr.setEndKey(endKey);
+            this.rwSetBuilder = rwSetBuilder;
+            this.endKey = endKey;
             KvRwset.RangeQueryInfo rqi = KvRwset.RangeQueryInfo.newBuilder()
                     .setStartKey(startKey)
                     .build();
-            itr.setRangeQueryInfo(rqi);
-            RangeQueryResultsHelper rangeQueryResultsHelper = RangeQueryResultsHelper.newRangeQueryResultsHelper(enableHashing, maxDegree);
-            itr.setRangeQueryResultsHelper(rangeQueryResultsHelper);
+            this.rangeQueryInfo = rqi;
+            RangeQueryResultsHelper rangeQueryResultsHelper = new RangeQueryResultsHelper(enableHashing, maxDegree);
+            this.rangeQueryResultsHelper = rangeQueryResultsHelper;
         }
-        return itr;
     }
 
     private void updateRangeQueryInfo(QueryResult queryResult) throws LedgerException{

@@ -49,11 +49,10 @@ public class BlockSerialization {
      * 序列化block
      */
     public static AbstractMap.SimpleEntry<SerializedBlockInfo, byte[]> serializeBlock(Block block, long blockPosition) {
-        SerializedBlockInfo info = new SerializedBlockInfo();
-        info.setBlockHeader(block.getHeader());
-        info.setMetadata(block.getMetadata());
-        //序列化Data
-        info.setTxOffsets(addDataBytes(block, blockPosition));
+        SerializedBlockInfo info = new SerializedBlockInfo(block.getHeader(),
+                //序列化Data
+                addDataBytes(block, blockPosition),
+                block.getMetadata());
         AbstractMap.SimpleEntry<SerializedBlockInfo, byte[]> entry =
                 new AbstractMap.SimpleEntry<>(info, block.toByteArray());
         return entry;
@@ -64,8 +63,7 @@ public class BlockSerialization {
      */
     public static Block deserializeBlock(byte[] serializedBlockBytes) throws LedgerException {
         try {
-            Block block = Block.parseFrom(serializedBlockBytes);
-            return block;
+            return Block.parseFrom(serializedBlockBytes);
         }catch (InvalidProtocolBufferException e){
             throw new LedgerException(e.getMessage(),e);
         }
@@ -73,11 +71,7 @@ public class BlockSerialization {
 
     public static SerializedBlockInfo extractSerializedBlockInfo(byte[] serializedBlockBytes, long blockPosition) throws LedgerException {
         Block block = deserializeBlock(serializedBlockBytes);
-        SerializedBlockInfo info = new SerializedBlockInfo();
-        info.setBlockHeader(block.getHeader());
-        info.setMetadata(block.getMetadata());
-        info.setTxOffsets(addDataBytes(block, blockPosition));
-        return info;
+        return new SerializedBlockInfo(block.getHeader(), addDataBytes(block, blockPosition), block.getMetadata());
     }
 
     /**
@@ -117,8 +111,7 @@ public class BlockSerialization {
 
         //进入BlockData
         //blockData每一项为envelope
-        //当envelope只有signature或payload中一个时, blockData没有起始标识位
-        //当envelope同事包含signature和payload时，blockData包含1位标识位 + n位data长度
+        //blockData包含blockData标志位1位 + Envelope长度
         for(ByteString txEnvelopeBytes : block.getData().getDataList()){
             //记录当前位置
             long offset = envPosition;
@@ -136,21 +129,14 @@ public class BlockSerialization {
                 logger.error("Got error when resolve object from byteString");
                 return null;
             }
-            //判断payload和signature长度，确定是否同时存在二者
-            if(txEnvelope.getSignature().size() != 0 && txEnvelope.getPayload().size() != 0){
-                //同时存在时跳过标识位
-                offset += (2 + computeLength(txEvnelopeLength));
-            }
-            //构造locpointer对象
+            //跳过blockData标志位
+            offset += (2 + computeLength(txEvnelopeLength));
+            //构造locpointer对象, 保存Envelope位置信息
             //offset        Envelope起始位置
             //bytesLength   Envelope长度, 应包含头部长度2
             LocPointer locPointer = new LocPointer(offset, txEvnelopeLength);
             //构造txIndexInfo对象
-            TxIndexInfo indexInfo = new TxIndexInfo();
-            indexInfo.setTxID(gh.getTxId());
-            indexInfo.setLoc(locPointer);
-            txOffsets.add(indexInfo);
-
+            txOffsets.add(new TxIndexInfo(gh.getTxId(), locPointer));
             //Envelope起始位置相应移动
             envPosition += txEvnelopeLength;
         }
@@ -214,23 +200,5 @@ public class BlockSerialization {
 
     public void setTxOffsets(List<TxIndexInfo> txOffsets) {
         this.txOffsets = txOffsets;
-    }
-
-    public static String longer(StringBuffer buffer, int length){
-        while(buffer.length() < length){
-            buffer.append(1);
-        }
-        return buffer.toString();
-    }
-
-    public static void soutBytes(byte[] bytes){
-        int i = 0;
-        for(byte b : bytes){
-            System.out.print(b + ",");
-            if (i++ % 30 == 29) {
-                System.out.println();
-            }
-        }
-        System.out.println();
     }
 }

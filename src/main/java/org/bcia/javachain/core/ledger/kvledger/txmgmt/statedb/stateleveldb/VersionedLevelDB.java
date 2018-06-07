@@ -19,7 +19,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.IResultsIterator;
 import org.bcia.javachain.common.ledger.util.IDBProvider;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.BytesHexStrTranslate;
@@ -49,6 +48,11 @@ public class VersionedLevelDB implements IVersionedDB {
     private IDBProvider db;
     private String dbName;
 
+    public VersionedLevelDB(IDBProvider db, String dbName) {
+        this.db = db;
+        this.dbName = dbName;
+    }
+
     @Override
     public VersionedValue getState(String namespace, String key) throws LedgerException {
         logger.debug(String.format("getState() ns = %s, key = %s", namespace, key));
@@ -60,16 +64,12 @@ public class VersionedLevelDB implements IVersionedDB {
         }
         //根据0~7字节组装blockNum
         //根据8~16字节组装txNum
-        Height h = Height.newHeightFromBytes(dbVal);
+        Height h = new Height(dbVal);
         //其余为block信息
         byte[] value = new byte[dbVal.length - 16];
         System.arraycopy(dbVal, 16, value, 0, value.length);
         //组装versionValue
-        VersionedValue versionedValue = new VersionedValue();
-        versionedValue.setValue(value);
-        versionedValue.setVersion(h);
-
-        return versionedValue;
+        return new VersionedValue(h, value);
     }
 
     @Override
@@ -100,7 +100,7 @@ public class VersionedLevelDB implements IVersionedDB {
             compositeEndKey[compositeEndKey.length - 1] = LAST_KEY_INDICATOR;
         }
         Iterator dbItr = db.getIterator(compositeStartKey);
-        return KvScanner.newKVScanner(namespace, dbItr);
+        return new KvScanner(namespace, dbItr);
     }
 
     @Override
@@ -113,7 +113,8 @@ public class VersionedLevelDB implements IVersionedDB {
      */
     @Override
     public void applyUpdates(UpdateBatch batch, Height height) throws LedgerException {
-        org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch dbBatch = LevelDBProvider.newUpdateBatch();
+        org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch dbBatch =
+                new org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch();
         List<String> nameSpaces = batch.getUpdatedNamespaces();
         for(String ns : nameSpaces){
             Map<String,VersionedValue> updates = batch.getUpdates(ns);
@@ -140,7 +141,7 @@ public class VersionedLevelDB implements IVersionedDB {
         if(versionBytes == null){
             return null;
         }
-       return Height.newHeightFromBytes(versionBytes);
+       return new Height(versionBytes);
     }
 
     @Override

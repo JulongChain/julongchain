@@ -38,8 +38,13 @@ import java.util.Map;
 public class QueryHelper {
     private LockBasedTxManager txMgr;
     private RWSetBuilder rwSetBuilder;
-    private List<IResultsItr> itrs = new ArrayList<>();
+    private List<ResultsItr> itrs = new ArrayList<>();
     private boolean doneInvoked = true;
+
+    public QueryHelper(LockBasedTxManager txMgr, RWSetBuilder rwSetBuilder) {
+        this.txMgr = txMgr;
+        this.rwSetBuilder = rwSetBuilder;
+    }
 
     public byte[] getState(String ns, String key) throws LedgerException{
         checkDone();
@@ -68,7 +73,7 @@ public class QueryHelper {
 
     public IResultsIterator getStateRangeScanIterator(String ns, String startKey, String endKey) throws LedgerException{
         checkDone();
-        IResultsItr itr = IResultsItr.newResultsItr(ns, startKey, endKey, txMgr.getDb(), rwSetBuilder, false, LedgerConfig.getMaxDegreeQueryReadsHashing());
+        ResultsItr itr = new ResultsItr(ns, startKey, endKey, txMgr.getDb(), rwSetBuilder, false, LedgerConfig.getMaxDegreeQueryReadsHashing());
         itrs.add(itr);
         return itr;
     }
@@ -79,10 +84,7 @@ public class QueryHelper {
     public IResultsIterator executeQuery(String ns, String query) throws LedgerException {
         checkDone();
         IResultsIterator dbItr = txMgr.getDb().executeQuery(ns, query);
-        QueryResultsItr itr = new QueryResultsItr();
-        itr.setDbItr(dbItr);
-        itr.setRwSetBuilder(rwSetBuilder);
-        return itr;
+        return new QueryResultsItr(dbItr ,rwSetBuilder);
     }
 
     public byte[] getPrivateData(String ns, String coll, String key) throws LedgerException {
@@ -117,11 +119,7 @@ public class QueryHelper {
     public IResultsIterator getPrivateDataRangeScanIterator(String ns, String coll, String startKey, String endKey) throws LedgerException {
         checkDone();
         IResultsIterator dbitr = txMgr.getDb().getPrivateDataRangeScanIterator(ns, coll, startKey, endKey);
-        PvtdataIResultsItr itr = new PvtdataIResultsItr();
-        itr.setNs(ns);
-        itr.setColl(coll);
-        itr.setDbItr(dbitr);
-        return itr;
+        return new PvtdataIResultsItr(ns, coll, dbitr);
     }
 
     /**
@@ -130,11 +128,7 @@ public class QueryHelper {
     public IResultsIterator executeQueryOnPrivateData(String ns, String coll, String query) throws LedgerException {
         checkDone();
         IResultsIterator dbitr = txMgr.getDb().executeQueryOnPrivateData(ns, coll, query);
-        PvtdataIResultsItr itr = new PvtdataIResultsItr();
-        itr.setNs(ns);
-        itr.setColl(coll);
-        itr.setDbItr(dbitr);
-        return itr;
+        return new PvtdataIResultsItr(ns, coll, dbitr);
     }
 
     public void done() throws LedgerException{
@@ -142,7 +136,7 @@ public class QueryHelper {
             return;
         }
         try {
-            for(IResultsItr itr : itrs){
+            for(ResultsItr itr : itrs){
                 if (rwSetBuilder != null){
                     Map.Entry<List<KvRwset.KVRead>, KvRwset.QueryReadsMerkleSummary> entry = itr.getRangeQueryResultsHelper().done();
                     if(entry.getKey() != null){
@@ -211,11 +205,11 @@ public class QueryHelper {
         this.rwSetBuilder = rwSetBuilder;
     }
 
-    public List<IResultsItr> getItrs() {
+    public List<ResultsItr> getItrs() {
         return itrs;
     }
 
-    public void setItrs(List<IResultsItr> itrs) {
+    public void setItrs(List<ResultsItr> itrs) {
         this.itrs = itrs;
     }
 

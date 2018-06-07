@@ -27,6 +27,15 @@ public class HashedCompositeKey {
     private String collectionName;
     private String keyHash;
 
+    public HashedCompositeKey() {
+    }
+
+    public HashedCompositeKey(String namespace, String collectionName, String keyHash) {
+        this.namespace = namespace;
+        this.collectionName = collectionName;
+        this.keyHash = keyHash;
+    }
+
     public String getNamespace() {
         return namespace;
     }

@@ -42,24 +42,15 @@ public class LockBasedTxSimulator implements ITxSimulator {
     private boolean writePreformed;
     private boolean pvtdataQueriesPerformed;
 
-    public static LockBasedTxSimulator newLockBasedTxSimulator(LockBasedTxManager txMgr, String txid){
-        LockBasedTxSimulator l = new LockBasedTxSimulator();
-
+    public LockBasedTxSimulator(LockBasedTxManager txMgr, String txid) {
         RWSetBuilder rwSetBuilder = new RWSetBuilder();
 
-        QueryHelper queryHelper = new QueryHelper();
-        queryHelper.setTxMgr(txMgr);
-        queryHelper.setRwSetBuilder(rwSetBuilder);
+        QueryHelper queryHelper = new QueryHelper(txMgr, rwSetBuilder);
 
-        LockBasedQueryExecutor lockBasedQueryExecutor = new LockBasedQueryExecutor();
-        lockBasedQueryExecutor.setHelper(queryHelper);
-        lockBasedQueryExecutor.setTxID(txid);
-
-        l.setQueryExecutor(lockBasedQueryExecutor);
-        l.setRwSetBuilder(rwSetBuilder);
-        l.setWritePreformed(false);
-        l.setPvtdataQueriesPerformed(false);
-        return l;
+        this.queryExecutor = new LockBasedQueryExecutor(queryHelper, txid);
+        this.rwSetBuilder = rwSetBuilder;
+        this.writePreformed = false;
+        this.pvtdataQueriesPerformed = false;
     }
 
     @Override

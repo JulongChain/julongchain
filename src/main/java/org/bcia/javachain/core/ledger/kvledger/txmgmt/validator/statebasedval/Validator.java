@@ -53,10 +53,8 @@ public class Validator implements InternalValidator {
 
     private IDB db;
 
-    public static Validator newValidator(IDB db){
-        Validator validator = new Validator();
-        validator.setDb(db);
-        return validator;
+    public Validator(IDB db) {
+        this.db = db;
     }
 
     public void preLoadCommittedVersionOfRSet(Block block) throws LedgerException{
@@ -67,9 +65,7 @@ public class Validator implements InternalValidator {
         for(Transaction tx : block.getTxs()){
             for(NsRwSet nsRwSet : tx.getRwSet().getNsRwSets()){
                 for(KvRwset.KVRead kvRead : nsRwSet.getKvRwSet().getReadsList()){
-                    CompositeKey compositeKey = new CompositeKey();
-                    compositeKey.setNamespace(nsRwSet.getNameSpace());
-                    compositeKey.setKey(kvRead.getKey());
+                    CompositeKey compositeKey = new CompositeKey(nsRwSet.getNameSpace(), kvRead.getKey());
                     if(!pubKeysMap.containsKey(compositeKey)){
                         pubKeysMap.put(compositeKey, null);
                         pubKeys.add(compositeKey);
@@ -77,10 +73,9 @@ public class Validator implements InternalValidator {
                 }
                 for(CollHashedRwSet col : nsRwSet.getCollHashedRwSets()){
                     for(KvRwset.KVWriteHash kvHashedRead : col.getHashedRwSet().getHashedWritesList()){
-                        HashedCompositeKey hashedCompositeKey = new HashedCompositeKey();
-                        hashedCompositeKey.setNamespace(nsRwSet.getNameSpace());
-                        hashedCompositeKey.setCollectionName(col.getCollectionName());
-                        hashedCompositeKey.setKeyHash(new String(kvHashedRead.getKeyHash().toByteArray()));
+                        HashedCompositeKey hashedCompositeKey = new HashedCompositeKey(nsRwSet.getNameSpace(),
+                                col.getCollectionName(),
+                                new String(kvHashedRead.getKeyHash().toByteArray()));
                         if(!hashedKeyMap.containsKey(hashedCompositeKey)){
                             hashedKeyMap.put(hashedCompositeKey, null);
                             hashedKeys.add(hashedCompositeKey);
@@ -100,13 +95,13 @@ public class Validator implements InternalValidator {
         if(db.isBulkOptimizable()){
             preLoadCommittedVersionOfRSet(block);
         }
-        PubAndHashUpdates updates = PubAndHashUpdates.newPubAndHashUpdates();
+        PubAndHashUpdates updates = new PubAndHashUpdates();
         for(Transaction tx : block.getTxs()){
             TransactionPackage.TxValidationCode validationCode = validateEndorserTX(tx.getRwSet(), doMVCCValidation, updates);
             tx.setValidationCode(validationCode);
             if(TransactionPackage.TxValidationCode.VALID.equals(validationCode)){
                 logger.debug(String.format("Block [%d] Transaction index [%d] txID [%s] marked as valid by state validator", block.getNum(), tx.getIndexInBlock(), tx.getId()));
-                Height committingTxHeight = Height.newHeight(block.getNum(), tx.getIndexInBlock());
+                Height committingTxHeight = new Height(block.getNum(), tx.getIndexInBlock());
                 updates.applyWriteSet(tx.getRwSet(), committingTxHeight);
             } else {
                 logger.debug(String.format("Block [%d] Transaction id [%d] TxID [%s] marked as invalid by state validator.", block.getNum(), tx.getIndexInBlock(), tx.getId()));
@@ -174,7 +169,7 @@ public class Validator implements InternalValidator {
         logger.debug(String.format("validateRangeQueryL ns = %s, rangQueryInfo = %s", ns, rqi));
         boolean includeEndKey = !rqi.getItrExhausted();
 
-        CombinedIteratorI combinedItr = CombinedIteratorI.newCombinedIterator(db, updates.getBatch(), ns, rqi.getStartKey(), rqi.getEndKey(), includeEndKey);
+        CombinedIterator combinedItr = new CombinedIterator(db, updates.getBatch(), ns, rqi.getStartKey(), rqi.getEndKey(), includeEndKey);
         IRangeQueryValidator validator;
         if(null != rqi.getReadsMerkleHashes()){
             logger.debug("Hashing results are present in the range query info hence, initiating hashing based validation");

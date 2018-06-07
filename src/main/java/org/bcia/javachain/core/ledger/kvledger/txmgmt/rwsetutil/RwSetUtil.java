@@ -52,10 +52,9 @@ public class RwSetUtil {
      * 在NsReadWriteSet中获取NsRwSet
      */
     public static NsRwSet nsRwSetFromProtoMsg(Rwset.NsReadWriteSet protoMsg) throws LedgerException{
-        NsRwSet nsRwSet = new NsRwSet();
-        nsRwSet.setNameSpace(protoMsg.getNamespace());
+        NsRwSet nsRwSet = null;
         try {
-            nsRwSet.setKvRwSet(KvRwset.KVRWSet.parseFrom(protoMsg.getRwset()));
+            nsRwSet = new NsRwSet(protoMsg.getNamespace(), KvRwset.KVRWSet.parseFrom(protoMsg.getRwset()));
         } catch (InvalidProtocolBufferException e) {
             throw new LedgerException(e);
         }
@@ -85,8 +84,7 @@ public class RwSetUtil {
      * 在NsPvtReadWriteSet中获取NsPvtRwSet
      */
     public static NsPvtRwSet nsPvtRwSetFromProtoMsg(Rwset.NsPvtReadWriteSet protoMsg) throws LedgerException{
-        NsPvtRwSet nsPvtRwSet = new NsPvtRwSet();
-        nsPvtRwSet.setNameSpace(protoMsg.getNamespace());
+        NsPvtRwSet nsPvtRwSet = new NsPvtRwSet(protoMsg.getNamespace());
         for(Rwset.CollectionPvtReadWriteSet collPvtRwSetProtoMsg : protoMsg.getCollectionPvtRwsetList()){
             CollPvtRwSet collPvtRwSet = collPvtRwSetFromProtoMsg(collPvtRwSetProtoMsg);
             nsPvtRwSet.getCollPvtRwSets().add(collPvtRwSet);
@@ -98,29 +96,24 @@ public class RwSetUtil {
      * 在CollectionPvtReadWriteSet中获取CollPvtRwSet
      */
     public static CollPvtRwSet collPvtRwSetFromProtoMsg(Rwset.CollectionPvtReadWriteSet protoMsg) throws LedgerException{
-        CollPvtRwSet collPvtRwSet = new CollPvtRwSet();
-        collPvtRwSet.setCollectionName(protoMsg.getCollectionName());
         try {
-            collPvtRwSet.setKvRwSet(KvRwset.KVRWSet.parseFrom(protoMsg.getRwset()));
+            return new CollPvtRwSet(protoMsg.getCollectionName(), KvRwset.KVRWSet.parseFrom(protoMsg.getRwset()));
         } catch (InvalidProtocolBufferException e) {
             throw new LedgerException("Got error when getting KVRWSet from protoMsg: " + e);
         }
-        return collPvtRwSet;
     }
 
     /**
      * 在CollectionHashedReadWriteSet中获取CollHashedRwSet
      */
     public static CollHashedRwSet collHashedRwSetFromProtoMsg(Rwset.CollectionHashedReadWriteSet protoMsg) throws LedgerException{
-        CollHashedRwSet collHashedRwSet = new CollHashedRwSet();
-        collHashedRwSet.setCollectionName(protoMsg.getCollectionName());
-        collHashedRwSet.setPvtRwSetHash(protoMsg.getPvtRwsetHash());
         try {
-            collHashedRwSet.setHashedRwSet(KvRwset.HashedRWSet.parseFrom(protoMsg.getHashedRwset()));
+            return new CollHashedRwSet(protoMsg.getCollectionName(),
+                    protoMsg.getPvtRwsetHash(),
+                    KvRwset.HashedRWSet.parseFrom(protoMsg.getHashedRwset()));
         } catch (InvalidProtocolBufferException e) {
             throw new LedgerException("Got error when getting HashedRwSet from protoMsg: " + e);
         }
-        return collHashedRwSet;
     }
 
     /**
@@ -153,10 +146,7 @@ public class RwSetUtil {
         if(protoVersion == null){
             return null;
         }
-        Height height = new Height();
-        height.setBlockNum(protoVersion.getBlockNum());
-        height.setTxNum(protoVersion.getTxNum());
-        return height;
+        return new Height(protoVersion.getBlockNum(), protoVersion.getTxNum());
     }
 
     /**

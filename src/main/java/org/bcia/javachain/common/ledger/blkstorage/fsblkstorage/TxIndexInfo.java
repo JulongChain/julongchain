@@ -27,6 +27,14 @@ public class TxIndexInfo {
     private String txID;
     private LocPointer loc;
 
+    public TxIndexInfo() {
+    }
+
+    public TxIndexInfo(String txID, LocPointer loc) {
+        this.txID = txID;
+        this.loc = loc;
+    }
+
     public String getTxID() {
         return txID;
     }

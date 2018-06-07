@@ -17,17 +17,10 @@ package org.bcia.javachain.core.ledger.ledgerstorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.IResultsIterator;
-import org.bcia.javachain.common.ledger.blkstorage.BlockStorage;
 import org.bcia.javachain.common.ledger.blkstorage.IBlockStore;
-import org.bcia.javachain.common.ledger.blkstorage.IBlockStoreProvider;
-import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
-import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Conf;
-import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
-import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.FsBlockStoreProvider;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
 import org.bcia.javachain.core.ledger.PvtNsCollFilter;
 import org.bcia.javachain.core.ledger.TxPvtData;
-import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.pvtdatastorage.IStore;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
@@ -48,28 +41,6 @@ import java.util.Map;
 public class Store implements IBlockStore {
     private IStore pvtdataStore = null;
     private IBlockStore blkStorage = null;
-
-    public static Provider newProvider() throws LedgerException{
-        Provider provider = new Provider();
-        String[] attrsToIndex = {
-                BlockStorage.INDEXABLE_ATTR_BLOCK_HASH,
-                BlockStorage.INDEXABLE_ATTR_BLOCK_NUM,
-                BlockStorage.INDEXABLE_ATTR_TX_ID,
-                BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM,
-                BlockStorage.INDEXABLE_ATTR_BLOCK_TX_ID,
-                BlockStorage.INDEXABLE_ATTR_TX_VALIDATION_CODE
-        };
-        IndexConfig indexConfig = new IndexConfig();
-        indexConfig.setAttrsToIndex(attrsToIndex);
-        //文件系统初始化参数
-        IBlockStoreProvider blockStoreProvider = FsBlockStoreProvider.newProvider(new Config(LedgerConfig.getBlockStorePath(), LedgerConfig.getMaxBlockfileSize()), indexConfig);
-        provider.setBlkStoreProvider(blockStoreProvider);
-        //pvtdata初始化
-        org.bcia.javachain.core.ledger.pvtdatastorage.Provider pvtDataStoreProvider =
-                org.bcia.javachain.core.ledger.pvtdatastorage.Provider.newProvider();
-        provider.setPvtDataStoreProvider(pvtDataStoreProvider);
-        return provider;
-    }
 
     @Override
     public void addBlock(Common.Block block) throws LedgerException {

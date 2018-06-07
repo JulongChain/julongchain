@@ -43,11 +43,9 @@ public class DefaultValidator implements IValidator {
     private ITxManager txMgr;
     private InternalValidator val;
 
-    public static DefaultValidator newDefaultValidator(ITxManager txMgr, IDB db){
-        DefaultValidator dVal = new DefaultValidator();
-        dVal.setTxMgr(txMgr);
-        dVal.setVal(Validator.newValidator(db));
-        return dVal;
+    public DefaultValidator(ITxManager txMgr, IDB db) {
+        this.txMgr = txMgr;
+        this.val = new Validator(db);
     }
 
     @Override

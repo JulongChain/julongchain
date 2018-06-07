@@ -38,11 +38,32 @@ public class KvScanner implements IResultsIterator {
     private String nameSpace;
     private Iterator dbItr;
 
-    public static KvScanner newKVScanner(String nameSpace, Iterator dbItr){
-        KvScanner kvScanner = new KvScanner();
-        kvScanner.setNameSpace(nameSpace);
-        kvScanner.setDbItr(dbItr);
-        return kvScanner;
+    public KvScanner(String nameSpace, Iterator dbItr) {
+        this.nameSpace = nameSpace;
+        this.dbItr = dbItr;
+    }
+
+    @Override
+    public QueryResult next() throws LedgerException {
+        if(!dbItr.hasNext()){
+            return null;
+        }
+        Map.Entry<byte[], byte[]> iterator = (Map.Entry<byte[], byte[]>) dbItr.next();
+        byte[] dbKey = iterator.getKey();
+        byte[] dbVal = iterator.getValue();
+        byte[] dbValCpy = Arrays.copyOf(dbVal, dbVal.length);
+        String key = VersionedLevelDB.splitCompositeKeyToKey(dbKey);
+        byte[] value = StatedDB.decodeValueToBytes(dbValCpy);
+        Height version = StatedDB.decodeValueToHeight(dbValCpy);
+        return new QueryResult(
+                new VersionedKV(
+                        new CompositeKey(nameSpace, key),
+                        new VersionedValue(version, value)));
+    }
+
+    @Override
+    public void close() throws LedgerException {
+
     }
 
     public String getNameSpace() {
@@ -59,34 +80,5 @@ public class KvScanner implements IResultsIterator {
 
     public void setDbItr(Iterator dbItr) {
         this.dbItr = dbItr;
-    }
-
-    @Override
-    public QueryResult next() throws LedgerException {
-        if(!dbItr.hasNext()){
-            return null;
-        }
-        Map.Entry<byte[], byte[]> iterator = (Map.Entry<byte[], byte[]>) dbItr.next();
-        byte[] dbKey = iterator.getKey();
-        byte[] dbVal = iterator.getValue();
-        byte[] dbValCpy = Arrays.copyOf(dbVal, dbVal.length);
-        String key = VersionedLevelDB.splitCompositeKeyToKey(dbKey);
-        byte[] value = StatedDB.decodeValueToBytes(dbValCpy);
-        Height version = StatedDB.decodeValueToHeight(dbValCpy);
-        CompositeKey compositeKey = new CompositeKey();
-        compositeKey.setKey(key);
-        compositeKey.setNamespace(nameSpace);
-        VersionedValue versionedValue = new VersionedValue();
-        versionedValue.setVersion(version);
-        versionedValue.setValue(value);
-        VersionedKV kv = new VersionedKV();
-        kv.setCompositeKey(compositeKey);
-        kv.setVersionedValue(versionedValue);
-        return new QueryResult(kv);
-    }
-
-    @Override
-    public void close() throws LedgerException {
-
     }
 }

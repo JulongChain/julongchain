@@ -30,14 +30,19 @@ public class FileLocPointer {
     private int fileSuffixNum;
     private LocPointer locPointer;
 
-    public static FileLocPointer newFileLocationPointer(Integer fileSuffixNum, long beginningOffset, LocPointer relativeLP) {
-        FileLocPointer flp = new FileLocPointer();
-        LocPointer lp = new LocPointer();
-        lp.setOffset(relativeLP.getOffset());
-        lp.setBytesLength(relativeLP.getBytesLength());
-        flp.setFileSuffixNum(fileSuffixNum);
-        flp.setLocPointer(lp);
-        return flp;
+    /**
+     * 默认构造方法
+     */
+    public FileLocPointer(){}
+
+    public FileLocPointer(int fileSuffixNum, LocPointer relativeLP){
+        this.fileSuffixNum = fileSuffixNum;
+        this.locPointer = relativeLP;
+    }
+
+    public FileLocPointer(int fileSuffixNum, long offset, long bytesLength){
+        this.fileSuffixNum = fileSuffixNum;
+        this.locPointer = new LocPointer(offset, bytesLength);
     }
 
     byte[] marshal() {

@@ -27,11 +27,11 @@ import org.bcia.javachain.common.exception.LedgerException;
 public class BlockFileRw {
 
     public static BlockFileWriter newBlockfileWriter(String filePath) throws LedgerException {
-        return BlockFileWriter.newBlockfileWriter(filePath);
+        return new BlockFileWriter(filePath);
     }
 
     public static BlockFileReader newBlockfileReader(String filePath) {
-        return BlockFileReader.newBlockfileReader(filePath);
+        return new BlockFileReader(filePath);
     }
 
 }

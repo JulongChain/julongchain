@@ -35,11 +35,9 @@ public class PubAndHashUpdates {
     private PubUpdateBatch pubUpdates;
     private HashedUpdateBatch hashedUpdates;
 
-    public static PubAndHashUpdates newPubAndHashUpdates(){
-        PubAndHashUpdates p = new PubAndHashUpdates();
-        p.setPubUpdates(PubUpdateBatch.newPubUpdateBatch());
-        p.setHashedUpdates(HashedUpdateBatch.newHashedUpdateBatch());
-        return p;
+    public PubAndHashUpdates() {
+        this.pubUpdates = new PubUpdateBatch();
+        this.hashedUpdates = new HashedUpdateBatch();
     }
 
     public void applyWriteSet(TxRwSet txRwSet, Height txHeight) throws LedgerException  {

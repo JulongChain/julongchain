@@ -26,6 +26,13 @@ public class IndexConfig {
 
     private String[] attrsToIndex;
 
+    public IndexConfig() {
+    }
+
+    public IndexConfig(String[] attrsToIndex) {
+        this.attrsToIndex = attrsToIndex;
+    }
+
     public String[] getAttrsToIndex() {
         return attrsToIndex;
     }

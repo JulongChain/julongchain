@@ -77,7 +77,7 @@ public class UpdateBatch {
     }
 
     public IResultsIterator getRangeScanIterator(String ns, String startKey, String endKey){
-        return NsIteratorI.newNsIterator(ns, startKey, endKey, this);
+        return new NsIterator(ns, startKey, endKey, this);
     }
 
     public NsUpdates getOrCreateNsUpdates(String ns){

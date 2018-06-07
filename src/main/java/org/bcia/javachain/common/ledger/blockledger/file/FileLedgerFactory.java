@@ -44,11 +44,10 @@ public class FileLedgerFactory implements IFactory {
     private Map<String, ReadWriteBase> ledgers;
 
     public FileLedgerFactory(String directory) throws LedgerException {
-        IndexConfig indexConfig = new IndexConfig();
-        indexConfig.setAttrsToIndex(new String[]{BlockStorage.INDEXABLE_ATTR_BLOCK_NUM});
+        IndexConfig indexConfig = new IndexConfig(new String[]{BlockStorage.INDEXABLE_ATTR_BLOCK_NUM});
         LedgerConfig.setRootPath(directory);
         LedgerConfig.setMaxBlockfileSize(-1);
-        this.blkStorageProvider = FsBlockStoreProvider.newProvider(new Config(directory, -1), indexConfig);
+        this.blkStorageProvider = new FsBlockStoreProvider(new Config(directory, -1), indexConfig);
         ledgers = new HashMap<>();
     }
 

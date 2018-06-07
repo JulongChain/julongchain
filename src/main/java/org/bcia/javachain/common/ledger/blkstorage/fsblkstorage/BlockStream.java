@@ -32,53 +32,19 @@ public class BlockStream {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockStream.class);
 
     private String rootDir;
-    private Integer currentFileNum;
-    private Integer endFileNum;
+    private int currentFileNum;
+    private int endFileNum;
     private BlockFileStream currentFileStream;
 
-    public String getRootDir() {
-        return rootDir;
+    public BlockStream() {
     }
 
-    public void setRootDir(String rootDir) {
-        this.rootDir = rootDir;
-    }
-
-    public Integer getCurrentFileNum() {
-        return currentFileNum;
-    }
-
-    public void setCurrentFileNum(Integer currentFileNum) {
-        this.currentFileNum = currentFileNum;
-    }
-
-    public Integer getEndFileNum() {
-        return endFileNum;
-    }
-
-    public void setEndFileNum(Integer endFileNum) {
-        this.endFileNum = endFileNum;
-    }
-
-    public BlockFileStream getCurrentFileStream() {
-        return currentFileStream;
-    }
-
-    public void setCurrentFileStream(BlockFileStream currentFileStream) {
-        this.currentFileStream = currentFileStream;
-    }
-
-    /**
-     * 初始化
-     */
-    public BlockStream newBlockStream(String rootDir, int startFileNum, long startOffset, int endFileNum) throws LedgerException{
-        BlockFileStream startFileStream = new BlockFileStream();
-        startFileStream.newBlockFileStream(rootDir, startFileNum, startOffset);
+    public BlockStream(String rootDir, int startFileNum, long startOffset, int endFileNum) throws LedgerException{
+        BlockFileStream startFileStream = new BlockFileStream(rootDir, startFileNum, startOffset);
         this.rootDir = rootDir;
         this.currentFileNum = startFileNum;
         this.endFileNum = endFileNum;
         this.currentFileStream = startFileStream;
-        return this;
     }
 
     /**
@@ -87,7 +53,7 @@ public class BlockStream {
     public void moveToNextBlockFileStream() throws LedgerException{
         currentFileStream.close();
         currentFileNum++;
-        currentFileStream.newBlockFileStream(rootDir, currentFileNum, 0);
+        currentFileStream = new BlockFileStream(rootDir, currentFileNum, 0);
     }
 
     /**
@@ -123,5 +89,37 @@ public class BlockStream {
         } catch (LedgerException e) {
             throw e;
         }
+    }
+
+    public String getRootDir() {
+        return rootDir;
+    }
+
+    public void setRootDir(String rootDir) {
+        this.rootDir = rootDir;
+    }
+
+    public Integer getCurrentFileNum() {
+        return currentFileNum;
+    }
+
+    public void setCurrentFileNum(Integer currentFileNum) {
+        this.currentFileNum = currentFileNum;
+    }
+
+    public Integer getEndFileNum() {
+        return endFileNum;
+    }
+
+    public void setEndFileNum(Integer endFileNum) {
+        this.endFileNum = endFileNum;
+    }
+
+    public BlockFileStream getCurrentFileStream() {
+        return currentFileStream;
+    }
+
+    public void setCurrentFileStream(BlockFileStream currentFileStream) {
+        this.currentFileStream = currentFileStream;
     }
 }

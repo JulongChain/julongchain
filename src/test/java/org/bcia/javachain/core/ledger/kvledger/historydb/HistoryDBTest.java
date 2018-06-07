@@ -16,6 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.historydb;
 
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.core.ledger.kvledger.history.historydb.HistoryDBHelper;
 import org.bcia.javachain.core.ledger.kvledger.history.historydb.HistoryLevelDB;
 import org.bcia.javachain.core.ledger.kvledger.history.historydb.IHistoryDB;
@@ -48,7 +49,7 @@ public class HistoryDBTest {
 
     @Before
     public void before() throws LedgerException {
-        db = new HistoryLevelDB();
+        db = new HistoryLevelDB(new LevelDBProvider("/tmp/javchain/historydb"), "123");
     }
 
     @Test

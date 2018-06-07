@@ -39,13 +39,14 @@ public class BlocksItr implements IResultsIterator {
     private BlockStream stream;
     private Boolean closeMarker;
 
-    public static BlocksItr newBlockItr(BlockFileManager mgr, long startBlockNum) {
-        BlocksItr itr = new BlocksItr();
-        itr.setMgr(mgr);
-        itr.setMaxBlockNumAvailable(mgr.getCpInfo().getLastBlockNumber());
-        itr.setBlockNumToRetrieve(startBlockNum);
-        itr.setCloseMarker(false);
-        return itr;
+    public BlocksItr() {
+    }
+
+    public BlocksItr(BlockFileManager mgr, long startBlockNum) {
+        this.mgr = mgr;
+        this.maxBlockNumAvailable = mgr.getCpInfo().getLastBlockNumber();
+        this.blockNumToRetrieve = startBlockNum;
+        this.closeMarker = false;
     }
 
     /**
@@ -72,7 +73,7 @@ public class BlocksItr implements IResultsIterator {
      */
     public void initStream() throws LedgerException{
         FileLocPointer lp = mgr.getIndex().getBlockLocByBlockNum(blockNumToRetrieve);
-        stream.newBlockStream(mgr.getRootDir(), lp.getFileSuffixNum(), lp.getLocPointer().getOffset(), -1);
+        stream = new BlockStream(mgr.getRootDir(), lp.getFileSuffixNum(), lp.getLocPointer().getOffset(), -1);
     }
 
     /**

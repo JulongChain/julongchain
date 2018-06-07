@@ -16,11 +16,17 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.ledgerstorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.ledger.blkstorage.BlockStorage;
 import org.bcia.javachain.common.ledger.blkstorage.IBlockStore;
 import org.bcia.javachain.common.ledger.blkstorage.IBlockStoreProvider;
+import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
+import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.Config;
+import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.FsBlockStoreProvider;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.javachain.core.ledger.pvtdatastorage.IStore;
+import org.bcia.javachain.core.ledger.pvtdatastorage.PvtDataProvider;
 
 /**
  * 提供文件系统以及pvtdata操作类
@@ -33,11 +39,28 @@ public class Provider {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(Provider.class);
 
     private IBlockStoreProvider blkStoreProvider;
-    private org.bcia.javachain.core.ledger.pvtdatastorage.Provider pvtDataStoreProvider;
+    private PvtDataProvider pvtDataProvider;
+
+    public Provider() throws LedgerException {
+        String[] attrsToIndex = {
+                BlockStorage.INDEXABLE_ATTR_BLOCK_HASH,
+                BlockStorage.INDEXABLE_ATTR_BLOCK_NUM,
+                BlockStorage.INDEXABLE_ATTR_TX_ID,
+                BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM,
+                BlockStorage.INDEXABLE_ATTR_BLOCK_TX_ID,
+                BlockStorage.INDEXABLE_ATTR_TX_VALIDATION_CODE
+        };
+        IndexConfig indexConfig = new IndexConfig(attrsToIndex);
+        //文件系统初始化参数
+		this.blkStoreProvider =
+				new FsBlockStoreProvider(new Config(LedgerConfig.getBlockStorePath(), LedgerConfig.getMaxBlockfileSize()), indexConfig);
+        //pvtdata初始化
+        this.pvtDataProvider = new PvtDataProvider();
+    }
 
     public Store open(String ledgerID) throws LedgerException {
         IBlockStore blockStore = blkStoreProvider.openBlockStore(ledgerID);
-        IStore pvtDataStore = pvtDataStoreProvider.openStore(ledgerID);
+        IStore pvtDataStore = pvtDataProvider.openStore(ledgerID);
         Store store = new Store();
         store.setBlkStorage(blockStore);
         store.setPvtdataStore(pvtDataStore);
@@ -47,7 +70,7 @@ public class Provider {
 
     public void close() throws LedgerException{
         blkStoreProvider.close();
-        pvtDataStoreProvider.close();
+        pvtDataProvider.close();
     }
 
     public IBlockStoreProvider getBlkStoreProvider() {
@@ -58,11 +81,11 @@ public class Provider {
         this.blkStoreProvider = blkStoreProvider;
     }
 
-    public org.bcia.javachain.core.ledger.pvtdatastorage.Provider getPvtDataStoreProvider() {
-        return pvtDataStoreProvider;
+    public PvtDataProvider getPvtDataProvider() {
+        return pvtDataProvider;
     }
 
-    public void setPvtDataStoreProvider(org.bcia.javachain.core.ledger.pvtdatastorage.Provider pvtDataStoreProvider) {
-        this.pvtDataStoreProvider = pvtDataStoreProvider;
+    public void setPvtDataProvider(PvtDataProvider pvtDataProvider) {
+        this.pvtDataProvider = pvtDataProvider;
     }
 }

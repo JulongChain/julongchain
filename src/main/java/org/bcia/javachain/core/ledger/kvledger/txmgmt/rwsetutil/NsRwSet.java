@@ -34,6 +34,11 @@ public class NsRwSet {
     private KvRwset.KVRWSet kvRwSet = null;
     private List<CollHashedRwSet> collHashedRwSets = new ArrayList<>();
 
+    public NsRwSet(String nameSpace, KvRwset.KVRWSet kvRwSet) {
+        this.nameSpace = nameSpace;
+        this.kvRwSet = kvRwSet;
+    }
+
     public String getNameSpace() {
         return nameSpace;
     }

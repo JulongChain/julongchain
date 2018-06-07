@@ -29,8 +29,8 @@ public class VersionedValue {
     private Height version;
     private byte[] value;
 
-    public VersionedValue(){
-    }
+//    public VersionedValue(){
+//    }
 
     public VersionedValue(Height version, byte[] value){
         this.version = version;

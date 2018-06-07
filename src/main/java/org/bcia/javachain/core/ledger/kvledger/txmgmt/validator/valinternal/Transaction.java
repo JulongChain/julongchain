@@ -35,6 +35,13 @@ public class Transaction {
     private TxRwSet rwSet;
     private TransactionPackage.TxValidationCode validationCode;
 
+    public Transaction(int indexInBlock, String id, TxRwSet rwSet, TransactionPackage.TxValidationCode validationCode) {
+        this.indexInBlock = indexInBlock;
+        this.id = id;
+        this.rwSet = rwSet;
+        this.validationCode = validationCode;
+    }
+
     public boolean containsPvtWrites(){
         for(NsRwSet ns : rwSet.getNsRwSets()){
             for(CollHashedRwSet coll : ns.getCollHashedRwSets()){

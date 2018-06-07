@@ -66,6 +66,7 @@ public class MockTxSimulator implements ITxSimulator {
         return new byte[0][];
     }
 
+    @Override
     public IResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
         return null;
     }
