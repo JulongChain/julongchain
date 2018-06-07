@@ -1,5 +1,5 @@
 /**
- * Copyright Feitian. All Rights Reserved.
+ * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,39 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.csp.pkcs11.ecdsa;
+
+package org.bcia.javachain.csp.pkcs11.rsa;
 
 import org.bcia.javachain.csp.intfs.IKey;
 
-import java.security.interfaces.ECPrivateKey;
-import java.security.interfaces.ECPublicKey;
-
 /**
- * ECDSA KEY
+ * RSA IKey implements
  *
- * @author XuYing
- * @date 4/19/18
+ * @author xuying
+ * @date 2018/05/20
  * @company FEITIAN
  */
-
-public class EcdsaKeyOpts {
-
-    public static class EcdsaPriKey implements IKey{
+public class RsaKeyOpts {
+    public static class RsaPriKey implements IKey {
         private byte[] byski;
-        private EcdsaPubKey ecdsapubkey;
         private byte[] raw;
+        private RsaPubKey rsapubkey;
 
-        public EcdsaPriKey(byte[] byski, byte[] prider, EcdsaPubKey ecdsaPubkey) {
-        	this.byski = new byte[byski.length + 1];
-        	this.byski[0] = 0x02;
-            System.arraycopy(byski, 0, this.byski, 1, byski.length);
-            this.ecdsapubkey = ecdsaPubkey;
-            this.raw = prider;
+        public RsaPriKey(byte[] ski, byte[] prider, RsaPubKey pubkey) {
+            this.byski = new byte[ski.length + 1];
+            this.raw = new byte[prider.length];
+            System.arraycopy(prider, 0, this.raw, 0, prider.length);
+            this.byski[0] = 0x01;
+            System.arraycopy(ski, 0, this.byski, 1, ski.length);
+            this.rsapubkey = pubkey;
         }
 
         @Override
         public byte[] toBytes() {
             // TODO Auto-generated method stub
+            // private key der code
             return raw;
         }
 
@@ -67,26 +65,25 @@ public class EcdsaKeyOpts {
         @Override
         public IKey getPublicKey() {
 
-            return ecdsapubkey;
+            return rsapubkey;
         }
-
     }
 
-    public static class EcdsaPubKey implements IKey{
+    public static class RsaPubKey implements IKey{
         private byte[] byski;
         private byte[] raw;
-
-        public EcdsaPubKey(byte[] byski, byte[] pubder) {
-        	this.byski = new byte[byski.length + 1];
-        	this.byski[0] = 0x02;
-            System.arraycopy(byski, 0, this.byski, 1, byski.length);
-            this.raw = pubder;
+        public RsaPubKey(byte[] ski, byte[] pubder) {
+            this.byski = new byte[ski.length + 1];
+            this.raw = new byte[pubder.length];
+            System.arraycopy(pubder, 0, this.raw, 0, pubder.length);
+            this.byski[0] = 0x01;
+            System.arraycopy(ski, 0, this.byski, 1, ski.length);
         }
 
         @Override
         public byte[] toBytes() {
             // TODO Auto-generated method stub
-            //raw
+            // public key der code
             return raw;
         }
 

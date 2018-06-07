@@ -13,34 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.csp.pkcs11.entity;
+package org.bcia.javachain.csp.pkcs11.sw;
+
+import org.bcia.javachain.csp.factory.IFactoryOpts;
 
 /**
  * Class description
  *
  * @author
- * @date 4/19/18
+ * @date 5/25/18
  * @company FEITIAN
  */
-public class PKCS11KeyData {
+public interface IPKCS11SwFactoryOpts extends IFactoryOpts {
 
-    private byte[] rawpub;
+    // get soft verify flag
+    public boolean getSoftVerify();
 
-    private byte[] rawpri;
+    //
+    public boolean getNoImport();
 
-    public byte[] getRawPub() {
-        return rawpub;
-    }
-
-    public void setRawPub(byte[] raw) {
-        this.rawpub = raw;
-    }
-
-    public byte[] getRawPri() {
-        return rawpri;
-    }
-
-    public void setRawPri(byte[] raw) {
-        this.rawpri = raw;
-    }
+    //
+    public String getPath();
 }
