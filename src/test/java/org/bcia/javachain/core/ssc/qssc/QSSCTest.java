@@ -60,7 +60,7 @@ public class QSSCTest extends BaseJunit4Test {
 
     @Test
     public void testQueryGetGroupInfo() {
-        String groupid="mytestgroupid1";
+        String groupid="myGroup";
         String path="/var/javachain/test1/";
         setupTestLedger(groupid,path);
 

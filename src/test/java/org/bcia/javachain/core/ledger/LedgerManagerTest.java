@@ -73,7 +73,7 @@ public class LedgerManagerTest {
 
     @After
     public void after(){
-//        System.out.println(((KvLedger) l).getLedgerID());
+        System.out.println(((KvLedger) l).getLedgerID());
     }
 
     @Test
@@ -93,71 +93,98 @@ public class LedgerManagerTest {
         l = LedgerManager.createLedger(block);
         long after = System.currentTimeMillis();
         System.out.println("耗时： " + (after - before));
-//        l = LedgerManager.createLedger(block);
-//        List<String> list = LedgerManager.getLedgerIDs();
-//        list.forEach((s) -> {
-//            System.out.println(s);
-//        });
-//        ITxSimulator simulator = l.newTxSimulator("MyGroup");
-//        simulator.
     }
 
     @Test
     public void openLedger() throws Exception{
         LedgerManager.initialize(null);
         String ledgerId1 = "myGroup";
-        String ledgerId2 = "mytestgroupid2";
-        l = LedgerManager.openLedger(ledgerId2);
+        l = LedgerManager.openLedger(ledgerId1);
         Ledger.BlockchainInfo bcInfo = l.getBlockchainInfo();
         Common.Block lastBlock = l.getBlockByNumber(bcInfo.getHeight() - 1);
         System.out.println(bcInfo.getHeight() - 1);
         System.out.println(lastBlock);
-//        System.out.println(l.getTransactionByID("8"));
     }
 
     @Test
     public void commitBlock() throws Exception{
-        //重置路径
-        System.out.println(deleteDir(new File(LedgerConfig.getRootPath())));
-        //初始化账本
-        LedgerManager.initialize(null);
-        GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
-        Common.Block genesisBlock = factory.getGenesisBlock("myGroup");
-        soutBytes(genesisBlock.getHeader().toByteArray());
-        l = LedgerManager.createLedger(genesisBlock);
-        //构建交易模拟集
-        TxSimulationResults results = constructTxSimulationResults();
+    	//重置账本文件
+    	deleteDir(new File(LedgerConfig.getRootPath()));
+    	//初始化账本
+		LedgerManager.initialize(null);
+		LedgerManager.createLedger(new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance()).getGenesisBlock("myGroup"));
+		LedgerManager.createLedger(new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance()).getGenesisBlock("mytestgroupid2"));
+		//获取账本对象
+		l = LedgerManager.openLedger("myGroup");
         //构建区块
-        Common.Block block = constructBlock(l.getBlockByNumber(0), results);
+        Common.Block block = constructBlock(l.getBlockByNumber(0), "myGroup",
+				//构建交易模拟集
+				constructTxSimulationResults("myGroup", "key0", "value0").getPublicReadWriteSet().toByteString(),
+				constructTxSimulationResults("myGroup", "key1", "value1").getPublicReadWriteSet().toByteString(),
+				constructTxSimulationResults("myGroup", "key2", "value2").getPublicReadWriteSet().toByteString(),
+				constructTxSimulationResults("myGroup", "key3", "value3").getPublicReadWriteSet().toByteString(),
+				constructTxSimulationResults("myGroup", "key4", "value4").getPublicReadWriteSet().toByteString(),
+				constructTxSimulationResults("myGroup", "key5", "value5").getPublicReadWriteSet().toByteString()
+				);
+
         //构建私有数据集
-        TxPvtData txPvtData = new TxPvtData(0, results.getPrivateReadWriteSet());
         BlockAndPvtData bap = new BlockAndPvtData();
         bap.setBlock(block);
         bap.setBlockPvtData(new HashMap<Long, TxPvtData>(){{
-            put((long) 0, txPvtData);
+            put((long) 0, new TxPvtData(0, constructTxSimulationResults("myGroup", "key0", "value0").getPrivateReadWriteSet()));
+			put((long) 1, new TxPvtData(1, constructTxSimulationResults("myGroup", "key1", "value1").getPrivateReadWriteSet()));
+			put((long) 2, new TxPvtData(2, constructTxSimulationResults("myGroup", "key2", "value2").getPrivateReadWriteSet()));
+			put((long) 3, new TxPvtData(3, constructTxSimulationResults("myGroup", "key3", "value3").getPrivateReadWriteSet()));
+			put((long) 4, new TxPvtData(4, constructTxSimulationResults("myGroup", "key4", "value4").getPrivateReadWriteSet()));
+			put((long) 5, new TxPvtData(5, constructTxSimulationResults("myGroup", "key5", "value5").getPrivateReadWriteSet()));
         }});
-        //提交区块及私有数据
+        //提交区块及私有数据到myGroup
         l.commitWithPvtData(bap);
+		//获取账本对象
+		l = LedgerManager.openLedger("mytestgroupid2");
+		//构建区块
+		Common.Block block1 = constructBlock(l.getBlockByNumber(0), "mytestgroupid2",
+				//构建交易模拟集
+				constructTxSimulationResults("mytestgroupid2", "key0", "value0").getPublicReadWriteSet().toByteString(),
+				constructTxSimulationResults("mytestgroupid2", "key1", "value1").getPublicReadWriteSet().toByteString(),
+				constructTxSimulationResults("mytestgroupid2", "key2", "value2").getPublicReadWriteSet().toByteString(),
+				constructTxSimulationResults("mytestgroupid2", "key3", "value3").getPublicReadWriteSet().toByteString(),
+				constructTxSimulationResults("mytestgroupid2", "key4", "value4").getPublicReadWriteSet().toByteString(),
+				constructTxSimulationResults("mytestgroupid2", "key5", "value5").getPublicReadWriteSet().toByteString()
+		);
+
+		//构建私有数据集
+		BlockAndPvtData bap1 = new BlockAndPvtData();
+		bap1.setBlock(block1);
+		bap1.setBlockPvtData(new HashMap<Long, TxPvtData>(){{
+			put((long) 0, new TxPvtData(0, constructTxSimulationResults("mytestgroupid2", "key0", "value0").getPrivateReadWriteSet()));
+			put((long) 1, new TxPvtData(1, constructTxSimulationResults("mytestgroupid2", "key1", "value1").getPrivateReadWriteSet()));
+			put((long) 2, new TxPvtData(2, constructTxSimulationResults("mytestgroupid2", "key2", "value2").getPrivateReadWriteSet()));
+			put((long) 3, new TxPvtData(3, constructTxSimulationResults("mytestgroupid2", "key3", "value3").getPrivateReadWriteSet()));
+			put((long) 4, new TxPvtData(4, constructTxSimulationResults("mytestgroupid2", "key4", "value4").getPrivateReadWriteSet()));
+			put((long) 5, new TxPvtData(5, constructTxSimulationResults("mytestgroupid2", "key5", "value5").getPrivateReadWriteSet()));
+		}});
+		//提交区块及私有数据到mytestgroupid2
+		l.commitWithPvtData(bap1);
     }
 
-    private TxSimulationResults constructTxSimulationResults() throws Exception{
+    private TxSimulationResults constructTxSimulationResults(String groupID, String key, String value) throws Exception{
 
         ITxSimulator simulator = l.newTxSimulator("txid");
-        simulator.setState("myGroup", "key", "value pub".getBytes());
-        simulator.setPrivateData("myGroup", "coll", "key", "value pvt".getBytes());
+        simulator.setState(groupID, key, ("pub " + value).getBytes());
+        simulator.setPrivateData(groupID, "coll", key, ("pvt " + value).getBytes());
         return simulator.getTxSimulationResults();
     }
 
-    private Common.Block constructBlock(Common.Block preBlock, TxSimulationResults txSimulationResults) throws Exception{
-        Rwset.TxReadWriteSet rwset = txSimulationResults.getPublicReadWriteSet();
+    private Common.Block constructBlock(Common.Block preBlock, String groupID, ByteString... rwsets) throws Exception{
+		Common.BlockData.Builder builder = Common.BlockData.newBuilder();
+		for (int i = 0; i < rwsets.length; i++) {
+			//pub								//rwset		//txID					//version		//groupID
+			builder.addData(constructEnvelope(	rwsets[i], 	String.valueOf(i), 	1, 	groupID).toByteString());
+		}
+		Common.BlockData data = builder.build();
 
-        Common.BlockData data = Common.BlockData.newBuilder()
-                //pub
-                .addData(constructEnvelope(rwset.toByteString(), "1", 1, "myGroup").toByteString())
-                .addData(constructEnvelope(rwset.toByteString(), "2", 1, "myGroup").toByteString())
-                .build();
-
-        Common.BlockHeader blockHeader = Common.BlockHeader.newBuilder()
+		Common.BlockHeader blockHeader = Common.BlockHeader.newBuilder()
                 .setPreviousHash(preBlock.getHeader().getDataHash())
                 .setNumber(preBlock.getHeader().getNumber() + 1)
                 .setDataHash(ByteString.copyFrom(Util.getHashBytes(data.toByteArray())))

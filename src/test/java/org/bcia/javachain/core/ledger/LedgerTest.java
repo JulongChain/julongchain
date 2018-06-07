@@ -53,8 +53,8 @@ public class LedgerTest {
 
     @Test
     public void getKVFromLevelDB() throws Throwable {
-        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getIndexPath());
-//        LevelDBProvider provider = new LevleDBProvider(LedgerConfig.getStateLevelDBPath());
+//        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getIndexPath());
+        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getStateLevelDBPath());
 //        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getHistoryLevelDBPath());
 //        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getLedgerProviderPath());
 //        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getPvtDataStorePath());
@@ -70,10 +70,10 @@ public class LedgerTest {
             Map.Entry<byte[], byte[]> entry = itr.next();
 //            System.out.println(Height.newHeightFromBytes(entry.getValue()).getTxNum());
 //            System.out.println(Height.newHeightFromBytes(entry.getValue()).getBlockNum());
-//            System.out.println(new String(entry.getKey()));
 //            System.out.println(new String(entry.getValue()));
             soutBytes(entry.getKey());
-            soutBytes(entry.getValue());
+            System.out.println(new String(entry.getKey()));
+//            soutBytes(entry.getValue());
 //            soutBytes(entry.getKey());
 //            soutBytes(entry.getValue());
             System.out.println("_____________________________________");
@@ -96,8 +96,9 @@ public class LedgerTest {
         int i = 0;
         for(byte b : bytes){
             System.out.print(b + " ");
-            if (i++ % 30 == 29) {
+            if (i++ % 10 == 9) {
                 System.out.println();
+                System.out.println(i);
             }
         }
         System.out.println();

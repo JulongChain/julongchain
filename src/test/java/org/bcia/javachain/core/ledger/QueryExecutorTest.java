@@ -41,7 +41,7 @@ import java.util.List;
 public class QueryExecutorTest {
     IQueryExecutor queryExecutor = null;
     INodeLedger ledger = null;
-    final String ns = "myGroup";
+    final String ns = "mytestgroupid2";
     final String coll = "coll";
 
     @Before
@@ -53,51 +53,75 @@ public class QueryExecutorTest {
 
     @Test
     public void testGetState() throws Exception{
-        Assert.assertTrue(Arrays.equals(queryExecutor.getState(ns, "key"), "value pub".getBytes()));
-    }
+		for (int i = 0; i < 6; i++) {
+			System.out.println(new String(queryExecutor.getState(ns, "key" + i)));
+			Assert.assertTrue(Arrays.equals(queryExecutor.getState(ns, "key" + i), ("pub value" + i).getBytes()));
+		}
+	}
 
     @Test
     public void testGetStateMultipleKeys() throws Exception{
-        Assert.assertTrue(Arrays.equals(queryExecutor.getStateMultipleKeys(ns, new ArrayList<String>(){{
-            add("key");
-        }}).get(0), "value pub".getBytes()));
-    }
+		List<byte[]> states = queryExecutor.getStateMultipleKeys(ns, new ArrayList<String>() {{
+			add("key0");
+			add("key1");
+			add("key2");
+			add("key3");
+			add("key4");
+			add("key5");
+		}});
+		states.forEach((b) -> {
+			Assert.assertTrue(new String(b).startsWith("pub value"));
+		});
+	}
 
     @Test
     public void testGetStateRangeScanIterator() throws Exception{
-        IResultsIterator itr = queryExecutor.getStateRangeScanIterator(ns, "ke", null);
-        QueryResult n = itr.next();
-        System.out.println(n);
-        VersionedKV kv = (VersionedKV) n.getObj();
-        Assert.assertEquals(kv.getCompositeKey().getKey(), "key");
-        Assert.assertEquals(kv.getCompositeKey().getNamespace(), "myGroup");
-        Assert.assertSame(kv.getVersionedValue().getVersion().getBlockNum(), (long) 1);
-        Assert.assertSame(kv.getVersionedValue().getVersion().getTxNum(), (long) 0);
-        Assert.assertTrue(Arrays.equals(kv.getVersionedValue().getValue(), "value pub".getBytes()));
-    }
+        IResultsIterator itr = queryExecutor.getStateRangeScanIterator(ns, "key", null);
+		for (int i = 0; i < 6; i++) {
+			QueryResult n = itr.next();
+			VersionedKV kv = (VersionedKV) n.getObj();
+			Assert.assertEquals(kv.getCompositeKey().getKey(), "key" + i);
+			Assert.assertEquals(kv.getCompositeKey().getNamespace(), ns);
+			Assert.assertSame(kv.getVersionedValue().getVersion().getBlockNum(), (long) 1);
+			Assert.assertSame(kv.getVersionedValue().getVersion().getTxNum(), (long) i);
+			Assert.assertTrue(Arrays.equals(kv.getVersionedValue().getValue(), ("pub value" + i).getBytes()));
+		}
+	}
 
     @Test
     public void testGetPrivateData() throws Exception{
-        byte[] privateData = queryExecutor.getPrivateData(ns, "coll", "key");
-        Assert.assertTrue(Arrays.equals(privateData, "value pvt".getBytes()));
-    }
+		for (int i = 0; i < 6; i++) {
+			byte[] privateData = queryExecutor.getPrivateData(ns, "coll", "key" + i);
+			Assert.assertTrue(Arrays.equals(privateData, ("pvt value" + i).getBytes()));
+		}
+	}
 
     @Test
     public void testGetPrivateDataMultipleKeys() throws Exception{
         List<byte[]> privateDatas = queryExecutor.getPrivateDataMultipleKeys(ns, "coll", new ArrayList<String>() {{
-            add("key");
+			add("key0");
+			add("key1");
+			add("key2");
+			add("key3");
+			add("key4");
+			add("key5");
         }});
-        Assert.assertTrue(Arrays.equals(privateDatas.get(0), "value pvt".getBytes()));
-    }
+		for (int i = 0; i < 6; i++) {
+			Assert.assertTrue(Arrays.equals(privateDatas.get(i), ("pvt value" + i).getBytes()));
+		}
+	}
 
     @Test
     public void testGetPrivateDataRangeScanIterator() throws Exception{
         IResultsIterator itr = queryExecutor.getPrivateDataRangeScanIterator(ns, "coll", "key", "l");
-        KvQueryResult.KV kv = (KvQueryResult.KV) itr.next().getObj();
-        Assert.assertEquals(kv.getNamespace(), "myGroup");
-        Assert.assertEquals(kv.getKey(), "key");
-        Assert.assertEquals(kv.getValue(),ByteString.copyFromUtf8("value pvt"));
-    }
+		for (int i = 0; i < 6; i++) {
+			QueryResult qr = itr.next();
+			KvQueryResult.KV kv = ((KvQueryResult.KV) qr.getObj());
+			Assert.assertEquals(kv.getNamespace(), ns);
+			Assert.assertEquals(kv.getKey(), "key" + i);
+			Assert.assertEquals(kv.getValue(),ByteString.copyFromUtf8("pvt value" + i));
+		}
+	}
 
     @After
     public void after() throws Exception{

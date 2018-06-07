@@ -22,6 +22,7 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.javachain.common.ledger.util.IDBProvider;
 import org.bcia.javachain.common.ledger.util.IoUtil;
+import org.bcia.javachain.common.util.BytesHexStrTranslate;
 import org.bcia.javachain.core.ledger.util.Util;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -362,7 +363,7 @@ public class BlockFileManager {
      * 根据区块hash查找区块
      */
     public Common.Block retrieveBlockByHash(byte[] blockHash) throws LedgerException {
-        logger.debug(String.format("retrieveBlockByHash() - blockHash = [%s]", blockHash));
+        logger.debug(String.format("retrieveBlockByHash() - blockHash = [%s]", BytesHexStrTranslate.bytesToHexFun1(blockHash)));
         FileLocPointer loc = null;
         try {
             loc = index.getBlockLocByHash(blockHash);
@@ -536,7 +537,7 @@ public class BlockFileManager {
         BlockFileReader reader = null;
         String filePath = deriveBlockfilePath(rootDir, lp.getFileSuffixNum());
         reader = BlockFileRw.newBlockfileReader(filePath);
-        return reader.read(lp.getLocPointer().getOffset() - 1, lp.getLocPointer().getBytesLength());
+        return reader.read(lp.getLocPointer().getOffset(), lp.getLocPointer().getBytesLength());
     }
 
     /**

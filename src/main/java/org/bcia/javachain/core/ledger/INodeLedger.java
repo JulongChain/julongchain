@@ -69,9 +69,8 @@ public interface INodeLedger extends ILedger {
     IHistoryQueryExecutor newHistoryQueryExecutor() throws LedgerException;
 
     /**
-     * 通过给出的政策修剪区块
+     * 根据BlockNumber获取私有数据和区块
      */
-
     BlockAndPvtData getPvtDataAndBlockByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException;
 
     String getLedgerID();
