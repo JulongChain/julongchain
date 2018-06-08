@@ -41,6 +41,7 @@ public final class HttpSnoopServer {
         final SslContext sslCtx;
         if (SSL) {
             sslCtx = SslContextGMBuilder
+                    /* 默认协商出来的是ECDHE_SM4_SM3算法，所以必须是双向SSL，并且客户端和服务端必须要有加密证书和签名证书 */
                     .forServer(SslContextGMBuilderTest.ENC_CERT, SslContextGMBuilderTest.ENC_KEY, SslContextGMBuilderTest.SIGN_CERT, SslContextGMBuilderTest.SIGN_KEY, null)
                     .clientAuth(ClientAuth.REQUIRE)
                     .build();
