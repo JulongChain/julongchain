@@ -20,6 +20,7 @@ import org.bcia.javachain.protos.node.TransactionPackage;
 
 /**
  * 索引接口
+ * 用于对区块文件进行索引
  *
  * @author sunzongyu
  * @date 2018/4/9
@@ -27,20 +28,44 @@ import org.bcia.javachain.protos.node.TransactionPackage;
  */
 public interface Index {
 
+	/**
+	 * 获取最新索引编号
+	 */
     long getLastBlockIndexed() throws LedgerException;
 
-    void indexBlock(BlockIndexInfo blockIndexInfo) throws LedgerException;
+	/**
+	 * 对区块进行索引
+	 */
+	void indexBlock(BlockIndexInfo blockIndexInfo) throws LedgerException;
 
+	/**
+	 * 根据blockHash获取block位置
+	 */
     FileLocPointer getBlockLocByHash(byte[] blockHash) throws LedgerException;
 
+	/**
+	 * 根据blockNum获取block位置
+	 */
     FileLocPointer getBlockLocByBlockNum(long blockID) throws LedgerException;
 
+	/**
+	 * 根据交易ID获取交易位置
+	 */
     FileLocPointer getTxLoc(String txID) throws LedgerException;
 
+	/**
+	 * 根据区块号和交易序号获取交易位置
+	 */
     FileLocPointer getTXLocByBlockNumTranNum(long blockNum, long tranNum) throws LedgerException;
 
+	/**
+	 * 根据交易ID获取区块
+	 */
     FileLocPointer getBlockLocByTxID(String txID) throws LedgerException;
 
+	/**
+	 * 根据交易ID获取交易验证号
+	 */
     TransactionPackage.TxValidationCode getTxValidationCodeByTxID(String txID) throws LedgerException;
 
 }

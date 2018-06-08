@@ -92,16 +92,13 @@ public class LedgerManager {
         }
         log.info(String.format("Creating ledger [%s] with genesis block", id));
         INodeLedger l = ledgerProvider.create(genesisBlock);
-//        ((KvLedger) l).setLedgerConfig(id);
         openedLedgers.put(id, l);
         log.info(String.format("Created ledger [%s] with genesis block", id));
         return l;
     }
 
-    /** OpenLedger returns a ledger for the given id
-     *
-     * @param id
-     * @return
+    /**
+     * 打开现有账本
      */
     public synchronized static INodeLedger openLedger(String id) throws LedgerException {
         if(!initialized){
@@ -118,9 +115,8 @@ public class LedgerManager {
         return l;
     }
 
-    /** GetLedgerIDs returns the ids of the ledgers created
-     *
-     * @return
+    /**
+     * 获取已经创建的全部账本ID
      */
     public synchronized static List<String> getLedgerIDs() throws LedgerException {
         if(!initialized){
@@ -129,11 +125,11 @@ public class LedgerManager {
         return ledgerProvider.list();
     }
 
-    /** Close closes all the opened ledgers and any resources held for ledger management
-     *
+    /**
+     * 关闭LedgerManager
      */
     public synchronized static void close() throws LedgerException {
-        log.info("Closing ledger mgmt");
+        log.info("Closing ledger manager");
         if(!initialized){
             throw ERR_LEDGER_MANAGER_NOT_INITIALIZED;
         }
@@ -141,13 +137,11 @@ public class LedgerManager {
             l.close();
         }
         ledgerProvider.close();
-        openedLedgers = new HashMap<>();
-        log.info("ledger mgmt closed");
+        openedLedgers.clear();
+        log.info("Ledger manager closed");
     }
 
-    public void initializeTestEnvWithCustomProcessors(Map<Common.HeaderType, IProcessor> customTxProcessors) throws LedgerException {
-        initialize(customTxProcessors);
-    }
-
-
+    public synchronized static void initializeTestEnvWithCustomProcessors(Map<Common.HeaderType, IProcessor> processors) throws LedgerException {
+    	initialize(processors);
+	}
 }

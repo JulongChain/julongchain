@@ -16,9 +16,9 @@
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 
@@ -30,7 +30,7 @@ import java.io.FileInputStream;
  * @company Dingxuan
  */
 public class BlockFileReader {
-
+	private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockFileReader.class);
     private File file;
 
     public BlockFileReader(String filePath){
@@ -42,19 +42,30 @@ public class BlockFileReader {
      */
     public byte[] read(long offset, long length) throws LedgerException {
 		FileInputStream fis;
-		byte[] result = null;
+		byte[] result;
 		try {
 			result = new byte[(int) length];
 			fis = new FileInputStream(file);
 			//移动到指定位置
-			fis.skip(offset);
-			fis.read(result);
+			long skip = fis.skip(offset);
+			if (skip != offset) {
+				logger.debug("Wrong file skip. Expect skip = [{}], actual skip = [{}]", offset, skip);
+			}
+			int read = fis.read(result);
+			if (read != length) {
+				logger.debug("Wrong file read. Except read = [{}], actual read = [{}]", length, read);
+			}
 			fis.close();
 		} catch (Throwable e){
+			logger.error(e.getMessage(), e);
 			throw new LedgerException(e);
 		}
 		return result;
     }
+
+    public void close(){
+    	//do nothing
+	}
 
     public File getFile() {
         return file;
@@ -62,23 +73,5 @@ public class BlockFileReader {
 
     public void setFile(File file) {
         this.file = file;
-    }
-
-    public static void main(String[] args) throws Exception {
-        BlockFileReader reader = new BlockFileReader(LedgerConfig.getBlockStorePath() + "/chains/myGroup/blockfile_000000");
-		byte[] read = reader.read(1098, 7);
-		soutBytes(read);
-	}
-
-    public static void soutBytes(byte[] bytes){
-        int i = 0;
-        for(byte b : bytes){
-            System.out.print(b + ",");
-            if (i++ % 30 == 29) {
-                System.out.println();
-                System.out.println(i);
-            }
-        }
-        System.out.println();
     }
 }

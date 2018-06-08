@@ -28,14 +28,29 @@ import java.util.List;
  */
 public interface IBlockStoreProvider {
 
-    IBlockStore createBlockStore(String ledgerid) throws LedgerException;
+	/**
+	 * 创建区块仓库
+	 */
+    IBlockStore createBlockStore(String ledgerID) throws LedgerException;
 
-    IBlockStore openBlockStore(String ledgerid) throws LedgerException;
+	/**
+	 * 打开区块仓库
+	 */
+    IBlockStore openBlockStore(String ledgerID) throws LedgerException;
 
-    Boolean exists(String ledgerid) throws LedgerException;
+	/**
+	 * 是否存在区块仓库
+	 */
+    Boolean exists(String ledgerID) throws LedgerException;
 
-    List<String> list() throws LedgerException;
+	/**
+	 * 列出全部的区块仓库
+	 */
+	List<String> list() throws LedgerException;
 
+	/**
+	 * 关闭区块仓库
+	 */
     void close() throws LedgerException;
 
 }

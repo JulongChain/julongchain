@@ -38,7 +38,7 @@ public class BlockFileHelper {
     /**
      * 根据区块文件, 组织检查点信息
      */
-    public static CheckpointInfo constructCheckpointInfoFromBlockFiles(String rootDir) throws LedgerException {
+    static CheckpointInfo constructCheckpointInfoFromBlockFiles(String rootDir) throws LedgerException {
         logger.debug("Retrieving checkpoint info from block files");
         int lastFileNum;
         int numBlocksInFile;
@@ -86,7 +86,7 @@ public class BlockFileHelper {
     /**
      * 检索区块文件号最大的文件编号
      */
-    public static Integer retrieveLastFileSuffix(String rootDir) throws LedgerException{
+    private static Integer retrieveLastFileSuffix(String rootDir) throws LedgerException{
         logger.debug("retrieveLastFileSuffix()");
         int biggestFileNum = -1;
         File[] filesInfo;
@@ -118,14 +118,14 @@ public class BlockFileHelper {
     /**
      * 判断文件是否以BLOCK_FILE_PREFIX(blockfile)起始
      */
-    public static Boolean isBlockFileName(String name) {
+    private static Boolean isBlockFileName(String name) {
         return name.startsWith(BLOCK_FILE_PREFIX);
     }
 
     /**
      * 根据区块文件编号, 获取文件
      */
-    public static File getFileInfo(String rootDir, Integer fileNum) throws LedgerException{
+    private static File getFileInfo(String rootDir, Integer fileNum) throws LedgerException{
         String filePath = BlockFileManager.deriveBlockfilePath(rootDir, fileNum);
         File fileInfo = new File(filePath);
         if (!fileInfo.exists()){

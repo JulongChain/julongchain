@@ -16,6 +16,7 @@
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.version;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.BlockFileManager;
 import org.bcia.javachain.core.ledger.util.Util;
 
 /**
@@ -36,8 +37,8 @@ public class Height {
     }
 
     public Height(byte[] b){
-        this.blockNum = Util.bytesToLong(b, 0, 8);
-        this.txNum = Util.bytesToLong(b, 8, 8);
+        this.blockNum = Util.bytesToLong(b, 0, BlockFileManager.PEEK_BYTES_LEN);
+        this.txNum = Util.bytesToLong(b, 8, BlockFileManager.PEEK_BYTES_LEN);
     }
 
     public long getBlockNum() {
@@ -57,8 +58,8 @@ public class Height {
     }
 
     public byte[] toBytes(){
-        byte[] blockNumBytes = Util.longToBytes(blockNum, 8);
-        byte[] txNumBytes = Util.longToBytes(txNum, 8);
+        byte[] blockNumBytes = Util.longToBytes(blockNum, BlockFileManager.PEEK_BYTES_LEN);
+        byte[] txNumBytes = Util.longToBytes(txNum, BlockFileManager.PEEK_BYTES_LEN);
         return ArrayUtils.addAll(blockNumBytes, txNumBytes);
     }
 

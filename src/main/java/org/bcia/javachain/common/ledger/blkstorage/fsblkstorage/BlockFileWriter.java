@@ -17,6 +17,8 @@ package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.util.IoUtil;
+import org.bcia.javachain.common.log.JavaChainLog;
+import org.bcia.javachain.common.log.JavaChainLogFactory;
 
 import java.io.*;
 
@@ -28,6 +30,7 @@ import java.io.*;
  * @company Dingxuan
  */
 public class BlockFileWriter {
+	private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockFileWriter.class);
 
     private String filePath;
     private File file;
@@ -40,6 +43,7 @@ public class BlockFileWriter {
 
     /**
      * 截断文件为指定大小
+	 * 主要用于在文件写入出现异常时恢复文件
      */
     public void truncateFile(int targetSize) throws LedgerException {
         if(file.length() <= targetSize){
@@ -50,7 +54,10 @@ public class BlockFileWriter {
         try {
             fis = new FileInputStream(file);
             byte[] inputBytes = new byte[targetSize];
-            fis.read(inputBytes);
+            int read = fis.read(inputBytes);
+			if (read != targetSize) {
+				logger.debug("Can not read specified size. Expected file size [{}], actual file size [{}]", targetSize, read);
+			}
             fis.close();
             fos = new FileOutputStream(file);
             fos.write(inputBytes);
@@ -60,6 +67,9 @@ public class BlockFileWriter {
         }
     }
 
+	/**
+	 * 将字节b写入文件
+	 */
     public void append(byte[] b, Boolean sync) throws LedgerException {
         FileOutputStream fos;
         try {
@@ -71,7 +81,10 @@ public class BlockFileWriter {
         }
     }
 
-    public void open() throws LedgerException{
+	/**
+	 * 打开文件（文件不存在时创建文件）
+	 */
+	public void open() throws LedgerException{
         if (!IoUtil.createFileIfMissing(filePath)) {
             throw new LedgerException("Can not create file " + filePath);
         }

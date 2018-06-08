@@ -60,8 +60,7 @@ public class BlockStream {
      * 下一区块
      */
     public byte[] nextBlockBytes() throws LedgerException{
-        byte[] blockBytes = nextBlockBytesAndPlacementInfo().getKey();
-        return blockBytes;
+        return nextBlockBytesAndPlacementInfo().getKey();
     }
 
     /**
@@ -72,8 +71,9 @@ public class BlockStream {
         byte[] blockBytes = entry.getKey();
         logger.debug(String.format("Blockbytes [%d] read from file [%d]", blockBytes.length, currentFileNum));
         //当前文件无法读取出block
-        if(blockBytes == null && (currentFileNum < endFileNum || endFileNum < 0)){
-            logger.debug(String.format("Current file [%d] exhausted. Moving to next file"), currentFileNum);
+		boolean expected = ((blockBytes == null || blockBytes.length == 0) && (currentFileNum < endFileNum || endFileNum < 0));
+        if(expected){
+            logger.debug(String.format("Current file [%d] exhausted. Moving to next file", currentFileNum));
             moveToNextBlockFileStream();
             return nextBlockBytesAndPlacementInfo();
         }
