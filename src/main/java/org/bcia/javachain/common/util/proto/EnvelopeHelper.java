@@ -163,7 +163,7 @@ public class EnvelopeHelper {
         configUpdateBuilder.getWriteSetBuilder().putValues(GroupConfigConstant.CONSORTIUM,
                 Configtx.ConfigValue.newBuilder().setVersion(0).setValue(consortium.toByteString()).build());
 
-        if (appConfig.getCapabilities().isResourcesTree()) {
+        if (appConfig.getCapabilities() != null && appConfig.getCapabilities().isResourcesTree()) {
             String defaultModPolicy = null;
             if (profile.getApplication().getResources() != null) {
                 defaultModPolicy = profile.getApplication().getResources().getDefaultModPolicy();
