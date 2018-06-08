@@ -25,5 +25,8 @@ import org.bcia.javachain.common.exception.LedgerException;
  * @company Dingxuan
  */
 public interface InternalValidator {
+    /**
+     * 执行检验并准备更新包
+     */
     PubAndHashUpdates validateAndPrepareBatch(Block block, boolean doMVCCValidation) throws LedgerException;
 }

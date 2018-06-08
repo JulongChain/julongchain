@@ -22,7 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 类描述
+ * 包装交易处理器
+ * 用于处理未背书交易
+ * 于账本初始化时创建并初始化
  *
  * @author sunzongyu
  * @date 2018/04/09
@@ -36,7 +38,9 @@ public class CustomTx {
     }
 
     public static void initialize(Map<Common.HeaderType, IProcessor> processors){
-        CustomTx.processors = processors;
+		if (processors != null) {
+			CustomTx.processors = processors;
+		}
     }
 
     public static IProcessor getProcessor(Common.HeaderType txType){

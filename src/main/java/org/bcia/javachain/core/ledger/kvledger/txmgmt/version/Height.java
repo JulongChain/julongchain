@@ -21,6 +21,7 @@ import org.bcia.javachain.core.ledger.util.Util;
 
 /**
  * 封装版本信息
+ * 版本既区块号+交易号
  *
  * @author wanliangbing
  * @date 2018/3/9

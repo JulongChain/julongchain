@@ -54,13 +54,13 @@ public class HistoryLevelDB implements IHistoryDB {
     private static final byte[] EMPTY_VALUE = {};
     private static final byte[] SAVE_POINT_KEY = {0x00};
 
-    public HistoryLevelDB(IDBProvider dbProvider, String dbName) throws LedgerException {
+    public HistoryLevelDB(IDBProvider dbProvider, String dbName) {
         this.dbName = dbName;
         this.provider = dbProvider;
     }
 
     @Override
-    public IHistoryQueryExecutor newHistoryQueryExecutor(IBlockStore blockStore) throws LedgerException {
+    public IHistoryQueryExecutor newHistoryQueryExecutor(IBlockStore blockStore) {
         return new HistoryLevelDBQueryExecutor(this, blockStore);
     }
 
@@ -74,7 +74,6 @@ public class HistoryLevelDB implements IHistoryDB {
         //获取失效
         TxValidationFlags txsFilter = TxValidationFlags.fromByteString(block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
         //没有失效的部分
-        //对于正常的完整的block不存在setMetadata报错问题
         if(txsFilter.length() == 0){
             txsFilter = new TxValidationFlags(block.getData().getDataCount());
             block = block.toBuilder()

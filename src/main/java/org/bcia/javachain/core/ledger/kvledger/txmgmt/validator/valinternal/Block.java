@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 封装交易信息
+ * 封装区块号和交易信息
  *
  * @author sunzongyu
  * @date 2018/04/19

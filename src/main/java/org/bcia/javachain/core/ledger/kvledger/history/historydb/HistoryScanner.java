@@ -59,10 +59,10 @@ public class HistoryScanner implements IResultsIterator {
     private long tranNum;
 
     public HistoryScanner(byte[] compositePartialKey,
-                                                   String nameSpace,
-                                                   String key,
-                                                   DBIterator dbIter,
-                                                   IBlockStore blockStore){
+                          String nameSpace,
+                          String key,
+                          DBIterator dbIter,
+                          IBlockStore blockStore){
         this.compositePartialKey = compositePartialKey;
         this.nameSpace = nameSpace;
         this.key = key;

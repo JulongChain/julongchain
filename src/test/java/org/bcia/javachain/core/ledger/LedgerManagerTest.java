@@ -117,7 +117,7 @@ public class LedgerManagerTest {
 		//获取账本对象
 		l = LedgerManager.openLedger("myGroup");
         //构建区块
-        Common.Block block = constructBlock(l.getBlockByNumber(0), "myGroup",
+        Common.Block block = constructBlock(l.getBlockByNumber(0), "myGroup", Common.HeaderType.NODE_RESOURCE_UPDATE,
 				//构建交易模拟集
 				constructTxSimulationResults("myGroup", "key0", "value0").getPublicReadWriteSet().toByteString(),
 				constructTxSimulationResults("myGroup", "key1", "value1").getPublicReadWriteSet().toByteString(),
@@ -143,7 +143,7 @@ public class LedgerManagerTest {
 		//获取账本对象
 		l = LedgerManager.openLedger("mytestgroupid2");
 		//构建区块
-		Common.Block block1 = constructBlock(l.getBlockByNumber(0), "mytestgroupid2",
+		Common.Block block1 = constructBlock(l.getBlockByNumber(0), "mytestgroupid2", Common.HeaderType.ENDORSER_TRANSACTION,
 				//构建交易模拟集
 				constructTxSimulationResults("mytestgroupid2", "key0", "value0").getPublicReadWriteSet().toByteString(),
 				constructTxSimulationResults("mytestgroupid2", "key1", "value1").getPublicReadWriteSet().toByteString(),
@@ -176,11 +176,11 @@ public class LedgerManagerTest {
         return simulator.getTxSimulationResults();
     }
 
-    private Common.Block constructBlock(Common.Block preBlock, String groupID, ByteString... rwsets) throws Exception{
+    private Common.Block constructBlock(Common.Block preBlock, String groupID, Common.HeaderType type, ByteString... rwsets) throws Exception{
 		Common.BlockData.Builder builder = Common.BlockData.newBuilder();
 		for (int i = 0; i < rwsets.length; i++) {
-			//pub								//rwset		//txID					//version		//groupID
-			builder.addData(constructEnvelope(	rwsets[i], 	String.valueOf(i), 	1, 	groupID).toByteString());
+			//pub								//rwset		//txID				//type	//version	//groupID
+			builder.addData(constructEnvelope(	rwsets[i], 	String.valueOf(i), 	type, 	1, 	groupID).toByteString());
 		}
 		Common.BlockData data = builder.build();
 
@@ -193,8 +193,9 @@ public class LedgerManagerTest {
         Common.BlockMetadata metadata = Common.BlockMetadata.newBuilder()
                 .addMetadata(ByteString.EMPTY)
                 .addMetadata(ByteString.EMPTY)
-                .addMetadata(ByteString.copyFrom(new byte[]{0, 0, 0, 0, 0, 0}))
+//                .addMetadata(ByteString.copyFrom(new byte[]{0, 0, 0, 0, 0, 0}))
                 .addMetadata(ByteString.EMPTY)
+				.addMetadata(ByteString.EMPTY)
                 .build();
 
         Common.Block block = Common.Block.newBuilder()
@@ -206,9 +207,9 @@ public class LedgerManagerTest {
         return block;
     }
 
-    private Common.Envelope constructEnvelope(ByteString rwset, String txID, int version, String groupID) throws Exception {
+    private Common.Envelope constructEnvelope(ByteString rwset, String txID, Common.HeaderType type, int version, String groupID) throws Exception {
         Common.GroupHeader groupHeader = Common.GroupHeader.newBuilder()
-                .setType(Common.HeaderType.ENDORSER_TRANSACTION_VALUE)
+                .setType(type.getNumber())
                 .setTxId(txID)
                 .setVersion(version)
                 .setGroupId(groupID)

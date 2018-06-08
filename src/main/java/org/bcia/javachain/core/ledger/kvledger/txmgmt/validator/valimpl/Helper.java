@@ -16,6 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valimpl;
 
 import com.google.protobuf.ByteString;
+import org.bcia.javachain.common.exception.InvalidTxException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -33,6 +34,7 @@ import org.bcia.javachain.core.ledger.kvledger.txmgmt.validator.valinternal.Tran
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.core.ledger.util.TxValidationFlags;
 import org.bcia.javachain.core.ledger.util.Util;
+import org.bcia.javachain.core.node.ConfigtxProcessor;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.ledger.rwset.Rwset;
 import org.bcia.javachain.protos.ledger.rwset.kvrwset.KvRwset;
@@ -117,8 +119,9 @@ public class Helper {
                 throw new LedgerException(e);
             }
             if(txsFilter.isInValid(txIndex)){
-                logger.debug(String.format("Gtoup [%s]: Block [%d] Transaction index [%d] TxID [%d]" +
-                        " marked as invalid by committer. Reason code [%s]", gh.getGroupId(),
+                logger.debug(String.format("Group [%s]: Block [%d] Transaction index [%d] TxID [%s]" +
+                        " marked as invalid by committer. Reason code [%s]",
+                        gh.getGroupId(),
                         block.getHeader().getNumber(),
                         txIndex,
                         gh.getTxId(),
@@ -148,9 +151,13 @@ public class Helper {
                 try {
                     rwSetProto = processNonEndorserTx(env, gh.getTxId(), txType, txMgr, !doMVCCValidation);
                 } catch (Exception e) {
-                    //todo catch invalidException
-                    txsFilter.setFlag(txIndex, TransactionPackage.TxValidationCode.INVALID_OTHER_REASON);
-                    continue;
+                	//无效交易跳过
+					if (e.getCause() instanceof InvalidTxException) {
+						txsFilter.setFlag(txIndex, TransactionPackage.TxValidationCode.INVALID_OTHER_REASON);
+						continue;
+					} else {
+						throw e;
+					}
                 }
                 if(rwSetProto != null){
                     txRwSet = RwSetUtil.txRwSetFromProtoMsg(rwSetProto);
@@ -172,7 +179,7 @@ public class Helper {
         IProcessor processor = CustomTx.getProcessor(txType);
         logger.debug("Processor for custom tx processing " + processor);
         if(processor == null){
-            return null;
+        	return null;
         }
         ITxSimulator sim = null;
         TxSimulationResults simRes = null;
@@ -182,6 +189,7 @@ public class Helper {
             simRes = sim.getTxSimulationResults();
         } catch (LedgerException e) {
             sim.done();
+            throw e;
         }
         sim.done();
         return simRes.getPublicReadWriteSet();

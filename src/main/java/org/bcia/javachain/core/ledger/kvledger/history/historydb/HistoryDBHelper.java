@@ -28,6 +28,7 @@ import org.bcia.javachain.core.ledger.util.Util;
  */
 public class HistoryDBHelper {
     private static final byte[] COMPOSITE_KEY_SEP = {0x00};
+    private static final byte[] COMPOSITE_END_KEY = {Byte.MAX_VALUE};
 
     /**
      * 将namespace, key, blockNum, tranNum组装为HistoryDB key
@@ -53,7 +54,7 @@ public class HistoryDBHelper {
         compositeKey = ArrayUtils.addAll(compositeKey, key.getBytes());
         compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
         if(endKey){
-            compositeKey = ArrayUtils.addAll(compositeKey, new byte[]{(byte) 0xff});
+            compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_END_KEY);
         }
         return compositeKey;
     }

@@ -92,6 +92,7 @@ public class Validator implements InternalValidator {
 
     @Override
     public PubAndHashUpdates validateAndPrepareBatch(Block block, boolean doMVCCValidation) throws LedgerException {
+    	//couchDB继承BulkOptimizable
         if(db.isBulkOptimizable()){
             preLoadCommittedVersionOfRSet(block);
         }
