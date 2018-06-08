@@ -87,8 +87,6 @@ public final class SecureChatServer {
 
     public static void main(String[] args) throws Exception {
         SelfSignedCertificate ssc = new SelfSignedCertificate();
-        /*SslContext sslCtx = SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey())
-            .build();*/
         SslContext sslCtx = SslContextGMBuilder.forServer(ENC_CERT, ENC_KEY, SIGN_CERT, SIGN_KEY, null)
                 /* 默认协商出来的是ECDHE_SM4_SM3算法，所以必须是双向SSL，并且客户端和服务端必须要有加密证书和签名证书 */
                 .clientAuth(ClientAuth.REQUIRE)

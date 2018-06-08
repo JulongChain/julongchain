@@ -89,8 +89,6 @@ public final class SecureChatClient {
 
     public static void main(String[] args) throws Exception {
         // Configure SSL.
-        /*final SslContext sslCtx = SslContextBuilder.forClient()
-            .trustManager(InsecureTrustManagerFactory.INSTANCE).build();*/
         SslContext sslCtx = SslContextGMBuilder.forClient()
                 .trustManager(TRUST_CERT)
                 .keyManager(ENC_CERT, ENC_KEY, SIGN_CERT, SIGN_KEY, null)
