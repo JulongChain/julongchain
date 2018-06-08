@@ -66,7 +66,7 @@ public class GossipServiceUtilTest {
 
     String address_addData = "localhost:7052";
     String address_readData = "localhost:7053";
-    String group = "group";
+    String group = "group111";
 
     try {
       GossipServiceUtil.newGossipService(id1, group, address_addData);
@@ -91,5 +91,35 @@ public class GossipServiceUtilTest {
     System.out.println(string);
 
     Assert.assertEquals(string, data);
+  }
+
+  @Test
+  /** 测试上传数据，另一个节点读取数据 */
+  public void getDataFromRemote() {
+
+    String id2 = UUID.randomUUID().toString();
+
+    String address_readData = "192.168.1.50:7053";
+    String group = "group";
+
+    try {
+      GossipServiceUtil.newGossipService(
+          id2, group, address_readData, UUID.randomUUID().toString(), "192.168.1.110:7052");
+    } catch (UnknownHostException e) {
+      e.printStackTrace();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
+
+    try {
+      Thread.sleep(2000);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    String string = (String) GossipServiceUtil.getData(address_readData, 1l);
+    System.out.println(string);
+
+    Assert.assertEquals(string, "hello");
   }
 }
