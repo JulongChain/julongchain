@@ -108,7 +108,7 @@ public class ConsenterServer {
                 DeliverHandler deliverHandler = new DeliverHandler();
                 @Override
                 public void onNext(Common.Envelope envelope) {
-                    log.info("envelop:" + envelope.getPayload().toStringUtf8());
+                  //  log.info("envelop:" + envelope.getPayload().toStringUtf8());
                     deliverHandler.handle(envelope);
                 }
 

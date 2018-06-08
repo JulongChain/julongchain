@@ -53,10 +53,9 @@ public class StartCmd implements IConsenterCmd {
                 new Thread() {
                     @Override
                     public void run() {
-                       ConsenterServer server = new ConsenterServer();
                         try {
-                            server.start();
-                            server.blockUntilShutdown();
+                            consenterServer.start();
+                            consenterServer.blockUntilShutdown();
                         } catch (IOException ex) {
                             log.error(ex.getMessage(), ex);
                         } catch (InterruptedException ex) {

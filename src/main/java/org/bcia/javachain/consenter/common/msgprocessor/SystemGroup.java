@@ -39,7 +39,7 @@ import org.bcia.javachain.protos.common.Configtx;
  * @Date: 2018/5/8
  * @company Dingxuan
  */
-public class SystemGroup  implements IProcessor, IGroupConfigTemplator {
+public class SystemGroup  implements IProcessor {
     private static JavaChainLog log = JavaChainLogFactory.getLog(SystemGroup.class);
     private StandardGroup standardGroup;
     private IGroupConfigTemplator groupConfigTemplator;
@@ -176,10 +176,10 @@ public class SystemGroup  implements IProcessor, IGroupConfigTemplator {
         return support;
     }
 
-    @Override
-    public IGroupConfigBundle newGroupConfig(Common.Envelope envelope) {
-        return null;
-    }
+//    @Override
+//    public IGroupConfigBundle newGroupConfig(Common.Envelope envelope) {
+//        return null;
+//    }
 
     public StandardGroup getStandardGroup() {
         return standardGroup;

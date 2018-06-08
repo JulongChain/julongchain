@@ -101,49 +101,51 @@ public class DefaultTemplator implements IGroupConfigTemplator {
 
         //获取当前的系统通道配置
         Configtx.ConfigTree systemGroupTree = groupConfigBundle.getConfigtxValidator().getConfig().getGroupTree();
-        if (systemGroupTree.getChildsMap().get(GroupConfigConstant.CONSORTIUM).getChildsMap().get(consortium.getName()).getChildsMap().size() > 0 &&
-                configUpdate.getWriteSet().getChildsMap().get(GroupConfigConstant.APPLICATION).getChildsMap().size() == 0) {
+        configUpdate.getWriteSet().getChildsMap().get(GroupConfigConstant.APPLICATION).getChildsMap().size();
+        if (systemGroupTree.getChildsMap().get(GroupConfigConstant.CONSORTIUMS).getChildsMap().get(consortium.getName()).getChildsCount() > 0 &&
+                configUpdate.getWriteSet().getChildsMap().get(GroupConfigConstant.APPLICATION).getChildsCount() == 0) {
             try {
-                throw new ConnectException("Proposed configuration has no application group members, but consortium contains members");
-            } catch (ConnectException e) {
-                e.printStackTrace();
+
+                throw new ConsenterException("Proposed configuration has no application group members, but consortium contains members");
+            } catch (ConsenterException e) {
+               log.error(e.getMessage());
             }
         }
-        if (systemGroupTree.getChildsMap().get(GroupConfigConstant.CONSORTIUM).getChildsMap().get(consortium.getName()).getChildsMap().size() > 0) {
+        if (systemGroupTree.getChildsMap().get(GroupConfigConstant.CONSORTIUMS).getChildsMap().get(consortium.getName()).getChildsCount() > 0) {
             Map<String, Configtx.ConfigTree> configTreeMap = configUpdate.getWriteSet().getChildsMap().get(GroupConfigConstant.APPLICATION).getChildsMap();
             for (String key : configTreeMap.keySet()) {
-                Configtx.ConfigTree consortiumGroup = systemGroupTree.getChildsMap().get(GroupConfigConstant.APPLICATION).getChildsMap().get(consortium.getName()).getChildsMap().get(key);
+                Configtx.ConfigTree consortiumGroup = systemGroupTree.getChildsMap().get(GroupConfigConstant.CONSORTIUMS).getChildsMap().get(consortium.getName()).getChildsMap().get(key);
                 applicationGroup.toBuilder().putChilds(key, consortiumGroup);
             }
         }
-        Configtx.ConfigTree groupTree = Configtx.ConfigTree.getDefaultInstance();
+        Configtx.ConfigTree.Builder  groupTreeBuilder = Configtx.ConfigTree.newBuilder();
         Map<String, Configtx.ConfigValue> configValue = systemGroupTree.getValuesMap();
         for (String key : configValue.keySet()) {
-            groupTree.toBuilder().putValues(key, configValue.get(key));
+            groupTreeBuilder.putValues(key, configValue.get(key));
             if (key == GroupConfigConstant.CONSORTIUM) {
                 continue;
             }
         }
         Map<String, Configtx.ConfigPolicy> configPolicyMap = systemGroupTree.getPoliciesMap();
         for (String key : configPolicyMap.keySet()) {
-            groupTree.toBuilder().putPolicies(key, configPolicyMap.get(key));
+            groupTreeBuilder.putPolicies(key, configPolicyMap.get(key));
         }
 
-        groupTree.toBuilder().putChilds(GroupConfigConstant.CONSENTER, systemGroupTree.getChildsMap().get(GroupConfigConstant.CONSENTER));
-        groupTree.toBuilder().putChilds(GroupConfigConstant.APPLICATION, applicationGroup);
+        groupTreeBuilder.putChilds(GroupConfigConstant.CONSENTER, systemGroupTree.getChildsMap().get(GroupConfigConstant.CONSENTER));
+        groupTreeBuilder.putChilds(GroupConfigConstant.APPLICATION, applicationGroup);
 
         Configtx.ConfigValue confValue = Configtx.ConfigValue.newBuilder()
                 .setModPolicy(GroupConfigConstant.POLICY_ADMINS)
                 .setValue(ByteString.copyFrom(CommonUtils.marshlOrPanic(new ConsortiumValue(consortium.getName()).getValue()))).build();
 
-        groupTree.toBuilder().putValues(GroupConfigConstant.CONSORTIUM, confValue);
+        groupTreeBuilder.putValues(GroupConfigConstant.CONSORTIUM, confValue);
 
         IConsenterConfig consenterConfig = groupConfigBundle.getGroupConfig().getConsenterConfig();
-        if (consenterConfig != null && consenterConfig.getCapabilities().isPredictableGroupTemplate()) {
-            groupTree.toBuilder().setModPolicy(systemGroupTree.getModPolicy());
-            zeroVersions(groupTree);
+        if (consenterConfig != null && consenterConfig.getCapabilities() != null && consenterConfig.getCapabilities().isPredictableGroupTemplate()) {
+            groupTreeBuilder.setModPolicy(systemGroupTree.getModPolicy());
+            zeroVersions(groupTreeBuilder);
         }
-        Configtx.Config config = Configtx.Config.newBuilder().setGroupTree(groupTree).build();
+        Configtx.Config config = Configtx.Config.newBuilder().setGroupTree(groupTreeBuilder).build();
         GroupConfigBundle bundle = null;
         try {
             bundle = new GroupConfigBundle(groupHeader.getGroupId(), config);
@@ -158,19 +160,19 @@ public class DefaultTemplator implements IGroupConfigTemplator {
     }
 
 
-    public void zeroVersions(Configtx.ConfigTree configTree) {
-        configTree.toBuilder().setVersion(0);
-        Map<String, Configtx.ConfigValue> configValueMap = configTree.getValuesMap();
+    public void zeroVersions(Configtx.ConfigTree.Builder configTreeBuild) {
+        configTreeBuild.setVersion(0);
+        Map<String, Configtx.ConfigValue> configValueMap = configTreeBuild.getValuesMap();
         for (String key : configValueMap.keySet()) {
             configValueMap.get(key).toBuilder().setVersion(0);
         }
-        Map<String, Configtx.ConfigPolicy> configPolicyMap = configTree.getPoliciesMap();
+        Map<String, Configtx.ConfigPolicy> configPolicyMap = configTreeBuild.getPoliciesMap();
         for (String key : configPolicyMap.keySet()) {
             configPolicyMap.get(key).toBuilder().setVersion(0);
         }
-        Map<String, Configtx.ConfigTree> configTreeMap = configTree.getChildsMap();
+        Map<String, Configtx.ConfigTree> configTreeMap = configTreeBuild.getChildsMap();
         for (String key: configTreeMap.keySet()) {
-            zeroVersions(configTree);
+            zeroVersions(configTreeBuild);
         }
     }
 

@@ -81,14 +81,14 @@ public class BroadCastHandler implements IHandler {
                     responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setInfo(e.getMessage()).build());
                 }
                 //
-//                Singleton singleton = null;
-//                singleton = Singleton.getInstance();
-//                singleton.order(envelope,configSeq);
-//                try {
-//                    singleton.pushToQueue(envelope);
-//                } catch (ValidateException e) {
-//                    responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatus(Common.Status.SERVICE_UNAVAILABLE).build());
-//                }
+                Singleton singleton = null;
+                singleton = Singleton.getInstance();
+                singleton.order(envelope,configSeq);
+                try {
+                    singleton.pushToQueue(envelope);
+                } catch (ValidateException e) {
+                    responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatus(Common.Status.SERVICE_UNAVAILABLE).build());
+                }
                 responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatus(Common.Status.SUCCESS).build());
             }else { //配置消息
                 ConfigMsg  configMsg = null;
@@ -98,7 +98,7 @@ public class BroadCastHandler implements IHandler {
                 } catch (ConsenterException e) {
                     log.warn(String.format("[channel: %s] Rejecting broadcast of config message because of error: %s", groupHeader.getGroupId(), e.getMessage()));
                 } catch (ValidateException e) {
-                    log.info(e.getMessage());
+                    log.error(e.getMessage());
                 }
                 chainSupport.getChain().configure(configMsg.getConfig(),configMsg.getConfigSeq());
             }
