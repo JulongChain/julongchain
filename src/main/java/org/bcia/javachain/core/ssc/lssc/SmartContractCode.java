@@ -19,7 +19,7 @@ import org.bcia.javachain.protos.node.SmartContractDataPackage;
 import org.bcia.javachain.protos.node.Smartcontract;
 
 /**
- * 类描述
+ * 智能合约代码的描述及数据
  *
  * @author sunianle
  * @date 4/24/18

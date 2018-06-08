@@ -24,6 +24,7 @@ import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.node.ProposalPackage;
 import org.bcia.javachain.protos.node.Query;
+import org.bcia.javachain.protos.node.ResourcesPackage;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
@@ -138,9 +139,8 @@ public class CSSCTest extends BaseJunit4Test {
         ISmartContract.SmartContractResponse res3 = mockStub.mockInvokeWithSignedProposal("3", args3,sp);
         assertThat(res3.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
         try {
-            Query.GroupQueryResponse groups = Query.GroupQueryResponse.parseFrom(res3.getPayload());
-            assertNotNull(groups);
-            assertThat(groups.getGroupsCount(),is(1));
+            ResourcesPackage.ConfigTree tree = ResourcesPackage.ConfigTree.parseFrom(res3.getPayload());
+            assertNotNull(tree);
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
             return;
