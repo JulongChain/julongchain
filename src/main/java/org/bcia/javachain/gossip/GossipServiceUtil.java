@@ -51,7 +51,7 @@ public class GossipServiceUtil {
    * @throws UnknownHostException
    * @throws InterruptedException
    */
-  public static void newGossipService(String id, String group, String address)
+  public static GossipService newGossipService(String id, String group, String address)
       throws UnknownHostException, InterruptedException {
 
     GossipService gossipService =
@@ -72,16 +72,15 @@ public class GossipServiceUtil {
     addressAndGroupMap.put(address, group);
     idAndGossipServiceMap.put(id, gossipService);
 
-    gossipService.start();
+    return gossipService;
   }
 
-  public static void newGossipService(
+  public static GossipService newGossipService(
       String id, String group, String address, String id_leader, String address_leader)
       throws UnknownHostException, InterruptedException {
 
     if (StringUtils.isEmpty(id_leader) || StringUtils.isEmpty(address_leader)) {
-      newGossipService(id, group, address);
-      return;
+      return newGossipService(id, group, address);
     }
 
     List<GossipMember> gossipMembers = new ArrayList<>();
@@ -107,7 +106,7 @@ public class GossipServiceUtil {
     addressAndGroupMap.put(address, group);
     idAndGossipServiceMap.put(id, gossipService);
 
-    gossipService.start();
+    return gossipService;
   }
 
   /**

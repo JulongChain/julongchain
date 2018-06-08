@@ -47,7 +47,8 @@ public class GossipServiceUtilTest {
     String address = "localhost:7052";
     String group = "group";
     try {
-      GossipServiceUtil.newGossipService(id, group, address);
+      GossipService gossipService = GossipServiceUtil.newGossipService(id, group, address);
+      gossipService.start();
     } catch (UnknownHostException e) {
       e.printStackTrace();
     } catch (InterruptedException e) {
@@ -69,8 +70,13 @@ public class GossipServiceUtilTest {
     String group = "group111";
 
     try {
-      GossipServiceUtil.newGossipService(id1, group, address_addData);
-      GossipServiceUtil.newGossipService(id2, group, address_readData);
+      GossipService gossipService_add =
+          GossipServiceUtil.newGossipService(id1, group, address_addData);
+      GossipService gossipService_read =
+          GossipServiceUtil.newGossipService(id2, group, address_readData);
+
+      gossipService_add.start();
+      gossipService_read.start();
     } catch (UnknownHostException e) {
       e.printStackTrace();
     } catch (InterruptedException e) {
@@ -103,8 +109,10 @@ public class GossipServiceUtilTest {
     String group = "group";
 
     try {
-      GossipServiceUtil.newGossipService(
-          id2, group, address_readData, UUID.randomUUID().toString(), "192.168.1.110:7052");
+      GossipService gossipService =
+          GossipServiceUtil.newGossipService(
+              id2, group, address_readData, UUID.randomUUID().toString(), "192.168.1.110:7052");
+      gossipService.start();
     } catch (UnknownHostException e) {
       e.printStackTrace();
     } catch (InterruptedException e) {
