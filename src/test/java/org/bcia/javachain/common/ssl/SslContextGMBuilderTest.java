@@ -18,6 +18,7 @@ package org.bcia.javachain.common.ssl;
 import io.netty.buffer.UnpooledByteBufAllocator;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextGMBuilder;
 import org.junit.Test;
 
 import javax.net.ssl.SSLEngine;
