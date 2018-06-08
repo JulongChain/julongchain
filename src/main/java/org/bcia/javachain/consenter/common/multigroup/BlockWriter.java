@@ -23,6 +23,7 @@ import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.consenter.consensus.IConsenterSupport;
 import org.bcia.javachain.consenter.util.BlockHelper;
 import org.bcia.javachain.consenter.util.CommonUtils;
 import org.bcia.javachain.consenter.util.Utils;
@@ -36,8 +37,8 @@ import org.bcia.javachain.protos.common.Configtx;
  */
 public class BlockWriter {
     private static JavaChainLog log = JavaChainLogFactory.getLog(BlockWriter.class);
-    private IBlockWriterSupport support;
-
+   // private IBlockWriterSupport support;
+    private ChainSupport support;
     private Registrar registrar;
 
     private long lastConfigBlockNum;
@@ -46,10 +47,11 @@ public class BlockWriter {
 
     private Common.Block lastBlock;
 
-    public BlockWriter(IBlockWriterSupport support, Registrar registrar, Common.Block lastBlock) {
+    public BlockWriter(ChainSupport support, Registrar registrar, Common.Block lastBlock) {
         this.support = support;
         this.registrar = registrar;
         this.lastBlock = lastBlock;
+        this.lastConfigSeq=support.getSequence();
     }
 
 
@@ -86,8 +88,11 @@ public class BlockWriter {
             case Common.HeaderType.CONFIG_VALUE:
                 Configtx.ConfigEnvelope configEnvelope = Utils.unmarshalConfigEnvelope(payload.getData().toByteArray());
                 support.validate(configEnvelope);
+
                 IGroupConfigBundle iGroupConfigBundle = support.createBundle(groupHeader.getGroupId(), configEnvelope.getConfig());
-                support.update(iGroupConfigBundle);
+               //TODO update未实现
+                support.getLedgerResources().getMutableResources().update();
+                // support.update(iGroupConfigBundle);
                 break;
             default:
                 log.error(String.format("Told to write a config block with unknown header type: %v", groupHeader.getType()));
@@ -111,7 +116,8 @@ public class BlockWriter {
                 addBlockSignature(lastBlock);
                 addLastConfigSignature(lastBlock);
                 try {
-                    support.append(lastBlock);
+                    support.getLedgerResources().getReadWriteBase().append(lastBlock);
+                   // support.append(lastBlock);
                 } catch (LedgerException e) {
                     e.printStackTrace();
                 }
@@ -127,13 +133,13 @@ public class BlockWriter {
 
         try {
 
-            Common.SignatureHeader signatureHeader = Common.SignatureHeader.parseFrom(Utils.marshalOrPanic(CommonUtils.newSignatureHeaderOrPanic(support)));
+            Common.SignatureHeader signatureHeader = Common.SignatureHeader.parseFrom(Utils.marshalOrPanic(CommonUtils.newSignatureHeaderOrPanic(support.getLocalSigner())));
 
             Common.MetadataSignature blockSignature = Common.MetadataSignature.newBuilder().setSignatureHeader(signatureHeader.toByteString()).build();
             byte[] blockSignatureValue = new byte[0];
             //TODO toByteArray转换为Bytes
             blockSignature.toBuilder().setSignature(ByteString.copyFrom(
-                    CommonUtils.signOrPanic(support, Utils.concatenateBytes(blockSignatureValue, blockSignature.getSignatureHeader().toByteArray(),
+                    CommonUtils.signOrPanic(support.getLocalSigner(), Utils.concatenateBytes(blockSignatureValue, blockSignature.getSignatureHeader().toByteArray(),
                             block.getHeader().toByteArray()))));
 
             Common.MetadataSignature metadataSignature = Common.MetadataSignature.parseFrom(blockSignature.toByteArray());
@@ -149,10 +155,10 @@ public class BlockWriter {
     }
 
     public void addLastConfigSignature(Common.Block block) {
-        long configSeq = support.sequence();
+        long configSeq = support.getSequence();
         if (configSeq > lastConfigSeq) {
             log.debug(String.format("[channel: %s] Detected lastConfigSeq transitioning from %d to %d, setting lastConfigBlockNum from %d to %d",
-                    support.groupId(), lastConfigSeq, configSeq, lastConfigBlockNum, block.getHeader().getNumber()));
+                    support.getGroupId(), lastConfigSeq, configSeq, lastConfigBlockNum, block.getHeader().getNumber()));
             lastConfigBlockNum = block.getHeader().getNumber();
             lastConfigSeq = configSeq;
         }
@@ -160,7 +166,7 @@ public class BlockWriter {
             Common.LastConfig lastConfig = Common.LastConfig.newBuilder().setIndex(lastConfigBlockNum).build();
             byte[] lastConfigValue = Utils.marshalOrPanic(lastConfig);
 
-            Common.MetadataSignature lastConfigSignature = Common.MetadataSignature.parseFrom(Utils.marshalOrPanic(CommonUtils.newSignatureHeaderOrPanic(support)));
+            Common.MetadataSignature lastConfigSignature = Common.MetadataSignature.parseFrom(Utils.marshalOrPanic(CommonUtils.newSignatureHeaderOrPanic(support.getLocalSigner())));
             Common.MetadataSignature metadataSignature = Common.MetadataSignature.parseFrom(lastConfigSignature.toByteArray());
             Common.Metadata metadata = Common.Metadata.newBuilder()
                     .addSignatures(metadataSignature)
@@ -180,11 +186,11 @@ public class BlockWriter {
         BlockWriter.log = log;
     }
 
-    public IBlockWriterSupport getSupport() {
+    public ChainSupport getSupport() {
         return support;
     }
 
-    public void setSupport(IBlockWriterSupport support) {
+    public void setSupport(ChainSupport support) {
         this.support = support;
     }
 

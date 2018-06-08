@@ -28,5 +28,5 @@ import org.bcia.javachain.protos.common.Common;
  */
 public interface IRule {
     // Apply applies the rule to the given Envelope, either successfully or returns error
-    void apply(Common.Envelope message) throws ConsenterException;
+    void apply(Common.Envelope message) throws ConsenterException, InvalidProtocolBufferException;
 }

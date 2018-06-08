@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.common.msgprocessor;
+package org.bcia.javachain.core.deliverservice.blocksprovider;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
-import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.common.Configtx;
-
+import org.bcia.javachain.gossip.NetworkMember;
+import org.bcia.javachain.protos.gossip.Message;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/5/14
+ * @Date: 2018/5/31
  * @company Dingxuan
  */
-public interface IChainCreator {
-    IGroupConfigBundle newGroupConfig(Common.Envelope envConfigUpdate) throws InvalidProtocolBufferException;
+public interface IGossipServcieAdapter {
+    NetworkMember[] nodeOfGroup(byte[] groupId);
 
-    IGroupConfigBundle createBundle(String groupId, Configtx.Config  config);
+    void addPayload(String groupId, Message.Payload gossipPayload);
 
-   int groupCount();
+    void gossip(Message.GossipMessage msg);
 }

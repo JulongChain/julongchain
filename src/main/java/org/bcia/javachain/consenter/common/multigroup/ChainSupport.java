@@ -16,10 +16,14 @@
 package org.bcia.javachain.consenter.common.multigroup;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.ConsenterException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.exception.PolicyException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.groupconfig.GroupConfigBundle;
+import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
+import org.bcia.javachain.common.ledger.blockledger.IReader;
+import org.bcia.javachain.common.ledger.blockledger.IWriter;
 import org.bcia.javachain.common.ledger.blockledger.Util;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.consenter.common.blockcutter.BlockCutter;
@@ -37,13 +41,13 @@ import java.util.Map;
  * @Date: 2018/5/8
  * @company Dingxuan
  */
-public class ChainSupport implements IStandardGroupSupport {
-    LedgerResources ledgerResources;
-    IProcessor processor;
-    BlockWriter blockWriter;
-    IChain chain;
-    IReceiver cutter;
-    ILocalSigner localSigner;
+public class ChainSupport implements IStandardGroupSupport,IConsenterSupport {
+     LedgerResources ledgerResources;
+     IProcessor processor;
+     BlockWriter blockWriter;
+     IChain chain;
+     IReceiver cutter;
+     ILocalSigner localSigner;
 
 
     public ChainSupport() {
@@ -53,7 +57,7 @@ public class ChainSupport implements IStandardGroupSupport {
         Common.Block lastBlock = null;
         Common.Metadata metadata = null;
         try {
-            lastBlock = Util.getBlock(ledgerResources.reader, ledgerResources.reader.height() - 1);
+            lastBlock = Util.getBlock(ledgerResources.getReadWriteBase(), ledgerResources.getReadWriteBase().height() - 1);
             metadata = BlockUtils.getMetadataFromBlock(lastBlock, Common.BlockMetadataIndex.CONSENTER_VALUE);
 
         } catch (LedgerException e) {
@@ -61,12 +65,17 @@ public class ChainSupport implements IStandardGroupSupport {
         }
         this.ledgerResources = ledgerResources;
         this.localSigner = signer;
-        this.cutter = new BlockCutter(ledgerResources.mutableResources.getGroupConfig().getConsenterConfig());
-        this.processor = new StandardGroup((IStandardGroupSupport) this, new StandardGroup().createStandardGroupFilters(this.ledgerResources.getMutableResources()));
-        this.blockWriter = new BlockWriter(blockWriter.getSupport(), registrar, lastBlock);
-        String consensusType = ledgerResources.mutableResources.getGroupConfig().getConsenterConfig().getConsensusType();
+        this.cutter = new BlockCutter(ledgerResources.getMutableResources().getGroupConfig().getConsenterConfig());
+        this.processor = new StandardGroup(this, new StandardGroup().createStandardGroupFilters(this.ledgerResources.getMutableResources()));
+        this.blockWriter = new BlockWriter(this, registrar, lastBlock);
+        // this.blockWriter = new BlockWriter(blockWriter.getSupport(), registrar, lastBlock);
+        String consensusType = ledgerResources.getMutableResources().getGroupConfig().getConsenterConfig().getConsensusType();
         IConsensue consenter = consenters.get(consensusType);
-        chain = consenter.handleChain((IConsenterSupport) this, metadata);
+        chain = consenter.handleChain(this, metadata);
+    }
+
+    public GroupConfigBundle createBundle(String groupId, Configtx.Config config) throws ValidateException, PolicyException, InvalidProtocolBufferException {
+        return Registrar.newBundle(groupId, config);
     }
 
     public void start() {
@@ -99,12 +108,12 @@ public class ChainSupport implements IStandardGroupSupport {
 
     @Override
     public void validate(Configtx.ConfigEnvelope configEnv) throws InvalidProtocolBufferException, ValidateException {
-        ledgerResources.mutableResources.getConfigtxValidator().validate(configEnv);
+        ledgerResources.getMutableResources().getConfigtxValidator().validate(configEnv);
     }
 
     @Override
     public Configtx.ConfigEnvelope proposeConfigUpdate(Common.Envelope configtx) throws InvalidProtocolBufferException, ValidateException {
-        Configtx.ConfigEnvelope env = ledgerResources.mutableResources.getConfigtxValidator().proposeConfigUpdate(configtx);
+        Configtx.ConfigEnvelope env = ledgerResources.getMutableResources().getConfigtxValidator().proposeConfigUpdate(configtx);
         GroupConfigBundle bundle = null;
         try {
             bundle = new GroupConfigBundle(this.getGroupId(), env.getConfig());
@@ -117,21 +126,36 @@ public class ChainSupport implements IStandardGroupSupport {
 
     @Override
     public String getGroupId() {
-        return ledgerResources.mutableResources.getConfigtxValidator().getGroupId();
+        return ledgerResources.getMutableResources().getConfigtxValidator().getGroupId();
     }
 
     @Override
     public long getSequence() {
-        return ledgerResources.mutableResources.getConfigtxValidator().getSequence();
+        return ledgerResources.getMutableResources().getConfigtxValidator().getSequence();
     }
 
     @Override
     public Configtx.Config getConfig() {
-        return ledgerResources.mutableResources.getConfigtxValidator().getConfig();
+        return ledgerResources.getMutableResources().getConfigtxValidator().getConfig();
     }
 
     @Override
     public ILocalSigner signer() {
         return localSigner;
+    }
+
+    @Override
+    public Common.Block createNextBlock(Common.Envelope[] messages) {
+        return null;
+    }
+
+    @Override
+    public void writeBlock(Common.Block block, byte[] encodedMetadataValue) {
+
+    }
+
+    @Override
+    public void writeConfigBlock(Common.Block block, byte[] encodedMetadataValue) throws InvalidProtocolBufferException, LedgerException, ValidateException, PolicyException {
+
     }
 }

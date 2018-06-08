@@ -17,8 +17,7 @@ package org.bcia.javachain.common.deliver;
 
 
 
-import org.bcia.javachain.common.util.SpringContext;
-import org.bcia.javachain.consenter.common.broadcast.Message;
+import com.google.protobuf.Message;
 import org.bcia.javachain.protos.common.Common;
 
 

@@ -59,7 +59,7 @@ public class BroadCastClient {
         Common.Envelope.Builder envelope= Common.Envelope.newBuilder();
         envelopeStreamObserver.onNext(envelope.build());
         
-        Thread.sleep(1000);
+        Thread.sleep(9000);
 
     }
 

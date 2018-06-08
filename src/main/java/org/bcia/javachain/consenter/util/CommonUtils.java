@@ -73,13 +73,9 @@ public class CommonUtils {
         return envelope;
     }
 
-    public static Common.Payload unmarshalPayload(byte[] encoded) {
+    public static Common.Payload unmarshalPayload(byte[] encoded) throws InvalidProtocolBufferException {
         Common.Payload payload = null;
-        try {
-            payload = Common.Payload.parseFrom(encoded);
-        } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
-        }
+        payload = Common.Payload.parseFrom(encoded);
         return payload;
     }
 
@@ -93,11 +89,11 @@ public class CommonUtils {
         return groupHeader;
     }
 
-    public static Common.GroupHeader unmarshalEnvelopeOfType(Common.Envelope envelope, Common.HeaderType headerType, Message message) {
+    public static Common.GroupHeader unmarshalEnvelopeOfType(Common.Envelope envelope, Common.HeaderType headerType, Message message) throws InvalidProtocolBufferException {
         return unmarshalEnvelopeOfTypes(envelope, new Common.HeaderType[]{headerType}, message);
     }
 
-    public static Common.GroupHeader unmarshalEnvelopeOfTypes(Common.Envelope envelope, Common.HeaderType[] expectedHeaderTypes, Message message) {
+    public static Common.GroupHeader unmarshalEnvelopeOfTypes(Common.Envelope envelope, Common.HeaderType[] expectedHeaderTypes, Message message) throws InvalidProtocolBufferException {
         Common.Payload payload = unmarshalPayload(envelope.getPayload().toByteArray());
         if (payload.getHeader() == null) {
             log.error("Envelope must have a Header");
@@ -132,7 +128,7 @@ public class CommonUtils {
         return groupHeader;
     }
 
-    public static Common.GroupHeader groupHeader(Common.Envelope env){
+    public static Common.GroupHeader groupHeader(Common.Envelope env) throws InvalidProtocolBufferException {
         Common.Payload  envPayload=  unmarshalPayload(env.getPayload().toByteArray());
         if(envPayload.getHeader()==null){
             log.error("no header was set");
@@ -151,7 +147,7 @@ public class CommonUtils {
                 .setNanos((int) ((millis % 1000) * 1000000)).build();
     }
 
-    public static String groupId(Common.Envelope env){
+    public static String groupId(Common.Envelope env) throws InvalidProtocolBufferException {
         Common.GroupHeader chdr=groupHeader(env);
         return chdr.getGroupId();
     }

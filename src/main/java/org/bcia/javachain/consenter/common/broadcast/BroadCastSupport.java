@@ -13,23 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.common.msgprocessor;
+package org.bcia.javachain.consenter.common.broadcast;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
+import org.bcia.javachain.consenter.common.multigroup.Registrar;
 import org.bcia.javachain.protos.common.Common;
-import org.bcia.javachain.protos.common.Configtx;
 
+import java.util.Map;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/5/14
+ * @Date: 2018/6/6
  * @company Dingxuan
  */
-public interface IChainCreator {
-    IGroupConfigBundle newGroupConfig(Common.Envelope envConfigUpdate) throws InvalidProtocolBufferException;
+public class BroadCastSupport implements IGroupSupportRegistrar  {
 
-    IGroupConfigBundle createBundle(String groupId, Configtx.Config  config);
+    private  Registrar registrar;
 
-   int groupCount();
+    public BroadCastSupport(Registrar registrar) {
+        this.registrar = registrar;
+    }
+
+    @Override
+    public Map<String, Object> broadcastGroupSupport(Common.Envelope msg) throws InvalidProtocolBufferException {
+        return new Registrar().broadcastGroupSupport(msg);
+    }
 }

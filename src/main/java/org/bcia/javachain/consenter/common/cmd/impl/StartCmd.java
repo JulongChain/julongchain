@@ -19,12 +19,17 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.localmsp.impl.LocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.consenter.common.cmd.IConsenterCmd;
 import org.bcia.javachain.consenter.common.server.ConsenterServer;
+import org.bcia.javachain.consenter.common.server.PreStart;
 
 import java.io.IOException;
+
+import static org.bcia.javachain.consenter.common.localconfig.ConsenterConfigFactory.loadConsenterConfig;
 
 /**
  * @author zhangmingyang

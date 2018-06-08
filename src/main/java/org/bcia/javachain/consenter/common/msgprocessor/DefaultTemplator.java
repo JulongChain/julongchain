@@ -50,7 +50,7 @@ public class DefaultTemplator implements IGroupConfigTemplator {
     }
 
     @Override
-    public IGroupConfigBundle newGroupConfig(Common.Envelope envelope) {
+    public IGroupConfigBundle newGroupConfig(Common.Envelope envelope) throws InvalidProtocolBufferException {
         Common.Payload configUpdatePayload = CommonUtils.unmarshalPayload(envelope.getPayload().toByteArray());
         Configtx.ConfigUpdateEnvelope configUpdateEnv = ConfigTxUtil.unmarshalConfigUpdateEnvelope(configUpdatePayload.getData().toByteArray());
         if (configUpdatePayload.getHeader() == null) {
@@ -63,7 +63,7 @@ public class DefaultTemplator implements IGroupConfigTemplator {
         }
         Common.GroupHeader groupHeader = CommonUtils.unmarshalGroupHeader(configUpdatePayload.getHeader().getGroupHeader().toByteArray());
         Configtx.ConfigUpdate configUpdate = ConfigTxUtil.unmarshalConfigUpdate(configUpdateEnv.getConfigUpdate().toByteArray());
-        if (configUpdate.getGroupId() != groupHeader.getGroupId()) {
+        if (configUpdate.getGroupId()!= groupHeader.getGroupId()) {
             log.error(String.format("Failing initial group config creation: mismatched group IDs: '%s' != '%s'", configUpdate.getGroupId(), groupHeader.getGroupId()));
         }
         if (configUpdate.getWriteSet() == null) {

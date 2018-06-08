@@ -14,18 +14,24 @@
  * limitations under the License.
  */
 package org.bcia.javachain.consenter.common.multigroup;
+
 import org.bcia.javachain.common.ledger.blockledger.IReader;
 import org.bcia.javachain.common.ledger.blockledger.IWriter;
+import org.bcia.javachain.common.ledger.blockledger.ReadWriteBase;
 
 /**
  * @author zhangmingyang
  * @Date: 2018/5/17
  * @company Dingxuan
  */
-public class LedgerResources {
-    IMutableResources mutableResources;
-    IReader reader;
-    IWriter writer;
+public class LedgerResources{
+    private IMutableResources mutableResources;
+    private ReadWriteBase readWriteBase;
+
+    public LedgerResources(IMutableResources mutableResources, ReadWriteBase readWriteBase) {
+        this.mutableResources = mutableResources;
+        this.readWriteBase = readWriteBase;
+    }
 
     public IMutableResources getMutableResources() {
         return mutableResources;
@@ -35,19 +41,11 @@ public class LedgerResources {
         this.mutableResources = mutableResources;
     }
 
-    public IReader getReader() {
-        return reader;
+    public ReadWriteBase getReadWriteBase() {
+        return readWriteBase;
     }
 
-    public void setReader(IReader reader) {
-        this.reader = reader;
-    }
-
-    public IWriter getWriter() {
-        return writer;
-    }
-
-    public void setWriter(IWriter writer) {
-        this.writer = writer;
+    public void setReadWriteBase(ReadWriteBase readWriteBase) {
+        this.readWriteBase = readWriteBase;
     }
 }

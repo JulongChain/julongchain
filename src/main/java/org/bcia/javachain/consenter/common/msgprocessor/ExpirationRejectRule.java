@@ -23,13 +23,12 @@ import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.javachain.common.groupconfig.config.IConsenterConfig;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.util.Expiration;
 import org.bcia.javachain.common.util.proto.SignedData;
 import org.bcia.javachain.protos.common.Common;
 import org.bouncycastle.asn1.x509.Time;
 import java.util.Date;
 import java.util.List;
-
-import static org.bcia.javachain.common.util.Expiration.expiresAt;
 
 /**
  * @author zhangmingyang
@@ -62,7 +61,7 @@ public class ExpirationRejectRule implements IRule {
         } catch (InvalidProtocolBufferException e) {
         }
 
-        Time expireTime = expiresAt(signedData.get(0).getIdentity());
+        Time expireTime = new Expiration().expiresAt(signedData.get(0).getIdentity());
         Date nowDate = new Date();
         if (expireTime != null) {
             if (nowDate.after(expireTime.getDate())) {

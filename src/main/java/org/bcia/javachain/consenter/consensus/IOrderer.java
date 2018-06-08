@@ -24,6 +24,7 @@ import java.util.Map;
  * @Date: 2018/3/7
  * @company Dingxuan
  */
+@Deprecated
 public interface IOrderer {
     public String consensusType();
 

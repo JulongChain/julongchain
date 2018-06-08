@@ -29,6 +29,8 @@ import java.security.SecureRandom;
  * @company Dingxuan
  */
 public class LocalSigner implements ILocalSigner {
+    public LocalSigner() {
+    }
     @Override
     public Common.SignatureHeader newSignatureHeader() {
         try {

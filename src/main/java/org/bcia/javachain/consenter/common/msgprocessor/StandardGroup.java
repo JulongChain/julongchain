@@ -88,7 +88,7 @@ public class StandardGroup implements IProcessor {
     }
 
     @Override
-    public Object processConfigUpdateMsg(Common.Envelope env) throws InvalidProtocolBufferException, ValidateException, PolicyException {
+    public ConfigMsg processConfigUpdateMsg(Common.Envelope env) throws InvalidProtocolBufferException, ValidateException{
         long seq = standardGroupSupport.getSequence();
         //TODO 通过apply过滤
         Configtx.ConfigEnvelope configEnvelope = standardGroupSupport.proposeConfigUpdate(env);
@@ -99,7 +99,7 @@ public class StandardGroup implements IProcessor {
     }
 
     @Override
-    public Object processConfigMsg(Common.Envelope env) throws InvalidProtocolBufferException, ValidateException, PolicyException {
+    public ConfigMsg processConfigMsg(Common.Envelope env) throws InvalidProtocolBufferException, ValidateException, PolicyException {
         Configtx.ConfigEnvelope configEnvelope = null;
         CommonUtils.unmarshalEnvelopeOfType(env, Common.HeaderType.CONFIG, configEnvelope);
         //根据Envelope中groupHeader中的type,将data转换为ConfigEnvelop
