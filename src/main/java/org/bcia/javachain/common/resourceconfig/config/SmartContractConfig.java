@@ -18,7 +18,7 @@ package org.bcia.javachain.common.resourceconfig.config;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.ValidateException;
 import org.bcia.javachain.common.resourceconfig.ISmartContractDefinition;
-import org.bcia.javachain.common.resourceconfig.ResourceConfigConstant;
+import org.bcia.javachain.common.resourceconfig.ResourcesConfigConstant;
 import org.bcia.javachain.common.resourceconfig.Validation;
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.node.SmartContractDataPackage;
@@ -55,14 +55,14 @@ public class SmartContractConfig implements ISmartContractDefinition {
         this.scName = scName;
 
         if (tree != null && tree.getValuesMap() != null) {
-            Configtx.ConfigValue identifierValue = tree.getValuesMap().get(ResourceConfigConstant.SMART_CONTRACT_IDENTIFIER);
+            Configtx.ConfigValue identifierValue = tree.getValuesMap().get(ResourcesConfigConstant.SMART_CONTRACT_IDENTIFIER);
             if (identifierValue != null) {
                 smartContractIdentifier = ResourcesPackage.SmartContractIdentifier.parseFrom(identifierValue.getValue());
                 id = smartContractIdentifier.getHash().toByteArray();
                 scVersion = smartContractIdentifier.getVersion();
             }
 
-            Configtx.ConfigValue validationValue = tree.getValuesMap().get(ResourceConfigConstant
+            Configtx.ConfigValue validationValue = tree.getValuesMap().get(ResourcesConfigConstant
                     .SMART_CONTRACT_VALIDATION);
             if (validationValue != null) {
                 smartContractValidation = ResourcesPackage.SmartContractValidation.parseFrom(validationValue.getValue());
@@ -73,7 +73,7 @@ public class SmartContractConfig implements ISmartContractDefinition {
             }
 
             Configtx.ConfigValue endorsementValue = tree.getValuesMap().get
-                    (ResourceConfigConstant.SMART_CONTRACT_ENDORSEMENT);
+                    (ResourcesConfigConstant.SMART_CONTRACT_ENDORSEMENT);
             if (endorsementValue != null) {
                 smartContractEndorsement = ResourcesPackage.SmartContractEndorsement.parseFrom(endorsementValue.getValue());
                 this.essc = smartContractEndorsement.getName();
