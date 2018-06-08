@@ -157,7 +157,6 @@ public class ConfigtxValidator implements IConfigtxValidator {
         verifyReadSet(readSet);
 
         Map<String, ConfigComparable> writeSet = ConfigMapUtils.mapConfig(configUpdate.getWriteSet(), namespace);
-        verifyReadSet(writeSet);
 
         Map<String, ConfigComparable> deltaSet = computeDeltaSet(readSet, writeSet);
 

@@ -22,24 +22,20 @@ import org.bcia.javachain.common.exception.JavaChainException;
 import org.bcia.javachain.common.exception.NodeException;
 import org.bcia.javachain.common.genesis.GenesisBlockFactory;
 import org.bcia.javachain.common.groupconfig.GroupConfigConstant;
-import org.bcia.javachain.common.groupconfig.MSPConfigHandler;
-import org.bcia.javachain.common.groupconfig.config.ApplicationConfig;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.localmsp.impl.LocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.common.util.CommConstant;
 import org.bcia.javachain.common.util.FileUtils;
+import org.bcia.javachain.common.util.proto.EnvelopeHelper;
 import org.bcia.javachain.common.util.proto.ProposalUtils;
 import org.bcia.javachain.consenter.common.broadcast.BroadCastClient;
-import org.bcia.javachain.common.util.proto.EnvelopeHelper;
-import org.bcia.javachain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.javachain.core.smartcontract.shim.ISmartContract;
 import org.bcia.javachain.core.ssc.cssc.CSSC;
 import org.bcia.javachain.csp.factory.CspManager;
 import org.bcia.javachain.msp.ISigningIdentity;
 import org.bcia.javachain.msp.mgmt.GlobalMspManagement;
-import org.bcia.javachain.msp.mgmt.MspManager;
 import org.bcia.javachain.node.Node;
 import org.bcia.javachain.node.common.client.*;
 import org.bcia.javachain.node.common.helper.ConfigTreeHelper;
@@ -53,7 +49,6 @@ import org.bcia.javachain.protos.node.Query;
 import org.bcia.javachain.protos.node.Smartcontract;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.javachain.tools.configtxgen.entity.GenesisConfigFactory;
-import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,7 +61,6 @@ import java.util.List;
  * @date 2018/2/23
  * @company Dingxuan
  */
-@Component
 public class NodeGroup {
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeGroup.class);
 

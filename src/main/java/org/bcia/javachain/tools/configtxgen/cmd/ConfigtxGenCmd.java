@@ -108,6 +108,18 @@ public class ConfigtxGenCmd implements IConfigtxGenCmd {
             log.info("asOrg-----$" + asOrg);
         }
 
+        String inspectBlock = null;
+        if (cmd.hasOption(ARG_INSPECTBLOCK)) {
+            inspectBlock = cmd.getOptionValue(ARG_INSPECTBLOCK, defaultValue);
+            log.info("inspectBlock-----$" + inspectBlock);
+        }
+
+        String inspectGroupCreateTx = null;
+        if (cmd.hasOption(ARG_INSPECT_GROUP_CREATE_TX)) {
+            inspectGroupCreateTx = cmd.getOptionValue(ARG_INSPECT_GROUP_CREATE_TX, defaultValue);
+            log.info("inspectGroupCreateTx-----$" + inspectGroupCreateTx);
+        }
+
         //-----------------------------------解析参数值-------------------------------//
         if (StringUtils.isNotBlank(outputBlock)) {
             ValidateUtils.isNotBlank(profile, "profile can not be empty");
