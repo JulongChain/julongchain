@@ -17,7 +17,7 @@ Modified java_package and other contents by Dingxuan on 2018-03-02
 */
 syntax = "proto3";
 package protos;
-option java_package = "org.bcia.javachain.protos.node";
+option java_package = "org.bcia.julongchain.protos.node";
 option java_outer_classname = "SmartContractEventPackage";
 option go_package = "github.com/hyperledger/fabric/protos/peer";
 
