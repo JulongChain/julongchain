@@ -16,7 +16,8 @@
 package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 /**
- * 封装读写点
+ * 封装位置信息
+ * 包含位置、长度
  *
  * @author sunzongyu
  * @date 2018/04/12

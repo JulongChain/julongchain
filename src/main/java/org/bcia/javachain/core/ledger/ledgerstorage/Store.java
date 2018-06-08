@@ -21,7 +21,7 @@ import org.bcia.javachain.common.ledger.blkstorage.IBlockStore;
 import org.bcia.javachain.core.ledger.BlockAndPvtData;
 import org.bcia.javachain.core.ledger.PvtNsCollFilter;
 import org.bcia.javachain.core.ledger.TxPvtData;
-import org.bcia.javachain.core.ledger.pvtdatastorage.IStore;
+import org.bcia.javachain.core.ledger.pvtdatastorage.IPvtDataStore;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Ledger;
 import org.bcia.javachain.protos.node.TransactionPackage;
@@ -39,7 +39,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class Store implements IBlockStore {
-    private IStore pvtdataStore = null;
+    private IPvtDataStore pvtdataStore = null;
     private IBlockStore blkStorage = null;
 
     @Override
@@ -155,7 +155,7 @@ public class Store implements IBlockStore {
         Ledger.BlockchainInfo bcInfo = blkStorage.getBlockchainInfo();
         boolean pvtdataStoreEmpty = pvtdataStore.isEmpty();
         if(pvtdataStoreEmpty && bcInfo.getHeight() > 0){
-            pvtdataStore.initLastCommitedBlock(bcInfo.getHeight() - 1);
+            pvtdataStore.initLastCommittedBlock(bcInfo.getHeight() - 1);
             return true;
         }
         return false;
@@ -190,11 +190,11 @@ public class Store implements IBlockStore {
         this.blkStorage = blkStorage;
     }
 
-    public IStore getPvtdataStore() {
+    public IPvtDataStore getPvtdataStore() {
         return pvtdataStore;
     }
 
-    public void setPvtdataStore(IStore pvtdataStore) {
+    public void setPvtdataStore(IPvtDataStore pvtdataStore) {
         this.pvtdataStore = pvtdataStore;
     }
 }

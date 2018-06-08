@@ -46,8 +46,8 @@ public class PvtDataProvider {
     /**
      * 根据id打开对应pvtdata
      */
-    public IStore openStore(String ledgerID) throws LedgerException{
-        return new StoreImpl(db, ledgerID).initState();
+    public IPvtDataStore openStore(String ledgerID) throws LedgerException{
+        return new PvtDataStoreImpl(db, ledgerID).initState();
     }
 
     /**

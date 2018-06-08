@@ -48,14 +48,11 @@ public class BlockSerialization {
     /**
      * 序列化block
      */
-    public static AbstractMap.SimpleEntry<SerializedBlockInfo, byte[]> serializeBlock(Block block, long blockPosition) {
-        SerializedBlockInfo info = new SerializedBlockInfo(block.getHeader(),
+    public static SerializedBlockInfo serializeBlock(Block block, long blockPosition) {
+        return new SerializedBlockInfo(block.getHeader(),
                 //序列化Data
                 addDataBytes(block, blockPosition),
                 block.getMetadata());
-        AbstractMap.SimpleEntry<SerializedBlockInfo, byte[]> entry =
-                new AbstractMap.SimpleEntry<>(info, block.toByteArray());
-        return entry;
     }
 
     /**
@@ -79,13 +76,13 @@ public class BlockSerialization {
      */
     private static byte[] addHeaderBytes(BlockHeader blockHeader){
         //数量
-        byte[] result = Util.longToBytes(blockHeader.getNumber(), 8);
+        byte[] result = Util.longToBytes(blockHeader.getNumber(), BlockFileManager.PEEK_BYTES_LEN);
         //Data hash 长度
-        result = ArrayUtils.addAll(result, Util.longToBytes(blockHeader.getDataHash().toByteArray().length, 8));
+        result = ArrayUtils.addAll(result, Util.longToBytes(blockHeader.getDataHash().toByteArray().length, BlockFileManager.PEEK_BYTES_LEN));
         //hash
         result = ArrayUtils.addAll(result, blockHeader.getDataHash().toByteArray());
         //pre data hash 长度
-        result = ArrayUtils.addAll(result, Util.longToBytes(blockHeader.getPreviousHash().toByteArray().length, 8));
+        result = ArrayUtils.addAll(result, Util.longToBytes(blockHeader.getPreviousHash().toByteArray().length, BlockFileManager.PEEK_BYTES_LEN));
         //pre hash
         result = ArrayUtils.addAll(result, blockHeader.getPreviousHash().toByteArray());
         return result;
@@ -105,7 +102,8 @@ public class BlockSerialization {
         //序列化后首部为1位标识位 + headerLen
         //序列化后尾部为1位表示位 + dataLen
         //headerLen、dataLen为每7位2进制位长度+1
-        long headerLen = headerSerializedLen + 2 + computeLength(headerSerializedLen) + computeLength(dataSerializedLen);
+							//区块头部长度			//区块头部标志位长度							//区块尾部标志位长度
+        long headerLen = 	headerSerializedLen + 	1 + computeLength(headerSerializedLen) + 	1 + computeLength(dataSerializedLen);
         //头部结束后为Data起始位置
 		//当前位置为blockData的开始位置
         long offset = headerLen + blockPosition;
@@ -131,7 +129,7 @@ public class BlockSerialization {
             offset += (1 + computeLength(txEvnelopeLength));
             //构造locpointer对象, 保存Envelope位置信息
             //offset        Envelope起始位置
-            //bytesLength   Envelope长度, 应包含头部长度2
+            //bytesLength   Envelope长度, 应包含头部长度
             LocPointer locPointer = new LocPointer(offset, txEvnelopeLength);
             //构造txIndexInfo对象
             txOffsets.add(new TxIndexInfo(gh.getTxId(), locPointer));
@@ -167,9 +165,9 @@ public class BlockSerialization {
         }
         long metadataLen = metadata.toByteArray().length;
         //metadata长度
-        byte[] result = ArrayUtils.addAll(preBytes, Util.longToBytes(metadataLen, 8));
+        byte[] result = ArrayUtils.addAll(preBytes, Util.longToBytes(metadataLen, BlockFileManager.PEEK_BYTES_LEN));
         //metadata数量
-        result = ArrayUtils.addAll(result, Util.longToBytes(metadata.getMetadataCount(), 8));
+        result = ArrayUtils.addAll(result, Util.longToBytes(metadata.getMetadataCount(), BlockFileManager.PEEK_BYTES_LEN));
         for(ByteString b : metadata.getMetadataList()){
             //将metadata添加到结果中
             result = ArrayUtils.addAll(result, b.toByteArray());
@@ -200,49 +198,4 @@ public class BlockSerialization {
         this.txOffsets = txOffsets;
     }
 
-	public static void main(String[] args) {
-		Common.BlockHeader header = null;
-		Common.Block block = null;
-		int i = 4;
-		header = Common.BlockHeader.newBuilder()
-				.setDataHash(ByteString.copyFromUtf8("DataHash"))
-				.setNumber(1)
-				.build();
-		Common.Envelope envelope = Common.Envelope.newBuilder()
-				.setSignature(ByteString.copyFromUtf8("a"))
-				.setPayload(ByteString.copyFromUtf8("b"))
-				.build();
-		Common.Envelope envelope1 = Common.Envelope.newBuilder()
-				.setSignature(ByteString.copyFromUtf8("a1"))
-				.setPayload(ByteString.copyFromUtf8("b1"))
-				.build();
-		Common.BlockData blockData = Common.BlockData.newBuilder()
-				.addData(envelope.toByteString())
-				.addData(envelope.toByteString())
-				.build();
-		block = Common.Block.newBuilder()
-				.setHeader(header)
-				.setData(blockData)
-				.setMetadata(Common.BlockMetadata.newBuilder()
-						.addMetadata(ByteString.EMPTY)
-						.addMetadata(ByteString.EMPTY)
-						.addMetadata(ByteString.EMPTY)
-						.addMetadata(ByteString.EMPTY)
-						.build())
-				.build();
-//		addDataBytes(block, 0);
-		System.out.println(computeLength(1));
-	}
-
-	public static void soutBytes(byte[] bytes){
-		int i = 0;
-		for(byte b : bytes){
-			System.out.print(b + " ");
-			if (i++ % 10 == 9) {
-				System.out.println();
-				System.out.println(i);
-			}
-		}
-		System.out.println();
-	}
 }

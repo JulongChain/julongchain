@@ -18,7 +18,6 @@ package org.bcia.javachain.core.ledger.pvtdatastorage;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.util.IDBProvider;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -37,8 +36,8 @@ import java.util.*;
  * @date 2018/04/19
  * @company Dingxuan
  */
-public class StoreImpl implements IStore {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(StoreImpl.class);
+public class PvtDataStoreImpl implements IPvtDataStore {
+    private static final JavaChainLog logger = JavaChainLogFactory.getLog(PvtDataStoreImpl.class);
 
     private IDBProvider db;
     private String ledgerID;
@@ -46,12 +45,12 @@ public class StoreImpl implements IStore {
     private long lastCommittedBlock;
     private boolean batchPending;
 
-    public StoreImpl(IDBProvider db, String ledgerID) {
+    public PvtDataStoreImpl(IDBProvider db, String ledgerID) {
         this.db = db;
         this.ledgerID = ledgerID;
     }
 
-    public StoreImpl initState() throws LedgerException {
+    public PvtDataStoreImpl initState() throws LedgerException {
         lastCommittedBlock = getLastCommittedBlockNum();
         isEmpty = lastCommittedBlock == 0;
         batchPending = hasPendingCommit();
@@ -59,10 +58,10 @@ public class StoreImpl implements IStore {
     }
 
     /**
-     * 根据给出的blockid初始化
+     * 根据给出的blockNum初始化
      */
     @Override
-    public void initLastCommitedBlock(long blockNum) throws LedgerException {
+    public void initLastCommittedBlock(long blockNum) throws LedgerException {
         if(!(isEmpty && !batchPending)){
             throw new LedgerException("The private data store is not empty. InitLastCommittedBlock() function call is not allowed");
         }
@@ -284,7 +283,10 @@ public class StoreImpl implements IStore {
         return lastCommittedBlock + 1;
     }
 
-    private List<byte[]> retrievePendingBatchKeys() throws LedgerException{
+	/**
+	 * 查找预备数据，既查找区块号为nextBlockNum的pvtData
+	 */
+	private List<byte[]> retrievePendingBatchKeys() throws LedgerException{
         List<byte[]> pendingBatchKeys = new ArrayList<>();
         Iterator<Map.Entry<byte[], byte[]>> itr = db.getIterator(KvEncoding.encodePK(nextBlockNum(), 0));
         while(itr.hasNext()){

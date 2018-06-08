@@ -193,7 +193,7 @@ public class LedgerManagerTest {
         Common.BlockMetadata metadata = Common.BlockMetadata.newBuilder()
                 .addMetadata(ByteString.EMPTY)
                 .addMetadata(ByteString.EMPTY)
-                .addMetadata(ByteString.EMPTY)
+                .addMetadata(ByteString.copyFrom(new byte[]{0, 0, 0, 0, 0, 0}))
                 .addMetadata(ByteString.EMPTY)
                 .build();
 

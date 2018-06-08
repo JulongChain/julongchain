@@ -25,7 +25,7 @@ import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.FsBlockStoreProv
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.core.ledger.ledgerconfig.LedgerConfig;
-import org.bcia.javachain.core.ledger.pvtdatastorage.IStore;
+import org.bcia.javachain.core.ledger.pvtdatastorage.IPvtDataStore;
 import org.bcia.javachain.core.ledger.pvtdatastorage.PvtDataProvider;
 
 /**
@@ -60,7 +60,7 @@ public class Provider {
 
     public Store open(String ledgerID) throws LedgerException {
         IBlockStore blockStore = blkStoreProvider.openBlockStore(ledgerID);
-        IStore pvtDataStore = pvtDataProvider.openStore(ledgerID);
+        IPvtDataStore pvtDataStore = pvtDataProvider.openStore(ledgerID);
         Store store = new Store();
         store.setBlkStorage(blockStore);
         store.setPvtdataStore(pvtDataStore);

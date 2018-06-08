@@ -46,20 +46,20 @@ public class FileLocPointer {
     }
 
     byte[] marshal() {
-        byte[] fileSUffixNumBytes = Util.longToBytes(fileSuffixNum, 8);
-        byte[] offsetBytes = Util.longToBytes(locPointer.getOffset(), 8);
-        byte[] bytesLengthBytes = Util.longToBytes(locPointer.getBytesLength(), 8);
+        byte[] fileSUffixNumBytes = Util.longToBytes(fileSuffixNum, BlockFileManager.PEEK_BYTES_LEN);
+        byte[] offsetBytes = Util.longToBytes(locPointer.getOffset(), BlockFileManager.PEEK_BYTES_LEN);
+        byte[] bytesLengthBytes = Util.longToBytes(locPointer.getBytesLength(), BlockFileManager.PEEK_BYTES_LEN);
         byte[] result = ArrayUtils.addAll(fileSUffixNumBytes, offsetBytes);
         return ArrayUtils.addAll(result, bytesLengthBytes);
     }
 
     void unmarshal(byte[] b) {
-        fileSuffixNum = ((int) Util.bytesToLong(b, 0, 8));
+        fileSuffixNum = ((int) Util.bytesToLong(b, 0, BlockFileManager.PEEK_BYTES_LEN));
         if(locPointer == null){
             locPointer = new LocPointer();
         }
-        locPointer.setOffset(((int) Util.bytesToLong(b, 8, 8)));
-        locPointer.setBytesLength(((int) Util.bytesToLong(b, 16, 8)));
+        locPointer.setOffset(((int) Util.bytesToLong(b, 8, BlockFileManager.PEEK_BYTES_LEN)));
+        locPointer.setBytesLength(((int) Util.bytesToLong(b, 16, BlockFileManager.PEEK_BYTES_LEN)));
     }
 
     public Integer getFileSuffixNum() {

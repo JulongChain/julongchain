@@ -30,7 +30,7 @@ import java.util.Random;
 public class Config {
     public static final String CHAINS_DIR = "chains";
     public static final String INDEX_DIR = "index";
-    public static final Integer DEFAULT_MAX_BLOCKFILE_SIZE = 64 * 1024 * 1024;
+    public static final int DEFAULT_MAX_BLOCKFILE_SIZE = 64 * 1024 * 1024;
 
     private String blockStorageDir;
     private int maxBlockFileSize;

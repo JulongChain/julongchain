@@ -17,12 +17,14 @@ package org.bcia.javachain.core.ledger.pvtdatastorage;
 
 import com.google.protobuf.ByteString;
 import org.apache.commons.lang3.ArrayUtils;
+import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.BlockFileManager;
 import org.bcia.javachain.core.ledger.kvledger.txmgmt.version.Height;
 import org.bcia.javachain.core.ledger.util.Util;
 import org.bcia.javachain.protos.ledger.rwset.Rwset;
 
 /**
  * 序列化kv
+ * 用于序列化pvtDataStore
  *
  * @author sunzongyu
  * @date 2018/04/18
@@ -61,11 +63,11 @@ public class KvEncoding  {
     }
 
     public static byte[] encodeBlockNum(long blockNum){
-        return Util.longToBytes(blockNum, 8);
+        return Util.longToBytes(blockNum, BlockFileManager.PEEK_BYTES_LEN);
     }
 
     public static long decodeBlockNum(byte[] blockNumBytes){
-        return Util.bytesToLong(blockNumBytes, 0, 8);
+        return Util.bytesToLong(blockNumBytes, 0, BlockFileManager.PEEK_BYTES_LEN);
     }
 
     public static byte[] getPendingCommitKey(String ledgerId){
