@@ -19,7 +19,7 @@ package org.bcia.javachain.consenter.consensus.kafka;
  * 类描述
  *
  * @author yangdong
- * @date 2018/3/19
+ * @date 2018/6/7
  * @company Shudun
  */
 
@@ -55,7 +55,13 @@ public class KafkaBrokerInfo {
         this.brokerHost = brokerHost;
         this.brokerPort = brokerPort;
     }
-    public KafkaBrokerInfo() {
+    /**
+     * 构造方法， 使用默认端口号9092进行构造
+     *
+     * @param brokerHost
+     */
+    public KafkaBrokerInfo(String brokerHost) {
+        this(brokerHost, 9092);
     }
 }
 
