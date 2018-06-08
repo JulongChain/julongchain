@@ -175,7 +175,7 @@ public class EnvelopeHelper {
                     makeResourcesConfig(defaultModPolicy).toByteString());
         }
 
-        return configUpdate;
+        return configUpdateBuilder.build();
     }
 
     public static Configtx.Config makeResourcesConfig(String modPolicy) {
