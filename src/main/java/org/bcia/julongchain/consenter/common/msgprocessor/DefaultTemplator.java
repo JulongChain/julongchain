@@ -86,7 +86,7 @@ public class DefaultTemplator implements IGroupConfigTemplator {
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
         }
-        Configtx.ConfigTree applicationGroup = Configtx.ConfigTree.getDefaultInstance();
+        Configtx.ConfigTree.Builder applicationGroupBuilder = Configtx.ConfigTree.newBuilder();
         Map<String, IConsortiumConfig> consortiumsConfig = groupConfigBundle.getGroupConfig().getConsortiumsConfig().getConsortiumConfigMap();
         if (consortiumsConfig == null) {
             log.error("The ordering system channel does not appear to support creating channels");
@@ -96,8 +96,8 @@ public class DefaultTemplator implements IGroupConfigTemplator {
             log.error(String.format("Unknown consortium name: %s", consortium.getName()));
         }
         Configtx.ConfigPolicy.Builder configPolicy = Configtx.ConfigPolicy.newBuilder().setPolicy(consortiumConf.getGroupCreationPolicy());
-        applicationGroup.toBuilder().putPolicies(GroupConfigConstant.GROUP_CREATION_POLICY, configPolicy.build());
-        applicationGroup.toBuilder().setModPolicy(GroupConfigConstant.GROUP_CREATION_POLICY);
+        applicationGroupBuilder.putPolicies(GroupConfigConstant.GROUP_CREATION_POLICY, configPolicy.build());
+        applicationGroupBuilder.setModPolicy(GroupConfigConstant.GROUP_CREATION_POLICY);
 
         //获取当前的系统通道配置
         Configtx.ConfigTree systemGroupTree = groupConfigBundle.getConfigtxValidator().getConfig().getGroupTree();
@@ -115,7 +115,7 @@ public class DefaultTemplator implements IGroupConfigTemplator {
             Map<String, Configtx.ConfigTree> configTreeMap = configUpdate.getWriteSet().getChildsMap().get(GroupConfigConstant.APPLICATION).getChildsMap();
             for (String key : configTreeMap.keySet()) {
                 Configtx.ConfigTree consortiumGroup = systemGroupTree.getChildsMap().get(GroupConfigConstant.CONSORTIUMS).getChildsMap().get(consortium.getName()).getChildsMap().get(key);
-                applicationGroup.toBuilder().putChilds(key, consortiumGroup);
+                applicationGroupBuilder.putChilds(key, consortiumGroup);
             }
         }
         Configtx.ConfigTree.Builder  groupTreeBuilder = Configtx.ConfigTree.newBuilder();
@@ -132,7 +132,7 @@ public class DefaultTemplator implements IGroupConfigTemplator {
         }
 
         groupTreeBuilder.putChilds(GroupConfigConstant.CONSENTER, systemGroupTree.getChildsMap().get(GroupConfigConstant.CONSENTER));
-        groupTreeBuilder.putChilds(GroupConfigConstant.APPLICATION, applicationGroup);
+        groupTreeBuilder.putChilds(GroupConfigConstant.APPLICATION, applicationGroupBuilder.build());
 
         Configtx.ConfigValue confValue = Configtx.ConfigValue.newBuilder()
                 .setModPolicy(GroupConfigConstant.POLICY_ADMINS)
