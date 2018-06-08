@@ -19,7 +19,7 @@ package org.bcia.javachain.consenter.consensus.kafka;
  * 类描述
  *
  * @author yangdong
- * @date 2018/6/6
+ * @date 2018/6/7
  * @company Shudun
  */
 
