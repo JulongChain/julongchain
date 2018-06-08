@@ -32,6 +32,8 @@ import org.bcia.javachain.common.groupconfig.value.AnchorNodesValue;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.common.policies.PolicyConstant;
+import org.bcia.javachain.common.resourceconfig.ResourcesConfigConstant;
 import org.bcia.javachain.common.util.FileUtils;
 import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.msp.ISigningIdentity;
@@ -152,11 +154,46 @@ public class EnvelopeHelper {
         Configtx.Config pending = Configtx.Config.newBuilder().setGroupTree(pendingTree).build();
         Configtx.ConfigUpdate configUpdate = ConfigUpdateHelper.compute(original, pending);
 
-        //TODO:
-//        if(appConfig.getCapabilities().)
+        Configtx.ConfigUpdate.Builder configUpdateBuilder = configUpdate.toBuilder();
+        configUpdateBuilder.setGroupId(groupId);
+        configUpdateBuilder.getReadSetBuilder().putValues(GroupConfigConstant.CONSORTIUM,
+                Configtx.ConfigValue.newBuilder().setVersion(0).build());
 
+        org.bcia.javachain.protos.common.Configuration.Consortium consortium =
+                org.bcia.javachain.protos.common.Configuration.Consortium.newBuilder().setName(profile.getConsortium()).build();
+        configUpdateBuilder.getWriteSetBuilder().putValues(GroupConfigConstant.CONSORTIUM,
+                Configtx.ConfigValue.newBuilder().setVersion(0).setValue(consortium.toByteString()).build());
+
+        if (appConfig.getCapabilities().isResourcesTree()) {
+            String defaultModPolicy = null;
+            if (profile.getApplication().getResources() != null) {
+                defaultModPolicy = profile.getApplication().getResources().getDefaultModPolicy();
+            } else {
+                defaultModPolicy = PolicyConstant.GROUP_APP_ADMINS;
+            }
+
+            configUpdateBuilder.putIsolatedData(ResourcesConfigConstant.RESOURCE_CONFIG_SEED_DATA,
+                    makeResourcesConfig(defaultModPolicy).toByteString());
+        }
 
         return configUpdate;
+    }
+
+    public static Configtx.Config makeResourcesConfig(String modPolicy) {
+        Configtx.ConfigTree.Builder resourcesTreeBuilder = Configtx.ConfigTree.newBuilder();
+        resourcesTreeBuilder.setModPolicy(modPolicy);
+        resourcesTreeBuilder.putChilds(ResourcesConfigConstant.SMART_CONTRACTS,
+                Configtx.ConfigTree.newBuilder().setModPolicy(modPolicy).build());
+        resourcesTreeBuilder.putChilds(ResourcesConfigConstant.NODE_POLICIES,
+                Configtx.ConfigTree.newBuilder().setModPolicy(modPolicy).build());
+        resourcesTreeBuilder.putChilds(ResourcesConfigConstant.APIS,
+                Configtx.ConfigTree.newBuilder().setModPolicy(modPolicy).build());
+        Configtx.ConfigTree resourcesTree = resourcesTreeBuilder.build();
+
+        Configtx.Config.Builder configBuilder = Configtx.Config.newBuilder();
+        configBuilder.setType(Configtx.ConfigType.RESOURCE_VALUE);
+        configBuilder.setGroupTree(resourcesTree);
+        return configBuilder.build();
     }
 
     public static Configtx.ConfigUpdate makeConfigUpdate(String groupId, String orgName,

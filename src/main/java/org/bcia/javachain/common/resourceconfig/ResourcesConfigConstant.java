@@ -22,7 +22,7 @@ package org.bcia.javachain.common.resourceconfig;
  * @date 2018/4/19
  * @company Dingxuan
  */
-public class ResourceConfigConstant {
+public class ResourcesConfigConstant {
     public static final String SMART_CONTRACT_IDENTIFIER = "SmartContractIdentifier";
     public static final String SMART_CONTRACT_VALIDATION = "SmartContractValidation";
     public static final String SMART_CONTRACT_ENDORSEMENT = "SmartContractEndorsement";
@@ -32,4 +32,5 @@ public class ResourceConfigConstant {
     public static final String NODE_POLICIES = "NodePolicies";
     public static final String SMART_CONTRACTS = "SmartContracts";
 
+    public static final String RESOURCE_CONFIG_SEED_DATA = "resource_config_seed_data";
 }
