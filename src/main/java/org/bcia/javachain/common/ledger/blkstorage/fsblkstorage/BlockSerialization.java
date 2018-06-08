@@ -107,18 +107,16 @@ public class BlockSerialization {
         //headerLen、dataLen为每7位2进制位长度+1
         long headerLen = headerSerializedLen + 2 + computeLength(headerSerializedLen) + computeLength(dataSerializedLen);
         //头部结束后为Data起始位置
-        long envPosition = headerLen + blockPosition;
-
-        //进入BlockData
-        //blockData每一项为envelope
-        //blockData包含blockData标志位1位 + Envelope长度
+		//当前位置为blockData的开始位置
+        long offset = headerLen + blockPosition;
+		//进入BlockData
+		//blockData每一项为envelope
+		//blockData包含blockData标志位1位 + Envelope长度
         for(ByteString txEnvelopeBytes : block.getData().getDataList()){
-            //记录当前位置
-            long offset = envPosition;
             Envelope txEnvelope;
             Payload txPayload;
             GroupHeader gh = null;
-            long txEvnelopeLength = 0;
+            long txEvnelopeLength;
             //解析并获取TxID
             try {
                 txEnvelope = Envelope.parseFrom(txEnvelopeBytes);
@@ -130,7 +128,7 @@ public class BlockSerialization {
                 return null;
             }
             //跳过blockData标志位
-            offset += (2 + computeLength(txEvnelopeLength));
+            offset += (1 + computeLength(txEvnelopeLength));
             //构造locpointer对象, 保存Envelope位置信息
             //offset        Envelope起始位置
             //bytesLength   Envelope长度, 应包含头部长度2
@@ -138,7 +136,7 @@ public class BlockSerialization {
             //构造txIndexInfo对象
             txOffsets.add(new TxIndexInfo(gh.getTxId(), locPointer));
             //Envelope起始位置相应移动
-            envPosition += txEvnelopeLength;
+            offset += txEvnelopeLength;
         }
 
         return txOffsets;
@@ -201,4 +199,50 @@ public class BlockSerialization {
     public void setTxOffsets(List<TxIndexInfo> txOffsets) {
         this.txOffsets = txOffsets;
     }
+
+	public static void main(String[] args) {
+		Common.BlockHeader header = null;
+		Common.Block block = null;
+		int i = 4;
+		header = Common.BlockHeader.newBuilder()
+				.setDataHash(ByteString.copyFromUtf8("DataHash"))
+				.setNumber(1)
+				.build();
+		Common.Envelope envelope = Common.Envelope.newBuilder()
+				.setSignature(ByteString.copyFromUtf8("a"))
+				.setPayload(ByteString.copyFromUtf8("b"))
+				.build();
+		Common.Envelope envelope1 = Common.Envelope.newBuilder()
+				.setSignature(ByteString.copyFromUtf8("a1"))
+				.setPayload(ByteString.copyFromUtf8("b1"))
+				.build();
+		Common.BlockData blockData = Common.BlockData.newBuilder()
+				.addData(envelope.toByteString())
+				.addData(envelope.toByteString())
+				.build();
+		block = Common.Block.newBuilder()
+				.setHeader(header)
+				.setData(blockData)
+				.setMetadata(Common.BlockMetadata.newBuilder()
+						.addMetadata(ByteString.EMPTY)
+						.addMetadata(ByteString.EMPTY)
+						.addMetadata(ByteString.EMPTY)
+						.addMetadata(ByteString.EMPTY)
+						.build())
+				.build();
+//		addDataBytes(block, 0);
+		System.out.println(computeLength(1));
+	}
+
+	public static void soutBytes(byte[] bytes){
+		int i = 0;
+		for(byte b : bytes){
+			System.out.print(b + " ");
+			if (i++ % 10 == 9) {
+				System.out.println();
+				System.out.println(i);
+			}
+		}
+		System.out.println();
+	}
 }

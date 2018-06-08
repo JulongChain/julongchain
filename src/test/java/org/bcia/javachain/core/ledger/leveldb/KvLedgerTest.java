@@ -46,49 +46,58 @@ public class KvLedgerTest {
 
     @Test
     public void testGetTransactionByID() throws Exception{
-        TransactionPackage.ProcessedTransaction tx = l.getTransactionByID("1");
-        Assert.assertNotNull(tx);
-        tx = l.getTransactionByID("2");
-        Assert.assertNotNull(tx);
-    }
+		for (int i = 0; i < 6; i++) {
+			TransactionPackage.ProcessedTransaction tx = l.getTransactionByID(String.valueOf(i));
+			Assert.assertNotNull(tx.getTransactionEnvelope().getPayload());
+			Assert.assertSame(tx.getValidationCode(), 0);
+		}
+	}
 
     @Test
     public void testGetBlockByHash() throws Exception{
         Common.Block block = null;
-        block = l.getBlockByNumber(0);
-        block = l.getBlockByHash(block.getHeader().getDataHash().toByteArray());
-        Assert.assertSame(block.getHeader().getNumber(), ((long) 0));
-        block = l.getBlockByNumber(1);
-        block = l.getBlockByHash(block.getHeader().getDataHash().toByteArray());
-        Assert.assertSame(block.getHeader().getNumber(), (long) 1);
+		for (int i = 0; i < 6; i++) {
+			block = l.getBlockByNumber(1);
+			block = l.getBlockByHash(block.getHeader().getDataHash().toByteArray());
+			Assert.assertSame(block.getHeader().getNumber(), ((long) 1));
+		}
     }
 
     @Test
     public void testGetBlockByTxID() throws Exception{
+		Common.Block expected = l.getBlockByNumber(1);
         Common.Block block = null;
-        block = l.getBlockByTxID("1");
-        Assert.assertSame(block.getHeader().getNumber(), (long) 1);
+		for (int i = 0; i < 6; i++) {
+			block = l.getBlockByTxID(String.valueOf(i));
+			Assert.assertEquals(expected, block);
+		}
     }
 
     @Test
     public void testGetTxValidationCodeByTxID() throws Exception {
-        TransactionPackage.TxValidationCode code = l.getTxValidationCodeByTxID("1");
-        Assert.assertSame(code.getNumber(), 0);
+		for (int i = 0; i < 6; i++) {
+			TransactionPackage.TxValidationCode code = l.getTxValidationCodeByTxID(String.valueOf(i));
+			Assert.assertSame(code.getNumber(), 0);
+		}
     }
 
     @Test
     public void testGetPvtDataAndBlockByNum() throws Exception{
-        BlockAndPvtData bap = l.getPvtDataAndBlockByNum(1, null);
-        Common.Block block = bap.getBlock();
-        TxPvtData txPvtData = bap.getBlockPvtData().get(((long) 0));
-        Assert.assertEquals(block, l.getBlockByNumber(1));
-        Assert.assertSame(txPvtData.getSeqInBlock(), (long) 0);
-    }
+		BlockAndPvtData bap = l.getPvtDataAndBlockByNum(1, null);
+		Common.Block block = bap.getBlock();
+		Assert.assertEquals(block, l.getBlockByNumber(1));
+		for (int i = 0; i < 6; i++) {
+			TxPvtData txPvtData = bap.getBlockPvtData().get(((long) i));
+			Assert.assertSame(txPvtData.getSeqInBlock(), (long) i);
+		}
+	}
 
     @Test
     public void testGetPvtDataByNum() throws Exception {
         List<TxPvtData> pvtDataByNum = l.getPvtDataByNum(0, null);
-        TxPvtData txPvtData = pvtDataByNum.get(0);
-        Assert.assertSame(txPvtData.getSeqInBlock(), (long) 0);
-    }
+		for (int i = 0; i < 6; i++) {
+			TxPvtData txPvtData = pvtDataByNum.get(i);
+			Assert.assertSame(txPvtData.getSeqInBlock(), (long) i);
+		}
+	}
 }
