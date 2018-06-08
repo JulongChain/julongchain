@@ -42,10 +42,6 @@ public class GossipServiceUtil {
   public static final Map<String, String> addressAndGroupMap = new HashMap<>();
   public static final Map<String, GossipService> idAndGossipServiceMap = new HashMap<>();
 
-  public static final Map<String, GossipService> groupAndGossipServiceLeaderMap = new HashMap<>();
-  public static final Map<String, String> groupAndAddressLeaderMap = new HashMap<>();
-  public static final Map<String, String> groupAndIdLeaderMap = new HashMap<>();
-
   /**
    * 启动gossip server服务
    *
@@ -58,15 +54,40 @@ public class GossipServiceUtil {
   public static void newGossipService(String id, String group, String address)
       throws UnknownHostException, InterruptedException {
 
-    List<GossipMember> gossipMembers = new ArrayList<>();
+    GossipService gossipService =
+        new GossipService(
+            group,
+            URI.create("udp://" + address),
+            id,
+            new HashMap<>(),
+            new ArrayList<>(),
+            new GossipSettings(),
+            new GossipListener() {
+              @Override
+              public void gossipEvent(GossipMember member, GossipState state) {}
+            },
+            new MetricRegistry());
 
-    if (groupAndGossipServiceLeaderMap.get(group) != null) {
-      String addressLeader = groupAndAddressLeaderMap.get(group);
-      String idLeader = groupAndIdLeaderMap.get(group);
-      RemoteGossipMember remoteGossipMember =
-          new RemoteGossipMember(group, URI.create("udp://" + addressLeader), idLeader);
-      gossipMembers.add(remoteGossipMember);
+    addressAndGossipServiceMap.put(address, gossipService);
+    addressAndGroupMap.put(address, group);
+    idAndGossipServiceMap.put(id, gossipService);
+
+    gossipService.start();
+  }
+
+  public static void newGossipService(
+      String id, String group, String address, String id_leader, String address_leader)
+      throws UnknownHostException, InterruptedException {
+
+    if (StringUtils.isEmpty(id_leader) || StringUtils.isEmpty(address_leader)) {
+      newGossipService(id, group, address);
+      return;
     }
+
+    List<GossipMember> gossipMembers = new ArrayList<>();
+    RemoteGossipMember remoteGossipMember =
+        new RemoteGossipMember(group, URI.create("tcp://" + address_leader), id_leader);
+    gossipMembers.add(remoteGossipMember);
 
     GossipService gossipService =
         new GossipService(
@@ -85,12 +106,6 @@ public class GossipServiceUtil {
     addressAndGossipServiceMap.put(address, gossipService);
     addressAndGroupMap.put(address, group);
     idAndGossipServiceMap.put(id, gossipService);
-
-    if (groupAndGossipServiceLeaderMap.get(group) == null) {
-      groupAndGossipServiceLeaderMap.put(group, gossipService);
-      groupAndAddressLeaderMap.put(group, address);
-      groupAndIdLeaderMap.put(group, id);
-    }
 
     gossipService.start();
   }
