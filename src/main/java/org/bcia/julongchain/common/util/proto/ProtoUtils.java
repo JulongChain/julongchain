@@ -25,6 +25,9 @@ import org.bcia.julongchain.protos.common.Collection;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.*;
 
+import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -39,6 +42,7 @@ public class ProtoUtils {
 
     /**
      * 从字节流解析出SmartContractID对象
+     *
      * @param smartContractIDBytes
      * @return
      * @throws UnsupportedEncodingException
@@ -53,6 +57,7 @@ public class ProtoUtils {
 
     /**
      * 将ProposalResponse转化为字节流
+     *
      * @param proposalResponse
      * @return
      */
@@ -63,6 +68,7 @@ public class ProtoUtils {
 
     /**
      * 从字节流中解析出ProposalResponse
+     *
      * @param prBytes
      * @return
      * @throws InvalidProtocolBufferException
@@ -78,7 +84,7 @@ public class ProtoUtils {
     }
 
     public static Common.Payload getPayload(Common.Envelope envelope)
-            throws InvalidProtocolBufferException{
+            throws InvalidProtocolBufferException {
         ByteString byteString = envelope.getPayload();
         Common.Payload payload = Common.Payload.parseFrom(byteString);
         return payload;
@@ -94,22 +100,24 @@ public class ProtoUtils {
 
     /**
      * 从字节流从解析出ProposalResponsePackage.Response
+     *
      * @param byteResponse
      * @return
      * @throws InvalidProtocolBufferException
      */
     public static ProposalResponsePackage.Response getResponse(byte[] byteResponse)
-                                                   throws InvalidProtocolBufferException {
+            throws InvalidProtocolBufferException {
         ProposalResponsePackage.Response response = ProposalResponsePackage.Response.parseFrom(byteResponse);
         return response;
     }
 
-    public static byte[] marshalOrPanic(Message message){
+    public static byte[] marshalOrPanic(Message message) {
         return message.toByteArray();
     }
 
     /**
      * 从字节流中解析出SmartContractDeploymentSpec
+     *
      * @param depSpecBytes
      * @return
      * @throws InvalidProtocolBufferException
@@ -121,17 +129,17 @@ public class ProtoUtils {
 
     public static void unMarshalCollectionConfigPackage(byte[] collectionConfigBytes,
                                                         Collection.CollectionConfigPackage collections)
-            throws JavaChainException
-    {
+            throws JavaChainException {
 
     }
 
-    public static SmartContractDataPackage.SmartContractData unMarshalSmartContractData(byte[] scdBytes) throws InvalidProtocolBufferException{
+    public static SmartContractDataPackage.SmartContractData unMarshalSmartContractData(byte[] scdBytes) throws InvalidProtocolBufferException {
         return null;
     }
 
     /**
      * 从TxAction中解析出SCAction
+     *
      * @param txActions
      * @return
      * @throws InvalidProtocolBufferException
@@ -148,5 +156,36 @@ public class ProtoUtils {
             return null;
         }
         return ProposalPackage.SmartContractAction.parseFrom(pResPayload.getExtension());
+    }
+
+    public static <T extends Message> void printMessageJson(T t) {
+        // 指定要写入文件的缓冲输出字节流
+        BufferedOutputStream out = new BufferedOutputStream(System.out);
+
+        InputStream is = io.grpc.protobuf.ProtoUtils.jsonMarshaller(t.getDefaultInstanceForType()).stream(t);
+
+        // 用来存储每次读取到的字节数组
+        byte[] bytes = new byte[4096];
+        // 每次读取到的字节数组的长度
+        int len;
+        try {
+            while ((len = is.read(bytes)) != -1) {
+                // 写入到输出流
+                out.write(bytes, 0, len);
+            }
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        } finally {
+            try {
+                out.close();// 关闭流
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
+            try {
+                is.close();
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
+        }
     }
 }

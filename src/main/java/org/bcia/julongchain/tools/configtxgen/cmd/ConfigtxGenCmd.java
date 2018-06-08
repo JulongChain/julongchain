@@ -120,7 +120,13 @@ public class ConfigtxGenCmd implements IConfigtxGenCmd {
             log.info("inspectGroupCreateTx-----$" + inspectGroupCreateTx);
         }
 
-        //-----------------------------------解析参数值-------------------------------//
+        String printOrg = null;
+        if (cmd.hasOption(ARG_PRINT_ORGANIZATION)) {
+            printOrg = cmd.getOptionValue(ARG_PRINT_ORGANIZATION, defaultValue);
+            log.info("printOrg-----$" + printOrg);
+        }
+
+        //-----------------------------------业务逻辑--------------------------------//
         if (StringUtils.isNotBlank(outputBlock)) {
             ValidateUtils.isNotBlank(profile, "profile can not be empty");
             GenesisConfig.Profile profileConfig = GenesisConfigFactory.getGenesisConfig().getCompletedProfile(profile);
@@ -140,6 +146,21 @@ public class ConfigtxGenCmd implements IConfigtxGenCmd {
             ValidateUtils.isNotBlank(asOrg, "asOrg can not be empty");
             GenesisConfig.Profile profileConfig = GenesisConfigFactory.getGenesisConfig().getCompletedProfile(profile);
             ConfigtxHelper.doOutputAnchorNodesUpdate(profileConfig, groupId, outputAnchorNodesUpdate, asOrg);
+            return;
+        }
+
+        if (StringUtils.isNotBlank(inspectBlock)) {
+            ConfigtxHelper.doInspectBlock(inspectBlock);
+            return;
+        }
+
+        if (StringUtils.isNotBlank(inspectGroupCreateTx)) {
+            ConfigtxHelper.doInspectGroupCreateTx(inspectGroupCreateTx);
+            return;
+        }
+
+        if (StringUtils.isNotBlank(printOrg)) {
+            ConfigtxHelper.doPrintOrganization(printOrg);
             return;
         }
 

@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.tools.configtxgen.helper;
 
+import com.alibaba.fastjson.JSON;
 import org.bcia.julongchain.common.exception.ConfigtxToolsException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.genesis.GenesisBlockFactory;
@@ -23,11 +24,13 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.util.FileUtils;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
+import org.bcia.julongchain.common.util.proto.ProtoUtils;
 import org.bcia.julongchain.node.common.helper.ConfigTreeHelper;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.node.Configuration;
 import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfig;
+import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfigFactory;
 
 import java.io.IOException;
 
@@ -120,5 +123,46 @@ public class ConfigtxHelper {
         }
 
         return result;
+    }
+
+    public static void doInspectBlock(String inspectBlock) throws ConfigtxToolsException {
+        try {
+            byte[] fileBytes = FileUtils.readFileBytes(inspectBlock);
+            Common.Block block = Common.Block.parseFrom(fileBytes);
+            log.info("Get a block: \n" + JSON.toJSONString(block, true));
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+            throw new ConfigtxToolsException(e);
+        }
+    }
+
+    public static void doInspectGroupCreateTx(String inspectGroupCreateTx) throws ConfigtxToolsException {
+        try {
+            byte[] fileBytes = FileUtils.readFileBytes(inspectGroupCreateTx);
+            Common.Envelope envelope = Common.Envelope.parseFrom(fileBytes);
+            log.info("Get a envelope: \n" + JSON.toJSONString(envelope, true));
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+            throw new ConfigtxToolsException(e);
+        }
+    }
+
+    public static void doPrintOrganization(String printOrg) throws ValidateException {
+        GenesisConfig genesisConfig = GenesisConfigFactory.getGenesisConfig();
+
+        GenesisConfig.Organization[] organizations = genesisConfig.getOrganizations();
+        if (organizations == null || organizations.length <= 0) {
+            throw new ValidateException("organizations is empty");
+        }
+
+        for (GenesisConfig.Organization org : organizations) {
+            if (printOrg.equals(org.getName())) {
+                Configtx.ConfigTree consenterOrgTree = ConfigTreeHelper.buildConsenterOrgTree(org);
+                log.info("Get a consenterOrg: \n");
+                ProtoUtils.printMessageJson(consenterOrgTree);
+
+                return;
+            }
+        }
     }
 }
