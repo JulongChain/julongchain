@@ -27,7 +27,7 @@ import sun.security.pkcs11.wrapper.PKCS11Constants;
  * @company FEITIAN
  */
 public enum EcdsaSignOpts implements ISignerOpts {
-    ECDSA("NONEwithECDSA", PKCS11Constants.CKM_ECDSA, 1),    
+    ECDSA("NONEwithECDSA", PKCS11Constants.CKM_ECDSA, 1),
     SHA1("SHA1withECDSA", /*PKCS11Constants.CKM_ECDSA_SHA1*/PKCS11Constants.CKM_ECDSA, 2),
     SHA256("SHA256withECDSA", PKCS11Constants.CKM_ECDSA, 3),
     SHA384("SHA384withECDSA", PKCS11Constants.CKM_ECDSA, 4);
