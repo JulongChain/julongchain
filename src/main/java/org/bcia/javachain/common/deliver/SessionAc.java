@@ -39,8 +39,8 @@ public class SessionAc {
     private long lastConfigSequence;
     private Time sessionEndTime;
     private boolean usedAtLeastOnce;
-
-    public SessionAc(IAcSupport acSupport, IPolicyChecker checkPolicy, String group, Common.Envelope envelope, Time time){
+    private Expiration expiration;
+    public SessionAc(IAcSupport acSupport, IPolicyChecker checkPolicy, String group, Common.Envelope envelope, Expiration expiration){
         List<SignedData> signedData=null;
         try {
            signedData= SignedData.asSignedData(envelope);
@@ -54,7 +54,7 @@ public class SessionAc {
         this.checkPolicy = checkPolicy;
         this.group = group;
         this.envelope = envelope;
-        this.sessionEndTime = Expiration.expiresAt(signedData.get(0).getIdentity());
+        this.sessionEndTime = expiration.expiresAt(signedData.get(0).getIdentity());
     }
 
     public void enaluate() throws ValidateException {

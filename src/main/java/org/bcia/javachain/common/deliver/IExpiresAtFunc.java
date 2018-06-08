@@ -23,5 +23,5 @@ import org.bouncycastle.asn1.x509.Time;
  * @company Dingxuan
  */
 public interface IExpiresAtFunc {
-   Time expires(byte[] identityBytes);
+   Time expiresAt(byte[] identityBytes);
 }

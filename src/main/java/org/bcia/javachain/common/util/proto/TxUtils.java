@@ -34,7 +34,7 @@ import org.bcia.javachain.protos.node.Smartcontract;
 /**
  * 类描述
  *
- * @author sunianle
+ * @author sunianle,zhangmingyang
  * @date 3/29/18
  * @company Dingxuan
  */

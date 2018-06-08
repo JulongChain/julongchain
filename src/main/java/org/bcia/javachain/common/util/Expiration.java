@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.common.util;
 
+import org.bcia.javachain.common.deliver.IExpiresAtFunc;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.Time;
 import org.bouncycastle.util.io.pem.PemReader;
@@ -28,8 +29,11 @@ import java.io.InputStreamReader;
  * @Date: 2018/5/17
  * @company Dingxuan
  */
-public class Expiration {
-    public static Time expiresAt(byte[] identityBytes) {
+public class Expiration implements IExpiresAtFunc {
+    public Expiration() {
+    }
+    @Override
+    public  Time expiresAt(byte[] identityBytes) {
         Certificate certificate = null;
         try {
             certificate = Certificate.getInstance(new PemReader(new InputStreamReader(new ByteArrayInputStream(identityBytes)))

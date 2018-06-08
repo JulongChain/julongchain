@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.consenter.consensus;
 
+import org.bcia.javachain.consenter.common.multigroup.ChainSupport;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.consenter.Configuration;
 import org.springframework.core.annotation.Order;
@@ -26,5 +27,5 @@ import java.util.Map;
  * @company Dingxuan
  */
 public interface IConsensue {
-     IChain handleChain(IConsenterSupport consenterSupport, Common.Metadata metadata);
+     IChain handleChain(ChainSupport consenterSupport, Common.Metadata metadata);
 }

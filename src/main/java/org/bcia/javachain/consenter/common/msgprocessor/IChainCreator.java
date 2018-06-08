@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.consenter.common.msgprocessor;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
@@ -26,7 +27,7 @@ import org.bcia.javachain.protos.common.Configtx;
  * @company Dingxuan
  */
 public interface IChainCreator {
-    IGroupConfigBundle newGroupConfig(Common.Envelope envConfigUpdate);
+    IGroupConfigBundle newGroupConfig(Common.Envelope envConfigUpdate) throws InvalidProtocolBufferException;
 
     IGroupConfigBundle createBundle(String groupId, Configtx.Config  config);
 

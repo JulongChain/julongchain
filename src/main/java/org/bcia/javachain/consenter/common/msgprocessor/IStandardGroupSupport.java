@@ -23,7 +23,7 @@ import org.bcia.javachain.common.localmsp.ILocalSigner;
  * @Date: 2018/5/17
  * @company Dingxuan
  */
-public interface IStandardGroupSupport extends IConfigtxValidator {
+public interface IStandardGroupSupport extends IConfigtxValidator{
 
     ILocalSigner signer();
 }

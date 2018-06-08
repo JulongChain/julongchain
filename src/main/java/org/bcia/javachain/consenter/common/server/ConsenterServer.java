@@ -18,10 +18,14 @@ package org.bcia.javachain.consenter.common.server;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
+import org.bcia.javachain.common.exception.JavaChainException;
+import org.bcia.javachain.common.localmsp.impl.LocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
 import org.bcia.javachain.consenter.common.broadcast.BroadCastHandler;
 import org.bcia.javachain.consenter.common.deliver.DeliverHandler;
+import org.bcia.javachain.consenter.common.multigroup.BlockWriter;
+import org.bcia.javachain.consenter.common.multigroup.Registrar;
 import org.bcia.javachain.protos.common.Common;
 
 import org.bcia.javachain.protos.consenter.Ab;
@@ -31,6 +35,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
+import static org.bcia.javachain.consenter.common.localconfig.ConsenterConfigFactory.loadConsenterConfig;
 import static org.bouncycastle.asn1.iana.IANAObjectIdentifiers.mgmt;
 
 /**
@@ -85,18 +90,26 @@ public class ConsenterServer {
 
     // 定义一个实现服务接口的类
     private class ConsenterServerImpl extends AtomicBroadcastGrpc.AtomicBroadcastImplBase {
+        LocalSigner localSigner = new LocalSigner();
+        Registrar registrar;
+        {
+            try {
+                registrar = PreStart.initializeMultichannelRegistrar(loadConsenterConfig(),localSigner);
+            } catch (JavaChainException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         @Override
         public StreamObserver<Common.Envelope> deliver(StreamObserver<Ab.DeliverResponse> responseObserver) {
             return new StreamObserver<Common.Envelope>() {
                 DeliverHandler deliverHandler = new DeliverHandler();
-
                 @Override
                 public void onNext(Common.Envelope envelope) {
                     log.info("envelop:" + envelope.getPayload().toStringUtf8());
                     deliverHandler.handle(envelope);
-                    responseObserver.onNext(Ab.DeliverResponse.newBuilder().setStatusValue(200).build());
-                    //封装处理消息的方法
                 }
 
                 @Override
@@ -114,15 +127,16 @@ public class ConsenterServer {
         @Override
         public StreamObserver<Common.Envelope> broadcast(StreamObserver<Ab.BroadcastResponse> responseObserver) {
             return new StreamObserver<Common.Envelope>() {
-                BroadCastHandler broadCastHandle = new BroadCastHandler();
-
+                BroadCastHandler broadCastHandle = new BroadCastHandler(registrar);
                 @Override
                 public void onNext(Common.Envelope envelope) {
+
                     try {
                         broadCastHandle.handle(envelope, responseObserver);
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                    } catch (IOException e) {
+                     log.error(e.getMessage());
                     }
+
                 }
 
                 @Override

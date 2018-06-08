@@ -13,22 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.common.broadcast;
-
-import org.bcia.javachain.protos.common.Common;
-
-import java.util.Map;
+package org.bcia.javachain.core.deliverservice.blocksprovider;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/5/7
+ * @Date: 2018/5/31
  * @company Dingxuan
  */
-public class BroadCast {
-
-
-    void handle(){
-
-    }
-
+public interface IStreamClient extends IBlocksDeliverer{
+    void updateEndpoints(String[] endpoints);
+    String [] getEndpoints();
+    void close();
+    void disConnect(boolean disableEndpoint);
 }

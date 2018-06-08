@@ -15,7 +15,8 @@
  */
 package org.bcia.javachain.common.deliver;
 
-import org.bcia.javachain.consenter.common.broadcast.Message;
+
+import com.google.protobuf.Message;
 
 /**
  * @author zhangmingyang

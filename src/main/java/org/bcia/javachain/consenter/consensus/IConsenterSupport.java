@@ -15,6 +15,12 @@
  */
 package org.bcia.javachain.consenter.consensus;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.javachain.common.exception.ConsenterException;
+import org.bcia.javachain.common.exception.LedgerException;
+import org.bcia.javachain.common.exception.PolicyException;
+import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.protos.common.Common;
 
@@ -23,20 +29,12 @@ import org.bcia.javachain.protos.common.Common;
  * @Date: 2018/3/7
  * @company Dingxuan
  */
-public interface IConsenterSupport extends ILocalSigner, IProcessor {
-    IReceiver blockCutter();
+public interface IConsenterSupport  {
 
-    IOrderer sharedConfig();
+    Common.Block createNextBlock(Common.Envelope[] messages) throws ConsenterException;
 
-    Common.Block createNextBlock(Common.Envelope[] messages);
+    void writeBlock(Common.Block block, byte[] encodedMetadataValue) throws ConsenterException;
 
-    void writeBlock(Common.Block block, byte[] encodedMetadataValue);
+    void writeConfigBlock(Common.Block block, byte[] encodedMetadataValue) throws InvalidProtocolBufferException, LedgerException, ValidateException, PolicyException;
 
-    void writeConfigBlock(Common.Block block, byte[] encodedMetadataValue);
-
-    long sequence();
-
-    String chainID();
-
-    long height();
 }

@@ -26,6 +26,7 @@ import org.bcia.javachain.common.policies.IPolicyProvider;
 import org.bcia.javachain.common.policies.PolicyManager;
 import org.bcia.javachain.common.policycheck.policies.PolicyProvider;
 import org.bcia.javachain.common.util.ValidateUtils;
+import org.bcia.javachain.consenter.common.multigroup.IMutableResources;
 import org.bcia.javachain.msp.IMspManager;
 import org.bcia.javachain.protos.common.Common;
 import org.bcia.javachain.protos.common.Configtx;
@@ -43,7 +44,7 @@ import java.util.Objects;
  * @date 2018/4/18
  * @company Dingxuan
  */
-public class GroupConfigBundle implements IGroupConfigBundle {
+public class GroupConfigBundle implements IGroupConfigBundle,IMutableResources {
     /**
      * 策略管理器
      */
@@ -244,5 +245,10 @@ public class GroupConfigBundle implements IGroupConfigBundle {
     @Override
     public Configtx.ConfigEnvelope updateProposeConfig(Common.Envelope configtx) throws InvalidProtocolBufferException, ValidateException {
         return configtxValidator.proposeConfigUpdate(configtx);
+    }
+
+    @Override
+    public GroupConfigBundle update() {
+        return null;
     }
 }

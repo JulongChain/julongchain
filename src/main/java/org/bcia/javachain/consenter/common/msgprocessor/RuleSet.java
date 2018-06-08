@@ -30,7 +30,7 @@ public class RuleSet implements IRule {
     private IRule[] rules;
 
     @Override
-    public void apply(Common.Envelope message) throws ConsenterException {
+    public void apply(Common.Envelope message) throws ConsenterException, InvalidProtocolBufferException {
         for (IRule rule : rules) {
             rule.apply(message);
         }

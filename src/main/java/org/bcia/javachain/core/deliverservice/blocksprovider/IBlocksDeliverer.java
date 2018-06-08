@@ -13,39 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.javachain.consenter.common.broadcast;
+package org.bcia.javachain.core.deliverservice.blocksprovider;
 
 import org.bcia.javachain.protos.common.Common;
+import org.bcia.javachain.protos.consenter.Ab;
+import org.bcia.javachain.protos.node.EventsPackage;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/12
+ * @Date: 2018/5/31
  * @company Dingxuan
  */
-public class Message {
-    //private String content;
-//    public Message(String content)
-//    {
-//        this.content=content;
-//    }
-//    public void display(){
-//        System.out.println(content);
-//    }
-    private Common.Envelope envelope;
-//    public Message(Common.Envelope envelope)
-//    {
-//        this.envelope=envelope;
-//    }
-
-    public Common.Envelope getEnvelope() {
-        return envelope;
-    }
-
-    public void setEnvelope(Common.Envelope envelope) {
-        this.envelope = envelope;
-    }
-
-    public void display(){
-        System.out.println(envelope);
-    }
+public interface IBlocksDeliverer {
+   Ab.DeliverResponse recv();
+   void send(Common.Envelope envelope);
 }

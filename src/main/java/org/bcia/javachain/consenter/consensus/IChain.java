@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.consenter.consensus;
 
+import org.bcia.javachain.common.exception.ConsenterException;
 import org.bcia.javachain.protos.common.Common;
 
 /**
@@ -47,7 +48,7 @@ public interface IChain {
     // that in-flight messages can be consumed. It could return error if consenter is
     // in erroneous states. If this blocking behavior is not desired, consenter could
     // simply return nil.
-    void waitReady();
+    void waitReady() throws ConsenterException;
 
     /**
      * 未定义方法Errored() <-chan struct{}

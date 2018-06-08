@@ -15,11 +15,15 @@
  */
 package org.bcia.javachain.common.deliver;
 
+import io.grpc.stub.StreamObserver;
+import org.bcia.javachain.protos.consenter.Ab;
+
 /**
  * @author zhangmingyang
- * @Date: 2018/5/29
+ * @Date: 2018/6/4
  * @company Dingxuan
  */
-public interface IHandle {
-  void handle(DeliverServer server);
+public class DeliverHandlerSupport {
+   private StreamObserver<Ab.BroadcastResponse> responseObserver;
+
 }

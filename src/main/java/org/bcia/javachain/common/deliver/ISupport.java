@@ -24,7 +24,7 @@ import org.bcia.javachain.common.policies.PolicyManager;
  * @Date: 2018/5/29
  * @company Dingxuan
  */
-public interface ISupport {
+public interface ISupport extends IAcSupport{
     long sequence();
     IPolicyManager policyManager();
     IReader reader();

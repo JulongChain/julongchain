@@ -46,7 +46,7 @@ public class SystemGroupFilter implements IRule {
     }
 
     @Override
-    public void apply(Common.Envelope message) throws ConsenterException{
+    public void apply(Common.Envelope message) throws ConsenterException, InvalidProtocolBufferException {
         Common.Payload msgData = null;
         try {
             msgData = Common.Payload.parseFrom(message.getPayload().toByteArray());
@@ -81,7 +81,7 @@ public class SystemGroupFilter implements IRule {
         authorizeAndInspect(configTx);
     }
 
-    public void authorizeAndInspect(Common.Envelope configTx) throws ConsenterException {
+    public void authorizeAndInspect(Common.Envelope configTx) throws ConsenterException, InvalidProtocolBufferException {
         Common.Payload payload = null;
         try {
             payload = Common.Payload.parseFrom(configTx.getPayload().toByteArray());

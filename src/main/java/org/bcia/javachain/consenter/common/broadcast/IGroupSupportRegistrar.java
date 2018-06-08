@@ -15,6 +15,7 @@
  */
 package org.bcia.javachain.consenter.common.broadcast;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.protos.common.Common;
 
 import java.util.Map;
@@ -25,5 +26,5 @@ import java.util.Map;
  * @company Dingxuan
  */
 public interface IGroupSupportRegistrar {
-    Map<String,Object> broadcastGroupSupport(Common.Envelope msg);
+    Map<String,Object> broadcastGroupSupport(Common.Envelope msg) throws InvalidProtocolBufferException;
 }

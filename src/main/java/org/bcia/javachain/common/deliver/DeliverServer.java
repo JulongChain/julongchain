@@ -32,27 +32,18 @@ public class DeliverServer {
         this.policyChecker = policyChecker;
         this.send = send;
     }
+
     public IDeliverSupport getSupport() {
         return support;
-    }
-
-    public void setSupport(IDeliverSupport support) {
-        this.support = support;
     }
 
     public IPolicyChecker getPolicyChecker() {
         return policyChecker;
     }
 
-    public void setPolicyChecker(IPolicyChecker policyChecker) {
-        this.policyChecker = policyChecker;
-    }
-
     public ISend getSend() {
         return send;
     }
 
-    public void setSend(ISend send) {
-        this.send = send;
-    }
+
 }

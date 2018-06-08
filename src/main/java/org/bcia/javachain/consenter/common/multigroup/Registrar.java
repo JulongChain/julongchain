@@ -31,12 +31,14 @@ import org.bcia.javachain.common.ledger.blockledger.file.FileLedgerIterator;
 import org.bcia.javachain.common.localmsp.ILocalSigner;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
+import org.bcia.javachain.consenter.common.broadcast.IGroupSupportRegistrar;
 import org.bcia.javachain.consenter.common.msgprocessor.DefaultTemplator;
 import org.bcia.javachain.consenter.common.msgprocessor.IChainCreator;
 import org.bcia.javachain.consenter.common.msgprocessor.IGroupConfigTemplator;
 import org.bcia.javachain.consenter.common.msgprocessor.SystemGroup;
 import org.bcia.javachain.consenter.consensus.IConsensue;
 import org.bcia.javachain.consenter.entity.ConfigMsg;
+import org.bcia.javachain.consenter.util.BlockHelper;
 import org.bcia.javachain.consenter.util.BlockUtils;
 import org.bcia.javachain.consenter.util.CommonUtils;
 import org.bcia.javachain.consenter.util.ConfigTxUtil;
@@ -45,6 +47,7 @@ import org.bcia.javachain.protos.common.Common;
 
 import org.bcia.javachain.protos.common.Configtx;
 import org.bcia.javachain.protos.consenter.Ab;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.util.*;
 
@@ -56,9 +59,9 @@ import static org.bcia.javachain.consenter.common.msgprocessor.SystemGroup.newSy
  * @Date: 2018/5/8
  * @company Dingxuan
  */
-public class Registrar implements IChainCreator {
+public class Registrar implements IChainCreator,IGroupSupportRegistrar {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Registrar.class);
-    Map<String, ChainSupport> chains;
+    Map<String, ChainSupport> chains=new HashMap<>();
 
     Map<String, IConsensue> consenters;
 
@@ -77,11 +80,12 @@ public class Registrar implements IChainCreator {
     public Registrar() {
     }
 
-    public Registrar(Map<String, ChainSupport> chains, Map<String, IConsensue> consenters, ILocalSigner signer, IFactory ledgerFactory) {
+    public Registrar(Map<String, ChainSupport> chains, Map<String, IConsensue> consenters, ILocalSigner signer, IFactory ledgerFactory,ChainSupport systemGroup) {
         this.chains = chains;
         this.consenters = consenters;
         this.signer = signer;
         this.ledgerFactory = ledgerFactory;
+        this.systemGroup=systemGroup;
     }
 
     public void checkResources(IGroupConfigBundle resources) throws ConsenterException {
@@ -115,6 +119,9 @@ public class Registrar implements IChainCreator {
     }
 
     public   Registrar newRegistrar(IFactory ledgerFactory, Map<String, IConsensue> consenters, ILocalSigner signer) throws LedgerException, ValidateException, PolicyException, InvalidProtocolBufferException {
+        this.ledgerFactory=ledgerFactory;
+        this.signer=signer;
+        this.consenters=consenters;
         List<String> existingChains = ledgerFactory.groupIDs();
         for (String chainId : existingChains) {
             ReadWriteBase rl = ledgerFactory.getOrCreate(chainId);
@@ -123,32 +130,38 @@ public class Registrar implements IChainCreator {
                 log.error("Programming error, configTx should never be nil here");
             }
             LedgerResources ledgerResources = newLedgerResources(configTx);
-            String groupId = ledgerResources.mutableResources.getConfigtxValidator().getGroupId();
+            String groupId = ledgerResources.getMutableResources().getConfigtxValidator().getGroupId();
 
-            if (ledgerResources.mutableResources.getGroupConfig().getConsortiumsConfig() != null) {
+            if (ledgerResources.getMutableResources().getGroupConfig().getConsortiumsConfig() != null) {
                 ChainSupport chain = new ChainSupport(this, ledgerResources, consenters, signer);
-                this.templator = new DefaultTemplator(chain.ledgerResources.mutableResources);
-                chain.processor = newSystemGroup(chain, templator, SystemGroup.createSystemChannelFilters(this, chain.ledgerResources.getMutableResources()));
+                this.templator = new DefaultTemplator(chain.getLedgerResources().getMutableResources());
+                chain.processor= newSystemGroup(chain, templator, SystemGroup.createSystemChannelFilters(this, chain.getLedgerResources().getMutableResources()));
                 //组装seekPosition
                 Ab.SeekPosition.Builder seekPosition = Ab.SeekPosition.newBuilder();
                 Ab.SeekOldest.Builder seekOldest = Ab.SeekOldest.newBuilder();
                 seekPosition.setOldest(seekOldest);
 
                 org.bcia.javachain.common.ledger.blockledger.IIterator iter = rl.iterator(seekPosition.build());
-                iter.close();
+                //TODO 使用完关闭
+                //iter.close();
                 FileLedgerIterator fileLedgerIterator = (FileLedgerIterator) iter;
                 if (fileLedgerIterator.getBlockNum() != 0) {
                     log.error(String.format("Error iterating over system channel: '%s', expected position 0, got %d", groupId, fileLedgerIterator.getBlockNum()));
                 }
-                Map.Entry<QueryResult, Common.Status> genesisBlock = (Map.Entry<QueryResult, Common.Status>) iter.next();
+                QueryResult queryResult =  iter.next();
+                iter.close();
+                Map.Entry<QueryResult, Common.Status> genesisBlock= (Map.Entry<QueryResult, Common.Status>) queryResult.getObj();
                 genesisBlock.getValue();
+                Common.Block block= (Common.Block) genesisBlock.getKey().getObj();
                 if (genesisBlock.getValue() != Common.Status.SUCCESS) {
                     log.error(String.format("Error reading genesis block of system channel '%s'", groupId));
                 }
+                log.info(String.format("Starting system channel '%s' with genesis block hash %s and consenter type %s", groupId, Hex.toHexString(BlockHelper.hash(block.getHeader().toByteArray())), chain.ledgerResources.getMutableResources().getGroupConfig().getConsenterConfig().getConsensusType()));
                 chains.put(groupId, chain);
                 systemGroupID = groupId;
                 systemGroup = chain;
-                chain.start();
+                //TODO 去掉chain启动
+             //   chain.start();
             } else {
                 log.debug(String.format("Starting chain: %s", groupId));
                 ChainSupport chain = new ChainSupport(this, ledgerResources, consenters, signer);
@@ -159,10 +172,10 @@ public class Registrar implements IChainCreator {
                 log.error("No system chain found.  If bootstrapping, does your system channel contain a consortiums group definition?");
             }
         }
-        return new Registrar(chains,consenters,signer,ledgerFactory);
+        return new Registrar(chains,consenters,signer,ledgerFactory,systemGroup);
     }
 
-    public GroupConfigBundle newBundle(String groupId, Configtx.Config config) throws ValidateException, PolicyException, InvalidProtocolBufferException {
+    public static GroupConfigBundle newBundle(String groupId, Configtx.Config config) throws ValidateException, PolicyException, InvalidProtocolBufferException {
         return new GroupConfigBundle(groupId, config);
     }
 
@@ -170,7 +183,7 @@ public class Registrar implements IChainCreator {
     public void update(GroupConfigBundle groupConfigBundle) throws ConsenterException {
         checkResourcesOrPanic(groupConfigBundle);
         //TODO update实现 bundlesource
-        ledgerResources.mutableResources.update();
+        ledgerResources.getMutableResources().update();
     }
 
 
@@ -178,7 +191,7 @@ public class Registrar implements IChainCreator {
         return systemGroupID;
     }
 
-    public Object broadcastGroupSupport(Common.Envelope msg) {
+    public  Map<String,Object> broadcastGroupSupport(Common.Envelope msg) throws InvalidProtocolBufferException {
         Common.GroupHeader chdr = CommonUtils.groupHeader(msg);
         ChainSupport cs = chains.get(chdr.getGroupId());
         if (cs == null) {
@@ -191,6 +204,7 @@ public class Registrar implements IChainCreator {
         Map<String, Object> map = new HashMap<>();
         map.put("isConfig", isConfig);
         map.put("chdr", chdr);
+        map.put("cs",cs);
         return map;
     }
 
@@ -207,16 +221,25 @@ public class Registrar implements IChainCreator {
         Common.GroupHeader chdr = CommonUtils.unmarshalGroupHeader(payload.getHeader().getGroupHeader().toByteArray());
         Configtx.ConfigEnvelope configEnvelope = ConfigTxUtil.unmarshalConfigEnvelope(payload.getData().toByteArray());
         GroupConfigBundle bundle = new GroupConfigBundle(chdr.getGroupId(), configEnvelope.getConfig());
-        ledgerFactory.getOrCreate(chdr.getGroupId());
+
+        //TODO  checkResourcesOrPanic报错
+//        try {
+//            checkResourcesOrPanic(bundle);
+//        } catch (ConsenterException e) {
+//         log.error(e.getMessage());
+//        }
+        ReadWriteBase ledger=ledgerFactory.getOrCreate(chdr.getGroupId());
         //TODO 回调函数
-        return null;
+        return new LedgerResources(bundle,ledger);
+
+
     }
 
     public void newChain(Common.Envelope configtx) throws ValidateException, PolicyException, InvalidProtocolBufferException, LedgerException {
         LedgerResources ledgerResources = newLedgerResources(configtx);
         List<Common.Envelope> envelopes = Arrays.asList(new Common.Envelope[]{configtx});
         try {
-            ledgerResources.writer.append(Util.createNextBlock(ledgerResources.reader, envelopes));
+            ledgerResources.getReadWriteBase().append(Util.createNextBlock(ledgerResources.getReadWriteBase(), envelopes));
         } catch (LedgerException e) {
             e.printStackTrace();
         }
@@ -227,14 +250,14 @@ public class Registrar implements IChainCreator {
             newChains.put(key, chains.get(key));
         }
         ChainSupport cs = new ChainSupport(this, ledgerResources, consenters, signer);
-        String chainId = ledgerResources.mutableResources.getConfigtxValidator().getGroupId();
+        String chainId = ledgerResources.getMutableResources().getConfigtxValidator().getGroupId();
         newChains.put(chainId, cs);
         cs.start();
         chains = newChains;
     }
 
     @Override
-    public IGroupConfigBundle newGroupConfig(Common.Envelope envConfigUpdate) {
+    public IGroupConfigBundle newGroupConfig(Common.Envelope envConfigUpdate) throws InvalidProtocolBufferException {
         return templator.newGroupConfig(envConfigUpdate);
     }
 

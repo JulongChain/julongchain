@@ -82,7 +82,7 @@ public class SystemGroup  implements IProcessor, IGroupConfigTemplator {
     }
 
     @Override
-    public long processNormalMsg(Common.Envelope env) {
+    public long processNormalMsg(Common.Envelope env) throws InvalidProtocolBufferException {
         String groupId = CommonUtils.groupId(env);
         if (groupId != standardGroup.getSupport().getGroupId()) {
             return 0;
@@ -91,9 +91,10 @@ public class SystemGroup  implements IProcessor, IGroupConfigTemplator {
     }
 
     @Override
-    public Object processConfigUpdateMsg(Common.Envelope envConfigUpdate) throws ConsenterException, InvalidProtocolBufferException, ValidateException, PolicyException {
+    public ConfigMsg processConfigUpdateMsg(Common.Envelope envConfigUpdate) throws ConsenterException, InvalidProtocolBufferException, ValidateException {
         String groupId = CommonUtils.groupId(envConfigUpdate);
         log.debug(String.format("Processing config update tx with system channel message processor for channel ID %s", groupId));
+        String  standardGroupName= standardGroup.getSupport().getGroupId();
         if (groupId == standardGroup.getSupport().getGroupId()) {
             return standardGroup.processConfigUpdateMsg(envConfigUpdate);
         }
@@ -116,7 +117,7 @@ public class SystemGroup  implements IProcessor, IGroupConfigTemplator {
     }
 
     @Override
-    public Object processConfigMsg(Common.Envelope env) throws ConsenterException, InvalidProtocolBufferException, ValidateException, PolicyException {
+    public ConfigMsg processConfigMsg(Common.Envelope env) throws ConsenterException, InvalidProtocolBufferException, ValidateException, PolicyException {
         Common.Payload payload = null;
         try {
             payload = Common.Payload.parseFrom(env.getPayload().toByteArray());

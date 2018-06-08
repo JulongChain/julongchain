@@ -16,6 +16,7 @@
 package org.bcia.javachain.consenter.common.msgprocessor;
 
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.javachain.protos.common.Common;
 
@@ -25,5 +26,5 @@ import org.bcia.javachain.protos.common.Common;
  * @company Dingxuan
  */
 public interface IGroupConfigTemplator {
-    IGroupConfigBundle newGroupConfig(Common.Envelope envelope);
+    IGroupConfigBundle newGroupConfig(Common.Envelope envelope) throws InvalidProtocolBufferException;
 }
