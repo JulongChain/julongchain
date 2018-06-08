@@ -50,10 +50,9 @@ public enum EcdsaSignOpts implements ISignerOpts {
         return this.name;
     }
     @Override
-    public String hashFunc() {
+    public int hashFunc() {
         // TODO Auto-generated method stub
-//        return this.index;
-		return null;
+        return this.index;
     }
 
     public long getmechanism() {
