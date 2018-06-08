@@ -17,10 +17,7 @@ package org.bcia.javachain.core.node.util;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.javachain.common.exception.LedgerException;
-import org.bcia.javachain.common.exception.NodeException;
-import org.bcia.javachain.common.exception.PolicyException;
-import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.exception.*;
 import org.bcia.javachain.common.groupconfig.GroupConfigBundle;
 import org.bcia.javachain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.javachain.common.groupconfig.config.IApplicationConfig;
@@ -49,8 +46,8 @@ import java.util.Map;
 public class ConfigTxUtils {
     private static final String RESOURCE_CONFIG_SEED_DATA = "resource_config_seed_data";
 
-    public static Configtx.Config validateAndApplyResourceConfig(String groupId, Common.Envelope txEnvelope) throws
-            NodeException, ValidateException, InvalidProtocolBufferException, PolicyException {
+    public static Configtx.Config validateAndApplyResourceConfig(String groupId, Common.Envelope txEnvelope)
+            throws NodeException, ValidateException, InvalidTxException, InvalidProtocolBufferException, PolicyException {
         Map<String, Group> groupMap = Node.getInstance().getGroupMap();
         ValidateUtils.isNotNull(groupMap, "groupMap can not be null");
 
@@ -61,7 +58,12 @@ public class ConfigTxUtils {
         ValidateUtils.isNotNull(groupSupport, "groupSupport can not be null");
 
         IResourcesConfigBundle resourcesConfigBundle = groupSupport.getResourcesConfigBundle();
-        Configtx.Config fullResourceConfig = computeFullConfig(resourcesConfigBundle, txEnvelope);
+        Configtx.Config fullResourceConfig = null;
+        try {
+            fullResourceConfig = computeFullConfig(resourcesConfigBundle, txEnvelope);
+        } catch (Exception e) {
+            throw new InvalidTxException(e);
+        }
 
         IResourcesConfigBundle bundle = new ResourcesConfigBundle(groupId, fullResourceConfig,
                 groupSupport.getGroupConfigBundle(), null);
@@ -71,7 +73,7 @@ public class ConfigTxUtils {
     }
 
     public static Configtx.Config computeFullConfig(IResourcesConfigBundle resourcesConfigBundle,
-                                                     Common.Envelope txEnvelope)
+                                                    Common.Envelope txEnvelope)
             throws InvalidProtocolBufferException, ValidateException {
         Configtx.ConfigEnvelope configEnvelope =
                 resourcesConfigBundle.getConfigtxValidator().proposeConfigUpdate(txEnvelope);
