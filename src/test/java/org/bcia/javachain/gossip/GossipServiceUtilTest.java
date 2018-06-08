@@ -38,15 +38,6 @@ public class GossipServiceUtilTest {
     GossipService gossipService1 = GossipServiceUtil.addressAndGossipServiceMap.get(address);
     Assert.assertNotNull(gossipService1);
     Assert.assertEquals(gossipService, gossipService1);
-
-    String id_leader = GossipServiceUtil.groupAndIdLeaderMap.get(group);
-    String address_leader = GossipServiceUtil.groupAndAddressLeaderMap.get(group);
-    GossipService gossipService_leader =
-        GossipServiceUtil.groupAndGossipServiceLeaderMap.get(group);
-
-    Assert.assertEquals(id, id_leader);
-    Assert.assertEquals(address_leader, address);
-    Assert.assertEquals(gossipService, gossipService_leader);
   }
 
   @Test
