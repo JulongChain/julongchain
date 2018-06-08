@@ -65,13 +65,13 @@ public class ResourcesConfigBundle implements IResourcesConfigBundle {
         Map<Integer, IPolicyProvider> policyProviderMap = new HashMap<Integer, IPolicyProvider>();
 //        policyProviderMap.put(Policies.Policy.PolicyType.SIGNATURE_VALUE, new PolicyProvider(configResources.getPolicyManager()));
 
-        IPolicyManager resourcesPolicyManager = new PolicyManager(ResourceConfigConstant.RESOURCES,
+        IPolicyManager resourcesPolicyManager = new PolicyManager(ResourcesConfigConstant.RESOURCES,
                 policyProviderMap, config.getGroupTree());
         IPolicyManager groupPolicyManager = groupConfigBundle.getPolicyManager();
 
         this.policyManager = new PolicyRouter(groupPolicyManager, resourcesPolicyManager);
 
-        this.configtxValidator = new ConfigtxValidator(groupId, config, ResourceConfigConstant.RESOURCES, policyManager);
+        this.configtxValidator = new ConfigtxValidator(groupId, config, ResourcesConfigConstant.RESOURCES, policyManager);
 
     }
 

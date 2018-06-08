@@ -51,15 +51,15 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
         this.indexConfig = indexConfig;
         this.leveldbProvider = new LevelDBProvider(config.getIndexDir());
         this.config = config;
-        logger.debug("Createing fsBlockStore using path = " + config.getChainsDir());
+        logger.debug("Creating fsBlockStore using path = " + config.getChainsDir());
     }
 
     /**
      * 创建(打开)一个文件系统
      */
     @Override
-    public IBlockStore createBlockStore(String ledgerid) throws LedgerException {
-        return openBlockStore(ledgerid);
+    public IBlockStore createBlockStore(String ledgerID) throws LedgerException {
+        return openBlockStore(ledgerID);
     }
 
     /**
@@ -67,16 +67,16 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
      * 仅调用一次
      */
     @Override
-    public IBlockStore openBlockStore(String ledgerid) throws LedgerException {
-        return FsBlockStore.newFsBlockStore(ledgerid, config, indexConfig, leveldbProvider);
+    public IBlockStore openBlockStore(String ledgerID) throws LedgerException {
+        return FsBlockStore.newFsBlockStore(ledgerID, config, indexConfig, leveldbProvider);
     }
 
     /**
      * 给出的ledgerid是否存在文件系统
      */
     @Override
-    public Boolean exists(String ledgerid) {
-         return IoUtil.fileExists(config.getLedgerBlockDir(ledgerid)) >= 0;
+    public Boolean exists(String ledgerID) {
+         return IoUtil.fileExists(config.getLedgerBlockDir(ledgerID)) >= 0;
     }
 
     /**

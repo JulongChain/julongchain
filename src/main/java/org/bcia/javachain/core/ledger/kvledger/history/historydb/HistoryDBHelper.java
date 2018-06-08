@@ -16,6 +16,7 @@ limitations under the License.
 package org.bcia.javachain.core.ledger.kvledger.history.historydb;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.bcia.javachain.common.ledger.blkstorage.fsblkstorage.BlockFileManager;
 import org.bcia.javachain.core.ledger.util.Util;
 
 /**
@@ -36,9 +37,9 @@ public class HistoryDBHelper {
         compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
         compositeKey = ArrayUtils.addAll(compositeKey, key.getBytes());
         compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
-        compositeKey = ArrayUtils.addAll(compositeKey, Util.longToBytes(blocNum, 8));
+        compositeKey = ArrayUtils.addAll(compositeKey, Util.longToBytes(blocNum, BlockFileManager.PEEK_BYTES_LEN));
         compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
-        compositeKey = ArrayUtils.addAll(compositeKey, Util.longToBytes(tranNum, 8));
+        compositeKey = ArrayUtils.addAll(compositeKey, Util.longToBytes(tranNum, BlockFileManager.PEEK_BYTES_LEN));
         return compositeKey;
     }
 
@@ -67,7 +68,7 @@ public class HistoryDBHelper {
         if(length != byteToSplit.length - 17){
             return -1;
         }
-        return Util.bytesToLong(byteToSplit, length, 8);
+        return Util.bytesToLong(byteToSplit, length, BlockFileManager.PEEK_BYTES_LEN);
     }
 
     /**
@@ -80,7 +81,7 @@ public class HistoryDBHelper {
         if(length != byteToSplit.length - 17){
             return -1;
         }
-        return Util.bytesToLong(byteToSplit, length + 9, 8);
+        return Util.bytesToLong(byteToSplit, length + 9, BlockFileManager.PEEK_BYTES_LEN);
     }
 
     /**

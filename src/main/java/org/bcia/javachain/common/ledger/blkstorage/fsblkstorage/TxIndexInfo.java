@@ -17,6 +17,7 @@ package org.bcia.javachain.common.ledger.blkstorage.fsblkstorage;
 
 /**
  * 封装交易索引信息
+ * 包含交易ID、交易位置
  *
  * @author sunzongyu
  * @date 2018/04/12

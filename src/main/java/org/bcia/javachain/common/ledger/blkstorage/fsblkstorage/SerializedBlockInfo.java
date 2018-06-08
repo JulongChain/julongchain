@@ -21,6 +21,7 @@ import java.util.List;
 
 /**
  * 序列化的区块信息
+ * 包含区块头部、全部交易、metadata
  *
  * @author sunzongyu
  * @date 2018/4/7

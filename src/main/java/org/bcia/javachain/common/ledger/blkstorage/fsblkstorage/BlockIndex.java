@@ -20,7 +20,6 @@ import org.bcia.javachain.common.exception.LedgerException;
 import org.bcia.javachain.common.ledger.blkstorage.BlockStorage;
 import org.bcia.javachain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.javachain.common.ledger.util.IDBProvider;
-import org.bcia.javachain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.javachain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.bcia.javachain.common.log.JavaChainLog;
 import org.bcia.javachain.common.log.JavaChainLogFactory;
@@ -35,26 +34,27 @@ import java.util.Map;
 
 /**
  * 操作block索引类
+ * 用于完成区块索引以及索引数据库写入、查询
  *
  * @author sunzongyu
  * @date 2018/04/09
  * @company Dingxuan
  */
 public class BlockIndex implements Index {
-
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockIndex.class);
+    static final LedgerException NO_BLOCK_INDEXED = new LedgerException("NoBlockIndexed");
 
-    private Map<String, Boolean> indexItemsMap = new HashMap<>();
+    private Map<String, Boolean> indexItemsMap;
     private IDBProvider db;
     private String ledgerId;
 
-    private static final String BLOCK_NUM_IDX_KEY_PREFIX           = "n";
-    private static final String BLOCK_HASH_IDX_KEY_PREFIX          = "h";
-    private static final String TX_ID_IDX_KEY_PREFIX               = "t";
-    private static final String BLOCK_NUM_TRAN_NUM_IDX_KEY_PREFIX    = "a";
+	private static final String BLOCK_NUM_IDX_KEY_PREFIX      		= "n";
+    private static final String BLOCK_HASH_IDX_KEY_PREFIX			= "h";
+    private static final String TX_ID_IDX_KEY_PREFIX 				= "t";
+    private static final String BLOCK_NUM_TRAN_NUM_IDX_KEY_PREFIX	= "a";
     private static final String BLOCK_TX_ID_IDX_KEY_PREFIX          = "b";
     private static final String TX_VALIDATION_RESULT_IDX_KEY_PREFIX = "v";
-    private static final String INDEX_CHECK_POINT_KEY_STR          = "indexCheckpointKey";
+    private static final String INDEX_CHECK_POINT_KEY_STR			= "indexCheckpointKey";
 
     public BlockIndex(IndexConfig indexConfig, IDBProvider db, String id) {
         String[] indexItems = indexConfig.getAttrsToIndex();
@@ -73,10 +73,10 @@ public class BlockIndex implements Index {
      */
     @Override
     public long getLastBlockIndexed() throws LedgerException {
-        byte[] blockNumBytes = null;
+        byte[] blockNumBytes;
         blockNumBytes = db.get(constructIndexCheckpointKey());
         if (blockNumBytes == null){
-            throw new LedgerException("NoBlockIndexed");
+        	throw NO_BLOCK_INDEXED;
         }
         return Util.bytesToLong(blockNumBytes, 0, blockNumBytes.length);
     }
@@ -135,7 +135,7 @@ public class BlockIndex implements Index {
             }
         }
 
-        //index6 根据txid获取交易有效性
+        //index6 根据txid获取交易有效标志
         if(Boolean.TRUE.equals(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_VALIDATION_CODE))){
             for (int i = 0; i < txOffsets.size(); i++) {
                 TxIndexInfo txOffset = txOffsets.get(i);
@@ -143,7 +143,7 @@ public class BlockIndex implements Index {
             }
         }
 
-        batch.put(constructIndexCheckpointKey(), Util.longToBytes(blockIndexInfo.getBlockNum(), 8));
+        batch.put(constructIndexCheckpointKey(), Util.longToBytes(blockIndexInfo.getBlockNum(), BlockFileManager.PEEK_BYTES_LEN));
         db.writeBatch(batch, true);
     }
 
@@ -155,7 +155,6 @@ public class BlockIndex implements Index {
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_HASH) == null){
             throw BlockStorage.ERR_ARRT_NOT_INDEXED;
         }
-        byte[] a = constructBlockHashKey(blockHash);
         byte[] b = db.get(constructBlockHashKey(blockHash));
         if(b == null){
             throw BlockStorage.ERR_NOT_FOUND_IN_INDEX;
@@ -190,7 +189,6 @@ public class BlockIndex implements Index {
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_ID) == null){
             throw BlockStorage.ERR_ARRT_NOT_INDEXED;
         }
-        byte[] bytes = constructTxIDKey(txID);
         byte[] b = db.get(constructTxIDKey(txID));
         if(b == null){
             throw BlockStorage.ERR_NOT_FOUND_IN_INDEX;
@@ -251,66 +249,69 @@ public class BlockIndex implements Index {
         return TransactionPackage.TxValidationCode.forNumber(Integer.valueOf(new String(raw)));
     }
 
-    byte[] constructBlockNumKey(long blockNum) {
-        byte[] blkNumBytes = Util.longToBytes(blockNum, 8);
+    /*
+   	--------------------------------------------------------------------------------------------------------------------
+   	在kv数据库中，1个k只对应1个v
+   	如何只使用1个txID既完成对交易的索引，又完成对block的索引
+	同时按目前的设计，只存在一个index数据库，但是可能存在多个群组（group）
+	故需要对k进行组装,格式为：	类型～groupID～key
+	以下方法对目前支持的类型key进行组装
+   	--------------------------------------------------------------------------------------------------------------------
+     */
+
+    private byte[] constructBlockNumKey(long blockNum) {
+        byte[] blkNumBytes = Util.longToBytes(blockNum, BlockFileManager.PEEK_BYTES_LEN);
         byte[] result = new byte[0];
         result = ArrayUtils.addAll(result, BLOCK_NUM_IDX_KEY_PREFIX.getBytes());
         result = ArrayUtils.addAll(result, ledgerId.getBytes());
         result = ArrayUtils.addAll(result, blkNumBytes);
         return result;
-//        return ArrayUtils.addAll(BLOCK_NUM_IDX_KEY_PREFIX.getBytes(), blockNum);
     }
 
-    byte[] constructBlockHashKey(byte[] blockHash) {
+    private byte[] constructBlockHashKey(byte[] blockHash) {
         byte[] result = new byte[0];
         result = ArrayUtils.addAll(result, BLOCK_HASH_IDX_KEY_PREFIX.getBytes());
         result = ArrayUtils.addAll(result, ledgerId.getBytes());
         result = ArrayUtils.addAll(result, blockHash);
         return result;
-//        return ArrayUtils.addAll(BLOCK_HASH_IDX_KEY_PREFIX.getBytes(), blockHash);
     }
 
-    byte[] constructTxIDKey(String txID) {
+    private byte[] constructTxIDKey(String txID) {
         byte[] result = new byte[0];
         result = ArrayUtils.addAll(result, TX_ID_IDX_KEY_PREFIX.getBytes());
         result = ArrayUtils.addAll(result, ledgerId.getBytes());
         result = ArrayUtils.addAll(result, txID.getBytes());
         return result;
-//        return ArrayUtils.addAll(TX_ID_IDX_KEY_PREFIX.getBytes(), txID.getBytes());
     }
 
-    byte[] constructBlockTxIDKey(String txID) {
+    private byte[] constructBlockTxIDKey(String txID) {
         byte[] result = new byte[0];
         result = ArrayUtils.addAll(result, BLOCK_TX_ID_IDX_KEY_PREFIX.getBytes());
         result = ArrayUtils.addAll(result, ledgerId.getBytes());
         result = ArrayUtils.addAll(result, txID.getBytes());
         return result;
-//        return ArrayUtils.addAll(BLOCK_TX_ID_IDX_KEY_PREFIX.getBytes(), txID.getBytes());
     }
 
-    byte[] constructTxValidationCodeIDKey(String txID) {
+    private byte[] constructTxValidationCodeIDKey(String txID) {
         byte[] result = new byte[0];
         result = ArrayUtils.addAll(result, TX_VALIDATION_RESULT_IDX_KEY_PREFIX.getBytes());
         result = ArrayUtils.addAll(result, ledgerId.getBytes());
         result = ArrayUtils.addAll(result, txID.getBytes());
         return result;
-//        return ArrayUtils.addAll(TX_VALIDATION_RESULT_IDX_KEY_PREFIX.getBytes(), txID.getBytes());
     }
 
-    byte[] constructBlockNumTranNumKey(long blockNum, long txNum) {
-        byte[] blkNumBytes = Util.longToBytes(blockNum, 8);
-        byte[] txNumBytes = Util.longToBytes(txNum, 8);
-        byte[] key = ArrayUtils.addAll(blkNumBytes, txNumBytes);
+    private byte[] constructBlockNumTranNumKey(long blockNum, long txNum) {
+        byte[] blkNumBytes = Util.longToBytes(blockNum, BlockFileManager.PEEK_BYTES_LEN);
+        byte[] txNumBytes = Util.longToBytes(txNum, BlockFileManager.PEEK_BYTES_LEN);
         byte[] result = new byte[0];
         result = ArrayUtils.addAll(result, BLOCK_NUM_TRAN_NUM_IDX_KEY_PREFIX.getBytes());
         result = ArrayUtils.addAll(result, ledgerId.getBytes());
         result = ArrayUtils.addAll(result, blkNumBytes);
         result = ArrayUtils.addAll(result, txNumBytes);
         return result;
-//        return ArrayUtils.addAll(BLOCK_NUM_TRAN_NUM_IDX_KEY_PREFIX.getBytes(), key);
     }
 
-    byte[] constructIndexCheckpointKey(){
+    private byte[] constructIndexCheckpointKey(){
         byte[] result = new byte[0];
         result = ArrayUtils.addAll(result, INDEX_CHECK_POINT_KEY_STR.getBytes());
         result = ArrayUtils.addAll(result, ledgerId.getBytes());

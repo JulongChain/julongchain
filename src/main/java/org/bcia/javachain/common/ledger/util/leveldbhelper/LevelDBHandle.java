@@ -74,7 +74,6 @@ public class LevelDBHandle implements IDBHandle {
      */
     @Override
     public DB createDB(String dbPath) throws LevelDBException{
-//        this.db = LevelDBFactory.getDB(dbPath);
         this.opened = true;
         this.dbName = dbPath;
         return db;

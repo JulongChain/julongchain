@@ -17,7 +17,7 @@ package org.bcia.javachain.common.resourceconfig.config;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.javachain.common.exception.ValidateException;
-import org.bcia.javachain.common.resourceconfig.ResourceConfigConstant;
+import org.bcia.javachain.common.resourceconfig.ResourcesConfigConstant;
 import org.bcia.javachain.protos.common.Configtx;
 
 import java.util.Iterator;
@@ -43,11 +43,11 @@ public class ResourcesConfig implements IResourcesConfig {
                 String childName = entry.getKey();
                 Configtx.ConfigTree childTree = entry.getValue();
 
-                if (ResourceConfigConstant.APIS.equals(childName)) {
+                if (ResourcesConfigConstant.APIS.equals(childName)) {
                     this.apiConfig = new ApisConfig(childTree);
-                } else if (ResourceConfigConstant.NODE_POLICIES.equals(childName)) {
+                } else if (ResourcesConfigConstant.NODE_POLICIES.equals(childName)) {
                     this.nodePoliciesConfig = new NodePoliciesConfig(childTree);
-                } else if (ResourceConfigConstant.SMART_CONTRACTS.equals(childName)) {
+                } else if (ResourcesConfigConstant.SMART_CONTRACTS.equals(childName)) {
                     this.smartContractsConfig = new SmartContractsConfig(childTree);
                 }
             }

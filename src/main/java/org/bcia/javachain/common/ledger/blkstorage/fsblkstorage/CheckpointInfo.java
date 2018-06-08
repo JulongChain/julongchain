@@ -67,17 +67,17 @@ public class CheckpointInfo {
     byte[] marshal() {
         //4部分共32字节
         //0~7位 lastestFileChunkSuffixNum
-        byte[] bytes0 = Util.longToBytes(lastestFileChunkSuffixNum, 8);
+        byte[] bytes0 = Util.longToBytes(lastestFileChunkSuffixNum, BlockFileManager.PEEK_BYTES_LEN);
         //8~15位 latestFileChunksize
-        byte[] bytes1 = Util.longToBytes(latestFileChunksize, 8);
+        byte[] bytes1 = Util.longToBytes(latestFileChunksize, BlockFileManager.PEEK_BYTES_LEN);
         //16~23位 lastBlockNumber
-        byte[] bytes2 = Util.longToBytes(lastBlockNumber, 8);
+        byte[] bytes2 = Util.longToBytes(lastBlockNumber, BlockFileManager.PEEK_BYTES_LEN);
         //24~31位 chainEmptyMarker
         long chainEmptyMarker = 0;
         if(isChainEmpty){
             chainEmptyMarker = 1;
         }
-        byte[] bytes3 = Util.longToBytes(chainEmptyMarker, 8);
+        byte[] bytes3 = Util.longToBytes(chainEmptyMarker, BlockFileManager.PEEK_BYTES_LEN);
         byte[] result = ArrayUtils.addAll(bytes0, bytes1);
         result = ArrayUtils.addAll(result, bytes2);
         result = ArrayUtils.addAll(result, bytes3);
@@ -90,13 +90,13 @@ public class CheckpointInfo {
     void unmarshal(byte[] b) throws LedgerException {
         //4部分共32字节
         //0~7位 lastestFileChunkSuffixNum
-        lastestFileChunkSuffixNum = (int) Util.bytesToLong(b, 0, 8);
+        lastestFileChunkSuffixNum = (int) Util.bytesToLong(b, 0, BlockFileManager.PEEK_BYTES_LEN);
         //8~15位 latestFileChunksize
-        latestFileChunksize = (int) Util.bytesToLong(b, 8, 8);
+        latestFileChunksize = (int) Util.bytesToLong(b, 8, BlockFileManager.PEEK_BYTES_LEN);
         //16~23位 lastBlockNumber
-        lastBlockNumber = Util.bytesToLong(b, 16, 8);
+        lastBlockNumber = Util.bytesToLong(b, 16, BlockFileManager.PEEK_BYTES_LEN);
         //24~31位 chainEmptyMarker
-        isChainEmpty = Util.bytesToLong(b, 24, 8) == 1;
+        isChainEmpty = Util.bytesToLong(b, 24, BlockFileManager.PEEK_BYTES_LEN) == 1;
     }
 
     public int getLastestFileChunkSuffixNum() {

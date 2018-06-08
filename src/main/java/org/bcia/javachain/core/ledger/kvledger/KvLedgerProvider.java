@@ -136,8 +136,7 @@ public class KvLedgerProvider implements INodeLedgerProvider {
             logger.error("Ledger {} does not exists", ledgerID);
             throw ERR_NON_EXISTS_LEDGER_ID;
         }
-        INodeLedger lgr = openInternal(ledgerID);
-        return lgr;
+        return openInternal(ledgerID);
     }
 
     /**
@@ -222,8 +221,7 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         //账本的历史db
         IHistoryDB historyDB = historyDBProvider.getDBHandle(ledgerID);
 
-        KvLedger kvLedger = new KvLedger(ledgerID, blockStore, vdb, historyDB, stateListeners);
-        return kvLedger;
+        return new KvLedger(ledgerID, blockStore, vdb, historyDB, stateListeners);
     }
 
     private void runCleanup(String ledgerID){
