@@ -127,13 +127,9 @@ public class EnvelopeHelper {
     public static Configtx.ConfigUpdate buildConfigUpdate(String groupId, Configtx.ConfigTree
             consenterSystemGroupTree, GenesisConfig.Profile profile) throws InvalidProtocolBufferException,
             ValidateException {
-        if (profile.getApplication() == null) {
-            throw new ValidateException("No Application in profile");
-        }
-
-        if (profile.getConsortium() == null) {
-            throw new ValidateException("No Consortium in profile");
-        }
+        ValidateUtils.isNotNull(profile, "profile can not be null");
+        ValidateUtils.isNotNull(profile.getApplication(), "profile.getApplication can not be null");
+        ValidateUtils.isNotNull(profile.getConsortium(), "profile.getConsortium can not be null");
 
         //构造应用子树
         Configtx.ConfigTree appTree = ConfigTreeHelper.buildApplicationTree(profile.getApplication());

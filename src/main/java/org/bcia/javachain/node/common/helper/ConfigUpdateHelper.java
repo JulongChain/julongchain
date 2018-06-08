@@ -16,12 +16,10 @@
 package org.bcia.javachain.node.common.helper;
 
 import org.bcia.javachain.common.exception.ValidateException;
+import org.bcia.javachain.common.util.ValidateUtils;
 import org.bcia.javachain.protos.common.Configtx;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * 配置更新对象帮助类
@@ -33,18 +31,19 @@ import java.util.Objects;
 public class ConfigUpdateHelper {
     public static Configtx.ConfigUpdate compute(Configtx.Config originalConfig, Configtx.Config pendingConfig) throws
             ValidateException {
-        if (originalConfig.getGroupTree() == null) {
-            throw new ValidateException("No group tree found in original");
-        }
-
-        if (pendingConfig.getGroupTree() == null) {
-            throw new ValidateException("No group tree found in pending");
-        }
+        ValidateUtils.isNotNull(originalConfig, "originalConfig can not be null");
+        ValidateUtils.isNotNull(pendingConfig, "pendingConfig can not be null");
+        ValidateUtils.isNotNull(originalConfig.getGroupTree(), "No group tree found in original");
+        ValidateUtils.isNotNull(pendingConfig.getGroupTree(), "No group tree found in pending");
 
         Object[] childObjs = computeTreeUpdate(originalConfig.getGroupTree(), pendingConfig.getGroupTree());
         Configtx.ConfigTree readChild = (Configtx.ConfigTree) childObjs[0];
         Configtx.ConfigTree writeChild = (Configtx.ConfigTree) childObjs[1];
         boolean childUpdate = (boolean) childObjs[2];
+
+        if (!childUpdate) {
+            throw new ValidateException("No differences between original and pending");
+        }
 
         //开始构造ConfigUpdate对象
         Configtx.ConfigUpdate.Builder configUpdateBuilder = Configtx.ConfigUpdate.newBuilder();
@@ -86,8 +85,8 @@ public class ConfigUpdateHelper {
             }
 
             //如果存在对应项，相同的并入sameSet，不同的并入writeSet
-            if (pendingPolicy.getModPolicy().equals(originalPolicy.getModPolicy()) && originalPolicy.getPolicy()
-                    .equals(pendingPolicy.getPolicy())) {
+            if (pendingPolicy.getModPolicy().equals(originalPolicy.getModPolicy()) &&
+                    Arrays.equals(originalPolicy.getPolicy().toByteArray(), pendingPolicy.getPolicy().toByteArray())) {
                 sameSet.put(policyName, originalPolicy);
             } else {
                 //基于新集合创建另一个集合，只是版本增加1
@@ -149,8 +148,8 @@ public class ConfigUpdateHelper {
             }
 
             //如果存在对应项，相同的并入sameSet，不同的并入writeSet
-            if (pendingValue.getModPolicy().equals(originalValue.getModPolicy()) && originalValue.getValue()
-                    .equals(pendingValue.getValue())) {
+            if (pendingValue.getModPolicy().equals(originalValue.getModPolicy())
+                    && Arrays.equals(originalValue.getValue().toByteArray(), pendingValue.getValue().toByteArray())) {
                 sameSet.put(valueName, originalValue);
             } else {
                 //基于新集合创建另一个集合，只是版本增加1
@@ -233,7 +232,7 @@ public class ConfigUpdateHelper {
             Configtx.ConfigTree pendingTree = entry.getValue();
 
             //判断在原集合originalMap有没有对应项。有对应项的已经在前面处理过了，只需要再处理不存在的
-            Configtx.ConfigTree originalTree = pendingMap.get(childName);
+            Configtx.ConfigTree originalTree = originalMap.get(childName);
             if (originalTree == null) {
                 //该成员在原集合不存在，很可能是新增项，说明集合成员项有更新
                 hasMemberUpdate = true;
