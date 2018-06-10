@@ -26,6 +26,7 @@ import org.bcia.julongchain.common.util.Expiration;
 import org.bcia.julongchain.common.util.proto.SignedData;
 import org.bcia.julongchain.protos.common.Common;
 import org.bouncycastle.asn1.x509.Time;
+
 import java.util.Date;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class ExpirationRejectRule implements IRule {
 
         IConsenterConfig consenterConfig = filterSupport.getGroupConfig().getConsenterConfig();
 
-        if (!consenterConfig.getCapabilities().isExpiration()) {
+        if (consenterConfig != null && consenterConfig.getCapabilities() != null && !consenterConfig.getCapabilities().isExpiration()) {
             return;
         }
         List<SignedData> signedData = null;

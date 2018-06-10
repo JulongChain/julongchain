@@ -113,6 +113,13 @@ public class NodeGroup {
                 log.info("Broadcast onNext");
                 //收到响应消息，判断是否是200消息
                 if (Common.Status.SUCCESS.equals(value.getStatus())) {
+                    try {
+                        //wait consenter do this message
+                        Thread.sleep(3000);
+                    } catch (InterruptedException e) {
+                        log.error(e.getMessage(), e);
+                    }
+
                     getGenesisBlockThenWrite(host, port, groupId);
                 }
             }

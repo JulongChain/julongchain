@@ -129,18 +129,19 @@ public class PolicyManager implements IPolicyManager {
     }
 
     @Override
-    public IPolicyManager getSubPolicyManager(String[] path) {
-        if(path == null || path.length <= 0){
+    public IPolicyManager getSubPolicyManager(String[] paths) {
+        if (paths == null || paths.length <= 0) {
             return this;
         }
 
-        for (String str : path) {
-            if (!childManagers.containsKey(str)) {
-                return null;
-            }
+        IPolicyManager policyManager = childManagers.get(paths[0]);
+        if (policyManager == null) {
+            return null;
         }
 
-        return childManagers.get(path[path.length - 1]);
+        String[] newPaths = new String[paths.length - 1];
+        System.arraycopy(paths, 1, newPaths, 0, paths.length - 1);
+        return policyManager.getSubPolicyManager(newPaths);
     }
 
     @Override

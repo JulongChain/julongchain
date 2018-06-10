@@ -30,10 +30,10 @@ public interface IPolicyManager {
     /**
      * the sub-policy getPolicyManager for a given path and whether it exists
      *
-     * @param path
+     * @param paths
      * @return
      */
-    IPolicyManager getSubPolicyManager(String[] path);
+    IPolicyManager getSubPolicyManager(String[] paths);
 
     Map<String, IPolicy> getPolicies();
 }
