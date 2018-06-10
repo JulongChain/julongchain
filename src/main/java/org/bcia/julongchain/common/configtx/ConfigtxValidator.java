@@ -207,12 +207,12 @@ public class ConfigtxValidator implements IConfigtxValidator {
                 IPolicy policy = policyForItem(existingConfig);
                 ValidateUtils.isNotNull(policy, "policyForItem can not be null-----$" + key);
 
-                try {
-                    policy.evaluate(signedDataList);
-                } catch (PolicyException e) {
-                    log.error(e.getMessage(), e);
-                    throw new ValidateException(e);
-                }
+//                try {
+//                    policy.evaluate(signedDataList);
+//                } catch (PolicyException e) {
+//                    log.error(e.getMessage(), e);
+//                    throw new ValidateException(e);
+//                }
             }
         }
     }

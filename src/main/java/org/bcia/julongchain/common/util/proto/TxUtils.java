@@ -88,7 +88,9 @@ public class TxUtils {
 
     public static Common.Envelope createSignedEnvelopeWithTLSBinding(int txType, String groupId, ILocalSigner signer, Message dataMsg, int msgVersion, long epoch, byte[] tlsCertHash) {
         Common.GroupHeader groupHeader = CommonUtils.makeGroupHeader(txType, msgVersion, groupId, epoch);
-        groupHeader.toBuilder().setTlsCertHash(ByteString.copyFrom(tlsCertHash));
+        if(tlsCertHash != null) {
+            groupHeader.toBuilder().setTlsCertHash(ByteString.copyFrom(tlsCertHash));
+        }
 
         Common.SignatureHeader signatureHeader = null;
         if (signer != null) {

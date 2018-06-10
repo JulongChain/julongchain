@@ -111,14 +111,14 @@ public class ConfigTreeHelper {
 
         //构造可读人员的内置策略(任意子策略被满足即可)
         Configtx.ConfigPolicy.Builder readerPolicyBuilder = Configtx.ConfigPolicy.newBuilder();
-        adminPolicyBuilder.setPolicy(new ImplicitMetaAnyPolicy(GroupConfigConstant.POLICY_READERS).getValue());
-        adminPolicyBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
+        readerPolicyBuilder.setPolicy(new ImplicitMetaAnyPolicy(GroupConfigConstant.POLICY_READERS).getValue());
+        readerPolicyBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
         defaultPolicies.put(GroupConfigConstant.POLICY_READERS, readerPolicyBuilder.build());
 
         //构造可写人员的内置策略(任意子策略被满足即可)
         Configtx.ConfigPolicy.Builder writerPolicyBuilder = Configtx.ConfigPolicy.newBuilder();
-        adminPolicyBuilder.setPolicy(new ImplicitMetaAnyPolicy(GroupConfigConstant.POLICY_WRITERS).getValue());
-        adminPolicyBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
+        writerPolicyBuilder.setPolicy(new ImplicitMetaAnyPolicy(GroupConfigConstant.POLICY_WRITERS).getValue());
+        writerPolicyBuilder.setModPolicy(GroupConfigConstant.POLICY_ADMINS);
         defaultPolicies.put(GroupConfigConstant.POLICY_WRITERS, writerPolicyBuilder.build());
 
         return defaultPolicies;

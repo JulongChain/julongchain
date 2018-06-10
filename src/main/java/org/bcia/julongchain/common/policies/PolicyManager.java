@@ -130,6 +130,10 @@ public class PolicyManager implements IPolicyManager {
 
     @Override
     public IPolicyManager getSubPolicyManager(String[] path) {
+        if(path == null || path.length <= 0){
+            return this;
+        }
+
         for (String str : path) {
             if (!childManagers.containsKey(str)) {
                 return null;

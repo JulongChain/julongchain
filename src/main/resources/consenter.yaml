@@ -62,7 +62,7 @@ general:
     # GenesisMethod is set to "provisional". See the configtx.yaml file for the
     # descriptions of the available profiles. Ignored if GenesisMethod is set to
     # "file".
-    genesisProfile: SampleInsecureSolo
+    genesisProfile: SampleDevModeSolo
 
     # Genesis file: The file containing the genesis block to use when
     # initializing the orderer system channel and GenesisMethod is set to
@@ -118,11 +118,11 @@ fileLedger:
     # Location: The directory to store the blocks in.
     # NOTE: If this is unset, a new temporary location will be chosen every time
     # the orderer is restarted, using the prefix specified by Prefix.
-    location: /var/hyperledger/production/orderer
+    location: /var/julongchain/production/consenter
 
     # The prefix to use when generating a ledger directory in temporary space.
     # Otherwise, this value is ignored.
-    prefix: hyperledger-fabric-ordererledger
+    prefix: julongchain-consenterledger
 
 ################################################################################
 #

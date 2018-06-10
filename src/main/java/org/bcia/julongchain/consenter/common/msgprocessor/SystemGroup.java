@@ -95,7 +95,7 @@ public class SystemGroup  implements IProcessor {
         String groupId = CommonUtils.groupId(envConfigUpdate);
         log.debug(String.format("Processing config update tx with system channel message processor for channel ID %s", groupId));
         String  standardGroupName= standardGroup.getSupport().getGroupId();
-        if (groupId == standardGroup.getSupport().getGroupId()) {
+        if (groupId.equals(standardGroup.getSupport().getGroupId()) ) {
             return standardGroup.processConfigUpdateMsg(envConfigUpdate);
         }
         log.debug(String.format("Processing group create tx for group %s on system group %s", groupId,
