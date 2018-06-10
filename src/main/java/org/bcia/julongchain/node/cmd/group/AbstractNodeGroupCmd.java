@@ -34,10 +34,6 @@ public abstract class AbstractNodeGroupCmd implements INodeCmd {
 
     private Node node;
 
-    public AbstractNodeGroupCmd() {
-        nodeGroup = new NodeGroup();
-    }
-
     public AbstractNodeGroupCmd(Node node) {
         this.nodeGroup = new NodeGroup(node);
 

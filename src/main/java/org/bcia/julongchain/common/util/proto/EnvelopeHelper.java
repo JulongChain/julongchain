@@ -149,8 +149,16 @@ public class EnvelopeHelper {
         groupTreeBuilder.putChilds(GroupConfigConstant.APPLICATION, appTree);
         Configtx.ConfigTree pendingTree = groupTreeBuilder.build();
 
-        Configtx.Config original = Configtx.Config.newBuilder().setGroupTree(originalTree).build();
+//        Configtx.Config original = Configtx.Config.newBuilder().setGroupTree(originalTree).build();
         Configtx.Config pending = Configtx.Config.newBuilder().setGroupTree(pendingTree).build();
+
+        Configtx.ConfigTree.Builder originalAppTreeBuilder = appTree.toBuilder().clearValues().clearPolicies();
+        Configtx.Config.Builder originalBuilder = pending.toBuilder();
+
+        originalBuilder.getGroupTreeBuilder().putChilds(GroupConfigConstant.APPLICATION,
+                originalAppTreeBuilder.build());
+        Configtx.Config original = originalBuilder.build();
+
         Configtx.ConfigUpdate configUpdate = ConfigUpdateHelper.compute(original, pending);
 
         Configtx.ConfigUpdate.Builder configUpdateBuilder = configUpdate.toBuilder();

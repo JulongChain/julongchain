@@ -63,7 +63,7 @@ public class DefaultTemplator implements IGroupConfigTemplator {
         }
         Common.GroupHeader groupHeader = CommonUtils.unmarshalGroupHeader(configUpdatePayload.getHeader().getGroupHeader().toByteArray());
         Configtx.ConfigUpdate configUpdate = ConfigTxUtil.unmarshalConfigUpdate(configUpdateEnv.getConfigUpdate().toByteArray());
-        if (configUpdate.getGroupId()!= groupHeader.getGroupId()) {
+        if (!configUpdate.getGroupId().equals(groupHeader.getGroupId()) ) {
             log.error(String.format("Failing initial group config creation: mismatched group IDs: '%s' != '%s'", configUpdate.getGroupId(), groupHeader.getGroupId()));
         }
         if (configUpdate.getWriteSet() == null) {
@@ -73,7 +73,7 @@ public class DefaultTemplator implements IGroupConfigTemplator {
             log.error("Config update has missing application group");
         }
         long uv = configUpdate.getWriteSet().getChildsMap().get(GroupConfigConstant.APPLICATION).getVersion();
-        if (uv != 1) {
+        if (uv != 1L) {
             log.error(String.format("Config update for channel creation does not set application group version to 1, was %d", uv));
         }
         Configtx.ConfigValue consortiumConfigValue = configUpdate.getWriteSet().getValuesMap().get(GroupConfigConstant.CONSORTIUM);

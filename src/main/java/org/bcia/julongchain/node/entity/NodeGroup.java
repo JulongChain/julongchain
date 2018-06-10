@@ -68,42 +68,8 @@ public class NodeGroup {
 
     private Node node;
 
-    public NodeGroup() {
-    }
-
     public NodeGroup(Node node) {
         this.node = node;
-    }
-
-    class CreateGroupObserver implements StreamObserver<Ab.BroadcastResponse> {
-        private String host;
-        private int port;
-        private String groupId;
-
-        public CreateGroupObserver(String host, int port, String groupId) {
-            this.host = host;
-            this.port = port;
-            this.groupId = groupId;
-        }
-
-        @Override
-        public void onNext(Ab.BroadcastResponse broadcastResponse) {
-            log.info("Broadcast onNext");
-            //收到响应消息，判断是否是200消息
-            if (Common.Status.SUCCESS.equals(broadcastResponse.getStatus())) {
-                getGenesisBlockThenWrite(host, port, groupId);
-            }
-        }
-
-        @Override
-        public void onError(Throwable throwable) {
-            log.error(throwable.getMessage(), throwable);
-        }
-
-        @Override
-        public void onCompleted() {
-            log.info("Broadcast completed");
-        }
     }
 
     /**
@@ -116,7 +82,7 @@ public class NodeGroup {
      * @return
      * @throws NodeException
      */
-    public NodeGroup createGroup(String host, int port, String groupId, String groupFile) throws NodeException {
+    public void createGroup(String host, int port, String groupId, String groupFile) throws NodeException {
         Common.Envelope envelope = null;
 
         ILocalSigner signer = new LocalSigner();
@@ -141,15 +107,32 @@ public class NodeGroup {
 
         Common.Envelope signedEnvelope = EnvelopeHelper.sanityCheckAndSignConfigTx(envelope, groupId, signer);
         IBroadcastClient broadcastClient = new BroadcastClient(host, port);
-        broadcastClient.send(signedEnvelope, new CreateGroupObserver(host, port, groupId));
+        broadcastClient.send(signedEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
+            @Override
+            public void onNext(Ab.BroadcastResponse value) {
+                log.info("Broadcast onNext");
+                //收到响应消息，判断是否是200消息
+                if (Common.Status.SUCCESS.equals(value.getStatus())) {
+                    getGenesisBlockThenWrite(host, port, groupId);
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                log.error(t.getMessage(), t);
+            }
+
+            @Override
+            public void onCompleted() {
+                log.info("Broadcast completed");
+            }
+        });
 
         try {
             Thread.sleep(15000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
-
-        return this;
     }
 
     private void getGenesisBlockThenWrite(String ip, int port, String groupId) {
@@ -230,9 +213,7 @@ public class NodeGroup {
         return new GenesisBlockFactory(groupTree).getGenesisBlock(groupId);
     }
 
-    public NodeGroup joinGroup(String blockPath) throws NodeException {
-        NodeGroup group = new NodeGroup();
-
+    public void joinGroup(String blockPath) throws NodeException {
         Smartcontract.SmartContractInvocationSpec spec = null;
         try {
             spec = SpecHelper.buildInvocationSpec(CommConstant.CSSC, CSSC.JOIN_GROUP,
@@ -275,16 +256,12 @@ public class NodeGroup {
         } else {
             log.info("Join group fail:" + proposalResponse);
         }
-
-        return group;
     }
 
     /**
      * 更新群组配置 V0.25
      */
-    public NodeGroup updateGroup(String ip, int port, String groupId) {
-        NodeGroup group = new NodeGroup();
-
+    public void updateGroup(String ip, int port, String groupId) {
         BroadCastClient broadCastClient = new BroadCastClient();
         try {
             //broadCastClient.send(ip, port, groupId, this);
@@ -292,8 +269,6 @@ public class NodeGroup {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-
-        return group;
     }
 
     /**

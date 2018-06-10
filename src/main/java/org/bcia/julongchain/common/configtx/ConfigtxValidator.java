@@ -192,8 +192,11 @@ public class ConfigtxValidator implements IConfigtxValidator {
                 ConfigComparable existingConfig = this.configComparableMap.get(key);
                 if (existingConfig == null) {
                     if (value.getVersion() != 0L) {
+                        log.error("configComparableMap has not this value-----$" + key);
                         throw new ValidateException("configComparableMap has not this value-----$" + key);
                     }
+
+                    continue;
                 }
 
                 if (value.getVersion() != existingConfig.getVersion() + 1) {

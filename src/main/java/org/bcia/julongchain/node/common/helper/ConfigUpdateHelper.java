@@ -106,7 +106,7 @@ public class ConfigUpdateHelper {
             Configtx.ConfigPolicy pendingPolicy = entry.getValue();
 
             //判断在原集合originalMap有没有对应项。有对应项的已经在前面处理过了，只需要再处理不存在的
-            Configtx.ConfigPolicy originalPolicy = pendingMap.get(policyName);
+            Configtx.ConfigPolicy originalPolicy = originalMap.get(policyName);
             if (originalPolicy == null) {
                 //该成员在原集合不存在，很可能是新增项，说明集合成员项有更新
                 hasMembersUpdate = true;
@@ -169,7 +169,7 @@ public class ConfigUpdateHelper {
             Configtx.ConfigValue pendingValue = entry.getValue();
 
             //判断在原集合originalMap有没有对应项。有对应项的已经在前面处理过了，只需要再处理不存在的
-            Configtx.ConfigValue originalValue = pendingMap.get(valueName);
+            Configtx.ConfigValue originalValue = originalMap.get(valueName);
             if (originalValue == null) {
                 //该成员在原集合不存在，很可能是新增项，说明集合成员项有更新
                 hasMembersUpdate = true;
@@ -307,7 +307,8 @@ public class ConfigUpdateHelper {
         Configtx.ConfigTree resultSet = Configtx.ConfigTree.newBuilder().setVersion(originalTree.getVersion())
                 .putAllPolicies(policiesReadSet).putAllValues(valuesReadSet).putAllChilds(childsReadSet).build();
         Configtx.ConfigTree writeSet = Configtx.ConfigTree.newBuilder().setVersion(originalTree.getVersion() + 1)
-                .putAllPolicies(policiesWriteSet).putAllValues(valuesWriteSet).putAllChilds(childsWriteSet).build();
+                .putAllPolicies(policiesWriteSet).putAllValues(valuesWriteSet).putAllChilds(childsWriteSet)
+                .setModPolicy(pendingTree.getModPolicy()).build();
 
         return new Object[]{resultSet, writeSet, true};
     }
