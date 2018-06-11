@@ -30,6 +30,7 @@ public class App {
     private static JavaChainLog log = JavaChainLogFactory.getLog(App.class);
 
     public static void main(String[] args) {
+        //打印异常日志的正反样例
 //        log.info("JavaChain begin, This is a right log");
 //        System.out.println("JavaChain begin, This is a wrong log");
 
@@ -40,30 +41,7 @@ public class App {
 //            log.error(ex.getMessage(), ex);
 //        }
 
-      //  异步启动Consenter服务
-//        new Thread() {
-//            @Override
-//            public void run() {
-//                ConsenterServer server = new ConsenterServer();
-//                try {
-//                    server.start();
-//                    server.blockUntilShutdown();
-//                } catch (IOException ex) {
-//                    log.error(ex.getMessage(), ex);
-//                } catch (InterruptedException ex) {
-//                    log.error(ex.getMessage(), ex);
-//                }
-//            }
-//        }.start();
-//
-//        //等待1秒，让Consenter服务完成
-//        try {
-//            Thread.sleep(1000);
-//        } catch (InterruptedException ex) {
-//            log.error(ex.getMessage(), ex);
-//        }
-
-        //引入Spring配置文件
+        //引入Spring配置文件的两种方式
 //        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
 //        Node node = context.getBean(Node.class);
 //        Node node = SpringContext.getInstance().getBean(Node.class);

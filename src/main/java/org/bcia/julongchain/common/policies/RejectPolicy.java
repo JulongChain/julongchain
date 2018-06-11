@@ -31,6 +31,7 @@ public class RejectPolicy implements IPolicy {
 
     @Override
     public void evaluate(List<SignedData> signatureList) throws PolicyException {
-        throw new PolicyException("No such policy");
+//TODO
+        //        throw new PolicyException("No such policy");
     }
 }

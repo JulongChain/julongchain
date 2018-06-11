@@ -84,8 +84,6 @@ public class Node {
      */
     private INodeCmd nodeCmd;
 
-    private GroupSupport groupSupport;
-
     private Map<String, Group> groupMap = new ConcurrentHashMap<String, Group>();
 
     private InitializeCallback initializeCallback;
@@ -154,42 +152,23 @@ public class Node {
      * 初始化
      */
     private void init() throws NodeException {
-//        NodeConfig config = NodeConfigFactory.getNodeConfig();
-//        try {
-//            config = NodeConfigFactory.getNodeConfig();
-//        } catch (IOException e) {
-//            log.error(e.getMessage(), e);
-//            throw new NodeException(e);
-//        }
+        initLocalMsp();
+    }
 
-        //初始化MSP
-//        String mspConfigDir = config.getNode().getMspConfigPath();
-//        String mspId = config.getNode().getLocalMspId();
-//        String mspType = config.getNode().getLocalMspType();
-
-//        String mspConfigDir = "D:\\msp";
-//        String mspId = "myMspId";
-//        String mspType = "csp";
-
-//        if (!FileUtils.isExists(mspConfigDir)) {
-//            throw new NodeException("MspConfigPath is not exists");
-//        }
-
+    private void initLocalMsp() throws NodeException {
         try {
             List<IFactoryOpts> optsList = new ArrayList<IFactoryOpts>();
             MspConfig mspConfig = loadMspConfig();
             String mspConfigDir = mspConfig.getNode().getMspConfigPath();
             String mspId = mspConfig.getNode().getLocalMspId();
             String mspType = mspConfig.getNode().getLocalMspType();
-//        String mspId = "myMspId";
-//        String mspType = "csp";
 
-            String symmetrickey = mspConfig.node.getCsp().getGm().getSymmetricKey();
-            String sign = mspConfig.node.getCsp().getGm().getSign();
-            String hash = mspConfig.node.getCsp().getGm().getHash();
-            String asymmetric = mspConfig.node.getCsp().getGm().getAsymmetric();
-            String privateKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPrivateKeyStore();
-            String publicKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPublicKeyStore();
+            String symmetrickey = mspConfig.getNode().getCsp().getGm().getSymmetricKey();
+            String sign = mspConfig.getNode().getCsp().getGm().getSign();
+            String hash = mspConfig.getNode().getCsp().getGm().getHash();
+            String asymmetric = mspConfig.getNode().getCsp().getGm().getAsymmetric();
+            String privateKeyPath = mspConfig.getNode().getCsp().getGm().getFileKeyStore().getPrivateKeyStore();
+            String publicKeyPath = mspConfig.getNode().getCsp().getGm().getFileKeyStore().getPublicKeyStore();
             //new GmCspConfig(symmetrickey,asymmetric,hash,sign,publicKeyPath,privateKeyPath);
             optsList.add(new GmFactoryOpts(symmetrickey, asymmetric, hash, sign, publicKeyPath, privateKeyPath));
 
