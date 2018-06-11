@@ -2,6 +2,7 @@ package org.bcia.julongchain.common.policies;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.groupconfig.GroupConfigConstant;
+import org.bcia.julongchain.common.policies.config.*;
 import org.bcia.julongchain.protos.common.Policies;
 import org.junit.Before;
 import org.junit.Test;
