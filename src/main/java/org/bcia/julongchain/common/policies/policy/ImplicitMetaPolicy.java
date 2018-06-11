@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.common.policies;
+package org.bcia.julongchain.common.policies.policy;
 
 import org.bcia.julongchain.common.exception.PolicyException;
+import org.bcia.julongchain.common.policies.IPolicyManager;
 import org.bcia.julongchain.common.util.proto.SignedData;
 import org.bcia.julongchain.protos.common.Policies;
 

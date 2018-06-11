@@ -20,7 +20,7 @@ import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.common.policies.IPolicy;
+import org.bcia.julongchain.common.policies.policy.IPolicy;
 import org.bcia.julongchain.common.policies.IPolicyManager;
 import org.bcia.julongchain.common.util.proto.SignedData;
 import org.bcia.julongchain.protos.common.Common;

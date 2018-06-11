@@ -20,6 +20,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.policies.policy.IPolicy;
+import org.bcia.julongchain.common.policies.policy.ImplicitMetaPolicy;
+import org.bcia.julongchain.common.policies.policy.NormalPolicy;
+import org.bcia.julongchain.common.policies.policy.RejectPolicy;
 import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.common.Policies;
 

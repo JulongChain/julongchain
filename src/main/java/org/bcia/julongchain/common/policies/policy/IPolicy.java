@@ -13,17 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.common.resourceconfig;
+package org.bcia.julongchain.common.policies.policy;
+
+import org.bcia.julongchain.common.exception.PolicyException;
+import org.bcia.julongchain.common.util.proto.SignedData;
+
+import java.util.List;
 
 /**
- * 类描述
+ * 策略接口
  *
- * @author wanliangbing
- * @date 2018/3/15
+ * @author zhouhui
+ * @date 2018/3/9
  * @company Dingxuan
  */
-public interface ISmartContractRegistry {
+public interface IPolicy {
 
-    ISmartContractDefinition smartContractByName(String name);
-
+    void evaluate(List<SignedData> signatureList) throws PolicyException;
 }

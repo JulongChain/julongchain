@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.common.policies;
+package org.bcia.julongchain.common.policies.policy;
 
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.util.proto.SignedData;
@@ -21,13 +21,23 @@ import org.bcia.julongchain.common.util.proto.SignedData;
 import java.util.List;
 
 /**
- * 策略接口
+ * 对象
  *
  * @author zhouhui
- * @date 2018/3/9
+ * @date 2018/4/18
  * @company Dingxuan
  */
-public interface IPolicy {
+public class NormalPolicy implements IPolicy {
+    private IPolicy policy;
+    private String policyName;
 
-    void evaluate(List<SignedData> signatureList) throws PolicyException;
+    public NormalPolicy(IPolicy policy, String policyName) {
+        this.policy = policy;
+        this.policyName = policyName;
+    }
+
+    @Override
+    public void evaluate(List<SignedData> signatureSet) throws PolicyException {
+        policy.evaluate(signatureSet);
+    }
 }

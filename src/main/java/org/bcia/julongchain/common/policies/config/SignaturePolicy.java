@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.common.policies;
+package org.bcia.julongchain.common.policies.config;
 
 import org.bcia.julongchain.common.policycheck.common.IsSignaturePolicyType;
 import org.bcia.julongchain.protos.common.Policies;

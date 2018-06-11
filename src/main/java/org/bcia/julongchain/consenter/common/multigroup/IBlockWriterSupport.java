@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.consenter.common.multigroup;
 
-import org.bcia.julongchain.common.configtx.IValidator;
+import org.bcia.julongchain.common.configtx.IConfigtxValidator;
 import org.bcia.julongchain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.julongchain.common.ledger.blockledger.IReader;
 import org.bcia.julongchain.common.ledger.blockledger.IWriter;
@@ -27,7 +27,8 @@ import org.bcia.julongchain.protos.common.Configtx;
  * @Date: 2018/5/10
  * @company Dingxuan
  */
-public interface IBlockWriterSupport extends ILocalSigner,IValidator,IReader,IWriter {
+public interface IBlockWriterSupport extends ILocalSigner, IConfigtxValidator, IReader, IWriter {
     void update(IGroupConfigBundle iGroupConfigBundle);
+
     IGroupConfigBundle createBundle(String groupId, Configtx.Config config);
 }

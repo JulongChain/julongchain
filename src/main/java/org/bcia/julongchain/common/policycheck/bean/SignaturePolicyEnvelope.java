@@ -16,7 +16,7 @@
 
 package org.bcia.julongchain.common.policycheck.bean;
 
-import org.bcia.julongchain.common.policies.SignaturePolicy;
+import org.bcia.julongchain.common.policies.config.SignaturePolicy;
 import org.bcia.julongchain.protos.common.MspPrincipal;
 
 /**

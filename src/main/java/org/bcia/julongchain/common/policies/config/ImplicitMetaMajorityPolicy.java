@@ -13,20 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.common.policies;
+package org.bcia.julongchain.common.policies.config;
 
 import org.bcia.julongchain.protos.common.Policies;
 
 /**
- * 配置策略接口
+ * 策略：大多数子策略需要满足
  *
  * @author zhouhui
  * @date 2018/3/8
  * @company Dingxuan
  */
-public interface IConfigPolicy {
+public class ImplicitMetaMajorityPolicy extends StandardConfigPolicy {
+    public ImplicitMetaMajorityPolicy(String key) {
+        super(key);
 
-    String getKey();
-
-    Policies.Policy getValue();
+        this.value = buildImplicitMetaPolicy(key, Policies.ImplicitMetaPolicy.Rule.MAJORITY);
+    }
 }

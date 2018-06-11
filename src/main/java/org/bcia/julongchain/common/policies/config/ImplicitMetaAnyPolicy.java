@@ -13,27 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.core.common.validation;
+package org.bcia.julongchain.common.policies.config;
 
-import org.bcia.julongchain.msp.IIdentity;
-import org.bcia.julongchain.msp.IIdentityDeserializer;
-import org.bcia.julongchain.protos.msp.Identities;
+import org.bcia.julongchain.protos.common.Policies;
 
 /**
- * 类描述
+ * 策略：任一子策略满足即可
  *
- * @author
- * @date 2018/3/14
+ * @author zhouhui
+ * @date 2018/3/8
  * @company Dingxuan
  */
-public class MockIdentityDeserializer implements IIdentityDeserializer {
-    @Override
-    public IIdentity deserializeIdentity(byte[] serializedIdentity) {
-        return null;
-    }
+public class ImplicitMetaAnyPolicy extends StandardConfigPolicy {
+    public ImplicitMetaAnyPolicy(String key) {
+        super(key);
 
-    @Override
-    public void isWellFormed(Identities.SerializedIdentity identity) {
-
+        this.value = buildImplicitMetaPolicy(key, Policies.ImplicitMetaPolicy.Rule.ANY);
     }
 }

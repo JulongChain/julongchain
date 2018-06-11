@@ -15,6 +15,8 @@
  */
 package org.bcia.julongchain.common.policies;
 
+import org.bcia.julongchain.common.policies.policy.IPolicy;
+
 import java.util.Map;
 
 /**

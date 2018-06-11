@@ -16,6 +16,7 @@
 package org.bcia.julongchain.common.policies;
 
 import org.bcia.julongchain.common.exception.PolicyException;
+import org.bcia.julongchain.common.policies.policy.IPolicy;
 
 /**
  * 策略提供者

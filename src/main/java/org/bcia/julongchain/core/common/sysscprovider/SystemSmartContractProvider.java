@@ -21,7 +21,7 @@ import org.bcia.julongchain.common.groupconfig.MSPConfigHandler;
 import org.bcia.julongchain.common.groupconfig.capability.IApplicationCapabilities;
 import org.bcia.julongchain.common.groupconfig.config.ApplicationConfig;
 import org.bcia.julongchain.common.groupconfig.config.IApplicationConfig;
-import org.bcia.julongchain.common.policies.IManager;
+import org.bcia.julongchain.common.policies.IPolicyManager;
 import org.bcia.julongchain.common.util.SpringContext;
 import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.IQueryExecutor;
@@ -73,7 +73,7 @@ public class SystemSmartContractProvider implements ISystemSmartContractProvider
     }
 
     @Override
-    public IManager policyManager(String groupID) {
+    public IPolicyManager policyManager(String groupID) {
         return null;
     }
 

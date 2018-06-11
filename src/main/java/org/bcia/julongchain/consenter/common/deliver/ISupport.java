@@ -18,7 +18,7 @@ package org.bcia.julongchain.consenter.common.deliver;
 
 
 import org.bcia.julongchain.common.ledger.blockledger.IReader;
-import org.bcia.julongchain.common.policies.IManager;
+import org.bcia.julongchain.common.policies.IPolicyManager;
 
 /**
  * @author zhangmingyang
@@ -28,7 +28,7 @@ import org.bcia.julongchain.common.policies.IManager;
 public interface ISupport {
     long sequence() ;
 
-    IManager poclicyManager();
+    IPolicyManager poclicyManager();
 
     IReader reader();
 }

@@ -17,7 +17,7 @@ package org.bcia.julongchain.core.common.sysscprovider;
 
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.groupconfig.config.IApplicationConfig;
-import org.bcia.julongchain.common.policies.IManager;
+import org.bcia.julongchain.common.policies.IPolicyManager;
 import org.bcia.julongchain.core.ledger.IQueryExecutor;
 
 /**
@@ -77,5 +77,5 @@ public interface ISystemSmartContractProvider {
      * @param groupID
      * @return
      */
-    IManager policyManager(String groupID);
+    IPolicyManager policyManager(String groupID);
 }
