@@ -16,6 +16,7 @@
 package org.bcia.julongchain.consenter.common.multigroup;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.julongchain.common.deliver.ISupportManager;
 import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.PolicyException;
@@ -58,7 +59,7 @@ import static org.bcia.julongchain.consenter.common.msgprocessor.SystemGroup.new
  * @Date: 2018/5/8
  * @company Dingxuan
  */
-public class Registrar implements IChainCreator,IGroupSupportRegistrar {
+public class Registrar implements IChainCreator,IGroupSupportRegistrar,ISupportManager {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Registrar.class);
     Map<String, ChainSupport> chains=new HashMap<>();
 

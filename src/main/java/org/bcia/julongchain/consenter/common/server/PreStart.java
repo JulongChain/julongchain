@@ -16,6 +16,8 @@
 package org.bcia.julongchain.consenter.common.server;
 
 
+import org.bcia.julongchain.common.deliver.DeliverHandler;
+import org.bcia.julongchain.common.deliver.DeliverSupport;
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.genesis.GenesisBlockFactory;
 import org.bcia.julongchain.common.ledger.blockledger.IFactory;
@@ -46,30 +48,61 @@ import java.util.Map;
 import static org.bcia.julongchain.consenter.common.localconfig.ConsenterConfigFactory.loadConsenterConfig;
 
 /**
+ * 预启动
+ *
  * @author zhangmingyang
  * @Date: 2018/5/29
  * @company Dingxuan
  */
 public class PreStart {
     private static JavaChainLog log = JavaChainLogFactory.getLog(PreStart.class);
+    private static ConsenterConfig defaultConsenterConfig;
+    private static DeliverHandler defaultDeliverHandler;
+    private static Registrar  defaultRegistrar;
+
+
+    public static void initAll() throws IOException, JavaChainException {
+        boolean mutalTLS=false;
+        initConsnterConfig();
+        defaultRegistrar=initializeMultichannelRegistrar(defaultConsenterConfig,new LocalSigner());
+        defaultDeliverHandler=initDeliverHandler(defaultRegistrar,mutalTLS);
+    }
+
+    private static ConsenterConfig initConsnterConfig() {
+        if (defaultConsenterConfig==null) {
+            defaultConsenterConfig = loadConsenterConfig();
+            return defaultConsenterConfig;
+        }else {
+            return defaultConsenterConfig;
+        }
+    }
+
+    private static DeliverHandler initDeliverHandler(Registrar registrar, boolean mutalTLS) {
+        return new DeliverHandler(new DeliverSupport(registrar), defaultConsenterConfig.getGeneral().getAuthentication().get("timeWindow"), mutalTLS);
+    }
 
     public static Registrar initializeMultichannelRegistrar(ConsenterConfig consenterConfig, ILocalSigner signer) throws JavaChainException, IOException {
-        IFactory lf = LedgerHelper.createLedgerFactroy(consenterConfig);
-        if (lf.groupIDs().size() == 0) {
-            initBootstrapGroup(consenterConfig, lf);
-        } else {
-            log.info("Not bootstrapping because of existing chains");
+        if(defaultRegistrar==null){
+            IFactory lf = LedgerHelper.createLedgerFactroy(consenterConfig);
+            if (lf.groupIDs().size() == 0) {
+                initBootstrapGroup(consenterConfig, lf);
+            } else {
+                log.info("Not bootstrapping because of existing chains");
+            }
+            Map<String, IConsensue> consenters = new HashMap<>();
+            consenters.put("Singleton", new Singleton());
+           defaultRegistrar=new Registrar().newRegistrar(lf, consenters, signer);
+           return defaultRegistrar;
+        }else {
+            return defaultRegistrar;
         }
-        Map<String, IConsensue> consenters = new HashMap<>();
-        consenters.put("Singleton", new Singleton());
-        return new Registrar().newRegistrar(lf, consenters, signer);
     }
 
     private static void initBootstrapGroup(ConsenterConfig consenterConfig, IFactory blockLedger) throws IOException, JavaChainException {
         Common.Block genesisBlock = null;
         switch (consenterConfig.getGeneral().getGenesisMethod()) {
             case "provisional":
-                //TODO 临时文件生成创世区块
+                //根据配置生成创世区块
                 GenesisConfig.Profile completedProfile = GenesisConfigFactory.loadGenesisConfig().getCompletedProfile(consenterConfig.getGeneral().getGenesisProfile());
                 Configtx.ConfigTree groupTree = ConfigTreeHelper.buildGroupTree(completedProfile);
                 genesisBlock = new GenesisBlockFactory(groupTree).getGenesisBlock("systemGroup");
@@ -119,5 +152,17 @@ public class PreStart {
 
         Registrar registrar = initializeMultichannelRegistrar(loadConsenterConfig(), localSigner);
 
+    }
+
+    public static ConsenterConfig getDefaultConsenterConfig() {
+        return defaultConsenterConfig;
+    }
+
+    public static DeliverHandler getDefaultDeliverHandler() {
+        return defaultDeliverHandler;
+    }
+
+    public static Registrar getDefaultRegistrar() {
+        return defaultRegistrar;
     }
 }

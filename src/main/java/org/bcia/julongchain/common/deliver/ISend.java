@@ -16,6 +16,7 @@
 package org.bcia.julongchain.common.deliver;
 
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 
 /**
@@ -24,5 +25,5 @@ import com.google.protobuf.Message;
  * @company Dingxuan
  */
 public interface ISend {
-   void send(Message msg);
+   void send(Message msg) throws InvalidProtocolBufferException;
 }

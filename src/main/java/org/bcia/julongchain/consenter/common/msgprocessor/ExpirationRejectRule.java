@@ -61,10 +61,10 @@ public class ExpirationRejectRule implements IRule {
         } catch (InvalidProtocolBufferException e) {
         }
 
-        Time expireTime = new Expiration().expiresAt(signedData.get(0).getIdentity());
+        Date expireTime = new Expiration().expiresAt(signedData.get(0).getIdentity());
         Date nowDate = new Date();
         if (expireTime != null) {
-            if (nowDate.after(expireTime.getDate())) {
+            if (nowDate.after(expireTime)) {
                 try {
                     throw new ValidateException("identity expired");
                 } catch (ValidateException e) {

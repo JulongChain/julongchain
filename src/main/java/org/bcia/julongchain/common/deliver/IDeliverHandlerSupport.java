@@ -26,8 +26,8 @@ import org.bcia.julongchain.protos.common.Common;
  * @Date: 2018/5/29
  * @company Dingxuan
  */
-public interface IDeliverSupport {
-    Common.Envelope recv();
+public interface IDeliverHandlerSupport {
+   // Common.Envelope recv();
     Message createStatusReply(Common.Status status);
     Message createBlockReply(Common.Block block);
 }

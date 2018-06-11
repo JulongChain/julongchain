@@ -20,6 +20,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.util.Expiration;
 import org.bcia.julongchain.common.util.proto.SignedData;
+import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
 import org.bcia.julongchain.protos.common.Common;
 import org.bouncycastle.asn1.x509.Time;
 
@@ -32,15 +33,15 @@ import java.util.List;
  * @company Dingxuan
  */
 public class SessionAc {
-    private IAcSupport acSupport;
+    private ChainSupport acSupport;
     private IPolicyChecker checkPolicy;
     private String group;
     private Common.Envelope envelope;
     private long lastConfigSequence;
-    private Time sessionEndTime;
+    private Date sessionEndTime;
     private boolean usedAtLeastOnce;
     private Expiration expiration;
-    public SessionAc(IAcSupport acSupport, IPolicyChecker checkPolicy, String group, Common.Envelope envelope, Expiration expiration){
+    public SessionAc(ChainSupport acSupport, IPolicyChecker checkPolicy, String group, Common.Envelope envelope, Expiration expiration){
         List<SignedData> signedData=null;
         try {
            signedData= SignedData.asSignedData(envelope);
@@ -59,11 +60,11 @@ public class SessionAc {
 
     public void enaluate() throws ValidateException {
         Date nowDate = new Date();
-        if(nowDate.after(sessionEndTime.getDate())&&!sessionEndTime.getDate().equals(null)){
+        if(nowDate.after(sessionEndTime)&&!sessionEndTime.equals(null)){
             throw new ValidateException(String.format("client identity expired %v before",sessionEndTime));
         }
         boolean policyCheckNeeded=!usedAtLeastOnce;
-        long currentConfigSequence=acSupport.sequence();
+        long currentConfigSequence=acSupport.getSequence();
         if(currentConfigSequence>lastConfigSequence){
             lastConfigSequence=currentConfigSequence;
             policyCheckNeeded=true;

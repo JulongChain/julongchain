@@ -15,24 +15,24 @@
  */
 package org.bcia.julongchain.consenter.common.server;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
+import org.bcia.julongchain.common.deliver.DeliverHandler;
+import org.bcia.julongchain.common.deliver.DeliverServer;
 import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.localmsp.impl.LocalSigner;
+import org.bcia.julongchain.common.exception.LedgerException;
+import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.consenter.common.broadcast.BroadCastHandler;
-import org.bcia.julongchain.consenter.common.deliver.DeliverHandler;
 import org.bcia.julongchain.consenter.common.multigroup.Registrar;
 import org.bcia.julongchain.protos.common.Common;
-
 import org.bcia.julongchain.protos.consenter.Ab;
 import org.bcia.julongchain.protos.consenter.AtomicBroadcastGrpc;
-
 import java.io.IOException;
 
-import static org.bcia.julongchain.consenter.common.localconfig.ConsenterConfigFactory.loadConsenterConfig;
 
 /**
  * @author zhangmingyang
@@ -43,6 +43,7 @@ public class ConsenterServer {
     private int port = 7050;
     private Server server;
     private static JavaChainLog log = JavaChainLogFactory.getLog(ConsenterServer.class);
+
     public void start() throws IOException {
         server = ServerBuilder.forPort(port)
                 .addService(new ConsenterServerImpl())
@@ -86,58 +87,39 @@ public class ConsenterServer {
 
     // 定义一个实现服务接口的类
     private class ConsenterServerImpl extends AtomicBroadcastGrpc.AtomicBroadcastImplBase {
-        LocalSigner localSigner = new LocalSigner();
-        Registrar registrar;
+        private Registrar registrar;
+        private DeliverHandler deliverHandler;
+
         {
             try {
-                registrar = PreStart.initializeMultichannelRegistrar(loadConsenterConfig(),localSigner);
-            } catch (JavaChainException e) {
-                e.printStackTrace();
+                PreStart.initAll();
+                registrar=PreStart.getDefaultRegistrar();
+                deliverHandler=PreStart.getDefaultDeliverHandler();
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e.getMessage());
+            } catch (JavaChainException e) {
+                log.error(e.getMessage());
             }
-        }
-
-        @Override
-        public StreamObserver<Common.Envelope> deliver(StreamObserver<Ab.DeliverResponse> responseObserver) {
-            return new StreamObserver<Common.Envelope>() {
-                DeliverHandler deliverHandler = new DeliverHandler();
-                @Override
-                public void onNext(Common.Envelope envelope) {
-                  //  log.info("envelop:" + envelope.getPayload().toStringUtf8());
-                    deliverHandler.handle(envelope);
-                }
-
-                @Override
-                public void onError(Throwable throwable) {
-
-                }
-
-                @Override
-                public void onCompleted() {
-
-                }
-            };
         }
 
         @Override
         public StreamObserver<Common.Envelope> broadcast(StreamObserver<Ab.BroadcastResponse> responseObserver) {
             return new StreamObserver<Common.Envelope>() {
                 BroadCastHandler broadCastHandle = new BroadCastHandler(registrar);
+
                 @Override
                 public void onNext(Common.Envelope envelope) {
 
                     try {
                         broadCastHandle.handle(envelope, responseObserver);
                     } catch (IOException e) {
-                     log.error(e.getMessage());
+                        log.error(e.getMessage());
                     }
-
                 }
 
                 @Override
                 public void onError(Throwable throwable) {
-                   log.error(throwable.getMessage());
+                    log.error(throwable.getMessage());
                 }
 
                 @Override
@@ -147,7 +129,34 @@ public class ConsenterServer {
             };
         }
 
+        @Override
+        public StreamObserver<Common.Envelope> deliver(StreamObserver<Ab.DeliverResponse> responseObserver) {
+            return new StreamObserver<Common.Envelope>() {
+                @Override
+                public void onNext(Common.Envelope envelope) {
+                    DeliverServer deliverServer=new DeliverServer(responseObserver,envelope) ;
+                    try {
+                        deliverHandler.handle(deliverServer);
+                    } catch (ValidateException e) {
+                        e.printStackTrace();
+                    } catch (InvalidProtocolBufferException e) {
+                        e.printStackTrace();
+                    } catch (LedgerException e) {
+                        e.printStackTrace();
+                    }
+                }
 
+                @Override
+                public void onError(Throwable throwable) {
+                    log.error(throwable.getMessage());
+                }
+
+                @Override
+                public void onCompleted() {
+
+                }
+            };
+        }
     }
 
 

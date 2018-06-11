@@ -13,25 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.consenter.common.deliver;
+package org.bcia.julongchain.common.deliver;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.protos.common.Common;
+import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
+import org.bcia.julongchain.consenter.common.multigroup.Registrar;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/12
+ * @Date: 2018/6/9
  * @company Dingxuan
  */
-public class DeliverHandler {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(DeliverHandler.class);
-   public void handle(Common.Envelope envelope){
-      log.info("this is deliver handler");
-      deliverBlocks(envelope);
-    }
-    public void  deliverBlocks(Common.Envelope envelope){
-       log.info("this is deliverBlocks");
+public class DeliverSupport implements ISupportManager{
+    private Registrar registrar;
+
+    public DeliverSupport(Registrar registrar) {
+        this.registrar = registrar;
     }
 
+    @Override
+    public ChainSupport getChain(String groupId) {
+        return new Registrar().getChain(groupId);
+    }
+
+    public Registrar getRegistrar() {
+        return registrar;
+    }
 }

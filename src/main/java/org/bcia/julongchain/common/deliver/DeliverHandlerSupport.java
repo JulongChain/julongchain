@@ -15,7 +15,9 @@
  */
 package org.bcia.julongchain.common.deliver;
 
+import com.google.protobuf.Message;
 import io.grpc.stub.StreamObserver;
+import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 
 /**
@@ -23,7 +25,18 @@ import org.bcia.julongchain.protos.consenter.Ab;
  * @Date: 2018/6/4
  * @company Dingxuan
  */
-public class DeliverHandlerSupport {
-   private StreamObserver<Ab.BroadcastResponse> responseObserver;
+public class DeliverHandlerSupport implements  IDeliverHandlerSupport{
+    @Override
+    public Message createStatusReply(Common.Status status) {
+        Ab.DeliverResponse.Builder deliverResponseBuilder= Ab.DeliverResponse.newBuilder();
+        deliverResponseBuilder.setStatus(status);
+        return deliverResponseBuilder.build();
+    }
 
+    @Override
+    public Message createBlockReply(Common.Block block) {
+        Ab.DeliverResponse.Builder deliverResponseBuilder= Ab.DeliverResponse.newBuilder();
+        deliverResponseBuilder.setBlock(block);
+        return deliverResponseBuilder.build();
+    }
 }

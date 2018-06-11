@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.common.deliver;
 
-import org.bouncycastle.asn1.x509.Time;
+import java.util.Date;
 
 /**
  * @author zhangmingyang
@@ -23,5 +23,5 @@ import org.bouncycastle.asn1.x509.Time;
  * @company Dingxuan
  */
 public interface IExpiresAtFunc {
-   Time expiresAt(byte[] identityBytes);
+   Date expiresAt(byte[] identityBytes);
 }

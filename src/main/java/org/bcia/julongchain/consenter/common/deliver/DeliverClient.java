@@ -22,7 +22,9 @@ import static org.bcia.julongchain.protos.consenter.AtomicBroadcastGrpc.*;
  */
 @Component
 public class DeliverClient {
-    public  void send(String ip,int port,String mess) {
+    public static   void main(String[] args) {
+        String ip="localhost";
+        int port=7050;
         System.out.println("begin");
 
         ManagedChannel managedChannel= ManagedChannelBuilder.forAddress(ip,port).usePlaintext(true).build();
@@ -30,8 +32,8 @@ public class DeliverClient {
         StreamObserver<Common.Envelope> envelopeStreamObserver=stub.deliver(new StreamObserver<Ab.DeliverResponse>() {
             @Override
             public void onNext(Ab.DeliverResponse deliverResponse) {
-                if(deliverResponse.getStatusValue()==500){
-                    System.out.println("INTERNAL_SERVER_ERROR");
+                if(deliverResponse.getStatusValue()==200){
+                    System.out.println("chenggong");
                 }
             }
 
@@ -59,7 +61,7 @@ public class DeliverClient {
 
 
         try {
-            Thread.sleep(1000);
+            Thread.sleep(9000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

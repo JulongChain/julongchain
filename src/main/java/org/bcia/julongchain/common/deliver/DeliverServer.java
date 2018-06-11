@@ -15,24 +15,30 @@
  */
 package org.bcia.julongchain.common.deliver;
 
+import com.google.protobuf.InvalidProtocolBufferException;
+import com.google.protobuf.Message;
+import io.grpc.stub.StreamObserver;
+import org.bcia.julongchain.protos.common.Common;
+import org.bcia.julongchain.protos.consenter.Ab;
+
 /**
  * @author zhangmingyang
  * @Date: 2018/5/29
  * @company Dingxuan
  */
-public class DeliverServer {
-    private IDeliverSupport support;
+public class DeliverServer  implements ISend{
+    StreamObserver<Ab.DeliverResponse> responseObserver;
     private IPolicyChecker policyChecker;
     private ISend send;
+    private Common.Envelope envelope;
 
-    public DeliverServer(IDeliverSupport support, IPolicyChecker policyChecker, ISend send) {
-        this.support = support;
-        this.policyChecker = policyChecker;
-        this.send = send;
+    public DeliverServer(StreamObserver<Ab.DeliverResponse> responseObserver, Common.Envelope envelope) {
+        this.responseObserver = responseObserver;
+        this.envelope = envelope;
     }
 
-    public IDeliverSupport getSupport() {
-        return support;
+    public StreamObserver<Ab.DeliverResponse> getResponseObserver() {
+        return responseObserver;
     }
 
     public IPolicyChecker getPolicyChecker() {
@@ -43,5 +49,13 @@ public class DeliverServer {
         return send;
     }
 
+    public Common.Envelope getEnvelope() {
+        return envelope;
+    }
 
+    @Override
+    public void send(Message msg) throws InvalidProtocolBufferException {
+        Ab.DeliverResponse deliverResponse= Ab.DeliverResponse.parseFrom(msg.toByteArray());
+        responseObserver.onNext(deliverResponse);
+    }
 }

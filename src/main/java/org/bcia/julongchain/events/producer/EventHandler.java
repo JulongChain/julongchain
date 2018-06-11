@@ -135,11 +135,11 @@ public class EventHandler implements IEventHandler {
         EventsPackage.Event event = EventsPackage.Event.parseFrom(signedEvent.getEventBytes());
         byte[] creator = event.getCreator().toByteArray();
 
-        Time expireTime = new Expiration().expiresAt(creator);
+        Date expireTime = new Expiration().expiresAt(creator);
         Date nowDate = new Date();
 
         if (expireTime != null) {
-            this.sessionEndDate = expireTime.getDate();
+            this.sessionEndDate = expireTime;
 
             if (nowDate.after(sessionEndDate)) {
                 //dangqian

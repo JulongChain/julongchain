@@ -15,6 +15,8 @@
  */
 package org.bcia.julongchain.common.deliver;
 
+import org.bcia.julongchain.common.configtx.IConfigtxValidator;
+
 /**
  * @author zhangmingyang
  * @Date: 2018/5/30

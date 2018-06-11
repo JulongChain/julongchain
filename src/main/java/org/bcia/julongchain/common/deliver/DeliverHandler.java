@@ -25,6 +25,7 @@ import org.bcia.julongchain.common.ledger.blockledger.file.FileLedgerIterator;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.util.Expiration;
+import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
 import org.bcia.julongchain.consenter.util.CommonUtils;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.julongchain.protos.common.Common;
@@ -41,25 +42,22 @@ public class DeliverHandler implements IHandler {
     private static JavaChainLog log = JavaChainLogFactory.getLog(DeliverHandler.class);
     private ISupportManager sm;
     private long timeWindow;
-
+    private boolean mutualTLS;
     public DeliverHandler(ISupportManager sm, long timeWindow) {
         this.sm = sm;
         this.timeWindow = timeWindow;
     }
 
-    public ISupportManager getSm() {
-        return sm;
-    }
-
-    public long getTimeWindow() {
-        return timeWindow;
+    public DeliverHandler(ISupportManager sm, long timeWindow, boolean mutualTLS) {
+        this.sm = sm;
+        this.timeWindow = timeWindow;
+        this.mutualTLS = mutualTLS;
     }
 
     @Override
     public void handle(DeliverServer server) throws ValidateException, InvalidProtocolBufferException, LedgerException {
-        Common.Envelope envelope = server.getSupport().recv();
         try {
-            delivrBlocks(server, envelope);
+            delivrBlocks(server,server.getEnvelope());
         } catch (ConsenterException e) {
             e.printStackTrace();
         }
@@ -81,7 +79,7 @@ public class DeliverHandler implements IHandler {
         validateGroupHeader(server, chdr);
         sendStatusReply(server, Common.Status.BAD_REQUEST);
 
-        ISupport chain = sm.getChain(chdr.getGroupId());
+        ChainSupport chain = sm.getChain(chdr.getGroupId());
         if (chain == null) {
             log.debug(String.format("Rejecting deliver  channel %s not found", chdr.getGroupId()));
             sendStatusReply(server, Common.Status.NOT_FOUND);
@@ -106,7 +104,8 @@ public class DeliverHandler implements IHandler {
             sendStatusReply(server, Common.Status.BAD_REQUEST);
         }
 
-        IIterator cursor = chain.reader().iterator(seekInfo.getStart());
+       // IIterator cursor = chain.reader().iterator(seekInfo.getStart());
+        IIterator cursor = chain.getLedgerResources().getReadWriteBase().iterator(seekInfo.getStart());
         if (cursor instanceof FileLedgerIterator) {
             FileLedgerIterator fileLedgerIterator = (FileLedgerIterator) cursor;
             long number = fileLedgerIterator.getBlockNum();
@@ -116,7 +115,7 @@ public class DeliverHandler implements IHandler {
                 case OLDEST:
                     stopNumber = number;
                 case NEWEST:
-                    stopNumber = chain.reader().height() - 1;
+                    stopNumber = chain.getLedgerResources().getReadWriteBase().height() - 1;
                 case SPECIFIED:
                     stopNumber = stop.getNumber();
                     if (stopNumber < number) {
@@ -128,7 +127,7 @@ public class DeliverHandler implements IHandler {
             cursor.close();
             for (; ; number++) {
                 if (seekInfo.getBehavior()==Ab.SeekInfo.SeekBehavior.FAIL_IF_NOT_READY) {
-                    if(number>chain.reader().height()-1){
+                    if(number>chain.getLedgerResources().getReadWriteBase().height()-1){
                         sendStatusReply(server,Common.Status.NOT_FOUND);
                     }
                 }
@@ -161,12 +160,20 @@ public class DeliverHandler implements IHandler {
 
     }
 
-    public void sendStatusReply(DeliverServer srv, Common.Status status) {
-        srv.getSupport().createStatusReply(status);
+    public void sendStatusReply(DeliverServer srv, Common.Status status) throws InvalidProtocolBufferException {
+        srv.send(new DeliverHandlerSupport().createStatusReply(status));
     }
 
-    public void sendBlockReply(DeliverServer srv, Common.Block block) {
-        srv.getSupport().createBlockReply(block);
+    public void sendBlockReply(DeliverServer srv, Common.Block block) throws InvalidProtocolBufferException {
+        srv.send(new DeliverHandlerSupport().createBlockReply(block));
+    }
+
+    public ISupportManager getSm() {
+        return sm;
+    }
+
+    public long getTimeWindow() {
+        return timeWindow;
     }
 
 }
