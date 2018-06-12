@@ -41,7 +41,6 @@ import static org.bcia.julongchain.tools.configtxgen.entity.GenesisConfigFactory
  * @Date: 2018/3/8
  * @company Dingxuan
  */
-@Component
 public class BroadCastHandler implements IHandler {
     private static JavaChainLog log = JavaChainLogFactory.getLog(BroadCastHandler.class);
     private IGroupSupportRegistrar sm;
