@@ -161,7 +161,7 @@ public class Registrar implements IChainCreator,IGroupSupportRegistrar,ISupportM
                 systemGroupID = groupId;
                 systemGroup = chain;
                 //TODO 去掉chain启动
-             //   chain.start();
+                chain.start();
             } else {
                 log.debug(String.format("Starting chain: %s", groupId));
                 ChainSupport chain = new ChainSupport(this, ledgerResources, consenters, signer);

@@ -16,6 +16,7 @@
 package org.bcia.julongchain.consenter.util;
 
 import com.google.protobuf.ByteString;
+import org.apache.commons.lang.ArrayUtils;
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.csp.gm.dxct.sm3.SM3HashOpts;
 import org.bcia.julongchain.protos.common.Common;
@@ -48,16 +49,13 @@ public class BlockHelper {
 
         Common.BlockData.Builder blockData = Common.BlockData.newBuilder();
         Common.BlockMetadata.Builder metaData = Common.BlockMetadata.newBuilder();
-        byte[][] metadataContents;
 
         //TODO 封装append函数,BlockMetaIndex_name
-//        for (int i = 0; i <; i++) {
-//
-//        }
-
+        for (int i = 0; i <4; i++) {
+            block.getMetadataBuilder().addMetadata(ByteString.copyFrom(metaData.build().toByteArray()));
+        }
         block.setHeader(blockHeader);
         block.setData(blockData);
-        block.setMetadata(metaData);
         return block.build();
     }
 
