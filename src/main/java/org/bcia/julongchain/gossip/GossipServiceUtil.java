@@ -139,11 +139,11 @@ public class GossipServiceUtil {
 
     GossipService gossipService = addressAndGossipServiceMap.get(address);
     if (gossipService == null) {
-      throw new GossipException("Gossip服务异常，请检查是否已经启动。");
+      throw new GossipException("Gossip服务异常，请检查是否已经启动。[" + address + "]");
     }
     String group = addressAndGroupMap.get(address);
     if (StringUtils.isEmpty(group)) {
-      throw new GossipException("Gossip服务所属group不能为空。");
+      throw new GossipException("Gossip服务所属group不能为空。[" + address + "]");
     }
 
     SharedGossipDataMessage m = new SharedGossipDataMessage();
@@ -167,11 +167,11 @@ public class GossipServiceUtil {
     }
     GossipService gossipService = addressAndGossipServiceMap.get(address);
     if (gossipService == null) {
-      throw new GossipException("Gossip服务异常，请检查是否启动。");
+      throw new GossipException("Gossip服务异常，请检查是否启动。[" + address + "]");
     }
     String group = addressAndGroupMap.get(address);
     if (StringUtils.isEmpty(group)) {
-      throw new GossipException("Gossip服务所属group不能为空。");
+      throw new GossipException("Gossip服务所属group不能为空。[" + address + "]");
     }
     Crdt crdt = gossipService.getGossipManager().findCrdt(group + "-" + seqNum);
     if (crdt == null) {
