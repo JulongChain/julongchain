@@ -24,7 +24,7 @@ public class GossipServiceUtilTest {
     String address = "localhost:7052";
 
     try {
-      GossipServiceUtil.newGossipService(id, group, address);
+      GossipServiceUtil.newGossipService(id, group, address).start();
     } catch (UnknownHostException e) {
       e.printStackTrace();
     } catch (InterruptedException e) {

@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.core.ledger.customtx;
 
+import org.bcia.julongchain.common.exception.InvalidTxException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
 import org.bcia.julongchain.protos.common.Common;
@@ -36,6 +37,6 @@ import org.bcia.julongchain.protos.common.Common;
  */
 public interface IProcessor {
 
-    void generateSimulationResults(Common.Envelope txEnvelop, ITxSimulator simulator, boolean initializingLedger) throws LedgerException;
+    void generateSimulationResults(Common.Envelope txEnvelop, ITxSimulator simulator, boolean initializingLedger) throws LedgerException, InvalidTxException;
 
 }

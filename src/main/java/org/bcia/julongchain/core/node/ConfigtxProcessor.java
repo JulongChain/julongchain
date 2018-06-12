@@ -16,6 +16,7 @@
 package org.bcia.julongchain.core.node;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.julongchain.common.exception.InvalidTxException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.ValidateException;
@@ -51,7 +52,7 @@ public class ConfigtxProcessor implements IProcessor {
     @Override
     public void generateSimulationResults(Common.Envelope txEnvelope, ITxSimulator simulator, boolean
             initializingLedger)
-            throws LedgerException {
+            throws LedgerException, InvalidTxException {
         Common.Payload payload = null;
         try {
             payload = Common.Payload.parseFrom(txEnvelope.getPayload());
@@ -120,7 +121,7 @@ public class ConfigtxProcessor implements IProcessor {
 
 
     private void processResourceConfigTx(String groupId, Common.Envelope txEnvelope, ITxSimulator simulator, boolean
-            initializingLedger) throws LedgerException {
+            initializingLedger) throws LedgerException, InvalidTxException {
         if (initializingLedger) {
             try {
                 Configtx.Config existingResourcesConfig = retrievePersistedConfig(simulator, RESOURCES_CONFIG_KEY);
@@ -143,9 +144,12 @@ public class ConfigtxProcessor implements IProcessor {
             try {
                 Configtx.Config fullResourceConfig = ConfigTxUtils.validateAndApplyResourceConfig(groupId, txEnvelope);
                 persistConfig(simulator, RESOURCES_CONFIG_KEY, fullResourceConfig);
-            } catch (Exception e) {
+            } catch (InvalidTxException e) {
                 log.error(e.getMessage(), e);
-                throw new LedgerException(e);
+                throw new InvalidTxException(e);
+            }catch (Exception ex){
+                log.error(ex.getMessage(), ex);
+                throw new LedgerException(ex);
             }
         }
     }
