@@ -85,7 +85,7 @@ public class KvLedger implements INodeLedger {
     /** Recover the state database and history database (if exist)
       * by recommitting last valid blocks
      */
-    public void recoverDBs() throws LedgerException {
+    private void recoverDBs() throws LedgerException {
         logger.debug("Evtering revocerDBs()");
         Ledger.BlockchainInfo info = blockStore.getBlockchainInfo();
         if(info.getHeight() == 0){
@@ -129,7 +129,7 @@ public class KvLedger implements INodeLedger {
     /** recommitLostBlocks retrieves blocks in specified range and commit the write set to either
      * state IDB or history IDB or both
      */
-    public void recommitLostBlocks(long firstBlockNum, long lastBlockNum, IRecoverable... recoverables) throws LedgerException{
+    private void recommitLostBlocks(long firstBlockNum, long lastBlockNum, IRecoverable... recoverables) throws LedgerException{
         BlockAndPvtData blockAndPvtData;
         for (long blockNumber = firstBlockNum; blockNumber <= lastBlockNum; blockNumber++) {
             blockAndPvtData = getPvtDataAndBlockByNum(blockNumber, null);
