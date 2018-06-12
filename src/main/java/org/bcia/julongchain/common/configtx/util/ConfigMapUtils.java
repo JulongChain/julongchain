@@ -141,11 +141,11 @@ public class ConfigMapUtils {
         }
 
         if (ArrayUtils.contains(ILLEGAL_NAMES, configId)) {
-            throw new ValidateException("illegal configId");
+            throw new ValidateException("illegal configId: " + configId);
         }
 
         if (!Pattern.matches(REGEX_CONFIG_ID, configId)) {
-            throw new ValidateException("Wrong configId");
+            throw new ValidateException("Wrong configId: " + configId);
         }
     }
 
@@ -159,7 +159,7 @@ public class ConfigMapUtils {
         }
 
         if (!Pattern.matches(REGEX_GROUP_ID, groupId)) {
-            throw new ValidateException("Wrong groupId");
+            throw new ValidateException("Wrong groupId: " + groupId);
         }
     }
 
