@@ -85,7 +85,7 @@ public class GossipServiceUtil {
 
     List<GossipMember> gossipMembers = new ArrayList<>();
     RemoteGossipMember remoteGossipMember =
-        new RemoteGossipMember(group, URI.create("tcp://" + address_leader), id_leader);
+        new RemoteGossipMember(group, URI.create("udp://" + address_leader), id_leader);
     gossipMembers.add(remoteGossipMember);
 
     GossipService gossipService =
@@ -172,4 +172,11 @@ public class GossipServiceUtil {
     }
     return null;
   }
+
+  // public static void startGossipService(String address, List<String> groups, String id_seed, String address_seed) {
+  //   for (String group : groups) {
+  //     newGossipService(UUID.randomUUID().toString(), group, address, , ).start();
+  //   }
+  // }
+
 }
