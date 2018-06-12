@@ -147,8 +147,8 @@ public class NodeUtils {
             log.error(e.getMessage(), e);
         }
 
-        if (node != null && node.getInitializeCallback() != null) {
-            node.getInitializeCallback().onGroupInitialized(groupId);
+        if (node != null && node.getGroupCallback() != null) {
+            node.getGroupCallback().onGroupInitialized(groupId);
         }
     }
 

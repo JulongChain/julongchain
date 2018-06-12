@@ -48,6 +48,7 @@ import org.bcia.julongchain.node.common.helper.ConfigTreeHelper;
 import org.bcia.julongchain.node.entity.Group;
 import org.bcia.julongchain.node.util.LedgerUtils;
 import org.bcia.julongchain.node.util.NodeConstant;
+import org.bcia.julongchain.node.util.NodeGossipManager;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.common.Ledger;
@@ -72,6 +73,12 @@ import static org.bcia.julongchain.msp.mspconfig.MspConfigFactory.loadMspConfig;
 public class Node {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Node.class);
 
+    public interface IGroupCallback {
+        void onGroupInitialized(String groupId);
+
+        void onGroupsReady(List<String> groupIds);
+    }
+
     private static final String SAMPLE_DEVMODE_SOLO_PROFILE = "SampleDevModeSolo";
 
     /**
@@ -86,7 +93,9 @@ public class Node {
 
     private Map<String, Group> groupMap = new ConcurrentHashMap<String, Group>();
 
-    private InitializeCallback initializeCallback;
+    private IGroupCallback groupCallback;
+
+    private NodeGossipManager gossipManager;
 
     private Node() throws NodeException {
         init();
@@ -157,12 +166,12 @@ public class Node {
 
     private void initLocalMsp() throws NodeException {
         try {
-            List<IFactoryOpts> optsList = new ArrayList<IFactoryOpts>();
             MspConfig mspConfig = loadMspConfig();
             String mspConfigDir = mspConfig.getNode().getMspConfigPath();
             String mspId = mspConfig.getNode().getLocalMspId();
             String mspType = mspConfig.getNode().getLocalMspType();
 
+            List<IFactoryOpts> optsList = new ArrayList<IFactoryOpts>();
             String symmetrickey = mspConfig.getNode().getCsp().getGm().getSymmetricKey();
             String sign = mspConfig.getNode().getCsp().getGm().getSign();
             String hash = mspConfig.getNode().getCsp().getGm().getHash();
@@ -184,8 +193,8 @@ public class Node {
      *
      * @param callback
      */
-    public void initialize(InitializeCallback callback) {
-        this.initializeCallback = callback;
+    public void initialize(IGroupCallback callback) {
+        this.groupCallback = callback;
 
         try {
             IProcessor configtxProcessor = new ConfigtxProcessor();
@@ -223,6 +232,8 @@ public class Node {
                     }
                 }
             }
+
+            callback.onGroupsReady(ledgerIDs);
         } catch (LedgerException e) {
             log.error(e.getMessage(), e);
         }
@@ -361,18 +372,18 @@ public class Node {
         return groupMap;
     }
 
-    public InitializeCallback getInitializeCallback() {
-        return initializeCallback;
+    public IGroupCallback getGroupCallback() {
+        return groupCallback;
     }
 
-    public interface InitializeCallback {
-        void onGroupInitialized(String groupId);
+    public NodeGossipManager getGossipManager() {
+        return gossipManager;
     }
 
     //MockInitialize resets chains for test env
     public void mockInitialize() {
         try {
-            new LedgerManager().initializeTestEnvWithCustomProcessors(null);
+            LedgerManager.initializeTestEnvWithCustomProcessors(null);
         } catch (LedgerException e) {
             e.printStackTrace();
         }
