@@ -28,7 +28,9 @@ import org.bcia.julongchain.consenter.consensus.IChain;
 import org.bcia.julongchain.consenter.consensus.IConsensue;
 import org.bcia.julongchain.consenter.consensus.IConsenterSupport;
 import org.bcia.julongchain.consenter.entity.BatchesMes;
+import org.bcia.julongchain.consenter.entity.Message;
 import org.bcia.julongchain.protos.common.Common;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -38,25 +40,26 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @company Dingxuan
  */
 public class Singleton implements IChain, IConsensue {
-    private BlockingQueue<Common.Envelope> blockingQueue;
-    private Producer<Common.Envelope> producer;
-    private Consumer<Common.Envelope> consumer;
+    private BlockingQueue<Message> blockingQueue;
+    private Producer<Message> producer;
+    private Consumer<Message> consumer;
     private static Singleton instance;
     private static JavaChainLog log = JavaChainLogFactory.getLog(Singleton.class);
     private ChainSupport support;
-   // private IConsenterSupport support;
+    // private IConsenterSupport support;
     private Message normalMessage;
     private Message configMessage;
 
-    public static Singleton getInstance() {
+    public static Singleton getInstance(ChainSupport consenterSupport) {
         if (instance == null) {
             synchronized (Singleton.class) {
-                if (instance == null) {
+                if (consenterSupport == null) {
                     instance = new Singleton();
+                } else {
+                    instance = new Singleton(consenterSupport);
                 }
             }
         }
-
         return instance;
     }
 
@@ -94,20 +97,20 @@ public class Singleton implements IChain, IConsensue {
     }
 
 
-    public Singleton(ChainSupport support) {
-        this.support = support;
+    public Singleton() {
     }
 
 
-    public Singleton() {
+    public Singleton(ChainSupport consenterSupport) {
+        this.support = consenterSupport;
         instance = this;
         blockingQueue = new LinkedBlockingQueue<>();
-        producer = new Producer<>(blockingQueue);
-        consumer = new Consumer<Common.Envelope>(blockingQueue) {
+        producer = new Producer<Message>(blockingQueue);
+        consumer = new Consumer<Message>(blockingQueue) {
             @Override
-            public boolean consume(Common.Envelope envelope) {
+            public boolean consume(Message message) {
                 try {
-                    doProcess(envelope);
+                    doProcess();
                 } catch (InvalidProtocolBufferException e) {
                     e.printStackTrace();
                 } catch (LedgerException e) {
@@ -120,103 +123,82 @@ public class Singleton implements IChain, IConsensue {
                 return true;
             }
         };
-        start();
     }
 
     //处理剪块操作
-    public void doProcess(Common.Envelope envelope) throws InvalidProtocolBufferException, LedgerException, ValidateException, PolicyException {
+    public void doProcess() throws InvalidProtocolBufferException, LedgerException, ValidateException, PolicyException {
         long timer = 0;
         long seq = support.getSequence();
         if (configMessage == null) {//普通消息
             if (normalMessage.getConfigSeq() < seq) {
                 try {
                     support.getProcessor().processNormalMsg(normalMessage.getMessage());
-                    //support.processNormalMsg(normalMessage.getMessage());
                 } catch (InvalidProtocolBufferException e) {
                     log.warn(String.format("Discarding bad normal message: %s", e.getMessage()));
                 }
             }
-            BatchesMes batchesMes = support.getCutter().ordered(normalMessage.message);
-           // BatchesMes batchesMes = support.blockCutter().ordered(normalMessage.message);
+            BatchesMes batchesMes = support.getCutter().ordered(normalMessage.getMessage());
             Common.Envelope[][] batches = batchesMes.getMessageBatches();
-            if(batches.length==0&&timer==0){
-                timer= support.getLedgerResources().getMutableResources().getGroupConfig().getConsenterConfig().getBatchTimeout();
-                //timer=support.sharedConfig().getGroupConfig().getConsenterConfig().getBatchTimeout();
+            if (batches.length == 0 && timer == 0) {
+                timer = support.getLedgerResources().getMutableResources().getGroupConfig().getConsenterConfig().getBatchTimeout();
             }
-            for (Common.Envelope[] env:batches) {
-                Common.Block block=support.createNextBlock(env);
-                support.writeBlock(block,null);
-            }if(batches.length>0){
-                timer=0;
+            for (Common.Envelope[] env : batches) {
+                Common.Block block = support.createNextBlock(env);
+                support.writeBlock(block, null);
+            }
+            if (batches.length > 0) {
+                timer = 0;
             }
         } else {
-            if(configMessage.getConfigSeq()<seq){
+            if (configMessage.getConfigSeq() < seq) {
                 try {
                     support.getProcessor().processConfigMsg(configMessage.getMessage());
-                 //   support.processConfigMsg(configMessage.getMessage());
                 } catch (ConsenterException e) {
+                    log.error(e.getMessage());
                 } catch (InvalidProtocolBufferException e) {
                     log.warn(String.format("Discarding bad config message: %s", e.getMessage()));
                 } catch (ValidateException e) {
+                    log.error(e.getMessage());
                 } catch (PolicyException e) {
+                    log.error(e.getMessage());
                 }
-               Common.Envelope[] batch=support.getCutter().cut();
-                if(batch!=null){
-                    Common.Block block= support.createNextBlock(batch);
-                    support.writeBlock(block,null);
-                }
-                Common.Block block=support.createNextBlock(new Common.Envelope[]{configMessage.getMessage()});
-                support.writeConfigBlock(block,null);
-                timer=0;
             }
-           if(timer>0){
-                timer=0;
-                Common.Envelope[] batch=support.getCutter().cut();
-                if(batch.length==0){
-                    log.warn("Batch timer expired with no pending requests, this might indicate a bug");
-                }
-                log.debug("Batch timer expired, creating block");
-               Common.Block block=support.createNextBlock(batch);
-               support.writeBlock(block,null);
+            support.getCutter().ordered(configMessage.getMessage());
+            Common.Envelope[] batch = support.getCutter().cut();
+            if (batch != null) {
+                Common.Block block = support.createNextBlock(batch);
+                support.writeBlock(block, null);
             }
+            Common.Block block = support.createNextBlock(new Common.Envelope[]{configMessage.getMessage()});
+            support.writeConfigBlock(block, null);
+            timer = 0;
 
         }
+        if (timer > 0) {
+            timer = 0;
+            Common.Envelope[] batch = support.getCutter().cut();
+            if (batch.length == 0) {
+                log.warn("Batch timer expired with no pending requests, this might indicate a bug");
+            }
+            log.debug("Batch timer expired, creating block");
+            Common.Block block = support.createNextBlock(batch);
+            support.writeBlock(block, null);
+        }
 
-
-        System.out.println(envelope.getPayload().toStringUtf8());
     }
 
-    public boolean pushToQueue(Common.Envelope envelope) throws ValidateException {
-        ValidateUtils.isNotNull(envelope, "event can not be null");
-        return producer.produce(envelope);
+    public boolean pushToQueue(Message message) throws ValidateException {
+        ValidateUtils.isNotNull(message, "event can not be null");
+        return producer.produce(message);
     }
 
     public static void main(String[] args) throws ValidateException, ConsenterException {
-        Singleton singleton = null;
-        singleton = Singleton.getInstance();
-
-        Common.Envelope envelope = Common.Envelope.newBuilder().setPayload(ByteString.copyFrom("123".getBytes())).build();
-        singleton.order(envelope,1);
-        singleton.pushToQueue(envelope);
-    }
-
-
-    class Message {
-        long configSeq;
-        Common.Envelope message;
-
-        public Message(long configSeq, Common.Envelope message) {
-            this.configSeq = configSeq;
-            this.message = message;
-        }
-
-        public long getConfigSeq() {
-            return configSeq;
-        }
-
-        public Common.Envelope getMessage() {
-            return message;
-        }
+//        Singleton singleton = null;
+//        singleton = Singleton.getInstance();
+//
+//        Common.Envelope envelope = Common.Envelope.newBuilder().setPayload(ByteString.copyFrom("123".getBytes())).build();
+//        singleton.order(envelope,1);
+//        singleton.pushToQueue(envelope);
     }
 
     public IConsenterSupport getSupport() {

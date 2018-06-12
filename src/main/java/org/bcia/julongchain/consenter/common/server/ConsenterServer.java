@@ -93,8 +93,8 @@ public class ConsenterServer {
         {
             try {
                 PreStart.initAll();
-                registrar=PreStart.getDefaultRegistrar();
-                deliverHandler=PreStart.getDefaultDeliverHandler();
+                registrar=  PreStart.getDefaultRegistrar();
+                deliverHandler=  PreStart.getDefaultDeliverHandler();
             } catch (IOException e) {
                 log.error(e.getMessage());
             } catch (JavaChainException e) {
@@ -135,15 +135,15 @@ public class ConsenterServer {
                 @Override
                 public void onNext(Common.Envelope envelope) {
                     DeliverServer deliverServer=new DeliverServer(responseObserver,envelope) ;
-                    try {
-                        deliverHandler.handle(deliverServer);
-                    } catch (ValidateException e) {
-                        e.printStackTrace();
-                    } catch (InvalidProtocolBufferException e) {
-                        e.printStackTrace();
-                    } catch (LedgerException e) {
-                        e.printStackTrace();
-                    }
+//                    try {
+//                       // deliverHandler.handle(deliverServer);
+//                    } catch (ValidateException e) {
+//                        e.printStackTrace();
+//                    } catch (InvalidProtocolBufferException e) {
+//                        e.printStackTrace();
+//                    } catch (LedgerException e) {
+//                        e.printStackTrace();
+//                    }
                 }
 
                 @Override

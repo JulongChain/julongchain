@@ -13,21 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.consenter.common.server;
+package org.bcia.julongchain.consenter.entity;
 
-import io.grpc.stub.StreamObserver;
-import org.bcia.julongchain.common.exception.ConsenterException;
-import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.protos.common.Common;
-import org.bcia.julongchain.protos.consenter.Ab;
-
-import java.io.IOException;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/6/4
+ * @Date: 2018/6/11
  * @company Dingxuan
  */
-public interface IHandler {
-   void handle(Common.Envelope envelope, StreamObserver<Ab.BroadcastResponse> responseObserver) throws ConsenterException, IOException, ValidateException;
+public class Message {
+    long configSeq;
+    Common.Envelope message;
+
+    public Message(long configSeq, Common.Envelope message) {
+        this.configSeq = configSeq;
+        this.message = message;
+    }
+
+    public long getConfigSeq() {
+        return configSeq;
+    }
+
+    public Common.Envelope getMessage() {
+        return message;
+    }
 }

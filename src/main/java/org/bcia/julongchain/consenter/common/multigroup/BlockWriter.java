@@ -23,6 +23,7 @@ import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.util.proto.ProtoUtils;
 import org.bcia.julongchain.consenter.util.BlockHelper;
 import org.bcia.julongchain.consenter.util.CommonUtils;
 import org.bcia.julongchain.consenter.util.Utils;
@@ -36,7 +37,7 @@ import org.bcia.julongchain.protos.common.Configtx;
  */
 public class BlockWriter {
     private static JavaChainLog log = JavaChainLogFactory.getLog(BlockWriter.class);
-   // private IBlockWriterSupport support;
+    // private IBlockWriterSupport support;
     private ChainSupport support;
     private Registrar registrar;
 
@@ -50,7 +51,7 @@ public class BlockWriter {
         this.support = support;
         this.registrar = registrar;
         this.lastBlock = lastBlock;
-        this.lastConfigSeq=support.getSequence();
+        this.lastConfigSeq = support.getSequence();
     }
 
 
@@ -66,10 +67,10 @@ public class BlockWriter {
         Common.Block block = BlockHelper.createBlock(lastBlock.getHeader().getNumber() + 1, previousBlockHash);
         Common.BlockHeader.Builder header = Common.BlockHeader.newBuilder()
                 .setDataHash(ByteString.copyFrom(BlockHelper.hash(data.build().toByteArray())));
-        block.toBuilder()
-                .setData(data)
-                .setHeader(header);
-        return block;
+
+        Common.Block.Builder updateBlockBuilder=Common.Block.newBuilder(block);
+        updateBlockBuilder.setData(data).setHeader(header);
+        return updateBlockBuilder.build();
     }
 
     public void writeConfigBlock(Common.Block block, byte[] encodedMetadataValue) throws InvalidProtocolBufferException, LedgerException, ValidateException, PolicyException {
@@ -89,9 +90,8 @@ public class BlockWriter {
                 support.validate(configEnvelope);
 
                 IGroupConfigBundle iGroupConfigBundle = support.createBundle(groupHeader.getGroupId(), configEnvelope.getConfig());
-               //TODO update未实现
-                support.getLedgerResources().getMutableResources().update();
-                // support.update(iGroupConfigBundle);
+                //  support.getLedgerResources().getMutableResources().update();
+                support.update(iGroupConfigBundle);
                 break;
             default:
                 log.error(String.format("Told to write a config block with unknown header type: %v", groupHeader.getType()));
@@ -101,52 +101,60 @@ public class BlockWriter {
     }
 
     public synchronized void writeBlock(Common.Block block, byte[] encodedMetadataValue) {
-        //TODO 开启线程锁
         lastBlock = block;
         commitBlock(encodedMetadataValue);
     }
 
     private void commitBlock(byte[] encodedMetadataValue) {
         if (encodedMetadataValue != null) {
-
+            Common.Metadata metadata = null;
             try {
-                Common.Metadata metadata = Common.Metadata.parseFrom(encodedMetadataValue);
-                lastBlock.getMetadata().toBuilder().setMetadata(Common.BlockMetadataIndex.CONSENTER_VALUE, ByteString.copyFrom(Utils.marshalOrPanic(metadata)));
-                addBlockSignature(lastBlock);
-                addLastConfigSignature(lastBlock);
-                try {
-                    support.getLedgerResources().getReadWriteBase().append(lastBlock);
-                   // support.append(lastBlock);
-                } catch (LedgerException e) {
-                    e.printStackTrace();
-                }
+                metadata = Common.Metadata.parseFrom(encodedMetadataValue);
             } catch (InvalidProtocolBufferException e) {
                 e.printStackTrace();
             }
+            Common.Block.Builder block = Common.Block.newBuilder(lastBlock);
+            //block.getMetadata().toBuilder().setMetadata()
+            block.getMetadataBuilder().setMetadata(Common.BlockMetadataIndex.CONSENTER_VALUE, ByteString.copyFrom(Utils.marshalOrPanic(metadata)));
+            //     lastBlock.getMetadata().toBuilder().setMetadata(Common.BlockMetadataIndex.CONSENTER_VALUE, ByteString.copyFrom(Utils.marshalOrPanic(metadata)));
+            lastBlock = block.build();
         }
-
+        addBlockSignature(lastBlock);
+        addLastConfigSignature(lastBlock);
+        log.info("aaaaaaaaa");
+        try {
+            log.info("bbbbbbbb");
+            support.getLedgerResources().getReadWriteBase().append(lastBlock);
+        } catch (LedgerException e) {
+            e.printStackTrace();
+        }
     }
 
 
     public void addBlockSignature(Common.Block block) {
 
         try {
-
             Common.SignatureHeader signatureHeader = Common.SignatureHeader.parseFrom(Utils.marshalOrPanic(CommonUtils.newSignatureHeaderOrPanic(support.getLocalSigner())));
-
-            Common.MetadataSignature blockSignature = Common.MetadataSignature.newBuilder().setSignatureHeader(signatureHeader.toByteString()).build();
+            //构建MetadataSignatureBuilder 对象
+            Common.MetadataSignature.Builder blockSignatureBuilder = Common.MetadataSignature
+                    .newBuilder()
+                    .setSignatureHeader(signatureHeader.toByteString());
             byte[] blockSignatureValue = new byte[0];
             //TODO toByteArray转换为Bytes
-            blockSignature.toBuilder().setSignature(ByteString.copyFrom(
-                    CommonUtils.signOrPanic(support.getLocalSigner(), Utils.concatenateBytes(blockSignatureValue, blockSignature.getSignatureHeader().toByteArray(),
+            blockSignatureBuilder.setSignature(ByteString.copyFrom(
+                    CommonUtils.signOrPanic(support.getLocalSigner(), Utils.concatenateBytes(blockSignatureValue, blockSignatureBuilder.getSignatureHeader().toByteArray(),
                             block.getHeader().toByteArray()))));
 
-            Common.MetadataSignature metadataSignature = Common.MetadataSignature.parseFrom(blockSignature.toByteArray());
+            Common.MetadataSignature metadataSignature = Common.MetadataSignature.parseFrom(blockSignatureBuilder.build().toByteArray());
             Common.Metadata metadata = Common.Metadata.newBuilder()
                     .addSignatures(metadataSignature)
                     .setValue(ByteString.copyFrom(blockSignatureValue)).build();
-            block.getMetadata().toBuilder().setMetadata(Common.BlockMetadataIndex.SIGNATURES_VALUE, ByteString.copyFrom(Utils.marshalOrPanic(metadata)));
-
+            Common.Block.Builder updateBlockBuilder = Common.Block.newBuilder(block);
+//            updateBlockBuilder.getMetadataBuilder().setMetadata(Common.BlockMetadataIndex.SIGNATURES_VALUE, ByteString.copyFrom(Utils.marshalOrPanic(metadata)));
+            updateBlockBuilder.getMetadataBuilder().addMetadata(metadata.toByteString());
+            Common.Block block1 = updateBlockBuilder.build();
+            //ProtoUtils.printMessageJson(block1);
+            lastBlock = block1;
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
         }
@@ -170,7 +178,10 @@ public class BlockWriter {
             Common.Metadata metadata = Common.Metadata.newBuilder()
                     .addSignatures(metadataSignature)
                     .setValue(ByteString.copyFrom(lastConfigValue)).build();
-            block.getMetadata().toBuilder().setMetadata(Common.BlockMetadataIndex.LAST_CONFIG_VALUE, ByteString.copyFrom(Utils.marshalOrPanic(metadata)));
+            Common.Block.Builder updateblock = Common.Block.newBuilder(block);
+            //TODO 判断序列值
+            updateblock.getMetadataBuilder().addMetadata(ByteString.copyFrom(Utils.marshalOrPanic(metadata)));
+            lastBlock = updateblock.build();
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
         }

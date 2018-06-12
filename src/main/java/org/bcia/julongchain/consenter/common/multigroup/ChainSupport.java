@@ -20,6 +20,7 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.groupconfig.GroupConfigBundle;
+import org.bcia.julongchain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.julongchain.common.ledger.blockledger.Util;
 import org.bcia.julongchain.common.localmsp.ILocalSigner;
 import org.bcia.julongchain.consenter.common.blockcutter.BlockCutter;
@@ -44,7 +45,7 @@ public class ChainSupport implements IStandardGroupSupport,IConsenterSupport {
      IChain chain;
      IReceiver cutter;
      ILocalSigner localSigner;
-
+     IGroupConfigBundle updateBundle;
 
     public ChainSupport() {
     }
@@ -74,6 +75,10 @@ public class ChainSupport implements IStandardGroupSupport,IConsenterSupport {
         return Registrar.newBundle(groupId, config);
     }
 
+
+    public  void update(IGroupConfigBundle groupConfigBundle){
+        this.updateBundle=groupConfigBundle;
+    }
     public void start() {
         chain.start();
     }
@@ -100,6 +105,10 @@ public class ChainSupport implements IStandardGroupSupport,IConsenterSupport {
 
     public ILocalSigner getLocalSigner() {
         return localSigner;
+    }
+
+    public IGroupConfigBundle getUpdateBundle() {
+        return updateBundle;
     }
 
     @Override
@@ -142,16 +151,16 @@ public class ChainSupport implements IStandardGroupSupport,IConsenterSupport {
 
     @Override
     public Common.Block createNextBlock(Common.Envelope[] messages) {
-        return null;
+        return blockWriter.createNextBlock(messages);
     }
 
     @Override
     public void writeBlock(Common.Block block, byte[] encodedMetadataValue) {
-
+            blockWriter.writeBlock(block,encodedMetadataValue);
     }
 
     @Override
     public void writeConfigBlock(Common.Block block, byte[] encodedMetadataValue) throws InvalidProtocolBufferException, LedgerException, ValidateException, PolicyException {
-
+            blockWriter.writeConfigBlock(block,encodedMetadataValue);
     }
 }
