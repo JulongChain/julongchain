@@ -24,6 +24,7 @@ import org.apache.gossip.crdt.OrSet;
 import org.apache.gossip.event.GossipListener;
 import org.apache.gossip.event.GossipState;
 import org.apache.gossip.model.SharedGossipDataMessage;
+import org.bcia.julongchain.common.exception.GossipException;
 
 import java.net.URI;
 import java.net.UnknownHostException;
@@ -52,21 +53,28 @@ public class GossipServiceUtil {
    * @throws InterruptedException
    */
   public static GossipService newGossipService(String id, String group, String address)
-      throws UnknownHostException, InterruptedException {
+      throws GossipException {
 
-    GossipService gossipService =
-        new GossipService(
-            group,
-            URI.create("udp://" + address),
-            id,
-            new HashMap<>(),
-            new ArrayList<>(),
-            new GossipSettings(),
-            new GossipListener() {
-              @Override
-              public void gossipEvent(GossipMember member, GossipState state) {}
-            },
-            new MetricRegistry());
+    GossipService gossipService = null;
+    try {
+      gossipService =
+          new GossipService(
+              group,
+              URI.create("udp://" + address),
+              id,
+              new HashMap<>(),
+              new ArrayList<>(),
+              new GossipSettings(),
+              new GossipListener() {
+                @Override
+                public void gossipEvent(GossipMember member, GossipState state) {}
+              },
+              new MetricRegistry());
+    } catch (InterruptedException e) {
+      throw new GossipException(e.getMessage(), e);
+    } catch (UnknownHostException e) {
+      throw new GossipException(e.getMessage(), e);
+    }
 
     addressAndGossipServiceMap.put(address, gossipService);
     addressAndGroupMap.put(address, group);
@@ -77,7 +85,7 @@ public class GossipServiceUtil {
 
   public static GossipService newGossipService(
       String id, String group, String address, String id_leader, String address_leader)
-      throws UnknownHostException, InterruptedException {
+      throws GossipException {
 
     if (StringUtils.isEmpty(id_leader) || StringUtils.isEmpty(address_leader)) {
       return newGossipService(id, group, address);
@@ -85,22 +93,29 @@ public class GossipServiceUtil {
 
     List<GossipMember> gossipMembers = new ArrayList<>();
     RemoteGossipMember remoteGossipMember =
-        new RemoteGossipMember(group, URI.create("tcp://" + address_leader), id_leader);
+        new RemoteGossipMember(group, URI.create("udp://" + address_leader), id_leader);
     gossipMembers.add(remoteGossipMember);
 
-    GossipService gossipService =
-        new GossipService(
-            group,
-            URI.create("udp://" + address),
-            id,
-            new HashMap<>(),
-            gossipMembers,
-            new GossipSettings(),
-            new GossipListener() {
-              @Override
-              public void gossipEvent(GossipMember member, GossipState state) {}
-            },
-            new MetricRegistry());
+    GossipService gossipService = null;
+    try {
+      gossipService =
+          new GossipService(
+              group,
+              URI.create("udp://" + address),
+              id,
+              new HashMap<>(),
+              gossipMembers,
+              new GossipSettings(),
+              new GossipListener() {
+                @Override
+                public void gossipEvent(GossipMember member, GossipState state) {}
+              },
+              new MetricRegistry());
+    } catch (InterruptedException e) {
+      throw new GossipException(e.getMessage(), e);
+    } catch (UnknownHostException e) {
+      throw new GossipException(e.getMessage(), e);
+    }
 
     addressAndGossipServiceMap.put(address, gossipService);
     addressAndGroupMap.put(address, group);
@@ -116,19 +131,19 @@ public class GossipServiceUtil {
    * @param seqNum 区块的num
    * @param data String格式的区块
    */
-  public static void addData(String address, Long seqNum, String data) {
+  public static void addData(String address, Long seqNum, String data) throws GossipException {
 
     if (StringUtils.isEmpty(address) || seqNum == null || data == null) {
-      return;
+      throw new GossipException("Gossip服务器地址，区块高度，区块文件不能为空。");
     }
 
     GossipService gossipService = addressAndGossipServiceMap.get(address);
     if (gossipService == null) {
-      return;
+      throw new GossipException("Gossip服务异常，请检查是否已经启动。[" + address + "]");
     }
     String group = addressAndGroupMap.get(address);
     if (StringUtils.isEmpty(group)) {
-      return;
+      throw new GossipException("Gossip服务所属group不能为空。[" + address + "]");
     }
 
     SharedGossipDataMessage m = new SharedGossipDataMessage();
@@ -146,17 +161,17 @@ public class GossipServiceUtil {
    * @param seqNum 区块的num
    * @return
    */
-  public static Object getData(String address, Long seqNum) {
+  public static Object getData(String address, Long seqNum) throws GossipException {
     if (StringUtils.isEmpty(address) || seqNum == null) {
-      return null;
+      throw new GossipException("Gossip服务器地址，区块高度不能为空。");
     }
     GossipService gossipService = addressAndGossipServiceMap.get(address);
     if (gossipService == null) {
-      return null;
+      throw new GossipException("Gossip服务异常，请检查是否启动。[" + address + "]");
     }
     String group = addressAndGroupMap.get(address);
     if (StringUtils.isEmpty(group)) {
-      return null;
+      throw new GossipException("Gossip服务所属group不能为空。[" + address + "]");
     }
     Crdt crdt = gossipService.getGossipManager().findCrdt(group + "-" + seqNum);
     if (crdt == null) {
@@ -172,4 +187,12 @@ public class GossipServiceUtil {
     }
     return null;
   }
+
+  // public static void startGossipService(String address, List<String> groups, String id_seed,
+  // String address_seed) {
+  //   for (String group : groups) {
+  //     newGossipService(UUID.randomUUID().toString(), group, address, , ).start();
+  //   }
+  // }
+
 }
