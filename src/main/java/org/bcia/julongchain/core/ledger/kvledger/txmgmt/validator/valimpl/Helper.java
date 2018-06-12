@@ -52,7 +52,7 @@ import java.util.Map;
 public class Helper {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(Helper.class);
 
-    public static PvtUpdateBatch validateAndPreparePvtBatch(Block block, Map<Long, TxPvtData> pvtData) throws LedgerException{
+    static PvtUpdateBatch validateAndPreparePvtBatch(Block block, Map<Long, TxPvtData> pvtData) throws LedgerException{
         PvtUpdateBatch pvtUpdates = new PvtUpdateBatch();
         for(Transaction tx : block.getTxs()){
             if(!TransactionPackage.TxValidationCode.VALID.equals(tx.getValidationCode())){
@@ -74,11 +74,11 @@ public class Helper {
         return pvtUpdates;
     }
 
-    public static boolean requiresPvtdataValidation(TxPvtData tx){
+    private static boolean requiresPvtdataValidation(TxPvtData tx){
         return true;
     }
 
-    public static void validatePvtdata(Transaction tx, TxPvtData pvtData)throws LedgerException{
+    private static void validatePvtdata(Transaction tx, TxPvtData pvtData)throws LedgerException{
         if(pvtData.getWriteSet() == null){
             return;
         }
@@ -94,7 +94,7 @@ public class Helper {
         }
     }
 
-    public static Block preprocessProtoBlock(ITxManager txMgr, Common.Block.Builder blockBuilder, boolean doMVCCValidation) throws LedgerException {
+    static Block preprocessProtoBlock(ITxManager txMgr, Common.Block.Builder blockBuilder, boolean doMVCCValidation) throws LedgerException {
         Common.Block block = blockBuilder.build();
         Block b = new Block(block.getHeader().getNumber());
         TxValidationFlags txsFilter = TxValidationFlags.fromByteString(block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
@@ -131,7 +131,7 @@ public class Helper {
             Common.HeaderType txType = Common.HeaderType.forNumber(gh.getType());
             logger.debug("txType " + txType);
             if(Common.HeaderType.ENDORSER_TRANSACTION.equals(txType)){
-                ProposalPackage.SmartContractAction respPayload = null;
+                ProposalPackage.SmartContractAction respPayload;
                 try {
                     respPayload = Util.getActionFromEnvelope(ByteString.copyFrom(envBytes));
                 } catch (Exception e) {
@@ -140,7 +140,8 @@ public class Helper {
                 }
                 txRwSet = new TxRwSet();
                 try {
-                    txRwSet.fromProtoBytes(respPayload.getResults());
+	                assert respPayload != null;
+	                txRwSet.fromProtoBytes(respPayload.getResults());
                 } catch (Exception e) {
                     txsFilter.setFlag(txIndex, TransactionPackage.TxValidationCode.INVALID_OTHER_REASON);
                     continue;
@@ -149,14 +150,10 @@ public class Helper {
                 Rwset.TxReadWriteSet rwSetProto = null;
                 try {
                     rwSetProto = processNonEndorserTx(env, gh.getTxId(), txType, txMgr, !doMVCCValidation);
-                } catch (Exception e) {
-                	//无效交易跳过
-					if (e.getCause() instanceof InvalidTxException) {
-						txsFilter.setFlag(txIndex, TransactionPackage.TxValidationCode.INVALID_OTHER_REASON);
-						continue;
-					} else {
-						throw e;
-					}
+                } catch (InvalidTxException e) {
+                    // TODO: 6/11/18 无效交易跳过
+					txsFilter.setFlag(txIndex, TransactionPackage.TxValidationCode.INVALID_OTHER_REASON);
+					continue;
                 }
                 if(rwSetProto != null){
                     txRwSet = RwSetUtil.txRwSetFromProtoMsg(rwSetProto);
@@ -173,15 +170,15 @@ public class Helper {
         return b;
     }
 
-    public static Rwset.TxReadWriteSet processNonEndorserTx(Common.Envelope txEnv, String txID, Common.HeaderType txType, ITxManager txMgr, boolean synchingState) throws LedgerException {
+    private static Rwset.TxReadWriteSet processNonEndorserTx(Common.Envelope txEnv, String txID, Common.HeaderType txType, ITxManager txMgr, boolean synchingState) throws LedgerException, InvalidTxException {
         logger.debug(String.format("Performing custom processing for transaction [txid=%s], [txtype=%s]", txID, txType));
         IProcessor processor = CustomTx.getProcessor(txType);
         logger.debug("Processor for custom tx processing " + processor);
         if(processor == null){
         	return null;
         }
-        ITxSimulator sim = null;
-        TxSimulationResults simRes = null;
+        ITxSimulator sim;
+        TxSimulationResults simRes;
         sim = txMgr.newTxSimulator(txID);
         try {
             processor.generateSimulationResults(txEnv, sim, synchingState);
@@ -189,6 +186,8 @@ public class Helper {
         } catch (LedgerException e) {
             sim.done();
             throw e;
+        } catch (InvalidTxException e) {
+        	throw e;
         }
         sim.done();
         return simRes.getPublicReadWriteSet();
