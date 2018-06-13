@@ -576,9 +576,8 @@ public class NodeConfig {
     }
 
     public static class Gossip {
-        private String ip;
-        private String startPort;
-        private String seedAddress;
+        private String commiterAddress;
+        private String consenterAddress;
         private String bootstrap;
         private boolean useLeaderElection;
         private boolean orgLeader;
@@ -841,28 +840,20 @@ public class NodeConfig {
             this.privateData = privateData;
         }
 
-        public String getStartPort() {
-            return startPort;
+        public String getCommiterAddress() {
+            return commiterAddress;
         }
 
-        public void setStartPort(String startPort) {
-            this.startPort = startPort;
+        public void setCommiterAddress(String commiterAddress) {
+            this.commiterAddress = commiterAddress;
         }
 
-        public String getIp() {
-            return ip;
+        public String getConsenterAddress() {
+            return consenterAddress;
         }
 
-        public void setIp(String ip) {
-            this.ip = ip;
-        }
-
-        public String getSeedAddress() {
-            return seedAddress;
-        }
-
-        public void setSeedAddress(String seedAddress) {
-            this.seedAddress = seedAddress;
+        public void setConsenterAddress(String consenterAddress) {
+            this.consenterAddress = consenterAddress;
         }
     }
 

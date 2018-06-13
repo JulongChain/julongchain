@@ -129,9 +129,8 @@ node:
     # Gossip related configuration
     gossip:
 
-        ip:
-        startPort: 50000
-        seedAddress:
+        commiterAddress:
+        consenterAddress:
 
         # Bootstrap set to initialize gossip with.
         # This is a list of other nodes that this node reaches out to at startup.

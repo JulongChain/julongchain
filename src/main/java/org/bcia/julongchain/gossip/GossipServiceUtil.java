@@ -25,13 +25,14 @@ import org.apache.gossip.event.GossipListener;
 import org.apache.gossip.event.GossipState;
 import org.apache.gossip.model.SharedGossipDataMessage;
 import org.bcia.julongchain.common.exception.GossipException;
+import org.bcia.julongchain.core.node.NodeConfigFactory;
 
 import java.net.URI;
 import java.net.UnknownHostException;
 import java.util.*;
 
 /**
- * 类描述
+ * 类描述 参考：https://github.com/apache/incubator-gossip
  *
  * @author wanliangbing
  * @date 2018/06/08
@@ -39,29 +40,22 @@ import java.util.*;
  */
 public class GossipServiceUtil {
 
-  public static final Map<String, GossipService> addressAndGossipServiceMap = new HashMap<>();
-  public static final Map<String, String> addressAndGroupMap = new HashMap<>();
-  public static final Map<String, GossipService> idAndGossipServiceMap = new HashMap<>();
-
   /**
    * 启动gossip server服务
    *
-   * @param id 指定节点gossip服务ID
-   * @param group 节点gossip服务所属的group
    * @param address 节点的地址，格式为ip:port
    * @throws UnknownHostException
    * @throws InterruptedException
    */
-  public static GossipService newGossipService(String id, String group, String address)
-      throws GossipException {
+  public static GossipService newGossipService(String address) throws GossipException {
 
     GossipService gossipService = null;
     try {
       gossipService =
           new GossipService(
-              group,
+              "julongchain",
               URI.create("udp://" + address),
-              id,
+              UUID.randomUUID().toString(),
               new HashMap<>(),
               new ArrayList<>(),
               new GossipSettings(),
@@ -76,33 +70,29 @@ public class GossipServiceUtil {
       throw new GossipException(e.getMessage(), e);
     }
 
-    addressAndGossipServiceMap.put(address, gossipService);
-    addressAndGroupMap.put(address, group);
-    idAndGossipServiceMap.put(id, gossipService);
-
     return gossipService;
   }
 
-  public static GossipService newGossipService(
-      String id, String group, String address, String id_leader, String address_leader)
+  public static GossipService newGossipService(String address, String address_leader)
       throws GossipException {
 
-    if (StringUtils.isEmpty(id_leader) || StringUtils.isEmpty(address_leader)) {
-      return newGossipService(id, group, address);
+    if (StringUtils.isEmpty(address_leader)) {
+      return newGossipService(address);
     }
 
     List<GossipMember> gossipMembers = new ArrayList<>();
     RemoteGossipMember remoteGossipMember =
-        new RemoteGossipMember(group, URI.create("udp://" + address_leader), id_leader);
+        new RemoteGossipMember(
+            "julongchain", URI.create("udp://" + address_leader), UUID.randomUUID().toString());
     gossipMembers.add(remoteGossipMember);
 
     GossipService gossipService = null;
     try {
       gossipService =
           new GossipService(
-              group,
+              "julongchain",
               URI.create("udp://" + address),
-              id,
+              UUID.randomUUID().toString(),
               new HashMap<>(),
               gossipMembers,
               new GossipSettings(),
@@ -117,33 +107,24 @@ public class GossipServiceUtil {
       throw new GossipException(e.getMessage(), e);
     }
 
-    addressAndGossipServiceMap.put(address, gossipService);
-    addressAndGroupMap.put(address, group);
-    idAndGossipServiceMap.put(id, gossipService);
-
     return gossipService;
   }
 
   /**
    * 节点上传区块
    *
-   * @param address 上传数据的源始ip和端口，格式为ip:port
+   * @param group 上传数据的群组
    * @param seqNum 区块的num
    * @param data String格式的区块
    */
-  public static void addData(String address, Long seqNum, String data) throws GossipException {
-
-    if (StringUtils.isEmpty(address) || seqNum == null || data == null) {
-      throw new GossipException("Gossip服务器地址，区块高度，区块文件不能为空。");
-    }
-
-    GossipService gossipService = addressAndGossipServiceMap.get(address);
+  public static void addData(GossipService gossipService, String group, Long seqNum, String data)
+      throws GossipException {
     if (gossipService == null) {
-      throw new GossipException("Gossip服务异常，请检查是否已经启动。[" + address + "]");
+      throw new GossipException("Gossip服务未启动。");
     }
-    String group = addressAndGroupMap.get(address);
-    if (StringUtils.isEmpty(group)) {
-      throw new GossipException("Gossip服务所属group不能为空。[" + address + "]");
+
+    if (StringUtils.isEmpty(group) || seqNum == null || data == null) {
+      throw new GossipException("群组，区块高度，区块文件不能为空。");
     }
 
     SharedGossipDataMessage m = new SharedGossipDataMessage();
@@ -157,21 +138,17 @@ public class GossipServiceUtil {
   /**
    * 读取指定区块num的数据
    *
-   * @param address 读取节点的地址，格式为ip:port
+   * @param group 上传数据的群组
    * @param seqNum 区块的num
    * @return
    */
-  public static Object getData(String address, Long seqNum) throws GossipException {
-    if (StringUtils.isEmpty(address) || seqNum == null) {
-      throw new GossipException("Gossip服务器地址，区块高度不能为空。");
-    }
-    GossipService gossipService = addressAndGossipServiceMap.get(address);
+  public static Object getData(GossipService gossipService, String group, Long seqNum)
+      throws GossipException {
     if (gossipService == null) {
-      throw new GossipException("Gossip服务异常，请检查是否启动。[" + address + "]");
+      throw new GossipException("Gossip服务未启动。");
     }
-    String group = addressAndGroupMap.get(address);
-    if (StringUtils.isEmpty(group)) {
-      throw new GossipException("Gossip服务所属group不能为空。[" + address + "]");
+    if (StringUtils.isEmpty(group) || seqNum == null) {
+      throw new GossipException("区块，区块高度不能为空。");
     }
     Crdt crdt = gossipService.getGossipManager().findCrdt(group + "-" + seqNum);
     if (crdt == null) {
@@ -188,18 +165,26 @@ public class GossipServiceUtil {
     return null;
   }
 
-  public static void startGossipService(String group, String address) throws GossipException {
-    newGossipService(UUID.randomUUID().toString(), group, address).start();
+  public static void startGossipService(String address) throws GossipException {
+    newGossipService(address).start();
   }
 
-  public static void startGossipService(String group, String address, String address_seed)
+  public static void startGossipService(String address, String address_seed)
       throws GossipException {
-    newGossipService(
-            UUID.randomUUID().toString(),
-            group,
-            address,
-            UUID.randomUUID().toString(),
-            address_seed)
-        .start();
+    newGossipService(address, address_seed).start();
+  }
+
+  public static GossipService startConsenterGossip() throws GossipException {
+    String consenterAddress = NodeConfigFactory.getNodeConfig().getNode().getGossip().getConsenterAddress();
+    GossipService gossipService = newGossipService(consenterAddress);
+    gossipService.start();
+    return gossipService;
+  }
+
+  public static void startCommiterGossip() throws GossipException {
+    String consenterAddress = NodeConfigFactory.getNodeConfig().getNode().getGossip().getConsenterAddress();
+    String commiterAddress = NodeConfigFactory.getNodeConfig().getNode().getGossip().getCommiterAddress();
+    GossipService gossipService = newGossipService(commiterAddress, consenterAddress);
+    gossipService.start();
   }
 }
