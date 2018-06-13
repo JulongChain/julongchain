@@ -270,7 +270,7 @@
     </dependencies>
 
     <build>
-        <finalName>javachain</finalName>
+        <finalName>julongchain</finalName>
 
         <extensions>
             <extension>
