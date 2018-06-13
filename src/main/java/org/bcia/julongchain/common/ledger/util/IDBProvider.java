@@ -62,7 +62,7 @@ public interface IDBProvider {
     /**
      * 获取DB路径
      */
-    String getDbPath() throws LevelDBException;
+    String getDBPath() throws LevelDBException;
 
     /**
      * 获取DB

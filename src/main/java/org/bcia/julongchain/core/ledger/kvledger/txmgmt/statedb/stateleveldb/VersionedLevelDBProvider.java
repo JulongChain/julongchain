@@ -40,7 +40,7 @@ public class VersionedLevelDBProvider implements IVersionedDBProvider {
     public VersionedLevelDBProvider() throws LedgerException {
         String dbPath = LedgerConfig.getStateLevelDBPath();
         this.db = new LevelDBProvider(dbPath);
-        logger.debug("Create vdb using path " + this.db.getDbPath());
+        logger.debug("Create vdb using path " + this.db.getDBPath());
     }
 
     @Override

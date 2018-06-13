@@ -55,7 +55,6 @@ public class LockBasedTxManager implements ITxManager {
     private UpdateBatch batch;
     private Common.Block currentBlock;
     private Map<String, IStateListener> stateListeners;
-    private ReentrantLock lock;
 
     public LockBasedTxManager(String ledgerID,
                               IDB db,
@@ -65,19 +64,16 @@ public class LockBasedTxManager implements ITxManager {
         this.db = db;
         this.stateListeners = stateListeners;
         this.validator = new DefaultValidator(this, db);
-        this.lock = new ReentrantLock();
     }
 
     @Override
-    public IQueryExecutor newQueryExecutor(String txid) throws LedgerException {
-        lock.lock();
+    public synchronized IQueryExecutor newQueryExecutor(String txid) throws LedgerException {
         return new LockBasedQueryExecutor(this, txid);
     }
 
     @Override
-    public ITxSimulator newTxSimulator(String txid) throws LedgerException {
+    public synchronized ITxSimulator newTxSimulator(String txid) throws LedgerException {
         logger.debug("Constructing new tx simulator");
-        lock.lock();
         return new LockBasedTxSimulator(this, txid);
     }
 
@@ -228,13 +224,5 @@ public class LockBasedTxManager implements ITxManager {
 
     public void setStateListeners(Map<String, IStateListener> stateListeners) {
         this.stateListeners = stateListeners;
-    }
-
-    public ReentrantLock getLock() {
-        return lock;
-    }
-
-    public void setLock(ReentrantLock lock) {
-        this.lock = lock;
     }
 }

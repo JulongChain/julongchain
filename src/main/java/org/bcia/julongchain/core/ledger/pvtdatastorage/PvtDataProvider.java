@@ -40,7 +40,7 @@ public class PvtDataProvider {
     public PvtDataProvider() throws LedgerException{
 		String dbPath = LedgerConfig.getPvtDataStorePath();
 		this.db = new LevelDBProvider(dbPath);
-		logger.debug("Create pvtprovider using path = " + this.db.getDbPath());
+		logger.debug("Create pvtprovider using path = " + this.db.getDBPath());
 	}
 
     /**

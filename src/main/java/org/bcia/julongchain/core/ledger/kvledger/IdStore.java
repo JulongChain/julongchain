@@ -52,7 +52,7 @@ public class IdStore {
         IdStore idStore = new IdStore();
         String dbPath = LedgerConfig.getLedgerProviderPath();
         idStore.setProvider(new LevelDBProvider(dbPath));
-        logger.debug("Create idstore using path = " + idStore.getProvider().getDbPath());
+        logger.debug("Create idstore using path = " + idStore.getProvider().getDBPath());
         return idStore;
     }
 
