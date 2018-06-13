@@ -28,6 +28,7 @@ import org.bcia.julongchain.core.container.api.IBuildSpecFactory;
 import org.bcia.julongchain.core.container.scintf.ISmartContractStream;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
 import org.bcia.julongchain.core.ledger.kvledger.history.IHistoryQueryExecutor;
+import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.core.smartcontract.client.SmartContractSupportClient;
 import org.bcia.julongchain.core.smartcontract.node.SmartContractRunningUtil;
 import org.bcia.julongchain.core.smartcontract.node.SmartContractSupportService;
@@ -309,7 +310,12 @@ public class SmartContractSupport {
           if (CollectionUtils.isEmpty(images)) {
 
             // 清空instantiate目录
-            String basePath = "/root/julongchain/instantiate/" + smartContractId + "-" + version;
+            String basePath =
+                NodeConfigFactory.getNodeConfig().getSmartContract().getInstantiatePath()
+                    + "/"
+                    + smartContractId
+                    + "-"
+                    + version;
             File basePathFile = new File(basePath);
             if (!basePathFile.exists()) {
               FileUtils.forceMkdir(basePathFile);
@@ -350,7 +356,7 @@ public class SmartContractSupport {
               log.info("wait smart contract register[" + smartContractId + "]");
               Thread.sleep(1000);
             }
-          }else{
+          } else {
             DockerUtil.startContainer(smartContractId);
             while (!SmartContractRunningUtil.checkSmartContractRunning(smartContractId)) {
               log.info("wait smart contract register[" + smartContractId + "]");

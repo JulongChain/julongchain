@@ -312,6 +312,7 @@ public class NodeConfig {
      *
      */
     public static class SmartContract {
+        private String instantiatePath;
         private Map<String, String> id;
         private String builder;
         private boolean pull;
@@ -437,6 +438,14 @@ public class NodeConfig {
 
         public void setLogging(Map<String, String> logging) {
             this.logging = logging;
+        }
+
+        public String getInstantiatePath() {
+            return instantiatePath;
+        }
+
+        public void setInstantiatePath(String instantiatePath) {
+            this.instantiatePath = instantiatePath;
         }
     }
 

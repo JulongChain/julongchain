@@ -41,16 +41,9 @@ public class SessionAc {
     private Date sessionEndTime;
     private boolean usedAtLeastOnce;
     private Expiration expiration;
-    public SessionAc(ChainSupport acSupport, IPolicyChecker checkPolicy, String group, Common.Envelope envelope, Expiration expiration){
+    public SessionAc(ChainSupport acSupport, IPolicyChecker checkPolicy, String group, Common.Envelope envelope, Expiration expiration) throws InvalidProtocolBufferException, ValidateException {
         List<SignedData> signedData=null;
-        try {
-           signedData= SignedData.asSignedData(envelope);
-        } catch (ValidateException e) {
-            e.printStackTrace();
-        } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
-        }
-
+        signedData= SignedData.asSignedData(envelope);
         this.acSupport = acSupport;
         this.checkPolicy = checkPolicy;
         this.group = group;
