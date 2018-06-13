@@ -18,6 +18,6 @@ RUN apt-get -y install openjdk-8-jdk
 RUN apt-get -y install maven
 RUN apt-get -y install net-tools
 RUN apt-get -y install iputils-ping
-RUN mkdir -p /root/javachain
-WORKDIR /root/javachain
+RUN mkdir -p /root/julongchain
+WORKDIR /root/julongchain
 

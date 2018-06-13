@@ -153,7 +153,12 @@ public class SDSPackage implements ISmartContractPackage {
             throw new JavaChainException("SmartContract " + path + " exists");
         }
         try {
-            IoUtil.createFileIfMissing(file.getPath());
+            if (!IoUtil.createFileIfMissing(file.getPath())) {
+                //创建文件失败
+	            String errMsg = "File [" + path + "] can not be created. Please make sure you have the permission of the directory";
+	            log.error(errMsg);
+                throw new JavaChainException(errMsg);
+            }
         } catch (Exception e){
             log.error(e.getMessage(), e);
             throw new JavaChainException(e);

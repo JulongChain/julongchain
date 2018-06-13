@@ -19,7 +19,7 @@ public class GossipServiceUtilTest {
 
   @Test
   /** 测试启动gossip服务 */
-  public void newGossipService() throws GossipException{
+  public void newGossipService() throws GossipException {
     String id = UUID.randomUUID().toString();
     String group = "group";
     String address = "localhost:7052";
@@ -58,12 +58,15 @@ public class GossipServiceUtilTest {
 
     String address_addData = "localhost:7052";
     String address_readData = "localhost:7053";
+
     String group = "group111";
 
     GossipService gossipService_add =
         GossipServiceUtil.newGossipService(id1, group, address_addData);
+
     GossipService gossipService_read =
-        GossipServiceUtil.newGossipService(id2, group, address_readData);
+        GossipServiceUtil.newGossipService(
+            id2, group, address_readData, UUID.randomUUID().toString(), address_addData);
 
     gossipService_add.start();
     gossipService_read.start();
@@ -73,7 +76,7 @@ public class GossipServiceUtilTest {
     GossipServiceUtil.addData(address_addData, 1l, data);
 
     try {
-      Thread.sleep(5000);
+      Thread.sleep(1000);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -110,5 +113,9 @@ public class GossipServiceUtilTest {
     System.out.println(string);
 
     Assert.assertEquals(string, "hello");
+  }
+
+  public static void main(String[] args) {
+    System.out.println("hello world");
   }
 }
