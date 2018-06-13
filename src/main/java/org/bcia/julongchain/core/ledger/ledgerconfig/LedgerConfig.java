@@ -48,11 +48,11 @@ public class LedgerConfig {
     private static int MAX_BLOCKFILE_SIZE;
 
     public static boolean isCouchDBEnable(){
-        return false;
+	    return NodeConfigFactory.getNodeConfig().getLedger().getState().getStateDatabase().toLowerCase().contains("couchdb");
     }
 
     public static boolean isHistoryDBEnabled(){
-        return true;
+	    return NodeConfigFactory.getNodeConfig().getLedger().getHistory().get("enableHistoryDatabase");
     }
 
     public static String getRootPath(){
