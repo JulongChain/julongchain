@@ -131,13 +131,14 @@ public class LevelDBUtil {
 
   /**
    * 删除level db中的key
+   * 删除应将level db中key对应的value设置为null，否则无法删除key
    *
    * @param db - 要删除的level db数据库
    * @param key - 要删除的key
    */
   public static void delete(DB db, byte[] key, boolean sync) throws LevelDBException {
     WriteOptions writeOptions = new WriteOptions().sync(sync);
-    db.delete(key, writeOptions);
+    db.put(key, null, writeOptions);
   }
 
   /**

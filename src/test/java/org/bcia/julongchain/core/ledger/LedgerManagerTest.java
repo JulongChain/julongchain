@@ -66,11 +66,6 @@ public class LedgerManagerTest {
         return dir.delete();
     }
 
-    @After
-    public void after(){
-        System.out.println(((KvLedger) l).getLedgerID());
-    }
-
     @Test
     public void delete() throws Exception{
         System.out.println(deleteDir(new File(LedgerConfig.getRootPath())));

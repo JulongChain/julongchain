@@ -64,6 +64,8 @@ public class LedgerTest {
 //            byte[] value = height.toBytes();
 //            provider.put(ArrayUtils.addAll(ArrayUtils.addAll(("ns" + i).getBytes(), COMPOSITE_KEY_SEP), ("key" + i).getBytes()), value, true);
 //        }
+	    provider.put("key".getBytes(), "value".getBytes(), true);
+	    provider.delete("key".getBytes(), true);
         Iterator<Map.Entry<byte[], byte[]>> itr =  provider.getIterator(null);
         while(itr.hasNext()){
             Map.Entry<byte[], byte[]> entry = itr.next();
@@ -73,12 +75,12 @@ public class LedgerTest {
 //            soutBytes(entry.getKey());
             System.out.println(new String(entry.getKey()));
             System.out.println(new String(entry.getValue()));
+	        System.out.println(entry.getValue().length == 0);
 //            soutBytes(entry.getValue());
 //            soutBytes(entry.getKey());
 //            soutBytes(entry.getValue());
             System.out.println("_____________________________________");
         }
-
     }
 
     @Test
