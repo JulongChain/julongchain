@@ -50,13 +50,9 @@ public class MspConfigHelper {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        String symmetrickey = mspConfig.node.getCsp().getGm().getSymmetricKey();
-        String sign = mspConfig.node.getCsp().getGm().getSign();
-        String hash = mspConfig.node.getCsp().getGm().getHash();
-        String asymmetric = mspConfig.node.getCsp().getGm().getAsymmetric();
-        String privateKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPrivateKeyStore();
-        String publicKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPublicKeyStore();
-        optsList.add(new GmFactoryOpts(symmetrickey, asymmetric, hash, sign, publicKeyPath, privateKeyPath));
+        GmFactoryOpts gmFactoryOpts=new GmFactoryOpts();
+        gmFactoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("gm"));
+        optsList.add(gmFactoryOpts);
         return optsList;
     }
 

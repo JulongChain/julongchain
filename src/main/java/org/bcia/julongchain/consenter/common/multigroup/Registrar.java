@@ -50,6 +50,7 @@ import org.bcia.julongchain.protos.consenter.Ab;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.bcia.julongchain.common.groupconfig.LogSanityChecks.logPolicy;
 import static org.bcia.julongchain.consenter.common.msgprocessor.SystemGroup.newSystemGroup;
@@ -61,7 +62,7 @@ import static org.bcia.julongchain.consenter.common.msgprocessor.SystemGroup.new
  */
 public class Registrar implements IChainCreator,IGroupSupportRegistrar,ISupportManager {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Registrar.class);
-    Map<String, ChainSupport> chains=new HashMap<>();
+    Map<String, ChainSupport> chains=new ConcurrentHashMap<>();
 
     Map<String, IConsensue> consenters;
 
@@ -160,7 +161,6 @@ public class Registrar implements IChainCreator,IGroupSupportRegistrar,ISupportM
                 chains.put(groupId, chain);
                 systemGroupID = groupId;
                 systemGroup = chain;
-                //TODO 去掉chain启动
                 chain.start();
             } else {
                 log.debug(String.format("Starting chain: %s", groupId));
@@ -235,7 +235,7 @@ public class Registrar implements IChainCreator,IGroupSupportRegistrar,ISupportM
 
     }
 
-    public void newChain(Common.Envelope configtx) throws ValidateException, PolicyException, InvalidProtocolBufferException, LedgerException {
+    public Registrar newChain(Common.Envelope configtx) throws ValidateException, PolicyException, InvalidProtocolBufferException, LedgerException {
         LedgerResources ledgerResources = newLedgerResources(configtx);
         List<Common.Envelope> envelopes = Arrays.asList(new Common.Envelope[]{configtx});
         try {
@@ -243,19 +243,22 @@ public class Registrar implements IChainCreator,IGroupSupportRegistrar,ISupportM
         } catch (LedgerException e) {
             e.printStackTrace();
         }
-        Map<String, ChainSupport> newChains = new HashMap<>();
-
-        for (Iterator entries = chains.keySet().iterator(); entries.hasNext(); ) {
-            String key = entries.next().toString();
-            newChains.put(key, chains.get(key));
-        }
+//        Map<String, ChainSupport> newChains = new ConcurrentHashMap<>();
+//
+//        for (Iterator entries = chains.keySet().iterator(); entries.hasNext(); ) {
+//            String key = entries.next().toString();
+//            newChains.put(key, chains.get(key));
+//        }
         ChainSupport cs = new ChainSupport(this, ledgerResources, consenters, signer);
         String chainId = ledgerResources.getMutableResources().getConfigtxValidator().getGroupId();
-        newChains.put(chainId, cs);
+        chains.put(chainId, cs);
         cs.start();
-        chains = newChains;
+        //chains = newChains;
+        return this;
     }
-
+//    public Registrar getRregistrar(){
+//        return this;
+//    }
     @Override
     public IGroupConfigBundle newGroupConfig(Common.Envelope envConfigUpdate) throws InvalidProtocolBufferException {
         return templator.newGroupConfig(envConfigUpdate);

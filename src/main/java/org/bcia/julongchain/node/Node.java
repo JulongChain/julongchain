@@ -172,15 +172,9 @@ public class Node {
             String mspType = mspConfig.getNode().getLocalMspType();
 
             List<IFactoryOpts> optsList = new ArrayList<IFactoryOpts>();
-            String symmetrickey = mspConfig.getNode().getCsp().getGm().getSymmetricKey();
-            String sign = mspConfig.getNode().getCsp().getGm().getSign();
-            String hash = mspConfig.getNode().getCsp().getGm().getHash();
-            String asymmetric = mspConfig.getNode().getCsp().getGm().getAsymmetric();
-            String privateKeyPath = mspConfig.getNode().getCsp().getGm().getFileKeyStore().getPrivateKeyStore();
-            String publicKeyPath = mspConfig.getNode().getCsp().getGm().getFileKeyStore().getPublicKeyStore();
-            //new GmCspConfig(symmetrickey,asymmetric,hash,sign,publicKeyPath,privateKeyPath);
-            optsList.add(new GmFactoryOpts(symmetrickey, asymmetric, hash, sign, publicKeyPath, privateKeyPath));
-
+            GmFactoryOpts factoryOpts=new GmFactoryOpts();
+            factoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("gm"));
+            optsList.add(factoryOpts);
             GlobalMspManagement.loadLocalMspWithType(mspConfigDir, optsList, mspId, mspType);
         } catch (Exception e) {
             log.error(e.getMessage(), e);

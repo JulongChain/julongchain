@@ -24,6 +24,7 @@ import org.bcia.julongchain.common.deliver.DeliverServer;
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.ValidateException;
+import org.bcia.julongchain.common.localmsp.impl.LocalSigner;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.consenter.common.broadcast.BroadCastHandler;
@@ -93,8 +94,8 @@ public class ConsenterServer {
         {
             try {
                  PreStart.initAll();
-                registrar= PreStart.getDefaultRegistrar();
-                deliverHandler=  PreStart.getDefaultDeliverHandler();
+                registrar= new PreStart().initializeMultichannelRegistrar(PreStart.getDefaultConsenterConfig(),new LocalSigner());
+
             } catch (IOException e) {
                 log.error(e.getMessage());
             } catch (JavaChainException e) {
@@ -105,6 +106,7 @@ public class ConsenterServer {
         @Override
         public StreamObserver<Common.Envelope> broadcast(StreamObserver<Ab.BroadcastResponse> responseObserver) {
             return new StreamObserver<Common.Envelope>() {
+
                 BroadCastHandler broadCastHandle = new BroadCastHandler(registrar);
 
                 @Override
@@ -135,6 +137,8 @@ public class ConsenterServer {
                 @Override
                 public void onNext(Common.Envelope envelope) {
                     DeliverServer deliverServer=new DeliverServer(responseObserver,envelope) ;
+                    //deliverHandler=  new DeliverHandler(new Registrar().getRregistrar(),PreStart.getDefaultConsenterConfig().getGeneral().getAuthentication().get("timeWindow"));
+                   deliverHandler=new DeliverHandler(registrar,PreStart.getDefaultConsenterConfig().getGeneral().getAuthentication().get("timeWindow"));
                     try {
                         deliverHandler.handle(deliverServer);
                     } catch (ValidateException e) {

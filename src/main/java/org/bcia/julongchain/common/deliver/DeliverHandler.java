@@ -156,15 +156,21 @@ public class DeliverHandler implements IHandler {
                         sendStatusReply(server, Common.Status.NOT_FOUND);
                     }
 
-                    nextBlock(cursor);
 
-
+                    Map.Entry<QueryResult, Common.Status> block = (Map.Entry<QueryResult, Common.Status>) nextBlock(cursor);
+                    Common.Block blockData = (Common.Block) block.getKey().getObj();
+                    Common.Status status = (Common.Status) block.getKey().getObj();
+                    if(status!= Common.Status.SUCCESS){
+                        log.error(String.format("[channel: %s] Error reading from channel, cause was: %v", chdr.getGroupId(), status));
+                        sendStatusReply(server,status);
+                    }
 
                     number++;
+                    try {
+                        accessControl.enaluate();
+                    }catch (ValidateException e){
 
-
-
-
+                    }
 
                 }
 
@@ -175,15 +181,13 @@ public class DeliverHandler implements IHandler {
     }
 
 
-    public Map.Entry<Common.Block, Common.Status> nextBlock(IIterator cursor) throws LedgerException, InvalidProtocolBufferException {
+    public         QueryResult  nextBlock(IIterator cursor) throws LedgerException, InvalidProtocolBufferException {
         // FIXME: 2018/5/31
 
-        Map.Entry<QueryResult, Common.Status> block = (Map.Entry<QueryResult, Common.Status>) cursor.next();
-
-        ByteString byteString = (ByteString) block.getKey().getObj();
-        Common.Block blockData = Common.Block.parseFrom(byteString);
-
-        return null;
+ //       Map.Entry<QueryResult, Common.Status> block = (Map.Entry<QueryResult, Common.Status>) cursor.next();
+//        Common.Block blockData= (Common.Block) block.getKey().getObj();
+//        Common.Status status= (Common.Status) block.getKey().getObj();
+        return   cursor.next();
 
     }
 

@@ -1,7 +1,8 @@
 node:
     csp:
         defaultValue: GM
-        gm:
+        factoryOpts:
+          gm:
             # TODO: The default Hash and Security level needs refactoring to be
             # fully configurable. Changing these defaults requires coordination
             # SHA2 is hardcoded in several places, not only BCCSP
@@ -11,16 +12,31 @@ node:
             asymmetric: SM2
             security: 256
             # Location of Key Store
-            fileKeyStore:
                 # If "", defaults to 'mspConfigPath'/keystore
                 # TODO: Ensure this is read with fabric/core/config.GetPath() once ready
-                #publicKeyStore: D:\msp\keystore\publickey.pem
-                publicKeyStore: /opt/msp/keystore/publickey.pem
-                #privateKeyStore: D:\msp\keystore\privatekey.pem
-                privateKeyStore: /opt/msp/keystore/privatekey.pem
+            #publicKeyStore: D:\msp\keystore\publickey.pem
+            publicKeyStore: /opt/msp/keystore/publickey.pem
+                #publicKeyStore: /opt/msp/keystore/publickey.pem
+            privateKeyStore: /opt/msp/keystore/privatekey.pem
+          sdtgm:
+                      # TODO: The default Hash and Security level needs refactoring to be
+                      # fully configurable. Changing these defaults requires coordination
+                      # SM3 is hardcoded in several places, not only BCCSP
+                      symmetricKey: SM4
+                      sign: SM2
+                      hash: SM3
+                      asymmetric: SM2
+                      security: 256
+                      # Location of Key Store
+                          # If "", defaults to 'mspConfigPath'/keystore
+                          # TODO: Ensure this is read with fabric/core/config.GetPath() once ready
+                      publicKeyStore: /opt/msp/keystore/sdt/
+                      privateKeyStore: /opt/msp/keystore/sdt/
+                      keyStore: /opt/msp/keystore/sdt/
+                #privateKeyStore: /opt/msp/keystore/privatekey.pem
     # Path on the file system where node will find MSP local configurations
-    #mspConfigPath: D:\msp
     mspConfigPath: /opt/msp
+    #mspConfigPath: /opt/msp
     #mspConfigPath: /root/IdeaProjects/javachain/src/main/resources/msp
 
     # Identifier of the local MSP

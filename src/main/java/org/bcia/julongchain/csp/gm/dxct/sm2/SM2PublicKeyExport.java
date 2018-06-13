@@ -20,7 +20,10 @@ import org.bcia.julongchain.csp.gm.dxct.sm2.util.SM2KeyUtil;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 
+import java.io.FileNotFoundException;
 import java.util.HashMap;
+
+import static org.bcia.julongchain.msp.mspconfig.MspConfigFactory.loadMspConfig;
 
 /**
  * @author zhangmingyang
@@ -35,9 +38,12 @@ public class SM2PublicKeyExport extends SM2KeyExport {
     public byte[] toBytes() {
         //根据nodeid获取私钥,路径可通过配置文件中读取
        // URL url = SM2PublicKeyExport.class.getClassLoader().getResource("publickey.pem");
-        HashMap map= (HashMap) LoadYaml.readYamlFile("gmcsp.yaml");
-        String  publicKeyPath= (String) ((HashMap) ((HashMap)((HashMap)((HashMap) map.get("node")).get("csp")).get("gm")).get("fileKeyStore")).get("publicKeyStore");
-
+        String publicKeyPath = "";
+        try {
+            publicKeyPath = loadMspConfig().getNode().getCsp().getFactoryOpts().get("gm").get("publicKeyStore");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         String publicKeyStr = null;
         try {
             publicKeyStr = SM2KeyUtil.readFile(publicKeyPath);

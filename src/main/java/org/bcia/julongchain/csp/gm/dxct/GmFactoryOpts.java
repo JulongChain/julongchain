@@ -16,6 +16,11 @@ package org.bcia.julongchain.csp.gm.dxct;
  * limitations under the License.
  */
 
+import org.bcia.julongchain.csp.factory.IFactoryOpts;
+
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author zhanglin
  * @purpose Define the interface, DecrypterOpts
@@ -62,6 +67,16 @@ public class GmFactoryOpts implements IGmFactoryOpts {
     @Override
     public boolean isDefaultCsp() {
         return bDefaultCsp;
+    }
+
+    @Override
+    public void parseFrom(Map<String, String> optMap) {
+        this.symmetricKeyType = optMap.get("symmetricKey");
+        this.asymmetricKeyType = optMap.get("asymmetric");
+        this.hashType = optMap.get("hash");
+        this.signType = optMap.get("sign");
+        this.publicKeyPath = optMap.get("publicKeyStore");
+        this.privateKeyPath = optMap.get("privateKeyStore");
     }
 
     @Override

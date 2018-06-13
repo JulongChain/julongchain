@@ -64,19 +64,9 @@ public class CspHelper {
         };
         try {
             MspConfig mspConfig = MspConfigFactory.loadMspConfig();
-            String symmetricKey = mspConfig.node.getCsp().getGm().getSymmetricKey();
-            String sign = mspConfig.node.getCsp().getGm().getSign();
-            String hash = mspConfig.node.getCsp().getGm().getHash();
-            String asymmetric = mspConfig.node.getCsp().getGm().getAsymmetric();
-            String privateKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPrivateKeyStore();
-            String publicKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPublicKeyStore();
-            //new GmCspConfig(symmetrickey,asymmetric,hash,sign,publicKeyPath,privateKeyPath);
-            list.add(new GmFactoryOpts(symmetricKey, asymmetric, hash, sign, publicKeyPath, privateKeyPath) {
-                @Override
-                public boolean isDefaultCsp() {
-                    return true;
-                }
-            });
+            GmFactoryOpts factoryOpts=new GmFactoryOpts();
+            factoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("gm"));
+            list.add(factoryOpts);
         } catch (FileNotFoundException e) {
             log.error(e.getMessage());
         }
@@ -95,7 +85,7 @@ public class CspHelper {
             log.error("invalid directory for keystorePath " + keystorePath);
             return null;
         }
-        for (File file: files) {
+        for (File file : files) {
             if (!file.getName().endsWith("_sk")) {
                 continue;
             }
@@ -108,7 +98,7 @@ public class CspHelper {
                 byte[] encodedData = pemObject.getContent();
                 List<Object> list = decodePrivateKeyPKCS8(encodedData);
                 Object rawKey = list.get(1);
-                return csp.keyImport(rawKey,  new SM2KeyImportOpts(true));
+                return csp.keyImport(rawKey, new SM2KeyImportOpts(true));
             } catch (Exception e) {
                 log.error("An error occurred on loadPrivateKey: {}", e.getMessage());
             }

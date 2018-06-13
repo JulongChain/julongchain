@@ -130,13 +130,12 @@ public class MspConfigBuilder {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        String symmetrickey = mspConfig.node.getCsp().getGm().getAsymmetric();
-        String sign = mspConfig.node.getCsp().getGm().getSign();
-        String hash = mspConfig.node.getCsp().getGm().getHash();
-        String asymmetric = mspConfig.node.getCsp().getGm().getAsymmetric();
-        String privateKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPrivateKeyStore();
-        String publicKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPublicKeyStore();
-
+        String symmetrickey = mspConfig.getNode().getCsp().getFactoryOpts().get("gm").get("symmetricKey");
+        String sign = mspConfig.getNode().getCsp().getFactoryOpts().get("gm").get("sign");
+        String hash = mspConfig.getNode().getCsp().getFactoryOpts().get("gm").get("hash");
+        String asymmetric = mspConfig.getNode().getCsp().getFactoryOpts().get("gm").get("asymmetric");
+        String privateKeyPath = mspConfig.getNode().getCsp().getFactoryOpts().get("gm").get("publicKeyStore");
+        String publicKeyPath = mspConfig.getNode().getCsp().getFactoryOpts().get("gm").get("privateKeyStore");
         cryptoConfig.setSymmetrickey(symmetrickey);
         cryptoConfig.setSign(sign);
         cryptoConfig.setHash(hash);

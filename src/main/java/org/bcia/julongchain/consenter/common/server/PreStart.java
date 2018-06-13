@@ -58,14 +58,14 @@ public class PreStart {
     private static JavaChainLog log = JavaChainLogFactory.getLog(PreStart.class);
     private static ConsenterConfig defaultConsenterConfig;
     private static DeliverHandler defaultDeliverHandler;
-    private static Registrar  defaultRegistrar;
+    private  Registrar  defaultRegistrar;
 
 
     public static void initAll() throws IOException, JavaChainException {
         boolean mutalTLS=false;
         initConsnterConfig();
-        defaultRegistrar=initializeMultichannelRegistrar(defaultConsenterConfig,new LocalSigner());
-        defaultDeliverHandler=initDeliverHandler(defaultRegistrar,mutalTLS);
+       // defaultRegistrar=initializeMultichannelRegistrar(defaultConsenterConfig,new LocalSigner());
+       // defaultDeliverHandler=initDeliverHandler(defaultRegistrar,mutalTLS);
     }
 
     private static ConsenterConfig initConsnterConfig() {
@@ -77,12 +77,12 @@ public class PreStart {
         }
     }
 
-    private static DeliverHandler initDeliverHandler(Registrar registrar, boolean mutalTLS) {
+    private  DeliverHandler initDeliverHandler(Registrar registrar, boolean mutalTLS) {
         return new DeliverHandler(new DeliverSupport(registrar), defaultConsenterConfig.getGeneral().getAuthentication().get("timeWindow"), mutalTLS);
     }
 
-    public static Registrar initializeMultichannelRegistrar(ConsenterConfig consenterConfig, ILocalSigner signer) throws JavaChainException, IOException {
-        if(defaultRegistrar==null){
+    public  Registrar initializeMultichannelRegistrar(ConsenterConfig consenterConfig, ILocalSigner signer) throws JavaChainException, IOException {
+     //   if(defaultRegistrar==null){
             IFactory lf = LedgerHelper.createLedgerFactroy(consenterConfig);
             if (lf.groupIDs().size() == 0) {
                 initBootstrapGroup(consenterConfig, lf);
@@ -93,9 +93,9 @@ public class PreStart {
             consenters.put("Singleton", new Singleton());
            defaultRegistrar=new Registrar().newRegistrar(lf, consenters, signer);
            return defaultRegistrar;
-        }else {
-            return defaultRegistrar;
-        }
+//        }else {
+//            return defaultRegistrar;
+//        }
     }
 
     private static void initBootstrapGroup(ConsenterConfig consenterConfig, IFactory blockLedger) throws IOException, JavaChainException {
@@ -150,7 +150,7 @@ public class PreStart {
     public static void main(String[] args) throws IOException, JavaChainException {
         LocalSigner localSigner = new LocalSigner();
 
-        Registrar registrar = initializeMultichannelRegistrar(loadConsenterConfig(), localSigner);
+       // Registrar registrar = initializeMultichannelRegistrar(loadConsenterConfig(), localSigner);
 
     }
 
@@ -162,7 +162,7 @@ public class PreStart {
         return defaultDeliverHandler;
     }
 
-    public static Registrar getDefaultRegistrar() {
+    public  Registrar getDefaultRegistrar() {
         return defaultRegistrar;
     }
 }
