@@ -32,7 +32,7 @@ public class DeliverSupport implements ISupportManager{
 
     @Override
     public ChainSupport getChain(String groupId) {
-        return new Registrar().getChain(groupId);
+        return registrar.getChain(groupId);
     }
 
     public Registrar getRegistrar() {
