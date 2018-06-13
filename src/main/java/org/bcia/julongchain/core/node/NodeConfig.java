@@ -576,6 +576,9 @@ public class NodeConfig {
     }
 
     public static class Gossip {
+        private String ip;
+        private String startPort;
+        private String seedAddress;
         private String bootstrap;
         private boolean useLeaderElection;
         private boolean orgLeader;
@@ -836,6 +839,30 @@ public class NodeConfig {
 
         public void setPrivateData(Map<String, Integer> privateData) {
             this.privateData = privateData;
+        }
+
+        public String getStartPort() {
+            return startPort;
+        }
+
+        public void setStartPort(String startPort) {
+            this.startPort = startPort;
+        }
+
+        public String getIp() {
+            return ip;
+        }
+
+        public void setIp(String ip) {
+            this.ip = ip;
+        }
+
+        public String getSeedAddress() {
+            return seedAddress;
+        }
+
+        public void setSeedAddress(String seedAddress) {
+            this.seedAddress = seedAddress;
         }
     }
 
