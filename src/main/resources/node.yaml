@@ -392,7 +392,8 @@ vm:
     # unix:///var/run/docker.sock
     # http://localhost:2375
     # https://localhost:2376
-    endpoint: unix:///var/run/docker.sock
+    # endpoint: unix:///var/run/docker.sock
+    endpoint: tcp://localhost:2375
 
     # settings for docker vms
     docker:
@@ -433,6 +434,8 @@ vm:
 #
 ###############################################################################
 smartContract:
+
+    instantiatePath: /root/julongchain/instantiate
 
     # The id is used by the Smartcontract stub to register the executing Smartcontract
     # ID with the Node and is generally supplied through ENV variables
