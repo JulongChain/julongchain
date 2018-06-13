@@ -99,11 +99,11 @@ public class LedgerManagerTest {
     @Test
     public void commitBlock() throws Exception{
     	//重置账本文件
-    	deleteDir(new File(LedgerConfig.getRootPath()));
+//    	deleteDir(new File(LedgerConfig.getRootPath()));
     	//初始化账本
 		LedgerManager.initialize(null);
-		LedgerManager.createLedger(new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance()).getGenesisBlock("myGroup"));
-		LedgerManager.createLedger(new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance()).getGenesisBlock("mytestgroupid2"));
+//		LedgerManager.createLedger(new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance()).getGenesisBlock("myGroup"));
+//		LedgerManager.createLedger(new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance()).getGenesisBlock("mytestgroupid2"));
 		//获取账本对象
 		l = LedgerManager.openLedger("myGroup");
         //构建区块

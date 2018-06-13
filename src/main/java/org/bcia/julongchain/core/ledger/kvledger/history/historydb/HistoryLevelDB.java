@@ -46,8 +46,8 @@ import java.util.List;
 public class HistoryLevelDB implements IHistoryDB {
 
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(HistoryLevelDB.class);
-    private IDBProvider provider = null;
-    private String dbName = null;
+    private IDBProvider provider;
+    private String dbName;
 
     private static final byte[] EMPTY_VALUE = {};
     private static final byte[] SAVE_POINT_KEY = {0x00};
@@ -91,29 +91,34 @@ public class HistoryLevelDB implements IHistoryDB {
             }
             Common.Envelope env = Util.getEnvelopFromBlock(evnByte);
             Common.Payload payload = Util.getPayload(env);
-            Common.GroupHeader header = Util.getGroupHeader(payload.getHeader().getGroupHeader());
+            Common.GroupHeader header = null;
+            if (payload != null) {
+                header = Util.getGroupHeader(payload.getHeader().getGroupHeader());
+            }
             //经过背书的交易写入HistoryDB
-            if(Common.HeaderType.ENDORSER_TRANSACTION.getNumber() == header.getType()){
-                ProposalPackage.SmartContractAction respPayload = null;
-                TxRwSet txRWSet = new TxRwSet();
-                respPayload = Util.getActionFromEnvelope(evnByte);
-                if(respPayload == null || !respPayload.hasResponse()){
-                    logger.debug("Got null respPayload from env");
-                    continue;
-                }
-                txRWSet.fromProtoBytes(respPayload.getResults());
-                for(NsRwSet nsRwSet : txRWSet.getNsRwSets()){
-                    String ns = nsRwSet.getNameSpace();
-                    for(KvRwset.KVWrite kvWrite : nsRwSet.getKvRwSet().getWritesList()){
-                        String writeKey = kvWrite.getKey();
-                        //key:ns~key~blockNo~tranNo
-                        byte[] compositeHistoryKey = HistoryDBHelper.constructCompositeHistoryKey(ns, writeKey, blockNo, tranNo);
-                        dbBatch.put(compositeHistoryKey, EMPTY_VALUE);
+            if (header != null) {
+                if(Common.HeaderType.ENDORSER_TRANSACTION.getNumber() == header.getType()){
+                    ProposalPackage.SmartContractAction respPayload;
+                    TxRwSet txRWSet = new TxRwSet();
+                    respPayload = Util.getActionFromEnvelope(evnByte);
+                    if(respPayload == null || !respPayload.hasResponse()){
+                        logger.debug("Got null respPayload from env");
+                        continue;
                     }
+                    txRWSet.fromProtoBytes(respPayload.getResults());
+                    for(NsRwSet nsRwSet : txRWSet.getNsRwSets()){
+                        String ns = nsRwSet.getNameSpace();
+                        for(KvRwset.KVWrite kvWrite : nsRwSet.getKvRwSet().getWritesList()){
+                            String writeKey = kvWrite.getKey();
+                            //key:ns~key~blockNo~tranNo
+                            byte[] compositeHistoryKey = HistoryDBHelper.constructCompositeHistoryKey(ns, writeKey, blockNo, tranNo);
+                            dbBatch.put(compositeHistoryKey, EMPTY_VALUE);
+                        }
+                    }
+                } else {
+                    logger.debug(String.format("Group [%s]: Skipping transaction [%d] since it is not an endorsement transaction"
+                            , dbName, tranNo));
                 }
-            } else {
-                logger.debug(String.format("Group [%s]: Skipping transaction [%d] since it is not an endorsement transaction"
-                        , dbName, tranNo));
             }
         }
 
@@ -134,8 +139,7 @@ public class HistoryLevelDB implements IHistoryDB {
         if(versionBytes == null){
             return null;
         }
-        Height height = new Height(versionBytes);
-        return height;
+        return new Height(versionBytes);
     }
 
     /**

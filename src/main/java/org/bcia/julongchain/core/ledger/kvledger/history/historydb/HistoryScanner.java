@@ -103,7 +103,9 @@ public class HistoryScanner implements IResultsIterator {
             Timestamp timestamp = chdr.getTimestamp();
 
             TxRwSet txRwSet = new TxRwSet();
-            txRwSet.fromProtoBytes(respPayload.getResults());
+            if (respPayload != null) {
+                txRwSet.fromProtoBytes(respPayload.getResults());
+            }
             for (NsRwSet nsRwSet : txRwSet.getNsRwSets()) {
                 if(nameSpace.equals(nsRwSet.getNameSpace())){
                     for (KvRwset.KVWrite kvWrite : nsRwSet.getKvRwSet().getWritesList()) {
