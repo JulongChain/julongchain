@@ -2,12 +2,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.bcia.javachain</groupId>
-    <artifactId>javachain</artifactId>
-    <version>0.5</version>
+    <groupId>org.bcia.julongchain</groupId>
+    <artifactId>julongchain</artifactId>
+    <version>0.9</version>
     <packaging>jar</packaging>
 
-    <name>javachain</name>
+    <name>julongchain</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -326,7 +326,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>org.bcia.javachain.App</mainClass>
+                            <mainClass>org.bcia.julongchain.App</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -353,7 +353,7 @@
                             <!-- 所有的依赖项应该位于 lib文件夹 -->
                             <classpathPrefix>lib/</classpathPrefix>
                             <!-- 当用户使用 lib命令执行JAR文件时，使用该元素定义将要执行的类名 -->
-                            <mainClass>org.bcia.javachain.App</mainClass>
+                            <mainClass>org.bcia.julongchain.App</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

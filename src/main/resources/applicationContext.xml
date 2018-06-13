@@ -13,7 +13,7 @@
           http://www.springframework.org/schema/aop/spring-aop-4.3.xsd"
        default-autowire="byName">
 
-    <context:component-scan base-package="org.bcia.javachain"/>
+    <context:component-scan base-package="org.bcia.julongchain"/>
     <!--<context:annotation-config />-->
     <!---->
 
