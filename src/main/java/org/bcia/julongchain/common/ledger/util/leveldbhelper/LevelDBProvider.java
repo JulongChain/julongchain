@@ -49,7 +49,7 @@ public class LevelDBProvider implements IDBProvider {
     }
 
     @Override
-    public String getDbPath() {
+    public String getDBPath() {
         return dbPath;
     }
 
@@ -83,7 +83,7 @@ public class LevelDBProvider implements IDBProvider {
 
     @Override
     public void delete(byte[] key, boolean sync) throws LevelDBException {
-        db.delete(key, sync);
+    	db.put(key, null, sync);
     }
 
     @Override

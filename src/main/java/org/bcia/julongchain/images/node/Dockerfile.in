@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM docker.bcia.javachain:5000/baseimage
-ENV JAVACHAIN_CFG_PATH /etc/bcia/javachain
-RUN mkdir -p /var/bcia/production $JAVACHAIN_CFG_PATH
+FROM julongchain/julongchain-baseimage
+ENV JULONGCHAIN_CFG_PATH /etc/bcia/julongchain
+RUN mkdir -p /var/bcia/production $JULONGCHAIN_CFG_PATH
 COPY payload/peer /usr/local/bin
-ADD  payload/sampleconfig.tar.bz2 $JAVACHAIN_CFG_PATH
+ADD  payload/sampleconfig.tar.bz2 $JULONGCHAIN_CFG_PATH
 CMD ["peer","node","start"]

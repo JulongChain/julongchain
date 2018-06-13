@@ -24,6 +24,7 @@ import org.bcia.julongchain.common.ledger.util.leveldbhelper.UpdateBatch;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
+import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.common.Common;
 
 import java.util.*;
@@ -40,6 +41,7 @@ public class IdStore {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(IdStore.class);
 
     private IDBProvider provider = null;
+	private static final byte[] TIME_PREFIX= new byte[]{0};
     private static final byte[] UNDER_CONSTRUCTION_LEDGER_KEY = "underConstructionLedgerKey".getBytes();
     private static final byte[] LEDGER_KEY_PREFIX = "l".getBytes();
 
@@ -50,7 +52,7 @@ public class IdStore {
         IdStore idStore = new IdStore();
         String dbPath = LedgerConfig.getLedgerProviderPath();
         idStore.setProvider(new LevelDBProvider(dbPath));
-        logger.debug("Create idstore using path = " + idStore.getProvider().getDbPath());
+        logger.debug("Create idstore using path = " + idStore.getProvider().getDBPath());
         return idStore;
     }
 
@@ -79,14 +81,15 @@ public class IdStore {
     /**
      * 创建账本索引
      */
-    public void createLedgerID(String ledgerID) throws LedgerException {
+    void createLedgerID(String ledgerID) throws LedgerException {
         byte[] key = encodeLedgerKey(ledgerID);
-        byte[] val = null;
-        val = provider.get(key);
-        if(val != null && val.length == 0){
+        byte[] val = provider.get(key);
+        if(val != null && isTime(val)){
             throw new LedgerException("Ledger is already exists!");
         }
-        val = new byte[0];
+	    // TODO: 6/13/18 保存账本创建时间
+	    // TODO: 6/13/18 时间戳的获取，暂时先用系统时间代替
+        val = encodeTime();
         UpdateBatch batch = new UpdateBatch();
         batch.put(key, val);
         batch.delete(UNDER_CONSTRUCTION_LEDGER_KEY);
@@ -96,10 +99,10 @@ public class IdStore {
     /**
      * 开始创建账本, 将block完整存入idstore, 以备恢复使用
      */
-    public void creatingLedgerID(String ledgerID, Common.Block gb) throws LedgerException {
+    void creatingLedgerID(String ledgerID, Common.Block gb) throws LedgerException {
         byte[] key = encodeLedgerKey(ledgerID);
         byte[] val = provider.get(key);
-        if(val != null && val.length == 0){
+        if(val != null){
             throw new LedgerException("Ledger is already exists!");
         }
         try {
@@ -111,28 +114,13 @@ public class IdStore {
     }
 
     /**
-     * 创建完成后, 删除创建标记以及保存的区块信息
-     */
-    public void createdLedgerID(String ledgerID) throws LedgerException {
-        byte[] key = encodeLedgerKey(ledgerID);
-        if(provider.get(key) == null){
-            throw new LedgerException("Ledger id" + ledgerID + " is not creating");
-        }
-        byte[] val = new byte[0];
-        UpdateBatch batch = new UpdateBatch();
-        batch.put(key, val);
-        batch.delete(UNDER_CONSTRUCTION_LEDGER_KEY);
-        provider.writeBatch(batch, true);
-    }
-
-    /**
      * 获取未完成创建的ledger的block
      */
-    public Common.Block getCreatingBlock(String ledgerID) throws LedgerException {
+    Common.Block getCreatingBlock(String ledgerID) throws LedgerException {
         try {
             byte[] key = encodeLedgerKey(ledgerID);
             byte[] val = provider.get(key);
-            if(val != null && val.length == 0){
+            if(val == null){
                 logger.debug("NO CREATING LEDGER EXISTS");
                 return null;
             }
@@ -146,7 +134,7 @@ public class IdStore {
     /**
      * 判断账本是否存在
      */
-    public boolean ledgerIDExists(String ledgerID) throws LedgerException{
+    boolean ledgerIDExists(String ledgerID) throws LedgerException{
         byte[] key = encodeLedgerKey(ledgerID);
         byte[] val = provider.get(key);
         return val != null;
@@ -155,17 +143,19 @@ public class IdStore {
     /**
      * 迭代获取全部账本id
      */
-    public List<String> getAllLedgerIDs() throws LedgerException {
-        List<String> ids = new ArrayList<>();
+    List<String> getAllLedgerIDs() throws LedgerException {
+        Map<Long, String> ids = new TreeMap<>();
         Iterator<Map.Entry<byte[], byte[]>> itr = provider.getIterator(null);
         while(itr.hasNext()){
             Map.Entry<byte[], byte[]> entry = itr.next();
-            if(Arrays.equals(entry.getKey(), UNDER_CONSTRUCTION_LEDGER_KEY)){
-                continue;
-            }
-            ids.add(decodeLedgerID(entry.getKey()));
+	        if(Arrays.equals(entry.getKey(), UNDER_CONSTRUCTION_LEDGER_KEY)){
+		        continue;
+	        }
+            String ledgerID = decodeLedgerID(entry.getKey());
+            Long timeStamp  = decodeTime(entry.getValue());
+            ids.put(timeStamp, ledgerID);
         }
-        return ids;
+        return new ArrayList<>(ids.values());
     }
 
     /**
@@ -178,16 +168,37 @@ public class IdStore {
     /**
      * 为ledgerID添加LedgerKeyPrefix前缀
      */
-    public byte[] encodeLedgerKey(String ledgerID){
+    private byte[] encodeLedgerKey(String ledgerID){
         return ArrayUtils.addAll(LEDGER_KEY_PREFIX, ledgerID.getBytes());
     }
 
     /**
      * 删除key的LedgerKeyPrefix前缀
      */
-    public String decodeLedgerID(byte[] key){
+    private String decodeLedgerID(byte[] key){
         String keyStr = new String(key);
         return keyStr.substring(1, key.length);
+    }
+
+	/**
+	 * 添加时间前缀
+	 */
+	private byte[] encodeTime(){
+    	return ArrayUtils.addAll(TIME_PREFIX, Util.longToBytes(System.currentTimeMillis(), 8));
+    }
+
+	/**
+	 * 解析时间
+	 */
+	private long decodeTime(byte[] encodeTime){
+		return Util.bytesToLong(encodeTime, 1, 8);
+    }
+
+	/**
+	 * 判断是否为编码后的时间
+	 */
+	private boolean isTime(byte[] b){
+		return b[0] == (byte) 0 && b.length == 9;
     }
 
     public IDBProvider getProvider() {
@@ -197,5 +208,4 @@ public class IdStore {
     public void setProvider(IDBProvider provider) {
         this.provider = provider;
     }
-
 }

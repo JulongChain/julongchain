@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM docker.bcia.javachain:5000/baseimage
+FROM julongchain/julongchain-baseimage
 
 ENV SCALA_VERSION=2.11 \
     KAFKA_VERSION=0.9.0.1 \

@@ -63,12 +63,15 @@ import java.util.regex.Pattern;
  * 支持智能合约的安装(install)、部署(deploy)、升级(upgrade)等生命周期管理，
  * 支持查询智能合约信息(getid)，获取智能合约部署规范(getdepspec)、获取智能合约数据（getscdata）、
  * 获取实例化智能合约（getsmartcontracts）、获取安装的智能合约（getinstalledsmartcontracts）等功能。
- *　The life cycle system smartcontract manages smartcontracts deployed
- *  on this node. It manages smartcontracts via Invoke proposals.
- *    "Args":["deploy",<SmartcontractDeploymentSpec>]
- *    "Args":["upgrade",<SmartcontractDeploymentSpec>]
- *    "Args":["stop",<SmartcontractInvocationSpec>]
- *    "Args":["start",<SmartcontractInvocationSpec>]
+ * LSSC的invoke函数，接受的args格式说明如下：
+ * "Args":["deploy",<groupID>,<SmartcontractDeploymentSpec>]
+ * "Args":["upgrade",<groupID>,<SmartcontractDeploymentSpec>]
+ * "Args":["install",<SmartContractDeploymentSpec>]
+ * "Args":["getid",<groupID>,<smartcontractName>]
+ * "Args":["getdepspec",<groupID>,<smartcontractName>]
+ * "Args":["getscdata",<groupID>,<smartcontractName>]
+ * "Args":["getsmartcontracts"]
+ * "Args":["getinstalledsmartcontracts"]
  * @author sunianle
  * @date 3/5/18
  * @company Dingxuan

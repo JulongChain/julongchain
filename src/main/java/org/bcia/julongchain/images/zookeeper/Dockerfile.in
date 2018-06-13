@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM docker.bcia.javachain:5000/baseimage
+FROM julongchain/julongchain-baseimage
 
 # Install su-exec
 RUN set -x \

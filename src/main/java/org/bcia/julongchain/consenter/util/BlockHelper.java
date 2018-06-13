@@ -18,6 +18,8 @@ package org.bcia.julongchain.consenter.util;
 import com.google.protobuf.ByteString;
 import org.apache.commons.lang.ArrayUtils;
 import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.log.JavaChainLog;
+import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.csp.gm.dxct.sm3.SM3HashOpts;
 import org.bcia.julongchain.protos.common.Common;
 
@@ -29,7 +31,7 @@ import static org.bcia.julongchain.csp.factory.CspManager.getDefaultCsp;
  * @company Dingxuan
  */
 public class BlockHelper {
-
+    private static JavaChainLog log = JavaChainLogFactory.getLog(BlockHelper.class);
     byte[] previousHash;
     byte[] dataHash;
     long number;
@@ -43,9 +45,8 @@ public class BlockHelper {
 
     public static Common.Block createBlock(long seqNum, byte[] previousHash) {
         Common.Block.Builder block = Common.Block.newBuilder();
-        Common.BlockHeader.Builder blockHeader = Common.BlockHeader.newBuilder()
-                .setNumber(seqNum)
-                .setPreviousHash(ByteString.copyFrom(previousHash));
+        System.out.println(seqNum);
+      //  Common.BlockHeader.Builder blockHeader = Common.BlockHeader.newBuilder().setNumber(seqNum).setPreviousHash(ByteString.copyFrom(previousHash));
 
         Common.BlockData.Builder blockData = Common.BlockData.newBuilder();
         Common.BlockMetadata.Builder metaData = Common.BlockMetadata.newBuilder();
@@ -54,7 +55,8 @@ public class BlockHelper {
         for (int i = 0; i <4; i++) {
             block.getMetadataBuilder().addMetadata(ByteString.copyFrom(metaData.build().toByteArray()));
         }
-        block.setHeader(blockHeader);
+        block.getHeaderBuilder().setNumber(seqNum).setPreviousHash(ByteString.copyFrom(previousHash));
+       // block.setHeader(blockHeader);
         block.setData(blockData);
         return block.build();
     }

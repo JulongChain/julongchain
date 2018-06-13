@@ -53,9 +53,9 @@ public class LedgerTest {
     @Test
     public void getKVFromLevelDB() throws Throwable {
 //        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getIndexPath());
-        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getStateLevelDBPath());
+//        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getStateLevelDBPath());
 //        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getHistoryLevelDBPath());
-//        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getLedgerProviderPath());
+        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getLedgerProviderPath());
 //        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getPvtDataStorePath());
 //        for (int i = 0; i < 100; i++) {
 //            Height height = new Height();
@@ -64,20 +64,23 @@ public class LedgerTest {
 //            byte[] value = height.toBytes();
 //            provider.put(ArrayUtils.addAll(ArrayUtils.addAll(("ns" + i).getBytes(), COMPOSITE_KEY_SEP), ("key" + i).getBytes()), value, true);
 //        }
+	    provider.put("key".getBytes(), "value".getBytes(), true);
+	    provider.delete("key".getBytes(), true);
         Iterator<Map.Entry<byte[], byte[]>> itr =  provider.getIterator(null);
         while(itr.hasNext()){
             Map.Entry<byte[], byte[]> entry = itr.next();
 //            System.out.println(Height.newHeightFromBytes(entry.getValue()).getTxNum());
 //            System.out.println(Height.newHeightFromBytes(entry.getValue()).getBlockNum());
 //            System.out.println(new String(entry.getValue()));
-            soutBytes(entry.getKey());
+//            soutBytes(entry.getKey());
             System.out.println(new String(entry.getKey()));
+            System.out.println(new String(entry.getValue()));
+	        System.out.println(entry.getValue().length == 0);
 //            soutBytes(entry.getValue());
 //            soutBytes(entry.getKey());
 //            soutBytes(entry.getValue());
             System.out.println("_____________________________________");
         }
-
     }
 
     @Test

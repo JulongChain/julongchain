@@ -24,6 +24,10 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
+
 /**
  * 类描述
  *
@@ -49,17 +53,7 @@ public class LevelDBProviderTest {
     }
 
     @Test
-    public void newUpdateBatch(){
-        Assert.assertNotNull(new UpdateBatch());
-    }
-
-    @Test
     public void add() throws LedgerException {
-//        for (int i = 0; i < 100; i++) {
-//            byte[] key = ("key" + i).getBytes();
-//            byte[] value = ("value" + i).getBytes();
-//            provider.put(key, value, true);
-//        }
         provider.put(new byte[]{0x00}, "0".getBytes(), true);
         provider.put(new byte[]{0x00, 0x00}, "00".getBytes(), true);
         provider.put(new byte[]{0x01}, "1".getBytes(), true);
@@ -68,45 +62,37 @@ public class LevelDBProviderTest {
 
     @Test
     public void get() throws LedgerException {
-//        byte[] key = {0x01};
-//        byte[] value = provider.get(key);
-//        System.out.println(new String(value));
-//        byte[] value1 = provider.get(key);
-//        System.out.println(new String(value));
-//        provider.close();
-//        byte[] key = "underConstructionLedgerKey".getBytes();
-//        byte[] value = provider.get(key);
-//        System.out.println(new String(value));
-        DBIterator iterator = (DBIterator) provider.getIterator(null);
-        while(iterator.hasNext()){
-            System.out.println(new String(iterator.next().getValue()));
-        }
-    }
-
-    @Test
-    public void constructLevelKey(){
-        byte[] bytes = provider.constructLevelKey("123", "key".getBytes());
-        System.out.println(new String(bytes));
-    }
-
-    @Test
-    public void retrieveAppKey(){
-        byte[] bytes = provider.retrieveAppKey(provider.constructLevelKey("123", "key".getBytes()));
-        System.out.println(new String(bytes));
+        byte[] key0 = {0x00};
+        byte[] key1 = {0x00, 0x00};
+        byte[] key2 = {0x01};
+        byte[] key3 = {0x00, 0x01};
+        byte[] value0 = provider.get(key0);
+        Assert.assertTrue(Arrays.equals(value0, "0".getBytes()));
+        byte[] value1 = provider.get(key1);
+	    Assert.assertTrue(Arrays.equals(value1, "00".getBytes()));
+	    byte[] value2 = provider.get(key2);
+	    Assert.assertTrue(Arrays.equals(value2, "1".getBytes()));
+	    byte[] value3 = provider.get(key3);
+	    Assert.assertTrue(Arrays.equals(value3, "01".getBytes()));
     }
 
     @Test
     public void getIterator() throws LedgerException {
-        for (int i = 0; i < 10; i++) {
-            byte[] key = ("key" + i).getBytes();
-            soutByte(provider.get(key));
-        }
+	    Iterator<Map.Entry<byte[], byte[]>> iterator = provider.getIterator(new byte[]{0x00, 0x00});
+	    Map.Entry<byte[], byte[]> entry0 = iterator.next();
+	    byte[] key0 = entry0.getKey();
+	    byte[] value0 = entry0.getValue();
+	    Assert.assertTrue(Arrays.equals(key0, new byte[]{0x00, 0x00}));
+	    Assert.assertTrue(Arrays.equals(value0, "00".getBytes()));
     }
 
-    public static void soutByte(byte[] bytes){
-        for (byte aByte : bytes) {
-            System.out.print(aByte + " ");
-        }
-        System.out.println();
+    @Test
+    public void writeBatch() throws LedgerException {
+    	UpdateBatch batch = new UpdateBatch();
+    	batch.put(new byte[]{0x02}, new byte[]{0x03});
+    	batch.delete(new byte[]{0x00});
+    	provider.writeBatch(batch, true);
+    	Assert.assertNull(provider.get(new byte[]{0x00}));
+	    Assert.assertNotNull(provider.get(new byte[]{0x02}));
     }
 }

@@ -86,8 +86,10 @@ public class LSSCTest extends BaseJunit4Test {
         ISmartContract.SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
         //尚未完全实现调通全部逻辑，返回内部错误
 //        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
-        //TODO write by sunzongyu. Create file $SmartContractInstallPath(/home/bica/julongchain/lssc)/example02.1.0 success
+        //TODO write by sunzongyu. 当获取到权限时，完成安装
         assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
+        //TODO write by sunzongyu. 当未获取权限时，安装失败, 并有相应提示信息
+//        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
     }
 
     @Test

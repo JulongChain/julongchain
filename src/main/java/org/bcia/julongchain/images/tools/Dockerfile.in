@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM docker.bcia.javachain:5000/baseimage
-ENV JAVACHAIN_CFG_PATH /etc/bcia/javachain
-VOLUME /etc/bcia/javachain
-ADD  payload/sampleconfig.tar.bz2 $JAVACHAIN_CFG_PATH
+FROM julongchain/julongchain-baseimage
+ENV JULONGCHAIN_CFG_PATH /etc/bcia/julongchain
+VOLUME /etc/bcia/julongchain
+ADD  payload/sampleconfig.tar.bz2 $JULONGCHAIN_CFG_PATH
 COPY payload/cryptogen /usr/local/bin
 COPY payload/configtxgen /usr/local/bin
 COPY payload/configtxlator /usr/local/bin

@@ -12,20 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM _NS_/javachain-buildenv:_TAG_
+FROM julongchain/julongchain-baseimage
 
-# javachain configuration locations
-ENV FABRIC_CFG_PATH /etc/bcia/javachain
+# julongchain configuration locations
+ENV FABRIC_CFG_PATH /etc/bcia/julongchain
 
 # create needed directories
 RUN mkdir -p \
-  $JAVACHAIN_CFG_PATH \
+  $JULONGCHAIN_CFG_PATH \
   /var/bcia/production
 
-# javachain configuration files
-ADD payload/sampleconfig.tar.bz2 $JAVACHAIN_CFG_PATH
+# julongchain configuration files
+ADD payload/sampleconfig.tar.bz2 $JULONGCHAIN_CFG_PATH
 
-# javachain binaries
+# julongchain binaries
 COPY payload/orderer /usr/local/bin
 COPY payload/peer /usr/local/bin
 

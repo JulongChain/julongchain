@@ -37,7 +37,7 @@ public class HistoryLevelDBProvider implements IHistoryDBProvider {
     public HistoryLevelDBProvider() throws LedgerException{
         String dbPath = LedgerConfig.getHistoryLevelDBPath();
         this.provider = new LevelDBProvider(dbPath);
-        logger.debug(String.format("Create historyDB using dbPath = %s", this.provider.getDbPath()));
+        logger.debug(String.format("Create historyDB using dbPath = %s", this.provider.getDBPath()));
     }
 
     @Override
