@@ -188,11 +188,18 @@ public class GossipServiceUtil {
     return null;
   }
 
-  // public static void startGossipService(String address, List<String> groups, String id_seed,
-  // String address_seed) {
-  //   for (String group : groups) {
-  //     newGossipService(UUID.randomUUID().toString(), group, address, , ).start();
-  //   }
-  // }
+  public static void startGossipService(String group, String address) throws GossipException {
+    newGossipService(UUID.randomUUID().toString(), group, address).start();
+  }
 
+  public static void startGossipService(String group, String address, String address_seed)
+      throws GossipException {
+    newGossipService(
+            UUID.randomUUID().toString(),
+            group,
+            address,
+            UUID.randomUUID().toString(),
+            address_seed)
+        .start();
+  }
 }

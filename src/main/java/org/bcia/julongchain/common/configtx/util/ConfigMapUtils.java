@@ -23,9 +23,9 @@ import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.protos.common.Configtx;
 
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 /**
@@ -47,7 +47,7 @@ public class ConfigMapUtils {
 
     public static Map<String, ConfigComparable> mapConfig(Configtx.ConfigTree configTree, String rootKey) throws
             ValidateException {
-        Map<String, ConfigComparable> result = new HashMap<String, ConfigComparable>();
+        Map<String, ConfigComparable> result = new ConcurrentHashMap<>();
 
         if (configTree != null) {
             recurseMapConfig(result, new String[]{rootKey}, configTree);
@@ -212,7 +212,7 @@ public class ConfigMapUtils {
                 throw new ValidateException("should be value");
             }
 
-            newConfigTreeBuilder.putValues(valuePath, (Configtx.ConfigValue) configComparable.getT());
+            newConfigTreeBuilder.putValues(valueName, (Configtx.ConfigValue) configComparable.getT());
         }
 
         //遍历所有的策略
@@ -233,7 +233,7 @@ public class ConfigMapUtils {
                 throw new ValidateException("should be value");
             }
 
-            newConfigTreeBuilder.putPolicies(policyPath, (Configtx.ConfigPolicy) configComparable.getT());
+            newConfigTreeBuilder.putPolicies(policyName, (Configtx.ConfigPolicy) configComparable.getT());
         }
 
         return newConfigTreeBuilder.build();

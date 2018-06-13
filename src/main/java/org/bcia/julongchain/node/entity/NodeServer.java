@@ -44,6 +44,7 @@ import org.bcia.julongchain.node.util.NodeConstant;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.util.List;
 
 /**
  * 节点服务
@@ -53,9 +54,9 @@ import java.lang.management.ManagementFactory;
  * @company Dingxuan
  */
 public class NodeServer {
-    private static final String PID_FILE_NAME = "node.pid";
-
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeServer.class);
+
+    private static final String PID_FILE_NAME = "node.pid";
 
     private String cachedEndpoint;
 
@@ -127,12 +128,20 @@ public class NodeServer {
         //初始化系统智能合约
         initSysSmartContracts();
 
-        node.initialize(new Node.InitializeCallback() {
+        node.initialize(new Node.IGroupCallback() {
             @Override
             public void onGroupInitialized(String groupId) {
                 systemSmartContractManager.deploySysSmartContracts(groupId);
             }
+
+            @Override
+            public void onGroupsReady(List<String> groupIds) {
+                if (groupIds != null && groupIds.size() > 0) {
+                    startGossipService(groupIds, nodeConfig);
+                }
+            }
         });
+
 
         //记录进程号到文件
         recordPid(nodeConfig);
@@ -222,6 +231,22 @@ public class NodeServer {
         }.start();
     }
 
+    private void startGossipService(List<String> groupIds, NodeConfig nodeConfig) {
+//        String groupId, String nodeId, String nodeAddress, String consenterId,
+//                String consenterAddress
+//        final String nodeId = nodeConfig.getNode().getId();
+//        final String nodeAddress = nodeConfig.getNode().getListenAddress();
+//        final String consenterId = nodeConfig.getNode().getListenAddress();
+//
+//        for (String groupId : groupIds) {
+//            new Thread() {
+//                @Override
+//                public void run() {
+//                    node.getGossipManager().addGossipService(groupId, );
+//                }
+//            }.start();
+//        }
+    }
 
     /**
      * 记录进程号

@@ -20,6 +20,8 @@ import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.exception.SmartContractException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.core.node.NodeConfig;
+import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.protos.node.Query;
 import org.bcia.julongchain.protos.node.Smartcontract;
 
@@ -38,7 +40,7 @@ import java.io.*;
 public class SmartContractProvider {
     private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractProvider.class);
 
-    public static String smartContractInstallPath = "/var/julongchain/product";
+    public static String smartContractInstallPath = NodeConfigFactory.getNodeConfig().getNode().getFileSystemPath();
 
     /**
      * 给静态变量smartContractInstallPath设置值为智能合约路径

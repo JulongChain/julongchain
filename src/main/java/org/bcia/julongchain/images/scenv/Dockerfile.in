@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM javachain-baseimage
-COPY pom.xml /root/javachain
-COPY src/ /root/javachain/src
-WORKDIR /root/javachain
+FROM julongchain-baseimage
+COPY pom.xml /root/julongchain
+COPY src/ /root/julongchain/src
+WORKDIR /root/julongchain
 RUN mvn package
-RUN rm -rf /root/javachain/pom.xml
-RUN rm -rf /root/javachain/src/*dock
+RUN rm -rf /root/julongchain/pom.xml
+RUN rm -rf /root/julongchain/src/*dock
 
