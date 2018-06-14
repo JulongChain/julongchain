@@ -42,8 +42,7 @@ public class LockBasedQueryExecutor implements IQueryExecutor {
     }
 
     public LockBasedQueryExecutor(LockBasedTxManager txMgr, String txID) {
-        QueryHelper helper = new QueryHelper(txMgr, null);
-        this.helper = helper;
+        this.helper = new QueryHelper(txMgr, null);
         this.txID = txID;
         logger.debug("Constructing new query executor txid = " + txID);
     }

@@ -39,7 +39,7 @@ public class QueryHelper {
     private LockBasedTxManager txMgr;
     private RWSetBuilder rwSetBuilder;
     private List<ResultsItr> itrs = new ArrayList<>();
-    private boolean doneInvoked = true;
+    private boolean doneInvoked = false;
 
     public QueryHelper(LockBasedTxManager txMgr, RWSetBuilder rwSetBuilder) {
         this.txMgr = txMgr;
@@ -183,7 +183,7 @@ public class QueryHelper {
     }
 
     public void checkDone() throws LedgerException{
-        if(!doneInvoked){
+        if(doneInvoked){
             throw new LedgerException("This instance should not be used after calling Done()");
         }
     }

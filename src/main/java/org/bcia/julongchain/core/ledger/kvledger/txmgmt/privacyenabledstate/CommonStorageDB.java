@@ -31,6 +31,7 @@ import java.util.Map;
 
 /**
  * 处理pvt、pubdata
+ * 主要用于couchdb
  *
  * @author sunzongyu
  * @date 2018/04/17
@@ -60,9 +61,8 @@ public class CommonStorageDB implements IDB {
 
         for(HashedCompositeKey key : hashKeys){
             String ns = deriveHashedDataNs(key.getNamespace(), key.getCollectionName());
-            String keyHashStr = null;
+            String keyHashStr;
             if(!bytesKeySuppoted()){
-                //TODO SM3 Hash
                 keyHashStr = new String(Util.getHashBytes(key.getKeyHash().getBytes()));
             } else {
                 keyHashStr = key.getKeyHash();
@@ -80,7 +80,6 @@ public class CommonStorageDB implements IDB {
             IBulkOptimizable bulkOptimizable = (IBulkOptimizable) vdb;
             String keyHashStr = new String(keyHash);
             if(!bytesKeySuppoted()){
-                //TODO SM3 Hash
                 keyHashStr = new String(Util.getHashBytes(keyHash));
             }
             return bulkOptimizable.getCachedVersion(deriveHashedDataNs(ns, coll), keyHashStr);
@@ -117,7 +116,6 @@ public class CommonStorageDB implements IDB {
     public VersionedValue getValueHash(String ns, String coll, byte[] keyHash) throws LedgerException {
         String keyHashStr = new String(keyHash);
         if(!bytesKeySuppoted()){
-            //TODO SM3 Hash
             keyHashStr = new String(Util.getHashBytes(keyHash));
         }
         return getState(deriveHashedDataNs(ns, coll), keyHashStr);
@@ -127,7 +125,6 @@ public class CommonStorageDB implements IDB {
     public Height getKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException {
         String keyHashStr = new String(keyHash);
         if(!bytesKeySuppoted()){
-            //TODO SM3 Hash
             keyHashStr = new String(Util.getHashBytes(keyHash));
         }
         return getVersion(deriveHashedDataNs(ns, coll), keyHashStr);

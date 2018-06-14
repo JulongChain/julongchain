@@ -155,7 +155,6 @@ public class RWSetBuilder {
         NsPubRwBuilder nsPubRwBuilder = pubRwBuilderMap.get(ns);
         if(nsPubRwBuilder == null){
             nsPubRwBuilder = new NsPubRwBuilder(ns);
-            nsPubRwBuilder.setRangeQueryKeys(null);
             pubRwBuilderMap.put(ns, nsPubRwBuilder);
         }
         return nsPubRwBuilder;

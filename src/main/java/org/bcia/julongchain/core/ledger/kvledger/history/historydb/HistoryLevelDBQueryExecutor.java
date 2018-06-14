@@ -45,7 +45,9 @@ public class HistoryLevelDBQueryExecutor implements IHistoryQueryExecutor {
     @Override
     public IResultsIterator getHistoryForKey(String ns, String key) throws LedgerException{
         if(!LedgerConfig.isHistoryDBEnabled()){
-            throw new LedgerException("History db is not avilable");
+        	String msg = "History db is not available";
+			logger.debug(msg);
+            throw new LedgerException(msg);
         }
         byte[] compositeStartKey = HistoryDBHelper.constructPartialCompositeHistoryKey(ns, key, false);
 

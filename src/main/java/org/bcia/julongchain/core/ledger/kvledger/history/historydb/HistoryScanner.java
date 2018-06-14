@@ -47,32 +47,32 @@ public class HistoryScanner implements IResultsIterator {
     /**
      * HistoryDB key头部 包含namespace, key
      */
-    private byte[] compositePartialKey = null;
-    private String nameSpace = null;
-    private String key = null;
-    private DBIterator dbIter = null;
-    private IBlockStore blockStore = null;
+    private byte[] compositePartialKey;
+    private String nameSpace;
+    private String key;
+    private DBIterator dbItr;
+    private IBlockStore blockStore;
     private long blockNum;
     private long tranNum;
 
     public HistoryScanner(byte[] compositePartialKey,
                           String nameSpace,
                           String key,
-                          DBIterator dbIter,
+                          DBIterator dbItr,
                           IBlockStore blockStore){
         this.compositePartialKey = compositePartialKey;
         this.nameSpace = nameSpace;
         this.key = key;
-        this.dbIter = dbIter;
+        this.dbItr = dbItr;
         this.blockStore = blockStore;
     }
 
     @Override
     public QueryResult next() throws LedgerException {
-        if(!dbIter.hasNext()){
+        if(!dbItr.hasNext()){
             return null;
         }
-        Map.Entry<byte[], byte[]> entry = dbIter.next();
+        Map.Entry<byte[], byte[]> entry = dbItr.next();
         byte[] historyKey = entry.getKey();
 
         //key:ns~key~blockNo~tranNo
@@ -152,12 +152,12 @@ public class HistoryScanner implements IResultsIterator {
         this.key = key;
     }
 
-    public DBIterator getDbIter() {
-        return dbIter;
+    public DBIterator getDbItr() {
+        return dbItr;
     }
 
-    public void setDbIter(DBIterator dbIter) {
-        this.dbIter = dbIter;
+    public void setDbItr(DBIterator dbItr) {
+        this.dbItr = dbItr;
     }
 
     public IBlockStore getBlockStore() {

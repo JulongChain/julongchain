@@ -62,7 +62,7 @@ public class HashedCompositeKey {
 
     @Override
     public boolean equals(Object obj) {
-        HashedCompositeKey hcKey = null;
+        HashedCompositeKey hcKey;
         try {
             hcKey = (HashedCompositeKey) obj;
         } catch (Exception e) {

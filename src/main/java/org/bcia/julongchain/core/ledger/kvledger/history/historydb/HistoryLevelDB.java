@@ -81,7 +81,7 @@ public class HistoryLevelDB implements IHistoryDB {
                     .build();
         }
         //将每个交易的写集写入HistoryDB
-        List<ByteString> list = block.getData().getDataList();
+	    List<ByteString> list = block.getData().getDataList();
         for (; tranNo < list.size(); tranNo++) {
             ByteString evnByte = list.get(tranNo);
             if(txsFilter.isInValid(tranNo)){
