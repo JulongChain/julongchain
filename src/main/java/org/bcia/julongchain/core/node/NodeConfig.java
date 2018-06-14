@@ -31,101 +31,17 @@ public class NodeConfig {
      */
     public static final String NODECONFIG_FILE_PATH = "node.yaml";
 
-    private Logging logging;
     private Node node;
     private VM vm;
     private SmartContract smartContract;
     private Ledger ledger;
     private Metrics metrics;
 
-    public static class Logging {
-        private String level;
-        private String cauthdsl;
-        private String gossip;
-        private String grpc;
-        private String ledger;
-        private String msp;
-        private String policies;
-        private String nodeGossip;
-        private String format;
-
-        public String getLevel() {
-            return level;
-        }
-
-        public void setLevel(String level) {
-            this.level = level;
-        }
-
-        public String getCauthdsl() {
-            return cauthdsl;
-        }
-
-        public void setCauthdsl(String cauthdsl) {
-            this.cauthdsl = cauthdsl;
-        }
-
-        public String getGossip() {
-            return gossip;
-        }
-
-        public void setGossip(String gossip) {
-            this.gossip = gossip;
-        }
-
-        public String getGrpc() {
-            return grpc;
-        }
-
-        public void setGrpc(String grpc) {
-            this.grpc = grpc;
-        }
-
-        public String getLedger() {
-            return ledger;
-        }
-
-        public void setLedger(String ledger) {
-            this.ledger = ledger;
-        }
-
-        public String getMsp() {
-            return msp;
-        }
-
-        public void setMsp(String msp) {
-            this.msp = msp;
-        }
-
-        public String getPolicies() {
-            return policies;
-        }
-
-        public void setPolicies(String policies) {
-            this.policies = policies;
-        }
-
-        public String getNodeGossip() {
-            return nodeGossip;
-        }
-
-        public void setNodeGossip(String nodeGossip) {
-            this.nodeGossip = nodeGossip;
-        }
-
-        public String getFormat() {
-            return format;
-        }
-
-        public void setFormat(String format) {
-            this.format = format;
-        }
-    }
-
     public static class Node {
         private String id;
         private String networkId;
         private String listenAddress;
+        private String consenterAddress;
         private String address;
         private String addressAutoDetect;
         private KeepAlive keepalive;
@@ -164,6 +80,14 @@ public class NodeConfig {
 
         public void setListenAddress(String listenAddress) {
             this.listenAddress = listenAddress;
+        }
+
+        public String getConsenterAddress() {
+            return consenterAddress;
+        }
+
+        public void setConsenterAddress(String consenterAddress) {
+            this.consenterAddress = consenterAddress;
         }
 
         public String getAddress() {
@@ -1041,14 +965,6 @@ public class NodeConfig {
         public void setHostConfig(HostConfig hostConfig) {
             this.hostConfig = hostConfig;
         }
-    }
-
-    public Logging getLogging() {
-        return logging;
-    }
-
-    public void setLogging(Logging logging) {
-        this.logging = logging;
     }
 
     public Node getNode() {

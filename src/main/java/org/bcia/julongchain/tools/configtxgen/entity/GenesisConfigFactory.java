@@ -50,7 +50,7 @@ public class GenesisConfigFactory {
         return genesisConfig;
     }
 
-    public static GenesisConfig loadGenesisConfig() {
+    private static GenesisConfig loadGenesisConfig() {
         Yaml yaml = new Yaml();
 
         InputStream is = null;

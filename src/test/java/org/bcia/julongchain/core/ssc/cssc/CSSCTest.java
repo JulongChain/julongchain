@@ -165,7 +165,7 @@ public class CSSCTest extends BaseJunit4Test {
 
 
     private byte[] mockConfigBlock() throws IOException, ValidateException,JavaChainException {
-        GenesisConfig.Profile profile=GenesisConfigFactory.loadGenesisConfig().getCompletedProfile("SampleDevModeSolo");
+        GenesisConfig.Profile profile=GenesisConfigFactory.getGenesisConfig().getCompletedProfile("SampleDevModeSolo");
         Configtx.ConfigTree tree = ConfigTreeHelper.buildGroupTree(profile);
         GenesisBlockFactory factory=new GenesisBlockFactory(tree);
         Common.Block block = factory.getGenesisBlock("mytestchainid");

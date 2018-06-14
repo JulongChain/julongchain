@@ -40,6 +40,7 @@ import org.bcia.julongchain.core.node.GroupSupport;
 import org.bcia.julongchain.core.node.util.ConfigTxUtils;
 import org.bcia.julongchain.csp.factory.IFactoryOpts;
 import org.bcia.julongchain.csp.gm.dxct.GmFactoryOpts;
+import org.bcia.julongchain.csp.gm.sdt.SdtGmFactoryOpts;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.msp.mspconfig.MspConfig;
 import org.bcia.julongchain.node.cmd.INodeCmd;
@@ -161,10 +162,12 @@ public class Node {
      * 初始化
      */
     private void init() throws NodeException {
+        log.info("Node init-----");
         initLocalMsp();
     }
 
     private void initLocalMsp() throws NodeException {
+        log.info("Init LocalMsp-----");
         try {
             MspConfig mspConfig = loadMspConfig();
             String mspConfigDir = mspConfig.getNode().getMspConfigPath();
@@ -172,9 +175,15 @@ public class Node {
             String mspType = mspConfig.getNode().getLocalMspType();
 
             List<IFactoryOpts> optsList = new ArrayList<IFactoryOpts>();
-            GmFactoryOpts factoryOpts=new GmFactoryOpts();
-            factoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("gm"));
-            optsList.add(factoryOpts);
+
+            IFactoryOpts gmFactoryOpts=new GmFactoryOpts();
+            gmFactoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("gm"));
+            optsList.add(gmFactoryOpts);
+
+            IFactoryOpts sdtGmFactoryOpts = new SdtGmFactoryOpts();
+            sdtGmFactoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("sdtgm"));
+            optsList.add(sdtGmFactoryOpts);
+
             GlobalMspManagement.loadLocalMspWithType(mspConfigDir, optsList, mspId, mspType);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -227,7 +236,9 @@ public class Node {
                 }
             }
 
-            callback.onGroupsReady(ledgerIDs);
+            if (callback != null) {
+                callback.onGroupsReady(ledgerIDs);
+            }
         } catch (LedgerException e) {
             log.error(e.getMessage(), e);
         }

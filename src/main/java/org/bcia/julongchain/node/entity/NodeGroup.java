@@ -106,11 +106,12 @@ public class NodeGroup {
         }
 
         Common.Envelope signedEnvelope = EnvelopeHelper.sanityCheckAndSignConfigTx(envelope, groupId, signer);
+        log.info("Begin to broadcast-----");
         IBroadcastClient broadcastClient = new BroadcastClient(host, port);
         broadcastClient.send(signedEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
             @Override
             public void onNext(Ab.BroadcastResponse value) {
-                log.info("Broadcast onNext");
+                log.info("Receive broadcast onNext");
                 //收到响应消息，判断是否是200消息
                 if (Common.Status.SUCCESS.equals(value.getStatus())) {
                     try {

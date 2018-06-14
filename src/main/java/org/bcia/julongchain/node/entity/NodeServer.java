@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.node.entity;
 
+import org.bcia.julongchain.common.exception.GossipException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.log.JavaChainLog;
@@ -28,6 +29,7 @@ import org.bcia.julongchain.core.aclmgmt.IAclProvider;
 import org.bcia.julongchain.core.admin.AdminServer;
 import org.bcia.julongchain.core.endorser.Endorser;
 import org.bcia.julongchain.core.events.DeliverEventsServer;
+import org.bcia.julongchain.core.ledger.BlockAndPvtData;
 import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.core.node.NodeConfig;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
@@ -40,11 +42,14 @@ import org.bcia.julongchain.events.producer.EventsServerConfig;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.node.util.NodeConstant;
+import org.bcia.julongchain.protos.common.Common;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 节点服务
@@ -234,18 +239,44 @@ public class NodeServer {
     private void startGossipService(List<String> groupIds, NodeConfig nodeConfig) {
 //        String groupId, String nodeId, String nodeAddress, String consenterId,
 //                String consenterAddress
-//        final String nodeId = nodeConfig.getNode().getId();
-//        final String nodeAddress = nodeConfig.getNode().getListenAddress();
-//        final String consenterId = nodeConfig.getNode().getListenAddress();
-//
-//        for (String groupId : groupIds) {
-//            new Thread() {
-//                @Override
-//                public void run() {
-//                    node.getGossipManager().addGossipService(groupId, );
-//                }
-//            }.start();
-//        }
+        final String nodeId = nodeConfig.getNode().getId();
+
+        final String consenterId = UUID.randomUUID().toString();
+        final String consenterAddress = nodeConfig.getNode().getConsenterAddress();
+
+        for (int i = 0; i < groupIds.size(); i++) {
+            String groupId = groupIds.get(i);
+            final String nodeAddress = "127.0.0.1:" + (50000 + i);
+
+            new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        node.getGossipManager().addGossipService(groupId, nodeId, nodeAddress, consenterId, consenterAddress);
+
+                        try {
+                            long blockHeight = LedgerManager.openLedger(groupId).getBlockchainInfo().getHeight();
+
+                            while (true) {
+                                Common.Block block = node.getGossipManager().acquireMessage(groupId, blockHeight);
+                                if (block != null) {
+                                    BlockAndPvtData blockAndPvtData = new BlockAndPvtData(block, new HashMap<>(), null);
+
+                                    node.getGroupMap().get(groupId).getCommiter().commitWithPrivateData(blockAndPvtData);
+                                }
+
+                                Thread.sleep(nodeConfig.getNode().getGossip().getPullInterval());
+                            }
+                        } catch (Exception e) {
+                            log.error(e.getMessage(), e);
+                        }
+
+                    } catch (GossipException e) {
+                        log.error(e.getMessage(), e);
+                    }
+                }
+            }.start();
+        }
     }
 
     /**

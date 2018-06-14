@@ -30,7 +30,7 @@ import org.bcia.julongchain.node.entity.Group;
  * @date 21/05/18
  * @company Aisino
  */
-public class GroupPolicyManager implements IGroupPolicyManagerGetter {
+public class GroupPolicyManagerGetter implements IGroupPolicyManagerGetter {
     @Override
     public IPolicyManager getPolicyManager(String groupId) throws InvalidProtocolBufferException, PolicyException {
         Group group = null;
