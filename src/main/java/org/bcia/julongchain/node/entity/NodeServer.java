@@ -157,8 +157,6 @@ public class NodeServer {
             }
         });
 
-        startGossipService();
-
         //记录进程号到文件
         recordPid(nodeConfig);
     }
