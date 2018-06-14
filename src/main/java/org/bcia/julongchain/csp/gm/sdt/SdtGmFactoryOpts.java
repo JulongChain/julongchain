@@ -73,7 +73,13 @@ public class SdtGmFactoryOpts implements ISdtGmFactoryOpts {
 
     @Override
     public void parseFrom(Map<String, String> optMap) {
-
+        this.symmetricKeyType = optMap.get("symmetricKey");
+        this.asymmetricKeyType = optMap.get("asymmetric");
+        this.hashType = optMap.get("hash");
+        this.signType = optMap.get("sign");
+        this.publicKeyPath = optMap.get("publicKeyStore");
+        this.privateKeyPath = optMap.get("privateKeyStore");
+        this.keyPath = optMap.get("keyStore");
     }
 
     @Override
