@@ -25,6 +25,8 @@ import org.apache.gossip.event.GossipListener;
 import org.apache.gossip.event.GossipState;
 import org.apache.gossip.model.SharedGossipDataMessage;
 import org.bcia.julongchain.common.exception.GossipException;
+import org.bcia.julongchain.common.log.JavaChainLog;
+import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 
 import java.net.URI;
@@ -45,14 +47,16 @@ import java.util.*;
  */
 public class GossipServiceUtil {
 
+  private static JavaChainLog log = JavaChainLogFactory.getLog(GossipServiceUtil.class);
+
   /**
    * 启动gossip server服务，（seed节点）
    *
    * @param address 节点的地址，格式为ip:port
-   * @throws UnknownHostException
-   * @throws InterruptedException
+   * @throws GossipException
    */
   public static GossipService newGossipService(String address) throws GossipException {
+    log.info("newGossipService(address[" + address + "])");
 
     GossipService gossipService = null;
     try {
@@ -82,21 +86,23 @@ public class GossipServiceUtil {
    * 启动节点，并加入种子节点地址
    *
    * @param address 本机地址
-   * @param address_leader 种子节点地址
+   * @param seedAddress 种子节点地址
    * @return
    * @throws GossipException
    */
-  public static GossipService newGossipService(String address, String address_leader)
+  public static GossipService newGossipService(String address, String seedAddress)
       throws GossipException {
 
-    if (StringUtils.isEmpty(address_leader)) {
+    log.info("newGossipService(address[" + address + "],seedAddress[" + seedAddress + "])");
+
+    if (StringUtils.isEmpty(seedAddress)) {
       return newGossipService(address);
     }
 
     List<GossipMember> gossipMembers = new ArrayList<>();
     RemoteGossipMember remoteGossipMember =
         new RemoteGossipMember(
-            "julongchain", URI.create("udp://" + address_leader), UUID.randomUUID().toString());
+            "julongchain", URI.create("udp://" + seedAddress), UUID.randomUUID().toString());
     gossipMembers.add(remoteGossipMember);
 
     GossipService gossipService = null;
@@ -130,12 +136,25 @@ public class GossipServiceUtil {
    * @param group 上传数据的群组
    * @param seqNum 区块的num
    * @param data String格式的区块
+   * @throws GossipException
    */
   public static void addData(GossipService gossipService, String group, Long seqNum, String data)
       throws GossipException {
+
     if (gossipService == null) {
       throw new GossipException("Gossip服务未启动。");
     }
+
+    log.info(
+        "addData(gossipService["
+            + gossipService.toString()
+            + "],group["
+            + group
+            + "],seqNum["
+            + seqNum
+            + "],data["
+            + data
+            + "])");
 
     if (StringUtils.isEmpty(group) || seqNum == null || data == null) {
       throw new GossipException("群组，区块高度，区块文件不能为空。");
@@ -156,6 +175,7 @@ public class GossipServiceUtil {
    * @param group 读取数据的群组
    * @param seqNum 区块的num
    * @return
+   * @throws GossipException
    */
   public static Object getData(GossipService gossipService, String group, Long seqNum)
       throws GossipException {
@@ -165,6 +185,16 @@ public class GossipServiceUtil {
     if (StringUtils.isEmpty(group) || seqNum == null) {
       throw new GossipException("区块，区块高度不能为空。");
     }
+
+    log.info(
+        "getData(gossipService["
+            + gossipService.toString()
+            + "],group["
+            + group
+            + "],seqNum["
+            + seqNum
+            + "])");
+
     Crdt crdt = gossipService.getGossipManager().findCrdt(group + "-" + seqNum);
     if (crdt == null) {
       return null;
@@ -189,8 +219,10 @@ public class GossipServiceUtil {
   public static GossipService startConsenterGossip() throws GossipException {
     String consenterAddress =
         NodeConfigFactory.getNodeConfig().getNode().getGossip().getConsenterAddress();
+    log.info("consenter gossip address:" + consenterAddress);
     GossipService gossipService = newGossipService(consenterAddress);
     gossipService.start();
+    log.info("启动consenter gossip: address[" + consenterAddress + "]");
     return gossipService;
   }
 
@@ -203,10 +235,14 @@ public class GossipServiceUtil {
   public static GossipService startCommitterGossip() throws GossipException {
     String consenterAddress =
         NodeConfigFactory.getNodeConfig().getNode().getGossip().getConsenterAddress();
+    log.info("consenter gossip address:" + consenterAddress);
     String committerAddress =
         NodeConfigFactory.getNodeConfig().getNode().getGossip().getCommiterAddress();
+    log.info("committer gossip address:" + committerAddress);
     GossipService gossipService = newGossipService(committerAddress, consenterAddress);
     gossipService.start();
+    log.info(
+        "启动committer gossip: address[" + committerAddress + "] seedAddress:" + consenterAddress);
     return gossipService;
   }
 }

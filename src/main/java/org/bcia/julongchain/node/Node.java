@@ -96,6 +96,11 @@ public class Node {
 
     private IGroupCallback groupCallback;
 
+    /**
+     * Node已经加入的群组
+     */
+    private List<String> ledgerIds = new ArrayList<>();
+
     private NodeGossipManager gossipManager;
 
     private Node() throws NodeException {
@@ -423,4 +428,11 @@ public class Node {
         }
     }
 
+    public List<String> getLedgerIds() {
+        return ledgerIds;
+    }
+
+    public void setLedgerIds(List<String> ledgerIds) {
+        this.ledgerIds = ledgerIds;
+    }
 }

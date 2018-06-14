@@ -28,6 +28,7 @@ import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.common.util.FileUtils;
+import org.bcia.julongchain.common.util.proto.BlockUtils;
 import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
 import org.bcia.julongchain.common.util.proto.ProposalUtils;
 import org.bcia.julongchain.consenter.common.broadcast.BroadCastClient;
@@ -260,6 +261,19 @@ public class NodeGroup {
 
         if (proposalResponse != null && proposalResponse.getResponse() != null && proposalResponse.getResponse()
                 .getStatus() == ISmartContract.SmartContractResponse.Status.SUCCESS.getCode()) {
+
+	      // TODO 周辉检查
+	      try {
+	        byte[] bytes = FileUtils.readFileBytes(blockPath);
+	        Common.Block block = Common.Block.parseFrom(bytes);
+	        String groupId = BlockUtils.getGroupIDFromBlock(block);
+	        node.getLedgerIds().add(groupId);
+	      } catch (IOException e) {
+	        log.error(e.getMessage(), e);
+	      } catch (JavaChainException e) {
+	        log.error(e.getMessage(), e);
+	      }
+
             log.info("Join group success");
         } else {
             log.info("Join group fail:" + proposalResponse);
