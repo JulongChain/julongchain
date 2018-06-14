@@ -32,7 +32,12 @@ import java.net.UnknownHostException;
 import java.util.*;
 
 /**
- * 类描述 参考：https://github.com/apache/incubator-gossip
+ * Gossip服务的相关方法，<br>
+ * 包括启动gossip服务，<br>
+ * 向gossip网络广播数据，<br>
+ * 从gossip网络读取数据
+ *
+ * <p>参考：https://github.com/apache/incubator-gossip
  *
  * @author wanliangbing
  * @date 2018/06/08
@@ -41,7 +46,7 @@ import java.util.*;
 public class GossipServiceUtil {
 
   /**
-   * 启动gossip server服务
+   * 启动gossip server服务，（seed节点）
    *
    * @param address 节点的地址，格式为ip:port
    * @throws UnknownHostException
@@ -73,6 +78,14 @@ public class GossipServiceUtil {
     return gossipService;
   }
 
+  /**
+   * 启动节点，并加入种子节点地址
+   *
+   * @param address 本机地址
+   * @param address_leader 种子节点地址
+   * @return
+   * @throws GossipException
+   */
   public static GossipService newGossipService(String address, String address_leader)
       throws GossipException {
 
@@ -113,6 +126,7 @@ public class GossipServiceUtil {
   /**
    * 节点上传区块
    *
+   * @param gossipService 上传数据的gossip service
    * @param group 上传数据的群组
    * @param seqNum 区块的num
    * @param data String格式的区块
@@ -138,7 +152,8 @@ public class GossipServiceUtil {
   /**
    * 读取指定区块num的数据
    *
-   * @param group 上传数据的群组
+   * @param gossipService 读取数据的gossip service
+   * @param group 读取数据的群组
    * @param seqNum 区块的num
    * @return
    */
@@ -165,15 +180,12 @@ public class GossipServiceUtil {
     return null;
   }
 
-  public static void startGossipService(String address) throws GossipException {
-    newGossipService(address).start();
-  }
-
-  public static void startGossipService(String address, String address_seed)
-      throws GossipException {
-    newGossipService(address, address_seed).start();
-  }
-
+  /**
+   * 从配置文件读取consenter地址，并启动gossip服务
+   *
+   * @return
+   * @throws GossipException
+   */
   public static GossipService startConsenterGossip() throws GossipException {
     String consenterAddress =
         NodeConfigFactory.getNodeConfig().getNode().getGossip().getConsenterAddress();
@@ -182,12 +194,18 @@ public class GossipServiceUtil {
     return gossipService;
   }
 
-  public static GossipService startCommiterGossip() throws GossipException {
+  /**
+   * 从配置文件读取committer地址，并启动gossip服务
+   *
+   * @return
+   * @throws GossipException
+   */
+  public static GossipService startCommitterGossip() throws GossipException {
     String consenterAddress =
         NodeConfigFactory.getNodeConfig().getNode().getGossip().getConsenterAddress();
-    String commiterAddress =
+    String committerAddress =
         NodeConfigFactory.getNodeConfig().getNode().getGossip().getCommiterAddress();
-    GossipService gossipService = newGossipService(commiterAddress, consenterAddress);
+    GossipService gossipService = newGossipService(committerAddress, consenterAddress);
     gossipService.start();
     return gossipService;
   }
