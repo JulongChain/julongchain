@@ -20,7 +20,10 @@ import org.bcia.julongchain.csp.gm.dxct.sm2.util.SM2KeyUtil;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bouncycastle.util.encoders.Base64;
 
+import java.io.FileNotFoundException;
 import java.util.HashMap;
+
+import static org.bcia.julongchain.msp.mspconfig.MspConfigFactory.loadMspConfig;
 
 /**
  * @author zhangmingyang
@@ -36,9 +39,13 @@ public class SM2KeyExport implements IKey {
 
     @Override
     public byte[] toBytes() {
-        //根据nodeid获取私钥,路径可通过配置文件中读取
-        HashMap map = (HashMap) LoadYaml.readYamlFile("gmcsp.yaml");
-        String privateKeyPath = (String) ((HashMap) ((HashMap) ((HashMap) ((HashMap) map.get("node")).get("csp")).get("gm")).get("fileKeyStore")).get("privateKeyStore");
+        //根据路径获取私钥,路径可通过配置文件中读取
+        String privateKeyPath = "";
+        try {
+             privateKeyPath = loadMspConfig().getNode().getCsp().getFactoryOpts().get("gm").get("privateKeyStore");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         try {
             String privateKeyStr = SM2KeyUtil.readFile(privateKeyPath);
             byte[] privateKey = Base64.decode(privateKeyStr);

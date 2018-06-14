@@ -15,6 +15,8 @@
  */
 package org.bcia.julongchain.csp.gm.sdt;
 
+import java.util.Map;
+
 /**
  * SDT GM algorithm factory options
  *
@@ -67,6 +69,11 @@ public class SdtGmFactoryOpts implements ISdtGmFactoryOpts {
     @Override
     public boolean isDefaultCsp() {
         return bDefaultCsp;
+    }
+
+    @Override
+    public void parseFrom(Map<String, String> optMap) {
+
     }
 
     @Override

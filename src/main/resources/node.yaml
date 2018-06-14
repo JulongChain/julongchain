@@ -9,7 +9,7 @@
 #    LOGGING section
 #
 ###############################################################################
-logging:
+#logging:
 
     # Default logging levels are specified here.
 
@@ -35,7 +35,7 @@ logging:
     # Default for all modules running within the scope of a node.
     # Note: this value is only used when --logging-level or CORE_LOGGING_LEVEL
     #       are not set
-    level:       info
+    #level:       info
 
     # The overall default values mentioned above can be overridden for the
     # specific components listed in the override section below.
@@ -46,16 +46,16 @@ logging:
     # logging package.
     # Note: the modules listed below are the only acceptable modules at this
     #       time.
-    cauthdsl:   warning
-    gossip:     warning
-    grpc:       error
-    ledger:     info
-    msp:        warning
-    policies:   warning
-    nodeGossip: warning
+    #cauthdsl:   warning
+    #gossip:     warning
+    #grpc:       error
+    #ledger:     info
+    #msp:        warning
+    #policies:   warning
+    #nodeGossip: warning
 
     # Message format for the node logs
-    format: '%{color}%{time:2006-01-02 15:04:05.000 MST} [%{module}] %{shortfunc} -> %{level:.4s} %{id:03x}%{color:reset} %{message}'
+    #format: '%{color}%{time:2006-01-02 15:04:05.000 MST} [%{module}] %{shortfunc} -> %{level:.4s} %{id:03x}%{color:reset} %{message}'
 
 ###############################################################################
 #
@@ -73,6 +73,8 @@ node:
     # The Address at local network interface this Node will listen on.
     # By default, it will listen on all network interfaces
     listenAddress: 0.0.0.0:7051
+
+    consenterAddress: 127.0.0.1:7050
 
     # The endpoint this node uses to listen for inbound smartcontract connections.
     # If this is commented-out, the listen address is selected to be
@@ -129,9 +131,8 @@ node:
     # Gossip related configuration
     gossip:
 
-        ip:
-        startPort: 50000
-        seedAddress:
+        commiterAddress:
+        consenterAddress:
 
         # Bootstrap set to initialize gossip with.
         # This is a list of other nodes that this node reaches out to at startup.

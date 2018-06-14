@@ -2,7 +2,7 @@ package org.bcia.julongchain.common.policycheck;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.policycheck.policies.GroupPolicyManager;
+import org.bcia.julongchain.common.policycheck.policies.GroupPolicyManagerGetter;
 import org.bcia.julongchain.common.util.proto.SignedData;
 import org.bcia.julongchain.common.util.proto.TxUtils;
 import org.bcia.julongchain.msp.IIdentityDeserializer;
@@ -48,7 +48,7 @@ public class PolicyCheckerTest {
     public void checkPolicy() throws InvalidProtocolBufferException, JavaChainException, UnsupportedEncodingException {
         IIdentityDeserializer localMSP = mock(IIdentityDeserializer.class);
         IMspPrincipalGetter principalGetter = mock(IMspPrincipalGetter.class);
-        PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManager(),localMSP,principalGetter);
+        PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManagerGetter(),localMSP,principalGetter);
         ProposalPackage.SignedProposal sp = TxUtils.mockSignedEndorserProposalOrPanic("",
                 Smartcontract.SmartContractSpec.newBuilder().build());
         policyChecker.checkPolicy("A", "Admins",sp);
@@ -60,7 +60,7 @@ public class PolicyCheckerTest {
     public void checkPolicyBySignedData() {
         IIdentityDeserializer localMSP = mock(IIdentityDeserializer.class);
         IMspPrincipalGetter principalGetter = mock(IMspPrincipalGetter.class);
-        PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManager(),localMSP,principalGetter);
+        PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManagerGetter(),localMSP,principalGetter);
         List<SignedData> sd = new ArrayList<SignedData>();
 
     }
@@ -71,7 +71,7 @@ public class PolicyCheckerTest {
         IIdentityDeserializer localMSP = mock(IIdentityDeserializer.class);
         MspManager mspManager = new MspManager();
         IMspPrincipalGetter principalGetter = mock(IMspPrincipalGetter.class);
-        PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManager(),mspManager,principalGetter);
+        PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManagerGetter(),mspManager,principalGetter);
         ProposalPackage.SignedProposal sp = TxUtils.mockSignedEndorserProposalOrPanic("",
                 Smartcontract.SmartContractSpec.newBuilder().build());
         policyChecker.checkPolicyNoGroup("Admins",sp);

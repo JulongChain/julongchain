@@ -105,19 +105,20 @@ public class DeliverHandler implements IHandler {
             }
         }
         //TODO select case  erroredChan
-        SessionAc accessControl = null;
-        try {
-            accessControl = new SessionAc(chain, server.getPolicyChecker(), chdr.getGroupId(), envelope, new Expiration());
-        } catch (InvalidProtocolBufferException e) {
-            log.error(e.getMessage());
-            sendStatusReply(server, Common.Status.BAD_REQUEST);
-        }
-        try {
-            accessControl.enaluate();
-        } catch (ValidateException e) {
-            log.error(e.getMessage());
-            sendStatusReply(server, Common.Status.FORBIDDEN);
-        }
+//        SessionAc accessControl = null;
+//        try {
+//            accessControl = new SessionAc(chain, server.getPolicyChecker(), chdr.getGroupId(), envelope, new Expiration());
+//        } catch (InvalidProtocolBufferException e) {
+//            log.error(e.getMessage());
+//            sendStatusReply(server, Common.Status.BAD_REQUEST);
+//        }
+        //TODO 先去掉权限控制部分
+//        try {
+//            accessControl.enaluate();
+//        } catch (ValidateException e) {
+//            log.error(e.getMessage());
+//            sendStatusReply(server, Common.Status.FORBIDDEN);
+//        }
         Ab.SeekInfo seekInfo = null;
         try {
             seekInfo = Ab.SeekInfo.parseFrom(payload.getData().toByteArray());
@@ -135,13 +136,15 @@ public class DeliverHandler implements IHandler {
         if (cursor instanceof FileLedgerIterator) {
             FileLedgerIterator fileLedgerIterator = (FileLedgerIterator) cursor;
             long number = fileLedgerIterator.getBlockNum();
-            long stopNumber;
+            long stopNumber = 0;
             Ab.SeekPosition.TypeCase stop = seekInfo.getStop().getTypeCase();
             switch (stop) {
                 case OLDEST:
                     stopNumber = number;
+                    break;
                 case NEWEST:
                     stopNumber = chain.getLedgerResources().getReadWriteBase().height() - 1;
+                    break;
                 case SPECIFIED:
                     stopNumber = stop.getNumber();
                     if (stopNumber < number) {
@@ -149,25 +152,45 @@ public class DeliverHandler implements IHandler {
                         sendStatusReply(server, Common.Status.BAD_REQUEST);
                     }
             }
-            cursor.close();
             {
                 if (seekInfo.getBehavior() == Ab.SeekInfo.SeekBehavior.FAIL_IF_NOT_READY) {
                     if (number > chain.getLedgerResources().getReadWriteBase().height() - 1) {
                         sendStatusReply(server, Common.Status.NOT_FOUND);
                     }
-
-                    nextBlock(cursor);
-
-
-
-                    number++;
-
-
-
-
-
                 }
+                QueryResult queryResult = nextBlock(cursor);
+                Map.Entry<QueryResult, Common.Status> block= (Map.Entry<QueryResult, Common.Status>) queryResult.getObj();
+                cursor.close();
+                Common.Block blockData = (Common.Block) block.getKey().getObj();
+                Common.Status status = block.getValue();
 
+                if (status != Common.Status.SUCCESS) {
+                    log.error(String.format("[channel: %s] Error reading from channel, cause was: %v", chdr.getGroupId(), status));
+                    sendStatusReply(server, status);
+                }
+                number++;
+                //TODO 去掉权限控制部分
+//                try {
+//                    accessControl.enaluate();
+//                } catch (ValidateException e) {
+//                    sendStatusReply(server, Common.Status.FORBIDDEN);
+//                }
+                log.debug(String.format("[channel: %s] Delivering block for (%p) for %s", chdr.getGroupId(), seekInfo));
+                try {
+                    log.info("bbbbbbbbbb");
+                    sendBlockReply(server, blockData);
+                    log.info("aaaaaaaaa");
+                } catch (InvalidProtocolBufferException e) {
+                    log.error(e.getMessage());
+                }
+                if (stopNumber == blockData.getHeader().getNumber()) {
+                    return;
+                }
+            }
+            try {
+                sendStatusReply(server, Common.Status.SUCCESS);
+            } catch (InvalidProtocolBufferException e) {
+                log.error(e.getMessage());
             }
         }
 
@@ -175,16 +198,9 @@ public class DeliverHandler implements IHandler {
     }
 
 
-    public Map.Entry<Common.Block, Common.Status> nextBlock(IIterator cursor) throws LedgerException, InvalidProtocolBufferException {
+    public QueryResult nextBlock(IIterator cursor) throws LedgerException {
         // FIXME: 2018/5/31
-
-        Map.Entry<QueryResult, Common.Status> block = (Map.Entry<QueryResult, Common.Status>) cursor.next();
-
-        ByteString byteString = (ByteString) block.getKey().getObj();
-        Common.Block blockData = Common.Block.parseFrom(byteString);
-
-        return null;
-
+        return cursor.next();
     }
 
     public void validateGroupHeader(DeliverServer server, Common.GroupHeader chdr) throws ConsenterException, ValidateException {

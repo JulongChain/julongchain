@@ -15,56 +15,16 @@
  */
 package org.bcia.julongchain.msp.mspconfig;
 
+import java.util.Map;
+
 /**
+ * 将gmcsp文件转换为配置对象
  * @author zhangmingyang
- * @Date: 2018/3/29
+ * @Date: 2018/6/13
  * @company Dingxuan
  */
 public class MspConfig {
     public static final String MspConfig_FILE_PATH = "gmcsp.yaml";
-    private static final MspConfig DEFAULT_INSTANCE;
-    private static  final String DEFAULT="GM";
-    private static  final String SYMMETRIKEY="SM4";
-    private static  final String SIGN="SM2";
-    private static  final String HASH="SM3";
-    private static  final String ASYMMETRIC="SM2";
-    private static  final String SECURITY="256";
-    private static  final String PUBLICKEYSTORE="D:/msp/keystore/publickey.pem";
-    // private static  final String PUBLICKEYSTORE="/opt/msp/keystore/publickey.pem";
-    private static  final String PRIVATEKEYSTORE="D:/msp/keystore/privatekey.pem";
-    // private static  final String PRIVATEKEYSTORE="/opt/msp/keystore/privatekey.pem";
-    private static  final String MSPCONFIGPATH="msp";
-    private static  final String LOCALMSPID="DEFAULT";
-    private static  final String LOCALMSPTYPE="GMMSP";
-
-
-    static {
-
-        FileKeyStore defaultFileKeyStore=new FileKeyStore();
-        defaultFileKeyStore.setPrivateKeyStore(PRIVATEKEYSTORE);
-        defaultFileKeyStore.setPublicKeyStore(PUBLICKEYSTORE);
-
-        GM defaultGm=new GM();
-        defaultGm.setSymmetricKey(SYMMETRIKEY);
-        defaultGm.setSign(SIGN);
-        defaultGm.setHash(HASH);
-        defaultGm.setAsymmetric(ASYMMETRIC);
-        defaultGm.setSecurity(SECURITY);
-        defaultGm.setFileKeyStore(defaultFileKeyStore);
-
-        Csp defaultCsp=new Csp();
-        defaultCsp.setDefaultValue(DEFAULT);
-        defaultCsp.setGm(defaultGm);
-
-        Node defaultNode=new Node();
-        defaultNode.setLocalMspId(LOCALMSPID);
-        defaultNode.setMspConfigPath(MSPCONFIGPATH);
-        defaultNode.setLocalMspType(LOCALMSPTYPE);
-        defaultNode.setCsp(defaultCsp);
-
-        DEFAULT_INSTANCE=new MspConfig();
-        DEFAULT_INSTANCE.setNode(defaultNode);
-    }
 
     public Node node;
 
@@ -77,10 +37,10 @@ public class MspConfig {
     }
 
     public static class Node {
-       private Csp  csp;
-       private String mspConfigPath;
-       private String localMspId;
-       private String localMspType;
+        private Csp csp;
+        private String mspConfigPath;
+        private String localMspId;
+        private String localMspType;
 
         public Csp getCsp() {
             return csp;
@@ -117,7 +77,7 @@ public class MspConfig {
 
     public  static class Csp{
         private String defaultValue;
-        private GM gm;
+        private Map<String,Map<String,String>> factoryOpts;
 
         public String getDefaultValue() {
             return defaultValue;
@@ -127,12 +87,12 @@ public class MspConfig {
             this.defaultValue = defaultValue;
         }
 
-        public GM getGm() {
-            return gm;
+        public Map<String, Map<String, String>> getFactoryOpts() {
+            return factoryOpts;
         }
 
-        public void setGm(GM gm) {
-            this.gm = gm;
+        public void setFactoryOpts(Map<String, Map<String, String>> factoryOpts) {
+            this.factoryOpts = factoryOpts;
         }
     }
     public static  class GM{
@@ -141,7 +101,7 @@ public class MspConfig {
         private String hash;
         private String asymmetric;
         private String security;
-        private FileKeyStore fileKeyStore;
+
 
         public String getSymmetricKey() {
             return symmetricKey;
@@ -149,14 +109,6 @@ public class MspConfig {
 
         public void setSymmetricKey(String symmetricKey) {
             this.symmetricKey = symmetricKey;
-        }
-
-        public FileKeyStore getFileKeyStore() {
-            return fileKeyStore;
-        }
-
-        public void setFileKeyStore(FileKeyStore fileKeyStore) {
-            this.fileKeyStore = fileKeyStore;
         }
 
         public String getSign() {
@@ -192,25 +144,5 @@ public class MspConfig {
         }
 
 
-    }
-    public static class  FileKeyStore{
-        private String publicKeyStore;
-        private String privateKeyStore;
-
-        public String getPublicKeyStore() {
-            return publicKeyStore;
-        }
-
-        public void setPublicKeyStore(String publicKeyStore) {
-            this.publicKeyStore = publicKeyStore;
-        }
-
-        public String getPrivateKeyStore() {
-            return privateKeyStore;
-        }
-
-        public void setPrivateKeyStore(String privateKeyStore) {
-            this.privateKeyStore = privateKeyStore;
-        }
     }
 }

@@ -81,8 +81,8 @@ public class GmCspTest {
         try {
          IKey sm2key=getDefaultCsp().keyGen(new SM2KeyGenOpts());
 
-         System.out.println("SM2 Privatekey:"+Hex.toHexString(sm2key.toBytes()));
-         System.out.println("SM2 PublicKey:"+Hex.toHexString(sm2key.getPublicKey().toBytes()));
+         System.out.println("generate the SM2 Privatekey:"+Hex.toHexString(sm2key.toBytes()));
+         System.out.println("generate the SM2 PublicKey:"+Hex.toHexString(sm2key.getPublicKey().toBytes()));
          IKey sm4key=getDefaultCsp().keyGen(new SM4KeyGenOpts());
          System.out.println("SM4 Key:"+Hex.toHexString(sm4key.toBytes()));
         } catch (JavaChainException e) {

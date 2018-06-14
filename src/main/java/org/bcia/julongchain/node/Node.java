@@ -40,6 +40,7 @@ import org.bcia.julongchain.core.node.GroupSupport;
 import org.bcia.julongchain.core.node.util.ConfigTxUtils;
 import org.bcia.julongchain.csp.factory.IFactoryOpts;
 import org.bcia.julongchain.csp.gm.dxct.GmFactoryOpts;
+import org.bcia.julongchain.csp.gm.sdt.SdtGmFactoryOpts;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.msp.mspconfig.MspConfig;
 import org.bcia.julongchain.node.cmd.INodeCmd;
@@ -161,10 +162,12 @@ public class Node {
      * 初始化
      */
     private void init() throws NodeException {
+        log.info("Node init-----");
         initLocalMsp();
     }
 
     private void initLocalMsp() throws NodeException {
+        log.info("Init LocalMsp-----");
         try {
             MspConfig mspConfig = loadMspConfig();
             String mspConfigDir = mspConfig.getNode().getMspConfigPath();
@@ -172,14 +175,14 @@ public class Node {
             String mspType = mspConfig.getNode().getLocalMspType();
 
             List<IFactoryOpts> optsList = new ArrayList<IFactoryOpts>();
-            String symmetrickey = mspConfig.getNode().getCsp().getGm().getSymmetricKey();
-            String sign = mspConfig.getNode().getCsp().getGm().getSign();
-            String hash = mspConfig.getNode().getCsp().getGm().getHash();
-            String asymmetric = mspConfig.getNode().getCsp().getGm().getAsymmetric();
-            String privateKeyPath = mspConfig.getNode().getCsp().getGm().getFileKeyStore().getPrivateKeyStore();
-            String publicKeyPath = mspConfig.getNode().getCsp().getGm().getFileKeyStore().getPublicKeyStore();
-            //new GmCspConfig(symmetrickey,asymmetric,hash,sign,publicKeyPath,privateKeyPath);
-            optsList.add(new GmFactoryOpts(symmetrickey, asymmetric, hash, sign, publicKeyPath, privateKeyPath));
+
+            IFactoryOpts gmFactoryOpts=new GmFactoryOpts();
+            gmFactoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("gm"));
+            optsList.add(gmFactoryOpts);
+
+            IFactoryOpts sdtGmFactoryOpts = new SdtGmFactoryOpts();
+            sdtGmFactoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("sdtgm"));
+            optsList.add(sdtGmFactoryOpts);
 
             GlobalMspManagement.loadLocalMspWithType(mspConfigDir, optsList, mspId, mspType);
         } catch (Exception e) {
@@ -233,7 +236,9 @@ public class Node {
                 }
             }
 
-            callback.onGroupsReady(ledgerIDs);
+            if (callback != null) {
+                callback.onGroupsReady(ledgerIDs);
+            }
         } catch (LedgerException e) {
             log.error(e.getMessage(), e);
         }

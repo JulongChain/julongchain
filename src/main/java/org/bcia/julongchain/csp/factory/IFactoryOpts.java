@@ -16,6 +16,9 @@ package org.bcia.julongchain.csp.factory;
  * limitations under the License.
  */
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author zhanglin,sunianle
  * @purpose Define the interface, IFactoryOpts
@@ -43,4 +46,5 @@ public interface IFactoryOpts {
 
     boolean isDefaultCsp();
 
+    void parseFrom(Map<String,String> optMap);
 }

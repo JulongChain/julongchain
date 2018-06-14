@@ -25,7 +25,7 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.policycheck.IPolicyChecker;
 import org.bcia.julongchain.common.policycheck.PolicyChecker;
 import org.bcia.julongchain.common.policycheck.cauthdsl.CAuthDslBuilder;
-import org.bcia.julongchain.common.policycheck.policies.GroupPolicyManager;
+import org.bcia.julongchain.common.policycheck.policies.GroupPolicyManagerGetter;
 import org.bcia.julongchain.common.util.proto.ProtoUtils;
 import org.bcia.julongchain.core.aclmgmt.AclManagement;
 import org.bcia.julongchain.core.aclmgmt.resources.Resources;
@@ -118,7 +118,7 @@ public class LSSC  extends SystemSmartContractBase {
     public SmartContractResponse init(ISmartContractStub stub) {
         this.sscProvider=SystemSmartContractFactory.getSystemSmartContractProvider();
         IMsp localMSP = GlobalMspManagement.getLocalMsp();
-        policyChecker=new PolicyChecker(new GroupPolicyManager(),localMSP,new MSPPrincipalGetter());
+        policyChecker=new PolicyChecker(new GroupPolicyManagerGetter(),localMSP,new MSPPrincipalGetter());
         log.info("Successfully initialized LSSC");
         return newSuccessResponse();
     }
