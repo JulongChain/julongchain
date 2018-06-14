@@ -15,6 +15,10 @@
  */
 package org.bcia.julongchain.node.entity;
 
+import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.gossip.GossipService;
 import org.bcia.julongchain.common.exception.GossipException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.NodeException;
@@ -39,6 +43,7 @@ import org.bcia.julongchain.core.ssc.ISystemSmartContractManager;
 import org.bcia.julongchain.core.ssc.SystemSmartContractManager;
 import org.bcia.julongchain.events.producer.EventHubServer;
 import org.bcia.julongchain.events.producer.EventsServerConfig;
+import org.bcia.julongchain.gossip.GossipServiceUtil;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.node.util.NodeConstant;
@@ -141,15 +146,80 @@ public class NodeServer {
 
             @Override
             public void onGroupsReady(List<String> groupIds) {
-                if (groupIds != null && groupIds.size() > 0) {
-                    startGossipService(groupIds, nodeConfig);
-                }
+                // if (groupIds != null && groupIds.size() > 0) {
+                //     startGossipService(groupIds, nodeConfig);
+                // }
+              try {
+                startGossipService();
+              } catch (NodeException e) {
+                log.error(e.getMessage(), e);
+              }
             }
         });
 
+        startGossipService();
 
         //记录进程号到文件
         recordPid(nodeConfig);
+    }
+
+    // 启动gossip，定时读取数据
+    private void startGossipService() throws NodeException {
+      //  查询群组
+      try {
+        List<String> ledgerIds = LedgerManager.getLedgerIDs();
+        if (CollectionUtils.isNotEmpty(ledgerIds)) {
+          node.setLedgerIds(ledgerIds);
+        }
+      } catch (LedgerException e) {
+        log.error(e.getMessage(), e);
+        throw new NodeException(e.getMessage(), e);
+      }
+
+      // 启动gossip
+      try {
+        GossipService gossipService = GossipServiceUtil.startCommitterGossip();
+        new Thread() {
+          public void run() {
+            while (true) {
+              // 1s查询一次
+              try {
+                Thread.sleep(1000);
+              } catch (Exception e) {
+                log.error(e.getMessage(), e);
+              }
+              // 处理当前所有的群组
+              List<String> ledgerIds = node.getLedgerIds();
+              for (String ledgerId : ledgerIds) {
+                long blockHeight = 0l;
+                try {
+                  blockHeight = LedgerManager.openLedger(ledgerId).getBlockchainInfo().getHeight();
+                  if (blockHeight == 0l) {
+                    continue;
+                  }
+                  Object data = GossipServiceUtil.getData(gossipService, ledgerId, blockHeight + 1l);
+                  if (data == null) {
+                    continue;
+                  }
+                  String blockStr = (String) data;
+                  Common.Block block = Common.Block.parseFrom(ByteString.copyFromUtf8(blockStr));
+                  BlockAndPvtData blockAndPvtData = new BlockAndPvtData(block, null, null);
+                  LedgerManager.openLedger(ledgerId).commitWithPvtData(blockAndPvtData);
+                } catch (LedgerException e) {
+                  log.error(e.getMessage(), e);
+                } catch (GossipException e) {
+                  log.error(e.getMessage(), e);
+                } catch (InvalidProtocolBufferException e) {
+                  log.error(e.getMessage(), e);
+                }
+              }
+            }
+          }
+        }.start();
+      } catch (GossipException e) {
+        log.error(e.getMessage(), e);
+        throw new NodeException(e.getMessage(), e);
+      }
     }
 
     private void initSysSmartContracts() {

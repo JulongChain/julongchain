@@ -49,8 +49,7 @@ public class GossipServiceUtil {
    * 启动gossip server服务，（seed节点）
    *
    * @param address 节点的地址，格式为ip:port
-   * @throws UnknownHostException
-   * @throws InterruptedException
+   * @throws GossipException
    */
   public static GossipService newGossipService(String address) throws GossipException {
 
@@ -82,21 +81,21 @@ public class GossipServiceUtil {
    * 启动节点，并加入种子节点地址
    *
    * @param address 本机地址
-   * @param address_leader 种子节点地址
+   * @param seedAddress 种子节点地址
    * @return
    * @throws GossipException
    */
-  public static GossipService newGossipService(String address, String address_leader)
+  public static GossipService newGossipService(String address, String seedAddress)
       throws GossipException {
 
-    if (StringUtils.isEmpty(address_leader)) {
+    if (StringUtils.isEmpty(seedAddress)) {
       return newGossipService(address);
     }
 
     List<GossipMember> gossipMembers = new ArrayList<>();
     RemoteGossipMember remoteGossipMember =
         new RemoteGossipMember(
-            "julongchain", URI.create("udp://" + address_leader), UUID.randomUUID().toString());
+            "julongchain", URI.create("udp://" + seedAddress), UUID.randomUUID().toString());
     gossipMembers.add(remoteGossipMember);
 
     GossipService gossipService = null;
@@ -130,6 +129,7 @@ public class GossipServiceUtil {
    * @param group 上传数据的群组
    * @param seqNum 区块的num
    * @param data String格式的区块
+   * @throws GossipException
    */
   public static void addData(GossipService gossipService, String group, Long seqNum, String data)
       throws GossipException {
@@ -156,6 +156,7 @@ public class GossipServiceUtil {
    * @param group 读取数据的群组
    * @param seqNum 区块的num
    * @return
+   * @throws GossipException
    */
   public static Object getData(GossipService gossipService, String group, Long seqNum)
       throws GossipException {
