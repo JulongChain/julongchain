@@ -25,6 +25,8 @@ import org.apache.gossip.event.GossipListener;
 import org.apache.gossip.event.GossipState;
 import org.apache.gossip.model.SharedGossipDataMessage;
 import org.bcia.julongchain.common.exception.GossipException;
+import org.bcia.julongchain.common.log.JavaChainLog;
+import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 
 import java.net.URI;
@@ -45,6 +47,8 @@ import java.util.*;
  */
 public class GossipServiceUtil {
 
+  private static JavaChainLog log = JavaChainLogFactory.getLog(GossipServiceUtil.class);
+
   /**
    * 启动gossip server服务，（seed节点）
    *
@@ -52,6 +56,7 @@ public class GossipServiceUtil {
    * @throws GossipException
    */
   public static GossipService newGossipService(String address) throws GossipException {
+    log.info("newGossipService(address[" + address + "])");
 
     GossipService gossipService = null;
     try {
@@ -87,6 +92,8 @@ public class GossipServiceUtil {
    */
   public static GossipService newGossipService(String address, String seedAddress)
       throws GossipException {
+
+    log.info("newGossipService(address[" + address + "],seedAddress[" + seedAddress + "])");
 
     if (StringUtils.isEmpty(seedAddress)) {
       return newGossipService(address);
@@ -133,9 +140,21 @@ public class GossipServiceUtil {
    */
   public static void addData(GossipService gossipService, String group, Long seqNum, String data)
       throws GossipException {
+
     if (gossipService == null) {
       throw new GossipException("Gossip服务未启动。");
     }
+
+    log.info(
+        "addData(gossipService["
+            + gossipService.toString()
+            + "],group["
+            + group
+            + "],seqNum["
+            + seqNum
+            + "],data["
+            + data
+            + "])");
 
     if (StringUtils.isEmpty(group) || seqNum == null || data == null) {
       throw new GossipException("群组，区块高度，区块文件不能为空。");
@@ -166,6 +185,16 @@ public class GossipServiceUtil {
     if (StringUtils.isEmpty(group) || seqNum == null) {
       throw new GossipException("区块，区块高度不能为空。");
     }
+
+    log.info(
+        "getData(gossipService["
+            + gossipService.toString()
+            + "],group["
+            + group
+            + "],seqNum["
+            + seqNum
+            + "])");
+
     Crdt crdt = gossipService.getGossipManager().findCrdt(group + "-" + seqNum);
     if (crdt == null) {
       return null;
@@ -190,8 +219,10 @@ public class GossipServiceUtil {
   public static GossipService startConsenterGossip() throws GossipException {
     String consenterAddress =
         NodeConfigFactory.getNodeConfig().getNode().getGossip().getConsenterAddress();
+    log.info("consenter gossip address:" + consenterAddress);
     GossipService gossipService = newGossipService(consenterAddress);
     gossipService.start();
+    log.info("启动consenter gossip: address[" + consenterAddress + "]");
     return gossipService;
   }
 
@@ -204,10 +235,14 @@ public class GossipServiceUtil {
   public static GossipService startCommitterGossip() throws GossipException {
     String consenterAddress =
         NodeConfigFactory.getNodeConfig().getNode().getGossip().getConsenterAddress();
+    log.info("consenter gossip address:" + consenterAddress);
     String committerAddress =
         NodeConfigFactory.getNodeConfig().getNode().getGossip().getCommiterAddress();
+    log.info("committer gossip address:" + committerAddress);
     GossipService gossipService = newGossipService(committerAddress, consenterAddress);
     gossipService.start();
+    log.info(
+        "启动committer gossip: address[" + committerAddress + "] seedAddress:" + consenterAddress);
     return gossipService;
   }
 }
