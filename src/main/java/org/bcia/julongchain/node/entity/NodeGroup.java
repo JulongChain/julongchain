@@ -113,6 +113,8 @@ public class NodeGroup {
             @Override
             public void onNext(Ab.BroadcastResponse value) {
                 log.info("Receive broadcast onNext");
+                broadcastClient.close();
+
                 //收到响应消息，判断是否是200消息
                 if (Common.Status.SUCCESS.equals(value.getStatus())) {
                     try {
@@ -129,16 +131,18 @@ public class NodeGroup {
             @Override
             public void onError(Throwable t) {
                 log.error(t.getMessage(), t);
+                broadcastClient.close();
             }
 
             @Override
             public void onCompleted() {
                 log.info("Broadcast completed");
+                broadcastClient.close();
             }
         });
 
         try {
-            Thread.sleep(15000);
+            Thread.sleep(900000);
         } catch (InterruptedException e) {
             log.error(e.getMessage(), e);
         }
@@ -151,26 +155,27 @@ public class NodeGroup {
             @Override
             public void onNext(Ab.DeliverResponse value) {
                 log.info("Deliver onNext");
+                deliverClient.close();
 
                 //测试用
-                if (true) {
-                    try {
-                        //模拟建立一个Block
-                        Common.Block block = mockCreateBlock(groupId);
-
-//                        LedgerManager.initialize(null);
-//                        LedgerManager.createLedger(block);
-
-                        FileUtils.writeFileBytes(groupId + ".block", block.toByteArray());
-
-                        File file = new File(groupId + ".block");
-                        log.info("file is generated1-----$" + file.getCanonicalPath());
-                    } catch (IOException e) {
-                        log.error(e.getMessage(), e);
-                    } catch (JavaChainException e) {
-                        log.error(e.getMessage(), e);
-                    }
-                }
+//                if (true) {
+//                    try {
+//                        //模拟建立一个Block
+//                        Common.Block block = mockCreateBlock(groupId);
+//
+////                        LedgerManager.initialize(null);
+////                        LedgerManager.createLedger(block);
+//
+//                        FileUtils.writeFileBytes(groupId + ".block", block.toByteArray());
+//
+//                        File file = new File(groupId + ".block");
+//                        log.info("file is generated1-----$" + file.getCanonicalPath());
+//                    } catch (IOException e) {
+//                        log.error(e.getMessage(), e);
+//                    } catch (JavaChainException e) {
+//                        log.error(e.getMessage(), e);
+//                    }
+//                }
 
                 if (value.hasBlock()) {
                     Common.Block block = value.getBlock();
@@ -190,11 +195,13 @@ public class NodeGroup {
             @Override
             public void onError(Throwable t) {
                 log.error(t.getMessage(), t);
+                deliverClient.close();
             }
 
             @Override
             public void onCompleted() {
                 log.info("Deliver onCompleted");
+                deliverClient.close();
             }
         });
 

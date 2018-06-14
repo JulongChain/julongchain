@@ -48,7 +48,7 @@ public class EndorserClient implements IEndorserClient {
     public ProposalResponsePackage.ProposalResponse sendProcessProposal(ProposalPackage.SignedProposal signedProposal) {
         ManagedChannel managedChannel =
                 NettyChannelBuilder.forAddress(ip, port).maxInboundMessageSize(CommConstant.MAX_GRPC_MESSAGE_SIZE)
-                        .usePlaintext(true).build();
+                        .usePlaintext().build();
         EndorserGrpc.EndorserBlockingStub stub = EndorserGrpc.newBlockingStub(managedChannel);
         return stub.processProposal(signedProposal);
     }

@@ -16,11 +16,16 @@
 package org.bcia.julongchain.node.common.client;
 
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.netty.NettyChannelBuilder;
 import io.grpc.stub.StreamObserver;
+import org.bcia.julongchain.common.log.JavaChainLog;
+import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 import org.bcia.julongchain.protos.consenter.AtomicBroadcastGrpc;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * 广播客户端实现
@@ -30,6 +35,7 @@ import org.bcia.julongchain.protos.consenter.AtomicBroadcastGrpc;
  * @company Dingxuan
  */
 public class BroadcastClient implements IBroadcastClient {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(BroadcastClient.class);
     /**
      * IP地址
      */
@@ -39,6 +45,8 @@ public class BroadcastClient implements IBroadcastClient {
      */
     private int port;
 
+    private ManagedChannel managedChannel;
+
     public BroadcastClient(String ip, int port) {
         this.ip = ip;
         this.port = port;
@@ -46,7 +54,9 @@ public class BroadcastClient implements IBroadcastClient {
 
     @Override
     public void send(Common.Envelope envelope, StreamObserver<Ab.BroadcastResponse> responseObserver) {
-        ManagedChannel managedChannel = ManagedChannelBuilder.forAddress(ip, port).usePlaintext(true).build();
+        managedChannel =
+                NettyChannelBuilder.forAddress(ip, port).maxInboundMessageSize(CommConstant.MAX_GRPC_MESSAGE_SIZE)
+                        .usePlaintext().build();
         AtomicBroadcastGrpc.AtomicBroadcastStub stub = AtomicBroadcastGrpc.newStub(managedChannel);
         StreamObserver<Common.Envelope> envelopeStreamObserver = stub.broadcast(responseObserver);
         envelopeStreamObserver.onNext(envelope);
@@ -54,6 +64,13 @@ public class BroadcastClient implements IBroadcastClient {
 
     @Override
     public void close() {
+        log.info("BroadcastClient close-----");
 
+        managedChannel.shutdown();
+        try {
+            managedChannel.awaitTermination(1000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 }

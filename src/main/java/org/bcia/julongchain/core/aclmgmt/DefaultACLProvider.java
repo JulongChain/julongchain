@@ -20,7 +20,6 @@ import org.bcia.julongchain.common.policies.PolicyConstant;
 import org.bcia.julongchain.common.policycheck.IPolicyChecker;
 import org.bcia.julongchain.common.policycheck.PolicyChecker;
 import org.bcia.julongchain.common.policycheck.policies.GroupPolicyManagerGetter;
-import org.bcia.julongchain.common.policycheck.policies.IGroupPolicyManagerGetter;
 import org.bcia.julongchain.core.aclmgmt.resources.Resources;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.msp.mgmt.MSPPrincipalGetter;
@@ -77,12 +76,27 @@ public class DefaultACLProvider implements IAclProvider {
         groupPolicyMap.put(Resources.CSSC_GetConfigTree, PolicyConstant.GROUP_APP_READERS);
         groupPolicyMap.put(Resources.CSSC_SimulateConfigTreeUpdate, PolicyConstant.GROUP_APP_WRITERS);
 
-
-
+        //Other
+        groupPolicyMap.put(Resources.PROPOSE, PolicyConstant.GROUP_APP_WRITERS);
+        groupPolicyMap.put(Resources.SC2SC, PolicyConstant.GROUP_APP_WRITERS);
+        groupPolicyMap.put(Resources.BLOCKEVENT, PolicyConstant.GROUP_APP_READERS);
+        groupPolicyMap.put(Resources.FILTEREDBLOCKEVENT, PolicyConstant.GROUP_APP_READERS);
     }
 
     @Override
     public void checkACL(String resName, String groupID, ProposalPackage.SignedProposal idinfo) throws JavaChainException {
+        getDefaultPolicy(resName, true);
+
 
     }
+
+    private void getDefaultPolicy(String resName, boolean isGroup) {
+//        if(isGroup){
+//            return groupPolicyMap.get(resName);
+//        }else{
+//            return resourcePolicyMap.get(resName);
+//        }
+    }
+
+
 }

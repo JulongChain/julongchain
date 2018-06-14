@@ -185,9 +185,9 @@ public class Node {
             gmFactoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("gm"));
             optsList.add(gmFactoryOpts);
 
-            IFactoryOpts sdtGmFactoryOpts = new SdtGmFactoryOpts();
-            sdtGmFactoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("sdtgm"));
-            optsList.add(sdtGmFactoryOpts);
+//            IFactoryOpts sdtGmFactoryOpts = new SdtGmFactoryOpts();
+//            sdtGmFactoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("sdtgm"));
+//            optsList.add(sdtGmFactoryOpts);
 
             GlobalMspManagement.loadLocalMspWithType(mspConfigDir, optsList, mspId, mspType);
         } catch (Exception e) {
