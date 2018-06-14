@@ -16,7 +16,6 @@
 package org.bcia.julongchain.consenter.common.broadcast;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.protobuf.Message;
 import io.grpc.stub.StreamObserver;
 import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.common.exception.ValidateException;
@@ -29,12 +28,12 @@ import org.bcia.julongchain.consenter.entity.ConfigMsg;
 import org.bcia.julongchain.consenter.util.Constant;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
-import org.springframework.stereotype.Component;
+import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfigFactory;
+
 
 import java.io.IOException;
 import java.util.Map;
 
-import static org.bcia.julongchain.tools.configtxgen.entity.GenesisConfigFactory.loadGenesisConfig;
 
 /**
  * @author zhangmingyang
@@ -53,7 +52,7 @@ public class BroadCastHandler implements IHandler {
     public void handle(Common.Envelope envelope, StreamObserver<Ab.BroadcastResponse> responseObserver) throws IOException {
         // Common.Payload payload = Common.Payload.parseFrom(envelope.getPayload());
         //  Common.GroupHeader groupHeader = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
-        if (Constant.SINGLETON.equals(loadGenesisConfig().getConsenter().getConsenterType())) {
+        if (Constant.SINGLETON.equals(GenesisConfigFactory.getGenesisConfig().getConsenter().getConsenterType())) {
             Common.GroupHeader groupHeader = null;
             ChainSupport chainSupport = null;
             boolean isConfig = false;

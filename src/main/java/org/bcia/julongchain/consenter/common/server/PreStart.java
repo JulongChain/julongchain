@@ -103,7 +103,7 @@ public class PreStart {
         switch (consenterConfig.getGeneral().getGenesisMethod()) {
             case "provisional":
                 //根据配置生成创世区块
-                GenesisConfig.Profile completedProfile = GenesisConfigFactory.loadGenesisConfig().getCompletedProfile(consenterConfig.getGeneral().getGenesisProfile());
+                GenesisConfig.Profile completedProfile = GenesisConfigFactory.getGenesisConfig().getCompletedProfile(consenterConfig.getGeneral().getGenesisProfile());
                 Configtx.ConfigTree groupTree = ConfigTreeHelper.buildGroupTree(completedProfile);
                 genesisBlock = new GenesisBlockFactory(groupTree).getGenesisBlock("systemGroup");
                 break;
