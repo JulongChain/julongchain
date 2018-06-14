@@ -175,16 +175,20 @@ public class GossipServiceUtil {
   }
 
   public static GossipService startConsenterGossip() throws GossipException {
-    String consenterAddress = NodeConfigFactory.getNodeConfig().getNode().getGossip().getConsenterAddress();
+    String consenterAddress =
+        NodeConfigFactory.getNodeConfig().getNode().getGossip().getConsenterAddress();
     GossipService gossipService = newGossipService(consenterAddress);
     gossipService.start();
     return gossipService;
   }
 
-  public static void startCommiterGossip() throws GossipException {
-    String consenterAddress = NodeConfigFactory.getNodeConfig().getNode().getGossip().getConsenterAddress();
-    String commiterAddress = NodeConfigFactory.getNodeConfig().getNode().getGossip().getCommiterAddress();
+  public static GossipService startCommiterGossip() throws GossipException {
+    String consenterAddress =
+        NodeConfigFactory.getNodeConfig().getNode().getGossip().getConsenterAddress();
+    String commiterAddress =
+        NodeConfigFactory.getNodeConfig().getNode().getGossip().getCommiterAddress();
     GossipService gossipService = newGossipService(commiterAddress, consenterAddress);
     gossipService.start();
+    return gossipService;
   }
 }
