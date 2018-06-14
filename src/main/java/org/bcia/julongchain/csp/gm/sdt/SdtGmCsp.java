@@ -21,18 +21,13 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.csp.gm.sdt.SM2.*;
 import org.bcia.julongchain.csp.gm.sdt.SM3.SM3;
 import org.bcia.julongchain.csp.gm.sdt.SM4.*;
-import org.bcia.julongchain.csp.gm.sdt.config.Config;
 import org.bcia.julongchain.csp.gm.sdt.random.GmRandom;
 import org.bcia.julongchain.csp.gm.sdt.util.KeysStore;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IHash;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.intfs.opts.*;
-import org.yaml.snakeyaml.Yaml;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 
 /**
  * SDT GM algorithm CSP
@@ -46,9 +41,6 @@ public class SdtGmCsp implements ICsp {
     private static JavaChainLog logger = JavaChainLogFactory.getLog(SdtGmCsp.class);
 
     private final static String KEY_STORE_PATH = "/opt/msp/keystore/sdt/";
-
-    //config
-    private Config config;
     // List algorithms to be used.
     private SM2 sm2;
     private SM3 sm3;
@@ -56,12 +48,10 @@ public class SdtGmCsp implements ICsp {
     private GmRandom gmRandom;
 
     public SdtGmCsp() {
-        this.config = new Config();
         this.sm3 = new SM3();
         this.sm2 = new SM2();
         this.sm4 = new SM4();
         this.gmRandom = new GmRandom();
-        loadConfig();
     }
 
     //GmFactoryOpts
@@ -73,18 +63,6 @@ public class SdtGmCsp implements ICsp {
         this.sm2 = new SM2();
         this.sm4 = new SM4();
         this.gmRandom = new GmRandom();
-        this.config = new Config();
-        loadConfig();
-    }
-
-    private void loadConfig() {
-        try {
-            Yaml yaml = new Yaml();
-            FileInputStream inputStream = new FileInputStream(new File("src/main/resources/sdtgmcsp.yaml"));
-            config = yaml.loadAs(inputStream, Config.class);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -99,21 +77,15 @@ public class SdtGmCsp implements ICsp {
             //if not ephemeral, then save it
             if (!opts.isEphemeral()) {
                 String path = KEY_STORE_PATH;
-                String configPrivateKeyPath = config.getNode().getCsp().getSdtgm().getFileKeyStore().getPrivateKeyStore();
-                String configPublicKeyPath = config.getNode().getCsp().getSdtgm().getFileKeyStore().getPublicKeyStore();
                 //save SM2 private key
                 if(null != sdtGmOpts.getPrivateKeyPath() && !"".equals(sdtGmOpts.getPrivateKeyPath())) {
                     path = sdtGmOpts.getPrivateKeyPath();
-                } else if(null != configPrivateKeyPath && !"".equals(configPrivateKeyPath)) {
-                    path = configPrivateKeyPath;
                 }
                 KeysStore.storeKey(path, null, sm2Key, KeysStore.KEY_TYPE_SK);
                 //save SM2 public key
                 path = KEY_STORE_PATH;
                 if(null != sdtGmOpts.getPublicKeyPath() && !"".equals(sdtGmOpts.getPublicKeyPath())) {
                     path = sdtGmOpts.getPublicKeyPath();
-                } else if(null != configPublicKeyPath && !"".equals(configPublicKeyPath)) {
-                    path = configPublicKeyPath;
                 }
                 KeysStore.storeKey(path, null, sm2Key.getPublicKey(), KeysStore.KEY_TYPE_PK);
             }
@@ -125,11 +97,8 @@ public class SdtGmCsp implements ICsp {
             if (!opts.isEphemeral()) {
                 //save SM4 key
                 String path = KEY_STORE_PATH;
-                String configKeyPath = config.getNode().getCsp().getSdtgm().getFileKeyStore().getKeyStore();
                 if(null != sdtGmOpts.getKeyPath() && !"".equals(sdtGmOpts.getKeyPath())) {
                     path = sdtGmOpts.getKeyPath();
-                } else if(null != configKeyPath && !"".equals(configKeyPath)) {
-                    path = configKeyPath;
                 }
                 KeysStore.storeKey(path, null, sm4Key, KeysStore.KEY_TYPE_KEY);
             }
