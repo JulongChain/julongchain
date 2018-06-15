@@ -129,7 +129,8 @@ public class Singleton implements IChain, IConsensue {
     public void doProcess() throws InvalidProtocolBufferException, LedgerException, ValidateException, PolicyException {
         long timer = 0;
         long seq = support.getSequence();
-        if (configMessage == null) {//普通消息
+        if (configMessage == null) {
+            // /普通消息
             if (normalMessage.getConfigSeq() < seq) {
                 try {
                     support.getProcessor().processNormalMsg(normalMessage.getMessage());
@@ -139,16 +140,18 @@ public class Singleton implements IChain, IConsensue {
             }
             BatchesMes batchesMes = support.getCutter().ordered(normalMessage.getMessage());
             Common.Envelope[][] batches = batchesMes.getMessageBatches();
-            if (batches.length == 0 && timer == 0) {
+            if (batches== null && timer == 0) {
                 timer = support.getLedgerResources().getMutableResources().getGroupConfig().getConsenterConfig().getBatchTimeout();
+            }else {
+                for (Common.Envelope[] env : batches) {
+                    Common.Block block = support.createNextBlock(env);
+                    support.writeBlock(block, null);
+                }
+                if (batches.length > 0) {
+                    timer = 0;
+                }
             }
-            for (Common.Envelope[] env : batches) {
-                Common.Block block = support.createNextBlock(env);
-                support.writeBlock(block, null);
-            }
-            if (batches.length > 0) {
-                timer = 0;
-            }
+
         } else {
             if (configMessage.getConfigSeq() < seq) {
                 try {
