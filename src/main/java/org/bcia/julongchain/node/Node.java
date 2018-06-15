@@ -96,6 +96,11 @@ public class Node {
 
     private IGroupCallback groupCallback;
 
+    /**
+     * Node已经加入的群组
+     */
+    private List<String> ledgerIds = new ArrayList<>();
+
     private NodeGossipManager gossipManager;
 
     private Node() throws NodeException {
@@ -180,9 +185,9 @@ public class Node {
             gmFactoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("gm"));
             optsList.add(gmFactoryOpts);
 
-            IFactoryOpts sdtGmFactoryOpts = new SdtGmFactoryOpts();
-            sdtGmFactoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("sdtgm"));
-            optsList.add(sdtGmFactoryOpts);
+//            IFactoryOpts sdtGmFactoryOpts = new SdtGmFactoryOpts();
+//            sdtGmFactoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("sdtgm"));
+//            optsList.add(sdtGmFactoryOpts);
 
             GlobalMspManagement.loadLocalMspWithType(mspConfigDir, optsList, mspId, mspType);
         } catch (Exception e) {
@@ -423,4 +428,11 @@ public class Node {
         }
     }
 
+    public List<String> getLedgerIds() {
+        return ledgerIds;
+    }
+
+    public void setLedgerIds(List<String> ledgerIds) {
+        this.ledgerIds = ledgerIds;
+    }
 }

@@ -25,6 +25,8 @@ import org.bcia.julongchain.csp.gm.sdt.SM4.*;
 import org.bcia.julongchain.csp.gm.sdt.util.KeysStore;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IKey;
+import org.bcia.julongchain.msp.mspconfig.MspConfig;
+import org.bcia.julongchain.msp.mspconfig.MspConfigFactory;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.After;
 import org.junit.Assert;
@@ -48,6 +50,11 @@ public class SdtGmCspTest {
         SdtGmCspFactory factory = new SdtGmCspFactory();
         Assert.assertNotNull(factory);
         IFactoryOpts opts = new SdtGmFactoryOpts();
+
+        MspConfig mspConfig = MspConfigFactory.loadMspConfig();
+
+        opts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("sdtgm"));
+
         csp = factory.getCsp(opts);
         Assert.assertNotNull(csp);
     }

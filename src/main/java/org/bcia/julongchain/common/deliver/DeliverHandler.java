@@ -18,6 +18,7 @@ package org.bcia.julongchain.common.deliver;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.ConsenterException;
+import org.bcia.julongchain.common.exception.GossipException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.ledger.blockledger.IIterator;
@@ -25,9 +26,12 @@ import org.bcia.julongchain.common.ledger.blockledger.file.FileLedgerIterator;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.util.Expiration;
+import org.bcia.julongchain.common.util.proto.ProtoUtils;
+import org.bcia.julongchain.consenter.common.cmd.impl.StartCmd;
 import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
 import org.bcia.julongchain.consenter.util.CommonUtils;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
+import org.bcia.julongchain.gossip.GossipServiceUtil;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 
@@ -163,7 +167,7 @@ public class DeliverHandler implements IHandler {
                 cursor.close();
                 Common.Block blockData = (Common.Block) block.getKey().getObj();
                 Common.Status status = block.getValue();
-
+                blockData.getHeader().getNumber();
                 if (status != Common.Status.SUCCESS) {
                     log.error(String.format("[channel: %s] Error reading from channel, cause was: %v", chdr.getGroupId(), status));
                     sendStatusReply(server, status);
@@ -175,13 +179,15 @@ public class DeliverHandler implements IHandler {
 //                } catch (ValidateException e) {
 //                    sendStatusReply(server, Common.Status.FORBIDDEN);
 //                }
-                log.debug(String.format("[channel: %s] Delivering block for (%p) for %s", chdr.getGroupId(), seekInfo));
+                log.debug(String.format("[channel: %s] Delivering block for %s", chdr.getGroupId(), seekInfo));
                 try {
-                    log.info("bbbbbbbbbb");
+                   // ProtoUtils.printMessageJson(blockData);
+                    GossipServiceUtil.addData(StartCmd.getGossipService(),chdr.getGroupId(),blockData.getHeader().getNumber(),blockData.toString());
                     sendBlockReply(server, blockData);
-                    log.info("aaaaaaaaa");
                 } catch (InvalidProtocolBufferException e) {
                     log.error(e.getMessage());
+                }catch (GossipException e) {
+                    e.printStackTrace();
                 }
                 if (stopNumber == blockData.getHeader().getNumber()) {
                     return;
@@ -223,6 +229,7 @@ public class DeliverHandler implements IHandler {
     }
 
     public void sendBlockReply(DeliverServer srv, Common.Block block) throws InvalidProtocolBufferException {
+        log.info("send the block");
         srv.send(new DeliverHandlerSupport().createBlockReply(block));
     }
 

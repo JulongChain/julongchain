@@ -16,13 +16,18 @@
 package org.bcia.julongchain.node.common.client;
 
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.netty.NettyChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import org.bcia.julongchain.common.localmsp.impl.LocalSigner;
+import org.bcia.julongchain.common.log.JavaChainLog;
+import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 import org.bcia.julongchain.protos.consenter.AtomicBroadcastGrpc;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * 投递客户端实现
@@ -32,6 +37,7 @@ import org.bcia.julongchain.protos.consenter.AtomicBroadcastGrpc;
  * @company Dingxuan
  */
 public class DeliverClient implements IDeliverClient {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(DeliverClient.class);
 
     /**
      * IP地址
@@ -42,6 +48,8 @@ public class DeliverClient implements IDeliverClient {
      */
     private int port;
 
+    private ManagedChannel managedChannel;
+
     public DeliverClient(String ip, int port) {
         this.ip = ip;
         this.port = port;
@@ -49,7 +57,9 @@ public class DeliverClient implements IDeliverClient {
 
     @Override
     public void send(Common.Envelope envelope, StreamObserver<Ab.DeliverResponse> responseObserver) {
-        ManagedChannel managedChannel = ManagedChannelBuilder.forAddress(ip, port).usePlaintext(true).build();
+        managedChannel =
+                NettyChannelBuilder.forAddress(ip, port).maxInboundMessageSize(CommConstant.MAX_GRPC_MESSAGE_SIZE)
+                        .usePlaintext().build();
         AtomicBroadcastGrpc.AtomicBroadcastStub stub = AtomicBroadcastGrpc.newStub(managedChannel);
         StreamObserver<Common.Envelope> envelopeStreamObserver = stub.deliver(responseObserver);
         envelopeStreamObserver.onNext(envelope);
@@ -79,7 +89,14 @@ public class DeliverClient implements IDeliverClient {
 
     @Override
     public void close() {
+        log.info("DeliverClient close-----");
 
+        managedChannel.shutdown();
+        try {
+            managedChannel.awaitTermination(1000, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     private Common.Envelope createSeekSignedEnvelope(String groupId, Ab.SeekPosition seekPosition) {
