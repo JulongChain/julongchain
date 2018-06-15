@@ -24,10 +24,7 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.common.util.CommConstant;
-import org.bcia.julongchain.common.util.FileUtils;
-import org.bcia.julongchain.common.util.NetAddress;
-import org.bcia.julongchain.common.util.SpringContext;
+import org.bcia.julongchain.common.util.*;
 import org.bcia.julongchain.core.aclmgmt.AclManagement;
 import org.bcia.julongchain.core.aclmgmt.IAclProvider;
 import org.bcia.julongchain.core.admin.AdminServer;
@@ -200,12 +197,13 @@ public class NodeServer {
                                     continue;
                                 }
                                 log.info("当前群组[" + ledgerId + "]" + "发现新的区块");
-                                String blockStr = (String) data;
+                                String blockByteStr = (String) data;
+                                byte[] blockBytes = BytesHexStrTranslate.toBytes(blockByteStr);
                                 log.info("开始打印区块==========================================");
-                                log.info(blockStr);
+                                log.info(blockByteStr);
                                 log.info("结束打印区块==========================================");
                                 log.info("开始转换区块");
-                                Common.Block block = Common.Block.parseFrom(ByteString.copyFromUtf8(blockStr));
+                                Common.Block block = Common.Block.parseFrom(blockBytes);
                                 BlockAndPvtData blockAndPvtData = new BlockAndPvtData(block, null, null);
                                 log.info("完成转换区块");
                                 log.info("开始保存区块");
