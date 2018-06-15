@@ -23,12 +23,16 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.common.util.producer.Consumer;
 import org.bcia.julongchain.common.util.producer.Producer;
+import org.bcia.julongchain.consenter.common.cmd.impl.StartCmd;
 import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
+import org.bcia.julongchain.consenter.common.multigroup.Registrar;
+import org.bcia.julongchain.consenter.common.server.PreStart;
 import org.bcia.julongchain.consenter.consensus.IChain;
 import org.bcia.julongchain.consenter.consensus.IConsensue;
 import org.bcia.julongchain.consenter.consensus.IConsenterSupport;
 import org.bcia.julongchain.consenter.entity.BatchesMes;
 import org.bcia.julongchain.consenter.entity.Message;
+import org.bcia.julongchain.gossip.GossipServiceUtil;
 import org.bcia.julongchain.protos.common.Common;
 
 import java.util.concurrent.BlockingQueue;
@@ -146,6 +150,11 @@ public class Singleton implements IChain, IConsensue {
                 for (Common.Envelope[] env : batches) {
                     Common.Block block = support.createNextBlock(env);
                     support.writeBlock(block, null);
+                    try {
+                        GossipServiceUtil.addData(StartCmd.getGossipService(),support.getGroupId(),block.getHeader().getNumber(),block.toString());
+                    } catch (GossipException e) {
+                        e.printStackTrace();
+                    }
                 }
                 if (batches.length > 0) {
                     timer = 0;
@@ -174,6 +183,11 @@ public class Singleton implements IChain, IConsensue {
             }
             Common.Block block = support.createNextBlock(new Common.Envelope[]{configMessage.getMessage()});
             support.writeConfigBlock(block, null);
+            try {
+                GossipServiceUtil.addData(StartCmd.getGossipService(),support.getGroupId(),block.getHeader().getNumber(),block.toString());
+            } catch (GossipException e) {
+                e.printStackTrace();
+            }
             timer = 0;
 
         }
@@ -186,6 +200,11 @@ public class Singleton implements IChain, IConsensue {
             log.debug("Batch timer expired, creating block");
             Common.Block block = support.createNextBlock(batch);
             support.writeBlock(block, null);
+            try {
+                GossipServiceUtil.addData(StartCmd.getGossipService(),support.getGroupId(),block.getHeader().getNumber(),block.toString());
+            } catch (GossipException e) {
+                e.printStackTrace();
+            }
         }
 
     }
