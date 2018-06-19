@@ -58,30 +58,37 @@ public class BlockCutter implements IReceiver {
 
             if (pendingBatch.length > 0) {
                 Common.Envelope[] messageBatch = cut();
-                batchesMes.messageBatches = (Common.Envelope[][]) ArrayUtils.add(batchesMes.messageBatches, messageBatch);
+                batchesMes.setMessageBatches((Common.Envelope[][]) ArrayUtils.add(batchesMes.getMessageBatches(), messageBatch));
+                //batchesMes.messageBatches = (Common.Envelope[][]) ArrayUtils.add(batchesMes.messageBatches, messageBatch);
             }
-            batchesMes.messageBatches = (Common.Envelope[][]) ArrayUtils.add(batchesMes.messageBatches, new Common.Envelope[]{msg});
+            batchesMes.setMessageBatches((Common.Envelope[][]) ArrayUtils.add(batchesMes.getMessageBatches(), new Common.Envelope[]{msg}));
+          //  batchesMes.messageBatches = (Common.Envelope[][]) ArrayUtils.add(batchesMes.messageBatches, new Common.Envelope[]{msg});
         }
 
-        boolean messageWillOverflowBatchSizeBytes = pendingBatchSizeBytes > sharedConfigManager.getBatchSize().getPreferredMaxBytes();
+        boolean messageWillOverflowBatchSizeBytes = pendingBatchSizeBytes +messageSizeBytes> sharedConfigManager.getBatchSize().getPreferredMaxBytes();
         if (messageWillOverflowBatchSizeBytes) {
             log.debug(String.format("The current message, with %v bytes, will overflow the pending batch of %v bytes.", messageSizeBytes, pendingBatchSizeBytes));
             log.debug("Pending batch would overflow if current message is added, cutting batch now.");
             Common.Envelope[] messageBatch = cut();
-            batchesMes.messageBatches = (Common.Envelope[][]) ArrayUtils.add(batchesMes.messageBatches, messageBatch);
+           // batchesMes.messageBatches = (Common.Envelope[][]) ArrayUtils.add(batchesMes.getMessageBatches(), messageBatch);
+            batchesMes.setMessageBatches((Common.Envelope[][]) ArrayUtils.add(batchesMes.getMessageBatches(), messageBatch));
         }
         log.debug("Enqueuing message into batch");
+
         pendingBatch = (Common.Envelope[]) ArrayUtils.add(pendingBatch, msg);
         pendingBatchSizeBytes += messageSizeBytes;
 
-        batchesMes.pending = true;
+        batchesMes.setPending(true);
+        //batchesMes.pending = true;
         //BatchesMes mes = new BatchesMes();
 
         if(pendingBatch.length>=sharedConfigManager.getBatchSize().getMaxMessageCount()){
             log.debug("Batch size met,cutting batch");
             Common.Envelope[] messageBatch = cut();
-            batchesMes.messageBatches= (Common.Envelope[][]) ArrayUtils.add(batchesMes.messageBatches,messageBatch);
-            batchesMes.pending=true;
+            batchesMes.setMessageBatches((Common.Envelope[][]) ArrayUtils.add(batchesMes.getMessageBatches(),messageBatch));
+          //  batchesMes.messageBatches= (Common.Envelope[][]) ArrayUtils.add(batchesMes.messageBatches,messageBatch);
+            batchesMes.setPending(true);
+          //  batchesMes.pending=true;
         }
         return batchesMes;
     }

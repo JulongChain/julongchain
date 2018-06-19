@@ -23,12 +23,16 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.common.util.producer.Consumer;
 import org.bcia.julongchain.common.util.producer.Producer;
+import org.bcia.julongchain.consenter.common.cmd.impl.StartCmd;
 import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
+import org.bcia.julongchain.consenter.common.multigroup.Registrar;
+import org.bcia.julongchain.consenter.common.server.PreStart;
 import org.bcia.julongchain.consenter.consensus.IChain;
 import org.bcia.julongchain.consenter.consensus.IConsensue;
 import org.bcia.julongchain.consenter.consensus.IConsenterSupport;
 import org.bcia.julongchain.consenter.entity.BatchesMes;
 import org.bcia.julongchain.consenter.entity.Message;
+import org.bcia.julongchain.gossip.GossipServiceUtil;
 import org.bcia.julongchain.protos.common.Common;
 
 import java.util.concurrent.BlockingQueue;
@@ -129,7 +133,8 @@ public class Singleton implements IChain, IConsensue {
     public void doProcess() throws InvalidProtocolBufferException, LedgerException, ValidateException, PolicyException {
         long timer = 0;
         long seq = support.getSequence();
-        if (configMessage == null) {//普通消息
+        if (configMessage == null) {
+            // /普通消息
             if (normalMessage.getConfigSeq() < seq) {
                 try {
                     support.getProcessor().processNormalMsg(normalMessage.getMessage());
@@ -139,16 +144,23 @@ public class Singleton implements IChain, IConsensue {
             }
             BatchesMes batchesMes = support.getCutter().ordered(normalMessage.getMessage());
             Common.Envelope[][] batches = batchesMes.getMessageBatches();
-            if (batches.length == 0 && timer == 0) {
+            if (batches== null && timer == 0) {
                 timer = support.getLedgerResources().getMutableResources().getGroupConfig().getConsenterConfig().getBatchTimeout();
+            }else {
+                for (Common.Envelope[] env : batches) {
+                    Common.Block block = support.createNextBlock(env);
+                    support.writeBlock(block, null);
+                    try {
+                        GossipServiceUtil.addData(StartCmd.getGossipService(),support.getGroupId(),block.getHeader().getNumber(),block.toString());
+                    } catch (GossipException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (batches.length > 0) {
+                    timer = 0;
+                }
             }
-            for (Common.Envelope[] env : batches) {
-                Common.Block block = support.createNextBlock(env);
-                support.writeBlock(block, null);
-            }
-            if (batches.length > 0) {
-                timer = 0;
-            }
+
         } else {
             if (configMessage.getConfigSeq() < seq) {
                 try {
@@ -171,6 +183,11 @@ public class Singleton implements IChain, IConsensue {
             }
             Common.Block block = support.createNextBlock(new Common.Envelope[]{configMessage.getMessage()});
             support.writeConfigBlock(block, null);
+            try {
+                GossipServiceUtil.addData(StartCmd.getGossipService(),support.getGroupId(),block.getHeader().getNumber(),block.toString());
+            } catch (GossipException e) {
+                e.printStackTrace();
+            }
             timer = 0;
 
         }
@@ -183,6 +200,11 @@ public class Singleton implements IChain, IConsensue {
             log.debug("Batch timer expired, creating block");
             Common.Block block = support.createNextBlock(batch);
             support.writeBlock(block, null);
+            try {
+                GossipServiceUtil.addData(StartCmd.getGossipService(),support.getGroupId(),block.getHeader().getNumber(),block.toString());
+            } catch (GossipException e) {
+                e.printStackTrace();
+            }
         }
 
     }
