@@ -14,6 +14,7 @@
 package org.bcia.julongchain.gossip;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.protobuf.ByteString;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.gossip.GossipMember;
 import org.apache.gossip.GossipService;
@@ -27,6 +28,7 @@ import org.apache.gossip.model.SharedGossipDataMessage;
 import org.bcia.julongchain.common.exception.GossipException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfigFactory;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 
 import java.net.URI;
@@ -218,7 +220,7 @@ public class GossipServiceUtil {
    */
   public static GossipService startConsenterGossip() throws GossipException {
     String consenterAddress =
-        NodeConfigFactory.getNodeConfig().getNode().getGossip().getConsenterAddress();
+        ConsenterConfigFactory.loadConsenterConfig().getGeneral().getGossipAddress();
     log.info("consenter gossip address:" + consenterAddress);
     GossipService gossipService = newGossipService(consenterAddress);
     gossipService.start();

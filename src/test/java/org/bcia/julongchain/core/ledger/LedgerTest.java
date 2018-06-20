@@ -16,9 +16,12 @@
 package org.bcia.julongchain.core.ledger;
 
 import org.bcia.julongchain.common.exception.LedgerException;
+import org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage.BlockFileReader;
 import org.bcia.julongchain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.julongchain.core.ledger.kvledger.history.historydb.HistoryDBHelper;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
+import org.bcia.julongchain.core.ledger.util.Util;
+import org.bcia.julongchain.protos.common.Common;
 import org.junit.Test;
 
 import java.io.File;
@@ -53,9 +56,9 @@ public class LedgerTest {
     @Test
     public void getKVFromLevelDB() throws Throwable {
 //        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getIndexPath());
-//        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getStateLevelDBPath());
+        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getStateLevelDBPath());
 //        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getHistoryLevelDBPath());
-        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getLedgerProviderPath());
+//        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getLedgerProviderPath());
 //        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getPvtDataStorePath());
 //        for (int i = 0; i < 100; i++) {
 //            Height height = new Height();
@@ -64,8 +67,6 @@ public class LedgerTest {
 //            byte[] value = height.toBytes();
 //            provider.put(ArrayUtils.addAll(ArrayUtils.addAll(("ns" + i).getBytes(), COMPOSITE_KEY_SEP), ("key" + i).getBytes()), value, true);
 //        }
-	    provider.put("key".getBytes(), "value".getBytes(), true);
-	    provider.delete("key".getBytes(), true);
         Iterator<Map.Entry<byte[], byte[]>> itr =  provider.getIterator(null);
         while(itr.hasNext()){
             Map.Entry<byte[], byte[]> entry = itr.next();
@@ -75,7 +76,7 @@ public class LedgerTest {
 //            soutBytes(entry.getKey());
             System.out.println(new String(entry.getKey()));
             System.out.println(new String(entry.getValue()));
-	        System.out.println(entry.getValue().length == 0);
+//	        System.out.println(entry.getValue().length == 0);
 //            soutBytes(entry.getValue());
 //            soutBytes(entry.getKey());
 //            soutBytes(entry.getValue());
@@ -85,13 +86,22 @@ public class LedgerTest {
 
     @Test
     public void getValuesFromFS() throws Exception {
-        File file = new File(LedgerConfig.getBlockStorePath() + "/chains/myGroup/blockfile_000000");
-        FileInputStream reader = new FileInputStream(file);
-        System.out.println(file.length());
-        byte[] bytes = new byte[(int) file.length()];
-        reader.read(bytes);
-        soutBytes(bytes);
-        byte[] blockByte = new byte[bytes.length - 8];
+    	String filePath = LedgerConfig.getBlockStorePath() + "/chains/myGroup/blockfile_000000";
+    	int len = 0;
+    	int i = 0;
+    	File file = new File(filePath);
+
+	    while (len < file.length()) {
+		    BlockFileReader reader = new BlockFileReader(filePath);
+		    byte[] blockLen = reader.read(len, 8);
+		    len += 8;
+		    long l = Util.bytesToLong(blockLen, 0, 8);
+		    System.out.println("block" + i++ + " length : " + l);
+		    byte[] blockBytes = reader.read(len, l);
+		    len += l;
+		    Common.Block block = Common.Block.parseFrom(blockBytes);
+		    System.out.println(block);
+	    }
     }
 
     public static void soutBytes(byte[] bytes){

@@ -175,19 +175,21 @@ public class Singleton implements IChain, IConsensue {
                     log.error(e.getMessage());
                 }
             }
-            support.getCutter().ordered(configMessage.getMessage());
+            //support.getCutter().ordered(configMessage.getMessage());
             Common.Envelope[] batch = support.getCutter().cut();
             if (batch != null) {
                 Common.Block block = support.createNextBlock(batch);
                 support.writeBlock(block, null);
+            }else {
+                Common.Block block = support.createNextBlock(new Common.Envelope[]{configMessage.getMessage()});
+                support.writeConfigBlock(block, null);
+//                try {
+//                    GossipServiceUtil.addData(StartCmd.getGossipService(),support.getGroupId(),block.getHeader().getNumber(),block.toString());
+//                } catch (GossipException e) {
+//                    e.printStackTrace();
+//                }
             }
-            Common.Block block = support.createNextBlock(new Common.Envelope[]{configMessage.getMessage()});
-            support.writeConfigBlock(block, null);
-            try {
-                GossipServiceUtil.addData(StartCmd.getGossipService(),support.getGroupId(),block.getHeader().getNumber(),block.toString());
-            } catch (GossipException e) {
-                e.printStackTrace();
-            }
+
             timer = 0;
 
         }
