@@ -157,6 +157,9 @@ public class LockBasedTxManager implements ITxManager {
     private void invokeNamespaceListeners(UpdateBatch batch) throws JavaChainException {
         List<String> namespaces = batch.getPubUpdateBatch().getBatch().getUpdatedNamespaces();
         for(String ns : namespaces){
+        	if(stateListeners == null){
+        		break;
+	        }
             IStateListener listener = stateListeners.get(ns);
             if(listener == null){
                 continue;

@@ -438,13 +438,4 @@ public class IoUtil {
             closeStream(fis, baos);
         }
     }
-
-    public static void main(String[] args) throws Exception  {
-        String s = "/home/bcia/test/12345.tar.gz";
-        byte[] fileBytes = fileReader(s, 1024);
-        byte[] gzipBytes = gzipReader(fileBytes, 1024);
-        Map<String, byte[]> tarMap = tarReader(gzipBytes, 1024);
-        fileWriter(tarMap, "/home/bcia/test/123");
-
-    }
 }

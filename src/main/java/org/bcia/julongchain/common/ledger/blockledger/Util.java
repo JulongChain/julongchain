@@ -66,10 +66,11 @@ public class Util {
             });
         }
         //组装区块
-        Common.Block block = Common.Block.newBuilder()
+        return Common.Block.newBuilder()
                 .setHeader(Common.BlockHeader.newBuilder()
                         .setNumber(nextBlockNumber)
                         .setPreviousHash(previousBlockHash == null ? ByteString.EMPTY : previousBlockHash)
+		                .setDataHash(ByteString.copyFrom(org.bcia.julongchain.core.ledger.util.Util.getHashBytes(dataBuilder.build().toByteArray())))
                         .build())
                 .setData(dataBuilder)
                 .setMetadata(Common.BlockMetadata.newBuilder()
@@ -79,7 +80,6 @@ public class Util {
                         .addMetadata(ByteString.EMPTY)
                         .build())
                 .build();
-        return block;
     }
 
     /**

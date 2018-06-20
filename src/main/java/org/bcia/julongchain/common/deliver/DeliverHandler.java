@@ -182,13 +182,14 @@ public class DeliverHandler implements IHandler {
                 log.debug(String.format("[channel: %s] Delivering block for %s", chdr.getGroupId(), seekInfo));
                 try {
                    // ProtoUtils.printMessageJson(blockData);
-                    GossipServiceUtil.addData(StartCmd.getGossipService(),chdr.getGroupId(),blockData.getHeader().getNumber(),blockData.toString());
+                   // GossipServiceUtil.addData(StartCmd.getGossipService(),chdr.getGroupId(),blockData.getHeader().getNumber(),blockData.toString());
                     sendBlockReply(server, blockData);
                 } catch (InvalidProtocolBufferException e) {
                     log.error(e.getMessage());
-                }catch (GossipException e) {
-                    e.printStackTrace();
                 }
+//                catch (GossipException e) {
+//                    e.printStackTrace();
+//                }
                 if (stopNumber == blockData.getHeader().getNumber()) {
                     return;
                 }

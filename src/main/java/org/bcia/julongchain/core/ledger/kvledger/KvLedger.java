@@ -350,8 +350,8 @@ public class KvLedger implements INodeLedger {
      * @param block
      */
     @Override
-    public void commit(Common.Block block) {
-        return;
+    public void commit(Common.Block block) throws LedgerException {
+    	commitWithPvtData(new BlockAndPvtData(block, null, null));
     }
 
     /** Close closes `KVLedger`
@@ -371,7 +371,7 @@ public class KvLedger implements INodeLedger {
     public synchronized void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException {
         long blockNo = blockAndPvtData.getBlock().getHeader().getNumber();
         logger.debug(String.format("Group %s: Validating state for block %d", ledgerID, blockNo));
-        //执行校验工作
+        //执行校验工作, 并准备更新包
         txtmgmt.validateAndPrepare(blockAndPvtData, true);
         logger.debug(String.format("Group %s: Committing block %d to storage", ledgerID, blockNo));
         //提交区块私有信息

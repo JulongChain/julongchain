@@ -76,7 +76,7 @@ public class RangeQueryHashValidator implements IRangeQueryValidator {
             merkle = resultsHelper.getMerkleSummary();
 
             if(merkle.getMaxLevel() < inMerkle.getMaxLevel()){
-                logger.debug("Hashes still under construction. Noting to compare yet. Need more results. Continuing...");
+                logger.debug("Hashes still under construction. Noting to compareTo yet. Need more results. Continuing...");
                 continue;
             }
             if(lastMatchedIndex == merkle.getMaxLevelHashesList().size() - 1){

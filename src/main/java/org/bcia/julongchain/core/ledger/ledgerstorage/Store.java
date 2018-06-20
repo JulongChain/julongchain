@@ -126,8 +126,7 @@ public class Store implements IBlockStore {
     }
 
     private List<TxPvtData> getPvtDataByNumWithoutLock(long blockNum, PvtNsCollFilter filter) throws LedgerException {
-        List<TxPvtData> pvtData = pvtdataStore.getPvtDataByBlockNum(blockNum, filter);
-        return pvtData;
+        return pvtdataStore.getPvtDataByBlockNum(blockNum, filter);
     }
 
     private Map<Long, TxPvtData> constructPvtdataMap(List<TxPvtData> pvtData){
