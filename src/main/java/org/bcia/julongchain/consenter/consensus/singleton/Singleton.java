@@ -20,6 +20,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.*;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.common.util.producer.Consumer;
 import org.bcia.julongchain.common.util.producer.Producer;
@@ -151,7 +152,7 @@ public class Singleton implements IChain, IConsensue {
                     Common.Block block = support.createNextBlock(env);
                     support.writeBlock(block, null);
                     try {
-                        GossipServiceUtil.addData(StartCmd.getGossipService(),support.getGroupId(),block.getHeader().getNumber(),block.toString());
+                        GossipServiceUtil.addData(StartCmd.getGossipService(),support.getGroupId(),block.getHeader().getNumber(), BytesHexStrTranslate.bytesToHexFun1(block.toByteArray()));
                     } catch (GossipException e) {
                         e.printStackTrace();
                     }
@@ -203,7 +204,7 @@ public class Singleton implements IChain, IConsensue {
             Common.Block block = support.createNextBlock(batch);
             support.writeBlock(block, null);
             try {
-                GossipServiceUtil.addData(StartCmd.getGossipService(),support.getGroupId(),block.getHeader().getNumber(),block.toString());
+                GossipServiceUtil.addData(StartCmd.getGossipService(),support.getGroupId(),block.getHeader().getNumber(), BytesHexStrTranslate.bytesToHexFun1(block.toByteArray()));
             } catch (GossipException e) {
                 e.printStackTrace();
             }
