@@ -21,6 +21,7 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.csp.gm.sdt.SM2.*;
 import org.bcia.julongchain.csp.gm.sdt.SM3.SM3;
 import org.bcia.julongchain.csp.gm.sdt.SM4.*;
+import org.bcia.julongchain.csp.gm.sdt.common.Constants;
 import org.bcia.julongchain.csp.gm.sdt.random.GmRandom;
 import org.bcia.julongchain.csp.gm.sdt.util.KeysStore;
 import org.bcia.julongchain.csp.intfs.ICsp;
@@ -92,7 +93,8 @@ public class SdtGmCsp implements ICsp {
             return sm2Key;
         }
         if (opts instanceof SM4KeyGenOpts) {
-            IKey sm4Key = new SM4Key();
+            byte[] sm4KeyData = gmRandom.rng(Constants.SM4_KEY_LEN);
+            IKey sm4Key = new SM4Key(sm4KeyData);
             //if not ephemeral, then save it
             if (!opts.isEphemeral()) {
                 //save SM4 key

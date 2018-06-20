@@ -47,7 +47,7 @@ public class SMJniSM3ApiTest {
             try {
                 System.out.println("\n**** case " + caseIndex++ + ": SM3Hash message length = "+ msgLen + " ****");
                 System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
-                byte[] hash = jni.SM3Hash(msg);
+                byte[] hash = jni.sm3Hash(msg);
                 if (null != hash) {
                     System.out.println("[output data] SM3 hash data : " + Convert.bytesToHexString(hash));
                 } else {
@@ -65,7 +65,7 @@ public class SMJniSM3ApiTest {
         int caseIndex = 1;
         try {
             System.out.println("\n**** case " + caseIndex++ + ": SM3Hash message is null ****");
-            byte[] hash = jni.SM3Hash(null);
+            byte[] hash = jni.sm3Hash(null);
             if (null != hash) {
                 System.out.println("[output data] SM3 hash data : " + Convert.bytesToHexString(hash));
             } else {
@@ -78,7 +78,7 @@ public class SMJniSM3ApiTest {
         try {
             System.out.println("\n**** case " + caseIndex++ + ": SM3Hash message length is 0 ****");
             byte[] msg = new byte[0];
-            byte[] hash = jni.SM3Hash(msg);
+            byte[] hash = jni.sm3Hash(msg);
             if (null != hash) {
                 System.out.println("[output data] SM3 hash data : " + Convert.bytesToHexString(hash));
             } else {
@@ -100,7 +100,7 @@ public class SMJniSM3ApiTest {
                     (byte)0x29, (byte)0x7D, (byte)0xA0, (byte)0x2B, (byte)0x8F, (byte)0x4B, (byte)0xA8, (byte)0xE0};
             byte[] msg = {97, 98, 99};
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
-            byte[] hash = jni.SM3Hash(msg);
+            byte[] hash = jni.sm3Hash(msg);
             System.out.println("[output data] hash data : " + Convert.bytesToHexString(hash));
 
             if(Arrays.equals(hash, GMHashData)) {
@@ -121,7 +121,7 @@ public class SMJniSM3ApiTest {
             byte[] msg = { 'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
                     'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d'};
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
-            byte[] hash = jni.SM3Hash(msg);
+            byte[] hash = jni.sm3Hash(msg);
             System.out.println("[output data] hash data : " + Convert.bytesToHexString(hash));
 
             if(Arrays.equals(hash, GMHashData)) {
@@ -146,7 +146,7 @@ public class SMJniSM3ApiTest {
             byte[] hash = null;
             long startTime = System.currentTimeMillis();
             for(int i = 0;i < 1024*100*num; i++) {
-                hash = jni.SM3Hash(testMsg);
+                hash = jni.sm3Hash(testMsg);
             }
             long endTime = System.currentTimeMillis();
             float speed = (float) (100*num/ ((endTime - startTime)/1000.00));

@@ -41,7 +41,7 @@ public class GmRandom {
         }
         byte[] result = null;
         try {
-            result = smJniApi.RandomGen(len);
+            result = smJniApi.randomGen(len);
         } catch (Exception e) {
             logger.error("SM RandomGen error: generate random failed");
             throw new JavaChainException("SM RandomGen error: generate random failed");

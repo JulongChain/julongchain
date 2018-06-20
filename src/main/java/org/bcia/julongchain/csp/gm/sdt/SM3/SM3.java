@@ -48,7 +48,7 @@ public class SM3 {
         }
         byte[] result = null;
         try {
-            result = smJniApi.SM3Hash(message);
+            result = smJniApi.sm3Hash(message);
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw new JavaChainException("SM3Hash error: compute message hash failed.");

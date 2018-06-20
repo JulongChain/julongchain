@@ -296,7 +296,7 @@ public class SM2Test {
             verifyResult = sm2.verify(hash, keyPair.getPublicKey(), signData63);
             System.out.println("[output data] signature verify return : " + verifyResult);
         } catch (Exception e) {
-            System.out.println("=Exception: " + e.getMessage());
+            System.out.println("Exception: " + e.getMessage());
         }
 
         try {

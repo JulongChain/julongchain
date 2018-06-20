@@ -42,11 +42,11 @@ public class SMJniSM4ApiTest {
                 (byte) 0x60, (byte) 0xA0, (byte) 0x71, (byte) 0x6B,
                 (byte) 0x3F, (byte) 0x8E, (byte) 0x3C, (byte) 0xA1};
         try {
-            byte[] key = jni.RandomGen( Constants.SM4_KEY_LEN);
+            byte[] key = jni.randomGen( Constants.SM4_KEY_LEN);
             System.out.println("\n**** case 1 SM4ECBEncrypt ****");
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
             System.out.println("[input data] key data : " + Convert.bytesToHexString(key));
-            byte[] cipherData = jni.SM4ECBEncrypt(key, msg);
+            byte[] cipherData = jni.sm4ECBEncrypt(key, msg);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData));
             } else {
@@ -56,7 +56,7 @@ public class SMJniSM4ApiTest {
             System.out.println("\n**** case 2 SM4ECBDecrypt ****");
             System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData));
             System.out.println("[input data] key data : " + Convert.bytesToHexString(key));
-            byte[] plainData = jni.SM4ECBDecrypt(key, cipherData);
+            byte[] plainData = jni.sm4ECBDecrypt(key, cipherData);
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData));
             } else {
@@ -76,7 +76,7 @@ public class SMJniSM4ApiTest {
                 (byte) 0x3F, (byte) 0x8E, (byte) 0x3C, (byte) 0xA1};
         byte[] key = null;
         try {
-            key = jni.RandomGen(Constants.SM4_KEY_LEN);
+            key = jni.randomGen(Constants.SM4_KEY_LEN);
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
             return;
@@ -86,7 +86,7 @@ public class SMJniSM4ApiTest {
             System.out.println("\n**** case " + caseIndex++ + ": SM4ECBEncrypt key is null ****");
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
             System.out.println("[input data] key data: null");
-            byte[] cipherData = jni.SM4ECBEncrypt(null, msg);
+            byte[] cipherData = jni.sm4ECBEncrypt(null, msg);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData));
             } else {
@@ -101,7 +101,7 @@ public class SMJniSM4ApiTest {
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
             byte[] key0 = new byte[0];
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key0));
-            byte[] cipherData = jni.SM4ECBEncrypt(key0, msg);
+            byte[] cipherData = jni.sm4ECBEncrypt(key0, msg);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData));
             } else {
@@ -117,7 +117,7 @@ public class SMJniSM4ApiTest {
             byte[] key15 = new byte[15];
             System.arraycopy(key, 0, key15, 0,15);
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key15));
-            byte[] cipherData = jni.SM4ECBEncrypt(key15, msg);
+            byte[] cipherData = jni.sm4ECBEncrypt(key15, msg);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData));
             } else {
@@ -134,7 +134,7 @@ public class SMJniSM4ApiTest {
             System.arraycopy(key, 0, key17, 0,16);
             key17[16] = 0x17;
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key17));
-            byte[] cipherData = jni.SM4ECBEncrypt(key17, msg);
+            byte[] cipherData = jni.sm4ECBEncrypt(key17, msg);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData));
             } else {
@@ -154,7 +154,7 @@ public class SMJniSM4ApiTest {
                 (byte) 0x3F, (byte) 0x8E, (byte) 0x3C, (byte) 0xA1};
         byte[] key = null;
         try {
-            key = jni.RandomGen(Constants.SM4_KEY_LEN);
+            key = jni.randomGen(Constants.SM4_KEY_LEN);
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
             return;
@@ -164,7 +164,7 @@ public class SMJniSM4ApiTest {
             System.out.println("\n**** case " + caseIndex++ + ": SM4ECBEncrypt message is null ****");
             System.out.println("[input data] message data : null");
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key));
-            byte[] cipherData = jni.SM4ECBEncrypt(key, null);
+            byte[] cipherData = jni.sm4ECBEncrypt(key, null);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData));
             } else {
@@ -179,7 +179,7 @@ public class SMJniSM4ApiTest {
             byte[] msg0 = new byte[0];
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg0));
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key));
-            byte[] cipherData = jni.SM4ECBEncrypt(key, msg0);
+            byte[] cipherData = jni.sm4ECBEncrypt(key, msg0);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData));
             } else {
@@ -200,8 +200,8 @@ public class SMJniSM4ApiTest {
         byte[] key = null;
         byte[] cipherData = null;
         try {
-            key = jni.RandomGen(Constants.SM4_KEY_LEN);
-            cipherData = jni.SM4ECBEncrypt(key, msg);
+            key = jni.randomGen(Constants.SM4_KEY_LEN);
+            cipherData = jni.sm4ECBEncrypt(key, msg);
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
             return;
@@ -212,7 +212,7 @@ public class SMJniSM4ApiTest {
             System.out.println("\n**** case " + caseIndex++ + ": SM4ECBDecrypt key is null ****");
             System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData));
             System.out.println("[input data] key data: null");
-            byte[] plainData = jni.SM4ECBDecrypt(null, cipherData);
+            byte[] plainData = jni.sm4ECBDecrypt(null, cipherData);
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData));
             } else {
@@ -227,7 +227,7 @@ public class SMJniSM4ApiTest {
             System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData));
             byte[] key0 = new byte[0];
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key0));
-            byte[] plainData = jni.SM4ECBDecrypt(key0, cipherData);
+            byte[] plainData = jni.sm4ECBDecrypt(key0, cipherData);
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData));
             } else {
@@ -243,7 +243,7 @@ public class SMJniSM4ApiTest {
             byte[] key15 = new byte[15];
             System.arraycopy(key, 0, key15, 0,15);
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key15));
-            byte[] plainData = jni.SM4ECBDecrypt(key15, cipherData);
+            byte[] plainData = jni.sm4ECBDecrypt(key15, cipherData);
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData));
             } else {
@@ -260,7 +260,7 @@ public class SMJniSM4ApiTest {
             System.arraycopy(key, 0, key17, 0,16);
             key17[16] = 0x17;
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key17));
-            byte[] plainData = jni.SM4ECBDecrypt(key17, cipherData);
+            byte[] plainData = jni.sm4ECBDecrypt(key17, cipherData);
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData));
             } else {
@@ -281,8 +281,8 @@ public class SMJniSM4ApiTest {
         byte[] key = null;
         byte[] cipherData = null;
         try {
-            key = jni.RandomGen(Constants.SM4_KEY_LEN);
-            cipherData = jni.SM4ECBEncrypt(key, msg);
+            key = jni.randomGen(Constants.SM4_KEY_LEN);
+            cipherData = jni.sm4ECBEncrypt(key, msg);
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
             return;
@@ -292,7 +292,7 @@ public class SMJniSM4ApiTest {
             System.out.println("\n**** case " + caseIndex++ + ": SM4ECBDecrypt cipher data is null ****");
             System.out.println("[input data] cipher data : null");
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key));
-            byte[] plainData = jni.SM4ECBDecrypt(key, null);
+            byte[] plainData = jni.sm4ECBDecrypt(key, null);
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData));
             } else {
@@ -307,7 +307,7 @@ public class SMJniSM4ApiTest {
             byte[] msg0 = new byte[0];
             System.out.println("[input data] cipher data : " + Convert.bytesToHexString(msg0));
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key));
-            byte[] plainData = jni.SM4ECBDecrypt(key, msg0);
+            byte[] plainData = jni.sm4ECBDecrypt(key, msg0);
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData));
             } else {
@@ -326,13 +326,13 @@ public class SMJniSM4ApiTest {
                 (byte) 0x60, (byte) 0xA0, (byte) 0x71, (byte) 0x6B,
                 (byte) 0x3F, (byte) 0x8E, (byte) 0x3C, (byte) 0xA1};
         try {
-            byte[] key = jni.RandomGen(Constants.SM4_KEY_LEN);
-            byte[] iv = jni.RandomGen(Constants.SM4_IV_LEN);
+            byte[] key = jni.randomGen(Constants.SM4_KEY_LEN);
+            byte[] iv = jni.randomGen(Constants.SM4_IV_LEN);
             System.out.println("\n**** case 1 SM4CBCEncrypt ****");
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
             System.out.println("[input data] key data : " + Convert.bytesToHexString(key));
             System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv));
-            SM4CBCResult cipherDataResult = jni.SM4CBCEncrypt(key, iv, msg);
+            SM4CBCResult cipherDataResult = jni.sm4CBCEncrypt(key, iv, msg);
             if (null != cipherDataResult) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherDataResult.getData()));
             } else {
@@ -343,7 +343,7 @@ public class SMJniSM4ApiTest {
             System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherDataResult.getData()));
             System.out.println("[input data] key data : " + Convert.bytesToHexString(key));
             System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv));
-            SM4CBCResult plainDataResult = jni.SM4CBCDecrypt(key, iv, cipherDataResult.getData());
+            SM4CBCResult plainDataResult = jni.sm4CBCDecrypt(key, iv, cipherDataResult.getData());
             if (null != plainDataResult) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainDataResult.getData()));
             } else {
@@ -364,8 +364,8 @@ public class SMJniSM4ApiTest {
         byte[] key = null;
         byte[] iv = null;
         try {
-            key = jni.RandomGen(Constants.SM4_KEY_LEN);
-            iv = jni.RandomGen(Constants.SM4_IV_LEN);
+            key = jni.randomGen(Constants.SM4_KEY_LEN);
+            iv = jni.randomGen(Constants.SM4_IV_LEN);
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
             return;
@@ -376,7 +376,7 @@ public class SMJniSM4ApiTest {
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
             System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv));
             System.out.println("[input data] key data: null");
-            SM4CBCResult cipherData = jni.SM4CBCEncrypt(null, iv, msg);
+            SM4CBCResult cipherData = jni.sm4CBCEncrypt(null, iv, msg);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData.getData()));
             } else {
@@ -392,7 +392,7 @@ public class SMJniSM4ApiTest {
             System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv));
             byte[] key0 = new byte[0];
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key0));
-            SM4CBCResult cipherData = jni.SM4CBCEncrypt(key0, iv, msg);
+            SM4CBCResult cipherData = jni.sm4CBCEncrypt(key0, iv, msg);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData.getData()));
             } else {
@@ -409,7 +409,7 @@ public class SMJniSM4ApiTest {
             System.arraycopy(key, 0, key15, 0,15);
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key15));
             System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv));
-            SM4CBCResult cipherData = jni.SM4CBCEncrypt(key15, iv, msg);
+            SM4CBCResult cipherData = jni.sm4CBCEncrypt(key15, iv, msg);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData.getData()));
             } else {
@@ -427,7 +427,7 @@ public class SMJniSM4ApiTest {
             key17[16] = 0x17;
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key17));
             System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv));
-            SM4CBCResult cipherData = jni.SM4CBCEncrypt(key17, iv, msg);
+            SM4CBCResult cipherData = jni.sm4CBCEncrypt(key17, iv, msg);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData.getData()));
             } else {
@@ -448,8 +448,8 @@ public class SMJniSM4ApiTest {
         byte[] key = null;
         byte[] iv = null;
         try {
-            key = jni.RandomGen(Constants.SM4_KEY_LEN);
-            iv = jni.RandomGen(Constants.SM4_IV_LEN);
+            key = jni.randomGen(Constants.SM4_KEY_LEN);
+            iv = jni.randomGen(Constants.SM4_IV_LEN);
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
             return;
@@ -460,7 +460,7 @@ public class SMJniSM4ApiTest {
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key));
             System.out.println("[input data] iv data : null");
-            SM4CBCResult cipherData = jni.SM4CBCEncrypt(key, null, msg);
+            SM4CBCResult cipherData = jni.sm4CBCEncrypt(key, null, msg);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData.getData()));
             } else {
@@ -476,7 +476,7 @@ public class SMJniSM4ApiTest {
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key));
             byte[] iv0 = new byte[0];
             System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv0));
-            SM4CBCResult cipherData = jni.SM4CBCEncrypt(key, iv0, msg);
+            SM4CBCResult cipherData = jni.sm4CBCEncrypt(key, iv0, msg);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData.getData()));
             } else {
@@ -493,7 +493,7 @@ public class SMJniSM4ApiTest {
             byte[] iv15 = new byte[15];
             System.arraycopy(iv, 0, iv15, 0, 15);
             System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv15));
-            SM4CBCResult cipherData = jni.SM4CBCEncrypt(key, iv15, msg);
+            SM4CBCResult cipherData = jni.sm4CBCEncrypt(key, iv15, msg);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData.getData()));
             } else {
@@ -511,7 +511,7 @@ public class SMJniSM4ApiTest {
             System.arraycopy(iv, 0, iv17, 0, 16);
             iv17[16] = 0x17;
             System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv17));
-            SM4CBCResult cipherData = jni.SM4CBCEncrypt(key, iv17, msg);
+            SM4CBCResult cipherData = jni.sm4CBCEncrypt(key, iv17, msg);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData.getData()));
             } else {
@@ -532,8 +532,8 @@ public class SMJniSM4ApiTest {
         byte[] key = null;
         byte[] iv = null;
         try {
-            key = jni.RandomGen(Constants.SM4_KEY_LEN);
-            iv = jni.RandomGen(Constants.SM4_IV_LEN);
+            key = jni.randomGen(Constants.SM4_KEY_LEN);
+            iv = jni.randomGen(Constants.SM4_IV_LEN);
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
             return;
@@ -544,7 +544,7 @@ public class SMJniSM4ApiTest {
             System.out.println("[input data] message data : null");
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key));
             System.out.println("[input data] iv data: " + Convert.bytesToHexString(iv));
-            SM4CBCResult cipherData = jni.SM4CBCEncrypt(key, iv, null);
+            SM4CBCResult cipherData = jni.sm4CBCEncrypt(key, iv, null);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData.getData()));
             } else {
@@ -560,7 +560,7 @@ public class SMJniSM4ApiTest {
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg0));
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key));
             System.out.println("[input data] iv data: " + Convert.bytesToHexString(iv));
-            SM4CBCResult cipherData = jni.SM4CBCEncrypt(key, iv, msg0);
+            SM4CBCResult cipherData = jni.sm4CBCEncrypt(key, iv, msg0);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData.getData()));
             } else {
@@ -582,9 +582,9 @@ public class SMJniSM4ApiTest {
         byte[] iv = null;
         SM4CBCResult cipherData = null;
         try {
-            key = jni.RandomGen(Constants.SM4_KEY_LEN);
-            iv = jni.RandomGen(Constants.SM4_IV_LEN);
-            cipherData = jni.SM4CBCEncrypt(key, iv, msg);
+            key = jni.randomGen(Constants.SM4_KEY_LEN);
+            iv = jni.randomGen(Constants.SM4_IV_LEN);
+            cipherData = jni.sm4CBCEncrypt(key, iv, msg);
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
             return;
@@ -595,7 +595,7 @@ public class SMJniSM4ApiTest {
             System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData.getData()));
             System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv));
             System.out.println("[input data] key data: null");
-            SM4CBCResult plainData = jni.SM4CBCDecrypt(null, iv, cipherData.getData());
+            SM4CBCResult plainData = jni.sm4CBCDecrypt(null, iv, cipherData.getData());
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData.getData()));
             } else {
@@ -611,7 +611,7 @@ public class SMJniSM4ApiTest {
             System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData.getData()));
             System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv));
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key0));
-            SM4CBCResult plainData = jni.SM4CBCDecrypt(key0, iv, cipherData.getData());
+            SM4CBCResult plainData = jni.sm4CBCDecrypt(key0, iv, cipherData.getData());
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData.getData()));
             } else {
@@ -628,7 +628,7 @@ public class SMJniSM4ApiTest {
             System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData.getData()));
             System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv));
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key15));
-            SM4CBCResult plainData = jni.SM4CBCDecrypt(key15, iv, cipherData.getData());
+            SM4CBCResult plainData = jni.sm4CBCDecrypt(key15, iv, cipherData.getData());
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData.getData()));
             } else {
@@ -646,7 +646,7 @@ public class SMJniSM4ApiTest {
             System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData.getData()));
             System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv));
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key17));
-            SM4CBCResult plainData = jni.SM4CBCDecrypt(key17, iv, cipherData.getData());
+            SM4CBCResult plainData = jni.sm4CBCDecrypt(key17, iv, cipherData.getData());
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData.getData()));
             } else {
@@ -668,9 +668,9 @@ public class SMJniSM4ApiTest {
         byte[] iv = null;
         SM4CBCResult cipherData = null;
         try {
-            key = jni.RandomGen(Constants.SM4_KEY_LEN);
-            iv = jni.RandomGen(Constants.SM4_IV_LEN);
-            cipherData = jni.SM4CBCEncrypt(key, iv, msg);
+            key = jni.randomGen(Constants.SM4_KEY_LEN);
+            iv = jni.randomGen(Constants.SM4_IV_LEN);
+            cipherData = jni.sm4CBCEncrypt(key, iv, msg);
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
             return;
@@ -681,7 +681,7 @@ public class SMJniSM4ApiTest {
             System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData.getData()));
             System.out.println("[input data] iv data : null");
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key));
-            SM4CBCResult plainData = jni.SM4CBCDecrypt(key, null, cipherData.getData());
+            SM4CBCResult plainData = jni.sm4CBCDecrypt(key, null, cipherData.getData());
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData.getData()));
             } else {
@@ -697,7 +697,7 @@ public class SMJniSM4ApiTest {
             System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData.getData()));
             System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv0));
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key));
-            SM4CBCResult plainData = jni.SM4CBCDecrypt(key, iv0, cipherData.getData());
+            SM4CBCResult plainData = jni.sm4CBCDecrypt(key, iv0, cipherData.getData());
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData.getData()));
             } else {
@@ -714,7 +714,7 @@ public class SMJniSM4ApiTest {
             System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData.getData()));
             System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv15));
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key));
-            SM4CBCResult plainData = jni.SM4CBCDecrypt(key, iv15, cipherData.getData());
+            SM4CBCResult plainData = jni.sm4CBCDecrypt(key, iv15, cipherData.getData());
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData.getData()));
             } else {
@@ -732,7 +732,7 @@ public class SMJniSM4ApiTest {
             System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData.getData()));
             System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv17));
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key));
-            SM4CBCResult plainData = jni.SM4CBCDecrypt(key, iv17, cipherData.getData());
+            SM4CBCResult plainData = jni.sm4CBCDecrypt(key, iv17, cipherData.getData());
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData.getData()));
             } else {
@@ -754,9 +754,9 @@ public class SMJniSM4ApiTest {
         byte[] iv = null;
         SM4CBCResult cipherData = null;
         try {
-            key = jni.RandomGen(Constants.SM4_KEY_LEN);
-            iv = jni.RandomGen(Constants.SM4_IV_LEN);
-            cipherData = jni.SM4CBCEncrypt(key, iv, msg);
+            key = jni.randomGen(Constants.SM4_KEY_LEN);
+            iv = jni.randomGen(Constants.SM4_IV_LEN);
+            cipherData = jni.sm4CBCEncrypt(key, iv, msg);
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
             return;
@@ -767,7 +767,7 @@ public class SMJniSM4ApiTest {
             System.out.println("[input data] cipher data : null");
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key));
             System.out.println("[input data] iv data: " + Convert.bytesToHexString(iv));
-            SM4CBCResult plainData = jni.SM4CBCDecrypt(key, iv, null);
+            SM4CBCResult plainData = jni.sm4CBCDecrypt(key, iv, null);
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData.getData()));
             } else {
@@ -783,7 +783,7 @@ public class SMJniSM4ApiTest {
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg0));
             System.out.println("[input data] key data: " + Convert.bytesToHexString(key));
             System.out.println("[input data] iv data: " + Convert.bytesToHexString(iv));
-            SM4CBCResult plainData = jni.SM4CBCDecrypt(key, iv, msg0);
+            SM4CBCResult plainData = jni.sm4CBCDecrypt(key, iv, msg0);
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData.getData()));
             } else {
@@ -808,7 +808,7 @@ public class SMJniSM4ApiTest {
                     (byte)0xfe, (byte)0xdc, (byte)0xba, (byte)0x98, (byte)0x76, (byte)0x54, (byte)0x32, (byte)0x10 };
             System.out.println("[input data] key data : " + Convert.bytesToHexString(key));
 
-            byte[] ecbCipherData = jni.SM4ECBEncrypt(key, msg);
+            byte[] ecbCipherData = jni.sm4ECBEncrypt(key, msg);
             System.out.println("[output data] cipher data : " + Convert.bytesToHexString(ecbCipherData));
             if(Arrays.equals(ecbCipherData, GMEcbCipherData)) {
                 System.out.println("[compare result equal] SM4 ECBEncrypt data is equal with GM/T 0002-2012");
@@ -832,7 +832,7 @@ public class SMJniSM4ApiTest {
             byte[] ecbCipherResult = null;
 
             for ( int i = 0;i < 1000000; i++) {
-                ecbCipherResult = jni.SM4ECBEncrypt(key, msg);
+                ecbCipherResult = jni.sm4ECBEncrypt(key, msg);
                 msg = ecbCipherResult;
             }
             System.out.println("[output data] cipher data : " + Convert.bytesToHexString(ecbCipherResult));
@@ -861,7 +861,7 @@ public class SMJniSM4ApiTest {
             int num = 5;
             long startTime = System.currentTimeMillis();
             for(int i = 0;i < 1024*100*num; i++) {
-                ecbCipherData = jni.SM4ECBEncrypt(key, testPlainData);
+                ecbCipherData = jni.sm4ECBEncrypt(key, testPlainData);
             }
             long endTime = System.currentTimeMillis();
             float speed = (float) (100*num/ ((endTime - startTime)/1000.00));
@@ -887,7 +887,7 @@ public class SMJniSM4ApiTest {
                     (byte)0xfe, (byte)0xdc, (byte)0xba, (byte)0x98, (byte)0x76, (byte)0x54, (byte)0x32, (byte)0x10 };
             System.out.println("[input data] key data : " + Convert.bytesToHexString(key));
 
-            byte[] ecbPlainData = jni.SM4ECBDecrypt(key, GMEcbCipherData);
+            byte[] ecbPlainData = jni.sm4ECBDecrypt(key, GMEcbCipherData);
             System.out.println("[output data] plain data : " + Convert.bytesToHexString(ecbPlainData));
             if(Arrays.equals(ecbPlainData, msg)) {
                 System.out.println("[compare result equal] SM4 ECBDecrypt data is equal with GM/T 0002-2012");
@@ -913,7 +913,7 @@ public class SMJniSM4ApiTest {
 
             byte[] ecbPlainData = null;
             for(int i = 0; i < 1000000; i++) {
-                ecbPlainData = jni.SM4ECBDecrypt(key, GMEcbCipherData);
+                ecbPlainData = jni.sm4ECBDecrypt(key, GMEcbCipherData);
                 GMEcbCipherData = ecbPlainData;
             }
             System.out.println("[output data] plain data : " + Convert.bytesToHexString(GMEcbCipherData));
@@ -937,13 +937,13 @@ public class SMJniSM4ApiTest {
             }
             byte[] key = {(byte)0x01, (byte)0x23, (byte)0x45, (byte)0x67, (byte)0x89, (byte)0xab, (byte)0xcd, (byte)0xef,
                     (byte)0xfe, (byte)0xdc, (byte)0xba, (byte)0x98, (byte)0x76, (byte)0x54, (byte)0x32, (byte)0x10 };
-            byte[] ecbCipherData = jni.SM4ECBEncrypt(key, testPlainData);
+            byte[] ecbCipherData = jni.sm4ECBEncrypt(key, testPlainData);
 
             byte[] ecbPlainData = null;
             long startTime = System.currentTimeMillis();
             int num = 5;
             for(int i = 0; i < 1024*100*num; i++) {
-                ecbPlainData = jni.SM4ECBDecrypt(key, ecbCipherData);
+                ecbPlainData = jni.sm4ECBDecrypt(key, ecbCipherData);
             }
             long endTime = System.currentTimeMillis();
             float speed = (float) (100*num/ ((endTime - startTime)/1000.00));
@@ -976,7 +976,7 @@ public class SMJniSM4ApiTest {
                     (byte)0xF1,(byte)0x5D,(byte)0x12,(byte)0x7A,(byte)0x02,(byte)0xBC,(byte)0x65,(byte)0x89,};
             System.out.println("[input data] iv data : " + Convert.bytesToHexString(iv));
 
-            SM4CBCResult cbcCipherResult = jni.SM4CBCEncrypt(key, iv, msg);
+            SM4CBCResult cbcCipherResult = jni.sm4CBCEncrypt(key, iv, msg);
             if(Arrays.equals(cbcCipherResult.getData(), RefCipherData) ) {
                 System.out.println("[compare result equal] SM4 CBCEncrypt data is equal with third party software");
             } else {
@@ -1003,7 +1003,7 @@ public class SMJniSM4ApiTest {
             int num = 5;
             long startTime = System.currentTimeMillis();
             for(int i = 0;i < 1024*100*num; i++) {
-                cbcCipherResult = jni.SM4CBCEncrypt(key, iv, testPlainData);
+                cbcCipherResult = jni.sm4CBCEncrypt(key, iv, testPlainData);
             }
             long endTime = System.currentTimeMillis();
             float speed = (float) (100*num/ ((endTime - startTime)/1000.00));
@@ -1031,7 +1031,7 @@ public class SMJniSM4ApiTest {
                     (byte)0x48,(byte)0x0e,(byte)0x6f,(byte)0x3a,(byte)0xc7,(byte)0x58,(byte)0x0e,(byte)0x67,
                     (byte)0x74,(byte)0xad,(byte)0xdc,(byte)0x42,(byte)0xd7,(byte)0x3c,(byte)0xfb,(byte)0x4c};
 
-            SM4CBCResult cbcPlainResult = jni.SM4CBCDecrypt(key, iv, RefCipherData);
+            SM4CBCResult cbcPlainResult = jni.sm4CBCDecrypt(key, iv, RefCipherData);
             System.out.println("[input data] plain data : " + Convert.bytesToHexString(cbcPlainResult.getData()));
             if(Arrays.equals(cbcPlainResult.getData(), msg) ) {
                 System.out.println("[compare result equal] SM4 CBCDecrypt data is equal with third party software");
@@ -1056,12 +1056,12 @@ public class SMJniSM4ApiTest {
                     (byte)0x74,(byte)0xad,(byte)0xdc,(byte)0x42,(byte)0xd7,(byte)0x3c,(byte)0xfb,(byte)0x4c};
             byte[] iv = {(byte)0xF1,(byte)0x5D,(byte)0x12,(byte)0x7A,(byte)0x02,(byte)0xBC,(byte)0x65,(byte)0x89,
                     (byte)0xF1,(byte)0x5D,(byte)0x12,(byte)0x7A,(byte)0x02,(byte)0xBC,(byte)0x65,(byte)0x89,};
-            SM4CBCResult cbcCipherResult = jni.SM4CBCEncrypt(key, iv, testPlainData);
+            SM4CBCResult cbcCipherResult = jni.sm4CBCEncrypt(key, iv, testPlainData);
             SM4CBCResult cbcPlainResult = null;
             int num = 5;
             long startTime = System.currentTimeMillis();
             for(int i = 0;i < 1024*100*num; i++) {
-                cbcPlainResult = jni.SM4CBCDecrypt(key, iv, cbcCipherResult.getData());
+                cbcPlainResult = jni.sm4CBCDecrypt(key, iv, cbcCipherResult.getData());
             }
             long endTime = System.currentTimeMillis();
             float speed = (float) (100*num/ ((endTime - startTime)/1000.00));

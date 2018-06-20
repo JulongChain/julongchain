@@ -40,9 +40,9 @@ public class SMJniSM2ApiTest {
     {
         System.out.println("============= SMJniApi SM2MakeKey test =============");
         try {
-            byte[] sk = jni.RandomGen(Constants.SM2_SK_LEN);
+            byte[] sk = jni.randomGen(Constants.SM2_SK_LEN);
             System.out.println("[input data] SM2 private data : " + Convert.bytesToHexString(sk));
-            byte[] pk = jni.SM2MakeKey(sk);
+            byte[] pk = jni.sm2MakeKey(sk);
             if (null != pk) {
                 System.out.println("[output data] SM2 public key : " + Convert.bytesToHexString(pk));
             } else {
@@ -61,7 +61,7 @@ public class SMJniSM2ApiTest {
         try {
             System.out.println("\n**** case " + caseIndex++ + ": SM2MakeKey private key is null ****");
             System.out.println("[input data] SM2 private key : null " );
-            byte[] pk = jni.SM2MakeKey(null);
+            byte[] pk = jni.sm2MakeKey(null);
             if (null != pk) {
                 System.out.println("[output data] SM2 public key : " + Convert.bytesToHexString(pk));
             } else {
@@ -75,7 +75,7 @@ public class SMJniSM2ApiTest {
             System.out.println("\n**** case " + caseIndex++ + ": SM2MakeKey private key length is 0 ****");
             byte[] sk0 = new byte[0];
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(sk0));
-            byte[] pk = jni.SM2MakeKey(sk0);
+            byte[] pk = jni.sm2MakeKey(sk0);
             if (null != pk) {
                 System.out.println("[output data] SM2 public key : " + Convert.bytesToHexString(pk));
             } else {
@@ -87,9 +87,9 @@ public class SMJniSM2ApiTest {
 
         try {
             System.out.println("\n**** case " + caseIndex++ + ": SM2MakeKey private key length is 31 ****");
-            byte[] sk31 = jni.RandomGen(31);
+            byte[] sk31 = jni.randomGen(31);
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(sk31));
-            byte[] pk = jni.SM2MakeKey(sk31);
+            byte[] pk = jni.sm2MakeKey(sk31);
             if (null != pk) {
                 System.out.println("[output data] SM2 public key : " + Convert.bytesToHexString(pk));
             } else {
@@ -101,9 +101,9 @@ public class SMJniSM2ApiTest {
 
         try {
             System.out.println("\n**** case " + caseIndex++ + ": SM2MakeKey private key length is 33 ****");
-            byte[] sk33 = jni.RandomGen(33);
+            byte[] sk33 = jni.randomGen(33);
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(sk33));
-            byte[] pk = jni.SM2MakeKey(sk33);
+            byte[] pk = jni.sm2MakeKey(sk33);
             if (null != pk) {
                 System.out.println("[output data] SM2 public key : " + Convert.bytesToHexString(pk));
             } else {
@@ -131,7 +131,7 @@ public class SMJniSM2ApiTest {
         int kdfKeyLen = 32;
         try {
             System.out.println("\n**** case " + caseIndex++ + ": SM2KDF key is null ****");
-            byte[] kdfKey = jni.SM2KDF(null, kdfKeyLen);
+            byte[] kdfKey = jni.sm2KDF(null, kdfKeyLen);
             if (null != kdfKey) {
                 System.out.println("[output data] SM2 KDF key : " + Convert.bytesToHexString(kdfKey));
             } else {
@@ -144,7 +144,7 @@ public class SMJniSM2ApiTest {
         try {
             System.out.println("\n**** case " + caseIndex++ + ": SM2KDF key length is 0 ****");
             byte[] key0 = new byte[0];
-            byte[] kdfKey = jni.SM2KDF(key0, kdfKeyLen);
+            byte[] kdfKey = jni.sm2KDF(key0, kdfKeyLen);
             if (null != kdfKey) {
                 System.out.println("[output data] SM2 KDF key : " + Convert.bytesToHexString(kdfKey));
             } else {
@@ -161,7 +161,7 @@ public class SMJniSM2ApiTest {
                 key385[i] = (byte)((i+1)%255);
             }
             System.out.println("[input data] source key data : " + Convert.bytesToHexString(key385));
-            byte[] kdfKey = jni.SM2KDF(key385, kdfKeyLen);
+            byte[] kdfKey = jni.sm2KDF(key385, kdfKeyLen);
             if (null != kdfKey) {
                 System.out.println("[output data] SM2 KDF key : " + Convert.bytesToHexString(kdfKey));
             } else {
@@ -185,7 +185,7 @@ public class SMJniSM2ApiTest {
                 try {
                     System.out.println("\n**** case " + caseIndex++ + ": SM2KDF key length is "+ keyLen + "; KDF key length = " + kdfKeyLen +" ****");
                     System.out.println("[input data] source key data : " + Convert.bytesToHexString(key));
-                    byte[] kdfKey = jni.SM2KDF(key, kdfKeyLen);
+                    byte[] kdfKey = jni.sm2KDF(key, kdfKeyLen);
                     if (null != kdfKey) {
                         System.out.println("[output data] SM2 KDF key : " + Convert.bytesToHexString(kdfKey));
                     } else {
@@ -232,13 +232,13 @@ public class SMJniSM2ApiTest {
     {
         System.out.println("============= SMJniApi SM2Sign and SM2Verify test =============");
         try {
-            byte[] sk = jni.RandomGen(Constants.SM2_SK_LEN);
-            byte[] pk = jni.SM2MakeKey(sk);
+            byte[] sk = jni.randomGen(Constants.SM2_SK_LEN);
+            byte[] pk = jni.sm2MakeKey(sk);
             System.out.println("\n**** case 1 SM2Sign ****");
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(GMHash));
             System.out.println("[input data] random data : " + Convert.bytesToHexString(GMRandom));
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(sk));
-            byte[] signData = jni.SM2Sign(GMHash, GMRandom, sk);
+            byte[] signData = jni.sm2Sign(GMHash, GMRandom, sk);
             if (null != signData) {
                 System.out.println("[output data] SM2 signature data : " + Convert.bytesToHexString(signData));
             } else {
@@ -249,7 +249,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(GMHash));
             System.out.println("[input data] signature data : " + Convert.bytesToHexString(signData));
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(pk));
-            int verify = jni.SM2Verify(GMHash, pk, signData);
+            int verify = jni.sm2Verify(GMHash, pk, signData);
             if (0 == verify) {
                 System.out.println("[output data] SM2 verify signature success ");
             } else {
@@ -270,7 +270,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : null");
             System.out.println("[input data] random data : " + Convert.bytesToHexString(GMRandom));
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(GMSk));
-            byte[] signData = jni.SM2Sign(null, GMRandom, GMSk);
+            byte[] signData = jni.sm2Sign(null, GMRandom, GMSk);
             if (null != signData) {
                 System.out.println("[output data] SM2 signature data : " + Convert.bytesToHexString(signData));
             } else {
@@ -286,7 +286,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(hash0));
             System.out.println("[input data] random data : " + Convert.bytesToHexString(GMRandom));
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(GMSk));
-            byte[] signData = jni.SM2Sign(hash0, GMRandom, GMSk);
+            byte[] signData = jni.sm2Sign(hash0, GMRandom, GMSk);
             if (null != signData) {
                 System.out.println("[output data] SM2 signature data : " + Convert.bytesToHexString(signData));
             } else {
@@ -303,7 +303,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(hash31));
             System.out.println("[input data] random data : " + Convert.bytesToHexString(GMRandom));
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(GMSk));
-            byte[] signData = jni.SM2Sign(hash31, GMRandom, GMSk);
+            byte[] signData = jni.sm2Sign(hash31, GMRandom, GMSk);
             if (null != signData) {
                 System.out.println("[output data] SM2 signature data : " + Convert.bytesToHexString(signData));
             } else {
@@ -321,7 +321,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(hash33));
             System.out.println("[input data] random data : " + Convert.bytesToHexString(GMRandom));
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(GMSk));
-            byte[] signData = jni.SM2Sign(hash33, GMRandom, GMSk);
+            byte[] signData = jni.sm2Sign(hash33, GMRandom, GMSk);
             if (null != signData) {
                 System.out.println("[output data] SM2 signature data : " + Convert.bytesToHexString(signData));
             } else {
@@ -342,7 +342,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(GMHash));
             System.out.println("[input data] random data : null");
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(GMSk));
-            byte[] signData = jni.SM2Sign(GMHash, null, GMSk);
+            byte[] signData = jni.sm2Sign(GMHash, null, GMSk);
             if (null != signData) {
                 System.out.println("[output data] SM2 signature data : " + Convert.bytesToHexString(signData));
             } else {
@@ -358,7 +358,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(GMHash));
             System.out.println("[input data] random data : " + Convert.bytesToHexString(random0));
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(GMSk));
-            byte[] signData = jni.SM2Sign(GMHash, random0, GMSk);
+            byte[] signData = jni.sm2Sign(GMHash, random0, GMSk);
             if (null != signData) {
                 System.out.println("[output data] SM2 signature data : " + Convert.bytesToHexString(signData));
             } else {
@@ -375,7 +375,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(GMHash));
             System.out.println("[input data] random data : " + Convert.bytesToHexString(random31));
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(GMSk));
-            byte[] signData = jni.SM2Sign(GMHash, random31, GMSk);
+            byte[] signData = jni.sm2Sign(GMHash, random31, GMSk);
             if (null != signData) {
                 System.out.println("[output data] SM2 signature data : " + Convert.bytesToHexString(signData));
             } else {
@@ -393,7 +393,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(GMHash));
             System.out.println("[input data] random data : " + Convert.bytesToHexString(random33));
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(GMSk));
-            byte[] signData = jni.SM2Sign(GMHash, random33, GMSk);
+            byte[] signData = jni.sm2Sign(GMHash, random33, GMSk);
             if (null != signData) {
                 System.out.println("[output data] SM2 signature data : " + Convert.bytesToHexString(signData));
             } else {
@@ -414,7 +414,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(GMHash));
             System.out.println("[input data] random data : " + Convert.bytesToHexString(GMRandom));
             System.out.println("[input data] SM2 private key : null");
-            byte[] signData = jni.SM2Sign(GMHash, GMRandom, null);
+            byte[] signData = jni.sm2Sign(GMHash, GMRandom, null);
             if (null != signData) {
                 System.out.println("[output data] SM2 signature data : " + Convert.bytesToHexString(signData));
             } else {
@@ -430,7 +430,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(GMHash));
             System.out.println("[input data] random data : " + Convert.bytesToHexString(GMRandom));
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(sk0));
-            byte[] signData = jni.SM2Sign(GMHash, GMRandom, sk0);
+            byte[] signData = jni.sm2Sign(GMHash, GMRandom, sk0);
             if (null != signData) {
                 System.out.println("[output data] SM2 signature data : " + Convert.bytesToHexString(signData));
             } else {
@@ -447,7 +447,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(GMHash));
             System.out.println("[input data] random data : " + Convert.bytesToHexString(GMRandom));
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(sk31));
-            byte[] signData = jni.SM2Sign(GMHash, GMRandom, sk31);
+            byte[] signData = jni.sm2Sign(GMHash, GMRandom, sk31);
             if (null != signData) {
                 System.out.println("[output data] SM2 signature data : " + Convert.bytesToHexString(signData));
             } else {
@@ -465,7 +465,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(GMHash));
             System.out.println("[input data] random data : " + Convert.bytesToHexString(GMRandom));
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(sk33));
-            byte[] signData = jni.SM2Sign(GMHash, GMRandom, sk33);
+            byte[] signData = jni.sm2Sign(GMHash, GMRandom, sk33);
             if (null != signData) {
                 System.out.println("[output data] SM2 signature data : " + Convert.bytesToHexString(signData));
             } else {
@@ -486,7 +486,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : null");
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(GMPk));
             System.out.println("[input data] signature data : " + Convert.bytesToHexString(GMSignData));
-            int verify = jni.SM2Verify(null, GMPk, GMSignData);
+            int verify = jni.sm2Verify(null, GMPk, GMSignData);
             if (0 == verify) {
                 System.out.println("[output data] SM2 verify signature success ");
             } else {
@@ -502,7 +502,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(hash0));
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(GMPk));
             System.out.println("[input data] signature data : " + Convert.bytesToHexString(GMSignData));
-            int verify = jni.SM2Verify(hash0, GMPk, GMSignData);
+            int verify = jni.sm2Verify(hash0, GMPk, GMSignData);
             if (0 == verify) {
                 System.out.println("[output data] SM2 verify signature success ");
             } else {
@@ -519,7 +519,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(hash31));
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(GMPk));
             System.out.println("[input data] signature data : " + Convert.bytesToHexString(GMSignData));
-            int verify = jni.SM2Verify(hash31, GMPk, GMSignData);
+            int verify = jni.sm2Verify(hash31, GMPk, GMSignData);
             if (0 == verify) {
                 System.out.println("[output data] SM2 verify signature success ");
             } else {
@@ -537,7 +537,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(hash33));
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(GMPk));
             System.out.println("[input data] signature data : " + Convert.bytesToHexString(GMSignData));
-            int verify = jni.SM2Verify(hash33, GMPk, GMSignData);
+            int verify = jni.sm2Verify(hash33, GMPk, GMSignData);
             if (0 == verify) {
                 System.out.println("[output data] SM2 verify signature success ");
             } else {
@@ -558,7 +558,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(GMHash));
             System.out.println("[input data] SM2 public key : null");
             System.out.println("[input data] signature data : " + Convert.bytesToHexString(GMSignData));
-            int verify = jni.SM2Verify(GMHash, null, GMSignData);
+            int verify = jni.sm2Verify(GMHash, null, GMSignData);
             if (0 == verify) {
                 System.out.println("[output data] SM2 verify signature success ");
             } else {
@@ -574,7 +574,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(GMHash));
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(pk0));
             System.out.println("[input data] signature data : " + Convert.bytesToHexString(GMSignData));
-            int verify = jni.SM2Verify(GMHash, pk0, GMSignData);
+            int verify = jni.sm2Verify(GMHash, pk0, GMSignData);
             if (0 == verify) {
                 System.out.println("[output data] SM2 verify signature success ");
             } else {
@@ -591,7 +591,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(GMHash));
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(pk63));
             System.out.println("[input data] signature data : " + Convert.bytesToHexString(GMSignData));
-            int verify = jni.SM2Verify(GMHash, pk63, GMSignData);
+            int verify = jni.sm2Verify(GMHash, pk63, GMSignData);
             if (0 == verify) {
                 System.out.println("[output data] SM2 verify signature success ");
             } else {
@@ -609,7 +609,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(GMHash));
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(pk65));
             System.out.println("[input data] signature data : " + Convert.bytesToHexString(GMSignData));
-            int verify = jni.SM2Verify(GMHash, pk65, GMSignData);
+            int verify = jni.sm2Verify(GMHash, pk65, GMSignData);
             if (0 == verify) {
                 System.out.println("[output data] SM2 verify signature success ");
             } else {
@@ -630,7 +630,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(GMHash));
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(GMPk));
             System.out.println("[input data] signature data : null");
-            int verify = jni.SM2Verify(GMHash, GMHash, null);
+            int verify = jni.sm2Verify(GMHash, GMHash, null);
             if (0 == verify) {
                 System.out.println("[output data] SM2 verify signature success ");
             } else {
@@ -646,7 +646,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(GMHash));
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(GMPk));
             System.out.println("[input data] signature data : " + Convert.bytesToHexString(sign0));
-            int verify = jni.SM2Verify(GMHash, GMHash, sign0);
+            int verify = jni.sm2Verify(GMHash, GMHash, sign0);
             if (0 == verify) {
                 System.out.println("[output data] SM2 verify signature success ");
             } else {
@@ -663,7 +663,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(GMHash));
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(GMPk));
             System.out.println("[input data] signature data : " + Convert.bytesToHexString(sign63));
-            int verify = jni.SM2Verify(GMHash, GMHash, sign63);
+            int verify = jni.sm2Verify(GMHash, GMHash, sign63);
             if (0 == verify) {
                 System.out.println("[output data] SM2 verify signature success ");
             } else {
@@ -681,7 +681,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash data : " + Convert.bytesToHexString(GMHash));
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(GMPk));
             System.out.println("[input data] signature data : " + Convert.bytesToHexString(sign65));
-            int verify = jni.SM2Verify(GMHash, GMHash, sign65);
+            int verify = jni.sm2Verify(GMHash, GMHash, sign65);
             if (0 == verify) {
                 System.out.println("[output data] SM2 verify signature success ");
             } else {
@@ -701,13 +701,13 @@ public class SMJniSM2ApiTest {
                 (byte) 0x60, (byte) 0xA0, (byte) 0x71, (byte) 0x6B,
                 (byte) 0x3F, (byte) 0x8E, (byte) 0x3C, (byte) 0xA1};
         try {
-            byte[] sk = jni.RandomGen(Constants.SM2_SK_LEN);
-            byte[] pk = jni.SM2MakeKey(sk);
+            byte[] sk = jni.randomGen(Constants.SM2_SK_LEN);
+            byte[] pk = jni.sm2MakeKey(sk);
             System.out.println("\n**** case 1 SM2Encrypt ****");
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
             System.out.println("[input data] random data : " + Convert.bytesToHexString(GMRandom));
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(pk));
-            byte[] cipherData = jni.SM2Encrypt(msg, GMRandom, pk);
+            byte[] cipherData = jni.sm2Encrypt(msg, GMRandom, pk);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData));
             } else {
@@ -717,7 +717,7 @@ public class SMJniSM2ApiTest {
             System.out.println("\n**** case 2 SM2Decrypt ****");
             System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData));
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(sk));
-            byte[] plainData = jni.SM2Decrypt(cipherData, sk);
+            byte[] plainData = jni.sm2Decrypt(cipherData, sk);
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData));
             } else {
@@ -738,7 +738,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] message data : null");
             System.out.println("[input data] random data : " + Convert.bytesToHexString(GMRandom));
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(GMPk));
-            byte[] cipherData = jni.SM2Encrypt(null, GMRandom, GMPk);
+            byte[] cipherData = jni.sm2Encrypt(null, GMRandom, GMPk);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData));
             } else {
@@ -754,7 +754,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg0));
             System.out.println("[input data] random data : " + Convert.bytesToHexString(GMRandom));
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(GMPk));
-            byte[] cipherData = jni.SM2Encrypt(msg0, GMRandom, GMPk);
+            byte[] cipherData = jni.sm2Encrypt(msg0, GMRandom, GMPk);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData));
             } else {
@@ -778,7 +778,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
             System.out.println("[input data] random data : null");
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(GMPk));
-            byte[] cipherData = jni.SM2Encrypt(msg, null, GMPk);
+            byte[] cipherData = jni.sm2Encrypt(msg, null, GMPk);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData));
             } else {
@@ -794,7 +794,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
             System.out.println("[input data] random data : " + Convert.bytesToHexString(random0));
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(GMPk));
-            byte[] cipherData = jni.SM2Encrypt(msg, random0, GMPk);
+            byte[] cipherData = jni.sm2Encrypt(msg, random0, GMPk);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData));
             } else {
@@ -811,7 +811,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
             System.out.println("[input data] random data : " + Convert.bytesToHexString(random31));
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(GMPk));
-            byte[] cipherData = jni.SM2Encrypt(msg, random31, GMPk);
+            byte[] cipherData = jni.sm2Encrypt(msg, random31, GMPk);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData));
             } else {
@@ -829,7 +829,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
             System.out.println("[input data] random data : " + Convert.bytesToHexString(random33));
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(GMPk));
-            byte[] cipherData = jni.SM2Encrypt(msg, random33, GMPk);
+            byte[] cipherData = jni.sm2Encrypt(msg, random33, GMPk);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData));
             } else {
@@ -853,7 +853,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
             System.out.println("[input data] random data : " + Convert.bytesToHexString(GMRandom));
             System.out.println("[input data] SM2 public key : null");
-            byte[] cipherData = jni.SM2Encrypt(msg, GMRandom, null);
+            byte[] cipherData = jni.sm2Encrypt(msg, GMRandom, null);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData));
             } else {
@@ -869,7 +869,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
             System.out.println("[input data] random data : " + Convert.bytesToHexString(GMRandom));
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(pk0));
-            byte[] cipherData = jni.SM2Encrypt(msg, GMRandom, pk0);
+            byte[] cipherData = jni.sm2Encrypt(msg, GMRandom, pk0);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData));
             } else {
@@ -886,7 +886,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
             System.out.println("[input data] random data : " + Convert.bytesToHexString(GMRandom));
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(pk63));
-            byte[] cipherData = jni.SM2Encrypt(msg, GMRandom, pk63);
+            byte[] cipherData = jni.sm2Encrypt(msg, GMRandom, pk63);
             if (null != cipherData) {
                 System.out.println("[output data] cipherdata : " + Convert.bytesToHexString(cipherData));
             } else {
@@ -904,7 +904,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
             System.out.println("[input data] random data : " + Convert.bytesToHexString(GMRandom));
             System.out.println("[input data] SM2 public key : " + Convert.bytesToHexString(pk65));
-            byte[] cipherData = jni.SM2Encrypt(msg, GMRandom, pk65);
+            byte[] cipherData = jni.sm2Encrypt(msg, GMRandom, pk65);
             if (null != cipherData) {
                 System.out.println("[output data] cipher data : " + Convert.bytesToHexString(cipherData));
             } else {
@@ -924,7 +924,7 @@ public class SMJniSM2ApiTest {
                 (byte) 0x3F, (byte) 0x8E, (byte) 0x3C, (byte) 0xA1};
         byte[] cipherData = null;
         try {
-            cipherData = jni.SM2Encrypt(msg, GMRandom, GMPk);
+            cipherData = jni.sm2Encrypt(msg, GMRandom, GMPk);
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
             return;
@@ -935,7 +935,7 @@ public class SMJniSM2ApiTest {
             System.out.println("\n**** case " + caseIndex++ + ": SM2Decrypt cipher data is null ****");
             System.out.println("[input data] cipher data : null" + Convert.bytesToHexString(cipherData));
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(GMSk));
-            byte[] plainData = jni.SM2Decrypt(null, GMSk);
+            byte[] plainData = jni.sm2Decrypt(null, GMSk);
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData));
             } else {
@@ -950,7 +950,7 @@ public class SMJniSM2ApiTest {
             byte[] cipherData0 = new byte[0];
             System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData0));
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(GMSk));
-            byte[] plainData = jni.SM2Decrypt(cipherData0, GMSk);
+            byte[] plainData = jni.sm2Decrypt(cipherData0, GMSk);
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData));
             } else {
@@ -970,7 +970,7 @@ public class SMJniSM2ApiTest {
                 (byte) 0x3F, (byte) 0x8E, (byte) 0x3C, (byte) 0xA1};
         byte[] cipherData = null;
         try {
-            cipherData = jni.SM2Encrypt(msg, GMRandom, GMPk);
+            cipherData = jni.sm2Encrypt(msg, GMRandom, GMPk);
         } catch (Exception e) {
             System.out.println("Exception: " + e.getMessage());
             return;
@@ -981,7 +981,7 @@ public class SMJniSM2ApiTest {
             System.out.println("\n**** case " + caseIndex++ + ": SM2Decrypt sk is null ****");
             System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData));
             System.out.println("[input data] SM2 private key : null");
-            byte[] plainData = jni.SM2Decrypt(cipherData, null);
+            byte[] plainData = jni.sm2Decrypt(cipherData, null);
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData));
             } else {
@@ -996,7 +996,7 @@ public class SMJniSM2ApiTest {
             byte[] sk0 = new byte[0];
             System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData));
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(sk0));
-            byte[] plainData = jni.SM2Decrypt(cipherData, sk0);
+            byte[] plainData = jni.sm2Decrypt(cipherData, sk0);
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData));
             } else {
@@ -1012,7 +1012,7 @@ public class SMJniSM2ApiTest {
             System.arraycopy(GMSk, 0, sk31, 0, 31);
             System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData));
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(sk31));
-            byte[] plainData = jni.SM2Decrypt(cipherData, sk31);
+            byte[] plainData = jni.sm2Decrypt(cipherData, sk31);
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData));
             } else {
@@ -1029,7 +1029,7 @@ public class SMJniSM2ApiTest {
             sk33[32] = 0x33;
             System.out.println("[input data] cipher data : " + Convert.bytesToHexString(cipherData));
             System.out.println("[input data] SM2 private key : " + Convert.bytesToHexString(sk33));
-            byte[] plainData = jni.SM2Decrypt(cipherData, sk33);
+            byte[] plainData = jni.sm2Decrypt(cipherData, sk33);
             if (null != plainData) {
                 System.out.println("[output data] plain data : " + Convert.bytesToHexString(plainData));
             } else {
@@ -1074,7 +1074,7 @@ public class SMJniSM2ApiTest {
                     (byte)0x2D, (byte)0xC6, (byte)0xEA, (byte)0x71, (byte)0x8C, (byte)0xC1, (byte)0xAA, (byte)0x60,
                     (byte)0x0A, (byte)0xED, (byte)0x05, (byte)0xFB, (byte)0xF3, (byte)0x5E, (byte)0x08, (byte)0x4A,
                     (byte)0x66, (byte)0x32, (byte)0xF6, (byte)0x07, (byte)0x2D, (byte)0xA9, (byte)0xAD, (byte)0x13};
-            byte[] cipherData = jni.SM2Encrypt(plaintext, random, pk);
+            byte[] cipherData = jni.sm2Encrypt(plaintext, random, pk);
             System.out.println("[output data] cipher data : " + bytesToHexString(cipherData));
             if(Arrays.equals(cipherData, GMCipherData)) {
                 System.out.println("[compare result equal] SM2 encrypt data is equal with GM/T 0003.5-2012");
@@ -1112,7 +1112,7 @@ public class SMJniSM2ApiTest {
                     (byte)0x3F, (byte)0x36, (byte)0xE3, (byte)0x8A, (byte)0xC6, (byte)0xD3, (byte)0x9F, (byte)0x95,
                     (byte)0x88, (byte)0x93, (byte)0x93, (byte)0x69, (byte)0x28, (byte)0x60, (byte)0xB5, (byte)0x1A,
                     (byte)0x42, (byte)0xFB, (byte)0x81, (byte)0xEF, (byte)0x4D, (byte)0xF7, (byte)0xC5, (byte)0xB8};
-            byte[] plainData = jni.SM2Decrypt(GBCipherData, sk);
+            byte[] plainData = jni.sm2Decrypt(GBCipherData, sk);
             System.out.println("[output data] plain data : " + bytesToHexString(plainData));
             if(Arrays.equals(plainData, GMPlainData)) {
                 System.out.println("[compare result equal] SM2 decrypt data is equal with GM/T 0003.5-2012");
@@ -1128,7 +1128,7 @@ public class SMJniSM2ApiTest {
     public void SM2SignDataCompareWithStandardData() {
         System.out.println("============= SMJniApi SM2 Sign data compare with GM/T 0003.5-2012 =============");
         try {
-            byte[] signData = jni.SM2Sign(GMHash, GMRandom, GMSk);
+            byte[] signData = jni.sm2Sign(GMHash, GMRandom, GMSk);
             System.out.println("[output data] signature data : " + bytesToHexString(signData));
             if(Arrays.equals(signData, GMSignData)) {
                 System.out.println("[compare result equal] SM2 signature data is equal with GM/T 0003.5-2012");
@@ -1148,7 +1148,7 @@ public class SMJniSM2ApiTest {
             long startTime = System.currentTimeMillis();
 
             for(int i = 0; i < 10000; i++) {
-                byte[] sign = jni.SM2Sign(GMHash, GMRandom, GMSk);
+                byte[] sign = jni.sm2Sign(GMHash, GMRandom, GMSk);
             }
             long endTime = System.currentTimeMillis();
             float speed = (float) (10000.00 / ((endTime - startTime)/1000.00));
@@ -1166,7 +1166,7 @@ public class SMJniSM2ApiTest {
             System.out.println("[input data] hash : " + Convert.bytesToHexString(GMHash));
             System.out.println("[input data] pk : " + Convert.bytesToHexString(GMPk));
             System.out.println("[input data] signature : " + Convert.bytesToHexString(GMSignData));
-            int verifyResult = jni.SM2Verify(GMHash, GMPk, GMSignData);
+            int verifyResult = jni.sm2Verify(GMHash, GMPk, GMSignData);
             if(verifyResult == 0) {
                 System.out.println("[verify result success] SM2 verify signature data success.");
             } else {
@@ -1185,7 +1185,7 @@ public class SMJniSM2ApiTest {
             long startTime = System.currentTimeMillis();
             int totalRound = 10000;
             for(int i = 0; i < totalRound; i++) {
-                verifyResult = jni.SM2Verify(GMHash, GMPk, GMSignData);
+                verifyResult = jni.sm2Verify(GMHash, GMPk, GMSignData);
             }
             long endTime = System.currentTimeMillis();
             float speed = (float) (totalRound / ((endTime - startTime)/1000.00));

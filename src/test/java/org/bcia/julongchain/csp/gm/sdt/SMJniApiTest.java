@@ -50,7 +50,7 @@ public class SMJniApiTest {
             try {
                 int len = lists[index];
                 System.out.println("\n**** case " + caseIndex++ + ": generate random length = " + len + "  ****");
-                byte[] random = jni.RandomGen(len);
+                byte[] random = jni.randomGen(len);
                 if (null != random) {
                     System.out.println("[output data] random data : " + Convert.bytesToHexString(random));
                 } else {
