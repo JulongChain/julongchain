@@ -35,9 +35,12 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import static org.bcia.julongchain.common.ledger.util.IoUtil.gzipWriter;
 
 /**
  * 类描述
@@ -99,15 +102,17 @@ public class LedgerManagerTest {
     @Test
     public void commitBlock() throws Exception{
     	//重置账本文件
-//    	deleteDir(new File(LedgerConfig.getRootPath()));
+    	deleteDir(new File(LedgerConfig.getRootPath()));
     	//初始化账本
 		LedgerManager.initialize(null);
-//		LedgerManager.createLedger(new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance()).getGenesisBlock("myGroup"));
-//		LedgerManager.createLedger(new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance()).getGenesisBlock("mytestgroupid2"));
+		LedgerManager.createLedger(new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance()).getGenesisBlock("myGroup"));
+		LedgerManager.createLedger(new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance()).getGenesisBlock("mytestgroupid2"));
 		//获取账本对象
 		l = LedgerManager.openLedger("myGroup");
+		//当前账本高度
+		long height = l.getBlockchainInfo().getHeight() - 1;
         //构建区块
-        Common.Block block = constructBlock(l.getBlockByNumber(0), "myGroup", Common.HeaderType.NODE_RESOURCE_UPDATE,
+        Common.Block block = constructBlock(l.getBlockByNumber(height), "myGroup", Common.HeaderType.NODE_RESOURCE_UPDATE,
 				//构建交易模拟集
 				constructTxSimulationResults("myGroup", "key0", "value0").getPublicReadWriteSet().toByteString(),
 				constructTxSimulationResults("myGroup", "key1", "value1").getPublicReadWriteSet().toByteString(),
@@ -116,7 +121,7 @@ public class LedgerManagerTest {
 				constructTxSimulationResults("myGroup", "key4", "value4").getPublicReadWriteSet().toByteString(),
 				constructTxSimulationResults("myGroup", "key5", "value5").getPublicReadWriteSet().toByteString()
 				);
-
+        block.getHeader().getPreviousHash();
         //构建私有数据集
         BlockAndPvtData bap = new BlockAndPvtData();
         bap.setBlock(block);
@@ -132,8 +137,10 @@ public class LedgerManagerTest {
         l.commitWithPvtData(bap);
 		//获取账本对象
 		l = LedgerManager.openLedger("mytestgroupid2");
+	    //当前账本高度
+	    height = l.getBlockchainInfo().getHeight() - 1;
 		//构建区块
-		Common.Block block1 = constructBlock(l.getBlockByNumber(0), "mytestgroupid2", Common.HeaderType.ENDORSER_TRANSACTION,
+		Common.Block block1 = constructBlock(l.getBlockByNumber(height), "mytestgroupid2", Common.HeaderType.ENDORSER_TRANSACTION,
 				//构建交易模拟集
 				constructTxSimulationResults("mytestgroupid2", "key0", "value0").getPublicReadWriteSet().toByteString(),
 				constructTxSimulationResults("mytestgroupid2", "key1", "value1").getPublicReadWriteSet().toByteString(),
@@ -175,7 +182,7 @@ public class LedgerManagerTest {
 		Common.BlockData data = builder.build();
 
 		Common.BlockHeader blockHeader = Common.BlockHeader.newBuilder()
-                .setPreviousHash(preBlock.getHeader().getDataHash())
+                .setPreviousHash(ByteString.copyFrom(Util.getHashBytes(preBlock.getHeader().toByteArray())))
                 .setNumber(preBlock.getHeader().getNumber() + 1)
                 .setDataHash(ByteString.copyFrom(Util.getHashBytes(data.toByteArray())))
                 .build();
@@ -357,15 +364,26 @@ public class LedgerManagerTest {
         Assert.assertEquals(LedgerManager.getLedgerIDs().get(1), groupID);
     }
 
+    @Test
+    public void testGetBlocksIterator() throws Exception{
+	    LedgerManager.initialize(null);
+	    l = LedgerManager.openLedger("myGroup");
+	    IResultsIterator blocksIterator = l.getBlocksIterator(0);
+	    Object obj = blocksIterator.next().getObj();
+	    while(obj != null){
+		    System.out.println(blocksIterator.next().getObj());
+	    }
+    }
+
     public static void soutBytes(byte[] bytes){
         int i = 0;
         for(byte b : bytes){
             System.out.print(b + ",");
             if (i++ % 30 == 29) {
                 System.out.println();
-                System.out.println(i);
             }
         }
         System.out.println();
+	    System.out.println(i);
     }
 }

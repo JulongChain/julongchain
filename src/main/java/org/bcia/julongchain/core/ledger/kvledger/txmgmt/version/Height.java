@@ -27,7 +27,7 @@ import org.bcia.julongchain.core.ledger.util.Util;
  * @date 2018/3/9
  * @company Dingxuan
  */
-public class Height {
+public class Height implements Comparable<Height> {
 
     private long blockNum;
     private long txNum;
@@ -54,9 +54,9 @@ public class Height {
         return txNum;
     }
 
-    public void setTxNum(long txNum) {
-        this.txNum = txNum;
-    }
+	public void setTxNum(long txNum) {
+		this.txNum = txNum;
+	}
 
     public byte[] toBytes(){
         byte[] blockNumBytes = Util.longToBytes(blockNum, BlockFileManager.PEEK_BYTES_LEN);
@@ -64,8 +64,9 @@ public class Height {
         return ArrayUtils.addAll(blockNumBytes, txNumBytes);
     }
 
-    public int compare(Height h){
-        int res = 0;
+    @Override
+    public int compareTo(Height h){
+        int res;
         if(this.blockNum != h.blockNum){
             res = (int) (this.blockNum - h.blockNum);
         } else if(this.txNum != h.txNum) {
@@ -83,6 +84,6 @@ public class Height {
         if(h2 == null){
             return false;
         }
-        return h1.compare(h2) == 0;
+        return h1.compareTo(h2) == 0;
     }
 }

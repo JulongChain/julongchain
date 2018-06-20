@@ -186,14 +186,12 @@ public class Helper {
         } catch (LedgerException e) {
             sim.done();
             throw e;
-        } catch (InvalidTxException e) {
-        	throw e;
         }
         sim.done();
         return simRes.getPublicReadWriteSet();
     }
 
-    public static void postprocessProtoBlock(Common.Block.Builder blockBuilder, Block validatedBlock) throws LedgerException {
+    static void postprocessProtoBlock(Common.Block.Builder blockBuilder, Block validatedBlock) {
         TxValidationFlags txsFilter = TxValidationFlags.fromByteString(blockBuilder.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
         for(Transaction tx : validatedBlock.getTxs()){
             txsFilter.setFlag(tx.getIndexInBlock(), tx.getValidationCode());
@@ -203,7 +201,7 @@ public class Helper {
         blockBuilder.setMetadata(blockMetadataBuilder);
     }
 
-    public static void addPvtRWSetToPvtUpdateBatch(TxPvtRwSet pvtRwSet, PvtUpdateBatch pvtUpdateBatch, Height ver) throws LedgerException {
+    private static void addPvtRWSetToPvtUpdateBatch(TxPvtRwSet pvtRwSet, PvtUpdateBatch pvtUpdateBatch, Height ver) throws LedgerException {
         for(NsPvtRwSet ns : pvtRwSet.getNsPvtRwSets()){
             for(CollPvtRwSet coll : ns.getCollPvtRwSets()){
                 for(KvRwset.KVWrite kvWrite : coll.getKvRwSet().getWritesList()){
