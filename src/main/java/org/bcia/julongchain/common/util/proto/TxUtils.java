@@ -73,13 +73,19 @@ public class TxUtils {
     }
 
     public static Common.Envelope getEnvelopeFromBlock(byte[] data) {
-        Common.Envelope.Builder envelope = Common.Envelope.newBuilder();
+//        Common.Envelope.Builder envelope = Common.Envelope.newBuilder();
+//        try {
+//            envelope.mergeFrom(data);
+//        } catch (InvalidProtocolBufferException e) {
+//            e.printStackTrace();
+//        }
+        Common.Envelope envelope= null;
         try {
-            envelope.mergeFrom(data);
+            envelope = Common.Envelope.parseFrom(data);
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
         }
-        return envelope.build();
+        return envelope;
     }
 
     public static Common.Envelope createSignedEnvelope (int txType, String groupId, ILocalSigner signer, Message dataMsg, int msgVersion, long epoch) {
