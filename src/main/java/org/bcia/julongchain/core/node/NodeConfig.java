@@ -237,6 +237,7 @@ public class NodeConfig {
      */
     public static class SmartContract {
         private String instantiatePath;
+        private String coreNodeAddress;
         private Map<String, String> id;
         private String builder;
         private boolean pull;
@@ -370,6 +371,14 @@ public class NodeConfig {
 
         public void setInstantiatePath(String instantiatePath) {
             this.instantiatePath = instantiatePath;
+        }
+
+        public String getCoreNodeAddress() {
+            return coreNodeAddress;
+        }
+
+        public void setCoreNodeAddress(String coreNodeAddress) {
+            this.coreNodeAddress = coreNodeAddress;
         }
     }
 
