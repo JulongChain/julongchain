@@ -42,10 +42,10 @@ public class SM4 {
      *
      * @return 密钥
      */
-    public static byte[] SM4KeyGen() throws JavaChainException{
+    public static byte[] generateKey() throws JavaChainException{
         byte[] result = null;
         try {
-            result = smJniApi.RandomGen(Constants.SM4_KEY_LEN);
+            result = smJniApi.randomGen(Constants.SM4_KEY_LEN);
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw new JavaChainException("SM4KeyGen error: generate random failed.");
@@ -113,12 +113,12 @@ public class SM4 {
                 switch (type) {
                     case TYPE_ENCRYPT:
                     {
-                        tmpDestData = smJniApi.SM4ECBEncrypt(key, tmpSrcData);
+                        tmpDestData = smJniApi.sm4ECBEncrypt(key, tmpSrcData);
                         break;
                     }
                     case TYPE_DECRYPT:
                     {
-                        tmpDestData = smJniApi.SM4ECBDecrypt(key, tmpSrcData);
+                        tmpDestData = smJniApi.sm4ECBDecrypt(key, tmpSrcData);
                         break;
                     }
                     default:
@@ -220,12 +220,12 @@ public class SM4 {
                 switch (type) {
                     case TYPE_ENCRYPT:
                     {
-                        tmpResult = smJniApi.SM4CBCEncrypt(key, tmpIv, tmpSrcData);
+                        tmpResult = smJniApi.sm4CBCEncrypt(key, tmpIv, tmpSrcData);
                         break;
                     }
                     case TYPE_DECRYPT:
                     {
-                        tmpResult = smJniApi.SM4CBCDecrypt(key, tmpIv, tmpSrcData);
+                        tmpResult = smJniApi.sm4CBCDecrypt(key, tmpIv, tmpSrcData);
                         break;
                     }
                     default:

@@ -31,24 +31,19 @@ public class SM4Key implements IKey {
     private SM3 sm3;
     private byte[] sm4Key;
 
-    public SM4Key() throws JavaChainException {
-        this.sm3 = new SM3();
-        this.sm4Key = SM4.SM4KeyGen();
-    }
-
     public SM4Key(byte[] sm4Key) {
         this.sm3 = new SM3();
         this.sm4Key = sm4Key;
     }
 
     public byte[] toBytes() {
-        return sm4Key;
+        return this.sm4Key;
     }
 
     @Override
     public byte[] ski() {
         try {
-            return sm3.hash(sm4Key);
+            return sm3.hash(this.sm4Key);
         } catch (Exception e) {
             return null;
         }

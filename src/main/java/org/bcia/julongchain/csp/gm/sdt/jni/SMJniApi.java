@@ -49,7 +49,7 @@ public class SMJniApi {
         }
     }
 
-    public byte[] RandomGen(int length) throws Exception {
+    public byte[] randomGen(int length) throws Exception {
         if(0 > length) {
             throw new JavaChainException(getErrorMsg(SMJNIAPI_ERR_PARAM));
         }
@@ -62,7 +62,7 @@ public class SMJniApi {
         return outData;
     }
 
-    public byte[] SM2MakeKey(byte[] sk) throws Exception {
+    public byte[] sm2MakeKey(byte[] sk) throws Exception {
         if(null == sk) {
             throw new JavaChainException(getErrorMsg(SMJNIAPI_ERR_PARAM));
         }
@@ -75,7 +75,7 @@ public class SMJniApi {
         return outData;
     }
 
-    public byte[] SM2KDF(byte[] key, int length) throws Exception {
+    public byte[] sm2KDF(byte[] key, int length) throws Exception {
         if(null == key || 0 > length) {
             throw new JavaChainException(getErrorMsg(SMJNIAPI_ERR_PARAM));
         }
@@ -89,7 +89,7 @@ public class SMJniApi {
         return outData;
     }
 
-    public byte[] SM2Sign(byte[] hash, byte[] random,
+    public byte[] sm2Sign(byte[] hash, byte[] random,
                           byte[] priKey) throws Exception {
         if(null == hash || null == random || null == priKey) {
             throw new JavaChainException(getErrorMsg(SMJNIAPI_ERR_PARAM));
@@ -105,7 +105,7 @@ public class SMJniApi {
         return outData;
     }
 
-    public int SM2Verify(byte[] hash, byte[] pubKey,
+    public int sm2Verify(byte[] hash, byte[] pubKey,
                             byte[] sign) throws Exception {
         if(null == hash || null == pubKey ||  null == sign) {
             throw new JavaChainException(getErrorMsg(SMJNIAPI_ERR_PARAM));
@@ -122,7 +122,7 @@ public class SMJniApi {
         return result;
     }
 
-    public byte[] SM2Encrypt(byte[] plainData, byte[] random,
+    public byte[] sm2Encrypt(byte[] plainData, byte[] random,
                           byte[] pubKey) throws Exception {
         if(null == plainData || null == random || null == pubKey) {
             throw new JavaChainException(getErrorMsg(SMJNIAPI_ERR_PARAM));
@@ -136,7 +136,7 @@ public class SMJniApi {
         return outData;
     }
 
-    public byte[] SM2Decrypt(byte[] cipherData, byte[] priKey) throws Exception {
+    public byte[] sm2Decrypt(byte[] cipherData, byte[] priKey) throws Exception {
         if(null == cipherData || null == priKey) {
             throw new JavaChainException(getErrorMsg(SMJNIAPI_ERR_PARAM));
         }
@@ -149,7 +149,7 @@ public class SMJniApi {
         return outData;
     }
 
-    public byte[] SM3Hash(byte[] message) throws Exception {
+    public byte[] sm3Hash(byte[] message) throws Exception {
         if(null == message) {
             throw new JavaChainException(getErrorMsg(SMJNIAPI_ERR_PARAM));
         }
@@ -162,7 +162,7 @@ public class SMJniApi {
         return outData;
     }
 
-    public byte[] SM4ECBEncrypt(byte[] key, byte[] plainData) throws JavaChainException {
+    public byte[] sm4ECBEncrypt(byte[] key, byte[] plainData) throws JavaChainException {
         if(null == key || null == plainData) {
             throw new JavaChainException(getErrorMsg(SMJNIAPI_ERR_PARAM));
         }
@@ -175,7 +175,7 @@ public class SMJniApi {
         return outData;
     }
 
-    public byte[] SM4ECBDecrypt(byte[] key, byte[] cipherData) throws JavaChainException {
+    public byte[] sm4ECBDecrypt(byte[] key, byte[] cipherData) throws JavaChainException {
         if(null == key || null == cipherData) {
             throw new JavaChainException(getErrorMsg(SMJNIAPI_ERR_PARAM));
         }
@@ -188,7 +188,7 @@ public class SMJniApi {
         return outData;
     }
 
-    public SM4CBCResult SM4CBCEncrypt(byte[] key, byte[] iv, byte[] plainData) throws JavaChainException {
+    public SM4CBCResult sm4CBCEncrypt(byte[] key, byte[] iv, byte[] plainData) throws JavaChainException {
         if(null == key || null == iv || null == plainData) {
             throw new JavaChainException(getErrorMsg(SMJNIAPI_ERR_PARAM));
         }
@@ -207,7 +207,7 @@ public class SMJniApi {
         return null;
     }
 
-    public SM4CBCResult SM4CBCDecrypt(byte[] key, byte[] iv, byte[] cipherData) throws JavaChainException {
+    public SM4CBCResult sm4CBCDecrypt(byte[] key, byte[] iv, byte[] cipherData) throws JavaChainException {
         if(null == key || null == iv || null == cipherData) {
             throw new JavaChainException(getErrorMsg(SMJNIAPI_ERR_PARAM));
         }

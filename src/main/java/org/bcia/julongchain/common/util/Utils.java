@@ -17,7 +17,11 @@ package org.bcia.julongchain.common.util;
 
 import com.google.protobuf.Timestamp;
 import com.google.protobuf.util.Timestamps;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import java.io.*;
+import java.nio.charset.Charset;
 import java.util.Date;
 
 /**
@@ -53,4 +57,17 @@ public class Utils {
         }
         return results;
     }
+
+  public static void replaceFileContent(String filePath, String oldStr, String newStr) throws IOException {
+    String string = FileUtils.readFileToString(new File(filePath), Charset.forName("UTF-8"));
+    string = StringUtils.replaceAll(string, oldStr, newStr);
+    FileUtils.writeStringToFile(new File(filePath), string, Charset.forName("UTF-8"));
+  }
+
+  public static void main(String[] args) throws IOException {
+    String filePath = "/root/test.txt";
+    String oldStr = "bbbbb";
+    String newStr = "newStr";
+    replaceFileContent(filePath, oldStr, newStr);
+  }
 }

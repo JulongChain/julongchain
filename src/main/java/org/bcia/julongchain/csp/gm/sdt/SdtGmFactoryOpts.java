@@ -33,10 +33,10 @@ public class SdtGmFactoryOpts implements ISdtGmFactoryOpts {
     private String publicKeyPath;
     private String privateKeyPath;
     private String keyPath;
+
     private int secLevel;
     private String hashFamily;
     private boolean bEphemeral;
-    private boolean bDummyKeyStore;
     private String keyStorePath;
     private boolean bDefaultCsp;
 
@@ -63,7 +63,7 @@ public class SdtGmFactoryOpts implements ISdtGmFactoryOpts {
 
     @Override
     public String getProviderDescription() {
-        return null;
+        return "SM algorithm provided by SDT";
     }
 
     @Override
@@ -84,64 +84,57 @@ public class SdtGmFactoryOpts implements ISdtGmFactoryOpts {
 
     @Override
     public int getSecLevel() {
-        return 256;
+        return secLevel;
     }
 
     @Override
     public String getHashFamily() {
-        return "SM3";
+        return hashFamily;
     }
 
     @Override
     public boolean isEphemeral() {
-        return false;
+        return bEphemeral;
     }
 
     @Override
-    public String getKeyStorePath() { return keyStorePath; }
-
-    @Override
-    public boolean isDummyKeystore() {
-        return bDefaultCsp;
+    public String getKeyStorePath() {
+        return keyStorePath;
     }
 
+    @Override
     public String getSymmetricKeyType() {
         return symmetricKeyType;
     }
 
+    @Override
     public String getAsymmetricKeyType() {
         return asymmetricKeyType;
     }
 
+    @Override
     public String getHashType() {
         return hashType;
     }
 
+    @Override
     public String getSignType() {
         return signType;
     }
 
+    @Override
     public String getPublicKeyPath() {
         return publicKeyPath;
     }
 
+    @Override
     public String getPrivateKeyPath() {
         return privateKeyPath;
     }
 
+    @Override
     public String getKeyPath() {
         return keyPath;
     }
 
-    public boolean isbEphemeral() {
-        return bEphemeral;
-    }
-
-    public boolean isbDummyKeyStore() {
-        return bDummyKeyStore;
-    }
-
-    public boolean isbDefaultCsp() {
-        return bDefaultCsp;
-    }
 }

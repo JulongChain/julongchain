@@ -66,12 +66,12 @@ public class SM3Test {
                         if(len > 1024) {
                             len = 1024;
                         }
-                        byte[] randomData = jni.RandomGen(len);
+                        byte[] randomData = jni.randomGen(len);
                         System.arraycopy(randomData, 0, msg, msgLen-leftLen, len);
                         leftLen = leftLen - len;
                     }
                 } else {
-                    msg = jni.RandomGen(msgLen);
+                    msg = jni.randomGen(msgLen);
                 }
                 System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
                 byte[] hash = sm3.hash(msg);

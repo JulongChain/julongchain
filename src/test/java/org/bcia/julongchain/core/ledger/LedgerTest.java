@@ -26,6 +26,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -56,7 +57,7 @@ public class LedgerTest {
     @Test
     public void getKVFromLevelDB() throws Throwable {
 //        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getIndexPath());
-        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getStateLevelDBPath());
+        LevelDBProvider provider = new LevelDBProvider("/var/julongchain/production/node/stateLeveldb");
 //        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getHistoryLevelDBPath());
 //        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getLedgerProviderPath());
 //        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getPvtDataStorePath());
@@ -75,7 +76,7 @@ public class LedgerTest {
 //            System.out.println(new String(entry.getValue()));
 //            soutBytes(entry.getKey());
             System.out.println(new String(entry.getKey()));
-            System.out.println(new String(entry.getValue()));
+//            System.out.println(new String(entry.getValue()));
 //	        System.out.println(entry.getValue().length == 0);
 //            soutBytes(entry.getValue());
 //            soutBytes(entry.getKey());
@@ -86,8 +87,12 @@ public class LedgerTest {
 
     @Test
     public void getValuesFromFS() throws Exception {
-    	String filePath = LedgerConfig.getBlockStorePath() + "/chains/myGroup/blockfile_000000";
-    	int len = 0;
+    	Map<String, String> map = new HashMap<>();
+	    System.out.println(map.entrySet());
+
+	    String filePath = "/var/julongchain/production/consenter/chains/myGroup/blockfile_000000";
+	    System.out.println(filePath);
+	    int len = 0;
     	int i = 0;
     	File file = new File(filePath);
 

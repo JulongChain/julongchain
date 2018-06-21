@@ -19,6 +19,8 @@ general:
     # Listen address: The IP on which to bind to listen.
     listenAddress: 127.0.0.1
 
+    gossipAddress: 0.0.0.0:7070
+
     # Listen port: The port on which to bind to listen.
     listenPort: 7050
 
