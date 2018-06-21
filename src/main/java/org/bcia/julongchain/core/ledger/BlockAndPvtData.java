@@ -36,8 +36,10 @@ public class BlockAndPvtData {
 
     public BlockAndPvtData(Common.Block block, Map<Long, TxPvtData> blockPvtData, MissingPrivateData missing){
         this.block = block;
-        this.blockPvtData = blockPvtData;
-        this.missing = missing;
+	    if (blockPvtData == null) {
+		    this.blockPvtData = new HashMap<>();
+	    }
+	    this.missing = missing;
     }
 
     public Common.Block getBlock() {
@@ -53,7 +55,11 @@ public class BlockAndPvtData {
     }
 
     public void setBlockPvtData(Map<Long, TxPvtData> blockPvtData) {
-        this.blockPvtData = blockPvtData;
+	    if (blockPvtData == null) {
+		    this.blockPvtData = new HashMap<>();
+	    } else {
+		    this.blockPvtData = blockPvtData;
+	    }
     }
 
     public MissingPrivateData getMissing() {

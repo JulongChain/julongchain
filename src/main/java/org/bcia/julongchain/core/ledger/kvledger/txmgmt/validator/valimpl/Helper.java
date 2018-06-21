@@ -140,8 +140,9 @@ public class Helper {
                 }
                 txRwSet = new TxRwSet();
                 try {
-	                assert respPayload != null;
-	                txRwSet.fromProtoBytes(respPayload.getResults());
+	                if (respPayload != null) {
+		                txRwSet.fromProtoBytes(respPayload.getResults());
+	                }
                 } catch (Exception e) {
                     txsFilter.setFlag(txIndex, TransactionPackage.TxValidationCode.INVALID_OTHER_REASON);
                     continue;
