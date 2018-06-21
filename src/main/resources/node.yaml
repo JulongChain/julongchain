@@ -443,7 +443,7 @@ smartContract:
 
     instantiatePath: /root/julongchain/instantiate
 
-    coreNodeAddress: 172.172.3.1
+    coreNodeAddress: 172.17.0.1
 
     # The id is used by the Smartcontract stub to register the executing Smartcontract
     # ID with the Node and is generally supplied through ENV variables
