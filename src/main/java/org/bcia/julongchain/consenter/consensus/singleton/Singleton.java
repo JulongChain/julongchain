@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 package org.bcia.julongchain.consenter.consensus.singleton;
-
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.*;
 import org.bcia.julongchain.common.log.JavaChainLog;
@@ -26,8 +24,6 @@ import org.bcia.julongchain.common.util.producer.Consumer;
 import org.bcia.julongchain.common.util.producer.Producer;
 import org.bcia.julongchain.consenter.common.cmd.impl.StartCmd;
 import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
-import org.bcia.julongchain.consenter.common.multigroup.Registrar;
-import org.bcia.julongchain.consenter.common.server.PreStart;
 import org.bcia.julongchain.consenter.consensus.IChain;
 import org.bcia.julongchain.consenter.consensus.IConsensue;
 import org.bcia.julongchain.consenter.consensus.IConsenterSupport;
@@ -35,7 +31,6 @@ import org.bcia.julongchain.consenter.entity.BatchesMes;
 import org.bcia.julongchain.consenter.entity.Message;
 import org.bcia.julongchain.gossip.GossipServiceUtil;
 import org.bcia.julongchain.protos.common.Common;
-
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -50,20 +45,15 @@ public class Singleton implements IChain, IConsensue {
     private Consumer<Message> consumer;
     private static Singleton instance;
     private static JavaChainLog log = JavaChainLogFactory.getLog(Singleton.class);
-    private ChainSupport support;
-    // private IConsenterSupport support;
+    private static ChainSupport support;
     private Message normalMessage;
     private Message configMessage;
 
     public static Singleton getInstance(ChainSupport consenterSupport) {
-        if (instance == null) {
-            synchronized (Singleton.class) {
-                if (consenterSupport == null) {
-                    instance = new Singleton();
-                } else {
-                    instance = new Singleton(consenterSupport);
-                }
-            }
+        if(consenterSupport==null){
+            return instance;
+        }else {
+           support=consenterSupport;
         }
         return instance;
     }
@@ -184,11 +174,6 @@ public class Singleton implements IChain, IConsensue {
             }else {
                 Common.Block block = support.createNextBlock(new Common.Envelope[]{configMessage.getMessage()});
                 support.writeConfigBlock(block, null);
-//                try {
-//                    GossipServiceUtil.addData(StartCmd.getGossipService(),support.getGroupId(),block.getHeader().getNumber(),block.toString());
-//                } catch (GossipException e) {
-//                    e.printStackTrace();
-//                }
             }
 
             timer = 0;
@@ -213,21 +198,16 @@ public class Singleton implements IChain, IConsensue {
     }
 
     public boolean pushToQueue(Message message) throws ValidateException {
-        ValidateUtils.isNotNull(message, "event can not be null");
+        ValidateUtils.isNotNull(message, "message can not be null");
         return producer.produce(message);
-    }
-
-    public static void main(String[] args) throws ValidateException, ConsenterException {
-//        Singleton singleton = null;
-//        singleton = Singleton.getInstance();
-//
-//        Common.Envelope envelope = Common.Envelope.newBuilder().setPayload(ByteString.copyFrom("123".getBytes())).build();
-//        singleton.order(envelope,1);
-//        singleton.pushToQueue(envelope);
     }
 
     public IConsenterSupport getSupport() {
         return support;
+    }
+
+    public void setSupport(ChainSupport support) {
+        this.support = support;
     }
 
     public Message getNormalMessage() {
