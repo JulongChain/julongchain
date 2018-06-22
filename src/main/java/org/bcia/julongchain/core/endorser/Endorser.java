@@ -24,6 +24,7 @@ import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.protos.ProposalResponsePayloadVO;
 import org.bcia.julongchain.common.resourceconfig.ISmartContractDefinition;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.common.util.SpringContext;
@@ -139,7 +140,21 @@ public class Endorser implements IEndorserServer {
             ProposalResponsePackage.Response endorseResponse = endorseProposal(groupHeader.getGroupId(), groupHeader
                             .getTxId(), signedProposal, proposal, scIdBuilder,
                     response, txReadWriteSetBytes, scEvent, extension.getPayloadVisibility().toByteArray(), scDefinition);
-            return ProposalResponseUtils.buildProposalResponse(endorseResponse.getPayload());
+
+
+            ProposalResponsePackage.ProposalResponse proposalResponse = null;
+
+            ProposalResponsePayloadVO proposalResponsePayloadVO = new ProposalResponsePayloadVO();
+            try {
+                proposalResponse = ProposalResponsePackage.ProposalResponse.parseFrom(endorseResponse.getPayload());
+                proposalResponsePayloadVO.parseFrom(ProposalResponsePackage.ProposalResponsePayload.parseFrom(proposalResponse.getPayload()));
+            } catch (InvalidProtocolBufferException e) {
+                e.printStackTrace();
+            } catch (ValidateException e) {
+                e.printStackTrace();
+            }
+
+            return ProposalResponseUtils.buildProposalResponse(proposalResponse.getPayload());
         }
     }
 
