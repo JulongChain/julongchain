@@ -17,6 +17,8 @@ package org.bcia.julongchain.core.smartcontract.shim.impl;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Timestamp;
+import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.ledger.util.IoUtil;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.util.Utils;
@@ -27,6 +29,7 @@ import org.bcia.julongchain.core.smartcontract.shim.ledger.IKeyModification;
 import org.bcia.julongchain.core.smartcontract.shim.ledger.IKeyValue;
 import org.bcia.julongchain.core.smartcontract.shim.ledger.IQueryResultsIterator;
 import org.bcia.julongchain.protos.node.ProposalPackage;
+import org.bcia.julongchain.protos.node.SmartContractDataPackage;
 import org.bcia.julongchain.protos.node.SmartContractEventPackage;
 
 import java.time.Instant;
@@ -103,9 +106,14 @@ public class MockStub implements ISmartContractStub {
      */
     @Override
     public byte[] getState(String key) {
-        byte[] value=state.get(key);
-        log.debug("MockStub {} Getting {} {}",this.name,key,value);
-        return value;
+	    SmartContractDataPackage.SmartContractData.Builder builder = null;
+	    try {
+		    builder.setName("name");
+		    builder.setData(ByteString.copyFrom(IoUtil.fileReader("", 1024)));
+	    } catch (Exception e) {
+		    e.printStackTrace();
+	    }
+	    return builder.build().toByteArray();
     }
 
     @Override
