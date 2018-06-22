@@ -98,7 +98,7 @@ public class SimpleCollection implements ICollection, ICollectionAccessPolicy {
                         log.error(e.getMessage(), e);
                         throw new PolicyException(e);
                     }
-                    this.memberOrgs.add(principalId.getMSPIdentifier());
+                    this.memberOrgs.add(principalId.getMSPIdentifier().getMspid());
                 case  MspPrincipal.MSPPrincipal.Classification.ORGANIZATION_UNIT_VALUE:
                     MspPrincipal.OrganizationUnit ou = null;
                     try {

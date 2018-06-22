@@ -17,6 +17,7 @@ package org.bcia.julongchain.msp;
 
 import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.exception.VerifyException;
+import org.bcia.julongchain.msp.entity.IdentityIdentifier;
 import org.bcia.julongchain.msp.entity.OUIdentifier;
 import org.bcia.julongchain.protos.common.MspPrincipal;
 
@@ -40,7 +41,7 @@ public interface IIdentity {
 
 
 
-     String getMSPIdentifier();
+    IdentityIdentifier getMSPIdentifier();
 
      void validate();
 
