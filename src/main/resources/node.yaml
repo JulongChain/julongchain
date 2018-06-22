@@ -441,9 +441,9 @@ vm:
 ###############################################################################
 smartContract:
 
-    instantiatePath: /root/julongchain/instantiate
+    instantiatePath: /var/julongchain/production/instantiate_temp
 
-    coreNodeAddress: 172.17.0.1
+    coreNodeAddress: 192.168.136.132
 
     # The id is used by the Smartcontract stub to register the executing Smartcontract
     # ID with the Node and is generally supplied through ENV variables
