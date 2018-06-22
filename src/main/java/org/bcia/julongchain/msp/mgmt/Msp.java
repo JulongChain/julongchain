@@ -19,9 +19,11 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.csp.factory.CspManager;
 import org.bcia.julongchain.csp.gm.dxct.GmCsp;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2KeyExport;
 import org.bcia.julongchain.csp.intfs.IKey;
+import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.msp.IIdentity;
 import org.bcia.julongchain.msp.IMsp;
 import org.bcia.julongchain.msp.ISigningIdentity;
@@ -34,7 +36,7 @@ import org.bcia.julongchain.protos.msp.Identities;
 import org.bcia.julongchain.protos.msp.MspConfigPackage;
 
 import org.bouncycastle.asn1.x509.CertificateList;
-
+import org.bouncycastle.util.encoders.Hex;
 
 import java.io.ByteArrayInputStream;
 
@@ -185,13 +187,25 @@ public class Msp implements IMsp {
         try {
             Identities.SerializedIdentity sId = Identities.SerializedIdentity.parseFrom(serializedIdentity);
 
+
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             InputStream stream= new ByteArrayInputStream(sId.getIdBytes().toByteArray());
             X509Certificate cert = (X509Certificate) cf .generateCertificate(stream);
 
             //Certificate cert = Certificate.getInstance(new PemReader(new InputStreamReader(new ByteArrayInputStream(sId.getIdBytes().toByteArray()))).readPemObject().getContent());
             SM2KeyExport certPubK = new SM2KeyExport();
-            IIdentity identity = new Identity(cert, certPubK.getPublicKey(), this);
+
+            //    Identity.identityIdentifier    BY LIUXIONG  2018-06-13
+            String identifier_Id ;
+            ICsp iCsp = CspManager.getDefaultCsp();
+            byte[] resultBytes = iCsp.hash(cert.toString().getBytes(),null);    //csp.hash(bytes, null);
+
+            //转换成十六进制字符串表示
+            identifier_Id = Hex.toHexString(resultBytes);
+            IdentityIdentifier identityIdentifier = new IdentityIdentifier(sId.getMspid(),identifier_Id);
+
+
+            IIdentity identity = new Identity(identityIdentifier, cert, certPubK.getPublicKey(), this);
             return identity;
         } catch (Exception e) {
             e.printStackTrace();

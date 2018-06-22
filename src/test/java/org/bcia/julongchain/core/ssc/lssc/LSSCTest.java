@@ -51,7 +51,22 @@ public class LSSCTest extends BaseJunit4Test {
     public void testInstalls(){
         String path="src/main/java/org/bcia/julongchain/examples/smartcontract/java/smartcontract_example02";
         ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("1",new LinkedList<ByteString>());
-        testInstall("mycc","1.0",path,"","Alice",mockStub);
+       // testInstall("mycc","1.0",path,"","Alice",mockStub);
+        testInstall("example02","1.0",path,"","Alice",mockStub);  //  TESTED  OK
+
+        //  testInstall("example02-2","1.0",path,"","Alice",mockStub); //  TESTED  OK
+
+        /*  testInstall("example02.java","0",path,
+                 "Execute install failed, [SysSmartContract]InvalidChaincodeNameErr:example02.java","Alice",mockStub);
+                 // TESTED  invalid ChaincodeName
+                 */
+
+        /* testInstall("","0",path,
+                 "Execute install failed, [SysSmartContract]EmptySmartContractNameErr","Alice",mockStub);
+                 // TESTED  EmptySmartContractName
+                 */
+
+        // testInstall("example02","1.0-alpha+001",path,"","Alice",mockStub);  //   TESTED   invalid version
     }
 
     public void testInstall(String smartcontractName,String version,String path,
@@ -85,18 +100,57 @@ public class LSSCTest extends BaseJunit4Test {
         }
         ISmartContract.SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
         //尚未完全实现调通全部逻辑，返回内部错误
-//        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
-        //TODO write by sunzongyu. 当获取到权限时，完成安装
-        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
         //TODO write by sunzongyu. 当未获取权限时，安装失败, 并有相应提示信息
 //        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
+
+
+        if(expectErrorMsg =="") //According to  status  or  message
+        {
+            //TODO write by sunzongyu. 当获取到权限时，完成安装
+            assertThat(res.getStatus(), is(ISmartContract.SmartContractResponse.Status.SUCCESS));
+        }
+        else
+        {
+            assertThat(res.getMessage(), is(expectErrorMsg));
+        }
+
     }
 
     @Test
     public void testDeploys(){
         String path="src/main/java/org/bcia/julongchain/examples/smartcontract/java/smartcontract_example02";
         ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("1",new LinkedList<ByteString>());
-        testDeploy("example02","1.0",path,"","Alice",mockStub);
+          testDeploy("example02","1.0",path,"","Alice",mockStub);//  TESTED  OK
+
+        /*  testDeploy("example02","1.0",path,
+                "ExecuteDeployOrUpgrade failed,[SysSmartContract]Get smartcontract example02 from localstorage failed:java.io.FileNotFoundException: /var/julongchain/production/example02.1.0 (No such file or directory)",
+                "Alice",mockStub);//  TESTED    Uninstall example02
+                */
+
+
+        /*  testDeploy("example02.java","1.0",path,
+                "ExecuteDeployOrUpgrade failed,[SysSmartContract]InvalidChaincodeNameErr:example02.java",
+                "Alice",mockStub);//  TESTED    invalid SCname
+                */
+
+
+        /*  testDeploy("example02","1{}0",path,
+                "ExecuteDeployOrUpgrade failed,[SysSmartContract]InvalidChaincodeVersionErr:1{}0",
+                "Alice",mockStub);//  TESTED    invalid version
+                */
+
+
+        /*  testDeploy("","1.0",path,
+                "ExecuteDeployOrUpgrade failed,[SysSmartContract]EmptySmartContractNameErr",
+                "Alice",mockStub);//  TESTED    blank SCname
+                */
+
+
+        /*  testDeploy("example02","",path,
+                "ExecuteDeployOrUpgrade failed,[SysSmartContract]EmptySmartContractVersionErr",
+                "Alice",mockStub);//  TESTED   blank version
+                */
+
     }
 
     public void testDeploy(String smartcontractName,String version,String path,
@@ -131,15 +185,27 @@ public class LSSCTest extends BaseJunit4Test {
         }
 
         ISmartContract.SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
-        //尚未完全实现调通全部逻辑，返回内部错误
-        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
+
+        if(expectErrorMsg=="") //According to  status  or  message
+        {
+            //尚未完全实现调通全部逻辑，返回内部错误
+            assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
+        }
+        else
+        {
+            assertThat(res.getMessage(),is(expectErrorMsg));
+        }
+
+
     }
 
     @Test
     public void testUpgrades(){
         String path="src/main/java/org/bcia/julongchain/examples/smartcontract/java/smartcontract_example02";
         ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("1",new LinkedList<ByteString>());
-        testUpgrade("example02","1.0",path,"","Alice",mockStub);
+        testUpgrade("example02","1.0",path,"","Alice",mockStub);  //  TODO:COULDNOT  getSmartContractInstance
+
+      //  testUpgrade("example02","1.0",path,"123","Alice",mockStub);   //   T   invalid version
     }
 
     public void testUpgrade(String smartcontractName,String version,String path,
@@ -174,8 +240,17 @@ public class LSSCTest extends BaseJunit4Test {
         }
 
         ISmartContract.SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("1", args0, signedProp);
-        //尚未安全实现调通全部逻辑，返回内部错误
-        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
+
+        if(expectErrorMsg=="") //According to  status  or  message
+        {
+            //尚未完全实现调通全部逻辑，返回内部错误
+            assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
+        }
+        else
+        {
+            assertThat(res.getMessage(),is(expectErrorMsg));
+        }
+
     }
 
     private Smartcontract.SmartContractDeploymentSpec constructDeploySpec(String smartcontractName, String path, String version, List<String> initArgs, boolean bCreateFS) throws SysSmartContractException {
