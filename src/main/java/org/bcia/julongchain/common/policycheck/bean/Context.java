@@ -31,6 +31,10 @@ public class Context {
     private int IDNum;
     private List<MspPrincipal.MSPPrincipal> principals;
 
+    public Context(int IDNum, List<MspPrincipal.MSPPrincipal> principals) {
+        this.IDNum = IDNum;
+        this.principals = principals;
+    }
 
     public int getIDNum() {
         return IDNum;
