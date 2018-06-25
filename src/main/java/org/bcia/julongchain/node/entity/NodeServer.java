@@ -15,8 +15,6 @@
  */
 package org.bcia.julongchain.node.entity;
 
-import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.gossip.GossipService;
 import org.bcia.julongchain.common.exception.GossipException;
@@ -24,7 +22,10 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.common.util.*;
+import org.bcia.julongchain.common.util.CommConstant;
+import org.bcia.julongchain.common.util.FileUtils;
+import org.bcia.julongchain.common.util.NetAddress;
+import org.bcia.julongchain.common.util.SpringContext;
 import org.bcia.julongchain.core.aclmgmt.AclManagement;
 import org.bcia.julongchain.core.aclmgmt.IAclProvider;
 import org.bcia.julongchain.core.admin.AdminServer;
@@ -191,19 +192,12 @@ public class NodeServer {
                   log.info("群组高度为0，退出处理");
                   continue;
                 }
-                Object data = GossipServiceUtil.getData(gossipService, ledgerId, blockHeight);
-                if (data == null) {
+                Common.Block block = GossipServiceUtil.getData(gossipService, ledgerId, blockHeight);
+                if (block == null) {
                   log.info("当前群组[" + ledgerId + "]" + "没有新的区块[" + blockHeight + "]");
                   continue;
                 }
-                log.info("当前群组[" + ledgerId + "]" + "发现新的区块[" + blockHeight + "]");
-                String blockByteStr = (String) data;
-                byte[] blockBytes = BytesHexStrTranslate.toBytes(blockByteStr);
-                log.info("开始打印区块==========================================");
-                log.info(blockByteStr);
-                log.info("结束打印区块==========================================");
-                log.info("开始转换区块");
-                Common.Block block = Common.Block.parseFrom(blockBytes);
+                log.info("发现新区块");
                 BlockAndPvtData blockAndPvtData = new BlockAndPvtData(block, null, null);
                 log.info("完成转换区块");
                 log.info("开始保存区块");
@@ -212,8 +206,6 @@ public class NodeServer {
               } catch (LedgerException e) {
                 log.error(e.getMessage(), e);
               } catch (GossipException e) {
-                log.error(e.getMessage(), e);
-              } catch (InvalidProtocolBufferException e) {
                 log.error(e.getMessage(), e);
               }
             }
