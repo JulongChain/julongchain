@@ -92,8 +92,9 @@ public class TransactionRunningUtil {
     }
   }
 
-  public static List<KvRwset.KVRead> getKvReads(String smartContractId, String txId) {
-    return txIdAndKvReadMap.get(composite(smartContractId, txId));
+  public static List<KvRwset.KVRead> getKvReads(String txId) {
+    String scId = txIdAndSmartContractIdMap.get(txId);
+    return txIdAndKvReadMap.get(composite(scId, txId));
   }
 
   public static void addKvWrite(String smartContractId, String txId, KvRwset.KVWrite kvWrite) {
@@ -107,8 +108,9 @@ public class TransactionRunningUtil {
     }
   }
 
-  public static List<KvRwset.KVWrite> getKvWrites(String smartContractId, String txId) {
-    return txIdAndKvWriteMap.get(composite(smartContractId, txId));
+  public static List<KvRwset.KVWrite> getKvWrites(String txId) {
+    String scId = txIdAndSmartContractIdMap.get(txId);
+    return txIdAndKvWriteMap.get(composite(scId, txId));
   }
 
   /**

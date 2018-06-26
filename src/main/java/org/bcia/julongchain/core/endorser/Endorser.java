@@ -323,21 +323,21 @@ public class Endorser implements IEndorserServer {
             }
         }
 
-        List<KvRwset.KVRead> kvReads = TransactionRunningUtil.getKvReads(scName, txId);
+        List<KvRwset.KVRead> kvReads = TransactionRunningUtil.getKvReads(txId);
         if (CollectionUtils.isEmpty(kvReads)) {
             kvReads = new ArrayList<>();
         }
-        List<KvRwset.KVRead> kvReadsInit = TransactionRunningUtil.getKvReads(scName, txId + CommConstant.TX_INIT);
+        List<KvRwset.KVRead> kvReadsInit = TransactionRunningUtil.getKvReads(txId + CommConstant.TX_INIT);
         if (CollectionUtils.isEmpty(kvReadsInit)) {
             kvReadsInit= new ArrayList<>();
         }
         kvReads.addAll(kvReadsInit);
 
-        List<KvRwset.KVWrite> kvWrites = TransactionRunningUtil.getKvWrites(scName, txId);
+        List<KvRwset.KVWrite> kvWrites = TransactionRunningUtil.getKvWrites(txId);
         if(CollectionUtils.isEmpty(kvWrites)){
             kvWrites = new ArrayList<>();
         }
-        List<KvRwset.KVWrite> kvWritesInit = TransactionRunningUtil.getKvWrites(scName, txId + CommConstant.TX_INIT);
+        List<KvRwset.KVWrite> kvWritesInit = TransactionRunningUtil.getKvWrites(txId + CommConstant.TX_INIT);
         if(CollectionUtils.isEmpty(kvWritesInit)){
             kvWritesInit = new ArrayList<>();
         }

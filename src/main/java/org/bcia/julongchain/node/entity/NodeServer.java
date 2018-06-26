@@ -183,7 +183,12 @@ public class NodeServer {
           while (true) {
 
             // 处理当前所有的群组
-            List<String> ledgerIds = node.getLedgerIds();
+            List<String> ledgerIds = null;
+            try {
+              ledgerIds = LedgerManager.getLedgerIDs();
+            } catch (LedgerException e) {
+              log.error(e.getMessage(), e);
+            }
             log.info("当前所有群组：" + ledgerIds.toString());
             for (String ledgerId : ledgerIds) {
               log.info("开始检查群组[" + ledgerId + "] 是否有新的区块");
@@ -196,59 +201,8 @@ public class NodeServer {
                   continue;
                 }
 
-                /**
-                SharedGossipDataMessage sharedData = gossipService.findSharedData(ledgerId + "-" + blockHeight);
-                log.info("======="+sharedData);
-                if(sharedData == null){
-                  continue;
-                }
-
-                Object fileNumberPayload = sharedData.getPayload();
-
-                Integer fileNumber = (Integer) fileNumberPayload;
-                log.info("=====================fileNumber:" + fileNumber);
-
-                if (fileNumber < 1) {
-                  log.info("file number small than 1");
-                  continue;
-                }
-
-                StringBuffer sb = new StringBuffer("");
-
-                for (int i = 0; i < fileNumber; i++) {
-                  SharedGossipDataMessage m = gossipService.findSharedData(ledgerId + "-" + blockHeight + "-" + i);
-                  log.info("gossip get data detail, check [" + ledgerId + "-" + blockHeight + "-" + i + "]");
-                  if (m == null) {
-                    log.info("=====================[" + ledgerId + "-" + blockHeight + "-" + i + "] is null");
-                    continue;
-                  }
-                  Object p = m.getPayload();
-                  if (p == null) {
-                    log.info("1111");
-                    continue;
-                  }
-                  String str = (String) p;
-                  sb.append(str);
-                }
-
-                byte[] bytes = new byte[0];
-                try {
-                  bytes = sb.toString().getBytes("ISO8859-1");
-                } catch (UnsupportedEncodingException e) {
-                  log.info("333");
-                  throw new GossipException(e);
-                }
-
-                Common.Block block = null;
-                try {
-                  block = Common.Block.parseFrom(bytes);
-                } catch (InvalidProtocolBufferException e) {
-                  log.info("444");
-                  throw new GossipException(e);
-                }
-*/
-
-                Common.Block block = GossipServiceUtil.getData(gossipService, ledgerId, blockHeight);
+                Common.Block block =
+                    GossipServiceUtil.getData(gossipService, ledgerId, blockHeight);
                 if (block == null) {
                   log.info("当前群组[" + ledgerId + "]" + "没有新的区块[" + blockHeight + "]");
                   continue;
@@ -268,7 +222,7 @@ public class NodeServer {
 
             // 1s查询一次
             try {
-              Thread.sleep(1000);
+              Thread.sleep(10000);
             } catch (Exception e) {
               log.error(e.getMessage(), e);
             }
