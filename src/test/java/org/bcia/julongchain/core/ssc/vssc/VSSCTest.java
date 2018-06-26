@@ -2,15 +2,13 @@ package org.bcia.julongchain.core.ssc.vssc;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import io.netty.channel.ChannelHandler;
 import org.bcia.julongchain.BaseJunit4Test;
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.exception.SysSmartContractException;
 import org.bcia.julongchain.common.policycheck.cauthdsl.CAuthDslBuilder;
 import org.bcia.julongchain.common.util.CommConstant;
-import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
-import org.bcia.julongchain.common.util.proto.ProposalResponseUtils;
-import org.bcia.julongchain.common.util.proto.ProposalUtils;
-import org.bcia.julongchain.common.util.proto.TxUtils;
+import org.bcia.julongchain.common.util.proto.*;
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContract;
 import org.bcia.julongchain.core.smartcontract.shim.impl.MockStub;
 import org.bcia.julongchain.msp.IMsp;
@@ -59,6 +57,7 @@ public class VSSCTest extends BaseJunit4Test {
         ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("1",new LinkedList<ByteString>());
         assertThat(smartContractResponse.getStatus(), is(ISmartContract.SmartContractResponse.Status.SUCCESS));
 
+        String expectErrMessage = null;
         Common.Envelope tx= null;
         try {
             tx = createTx(false);
@@ -75,13 +74,99 @@ public class VSSCTest extends BaseJunit4Test {
         String mspid="DEFAULT";
         byte[] policyBytes=getSignedByMSPMemberPolicy(mspid);
 
+        //region TESTED OK
+        /*  TESTED OK
         List<ByteString> args= new LinkedList<ByteString>();
         args.add(ByteString.copyFromUtf8("dv"));
         args.add(ByteString.copyFrom(envBytes));
         args.add(ByteString.copyFrom(policyBytes));
 
+        */
+        //endregion
+
+
+        //region not enough args
+        /*  not enough args
+        List<ByteString> args= new LinkedList<ByteString>();
+        args.add(ByteString.copyFromUtf8("dv"));
+
+        expectErrMessage = "Incorrect number of arguments , 1)";
+        */
+        //endregion
+
+
+        //region broken Envelope
+        /*  broken Envelope
+        List<ByteString> args= new LinkedList<ByteString>();
+        args.add(ByteString.copyFromUtf8("a"));
+        args.add(ByteString.copyFromUtf8("a"));
+        args.add(ByteString.copyFromUtf8("a"));
+
+        expectErrMessage = "VSSC error: GetEnvelope failed, err While parsing a protocol message, the input ended unexpectedly in the middle of a field.  This could mean either that the input has been truncated or that an embedded message misreported its own length.";
+        */
+        //endregion
+
+
+        //region broken policy
+        /*  broken policy
+        List<ByteString> args= new LinkedList<ByteString>();
+        args.add(ByteString.copyFromUtf8("dv"));
+        args.add(ByteString.copyFrom(envBytes));
+        args.add(ByteString.copyFromUtf8("barf"));
+
+        expectErrMessage = "VSSC error:make policy failed,err com.google.protobuf.InvalidProtocolBufferException: While parsing a protocol message, the input ended unexpectedly in the middle of a field.  This could mean either that the input has been truncated or that an embedded message misreported its own length.";
+        */
+        //endregion
+
+
+
+        //region signed by the wrong MSP
+        /*  signed by the wrong MSP
+        policyBytes = getSignedByMSPMemberPolicy("bupg");
+        List<ByteString> args= new LinkedList<ByteString>();
+        args.add(ByteString.copyFromUtf8("dv"));
+        args.add(ByteString.copyFrom(envBytes));
+        args.add(ByteString.copyFrom(policyBytes));
+
+        expectErrMessage = "VSSC error:make policy failed,err com.google.protobuf.InvalidProtocolBufferException: While parsing a protocol message, the input ended unexpectedly in the middle of a field.  This could mean either that the input has been truncated or that an embedded message misreported its own length.";
+        */
+        //endregion
+
+
+        //region signed by the wrong MSP
+        //*  signed by the wrong MSP
+//        Common.GroupHeader groupHeader = Common.GroupHeader.newBuilder().setType(Common.HeaderType.CONSENTER_TRANSACTION.getNumber()).build();
+//        Common.Header header = Common.Header.newBuilder().setGroupHeader(groupHeader.toByteString()).build();
+//        Common.Payload payload = Common.Payload.newBuilder().setHeader(header).build();
+        Common.Envelope  env= Common.Envelope.newBuilder()
+                .setPayload((Common.Payload.newBuilder()
+                        .setHeader(Common.Header.newBuilder()
+                                .setGroupHeader((Common.GroupHeader.newBuilder()
+                                        .setType(Common.HeaderType.CONSENTER_TRANSACTION.getNumber()).build()).toByteString()).build()).build()).toByteString())
+                .build();
+        byte[] envBrokenBytes = env.toByteArray();
+
+        List<ByteString> args= new LinkedList<ByteString>();
+        args.add(ByteString.copyFromUtf8("dv"));
+        args.add(ByteString.copyFrom(envBrokenBytes));
+        args.add(ByteString.copyFrom(policyBytes));
+
+        expectErrMessage = "Only Endorser Transactions are supported, provided type 4";
+
+        //endregion
+
+
+
         ISmartContract.SmartContractResponse smartContractResponse2 =mockStub.mockInvoke("1",args);
-        assertThat(smartContractResponse2.getStatus(), is(ISmartContract.SmartContractResponse.Status.SUCCESS));
+        if(expectErrMessage==null)
+        {
+            assertThat(smartContractResponse2.getStatus(), is(ISmartContract.SmartContractResponse.Status.SUCCESS));
+        }
+        else
+        {
+            assertThat(smartContractResponse2.getMessage(), is(expectErrMessage));
+        }
+
     }
 
     @Test
