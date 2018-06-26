@@ -335,23 +335,28 @@ public class Endorser implements IEndorserServer {
         Rwset.NsReadWriteSet nsReadWriteSet = Rwset.NsReadWriteSet.newBuilder().setNamespace(scName).setRwset(kvRwSet
             .toByteString()).build();
 
+	      Rwset.TxReadWriteSet txReadWriteSet;
+
         String txIdInit = txId + CommConstant.TX_INIT;
-        List<KvRwset.KVRead> kvReadsInit = TransactionRunningUtil.getKvReads(txIdInit);
-        if (CollectionUtils.isEmpty(kvReadsInit)) {
-            kvReadsInit= new ArrayList<>();
-        }
-        List<KvRwset.KVWrite> kvWritesInit = TransactionRunningUtil.getKvWrites(txIdInit);
-        if(CollectionUtils.isEmpty(kvWritesInit)){
-            kvWritesInit = new ArrayList<>();
-        }
-        KvRwset.KVRWSet kvRwSetInit = KvRwset.KVRWSet.newBuilder().addAllReads(kvReadsInit).addAllWrites(kvWritesInit).build();
-
-        String scNameInit = TransactionRunningUtil.getSmartContractIdByTxId(txIdInit);
-        Rwset.NsReadWriteSet nsReadWriteSetInit = Rwset.NsReadWriteSet.newBuilder().setNamespace(scNameInit).setRwset(kvRwSetInit
-            .toByteString()).build();
-
-        Rwset.TxReadWriteSet txReadWriteSet = Rwset.TxReadWriteSet.newBuilder().addNsRwset(nsReadWriteSet).addNsRwset(nsReadWriteSetInit).setDataModel(Rwset
-            .TxReadWriteSet.DataModel.KV).build();
+		    String scNameInit = TransactionRunningUtil.getSmartContractIdByTxId(txIdInit);
+		    if(StringUtils.isNotEmpty(scNameInit)){
+				    List<KvRwset.KVRead> kvReadsInit = TransactionRunningUtil.getKvReads(txIdInit);
+				    if (CollectionUtils.isEmpty(kvReadsInit)) {
+					    kvReadsInit= new ArrayList<>();
+				    }
+				    List<KvRwset.KVWrite> kvWritesInit = TransactionRunningUtil.getKvWrites(txIdInit);
+				    if(CollectionUtils.isEmpty(kvWritesInit)){
+					    kvWritesInit = new ArrayList<>();
+				    }
+				    KvRwset.KVRWSet kvRwSetInit = KvRwset.KVRWSet.newBuilder().addAllReads(kvReadsInit).addAllWrites(kvWritesInit).build();
+				    Rwset.NsReadWriteSet nsReadWriteSetInit = Rwset.NsReadWriteSet.newBuilder().setNamespace(scNameInit).setRwset(kvRwSetInit
+						    .toByteString()).build();
+				    txReadWriteSet = Rwset.TxReadWriteSet.newBuilder().addNsRwset(nsReadWriteSet).addNsRwset(nsReadWriteSetInit).setDataModel(Rwset
+						    .TxReadWriteSet.DataModel.KV).build();
+		    }else{
+				    txReadWriteSet = Rwset.TxReadWriteSet.newBuilder().addNsRwset(nsReadWriteSet).setDataModel(Rwset
+						    .TxReadWriteSet.DataModel.KV).build();
+		    }
 
         publicSimulateBytes = txReadWriteSet.toByteArray();
 
