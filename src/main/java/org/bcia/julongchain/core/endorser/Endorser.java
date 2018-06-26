@@ -332,7 +332,7 @@ public class Endorser implements IEndorserServer {
             kvWrites = new ArrayList<>();
         }
         KvRwset.KVRWSet kvRwSet = KvRwset.KVRWSet.newBuilder().addAllReads(kvReads).addAllWrites(kvWrites).build();
-        Rwset.NsReadWriteSet nsReadWriteSet = Rwset.NsReadWriteSet.newBuilder().setNamespace(scName).setRwset(kvRwSet
+        Rwset.NsReadWriteSet nsReadWriteSet = Rwset.NsReadWriteSet.newBuilder().setNamespace(groupId).setRwset(kvRwSet
             .toByteString()).build();
 
 	      Rwset.TxReadWriteSet txReadWriteSet;
@@ -349,7 +349,7 @@ public class Endorser implements IEndorserServer {
 					    kvWritesInit = new ArrayList<>();
 				    }
 				    KvRwset.KVRWSet kvRwSetInit = KvRwset.KVRWSet.newBuilder().addAllReads(kvReadsInit).addAllWrites(kvWritesInit).build();
-				    Rwset.NsReadWriteSet nsReadWriteSetInit = Rwset.NsReadWriteSet.newBuilder().setNamespace(scNameInit).setRwset(kvRwSetInit
+				    Rwset.NsReadWriteSet nsReadWriteSetInit = Rwset.NsReadWriteSet.newBuilder().setNamespace(groupId).setRwset(kvRwSetInit
 						    .toByteString()).build();
 				    txReadWriteSet = Rwset.TxReadWriteSet.newBuilder().addNsRwset(nsReadWriteSet).addNsRwset(nsReadWriteSetInit).setDataModel(Rwset
 						    .TxReadWriteSet.DataModel.KV).build();
@@ -357,7 +357,6 @@ public class Endorser implements IEndorserServer {
 				    txReadWriteSet = Rwset.TxReadWriteSet.newBuilder().addNsRwset(nsReadWriteSet).setDataModel(Rwset
 						    .TxReadWriteSet.DataModel.KV).build();
 		    }
-
         publicSimulateBytes = txReadWriteSet.toByteArray();
 
         return new Object[]{response, publicSimulateBytes, scDefinition, scEvent};
