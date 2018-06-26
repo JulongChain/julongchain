@@ -8,7 +8,11 @@
 [Gitlab代码库管理系统](http://gitlab.bcia.net.cn:6060/)
 
 ## 如何编译
+使用IntelliJ IDEA开发环境。
+
 使用maven进行编译。
+
+JDK版本为1.8。
 
 ## 当前版本
 当前版本为0.8。
