@@ -84,5 +84,10 @@ public class CommConstant {
      */
     public static final int MAX_GRPC_MESSAGE_SIZE = 1 << 29;
 
+    /**
+     * 执行init方法的txId后缀
+     */
+    public static final String TX_INIT = "-init";
+
 
 }

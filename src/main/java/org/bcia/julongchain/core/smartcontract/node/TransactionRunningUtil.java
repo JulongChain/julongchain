@@ -66,6 +66,10 @@ public class TransactionRunningUtil {
     txIdAndMessageMap.put(composite(smartContractId, txId), smartContractMessage);
   }
 
+  public static boolean checkTxId(String txId) {
+    return txIdAndSmartContractIdMap.containsKey(txId);
+  }
+
   public static SmartcontractShim.SmartContractMessage getTxMessage(
       String smartContractId, String txId) {
     return txIdAndMessageMap.get(composite(smartContractId, txId));

@@ -38,7 +38,10 @@ import org.bcia.julongchain.node.common.helper.SpecHelper;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.ledger.rwset.Rwset;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
-import org.bcia.julongchain.protos.node.*;
+import org.bcia.julongchain.protos.node.ProposalPackage;
+import org.bcia.julongchain.protos.node.ProposalResponsePackage;
+import org.bcia.julongchain.protos.node.SmartContractEventPackage;
+import org.bcia.julongchain.protos.node.Smartcontract;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -324,10 +327,21 @@ public class Endorser implements IEndorserServer {
         if (CollectionUtils.isEmpty(kvReads)) {
             kvReads = new ArrayList<>();
         }
+        List<KvRwset.KVRead> kvReadsInit = TransactionRunningUtil.getKvReads(scName, txId + CommConstant.TX_INIT);
+        if (CollectionUtils.isEmpty(kvReadsInit)) {
+            kvReadsInit= new ArrayList<>();
+        }
+        kvReads.addAll(kvReadsInit);
+
         List<KvRwset.KVWrite> kvWrites = TransactionRunningUtil.getKvWrites(scName, txId);
         if(CollectionUtils.isEmpty(kvWrites)){
             kvWrites = new ArrayList<>();
         }
+        List<KvRwset.KVWrite> kvWritesInit = TransactionRunningUtil.getKvWrites(scName, txId + CommConstant.TX_INIT);
+        if(CollectionUtils.isEmpty(kvWritesInit)){
+            kvWritesInit = new ArrayList<>();
+        }
+        kvWrites.addAll(kvWritesInit);
 
         KvRwset.KVRWSet kvRwSet = KvRwset.KVRWSet.newBuilder().addAllReads(kvReads).addAllWrites(kvWrites).build();
 
@@ -468,7 +482,7 @@ public class Endorser implements IEndorserServer {
                         String deployScName = deployScId.getName();
                         String deployScVersion = deployScId.getVersion();
                         if (!endorserSupport.isSysSmartContract(deployScName)) {
-                            endorserSupport.execute(groupId, deployScName, deployScVersion, txId, false,
+                            endorserSupport.execute(groupId, deployScName, deployScVersion, txId + CommConstant.TX_INIT, false,
                                     signedProposal, proposal, deploymentSpec);
                         } else {
                             throw new NodeException("Should not be system smart contract");
