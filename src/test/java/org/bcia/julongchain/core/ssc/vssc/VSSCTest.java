@@ -52,12 +52,15 @@ public class VSSCTest extends BaseJunit4Test {
         assertThat(smartContractResponse.getStatus(), is(ISmartContract.SmartContractResponse.Status.SUCCESS));
     }
 
+
     @Test
-    public void invoke() {
+    public void testInvokes()
+    {
         ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("1",new LinkedList<ByteString>());
         assertThat(smartContractResponse.getStatus(), is(ISmartContract.SmartContractResponse.Status.SUCCESS));
 
-        String expectErrMessage = null;
+        String expectErrMsg = null;
+        List<ByteString> args= new LinkedList<ByteString>();
         Common.Envelope tx= null;
         try {
             tx = createTx(false);
@@ -74,70 +77,56 @@ public class VSSCTest extends BaseJunit4Test {
         String mspid="DEFAULT";
         byte[] policyBytes=getSignedByMSPMemberPolicy(mspid);
 
+
         //region TESTED OK
-        /*  TESTED OK
-        List<ByteString> args= new LinkedList<ByteString>();
+        //  TESTED OK
         args.add(ByteString.copyFromUtf8("dv"));
         args.add(ByteString.copyFrom(envBytes));
         args.add(ByteString.copyFrom(policyBytes));
 
-        */
+        Invoke(args,expectErrMsg);
         //endregion
 
 
         //region not enough args
-        /*  not enough args
-        List<ByteString> args= new LinkedList<ByteString>();
+        //  not enough args  TESTED
+        args= new LinkedList<ByteString>();
         args.add(ByteString.copyFromUtf8("dv"));
 
-        expectErrMessage = "Incorrect number of arguments , 1)";
-        */
+        expectErrMsg = "Incorrect number of arguments , 1)";
+        Invoke(args,expectErrMsg);
         //endregion
 
 
         //region broken Envelope
-        /*  broken Envelope
-        List<ByteString> args= new LinkedList<ByteString>();
+        //  broken Envelope  TESTED
+        args= new LinkedList<ByteString>();
         args.add(ByteString.copyFromUtf8("a"));
         args.add(ByteString.copyFromUtf8("a"));
         args.add(ByteString.copyFromUtf8("a"));
 
-        expectErrMessage = "VSSC error: GetEnvelope failed, err While parsing a protocol message, the input ended unexpectedly in the middle of a field.  This could mean either that the input has been truncated or that an embedded message misreported its own length.";
-        */
+        expectErrMsg = "VSSC error: GetEnvelope failed, err While parsing a protocol message, the input ended unexpectedly in the middle of a field.  " +
+                "This could mean either that the input has been truncated or that an embedded message misreported its own length.";
+        Invoke(args,expectErrMsg);
         //endregion
 
 
         //region broken policy
-        /*  broken policy
-        List<ByteString> args= new LinkedList<ByteString>();
+        //  broken policy  TESTED
+        args= new LinkedList<ByteString>();
         args.add(ByteString.copyFromUtf8("dv"));
         args.add(ByteString.copyFrom(envBytes));
         args.add(ByteString.copyFromUtf8("barf"));
 
-        expectErrMessage = "VSSC error:make policy failed,err com.google.protobuf.InvalidProtocolBufferException: While parsing a protocol message, the input ended unexpectedly in the middle of a field.  This could mean either that the input has been truncated or that an embedded message misreported its own length.";
-        */
+        expectErrMsg = "VSSC error:make policy failed,err com.google.protobuf.InvalidProtocolBufferException: " +
+                "While parsing a protocol message, the input ended unexpectedly in the middle of a field.  " +
+                "This could mean either that the input has been truncated or that an embedded message misreported its own length.";
+        Invoke(args,expectErrMsg);
         //endregion
 
 
-
-        //region signed by the wrong MSP
-        /*  signed by the wrong MSP
-        policyBytes = getSignedByMSPMemberPolicy("bupg");
-        List<ByteString> args= new LinkedList<ByteString>();
-        args.add(ByteString.copyFromUtf8("dv"));
-        args.add(ByteString.copyFrom(envBytes));
-        args.add(ByteString.copyFrom(policyBytes));
-
-        expectErrMessage = "VSSC error:make policy failed,err com.google.protobuf.InvalidProtocolBufferException: While parsing a protocol message, the input ended unexpectedly in the middle of a field.  This could mean either that the input has been truncated or that an embedded message misreported its own length.";
-        */
-        //endregion
-
-
-        //region signed by the wrong MSP
-        //*  signed by the wrong MSP
-//        Common.GroupHeader groupHeader = Common.GroupHeader.newBuilder().setType(Common.HeaderType.CONSENTER_TRANSACTION.getNumber()).build();
-//        Common.Header header = Common.Header.newBuilder().setGroupHeader(groupHeader.toByteString()).build();
-//        Common.Payload payload = Common.Payload.newBuilder().setHeader(header).build();
+        //region  broken type
+        //  broken type  TESTED
         Common.Envelope  env= Common.Envelope.newBuilder()
                 .setPayload((Common.Payload.newBuilder()
                         .setHeader(Common.Header.newBuilder()
@@ -146,16 +135,20 @@ public class VSSCTest extends BaseJunit4Test {
                 .build();
         byte[] envBrokenBytes = env.toByteArray();
 
-        List<ByteString> args= new LinkedList<ByteString>();
+        args= new LinkedList<ByteString>();
         args.add(ByteString.copyFromUtf8("dv"));
         args.add(ByteString.copyFrom(envBrokenBytes));
         args.add(ByteString.copyFrom(policyBytes));
 
-        expectErrMessage = "Only Endorser Transactions are supported, provided type 4";
-
+        expectErrMsg = "Only Endorser Transactions are supported, provided type 4";
+        Invoke(args,expectErrMsg);
         //endregion
 
+    }
 
+
+
+    public void Invoke(List<ByteString> args,String expectErrMessage) {
 
         ISmartContract.SmartContractResponse smartContractResponse2 =mockStub.mockInvoke("1",args);
         if(expectErrMessage==null)
