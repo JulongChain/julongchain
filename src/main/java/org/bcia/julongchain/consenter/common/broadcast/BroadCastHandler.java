@@ -81,7 +81,7 @@ public class BroadCastHandler implements IHandler {
                 }
                 //
                 Singleton singleton = null;
-                singleton = Singleton.getInstance(null);
+                singleton = Singleton.getInstance(chainSupport);
                 singleton.order(envelope,configSeq);
                 try {
                     singleton.pushToQueue(singleton.getNormalMessage());

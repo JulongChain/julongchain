@@ -18,6 +18,7 @@ package org.bcia.julongchain.common.policycheck.cauthdsl;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.ValidateException;
+import org.bcia.julongchain.common.util.proto.ConfigGroup;
 import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.common.Policies;
 
@@ -31,6 +32,7 @@ import org.bcia.julongchain.protos.common.Policies;
 public class PolicyUtil {
     public void templatePolicy(String key, Policies.SignaturePolicyEnvelope  sigPolicyEnv) throws InvalidProtocolBufferException, ValidateException {
         Configtx.Config c = Configtx.Config.newBuilder().build();
+        ConfigGroup configGroup = new ConfigGroup();
 
 
     }

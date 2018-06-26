@@ -14,14 +14,13 @@
 package org.bcia.julongchain.gossip;
 
 import com.codahale.metrics.MetricRegistry;
-import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
+import jdk.nashorn.internal.runtime.options.LoggingOption;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.gossip.GossipMember;
 import org.apache.gossip.GossipService;
 import org.apache.gossip.GossipSettings;
 import org.apache.gossip.RemoteGossipMember;
-import org.apache.gossip.crdt.Crdt;
-import org.apache.gossip.crdt.OrSet;
 import org.apache.gossip.event.GossipListener;
 import org.apache.gossip.event.GossipState;
 import org.apache.gossip.model.SharedGossipDataMessage;
@@ -30,10 +29,16 @@ import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfigFactory;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
+import org.bcia.julongchain.protos.common.Common;
 
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Gossip服务的相关方法，<br>
@@ -50,6 +55,8 @@ import java.util.*;
 public class GossipServiceUtil {
 
   private static JavaChainLog log = JavaChainLogFactory.getLog(GossipServiceUtil.class);
+
+  private static final Integer messageLength = 10000;
 
   /**
    * 启动gossip server服务，（seed节点）
@@ -140,7 +147,8 @@ public class GossipServiceUtil {
    * @param data String格式的区块
    * @throws GossipException
    */
-  public static void addData(GossipService gossipService, String group, Long seqNum, String data)
+  public static void addData(
+      GossipService gossipService, String group, Long seqNum, Common.Block data)
       throws GossipException {
 
     if (gossipService == null) {
@@ -162,12 +170,48 @@ public class GossipServiceUtil {
       throw new GossipException("群组，区块高度，区块文件不能为空。");
     }
 
+    String blockStr = "";
+    try {
+      blockStr = new String(data.toByteArray(), "ISO8859-1");
+      // log.info("blockStr:" + blockStr);
+    } catch (UnsupportedEncodingException e) {
+      log.error(e.getMessage(), e);
+      throw new GossipException(e);
+    }
+
+    int fileNumber = blockStr.length() / messageLength;
+    if (blockStr.length() % messageLength > 0) {
+      fileNumber = fileNumber + 1;
+    }
+    log.info("fileNumber:" + fileNumber);
+
     SharedGossipDataMessage m = new SharedGossipDataMessage();
     m.setExpireAt(Long.MAX_VALUE);
     m.setKey(group + "-" + seqNum);
-    m.setPayload(new OrSet<String>(data));
+    m.setPayload(fileNumber);
     m.setTimestamp(System.currentTimeMillis());
-    gossipService.getGossipManager().merge(m);
+    gossipService.gossipSharedData(m);
+    log.info("send gossip:[" + group + "-" + seqNum + "]");
+
+    for (int i = 0; i < fileNumber; i++) {
+
+      int start = i * messageLength;
+      int end = (i + 1) * messageLength;
+      if (end > blockStr.length()) {
+        end = blockStr.length();
+      }
+
+      String str = blockStr.substring(start, end);
+
+      SharedGossipDataMessage msg = new SharedGossipDataMessage();
+      msg.setExpireAt(Long.MAX_VALUE);
+      msg.setKey(group + "-" + seqNum + "-" + i);
+      msg.setPayload(str);
+      msg.setTimestamp(System.currentTimeMillis());
+      gossipService.gossipSharedData(msg);
+
+      log.info("send gossip detail:[" + group + "-" + seqNum + "-" + i + "]");
+    }
   }
 
   /**
@@ -179,7 +223,7 @@ public class GossipServiceUtil {
    * @return
    * @throws GossipException
    */
-  public static Object getData(GossipService gossipService, String group, Long seqNum)
+  public static Common.Block getData(GossipService gossipService, String group, Long seqNum)
       throws GossipException {
     if (gossipService == null) {
       throw new GossipException("Gossip服务未启动。");
@@ -197,19 +241,55 @@ public class GossipServiceUtil {
             + seqNum
             + "])");
 
-    Crdt crdt = gossipService.getGossipManager().findCrdt(group + "-" + seqNum);
-    if (crdt == null) {
+    SharedGossipDataMessage sharedData = gossipService.findSharedData(group + "-" + seqNum);
+
+    log.info("gossip get data, check [" + group + "-" + seqNum + "]");
+    if (sharedData == null) {
+      log.info("[" + group + "-" + seqNum + "] is null");
       return null;
     }
-    if (crdt.value() == null) {
+
+    Object fileNumberPayload = sharedData.getPayload();
+
+    Integer fileNumber = (Integer) fileNumberPayload;
+    log.info("=====================fileNumber:" + fileNumber);
+
+    if (fileNumber < 1) {
       return null;
     }
-    Set sets = (Set) crdt.value();
-    Iterator iterator = sets.iterator();
-    if (iterator.hasNext()) {
-      return iterator.next();
+
+    StringBuffer sb = new StringBuffer("");
+
+    for (int i = 0; i < fileNumber; i++) {
+      SharedGossipDataMessage m = gossipService.findSharedData(group + "-" + seqNum + "-" + i);
+      log.info("gossip get data detail, check [" + group + "-" + seqNum + "-" + i + "]");
+      if (m == null) {
+        log.info("=====================[" + group + "-" + seqNum + "-" + i + "] is null");
+        return null;
+      }
+      Object p = m.getPayload();
+      if (p == null) {
+        return null;
+      }
+      String str = (String) p;
+      sb.append(str);
     }
-    return null;
+
+    byte[] bytes = new byte[0];
+    try {
+      bytes = sb.toString().getBytes("ISO8859-1");
+    } catch (UnsupportedEncodingException e) {
+      throw new GossipException(e);
+    }
+
+    Common.Block block = null;
+    try {
+      block = Common.Block.parseFrom(bytes);
+    } catch (InvalidProtocolBufferException e) {
+      throw new GossipException(e);
+    }
+
+    return block;
   }
 
   /**
@@ -246,5 +326,23 @@ public class GossipServiceUtil {
     log.info(
         "启动committer gossip: address[" + committerAddress + "] seedAddress:" + consenterAddress);
     return gossipService;
+  }
+
+  public static void main(String[] args) {
+    String str = "11122233344455566";
+    int number = str.length() / 3;
+    if (str.length() % 3 > 0) {
+      number = number + 1;
+    }
+    int current = 0;
+    for (int i = 0; i < number; i++) {
+      int start = i * 3;
+      int end = (i + 1) * 3;
+      if (end > str.length()) {
+        end = str.length();
+      }
+      String s = str.substring(start, end);
+      System.out.println(s);
+    }
   }
 }

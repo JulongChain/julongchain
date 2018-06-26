@@ -25,6 +25,7 @@ import java.util.Map;
  * @date 04/05/18
  * @company Aisino
  */
+@Deprecated
 public class ConfigGroup {
     private Long version;
     private Map groups;

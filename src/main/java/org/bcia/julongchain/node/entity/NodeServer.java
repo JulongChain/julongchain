@@ -15,16 +15,19 @@
  */
 package org.bcia.julongchain.node.entity;
 
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.gossip.GossipService;
+import org.apache.gossip.model.SharedGossipDataMessage;
 import org.bcia.julongchain.common.exception.GossipException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.common.util.*;
+import org.bcia.julongchain.common.util.CommConstant;
+import org.bcia.julongchain.common.util.FileUtils;
+import org.bcia.julongchain.common.util.NetAddress;
+import org.bcia.julongchain.common.util.SpringContext;
 import org.bcia.julongchain.core.aclmgmt.AclManagement;
 import org.bcia.julongchain.core.aclmgmt.IAclProvider;
 import org.bcia.julongchain.core.admin.AdminServer;
@@ -48,6 +51,7 @@ import org.bcia.julongchain.protos.common.Common;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.List;
@@ -191,19 +195,65 @@ public class NodeServer {
                   log.info("群组高度为0，退出处理");
                   continue;
                 }
-                Object data = GossipServiceUtil.getData(gossipService, ledgerId, blockHeight);
-                if (data == null) {
+
+                /**
+                SharedGossipDataMessage sharedData = gossipService.findSharedData(ledgerId + "-" + blockHeight);
+                log.info("======="+sharedData);
+                if(sharedData == null){
+                  continue;
+                }
+
+                Object fileNumberPayload = sharedData.getPayload();
+
+                Integer fileNumber = (Integer) fileNumberPayload;
+                log.info("=====================fileNumber:" + fileNumber);
+
+                if (fileNumber < 1) {
+                  log.info("file number small than 1");
+                  continue;
+                }
+
+                StringBuffer sb = new StringBuffer("");
+
+                for (int i = 0; i < fileNumber; i++) {
+                  SharedGossipDataMessage m = gossipService.findSharedData(ledgerId + "-" + blockHeight + "-" + i);
+                  log.info("gossip get data detail, check [" + ledgerId + "-" + blockHeight + "-" + i + "]");
+                  if (m == null) {
+                    log.info("=====================[" + ledgerId + "-" + blockHeight + "-" + i + "] is null");
+                    continue;
+                  }
+                  Object p = m.getPayload();
+                  if (p == null) {
+                    log.info("1111");
+                    continue;
+                  }
+                  String str = (String) p;
+                  sb.append(str);
+                }
+
+                byte[] bytes = new byte[0];
+                try {
+                  bytes = sb.toString().getBytes("ISO8859-1");
+                } catch (UnsupportedEncodingException e) {
+                  log.info("333");
+                  throw new GossipException(e);
+                }
+
+                Common.Block block = null;
+                try {
+                  block = Common.Block.parseFrom(bytes);
+                } catch (InvalidProtocolBufferException e) {
+                  log.info("444");
+                  throw new GossipException(e);
+                }
+*/
+
+                Common.Block block = GossipServiceUtil.getData(gossipService, ledgerId, blockHeight);
+                if (block == null) {
                   log.info("当前群组[" + ledgerId + "]" + "没有新的区块[" + blockHeight + "]");
                   continue;
                 }
-                log.info("当前群组[" + ledgerId + "]" + "发现新的区块[" + blockHeight + "]");
-                String blockByteStr = (String) data;
-                byte[] blockBytes = BytesHexStrTranslate.toBytes(blockByteStr);
-                log.info("开始打印区块==========================================");
-                log.info(blockByteStr);
-                log.info("结束打印区块==========================================");
-                log.info("开始转换区块");
-                Common.Block block = Common.Block.parseFrom(blockBytes);
+                log.info("发现新区块");
                 BlockAndPvtData blockAndPvtData = new BlockAndPvtData(block, null, null);
                 log.info("完成转换区块");
                 log.info("开始保存区块");
@@ -213,14 +263,12 @@ public class NodeServer {
                 log.error(e.getMessage(), e);
               } catch (GossipException e) {
                 log.error(e.getMessage(), e);
-              } catch (InvalidProtocolBufferException e) {
-                log.error(e.getMessage(), e);
               }
             }
 
             // 1s查询一次
             try {
-              Thread.sleep(10000);
+              Thread.sleep(1000);
             } catch (Exception e) {
               log.error(e.getMessage(), e);
             }

@@ -125,8 +125,9 @@ public class Identity implements ISigningIdentity {
         return null;
     }
 
+
     @Override
-    public String getMSPIdentifier() {
+    public IdentityIdentifier getMSPIdentifier() {
         return null;
     }
 

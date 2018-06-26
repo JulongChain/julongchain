@@ -1,10 +1,22 @@
 package org.bcia.julongchain.gossip;
 
+import com.codahale.metrics.MetricRegistry;
+import org.apache.gossip.GossipMember;
 import org.apache.gossip.GossipService;
+import org.apache.gossip.GossipSettings;
+import org.apache.gossip.event.GossipListener;
+import org.apache.gossip.event.GossipState;
+import org.apache.gossip.model.SharedGossipDataMessage;
+import org.apache.gossip.udp.UdpSharedGossipDataMessage;
 import org.bcia.julongchain.common.exception.GossipException;
-import org.junit.Assert;
+import org.bcia.julongchain.common.log.JavaChainLog;
+import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.protos.common.Common;
 import org.junit.Test;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
 /**
@@ -15,6 +27,8 @@ import java.util.UUID;
  * @company Dingxuan
  */
 public class GossipServiceUtilTest {
+
+  private static JavaChainLog log = JavaChainLogFactory.getLog(GossipServiceUtilTest.class);
 
   @Test
   /** 测试启动gossip服务 */
@@ -31,7 +45,7 @@ public class GossipServiceUtilTest {
     GossipService gossipService = GossipServiceUtil.newGossipService(address);
     gossipService.start();
     String data = "hello";
-    GossipServiceUtil.addData(gossipService, group, 1l, data);
+    GossipServiceUtil.addData(gossipService, group, 1l, null);
   }
 
   @Test
@@ -58,21 +72,13 @@ public class GossipServiceUtilTest {
 
     String data = "hello gossip";
 
-    GossipServiceUtil.addData(gossipService_add, group, 1l, data);
+    GossipServiceUtil.addData(gossipService_add, group, 1l, null);
 
     try {
       Thread.sleep(1000);
     } catch (Exception e) {
       e.printStackTrace();
     }
-
-    String string = (String) GossipServiceUtil.getData(gossipService_read, group, 1l);
-    System.out.println(string);
-
-    String string2 = (String) GossipServiceUtil.getData(gossipService_read2, group, 1l);
-    System.out.println(string2);
-
-    Assert.assertEquals(string, data);
   }
 
   @Test
@@ -94,13 +100,70 @@ public class GossipServiceUtilTest {
       e.printStackTrace();
     }
 
-    String string = (String) GossipServiceUtil.getData(gossipService, group, 1l);
-    System.out.println(string);
-
-    Assert.assertEquals(string, "hello");
   }
 
-  public static void main(String[] args) {
-    System.out.println("hello world");
+  @Test
+  public void testGet() throws GossipException, InterruptedException {
+    // GossipService gossipService = GossipServiceUtil.newGossipService("0.0.0.0:7080", "0.0.0.0:7060");
+    // gossipService.start();
+    GossipService gossipService = GossipServiceUtil.startConsenterGossip();
+
+    UdpSharedGossipDataMessage m = new UdpSharedGossipDataMessage();
+    m.setTimestamp(System.currentTimeMillis());
+    m.setExpireAt(Long.MAX_VALUE);
+    m.setKey("myGroup-1");
+    m.setPayload("2222222");
+
+    gossipService.gossipSharedData(m);
+
+    for(int i = 0;i<20;i++){
+      UdpSharedGossipDataMessage msg = new UdpSharedGossipDataMessage();
+      msg.setTimestamp(System.currentTimeMillis());
+      msg.setExpireAt(Long.MAX_VALUE);
+      msg.setKey("myGroup-1-"+i);
+
+      StringBuffer sb = new StringBuffer("");
+      for(int j=0;j<10000;j++){
+        sb.append(1+"");
+      }
+
+      msg.setPayload(sb.toString());
+
+      gossipService.gossipSharedData(msg);
+    }
+
+
+    while(true){
+    }
   }
+
+  @Test
+  public void testGet2() throws GossipException, InterruptedException {
+    // GossipService gossipService = GossipServiceUtil.newGossipService("0.0.0.0:7080", "0.0.0.0:7060");
+    // gossipService.start();
+    GossipService gossipService = GossipServiceUtil.startCommitterGossip();
+    while(true){
+      SharedGossipDataMessage sharedData = gossipService.findSharedData("myGroup-1");
+      if(sharedData == null){
+        continue;
+      }
+      System.out.println("[myGroup-1]" +sharedData.getPayload());
+
+      for(int i=0;i<20;i++){
+
+        SharedGossipDataMessage sd = gossipService.findSharedData("myGroup-1-"+i);
+        if(sd == null){
+          log.info("[myGroup-1-"+i+"] is null");
+          continue;
+        }
+
+        System.out.println("[myGroup-1-"+i+"] " + sd.getPayload().toString());
+      }
+
+
+
+      Thread.sleep(2000);
+    }
+  }
+
 }
