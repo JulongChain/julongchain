@@ -38,9 +38,8 @@ import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.core.node.ConfigtxProcessor;
 import org.bcia.julongchain.core.node.GroupSupport;
 import org.bcia.julongchain.core.node.util.ConfigTxUtils;
+import org.bcia.julongchain.csp.factory.CspOptsManager;
 import org.bcia.julongchain.csp.factory.IFactoryOpts;
-import org.bcia.julongchain.csp.gm.dxct.GmFactoryOpts;
-import org.bcia.julongchain.csp.gm.sdt.SdtGmFactoryOpts;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.msp.mspconfig.MspConfig;
 import org.bcia.julongchain.node.cmd.INodeCmd;
@@ -179,15 +178,9 @@ public class Node {
             String mspId = mspConfig.getNode().getLocalMspId();
             String mspType = mspConfig.getNode().getLocalMspType();
 
-            List<IFactoryOpts> optsList = new ArrayList<IFactoryOpts>();
-
-            IFactoryOpts gmFactoryOpts=new GmFactoryOpts();
-            gmFactoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("gm"));
-            optsList.add(gmFactoryOpts);
-
-//            IFactoryOpts sdtGmFactoryOpts = new SdtGmFactoryOpts();
-//            sdtGmFactoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("sdtgm"));
-//            optsList.add(sdtGmFactoryOpts);
+            CspOptsManager cspOptsManager = new CspOptsManager();
+            cspOptsManager.addAll(mspConfig.getNode().getCsp().getFactoryOpts());
+            List<IFactoryOpts> optsList = cspOptsManager.getFactoryOptsList();
 
             GlobalMspManagement.loadLocalMspWithType(mspConfigDir, optsList, mspId, mspType);
         } catch (Exception e) {
@@ -224,7 +217,7 @@ public class Node {
 
                         Group group = createGroup(ledgerId, nodeLedger, configBlock);
                         groupMap.put(ledgerId, group);
-                        log.info("ledgerId-----$" + ledgerId);
+                        log.info("group-----$" + ledgerId);
 
                         if (callback != null) {
                             callback.onGroupInitialized(ledgerId);

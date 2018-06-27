@@ -19,6 +19,7 @@ import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.csp.gm.dxct.GmCspFactory;
 import org.bcia.julongchain.csp.gm.dxct.GmFactoryOpts;
+import org.bcia.julongchain.csp.gm.sdt.SdtGmCspFactory;
 import org.bcia.julongchain.csp.intfs.ICsp;
 
 import java.util.HashMap;
@@ -34,76 +35,75 @@ import java.util.List;
 public class CspManager {
     private static JavaChainLog log = JavaChainLogFactory.getLog(CspManager.class);
     //default csp
-    private static ICsp defaultCsp=null;
+    private static ICsp defaultCsp = null;
     //initFactories尚未调用之前，临时使用的csp
-    private static ICsp bootCsp=null;
+    private static ICsp bootCsp = null;
     //csp factory map
-    private static HashMap<String,ICsp> cspMap=new HashMap<String,ICsp>();
+    private static HashMap<String, ICsp> cspMap = new HashMap<String, ICsp>();
 
     /**
      * 读取配置文件，并对工厂做初始化，创建相应的Csp
+     *
      * @param optsList 工厂配置列表
      */
-    public static void initCspFactories(List<IFactoryOpts> optsList){
-        for(IFactoryOpts opts:optsList){
-            String providerName=opts.getProviderName();
-            if(providerName==IFactoryOpts.PROVIDER_GM){
-                GmCspFactory factory=new GmCspFactory();
-                initCsp(factory,opts);
-            }
-            else if(providerName==IFactoryOpts.PROVIDER_GM_BOUNCYCASTLE){
+    public static void initCspFactories(List<IFactoryOpts> optsList) {
+        for (IFactoryOpts opts : optsList) {
+            String providerName = opts.getProviderName();
+            if (IFactoryOpts.PROVIDER_GM.equals(providerName)) {
+                ICspFactory factory = new GmCspFactory();
+                initCsp(factory, opts);
+            } else if (IFactoryOpts.PROVIDER_GM_SDT.equals(providerName)) {
+                ICspFactory factory = new SdtGmCspFactory();
+                initCsp(factory, opts);
+            } else if (IFactoryOpts.PROVIDER_GMT0016.equals(providerName)) {
 
-            }
-            else if(providerName==IFactoryOpts.PROVIDER_GMT0016){
+            } else if (IFactoryOpts.PROVIDER_GMT0018.equals(providerName)) {
 
-            }
-            else if(providerName==IFactoryOpts.PROVIDER_GMT0018){
+            } else if (IFactoryOpts.PROVIDER_GMT0019.equals(providerName)) {
 
-            }
-            else if(providerName==IFactoryOpts.PROVIDER_GMT0019){
+            } else if (IFactoryOpts.PROVIDER_NIST.equals(providerName)) {
 
-            }
-            else if(providerName==IFactoryOpts.PROVIDER_NIST){
-
-            }
-            else if(providerName==IFactoryOpts.PROVIDER_PKCS11){
+            } else if (IFactoryOpts.PROVIDER_PKCS11.equals(providerName)) {
 
             }
         }
     }
+
     //根据工厂创建CSP实例，并做初始化
-    private static void initCsp(ICspFactory factory,IFactoryOpts opts){
+    private static void initCsp(ICspFactory factory, IFactoryOpts opts) {
         ICsp csp = factory.getCsp(opts);
-        log.info("Initialize CSP {}",opts.getProviderName());
-        cspMap.put(opts.getProviderName(),csp);
-        if(opts.isDefaultCsp()){
-            defaultCsp=csp;
+        log.info("Initialize CSP {}", opts.getProviderName());
+        cspMap.put(opts.getProviderName(), csp);
+        if (opts.isDefaultCsp()) {
+            defaultCsp = csp;
         }
     }
 
     //返回默认的CSP
-    public static ICsp getDefaultCsp(){
-        if(defaultCsp==null){
+    public static ICsp getDefaultCsp() {
+        if (defaultCsp == null) {
             log.warn("Before using CSP, please call initCspFactories(). Falling back to bootCsp.");
             //IFactoryOpts opts = new GmFactoryOpts(256, "SM3", true, true, "",true);
             IFactoryOpts opts = new GmFactoryOpts();
-            GmCspFactory factory=new GmCspFactory();
-            bootCsp=factory.getCsp(opts);
+            GmCspFactory factory = new GmCspFactory();
+
+//            IFactoryOpts opts = new SdtGmFactoryOpts();
+//            ICspFactory factory = new SdtGmCspFactory();
+            bootCsp = factory.getCsp(opts);
             return bootCsp;
         }
         return defaultCsp;
     }
 
     //根据工厂名称返回指定的CSP
-    public static ICsp getCsp(String name){
+    public static ICsp getCsp(String name) {
         ICsp csp = cspMap.get(name);
-        if(csp==null){
-            log.error("Get Csp {} failed",name);
+        if (csp == null) {
+            log.error("Get Csp {} failed", name);
             return null;
         }
         return csp;
     }
-
 
 
 }

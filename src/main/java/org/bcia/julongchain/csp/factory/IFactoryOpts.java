@@ -16,11 +16,10 @@ package org.bcia.julongchain.csp.factory;
  * limitations under the License.
  */
 
-import java.util.List;
 import java.util.Map;
 
 /**
- * @author zhanglin,sunianle
+ * @author zhanglin, sunianle
  * @purpose Define the interface, IFactoryOpts
  * @date 2018-01-25
  * @company Dingxuan
@@ -29,9 +28,12 @@ import java.util.Map;
 // The IFactoryOpts contains options for factories.
 public interface IFactoryOpts {
 
+    String PROVIDER_GM = "GM";
+    String PROVIDER_GM_SDT = "SDTGM";
+
     // The values of string type below present providers' names to be implemented.
     String PROVIDER_NIST = "NIST";
-    String PROVIDER_GM = "GM";
+
     String PROVIDER_GM_BOUNCYCASTLE = "GM_BOUNCYCASTLE";
     String PROVIDER_PKCS11 = "PKCS11";
     String PROVIDER_GMT0016 = "GMT0016";
@@ -46,5 +48,5 @@ public interface IFactoryOpts {
 
     boolean isDefaultCsp();
 
-    void parseFrom(Map<String,String> optMap);
+    void parseFrom(Map<String, String> optMap);
 }
