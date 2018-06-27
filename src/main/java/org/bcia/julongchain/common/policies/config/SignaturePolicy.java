@@ -15,7 +15,6 @@
  */
 package org.bcia.julongchain.common.policies.config;
 
-import org.bcia.julongchain.common.policycheck.common.IsSignaturePolicyType;
 import org.bcia.julongchain.protos.common.Policies;
 
 /**
@@ -42,8 +41,6 @@ public class SignaturePolicy extends StandardConfigPolicy {
         return policyBuilder.build();
     }
 
-
-    public IsSignaturePolicyType isSignaturePolicy_type;
 
 
 }
