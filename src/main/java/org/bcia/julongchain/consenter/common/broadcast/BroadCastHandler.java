@@ -30,7 +30,6 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfigFactory;
 
-
 import java.io.IOException;
 import java.util.Map;
 
@@ -50,6 +49,7 @@ public class BroadCastHandler implements IHandler {
 
     @Override
     public void handle(Common.Envelope envelope, StreamObserver<Ab.BroadcastResponse> responseObserver) throws IOException {
+
         // Common.Payload payload = Common.Payload.parseFrom(envelope.getPayload());
         //  Common.GroupHeader groupHeader = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
         if (Constant.SINGLETON.equals(GenesisConfigFactory.getGenesisConfig().getConsenter().getConsenterType())) {
@@ -106,8 +106,10 @@ public class BroadCastHandler implements IHandler {
                 } catch (ValidateException e) {
                     e.printStackTrace();
                 }
+
+                responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatus(Common.Status.SUCCESS).build());
             }
-            responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatus(Common.Status.SUCCESS).build());
+
 
         } else {
 
