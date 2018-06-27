@@ -281,7 +281,7 @@ public class VsscValidator implements IVsscValidator {
         // args[2] - serialized policy
         byte[][] args = new byte[][]{new byte[0], envelopeBytes, policy};
 
-        Smartcontract.SmartContractInvocationSpec invocationSpec = SpecHelper.buildInvocationSpec(vsscName, args);
+        SmartContractPackage.SmartContractInvocationSpec invocationSpec = SpecHelper.buildInvocationSpec(vsscName, args);
         SmartContractContext scContext = new SmartContractContext(groupId, vsscName, vsscVersion, vsscTxId, true,
                 null, null);
 

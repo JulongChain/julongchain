@@ -38,7 +38,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
  * 节点智能合约
@@ -59,9 +59,9 @@ public class NodeSmartContract {
         this.node = node;
     }
 
-    public void install(String scName, String scVersion, String scPath, String scLanguage, Smartcontract
+    public void install(String scName, String scVersion, String scPath, String scLanguage, SmartContractPackage
             .SmartContractInput input) throws NodeException {
-        Smartcontract.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName, scVersion,
+        SmartContractPackage.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName, scVersion,
                 scPath, input);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
@@ -84,7 +84,7 @@ public class NodeSmartContract {
         }
 
         byte[] inputBytes = (input != null ? input.toByteArray() : new byte[0]);
-        Smartcontract.SmartContractInvocationSpec lsscSpec = SpecHelper.buildInvocationSpec(CommConstant.LSSC,
+        SmartContractPackage.SmartContractInvocationSpec lsscSpec = SpecHelper.buildInvocationSpec(CommConstant.LSSC,
                 LSSC.INSTALL.getBytes(), deploymentSpec.toByteArray());
         //生成proposal  Type=ENDORSER_TRANSACTION
         ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType
@@ -97,9 +97,9 @@ public class NodeSmartContract {
         log.info("Install Result: " + proposalResponse.getResponse().getStatus());
     }
 
-    public void instantiate(String ip, int port, String groupId, String scName, String scVersion, Smartcontract
+    public void instantiate(String ip, int port, String groupId, String scName, String scVersion, SmartContractPackage
             .SmartContractInput input) throws NodeException {
-        Smartcontract.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName, scVersion,
+        SmartContractPackage.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName, scVersion,
                 null, input);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
@@ -121,7 +121,7 @@ public class NodeSmartContract {
             throw new NodeException("Generate txId fail");
         }
 
-        Smartcontract.SmartContractInvocationSpec lsscSpec = SpecHelper.buildInvocationSpec(CommConstant.LSSC,
+        SmartContractPackage.SmartContractInvocationSpec lsscSpec = SpecHelper.buildInvocationSpec(CommConstant.LSSC,
                 CommConstant.DEPLOY.getBytes(), groupId.getBytes(), deploymentSpec.toByteArray());
         //生成proposal  Type=ENDORSER_TRANSACTION
         ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType
@@ -173,9 +173,9 @@ public class NodeSmartContract {
 
     }
 
-    public void invoke(String ip, int port, String groupId, String scName, String scLanguage, Smartcontract
+    public void invoke(String ip, int port, String groupId, String scName, String scLanguage, SmartContractPackage
             .SmartContractInput input) throws NodeException {
-        Smartcontract.SmartContractInvocationSpec sciSpec = SpecHelper.buildInvocationSpec(scName, input.toByteArray());
+        SmartContractPackage.SmartContractInvocationSpec sciSpec = SpecHelper.buildInvocationSpec(scName, input.toByteArray());
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
@@ -255,7 +255,7 @@ public class NodeSmartContract {
     }
 
     public void query(String groupId, String smartContractName, String ctor) throws NodeException {
-        Smartcontract.SmartContractInvocationSpec spec = SpecHelper.buildInvocationSpec(smartContractName, ctor, null);
+        SmartContractPackage.SmartContractInvocationSpec spec = SpecHelper.buildInvocationSpec(smartContractName, ctor, null);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 

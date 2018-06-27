@@ -40,9 +40,9 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
-import static org.bcia.julongchain.protos.node.Smartcontract.*;
-import static org.bcia.julongchain.protos.node.SmartcontractShim.SmartContractMessage;
-import static org.bcia.julongchain.protos.node.SmartcontractShim.SmartContractMessage.Type;
+import static org.bcia.julongchain.protos.node.SmartContractPackage.*;
+import static org.bcia.julongchain.protos.node.SmartContractShim.SmartContractMessage;
+import static org.bcia.julongchain.protos.node.SmartContractShim.SmartContractMessage.Type;
 
 /**
  * 类描述

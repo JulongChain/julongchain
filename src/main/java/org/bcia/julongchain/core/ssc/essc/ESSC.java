@@ -25,7 +25,7 @@ import org.bcia.julongchain.msp.IMsp;
 import org.bcia.julongchain.msp.ISigningIdentity;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -99,7 +99,7 @@ public class ESSC extends SystemSmartContractBase {
             return newErrorResponse("SmartcontractID is empty");
         }
 
-        Smartcontract.SmartContractID smartContractID=null;
+        SmartContractPackage.SmartContractID smartContractID=null;
         try {
             smartContractID = ProtoUtils.unmarshalSmartcontractID(smartContractIDBytes);
         }catch(Exception e){

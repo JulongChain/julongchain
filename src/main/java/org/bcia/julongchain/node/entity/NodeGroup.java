@@ -47,7 +47,7 @@ import org.bcia.julongchain.protos.consenter.Ab;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
 import org.bcia.julongchain.protos.node.Query;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfigFactory;
 
@@ -230,7 +230,7 @@ public class NodeGroup {
     }
 
     public void joinGroup(String blockPath) throws NodeException {
-        Smartcontract.SmartContractInvocationSpec spec = null;
+        SmartContractPackage.SmartContractInvocationSpec spec = null;
         try {
             spec = SpecHelper.buildInvocationSpec(CommConstant.CSSC, CSSC.JOIN_GROUP,
                     FileUtils.readFileBytes(blockPath));
@@ -304,7 +304,7 @@ public class NodeGroup {
      * 获取当前节点所在的所有群组列表
      */
     public List<Query.GroupInfo> listGroups() throws NodeException {
-        Smartcontract.SmartContractInvocationSpec csscSpec = SpecHelper.buildInvocationSpec(CommConstant.CSSC, CSSC
+        SmartContractPackage.SmartContractInvocationSpec csscSpec = SpecHelper.buildInvocationSpec(CommConstant.CSSC, CSSC
                 .GET_GROUPS, null);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();

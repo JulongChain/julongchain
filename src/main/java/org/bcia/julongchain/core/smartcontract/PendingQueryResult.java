@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.core.smartcontract;
 
-import org.bcia.julongchain.protos.node.SmartcontractShim;
+import org.bcia.julongchain.protos.node.SmartContractShim;
 
 /**
  * 类描述
@@ -26,14 +26,14 @@ import org.bcia.julongchain.protos.node.SmartcontractShim;
  */
 public class PendingQueryResult {
 
-    private SmartcontractShim.QueryResultBytes[] batch;
+    private SmartContractShim.QueryResultBytes[] batch;
     private Integer count;
 
-    public SmartcontractShim.QueryResultBytes[] getBatch() {
+    public SmartContractShim.QueryResultBytes[] getBatch() {
         return batch;
     }
 
-    public void setBatch(SmartcontractShim.QueryResultBytes[] batch) {
+    public void setBatch(SmartContractShim.QueryResultBytes[] batch) {
         this.batch = batch;
     }
 

@@ -113,7 +113,7 @@ public class EndorserSupport implements IEndorserSupport {
     @Override
     public Object[] execute(String groupId, String scName, String scVersion, String txId, boolean sysSC,
                             ProposalPackage.SignedProposal signedProposal, ProposalPackage.Proposal proposal,
-                            Smartcontract.SmartContractInvocationSpec spec) throws NodeException {
+                            SmartContractPackage.SmartContractInvocationSpec spec) throws NodeException {
         SmartContractContext scContext = new SmartContractContext(groupId, scName, scVersion, txId, sysSC,
                 signedProposal, proposal);
         //TODO:Decorator功能未实现
@@ -128,7 +128,7 @@ public class EndorserSupport implements IEndorserSupport {
     @Override
     public Object[] execute(String groupId, String scName, String scVersion, String txId, boolean sysSC,
                             ProposalPackage.SignedProposal signedProposal, ProposalPackage.Proposal proposal,
-                            Smartcontract.SmartContractDeploymentSpec spec) throws NodeException {
+                            SmartContractPackage.SmartContractDeploymentSpec spec) throws NodeException {
         SmartContractContext scContext = new SmartContractContext(groupId, scName, scVersion, txId, sysSC,
                 signedProposal, proposal);
         try {
@@ -149,7 +149,7 @@ public class EndorserSupport implements IEndorserSupport {
         SmartContractContext scContext = new SmartContractContext(groupId, CommConstant.LSSC, version, txId, true,
                 signedProposal, proposal);
 
-        Smartcontract.SmartContractInvocationSpec lsscSpec = SpecHelper.buildInvocationSpec(CommConstant.LSSC,
+        SmartContractPackage.SmartContractInvocationSpec lsscSpec = SpecHelper.buildInvocationSpec(CommConstant.LSSC,
                 LSSC.GET_SC_DATA.getBytes(), groupId.getBytes(), scName.getBytes());
 
         try {

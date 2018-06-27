@@ -21,7 +21,7 @@ import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractConte
 import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.LedgerContext;
 import org.bcia.julongchain.protos.node.ProposalPackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
  * SmartContractExecuteProvider is an implementation of the ISmartContractProvider interface
@@ -60,7 +60,7 @@ public class SmartContractExecuteProvider implements ISmartContractProvider {
     }
 
     @Override
-    public void stop(LedgerContext ctxt, SmartContractContext scContext, Smartcontract.SmartContractDeploymentSpec spec) throws SmartContractException {
+    public void stop(LedgerContext ctxt, SmartContractContext scContext, SmartContractPackage.SmartContractDeploymentSpec spec) throws SmartContractException {
 
     }
 }

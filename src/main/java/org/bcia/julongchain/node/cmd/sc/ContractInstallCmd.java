@@ -23,7 +23,7 @@ import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.node.Node;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
  * 完成节点安装智能合约的解析
@@ -92,13 +92,13 @@ public class ContractInstallCmd extends AbstractNodeContractCmd {
             log.info("Smart Contract version-----$" + scVersion);
         }
         //合约具体执行参数
-        Smartcontract.SmartContractInput input = null;
+        SmartContractPackage.SmartContractInput input = null;
         if (cmd.hasOption(ARG_SC_CTOR)) {
             String ctor = cmd.getOptionValue(ARG_SC_CTOR, defaultValue);
             log.info("ctor-----$" + ctor);
             JSONObject ctorJson = JSONObject.parseObject(ctor);
 
-            Smartcontract.SmartContractInput.Builder inputBuilder = Smartcontract.SmartContractInput.newBuilder();
+            SmartContractPackage.SmartContractInput.Builder inputBuilder = SmartContractPackage.SmartContractInput.newBuilder();
 
             JSONArray argsJSONArray = ctorJson.getJSONArray(KEY_ARGS);
             for (int i = 0; i < argsJSONArray.size(); i++) {

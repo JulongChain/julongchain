@@ -27,7 +27,7 @@ import org.bcia.julongchain.core.ssc.essc.ESSC;
 import org.bcia.julongchain.core.ssc.lssc.LSSC;
 import org.bcia.julongchain.core.ssc.qssc.QSSC;
 import org.bcia.julongchain.core.ssc.vssc.VSSC;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -220,7 +220,7 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
 
 
     //编译智能合约，形成智能合约部署规范(DeploymentSpec);
-    private Smartcontract.SmartContractDeploymentSpec buildSysSmartContract(Smartcontract.SmartContractSpec spec)
+    private SmartContractPackage.SmartContractDeploymentSpec buildSysSmartContract(SmartContractPackage.SmartContractSpec spec)
             throws SysSmartContractException {
         return null;
     }

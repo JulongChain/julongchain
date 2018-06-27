@@ -127,9 +127,9 @@ public class EventHelper {
                                 SmartContractEventPackage.SmartContractEvent.Builder newSmartContractEventBuilder =
                                         smartContractEvent.toBuilder();
                                 newSmartContractEventBuilder.clearPayload();
-                                filteredSmartContractActionBuilder.setSmartcontractEvent(newSmartContractEventBuilder);
+                                filteredSmartContractActionBuilder.setSmartContractEvent(newSmartContractEventBuilder);
                             }
-                            transactionActionsBuilder.addSmartcontractActions(filteredSmartContractActionBuilder);
+                            transactionActionsBuilder.addSmartContractActions(filteredSmartContractActionBuilder);
 
                             ProposalResponsePackage.ProposalResponsePayload newProposalResponsePayload =
                                     ProposalResponseUtils.buildProposalResponsePayload(smartContractAction.getEvents(),

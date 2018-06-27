@@ -24,7 +24,7 @@ import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.node.Node;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
  * node contract invoke -c consenter.example.com:7050 -g groupId -n mycc -l java -ctor '{"Args":["query","a"]}'
@@ -101,13 +101,13 @@ public class ContractInvokeCmd extends AbstractNodeContractCmd {
 //            log.info("Contract ctor-----$" + ctor);
 //        }
 
-        Smartcontract.SmartContractInput input = null;
+        SmartContractPackage.SmartContractInput input = null;
         if (cmd.hasOption(ARG_SC_CTOR)) {
             String ctor = cmd.getOptionValue(ARG_SC_CTOR, defaultValue);
             log.info("ctor-----$" + ctor);
             JSONObject ctorJson = JSONObject.parseObject(ctor);
 
-            Smartcontract.SmartContractInput.Builder inputBuilder = Smartcontract.SmartContractInput.newBuilder();
+            SmartContractPackage.SmartContractInput.Builder inputBuilder = SmartContractPackage.SmartContractInput.newBuilder();
 
             JSONArray argsJSONArray = ctorJson.getJSONArray(KEY_ARGS);
             for (int i = 0; i < argsJSONArray.size(); i++) {

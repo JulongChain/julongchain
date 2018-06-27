@@ -16,7 +16,7 @@
 package org.bcia.julongchain.core.ssc.lssc;
 
 import org.bcia.julongchain.protos.node.SmartContractDataPackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
  * 智能合约代码的描述及数据
@@ -27,10 +27,10 @@ import org.bcia.julongchain.protos.node.Smartcontract;
  */
 public class SmartContractCode {
     SmartContractDataPackage.SmartContractData smartcontractData;
-    Smartcontract.SmartContractDeploymentSpec depSpec;
+    SmartContractPackage.SmartContractDeploymentSpec depSpec;
     byte[] depSpecBytes;
 
-    public SmartContractCode(SmartContractDataPackage.SmartContractData smartcontractData, Smartcontract.SmartContractDeploymentSpec depSpec, byte[] depSpecBytes) {
+    public SmartContractCode(SmartContractDataPackage.SmartContractData smartcontractData, SmartContractPackage.SmartContractDeploymentSpec depSpec, byte[] depSpecBytes) {
         this.smartcontractData = smartcontractData;
         this.depSpec = depSpec;
         this.depSpecBytes = depSpecBytes;
@@ -44,11 +44,11 @@ public class SmartContractCode {
         this.smartcontractData = smartcontractData;
     }
 
-    public Smartcontract.SmartContractDeploymentSpec getDepSpec() {
+    public SmartContractPackage.SmartContractDeploymentSpec getDepSpec() {
         return depSpec;
     }
 
-    public void setDepSpec(Smartcontract.SmartContractDeploymentSpec depSpec) {
+    public void setDepSpec(SmartContractPackage.SmartContractDeploymentSpec depSpec) {
         this.depSpec = depSpec;
     }
 

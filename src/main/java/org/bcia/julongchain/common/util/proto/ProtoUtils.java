@@ -48,9 +48,9 @@ public class ProtoUtils {
      * @throws UnsupportedEncodingException
      * @throws InvalidProtocolBufferException
      */
-    public static Smartcontract.SmartContractID unmarshalSmartcontractID(byte[] smartContractIDBytes)
+    public static SmartContractPackage.SmartContractID unmarshalSmartcontractID(byte[] smartContractIDBytes)
             throws UnsupportedEncodingException, InvalidProtocolBufferException {
-        Smartcontract.SmartContractID id = Smartcontract.SmartContractID.parseFrom(smartContractIDBytes);
+        SmartContractPackage.SmartContractID id = SmartContractPackage.SmartContractID.parseFrom(smartContractIDBytes);
         return id;
     }
 
@@ -122,8 +122,8 @@ public class ProtoUtils {
      * @return
      * @throws InvalidProtocolBufferException
      */
-    public static Smartcontract.SmartContractDeploymentSpec getSmartContractDeploymentSpec(byte[] depSpecBytes) throws InvalidProtocolBufferException {
-        return Smartcontract.SmartContractDeploymentSpec.parseFrom(depSpecBytes);
+    public static SmartContractPackage.SmartContractDeploymentSpec getSmartContractDeploymentSpec(byte[] depSpecBytes) throws InvalidProtocolBufferException {
+        return SmartContractPackage.SmartContractDeploymentSpec.parseFrom(depSpecBytes);
     }
 
 

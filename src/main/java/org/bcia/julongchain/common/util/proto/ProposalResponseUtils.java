@@ -27,7 +27,7 @@ import org.bcia.julongchain.msp.ISigningIdentity;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
  * 提案响应工具类
@@ -116,7 +116,7 @@ public class ProposalResponseUtils {
             byte[] headerBytes, byte[] payloadBytes, ProposalResponsePackage.Response response,
             byte[] results,
             byte[] events,
-            Smartcontract.SmartContractID smartContractID,
+            SmartContractPackage.SmartContractID smartContractID,
             byte[] visibility,
             ISigningIdentity signingIdentity) throws InvalidProtocolBufferException, JavaChainException {
         Common.Header header = Common.Header.parseFrom(headerBytes);
@@ -179,7 +179,7 @@ public class ProposalResponseUtils {
      * @return
      */
     private static byte[] getBytesProposalResponsePayload(byte[] pHashBytes, ProposalResponsePackage.Response
-            response, byte[] results, byte[] events, Smartcontract.SmartContractID smartContractID) {
+            response, byte[] results, byte[] events, SmartContractPackage.SmartContractID smartContractID) {
         //构造SmartContractAction
         ProposalPackage.SmartContractAction.Builder actionBuilder = ProposalPackage.SmartContractAction.newBuilder();
         if (events != null) {
@@ -259,7 +259,7 @@ public class ProposalResponseUtils {
     }
 
     public static ProposalResponsePackage.ProposalResponsePayload buildProposalResponsePayload(
-            ByteString event, ByteString result, ProposalResponsePackage.Response response, Smartcontract
+            ByteString event, ByteString result, ProposalResponsePackage.Response response, SmartContractPackage
             .SmartContractID smartContractId, ByteString hash) {
         ProposalPackage.SmartContractAction.Builder actionBuilder = ProposalPackage.SmartContractAction.newBuilder();
         actionBuilder.setEvents(event);

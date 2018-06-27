@@ -15,7 +15,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.ledger.queryresult.KvQueryResult;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.SmartContractEventPackage;
-import org.bcia.julongchain.protos.node.SmartcontractShim;
+import org.bcia.julongchain.protos.node.SmartContractShim;
 import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
@@ -181,10 +181,10 @@ public class SmartContractStubTest {
                         .setValue(ByteString.copyFromUtf8("Value of B"))
                         .build()
         };
-        final SmartcontractShim.QueryResponse value = SmartcontractShim.QueryResponse.newBuilder()
+        final SmartContractShim.QueryResponse value = SmartContractShim.QueryResponse.newBuilder()
                 .setHasMore(false)
-                .addResults(SmartcontractShim.QueryResultBytes.newBuilder().setResultBytes(keyValues[0].toByteString()))
-                .addResults(SmartcontractShim.QueryResultBytes.newBuilder().setResultBytes(keyValues[1].toByteString()))
+                .addResults(SmartContractShim.QueryResultBytes.newBuilder().setResultBytes(keyValues[0].toByteString()))
+                .addResults(SmartContractShim.QueryResultBytes.newBuilder().setResultBytes(keyValues[1].toByteString()))
                 .build();
         when(handler.getStateByRange("myc", "txId", startKey, endKey)).thenReturn(value);
         assertThat(stub.getStateByRange(startKey, endKey), contains(Arrays.stream(keyValues).map(KeyValue::new).toArray()));
@@ -203,10 +203,10 @@ public class SmartContractStubTest {
                         .setValue(ByteString.copyFromUtf8("Value of B"))
                         .build()
         };
-        final SmartcontractShim.QueryResponse value = SmartcontractShim.QueryResponse.newBuilder()
+        final SmartContractShim.QueryResponse value = SmartContractShim.QueryResponse.newBuilder()
                 .setHasMore(false)
-                .addResults(SmartcontractShim.QueryResultBytes.newBuilder().setResultBytes(keyValues[0].toByteString()))
-                .addResults(SmartcontractShim.QueryResultBytes.newBuilder().setResultBytes(keyValues[1].toByteString()))
+                .addResults(SmartContractShim.QueryResultBytes.newBuilder().setResultBytes(keyValues[0].toByteString()))
+                .addResults(SmartContractShim.QueryResultBytes.newBuilder().setResultBytes(keyValues[1].toByteString()))
                 .build();
         when(handler.getStateByRange(anyString(), anyString(), anyString(), anyString())).thenReturn(value);
         stub.getStateByPartialCompositeKey("KEY");
@@ -249,10 +249,10 @@ public class SmartContractStubTest {
                         .setValue(ByteString.copyFromUtf8("Value of B"))
                         .build()
         };
-        final SmartcontractShim.QueryResponse value = SmartcontractShim.QueryResponse.newBuilder()
+        final SmartContractShim.QueryResponse value = SmartContractShim.QueryResponse.newBuilder()
                 .setHasMore(false)
-                .addResults(SmartcontractShim.QueryResultBytes.newBuilder().setResultBytes(keyValues[0].toByteString()))
-                .addResults(SmartcontractShim.QueryResultBytes.newBuilder().setResultBytes(keyValues[1].toByteString()))
+                .addResults(SmartContractShim.QueryResultBytes.newBuilder().setResultBytes(keyValues[0].toByteString()))
+                .addResults(SmartContractShim.QueryResultBytes.newBuilder().setResultBytes(keyValues[1].toByteString()))
                 .build();
         when(handler.getQueryResult("myc", "txId", "QUERY")).thenReturn(value);
         assertThat(stub.getQueryResult("QUERY"), contains(Arrays.stream(keyValues).map(KeyValue::new).toArray()));
@@ -273,10 +273,10 @@ public class SmartContractStubTest {
                         .setValue(ByteString.copyFromUtf8("Value B"))
                         .build()
         };
-        final SmartcontractShim.QueryResponse value = SmartcontractShim.QueryResponse.newBuilder()
+        final SmartContractShim.QueryResponse value = SmartContractShim.QueryResponse.newBuilder()
                 .setHasMore(false)
-                .addResults(SmartcontractShim.QueryResultBytes.newBuilder().setResultBytes(keyModifications[0].toByteString()))
-                .addResults(SmartcontractShim.QueryResultBytes.newBuilder().setResultBytes(keyModifications[1].toByteString()))
+                .addResults(SmartContractShim.QueryResultBytes.newBuilder().setResultBytes(keyModifications[0].toByteString()))
+                .addResults(SmartContractShim.QueryResultBytes.newBuilder().setResultBytes(keyModifications[1].toByteString()))
                 .build();
         when(handler.getHistoryForKey("myc", "txId", "KEY")).thenReturn(value);
         assertThat(stub.getHistoryForKey("KEY"), contains(Arrays.stream(keyModifications).map(KeyModification::new).toArray()));

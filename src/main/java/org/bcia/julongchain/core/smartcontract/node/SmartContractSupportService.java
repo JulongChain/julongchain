@@ -37,7 +37,7 @@ import java.util.Map;
 
 import static org.bcia.julongchain.core.smartcontract.node.SmartContractRunningUtil.*;
 import static org.bcia.julongchain.core.smartcontract.node.TransactionRunningUtil.*;
-import static org.bcia.julongchain.protos.node.SmartcontractShim.SmartContractMessage;
+import static org.bcia.julongchain.protos.node.SmartContractShim.SmartContractMessage;
 
 /**
  * 智能合约service，负责接收和处理gRPC消息
@@ -103,7 +103,7 @@ public class SmartContractSupportService
             SmartContractMessage.newBuilder()
                 .setType(SmartContractMessage.Type.INIT)
                 .setProposal(signedProposal)
-                .setSmartcontractEvent(smartContractEvent)
+                .setSmartContractEvent(smartContractEvent)
                 .build();
         streamObserver.onNext(responseMessage);
       }
@@ -268,8 +268,8 @@ public class SmartContractSupportService
         // 收到putState信息
         if (message.getType().equals(SmartContractMessage.Type.PUT_STATE)) {
           try {
-            SmartcontractShim.PutState putState = null;
-            putState = SmartcontractShim.PutState.parseFrom(message.getPayload());
+            SmartContractShim.PutState putState = null;
+            putState = SmartContractShim.PutState.parseFrom(message.getPayload());
             logger.info(putState.getKey());
             logger.info(putState.getValue());
 
@@ -336,8 +336,8 @@ public class SmartContractSupportService
             return;
         }
         // 从message的payload中获取smartContractID
-        Smartcontract.SmartContractID smartContractID =
-                Smartcontract.SmartContractID.parseFrom(message.getPayload());
+        SmartContractPackage.SmartContractID smartContractID =
+                SmartContractPackage.SmartContractID.parseFrom(message.getPayload());
         String name = smartContractID.getName();
         if (name == null || name.length() == 0) {
             return;
@@ -425,7 +425,7 @@ public class SmartContractSupportService
     private String getSmartContractId(SmartContractMessage message) {
         String smartContractIdStr = "";
         try {
-            smartContractIdStr = Smartcontract.SmartContractID.parseFrom(message.getPayload()).getName();
+            smartContractIdStr = SmartContractPackage.SmartContractID.parseFrom(message.getPayload()).getName();
         } catch (InvalidProtocolBufferException e) {
             logger.error(e.getMessage(), e);
         }

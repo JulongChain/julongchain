@@ -7,8 +7,8 @@ SPDX-License-Identifier: Apache-2.0
 package org.bcia.julongchain.core.smartcontract.shim.impl;
 
 import org.bcia.julongchain.core.smartcontract.shim.ledger.IQueryResultsIterator;
-import org.bcia.julongchain.protos.node.SmartcontractShim.QueryResponse;
-import org.bcia.julongchain.protos.node.SmartcontractShim.QueryResultBytes;
+import org.bcia.julongchain.protos.node.SmartContractShim.QueryResponse;
+import org.bcia.julongchain.protos.node.SmartContractShim.QueryResultBytes;
 
 import java.util.Collections;
 import java.util.Iterator;

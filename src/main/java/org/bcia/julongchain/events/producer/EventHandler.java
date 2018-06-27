@@ -104,8 +104,8 @@ public class EventHandler implements IEventHandler {
             key = PATH_SEPARATOR + String.valueOf(EventsPackage.EventType.REJECTION_VALUE);
         } else if (EventsPackage.EventType.SMART_CONTRACT.equals(eventType)) {
             key = PATH_SEPARATOR + String.valueOf(EventsPackage.EventType.SMART_CONTRACT_VALUE) + PATH_SEPARATOR +
-                    interest.getSmartcontractRegInfo().getSmartcontractId() + PATH_SEPARATOR + interest
-                    .getSmartcontractRegInfo().getEventName();
+                    interest.getSmartContractRegInfo().getSmartContractId() + PATH_SEPARATOR + interest
+                    .getSmartContractRegInfo().getEventName();
         } else {
             key = PATH_SEPARATOR + String.valueOf(eventType.getNumber());
         }
