@@ -22,18 +22,15 @@ import java.util.Map;
 
 /**
  * 类描述
- *
+ *  用在PolicyPareser里，将策略解析到多叉树数中
  * @author yuanjun
  * @date 12/06/18
  * @company Aisino
  */
-public class Node {
+public class PolicyNode {
     public StringBuffer msg = new StringBuffer("");
-    public Node left;
-    public Node right;
-    public Node parent;
-    public List<Node> sons = new ArrayList<Node>();
-    public boolean cal = false;
+    public PolicyNode parent;
+    public List<PolicyNode> sons = new ArrayList<PolicyNode>();
     public boolean value = false;
 
     public String getMsg() {
@@ -48,7 +45,7 @@ public class Node {
                 ",flag="+value+
                 ",sons="+sons.size();
     }
-    public boolean getValue(Map<String, String> userOrgs){
+   /* public boolean getValue(Map<String, String> userOrgs){
         if ("or".equals(msg.toString()) || "and".equals(msg.toString())) {
             return value;
         }
@@ -60,11 +57,11 @@ public class Node {
             }
         }
         return false;
-    }
+    }*/
     public String n2str() {
         if ("or".equals(msg.toString().trim().toLowerCase()) || "and".equals(msg.toString().trim().toLowerCase()) ) {
             String nstr = "";
-            for (Node node : sons) {
+            for (PolicyNode node : sons) {
                 nstr += node.n2str()+",";
             }
             return "outof(ID,"+(msg.toString().toLowerCase().equals("or")?"1":sons.size())+","
