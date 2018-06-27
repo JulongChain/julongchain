@@ -22,6 +22,6 @@ import org.bcia.julongchain.common.configtx.IConfigtxValidator;
  * @Date: 2018/5/30
  * @company Dingxuan
  */
-public interface IAcSupport {
+public interface IAccessControlSupport {
     long sequence();
 }

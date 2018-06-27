@@ -23,8 +23,8 @@ import org.bcia.julongchain.common.policies.IPolicyManager;
  * @Date: 2018/5/29
  * @company Dingxuan
  */
-public interface ISupport extends IAcSupport{
+public interface ISupport extends IAccessControlSupport{
     long sequence();
-    IPolicyManager policyManager();
-    IReader reader();
+    IPolicyManager getPolicyManager();
+    IReader getReader();
 }

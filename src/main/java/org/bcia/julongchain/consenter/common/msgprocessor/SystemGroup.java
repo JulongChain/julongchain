@@ -110,8 +110,7 @@ public class SystemGroup  implements IProcessor {
                 TxUtils.createSignedEnvelope(Common.HeaderType.CONSENTER_TRANSACTION_VALUE,
                         standardGroup.getSupport().getGroupId(), standardGroup.getSupport().signer(), newChannelEnvConfig,
                         Constant.MSGVERSION, Constant.EPOCH);
-
-        new RuleSet(standardGroup.getFilters().getRules()).apply(wrappedOrdererTransaction);
+//       new RuleSet(standardGroup.getFilters().getRules()).apply(wrappedOrdererTransaction);
 
         return new ConfigMsg(wrappedOrdererTransaction, standardGroup.getSupport().getSequence());
     }

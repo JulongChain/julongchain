@@ -32,7 +32,7 @@ import java.util.List;
  * @Date: 2018/5/30
  * @company Dingxuan
  */
-public class SessionAc {
+public class SessionAccessControl  {
     private ChainSupport acSupport;
     private IPolicyChecker checkPolicy;
     private String group;
@@ -41,7 +41,7 @@ public class SessionAc {
     private Date sessionEndTime;
     private boolean usedAtLeastOnce;
     private Expiration expiration;
-    public SessionAc(ChainSupport acSupport, IPolicyChecker checkPolicy, String group, Common.Envelope envelope, Expiration expiration) throws InvalidProtocolBufferException, ValidateException {
+    public SessionAccessControl(ChainSupport acSupport, IPolicyChecker checkPolicy, String group, Common.Envelope envelope, Expiration expiration) throws InvalidProtocolBufferException, ValidateException {
         List<SignedData> signedData=null;
         signedData= SignedData.asSignedData(envelope);
         this.acSupport = acSupport;
@@ -66,7 +66,7 @@ public class SessionAc {
             return;
         }
         usedAtLeastOnce=true;
-        checkPolicy.policyChecker(envelope,group);
+        checkPolicy.checkPolicy(envelope,group);
     }
 
 }

@@ -23,5 +23,5 @@ import org.bcia.julongchain.protos.common.Common;
  * @company Dingxuan
  */
 public interface IPolicyChecker {
-    void policyChecker(Common.Envelope envelope,String groupId);
+    void checkPolicy(Common.Envelope envelope,String groupId);
 }

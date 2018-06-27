@@ -24,6 +24,6 @@ import com.google.protobuf.Message;
  * @Date: 2018/5/29
  * @company Dingxuan
  */
-public interface ISend {
+public interface ISender {
    void send(Message msg) throws InvalidProtocolBufferException;
 }
