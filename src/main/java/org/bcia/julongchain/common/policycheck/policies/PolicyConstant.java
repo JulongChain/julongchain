@@ -23,7 +23,7 @@ package org.bcia.julongchain.common.policycheck.policies;
  * @date 14/05/18
  * @company Aisino
  */
-public class Policy {
+public class PolicyConstant {
     public static final String PathSeparator = "/";
 
     // ChannelPrefix is used in the path of standard channel policy managers

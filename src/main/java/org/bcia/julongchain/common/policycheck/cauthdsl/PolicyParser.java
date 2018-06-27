@@ -20,15 +20,13 @@ import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.policycheck.bean.Context;
-import org.bcia.julongchain.common.policycheck.bean.Node;
+import org.bcia.julongchain.common.policycheck.bean.PolicyNode;
 import org.bcia.julongchain.common.util.proto.ProtoUtils;
 import org.bcia.julongchain.protos.common.MspPrincipal;
 import org.bcia.julongchain.protos.common.Policies;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.*;
 /**
  * 类描述
@@ -46,7 +44,7 @@ public class PolicyParser {
     public static Policies.SignaturePolicyEnvelope fromString(String policy) throws PolicyException {
 
        String res = checkPolicyStr(policy);
-       Node node = checkPolicyNode(res);
+       PolicyNode node = checkPolicyNode(res);
        Context ctx = new Context(0,new ArrayList<MspPrincipal.MSPPrincipal>());
        Policies.SignaturePolicy signaturePolicy = getSignaturePolicy(node,ctx);
         Policies.SignaturePolicyEnvelope.Builder builder = Policies.SignaturePolicyEnvelope.newBuilder();
@@ -59,7 +57,7 @@ public class PolicyParser {
     }
 
 
-    public static Policies.SignaturePolicy getSignaturePolicy(Node node,Context ctx) throws PolicyException {
+    public static Policies.SignaturePolicy getSignaturePolicy(PolicyNode node, Context ctx) throws PolicyException {
         for(int i=0;i<node.sons.size();i++){
             if("outof".equals(node.getMsg())){
                 getSignaturePolicy(node.sons.get(i),ctx);
@@ -131,11 +129,11 @@ public class PolicyParser {
     }
 
     public static String checkPolicyStr(String policy) {
-        Node todo = new Node();
-        Node first = new Node();
+        PolicyNode todo = new PolicyNode();
+        PolicyNode first = new PolicyNode();
         todo = first;
         for (char c : policy.toCharArray()) {
-            Node tmp = new Node();
+            PolicyNode tmp = new PolicyNode();
             switch (c) {
                 case '(':
                     todo.sons.add(tmp);
@@ -162,12 +160,12 @@ public class PolicyParser {
 
         return str;
     }
-    public static Node checkPolicyNode(String policy) {
-        Node todo = new Node();
-        Node first = new Node();
+    public static PolicyNode checkPolicyNode(String policy) {
+        PolicyNode todo = new PolicyNode();
+        PolicyNode first = new PolicyNode();
         todo = first;
         for (char c : policy.toCharArray()) {
-            Node tmp = new Node();
+            PolicyNode tmp = new PolicyNode();
             switch (c) {
                 case '(':
                     todo.sons.add(tmp);
