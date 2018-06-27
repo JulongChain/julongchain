@@ -136,7 +136,7 @@ public class PvtDataStoreImpl implements IPvtDataStore {
         //执行写入
         db.writeBatch(batch, true);
         batchPending = true;
-        logger.debug(String.format("Saved %d private data write sets for block [%d]", pvtData.size(), blockNum));
+        logger.info(String.format("Saved %d private data write sets for block [%d]", pvtData.size(), blockNum));
     }
 
     /**

@@ -331,11 +331,11 @@ public class Endorser implements IEndorserServer {
         if(CollectionUtils.isEmpty(kvWrites)){
             kvWrites = new ArrayList<>();
         }
-        String ns = scName;
+        String ns = groupId + " " + scName;
         String txIdInit = txId + CommConstant.TX_INIT;
         String scNameInit = TransactionRunningUtil.getSmartContractIdByTxId(txIdInit);
         if(StringUtils.isNotEmpty(scNameInit)){
-            ns = scNameInit;
+            ns = groupId + " " + scNameInit;
         }
 
         KvRwset.KVRWSet kvRwSet = KvRwset.KVRWSet.newBuilder().addAllReads(kvReads).addAllWrites(kvWrites).build();
