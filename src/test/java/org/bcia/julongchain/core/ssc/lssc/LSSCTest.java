@@ -51,7 +51,7 @@ public class LSSCTest extends BaseJunit4Test {
     public void testInstalls(){
         String path="src/main/java/org/bcia/julongchain/examples/smartcontract/java/smartcontract_example02";
         ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("1",new LinkedList<ByteString>());
-       // testInstall("mycc","1.0",path,"","Alice",mockStub);
+        testInstall("mycc","1.0",path,"","Alice",mockStub);
         testInstall("example02","1.0",path,"","Alice",mockStub);  //  TESTED  OK
 
         //  testInstall("example02-2","1.0",path,"","Alice",mockStub); //  TESTED  OK

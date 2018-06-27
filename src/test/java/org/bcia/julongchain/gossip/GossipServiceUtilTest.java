@@ -1,22 +1,11 @@
 package org.bcia.julongchain.gossip;
 
-import com.codahale.metrics.MetricRegistry;
-import org.apache.gossip.GossipMember;
 import org.apache.gossip.GossipService;
-import org.apache.gossip.GossipSettings;
-import org.apache.gossip.event.GossipListener;
-import org.apache.gossip.event.GossipState;
-import org.apache.gossip.model.SharedGossipDataMessage;
-import org.apache.gossip.udp.UdpSharedGossipDataMessage;
 import org.bcia.julongchain.common.exception.GossipException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.protos.common.Common;
 import org.junit.Test;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.UUID;
 
 /**

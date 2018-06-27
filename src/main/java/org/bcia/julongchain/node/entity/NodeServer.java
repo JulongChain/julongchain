@@ -15,8 +15,10 @@
  */
 package org.bcia.julongchain.node.entity;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.gossip.GossipService;
+import org.apache.gossip.model.SharedGossipDataMessage;
 import org.bcia.julongchain.common.exception.GossipException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.NodeException;
@@ -49,6 +51,7 @@ import org.bcia.julongchain.protos.common.Common;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.List;
@@ -180,7 +183,12 @@ public class NodeServer {
           while (true) {
 
             // 处理当前所有的群组
-            List<String> ledgerIds = node.getLedgerIds();
+            List<String> ledgerIds = null;
+            try {
+              ledgerIds = LedgerManager.getLedgerIDs();
+            } catch (LedgerException e) {
+              log.error(e.getMessage(), e);
+            }
             log.info("当前所有群组：" + ledgerIds.toString());
             for (String ledgerId : ledgerIds) {
               log.info("开始检查群组[" + ledgerId + "] 是否有新的区块");
@@ -192,7 +200,9 @@ public class NodeServer {
                   log.info("群组高度为0，退出处理");
                   continue;
                 }
-                Common.Block block = GossipServiceUtil.getData(gossipService, ledgerId, blockHeight);
+
+                Common.Block block =
+                    GossipServiceUtil.getData(gossipService, ledgerId, blockHeight);
                 if (block == null) {
                   log.info("当前群组[" + ledgerId + "]" + "没有新的区块[" + blockHeight + "]");
                   continue;

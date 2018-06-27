@@ -32,4 +32,25 @@ public class DockerUtilTest {
 
   }
 
+  @Test
+  public void listImages() {
+
+    List<String> list = DockerUtil.listImages("");
+    System.out.println(list.toString());
+  }
+
+  @Test
+  public void deleteContainer() throws InterruptedException {
+    List<String> list = DockerUtil.listContainers("mycc");
+    System.out.println(list);
+    DockerClient dockerClient = DockerUtil.getDockerClient();
+    for (String s : list) {
+      dockerClient.removeContainerCmd(s);
+    }
+
+    Thread.sleep(5000);
+    DockerUtil.closeDockerClient(dockerClient);
+
+  }
+
 }

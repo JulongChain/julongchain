@@ -53,6 +53,7 @@ public class SmartContractSupportClient extends SmartContractBase {
     map.put(CommConstant.CSSC, CSSC.class.getName());
     map.put(CommConstant.QSSC, QSSC.class.getName());
     map.put(CommConstant.VSSC, VSSC.class.getName());
+    // map.put("mycc", SmartContractSupportClient.class.getName());
   }
 
   @Override

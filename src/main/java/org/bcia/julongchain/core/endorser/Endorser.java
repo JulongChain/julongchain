@@ -38,7 +38,10 @@ import org.bcia.julongchain.node.common.helper.SpecHelper;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.ledger.rwset.Rwset;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
-import org.bcia.julongchain.protos.node.*;
+import org.bcia.julongchain.protos.node.ProposalPackage;
+import org.bcia.julongchain.protos.node.ProposalResponsePackage;
+import org.bcia.julongchain.protos.node.SmartContractEventPackage;
+import org.bcia.julongchain.protos.node.Smartcontract;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -320,23 +323,45 @@ public class Endorser implements IEndorserServer {
             }
         }
 
-        List<KvRwset.KVRead> kvReads = TransactionRunningUtil.getKvReads(scName, txId);
+        List<KvRwset.KVRead> kvReads = TransactionRunningUtil.getKvReads(txId);
         if (CollectionUtils.isEmpty(kvReads)) {
             kvReads = new ArrayList<>();
         }
-        List<KvRwset.KVWrite> kvWrites = TransactionRunningUtil.getKvWrites(scName, txId);
+        List<KvRwset.KVWrite> kvWrites = TransactionRunningUtil.getKvWrites(txId);
         if(CollectionUtils.isEmpty(kvWrites)){
             kvWrites = new ArrayList<>();
         }
+        String ns = scName;
+        String txIdInit = txId + CommConstant.TX_INIT;
+        String scNameInit = TransactionRunningUtil.getSmartContractIdByTxId(txIdInit);
+        if(StringUtils.isNotEmpty(scNameInit)){
+            ns = scNameInit;
+        }
 
         KvRwset.KVRWSet kvRwSet = KvRwset.KVRWSet.newBuilder().addAllReads(kvReads).addAllWrites(kvWrites).build();
-
-        Rwset.NsReadWriteSet nsReadWriteSet = Rwset.NsReadWriteSet.newBuilder().setNamespace(scName).setRwset(kvRwSet
+        Rwset.NsReadWriteSet nsReadWriteSet = Rwset.NsReadWriteSet.newBuilder().setNamespace(ns).setRwset(kvRwSet
             .toByteString()).build();
 
-        Rwset.TxReadWriteSet txReadWriteSet = Rwset.TxReadWriteSet.newBuilder().addNsRwset(nsReadWriteSet).setDataModel(Rwset
-            .TxReadWriteSet.DataModel.KV).build();
+        Rwset.TxReadWriteSet txReadWriteSet;
 
+		    if(StringUtils.isNotEmpty(scNameInit)){
+				    List<KvRwset.KVRead> kvReadsInit = TransactionRunningUtil.getKvReads(txIdInit);
+				    if (CollectionUtils.isEmpty(kvReadsInit)) {
+					    kvReadsInit= new ArrayList<>();
+				    }
+				    List<KvRwset.KVWrite> kvWritesInit = TransactionRunningUtil.getKvWrites(txIdInit);
+				    if(CollectionUtils.isEmpty(kvWritesInit)){
+					    kvWritesInit = new ArrayList<>();
+				    }
+				    KvRwset.KVRWSet kvRwSetInit = KvRwset.KVRWSet.newBuilder().addAllReads(kvReadsInit).addAllWrites(kvWritesInit).build();
+				    Rwset.NsReadWriteSet nsReadWriteSetInit = Rwset.NsReadWriteSet.newBuilder().setNamespace(ns).setRwset(kvRwSetInit
+						    .toByteString()).build();
+				    txReadWriteSet = Rwset.TxReadWriteSet.newBuilder().addNsRwset(nsReadWriteSet).addNsRwset(nsReadWriteSetInit).setDataModel(Rwset
+						    .TxReadWriteSet.DataModel.KV).build();
+		    }else{
+				    txReadWriteSet = Rwset.TxReadWriteSet.newBuilder().addNsRwset(nsReadWriteSet).setDataModel(Rwset
+						    .TxReadWriteSet.DataModel.KV).build();
+		    }
         publicSimulateBytes = txReadWriteSet.toByteArray();
 
         return new Object[]{response, publicSimulateBytes, scDefinition, scEvent};
@@ -468,7 +493,7 @@ public class Endorser implements IEndorserServer {
                         String deployScName = deployScId.getName();
                         String deployScVersion = deployScId.getVersion();
                         if (!endorserSupport.isSysSmartContract(deployScName)) {
-                            endorserSupport.execute(groupId, deployScName, deployScVersion, txId, false,
+                            endorserSupport.execute(groupId, deployScName, deployScVersion, txId + CommConstant.TX_INIT, false,
                                     signedProposal, proposal, deploymentSpec);
                         } else {
                             throw new NodeException("Should not be system smart contract");

@@ -15,6 +15,7 @@ package org.bcia.julongchain.gossip;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.protobuf.InvalidProtocolBufferException;
+import jdk.nashorn.internal.runtime.options.LoggingOption;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.gossip.GossipMember;
 import org.apache.gossip.GossipService;
@@ -30,6 +31,7 @@ import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfigFactory;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.protos.common.Common;
 
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.UnknownHostException;
@@ -171,6 +173,7 @@ public class GossipServiceUtil {
     String blockStr = "";
     try {
       blockStr = new String(data.toByteArray(), "ISO8859-1");
+      // log.info("blockStr:" + blockStr);
     } catch (UnsupportedEncodingException e) {
       log.error(e.getMessage(), e);
       throw new GossipException(e);
@@ -180,12 +183,15 @@ public class GossipServiceUtil {
     if (blockStr.length() % messageLength > 0) {
       fileNumber = fileNumber + 1;
     }
+    log.info("fileNumber:" + fileNumber);
 
     SharedGossipDataMessage m = new SharedGossipDataMessage();
     m.setExpireAt(Long.MAX_VALUE);
     m.setKey(group + "-" + seqNum);
     m.setPayload(fileNumber);
     m.setTimestamp(System.currentTimeMillis());
+    gossipService.gossipSharedData(m);
+    log.info("send gossip:[" + group + "-" + seqNum + "]");
 
     for (int i = 0; i < fileNumber; i++) {
 
@@ -202,9 +208,10 @@ public class GossipServiceUtil {
       msg.setKey(group + "-" + seqNum + "-" + i);
       msg.setPayload(str);
       msg.setTimestamp(System.currentTimeMillis());
-    }
+      gossipService.gossipSharedData(msg);
 
-    gossipService.gossipSharedData(m);
+      log.info("send gossip detail:[" + group + "-" + seqNum + "-" + i + "]");
+    }
   }
 
   /**
@@ -236,17 +243,16 @@ public class GossipServiceUtil {
 
     SharedGossipDataMessage sharedData = gossipService.findSharedData(group + "-" + seqNum);
 
+    log.info("gossip get data, check [" + group + "-" + seqNum + "]");
     if (sharedData == null) {
+      log.info("[" + group + "-" + seqNum + "] is null");
       return null;
     }
 
     Object fileNumberPayload = sharedData.getPayload();
 
-    if (!(fileNumberPayload instanceof String)) {
-      return null;
-    }
-
-    Integer fileNumber = Integer.parseInt((String) fileNumberPayload);
+    Integer fileNumber = (Integer) fileNumberPayload;
+    log.info("=====================fileNumber:" + fileNumber);
 
     if (fileNumber < 1) {
       return null;
@@ -256,14 +262,13 @@ public class GossipServiceUtil {
 
     for (int i = 0; i < fileNumber; i++) {
       SharedGossipDataMessage m = gossipService.findSharedData(group + "-" + seqNum + "-" + i);
+      log.info("gossip get data detail, check [" + group + "-" + seqNum + "-" + i + "]");
       if (m == null) {
+        log.info("=====================[" + group + "-" + seqNum + "-" + i + "] is null");
         return null;
       }
       Object p = m.getPayload();
       if (p == null) {
-        return null;
-      }
-      if (!(p instanceof String)) {
         return null;
       }
       String str = (String) p;

@@ -120,184 +120,205 @@ public class SmartContractSupportService
     public StreamObserver<SmartContractMessage> register(
             StreamObserver<SmartContractMessage> responseObserver) {
 
-        return new StreamObserver<SmartContractMessage>() {
+    return new StreamObserver<SmartContractMessage>() {
 
-            @Override
-            public void onNext(SmartContractMessage message) {
+      @Override
+      public void onNext(SmartContractMessage message) {
 
-                String txId = message.getTxid();
-                String groupId = message.getGroupId();
-                String smartContractId = getSmartContractIdByTxId(txId);
+        String txId = message.getTxid();
+        String groupId = message.getGroupId();
+        String smartContractId = getSmartContractIdByTxId(txId);
 
-                logger.info(
-                        String.format(
-                                "Got message: smartContractId[%s] groupId[%s] txId[%s] messageStr[%s]",
-                                smartContractId, groupId, txId, message.toString()));
+        logger.info(
+            String.format(
+                "Got message: smartContractId[%s] groupId[%s] txId[%s] messageStr[%s]",
+                smartContractId, groupId, txId, message.toString()));
 
-                logger.info(
-                        String.format(
-                                "smart contract status: smartContractId[%s] smartContractStatus[%s]",
-                                smartContractId, getSmartContractStauts(smartContractId)));
+        logger.info(
+            String.format(
+                "smart contract status: smartContractId[%s] smartContractStatus[%s]",
+                smartContractId, getSmartContractStauts(smartContractId)));
 
-                logger.info(
-                        String.format(
-                                "transaction status: txId[%s] smartContractId[%s] txStatus[%s]",
-                                txId, smartContractId, getTxStatusById(smartContractId, txId)));
+        logger.info(
+            String.format(
+                "transaction status: txId[%s] smartContractId[%s] txStatus[%s]",
+                txId, smartContractId, getTxStatusById(smartContractId, txId)));
 
-                // 收到error信息
-                if (message.getType().equals(SmartContractMessage.Type.ERROR)) {
-                    addTxMessage(smartContractId, txId, message);
-                    updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_ERROR);
-                    updateTxStatus(smartContractId, txId, TX_STATUS_ERROR);
-                    return;
-                }
+        // 收到error信息
+        if (message.getType().equals(SmartContractMessage.Type.ERROR)) {
+          addTxMessage(smartContractId, txId, message);
+          updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_ERROR);
+          updateTxStatus(smartContractId, txId, TX_STATUS_ERROR);
+          return;
+        }
 
-                // 收到register消息
-                if (message.getType().equals(SmartContractMessage.Type.REGISTER)) {
-                    handleRegister(message, responseObserver);
-                    return;
-                }
+        // 收到register消息
+        if (message.getType().equals(SmartContractMessage.Type.REGISTER)) {
+          handleRegister(message, responseObserver);
+          return;
+        }
 
-                // 收到complete信息
-                if (message.getType().equals(SmartContractMessage.Type.COMPLETED)) {
-                    addTxMessage(smartContractId, txId, message);
-                    updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_READY);
-                    updateTxStatus(smartContractId, txId, TX_STATUS_COMPLETE);
-                    return;
-                }
+        // 收到complete信息
+        if (message.getType().equals(SmartContractMessage.Type.COMPLETED)) {
+          addTxMessage(smartContractId, txId, message);
+          updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_READY);
+          updateTxStatus(smartContractId, txId, TX_STATUS_COMPLETE);
+          return;
+        }
 
-                // 收到keepalive信息
-                if (message.getType().equals(SmartContractMessage.Type.KEEPALIVE)) {
-                    responseObserver.onNext(message);
-                    return;
-                }
+        // 收到keepalive信息
+        if (message.getType().equals(SmartContractMessage.Type.KEEPALIVE)) {
+          responseObserver.onNext(message);
+          return;
+        }
 
-                // 收到getState信息
-                if (message.getType().equals(SmartContractMessage.Type.GET_STATE)) {
+        // 收到getState信息
+        if (message.getType().equals(SmartContractMessage.Type.GET_STATE)) {
 
-                    // shim传过来的key
-                    String key = message.getPayload().toStringUtf8();
+          // shim传过来的key
+          String key = message.getPayload().toStringUtf8();
 
-                    logger.info("===============>" + key);
+          logger.info("===============>" + key);
 
-                    // history数据库路径
-                    String historyDBPath = LedgerConfig.getHistoryLevelDBPath();
-                    // 世界状态数据库路径
-                    String stateLevelDBPath = LedgerConfig.getStateLevelDBPath();
+          // history数据库路径
+          String historyDBPath = LedgerConfig.getHistoryLevelDBPath();
+          // 世界状态数据库路径
+          String stateLevelDBPath = LedgerConfig.getStateLevelDBPath();
 
-                    // history数据库保存的key(以这个开头)
-                    byte[] historyKeyBytes =
-                            HistoryDBHelper.constructPartialCompositeHistoryKey(groupId, key, false);
+          // history数据库保存的key(以这个开头)
+          byte[] historyKeyBytes =
+              HistoryDBHelper.constructPartialCompositeHistoryKey(groupId, key, false);
 
-                    logger.info(new String(historyKeyBytes));
+          logger.info(new String(historyKeyBytes));
 
-                    // 世界状态数据库保存的key
-                    byte[] worldStateKeyByte = VersionedLevelDB.constructCompositeKey(groupId, key);
+          // 世界状态数据库保存的key
+          byte[] worldStateKeyByte = VersionedLevelDB.constructCompositeKey(groupId, key);
 
-                    try {
-                        // 查询历史数据库
-                        LevelDB db = LevelDBUtil.getDB(historyDBPath);
-                        // 找到历史数据库最大的key
-                        byte[] lastKey = LevelDBUtil.getLastKey(db, historyKeyBytes);
-                        logger.info(new String(lastKey));
-                        // 解析blockNum
-                        long blockNum =
-                                HistoryDBHelper.splitCompositeHistoryKeyForBlockNum(
-                                        lastKey, historyKeyBytes.length);
-                        // 解析txNum
-                        long txNum =
-                                HistoryDBHelper.splitCompositeHistoryKeyForTranNum(lastKey, historyKeyBytes.length);
-                        // 保存Version
-                        KvRwset.Version version =
-                                KvRwset.Version.newBuilder().setBlockNum(blockNum).setTxNum(txNum).build();
-                        // 保存读记录
-                        KvRwset.KVRead kvRead =
-                                KvRwset.KVRead.newBuilder().setVersion(version).setKey(key).build();
+          logger.info(new String(worldStateKeyByte));
 
-                        // 保存所有的读记录
-                        TransactionRunningUtil.addKvRead(smartContractId, txId, kvRead);
+          try {
+            // 查询历史数据库
+            LevelDB db = LevelDBUtil.getDB(historyDBPath);
+            // 找到历史数据库最大的key
+            byte[] lastKey = LevelDBUtil.getLastKey(db, historyKeyBytes);
+            logger.info(new String(lastKey));
+            // 解析blockNum
+            long blockNum =
+                HistoryDBHelper.splitCompositeHistoryKeyForBlockNum(
+                    lastKey, historyKeyBytes.length);
+            // 解析txNum
+            long txNum =
+                HistoryDBHelper.splitCompositeHistoryKeyForTranNum(lastKey, historyKeyBytes.length);
+            // 保存Version
+            KvRwset.Version version =
+                KvRwset.Version.newBuilder().setBlockNum(blockNum).setTxNum(txNum).build();
+            // 保存读记录
+            KvRwset.KVRead kvRead =
+                KvRwset.KVRead.newBuilder().setVersion(version).setKey(key).build();
 
-                        // 查询世界状态数据库
-                        db = LevelDBUtil.getDB(stateLevelDBPath);
+            // 保存所有的读记录
+            TransactionRunningUtil.addKvRead(smartContractId, txId, kvRead);
 
-                        byte[] worldStateBytes = LevelDBUtil.get(db, worldStateKeyByte, true);
-                        if (worldStateBytes == null) {
-                            worldStateBytes = new byte[] {};
-                        }
+            // 查询世界状态数据库
+            db = LevelDBUtil.getDB(stateLevelDBPath);
 
-                        // 发送读取结果到shim端
-                        SmartContractMessage responseMessage =
-                                SmartContractMessage.newBuilder()
-                                        .mergeFrom(message)
-                                        .setType(SmartContractMessage.Type.RESPONSE)
-                                        .setPayload(ByteString.copyFrom(worldStateBytes))
-                                        .setTxid(txId)
-                                        .setGroupId(groupId)
-                                        .build();
+            byte[] worldStateBytes = LevelDBUtil.get(db, worldStateKeyByte, true);
+            if(worldStateBytes != null){
+              logger.info("=============> world state bytes length:" + worldStateBytes.length);
+            }
+            if (worldStateBytes == null || worldStateBytes.length > 10000) {
+              worldStateBytes = new byte[] {};
+              // 发送读取结果到shim端
+              SmartContractMessage responseMessage =
+                  SmartContractMessage.newBuilder()
+                      .mergeFrom(message)
+                      .setType(SmartContractMessage.Type.RESPONSE)
+                      .setPayload(ByteString.copyFrom(worldStateBytes))
+                      .setTxid(txId)
+                      .setGroupId(groupId)
+                      .build();
 
-                        responseObserver.onNext(responseMessage);
+              responseObserver.onNext(responseMessage);
+            }else{
+              byte[] newBytes = new byte[worldStateBytes.length-16];
+              for(int i=16;i<worldStateBytes.length;i++){
+                newBytes[i-16] = worldStateBytes[i];
+              }
+              // 发送读取结果到shim端
+              SmartContractMessage responseMessage =
+                  SmartContractMessage.newBuilder()
+                      .mergeFrom(message)
+                      .setType(SmartContractMessage.Type.RESPONSE)
+                      .setPayload(ByteString.copyFrom(newBytes))
+                      .setTxid(txId)
+                      .setGroupId(groupId)
+                      .build();
 
-                    } catch (LevelDBException e) {
-                        e.printStackTrace();
-                    }
-
-                    return;
-                }
-
-                // 收到putState信息
-                if (message.getType().equals(SmartContractMessage.Type.PUT_STATE)) {
-                    try {
-                        SmartcontractShim.PutState putState = null;
-                        putState = SmartcontractShim.PutState.parseFrom(message.getPayload());
-                        logger.info(putState.getKey());
-                        logger.info(putState.getValue());
-
-                        KvRwset.KVWrite kvWrite =
-                                KvRwset.KVWrite.newBuilder()
-                                        .setKey(putState.getKey())
-                                        .setValue(putState.getValue())
-                                        .setIsDelete(false)
-                                        .build();
-
-                        TransactionRunningUtil.addKvWrite(smartContractId, txId, kvWrite);
-
-                    } catch (InvalidProtocolBufferException e) {
-                        logger.error(e.getMessage(), e);
-                    }
-
-                    SmartContractMessage responseMessage =
-                            SmartContractMessage.newBuilder()
-                                    .mergeFrom(message)
-                                    .setType(SmartContractMessage.Type.RESPONSE)
-                                    .setTxid(txId)
-                                    .setGroupId(groupId)
-                                    .build();
-
-                    responseObserver.onNext(responseMessage);
-                    return;
-                }
-
-                // 收到delState信息
-                if (message.getType().equals(SmartContractMessage.Type.DEL_STATE)) {
-                    return;
-                }
-
-                // 收到getHistoryForKey信息
-                if (message.getType().equals(SmartContractMessage.Type.GET_HISTORY_FOR_KEY)) {
-                    return;
-                }
+              responseObserver.onNext(responseMessage);
             }
 
-            @Override
-            public void onError(Throwable throwable) {
-                logger.error(throwable.getMessage(), throwable);
-            }
 
-            @Override
-            public void onCompleted() {
-                logger.info("SmartContract completed");
-            }
-        };
+          } catch (LevelDBException e) {
+            e.printStackTrace();
+          }
+
+          return;
+        }
+
+        // 收到putState信息
+        if (message.getType().equals(SmartContractMessage.Type.PUT_STATE)) {
+          try {
+            SmartcontractShim.PutState putState = null;
+            putState = SmartcontractShim.PutState.parseFrom(message.getPayload());
+            logger.info(putState.getKey());
+            logger.info(putState.getValue());
+
+            KvRwset.KVWrite kvWrite =
+                KvRwset.KVWrite.newBuilder()
+                    .setKey(putState.getKey())
+                    .setValue(putState.getValue())
+                    .setIsDelete(false)
+                    .build();
+
+            TransactionRunningUtil.addKvWrite(smartContractId, txId, kvWrite);
+
+          } catch (InvalidProtocolBufferException e) {
+            logger.error(e.getMessage(), e);
+          }
+
+          SmartContractMessage responseMessage =
+              SmartContractMessage.newBuilder()
+                  .mergeFrom(message)
+                  .setType(SmartContractMessage.Type.RESPONSE)
+                  .setTxid(txId)
+                  .setGroupId(groupId)
+                  .build();
+
+          responseObserver.onNext(responseMessage);
+          return;
+        }
+
+        // 收到delState信息
+        if (message.getType().equals(SmartContractMessage.Type.DEL_STATE)) {
+          return;
+        }
+
+        // 收到getHistoryForKey信息
+        if (message.getType().equals(SmartContractMessage.Type.GET_HISTORY_FOR_KEY)) {
+          return;
+        }
+      }
+
+      @Override
+      public void onError(Throwable throwable) {
+        logger.error(throwable.getMessage(), throwable);
+      }
+
+      @Override
+      public void onCompleted() {
+        logger.info("SmartContract completed");
+      }
+    };
     }
 
     /**

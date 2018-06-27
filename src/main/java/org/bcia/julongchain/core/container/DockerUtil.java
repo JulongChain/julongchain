@@ -50,7 +50,7 @@ public class DockerUtil {
     return dockerClient;
   }
 
-  private static void closeDockerClient(DockerClient dockerClient) {
+  public static void closeDockerClient(DockerClient dockerClient) {
     try {
       dockerClient.close();
     } catch (IOException e) {
@@ -141,8 +141,8 @@ public class DockerUtil {
     DockerClient dockerClient = getDockerClient();
     List<Container> containerList = dockerClient.listContainersCmd().withShowAll(true).exec();
     for (Container container : containerList) {
-      if (StringUtils.isEmpty(name) || StringUtils.contains(container.getImage(), name)) {
-        result.add(container.getImage());
+      if (StringUtils.isEmpty(name) || StringUtils.contains(container.getNames()[0], name)) {
+        result.add(container.getId());
       }
     }
     closeDockerClient(dockerClient);
