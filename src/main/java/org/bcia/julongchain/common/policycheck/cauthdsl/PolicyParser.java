@@ -60,6 +60,11 @@ public class PolicyParser {
 
 
     public static Policies.SignaturePolicy getSignaturePolicy(Node node,Context ctx) throws PolicyException {
+        for(int i=0;i<node.sons.size();i++){
+            if("outof".equals(node.getMsg())){
+                getSignaturePolicy(node.sons.get(i),ctx);
+            }
+        }
         if(node.sons.size() < 3 ){
             String msg=String.format("At least 3 arguments expected, got %d",node.sons.size());
             throw new PolicyException(msg);

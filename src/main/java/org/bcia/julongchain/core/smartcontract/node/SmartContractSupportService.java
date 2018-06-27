@@ -192,7 +192,7 @@ public class SmartContractSupportService
           logger.info(new String(historyKeyBytes));
 
           // 世界状态数据库保存的key
-          byte[] worldStateKeyByte = VersionedLevelDB.constructCompositeKey(groupId, key);
+          byte[] worldStateKeyByte = VersionedLevelDB.constructCompositeKey(groupId + " " + smartContractId, key);
 
           logger.info(new String(worldStateKeyByte));
 

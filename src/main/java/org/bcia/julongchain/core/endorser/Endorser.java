@@ -331,14 +331,19 @@ public class Endorser implements IEndorserServer {
         if(CollectionUtils.isEmpty(kvWrites)){
             kvWrites = new ArrayList<>();
         }
+        String ns = groupId + " " + scName;
+        String txIdInit = txId + CommConstant.TX_INIT;
+        String scNameInit = TransactionRunningUtil.getSmartContractIdByTxId(txIdInit);
+        if(StringUtils.isNotEmpty(scNameInit)){
+            ns = groupId + " " + scNameInit;
+        }
+
         KvRwset.KVRWSet kvRwSet = KvRwset.KVRWSet.newBuilder().addAllReads(kvReads).addAllWrites(kvWrites).build();
-        Rwset.NsReadWriteSet nsReadWriteSet = Rwset.NsReadWriteSet.newBuilder().setNamespace(groupId).setRwset(kvRwSet
+        Rwset.NsReadWriteSet nsReadWriteSet = Rwset.NsReadWriteSet.newBuilder().setNamespace(ns).setRwset(kvRwSet
             .toByteString()).build();
 
-	      Rwset.TxReadWriteSet txReadWriteSet;
+        Rwset.TxReadWriteSet txReadWriteSet;
 
-        String txIdInit = txId + CommConstant.TX_INIT;
-		    String scNameInit = TransactionRunningUtil.getSmartContractIdByTxId(txIdInit);
 		    if(StringUtils.isNotEmpty(scNameInit)){
 				    List<KvRwset.KVRead> kvReadsInit = TransactionRunningUtil.getKvReads(txIdInit);
 				    if (CollectionUtils.isEmpty(kvReadsInit)) {
@@ -349,7 +354,7 @@ public class Endorser implements IEndorserServer {
 					    kvWritesInit = new ArrayList<>();
 				    }
 				    KvRwset.KVRWSet kvRwSetInit = KvRwset.KVRWSet.newBuilder().addAllReads(kvReadsInit).addAllWrites(kvWritesInit).build();
-				    Rwset.NsReadWriteSet nsReadWriteSetInit = Rwset.NsReadWriteSet.newBuilder().setNamespace(groupId).setRwset(kvRwSetInit
+				    Rwset.NsReadWriteSet nsReadWriteSetInit = Rwset.NsReadWriteSet.newBuilder().setNamespace(ns).setRwset(kvRwSetInit
 						    .toByteString()).build();
 				    txReadWriteSet = Rwset.TxReadWriteSet.newBuilder().addNsRwset(nsReadWriteSet).addNsRwset(nsReadWriteSetInit).setDataModel(Rwset
 						    .TxReadWriteSet.DataModel.KV).build();
