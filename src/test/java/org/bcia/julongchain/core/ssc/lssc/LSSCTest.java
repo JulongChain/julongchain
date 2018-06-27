@@ -51,22 +51,27 @@ public class LSSCTest extends BaseJunit4Test {
     public void testInstalls(){
         String path="src/main/java/org/bcia/julongchain/examples/smartcontract/java/smartcontract_example02";
         ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("1",new LinkedList<ByteString>());
+
         testInstall("mycc","1.0",path,"","Alice",mockStub);
+
         testInstall("example02","1.0",path,"","Alice",mockStub);  //  TESTED  OK
 
-        //  testInstall("example02-2","1.0",path,"","Alice",mockStub); //  TESTED  OK
+        testInstall("example02-2","1.0",path,"","Alice",mockStub); //  TESTED  OK
 
-        /*  testInstall("example02.java","0",path,
+        //region  TESTED  invalid ChaincodeName
+        testInstall("example02.java","0",path,
                  "Execute install failed, [SysSmartContract]InvalidChaincodeNameErr:example02.java","Alice",mockStub);
-                 // TESTED  invalid ChaincodeName
-                 */
+        //endregion
 
-        /* testInstall("","0",path,
+        //region  TESTED  EmptySmartContractName
+        testInstall("","0",path,
                  "Execute install failed, [SysSmartContract]EmptySmartContractNameErr","Alice",mockStub);
-                 // TESTED  EmptySmartContractName
-                 */
+        //endregion
 
-        // testInstall("example02","1.0-alpha+001",path,"","Alice",mockStub);  //   TESTED   invalid version
+        // region  TESTED   invalid version
+        testInstall("example02","1.0-alpha{}+001",path,
+                "Execute install failed, [SysSmartContract]InvalidChaincodeVersionErr:1.0-alpha{}+001","Alice",mockStub);
+        //endregion
     }
 
     public void testInstall(String smartcontractName,String version,String path,
@@ -127,29 +132,33 @@ public class LSSCTest extends BaseJunit4Test {
                 "Alice",mockStub);//  TESTED    Uninstall example02
                 */
 
-
-        /*  testDeploy("example02.java","1.0",path,
+        //region  TESTED    invalid SCname
+        testDeploy("example02.java","1.0",path,
                 "ExecuteDeployOrUpgrade failed,[SysSmartContract]InvalidChaincodeNameErr:example02.java",
-                "Alice",mockStub);//  TESTED    invalid SCname
-                */
+                "Alice",mockStub);
+        //endregion
 
 
-        /*  testDeploy("example02","1{}0",path,
+        //region  TESTED    invalid version
+        testDeploy("example02","1{}0",path,
                 "ExecuteDeployOrUpgrade failed,[SysSmartContract]InvalidChaincodeVersionErr:1{}0",
-                "Alice",mockStub);//  TESTED    invalid version
-                */
+                "Alice",mockStub);
+        //endregion
 
 
-        /*  testDeploy("","1.0",path,
+        //region  TESTED    blank SCname
+        testDeploy("","1.0",path,
                 "ExecuteDeployOrUpgrade failed,[SysSmartContract]EmptySmartContractNameErr",
-                "Alice",mockStub);//  TESTED    blank SCname
-                */
+                "Alice",mockStub);
+        //endregion
 
 
-        /*  testDeploy("example02","",path,
+        //region  TESTED   blank version
+        testDeploy("example02","",path,
                 "ExecuteDeployOrUpgrade failed,[SysSmartContract]EmptySmartContractVersionErr",
-                "Alice",mockStub);//  TESTED   blank version
-                */
+                "Alice",mockStub);
+        //endregion
+
 
     }
 
