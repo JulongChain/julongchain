@@ -72,14 +72,14 @@ public class FileLedgerTest {
         GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
         Common.Block block = factory.getGenesisBlock("myGroup");
         fileRelativePath = IoUtil.getFileRelativePath(dir);
-        Assert.assertSame(fileRelativePath.get("chains/myGroup/blockfile000000").length(), (long) 0);
+        Assert.assertSame(fileRelativePath.get("chains/myGroup/blockfile_000000").length(), (long) 0);
 
         fileLedger.append(block);
         fileRelativePath = IoUtil.getFileRelativePath(dir);
-        Assert.assertNotSame(fileRelativePath.get("chains/myGroup/blockfile000000").length(), (long) 0);
+        Assert.assertNotSame(fileRelativePath.get("chains/myGroup/blockfile_000000").length(), (long) 0);
 
         byte[] bytes = new byte[1024];
-        FileInputStream fis = new FileInputStream(fileRelativePath.get("chains/myGroup/blockfile000000"));
+        FileInputStream fis = new FileInputStream(fileRelativePath.get("chains/myGroup/blockfile_000000"));
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         int num = 0;
         while((num = fis.read(bytes)) != -1){

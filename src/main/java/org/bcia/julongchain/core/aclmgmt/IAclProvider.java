@@ -15,19 +15,19 @@
  */
 package org.bcia.julongchain.core.aclmgmt;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.PolicyException;
+import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 
 /**
  * 类描述
  *
  * @author sunianle
- * @date 3/14/18
+ * @date 2018/03/14
  * @company Dingxuan
  */
 public interface IAclProvider {
-    //CheckACL checks the ACL for the resource for the channel using the
-    //idinfo. idinfo is an object such as SignedProposal from which an
-    //id can be extracted for testing against a policy
-    void checkACL(String resName,String groupID,ProposalPackage.SignedProposal idinfo) throws JavaChainException;
+    void checkACL(String resName, String groupId, ProposalPackage.SignedProposal signedProposal) throws PolicyException;
+
+    void checkACL(String resName, String groupId, Common.Envelope envelope) throws PolicyException;
 }

@@ -24,29 +24,41 @@ import java.util.Map;
  * @date 2018-01-25
  * @company Dingxuan
  */
-
-// The IFactoryOpts contains options for factories.
 public interface IFactoryOpts {
+    /**
+     * 国密默认实现
+     */
+    String PROVIDER_GM = "gm";
+    /**
+     * 兴唐通讯国密实现
+     */
+    String PROVIDER_GM_SDT = "sdtgm";
 
-    String PROVIDER_GM = "GM";
-    String PROVIDER_GM_SDT = "SDTGM";
+    String PROVIDER_NIST = "nist";
 
-    // The values of string type below present providers' names to be implemented.
-    String PROVIDER_NIST = "NIST";
+    String PROVIDER_PKCS11 = "pkcs11";
 
-    String PROVIDER_GM_BOUNCYCASTLE = "GM_BOUNCYCASTLE";
-    String PROVIDER_PKCS11 = "PKCS11";
-    String PROVIDER_GMT0016 = "GMT0016";
-    String PROVIDER_GMT0018 = "GMT0018";
-    String PROVIDER_GMT0019 = "GMT0019";
+    String PROVIDER_GMT0016 = "gmt0016";
 
-    // The getProviderName returns a provider's name.
+    String PROVIDER_GMT0018 = "gmt0018";
+
+    String PROVIDER_GMT0019 = "gmt0019";
+
+    /**
+     * 返回Csp名称
+     *
+     * @return
+     */
     String getProviderName();
 
-    // The getProviderDescription returns the description of a provider.
     String getProviderDescription();
 
     boolean isDefaultCsp();
 
+    /**
+     * 从Map中转化数据
+     *
+     * @param optMap
+     */
     void parseFrom(Map<String, String> optMap);
 }

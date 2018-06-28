@@ -23,7 +23,7 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.core.node.NodeConfig;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.protos.node.Query;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 import java.io.*;
 
@@ -140,7 +140,7 @@ public class SmartContractProvider {
      */
 
     public static byte[] extractStateDBArtifactsFromSCPackage(ISmartContractPackage scPack) throws JavaChainException {
-        Smartcontract.SmartContractDeploymentSpec sds = scPack.getDepSpec();
+        SmartContractPackage.SmartContractDeploymentSpec sds = scPack.getDepSpec();
         ByteString bytes = sds.getCodePackage();
         return bytes.toByteArray();
     }
@@ -178,7 +178,7 @@ public class SmartContractProvider {
                     log.error("Unreadable smartcontract file found on filesystem: " + file.getName());
                     continue;
                 }
-                Smartcontract.SmartContractDeploymentSpec scds = scPackage.getDepSpec();
+                SmartContractPackage.SmartContractDeploymentSpec scds = scPackage.getDepSpec();
                 String name = scds.getSmartContractSpec().getSmartContractId().getName();
                 String version = scds.getSmartContractSpec().getSmartContractId().getVersion();
                 if(!name.equals(scName) || !version.equals(scVersion)){
@@ -198,7 +198,7 @@ public class SmartContractProvider {
                         .setVssc(vssc)
                         .setId(ByteString.copyFrom(scPackage.getId()))
                         .build();
-                builder.addSmartcontracts(scInfo);
+                builder.addSmartContracts(scInfo);
             }
         }
         return builder.build();

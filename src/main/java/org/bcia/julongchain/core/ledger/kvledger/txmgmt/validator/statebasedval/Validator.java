@@ -150,7 +150,7 @@ public class Validator implements InternalValidator {
         }
         Height committedVersion = db.getVersion(ns, kvRead.getKey());
         logger.debug("Comparing versions for keys " + kvRead.getKey());
-        if(Height.areSame(committedVersion, RwSetUtil.newVersion(kvRead.getVersion()))){
+        if(!Height.areSame(committedVersion, RwSetUtil.newVersion(kvRead.getVersion()))){
             logger.debug(String.format("Version mismatch for key [%s:%s]", ns, kvRead.getKey()));
             return false;
         }
@@ -171,17 +171,20 @@ public class Validator implements InternalValidator {
         boolean includeEndKey = !rqi.getItrExhausted();
 
         CombinedIterator combinedItr = new CombinedIterator(db, updates.getBatch(), ns, rqi.getStartKey(), rqi.getEndKey(), includeEndKey);
-        IRangeQueryValidator validator;
-        if(null != rqi.getReadsMerkleHashes()){
-            logger.debug("Hashing results are present in the range query info hence, initiating hashing based validation");
-            validator = new RangeQueryHashValidator();
-        } else {
-            logger.debug("Hashing results are not present in the range query info hence, initiating hashing based validation");
-            validator = new RangeQueryResultsValidator();
-        }
-        validator.init(rqi, combinedItr);
-        combinedItr.close();
-        return validator.validate();
+	    try {
+		    IRangeQueryValidator validator;
+		    if(null != rqi.getReadsMerkleHashes()){
+		        logger.debug("Hashing results are present in the range query info hence, initiating hashing based validation");
+		        validator = new RangeQueryHashValidator();
+		    } else {
+		        logger.debug("Hashing results are not present in the range query info hence, initiating hashing based validation");
+		        validator = new RangeQueryResultsValidator();
+		    }
+		    validator.init(rqi, combinedItr);
+		    return validator.validate();
+	    } finally {
+		    combinedItr.close();
+	    }
     }
 
     private boolean validateNsHashedReadSets(String ns, List<CollHashedRwSet> collHashedRwSets, HashedUpdateBatch updates) throws LedgerException {

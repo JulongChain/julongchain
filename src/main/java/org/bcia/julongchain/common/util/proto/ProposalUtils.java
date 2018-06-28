@@ -24,7 +24,7 @@ import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.msp.ISigningIdentity;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.util.Map;
@@ -70,7 +70,7 @@ public class ProposalUtils {
      * @return
      */
     public static ProposalPackage.Proposal buildSmartContractProposal(Common.HeaderType type, String groupId, String
-            txId, Smartcontract.SmartContractInvocationSpec scis, byte[] nonce, byte[] creator, Map<String, byte[]>
+            txId, SmartContractPackage.SmartContractInvocationSpec scis, byte[] nonce, byte[] creator, Map<String, byte[]>
                                                                               transientMap) {
         //首先构造SmartContractHeaderExtension对象
         ProposalPackage.SmartContractHeaderExtension.Builder headerExtensionBuilder = ProposalPackage
@@ -100,7 +100,7 @@ public class ProposalUtils {
      * @param transientMap
      * @return
      */
-    public static ProposalPackage.SmartContractProposalPayload buildProposalPayload(Smartcontract.SmartContractInvocationSpec scis,Map<String,
+    public static ProposalPackage.SmartContractProposalPayload buildProposalPayload(SmartContractPackage.SmartContractInvocationSpec scis,Map<String,
             byte[]> transientMap) {
         //SmartContractProposalPayload构造器
         ProposalPackage.SmartContractProposalPayload.Builder proposalPayloadBuilder = ProposalPackage
@@ -117,12 +117,12 @@ public class ProposalUtils {
         return proposalPayloadBuilder.build();
     }
 
-    public static Smartcontract.SmartContractSpec buildSmartContractSpec(){
+    public static SmartContractPackage.SmartContractSpec buildSmartContractSpec(){
         return null;
 
     }
 
-    public static Smartcontract.SmartContractInput buildSmartContractInput(){
+    public static SmartContractPackage.SmartContractInput buildSmartContractInput(){
         return null;
     }
 
@@ -157,7 +157,7 @@ public class ProposalUtils {
     public static ProposalPackage.Proposal createProposalFromInvocationSpec
                                             (Common.HeaderType type,
                                              String groupID,
-                                             Smartcontract.SmartContractInvocationSpec invocationSpec,
+                                             SmartContractPackage.SmartContractInvocationSpec invocationSpec,
                                              byte[] creator)
                                              throws JavaChainException {
         return createSmartcontractProposal(type,groupID,invocationSpec,creator);
@@ -173,7 +173,7 @@ public class ProposalUtils {
      * @throws JavaChainException
      */
     private static ProposalPackage.Proposal createSmartcontractProposal(Common.HeaderType type, String groupID,
-                                                                        Smartcontract.SmartContractInvocationSpec invocationSpec,
+                                                                        SmartContractPackage.SmartContractInvocationSpec invocationSpec,
                                                                         byte[] creator) throws JavaChainException {
         return createSmartcontractProposalWithTransient(type,groupID,invocationSpec,creator,null);
     }
@@ -190,7 +190,7 @@ public class ProposalUtils {
      */
     public static ProposalPackage.Proposal createSmartcontractProposalWithTransient
             (Common.HeaderType type, String groupID,
-             Smartcontract.SmartContractInvocationSpec invocationSpec,
+             SmartContractPackage.SmartContractInvocationSpec invocationSpec,
              byte[] creator,
              Map<String,byte[]> transientMap)
             throws JavaChainException {

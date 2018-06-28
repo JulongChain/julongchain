@@ -23,4 +23,5 @@ package org.bcia.julongchain.common.resourceconfig.config;
  * @company Dingxuan
  */
 public interface IApisConfig {
+    String getPolicy(String apiName);
 }

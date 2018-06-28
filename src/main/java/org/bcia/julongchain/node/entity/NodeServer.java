@@ -100,7 +100,7 @@ public class NodeServer {
             return;
         }
 
-        log.info("begin to start node, current version： " + NodeConstant.CURRENT_VERSION);
+        log.info("begin to start node, current version: " + NodeConstant.CURRENT_VERSION);
 
         //获取当前的访问清单提供者
         IAclProvider aclProvider = AclManagement.getACLProvider();

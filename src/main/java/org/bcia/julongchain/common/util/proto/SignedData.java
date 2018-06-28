@@ -19,10 +19,12 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.consenter.common.msgprocessor.SigFilter;
 import org.bcia.julongchain.consenter.util.Utils;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
+import org.bcia.julongchain.protos.node.ProposalPackage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,6 +81,24 @@ public class SignedData {
         }
         Common.SignatureHeader signatureHeader = Common.SignatureHeader.parseFrom(payload.getHeader().getSignatureHeader());
         result.add(new SignedData(payload.toByteArray(), signatureHeader.getCreator().toByteArray(), envelope.getSignature().toByteArray()));
+
+        return result;
+    }
+
+    public static List<SignedData> asSignedData(ProposalPackage.SignedProposal signedProposal) throws ValidateException,
+            InvalidProtocolBufferException {
+        ValidateUtils.isNotNull(signedProposal, "signedProposal can not be null");
+        ValidateUtils.isNotNull(signedProposal.getProposalBytes(), "proposal can not be null");
+
+        List<SignedData> result = new ArrayList<>();
+
+        ProposalPackage.Proposal proposal = ProposalPackage.Proposal.parseFrom(signedProposal.getProposalBytes());
+        Common.Header header = Common.Header.parseFrom(proposal.getHeader());
+        Common.SignatureHeader signatureHeader = Common.SignatureHeader.parseFrom(header.getSignatureHeader());
+
+        SignedData signedData = new SignedData(signedProposal.getProposalBytes().toByteArray(),
+                signatureHeader.getCreator().toByteArray(), signedProposal.getSignature().toByteArray());
+        result.add(signedData);
 
         return result;
     }

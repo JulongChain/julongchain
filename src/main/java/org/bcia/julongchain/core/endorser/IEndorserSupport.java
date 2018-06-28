@@ -21,7 +21,7 @@ import org.bcia.julongchain.core.ledger.ITxSimulator;
 import org.bcia.julongchain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.bcia.julongchain.protos.node.TransactionPackage;
 
 /**
@@ -88,7 +88,7 @@ public interface IEndorserSupport {
      * @return
      */
     Object[] execute(String groupId, String scName, String scVersion, String txId, boolean
-            sysSC, ProposalPackage.SignedProposal signedProposal, ProposalPackage.Proposal proposal, Smartcontract
+            sysSC, ProposalPackage.SignedProposal signedProposal, ProposalPackage.Proposal proposal, SmartContractPackage
                              .SmartContractInvocationSpec spec) throws NodeException;
 
     /**
@@ -105,7 +105,7 @@ public interface IEndorserSupport {
      * @return
      */
     Object[] execute(String groupId, String scName, String scVersion, String txId, boolean
-            sysSC, ProposalPackage.SignedProposal signedProposal, ProposalPackage.Proposal proposal, Smartcontract
+            sysSC, ProposalPackage.SignedProposal signedProposal, ProposalPackage.Proposal proposal, SmartContractPackage
                              .SmartContractDeploymentSpec spec) throws NodeException;
 
     /**

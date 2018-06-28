@@ -11,7 +11,7 @@ syntax = "proto3";
 package protos;
 option java_package = "org.bcia.julongchain.protos.node";
 option go_package = "github.com/hyperledger/fabric/protos/peer";
-import "node/smartcontract_event.proto";
+import "node/smart_contract_event.proto";
 import "node/proposal.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -47,10 +47,10 @@ message SmartContractMessage {
 
     SignedProposal proposal = 5;
 
-    //event emitted by smartcontract. Used only with Init or Invoke.
+    //event emitted by smartContract. Used only with Init or Invoke.
     // This event is then stored (currently)
     //with Block.NonHashData.TransactionResult
-    SmartContractEvent smartcontract_event = 6;
+    SmartContractEvent smart_contract_event = 6;
 
     //group id
     string group_id = 7;
@@ -106,7 +106,7 @@ message QueryResponse {
 }
 
 
-// Interface that provides support to smartcontract execution. SmartContractContext
+// Interface that provides support to smartContract execution. SmartContractContext
 // provides the context necessary for the server to respond appropriately.
 service SmartContractSupport {
 

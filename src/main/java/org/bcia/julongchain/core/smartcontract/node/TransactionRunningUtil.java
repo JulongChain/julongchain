@@ -18,7 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
-import org.bcia.julongchain.protos.node.SmartcontractShim;
+import org.bcia.julongchain.protos.node.SmartContractShim;
 
 import java.util.*;
 
@@ -53,8 +53,8 @@ public class TransactionRunningUtil {
   private static Map<String, List<KvRwset.KVRead>> txIdAndKvReadMap =
       Collections.synchronizedMap(new HashMap<String, List<KvRwset.KVRead>>());
 
-  private static Map<String, SmartcontractShim.SmartContractMessage> txIdAndMessageMap =
-      Collections.synchronizedMap(new HashMap<String, SmartcontractShim.SmartContractMessage>());
+  private static Map<String, SmartContractShim.SmartContractMessage> txIdAndMessageMap =
+      Collections.synchronizedMap(new HashMap<String, SmartContractShim.SmartContractMessage>());
 
   private static Map<String, List<KvRwset.KVWrite>> txIdAndKvWriteMap =
       Collections.synchronizedMap(new HashMap<String, List<KvRwset.KVWrite>>());
@@ -62,7 +62,7 @@ public class TransactionRunningUtil {
   public static void addTxMessage(
       String smartContractId,
       String txId,
-      SmartcontractShim.SmartContractMessage smartContractMessage) {
+      SmartContractShim.SmartContractMessage smartContractMessage) {
     txIdAndMessageMap.put(composite(smartContractId, txId), smartContractMessage);
   }
 
@@ -70,7 +70,7 @@ public class TransactionRunningUtil {
     return txIdAndSmartContractIdMap.containsKey(txId);
   }
 
-  public static SmartcontractShim.SmartContractMessage getTxMessage(
+  public static SmartContractShim.SmartContractMessage getTxMessage(
       String smartContractId, String txId) {
     return txIdAndMessageMap.get(composite(smartContractId, txId));
   }

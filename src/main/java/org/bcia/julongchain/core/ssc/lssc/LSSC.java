@@ -49,7 +49,7 @@ import org.bcia.julongchain.protos.common.Policies;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.Query;
 import org.bcia.julongchain.protos.node.SmartContractDataPackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -196,7 +196,7 @@ public class LSSC  extends SystemSmartContractBase {
 //                    return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
 //                }
                 byte[] depSpecBytes2=args.get(2);
-                Smartcontract.SmartContractDeploymentSpec spec=null;
+                SmartContractPackage.SmartContractDeploymentSpec spec=null;
                 try {
                     spec=ProtoUtils.getSmartContractDeploymentSpec(depSpecBytes2);
                 }catch (InvalidProtocolBufferException e){
@@ -471,7 +471,7 @@ public class LSSC  extends SystemSmartContractBase {
             throw new SysSmartContractException(msg);
         }
         //these are guaranteed to be non-nil because we got a valid scpack
-        Smartcontract.SmartContractDeploymentSpec depSpec = scPack.getDepSpec();
+        SmartContractPackage.SmartContractDeploymentSpec depSpec = scPack.getDepSpec();
         byte[] depSpecBytes = scPack.getDepSpecBytes();
         SmartContractCode smartContractCode=new SmartContractCode(scd,depSpec,depSpecBytes);
         return smartContractCode;
@@ -520,7 +520,7 @@ public class LSSC  extends SystemSmartContractBase {
             scInfoList.add(scInfo);
         }
 
-        Query.SmartContractQueryResponse scqr = Query.SmartContractQueryResponse.newBuilder().addAllSmartcontracts(scInfoList).build();
+        Query.SmartContractQueryResponse scqr = Query.SmartContractQueryResponse.newBuilder().addAllSmartContracts(scInfoList).build();
         byte[] scqrBytes = scqr.toByteArray();
         return newSuccessResponse(scqrBytes);
     }
@@ -620,7 +620,7 @@ public class LSSC  extends SystemSmartContractBase {
             throw new SysSmartContractException(message);
         }
 
-        Smartcontract.SmartContractDeploymentSpec scds = scPack.getDepSpec();
+        SmartContractPackage.SmartContractDeploymentSpec scds = scPack.getDepSpec();
         if(scds==null){
             String message="Null deployment spec from from the SC package";
             throw new SysSmartContractException(message);
@@ -690,7 +690,7 @@ public class LSSC  extends SystemSmartContractBase {
      */
     private SmartContractDataPackage.SmartContractData executeDeployOrUpgrade(ISmartContractStub stub,
                                                      String groupName,
-                                                     Smartcontract.SmartContractDeploymentSpec scds,
+                                                     SmartContractPackage.SmartContractDeploymentSpec scds,
                                                      byte [] policy,
                                                      byte [] essc,
                                                      byte [] vssc,
@@ -744,7 +744,7 @@ public class LSSC  extends SystemSmartContractBase {
     private SmartContractDataPackage.SmartContractData executeDeploy(
             ISmartContractStub stub,
             String groupName,
-            Smartcontract.SmartContractDeploymentSpec scds,
+            SmartContractPackage.SmartContractDeploymentSpec scds,
             byte[] policy,
             byte[] essc,
             byte[] vssc,
@@ -791,7 +791,7 @@ public class LSSC  extends SystemSmartContractBase {
     private SmartContractDataPackage.SmartContractData executeUpgrade(
             ISmartContractStub stub,
             String groupName,
-            Smartcontract.SmartContractDeploymentSpec scds,
+            SmartContractPackage.SmartContractDeploymentSpec scds,
             byte[] policy,
             byte[] essc,
             byte[] vssc,

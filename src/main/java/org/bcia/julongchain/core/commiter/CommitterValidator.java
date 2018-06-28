@@ -33,7 +33,7 @@ import org.bcia.julongchain.core.ledger.util.TxValidationFlags;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.bcia.julongchain.protos.node.TransactionPackage;
 
 import java.util.*;
@@ -320,13 +320,13 @@ public class CommitterValidator implements ICommitterValidator {
         SmartContractInstance upgradeInstance = null;
 
         TransactionVO transactionVO = (TransactionVO) payloadVO.getDataVO();
-        Smartcontract.SmartContractInvocationSpec invocationSpec = transactionVO.getTransactionActionVOList().get(0)
+        SmartContractPackage.SmartContractInvocationSpec invocationSpec = transactionVO.getTransactionActionVOList().get(0)
                 .getSmartContractActionPayloadVO().getSmartContractProposalPayloadVO().getInput();
 
         if (CommConstant.LSSC.equals(invokeInstance.getSmartContractName())) {
             if (CommConstant.UPGRADE.equals(invocationSpec.getSmartContractSpec().getInput().getArgs(0).toStringUtf8
                     ())) {
-                Smartcontract.SmartContractDeploymentSpec deploymentSpec = Smartcontract.SmartContractDeploymentSpec
+                SmartContractPackage.SmartContractDeploymentSpec deploymentSpec = SmartContractPackage.SmartContractDeploymentSpec
                         .parseFrom(invocationSpec.getSmartContractSpec().getInput().getArgs(2));
                 upgradeInstance = new SmartContractInstance();
                 upgradeInstance.setGroupId(payloadVO.getGroupHeaderVO().getGroupId());

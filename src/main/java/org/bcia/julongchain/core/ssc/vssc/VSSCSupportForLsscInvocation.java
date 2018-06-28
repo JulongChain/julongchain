@@ -74,9 +74,9 @@ public class VSSCSupportForLsscInvocation {
             String msg=String.format("VSSC error: GetSmartContractProposalPayload failed, err %s",e.getMessage());
             throw new SysSmartContractException(msg);
         }
-        Smartcontract.SmartContractInvocationSpec scis=null;
+        SmartContractPackage.SmartContractInvocationSpec scis=null;
         try {
-            Smartcontract.SmartContractInvocationSpec.parseFrom(scpp.getInput());
+            SmartContractPackage.SmartContractInvocationSpec.parseFrom(scpp.getInput());
         } catch (InvalidProtocolBufferException e) {
             String msg=String.format("VSSC error: Unmarshal SmartContractInvocationSpec failed, err %s",e.getMessage());
             throw new SysSmartContractException(msg);
@@ -114,9 +114,9 @@ public class VSSCSupportForLsscInvocation {
                     String msg=String.format("Wrong number of arguments for invocation lssc(%s): expected at least 2, received %d",lsscFunc,size);
                     throw new SysSmartContractException(msg);
                 }
-                Smartcontract.SmartContractDeploymentSpec scds;
+                SmartContractPackage.SmartContractDeploymentSpec scds;
                 try {
-                    scds=Smartcontract.SmartContractDeploymentSpec.parseFrom(argsListWithoutFunction.get(1));
+                    scds=SmartContractPackage.SmartContractDeploymentSpec.parseFrom(argsListWithoutFunction.get(1));
                 } catch (InvalidProtocolBufferException e) {
                     String msg=String.format("GetSmartContractDeploymentSpec error %s",e.getMessage());
                     throw new SysSmartContractException(msg);

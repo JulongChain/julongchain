@@ -11,7 +11,7 @@ import org.bcia.julongchain.common.util.proto.TxUtils;
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContract;
 import org.bcia.julongchain.core.smartcontract.shim.impl.MockStub;
 import org.bcia.julongchain.protos.node.ProposalPackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +74,7 @@ public class LSSCTest extends BaseJunit4Test {
         //endregion
     }
 
-    public void testInstall(String smartcontractName,String version,String path,
+    public void testInstall(String smartContractName,String version,String path,
                             String expectErrorMsg,String caller,
                             MockStub mockStub){
         List<String> initArgs=new LinkedList<String>();
@@ -84,9 +84,9 @@ public class LSSCTest extends BaseJunit4Test {
         initArgs.add("b");
         initArgs.add("200");
 
-        Smartcontract.SmartContractDeploymentSpec cds = null;
+        SmartContractPackage.SmartContractDeploymentSpec cds = null;
         try {
-            cds = constructDeploySpec(smartcontractName, path, version, initArgs, false);
+            cds = constructDeploySpec(smartContractName, path, version, initArgs, false);
         } catch (SysSmartContractException e) {
             e.printStackTrace();
             return;
@@ -95,7 +95,7 @@ public class LSSCTest extends BaseJunit4Test {
         List<ByteString> args0 = new LinkedList<ByteString>();
         args0.add(ByteString.copyFromUtf8(LSSC.INSTALL));
         args0.add(ByteString.copyFrom(cdsBytes));
-        Smartcontract.SmartContractSpec spec=Smartcontract.SmartContractSpec.newBuilder().build();
+        SmartContractPackage.SmartContractSpec spec=SmartContractPackage.SmartContractSpec.newBuilder().build();
         ProposalPackage.SignedProposal signedProp = null;
         try {
             signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec);
@@ -128,7 +128,7 @@ public class LSSCTest extends BaseJunit4Test {
           testDeploy("example02","1.0",path,"","Alice",mockStub);//  TESTED  OK
 
         /*  testDeploy("example02","1.0",path,
-                "ExecuteDeployOrUpgrade failed,[SysSmartContract]Get smartcontract example02 from localstorage failed:java.io.FileNotFoundException: /var/julongchain/production/example02.1.0 (No such file or directory)",
+                "ExecuteDeployOrUpgrade failed,[SysSmartContract]Get smartContract example02 from localstorage failed:java.io.FileNotFoundException: /var/julongchain/production/example02.1.0 (No such file or directory)",
                 "Alice",mockStub);//  TESTED    Uninstall example02
                 */
 
@@ -162,7 +162,7 @@ public class LSSCTest extends BaseJunit4Test {
 
     }
 
-    public void testDeploy(String smartcontractName,String version,String path,
+    public void testDeploy(String smartContractName,String version,String path,
                             String expectErrorMsg,String caller,
                             MockStub mockStub){
         List<String> initArgs=new LinkedList<String>();
@@ -172,9 +172,9 @@ public class LSSCTest extends BaseJunit4Test {
         initArgs.add("b");
         initArgs.add("200");
 
-        Smartcontract.SmartContractDeploymentSpec cds = null;
+        SmartContractPackage.SmartContractDeploymentSpec cds = null;
         try {
-            cds = constructDeploySpec(smartcontractName, path, version, initArgs, false);
+            cds = constructDeploySpec(smartContractName, path, version, initArgs, false);
         } catch (SysSmartContractException e) {
             e.printStackTrace();
             return;
@@ -184,7 +184,7 @@ public class LSSCTest extends BaseJunit4Test {
         args0.add(ByteString.copyFromUtf8(LSSC.DEPLOY));
         args0.add(ByteString.copyFromUtf8("test"));
         args0.add(ByteString.copyFrom(cdsBytes));
-        Smartcontract.SmartContractSpec spec=Smartcontract.SmartContractSpec.newBuilder().build();
+        SmartContractPackage.SmartContractSpec spec=SmartContractPackage.SmartContractSpec.newBuilder().build();
         ProposalPackage.SignedProposal signedProp = null;
         try {
             signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec);
@@ -217,7 +217,7 @@ public class LSSCTest extends BaseJunit4Test {
       //  testUpgrade("example02","1.0",path,"123","Alice",mockStub);   //   T   invalid version
     }
 
-    public void testUpgrade(String smartcontractName,String version,String path,
+    public void testUpgrade(String smartContractName,String version,String path,
                            String expectErrorMsg,String caller,
                            MockStub mockStub){
         List<String> initArgs=new LinkedList<String>();
@@ -227,9 +227,9 @@ public class LSSCTest extends BaseJunit4Test {
         initArgs.add("b");
         initArgs.add("200");
 
-        Smartcontract.SmartContractDeploymentSpec cds = null;
+        SmartContractPackage.SmartContractDeploymentSpec cds = null;
         try {
-            cds = constructDeploySpec(smartcontractName, path, version, initArgs, false);
+            cds = constructDeploySpec(smartContractName, path, version, initArgs, false);
         } catch (SysSmartContractException e) {
             e.printStackTrace();
             return;
@@ -239,7 +239,7 @@ public class LSSCTest extends BaseJunit4Test {
         args0.add(ByteString.copyFromUtf8(LSSC.UPGRADE));
         args0.add(ByteString.copyFromUtf8("test"));
         args0.add(ByteString.copyFrom(cdsBytes));
-        Smartcontract.SmartContractSpec spec=Smartcontract.SmartContractSpec.newBuilder().build();
+        SmartContractPackage.SmartContractSpec spec=SmartContractPackage.SmartContractSpec.newBuilder().build();
         ProposalPackage.SignedProposal signedProp = null;
         try {
             signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec);
@@ -262,22 +262,22 @@ public class LSSCTest extends BaseJunit4Test {
 
     }
 
-    private Smartcontract.SmartContractDeploymentSpec constructDeploySpec(String smartcontractName, String path, String version, List<String> initArgs, boolean bCreateFS) throws SysSmartContractException {
-//        Smartcontract.SmartContractDeploymentSpec spec=Smartcontract.SmartContractDeploymentSpec.newBuilder().
+    private SmartContractPackage.SmartContractDeploymentSpec constructDeploySpec(String smartContractName, String path, String version, List<String> initArgs, boolean bCreateFS) throws SysSmartContractException {
+//        SmartContractPackage.SmartContractDeploymentSpec spec=SmartContractPackage.SmartContractDeploymentSpec.newBuilder().
 //                setCodePackage(ByteString.copyFromUtf8("testcds")).build();
-        Smartcontract.SmartContractID smartContractID = Smartcontract.SmartContractID.newBuilder().
-                setName(smartcontractName).setPath(path).setVersion(version).build();
-        Smartcontract.SmartContractInput.Builder inputBuilder= Smartcontract.SmartContractInput.newBuilder();
+        SmartContractPackage.SmartContractID smartContractID = SmartContractPackage.SmartContractID.newBuilder().
+                setName(smartContractName).setPath(path).setVersion(version).build();
+        SmartContractPackage.SmartContractInput.Builder inputBuilder= SmartContractPackage.SmartContractInput.newBuilder();
         for (String initArg:initArgs) {
             ByteString arg = ByteString.copyFromUtf8(initArg);
             inputBuilder.addArgs(arg);
         }
-        Smartcontract.SmartContractInput input=inputBuilder.build();
-        Smartcontract.SmartContractSpec.Builder builder=Smartcontract.SmartContractSpec.newBuilder();
-        builder.setType(Smartcontract.SmartContractSpec.Type.JAVA);
+        SmartContractPackage.SmartContractInput input=inputBuilder.build();
+        SmartContractPackage.SmartContractSpec.Builder builder=SmartContractPackage.SmartContractSpec.newBuilder();
+        builder.setType(SmartContractPackage.SmartContractSpec.Type.JAVA);
         builder.setSmartContractId(smartContractID);
         builder.setInput(input);
-        Smartcontract.SmartContractSpec spec=builder.build();
+        SmartContractPackage.SmartContractSpec spec=builder.build();
 
         Map<String, File> map = IoUtil.getFileRelativePath(path);
         byte[] tarBytes=null;
@@ -290,12 +290,12 @@ public class LSSCTest extends BaseJunit4Test {
             //stream.write(tarBytes);
             //stream.close();
         } catch (Exception e) {
-            String msg=String.format("Create tar file for %s failed:%s",smartcontractName,e.getMessage());
+            String msg=String.format("Create tar file for %s failed:%s",smartContractName,e.getMessage());
             throw new SysSmartContractException(msg);
         }
 
 
-        Smartcontract.SmartContractDeploymentSpec depSpec = Smartcontract.SmartContractDeploymentSpec.newBuilder()
+        SmartContractPackage.SmartContractDeploymentSpec depSpec = SmartContractPackage.SmartContractDeploymentSpec.newBuilder()
              .setSmartContractSpec(spec).setCodePackage(ByteString.copyFrom(gzipBytes)).build();
         if(bCreateFS){
             //后面填充
@@ -310,7 +310,7 @@ public class LSSCTest extends BaseJunit4Test {
         testStart("example02","1.0",path,"","Alice",mockStub);
     }
 
-    public void testStart(String smartcontractName,String version,String path,
+    public void testStart(String smartContractName,String version,String path,
                             String expectErrorMsg,String caller,
                             MockStub mockStub){
         List<String> initArgs=new LinkedList<String>();
@@ -320,9 +320,9 @@ public class LSSCTest extends BaseJunit4Test {
         initArgs.add("b");
         initArgs.add("200");
 
-        Smartcontract.SmartContractDeploymentSpec cds = null;
+        SmartContractPackage.SmartContractDeploymentSpec cds = null;
         try {
-            cds = constructDeploySpec(smartcontractName, path, version, initArgs, false);
+            cds = constructDeploySpec(smartContractName, path, version, initArgs, false);
         } catch (SysSmartContractException e) {
             e.printStackTrace();
             return;
@@ -333,7 +333,7 @@ public class LSSCTest extends BaseJunit4Test {
         args0.add(ByteString.copyFromUtf8("testGroup"));
         args0.add(ByteString.copyFromUtf8("test"));
 //        args0.add(ByteString.copyFrom(cdsBytes));
-        Smartcontract.SmartContractSpec spec=Smartcontract.SmartContractSpec.newBuilder().build();
+        SmartContractPackage.SmartContractSpec spec=SmartContractPackage.SmartContractSpec.newBuilder().build();
         ProposalPackage.SignedProposal signedProp = null;
         try {
             signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec);

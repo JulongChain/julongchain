@@ -21,6 +21,7 @@ syntax = "proto3";
 package protos;
 option java_package = "org.bcia.julongchain.protos.node";
 option go_package = "github.com/hyperledger/fabric/protos/peer";
+option java_outer_classname = "SmartContractPackage";
 import "google/protobuf/timestamp.proto";
 
 
@@ -71,7 +72,7 @@ message SmartContractSpec {
     }
 
     Type type = 1;
-    SmartContractID SmartContract_id = 2;
+    SmartContractID smart_contract_id = 2;
     SmartContractInput input = 3;
     int32 timeout = 4;
 }
@@ -85,7 +86,7 @@ message SmartContractDeploymentSpec {
         SYSTEM = 1;
     }
 
-    SmartContractSpec SmartContract_spec = 1;
+    SmartContractSpec smart_contract_spec = 1;
     // Controls when the SmartContract becomes executable.
     google.protobuf.Timestamp effective_date = 2;
     bytes code_package = 3;
@@ -96,7 +97,7 @@ message SmartContractDeploymentSpec {
 // Carries the SmartContract function and its arguments.
 message SmartContractInvocationSpec {
 
-    SmartContractSpec SmartContract_spec = 1;
+    SmartContractSpec smart_contract_spec = 1;
     // This field can contain a user-specified ID generation algorithm
     // If supplied, this will be used to generate a ID
     // If not supplied (left empty), sha256base64 will be used

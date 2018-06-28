@@ -65,7 +65,7 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
      */
     @Override
     public IBlockStore openBlockStore(String ledgerID) throws LedgerException {
-        return FsBlockStore.newFsBlockStore(ledgerID, config, indexConfig, leveldbProvider);
+        return FsBlockStore.newFsBlockStore(ledgerID, config, indexConfig, ((LevelDBProvider) leveldbProvider).getDBHandle(ledgerID));
     }
 
     /**

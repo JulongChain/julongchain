@@ -29,7 +29,7 @@ import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
  * 类描述
@@ -44,11 +44,11 @@ public class TxUtils {
     // MockSignedEndorserProposalOrPanic creates a SignedProposal with the passed arguments
     public static ProposalPackage.SignedProposal mockSignedEndorserProposalOrPanic(
             String groupID,
-            Smartcontract.SmartContractSpec spec
+            SmartContractPackage.SmartContractSpec spec
     ) throws JavaChainException {
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
         byte[] creator = identity.serialize();
-        Smartcontract.SmartContractInvocationSpec invocationSpec=Smartcontract.SmartContractInvocationSpec.newBuilder().build();
+        SmartContractPackage.SmartContractInvocationSpec invocationSpec=SmartContractPackage.SmartContractInvocationSpec.newBuilder().build();
         ProposalPackage.Proposal proposal = ProposalUtils.createSmartcontractProposalWithTransient(Common.HeaderType.ENDORSER_TRANSACTION,
                 groupID,invocationSpec,creator,null);
         byte[] proBytes =proposal.toByteArray();

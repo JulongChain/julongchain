@@ -21,7 +21,7 @@ import org.bcia.julongchain.core.ledger.LedgerContext;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
 import org.bcia.julongchain.protos.node.SmartContractEventPackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
  * ISmartContractProvider provides an abstraction layer that is
@@ -92,7 +92,7 @@ public interface ISmartContractProvider {
 
     void stop(LedgerContext ctxt,
          SmartContractContext scContext,
-         Smartcontract.SmartContractDeploymentSpec spec)throws SmartContractException;
+              SmartContractPackage.SmartContractDeploymentSpec spec)throws SmartContractException;
 
 
 

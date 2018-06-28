@@ -26,7 +26,7 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
 import org.bcia.julongchain.protos.node.SmartContractDataPackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.bica.julongchain.protos.node.SignedScDepSpec;
 
 import java.io.*;
@@ -42,7 +42,7 @@ public class SignedSDSPackage implements ISmartContractPackage {
     private static final JavaChainLog log = JavaChainLogFactory.getLog(SignedSDSPackage.class);
 
     private byte[] buf;
-    private Smartcontract.SmartContractDeploymentSpec depSpec;
+    private SmartContractPackage.SmartContractDeploymentSpec depSpec;
     private SignedScDepSpec.SignedSmartContractDeploymentSpec sDepSpec;
     private Common.Envelope env;
     private SignedSDSData data;
@@ -65,7 +65,7 @@ public class SignedSDSPackage implements ISmartContractPackage {
         }
         this.sDepSpec = SmartContractPackageUtil.extractSignedSmartContractDeploymentSpecFromEnvelope(env);
         try {
-            this.depSpec = Smartcontract.SmartContractDeploymentSpec.parseFrom(sDepSpec.getSmartcontractDeploymentSpec());
+            this.depSpec = SmartContractPackage.SmartContractDeploymentSpec.parseFrom(sDepSpec.getSmartContractDeploymentSpec());
         } catch (InvalidProtocolBufferException e) {
             log.error("Error getting deployment spec");
             throw new JavaChainException(e);
@@ -83,7 +83,7 @@ public class SignedSDSPackage implements ISmartContractPackage {
     }
 
     @Override
-    public Smartcontract.SmartContractDeploymentSpec initFromFS(String scName, String scVersion) throws JavaChainException {
+    public SmartContractPackage.SmartContractDeploymentSpec initFromFS(String scName, String scVersion) throws JavaChainException {
         reset();
         byte[] buf = SmartContractProvider.getSmartContractPackage(scName, scVersion);
         initFromBuffer(buf);
@@ -150,7 +150,7 @@ public class SignedSDSPackage implements ISmartContractPackage {
     }
 
     @Override
-    public Smartcontract.SmartContractDeploymentSpec getDepSpec(){
+    public SmartContractPackage.SmartContractDeploymentSpec getDepSpec(){
         if(depSpec == null){
             throw new RuntimeException("GetDepSpec called on uninitialized package");
         }
@@ -166,10 +166,10 @@ public class SignedSDSPackage implements ISmartContractPackage {
 
     @Override
     public byte[] getDepSpecBytes() {
-        if(sDepSpec == null || sDepSpec.getSmartcontractDeploymentSpec() == null){
+        if(sDepSpec == null || sDepSpec.getSmartContractDeploymentSpec() == null){
             throw new RuntimeException("GetDepSpecBytes called on uninitialized package");
         }
-        return sDepSpec.getSmartcontractDeploymentSpec().toByteArray();
+        return sDepSpec.getSmartContractDeploymentSpec().toByteArray();
     }
 
     @Override
@@ -200,9 +200,9 @@ public class SignedSDSPackage implements ISmartContractPackage {
             log.error("Null sds");
             return null;
         }
-        Smartcontract.SmartContractDeploymentSpec sds = null;
+        SmartContractPackage.SmartContractDeploymentSpec sds = null;
         try {
-            sds = Smartcontract.SmartContractDeploymentSpec.parseFrom(ssds.getSmartcontractDeploymentSpec());
+            sds = SmartContractPackage.SmartContractDeploymentSpec.parseFrom(ssds.getSmartContractDeploymentSpec());
         } catch (Exception e){
             log.error(e.getMessage(), e);
             throw new JavaChainException(e);
@@ -234,7 +234,7 @@ public class SignedSDSPackage implements ISmartContractPackage {
         if(sDepSpec == null){
             throw new JavaChainException("Uninitialized package");
         }
-        if(sDepSpec.getSmartcontractDeploymentSpec() == null){
+        if(sDepSpec.getSmartContractDeploymentSpec() == null){
             throw new JavaChainException("Signed smartcontract deployment spec cannot be null in a package");
         }
         if(depSpec == null){
@@ -252,7 +252,7 @@ public class SignedSDSPackage implements ISmartContractPackage {
 
     private void reset(){
         this.buf = new byte[0];
-        this.depSpec = Smartcontract.SmartContractDeploymentSpec.getDefaultInstance();
+        this.depSpec = SmartContractPackage.SmartContractDeploymentSpec.getDefaultInstance();
         this.sDepSpec = SignedScDepSpec.SignedSmartContractDeploymentSpec.getDefaultInstance();
         this.env = Common.Envelope.getDefaultInstance();
         this.data = new SignedSDSData();

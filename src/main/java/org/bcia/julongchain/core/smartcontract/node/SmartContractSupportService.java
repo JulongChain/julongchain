@@ -20,14 +20,25 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.LevelDBException;
+import org.bcia.julongchain.common.ledger.IResultsIterator;
+import org.bcia.julongchain.core.ledger.INodeLedger;
+import org.bcia.julongchain.core.ledger.ITxSimulator;
+import org.bcia.julongchain.core.ledger.TxSimulationResults;
+import org.bcia.julongchain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.julongchain.core.ledger.kvledger.history.historydb.HistoryDBHelper;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedLevelDB;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
+import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.core.ledger.leveldb.LevelDB;
 import org.bcia.julongchain.core.ledger.leveldb.LevelDBUtil;
+import org.bcia.julongchain.core.node.util.NodeUtils;
 import org.bcia.julongchain.core.smartcontract.client.SmartContractSupportClient;
 import org.bcia.julongchain.protos.common.Common;
+import org.bcia.julongchain.protos.ledger.queryresult.KvQueryResult;
+import org.bcia.julongchain.protos.ledger.rwset.Rwset;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.julongchain.protos.node.*;
 
@@ -37,7 +48,7 @@ import java.util.Map;
 
 import static org.bcia.julongchain.core.smartcontract.node.SmartContractRunningUtil.*;
 import static org.bcia.julongchain.core.smartcontract.node.TransactionRunningUtil.*;
-import static org.bcia.julongchain.protos.node.SmartcontractShim.SmartContractMessage;
+import static org.bcia.julongchain.protos.node.SmartContractShim.SmartContractMessage;
 
 /**
  * 智能合约service，负责接收和处理gRPC消息
@@ -103,7 +114,7 @@ public class SmartContractSupportService
             SmartContractMessage.newBuilder()
                 .setType(SmartContractMessage.Type.INIT)
                 .setProposal(signedProposal)
-                .setSmartcontractEvent(smartContractEvent)
+                .setSmartContractEvent(smartContractEvent)
                 .build();
         streamObserver.onNext(responseMessage);
       }
@@ -180,52 +191,11 @@ public class SmartContractSupportService
 
           logger.info("===============>" + key);
 
-          // history数据库路径
-          String historyDBPath = LedgerConfig.getHistoryLevelDBPath();
-          // 世界状态数据库路径
-          String stateLevelDBPath = LedgerConfig.getStateLevelDBPath();
-
-          // history数据库保存的key(以这个开头)
-          byte[] historyKeyBytes =
-              HistoryDBHelper.constructPartialCompositeHistoryKey(groupId, key, false);
-
-          logger.info(new String(historyKeyBytes));
-
-          // 世界状态数据库保存的key
-          byte[] worldStateKeyByte = VersionedLevelDB.constructCompositeKey(groupId + " " + smartContractId, key);
-
-          logger.info(new String(worldStateKeyByte));
-
           try {
-            // 查询历史数据库
-            LevelDB db = LevelDBUtil.getDB(historyDBPath);
-            // 找到历史数据库最大的key
-            byte[] lastKey = LevelDBUtil.getLastKey(db, historyKeyBytes);
-            logger.info(new String(lastKey));
-            // 解析blockNum
-            long blockNum =
-                HistoryDBHelper.splitCompositeHistoryKeyForBlockNum(
-                    lastKey, historyKeyBytes.length);
-            // 解析txNum
-            long txNum =
-                HistoryDBHelper.splitCompositeHistoryKeyForTranNum(lastKey, historyKeyBytes.length);
-            // 保存Version
-            KvRwset.Version version =
-                KvRwset.Version.newBuilder().setBlockNum(blockNum).setTxNum(txNum).build();
-            // 保存读记录
-            KvRwset.KVRead kvRead =
-                KvRwset.KVRead.newBuilder().setVersion(version).setKey(key).build();
+            INodeLedger nodeLedger = NodeUtils.getLedger(groupId);
+            ITxSimulator txSimulator = nodeLedger.newTxSimulator(txId);
+            byte[] worldStateBytes = txSimulator.getState(smartContractId, key);
 
-            // 保存所有的读记录
-            TransactionRunningUtil.addKvRead(smartContractId, txId, kvRead);
-
-            // 查询世界状态数据库
-            db = LevelDBUtil.getDB(stateLevelDBPath);
-
-            byte[] worldStateBytes = LevelDBUtil.get(db, worldStateKeyByte, true);
-            if(worldStateBytes != null){
-              logger.info("=============> world state bytes length:" + worldStateBytes.length);
-            }
             if (worldStateBytes == null || worldStateBytes.length > 10000) {
               worldStateBytes = new byte[] {};
               // 发送读取结果到shim端
@@ -258,7 +228,7 @@ public class SmartContractSupportService
             }
 
 
-          } catch (LevelDBException e) {
+          } catch (LedgerException e) {
             e.printStackTrace();
           }
 
@@ -268,21 +238,11 @@ public class SmartContractSupportService
         // 收到putState信息
         if (message.getType().equals(SmartContractMessage.Type.PUT_STATE)) {
           try {
-            SmartcontractShim.PutState putState = null;
-            putState = SmartcontractShim.PutState.parseFrom(message.getPayload());
-            logger.info(putState.getKey());
-            logger.info(putState.getValue());
-
-            KvRwset.KVWrite kvWrite =
-                KvRwset.KVWrite.newBuilder()
-                    .setKey(putState.getKey())
-                    .setValue(putState.getValue())
-                    .setIsDelete(false)
-                    .build();
-
-            TransactionRunningUtil.addKvWrite(smartContractId, txId, kvWrite);
-
-          } catch (InvalidProtocolBufferException e) {
+            SmartContractShim.PutState putState = SmartContractShim.PutState.parseFrom(message.getPayload());
+            INodeLedger nodeLedger = NodeUtils.getLedger(groupId);
+            ITxSimulator txSimulator = nodeLedger.newTxSimulator(txId);
+            txSimulator.setState(smartContractId, putState.getKey(), putState.getValue().toByteArray());
+          } catch (Exception e) {
             logger.error(e.getMessage(), e);
           }
 
@@ -336,8 +296,8 @@ public class SmartContractSupportService
             return;
         }
         // 从message的payload中获取smartContractID
-        Smartcontract.SmartContractID smartContractID =
-                Smartcontract.SmartContractID.parseFrom(message.getPayload());
+        SmartContractPackage.SmartContractID smartContractID =
+                SmartContractPackage.SmartContractID.parseFrom(message.getPayload());
         String name = smartContractID.getName();
         if (name == null || name.length() == 0) {
             return;
@@ -425,21 +385,24 @@ public class SmartContractSupportService
     private String getSmartContractId(SmartContractMessage message) {
         String smartContractIdStr = "";
         try {
-            smartContractIdStr = Smartcontract.SmartContractID.parseFrom(message.getPayload()).getName();
+            smartContractIdStr = SmartContractPackage.SmartContractID.parseFrom(message.getPayload()).getName();
         } catch (InvalidProtocolBufferException e) {
             logger.error(e.getMessage(), e);
         }
         return smartContractIdStr;
     }
 
-    public static void main(String[] args) {
-        SmartContractMessage build =
-                SmartContractMessage.newBuilder().setTxid("t1").setGroupId("g1").build();
-        SmartContractMessage build1 = SmartContractMessage.newBuilder().mergeFrom(build).build();
-
-        build = SmartContractMessage.newBuilder().setTxid("t2").setGroupId("g2").build();
-
-        System.out.println(build.getTxid() + " " + build.getGroupId());
-        System.out.println(build1.getTxid() + " " + build1.getGroupId());
+    public static void main(String[] args) throws Exception {
+	    INodeLedger l = NodeUtils.getLedger("mytestgroupid2");
+	    ITxSimulator txSimulator = l.newTxSimulator("mytestgroupid2");
+	    byte[] state = txSimulator.getState("mytestgroupid2", "key1");
+//	    System.out.println(new String(state));
+	    txSimulator.setState("mytestgroupid1", "key", "value".getBytes());
+	    TxSimulationResults txSimulationResults = txSimulator.getTxSimulationResults();
+	    Rwset.TxReadWriteSet publicReadWriteSet = txSimulationResults.getPublicReadWriteSet();
+	    Rwset.NsReadWriteSet nsRwset = publicReadWriteSet.getNsRwset(0);
+	    ByteString rwset = nsRwset.getRwset();
+	    System.out.println(rwset.toStringUtf8());
     }
+
 }

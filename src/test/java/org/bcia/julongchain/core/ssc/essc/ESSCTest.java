@@ -16,7 +16,7 @@ import org.bcia.julongchain.node.entity.MockCrypto;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,15 +65,15 @@ public class ESSCTest extends BaseJunit4Test {
 
 
             //success test 1: invocation with mandatory args only
-            Smartcontract.SmartContractID smartContractID = Smartcontract.SmartContractID.newBuilder().setName("foo").setVersion("1.0").build();
-            Smartcontract.SmartContractInput input = Smartcontract.SmartContractInput.newBuilder().addArgs(ByteString.copyFromUtf8("some"))
+            SmartContractPackage.SmartContractID smartContractID = SmartContractPackage.SmartContractID.newBuilder().setName("foo").setVersion("1.0").build();
+            SmartContractPackage.SmartContractInput input = SmartContractPackage.SmartContractInput.newBuilder().addArgs(ByteString.copyFromUtf8("some"))
                     .addArgs(ByteString.copyFromUtf8("args")).build();
-            Smartcontract.SmartContractSpec smartContractSpec = Smartcontract.SmartContractSpec.newBuilder().
+            SmartContractPackage.SmartContractSpec smartContractSpec = SmartContractPackage.SmartContractSpec.newBuilder().
                     setSmartContractId(smartContractID).
-                    setType(Smartcontract.SmartContractSpec.Type.JAVA).
+                    setType(SmartContractPackage.SmartContractSpec.Type.JAVA).
                     setInput(input).
                     build();
-            Smartcontract.SmartContractInvocationSpec invocationSpec = Smartcontract.SmartContractInvocationSpec.newBuilder().
+            SmartContractPackage.SmartContractInvocationSpec invocationSpec = SmartContractPackage.SmartContractInvocationSpec.newBuilder().
                     setSmartContractSpec(smartContractSpec).build();
             ISigningIdentity sId = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
             byte[] sIdBytes = sId.serialize();

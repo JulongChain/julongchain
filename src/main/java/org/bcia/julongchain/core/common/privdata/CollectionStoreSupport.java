@@ -46,8 +46,8 @@ public class CollectionStoreSupport implements IPrivDataSupport {
     }
 
     @Override
-    public String buildCollectionKVSKey(String smartcontractname) {
-        return smartcontractname+ COLLECTION_SEPARATOR + COLLECTION_SUFFIX;
+    public String buildCollectionKVSKey(String smartContractname) {
+        return smartContractname+ COLLECTION_SEPARATOR + COLLECTION_SUFFIX;
     }
 
     @Override

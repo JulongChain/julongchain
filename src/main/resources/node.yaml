@@ -76,16 +76,16 @@ node:
 
     consenterAddress: 127.0.0.1:7050
 
-    # The endpoint this node uses to listen for inbound smartcontract connections.
+    # The endpoint this node uses to listen for inbound smartContract connections.
     # If this is commented-out, the listen address is selected to be
     # the node's address (see below) with port 7052
-    # smartcontractListenAddress: 0.0.0.0:7052
+    # smartContractListenAddress: 0.0.0.0:7052
 
-    # The endpoint the smartcontract for this node uses to connect to the node.
-    # If this is not specified, the smartcontractListenAddress address is selected.
-    # And if smartcontractListenAddress is not specified, address is selected from
+    # The endpoint the smartContract for this node uses to connect to the node.
+    # If this is not specified, the smartContractListenAddress address is selected.
+    # And if smartContractListenAddress is not specified, address is selected from
     # node listenAddress.
-    # smartcontractAddress: 0.0.0.0:7052
+    # smartContractAddress: 0.0.0.0:7052
 
     # When used as node config, this represents the endpoint to other nodes
     # in the same organization. For nodes in other organization, see
@@ -261,8 +261,8 @@ node:
         #keepaliveMinInterval: 60000
 
     # TLS Settings
-    # Note that node-smartcontract connections through smartcontractListenAddress is
-    # not mutual TLS auth. See comments on smartcontractListenAddress for more info
+    # Note that node-smartContract connections through smartContractListenAddress is
+    # not mutual TLS auth. See comments on smartContractListenAddress for more info
     tls:
         # Require server-side TLS
         enabled:  false
@@ -303,7 +303,7 @@ node:
     # Path on the file system where node will store data (eg ledger). This
     # location must be access control protected to prevent unintended
     # modification that might corrupt the node operations.
-    fileSystemPath: /var/julongchain/production
+    fileSystemPath: /var/julongchain/production/node
 
     # BCCSP (Blockchain crypto provider): Select which crypto implementation or
     # library to use
@@ -351,7 +351,7 @@ node:
     # Handlers defines custom handlers that can filter and mutate
     # objects passing within the node, such as:
     #   Auth filter - reject or forward proposals from clients
-    #   Decorators  - append or mutate the smartcontract input passed to the smartcontract
+    #   Decorators  - append or mutate the smartContract input passed to the smartContract
     # Valid handler definition contains:
     #   - A name which is a factory method name defined in
     #     core/handlers/library/library.go for statically compiled handlers
@@ -409,7 +409,7 @@ vm:
             certFile: docker/tls.crt
             keyFile: docker/tls.key
 
-        # Enables/disables the standard out/err from smartcontract containers for
+        # Enables/disables the standard out/err from smartContract containers for
         # debugging purposes
         attachStdout: false
 
@@ -436,7 +436,7 @@ vm:
 
 ###############################################################################
 #
-#    Smartcontract section
+#    SmartContractPackage section
 #
 ###############################################################################
 smartContract:
@@ -445,19 +445,19 @@ smartContract:
 
     coreNodeAddress: 172.17.0.1
 
-    # The id is used by the Smartcontract stub to register the executing Smartcontract
+    # The id is used by the SmartContract stub to register the executing SmartContract
     # ID with the Node and is generally supplied through ENV variables
-    # the `path` form of ID is provided when installing the smartcontract.
+    # the `path` form of ID is provided when installing the smartContract.
     # The `name` is used for all other requests and can be any string.
     id:
         path:
         name:
 
-    # Generic builder environment, suitable for most smartcontract types
+    # Generic builder environment, suitable for most smartContract types
     builder: $(DOCKER_NS)/fabric-ccenv:$(ARCH)-$(PROJECT_VERSION)
 
     # Enables/disables force pulling of the base docker images (listed below)
-    # during user smartcontract instantiation.
+    # during user smartContract instantiation.
     # Useful when using moving image tags (such as :latest)
     pull: false
 
@@ -465,7 +465,7 @@ smartContract:
         # golang will never need more than baseos
         runtime: $(BASE_DOCKER_NS)/fabric-baseos:$(ARCH)-$(BASE_VERSION)
 
-        # whether or not golang smartcontract should be linked dynamically
+        # whether or not golang smartContract should be linked dynamically
         dynamicLink: false
 
     car:
@@ -477,7 +477,7 @@ smartContract:
         # This is an image based on java:openjdk-8 with addition compiler
         # tools added for java shim layer packaging.
         # This image is packed with shim layer libraries that are necessary
-        # for Java smartcontract runtime.
+        # for Java smartContract runtime.
         Dockerfile:  |
             from $(DOCKER_NS)/fabric-javaenv:$(ARCH)-$(PROJECT_VERSION)
 
@@ -487,32 +487,32 @@ smartContract:
         runtime: $(BASE_DOCKER_NS)/fabric-baseimage:$(ARCH)-$(BASE_VERSION)
 
     # Timeout duration for starting up a container and waiting for Register
-    # to come through. 1sec should be plenty for smartcontract unit tests
+    # to come through. 1sec should be plenty for smartContract unit tests
     startuptimeout: 300s
 
     # Timeout duration for Invoke and Init calls to prevent runaway.
-    # This timeout is used by all smartcontracts in all the channels, including
-    # system smartcontracts.
+    # This timeout is used by all smartContracts in all the channels, including
+    # system smartContracts.
     # Note that during Invoke, if the image is not available (e.g. being
     # cleaned up when in development environment), the node will automatically
     # build the image, which might take more time. In production environment,
-    # the smartcontract image is unlikely to be deleted, so the timeout could be
+    # the smartContract image is unlikely to be deleted, so the timeout could be
     # reduced accordingly.
     executetimeout: 30s
 
     # There are 2 modes: "dev" and "net".
-    # In dev mode, user runs the smartcontract after starting node from
+    # In dev mode, user runs the smartContract after starting node from
     # command line on local machine.
-    # In net mode, node will run smartcontract in a docker container.
+    # In net mode, node will run smartContract in a docker container.
     mode: net
 
     # keepalive in seconds. In situations where the communiction goes through a
     # proxy that does not support keep-alive, this parameter will maintain connection
-    # between node and smartcontract.
+    # between node and smartContract.
     # A value <= 0 turns keepalive off
     keepalive: 0
 
-    # system smartcontracts whitelist. To add system smartcontract "myscc" to the
+    # system smartContracts whitelist. To add system smartContract "myscc" to the
     # whitelist, add "myscc: enable" to the list below, and register in
     # smartcontract/importsysccs.go
     system:
@@ -522,12 +522,12 @@ smartContract:
         vssc: enable
         qssc: enable
 
-    # System smartcontract plugins: in addition to being imported and compiled
-    # into fabric through core/smartcontract/importsysccs.go, system smartcontracts
+    # System smartContract plugins: in addition to being imported and compiled
+    # into fabric through core/smartcontract/importsysccs.go, system smartContracts
     # can also be loaded as shared objects compiled as Go plugins.
     # See examples/plugins/scc for an example.
-    # Like regular system smartcontracts, plugins must also be white listed in the
-    # smartcontract.system section above.
+    # Like regular system smartContracts, plugins must also be white listed in the
+    # smartContract.system section above.
     systemPlugins:
       # example configuration:
       # - enabled: true
@@ -536,13 +536,13 @@ smartContract:
       #   invokableExternal: true
       #   invokableCC2CC: true
 
-    # Logging section for the smartcontract container
+    # Logging section for the smartContract container
     logging:
-      # Default level for all loggers within the smartcontract container
+      # Default level for all loggers within the smartContract container
       level:  info
       # Override default level for the 'shim' module
       shim:   warning
-      # Format for the smartcontract container logs
+      # Format for the smartContract container logs
       format: '%{color}%{time:2006-01-02 15:04:05.000 MST} [%{module}] %{shortfunc} -> %{level:.4s} %{id:03x}%{color:reset} %{message}'
 
 ###############################################################################

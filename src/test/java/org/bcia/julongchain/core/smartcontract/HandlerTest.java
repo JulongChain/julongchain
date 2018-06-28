@@ -24,8 +24,8 @@ import org.bcia.julongchain.core.endorser.MockTxSimulator;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.julongchain.core.smartcontract.shim.fsm.Event;
 import org.bcia.julongchain.core.smartcontract.shim.helper.Channel;
-import org.bcia.julongchain.protos.node.Smartcontract;
-import org.bcia.julongchain.protos.node.SmartcontractShim;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
+import org.bcia.julongchain.protos.node.SmartContractShim;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -39,7 +39,7 @@ import org.mockito.quality.Strictness;
 
 import java.util.HashMap;
 
-import static org.bcia.julongchain.protos.node.SmartcontractShim.SmartContractMessage.Type.*;
+import static org.bcia.julongchain.protos.node.SmartContractShim.SmartContractMessage.Type.*;
 import static org.mockito.Mockito.when;
 
 /**
@@ -235,18 +235,18 @@ public class HandlerTest {
         handler.setChatStream(new ISmartContractStream() {
             int i = 0;
             @Override
-            public void send(SmartcontractShim.SmartContractMessage msg) {
+            public void send(SmartContractShim.SmartContractMessage msg) {
 
             }
 
             @Override
-            public SmartcontractShim.SmartContractMessage recv(){
-                SmartcontractShim.SmartContractMessage in = null;
+            public SmartContractShim.SmartContractMessage recv(){
+                SmartContractShim.SmartContractMessage in = null;
                 if (i == 0) {
-                    in = SmartcontractShim.SmartContractMessage.newBuilder()
+                    in = SmartContractShim.SmartContractMessage.newBuilder()
                             .setGroupId("GroupId")
                             .setTxid("TxId")
-                            .setPayload(Smartcontract.SmartContractID.newBuilder().setName("root").build().toByteString())
+                            .setPayload(SmartContractPackage.SmartContractID.newBuilder().setName("root").build().toByteString())
                             .setType(GET_STATE)
                             .build();
                     try {
@@ -287,8 +287,8 @@ public class HandlerTest {
     public void notifyDuringStartup() throws InterruptedException{
         handler.notifyDuringStartup(Boolean.FALSE);
         handler.notifyDuringStartup(Boolean.TRUE);
-        SmartcontractShim.SmartContractMessage.Type expected = READY;
-        SmartcontractShim.SmartContractMessage.Type actual = handler.getNextState().take().getMsg().getType();
+        SmartContractShim.SmartContractMessage.Type expected = READY;
+        SmartContractShim.SmartContractMessage.Type actual = handler.getNextState().take().getMsg().getType();
         Assert.assertEquals(expected, actual);
     }
 
@@ -296,17 +296,17 @@ public class HandlerTest {
     public void befortRegisterEvent(){
         handler.setChatStream(new ISmartContractStream() {
             @Override
-            public void send(SmartcontractShim.SmartContractMessage msg) {
+            public void send(SmartContractShim.SmartContractMessage msg) {
                 System.out.println("send");
             }
 
             @Override
-            public SmartcontractShim.SmartContractMessage recv() {
+            public SmartContractShim.SmartContractMessage recv() {
                 return null;
             }
         });
-        Smartcontract.SmartContractID id = Smartcontract.SmartContractID.newBuilder().build();
-        SmartcontractShim.SmartContractMessage msg = SmartcontractShim.SmartContractMessage.newBuilder()
+        SmartContractPackage.SmartContractID id = SmartContractPackage.SmartContractID.newBuilder().build();
+        SmartContractShim.SmartContractMessage msg = SmartContractShim.SmartContractMessage.newBuilder()
                 .setPayload(id.toByteString())
                 .build();
         Event event = new Event(handler.getFsm(), "test", "test", "test", null, false, false, msg);
@@ -317,7 +317,7 @@ public class HandlerTest {
 
     @Test
     public void notifyTest() {
-        SmartcontractShim.SmartContractMessage msg = SmartcontractShim.SmartContractMessage.newBuilder()
+        SmartContractShim.SmartContractMessage msg = SmartContractShim.SmartContractMessage.newBuilder()
                 .setGroupId("123")
                 .setTxid("456")
                 .setType(READY)
@@ -327,7 +327,7 @@ public class HandlerTest {
 
     @Test
     public void beforeCompletedEvent(){
-        SmartcontractShim.SmartContractMessage msg = SmartcontractShim.SmartContractMessage.newBuilder()
+        SmartContractShim.SmartContractMessage msg = SmartContractShim.SmartContractMessage.newBuilder()
                 .setTxid("123")
                 .build();
         Event event = new Event(handler.getFsm(), "test", "test", "test", null, false, false, msg);
@@ -336,11 +336,11 @@ public class HandlerTest {
 
     @Test
     public void handleGetState(){
-        SmartcontractShim.SmartContractMessage msg = SmartcontractShim.SmartContractMessage.newBuilder()
+        SmartContractShim.SmartContractMessage msg = SmartContractShim.SmartContractMessage.newBuilder()
                 .setGroupId("GroupId")
                 .setTxid("Txid")
                 .build();
-        Smartcontract.SmartContractID id = Smartcontract.SmartContractID.newBuilder()
+        SmartContractPackage.SmartContractID id = SmartContractPackage.SmartContractID.newBuilder()
                 .setName("root")
                 .build();
         TransactionContext txContext = new TransactionContext();
@@ -369,7 +369,7 @@ public class HandlerTest {
             }
         };
         txContext.getQueryIteratorMap().put(iterID, iter);
-        Smartcontract.SmartContractID id = Smartcontract.SmartContractID.newBuilder()
+        SmartContractPackage.SmartContractID id = SmartContractPackage.SmartContractID.newBuilder()
                 .setName("root")
                 .build();
         txContext.setTxSimulator(new MockTxSimulator());
@@ -393,7 +393,7 @@ public class HandlerTest {
             }
         };
         txContext = getTransactionContextBeforeQuery();
-        SmartcontractShim.QueryResponse actual = handler.getQueryResponse(txContext, iter, iterID);
+        SmartContractShim.QueryResponse actual = handler.getQueryResponse(txContext, iter, iterID);
         String expected = "iterID";
         Assert.assertEquals(expected, actual.getId());
         Assert.assertFalse(actual.getHasMore());
@@ -403,7 +403,7 @@ public class HandlerTest {
     public void handleGetStateByRange(){
         txContext = getTransactionContextBeforeQuery();
 
-        SmartcontractShim.SmartContractMessage msg = SmartcontractShim.SmartContractMessage.newBuilder()
+        SmartContractShim.SmartContractMessage msg = SmartContractShim.SmartContractMessage.newBuilder()
                 .setGroupId("GroupId")
                 .setTxid("txid")
                 .build();
@@ -416,10 +416,10 @@ public class HandlerTest {
         String groupId = "GroupId";
         String txid = "txid";
 
-        SmartcontractShim.SmartContractMessage msg = SmartcontractShim.SmartContractMessage.newBuilder()
+        SmartContractShim.SmartContractMessage msg = SmartContractShim.SmartContractMessage.newBuilder()
                 .setTxid(txid)
                 .setGroupId(groupId)
-                .setPayload(SmartcontractShim.QueryStateNext.newBuilder().setId("iterID").build().toByteString())
+                .setPayload(SmartContractShim.QueryStateNext.newBuilder().setId("iterID").build().toByteString())
                 .build();
         handler.handleQueryStateNext(msg);
     }
@@ -428,10 +428,10 @@ public class HandlerTest {
     public void handleQueryStateClose(){
         String groupId = "GroupId";
         String txid = "txid";
-        SmartcontractShim.SmartContractMessage msg = SmartcontractShim.SmartContractMessage.newBuilder()
+        SmartContractShim.SmartContractMessage msg = SmartContractShim.SmartContractMessage.newBuilder()
                 .setGroupId(groupId)
                 .setTxid(txid)
-                .setPayload(SmartcontractShim.QueryStateClose.newBuilder().setId("iterID").build().toByteString())
+                .setPayload(SmartContractShim.QueryStateClose.newBuilder().setId("iterID").build().toByteString())
                 .build();
         txContext = getTransactionContextBeforeQuery();
         handler.handleQueryStateClose(msg);
@@ -441,10 +441,10 @@ public class HandlerTest {
     public void handleGetQueryResult(){
         String groupId = "GroupId";
         String txid = "txid";
-        SmartcontractShim.SmartContractMessage msg = SmartcontractShim.SmartContractMessage.newBuilder()
+        SmartContractShim.SmartContractMessage msg = SmartContractShim.SmartContractMessage.newBuilder()
                 .setGroupId(groupId)
                 .setTxid(txid)
-                .setPayload(SmartcontractShim.GetQueryResult.newBuilder().build().toByteString())
+                .setPayload(SmartContractShim.GetQueryResult.newBuilder().build().toByteString())
                 .build();
         txContext = getTransactionContextBeforeQuery();
         handler.handleGetQueryResult(msg);
@@ -454,10 +454,10 @@ public class HandlerTest {
     public void handleGetHistoryForKey(){
         String groupId = "GroupId";
         String txid = "txid";
-        SmartcontractShim.SmartContractMessage msg = SmartcontractShim.SmartContractMessage.newBuilder()
+        SmartContractShim.SmartContractMessage msg = SmartContractShim.SmartContractMessage.newBuilder()
                 .setGroupId(groupId)
                 .setTxid(txid)
-                .setPayload(SmartcontractShim.GetQueryResult.newBuilder().build().toByteString())
+                .setPayload(SmartContractShim.GetQueryResult.newBuilder().build().toByteString())
                 .build();
         txContext = getTransactionContextBeforeQuery();
         handler.handleGetHistoryForKey(msg);
@@ -467,10 +467,10 @@ public class HandlerTest {
     public void getSmartContractMessageForMessage(){
         String msgType = INVOKE_SMARTCONTRACT.toString();
         String errStr = "errStr";
-        Smartcontract.SmartContractID id = Smartcontract.SmartContractID.newBuilder()
+        SmartContractPackage.SmartContractID id = SmartContractPackage.SmartContractID.newBuilder()
                 .setName("root1")
                 .build();
-        ByteString payload =  Smartcontract.SmartContractSpec.newBuilder().setSmartContractId(id)
+        ByteString payload =  SmartContractPackage.SmartContractSpec.newBuilder().setSmartContractId(id)
                 .build().toByteString();
         txContext = getTransactionContextBeforeQuery();
         handler.getTxContractForMessage("", "txid", msgType, payload, errStr);
@@ -479,12 +479,12 @@ public class HandlerTest {
     @Test
     public void enterBusyState(){
         Object[] args = new Object[1];
-        args[0] = SmartcontractShim.SmartContractMessage.newBuilder()
+        args[0] = SmartContractShim.SmartContractMessage.newBuilder()
                 .setGroupId("GroupId")
                 .setTxid("Txid")
                 .setType(INVOKE_SMARTCONTRACT)
                 .build();
-        Smartcontract.SmartContractID id = Smartcontract.SmartContractID.newBuilder()
+        SmartContractPackage.SmartContractID id = SmartContractPackage.SmartContractID.newBuilder()
                 .setName("root")
                 .build();
         Event event = new Event(handler.getFsm(), "event", "", "", null, false, true, args);
@@ -504,7 +504,7 @@ public class HandlerTest {
 
     @Test
     public void handleMessate(){
-        SmartcontractShim.SmartContractMessage msg = SmartcontractShim.SmartContractMessage.newBuilder()
+        SmartContractShim.SmartContractMessage msg = SmartContractShim.SmartContractMessage.newBuilder()
                 .setType(GET_STATE)
                 .build();
         handler.ready(null, "GroupId", "TxId", null, null);

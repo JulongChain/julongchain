@@ -15,9 +15,11 @@
  */
 package org.bcia.julongchain.msp.mgmt;
 
+import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.csp.factory.CspManager;
+import org.bcia.julongchain.csp.factory.CspOptsManager;
 import org.bcia.julongchain.csp.factory.IFactoryOpts;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.msp.*;
@@ -75,26 +77,27 @@ public class GlobalMspManagement {
      * @param mspId
      * @param mspType
      */
-    public static IMsp loadLocalMspWithType(String localmspdir, List<IFactoryOpts> optsList, String mspId, String mspType) throws FileNotFoundException {
+    public static IMsp loadLocalMspWithType(String localmspdir, List<IFactoryOpts> optsList, String defaultOpts,
+                                            String mspId, String mspType) throws FileNotFoundException {
 
-        CspManager.initCspFactories(optsList);
+        CspManager.initCspFactories(optsList, defaultOpts);
         MspConfig mspConfig = loadMspConfig();
         defaultCspValue = mspConfig.node.getCsp().getDefaultValue();
         defaultCsp = CspManager.getCsp(defaultCspValue);
-        if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(defaultCspValue)) {
-            //解析配置文件
-            log.info("build the mspconfig");
-            if (!new File(localmspdir).exists()) {
-                throw new FileNotFoundException(String.format("the %s dir is not find", localmspdir));
-            }
-            MspConfigPackage.MSPConfig buildMspConfig = MspConfigHelper.buildMspConfig(localmspdir, mspId);
-            loadMsp = getLocalMsp().setup(buildMspConfig);
-
-        } else if (IFactoryOpts.PROVIDER_GMT0016.equalsIgnoreCase(defaultCspValue)) {
-
-        } else if (IFactoryOpts.PROVIDER_GMT0018.equalsIgnoreCase(defaultCspValue)) {
-
+//        if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(defaultCspValue)) {
+        //解析配置文件
+        log.info("build the mspconfig");
+        if (!new File(localmspdir).exists()) {
+            throw new FileNotFoundException(String.format("the %s dir is not find", localmspdir));
         }
+        MspConfigPackage.MSPConfig buildMspConfig = MspConfigHelper.buildMspConfig(localmspdir, mspId);
+        loadMsp = getLocalMsp().setup(buildMspConfig);
+
+//        } else if (IFactoryOpts.PROVIDER_GMT0016.equalsIgnoreCase(defaultCspValue)) {
+//
+//        } else if (IFactoryOpts.PROVIDER_GMT0018.equalsIgnoreCase(defaultCspValue)) {
+//
+//        }
 
         return loadMsp;
     }
@@ -117,30 +120,33 @@ public class GlobalMspManagement {
      */
     public static IMsp getLocalMsp() {
         if (localMsp == null) {
-            //读取配置文件构造选项集合
-            List<IFactoryOpts> optsList = MspConfigHelper.buildFactoryOpts();
-            CspManager.initCspFactories(optsList);
+//            //读取配置文件构造选项集合
+//            List<IFactoryOpts> optsList = MspConfigHelper.buildFactoryOpts();
+//            CspManager.initCspFactories(optsList);
             MspConfig mspConfig = null;
             try {
                 mspConfig = loadMspConfig();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-            defaultCspValue = mspConfig.node.getCsp().getDefaultValue();
-            defaultCsp = CspManager.getCsp(defaultCspValue);
-            if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(defaultCspValue)) {
-                //构建fabricmspconfig
-                // MspConfigPackage.MSPConfig fabricMSPConfig = MspConfigHelper.buildMspConfig( mspConfig.node.getMspConfigPath());
-                MspConfigPackage.MSPConfig buildMspConfig = MspConfigHelper.buildMspConfig(mspConfig.node.getMspConfigPath(), mspConfig.node.getLocalMspId());
-                localMsp = new Msp().setup(buildMspConfig);
-                return localMsp;
-
-            } else if (IFactoryOpts.PROVIDER_GMT0016.equalsIgnoreCase(defaultCspValue)) {
-
-            } else if (IFactoryOpts.PROVIDER_GMT0018.equalsIgnoreCase(defaultCspValue)) {
-
-            }
+//            defaultCspValue = mspConfig.getNode().getCsp().getDefaultValue();
+//            defaultCsp = CspManager.getCsp(defaultCspValue);
+//            if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(defaultCspValue)) {
+            //构建fabricmspconfig
+            // MspConfigPackage.MSPConfig fabricMSPConfig = MspConfigHelper.buildMspConfig( mspConfig.node.getMspConfigPath());
+            MspConfigPackage.MSPConfig buildMspConfig =
+                    MspConfigHelper.buildMspConfig(mspConfig.getNode().getMspConfigPath(), mspConfig.getNode().getLocalMspId());
+            localMsp = new Msp().setup(buildMspConfig);
             return localMsp;
+
+//            } else if (IFactoryOpts.PROVIDER_GMT0016.equalsIgnoreCase(defaultCspValue)) {
+//
+//            } else if (IFactoryOpts.PROVIDER_GMT0018.equalsIgnoreCase(defaultCspValue)) {
+//
+//            }
+
+
+//            return localMsp;
         }
         return localMsp;
     }
@@ -183,5 +189,26 @@ public class GlobalMspManagement {
             return mspmgr;
         }
         return mspManager;
+    }
+
+
+    public static void initLocalMsp() throws MspException {
+        log.info("Init LocalMsp-----");
+        try {
+            MspConfig mspConfig = loadMspConfig();
+            String mspConfigDir = mspConfig.getNode().getMspConfigPath();
+            String mspId = mspConfig.getNode().getLocalMspId();
+            String mspType = mspConfig.getNode().getLocalMspType();
+
+            CspOptsManager cspOptsManager = new CspOptsManager();
+            cspOptsManager.addAll(mspConfig.getNode().getCsp().getFactoryOpts());
+            List<IFactoryOpts> optsList = cspOptsManager.getFactoryOptsList();
+
+            String defaultOpts = mspConfig.getNode().getCsp().getDefaultValue();
+            GlobalMspManagement.loadLocalMspWithType(mspConfigDir, optsList, defaultOpts, mspId, mspType);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new MspException(e);
+        }
     }
 }

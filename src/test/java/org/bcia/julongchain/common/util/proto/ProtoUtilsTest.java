@@ -2,7 +2,7 @@ package org.bcia.julongchain.common.util.proto;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.junit.Test;
 
 import java.io.UnsupportedEncodingException;
@@ -21,12 +21,12 @@ public class ProtoUtilsTest {
 
     @Test
     public void unmarshalSmartcontractID() {
-        Smartcontract.SmartContractID.Builder idBuilder=Smartcontract.SmartContractID.newBuilder();
+        SmartContractPackage.SmartContractID.Builder idBuilder=SmartContractPackage.SmartContractID.newBuilder();
         idBuilder.setName("ESSC").setPath("core/ssc/essc").setVersion("1.0");
-        Smartcontract.SmartContractID esscID = idBuilder.build();
+        SmartContractPackage.SmartContractID esscID = idBuilder.build();
         ByteString byteString = esscID.toByteString();
         try {
-            Smartcontract.SmartContractID id=ProtoUtils.unmarshalSmartcontractID(byteString.toByteArray());
+            SmartContractPackage.SmartContractID id=ProtoUtils.unmarshalSmartcontractID(byteString.toByteArray());
             assertThat(id.getName(),is("ESSC"));
             assertThat(id.getPath(),is("core/ssc/essc"));
             assertThat(id.getVersion(),is("1.0"));

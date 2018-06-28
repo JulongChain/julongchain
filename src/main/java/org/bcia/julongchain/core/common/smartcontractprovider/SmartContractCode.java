@@ -16,7 +16,7 @@
 package org.bcia.julongchain.core.common.smartcontractprovider;
 
 import org.bcia.julongchain.protos.node.SmartContractDataPackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
  * 类描述
@@ -27,6 +27,6 @@ import org.bcia.julongchain.protos.node.Smartcontract;
  */
 public class SmartContractCode {
     SmartContractDataPackage.SmartContractData data;
-    Smartcontract.SmartContractDeploymentSpec spec;
+    SmartContractPackage.SmartContractDeploymentSpec spec;
     byte [] depspecbytes;
 }

@@ -18,7 +18,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Policies;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -250,13 +250,13 @@ public class VSSCTest extends BaseJunit4Test {
      */
     private Common.Envelope createTx(boolean bEndorsedByDuplicatedIdentity) throws JavaChainException, InvalidProtocolBufferException {
         //创建SmartContractID
-        Smartcontract.SmartContractID smartContractID=Smartcontract.SmartContractID.newBuilder().
+        SmartContractPackage.SmartContractID smartContractID=SmartContractPackage.SmartContractID.newBuilder().
                                                        setName("foo").setVersion("v1").build();
         //创建SmartContractSpec
-        Smartcontract.SmartContractSpec spec=Smartcontract.SmartContractSpec.newBuilder().
+        SmartContractPackage.SmartContractSpec spec=SmartContractPackage.SmartContractSpec.newBuilder().
                                                    setSmartContractId(smartContractID).build();
         //创建SmartContractInvocationSpec
-        Smartcontract.SmartContractInvocationSpec invokeSpec=Smartcontract.SmartContractInvocationSpec.newBuilder().
+        SmartContractPackage.SmartContractInvocationSpec invokeSpec=SmartContractPackage.SmartContractInvocationSpec.newBuilder().
                                                    setSmartContractSpec(spec).build();
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
@@ -297,12 +297,12 @@ public class VSSCTest extends BaseJunit4Test {
         return env;
     }
 
-    private byte[] processSignedCDS(Smartcontract.SmartContractDeploymentSpec cds,
+    private byte[] processSignedCDS(SmartContractPackage.SmartContractDeploymentSpec cds,
                                     Policies.SignaturePolicyEnvelope policy)throws SysSmartContractException{
         return null;
     }
 
-    private Smartcontract.SmartContractDeploymentSpec constructDeploymentSpec(String name,String path,String version,
+    private SmartContractPackage.SmartContractDeploymentSpec constructDeploymentSpec(String name,String path,String version,
                                                                               List<ByteString> initArgs,
                                                                               boolean bCreateFS)throws SysSmartContractException{
         return null;

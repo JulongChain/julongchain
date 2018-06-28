@@ -33,8 +33,8 @@ public class App {
 
     public static void main(String[] args) {
         //打印异常日志的正反样例
-//        log.info("JavaChain begin, This is a right log");
-//        System.out.println("JavaChain begin, This is a wrong log");
+//        log.info("JulongChain begin, This is a right log");
+//        System.out.println("JulongChain begin, This is a wrong log");
 
         //示例异常日志的打印方式
 //        try {

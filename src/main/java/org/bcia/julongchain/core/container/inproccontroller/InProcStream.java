@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.core.container.inproccontroller;
 
-import org.bcia.julongchain.protos.node.SmartcontractShim;
+import org.bcia.julongchain.protos.node.SmartContractShim;
 
 /**
  * 类描述
@@ -26,11 +26,11 @@ import org.bcia.julongchain.protos.node.SmartcontractShim;
  */
 public class InProcStream {
 
-    public SmartcontractShim.SmartContractMessage recv(){
+    public SmartContractShim.SmartContractMessage recv(){
         return null;
     }
 
-    public void send(SmartcontractShim.SmartContractMessage msg) {
+    public void send(SmartContractShim.SmartContractMessage msg) {
 
     }
 

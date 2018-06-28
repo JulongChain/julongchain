@@ -29,7 +29,7 @@ import java.util.Map;
  * @date 2018/04/24
  * @company Dingxuan
  */
-public interface IDBHandle {
+public interface IDBHandler {
     /**
      * db是否开启
      */

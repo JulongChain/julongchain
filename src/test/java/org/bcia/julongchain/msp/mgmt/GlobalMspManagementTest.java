@@ -29,7 +29,7 @@ public class GlobalMspManagementTest {
         GmFactoryOpts factoryOpts=new GmFactoryOpts();
         factoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("gm"));
         optsList.add(factoryOpts);
-        GlobalMspManagement.loadLocalMspWithType(localmspdir, optsList, mspID, mspType);
+        GlobalMspManagement.loadLocalMspWithType(localmspdir, optsList, "gm", mspID, mspType);
         byte[] signData = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity().sign("123".getBytes());
         GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity().verify("123".getBytes(), signData);
 

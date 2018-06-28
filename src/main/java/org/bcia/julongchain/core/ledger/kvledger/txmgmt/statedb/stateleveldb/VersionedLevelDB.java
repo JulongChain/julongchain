@@ -175,13 +175,13 @@ public class VersionedLevelDB implements IVersionedDB {
     public static String splitCompositeKeyToKey(byte[] compositeKey){
        String tmp = new String(compositeKey);
        String[] result = tmp.split(new String(COMPOSITE_KEY_SEP));
-       return result[1];
+       return result[result.length - 1];
     }
 
     public static String splitCompositeKeyToNs(byte[] compositeKey){
         String tmp = new String(compositeKey);
         String[] result = tmp.split(new String(COMPOSITE_KEY_SEP));
-        return result[0];
+        return result[result.length - 2];
     }
 
     public IDBProvider getDb() {

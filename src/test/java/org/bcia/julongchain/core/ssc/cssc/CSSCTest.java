@@ -20,7 +20,7 @@ import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.Query;
 import org.bcia.julongchain.protos.node.ResourcesPackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfigFactory;
 import org.junit.Before;
@@ -88,7 +88,7 @@ public class CSSCTest extends BaseJunit4Test {
         ProposalPackage.SignedProposal sp= null;
         try {
             sp = TxUtils.mockSignedEndorserProposalOrPanic("",
-                    Smartcontract.SmartContractSpec.newBuilder().build());
+                    SmartContractPackage.SmartContractSpec.newBuilder().build());
         } catch (JavaChainException e) {
             e.printStackTrace();
             return;

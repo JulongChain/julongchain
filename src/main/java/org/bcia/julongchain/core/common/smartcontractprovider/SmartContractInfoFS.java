@@ -18,7 +18,7 @@ package org.bcia.julongchain.core.common.smartcontractprovider;
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
  * SmartContractInfoFS provides the implementation for SC on the FS and the access to it
@@ -65,7 +65,7 @@ public class SmartContractInfoFS implements ISmartContractCacheSupport {
      * @param deploymentSpec
      * @return
      */
-    public ISmartContractPackage putSmartContract(Smartcontract.SmartContractDeploymentSpec deploymentSpec) throws JavaChainException{
+    public ISmartContractPackage putSmartContract(SmartContractPackage.SmartContractDeploymentSpec deploymentSpec) throws JavaChainException{
         SDSPackage sdsPackage = new SDSPackage();
         sdsPackage.initFromBuffer(deploymentSpec.toByteArray());
         sdsPackage.putSmartcontractToFS();
