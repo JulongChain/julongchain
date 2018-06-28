@@ -17,7 +17,7 @@ package org.bcia.julongchain.common.ledger.util.leveldbhelper;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.exception.LevelDBException;
-import org.bcia.julongchain.common.ledger.util.IDBHandle;
+import org.bcia.julongchain.common.ledger.util.IDBHandler;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
@@ -35,7 +35,7 @@ public class LevelDBProvider implements IDBProvider {
 
 	private static JavaChainLog logger = JavaChainLogFactory.getLog(LevelDBProvider.class);
 
-	private IDBHandle db = null;
+	private IDBHandler db = null;
 	private static byte[] DB_NAME_KEY_SEP = new byte[]{0x00};
 	private static byte[] DB_LEDGERID_KEY_SEP = new byte[]{0x03};
 	private String dbPath = null;
@@ -44,7 +44,7 @@ public class LevelDBProvider implements IDBProvider {
 
 	public LevelDBProvider(String dbPath) throws LevelDBException {
 		this.dbPath = dbPath;
-		db = new LevelDBHandle();
+		db = new LevelDBHandler();
 		db.createDB(dbPath);
 	}
 
@@ -68,11 +68,11 @@ public class LevelDBProvider implements IDBProvider {
 	}
 
 	@Override
-	public IDBHandle getDb() {
+	public IDBHandler getDb() {
 		return db;
 	}
 
-	public void setDb(IDBHandle db) {
+	public void setDb(IDBHandler db) {
 		this.db = db;
 	}
 

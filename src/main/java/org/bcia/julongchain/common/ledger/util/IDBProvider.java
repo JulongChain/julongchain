@@ -67,7 +67,7 @@ public interface IDBProvider {
 	/**
 	 * 获取DB
 	 */
-	IDBHandle getDb();
+	IDBHandler getDb();
 
 	String getLedgerID();
 
