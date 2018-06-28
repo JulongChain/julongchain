@@ -59,7 +59,7 @@ public class HistoryLevelDB implements IHistoryDB {
 
     @Override
     public IHistoryQueryExecutor newHistoryQueryExecutor(IBlockStore blockStore) {
-        return new HistoryLevelDBQueryExecutor(this, blockStore);
+        return new HistoryLevelDBQueryExecutor(this, blockStore, dbName);
     }
 
     @Override
@@ -112,7 +112,8 @@ public class HistoryLevelDB implements IHistoryDB {
                             String writeKey = kvWrite.getKey();
                             //key:ns~key~blockNo~tranNo
                             byte[] compositeHistoryKey = HistoryDBHelper.constructCompositeHistoryKey(ns, writeKey, blockNo, tranNo);
-                            dbBatch.put(compositeHistoryKey, EMPTY_VALUE);
+	                        String s = new String(compositeHistoryKey);
+	                        dbBatch.put(compositeHistoryKey, EMPTY_VALUE);
                         }
                     }
                 } else {

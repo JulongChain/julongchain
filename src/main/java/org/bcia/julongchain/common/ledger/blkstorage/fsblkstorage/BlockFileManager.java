@@ -160,7 +160,7 @@ public class BlockFileManager {
      * 组装区块文件名
      * rootDir/blockfile_000000
      */
-    static String deriveBlockfilePath(String rootDir, Integer suffixNum) {
+    public static String deriveBlockfilePath(String rootDir, int suffixNum) {
         return String.format("%s/%s_%06d", rootDir, BLOCKFILE_PREFIX, suffixNum);
     }
 
@@ -187,7 +187,7 @@ public class BlockFileManager {
      * blockBytesLenEncoded     8
      * blockbytes               blockBytesLen
      */
-	void addBlock(Common.Block block) throws LedgerException {
+	public void addBlock(Common.Block block) throws LedgerException {
         if(block.getHeader().getNumber() != bcInfo.getHeight()){
             throw new LedgerException(String.format("Block number should have been %d but was %d", getBlockchainInfo().getHeight(), block.getHeader().getNumber()));
         }
@@ -253,16 +253,11 @@ public class BlockFileManager {
         long lastBlockIndexed = 0;
         boolean indexEmpty = false;
         //获取最新索引
-        try {
-            lastBlockIndexed = index.getLastBlockIndexed();
-        } catch (LedgerException e) {
-			if (!e.equals(BlockIndex.NO_BLOCK_INDEXED)) {
-				logger.error("Got error when syncIndex", e);
-				throw e;
-			}
-			//没有索引时设置索引为空
-            indexEmpty = true;
-        }
+        lastBlockIndexed = index.getLastBlockIndexed();
+	    if (lastBlockIndexed == -1) {
+		    //没有索引时设置索引为空
+		    indexEmpty = true;
+	    }
         //初始化index
         int startFileNum = 0;
         long startOffset = 0;
@@ -369,7 +364,7 @@ public class BlockFileManager {
     /**
      * 根据区块hash查找区块
      */
-	Common.Block retrieveBlockByHash(byte[] blockHash) throws LedgerException {
+	public Common.Block retrieveBlockByHash(byte[] blockHash) throws LedgerException {
         logger.debug(String.format("retrieveBlockByHash() - blockHash = [%s]", BytesHexStrTranslate.bytesToHexFun1(blockHash)));
         FileLocPointer loc;
 		loc = index.getBlockLocByHash(blockHash);
@@ -379,7 +374,7 @@ public class BlockFileManager {
     /**
      * 根据区块号查找区块
      */
-	Common.Block retrieveBlockByNumber(long blockNum) throws LedgerException {
+	public Common.Block retrieveBlockByNumber(long blockNum) throws LedgerException {
         logger.debug(String.format("retrieveBlockByHash() - blockHash = [%d]", blockNum));
         if(blockNum == Long.MAX_VALUE){
             blockNum = getBlockchainInfo().getHeight() - 1;
@@ -392,7 +387,7 @@ public class BlockFileManager {
     /**
      * 根据交易ID查找区块
      */
-	Common.Block retrieveBlockByTxID(String txID) throws LedgerException {
+	public Common.Block retrieveBlockByTxID(String txID) throws LedgerException {
         logger.debug(String.format("retrieveBlockByTxID() - txID = [%s]", txID));
 
         FileLocPointer loc = index.getBlockLocByTxID(txID);
@@ -402,7 +397,7 @@ public class BlockFileManager {
     /**
      * 根据交易ID查找交易校验码
      */
-	TransactionPackage.TxValidationCode retrieveTxValidationCodeByTxID(String txID) throws LedgerException{
+	public TransactionPackage.TxValidationCode retrieveTxValidationCodeByTxID(String txID) throws LedgerException{
         logger.debug(String.format("retrieveTxValidationCodeByTxID() - txID = [%s]", txID));
 		return index.getTxValidationCodeByTxID(txID);
     }
@@ -421,23 +416,26 @@ public class BlockFileManager {
     /**
      * 获取区块迭代器
      */
-	BlocksItr retrieveBlocks(long startNum) {
+	public BlocksItr retrieveBlocks(long startNum) {
         return new BlocksItr(this, startNum);
     }
 
     /**
      * 根据交易ID查找交易
      */
-	Common.Envelope retrieveTransactionByID(String txID) throws LedgerException {
+	public Common.Envelope retrieveTransactionByID(String txID) throws LedgerException {
         logger.debug(String.format("retrieveTransactionByID() - txID = [%s]", txID));
         FileLocPointer loc = index.getTxLoc(txID);
+		if (loc == null) {
+			return null;
+		}
         return fetchTransactionEnvelope(loc);
     }
 
     /**
      * 根据交易区块号以及交易序号查找交易
      */
-	Common.Envelope retrieveTransactionByBlockNumTranNum(long blockNum, long tranNum) throws LedgerException{
+	public Common.Envelope retrieveTransactionByBlockNumTranNum(long blockNum, long tranNum) throws LedgerException{
         logger.debug(String.format("retrieveTransactionByBlockNumTranNum() - blockNum = [%d], tranNum = [%d]"
                 , blockNum, tranNum));
         FileLocPointer loc = index.getTXLocByBlockNumTranNum(blockNum, tranNum);
@@ -533,7 +531,7 @@ public class BlockFileManager {
     /**
      * 检索最新的完整区块
      */
-    static List<Object> scanForLastCompleteBlock(String rootDir, Integer fileNum, long startingOffset) throws LedgerException{
+    public static List<Object> scanForLastCompleteBlock(String rootDir, int fileNum, long startingOffset) throws LedgerException{
         BlockFileStream stream = null;
         byte[] blockBytes;
         byte[] lastBlockBytes = null;

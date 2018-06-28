@@ -59,40 +59,48 @@ public class HistoryDBHelper {
         return compositeKey;
     }
 
+	public static byte[] removeLedgerIDFromHistoryKey(String ledgerID, byte[] historykey){
+		byte[] ledgerIDBytes = ledgerID.getBytes();
+		byte[] reuslt = new byte[historykey.length - 1 - ledgerIDBytes.length];
+		System.arraycopy(historykey, ledgerIDBytes.length + 1, reuslt, 0, reuslt.length);
+		String s = new String(reuslt);
+		return reuslt;
+	}
+
     /**
      * 解析HistoryDB key中的blockNum
      * @param byteToSplit 将要解析的bytes
-     * @param length 头部(ns + key)长度
      * @return blockNum
      */
-    public static long splitCompositeHistoryKeyForBlockNum(byte[] byteToSplit, int length){
-        if(length != byteToSplit.length - 17){
-            return -1;
-        }
-        return Util.bytesToLong(byteToSplit, length, BlockFileManager.PEEK_BYTES_LEN);
+    public static long splitCompositeHistoryKeyForBlockNum(byte[] byteToSplit){
+    	int length = byteToSplit.length;
+	    if (length <= 19) {
+		    return -1;
+	    }
+        return Util.bytesToLong(byteToSplit, length - 17, BlockFileManager.PEEK_BYTES_LEN);
     }
 
     /**
      * 解析HistoryDB key中的tranNum
      * @param byteToSplit 将要解析的bytes
-     * @param length 头部(ns + key)长度
      * @return blockNum
      */
-    public static long splitCompositeHistoryKeyForTranNum(byte[] byteToSplit, int length){
-        if(length != byteToSplit.length - 17){
-            return -1;
-        }
-        return Util.bytesToLong(byteToSplit, length + 9, BlockFileManager.PEEK_BYTES_LEN);
+    public static long splitCompositeHistoryKeyForTranNum(byte[] byteToSplit){
+	    int length = byteToSplit.length;
+	    if (length <= 19) {
+		    return -1;
+	    }
+        return Util.bytesToLong(byteToSplit, length - 8, BlockFileManager.PEEK_BYTES_LEN);
     }
 
     /**
      * 获取History数据头部
      */
     public static byte[] splitCompositeHistoryKeyForHeader(byte[] byteToSplit){
-        if(byteToSplit.length <= 17){
+        if(byteToSplit.length <= 19){
             return null;
         }
-        byte[] header = new byte[byteToSplit.length - 17];
+        byte[] header = new byte[byteToSplit.length - 18];
         System.arraycopy(byteToSplit, 0, header, 0 , header.length);
         return header;
     }

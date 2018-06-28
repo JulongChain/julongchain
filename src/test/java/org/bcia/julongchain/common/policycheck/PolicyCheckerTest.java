@@ -9,7 +9,7 @@ import org.bcia.julongchain.msp.IIdentityDeserializer;
 import org.bcia.julongchain.msp.mgmt.IMspPrincipalGetter;
 import org.bcia.julongchain.msp.mgmt.MspManager;
 import org.bcia.julongchain.protos.node.ProposalPackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -50,7 +50,7 @@ public class PolicyCheckerTest {
         IMspPrincipalGetter principalGetter = mock(IMspPrincipalGetter.class);
         PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManagerGetter(),localMSP,principalGetter);
         ProposalPackage.SignedProposal sp = TxUtils.mockSignedEndorserProposalOrPanic("",
-                Smartcontract.SmartContractSpec.newBuilder().build());
+                SmartContractPackage.SmartContractSpec.newBuilder().build());
         policyChecker.checkPolicy("A", "Admins",sp);
 
 
@@ -73,7 +73,7 @@ public class PolicyCheckerTest {
         IMspPrincipalGetter principalGetter = mock(IMspPrincipalGetter.class);
         PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManagerGetter(),mspManager,principalGetter);
         ProposalPackage.SignedProposal sp = TxUtils.mockSignedEndorserProposalOrPanic("",
-                Smartcontract.SmartContractSpec.newBuilder().build());
+                SmartContractPackage.SmartContractSpec.newBuilder().build());
         policyChecker.checkPolicyNoGroup("Admins",sp);
     }
 

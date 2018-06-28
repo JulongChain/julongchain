@@ -29,43 +29,47 @@ import java.util.Map;
  * @company Dingxuan
  */
 public interface IDBProvider {
-    /**
-     * 关闭
-     */
-    void close() throws LevelDBException;
+	/**
+	 * 关闭
+	 */
+	void close() throws LevelDBException;
 
-    /**
-     * 根据key获取value
-     */
-    byte[] get(byte[] key) throws LevelDBException;
+	/**
+	 * 根据key获取value
+	 */
+	byte[] get(byte[] key) throws LevelDBException;
 
-    /**
-     * 插入kv
-     */
-    void put(byte[] key, byte[] value, boolean sync) throws LevelDBException;
+	/**
+	 * 插入kv
+	 */
+	void put(byte[] key, byte[] value, boolean sync) throws LevelDBException;
 
-    /**
-     * 删除key
-     */
-    void delete(byte[] key, boolean sync) throws LevelDBException;
+	/**
+	 * 删除key
+	 */
+	void delete(byte[] key, boolean sync) throws LevelDBException;
 
-    /**
-     * 批量写入
-     */
-    void writeBatch(UpdateBatch batch, boolean sync) throws LevelDBException;
+	/**
+	 * 批量写入
+	 */
+	void writeBatch(UpdateBatch batch, boolean sync) throws LevelDBException;
 
-    /**
-     * 迭代
-     */
-    Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey) throws LevelDBException;
+	/**
+	 * 迭代
+	 */
+	Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey) throws LevelDBException;
 
-    /**
-     * 获取DB路径
-     */
-    String getDBPath() throws LevelDBException;
+	/**
+	 * 获取DB路径
+	 */
+	String getDBPath() throws LevelDBException;
 
-    /**
-     * 获取DB
-     */
-    IDBHandle getDb();
+	/**
+	 * 获取DB
+	 */
+	IDBHandle getDb();
+
+	String getLedgerID();
+
+	void setLedgerID(String ledgerID);
 }

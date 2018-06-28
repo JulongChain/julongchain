@@ -99,19 +99,19 @@ public class BlockStream {
         this.rootDir = rootDir;
     }
 
-    public Integer getCurrentFileNum() {
-        return currentFileNum;
-    }
+	public int getCurrentFileNum() {
+		return currentFileNum;
+	}
 
-    public void setCurrentFileNum(Integer currentFileNum) {
-        this.currentFileNum = currentFileNum;
-    }
+	public void setCurrentFileNum(int currentFileNum) {
+		this.currentFileNum = currentFileNum;
+	}
 
-    public Integer getEndFileNum() {
+	public int getEndFileNum() {
         return endFileNum;
     }
 
-    public void setEndFileNum(Integer endFileNum) {
+    public void setEndFileNum(int endFileNum) {
         this.endFileNum = endFileNum;
     }
 

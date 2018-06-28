@@ -54,17 +54,20 @@ public class HistoryScanner implements IResultsIterator {
     private IBlockStore blockStore;
     private long blockNum;
     private long tranNum;
+    private String ledgerID;
 
     public HistoryScanner(byte[] compositePartialKey,
                           String nameSpace,
                           String key,
                           DBIterator dbItr,
-                          IBlockStore blockStore){
+                          IBlockStore blockStore,
+                          String ledgerID){
         this.compositePartialKey = compositePartialKey;
         this.nameSpace = nameSpace;
         this.key = key;
         this.dbItr = dbItr;
         this.blockStore = blockStore;
+        this.ledgerID = ledgerID;
     }
 
     @Override
@@ -73,11 +76,12 @@ public class HistoryScanner implements IResultsIterator {
             return null;
         }
         Map.Entry<byte[], byte[]> entry = dbItr.next();
-        byte[] historyKey = entry.getKey();
+        byte[] historyKey = HistoryDBHelper.removeLedgerIDFromHistoryKey(ledgerID, entry.getKey());
+	    String s = new String(historyKey);
 
-        //key:ns~key~blockNo~tranNo
-        blockNum = HistoryDBHelper.splitCompositeHistoryKeyForBlockNum(historyKey, compositePartialKey.length);
-        tranNum = HistoryDBHelper.splitCompositeHistoryKeyForTranNum(historyKey, compositePartialKey.length);
+	    //key:ns~key~blockNo~tranNo
+        blockNum = HistoryDBHelper.splitCompositeHistoryKeyForBlockNum(historyKey);
+        tranNum = HistoryDBHelper.splitCompositeHistoryKeyForTranNum(historyKey);
         logger.debug(String.format("Found history record for namespace: %s, key: %s. BlockNum: %d, TranNum: %d", nameSpace, key, blockNum, tranNum));
 
         Common.Envelope tranEnvelope = blockStore.retrieveTxByBlockNumTranNum(blockNum, tranNum);
@@ -183,4 +187,12 @@ public class HistoryScanner implements IResultsIterator {
     public void setTranNum(long tranNum) {
         this.tranNum = tranNum;
     }
+
+	public String getLedgerID() {
+		return ledgerID;
+	}
+
+	public void setLedgerID(String ledgerID) {
+		this.ledgerID = ledgerID;
+	}
 }

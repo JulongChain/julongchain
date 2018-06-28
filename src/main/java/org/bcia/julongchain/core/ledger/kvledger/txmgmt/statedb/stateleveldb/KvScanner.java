@@ -50,7 +50,8 @@ public class KvScanner implements IResultsIterator {
         }
         Map.Entry<byte[], byte[]> iterator = (Map.Entry<byte[], byte[]>) dbItr.next();
         byte[] dbKey = iterator.getKey();
-        byte[] dbVal = iterator.getValue();
+	    String s = new String(dbKey);
+	    byte[] dbVal = iterator.getValue();
         byte[] dbValCpy = Arrays.copyOf(dbVal, dbVal.length);
         String key = VersionedLevelDB.splitCompositeKeyToKey(dbKey);
         byte[] value = StatedDB.decodeValueToBytes(dbValCpy);

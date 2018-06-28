@@ -45,7 +45,7 @@ public class FileLocPointer {
         this.locPointer = new LocPointer(offset, bytesLength);
     }
 
-    byte[] marshal() {
+    public byte[] marshal() {
         byte[] fileSUffixNumBytes = Util.longToBytes(fileSuffixNum, BlockFileManager.PEEK_BYTES_LEN);
         byte[] offsetBytes = Util.longToBytes(locPointer.getOffset(), BlockFileManager.PEEK_BYTES_LEN);
         byte[] bytesLengthBytes = Util.longToBytes(locPointer.getBytesLength(), BlockFileManager.PEEK_BYTES_LEN);
@@ -53,7 +53,7 @@ public class FileLocPointer {
         return ArrayUtils.addAll(result, bytesLengthBytes);
     }
 
-    void unmarshal(byte[] b) {
+    public void unmarshal(byte[] b) {
         fileSuffixNum = ((int) Util.bytesToLong(b, 0, BlockFileManager.PEEK_BYTES_LEN));
         if(locPointer == null){
             locPointer = new LocPointer();
@@ -62,11 +62,11 @@ public class FileLocPointer {
         locPointer.setBytesLength(((int) Util.bytesToLong(b, 16, BlockFileManager.PEEK_BYTES_LEN)));
     }
 
-    public Integer getFileSuffixNum() {
+    public int getFileSuffixNum() {
         return fileSuffixNum;
     }
 
-    public void setFileSuffixNum(Integer fileSuffixNum) {
+    public void setFileSuffixNum(int fileSuffixNum) {
         this.fileSuffixNum = fileSuffixNum;
     }
 

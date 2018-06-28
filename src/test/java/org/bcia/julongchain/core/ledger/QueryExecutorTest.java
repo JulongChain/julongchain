@@ -40,7 +40,7 @@ import java.util.List;
 public class QueryExecutorTest {
     IQueryExecutor queryExecutor = null;
     INodeLedger ledger = null;
-    final String ns = "mytestgroupid2";
+    final String ns = "myGroup";
     final String coll = "coll";
 
     @Before

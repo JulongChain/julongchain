@@ -197,27 +197,27 @@ public class SmartContractSupportService
           logger.info(new String(worldStateKeyByte));
 
           try {
-            // 查询历史数据库
+            // todo 查询历史数据库
             LevelDB db = LevelDBUtil.getDB(historyDBPath);
             // 找到历史数据库最大的key
             byte[] lastKey = LevelDBUtil.getLastKey(db, historyKeyBytes);
             logger.info(new String(lastKey));
             // 解析blockNum
-            long blockNum =
-                HistoryDBHelper.splitCompositeHistoryKeyForBlockNum(
-                    lastKey, historyKeyBytes.length);
+//            long blockNum =
+//                HistoryDBHelper.splitCompositeHistoryKeyForBlockNum(
+//                    lastKey, historyKeyBytes.length);
             // 解析txNum
-            long txNum =
-                HistoryDBHelper.splitCompositeHistoryKeyForTranNum(lastKey, historyKeyBytes.length);
+//            long txNum =
+//                HistoryDBHelper.splitCompositeHistoryKeyForTranNum(lastKey, historyKeyBytes.length);
             // 保存Version
-            KvRwset.Version version =
-                KvRwset.Version.newBuilder().setBlockNum(blockNum).setTxNum(txNum).build();
+//            KvRwset.Version version =
+//                KvRwset.Version.newBuilder().setBlockNum(blockNum).setTxNum(txNum).build();
             // 保存读记录
-            KvRwset.KVRead kvRead =
-                KvRwset.KVRead.newBuilder().setVersion(version).setKey(key).build();
+//            KvRwset.KVRead kvRead =
+//                KvRwset.KVRead.newBuilder().setVersion(version).setKey(key).build();
 
             // 保存所有的读记录
-            TransactionRunningUtil.addKvRead(smartContractId, txId, kvRead);
+//            TransactionRunningUtil.addKvRead(smartContractId, txId, kvRead);
 
             // 查询世界状态数据库
             db = LevelDBUtil.getDB(stateLevelDBPath);

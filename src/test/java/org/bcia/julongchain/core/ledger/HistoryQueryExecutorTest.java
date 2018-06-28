@@ -32,7 +32,7 @@ import org.junit.Test;
  * @company Dingxuan
  */
 public class HistoryQueryExecutorTest {
-    String ns = "myGroup";
+    String ns = "mytestgroupid2";
     IHistoryQueryExecutor queryExecutor;
 
     @Before
@@ -43,9 +43,9 @@ public class HistoryQueryExecutorTest {
 
     @Test
     public void testGetHistoryForKey() throws Exception{
-        QueryResult qr = queryExecutor.getHistoryForKey(ns, "key").next();
+        QueryResult qr = queryExecutor.getHistoryForKey(ns, "key0").next();
         KvQueryResult.KeyModification result = (KvQueryResult.KeyModification) qr.getObj();
-        Assert.assertEquals(result.getTxId(), "1");
+        Assert.assertEquals(result.getTxId(), "0");
     }
 
     @After

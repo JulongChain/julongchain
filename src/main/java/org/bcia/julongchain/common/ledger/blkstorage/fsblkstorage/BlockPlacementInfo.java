@@ -24,24 +24,24 @@ package org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage;
  */
 public class BlockPlacementInfo {
 
-    private Integer fileNum;
+    private int fileNum;
     private long blockStartOffset;
     private long blockBytesOffset;
 
     public BlockPlacementInfo() {
     }
 
-    public BlockPlacementInfo(Integer fileNum, long blockStartOffset, long blockBytesOffset) {
+    public BlockPlacementInfo(int fileNum, long blockStartOffset, long blockBytesOffset) {
         this.fileNum = fileNum;
         this.blockStartOffset = blockStartOffset;
         this.blockBytesOffset = blockBytesOffset;
     }
 
-    public Integer getFileNum() {
+    public int getFileNum() {
         return fileNum;
     }
 
-    public void setFileNum(Integer fileNum) {
+    public void setFileNum(int fileNum) {
         this.fileNum = fileNum;
     }
 

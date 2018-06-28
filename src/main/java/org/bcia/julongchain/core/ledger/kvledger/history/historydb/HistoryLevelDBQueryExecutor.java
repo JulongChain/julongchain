@@ -15,6 +15,7 @@ limitations under the License.
  */
 package org.bcia.julongchain.core.ledger.kvledger.history.historydb;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.common.ledger.blkstorage.IBlockStore;
@@ -36,10 +37,12 @@ public class HistoryLevelDBQueryExecutor implements IHistoryQueryExecutor {
 
     private HistoryLevelDB historyDB;
     private IBlockStore blockStore;
+    private String ledgerID;
 
-    public HistoryLevelDBQueryExecutor(HistoryLevelDB historyDB, IBlockStore blockStore) {
+    public HistoryLevelDBQueryExecutor(HistoryLevelDB historyDB, IBlockStore blockStore, String ledgerID) {
         this.historyDB = historyDB;
         this.blockStore = blockStore;
+        this.ledgerID = ledgerID;
     }
 
     @Override
@@ -51,8 +54,15 @@ public class HistoryLevelDBQueryExecutor implements IHistoryQueryExecutor {
         }
         byte[] compositeStartKey = HistoryDBHelper.constructPartialCompositeHistoryKey(ns, key, false);
 
-        DBIterator iterator = (DBIterator) historyDB.getProvider().getIterator(compositeStartKey);
-        return new HistoryScanner(compositeStartKey, ns, key, iterator, blockStore);
+        DBIterator iterator = (DBIterator) historyDB.getProvider().getIterator((compositeStartKey));
+
+	    return new HistoryScanner(compositeStartKey, ns, key, iterator, blockStore, ledgerID);
+    }
+
+    private byte[] constructHistoryKey(byte[] key){
+    	byte[] sep = new byte[]{0x00};
+    	byte[] result = ArrayUtils.addAll(ledgerID.getBytes(), sep);
+    	return ArrayUtils.addAll(result, key);
     }
 
     public HistoryLevelDB getHistoryDB() {

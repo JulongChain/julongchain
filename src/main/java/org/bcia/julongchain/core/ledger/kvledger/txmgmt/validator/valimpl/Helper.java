@@ -52,7 +52,7 @@ import java.util.Map;
 public class Helper {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(Helper.class);
 
-    static PvtUpdateBatch validateAndPreparePvtBatch(Block block, Map<Long, TxPvtData> pvtData) throws LedgerException{
+    public static PvtUpdateBatch validateAndPreparePvtBatch(Block block, Map<Long, TxPvtData> pvtData) throws LedgerException{
         PvtUpdateBatch pvtUpdates = new PvtUpdateBatch();
         for(Transaction tx : block.getTxs()){
             if(!TransactionPackage.TxValidationCode.VALID.equals(tx.getValidationCode())){
@@ -94,7 +94,7 @@ public class Helper {
         }
     }
 
-    static Block preprocessProtoBlock(ITxManager txMgr, Common.Block.Builder blockBuilder, boolean doMVCCValidation) throws LedgerException {
+    public static Block preprocessProtoBlock(ITxManager txMgr, Common.Block.Builder blockBuilder, boolean doMVCCValidation) throws LedgerException {
         Common.Block block = blockBuilder.build();
         Block b = new Block(block.getHeader().getNumber());
         TxValidationFlags txsFilter = TxValidationFlags.fromByteString(block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
@@ -192,7 +192,7 @@ public class Helper {
         return simRes.getPublicReadWriteSet();
     }
 
-    static void postprocessProtoBlock(Common.Block.Builder blockBuilder, Block validatedBlock) {
+    public static void postprocessProtoBlock(Common.Block.Builder blockBuilder, Block validatedBlock) {
         TxValidationFlags txsFilter = TxValidationFlags.fromByteString(blockBuilder.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
         for(Transaction tx : validatedBlock.getTxs()){
             txsFilter.setFlag(tx.getIndexInBlock(), tx.getValidationCode());
