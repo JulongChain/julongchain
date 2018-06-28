@@ -38,10 +38,7 @@ import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.core.node.ConfigtxProcessor;
 import org.bcia.julongchain.core.node.GroupSupport;
 import org.bcia.julongchain.core.node.util.ConfigTxUtils;
-import org.bcia.julongchain.csp.factory.CspOptsManager;
-import org.bcia.julongchain.csp.factory.IFactoryOpts;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
-import org.bcia.julongchain.msp.mspconfig.MspConfig;
 import org.bcia.julongchain.node.cmd.INodeCmd;
 import org.bcia.julongchain.node.cmd.factory.NodeCmdFactory;
 import org.bcia.julongchain.node.common.helper.ConfigTreeHelper;
@@ -60,8 +57,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static org.bcia.julongchain.msp.mspconfig.MspConfigFactory.loadMspConfig;
 
 /**
  * 节点对象
@@ -104,8 +99,14 @@ public class Node {
      */
     private INodeCmd nodeCmd;
 
+    /**
+     * 当前Node节点加入的群组集合
+     */
     private Map<String, Group> groupMap = new ConcurrentHashMap<String, Group>();
 
+    /**
+     * 群组回调
+     */
     private IGroupCallback groupCallback;
 
     /**
@@ -180,7 +181,9 @@ public class Node {
      */
     private void init() throws NodeException {
         log.info("Node init-----");
+
         try {
+            //初始化本地Msp
             GlobalMspManagement.initLocalMsp();
         } catch (MspException e) {
             log.error(e.getMessage(), e);
