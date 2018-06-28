@@ -210,16 +210,12 @@ public class SmartContractSupportService
 
               responseObserver.onNext(responseMessage);
             }else{
-              byte[] newBytes = new byte[worldStateBytes.length-16];
-              for(int i=16;i<worldStateBytes.length;i++){
-                newBytes[i-16] = worldStateBytes[i];
-              }
               // 发送读取结果到shim端
               SmartContractMessage responseMessage =
                   SmartContractMessage.newBuilder()
                       .mergeFrom(message)
                       .setType(SmartContractMessage.Type.RESPONSE)
-                      .setPayload(ByteString.copyFrom(newBytes))
+                      .setPayload(ByteString.copyFrom(worldStateBytes))
                       .setTxid(txId)
                       .setGroupId(groupId)
                       .build();
