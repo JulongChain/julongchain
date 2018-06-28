@@ -56,7 +56,7 @@ public class GmFactoryOpts implements IGmFactoryOpts {
 
     @Override
     public String getProviderName() {
-        return "GM";
+        return PROVIDER_GM;
     }
 
     @Override

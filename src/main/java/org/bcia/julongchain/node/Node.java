@@ -180,28 +180,14 @@ public class Node {
      */
     private void init() throws NodeException {
         log.info("Node init-----");
-        initLocalMsp();
-    }
-
-    private void initLocalMsp() throws NodeException {
-        log.info("Init LocalMsp-----");
         try {
-            MspConfig mspConfig = loadMspConfig();
-            String mspConfigDir = mspConfig.getNode().getMspConfigPath();
-            String mspId = mspConfig.getNode().getLocalMspId();
-            String mspType = mspConfig.getNode().getLocalMspType();
-
-            CspOptsManager cspOptsManager = new CspOptsManager();
-            cspOptsManager.addAll(mspConfig.getNode().getCsp().getFactoryOpts());
-            List<IFactoryOpts> optsList = cspOptsManager.getFactoryOptsList();
-
-            String defaultOpts = mspConfig.getNode().getCsp().getDefaultValue();
-            GlobalMspManagement.loadLocalMspWithType(mspConfigDir, optsList, defaultOpts, mspId, mspType);
-        } catch (Exception e) {
+            GlobalMspManagement.initLocalMsp();
+        } catch (MspException e) {
             log.error(e.getMessage(), e);
             throw new NodeException(e);
         }
     }
+
 
     /**
      * 实例化

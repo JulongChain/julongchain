@@ -58,7 +58,7 @@ public class SdtGmFactoryOpts implements ISdtGmFactoryOpts {
 
     @Override
     public String getProviderName() {
-        return "SDTGM";
+        return PROVIDER_GM_SDT;
     }
 
     @Override
