@@ -309,7 +309,7 @@ public class GossipServiceUtil {
     String consenterAddress =
         ConsenterConfigFactory.loadConsenterConfig().getGeneral().getGossipAddress();
     log.info("consenter gossip address:" + consenterAddress);
-    GossipService gossipService = newGossipService("192.168.1.71:7070");
+    GossipService gossipService = newGossipService(consenterAddress);
     gossipService.start();
     log.info("started consenter gossip: address[" + consenterAddress + "]");
     return gossipService;

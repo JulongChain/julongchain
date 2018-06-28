@@ -20,16 +20,23 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.bcia.julongchain.common.exception.LedgerException;
+import org.bcia.julongchain.common.exception.LevelDBException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
 import org.bcia.julongchain.core.ledger.TxSimulationResults;
 import org.bcia.julongchain.core.ledger.kvledger.history.IHistoryQueryExecutor;
+import org.bcia.julongchain.core.ledger.kvledger.history.historydb.HistoryDBHelper;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedLevelDB;
+import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
+import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
+import org.bcia.julongchain.core.ledger.leveldb.LevelDB;
+import org.bcia.julongchain.core.ledger.leveldb.LevelDBUtil;
 import org.bcia.julongchain.core.node.util.NodeUtils;
 import org.bcia.julongchain.core.smartcontract.client.SmartContractSupportClient;
 import org.bcia.julongchain.protos.common.Common;
+import org.bcia.julongchain.protos.ledger.queryresult.KvQueryResult;
 import org.bcia.julongchain.protos.ledger.rwset.Rwset;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.julongchain.protos.node.*;
@@ -50,14 +57,14 @@ import static org.bcia.julongchain.protos.node.SmartContractShim.SmartContractMe
  * @company Dingxuan
  */
 public class SmartContractSupportService
-    extends SmartContractSupportGrpc.SmartContractSupportImplBase {
+        extends SmartContractSupportGrpc.SmartContractSupportImplBase {
 
-  private static Log logger = LogFactory.getLog(SmartContractSupportService.class);
+    private static Log logger = LogFactory.getLog(SmartContractSupportService.class);
 
-  /** 以smartContractId为key,保存gRPC客户端 */
-  public static Map<String, StreamObserver<SmartContractMessage>>
-      smartContractIdAndStreamObserverMap =
-          Collections.synchronizedMap(new HashMap<String, StreamObserver<SmartContractMessage>>());
+    /** 以smartContractId为key,保存gRPC客户端 */
+    public static Map<String, StreamObserver<SmartContractMessage>>
+            smartContractIdAndStreamObserverMap =
+            Collections.synchronizedMap(new HashMap<String, StreamObserver<SmartContractMessage>>());
 
   /**
    * 处理智能合约register信息（命令）
@@ -119,9 +126,9 @@ public class SmartContractSupportService
     }
   }
 
-  @Override
-  public StreamObserver<SmartContractMessage> register(
-      StreamObserver<SmartContractMessage> responseObserver) {
+    @Override
+    public StreamObserver<SmartContractMessage> register(
+            StreamObserver<SmartContractMessage> responseObserver) {
 
     return new StreamObserver<SmartContractMessage>() {
 
@@ -179,14 +186,56 @@ public class SmartContractSupportService
         if (message.getType().equals(SmartContractMessage.Type.GET_STATE)) {
 
           // shim传过来的key
-
           String key = message.getPayload().toStringUtf8();
 
-          INodeLedger nodeLedger = NodeUtils.getLedger(groupId);
+          logger.info("===============>" + key);
+
+          // history数据库路径
+          String historyDBPath = LedgerConfig.getHistoryLevelDBPath();
+          // 世界状态数据库路径
+          String stateLevelDBPath = LedgerConfig.getStateLevelDBPath();
+
+          // history数据库保存的key(以这个开头)
+          byte[] historyKeyBytes =
+              HistoryDBHelper.constructPartialCompositeHistoryKey(groupId, key, false);
+
+          logger.info(new String(historyKeyBytes));
+
+          // 世界状态数据库保存的key
+          byte[] worldStateKeyByte = VersionedLevelDB.constructCompositeKey(groupId + " " + smartContractId, key);
+
+          logger.info(new String(worldStateKeyByte));
 
           try {
-            ITxSimulator txSimulator = nodeLedger.newTxSimulator(txId);
-            byte[] worldStateBytes = txSimulator.getState(smartContractId, key);
+            // todo 查询历史数据库
+            LevelDB db = LevelDBUtil.getDB(historyDBPath);
+            // 找到历史数据库最大的key
+            byte[] lastKey = LevelDBUtil.getLastKey(db, historyKeyBytes);
+            logger.info(new String(lastKey));
+            // 解析blockNum
+//            long blockNum =
+//                HistoryDBHelper.splitCompositeHistoryKeyForBlockNum(
+//                    lastKey, historyKeyBytes.length);
+            // 解析txNum
+//            long txNum =
+//                HistoryDBHelper.splitCompositeHistoryKeyForTranNum(lastKey, historyKeyBytes.length);
+            // 保存Version
+//            KvRwset.Version version =
+//                KvRwset.Version.newBuilder().setBlockNum(blockNum).setTxNum(txNum).build();
+            // 保存读记录
+//            KvRwset.KVRead kvRead =
+//                KvRwset.KVRead.newBuilder().setVersion(version).setKey(key).build();
+
+            // 保存所有的读记录
+//            TransactionRunningUtil.addKvRead(smartContractId, txId, kvRead);
+
+            // 查询世界状态数据库
+            db = LevelDBUtil.getDB(stateLevelDBPath);
+
+            byte[] worldStateBytes = LevelDBUtil.get(db, worldStateKeyByte, true);
+            if(worldStateBytes != null){
+              logger.info("=============> world state bytes length:" + worldStateBytes.length);
+            }
             if (worldStateBytes == null || worldStateBytes.length > 10000) {
               worldStateBytes = new byte[] {};
               // 发送读取结果到shim端
@@ -200,10 +249,10 @@ public class SmartContractSupportService
                       .build();
 
               responseObserver.onNext(responseMessage);
-            } else {
-              byte[] newBytes = new byte[worldStateBytes.length - 16];
-              for (int i = 16; i < worldStateBytes.length; i++) {
-                newBytes[i - 16] = worldStateBytes[i];
+            }else{
+              byte[] newBytes = new byte[worldStateBytes.length-16];
+              for(int i=16;i<worldStateBytes.length;i++){
+                newBytes[i-16] = worldStateBytes[i];
               }
               // 发送读取结果到shim端
               SmartContractMessage responseMessage =
@@ -218,7 +267,8 @@ public class SmartContractSupportService
               responseObserver.onNext(responseMessage);
             }
 
-          } catch (LedgerException e) {
+
+          } catch (LevelDBException e) {
             e.printStackTrace();
           }
 
@@ -228,13 +278,21 @@ public class SmartContractSupportService
         // 收到putState信息
         if (message.getType().equals(SmartContractMessage.Type.PUT_STATE)) {
           try {
-            SmartContractShim.PutState putState =
-                SmartContractShim.PutState.parseFrom(message.getPayload());
-            INodeLedger nodeLedger = NodeUtils.getLedger(groupId);
-            ITxSimulator txSimulator = nodeLedger.newTxSimulator(txId);
-            txSimulator.setState(
-                smartContractId, putState.getKey(), putState.getValue().toByteArray());
-          } catch (Exception e) {
+            SmartContractShim.PutState putState = null;
+            putState = SmartContractShim.PutState.parseFrom(message.getPayload());
+            logger.info(putState.getKey());
+            logger.info(putState.getValue());
+
+            KvRwset.KVWrite kvWrite =
+                KvRwset.KVWrite.newBuilder()
+                    .setKey(putState.getKey())
+                    .setValue(putState.getValue())
+                    .setIsDelete(false)
+                    .build();
+
+            TransactionRunningUtil.addKvWrite(smartContractId, txId, kvWrite);
+
+          } catch (InvalidProtocolBufferException e) {
             logger.error(e.getMessage(), e);
           }
 
@@ -271,142 +329,130 @@ public class SmartContractSupportService
         logger.info("SmartContract completed");
       }
     };
-  }
-
-  /**
-   * 保存gRPC客户端
-   *
-   * @param message 接收到的消息
-   * @param streamObserver gRPC客户端
-   * @throws InvalidProtocolBufferException
-   */
-  private void saveSmartContractStreamObserver(
-      SmartContractMessage message, StreamObserver<SmartContractMessage> streamObserver)
-      throws InvalidProtocolBufferException {
-    // 只有注册时才保存
-    if (!message.getType().equals(SmartContractMessage.Type.REGISTER)) {
-      return;
     }
-    // 从message的payload中获取smartContractID
-    SmartContractPackage.SmartContractID smartContractID =
-        SmartContractPackage.SmartContractID.parseFrom(message.getPayload());
-    String name = smartContractID.getName();
-    if (name == null || name.length() == 0) {
-      return;
+
+    /**
+     * 保存gRPC客户端
+     *
+     * @param message 接收到的消息
+     * @param streamObserver gRPC客户端
+     * @throws InvalidProtocolBufferException
+     */
+    private void saveSmartContractStreamObserver(
+            SmartContractMessage message, StreamObserver<SmartContractMessage> streamObserver)
+            throws InvalidProtocolBufferException {
+        // 只有注册时才保存
+        if (!message.getType().equals(SmartContractMessage.Type.REGISTER)) {
+            return;
+        }
+        // 从message的payload中获取smartContractID
+        SmartContractPackage.SmartContractID smartContractID =
+                SmartContractPackage.SmartContractID.parseFrom(message.getPayload());
+        String name = smartContractID.getName();
+        if (name == null || name.length() == 0) {
+            return;
+        }
+        // 保存gRPC客户端
+        smartContractIdAndStreamObserverMap.put(name, streamObserver);
+        // 设置状态为new
+        updateSmartContractStatus(name, SMART_CONTRACT_STATUS_NEW);
+        logger.info(
+                String.format(
+                        "add SmartContract streamObserver: name[%s] streamObserver[%s]",
+                        name, streamObserver.toString()));
     }
-    // 保存gRPC客户端
-    smartContractIdAndStreamObserverMap.put(name, streamObserver);
-    // 设置状态为new
-    updateSmartContractStatus(name, SMART_CONTRACT_STATUS_NEW);
-    logger.info(
-        String.format(
-            "add SmartContract streamObserver: name[%s] streamObserver[%s]",
-            name, streamObserver.toString()));
-  }
 
-  /**
-   * 发送消息给gRPC客户端
-   *
-   * @param smartContractId 智能合约编号
-   * @param message 消息
-   */
-  public static void send(String smartContractId, SmartContractMessage message) {
-    StreamObserver<SmartContractMessage> streamObserver =
-        smartContractIdAndStreamObserverMap.get(smartContractId);
-    if (streamObserver == null) {
-      logger.info(String.format("no stream observer for %s", smartContractId));
-      return;
+    /**
+     * 发送消息给gRPC客户端
+     *
+     * @param smartContractId 智能合约编号
+     * @param message 消息
+     */
+    public static void send(String smartContractId, SmartContractMessage message) {
+        StreamObserver<SmartContractMessage> streamObserver =
+                smartContractIdAndStreamObserverMap.get(smartContractId);
+        if (streamObserver == null) {
+            logger.info(String.format("no stream observer for %s", smartContractId));
+            return;
+        }
+        streamObserver.onNext(message);
     }
-    streamObserver.onNext(message);
-  }
 
-  /**
-   * 初始化智能合约
-   *
-   * @param smartContractId 智能合约编号
-   * @param smartContractMessage 发送的消息
-   */
-  public static void init(String smartContractId, SmartContractMessage smartContractMessage) {
-    logger.info("init " + smartContractId);
-    // 设置消息的type为INIT
-    SmartContractMessage message =
-        SmartContractMessage.newBuilder()
-            .mergeFrom(smartContractMessage)
-            .setType(SmartContractMessage.Type.INIT)
-            .build();
-    send(smartContractId, message);
-  }
-
-  /**
-   * invoke智能合约
-   *
-   * @param smartContractId 智能合约编号
-   * @param smartContractMessage 消息
-   */
-  public static SmartContractMessage invoke(
-      String smartContractId, SmartContractMessage smartContractMessage) {
-    logger.info("invoke " + smartContractId);
-
-    // 修改消息的type为TRANSACTION
-    SmartContractMessage message =
-        SmartContractMessage.newBuilder()
-            .mergeFrom(smartContractMessage)
-            // .setType(SmartContractMessage.Type.TRANSACTION)
-            .build();
-
-    updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_BUSY);
-    String txId = smartContractMessage.getTxid();
-    addTxId(txId, smartContractId);
-    updateTxStatus(smartContractId, txId, TX_STATUS_START);
-
-    send(smartContractId, message);
-
-    while (!StringUtils.equals(getTxStatusById(smartContractId, txId), TX_STATUS_COMPLETE)
-        && !StringUtils.equals(getTxStatusById(smartContractId, txId), TX_STATUS_ERROR)) {}
-
-    SmartContractMessage receiveMessage = getTxMessage(smartContractId, txId);
-    return receiveMessage;
-  }
-
-  /**
-   * 从message中获取智能合约编号
-   *
-   * @param message 消息
-   * @return
-   */
-  private String getSmartContractId(SmartContractMessage message) {
-    String smartContractIdStr = "";
-    try {
-      smartContractIdStr =
-          SmartContractPackage.SmartContractID.parseFrom(message.getPayload()).getName();
-    } catch (InvalidProtocolBufferException e) {
-      logger.error(e.getMessage(), e);
+    /**
+     * 初始化智能合约
+     *
+     * @param smartContractId 智能合约编号
+     * @param smartContractMessage 发送的消息
+     */
+    public static void init(String smartContractId, SmartContractMessage smartContractMessage) {
+        logger.info("init " + smartContractId);
+        // 设置消息的type为INIT
+        SmartContractMessage message =
+                SmartContractMessage.newBuilder()
+                        .mergeFrom(smartContractMessage)
+                        .setType(SmartContractMessage.Type.INIT)
+                        .build();
+        send(smartContractId, message);
     }
-    return smartContractIdStr;
-  }
 
-  public static void main(String[] args) throws Exception {
-    INodeLedger l = NodeUtils.getLedger("mytestgroupid2");
+    /**
+     * invoke智能合约
+     *
+     * @param smartContractId 智能合约编号
+     * @param smartContractMessage 消息
+     */
+    public static SmartContractMessage invoke(
+            String smartContractId, SmartContractMessage smartContractMessage) {
+        logger.info("invoke " + smartContractId);
 
-    IHistoryQueryExecutor historyQueryExecutro = l.newHistoryQueryExecutor();
-    IResultsIterator itr = historyQueryExecutro.getHistoryForKey("mytestgroupid2", "key2");
-    QueryResult next = itr.next();
-    System.out.println(((KvRwset.Version) next.getObj()).getBlockNum());
-    System.out.println(((KvRwset.Version) next.getObj()).getTxNum());
-    next = itr.next();
-    System.out.println(((KvRwset.Version) next.getObj()).getBlockNum());
-    System.out.println(((KvRwset.Version) next.getObj()).getTxNum());
-    itr.close();
+        // 修改消息的type为TRANSACTION
+        SmartContractMessage message =
+                SmartContractMessage.newBuilder()
+                        .mergeFrom(smartContractMessage)
+                        // .setType(SmartContractMessage.Type.TRANSACTION)
+                        .build();
 
-    ITxSimulator txSimulator = l.newTxSimulator("mytestgroupid2");
-    byte[] state = txSimulator.getState("mytestgroupid2", "key1");
-    System.out.println(new String(state));
+        updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_BUSY);
+        String txId = smartContractMessage.getTxid();
+        addTxId(txId, smartContractId);
+        updateTxStatus(smartContractId, txId, TX_STATUS_START);
 
-    txSimulator.setState("mytestgroupid1", "key", "value".getBytes());
+        send(smartContractId, message);
 
-    TxSimulationResults txSimulationResults = txSimulator.getTxSimulationResults();
-    Rwset.TxReadWriteSet publicReadWriteSet = txSimulationResults.getPublicReadWriteSet();
-    Rwset.NsReadWriteSet nsRwset = publicReadWriteSet.getNsRwset(0);
-    System.out.println(nsRwset.getNamespace());
-  }
+        while (!StringUtils.equals(getTxStatusById(smartContractId, txId), TX_STATUS_COMPLETE)
+                && !StringUtils.equals(getTxStatusById(smartContractId, txId), TX_STATUS_ERROR)) {}
+
+        SmartContractMessage receiveMessage = getTxMessage(smartContractId, txId);
+        return receiveMessage;
+    }
+
+    /**
+     * 从message中获取智能合约编号
+     *
+     * @param message 消息
+     * @return
+     */
+    private String getSmartContractId(SmartContractMessage message) {
+        String smartContractIdStr = "";
+        try {
+            smartContractIdStr = SmartContractPackage.SmartContractID.parseFrom(message.getPayload()).getName();
+        } catch (InvalidProtocolBufferException e) {
+            logger.error(e.getMessage(), e);
+        }
+        return smartContractIdStr;
+    }
+
+    public static void main(String[] args) throws Exception {
+	    INodeLedger l = NodeUtils.getLedger("mytestgroupid2");
+	    ITxSimulator txSimulator = l.newTxSimulator("mytestgroupid2");
+	    byte[] state = txSimulator.getState("mytestgroupid2", "key1");
+//	    System.out.println(new String(state));
+	    txSimulator.setState("mytestgroupid1", "key", "value".getBytes());
+	    TxSimulationResults txSimulationResults = txSimulator.getTxSimulationResults();
+	    Rwset.TxReadWriteSet publicReadWriteSet = txSimulationResults.getPublicReadWriteSet();
+	    Rwset.NsReadWriteSet nsRwset = publicReadWriteSet.getNsRwset(0);
+	    ByteString rwset = nsRwset.getRwset();
+	    System.out.println(rwset.toStringUtf8());
+    }
+
 }
