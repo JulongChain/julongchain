@@ -57,8 +57,8 @@ public class LedgerTest {
     @Test
     public void getKVFromLevelDB() throws Throwable {
 //        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getIndexPath());
-        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getStateLevelDBPath());
-//        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getHistoryLevelDBPath());
+//        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getStateLevelDBPath());
+        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getHistoryLevelDBPath());
 //        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getLedgerProviderPath());
 //        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getPvtDataStorePath());
 //        for (int i = 0; i < 100; i++) {

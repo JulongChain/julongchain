@@ -21,13 +21,20 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bcia.julongchain.common.exception.LevelDBException;
+import org.bcia.julongchain.common.ledger.IResultsIterator;
+import org.bcia.julongchain.core.ledger.INodeLedger;
+import org.bcia.julongchain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.julongchain.core.ledger.kvledger.history.historydb.HistoryDBHelper;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedLevelDB;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
+import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.core.ledger.leveldb.LevelDB;
 import org.bcia.julongchain.core.ledger.leveldb.LevelDBUtil;
+import org.bcia.julongchain.core.node.util.NodeUtils;
 import org.bcia.julongchain.core.smartcontract.client.SmartContractSupportClient;
 import org.bcia.julongchain.protos.common.Common;
+import org.bcia.julongchain.protos.ledger.queryresult.KvQueryResult;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.julongchain.protos.node.*;
 
@@ -432,14 +439,13 @@ public class SmartContractSupportService
         return smartContractIdStr;
     }
 
-    public static void main(String[] args) {
-        SmartContractMessage build =
-                SmartContractMessage.newBuilder().setTxid("t1").setGroupId("g1").build();
-        SmartContractMessage build1 = SmartContractMessage.newBuilder().mergeFrom(build).build();
-
-        build = SmartContractMessage.newBuilder().setTxid("t2").setGroupId("g2").build();
-
-        System.out.println(build.getTxid() + " " + build.getGroupId());
-        System.out.println(build1.getTxid() + " " + build1.getGroupId());
+    public static void main(String[] args) throws Exception {
+	    INodeLedger l = NodeUtils.getLedger("mytestgroupid2");
+	    IHistoryQueryExecutor historyQueryExecutro = l.newHistoryQueryExecutor();
+	    IResultsIterator itr = historyQueryExecutro.getHistoryForKey("mytestgroupid2", "key2");
+	    QueryResult next = itr.next();
+	    System.out.println(((KvRwset.Version) next.getObj()).getBlockNum());
+	    System.out.println(((KvRwset.Version) next.getObj()).getTxNum());
+	    itr.close();
     }
 }

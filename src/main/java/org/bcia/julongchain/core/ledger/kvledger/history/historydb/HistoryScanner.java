@@ -32,6 +32,7 @@ import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.TransactionPackage;
 import org.iq80.leveldb.DBIterator;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -85,15 +86,29 @@ public class HistoryScanner implements IResultsIterator {
         logger.debug(String.format("Found history record for namespace: %s, key: %s. BlockNum: %d, TranNum: %d", nameSpace, key, blockNum, tranNum));
 
         Common.Envelope tranEnvelope = blockStore.retrieveTxByBlockNumTranNum(blockNum, tranNum);
-        QueryResult queryResult = getKeyModificationFromTran(tranEnvelope, nameSpace, key);
-        logger.debug("Found history key value for namespace=[{}], key=[{}] from transaction=[{}]", nameSpace, key, ((KvQueryResult.KeyModification) queryResult.getObj()).getTxId());
+//        QueryResult queryResult = getKeyModificationFromTran(tranEnvelope, nameSpace, key);
+        QueryResult queryResult = getKvVersion(blockNum, tranNum);
+//        logger.debug("Found history key value for namespace=[{}], key=[{}] from transaction=[{}]", nameSpace, key, ((KvQueryResult.KeyModification) queryResult.getObj()).getTxId());
 
         return queryResult;
     }
 
     @Override
     public void close() throws LedgerException {
+	    try {
+		    dbItr.close();
+	    } catch (IOException e) {
+	    	logger.error("Got error when close dbItr");
+	    	throw new RuntimeException(e);
+	    }
+    }
 
+    private QueryResult getKvVersion(long blockNum, long tranNum){
+	    KvRwset.Version version = KvRwset.Version.newBuilder()
+			    .setBlockNum(blockNum)
+			    .setTxNum(tranNum)
+			    .build();
+	    return new QueryResult(version);
     }
 
     private QueryResult getKeyModificationFromTran(Common.Envelope envelope, String ns, String key) throws LedgerException {
