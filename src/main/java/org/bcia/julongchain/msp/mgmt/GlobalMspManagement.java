@@ -75,9 +75,10 @@ public class GlobalMspManagement {
      * @param mspId
      * @param mspType
      */
-    public static IMsp loadLocalMspWithType(String localmspdir, List<IFactoryOpts> optsList, String mspId, String mspType) throws FileNotFoundException {
+    public static IMsp loadLocalMspWithType(String localmspdir, List<IFactoryOpts> optsList, String defaultOpts,
+                                            String mspId, String mspType) throws FileNotFoundException {
 
-        CspManager.initCspFactories(optsList);
+        CspManager.initCspFactories(optsList, defaultOpts);
         MspConfig mspConfig = loadMspConfig();
         defaultCspValue = mspConfig.node.getCsp().getDefaultValue();
         defaultCsp = CspManager.getCsp(defaultCspValue);
