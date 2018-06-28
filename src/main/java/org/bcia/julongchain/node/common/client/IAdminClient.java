@@ -15,24 +15,20 @@
  */
 package org.bcia.julongchain.node.common.client;
 
-import org.bcia.julongchain.protos.node.ProposalPackage;
-import org.bcia.julongchain.protos.node.ProposalResponsePackage;
-
 /**
- * 背书客户端接口定义
+ * 类描述
  *
  * @author zhouhui
- * @date 2018/3/19
+ * @date 2018/06/28
  * @company Dingxuan
  */
-public interface IEndorserClient {
+public interface IAdminClient {
     /**
-     * 发送背书请求
+     * 获取状态值
      *
-     * @param signedProposal
      * @return
      */
-    ProposalResponsePackage.ProposalResponse sendProcessProposal(ProposalPackage.SignedProposal signedProposal);
+    int getStatus();
 
     void close();
 }

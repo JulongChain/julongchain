@@ -42,7 +42,7 @@ public class DeliverClient implements IDeliverClient {
     /**
      * IP地址
      */
-    private String ip;
+    private String host;
     /**
      * 端口
      */
@@ -50,15 +50,15 @@ public class DeliverClient implements IDeliverClient {
 
     private ManagedChannel managedChannel;
 
-    public DeliverClient(String ip, int port) {
-        this.ip = ip;
+    public DeliverClient(String host, int port) {
+        this.host = host;
         this.port = port;
     }
 
     @Override
     public void send(Common.Envelope envelope, StreamObserver<Ab.DeliverResponse> responseObserver) {
         managedChannel =
-                NettyChannelBuilder.forAddress(ip, port).maxInboundMessageSize(CommConstant.MAX_GRPC_MESSAGE_SIZE)
+                NettyChannelBuilder.forAddress(host, port).maxInboundMessageSize(CommConstant.MAX_GRPC_MESSAGE_SIZE)
                         .usePlaintext().build();
         AtomicBroadcastGrpc.AtomicBroadcastStub stub = AtomicBroadcastGrpc.newStub(managedChannel);
         StreamObserver<Common.Envelope> envelopeStreamObserver = stub.deliver(responseObserver);
@@ -92,11 +92,11 @@ public class DeliverClient implements IDeliverClient {
         log.info("DeliverClient close-----");
 
         managedChannel.shutdown();
-        try {
-            managedChannel.awaitTermination(1000, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
-        }
+//        try {
+//            managedChannel.awaitTermination(1000, TimeUnit.MILLISECONDS);
+//        } catch (InterruptedException e) {
+//            log.error(e.getMessage(), e);
+//        }
     }
 
     private Common.Envelope createSeekSignedEnvelope(String groupId, Ab.SeekPosition seekPosition) {

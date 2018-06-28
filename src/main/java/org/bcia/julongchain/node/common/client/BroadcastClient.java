@@ -39,7 +39,7 @@ public class BroadcastClient implements IBroadcastClient {
     /**
      * IP地址
      */
-    private String ip;
+    private String host;
     /**
      * 端口
      */
@@ -47,15 +47,15 @@ public class BroadcastClient implements IBroadcastClient {
 
     private ManagedChannel managedChannel;
 
-    public BroadcastClient(String ip, int port) {
-        this.ip = ip;
+    public BroadcastClient(String host, int port) {
+        this.host = host;
         this.port = port;
     }
 
     @Override
     public void send(Common.Envelope envelope, StreamObserver<Ab.BroadcastResponse> responseObserver) {
         managedChannel =
-                NettyChannelBuilder.forAddress(ip, port).maxInboundMessageSize(CommConstant.MAX_GRPC_MESSAGE_SIZE)
+                NettyChannelBuilder.forAddress(host, port).maxInboundMessageSize(CommConstant.MAX_GRPC_MESSAGE_SIZE)
                         .usePlaintext().build();
         AtomicBroadcastGrpc.AtomicBroadcastStub stub = AtomicBroadcastGrpc.newStub(managedChannel);
         StreamObserver<Common.Envelope> envelopeStreamObserver = stub.broadcast(responseObserver);
@@ -67,10 +67,10 @@ public class BroadcastClient implements IBroadcastClient {
         log.info("BroadcastClient close-----");
 
         managedChannel.shutdown();
-        try {
-            managedChannel.awaitTermination(1000, TimeUnit.MILLISECONDS);
-        } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
-        }
+//        try {
+//            managedChannel.awaitTermination(1000, TimeUnit.MILLISECONDS);
+//        } catch (InterruptedException e) {
+//            log.error(e.getMessage(), e);
+//        }
     }
 }
