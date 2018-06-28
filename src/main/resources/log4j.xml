@@ -53,7 +53,7 @@
         <!--<priority value="warn"/>-->
         <!--<priority value="error"/>-->
         <!--<priority value="fatal"/>-->
-        <priority value="debug"/>
+        <priority value="info"/>
         <!--添加刚才设置的appender-->
         <appender-ref ref="myConsole"/>
         <appender-ref ref="myFile"/>
