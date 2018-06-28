@@ -15,6 +15,8 @@
  */
 package org.bcia.julongchain.core.aclmgmt;
 
+import org.bcia.julongchain.common.exception.PolicyException;
+import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 
 /**
@@ -27,6 +29,11 @@ import org.bcia.julongchain.protos.node.ProposalPackage;
 public class MockAclProvider implements IAclProvider {
     @Override
     public void checkACL(String resName, String groupID, ProposalPackage.SignedProposal idinfo) {
+
+    }
+
+    @Override
+    public void checkACL(String resName, String groupId, Common.Envelope envelope) throws PolicyException {
 
     }
 

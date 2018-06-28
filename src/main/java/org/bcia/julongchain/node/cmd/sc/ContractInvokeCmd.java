@@ -29,7 +29,7 @@ import org.bcia.julongchain.protos.node.SmartContractPackage;
 /**
  * node contract invoke -c consenter.example.com:7050 -g groupId -n mycc -l java -ctor '{"Args":["query","a"]}'
  * contract invoke -c 127.0.0.1:7050 -g myGroup -n mycc -l java -ctor "{'Args':['query','a']}"
- * consenter节点 群组 名称 语言 执行信息
+ * consenter节点 群组名称 语言 执行信息
  *
  * @author wanglei zhouhui
  * @date 2018/03/14
@@ -51,13 +51,6 @@ public class ContractInvokeCmd extends AbstractNodeContractCmd {
     //参数
     private static final String KEY_ARGS = "args";
 
-    //参数：超时时间
-    private static final String ARG_TIMEOUT = "t";
-    //参数：是否使用TLS传输
-    private static final String ARG_USE_TLS = "tls";
-    //参数：CA文件位置
-    private static final String ARG_CA = "ca";
-
     public ContractInvokeCmd(Node node) {
         super(node);
     }
@@ -75,7 +68,7 @@ public class ContractInvokeCmd extends AbstractNodeContractCmd {
         CommandLine cmd = parser.parse(options, args);
 
         String defaultValue = "unknown";
-        //consenter 信息  ip:port
+        //consenter信息
         String consenter = null;
         if (cmd.hasOption(ARG_CONSENTER)) {
             consenter = cmd.getOptionValue(ARG_CONSENTER, defaultValue);
@@ -85,7 +78,7 @@ public class ContractInvokeCmd extends AbstractNodeContractCmd {
         String groupId = null;
         if (cmd.hasOption(ARG_GROUP_ID)) {
             groupId = cmd.getOptionValue(ARG_GROUP_ID, defaultValue);
-            log.info("Grout ID-----$" + groupId);
+            log.info("GroupId-----$" + groupId);
         }
         //解析出合约名称
         String scName = null;
@@ -93,13 +86,6 @@ public class ContractInvokeCmd extends AbstractNodeContractCmd {
             scName = cmd.getOptionValue(ARG_SC_NAME, defaultValue);
             log.info("Contract name-----$" + scName);
         }
-
-        //合约具体执行参数
-//        String ctor = null;
-//        if (cmd.hasOption(ARG_SC_CTOR)) {
-//            ctor = cmd.getOptionValue(ARG_SC_CTOR, defaultValue);
-//            log.info("Contract ctor-----$" + ctor);
-//        }
 
         SmartContractPackage.SmartContractInput input = null;
         if (cmd.hasOption(ARG_SC_CTOR)) {

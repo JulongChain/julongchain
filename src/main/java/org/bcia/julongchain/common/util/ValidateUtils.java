@@ -18,6 +18,8 @@ package org.bcia.julongchain.common.util;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.ValidateException;
 
+import java.util.Collection;
+
 /**
  * 验证工具类
  *
@@ -50,6 +52,20 @@ public class ValidateUtils {
      */
     public static void isNotBlank(String str, String errorMessage) throws ValidateException {
         if (StringUtils.isBlank(str)) {
+            throw new ValidateException(errorMessage);
+        }
+    }
+
+    /**
+     * 确保对象不为空，否则抛出异常
+     * 举例：ValidateUtils.isNotEmpty(list, "list can not be empty");
+     *
+     * @param collection
+     * @param errorMessage
+     * @throws ValidateException
+     */
+    public static void isNotEmpty(Collection collection, String errorMessage) throws ValidateException {
+        if (collection == null || collection.size() <= 0) {
             throw new ValidateException(errorMessage);
         }
     }

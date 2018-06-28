@@ -15,16 +15,17 @@
  */
 package org.bcia.julongchain.node.entity;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.stub.StreamObserver;
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.protos.EnvelopeVO;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
 import org.bcia.julongchain.common.util.proto.ProposalUtils;
-import org.bcia.julongchain.consenter.common.broadcast.BroadCastClient;
 import org.bcia.julongchain.core.ssc.lssc.LSSC;
 import org.bcia.julongchain.csp.factory.CspManager;
 import org.bcia.julongchain.msp.ISigningIdentity;
@@ -134,6 +135,14 @@ public class NodeSmartContract {
 
         try {
             Common.Envelope signedTxEnvelope = EnvelopeHelper.createSignedTxEnvelope(proposal, identity, proposalResponse);
+
+            EnvelopeVO envelopeVO = new EnvelopeVO();
+            try {
+                envelopeVO.parseFrom(signedTxEnvelope);
+            } catch (InvalidProtocolBufferException e) {
+                log.error(e.getMessage(), e);
+            }
+
             IBroadcastClient broadcastClient = new BroadcastClient(ip, port);
             broadcastClient.send(signedTxEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
                 @Override
@@ -203,6 +212,7 @@ public class NodeSmartContract {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //背书
+//        EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
         EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
 
@@ -216,6 +226,10 @@ public class NodeSmartContract {
 
         try {
             Common.Envelope signedTxEnvelope = EnvelopeHelper.createSignedTxEnvelope(proposal, identity, proposalResponse);
+
+            EnvelopeVO envelopeVO = new EnvelopeVO();
+            envelopeVO.parseFrom(signedTxEnvelope);
+
             IBroadcastClient broadcastClient = new BroadcastClient(ip, port);
             broadcastClient.send(signedTxEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
                 @Override
@@ -242,7 +256,7 @@ public class NodeSmartContract {
                 }
             });
 
-        } catch (ValidateException e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new NodeException(e);
         }
@@ -254,8 +268,8 @@ public class NodeSmartContract {
         }
     }
 
-    public void query(String groupId, String smartContractName, String ctor) throws NodeException {
-        SmartContractPackage.SmartContractInvocationSpec spec = SpecHelper.buildInvocationSpec(smartContractName, ctor, null);
+    public void query(String groupId, String smartContractName, SmartContractPackage.SmartContractInput input) throws NodeException {
+        SmartContractPackage.SmartContractInvocationSpec spec = SpecHelper.buildInvocationSpec(smartContractName, input.toByteArray());
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
@@ -277,7 +291,7 @@ public class NodeSmartContract {
         }
 
         ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType
-                .ENDORSER_TRANSACTION, "", txId, spec, nonce, creator, null);
+                .ENDORSER_TRANSACTION, groupId, txId, spec, nonce, creator, null);
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);

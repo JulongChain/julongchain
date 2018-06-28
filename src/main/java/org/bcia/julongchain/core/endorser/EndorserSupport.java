@@ -27,6 +27,7 @@ import org.bcia.julongchain.common.resourceconfig.ISmartContractDefinition;
 import org.bcia.julongchain.common.resourceconfig.config.SmartContractConfig;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.core.aclmgmt.AclManagement;
+import org.bcia.julongchain.core.aclmgmt.resources.Resources;
 import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractContext;
 import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
@@ -187,7 +188,7 @@ public class EndorserSupport implements IEndorserSupport {
             .SignatureHeader signatureHeader, ProposalPackage.SmartContractHeaderExtension extension) {
         //TODO：有些参数未使用?
         try {
-            AclManagement.getACLProvider().checkACL(null, groupHeader.getGroupId(), signedProposal);
+            AclManagement.getACLProvider().checkACL(Resources.PROPOSE, groupHeader.getGroupId(), signedProposal);
         } catch (JavaChainException e) {
             e.printStackTrace();
         }

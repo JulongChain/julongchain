@@ -148,17 +148,17 @@ public class Msp implements IMsp {
     @Override
     public ISigningIdentity getDefaultSigningIdentity() {
         // 返回基于国密的默认签名身份实现
-        if (defaultCspValue.equalsIgnoreCase("gm")) {
+//        if (defaultCspValue.equalsIgnoreCase("gm")) {
 
 
             // return new SigningIdentity(mspConfig);
 
             return this.signer;
 
-        } else if (defaultCspValue.equalsIgnoreCase("gmt0016")) {
-            return null;
-        }
-        return null;
+//        } else if (defaultCspValue.equalsIgnoreCase("gmt0016")) {
+//            return null;
+//        }
+//        return null;
     }
 
     @Override
