@@ -20,6 +20,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.LevelDBException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.core.ledger.INodeLedger;
@@ -190,52 +191,11 @@ public class SmartContractSupportService
 
           logger.info("===============>" + key);
 
-          // history数据库路径
-          String historyDBPath = LedgerConfig.getHistoryLevelDBPath();
-          // 世界状态数据库路径
-          String stateLevelDBPath = LedgerConfig.getStateLevelDBPath();
-
-          // history数据库保存的key(以这个开头)
-          byte[] historyKeyBytes =
-              HistoryDBHelper.constructPartialCompositeHistoryKey(groupId, key, false);
-
-          logger.info(new String(historyKeyBytes));
-
-          // 世界状态数据库保存的key
-          byte[] worldStateKeyByte = VersionedLevelDB.constructCompositeKey(groupId + " " + smartContractId, key);
-
-          logger.info(new String(worldStateKeyByte));
-
           try {
-            // todo 查询历史数据库
-            LevelDB db = LevelDBUtil.getDB(historyDBPath);
-            // 找到历史数据库最大的key
-            byte[] lastKey = LevelDBUtil.getLastKey(db, historyKeyBytes);
-            logger.info(new String(lastKey));
-            // 解析blockNum
-//            long blockNum =
-//                HistoryDBHelper.splitCompositeHistoryKeyForBlockNum(
-//                    lastKey, historyKeyBytes.length);
-            // 解析txNum
-//            long txNum =
-//                HistoryDBHelper.splitCompositeHistoryKeyForTranNum(lastKey, historyKeyBytes.length);
-            // 保存Version
-//            KvRwset.Version version =
-//                KvRwset.Version.newBuilder().setBlockNum(blockNum).setTxNum(txNum).build();
-            // 保存读记录
-//            KvRwset.KVRead kvRead =
-//                KvRwset.KVRead.newBuilder().setVersion(version).setKey(key).build();
+            INodeLedger nodeLedger = NodeUtils.getLedger(groupId);
+            ITxSimulator txSimulator = nodeLedger.newTxSimulator(txId);
+            byte[] worldStateBytes = txSimulator.getState(smartContractId, key);
 
-            // 保存所有的读记录
-//            TransactionRunningUtil.addKvRead(smartContractId, txId, kvRead);
-
-            // 查询世界状态数据库
-            db = LevelDBUtil.getDB(stateLevelDBPath);
-
-            byte[] worldStateBytes = LevelDBUtil.get(db, worldStateKeyByte, true);
-            if(worldStateBytes != null){
-              logger.info("=============> world state bytes length:" + worldStateBytes.length);
-            }
             if (worldStateBytes == null || worldStateBytes.length > 10000) {
               worldStateBytes = new byte[] {};
               // 发送读取结果到shim端
@@ -268,7 +228,7 @@ public class SmartContractSupportService
             }
 
 
-          } catch (LevelDBException e) {
+          } catch (LedgerException e) {
             e.printStackTrace();
           }
 
@@ -280,17 +240,6 @@ public class SmartContractSupportService
           try {
             SmartContractShim.PutState putState = null;
             putState = SmartContractShim.PutState.parseFrom(message.getPayload());
-            logger.info(putState.getKey());
-            logger.info(putState.getValue());
-
-            KvRwset.KVWrite kvWrite =
-                KvRwset.KVWrite.newBuilder()
-                    .setKey(putState.getKey())
-                    .setValue(putState.getValue())
-                    .setIsDelete(false)
-                    .build();
-
-            TransactionRunningUtil.addKvWrite(smartContractId, txId, kvWrite);
 
           } catch (InvalidProtocolBufferException e) {
             logger.error(e.getMessage(), e);
