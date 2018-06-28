@@ -16,19 +16,17 @@
 package org.bcia.julongchain.common.tools.cryptogen;
 
 import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.tools.cryptogen.sm2cert.SM2PublicKeyImpl;
 import org.bcia.julongchain.csp.factory.CspManager;
-import org.bcia.julongchain.csp.factory.IFactoryOpts;
-import org.bcia.julongchain.csp.gm.dxct.GmFactoryOpts;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2KeyGenOpts;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2KeyImportOpts;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2PublicKey;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IKey;
-import org.bcia.julongchain.msp.mspconfig.MspConfig;
-import org.bcia.julongchain.msp.mspconfig.MspConfigFactory;
+import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
@@ -55,23 +53,29 @@ public class CspHelper {
     private static final ICsp csp = getCsp();
 
     static {
-        List<IFactoryOpts> list = new ArrayList<>();
-        IFactoryOpts opts = new GmFactoryOpts() {
-            @Override
-            public boolean isDefaultCsp() {
-                return true;
-            }
-        };
         try {
-            MspConfig mspConfig = MspConfigFactory.loadMspConfig();
-            GmFactoryOpts factoryOpts=new GmFactoryOpts();
-            factoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("gm"));
-            list.add(factoryOpts);
-        } catch (FileNotFoundException e) {
-            log.error(e.getMessage());
+            GlobalMspManagement.initLocalMsp();
+        } catch (MspException e) {
+            log.error(e.getMessage(), e);
         }
-        list.add(opts);
-        CspManager.initCspFactories(list);
+
+//        List<IFactoryOpts> list = new ArrayList<>();
+//        IFactoryOpts opts = new GmFactoryOpts() {
+//            @Override
+//            public boolean isDefaultCsp() {
+//                return true;
+//            }
+//        };
+//        try {
+//            MspConfig mspConfig = MspConfigFactory.loadMspConfig();
+//            GmFactoryOpts factoryOpts=new GmFactoryOpts();
+//            factoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("gm"));
+//            list.add(factoryOpts);
+//        } catch (FileNotFoundException e) {
+//            log.error(e.getMessage());
+//        }
+//        list.add(opts);
+//        CspManager.initCspFactories(list);
     }
 
     public static ICsp getCsp() {
