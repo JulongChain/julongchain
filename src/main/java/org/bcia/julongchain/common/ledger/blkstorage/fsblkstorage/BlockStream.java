@@ -18,6 +18,7 @@ package org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 
 import java.util.AbstractMap;
 
@@ -69,7 +70,7 @@ public class BlockStream {
     public AbstractMap.SimpleEntry<byte[], BlockPlacementInfo> nextBlockBytesAndPlacementInfo() throws LedgerException{
         AbstractMap.SimpleEntry<byte[], BlockPlacementInfo> entry = currentFileStream.nextBlockBytesAndPlacementInfo();
         byte[] blockBytes = entry.getKey();
-        logger.debug(String.format("Blockbytes [%d] read from file [%d]", blockBytes.length, currentFileNum));
+        logger.debug(String.format("Blockbytes [%s] read from file [%d]", BytesHexStrTranslate.bytesToHexFun1(blockBytes), currentFileNum));
         //当前文件无法读取出block
 		boolean expected = ((blockBytes == null || blockBytes.length == 0) && (currentFileNum < endFileNum || endFileNum < 0));
         if(expected){

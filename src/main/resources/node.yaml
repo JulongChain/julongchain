@@ -303,7 +303,7 @@ node:
     # Path on the file system where node will store data (eg ledger). This
     # location must be access control protected to prevent unintended
     # modification that might corrupt the node operations.
-    fileSystemPath: /var/julongchain/production
+    fileSystemPath: /var/julongchain/production/node
 
     # BCCSP (Blockchain crypto provider): Select which crypto implementation or
     # library to use
