@@ -73,9 +73,22 @@ import static org.bcia.julongchain.msp.mspconfig.MspConfigFactory.loadMspConfig;
 public class Node {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Node.class);
 
+    /**
+     * 群组回调接口
+     */
     public interface IGroupCallback {
+        /**
+         * 当某群组实例化完成时回调
+         *
+         * @param groupId
+         */
         void onGroupInitialized(String groupId);
 
+        /**
+         * 当群组全部实例化完成时回调
+         *
+         * @param groupIds
+         */
         void onGroupsReady(List<String> groupIds);
     }
 
@@ -182,7 +195,8 @@ public class Node {
             cspOptsManager.addAll(mspConfig.getNode().getCsp().getFactoryOpts());
             List<IFactoryOpts> optsList = cspOptsManager.getFactoryOptsList();
 
-            GlobalMspManagement.loadLocalMspWithType(mspConfigDir, optsList, mspId, mspType);
+            String defaultOpts = mspConfig.getNode().getCsp().getDefaultValue();
+            GlobalMspManagement.loadLocalMspWithType(mspConfigDir, optsList, defaultOpts, mspId, mspType);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new NodeException(e);
