@@ -52,9 +52,10 @@ public class HistoryDBHelper {
         byte[] compositeKey = ns.getBytes();
         compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
         compositeKey = ArrayUtils.addAll(compositeKey, key.getBytes());
-        compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
         if(endKey){
             compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_END_KEY);
+        } else {
+	        compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
         }
         return compositeKey;
     }

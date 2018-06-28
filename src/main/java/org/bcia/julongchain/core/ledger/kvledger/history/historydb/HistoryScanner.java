@@ -78,7 +78,6 @@ public class HistoryScanner implements IResultsIterator {
         }
         Map.Entry<byte[], byte[]> entry = dbItr.next();
         byte[] historyKey = HistoryDBHelper.removeLedgerIDFromHistoryKey(ledgerID, entry.getKey());
-	    String s = new String(historyKey);
 
 	    //key:ns~key~blockNo~tranNo
         blockNum = HistoryDBHelper.splitCompositeHistoryKeyForBlockNum(historyKey);
