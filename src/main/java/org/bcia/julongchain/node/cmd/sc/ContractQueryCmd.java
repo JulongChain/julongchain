@@ -15,12 +15,16 @@
  */
 package org.bcia.julongchain.node.cmd.sc;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.google.protobuf.ByteString;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.node.Node;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
  * 完成节点查询智能合约的解析
@@ -39,6 +43,8 @@ public class ContractQueryCmd extends AbstractNodeContractCmd {
     private static final String ARG_SC_NAME = "n";
     //参数：解析出查询主体
     private static final String ARG_CTOR = "ctor";
+    //参数
+    private static final String KEY_ARGS = "args";
 
     public ContractQueryCmd(Node node) {
         super(node);
@@ -46,15 +52,15 @@ public class ContractQueryCmd extends AbstractNodeContractCmd {
 
     @Override
     public void execCmd(String[] args) throws ParseException, NodeException {
-
         Options options = new Options();
         options.addOption(ARG_GROUP_ID, true, "Input group id");
         options.addOption(ARG_SC_NAME, true, "Input smart contract id");
+        options.addOption(ARG_CTOR, true, "");
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
-        String defaultValue = "unknown";
+        String defaultValue = "";
 
         //-----------------------------------解析参数值-------------------------------//
         //解析出群组ID
@@ -72,10 +78,24 @@ public class ContractQueryCmd extends AbstractNodeContractCmd {
         }
 
         //解析出智能合约执行参数
-        String ctor = null;
+        SmartContractPackage.SmartContractInput input = null;
         if (cmd.hasOption(ARG_CTOR)) {
-            ctor = cmd.getOptionValue(ARG_CTOR, defaultValue);
+            String ctor = cmd.getOptionValue(ARG_CTOR, defaultValue);
             log.info("ctor-----$" + ctor);
+            JSONObject ctorJson = JSONObject.parseObject(ctor);
+
+            SmartContractPackage.SmartContractInput.Builder inputBuilder = SmartContractPackage.SmartContractInput.newBuilder();
+
+            JSONArray argsJSONArray = ctorJson.getJSONArray(KEY_ARGS);
+            for (int i = 0; i < argsJSONArray.size(); i++) {
+                inputBuilder.addArgs(ByteString.copyFrom(argsJSONArray.getString(i).getBytes()));
+            }
+
+            input = inputBuilder.build();
+            //打印一下参数，检查是否跟预期一致
+            for (int i = 0; i < input.getArgsCount(); i++) {
+                log.info("input.getArg-----$" + input.getArgs(i).toStringUtf8());
+            }
         }
 
         //-----------------------------------校验入参--------------------------------//
@@ -122,7 +142,7 @@ public class ContractQueryCmd extends AbstractNodeContractCmd {
 
         }
 
-        nodeSmartContract.query(groupId, scName, ctor);
+        nodeSmartContract.query(groupId, scName, input);
     }
 
 }

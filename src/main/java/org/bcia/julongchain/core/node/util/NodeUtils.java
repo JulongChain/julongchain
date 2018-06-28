@@ -22,6 +22,7 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.resourceconfig.IResourcesConfigBundle;
 import org.bcia.julongchain.common.util.proto.BlockUtils;
 import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
@@ -189,7 +190,7 @@ public class NodeUtils {
             Node node = Node.getInstance();
             Map<String, Group> groupMap = node.getGroupMap();
 
-            for (String groupId : groupMap.keySet()) {
+            for (String groupId: groupMap.keySet()) {
                 Query.GroupInfo groupInfo = Query.GroupInfo.newBuilder().setGroupId(groupId).build();
                 groupInfoList.add(groupInfo);
                 log.info("groupId-----$" + groupId);
@@ -199,5 +200,24 @@ public class NodeUtils {
         }
 
         return groupInfoList;
+    }
+
+    public static IResourcesConfigBundle getResourcesConfigBundle(String groupId) {
+        Node node = null;
+        try {
+            node = Node.getInstance();
+        } catch (NodeException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        if (node != null) {
+            Map<String, Group> groupMap = node.getGroupMap();
+            Group group = groupMap.get(groupId);
+            if (group != null) {
+                return group.getGroupSupport().getResourcesConfigBundle();
+            }
+        }
+
+        return null;
     }
 }

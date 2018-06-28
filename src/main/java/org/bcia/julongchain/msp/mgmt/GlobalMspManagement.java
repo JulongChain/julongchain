@@ -81,7 +81,7 @@ public class GlobalMspManagement {
         MspConfig mspConfig = loadMspConfig();
         defaultCspValue = mspConfig.node.getCsp().getDefaultValue();
         defaultCsp = CspManager.getCsp(defaultCspValue);
-        if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(defaultCspValue)) {
+//        if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(defaultCspValue)) {
             //解析配置文件
             log.info("build the mspconfig");
             if (!new File(localmspdir).exists()) {
@@ -90,11 +90,11 @@ public class GlobalMspManagement {
             MspConfigPackage.MSPConfig buildMspConfig = MspConfigHelper.buildMspConfig(localmspdir, mspId);
             loadMsp = getLocalMsp().setup(buildMspConfig);
 
-        } else if (IFactoryOpts.PROVIDER_GMT0016.equalsIgnoreCase(defaultCspValue)) {
-
-        } else if (IFactoryOpts.PROVIDER_GMT0018.equalsIgnoreCase(defaultCspValue)) {
-
-        }
+//        } else if (IFactoryOpts.PROVIDER_GMT0016.equalsIgnoreCase(defaultCspValue)) {
+//
+//        } else if (IFactoryOpts.PROVIDER_GMT0018.equalsIgnoreCase(defaultCspValue)) {
+//
+//        }
 
         return loadMsp;
     }
@@ -117,30 +117,33 @@ public class GlobalMspManagement {
      */
     public static IMsp getLocalMsp() {
         if (localMsp == null) {
-            //读取配置文件构造选项集合
-            List<IFactoryOpts> optsList = MspConfigHelper.buildFactoryOpts();
-            CspManager.initCspFactories(optsList);
+//            //读取配置文件构造选项集合
+//            List<IFactoryOpts> optsList = MspConfigHelper.buildFactoryOpts();
+//            CspManager.initCspFactories(optsList);
             MspConfig mspConfig = null;
             try {
                 mspConfig = loadMspConfig();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-            defaultCspValue = mspConfig.node.getCsp().getDefaultValue();
-            defaultCsp = CspManager.getCsp(defaultCspValue);
-            if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(defaultCspValue)) {
-                //构建fabricmspconfig
-                // MspConfigPackage.MSPConfig fabricMSPConfig = MspConfigHelper.buildMspConfig( mspConfig.node.getMspConfigPath());
-                MspConfigPackage.MSPConfig buildMspConfig = MspConfigHelper.buildMspConfig(mspConfig.node.getMspConfigPath(), mspConfig.node.getLocalMspId());
-                localMsp = new Msp().setup(buildMspConfig);
-                return localMsp;
-
-            } else if (IFactoryOpts.PROVIDER_GMT0016.equalsIgnoreCase(defaultCspValue)) {
-
-            } else if (IFactoryOpts.PROVIDER_GMT0018.equalsIgnoreCase(defaultCspValue)) {
-
-            }
+//            defaultCspValue = mspConfig.getNode().getCsp().getDefaultValue();
+//            defaultCsp = CspManager.getCsp(defaultCspValue);
+//            if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(defaultCspValue)) {
+            //构建fabricmspconfig
+            // MspConfigPackage.MSPConfig fabricMSPConfig = MspConfigHelper.buildMspConfig( mspConfig.node.getMspConfigPath());
+            MspConfigPackage.MSPConfig buildMspConfig =
+                    MspConfigHelper.buildMspConfig(mspConfig.getNode().getMspConfigPath(), mspConfig.getNode().getLocalMspId());
+            localMsp = new Msp().setup(buildMspConfig);
             return localMsp;
+
+//            } else if (IFactoryOpts.PROVIDER_GMT0016.equalsIgnoreCase(defaultCspValue)) {
+//
+//            } else if (IFactoryOpts.PROVIDER_GMT0018.equalsIgnoreCase(defaultCspValue)) {
+//
+//            }
+
+
+//            return localMsp;
         }
         return localMsp;
     }
