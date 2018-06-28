@@ -142,8 +142,8 @@ public class QueryHelper {
                     if(entry.getKey() != null){
                         KvRwset.RangeQueryInfo rqi = itr.getRangeQueryInfo();
                         KvRwset.QueryReads.Builder builder = rqi.getRawReads().toBuilder();
-                        builder = setKvReads(builder, entry.getKey());
-                        rqi.toBuilder().setRawReads(builder);
+                        //add all kvReads
+                        builder.addAllKvReads(entry.getKey());
                         itr.setRangeQueryInfo(rqi);
                     }
                     if(entry.getValue() != null){
@@ -158,16 +158,6 @@ public class QueryHelper {
                 itr.close();
             }
         }
-    }
-
-    /**
-     * grpc set各种list貌似只能一个一个添加:( ...
-     */
-    private KvRwset.QueryReads.Builder setKvReads(KvRwset.QueryReads.Builder builder, List<KvRwset.KVRead> list){
-        for (int i = 0; i < list.size(); i++) {
-            builder.addKvReads(i, list.get(i));
-        }
-        return builder;
     }
 
     private void addToReadSet(String ns, String key, Height ver){

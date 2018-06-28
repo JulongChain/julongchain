@@ -158,7 +158,7 @@ public class BlockIndex implements Index {
         }
         byte[] b = db.get(constructBlockHashKey(blockHash));
         if(b == null){
-        	logger.info("Got null result");
+        	logger.info("Get block loc by hash got null result");
         	return null;
         }
         FileLocPointer blkLoc = new FileLocPointer();
@@ -177,7 +177,7 @@ public class BlockIndex implements Index {
         }
         byte[] b = db.get(constructBlockNumKey(blockID));
         if(b == null){
-	        logger.info("Got null result");
+	        logger.info("Get block loc by block num got null result");
         	return null;
         }
         FileLocPointer blkLoc = new FileLocPointer();
@@ -196,7 +196,7 @@ public class BlockIndex implements Index {
         }
         byte[] b = db.get(constructTxIDKey(txID));
         if(b == null){
-	        logger.info("Got null result");
+	        logger.info("Get tx loc got null result");
         	return null;
         }
         FileLocPointer txFLP = new FileLocPointer();
@@ -215,7 +215,7 @@ public class BlockIndex implements Index {
         }
         byte[] b = db.get(constructBlockTxIDKey(txID));
         if(b == null){
-	        logger.info("Got null result");
+	        logger.info("Get block loc by tx id got null result");
         	return null;
         }
         FileLocPointer txFLP = new FileLocPointer();
@@ -234,7 +234,7 @@ public class BlockIndex implements Index {
         }
         byte[] b = db.get(constructBlockNumTranNumKey(blockNum, tranNum));
         if(b == null){
-	        logger.info("Got null result");
+	        logger.info("Get tx loc by block num tran num got null result");
         	return null;
         }
         FileLocPointer txFLP = new FileLocPointer();
@@ -253,7 +253,7 @@ public class BlockIndex implements Index {
         }
         byte[] raw = db.get(constructTxValidationCodeIDKey(txID));
         if(raw == null){
-	        logger.info("Got null result");
+	        logger.info("Get tx validationg code by tx id got null result");
         	return null;
         } else if (raw.length != 1){
         	logger.error("Got wrong txValidationCode which length is 1");

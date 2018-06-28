@@ -375,7 +375,7 @@ public class BlockFileManager {
      * 根据区块号查找区块
      */
 	public Common.Block retrieveBlockByNumber(long blockNum) throws LedgerException {
-        logger.debug(String.format("retrieveBlockByHash() - blockHash = [%d]", blockNum));
+        logger.debug(String.format("retrieveBlockByHash() - blockNum = [%d]", blockNum));
         if(blockNum == Long.MAX_VALUE){
             blockNum = getBlockchainInfo().getHeight() - 1;
         }
