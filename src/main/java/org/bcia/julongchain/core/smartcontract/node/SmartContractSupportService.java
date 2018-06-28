@@ -23,6 +23,8 @@ import org.apache.commons.logging.LogFactory;
 import org.bcia.julongchain.common.exception.LevelDBException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.core.ledger.INodeLedger;
+import org.bcia.julongchain.core.ledger.ITxSimulator;
+import org.bcia.julongchain.core.ledger.TxSimulationResults;
 import org.bcia.julongchain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.julongchain.core.ledger.kvledger.history.historydb.HistoryDBHelper;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
@@ -35,6 +37,7 @@ import org.bcia.julongchain.core.node.util.NodeUtils;
 import org.bcia.julongchain.core.smartcontract.client.SmartContractSupportClient;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.ledger.queryresult.KvQueryResult;
+import org.bcia.julongchain.protos.ledger.rwset.Rwset;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.julongchain.protos.node.*;
 
@@ -446,6 +449,19 @@ public class SmartContractSupportService
 	    QueryResult next = itr.next();
 	    System.out.println(((KvRwset.Version) next.getObj()).getBlockNum());
 	    System.out.println(((KvRwset.Version) next.getObj()).getTxNum());
+	    next = itr.next();
+	    System.out.println(((KvRwset.Version) next.getObj()).getBlockNum());
+	    System.out.println(((KvRwset.Version) next.getObj()).getTxNum());
 	    itr.close();
+
+
+	    ITxSimulator txSimulator = l.newTxSimulator("mytestgroupid2");
+	    byte[] state = txSimulator.getState("mytestgroupid2", "key1");
+	    System.out.println(new String(state));
+	    txSimulator.setState("mytestgroupid1", "key", "value".getBytes());
+	    TxSimulationResults txSimulationResults = txSimulator.getTxSimulationResults();
+	    Rwset.TxReadWriteSet publicReadWriteSet = txSimulationResults.getPublicReadWriteSet();
+	    Rwset.NsReadWriteSet nsRwset = publicReadWriteSet.getNsRwset(0);
+	    System.out.println(nsRwset.getNamespace());
     }
 }
