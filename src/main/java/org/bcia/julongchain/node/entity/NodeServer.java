@@ -15,10 +15,8 @@
  */
 package org.bcia.julongchain.node.entity;
 
-import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.gossip.GossipService;
-import org.apache.gossip.model.SharedGossipDataMessage;
 import org.bcia.julongchain.common.exception.GossipException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.NodeException;
@@ -46,12 +44,13 @@ import org.bcia.julongchain.events.producer.EventsServerConfig;
 import org.bcia.julongchain.gossip.GossipServiceUtil;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.node.Node;
+import org.bcia.julongchain.node.common.client.AdminClient;
+import org.bcia.julongchain.node.common.client.IAdminClient;
 import org.bcia.julongchain.node.util.NodeConstant;
 import org.bcia.julongchain.protos.common.Common;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
 import java.util.HashMap;
 import java.util.List;
@@ -162,78 +161,78 @@ public class NodeServer {
         recordPid(nodeConfig);
     }
 
-  // 启动gossip，定时读取数据
-  private void startGossipService() throws NodeException {
-    //  查询群组
-    try {
-      List<String> ledgerIds = LedgerManager.getLedgerIDs();
-      if (CollectionUtils.isNotEmpty(ledgerIds)) {
-        node.setLedgerIds(ledgerIds);
-      }
-    } catch (LedgerException e) {
-      log.error(e.getMessage(), e);
-      throw new NodeException(e.getMessage(), e);
-    }
-
-    // 启动gossip
-    try {
-      GossipService gossipService = GossipServiceUtil.startCommitterGossip();
-      new Thread() {
-        public void run() {
-          while (true) {
-
-            // 处理当前所有的群组
-            List<String> ledgerIds = null;
-            try {
-              ledgerIds = LedgerManager.getLedgerIDs();
-            } catch (LedgerException e) {
-              log.error(e.getMessage(), e);
+    // 启动gossip，定时读取数据
+    private void startGossipService() throws NodeException {
+        //  查询群组
+        try {
+            List<String> ledgerIds = LedgerManager.getLedgerIDs();
+            if (CollectionUtils.isNotEmpty(ledgerIds)) {
+                node.setLedgerIds(ledgerIds);
             }
-            log.info("当前所有群组：" + ledgerIds.toString());
-            for (String ledgerId : ledgerIds) {
-              log.info("开始检查群组[" + ledgerId + "] 是否有新的区块");
-              long blockHeight = 0l;
-              try {
-                blockHeight = LedgerManager.openLedger(ledgerId).getBlockchainInfo().getHeight();
-                log.info("当前群组[" + ledgerId + "] 的区块高度是：" + blockHeight);
-                if (blockHeight == 0l) {
-                  log.info("群组高度为0，退出处理");
-                  continue;
-                }
-
-                Common.Block block =
-                    GossipServiceUtil.getData(gossipService, ledgerId, blockHeight);
-                if (block == null) {
-                  log.info("当前群组[" + ledgerId + "]" + "没有新的区块[" + blockHeight + "]");
-                  continue;
-                }
-                log.info("发现新区块");
-                BlockAndPvtData blockAndPvtData = new BlockAndPvtData(block, null, null);
-                log.info("完成转换区块");
-                log.info("开始保存区块");
-                LedgerManager.openLedger(ledgerId).commitWithPvtData(blockAndPvtData);
-                log.info("完成保存区块");
-              } catch (LedgerException e) {
-                log.error(e.getMessage(), e);
-              } catch (GossipException e) {
-                log.error(e.getMessage(), e);
-              }
-            }
-
-            // 1s查询一次
-            try {
-              Thread.sleep(10000);
-            } catch (Exception e) {
-              log.error(e.getMessage(), e);
-            }
-          }
+        } catch (LedgerException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException(e.getMessage(), e);
         }
-      }.start();
-    } catch (GossipException e) {
-      log.error(e.getMessage(), e);
-      throw new NodeException(e.getMessage(), e);
+
+        // 启动gossip
+        try {
+            GossipService gossipService = GossipServiceUtil.startCommitterGossip();
+            new Thread() {
+                public void run() {
+                    while (true) {
+
+                        // 处理当前所有的群组
+                        List<String> ledgerIds = null;
+                        try {
+                            ledgerIds = LedgerManager.getLedgerIDs();
+                        } catch (LedgerException e) {
+                            log.error(e.getMessage(), e);
+                        }
+                        log.info("当前所有群组：" + ledgerIds.toString());
+                        for (String ledgerId: ledgerIds) {
+                            log.info("开始检查群组[" + ledgerId + "] 是否有新的区块");
+                            long blockHeight = 0l;
+                            try {
+                                blockHeight = LedgerManager.openLedger(ledgerId).getBlockchainInfo().getHeight();
+                                log.info("当前群组[" + ledgerId + "] 的区块高度是：" + blockHeight);
+                                if (blockHeight == 0l) {
+                                    log.info("群组高度为0，退出处理");
+                                    continue;
+                                }
+
+                                Common.Block block =
+                                        GossipServiceUtil.getData(gossipService, ledgerId, blockHeight);
+                                if (block == null) {
+                                    log.info("当前群组[" + ledgerId + "]" + "没有新的区块[" + blockHeight + "]");
+                                    continue;
+                                }
+                                log.info("发现新区块");
+                                BlockAndPvtData blockAndPvtData = new BlockAndPvtData(block, null, null);
+                                log.info("完成转换区块");
+                                log.info("开始保存区块");
+                                LedgerManager.openLedger(ledgerId).commitWithPvtData(blockAndPvtData);
+                                log.info("完成保存区块");
+                            } catch (LedgerException e) {
+                                log.error(e.getMessage(), e);
+                            } catch (GossipException e) {
+                                log.error(e.getMessage(), e);
+                            }
+                        }
+
+                        // 1s查询一次
+                        try {
+                            Thread.sleep(10000);
+                        } catch (Exception e) {
+                            log.error(e.getMessage(), e);
+                        }
+                    }
+                }
+            }.start();
+        } catch (GossipException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException(e.getMessage(), e);
+        }
     }
-  }
 
     private void initSysSmartContracts() {
         log.info("Init system smart contracts");
@@ -396,7 +395,20 @@ public class NodeServer {
         return processId;
     }
 
-    public void status() {
+    public int status() throws NodeException {
+        NodeConfig nodeConfig = NodeConfigFactory.getNodeConfig();
 
+        //从配置中获取要监听的地址和端口
+        NetAddress address = null;
+        try {
+            String listenAddress = nodeConfig.getNode().getListenAddress();
+            address = new NetAddress(listenAddress);
+
+            IAdminClient adminClient = new AdminClient(address.getHost(), address.getPort());
+            return adminClient.getStatus();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException(e);
+        }
     }
 }
