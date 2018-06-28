@@ -238,10 +238,11 @@ public class SmartContractSupportService
         // 收到putState信息
         if (message.getType().equals(SmartContractMessage.Type.PUT_STATE)) {
           try {
-            SmartContractShim.PutState putState = null;
-            putState = SmartContractShim.PutState.parseFrom(message.getPayload());
-
-          } catch (InvalidProtocolBufferException e) {
+            SmartContractShim.PutState putState = SmartContractShim.PutState.parseFrom(message.getPayload());
+            INodeLedger nodeLedger = NodeUtils.getLedger(groupId);
+            ITxSimulator txSimulator = nodeLedger.newTxSimulator(txId);
+            txSimulator.setState(smartContractId, putState.getKey(), putState.getValue().toByteArray());
+          } catch (Exception e) {
             logger.error(e.getMessage(), e);
           }
 
