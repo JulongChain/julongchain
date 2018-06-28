@@ -444,24 +444,15 @@ public class SmartContractSupportService
 
     public static void main(String[] args) throws Exception {
 	    INodeLedger l = NodeUtils.getLedger("mytestgroupid2");
-	    IHistoryQueryExecutor historyQueryExecutro = l.newHistoryQueryExecutor();
-	    IResultsIterator itr = historyQueryExecutro.getHistoryForKey("mytestgroupid2", "key2");
-	    QueryResult next = itr.next();
-	    System.out.println(((KvRwset.Version) next.getObj()).getBlockNum());
-	    System.out.println(((KvRwset.Version) next.getObj()).getTxNum());
-	    next = itr.next();
-	    System.out.println(((KvRwset.Version) next.getObj()).getBlockNum());
-	    System.out.println(((KvRwset.Version) next.getObj()).getTxNum());
-	    itr.close();
-
-
 	    ITxSimulator txSimulator = l.newTxSimulator("mytestgroupid2");
 	    byte[] state = txSimulator.getState("mytestgroupid2", "key1");
-	    System.out.println(new String(state));
+//	    System.out.println(new String(state));
 	    txSimulator.setState("mytestgroupid1", "key", "value".getBytes());
 	    TxSimulationResults txSimulationResults = txSimulator.getTxSimulationResults();
 	    Rwset.TxReadWriteSet publicReadWriteSet = txSimulationResults.getPublicReadWriteSet();
 	    Rwset.NsReadWriteSet nsRwset = publicReadWriteSet.getNsRwset(0);
-	    System.out.println(nsRwset.getNamespace());
+	    ByteString rwset = nsRwset.getRwset();
+	    System.out.println(rwset.toStringUtf8());
     }
+
 }

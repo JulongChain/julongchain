@@ -35,6 +35,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
@@ -55,6 +56,7 @@ public class LockBasedTxManager implements ITxManager {
     private UpdateBatch batch;
     private Common.Block currentBlock;
     private Map<String, IStateListener> stateListeners;
+    private static Map<String, LockBasedTxSimulator> txSimulatorMap = new HashMap<>();
 
     public LockBasedTxManager(String ledgerID,
                               IDB db,
@@ -73,8 +75,15 @@ public class LockBasedTxManager implements ITxManager {
 
     @Override
     public synchronized ITxSimulator newTxSimulator(String txid) throws LedgerException {
-        logger.debug("Constructing new tx simulator");
-        return new LockBasedTxSimulator(this, txid);
+	    if (txSimulatorMap.containsKey(txid)) {
+		    logger.debug("Contains tx simulator with txid: " + txid);
+		    return txSimulatorMap.get(txid);
+	    } else {
+		    logger.debug("Constructing new tx simulator");
+		    LockBasedTxSimulator simulator = new LockBasedTxSimulator(this, txid);
+		    txSimulatorMap.put(txid, simulator);
+		    return simulator;
+	    }
     }
 
     @Override
