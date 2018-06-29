@@ -13,19 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.core.policy;
+package org.bcia.julongchain.node.common.client;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.protos.node.ProposalPackage; /**
+/**
  * 类描述
  *
- * @author sunianle
- * @date 3/13/18
+ * @author zhouhui
+ * @date 2018/06/28
  * @company Dingxuan
- * @deprecated
  */
-public interface IPolicyChecker {
+public interface IAdminClient {
+    /**
+     * 获取状态值
+     *
+     * @return
+     */
+    int getStatus();
 
-    void checkPolicyNoGroup(String admins, ProposalPackage.SignedProposal sp) throws JavaChainException;
-
+    void close();
 }

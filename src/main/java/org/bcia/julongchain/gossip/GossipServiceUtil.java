@@ -20,10 +20,11 @@ import org.apache.gossip.GossipMember;
 import org.apache.gossip.GossipService;
 import org.apache.gossip.GossipSettings;
 import org.apache.gossip.RemoteGossipMember;
+import org.apache.gossip.crdt.Crdt;
+import org.apache.gossip.crdt.OrSet;
 import org.apache.gossip.event.GossipListener;
 import org.apache.gossip.event.GossipState;
 import org.apache.gossip.model.SharedGossipDataMessage;
-import org.apache.gossip.udp.UdpSharedGossipDataMessage;
 import org.bcia.julongchain.common.exception.GossipException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
@@ -34,10 +35,7 @@ import org.bcia.julongchain.protos.common.Common;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Gossip服务的相关方法，<br>
@@ -192,12 +190,14 @@ public class GossipServiceUtil {
     }
     log.info("fileNumber:" + fileNumber);
 
-    SharedGossipDataMessage m = new UdpSharedGossipDataMessage();
-    m.setExpireAt(Long.MAX_VALUE);
+    SharedGossipDataMessage m = new SharedGossipDataMessage();
+    // m.setTimestamp(System.currentTimeMillis());
     m.setKey(group + "-" + seqNum);
-    m.setPayload(fileNumber);
-    m.setTimestamp(System.currentTimeMillis());
-    gossipService.gossipSharedData(m);
+    m.setExpireAt(Long.MAX_VALUE);
+    m.setPayload(new OrSet<String>(fileNumber + ""));
+
+    gossipService.getGossipManager().merge(m);
+
     log.info("send gossip:[" + group + "-" + seqNum + "]");
 
     for (int i = 0; i < fileNumber; i++) {
@@ -211,11 +211,12 @@ public class GossipServiceUtil {
       String str = blockStr.substring(start, end);
 
       SharedGossipDataMessage msg = new SharedGossipDataMessage();
-      msg.setExpireAt(Long.MAX_VALUE);
+      // msg.setTimestamp(System.currentTimeMillis());
       msg.setKey(group + "-" + seqNum + "-" + i);
-      msg.setPayload(str);
-      msg.setTimestamp(System.currentTimeMillis());
-      gossipService.gossipSharedData(msg);
+      msg.setExpireAt(Long.MAX_VALUE);
+      msg.setPayload(new OrSet<String>(str));
+
+      gossipService.getGossipManager().merge(msg);
 
       log.info("send gossip detail:[" + group + "-" + seqNum + "-" + i + "]");
     }
@@ -248,38 +249,51 @@ public class GossipServiceUtil {
             + seqNum
             + "])");
 
-    SharedGossipDataMessage sharedData = gossipService.findSharedData(group + "-" + seqNum);
+    Integer fileNumber = 0;
 
-    log.info("gossip get data, check [" + group + "-" + seqNum + "]");
-    if (sharedData == null) {
-      log.info("[" + group + "-" + seqNum + "] is null");
+    Crdt crdtFileNumber = gossipService.getGossipManager().findCrdt(group + "-" + seqNum);
+    if (crdtFileNumber == null) {
+      log.info("crdtFileNumber is null");
       return null;
     }
+    if (crdtFileNumber.value() == null) {
+      log.info("crdtFileNumber value is null");
+      return null;
+    }
+    Set setsFIleNumber = (Set) crdtFileNumber.value();
+    Iterator iteratorFileNumber = setsFIleNumber.iterator();
+    if (iteratorFileNumber.hasNext()) {
+      log.info(iteratorFileNumber.next().toString());
+      fileNumber = Integer.parseInt((String) iteratorFileNumber.next());
+    }
 
-    Object fileNumberPayload = sharedData.getPayload();
-
-    Integer fileNumber = (Integer) fileNumberPayload;
     log.info("=====================fileNumber:" + fileNumber);
 
     if (fileNumber < 1) {
+      log.info("fileNumber:"+fileNumber);
       return null;
     }
 
     StringBuffer sb = new StringBuffer("");
 
     for (int i = 0; i < fileNumber; i++) {
-      SharedGossipDataMessage m = gossipService.findSharedData(group + "-" + seqNum + "-" + i);
-      log.info("gossip get data detail, check [" + group + "-" + seqNum + "-" + i + "]");
-      if (m == null) {
-        log.info("=====================[" + group + "-" + seqNum + "-" + i + "] is null");
+
+      Crdt crdtDetail = gossipService.getGossipManager().findCrdt(group + "-" + seqNum + "-" + i);
+      if (crdtDetail == null) {
+        log.info("crdtDetail is null");
         return null;
       }
-      Object p = m.getPayload();
-      if (p == null) {
+      if (crdtDetail.value() == null) {
+        log.info("crdtDetail value is null");
         return null;
       }
-      String str = (String) p;
-      sb.append(str);
+      Set setsDetail = (Set) crdtDetail.value();
+      Iterator iteratorDetail = setsDetail.iterator();
+      if (iteratorDetail.hasNext()) {
+        log.info(iteratorDetail.next().toString());
+        fileNumber = Integer.parseInt((String) iteratorDetail.next());
+        sb.append(iteratorDetail.next());
+      }
     }
 
     byte[] bytes = new byte[0];
@@ -331,7 +345,10 @@ public class GossipServiceUtil {
     GossipService gossipService = newGossipService(committerAddress, consenterAddress);
     gossipService.start();
     log.info(
-        "start committer gossip: address[" + committerAddress + "] seedAddress:" + consenterAddress);
+        "start committer gossip: address["
+            + committerAddress
+            + "] seedAddress:"
+            + consenterAddress);
     return gossipService;
   }
 

@@ -452,7 +452,7 @@ public class Endorser implements IEndorserServer {
                         String deployScName = deployScId.getName();
                         String deployScVersion = deployScId.getVersion();
                         if (!endorserSupport.isSysSmartContract(deployScName)) {
-                            endorserSupport.execute(groupId, deployScName, deployScVersion, txId + CommConstant.TX_INIT, false,
+                            endorserSupport.execute(groupId, deployScName, deployScVersion, txId, false,
                                     signedProposal, proposal, deploymentSpec);
                         } else {
                             throw new NodeException("Should not be system smart contract");

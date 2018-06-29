@@ -26,5 +26,13 @@ import org.bcia.julongchain.protos.node.ProposalResponsePackage;
  * @company Dingxuan
  */
 public interface IEndorserClient {
+    /**
+     * 发送背书请求
+     *
+     * @param signedProposal
+     * @return
+     */
     ProposalResponsePackage.ProposalResponse sendProcessProposal(ProposalPackage.SignedProposal signedProposal);
+
+    void close();
 }

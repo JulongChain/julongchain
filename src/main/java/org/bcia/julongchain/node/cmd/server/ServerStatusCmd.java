@@ -38,7 +38,7 @@ public class ServerStatusCmd extends AbstractNodeServerCmd {
 
     @Override
     public void execCmd(String[] args) throws ParseException, NodeException {
-        nodeServer.status();
+        log.info("Node Server Status: " + nodeServer.status());
     }
 
 }

@@ -29,7 +29,7 @@ public class NodeConstant {
 	public static final String CLI_LOG = "logging";
 	public static final String GROUP = "group";
 
-	public static final String CURRENT_VERSION = "0.5";
+	public static final String CURRENT_VERSION = "0.8";
 
 	public static final int PROVIDER_CSP = 0;
 }

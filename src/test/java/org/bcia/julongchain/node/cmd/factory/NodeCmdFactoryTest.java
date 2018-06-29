@@ -1,6 +1,7 @@
 package org.bcia.julongchain.node.cmd.factory;
 
 import org.bcia.julongchain.BaseJunit4Test;
+import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.node.cmd.INodeCmd;
 import org.bcia.julongchain.node.cmd.group.GroupCreateCmd;
@@ -17,7 +18,6 @@ import org.bcia.julongchain.node.cmd.version.NodeVersionCmd;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 节点命令工厂单元测试
@@ -27,11 +27,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @company Dingxuan
  */
 public class NodeCmdFactoryTest extends BaseJunit4Test {
-    @Autowired
-    private Node node;
 
     @Test
-    public void getInstance() {
+    public void getInstance() throws NodeException {
+        Node node = Node.getInstance();
+
         //----------------------------------------正常用例集--------------------------------------------//
         //创建群组命令
         INodeCmd nodeCmd1 = NodeCmdFactory.getInstance(node, "group", "create");
