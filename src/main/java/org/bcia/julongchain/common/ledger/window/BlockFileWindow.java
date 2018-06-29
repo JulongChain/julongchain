@@ -42,9 +42,13 @@ public class BlockFileWindow {
 	}
 
 	private static List<Common.Block> getBlocks(String ledgerID, long blockFileNum) throws Exception {
-		List<Common.Block> list = new ArrayList<>();
 		String filePath = getBlockFile(ledgerID, blockFileNum);
 		System.out.println("区块文件路径：" + filePath);
+		return getBlocks(filePath);
+	}
+
+	private static List<Common.Block> getBlocks(String filePath) throws Exception {
+		List<Common.Block> list = new ArrayList<>();
 		File file = new File(filePath);
 		int len = 0;
 		int i = 0;

@@ -35,12 +35,18 @@ public class LevelDBWindow {
 	private final static int PVT_DATA_LEVELDB = 3;
 
 	public static void main(String[] args) throws Exception {
-		soutLevelDB(STATE_LEVELDB,  //数据库类型
-				null, 		//kv数据库中起始key, null为全部
-				true,    	//展示new String(key)
-				30,			//每行展示key byte[]长度
-				true,		//展示new String(value)
-				-1			//每行l展示value byte[]长度
+					//数据库类型
+		soutLevelDB(STATE_LEVELDB,
+					//kv数据库中起始key, null为全部
+					null,
+					//展示new String(key)
+					true,
+					//每行展示key byte[]长度
+					-1,
+					//展示new String(value)
+					true,
+					//每行l展示value byte[]长度
+					-1
 		);
 	}
 
