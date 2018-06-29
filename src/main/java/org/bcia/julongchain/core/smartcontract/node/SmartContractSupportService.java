@@ -184,7 +184,7 @@ public class SmartContractSupportService
             ITxSimulator txSimulator = nodeLedger.newTxSimulator(txId);
             byte[] worldStateBytes = txSimulator.getState(smartContractId, key);
 
-            if (worldStateBytes == null || worldStateBytes.length > 10000) {
+            if (worldStateBytes == null) {
               worldStateBytes = new byte[] {};
               // 发送读取结果到shim端
               SmartContractMessage responseMessage =

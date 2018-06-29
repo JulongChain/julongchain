@@ -174,7 +174,7 @@ public class GossipServiceUtil {
     try {
       blockStr = new String(data.toByteArray(), "ISO8859-1");
       log.info("=================================================");
-       log.info("blockStr:" + blockStr);
+//       log.info("blockStr:" + blockStr);
       log.info("=================================================");
     } catch (UnsupportedEncodingException e) {
       log.error(e.getMessage(), e);

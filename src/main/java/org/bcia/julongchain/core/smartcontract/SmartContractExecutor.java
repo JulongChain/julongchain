@@ -112,7 +112,7 @@ public class SmartContractExecutor {
                 }
                 return new Object[]{response, responseMessage.getSmartContractEvent()};
             } else {
-                throw new SmartContractException("execute smart contract fail: " + responseMessage.getPayload());
+                throw new SmartContractException("execute smart contract fail: " + responseMessage.getPayload().toStringUtf8());
             }
         }
 
