@@ -17,7 +17,9 @@
 package org.bcia.julongchain.common.policycheck;
 
 import org.bcia.julongchain.common.exception.PolicyException;
+import org.bcia.julongchain.common.policycheck.cauthdsl.CAuthDsl;
 import org.bcia.julongchain.common.util.proto.SignedData;
+import org.bcia.julongchain.msp.mgmt.Msp;
 import org.bcia.julongchain.msp.mgmt.MspManager;
 import org.junit.After;
 import org.junit.Before;
@@ -53,7 +55,9 @@ public class CAuthDslTest {
         sds.add(sd1);
         sds.add(sd2);
         sds.add(sd3);
-        MspManager deserializer = new MspManager();//mock(MspManager.class);
+       // MspManager deserializer = new MspManager();//mock(MspManager.class);
+        Msp deserializer = new Msp();
+        CAuthDsl.deduplicate(sds,deserializer);
     }
     @Test
     public void compile() throws PolicyException {
@@ -65,6 +69,6 @@ public class CAuthDslTest {
         sds.add(sd2);
         sds.add(sd3);
         MspManager deserializer = new MspManager();//mock(MspManager.class);
-        //CAuthDsl.deduplicate(sds,deserializer);
+
     }
 }

@@ -52,15 +52,15 @@ message StaticCollectionConfig {
 
 // Collection policy configuration. Initially, the configuration can only
 // contain a SignaturePolicy. In the future, the SignaturePolicy may be a
-// more general Policy. Instead of containing the actual policy, the
+// more general PolicyConstant. Instead of containing the actual policy, the
 // configuration may in the future contain a string reference to a policy.
 message CollectionPolicyConfig {
     oneof payload {
         // Initially, only a signature policy is supported.
         SignaturePolicyEnvelope signature_policy = 1;
-        // Later, the SignaturePolicy will be replaced by a Policy.
-        //        Policy policy = 1;
-        // A reference to a Policy is planned to be added later.
+        // Later, the SignaturePolicy will be replaced by a PolicyConstant.
+        //        PolicyConstant policy = 1;
+        // A reference to a PolicyConstant is planned to be added later.
 //        string reference = 2;
     }
 }

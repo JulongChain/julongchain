@@ -112,7 +112,7 @@ message MSPRole {
         MEMBER = 0; // Represents an MSP Member
         ADMIN  = 1; // Represents an MSP Admin
         CLIENT = 2; // Represents an MSP Client
-        NODE = 3; // Represents an MSP Node
+        NODE = 3; // Represents an MSP PolicyNode
     }
 
     // MSPRoleType defines which of the available, pre-defined MSP-roles

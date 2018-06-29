@@ -23,7 +23,7 @@ package org.bcia.julongchain.common.exception;
  * @company Dingxuan
  */
 public class PolicyException extends JavaChainException {
-    private static final String MODULE_NAME = "[Policy]";
+    private static final String MODULE_NAME = "[PolicyConstant]";
 
     public PolicyException() {
         super();

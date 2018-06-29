@@ -33,7 +33,7 @@ public class Consenter {
 
     public void execCmd(String[] args) {
         if (args.length <= 0) {
-            log.warn("Node command need more args-----");
+            log.warn("PolicyNode command need more args-----");
             return;
         }
         String command = args[0];

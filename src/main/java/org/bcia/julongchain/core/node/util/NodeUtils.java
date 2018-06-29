@@ -50,9 +50,9 @@ public class NodeUtils {
 //            return null;
 //        }
 //
-//        Node node = null;
+//        PolicyNode node = null;
 //        try {
-//            node = Node.getInstance();
+//            node = PolicyNode.getInstance();
 //        } catch (NodeException e) {
 //            log.error(e.getMessage(), e);
 //        }

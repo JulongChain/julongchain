@@ -30,12 +30,12 @@ node:
                       # Location of Key Store
                           # If "", defaults to 'mspConfigPath'/keystore
                           # TODO: Ensure this is read with fabric/core/config.GetPath() once ready
-                      publicKeyStore: /opt/msp/keystore/sdt/
-                      privateKeyStore: /opt/msp/keystore/sdt/
-                      keyStore: /opt/msp/keystore/sdt/
+                      publicKeyStore: /opt/BCIAjava/javachain/src/main/resources/msp/keystore/publickey.pem
+                      privateKeyStore: /opt/BCIAjava/javachain/src/main/resources/msp/keystore/privatekey.pem
+                      keyStore: /opt/BCIAjava/javachain/src/main/resources/msp/keystore
                 #privateKeyStore: /opt/msp/keystore/privatekey.pem
     # Path on the file system where node will find MSP local configurations
-    mspConfigPath: /opt/msp
+    mspConfigPath: /opt/BCIAjava/javachain/src/main/resources/msp
     #mspConfigPath: /opt/msp
     #mspConfigPath: /root/IdeaProjects/javachain/src/main/resources/msp
 

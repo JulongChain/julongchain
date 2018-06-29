@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
 public class ConfigMapUtils {
     private static final String CHILD_PREFIX = "[Tree]   ";
     private static final String VALUE_PREFIX = "[Value]  ";
-    private static final String POLICY_PREFIX = "[Policy] ";
+    private static final String POLICY_PREFIX = "[PolicyConstant] ";
 
     private static final int MAX_LENGTH = 249;
     private static final String REGEX_GROUP_ID = "[a-z][a-z0-9.-]*";
