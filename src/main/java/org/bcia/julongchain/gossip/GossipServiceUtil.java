@@ -191,7 +191,7 @@ public class GossipServiceUtil {
     log.info("fileNumber:" + fileNumber);
 
     SharedGossipDataMessage m = new SharedGossipDataMessage();
-    m.setTimestamp(System.currentTimeMillis());
+    // m.setTimestamp(System.currentTimeMillis());
     m.setKey(group + "-" + seqNum);
     m.setExpireAt(Long.MAX_VALUE);
     m.setPayload(new OrSet<String>(fileNumber + ""));
@@ -211,7 +211,7 @@ public class GossipServiceUtil {
       String str = blockStr.substring(start, end);
 
       SharedGossipDataMessage msg = new SharedGossipDataMessage();
-      msg.setTimestamp(System.currentTimeMillis());
+      // msg.setTimestamp(System.currentTimeMillis());
       msg.setKey(group + "-" + seqNum + "-" + i);
       msg.setExpireAt(Long.MAX_VALUE);
       msg.setPayload(new OrSet<String>(str));
@@ -253,17 +253,17 @@ public class GossipServiceUtil {
 
     Crdt crdtFileNumber = gossipService.getGossipManager().findCrdt(group + "-" + seqNum);
     if (crdtFileNumber == null) {
-      log.info("null");
+      log.info("crdtFileNumber is null");
       return null;
     }
     if (crdtFileNumber.value() == null) {
-      log.info("null");
+      log.info("crdtFileNumber value is null");
       return null;
     }
     Set setsFIleNumber = (Set) crdtFileNumber.value();
     Iterator iteratorFileNumber = setsFIleNumber.iterator();
     if (iteratorFileNumber.hasNext()) {
-      System.out.println(iteratorFileNumber.next());
+      log.info(iteratorFileNumber.next().toString());
       fileNumber = Integer.parseInt((String) iteratorFileNumber.next());
     }
 
@@ -280,17 +280,17 @@ public class GossipServiceUtil {
 
       Crdt crdtDetail = gossipService.getGossipManager().findCrdt(group + "-" + seqNum + "-" + i);
       if (crdtDetail == null) {
-        log.info("null");
+        log.info("crdtDetail is null");
         return null;
       }
       if (crdtDetail.value() == null) {
-        log.info("null");
+        log.info("crdtDetail value is null");
         return null;
       }
       Set setsDetail = (Set) crdtDetail.value();
       Iterator iteratorDetail = setsDetail.iterator();
       if (iteratorDetail.hasNext()) {
-        System.out.println(iteratorDetail.next());
+        log.info(iteratorDetail.next().toString());
         fileNumber = Integer.parseInt((String) iteratorDetail.next());
         sb.append(iteratorDetail.next());
       }
