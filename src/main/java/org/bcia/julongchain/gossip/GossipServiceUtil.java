@@ -68,9 +68,6 @@ public class GossipServiceUtil {
 
     GossipService gossipService = null;
     try {
-      GossipSettings s = new GossipSettings();
-      s.setWindowSize(1000);
-      s.setGossipInterval(100);
 
       gossipService =
           new GossipService(
@@ -79,7 +76,7 @@ public class GossipServiceUtil {
               UUID.randomUUID().toString(),
               new HashMap<>(),
               new ArrayList<>(),
-              s,
+              new GossipSettings(),
               new GossipListener() {
                 @Override
                 public void gossipEvent(GossipMember member, GossipState state) {}
@@ -119,10 +116,6 @@ public class GossipServiceUtil {
 
     GossipService gossipService = null;
     try {
-      GossipSettings s = new GossipSettings();
-      s.setWindowSize(1000);
-      s.setGossipInterval(100);
-
       gossipService =
           new GossipService(
               "julongchain",
@@ -130,7 +123,7 @@ public class GossipServiceUtil {
               UUID.randomUUID().toString(),
               new HashMap<>(),
               gossipMembers,
-              s,
+              new GossipSettings(),
               new GossipListener() {
                 @Override
                 public void gossipEvent(GossipMember member, GossipState state) {}
@@ -180,7 +173,9 @@ public class GossipServiceUtil {
     String blockStr = "";
     try {
       blockStr = new String(data.toByteArray(), "ISO8859-1");
-      // log.info("blockStr:" + blockStr);
+      log.info("=================================================");
+       log.info("blockStr:" + blockStr);
+      log.info("=================================================");
     } catch (UnsupportedEncodingException e) {
       log.error(e.getMessage(), e);
       throw new GossipException(e);
