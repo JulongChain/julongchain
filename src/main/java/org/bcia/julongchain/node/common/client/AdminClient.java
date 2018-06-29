@@ -15,26 +15,25 @@
  */
 package org.bcia.julongchain.node.common.client;
 
+import com.google.protobuf.Empty;
 import io.grpc.ManagedChannel;
 import io.grpc.netty.NettyChannelBuilder;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
-import org.bcia.julongchain.protos.node.EndorserGrpc;
-import org.bcia.julongchain.protos.node.ProposalPackage;
-import org.bcia.julongchain.protos.node.ProposalResponsePackage;
+import org.bcia.julongchain.protos.node.AdminGrpc;
 
 /**
- * 背书客户端实现
+ * 管理客户端实现
  *
  * @author zhouhui
- * @date 2018/3/19
+ * @date 2018/06/28
  * @company Dingxuan
  */
-public class EndorserClient implements IEndorserClient {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(EndorserClient.class);
+public class AdminClient implements IAdminClient {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(AdminClient.class);
     /**
-     * IP地址
+     * 主机地址
      */
     private String host;
     /**
@@ -44,23 +43,23 @@ public class EndorserClient implements IEndorserClient {
 
     private ManagedChannel managedChannel;
 
-    public EndorserClient(String host, int port) {
+    public AdminClient(String host, int port) {
         this.host = host;
         this.port = port;
     }
 
     @Override
-    public ProposalResponsePackage.ProposalResponse sendProcessProposal(ProposalPackage.SignedProposal signedProposal) {
+    public int getStatus() {
         managedChannel =
                 NettyChannelBuilder.forAddress(host, port).maxInboundMessageSize(CommConstant.MAX_GRPC_MESSAGE_SIZE)
                         .usePlaintext().build();
-        EndorserGrpc.EndorserBlockingStub stub = EndorserGrpc.newBlockingStub(managedChannel);
-        return stub.processProposal(signedProposal);
+        AdminGrpc.AdminBlockingStub stub = AdminGrpc.newBlockingStub(managedChannel);
+        return stub.getStatus(Empty.getDefaultInstance()).getStatusValue();
     }
 
     @Override
     public void close() {
-        log.info("EndorserClient close-----");
+        log.info("AdminClient close-----");
 
         managedChannel.shutdown();
     }
