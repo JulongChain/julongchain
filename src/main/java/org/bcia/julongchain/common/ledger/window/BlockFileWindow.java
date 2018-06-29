@@ -21,6 +21,8 @@ import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.common.Common;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 用于展示BlockFile文件
@@ -32,13 +34,15 @@ import java.io.File;
 public class BlockFileWindow {
 	public static void main(String[] args) throws Exception {
 		//账本ID
-		String ledgerID = "";
+		String ledgerID = "myGroup";
 		//区块文件号
 		long blockFileNum = 0;
-		soutBlock(ledgerID, blockFileNum);
+		List<Common.Block> blocks = getBlocks(ledgerID, blockFileNum);
+		blocks.forEach(System.out::println);
 	}
 
-	private static void soutBlock(String ledgerID, long blockFileNum) throws Exception {
+	private static List<Common.Block> getBlocks(String ledgerID, long blockFileNum) throws Exception {
+		List<Common.Block> list = new ArrayList<>();
 		String filePath = getBlockFile(ledgerID, blockFileNum);
 		System.out.println("区块文件路径：" + filePath);
 		File file = new File(filePath);
@@ -53,8 +57,9 @@ public class BlockFileWindow {
 			byte[] blockBytes = reader.read(len, l);
 			len += l;
 			Common.Block block = Common.Block.parseFrom(blockBytes);
-			System.out.println(block);
+			list.add(block);
 		}
+		return list;
 	}
 
 	private static String getBlockFile(String ledgerID, long blockNum) {
