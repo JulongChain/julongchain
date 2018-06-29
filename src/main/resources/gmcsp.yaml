@@ -1,6 +1,6 @@
 node:
     csp:
-        defaultValue: GM
+        defaultValue: gm
         factoryOpts:
           gm:
             # TODO: The default Hash and Security level needs refactoring to be
