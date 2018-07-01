@@ -33,6 +33,7 @@ import org.bcia.julongchain.protos.common.Common;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,7 +56,7 @@ public class GossipServiceUtil {
 
   private static JavaChainLog log = JavaChainLogFactory.getLog(GossipServiceUtil.class);
 
-  private static final Integer messageLength = 1000;
+  private static final Integer messageLength = 10000;
 
   /**
    * 启动gossip server服务，（seed节点）
@@ -72,7 +73,7 @@ public class GossipServiceUtil {
       gossipService =
           new GossipService(
               "julongchain",
-              URI.create("udp://" + address),
+              new URI("udp://" + address),
               UUID.randomUUID().toString(),
               new HashMap<>(),
               new ArrayList<>(),
@@ -85,6 +86,8 @@ public class GossipServiceUtil {
     } catch (InterruptedException e) {
       throw new GossipException(e.getMessage(), e);
     } catch (UnknownHostException e) {
+      throw new GossipException(e.getMessage(), e);
+    } catch (URISyntaxException e) {
       throw new GossipException(e.getMessage(), e);
     }
 
@@ -107,19 +110,19 @@ public class GossipServiceUtil {
     if (StringUtils.isEmpty(seedAddress)) {
       return newGossipService(address);
     }
-
-    List<GossipMember> gossipMembers = new ArrayList<>();
-    RemoteGossipMember remoteGossipMember =
-        new RemoteGossipMember(
-            "julongchain", URI.create("udp://" + seedAddress), UUID.randomUUID().toString());
-    gossipMembers.add(remoteGossipMember);
-
     GossipService gossipService = null;
     try {
+
+      List<GossipMember> gossipMembers = new ArrayList<>();
+      RemoteGossipMember remoteGossipMember =
+          new RemoteGossipMember(
+              "julongchain", new URI("udp://" + seedAddress), UUID.randomUUID().toString());
+      gossipMembers.add(remoteGossipMember);
+
       gossipService =
           new GossipService(
               "julongchain",
-              URI.create("udp://" + address),
+              new URI("udp://" + address),
               UUID.randomUUID().toString(),
               new HashMap<>(),
               gossipMembers,
@@ -132,6 +135,8 @@ public class GossipServiceUtil {
     } catch (InterruptedException e) {
       throw new GossipException(e.getMessage(), e);
     } catch (UnknownHostException e) {
+      throw new GossipException(e.getMessage(), e);
+    } catch (URISyntaxException e) {
       throw new GossipException(e.getMessage(), e);
     }
 
@@ -174,7 +179,7 @@ public class GossipServiceUtil {
     try {
       blockStr = new String(data.toByteArray(), "ISO8859-1");
       log.info("=================================================");
-//       log.info("blockStr:" + blockStr);
+      //       log.info("blockStr:" + blockStr);
       log.info("=================================================");
     } catch (UnsupportedEncodingException e) {
       log.error(e.getMessage(), e);
@@ -192,6 +197,7 @@ public class GossipServiceUtil {
     m.setKey(group + "-" + seqNum);
     m.setPayload(fileNumber);
     m.setTimestamp(System.currentTimeMillis());
+    // m.setTimestamp(Long.MIN_VALUE);
     gossipService.gossipSharedData(m);
     log.info("send gossip:[" + group + "-" + seqNum + "]");
 
@@ -210,6 +216,7 @@ public class GossipServiceUtil {
       msg.setKey(group + "-" + seqNum + "-" + i);
       msg.setPayload(str);
       msg.setTimestamp(System.currentTimeMillis());
+      // m.setTimestamp(Long.MIN_VALUE);
       gossipService.gossipSharedData(msg);
 
       log.info("send gossip detail:[" + group + "-" + seqNum + "-" + i + "]");
