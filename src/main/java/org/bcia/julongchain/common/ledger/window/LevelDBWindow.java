@@ -36,7 +36,7 @@ public class LevelDBWindow {
 
 	public static void main(String[] args) throws Exception {
 					//数据库类型
-		soutLevelDB(STATE_LEVELDB,
+		new LevelDBWindow().soutLevelDB(STATE_LEVELDB,
 					//kv数据库中起始key, null为全部
 					null,
 					//展示new String(key)
@@ -44,13 +44,13 @@ public class LevelDBWindow {
 					//每行展示key byte[]长度
 					-1,
 					//展示new String(value)
-					true,
-					//每行l展示value byte[]长度
+					false,
+					//每行展示value byte[]长度
 					-1
 		);
 	}
 
-	private static void soutLevelDB(int levelDBType, byte[] startKey, boolean keyString, int keyBytes, boolean valueString, int valueBytes) throws Exception {
+	private void soutLevelDB(int levelDBType, byte[] startKey, boolean keyString, int keyBytes, boolean valueString, int valueBytes) throws Exception {
 		LevelDBProvider provider = getLevelDBProvider(levelDBType);
 		System.out.println(provider.getDBPath());
 
@@ -73,7 +73,7 @@ public class LevelDBWindow {
 		}
 	}
 
-	private static LevelDBProvider getLevelDBProvider(int levelDBType) throws Exception {
+	private LevelDBProvider getLevelDBProvider(int levelDBType) throws Exception {
 		switch (levelDBType) {
 			case HISTORY_LEVELDB:
 				return new LevelDBProvider(LedgerConfig.getHistoryLevelDBPath());

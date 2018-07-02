@@ -37,17 +37,18 @@ public class BlockFileWindow {
 		String ledgerID = "myGroup";
 		//区块文件号
 		long blockFileNum = 0;
-		List<Common.Block> blocks = getBlocks(ledgerID, blockFileNum);
+
+		List<Common.Block> blocks = new BlockFileWindow().getBlocks(ledgerID, blockFileNum);
 		blocks.forEach(System.out::println);
 	}
 
-	private static List<Common.Block> getBlocks(String ledgerID, long blockFileNum) throws Exception {
+	private List<Common.Block> getBlocks(String ledgerID, long blockFileNum) throws Exception {
 		String filePath = getBlockFile(ledgerID, blockFileNum);
 		System.out.println("区块文件路径：" + filePath);
 		return getBlocks(filePath);
 	}
 
-	private static List<Common.Block> getBlocks(String filePath) throws Exception {
+	private List<Common.Block> getBlocks(String filePath) throws Exception {
 		List<Common.Block> list = new ArrayList<>();
 		File file = new File(filePath);
 		int len = 0;
@@ -57,7 +58,7 @@ public class BlockFileWindow {
 			byte[] blockLen = reader.read(len, 8);
 			len += 8;
 			long l = Util.bytesToLong(blockLen, 0, 8);
-			System.out.println("block" + i++ + " length : " + l);
+			System.out.println("block" + i++ + " length: " + l);
 			byte[] blockBytes = reader.read(len, l);
 			len += l;
 			Common.Block block = Common.Block.parseFrom(blockBytes);
@@ -66,11 +67,11 @@ public class BlockFileWindow {
 		return list;
 	}
 
-	private static String getBlockFile(String ledgerID, long blockNum) {
+	private String getBlockFile(String ledgerID, long blockNum) {
 		return getBlockDir(ledgerID) + "/blockfile_" + String.format("%06d", blockNum);
 	}
 
-	private static String getBlockDir(String ledgerID) {
+	private String getBlockDir(String ledgerID) {
 		return LedgerConfig.getChainsPath() + "/chains/" + ledgerID;
 	}
 }
