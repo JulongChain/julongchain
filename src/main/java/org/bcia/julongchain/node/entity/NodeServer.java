@@ -16,7 +16,7 @@
 package org.bcia.julongchain.node.entity;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.gossip.GossipService;
+import org.apache.gossip.manager.GossipManager;
 import org.bcia.julongchain.common.exception.GossipException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.NodeException;
@@ -52,9 +52,7 @@ import org.bcia.julongchain.protos.common.Common;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * 节点服务
@@ -176,7 +174,7 @@ public class NodeServer {
 
         // 启动gossip
         try {
-            GossipService gossipService = GossipServiceUtil.startCommitterGossip();
+            GossipManager gossipService = GossipServiceUtil.startCommitterGossip();
             new Thread() {
                 public void run() {
                     while (true) {
@@ -316,49 +314,6 @@ public class NodeServer {
                 }
             }
         }.start();
-    }
-
-    private void startGossipService(List<String> groupIds, NodeConfig nodeConfig) {
-//        String groupId, String nodeId, String nodeAddress, String consenterId,
-//                String consenterAddress
-        final String nodeId = nodeConfig.getNode().getId();
-
-        final String consenterId = UUID.randomUUID().toString();
-        final String consenterAddress = nodeConfig.getNode().getConsenterAddress();
-
-        for (int i = 0; i < groupIds.size(); i++) {
-            String groupId = groupIds.get(i);
-            final String nodeAddress = "127.0.0.1:" + (50000 + i);
-
-            new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        node.getGossipManager().addGossipService(groupId, nodeId, nodeAddress, consenterId, consenterAddress);
-
-                        try {
-                            long blockHeight = LedgerManager.openLedger(groupId).getBlockchainInfo().getHeight();
-
-                            while (true) {
-                                Common.Block block = node.getGossipManager().acquireMessage(groupId, blockHeight);
-                                if (block != null) {
-                                    BlockAndPvtData blockAndPvtData = new BlockAndPvtData(block, new HashMap<>(), null);
-
-                                    node.getGroupMap().get(groupId).getCommiter().commitWithPrivateData(blockAndPvtData);
-                                }
-
-                                Thread.sleep(nodeConfig.getNode().getGossip().getPullInterval());
-                            }
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-
-                    } catch (GossipException e) {
-                        log.error(e.getMessage(), e);
-                    }
-                }
-            }.start();
-        }
     }
 
     /**
