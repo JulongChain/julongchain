@@ -74,12 +74,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.gossip</groupId>
-            <artifactId>gossip</artifactId>
-            <version>0.1.2-incubating</version>
-        </dependency>
-    
-        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
             <version>${spring.version}</version>
@@ -227,6 +221,12 @@
             <version>1.1.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+            <version>4.0.2</version>
+        </dependency>
+
         <!-- 使用本地lib中的jar包 -->
         <dependency>
             <groupId>io.netty</groupId>
@@ -235,12 +235,37 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/netty-tcnative-openssl-static-2.0.9.Final-SNAPSHOT-linux-x86_64.jar</systemPath>
         </dependency>
+
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-handler</artifactId>
             <version>4.1.26.Final-SNAPSHOT</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/netty-handler-4.1.26.Final-SNAPSHOT.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.gossip</groupId>
+            <artifactId>gossip-base</artifactId>
+            <version>0.1.3-incubating</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/gossip-base-0.1.3-incubating-SNAPSHOT.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.gossip</groupId>
+            <artifactId>gossip-protocal-jackson</artifactId>
+            <version>0.1.3-incubating</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/gossip-protocol-jackson-0.1.3-incubating-SNAPSHOT.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.gossip</groupId>
+            <artifactId>gossip-transport-udp</artifactId>
+            <version>0.1.3-incubating</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/gossip-transport-udp-0.1.3-incubating-SNAPSHOT.jar</systemPath>
         </dependency>
     </dependencies>
 
