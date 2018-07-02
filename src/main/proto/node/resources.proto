@@ -58,7 +58,7 @@ message SmartContractEndorsement {
 
 // ConfigTree encapsulates Group and resources configuration of a Group.
 // Both configurations are represented as common.Config
-message ConfigTree {
+message RootConfigTree {
     common.Config group_config = 1;
     common.Config resources_config = 2;
 }
