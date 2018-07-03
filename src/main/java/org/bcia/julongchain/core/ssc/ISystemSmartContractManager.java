@@ -15,6 +15,8 @@
  */
 package org.bcia.julongchain.core.ssc;
 
+import org.bcia.julongchain.common.exception.SysSmartContractException;
+
 /**
  * 系统智能合约管理器接口
  * 各接口被调用的时机：

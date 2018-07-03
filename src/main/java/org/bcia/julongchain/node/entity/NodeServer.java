@@ -16,7 +16,7 @@
 package org.bcia.julongchain.node.entity;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.gossip.GossipService;
+import org.apache.gossip.manager.GossipManager;
 import org.bcia.julongchain.common.exception.GossipException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.NodeException;
@@ -52,9 +52,7 @@ import org.bcia.julongchain.protos.common.Common;
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * 节点服务
@@ -176,7 +174,7 @@ public class NodeServer {
 
         // 启动gossip
         try {
-            GossipService gossipService = GossipServiceUtil.startCommitterGossip();
+            GossipManager gossipService = GossipServiceUtil.startCommitterGossip();
             new Thread() {
                 public void run() {
                     while (true) {
@@ -188,30 +186,30 @@ public class NodeServer {
                         } catch (LedgerException e) {
                             log.error(e.getMessage(), e);
                         }
-                        log.info("当前所有群组：" + ledgerIds.toString());
+                        log.info("all group：" + ledgerIds.toString());
                         for (String ledgerId: ledgerIds) {
-                            log.info("开始检查群组[" + ledgerId + "] 是否有新的区块");
+                            log.info("start check group[" + ledgerId + "] new bolck");
                             long blockHeight = 0l;
                             try {
                                 blockHeight = LedgerManager.openLedger(ledgerId).getBlockchainInfo().getHeight();
-                                log.info("当前群组[" + ledgerId + "] 的区块高度是：" + blockHeight);
+                                log.info("group[" + ledgerId + "] block height：" + blockHeight);
                                 if (blockHeight == 0l) {
-                                    log.info("群组高度为0，退出处理");
+                                    log.info("block height is 0，exit");
                                     continue;
                                 }
 
                                 Common.Block block =
                                         GossipServiceUtil.getData(gossipService, ledgerId, blockHeight);
                                 if (block == null) {
-                                    log.info("当前群组[" + ledgerId + "]" + "没有新的区块[" + blockHeight + "]");
+                                    log.info("group[" + ledgerId + "]" + "no new block[" + blockHeight + "]");
                                     continue;
                                 }
-                                log.info("发现新区块");
+                                log.info("new block delivered");
                                 BlockAndPvtData blockAndPvtData = new BlockAndPvtData(block, null, null);
-                                log.info("完成转换区块");
-                                log.info("开始保存区块");
+                                log.info("complete convert to Block file");
+                                log.info("start save block file");
                                 LedgerManager.openLedger(ledgerId).commitWithPvtData(blockAndPvtData);
-                                log.info("完成保存区块");
+                                log.info("completed save block file");
                             } catch (LedgerException e) {
                                 log.error(e.getMessage(), e);
                             } catch (GossipException e) {
@@ -316,49 +314,6 @@ public class NodeServer {
                 }
             }
         }.start();
-    }
-
-    private void startGossipService(List<String> groupIds, NodeConfig nodeConfig) {
-//        String groupId, String nodeId, String nodeAddress, String consenterId,
-//                String consenterAddress
-        final String nodeId = nodeConfig.getNode().getId();
-
-        final String consenterId = UUID.randomUUID().toString();
-        final String consenterAddress = nodeConfig.getNode().getConsenterAddress();
-
-        for (int i = 0; i < groupIds.size(); i++) {
-            String groupId = groupIds.get(i);
-            final String nodeAddress = "127.0.0.1:" + (50000 + i);
-
-            new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        node.getGossipManager().addGossipService(groupId, nodeId, nodeAddress, consenterId, consenterAddress);
-
-                        try {
-                            long blockHeight = LedgerManager.openLedger(groupId).getBlockchainInfo().getHeight();
-
-                            while (true) {
-                                Common.Block block = node.getGossipManager().acquireMessage(groupId, blockHeight);
-                                if (block != null) {
-                                    BlockAndPvtData blockAndPvtData = new BlockAndPvtData(block, new HashMap<>(), null);
-
-                                    node.getGroupMap().get(groupId).getCommiter().commitWithPrivateData(blockAndPvtData);
-                                }
-
-                                Thread.sleep(nodeConfig.getNode().getGossip().getPullInterval());
-                            }
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-
-                    } catch (GossipException e) {
-                        log.error(e.getMessage(), e);
-                    }
-                }
-            }.start();
-        }
     }
 
     /**

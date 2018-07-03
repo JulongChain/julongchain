@@ -331,10 +331,10 @@ public class CSSC extends SystemSmartContractBase {
         if (resourceConfig == null) {
             return newErrorResponse(String.format("Unknown group ID,%s", groupID));
         }
-        ResourcesPackage.ConfigTree.Builder builder = ResourcesPackage.ConfigTree.newBuilder();
+        ResourcesPackage.RootConfigTree.Builder builder = ResourcesPackage.RootConfigTree.newBuilder();
         builder.setGroupConfig(groupConfig);
         builder.setResourcesConfig(resourceConfig);
-        ResourcesPackage.ConfigTree configTree = builder.build();
+        ResourcesPackage.RootConfigTree configTree = builder.build();
         byte[] configTreeBytes = configTree.toByteArray();
         return newSuccessResponse(configTreeBytes);
     }

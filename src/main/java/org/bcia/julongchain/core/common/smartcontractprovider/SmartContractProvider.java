@@ -16,12 +16,15 @@
 package org.bcia.julongchain.core.common.smartcontractprovider;
 
 import com.google.protobuf.ByteString;
+import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.exception.SmartContractException;
+import org.bcia.julongchain.common.exception.SysSmartContractException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.core.node.NodeConfig;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
+import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.Query;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
 
@@ -238,4 +241,27 @@ public class SmartContractProvider {
         }
         return extractStateDBArtifactsFromSCPackage(scPackage);
     }
+	/**
+	 * GetCCContext returns an interface that encapsulates a
+	 * chaincode context; the interface is required to avoid
+	 * referencing the chaincode package from the interface definition
+	 */
+    public static SmartContractContext getSCContext(String groupID, String name, String version, String txid, boolean syssc, ProposalPackage.SignedProposal signedProp, ProposalPackage.Proposal proposal) throws SysSmartContractException{
+		if (StringUtils.isEmpty(version)) {
+			log.error("---empty version---");
+			log.error("group=[{}], sc=[{}], txid=[{}]", groupID, name, txid);
+			throw new SysSmartContractException("Got empty version when getSCContext");
+		}
+		SmartContractContext sccid = new SmartContractContext(groupID,
+				name,
+				version,
+				txid,
+				true,
+				null,
+				null);
+		sccid.setCanonicalName(name + ":" + version);
+		log.debug("NewSCCC (group=[{}], sc=[{}], version=[{}], txid=[{}], canName=[{}]", groupID, name, version, txid, name + ":" + version);
+		return sccid;
+	}
+
 }

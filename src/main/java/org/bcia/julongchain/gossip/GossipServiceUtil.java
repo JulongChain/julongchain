@@ -13,18 +13,14 @@
  */
 package org.bcia.julongchain.gossip;
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.gossip.GossipMember;
-import org.apache.gossip.GossipService;
 import org.apache.gossip.GossipSettings;
-import org.apache.gossip.RemoteGossipMember;
-import org.apache.gossip.crdt.Crdt;
-import org.apache.gossip.crdt.OrSet;
-import org.apache.gossip.event.GossipListener;
-import org.apache.gossip.event.GossipState;
-import org.apache.gossip.model.SharedGossipDataMessage;
+import org.apache.gossip.Member;
+import org.apache.gossip.RemoteMember;
+import org.apache.gossip.manager.GossipManager;
+import org.apache.gossip.manager.GossipManagerBuilder;
+import org.apache.gossip.model.SharedDataMessage;
 import org.bcia.julongchain.common.exception.GossipException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
@@ -34,8 +30,9 @@ import org.bcia.julongchain.protos.common.Common;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Gossip服务的相关方法，<br>
@@ -53,107 +50,72 @@ public class GossipServiceUtil {
 
   private static JavaChainLog log = JavaChainLogFactory.getLog(GossipServiceUtil.class);
 
-  private static final Integer messageLength = 1000;
+  private static final Integer messageLength = 10000;
 
-  /**
-   * 启动gossip server服务，（seed节点）
-   *
-   * @param address 节点的地址，格式为ip:port
-   * @throws GossipException
-   */
-  public static GossipService newGossipService(String address) throws GossipException {
-    log.info("newGossipService(address[" + address + "])");
+  private static final String cluster = "julongchain";
 
-    GossipService gossipService = null;
+  public static GossipManager newGossipService(String address) throws GossipException {
+
     try {
-      GossipSettings s = new GossipSettings();
-      s.setWindowSize(1000);
-      s.setGossipInterval(100);
+      GossipSettings settings = new GossipSettings();
+      settings.setPersistRingState(false);
+      settings.setPersistDataState(false);
 
-      gossipService =
-          new GossipService(
-              "julongchain",
-              URI.create("udp://" + address),
-              UUID.randomUUID().toString(),
-              new HashMap<>(),
-              new ArrayList<>(),
-              s,
-              new GossipListener() {
-                @Override
-                public void gossipEvent(GossipMember member, GossipState state) {}
-              },
-              new MetricRegistry());
-    } catch (InterruptedException e) {
-      throw new GossipException(e.getMessage(), e);
-    } catch (UnknownHostException e) {
+      List<Member> startupMembers = new ArrayList<Member>();
+
+      // RemoteMember member =
+      //     new RemoteMember(cluster, new URI("udp://" + address), UUID.randomUUID().toString());
+      // startupMembers.add(member);
+
+      GossipManager gossipService =
+          GossipManagerBuilder.newBuilder()
+              .cluster(cluster)
+              .uri(new URI("udp://" + address))
+              .id(UUID.randomUUID().toString())
+              .gossipMembers(startupMembers)
+              .gossipSettings(settings)
+              .build();
+
+      return gossipService;
+    } catch (Exception e) {
       throw new GossipException(e.getMessage(), e);
     }
-
-    return gossipService;
   }
 
-  /**
-   * 启动节点，并加入种子节点地址
-   *
-   * @param address 本机地址
-   * @param seedAddress 种子节点地址
-   * @return
-   * @throws GossipException
-   */
-  public static GossipService newGossipService(String address, String seedAddress)
+  public static GossipManager newGossipService(String address, String seedAddress)
       throws GossipException {
-
-    log.info("newGossipService(address[" + address + "],seedAddress[" + seedAddress + "])");
-
-    if (StringUtils.isEmpty(seedAddress)) {
-      return newGossipService(address);
-    }
-
-    List<GossipMember> gossipMembers = new ArrayList<>();
-    RemoteGossipMember remoteGossipMember =
-        new RemoteGossipMember(
-            "julongchain", URI.create("udp://" + seedAddress), UUID.randomUUID().toString());
-    gossipMembers.add(remoteGossipMember);
-
-    GossipService gossipService = null;
     try {
-      GossipSettings s = new GossipSettings();
-      s.setWindowSize(1000);
-      s.setGossipInterval(100);
+      GossipSettings settings = new GossipSettings();
+      settings.setPersistRingState(false);
+      settings.setPersistDataState(false);
 
-      gossipService =
-          new GossipService(
-              "julongchain",
-              URI.create("udp://" + address),
-              UUID.randomUUID().toString(),
-              new HashMap<>(),
-              gossipMembers,
-              s,
-              new GossipListener() {
-                @Override
-                public void gossipEvent(GossipMember member, GossipState state) {}
-              },
-              new MetricRegistry());
-    } catch (InterruptedException e) {
-      throw new GossipException(e.getMessage(), e);
-    } catch (UnknownHostException e) {
+      List<Member> startupMembers = new ArrayList<Member>();
+
+      RemoteMember seed =
+          new RemoteMember(cluster, new URI("udp://" + seedAddress), UUID.randomUUID().toString());
+      startupMembers.add(seed);
+
+      // RemoteMember member2 =
+      //     new RemoteMember(cluster, new URI("udp://" + address), UUID.randomUUID().toString());
+      // startupMembers.add(member2);
+
+      GossipManager gossipService =
+          GossipManagerBuilder.newBuilder()
+              .cluster(cluster)
+              .uri(new URI("udp://" + address))
+              .id(UUID.randomUUID().toString())
+              .gossipMembers(startupMembers)
+              .gossipSettings(settings)
+              .build();
+
+      return gossipService;
+    } catch (Exception e) {
       throw new GossipException(e.getMessage(), e);
     }
-
-    return gossipService;
   }
 
-  /**
-   * 节点上传区块
-   *
-   * @param gossipService 上传数据的gossip service
-   * @param group 上传数据的群组
-   * @param seqNum 区块的num
-   * @param data String格式的区块
-   * @throws GossipException
-   */
   public static void addData(
-      GossipService gossipService, String group, Long seqNum, Common.Block data)
+      GossipManager gossipService, String group, Long seqNum, Common.Block data)
       throws GossipException {
 
     if (gossipService == null) {
@@ -178,7 +140,9 @@ public class GossipServiceUtil {
     String blockStr = "";
     try {
       blockStr = new String(data.toByteArray(), "ISO8859-1");
-      // log.info("blockStr:" + blockStr);
+      log.info("=================================================");
+      //       log.info("blockStr:" + blockStr);
+      log.info("=================================================");
     } catch (UnsupportedEncodingException e) {
       log.error(e.getMessage(), e);
       throw new GossipException(e);
@@ -190,14 +154,12 @@ public class GossipServiceUtil {
     }
     log.info("fileNumber:" + fileNumber);
 
-    SharedGossipDataMessage m = new SharedGossipDataMessage();
-    // m.setTimestamp(System.currentTimeMillis());
-    m.setKey(group + "-" + seqNum);
+    SharedDataMessage m = new SharedDataMessage();
     m.setExpireAt(Long.MAX_VALUE);
-    m.setPayload(new OrSet<String>(fileNumber + ""));
-
-    gossipService.getGossipManager().merge(m);
-
+    m.setKey(group + "-" + seqNum);
+    m.setPayload(fileNumber);
+    m.setTimestamp(System.currentTimeMillis());
+    gossipService.gossipSharedData(m);
     log.info("send gossip:[" + group + "-" + seqNum + "]");
 
     for (int i = 0; i < fileNumber; i++) {
@@ -210,29 +172,20 @@ public class GossipServiceUtil {
 
       String str = blockStr.substring(start, end);
 
-      SharedGossipDataMessage msg = new SharedGossipDataMessage();
-      // msg.setTimestamp(System.currentTimeMillis());
-      msg.setKey(group + "-" + seqNum + "-" + i);
+      SharedDataMessage msg = new SharedDataMessage();
       msg.setExpireAt(Long.MAX_VALUE);
-      msg.setPayload(new OrSet<String>(str));
-
-      gossipService.getGossipManager().merge(msg);
+      msg.setKey(group + "-" + seqNum + "-" + i);
+      msg.setPayload(str);
+      msg.setTimestamp(System.currentTimeMillis());
+      gossipService.gossipSharedData(msg);
 
       log.info("send gossip detail:[" + group + "-" + seqNum + "-" + i + "]");
     }
   }
 
-  /**
-   * 读取指定区块num的数据
-   *
-   * @param gossipService 读取数据的gossip service
-   * @param group 读取数据的群组
-   * @param seqNum 区块的num
-   * @return
-   * @throws GossipException
-   */
-  public static Common.Block getData(GossipService gossipService, String group, Long seqNum)
+  public static Common.Block getData(GossipManager gossipService, String group, Long seqNum)
       throws GossipException {
+
     if (gossipService == null) {
       throw new GossipException("Gossip not start");
     }
@@ -249,51 +202,38 @@ public class GossipServiceUtil {
             + seqNum
             + "])");
 
-    Integer fileNumber = 0;
+    SharedDataMessage sharedData = gossipService.findSharedGossipData(group + "-" + seqNum);
 
-    Crdt crdtFileNumber = gossipService.getGossipManager().findCrdt(group + "-" + seqNum);
-    if (crdtFileNumber == null) {
-      log.info("crdtFileNumber is null");
+    log.info("gossip get data, check [" + group + "-" + seqNum + "]");
+    if (sharedData == null) {
+      log.info("[" + group + "-" + seqNum + "] is null");
       return null;
     }
-    if (crdtFileNumber.value() == null) {
-      log.info("crdtFileNumber value is null");
-      return null;
-    }
-    Set setsFIleNumber = (Set) crdtFileNumber.value();
-    Iterator iteratorFileNumber = setsFIleNumber.iterator();
-    if (iteratorFileNumber.hasNext()) {
-      log.info(iteratorFileNumber.next().toString());
-      fileNumber = Integer.parseInt((String) iteratorFileNumber.next());
-    }
 
+    Object fileNumberPayload = sharedData.getPayload();
+
+    Integer fileNumber = (Integer) fileNumberPayload;
     log.info("=====================fileNumber:" + fileNumber);
 
     if (fileNumber < 1) {
-      log.info("fileNumber:"+fileNumber);
       return null;
     }
 
     StringBuffer sb = new StringBuffer("");
 
     for (int i = 0; i < fileNumber; i++) {
-
-      Crdt crdtDetail = gossipService.getGossipManager().findCrdt(group + "-" + seqNum + "-" + i);
-      if (crdtDetail == null) {
-        log.info("crdtDetail is null");
+      SharedDataMessage m = gossipService.findSharedGossipData(group + "-" + seqNum + "-" + i);
+      log.info("gossip get data detail, check [" + group + "-" + seqNum + "-" + i + "]");
+      if (m == null) {
+        log.info("=====================[" + group + "-" + seqNum + "-" + i + "] is null");
         return null;
       }
-      if (crdtDetail.value() == null) {
-        log.info("crdtDetail value is null");
+      Object p = m.getPayload();
+      if (p == null) {
         return null;
       }
-      Set setsDetail = (Set) crdtDetail.value();
-      Iterator iteratorDetail = setsDetail.iterator();
-      if (iteratorDetail.hasNext()) {
-        log.info(iteratorDetail.next().toString());
-        fileNumber = Integer.parseInt((String) iteratorDetail.next());
-        sb.append(iteratorDetail.next());
-      }
+      String str = (String) p;
+      sb.append(str);
     }
 
     byte[] bytes = new byte[0];
@@ -313,60 +253,30 @@ public class GossipServiceUtil {
     return block;
   }
 
-  /**
-   * 从配置文件读取consenter地址，并启动gossip服务
-   *
-   * @return
-   * @throws GossipException
-   */
-  public static GossipService startConsenterGossip() throws GossipException {
+  public static GossipManager startConsenterGossip() throws GossipException {
     String consenterAddress =
         ConsenterConfigFactory.loadConsenterConfig().getGeneral().getGossipAddress();
     log.info("consenter gossip address:" + consenterAddress);
-    GossipService gossipService = newGossipService(consenterAddress);
-    gossipService.start();
+    GossipManager gossipService = newGossipService(consenterAddress);
+    gossipService.init();
     log.info("started consenter gossip: address[" + consenterAddress + "]");
     return gossipService;
   }
 
-  /**
-   * 从配置文件读取committer地址，并启动gossip服务
-   *
-   * @return
-   * @throws GossipException
-   */
-  public static GossipService startCommitterGossip() throws GossipException {
+  public static GossipManager startCommitterGossip() throws GossipException {
     String consenterAddress =
         NodeConfigFactory.getNodeConfig().getNode().getGossip().getConsenterAddress();
     log.info("consenter gossip address:" + consenterAddress);
     String committerAddress =
         NodeConfigFactory.getNodeConfig().getNode().getGossip().getCommiterAddress();
     log.info("committer gossip address:" + committerAddress);
-    GossipService gossipService = newGossipService(committerAddress, consenterAddress);
-    gossipService.start();
+    GossipManager gossipService = newGossipService(committerAddress, consenterAddress);
+    gossipService.init();
     log.info(
         "start committer gossip: address["
             + committerAddress
             + "] seedAddress:"
             + consenterAddress);
     return gossipService;
-  }
-
-  public static void main(String[] args) {
-    String str = "11122233344455566";
-    int number = str.length() / 3;
-    if (str.length() % 3 > 0) {
-      number = number + 1;
-    }
-    int current = 0;
-    for (int i = 0; i < number; i++) {
-      int start = i * 3;
-      int end = (i + 1) * 3;
-      if (end > str.length()) {
-        end = str.length();
-      }
-      String s = str.substring(start, end);
-      System.out.println(s);
-    }
   }
 }
