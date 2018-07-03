@@ -94,7 +94,7 @@ public class StandardGroup implements IProcessor {
         Configtx.ConfigEnvelope configEnvelope = standardGroupSupport.proposeConfigUpdate(env);
         int headerType = 0;
         Common.Envelope config = TxUtils.createSignedEnvelope(headerType, standardGroupSupport.getGroupId(),
-                standardGroupSupport.signer(), configEnvelope, Constant.MSGVERSION, Constant.EPOCH);
+                standardGroupSupport.getSigner(), configEnvelope, Constant.MSGVERSION, Constant.EPOCH);
         return new ConfigMsg(config, seq);
     }
 

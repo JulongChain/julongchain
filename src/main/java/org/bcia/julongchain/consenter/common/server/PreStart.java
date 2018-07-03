@@ -108,7 +108,7 @@ public class PreStart {
                 genesisBlock = new GenesisBlockFactory(groupTree).getGenesisBlock("systemGroup");
                 break;
             case "file":
-                genesisBlock = new BootStrapHelper(consenterConfig.getGeneral().getGenesisFile()).genesisBlock();
+                genesisBlock = new BootStrapHelper(consenterConfig.getGeneral().getGenesisFile()).getGenesisBlock();
                 break;
             default:
         }

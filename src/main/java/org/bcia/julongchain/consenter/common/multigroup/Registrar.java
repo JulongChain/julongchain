@@ -136,7 +136,7 @@ public class Registrar implements IChainCreator,IGroupSupportRegistrar,ISupportM
             if (ledgerResources.getMutableResources().getGroupConfig().getConsortiumsConfig() != null) {
                 ChainSupport chain = new ChainSupport(this, ledgerResources, consenters, signer);
                 this.templator = new DefaultTemplator(chain.getLedgerResources().getMutableResources());
-                chain.processor= newSystemGroup(chain, templator, SystemGroup.createSystemChannelFilters(this, chain.getLedgerResources().getMutableResources()));
+                chain.setProcessor(newSystemGroup(chain, templator, SystemGroup.createSystemChannelFilters(this, chain.getLedgerResources().getMutableResources())));
                 //组装seekPosition
                 Ab.SeekPosition.Builder seekPosition = Ab.SeekPosition.newBuilder();
                 Ab.SeekOldest.Builder seekOldest = Ab.SeekOldest.newBuilder();
@@ -157,7 +157,7 @@ public class Registrar implements IChainCreator,IGroupSupportRegistrar,ISupportM
                 if (genesisBlock.getValue() != Common.Status.SUCCESS) {
                     log.error(String.format("Error reading genesis block of system channel '%s'", groupId));
                 }
-                log.info(String.format("Starting system channel '%s' with genesis block hash %s and consenter type %s", groupId, Hex.toHexString(BlockHelper.hash(block.getHeader().toByteArray())), chain.ledgerResources.getMutableResources().getGroupConfig().getConsenterConfig().getConsensusType()));
+                log.info(String.format("Starting system channel '%s' with genesis block hash %s and consenter type %s", groupId, Hex.toHexString(BlockHelper.hash(block.getHeader().toByteArray())), chain.getLedgerResources().getMutableResources().getGroupConfig().getConsenterConfig().getConsensusType()));
                 chains.put(groupId, chain);
                 systemGroupID = groupId;
                 systemGroup = chain;
