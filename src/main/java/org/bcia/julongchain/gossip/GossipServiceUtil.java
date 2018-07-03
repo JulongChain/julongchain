@@ -114,6 +114,23 @@ public class GossipServiceUtil {
     }
   }
 
+  public static void shareData(GossipManager gossipService, String group, Long seqNum, String data) {
+    SharedDataMessage m = new SharedDataMessage();
+    m.setExpireAt(Long.MAX_VALUE);
+    m.setKey(group + "-" + seqNum);
+    m.setPayload(data);
+    m.setTimestamp(System.currentTimeMillis());
+    gossipService.gossipSharedData(m);
+  }
+
+  public static String findData(GossipManager gossipService, String group, Long seqNum) {
+    SharedDataMessage sharedGossipData = gossipService.findSharedGossipData(group + "-" + seqNum);
+    if(sharedGossipData == null){
+      return null;
+    }
+    return (String) sharedGossipData.getPayload();
+  }
+
   public static void addData(
       GossipManager gossipService, String group, Long seqNum, Common.Block data)
       throws GossipException {
