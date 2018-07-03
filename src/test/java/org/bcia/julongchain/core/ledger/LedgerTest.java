@@ -20,6 +20,7 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.SysSmartContractException;
 import org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage.BlockFileReader;
 import org.bcia.julongchain.common.ledger.util.leveldbhelper.LevelDBProvider;
+import org.bcia.julongchain.common.protos.EnvelopeVO;
 import org.bcia.julongchain.core.ledger.kvledger.history.historydb.HistoryDBHelper;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
@@ -106,7 +107,10 @@ public class LedgerTest {
 		    byte[] blockBytes = reader.read(len, l);
 		    len += l;
 		    Common.Block block = Common.Block.parseFrom(blockBytes);
+			EnvelopeVO envelopeVO = new EnvelopeVO();
+			envelopeVO.parseFrom(Common.Envelope.parseFrom(block.getData().getData(0)));
 		    System.out.println(block);
+		    soutBytes(block.getHeader().getDataHash().toByteArray());
 	    }
 //	    FileInputStream fis = new FileInputStream(file);
 //	    byte[] b = new byte[(int) file.length()];
@@ -125,7 +129,7 @@ public class LedgerTest {
         int i = 0;
         for(byte b : bytes){
             System.out.print(b + " ");
-            if (i++ % 10 == 9) {
+            if (i++ % 10 == 29) {
                 System.out.println();
 //                System.out.println(i);
             }

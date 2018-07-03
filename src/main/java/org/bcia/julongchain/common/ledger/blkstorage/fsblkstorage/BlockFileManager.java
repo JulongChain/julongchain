@@ -446,6 +446,9 @@ public class BlockFileManager {
      * 获取区块
      */
     private Common.Block fetchBlock(FileLocPointer lp) throws LedgerException{
+		if (lp == null) {
+			return null;
+		}
         byte[] blockBytes = fetchBlockBytes(lp);
         if (blockBytes == null){
             throw new LedgerException(String.format("Fail to fetch block by [%s]", lp));
@@ -461,6 +464,9 @@ public class BlockFileManager {
      * 获取交易Envelope
      */
     private Common.Envelope fetchTransactionEnvelope(FileLocPointer lp) throws LedgerException{
+		if (lp == null) {
+			return null;
+		}
         logger.debug(String.format("Entering fetchTransactionEnvelope() %s", lp));
         byte[] txEnvelopeBytes = fetchRawBytes(lp);
         if (txEnvelopeBytes == null){
@@ -484,6 +490,9 @@ public class BlockFileManager {
      * 获取区块
      */
     private byte[] fetchBlockBytes(FileLocPointer lp) throws LedgerException {
+		if (lp == null) {
+			return null;
+		}
         BlockFileStream stream = null;
         try {
             stream = new BlockFileStream(rootDir, lp.getFileSuffixNum(), lp.getLocPointer().getOffset());
@@ -499,6 +508,9 @@ public class BlockFileManager {
      * 获取获取对应位置字节
      */
     private byte[] fetchRawBytes(FileLocPointer lp) throws LedgerException {
+		if (lp == null) {
+			return null;
+		}
         BlockFileReader reader;
         String filePath = deriveBlockfilePath(rootDir, lp.getFileSuffixNum());
         reader = new BlockFileReader(filePath);
