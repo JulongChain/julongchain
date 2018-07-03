@@ -25,6 +25,7 @@ import org.bcia.julongchain.common.policies.IPolicyManager;
 import org.bcia.julongchain.common.util.SpringContext;
 import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.IQueryExecutor;
+import org.bcia.julongchain.core.node.NodeSupport;
 import org.bcia.julongchain.core.node.util.NodeUtils;
 import org.bcia.julongchain.core.ssc.ISystemSmartContractManager;
 import org.bcia.julongchain.core.ssc.SystemSmartContractManager;
@@ -52,28 +53,12 @@ public class SystemSmartContractProvider implements ISystemSmartContractProvider
 
     @Override
     public IApplicationConfig getApplicationConfig(String groupId) {
-        //TODO: add by zhouhui 使测试通过
-        //构造应用子树
-        GenesisConfig.Profile profile = null;
-        try {
-            profile = GenesisConfigFactory.getGenesisConfig().getCompletedProfile(PROFILE_CREATE_GROUP);
-            Configtx.ConfigTree appTree = ConfigTreeHelper.buildApplicationTree(profile.getApplication());
-            //得到最终的应用配置
-            ApplicationConfig appConfig = new ApplicationConfig(appTree, new MSPConfigHandler(0));
-            IApplicationCapabilities applicationCapabilities = appConfig.getCapabilities();
-            return appConfig;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ValidateException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+    	return new NodeSupport().getApplicationConfig(groupId);
     }
 
     @Override
     public IPolicyManager policyManager(String groupID) {
+		// TODO: 7/2/18 策略管理者
         return null;
     }
 
@@ -84,8 +69,7 @@ public class SystemSmartContractProvider implements ISystemSmartContractProvider
 
     @Override
     public boolean isSysSCAndNotInvokableSC2SC(String name) {
-        return false;
-//        return sscManager.isSysSmartContractAndNotInvokableSC2SC(name);
+        return sscManager.isSysSmartContractAndNotInvokableSC2SC(name);
     }
 
     @Override

@@ -190,11 +190,11 @@ public class LSSC  extends SystemSmartContractBase {
                     return newErrorResponse(String.format("Programming error, non-existent appplication config for group '%s'",groupName));
                 }
                 //the maximum number of arguments depends on the capability of the group
-                // TODO: 5/21/18  ac.getCapabilities() == null
-//                if((ac.getCapabilities().isPrivateGroupData()==false && size>6) ||
-//                        (ac.getCapabilities().isPrivateGroupData()==true && size>7)){
-//                    return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
-//                }
+				// TODO: 7/2/18 暂时没有能力capabilities概念
+                if((size>6 && !ac.getCapabilities().isPrivateGroupData()) ||
+                        (size>7 && ac.getCapabilities().isPrivateGroupData())){
+                    return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
+                }
                 byte[] depSpecBytes2=args.get(2);
                 SmartContractPackage.SmartContractDeploymentSpec spec=null;
                 try {
