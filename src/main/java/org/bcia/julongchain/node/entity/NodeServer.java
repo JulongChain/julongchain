@@ -186,30 +186,30 @@ public class NodeServer {
                         } catch (LedgerException e) {
                             log.error(e.getMessage(), e);
                         }
-                        log.info("当前所有群组：" + ledgerIds.toString());
+                        log.info("all group：" + ledgerIds.toString());
                         for (String ledgerId: ledgerIds) {
-                            log.info("开始检查群组[" + ledgerId + "] 是否有新的区块");
+                            log.info("start check group[" + ledgerId + "] new bolck");
                             long blockHeight = 0l;
                             try {
                                 blockHeight = LedgerManager.openLedger(ledgerId).getBlockchainInfo().getHeight();
-                                log.info("当前群组[" + ledgerId + "] 的区块高度是：" + blockHeight);
+                                log.info("group[" + ledgerId + "] block height：" + blockHeight);
                                 if (blockHeight == 0l) {
-                                    log.info("群组高度为0，退出处理");
+                                    log.info("block height is 0，exit");
                                     continue;
                                 }
 
                                 Common.Block block =
                                         GossipServiceUtil.getData(gossipService, ledgerId, blockHeight);
                                 if (block == null) {
-                                    log.info("当前群组[" + ledgerId + "]" + "没有新的区块[" + blockHeight + "]");
+                                    log.info("group[" + ledgerId + "]" + "no new block[" + blockHeight + "]");
                                     continue;
                                 }
-                                log.info("发现新区块");
+                                log.info("new block delivered");
                                 BlockAndPvtData blockAndPvtData = new BlockAndPvtData(block, null, null);
-                                log.info("完成转换区块");
-                                log.info("开始保存区块");
+                                log.info("complete convert to Block file");
+                                log.info("start save block file");
                                 LedgerManager.openLedger(ledgerId).commitWithPvtData(blockAndPvtData);
-                                log.info("完成保存区块");
+                                log.info("completed save block file");
                             } catch (LedgerException e) {
                                 log.error(e.getMessage(), e);
                             } catch (GossipException e) {
