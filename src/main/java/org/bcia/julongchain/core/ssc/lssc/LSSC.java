@@ -441,7 +441,7 @@ public class LSSC  extends SystemSmartContractBase {
             String msg=String.format("SmartContractdata for%s unmarshal failed ",contractName);
             throw new SysSmartContractException(msg);
         }
-        if(scd.getName()!=contractName){
+        if(!(scd.getName().equals(contractName))){
             String msg=String.format("SmartContract mismatch:%s!=%s",contractName,scd.getName());
             throw new SysSmartContractException(msg);
         }
