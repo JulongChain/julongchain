@@ -22,6 +22,9 @@ import org.bcia.julongchain.common.ledger.util.IoUtil;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.util.Utils;
+import org.bcia.julongchain.core.ledger.INodeLedger;
+import org.bcia.julongchain.core.ledger.ITxSimulator;
+import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContract;
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.julongchain.core.smartcontract.shim.ledger.CompositeKey;
@@ -31,6 +34,7 @@ import org.bcia.julongchain.core.smartcontract.shim.ledger.IQueryResultsIterator
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.SmartContractDataPackage;
 import org.bcia.julongchain.protos.node.SmartContractEventPackage;
+import scala.collection.concurrent.INode;
 
 import java.time.Instant;
 import java.util.*;
@@ -106,14 +110,23 @@ public class MockStub implements ISmartContractStub {
      */
     @Override
     public byte[] getState(String key) {
-	    SmartContractDataPackage.SmartContractData.Builder builder = null;
-	    try {
-		    builder.setName("name");
-		    builder.setData(ByteString.copyFrom(IoUtil.fileReader("", 1024)));
-	    } catch (Exception e) {
-		    e.printStackTrace();
-	    }
-	    return builder.build().toByteArray();
+
+        byte[] state = null;
+        try {
+            LedgerManager.initialize(null);
+            INodeLedger l = LedgerManager.openLedger("myGroup");
+
+            ITxSimulator simulator = l.newTxSimulator("txID");
+            state = simulator.getState("lssc", "mycc");
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+	    return state;
     }
 
     @Override

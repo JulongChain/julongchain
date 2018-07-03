@@ -35,60 +35,62 @@ import java.util.List;
  * @company Dingxuan
  */
 public class KvLedgerTest {
-    INodeLedger l_endorser;
-    INodeLedger l_not_endorser;
+    INodeLedger l;
+	byte[] blockHashAtBlock1 = new byte[]{(byte) 90, (byte) 28, (byte) 92, (byte) -26, (byte) -23, (byte) -105, (byte) -103, (byte) 2, (byte) -127, (byte) -120, (byte) 69, (byte) -38, (byte) -29, (byte) -35, (byte) 85, (byte) 42, (byte) 81, (byte) 15, (byte) 82, (byte) 77, (byte) -18, (byte) 89, (byte) 46, (byte) -13, (byte) 16, (byte) 94, (byte) 0, (byte) -27, (byte) 86, (byte) 118, (byte) -123, (byte) 2};
+    String txIDAtBlock1 = "567253d44b49608ca8f0fbb751892dfa200dc6218046132a6d5497b77ffe7de1";
 
     @Before
     public void before() throws Exception{
         LedgerManager.initialize(null);
-        l_endorser = LedgerManager.openLedger("myGroup");
-		l_not_endorser = LedgerManager.openLedger("mytestgroupid2");
+        l = LedgerManager.openLedger("myGroup");
     }
 
     @Test
     public void testGetTransactionByID() throws Exception{
-		for (int i = 0; i < 6; i++) {
-			TransactionPackage.ProcessedTransaction tx = l_endorser.getTransactionByID(String.valueOf(i));
-			Assert.assertNotNull(tx.getTransactionEnvelope().getPayload());
-			Assert.assertSame(tx.getValidationCode(), 0);
-		}
-		TransactionPackage.ProcessedTransaction transactionByID = l_not_endorser.getTransactionByID("1");
-		System.out.println(transactionByID);
+		TransactionPackage.ProcessedTransaction tx = l.getTransactionByID(txIDAtBlock1);
+		Assert.assertNotNull(tx.getTransactionEnvelope().getPayload());
+		Assert.assertSame(0, tx.getValidationCode());
+		tx = l.getTransactionByID("hahahah");
+		Assert.assertNull(tx);
 	}
 
     @Test
     public void testGetBlockByHash() throws Exception{
-        Common.Block block = null;
-		for (int i = 0; i < 6; i++) {
-			block = l_endorser.getBlockByNumber(1);
-			block = l_endorser.getBlockByHash(block.getHeader().getDataHash().toByteArray());
-			Assert.assertSame(block.getHeader().getNumber(), ((long) 1));
-		}
-    }
+		Common.Block block = l.getBlockByHash(blockHashAtBlock1);
+		Assert.assertSame((long) 1, block.getHeader().getNumber());
+		Assert.assertNotNull(block);
+		System.out.println(block);
+		byte[] bytes = blockHashAtBlock1;
+		bytes[0] = (byte) 0;
+		block = l.getBlockByHash(bytes);
+		Assert.assertNull(block);
+	}
 
     @Test
     public void testGetBlockByTxID() throws Exception{
-		Common.Block expected = l_endorser.getBlockByNumber(1);
-        Common.Block block = null;
-		for (int i = 0; i < 6; i++) {
-			block = l_endorser.getBlockByTxID(String.valueOf(i));
-			Assert.assertEquals(expected, block);
-		}
+		Common.Block block = l.getBlockByTxID(txIDAtBlock1);
+		Assert.assertNotNull(block);
+		Assert.assertSame((long) 1, block.getHeader().getNumber());
+		System.out.println(block);
+		block = l.getBlockByTxID(txIDAtBlock1 + "1");
+		Assert.assertNull(block);
     }
 
     @Test
     public void testGetTxValidationCodeByTxID() throws Exception {
-		for (int i = 0; i < 6; i++) {
-			TransactionPackage.TxValidationCode code = l_endorser.getTxValidationCodeByTxID(String.valueOf(i));
-			Assert.assertSame(code.getNumber(), 0);
-		}
-    }
+		TransactionPackage.TxValidationCode txValidationCode = l.getTxValidationCodeByTxID(txIDAtBlock1);
+		Assert.assertSame(TransactionPackage.TxValidationCode.VALID, txValidationCode);
+		txValidationCode = l.getTxValidationCodeByTxID(txIDAtBlock1 + "1");
+		Assert.assertNull(txValidationCode);
+	}
 
+	/*-------------------------------------------------------
+	pvtdata暂时没有...
     @Test
     public void testGetPvtDataAndBlockByNum() throws Exception{
-		BlockAndPvtData bap = l_endorser.getPvtDataAndBlockByNum(1, null);
+		BlockAndPvtData bap = l.getPvtDataAndBlockByNum(1, null);
 		Common.Block block = bap.getBlock();
-		Assert.assertEquals(block, l_endorser.getBlockByNumber(1));
+		Assert.assertEquals(block, l.getBlockByNumber(1));
 		for (int i = 0; i < 6; i++) {
 			TxPvtData txPvtData = bap.getBlockPvtData().get(((long) i));
 			Assert.assertSame(txPvtData.getSeqInBlock(), (long) i);
@@ -97,10 +99,11 @@ public class KvLedgerTest {
 
     @Test
     public void testGetPvtDataByNum() throws Exception {
-        List<TxPvtData> pvtDataByNum = l_endorser.getPvtDataByNum(0, null);
+        List<TxPvtData> pvtDataByNum = l.getPvtDataByNum(0, null);
 		for (int i = 0; i < 6; i++) {
 			TxPvtData txPvtData = pvtDataByNum.get(i);
 			Assert.assertSame(txPvtData.getSeqInBlock(), (long) i);
 		}
 	}
+	-------------------------------------------------------*/
 }
