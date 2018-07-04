@@ -101,11 +101,11 @@ public class NodeSpec {
         this.postalCode = postalCode;
     }
 
-    public List<String> getSANS() {
+    public List<String> getSans() {
         return sans;
     }
 
-    public void setSANS(List<String> sans) {
+    public void setSans(List<String> sans) {
         this.sans = sans;
     }
 }

@@ -17,6 +17,11 @@ package org.bcia.julongchain.common.tools.cryptogen.bean;
 
 import org.bcia.julongchain.csp.intfs.IKey;
 
+/**
+ * @author chenhao, yegangcheng
+ * @date 2018/7/4
+ * @company Excelsecu
+ */
 public class KeySinger {
     private IKey mIkey;
     private Object mISigner;

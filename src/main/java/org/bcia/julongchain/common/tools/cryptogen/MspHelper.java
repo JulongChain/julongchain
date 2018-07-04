@@ -25,6 +25,7 @@ import org.bcia.julongchain.csp.intfs.IKey;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.util.encoders.Hex;
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileWriter;
@@ -238,10 +239,12 @@ public class MspHelper {
         Configuration configuration = new Configuration();
         configuration.setNodeOUs(nodeOUs);
 
-        Yaml yaml = new Yaml();
+        DumperOptions options = new DumperOptions();
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        Yaml yaml = new Yaml(options);
         String path = Paths.get(mspDir, "config.yaml").toString();
         try {
-            yaml.dump(configuration, new FileWriter(path));
+            yaml.dump(configuration.getPropertyMap(), new FileWriter(path));
         } catch (IOException e) {
             throw new JavaChainException("An error occurred on exportConfig:" + e.getMessage());
         }

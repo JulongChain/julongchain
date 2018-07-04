@@ -91,7 +91,7 @@ public class Util {
 
             NodeSpec nodeSpec = new NodeSpec();
             nodeSpec.setCommonName(hostName);
-            nodeSpec.setSANS(nodeTemplate.getSANS());
+            nodeSpec.setSans(nodeTemplate.getSans());
             List<NodeSpec> specs = orgSpec.getSpecs();
             specs.add(nodeSpec);
             orgSpec.setSpecs(specs);
@@ -128,10 +128,10 @@ public class Util {
         data.setCommonName(cn);
 
         // Save off our original, unprocessed SANS entries
-        List<String> originSANS = spec.getSANS();
+        List<String> originSANS = spec.getSans();
         if (originSANS == null) {
             originSANS = new ArrayList<>();
-            spec.setSANS(originSANS);
+            spec.setSans(originSANS);
         }
 
         // Set our implicit SANS entries for CN/Hostname
@@ -141,12 +141,12 @@ public class Util {
         if (hostName != null && hostName.length() != 0) {
             newSans.add(spec.getHostname());
         }
-        spec.setSANS(newSans);
+        spec.setSans(newSans);
 
         // Finally, process any remaining SANS entries
         for (String _san : originSANS) {
             String san = parseTemplate(_san, data);
-            spec.getSANS().add(san);
+            spec.getSans().add(san);
         }
     }
 
@@ -253,7 +253,7 @@ public class Util {
 
             if (!file.exists()) {
                 try {
-                    MspHelper.generateLocalMSP(nodeDir, node.getCommonName(), node.getSANS(), signCA, tlsCA, nodeType, nodeOUs);
+                    MspHelper.generateLocalMSP(nodeDir, node.getCommonName(), node.getSans(), signCA, tlsCA, nodeType, nodeOUs);
                 } catch (JavaChainException e) {
                     log.error("Error generating local MSP for", e);
                     System.exit(1);

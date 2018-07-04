@@ -15,38 +15,41 @@
  */
 package org.bcia.julongchain.common.tools.cryptogen.bean;
 
+/**
+ * @author chenhao, yegangcheng
+ * @date 2018/7/4
+ * @company Excelsecu
+ */
 public class NodeOUs {
-    //按go项目中的yaml指定的命名
-    private boolean Enable;
-    private OrgUnitIdentifiersConfig ClientOUIdentifier;
-    private OrgUnitIdentifiersConfig PeerOUIdentifier;
+    private boolean enable;
+    private OrgUnitIdentifiersConfig clientOUIdentifier;
+    private OrgUnitIdentifiersConfig peerOUIdentifier;
 
     public NodeOUs() {
 
     }
 
-
     public OrgUnitIdentifiersConfig getClientOUIdentifier() {
-        return ClientOUIdentifier;
+        return clientOUIdentifier;
     }
 
     public OrgUnitIdentifiersConfig getPeerOUIdentifier() {
-        return PeerOUIdentifier;
+        return peerOUIdentifier;
     }
 
     public boolean getEnable() {
-        return Enable;
+        return enable;
     }
 
     public void setClientOUIdentifier(OrgUnitIdentifiersConfig clientOUIdentifier) {
-        ClientOUIdentifier = clientOUIdentifier;
+        this.clientOUIdentifier = clientOUIdentifier;
     }
 
     public void setEnable(boolean enable) {
-        Enable = enable;
+        this.enable = enable;
     }
 
     public void setPeerOUIdentifier(OrgUnitIdentifiersConfig peerOUIdentifier) {
-        PeerOUIdentifier = peerOUIdentifier;
+        this.peerOUIdentifier = peerOUIdentifier;
     }
 }
