@@ -1,22 +1,21 @@
 # ---------------------------------------------------------------------------
-# "ConsenterOrgs" - Definition of organizations managing consenter nodes
+# "consenterOrgs" - Definition of organizations managing consenter nodes
 # ---------------------------------------------------------------------------
-!!org.bcia.javachain.common.tools.cryptogen.bean.Config
 consenterOrgs:
   # ---------------------------------------------------------------------------
-  # Consenter
+  # consenter
   # ---------------------------------------------------------------------------
   - name: Consenter
     domain: example.com
 
     # ---------------------------------------------------------------------------
-    # "Specs" - See PeerOrgs below for complete description
+    # "specs" - See PeerOrgs below for complete description
     # ---------------------------------------------------------------------------
     specs:
       - hostname: consenter
 
 # ---------------------------------------------------------------------------
-# "PeerOrgs" - Definition of organizations managing peer nodes
+# "peerOrgs" - Definition of organizations managing peer nodes
 # ---------------------------------------------------------------------------
 peerOrgs:
   # ---------------------------------------------------------------------------
@@ -27,36 +26,36 @@ peerOrgs:
     enableNodeOUs: false
 
     # ---------------------------------------------------------------------------
-    # "CA"
+    # "ca"
     # ---------------------------------------------------------------------------
     # Uncomment this section to enable the explicit definition of the CA for this
     # organization.  This entry is a Spec.  See "Specs" section below for details.
     # ---------------------------------------------------------------------------
-    # CA:
-    #    Hostname: ca # implicitly ca.org1.example.com
-    #    Country: US
-    #    Province: California
-    #    Locality: San Francisco
-    #    OrganizationalUnit: Hyperledger Fabric
-    #    StreetAddress: address for org # default nil
-    #    PostalCode: postalCode for org # default nil
+    # ca:
+    #    hostname: ca # implicitly ca.org1.example.com
+    #    country: US
+    #    province: California
+    #    locality: San Francisco
+    #    organizationalUnit: Hyperledger Fabric
+    #    streetAddress: address for org # default nil
+    #    postalCode: postalCode for org # default nil
 
     # ---------------------------------------------------------------------------
-    # "Specs"
+    # "specs"
     # ---------------------------------------------------------------------------
     # Uncomment this section to enable the explicit definition of hosts in your
     # configuration.  Most users will want to use Template, below
     #
     # Specs is an array of Spec entries.  Each Spec entry consists of two fields:
-    #   - Hostname:   (Required) The desired hostname, sans the domain.
-    #   - CommonName: (Optional) Specifies the template or explicit override for
+    #   - hostname:   (Required) The desired hostname, sans the domain.
+    #   - commonName: (Optional) Specifies the template or explicit override for
     #                 the CN.  By default, this is the template:
     #
     #                              "{{.Hostname}}.{{.Domain}}"
     #
     #                 which obtains its values from the Spec.Hostname and
     #                 Org.Domain, respectively.
-    #   - SANS:       (Optional) Specifies one or more Subject Alternative Names
+    #   - sans:       (Optional) Specifies one or more Subject Alternative Names
     #                 to be set in the resulting x509. Accepts template
     #                 variables {{.Hostname}}, {{.Domain}}, {{.CommonName}}. IP
     #                 addresses provided here will be properly recognized. Other
@@ -65,19 +64,19 @@ peerOrgs:
     #                     - {{ .CommonName }}
     #                     - {{ .Hostname }}
     # ---------------------------------------------------------------------------
-    # Specs:
-    #   - Hostname: foo # implicitly "foo.org1.example.com"
-    #     CommonName: foo27.org5.example.com # overrides Hostname-based FQDN set above
-    #     SANS:
+    # specs:
+    #   - hostname: foo # implicitly "foo.org1.example.com"
+    #     commonName: foo27.org5.example.com # overrides Hostname-based FQDN set above
+    #     sans:
     #       - "bar.{{.Domain}}"
     #       - "altfoo.{{.Domain}}"
     #       - "{{.Hostname}}.org6.net"
     #       - 172.16.10.31
-    #   - Hostname: bar
-    #   - Hostname: baz
+    #   - hostname: bar
+    #   - hostname: baz
 
     # ---------------------------------------------------------------------------
-    # "Template"
+    # "template"
     # ---------------------------------------------------------------------------
     # Allows for the definition of 1 or more hosts that are created sequentially
     # from a template. By default, this looks like "peer%d" from 0 to Count-1.
@@ -90,15 +89,15 @@ peerOrgs:
     # ---------------------------------------------------------------------------
     template:
       count: 1
-      # Start: 5
-      # Hostname: {{.Prefix}}{{.Index}} # default
-      # SANS:
+      # start: 5
+      # hostname: {{.Prefix}}{{.Index}} # default
+      # sans:
       #   - "{{.Hostname}}.alt.{{.Domain}}"
 
     # ---------------------------------------------------------------------------
-    # "Users"
+    # "users"
     # ---------------------------------------------------------------------------
-    # Count: The number of user accounts _in addition_ to Admin
+    # count: The number of user accounts _in addition_ to Admin
     # ---------------------------------------------------------------------------
     users:
       count: 1

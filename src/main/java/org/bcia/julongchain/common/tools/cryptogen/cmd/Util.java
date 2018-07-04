@@ -127,14 +127,14 @@ public class Util {
         spec.setCommonName(cn);
         data.setCommonName(cn);
 
-        // Save off our original, unprocessed SANS entries
-        List<String> originSANS = spec.getSans();
-        if (originSANS == null) {
-            originSANS = new ArrayList<>();
-            spec.setSans(originSANS);
+        // Save off our original, unprocessed sans entries
+        List<String> originSans = spec.getSans();
+        if (originSans == null) {
+            originSans = new ArrayList<>();
+            spec.setSans(originSans);
         }
 
-        // Set our implicit SANS entries for CN/Hostname
+        // Set our implicit sans entries for CN/Hostname
         List<String> newSans = new ArrayList<>();
         newSans.add(cn);
         String hostName = spec.getHostname();
@@ -143,8 +143,8 @@ public class Util {
         }
         spec.setSans(newSans);
 
-        // Finally, process any remaining SANS entries
-        for (String _san : originSANS) {
+        // Finally, process any remaining sans entries
+        for (String _san : originSans) {
             String san = parseTemplate(_san, data);
             spec.getSans().add(san);
         }

@@ -15,8 +15,6 @@
  */
 package org.bcia.julongchain.common.tools.cryptogen.bean;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import java.util.HashMap;
 import java.util.Map;
 
