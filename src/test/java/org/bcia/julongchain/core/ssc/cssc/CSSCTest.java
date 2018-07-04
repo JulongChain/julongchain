@@ -133,7 +133,7 @@ public class CSSCTest extends BaseJunit4Test {
         ISmartContract.SmartContractResponse res3 = mockStub.mockInvokeWithSignedProposal("3", args3,sp);
         assertThat(res3.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
         try {
-            ResourcesPackage.ConfigTree tree = ResourcesPackage.ConfigTree.parseFrom(res3.getPayload());
+            ResourcesPackage.RootConfigTree tree = ResourcesPackage.RootConfigTree.parseFrom(res3.getPayload());
             assertNotNull(tree);
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();

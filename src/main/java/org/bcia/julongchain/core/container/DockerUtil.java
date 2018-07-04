@@ -149,16 +149,12 @@ public class DockerUtil {
     return result;
   }
 
-  public static String createContainer(String imageId, String containerName) {
+  public static String createContainer(String imageId, String containerName, String... cmdStr) {
     String containerId =
         getDockerClient()
             .createContainerCmd(imageId)
             .withName(containerName)
-            .withCmd(
-                "/bin/sh",
-                "-c",
-                "java -jar /root/julongchain/target/julongchain-smartcontract-java-jar-with-dependencies.jar -i "
-                    + containerName)
+            .withCmd(cmdStr)
             .exec()
             .getId();
     logger.info("container ID:" + containerId);

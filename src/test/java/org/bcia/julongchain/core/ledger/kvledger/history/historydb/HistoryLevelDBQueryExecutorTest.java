@@ -15,10 +15,12 @@ limitations under the License.
  */
 package org.bcia.julongchain.core.ledger.kvledger.history.historydb;
 
+import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.protos.ledger.queryresult.KvQueryResult;
+import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -32,20 +34,36 @@ import org.junit.Test;
  * @company Dingxuan
  */
 public class HistoryLevelDBQueryExecutorTest {
-	String ns = "myGroup";
+	String ledgerID = "myGroup";
+	String ns = "mycc";
 	IHistoryQueryExecutor queryExecutor;
 
 	@Before
 	public void before() throws Exception{
 		LedgerManager.initialize(null);
-		queryExecutor = LedgerManager.openLedger(ns).newHistoryQueryExecutor();
+		queryExecutor = LedgerManager.openLedger(ledgerID).newHistoryQueryExecutor();
 	}
 
 	@Test
 	public void testGetHistoryForKey() throws Exception{
-		QueryResult qr = queryExecutor.getHistoryForKey(ns, "key").next();
-		KvQueryResult.KeyModification result = (KvQueryResult.KeyModification) qr.getObj();
-		Assert.assertEquals(result.getTxId(), "1");
+		IResultsIterator itr = queryExecutor.getHistoryForKey(ns, "a");
+		QueryResult qr = itr.next();
+		KvRwset.Version result = (KvRwset.Version) qr.getObj();
+		Assert.assertSame((long) 0, result.getTxNum());
+		Assert.assertSame((long) 1, result.getBlockNum());
+		qr = itr.next();
+		result = (KvRwset.Version) qr.getObj();
+		Assert.assertSame((long) 0, result.getTxNum());
+		Assert.assertSame((long) 2, result.getBlockNum());
+		itr = queryExecutor.getHistoryForKey(ns, "c");
+		qr = itr.next();
+		result = (KvRwset.Version) qr.getObj();
+		Assert.assertSame((long) 0, result.getTxNum());
+		Assert.assertSame((long) 1, result.getBlockNum());
+		qr = itr.next();
+		result = (KvRwset.Version) qr.getObj();
+		Assert.assertSame((long) -1, result.getTxNum());
+		Assert.assertSame((long) -1, result.getBlockNum());
 	}
 
 	@After
