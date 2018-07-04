@@ -54,23 +54,20 @@ public class BlockCutter implements IReceiver {
         BatchesMes batchesMes = new BatchesMes();
         if (messageSizeBytes > sharedConfigManager.getBatchSize().getPreferredMaxBytes()) {
 
-            log.debug(String.format("he current message, with %v bytes, is larger than the preferred batch size of %v bytes and will be isolated.", messageSizeBytes, sharedConfigManager.getBatchSize().getPreferredMaxBytes()));
+            log.debug(String.format("he current message, with %s bytes, is larger than the preferred batch size of %s bytes and will be isolated.", messageSizeBytes, sharedConfigManager.getBatchSize().getPreferredMaxBytes()));
 
             if (pendingBatch.length > 0) {
                 Common.Envelope[] messageBatch = cut();
                 batchesMes.setMessageBatches((Common.Envelope[][]) ArrayUtils.add(batchesMes.getMessageBatches(), messageBatch));
-                //batchesMes.messageBatches = (Common.Envelope[][]) ArrayUtils.add(batchesMes.messageBatches, messageBatch);
             }
             batchesMes.setMessageBatches((Common.Envelope[][]) ArrayUtils.add(batchesMes.getMessageBatches(), new Common.Envelope[]{msg}));
-          //  batchesMes.messageBatches = (Common.Envelope[][]) ArrayUtils.add(batchesMes.messageBatches, new Common.Envelope[]{msg});
         }
 
         boolean messageWillOverflowBatchSizeBytes = pendingBatchSizeBytes +messageSizeBytes> sharedConfigManager.getBatchSize().getPreferredMaxBytes();
         if (messageWillOverflowBatchSizeBytes) {
-            log.debug(String.format("The current message, with %v bytes, will overflow the pending batch of %v bytes.", messageSizeBytes, pendingBatchSizeBytes));
+            log.debug(String.format("The current message, with %s bytes, will overflow the pending batch of %s bytes.", messageSizeBytes, pendingBatchSizeBytes));
             log.debug("Pending batch would overflow if current message is added, cutting batch now.");
             Common.Envelope[] messageBatch = cut();
-           // batchesMes.messageBatches = (Common.Envelope[][]) ArrayUtils.add(batchesMes.getMessageBatches(), messageBatch);
             batchesMes.setMessageBatches((Common.Envelope[][]) ArrayUtils.add(batchesMes.getMessageBatches(), messageBatch));
         }
         log.debug("Enqueuing message into batch");
@@ -79,16 +76,11 @@ public class BlockCutter implements IReceiver {
         pendingBatchSizeBytes += messageSizeBytes;
 
         batchesMes.setPending(true);
-        //batchesMes.pending = true;
-        //BatchesMes mes = new BatchesMes();
-
         if(pendingBatch.length>=sharedConfigManager.getBatchSize().getMaxMessageCount()){
             log.debug("Batch size met,cutting batch");
             Common.Envelope[] messageBatch = cut();
             batchesMes.setMessageBatches((Common.Envelope[][]) ArrayUtils.add(batchesMes.getMessageBatches(),messageBatch));
-          //  batchesMes.messageBatches= (Common.Envelope[][]) ArrayUtils.add(batchesMes.messageBatches,messageBatch);
             batchesMes.setPending(true);
-          //  batchesMes.pending=true;
         }
         return batchesMes;
     }

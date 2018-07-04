@@ -24,8 +24,7 @@ import org.bcia.julongchain.common.util.producer.Producer;
 import org.bcia.julongchain.consenter.common.cmd.impl.StartCmd;
 import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
 import org.bcia.julongchain.consenter.consensus.IChain;
-import org.bcia.julongchain.consenter.consensus.IConsensue;
-import org.bcia.julongchain.consenter.consensus.IConsenterSupport;
+import org.bcia.julongchain.consenter.consensus.IConsensusPlugin;
 import org.bcia.julongchain.consenter.entity.BatchesMes;
 import org.bcia.julongchain.consenter.entity.Message;
 import org.bcia.julongchain.gossip.GossipServiceUtil;
@@ -39,7 +38,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @Date: 2018/3/7
  * @company Dingxuan
  */
-public class Singleton implements IChain, IConsensue {
+public class Singleton implements IChain, IConsensusPlugin {
     private BlockingQueue<Message> blockingQueue;
     private Producer<Message> producer;
     private Consumer<Message> consumer;
@@ -97,7 +96,7 @@ public class Singleton implements IChain, IConsensue {
 
 
     public Singleton(ChainSupport consenterSupport) {
-        this.support = consenterSupport;
+       support = consenterSupport;
         instance = this;
         blockingQueue = new LinkedBlockingQueue<>();
         producer = new Producer<Message>(blockingQueue);
@@ -200,14 +199,6 @@ public class Singleton implements IChain, IConsensue {
     public boolean pushToQueue(Message message) throws ValidateException {
         ValidateUtils.isNotNull(message, "message can not be null");
         return producer.produce(message);
-    }
-
-    public IConsenterSupport getSupport() {
-        return support;
-    }
-
-    public void setSupport(ChainSupport support) {
-        this.support = support;
     }
 
     public Message getNormalMessage() {

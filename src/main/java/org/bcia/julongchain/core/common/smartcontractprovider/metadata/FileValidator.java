@@ -39,14 +39,14 @@ public class FileValidator {
     }
 
     public void handle(String fileName, byte[] fileBytes) throws ValidateException {
-        couchdbIndexFileValidator(fileName, fileBytes);
+        validateCouchdbIndexFile(fileName, fileBytes);
     }
 
 
     /**
-     * couchdbIndexFileValidator implements fileValidator
+     * validateCouchdbIndexFile implements fileValidator
      */
-    private static void couchdbIndexFileValidator(String fileName, byte[] fileBytes) throws ValidateException {
+    private static void validateCouchdbIndexFile(String fileName, byte[] fileBytes) throws ValidateException {
         String ext = fileName.substring(fileName.length() - 5);
         String json = ".json";
         if(!json.equals(ext)){

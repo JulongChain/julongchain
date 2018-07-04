@@ -32,9 +32,9 @@ import static org.bcia.julongchain.csp.factory.CspManager.getDefaultCsp;
  */
 public class BlockHelper {
     private static JavaChainLog log = JavaChainLogFactory.getLog(BlockHelper.class);
-    byte[] previousHash;
-    byte[] dataHash;
-    long number;
+    private  byte[] previousHash;
+    private byte[] dataHash;
+    private long number;
 
 
     public BlockHelper(byte[] previousHash, byte[] dataHash, long number) {

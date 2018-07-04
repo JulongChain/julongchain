@@ -22,6 +22,9 @@ import org.bcia.julongchain.consenter.common.cmd.IConsenterCmd;
 import org.bcia.julongchain.consenter.common.cmd.factory.ConsenterCmdFactory;
 import org.bcia.julongchain.consenter.util.Constant;
 
+import java.io.File;
+import java.nio.file.Files;
+
 /**
  * @author zhangmingyang
  * @Date: 2018/3/1 *

@@ -22,7 +22,7 @@ import org.bcia.julongchain.consenter.common.blockcutter.BlockCutter;
 import org.bcia.julongchain.consenter.consensus.IChain;
 import org.bcia.julongchain.consenter.entity.ChainEntity;
 import org.bcia.julongchain.consenter.util.Constant;
-import org.bcia.julongchain.consenter.util.LoadYaml;
+import org.bcia.julongchain.consenter.util.YamlLoader;
 import org.bcia.julongchain.consenter.util.Utils;
 import org.bcia.julongchain.gossip.Node1;
 import org.bcia.julongchain.protos.common.Common;
@@ -50,10 +50,10 @@ public class Chain implements IChain {
     //TODO 使用自动注入报错，暂时new方式
     private KafkaSimpleConsumer kafkaSimpleConsumer=new KafkaSimpleConsumer();
     @Autowired
-    private LoadYaml loadYaml=new LoadYaml();
+    private YamlLoader yamlLoader =new YamlLoader();
     //TODO 不知如何获取
     private ChainEntity chain=new ChainEntity();
-    Map map=(HashMap)LoadYaml.readYamlFile(Constant.ORDERER_CONFIG).get(Constant.KAFKA);
+    Map map=(HashMap) YamlLoader.readYamlFile(Constant.ORDERER_CONFIG).get(Constant.KAFKA);
     BlockCutter blockCutter=new BlockCutter();
 
     @Override
@@ -383,7 +383,7 @@ public class Chain implements IChain {
 
     public static void main(String[] args) {
         Chain cc=new Chain();
-      //  cc.start();
+      // cc.start();
         cc.enqueue(null);
     }
 
