@@ -74,6 +74,8 @@ public class CommConstant {
      */
     public static final String PATH_SEPARATOR = "/";
 
+    public static final String CONFIG_DIR_PREFIX = "config/";
+
     /**
      * 默认随机数长度
      */

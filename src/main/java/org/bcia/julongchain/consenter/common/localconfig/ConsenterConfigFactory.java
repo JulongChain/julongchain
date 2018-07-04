@@ -17,8 +17,12 @@ package org.bcia.julongchain.consenter.common.localconfig;
 
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.util.CommConstant;
+import org.bcia.julongchain.core.node.NodeConfig;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 /**
@@ -31,10 +35,20 @@ public class ConsenterConfigFactory {
 
     public static ConsenterConfig loadConsenterConfig() {
         Yaml yaml = new Yaml();
-        InputStream is = ConsenterConfigFactory.class.getClassLoader().getResourceAsStream(ConsenterConfig.CONSENTER_CONFIG_PATH);
-        ConsenterConfig consenterConfig = yaml.loadAs(is, ConsenterConfig.class);
-        return consenterConfig;
+//        InputStream is = ConsenterConfigFactory.class.getClassLoader().getResourceAsStream(ConsenterConfig.CONSENTER_CONFIG_PATH);
+
+        InputStream is = null;
+        try {
+            is = new FileInputStream(CommConstant.CONFIG_DIR_PREFIX + ConsenterConfig.CONSENTER_CONFIG_PATH);
+            ConsenterConfig consenterConfig = yaml.loadAs(is, ConsenterConfig.class);
+            return consenterConfig;
+        } catch (FileNotFoundException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        return null;
     }
+
     public static void main(String[] args) {
         ConsenterConfig consenterConfig = loadConsenterConfig();
         System.out.println(consenterConfig.getKafka().getComumer().get("maxReads"));
