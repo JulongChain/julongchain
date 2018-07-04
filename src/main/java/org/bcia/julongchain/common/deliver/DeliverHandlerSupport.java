@@ -16,7 +16,6 @@
 package org.bcia.julongchain.common.deliver;
 
 import com.google.protobuf.Message;
-import io.grpc.stub.StreamObserver;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 

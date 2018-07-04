@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.consenter.common.server;
+package org.bcia.julongchain.consenter.consensus;
 
-import org.bcia.julongchain.common.deliver.IHandler;
-import org.bcia.julongchain.consenter.common.multigroup.Registrar;
+import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
+import org.bcia.julongchain.protos.common.Common;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/6/4
+ * @Date: 2018/3/1
  * @company Dingxuan
  */
-public class Server {
- private Registrar registrar;
- private IHandler deliverHandle;
- private org.bcia.julongchain.consenter.common.server.IHandler broadcastHandler;
-
+public interface IConsensusPlugin {
+     IChain handleChain(ChainSupport consenterSupport, Common.Metadata metadata);
 }

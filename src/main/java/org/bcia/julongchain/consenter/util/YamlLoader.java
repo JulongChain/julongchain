@@ -27,21 +27,14 @@ import java.util.Map;
  * @Date: 2018/3/1
  * @company Dingxuan
  */
-public class LoadYaml {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(LoadYaml.class);
+public class YamlLoader {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(YamlLoader.class);
 
     public static Map readYamlFile(String file){
         HashMap map=new HashMap();
         try {
             Yaml yaml = new Yaml();
-//            URL url = LoadYaml.class.getClassLoader().getResource(file);
-//            if (url != null) {
-//                //可以将值转换为Map
-//                log.info("Loading the yaml file...");
-//                 map =(HashMap)yaml.load(new FileInputStream(url.getFile()));
-//            }
-
-            map =(HashMap)yaml.load(LoadYaml.class.getClassLoader().getResourceAsStream(file));
+            map =(HashMap)yaml.load(YamlLoader.class.getClassLoader().getResourceAsStream(file));
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -169,7 +169,7 @@ public class DeliverHandler implements IHandler {
                 Common.Status status = block.getValue();
                 blockData.getHeader().getNumber();
                 if (status != Common.Status.SUCCESS) {
-                    log.error(String.format("[channel: %s] Error reading from channel, cause was: %v", chdr.getGroupId(), status));
+                    log.error(String.format("[channel: %s] Error reading from channel, cause was: %s", chdr.getGroupId(), status));
                     sendStatusReply(server, status);
                 }
                 number++;

@@ -54,7 +54,7 @@ public class SessionAccessControl  {
     public void enaluate() throws ValidateException {
         Date nowDate = new Date();
         if(nowDate.after(sessionEndTime)&&!sessionEndTime.equals(null)){
-            throw new ValidateException(String.format("client identity expired %v before",sessionEndTime));
+            throw new ValidateException(String.format("client identity expired %s before",sessionEndTime));
         }
         boolean policyCheckNeeded=!usedAtLeastOnce;
         long currentConfigSequence=acSupport.getSequence();

@@ -31,7 +31,7 @@ import org.bcia.julongchain.common.util.proto.BlockUtils;
 import org.bcia.julongchain.consenter.common.bootstrap.file.BootStrapHelper;
 import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfig;
 import org.bcia.julongchain.consenter.common.multigroup.Registrar;
-import org.bcia.julongchain.consenter.consensus.IConsensue;
+import org.bcia.julongchain.consenter.consensus.IConsensusPlugin;
 import org.bcia.julongchain.consenter.consensus.singleton.Singleton;
 import org.bcia.julongchain.core.common.grpc.GrpcServerConfig;
 import org.bcia.julongchain.core.common.grpc.SecureOptions;
@@ -89,7 +89,7 @@ public class PreStart {
             } else {
                 log.info("Not bootstrapping because of existing chains");
             }
-            Map<String, IConsensue> consenters = new HashMap<>();
+            Map<String, IConsensusPlugin> consenters = new HashMap<>();
             consenters.put("Singleton", new Singleton());
            defaultRegistrar=new Registrar().newRegistrar(lf, consenters, signer);
            return defaultRegistrar;

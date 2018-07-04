@@ -38,8 +38,4 @@ public class BroadCastSupport implements IGroupSupportRegistrar  {
     public Map<String, Object> broadcastGroupSupport(Common.Envelope msg) throws InvalidProtocolBufferException {
         return new Registrar().broadcastGroupSupport(msg);
     }
-
-    public Registrar getRegistrar() {
-        return registrar;
-    }
 }

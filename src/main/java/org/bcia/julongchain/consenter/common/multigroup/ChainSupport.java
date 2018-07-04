@@ -50,7 +50,7 @@ public class ChainSupport implements IStandardGroupSupport, IConsenterSupport {
     public ChainSupport() {
     }
 
-    public ChainSupport(Registrar registrar, LedgerResources ledgerResources, Map<String, IConsensue> consenters, ILocalSigner signer) {
+    public ChainSupport(Registrar registrar, LedgerResources ledgerResources, Map<String, IConsensusPlugin> consenters, ILocalSigner signer) {
         Common.Block lastBlock = null;
         Common.Metadata metadata = null;
         try {
@@ -67,7 +67,7 @@ public class ChainSupport implements IStandardGroupSupport, IConsenterSupport {
         this.blockWriter = new BlockWriter(this, registrar, lastBlock);
         // this.blockWriter = new BlockWriter(blockWriter.getSupport(), registrar, lastBlock);
         String consensusType = ledgerResources.getMutableResources().getGroupConfig().getConsenterConfig().getConsensusType();
-        IConsensue consenter = consenters.get(consensusType);
+        IConsensusPlugin consenter = consenters.get(consensusType);
         chain = consenter.handleChain(this, metadata);
     }
 

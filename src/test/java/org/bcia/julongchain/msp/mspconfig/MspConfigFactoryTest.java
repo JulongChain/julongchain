@@ -15,7 +15,7 @@ public class MspConfigFactoryTest {
     public void loadMspConfig() {
         try {
             MspConfigFactory.loadMspConfig();
-            System.out.println("默认csp配置："+MspConfigFactory.loadMspConfig().getNode().getCsp().getDefaultValue());
+            System.out.println("默认csp配置："+MspConfigFactory.loadMspConfig().getNode().getCsp().getFactoryOpts().get("gm"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

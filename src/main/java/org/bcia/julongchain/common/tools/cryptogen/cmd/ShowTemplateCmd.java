@@ -19,7 +19,7 @@ package org.bcia.julongchain.common.tools.cryptogen.cmd;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.util.FileUtils;
-import org.bcia.julongchain.consenter.util.LoadYaml;
+import org.bcia.julongchain.consenter.util.YamlLoader;
 
 import java.io.IOException;
 import java.net.URL;
@@ -157,7 +157,7 @@ public class ShowTemplateCmd implements ICryptoGenCmd {
 
     static {
         String temp = DEFAULT_TEMPLATE;
-        URL url = LoadYaml.class.getClassLoader().getResource("crypto-config.yaml");
+        URL url = YamlLoader.class.getClassLoader().getResource("crypto-config.yaml");
         if (url == null) {
             log.warn("crypto-config.yaml not found in jar, use default template");
         } else {
