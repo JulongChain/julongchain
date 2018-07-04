@@ -167,7 +167,7 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
         }
 
         String contractID = contract.getSmartContractID();
-        log.info("Register system contract [%s]", contractID);
+        log.info("Register system contract {}", contractID);
         sysSCMap.put(contractID, contract);
         return true;
     }
