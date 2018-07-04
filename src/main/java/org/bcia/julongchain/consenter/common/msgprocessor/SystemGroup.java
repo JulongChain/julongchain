@@ -104,11 +104,11 @@ public class SystemGroup  implements IProcessor {
 
         Configtx.ConfigEnvelope newGroupConfigEnv = bundle.getConfigtxValidator().proposeConfigUpdate(envConfigUpdate);
 
-        Common.Envelope newChannelEnvConfig = TxUtils.createSignedEnvelope(Common.HeaderType.CONFIG_VALUE, groupId, standardGroup.getSupport().signer(), newGroupConfigEnv, Constant.MSGVERSION, Constant.EPOCH);
+        Common.Envelope newChannelEnvConfig = TxUtils.createSignedEnvelope(Common.HeaderType.CONFIG_VALUE, groupId, standardGroup.getSupport().getSigner(), newGroupConfigEnv, Constant.MSGVERSION, Constant.EPOCH);
 
         Common.Envelope wrappedOrdererTransaction =
                 TxUtils.createSignedEnvelope(Common.HeaderType.CONSENTER_TRANSACTION_VALUE,
-                        standardGroup.getSupport().getGroupId(), standardGroup.getSupport().signer(), newChannelEnvConfig,
+                        standardGroup.getSupport().getGroupId(), standardGroup.getSupport().getSigner(), newChannelEnvConfig,
                         Constant.MSGVERSION, Constant.EPOCH);
 //       new RuleSet(standardGroup.getFilters().getRules()).apply(wrappedOrdererTransaction);
 

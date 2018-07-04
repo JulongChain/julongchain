@@ -64,12 +64,19 @@ import java.util.List;
 public class NodeServer {
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeServer.class);
 
+    /**
+     * 记录当前进程id的文件
+     */
     private static final String PID_FILE_NAME = "node.pid";
 
-    private String cachedEndpoint;
-
+    /**
+     * 当前所在的节点
+     */
     private Node node;
 
+    /**
+     * 系统智能合约管理器
+     */
     private ISystemSmartContractManager systemSmartContractManager;
 
     public NodeServer(Node node) {
@@ -99,40 +106,14 @@ public class NodeServer {
 
         log.info("begin to start node, current version: " + NodeConstant.CURRENT_VERSION);
 
-        //获取当前的访问清单提供者
-        IAclProvider aclProvider = AclManagement.getACLProvider();
-
-        //初始化账本
-//        LedgerMgmt.initialize();
-//        ledgermgmt.Initialize(peer.ConfigTxProcessors)
-        try {
-            LedgerManager.initialize(null);
-        } catch (LedgerException e) {
-            e.printStackTrace();
-        }
-
-
-        String nodeEndpoint = null;
-
-//        if(StringUtils.isNotBlank(cachedEndpoint)){
-//            nodeEndpoint = cachedEndpoint;
-//        }else{
-//            nodeEndpoint = NodeConfiguration.getLocalAddress()
-//        }
-        //读取终端地址
-        //读取配置文件，形成serverConfig对象
-        //TODO:如何将Grpc服务与serverConfig关联
-
         //启动Node主服务(Grpc Server1)
         startNodeGrpcServer(nodeConfig);
 
         //启动事件处理服务(Grpc Server2)
         startEventGrpcServer(nodeConfig);
 
-        //创建智能合约支持服务
-        //创建Gossip服务
+        //注册系统智能合约
         systemSmartContractManager.registerSysSmartContracts();
-
         //初始化系统智能合约
         initSysSmartContracts();
 

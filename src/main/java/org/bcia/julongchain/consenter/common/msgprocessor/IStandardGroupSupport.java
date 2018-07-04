@@ -25,5 +25,5 @@ import org.bcia.julongchain.common.localmsp.ILocalSigner;
  */
 public interface IStandardGroupSupport extends IConfigtxValidator{
 
-    ILocalSigner signer();
+    ILocalSigner getSigner();
 }

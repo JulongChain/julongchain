@@ -356,7 +356,10 @@ public class SmartContractSupport {
             String imageId =
                 DockerUtil.buildImage(basePath + "/Dockerfile.in", smartContractId + "-" + version);
             // 创建容器
-            String containerId = DockerUtil.createContainer(imageId, smartContractId);
+              // "/bin/sh",
+              // "-c",
+              // "java -jar /root/julongchain/target/julongchain-smartcontract-java-jar-with-dependencies.jar -i " + containerName
+            String containerId = DockerUtil.createContainer(imageId, smartContractId, "/bin/sh", "-c", "java -jar /root/julongchain/target/julongchain-smartcontract-java-jar-with-dependencies.jar -i " + smartContractId);
             // 启动容器
             DockerUtil.startContainer(containerId);
 

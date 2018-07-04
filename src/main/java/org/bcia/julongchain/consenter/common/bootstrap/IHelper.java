@@ -25,5 +25,5 @@ import org.bcia.julongchain.protos.common.Common;
 public interface IHelper {
     // GenesisBlock should return the genesis block required to bootstrap
     // the ledger (be it reading from the filesystem, generating it, etc.)
-    Common.Block genesisBlock();
+    Common.Block getGenesisBlock();
 }

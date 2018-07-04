@@ -34,7 +34,7 @@ public class BootStrapHelper implements IHelper {
     }
 
     @Override
-    public Common.Block genesisBlock() {
+    public Common.Block getGenesisBlock() {
         Common.Block gensisBlock = null;
         try {
            byte[] bootstrapFile=FileUtils.readFileBytes(genesisBlockFile);

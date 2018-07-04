@@ -50,7 +50,7 @@ public class BlockCutter implements IReceiver {
     @Override
     public BatchesMes ordered(Common.Envelope msg) {
 
-        int messageSizeBytes = messageSizeBytes(msg);
+        int messageSizeBytes = getMessageSizeBytes(msg);
         BatchesMes batchesMes = new BatchesMes();
         if (messageSizeBytes > sharedConfigManager.getBatchSize().getPreferredMaxBytes()) {
 
@@ -103,7 +103,7 @@ public class BlockCutter implements IReceiver {
     }
 
 
-    private static int messageSizeBytes(Common.Envelope message) {
+    private static int getMessageSizeBytes(Common.Envelope message) {
         return message.getPayload().size() + message.getSignature().size();
     }
 

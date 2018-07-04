@@ -1,7 +1,9 @@
 package org.bcia.julongchain.core.container;
 
 import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.ListContainersCmd;
 import com.github.dockerjava.core.command.LogContainerResultCallback;
+import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.List;
@@ -15,42 +17,47 @@ import java.util.List;
  */
 public class DockerUtilTest {
 
-  @Test
-  public void buildBaseImage() {
-    DockerUtil.buildImage(
-        "src/main/java/org/bcia/julongchain/images/baseos/Dockerfile.in", "julongchain-baseimage");
-  }
-
-  @Test
-  public void logC() {
-    List<String> list = DockerUtil.listContainers("");
-    System.out.println(list.toString());
-
-    DockerClient dockerClient = DockerUtil.getDockerClient();
-    LogContainerResultCallback exec = dockerClient.logContainerCmd(list.get(0)).withTailAll().exec(new
-        LogContainerResultCallback());
-
-  }
-
-  @Test
-  public void listImages() {
-
-    List<String> list = DockerUtil.listImages("");
-    System.out.println(list.toString());
-  }
-
-  @Test
-  public void deleteContainer() throws InterruptedException {
-    List<String> list = DockerUtil.listContainers("mycc");
-    System.out.println(list);
-    DockerClient dockerClient = DockerUtil.getDockerClient();
-    for (String s : list) {
-      dockerClient.removeContainerCmd(s);
+    @Test
+    public void testCreateImages() {
+        String dockerFilePath = "src/main/java/org/bcia/julongchain/images/baseos/test.in";
+        String tag = "test-image1";
+        DockerUtil.buildImage(
+                dockerFilePath, tag);
+        List<String> list = DockerUtil.listImages(tag);
+        Assert.assertEquals(list.get(0), tag);
     }
 
-    Thread.sleep(5000);
-    DockerUtil.closeDockerClient(dockerClient);
+    @Test
+    public void testListContainer() {
+        List<String> strings = DockerUtil.listContainers("test");
+        System.out.println(strings);
+    }
 
-  }
+    @Test
+    public void testStartContainer() {
+        DockerUtil.startContainer("f62387bd60db495cf40aa84ebe831a023d4a6030010c903dbbc5fe5c7a883529");
+    }
+
+    @Test
+    public void testCreateContainer() {
+        String imageName = "testImage";
+        List<String> imageTags = DockerUtil.listImages(imageName);
+        String imageId = imageTags.get(0);
+        String name = "testContainer";
+        DockerUtil.createContainer(imageId, name, "/bin/bash");
+        List<String> containers = DockerUtil.listContainers(name);
+        Assert.assertEquals(containers.get(0), name);
+    }
+
+    @Test
+    public void testListImages() {
+        String imageName = "test-image1:latest";
+        List<String> list = DockerUtil.listImages(imageName);
+        System.out.println(list.toString());
+        Assert.assertNotNull(list);
+        Assert.assertEquals(list.size(), 1);
+        Assert.assertEquals(list.get(0), imageName);
+    }
+
 
 }
