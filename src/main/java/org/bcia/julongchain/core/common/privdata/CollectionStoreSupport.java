@@ -15,34 +15,51 @@
  */
 package org.bcia.julongchain.core.common.privdata;
 
+import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.LedgerException;
+import org.bcia.julongchain.common.exception.PrivDataException;
+import org.bcia.julongchain.common.log.JavaChainLog;
+import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.IQueryExecutor;
+import org.bcia.julongchain.core.node.NodeSupport;
+import org.bcia.julongchain.core.node.util.NodeUtils;
 import org.bcia.julongchain.msp.IIdentityDeserializer;
+import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.protos.common.Collection;
 
 /**
- * 类描述
+ * implements IPrivDataSupport
  *
- * @author sunianle
+ * @author sunianle, sunzongyu
  * @date 3/15/18
  * @company Dingxuan
  */
 public class CollectionStoreSupport implements IPrivDataSupport {
+	private static final JavaChainLog log = JavaChainLogFactory.getLog(CollectionStoreSupport.class);
+
     public final static String COLLECTION_SEPARATOR = "~";
     public final static String COLLECTION_SUFFIX ="collection";
 
     @Override
-    public IQueryExecutor getQueryExecotorForLedger(String groupID) {
-        return null;
-    }
+    public IQueryExecutor getQueryExecutorForLedger(String groupID) throws PrivDataException {
+		INodeLedger l = NodeUtils.getLedger(groupID);
+		try {
+			return l.newQueryExecutor();
+		} catch (LedgerException e) {
+			log.error(e.getMessage());
+			throw new PrivDataException(e);
+		}
+	}
 
     @Override
     public String getCollectionKVSKey(Collection.CollectionCriteria cc) {
-        return null;
+    	return cc.getNamespace() + COLLECTION_SEPARATOR + COLLECTION_SUFFIX;
     }
 
     @Override
     public IIdentityDeserializer getIdentityDeserializer(String groupID) {
-        return null;
+		return GlobalMspManagement.getManagerForChain(groupID);
     }
 
     @Override

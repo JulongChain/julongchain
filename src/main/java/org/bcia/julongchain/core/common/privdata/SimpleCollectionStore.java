@@ -54,7 +54,7 @@ public class SimpleCollectionStore implements ICollectionStore{
 
     @Override
     public Collection.CollectionConfigPackage retrieveCollectionConfigPackage(Collection.CollectionCriteria cc) throws JavaChainException {
-        IQueryExecutor qe = s.getQueryExecotorForLedger(cc.getChannel());
+        IQueryExecutor qe = s.getQueryExecutorForLedger(cc.getChannel());
         try {
             byte[] cb = qe.getState("lssc", s.getCollectionKVSKey(cc));
             if(cb == null){
