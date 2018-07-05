@@ -23,8 +23,8 @@ import org.bcia.julongchain.protos.common.Common;
  * @company Dingxuan
  */
 public class Message {
-    long configSeq;
-    Common.Envelope message;
+    private long configSeq;
+    private Common.Envelope message;
 
     public Message(long configSeq, Common.Envelope message) {
         this.configSeq = configSeq;

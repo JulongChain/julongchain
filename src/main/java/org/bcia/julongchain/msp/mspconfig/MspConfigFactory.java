@@ -17,8 +17,10 @@ package org.bcia.julongchain.msp.mspconfig;
 
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.util.CommConstant;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,7 +38,9 @@ public class MspConfigFactory {
 
         InputStream is = null;
         try {
-            is = MspConfigFactory.class.getClassLoader().getResourceAsStream(MspConfig.MspConfig_FILE_PATH);
+//            is = MspConfigFactory.class.getClassLoader().getResourceAsStream(MspConfig.MspConfig_FILE_PATH);
+            is = new FileInputStream(CommConstant.CONFIG_DIR_PREFIX + MspConfig.MspConfig_FILE_PATH);
+
             MspConfig mspConfig = yaml.loadAs(is, MspConfig.class);
             return mspConfig;
         } finally {

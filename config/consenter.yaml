@@ -1,0 +1,263 @@
+---
+################################################################################
+#
+#   consenter Configuration
+#
+#   - This controls the type and configuration of the orderer.
+#
+################################################################################
+general:
+
+    # Ledger Type: The ledger type to provide to the orderer.
+    # Two non-production ledger types are provided for test purposes only:
+    #  - ram: An in-memory ledger whose contents are lost on restart.
+    #  - json: A simple file ledger that writes blocks to disk in JSON format.
+    # Only one production ledger type is provided:
+    #  - file: A production file-based ledger.
+    ledgerType: file
+
+    # Listen address: The IP on which to bind to listen.
+    listenAddress: 127.0.0.1
+
+    gossipAddress: 127.0.0.1:7070
+
+    # Listen port: The port on which to bind to listen.
+    listenPort: 7050
+
+    # TLS: TLS settings for the GRPC server.
+    tls:
+        enabled: false
+        privateKey: tls/server.key
+        certificate: tls/server.crt
+        rootCAs: tls/ca.crt
+        clientAuthRequired: false
+        clientRootCAs:
+
+    # Keepalive settings for the GRPC server.
+    keepAlive:
+        # ServerMinInterval is the minimum permitted time between client pings.
+        # If clients send pings more frequently, the server will
+        # disconnect them.
+        serverMinInterval: 60
+        # ServerInterval is the time between pings to clients.
+        serverInterval: 7200
+        # ServerTimeout is the duration the server waits for a response from
+        # a client before closing the connection.
+        serverTimeout: 20
+
+    # Log Level: The level at which to log. This accepts logging specifications
+    # per: fabric/docs/Setup/logging-control.md
+    logLevel: info
+
+    # Log Format:  The format string to use when logging.  Especially useful to disable color logging
+    logFormat: '%{color}%{time:2006-01-02 15:04:05.000 MST} [%{module}] %{shortfunc} -> %{level:.4s} %{id:03x}%{color:reset} %{message}'
+
+    # Genesis method: The method by which the genesis block for the orderer
+    # system channel is specified. Available options are "provisional", "file":
+    #  - provisional: Utilizes a genesis profile, specified by GenesisProfile,
+    #                 to dynamically generate a new genesis block.
+    #  - file: Uses the file provided by GenesisFile as the genesis block.
+    genesisMethod: provisional
+
+    # Genesis profile: The profile to use to dynamically generate the genesis
+    # block to use when initializing the orderer system channel and
+    # GenesisMethod is set to "provisional". See the configtx.yaml file for the
+    # descriptions of the available profiles. Ignored if GenesisMethod is set to
+    # "file".
+    genesisProfile: SampleDevModeSolo
+
+    # Genesis file: The file containing the genesis block to use when
+    # initializing the orderer system channel and GenesisMethod is set to
+    # "file". Ignored if GenesisMethod is set to "provisional".
+    genesisFile: genesisblock
+
+    # LocalMSPDir is where to find the private crypto material needed by the
+    # orderer. It is set relative here as a default for dev environments but
+    # should be changed to the real location in production.
+    localMspDir: msp
+
+    # LocalMSPID is the identity to register the local MSP material with the MSP
+    # getPolicyManager. IMPORTANT: The local MSP ID of an orderer needs to match the MSP
+    # ID of one of the organizations defined in the orderer system channel's
+    # /Channel/Orderer configuration. The sample organization defined in the
+    # sample configuration provided has an MSP ID of "DEFAULT".
+    localMspId: DEFAULT
+
+    # Enable an HTTP service for Go "pprof" profiling as documented at:
+    # https://golang.org/pkg/net/http/pprof
+    profile:
+        enabled: false
+        address: 0.0.0.0:6060
+
+    # BCCSP configures the blockchain crypto service providers.
+    bccsp:
+        # Default specifies the preferred blockchain crypto service provider
+        # to use. If the preferred provider is not available, the software
+        # based provider ("SW") will be used.
+        # Valid providers are:
+        #  - SW: a software based crypto provider
+        #  - PKCS11: a CA hardware security module crypto provider.
+        defaultValue: sw
+
+        # SW configures the software based blockchain crypto provider.
+        sw:
+            # TODO: The default Hash and Security level needs refactoring to be
+            # fully configurable. Changing these defaults requires coordination
+            # SHA2 is hardcoded in several places, not only BCCSP
+            hash: SHA2
+            security: 256
+#            # Location of key store. If this is unset, a location will be
+#            # chosen using: 'LocalMSPDir'/keystore
+#            fileKeyStore:
+    # Authentication contains configuration parameters related to authenticating
+    # client messages
+    authentication:
+        # the acceptable difference between the current server time and the
+        # client's time as specified in a client request message
+        timeWindow: 900000
+fileLedger:
+
+    # Location: The directory to store the blocks in.
+    # NOTE: If this is unset, a new temporary location will be chosen every time
+    # the orderer is restarted, using the prefix specified by Prefix.
+#    location: /var/hyperledger/production/orderer
+    location: /var/julongchain/production/consenter
+    # The prefix to use when generating a ledger directory in temporary space.
+    # Otherwise, this value is ignored.
+    prefix: julongchain-consenterledger
+
+################################################################################
+#
+#   SECTION: RAM Ledger
+#
+#   - This section applies to the configuration of the RAM ledger.
+#
+################################################################################
+ramLedger:
+
+    # History Size: The number of blocks that the RAM ledger is set to retain.
+    # WARNING: Appending a block to the ledger might cause the oldest block in
+    # the ledger to be dropped in order to limit the number total number blocks
+    # to HistorySize. For example, if history size is 10, when appending block
+    # 10, block 0 (the genesis block!) will be dropped to make room for block 10.
+    historySize: 1000
+
+################################################################################
+#
+#   SECTION: Kafka
+#
+#   - This section applies to the configuration of the Kafka-based orderer, and
+#     its interaction with the Kafka cluster.
+#
+################################################################################
+kafka:
+    comumer:
+         maxReads: 300
+         topic: test2
+         partitionID: 0
+         maxRetryTimes: 5
+         retryIntervalMillis: 1000
+    server:
+        brokerHost1: 10.0.20.91:9092
+        brokerHost2: 10.0.20.92:9092
+    zookeeper:
+        ZKHost1: 10.0.20.91:2181
+        ZKHost2: 10.0.20.92:2181
+    # Retry: What do if a connection to the Kafka cluster cannot be established,
+    # or if a metadata request to the Kafka cluster needs to be repeated.
+    retry:
+        # When a new channel is created, or when an existing channel is reloaded
+        # (in case of a just-restarted orderer), the orderer interacts with the
+        # Kafka cluster in the following ways:
+        # 1. It creates a Kafka producer (writer) for the Kafka partition that
+        # corresponds to the channel.
+        # 2. It uses that producer to post a no-op CONNECT message to that
+        # partition
+        # 3. It creates a Kafka consumer (reader) for that partition.
+        # If any of these steps fail, they will be re-attempted every
+        # <ShortInterval> for a total of <ShortTotal>, and then every
+        # <LongInterval> for a total of <LongTotal> until they succeed.
+        # Note that the orderer will be unable to write to or read from a
+        # channel until all of the steps above have been completed successfully.
+        shortInterval: 5000
+        shortTotal: 600000
+        longInterval: 300000
+        longTotal: 43200000
+        # Affects the socket timeouts when waiting for an initial connection, a
+        # response, or a transmission. See Config.Net for more info:
+        # https://godoc.org/github.com/Shopify/sarama#Config
+        networkTimeouts:
+            DialTimeout: 10000
+            ReadTimeout: 10000
+            WriteTimeout: 10000
+        # Affects the metadata requests when the Kafka cluster is in the middle
+        # of a leader election.See Config.Metadata for more info:
+        # https://godoc.org/github.com/Shopify/sarama#Config
+        metadata:
+            RetryBackoff: 250
+            RetryMax: 3
+        # What to do if posting a message to the Kafka cluster fails. See
+        # Config.Producer for more info:
+        # https://godoc.org/github.com/Shopify/sarama#Config
+        producer:
+            RetryBackoff: 100
+            RetryMax: 3
+        # What to do if reading from the Kafka cluster fails. See
+        # Config.Consumer for more info:
+        # https://godoc.org/github.com/Shopify/sarama#Config
+        consumer:
+            retryBackoff: 2
+            RetryMax: 3
+    # Verbose: Enable logging for interactions with the Kafka cluster.
+    verbose: false
+
+    # TLS: TLS settings for the orderer's connection to the Kafka cluster.
+    tls:
+
+      # Enabled: Use TLS when connecting to the Kafka cluster.
+      enabled: false
+
+      # PrivateKey: PEM-encoded private key the orderer will use for
+      # authentication.
+      privateKey:
+        # As an alternative to specifying the PrivateKey here, uncomment the
+        # following "File" key and specify the file name from which to load the
+        # value of PrivateKey.
+        #File: path/to/PrivateKey
+
+      # Certificate: PEM-encoded signed public key certificate the orderer will
+      # use for authentication.
+      certificate:
+        # As an alternative to specifying the Certificate here, uncomment the
+        # following "File" key and specify the file name from which to load the
+        # value of Certificate.
+        #File: path/to/Certificate
+
+      # RootCAs: PEM-encoded trusted root certificates used to validate
+      # certificates from the Kafka cluster.
+      rootCAs:
+        # As an alternative to specifying the RootCAs here, uncomment the
+        # following "File" key and specify the file name from which to load the
+        # value of RootCAs.
+        #File: path/to/RootCAs
+
+    # Kafka protocol version used to communicate with the Kafka cluster brokers
+    # (defaults to 0.10.2.0 if not specified)
+    version: 0.10.2.0
+
+################################################################################
+#
+#   Debug Configuration
+#
+#   - This controls the debugging options for the orderer
+#
+################################################################################
+debug:
+
+    # BroadcastTraceDir when set will cause each request to the Broadcast service
+    # for this orderer to be written to a file in this directory
+    broadcastTraceDir:
+
+    # DeliverTraceDir when set will cause each request to the Deliver service
+    # for this orderer to be written to a file in this directory
+    deliverTraceDir:

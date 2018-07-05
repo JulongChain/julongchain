@@ -20,7 +20,7 @@ import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
-import org.bica.julongchain.protos.node.SignedScDepSpec;
+import org.bcia.julongchain.protos.node.SignedScDepSpec;
 
 /**
  * 类描述

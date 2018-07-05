@@ -38,6 +38,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import static org.junit.Assert.*;
@@ -189,7 +190,8 @@ public class MspHelperTest {
         Yaml yaml = new Yaml();
         Configuration configuration;
         try {
-            configuration = yaml.loadAs(new FileInputStream(configFile), Configuration.class);
+            Map<String, Object> map = yaml.load(new FileInputStream(configFile));
+            configuration = Configuration.parse(map);
         } catch (FileNotFoundException e) {
             throw new JavaChainException(configFile + " is not found");
         }

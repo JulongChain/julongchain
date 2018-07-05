@@ -19,7 +19,7 @@ package org.bcia.julongchain.common.tools.cryptogen.cmd;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.util.FileUtils;
-import org.bcia.julongchain.consenter.util.LoadYaml;
+import org.bcia.julongchain.consenter.util.YamlLoader;
 
 import java.io.IOException;
 import java.net.URL;
@@ -34,24 +34,23 @@ public class ShowTemplateCmd implements ICryptoGenCmd {
 
     private static final String DEFAULT_TEMPLATE =
             "# ---------------------------------------------------------------------------\n" +
-            "# \"ConsenterOrgs\" - Definition of organizations managing consenter nodes\n" +
+            "# \"consenterOrgs\" - Definition of organizations managing consenter nodes\n" +
             "# ---------------------------------------------------------------------------\n" +
-            "!!org.bcia.julongchain.common.tools.cryptogen.bean.Config\n" +
             "consenterOrgs:\n" +
             "  # ---------------------------------------------------------------------------\n" +
-            "  # Consenter\n" +
+            "  # consenter\n" +
             "  # ---------------------------------------------------------------------------\n" +
             "  - name: Consenter\n" +
             "    domain: example.com\n" +
             "\n" +
             "    # ---------------------------------------------------------------------------\n" +
-            "    # \"Specs\" - See PeerOrgs below for complete description\n" +
+            "    # \"specs\" - See PeerOrgs below for complete description\n" +
             "    # ---------------------------------------------------------------------------\n" +
             "    specs:\n" +
             "      - hostname: consenter\n" +
             "\n" +
             "# ---------------------------------------------------------------------------\n" +
-            "# \"PeerOrgs\" - Definition of organizations managing peer nodes\n" +
+            "# \"peerOrgs\" - Definition of organizations managing peer nodes\n" +
             "# ---------------------------------------------------------------------------\n" +
             "peerOrgs:\n" +
             "  # ---------------------------------------------------------------------------\n" +
@@ -62,36 +61,36 @@ public class ShowTemplateCmd implements ICryptoGenCmd {
             "    enableNodeOUs: false\n" +
             "\n" +
             "    # ---------------------------------------------------------------------------\n" +
-            "    # \"CA\"\n" +
+            "    # \"ca\"\n" +
             "    # ---------------------------------------------------------------------------\n" +
             "    # Uncomment this section to enable the explicit definition of the CA for this\n" +
             "    # organization.  This entry is a Spec.  See \"Specs\" section below for details.\n" +
             "    # ---------------------------------------------------------------------------\n" +
-            "    # CA:\n" +
-            "    #    Hostname: ca # implicitly ca.org1.example.com\n" +
-            "    #    Country: US\n" +
-            "    #    Province: California\n" +
-            "    #    Locality: San Francisco\n" +
-            "    #    OrganizationalUnit: Hyperledger Fabric\n" +
-            "    #    StreetAddress: address for org # default nil\n" +
-            "    #    PostalCode: postalCode for org # default nil\n" +
+            "    # ca:\n" +
+            "    #    hostname: ca # implicitly ca.org1.example.com\n" +
+            "    #    country: US\n" +
+            "    #    province: California\n" +
+            "    #    locality: San Francisco\n" +
+            "    #    organizationalUnit: Hyperledger Fabric\n" +
+            "    #    streetAddress: address for org # default nil\n" +
+            "    #    postalCode: postalCode for org # default nil\n" +
             "\n" +
             "    # ---------------------------------------------------------------------------\n" +
-            "    # \"Specs\"\n" +
+            "    # \"specs\"\n" +
             "    # ---------------------------------------------------------------------------\n" +
             "    # Uncomment this section to enable the explicit definition of hosts in your\n" +
             "    # configuration.  Most users will want to use Template, below\n" +
             "    #\n" +
             "    # Specs is an array of Spec entries.  Each Spec entry consists of two fields:\n" +
-            "    #   - Hostname:   (Required) The desired hostname, sans the domain.\n" +
-            "    #   - CommonName: (Optional) Specifies the template or explicit override for\n" +
+            "    #   - hostname:   (Required) The desired hostname, sans the domain.\n" +
+            "    #   - commonName: (Optional) Specifies the template or explicit override for\n" +
             "    #                 the CN.  By default, this is the template:\n" +
             "    #\n" +
             "    #                              \"{{.Hostname}}.{{.Domain}}\"\n" +
             "    #\n" +
             "    #                 which obtains its values from the Spec.Hostname and\n" +
             "    #                 Org.Domain, respectively.\n" +
-            "    #   - SANS:       (Optional) Specifies one or more Subject Alternative Names\n" +
+            "    #   - sans:       (Optional) Specifies one or more Subject Alternative Names\n" +
             "    #                 to be set in the resulting x509. Accepts template\n" +
             "    #                 variables {{.Hostname}}, {{.Domain}}, {{.CommonName}}. IP\n" +
             "    #                 addresses provided here will be properly recognized. Other\n" +
@@ -100,19 +99,19 @@ public class ShowTemplateCmd implements ICryptoGenCmd {
             "    #                     - {{ .CommonName }}\n" +
             "    #                     - {{ .Hostname }}\n" +
             "    # ---------------------------------------------------------------------------\n" +
-            "    # Specs:\n" +
-            "    #   - Hostname: foo # implicitly \"foo.org1.example.com\"\n" +
-            "    #     CommonName: foo27.org5.example.com # overrides Hostname-based FQDN set above\n" +
-            "    #     SANS:\n" +
+            "    # specs:\n" +
+            "    #   - hostname: foo # implicitly \"foo.org1.example.com\"\n" +
+            "    #     commonName: foo27.org5.example.com # overrides Hostname-based FQDN set above\n" +
+            "    #     sans:\n" +
             "    #       - \"bar.{{.Domain}}\"\n" +
             "    #       - \"altfoo.{{.Domain}}\"\n" +
             "    #       - \"{{.Hostname}}.org6.net\"\n" +
             "    #       - 172.16.10.31\n" +
-            "    #   - Hostname: bar\n" +
-            "    #   - Hostname: baz\n" +
+            "    #   - hostname: bar\n" +
+            "    #   - hostname: baz\n" +
             "\n" +
             "    # ---------------------------------------------------------------------------\n" +
-            "    # \"Template\"\n" +
+            "    # \"template\"\n" +
             "    # ---------------------------------------------------------------------------\n" +
             "    # Allows for the definition of 1 or more hosts that are created sequentially\n" +
             "    # from a template. By default, this looks like \"peer%d\" from 0 to Count-1.\n" +
@@ -125,15 +124,15 @@ public class ShowTemplateCmd implements ICryptoGenCmd {
             "    # ---------------------------------------------------------------------------\n" +
             "    template:\n" +
             "      count: 1\n" +
-            "      # Start: 5\n" +
-            "      # Hostname: {{.Prefix}}{{.Index}} # default\n" +
-            "      # SANS:\n" +
+            "      # start: 5\n" +
+            "      # hostname: {{.Prefix}}{{.Index}} # default\n" +
+            "      # sans:\n" +
             "      #   - \"{{.Hostname}}.alt.{{.Domain}}\"\n" +
             "\n" +
             "    # ---------------------------------------------------------------------------\n" +
-            "    # \"Users\"\n" +
+            "    # \"users\"\n" +
             "    # ---------------------------------------------------------------------------\n" +
-            "    # Count: The number of user accounts _in addition_ to Admin\n" +
+            "    # count: The number of user accounts _in addition_ to Admin\n" +
             "    # ---------------------------------------------------------------------------\n" +
             "    users:\n" +
             "      count: 1\n" +
@@ -158,7 +157,7 @@ public class ShowTemplateCmd implements ICryptoGenCmd {
 
     static {
         String temp = DEFAULT_TEMPLATE;
-        URL url = LoadYaml.class.getClassLoader().getResource("crypto-config.yaml");
+        URL url = YamlLoader.class.getClassLoader().getResource("crypto-config.yaml");
         if (url == null) {
             log.warn("crypto-config.yaml not found in jar, use default template");
         } else {

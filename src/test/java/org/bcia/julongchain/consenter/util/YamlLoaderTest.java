@@ -10,11 +10,11 @@ import java.util.Map;
  * @Date: 2018/4/2
  * @company Dingxuan
  */
-public class LoadYamlTest {
+public class YamlLoaderTest {
 
     @Test
     public void readYamlFile() {
-        Map map=LoadYaml.readYamlFile("gmcsp.yaml");
+        Map map= YamlLoader.readYamlFile("gmcsp.yaml");
         System.out.println(map.get("node"));
         System.out.println(((HashMap)map.get("node")).get("CSP"));
         System.out.println( ((HashMap)((HashMap) map.get("node")).get("CSP")).get("GM"));

@@ -19,7 +19,7 @@ import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
 import org.bcia.julongchain.consenter.util.Constant;
-import org.bcia.julongchain.consenter.util.LoadYaml;
+import org.bcia.julongchain.consenter.util.YamlLoader;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +40,7 @@ public class KafkaProduce {
 
 
 
-    Map map=(HashMap)LoadYaml.readYamlFile(Constant.ORDERER_CONFIG).get(Constant.KAFKA);
+    Map map=(HashMap) YamlLoader.readYamlFile(Constant.ORDERER_CONFIG).get(Constant.KAFKA);
 
 
 

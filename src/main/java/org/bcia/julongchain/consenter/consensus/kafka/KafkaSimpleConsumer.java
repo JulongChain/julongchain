@@ -26,7 +26,7 @@ import kafka.javaapi.*;
 import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.message.MessageAndOffset;
 import org.bcia.julongchain.consenter.util.Constant;
-import org.bcia.julongchain.consenter.util.LoadYaml;
+import org.bcia.julongchain.consenter.util.YamlLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.nio.ByteBuffer;
@@ -45,8 +45,8 @@ public class KafkaSimpleConsumer {
     @Autowired
     private Chain chain;
     @Autowired
-    private LoadYaml loadYaml=new LoadYaml();
-    Map map=(HashMap)loadYaml.readYamlFile(Constant.ORDERER_CONFIG).get(Constant.KAFKA);
+    private YamlLoader yamlLoader =new YamlLoader();
+    Map map=(HashMap) yamlLoader.readYamlFile(Constant.ORDERER_CONFIG).get(Constant.KAFKA);
 
     // 最大重试次数
     private int maxRetryTimes = (int) ((HashMap)map.get(Constant.COMSUMER)).get(Constant.MAX_RETRY_TIMES);

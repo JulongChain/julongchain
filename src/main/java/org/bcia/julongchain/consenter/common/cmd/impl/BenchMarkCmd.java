@@ -30,7 +30,7 @@ import java.io.IOException;
  */
 public class BenchMarkCmd implements IConsenterCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(BenchMarkCmd.class);
-    public ConsenterServer consenterServer;
+    private ConsenterServer consenterServer;
 
     public BenchMarkCmd() {
         consenterServer=new ConsenterServer();

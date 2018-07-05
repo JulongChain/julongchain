@@ -27,7 +27,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
 import org.bcia.julongchain.protos.node.SmartContractDataPackage;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
-import org.bica.julongchain.protos.node.SignedScDepSpec;
+import org.bcia.julongchain.protos.node.SignedScDepSpec;
 
 import java.io.*;
 
