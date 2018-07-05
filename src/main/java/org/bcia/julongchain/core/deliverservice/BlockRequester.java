@@ -38,7 +38,7 @@ public class BlockRequester {
 
 
     public void requestBlocks(ILedgerInfo ledgerInfo) throws ConsenterException {
-        long height = ledgerInfo.ledgerHeight();
+        long height = ledgerInfo.getLedgerHeight();
         if (height > 0) {
             log.debug(String.format("Starting deliver with block [%d] for channel %s", height, groupId));
             seekLatestFromCommitter(height);
