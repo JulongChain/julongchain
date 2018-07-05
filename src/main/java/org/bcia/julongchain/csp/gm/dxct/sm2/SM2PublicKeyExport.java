@@ -15,13 +15,11 @@
  */
 package org.bcia.julongchain.csp.gm.dxct.sm2;
 
-import org.bcia.julongchain.consenter.util.LoadYaml;
 import org.bcia.julongchain.csp.gm.dxct.sm2.util.SM2KeyUtil;
 import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.io.FileNotFoundException;
-import java.util.HashMap;
 
 import static org.bcia.julongchain.msp.mspconfig.MspConfigFactory.loadMspConfig;
 
