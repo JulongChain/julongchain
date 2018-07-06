@@ -20,7 +20,7 @@ import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.*;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.CompositeKey;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.core.ledger.sceventmgmt.ISmartContractLifecycleEventListener;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public interface IDB extends IVersionedDB {
 
     void loadCommittedVersionsOfPubAndHashedKeys(List<CompositeKey> pubKeys, List<HashedCompositeKey> hashKeys) throws LedgerException;
 
-    Height getCacheKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException;
+    LedgerHeight getCacheKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException;
 
     void clearCachedVersions();
 
@@ -47,7 +47,7 @@ public interface IDB extends IVersionedDB {
 
     VersionedValue getValueHash(String ns, String coll, byte[] keyHash) throws LedgerException;
 
-    Height getKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException;
+    LedgerHeight getKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException;
 
     List<VersionedValue> getPrivateDataMultipleKeys(String ns, String coll, List<String> keys) throws LedgerException;
 
@@ -55,5 +55,5 @@ public interface IDB extends IVersionedDB {
 
     IResultsIterator executeQueryOnPrivateData(String ns, String coll, String query) throws LedgerException;
 
-    void applyPrivacyAwareUpdates(UpdateBatch updates, Height height) throws LedgerException;
+    void applyPrivacyAwareUpdates(UpdateBatch updates, LedgerHeight height) throws LedgerException;
 }

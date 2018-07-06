@@ -17,7 +17,7 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +43,7 @@ public class UpdateBatch {
         return vv;
     }
 
-    public void put(String ns, String key, byte[] value, Height version) throws LedgerException {
+    public void put(String ns, String key, byte[] value, LedgerHeight version) throws LedgerException {
         if(value == null){
             throw new LedgerException("Null value not allow");
         }
@@ -51,7 +51,7 @@ public class UpdateBatch {
         update(ns, key, vv);
     }
 
-    public void delete(String ns, String key, Height version){
+    public void delete(String ns, String key, LedgerHeight version){
         VersionedValue vv = new VersionedValue(version, null);
         update(ns, key, vv);
     }

@@ -23,5 +23,5 @@ import org.bcia.julongchain.common.exception.ConsenterException;
  * @company Dingxuan
  */
 public interface ILedgerInfo {
-    long ledgerHeight() throws ConsenterException;
+    long getLedgerHeight() throws ConsenterException;
 }

@@ -18,7 +18,7 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.ledger.rwset.Rwset;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
@@ -118,7 +118,7 @@ public class RwSetUtil {
     /**
      * 构建KVRead
      */
-    public static KvRwset.KVRead newKVRead(String key, Height version){
+    public static KvRwset.KVRead newKVRead(String key, LedgerHeight version){
         return KvRwset.KVRead.newBuilder()
                 .setKey(key)
                 .setVersion(newProtoVersion(version))
@@ -128,7 +128,7 @@ public class RwSetUtil {
     /**
      * 通过version.Height构建proto中Version
      */
-    public static KvRwset.Version newProtoVersion(Height height){
+    public static KvRwset.Version newProtoVersion(LedgerHeight height){
         if(height == null){
             return null;
         }
@@ -141,11 +141,11 @@ public class RwSetUtil {
     /**
      * 通过proto中Version构建version.Height
      */
-    public static Height newVersion(KvRwset.Version protoVersion){
+    public static LedgerHeight newVersion(KvRwset.Version protoVersion){
         if(protoVersion == null){
             return null;
         }
-        return new Height(protoVersion.getBlockNum(), protoVersion.getTxNum());
+        return new LedgerHeight(protoVersion.getBlockNum(), protoVersion.getTxNum());
     }
 
     /**
@@ -162,7 +162,7 @@ public class RwSetUtil {
     /**
      * 构建KVReadHash
      */
-    public static KvRwset.KVReadHash newPvtKVReadHash(String key, Height version) throws LedgerException {
+    public static KvRwset.KVReadHash newPvtKVReadHash(String key, LedgerHeight version) throws LedgerException {
         return KvRwset.KVReadHash.newBuilder()
                 // TODO: 5/31/18 SM3 Hash
                 .setKeyHash(ByteString.copyFrom(Util.getHashBytes(key.getBytes())))

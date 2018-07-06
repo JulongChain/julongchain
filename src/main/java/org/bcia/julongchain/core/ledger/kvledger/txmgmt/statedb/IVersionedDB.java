@@ -18,7 +18,7 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.UpdateBatch;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 
 import java.util.List;
 
@@ -41,7 +41,7 @@ public interface IVersionedDB{
      */
     VersionedValue getState(String namespace, String key) throws LedgerException;
 
-    Height getVersion(String namespace, String key) throws LedgerException;
+    LedgerHeight getVersion(String namespace, String key) throws LedgerException;
 
     /** GetStateMultipleKeys gets the values for multiple keys in a single call
      *
@@ -82,7 +82,7 @@ public interface IVersionedDB{
      * @param height
      * @throws LedgerException
      */
-    void applyUpdates(UpdateBatch batch, Height height) throws LedgerException;
+    void applyUpdates(UpdateBatch batch, LedgerHeight height) throws LedgerException;
 
     /** GetLatestSavePoint returns the height of the highest transaction upto which
      * the state db is consistent
@@ -90,7 +90,7 @@ public interface IVersionedDB{
      * @return
      * @throws LedgerException
      */
-    Height getLatestSavePoint() throws LedgerException;
+    LedgerHeight getLatestSavePoint() throws LedgerException;
 
     /** ValidateKey tests whether the key is supported by the db implementation.
      * For instance, leveldb supports any bytes for the key while the couchdb supports only valid utf-8 string

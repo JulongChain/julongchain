@@ -17,7 +17,7 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate;
 
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,11 +36,11 @@ public class UpdateMap {
        return map.isEmpty();
     }
 
-    public void put(String ns, String coll, String key, byte[] value, Height version) throws LedgerException {
+    public void put(String ns, String coll, String key, byte[] value, LedgerHeight version) throws LedgerException {
         getOrCreateNsBatch(ns).getBatch().put(coll, key, value, version);
     }
 
-    public void delete(String ns, String coll, String key, Height version){
+    public void delete(String ns, String coll, String key, LedgerHeight version){
         getOrCreateNsBatch(ns).getBatch().delete(coll, key, version);
     }
 

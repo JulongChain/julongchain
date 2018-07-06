@@ -17,7 +17,7 @@ package org.bcia.julongchain.core.container.dockercontroller;
 
 import org.bcia.julongchain.core.container.ccintf.SCID;
 import org.bcia.julongchain.core.container.api.IBuildSpecFactory;
-import org.bcia.julongchain.core.container.api.IFormat;
+import org.bcia.julongchain.core.container.api.IFormatter;
 import org.bcia.julongchain.core.container.api.IPrelaunchFunc;
 import org.bcia.julongchain.core.container.api.VM;
 
@@ -122,7 +122,7 @@ public class DockerVM implements VM{
     }
 
     @Override
-    public String getVMName(SCID ccid, IFormat format) {
+    public String getVMName(SCID ccid, IFormatter format) {
         return "";
     }
 

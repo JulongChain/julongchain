@@ -27,17 +27,17 @@ import org.bcia.julongchain.core.ledger.util.Util;
  * @date 2018/3/9
  * @company Dingxuan
  */
-public class Height implements Comparable<Height> {
+public class LedgerHeight implements Comparable<LedgerHeight> {
 
     private long blockNum;
     private long txNum;
 
-    public Height(long blockNum, long txNum) {
+    public LedgerHeight(long blockNum, long txNum) {
         this.blockNum = blockNum;
         this.txNum = txNum;
     }
 
-    public Height(byte[] b){
+    public LedgerHeight(byte[] b){
         this.blockNum = Util.bytesToLong(b, 0, BlockFileManager.PEEK_BYTES_LEN);
         this.txNum = Util.bytesToLong(b, 8, BlockFileManager.PEEK_BYTES_LEN);
     }
@@ -65,7 +65,7 @@ public class Height implements Comparable<Height> {
     }
 
     @Override
-    public int compareTo(Height h){
+    public int compareTo(LedgerHeight h){
         int res;
         if(this.blockNum != h.blockNum){
             res = (int) (this.blockNum - h.blockNum);
@@ -77,7 +77,7 @@ public class Height implements Comparable<Height> {
         return res > 0 ? 1 : -1;
     }
 
-    public static boolean areSame(Height h1, Height h2){
+    public static boolean areSame(LedgerHeight h1, LedgerHeight h2){
         if(h1 == null){
             return h2 == null;
         }

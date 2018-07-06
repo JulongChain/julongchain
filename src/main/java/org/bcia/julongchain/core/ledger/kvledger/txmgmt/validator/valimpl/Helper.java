@@ -31,7 +31,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.*;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.txmgr.ITxManager;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.validator.valinternal.Block;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.validator.valinternal.Transaction;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.core.ledger.util.TxValidationFlags;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.common.Common;
@@ -69,7 +69,7 @@ public class Helper {
                 validatePvtdata(tx, txPvData);
             }
             TxPvtRwSet pvtRwSet = RwSetUtil.txPvtRwSetFromProtoMsg(txPvData.getWriteSet());
-            addPvtRWSetToPvtUpdateBatch(pvtRwSet, pvtUpdates, new Height(block.getNum(), tx.getIndexInBlock()));
+            addPvtRWSetToPvtUpdateBatch(pvtRwSet, pvtUpdates, new LedgerHeight(block.getNum(), tx.getIndexInBlock()));
         }
         return pvtUpdates;
     }
@@ -202,7 +202,7 @@ public class Helper {
         blockBuilder.setMetadata(blockMetadataBuilder);
     }
 
-    private static void addPvtRWSetToPvtUpdateBatch(TxPvtRwSet pvtRwSet, PvtUpdateBatch pvtUpdateBatch, Height ver) throws LedgerException {
+    private static void addPvtRWSetToPvtUpdateBatch(TxPvtRwSet pvtRwSet, PvtUpdateBatch pvtUpdateBatch, LedgerHeight ver) throws LedgerException {
         for(NsPvtRwSet ns : pvtRwSet.getNsPvtRwSets()){
             for(CollPvtRwSet coll : ns.getCollPvtRwSets()){
                 for(KvRwset.KVWrite kvWrite : coll.getKvRwSet().getWritesList()){

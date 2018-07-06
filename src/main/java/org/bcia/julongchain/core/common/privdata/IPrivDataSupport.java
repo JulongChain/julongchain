@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.core.common.privdata;
 
+import org.bcia.julongchain.common.exception.PrivDataException;
 import org.bcia.julongchain.core.ledger.IQueryExecutor;
 import org.bcia.julongchain.msp.IIdentityDeserializer;
 import org.bcia.julongchain.protos.common.Collection;
@@ -27,9 +28,11 @@ import org.bcia.julongchain.protos.common.Collection;
  */
 public interface IPrivDataSupport {
     /**
-     * getQueryExecotorForLedger returns a query executor for the specified group
+     * getQueryExecutorForLedger returns a query executor for the specified group
+	 *
+	 * @throws PrivDataException: Caused by newQueryExecutor
      */
-    IQueryExecutor getQueryExecotorForLedger(String groupID);
+    IQueryExecutor getQueryExecutorForLedger(String groupID) throws PrivDataException;
 
     /**
      *

@@ -29,7 +29,7 @@ import org.bcia.julongchain.core.ledger.util.TxValidationFlags;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.NsRwSet;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.TxRwSet;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.julongchain.protos.node.ProposalPackage;
@@ -124,7 +124,7 @@ public class HistoryLevelDB implements IHistoryDB {
         }
 
         //添加保存点
-        Height height = new Height(blockNo,tranNo);
+        LedgerHeight height = new LedgerHeight(blockNo,tranNo);
         dbBatch.put(SAVE_POINT_KEY, height.toBytes());
 
         //同步写入leveldb
@@ -135,12 +135,12 @@ public class HistoryLevelDB implements IHistoryDB {
     }
 
     @Override
-    public Height getLastSavepoint() throws LedgerException {
+    public LedgerHeight getLastSavepoint() throws LedgerException {
         byte[] versionBytes = provider.get(SAVE_POINT_KEY);
         if(versionBytes == null){
             return null;
         }
-        return new Height(versionBytes);
+        return new LedgerHeight(versionBytes);
     }
 
     /**
@@ -151,7 +151,7 @@ public class HistoryLevelDB implements IHistoryDB {
         if(!LedgerConfig.isHistoryDBEnabled()){
             return 0;
         }
-        Height savePoint = getLastSavepoint();
+        LedgerHeight savePoint = getLastSavepoint();
         if(savePoint == null){
             return -1;
         }
@@ -163,7 +163,7 @@ public class HistoryLevelDB implements IHistoryDB {
         if(!LedgerConfig.isHistoryDBEnabled()){
             return 0;
         }
-        Height savePoint = getLastSavepoint();
+        LedgerHeight savePoint = getLastSavepoint();
         if(savePoint == null){
             return 0;
         }
