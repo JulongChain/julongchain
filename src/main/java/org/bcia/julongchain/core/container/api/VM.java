@@ -42,6 +42,6 @@ public interface VM {
 
     void destroy(Context ctxt, SCID ccid, Boolean force, Boolean noprune);
 
-    String getVMName(SCID ccID, IFormat format);
+    String getVMName(SCID ccID, IFormatter format);
 
 }

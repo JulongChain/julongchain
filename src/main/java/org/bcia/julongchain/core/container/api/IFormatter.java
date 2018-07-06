@@ -22,7 +22,7 @@ package org.bcia.julongchain.core.container.api;
  * @date 2018/4/2
  * @company Dingxuan
  */
-public interface IFormat {
+public interface IFormatter {
 
     String format(String string);
 
