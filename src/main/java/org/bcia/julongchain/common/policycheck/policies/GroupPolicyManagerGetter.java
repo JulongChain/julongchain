@@ -19,9 +19,15 @@ package org.bcia.julongchain.common.policycheck.policies;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.exception.PolicyException;
+import org.bcia.julongchain.common.exception.ValidateException;
+import org.bcia.julongchain.common.groupconfig.GroupConfigBundle;
 import org.bcia.julongchain.common.policies.*;
+import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
+import org.bcia.julongchain.core.RWMutex;
+import org.bcia.julongchain.core.node.GroupSupport;
 import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.node.entity.Group;
+import org.bcia.julongchain.protos.common.Configtx;
 
 /**
  * 类描述
@@ -33,13 +39,23 @@ import org.bcia.julongchain.node.entity.Group;
 public class GroupPolicyManagerGetter implements IGroupPolicyManagerGetter {
     @Override
     public IPolicyManager getPolicyManager(String groupId) throws InvalidProtocolBufferException, PolicyException {
-        Group group = null;
+        /*Group group = null;
         try {
+
+            groupConfigBundle.getPolicyManager()
             group = Node.getInstance().getGroupMap().get(groupId);
         } catch (NodeException e) {
             e.printStackTrace();
         }
-        return group.getGroupSupport().getGroupConfigBundle().getPolicyManager();
+        return group.getGroupSupport().getGroupConfigBundle().getPolicyManager();*/
+        GroupConfigBundle groupConfigBundle = null;
+        ChainSupport chainSupport = new ChainSupport();
+        try {
+            groupConfigBundle = chainSupport.createBundle(groupId, Configtx.Config.getDefaultInstance());
+        } catch (ValidateException e) {
+            e.printStackTrace();
+        }
+        return groupConfigBundle.getPolicyManager();
 
     }
 

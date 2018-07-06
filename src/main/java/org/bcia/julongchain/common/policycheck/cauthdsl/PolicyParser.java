@@ -38,6 +38,7 @@ import java.util.regex.*;
 public class PolicyParser {
     private static JavaChainLog log = JavaChainLogFactory.getLog(PolicyParser.class);
     public static Context context;
+    public static List<Policies.SignaturePolicy> policies = new ArrayList<Policies.SignaturePolicy>();
     static  String regex = "^([[:alnum:]]+)([.])(member|admin)$";
     String regexErr = "^No parameter '([^']+)' found[.]$";
 
@@ -46,23 +47,42 @@ public class PolicyParser {
        String res = checkPolicyStr(policy);
        PolicyNode node = checkPolicyNode(res);
        Context ctx = new Context(0,new ArrayList<MspPrincipal.MSPPrincipal>());
-       Policies.SignaturePolicy signaturePolicy = getSignaturePolicy(node,ctx);
-        Policies.SignaturePolicyEnvelope.Builder builder = Policies.SignaturePolicyEnvelope.newBuilder();
-        builder.setVersion(0);
-        builder.setRule(signaturePolicy);
-        for(int i=0;i<context.getPrincipals().size();i++){
-            builder.setIdentities(i,context.getPrincipals().get(i));
+       List<PolicyNode> policyNodes = queryNode(node);
+
+       //getSignaturePolicy(policyNodes.get(1),ctx);
+       for(PolicyNode policyNode : policyNodes){
+           getSignaturePolicy(policyNode,ctx);
+       }
+        Policies.SignaturePolicy[] policys = new Policies.SignaturePolicy[policies.size()];
+        for(int i=0;i<policys.length;i++){
+            policys[i] = policies.get(i);
+        }
+        Policies.SignaturePolicy signaturePolicy = CAuthDslBuilder.nOutOf(1,policys);
+       Policies.SignaturePolicyEnvelope.Builder builder = Policies.SignaturePolicyEnvelope.newBuilder();
+       builder.setVersion(0);
+       builder.setRule(signaturePolicy);
+       for(int i=0;i<context.getPrincipals().size();i++){
+           // builder.setIdentities(i,context.getPrincipals().get(i));
+            builder.addIdentities(context.getPrincipals().get(i));
         }
        return builder.build();
     }
-
-
-    public static Policies.SignaturePolicy getSignaturePolicy(PolicyNode node, Context ctx) throws PolicyException {
-        for(int i=0;i<node.sons.size();i++){
-            if("outof".equals(node.getMsg())){
-                getSignaturePolicy(node.sons.get(i),ctx);
+    public static List<PolicyNode> queryNode(PolicyNode node){
+        List<PolicyNode> policyNodes = new ArrayList<PolicyNode>();
+        if("outof".equals(node.getMsg())){
+            for(int i=0;i<node.sons.size();i++){
+                if("outof".equals(node.sons.get(i).msg.toString())){
+                    policyNodes.add(node.sons.get(i));
+                }else{
+                    continue;
+                }
             }
         }
+        return policyNodes;
+    }
+
+    public static void getSignaturePolicy(PolicyNode node, Context ctx) throws PolicyException {
+
         if(node.sons.size() < 3 ){
             String msg=String.format("At least 3 arguments expected, got %d",node.sons.size());
             throw new PolicyException(msg);
@@ -79,53 +99,44 @@ public class PolicyParser {
             String msg=String.format("Invalid t-out-of-n predicate, t %d, n %d",t,n);
             throw new PolicyException(msg);
         }
-        List<Policies.SignaturePolicy> policies = new ArrayList<Policies.SignaturePolicy>();
+        //List<Policies.SignaturePolicy> policies = new ArrayList<Policies.SignaturePolicy>();
         for(int i=2;i<node.sons.size();i++){
-            Pattern p=Pattern.compile(regex);
-            Matcher m=p.matcher(node.sons.get(i).getMsg());
-            if(m.matches()){
-                Pattern pattern = Pattern.compile(regex);
-                Matcher matchPattern = pattern.matcher((CharSequence) node.sons.get(i));
-                List<String> subm = new ArrayList<String>();
-                while(matchPattern.find()){
-                    subm.add(matchPattern.group());
-                }
-                if(subm == null || subm.size() != 1 || subm.get(0).length() != 4){
-                    log.error("Error parsing principal %s",t);
-                    return null;
-                }
-                MspPrincipal.MSPRole.MSPRoleType role = null;
-                if(subm.get(3) == "member"){
-                    role = MspPrincipal.MSPRole.MSPRoleType.MEMBER;
-                }else{
-                    role = MspPrincipal.MSPRole.MSPRoleType.ADMIN;
-                }
-                MspPrincipal.MSPPrincipal.Builder builder = MspPrincipal.MSPPrincipal.newBuilder();
-                builder.setPrincipalClassification(MspPrincipal.MSPPrincipal.Classification.ROLE);
-                MspPrincipal.MSPRole.Builder roleBuilder = MspPrincipal.MSPRole.newBuilder();
-                //build MspRole
-                roleBuilder.setRole(role);
-                roleBuilder.setMspIdentifier(subm.get(1));
-                roleBuilder.build();
-                builder.setPrincipal(ByteString.copyFrom(ProtoUtils.marshalOrPanic(roleBuilder.build())));
-                MspPrincipal.MSPPrincipal mspPrincipal = builder.build();
-                ctx.getPrincipals().add(mspPrincipal);
-                ctx.setPrincipals(ctx.getPrincipals());
-                Policies.SignaturePolicy dapolicy = CAuthDslBuilder.signedBy(context.getIDNum());
-                policies.add(dapolicy);
-                int num = ctx.getIDNum();
-                num++;
-                ctx.setIDNum(num);
-                context = ctx;
+            String str = node.sons.get(i).getMsg().toString();
+            str = str.replaceAll("\'","");
+            String[] strs = str.split("\\.");
+            MspPrincipal.MSPRole.MSPRoleType role = null;
+            if("member".equals(strs[strs.length-1])){
+                role = MspPrincipal.MSPRole.MSPRoleType.MEMBER;
+            }if("admin".equals(strs[strs.length-1])){
+                role = MspPrincipal.MSPRole.MSPRoleType.ADMIN;
             }else{
                 String msg=String.format("Unrecognized type, expected a principal or a policy, got %s",node.sons.get(i).getMsg());
             }
+            MspPrincipal.MSPPrincipal.Builder builder = MspPrincipal.MSPPrincipal.newBuilder();
+            builder.setPrincipalClassification(MspPrincipal.MSPPrincipal.Classification.ROLE);
+            MspPrincipal.MSPRole.Builder roleBuilder = MspPrincipal.MSPRole.newBuilder();
+            //build MspRole
+            roleBuilder.setRole(role);
+            roleBuilder.setMspIdentifier(node.sons.get(i).getMsg());
+            roleBuilder.build();
+            builder.setPrincipal(ByteString.copyFrom(ProtoUtils.marshalOrPanic(roleBuilder.build())));
+            MspPrincipal.MSPPrincipal mspPrincipal = builder.build();
+            ctx.getPrincipals().add(mspPrincipal);
+            ctx.setPrincipals(ctx.getPrincipals());
+            Policies.SignaturePolicy dapolicy = CAuthDslBuilder.signedBy(ctx.getIDNum());
+            policies.add(dapolicy);
+            int num = ctx.getIDNum();
+            num++;
+            ctx.setIDNum(num);
+            context = ctx;
         }
-        Policies.SignaturePolicy[] policys = new Policies.SignaturePolicy[policies.size()];
+
+
+       /* Policies.SignaturePolicy[] policys = new Policies.SignaturePolicy[policies.size()];
         for(int i=0;i<policys.length;i++){
             policys[i] = policies.get(i);
         }
-        return CAuthDslBuilder.nOutOf(t,policys);
+        return CAuthDslBuilder.nOutOf(t,policys);*/
     }
 
     public static String checkPolicyStr(String policy) {
@@ -156,7 +167,7 @@ public class PolicyParser {
             }
         }
         String str =first.n2str();
-        System.out.print(first.n2str());
+        System.out.print(str);
 
         return str;
     }
@@ -187,8 +198,6 @@ public class PolicyParser {
                     break;
             }
         }
-
-
         return first;
     }
 

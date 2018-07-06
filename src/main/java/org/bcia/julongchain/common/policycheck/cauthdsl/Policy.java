@@ -74,7 +74,7 @@ public class Policy implements IPolicy {
 
 
         // FOR DEBUG  策略评估出错，保证测试继续，未评估策略      BY LIUXIONG  2018-06-15
-        // Boolean ok = evalutor.evalutor(signedDataList,bool);
+        //Boolean ok1 = evalutor.evaluate(signedDataList,bool);
         Boolean ok = true;
             if(!ok){
                 log.error("Failed to authenticate policy");

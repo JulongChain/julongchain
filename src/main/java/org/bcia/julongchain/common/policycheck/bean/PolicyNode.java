@@ -22,7 +22,7 @@ import java.util.Map;
 
 /**
  * 类描述
- *  用在PolicyPareser里，将策略解析到多叉树数中
+ *  用在PolicyParser里，将策略解析到多叉树数中
  * @author yuanjun
  * @date 12/06/18
  * @company Aisino
