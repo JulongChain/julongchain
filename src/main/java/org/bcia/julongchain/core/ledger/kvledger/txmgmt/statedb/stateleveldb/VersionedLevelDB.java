@@ -24,7 +24,7 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.StatedDB;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -63,7 +63,7 @@ public class VersionedLevelDB implements IVersionedDB {
         }
         //根据0~7字节组装blockNum
         //根据8~16字节组装txNum
-        Height h = new Height(dbVal);
+        LedgerHeight h = new LedgerHeight(dbVal);
         //其余为block信息
         byte[] value = new byte[dbVal.length - 16];
         System.arraycopy(dbVal, 16, value, 0, value.length);
@@ -72,7 +72,7 @@ public class VersionedLevelDB implements IVersionedDB {
     }
 
     @Override
-    public Height getVersion(String namespace, String key) throws LedgerException {
+    public LedgerHeight getVersion(String namespace, String key) throws LedgerException {
         VersionedValue versionedValue = getState(namespace, key);
         if (versionedValue == null) {
             return null;
@@ -111,7 +111,7 @@ public class VersionedLevelDB implements IVersionedDB {
      * 批量写操作
      */
     @Override
-    public void applyUpdates(UpdateBatch batch, Height height) throws LedgerException {
+    public void applyUpdates(UpdateBatch batch, LedgerHeight height) throws LedgerException {
         org.bcia.julongchain.common.ledger.util.leveldbhelper.UpdateBatch dbBatch =
                 new org.bcia.julongchain.common.ledger.util.leveldbhelper.UpdateBatch();
         List<String> nameSpaces = batch.getUpdatedNamespaces();
@@ -135,12 +135,12 @@ public class VersionedLevelDB implements IVersionedDB {
     }
 
     @Override
-    public Height getLatestSavePoint() throws LedgerException {
+    public LedgerHeight getLatestSavePoint() throws LedgerException {
         byte[] versionBytes = db.get(SAVE_POINT_KEY);
         if(versionBytes == null){
             return null;
         }
-       return new Height(versionBytes);
+       return new LedgerHeight(versionBytes);
     }
 
     @Override

@@ -20,7 +20,7 @@ import org.bcia.julongchain.common.ledger.blkstorage.IBlockStore;
 import org.bcia.julongchain.core.ledger.BlockAndPvtData;
 import org.bcia.julongchain.core.ledger.kvledger.IRecoverable;
 import org.bcia.julongchain.core.ledger.kvledger.history.IHistoryQueryExecutor;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
@@ -45,7 +45,7 @@ public interface IHistoryDB extends IRecoverable {
     /**
      * 获取最新存储点
      */
-    Height getLastSavepoint() throws LedgerException;
+    LedgerHeight getLastSavepoint() throws LedgerException;
 
     /**
      * 判断是否需要恢复数据库

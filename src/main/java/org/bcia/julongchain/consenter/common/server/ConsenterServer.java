@@ -32,6 +32,7 @@ import org.bcia.julongchain.consenter.common.multigroup.Registrar;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 import org.bcia.julongchain.protos.consenter.AtomicBroadcastGrpc;
+
 import java.io.IOException;
 
 

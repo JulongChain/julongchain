@@ -4,17 +4,13 @@ import org.bcia.julongchain.common.ledger.blkstorage.BlockStorage;
 import org.bcia.julongchain.common.ledger.blkstorage.IBlockStore;
 import org.bcia.julongchain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage.Config;
-import org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage.FsBlockStore;
 import org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage.FsBlockStoreProvider;
 import org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage.FsBlockStoreTest;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
-import org.bcia.julongchain.protos.common.Ledger;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * 类描述
@@ -61,7 +57,7 @@ public class HistoryLevelDBTest {
 
 	@Test
 	public void getLastSavepaoint() throws Exception {
-		Height lastSavepoint = db.getLastSavepoint();
+		LedgerHeight lastSavepoint = db.getLastSavepoint();
 		Assert.assertSame(lastSavepoint.getBlockNum(), (long) 0);
 		//获取的txNum从1开始
 		Assert.assertSame(lastSavepoint.getTxNum(), (long) 1);

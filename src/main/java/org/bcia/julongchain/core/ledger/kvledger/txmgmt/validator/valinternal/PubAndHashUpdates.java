@@ -21,7 +21,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate.PubU
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.CollHashedRwSet;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.NsRwSet;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.TxRwSet;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 
 /**
@@ -40,7 +40,7 @@ public class PubAndHashUpdates {
         this.hashedUpdates = new HashedUpdateBatch();
     }
 
-    public void applyWriteSet(TxRwSet txRwSet, Height txHeight) throws LedgerException  {
+    public void applyWriteSet(TxRwSet txRwSet, LedgerHeight txHeight) throws LedgerException  {
         for(NsRwSet nsRwSet : txRwSet.getNsRwSets()){
             String ns = nsRwSet.getNameSpace();
             for(KvRwset.KVWrite kvWrite : nsRwSet.getKvRwSet().getWritesList()){
