@@ -2,11 +2,13 @@ package org.bcia.julongchain.common.policycheck;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.policycheck.policies.GroupPolicyManagerGetter;
 import org.bcia.julongchain.common.util.proto.SignedData;
 import org.bcia.julongchain.common.util.proto.TxUtils;
 import org.bcia.julongchain.msp.IIdentityDeserializer;
 import org.bcia.julongchain.msp.mgmt.IMspPrincipalGetter;
+import org.bcia.julongchain.msp.mgmt.Msp;
 import org.bcia.julongchain.msp.mgmt.MspManager;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
@@ -47,8 +49,9 @@ public class PolicyCheckerTest {
     @Test
     public void checkPolicy() throws InvalidProtocolBufferException, JavaChainException, UnsupportedEncodingException {
         IIdentityDeserializer localMSP = mock(IIdentityDeserializer.class);
+        Msp msp = new Msp();
         IMspPrincipalGetter principalGetter = mock(IMspPrincipalGetter.class);
-        PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManagerGetter(),localMSP,principalGetter);
+        PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManagerGetter(),msp,principalGetter);
         ProposalPackage.SignedProposal sp = TxUtils.mockSignedEndorserProposalOrPanic("",
                 SmartContractPackage.SmartContractSpec.newBuilder().build());
         policyChecker.checkPolicy("A", "Admins",sp);
@@ -57,11 +60,18 @@ public class PolicyCheckerTest {
     }
 
     @Test
-    public void checkPolicyBySignedData() {
+    public void checkPolicyBySignedData() throws PolicyException {
         IIdentityDeserializer localMSP = mock(IIdentityDeserializer.class);
         IMspPrincipalGetter principalGetter = mock(IMspPrincipalGetter.class);
         PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManagerGetter(),localMSP,principalGetter);
         List<SignedData> sd = new ArrayList<SignedData>();
+        SignedData sd1 = new SignedData("A".getBytes(),"id1".getBytes(),"A".getBytes());
+        SignedData sd2 = new SignedData("B".getBytes(),"id2".getBytes(),"B".getBytes());
+        SignedData sd3 = new SignedData("C".getBytes(),"id3".getBytes(),"C".getBytes());
+        sd.add(sd1);
+        sd.add(sd2);
+        sd.add(sd3);
+        policyChecker.checkPolicyBySignedData("myGroup","Admins",sd);
 
     }
 
@@ -70,8 +80,9 @@ public class PolicyCheckerTest {
         String reader = "readers";
         IIdentityDeserializer localMSP = mock(IIdentityDeserializer.class);
         MspManager mspManager = new MspManager();
+        Msp msp = new Msp();
         IMspPrincipalGetter principalGetter = mock(IMspPrincipalGetter.class);
-        PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManagerGetter(),mspManager,principalGetter);
+        PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManagerGetter(),msp,principalGetter);
         ProposalPackage.SignedProposal sp = TxUtils.mockSignedEndorserProposalOrPanic("",
                 SmartContractPackage.SmartContractSpec.newBuilder().build());
         policyChecker.checkPolicyNoGroup("Admins",sp);

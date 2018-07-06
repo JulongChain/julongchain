@@ -17,13 +17,11 @@ public class PolicyParserTest {
 
     @Test
     public void fromString() throws PolicyException {
-       /* PolicyParser policyParser = new PolicyParser();
-        String p = "or('zuoxuesong1.admin',or(and('zuoxuesong2.member','zuoxuesong3.member'),'zuoxuesong1.member'))";
 
-        policyParser.fromString(p);*/
         String policy = "OR(AND('A.member', 'B.member'), OR('C.admin', 'D.member'))";
-        //String policy = "OR('A.member', AND('B.member', 'C.member'))";
+        String str = PolicyParser.checkPolicyStr(policy);
+        assertTrue(String.valueOf(str.equals("outof(ID,1,outof(ID,2,'A.member','B.member'),outof(ID,1,'C.admin','D.member'))")),true);
+        //assertSame(str,"outof(ID,1,outof(ID,2,'A.member','B.member'),outof(ID,1,'C.admin','D.member'))");
         PolicyParser.fromString(policy);
-        //System.out.println(checkPolicyStr(policy));
     }
 }
