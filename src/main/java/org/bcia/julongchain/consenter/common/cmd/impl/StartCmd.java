@@ -16,12 +16,16 @@
 package org.bcia.julongchain.consenter.common.cmd.impl;
 
 import org.apache.commons.cli.ParseException;
+import org.apache.gossip.manager.GossipManager;
+import org.bcia.julongchain.common.exception.GossipException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.consenter.common.cmd.IConsenterCmd;
 import org.bcia.julongchain.consenter.common.server.ConsenterServer;
 
 import java.io.IOException;
+
+import static org.bcia.julongchain.gossip.GossipServiceUtil.startConsenterGossip;
 
 /**
  * @author zhangmingyang
@@ -30,10 +34,11 @@ import java.io.IOException;
  */
 public class StartCmd implements IConsenterCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(StartCmd.class);
-    public ConsenterServer consenterServer;
+    private ConsenterServer consenterServer;
+    private static GossipManager gossipService;
 
     public StartCmd() {
-        consenterServer=new ConsenterServer();
+        consenterServer = new ConsenterServer();
     }
 
     @Override
@@ -41,23 +46,30 @@ public class StartCmd implements IConsenterCmd {
         for (String str : args) {
             log.info("arg-----$" + str);
         }
-            try {
-                new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            consenterServer.start();
-                            consenterServer.blockUntilShutdown();
-                        } catch (IOException ex) {
-                            log.error(ex.getMessage(), ex);
-                        } catch (InterruptedException ex) {
-                            log.error(ex.getMessage(), ex);
-                        }
+        try {
+            new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        gossipService= startConsenterGossip();
+                        consenterServer.start();
+                        consenterServer.blockUntilShutdown();
+                    } catch (IOException ex) {
+                        log.error(ex.getMessage(), ex);
+                    } catch (InterruptedException ex) {
+                        log.error(ex.getMessage(), ex);
+                    } catch (GossipException e) {
+                        e.printStackTrace();
                     }
-                }.start();
-                Thread.sleep(1000);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+                }
+            }.start();
+            Thread.sleep(1000);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static GossipManager getGossipService() {
+        return gossipService;
     }
 }

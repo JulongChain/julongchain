@@ -28,7 +28,7 @@ import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.policycheck.IPolicyChecker;
 import org.bcia.julongchain.common.policycheck.PolicyChecker;
-import org.bcia.julongchain.common.policycheck.policies.GroupPolicyManager;
+import org.bcia.julongchain.common.policycheck.policies.GroupPolicyManagerGetter;
 import org.bcia.julongchain.common.util.proto.BlockUtils;
 import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
 import org.bcia.julongchain.core.aclmgmt.AclManagement;
@@ -93,7 +93,7 @@ public class CSSC extends SystemSmartContractBase {
     public SmartContractResponse init(ISmartContractStub stub) {
         log.info("Init CSSC");
         IMsp localMSP = GlobalMspManagement.getLocalMsp();
-        policyChecker=new PolicyChecker(new GroupPolicyManager(),localMSP,new MSPPrincipalGetter());
+        policyChecker=new PolicyChecker(new GroupPolicyManagerGetter(),localMSP,new MSPPrincipalGetter());
         configManager =new ConfigManager();
         return newSuccessResponse();
     }
@@ -331,10 +331,10 @@ public class CSSC extends SystemSmartContractBase {
         if (resourceConfig == null) {
             return newErrorResponse(String.format("Unknown group ID,%s", groupID));
         }
-        ResourcesPackage.ConfigTree.Builder builder = ResourcesPackage.ConfigTree.newBuilder();
+        ResourcesPackage.RootConfigTree.Builder builder = ResourcesPackage.RootConfigTree.newBuilder();
         builder.setGroupConfig(groupConfig);
         builder.setResourcesConfig(resourceConfig);
-        ResourcesPackage.ConfigTree configTree = builder.build();
+        ResourcesPackage.RootConfigTree configTree = builder.build();
         byte[] configTreeBytes = configTree.toByteArray();
         return newSuccessResponse(configTreeBytes);
     }

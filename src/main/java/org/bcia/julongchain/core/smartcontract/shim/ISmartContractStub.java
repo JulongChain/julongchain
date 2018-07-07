@@ -42,7 +42,7 @@ public interface ISmartContractStub {
 	List<String> getStringArgs();
 
 	/**
-	 * A convenience method that returns the first argument of the smartcontract
+	 * A convenience method that returns the first argument of the smartContract
 	 * invocation for use as a function name.
 	 *
 	 * The bytes of the first argument are decoded as a UTF-8 string.
@@ -53,7 +53,7 @@ public interface ISmartContractStub {
 
 	/**
 	 * A convenience method that returns all except the first argument of the
-	 * smartcontract invocation for use as the parameters to the function returned
+	 * smartContract invocation for use as the parameters to the function returned
 	 * by #{@link ISmartContractStub#getFunction()}.
 	 *
 	 * The bytes of the arguments are decoded as a UTF-8 strings and returned as
@@ -78,12 +78,12 @@ public interface ISmartContractStub {
 	String getGroupId();
 
 	/**
-	 * Invoke another smartcontract using the same transaction context.
+	 * Invoke another smartContract using the same transaction context.
 	 *
 	 * @param smartContractName
-	 *            Name of smartcontract to be invoked.
+	 *            Name of smartContract to be invoked.
 	 * @param args
-	 *            Arguments to pass on to the called smartcontract.
+	 *            Arguments to pass on to the called smartContract.
 	 * @param channel
 	 *            If not specified, the caller's channel is assumed.
 	 * @return
@@ -184,7 +184,7 @@ public interface ISmartContractStub {
 
 	/**
 	 * Defines the SMARTCONTRACT type event that will be posted to interested
-	 * clients when the smartcontract's result is committed to the ledger.
+	 * clients when the smartContract's result is committed to the ledger.
 	 *
 	 * @param name
 	 *            Name of event. Cannot be null or empty string.
@@ -194,12 +194,12 @@ public interface ISmartContractStub {
 	void setEvent(String name, byte[] payload);
 
 	/**
-	 * Invoke another smartcontract using the same transaction context.
+	 * Invoke another smartContract using the same transaction context.
 	 *
 	 * @param smartContractName
-	 *            Name of smartcontract to be invoked.
+	 *            Name of smartContract to be invoked.
 	 * @param args
-	 *            Arguments to pass on to the called smartcontract.
+	 *            Arguments to pass on to the called smartContract.
 	 * @return
 	 */
 	default ISmartContract.SmartContractResponse invokeSmartContract(String smartContractName, List<byte[]> args) {
@@ -207,57 +207,57 @@ public interface ISmartContractStub {
 	}
 
 	/**
-	 * Invoke another smartcontract using the same transaction context.
+	 * Invoke another smartContract using the same transaction context.
 	 *
 	 * This is a convenience version of
 	 * {@link #invokeSmartContract(String, List, String)}. The string args will be
 	 * encoded into as UTF-8 bytes.
 	 *
-	 * @param smartcontractName
-	 *            Name of smartcontract to be invoked.
+	 * @param smartContractName
+	 *            Name of smartContract to be invoked.
 	 * @param args
-	 *            Arguments to pass on to the called smartcontract.
+	 *            Arguments to pass on to the called smartContract.
 	 * @param channel
 	 *            If not specified, the caller's channel is assumed.
 	 * @return
 	 */
-	default ISmartContract.SmartContractResponse invokeSmartContractWithStringArgs(String smartcontractName,
+	default ISmartContract.SmartContractResponse invokeSmartContractWithStringArgs(String smartContractName,
                                                                                    List<String> args, String channel) {
-		return invokeSmartContract(smartcontractName, args.stream().map(x -> x.getBytes(UTF_8)).collect(toList()), channel);
+		return invokeSmartContract(smartContractName, args.stream().map(x -> x.getBytes(UTF_8)).collect(toList()), channel);
 	}
 
 	/**
-	 * Invoke another smartcontract using the same transaction context.
+	 * Invoke another smartContract using the same transaction context.
 	 *
 	 * This is a convenience version of {@link #invokeSmartContract(String, List)}.
 	 * The string args will be encoded into as UTF-8 bytes.
 	 *
 	 *
-	 * @param smartcontractName
-	 *            Name of smartcontract to be invoked.
+	 * @param smartContractName
+	 *            Name of smartContract to be invoked.
 	 * @param args
-	 *            Arguments to pass on to the called smartcontract.
+	 *            Arguments to pass on to the called smartContract.
 	 * @return
 	 */
-	default ISmartContract.SmartContractResponse invokeSmartContractWithStringArgs(String smartcontractName, List<String> args) {
-		return invokeSmartContractWithStringArgs(smartcontractName, args, null);
+	default ISmartContract.SmartContractResponse invokeSmartContractWithStringArgs(String smartContractName, List<String> args) {
+		return invokeSmartContractWithStringArgs(smartContractName, args, null);
 	}
 
 	/**
-	 * Invoke another smartcontract using the same transaction context.
+	 * Invoke another smartContract using the same transaction context.
 	 *
 	 * This is a convenience version of {@link #invokeSmartContract(String, List)}.
 	 * The string args will be encoded into as UTF-8 bytes.
 	 *
 	 *
-	 * @param smartcontractName
-	 *            Name of smartcontract to be invoked.
+	 * @param smartContractName
+	 *            Name of smartContract to be invoked.
 	 * @param args
-	 *            Arguments to pass on to the called smartcontract.
+	 *            Arguments to pass on to the called smartContract.
 	 * @return
 	 */
-	default ISmartContract.SmartContractResponse invokeSmartContractWithStringArgs(final String smartcontractName, final String... args) {
-		return invokeSmartContractWithStringArgs(smartcontractName, Arrays.asList(args), null);
+	default ISmartContract.SmartContractResponse invokeSmartContractWithStringArgs(final String smartContractName, final String... args) {
+		return invokeSmartContractWithStringArgs(smartContractName, Arrays.asList(args), null);
 	}
 
 	/**
@@ -286,9 +286,9 @@ public interface ISmartContractStub {
 
 	/**
 	 * Returns the SMARTCONTRACT type event that will be posted to interested
-	 * clients when the smartcontract's result is committed to the ledger.
+	 * clients when the smartContract's result is committed to the ledger.
 	 *
-	 * @return the smartcontract event or null
+	 * @return the smartContract event or null
 	 */
 	SmartContractEventPackage.SmartContractEvent getEvent();
 
@@ -296,7 +296,7 @@ public interface ISmartContractStub {
 	 * Returns the signed transaction proposal currently being executed.
 	 *
 	 * @return null if the current transaction is an internal call to a system
-	 *         smartcontract.
+	 *         smartContract.
 	 */
 	SignedProposal getSignedProposal();
 

@@ -84,7 +84,7 @@ public class EndorserTest extends BaseJunit4Test {
         String txId = "txId1";
         ProposalPackage.Proposal proposal = ProposalPackage.Proposal.newBuilder().build();
         ProposalPackage.SignedProposal signedProposal = ProposalPackage.SignedProposal.newBuilder().build();
-        Smartcontract.SmartContractID.Builder smartContractIDBuilder = Smartcontract.SmartContractID.newBuilder();
+        SmartContractPackage.SmartContractID.Builder smartContractIDBuilder = SmartContractPackage.SmartContractID.newBuilder();
         ProposalResponsePackage.Response response = ProposalResponsePackage.Response.newBuilder().build();
         SmartContractEventPackage.SmartContractEvent event = SmartContractEventPackage.SmartContractEvent.newBuilder
                 ().build();
@@ -100,7 +100,7 @@ public class EndorserTest extends BaseJunit4Test {
 
     @Test
     public void callSmartContract() throws JavaChainException, InvalidProtocolBufferException {
-        Smartcontract.SmartContractInvocationSpec csscSpec = SpecHelper.buildInvocationSpec(CommConstant.CSSC, CSSC
+        SmartContractPackage.SmartContractInvocationSpec csscSpec = SpecHelper.buildInvocationSpec(CommConstant.CSSC, CSSC
                 .GET_GROUPS, null);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();

@@ -22,6 +22,9 @@ import org.bcia.julongchain.consenter.common.cmd.IConsenterCmd;
 import org.bcia.julongchain.consenter.common.cmd.factory.ConsenterCmdFactory;
 import org.bcia.julongchain.consenter.util.Constant;
 
+import java.io.File;
+import java.nio.file.Files;
+
 /**
  * @author zhangmingyang
  * @Date: 2018/3/1 *
@@ -33,7 +36,7 @@ public class Consenter {
 
     public void execCmd(String[] args) {
         if (args.length <= 0) {
-            log.warn("Node command need more args-----");
+            log.warn("PolicyNode command need more args-----");
             return;
         }
         String command = args[0];

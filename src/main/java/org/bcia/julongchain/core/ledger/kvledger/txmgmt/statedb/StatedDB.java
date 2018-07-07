@@ -19,7 +19,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.NsIterator;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.NsUpdates;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.UpdateBatch;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 
 /**
  * 类描述
@@ -46,7 +46,7 @@ public class StatedDB {
         return null;
     }
 
-    public static byte[] encodeValue(byte[] value, Height version){
+    public static byte[] encodeValue(byte[] value, LedgerHeight version){
         byte[] encodeValue = version.toBytes();
         if(value != null){
             encodeValue = ArrayUtils.addAll(encodeValue, value);
@@ -54,8 +54,8 @@ public class StatedDB {
         return encodeValue;
     }
 
-    public static Height decodeValueToHeight(byte[] encodeValue){
-        return new Height(encodeValue);
+    public static LedgerHeight decodeValueToHeight(byte[] encodeValue){
+        return new LedgerHeight(encodeValue);
     }
     public static byte[] decodeValueToBytes(byte[] encodeValue){
         byte[] result = new byte[encodeValue.length - 16];

@@ -39,6 +39,7 @@ public class BlockWriter {
     private static JavaChainLog log = JavaChainLogFactory.getLog(BlockWriter.class);
     // private IBlockWriterSupport support;
     private ChainSupport support;
+
     private Registrar registrar;
 
     private long lastConfigBlockNum;
@@ -95,7 +96,7 @@ public class BlockWriter {
                 support.update(iGroupConfigBundle);
                 break;
             default:
-                log.error(String.format("Told to write a config block with unknown header type: %v", groupHeader.getType()));
+                log.error(String.format("Told to write a config block with unknown header type: %s", groupHeader.getType()));
         }
 
         writeBlock(block, encodedMetadataValue);

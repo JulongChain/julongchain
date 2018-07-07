@@ -23,7 +23,7 @@ import org.bcia.julongchain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.julongchain.common.groupconfig.config.IConsenterConfig;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.common.policycheck.policies.Policy;
+import org.bcia.julongchain.common.policies.PolicyConstant;
 import org.bcia.julongchain.common.util.proto.TxUtils;
 import org.bcia.julongchain.consenter.consensus.IProcessor;
 import org.bcia.julongchain.consenter.entity.ConfigMsg;
@@ -63,7 +63,8 @@ public class StandardGroup implements IProcessor {
             }
         }
         //TODO EmptyRejectRule 待确定是否为无参构函数
-        filters = new RuleSet(new IRule[]{new EmptyRejectRule(), new ExpirationRejectRule(filterSupport), new SizeFilter(consenterConfig), new SigFilter(Policy.ChannelWriters, filterSupport.getPolicyManager())});
+        filters = new RuleSet(new IRule[]{new EmptyRejectRule(), new ExpirationRejectRule(filterSupport),
+                new SizeFilter(consenterConfig), new SigFilter(PolicyConstant.GROUP_APP_WRITERS, filterSupport.getPolicyManager())});
         return filters;
     }
 
@@ -94,7 +95,7 @@ public class StandardGroup implements IProcessor {
         Configtx.ConfigEnvelope configEnvelope = standardGroupSupport.proposeConfigUpdate(env);
         int headerType = 0;
         Common.Envelope config = TxUtils.createSignedEnvelope(headerType, standardGroupSupport.getGroupId(),
-                standardGroupSupport.signer(), configEnvelope, Constant.MSGVERSION, Constant.EPOCH);
+                standardGroupSupport.getSigner(), configEnvelope, Constant.MSGVERSION, Constant.EPOCH);
         return new ConfigMsg(config, seq);
     }
 

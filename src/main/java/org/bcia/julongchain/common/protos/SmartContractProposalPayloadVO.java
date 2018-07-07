@@ -20,7 +20,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.protos.node.ProposalPackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 import java.util.Map;
 
@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public class SmartContractProposalPayloadVO implements IProtoVO<ProposalPackage.SmartContractProposalPayload> {
     private Map<String, ByteString> transientMap;
-    private Smartcontract.SmartContractInvocationSpec input;
+    private SmartContractPackage.SmartContractInvocationSpec input;
 
     @Override
     public void parseFrom(ProposalPackage.SmartContractProposalPayload smartContractProposalPayload) throws
@@ -43,7 +43,7 @@ public class SmartContractProposalPayloadVO implements IProtoVO<ProposalPackage.
         this.transientMap = smartContractProposalPayload.getTransientMapMap();
 
         if (smartContractProposalPayload.getInput() != null) {
-            this.input = Smartcontract.SmartContractInvocationSpec.parseFrom(smartContractProposalPayload.getInput());
+            this.input = SmartContractPackage.SmartContractInvocationSpec.parseFrom(smartContractProposalPayload.getInput());
         }
     }
 
@@ -61,7 +61,7 @@ public class SmartContractProposalPayloadVO implements IProtoVO<ProposalPackage.
         return transientMap;
     }
 
-    public Smartcontract.SmartContractInvocationSpec getInput() {
+    public SmartContractPackage.SmartContractInvocationSpec getInput() {
         return input;
     }
 }

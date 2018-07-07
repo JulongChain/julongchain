@@ -17,7 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bcia.julongchain.csp.gm.sdt.SM3.SM3;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
  * 类描述
@@ -28,17 +28,17 @@ import org.bcia.julongchain.protos.node.Smartcontract;
  */
 public class SCID {
 
-  private Smartcontract.SmartContractSpec smartContractSpec;
+  private SmartContractPackage.SmartContractSpec smartContractSpec;
   private String networkID;
   private String nodeID;
   private String chainID;
   private String version;
 
-  public Smartcontract.SmartContractSpec getSmartContractSpec() {
+  public SmartContractPackage.SmartContractSpec getSmartContractSpec() {
     return smartContractSpec;
   }
 
-  public void setSmartContractSpec(Smartcontract.SmartContractSpec smartContractSpec) {
+  public void setSmartContractSpec(SmartContractPackage.SmartContractSpec smartContractSpec) {
     this.smartContractSpec = smartContractSpec;
   }
 

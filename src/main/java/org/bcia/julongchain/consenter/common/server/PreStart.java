@@ -31,7 +31,7 @@ import org.bcia.julongchain.common.util.proto.BlockUtils;
 import org.bcia.julongchain.consenter.common.bootstrap.file.BootStrapHelper;
 import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfig;
 import org.bcia.julongchain.consenter.common.multigroup.Registrar;
-import org.bcia.julongchain.consenter.consensus.IConsensue;
+import org.bcia.julongchain.consenter.consensus.IConsensusPlugin;
 import org.bcia.julongchain.consenter.consensus.singleton.Singleton;
 import org.bcia.julongchain.core.common.grpc.GrpcServerConfig;
 import org.bcia.julongchain.core.common.grpc.SecureOptions;
@@ -58,14 +58,14 @@ public class PreStart {
     private static JavaChainLog log = JavaChainLogFactory.getLog(PreStart.class);
     private static ConsenterConfig defaultConsenterConfig;
     private static DeliverHandler defaultDeliverHandler;
-    private static Registrar  defaultRegistrar;
+    private  Registrar  defaultRegistrar;
 
 
     public static void initAll() throws IOException, JavaChainException {
         boolean mutalTLS=false;
         initConsnterConfig();
-        defaultRegistrar=initializeMultichannelRegistrar(defaultConsenterConfig,new LocalSigner());
-        defaultDeliverHandler=initDeliverHandler(defaultRegistrar,mutalTLS);
+       // defaultRegistrar=initializeMultichannelRegistrar(defaultConsenterConfig,new LocalSigner());
+       // defaultDeliverHandler=initDeliverHandler(defaultRegistrar,mutalTLS);
     }
 
     private static ConsenterConfig initConsnterConfig() {
@@ -77,25 +77,25 @@ public class PreStart {
         }
     }
 
-    private static DeliverHandler initDeliverHandler(Registrar registrar, boolean mutalTLS) {
+    private  DeliverHandler initDeliverHandler(Registrar registrar, boolean mutalTLS) {
         return new DeliverHandler(new DeliverSupport(registrar), defaultConsenterConfig.getGeneral().getAuthentication().get("timeWindow"), mutalTLS);
     }
 
-    public static Registrar initializeMultichannelRegistrar(ConsenterConfig consenterConfig, ILocalSigner signer) throws JavaChainException, IOException {
-        if(defaultRegistrar==null){
+    public  Registrar initializeMultichannelRegistrar(ConsenterConfig consenterConfig, ILocalSigner signer) throws JavaChainException, IOException {
+     //   if(defaultRegistrar==null){
             IFactory lf = LedgerHelper.createLedgerFactroy(consenterConfig);
             if (lf.groupIDs().size() == 0) {
                 initBootstrapGroup(consenterConfig, lf);
             } else {
                 log.info("Not bootstrapping because of existing chains");
             }
-            Map<String, IConsensue> consenters = new HashMap<>();
+            Map<String, IConsensusPlugin> consenters = new HashMap<>();
             consenters.put("Singleton", new Singleton());
            defaultRegistrar=new Registrar().newRegistrar(lf, consenters, signer);
            return defaultRegistrar;
-        }else {
-            return defaultRegistrar;
-        }
+//        }else {
+//            return defaultRegistrar;
+//        }
     }
 
     private static void initBootstrapGroup(ConsenterConfig consenterConfig, IFactory blockLedger) throws IOException, JavaChainException {
@@ -103,12 +103,12 @@ public class PreStart {
         switch (consenterConfig.getGeneral().getGenesisMethod()) {
             case "provisional":
                 //根据配置生成创世区块
-                GenesisConfig.Profile completedProfile = GenesisConfigFactory.loadGenesisConfig().getCompletedProfile(consenterConfig.getGeneral().getGenesisProfile());
+                GenesisConfig.Profile completedProfile = GenesisConfigFactory.getGenesisConfig().getCompletedProfile(consenterConfig.getGeneral().getGenesisProfile());
                 Configtx.ConfigTree groupTree = ConfigTreeHelper.buildGroupTree(completedProfile);
                 genesisBlock = new GenesisBlockFactory(groupTree).getGenesisBlock("systemGroup");
                 break;
             case "file":
-                genesisBlock = new BootStrapHelper(consenterConfig.getGeneral().getGenesisFile()).genesisBlock();
+                genesisBlock = new BootStrapHelper(consenterConfig.getGeneral().getGenesisFile()).getGenesisBlock();
                 break;
             default:
         }
@@ -150,7 +150,7 @@ public class PreStart {
     public static void main(String[] args) throws IOException, JavaChainException {
         LocalSigner localSigner = new LocalSigner();
 
-        Registrar registrar = initializeMultichannelRegistrar(loadConsenterConfig(), localSigner);
+       // Registrar registrar = initializeMultichannelRegistrar(loadConsenterConfig(), localSigner);
 
     }
 
@@ -162,7 +162,7 @@ public class PreStart {
         return defaultDeliverHandler;
     }
 
-    public static Registrar getDefaultRegistrar() {
+    public  Registrar getDefaultRegistrar() {
         return defaultRegistrar;
     }
 }

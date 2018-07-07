@@ -42,6 +42,7 @@ public class HistoryLevelDBProvider implements IHistoryDBProvider {
 
     @Override
     public IHistoryDB getDBHandle(String dbName) throws LedgerException {
+	    provider = ((LevelDBProvider) provider).getDBHandle(dbName);
         return new HistoryLevelDB(provider, dbName);
     }
 

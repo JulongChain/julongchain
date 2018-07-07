@@ -15,14 +15,23 @@
  */
 package org.bcia.julongchain.core.ledger;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.LedgerException;
+import org.bcia.julongchain.common.exception.SysSmartContractException;
+import org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage.BlockFileReader;
 import org.bcia.julongchain.common.ledger.util.leveldbhelper.LevelDBProvider;
+import org.bcia.julongchain.common.protos.EnvelopeVO;
 import org.bcia.julongchain.core.ledger.kvledger.history.historydb.HistoryDBHelper;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
+import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
+import org.bcia.julongchain.core.ledger.util.Util;
+import org.bcia.julongchain.protos.common.Common;
+import org.bcia.julongchain.protos.node.SmartContractDataPackage;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -52,55 +61,77 @@ public class LedgerTest {
 
     @Test
     public void getKVFromLevelDB() throws Throwable {
-//        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getIndexPath());
-//        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getStateLevelDBPath());
-//        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getHistoryLevelDBPath());
-        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getLedgerProviderPath());
-//        LevelDBProvider provider = new LevelDBProvider(LedgerConfig.getPvtDataStorePath());
-//        for (int i = 0; i < 100; i++) {
-//            Height height = new Height();
-//            height.setTxNum((long) i);
-//            height.setBlockNum((long) i * 10);
-//            byte[] value = height.toBytes();
-//            provider.put(ArrayUtils.addAll(ArrayUtils.addAll(("ns" + i).getBytes(), COMPOSITE_KEY_SEP), ("key" + i).getBytes()), value, true);
-//        }
-	    provider.put("key".getBytes(), "value".getBytes(), true);
-	    provider.delete("key".getBytes(), true);
-        Iterator<Map.Entry<byte[], byte[]>> itr =  provider.getIterator(null);
-        while(itr.hasNext()){
-            Map.Entry<byte[], byte[]> entry = itr.next();
-//            System.out.println(Height.newHeightFromBytes(entry.getValue()).getTxNum());
-//            System.out.println(Height.newHeightFromBytes(entry.getValue()).getBlockNum());
-//            System.out.println(new String(entry.getValue()));
-//            soutBytes(entry.getKey());
-            System.out.println(new String(entry.getKey()));
-            System.out.println(new String(entry.getValue()));
-	        System.out.println(entry.getValue().length == 0);
-//            soutBytes(entry.getValue());
-//            soutBytes(entry.getKey());
-//            soutBytes(entry.getValue());
-            System.out.println("_____________________________________");
-        }
-    }
+		LedgerManager.initialize(null);
+		INodeLedger l = LedgerManager.openLedger("myGroup");
+		ITxSimulator simulator = l.newTxSimulator("txID");
+		byte[] state = simulator.getState("lssc", "mycc");
+
+		SmartContractDataPackage.SmartContractData mycc = getSmartContractData("mycc", state);
+	}
+
+	private SmartContractDataPackage.SmartContractData getSmartContractData(String contractName, byte[] scdBytes)
+			throws SysSmartContractException
+	{
+		SmartContractDataPackage.SmartContractData scd=null;
+		try {
+			scd=SmartContractDataPackage.SmartContractData.parseFrom(scdBytes);
+		} catch (InvalidProtocolBufferException e) {
+			String msg=String.format("SmartContractdata for%s unmarshal failed ",contractName);
+			throw new SysSmartContractException(msg);
+		}
+		if(!scd.getName().equalsIgnoreCase(contractName)){
+			String msg=String.format("SmartContract mismatch:%s!=%s",contractName,scd.getName());
+			throw new SysSmartContractException(msg);
+		}
+		return scd;
+	}
 
     @Test
     public void getValuesFromFS() throws Exception {
-        File file = new File(LedgerConfig.getBlockStorePath() + "/chains/myGroup/blockfile_000000");
-        FileInputStream reader = new FileInputStream(file);
-        System.out.println(file.length());
-        byte[] bytes = new byte[(int) file.length()];
-        reader.read(bytes);
-        soutBytes(bytes);
-        byte[] blockByte = new byte[bytes.length - 8];
+    	Map<String, String> map = new HashMap<>();
+	    System.out.println(map.entrySet());
+
+	    String filePath = LedgerConfig.getChainsPath() + "/chains/myGroup/blockfile_000000";
+	    File file = new File(filePath);
+	    System.out.println(filePath);
+	    int len = 0;
+    	int i = 0;
+//    	File file = new File(filePath);
+
+	    while (len < file.length()) {
+		    BlockFileReader reader = new BlockFileReader(filePath);
+		    byte[] blockLen = reader.read(len, 8);
+		    len += 8;
+		    long l = Util.bytesToLong(blockLen, 0, 8);
+		    System.out.println("block" + i++ + " length : " + l);
+		    byte[] blockBytes = reader.read(len, l);
+		    len += l;
+		    Common.Block block = Common.Block.parseFrom(blockBytes);
+			EnvelopeVO envelopeVO = new EnvelopeVO();
+			envelopeVO.parseFrom(Common.Envelope.parseFrom(block.getData().getData(0)));
+		    System.out.println(block);
+		    soutBytes(block.getHeader().getDataHash().toByteArray());
+	    }
+//	    FileInputStream fis = new FileInputStream(file);
+//	    byte[] b = new byte[(int) file.length()];
+//	    fis.read(b);
+//	    soutBytes(b);
+    }
+
+    @Test
+    public void test() throws Exception {
+    	String a = "123 234 345";
+	    String[] split = a.split(" ");
+	    System.out.println(split[split.length - 1]);
     }
 
     public static void soutBytes(byte[] bytes){
         int i = 0;
         for(byte b : bytes){
             System.out.print(b + " ");
-            if (i++ % 10 == 9) {
+            if (i++ % 10 == 29) {
                 System.out.println();
-                System.out.println(i);
+//                System.out.println(i);
             }
         }
         System.out.println();

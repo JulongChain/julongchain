@@ -24,7 +24,7 @@ import org.bcia.julongchain.common.ledger.util.IoUtil;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.protos.node.SmartContractDataPackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 import java.io.*;
 
@@ -38,7 +38,7 @@ import java.io.*;
 public class SDSPackage implements ISmartContractPackage {
     private static JavaChainLog log = JavaChainLogFactory.getLog(SDSPackage.class);
 
-    private Smartcontract.SmartContractDeploymentSpec deploymentSpec;
+    private SmartContractPackage.SmartContractDeploymentSpec deploymentSpec;
     private byte[] buf;
     private SDSData data;
     private byte[] datab;
@@ -64,9 +64,9 @@ public class SDSPackage implements ISmartContractPackage {
     public SmartContractDataPackage.SmartContractData initFromBuffer(byte[] buf) throws JavaChainException {
         reset();
 
-        Smartcontract.SmartContractDeploymentSpec deploymentSpec = null;
+        SmartContractPackage.SmartContractDeploymentSpec deploymentSpec = null;
         try {
-            deploymentSpec = Smartcontract.SmartContractDeploymentSpec.parseFrom(buf);
+            deploymentSpec = SmartContractPackage.SmartContractDeploymentSpec.parseFrom(buf);
         } catch (InvalidProtocolBufferException e) {
             log.error(e.getMessage(), e);
             throw new JavaChainException(e);
@@ -94,7 +94,7 @@ public class SDSPackage implements ISmartContractPackage {
      * @throws JavaChainException
      */
     @Override
-    public Smartcontract.SmartContractDeploymentSpec initFromFS(String scName, String scVersion) throws JavaChainException {
+    public SmartContractPackage.SmartContractDeploymentSpec initFromFS(String scName, String scVersion) throws JavaChainException {
         //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
         reset();
         byte[] buf = SmartContractProvider.getSmartContractPackage(scName, scVersion);
@@ -107,7 +107,7 @@ public class SDSPackage implements ISmartContractPackage {
      * @param sds
      * @return
      */
-    private SDSData getSDSData(Smartcontract.SmartContractDeploymentSpec sds) throws JavaChainException{
+    private SDSData getSDSData(SmartContractPackage.SmartContractDeploymentSpec sds) throws JavaChainException{
         //检查是否为空
         if(sds == null){
             throw new JavaChainException("Null sds");
@@ -180,7 +180,7 @@ public class SDSPackage implements ISmartContractPackage {
     }
 
     @Override
-    public Smartcontract.SmartContractDeploymentSpec getDepSpec() {
+    public SmartContractPackage.SmartContractDeploymentSpec getDepSpec() {
         if(this.deploymentSpec == null){
             throw new RuntimeException("Function getDepSpec() called on uninitialized package");
         }

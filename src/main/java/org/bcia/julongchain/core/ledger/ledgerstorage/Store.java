@@ -98,10 +98,10 @@ public class Store implements IBlockStore {
     @Override
     public synchronized void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException{
         List<TxPvtData> pvtDatas = new ArrayList<>();
-        for(Map.Entry<Long, TxPvtData> entry : blockAndPvtData.getBlockPvtData().entrySet()){
-            pvtDatas.add(entry.getValue());
-        }
-        //提交数据,出现异常则回滚,否则完成提交
+	    for(Map.Entry<Long, TxPvtData> entry : blockAndPvtData.getBlockPvtData().entrySet()){
+		    pvtDatas.add(entry.getValue());
+	    }
+	    //提交数据,出现异常则回滚,否则完成提交
         pvtdataStore.prepare(blockAndPvtData.getBlock().getHeader().getNumber(), pvtDatas);
         try {
             addBlock(blockAndPvtData.getBlock());
@@ -126,8 +126,7 @@ public class Store implements IBlockStore {
     }
 
     private List<TxPvtData> getPvtDataByNumWithoutLock(long blockNum, PvtNsCollFilter filter) throws LedgerException {
-        List<TxPvtData> pvtData = pvtdataStore.getPvtDataByBlockNum(blockNum, filter);
-        return pvtData;
+        return pvtdataStore.getPvtDataByBlockNum(blockNum, filter);
     }
 
     private Map<Long, TxPvtData> constructPvtdataMap(List<TxPvtData> pvtData){

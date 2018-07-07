@@ -23,8 +23,8 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractContext;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
-import org.bcia.julongchain.protos.node.SmartcontractShim;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
+import org.bcia.julongchain.protos.node.SmartContractShim;
 import org.springframework.stereotype.Component;
 
 /**
@@ -54,19 +54,19 @@ public class SmartContractExecutor {
 
         int msgType = 0;
         //spec必须为SmartContractDeploymentSpec或者SmartContractInvocationSpec实例
-        if (spec instanceof Smartcontract.SmartContractDeploymentSpec) {
+        if (spec instanceof SmartContractPackage.SmartContractDeploymentSpec) {
             //消息类型为初始化
-            msgType = SmartcontractShim.SmartContractMessage.Type.INIT_VALUE;
-        } else if (spec instanceof Smartcontract.SmartContractInvocationSpec) {
+            msgType = SmartContractShim.SmartContractMessage.Type.INIT_VALUE;
+        } else if (spec instanceof SmartContractPackage.SmartContractInvocationSpec) {
             //消息类型为交易
-            msgType = SmartcontractShim.SmartContractMessage.Type.TRANSACTION_VALUE;
+            msgType = SmartContractShim.SmartContractMessage.Type.TRANSACTION_VALUE;
         } else {
             log.error("Unsupported spec");
             throw new SmartContractException("Unsupported spec");
         }
 
         //启动智能合约
-        Smartcontract.SmartContractInput scInput = scSupport.launch(scContext, spec);
+        SmartContractPackage.SmartContractInput scInput = scSupport.launch(scContext, spec);
         if (scInput == null) {
             log.error("launch smart contract fail");
             throw new SmartContractException("launch smart contract fail");
@@ -80,10 +80,10 @@ public class SmartContractExecutor {
 
         //TODO:SmartContractInput是否需要再处理?
 
-        SmartcontractShim.SmartContractMessage scMessage = buildSmartContractMessage(msgType, scInput.toByteArray(),
+        SmartContractShim.SmartContractMessage scMessage = buildSmartContractMessage(msgType, scInput.toByteArray(),
                 scContext.getTxID(), scContext.getChainID(), scContext.getSignedProposal());
         //执行智能合约
-        SmartcontractShim.SmartContractMessage responseMessage = scSupport.execute(scContext, scMessage, timeout);
+        SmartContractShim.SmartContractMessage responseMessage = scSupport.execute(scContext, scMessage, timeout);
 
 //        try {
 //            Query.GroupQueryResponse groupQueryResponse = null;
@@ -102,7 +102,7 @@ public class SmartContractExecutor {
         //判断返回结果
         if (responseMessage != null) {
             //完成时返回负载
-            if (responseMessage.getType().equals(SmartcontractShim.SmartContractMessage.Type.COMPLETED)) {
+            if (responseMessage.getType().equals(SmartContractShim.SmartContractMessage.Type.COMPLETED)) {
                 ProposalResponsePackage.Response response = null;
                 try {
                     response = ProposalResponsePackage.Response.parseFrom(responseMessage.getPayload());
@@ -110,9 +110,9 @@ public class SmartContractExecutor {
                     log.error(e.getMessage(), e);
                     throw new SmartContractException("Wrong Response");
                 }
-                return new Object[]{response, responseMessage.getSmartcontractEvent()};
+                return new Object[]{response, responseMessage.getSmartContractEvent()};
             } else {
-                throw new SmartContractException("execute smart contract fail: " + responseMessage.getPayload());
+                throw new SmartContractException("execute smart contract fail: " + responseMessage.getPayload().toStringUtf8());
             }
         }
 
@@ -128,9 +128,9 @@ public class SmartContractExecutor {
      * @param groupId 群组ID
      * @return
      */
-    private SmartcontractShim.SmartContractMessage buildSmartContractMessage(int msgType, byte[] payload, String txId, String groupId, ProposalPackage.SignedProposal signedProposal) {
+    private SmartContractShim.SmartContractMessage buildSmartContractMessage(int msgType, byte[] payload, String txId, String groupId, ProposalPackage.SignedProposal signedProposal) {
 
-        SmartcontractShim.SmartContractMessage.Builder scMessageBuilder = SmartcontractShim.SmartContractMessage
+        SmartContractShim.SmartContractMessage.Builder scMessageBuilder = SmartContractShim.SmartContractMessage
                 .newBuilder();
 
         scMessageBuilder.setTypeValue(msgType);

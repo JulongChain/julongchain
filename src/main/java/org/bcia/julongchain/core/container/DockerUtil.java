@@ -50,7 +50,7 @@ public class DockerUtil {
     return dockerClient;
   }
 
-  private static void closeDockerClient(DockerClient dockerClient) {
+  public static void closeDockerClient(DockerClient dockerClient) {
     try {
       dockerClient.close();
     } catch (IOException e) {
@@ -141,24 +141,20 @@ public class DockerUtil {
     DockerClient dockerClient = getDockerClient();
     List<Container> containerList = dockerClient.listContainersCmd().withShowAll(true).exec();
     for (Container container : containerList) {
-      if (StringUtils.isEmpty(name) || StringUtils.contains(container.getImage(), name)) {
-        result.add(container.getImage());
+      if (StringUtils.isEmpty(name) || StringUtils.contains(container.getNames()[0], name)) {
+        result.add(container.getId());
       }
     }
     closeDockerClient(dockerClient);
     return result;
   }
 
-  public static String createContainer(String imageId, String containerName) {
+  public static String createContainer(String imageId, String containerName, String... cmdStr) {
     String containerId =
         getDockerClient()
             .createContainerCmd(imageId)
             .withName(containerName)
-            .withCmd(
-                "/bin/sh",
-                "-c",
-                "java -jar /root/julongchain/target/julongchain-smartcontract-java-jar-with-dependencies.jar -i "
-                    + containerName)
+            .withCmd(cmdStr)
             .exec()
             .getId();
     logger.info("container ID:" + containerId);

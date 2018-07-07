@@ -18,12 +18,13 @@ package org.bcia.julongchain.events.consumer;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Timestamp;
 import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.netty.NettyChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.csp.factory.CspManager;
 import org.bcia.julongchain.msp.IMsp;
@@ -103,7 +104,9 @@ public class EventsClient {
      */
     private void sendChat(EventsPackage.SignedEvent signedEvent, StreamObserver<EventsPackage.Event> responseObserver) {
         //TODO：去明文
-        ManagedChannel managedChannel = ManagedChannelBuilder.forAddress(host, port).usePlaintext(true).build();
+        ManagedChannel managedChannel =
+                NettyChannelBuilder.forAddress(host, port).maxInboundMessageSize(CommConstant.MAX_GRPC_MESSAGE_SIZE)
+                        .usePlaintext().build();
         EventsGrpc.EventsStub stub = EventsGrpc.newStub(managedChannel);
         StreamObserver<EventsPackage.SignedEvent> streamObserver = stub.chat(responseObserver);
         //调用服务器对端的onNext方法

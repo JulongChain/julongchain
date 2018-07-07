@@ -25,7 +25,7 @@ import org.bcia.julongchain.msp.IMsp;
 import org.bcia.julongchain.msp.ISigningIdentity;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -99,7 +99,7 @@ public class ESSC extends SystemSmartContractBase {
             return newErrorResponse("SmartcontractID is empty");
         }
 
-        Smartcontract.SmartContractID smartContractID=null;
+        SmartContractPackage.SmartContractID smartContractID=null;
         try {
             smartContractID = ProtoUtils.unmarshalSmartcontractID(smartContractIDBytes);
         }catch(Exception e){
@@ -127,10 +127,12 @@ public class ESSC extends SystemSmartContractBase {
 
 
         //handle simulation results
+		// TODO: 7/2/18 install时会因为不需要指定groupID导致获取simulator失败
         byte[] resultBytes=args.get(5);
-        if(resultBytes.length==0){
-            return newErrorResponse("Simulation results is empty");
-        }
+		if (resultBytes.length == 0) {
+			log.warn("Simulation results is empty");
+//            return newErrorResponse("Simulation results is empty");
+		}
 
         // Handle serialized events if they have been provided
         // they might be nil in case there's no events but there

@@ -32,7 +32,6 @@ public interface ISdtGmFactoryOpts extends IFactoryOpts {
     // Keystore options.
     boolean isEphemeral();
     String getKeyStorePath();
-    boolean isDummyKeystore();
 
     String getSymmetricKeyType();
     String getAsymmetricKeyType();
@@ -41,9 +40,4 @@ public interface ISdtGmFactoryOpts extends IFactoryOpts {
     String getPublicKeyPath();
     String getPrivateKeyPath();
     String getKeyPath();
-    boolean isbEphemeral();
-    boolean isbDummyKeyStore();
-    boolean isbDefaultCsp();
-
-
 }

@@ -19,6 +19,8 @@ general:
     # Listen address: The IP on which to bind to listen.
     listenAddress: 127.0.0.1
 
+    gossipAddress: 0.0.0.0:7070
+
     # Listen port: The port on which to bind to listen.
     listenPort: 7050
 
@@ -112,14 +114,14 @@ general:
     authentication:
         # the acceptable difference between the current server time and the
         # client's time as specified in a client request message
-        timeWindow: 15
+        timeWindow: 900000
 fileLedger:
 
     # Location: The directory to store the blocks in.
     # NOTE: If this is unset, a new temporary location will be chosen every time
     # the orderer is restarted, using the prefix specified by Prefix.
+#    location: /var/hyperledger/production/orderer
     location: /var/julongchain/production/consenter
-
     # The prefix to use when generating a ledger directory in temporary space.
     # Otherwise, this value is ignored.
     prefix: julongchain-consenterledger

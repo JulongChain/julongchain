@@ -20,7 +20,7 @@ import org.bcia.julongchain.core.ledger.BlockAndPvtData;
 import org.bcia.julongchain.core.ledger.IQueryExecutor;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
 import org.bcia.julongchain.core.ledger.kvledger.IRecoverable;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 
 /**
  * 交易管理者接口
@@ -60,7 +60,7 @@ public interface ITxManager extends IRecoverable {
      * @return
      * @throws LedgerException
      */
-    Height getLastSavepoint() throws LedgerException;
+    LedgerHeight getLastSavepoint() throws LedgerException;
 
     /**
      * 账本是否需要被恢复

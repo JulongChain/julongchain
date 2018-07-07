@@ -17,9 +17,12 @@ package org.bcia.julongchain.core.node;
 
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.util.CommConstant;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -53,9 +56,14 @@ public class NodeConfigFactory {
 
         InputStream is = null;
         try {
-            is = NodeConfigFactory.class.getClassLoader().getResourceAsStream(NodeConfig.NODECONFIG_FILE_PATH);
+//            is = NodeConfigFactory.class.getClassLoader().getResourceAsStream(NodeConfig.NODECONFIG_FILE_PATH);
+            is = new FileInputStream(CommConstant.CONFIG_DIR_PREFIX + NodeConfig.NODECONFIG_FILE_PATH);
+
             NodeConfig nodeConfig = yaml.loadAs(is, NodeConfig.class);
             return nodeConfig;
+        } catch (FileNotFoundException e) {
+            log.error(e.getMessage(), e);
+            return null;
         } finally {
             if (is != null) {
                 try {

@@ -69,7 +69,7 @@ public class PolicyManager implements IPolicyManager {
             String policyName = entry.getKey();
             Configtx.ConfigPolicy configPolicy = entry.getValue();
             if (configPolicy.getPolicy() == null) {
-                throw new PolicyException("Policy can not be null");
+                throw new PolicyException("PolicyConstant can not be null");
             }
 
             if (configPolicy.getPolicy().getType() == Policies.Policy.PolicyType.IMPLICIT_META_VALUE) {

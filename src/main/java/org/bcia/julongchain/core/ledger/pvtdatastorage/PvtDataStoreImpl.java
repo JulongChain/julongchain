@@ -123,7 +123,7 @@ public class PvtDataStoreImpl implements IPvtDataStore {
         //区块写入异常
         long expectedBlockNum = nextBlockNum();
         if(expectedBlockNum != blockNum){
-            throw new LedgerException(String.format("Expected block number=%d, recived block number=%d", expectedBlockNum, blockNum));
+            throw new LedgerException(String.format("Expected block number=%d, received block number=%d", expectedBlockNum, blockNum));
         }
         UpdateBatch batch = new UpdateBatch();
         for(TxPvtData txPvtData : pvtData){
@@ -136,7 +136,7 @@ public class PvtDataStoreImpl implements IPvtDataStore {
         //执行写入
         db.writeBatch(batch, true);
         batchPending = true;
-        logger.debug(String.format("Saved %d private data write sets for block [%d]", pvtData.size(), blockNum));
+        logger.info(String.format("Saved %d private data write sets for block [%d]", pvtData.size(), blockNum));
     }
 
     /**

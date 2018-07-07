@@ -17,8 +17,13 @@
 package org.bcia.julongchain.common.policycheck;
 
 import org.bcia.julongchain.common.exception.PolicyException;
+import org.bcia.julongchain.common.policies.config.SignaturePolicy;
+import org.bcia.julongchain.common.policycheck.cauthdsl.CAuthDsl;
 import org.bcia.julongchain.common.util.proto.SignedData;
+import org.bcia.julongchain.msp.mgmt.Msp;
 import org.bcia.julongchain.msp.mgmt.MspManager;
+import org.bcia.julongchain.protos.common.MspPrincipal;
+import org.bcia.julongchain.protos.common.Policies;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -47,24 +52,32 @@ public class CAuthDslTest {
     @Test
     public void deduplicate() throws PolicyException {
         List<SignedData> sds = new ArrayList<SignedData>();
-        SignedData sd1 = new SignedData("A".getBytes(),"id1".getBytes(),"A".getBytes());
-        SignedData sd2 = new SignedData("B".getBytes(),"id2".getBytes(),"B".getBytes());
-        SignedData sd3 = new SignedData("C".getBytes(),"id3".getBytes(),"C".getBytes());
+        SignedData sd1 = new SignedData(null,"id1111111111111111".getBytes(),null);
+        SignedData sd2 = new SignedData(null,"id2222222222222222".getBytes(),null);
+        SignedData sd3 = new SignedData(null,"id3333333333333333".getBytes(),null);
         sds.add(sd1);
         sds.add(sd2);
         sds.add(sd3);
-        MspManager deserializer = new MspManager();//mock(MspManager.class);
+       // MspManager deserializer = new MspManager();//mock(MspManager.class);
+        Msp deserializer = new Msp();
+        MspManager m = new MspManager();
+        CAuthDsl.deduplicate(sds,deserializer);
     }
     @Test
     public void compile() throws PolicyException {
         List<SignedData> sds = new ArrayList<SignedData>();
-        SignedData sd1 = new SignedData("A".getBytes(),"id1".getBytes(),"A".getBytes());
-        SignedData sd2 = new SignedData("B".getBytes(),"id2".getBytes(),"B".getBytes());
-        SignedData sd3 = new SignedData("C".getBytes(),"id3".getBytes(),"C".getBytes());
+        SignedData sd1 = new SignedData("A".getBytes(),"id111111111".getBytes(),"A".getBytes());
+        SignedData sd2 = new SignedData("B".getBytes(),"id222222222".getBytes(),"B".getBytes());
+        SignedData sd3 = new SignedData("C".getBytes(),"id333333333".getBytes(),"C".getBytes());
         sds.add(sd1);
         sds.add(sd2);
         sds.add(sd3);
         MspManager deserializer = new MspManager();//mock(MspManager.class);
-        //CAuthDsl.deduplicate(sds,deserializer);
+        Policies.SignaturePolicy policy = Policies.SignaturePolicy.newBuilder().build();
+        List<MspPrincipal.MSPPrincipal> identities = new ArrayList<MspPrincipal.MSPPrincipal>();
+        Msp deserializers = new Msp();
+        CAuthDsl.compile(policy,identities,deserializers);
+
+
     }
 }

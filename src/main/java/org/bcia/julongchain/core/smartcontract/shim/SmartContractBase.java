@@ -18,7 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.core.smartcontract.shim.impl.ChatStream;
-import org.bcia.julongchain.protos.node.SmartcontractShim;
+import org.bcia.julongchain.protos.node.SmartContractShim;
 
 import javax.net.ssl.SSLException;
 import java.io.File;
@@ -164,23 +164,23 @@ public abstract class SmartContractBase implements ISmartContract {
 
     logger.info("smartcontract id: " + id);
 
-    // Send the SmartcontractID during register.
-    org.bcia.julongchain.protos.node.Smartcontract.SmartContractID smartcontractID =
-        org.bcia.julongchain.protos.node.Smartcontract.SmartContractID.newBuilder()
+    // Send the SmartContractID during register.
+    org.bcia.julongchain.protos.node.SmartContractPackage.SmartContractID smartcontractID =
+        org.bcia.julongchain.protos.node.SmartContractPackage.SmartContractID.newBuilder()
             .setName(id)
             .build();
 
-    SmartcontractShim.SmartContractMessage payload =
-        SmartcontractShim.SmartContractMessage.newBuilder()
+    SmartContractShim.SmartContractMessage payload =
+        SmartContractShim.SmartContractMessage.newBuilder()
             .setPayload(smartcontractID.toByteString())
-            .setType(SmartcontractShim.SmartContractMessage.Type.REGISTER)
+            .setType(SmartContractShim.SmartContractMessage.Type.REGISTER)
             .build();
 
     // Register on the stream
     logger.info(
         String.format(
             "Registering as '%s' ... sending %s",
-            id, SmartcontractShim.SmartContractMessage.Type.REGISTER));
+            id, SmartContractShim.SmartContractMessage.Type.REGISTER));
     chatStream.serialSend(payload);
 
     while (true) {

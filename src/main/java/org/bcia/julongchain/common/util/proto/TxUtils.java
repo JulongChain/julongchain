@@ -29,7 +29,7 @@ import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
  * 类描述
@@ -44,11 +44,11 @@ public class TxUtils {
     // MockSignedEndorserProposalOrPanic creates a SignedProposal with the passed arguments
     public static ProposalPackage.SignedProposal mockSignedEndorserProposalOrPanic(
             String groupID,
-            Smartcontract.SmartContractSpec spec
+            SmartContractPackage.SmartContractSpec spec
     ) throws JavaChainException {
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
         byte[] creator = identity.serialize();
-        Smartcontract.SmartContractInvocationSpec invocationSpec=Smartcontract.SmartContractInvocationSpec.newBuilder().build();
+        SmartContractPackage.SmartContractInvocationSpec invocationSpec=SmartContractPackage.SmartContractInvocationSpec.newBuilder().build();
         ProposalPackage.Proposal proposal = ProposalUtils.createSmartcontractProposalWithTransient(Common.HeaderType.ENDORSER_TRANSACTION,
                 groupID,invocationSpec,creator,null);
         byte[] proBytes =proposal.toByteArray();
@@ -73,13 +73,19 @@ public class TxUtils {
     }
 
     public static Common.Envelope getEnvelopeFromBlock(byte[] data) {
-        Common.Envelope.Builder envelope = Common.Envelope.newBuilder();
+//        Common.Envelope.Builder envelope = Common.Envelope.newBuilder();
+//        try {
+//            envelope.mergeFrom(data);
+//        } catch (InvalidProtocolBufferException e) {
+//            e.printStackTrace();
+//        }
+        Common.Envelope envelope= null;
         try {
-            envelope.mergeFrom(data);
+            envelope = Common.Envelope.parseFrom(data);
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
         }
-        return envelope.build();
+        return envelope;
     }
 
     public static Common.Envelope createSignedEnvelope (int txType, String groupId, ILocalSigner signer, Message dataMsg, int msgVersion, long epoch) {

@@ -46,8 +46,8 @@ public class SM2 {
         byte[] privateKey = new byte[Constants.SM2_SK_LEN];
         byte[] publicKey = new byte[Constants.SM2_PK_LEN];
         try {
-            privateKey = smJniApi.RandomGen(Constants.SM2_SK_LEN);
-            publicKey = smJniApi.SM2MakeKey(privateKey);
+            privateKey = smJniApi.randomGen(Constants.SM2_SK_LEN);
+            publicKey = smJniApi.sm2MakeKey(privateKey);
         } catch (Exception e) {
             logger.error("SM2KeyPair error: generate key pair failed.");
             throw new JavaChainException("SM2KeyPair error: generate key pair failed.");
@@ -88,8 +88,8 @@ public class SM2 {
         }
         byte[] result = null;
         try {
-            byte[] random = smJniApi.RandomGen(Constants.SM2_SIGN_RANDOM_LEN);
-            result = smJniApi.SM2Sign(hash, random, priKey);
+            byte[] random = smJniApi.randomGen(Constants.SM2_SIGN_RANDOM_LEN);
+            result = smJniApi.sm2Sign(hash, random, priKey);
         } catch (Exception e) {
             logger.error( "SM2 sign data failed." );
             throw new JavaChainException("SM2 sign data failed.");
@@ -121,7 +121,7 @@ public class SM2 {
         }
         int result = 1;
         try {
-            result = smJniApi.SM2Verify(hash, pubKey, sign);
+            result = smJniApi.sm2Verify(hash, pubKey, sign);
         } catch (Exception e) {
             logger.error( "SM2 verify signature failed." );
             throw new JavaChainException("SM2 verify signature failed.");

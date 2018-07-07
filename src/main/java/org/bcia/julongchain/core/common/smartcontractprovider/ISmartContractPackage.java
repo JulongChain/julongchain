@@ -18,7 +18,7 @@ package org.bcia.julongchain.core.common.smartcontractprovider;
 import com.google.protobuf.Message;
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.protos.node.SmartContractDataPackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
  * ISmartContractPackage encapsulates a smartcontract package which can be
@@ -35,11 +35,11 @@ public interface ISmartContractPackage {
     //initFromBuffer initialize the package from bytes
     SmartContractDataPackage.SmartContractData initFromBuffer(byte[] buf) throws JavaChainException;
     //initFromFS gets the chaincode from the filesystem (includes the raw bytes too)
-    Smartcontract.SmartContractDeploymentSpec initFromFS(String scName, String scVersion)throws JavaChainException;
+    SmartContractPackage.SmartContractDeploymentSpec initFromFS(String scName, String scVersion)throws JavaChainException;
     //putSmartcontractToFS writes the chaincode to the filesystem
     void putSmartcontractToFS() throws JavaChainException;
     //getDepSpec gets the SmartcontractDeploymentSpec from the package
-    Smartcontract.SmartContractDeploymentSpec getDepSpec();
+    SmartContractPackage.SmartContractDeploymentSpec getDepSpec();
     //getDepSpecBytes gets the serialized SmartcontractDeploymentSpec from the package
     byte[] getDepSpecBytes();
     // ValidateSC validates and returns the chaincode deployment spec corresponding to

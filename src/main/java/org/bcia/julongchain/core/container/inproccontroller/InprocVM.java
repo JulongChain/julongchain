@@ -18,7 +18,7 @@ package org.bcia.julongchain.core.container.inproccontroller;
 import org.bcia.julongchain.core.container.ccintf.SCID;
 import org.bcia.julongchain.core.container.ccintf.ICCSupport;
 import org.bcia.julongchain.core.container.api.IBuildSpecFactory;
-import org.bcia.julongchain.core.container.api.IFormat;
+import org.bcia.julongchain.core.container.api.IFormatter;
 import org.bcia.julongchain.core.container.api.IPrelaunchFunc;
 import org.bcia.julongchain.core.container.api.VM;
 
@@ -63,7 +63,7 @@ public class InprocVM implements VM {
     }
 
     @Override
-    public String getVMName(SCID ccID, IFormat format) {
+    public String getVMName(SCID ccID, IFormatter format) {
         return null;
     }
 

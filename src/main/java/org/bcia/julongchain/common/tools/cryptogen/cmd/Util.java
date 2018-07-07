@@ -91,7 +91,7 @@ public class Util {
 
             NodeSpec nodeSpec = new NodeSpec();
             nodeSpec.setCommonName(hostName);
-            nodeSpec.setSANS(nodeTemplate.getSANS());
+            nodeSpec.setSans(nodeTemplate.getSans());
             List<NodeSpec> specs = orgSpec.getSpecs();
             specs.add(nodeSpec);
             orgSpec.setSpecs(specs);
@@ -127,26 +127,26 @@ public class Util {
         spec.setCommonName(cn);
         data.setCommonName(cn);
 
-        // Save off our original, unprocessed SANS entries
-        List<String> originSANS = spec.getSANS();
-        if (originSANS == null) {
-            originSANS = new ArrayList<>();
-            spec.setSANS(originSANS);
+        // Save off our original, unprocessed sans entries
+        List<String> originSans = spec.getSans();
+        if (originSans == null) {
+            originSans = new ArrayList<>();
+            spec.setSans(originSans);
         }
 
-        // Set our implicit SANS entries for CN/Hostname
+        // Set our implicit sans entries for CN/Hostname
         List<String> newSans = new ArrayList<>();
         newSans.add(cn);
         String hostName = spec.getHostname();
         if (hostName != null && hostName.length() != 0) {
             newSans.add(spec.getHostname());
         }
-        spec.setSANS(newSans);
+        spec.setSans(newSans);
 
-        // Finally, process any remaining SANS entries
-        for (String _san : originSANS) {
+        // Finally, process any remaining sans entries
+        for (String _san : originSans) {
             String san = parseTemplate(_san, data);
-            spec.getSANS().add(san);
+            spec.getSans().add(san);
         }
     }
 
@@ -253,7 +253,7 @@ public class Util {
 
             if (!file.exists()) {
                 try {
-                    MspHelper.generateLocalMSP(nodeDir, node.getCommonName(), node.getSANS(), signCA, tlsCA, nodeType, nodeOUs);
+                    MspHelper.generateLocalMSP(nodeDir, node.getCommonName(), node.getSans(), signCA, tlsCA, nodeType, nodeOUs);
                 } catch (JavaChainException e) {
                     log.error("Error generating local MSP for", e);
                     System.exit(1);

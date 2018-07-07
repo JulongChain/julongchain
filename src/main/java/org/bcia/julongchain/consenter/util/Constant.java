@@ -27,16 +27,16 @@ public class Constant {
     public static final String ORDERER_CONFIG= "consenter.yaml";
     public static final String CONFIGTX="configtx.yaml";
     public static final String SINGLETON="Singleton";
-    public static final String KAFKA="Kafka";
-    public static final String COMSUMER="Comumer";
+    public static final String KAFKA="kafka";
+    public static final String COMSUMER="comumer";
     public static final String MAX_READS="maxReads";
     public static final String  TOPIC="topic";
 
     public static final String  PARTITION_ID="partitionID";
-    public static final String  SERVER="Server";
+    public static final String  SERVER="server";
     public static final String  MAX_RETRY_TIMES ="maxRetryTimes";
     public static final String  RETRY_INTERVAL_MILLIS="retryIntervalMillis";
-    public static final String  ZOOKEEPER = "Zookeeper";
+    public static final String  ZOOKEEPER = "zookeeper";
 
     public final static int MSGVERSION = 0;
     public final static int EPOCH = 0;

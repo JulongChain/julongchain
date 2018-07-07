@@ -16,7 +16,9 @@
 package org.bcia.julongchain.core.ledger;
 
 import org.bcia.julongchain.common.exception.LedgerException;
+import org.bcia.julongchain.common.ledger.IResultsIterator;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -71,4 +73,27 @@ public interface ITxSimulator extends IQueryExecutor {
      */
     void deletePrivateData(String namespace, String collection, String key) throws LedgerException;
 
+	@Override
+	byte[] getState(String namespace, String key) throws LedgerException;
+
+	@Override
+	List<byte[]> getStateMultipleKeys(String namespace, List<String> keys) throws LedgerException;
+
+	@Override
+	IResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException;
+
+	@Override
+	IResultsIterator executeQuery(String namespace, String query) throws LedgerException;
+
+	@Override
+	byte[] getPrivateData(String namespace, String collection, String key) throws LedgerException;
+
+	@Override
+	List<byte[]> getPrivateDataMultipleKeys(String namespace, String collection, List<String> keys) throws LedgerException;
+
+	@Override
+	IResultsIterator getPrivateDataRangeScanIterator(String namespace, String collection, String startKey, String endKey) throws LedgerException;
+
+	@Override
+	void done();
 }

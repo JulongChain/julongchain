@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate;
 
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 
 /**
  * hash更新包
@@ -40,11 +40,11 @@ public class HashedUpdateBatch {
         return nsBatch.getBatch().exists(coll, new String(keyHash));
     }
 
-    public void put(String ns, String coll, byte[] key, byte[] value, Height version) throws LedgerException {
+    public void put(String ns, String coll, byte[] key, byte[] value, LedgerHeight version) throws LedgerException {
         map.put(ns, coll, new String(key), value, version);
     }
 
-    public void delete(String ns, String coll, byte[] key, Height version) throws LedgerException {
+    public void delete(String ns, String coll, byte[] key, LedgerHeight version) throws LedgerException {
         map.delete(ns, coll, new String(key), version);
     }
 

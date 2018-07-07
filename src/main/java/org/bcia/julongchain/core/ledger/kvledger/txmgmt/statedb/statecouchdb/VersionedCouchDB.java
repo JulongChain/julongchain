@@ -23,7 +23,7 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.UpdateBatch;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.core.ledger.sceventmgmt.ISmartContractLifecycleEventListener;
 import org.bcia.julongchain.core.ledger.sceventmgmt.SmartContractDefinition;
 
@@ -69,7 +69,7 @@ public class VersionedCouchDB implements IVersionedDB, ISmartContractLifecycleEv
     }
 
     @Override
-    public Height getVersion(String namespace, String key) throws LedgerException {
+    public LedgerHeight getVersion(String namespace, String key) throws LedgerException {
         return null;
     }
 
@@ -89,12 +89,12 @@ public class VersionedCouchDB implements IVersionedDB, ISmartContractLifecycleEv
     }
 
     @Override
-    public void applyUpdates(UpdateBatch batch, Height height) throws LedgerException {
+    public void applyUpdates(UpdateBatch batch, LedgerHeight height) throws LedgerException {
 
     }
 
     @Override
-    public Height getLatestSavePoint() throws LedgerException {
+    public LedgerHeight getLatestSavePoint() throws LedgerException {
         return null;
     }
 

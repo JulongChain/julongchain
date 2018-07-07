@@ -4,7 +4,7 @@
 
     <groupId>org.bcia.julongchain</groupId>
     <artifactId>julongchain</artifactId>
-    <version>0.9</version>
+    <version>0.8</version>
     <packaging>jar</packaging>
 
     <name>julongchain</name>
@@ -32,21 +32,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.hierynomus</groupId>
-            <artifactId>sshj</artifactId>
-            <version>0.24.0</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-exec</artifactId>
             <version>1.3</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.offbytwo.jenkins</groupId>
-            <artifactId>jenkins-client</artifactId>
-            <version>0.3.7</version>
         </dependency>
 
         <dependency>
@@ -80,29 +68,11 @@
         </dependency>
 
         <dependency>
-            <groupId>org.iq80.leveldb</groupId>
-            <artifactId>leveldb-api</artifactId>
-            <version>0.10</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.lightcouch</groupId>
             <artifactId>lightcouch</artifactId>
             <version>0.2.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>com.jcraft</groupId>
-            <artifactId>jsch</artifactId>
-            <version>0.1.54</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.apache.gossip</groupId>
-            <artifactId>gossip</artifactId>
-            <version>0.1.2-incubating</version>
-        </dependency>
-    
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
@@ -239,7 +209,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- kafka-->
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
@@ -252,20 +221,58 @@
             <version>1.1.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-core</artifactId>
+            <version>4.0.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math</artifactId>
+            <version>2.2</version>
+        </dependency>
+
         <!-- 使用本地lib中的jar包 -->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-tcnative-openssl-static</artifactId>
             <version>2.0.9.Final-SNAPSHOT</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/netty-tcnative-openssl-static-2.0.9.Final-SNAPSHOT-linux-x86_64.jar</systemPath>
+            <systemPath>${project.basedir}/lib/netty-tcnative-openssl-static-2.0.9.Final-SNAPSHOT-linux-x86_64.jar
+            </systemPath>
         </dependency>
+
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-handler</artifactId>
             <version>4.1.26.Final-SNAPSHOT</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/netty-handler-4.1.26.Final-SNAPSHOT.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.gossip</groupId>
+            <artifactId>gossip-base</artifactId>
+            <version>0.1.3-incubating</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/gossip-base-0.1.3-incubating-SNAPSHOT.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.gossip</groupId>
+            <artifactId>gossip-protocal-jackson</artifactId>
+            <version>0.1.3-incubating</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/gossip-protocol-jackson-0.1.3-incubating-SNAPSHOT.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.gossip</groupId>
+            <artifactId>gossip-transport-udp</artifactId>
+            <version>0.1.3-incubating</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/gossip-transport-udp-0.1.3-incubating-SNAPSHOT.jar</systemPath>
         </dependency>
     </dependencies>
 
@@ -279,28 +286,32 @@
                 <version>1.5.0.Final</version>
             </extension>
         </extensions>
+
         <plugins>
+
             <plugin>
-            <groupId>org.xolstice.maven.plugins</groupId>
-            <artifactId>protobuf-maven-plugin</artifactId>
-            <version>0.5.1</version>
-            <configuration>
-                <!-- The version of protoc must match protobuf-java. If you don't depend
-                    on protobuf-java directly, you will be transitively depending on the protobuf-java
-                    version that grpc depends on. -->
-                <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}</protocArtifact>
-                <pluginId>grpc-java</pluginId>
-                <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}</pluginArtifact>
-            </configuration>
-            <executions>
-                <execution>
-                    <goals>
-                        <goal>compile</goal>
-                        <goal>compile-custom</goal>
-                    </goals>
-                </execution>
-            </executions>
-        </plugin>
+                <groupId>org.xolstice.maven.plugins</groupId>
+                <artifactId>protobuf-maven-plugin</artifactId>
+                <version>0.5.1</version>
+                <configuration>
+                    <!-- The version of protoc must match protobuf-java. If you don't depend
+                        on protobuf-java directly, you will be transitively depending on the protobuf-java
+                        version that grpc depends on. -->
+                    <protocArtifact>com.google.protobuf:protoc:${protobuf.version}:exe:${os.detected.classifier}
+                    </protocArtifact>
+                    <pluginId>grpc-java</pluginId>
+                    <pluginArtifact>io.grpc:protoc-gen-grpc-java:${grpc.version}:exe:${os.detected.classifier}
+                    </pluginArtifact>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>
+                            <goal>compile-custom</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

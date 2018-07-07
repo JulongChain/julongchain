@@ -125,7 +125,7 @@ public class EventProcessor implements IEventProcessor {
             eventType = EventsPackage.EventType.REGISTER_VALUE;
         } else if (event.hasBlock()) {
             eventType = EventsPackage.EventType.BLOCK_VALUE;
-        } else if (event.hasSmartcontractEvent()) {
+        } else if (event.hasSmartContractEvent()) {
             eventType = EventsPackage.EventType.SMART_CONTRACT_VALUE;
         } else if (event.hasRejection()) {
             eventType = EventsPackage.EventType.REJECTION_VALUE;

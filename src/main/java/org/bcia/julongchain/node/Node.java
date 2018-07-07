@@ -38,10 +38,7 @@ import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.core.node.ConfigtxProcessor;
 import org.bcia.julongchain.core.node.GroupSupport;
 import org.bcia.julongchain.core.node.util.ConfigTxUtils;
-import org.bcia.julongchain.csp.factory.IFactoryOpts;
-import org.bcia.julongchain.csp.gm.dxct.GmFactoryOpts;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
-import org.bcia.julongchain.msp.mspconfig.MspConfig;
 import org.bcia.julongchain.node.cmd.INodeCmd;
 import org.bcia.julongchain.node.cmd.factory.NodeCmdFactory;
 import org.bcia.julongchain.node.common.helper.ConfigTreeHelper;
@@ -61,8 +58,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.bcia.julongchain.msp.mspconfig.MspConfigFactory.loadMspConfig;
-
 /**
  * 节点对象
  *
@@ -73,9 +68,22 @@ import static org.bcia.julongchain.msp.mspconfig.MspConfigFactory.loadMspConfig;
 public class Node {
     private static JavaChainLog log = JavaChainLogFactory.getLog(Node.class);
 
+    /**
+     * 群组回调接口
+     */
     public interface IGroupCallback {
+        /**
+         * 当某群组实例化完成时回调
+         *
+         * @param groupId
+         */
         void onGroupInitialized(String groupId);
 
+        /**
+         * 当群组全部实例化完成时回调
+         *
+         * @param groupIds
+         */
         void onGroupsReady(List<String> groupIds);
     }
 
@@ -91,9 +99,20 @@ public class Node {
      */
     private INodeCmd nodeCmd;
 
+    /**
+     * 当前Node节点加入的群组集合
+     */
     private Map<String, Group> groupMap = new ConcurrentHashMap<String, Group>();
 
+    /**
+     * 群组回调
+     */
     private IGroupCallback groupCallback;
+
+    /**
+     * Node已经加入的群组
+     */
+    private List<String> ledgerIds = new ArrayList<>();
 
     private NodeGossipManager gossipManager;
 
@@ -161,32 +180,17 @@ public class Node {
      * 初始化
      */
     private void init() throws NodeException {
-        initLocalMsp();
-    }
+        log.info("Node init-----");
 
-    private void initLocalMsp() throws NodeException {
         try {
-            MspConfig mspConfig = loadMspConfig();
-            String mspConfigDir = mspConfig.getNode().getMspConfigPath();
-            String mspId = mspConfig.getNode().getLocalMspId();
-            String mspType = mspConfig.getNode().getLocalMspType();
-
-            List<IFactoryOpts> optsList = new ArrayList<IFactoryOpts>();
-            String symmetrickey = mspConfig.getNode().getCsp().getGm().getSymmetricKey();
-            String sign = mspConfig.getNode().getCsp().getGm().getSign();
-            String hash = mspConfig.getNode().getCsp().getGm().getHash();
-            String asymmetric = mspConfig.getNode().getCsp().getGm().getAsymmetric();
-            String privateKeyPath = mspConfig.getNode().getCsp().getGm().getFileKeyStore().getPrivateKeyStore();
-            String publicKeyPath = mspConfig.getNode().getCsp().getGm().getFileKeyStore().getPublicKeyStore();
-            //new GmCspConfig(symmetrickey,asymmetric,hash,sign,publicKeyPath,privateKeyPath);
-            optsList.add(new GmFactoryOpts(symmetrickey, asymmetric, hash, sign, publicKeyPath, privateKeyPath));
-
-            GlobalMspManagement.loadLocalMspWithType(mspConfigDir, optsList, mspId, mspType);
-        } catch (Exception e) {
+            //初始化本地Msp
+            GlobalMspManagement.initLocalMsp();
+        } catch (MspException e) {
             log.error(e.getMessage(), e);
             throw new NodeException(e);
         }
     }
+
 
     /**
      * 实例化
@@ -216,7 +220,7 @@ public class Node {
 
                         Group group = createGroup(ledgerId, nodeLedger, configBlock);
                         groupMap.put(ledgerId, group);
-                        log.info("ledgerId-----$" + ledgerId);
+                        log.info("group-----$" + ledgerId);
 
                         if (callback != null) {
                             callback.onGroupInitialized(ledgerId);
@@ -233,7 +237,9 @@ public class Node {
                 }
             }
 
-            callback.onGroupsReady(ledgerIDs);
+            if (callback != null) {
+                callback.onGroupsReady(ledgerIDs);
+            }
         } catch (LedgerException e) {
             log.error(e.getMessage(), e);
         }
@@ -418,4 +424,11 @@ public class Node {
         }
     }
 
+    public List<String> getLedgerIds() {
+        return ledgerIds;
+    }
+
+    public void setLedgerIds(List<String> ledgerIds) {
+        this.ledgerIds = ledgerIds;
+    }
 }

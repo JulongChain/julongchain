@@ -25,7 +25,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.Upd
  * @company Dingxuan
  */
 public class PubUpdateBatch {
-    UpdateBatch batch;
+    private UpdateBatch batch;
 
     public PubUpdateBatch() {
         this.batch = new UpdateBatch();

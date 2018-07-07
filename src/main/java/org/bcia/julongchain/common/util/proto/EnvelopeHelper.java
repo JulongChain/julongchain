@@ -312,8 +312,6 @@ public class EnvelopeHelper {
         TransactionPackage.SmartContractEndorsedAction.Builder endorsedActionBuilder = TransactionPackage
                 .SmartContractEndorsedAction.newBuilder();
 
-        ProposalResponsePackage.Endorsement[] endorsements = new ProposalResponsePackage.Endorsement[endorserResponses
-                .length];
         for (int i = 0; i < endorserResponses.length; i++) {
             ProposalResponsePackage.ProposalResponse endorserResponse = endorserResponses[i];
 
@@ -322,39 +320,47 @@ public class EnvelopeHelper {
             }
 
             if (i == 0) {
-                bytes = endorserResponse.getPayload().toByteArray();
-                endorsedActionBuilder.setProposalResponsePayload(endorserResponse.getPayload());
+                bytes = endorserResponse.getResponse().getPayload().toByteArray();
+                endorsedActionBuilder.setProposalResponsePayload(endorserResponse.getResponse().getPayload());
             } else {
-                if (Arrays.compareUnsigned(bytes, endorserResponse.getPayload().toByteArray()) != 0) {
+                if (Arrays.compareUnsigned(bytes, endorserResponse.getResponse().getPayload().toByteArray()) != 0) {
                     throw new ValidateException("Should be same payload");
                 }
             }
 
-            endorsements[i] = endorserResponse.getEndorsement();
             endorsedActionBuilder.addEndorsements(endorserResponse.getEndorsement());
         }
-        TransactionPackage.SmartContractEndorsedAction endorsedAction = endorsedActionBuilder.build();
 
-        //TODO:为什么要去掉transientMap属性？
-        ProposalPackage.SmartContractProposalPayload.Builder proposalPayloadBuilder = ProposalPackage
-                .SmartContractProposalPayload.newBuilder(smartContractProposalPayload);
-        proposalPayloadBuilder.clearTransientMap();
-        ProposalPackage.SmartContractProposalPayload clearProposalPayload = proposalPayloadBuilder.build();
+        /**
+         * Transaction
+         *      \_ TransactionAction (1...n)
+         *         |\_ Header (1)                           (the header of the proposal that requested this action)
+         *          \_ SmartContractActionPayload (1)
+         *             |\_ SmartContractProposalPayload (1)     (payload of the proposal that requested this action)
+         *              \_ SmartContractEndorsedAction (1)
+         *                 |\_ Endorsement (1...n)          (endorsers' signatures over the whole response payload)
+         *                  \_ ProposalResponsePayload
+         *                      \_ SmartContractAction          (the actions for this proposal)
+         */
+        //TODO:去掉transientMap属性？
+        ProposalPackage.SmartContractProposalPayload.Builder clearProposalPayloadBuilder =
+                smartContractProposalPayload.toBuilder();
+        clearProposalPayloadBuilder.clearTransientMap();
+        ProposalPackage.SmartContractProposalPayload clearProposalPayload = clearProposalPayloadBuilder.build();
 
         TransactionPackage.SmartContractActionPayload.Builder actionPayloadBuilder = TransactionPackage
                 .SmartContractActionPayload.newBuilder();
         actionPayloadBuilder.setSmartContractProposalPayload(clearProposalPayload.toByteString());
-        actionPayloadBuilder.setAction(endorsedAction);
+        actionPayloadBuilder.setAction(endorsedActionBuilder);
         TransactionPackage.SmartContractActionPayload actionPayload = actionPayloadBuilder.build();
 
         TransactionPackage.TransactionAction.Builder transactionActionBuilder = TransactionPackage.TransactionAction
                 .newBuilder();
         transactionActionBuilder.setHeader(header.getSignatureHeader());
         transactionActionBuilder.setPayload(actionPayload.toByteString());
-        TransactionPackage.TransactionAction transactionAction = transactionActionBuilder.build();
 
         TransactionPackage.Transaction.Builder transactionBuilder = TransactionPackage.Transaction.newBuilder();
-        transactionBuilder.addActions(transactionAction);
+        transactionBuilder.addActions(transactionActionBuilder);
         TransactionPackage.Transaction transaction = transactionBuilder.build();
 
         Common.Payload.Builder payloadBuilder = Common.Payload.newBuilder();

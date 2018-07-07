@@ -17,11 +17,14 @@ package org.bcia.julongchain.msp.entity;
 
 import org.bcia.julongchain.csp.factory.IFactoryOpts;
 
+import java.util.Map;
+
 /**
  * @author zhangmingyang
  * @Date: 2018/3/29
  * @company Dingxuan
  */
+@Deprecated
 public class GmCspConfig implements IFactoryOpts {
     private  String symmetricKey;
     private String asymmetric;
@@ -76,5 +79,10 @@ public class GmCspConfig implements IFactoryOpts {
     @Override
     public boolean isDefaultCsp() {
         return false;
+    }
+
+    @Override
+    public void parseFrom(Map<String, String> optMap) {
+
     }
 }

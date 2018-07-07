@@ -15,7 +15,7 @@ limitations under the License.
  */
 package org.bcia.julongchain.core.ledger.leveldb.txmgnt.version;
 
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.junit.Test;
 
 /**
@@ -27,11 +27,11 @@ import org.junit.Test;
  */
 public class HeightTest {
 
-    Height height;
+    LedgerHeight height;
 
     @Test
     public void toBytes(){
-        height = new Height(100000000, 20000000);
+        height = new LedgerHeight(100000000, 20000000);
         byte[] bytes = height.toBytes();
         for(int i = 0; i < bytes.length; i++){
             System.out.print(bytes[i] + " ");
@@ -40,13 +40,13 @@ public class HeightTest {
 
     @Test
     public void newHeightFromBytes(){
-        height = new Height(100000000, 20000000);
+        height = new LedgerHeight(100000000, 20000000);
         byte[] bytes = height.toBytes();
         for(int i = 0; i < bytes.length; i++){
             System.out.print(bytes[i] + " ");
         }
         System.out.println();
-        Height height1 = new Height(bytes);
+        LedgerHeight height1 = new LedgerHeight(bytes);
         System.out.println(height1.getTxNum());
         System.out.println(height1.getBlockNum());
     }

@@ -26,15 +26,10 @@ public class GlobalMspManagementTest {
         String mspType = "GMMSP";
         List<IFactoryOpts> optsList = new ArrayList<IFactoryOpts>();
         MspConfig mspConfig = loadMspConfig();
-        String symmetrickey = mspConfig.node.getCsp().getGm().getSymmetricKey();
-        String sign = mspConfig.node.getCsp().getGm().getSign();
-        String hash = mspConfig.node.getCsp().getGm().getHash();
-        String asymmetric = mspConfig.node.getCsp().getGm().getAsymmetric();
-        String privateKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPrivateKeyStore();
-        String publicKeyPath = mspConfig.node.getCsp().getGm().getFileKeyStore().getPublicKeyStore();
-        //new GmCspConfig(symmetrickey,asymmetric,hash,sign,publicKeyPath,privateKeyPath);
-        optsList.add(new GmFactoryOpts(symmetrickey, asymmetric, hash, sign, publicKeyPath, privateKeyPath));
-        GlobalMspManagement.loadLocalMspWithType(localmspdir, optsList, mspID, mspType);
+        GmFactoryOpts factoryOpts=new GmFactoryOpts();
+        factoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("gm"));
+        optsList.add(factoryOpts);
+        GlobalMspManagement.loadLocalMspWithType(localmspdir, optsList, "gm", mspID, mspType);
         byte[] signData = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity().sign("123".getBytes());
         GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity().verify("123".getBytes(), signData);
 

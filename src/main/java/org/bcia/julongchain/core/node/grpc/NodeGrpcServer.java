@@ -29,8 +29,6 @@ import org.bcia.julongchain.core.endorser.IEndorserServer;
 import org.bcia.julongchain.core.events.IDeliverEventsServer;
 import org.bcia.julongchain.core.smartcontract.node.SmartContractSupportService;
 import org.bcia.julongchain.protos.common.Common;
-import org.bcia.julongchain.protos.gossip.GossipGrpc;
-import org.bcia.julongchain.protos.gossip.Message;
 import org.bcia.julongchain.protos.node.*;
 
 import java.io.IOException;
@@ -210,34 +208,6 @@ public class NodeGrpcServer {
                 }
             };
         }
-    }
-
-    private class GossipServerImpl extends GossipGrpc.GossipImplBase {
-        @Override
-        public StreamObserver<Message.Envelope> gossipStream(StreamObserver<Message.Envelope> responseObserver) {
-            return new StreamObserver<Message.Envelope>() {
-                @Override
-                public void onNext(Message.Envelope value) {
-
-                }
-
-                @Override
-                public void onError(Throwable t) {
-
-                }
-
-                @Override
-                public void onCompleted() {
-
-                }
-            };
-        }
-
-        @Override
-        public void ping(Message.Empty request, StreamObserver<Message.Empty> responseObserver) {
-
-        }
-
     }
 
     private class AdminServerImpl extends AdminGrpc.AdminImplBase {

@@ -55,7 +55,7 @@ public class SpringContext {
     }
 
     /**
-     * 调用方式：如SpringContext.getInstance().getBean(Node.class);
+     * 调用方式：如SpringContext.getInstance().getBean(PolicyNode.class);
      *
      * @param requiredType
      * @param <T>

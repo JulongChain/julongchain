@@ -112,12 +112,8 @@ public class BlockFileStream {
 		reader.close();
     }
 
-    public Integer getFileNum() {
+    public int getFileNum() {
         return fileNum;
-    }
-
-    public void setFileNum(Integer fileNum) {
-        this.fileNum = fileNum;
     }
 
     public File getFile() {

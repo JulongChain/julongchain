@@ -31,7 +31,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.*;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.txmgr.ITxManager;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.validator.valinternal.Block;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.validator.valinternal.Transaction;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.core.ledger.util.TxValidationFlags;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.common.Common;
@@ -52,7 +52,7 @@ import java.util.Map;
 public class Helper {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(Helper.class);
 
-    static PvtUpdateBatch validateAndPreparePvtBatch(Block block, Map<Long, TxPvtData> pvtData) throws LedgerException{
+    public static PvtUpdateBatch validateAndPreparePvtBatch(Block block, Map<Long, TxPvtData> pvtData) throws LedgerException{
         PvtUpdateBatch pvtUpdates = new PvtUpdateBatch();
         for(Transaction tx : block.getTxs()){
             if(!TransactionPackage.TxValidationCode.VALID.equals(tx.getValidationCode())){
@@ -69,7 +69,7 @@ public class Helper {
                 validatePvtdata(tx, txPvData);
             }
             TxPvtRwSet pvtRwSet = RwSetUtil.txPvtRwSetFromProtoMsg(txPvData.getWriteSet());
-            addPvtRWSetToPvtUpdateBatch(pvtRwSet, pvtUpdates, new Height(block.getNum(), tx.getIndexInBlock()));
+            addPvtRWSetToPvtUpdateBatch(pvtRwSet, pvtUpdates, new LedgerHeight(block.getNum(), tx.getIndexInBlock()));
         }
         return pvtUpdates;
     }
@@ -94,7 +94,7 @@ public class Helper {
         }
     }
 
-    static Block preprocessProtoBlock(ITxManager txMgr, Common.Block.Builder blockBuilder, boolean doMVCCValidation) throws LedgerException {
+    public static Block preprocessProtoBlock(ITxManager txMgr, Common.Block.Builder blockBuilder, boolean doMVCCValidation) throws LedgerException {
         Common.Block block = blockBuilder.build();
         Block b = new Block(block.getHeader().getNumber());
         TxValidationFlags txsFilter = TxValidationFlags.fromByteString(block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
@@ -140,8 +140,9 @@ public class Helper {
                 }
                 txRwSet = new TxRwSet();
                 try {
-	                assert respPayload != null;
-	                txRwSet.fromProtoBytes(respPayload.getResults());
+	                if (respPayload != null) {
+		                txRwSet.fromProtoBytes(respPayload.getResults());
+	                }
                 } catch (Exception e) {
                     txsFilter.setFlag(txIndex, TransactionPackage.TxValidationCode.INVALID_OTHER_REASON);
                     continue;
@@ -186,14 +187,12 @@ public class Helper {
         } catch (LedgerException e) {
             sim.done();
             throw e;
-        } catch (InvalidTxException e) {
-        	throw e;
         }
         sim.done();
         return simRes.getPublicReadWriteSet();
     }
 
-    public static void postprocessProtoBlock(Common.Block.Builder blockBuilder, Block validatedBlock) throws LedgerException {
+    public static void postprocessProtoBlock(Common.Block.Builder blockBuilder, Block validatedBlock) {
         TxValidationFlags txsFilter = TxValidationFlags.fromByteString(blockBuilder.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
         for(Transaction tx : validatedBlock.getTxs()){
             txsFilter.setFlag(tx.getIndexInBlock(), tx.getValidationCode());
@@ -203,7 +202,7 @@ public class Helper {
         blockBuilder.setMetadata(blockMetadataBuilder);
     }
 
-    public static void addPvtRWSetToPvtUpdateBatch(TxPvtRwSet pvtRwSet, PvtUpdateBatch pvtUpdateBatch, Height ver) throws LedgerException {
+    private static void addPvtRWSetToPvtUpdateBatch(TxPvtRwSet pvtRwSet, PvtUpdateBatch pvtUpdateBatch, LedgerHeight ver) throws LedgerException {
         for(NsPvtRwSet ns : pvtRwSet.getNsPvtRwSets()){
             for(CollPvtRwSet coll : ns.getCollPvtRwSets()){
                 for(KvRwset.KVWrite kvWrite : coll.getKvRwSet().getWritesList()){

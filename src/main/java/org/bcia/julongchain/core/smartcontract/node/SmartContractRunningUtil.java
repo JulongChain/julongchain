@@ -13,7 +13,7 @@
  */
 package org.bcia.julongchain.core.smartcontract.node;
 
-import static org.bcia.julongchain.protos.node.SmartcontractShim.SmartContractMessage;
+import static org.bcia.julongchain.protos.node.SmartContractShim.SmartContractMessage;
 
 import io.grpc.stub.StreamObserver;
 import java.util.Collections;

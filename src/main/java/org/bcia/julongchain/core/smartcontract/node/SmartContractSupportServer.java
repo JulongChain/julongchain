@@ -23,7 +23,7 @@ import org.bcia.julongchain.common.util.proto.ProtoUtils;
 import org.bcia.julongchain.core.ssc.lssc.LSSC;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -122,14 +122,14 @@ public class SmartContractSupportServer {
         initArgs.add("b");
         initArgs.add("200");
 
-        Smartcontract.SmartContractDeploymentSpec cds = constructDeploySpec(smartcontractName, path, version, initArgs, false);
+        SmartContractPackage.SmartContractDeploymentSpec cds = constructDeploySpec(smartcontractName, path, version, initArgs, false);
         byte[] cdsBytes = ProtoUtils.marshalOrPanic(cds);
         List<ByteString> args0 = new LinkedList<ByteString>();
         args0.add(ByteString.copyFromUtf8(LSSC.INSTALL));
         args0.add(ByteString.copyFrom(cdsBytes));
 
-//        Smartcontract.SmartContractInput smartContractInput =
-//                Smartcontract.SmartContractInput.newBuilder()
+//        SmartContract.SmartContractInput smartContractInput =
+//                SmartContract.SmartContractInput.newBuilder()
 //                        .addArgs(ByteString.copyFromUtf8(QSSC.GET_TRANSACTION_BY_ID))
 //                        .addArgs(ByteString.copyFromUtf8(groupId))
 //                        .addArgs(ByteString.copyFromUtf8("20"))
@@ -138,17 +138,17 @@ public class SmartContractSupportServer {
 //        SmartContractEventPackage.SmartContractEvent smartContractEvent =
 //                SmartContractEventPackage.SmartContractEvent.newBuilder().setSmartContractId(scId).build();
 //
-//        SmartcontractShim.SmartContractMessage msg =
-//                SmartcontractShim.SmartContractMessage.newBuilder()
+//        SmartContractShim.SmartContractMessage msg =
+//                SmartContractShim.SmartContractMessage.newBuilder()
 //                        .setGroupId(groupId)
 //                        .setTxid(txId)
-//                        .setType(SmartcontractShim.SmartContractMessage.Type.TRANSACTION)
+//                        .setType(SmartContractShim.SmartContractMessage.Type.TRANSACTION)
 //                        .setProposal(signedProposal)
-//                        .setSmartcontractEvent(smartContractEvent)
+//                        .setSmartContractEvent(smartContractEvent)
 //                        .setPayload(smartContractInput.toByteString())
 //                        .build();
 //
-//        SmartcontractShim.SmartContractMessage scMsg = SmartContractSupportService.invoke(scId, msg);
+//        SmartContractShim.SmartContractMessage scMsg = SmartContractSupportService.invoke(scId, msg);
 //        System.out.println();
 
 
@@ -175,7 +175,7 @@ public class SmartContractSupportServer {
             //         .setTxid("txId " + UUID.randomUUID().toString())
             //         .setType(Type.TRANSACTION)
             //         .setProposal(signedProposal)
-            //         .setSmartcontractEvent(smartcontractEvent)
+            //         .setSmartContractEvent(smartcontractEvent)
             //         .build();
             // SmartContractSupportService.invoke(CommConstant.ESSC, msg);
             //
@@ -183,20 +183,20 @@ public class SmartContractSupportServer {
         }
 
     }
-    private static Smartcontract.SmartContractDeploymentSpec constructDeploySpec(String smartcontractName, String path, String version, List<String> initArgs, boolean bCreateFS) {
-//        Smartcontract.SmartContractDeploymentSpec spec=Smartcontract.SmartContractDeploymentSpec.newBuilder().
+    private static SmartContractPackage.SmartContractDeploymentSpec constructDeploySpec(String smartcontractName, String path, String version, List<String> initArgs, boolean bCreateFS) {
+//        SmartContract.SmartContractDeploymentSpec spec=SmartContract.SmartContractDeploymentSpec.newBuilder().
 //                setCodePackage(ByteString.copyFromUtf8("testcds")).build();
-        Smartcontract.SmartContractInput input = null;
+        SmartContractPackage.SmartContractInput input = null;
         for (String initArg : initArgs) {
             ByteString arg = ByteString.copyFromUtf8(initArg);
-            input = Smartcontract.SmartContractInput.newBuilder()
+            input = SmartContractPackage.SmartContractInput.newBuilder()
                     .addArgs(arg)
                     .build();
         }
-        Smartcontract.SmartContractDeploymentSpec depSpec = Smartcontract.SmartContractDeploymentSpec.newBuilder()
-                .setSmartContractSpec(Smartcontract.SmartContractSpec.newBuilder()
+        SmartContractPackage.SmartContractDeploymentSpec depSpec = SmartContractPackage.SmartContractDeploymentSpec.newBuilder()
+                .setSmartContractSpec(SmartContractPackage.SmartContractSpec.newBuilder()
                         .setTypeValue(1)
-                        .setSmartContractId(Smartcontract.SmartContractID.newBuilder()
+                        .setSmartContractId(SmartContractPackage.SmartContractID.newBuilder()
                                 .setName(smartcontractName)
                                 .setPath(path)
                                 .setVersion(version)

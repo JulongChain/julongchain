@@ -64,7 +64,7 @@ public class CheckpointInfo {
     /**
      * 序列化检查点
      */
-    byte[] marshal() {
+    public byte[] marshal() {
         //4部分共32字节
         //0~7位 lastestFileChunkSuffixNum
         byte[] bytes0 = Util.longToBytes(lastestFileChunkSuffixNum, BlockFileManager.PEEK_BYTES_LEN);
@@ -87,7 +87,7 @@ public class CheckpointInfo {
     /**
      * 反序列化
      */
-    void unmarshal(byte[] b) throws LedgerException {
+    public void unmarshal(byte[] b) throws LedgerException {
         //4部分共32字节
         //0~7位 lastestFileChunkSuffixNum
         lastestFileChunkSuffixNum = (int) Util.bytesToLong(b, 0, BlockFileManager.PEEK_BYTES_LEN);

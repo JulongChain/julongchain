@@ -74,6 +74,8 @@ public class CommConstant {
      */
     public static final String PATH_SEPARATOR = "/";
 
+    public static final String CONFIG_DIR_PREFIX = "config/";
+
     /**
      * 默认随机数长度
      */
@@ -83,6 +85,5 @@ public class CommConstant {
      * gRPC最大消息大小(512M)
      */
     public static final int MAX_GRPC_MESSAGE_SIZE = 1 << 29;
-
 
 }

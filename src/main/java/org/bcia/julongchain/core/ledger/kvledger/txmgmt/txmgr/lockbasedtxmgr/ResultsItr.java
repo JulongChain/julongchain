@@ -53,12 +53,10 @@ public class ResultsItr implements IResultsIterator {
         if(rwSetBuilder != null){
             this.rwSetBuilder = rwSetBuilder;
             this.endKey = endKey;
-            KvRwset.RangeQueryInfo rqi = KvRwset.RangeQueryInfo.newBuilder()
+            this.rangeQueryInfo = KvRwset.RangeQueryInfo.newBuilder()
                     .setStartKey(startKey)
                     .build();
-            this.rangeQueryInfo = rqi;
-            RangeQueryResultsHelper rangeQueryResultsHelper = new RangeQueryResultsHelper(enableHashing, maxDegree);
-            this.rangeQueryResultsHelper = rangeQueryResultsHelper;
+            this.rangeQueryResultsHelper = new RangeQueryResultsHelper(enableHashing, maxDegree);
         }
     }
 

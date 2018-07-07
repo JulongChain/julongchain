@@ -25,6 +25,7 @@ import sun.security.pkcs11.wrapper.PKCS11Exception;
 
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * Class description
@@ -131,6 +132,11 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
     @Override
     public boolean isDefaultCsp() {
         return false;
+    }
+
+    @Override
+    public void parseFrom(Map<String, String> optMap) {
+
     }
 
     @Override

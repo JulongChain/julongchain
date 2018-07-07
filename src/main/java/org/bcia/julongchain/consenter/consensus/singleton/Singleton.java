@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 package org.bcia.julongchain.consenter.consensus.singleton;
-
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.*;
 import org.bcia.julongchain.common.log.JavaChainLog;
@@ -23,12 +21,13 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.common.util.producer.Consumer;
 import org.bcia.julongchain.common.util.producer.Producer;
+import org.bcia.julongchain.consenter.common.cmd.impl.StartCmd;
 import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
 import org.bcia.julongchain.consenter.consensus.IChain;
-import org.bcia.julongchain.consenter.consensus.IConsensue;
-import org.bcia.julongchain.consenter.consensus.IConsenterSupport;
+import org.bcia.julongchain.consenter.consensus.IConsensusPlugin;
 import org.bcia.julongchain.consenter.entity.BatchesMes;
 import org.bcia.julongchain.consenter.entity.Message;
+import org.bcia.julongchain.gossip.GossipServiceUtil;
 import org.bcia.julongchain.protos.common.Common;
 
 import java.util.concurrent.BlockingQueue;
@@ -39,26 +38,21 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @Date: 2018/3/7
  * @company Dingxuan
  */
-public class Singleton implements IChain, IConsensue {
+public class Singleton implements IChain, IConsensusPlugin {
     private BlockingQueue<Message> blockingQueue;
     private Producer<Message> producer;
     private Consumer<Message> consumer;
     private static Singleton instance;
     private static JavaChainLog log = JavaChainLogFactory.getLog(Singleton.class);
-    private ChainSupport support;
-    // private IConsenterSupport support;
+    private static ChainSupport support;
     private Message normalMessage;
     private Message configMessage;
 
     public static Singleton getInstance(ChainSupport consenterSupport) {
-        if (instance == null) {
-            synchronized (Singleton.class) {
-                if (consenterSupport == null) {
-                    instance = new Singleton();
-                } else {
-                    instance = new Singleton(consenterSupport);
-                }
-            }
+        if(consenterSupport==null){
+            return instance;
+        }else {
+           support=consenterSupport;
         }
         return instance;
     }
@@ -102,7 +96,7 @@ public class Singleton implements IChain, IConsensue {
 
 
     public Singleton(ChainSupport consenterSupport) {
-        this.support = consenterSupport;
+       support = consenterSupport;
         instance = this;
         blockingQueue = new LinkedBlockingQueue<>();
         producer = new Producer<Message>(blockingQueue);
@@ -129,7 +123,8 @@ public class Singleton implements IChain, IConsensue {
     public void doProcess() throws InvalidProtocolBufferException, LedgerException, ValidateException, PolicyException {
         long timer = 0;
         long seq = support.getSequence();
-        if (configMessage == null) {//普通消息
+        if (configMessage == null) {
+            // /普通消息
             if (normalMessage.getConfigSeq() < seq) {
                 try {
                     support.getProcessor().processNormalMsg(normalMessage.getMessage());
@@ -139,16 +134,23 @@ public class Singleton implements IChain, IConsensue {
             }
             BatchesMes batchesMes = support.getCutter().ordered(normalMessage.getMessage());
             Common.Envelope[][] batches = batchesMes.getMessageBatches();
-            if (batches.length == 0 && timer == 0) {
+            if (batches== null && timer == 0) {
                 timer = support.getLedgerResources().getMutableResources().getGroupConfig().getConsenterConfig().getBatchTimeout();
+            }else {
+                for (Common.Envelope[] env : batches) {
+                    Common.Block block = support.createNextBlock(env);
+                    support.writeBlock(block, null);
+                    try {
+                        GossipServiceUtil.addData(StartCmd.getGossipService(),support.getGroupId(),block.getHeader().getNumber(),block);
+                    } catch (GossipException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (batches.length > 0) {
+                    timer = 0;
+                }
             }
-            for (Common.Envelope[] env : batches) {
-                Common.Block block = support.createNextBlock(env);
-                support.writeBlock(block, null);
-            }
-            if (batches.length > 0) {
-                timer = 0;
-            }
+
         } else {
             if (configMessage.getConfigSeq() < seq) {
                 try {
@@ -163,14 +165,16 @@ public class Singleton implements IChain, IConsensue {
                     log.error(e.getMessage());
                 }
             }
-            support.getCutter().ordered(configMessage.getMessage());
+            //support.getCutter().ordered(configMessage.getMessage());
             Common.Envelope[] batch = support.getCutter().cut();
             if (batch != null) {
                 Common.Block block = support.createNextBlock(batch);
                 support.writeBlock(block, null);
+            }else {
+                Common.Block block = support.createNextBlock(new Common.Envelope[]{configMessage.getMessage()});
+                support.writeConfigBlock(block, null);
             }
-            Common.Block block = support.createNextBlock(new Common.Envelope[]{configMessage.getMessage()});
-            support.writeConfigBlock(block, null);
+
             timer = 0;
 
         }
@@ -183,26 +187,18 @@ public class Singleton implements IChain, IConsensue {
             log.debug("Batch timer expired, creating block");
             Common.Block block = support.createNextBlock(batch);
             support.writeBlock(block, null);
+            try {
+                GossipServiceUtil.addData(StartCmd.getGossipService(),support.getGroupId(),block.getHeader().getNumber(), block);
+            } catch (GossipException e) {
+                e.printStackTrace();
+            }
         }
 
     }
 
     public boolean pushToQueue(Message message) throws ValidateException {
-        ValidateUtils.isNotNull(message, "event can not be null");
+        ValidateUtils.isNotNull(message, "message can not be null");
         return producer.produce(message);
-    }
-
-    public static void main(String[] args) throws ValidateException, ConsenterException {
-//        Singleton singleton = null;
-//        singleton = Singleton.getInstance();
-//
-//        Common.Envelope envelope = Common.Envelope.newBuilder().setPayload(ByteString.copyFrom("123".getBytes())).build();
-//        singleton.order(envelope,1);
-//        singleton.pushToQueue(envelope);
-    }
-
-    public IConsenterSupport getSupport() {
-        return support;
     }
 
     public Message getNormalMessage() {

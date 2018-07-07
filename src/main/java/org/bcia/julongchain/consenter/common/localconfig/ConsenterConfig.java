@@ -37,6 +37,7 @@ public class ConsenterConfig {
 
     public static class General {
         private String ledgerType;
+        private String gossipAddress;
         private String listenAddress;
         private String listenPort;
         private Map<String,String> tls;
@@ -170,6 +171,14 @@ public class ConsenterConfig {
 
         public void setAuthentication(Map<String, Integer> authentication) {
             this.authentication = authentication;
+        }
+
+        public String getGossipAddress() {
+            return gossipAddress;
+        }
+
+        public void setGossipAddress(String gossipAddress) {
+            this.gossipAddress = gossipAddress;
         }
     }
 

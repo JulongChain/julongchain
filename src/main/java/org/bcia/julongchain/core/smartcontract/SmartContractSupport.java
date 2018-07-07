@@ -20,6 +20,7 @@ import org.bcia.julongchain.common.exception.SmartContractException;
 import org.bcia.julongchain.common.ledger.util.IoUtil;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.util.Utils;
 import org.bcia.julongchain.core.common.smartcontractprovider.ISmartContractPackage;
 import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractContext;
 import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractProvider;
@@ -39,9 +40,9 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
-import static org.bcia.julongchain.protos.node.Smartcontract.*;
-import static org.bcia.julongchain.protos.node.SmartcontractShim.SmartContractMessage;
-import static org.bcia.julongchain.protos.node.SmartcontractShim.SmartContractMessage.Type;
+import static org.bcia.julongchain.protos.node.SmartContractPackage.*;
+import static org.bcia.julongchain.protos.node.SmartContractShim.SmartContractMessage;
+import static org.bcia.julongchain.protos.node.SmartContractShim.SmartContractMessage.Type;
 
 /**
  * 类描述
@@ -344,11 +345,21 @@ public class SmartContractSupport {
             FileUtils.copyFileToDirectory(
                 new File("src/main/java/org/bcia/julongchain/images/scenv/Dockerfile.in"),
                 new File(basePath));
+            // 设置Docker容器的CORE_NODE_ADDRESS环境变量
+            String coreNodeAddress =
+                NodeConfigFactory.getNodeConfig().getSmartContract().getCoreNodeAddress();
+            Utils.replaceFileContent(
+                basePath + File.separator + "Dockerfile.in",
+                "#core_node_address#",
+                coreNodeAddress);
             // build镜像
             String imageId =
                 DockerUtil.buildImage(basePath + "/Dockerfile.in", smartContractId + "-" + version);
             // 创建容器
-            String containerId = DockerUtil.createContainer(imageId, smartContractId);
+              // "/bin/sh",
+              // "-c",
+              // "java -jar /root/julongchain/target/julongchain-smartcontract-java-jar-with-dependencies.jar -i " + containerName
+            String containerId = DockerUtil.createContainer(imageId, smartContractId, "/bin/sh", "-c", "java -jar /root/julongchain/target/julongchain-smartcontract-java-jar-with-dependencies.jar -i " + smartContractId);
             // 启动容器
             DockerUtil.startContainer(containerId);
 

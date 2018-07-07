@@ -62,7 +62,7 @@ public class RangeQueryKey {
 
     @Override
     public boolean equals(Object obj) {
-        RangeQueryKey key = null;
+        RangeQueryKey key;
         try {
             key = (RangeQueryKey) obj;
         } catch (Exception e) {

@@ -19,7 +19,7 @@ import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
 import org.bcia.julongchain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.julongchain.protos.node.ProposalPackage;
-import org.bcia.julongchain.protos.node.SmartcontractShim;
+import org.bcia.julongchain.protos.node.SmartContractShim;
 
 import java.util.Map;
 
@@ -35,7 +35,7 @@ public class TransactionContext {
     private String chainID;
     private ProposalPackage.SignedProposal signedProp;
     private ProposalPackage.Proposal proposal;
-    private SmartcontractShim.SmartContractMessage responseNotifier;
+    private SmartContractShim.SmartContractMessage responseNotifier;
     private Map<String, IResultsIterator> queryIteratorMap;
     private Map<String, PendingQueryResult> pendingQueryResults;
     private ITxSimulator txSimulator;
@@ -65,11 +65,11 @@ public class TransactionContext {
         this.proposal = proposal;
     }
 
-    public SmartcontractShim.SmartContractMessage getResponseNotifier() {
+    public SmartContractShim.SmartContractMessage getResponseNotifier() {
         return responseNotifier;
     }
 
-    public void setResponseNotifier(SmartcontractShim.SmartContractMessage responseNotifier) {
+    public void setResponseNotifier(SmartContractShim.SmartContractMessage responseNotifier) {
         this.responseNotifier = responseNotifier;
     }
 

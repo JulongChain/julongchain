@@ -17,7 +17,7 @@ package org.bcia.julongchain.core.ledger.pvtdatastorage;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage.BlockFileManager;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.core.ledger.util.Util;
 
 /**
@@ -35,20 +35,20 @@ public class KvEncoding  {
     public static final byte[] EMPTY_VALUE = {3};
 
     public static byte[] encodePK(long blockNum, long tranNum) {
-        return  ArrayUtils.addAll(PVT_DATA_KEY_PREFIX, new Height(blockNum, tranNum).toBytes());
+        return  ArrayUtils.addAll(PVT_DATA_KEY_PREFIX, new LedgerHeight(blockNum, tranNum).toBytes());
     }
 
     public static long decodePKToBlockNum(byte[] key) {
         byte[] heightBytes = new byte[16];
         System.arraycopy(key, 1, heightBytes, 0, 16);
-        Height height = new Height(heightBytes);
+        LedgerHeight height = new LedgerHeight(heightBytes);
         return height.getBlockNum();
     }
 
     public static long decodePKToTranNum(byte[] key) {
         byte[] heightBytes = new byte[16];
         System.arraycopy(key, 1, heightBytes, 0, 16);
-        Height height = new Height(heightBytes);
+        LedgerHeight height = new LedgerHeight(heightBytes);
         return height.getTxNum();
     }
 

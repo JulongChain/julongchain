@@ -33,10 +33,10 @@ import java.util.Map;
  */
 public class ApisConfig implements IApisConfig {
     private static final String API_PATH_PREFIX = "/Resources/APIs/";
-    private Map<String, String> policyRefs;
+    private Map<String, String> apiPolicyMap;
 
     public ApisConfig(Configtx.ConfigTree tree) throws ValidateException, InvalidProtocolBufferException {
-        this.policyRefs = new HashMap<String, String>();
+        this.apiPolicyMap = new HashMap<String, String>();
 
         if (tree != null && tree.getChildsCount() > 0) {
             throw new ValidateException("apis does not support child");
@@ -51,11 +51,16 @@ public class ApisConfig implements IApisConfig {
 
                 ResourcesPackage.APIResource apiResource = ResourcesPackage.APIResource.parseFrom(value.getValue());
                 if (apiResource.getPolicyRef().startsWith("/")) {
-                    policyRefs.put(key, apiResource.getPolicyRef());
+                    apiPolicyMap.put(key, apiResource.getPolicyRef());
                 } else {
-                    policyRefs.put(key, API_PATH_PREFIX + apiResource.getPolicyRef());
+                    apiPolicyMap.put(key, API_PATH_PREFIX + apiResource.getPolicyRef());
                 }
             }
         }
+    }
+
+    @Override
+    public String getPolicy(String apiName) {
+        return apiPolicyMap.get(apiName);
     }
 }

@@ -116,38 +116,38 @@ public class LockBasedTxSimulator implements ITxSimulator {
 
     @Override
     public List<byte[]> getStateMultipleKeys(String namespace, List<String> keys) throws LedgerException {
-        return null;
+        return queryExecutor.getHelper().getStateMultipleKeys(namespace, keys);
     }
 
     @Override
     public IResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
-        checkBeforePvtdataQueries();
         return queryExecutor.getStateRangeScanIterator(namespace, startKey, endKey);
     }
 
     @Override
     public IResultsIterator executeQuery(String namespace, String query) throws LedgerException {
-        return null;
+        return queryExecutor.getHelper().executeQuery(namespace, query);
     }
 
     @Override
     public byte[] getPrivateData(String namespace, String collection, String key) throws LedgerException {
-        return new byte[0];
+    	return queryExecutor.getHelper().getPrivateData(namespace, collection, key);
     }
 
     @Override
     public List<byte[]> getPrivateDataMultipleKeys(String namespace, String collection, List<String> keys) throws LedgerException {
-        return null;
+        return queryExecutor.getHelper().getPrivateDataMultipleKeys(namespace, collection, keys);
     }
 
     @Override
     public IResultsIterator getPrivateDataRangeScanIterator(String namespace, String collection, String startKey, String endKey) throws LedgerException {
-        return null;
+	    checkBeforePvtdataQueries();
+        return queryExecutor.getHelper().getPrivateDataRangeScanIterator(namespace, collection, startKey, endKey);
     }
 
     @Override
     public void done() {
-
+		queryExecutor.done();
     }
 
     public void checkBeforeWrite() throws LedgerException {

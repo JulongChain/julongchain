@@ -29,7 +29,7 @@ import org.bcia.julongchain.core.ledger.util.TxValidationFlags;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.NsRwSet;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.TxRwSet;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.julongchain.protos.node.ProposalPackage;
@@ -46,8 +46,8 @@ import java.util.List;
 public class HistoryLevelDB implements IHistoryDB {
 
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(HistoryLevelDB.class);
-    private IDBProvider provider = null;
-    private String dbName = null;
+    private IDBProvider provider;
+    private String dbName;
 
     private static final byte[] EMPTY_VALUE = {};
     private static final byte[] SAVE_POINT_KEY = {0x00};
@@ -59,7 +59,7 @@ public class HistoryLevelDB implements IHistoryDB {
 
     @Override
     public IHistoryQueryExecutor newHistoryQueryExecutor(IBlockStore blockStore) {
-        return new HistoryLevelDBQueryExecutor(this, blockStore);
+        return new HistoryLevelDBQueryExecutor(this, blockStore, dbName);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class HistoryLevelDB implements IHistoryDB {
                     .build();
         }
         //将每个交易的写集写入HistoryDB
-        List<ByteString> list = block.getData().getDataList();
+	    List<ByteString> list = block.getData().getDataList();
         for (; tranNo < list.size(); tranNo++) {
             ByteString evnByte = list.get(tranNo);
             if(txsFilter.isInValid(tranNo)){
@@ -91,34 +91,40 @@ public class HistoryLevelDB implements IHistoryDB {
             }
             Common.Envelope env = Util.getEnvelopFromBlock(evnByte);
             Common.Payload payload = Util.getPayload(env);
-            Common.GroupHeader header = Util.getGroupHeader(payload.getHeader().getGroupHeader());
+            Common.GroupHeader header = null;
+            if (payload != null) {
+                header = Util.getGroupHeader(payload.getHeader().getGroupHeader());
+            }
             //经过背书的交易写入HistoryDB
-            if(Common.HeaderType.ENDORSER_TRANSACTION.getNumber() == header.getType()){
-                ProposalPackage.SmartContractAction respPayload = null;
-                TxRwSet txRWSet = new TxRwSet();
-                respPayload = Util.getActionFromEnvelope(evnByte);
-                if(respPayload == null || !respPayload.hasResponse()){
-                    logger.debug("Got null respPayload from env");
-                    continue;
-                }
-                txRWSet.fromProtoBytes(respPayload.getResults());
-                for(NsRwSet nsRwSet : txRWSet.getNsRwSets()){
-                    String ns = nsRwSet.getNameSpace();
-                    for(KvRwset.KVWrite kvWrite : nsRwSet.getKvRwSet().getWritesList()){
-                        String writeKey = kvWrite.getKey();
-                        //key:ns~key~blockNo~tranNo
-                        byte[] compositeHistoryKey = HistoryDBHelper.constructCompositeHistoryKey(ns, writeKey, blockNo, tranNo);
-                        dbBatch.put(compositeHistoryKey, EMPTY_VALUE);
+            if (header != null) {
+                if(Common.HeaderType.ENDORSER_TRANSACTION.getNumber() == header.getType()){
+                    ProposalPackage.SmartContractAction respPayload;
+                    TxRwSet txRWSet = new TxRwSet();
+                    respPayload = Util.getActionFromEnvelope(evnByte);
+                    if(respPayload == null || !respPayload.hasResponse()){
+                        logger.debug("Got null respPayload from env");
+                        continue;
                     }
+                    txRWSet.fromProtoBytes(respPayload.getResults());
+                    for(NsRwSet nsRwSet : txRWSet.getNsRwSets()){
+                        String ns = nsRwSet.getNameSpace();
+                        for(KvRwset.KVWrite kvWrite : nsRwSet.getKvRwSet().getWritesList()){
+                            String writeKey = kvWrite.getKey();
+                            //key:ns~key~blockNo~tranNo
+                            byte[] compositeHistoryKey = HistoryDBHelper.constructCompositeHistoryKey(ns, writeKey, blockNo, tranNo);
+	                        String s = new String(compositeHistoryKey);
+	                        dbBatch.put(compositeHistoryKey, EMPTY_VALUE);
+                        }
+                    }
+                } else {
+                    logger.debug(String.format("Group [%s]: Skipping transaction [%d] since it is not an endorsement transaction"
+                            , dbName, tranNo));
                 }
-            } else {
-                logger.debug(String.format("Group [%s]: Skipping transaction [%d] since it is not an endorsement transaction"
-                        , dbName, tranNo));
             }
         }
 
         //添加保存点
-        Height height = new Height(blockNo,tranNo);
+        LedgerHeight height = new LedgerHeight(blockNo,tranNo);
         dbBatch.put(SAVE_POINT_KEY, height.toBytes());
 
         //同步写入leveldb
@@ -129,13 +135,12 @@ public class HistoryLevelDB implements IHistoryDB {
     }
 
     @Override
-    public Height getLastSavepoint() throws LedgerException {
+    public LedgerHeight getLastSavepoint() throws LedgerException {
         byte[] versionBytes = provider.get(SAVE_POINT_KEY);
         if(versionBytes == null){
             return null;
         }
-        Height height = new Height(versionBytes);
-        return height;
+        return new LedgerHeight(versionBytes);
     }
 
     /**
@@ -146,7 +151,7 @@ public class HistoryLevelDB implements IHistoryDB {
         if(!LedgerConfig.isHistoryDBEnabled()){
             return 0;
         }
-        Height savePoint = getLastSavepoint();
+        LedgerHeight savePoint = getLastSavepoint();
         if(savePoint == null){
             return -1;
         }
@@ -158,7 +163,7 @@ public class HistoryLevelDB implements IHistoryDB {
         if(!LedgerConfig.isHistoryDBEnabled()){
             return 0;
         }
-        Height savePoint = getLastSavepoint();
+        LedgerHeight savePoint = getLastSavepoint();
         if(savePoint == null){
             return 0;
         }

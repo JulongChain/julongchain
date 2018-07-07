@@ -20,7 +20,7 @@ import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.Query;
 import org.bcia.julongchain.protos.node.ResourcesPackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfigFactory;
 import org.junit.Before;
@@ -88,7 +88,7 @@ public class CSSCTest extends BaseJunit4Test {
         ProposalPackage.SignedProposal sp= null;
         try {
             sp = TxUtils.mockSignedEndorserProposalOrPanic("",
-                    Smartcontract.SmartContractSpec.newBuilder().build());
+                    SmartContractPackage.SmartContractSpec.newBuilder().build());
         } catch (JavaChainException e) {
             e.printStackTrace();
             return;
@@ -133,7 +133,7 @@ public class CSSCTest extends BaseJunit4Test {
         ISmartContract.SmartContractResponse res3 = mockStub.mockInvokeWithSignedProposal("3", args3,sp);
         assertThat(res3.getStatus(),is(ISmartContract.SmartContractResponse.Status.SUCCESS));
         try {
-            ResourcesPackage.ConfigTree tree = ResourcesPackage.ConfigTree.parseFrom(res3.getPayload());
+            ResourcesPackage.RootConfigTree tree = ResourcesPackage.RootConfigTree.parseFrom(res3.getPayload());
             assertNotNull(tree);
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
@@ -165,7 +165,7 @@ public class CSSCTest extends BaseJunit4Test {
 
 
     private byte[] mockConfigBlock() throws IOException, ValidateException,JavaChainException {
-        GenesisConfig.Profile profile=GenesisConfigFactory.loadGenesisConfig().getCompletedProfile("SampleDevModeSolo");
+        GenesisConfig.Profile profile=GenesisConfigFactory.getGenesisConfig().getCompletedProfile("SampleDevModeSolo");
         Configtx.ConfigTree tree = ConfigTreeHelper.buildGroupTree(profile);
         GenesisBlockFactory factory=new GenesisBlockFactory(tree);
         Common.Block block = factory.getGenesisBlock("mytestchainid");

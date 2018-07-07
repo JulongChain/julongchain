@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 
 /**
  * 封装版本信息
@@ -26,22 +26,22 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
  */
 public class VersionedValue {
 
-    private Height version;
+    private LedgerHeight version;
     private byte[] value;
 
 //    public VersionedValue(){
 //    }
 
-    public VersionedValue(Height version, byte[] value){
+    public VersionedValue(LedgerHeight version, byte[] value){
         this.version = version;
         this.value = value;
     }
 
-    public Height getVersion() {
+    public LedgerHeight getVersion() {
         return version;
     }
 
-    public void setVersion(Height version) {
+    public void setVersion(LedgerHeight version) {
         this.version = version;
     }
 

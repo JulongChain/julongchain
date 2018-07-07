@@ -19,6 +19,8 @@ import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.node.Node;
 
+import java.util.Arrays;
+
 /**
  * 这是本项目的入口类（描述该类的功能）
  *
@@ -31,8 +33,8 @@ public class App {
 
     public static void main(String[] args) {
         //打印异常日志的正反样例
-//        log.info("JavaChain begin, This is a right log");
-//        System.out.println("JavaChain begin, This is a wrong log");
+//        log.info("JulongChain begin, This is a right log");
+//        System.out.println("JulongChain begin, This is a wrong log");
 
         //示例异常日志的打印方式
 //        try {
@@ -43,9 +45,10 @@ public class App {
 
         //引入Spring配置文件的两种方式
 //        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-//        Node node = context.getBean(Node.class);
-//        Node node = SpringContext.getInstance().getBean(Node.class);
+//        PolicyNode node = context.getBean(PolicyNode.class);
+//        PolicyNode node = SpringContext.getInstance().getBean(PolicyNode.class);
 
+        log.info("args-----$" + Arrays.toString(args));
         //开始解析执行命令行
         try {
             Node node = Node.getInstance();

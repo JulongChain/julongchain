@@ -22,7 +22,7 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.*;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.CompositeKey;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.core.ledger.sceventmgmt.ISmartContractLifecycleEventListener;
 import org.bcia.julongchain.core.ledger.util.Util;
 
@@ -31,6 +31,7 @@ import java.util.Map;
 
 /**
  * 处理pvt、pubdata
+ * 主要用于couchdb
  *
  * @author sunzongyu
  * @date 2018/04/17
@@ -60,9 +61,8 @@ public class CommonStorageDB implements IDB {
 
         for(HashedCompositeKey key : hashKeys){
             String ns = deriveHashedDataNs(key.getNamespace(), key.getCollectionName());
-            String keyHashStr = null;
+            String keyHashStr;
             if(!bytesKeySuppoted()){
-                //TODO SM3 Hash
                 keyHashStr = new String(Util.getHashBytes(key.getKeyHash().getBytes()));
             } else {
                 keyHashStr = key.getKeyHash();
@@ -75,12 +75,11 @@ public class CommonStorageDB implements IDB {
     }
 
     @Override
-    public Height getCacheKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException{
+    public LedgerHeight getCacheKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException{
         try {
             IBulkOptimizable bulkOptimizable = (IBulkOptimizable) vdb;
             String keyHashStr = new String(keyHash);
             if(!bytesKeySuppoted()){
-                //TODO SM3 Hash
                 keyHashStr = new String(Util.getHashBytes(keyHash));
             }
             return bulkOptimizable.getCachedVersion(deriveHashedDataNs(ns, coll), keyHashStr);
@@ -117,17 +116,15 @@ public class CommonStorageDB implements IDB {
     public VersionedValue getValueHash(String ns, String coll, byte[] keyHash) throws LedgerException {
         String keyHashStr = new String(keyHash);
         if(!bytesKeySuppoted()){
-            //TODO SM3 Hash
             keyHashStr = new String(Util.getHashBytes(keyHash));
         }
         return getState(deriveHashedDataNs(ns, coll), keyHashStr);
     }
 
     @Override
-    public Height getKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException {
+    public LedgerHeight getKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException {
         String keyHashStr = new String(keyHash);
         if(!bytesKeySuppoted()){
-            //TODO SM3 Hash
             keyHashStr = new String(Util.getHashBytes(keyHash));
         }
         return getVersion(deriveHashedDataNs(ns, coll), keyHashStr);
@@ -149,7 +146,7 @@ public class CommonStorageDB implements IDB {
     }
 
     @Override
-    public void applyPrivacyAwareUpdates(UpdateBatch updates, Height height) throws LedgerException {
+    public void applyPrivacyAwareUpdates(UpdateBatch updates, LedgerHeight height) throws LedgerException {
         addPvtUpdates(updates.getPubUpdateBatch(), updates.getPvtUpdateBatch());
         addHashedUpdates(updates.getPubUpdateBatch(), updates.getHashUpdates(), !bytesKeySuppoted());
         vdb.applyUpdates(updates.getPubUpdateBatch().getBatch(), height);
@@ -199,7 +196,7 @@ public class CommonStorageDB implements IDB {
     }
 
     @Override
-    public Height getVersion(String namespace, String key) throws LedgerException {
+    public LedgerHeight getVersion(String namespace, String key) throws LedgerException {
         return vdb.getVersion(namespace, key);
     }
 
@@ -219,12 +216,12 @@ public class CommonStorageDB implements IDB {
     }
 
     @Override
-    public void applyUpdates(org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.UpdateBatch batch, Height height) throws LedgerException {
+    public void applyUpdates(org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.UpdateBatch batch, LedgerHeight height) throws LedgerException {
         throw new LedgerException("this fun should not be invoke on this type. Please invoke fun applyPrivacyAwareUpdates()");
     }
 
     @Override
-    public Height getLatestSavePoint() throws LedgerException {
+    public LedgerHeight getLatestSavePoint() throws LedgerException {
         return vdb.getLatestSavePoint();
     }
 

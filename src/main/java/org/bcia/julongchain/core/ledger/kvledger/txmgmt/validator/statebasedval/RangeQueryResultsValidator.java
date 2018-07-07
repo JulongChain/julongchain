@@ -21,7 +21,7 @@ import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 
 import java.util.List;
@@ -72,7 +72,7 @@ public class RangeQueryResultsValidator implements IRangeQueryValidator {
                 logger.debug(String.format("Key name mismatch: key in rwset = %s, key in query result = %s", kvRead.getKey(), ((VersionedKV) result.getObj()).getCompositeKey().getKey()));
                 return false;
             }
-            if(!Height.areSame(((VersionedKV) result.getObj()).getVersionedValue().getVersion(), convertToVersionHeight(kvRead.getVersion()))){
+            if(!LedgerHeight.areSame(((VersionedKV) result.getObj()).getVersionedValue().getVersion(), convertToVersionHeight(kvRead.getVersion()))){
                 logger.debug(String.format("Version mismatch: key = %s", kvRead.getKey()));
                 return false;
             }
@@ -85,7 +85,7 @@ public class RangeQueryResultsValidator implements IRangeQueryValidator {
         return true;
     }
 
-    private Height convertToVersionHeight(KvRwset.Version v){
-        return new Height(v.getBlockNum(), v.getTxNum());
+    private LedgerHeight convertToVersionHeight(KvRwset.Version v){
+        return new LedgerHeight(v.getBlockNum(), v.getTxNum());
     }
 }

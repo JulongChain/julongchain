@@ -28,6 +28,6 @@ import java.util.List;
  * @company Aisino
  */
 public interface IEvalutor {
-    boolean evalutor(List<SignedData> signedDatas,Boolean[] bool) throws PolicyException;
+    boolean evaluate(List<SignedData> signedDatas,Boolean[] bool) throws PolicyException;
 
 }

@@ -15,25 +15,32 @@
  */
 package org.bcia.julongchain.core.ssc;
 
+import com.google.protobuf.ByteString;
+import org.apache.commons.lang3.StringUtils;
+import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.SmartContractException;
 import org.bcia.julongchain.common.exception.SysSmartContractException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractContext;
+import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractProvider;
 import org.bcia.julongchain.core.container.inproccontroller.InprocController;
+import org.bcia.julongchain.core.ledger.INodeLedger;
+import org.bcia.julongchain.core.ledger.ITxSimulator;
 import org.bcia.julongchain.core.node.NodeConfig;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
+import org.bcia.julongchain.core.node.util.NodeUtils;
 import org.bcia.julongchain.core.ssc.cssc.CSSC;
 import org.bcia.julongchain.core.ssc.essc.ESSC;
 import org.bcia.julongchain.core.ssc.lssc.LSSC;
 import org.bcia.julongchain.core.ssc.qssc.QSSC;
 import org.bcia.julongchain.core.ssc.vssc.VSSC;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 系统智能合约管理器,整合管理功能函数接口
@@ -143,8 +150,8 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
      * @return 是否注册成功
      */
     private boolean registerSysSmartContract(ISystemSmartContract contract){
-        if(contract.getSystemSmartContractDescriptor().isEnabled()==false||
-                isWhitelisted(contract)==false){
+        if(!contract.getSystemSmartContractDescriptor().isEnabled() ||
+				!isWhitelisted(contract)){
             log.info("System Smartcontract ({},{},{}) disabled",
                     contract.getSystemSmartContractDescriptor().getSSCName(),
                     contract.getSystemSmartContractDescriptor().getSSCPath(),
@@ -160,15 +167,94 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
         }
 
         String contractID = contract.getSmartContractID();
-        log.info("Register system contract [%s]", contractID);
+        log.info("Register system contract {}", contractID);
         sysSCMap.put(contractID, contract);
         return true;
     }
 
-    //相当于应用智能合约的Instantiate
+    /**
+	 * 系统智能合约部署
+	 * 相当于应用智能合约的Instantiate
+     */
     @Override
-    public void deploySysSmartContracts(String groupID) {
+    public void deploySysSmartContracts(String groupID){
+    	for(Map.Entry<String, ISystemSmartContract> entry : sysSCMap.entrySet()) {
+			String scName = entry.getKey();
+			ISystemSmartContract sc = entry.getValue();
+			if (!sc.getSystemSmartContractDescriptor().isEnabled() ||
+					!isWhitelisted(sc)) {
+				log.info("System Smartcontract ({},{},{}) disabled",
+						sc.getSystemSmartContractDescriptor().getSSCName(),
+						sc.getSystemSmartContractDescriptor().getSSCPath(),
+						sc.getSystemSmartContractDescriptor().isEnabled());
+				return;
+			}
+			// TODO: 7/2/18 uuid
+			String txid = UUID.randomUUID().toString();
+			ITxSimulator txsim = null;
+			try {
+				if (!StringUtils.isEmpty(groupID)) {
+					INodeLedger ledger = NodeUtils.getLedger(groupID);
+					if (ledger == null) {
+						String errMsg = "Got null ledger when deploy SysSC";
+						log.error(errMsg);
+//						throw new SysSmartContractException(errMsg);
+					}
+					try {
+						txsim = ledger.newTxSimulator(txid);
+					} catch (LedgerException e) {
+						log.error(e.getMessage());
+//						throw new SysSmartContractException(e);
+					}
+				}
 
+				SmartContractPackage.SmartContractID scID = SmartContractPackage.SmartContractID.newBuilder()
+						.setPath(sc.getSystemSmartContractDescriptor().getSSCPath())
+						.setName(sc.getSystemSmartContractDescriptor().getSSCName())
+						.build();
+
+				List<ByteString> scPath = new ArrayList<>();
+				for (String s : sc.getSystemSmartContractDescriptor().getInitArgs()) {
+					scPath.add(ByteString.copyFromUtf8(s));
+				}
+
+				SmartContractPackage.SmartContractSpec scs = SmartContractPackage.SmartContractSpec.newBuilder()
+						.setType(SmartContractPackage.SmartContractSpec.Type.JAVA)
+						.setSmartContractId(scID)
+						.setInput(SmartContractPackage.SmartContractInput.newBuilder()
+								.addAllArgs(scPath)
+								.build())
+						.build();
+
+				SmartContractPackage.SmartContractDeploymentSpec scds = SmartContractPackage.SmartContractDeploymentSpec.newBuilder()
+						.setExecEnv(SmartContractPackage.SmartContractDeploymentSpec.ExecutionEnvironment.SYSTEM)
+						.setSmartContractSpec(scs)
+						.setCodePackage(ByteString.EMPTY)
+						.build();
+
+				// TODO: 7/2/18 获取系统智能合约版本
+				String version = "1.0";
+
+				SmartContractContext sccid = null;
+				try {
+					sccid = SmartContractProvider.getSCContext(groupID,
+							sc.getSystemSmartContractDescriptor().getSSCName(),
+							version,
+							txid,
+							true,
+							null,
+							null);
+				} catch (SysSmartContractException e) {
+					e.printStackTrace();
+				}
+
+
+			} finally {
+				if (txsim != null) {
+					txsim.done();
+				}
+			}
+		}
     }
 
     @Override
@@ -192,7 +278,7 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
         NodeConfig.SmartContract smartcontractConfig = nodeConfig.getSmartContract();
         Map<String, String> sscMap = smartcontractConfig.getSystem();
         String value=sscMap.get(contract.getSmartContractID());
-        if(value.equals("enable")||value.equals("true")||value.equals("yes")){
+        if("enable".equals(value) || "true".equals(value) || "yes".equals(value)){
             return true;
         }
         return false;
@@ -220,7 +306,7 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
 
 
     //编译智能合约，形成智能合约部署规范(DeploymentSpec);
-    private Smartcontract.SmartContractDeploymentSpec buildSysSmartContract(Smartcontract.SmartContractSpec spec)
+    private SmartContractPackage.SmartContractDeploymentSpec buildSysSmartContract(SmartContractPackage.SmartContractSpec spec)
             throws SysSmartContractException {
         return null;
     }

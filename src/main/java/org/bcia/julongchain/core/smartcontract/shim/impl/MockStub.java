@@ -17,9 +17,14 @@ package org.bcia.julongchain.core.smartcontract.shim.impl;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Timestamp;
+import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.ledger.util.IoUtil;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.util.Utils;
+import org.bcia.julongchain.core.ledger.INodeLedger;
+import org.bcia.julongchain.core.ledger.ITxSimulator;
+import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContract;
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.julongchain.core.smartcontract.shim.ledger.CompositeKey;
@@ -27,7 +32,9 @@ import org.bcia.julongchain.core.smartcontract.shim.ledger.IKeyModification;
 import org.bcia.julongchain.core.smartcontract.shim.ledger.IKeyValue;
 import org.bcia.julongchain.core.smartcontract.shim.ledger.IQueryResultsIterator;
 import org.bcia.julongchain.protos.node.ProposalPackage;
+import org.bcia.julongchain.protos.node.SmartContractDataPackage;
 import org.bcia.julongchain.protos.node.SmartContractEventPackage;
+import scala.collection.concurrent.INode;
 
 import java.time.Instant;
 import java.util.*;
@@ -103,9 +110,23 @@ public class MockStub implements ISmartContractStub {
      */
     @Override
     public byte[] getState(String key) {
-        byte[] value=state.get(key);
-        log.debug("MockStub {} Getting {} {}",this.name,key,value);
-        return value;
+
+        byte[] state = null;
+        try {
+            LedgerManager.initialize(null);
+            INodeLedger l = LedgerManager.openLedger("myGroup");
+
+            ITxSimulator simulator = l.newTxSimulator("txID");
+            state = simulator.getState("lssc", "mycc");
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+	    return state;
     }
 
     @Override

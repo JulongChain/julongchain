@@ -42,10 +42,6 @@ public class NsPubRwBuilder {
         this.nameSpace = nameSpace;
     }
 
-    /**
-     *
-     * @return
-     */
     public NsRwSet build(){
         List<KvRwset.KVRead> readSet = Util.getValuesBySortedKeys(readMap);
         List<KvRwset.KVWrite> writeSet = Util.getValuesBySortedKeys(writeMap);

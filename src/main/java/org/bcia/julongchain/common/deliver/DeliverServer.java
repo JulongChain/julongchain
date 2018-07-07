@@ -26,10 +26,10 @@ import org.bcia.julongchain.protos.consenter.Ab;
  * @Date: 2018/5/29
  * @company Dingxuan
  */
-public class DeliverServer  implements ISend{
+public class DeliverServer  implements ISender{
     StreamObserver<Ab.DeliverResponse> responseObserver;
     private IPolicyChecker policyChecker;
-    private ISend send;
+    private ISender sender;
     private Common.Envelope envelope;
 
     public DeliverServer(StreamObserver<Ab.DeliverResponse> responseObserver, Common.Envelope envelope) {
@@ -45,8 +45,8 @@ public class DeliverServer  implements ISend{
         return policyChecker;
     }
 
-    public ISend getSend() {
-        return send;
+    public ISender getSend() {
+        return sender;
     }
 
     public Common.Envelope getEnvelope() {

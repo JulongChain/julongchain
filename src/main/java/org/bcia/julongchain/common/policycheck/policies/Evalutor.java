@@ -50,7 +50,7 @@ public class Evalutor implements IEvalutor{
     }
 
     @Override
-    public boolean evalutor(List<SignedData> signedDatas, Boolean[] used) throws PolicyException {
+    public boolean evaluate(List<SignedData> signedDatas, Boolean[] used) throws PolicyException {
         if(policy.getTypeCase().getNumber() == 2){
             Long grepKey = new Date().getTime();
             log.debug("[%s] gate [%s] evaluation starts",signedDatas,grepKey);
@@ -58,7 +58,7 @@ public class Evalutor implements IEvalutor{
             Boolean[] _used = new Boolean[used.length];
             for(int i = 0; i < policies.size(); i++){
                 System.arraycopy(used,0,_used,0,used.length);
-                if(policies.get(i).evalutor(signedDatas,_used)){
+                if(policies.get(i).evaluate(signedDatas,_used)){
                     verified++;
                     System.arraycopy(_used,0,used,0,used.length);
                 }

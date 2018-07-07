@@ -32,6 +32,7 @@ import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.TransactionPackage;
 import org.iq80.leveldb.DBIterator;
 
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -47,49 +48,66 @@ public class HistoryScanner implements IResultsIterator {
     /**
      * HistoryDB key头部 包含namespace, key
      */
-    private byte[] compositePartialKey = null;
-    private String nameSpace = null;
-    private String key = null;
-    private DBIterator dbIter = null;
-    private IBlockStore blockStore = null;
+    private byte[] compositePartialKey;
+    private String nameSpace;
+    private String key;
+    private DBIterator dbItr;
+    private IBlockStore blockStore;
     private long blockNum;
     private long tranNum;
+    private String ledgerID;
 
     public HistoryScanner(byte[] compositePartialKey,
                           String nameSpace,
                           String key,
-                          DBIterator dbIter,
-                          IBlockStore blockStore){
+                          DBIterator dbItr,
+                          IBlockStore blockStore,
+                          String ledgerID){
         this.compositePartialKey = compositePartialKey;
         this.nameSpace = nameSpace;
         this.key = key;
-        this.dbIter = dbIter;
+        this.dbItr = dbItr;
         this.blockStore = blockStore;
+        this.ledgerID = ledgerID;
     }
 
     @Override
     public QueryResult next() throws LedgerException {
-        if(!dbIter.hasNext()){
+        if(!dbItr.hasNext()){
             return null;
         }
-        Map.Entry<byte[], byte[]> entry = dbIter.next();
-        byte[] historyKey = entry.getKey();
+        Map.Entry<byte[], byte[]> entry = dbItr.next();
+        byte[] historyKey = HistoryDBHelper.removeLedgerIDFromHistoryKey(ledgerID, entry.getKey());
 
-        //key:ns~key~blockNo~tranNo
-        blockNum = HistoryDBHelper.splitCompositeHistoryKeyForBlockNum(historyKey, compositePartialKey.length);
-        tranNum = HistoryDBHelper.splitCompositeHistoryKeyForTranNum(historyKey, compositePartialKey.length);
+	    //key:ns~key~blockNo~tranNo
+        blockNum = HistoryDBHelper.splitCompositeHistoryKeyForBlockNum(historyKey);
+        tranNum = HistoryDBHelper.splitCompositeHistoryKeyForTranNum(historyKey);
         logger.debug(String.format("Found history record for namespace: %s, key: %s. BlockNum: %d, TranNum: %d", nameSpace, key, blockNum, tranNum));
 
         Common.Envelope tranEnvelope = blockStore.retrieveTxByBlockNumTranNum(blockNum, tranNum);
-        QueryResult queryResult = getKeyModificationFromTran(tranEnvelope, nameSpace, key);
-        logger.debug("Found history key value for namespace=[{}], key=[{}] from transaction=[{}]", nameSpace, key, ((KvQueryResult.KeyModification) queryResult.getObj()).getTxId());
+//        QueryResult queryResult = getKeyModificationFromTran(tranEnvelope, nameSpace, key);
+        QueryResult queryResult = getKvVersion(blockNum, tranNum);
+//        logger.debug("Found history key value for namespace=[{}], key=[{}] from transaction=[{}]", nameSpace, key, ((KvQueryResult.KeyModification) queryResult.getObj()).getTxId());
 
         return queryResult;
     }
 
     @Override
     public void close() throws LedgerException {
+	    try {
+		    dbItr.close();
+	    } catch (IOException e) {
+	    	logger.error("Got error when close dbItr");
+	    	throw new RuntimeException(e);
+	    }
+    }
 
+    private QueryResult getKvVersion(long blockNum, long tranNum){
+	    KvRwset.Version version = KvRwset.Version.newBuilder()
+			    .setBlockNum(blockNum)
+			    .setTxNum(tranNum)
+			    .build();
+	    return new QueryResult(version);
     }
 
     private QueryResult getKeyModificationFromTran(Common.Envelope envelope, String ns, String key) throws LedgerException {
@@ -103,7 +121,9 @@ public class HistoryScanner implements IResultsIterator {
             Timestamp timestamp = chdr.getTimestamp();
 
             TxRwSet txRwSet = new TxRwSet();
-            txRwSet.fromProtoBytes(respPayload.getResults());
+            if (respPayload != null) {
+                txRwSet.fromProtoBytes(respPayload.getResults());
+            }
             for (NsRwSet nsRwSet : txRwSet.getNsRwSets()) {
                 if(nameSpace.equals(nsRwSet.getNameSpace())){
                     for (KvRwset.KVWrite kvWrite : nsRwSet.getKvRwSet().getWritesList()) {
@@ -150,12 +170,12 @@ public class HistoryScanner implements IResultsIterator {
         this.key = key;
     }
 
-    public DBIterator getDbIter() {
-        return dbIter;
+    public DBIterator getDbItr() {
+        return dbItr;
     }
 
-    public void setDbIter(DBIterator dbIter) {
-        this.dbIter = dbIter;
+    public void setDbItr(DBIterator dbItr) {
+        this.dbItr = dbItr;
     }
 
     public IBlockStore getBlockStore() {
@@ -181,4 +201,12 @@ public class HistoryScanner implements IResultsIterator {
     public void setTranNum(long tranNum) {
         this.tranNum = tranNum;
     }
+
+	public String getLedgerID() {
+		return ledgerID;
+	}
+
+	public void setLedgerID(String ledgerID) {
+		this.ledgerID = ledgerID;
+	}
 }

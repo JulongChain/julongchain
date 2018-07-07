@@ -115,7 +115,7 @@ public class VSSC extends SystemSmartContractBase {
         try {
             envelope=ProtoUtils.getEnvelopeFromBlock(blockBytes);
         } catch (Exception e) {
-            newErrorResponse(String.format("VSSC error: GetEnvelope failed, err %s",e.getMessage()));
+            return newErrorResponse(String.format("VSSC error: GetEnvelope failed, err %s",e.getMessage()));
         }
 
         // ...and the payload...
@@ -124,7 +124,7 @@ public class VSSC extends SystemSmartContractBase {
         try {
             payload=ProtoUtils.getPayload(envelope);
         } catch (Exception e) {
-            newErrorResponse(String.format("VSSC error: GetPayload failed, err %s",e.getMessage()));
+            return newErrorResponse(String.format("VSSC error: GetPayload failed, err %s",e.getMessage()));
         }
 
         // get the policy

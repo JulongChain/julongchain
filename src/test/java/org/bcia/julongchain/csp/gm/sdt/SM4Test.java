@@ -46,10 +46,10 @@ public class SM4Test {
     }
 
     @Test
-    public void testSM4KeyGen() {
+    public void testSM4GenerateKey() {
         System.out.println("============ SM4 KeyGen test ============ ");
         try {
-            byte[] key = sm4.SM4KeyGen();
+            byte[] key = sm4.generateKey();
             if (null != key) {
                 System.out.println("[output data] key data : " + Convert.bytesToHexString(key));
             } else {
@@ -93,12 +93,12 @@ public class SM4Test {
                         if(len > 1024) {
                             len = 1024;
                         }
-                        byte[] randomData = jni.RandomGen(len);
+                        byte[] randomData = jni.randomGen(len);
                         System.arraycopy(randomData, 0, msg, msgLen-leftLen, len);
                         leftLen = leftLen - len;
                     }
                 } else {
-                    msg = jni.RandomGen(msgLen);
+                    msg = jni.randomGen(msgLen);
                 }
                 System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
                 byte[] ecbCipherData = sm4.encryptECB(msg, key);
