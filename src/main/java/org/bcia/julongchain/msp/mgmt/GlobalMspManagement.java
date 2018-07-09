@@ -200,11 +200,12 @@ public class GlobalMspManagement {
             String mspId = mspConfig.getNode().getLocalMspId();
             String mspType = mspConfig.getNode().getLocalMspType();
 
+            String defaultOpts = mspConfig.getNode().getCsp().getDefaultValue();
+
             CspOptsManager cspOptsManager = CspOptsManager.getInstance();
-            cspOptsManager.addAll(mspConfig.getNode().getCsp().getFactoryOpts());
+            cspOptsManager.addAll(defaultOpts, mspConfig.getNode().getCsp().getFactoryOpts());
             List<IFactoryOpts> optsList = cspOptsManager.getFactoryOptsList();
 
-            String defaultOpts = mspConfig.getNode().getCsp().getDefaultValue();
             GlobalMspManagement.loadLocalMspWithType(mspConfigDir, optsList, defaultOpts, mspId, mspType);
         } catch (Exception e) {
             log.error(e.getMessage(), e);

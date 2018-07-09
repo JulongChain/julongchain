@@ -37,9 +37,11 @@ public class CspOptsManager {
     private Map<String, IFactoryOpts> factoryOptsMap = new HashMap<>();
     private List<IFactoryOpts> factoryOptsList = new ArrayList<>();
 
+    private String defaultOpts;
+
     private static CspOptsManager instance;
 
-    private CspOptsManager(){
+    private CspOptsManager() {
     }
 
     public static CspOptsManager getInstance() {
@@ -75,7 +77,9 @@ public class CspOptsManager {
         factoryOptsList.add(factoryOpts);
     }
 
-    public void addAll(Map<String, Map<String, String>> optionsMap) {
+    public void addAll(String defaultOpts, Map<String, Map<String, String>> optionsMap) {
+        this.defaultOpts = defaultOpts;
+
         if (optionsMap != null && optionsMap.size() > 0) {
             Iterator<Map.Entry<String, Map<String, String>>> iterator = optionsMap.entrySet().iterator();
             while (iterator.hasNext()) {
@@ -87,6 +91,14 @@ public class CspOptsManager {
                 }
             }
         }
+    }
+
+    public String getDefaultOpts() {
+        return defaultOpts;
+    }
+
+    public IFactoryOpts getDefaultFactoryOpts() {
+        return factoryOptsMap.get(defaultOpts);
     }
 
     public IFactoryOpts getFactoryOpts(String providerName) {
