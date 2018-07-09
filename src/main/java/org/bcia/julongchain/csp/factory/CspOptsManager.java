@@ -37,6 +37,20 @@ public class CspOptsManager {
     private Map<String, IFactoryOpts> factoryOptsMap = new HashMap<>();
     private List<IFactoryOpts> factoryOptsList = new ArrayList<>();
 
+    private static CspOptsManager instance;
+
+    public static CspOptsManager getInstance() {
+        if (instance == null) {
+            synchronized (CspOptsManager.class) {
+                if (instance == null) {
+                    instance = new CspOptsManager();
+                }
+            }
+        }
+
+        return instance;
+    }
+
     public void addFactoryOpts(String name, Map<String, String> optionMap) throws ValidateException {
         IFactoryOpts factoryOpts = null;
 
