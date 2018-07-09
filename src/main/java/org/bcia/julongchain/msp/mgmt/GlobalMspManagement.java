@@ -200,7 +200,7 @@ public class GlobalMspManagement {
             String mspId = mspConfig.getNode().getLocalMspId();
             String mspType = mspConfig.getNode().getLocalMspType();
 
-            CspOptsManager cspOptsManager = new CspOptsManager();
+            CspOptsManager cspOptsManager = CspOptsManager.getInstance();
             cspOptsManager.addAll(mspConfig.getNode().getCsp().getFactoryOpts());
             List<IFactoryOpts> optsList = cspOptsManager.getFactoryOptsList();
 

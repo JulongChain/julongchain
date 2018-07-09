@@ -39,6 +39,9 @@ public class CspOptsManager {
 
     private static CspOptsManager instance;
 
+    private CspOptsManager(){
+    }
+
     public static CspOptsManager getInstance() {
         if (instance == null) {
             synchronized (CspOptsManager.class) {

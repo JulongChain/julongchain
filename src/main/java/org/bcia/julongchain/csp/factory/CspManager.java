@@ -109,7 +109,7 @@ public class CspManager {
                 log.error(e.getMessage(), e);
             }
 
-            CspOptsManager cspOptsManager = new CspOptsManager();
+            CspOptsManager cspOptsManager = CspOptsManager.getInstance();
             cspOptsManager.addAll(mspConfig.getNode().getCsp().getFactoryOpts());
 
             List<IFactoryOpts> optsList = cspOptsManager.getFactoryOptsList();
