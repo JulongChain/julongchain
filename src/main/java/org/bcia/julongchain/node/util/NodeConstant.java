@@ -24,7 +24,7 @@ package org.bcia.julongchain.node.util;
  */
 public class NodeConstant {
 	public static final String VERSION = "version";	
-	public static final String NODE = "server";
+	public static final String NODE = "node";
 	public static final String SMART_CONTRACT = "contract";
 	public static final String CLI_LOG = "logging";
 	public static final String GROUP = "group";
