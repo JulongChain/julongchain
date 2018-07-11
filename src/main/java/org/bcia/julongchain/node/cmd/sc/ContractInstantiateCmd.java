@@ -76,31 +76,31 @@ public class ContractInstantiateCmd extends AbstractNodeContractCmd {
         String consenter = null;
         if (cmd.hasOption(ARG_CONSENTER)) {
             consenter = cmd.getOptionValue(ARG_CONSENTER, defaultValue);
-            log.info("Consenter-----$" + consenter);
+            log.info("Consenter: " + consenter);
         }
 
         String groupId = null;
         if (cmd.hasOption(ARG_GROUP_ID)) {
             groupId = cmd.getOptionValue(ARG_GROUP_ID, defaultValue);
-            log.info("GroupId-----$" + groupId);
+            log.info("GroupId: " + groupId);
         }
 
         String scName = null;
         if (cmd.hasOption(ARG_SC_NAME)) {
             scName = cmd.getOptionValue(ARG_SC_NAME, defaultValue);
-            log.info("scName-----$" + scName);
+            log.info("ScName: " + scName);
         }
 
         String scVersion = null;
         if (cmd.hasOption(ARG_SC_VERSION)) {
             scVersion = cmd.getOptionValue(ARG_SC_VERSION, defaultValue);
-            log.info("scVersion-----$" + scVersion);
+            log.info("ScVersion: " + scVersion);
         }
 
         SmartContractPackage.SmartContractInput input = null;
         if (cmd.hasOption(ARG_CTOR)) {
             String ctor = cmd.getOptionValue(ARG_CTOR, defaultValue);
-            log.info("ctor-----$" + ctor);
+            log.info("Ctor: " + ctor);
             JSONObject ctorJson = JSONObject.parseObject(ctor);
 
             SmartContractPackage.SmartContractInput.Builder inputBuilder = SmartContractPackage.SmartContractInput.newBuilder();
@@ -113,14 +113,14 @@ public class ContractInstantiateCmd extends AbstractNodeContractCmd {
             input = inputBuilder.build();
             //打印一下参数，检查是否跟预期一致
             for (int i = 0; i < input.getArgsCount(); i++) {
-                log.info("input.getArg-----$" + input.getArgs(i).toStringUtf8());
+                log.info("Input.getArg: " + input.getArgs(i).toStringUtf8());
             }
         }
 
         String policy = null;
         if (cmd.hasOption(ARG_POLICY)) {
             policy = cmd.getOptionValue(ARG_POLICY, defaultValue);
-            log.info("policy-----$" + policy);
+            log.info("Policy: " + policy);
         }
 
         if (StringUtils.isBlank(groupId)) {

@@ -48,7 +48,7 @@ public class App {
 //        PolicyNode node = context.getBean(PolicyNode.class);
 //        PolicyNode node = SpringContext.getInstance().getBean(PolicyNode.class);
 
-        log.info("args-----$" + Arrays.toString(args));
+        log.info("Args: " + Arrays.toString(args));
         //开始解析执行命令行
         try {
             Node node = Node.getInstance();

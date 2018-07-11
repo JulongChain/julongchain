@@ -425,7 +425,7 @@ public class Endorser implements IEndorserServer {
     public Object[] callSmartContract(String groupId, String scName, String scVersion, String txId, ProposalPackage
             .SignedProposal signedProposal, ProposalPackage.Proposal proposal, SmartContractPackage
                                               .SmartContractInvocationSpec spec) throws NodeException {
-        log.info("begin callSmartContract-----" + scName);
+        log.info("Begin callSmartContract: " + scName);
 
         boolean isSysSmartContract = endorserSupport.isSysSmartContract(scName);
 

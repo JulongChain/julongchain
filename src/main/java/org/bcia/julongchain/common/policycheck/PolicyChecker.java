@@ -160,7 +160,7 @@ public class PolicyChecker implements IPolicyChecker{
         }
         IIdentity id = null;
         try {
-            log.info("signatureHeader.getCreator()-----$" + signatureHeader.getCreator());
+            log.info("SignatureHeader.getCreator(): " + signatureHeader.getCreator());
             id = localMSP.deserializeIdentity(signatureHeader.getCreator().toByteArray());//
         }catch (Exception e){
             String msg=String.format("Failed deserializing proposal creator during channelless check policy with policy [%s]:%s",policyName,e.getMessage());

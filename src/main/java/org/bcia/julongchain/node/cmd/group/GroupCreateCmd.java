@@ -65,19 +65,19 @@ public class GroupCreateCmd extends AbstractNodeGroupCmd {
         String consenter = null;
         if (cmd.hasOption(ARG_CONSENTER)) {
             consenter = cmd.getOptionValue(ARG_CONSENTER, defaultValue);
-            log.info("Consenter-----$" + consenter);
+            log.info("Consenter: " + consenter);
         }
 
         String groupId = null;
         if (cmd.hasOption(ARG_GROUP_ID)) {
             groupId = cmd.getOptionValue(ARG_GROUP_ID, defaultValue);
-            log.info("GroupId-----$" + groupId);
+            log.info("GroupId: " + groupId);
         }
 
         String groupConfigFile = null;
         if (cmd.hasOption(ARG_FILE_PATH)) {
             groupConfigFile = cmd.getOptionValue(ARG_FILE_PATH, defaultValue);
-            log.info("GroupId config File-----$" + groupConfigFile);
+            log.info("GroupId config File: " + groupConfigFile);
         }
 
         if (StringUtils.isBlank(groupId)) {

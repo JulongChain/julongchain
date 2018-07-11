@@ -77,25 +77,25 @@ public class ContractInstallCmd extends AbstractNodeContractCmd {
         String scName = null;
         if (cmd.hasOption(ARG_SC_NAME)) {
             scName = cmd.getOptionValue(ARG_SC_NAME, defaultValue);
-            log.info("Smart Contract Name-----$" + scName);
+            log.info("Smart Contract Name: " + scName);
         }
         //合约语言
         String scLanguage = null;
         if (cmd.hasOption(ARG_LANGUAGE)) {
             scLanguage = cmd.getOptionValue(ARG_LANGUAGE, defaultValue);
-            log.info("Smart Contract language-----$" + scLanguage);
+            log.info("Smart Contract language: " + scLanguage);
         }
         //合约版本
         String scVersion = null;
         if (cmd.hasOption(ARG_VERSION)) {
             scVersion = cmd.getOptionValue(ARG_VERSION, defaultValue);
-            log.info("Smart Contract version-----$" + scVersion);
+            log.info("Smart Contract version: " + scVersion);
         }
         //合约具体执行参数
         SmartContractPackage.SmartContractInput input = null;
         if (cmd.hasOption(ARG_SC_CTOR)) {
             String ctor = cmd.getOptionValue(ARG_SC_CTOR, defaultValue);
-            log.info("ctor-----$" + ctor);
+            log.info("Ctor: " + ctor);
             JSONObject ctorJson = JSONObject.parseObject(ctor);
 
             SmartContractPackage.SmartContractInput.Builder inputBuilder = SmartContractPackage.SmartContractInput.newBuilder();
@@ -108,7 +108,7 @@ public class ContractInstallCmd extends AbstractNodeContractCmd {
             input = inputBuilder.build();
             //打印一下参数，检查是否跟预期一致
             for (int i = 0; i < input.getArgsCount(); i++) {
-                log.info("input.getArg-----$" + input.getArgs(i).toStringUtf8());
+                log.info("Input.getArg: " + input.getArgs(i).toStringUtf8());
             }
         }
 
@@ -116,7 +116,7 @@ public class ContractInstallCmd extends AbstractNodeContractCmd {
         String scPath = null;
         if (cmd.hasOption(ARG_PATH)) {
             scPath = cmd.getOptionValue(ARG_PATH, defaultValue);
-            log.info("Smart Contract path-----$" + scPath);
+            log.info("Smart Contract path: " + scPath);
         }
 
         //TODO 待完成

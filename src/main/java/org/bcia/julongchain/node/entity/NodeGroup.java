@@ -107,7 +107,7 @@ public class NodeGroup {
         }
 
         Common.Envelope signedEnvelope = EnvelopeHelper.sanityCheckAndSignConfigTx(envelope, groupId, signer);
-        log.info("Begin to broadcast-----");
+        log.info("Begin to broadcast");
         IBroadcastClient broadcastClient = new BroadcastClient(host, port);
         broadcastClient.send(signedEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
             @Override
@@ -183,7 +183,7 @@ public class NodeGroup {
                         FileUtils.writeFileBytes(groupId + ".block", block.toByteArray());
 
                         File file = new File(groupId + ".block");
-                        log.info("file is generated2-----$" + file.getCanonicalPath());
+                        log.info("File is generated: " + file.getCanonicalPath());
                     } catch (IOException e) {
                         log.error(e.getMessage(), e);
                     }

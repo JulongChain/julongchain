@@ -88,9 +88,9 @@ public class NodeServer {
     }
 
     public void start(boolean devMode) throws NodeException {
-        log.info("node server start-----");
+        log.info("Node server start");
         if (devMode) {
-            log.info("start by devMode");
+            log.info("Start by devMode");
         }
 
         NodeConfig nodeConfig = NodeConfigFactory.getNodeConfig();

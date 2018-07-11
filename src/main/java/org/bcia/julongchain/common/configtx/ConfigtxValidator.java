@@ -97,7 +97,7 @@ public class ConfigtxValidator implements IConfigtxValidator {
         }
 
         if (ArrayUtils.contains(ILLEGAL_PATHS, path)) {
-            throw new ValidateException("path is not allowed-----$" + path);
+            throw new ValidateException("Path is not allowed: " + path);
         }
 
         if (!Pattern.matches(REGEX_CONFIG_ID, path)) {
@@ -191,8 +191,8 @@ public class ConfigtxValidator implements IConfigtxValidator {
                 ConfigComparable existingConfig = this.configComparableMap.get(key);
                 if (existingConfig == null) {
                     if (value.getVersion() != 0L) {
-                        log.error("configComparableMap has not this value-----$" + key);
-                        throw new ValidateException("configComparableMap has not this value-----$" + key);
+                        log.error("ConfigComparableMap has not this value: " + key);
+                        throw new ValidateException("ConfigComparableMap has not this value: " + key);
                     }
 
                     continue;
@@ -204,7 +204,7 @@ public class ConfigtxValidator implements IConfigtxValidator {
                 }
 
                 IPolicy policy = policyForItem(existingConfig);
-                ValidateUtils.isNotNull(policy, "policyForItem can not be null-----$" + key);
+                ValidateUtils.isNotNull(policy, "PolicyForItem can not be null: " + key);
 
 //                try {
 //                    policy.evaluate(signedDataList);
@@ -227,14 +227,14 @@ public class ConfigtxValidator implements IConfigtxValidator {
 
             IPolicyManager subPolicyManager = this.policyManager.getSubPolicyManager(newPaths);
             if (subPolicyManager == null) {
-                log.warn("Could not find subPolicyManager-----$" + newPaths);
+                log.warn("Could not find subPolicyManager: " + newPaths);
                 return null;
             }
 
             if (itemConfig.getT() instanceof Configtx.ConfigTree) {
                 subPolicyManager = this.policyManager.getSubPolicyManager(new String[]{itemConfig.getKey()});
                 if (subPolicyManager == null) {
-                    log.warn("Could not find subPolicyManager-----$" + itemConfig.getKey());
+                    log.warn("Could not find subPolicyManager: " + itemConfig.getKey());
                     return null;
                 }
             }
@@ -248,7 +248,7 @@ public class ConfigtxValidator implements IConfigtxValidator {
                                           Map<String, ConfigComparable> fullProposedConfig) throws ValidateException {
         for (String key : writeSet.keySet()) {
             if (!fullProposedConfig.containsKey(key)) {
-                throw new ValidateException("is not in fullProposedConfig-----$" + key);
+                throw new ValidateException("Is not in fullProposedConfig: " + key);
             }
         }
     }

@@ -72,25 +72,25 @@ public class ContractInvokeCmd extends AbstractNodeContractCmd {
         String consenter = null;
         if (cmd.hasOption(ARG_CONSENTER)) {
             consenter = cmd.getOptionValue(ARG_CONSENTER, defaultValue);
-            log.info("Consenter-----$" + consenter);
+            log.info("Consenter: " + consenter);
         }
         //群组信息
         String groupId = null;
         if (cmd.hasOption(ARG_GROUP_ID)) {
             groupId = cmd.getOptionValue(ARG_GROUP_ID, defaultValue);
-            log.info("GroupId-----$" + groupId);
+            log.info("GroupId: " + groupId);
         }
         //解析出合约名称
         String scName = null;
         if (cmd.hasOption(ARG_SC_NAME)) {
             scName = cmd.getOptionValue(ARG_SC_NAME, defaultValue);
-            log.info("Contract name-----$" + scName);
+            log.info("Contract name: " + scName);
         }
 
         SmartContractPackage.SmartContractInput input = null;
         if (cmd.hasOption(ARG_SC_CTOR)) {
             String ctor = cmd.getOptionValue(ARG_SC_CTOR, defaultValue);
-            log.info("ctor-----$" + ctor);
+            log.info("Ctor: " + ctor);
             JSONObject ctorJson = JSONObject.parseObject(ctor);
 
             SmartContractPackage.SmartContractInput.Builder inputBuilder = SmartContractPackage.SmartContractInput.newBuilder();
@@ -103,7 +103,7 @@ public class ContractInvokeCmd extends AbstractNodeContractCmd {
             input = inputBuilder.build();
             //打印一下参数，检查是否跟预期一致
             for (int i = 0; i < input.getArgsCount(); i++) {
-                log.info("input.getArg-----$" + input.getArgs(i).toStringUtf8());
+                log.info("Input.getArg: " + input.getArgs(i).toStringUtf8());
             }
         }
 
@@ -111,7 +111,7 @@ public class ContractInvokeCmd extends AbstractNodeContractCmd {
         String scLanguage = null;
         if (cmd.hasOption(ARG_LANGUAGE)) {
             scLanguage = cmd.getOptionValue(ARG_LANGUAGE, defaultValue);
-            log.info("Smart Contract language-----$" + scLanguage);
+            log.info("Smart Contract language: " + scLanguage);
         }
 
         //-----------------------------------校验入参--------------------------------//

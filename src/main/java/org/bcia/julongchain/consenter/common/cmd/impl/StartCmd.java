@@ -44,7 +44,7 @@ public class StartCmd implements IConsenterCmd {
     @Override
     public void execCmd(String[] args) throws ParseException {
         for (String str : args) {
-            log.info("arg-----$" + str);
+            log.info("Arg: " + str);
         }
         try {
             new Thread() {

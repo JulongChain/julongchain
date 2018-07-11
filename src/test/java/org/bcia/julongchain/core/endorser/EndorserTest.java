@@ -121,7 +121,7 @@ public class EndorserTest extends BaseJunit4Test {
         List<Query.GroupInfo> groupsList = groupQueryResponse.getGroupsList();
 
         for(Query.GroupInfo groupInfo: groupsList){
-            System.out.println("groupInfo-----" + groupInfo.getGroupId());
+            System.out.println("GroupInfo: " + groupInfo.getGroupId());
         };
     }
 }

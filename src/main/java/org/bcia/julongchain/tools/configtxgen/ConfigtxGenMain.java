@@ -54,7 +54,7 @@ public class ConfigtxGenMain {
         log.info("ConfigtxGen Command Start");
 
         if (args.length <= 0) {
-            log.warn("ConfigtxGen command need more args-----");
+            log.warn("ConfigtxGen command need more args");
             return null;
         }
 

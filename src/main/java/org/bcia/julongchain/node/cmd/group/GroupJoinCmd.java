@@ -54,7 +54,7 @@ public class GroupJoinCmd extends AbstractNodeGroupCmd {
         String blockPath = null;
         if (cmd.hasOption(ARG_BLOCK_PATH)) {
             blockPath = cmd.getOptionValue(ARG_BLOCK_PATH, defaultValue);
-            log.info("blockPath-----$" + blockPath);
+            log.info("BlockPath: " + blockPath);
         }
 
         if (StringUtils.isBlank(blockPath)) {

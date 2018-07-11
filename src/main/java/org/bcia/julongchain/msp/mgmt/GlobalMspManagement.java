@@ -193,7 +193,7 @@ public class GlobalMspManagement {
 
 
     public static void initLocalMsp() throws MspException {
-        log.info("Init LocalMsp-----");
+        log.info("Init LocalMsp");
         try {
             MspConfig mspConfig = loadMspConfig();
             String mspConfigDir = mspConfig.getNode().getMspConfigPath();
