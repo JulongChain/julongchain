@@ -165,34 +165,38 @@ public class NodeServer {
                         } catch (LedgerException e) {
                             log.error(e.getMessage(), e);
                         }
-                        log.info("all group：" + ledgerIds.toString());
-                        for (String ledgerId: ledgerIds) {
-                            log.info("start check group[" + ledgerId + "] new bolck");
-                            long blockHeight = 0l;
-                            try {
-                                blockHeight = LedgerManager.openLedger(ledgerId).getBlockchainInfo().getHeight();
-                                log.info("group[" + ledgerId + "] block height：" + blockHeight);
-                                if (blockHeight == 0l) {
-                                    log.info("block height is 0，exit");
-                                    continue;
-                                }
+                        if(ledgerIds == null || ledgerIds.size() <= 0) {
+                            log.info("The System has not group yet");
+                        }else{
+                            log.info("all group：" + ledgerIds.toString());
+                            for (String ledgerId : ledgerIds) {
+                                log.info("start check group[" + ledgerId + "] new bolck");
+                                long blockHeight = 0l;
+                                try {
+                                    blockHeight = LedgerManager.openLedger(ledgerId).getBlockchainInfo().getHeight();
+                                    log.info("group[" + ledgerId + "] block height：" + blockHeight);
+                                    if (blockHeight == 0L) {
+                                        log.info("block height is 0，exit");
+                                        continue;
+                                    }
 
-                                Common.Block block =
-                                        GossipServiceUtil.getData(gossipService, ledgerId, blockHeight);
-                                if (block == null) {
-                                    log.info("group[" + ledgerId + "]" + "no new block[" + blockHeight + "]");
-                                    continue;
+                                    Common.Block block =
+                                            GossipServiceUtil.getData(gossipService, ledgerId, blockHeight);
+                                    if (block == null) {
+                                        log.info("group[" + ledgerId + "]" + "no new block[" + blockHeight + "]");
+                                        continue;
+                                    }
+                                    log.info("new block delivered");
+                                    BlockAndPvtData blockAndPvtData = new BlockAndPvtData(block, null, null);
+                                    log.info("complete convert to Block file");
+                                    log.info("start save block file");
+                                    LedgerManager.openLedger(ledgerId).commitWithPvtData(blockAndPvtData);
+                                    log.info("completed save block file");
+                                } catch (LedgerException e) {
+                                    log.error(e.getMessage(), e);
+                                } catch (GossipException e) {
+                                    log.error(e.getMessage(), e);
                                 }
-                                log.info("new block delivered");
-                                BlockAndPvtData blockAndPvtData = new BlockAndPvtData(block, null, null);
-                                log.info("complete convert to Block file");
-                                log.info("start save block file");
-                                LedgerManager.openLedger(ledgerId).commitWithPvtData(blockAndPvtData);
-                                log.info("completed save block file");
-                            } catch (LedgerException e) {
-                                log.error(e.getMessage(), e);
-                            } catch (GossipException e) {
-                                log.error(e.getMessage(), e);
                             }
                         }
 
