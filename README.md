@@ -23,11 +23,14 @@ JDK版本为1.8。
 
 ##命令行支持
 
+启动Consenter服务  <br/>
+<i>  java -jar julongchain.jar consenter start  </i>
+
 启动Node服务  <br/>
-<i>  java -jar julongchain.jar server start  </i>
+<i>  java -jar julongchain.jar node start  </i>
 
 查询Node服务状态  <br/>
-<i>  java -jar julongchain.jar server status  </i>
+<i>  java -jar julongchain.jar node status  </i>
 
 创建群组  <br/>
 <i>  java -jar julongchain.jar group create -c 127.0.0.1:7050 -g myGroup  </i><br/>
