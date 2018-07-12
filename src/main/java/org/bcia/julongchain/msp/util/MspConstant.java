@@ -13,38 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.msp.entity;
-
-import org.bcia.julongchain.csp.intfs.IKey;
+package org.bcia.julongchain.msp.util;
 
 /**
+ * 类描述
+ *
  * @author zhangmingyang
- * @Date: 2018/3/15
+ * @date 2018/07/05
  * @company Dingxuan
  */
-public class CspKey implements IKey {
-    @Override
-    public byte[] toBytes() {
-        return new byte[0];
-    }
-
-    @Override
-    public byte[] ski() {
-        return new byte[0];
-    }
-
-    @Override
-    public boolean isSymmetric() {
-        return false;
-    }
-
-    @Override
-    public boolean isPrivate() {
-        return  false;
-    }
-
-    @Override
-    public IKey getPublicKey() {
-        return null;
-    }
+public class MspConstant {
+    public  final static String IDENTITY="Identity";
+    public final static String PUBLIC_KEY="publickey";
 }

@@ -58,13 +58,13 @@ public class CAuthDsl {
                 String msg=String.format("Principal deserialization failure  %s for [%s]",e.getMessage(),signedDatas.get(i).getIdentity());
                 throw new PolicyException(msg);
             }
-            String key = identity.identityIdentifier.getMspid()+identity.identityIdentifier.getId();
-            if(ids.get(key) != null){
-                log.warn("De-duplicating identity [%s] at index [%s] in signature set",signedDatas.get(i).getIdentity(),i);
-            }else{
-                result.add(signedDatas.get(i));
-                ids.put(key,null);
-            }
+//            String key = identity.identityIdentifier.Mspid+identity.identityIdentifier.Id;
+//            if(ids.get(key) != null){
+//                log.warn("De-duplicating identity [%s] at index [%s] in signature set",signedDatas.get(i).getIdentity(),i);
+//            }else{
+//                result.add(signedDatas.get(i));
+//                ids.put(key,null);
+//            }
         }
         return result;
     }

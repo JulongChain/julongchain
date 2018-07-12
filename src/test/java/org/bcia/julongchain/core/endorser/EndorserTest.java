@@ -104,7 +104,7 @@ public class EndorserTest extends BaseJunit4Test {
                 .GET_GROUPS, null);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
         byte[] nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
 
         String txId = ProposalUtils.computeProposalTxID(creator, nonce);

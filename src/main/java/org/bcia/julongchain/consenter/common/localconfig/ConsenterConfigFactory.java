@@ -52,5 +52,8 @@ public class ConsenterConfigFactory {
     public static void main(String[] args) {
         ConsenterConfig consenterConfig = loadConsenterConfig();
         System.out.println(consenterConfig.getKafka().getComumer().get("maxReads"));
+
+        String consenterAddress = ConsenterConfigFactory.loadConsenterConfig().getGeneral().getGossipAddress();
+        System.out.println(consenterAddress);
     }
 }

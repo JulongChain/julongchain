@@ -211,43 +211,40 @@ public class MspHelperTest {
     }
 
     private void setupMspConfig(String mspDir) throws IOException {
-        List<String> caCert = new ArrayList<>();
+        List<byte[]> caCert = new ArrayList<>();
         File caCertFile = new File(Paths.get(mspDir, "cacerts").toString());
         for (File file : Objects.requireNonNull(caCertFile.listFiles())) {
-            caCert.add(FileUtils.readFileToString(file, Charset.forName("UTF-8")));
+            caCert.add(FileUtils.readFileToByteArray(file));
         }
 
-        List<String> adminCert = new ArrayList<>();
+        List<byte[]> adminCert = new ArrayList<>();
         File adminCertFile = new File(Paths.get(mspDir, "admincerts").toString());
         for (File file : Objects.requireNonNull(adminCertFile.listFiles())) {
-            adminCert.add(FileUtils.readFileToString(file, Charset.forName("UTF-8")));
+            adminCert.add(FileUtils.readFileToByteArray(file));
         }
 
-        List<String> keyStore = new ArrayList<>();
+        List<byte[]> keyStore = new ArrayList<>();
         File keyStoreFile = new File(Paths.get(mspDir, "keystore").toString());
         for (File file : Objects.requireNonNull(keyStoreFile.listFiles())) {
-            keyStore.add(FileUtils.readFileToString(file, Charset.forName("UTF-8")));
+            keyStore.add(FileUtils.readFileToByteArray(file));
         }
 
-        List<String> tlsCaCert = new ArrayList<>();
+        List<byte[]> tlsCaCert = new ArrayList<>();
         File tlsCertFile = new File(Paths.get(mspDir, "tlscacerts").toString());
         for (File file : Objects.requireNonNull(tlsCertFile.listFiles())) {
-            tlsCaCert.add(FileUtils.readFileToString(file, Charset.forName("UTF-8")));
+            tlsCaCert.add(FileUtils.readFileToByteArray(file));
         }
 
-        List<String> configContent = new ArrayList<>();
-        File configFile = new File(Paths.get(mspDir, "config.yaml").toString());
-        configContent.add(FileUtils.readFileToString(configFile, Charset.forName("UTF-8")));
 
-        List<String> signCert = new ArrayList<>();
+        List<byte[]> signCert = new ArrayList<>();
         File signCertFile = new File(Paths.get(mspDir, "signcerts").toString());
         for (File file : Objects.requireNonNull(signCertFile.listFiles())) {
-            signCert.add(FileUtils.readFileToString(file, Charset.forName("UTF-8")));
+            signCert.add(FileUtils.readFileToByteArray(file));
         }
 
-        MspConfigPackage.MSPConfig mspConfig = MspConfigBuilder.buildMspConfig(
-                "testMsp", caCert, keyStore, signCert, adminCert, new ArrayList<>(), new ArrayList<>(), configContent, tlsCaCert, new ArrayList<>());
+        MspConfigPackage.MSPConfig.Builder mspConfig = MspConfigBuilder.mspConfigBuilder(
+                "testMsp", caCert, signCert, adminCert, new ArrayList<>(), new ArrayList<>(), tlsCaCert, new ArrayList<>(),new ArrayList<>());
         Msp msp = new Msp();
-        msp.setup(mspConfig);
+        msp.setup(mspConfig.build());
     }
 }

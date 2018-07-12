@@ -76,7 +76,7 @@ public class ESSCTest extends BaseJunit4Test {
             SmartContractPackage.SmartContractInvocationSpec invocationSpec = SmartContractPackage.SmartContractInvocationSpec.newBuilder().
                     setSmartContractSpec(smartContractSpec).build();
             ISigningIdentity sId = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
-            byte[] sIdBytes = sId.serialize();
+            byte[] sIdBytes = sId.getIdentity().serialize();
             byte[] nonce = MockCrypto.getRandomNonce();
             String txID=ProposalUtils.computeProposalTxID(sIdBytes, nonce);
             ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType.ENDORSER_TRANSACTION,

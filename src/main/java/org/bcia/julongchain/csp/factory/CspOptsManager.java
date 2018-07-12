@@ -34,8 +34,8 @@ import java.util.*;
 public class CspOptsManager {
     private static JavaChainLog log = JavaChainLogFactory.getLog(CspOptsManager.class);
 
-    private Map<String, IFactoryOpts> factoryOptsMap = new HashMap<>();
-    private List<IFactoryOpts> factoryOptsList = new ArrayList<>();
+    private  Map<String, IFactoryOpts> factoryOptsMap = new HashMap<>();
+    private  List<IFactoryOpts> factoryOptsList = new ArrayList<>();
 
     private String defaultOpts;
 

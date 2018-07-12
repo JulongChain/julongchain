@@ -20,7 +20,11 @@ import org.bcia.julongchain.csp.gm.dxct.GmFactoryOpts;
 import org.bcia.julongchain.msp.mspconfig.MspConfig;
 import org.bcia.julongchain.protos.msp.MspConfigPackage;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,24 +41,6 @@ public class MspConfigHelper {
 
     private static final String WINDOWS = "win";
 
-    /**
-     * 读取配置文件构建csp选项list
-     *
-     * @return
-     */
-    public static List<IFactoryOpts> buildFactoryOpts() {
-        List<IFactoryOpts> optsList = new ArrayList<IFactoryOpts>();
-        MspConfig mspConfig = null;
-        try {
-            mspConfig = loadMspConfig();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        GmFactoryOpts gmFactoryOpts=new GmFactoryOpts();
-        gmFactoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("gm"));
-        optsList.add(gmFactoryOpts);
-        return optsList;
-    }
 
     /**
      * 构建mspconfig
@@ -65,7 +51,7 @@ public class MspConfigHelper {
 
         //拼接文件路径
         String cacertDir = filePath(mspPath, LoadLocalMspFiles.CACERTS);
-        String keystoreDir = filePath(mspPath, LoadLocalMspFiles.KEYSTORE);
+        //TODO 密钥文件不装载
         String signcertDir = filePath(mspPath, LoadLocalMspFiles.SIGNCERTS);
         String admincertDir = filePath(mspPath, LoadLocalMspFiles.ADMINCERTS);
         String intermediatecertsDir = filePath(mspPath, LoadLocalMspFiles.INTERMEDIATECERTS);
@@ -74,22 +60,21 @@ public class MspConfigHelper {
         String tlscacertDir = filePath(mspPath, LoadLocalMspFiles.TLSCACERTS);
         String tlsintermediatecertsDir = filePath(mspPath, LoadLocalMspFiles.TLSINTERMEDIATECERTS);
 
-        //读取文件内容,获取文件夹中文件字符串列表
-        LoadLocalMspFiles loadLocalMspFiles = new LoadLocalMspFiles();
-        List<String> cacert = loadLocalMspFiles.getPemMaterialFromDir(cacertDir);
-        List<String> keystore = loadLocalMspFiles.getPemMaterialFromDir(keystoreDir);
-        List<String> signcert = loadLocalMspFiles.getPemMaterialFromDir(signcertDir);
-        List<String> admincert = loadLocalMspFiles.getPemMaterialFromDir(admincertDir);
-        List<String> intermediatecerts = loadLocalMspFiles.getPemMaterialFromDir(intermediatecertsDir);
-        List<String> crls = loadLocalMspFiles.getPemMaterialFromDir(crlsDir);
-        List<String> configFileContent = loadLocalMspFiles.getPemMaterialFromDir(configFile);
-        List<String> tlscacert = loadLocalMspFiles.getPemMaterialFromDir(tlscacertDir);
-        List<String> tlsintermediatecerts = loadLocalMspFiles.getPemMaterialFromDir(tlsintermediatecertsDir);
+        //原有fabric证书
+        LoadLocalMspFiles loadLocalMspFiles = new LoadLocalMspFiles();;
 
-        //构建mspconfig
-        MspConfigPackage.MSPConfig mspConfig = MspConfigBuilder.buildMspConfig(mspId,cacert, keystore, signcert,
-                admincert, intermediatecerts, crls, configFileContent, tlscacert, tlsintermediatecerts);
-        return mspConfig;
+        //国密证书部分
+        List<byte[]> caCerts=loadLocalMspFiles.getCertFromDir(cacertDir);
+        List<byte[]> signCerts=loadLocalMspFiles.getCertFromDir(signcertDir);
+        List<byte[]> adminCerts=loadLocalMspFiles.getCertFromDir(admincertDir);
+        List<byte[]> intermediateCerts=loadLocalMspFiles.getCertFromDir(intermediatecertsDir);
+        List<byte[]> CRLs=loadLocalMspFiles.getCertFromDir(crlsDir);
+        List<byte[]> configFileContents=loadLocalMspFiles.getCertFromDir(configFile);
+        List<byte[]> tlscaCerts=loadLocalMspFiles.getCertFromDir(tlscacertDir);
+        List<byte[]> tlsintermediateCerts=loadLocalMspFiles.getCertFromDir(tlsintermediatecertsDir);
+        MspConfigPackage.MSPConfig.Builder mspConfigBuilder=MspConfigBuilder.mspConfigBuilder(mspId,caCerts, signCerts,
+                adminCerts, intermediateCerts, CRLs, configFileContents, tlscaCerts, tlsintermediateCerts);
+        return mspConfigBuilder.build();
     }
 
 
@@ -106,7 +91,7 @@ public class MspConfigHelper {
         if (os.toLowerCase().startsWith(WINDOWS)) {
             absolutePath = prefixDir + "\\" + suffixDir;
         } else {
-            absolutePath = prefixDir + "//" + suffixDir;
+            absolutePath = prefixDir + "/" + suffixDir;
         }
         return absolutePath;
     }

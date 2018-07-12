@@ -35,6 +35,7 @@ import org.bcia.julongchain.consenter.consensus.IConsensusPlugin;
 import org.bcia.julongchain.consenter.consensus.singleton.Singleton;
 import org.bcia.julongchain.core.common.grpc.GrpcServerConfig;
 import org.bcia.julongchain.core.common.grpc.SecureOptions;
+import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.node.common.helper.ConfigTreeHelper;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
