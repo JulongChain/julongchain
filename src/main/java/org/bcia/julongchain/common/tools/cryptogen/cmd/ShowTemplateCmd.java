@@ -44,15 +44,15 @@ public class ShowTemplateCmd implements ICryptoGenCmd {
             "    domain: example.com\n" +
             "\n" +
             "    # ---------------------------------------------------------------------------\n" +
-            "    # \"specs\" - See PeerOrgs below for complete description\n" +
+            "    # \"specs\" - See NodeOrgs below for complete description\n" +
             "    # ---------------------------------------------------------------------------\n" +
             "    specs:\n" +
             "      - hostname: consenter\n" +
             "\n" +
             "# ---------------------------------------------------------------------------\n" +
-            "# \"peerOrgs\" - Definition of organizations managing peer nodes\n" +
+            "# \"nodeOrgs\" - Definition of organizations managing node nodes\n" +
             "# ---------------------------------------------------------------------------\n" +
-            "peerOrgs:\n" +
+            "nodeOrgs:\n" +
             "  # ---------------------------------------------------------------------------\n" +
             "  # Org1\n" +
             "  # ---------------------------------------------------------------------------\n" +
@@ -114,7 +114,7 @@ public class ShowTemplateCmd implements ICryptoGenCmd {
             "    # \"template\"\n" +
             "    # ---------------------------------------------------------------------------\n" +
             "    # Allows for the definition of 1 or more hosts that are created sequentially\n" +
-            "    # from a template. By default, this looks like \"peer%d\" from 0 to Count-1.\n" +
+            "    # from a template. By default, this looks like \"node%d\" from 0 to Count-1.\n" +
             "    # You may override the number of nodes (Count), the starting index (Start)\n" +
             "    # or the template used to construct the name (Hostname).\n" +
             "    #\n" +

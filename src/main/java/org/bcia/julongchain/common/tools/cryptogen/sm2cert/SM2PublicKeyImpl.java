@@ -61,6 +61,7 @@ public class SM2PublicKeyImpl extends X509Key implements ECPublicKey {
         this.decode(var1);
     }
 
+    @Override
     public String getAlgorithm() {
         return "SM2";
     }
@@ -96,6 +97,7 @@ public class SM2PublicKeyImpl extends X509Key implements ECPublicKey {
         }
     }
 
+    @Override
     public String toString() {
         return "Sun EC public key, " + this.params.getCurve().getField().getFieldSize() + " bits\n  public x coord: " + this.w.getAffineX() + "\n  public y coord: " + this.w.getAffineY() + "\n  parameters: " + this.params;
     }

@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.common.tools.cryptogen.sm2cert;
 
+import afu.org.checkerframework.checker.oigj.qual.O;
 import org.bcia.julongchain.common.tools.cryptogen.Util;
 import sun.security.util.DerOutputStream;
 import sun.security.util.ObjectIdentifier;
@@ -68,13 +69,14 @@ class SM2NamedCurve extends ECParameterSpec {
     }
 
     byte[] getEncoded() {
-        return (byte[])this.encoded.clone();
+        return this.encoded.clone();
     }
 
     String getObjectId() {
         return this.oid;
     }
 
+    @Override
     public String toString() {
         return this.name + " (" + this.oid + ")";
     }

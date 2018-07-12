@@ -48,7 +48,7 @@ public class MspHelperTest {
 
     private static final String testCAOrg = "example.com";
     private static final String testCAName = "ca" + "." + testCAOrg;
-    private static final String testName = "peer0";
+    private static final String testName = "node0";
     private static final String testCountry = "China";
     private static final String testProvince = "Guangdong";
     private static final String testLocality = "ShenZhen";
@@ -87,8 +87,8 @@ public class MspHelperTest {
         Assert.assertEquals(testLocality, X509CertificateUtil.getSubject(subjectDN).getLocality().get(0));
         Assert.assertEquals(testOrganizationUnit, X509CertificateUtil.getSubject(subjectDN).getOrganizationalUnit().get(0));
         Assert.assertEquals(testStreetAddress, X509CertificateUtil.getSubject(subjectDN).getStreetAddress().get(0));
-        // generate local MSP for nodeType=PEER
-        MspHelper.generateLocalMSP(testDir, testName, null, signCA, tlsCA, MspHelper.PEER, true);
+        // generate local MSP for nodeType=NODE
+        MspHelper.generateLocalMSP(testDir, testName, null, signCA, tlsCA, MspHelper.NODE, true);
         // check to see that the right files were generated/saved
         List<String> mspFiles = new ArrayList<>();
         mspFiles.add(Paths.get(mspDir, "admincerts", testName + "-cert.pem").toString());
@@ -198,8 +198,8 @@ public class MspHelperTest {
         assertTrue(configuration.getNodeOUs().getEnable());
         Assert.assertEquals(caFile, configuration.getNodeOUs().getClientOUIdentifier().getCertificate());
         Assert.assertEquals(MspHelper.CLIENT_OU, configuration.getNodeOUs().getClientOUIdentifier().getOrganizationalUnitIdentifier());
-        Assert.assertEquals(caFile, configuration.getNodeOUs().getPeerOUIdentifier().getCertificate());
-        Assert.assertEquals(MspHelper.PEER_OU, configuration.getNodeOUs().getPeerOUIdentifier().getOrganizationalUnitIdentifier());
+        Assert.assertEquals(caFile, configuration.getNodeOUs().getNodeOUIdentifier().getCertificate());
+        Assert.assertEquals(MspHelper.NODE_OU, configuration.getNodeOUs().getNodeOUIdentifier().getOrganizationalUnitIdentifier());
     }
 
     private void setupMspConfig(String mspDir) throws IOException {

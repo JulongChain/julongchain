@@ -220,7 +220,7 @@ public class CaHelperTest {
 
 
         // make sure ous are correctly set
-        String[] ous = new String[]{"TestOU", "PeerOU"};
+        String[] ous = new String[]{"TestOU", "NodeOU"};
         cert = rootCA.signCertificate(certDir,
                 testName,
                 ous,

@@ -46,9 +46,9 @@ public class Util {
 
     private static JavaChainLog log = JavaChainLogFactory.getLog(Util.class);
 
-    //copy the admin cert to each of the org's peer's or consenter's MSP admincerts
+    //copy the admin cert to each of the org's node's or consenter's MSP admincerts
     static void copyAllAdminCerts(String usersDir, String dstDir, String orgName, OrgSpec orgSpec, NodeSpec adminUser) {
-        String dir = dstDir.contains("peers") ? "peers" : "consenter";
+        String dir = dstDir.contains("nodes") ? "nodes" : "consenter";
         for (NodeSpec spec : orgSpec.getSpecs()) {
             try {
                 copyAdminCert(usersDir, Paths.get(dstDir, spec.getCommonName(), "msp", "admincerts").toString(), adminUser.getCommonName());
@@ -144,8 +144,8 @@ public class Util {
         spec.setSans(newSans);
 
         // Finally, process any remaining sans entries
-        for (String _san : originSans) {
-            String san = parseTemplate(_san, data);
+        for (String orgSan : originSans) {
+            String san = parseTemplate(orgSan, data);
             spec.getSans().add(san);
         }
     }
@@ -178,15 +178,15 @@ public class Util {
     }
 
 
-    static void generatePeerOrg(String baseDir, OrgSpec orgSpec) {
+    static void generateNodeOrg(String baseDir, OrgSpec orgSpec) {
         String orgName = orgSpec.getDomain();
         System.out.println(orgName);
         // generate CAs
-        String orgDir = Paths.get(baseDir, "peerOrganizations", orgName).toString();
+        String orgDir = Paths.get(baseDir, "nodeOrganizations", orgName).toString();
         String caDir = Paths.get(orgDir, "ca").toString();
         String tlsCADir = Paths.get(orgDir, "tlsca").toString();
         String mspDir = Paths.get(orgDir, "msp").toString();
-        String peerDir = Paths.get(orgDir, "peers").toString();
+        String nodeDir = Paths.get(orgDir, "nodes").toString();
         String userDir = Paths.get(orgDir, "users").toString();
         String adminCertDir = Paths.get(mspDir, "admincerts").toString();
 
@@ -207,7 +207,7 @@ public class Util {
             e.printStackTrace();
             System.exit(1);
         }
-        generateNodes(peerDir, orgSpec.getSpecs(), signCA, tlsCA, MspHelper.PEER, orgSpec.isEnableNodeOUs());
+        generateNodes(nodeDir, orgSpec.getSpecs(), signCA, tlsCA, MspHelper.NODE, orgSpec.isEnableNodeOUs());
 
         List<NodeSpec> users = new ArrayList<>();
         int count = orgSpec.getUsers().getCount();
@@ -232,14 +232,14 @@ public class Util {
 
             System.exit(1);
         }
-        copyAllAdminCerts(userDir, peerDir, orgName, orgSpec, adminUser);
+        copyAllAdminCerts(userDir, nodeDir, orgName, orgSpec, adminUser);
 
-        // copy the admin cert to each of the org's peer's MSP admincerts
+        // copy the admin cert to each of the org's node's MSP admincerts
         for (NodeSpec spec : orgSpec.getSpecs()) {
             try {
-                copyAdminCert(userDir, Paths.get(peerDir, spec.getCommonName(), "msp", "admincerts").toString(), adminUser.getCommonName());
+                copyAdminCert(userDir, Paths.get(nodeDir, spec.getCommonName(), "msp", "admincerts").toString(), adminUser.getCommonName());
             } catch (JavaChainException e) {
-                log.error("Error copying admin cert for org " + orgName + " peer " + spec.getCommonName());
+                log.error("Error copying admin cert for org " + orgName + " node " + spec.getCommonName());
                 log.error(e.getMessage());
                 System.exit(1);
             }

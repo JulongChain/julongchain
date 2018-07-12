@@ -46,13 +46,13 @@ public class Configuration {
         Map<String, Object> clientOUIdentifierMap = new HashMap<>();
         clientOUIdentifierMap.put("Certificate", nodeOUs.getClientOUIdentifier().getCertificate());
         clientOUIdentifierMap.put("OrganizationalUnitIdentifier", nodeOUs.getClientOUIdentifier().getOrganizationalUnitIdentifier());
-        Map<String, Object> peerOUIdentifierMap = new HashMap<>();
-        peerOUIdentifierMap.put("Certificate", nodeOUs.getPeerOUIdentifier().getCertificate());
-        peerOUIdentifierMap.put("OrganizationalUnitIdentifier", nodeOUs.getPeerOUIdentifier().getOrganizationalUnitIdentifier());
+        Map<String, Object> nodeOUIdentifierMap = new HashMap<>();
+        nodeOUIdentifierMap.put("Certificate", nodeOUs.getNodeOUIdentifier().getCertificate());
+        nodeOUIdentifierMap.put("OrganizationalUnitIdentifier", nodeOUs.getNodeOUIdentifier().getOrganizationalUnitIdentifier());
 
         nodeOUsMap.put("Enable", nodeOUs.getEnable());
         nodeOUsMap.put("ClientOUIdentifier", clientOUIdentifierMap);
-        nodeOUsMap.put("PeerOUIdentifier", peerOUIdentifierMap);
+        nodeOUsMap.put("NodeOUIdentifier", nodeOUIdentifierMap);
 
         map.put("NodeOUs", nodeOUsMap);
         return map;
@@ -70,10 +70,10 @@ public class Configuration {
         configuration.nodeOUs.getClientOUIdentifier().setCertificate(clientOUIdentifierMap.get("Certificate"));
         configuration.nodeOUs.getClientOUIdentifier().setOrganizationalUnitIdentifier(clientOUIdentifierMap.get("OrganizationalUnitIdentifier"));
 
-        configuration.nodeOUs.setPeerOUIdentifier(new OrgUnitIdentifiersConfig());
-        Map<String, String> peerOUIdentifierMap = (Map<String, String>) nodeOUsMap.get("PeerOUIdentifier");
-        configuration.nodeOUs.getPeerOUIdentifier().setCertificate(peerOUIdentifierMap.get("Certificate"));
-        configuration.nodeOUs.getPeerOUIdentifier().setOrganizationalUnitIdentifier(peerOUIdentifierMap.get("OrganizationalUnitIdentifier"));
+        configuration.nodeOUs.setNodeOUIdentifier(new OrgUnitIdentifiersConfig());
+        Map<String, String> nodeOUIdentifierMap = (Map<String, String>) nodeOUsMap.get("NodeOUIdentifier");
+        configuration.nodeOUs.getNodeOUIdentifier().setCertificate(nodeOUIdentifierMap.get("Certificate"));
+        configuration.nodeOUs.getNodeOUIdentifier().setOrganizationalUnitIdentifier(nodeOUIdentifierMap.get("OrganizationalUnitIdentifier"));
 
         return configuration;
     }

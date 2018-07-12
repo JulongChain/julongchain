@@ -27,7 +27,7 @@ public class Config {
 
     private List<OrgSpec> consenterOrgs;
 
-    private List<OrgSpec> peerOrgs;
+    private List<OrgSpec> nodeOrgs;
 
     public List<OrgSpec> getConsenterOrgs() {
         return consenterOrgs;
@@ -37,11 +37,11 @@ public class Config {
         this.consenterOrgs = consenterOrgs;
     }
 
-    public List<OrgSpec> getPeerOrgs() {
-        return peerOrgs;
+    public List<OrgSpec> getNodeOrgs() {
+        return nodeOrgs;
     }
 
-    public void setPeerOrgs(List<OrgSpec> peerOrgs) {
-        this.peerOrgs = peerOrgs;
+    public void setNodeOrgs(List<OrgSpec> nodeOrgs) {
+        this.nodeOrgs = nodeOrgs;
     }
 }

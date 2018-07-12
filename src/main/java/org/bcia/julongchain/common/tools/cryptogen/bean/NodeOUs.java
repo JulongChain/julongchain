@@ -23,7 +23,7 @@ package org.bcia.julongchain.common.tools.cryptogen.bean;
 public class NodeOUs {
     private boolean enable;
     private OrgUnitIdentifiersConfig clientOUIdentifier;
-    private OrgUnitIdentifiersConfig peerOUIdentifier;
+    private OrgUnitIdentifiersConfig nodeOUIdentifier;
 
     public NodeOUs() {
 
@@ -33,8 +33,8 @@ public class NodeOUs {
         return clientOUIdentifier;
     }
 
-    public OrgUnitIdentifiersConfig getPeerOUIdentifier() {
-        return peerOUIdentifier;
+    public OrgUnitIdentifiersConfig getNodeOUIdentifier() {
+        return nodeOUIdentifier;
     }
 
     public boolean getEnable() {
@@ -49,7 +49,7 @@ public class NodeOUs {
         this.enable = enable;
     }
 
-    public void setPeerOUIdentifier(OrgUnitIdentifiersConfig peerOUIdentifier) {
-        this.peerOUIdentifier = peerOUIdentifier;
+    public void setNodeOUIdentifier(OrgUnitIdentifiersConfig nodeOUIdentifier) {
+        this.nodeOUIdentifier = nodeOUIdentifier;
     }
 }

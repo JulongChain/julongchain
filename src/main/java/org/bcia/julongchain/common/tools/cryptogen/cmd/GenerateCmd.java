@@ -80,15 +80,15 @@ public class GenerateCmd implements ICryptoGenCmd {
             log.error(e.getMessage());
             System.exit(-1);
         }
-        for (OrgSpec orgSpec : config.getPeerOrgs()) {
+        for (OrgSpec orgSpec : config.getNodeOrgs()) {
             try {
-                renderOrgSpec(orgSpec, "peer");
+                renderOrgSpec(orgSpec, "node");
             } catch (JavaChainException e) {
-                log.error("Error processing peer configuration: " + e.getMessage());
+                log.error("Error processing node configuration: " + e.getMessage());
                 deleteAllFiles();
                 System.exit(-1);
             }
-            generatePeerOrg(outputDir, orgSpec);
+            generateNodeOrg(outputDir, orgSpec);
         }
         for (OrgSpec orgSpec : config.getConsenterOrgs()) {
             try {
