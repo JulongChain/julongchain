@@ -17,6 +17,7 @@ package org.bcia.julongchain.node.entity;
 
 import io.grpc.ManagedChannel;
 import io.grpc.netty.NettyChannelBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
@@ -132,7 +133,13 @@ public class NodeServer {
     }
 
     private void startGossipService() {
-        ManagedChannel managedChannel = NettyChannelBuilder.forAddress("127.0.0.1", 7050).usePlaintext().build();
+
+        String consenterAddress = NodeConfigFactory.getNodeConfig().getNode().getGossip().getConsenterAddress();
+        String[] split = StringUtils.split(consenterAddress, ":");
+        String host = split[0];
+        Integer port = Integer.parseInt(split[1]);
+
+        ManagedChannel managedChannel = NettyChannelBuilder.forAddress(host, port).usePlaintext().build();
         GossipClientStream gossipClientStream = new GossipClientStream(managedChannel);
         new Thread() {
             public void run() {
