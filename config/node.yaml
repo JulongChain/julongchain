@@ -132,7 +132,7 @@ node:
     gossip:
 
         commiterAddress: 127.0.0.1:7060
-        consenterAddress: 127.0.0.1:7070
+        consenterAddress: 127.0.0.1:7050
 
         # Bootstrap set to initialize gossip with.
         # This is a list of other nodes that this node reaches out to at startup.
