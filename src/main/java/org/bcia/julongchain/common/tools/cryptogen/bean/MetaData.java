@@ -19,6 +19,8 @@ package org.bcia.julongchain.common.tools.cryptogen.bean;
 import org.apache.commons.lang3.StringUtils;
 
 /**
+ * 获取辅助工具的版本信息
+ *
  * @author chenhao, yegangcheng
  * @date 2018/4/3
  * @company Excelsecu

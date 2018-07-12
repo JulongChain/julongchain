@@ -16,8 +16,7 @@
 package org.bcia.julongchain.common.tools.cryptogen;
 
 import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.tools.cryptogen.bean.KeySinger;
-import org.bcia.julongchain.common.tools.cryptogen.bean.MockKey;
+import org.bcia.julongchain.common.tools.cryptogen.utils.MockKey;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Rule;
@@ -35,6 +34,13 @@ import java.security.interfaces.ECPublicKey;
 import static org.junit.Assert.*;
 
 
+/**
+ * CspHelper 测试类
+ *
+ * @author chenhao, liuxifeng
+ * @date 2018/7/12
+ * @company Excelsecu
+ */
 public class CspHelperTest {
 
 
@@ -67,11 +73,9 @@ public class CspHelperTest {
     public void generatePrivateKey() throws JavaChainException {
         System.out.println(testDir);
         IKey priv = CspHelper.generatePrivateKey(testDir);
-        KeySinger keySinger = new KeySinger(priv, priv.getPublicKey());
 
         assertNotNull(priv);
         assertTrue(priv.isPrivate());
-        assertNotNull(keySinger);
         File pkFile = new File(Paths.get(testDir, Hex.toHexString(priv.ski()) + "_sk").toUri());
         assertTrue(pkFile.exists());
 

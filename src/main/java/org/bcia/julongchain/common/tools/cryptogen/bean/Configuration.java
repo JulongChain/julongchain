@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * MSP config.yaml 数据类
+ *
  * @author chenhao, yegangcheng
  * @date 2018/7/4
  * @company Excelsecu

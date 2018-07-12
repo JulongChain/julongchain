@@ -39,6 +39,8 @@ import java.util.Date;
 import java.util.Vector;
 
 /**
+ * cryptogen 工具类
+ *
  * @author chenhao, yegangcheng
  * @date 2018/4/9
  * @company Excelsecu
@@ -46,18 +48,18 @@ import java.util.Vector;
 @SuppressWarnings("WeakerAccess")
 public class Util {
 
-    public static final int extKeyUsageAny = 0;
-    public static final int extKeyUsageServerAuth = 1;
-    public static final int extKeyUsageClientAuth = 2;
-    public static final int extKeyUsageCodeSigning = 3;
-    public static final int extKeyUsageEmailProtection = 4;
-    public static final int extKeyUsageIPSECEndSystem = 5;
-    public static final int extKeyUsageIPSECTunnel = 6;
-    public static final int extKeyUsageIPSECUser = 7;
-    public static final int extKeyUsageTimeStamping = 8;
-    public static final int extKeyUsageOCSPSigning = 9;
-    public static final int extKeyUsageMicrosoftServerGatedCrypto = 10;
-    public static final int extKeyUsageNetscapeServerGatedCrypto = 11;
+    public static final int EXT_KEY_USAGE_ANY = 0;
+    public static final int EXT_KEY_USAGE_SERVER_AUTH = 1;
+    public static final int EXT_KEY_USAGE_CLIENT_AUTH = 2;
+    public static final int EXT_KEY_USAGE_CODE_SIGNING = 3;
+    public static final int EXT_KEY_USAGE_EMAIL_PROTECTION = 4;
+    public static final int EXT_KEY_USAGE_IPSEC_END_SYSTEM = 5;
+    public static final int EXT_KEY_USAGE_IPSEC_TUNNEL = 6;
+    public static final int EXT_KEY_USAGE_IPSEC_USER = 7;
+    public static final int EXT_KEY_USAGE_TIME_STAMPING = 8;
+    public static final int EXT_KEY_USAGE_OCSP_SIGNING = 9;
+    public static final int EXT_KEY_USAGE_MICROSOFT_SERVER_GATED_CRYPTO = 10;
+    public static final int EXT_KEY_USAGE_NETSCAPE_SERVER_GATED_CRYPTO = 11;
 
     public static void pemExport(String path, String pemType, byte[] bytes) throws JavaChainException {
 
@@ -155,40 +157,40 @@ public class Util {
         Vector<ObjectIdentifier> vKeyOid = new Vector<>();
         for (int index : eku) {
             switch (index) {
-                case extKeyUsageAny:
+                case EXT_KEY_USAGE_ANY:
                     vKeyOid.add(new ObjectIdentifier(new int[]{2, 5, 29, 37, 0}));
                     break;
-                case extKeyUsageServerAuth:
+                case EXT_KEY_USAGE_SERVER_AUTH:
                     vKeyOid.add(new ObjectIdentifier(new int[]{1, 3, 6, 1, 5, 5, 7, 3, 1}));
                     break;
-                case extKeyUsageClientAuth:
+                case EXT_KEY_USAGE_CLIENT_AUTH:
                     vKeyOid.add(new ObjectIdentifier(new int[]{1, 3, 6, 1, 5, 5, 7, 3, 2}));
                     break;
-                case extKeyUsageCodeSigning:
+                case EXT_KEY_USAGE_CODE_SIGNING:
                     vKeyOid.add(new ObjectIdentifier(new int[]{1, 3, 6, 1, 5, 5, 7, 3, 3}));
                     break;
-                case extKeyUsageEmailProtection:
+                case EXT_KEY_USAGE_EMAIL_PROTECTION:
                     vKeyOid.add(new ObjectIdentifier(new int[]{1, 3, 6, 1, 5, 5, 7, 3, 4}));
                     break;
-                case extKeyUsageIPSECEndSystem:
+                case EXT_KEY_USAGE_IPSEC_END_SYSTEM:
                     vKeyOid.add(new ObjectIdentifier(new int[]{1, 3, 6, 1, 5, 5, 7, 3, 5}));
                     break;
-                case extKeyUsageIPSECTunnel:
+                case EXT_KEY_USAGE_IPSEC_TUNNEL:
                     vKeyOid.add(new ObjectIdentifier(new int[]{1, 3, 6, 1, 5, 5, 7, 3, 6}));
                     break;
-                case extKeyUsageIPSECUser:
+                case EXT_KEY_USAGE_IPSEC_USER:
                     vKeyOid.add(new ObjectIdentifier(new int[]{1, 3, 6, 1, 5, 5, 7, 3, 7}));
                     break;
-                case extKeyUsageTimeStamping:
+                case EXT_KEY_USAGE_TIME_STAMPING:
                     vKeyOid.add(new ObjectIdentifier(new int[]{1, 3, 6, 1, 5, 5, 7, 3, 8}));
                     break;
-                case extKeyUsageOCSPSigning:
+                case EXT_KEY_USAGE_OCSP_SIGNING:
                     vKeyOid.add(new ObjectIdentifier(new int[]{1, 3, 6, 1, 5, 5, 7, 3, 9}));
                     break;
-                case extKeyUsageMicrosoftServerGatedCrypto:
+                case EXT_KEY_USAGE_MICROSOFT_SERVER_GATED_CRYPTO:
                     vKeyOid.add(new ObjectIdentifier(new int[]{1, 3, 6, 1, 4, 1, 311, 10, 3, 3}));
                     break;
-                case extKeyUsageNetscapeServerGatedCrypto:
+                case EXT_KEY_USAGE_NETSCAPE_SERVER_GATED_CRYPTO:
                     vKeyOid.add(new ObjectIdentifier(new int[]{2, 16, 840, 1, 113730, 4, 1}));
                     break;
                 default:

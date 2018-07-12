@@ -19,6 +19,7 @@ package org.bcia.julongchain.common.tools.cryptogen;
 import org.apache.commons.io.FileUtils;
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.tools.cryptogen.bean.Configuration;
+import org.bcia.julongchain.common.tools.cryptogen.utils.X509CertificateUtil;
 import org.bcia.julongchain.msp.mgmt.Msp;
 import org.bcia.julongchain.msp.util.MspConfigBuilder;
 import org.bcia.julongchain.protos.msp.MspConfigPackage;
@@ -44,6 +45,13 @@ import java.util.Objects;
 import static org.junit.Assert.*;
 
 
+/**
+ * MspHelper 测试类
+ *
+ * @author chenhao, liuxifeng
+ * @date 2018/7/12
+ * @company Excelsecu
+ */
 public class MspHelperTest {
 
     private static final String testCAOrg = "example.com";

@@ -39,6 +39,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
+ * CA 相关的密码材料生成
+ *
  * @author chenhao, yegangcheng
  * @date 2018/4/3
  * @company Excelsecu
@@ -151,7 +153,7 @@ public class CaHelper {
 
             return genCertificateSM2(baseDir, name, x509CertImpl, algorithmId, mSigner);
         } catch (Exception e) {
-            log.error("An error occurred on signCertificate: {}", e);
+            log.error("An error occurred on signCertificate:", e);
             throw new JavaChainException("An error occurred on signCertificate");
         }
     }
@@ -198,7 +200,7 @@ public class CaHelper {
 
             CertificateExtensions exts = new CertificateExtensions();
             exts.set("keyUsage", Util.parseKeyUsage(KeyUsage.digitalSignature | KeyUsage.keyCertSign | KeyUsage.keyEncipherment | KeyUsage.cRLSign));
-            exts.set("extendedKeyUsage", Util.parseExtendedKeyUsage(new int[]{Util.extKeyUsageAny}));
+            exts.set("extendedKeyUsage", Util.parseExtendedKeyUsage(new int[]{Util.EXT_KEY_USAGE_ANY}));
             x509CertInfo.set("extensions", exts);
 
             exts.set("SubjectKeyIdentifier", new SubjectKeyIdentifierExtension(privateKey.ski()));
@@ -248,11 +250,6 @@ public class CaHelper {
         if (streetAddress != null) {
             sb.append(",STREET=").append(streetAddress);
         }
-        /*
-        if (postalCode != null) {
-            sb.append(",2.5.4.17=").append(postalCode);
-        }
-        */
         try {
             x500Name = new X500Name(sb.toString());
         } catch (IOException e) {

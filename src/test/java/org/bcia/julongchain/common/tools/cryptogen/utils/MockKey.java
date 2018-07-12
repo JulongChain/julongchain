@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package org.bcia.julongchain.common.tools.cryptogen.bean;
+package org.bcia.julongchain.common.tools.cryptogen.utils;
 
 import org.bcia.julongchain.csp.intfs.IKey;
 
 /**
+ * 异常测试 IKey mock 类
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/13
  * @company Excelsecu

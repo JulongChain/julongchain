@@ -22,6 +22,8 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.tools.cryptogen.bean.MetaData;
 
 /**
+ * version 命令实现类
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/4
  * @company Excelsecu

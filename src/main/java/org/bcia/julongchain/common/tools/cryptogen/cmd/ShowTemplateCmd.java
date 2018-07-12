@@ -25,6 +25,8 @@ import java.io.IOException;
 import java.net.URL;
 
 /**
+ * showtemplate 命令实现类
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/4
  * @company Excelsecu
@@ -148,11 +150,11 @@ public class ShowTemplateCmd implements ICryptoGenCmd {
             "    users:\n" +
             "      count: 1";
 
-    static final String template;
+    static final String TEMPLATE;
 
     @Override
     public void execCmd(String[] args) {
-        System.out.println(template);
+        System.out.println(TEMPLATE);
     }
 
     static {
@@ -168,6 +170,6 @@ public class ShowTemplateCmd implements ICryptoGenCmd {
                 temp = DEFAULT_TEMPLATE;
             }
         }
-        template = temp;
+        TEMPLATE = temp;
     }
 }

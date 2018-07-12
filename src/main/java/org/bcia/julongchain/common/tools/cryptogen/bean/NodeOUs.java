@@ -16,6 +16,8 @@
 package org.bcia.julongchain.common.tools.cryptogen.bean;
 
 /**
+ * config.yaml 节点数据类
+ *
  * @author chenhao, yegangcheng
  * @date 2018/7/4
  * @company Excelsecu

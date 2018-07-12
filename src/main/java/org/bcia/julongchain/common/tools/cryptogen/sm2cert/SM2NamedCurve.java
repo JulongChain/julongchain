@@ -15,7 +15,6 @@
  */
 package org.bcia.julongchain.common.tools.cryptogen.sm2cert;
 
-import afu.org.checkerframework.checker.oigj.qual.O;
 import org.bcia.julongchain.common.tools.cryptogen.Util;
 import sun.security.util.DerOutputStream;
 import sun.security.util.ObjectIdentifier;
@@ -27,6 +26,8 @@ import java.security.spec.ECPoint;
 import java.security.spec.EllipticCurve;
 
 /**
+ * 实现 ECParameterSpec，加入 SM2 支持
+ *
  * @author chenhao
  * @date 2018/4/18
  * @company Excelsecu

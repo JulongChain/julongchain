@@ -18,6 +18,8 @@ package org.bcia.julongchain.common.tools.cryptogen.cmd;
 import org.bcia.julongchain.common.exception.JavaChainException;
 
 /**
+ * help 命令实现类
+ *
  * @author chenhao
  * @date 2018/5/21
  * @company Excelsecu

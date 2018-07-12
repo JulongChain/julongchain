@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 密码材料生成工具类
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/17
  * @company Excelsecu
@@ -336,7 +338,7 @@ public class Util {
         try {
             InputStream in;
             if (filePath == null) {
-                in = new ByteArrayInputStream(ShowTemplateCmd.template.getBytes());
+                in = new ByteArrayInputStream(ShowTemplateCmd.TEMPLATE.getBytes());
             } else {
                 in = new FileInputStream(new File(filePath));
             }

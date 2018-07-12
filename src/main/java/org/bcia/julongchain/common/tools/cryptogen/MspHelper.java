@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * MSP 相关密码材料生成
+ *
  * @author chenhao, yegangcheng
  * @date 2018/4/3
  * @company Excelsecu
@@ -126,7 +128,7 @@ public class MspHelper {
                 sans,
                 tlsPubKey,
                 KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
-                new int[]{Util.extKeyUsageServerAuth, Util.extKeyUsageClientAuth});
+                new int[]{Util.EXT_KEY_USAGE_SERVER_AUTH, Util.EXT_KEY_USAGE_CLIENT_AUTH});
 
         x509Export(Paths.get(tlsDir, "ca.crt").toString(), tlsCA.getSignCert());
 

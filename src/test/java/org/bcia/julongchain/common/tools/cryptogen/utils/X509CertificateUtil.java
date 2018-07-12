@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package org.bcia.julongchain.common.tools.cryptogen;
+package org.bcia.julongchain.common.tools.cryptogen.utils;
 
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.common.tools.cryptogen.bean.Subject;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * X509 证书测试辅助类
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/9
  * @company Excelsecu

@@ -19,6 +19,8 @@ package org.bcia.julongchain.common.tools.cryptogen.bean;
 import java.util.List;
 
 /**
+ * crypto-config.yaml 配置文件数据类
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/4
  * @company Excelsecu

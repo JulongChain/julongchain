@@ -17,6 +17,8 @@
 package org.bcia.julongchain.common.tools.cryptogen.cmd;
 
 /**
+ * 命令列表
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/16
  * @company Excelsecu

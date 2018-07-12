@@ -29,6 +29,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * 文件相关功能封装
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/9
  * @company Excelsecu

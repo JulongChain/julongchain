@@ -37,6 +37,8 @@ import java.util.List;
 import static org.bcia.julongchain.common.tools.cryptogen.cmd.Util.*;
 
 /**
+ * extend 命令实现类
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/4
  * @company Excelsecu

@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package org.bcia.julongchain.common.tools.cryptogen.bean;
+package org.bcia.julongchain.common.tools.cryptogen.utils;
 
 import java.util.List;
 
 /**
+ * 证书字段测试辅助类
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/11
  * @company Excelsecu
