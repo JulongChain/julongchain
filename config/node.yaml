@@ -74,7 +74,7 @@ node:
     # By default, it will listen on all network interfaces
     listenAddress: 0.0.0.0:7051
 
-    consenterAddress: 192.168.1.158:7050
+    consenterAddress: 0.0.0.0:7050
 
     # The endpoint this node uses to listen for inbound smartContract connections.
     # If this is commented-out, the listen address is selected to be
@@ -131,8 +131,8 @@ node:
     # Gossip related configuration
     gossip:
 
-        commiterAddress: 192.168.1.158:7060
-        consenterAddress: 192.168.1.158:7070
+        commiterAddress: 127.0.0.1:7060
+        consenterAddress: 127.0.0.1:7070
 
         # Bootstrap set to initialize gossip with.
         # This is a list of other nodes that this node reaches out to at startup.
