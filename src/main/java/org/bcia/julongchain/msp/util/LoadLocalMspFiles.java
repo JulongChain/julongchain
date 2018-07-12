@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 package org.bcia.julongchain.msp.util;
-
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.csp.gm.dxct.sm2.util.SM2KeyUtil;
-
+import org.bcia.julongchain.common.util.FileUtils;
+import org.bcia.julongchain.csp.gm.dxct.util.CryptoUtil;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,57 +60,14 @@ public class LoadLocalMspFiles {
     public static final String INTERMEDIATECERTS = "intermediatecerts";
     public static  final String CONFIGFILENAME="config.yaml";
 
-
     /**
-     * 遍历文件夹
-     *
+     *  从路经中获取证书内容集合
      * @param dir
+     * @return
      */
-    public void iteratorPath(String dir) {
-        or = new File(dir);
-        files = or.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.isFile()) {
-                    //文件名和文件路径放入map
-                    map.put(file.getName(), file.getAbsolutePath());
-                    pathName.add(file.getName());
-                } else if (file.isDirectory()) {
-                    iteratorPath(file.getAbsolutePath());
-                }
-            }
-        }
-    }
-
-    /**
-     * 初始化msp文件夹
-     *
-     * @param
-     */
-    public static void init(String mspPath) {
-        LoadLocalMspFiles configBuilder = new LoadLocalMspFiles();
-        configBuilder.iteratorPath(mspPath);
-        for (String list : configBuilder.pathName) {
-            log.info("文件路径:" + map.get(list));
-            try {
-                //文件绝对路径和文件内容放入mspMap
-                mspMap.put(map.get(list), SM2KeyUtil.readFile(map.get(list)));
-                mspMap.put(map.get(list), list);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    /**
-     * 获取密码材料内容
-     * @param dir  文件路径
-     * @return 字节数组list
-     */
-
-    public List<String>  getPemMaterialFromDir(String dir) {
+    public List<byte[]> getCertFromDir(String dir){
         String fileAbolutePath;
-        List<String> fileContent=new ArrayList<String>();
+        List<byte[]> fileContent=new ArrayList<>();
         or = new File(dir);
         files = or.listFiles();
         if (files != null) {
@@ -120,47 +76,44 @@ public class LoadLocalMspFiles {
             for(int i=0;i<files.length;i++){
                 if(files[i].isFile()){
                     fileAbolutePath =files[i].getAbsolutePath();
-                  //  System.out.println("文件的绝对路径："+fileAbolutePath);
                     try {
-                      String file=  SM2KeyUtil.readFile(fileAbolutePath);
-                      fileContent.add(file);
+                     byte[]  pemBytes= FileUtils.readFileBytes(fileAbolutePath);
+                        fileContent.add(pemBytes);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }else if(files[i].isDirectory()){
-                    getPemMaterialFromDir(files[i].getAbsolutePath());
-                }
-
-            }
-      }
-        return  fileContent;
-    }
-
-    /**
-     * 通过文件相对路径获取文件内容
-     * @param dir
-     */
-    public  void getFileContent(String dir){
-        String fileAbolutePath;
-        or = new File(dir);
-        files = or.listFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (file.isFile()) {
-                    fileAbolutePath =file.getAbsolutePath();
-                    log.info("文件的绝对路径："+fileAbolutePath);
-                    try {
-                        pemMap.put(file.getParent(),SM2KeyUtil.readFile(fileAbolutePath));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                } else if (file.isDirectory()) {
-                    getPemMaterialFromDir(file.getAbsolutePath());
+                    getCertFromDir(files[i].getAbsolutePath());
                 }
 
             }
         }
+        return  fileContent;
     }
 
+    public List<byte[]> getSkFromDir(String dir){
+        String fileAbolutePath;
+        List<byte[]> fileContent=new ArrayList<>();
+        or = new File(dir);
+        files = or.listFiles();
+        if (files != null) {
+
+
+            for(int i=0;i<files.length;i++){
+                if(files[i].isFile()){
+                    fileAbolutePath =files[i].getAbsolutePath();
+                    try {
+                        byte[]  pemBytes=CryptoUtil.readSkFile(fileAbolutePath);
+                        fileContent.add(pemBytes);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }else if(files[i].isDirectory()){
+                    getSkFromDir(files[i].getAbsolutePath());
+                }
+
+            }
+        }
+        return  fileContent;
+    }
 }

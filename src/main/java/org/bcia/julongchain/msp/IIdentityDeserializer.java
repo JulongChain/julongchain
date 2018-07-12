@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.msp;
 
+import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.protos.msp.Identities;
 
 /**

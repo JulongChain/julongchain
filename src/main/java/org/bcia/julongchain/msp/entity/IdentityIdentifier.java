@@ -21,8 +21,8 @@ package org.bcia.julongchain.msp.entity;
  * @company Dingxuan
  */
 public class IdentityIdentifier {
-    public String Mspid;
-    public String Id;
+    private String Mspid;
+    private String Id;
 
     public IdentityIdentifier(String mspid, String id) {
         Mspid = mspid;

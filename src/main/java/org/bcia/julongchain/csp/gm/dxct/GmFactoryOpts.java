@@ -33,27 +33,11 @@ public class GmFactoryOpts implements IGmFactoryOpts {
     private String asymmetricKeyType;
     private String hashType;
     private String signType;
-    private String publicKeyPath;
-    private String privateKeyPath;
-    private int secLevel;
-    private String hashFamily;
-    private boolean bEphemeral;
-    private boolean bDummyKeyStore;
     private String keyStorePath;
     private boolean bDefaultCsp;
 
     public GmFactoryOpts() {
     }
-
-    public GmFactoryOpts(String symmetricKeyType, String asymmetricKeyType, String hashType, String signType, String publicKeyPath, String privateKeyPath) {
-        this.symmetricKeyType = symmetricKeyType;
-        this.asymmetricKeyType = asymmetricKeyType;
-        this.hashType = hashType;
-        this.signType = signType;
-        this.publicKeyPath = publicKeyPath;
-        this.privateKeyPath = privateKeyPath;
-    }
-
     @Override
     public String getProviderName() {
         return PROVIDER_GM;
@@ -61,12 +45,12 @@ public class GmFactoryOpts implements IGmFactoryOpts {
 
     @Override
     public String getProviderDescription() {
-        return null;
+        return keyStorePath;
     }
 
     @Override
-    public boolean isDefaultCsp() {
-        return bDefaultCsp;
+    public String getKeyStore() {
+        return keyStorePath;
     }
 
     @Override
@@ -75,8 +59,7 @@ public class GmFactoryOpts implements IGmFactoryOpts {
         this.asymmetricKeyType = optMap.get("asymmetric");
         this.hashType = optMap.get("hash");
         this.signType = optMap.get("sign");
-        this.publicKeyPath = optMap.get("publicKeyStore");
-        this.privateKeyPath = optMap.get("privateKeyStore");
+        this.keyStorePath=optMap.get("KeyStore");
     }
 
     @Override
@@ -96,11 +79,27 @@ public class GmFactoryOpts implements IGmFactoryOpts {
 
     @Override
     public String getKeyStorePath() {
-        return null;
+        return keyStorePath;
     }
 
     @Override
     public boolean isDummyKeystore() {
         return bDefaultCsp;
+    }
+
+    public String getSymmetricKeyType() {
+        return symmetricKeyType;
+    }
+
+    public String getAsymmetricKeyType() {
+        return asymmetricKeyType;
+    }
+
+    public String getHashType() {
+        return hashType;
+    }
+
+    public String getSignType() {
+        return signType;
     }
 }

@@ -32,7 +32,7 @@ public class SdtGmCspFactory implements ICspFactory {
 
     @Override
     public String getName() {
-        return "SDTGM";
+        return "sdtgm";
     }
 
     @Override

@@ -16,6 +16,7 @@
 package org.bcia.julongchain.events.producer;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.exception.VerifyException;
 import org.bcia.julongchain.protos.node.EventsPackage;
@@ -31,7 +32,7 @@ import java.util.Date;
  */
 public interface IEventHandler {
     EventsPackage.Event handleMessage(EventsPackage.SignedEvent signedEvent) throws
-            InvalidProtocolBufferException, ValidateException, VerifyException;
+            InvalidProtocolBufferException, ValidateException, VerifyException, MspException;
 
     Date getSessionEndDate();
 

@@ -260,7 +260,7 @@ public class VSSCTest extends BaseJunit4Test {
                                                    setSmartContractSpec(spec).build();
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
 
         String groupID="testGroup";
         //创建Proposal

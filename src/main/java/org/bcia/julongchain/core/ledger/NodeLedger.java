@@ -142,7 +142,7 @@ public class NodeLedger implements INodeLedger {
 
     @Override
     public void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException {
-
+        throw new LedgerException("not implement");
     }
 
 }

@@ -15,57 +15,37 @@
  */
 package org.bcia.julongchain.msp;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.exception.VerifyException;
 import org.bcia.julongchain.msp.entity.IdentityIdentifier;
 import org.bcia.julongchain.msp.entity.OUIdentifier;
 import org.bcia.julongchain.protos.common.MspPrincipal;
 
+import java.io.IOException;
+import java.util.Date;
+
 /**
+ * 身份接口
  * @author zhangmingyang
  * @Date: 2018/3/8
  * @company Dingxuan
  */
 public interface IIdentity {
-    /**
-     * ExpiresAt() time.Time 未定义
-     */
-    /**
-     * 为定义该方法   定义实体类 IdentityIdentifier来实现  GetIdentifier() *IdentityIdentifier
-     */
 
-    /**
-     * 返回此实例的msp id
-     * @return
-     */
+    Date expireAt() throws MspException;
 
+    IdentityIdentifier getIdentifier();
 
+    String getMSPIdentifier();
 
-    IdentityIdentifier getMSPIdentifier();
+    void validate() throws MspException;
 
-     void validate();
+    OUIdentifier[] getOrganizationalUnits() throws MspException;
 
-     OUIdentifier[] getOrganizationalUnits();
+    void verify(byte[] msg, byte[] sig) throws VerifyException;
 
-    /**
-     * 使用此标识作为参考验证某个消息的签名
-     * @param msg
-     * @param sig
-     */
-     void verify(byte[] msg, byte[] sig) throws VerifyException;
+    byte[] serialize();
 
-    /**
-     * 将身份转换为字节
-     * @return
-     */
-     byte[] serialize();
-
-    /**
-     * SatisfiesPrincipal检查此实例是否匹配
-     在MSPPrincipal中提供的描述。 检查可能
-     涉及逐字节的比较（如果委托人是
-     序列化身份）或可能需要MSP验证
-     * @param principal
-     */
-     void satisfiesPrincipal(MspPrincipal.MSPPrincipal principal) throws MspException;
+    void satisfiesPrincipal(MspPrincipal.MSPPrincipal principal) throws MspException, IOException;
 }

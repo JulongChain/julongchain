@@ -15,48 +15,32 @@
  */
 package org.bcia.julongchain.csp.gm.dxct.sm2;
 
-import org.bcia.julongchain.csp.gm.dxct.sm2.util.SM2KeyUtil;
+import org.bcia.julongchain.csp.gm.dxct.sm3.SM3;
 import org.bcia.julongchain.csp.intfs.IKey;
-import org.bouncycastle.util.encoders.Base64;
-
-import java.io.FileNotFoundException;
-
-import static org.bcia.julongchain.msp.mspconfig.MspConfigFactory.loadMspConfig;
 
 /**
+ * 类描述
+ *
  * @author zhangmingyang
- * @Date: 2018/3/27
+ * @date 2018/07/06
  * @company Dingxuan
  */
-public class SM2KeyExport implements IKey {
-    public SM2 sm2;
-
-    public SM2KeyExport() {
-        sm2 = new SM2();
+public class Sm2PublicKeyImport implements IKey{
+    private byte[] publicKey;
+    private SM3 sm3;
+    public Sm2PublicKeyImport(byte[] publicKey) {
+        this.publicKey = publicKey;
+        this.sm3=new SM3();
     }
 
     @Override
     public byte[] toBytes() {
-        //根据路径获取私钥,路径可通过配置文件中读取
-        String privateKeyPath = "";
-        try {
-             privateKeyPath = loadMspConfig().getNode().getCsp().getFactoryOpts().get("gm").get("privateKeyStore");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        try {
-            String privateKeyStr = SM2KeyUtil.readFile(privateKeyPath);
-            byte[] privateKey = Base64.decode(privateKeyStr);
-            return privateKey;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+        return publicKey;
     }
 
     @Override
     public byte[] ski() {
-        return new byte[0];
+        return sm3.hash(publicKey);
     }
 
     @Override
@@ -66,11 +50,11 @@ public class SM2KeyExport implements IKey {
 
     @Override
     public boolean isPrivate() {
-        return true;
+        return false;
     }
 
     @Override
     public IKey getPublicKey() {
-        return new SM2PublicKeyExport();
+        return null;
     }
 }

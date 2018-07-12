@@ -15,7 +15,9 @@
  */
 package org.bcia.julongchain.msp.signer;
 
+import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.intfs.opts.ISignerOpts;
+import org.bouncycastle.crypto.CryptoException;
 
 /**
  * @author zhangmingyang
@@ -26,9 +28,6 @@ public interface ISigner {
 
     Object publicKey();
 
-    byte[] Sign(Reader reader,byte[] digest, ISignerOpts opts);
+    byte[] sign(IKey key, byte[] msgContent, ISignerOpts opts);
 
-    interface  Reader{
-        int Read(byte[] p);
-    }
 }

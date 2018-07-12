@@ -19,29 +19,21 @@ import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.intfs.opts.ISignerOpts;
+import org.bouncycastle.crypto.CryptoException;
 
 /**
  * @author zhangmingyang
  * @Date: 2018/4/18
  * @company Dingxuan
  */
-public class Signer implements ISigner {
-    public ICsp csp;
-    public IKey key;
-    public Object pk;
+public class NodeSigner implements ISigner {
+    private ICsp csp;
+    private IKey sk;
+    private IKey pk;
 
-    public Signer() {
-    }
-
-    public Signer(ICsp csp, IKey key, Object pk) {
+    public NodeSigner(ICsp csp, IKey sk) {
         this.csp = csp;
-        this.key = key;
-        this.pk = pk;
-    }
-
-    public  Signer newSigner(ICsp csp, IKey key){
-
-        return new Signer(csp,key,pk);
+        this.sk = sk;
     }
     @Override
     public Object publicKey() {
@@ -49,12 +41,24 @@ public class Signer implements ISigner {
     }
 
     @Override
-    public byte[] Sign(Reader reader, byte[] digest, ISignerOpts opts) {
+    public byte[] sign(IKey key, byte[] msgContent, ISignerOpts opts){
         try {
-            return this.csp.sign(this.key,digest,opts);
+            return this.csp.sign(this.sk,msgContent,opts);
         } catch (JavaChainException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public ICsp getCsp() {
+        return csp;
+    }
+
+    public IKey getSk() {
+        return sk;
+    }
+
+    public Object getPk() {
+        return pk;
     }
 }

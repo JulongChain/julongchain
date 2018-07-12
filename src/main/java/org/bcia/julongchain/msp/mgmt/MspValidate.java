@@ -13,28 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.csp.gm.dxct.sm2;
+package org.bcia.julongchain.msp.mgmt;
 
-import org.bcia.julongchain.csp.intfs.opts.IKeyImportOpts;
+import org.bcia.julongchain.common.exception.MspException;
+import org.bcia.julongchain.msp.IIdentity;
 
 /**
+ * 验证msp相关身份
+ *
  * @author zhangmingyang
- * @Date: 2018/5/7
+ * @date 2018/07/04
  * @company Dingxuan
  */
-public class SM2KeyImportOpts implements IKeyImportOpts{
-    private boolean isEphemeral;
-    public SM2KeyImportOpts(boolean isEphemeral) {
-    this.isEphemeral=isEphemeral;
+public class MspValidate {
+
+    public static void validateIdentity(Msp msp,IIdentity identity) throws MspException{
+
     }
 
-    @Override
-    public String getAlgorithm() {
-        return "SM2";
-    }
-
-    @Override
-    public boolean isEphemeral() {
-        return isEphemeral;
-    }
 }

@@ -67,7 +67,7 @@ public class NodeSmartContract {
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
 
         byte[] nonce = new byte[0];
         try {
@@ -105,7 +105,7 @@ public class NodeSmartContract {
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
 
         byte[] nonce = new byte[0];
         try {
@@ -184,11 +184,11 @@ public class NodeSmartContract {
 
     public void invoke(String ip, int port, String groupId, String scName, String scLanguage, SmartContractPackage
             .SmartContractInput input) throws NodeException {
-        SmartContractPackage.SmartContractInvocationSpec sciSpec = SpecHelper.buildInvocationSpec(scName, input.toByteArray());
+        SmartContractPackage.SmartContractInvocationSpec sciSpec = SpecHelper.buildInvocationSpec(scName, input);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
 
         byte[] nonce = new byte[0];
         try {
@@ -269,11 +269,11 @@ public class NodeSmartContract {
     }
 
     public void query(String groupId, String smartContractName, SmartContractPackage.SmartContractInput input) throws NodeException {
-        SmartContractPackage.SmartContractInvocationSpec spec = SpecHelper.buildInvocationSpec(smartContractName, input.toByteArray());
+        SmartContractPackage.SmartContractInvocationSpec spec = SpecHelper.buildInvocationSpec(smartContractName, input);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
 
         byte[] nonce = new byte[0];
         try {

@@ -33,6 +33,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.MspPrincipal;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -179,7 +180,11 @@ public class PolicyChecker implements IPolicyChecker{
         }
         //MspPrincipal.MSPPrincipal m = MspPrincipal.MSPPrincipal.newBuilder().build();
         try {
-            id.satisfiesPrincipal(principal);
+            try {
+                id.satisfiesPrincipal(principal);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }catch (MspException e){
             String msg=String.format("Satisfies Principal get error:%s",e.getMessage());
             throw new PolicyException(msg);
