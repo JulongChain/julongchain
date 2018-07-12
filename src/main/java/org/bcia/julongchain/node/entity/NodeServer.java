@@ -15,10 +15,8 @@
  */
 package org.bcia.julongchain.node.entity;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.gossip.manager.GossipManager;
-import org.bcia.julongchain.common.exception.GossipException;
-import org.bcia.julongchain.common.exception.LedgerException;
+import io.grpc.ManagedChannel;
+import io.grpc.netty.NettyChannelBuilder;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
@@ -29,8 +27,6 @@ import org.bcia.julongchain.common.util.SpringContext;
 import org.bcia.julongchain.core.admin.AdminServer;
 import org.bcia.julongchain.core.endorser.Endorser;
 import org.bcia.julongchain.core.events.DeliverEventsServer;
-import org.bcia.julongchain.core.ledger.BlockAndPvtData;
-import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.core.node.NodeConfig;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.core.node.grpc.EventGrpcServer;
@@ -39,13 +35,13 @@ import org.bcia.julongchain.core.ssc.ISystemSmartContractManager;
 import org.bcia.julongchain.core.ssc.SystemSmartContractManager;
 import org.bcia.julongchain.events.producer.EventHubServer;
 import org.bcia.julongchain.events.producer.EventsServerConfig;
-import org.bcia.julongchain.gossip.GossipServiceUtil;
+import org.bcia.julongchain.gossip.GossipClientStream;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.node.common.client.AdminClient;
 import org.bcia.julongchain.node.common.client.IAdminClient;
 import org.bcia.julongchain.node.util.NodeConstant;
-import org.bcia.julongchain.protos.common.Common;
+import org.bcia.julongchain.protos.gossip.Message;
 
 import java.io.File;
 import java.io.IOException;
@@ -123,12 +119,9 @@ public class NodeServer {
 
             @Override
             public void onGroupsReady(List<String> groupIds) {
-                // if (groupIds != null && groupIds.size() > 0) {
-                //     startGossipService(groupIds, nodeConfig);
-                // }
                 try {
                     startGossipService();
-                } catch (NodeException e) {
+                } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
             }
@@ -138,81 +131,14 @@ public class NodeServer {
         recordPid(nodeConfig);
     }
 
-    // 启动gossip，定时读取数据
-    private void startGossipService() throws NodeException {
-        //  查询群组
-        try {
-            List<String> ledgerIds = LedgerManager.getLedgerIDs();
-            if (CollectionUtils.isNotEmpty(ledgerIds)) {
-                node.setLedgerIds(ledgerIds);
+    private void startGossipService() {
+        ManagedChannel managedChannel = NettyChannelBuilder.forAddress("127.0.0.1", 7050).usePlaintext().build();
+        GossipClientStream gossipClientStream = new GossipClientStream(managedChannel);
+        new Thread() {
+            public void run() {
+                gossipClientStream.serialSend(Message.Envelope.newBuilder().build());
             }
-        } catch (LedgerException e) {
-            log.error(e.getMessage(), e);
-            throw new NodeException(e.getMessage(), e);
-        }
-
-        // 启动gossip
-        try {
-            GossipManager gossipService = GossipServiceUtil.startCommitterGossip();
-            new Thread() {
-                public void run() {
-                    while (true) {
-
-                        // 处理当前所有的群组
-                        List<String> ledgerIds = null;
-                        try {
-                            ledgerIds = LedgerManager.getLedgerIDs();
-                        } catch (LedgerException e) {
-                            log.error(e.getMessage(), e);
-                        }
-                        if(ledgerIds == null || ledgerIds.size() <= 0) {
-                            log.info("The System has not group yet");
-                        }else{
-                            log.info("all group：" + ledgerIds.toString());
-                            for (String ledgerId : ledgerIds) {
-                                log.info("start check group[" + ledgerId + "] new bolck");
-                                long blockHeight = 0l;
-                                try {
-                                    blockHeight = LedgerManager.openLedger(ledgerId).getBlockchainInfo().getHeight();
-                                    log.info("group[" + ledgerId + "] block height：" + blockHeight);
-                                    if (blockHeight == 0L) {
-                                        log.info("block height is 0，exit");
-                                        continue;
-                                    }
-
-                                    Common.Block block =
-                                            GossipServiceUtil.getData(gossipService, ledgerId, blockHeight);
-                                    if (block == null) {
-                                        log.info("group[" + ledgerId + "]" + "no new block[" + blockHeight + "]");
-                                        continue;
-                                    }
-                                    log.info("new block delivered");
-                                    BlockAndPvtData blockAndPvtData = new BlockAndPvtData(block, null, null);
-                                    log.info("complete convert to Block file");
-                                    log.info("start save block file");
-                                    LedgerManager.openLedger(ledgerId).commitWithPvtData(blockAndPvtData);
-                                    log.info("completed save block file");
-                                } catch (LedgerException e) {
-                                    log.error(e.getMessage(), e);
-                                } catch (GossipException e) {
-                                    log.error(e.getMessage(), e);
-                                }
-                            }
-                        }
-
-                        // 1s查询一次
-                        try {
-                            Thread.sleep(10000);
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-                    }
-                }
-            }.start();
-        } catch (GossipException e) {
-            log.error(e.getMessage(), e);
-            throw new NodeException(e.getMessage(), e);
-        }
+        }.start();
     }
 
     private void initSysSmartContracts() {

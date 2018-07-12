@@ -29,6 +29,7 @@ import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.consenter.common.broadcast.BroadCastHandler;
 import org.bcia.julongchain.consenter.common.multigroup.Registrar;
+import org.bcia.julongchain.gossip.GossipService;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 import org.bcia.julongchain.protos.consenter.AtomicBroadcastGrpc;
@@ -49,6 +50,7 @@ public class ConsenterServer {
     public void start() throws IOException {
         server = ServerBuilder.forPort(port)
                 .addService(new ConsenterServerImpl())
+                .addService(new GossipService())
                 .build()
                 .start();
         log.info("consenter service start, port: 7050");
