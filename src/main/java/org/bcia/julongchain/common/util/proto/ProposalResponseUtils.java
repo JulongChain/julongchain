@@ -140,9 +140,9 @@ public class ProposalResponseUtils {
             throw exception;
         }
 
-        byte[] endorser = signingIdentity.serialize();
+        byte[] endorser = signingIdentity.getIdentity().serialize();
         if (endorser == null || endorser.length == 0) {
-            String msg = String.format("Could not serialize the signing identity for %s", signingIdentity.getMSPIdentifier());
+            String msg = String.format("Could not serialize the signing identity for %s", signingIdentity.getIdentity().getMSPIdentifier());
             JavaChainException exception = new JavaChainException(msg);
             throw exception;
         }

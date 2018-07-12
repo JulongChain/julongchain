@@ -19,7 +19,7 @@ general:
     # Listen address: The IP on which to bind to listen.
     listenAddress: 127.0.0.1
 
-    gossipAddress: 127.0.0.1:7070
+    gossipAddress: 192.168.1.158:7070
 
     # Listen port: The port on which to bind to listen.
     listenPort: 7050

@@ -109,6 +109,7 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
 
 
 
+    @Override
     public void optFinalized() throws JavaChainException{
         try {
             p11.C_CloseSession(sessionhandle);
@@ -130,8 +131,8 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
     }
 
     @Override
-    public boolean isDefaultCsp() {
-        return false;
+    public String getKeyStore() {
+        return null;
     }
 
     @Override

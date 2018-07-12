@@ -241,7 +241,7 @@ public class NodeGroup {
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
 
         byte[] nonce = new byte[0];
         try {
@@ -308,7 +308,7 @@ public class NodeGroup {
                 .GET_GROUPS, null);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
 
         byte[] nonce = null;
         try {

@@ -27,6 +27,7 @@ import org.bcia.julongchain.csp.intfs.IHash;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.intfs.opts.*;
 import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.security.SecureRandom;
@@ -101,13 +102,21 @@ public class GmCsp implements ICsp {
             log.error("Invalid opts. It must not be nil.");
             throw new JavaChainException("Invalid opts. It must not be nil.");
         }
-        if (opts instanceof SM2KeyImportOpts) {
-            IKey sm2PrivateKey = new SM2PrivateKey(raw);
+        if (opts instanceof SM2PrivateKeyImportOpts) {
+            IKey sm2PrivateKey = new SM2KeyImport(raw,null);
             if (!opts.isEphemeral()) {
                 CryptoUtil.privateKeyFileGen(Hex.toHexString(sm2PrivateKey.ski()), sm2PrivateKey.toBytes());
             }
             return sm2PrivateKey;
         }
+        if(opts instanceof SM2PublicKeyImportOpts){
+            IKey sm2PublicKey = new SM2KeyImport(null,raw);
+            if (!opts.isEphemeral()) {
+                CryptoUtil.publicKeyFileGen(Hex.toHexString(sm2PublicKey.getPublicKey().ski()), sm2PublicKey.getPublicKey().toBytes());
+            }
+            return sm2PublicKey;
+        }
+
 
         return null;
     }
@@ -123,7 +132,6 @@ public class GmCsp implements ICsp {
             log.error("Invalid msg. Cannot be empty.");
             throw new JavaChainException("Invalid msg. Cannot be empty.");
         }
-
         byte[] results = sm3.hash(msg);
         return results;
     }
@@ -134,24 +142,24 @@ public class GmCsp implements ICsp {
     }
 
     @Override
-    public byte[] sign(IKey key, byte[] digest, ISignerOpts opts) throws JavaChainException {
+    public byte[] sign(IKey key, byte[] plaintext, ISignerOpts opts) throws JavaChainException {
         if (key == null) {
             log.error("Invalid Key. It must not be nil.");
             throw new JavaChainException("Invalid Key. It must not be nil.");
         }
-        if (digest.length == 0) {
-            log.error("Invalid digest. Cannot be empty.");
-            throw new JavaChainException("Invalid digest. Cannot be empty.");
+        if (plaintext.length == 0) {
+            log.error("Invalid content. Cannot be empty.");
+            throw new JavaChainException("Invalid content. Cannot be empty.");
         }
         if (opts instanceof SM2SignerOpts) {
             log.info("privateKey:" + Hex.toHexString(key.toBytes()));
-            return sm2.sign(key.toBytes(), digest);
+            return sm2.sign(key.toBytes(), plaintext);
         }
         return null;
     }
 
     @Override
-    public boolean verify(IKey key, byte[] signature, byte[] digest, ISignerOpts opts) throws JavaChainException {
+    public boolean verify(IKey key, byte[] signature, byte[] plaintext, ISignerOpts opts) throws JavaChainException {
         boolean verify = false;
         if (key == null) {
             log.error("Invalid Key. It must not be nil.");
@@ -162,7 +170,7 @@ public class GmCsp implements ICsp {
             throw new JavaChainException("Invalid signature. It must not be nil.");
         }
         if (opts instanceof SM2SignerOpts) {
-            verify = sm2.verify(key.getPublicKey().toBytes(), signature, digest);
+            verify = sm2.verify(key.getPublicKey().toBytes(), signature, plaintext);
         }
         return verify;
     }

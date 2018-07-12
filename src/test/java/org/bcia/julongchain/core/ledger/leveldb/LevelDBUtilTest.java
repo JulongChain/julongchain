@@ -73,7 +73,7 @@ public class LevelDBUtilTest {
       // LevelDB db = LevelDBUtil.getDB("/var/julongchain/stateLeveldb");
       LevelDB db =
           LevelDBUtil.getDB(
-              "/root/e2e_cli/peer0.org0/hyperledger/production/ledgersData/chains/index");
+              "/var/julongchain/production/node/chains/chains/myGroup");
       // byte[] bytes = LevelDBUtil.get(db, "aaa".getBytes(), false);
        // System.out.println(new String(bytes));
 

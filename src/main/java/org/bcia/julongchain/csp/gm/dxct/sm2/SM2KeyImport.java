@@ -23,12 +23,23 @@ import org.bcia.julongchain.csp.intfs.IKey;
  * @Date: 2018/5/4
  * @company Dingxuan
  */
-public class SM2PrivateKey implements IKey {
+public class SM2KeyImport implements IKey {
     private byte[] privateKey;
+    private byte[] publicKey;
     private SM3 sm3;
-    public SM2PrivateKey(Object privateKey) {
-        this.privateKey= (byte[]) privateKey;
-        sm3=new SM3();
+
+    public SM2KeyImport(Object privateKey, Object publicKey) {
+        if (privateKey == null) {
+            this.privateKey = null;
+        } else {
+            this.privateKey = (byte[]) privateKey;
+        }
+        if (publicKey == null) {
+            this.publicKey = null;
+        } else {
+            this.publicKey = (byte[]) publicKey;
+        }
+        sm3 = new SM3();
     }
 
     @Override
@@ -53,6 +64,6 @@ public class SM2PrivateKey implements IKey {
 
     @Override
     public IKey getPublicKey() {
-        return null;
+        return new Sm2PublicKeyImport(publicKey);
     }
 }

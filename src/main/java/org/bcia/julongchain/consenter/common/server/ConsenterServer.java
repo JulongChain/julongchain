@@ -112,7 +112,6 @@ public class ConsenterServer {
 
                 @Override
                 public void onNext(Common.Envelope envelope) {
-
                     try {
                         broadCastHandle.handle(envelope, responseObserver);
                     } catch (IOException e) {

@@ -84,9 +84,6 @@ public class SM2 {
         ECPublicKeyParameters ecpub = (ECPublicKeyParameters) kp.getPublic();
         BigInteger privateKey = ecpriv.getD();
         ECPoint publicKey = ecpub.getQ();
-        log.info("publicKey: " + Hex.toHexString(publicKey.getEncoded(false)));
-        log.info("privateKey: " + Hex.toHexString(privateKey.toByteArray()));
-
         return new SM2KeyPair(publicKey.getEncoded(false), privateKey.toByteArray());
     }
 

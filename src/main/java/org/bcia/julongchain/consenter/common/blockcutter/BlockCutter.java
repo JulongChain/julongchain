@@ -87,7 +87,7 @@ public class BlockCutter implements IReceiver {
 
     @Override
     public Common.Envelope[] cut() {
-        log.info("this is blockCutter'cut method!!");
+        log.info("This Block is cutting.....");
         Common.Envelope[] batch = pendingBatch;
         this.pendingBatch = null;
         this.pendingBatchSizeBytes = 0;

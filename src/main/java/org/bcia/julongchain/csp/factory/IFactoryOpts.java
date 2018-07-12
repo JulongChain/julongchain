@@ -53,8 +53,11 @@ public interface IFactoryOpts {
 
     String getProviderDescription();
 
-    boolean isDefaultCsp();
-
+    /**
+     *返回私钥路经
+     * @return
+     */
+    String getKeyStore();
     /**
      * 从Map中转化数据
      *

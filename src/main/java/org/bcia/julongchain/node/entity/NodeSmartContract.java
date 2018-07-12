@@ -67,7 +67,7 @@ public class NodeSmartContract {
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
 
         byte[] nonce = new byte[0];
         try {
@@ -105,7 +105,7 @@ public class NodeSmartContract {
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
 
         byte[] nonce = new byte[0];
         try {
@@ -188,7 +188,7 @@ public class NodeSmartContract {
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
 
         byte[] nonce = new byte[0];
         try {
@@ -273,7 +273,7 @@ public class NodeSmartContract {
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
 
         byte[] nonce = new byte[0];
         try {

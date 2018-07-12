@@ -22,7 +22,7 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.tools.cryptogen.sm2cert.SM2PublicKeyImpl;
 import org.bcia.julongchain.csp.factory.CspManager;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2KeyGenOpts;
-import org.bcia.julongchain.csp.gm.dxct.sm2.SM2KeyImportOpts;
+import org.bcia.julongchain.csp.gm.dxct.sm2.SM2PrivateKeyImportOpts;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2PublicKey;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IKey;
@@ -44,15 +44,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * CSP 相关功能封装
- *
  * @author chenhao, yegangcheng
  * @date 2018/4/3
  * @company Excelsecu
  */
 public class CspHelper {
     private static JavaChainLog log = JavaChainLogFactory.getLog(CspHelper.class);
-    private static final ICsp CSP = getCsp();
+    private static final ICsp csp = getCsp();
 
     static {
         try {
@@ -60,6 +58,24 @@ public class CspHelper {
         } catch (MspException e) {
             log.error(e.getMessage(), e);
         }
+
+//        List<IFactoryOpts> list = new ArrayList<>();
+//        IFactoryOpts opts = new GmFactoryOpts() {
+//            @Override
+//            public boolean isDefaultCsp() {
+//                return true;
+//            }
+//        };
+//        try {
+//            MspConfig mspConfig = MspConfigFactory.loadMspConfig();
+//            GmFactoryOpts factoryOpts=new GmFactoryOpts();
+//            factoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("gm"));
+//            list.add(factoryOpts);
+//        } catch (FileNotFoundException e) {
+//            log.error(e.getMessage());
+//        }
+//        list.add(opts);
+//        CspManager.initCspFactories(list);
     }
 
     public static ICsp getCsp() {
@@ -86,7 +102,7 @@ public class CspHelper {
                 byte[] encodedData = pemObject.getContent();
                 List<Object> list = decodePrivateKeyPKCS8(encodedData);
                 Object rawKey = list.get(1);
-                return CSP.keyImport(rawKey, new SM2KeyImportOpts(true));
+                return csp.keyImport(rawKey, new SM2PrivateKeyImportOpts(true));
             } catch (Exception e) {
                 log.error("An error occurred on loadPrivateKey: {}", e.getMessage());
             }
@@ -136,7 +152,7 @@ public class CspHelper {
     public static IKey generatePrivateKey(String keystorePath) throws JavaChainException {
 
         try {
-            IKey priv = CSP.keyGen(new SM2KeyGenOpts() {
+            IKey priv = csp.keyGen(new SM2KeyGenOpts() {
                 @Override
                 public boolean isEphemeral() {
                     return true;

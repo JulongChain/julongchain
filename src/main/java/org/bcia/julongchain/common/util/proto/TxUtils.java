@@ -47,7 +47,7 @@ public class TxUtils {
             SmartContractPackage.SmartContractSpec spec
     ) throws JavaChainException {
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
         SmartContractPackage.SmartContractInvocationSpec invocationSpec=SmartContractPackage.SmartContractInvocationSpec.newBuilder().build();
         ProposalPackage.Proposal proposal = ProposalUtils.createSmartcontractProposalWithTransient(Common.HeaderType.ENDORSER_TRANSACTION,
                 groupID,invocationSpec,creator,null);

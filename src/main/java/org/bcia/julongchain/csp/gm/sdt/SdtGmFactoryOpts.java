@@ -67,8 +67,8 @@ public class SdtGmFactoryOpts implements ISdtGmFactoryOpts {
     }
 
     @Override
-    public boolean isDefaultCsp() {
-        return bDefaultCsp;
+    public String getKeyStore() {
+        return null;
     }
 
     @Override
