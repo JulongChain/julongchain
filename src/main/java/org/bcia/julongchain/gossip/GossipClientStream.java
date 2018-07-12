@@ -34,7 +34,6 @@ public class GossipClientStream implements StreamObserver<Message.Envelope> {
 
     public synchronized void serialSend(Message.Envelope envelope) {
         try {
-            log.info("==================== serial send");
             this.streamObserver.onNext(envelope);
         } catch (Exception e) {
             throw new RuntimeException(String.format("Error sending %s: %s", envelope.getPayload(), e));
@@ -43,7 +42,6 @@ public class GossipClientStream implements StreamObserver<Message.Envelope> {
 
     @Override
     public void onNext(Message.Envelope envelope) {
-        log.info("====================gossip client receive");
 
         if (envelope == null) {
             return;
@@ -116,16 +114,4 @@ public class GossipClientStream implements StreamObserver<Message.Envelope> {
         log.info("completed");
     }
 
-    public static void main(String[] args) {
-        ManagedChannel managedChannel = NettyChannelBuilder.forAddress("127.0.0.1", 7050).usePlaintext().build();
-        GossipClientStream gossipClientStream = new GossipClientStream(managedChannel);
-        new Thread() {
-            public void run() {
-                gossipClientStream.serialSend(Message.Envelope.newBuilder().build());
-                log.info("===============================start ===================");
-                while (true) {
-                }
-            }
-        }.start();
-    }
 }
