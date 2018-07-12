@@ -17,8 +17,11 @@ package org.bcia.julongchain.msp.config;
 
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.util.CommConstant;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -32,12 +35,12 @@ import java.io.InputStream;
 public class ConfigFactory {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ConfigFactory.class);
 
-    public static Config loadConfig(){
+    public static Config loadConfig() throws FileNotFoundException {
         Yaml yaml = new Yaml();
 
         InputStream is = null;
         try {
-            is = ConfigFactory.class.getClassLoader().getResourceAsStream(Config.Config_FILE_PATH);
+            is = new FileInputStream(CommConstant.CONFIG_DIR_PREFIX + Config.Config_FILE_PATH);
             Config config = yaml.loadAs(is, Config.class);
             return config;
         } finally {
@@ -51,7 +54,7 @@ public class ConfigFactory {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
         Config config=ConfigFactory.loadConfig();
         System.out.println(config.getOrganizationalUnitIdentifiers().get("certificate"));
     }
