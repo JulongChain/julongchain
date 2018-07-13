@@ -180,8 +180,8 @@ public class NodeSmartContract {
 
     }
 
-    public void invoke(String ip, int port, String groupId, String scName, String scLanguage, SmartContractPackage
-            .SmartContractInput input) throws NodeException {
+    public void invoke(String nodeHost, int nodePort, String consenterHost, int consenterPort, String groupId,
+                       String scName, SmartContractPackage.SmartContractInput input) throws NodeException {
         SmartContractPackage.SmartContractInvocationSpec sciSpec = SpecHelper.buildInvocationSpec(scName, input);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
@@ -210,25 +210,16 @@ public class NodeSmartContract {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //背书
-//        EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
-        EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
+        EndorserClient client = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
-
-//        //envelop V0.25
-//        BroadCastClient broadCastClient = new BroadCastClient();
-//        try {
-//            broadCastClient.send(ip, port, Common.Envelope.newBuilder().build(), (StreamObserver<Ab.BroadcastResponse>) this);
-//        } catch (Exception e) {
-//            log.error(e.getMessage(), e);
-//        }
 
         try {
             Common.Envelope signedTxEnvelope = EnvelopeHelper.createSignedTxEnvelope(proposal, identity, proposalResponse);
 
-            EnvelopeVO envelopeVO = new EnvelopeVO();
-            envelopeVO.parseFrom(signedTxEnvelope);
+//            EnvelopeVO envelopeVO = new EnvelopeVO();
+//            envelopeVO.parseFrom(signedTxEnvelope);
 
-            IBroadcastClient broadcastClient = new BroadcastClient(ip, port);
+            IBroadcastClient broadcastClient = new BroadcastClient(consenterHost, consenterPort);
             broadcastClient.send(signedTxEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
                 @Override
                 public void onNext(Ab.BroadcastResponse value) {
@@ -237,7 +228,9 @@ public class NodeSmartContract {
 
                     //收到响应消息，判断是否是200消息
                     if (Common.Status.SUCCESS.equals(value.getStatus())) {
-                        log.info("invoke success");
+                        log.info("Invoke success");
+                    } else {
+                        log.info("Invoke fail: " + value.getStatus());
                     }
                 }
 

@@ -104,7 +104,9 @@ public class SpecHelper {
         SmartContractPackage.SmartContractSpec.Builder specBuilder = SmartContractPackage.SmartContractSpec.newBuilder();
         specBuilder.setType(SmartContractPackage.SmartContractSpec.Type.JAVA);
         specBuilder.setSmartContractId(SmartContractPackage.SmartContractID.newBuilder().setName(scName));
-        specBuilder.setInput(input);
+        if (input != null) {
+            specBuilder.setInput(input);
+        }
         SmartContractPackage.SmartContractSpec spec = specBuilder.build();
 
         //构造SmartContractInvocationSpec对象

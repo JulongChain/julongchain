@@ -128,11 +128,11 @@ public class ContractInstantiateCmd extends AbstractNodeContractCmd {
         if (cmd.hasOption(ARG_INPUT)) {
             String inputStr = cmd.getOptionValue(ARG_INPUT, defaultValue);
             log.info("InputStr: " + inputStr);
-            JSONObject ctorJson = JSONObject.parseObject(inputStr);
+            JSONObject inputJson = JSONObject.parseObject(inputStr);
 
             SmartContractPackage.SmartContractInput.Builder inputBuilder = SmartContractPackage.SmartContractInput.newBuilder();
 
-            JSONArray argsJSONArray = ctorJson.getJSONArray(KEY_ARGS);
+            JSONArray argsJSONArray = inputJson.getJSONArray(KEY_ARGS);
             for (int i = 0; i < argsJSONArray.size(); i++) {
                 inputBuilder.addArgs(ByteString.copyFrom(argsJSONArray.getString(i).getBytes()));
             }
