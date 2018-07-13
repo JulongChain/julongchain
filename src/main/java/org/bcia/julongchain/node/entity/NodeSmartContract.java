@@ -91,7 +91,7 @@ public class NodeSmartContract {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //获取背书节点返回信息
-        EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
+        EndorserClient client = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
         log.info("Install Result: " + proposalResponse.getResponse().getStatus());
     }
@@ -134,12 +134,12 @@ public class NodeSmartContract {
         try {
             Common.Envelope signedTxEnvelope = EnvelopeHelper.createSignedTxEnvelope(proposal, identity, proposalResponse);
 
-            EnvelopeVO envelopeVO = new EnvelopeVO();
-            try {
-                envelopeVO.parseFrom(signedTxEnvelope);
-            } catch (InvalidProtocolBufferException e) {
-                log.error(e.getMessage(), e);
-            }
+//            EnvelopeVO envelopeVO = new EnvelopeVO();
+//            try {
+//                envelopeVO.parseFrom(signedTxEnvelope);
+//            } catch (InvalidProtocolBufferException e) {
+//                log.error(e.getMessage(), e);
+//            }
 
             IBroadcastClient broadcastClient = new BroadcastClient(consenterHost, consenterPort);
             broadcastClient.send(signedTxEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
