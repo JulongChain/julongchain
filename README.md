@@ -45,34 +45,39 @@ JDK版本为1.8。
       -b 创世区块保存的文件地址  <br/>
    
 列出已加入的群组  <br/>
-<i>  java -jar julongchain.jar group list  </i><br/>
+<i>  java -jar julongchain.jar group list -t 127.0.0.1:7051  </i><br/>
+  参数说明：  <br/>
+      -t 要查询的目标节点地址 <br/>
 
 安装智能合约  <br/>
 <i>  java -jar julongchain.jar contract install -n mycc -v 1.0 -p /root/julongchain/mycc_src  </i><br/>
   参数说明：  <br/>
+   -t 要安装智能合约的目标节点地址 <br/>
    -n 智能合约名称      <br/>
    -v 智能合约版本      <br/>
    -p 智能合约源码路径   <br/>
    
 实例化智能合约  <br/>
-<i>  java -jar julongchain.jar contract instantiate -c 127.0.0.1:7050 -g myGroup -n mycc -v 1.0  -ctor 
+<i>  java -jar julongchain.jar contract instantiate -c 127.0.0.1:7050 -g myGroup -n mycc -v 1.0  -i 
 "{'args':['init','a','100','b','200']}" -P "OR	('Org1MSP.member','Org2MSP.member')"  </i><br/>
   参数说明：  <br/>
+   -t 要实例化智能合约的目标节点地址 <br/>
    -c 共识节点地址             <br/>
    -g 群组名称                <br/>
    -n 智能合约名称             <br/>
    -v 智能合约版本             <br/>
-   -ctor 智能合约init方法入参   <br/>
+   -i 智能合约init方法入参      <br/>
    -P 背书策略                 <br/>
    
 调用智能合约  <br/>
-<i>  java -jar julongchain.jar contract invoke -c 127.0.0.1:7050 -g myGroup -n mycc -ctor "{'args':['invoke','a','b',
+<i>  java -jar julongchain.jar contract invoke -c 127.0.0.1:7050 -g myGroup -n mycc -i "{'args':['invoke','a','b',
 '10']}"  </i><br/>
   参数说明：  <br/>
+   -t 要执行智能合约的目标节点地址 <br/>
    -c 共识节点地址               <br/>
    -g 群组名称                  <br/>
    -n 智能合约名称               <br/>
-   -ctor 智能合约invoke方法入参   <br/>
+   -i 智能合约invoke方法入参   <br/>
    
 ##Docker Daemon启动
 ```
