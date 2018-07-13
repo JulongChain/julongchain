@@ -76,14 +76,15 @@ public class NodeGroup {
     /**
      * 创建群组
      *
-     * @param host      共识节点域名或IP
-     * @param port      共识节点端口
-     * @param groupId   群组ID
-     * @param groupFile 群组配置文件
+     * @param consenterHost 共识节点域名或IP
+     * @param consenterPort 共识节点端口
+     * @param groupId       群组ID
+     * @param groupFile     群组配置文件
      * @return
      * @throws NodeException
      */
-    public void createGroup(String host, int port, String groupId, String groupFile) throws NodeException {
+    public void createGroup(String consenterHost, int consenterPort, String groupId, String groupFile)
+            throws NodeException {
         Common.Envelope envelope = null;
 
         ILocalSigner signer = new LocalSigner();
@@ -108,7 +109,7 @@ public class NodeGroup {
 
         Common.Envelope signedEnvelope = EnvelopeHelper.sanityCheckAndSignConfigTx(envelope, groupId, signer);
         log.info("Begin to broadcast");
-        IBroadcastClient broadcastClient = new BroadcastClient(host, port);
+        IBroadcastClient broadcastClient = new BroadcastClient(consenterHost, consenterPort);
         broadcastClient.send(signedEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
             @Override
             public void onNext(Ab.BroadcastResponse value) {
@@ -124,7 +125,7 @@ public class NodeGroup {
                         log.error(e.getMessage(), e);
                     }
 
-                    getGenesisBlockThenWrite(host, port, groupId);
+                    getGenesisBlockThenWrite(consenterHost, consenterPort, groupId);
                 }
             }
 
@@ -229,7 +230,7 @@ public class NodeGroup {
         return new GenesisBlockFactory(groupTree).getGenesisBlock(groupId);
     }
 
-    public void joinGroup(String blockPath) throws NodeException {
+    public void joinGroup(String nodeHost, int nodePort, String blockPath) throws NodeException {
         SmartContractPackage.SmartContractInvocationSpec spec = null;
         try {
             spec = SpecHelper.buildInvocationSpec(CommConstant.CSSC, CSSC.JOIN_GROUP,
@@ -263,23 +264,23 @@ public class NodeGroup {
                 "", txId, spec, nonce, creator, null);
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
-        EndorserClient endorserClient = new EndorserClient(CSSC.DEFAULT_HOST, CSSC.DEFAULT_PORT);
+        EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = endorserClient.sendProcessProposal(signedProposal);
 
         if (proposalResponse != null && proposalResponse.getResponse() != null && proposalResponse.getResponse()
                 .getStatus() == ISmartContract.SmartContractResponse.Status.SUCCESS.getCode()) {
 
-	      // TODO 周辉检查
-	      try {
-	        byte[] bytes = FileUtils.readFileBytes(blockPath);
-	        Common.Block block = Common.Block.parseFrom(bytes);
-	        String groupId = BlockUtils.getGroupIDFromBlock(block);
-	        node.getLedgerIds().add(groupId);
-	      } catch (IOException e) {
-	        log.error(e.getMessage(), e);
-	      } catch (JavaChainException e) {
-	        log.error(e.getMessage(), e);
-	      }
+            // TODO 周辉检查
+            try {
+                byte[] bytes = FileUtils.readFileBytes(blockPath);
+                Common.Block block = Common.Block.parseFrom(bytes);
+                String groupId = BlockUtils.getGroupIDFromBlock(block);
+                node.getLedgerIds().add(groupId);
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            } catch (JavaChainException e) {
+                log.error(e.getMessage(), e);
+            }
 
             log.info("Join group success");
         } else {
@@ -303,7 +304,7 @@ public class NodeGroup {
     /**
      * 获取当前节点所在的所有群组列表
      */
-    public List<Query.GroupInfo> listGroups() throws NodeException {
+    public List<Query.GroupInfo> listGroups(String nodeHost, int nodePort) throws NodeException {
         SmartContractPackage.SmartContractInvocationSpec csscSpec = SpecHelper.buildInvocationSpec(CommConstant.CSSC, CSSC
                 .GET_GROUPS, null);
 
@@ -332,7 +333,7 @@ public class NodeGroup {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //获取背书节点返回信息
-        EndorserClient client = new EndorserClient(CSSC.DEFAULT_HOST, CSSC.DEFAULT_PORT);
+        EndorserClient client = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
 
         Query.GroupQueryResponse groupQueryResponse = null;
@@ -341,8 +342,7 @@ public class NodeGroup {
             return groupQueryResponse.getGroupsList();
         } catch (InvalidProtocolBufferException e) {
             log.error(e.getMessage(), e);
+            return null;
         }
-
-        return null;
     }
 }

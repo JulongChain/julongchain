@@ -48,6 +48,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * 节点服务
@@ -99,7 +101,7 @@ public class NodeServer {
             return;
         }
 
-        log.info("begin to start node, current version: " + NodeConstant.CURRENT_VERSION);
+        log.info("Begin to start node, current version: " + NodeConstant.CURRENT_VERSION);
 
         //启动Node主服务(Grpc Server1)
         startNodeGrpcServer(nodeConfig);
@@ -115,11 +117,13 @@ public class NodeServer {
         node.initialize(new Node.IGroupCallback() {
             @Override
             public void onGroupInitialized(String groupId) {
+                log.info("OnGroupInitialized: " + groupId);
                 systemSmartContractManager.deploySysSmartContracts(groupId);
             }
 
             @Override
             public void onGroupsReady(List<String> groupIds) {
+                log.info("OnGroupsReady-----");
                 try {
                     startGossipService();
                 } catch (Exception e) {
@@ -133,6 +137,21 @@ public class NodeServer {
     }
 
     private void startGossipService() {
+
+        //
+//            ExecutorService fixedThreadPool = Executors.newFixedThreadPool(MAX_THREAD_POOL);
+//            for (int i = 0; i < 10; i++) {
+//                final int index = i;
+//                fixedThreadPool.execute(new Runnable() {
+//                    public void run() {
+//                        try {
+//                            System.out.println(index);
+//                            Thread.sleep(2000);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//                });
 
         String consenterAddress = NodeConfigFactory.getNodeConfig().getNode().getGossip().getConsenterAddress();
         String[] split = StringUtils.split(consenterAddress, ":");

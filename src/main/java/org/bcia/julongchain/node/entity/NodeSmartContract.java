@@ -60,10 +60,9 @@ public class NodeSmartContract {
         this.node = node;
     }
 
-    public void install(String scName, String scVersion, String scPath, String scLanguage, SmartContractPackage
-            .SmartContractInput input) throws NodeException {
+    public void install(String nodeHost, int nodePort, String scName, String scVersion, String scPath) throws NodeException {
         SmartContractPackage.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName, scVersion,
-                scPath, input);
+                scPath, null);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
@@ -84,7 +83,6 @@ public class NodeSmartContract {
             throw new NodeException("Generate txId fail");
         }
 
-        byte[] inputBytes = (input != null ? input.toByteArray() : new byte[0]);
         SmartContractPackage.SmartContractInvocationSpec lsscSpec = SpecHelper.buildInvocationSpec(CommConstant.LSSC,
                 LSSC.INSTALL.getBytes(), deploymentSpec.toByteArray());
         //生成proposal  Type=ENDORSER_TRANSACTION
@@ -98,8 +96,8 @@ public class NodeSmartContract {
         log.info("Install Result: " + proposalResponse.getResponse().getStatus());
     }
 
-    public void instantiate(String ip, int port, String groupId, String scName, String scVersion, SmartContractPackage
-            .SmartContractInput input) throws NodeException {
+    public void instantiate(String nodeHost, int nodePort, String consenterHost, int consenterPort, String groupId,
+                            String scName, String scVersion, SmartContractPackage.SmartContractInput input) throws NodeException {
         SmartContractPackage.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName, scVersion,
                 null, input);
 
@@ -130,7 +128,7 @@ public class NodeSmartContract {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //获取背书节点返回信息
-        EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
+        EndorserClient client = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
 
         try {
@@ -143,7 +141,7 @@ public class NodeSmartContract {
                 log.error(e.getMessage(), e);
             }
 
-            IBroadcastClient broadcastClient = new BroadcastClient(ip, port);
+            IBroadcastClient broadcastClient = new BroadcastClient(consenterHost, consenterPort);
             broadcastClient.send(signedTxEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
                 @Override
                 public void onNext(Ab.BroadcastResponse value) {
