@@ -26,9 +26,11 @@ import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
 import org.bcia.julongchain.core.ledger.TxSimulationResults;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 import org.bcia.julongchain.core.node.util.NodeUtils;
 import org.bcia.julongchain.core.smartcontract.client.SmartContractSupportClient;
 import org.bcia.julongchain.protos.common.Common;
+import org.bcia.julongchain.protos.ledger.queryresult.KvQueryResult;
 import org.bcia.julongchain.protos.ledger.rwset.Rwset;
 import org.bcia.julongchain.protos.node.*;
 
@@ -238,8 +240,20 @@ public class SmartContractSupportService
                             if (queryResult == null) {
                                 break;
                             }
-                            queryResponseBuilder.addResults(SmartContractShim.QueryResultBytes.newBuilder().build());
+                            VersionedKV kv = (VersionedKV) queryResult.getObj();
+                            if(kv.getCompositeKey().getKey().compareTo(endKey) == 1){
+                                break;
+                            }
+
+                            String key = kv.getCompositeKey().getKey();
+                            String namespace = kv.getCompositeKey().getNamespace();
+                            byte[] value = kv.getVersionedValue().getValue();
+
+                            KvQueryResult.KV kvProto = KvQueryResult.KV.newBuilder().setKey(key).setNamespace(namespace).setValue(ByteString.copyFrom(value)).build();
+
+                            queryResponseBuilder.addResults(SmartContractShim.QueryResultBytes.newBuilder().setResultBytes(kvProto.toByteString()).build());
                         }
+
 
                         SmartContractShim.QueryResponse queryResponse = queryResponseBuilder.build();
 
