@@ -222,13 +222,6 @@ public class MspHelperTest {
             adminCert.add(FileUtils.readFileToByteArray(file));
         }
 
-        // TODO keystore?
-        List<byte[]> keyStore = new ArrayList<>();
-        File keyStoreFile = new File(Paths.get(mspDir, "keystore").toString());
-        for (File file : Objects.requireNonNull(keyStoreFile.listFiles())) {
-            keyStore.add(FileUtils.readFileToByteArray(file));
-        }
-
         List<byte[]> tlsCaCert = new ArrayList<>();
         File tlsCertFile = new File(Paths.get(mspDir, "tlscacerts").toString());
         for (File file : Objects.requireNonNull(tlsCertFile.listFiles())) {
