@@ -223,6 +223,7 @@ public class MspHelperTest {
             adminCert.add(FileUtils.readFileToByteArray(file));
         }
 
+        // TODO keystore?
         List<byte[]> keyStore = new ArrayList<>();
         File keyStoreFile = new File(Paths.get(mspDir, "keystore").toString());
         for (File file : Objects.requireNonNull(keyStoreFile.listFiles())) {
@@ -235,6 +236,9 @@ public class MspHelperTest {
             tlsCaCert.add(FileUtils.readFileToByteArray(file));
         }
 
+        List<byte[]> configContent = new ArrayList<>();
+        File configFile = new File(Paths.get(mspDir, "config.yaml").toString());
+        configContent.add(FileUtils.readFileToByteArray(configFile));
 
         List<byte[]> signCert = new ArrayList<>();
         File signCertFile = new File(Paths.get(mspDir, "signcerts").toString());
@@ -242,9 +246,9 @@ public class MspHelperTest {
             signCert.add(FileUtils.readFileToByteArray(file));
         }
 
-        MspConfigPackage.MSPConfig.Builder mspConfig = MspConfigBuilder.mspConfigBuilder(
-                "testMsp", caCert, signCert, adminCert, new ArrayList<>(), new ArrayList<>(), tlsCaCert, new ArrayList<>(),new ArrayList<>());
+        MspConfigPackage.MSPConfig mspConfig = MspConfigBuilder.mspConfigBuilder(
+                "testMsp", caCert, signCert, adminCert, new ArrayList<>(), new ArrayList<>(), configContent, tlsCaCert, new ArrayList<>()).build();
         Msp msp = new Msp();
-        msp.setup(mspConfig.build());
+        msp.setup(mspConfig);
     }
 }

@@ -44,13 +44,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * CSP 相关功能封装
+ *
  * @author chenhao, yegangcheng
  * @date 2018/4/3
  * @company Excelsecu
  */
 public class CspHelper {
     private static JavaChainLog log = JavaChainLogFactory.getLog(CspHelper.class);
-    private static final ICsp csp = getCsp();
+    private static final ICsp CSP = getCsp();
 
     static {
         try {
@@ -58,24 +60,6 @@ public class CspHelper {
         } catch (MspException e) {
             log.error(e.getMessage(), e);
         }
-
-//        List<IFactoryOpts> list = new ArrayList<>();
-//        IFactoryOpts opts = new GmFactoryOpts() {
-//            @Override
-//            public boolean isDefaultCsp() {
-//                return true;
-//            }
-//        };
-//        try {
-//            MspConfig mspConfig = MspConfigFactory.loadMspConfig();
-//            GmFactoryOpts factoryOpts=new GmFactoryOpts();
-//            factoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("gm"));
-//            list.add(factoryOpts);
-//        } catch (FileNotFoundException e) {
-//            log.error(e.getMessage());
-//        }
-//        list.add(opts);
-//        CspManager.initCspFactories(list);
     }
 
     public static ICsp getCsp() {
@@ -102,7 +86,7 @@ public class CspHelper {
                 byte[] encodedData = pemObject.getContent();
                 List<Object> list = decodePrivateKeyPKCS8(encodedData);
                 Object rawKey = list.get(1);
-                return csp.keyImport(rawKey, new SM2PrivateKeyImportOpts(true));
+                return CSP.keyImport(rawKey, new SM2PrivateKeyImportOpts(true));
             } catch (Exception e) {
                 log.error("An error occurred on loadPrivateKey: {}", e.getMessage());
             }
@@ -152,7 +136,7 @@ public class CspHelper {
     public static IKey generatePrivateKey(String keystorePath) throws JavaChainException {
 
         try {
-            IKey priv = csp.keyGen(new SM2KeyGenOpts() {
+            IKey priv = CSP.keyGen(new SM2KeyGenOpts() {
                 @Override
                 public boolean isEphemeral() {
                     return true;
