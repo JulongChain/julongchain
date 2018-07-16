@@ -442,8 +442,10 @@ vm:
 smartContract:
 
     instantiatePath: /var/julongchain/production/instantiate_temp
+    dockerFile: /root/julongchain/smartcontract/Dockerfile.in
 
     coreNodeAddress: 172.17.0.1
+    coreNodeAddressPort: 7051
 
     # The id is used by the SmartContract stub to register the executing SmartContract
     # ID with the Node and is generally supplied through ENV variables
