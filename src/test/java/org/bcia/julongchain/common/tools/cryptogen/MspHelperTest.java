@@ -33,7 +33,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -132,7 +131,7 @@ public class MspHelperTest {
     }
 
     @Test
-    public void generateVerifyingMSP() throws JavaChainException, IOException {
+    public void generateVerifyingMSP() throws JavaChainException {
         System.out.println("testDir=" + testDir);
 
         String caDir = Paths.get(testDir, "ca").toString();

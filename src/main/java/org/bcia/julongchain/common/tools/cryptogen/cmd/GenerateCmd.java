@@ -35,6 +35,10 @@ import static org.bcia.julongchain.common.tools.cryptogen.cmd.Util.*;
  */
 public class GenerateCmd implements ICryptoGenCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(GenerateCmd.class);
+    private static final String CMD_GENERATE = "generate";
+    private static final String CMD_ARG_OUTPUT = "output";
+    private static final String CMD_ARG_CONFIG = "config";
+    private static final String CMD_ARG_HELP = "help";
 
     private String outputDir;
 
@@ -45,28 +49,28 @@ public class GenerateCmd implements ICryptoGenCmd {
         CommandLineParser parser = new DefaultParser();
         Options options = new Options();
         options.addOption(Option.builder()
-                .longOpt("output")
+                .longOpt(CMD_ARG_OUTPUT)
                 .desc("The output directory in which to place artifacts, default \"crypto-config\"")
                 .hasArg()
                 .argName("directory name")
                 .build());
         options.addOption(Option.builder()
-                .longOpt("config")
+                .longOpt(CMD_ARG_CONFIG)
                 .desc("The configuration template to use, default using \"cryptogen template\"")
                 .hasArg()
                 .argName("file name")
                 .build());
-        options.addOption(null, "help", false, "Print this message");
+        options.addOption(null, CMD_ARG_HELP, false, "Print this message");
 
         try {
             CommandLine commandLine = parser.parse(options, args);
-            if (commandLine.hasOption("help")) {
+            if (commandLine.hasOption(CMD_ARG_HELP)) {
                 HelpFormatter helpFormatter = new HelpFormatter();
-                helpFormatter.printHelp("generate", options);
+                helpFormatter.printHelp(CMD_GENERATE, options);
                 return;
             }
-            outputDir = commandLine.getOptionValue("output", "crypto-config");
-            configFile = commandLine.getOptionValue("config", null);
+            outputDir = commandLine.getOptionValue(CMD_ARG_OUTPUT, "crypto-config");
+            configFile = commandLine.getOptionValue(CMD_ARG_CONFIG, null);
             deleteAllFiles();
             generate();
         } catch (ParseException e) {

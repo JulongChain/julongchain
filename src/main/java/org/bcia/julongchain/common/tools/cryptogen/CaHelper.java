@@ -57,6 +57,7 @@ public class CaHelper {
     private Certificate mSignCert;
 
     private static JavaChainLog log = JavaChainLogFactory.getLog(CaHelper.class);
+    private static String SEPARATOR = "/";
 
 
     public void setName(String name) {
@@ -86,7 +87,7 @@ public class CaHelper {
     public X509Certificate signCertificate(String baseDir, String name, String[] ous, List<String> sans,
                                            ECPublicKey pub, int ku, int[] eku) throws JavaChainException {
 
-        if (name.contains("/")) {
+        if (name.contains(SEPARATOR)) {
             throw new JavaChainException("the name is illegal");
         }
 
