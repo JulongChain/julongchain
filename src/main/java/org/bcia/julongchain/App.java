@@ -45,8 +45,8 @@ public class App {
 
         //引入Spring配置文件的两种方式
 //        ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");
-//        PolicyNode node = context.getBean(PolicyNode.class);
-//        PolicyNode node = SpringContext.getInstance().getBean(PolicyNode.class);
+//        Node node = context.getBean(Node.class);
+//        Node node = SpringContext.getInstance().getBean(Node.class);
 
         log.info("args-----$" + Arrays.toString(args));
         //开始解析执行命令行
