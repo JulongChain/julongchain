@@ -28,7 +28,7 @@ node:
                       asymmetric: SM2
                       security: 256
                       # Location of Key Store
-                          # If "", defaults to 'mspConfigPath'/keystore
+                         # If "", defaults to 'mspConfigPath'/keystore
                           # TODO: Ensure this is read with fabric/core/config.GetPath() once ready
                       publicKeyStore: /opt/BCIAjava/javachain/src/main/resources/msp/keystore/publickey.pem
                       privateKeyStore: /opt/BCIAjava/javachain/src/main/resources/msp/keystore/privatekey.pem
