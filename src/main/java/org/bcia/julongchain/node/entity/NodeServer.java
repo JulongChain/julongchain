@@ -87,21 +87,12 @@ public class NodeServer {
     }
 
     public void start(boolean devMode) throws NodeException {
-        log.info("Node server start");
+        log.info("Begin to start node, current version: " + NodeConstant.CURRENT_VERSION);
         if (devMode) {
             log.info("Start by devMode");
         }
 
         NodeConfig nodeConfig = NodeConfigFactory.getNodeConfig();
-
-        //检查当前的成员服务提供者类型，目前只支持CSP，即密码提供商
-        int mspType = GlobalMspManagement.getLocalMsp().getType();
-        if (mspType != NodeConstant.PROVIDER_CSP) {
-            log.error("Unsupported msp type: " + mspType);
-            return;
-        }
-
-        log.info("Begin to start node, current version: " + NodeConstant.CURRENT_VERSION);
 
         //启动Node主服务(Grpc Server1)
         startNodeGrpcServer(nodeConfig);
