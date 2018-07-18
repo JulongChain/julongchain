@@ -59,7 +59,7 @@ public class AdminClient implements IAdminClient {
 
     @Override
     public void close() {
-        log.info("AdminClient close-----");
+        log.info("AdminClient close");
 
         managedChannel.shutdown();
     }

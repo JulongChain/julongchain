@@ -89,7 +89,7 @@ public class DeliverClient implements IDeliverClient {
 
     @Override
     public void close() {
-        log.info("DeliverClient close-----");
+        log.info("DeliverClient close");
 
         managedChannel.shutdown();
 //        try {

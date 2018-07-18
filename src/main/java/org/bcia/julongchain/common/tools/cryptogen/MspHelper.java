@@ -40,6 +40,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * MSP 相关密码材料生成
+ *
  * @author chenhao, yegangcheng
  * @date 2018/4/3
  * @company Excelsecu
@@ -48,11 +50,11 @@ public class MspHelper {
 
     public static final int CLIENT = 0;
     public static final int CONSENTER = 1;
-    public static final int PEER = 2;
+    public static final int NODE = 2;
     public static final String CLIENT_OU = "client";
-    public static final String PEER_OU = "peer";
+    public static final String NODE_OU = "node";
 
-    private static String[] nodeOUMap = {null, "client", "peer"};
+    private static String[] nodeOUMap = {null, "client", "node"};
 
     public static void generateLocalMSP(String baseDir, String name, List<String> sans, CaHelper signCA,
                                         CaHelper tlsCA, int nodeType, boolean nodeOUs) throws JavaChainException {
@@ -93,7 +95,7 @@ public class MspHelper {
         // the TLS CaHelper certificate goes into tlscacerts
         x509Export(Paths.get(mspDir, "tlscacerts", x509Filename(tlsCA.getName())).toString(), tlsCA.getSignCert());
 
-        if (nodeOUs && nodeType == PEER) {
+        if (nodeOUs && nodeType == NODE) {
             exportConfig(mspDir, "cacerts/" + x509Filename(signCA.getName()), true);
 
         }
@@ -126,7 +128,7 @@ public class MspHelper {
                 sans,
                 tlsPubKey,
                 KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
-                new int[]{Util.extKeyUsageServerAuth, Util.extKeyUsageClientAuth});
+                new int[]{Util.EXT_KEY_USAGE_SERVER_AUTH, Util.EXT_KEY_USAGE_CLIENT_AUTH});
 
         x509Export(Paths.get(tlsDir, "ca.crt").toString(), tlsCA.getSignCert());
 
@@ -227,13 +229,13 @@ public class MspHelper {
         clientOUIdentifier.setCertificate(caFile);
         clientOUIdentifier.setOrganizationalUnitIdentifier(CLIENT_OU);
 
-        OrgUnitIdentifiersConfig peerOUIdentifier = new OrgUnitIdentifiersConfig();
-        peerOUIdentifier.setCertificate(caFile);
-        peerOUIdentifier.setOrganizationalUnitIdentifier(PEER_OU);
+        OrgUnitIdentifiersConfig nodeOUIdentifier = new OrgUnitIdentifiersConfig();
+        nodeOUIdentifier.setCertificate(caFile);
+        nodeOUIdentifier.setOrganizationalUnitIdentifier(NODE_OU);
 
         NodeOUs nodeOUs = new NodeOUs();
         nodeOUs.setClientOUIdentifier(clientOUIdentifier);
-        nodeOUs.setPeerOUIdentifier(peerOUIdentifier);
+        nodeOUs.setNodeOUIdentifier(nodeOUIdentifier);
         nodeOUs.setEnable(enable);
 
         Configuration configuration = new Configuration();

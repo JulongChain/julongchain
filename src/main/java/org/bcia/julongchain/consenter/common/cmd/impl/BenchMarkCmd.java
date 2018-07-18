@@ -38,9 +38,9 @@ public class BenchMarkCmd implements IConsenterCmd {
     @Override
     public void execCmd(String[] args) throws ParseException {
         for (String str : args) {
-            log.info("arg-----$" + str);
+            log.info("Arg: " + str);
         }
-        log.info("consenter node start by BenchMark mode!!!");
+        log.info("Consenter node start by BenchMark mode!!!");
         try {
             new Thread() {
                 @Override

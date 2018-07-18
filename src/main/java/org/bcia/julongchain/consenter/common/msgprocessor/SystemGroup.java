@@ -69,7 +69,7 @@ public class SystemGroup  implements IProcessor {
            }
        }
         RuleSet ruleSet=new RuleSet(new IRule[]{new EmptyRejectRule(),new ExpirationRejectRule(filterSupport),new SizeFilter(consenterConfig),
-               new SigFilter(PolicyConstant.GROUP_WRITERS,filterSupport.getPolicyManager()),
+               new SigFilter(PolicyConstant.GROUP_APP_WRITERS,filterSupport.getPolicyManager()),
                new SystemGroupFilter(chainCreator,filterSupport.getGroupConfig())
        });
 

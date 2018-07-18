@@ -18,6 +18,7 @@ package org.bcia.julongchain.csp.gm.dxct.sm2;
 import org.bcia.julongchain.csp.intfs.opts.IKeyGenOpts;
 
 /**
+ * sm2 蜜钥生成选项
  * @author zhangmingyang
  * @Date: 2018/3/27
  * @company Dingxuan

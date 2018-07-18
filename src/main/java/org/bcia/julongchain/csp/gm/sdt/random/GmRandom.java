@@ -34,10 +34,10 @@ public class GmRandom {
 
     public byte[] rng(int len) throws JavaChainException{
 
-        //判断随机数长度是否为非负整数
-        if(len <= 0) {
-            logger.error("SM RandomGen error: the length must be bigger than 0.");
-            throw new JavaChainException("SM RandomGen error: the length must be bigger than 0.");
+        //判断随机数长度是否为非负整数,或者大于1024
+        if(0 >= len || 1024 < len) {
+            logger.error("SM RandomGen error: the length must be bigger than 0 and lesser than 1025.");
+            throw new JavaChainException("SM RandomGen error: the length must be bigger than 0 and lesser than 1025.");
         }
         byte[] result = null;
         try {

@@ -44,26 +44,13 @@ import static org.bcia.julongchain.msp.mspconfig.MspConfigFactory.loadMspConfig;
 public class GlobalMspManagement {
     private static JavaChainLog log = JavaChainLogFactory.getLog(GlobalMspManagement.class);
     /**
-     * 直接读取配置文件获取的本地的msp
+     * 本地的msp
      */
     public static IMsp localMsp;
     /**
-     * 通过node节点传入的参数获取的msp
+     * csp默认配置值
      */
-    public static IMsp loadMsp;
-    /**
-     * 默认的csp
-     */
-    public static ICsp defaultCsp;
-    /**
-     * csp默认配置
-     */
-    public static String defaultCspValue;
-
-    private MspManager mspManager;
-
-    private boolean up;
-
+    public static String defaultValue;
     /**
      * mspMap
      */
@@ -75,41 +62,27 @@ public class GlobalMspManagement {
      * @param localmspdir
      * @param optsList
      * @param mspId
-     * @param mspType
      */
     public static IMsp loadLocalMspWithType(String localmspdir, List<IFactoryOpts> optsList, String defaultOpts,
-                                            String mspId, String mspType) throws FileNotFoundException {
+                                            String mspId) throws FileNotFoundException {
 
         CspManager.initCspFactories(optsList, defaultOpts);
-        MspConfig mspConfig = loadMspConfig();
-        defaultCspValue = mspConfig.node.getCsp().getDefaultValue();
-        defaultCsp = CspManager.getCsp(defaultCspValue);
-//        if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(defaultCspValue)) {
-        //解析配置文件
-        log.info("build the mspconfig");
+        defaultValue = defaultOpts;
+
+        log.info("Build the mspconfig");
         if (!new File(localmspdir).exists()) {
-            throw new FileNotFoundException(String.format("the %s dir is not find", localmspdir));
+            throw new FileNotFoundException(String.format("The %s dir is not find", localmspdir));
         }
         MspConfigPackage.MSPConfig buildMspConfig = MspConfigHelper.buildMspConfig(localmspdir, mspId);
-        loadMsp = getLocalMsp().setup(buildMspConfig);
-
-//        } else if (IFactoryOpts.PROVIDER_GMT0016.equalsIgnoreCase(defaultCspValue)) {
-//
-//        } else if (IFactoryOpts.PROVIDER_GMT0018.equalsIgnoreCase(defaultCspValue)) {
-//
-//        }
-
-        return loadMsp;
+        localMsp=new Msp().setup(buildMspConfig);
+        return localMsp;
     }
 
     /**
      * 加载本地msp
      *
-     * @param localmspdir 本地msp目录
-     * @param optsList    bccsp配置
-     * @param mspID       mspid
      */
-    public static IMsp loadlocalMsp(String localmspdir, List<IFactoryOpts> optsList, String mspID) {
+    public static IMsp loadlocalMsp() {
         return getLocalMsp();
     }
 
@@ -121,32 +94,15 @@ public class GlobalMspManagement {
     public static IMsp getLocalMsp() {
         if (localMsp == null) {
 //            //读取配置文件构造选项集合
-//            List<IFactoryOpts> optsList = MspConfigHelper.buildFactoryOpts();
-//            CspManager.initCspFactories(optsList);
             MspConfig mspConfig = null;
             try {
                 mspConfig = loadMspConfig();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
-//            defaultCspValue = mspConfig.getNode().getCsp().getDefaultValue();
-//            defaultCsp = CspManager.getCsp(defaultCspValue);
-//            if (IFactoryOpts.PROVIDER_GM.equalsIgnoreCase(defaultCspValue)) {
-            //构建fabricmspconfig
-            // MspConfigPackage.MSPConfig fabricMSPConfig = MspConfigHelper.buildMspConfig( mspConfig.node.getMspConfigPath());
-            MspConfigPackage.MSPConfig buildMspConfig =
-                    MspConfigHelper.buildMspConfig(mspConfig.getNode().getMspConfigPath(), mspConfig.getNode().getLocalMspId());
+            MspConfigPackage.MSPConfig buildMspConfig = MspConfigHelper.buildMspConfig(mspConfig.getNode().getMspConfigPath(), mspConfig.getNode().getLocalMspId());
             localMsp = new Msp().setup(buildMspConfig);
             return localMsp;
-
-//            } else if (IFactoryOpts.PROVIDER_GMT0016.equalsIgnoreCase(defaultCspValue)) {
-//
-//            } else if (IFactoryOpts.PROVIDER_GMT0018.equalsIgnoreCase(defaultCspValue)) {
-//
-//            }
-
-
-//            return localMsp;
         }
         return localMsp;
     }
@@ -191,21 +147,24 @@ public class GlobalMspManagement {
         return mspManager;
     }
 
-
+    /**
+     * 初始化本地msp
+     * @throws MspException
+     */
     public static void initLocalMsp() throws MspException {
-        log.info("Init LocalMsp-----");
+        log.info("Init LocalMsp");
         try {
             MspConfig mspConfig = loadMspConfig();
             String mspConfigDir = mspConfig.getNode().getMspConfigPath();
             String mspId = mspConfig.getNode().getLocalMspId();
             String mspType = mspConfig.getNode().getLocalMspType();
+            String defaultOpts = mspConfig.getNode().getCsp().getDefaultValue();
 
-            CspOptsManager cspOptsManager = new CspOptsManager();
-            cspOptsManager.addAll(mspConfig.getNode().getCsp().getFactoryOpts());
+            CspOptsManager cspOptsManager = CspOptsManager.getInstance();
+            cspOptsManager.addAll(defaultOpts,mspConfig.getNode().getCsp().getFactoryOpts());
             List<IFactoryOpts> optsList = cspOptsManager.getFactoryOptsList();
 
-            String defaultOpts = mspConfig.getNode().getCsp().getDefaultValue();
-            GlobalMspManagement.loadLocalMspWithType(mspConfigDir, optsList, defaultOpts, mspId, mspType);
+            GlobalMspManagement.loadLocalMspWithType(mspConfigDir, optsList, defaultOpts, mspId);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new MspException(e);

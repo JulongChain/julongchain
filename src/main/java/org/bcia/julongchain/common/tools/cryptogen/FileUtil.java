@@ -29,12 +29,16 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * 文件相关功能封装
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/9
  * @company Excelsecu
  */
 public class FileUtil {
     private static JavaChainLog log = JavaChainLogFactory.getLog(FileUtil.class);
+    private static String SYSTEM_PROP_OS = "os.name";
+    private static String SYSTEM_PROP_VALUE_WINDOWS = "Windows";
 
     public static boolean removeAll(String filePath) {
         if (!new File(filePath).exists()){
@@ -95,7 +99,7 @@ public class FileUtil {
 
     // recursively set directory and its child directory or file permission 755
     private static void setPermission(Path path) throws JavaChainException {
-        if(System.getProperty("os.name").contains("Windows")) {
+        if(System.getProperty(SYSTEM_PROP_OS).contains(SYSTEM_PROP_VALUE_WINDOWS)) {
             return;
         }
 

@@ -60,7 +60,7 @@ public class EndorserClient implements IEndorserClient {
 
     @Override
     public void close() {
-        log.info("EndorserClient close-----");
+        log.info("EndorserClient close");
 
         managedChannel.shutdown();
     }

@@ -39,8 +39,8 @@ public class PolicyParser {
     private static JavaChainLog log = JavaChainLogFactory.getLog(PolicyParser.class);
     public static Context context;
     public static List<Policies.SignaturePolicy> policies = new ArrayList<Policies.SignaturePolicy>();
-    static  String regex = "^([[:alnum:]]+)([.])(member|admin)$";
-    String regexErr = "^No parameter '([^']+)' found[.]$";
+    //static  String regex = "^([[:alnum:]]+)([.])(member|admin)$";
+   // String regexErr = "^No parameter '([^']+)' found[.]$";
 
     public static Policies.SignaturePolicyEnvelope fromString(String policy) throws PolicyException {
 

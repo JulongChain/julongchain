@@ -41,7 +41,7 @@ public class VersionCmd implements IConsenterCmd {
     @Override
     public void execCmd(String[] args) throws ParseException {
         for (String str : args) {
-            log.info("arg-----$" + str);
+            log.info("Arg: " + str);
         }
         Options options = new Options();
         //需要支持peer node start, 无需参数

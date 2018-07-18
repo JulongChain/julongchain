@@ -26,6 +26,8 @@ import java.security.spec.ECPoint;
 import java.security.spec.EllipticCurve;
 
 /**
+ * 实现 ECParameterSpec，加入 SM2 支持
+ *
  * @author chenhao
  * @date 2018/4/18
  * @company Excelsecu
@@ -68,13 +70,14 @@ class SM2NamedCurve extends ECParameterSpec {
     }
 
     byte[] getEncoded() {
-        return (byte[])this.encoded.clone();
+        return this.encoded.clone();
     }
 
     String getObjectId() {
         return this.oid;
     }
 
+    @Override
     public String toString() {
         return this.name + " (" + this.oid + ")";
     }

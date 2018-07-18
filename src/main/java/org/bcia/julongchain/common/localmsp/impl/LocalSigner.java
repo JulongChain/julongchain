@@ -16,7 +16,15 @@
 package org.bcia.julongchain.common.localmsp.impl;
 
 import com.google.protobuf.ByteString;
+import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.localmsp.ILocalSigner;
+import org.bcia.julongchain.common.log.JavaChainLog;
+import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.util.CommConstant;
+import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
+import org.bcia.julongchain.csp.factory.CspManager;
+import org.bcia.julongchain.csp.factory.IFactoryOpts;
 import org.bcia.julongchain.msp.mgmt.Identity;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.protos.common.Common;
@@ -29,17 +37,37 @@ import java.security.SecureRandom;
  * @company Dingxuan
  */
 public class LocalSigner implements ILocalSigner {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(LocalSigner.class);
+
     public LocalSigner() {
     }
     @Override
     public Common.SignatureHeader newSignatureHeader() {
         try {
-            Identity identity= (Identity) GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
+
+            log.info("newSignatureHeader 1");
+
+            Identity identity= (Identity) GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity().getIdentity();
+            log.info("newSignatureHeader 2");
             byte[] creatorIdentityRaw=identity.serialize();
+            log.info("newSignatureHeader 3");
             Common.SignatureHeader.Builder signatureHeader=Common.SignatureHeader.newBuilder();
-            byte[] none=new SecureRandom().generateSeed(24);
-            signatureHeader.setNonce(ByteString.copyFrom(none));
+            log.info("newSignatureHeader 3.5");
+//            byte[] none=new SecureRandom().generateSeed(12);
+
+            byte[] nonce = null;
+            try {
+                nonce = CspManager.getCsp(IFactoryOpts.PROVIDER_GM_SDT).rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
+            } catch (JavaChainException e) {
+                log.error(e.getMessage(), e);
+                throw new NodeException("Can not get nonce");
+            }
+
+            log.info("newSignatureHeader 4");
+            signatureHeader.setNonce(ByteString.copyFrom(nonce));
+            log.info("newSignatureHeader 5");
             signatureHeader.setCreator(ByteString.copyFrom(creatorIdentityRaw));
+            log.info("newSignatureHeader 6");
             return signatureHeader.build();
         } catch (Exception e) {
             e.printStackTrace();

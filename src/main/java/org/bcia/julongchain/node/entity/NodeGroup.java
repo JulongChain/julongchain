@@ -27,6 +27,7 @@ import org.bcia.julongchain.common.localmsp.impl.LocalSigner;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
+import org.bcia.julongchain.common.util.CommLock;
 import org.bcia.julongchain.common.util.FileUtils;
 import org.bcia.julongchain.common.util.proto.BlockUtils;
 import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
@@ -66,24 +67,30 @@ public class NodeGroup {
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeGroup.class);
 
     private static final String PROFILE_CREATE_GROUP = "SampleSingleMSPGroup";
+    private static final int TIMEOUT_CREATE = 600000;
 
     private Node node;
 
+    private CommLock createLock;
+
     public NodeGroup(Node node) {
         this.node = node;
+
+        this.createLock = new CommLock(TIMEOUT_CREATE);
     }
 
     /**
      * 创建群组
      *
-     * @param host      共识节点域名或IP
-     * @param port      共识节点端口
-     * @param groupId   群组ID
-     * @param groupFile 群组配置文件
+     * @param consenterHost 共识节点域名或IP
+     * @param consenterPort 共识节点端口
+     * @param groupId       群组ID
+     * @param groupFile     群组配置文件
      * @return
      * @throws NodeException
      */
-    public void createGroup(String host, int port, String groupId, String groupFile) throws NodeException {
+    public void createGroup(String consenterHost, int consenterPort, String groupId, String groupFile)
+            throws NodeException {
         Common.Envelope envelope = null;
 
         ILocalSigner signer = new LocalSigner();
@@ -93,8 +100,10 @@ public class NodeGroup {
         } else if (StringUtils.isBlank(groupFile)) {
             //如果是空文件，则组成一个默认的信封对象
             try {
+                log.info("EnvelopeHelper.makeGroupCreateTx begin");
                 envelope = EnvelopeHelper.makeGroupCreateTx(groupId, signer, null, GenesisConfigFactory
                         .getGenesisConfig().getCompletedProfile(PROFILE_CREATE_GROUP));
+                log.info("EnvelopeHelper.makeGroupCreateTx end");
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 throw new NodeException(e);
@@ -106,9 +115,11 @@ public class NodeGroup {
             throw new NodeException("Group File is not exists");
         }
 
+        log.info("EnvelopeHelper.sanityCheckAndSignConfigTx begin");
         Common.Envelope signedEnvelope = EnvelopeHelper.sanityCheckAndSignConfigTx(envelope, groupId, signer);
-        log.info("Begin to broadcast-----");
-        IBroadcastClient broadcastClient = new BroadcastClient(host, port);
+
+        log.info("Begin to broadcast");
+        IBroadcastClient broadcastClient = new BroadcastClient(consenterHost, consenterPort);
         broadcastClient.send(signedEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
             @Override
             public void onNext(Ab.BroadcastResponse value) {
@@ -124,7 +135,10 @@ public class NodeGroup {
                         log.error(e.getMessage(), e);
                     }
 
-                    getGenesisBlockThenWrite(host, port, groupId);
+                    getGenesisBlockThenWrite(consenterHost, consenterPort, groupId);
+                }else{
+                    log.error("Some thing is wrong: " + value.getStatus());
+                    createLock.unLock();
                 }
             }
 
@@ -132,20 +146,28 @@ public class NodeGroup {
             public void onError(Throwable t) {
                 log.error(t.getMessage(), t);
                 broadcastClient.close();
+                createLock.unLock();
             }
 
             @Override
             public void onCompleted() {
                 log.info("Broadcast completed");
                 broadcastClient.close();
+                createLock.unLock();
             }
         });
 
         try {
-            Thread.sleep(900000);
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
         }
+
+        createLock.tryLock(new CommLock.TimeoutCallback() {
+            @Override
+            public void onTimeout() {
+                log.error("Timeout in group create");
+            }
+        });
     }
 
     private void getGenesisBlockThenWrite(String ip, int port, String groupId) {
@@ -156,6 +178,7 @@ public class NodeGroup {
             public void onNext(Ab.DeliverResponse value) {
                 log.info("Deliver onNext");
                 deliverClient.close();
+                createLock.unLock();
 
                 //测试用
 //                if (true) {
@@ -183,7 +206,7 @@ public class NodeGroup {
                         FileUtils.writeFileBytes(groupId + ".block", block.toByteArray());
 
                         File file = new File(groupId + ".block");
-                        log.info("file is generated2-----$" + file.getCanonicalPath());
+                        log.info("File is generated: " + file.getCanonicalPath());
                     } catch (IOException e) {
                         log.error(e.getMessage(), e);
                     }
@@ -196,12 +219,14 @@ public class NodeGroup {
             public void onError(Throwable t) {
                 log.error(t.getMessage(), t);
                 deliverClient.close();
+                createLock.unLock();
             }
 
             @Override
             public void onCompleted() {
                 log.info("Deliver onCompleted");
                 deliverClient.close();
+                createLock.unLock();
             }
         });
 
@@ -229,7 +254,7 @@ public class NodeGroup {
         return new GenesisBlockFactory(groupTree).getGenesisBlock(groupId);
     }
 
-    public void joinGroup(String blockPath) throws NodeException {
+    public void joinGroup(String nodeHost, int nodePort, String blockPath) throws NodeException {
         SmartContractPackage.SmartContractInvocationSpec spec = null;
         try {
             spec = SpecHelper.buildInvocationSpec(CommConstant.CSSC, CSSC.JOIN_GROUP,
@@ -241,7 +266,7 @@ public class NodeGroup {
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
 
         byte[] nonce = new byte[0];
         try {
@@ -263,23 +288,23 @@ public class NodeGroup {
                 "", txId, spec, nonce, creator, null);
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
-        EndorserClient endorserClient = new EndorserClient(CSSC.DEFAULT_HOST, CSSC.DEFAULT_PORT);
+        EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = endorserClient.sendProcessProposal(signedProposal);
 
         if (proposalResponse != null && proposalResponse.getResponse() != null && proposalResponse.getResponse()
                 .getStatus() == ISmartContract.SmartContractResponse.Status.SUCCESS.getCode()) {
 
-	      // TODO 周辉检查
-	      try {
-	        byte[] bytes = FileUtils.readFileBytes(blockPath);
-	        Common.Block block = Common.Block.parseFrom(bytes);
-	        String groupId = BlockUtils.getGroupIDFromBlock(block);
-	        node.getLedgerIds().add(groupId);
-	      } catch (IOException e) {
-	        log.error(e.getMessage(), e);
-	      } catch (JavaChainException e) {
-	        log.error(e.getMessage(), e);
-	      }
+            // TODO 周辉检查
+            try {
+                byte[] bytes = FileUtils.readFileBytes(blockPath);
+                Common.Block block = Common.Block.parseFrom(bytes);
+                String groupId = BlockUtils.getGroupIDFromBlock(block);
+                node.getLedgerIds().add(groupId);
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            } catch (JavaChainException e) {
+                log.error(e.getMessage(), e);
+            }
 
             log.info("Join group success");
         } else {
@@ -303,12 +328,12 @@ public class NodeGroup {
     /**
      * 获取当前节点所在的所有群组列表
      */
-    public List<Query.GroupInfo> listGroups() throws NodeException {
-        SmartContractPackage.SmartContractInvocationSpec csscSpec = SpecHelper.buildInvocationSpec(CommConstant.CSSC, CSSC
-                .GET_GROUPS, null);
+    public List<Query.GroupInfo> listGroups(String nodeHost, int nodePort) throws NodeException {
+        SmartContractPackage.SmartContractInvocationSpec csscSpec = SpecHelper.buildInvocationSpec(CommConstant.CSSC,
+                CSSC.GET_GROUPS, null);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
 
         byte[] nonce = null;
         try {
@@ -332,7 +357,7 @@ public class NodeGroup {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //获取背书节点返回信息
-        EndorserClient client = new EndorserClient(CSSC.DEFAULT_HOST, CSSC.DEFAULT_PORT);
+        EndorserClient client = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
 
         Query.GroupQueryResponse groupQueryResponse = null;
@@ -341,8 +366,7 @@ public class NodeGroup {
             return groupQueryResponse.getGroupsList();
         } catch (InvalidProtocolBufferException e) {
             log.error(e.getMessage(), e);
+            return null;
         }
-
-        return null;
     }
 }

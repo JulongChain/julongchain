@@ -32,7 +32,7 @@ public class ConfigBuilderTest {
 
     @Test
     public void init() {
-        LoadLocalMspFiles.init("E:/msp");
-        System.out.println(LoadLocalMspFiles.mspMap.get("E:\\msp\\keystore\\privatekey.pem"));
+//        LoadLocalMspFiles.init("E:/msp");
+//        System.out.println(LoadLocalMspFiles.mspMap.get("E:\\msp\\keystore\\privatekey.pem"));
     }
 }

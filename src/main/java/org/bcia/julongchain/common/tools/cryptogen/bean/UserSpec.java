@@ -17,6 +17,8 @@
 package org.bcia.julongchain.common.tools.cryptogen.bean;
 
 /**
+ * crypto-config.yaml 节点配置数据类 users 部分
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/20
  * @company Excelsecu

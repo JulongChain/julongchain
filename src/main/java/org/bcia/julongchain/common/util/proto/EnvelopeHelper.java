@@ -294,7 +294,7 @@ public class EnvelopeHelper {
         }
 
         //签名头部的消息创建者字段应与身份一致
-        if (Arrays.compareUnsigned(signatureHeader.getCreator().toByteArray(), identity.serialize()) != 0) {
+        if (Arrays.compareUnsigned(signatureHeader.getCreator().toByteArray(), identity.getIdentity().serialize()) != 0) {
             throw new ValidateException("Wrong signatureHeader creator");
         }
 

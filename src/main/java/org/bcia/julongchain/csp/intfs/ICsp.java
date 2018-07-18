@@ -18,6 +18,7 @@ package org.bcia.julongchain.csp.intfs;
 
 import org.bcia.julongchain.csp.intfs.opts.*;
 import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bouncycastle.crypto.CryptoException;
 
 /**
  * @author zhanglin

@@ -50,7 +50,7 @@ public class GenesisBlockFactory implements IGenesisBlockFactory {
 
         IMsp localMsp = GlobalMspManagement.getLocalMsp();
         ISigningIdentity signingIdentity = localMsp.getDefaultSigningIdentity();
-        byte[] creator = signingIdentity.serialize();
+        byte[] creator = signingIdentity.getIdentity().serialize();
 
         //计算交易ID
         String txId = ProposalUtils.computeProposalTxID(creator, nonce);

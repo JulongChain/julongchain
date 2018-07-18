@@ -207,7 +207,7 @@ public class GroupConfigBundle implements IGroupConfigBundle,IMutableResources {
                     if (otherOrganizationConfig != null && !Objects.equals(organizationConfig.getMspId(),
                             otherOrganizationConfig.getMspId())) {
                         //如果要比较的Map也存在对应的组织，但MSP却不相同,则抛出异常
-                        throw new ValidateException("Different org msp-----" + orgName + "," + organizationConfig
+                        throw new ValidateException("Different org msp: " + orgName + "," + organizationConfig
                                 .getMspId() + "," + otherOrganizationConfig.getMspId());
                     }
                 }

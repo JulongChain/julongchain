@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 package org.bcia.julongchain.msp;
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.msp.entity.IdentityIdentifier;
 import org.bcia.julongchain.protos.common.MspPrincipal;
 import org.bcia.julongchain.protos.msp.MspConfigPackage;
+
+import java.io.IOException;
 
 /**
  * @author zhangmingyang
@@ -31,7 +35,6 @@ public interface IMsp extends IIdentityDeserializer{
 
     IMsp setup(MspConfigPackage.MSPConfig config);
 
-   //  IMsp load(GmSoftConf GmSoftConf);
     /**
      * 返回此msp的版本
      * @return
@@ -46,7 +49,7 @@ public interface IMsp extends IIdentityDeserializer{
      * 返回提供者类型
      * @return
      */
-     int getType();
+     int  getType();
 
     /**
      * 返回提供者的标识符
@@ -83,7 +86,7 @@ public interface IMsp extends IIdentityDeserializer{
      * 验证检查提供的身份是否有效
      * @param id
      */
-     void validate(IIdentity id);
+     void validate(IIdentity id)throws MspException;
 
     /**
      * SatisfiesPrincipal检查该标识是否与MSPPrincipal中提供的描述相匹配。
@@ -91,5 +94,5 @@ public interface IMsp extends IIdentityDeserializer{
      * @param id
      * @param principal
      */
-     void satisfiesPrincipal(IIdentity id, MspPrincipal.MSPPrincipal principal);
+     void satisfiesPrincipal(IIdentity id, MspPrincipal.MSPPrincipal principal) throws IOException, MspException;
 }

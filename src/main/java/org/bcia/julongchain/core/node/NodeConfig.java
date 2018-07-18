@@ -237,7 +237,9 @@ public class NodeConfig {
      */
     public static class SmartContract {
         private String instantiatePath;
+        private String dockerFile;
         private String coreNodeAddress;
+        private String coreNodeAddressPort;
         private Map<String, String> id;
         private String builder;
         private boolean pull;
@@ -379,6 +381,22 @@ public class NodeConfig {
 
         public void setCoreNodeAddress(String coreNodeAddress) {
             this.coreNodeAddress = coreNodeAddress;
+        }
+
+        public String getDockerFile() {
+            return dockerFile;
+        }
+
+        public void setDockerFile(String dockerFile) {
+            this.dockerFile = dockerFile;
+        }
+
+        public String getCoreNodeAddressPort() {
+            return coreNodeAddressPort;
+        }
+
+        public void setCoreNodeAddressPort(String coreNodeAddressPort) {
+            this.coreNodeAddressPort = coreNodeAddressPort;
         }
     }
 

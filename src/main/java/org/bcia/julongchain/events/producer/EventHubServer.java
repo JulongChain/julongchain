@@ -17,6 +17,7 @@ package org.bcia.julongchain.events.producer;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.stub.StreamObserver;
+import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.exception.VerifyException;
 import org.bcia.julongchain.common.log.JavaChainLog;
@@ -64,6 +65,8 @@ public class EventHubServer implements IEventHubServer {
             log.error(e.getMessage(), e);
         } catch (VerifyException e) {
             log.error(e.getMessage(), e);
+        } catch (MspException e) {
+            e.printStackTrace();
         }
 
         return null;

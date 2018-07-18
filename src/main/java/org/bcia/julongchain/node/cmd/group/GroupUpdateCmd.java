@@ -65,25 +65,25 @@ public class GroupUpdateCmd extends AbstractNodeGroupCmd {
         String consenter = null;
         if (cmd.hasOption(ARG_CONSENTER)) {
             consenter = cmd.getOptionValue(ARG_CONSENTER, defaultValue);
-            log.info("Consenter-----$" + consenter);
+            log.info("Consenter: " + consenter);
         }
 
         String groupId = null;
         if (cmd.hasOption(ARG_GROUP_ID)) {
             groupId = cmd.getOptionValue(ARG_GROUP_ID, defaultValue);
-            log.info("GroupId-----$" + groupId);
+            log.info("GroupId: " + groupId);
         }
 
         String groupConfigFile = null;
         if (cmd.hasOption(ARG_FILE_PATH)) {
             groupConfigFile = cmd.getOptionValue(ARG_FILE_PATH, defaultValue);
-            log.info("GroupId config File-----$" + groupConfigFile);
+            log.info("GroupId config File: " + groupConfigFile);
         }
 
         String timeout = null;
         if (cmd.hasOption(ARG_TIMEOUT)) {
             timeout = cmd.getOptionValue(ARG_TIMEOUT, defaultValue);
-            log.info("Timeout-----$" + timeout);
+            log.info("Timeout: " + timeout);
         }
 
         if (StringUtils.isBlank(groupId)) {

@@ -60,14 +60,13 @@ public class NodeSmartContract {
         this.node = node;
     }
 
-    public void install(String scName, String scVersion, String scPath, String scLanguage, SmartContractPackage
-            .SmartContractInput input) throws NodeException {
+    public void install(String nodeHost, int nodePort, String scName, String scVersion, String scPath) throws NodeException {
         SmartContractPackage.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName, scVersion,
-                scPath, input);
+                scPath, null);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
 
         byte[] nonce = new byte[0];
         try {
@@ -84,7 +83,6 @@ public class NodeSmartContract {
             throw new NodeException("Generate txId fail");
         }
 
-        byte[] inputBytes = (input != null ? input.toByteArray() : new byte[0]);
         SmartContractPackage.SmartContractInvocationSpec lsscSpec = SpecHelper.buildInvocationSpec(CommConstant.LSSC,
                 LSSC.INSTALL.getBytes(), deploymentSpec.toByteArray());
         //生成proposal  Type=ENDORSER_TRANSACTION
@@ -93,19 +91,19 @@ public class NodeSmartContract {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //获取背书节点返回信息
-        EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
+        EndorserClient client = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
         log.info("Install Result: " + proposalResponse.getResponse().getStatus());
     }
 
-    public void instantiate(String ip, int port, String groupId, String scName, String scVersion, SmartContractPackage
-            .SmartContractInput input) throws NodeException {
+    public void instantiate(String nodeHost, int nodePort, String consenterHost, int consenterPort, String groupId,
+                            String scName, String scVersion, SmartContractPackage.SmartContractInput input) throws NodeException {
         SmartContractPackage.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName, scVersion,
                 null, input);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
 
         byte[] nonce = new byte[0];
         try {
@@ -130,20 +128,20 @@ public class NodeSmartContract {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //获取背书节点返回信息
-        EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
+        EndorserClient client = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
 
         try {
             Common.Envelope signedTxEnvelope = EnvelopeHelper.createSignedTxEnvelope(proposal, identity, proposalResponse);
 
-            EnvelopeVO envelopeVO = new EnvelopeVO();
-            try {
-                envelopeVO.parseFrom(signedTxEnvelope);
-            } catch (InvalidProtocolBufferException e) {
-                log.error(e.getMessage(), e);
-            }
+//            EnvelopeVO envelopeVO = new EnvelopeVO();
+//            try {
+//                envelopeVO.parseFrom(signedTxEnvelope);
+//            } catch (InvalidProtocolBufferException e) {
+//                log.error(e.getMessage(), e);
+//            }
 
-            IBroadcastClient broadcastClient = new BroadcastClient(ip, port);
+            IBroadcastClient broadcastClient = new BroadcastClient(consenterHost, consenterPort);
             broadcastClient.send(signedTxEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
                 @Override
                 public void onNext(Ab.BroadcastResponse value) {
@@ -182,13 +180,13 @@ public class NodeSmartContract {
 
     }
 
-    public void invoke(String ip, int port, String groupId, String scName, String scLanguage, SmartContractPackage
-            .SmartContractInput input) throws NodeException {
-        SmartContractPackage.SmartContractInvocationSpec sciSpec = SpecHelper.buildInvocationSpec(scName, input.toByteArray());
+    public void invoke(String nodeHost, int nodePort, String consenterHost, int consenterPort, String groupId,
+                       String scName, SmartContractPackage.SmartContractInput input) throws NodeException {
+        SmartContractPackage.SmartContractInvocationSpec sciSpec = SpecHelper.buildInvocationSpec(scName, input);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
 
         byte[] nonce = new byte[0];
         try {
@@ -212,25 +210,16 @@ public class NodeSmartContract {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //背书
-//        EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
-        EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
+        EndorserClient client = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
-
-//        //envelop V0.25
-//        BroadCastClient broadCastClient = new BroadCastClient();
-//        try {
-//            broadCastClient.send(ip, port, Common.Envelope.newBuilder().build(), (StreamObserver<Ab.BroadcastResponse>) this);
-//        } catch (Exception e) {
-//            log.error(e.getMessage(), e);
-//        }
 
         try {
             Common.Envelope signedTxEnvelope = EnvelopeHelper.createSignedTxEnvelope(proposal, identity, proposalResponse);
 
-            EnvelopeVO envelopeVO = new EnvelopeVO();
-            envelopeVO.parseFrom(signedTxEnvelope);
+//            EnvelopeVO envelopeVO = new EnvelopeVO();
+//            envelopeVO.parseFrom(signedTxEnvelope);
 
-            IBroadcastClient broadcastClient = new BroadcastClient(ip, port);
+            IBroadcastClient broadcastClient = new BroadcastClient(consenterHost, consenterPort);
             broadcastClient.send(signedTxEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
                 @Override
                 public void onNext(Ab.BroadcastResponse value) {
@@ -239,7 +228,9 @@ public class NodeSmartContract {
 
                     //收到响应消息，判断是否是200消息
                     if (Common.Status.SUCCESS.equals(value.getStatus())) {
-                        log.info("invoke success");
+                        log.info("Invoke success");
+                    } else {
+                        log.info("Invoke fail: " + value.getStatus());
                     }
                 }
 
@@ -269,11 +260,11 @@ public class NodeSmartContract {
     }
 
     public void query(String groupId, String smartContractName, SmartContractPackage.SmartContractInput input) throws NodeException {
-        SmartContractPackage.SmartContractInvocationSpec spec = SpecHelper.buildInvocationSpec(smartContractName, input.toByteArray());
+        SmartContractPackage.SmartContractInvocationSpec spec = SpecHelper.buildInvocationSpec(smartContractName, input);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
 
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
 
         byte[] nonce = new byte[0];
         try {

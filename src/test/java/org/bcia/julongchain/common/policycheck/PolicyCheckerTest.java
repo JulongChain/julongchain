@@ -56,7 +56,6 @@ public class PolicyCheckerTest {
                 SmartContractPackage.SmartContractSpec.newBuilder().build());
         policyChecker.checkPolicy("A", "Admins",sp);
 
-
     }
 
     @Test
@@ -80,12 +79,7 @@ public class PolicyCheckerTest {
         String reader = "readers";
         IIdentityDeserializer localMSP = mock(IIdentityDeserializer.class);
         MspManager mspManager = new MspManager();
-        Msp msp = new Msp();
-        IMspPrincipalGetter principalGetter = mock(IMspPrincipalGetter.class);
-        PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManagerGetter(),msp,principalGetter);
-        ProposalPackage.SignedProposal sp = TxUtils.mockSignedEndorserProposalOrPanic("",
-                SmartContractPackage.SmartContractSpec.newBuilder().build());
-        policyChecker.checkPolicyNoGroup("Admins",sp);
+
     }
 
 

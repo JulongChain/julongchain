@@ -109,11 +109,12 @@ public class CspManager {
                 log.error(e.getMessage(), e);
             }
 
-            CspOptsManager cspOptsManager = new CspOptsManager();
-            cspOptsManager.addAll(mspConfig.getNode().getCsp().getFactoryOpts());
+            String defaultOpts = mspConfig.getNode().getCsp().getDefaultValue();
+
+            CspOptsManager cspOptsManager = CspOptsManager.getInstance();
+            cspOptsManager.addAll(defaultOpts, mspConfig.getNode().getCsp().getFactoryOpts());
 
             List<IFactoryOpts> optsList = cspOptsManager.getFactoryOptsList();
-            String defaultOpts = mspConfig.getNode().getCsp().getDefaultValue();
             initCspFactories(optsList, defaultOpts);
         }
 

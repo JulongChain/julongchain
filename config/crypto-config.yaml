@@ -15,9 +15,9 @@ consenterOrgs:
       - hostname: consenter
 
 # ---------------------------------------------------------------------------
-# "peerOrgs" - Definition of organizations managing peer nodes
+# "nodeOrgs" - Definition of organizations managing node nodes
 # ---------------------------------------------------------------------------
-peerOrgs:
+nodeOrgs:
   # ---------------------------------------------------------------------------
   # Org1
   # ---------------------------------------------------------------------------
@@ -79,7 +79,7 @@ peerOrgs:
     # "template"
     # ---------------------------------------------------------------------------
     # Allows for the definition of 1 or more hosts that are created sequentially
-    # from a template. By default, this looks like "peer%d" from 0 to Count-1.
+    # from a template. By default, this looks like "node%d" from 0 to Count-1.
     # You may override the number of nodes (Count), the starting index (Start)
     # or the template used to construct the name (Hostname).
     #
