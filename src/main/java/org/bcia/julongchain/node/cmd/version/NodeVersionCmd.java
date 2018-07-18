@@ -37,7 +37,7 @@ public class NodeVersionCmd extends AbstractNodeVersionCmd {
 
     @Override
     public void execCmd(String[] args) throws ParseException {
-        log.info("PolicyNode version: " + nodeVersion.getVersion());
+        log.info("Node version: " + nodeVersion.getVersion());
     }
 
 }
