@@ -44,13 +44,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * CSP 相关功能封装
+ *
  * @author chenhao, yegangcheng
  * @date 2018/4/3
  * @company Excelsecu
  */
 public class CspHelper {
     private static JavaChainLog log = JavaChainLogFactory.getLog(CspHelper.class);
-    private static final ICsp csp = getCsp();
+    private static final ICsp CSP = getCsp();
+    private static final int ASN1_SEQUENCE = 0x30;
+    private static final int HEAD_PUBLIC_KEY_UNCOMPRESSED = 0x04;
 
     static {
         try {
@@ -58,24 +62,6 @@ public class CspHelper {
         } catch (MspException e) {
             log.error(e.getMessage(), e);
         }
-
-//        List<IFactoryOpts> list = new ArrayList<>();
-//        IFactoryOpts opts = new GmFactoryOpts() {
-//            @Override
-//            public boolean isDefaultCsp() {
-//                return true;
-//            }
-//        };
-//        try {
-//            MspConfig mspConfig = MspConfigFactory.loadMspConfig();
-//            GmFactoryOpts factoryOpts=new GmFactoryOpts();
-//            factoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("gm"));
-//            list.add(factoryOpts);
-//        } catch (FileNotFoundException e) {
-//            log.error(e.getMessage());
-//        }
-//        list.add(opts);
-//        CspManager.initCspFactories(list);
     }
 
     public static ICsp getCsp() {
@@ -102,7 +88,7 @@ public class CspHelper {
                 byte[] encodedData = pemObject.getContent();
                 List<Object> list = decodePrivateKeyPKCS8(encodedData);
                 Object rawKey = list.get(1);
-                return csp.keyImport(rawKey, new SM2PrivateKeyImportOpts(true));
+                return CSP.keyImport(rawKey, new SM2PrivateKeyImportOpts(true));
             } catch (Exception e) {
                 log.error("An error occurred on loadPrivateKey: {}", e.getMessage());
             }
@@ -117,7 +103,7 @@ public class CspHelper {
             var.putInteger(BigInteger.ZERO);
             algId.encode(var);
             var.putOctetString(privateKey);
-            encodedPriKey.write((byte) 48, var);
+            encodedPriKey.write((byte) ASN1_SEQUENCE, var);
             return encodedPriKey.toByteArray();
         } catch (IOException e) {
             throw new JavaChainException("An error occurred :" + e);
@@ -128,7 +114,7 @@ public class CspHelper {
     private static List<Object> decodePrivateKeyPKCS8(byte[] encodedData) throws JavaChainException {
         try {
             DerValue derValue = new DerValue(new ByteArrayInputStream(encodedData));
-            if (derValue.tag != 48) {
+            if (derValue.tag != ASN1_SEQUENCE) {
                 throw new JavaChainException("invalid key format");
             } else {
                 BigInteger version = derValue.data.getBigInteger();
@@ -149,10 +135,9 @@ public class CspHelper {
     }
 
 
-    public static IKey generatePrivateKey(String keystorePath) throws JavaChainException {
-
+    static IKey generatePrivateKey(String keystorePath) throws JavaChainException {
         try {
-            IKey priv = csp.keyGen(new SM2KeyGenOpts() {
+            IKey priv = CSP.keyGen(new SM2KeyGenOpts() {
                 @Override
                 public boolean isEphemeral() {
                     return true;
@@ -167,7 +152,7 @@ public class CspHelper {
         }
     }
 
-    public static ECPublicKey getSM2PublicKey(IKey priv) throws JavaChainException {
+    static ECPublicKey getSM2PublicKey(IKey priv) throws JavaChainException {
         IKey pubKey;
         try {
             pubKey = priv.getPublicKey();
@@ -182,7 +167,7 @@ public class CspHelper {
         try {
             byte[] bytes = sm2PublicKey.toBytes();
             // 默认非压缩公钥
-            if (bytes[0] != 0x04) {
+            if (bytes[0] != HEAD_PUBLIC_KEY_UNCOMPRESSED) {
                 throw new JavaChainException("CspHelper getSM2PublicKey publicKey not uncompressed");
             }
 

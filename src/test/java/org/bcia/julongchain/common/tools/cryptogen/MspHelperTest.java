@@ -33,7 +33,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -132,7 +131,7 @@ public class MspHelperTest {
     }
 
     @Test
-    public void generateVerifyingMSP() throws JavaChainException, IOException {
+    public void generateVerifyingMSP() throws JavaChainException {
         System.out.println("testDir=" + testDir);
 
         String caDir = Paths.get(testDir, "ca").toString();
@@ -223,18 +222,15 @@ public class MspHelperTest {
             adminCert.add(FileUtils.readFileToByteArray(file));
         }
 
-        List<byte[]> keyStore = new ArrayList<>();
-        File keyStoreFile = new File(Paths.get(mspDir, "keystore").toString());
-        for (File file : Objects.requireNonNull(keyStoreFile.listFiles())) {
-            keyStore.add(FileUtils.readFileToByteArray(file));
-        }
-
         List<byte[]> tlsCaCert = new ArrayList<>();
         File tlsCertFile = new File(Paths.get(mspDir, "tlscacerts").toString());
         for (File file : Objects.requireNonNull(tlsCertFile.listFiles())) {
             tlsCaCert.add(FileUtils.readFileToByteArray(file));
         }
 
+        List<byte[]> configContent = new ArrayList<>();
+        File configFile = new File(Paths.get(mspDir, "config.yaml").toString());
+        configContent.add(FileUtils.readFileToByteArray(configFile));
 
         List<byte[]> signCert = new ArrayList<>();
         File signCertFile = new File(Paths.get(mspDir, "signcerts").toString());
@@ -242,9 +238,9 @@ public class MspHelperTest {
             signCert.add(FileUtils.readFileToByteArray(file));
         }
 
-        MspConfigPackage.MSPConfig.Builder mspConfig = MspConfigBuilder.mspConfigBuilder(
-                "testMsp", caCert, signCert, adminCert, new ArrayList<>(), new ArrayList<>(), tlsCaCert, new ArrayList<>(),new ArrayList<>());
+        MspConfigPackage.MSPConfig mspConfig = MspConfigBuilder.mspConfigBuilder(
+                "testMsp", caCert, signCert, adminCert, new ArrayList<>(), new ArrayList<>(), configContent, tlsCaCert, new ArrayList<>()).build();
         Msp msp = new Msp();
-        msp.setup(mspConfig.build());
+        msp.setup(mspConfig);
     }
 }

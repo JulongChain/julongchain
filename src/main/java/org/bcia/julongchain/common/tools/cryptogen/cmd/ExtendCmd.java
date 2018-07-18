@@ -45,6 +45,10 @@ import static org.bcia.julongchain.common.tools.cryptogen.cmd.Util.*;
  */
 public class ExtendCmd implements ICryptoGenCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ExtendCmd.class);
+    private static final String CMD_EXTEND = "extend";
+    private static final String CMD_ARG_INPUT = "input";
+    private static final String CMD_ARG_CONFIG = "config";
+    private static final String CMD_ARG_HELP = "help";
 
     //the value of "input" commandline option
     private String inputDir;
@@ -56,29 +60,29 @@ public class ExtendCmd implements ICryptoGenCmd {
     public void execCmd(String[] args) throws JavaChainException {
         Options options = new Options();
         options.addOption(Option.builder()
-                .longOpt("input")
+                .longOpt(CMD_ARG_INPUT)
                 .desc("The input directory in which existing network place, default \"crypto-config\"")
                 .hasArg()
                 .argName("crypto-config")
                 .build());
         options.addOption(Option.builder()
-                .longOpt("config")
+                .longOpt(CMD_ARG_CONFIG)
                 .desc("The configuration template to use, default using \"cryptogen template\"")
                 .hasArg()
                 .argName("file name")
                 .build());
-        options.addOption(null, "help", false, "Print this message");
+        options.addOption(null, CMD_ARG_HELP, false, "Print this message");
 
         CommandLineParser parser = new DefaultParser();
         try {
             CommandLine commandLine = parser.parse(options, args);
-            if (commandLine.hasOption("help")) {
+            if (commandLine.hasOption(CMD_ARG_HELP)) {
                 HelpFormatter helpFormatter = new HelpFormatter();
-                helpFormatter.printHelp("extend", options);
+                helpFormatter.printHelp(CMD_EXTEND, options);
                 return;
             }
-            inputDir = commandLine.getOptionValue("input", "crypto-config");
-            configFile = commandLine.getOptionValue("config", null);
+            inputDir = commandLine.getOptionValue(CMD_ARG_INPUT, "crypto-config");
+            configFile = commandLine.getOptionValue(CMD_ARG_CONFIG, null);
             extend();
         } catch (ParseException e) {
             throw new JavaChainException(e.getMessage());
