@@ -398,8 +398,8 @@ vm:
     # unix:///var/run/docker.sock
     # http://localhost:2375
     # https://localhost:2376
-    # endpoint: unix:///var/run/docker.sock
-    endpoint: tcp://0.0.0.0:2375
+    endpoint: unix:///var/run/docker.sock
+    #endpoint: tcp://0.0.0.0:2375
 
     # settings for docker vms
     docker:
