@@ -16,6 +16,7 @@ package org.bcia.julongchain.core.smartcontract;
 import com.google.protobuf.ByteString;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.bcia.julongchain.common.exception.SmartContractException;
 import org.bcia.julongchain.common.ledger.util.IoUtil;
 import org.bcia.julongchain.common.log.JavaChainLog;
@@ -287,11 +288,19 @@ public class SmartContractSupport {
 
       String smartContractId = scContext.getName();
 
+      String nodeId = NodeConfigFactory.getNodeConfig().getNode().getId();
+
       String version = scContext.getVersion();
 
-      boolean scRunning = SmartContractRunningUtil.checkSmartContractRunning(smartContractId);
-
       Boolean isSystemContract = SmartContractSupportClient.checkSystemSmartContract(smartContractId);
+
+      boolean scRunning = false;
+
+      if(BooleanUtils.isTrue(isSystemContract)){
+        scRunning = SmartContractRunningUtil.checkSmartContractRunning(smartContractId);
+      }else{
+        scRunning = SmartContractRunningUtil.checkSmartContractRunning(nodeId + "-" + smartContractId);
+      }
 
       if (!scRunning) {
 
@@ -309,7 +318,10 @@ public class SmartContractSupport {
           } else {
               try {
 
-                  String imageName = smartContractId + "-" + version;
+
+
+                  String imageName = nodeId + "-" + smartContractId + "-" + version;
+                  String containerName = nodeId + "-" + smartContractId;
 
                   List<String> images = DockerUtil.listImages(imageName);
 
@@ -380,22 +392,22 @@ public class SmartContractSupport {
                       // "/bin/sh",
                       // "-c",
                       // "java -jar /root/julongchain/target/julongchain-smartcontract-java-jar-with-dependencies.jar -i " + containerName
-                      String containerId = DockerUtil.createContainer(imageId, smartContractId, "/bin/sh", "-c", "java -jar /root/julongchain/target/julongchain-smartcontract-java-jar-with-dependencies.jar -i " + smartContractId + coreNodeAddressAndPortArgus);
+                      String containerId = DockerUtil.createContainer(imageId, containerName, "/bin/sh", "-c", "java -jar /root/julongchain/target/julongchain-smartcontract-java-jar-with-dependencies.jar -i " + containerName + coreNodeAddressAndPortArgus);
 
                       log.info("========================containerId:" + containerId);
 
                       // 启动容器
                       DockerUtil.startContainer(containerId);
 
-                      while (!SmartContractRunningUtil.checkSmartContractRunning(smartContractId)) {
-                          log.info("wait smart contract register[" + smartContractId + "]");
+                      while (!SmartContractRunningUtil.checkSmartContractRunning(containerName)) {
+                          log.info("wait smart contract register[" + containerName + "]");
                           Thread.sleep(1000);
                       }
                   } else {
-                      log.info("========================container id ==============" + smartContractId);
-                      DockerUtil.startContainer(smartContractId);
-                      while (!SmartContractRunningUtil.checkSmartContractRunning(smartContractId)) {
-                          log.info("wait smart contract register[" + smartContractId + "]");
+                      log.info("========================container id ==============" + containerName);
+                      DockerUtil.startContainer(containerName);
+                      while (!SmartContractRunningUtil.checkSmartContractRunning(containerName)) {
+                          log.info("wait smart contract register[" + containerName + "]");
                           Thread.sleep(1000);
                       }
                   }
@@ -440,7 +452,12 @@ public class SmartContractSupport {
 
     String smartContractId = scContext.getName();
 
-    SmartContractMessage responseMessage =
+      Boolean isSystemContract = SmartContractSupportClient.checkSystemSmartContract(smartContractId);
+      if(!BooleanUtils.isTrue(isSystemContract)){
+          smartContractId = NodeConfigFactory.getNodeConfig().getNode().getId() + "-" + smartContractId;
+      }
+
+      SmartContractMessage responseMessage =
         SmartContractSupportService.invoke(smartContractId, scMessage);
 
     return responseMessage;
