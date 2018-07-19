@@ -16,9 +16,9 @@
 package org.bcia.julongchain.csp.pkcs11.aes;
 
 import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.pkcs11.IPKCS11FactoryOpts;
+import org.bcia.julongchain.csp.pkcs11.PKCS11CspLog;
 import org.bcia.julongchain.csp.pkcs11.util.SymmetryKey;
 import sun.security.pkcs11.wrapper.CK_ATTRIBUTE;
 import sun.security.pkcs11.wrapper.CK_MECHANISM;
@@ -38,7 +38,79 @@ import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
  * @company FEITIAN
  */
 public class AesImpl {
-	private static JavaChainLog logger;
+
+    private static void setLoggerDebug(String msg, int classNO){
+
+        PKCS11CspLog csplog = new PKCS11CspLog();
+        switch (classNO){
+            case 1:
+                csplog.setLogMsg(msg, 0, AesImpl.GenerateAES.class);
+                break;
+            case 2:
+                csplog.setLogMsg(msg, 0, AesImpl.ImoprtAESKey.class);
+                break;
+            case 3:
+                csplog.setLogMsg(msg, 0, AesImpl.GetAESKey.class);
+                break;
+            case 6:
+                csplog.setLogMsg(msg, 0, AesImpl.EncryptAES.class);
+                break;
+            case 7:
+                csplog.setLogMsg(msg, 0, AesImpl.DecryptAES.class);
+                break;
+            default:
+                csplog.setLogMsg(msg, 0, AesImpl.class);
+                break;
+        }
+    }
+
+    private static void setLoggerInfo(String msg, int classNO){
+        PKCS11CspLog csplog = new PKCS11CspLog();
+        switch (classNO){
+            case 1:
+                csplog.setLogMsg(msg, 1, AesImpl.GenerateAES.class);
+                break;
+            case 2:
+                csplog.setLogMsg(msg, 1, AesImpl.ImoprtAESKey.class);
+                break;
+            case 3:
+                csplog.setLogMsg(msg, 1, AesImpl.GetAESKey.class);
+                break;
+            case 6:
+                csplog.setLogMsg(msg, 1, AesImpl.EncryptAES.class);
+                break;
+            case 7:
+                csplog.setLogMsg(msg, 1, AesImpl.DecryptAES.class);
+                break;
+            default:
+                csplog.setLogMsg(msg, 1, AesImpl.class);
+                break;
+        }
+    }
+
+    private static void setLoggerErr(String msg, int classNO){
+        PKCS11CspLog csplog = new PKCS11CspLog();
+        switch (classNO){
+            case 1:
+                csplog.setLogMsg(msg, 2, AesImpl.GenerateAES.class);
+                break;
+            case 2:
+                csplog.setLogMsg(msg, 2, AesImpl.ImoprtAESKey.class);
+                break;
+            case 3:
+                csplog.setLogMsg(msg, 2, AesImpl.GetAESKey.class);
+                break;
+            case 6:
+                csplog.setLogMsg(msg, 2, AesImpl.EncryptAES.class);
+                break;
+            case 7:
+                csplog.setLogMsg(msg, 2, AesImpl.DecryptAES.class);
+                break;
+            default:
+                csplog.setLogMsg(msg, 2, AesImpl.class);
+                break;
+        }
+    }
 
     public static class GenerateAES{
 
@@ -76,17 +148,17 @@ public class AesImpl {
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                logger.error(err);
+                AesImpl.setLoggerErr(err, 1);
                 throw new JavaChainException(err, ex.getCause());
             }catch(NoSuchAlgorithmException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-                logger.error(err);
+                AesImpl.setLoggerErr(err, 1);
                 throw new JavaChainException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
-                logger.error(err);
+                AesImpl.setLoggerErr(err, 1);
                 throw new JavaChainException(err, ex.getCause());
             }
         }
@@ -123,17 +195,17 @@ public class AesImpl {
     		}catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                logger.error(err);
+                AesImpl.setLoggerErr(err, 2);
                 throw new JavaChainException(err, ex.getCause());
             }catch(NoSuchAlgorithmException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-                logger.error(err);
+                AesImpl.setLoggerErr(err, 2);
                 throw new JavaChainException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
-                logger.error(err);
+                AesImpl.setLoggerErr(err, 2);
                 throw new JavaChainException(err, ex.getCause());
             }
     	}
@@ -148,9 +220,8 @@ public class AesImpl {
                 long[] keyhandle = findKeyFromSKI(opts, ski);
                 if(keyhandle == null ||(keyhandle!=null && keyhandle.length==0))
                 {
-                	String str=null;
-                    str=String.format("[JC_PKCS]:No Find Key");
-                    logger.error(str);
+                    String str = String.format("[JC_PKCS]:No Find Key");
+                    AesImpl.setLoggerInfo(str, 3);
                     return null;
                 }
 
@@ -172,17 +243,17 @@ public class AesImpl {
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                logger.error(err);
+                AesImpl.setLoggerErr(err, 3);
                 throw new JavaChainException(err, ex.getCause());
             }catch(NoSuchAlgorithmException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-                logger.error(err);
+                AesImpl.setLoggerErr(err, 3);
                 throw new JavaChainException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
-                logger.error(err);
+                AesImpl.setLoggerErr(err, 3);
                 throw new JavaChainException(err, ex.getCause());
             }
         }
@@ -199,7 +270,9 @@ public class AesImpl {
                 long[] key = findKeyFromSKI(opts, ski);
                 if(key == null ||(key!=null && key.length==0))
                 {
-                    return null;
+                    String str = String.format("[JC_PKCS]:No Find Key");
+                    AesImpl.setLoggerErr(str, 6);
+                    throw new JavaChainException("[JC_PKCS]:No Find Key!");
                 }
                 CK_MECHANISM ckm = new CK_MECHANISM();
                 ckm.mechanism = mechanism;
@@ -218,12 +291,12 @@ public class AesImpl {
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                logger.error(err);
+                AesImpl.setLoggerErr(err, 6);
                 throw new JavaChainException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
-                logger.error(err);
+                AesImpl.setLoggerErr(err, 6);
                 throw new JavaChainException(err, ex.getCause());
             }
         }
@@ -238,7 +311,9 @@ public class AesImpl {
                 long[] key = findKeyFromSKI(opts, ski);
                 if(key == null ||(key!=null && key.length==0))
                 {
-                    return null;
+                    String str = String.format("[JC_PKCS]:No Find Key");
+                    AesImpl.setLoggerErr(str, 7);
+                    throw new JavaChainException("[JC_PKCS]:No Find Key!");
                 }
                 CK_MECHANISM ckm = new CK_MECHANISM();
                 ckm.mechanism = mechanism;
@@ -253,12 +328,12 @@ public class AesImpl {
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                logger.error(err);
+                AesImpl.setLoggerErr(err, 7);
                 throw new JavaChainException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
-                logger.error(err);
+                AesImpl.setLoggerErr(err, 7);
                 throw new JavaChainException(err, ex.getCause());
             }
         }
@@ -304,17 +379,17 @@ public class AesImpl {
 
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:PKCS11Exception ErrMessage: %s", ex.getMessage());
-            logger.error(err);
+            setLoggerErr(err, 0);
             throw new JavaChainException(err, ex.getCause());
         }catch(NoSuchAlgorithmException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-            logger.error(err);
+            setLoggerErr(err, 0);
             throw new JavaChainException(err, ex.getCause());
         }catch(Exception ex) {
         	ex.printStackTrace();
         	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
-            logger.error(err);
+            setLoggerErr(err, 0);
             throw new JavaChainException(err, ex.getCause());
         }
 
