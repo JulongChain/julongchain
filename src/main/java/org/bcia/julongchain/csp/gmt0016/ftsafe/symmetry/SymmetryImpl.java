@@ -18,6 +18,7 @@ package org.bcia.julongchain.csp.gmt0016.ftsafe.symmetry;
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.exception.SarException;
 import org.bcia.julongchain.common.log.JavaChainLog;
+import org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspLog;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.IGMT0016FactoryOpts;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.util.BlockCipherParam;
 
@@ -30,7 +31,7 @@ import org.bcia.julongchain.csp.gmt0016.ftsafe.util.BlockCipherParam;
  */
 public class SymmetryImpl {
 
-    private static JavaChainLog logger;
+    GMT0016CspLog csplog = new GMT0016CspLog();
 
     public byte[] SymmetryEncrypt(byte[] plaintext, long lKeyHandle, BlockCipherParam blockCipherParam, IGMT0016FactoryOpts opts) throws JavaChainException {
         try {
@@ -42,12 +43,12 @@ public class SymmetryImpl {
         }catch(SarException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, SymmetryImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, SymmetryImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }
 
@@ -63,12 +64,12 @@ public class SymmetryImpl {
         }catch(SarException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, SymmetryImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, SymmetryImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }
     }

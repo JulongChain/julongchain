@@ -15,10 +15,14 @@
  */
 package org.bcia.julongchain.csp.gmt0016.ftsafe;
 
+import org.bcia.julongchain.common.exception.JCSKFException;
+import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.exception.SarException;
+import org.bcia.julongchain.csp.gmt0016.ftsafe.entity.GMT0016Lib;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Class description
@@ -31,44 +35,58 @@ public class GMT0016FactoryOpts implements IGMT0016FactoryOpts{
 
     private ISKFFactory mSKF;
     private long lDevHandle;
-    private String sAppName;
     private long lAppHandle;
     private String sUserPin;
 
+    GMT0016CspLog csplog = new GMT0016CspLog();
 
-    public GMT0016FactoryOpts(GMT0016Lib gmt0016Lib/*, GMT0016Config gmt0016Conf*/) {
+    public GMT0016FactoryOpts(GMT0016Lib gmt0016Lib/*, GMT0016Config gmt0016Conf*/) throws JavaChainException {
         mSKF = new SKFFactoryOpts();
         sUserPin = gmt0016Lib.getUserPin();
         init(gmt0016Lib);
     }
 
-    private void init(GMT0016Lib lib) {
+    private void init(GMT0016Lib lib) throws JavaChainException {
 
         try {
 
             mSKF.InitSKF(lib.getLibrary());
             List<String> devNamesList = mSKF.SKF_EnumDevs(true);
-
-            String tempdevName = "";
+            boolean bFindDev = false;
             for(String devName : devNamesList) {
-                tempdevName = devName;
-                long devHandle = mSKF.SKF_ConnectDev(tempdevName);
+
+                long devHandle = mSKF.SKF_ConnectDev(devName);
                 lDevHandle = devHandle;
                 SKFDeviceInfo devinfo = mSKF.SKF_GetDevInfo(devHandle);
                 String sLabel = new String(new String(devinfo.getLabel()).getBytes("iso-8859-1"), "utf-8");
                 String sSn = new String(new String(devinfo.getSerialnumber()));
                 if(lib.getKeyLabel().equals(sLabel.trim()) && lib.getKeySN().equals(sSn.trim())) {
+                    bFindDev = true;
+                    boolean bFindApp = false;
                     List<String> appNamesList = mSKF.SKF_EnumApplication(devHandle);
-                    String tempappName = "";
                     for(String appName : appNamesList) {
-                        tempappName = appName;
+
                         //open application, save the handle
-                        lAppHandle = mSKF.SKF_OpenApplication(devHandle, tempappName);
+                        lAppHandle = mSKF.SKF_OpenApplication(devHandle, appName);
+                        bFindApp = true;
                         break;
                     }
-                    sAppName = tempappName;
-                    break;
+                    if(bFindApp)
+                        break;
+                    else {
+                        String info = "[JC_SKF]:Find The Device, But No Find Application!";
+                        csplog.setLogMsg(info, 2, GMT0016FactoryOpts.class);
+                        throw new JavaChainException(info);
+                    }
                 }
+            }
+
+            if(!bFindDev)
+            {
+                String info = String.format("[JC_SKF]:No Find The Device! (SN: %s, Lable:%s)",
+                        lib.getKeySN(), lib.getKeyLabel());
+                csplog.setLogMsg(info, 2, GMT0016FactoryOpts.class);
+                throw new JavaChainException(info);
             }
 
         }catch(SarException ex) {
@@ -77,24 +95,28 @@ public class GMT0016FactoryOpts implements IGMT0016FactoryOpts{
                 try {
                     mSKF.SKF_DisconnectDev(lDevHandle);
                 }catch(SarException e) {
-                    e.printStackTrace();
+                    ex.printStackTrace();
+                    String err = String.format("[JC_SKF]:SarException ErrMessage: %s", ex.getMessage());
+                    csplog.setLogMsg(err, 2, GMT0016FactoryOpts.class);
+                    throw new JavaChainException(err, ex.getCause());
                 }
             }
-            else
+            else{
                 ex.printStackTrace();
+                String err = String.format("[JC_SKF]:SarException ErrMessage: %s", ex.getMessage());
+                csplog.setLogMsg(err, 2, GMT0016FactoryOpts.class);
+                throw new JavaChainException(err, ex.getCause());
+            }
         }catch(JCSKFException ex) {
-            if(ex.getErrCode() == JCSKFException.JC_SKF_NOAPP)
-            {
-                try {
-                    mSKF.SKF_DisconnectDev(lDevHandle);
-                }catch(SarException e) {
-                    e.printStackTrace();
-                }
-            }
-            else
-                ex.printStackTrace();
+            ex.printStackTrace();
+            String err = String.format("[JC_SKF]:JCSKFException ErrMessage: %s", ex.getMessage());
+            csplog.setLogMsg(err, 2, GMT0016FactoryOpts.class);
+            throw new JavaChainException(err, ex.getCause());
         }catch(UnsupportedEncodingException ex) {
             ex.printStackTrace();
+            String err = String.format("[JC_SKF]:UnsupportedEncodingException ErrMessage: %s", ex.getMessage());
+            csplog.setLogMsg(err, 2, GMT0016FactoryOpts.class);
+            throw new JavaChainException(err, ex.getCause());
         }
     }
 
@@ -109,6 +131,14 @@ public class GMT0016FactoryOpts implements IGMT0016FactoryOpts{
     public String getProviderDescription() {
         return "";
     }
+
+    @Override
+    public String getKeyStore() {
+        return "";
+    }
+
+    @Override
+    public void parseFrom(Map<String, String> optMap){return;}
 
     public ISKFFactory getSKFFactory() {
         return mSKF;

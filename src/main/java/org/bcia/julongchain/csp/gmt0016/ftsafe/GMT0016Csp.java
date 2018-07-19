@@ -16,7 +16,6 @@
 package org.bcia.julongchain.csp.gmt0016.ftsafe;
 
 import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.ec.ECCOpts;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.ec.ECImpl;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.entity.GMT0016KeyData;
@@ -49,8 +48,8 @@ import java.util.UUID;
  */
 public class GMT0016Csp implements IGMT0016Csp {
 
-    private static JavaChainLog logger;
     private IGMT0016FactoryOpts gmt0016FactoryOpts;
+    GMT0016CspLog csplog = new GMT0016CspLog();
 
     GMT0016Csp(IGMT0016FactoryOpts gmt0016FactoryOpts)
     {
@@ -66,7 +65,8 @@ public class GMT0016Csp implements IGMT0016Csp {
     @Override
     public IKey keyGen(IKeyGenOpts opts) throws JavaChainException {
         if (opts == null) {
-            return null;
+            csplog.setLogMsg("[JC_SKF]:keyGenParam Err!", 2, GMT0016Csp.class);
+            throw new JavaChainException("[JC_SKF]:keyGenParam Err!");
         }
 
 
@@ -74,7 +74,6 @@ public class GMT0016Csp implements IGMT0016Csp {
         String containerName = UUID.randomUUID().toString();
         if(opts instanceof RSAOpts.RSA1024KeyGenOpts)
         {
-            containerName = "0dccdfdf-47b7-4148-9a05-8f4fd18b3ddc";  //for test
             RSAImpl rsa = new RSAImpl();
             key = rsa.generateRSAKey(containerName, 1024, gmt0016FactoryOpts);
             return key;
@@ -82,14 +81,12 @@ public class GMT0016Csp implements IGMT0016Csp {
 
         if(opts instanceof RSAOpts.RSA2048KeyGenOpts)
         {
-            //containerName = "0dccdfdf-47b7-4148-9a05-8f4fd18b3ddc";
             RSAImpl rsa = new RSAImpl();
             key = rsa.generateRSAKey(containerName, 2048, gmt0016FactoryOpts);
             return key;
         }
 
         if(opts instanceof ECCOpts.ECCKeyGenOpts) {
-            containerName = "6e12ca6d-60f2-4236-b5ae-f0ca2fecd5fc"; //for test
             ECImpl ecc = new ECImpl();
             key = ecc.generateECKey(containerName, gmt0016FactoryOpts);
             return key;
@@ -105,12 +102,15 @@ public class GMT0016Csp implements IGMT0016Csp {
             return symmkey;
         }
 
+        csplog.setLogMsg("[JC_SKF]:No Support KeyGen Opts!", 1, GMT0016Csp.class);
         return null;
     }
 
     @Override
     public IKey keyDeriv(IKey key, IKeyDerivOpts opts) throws JavaChainException {
-        return null;
+
+        throw new JavaChainException("[JC_SKF]:No Support keyDeriv Impl!");
+
     }
 
 
@@ -119,7 +119,7 @@ public class GMT0016Csp implements IGMT0016Csp {
 
         if(raw == null || opts == null)
         {
-            logger.error("[JC_SKF]:Param Err!");
+            csplog.setLogMsg("[JC_SKF]:keyImportParam Err!", 2, GMT0016Csp.class);
             throw new JavaChainException("[JC_SKF]:Param Err!");
         }
         GMT0016KeyData keyraw = (GMT0016KeyData)raw;
@@ -139,6 +139,7 @@ public class GMT0016Csp implements IGMT0016Csp {
             return key;
         }
 
+        csplog.setLogMsg("[JC_SKF]:No Support KeyImport Opts!", 1, GMT0016Csp.class);
         return null;
     }
 
@@ -260,7 +261,7 @@ public class GMT0016Csp implements IGMT0016Csp {
             }
 
             if(type != 2) {
-                logger.error("[JC_SKF]: The Publickey is not sm2 type! Param Err!");
+                csplog.setLogMsg("[JC_SKF]: The Publickey is not sm2 type! Param Err!", 2, GMT0016Csp.class);
                 throw new JavaChainException("[JC_SKF]: The Publickey is not sm2 type! Param Err!");
             }
             ECImpl ec = new ECImpl();
@@ -384,6 +385,8 @@ public class GMT0016Csp implements IGMT0016Csp {
             byte[] signature = ec.getECSign(digest, sContainerName, gmt0016FactoryOpts);
             return signature;
         }
+
+        csplog.setLogMsg("[JC_SKF]: Sign Param Err!", 2, GMT0016Csp.class);
         return null;
     }
 
@@ -449,6 +452,7 @@ public class GMT0016Csp implements IGMT0016Csp {
             boolean rv = ec.getECverify(signature, digest, sContainerName, gmt0016FactoryOpts);
         }
 
+        csplog.setLogMsg("[JC_SKF]: Verify Param Err!", 2, GMT0016Csp.class);
         return false;
     }
 
@@ -476,9 +480,12 @@ public class GMT0016Csp implements IGMT0016Csp {
                 byte[] ciphertext = sym.SymmetryEncrypt(plaintext, lSessionHandle,
                         ((SSF33Opts.SSF33EncrypterOpts) opts).getBlockChipher(),gmt0016FactoryOpts);
                 return ciphertext;
-            }else
-                throw new JavaChainException("[JC_SKF]: The Opts No Support!");
+            }else {
+                csplog.setLogMsg("[JC_SKF]: No Support Opts", 2, GMT0016Csp.class);
+                throw new JavaChainException("[JC_SKF]: No Support Opts, Param Err!");
+            }
         } else {
+            csplog.setLogMsg("[JC_SKF]: Ikey is not the instance of SymmCspKey, No support!", 2, GMT0016Csp.class);
             throw new JavaChainException("[JC_SKF]: Ikey is not the instance of SymmCspKey, No support!");
         }
 
@@ -508,10 +515,13 @@ public class GMT0016Csp implements IGMT0016Csp {
                 byte[] plaintext = sym.SymmetryDecrypt(ciphertext, lSessionHandle,
                         ((SSF33Opts.SSF33DecrypterOpts) opts).getBlockChipher(),gmt0016FactoryOpts);
                 return plaintext;
-            }else
-                throw new JavaChainException("[JC_SKF]: The Opts No Support!");
+            }else{
+                csplog.setLogMsg("[JC_SKF]: No Support Opts", 2, GMT0016Csp.class);
+                throw new JavaChainException("[JC_SKF]: No Support Opts, Param Err!");
+            }
 
         } else {
+            csplog.setLogMsg("[JC_SKF]: Ikey is not the instance of SymmCspKey, No support!", 2, GMT0016Csp.class);
             throw new JavaChainException("[JC_SKF]: Ikey is not the instance of SymmCspKey, No support!");
         }
 

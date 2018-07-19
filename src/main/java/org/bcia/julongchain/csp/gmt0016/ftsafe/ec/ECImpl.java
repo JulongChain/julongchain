@@ -19,6 +19,7 @@ import org.bcia.julongchain.common.exception.JCSKFException;
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.exception.SarException;
 import org.bcia.julongchain.common.log.JavaChainLog;
+import org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspLog;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.IGMT0016FactoryOpts;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.util.BlockCipherParam;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.util.DataUtil;
@@ -45,12 +46,26 @@ import static org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant.*;
  */
 public class ECImpl {
 
-    private static JavaChainLog logger;
+    GMT0016CspLog csplog = new GMT0016CspLog();
     public IKey generateECKey(String sContainerName, IGMT0016FactoryOpts opts) throws JavaChainException {
 
         try {
             opts.getSKFFactory().SKF_VerifyPIN(opts.getAppHandle(), USER_TYPE, opts.getUserPin());
-            List<String> appNamesList = opts.getSKFFactory().SKF_EnumContainer(opts.getAppHandle());
+            List<String> appNamesList = null;
+            try {
+                appNamesList = opts.getSKFFactory().SKF_EnumContainer(opts.getAppHandle());
+            }catch(JCSKFException ex) {
+                if (ex.getErrCode() == JCSKFException.JC_SKF_NOCONTAINER)
+                {
+                    String info = "[JC_SKF]:No container! Need create first!";
+                    csplog.setLogMsg(info, 0, ECImpl.class);
+                }
+                else {
+                    String err = String.format("[JC_SKF]:JCSKFException ErrMessage: %s", ex.getMessage());
+                    csplog.setLogMsg(err, 2, ECImpl.class);
+                    throw new JavaChainException(err, ex.getCause());
+                }
+            }
             boolean bFind = false;
             long lHandleContainer = 0L;
             if(appNamesList != null && !appNamesList.isEmpty()) {
@@ -94,17 +109,17 @@ public class ECImpl {
         }catch(SarException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }catch(JCSKFException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:JCSKFException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrCode(), ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }
 
@@ -132,18 +147,16 @@ public class ECImpl {
             }
             if(!bFind)
             {
-                String str=null;
-                str=String.format("[JC_SKF]:No Find Container");
-                logger.error(str);
-                return null;
+                String str = String.format("[JC_SKF]:No Find The Container %s!", sContainerName);
+                csplog.setLogMsg(str, 2, ECImpl.class);
+                throw new JavaChainException(str);
             }
             long type = opts.getSKFFactory().SKF_GetContainerType(lContainerHandle);
             if(type != 2)
             {
-                String str=null;
-                str=String.format("[JC_SKF]:The Container Type is not SM2");
-                logger.error(str);
-                return null;
+                String str = String.format("[JC_SKF]:The Container Type is not SM2");
+                csplog.setLogMsg(str, 2, ECImpl.class);
+                throw new JavaChainException(str);
             }
 
             SKFCspKey.ECCPublicKeyBlob eccPublicKeyBlob =
@@ -196,17 +209,17 @@ public class ECImpl {
         }catch(SarException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }catch(JCSKFException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:JCSKFException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrCode(), ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }
     }
@@ -229,17 +242,15 @@ public class ECImpl {
             }
             if(!bFind)
             {
-                String str=null;
-                str=String.format("[JC_SKF]:No Find Container");
-                logger.info(str);
+                String str = String.format("[JC_SKF]:No Find The Container %s!", sContainerName);
+                csplog.setLogMsg(str, 1, ECImpl.class);
                 return null;
             }
             long type = opts.getSKFFactory().SKF_GetContainerType(lContainerHandle);
             if(type != 2)
             {
-                String str=null;
-                str=String.format("[JC_SKF]:The Container Type is not SM2");
-                logger.info(str);
+                String str = String.format("[JC_SKF]:The Container Type is not SM2");
+                csplog.setLogMsg(str, 1, ECImpl.class);
                 return null;
             }
 
@@ -269,17 +280,17 @@ public class ECImpl {
         }catch(SarException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }catch(JCSKFException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:JCSKFException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrCode(), ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }
     }
@@ -301,18 +312,16 @@ public class ECImpl {
             }
             if(!bFind)
             {
-                String str=null;
-                str=String.format("[JC_SKF]:No Find Container");
-                logger.info(str);
-                return null;
+                String str = String.format("[JC_SKF]:No Find The Container %s!", sContainerName);
+                csplog.setLogMsg(str, 2, ECImpl.class);
+                throw new JavaChainException(str);
             }
             long type = opts.getSKFFactory().SKF_GetContainerType(lContainerHandle);
             if(type != 2)
             {
-                String str=null;
-                str=String.format("[JC_SKF]:The Container Type is not SM2");
-                logger.info(str);
-                return null;
+                String str = String.format("[JC_SKF]:The Container %s' Type is not SM2", sContainerName);
+                csplog.setLogMsg(str, 2, ECImpl.class);
+                throw new JavaChainException(str);
             }
 
             SKFCspKey.ECCPublicKeyBlob eccPublicKeyBlob =
@@ -325,17 +334,17 @@ public class ECImpl {
         }catch(SarException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }catch(JCSKFException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:JCSKFException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrCode(), ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }
     }
@@ -359,18 +368,16 @@ public class ECImpl {
             }
             if(!bFind)
             {
-                String str=null;
-                str=String.format("[JC_SKF]:No Find Container");
-                logger.info(str);
-                return null;
+                String str = String.format("[JC_SKF]:No Find The Container %s!", sContainerName);
+                csplog.setLogMsg(str, 2, ECImpl.class);
+                throw new JavaChainException(str);
             }
             long type = opts.getSKFFactory().SKF_GetContainerType(lContainerHandle);
             if(type != 2)
             {
-                String str=null;
-                str=String.format("[JC_SKF]:The Container Type is not SM2");
-                logger.info(str);
-                return null;
+                String str = String.format("[JC_SKF]:The Container %s' Type is not SM2", sContainerName);
+                csplog.setLogMsg(str, 2, ECImpl.class);
+                throw new JavaChainException(str);
             }
             byte[] hashdata =  opts.getSKFFactory().SKF_ECCSignData(lContainerHandle, digest, digest.length);
             opts.getSKFFactory().SKF_CloseContainer(lContainerHandle);
@@ -379,17 +386,17 @@ public class ECImpl {
         }catch(SarException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }catch(JCSKFException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:JCSKFException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrCode(), ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }
     }
@@ -410,18 +417,16 @@ public class ECImpl {
             }
             if(!bFind)
             {
-                String str=null;
-                str=String.format("[JC_SKF]:No Find Key");
-                logger.info(str);
-                return false;
+                String str = String.format("[JC_SKF]:No Find The Container %s!", sContainerName);
+                csplog.setLogMsg(str, 2, ECImpl.class);
+                throw new JavaChainException(str);
             }
             long type = opts.getSKFFactory().SKF_GetContainerType(lContainerHandle);
             if(type != 2)
             {
-                String str=null;
-                str=String.format("[JC_SKF]:The Container Type is not SM2");
-                logger.info(str);
-                return false;
+                String str = String.format("[JC_SKF]:The Container %s' Type is not SM2", sContainerName);
+                csplog.setLogMsg(str, 2, ECImpl.class);
+                throw new JavaChainException(str);
             }
             SKFCspKey.ECCPublicKeyBlob eccPublicKeyBlob =
                     (SKFCspKey.ECCPublicKeyBlob)opts.getSKFFactory().SKF_ExportPublicKey(lContainerHandle, true, true);
@@ -431,17 +436,17 @@ public class ECImpl {
         }catch(SarException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }catch(JCSKFException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:JCSKFException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrCode(), ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }
     }
@@ -455,12 +460,12 @@ public class ECImpl {
         }catch(SarException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }
     }
@@ -474,12 +479,12 @@ public class ECImpl {
         }catch(SarException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
-            logger.error(err);
+            csplog.setLogMsg(err, 2, ECImpl.class);
             throw new JavaChainException(err, ex.getCause());
         }
     }
