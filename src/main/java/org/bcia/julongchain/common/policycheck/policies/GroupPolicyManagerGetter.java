@@ -37,17 +37,16 @@ import org.bcia.julongchain.protos.common.Configtx;
  * @company Aisino
  */
 public class GroupPolicyManagerGetter implements IGroupPolicyManagerGetter {
+    /**
+     * 通过groupid获取策略管理的对象
+     *
+     * @param groupId
+     * @return
+     * @throws InvalidProtocolBufferException
+     * @throws PolicyException
+     */
     @Override
     public IPolicyManager getPolicyManager(String groupId) throws InvalidProtocolBufferException, PolicyException {
-        /*Group group = null;
-        try {
-
-            groupConfigBundle.getPolicyManager()
-            group = Node.getInstance().getGroupMap().get(groupId);
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
-        return group.getGroupSupport().getGroupConfigBundle().getPolicyManager();*/
         GroupConfigBundle groupConfigBundle = null;
         ChainSupport chainSupport = new ChainSupport();
         try {
