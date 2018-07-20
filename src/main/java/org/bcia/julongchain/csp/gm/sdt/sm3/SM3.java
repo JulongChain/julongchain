@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.csp.gm.sdt.SM3;
+package org.bcia.julongchain.csp.gm.sdt.sm3;
 
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.log.JavaChainLog;
@@ -22,7 +22,7 @@ import org.bcia.julongchain.csp.gm.sdt.common.Constants;
 import org.bcia.julongchain.csp.gm.sdt.jni.SMJniApi;
 
 /**
- * GM SM3 algorithm
+ * GM SM3 算法
  *
  * @author tengxiumin
  * @date 2018/05/14
@@ -30,8 +30,9 @@ import org.bcia.julongchain.csp.gm.sdt.jni.SMJniApi;
  */
 public class SM3 {
 
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog( SM3.class );
-    private static final SMJniApi smJniApi = new SMJniApi();
+    private static JavaChainLog logger = JavaChainLogFactory.getLog( SM3.class );
+    private static SMJniApi smJniApi = new SMJniApi();
+
     /**
      *摘要长度
      */
@@ -41,17 +42,19 @@ public class SM3 {
         digestSize = Constants.SM3_DIGEST_LEN;
     }
 
+    /**
+     * 计算消息摘要值
+     * @param message 消息数据
+     * @return 摘要值
+     * @throws JavaChainException
+     */
     public byte[] hash(byte[] message) throws JavaChainException{
-        if(null == message) {
-            logger.error("Invalid message. It must not be nil.");
-            throw new JavaChainException("Invalid message. It must not be nil.");
-        }
         byte[] result = null;
         try {
             result = smJniApi.sm3Hash(message);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            throw new JavaChainException("SM3Hash error: compute message hash failed.");
+            throw new JavaChainException(e.getMessage());
         }
         return result;
     }

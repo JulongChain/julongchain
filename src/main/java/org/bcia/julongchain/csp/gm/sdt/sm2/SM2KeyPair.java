@@ -1,4 +1,4 @@
-/**
+ /**
  * Copyright SDT. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,30 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.csp.gm.sdt.SM2;
-
-import org.bcia.julongchain.csp.intfs.opts.IKeyImportOpts;
+ package org.bcia.julongchain.csp.gm.sdt.sm2;
 
 /**
- * SM2 私钥导入
+ * GM SM2 公私钥对
  *
  * @author tengxiumin
- * @date 2018/05/17
+ * @date 2016/05/16
  * @company SDT
  */
-public class SM2PrivateKeyImportOpts implements IKeyImportOpts {
+public class SM2KeyPair {
 
-    private boolean ephemeral;
+    private byte[] publicKey;
+    private byte[] privateKey;
 
-    public SM2PrivateKeyImportOpts(boolean ephemeral) { this.ephemeral = ephemeral; }
-
-    @Override
-    public String getAlgorithm() {
-        return "SM2";
+    public SM2KeyPair(byte[] publicKey, byte[] privateKey) {
+        this.publicKey = publicKey;
+        this.privateKey = privateKey;
     }
 
-    @Override
-    public boolean isEphemeral() {
-        return ephemeral;
+    /**
+     * 获取公钥数据
+     * @return 公钥数据
+     */
+    public byte[] getPublicKey() {
+        return publicKey;
+    }
+
+    /**
+     * 获取私钥数据
+     * @return 私钥数据
+     */
+    public byte[] getPrivateKey() {
+        return privateKey;
     }
 }

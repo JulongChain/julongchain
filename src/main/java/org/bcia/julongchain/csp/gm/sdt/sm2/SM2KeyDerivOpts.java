@@ -13,19 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.csp.gm.sdt.SM2;
+package org.bcia.julongchain.csp.gm.sdt.sm2;
 
-import org.bcia.julongchain.csp.intfs.opts.IKeyGenOpts;
-
+import org.bcia.julongchain.csp.intfs.opts.IKeyDerivOpts;
 
 /**
- * GM SM2 SM2KeyGenOpts
+ * GM SM2 密钥派生选项
  *
  * @author tengxiumin
- * @date 2018/05/16
+ * @date 2018/5/16
  * @company SDT
  */
-public class SM2KeyGenOpts implements IKeyGenOpts {
+
+public class SM2KeyDerivOpts implements IKeyDerivOpts {
 
     @Override
     public String getAlgorithm() {
@@ -34,6 +34,6 @@ public class SM2KeyGenOpts implements IKeyGenOpts {
 
     @Override
     public boolean isEphemeral() {
-        return false;
+        return true;
     }
 }

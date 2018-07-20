@@ -13,23 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.csp.gm.sdt.SM3;
+package org.bcia.julongchain.csp.gm.sdt.sm4;
 
-import org.bcia.julongchain.csp.intfs.opts.IHashOpts;
+import org.bcia.julongchain.csp.intfs.opts.IKeyDerivOpts;
 
 /**
- * GM SM3HashOpts
+ * GM SM4 密钥派生选项
  *
  * @author tengxiumin
- * @date 2018/05/14
+ * @date 2018/05/17
  * @company SDT
  */
-public class SM3HashOpts implements IHashOpts {
-
-    public SM3HashOpts() {}
+public class SM4KeyDerivOpts implements IKeyDerivOpts {
 
     @Override
     public String getAlgorithm() {
-        return "SM3";
+        return "SM4";
+    }
+
+    @Override
+    public boolean isEphemeral() {
+        return true;
     }
 }

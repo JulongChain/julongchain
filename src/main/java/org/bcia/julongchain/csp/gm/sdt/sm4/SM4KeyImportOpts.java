@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.csp.gm.sdt.SM4;
+package org.bcia.julongchain.csp.gm.sdt.sm4;
 
 import org.bcia.julongchain.csp.intfs.opts.IKeyImportOpts;
 
 /**
- * SM4 密钥导入选项参数
+ * SM4 密钥导入选项
  *
  * @author tengxiumin
  * @date 2018/05/17
@@ -26,6 +26,7 @@ import org.bcia.julongchain.csp.intfs.opts.IKeyImportOpts;
  */
 public class SM4KeyImportOpts implements IKeyImportOpts {
 
+    //是否为临时密钥标志
     private boolean ephemeral;
 
     public SM4KeyImportOpts(boolean ephemeral) {

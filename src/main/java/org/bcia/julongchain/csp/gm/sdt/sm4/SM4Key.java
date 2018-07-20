@@ -13,60 +13,74 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.csp.gm.sdt.SM2;
+package org.bcia.julongchain.csp.gm.sdt.sm4;
 
-import org.bcia.julongchain.csp.gm.sdt.SM3.SM3;
+import org.bcia.julongchain.csp.gm.sdt.sm3.SM3;
 import org.bcia.julongchain.csp.intfs.IKey;
 
 /**
- * GM SM2 密钥
+ * GM SM4密钥
  *
  * @author tengxiumin
- * @date 2018/05/16
+ * @date 2018/05/08
  * @company SDT
  */
+public class SM4Key implements IKey {
 
-public class SM2Key implements IKey {
-
-    private SM2KeyPair sm2KeyPair;
     private SM3 sm3;
+    private byte[] sm4Key;
 
-    public SM2Key() {
-    }
-
-    public SM2Key(SM2KeyPair sm2KeyPair) {
-        this.sm2KeyPair = sm2KeyPair;
+    public SM4Key(byte[] sm4Key) {
         this.sm3 = new SM3();
+        this.sm4Key = sm4Key;
     }
 
+    /**
+     * 获取密钥数据
+     * @return 密钥数据
+     */
     @Override
     public byte[] toBytes() {
-        return sm2KeyPair.getPrivateKey();
+        return this.sm4Key;
     }
 
+    /**
+     * 获取密钥标识
+     * @return 密钥标识
+     */
     @Override
     public byte[] ski() {
-
         try {
-            return sm3.hash(sm2KeyPair.getPrivateKey());
+            return sm3.hash(this.sm4Key);
         } catch (Exception e) {
             return null;
         }
-
     }
 
+    /**
+     * 是否为对称密钥
+     * @return true/false
+     */
     @Override
     public boolean isSymmetric() {
-        return false;
-    }
-
-    @Override
-    public boolean isPrivate() {
         return true;
     }
 
+    /**
+     * 是否为私钥
+     * @return true/false
+     */
+    @Override
+    public boolean isPrivate() {
+        return false;
+    }
+
+    /**
+     * 获取公钥
+     * @return 公钥
+     */
     @Override
     public IKey getPublicKey() {
-        return new SM2PublicKey(sm2KeyPair.getPublicKey());
+        return null;
     }
 }

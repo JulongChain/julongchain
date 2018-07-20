@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.csp.gm.sdt.SM4;
+package org.bcia.julongchain.csp.gm.sdt.sm4;
 
 import org.bcia.julongchain.csp.intfs.opts.IKeyGenOpts;
 
 
 /**
- * GM SM4KeyGenOpts
+ * GM SM4密钥生成选项
  *
  * @author tengxiumin
  * @date 2018/05/08

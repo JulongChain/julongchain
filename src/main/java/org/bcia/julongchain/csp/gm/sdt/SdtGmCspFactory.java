@@ -30,11 +30,20 @@ public class SdtGmCspFactory implements ICspFactory {
 
     public SdtGmCspFactory(){ }
 
+    /**
+     * 获取算法服务工厂名称
+     * @return 服务工厂名称
+     */
     @Override
     public String getName() {
         return "sdtgm";
     }
 
+    /**
+     * 获取CSP实例
+     * @param opts
+     * @return ICsp对象
+     */
     @Override
     public ICsp getCsp(IFactoryOpts opts) {
         ISdtGmFactoryOpts sdtGmOpts = (ISdtGmFactoryOpts) opts;

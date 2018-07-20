@@ -13,20 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.csp.gm.sdt.SM4;
-import org.bcia.julongchain.csp.intfs.opts.IEncrypterOpts;
+package org.bcia.julongchain.csp.gm.sdt.sm2;
 
+import org.bcia.julongchain.csp.intfs.opts.IKeyImportOpts;
 
 /**
- * GM SM4EncrypterOpts
+ * SM2 私钥导入选项
  *
  * @author tengxiumin
- * @date 2018/05/08
+ * @date 2018/05/17
  * @company SDT
  */
-public class SM4EncrypterOpts implements IEncrypterOpts {
+public class SM2PrivateKeyImportOpts implements IKeyImportOpts {
+
+    private boolean ephemeral;
+
+    public SM2PrivateKeyImportOpts(boolean ephemeral) { this.ephemeral = ephemeral; }
+
     @Override
     public String getAlgorithm() {
-        return "SM4";
+        return "SM2";
+    }
+
+    @Override
+    public boolean isEphemeral() {
+        return ephemeral;
     }
 }

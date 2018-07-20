@@ -13,48 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.csp.gm.sdt.SM2;
+package org.bcia.julongchain.csp.gm.sdt.sm2;
 
-import org.bcia.julongchain.csp.gm.sdt.SM3.SM3;
+import org.bcia.julongchain.csp.intfs.opts.ISignerOpts;
+
 
 /**
- * GM SM2公钥
+ * GM SM2 签名者选项
  *
  * @author tengxiumin
  * @date 2018/05/16
  * @company SDT
  */
-public class SM2PublicKey extends SM2Key {
+public class SM2SignerOpts implements ISignerOpts {
 
-    private byte[] publicKey;
-    private SM3 sm3;
-
-    public SM2PublicKey(byte[] publicKey) {
-        this.publicKey = publicKey;
-        this.sm3 = new SM3();
+    @Override
+    public String hashFunc() {
+        return null;
     }
 
     @Override
-    public byte[] toBytes() {
-        return  publicKey;
-    }
-
-    @Override
-    public byte[] ski() {
-        try {
-            return sm3.hash(publicKey);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    @Override
-    public boolean isSymmetric() {
-        return false;
-    }
-
-    @Override
-    public boolean isPrivate() {
-        return false;
+    public String getAlgorithm() {
+        return "SM2";
     }
 }

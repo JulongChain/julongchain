@@ -1,4 +1,4 @@
- /**
+/**
  * Copyright SDT. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,30 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- package org.bcia.julongchain.csp.gm.sdt.SM2;
+package org.bcia.julongchain.csp.gm.sdt.sm2;
+
+import org.bcia.julongchain.csp.intfs.opts.IKeyGenOpts;
+
 
 /**
- * GM SM2 公私钥对
+ * GM SM2 密钥生存选项
  *
  * @author tengxiumin
- * @date 2016/05/16
+ * @date 2018/05/16
  * @company SDT
  */
-public class SM2KeyPair {
+public class SM2KeyGenOpts implements IKeyGenOpts {
 
-    private byte[] publicKey;
-    private byte[] privateKey;
-
-    public SM2KeyPair(byte[] publicKey, byte[] privateKey) {
-        this.publicKey = publicKey;
-        this.privateKey = privateKey;
+    @Override
+    public String getAlgorithm() {
+        return "SM2";
     }
 
-    public byte[] getPublicKey() {
-        return publicKey;
-    }
-
-    public byte[] getPrivateKey() {
-        return privateKey;
+    @Override
+    public boolean isEphemeral() {
+        return false;
     }
 }
