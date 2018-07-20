@@ -37,10 +37,9 @@ import java.util.regex.*;
  */
 public class PolicyParser {
     private static JavaChainLog log = JavaChainLogFactory.getLog(PolicyParser.class);
+    private static final int ARGS = 3;
     public static Context context;
     public static List<Policies.SignaturePolicy> policies = new ArrayList<Policies.SignaturePolicy>();
-    //static  String regex = "^([[:alnum:]]+)([.])(member|admin)$";
-   // String regexErr = "^No parameter '([^']+)' found[.]$";
 
     public static Policies.SignaturePolicyEnvelope fromString(String policy) throws PolicyException {
 
@@ -48,8 +47,6 @@ public class PolicyParser {
        PolicyNode node = checkPolicyNode(res);
        Context ctx = new Context(0,new ArrayList<MspPrincipal.MSPPrincipal>());
        List<PolicyNode> policyNodes = queryNode(node);
-
-       //getSignaturePolicy(policyNodes.get(1),ctx);
        for(PolicyNode policyNode : policyNodes){
            getSignaturePolicy(policyNode,ctx);
        }
@@ -62,7 +59,6 @@ public class PolicyParser {
        builder.setVersion(0);
        builder.setRule(signaturePolicy);
        for(int i=0;i<context.getPrincipals().size();i++){
-           // builder.setIdentities(i,context.getPrincipals().get(i));
             builder.addIdentities(context.getPrincipals().get(i));
         }
        return builder.build();
@@ -83,7 +79,7 @@ public class PolicyParser {
 
     public static void getSignaturePolicy(PolicyNode node, Context ctx) throws PolicyException {
 
-        if(node.sons.size() < 3 ){
+        if(node.sons.size() < ARGS ){
             String msg=String.format("At least 3 arguments expected, got %d",node.sons.size());
             throw new PolicyException(msg);
         }
@@ -131,12 +127,6 @@ public class PolicyParser {
             context = ctx;
         }
 
-
-       /* Policies.SignaturePolicy[] policys = new Policies.SignaturePolicy[policies.size()];
-        for(int i=0;i<policys.length;i++){
-            policys[i] = policies.get(i);
-        }
-        return CAuthDslBuilder.nOutOf(t,policys);*/
     }
 
     public static String checkPolicyStr(String policy) {
