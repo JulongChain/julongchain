@@ -41,7 +41,7 @@ import java.util.List;
  * 类描述
  * 策略检查器，通过通达及策略名获得策略，并使用此策略对签名进行验证
  * @author yuanjun,sunianle
- * @date 20/04/20
+ * @date 20/04/18
  * @company Aisino,Dingxuan
  */
 public class PolicyChecker implements IPolicyChecker{
@@ -130,7 +130,7 @@ public class PolicyChecker implements IPolicyChecker{
     @Override
     public void checkPolicyNoGroup(String policyName, ProposalPackage.SignedProposal signedProposal)throws PolicyException {
         if(policyName == ""){
-            String msg=String.format("Invalid policy name during groupless check policy. Name must be different from nil.");
+            String msg=String.format("Invalid policy name during groupless check policy. Name must be different from null.");
             throw new PolicyException(msg);
         }
         if(signedProposal == null){
