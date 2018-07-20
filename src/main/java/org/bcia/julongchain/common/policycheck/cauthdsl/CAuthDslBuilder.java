@@ -37,15 +37,15 @@ public class CAuthDslBuilder {
     private static JavaChainLog log = JavaChainLogFactory.getLog(CAuthDslBuilder.class);
     // AcceptAllPolicy always evaluates to true
     //AcceptAllPolicy总是评估为true
-    private Policies.SignaturePolicyEnvelope AcceptAllPolicy;
+    private Policies.SignaturePolicyEnvelope acceptAllPolicy;
     // MarshaledAcceptAllPolicy is the Marshaled version of AcceptAllPolicy.
     // arshaledAcceptAllPolicy是AcceptAllPolicy的Marshaled版本
-    private byte[] MarshaledAcceptAllPolicy;
+    private byte[] marshaledAcceptAllPolicy;
     // RejectAllPolicy always evaluates to false
-    private Policies.SignaturePolicyEnvelope RejectAllPolicy;
+    private Policies.SignaturePolicyEnvelope rejectAllPolicy;
     // MarshaledRejectAllPolicy is the Marshaled version of RejectAllPolicy
     // RejectAllPolicy总是评估为false
-    private byte[] MarshaledRejectAllPolicy;
+    private byte[] marshaledRejectAllPolicy;
 
 
     public void init() throws PolicyException {
@@ -53,16 +53,16 @@ public class CAuthDslBuilder {
         byte[][] b = {};
 
         try {
-            AcceptAllPolicy = CAuthDslBuilder.envelope(nOutOf(0,signaturePolicy),b);
-            MarshaledAcceptAllPolicy = ProtoUtils.marshalOrPanic(AcceptAllPolicy);
+            acceptAllPolicy = CAuthDslBuilder.envelope(nOutOf(0,signaturePolicy),b);
+            marshaledAcceptAllPolicy = ProtoUtils.marshalOrPanic(acceptAllPolicy);
         }catch (Exception e){
             log.error("Error marshaling trueEnvelope");
             throw new PolicyException(e);
             //或者throw new PolicyException(e.getMessage());
         }
         try {
-            RejectAllPolicy = CAuthDslBuilder.envelope(nOutOf(1,signaturePolicy),b);
-            MarshaledRejectAllPolicy = ProtoUtils.marshalOrPanic(RejectAllPolicy);
+            rejectAllPolicy = CAuthDslBuilder.envelope(nOutOf(1,signaturePolicy),b);
+            marshaledRejectAllPolicy = ProtoUtils.marshalOrPanic(rejectAllPolicy);
         }catch (Exception e){
             log.error("marshaling falseEnvelope");
             throw new PolicyException(e);
