@@ -942,8 +942,9 @@ public class SMJniSM4ApiTest {
                     (byte)0xF1,(byte)0x5D,(byte)0x12,(byte)0x7A,(byte)0x02,(byte)0xBC,(byte)0x65,(byte)0x89,};
             System.out.println("[ input ] iv : " + Convert.bytesToHexString(iv));
 
-            SM4CBCResult cipherTestResult = jni.sm4CBCEncrypt(key, iv, refPlainText);
-            if(Arrays.equals(cipherTestResult.getData(), refCipherText) ) {
+            SM4CBCResult cipherTextResult = jni.sm4CBCEncrypt(key, iv, refPlainText);
+            System.out.println("[ output ] cipher text : " + Convert.bytesToHexString(cipherTextResult.getData()));
+            if(Arrays.equals(cipherTextResult.getData(), refCipherText) ) {
                 System.out.println("[ compare result | equal ] sm4CBCEncrypt result is equal with third party software result");
             } else {
                 System.out.println("[ compare result | unequal ] sm4CBCEncrypt result is not equal with third party software result");
@@ -997,9 +998,12 @@ public class SMJniSM4ApiTest {
                     (byte)0x74,(byte)0xAD,(byte)0xDC,(byte)0x42,(byte)0xD7,(byte)0x3C,(byte)0xFB,(byte)0x4C,
                     (byte)0x48,(byte)0x0E,(byte)0x6F,(byte)0x3A,(byte)0xC7,(byte)0x58,(byte)0x0E,(byte)0x67,
                     (byte)0x74,(byte)0xAD,(byte)0xDC,(byte)0x42,(byte)0xD7,(byte)0x3C,(byte)0xFB,(byte)0x4C};
+            System.out.println("[ input ] cipher text : " + Convert.bytesToHexString(refCipherText));
+            System.out.println("[ input ] key : " + Convert.bytesToHexString(key));
+            System.out.println("[ input ] iv : " + Convert.bytesToHexString(iv));
 
             SM4CBCResult plainTextResult = jni.sm4CBCDecrypt(key, iv, refCipherText);
-            System.out.println("[ input ] plain text : " + Convert.bytesToHexString(plainTextResult.getData()));
+            System.out.println("[ output ] plain text : " + Convert.bytesToHexString(plainTextResult.getData()));
             if(Arrays.equals(plainTextResult.getData(), refPlainText) ) {
                 System.out.println("[ compare result | equal ] sm4CBCDecrypt result is equal with third party software result");
             } else {
