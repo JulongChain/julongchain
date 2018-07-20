@@ -37,6 +37,7 @@ import java.util.List;
  */
 public class Evalutor implements IEvalutor{
     private static JavaChainLog log = JavaChainLogFactory.getLog(Evalutor.class);
+    private static final int TYPE = 2;
     private List<IEvalutor> policies ;
     private Policies.SignaturePolicy policy;
     private IIdentityDeserializer deserializer;
@@ -51,7 +52,7 @@ public class Evalutor implements IEvalutor{
 
     @Override
     public boolean evaluate(List<SignedData> signedDatas, Boolean[] used) throws PolicyException {
-        if(policy.getTypeCase().getNumber() == 2){
+        if(policy.getTypeCase().getNumber() == TYPE){
             Long grepKey = System.currentTimeMillis();//new Date().getTime();
             log.debug("[%s] gate [%s] evaluation starts",signedDatas,grepKey);
             int verified = 0;
