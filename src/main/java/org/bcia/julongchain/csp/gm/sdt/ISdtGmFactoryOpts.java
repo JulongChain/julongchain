@@ -18,26 +18,33 @@ package org.bcia.julongchain.csp.gm.sdt;
 import org.bcia.julongchain.csp.factory.IFactoryOpts;
 
 /**
- * SDT GM algorithm IGmFactoryOpts
+ * SDT 国密算法工厂选项接口
  *
  * @author tengxiumin
  * @date 2018/05/16
  * @company SDT
  */
 public interface ISdtGmFactoryOpts extends IFactoryOpts {
-    //Algorithm options.
+    //获取安全级别
     int getSecLevel();
+    //获取哈希函数族
     String getHashFamily();
-
-    // Keystore options.
+    //是否为临时密钥
     boolean isEphemeral();
+    //获取密钥存储路径
     String getKeyStorePath();
-
+    //获取对称密钥类型
     String getSymmetricKeyType();
+    //获取非对称密钥类型
     String getAsymmetricKeyType();
+    //获取哈希类型
     String getHashType();
+    //获取签名类型
     String getSignType();
+    //获取公钥数据存储路径
     String getPublicKeyPath();
+    //获取私钥数据存储路径
     String getPrivateKeyPath();
+    //获取对称密钥数据存储路径
     String getKeyPath();
 }
