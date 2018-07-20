@@ -68,7 +68,7 @@ public class Policy implements IPolicy {
     public void evaluate(List<SignedData> signatureList) throws PolicyException {
         Boolean[] bool = new Boolean[signatureList.size()];
         if(this == null){
-            log.error("No such Evaluate policy");
+            log.error("No Such policy");
         }
             List<SignedData> signedDataList = CAuthDsl.deduplicate(signatureList,this.deserializer);
 
