@@ -105,7 +105,7 @@ public class PolicyChecker implements IPolicyChecker{
              throw new PolicyException(msg);
         }
 
-        Common.Header header = null; //Common.Header.newBuilder();
+        Common.Header header = null;
         try {
             header = Common.Header.parseFrom(proposal.getHeader());
         } catch (InvalidProtocolBufferException e) {
@@ -178,7 +178,6 @@ public class PolicyChecker implements IPolicyChecker{
             String msg=String.format("Failed getting local MSP principal during channelless check policy with policy [%s]:%s",policyName,e.getMessage());
             throw new PolicyException(msg);
         }
-        //MspPrincipal.MSPPrincipal m = MspPrincipal.MSPPrincipal.newBuilder().build();
         try {
             try {
                 id.satisfiesPrincipal(principal);
