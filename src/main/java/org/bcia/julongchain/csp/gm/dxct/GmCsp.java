@@ -22,6 +22,7 @@ import org.bcia.julongchain.csp.gm.dxct.sm2.*;
 import org.bcia.julongchain.csp.gm.dxct.sm3.SM3;
 import org.bcia.julongchain.csp.gm.dxct.sm4.*;
 import org.bcia.julongchain.csp.gm.dxct.util.CryptoUtil;
+import org.bcia.julongchain.csp.gm.sdt.random.GmRandom;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IHash;
 import org.bcia.julongchain.csp.intfs.IKey;
@@ -30,7 +31,10 @@ import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.util.encoders.Hex;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
+import java.util.Random;
 
 /**
  * @author zhanglin
@@ -209,8 +213,11 @@ public class GmCsp implements ICsp {
             log.error("The random length is less than Zero! ");
             throw new JavaChainException("The random length is less than Zero! ");
         }
-        byte[] none = new SecureRandom().generateSeed(len);
-        return none;
+//        byte[] none = new SecureRandom().generateSeed(len);
+//        return none;
+        byte [] secureSeed=new byte[len];
+        Random random=new Random();
+        random.nextBytes(secureSeed);
+        return secureSeed;
     }
-
 }
