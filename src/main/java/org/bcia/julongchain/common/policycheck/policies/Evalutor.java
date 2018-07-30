@@ -37,6 +37,7 @@ import java.util.List;
  */
 public class Evalutor implements IEvalutor{
     private static JavaChainLog log = JavaChainLogFactory.getLog(Evalutor.class);
+    private static final int TYPE = 2;
     private List<IEvalutor> policies ;
     private Policies.SignaturePolicy policy;
     private IIdentityDeserializer deserializer;
@@ -51,25 +52,25 @@ public class Evalutor implements IEvalutor{
 
     @Override
     public boolean evaluate(List<SignedData> signedDatas, Boolean[] used) throws PolicyException {
-        if(policy.getTypeCase().getNumber() == 2){
-            Long grepKey = new Date().getTime();
+        if(policy.getTypeCase().getNumber() == TYPE){
+            Long grepKey = System.currentTimeMillis();//new Date().getTime();
             log.debug("[%s] gate [%s] evaluation starts",signedDatas,grepKey);
             int verified = 0;
-            Boolean[] _used = new Boolean[used.length];
+            Boolean[] newused = new Boolean[used.length];
             for(int i = 0; i < policies.size(); i++){
-                System.arraycopy(used,0,_used,0,used.length);
-                if(policies.get(i).evaluate(signedDatas,_used)){
+                System.arraycopy(used,0,newused,0,used.length);
+                if(policies.get(i).evaluate(signedDatas,newused)){
                     verified++;
-                    System.arraycopy(_used,0,used,0,used.length);
+                    System.arraycopy(newused,0,used,0,used.length);
                 }
             }
-            int N = policy.getNOutOf().getN();
-            if(verified >= N){
+            int n = policy.getNOutOf().getN();
+            if(verified >= n){
                 log.debug("[%p] gate [%s] evaluation succeeds",signedDatas,grepKey);
             }else{
                 log.debug("[%p] gate [%s] evaluation  fails",signedDatas,grepKey);
             }
-            return verified >= N;
+            return verified >= n;
         }
         else{
             log.debug("[%p] signed by [%d] principal evaluation starts (used %v)",signedDatas,policy.getSignedBy(),used);
@@ -79,7 +80,6 @@ public class Evalutor implements IEvalutor{
                     log.debug("[%p] skipping identity [%d] because it has already been used", signedDatas, i);
                     continue;
                 }
-                // identity, err := deserializer.DeserializeIdentity(sd.Identity)
                 IIdentity iIdentity = null;
                 try {
                     iIdentity = deserializer.deserializeIdentity(signedDatas.get(i).getIdentity());

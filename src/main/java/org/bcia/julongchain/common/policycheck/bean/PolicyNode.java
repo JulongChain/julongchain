@@ -45,19 +45,6 @@ public class PolicyNode {
                 ",flag="+value+
                 ",sons="+sons.size();
     }
-   /* public boolean getValue(Map<String, String> userOrgs){
-        if ("or".equals(msg.toString()) || "and".equals(msg.toString())) {
-            return value;
-        }
-        for (String s : userOrgs.keySet()) {
-            if (msg.indexOf("\""+s+"\"") != -1) {
-                value = true;
-                cal = true;
-                return true;
-            }
-        }
-        return false;
-    }*/
     public String n2str() {
         if ("or".equals(msg.toString().trim().toLowerCase()) || "and".equals(msg.toString().trim().toLowerCase()) ) {
             String nstr = "";

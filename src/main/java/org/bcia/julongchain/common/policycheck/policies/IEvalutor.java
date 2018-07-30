@@ -28,6 +28,13 @@ import java.util.List;
  * @company Aisino
  */
 public interface IEvalutor {
+    /**
+     * 参照Fabric中compile方法的返回函数
+     * @param signedDatas
+     * @param bool
+     * @return
+     * @throws PolicyException
+     */
     boolean evaluate(List<SignedData> signedDatas,Boolean[] bool) throws PolicyException;
 
 }

@@ -18,9 +18,9 @@ package org.bcia.julongchain.csp.gm.sdt;
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.csp.gm.sdt.SM2.*;
-import org.bcia.julongchain.csp.gm.sdt.SM3.SM3;
-import org.bcia.julongchain.csp.gm.sdt.SM4.*;
+import org.bcia.julongchain.csp.gm.sdt.sm2.*;
+import org.bcia.julongchain.csp.gm.sdt.sm3.SM3;
+import org.bcia.julongchain.csp.gm.sdt.sm4.*;
 import org.bcia.julongchain.csp.gm.sdt.common.Constants;
 import org.bcia.julongchain.csp.gm.sdt.random.GmRandom;
 import org.bcia.julongchain.csp.gm.sdt.util.KeysStore;
@@ -31,7 +31,7 @@ import org.bcia.julongchain.csp.intfs.opts.*;
 
 
 /**
- * SDT GM algorithm CSP
+ * SDT 国密算法 密码服务提供者
  *
  * @author tengxiumin
  * @date 2018/05/16
@@ -41,8 +41,10 @@ public class SdtGmCsp implements ICsp {
 
     private static JavaChainLog logger = JavaChainLogFactory.getLog(SdtGmCsp.class);
 
-    private final static String KEY_STORE_PATH = "/opt/msp/keystore/sdt/";
-    // List algorithms to be used.
+    //默认密钥存储路径
+    private final static String KEY_STORE_PATH = "msp/keystore/sdt/";
+
+    //算法
     private SM2 sm2;
     private SM3 sm3;
     private SM4 sm4;
@@ -53,10 +55,13 @@ public class SdtGmCsp implements ICsp {
         this.sm2 = new SM2();
         this.sm4 = new SM4();
         this.gmRandom = new GmRandom();
+        this.keysStore = new KeysStore();
     }
 
-    //GmFactoryOpts
+    //工厂选项
     private ISdtGmFactoryOpts sdtGmOpts;
+    //密钥存储
+    private KeysStore keysStore;
 
     SdtGmCsp(ISdtGmFactoryOpts sdtGmOpts) {
         this.sdtGmOpts = sdtGmOpts;
@@ -64,261 +69,352 @@ public class SdtGmCsp implements ICsp {
         this.sm2 = new SM2();
         this.sm4 = new SM4();
         this.gmRandom = new GmRandom();
+        this.keysStore = new KeysStore();
     }
 
+    /**
+     * 生成密钥
+     * @param opts 密钥生成选项
+     * @return 密钥对象
+     * @throws JavaChainException
+     */
     @Override
     public IKey keyGen(IKeyGenOpts opts) throws JavaChainException {
         if (null == opts) {
-            logger.error("Invalid Opts parameter. It must not be null.");
-            throw new JavaChainException("Invalid Opts parameter. It must not be null.");
+            logger.error("Invalid Opts. It must not be null.");
+            throw new JavaChainException("Invalid Opts. It must not be null.");
         }
+        //如果opts为SM2KeyGenOpts的实例，则生成SM2公私钥对
         if (opts instanceof SM2KeyGenOpts) {
-
             IKey sm2Key = new SM2Key(sm2.generateKeyPair());
-            //if not ephemeral, then save it
+            //如果是非临时密钥，则存储密钥数据
             if (!opts.isEphemeral()) {
                 String path = KEY_STORE_PATH;
-                //save SM2 private key
+                //存储SM2私钥
                 if(null != sdtGmOpts.getPrivateKeyPath() && !"".equals(sdtGmOpts.getPrivateKeyPath())) {
                     path = sdtGmOpts.getPrivateKeyPath();
                 }
-                KeysStore.storeKey(path, null, sm2Key, KeysStore.KEY_TYPE_SK);
-                //save SM2 public key
+                keysStore.storeKey(path, null, sm2Key, KeysStore.KEY_TYPE_SK);
+                //存储SM2公钥
                 path = KEY_STORE_PATH;
                 if(null != sdtGmOpts.getPublicKeyPath() && !"".equals(sdtGmOpts.getPublicKeyPath())) {
                     path = sdtGmOpts.getPublicKeyPath();
                 }
-                KeysStore.storeKey(path, null, sm2Key.getPublicKey(), KeysStore.KEY_TYPE_PK);
+                keysStore.storeKey(path, null, sm2Key.getPublicKey(), KeysStore.KEY_TYPE_PK);
             }
             return sm2Key;
         }
+        //如果opts为SM4KeyGenOpts的实例，则生成SM4密钥
         if (opts instanceof SM4KeyGenOpts) {
             byte[] sm4KeyData = gmRandom.rng(Constants.SM4_KEY_LEN);
             IKey sm4Key = new SM4Key(sm4KeyData);
-            //if not ephemeral, then save it
+            //如果是非临时密钥，则存储密钥数据
             if (!opts.isEphemeral()) {
-                //save SM4 key
+                //存储SM4密钥
                 String path = KEY_STORE_PATH;
                 if(null != sdtGmOpts.getKeyPath() && !"".equals(sdtGmOpts.getKeyPath())) {
                     path = sdtGmOpts.getKeyPath();
                 }
-                KeysStore.storeKey(path, null, sm4Key, KeysStore.KEY_TYPE_KEY);
+                keysStore.storeKey(path, null, sm4Key, KeysStore.KEY_TYPE_KEY);
             }
             return sm4Key;
         }
-        return null;
+        logger.error("Unsupported ‘IKeyGenOpts‘.");
+        throw new JavaChainException("Unsupported ‘IKeyGenOpts‘.");
     }
 
+    /**
+     * 密钥派生
+     * @param key 原密钥
+     * @param opts 密钥派生选项
+     * @return 派生密钥
+     * @throws JavaChainException
+     */
     @Override
     public IKey keyDeriv(IKey key, IKeyDerivOpts opts) throws JavaChainException {
         if (null == opts) {
-            logger.error("Invalid Opts parameter. It must not be null.");
-            throw new JavaChainException("Invalid Opts parameter. It must not be null.");
+            logger.error("Invalid Opts. It must not be null.");
+            throw new JavaChainException("Invalid Opts. It must not be null.");
         }
         if (opts instanceof SM2KeyDerivOpts) {
-           //TODO:
+           //TODO: 待实现
+            return null;
         }
         if (opts instanceof SM4KeyDerivOpts) {
-            //TODO:
+            //TODO: 待实现
+            return null;
         }
-        return null;
+        logger.error("Unsupported ‘IKeyDerivOpts‘.");
+        throw new JavaChainException("Unsupported ‘IKeyDerivOpts‘.");
     }
 
+    /**
+     * 密钥导入
+     * @param raw 密钥原始数据
+     * @param opts 密钥导入选项
+     * @return 密钥对象
+     * @throws JavaChainException
+     */
     @Override
     public IKey keyImport(Object raw, IKeyImportOpts opts) throws JavaChainException {
         if (null == raw) {
-            logger.error("Invalid raw. It must not be nil.");
-            throw new JavaChainException("Invalid raw. It must not be nil.");
+            logger.error("Invalid raw. It must not be null.");
+            throw new JavaChainException("Invalid raw. It must not be null.");
         }
         if (null == opts) {
-            logger.error("Invalid opts. It must not be nil.");
-            throw new JavaChainException("Invalid opts. It must not be nil.");
+            logger.error("Invalid opts. It must not be null.");
+            throw new JavaChainException("Invalid opts. It must not be null.");
         }
+        //如果opts为SM2PrivateKeyImportOpts的实例，则导入为SM2私钥
         if (opts instanceof SM2PrivateKeyImportOpts) {
             IKey sm2PrivateKey = new SM2PrivateKey((byte[])raw);
-            //if not ephemeral, then save it
+            //如果是非临时密钥，则存储密钥数据
             if (!opts.isEphemeral()) {
                 String path = KEY_STORE_PATH;
                 if(null != sdtGmOpts.getPrivateKeyPath() && !"".equals(sdtGmOpts.getPrivateKeyPath())) {
                     path = sdtGmOpts.getPrivateKeyPath();
                 }
-                KeysStore.storeKey(path, null, sm2PrivateKey, KeysStore.KEY_TYPE_SK);
+                keysStore.storeKey(path, null, sm2PrivateKey, KeysStore.KEY_TYPE_SK);
             }
             return sm2PrivateKey;
         }
-
+        //如果opts为SM2PublicKeyImportOpts的实例，则导入为SM2公钥
         if (opts instanceof SM2PublicKeyImportOpts) {
             IKey sm2PublicKey = new SM2PublicKey((byte[])raw);
-            //if not ephemeral, then save it
+            //如果是非临时密钥，则存储密钥数据
             if (!opts.isEphemeral()) {
                 String path = KEY_STORE_PATH;
                 if(null != sdtGmOpts.getPublicKeyPath() && !"".equals(sdtGmOpts.getPublicKeyPath())) {
                     path = sdtGmOpts.getPublicKeyPath();
                 }
-                KeysStore.storeKey(path, null, sm2PublicKey, KeysStore.KEY_TYPE_PK);
+                keysStore.storeKey(path, null, sm2PublicKey, KeysStore.KEY_TYPE_PK);
             }
             return sm2PublicKey;
         }
-
+        //如果opts为SM4KeyImportOpts的实例，则导入为SM4密钥
         if (opts instanceof SM4KeyImportOpts) {
             IKey sm4Key = new SM4Key((byte[])raw);
-            //if not ephemeral, then save it
+            //如果是非临时密钥，则存储密钥数据
             if (!opts.isEphemeral()) {
                 String path = KEY_STORE_PATH;
                 if(null != sdtGmOpts.getKeyPath() && !"".equals(sdtGmOpts.getKeyPath())) {
                     path = sdtGmOpts.getKeyPath();
                 }
-                KeysStore.storeKey(path, null, sm4Key, KeysStore.KEY_TYPE_KEY);
+                keysStore.storeKey(path, null, sm4Key, KeysStore.KEY_TYPE_KEY);
             }
             return sm4Key;
         }
-        return null;
+        logger.error("Unsupported ‘IKeyImportOpts‘.");
+        throw new JavaChainException("Unsupported ‘IKeyImportOpts‘.");
     }
 
+    /**
+     * 根据密钥标识获取密钥
+     * @param ski 密钥标识
+     * @return 密钥对象
+     * @throws JavaChainException
+     */
     @Override
     public IKey getKey(byte[] ski) throws JavaChainException {
-        if(null == ski || 0 == ski.length) {
-            logger.error("Invalid ski. It must not be nil.");
-            throw new JavaChainException("Invalid ski. It must not be nil.");
+        if(null == ski) {
+            logger.error("Invalid ski. It must not be null.");
+            throw new JavaChainException("Invalid ski. It must not be null.");
         }
         byte[] keyData = null;
         String path = KEY_STORE_PATH;
-        //find sm2 sk
+        //查找SM2私钥
         if(null != sdtGmOpts.getPrivateKeyPath() && !"".equals(sdtGmOpts.getPrivateKeyPath())) {
             path = sdtGmOpts.getPrivateKeyPath();
         }
-        keyData = KeysStore.loadKey(path, null, ski, KeysStore.KEY_TYPE_SK);
+        keyData = keysStore.loadKey(path, null, ski, KeysStore.KEY_TYPE_SK);
         if(null != keyData) {
             IKey sm2PrivateKey = new SM2PrivateKey(keyData);
             return sm2PrivateKey;
         }
-        //find sm2 pk
+        //查找SM2公钥
         if(null != sdtGmOpts.getPublicKeyPath() && !"".equals(sdtGmOpts.getPublicKeyPath())) {
             path = sdtGmOpts.getPublicKeyPath();
         }
-        keyData = KeysStore.loadKey(path, null, ski, KeysStore.KEY_TYPE_PK);
+        keyData = keysStore.loadKey(path, null, ski, KeysStore.KEY_TYPE_PK);
         if(null != keyData) {
             IKey sm2PublicKey = new SM2PublicKey(keyData);
             return sm2PublicKey;
         }
-        //find sm4 key
+        //查找SM4密钥
         if(null != sdtGmOpts.getKeyPath() && !"".equals(sdtGmOpts.getKeyPath())) {
             path = sdtGmOpts.getKeyPath();
         }
-        keyData = KeysStore.loadKey(path, null, ski, KeysStore.KEY_TYPE_KEY);
+        keyData = keysStore.loadKey(path, null, ski, KeysStore.KEY_TYPE_KEY);
         if(null != keyData) {
             IKey sm4Key = new SM4Key(keyData);
             return sm4Key;
         }
-        throw new JavaChainException("Cannot find the key");
+        throw new JavaChainException("Cannot find the key for SKI [" + ski + "].");
     }
 
+    /**
+     * 计算消息摘要
+     * @param msg 消息数据
+     * @param opts 哈希选项
+     * @return 摘要值
+     * @throws JavaChainException
+     */
     @Override
     public byte[] hash(byte[] msg, IHashOpts opts) throws JavaChainException {
-        if (null == msg || 0 == msg.length) {
-            logger.error("Invalid msg. Cannot be empty.");
-            throw new JavaChainException("Invalid msg. Cannot be empty.");
+        if (null == msg) {
+            logger.error("Invalid msg. It must not be null.");
+            throw new JavaChainException("Invalid msg. It must not be null.");
         }
 
         byte[] results = sm3.hash(msg);
         return results;
     }
 
+    /**
+     * 获取哈希实例
+     * @param opts 哈希选项
+     * @return 哈希实例
+     * @throws JavaChainException
+     */
     @Override
     public IHash getHash(IHashOpts opts) throws JavaChainException {
         return null;
     }
 
+    /**
+     * 签名
+     * @param key 密钥
+     * @param digest 消息摘要
+     * @param opts 签名者选项
+     * @return 签名值
+     * @throws JavaChainException
+     */
     @Override
     public byte[] sign(IKey key, byte[] digest, ISignerOpts opts) throws JavaChainException {
         if (null == key) {
-            logger.error("Invalid Key. It must not be nil.");
-            throw new JavaChainException("Invalid Key. It must not be nil.");
+            logger.error("Invalid Key. It must not be null.");
+            throw new JavaChainException("Invalid Key. It must not be null.");
         }
-        if (null == digest || 0 == digest.length) {
-            logger.error("Invalid digest. Cannot be empty.");
-            throw new JavaChainException("Invalid digest. Cannot be empty.");
+        if (null == digest) {
+            logger.error("Invalid digest. It must not be null.");
+            throw new JavaChainException("Invalid digest. It must not be null.");
         }
         if (null == opts) {
-            logger.error("Invalid opts. It must not be nil.");
-            throw new JavaChainException("Invalid opts. It must not be nil.");
+            logger.error("Invalid opts. It must not be null.");
+            throw new JavaChainException("Invalid opts. It must not be null.");
         }
+        //如果opts为SM2SignerOpts的实例，则调用SM2算法进行签名
         if (opts instanceof SM2SignerOpts) {
             return sm2.sign(digest, key.toBytes());
         }
-        return null;
+        logger.error("Unsupported ‘ISignerOpts‘.");
+        throw new JavaChainException("Unsupported ‘ISignerOpts‘.");
     }
 
+    /**
+     * 验签
+     * @param key 密钥
+     * @param signature 签名值
+     * @param digest 消息摘要
+     * @param opts 签名者选项
+     * @return 验签结果
+     * @throws JavaChainException
+     */
     @Override
     public boolean verify(IKey key, byte[] signature, byte[] digest, ISignerOpts opts) throws JavaChainException {
         boolean verify = false;
         if (null == key) {
-            logger.error("Invalid Key. It must not be nil.");
-            throw new JavaChainException("Invalid Key. It must not be nil.");
+            logger.error("Invalid Key. It must not be null.");
+            throw new JavaChainException("Invalid Key. It must not be null.");
         }
-        if (null == signature || 0 == signature.length) {
-            logger.error("Invalid signature. It must not be nil.");
-            throw new JavaChainException("Invalid signature. It must not be nil.");
+        if (null == signature) {
+            logger.error("Invalid signature. It must not be null.");
+            throw new JavaChainException("Invalid signature. It must not be null.");
         }
         if (null == opts) {
-            logger.error("Invalid opts. It must not be nil.");
-            throw new JavaChainException("Invalid opts. It must not be nil.");
+            logger.error("Invalid opts. It must not be null.");
+            throw new JavaChainException("Invalid opts. It must not be null.");
         }
+        //如果opts为SM2SignerOpts的实例，则调用SM2算法进行验签
         if (opts instanceof SM2SignerOpts) {
             if(0 == sm2.verify(digest, key.getPublicKey().toBytes(), signature)) {
                 verify = true;
             }
+            return verify;
         }
-        return verify;
+        logger.error("Unsupported ‘ISignerOpts‘.");
+        throw new JavaChainException("Unsupported ‘ISignerOpts‘.");
     }
 
+    /**
+     * 对称加密
+     * @param key 密钥
+     * @param plaintext 明文数据
+     * @param opts 加密选项
+     * @return 密文数据
+     * @throws JavaChainException
+     */
     @Override
     public byte[] encrypt(IKey key, byte[] plaintext, IEncrypterOpts opts) throws JavaChainException {
         if (null == key) {
-            logger.error("Invalid Key. It must not be nil.");
-            throw new JavaChainException("Invalid Key. It must not be nil.");
+            logger.error("Invalid Key. It must not be null.");
+            throw new JavaChainException("Invalid Key. It must not be null.");
         }
-        if (null == plaintext || 0 == plaintext.length) {
-            logger.error("Invalid plaintext. It must not be nil.");
-            throw new JavaChainException("Invalid plaintext. It must not be nil.");
+        if (null == plaintext) {
+            logger.error("Invalid plaintext. It must not be null.");
+            throw new JavaChainException("Invalid plaintext. It must not be null.");
         }
         if (null == opts) {
-            logger.error("Invalid opts. It must not be nil.");
-            throw new JavaChainException("Invalid opts. It must not be nil.");
+            logger.error("Invalid opts. It must not be null.");
+            throw new JavaChainException("Invalid opts. It must not be null.");
         }
+        //如果opts为SM4EncrypterOpts的实例，则调用SM4算法ECB模式进行加密
         if (opts instanceof SM4EncrypterOpts) {
             return sm4.encryptECB(plaintext, key.toBytes());
         }
-        return null;
+        logger.error("Unsupported ‘IEncrypterOpts’.");
+        throw new JavaChainException("Unsupported ‘IEncrypterOpts’.");
     }
 
+    /**
+     * 对称解密
+     * @param key 密钥
+     * @param ciphertext 密文数据
+     * @param opts 解密选项
+     * @return
+     * @throws JavaChainException
+     */
     @Override
     public byte[] decrypt(IKey key, byte[] ciphertext, IDecrypterOpts opts) throws JavaChainException {
         if (null == key) {
-            logger.error("Invalid Key. It must not be nil.");
-            throw new JavaChainException("Invalid Key. It must not be nil.");
+            logger.error("Invalid Key. It must not be null.");
+            throw new JavaChainException("Invalid Key. It must not be null.");
         }
-        if (null == ciphertext || 0 == ciphertext.length) {
-            logger.error("Invalid ciphertext. Cannot be empty.");
-            throw new JavaChainException("Invalid ciphertext. Cannot be empty.");
+        if (null == ciphertext) {
+            logger.error("Invalid ciphertext. It must not be null.");
+            throw new JavaChainException("Invalid ciphertext. It must not be null.");
         }
         if (null == opts) {
-            logger.error("Invalid opts. It must not be nil.");
-            throw new JavaChainException("Invalid opts. It must not be nil.");
+            logger.error("Invalid opts. It must not be null.");
+            throw new JavaChainException("Invalid opts. It must not be null.");
         }
+        //如果opts为SM4EncrypterOpts的实例，则调用SM4算法ECB模式进行解密
         if (opts instanceof SM4DecrypterOpts) {
             return sm4.decryptECB(ciphertext, key.toBytes());
         }
-        return null;
+        logger.error("Unsupported ‘IDecrypterOpts’.");
+        throw new JavaChainException("Unsupported ‘IDecrypterOpts’.");
     }
 
+    /**
+     * 生成随机数
+     * @param len 随机数长度
+     * @param opts 随机数生成选项
+     * @return
+     * @throws JavaChainException
+     */
     @Override
     public byte[] rng(int len, IRngOpts opts) throws JavaChainException {
-        if (len <= 0) {
-            logger.error("The random length is less than Zero! ");
-            throw new JavaChainException("The random length is less than Zero! ");
-        }
-        byte[] random = gmRandom.rng(len);
-        return random;
+        return gmRandom.rng(len);
     }
 }

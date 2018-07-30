@@ -57,7 +57,7 @@ public class Singleton implements IChain, IConsensusPlugin {
         }else {
            support=consenterSupport;
         }
-        return instance;
+         return instance;
     }
 
     @Override
@@ -70,7 +70,7 @@ public class Singleton implements IChain, IConsensusPlugin {
     @Override
     public void configure(Common.Envelope config, long configSeq) {
         Message message = new Message(configSeq, config);
-        configMessage = message;
+        this.configMessage = message;
     }
 
     @Override
@@ -99,7 +99,7 @@ public class Singleton implements IChain, IConsensusPlugin {
 
 
     public Singleton(ChainSupport consenterSupport) {
-       support = consenterSupport;
+        support = consenterSupport;
         instance = this;
         blockingQueue = new LinkedBlockingQueue<>();
         producer = new Producer<Message>(blockingQueue);
@@ -202,10 +202,10 @@ public class Singleton implements IChain, IConsensusPlugin {
     }
 
     public Message getNormalMessage() {
-        return normalMessage;
+        return this.normalMessage;
     }
 
     public Message getConfigMessage() {
-        return configMessage;
+        return this.configMessage;
     }
 }

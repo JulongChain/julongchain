@@ -96,8 +96,8 @@ public class LSSC  extends SystemSmartContractBase {
     //GETINSTALLEDMARTCONTRACTS gets the installed smartcontracts on a node
     public final static String GET_INSTALLED_SMARTCONTRACTS="getinstalledsmartcontracts";
 
-    public final static String allowedCharsSmartContractName="[A-Za-z0-9_-]+";
-    public final static String allowedCharsVersion="[A-Za-z0-9_.+-]+";
+    public final static String ALLOWED_CHARS_SMART_CONTRACT_NAME="[A-Za-z0-9_-]+";
+    public final static String ALLOWED_CHARS_VERSION="[A-Za-z0-9_.+-]+";
 
 //    @Autowired
     private LsscSupport support = new LsscSupport();
@@ -275,6 +275,7 @@ public class LSSC  extends SystemSmartContractBase {
                     case GET_SC_DATA:
                         resource=Resources.LSSC_GETSCDATA;
                         break;
+                    default:resource="";
                 }
                 try{
                     AclManagement.getACLProvider().checkACL(resource,groupName2,sp);
@@ -568,7 +569,7 @@ public class LSSC  extends SystemSmartContractBase {
             String msg=String.format("EmptySmartContractNameErr");
             throw new SysSmartContractException(msg);
         }
-        if(isValidSmartContractNameOrVersion(contractName,allowedCharsSmartContractName)==false){
+        if(isValidSmartContractNameOrVersion(contractName,ALLOWED_CHARS_SMART_CONTRACT_NAME)==false){
             String msg=String.format("InvalidChaincodeNameErr:%s",contractName);
             throw new SysSmartContractException(msg);
         }
@@ -588,7 +589,7 @@ public class LSSC  extends SystemSmartContractBase {
             String msg=String.format("EmptySmartContractVersionErr");
             throw new SysSmartContractException(msg);
         }
-        if(isValidSmartContractNameOrVersion(version,allowedCharsVersion)==false){
+        if(isValidSmartContractNameOrVersion(version,ALLOWED_CHARS_VERSION)==false){
             String msg=String.format("InvalidChaincodeVersionErr:%s",version);
             throw new SysSmartContractException(msg);
         }

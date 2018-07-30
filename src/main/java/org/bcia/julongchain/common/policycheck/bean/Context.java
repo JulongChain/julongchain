@@ -28,20 +28,20 @@ import java.util.List;
  * @company Aisino
  */
 public class Context {
-    private int IDNum;
+    private int idNum;
     private List<MspPrincipal.MSPPrincipal> principals;
 
     public Context(int IDNum, List<MspPrincipal.MSPPrincipal> principals) {
-        this.IDNum = IDNum;
+        this.idNum = IDNum;
         this.principals = principals;
     }
 
     public int getIDNum() {
-        return IDNum;
+        return idNum;
     }
 
     public void setIDNum(int IDNum) {
-        this.IDNum = IDNum;
+        this.idNum = IDNum;
     }
 
     public List<MspPrincipal.MSPPrincipal> getPrincipals() {

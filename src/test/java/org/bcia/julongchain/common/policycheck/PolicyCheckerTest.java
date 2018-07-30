@@ -7,6 +7,7 @@ import org.bcia.julongchain.common.policycheck.policies.GroupPolicyManagerGetter
 import org.bcia.julongchain.common.util.proto.SignedData;
 import org.bcia.julongchain.common.util.proto.TxUtils;
 import org.bcia.julongchain.msp.IIdentityDeserializer;
+import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.msp.mgmt.IMspPrincipalGetter;
 import org.bcia.julongchain.msp.mgmt.Msp;
 import org.bcia.julongchain.msp.mgmt.MspManager;
@@ -73,19 +74,18 @@ public class PolicyCheckerTest {
         sd.add(sd3);
         policyChecker.checkPolicyBySignedData("myGroup","Admins",sd);
 
+
     }
 
     @Test
     public void checkPolicyNoChannel() throws JavaChainException {
-        String reader = "readers";
-        IIdentityDeserializer localMSP = mock(IIdentityDeserializer.class);
-        MspManager mspManager = new MspManager();
-        Msp msp = new Msp();
+        IIdentityDeserializer localmsp = GlobalMspManagement.getLocalMsp();
         IMspPrincipalGetter principalGetter = mock(IMspPrincipalGetter.class);
-        PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManagerGetter(),msp,principalGetter);
+        PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManagerGetter(),localmsp,principalGetter);
         ProposalPackage.SignedProposal sp = TxUtils.mockSignedEndorserProposalOrPanic("",
                 SmartContractPackage.SmartContractSpec.newBuilder().build());
         policyChecker.checkPolicyNoGroup("Admins",sp);
+
     }
 
 

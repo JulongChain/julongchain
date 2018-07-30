@@ -63,7 +63,9 @@ public class TransactionRunningUtil {
       String smartContractId,
       String txId,
       SmartContractShim.SmartContractMessage smartContractMessage) {
-    txIdAndMessageMap.put(composite(smartContractId, txId), smartContractMessage);
+    String composite = composite(smartContractId, txId);
+    logger.info("===========["+composite+"]");
+    txIdAndMessageMap.put(composite, smartContractMessage);
   }
 
   public static boolean checkTxId(String txId) {

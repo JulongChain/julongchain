@@ -16,7 +16,7 @@ package org.bcia.julongchain.core.container.ccintf;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.util.BytesHexStrTranslate;
-import org.bcia.julongchain.csp.gm.sdt.SM3.SM3;
+import org.bcia.julongchain.csp.gm.sdt.sm3.SM3;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**

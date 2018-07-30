@@ -25,7 +25,7 @@ option java_package = "org.bcia.julongchain.protos.common";
 
 package common;
 
-// PolicyConstant expresses a policy which the consenter can evaluate, because there has been some desire expressed to support
+// Policy expresses a policy which the consenter can evaluate, because there has been some desire expressed to support
 // multiple policy engines, this is typed as a oneof for now
 message Policy {
     enum PolicyType {
