@@ -158,7 +158,9 @@ public class EventHandler implements IEventHandler {
             }
         }
 
-        eventsServerConfig.getBindingInspector().bind(event);
+        if(eventsServerConfig.getBindingInspector() != null) {
+            eventsServerConfig.getBindingInspector().bind(event);
+        }
 
         IMsp localMsp = GlobalMspManagement.getLocalMsp();
         //TODO
