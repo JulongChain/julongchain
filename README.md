@@ -79,10 +79,4 @@ JDK版本为1.8。
    -n 智能合约名称               <br/>
    -i 智能合约invoke方法入参   <br/>
    
-##Docker Daemon启动
-```
-service docker stop
-dockerd -H tcp://0.0.0.0:2375
-```
-
 

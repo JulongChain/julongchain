@@ -37,7 +37,6 @@ import org.bcia.julongchain.protos.common.Policies;
 public class PolicyProvider implements IPolicyProvider{
     private static JavaChainLog log = JavaChainLogFactory.getLog(PolicyProvider.class);
     private IIdentityDeserializer deserializer;
-
     public PolicyProvider(IIdentityDeserializer deserializer) {
         this.deserializer = deserializer;
     }

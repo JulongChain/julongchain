@@ -17,9 +17,9 @@
 package org.bcia.julongchain.csp.pkcs11.rsa;
 
 import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.pkcs11.IPKCS11FactoryOpts;
+import org.bcia.julongchain.csp.pkcs11.PKCS11CspLog;
 import org.bcia.julongchain.csp.pkcs11.util.DataUtil;
 
 
@@ -40,10 +40,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
 
@@ -57,7 +54,96 @@ import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
  */
 public class RsaImpl {
 
-	private static JavaChainLog logger;
+    private static void setLoggerDebug(String msg, int classNO){
+
+        PKCS11CspLog csplog = new PKCS11CspLog();
+        switch (classNO){
+            case 1:
+                csplog.setLogMsg(msg, 0, RsaImpl.GenerateRSA.class);
+                break;
+            case 2:
+                csplog.setLogMsg(msg, 0, RsaImpl.ImportKeyRSA.class);
+                break;
+            case 3:
+                csplog.setLogMsg(msg, 0, RsaImpl.GetkeyRSA.class);
+                break;
+            case 4:
+                csplog.setLogMsg(msg, 0, RsaImpl.SignRSAKey.class);
+                break;
+            case 5:
+                csplog.setLogMsg(msg, 0, RsaImpl.VerifyRSAKey.class);
+                break;
+            case 6:
+                csplog.setLogMsg(msg, 0, RsaImpl.EncryptRSAKey.class);
+                break;
+            case 7:
+                csplog.setLogMsg(msg, 0, RsaImpl.DecryptRSAKey.class);
+                break;
+            default:
+                csplog.setLogMsg(msg, 0, RsaImpl.class);
+                break;
+        }
+    }
+
+    private static void setLoggerInfo(String msg, int classNO){
+        PKCS11CspLog csplog = new PKCS11CspLog();
+        switch (classNO){
+            case 1:
+                csplog.setLogMsg(msg, 1, RsaImpl.GenerateRSA.class);
+                break;
+            case 2:
+                csplog.setLogMsg(msg, 1, RsaImpl.ImportKeyRSA.class);
+                break;
+            case 3:
+                csplog.setLogMsg(msg, 1, RsaImpl.GetkeyRSA.class);
+                break;
+            case 4:
+                csplog.setLogMsg(msg, 1, RsaImpl.SignRSAKey.class);
+                break;
+            case 5:
+                csplog.setLogMsg(msg, 1, RsaImpl.VerifyRSAKey.class);
+                break;
+            case 6:
+                csplog.setLogMsg(msg, 1, RsaImpl.EncryptRSAKey.class);
+                break;
+            case 7:
+                csplog.setLogMsg(msg, 1, RsaImpl.DecryptRSAKey.class);
+                break;
+            default:
+                csplog.setLogMsg(msg, 1, RsaImpl.class);
+                break;
+        }
+    }
+
+    private static void setLoggerErr(String msg, int classNO){
+        PKCS11CspLog csplog = new PKCS11CspLog();
+        switch (classNO){
+            case 1:
+                csplog.setLogMsg(msg, 2, RsaImpl.GenerateRSA.class);
+                break;
+            case 2:
+                csplog.setLogMsg(msg, 2, RsaImpl.ImportKeyRSA.class);
+                break;
+            case 3:
+                csplog.setLogMsg(msg, 2, RsaImpl.GetkeyRSA.class);
+                break;
+            case 4:
+                csplog.setLogMsg(msg, 2, RsaImpl.SignRSAKey.class);
+                break;
+            case 5:
+                csplog.setLogMsg(msg, 2, RsaImpl.VerifyRSAKey.class);
+                break;
+            case 6:
+                csplog.setLogMsg(msg, 2, RsaImpl.EncryptRSAKey.class);
+                break;
+            case 7:
+                csplog.setLogMsg(msg, 2, RsaImpl.DecryptRSAKey.class);
+                break;
+            default:
+                csplog.setLogMsg(msg, 2, RsaImpl.class);
+                break;
+        }
+    }
     /**
      * Generate RSA Keypair
      *
@@ -143,12 +229,12 @@ public class RsaImpl {
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();                
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                logger.error(err);                
+                RsaImpl.setLoggerErr(err, 1);
                 throw new JavaChainException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
-                logger.error(err);
+                RsaImpl.setLoggerErr(err, 1);
                 throw new JavaChainException(err, ex.getCause());
             }
         }
@@ -232,27 +318,27 @@ public class RsaImpl {
             }catch(NoSuchAlgorithmException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-                logger.error(err); 
+                RsaImpl.setLoggerErr(err, 2);
                 throw new JavaChainException(err, ex.getCause());
             }catch(InvalidKeySpecException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:InvalidKeySpecException ErrMessage: %s", ex.getMessage());
-                logger.error(err); 
+                RsaImpl.setLoggerErr(err, 2);
                 throw new JavaChainException(err, ex.getCause());
             }catch(PKCS11Exception ex){
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                logger.error(err); 
+                RsaImpl.setLoggerErr(err, 2);
                 throw new JavaChainException(err, ex.getCause());
             }catch(InvalidKeyException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:InvalidKeyException ErrMessage: %s", ex.getMessage());
-                logger.error(err); 
+                RsaImpl.setLoggerErr(err, 2);
                 throw new JavaChainException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
-                logger.error(err);
+                RsaImpl.setLoggerErr(err, 2);
                 throw new JavaChainException(err, ex.getCause());
             }
 
@@ -292,9 +378,8 @@ public class RsaImpl {
             try {
                 long[] keypbu = findKeypairFromSKI(opts, false, ski);
                 if (keypbu==null || (keypbu!=null && keypbu.length==0)) {
-                	String str=null;
-                    str=String.format("[JC_PKCS]:No Find Key");
-                    logger.info(str);
+                	String str = String.format("[JC_PKCS]:No Find Key");
+                    RsaImpl.setLoggerInfo(str, 3);
                     return null;
                 }
                 else
@@ -314,7 +399,7 @@ public class RsaImpl {
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                logger.error(err);
+                RsaImpl.setLoggerErr(err, 3);
                 throw new JavaChainException(err, ex.getCause());
             }
         }
@@ -349,10 +434,9 @@ public class RsaImpl {
                 long[] privatekey = findKeypairFromSKI(opts, true, ski);
                 if (privatekey==null || (privatekey!=null && privatekey.length==0))
                 {
-                    String str=null;
-                    str=String.format("[JC_PKCS]:No Find Key");
-                    logger.info(str);
-                    return null;
+                    String str=String.format("[JC_PKCS]:No Find Key");
+                    RsaImpl.setLoggerErr(str, 4);
+                    throw new JavaChainException(str);
                 }
                 CK_MECHANISM ckMechanism = new CK_MECHANISM();
                 ckMechanism.mechanism = newMechanism;
@@ -363,7 +447,7 @@ public class RsaImpl {
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                logger.error(err);
+                RsaImpl.setLoggerErr(err, 4);
                 throw new JavaChainException(err, ex.getCause());
             }
 
@@ -400,10 +484,9 @@ public class RsaImpl {
             try {
                 long[] publickey = findKeypairFromSKI(opts, false, ski);
                 if (publickey==null || (publickey!=null && publickey.length==0)) {
-                    String str=null;
-                    str=String.format("[JC_PKCS]:No Find Key");
-                    logger.info(str);
-                    return false;
+                    String str=String.format("[JC_PKCS]:No Find Key");
+                    RsaImpl.setLoggerErr(str, 5);
+                    throw new JavaChainException(str);
                 }
                 CK_MECHANISM ckMechanism = new CK_MECHANISM();
                 ckMechanism.mechanism = newMechanism;
@@ -414,7 +497,7 @@ public class RsaImpl {
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                logger.error(err);
+                RsaImpl.setLoggerErr(err, 5);
                 return false;
             }
 
@@ -457,10 +540,9 @@ public class RsaImpl {
 
                 if (enckey==null || (enckey!=null && enckey.length==0)) {
 
-                	String str=null;
-                    str=String.format("[JC_PKCS]:No Find Key");
-                    logger.info(str);
-                    return null;
+                    String str=String.format("[JC_PKCS]:No Find Key");
+                    RsaImpl.setLoggerErr(str, 6);
+                    throw new JavaChainException(str);
                 }
 
                 CK_ATTRIBUTE[] attributes = new CK_ATTRIBUTE[] {
@@ -480,7 +562,7 @@ public class RsaImpl {
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                logger.error(err);
+                RsaImpl.setLoggerErr(err, 6);
                 throw new JavaChainException(err, ex.getCause());
             }
 
@@ -521,10 +603,9 @@ public class RsaImpl {
 
                 if (deckey==null || (deckey!=null && deckey.length==0)) {
 
-                	String str=null;
-                    str=String.format("[JC_PKCS]:No Find Key");
-                    logger.info(str);
-                    return null;
+                    String str=String.format("[JC_PKCS]:No Find Key");
+                    RsaImpl.setLoggerErr(str, 7);
+                    throw new JavaChainException(str);
                 }
 
                 int outlen = 512;
@@ -542,7 +623,7 @@ public class RsaImpl {
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                logger.error(err);
+                RsaImpl.setLoggerErr(err, 7);
                 throw new JavaChainException(err, ex.getCause());
             }
 
@@ -575,12 +656,12 @@ public class RsaImpl {
         }catch(PKCS11Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-            logger.error(err);
+            setLoggerErr(err, 0);
             throw new JavaChainException(err, ex.getCause());
         }catch(Exception ex) {
         	ex.printStackTrace();
         	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
-            logger.error(err);
+            setLoggerErr(err, 0);
             throw new JavaChainException(err, ex.getCause());
         }
     }
@@ -597,6 +678,7 @@ public class RsaImpl {
         }catch( InvalidKeyException ex){
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:InvalidKeyException ErrMessage: %s", ex.getMessage());
+            setLoggerErr(err, 0);
             throw new JavaChainException(err, ex.getCause());
         }
     }
@@ -616,6 +698,7 @@ public class RsaImpl {
         }catch(NoSuchAlgorithmException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
+            setLoggerErr(err, 0);
             throw new JavaChainException(err, ex.getCause());
         }
     }

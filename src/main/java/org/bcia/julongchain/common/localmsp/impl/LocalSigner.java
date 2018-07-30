@@ -44,30 +44,15 @@ public class LocalSigner implements ILocalSigner {
     @Override
     public Common.SignatureHeader newSignatureHeader() {
         try {
-
-            log.info("newSignatureHeader 1");
-
             Identity identity= (Identity) GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity().getIdentity();
-            log.info("newSignatureHeader 2");
             byte[] creatorIdentityRaw=identity.serialize();
-            log.info("newSignatureHeader 3");
             Common.SignatureHeader.Builder signatureHeader=Common.SignatureHeader.newBuilder();
-            log.info("newSignatureHeader 3.5");
-//            byte[] none=new SecureRandom().generateSeed(12);
-
             byte[] nonce = null;
-            try {
-                nonce = CspManager.getCsp(IFactoryOpts.PROVIDER_GM_SDT).rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
-            } catch (JavaChainException e) {
-                log.error(e.getMessage(), e);
-                throw new NodeException("Can not get nonce");
-            }
-
-            log.info("newSignatureHeader 4");
+            log.info("Gen the random start");
+            nonce= identity.getMsp().getCsp().rng(24,null);
+            log.info("Gen the random end");
             signatureHeader.setNonce(ByteString.copyFrom(nonce));
-            log.info("newSignatureHeader 5");
             signatureHeader.setCreator(ByteString.copyFrom(creatorIdentityRaw));
-            log.info("newSignatureHeader 6");
             return signatureHeader.build();
         } catch (Exception e) {
             e.printStackTrace();

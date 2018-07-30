@@ -29,7 +29,36 @@ import java.util.List;
  * @company Aisino
  */
 public interface IPolicyChecker {
+    /**
+     * CheckPolicy检查通过签名的提议是否有效
+     * 传递通道上的策略。
+     * @param groupID
+     * @param policyName
+     * @param signedProposal
+     * @throws PolicyException
+     */
     void checkPolicy(String groupID, String policyName, ProposalPackage.SignedProposal signedProposal)throws PolicyException;
+
+    /**
+     * CheckPolicyBySignedData checks that the passed signed data is valid with the respect to
+     * passed policy on the passed channel.
+     * CheckPolicyBySignedData检查传入的签名数据是否有效
+     * 传递通道上的策略。
+     * @param groupID
+     * @param policyName
+     * @param signedDatas
+     * @throws PolicyException
+     */
     void checkPolicyBySignedData(String groupID, String policyName, List<SignedData> signedDatas)throws PolicyException;
+
+    /**
+     * CheckPolicyNoChannel checks that the passed signed proposal is valid with the respect to
+     * passed policy on the local MSP.
+     * CheckPolicyNoChannel检查通过签名的提议是否有效
+     * 在当地的MSP上通过政策。
+     * @param policyName
+     * @param signedProposal
+     * @throws PolicyException
+     */
     void checkPolicyNoGroup(String policyName, ProposalPackage.SignedProposal signedProposal)throws PolicyException;
 }

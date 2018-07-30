@@ -16,7 +16,7 @@
 package org.bcia.julongchain.csp.gm.sdt.jni;
 
 /**
- * SM4 CBC模式加密结果
+ * SM4 CBC模式加解密结果
  *
  * @author tengxiumin
  * @date 2018/05/15

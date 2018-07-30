@@ -148,13 +148,6 @@ public class PreStart {
         return new GrpcServerConfig();
     }
 
-    public static void main(String[] args) throws IOException, JavaChainException {
-        LocalSigner localSigner = new LocalSigner();
-
-       // Registrar registrar = initializeMultichannelRegistrar(loadConsenterConfig(), localSigner);
-
-    }
-
     public static ConsenterConfig getDefaultConsenterConfig() {
         return defaultConsenterConfig;
     }

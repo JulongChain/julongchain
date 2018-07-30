@@ -41,7 +41,7 @@ import java.util.List;
  * 类描述
  * 策略检查器，通过通达及策略名获得策略，并使用此策略对签名进行验证
  * @author yuanjun,sunianle
- * @date 20/04/20
+ * @date 20/04/18
  * @company Aisino,Dingxuan
  */
 public class PolicyChecker implements IPolicyChecker{
@@ -105,7 +105,7 @@ public class PolicyChecker implements IPolicyChecker{
              throw new PolicyException(msg);
         }
 
-        Common.Header header = null; //Common.Header.newBuilder();
+        Common.Header header = null;
         try {
             header = Common.Header.parseFrom(proposal.getHeader());
         } catch (InvalidProtocolBufferException e) {
@@ -130,7 +130,7 @@ public class PolicyChecker implements IPolicyChecker{
     @Override
     public void checkPolicyNoGroup(String policyName, ProposalPackage.SignedProposal signedProposal)throws PolicyException {
         if(policyName == ""){
-            String msg=String.format("Invalid policy name during groupless check policy. Name must be different from nil.");
+            String msg=String.format("Invalid policy name during groupless check policy. Name must be different from null.");
             throw new PolicyException(msg);
         }
         if(signedProposal == null){
@@ -162,7 +162,7 @@ public class PolicyChecker implements IPolicyChecker{
         IIdentity id = null;
         try {
             log.info("SignatureHeader.getCreator(): " + signatureHeader.getCreator());
-            id = localMSP.deserializeIdentity(signatureHeader.getCreator().toByteArray());//
+            id = localMSP.deserializeIdentity(signatureHeader.getCreator().toByteArray());
         }catch (Exception e){
             String msg=String.format("Failed deserializing proposal creator during channelless check policy with policy [%s]:%s",policyName,e.getMessage());
             throw new PolicyException(msg);
@@ -178,7 +178,6 @@ public class PolicyChecker implements IPolicyChecker{
             String msg=String.format("Failed getting local MSP principal during channelless check policy with policy [%s]:%s",policyName,e.getMessage());
             throw new PolicyException(msg);
         }
-        //MspPrincipal.MSPPrincipal m = MspPrincipal.MSPPrincipal.newBuilder().build();
         try {
             try {
                 id.satisfiesPrincipal(principal);

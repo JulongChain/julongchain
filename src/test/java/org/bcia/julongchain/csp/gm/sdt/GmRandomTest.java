@@ -63,12 +63,12 @@ public class GmRandomTest {
                 System.out.println("\n**** case " + caseIndex++ + ": generate random length = " + len + "  ****");
                 byte[] random = randomGen.rng(len);
                 if (null != random) {
-                    System.out.println("[output data] random data : " + Convert.bytesToHexString(random));
+                    System.out.println("[ output ] random data : " + Convert.bytesToHexString(random));
                 } else {
-                    System.out.println("[**Error**] generate random data failed");
+                    System.out.println("[** error **] failed generating random data");
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("[## exception ##] " + e.getMessage());
             }
         }
     }
