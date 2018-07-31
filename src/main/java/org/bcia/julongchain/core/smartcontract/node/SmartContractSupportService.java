@@ -177,126 +177,19 @@ public class SmartContractSupportService
 
                 // 收到getState信息
                 if (message.getType().equals(SmartContractMessage.Type.GET_STATE)) {
-
-                    // shim传过来的key
-                    String key = message.getPayload().toStringUtf8();
-
-                    logger.info("===============>" + key);
-
-                    try {
-                        INodeLedger nodeLedger = NodeUtils.getLedger(groupId);
-                        ITxSimulator txSimulator = nodeLedger.newTxSimulator(txId);
-                        byte[] worldStateBytes = txSimulator.getState(smartContractId, key);
-
-                        if (worldStateBytes == null) {
-                            worldStateBytes = new byte[]{};
-                            // 发送读取结果到shim端
-                            SmartContractMessage responseMessage =
-                                    SmartContractMessage.newBuilder()
-                                            .mergeFrom(message)
-                                            .setType(SmartContractMessage.Type.RESPONSE)
-                                            .setPayload(ByteString.copyFrom(worldStateBytes))
-                                            .setTxid(txId)
-                                            .setGroupId(groupId)
-                                            .build();
-
-                            responseObserver.onNext(responseMessage);
-                        } else {
-                            // 发送读取结果到shim端
-                            SmartContractMessage responseMessage =
-                                    SmartContractMessage.newBuilder()
-                                            .mergeFrom(message)
-                                            .setType(SmartContractMessage.Type.RESPONSE)
-                                            .setPayload(ByteString.copyFrom(worldStateBytes))
-                                            .setTxid(txId)
-                                            .setGroupId(groupId)
-                                            .build();
-
-                            responseObserver.onNext(responseMessage);
-                        }
-
-
-                    } catch (LedgerException e) {
-                        e.printStackTrace();
-                    }
-
+                    handleGetState(message, txId, groupId, smartContractId, responseObserver);
                     return;
                 }
 
                 if (message.getType().equals(SmartContractMessage.Type.GET_STATE_BY_RANGE)) {
-                    try {
-                        SmartContractShim.GetStateByRange getStateByRange = SmartContractShim.GetStateByRange.parseFrom(message.getPayload());
-                        String startKey = getStateByRange.getStartKey();
-                        String endKey = getStateByRange.getEndKey();
-
-                        INodeLedger nodeLedger = NodeUtils.getLedger(groupId);
-                        ITxSimulator txSimulator = nodeLedger.newTxSimulator(txId);
-                        IResultsIterator iterator = txSimulator.getStateRangeScanIterator(smartContractId, startKey, endKey);
-
-                        SmartContractShim.QueryResponse.Builder queryResponseBuilder = SmartContractShim.QueryResponse.newBuilder();
-
-                        while (true) {
-                            QueryResult queryResult = iterator.next();
-                            if (queryResult == null) {
-                                break;
-                            }
-                            VersionedKV kv = (VersionedKV) queryResult.getObj();
-                            if(kv.getCompositeKey().getKey().compareTo(endKey) == 1){
-                                break;
-                            }
-
-                            String key = kv.getCompositeKey().getKey();
-                            String namespace = kv.getCompositeKey().getNamespace();
-                            byte[] value = kv.getVersionedValue().getValue();
-
-                            KvQueryResult.KV kvProto = KvQueryResult.KV.newBuilder().setKey(key).setNamespace(namespace).setValue(ByteString.copyFrom(value)).build();
-
-                            queryResponseBuilder.addResults(SmartContractShim.QueryResultBytes.newBuilder().setResultBytes(kvProto.toByteString()).build());
-                        }
-
-
-                        SmartContractShim.QueryResponse queryResponse = queryResponseBuilder.build();
-
-                        SmartContractMessage responseMessage =
-                                SmartContractMessage.newBuilder()
-                                        .mergeFrom(message)
-                                        .setType(SmartContractMessage.Type.RESPONSE)
-                                        .setPayload(queryResponse.toByteString())
-                                        .setTxid(txId)
-                                        .setGroupId(groupId)
-                                        .build();
-
-                        responseObserver.onNext(responseMessage);
-
-                    } catch (InvalidProtocolBufferException e) {
-                        e.printStackTrace();
-                    } catch (LedgerException e) {
-                        e.printStackTrace();
-                    }
+                    handleGetStateByRange(message, txId, groupId, smartContractId, responseObserver);
                     return;
                 }
 
 
                 // 收到putState信息
                 if (message.getType().equals(SmartContractMessage.Type.PUT_STATE)) {
-                    try {
-                        SmartContractShim.PutState putState = SmartContractShim.PutState.parseFrom(message.getPayload());
-                        INodeLedger nodeLedger = NodeUtils.getLedger(groupId);
-                        ITxSimulator txSimulator = nodeLedger.newTxSimulator(txId);
-                        txSimulator.setState(smartContractId, putState.getKey(), putState.getValue().toByteArray());
-                    } catch (Exception e) {
-                        logger.error(e.getMessage(), e);
-                    }
-
-                    SmartContractMessage responseMessage =
-                            SmartContractMessage.newBuilder()
-                                    .mergeFrom(message)
-                                    .setType(SmartContractMessage.Type.RESPONSE)
-                                    .setTxid(txId)
-                                    .setGroupId(groupId)
-                                    .build();
-
-                    responseObserver.onNext(responseMessage);
+                    handlePutState(message, txId, groupId, smartContractId, responseObserver);
                     return;
                 }
 
@@ -321,6 +214,123 @@ public class SmartContractSupportService
                 logger.info("SmartContract completed");
             }
         };
+    }
+
+    private void handlePutState(SmartContractMessage message, String txId, String groupId, String smartContractId, StreamObserver<SmartContractMessage> responseObserver) {
+        try {
+            SmartContractShim.PutState putState = SmartContractShim.PutState.parseFrom(message.getPayload());
+            INodeLedger nodeLedger = NodeUtils.getLedger(groupId);
+            ITxSimulator txSimulator = nodeLedger.newTxSimulator(txId);
+            txSimulator.setState(smartContractId, putState.getKey(), putState.getValue().toByteArray());
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        }
+
+        SmartContractMessage responseMessage =
+                SmartContractMessage.newBuilder()
+                        .mergeFrom(message)
+                        .setType(SmartContractMessage.Type.RESPONSE)
+                        .setTxid(txId)
+                        .setGroupId(groupId)
+                        .build();
+
+        responseObserver.onNext(responseMessage);
+    }
+
+    private void handleGetStateByRange(SmartContractMessage message, String txId, String groupId, String smartContractId, StreamObserver<SmartContractMessage> responseObserver) {
+        try {
+            SmartContractShim.GetStateByRange getStateByRange = SmartContractShim.GetStateByRange.parseFrom(message.getPayload());
+            String startKey = getStateByRange.getStartKey();
+            String endKey = getStateByRange.getEndKey();
+
+            INodeLedger nodeLedger = NodeUtils.getLedger(groupId);
+            ITxSimulator txSimulator = nodeLedger.newTxSimulator(txId);
+            IResultsIterator iterator = txSimulator.getStateRangeScanIterator(smartContractId, startKey, endKey);
+
+            SmartContractShim.QueryResponse.Builder queryResponseBuilder = SmartContractShim.QueryResponse.newBuilder();
+
+            while (true) {
+                QueryResult queryResult = iterator.next();
+                if (queryResult == null) {
+                    break;
+                }
+                VersionedKV kv = (VersionedKV) queryResult.getObj();
+                if(kv.getCompositeKey().getKey().compareTo(endKey) == 1){
+                    break;
+                }
+
+                String key = kv.getCompositeKey().getKey();
+                String namespace = kv.getCompositeKey().getNamespace();
+                byte[] value = kv.getVersionedValue().getValue();
+
+                KvQueryResult.KV kvProto = KvQueryResult.KV.newBuilder().setKey(key).setNamespace(namespace).setValue(ByteString.copyFrom(value)).build();
+
+                queryResponseBuilder.addResults(SmartContractShim.QueryResultBytes.newBuilder().setResultBytes(kvProto.toByteString()).build());
+            }
+
+
+            SmartContractShim.QueryResponse queryResponse = queryResponseBuilder.build();
+
+            SmartContractMessage responseMessage =
+                    SmartContractMessage.newBuilder()
+                            .mergeFrom(message)
+                            .setType(SmartContractMessage.Type.RESPONSE)
+                            .setPayload(queryResponse.toByteString())
+                            .setTxid(txId)
+                            .setGroupId(groupId)
+                            .build();
+
+            responseObserver.onNext(responseMessage);
+
+        } catch (InvalidProtocolBufferException e) {
+            e.printStackTrace();
+        } catch (LedgerException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void handleGetState(SmartContractMessage message, String txId, String groupId, String smartContractId, StreamObserver<SmartContractMessage> responseObserver) {
+        // shim传过来的key
+        String key = message.getPayload().toStringUtf8();
+
+        logger.info("===============>" + key);
+
+        try {
+            INodeLedger nodeLedger = NodeUtils.getLedger(groupId);
+            ITxSimulator txSimulator = nodeLedger.newTxSimulator(txId);
+            byte[] worldStateBytes = txSimulator.getState(smartContractId, key);
+
+            if (worldStateBytes == null) {
+                worldStateBytes = new byte[]{};
+                // 发送读取结果到shim端
+                SmartContractMessage responseMessage =
+                        SmartContractMessage.newBuilder()
+                                .mergeFrom(message)
+                                .setType(SmartContractMessage.Type.RESPONSE)
+                                .setPayload(ByteString.copyFrom(worldStateBytes))
+                                .setTxid(txId)
+                                .setGroupId(groupId)
+                                .build();
+
+                responseObserver.onNext(responseMessage);
+            } else {
+                // 发送读取结果到shim端
+                SmartContractMessage responseMessage =
+                        SmartContractMessage.newBuilder()
+                                .mergeFrom(message)
+                                .setType(SmartContractMessage.Type.RESPONSE)
+                                .setPayload(ByteString.copyFrom(worldStateBytes))
+                                .setTxid(txId)
+                                .setGroupId(groupId)
+                                .build();
+
+                responseObserver.onNext(responseMessage);
+            }
+
+
+        } catch (LedgerException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
