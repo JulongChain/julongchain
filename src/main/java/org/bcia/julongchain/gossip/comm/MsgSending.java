@@ -13,23 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.gossip.api;
+package org.bcia.julongchain.gossip.comm;
+
+import org.bcia.julongchain.protos.gossip.Message;
 
 /**
- * SecurityAdvisor defines an external auxiliary object
- * that provides security and identity related capabilities
+ * class description
+ *
+ * @author
+ * @date 18-7-24
+ * @company Dingxuan
  */
-public interface ISecurityAdvisor {
+public class MsgSending {
 
-    /**
-     * OrgByPeerIdentity returns the OrgIdentityType
-     * of a given peer identity.
-     * If any error occurs, nil is returned.
-     * This method does not validate peerIdentity.
-     * This validation is supposed to be done appropriately during the execution flow.
-     * @param peerIdentity
-     * @return
-     */
-    public byte[] orgByPeerIdentity(byte[] peerIdentity);
+    private Message.Envelope envelope;
+    private IOnError onError;
 
+    public Message.Envelope getEnvelope() {
+        return envelope;
+    }
+
+    public void setEnvelope(Message.Envelope envelope) {
+        this.envelope = envelope;
+    }
+
+    public IOnError getOnError() {
+        return onError;
+    }
+
+    public void setOnError(IOnError onError) {
+        this.onError = onError;
+    }
 }

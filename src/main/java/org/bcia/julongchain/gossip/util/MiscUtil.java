@@ -13,23 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.gossip.api;
+package org.bcia.julongchain.gossip.util;
+
+import org.apache.commons.lang.math.NumberUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
- * SecurityAdvisor defines an external auxiliary object
- * that provides security and identity related capabilities
+ * class description
+ *
+ * @author
+ * @date 18-7-25
+ * @company Dingxuan
  */
-public interface ISecurityAdvisor {
+public class MiscUtil {
 
-    /**
-     * OrgByPeerIdentity returns the OrgIdentityType
-     * of a given peer identity.
-     * If any error occurs, nil is returned.
-     * This method does not validate peerIdentity.
-     * This validation is supposed to be done appropriately during the execution flow.
-     * @param peerIdentity
-     * @return
-     */
-    public byte[] orgByPeerIdentity(byte[] peerIdentity);
+    public static Integer getIntOrDefault(String key, Integer defVal) {
+        String env = System.getenv(key);
+        if (StringUtils.isEmpty(env) || NumberUtils.isNumber(env)) {
+            return defVal;
+        }
+        return Integer.parseInt(env);
+    }
 
 }

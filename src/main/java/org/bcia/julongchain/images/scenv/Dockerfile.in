@@ -19,5 +19,5 @@ WORKDIR /root/julongchain
 ENV CORE_NODE_ADDRESS #core_node_address#
 RUN mvn package
 RUN rm -rf /root/julongchain/pom.xml
-RUN rm -rf /root/julongchain/src/*dock
-
+RUN rm -rf /root/julongchain/src
+CMD java -jar /root/julongchain/target/julongchain-smartcontract-java-jar-with-dependencies.jar -i #smart_contract_id -a #core_node_address_and_port
