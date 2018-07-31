@@ -18,6 +18,7 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 
@@ -42,7 +43,11 @@ public class RangeQueryResultsHelper {
     private boolean hashingEnable;
 
     public RangeQueryResultsHelper(boolean hashingEnable, int maxDegree) throws LedgerException {
-        this.maxDegree = maxDegree;
+		if(maxDegree < 2){
+			this.maxDegree = LedgerConfig.getMaxDegreeQueryReadsHashing();
+		} else {
+			this.maxDegree = maxDegree;
+		}
         this.hashingEnable = hashingEnable;
         if(hashingEnable){
             this.mt = new MerkleTree(maxDegree);
@@ -77,14 +82,14 @@ public class RangeQueryResultsHelper {
 
     public Map.Entry<List<KvRwset.KVRead>, KvRwset.QueryReadsMerkleSummary> done() throws LedgerException{
     	if(!hashingEnable || mt.isEmpty()){
-    		return new AbstractMap.SimpleEntry<>(pendingResults, null);
+    		return new AbstractMap.SimpleEntry<>(pendingResults, KvRwset.QueryReadsMerkleSummary.getDefaultInstance());
 	    }
 	    if (0 != pendingResults.size()) {
 		    logger.debug("Processing the pending results");
 		    try {
 			    processPendingResults();
 		    } catch (LedgerException e) {
-			    return new AbstractMap.SimpleEntry<>(pendingResults, null);
+			    return new AbstractMap.SimpleEntry<>(pendingResults, KvRwset.QueryReadsMerkleSummary.getDefaultInstance());
 		    }
 	    }
 	    mt.done();

@@ -18,6 +18,7 @@ package org.bcia.julongchain.core.ledger;
 import com.google.protobuf.ByteString;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.TxRwSet;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
@@ -47,7 +48,7 @@ public class TxSimulatorTest {
     INodeLedger ledger = null;
     TxSimulationResults txSimulationResults = null;
     final String ledgerID = "myGroup";
-    final String ns = "voucher";
+    final String ns = "jdoe-voucher";
 
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
@@ -225,6 +226,8 @@ public class TxSimulatorTest {
 
 	@Test
 	public void testGetStateRangeScanIterator() throws Exception{
+    	simulator.getState(ns, "a");
+    	simulator.setState(ns, "a1", "haha".getBytes());
 		IResultsIterator itr = simulator.getStateRangeScanIterator(ns, "a", "b");
 		System.out.println(itr.next());
 //		for (int i = 0; i < 6; i++) {
@@ -235,6 +238,8 @@ public class TxSimulatorTest {
 //		}
 		TxSimulationResults txSimulationResults = simulator.getTxSimulationResults();
 		Rwset.TxReadWriteSet publicReadWriteSet = txSimulationResults.getPublicReadWriteSet();
+		TxRwSet txRwSet = new TxRwSet();
+		txRwSet.fromProtoBytes(publicReadWriteSet.getNsRwset(0).getRwset());
 		System.out.println(publicReadWriteSet);
 	}
 
