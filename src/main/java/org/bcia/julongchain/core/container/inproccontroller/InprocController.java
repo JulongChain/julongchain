@@ -40,8 +40,8 @@ public class InprocController {
 		String sscName = sysSmartcontract.getSystemSmartContractDescriptor().getSSCName();
 		if (isRegistered(sscName)) {
 			String msg = String.format("Before register, %s is already registered", sscName);
-			log.error(msg);
-			throw new InprocVMException(msg);
+			log.info(msg);
+			return;
 		}
 		containers.put(sscName, null);
 		log.info(sscName + " register success");
@@ -67,8 +67,8 @@ public class InprocController {
 		}
 		if (isDeployed(sscName)) {
 			String msg = String.format("Before deploy, %s is already deployed", sscName);
-			log.error(msg);
-			throw new InprocVMException(msg);
+			log.info(msg);
+			return;
 		}
 		InprocContainer container = new InprocContainer(sysSmartcontract, args);
 		containers.put(sscName, container);
