@@ -21,6 +21,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.*;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.nio.charset.Charset;
 import java.util.Date;
 
@@ -63,6 +65,22 @@ public class Utils {
     string = StringUtils.replaceAll(string, oldStr, newStr);
     FileUtils.writeStringToFile(new File(filePath), string, Charset.forName("UTF-8"));
   }
+
+    public static boolean isHostConnectable(String host, int port) {
+        Socket socket = new Socket();
+        try {
+            socket.connect(new InetSocketAddress(host, port));
+        } catch (IOException e) {
+            return false;
+        } finally {
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return true;
+    }
 
   public static void main(String[] args) throws IOException {
     String filePath = "/root/test.txt";
