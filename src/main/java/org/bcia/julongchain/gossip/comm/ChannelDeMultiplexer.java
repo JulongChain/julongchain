@@ -13,23 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.gossip.api;
+package org.bcia.julongchain.gossip.comm;
 
 /**
- * SecurityAdvisor defines an external auxiliary object
- * that provides security and identity related capabilities
+ * class description
+ *
+ * @author
+ * @date 18-7-25
+ * @company Dingxuan
  */
-public interface ISecurityAdvisor {
+public class ChannelDeMultiplexer {
 
-    /**
-     * OrgByPeerIdentity returns the OrgIdentityType
-     * of a given peer identity.
-     * If any error occurs, nil is returned.
-     * This method does not validate peerIdentity.
-     * This validation is supposed to be done appropriately during the execution flow.
-     * @param peerIdentity
-     * @return
-     */
-    public byte[] orgByPeerIdentity(byte[] peerIdentity);
+    private Channel[] channels;
+    private Boolean close;
 
+    public Channel[] getChannels() {
+        return channels;
+    }
+
+    public void setChannels(Channel[] channels) {
+        this.channels = channels;
+    }
+
+    public Boolean getClose() {
+        return close;
+    }
+
+    public void setClose(Boolean close) {
+        this.close = close;
+    }
 }

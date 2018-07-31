@@ -295,13 +295,12 @@ public class SmartContractSupport implements ISCSupport {
         try {
             String imageName = getNodeIdFromYaml() + "-" + smartContractId + "-" + version;
             String containerName = getNodeIdFromYaml() + "-" + smartContractId;
-            String coreNodeAddressAndPortArgus = " -a " + getCoreNodeAddress() + ":" + getCoreNodeAddressPort();
 
             List<String> images = DockerUtil.listImages(imageName);
 
             if (CollectionUtils.isEmpty(images)) {
                 createUserImage(smartContractId, version, imageName);
-                DockerUtil.createContainer(imageName, containerName, "/bin/sh", "-c", "java -jar /root/julongchain/target/julongchain-smartcontract-java-jar-with-dependencies.jar -i " + smartContractId + coreNodeAddressAndPortArgus);
+                DockerUtil.createContainer(imageName, containerName);
             }
 
             // 启动容器
@@ -332,13 +331,20 @@ public class SmartContractSupport implements ISCSupport {
         FileUtils.copyFileToDirectory(
                 new File(dockerFile),
                 new File(basePath));
-
-
+        // replace core_node_address
+        String dockerFilePath = basePath + File.separator + "Dockerfile.in";
         Utils.replaceFileContent(
-                basePath + File.separator + "Dockerfile.in",
+                dockerFilePath,
                 "#core_node_address#",
                 getCoreNodeAddress());
-
+        // replace smart_contract_id
+        Utils.replaceFileContent(dockerFilePath,
+                "#smart_contract_id",
+                smartContractId);
+        // replace core_node_address_and_port
+        Utils.replaceFileContent(dockerFilePath,
+                "#core_node_address_and_port",
+                getCoreNodeAddress() + ":" + getCoreNodeAddressPort());
         // build镜像
         String imageId =
                 DockerUtil.buildImage(basePath + "/Dockerfile.in", imageName);

@@ -17,6 +17,12 @@ package org.bcia.julongchain.gossip.api;
 
 public interface IPeerSuspector {
 
-    public Boolean peerSuspector(byte[] peerIdentity);
+    /**
+     * PeerSuspector returns whether a peer with a given identity is suspected
+     * as being revoked, or its CA is revoked
+     * @param peerIdentity
+     * @return
+     */
+    public Boolean execute(byte[] peerIdentity);
 
 }

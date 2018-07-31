@@ -19,7 +19,6 @@ import com.google.protobuf.ByteString;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.core.deliverservice.blocksprovider.IGossipServcieAdapter;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.gossip.api.IJoinChannelMessage;
 import org.bcia.julongchain.gossip.gossip.channel.IGossipChannel;

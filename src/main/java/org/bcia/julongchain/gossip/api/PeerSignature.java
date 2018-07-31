@@ -15,6 +15,10 @@
  */
 package org.bcia.julongchain.gossip.api;
 
+/**
+ * PeerSignature defines a signature of a peer
+ * on a given message
+ */
 public class PeerSignature {
 
     private byte[] signature;
