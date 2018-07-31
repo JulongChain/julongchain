@@ -120,4 +120,19 @@ public class LedgerConfig {
         String result = buffer.toString();
         return result.substring(0, result.length() - 1);
     }
+
+    public static Boolean isAutoWarmIndexesEnabled(){
+        if("".equals(CONF_AUTO_WARM_INDEXES)){
+            return false;
+        }
+        return true;
+    }
+    public static int getWarmIndexesAfterNBlocks(){
+        String warmAfterNBlocks = CONF_WARM_INDEXES_AFTER_N_BLOCKS;
+        if("".equals(warmAfterNBlocks)){
+            return 1;
+        }
+
+        return Integer.parseInt(warmAfterNBlocks);
+    }
 }
