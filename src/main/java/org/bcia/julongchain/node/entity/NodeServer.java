@@ -21,10 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.common.util.CommConstant;
-import org.bcia.julongchain.common.util.FileUtils;
-import org.bcia.julongchain.common.util.NetAddress;
-import org.bcia.julongchain.common.util.SpringContext;
+import org.bcia.julongchain.common.util.*;
 import org.bcia.julongchain.core.admin.AdminServer;
 import org.bcia.julongchain.core.endorser.Endorser;
 import org.bcia.julongchain.core.events.DeliverEventsServer;
@@ -50,6 +47,7 @@ import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 节点服务
@@ -128,27 +126,18 @@ public class NodeServer {
     }
 
     private void startGossipService() {
-
-        //
-//            ExecutorService fixedThreadPool = Executors.newFixedThreadPool(MAX_THREAD_POOL);
-//            for (int i = 0; i < 10; i++) {
-//                final int index = i;
-//                fixedThreadPool.execute(new Runnable() {
-//                    public void run() {
-//                        try {
-//                            System.out.println(index);
-//                            Thread.sleep(2000);
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                });
-
         String consenterAddress = NodeConfigFactory.getNodeConfig().getNode().getGossip().getConsenterAddress();
         String[] split = StringUtils.split(consenterAddress, ":");
         String host = split[0];
         Integer port = Integer.parseInt(split[1]);
-
+        while (!Utils.isHostConnectable(host, port)) {
+            log.info("wait consenter start, host:" + host + ", port:" + port);
+            try {
+                Thread.sleep(1000l);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         ManagedChannel managedChannel = NettyChannelBuilder.forAddress(host, port).usePlaintext().build();
         GossipClientStream gossipClientStream = new GossipClientStream(managedChannel);
         new Thread() {
