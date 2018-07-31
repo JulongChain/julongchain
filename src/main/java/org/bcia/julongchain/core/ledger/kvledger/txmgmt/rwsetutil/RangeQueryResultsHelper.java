@@ -72,14 +72,7 @@ public class RangeQueryResultsHelper {
     }
 
     private byte[] serializeKVReads(List<KvRwset.KVRead> list){
-       return setKvReads(KvRwset.QueryReads.newBuilder(), list).build().toByteArray();
-    }
-
-    private KvRwset.QueryReads.Builder setKvReads(KvRwset.QueryReads.Builder builder, List<KvRwset.KVRead> list){
-        for (int i = 0; i < list.size(); i++) {
-            builder.setKvReads(i, list.get(i));
-        }
-        return builder;
+    	return KvRwset.QueryReads.newBuilder().addAllKvReads(list).build().toByteArray();
     }
 
     public Map.Entry<List<KvRwset.KVRead>, KvRwset.QueryReadsMerkleSummary> done() throws LedgerException{

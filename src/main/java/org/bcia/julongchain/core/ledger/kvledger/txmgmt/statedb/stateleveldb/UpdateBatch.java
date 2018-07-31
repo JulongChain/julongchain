@@ -71,7 +71,7 @@ public class UpdateBatch {
     public Map<String, VersionedValue> getUpdates(String ns){
         NsUpdates nsUpdates = updates.get(ns);
         if(nsUpdates == null){
-            return null;
+            return new HashMap<>();
         }
         return nsUpdates.getMap();
     }

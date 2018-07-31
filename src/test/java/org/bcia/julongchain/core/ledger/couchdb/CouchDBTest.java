@@ -41,7 +41,8 @@ public class CouchDBTest {
 
     public CouchDbClient creatConnectionDB() throws LedgerException {
         CouchDbProperties properties = new CouchDbProperties();
-        String url = "192.168.122.128";
+//        String url = "192.168.1.83";
+        String url = "127.0.0.1";
         int port = 9000;
         int requestTimeout = 1000;
         int maxConnections = 5;
@@ -51,8 +52,9 @@ public class CouchDBTest {
         properties.setHost(url);
         properties.setProtocol("http");
         properties.setPort(port);
-        properties.setUsername(username);
-        properties.setPassword(password);
+//        properties.setCreateDbIfNotExist(true);
+        properties.setUsername(null);
+        properties.setPassword(null);
         CouchDbClient dbClient = new CouchDbClient(properties);
         return dbClient;
     }
@@ -60,9 +62,10 @@ public class CouchDBTest {
     @Test
     public void CreateDatabaseIfNotExist() throws LedgerException{
         CouchDB couchDB = new CouchDB();
-        CouchDbClient db = creatConnectionDB();
-        String dbName = "julongchain";
+		String dbName = "julongchain";
+		CouchDbClient db = creatConnectionDB();
         couchDB.createDatabaseIfNotExist(db, dbName);
+
     }
 
     @Test

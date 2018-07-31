@@ -15,14 +15,12 @@
  */
 package org.bcia.julongchain.core.common.privdata;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.PrivDataException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.IQueryExecutor;
-import org.bcia.julongchain.core.node.NodeSupport;
 import org.bcia.julongchain.core.node.util.NodeUtils;
 import org.bcia.julongchain.msp.IIdentityDeserializer;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
@@ -54,7 +52,7 @@ public class CollectionStoreSupport implements IPrivDataSupport {
 
     @Override
     public String getCollectionKVSKey(Collection.CollectionCriteria cc) {
-    	return cc.getNamespace() + COLLECTION_SEPARATOR + COLLECTION_SUFFIX;
+    	return buildCollectionKVSKey(cc.getNamespace());
     }
 
     @Override

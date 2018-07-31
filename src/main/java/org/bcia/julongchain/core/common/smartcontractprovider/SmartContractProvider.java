@@ -256,9 +256,9 @@ public class SmartContractProvider {
 				name,
 				version,
 				txid,
-				true,
-				null,
-				null);
+				syssc,
+				signedProp,
+				proposal);
 		sccid.setCanonicalName(name + ":" + version);
 		log.debug("NewSCCC (group=[{}], sc=[{}], version=[{}], txid=[{}], canName=[{}]", groupID, name, version, txid, name + ":" + version);
 		return sccid;

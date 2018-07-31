@@ -20,6 +20,7 @@ import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
+import org.bcia.julongchain.protos.common.Common;
 
 /**
  *  区块迭代器

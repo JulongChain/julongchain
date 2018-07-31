@@ -88,9 +88,6 @@ public class LedgerTest {
 
     @Test
     public void getValuesFromFS() throws Exception {
-    	Map<String, String> map = new HashMap<>();
-	    System.out.println(map.entrySet());
-
 	    String filePath = LedgerConfig.getChainsPath() + "/chains/myGroup/blockfile_000000";
 	    File file = new File(filePath);
 	    System.out.println(filePath);

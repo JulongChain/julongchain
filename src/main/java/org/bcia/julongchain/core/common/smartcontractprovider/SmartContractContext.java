@@ -17,6 +17,9 @@ package org.bcia.julongchain.core.common.smartcontractprovider;
 
 import org.bcia.julongchain.protos.node.ProposalPackage;
 
+import javax.naming.Context;
+import javax.naming.NamingException;
+
 /**
  * 类描述
  *

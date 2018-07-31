@@ -15,6 +15,8 @@
  */
 package org.bcia.julongchain.core.smartcontract.accesscontrol;
 
+import org.bcia.julongchain.common.exception.SmartContractException;
+
 /**
  * 类描述
  *
@@ -24,6 +26,12 @@ package org.bcia.julongchain.core.smartcontract.accesscontrol;
  */
 public class Authenticator {
 
+	public void disableAccessCheck () {
 
+	}
 
+	public CertAndPrivKeyPair generate(String scName) throws SmartContractException{
+
+		return new CertAndPrivKeyPair();
+	}
 }

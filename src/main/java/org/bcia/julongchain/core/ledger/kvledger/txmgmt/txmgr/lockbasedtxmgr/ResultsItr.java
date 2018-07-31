@@ -66,9 +66,10 @@ public class ResultsItr implements IResultsIterator {
         }
         if(queryResult == null){
             rangeQueryInfo = rangeQueryInfo.toBuilder()
-                    .setEndKey(endKey)
+                    .setEndKey(endKey == null ? new String(new byte[]{Byte.MAX_VALUE}) : endKey)
                     .setItrExhausted(true)
                     .build();
+            return;
         }
         VersionedKV versionedKV = (VersionedKV) queryResult.getObj();
         rangeQueryResultsHelper.addResult(RwSetUtil.newKVRead(versionedKV.getCompositeKey().getKey(), versionedKV.getVersionedValue().getVersion()));

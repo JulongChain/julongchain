@@ -48,12 +48,11 @@
     <!-- 根logger的设置-->
     <root>
         <!--优先级设置，假设设置为“info”，则无法输出debug级别的日志-->
-        <!--<priority value="info"/>-->
-        <!--<priority value="info"/>-->
+        <priority value="info"/>
+        <!--<priority value="debug"/>-->
         <!--<priority value="warn"/>-->
         <!--<priority value="error"/>-->
         <!--<priority value="fatal"/>-->
-        <priority value="info"/>
         <!--添加刚才设置的appender-->
         <appender-ref ref="myConsole"/>
         <appender-ref ref="myFile"/>

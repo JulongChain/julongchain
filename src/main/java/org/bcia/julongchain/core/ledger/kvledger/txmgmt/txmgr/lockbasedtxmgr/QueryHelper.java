@@ -73,7 +73,7 @@ public class QueryHelper {
 
     public IResultsIterator getStateRangeScanIterator(String ns, String startKey, String endKey) throws LedgerException{
         checkDone();
-        ResultsItr itr = new ResultsItr(ns, startKey, endKey, txMgr.getDb(), rwSetBuilder, false, LedgerConfig.getMaxDegreeQueryReadsHashing());
+        ResultsItr itr = new ResultsItr(ns, startKey, endKey, txMgr.getDb(), rwSetBuilder, true, LedgerConfig.getMaxDegreeQueryReadsHashing());
         itrs.add(itr);
         return itr;
     }

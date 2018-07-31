@@ -20,6 +20,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.LedgerException;
+import org.bcia.julongchain.common.exception.SmartContractException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
@@ -83,7 +84,7 @@ public class Handler {
     private SmartContractInstance smartContractInstance;
     private SmartContractSupport smartContractSupport;
     private Boolean registered;
-    private Boolean readyNotify;
+    private Channel<Boolean> readyNotify;
     private Map<String, TransactionContext> txCtxs;
     private Map<String, Boolean> txidMap;
     private Channel<NextStateInfo> nextState;
@@ -180,21 +181,28 @@ public class Handler {
         this.smartContractSupport = smartContractSupport;
     }
 
-    public Boolean getRegistered() {
+    public boolean getRegistered() {
         return registered;
     }
 
-    public void setRegistered(Boolean registered) {
+    public void setRegistered(boolean registered) {
         this.registered = registered;
     }
 
-    public Boolean getReadyNotify() {
-        return readyNotify;
-    }
+	public Channel<Boolean> getReadyNotify() {
+		return readyNotify;
+	}
 
-    public void setReadyNotify(Boolean readyNotify) {
-        this.readyNotify = readyNotify;
-    }
+	public void setReadyNotify(Channel<Boolean> readyNotify) {
+		this.readyNotify = readyNotify;
+	}
+//    public boolean getReadyNotify() {
+//        return readyNotify;
+//    }
+//
+//    public void setReadyNotify(boolean readyNotify) {
+//        this.readyNotify = readyNotify;
+//    }
 
     public Map<String, TransactionContext> getTxCtxs() {
         return txCtxs;
@@ -482,7 +490,7 @@ public class Handler {
                     }
                     //处理消息
                     handleMessage(in);
-                } catch(RuntimeException e){
+                } catch(Exception e){
                     logger.error("Error handling message, ending stream");
                 } finally {
                     deregister();
@@ -584,7 +592,7 @@ public class Handler {
     public void notifyDuringStartup(Boolean val) {
         if(readyNotify != null){
             logger.info("Notifying during startup");
-            readyNotify = val;
+//            readyNotify = val;
         } else {
             logger.info("Nothing to notify (dev mode ?)");
 //            if(smartContractSupport.userRunCC){
@@ -1612,7 +1620,7 @@ public class Handler {
 
     /**move to ready
      */
-    public SmartContractShim.SmartContractMessage ready(Context ctxt, String chainID, String txid, ProposalPackage.SignedProposal signedProp, ProposalPackage.Proposal prop) {
+    public Channel<SmartContractShim.SmartContractMessage> ready(Context ctxt, String chainID, String txid, ProposalPackage.SignedProposal signedProp, ProposalPackage.Proposal prop) {
         TransactionContext txctx = createTxContext(ctxt, chainID, txid, signedProp, prop);
 
         logger.info("sending READY");
@@ -1671,7 +1679,7 @@ public class Handler {
         return false;
     }
 
-    public SmartContractShim.SmartContractMessage sendExecuteMessage(Context ctxt, String chainID, SmartContractShim.SmartContractMessage msg, ProposalPackage.SignedProposal signedProp, ProposalPackage.Proposal prop) {
+    public SmartContractShim.SmartContractMessage sendExecuteMessage(Context ctxt, String chainID, SmartContractShim.SmartContractMessage msg, ProposalPackage.SignedProposal signedProp, ProposalPackage.Proposal prop) throws SmartContractException{
         TransactionContext txctx = createTxContext(ctxt, chainID, msg.getTxid(), signedProp, prop);
         if(txctx != null){
             return null;
@@ -1685,8 +1693,15 @@ public class Handler {
         logger.info("[%s]sendExecuteMsg trigger event %s", shorttxid(msg.getTxid()), msg.getType().toString());
         triggerNextState(msg, true);
 
-        return txctx.getResponseNotifier();
-    }
+		SmartContractShim.SmartContractMessage scMsg = null;
+		try {
+			scMsg = txctx.getResponseNotifier().take();
+		} catch (InterruptedException e) {
+			logger.error("Got error:\n" + e.getMessage());
+			throw new SmartContractException(e);
+		}
+		return scMsg;
+	}
 
     public Boolean isRunning() {
         String current = getFsm().current();
