@@ -20,7 +20,7 @@ Modified java_package and other contents by Dingxuan on 2018-03-06
 syntax = "proto3";
 
 option go_package = "github.com/hyperledger/fabric/protos/msp";
-option java_package = "org.bcia.javachain.protos.common";
+option java_package = "org.bcia.julongchain.protos.common";
 
 package common;
 
@@ -47,7 +47,7 @@ package common;
 //     (ii) ByOrganizationUnit: that represents a classification of identities
 //          within MSP based on the organization unit an identity belongs to
 //     (iii)ByIdentity that denotes that MSPPrincipal is mapped to a single
-//          identity/certificate; this would mean that the Principal bytes
+//          identity/certificate; this would mean that the MSPPrincipalGetter bytes
 //          message
 message MSPPrincipal {
 
@@ -64,16 +64,16 @@ message MSPPrincipal {
     }
 
     // Classification describes the way that one should process
-    // Principal. An Classification value of "ByOrganizationUnit" reflects
-    // that "Principal" contains the name of an organization this MSP
+    // MSPPrincipalGetter. An Classification value of "ByOrganizationUnit" reflects
+    // that "MSPPrincipalGetter" contains the name of an organization this MSP
     // handles. A Classification value "ByIdentity" means that
-    // "Principal" contains a specific identity. Default value
-    // denotes that Principal contains one of the groups by
+    // "MSPPrincipalGetter" contains a specific identity. Default value
+    // denotes that MSPPrincipalGetter contains one of the groups by
     // default supported by all MSPs ("admin" or "member").
     Classification principal_classification = 1;
 
-    // Principal completes the policy principal definition. For the default
-    // principal types, Principal can be either "Admin" or "Member".
+    // MSPPrincipalGetter completes the policy principal definition. For the default
+    // principal types, MSPPrincipalGetter can be either "Admin" or "Member".
     // For the ByOrganizationUnit/ByIdentity values of Classification,
     // PolicyPrincipal acquires its value from an organization unit or
     // identity, respectively.
@@ -81,7 +81,7 @@ message MSPPrincipal {
 }
 
 
-// OrganizationUnit governs the organization of the Principal
+// OrganizationUnit governs the organization of the MSPPrincipalGetter
 // field of a policy principal when a specific organization unity members
 // are to be defined within a policy principal.
 message OrganizationUnit {
@@ -99,7 +99,7 @@ message OrganizationUnit {
     bytes certifiers_identifier = 3;
 }
 
-// MSPRole governs the organization of the Principal
+// MSPRole governs the organization of the MSPPrincipalGetter
 // field of an MSPPrincipal when it aims to define one of the
 // two dedicated roles within an MSP: Admin and Members.
 message MSPRole {
@@ -126,5 +126,5 @@ message MSPRole {
 // SerializedIdentity represents an serialized version of an identity;
 // this consists of an MSP-identifier this identity would correspond to
 // and the bytes of the actual identity. A serialized form of
-// SerializedIdentity would govern "Principal" field of a PolicyPrincipal
+// SerializedIdentity would govern "MSPPrincipalGetter" field of a PolicyPrincipal
 // of classification "ByIdentity".

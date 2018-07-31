@@ -6,7 +6,7 @@
 syntax = "proto3";
 
 option go_package = "github.com/hyperledger/fabric/protos/gossip";
-option java_package = "org.bcia.javachain.protos.gossip";
+option java_package = "org.bcia.julongchain.protos.gossip";
 
 package gossip;
 

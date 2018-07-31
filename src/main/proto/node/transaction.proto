@@ -19,12 +19,11 @@ Modified java_package and other contents by Dingxuan on 2018-03-21
 syntax = "proto3";
 
 option go_package = "github.com/hyperledger/fabric/protos/peer";
-option java_package = "org.bcia.javachain.protos.node";
+option java_package = "org.bcia.julongchain.protos.node";
 option java_outer_classname = "TransactionPackage";
 
 package protos;
 
-import "google/protobuf/timestamp.proto";
 import "node/proposal_response.proto";
 import "common/common.proto";
 

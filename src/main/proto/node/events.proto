@@ -20,10 +20,10 @@ syntax = "proto3";
 
 import "common/common.proto";
 import "google/protobuf/timestamp.proto";
-import "node/smartcontract_event.proto";
+import "node/smart_contract_event.proto";
 import "node/transaction.proto";
 
-option java_package = "org.bcia.javachain.protos.node";
+option java_package = "org.bcia.julongchain.protos.node";
 option java_outer_classname = "EventsPackage";
 option go_package = "github.com/hyperledger/fabric/protos/peer";
 
@@ -39,10 +39,10 @@ enum EventType {
     FILTEREDBLOCK = 4;
 }
 
-//SmartcontractReg is used for registering smartcontract Interests
+//SmartContractReg is used for registering smartcontract Interests
 //when EventType is SMART_CONTRACT
 message SmartContractReg {
-    string smartcontract_id = 1;
+    string smart_contract_id = 1;
     string event_name = 2;
 }
 
@@ -53,7 +53,7 @@ message Interest {
     //Additional Reg types may add messages specific to their type
     //to the oneof.
     oneof RegInfo {
-        SmartContractReg smartcontract_reg_info = 2;
+        SmartContractReg smart_contract_reg_info = 2;
     }
     string chainID = 3;
 }
@@ -80,7 +80,7 @@ message Unregister {
 //FilteredBlock is sent by producers and contains minimal information
 //about the block.
 message FilteredBlock {
-    string channel_id = 1;
+    string group_id = 1;
     uint64 number = 2; // The position in the blockchain
     repeated FilteredTransaction filtered_transactions = 4;
 }
@@ -99,13 +99,13 @@ message FilteredTransaction {
 // FilteredTransactionActions is a wrapper for array of TransactionAction
 // message from regular block
 message FilteredTransactionActions {
-    repeated FilteredSmartContractAction smartcontract_actions = 1;
+    repeated FilteredSmartContractAction smart_contract_actions = 1;
 }
 
 //FilteredSmartContractAction is a minimal set of information about an action within a
 //transaction.
 message FilteredSmartContractAction {
-    SmartContractEvent smartcontract_event = 1;
+    SmartContractEvent smart_contract_event = 1;
 }
 
 // SignedEvent is used for any communication between consumer and producer
@@ -126,7 +126,7 @@ message Event {
 
         //producer events
         common.Block block = 2;
-        SmartContractEvent smartcontract_event = 3;
+        SmartContractEvent smart_contract_event = 3;
         Rejection rejection = 4;
 
         //Unregister consumer sent events
