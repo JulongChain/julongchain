@@ -18,9 +18,9 @@ package org.bcia.julongchain.csp.pkcs11.entity;
 import org.bcia.julongchain.common.exception.JavaChainException;
 
 /**
- * Class description
+ * Config for PKCS11 (Maybe useful)
  *
- * @author
+ * @author Ying Xu
  * @date 4/19/18
  * @company FEITIAN
  */

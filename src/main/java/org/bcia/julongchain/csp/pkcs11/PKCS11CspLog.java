@@ -24,7 +24,7 @@ import java.util.Date;
 /**
  * Class description
  *
- * @author
+ * @author Ying Xu
  * @date 7/18/18
  * @company FEITIAN
  */

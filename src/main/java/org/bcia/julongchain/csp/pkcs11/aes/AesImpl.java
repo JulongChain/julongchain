@@ -33,7 +33,7 @@ import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
 /**
  * Class description
  *
- * @author
+ * @author Ying Xu
  * @date 5/25/18
  * @company FEITIAN
  */
@@ -112,8 +112,19 @@ public class AesImpl {
         }
     }
 
+    /**
+     * Generate Aes Key Class
+     */
     public static class GenerateAES{
 
+        /**
+         * Generate Key
+         * @param size          Key Size
+         * @param ephemeral     Ephemeral(True/False)
+         * @param opts          P11 factory
+         * @return IKey instance of SymmetryKey.AESPriKey
+         * @throws JavaChainException
+         */
         public static IKey generateAES(int size, boolean ephemeral, IPKCS11FactoryOpts opts) throws JavaChainException {
             try {
                 //create a key attribute
@@ -163,10 +174,20 @@ public class AesImpl {
             }
         }
     }
-    
-    
+
+    /**
+     * Generate Aes Key Class
+     */
     public static class ImoprtAESKey{
-    	
+
+        /**
+         *
+         * @param keyvalue      Key value
+         * @param ephemeral     Ephemeral(True/False)
+         * @param opts          P11 factory
+         * @return  IKey instance of SymmetryKey.AESPriKey
+         * @throws JavaChainException
+         */
     	public static IKey importAES(byte[] keyvalue, boolean ephemeral, IPKCS11FactoryOpts opts) throws JavaChainException {
     		
     		try {
@@ -212,8 +233,19 @@ public class AesImpl {
     }
 
 
+    /**
+     * Get Aes Key From Hardware Class
+     */
+
     public static class GetAESKey{
 
+        /**
+         * Get Aes key
+         * @param ski       Identify for Search Key
+         * @param opts      P11 factory
+         * @return  IKey instance of SymmetryKey.AESPriKey
+         * @throws JavaChainException
+         */
         public static IKey getAES(byte[] ski, IPKCS11FactoryOpts opts) throws JavaChainException {
             try {
 
@@ -259,12 +291,25 @@ public class AesImpl {
         }
     }
 
+
+    /**
+     * Encrypt with Aes
+     */
     public static class EncryptAES{
 
         public EncryptAES() {
 
         }
 
+        /**
+         *
+         * @param ski           Dentify for Search Key
+         * @param mechanism     Encrtypt mechanism
+         * @param plaintext     Plain text
+         * @param opts          P11 factory
+         * @return Enciphered data
+         * @throws JavaChainException
+         */
         public static byte[] encrtyptWithAES(byte[] ski, long mechanism, byte[] plaintext, IPKCS11FactoryOpts opts) throws JavaChainException {
             try {
                 long[] key = findKeyFromSKI(opts, ski);
@@ -304,8 +349,20 @@ public class AesImpl {
     }
 
 
+    /**
+     * Decrypt with Aes
+     */
     public static class DecryptAES{
 
+        /**
+         *
+         * @param ski           Dentify for Search Key
+         * @param mechanism     Decrypt mechanism
+         * @param ciphertext    Enciphered data
+         * @param opts          P11 factory
+         * @return Plain text
+         * @throws JavaChainException
+         */
         public static byte[] decryptWithAES(byte[] ski, long mechanism, byte[] ciphertext, IPKCS11FactoryOpts opts) throws JavaChainException {
             try {
                 long[] key = findKeyFromSKI(opts, ski);
@@ -339,7 +396,15 @@ public class AesImpl {
         }
     }
 
-    public static long[] findKeyFromSKI(IPKCS11FactoryOpts opts, byte[] ski) throws JavaChainException{
+
+    /**
+     * Find key from Hardware
+     * @param opts      P11 factory
+     * @param ski       Dentify for Search Key
+     * @return Key Handle
+     * @throws JavaChainException
+     */
+    private static long[] findKeyFromSKI(IPKCS11FactoryOpts opts, byte[] ski) throws JavaChainException{
 
 
         long keyclass = PKCS11Constants.CKO_SECRET_KEY;
@@ -394,8 +459,14 @@ public class AesImpl {
         }
 
     }
-    
-    public static boolean compereByteArray(byte[] b1, byte[] b2) {
+
+    /**
+     * Compare whether the tow byte arrays are the same
+     * @param b1    Source byte array
+     * @param b2    Compare byte array
+     * @return True or False
+     */
+    private static boolean compereByteArray(byte[] b1, byte[] b2) {
     	
 	       if(b1.length == 0 || b2.length == 0 ){
 	           return false;
