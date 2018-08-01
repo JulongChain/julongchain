@@ -66,11 +66,24 @@ import java.util.List;
 public class NodeGroup {
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeGroup.class);
 
+    /**
+     * 创建群组时的Profile名称
+     */
     private static final String PROFILE_CREATE_GROUP = "SampleSingleMSPGroup";
-    private static final int TIMEOUT_CREATE = 600000;
 
+    /**
+     * 创建群组超时时间:120s
+     */
+    private static final int TIMEOUT_CREATE = 120000;
+
+    /**
+     * 当前所操作的Node节点
+     */
     private Node node;
 
+    /**
+     * 创建群组时使用的锁
+     */
     private CommLock createLock;
 
     public NodeGroup(Node node) {
@@ -136,7 +149,7 @@ public class NodeGroup {
                     }
 
                     getGenesisBlockThenWrite(consenterHost, consenterPort, groupId);
-                }else{
+                } else {
                     log.error("Some thing is wrong: " + value.getStatus());
                     createLock.unLock();
                 }
@@ -158,8 +171,9 @@ public class NodeGroup {
         });
 
         try {
-            Thread.sleep(2000);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
         }
 
         createLock.tryLock(new CommLock.TimeoutCallback() {
