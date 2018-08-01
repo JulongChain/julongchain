@@ -30,12 +30,9 @@ import org.bcia.julongchain.node.entity.NodeServer;
  */
 public abstract class AbstractNodeServerCmd implements INodeCmd {
 
-	private Node node;
+	protected Node node;
 
 	protected NodeServer nodeServer;
-
-	public AbstractNodeServerCmd() {
-	}
 
 	public AbstractNodeServerCmd(Node node){
 		this.node = node;
