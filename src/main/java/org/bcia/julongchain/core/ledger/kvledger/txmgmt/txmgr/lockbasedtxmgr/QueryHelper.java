@@ -73,7 +73,7 @@ public class QueryHelper {
 
     public IResultsIterator getStateRangeScanIterator(String ns, String startKey, String endKey) throws LedgerException{
         checkDone();
-        ResultsItr itr = new ResultsItr(ns, startKey, endKey, txMgr.getDb(), rwSetBuilder, false, LedgerConfig.getMaxDegreeQueryReadsHashing());
+        ResultsItr itr = new ResultsItr(ns, startKey, endKey, txMgr.getDb(), rwSetBuilder, true, LedgerConfig.getMaxDegreeQueryReadsHashing());
         itrs.add(itr);
         return itr;
     }
@@ -140,11 +140,13 @@ public class QueryHelper {
                 if (rwSetBuilder != null){
                     Map.Entry<List<KvRwset.KVRead>, KvRwset.QueryReadsMerkleSummary> entry = itr.getRangeQueryResultsHelper().done();
                     if(entry.getKey() != null){
-                        KvRwset.RangeQueryInfo rqi = itr.getRangeQueryInfo();
-                        KvRwset.QueryReads.Builder builder = rqi.getRawReads().toBuilder();
+                        KvRwset.RangeQueryInfo.Builder rqiBuilder = itr.getRangeQueryInfo().toBuilder();
+                        KvRwset.QueryReads.Builder builder = rqiBuilder.getRawReads().toBuilder();
                         //add all kvReads
                         builder.addAllKvReads(entry.getKey());
-                        itr.setRangeQueryInfo(rqi);
+                        itr.setRangeQueryInfo(rqiBuilder
+								.setRawReads(builder)
+								.build());
                     }
                     if(entry.getValue() != null){
                         itr.setRangeQueryInfo(itr.getRangeQueryInfo().toBuilder().setReadsMerkleHashes(entry.getValue()).build());

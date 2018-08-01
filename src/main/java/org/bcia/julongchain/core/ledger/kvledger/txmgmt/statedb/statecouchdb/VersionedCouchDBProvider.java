@@ -16,10 +16,17 @@ limitations under the License.
 package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.statecouchdb;
 
 import org.bcia.julongchain.common.exception.LedgerException;
+import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.core.ledger.couchdb.CouchDBDefinition;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDBProvider;
+import org.lightcouch.CouchDbClient;
+import org.lightcouch.CouchDbProperties;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 提供leveldb实现的VersionDB辅助
@@ -31,19 +38,40 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDBProv
 public class VersionedCouchDBProvider implements IVersionedDBProvider {
     private static final JavaChainLog log = JavaChainLogFactory.getLog(VersionedCouchDBProvider.class);
 
-    public VersionedCouchDBProvider newVersionedDBProvider(){
-        log.debug("constructiong CouchDB VersionedDBProvider");
+	private CouchDbClient dbInstance;
+	private Map<String, IVersionedDB> databases;
 
-        return new VersionedCouchDBProvider();
-    }
+
+    public VersionedCouchDBProvider(){
+        log.debug("constructiong CouchDB VersionedDBProvider");
+		CouchDBDefinition couchDBDefinition = new CouchDBDefinition();
+		CouchDbProperties properties = new CouchDbProperties(
+				couchDBDefinition.getUserName(),
+				true,
+				"http",
+				couchDBDefinition.getHost(),
+				couchDBDefinition.getPort(),
+				couchDBDefinition.getUserName(),
+				couchDBDefinition.getPassword()
+
+		);
+		this.databases = new HashMap<>();
+		this.dbInstance = new CouchDbClient(properties);
+	}
 
     @Override
-    public IVersionedDB getDBHandle(String id) throws LedgerException {
-        return null;
+    public synchronized IVersionedDB getDBHandle(String dbName) throws LedgerException {
+		if(databases.containsKey(dbName)){
+			return databases.get(dbName);
+		} else {
+			VersionedCouchDB vdb = new VersionedCouchDB(this.dbInstance, dbName);
+			databases.put(dbName, vdb);
+			return vdb;
+		}
     }
 
     @Override
     public void close() {
-
+    	//nothing to do
     }
 }

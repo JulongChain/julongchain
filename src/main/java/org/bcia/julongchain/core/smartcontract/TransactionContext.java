@@ -18,6 +18,7 @@ package org.bcia.julongchain.core.smartcontract;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
 import org.bcia.julongchain.core.ledger.kvledger.history.IHistoryQueryExecutor;
+import org.bcia.julongchain.core.smartcontract.shim.helper.Channel;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.SmartContractShim;
 
@@ -35,7 +36,7 @@ public class TransactionContext {
     private String chainID;
     private ProposalPackage.SignedProposal signedProp;
     private ProposalPackage.Proposal proposal;
-    private SmartContractShim.SmartContractMessage responseNotifier;
+    private Channel<SmartContractShim.SmartContractMessage> responseNotifier = new Channel<>();
     private Map<String, IResultsIterator> queryIteratorMap;
     private Map<String, PendingQueryResult> pendingQueryResults;
     private ITxSimulator txSimulator;
@@ -65,15 +66,15 @@ public class TransactionContext {
         this.proposal = proposal;
     }
 
-    public SmartContractShim.SmartContractMessage getResponseNotifier() {
-        return responseNotifier;
-    }
+	public Channel<SmartContractShim.SmartContractMessage> getResponseNotifier() {
+		return responseNotifier;
+	}
 
-    public void setResponseNotifier(SmartContractShim.SmartContractMessage responseNotifier) {
-        this.responseNotifier = responseNotifier;
-    }
+	public void setResponseNotifier(SmartContractShim.SmartContractMessage msg) {
+		this.responseNotifier.add(msg);
+	}
 
-    public Map<String, IResultsIterator> getQueryIteratorMap() {
+	public Map<String, IResultsIterator> getQueryIteratorMap() {
         return queryIteratorMap;
     }
 

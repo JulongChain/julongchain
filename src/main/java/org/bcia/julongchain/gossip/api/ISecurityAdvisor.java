@@ -15,8 +15,21 @@
  */
 package org.bcia.julongchain.gossip.api;
 
+/**
+ * SecurityAdvisor defines an external auxiliary object
+ * that provides security and identity related capabilities
+ */
 public interface ISecurityAdvisor {
 
+    /**
+     * OrgByPeerIdentity returns the OrgIdentityType
+     * of a given peer identity.
+     * If any error occurs, nil is returned.
+     * This method does not validate peerIdentity.
+     * This validation is supposed to be done appropriately during the execution flow.
+     * @param peerIdentity
+     * @return
+     */
     public byte[] orgByPeerIdentity(byte[] peerIdentity);
 
 }

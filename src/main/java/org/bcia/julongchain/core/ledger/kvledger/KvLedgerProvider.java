@@ -50,8 +50,6 @@ import java.util.Map;
 public class KvLedgerProvider implements INodeLedgerProvider {
     private static final JavaChainLog logger  = JavaChainLogFactory.getLog(KvLedgerProvider.class);
     private static final LedgerException ERR_LEDGER_ID_EXISTS = new LedgerException("LedgerID is already exists");
-    private static final LedgerException ERR_NON_EXISTS_LEDGER_ID  = new LedgerException("LedgerID does not exists");
-    private static final LedgerException ERR_LEDGER_NOT_OPEN = new LedgerException("Ledger is not opened yet");
 
     private IdStore idStore = null;
     private Provider ledgerStoreProvider = null;
@@ -133,7 +131,7 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         //没有创建过ledgerid,抛出异常
         if(!idStore.ledgerIDExists(ledgerID)){
             logger.error("Ledger {} does not exists", ledgerID);
-            throw ERR_NON_EXISTS_LEDGER_ID;
+            throw new LedgerException("LedgerID " + ledgerID + " does not exists");
         }
         return openInternal(ledgerID);
     }

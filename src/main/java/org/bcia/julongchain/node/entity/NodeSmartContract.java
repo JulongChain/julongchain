@@ -15,15 +15,14 @@
  */
 package org.bcia.julongchain.node.entity;
 
-import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.stub.StreamObserver;
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.common.protos.EnvelopeVO;
 import org.bcia.julongchain.common.util.CommConstant;
+import org.bcia.julongchain.common.util.CommLock;
 import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
 import org.bcia.julongchain.common.util.proto.ProposalUtils;
 import org.bcia.julongchain.core.ssc.lssc.LSSC;
@@ -51,13 +50,34 @@ import org.bcia.julongchain.protos.node.SmartContractPackage;
 public class NodeSmartContract {
     private static JavaChainLog log = JavaChainLogFactory.getLog(NodeSmartContract.class);
 
+    /**
+     * 实例化智能合约超时时间:30min
+     */
+    private static final int TIMEOUT_INSTANTIATE = 1800000;
+    /**
+     * 执行智能合约超时时间:10min
+     */
+    private static final int TIMEOUT_INVOKE = 600000;
+
+    /**
+     * 当前所在的Node节点
+     */
     private Node node;
 
-    public NodeSmartContract() {
-    }
+    /**
+     * 实例化智能合约时使用的锁
+     */
+    private CommLock instantiateLock;
+    /**
+     * 执行智能合约时使用的锁
+     */
+    private CommLock invokeLock;
 
     public NodeSmartContract(Node node) {
         this.node = node;
+
+        this.instantiateLock = new CommLock(TIMEOUT_INSTANTIATE);
+        this.invokeLock = new CommLock(TIMEOUT_INVOKE);
     }
 
     public void install(String nodeHost, int nodePort, String scName, String scVersion, String scPath) throws NodeException {
@@ -147,6 +167,7 @@ public class NodeSmartContract {
                 public void onNext(Ab.BroadcastResponse value) {
                     log.info("Broadcast onNext");
                     broadcastClient.close();
+                    instantiateLock.unLock();
 
                     //收到响应消息，判断是否是200消息
                     if (Common.Status.SUCCESS.equals(value.getStatus())) {
@@ -158,12 +179,14 @@ public class NodeSmartContract {
                 public void onError(Throwable t) {
                     log.error(t.getMessage(), t);
                     broadcastClient.close();
+                    instantiateLock.unLock();
                 }
 
                 @Override
                 public void onCompleted() {
                     log.info("Broadcast completed");
                     broadcastClient.close();
+                    instantiateLock.unLock();
                 }
             });
 
@@ -172,12 +195,12 @@ public class NodeSmartContract {
             throw new NodeException(e);
         }
 
-        try {
-            Thread.sleep(900000);
-        } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
-        }
-
+        instantiateLock.tryLock(new CommLock.TimeoutCallback() {
+            @Override
+            public void onTimeout() {
+                log.error("Timeout in smart contract instantiate");
+            }
+        });
     }
 
     public void invoke(String nodeHost, int nodePort, String consenterHost, int consenterPort, String groupId,
@@ -225,6 +248,7 @@ public class NodeSmartContract {
                 public void onNext(Ab.BroadcastResponse value) {
                     log.info("Broadcast onNext");
                     broadcastClient.close();
+                    invokeLock.unLock();
 
                     //收到响应消息，判断是否是200消息
                     if (Common.Status.SUCCESS.equals(value.getStatus())) {
@@ -238,12 +262,14 @@ public class NodeSmartContract {
                 public void onError(Throwable t) {
                     log.error(t.getMessage(), t);
                     broadcastClient.close();
+                    invokeLock.unLock();
                 }
 
                 @Override
                 public void onCompleted() {
                     log.info("Broadcast completed");
                     broadcastClient.close();
+                    invokeLock.unLock();
                 }
             });
 
@@ -252,11 +278,12 @@ public class NodeSmartContract {
             throw new NodeException(e);
         }
 
-        try {
-            Thread.sleep(900000);
-        } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
-        }
+        invokeLock.tryLock(new CommLock.TimeoutCallback() {
+            @Override
+            public void onTimeout() {
+                log.error("Timeout in smart contract invoke");
+            }
+        });
     }
 
     public void query(String groupId, String smartContractName, SmartContractPackage.SmartContractInput input) throws NodeException {

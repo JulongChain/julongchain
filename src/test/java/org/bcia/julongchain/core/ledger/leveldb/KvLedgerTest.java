@@ -84,6 +84,11 @@ public class KvLedgerTest {
 		Assert.assertNull(txValidationCode);
 	}
 
+	public static void main(String[] args) {
+		String a = "MAKE_DATE_20180707*OBJ_VOUCHER_2018_102_20344011";
+		String voucherKey = a.split("\\*")[1];
+		System.out.println(voucherKey);
+	}
 	/*-------------------------------------------------------
 	pvtdata暂时没有...
     @Test

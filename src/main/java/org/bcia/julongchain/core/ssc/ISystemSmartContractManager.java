@@ -27,7 +27,7 @@ import org.bcia.julongchain.common.exception.SysSmartContractException;
  *  a)(SystemSmartContractManager内部)deploySysSmartContracts调用buildSysSmartContracts编译智能合约，形成智能合约部署规范(DeploymentSpec);
  *  3.分别为每个组，调用deploySysSmartContracts(groupID);
  *  a)(SystemSmartContractManager内部)deploySysSmartContracts(groupID)调用buildSysSmartContracts编译智能合约，形成智能合约部署规范(DeploymentSpec);
- * @author sunianle
+ * @author sunianle, sunzongyu
  * @date 3/5/18
  * @company Dingxuan
  */

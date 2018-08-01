@@ -23,6 +23,7 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDBProvider;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
+import org.lightcouch.CouchDbClient;
 
 /**
  * 提供leveldb实现的VersionDB辅助

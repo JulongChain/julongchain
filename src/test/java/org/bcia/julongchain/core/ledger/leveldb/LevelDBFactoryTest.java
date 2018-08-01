@@ -124,12 +124,14 @@ public class LevelDBFactoryTest {
 
     @Test
     public void test() throws Throwable {
-        String path = "";
-        DB db = LevelDBUtil.getDB(path);
-        byte[] key = {0x00};
-        LevelDBUtil.get(db, key, false);
-        LevelDBUtil.get(db, key, false);
-    }
+//        String path = "";
+//        DB db = LevelDBUtil.getDB(path);
+//        byte[] key = {0x00};
+//        LevelDBUtil.get(db, key, false);
+//        LevelDBUtil.get(db, key, false);
+		byte[] bytes = new byte[]{(byte) 97, (byte) 98};
+		System.out.println(new String(bytes));
+	}
 
     public static void soutByte(byte[] bytes) {
         for (byte aByte : bytes) {

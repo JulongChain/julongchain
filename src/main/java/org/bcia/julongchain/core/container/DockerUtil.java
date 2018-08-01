@@ -14,10 +14,7 @@
 package org.bcia.julongchain.core.container;
 
 import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.model.BuildResponseItem;
-import com.github.dockerjava.api.model.Container;
-import com.github.dockerjava.api.model.Image;
-import com.github.dockerjava.api.model.SearchItem;
+import com.github.dockerjava.api.model.*;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.command.BuildImageResultCallback;
 import com.google.common.collect.Sets;
@@ -116,6 +113,7 @@ public class DockerUtil {
    * @return
    */
   public static List<String> listImages(String imageName) {
+      logger.info("list images:" + imageName);
     List<String> imageNameList = new ArrayList<String>();
     DockerClient dockerClient = getDockerClient();
     List<Image> imageList = dockerClient.listImagesCmd().exec();
@@ -128,6 +126,11 @@ public class DockerUtil {
     closeDockerClient(dockerClient);
     return imageNameList;
   }
+
+    public static void main(String[] args) {
+        List<String> list = listImages("");
+        System.out.println(list);
+    }
 
   /**
    * list containers
@@ -149,17 +152,17 @@ public class DockerUtil {
     return result;
   }
 
-  public static String createContainer(String imageId, String containerName, String... cmdStr) {
-    String containerId =
-        getDockerClient()
-            .createContainerCmd(imageId)
-            .withName(containerName)
-            .withCmd(cmdStr)
-            .exec()
-            .getId();
-    logger.info("container ID:" + containerId);
-    return containerId;
-  }
+    public static String createContainer(String imageId, String containerName, String... cmdStr) {
+        String containerId =
+                getDockerClient()
+                        .createContainerCmd(imageId)
+                        .withName(containerName)
+                        .withCmd(cmdStr)
+                        .exec()
+                        .getId();
+        logger.info("container ID:" + containerId);
+        return containerId;
+    }
 
   public static void startContainer(String containerId) {
     logger.info("start container, ID:" + containerId);

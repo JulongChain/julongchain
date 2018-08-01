@@ -20,6 +20,7 @@ import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.protos.EnvelopeVO;
 import org.bcia.julongchain.core.ledger.BlockAndPvtData;
 import org.bcia.julongchain.core.ledger.IQueryExecutor;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
@@ -89,7 +90,9 @@ public class LockBasedTxManager implements ITxManager {
     public void validateAndPrepare(BlockAndPvtData blockAndPvtData, Boolean doMVCCValidation) throws LedgerException {
         try {
             Common.Block block = blockAndPvtData.getBlock();
-            logger.debug("Validating new block with num trans = " + block.getData().getDataList().size());
+			EnvelopeVO envelopeVO = new EnvelopeVO();
+			envelopeVO.parseFrom(Common.Envelope.parseFrom(block.getData().getData(0)));
+			logger.debug("Validating new block with num trans = " + block.getData().getDataList().size());
             UpdateBatch b = validator.validateAndPrepareBatch(blockAndPvtData, doMVCCValidation);
             currentBlock = block;
             batch = b;

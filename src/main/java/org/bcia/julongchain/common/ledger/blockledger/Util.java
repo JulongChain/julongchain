@@ -95,7 +95,6 @@ public class Util {
                         .setNumber(index)
                         .build())
                 .build());
-        Object token = null;
         //判断是否需要阻塞进程
         i.readyChain();
         Map.Entry<QueryResult, Common.Status> entry = (Map.Entry<QueryResult, Common.Status>) i.next().getObj();

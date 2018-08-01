@@ -32,7 +32,7 @@ public abstract class AbstractNodeGroupCmd implements INodeCmd {
 
     protected NodeGroup nodeGroup;
 
-    private Node node;
+    protected Node node;
 
     public AbstractNodeGroupCmd(Node node) {
         this.nodeGroup = new NodeGroup(node);

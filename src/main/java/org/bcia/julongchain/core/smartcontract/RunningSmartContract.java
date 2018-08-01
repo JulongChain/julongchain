@@ -17,6 +17,7 @@ package org.bcia.julongchain.core.smartcontract;
 
 import org.bcia.julongchain.core.RWMutex;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -27,10 +28,19 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class RunningSmartContract extends RWMutex{
-
-    private Map<String, SmartContractRTEnv> smartContractRTEnvMap;
+	private Map<String, SmartContractRTEnv> smartContractRTEnvMap;
 
     private Map<String, Boolean> launchStarted;
+
+	public RunningSmartContract() {
+		this.smartContractRTEnvMap = new HashMap<>();
+		this.launchStarted = new HashMap<>();
+	}
+
+	public RunningSmartContract(Map<String, SmartContractRTEnv> smartContractRTEnvMap, Map<String, Boolean> launchStarted) {
+		this.smartContractRTEnvMap = smartContractRTEnvMap;
+		this.launchStarted = launchStarted;
+	}
 
     public Map<String, SmartContractRTEnv> getSmartContractRTEnvMap() {
         return smartContractRTEnvMap;

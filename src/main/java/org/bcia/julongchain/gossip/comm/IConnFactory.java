@@ -13,22 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.core.container.ccintf;
-
-import org.bcia.julongchain.core.container.scintf.ISmartContractStream;
-
-import javax.naming.Context;
+package org.bcia.julongchain.gossip.comm;
 
 /**
- * 类描述
+ * class description
  *
- * @author wanliangbing
- * @date 2018/4/2
+ * @author
+ * @date 18-7-24
  * @company Dingxuan
  */
-public interface ICCSupport {
-
-    void handleSmartContractStream(Context context, ISmartContractStream
-            smartContractStream);
-
+public interface IConnFactory {
+    public Connection createConnection(String endpoint, byte[] pkiID);
 }

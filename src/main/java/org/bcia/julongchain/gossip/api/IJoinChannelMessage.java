@@ -15,12 +15,31 @@
  */
 package org.bcia.julongchain.gossip.api;
 
+/**
+ * JoinChannelMessage is the message that asserts a creation or mutation
+ * of a channel's membership list, and is the message that is gossipped
+ * among the peers
+ */
 public interface IJoinChannelMessage {
 
+    /**
+     * SequenceNumber returns the sequence number of the configuration block
+     * the JoinChannelMessage originated from
+     * @return
+     */
     public Long sequenceNumber();
 
-    public byte[][] members = new byte[][]{};
+    /**
+     * Members returns the organizations of the channel
+     * @return
+     */
+    public byte[][] members();
 
+    /**
+     * AnchorPeersOf returns the anchor peers of the given organization
+     * @param orgIdentity
+     * @return
+     */
     public AnchorPeer[] anchorPeersOf(byte[] orgIdentity);
 
 }
