@@ -195,12 +195,6 @@ public class NodeSmartContract {
             throw new NodeException(e);
         }
 
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
-        }
-
         instantiateLock.tryLock(new CommLock.TimeoutCallback() {
             @Override
             public void onTimeout() {
@@ -282,12 +276,6 @@ public class NodeSmartContract {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new NodeException(e);
-        }
-
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
         }
 
         invokeLock.tryLock(new CommLock.TimeoutCallback() {

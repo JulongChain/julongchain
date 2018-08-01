@@ -37,7 +37,7 @@ import org.bcia.julongchain.protos.node.SmartContractPackage;
  * @company Dingxuan
  */
 public class ContractInvokeCmd extends AbstractNodeContractCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ContractInstallCmd.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(ContractInvokeCmd.class);
 
     /**
      * Target地址(Node)
