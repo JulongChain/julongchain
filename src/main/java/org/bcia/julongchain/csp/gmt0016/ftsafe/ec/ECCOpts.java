@@ -20,9 +20,9 @@ import org.bcia.julongchain.csp.intfs.opts.IKeyGenOpts;
 import org.bcia.julongchain.csp.intfs.opts.IKeyImportOpts;
 
 /**
- * Class description
+ * SM2 Opts for generate keypair and import keypair
  *
- * @author
+ * @author Ying Xu
  * @date 7/4/18
  * @company FEITIAN
  */

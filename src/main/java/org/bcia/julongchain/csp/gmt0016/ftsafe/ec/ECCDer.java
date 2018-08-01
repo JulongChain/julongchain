@@ -18,9 +18,9 @@ package org.bcia.julongchain.csp.gmt0016.ftsafe.ec;
 import java.util.Arrays;
 
 /**
- * Class description
+ * Make DER Encoding of ASN.1 Types
  *
- * @author
+ * @author Ying Xu
  * @date 7/4/18
  * @company FEITIAN
  */

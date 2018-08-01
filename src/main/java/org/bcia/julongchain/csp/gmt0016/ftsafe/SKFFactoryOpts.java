@@ -32,9 +32,9 @@ import java.util.List;
 import static org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant.*;
 
 /**
- * Class description
+ * SKFFactory Class
  *
- * @author
+ * @author Ying Xu
  * @date 7/4/18
  * @company FEITIAN
  */

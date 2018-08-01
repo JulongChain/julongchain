@@ -24,9 +24,9 @@ import static org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant.*;
 
 
 /**
- * Class description
+ * Digest depends SKF
  *
- * @author
+ * @author Ying Xu
  * @date 7/4/18
  * @company FEITIAN
  */
@@ -57,6 +57,13 @@ public class GMDigest {
 
     }
 
+    /**
+     * Get digest
+     * @param msg       Message
+     * @param opts      Gmt0016 factory
+     * @return Digest value
+     * @throws JavaChainException
+     */
     public static byte[] getHash(byte[] msg, IGMT0016FactoryOpts opts) throws JavaChainException {
         try {
             long lHashHandle = opts.getSKFFactory().SKF_DigestInit(opts.getDevHandle(), lAlgID, null, null);

@@ -20,9 +20,9 @@ import org.bcia.julongchain.csp.gmt0016.ftsafe.IGMT0016KeyImportOpts;
 import static org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant.*;
 
 /**
- * Class description
+ * RSA Import Opts
  *
- * @author
+ * @author Ying Xu
  * @date 7/4/18
  * @company FEITIAN
  */
@@ -38,6 +38,13 @@ public enum RSAImportOpts implements IGMT0016KeyImportOpts {
     private int index;
     private boolean ephemeral;
 
+    /**
+     *
+     * @param salg          Algorithm
+     * @param algid         Algorithm ID
+     * @param ephemeral     Ephemeral(TRUE or FALSE)
+     * @param index         Index Num
+     */
     private RSAImportOpts(String salg, long algid, boolean ephemeral, int index) {
         this.salg = salg;
         this.algid = algid;

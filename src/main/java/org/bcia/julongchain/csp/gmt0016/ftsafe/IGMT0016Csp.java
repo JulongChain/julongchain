@@ -19,9 +19,9 @@ import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.csp.intfs.ICsp;
 
 /**
- * Class description
+ * Interface description
  *
- * @author
+ * @author Ying Xu
  * @date 7/10/18
  * @company FEITIAN
  */

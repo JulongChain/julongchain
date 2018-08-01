@@ -21,7 +21,7 @@ import org.bcia.julongchain.csp.intfs.opts.ISignerOpts;
 /**
  * Class description
  *
- * @author
+ * @author Ying Xu
  * @date 7/4/18
  * @company FEITIAN
  */

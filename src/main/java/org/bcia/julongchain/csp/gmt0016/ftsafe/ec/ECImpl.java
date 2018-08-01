@@ -38,15 +38,24 @@ import java.util.List;
 import static org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant.*;
 
 /**
- * Class description
+ * SM2 Key Impl Class
  *
- * @author
+ *
+ * @author Ying Xu
  * @date 7/4/18
  * @company FEITIAN
  */
 public class ECImpl {
 
     GMT0016CspLog csplog = new GMT0016CspLog();
+
+    /**
+     * Generate SM2 Keypair
+     * @param sContainerName  Container Name
+     * @param opts  skf factory
+     * @return  IKey's instance
+     * @throws JavaChainException
+     */
     public IKey generateECKey(String sContainerName, IGMT0016FactoryOpts opts) throws JavaChainException {
 
         try {
@@ -126,7 +135,16 @@ public class ECImpl {
     }
 
 
-
+    /**
+     * Import encrypt keypair
+     * @param algid             Algorithm id
+     * @param derPublicKey      Publickey's der
+     * @param privateKey        Privatekey
+     * @param sContainerName    Container Name
+     * @param opts              Skf factory
+     * @return IKey's instance
+     * @throws JavaChainException
+     */
     public IKey importECKey(long algid, byte[] derPublicKey, byte[] privateKey,
                             String sContainerName, IGMT0016FactoryOpts opts) throws JavaChainException{
 
@@ -225,6 +243,14 @@ public class ECImpl {
     }
 
 
+    /**
+     * Find and Get the designated sm2 key
+     * @param sContainerName    Container Name
+     * @param bSignFlag         Signatures or encrypted identities
+     * @param opts              Skf factory
+     * @return IKey's instance
+     * @throws JavaChainException
+     */
     public IKey getECKey(String sContainerName, boolean bSignFlag, IGMT0016FactoryOpts opts) throws JavaChainException {
 
         try {
@@ -295,6 +321,17 @@ public class ECImpl {
         }
     }
 
+    /**
+     *
+     * @param msg               Information/(original) text
+     * @param lAlgID            Algorithm id
+     * @param sContainerName    Container Name
+     * @param bSignFlag         Signatures or encrypted identities
+     * @param sPucID            Signer ID
+     * @param opts              Skf factory
+     * @return Z
+     * @throws JavaChainException
+     */
     public byte[] getHash(byte[] msg, long lAlgID, String sContainerName, boolean bSignFlag, String sPucID, IGMT0016FactoryOpts opts)
             throws JavaChainException {
 
@@ -350,7 +387,14 @@ public class ECImpl {
     }
 
 
-
+    /**
+     * Sign with SM2
+     * @param digest            summary info
+     * @param sContainerName    Container Name
+     * @param opts              Skf factory
+     * @return signature value
+     * @throws JavaChainException
+     */
 
     public byte[] getECSign(byte[] digest, String sContainerName, IGMT0016FactoryOpts opts) throws JavaChainException{
         try {
@@ -401,6 +445,15 @@ public class ECImpl {
         }
     }
 
+    /**
+     * Verify with SM2
+     * @param signature         signature value
+     * @param digest            summary info
+     * @param sContainerName    Container Name
+     * @param opts              Skf factory
+     * @return success/error
+     * @throws JavaChainException
+     */
     public boolean getECverify(byte[] signature, byte[] digest, String sContainerName, IGMT0016FactoryOpts opts) throws JavaChainException{
         try {
             List<String> appNamesList = opts.getSKFFactory().SKF_EnumContainer(opts.getAppHandle());

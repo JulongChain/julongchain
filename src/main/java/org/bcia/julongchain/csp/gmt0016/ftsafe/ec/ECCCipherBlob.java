@@ -18,9 +18,9 @@ package org.bcia.julongchain.csp.gmt0016.ftsafe.ec;
 import static org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant.*;
 
 /**
- * Class description
+ * CipherBlob Class for SM2
  *
- * @author
+ * @author Ying Xu
  * @date 7/4/18
  * @company FEITIAN
  */
