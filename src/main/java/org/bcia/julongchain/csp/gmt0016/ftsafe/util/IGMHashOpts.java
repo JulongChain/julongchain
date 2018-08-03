@@ -18,9 +18,9 @@ package org.bcia.julongchain.csp.gmt0016.ftsafe.util;
 import org.bcia.julongchain.csp.intfs.opts.IHashOpts;
 
 /**
- * Class description
+ * Interface description
  *
- * @author
+ * @author Ying Xu
  * @date 7/4/18
  * @company FEITIAN
  */

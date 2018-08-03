@@ -21,9 +21,9 @@ import org.bcia.julongchain.csp.intfs.opts.IDecrypterOpts;
 import org.bcia.julongchain.csp.intfs.opts.IEncrypterOpts;
 
 /**
- * Class description
+ * SM1 Opts for generate key and encrypt/decrypt
  *
- * @author
+ * @author Ying Xu
  * @date 7/4/18
  * @company FEITIAN
  */

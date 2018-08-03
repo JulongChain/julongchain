@@ -18,9 +18,9 @@ package org.bcia.julongchain.csp.gmt0016.ftsafe.ec;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.util.SKFCspKey;
 
 /**
- * Class description
+ * EnvelopedKeyBlob Class for SM2
  *
- * @author
+ * @author Ying Xu
  * @date 7/4/18
  * @company FEITIAN
  */

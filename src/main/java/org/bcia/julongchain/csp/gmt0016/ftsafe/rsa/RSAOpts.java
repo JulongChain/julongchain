@@ -19,9 +19,9 @@ import org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant;
 import org.bcia.julongchain.csp.intfs.opts.IKeyGenOpts;
 
 /**
- * Class description
+ * Generate RSA KeyPair Opts
  *
- * @author
+ * @author  Ying Xu
  * @date 7/4/18
  * @company FEITIAN
  */

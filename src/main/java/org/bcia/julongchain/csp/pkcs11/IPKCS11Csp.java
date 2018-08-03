@@ -22,7 +22,7 @@ import org.bcia.julongchain.csp.intfs.ICsp;
 /**
  * interface description
  *
- * @author xuying
+ * @author Ying Xu
  * @date 2018/05/21
  * @company FEITIAN
  */

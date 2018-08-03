@@ -23,9 +23,9 @@ import org.bcia.julongchain.csp.gmt0016.ftsafe.IGMT0016FactoryOpts;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.util.BlockCipherParam;
 
 /**
- * Class description
+ * Symmetry Key Impl Class
  *
- * @author
+ * @author Ying Xu
  * @date 7/4/18
  * @company FEITIAN
  */
@@ -33,6 +33,15 @@ public class SymmetryImpl {
 
     GMT0016CspLog csplog = new GMT0016CspLog();
 
+    /**
+     *
+     * @param plaintext         Paint text
+     * @param lKeyHandle        SymmetryKey Handle
+     * @param blockCipherParam  BlockCipher for skf
+     * @param opts              Gmt0016 factory
+     * @return  Enciphered data
+     * @throws JavaChainException
+     */
     public byte[] SymmetryEncrypt(byte[] plaintext, long lKeyHandle, BlockCipherParam blockCipherParam, IGMT0016FactoryOpts opts) throws JavaChainException {
         try {
 
@@ -54,6 +63,15 @@ public class SymmetryImpl {
 
     }
 
+    /**
+     *
+     * @param ciphertext        Enciphered data
+     * @param lKeyHandle        SymmetryKey Handle
+     * @param blockCipherParam  BlockCipher for skf
+     * @param opts              Gmt0016 factory
+     * @return  Plaint text
+     * @throws JavaChainException
+     */
     public byte[] SymmetryDecrypt(byte[] ciphertext, long lKeyHandle, BlockCipherParam blockCipherParam, IGMT0016FactoryOpts opts) throws JavaChainException {
         try {
 

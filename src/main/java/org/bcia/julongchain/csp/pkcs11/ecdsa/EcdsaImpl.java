@@ -363,14 +363,25 @@ public class EcdsaImpl {
 
         }
     }
-    
-    
+
+    /**
+     * Derive Ecdas Keypair
+     */
     public static class DeriveECKey{
     	private static byte[] byteSKI;
         private static byte[] pubder;
         
     	public DeriveECKey() {}
-    	
+
+        /**
+         *
+         * @param ski           Identify for Search Key
+         * @param ephemeral     Ephemeral(True/False)
+         * @param flagprikey    Key type identification(PrivateKey: True  PublicKey: Flase)
+         * @param opts          P11 factory
+         * @return  IKey instance of EcdsaKeyOpts.EcdsaPubKey
+         * @throws JavaChainException
+         */
     	public static IKey deriveKey(byte[] ski, boolean ephemeral, boolean flagprikey, IPKCS11FactoryOpts opts) throws JavaChainException {
     		try {    		
     			List<CK_ATTRIBUTE> keyTemplate = new ArrayList<CK_ATTRIBUTE>();

@@ -40,9 +40,9 @@ import sun.security.provider.SecureRandom;
 import java.util.UUID;
 
 /**
- * Class description
+ * The instance of csp interface with skf
  *
- * @author
+ * @author Ying Xu
  * @date 7/3/18
  * @company FEITIAN
  */
@@ -51,6 +51,10 @@ public class GMT0016Csp implements IGMT0016Csp {
     private IGMT0016FactoryOpts gmt0016FactoryOpts;
     GMT0016CspLog csplog = new GMT0016CspLog();
 
+    /**
+     * Initalize gmt0016 factory
+     * @param gmt0016FactoryOpts
+     */
     GMT0016Csp(IGMT0016FactoryOpts gmt0016FactoryOpts)
     {
         this.gmt0016FactoryOpts = gmt0016FactoryOpts;

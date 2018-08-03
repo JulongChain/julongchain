@@ -18,9 +18,9 @@ package org.bcia.julongchain.csp.gmt0016.ftsafe.symmetry;
 import org.bcia.julongchain.csp.intfs.IKey;
 
 /**
- * Class description
+ * Symmetry IKey
  *
- * @author
+ * @author Ying Xu
  * @date 7/4/18
  * @company FEITIAN
  */

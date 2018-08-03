@@ -156,7 +156,6 @@ public class GmCsp implements ICsp {
             throw new JavaChainException("Invalid content. Cannot be empty.");
         }
         if (opts instanceof SM2SignerOpts) {
-            log.info("privateKey:" + Hex.toHexString(key.toBytes()));
             return sm2.sign(key.toBytes(), plaintext);
         }
         return null;

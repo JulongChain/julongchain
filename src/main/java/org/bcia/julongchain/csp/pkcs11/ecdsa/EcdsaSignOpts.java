@@ -38,6 +38,12 @@ public enum EcdsaSignOpts implements ISignerOpts {
     private long mechanism;
 
 
+    /**
+     * Opt for sign with ecdsa
+     * @param name          Sign Algorithm
+     * @param mechanism     Sign mechanism
+     * @param index         Index num
+     */
     private EcdsaSignOpts(String name, long mechanism, int index) {
         this.name = name;
         this.index = index;

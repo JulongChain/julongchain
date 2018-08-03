@@ -22,7 +22,7 @@ import org.bcia.julongchain.csp.intfs.ICsp;
 /**
  * Class description
  *
- * @author
+ * @author Ying Xu
  * @date 7/3/18
  * @company FEITIAN
  */

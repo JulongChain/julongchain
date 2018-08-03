@@ -45,6 +45,13 @@ public enum RsaEncrypterOpts implements IEncrypterOpts {
     private long mechanism;
     private boolean flagpub;
 
+    /**
+     * Opt for decrypt with rsa
+     * @param padding       Encrypter padding type
+     * @param mechanism     Encrypter mechanism
+     * @param flagpub       Key type identification(PublicKey: true, PrivateKey false)
+     * @param index         Index num
+     */
     private RsaEncrypterOpts(String padding, long mechanism, boolean flagpub, int index) {
         this.mechanism = mechanism;
         this.padding = padding;

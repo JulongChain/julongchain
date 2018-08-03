@@ -18,7 +18,7 @@ package org.bcia.julongchain.csp.gmt0016.ftsafe.util;
 /**
  * Class description
  *
- * @author
+ * @author Ying Xu
  * @date 7/4/18
  * @company FEITIAN
  */

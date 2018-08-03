@@ -38,9 +38,9 @@ import java.util.List;
 import static org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant.*;
 
 /**
- * Class description
+ * RSA Key Impl Class
  *
- * @author
+ * @author Ying Xu
  * @date 7/4/18
  * @company FEITIAN
  */
@@ -48,6 +48,14 @@ public class RSAImpl {
 
     GMT0016CspLog csplog = new GMT0016CspLog();
 
+    /**
+     * Generate Rsa Keypair
+     * @param sContainerName        Container Name
+     * @param lBits                 Size of Keypair
+     * @param opts                  Skf factory
+     * @return  IKey's instance
+     * @throws JavaChainException
+     */
     public IKey generateRSAKey(String sContainerName, long lBits, IGMT0016FactoryOpts opts) throws JavaChainException {
 
         try {
@@ -135,6 +143,16 @@ public class RSAImpl {
     }
 
 
+    /**
+     * Import Rsa KeyPair
+     * @param algid                 Algorithm id
+     * @param derPublicKey          PublicKey's der (for compare)
+     * @param derPrivateKey         PrivateKey's der
+     * @param sContainerName        Container Name
+     * @param opts                  Skf factory
+     * @return IKey's instance
+     * @throws JavaChainException
+     */
     public IKey importRSAKey(long algid, byte[] derPublicKey, byte[] derPrivateKey,
                              String sContainerName, IGMT0016FactoryOpts opts) throws JavaChainException {
         try {
@@ -243,6 +261,14 @@ public class RSAImpl {
         }
     }
 
+    /**
+     * Find and Get the designated rsa key
+     * @param sContainerName    Container Name
+     * @param bSignFlag         Signatures or encrypted identities
+     * @param opts              Skf factory
+     * @return IKey's instance
+     * @throws JavaChainException
+     */
     public IKey getRSAKey(String sContainerName, boolean bSignFlag, IGMT0016FactoryOpts opts) throws JavaChainException {
         try {
             List<String> appNamesList = opts.getSKFFactory().SKF_EnumContainer(opts.getAppHandle());
@@ -320,6 +346,14 @@ public class RSAImpl {
 
     }
 
+    /**
+     * Sign with RSA
+     * @param digest            summary info
+     * @param sContainerName    Container Name
+     * @param opts              Skf factory
+     * @return signature value
+     * @throws JavaChainException
+     */
     public byte[] getRSASign(byte[] digest, String sContainerName, IGMT0016FactoryOpts opts) throws JavaChainException {
         try {
             List<String> appNamesList = opts.getSKFFactory().SKF_EnumContainer(opts.getAppHandle());
@@ -362,6 +396,15 @@ public class RSAImpl {
         }
     }
 
+    /**
+     * Verify with RSA
+     * @param signature         signature value
+     * @param digest            summary info
+     * @param sContainerName    Container Name
+     * @param opts              Skf factory
+     * @return success/error
+     * @throws JavaChainException
+     */
     public boolean getRSAVerify(byte[] signature, byte[] digest, String sContainerName, IGMT0016FactoryOpts opts)
             throws JavaChainException{
 
@@ -413,7 +456,13 @@ public class RSAImpl {
     }
 
 
-
+    /**
+     * DER Encoding of ASN.1 Types
+     * @param modulus           N
+     * @param publicExponent    E
+     * @return Der Encoding
+     * @throws InvalidKeyException
+     */
     public byte[] getPublicDer(byte[] modulus, byte[] publicExponent) throws InvalidKeyException {
         BigInteger b_n = new BigInteger(1, modulus);
         byte[] temp = b_n.toByteArray();
@@ -422,6 +471,15 @@ public class RSAImpl {
         return rsapublickeyimpl.getEncoded();
     }
 
+    /**
+     * PublicKey Hash
+     * @param modulus           N
+     * @param publicExponent    E
+     * @return publickey hash
+     * @throws NoSuchAlgorithmException
+     * @throws IOException
+     * @throws InvalidKeyException
+     */
     public byte[] getPublicHash(byte[] modulus, byte[] publicExponent)
             throws NoSuchAlgorithmException,IOException, InvalidKeyException {
         MessageDigest shahash = MessageDigest.getInstance("SHA-1");
@@ -430,6 +488,15 @@ public class RSAImpl {
         return shahash.digest();
     }
 
+    /**
+     * Make SKI
+     * @param keytype       key type(RSA or SM2)
+     * @param container     container name
+     * @param signflag      Signatures or encrypted identities
+     * @param pubhash       publickey hash  (maybe useful)
+     * @return ski byte array
+     * @throws Exception
+     */
     public byte[] getKeySki(int keytype, byte[] container, int signflag, byte[] pubhash) throws Exception {
 
         byte flag[] = new byte[1];
@@ -453,6 +520,13 @@ public class RSAImpl {
 
     }
 
+
+    /**
+     * Compare byte array value
+     * @param b1    byte array source
+     * @param b2    byte array data
+     * @return  ture/false
+     */
     public static boolean compereByteArray(byte[] b1, byte[] b2) {
 
         if(b1.length == 0 || b2.length == 0 ){

@@ -13,9 +13,12 @@
 # limitations under the License.
 #
 FROM julongchain/julongchain-baseimage
-ENV JULONGCHAIN_CFG_PATH /etc/bcia/julongchain
-RUN mkdir -p /var/bcia/production $JULONGCHAIN_CFG_PATH
-COPY payload/consenter /usr/local/bin
-ADD payload/sampleconfig.tar.bz2 $JULONGCHAIN_CFG_PATH/
-EXPOSE 7050
-CMD ["orderer"]
+COPY julongchain.jar /root/julongchain
+COPY config/ /root/julongchain/config
+COPY msp/ /root/julongchain/msp
+COPY smartcontract/ root/julongchain/smartcontract
+COPY libsdtsmjni.so /lib
+COPY libsdtsm.so /lib
+COPY lib/ /root/julongchain/lib
+WORKDIR /root/julongchain
+CMD java -jar /root/julongchain/julongchain.jar node start
