@@ -139,12 +139,10 @@ public class NodeServer {
         String[] split = StringUtils.split(consenterAddress, ":");
         String host = split[0];
         Integer port = Integer.parseInt(split[1]);
-
         waitConnectable(host, port);
-
         ManagedChannel managedChannel = NettyChannelBuilder.forAddress(host, port).usePlaintext().build();
         GossipClientStream gossipClientStream = new GossipClientStream(managedChannel);
-
+        GossipClientStream.setGossipClientStream(gossipClientStream);
         try {
             List<String> ledgerIDs = LedgerManager.getLedgerIDs();
             for (String ledgerID : ledgerIDs) {
@@ -153,7 +151,6 @@ public class NodeServer {
         } catch (LedgerException e) {
             log.error(e.getMessage(), e);
         }
-
     }
 
     private void waitConnectable(String host, Integer port) {
@@ -167,26 +164,26 @@ public class NodeServer {
         }
     }
 
-    private void startPullFromConsenter(GossipClientStream gossipClientStream, String ledgerID) {
+    public static void startPullFromConsenter(GossipClientStream gossipClientStream, String ledgerID) {
         new Thread() {
             @Override
             public void run() {
                 while (true) {
                     try {
-                        log.info("================== start a pull request.");
+                        log.info("start a pull request.");
                         long height = LedgerManager.openLedger(ledgerID).getBlockchainInfo().getHeight();
                         Message.RemoteStateRequest remoteStateRequest = Message.RemoteStateRequest.newBuilder().setStartSeqNum(height).setEndSeqNum(height).build();
                         Message.GossipMessage gossipMessage = Message.GossipMessage.newBuilder().setGroup(ByteString.copyFromUtf8(ledgerID)).setStateRequest(remoteStateRequest).build();
                         Message.Envelope envelope = Message.Envelope.newBuilder().setPayload(gossipMessage.toByteString()).build();
-                        log.info("========================= send pull request:" + ledgerID + " " + height);
+                        log.info("send pull request:" + ledgerID + " " + height);
                         gossipClientStream.serialSend(envelope);
                         if (gossipClientStream.getQueueMap().get(ledgerID) == null) {
                             gossipClientStream.getQueueMap().put(ledgerID, new LinkedBlockingQueue<Message.Envelope>());
                         }
-                        log.info("======================= receive block");
+                        log.info("receive block");
                         Message.Envelope receiveEnvelope = gossipClientStream.getQueueMap().get(ledgerID).take();
                         GossipService.saveBlock(receiveEnvelope);
-                        log.info("================== saved block");
+                        log.info("saved block");
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
                     }

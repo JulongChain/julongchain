@@ -143,10 +143,6 @@ public class Singleton implements IChain, IConsensusPlugin {
                 for (Common.Envelope[] env : batches) {
                     Common.Block block = support.createNextBlock(env);
                     support.writeBlock(block, null);
-
-//                    org.bcia.julongchain.protos.gossip.Message.Envelope envelope = GossipService.newGossipEnvelope(support.getGroupId(), block.getHeader().getNumber(), block);
-//                    GossipService.deliver(envelope);
-
                 }
                 if (batches.length > 0) {
                     timer = 0;
@@ -189,9 +185,6 @@ public class Singleton implements IChain, IConsensusPlugin {
             log.debug("Batch timer expired, creating block");
             Common.Block block = support.createNextBlock(batch);
             support.writeBlock(block, null);
-
-//            org.bcia.julongchain.protos.gossip.Message.Envelope envelope = GossipService.newGossipEnvelope(support.getGroupId(), block.getHeader().getNumber(), block);
-//            GossipService.deliver(envelope);
         }
 
     }

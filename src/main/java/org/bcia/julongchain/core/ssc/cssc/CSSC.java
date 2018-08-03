@@ -39,9 +39,11 @@ import org.bcia.julongchain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.julongchain.core.ssc.SystemSmartContractBase;
 import org.bcia.julongchain.events.producer.BlockEvents;
 import org.bcia.julongchain.events.producer.EventHelper;
+import org.bcia.julongchain.gossip.GossipClientStream;
 import org.bcia.julongchain.msp.IMsp;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.msp.mgmt.MSPPrincipalGetter;
+import org.bcia.julongchain.node.entity.NodeServer;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.node.ProposalPackage;
@@ -295,6 +297,7 @@ public class CSSC extends SystemSmartContractBase {
                 log.error(msg);
             }
         }
+        NodeServer.startPullFromConsenter(GossipClientStream.getGossipClientStream(), groupID);
         return newSuccessResponse();
     }
 

@@ -31,9 +31,12 @@ public class GossipClientStream implements StreamObserver<Message.Envelope> {
     private static JavaChainLog log = JavaChainLogFactory.getLog(GossipClientStream.class);
 
     private final ManagedChannel connection;
+
     private StreamObserver<Message.Envelope> streamObserver;
 
     private Map<String, LinkedBlockingQueue<Message.Envelope>> queueMap = new HashMap<String, LinkedBlockingQueue<Message.Envelope>>();
+
+    private static GossipClientStream gossipClientStream;
 
     public GossipClientStream(ManagedChannel connection) {
         GossipGrpc.GossipStub stub = GossipGrpc.newStub(connection);
@@ -64,7 +67,6 @@ public class GossipClientStream implements StreamObserver<Message.Envelope> {
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
-//        GossipService.saveBlock(envelope);
     }
 
     @Override
@@ -83,5 +85,13 @@ public class GossipClientStream implements StreamObserver<Message.Envelope> {
 
     public void setQueueMap(Map<String, LinkedBlockingQueue<Message.Envelope>> queueMap) {
         this.queueMap = queueMap;
+    }
+
+    public static GossipClientStream getGossipClientStream() {
+        return gossipClientStream;
+    }
+
+    public static void setGossipClientStream(GossipClientStream gossipClientStream) {
+        GossipClientStream.gossipClientStream = gossipClientStream;
     }
 }

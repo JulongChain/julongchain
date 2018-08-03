@@ -52,42 +52,7 @@ public class GossipService extends GossipGrpc.GossipImplBase {
             @Override
             public void onNext(Message.Envelope envelope) {
                 responseObservers.add(responseObserver);
-                try {
-                    ByteString payload = envelope.getPayload();
-                    if (payload == null) {
-                        return;
-                    }
-                    Message.GossipMessage gossipMessage = Message.GossipMessage.parseFrom(payload);
-                    if (gossipMessage == null) {
-                        return;
-                    }
-                    Message.RemoteStateRequest stateRequest = gossipMessage.getStateRequest();
-                    if (stateRequest == null) {
-                        return;
-                    }
-                    String group = gossipMessage.getGroup().toStringUtf8();
-                    long startSeqNum = stateRequest.getStartSeqNum();
-                    new Thread() {
-                        @Override
-                        public void run() {
-                            String location = ConsenterConfigFactory.loadConsenterConfig().getFileLedger().getLocation();
-                            FileLedgerFactory fileLedgerFactory = null;
-                            try {
-                                fileLedgerFactory = new FileLedgerFactory(location);
-                                ReadWriteBase readWriteBase = fileLedgerFactory.getOrCreate(group);
-                                log.info("====================== receive pull request:"+ group + " " +startSeqNum);
-                                Common.Block block = Util.getBlock(readWriteBase, startSeqNum);
-                                log.info("=============================:block" + block.getHeader().getNumber());
-                              Message.Envelope responseEnvelope = newGossipEnvelope(group, block.getHeader().getNumber(), block);
-                              responseObserver.onNext(responseEnvelope);
-                            } catch (LedgerException e) {
-                                log.error(e.getMessage(), e);
-                            }
-                        }
-                    }.start();
-                } catch (InvalidProtocolBufferException e) {
-                    log.error(e.getMessage(), e);
-                }
+                handPullRequest(envelope, responseObserver);
             }
 
             @Override
@@ -102,14 +67,43 @@ public class GossipService extends GossipGrpc.GossipImplBase {
         };
     }
 
-    public static void deliver(Message.Envelope envelope) {
-//        for (StreamObserver<Message.Envelope> responseObserver : responseObservers) {
-//            try {
-//                responseObserver.onNext(envelope);
-//            } catch (Exception e) {
-//                log.error(e.getMessage(), e);
-//            }
-//        }
+    private void handPullRequest(Message.Envelope envelope, StreamObserver<Message.Envelope> responseObserver) {
+        try {
+            ByteString payload = envelope.getPayload();
+            if (payload == null) {
+                return;
+            }
+            Message.GossipMessage gossipMessage = Message.GossipMessage.parseFrom(payload);
+            if (gossipMessage == null) {
+                return;
+            }
+            Message.RemoteStateRequest stateRequest = gossipMessage.getStateRequest();
+            if (stateRequest == null) {
+                return;
+            }
+            String group = gossipMessage.getGroup().toStringUtf8();
+            long startSeqNum = stateRequest.getStartSeqNum();
+            new Thread() {
+                @Override
+                public void run() {
+                    String location = ConsenterConfigFactory.loadConsenterConfig().getFileLedger().getLocation();
+                    FileLedgerFactory fileLedgerFactory = null;
+                    try {
+                        fileLedgerFactory = new FileLedgerFactory(location);
+                        ReadWriteBase readWriteBase = fileLedgerFactory.getOrCreate(group);
+                        log.info("receive pull request:"+ group + " " +startSeqNum);
+                        Common.Block block = Util.getBlock(readWriteBase, startSeqNum);
+                        log.info("get block:" + block.getHeader().getNumber());
+                        Message.Envelope responseEnvelope = newGossipEnvelope(group, block.getHeader().getNumber(), block);
+                        responseObserver.onNext(responseEnvelope);
+                    } catch (LedgerException e) {
+                        log.error(e.getMessage(), e);
+                    }
+                }
+            }.start();
+        } catch (InvalidProtocolBufferException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     public static Message.Envelope newGossipEnvelope(String group, Long seqNum, Common.Block block) {

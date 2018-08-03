@@ -293,7 +293,7 @@ public class SmartContractSupportService
         // shim传过来的key
         String key = message.getPayload().toStringUtf8();
 
-        logger.info("===============>" + key);
+        logger.info("key:" + key);
 
         try {
             INodeLedger nodeLedger = NodeUtils.getLedger(groupId);

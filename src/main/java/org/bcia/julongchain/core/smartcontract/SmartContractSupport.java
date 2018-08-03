@@ -276,14 +276,14 @@ public class SmartContractSupport implements ISCSupport {
 		}
 
 		if (spec instanceof SmartContractDeploymentSpec) {
-			log.info("================ deployment");
+			log.info("deployment");
 			log.info(version);
 			SmartContractDeploymentSpec deploymentSpec = (SmartContractDeploymentSpec) spec;
 			return deploymentSpec.getSmartContractSpec().getInput();
 		}
 
 		if (spec instanceof SmartContractInvocationSpec) {
-			log.info("================ invocation");
+			log.info("invocation");
 			SmartContractInvocationSpec invocationSpec = (SmartContractInvocationSpec) spec;
 			return invocationSpec.getSmartContractSpec().getInput();
 		}
@@ -311,7 +311,7 @@ public class SmartContractSupport implements ISCSupport {
     }
 
     private String createUserImage(String smartContractId, String version, String imageName) throws IOException, JavaChainException {
-        log.info("==========================images is null");
+        log.info("images is null");
 
         // 清空instantiate目录
         String basePath = createBaseDirectory(smartContractId, version);
@@ -349,7 +349,7 @@ public class SmartContractSupport implements ISCSupport {
         String imageId =
                 DockerUtil.buildImage(basePath + "/Dockerfile", imageName);
 
-        log.info("====================image id :" + imageId);
+        log.info("image id :" + imageId);
         return imageId;
     }
 
@@ -389,7 +389,7 @@ public class SmartContractSupport implements ISCSupport {
     }
 
     private void startDockerContainner(String containerName, String smartcontractId) throws InterruptedException {
-        log.info("========================container id ==============" + containerName);
+        log.info("container id:" + containerName);
         DockerUtil.startContainer(containerName);
         while (!SmartContractRunningUtil.checkSmartContractRunning(smartcontractId)) {
             log.info("wait smart contract register[" + smartcontractId + "]");
