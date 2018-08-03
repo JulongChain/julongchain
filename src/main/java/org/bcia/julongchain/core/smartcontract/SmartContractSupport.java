@@ -332,7 +332,7 @@ public class SmartContractSupport implements ISCSupport {
                 new File(dockerFile),
                 new File(basePath));
         // replace core_node_address
-        String dockerFilePath = basePath + File.separator + "Dockerfile.in";
+        String dockerFilePath = basePath + File.separator + "Dockerfile";
         Utils.replaceFileContent(
                 dockerFilePath,
                 "#core_node_address#",
