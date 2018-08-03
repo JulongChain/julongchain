@@ -55,13 +55,15 @@ public class BlocksItr implements IResultsIterator {
     public long waitForBlock(long blockNum) throws LedgerException {
         synchronized (BlockFileManager.lock){
             while(mgr.getCpInfo().getLastBlockNumber() < blockNum && !shouldClose()){
-                logger.debug(String.format("Going to wait for newer blocks.maxAvailaBlockNumber=[%d], waitForBlockNum=[%d]", mgr.getCpInfo().getLastBlockNumber(), blockNum));
+				long lastBlockNumber = mgr.getCpInfo().getLastBlockNumber();
+				logger.debug(String.format("Going to wait for newer blocks.maxAvailaBlockNumber=[%d], waitForBlockNum=[%d]", mgr.getCpInfo().getLastBlockNumber(), blockNum));
                 try {
                     BlockFileManager.lock.wait();
                 } catch (InterruptedException e) {
                     logger.error(e.getMessage(), e);
                     throw new LedgerException(e);
                 }
+				long lastBlockNumber1 = mgr.getCpInfo().getLastBlockNumber();
                 logger.debug("Coming out of wait. MaxAvailaBlockNumber=[{}]", mgr.getCpInfo().getLastBlockNumber());
             }
             return mgr.getCpInfo().getLastBlockNumber();

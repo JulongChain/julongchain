@@ -80,25 +80,25 @@ public class BlockFileManager {
         this.config = config;
         this.rootDir = config.getLedgerBlockDir(id);
         this.db = indexStore;
-        this.cpInfo = loadCurrentInfo();
+        cpInfo = loadCurrentInfo();
         //创建rootdir
         IoUtil.createDirIfMissing(getRootDir());
         //设置检查点信息
-        if(this.cpInfo == null){
+        if(cpInfo == null){
             logger.debug("Getting block information from block storage");
-            this.cpInfo = BlockFileHelper.constructCheckpointInfoFromBlockFiles(this.rootDir);
-            logger.debug(String.format("Info constructed by scanning the blocks dir = %s", this.cpInfo.toString()));
+            cpInfo = BlockFileHelper.constructCheckpointInfoFromBlockFiles(this.rootDir);
+            logger.debug(String.format("Info constructed by scanning the blocks dir = %s", cpInfo.toString()));
         } else {
             logger.debug("Syncing block information from block storage (if needed)");
-            syncCpInfoFromFS(this.rootDir, this.cpInfo);
+            syncCpInfoFromFS(this.rootDir, cpInfo);
         }
         //保存检查点信息到leveldb中
         //blkMgrInfoKey-checkpointInfo
-        saveCurrentInfo(this.cpInfo, true);
+        saveCurrentInfo(cpInfo, true);
         //写入文件 writer类
-        this.currentFileWriter = new BlockFileWriter(deriveBlockfilePath(this.rootDir, this.cpInfo.getLastestFileChunkSuffixNum()));
+        this.currentFileWriter = new BlockFileWriter(deriveBlockfilePath(this.rootDir, cpInfo.getLastestFileChunkSuffixNum()));
         //修剪文件为检查点保存的文件大小
-        this.currentFileWriter.truncateFile(this.cpInfo.getLatestFileChunksize());
+        this.currentFileWriter.truncateFile(cpInfo.getLatestFileChunksize());
         //设置blockindex对象
         this.index = new BlockIndex(indexConfig, indexStore, id);
         //设置blockchainINfo对象
@@ -108,18 +108,18 @@ public class BlockFileManager {
                 .setPreviousBlockHash(ByteString.EMPTY)
                 .build();
 
-        if (!this.cpInfo.getChainEmpty()) {
+        if (!cpInfo.getChainEmpty()) {
             try {
                 syncIndex();
             } catch (LedgerException e) {
                 logger.error(e.getMessage(), e);
                 throw new LedgerException("Got error when syncIndex");
             }
-            Common.BlockHeader lastBlockHeader = retrieveBlockHeaderByNumber(this.cpInfo.getLastBlockNumber());
+            Common.BlockHeader lastBlockHeader = retrieveBlockHeaderByNumber(cpInfo.getLastBlockNumber());
             ByteString lastBlockHash = lastBlockHeader.getDataHash();
             ByteString previousBlockHash = lastBlockHeader.getPreviousHash();
             this.bcInfo = Ledger.BlockchainInfo.newBuilder()
-                    .setHeight(this.cpInfo.getLastBlockNumber() + 1)
+                    .setHeight(cpInfo.getLastBlockNumber() + 1)
                     .setCurrentBlockHash(lastBlockHash)
                     .setPreviousBlockHash(previousBlockHash)
                     .build();
@@ -172,14 +172,14 @@ public class BlockFileManager {
      * 写下一文件
      */
     private void moveToNextFile() throws LedgerException {
-        CheckpointInfo cpInfo = new CheckpointInfo(this.cpInfo.getLastestFileChunkSuffixNum() + 1,
+        CheckpointInfo newCpInfo = new CheckpointInfo(cpInfo.getLastestFileChunkSuffixNum() + 1,
                 0,
                 false,
-                this.cpInfo.getLastBlockNumber());
-        BlockFileWriter nextFileWriter = new BlockFileWriter(deriveBlockfilePath(this.rootDir, cpInfo.getLastestFileChunkSuffixNum()));
-        saveCurrentInfo(cpInfo, true);
+                cpInfo.getLastBlockNumber());
+        BlockFileWriter nextFileWriter = new BlockFileWriter(deriveBlockfilePath(this.rootDir, newCpInfo.getLastestFileChunkSuffixNum()));
+        saveCurrentInfo(newCpInfo, true);
         this.currentFileWriter = nextFileWriter;
-        updateCheckpoint(cpInfo);
+        updateCheckpoint(newCpInfo);
     }
 
     /**
@@ -341,10 +341,10 @@ public class BlockFileManager {
     /**
      * 更新检查点信息
      */
-    private void updateCheckpoint(CheckpointInfo cpInfo) {
+    private void updateCheckpoint(CheckpointInfo newCpInfo) {
         synchronized (lock){
-            this.cpInfo = cpInfo;
-            logger.debug(String.format("Brodcasting about update checkpointInfo: %s", cpInfo));
+            cpInfo = newCpInfo;
+            logger.debug(String.format("Brodcasting about update checkpointInfo: %s", newCpInfo));
             //通知所有等待区块的线程
             lock.notifyAll();
         }
@@ -604,10 +604,6 @@ public class BlockFileManager {
 
     public CheckpointInfo getCpInfo() {
         return cpInfo;
-    }
-
-    public void setCpInfo(CheckpointInfo cpInfo) {
-        this.cpInfo = cpInfo;
     }
 
     public BlockFileWriter getCurrentFileWriter() {

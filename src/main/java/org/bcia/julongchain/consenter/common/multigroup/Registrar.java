@@ -102,7 +102,7 @@ public class Registrar implements IChainCreator, IGroupSupportRegistrar, ISuppor
     }
 
     private Common.Envelope getConfigTx(IReader blockLedgerReader) {
-        Common.Block configBlock = null;
+		Common.Block configBlock = null;
         try {
             Common.Block lastBlock = Util.getBlock(blockLedgerReader, blockLedgerReader.height() - 1);
             long index = BlockUtils.getLastConfigIndexFromBlock(lastBlock);
@@ -123,7 +123,21 @@ public class Registrar implements IChainCreator, IGroupSupportRegistrar, ISuppor
         List<String> existingChains = ledgerFactory.groupIDs();
         for (String chainId : existingChains) {
             ReadWriteBase rl = ledgerFactory.getOrCreate(chainId);
-            Common.Envelope configTx = getConfigTx(rl);
+			// TODO: 8/3/18  
+//			if (chainId.equalsIgnoreCase("myGroup")) {
+//				new Thread(() -> {
+//					try {
+//						while (true) {
+//							long index = rl.height();
+//							System.out.println(Util.getBlock(rl, index));
+//							System.out.println("get block" + index);
+//						}
+//					} catch (LedgerException e) {
+//						e.printStackTrace();
+//					}
+//				}).start();
+//			}
+			Common.Envelope configTx = getConfigTx(rl);
             if (configTx == null) {
                 log.error("Programming error, configTx should never be nil here");
             }

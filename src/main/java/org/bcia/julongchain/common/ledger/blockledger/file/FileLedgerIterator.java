@@ -67,11 +67,11 @@ public class FileLedgerIterator implements IIterator {
 
     @Override
     public void readyChain() throws LedgerException{
-        synchronized (FileLedger.getLock()) {
+        synchronized (FileLedger.lock) {
             if (blockNum > ledger.height()) {
                 try {
                     logger.debug("Require block num is [{}], ledger height is[{}], wait block append", blockNum, ledger.height());
-                    FileLedger.getLock().wait();
+                    FileLedger.lock.wait();
                 } catch (InterruptedException e) {
                     throw new LedgerException(e);
                 }

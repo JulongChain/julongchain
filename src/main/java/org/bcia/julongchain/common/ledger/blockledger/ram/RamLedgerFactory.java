@@ -38,11 +38,13 @@ public class RamLedgerFactory implements IFactory {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(RamLedgerFactory.class);
 
     private int maxSize;
-    private Map<String, ReadWriteBase> ledgers;
+    private static Map<String, ReadWriteBase> ledgers;
 
     public RamLedgerFactory(int maxSize){
         this.maxSize = maxSize;
-        this.ledgers = new HashMap<>();
+		if (ledgers == null) {
+			ledgers = new HashMap<>();
+		}
     }
 
     @Override
@@ -93,7 +95,7 @@ public class RamLedgerFactory implements IFactory {
         return ledgers;
     }
 
-    public void setLedgers(Map<String, ReadWriteBase> ledgers) {
-        this.ledgers = ledgers;
-    }
+	public static void setLedgers(Map<String, ReadWriteBase> ledgers) {
+		RamLedgerFactory.ledgers = ledgers;
+	}
 }
