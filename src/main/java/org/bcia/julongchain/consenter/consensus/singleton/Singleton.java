@@ -144,8 +144,8 @@ public class Singleton implements IChain, IConsensusPlugin {
                     Common.Block block = support.createNextBlock(env);
                     support.writeBlock(block, null);
 
-                    org.bcia.julongchain.protos.gossip.Message.Envelope envelope = GossipService.newGossipEnvelope(support.getGroupId(), block.getHeader().getNumber(), block);
-                    GossipService.deliver(envelope);
+//                    org.bcia.julongchain.protos.gossip.Message.Envelope envelope = GossipService.newGossipEnvelope(support.getGroupId(), block.getHeader().getNumber(), block);
+//                    GossipService.deliver(envelope);
 
                 }
                 if (batches.length > 0) {
@@ -190,8 +190,8 @@ public class Singleton implements IChain, IConsensusPlugin {
             Common.Block block = support.createNextBlock(batch);
             support.writeBlock(block, null);
 
-            org.bcia.julongchain.protos.gossip.Message.Envelope envelope = GossipService.newGossipEnvelope(support.getGroupId(), block.getHeader().getNumber(), block);
-            GossipService.deliver(envelope);
+//            org.bcia.julongchain.protos.gossip.Message.Envelope envelope = GossipService.newGossipEnvelope(support.getGroupId(), block.getHeader().getNumber(), block);
+//            GossipService.deliver(envelope);
         }
 
     }

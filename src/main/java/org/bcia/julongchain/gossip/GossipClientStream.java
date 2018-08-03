@@ -15,18 +15,16 @@
  */
 package org.bcia.julongchain.gossip;
 
-import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
-import io.grpc.netty.NettyChannelBuilder;
 import io.grpc.stub.StreamObserver;
-import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.core.ledger.BlockAndPvtData;
-import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
-import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.gossip.GossipGrpc;
 import org.bcia.julongchain.protos.gossip.Message;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class GossipClientStream implements StreamObserver<Message.Envelope> {
 
@@ -34,6 +32,8 @@ public class GossipClientStream implements StreamObserver<Message.Envelope> {
 
     private final ManagedChannel connection;
     private StreamObserver<Message.Envelope> streamObserver;
+
+    private Map<String, LinkedBlockingQueue<Message.Envelope>> queueMap = new HashMap<String, LinkedBlockingQueue<Message.Envelope>>();
 
     public GossipClientStream(ManagedChannel connection) {
         GossipGrpc.GossipStub stub = GossipGrpc.newStub(connection);
@@ -57,66 +57,14 @@ public class GossipClientStream implements StreamObserver<Message.Envelope> {
 
     @Override
     public void onNext(Message.Envelope envelope) {
-
-        if (envelope == null) {
-            return;
-        }
-
-        if (envelope.getPayload() == null) {
-            return;
-        }
-
         try {
             Message.GossipMessage gossipMessage = Message.GossipMessage.parseFrom(envelope.getPayload());
-
-            if (gossipMessage == null) {
-                return;
-            }
-
-            if (gossipMessage.getDataMsg() == null) {
-                return;
-            }
-
-            if (gossipMessage.getGroup() == null) {
-                return;
-            }
-
             String group = gossipMessage.getGroup().toStringUtf8();
-
-            if (StringUtils.isEmpty(group)) {
-                return;
-            }
-
-            Message.Payload payload = gossipMessage.getDataMsg().getPayload();
-
-            if (payload == null) {
-                return;
-            }
-
-            ByteString data = payload.getData();
-
-            if (data == null) {
-                return;
-            }
-
-            Common.Block block = Common.Block.parseFrom(data);
-
-            if (block == null) {
-                return;
-            }
-
-
-            BlockAndPvtData blockAndPvtData = new BlockAndPvtData(block, null, null);
-
-            if (blockAndPvtData == null) {
-                return;
-            }
-
-            LedgerManager.openLedger(group).commitWithPvtData(blockAndPvtData);
-
+            queueMap.get(group).put(envelope);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
+//        GossipService.saveBlock(envelope);
     }
 
     @Override
@@ -129,4 +77,11 @@ public class GossipClientStream implements StreamObserver<Message.Envelope> {
         log.info("completed");
     }
 
+    public Map<String, LinkedBlockingQueue<Message.Envelope>> getQueueMap() {
+        return queueMap;
+    }
+
+    public void setQueueMap(Map<String, LinkedBlockingQueue<Message.Envelope>> queueMap) {
+        this.queueMap = queueMap;
+    }
 }

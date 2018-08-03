@@ -15,9 +15,11 @@
  */
 package org.bcia.julongchain.node.entity;
 
+import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.netty.NettyChannelBuilder;
 import org.apache.commons.lang3.StringUtils;
+import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
@@ -25,21 +27,27 @@ import org.bcia.julongchain.common.util.*;
 import org.bcia.julongchain.core.admin.AdminServer;
 import org.bcia.julongchain.core.endorser.Endorser;
 import org.bcia.julongchain.core.events.DeliverEventsServer;
+import org.bcia.julongchain.core.ledger.INodeLedger;
+import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.core.node.NodeConfig;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.core.node.grpc.EventGrpcServer;
 import org.bcia.julongchain.core.node.grpc.NodeGrpcServer;
+import org.bcia.julongchain.core.node.util.NodeUtils;
 import org.bcia.julongchain.core.ssc.ISystemSmartContractManager;
 import org.bcia.julongchain.core.ssc.SystemSmartContractManager;
 import org.bcia.julongchain.events.producer.EventHubServer;
 import org.bcia.julongchain.events.producer.EventsServerConfig;
 import org.bcia.julongchain.gossip.GossipClientStream;
+import org.bcia.julongchain.gossip.GossipService;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.node.common.client.AdminClient;
 import org.bcia.julongchain.node.common.client.IAdminClient;
+import org.bcia.julongchain.node.util.LedgerUtils;
 import org.bcia.julongchain.node.util.NodeConstant;
 import org.bcia.julongchain.protos.gossip.Message;
+import org.bcia.julongchain.protos.node.Query;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,6 +55,7 @@ import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -130,6 +139,24 @@ public class NodeServer {
         String[] split = StringUtils.split(consenterAddress, ":");
         String host = split[0];
         Integer port = Integer.parseInt(split[1]);
+
+        waitConnectable(host, port);
+
+        ManagedChannel managedChannel = NettyChannelBuilder.forAddress(host, port).usePlaintext().build();
+        GossipClientStream gossipClientStream = new GossipClientStream(managedChannel);
+
+        try {
+            List<String> ledgerIDs = LedgerManager.getLedgerIDs();
+            for (String ledgerID : ledgerIDs) {
+                startPullFromConsenter(gossipClientStream, ledgerID);
+            }
+        } catch (LedgerException e) {
+            log.error(e.getMessage(), e);
+        }
+
+    }
+
+    private void waitConnectable(String host, Integer port) {
         while (!Utils.isHostConnectable(host, port)) {
             log.info("wait consenter start, host:" + host + ", port:" + port);
             try {
@@ -138,11 +165,32 @@ public class NodeServer {
                 e.printStackTrace();
             }
         }
-        ManagedChannel managedChannel = NettyChannelBuilder.forAddress(host, port).usePlaintext().build();
-        GossipClientStream gossipClientStream = new GossipClientStream(managedChannel);
+    }
+
+    private void startPullFromConsenter(GossipClientStream gossipClientStream, String ledgerID) {
         new Thread() {
+            @Override
             public void run() {
-                gossipClientStream.serialSend(Message.Envelope.newBuilder().build());
+                while (true) {
+                    try {
+                        log.info("================== start a pull request.");
+                        long height = LedgerManager.openLedger(ledgerID).getBlockchainInfo().getHeight();
+                        Message.RemoteStateRequest remoteStateRequest = Message.RemoteStateRequest.newBuilder().setStartSeqNum(height).setEndSeqNum(height).build();
+                        Message.GossipMessage gossipMessage = Message.GossipMessage.newBuilder().setGroup(ByteString.copyFromUtf8(ledgerID)).setStateRequest(remoteStateRequest).build();
+                        Message.Envelope envelope = Message.Envelope.newBuilder().setPayload(gossipMessage.toByteString()).build();
+                        log.info("========================= send pull request:" + ledgerID + " " + height);
+                        gossipClientStream.serialSend(envelope);
+                        if (gossipClientStream.getQueueMap().get(ledgerID) == null) {
+                            gossipClientStream.getQueueMap().put(ledgerID, new LinkedBlockingQueue<Message.Envelope>());
+                        }
+                        log.info("======================= receive block");
+                        Message.Envelope receiveEnvelope = gossipClientStream.getQueueMap().get(ledgerID).take();
+                        GossipService.saveBlock(receiveEnvelope);
+                        log.info("================== saved block");
+                    } catch (Exception e) {
+                        log.error(e.getMessage(), e);
+                    }
+                }
             }
         }.start();
     }
