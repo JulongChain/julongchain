@@ -86,11 +86,11 @@ public class Util {
      * 获取区块
      * 当前账本中存在所需区块，直接返回
      * 当前账本中不存在所需区块，阻塞进程并等待append
-     * @param IReader 账本
+     * @param reader 账本
      * @param index 区块编号
      */
-    public static Common.Block getBlock(IReader IReader, long index) throws LedgerException {
-        IIterator i = IReader.iterator(Ab.SeekPosition.newBuilder()
+    public static Common.Block getBlock(IReader reader, long index) throws LedgerException {
+        IIterator i = reader.iterator(Ab.SeekPosition.newBuilder()
                 .setSpecified(Ab.SeekSpecified.newBuilder()
                         .setNumber(index)
                         .build())

@@ -32,7 +32,6 @@ import org.bcia.julongchain.protos.common.Common;
 public class BlocksItr implements IResultsIterator {
 
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlocksItr.class);
-    private static final Object lock = BlockFileManager.lock;
 
     private BlockFileManager mgr;
     private long maxBlockNumAvailable;
@@ -54,11 +53,11 @@ public class BlocksItr implements IResultsIterator {
      * 读取区块时, 区块长度不足将等待区块的添加
      */
     public long waitForBlock(long blockNum) throws LedgerException {
-        synchronized (lock){
+        synchronized (BlockFileManager.lock){
             while(mgr.getCpInfo().getLastBlockNumber() < blockNum && !shouldClose()){
                 logger.debug(String.format("Going to wait for newer blocks.maxAvailaBlockNumber=[%d], waitForBlockNum=[%d]", mgr.getCpInfo().getLastBlockNumber(), blockNum));
                 try {
-                    lock.wait();
+                    BlockFileManager.lock.wait();
                 } catch (InterruptedException e) {
                     logger.error(e.getMessage(), e);
                     throw new LedgerException(e);
@@ -109,13 +108,13 @@ public class BlocksItr implements IResultsIterator {
 
     @Override
     public synchronized void close() throws LedgerException{
-        closeMarker = true;
-        synchronized (lock){
-            lock.notifyAll();
-            if(stream != null){
-                        stream.close();
-                    }
-        }
+		closeMarker = true;
+		synchronized (BlockFileManager.lock){
+			BlockFileManager.lock.notifyAll();
+			if(stream != null){
+				stream.close();
+			}
+		}
     }
 
     public BlockFileManager getMgr() {
