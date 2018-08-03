@@ -91,6 +91,7 @@ public class NodeGrpcServer {
                 .addService(new EndorserServerImpl())
                 .addService(new SmartContractSupportService())
                 .addService(new AdminServerImpl())
+                .addService(new DeliverServerImpl())
                 .build()
                 .start();
         log.info("NodeGrpcServer start, port: " + port);
