@@ -26,7 +26,7 @@ import org.bcia.julongchain.protos.node.EventsPackage;
  * @company Dingxuan
  */
 public class DeliverEventsServer implements IDeliverEventsServer {
-    private IDeliverHandler deliverHandler;
+    private IDeliverHandler deliverHandler = new DeliverHandler();
 
     @Override
     public EventsPackage.DeliverResponse deliverFiltered(Common.Envelope envelope) {
