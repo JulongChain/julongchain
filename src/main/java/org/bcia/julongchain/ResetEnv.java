@@ -15,7 +15,6 @@ limitations under the License.
  */
 package org.bcia.julongchain;
 
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -33,8 +32,6 @@ import java.util.List;
 public class ResetEnv {
 
 	public static void main(String[] args) throws Exception {
-//		exce("docker images").forEach(System.out::println);
-//		exce("docker images -q").forEach(System.out::println);
 		rm();
 		rmi();
 		rmrf();
