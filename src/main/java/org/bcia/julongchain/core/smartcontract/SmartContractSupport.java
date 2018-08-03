@@ -347,7 +347,7 @@ public class SmartContractSupport implements ISCSupport {
                 getCoreNodeAddress() + ":" + getCoreNodeAddressPort());
         // build镜像
         String imageId =
-                DockerUtil.buildImage(basePath + "/Dockerfile.in", imageName);
+                DockerUtil.buildImage(basePath + "/Dockerfile", imageName);
 
         log.info("====================image id :" + imageId);
         return imageId;
