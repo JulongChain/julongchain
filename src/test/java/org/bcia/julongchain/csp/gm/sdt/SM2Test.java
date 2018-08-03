@@ -19,7 +19,6 @@ package org.bcia.julongchain.csp.gm.sdt;
 import org.bcia.julongchain.common.util.Convert;
 import org.bcia.julongchain.csp.gm.sdt.sm2.SM2;
 import org.bcia.julongchain.csp.gm.sdt.sm2.SM2KeyPair;
-import org.bcia.julongchain.csp.gm.sdt.sm3.SM3;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +27,7 @@ import static org.bcia.julongchain.common.util.Convert.bytesToHexString;
 
 
 /**
- * SM2 算法单元测试
+ * SM2算法单元测试
  *
  * @author tengxiumin
  * @date 5/16/18

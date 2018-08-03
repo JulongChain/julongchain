@@ -20,7 +20,7 @@ import org.bcia.julongchain.csp.gm.sdt.jni.SMJniApi;
 import org.junit.Test;
 
 /**
- * SDTSMJNI接口单元测试
+ * SMJniApi 产生随机数接口单元测试
  *
  * @author tengxiumin
  * @date 2018/05/17

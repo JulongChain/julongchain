@@ -18,7 +18,7 @@ package org.bcia.julongchain.csp.gm.sdt.sm2;
 import org.bcia.julongchain.csp.intfs.opts.IKeyDerivOpts;
 
 /**
- * GM SM2 密钥派生选项
+ * GM SM2密钥派生选项
  *
  * @author tengxiumin
  * @date 2018/5/16
@@ -27,11 +27,19 @@ import org.bcia.julongchain.csp.intfs.opts.IKeyDerivOpts;
 
 public class SM2KeyDerivOpts implements IKeyDerivOpts {
 
+    /**
+     * 获取算法名称
+     * @return 算法名称
+     */
     @Override
     public String getAlgorithm() {
         return "SM2";
     }
 
+    /**
+     * 是否为临时密钥
+     * @return true/false
+     */
     @Override
     public boolean isEphemeral() {
         return true;

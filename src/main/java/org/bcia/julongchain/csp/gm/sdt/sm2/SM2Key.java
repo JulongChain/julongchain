@@ -19,7 +19,7 @@ import org.bcia.julongchain.csp.gm.sdt.sm3.SM3;
 import org.bcia.julongchain.csp.intfs.IKey;
 
 /**
- * GM SM2 Key
+ * GM SM2密钥
  *
  * @author tengxiumin
  * @date 2018/05/16

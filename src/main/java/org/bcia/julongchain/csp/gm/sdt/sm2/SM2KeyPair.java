@@ -16,7 +16,7 @@
  package org.bcia.julongchain.csp.gm.sdt.sm2;
 
 /**
- * GM SM2 公私钥对
+ * GM SM2公私钥对
  *
  * @author tengxiumin
  * @date 2016/05/16

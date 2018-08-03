@@ -34,7 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * SDTGmCsp 单元测试
+ * SDTGmCsp单元测试
  *
  * @author tengxiumin
  * @date 2018/05/16

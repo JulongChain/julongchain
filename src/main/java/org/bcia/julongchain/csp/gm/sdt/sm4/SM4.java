@@ -18,13 +18,12 @@ package org.bcia.julongchain.csp.gm.sdt.sm4;
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.common.util.Convert;
 import org.bcia.julongchain.csp.gm.sdt.common.Constants;
 import org.bcia.julongchain.csp.gm.sdt.jni.SM4CBCResult;
 import org.bcia.julongchain.csp.gm.sdt.jni.SMJniApi;
 
 /**
- * GM SM4 算法
+ * GM SM4算法
  *
  * @author tengxiumin
  * @date 2018/05/14
@@ -116,10 +115,10 @@ public class SM4 {
 
     /**
      * ECB模式加解密数据处理接口
-     * @param data 数据
+     * @param data 待处理数据
      * @param key 密钥
      * @param type 类型（加密/解密）
-     * @return
+     * @return 加密或解密结果
      * @throws JavaChainException
      */
     private byte[] proccessDataECB(byte[] data, byte[] key, int type) throws JavaChainException {
@@ -259,7 +258,7 @@ public class SM4 {
      * @param key 密钥
      * @param iv 初始向量
      * @param type 类型（加密/解密）
-     * @return
+     * @return 加密或解密结果
      * @throws JavaChainException
      */
     private byte[] proccessDataCBC(byte[] data, byte[] key, byte[] iv, int type) throws JavaChainException{
@@ -336,7 +335,7 @@ public class SM4 {
     /**
      * 数据去填充
      * @param input 填充后的数据
-     * @return 原数据
+     * @return 去填充的数据
      * @throws JavaChainException
      */
     private byte[] unpadding(byte[] input) throws JavaChainException{

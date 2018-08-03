@@ -16,11 +16,10 @@
 package org.bcia.julongchain.csp.gm.sdt.jni;
 
 import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.csp.gm.sdt.common.Constants;
 
 /**
- * JNI interface definition
+ * JNI接口定义
  *
  * @author tengxiumin
  * @date 2018/04/24
@@ -49,7 +48,7 @@ public class SMJniApi {
     }
 
     /**
-     * 生成随机数
+     * 产生随机数
      * @param length 随机数长度
      * @return 随机数
      * @throws JavaChainException

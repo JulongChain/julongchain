@@ -18,13 +18,18 @@ import org.bcia.julongchain.csp.intfs.opts.IEncrypterOpts;
 
 
 /**
- * GM SM4 加密选项
+ * GM SM4加密选项
  *
  * @author tengxiumin
  * @date 2018/05/08
  * @company SDT
  */
 public class SM4EncrypterOpts implements IEncrypterOpts {
+
+    /**
+     * 获取算法名称
+     * @return 算法名称
+     */
     @Override
     public String getAlgorithm() {
         return "SM4";

@@ -22,7 +22,7 @@ import org.junit.Test;
 import java.util.Arrays;
 
 /**
- * SDTSMJNI SM3接口单元测试
+ * SMJniApi SM3算法接口单元测试
  *
  * @author tengxiumin
  * @date 2018/05/29

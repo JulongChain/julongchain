@@ -23,7 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * SM3 算法单元测试
+ * SM3算法单元测试
  *
  * @author tengxiumin
  * @date 2018/05/16

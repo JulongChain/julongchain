@@ -24,7 +24,7 @@ import org.junit.Test;
 import java.util.Arrays;
 
 /**
- * SDTSMJNI SM4接口单元测试
+ * SMJniApi SM4算法接口单元测试
  *
  * @author tengxiumin
  * @date 2018/05/29
