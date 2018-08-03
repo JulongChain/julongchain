@@ -15,7 +15,6 @@
  */
 package org.bcia.julongchain.msp;
 
-import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.exception.VerifyException;
 import org.bcia.julongchain.msp.entity.IdentityIdentifier;
