@@ -8,21 +8,25 @@
 [Gitlab代码库管理系统](http://gitlab.bcia.net.cn:6060/)
 
 ## 如何编译
-编译环境：
-集成开发环境：IntelliJ IDEA 2017.3.3
-JAVA 开发环境：JAVA JDK 1.8.0_151
-Maven依赖管理工具：Maven 3.5.2
+编译环境：  <br/>
+集成开发环境：IntelliJ IDEA 2017.3.3  <br/>
+JAVA 开发环境：JAVA JDK 1.8.0_151  <br/>
+Maven依赖管理工具：Maven 3.5.2  <br/>
 
-编译步骤：
-1.从GitLab下载项目源码：打开IntelliJ IDEA,选择菜单File => New => Project from Version Control => Git
-  设置好文件夹和路径,点击Clone下载
-  Git Repository URL:ssh://git@gitlab.bcia.net.cn:13622/bcia/julongchain.git
-2.添加框架支持：项目名字右键 => Add Framework Support,Java EE version选择Java EE 8,勾选Maven选项
-3.设置Project环境：选择菜单File => Project Structure… => Project,Project SDK选择已安装的JDK 1.8
-  Project language level 修改为8
-4.Maven导入依赖包：pom.xml右键 => Maven => Reimport
-5.编译：在Maven Projects中展开julongchain => Lifecycle,选择双击compile编译
+编译步骤：  <br/>
+1.从GitLab下载项目源码：打开IntelliJ IDEA,选择菜单File => New => Project from Version Control => Git  <br/>
+  设置好文件夹和路径,点击Clone下载  <br/>
+  Git Repository URL:ssh://git@gitlab.bcia.net.cn:13622/bcia/julongchain.git  <br/>
+  
+2.添加框架支持：项目名字右键 => Add Framework Support,Java EE version选择Java EE 8,勾选Maven选项  <br/>
 
+3.设置Project环境：选择菜单File => Project Structure… => Project,Project SDK选择已安装的JDK 1.8  <br/>
+  Project language level 修改为8  <br/>
+  
+4.Maven导入依赖包：pom.xml右键 => Maven => Reimport  <br/>
+
+5.编译：在Maven Projects中展开julongchain => Lifecycle,选择双击compile编译  <br/>
+<br/>
 
 
 
