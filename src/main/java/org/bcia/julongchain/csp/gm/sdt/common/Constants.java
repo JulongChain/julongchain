@@ -16,19 +16,25 @@
 package org.bcia.julongchain.csp.gm.sdt.common;
 
 /**
- * Constant
+ * 常量定义
  *
  * @author tengxiumin
  * @date 2018/05/14
  * @company SDT
  */
 public class Constants {
-    public static final int SM2_SK_LEN = 32;
-    public static final int SM2_PK_LEN = 64;
+    public static final int SM2_PRIVATEKEY_LEN = 32;
+    public static final int SM2_PUBLICKEY_LEN = 64;
     public static final int SM2_SIGN_RANDOM_LEN = 32;
+    public static final int SM2_ENC_RANDOM_LEN = 32;
+    public static final int SM2_SIGNATURE_LEN = 64;
     public static final int SM3_DIGEST_LEN = 32;
     public static final int SM4_KEY_LEN = 16;
     public static final int SM4_BLOCK_LEN = 16;
     public static final int SM4_IV_LEN = 16;
     public static final int SM4_PACKAGE_LEN = 512;
+
+    public static final int MAX_RANDOM_LENGTH = 1024;
+    public static final int MAX_KDF_LENGTH = 1024;
+    public static final int MAX_KDF_SOURCE_KEY_LENGTH = 384;
 }

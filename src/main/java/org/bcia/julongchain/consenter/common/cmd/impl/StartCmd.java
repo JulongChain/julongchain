@@ -16,16 +16,12 @@
 package org.bcia.julongchain.consenter.common.cmd.impl;
 
 import org.apache.commons.cli.ParseException;
-import org.apache.gossip.manager.GossipManager;
-import org.bcia.julongchain.common.exception.GossipException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.consenter.common.cmd.IConsenterCmd;
 import org.bcia.julongchain.consenter.common.server.ConsenterServer;
 
 import java.io.IOException;
-
-import static org.bcia.julongchain.gossip.GossipServiceUtil.startConsenterGossip;
 
 /**
  * @author zhangmingyang
@@ -35,7 +31,6 @@ import static org.bcia.julongchain.gossip.GossipServiceUtil.startConsenterGossip
 public class StartCmd implements IConsenterCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(StartCmd.class);
     private ConsenterServer consenterServer;
-    private static GossipManager gossipService;
 
     public StartCmd() {
         consenterServer = new ConsenterServer();
@@ -44,22 +39,19 @@ public class StartCmd implements IConsenterCmd {
     @Override
     public void execCmd(String[] args) throws ParseException {
         for (String str : args) {
-            log.info("arg-----$" + str);
+            log.info("Arg: " + str);
         }
         try {
             new Thread() {
                 @Override
                 public void run() {
                     try {
-                        gossipService= startConsenterGossip();
                         consenterServer.start();
                         consenterServer.blockUntilShutdown();
                     } catch (IOException ex) {
                         log.error(ex.getMessage(), ex);
                     } catch (InterruptedException ex) {
                         log.error(ex.getMessage(), ex);
-                    } catch (GossipException e) {
-                        e.printStackTrace();
                     }
                 }
             }.start();
@@ -69,7 +61,4 @@ public class StartCmd implements IConsenterCmd {
         }
     }
 
-    public static GossipManager getGossipService() {
-        return gossipService;
-    }
 }

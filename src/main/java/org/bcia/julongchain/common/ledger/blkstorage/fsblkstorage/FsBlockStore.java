@@ -21,9 +21,13 @@ import org.bcia.julongchain.common.ledger.blkstorage.IBlockStore;
 import org.bcia.julongchain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.core.ledger.BlockAndPvtData;
+import org.bcia.julongchain.core.smartcontract.shim.impl.Handler;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Ledger;
 import org.bcia.julongchain.protos.node.TransactionPackage;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * 区块文件系统
@@ -42,12 +46,12 @@ public class FsBlockStore implements IBlockStore {
                                                Config config,
                                                IndexConfig indexConfig,
                                                IDBProvider dbHandle) throws LedgerException {
-        FsBlockStore fsBlockStore = new FsBlockStore();
-        BlockFileManager mgr = new BlockFileManager(id, config, indexConfig, dbHandle);
-        fsBlockStore.setId(id);
-        fsBlockStore.setConfig(config);
-        fsBlockStore.setBlockFileManager(mgr);
-        return fsBlockStore;
+		FsBlockStore fsBlockStore = new FsBlockStore();
+		BlockFileManager mgr = new BlockFileManager(id, config, indexConfig, dbHandle);
+		fsBlockStore.setId(id);
+		fsBlockStore.setConfig(config);
+		fsBlockStore.setBlockFileManager(mgr);
+		return fsBlockStore;
     }
 
     @Override

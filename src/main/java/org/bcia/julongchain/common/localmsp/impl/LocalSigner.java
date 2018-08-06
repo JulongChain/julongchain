@@ -16,7 +16,15 @@
 package org.bcia.julongchain.common.localmsp.impl;
 
 import com.google.protobuf.ByteString;
+import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.localmsp.ILocalSigner;
+import org.bcia.julongchain.common.log.JavaChainLog;
+import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.util.CommConstant;
+import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
+import org.bcia.julongchain.csp.factory.CspManager;
+import org.bcia.julongchain.csp.factory.IFactoryOpts;
 import org.bcia.julongchain.msp.mgmt.Identity;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.protos.common.Common;
@@ -29,16 +37,21 @@ import java.security.SecureRandom;
  * @company Dingxuan
  */
 public class LocalSigner implements ILocalSigner {
+    private static JavaChainLog log = JavaChainLogFactory.getLog(LocalSigner.class);
+
     public LocalSigner() {
     }
     @Override
     public Common.SignatureHeader newSignatureHeader() {
         try {
-            Identity identity= (Identity) GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
+            Identity identity= (Identity) GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity().getIdentity();
             byte[] creatorIdentityRaw=identity.serialize();
             Common.SignatureHeader.Builder signatureHeader=Common.SignatureHeader.newBuilder();
-            byte[] none=new SecureRandom().generateSeed(24);
-            signatureHeader.setNonce(ByteString.copyFrom(none));
+            byte[] nonce = null;
+            log.info("Gen the random start");
+            nonce= identity.getMsp().getCsp().rng(24,null);
+            log.info("Gen the random end");
+            signatureHeader.setNonce(ByteString.copyFrom(nonce));
             signatureHeader.setCreator(ByteString.copyFrom(creatorIdentityRaw));
             return signatureHeader.build();
         } catch (Exception e) {

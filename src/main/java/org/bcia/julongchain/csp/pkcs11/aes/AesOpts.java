@@ -20,9 +20,9 @@ import org.bcia.julongchain.csp.intfs.opts.IKeyImportOpts;
 import org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant;
 
 /**
- * Class description
+ * Aes Opts for generate key and import key
  *
- * @author
+ * @author Ying Xu
  * @date 5/25/18
  * @company FEITIAN
  */

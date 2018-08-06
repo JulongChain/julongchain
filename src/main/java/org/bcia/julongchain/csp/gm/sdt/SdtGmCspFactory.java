@@ -20,7 +20,7 @@ import org.bcia.julongchain.csp.factory.IFactoryOpts;
 import org.bcia.julongchain.csp.intfs.ICsp;
 
 /**
- * SDT GM算法服务工厂
+ * SDT 国密算法服务工厂
  *
  * @author tengxiumin
  * @date 2018/05/16
@@ -30,11 +30,20 @@ public class SdtGmCspFactory implements ICspFactory {
 
     public SdtGmCspFactory(){ }
 
+    /**
+     * 获取算法服务工厂名称
+     * @return 服务工厂名称
+     */
     @Override
     public String getName() {
-        return "SDTGM";
+        return "sdtgm";
     }
 
+    /**
+     * 获取CSP实例
+     * @param opts
+     * @return ICsp对象
+     */
     @Override
     public ICsp getCsp(IFactoryOpts opts) {
         ISdtGmFactoryOpts sdtGmOpts = (ISdtGmFactoryOpts) opts;

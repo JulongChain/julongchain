@@ -20,6 +20,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 
+/**
+ * MetaData 测试类
+ *
+ * @author chenhao, liuxifeng
+ * @date 2018/7/12
+ * @company Excelsecu
+ */
 public class MetaDataTest {
 
     @Test

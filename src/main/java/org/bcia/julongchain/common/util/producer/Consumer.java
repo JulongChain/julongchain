@@ -38,7 +38,7 @@ public abstract class Consumer<T> extends Thread {
 
     @Override
     public void run() {
-        log.info("Consumer start-----");
+        log.info("Consumer start");
         try {
             while (true) {
                 T t = queue.take();

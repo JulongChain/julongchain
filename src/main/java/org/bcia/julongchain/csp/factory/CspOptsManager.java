@@ -34,8 +34,27 @@ import java.util.*;
 public class CspOptsManager {
     private static JavaChainLog log = JavaChainLogFactory.getLog(CspOptsManager.class);
 
-    private Map<String, IFactoryOpts> factoryOptsMap = new HashMap<>();
-    private List<IFactoryOpts> factoryOptsList = new ArrayList<>();
+    private  Map<String, IFactoryOpts> factoryOptsMap = new HashMap<>();
+    private  List<IFactoryOpts> factoryOptsList = new ArrayList<>();
+
+    private String defaultOpts;
+
+    private static CspOptsManager instance;
+
+    private CspOptsManager() {
+    }
+
+    public static CspOptsManager getInstance() {
+        if (instance == null) {
+            synchronized (CspOptsManager.class) {
+                if (instance == null) {
+                    instance = new CspOptsManager();
+                }
+            }
+        }
+
+        return instance;
+    }
 
     public void addFactoryOpts(String name, Map<String, String> optionMap) throws ValidateException {
         IFactoryOpts factoryOpts = null;
@@ -58,7 +77,9 @@ public class CspOptsManager {
         factoryOptsList.add(factoryOpts);
     }
 
-    public void addAll(Map<String, Map<String, String>> optionsMap) {
+    public void addAll(String defaultOpts, Map<String, Map<String, String>> optionsMap) {
+        this.defaultOpts = defaultOpts;
+
         if (optionsMap != null && optionsMap.size() > 0) {
             Iterator<Map.Entry<String, Map<String, String>>> iterator = optionsMap.entrySet().iterator();
             while (iterator.hasNext()) {
@@ -70,6 +91,14 @@ public class CspOptsManager {
                 }
             }
         }
+    }
+
+    public String getDefaultOpts() {
+        return defaultOpts;
+    }
+
+    public IFactoryOpts getDefaultFactoryOpts() {
+        return factoryOptsMap.get(defaultOpts);
     }
 
     public IFactoryOpts getFactoryOpts(String providerName) {

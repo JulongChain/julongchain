@@ -25,6 +25,7 @@ import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
 import org.bcia.julongchain.consenter.common.server.IHandler;
 import org.bcia.julongchain.consenter.consensus.singleton.Singleton;
 import org.bcia.julongchain.consenter.entity.ConfigMsg;
+import org.bcia.julongchain.consenter.entity.Message;
 import org.bcia.julongchain.consenter.util.Constant;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
@@ -49,9 +50,6 @@ public class BroadCastHandler implements IHandler {
 
     @Override
     public void handle(Common.Envelope envelope, StreamObserver<Ab.BroadcastResponse> responseObserver) throws IOException {
-
-        // Common.Payload payload = Common.Payload.parseFrom(envelope.getPayload());
-        //  Common.GroupHeader groupHeader = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
         if (Constant.SINGLETON.equals(GenesisConfigFactory.getGenesisConfig().getConsenter().getConsenterType())) {
             Common.GroupHeader groupHeader = null;
             ChainSupport chainSupport = null;
@@ -70,13 +68,14 @@ public class BroadCastHandler implements IHandler {
                 log.warn(String.format("[channel: %s] Rejecting broadcast of message from %s with SERVICE_UNAVAILABLE: rejected by Consenter: %s", groupHeader.getGroupId()));
                 responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatus(Common.Status.SERVICE_UNAVAILABLE).build());
             }
-            if (!isConfig) { //普通消息
-             //   log.debug(String.format("[channel: %s] Broadcast is processing normal message from %s with txid '%s' of type %s", groupHeader.getGroupId(), groupHeader.getTxId(), groupHeader.getType()));
+            if (!isConfig) {
+                //普通消息
+//                log.debug(String.format("[channel: %s] Broadcast is processing normal message from %s with txid '%s' of type %s", groupHeader.getGroupId(), groupHeader.getTxId(), groupHeader.getType()));
                 long configSeq = 0;
                 try {
                     configSeq=  chainSupport.getProcessor().processNormalMsg(envelope);
                 } catch (InvalidProtocolBufferException e) {
-                    log.warn(String.format("[channel: %s] Rejecting broadcast of normal message from %s because of error: %s", groupHeader.getGroupId()));
+                   // log.warn(String.format("[channel: %s] Rejecting broadcast of normal message from %s because of error: %s", groupHeader.getGroupId()));
                     responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setInfo(e.getMessage()).build());
                 }
                 //
@@ -89,7 +88,8 @@ public class BroadCastHandler implements IHandler {
                     responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatus(Common.Status.SERVICE_UNAVAILABLE).build());
                 }
                 responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatus(Common.Status.SUCCESS).build());
-            }else { //配置消息
+            }else {
+                //配置消息
                 ConfigMsg  configMsg = null;
                 try {
                     log.info("process the configMsg");
@@ -99,12 +99,13 @@ public class BroadCastHandler implements IHandler {
                 } catch (ValidateException e) {
                     log.error(e.getMessage());
                 }
-                chainSupport.getChain().configure(configMsg.getConfig(),configMsg.getConfigSeq());
-                Singleton  singleton = Singleton.getInstance(chainSupport);
+                Singleton singleton = null;
+                singleton = Singleton.getInstance(chainSupport);
+                singleton.configure(configMsg.getConfig(),configMsg.getConfigSeq());
                 try {
                     singleton.pushToQueue(singleton.getConfigMessage());
                 } catch (ValidateException e) {
-                    e.printStackTrace();
+                   throw new IOException(e.getMessage());
                 }
 
                 responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatus(Common.Status.SUCCESS).build());

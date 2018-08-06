@@ -91,6 +91,7 @@ public class NodeGrpcServer {
                 .addService(new EndorserServerImpl())
                 .addService(new SmartContractSupportService())
                 .addService(new AdminServerImpl())
+                .addService(new DeliverServerImpl())
                 .build()
                 .start();
         log.info("NodeGrpcServer start, port: " + port);
@@ -100,7 +101,7 @@ public class NodeGrpcServer {
             public void run() {
                 log.info("shutting down NodeGrpcServer since JVM is shutting down");
                 NodeGrpcServer.this.stop();
-                log.error("NodeGrpcServer shut down");
+                log.info("NodeGrpcServer shut down");
             }
         });
     }

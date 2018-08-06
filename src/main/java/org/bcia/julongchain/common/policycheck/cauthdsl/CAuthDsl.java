@@ -48,7 +48,7 @@ public class CAuthDsl {
      * @return
      */
     public static List<SignedData> deduplicate(List<SignedData> signedDatas, IIdentityDeserializer deserializer) throws PolicyException {
-        Map<String,Object> ids = new HashMap<String,Object>();
+        Map<String,Object> ids = new HashMap<String,Object>(16);
         List<SignedData> result = new ArrayList<SignedData>();
         for(int i=0;i<signedDatas.size();i++){
             Identity identity = null;
@@ -58,7 +58,7 @@ public class CAuthDsl {
                 String msg=String.format("Principal deserialization failure  %s for [%s]",e.getMessage(),signedDatas.get(i).getIdentity());
                 throw new PolicyException(msg);
             }
-            String key = identity.identityIdentifier.getMspid()+identity.identityIdentifier.getId();
+            String key = identity.getIdentityIdentifier().getMspid()+identity.getIdentityIdentifier().getId();
             if(ids.get(key) != null){
                 log.warn("De-duplicating identity [%s] at index [%s] in signature set",signedDatas.get(i).getIdentity(),i);
             }else{

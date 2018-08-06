@@ -25,6 +25,8 @@ import org.bcia.julongchain.common.tools.cryptogen.cmd.HelpCmd;
 import org.bcia.julongchain.common.tools.cryptogen.cmd.ICryptoGenCmd;
 
 /**
+ * 辅助工具主入口
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/3
  * @company Excelsecu

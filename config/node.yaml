@@ -74,7 +74,7 @@ node:
     # By default, it will listen on all network interfaces
     listenAddress: 0.0.0.0:7051
 
-    consenterAddress: 192.168.1.158:7050
+    consenterAddress: 0.0.0.0:7050
 
     # The endpoint this node uses to listen for inbound smartContract connections.
     # If this is commented-out, the listen address is selected to be
@@ -132,7 +132,7 @@ node:
     gossip:
 
         commiterAddress: 127.0.0.1:7060
-        consenterAddress: 127.0.0.1:7070
+        consenterAddress: 127.0.0.1:7050
 
         # Bootstrap set to initialize gossip with.
         # This is a list of other nodes that this node reaches out to at startup.
@@ -398,8 +398,8 @@ vm:
     # unix:///var/run/docker.sock
     # http://localhost:2375
     # https://localhost:2376
-    # endpoint: unix:///var/run/docker.sock
-    endpoint: tcp://0.0.0.0:2375
+    endpoint: unix:///var/run/docker.sock
+    #endpoint: tcp://0.0.0.0:2375
 
     # settings for docker vms
     docker:
@@ -442,8 +442,10 @@ vm:
 smartContract:
 
     instantiatePath: /var/julongchain/production/instantiate_temp
+    dockerFile: /root/julongchain/smartcontract/Dockerfile.in
 
     coreNodeAddress: 172.17.0.1
+    coreNodeAddressPort: 7051
 
     # The id is used by the SmartContract stub to register the executing SmartContract
     # ID with the Node and is generally supplied through ENV variables

@@ -32,6 +32,7 @@ import org.bcia.julongchain.protos.node.Configuration;
 import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfigFactory;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -52,6 +53,8 @@ public class ConfigtxHelper {
         Configtx.ConfigTree groupTree = ConfigTreeHelper.buildGroupTree(profile);
         try {
             Common.Block genesisBlock = new GenesisBlockFactory(groupTree).getGenesisBlock(groupId);
+
+            org.apache.commons.io.FileUtils.forceMkdirParent(new File(outputBlock));
             FileUtils.writeFileBytes(outputBlock, genesisBlock.toByteArray());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -65,6 +68,8 @@ public class ConfigtxHelper {
         ValidateUtils.isNotNull(profile, "profile can not be null");
         try {
             Common.Envelope envelope = EnvelopeHelper.makeGroupCreateTx(groupId, null, null, profile);
+
+            org.apache.commons.io.FileUtils.forceMkdirParent(new File(outputGroupCreateTx));
             FileUtils.writeFileBytes(outputGroupCreateTx, envelope.toByteArray());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -99,6 +104,7 @@ public class ConfigtxHelper {
         Common.Envelope envelope = EnvelopeHelper.buildSignedEnvelope(Common.HeaderType.CONFIG_UPDATE_VALUE, 0,
                 groupId, null, configUpdateEnvelope, 0);
         try {
+            org.apache.commons.io.FileUtils.forceMkdirParent(new File(outputAnchorNodesUpdate));
             FileUtils.writeFileBytes(outputAnchorNodesUpdate, envelope.toByteArray());
         } catch (IOException e) {
             log.error(e.getMessage(), e);

@@ -18,6 +18,7 @@ package org.bcia.julongchain.core.common.validation;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.exception.VerifyException;
 import org.bcia.julongchain.common.groupconfig.capability.IApplicationCapabilities;
@@ -164,7 +165,7 @@ public class MsgValidation {
      * @throws ValidateException
      */
     public static void checkSignature(byte[] signature, byte[] message, byte[] creator, String groupId) throws
-            ValidateException, VerifyException {
+            ValidateException, VerifyException, MspException {
         if (ArrayUtils.isEmpty(signature) || ArrayUtils.isEmpty(message) || ArrayUtils.isEmpty(creator)) {
             throw new ValidateException("Missing arguments");
         }

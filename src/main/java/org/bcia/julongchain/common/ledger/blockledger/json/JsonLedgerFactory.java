@@ -40,7 +40,7 @@ public class JsonLedgerFactory implements IFactory {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(JsonLedgerFactory.class);
 
     private String directory;
-    private Map<String, ReadWriteBase> ledgers;
+    private static Map<String, ReadWriteBase> ledgers;
 
     public JsonLedgerFactory(){}
 
@@ -53,7 +53,9 @@ public class JsonLedgerFactory implements IFactory {
         }
         //初始化
         this.directory = directory;
-        this.ledgers = new HashMap<>();
+		if (ledgers == null) {
+			ledgers = new HashMap<>();
+		}
 
         File[] infos = file.listFiles();
         if (infos != null) {
@@ -125,7 +127,7 @@ public class JsonLedgerFactory implements IFactory {
         return ledgers;
     }
 
-    public void setLedgers(Map<String, ReadWriteBase> ledgers) {
-        this.ledgers = ledgers;
-    }
+	public static void setLedgers(Map<String, ReadWriteBase> ledgers) {
+		JsonLedgerFactory.ledgers = ledgers;
+	}
 }

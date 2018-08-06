@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.csp.gm.sdt.util;
 
-import org.bcia.julongchain.csp.gm.sdt.SM3.SM3;
-import org.bcia.julongchain.csp.gm.sdt.SM4.SM4;
+import org.bcia.julongchain.csp.gm.sdt.sm3.SM3;
+import org.bcia.julongchain.csp.gm.sdt.sm4.SM4;
 import org.bcia.julongchain.csp.gm.sdt.common.Constants;
 import org.bcia.julongchain.csp.gm.sdt.random.GmRandom;
 import org.bcia.julongchain.csp.intfs.IKey;
@@ -39,23 +39,26 @@ public class KeysStore {
     /**
      * 公钥文件后缀
      */
-    private final static String SUFFIX_PK = "_pk";
+    public final static String SUFFIX_PK = "_pk";
     /**
      * 私钥文件后缀
      */
-    private final static String SUFFIX_SK = "_sk";
+    public final static String SUFFIX_SK = "_sk";
     /**
      * 密钥文件后缀
      */
-    private final static String SUFFIX_KEY = "_key";
+    public final static String SUFFIX_KEY = "_key";
 
+    /**
+     * 密钥类型定义
+     */
     public final static int KEY_TYPE_KEY = 0;
     public final static int KEY_TYPE_SK = 1;
     public final static int KEY_TYPE_PK = 2;
 
-    private static SM3 sm3 = new SM3();
-    private static SM4 sm4 = new SM4();
-    private static GmRandom gmRandom = new GmRandom();
+    private SM3 sm3;
+    private SM4 sm4;
+    private GmRandom gmRandom;
 
     public KeysStore() {
         this.sm3 = new SM3();
@@ -63,18 +66,30 @@ public class KeysStore {
         this.gmRandom = new GmRandom();
     }
 
-    public static void storeKey(String path, byte[] pwd, IKey key, int keyType) {
+    /**
+     * 存储密钥数据
+     * @param path 存储路径
+     * @param pwd 口令
+     * @param key 密钥数据对象
+     * @param keyType 密钥类型
+     */
+    public void storeKey(String path, byte[] pwd, IKey key, int keyType) {
         try {
             String fileName = getFileNameByType(key.ski(), keyType);
             String pemObjectType = getPemObjectByType(keyType);
 
             String fullPath = fileName;
+            //检查存储路径是否存在，如果不存在则创建
             if(null != path && !"".equals(path)) {
                 File dir = new File(path);
                 if(!dir.exists()) {
                     dir.mkdirs();
                 }
-                fullPath = path + File.separator + fullPath;
+                if(path.endsWith("/")) {
+                    fullPath = path + fullPath;
+                } else {
+                    fullPath = path + File.separator + fullPath;
+                }
             }
 
             PemObject pemObject = null;
@@ -108,15 +123,28 @@ public class KeysStore {
         }
     }
 
-    public static byte[] loadKey(String path, byte[] pwd, byte[] ski, int keyType) {
+    /**
+     * 读取密钥数据
+     * @param path 存储路径
+     * @param pwd 口令
+     * @param ski 密钥标识
+     * @param keyType 密钥类型
+     * @return
+     */
+    public byte[] loadKey(String path, byte[] pwd, byte[] ski, int keyType) {
         if(null == ski || 0 == ski.length) {
             return null;
         }
         String fileName = getFileNameByType(ski, keyType);
         String fullPath = fileName;
         if(null != path && !"".equals(path)) {
-            fullPath = path + File.separator +fullPath;
+            if(path.endsWith("/")) {
+                fullPath = path + fullPath;
+            } else {
+                fullPath = path + File.separator + fullPath;
+            }
         }
+        //检查文件是否存在
         File inFile = new File(fullPath);
         if(!inFile.exists()) {
             return null;
@@ -154,7 +182,13 @@ public class KeysStore {
         return null;
     }
 
-    private static byte[] deriveKey(byte[] pwd, byte[] iv) {
+    /**
+     * 获取加密密钥
+     * @param pwd 口令
+     * @param iv 初始向量
+     * @return 加密密钥
+     */
+    private byte[] deriveKey(byte[] pwd, byte[] iv) {
         try {
             byte[] pwdBuf = new byte[pwd.length+8];
             System.arraycopy(pwd, 0, pwdBuf, 0, pwd.length);
@@ -169,7 +203,13 @@ public class KeysStore {
         return null;
     }
 
-    private static String getFileNameByType(byte[] ski, int keyType) {
+    /**
+     * 根据密钥标识和类型获取文件名
+     * @param ski 密钥标识
+     * @param keyType 密钥类型
+     * @return 文件名
+     */
+    private String getFileNameByType(byte[] ski, int keyType) {
         String fileName = Hex.toHexString(ski);
         switch (keyType) {
             case KEY_TYPE_KEY:
@@ -193,7 +233,12 @@ public class KeysStore {
         return fileName;
     }
 
-    private static String getPemObjectByType(int keyType) {
+    /**
+     * 根据密钥类型获取PEM对象名
+     * @param keyType 密钥类型
+     * @return PEM对象名
+     */
+    private String getPemObjectByType(int keyType) {
         String pemObjectType = "";
         switch (keyType) {
             case KEY_TYPE_KEY:

@@ -27,5 +27,4 @@ import javax.naming.Context;
 public interface ISCSupport {
 
     void handleSmartContractStream(Context context, ISmartContractStream smartContractStream);
-
 }

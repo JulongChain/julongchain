@@ -37,12 +37,18 @@ import java.util.List;
 import static org.bcia.julongchain.common.tools.cryptogen.cmd.Util.*;
 
 /**
+ * extend 命令实现类
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/4
  * @company Excelsecu
  */
 public class ExtendCmd implements ICryptoGenCmd {
     private static JavaChainLog log = JavaChainLogFactory.getLog(ExtendCmd.class);
+    private static final String CMD_EXTEND = "extend";
+    private static final String CMD_ARG_INPUT = "input";
+    private static final String CMD_ARG_CONFIG = "config";
+    private static final String CMD_ARG_HELP = "help";
 
     //the value of "input" commandline option
     private String inputDir;
@@ -54,29 +60,29 @@ public class ExtendCmd implements ICryptoGenCmd {
     public void execCmd(String[] args) throws JavaChainException {
         Options options = new Options();
         options.addOption(Option.builder()
-                .longOpt("input")
+                .longOpt(CMD_ARG_INPUT)
                 .desc("The input directory in which existing network place, default \"crypto-config\"")
                 .hasArg()
                 .argName("crypto-config")
                 .build());
         options.addOption(Option.builder()
-                .longOpt("config")
+                .longOpt(CMD_ARG_CONFIG)
                 .desc("The configuration template to use, default using \"cryptogen template\"")
                 .hasArg()
                 .argName("file name")
                 .build());
-        options.addOption(null, "help", false, "Print this message");
+        options.addOption(null, CMD_ARG_HELP, false, "Print this message");
 
         CommandLineParser parser = new DefaultParser();
         try {
             CommandLine commandLine = parser.parse(options, args);
-            if (commandLine.hasOption("help")) {
+            if (commandLine.hasOption(CMD_ARG_HELP)) {
                 HelpFormatter helpFormatter = new HelpFormatter();
-                helpFormatter.printHelp("extend", options);
+                helpFormatter.printHelp(CMD_EXTEND, options);
                 return;
             }
-            inputDir = commandLine.getOptionValue("input", "crypto-config");
-            configFile = commandLine.getOptionValue("config", null);
+            inputDir = commandLine.getOptionValue(CMD_ARG_INPUT, "crypto-config");
+            configFile = commandLine.getOptionValue(CMD_ARG_CONFIG, null);
             extend();
         } catch (ParseException e) {
             throw new JavaChainException(e.getMessage());
@@ -86,7 +92,7 @@ public class ExtendCmd implements ICryptoGenCmd {
     private void extendConsenterOrg(OrgSpec orgSpec) throws JavaChainException {
         String orgName = orgSpec.getDomain();
         String orgDir = Paths.get(inputDir, "consenterOrganizations", orgName).toString();
-        String peersDir = Paths.get(orgDir, "consenters").toString();
+        String nodesDir = Paths.get(orgDir, "consenters").toString();
         String usersDir = Paths.get(orgDir, "users").toString();
         String caDir = Paths.get(orgDir, "ca").toString();
         String tlscaDir = Paths.get(orgDir, "tlsca").toString();
@@ -99,25 +105,25 @@ public class ExtendCmd implements ICryptoGenCmd {
         CaHelper signCA = getCA(caDir, orgSpec, orgSpec.getCa().getCommonName());
         CaHelper tlsCA = getCA(tlscaDir, orgSpec, "tls" + orgSpec.getCa().getCommonName());
 
-        generateNodes(peersDir, orgSpec.getSpecs(), signCA, tlsCA, MspHelper.PEER, orgSpec.isEnableNodeOUs());
+        generateNodes(nodesDir, orgSpec.getSpecs(), signCA, tlsCA, MspHelper.NODE, orgSpec.isEnableNodeOUs());
 
         NodeSpec adminUser = new NodeSpec();
         adminUser.setCommonName(ADMIN_BASE_NAME + "@" + orgName);
 
-        copyAllAdminCerts(usersDir, peersDir, orgName, orgSpec, adminUser);
+        copyAllAdminCerts(usersDir, nodesDir, orgName, orgSpec, adminUser);
     }
 
-    private void extendPeerOrg(OrgSpec orgSpec) throws JavaChainException {
+    private void extendNodeOrg(OrgSpec orgSpec) throws JavaChainException {
         String orgName = orgSpec.getDomain();
-        String orgDir = Paths.get(inputDir, "peerOrganizations", orgName).toString();
+        String orgDir = Paths.get(inputDir, "nodeOrganizations", orgName).toString();
 
         File file = new File(orgDir);
         if (!file.exists()) {
-            generatePeerOrg(inputDir, orgSpec);
+            generateNodeOrg(inputDir, orgSpec);
             return;
         }
 
-        String peersDir = Paths.get(orgDir, "peers").toString();
+        String nodesDir = Paths.get(orgDir, "nodes").toString();
         String usersDir = Paths.get(orgDir, "users").toString();
         String caDir = Paths.get(orgDir, "ca").toString();
         String tlscaDir = Paths.get(orgDir, "tlsca").toString();
@@ -126,12 +132,12 @@ public class ExtendCmd implements ICryptoGenCmd {
         CaHelper signCA = getCA(caDir, orgSpec, orgSpec.getCa().getCommonName());
         CaHelper tlsCA = getCA(tlscaDir, orgSpec, "tls" + orgSpec.getCa().getCommonName());
 
-        generateNodes(peersDir, orgSpec.getSpecs(), signCA, tlsCA, MspHelper.PEER, orgSpec.isEnableNodeOUs());
+        generateNodes(nodesDir, orgSpec.getSpecs(), signCA, tlsCA, MspHelper.NODE, orgSpec.isEnableNodeOUs());
 
         NodeSpec adminUser = new NodeSpec();
         adminUser.setCommonName(ADMIN_BASE_NAME + "@" + orgName);
 
-        copyAllAdminCerts(usersDir, peersDir, orgName, orgSpec, adminUser);
+        copyAllAdminCerts(usersDir, nodesDir, orgName, orgSpec, adminUser);
         List<NodeSpec> users = new ArrayList<>();
 
         int userCount = orgSpec.getUsers().getCount();
@@ -165,14 +171,14 @@ public class ExtendCmd implements ICryptoGenCmd {
         // TODO fallback when failed
         Config config = Util.loadAs(configFile, Config.class);
 
-        for (OrgSpec orgSpec : config.getPeerOrgs()) {
+        for (OrgSpec orgSpec : config.getNodeOrgs()) {
             try {
-                renderOrgSpec(orgSpec, "peer");
+                renderOrgSpec(orgSpec, "node");
             } catch (JavaChainException e) {
-                log.error("Error processing peer configuration: " + e.getMessage());
+                log.error("Error processing node configuration: " + e.getMessage());
                 System.exit(-1);
             }
-            extendPeerOrg(orgSpec);
+            extendNodeOrg(orgSpec);
         }
         for (OrgSpec orgSpec : config.getConsenterOrgs()) {
             try {

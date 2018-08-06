@@ -155,6 +155,7 @@ public class DeliverHandler implements IHandler {
                         log.warn(String.format("[channel: %s] Received invalid seekInfo message from %s: start number %d greater than stop number %d", chdr.getGroupId(), number, stopNumber));
                         sendStatusReply(server, Common.Status.BAD_REQUEST);
                     }
+                    default:
             }
             {
                 if (seekInfo.getBehavior() == Ab.SeekInfo.SeekBehavior.FAIL_IF_NOT_READY) {

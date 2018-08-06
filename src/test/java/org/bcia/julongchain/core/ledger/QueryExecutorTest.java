@@ -52,10 +52,8 @@ public class QueryExecutorTest {
 
     @Test
     public void testGetState() throws Exception{
-		for (int i = 0; i < 6; i++) {
-			System.out.println(new String(queryExecutor.getState(ns, "key" + i)));
-			Assert.assertTrue(Arrays.equals(queryExecutor.getState(ns, "key" + i), ("pub value" + i).getBytes()));
-		}
+		byte[] as = queryExecutor.getState(ns, "a");
+		System.out.println(new String(as));
 	}
 
     @Test

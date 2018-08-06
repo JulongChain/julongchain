@@ -8,7 +8,7 @@
         <!--输出格式-->
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern"
-                   value="%-d{MM-dd HH:mm:ss,SSS} [%c{1}]-[%p] %m%n"/>
+                   value="%-d{MM-dd HH:mm:ss,SSS} [%c{1}][%p] %m%n"/>
         </layout>
     </appender>
 
@@ -18,7 +18,7 @@
         <param name="Append" value="true"/><!--是否选择追加-->
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern"
-                   value="%-d{yyyy-MM-dd HH:mm:ss,SSS} [%c]-[%p] %m%n"/>
+                   value="%-d{yyyy-MM-dd HH:mm:ss,SSS} [%c][%p] %m%n"/>
         </layout>
     </appender>
 
@@ -48,12 +48,11 @@
     <!-- 根logger的设置-->
     <root>
         <!--优先级设置，假设设置为“info”，则无法输出debug级别的日志-->
-        <!--<priority value="info"/>-->
-        <!--<priority value="info"/>-->
+        <priority value="info"/>
+        <!--<priority value="debug"/>-->
         <!--<priority value="warn"/>-->
         <!--<priority value="error"/>-->
         <!--<priority value="fatal"/>-->
-        <priority value="info"/>
         <!--添加刚才设置的appender-->
         <appender-ref ref="myConsole"/>
         <appender-ref ref="myFile"/>

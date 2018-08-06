@@ -144,14 +144,14 @@ public class Node {
         log.info("Node Command Start");
 
         if (args.length <= 0) {
-            log.warn("Node command need more args-----");
+            log.warn("Node command need more args");
             return null;
         }
 
         int cmdWordCount;//记录命令单词数量
         String command = args[0];
         if (args.length == 1 && !NodeConstant.VERSION.equalsIgnoreCase(command)) {
-            log.warn("Node " + command + " need more args-----");
+            log.warn("Node " + command + " need more args");
             return null;
         } else if (args.length == 1 && NodeConstant.VERSION.equalsIgnoreCase(command)) {
             //只有version命令只有一个单词，其余都是"命令+子命令"的形式,如"node server start"
@@ -180,7 +180,7 @@ public class Node {
      * 初始化
      */
     private void init() throws NodeException {
-        log.info("Node init-----");
+        log.info("Node init");
 
         try {
             //初始化本地Msp
@@ -211,7 +211,7 @@ public class Node {
             List<String> ledgerIDs = LedgerManager.getLedgerIDs();
             if (ledgerIDs != null && ledgerIDs.size() > 0) {
                 for (String ledgerId : ledgerIDs) {
-                    log.info("ledgerId-----$" + ledgerId);
+                    log.info("LedgerId: " + ledgerId);
 
                     try {
                         INodeLedger nodeLedger = LedgerManager.openLedger(ledgerId);
@@ -220,7 +220,7 @@ public class Node {
 
                         Group group = createGroup(ledgerId, nodeLedger, configBlock);
                         groupMap.put(ledgerId, group);
-                        log.info("group-----$" + ledgerId);
+                        log.info("Group: " + ledgerId);
 
                         if (callback != null) {
                             callback.onGroupInitialized(ledgerId);

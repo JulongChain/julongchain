@@ -20,7 +20,7 @@ import org.bcia.julongchain.csp.gm.sdt.jni.SMJniApi;
 import org.junit.Test;
 
 /**
- * SDTSMJNI接口单元测试
+ * SMJniApi 产生随机数接口单元测试
  *
  * @author tengxiumin
  * @date 2018/05/17
@@ -31,20 +31,20 @@ public class SMJniApiTest {
     private SMJniApi jni = new SMJniApi();
 
     @Test
-    public void testJniRandomGen() {
-        System.out.println("============= SMJniApi RandomGen test =============");
+    public void testRandomGen() {
+        System.out.println("============= SMJniApi randomGen test =============");
         int[] randomLen = {1, 16, 32, 128, 240, 1024};
-        genRandomUnitTest(randomLen);
+        unitTestGenRandom(randomLen);
     }
 
     @Test
-    public void testJniRandomGenInvalidParams() {
-        System.out.println("============= SMJniApi RandomGen invalid parameters test =============");
+    public void testRandomGenInvalidParams() {
+        System.out.println("============= SMJniApi randomGen invalid parameters test =============");
         int[] randomLen = {-1, 0, 1025};
-        genRandomUnitTest(randomLen);
+        unitTestGenRandom(randomLen);
     }
 
-    private void genRandomUnitTest(int[] lists) {
+    private void unitTestGenRandom(int[] lists) {
         int caseIndex = 1;
         for (int index = 0; index < lists.length; index++) {
             try {
@@ -52,12 +52,12 @@ public class SMJniApiTest {
                 System.out.println("\n**** case " + caseIndex++ + ": generate random length = " + len + "  ****");
                 byte[] random = jni.randomGen(len);
                 if (null != random) {
-                    System.out.println("[output data] random data : " + Convert.bytesToHexString(random));
+                    System.out.println("[ output ] random data : " + Convert.bytesToHexString(random));
                 } else {
-                    System.out.println("[**Error**] generate random data failed");
+                    System.out.println("[** error **] failed generating random data");
                 }
             } catch (Exception e) {
-                System.out.println("[**Exception**] " + e.getMessage());
+                System.out.println("[## exception ##] " + e.getMessage());
             }
         }
     }

@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 package org.bcia.julongchain.consenter.consensus.singleton;
+
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.*;
+import org.bcia.julongchain.common.exception.ConsenterException;
+import org.bcia.julongchain.common.exception.LedgerException;
+import org.bcia.julongchain.common.exception.PolicyException;
+import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.common.util.producer.Consumer;
 import org.bcia.julongchain.common.util.producer.Producer;
-import org.bcia.julongchain.consenter.common.cmd.impl.StartCmd;
 import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
 import org.bcia.julongchain.consenter.consensus.IChain;
 import org.bcia.julongchain.consenter.consensus.IConsensusPlugin;
 import org.bcia.julongchain.consenter.entity.BatchesMes;
 import org.bcia.julongchain.consenter.entity.Message;
-import org.bcia.julongchain.gossip.GossipServiceUtil;
+import org.bcia.julongchain.gossip.GossipService;
 import org.bcia.julongchain.protos.common.Common;
 
 import java.util.concurrent.BlockingQueue;
@@ -54,7 +57,7 @@ public class Singleton implements IChain, IConsensusPlugin {
         }else {
            support=consenterSupport;
         }
-        return instance;
+         return instance;
     }
 
     @Override
@@ -67,7 +70,7 @@ public class Singleton implements IChain, IConsensusPlugin {
     @Override
     public void configure(Common.Envelope config, long configSeq) {
         Message message = new Message(configSeq, config);
-        configMessage = message;
+        this.configMessage = message;
     }
 
     @Override
@@ -96,7 +99,7 @@ public class Singleton implements IChain, IConsensusPlugin {
 
 
     public Singleton(ChainSupport consenterSupport) {
-       support = consenterSupport;
+        support = consenterSupport;
         instance = this;
         blockingQueue = new LinkedBlockingQueue<>();
         producer = new Producer<Message>(blockingQueue);
@@ -140,11 +143,6 @@ public class Singleton implements IChain, IConsensusPlugin {
                 for (Common.Envelope[] env : batches) {
                     Common.Block block = support.createNextBlock(env);
                     support.writeBlock(block, null);
-                    try {
-                        GossipServiceUtil.addData(StartCmd.getGossipService(),support.getGroupId(),block.getHeader().getNumber(),block);
-                    } catch (GossipException e) {
-                        e.printStackTrace();
-                    }
                 }
                 if (batches.length > 0) {
                     timer = 0;
@@ -187,11 +185,6 @@ public class Singleton implements IChain, IConsensusPlugin {
             log.debug("Batch timer expired, creating block");
             Common.Block block = support.createNextBlock(batch);
             support.writeBlock(block, null);
-            try {
-                GossipServiceUtil.addData(StartCmd.getGossipService(),support.getGroupId(),block.getHeader().getNumber(), block);
-            } catch (GossipException e) {
-                e.printStackTrace();
-            }
         }
 
     }
@@ -202,10 +195,10 @@ public class Singleton implements IChain, IConsensusPlugin {
     }
 
     public Message getNormalMessage() {
-        return normalMessage;
+        return this.normalMessage;
     }
 
     public Message getConfigMessage() {
-        return configMessage;
+        return this.configMessage;
     }
 }

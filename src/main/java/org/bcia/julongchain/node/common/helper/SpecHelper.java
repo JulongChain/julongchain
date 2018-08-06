@@ -92,6 +92,31 @@ public class SpecHelper {
     }
 
     /**
+     * 构造针对scName的执调用规格
+     *
+     * @param scName 要调用的智能合约名称
+     * @param input
+     * @return
+     */
+    public static SmartContractPackage.SmartContractInvocationSpec buildInvocationSpec(String scName,
+                                                                                       SmartContractPackage.SmartContractInput input) {
+        //构造SmartContractSpec对象
+        SmartContractPackage.SmartContractSpec.Builder specBuilder = SmartContractPackage.SmartContractSpec.newBuilder();
+        specBuilder.setType(SmartContractPackage.SmartContractSpec.Type.JAVA);
+        specBuilder.setSmartContractId(SmartContractPackage.SmartContractID.newBuilder().setName(scName));
+        if (input != null) {
+            specBuilder.setInput(input);
+        }
+        SmartContractPackage.SmartContractSpec spec = specBuilder.build();
+
+        //构造SmartContractInvocationSpec对象
+        SmartContractPackage.SmartContractInvocationSpec.Builder invocationSpecBuilder = SmartContractPackage.SmartContractInvocationSpec
+                .newBuilder();
+        invocationSpecBuilder.setSmartContractSpec(spec);
+        return invocationSpecBuilder.build();
+    }
+
+    /**
      * 构造针对scName的部署规格
      *
      * @param scName
@@ -100,8 +125,8 @@ public class SpecHelper {
      * @return
      */
     public static SmartContractPackage.SmartContractDeploymentSpec buildDeploymentSpec(String scName, String scVersion,
-                                                                                String scPath, SmartContractPackage
-                                                                                        .SmartContractInput input)
+                                                                                       String scPath, SmartContractPackage
+                                                                                               .SmartContractInput input)
             throws NodeException {
         //构造SmartContractID对象
         SmartContractPackage.SmartContractID.Builder scIdBuilder = SmartContractPackage.SmartContractID.newBuilder();

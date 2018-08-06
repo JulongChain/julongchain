@@ -64,7 +64,7 @@ public class BroadcastClient implements IBroadcastClient {
 
     @Override
     public void close() {
-        log.info("BroadcastClient close-----");
+        log.info("BroadcastClient close");
 
         managedChannel.shutdown();
 //        try {

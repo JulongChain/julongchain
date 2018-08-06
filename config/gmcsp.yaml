@@ -10,14 +10,10 @@ node:
             sign: SM2
             hash: SM3
             asymmetric: SM2
-            security: 256
             # Location of Key Store
                 # If "", defaults to 'mspConfigPath'/keystore
                 # TODO: Ensure this is read with fabric/core/config.GetPath() once ready
-            #publicKeyStore: D:\msp\keystore\publickey.pem
-            publicKeyStore: msp/keystore/publickey.pem
-                #publicKeyStore: /opt/msp/keystore/publickey.pem
-            privateKeyStore: msp/keystore/privatekey.pem
+            KeyStore: msp/keystore/
           sdtgm:
                       # TODO: The default Hash and Security level needs refactoring to be
                       # fully configurable. Changing these defaults requires coordination

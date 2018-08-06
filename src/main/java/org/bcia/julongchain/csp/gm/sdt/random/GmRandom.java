@@ -29,22 +29,22 @@ import org.bcia.julongchain.csp.gm.sdt.jni.SMJniApi;
  */
 public class GmRandom {
 
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(GmRandom.class);
-    private static final SMJniApi smJniApi = new SMJniApi();
+    private static JavaChainLog logger = JavaChainLogFactory.getLog(GmRandom.class);
+    private static SMJniApi smJniApi = new SMJniApi();
 
-    public byte[] rng(int len) throws JavaChainException{
-
-        //判断随机数长度是否为非负整数
-        if(len <= 0) {
-            logger.error("SM RandomGen error: the length must be bigger than 0.");
-            throw new JavaChainException("SM RandomGen error: the length must be bigger than 0.");
-        }
+    /**
+     * 产生随机数
+     * @param length 随机数长度
+     * @return 随机数
+     * @throws JavaChainException
+     */
+    public byte[] rng(int length) throws JavaChainException{
         byte[] result = null;
         try {
-            result = smJniApi.randomGen(len);
+            result = smJniApi.randomGen(length);
         } catch (Exception e) {
-            logger.error("SM RandomGen error: generate random failed");
-            throw new JavaChainException("SM RandomGen error: generate random failed");
+            logger.error(e.getMessage());
+            throw new JavaChainException(e.getMessage());
         }
         return result;
     }

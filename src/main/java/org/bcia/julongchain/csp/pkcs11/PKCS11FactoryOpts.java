@@ -30,7 +30,7 @@ import java.util.Map;
 /**
  * Class description
  *
- * @author
+ * @author Ying Xu
  * @date 4/19/18
  * @company FEITIAN
  */
@@ -46,6 +46,9 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
     private char[] pin;
 
     private String path;
+
+
+    PKCS11CspLog csplog = new PKCS11CspLog();
 
 
     public PKCS11FactoryOpts(PKCS11Config pkcsConf) {
@@ -84,6 +87,7 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
             {
                 String str=null;
                 str=String.format("[JC_PKCS]:Could not find token with label %s and serialNumber %s", pkcslib.getKeyLabel(),pkcslib.getKeySN());
+                csplog.setLogMsg(str, 2, PKCS11FactoryOpts.class);
                 throw new JavaChainException(str);
             }
 
@@ -92,16 +96,18 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
             pin = pkcslib.getKeyPin().toCharArray();
             p11.C_Login(sessionhandle, PKCS11Constants.CKU_USER, pin);
 
-        }catch (IOException/*|KeyStoreException|CertificateException|NoSuchAlgorithmException*/ ex){
+        }catch (IOException ex){
             String err = String.format("[JC_PKCS]:IOException ErrMessage:", ex.getMessage());
+            csplog.setLogMsg(err, 2, PKCS11FactoryOpts.class);
             throw new JavaChainException(err, ex.getCause());
         }catch(PKCS11Exception ex) {
             if(ex.getErrorCode() == PKCS11Constants.CKR_USER_ALREADY_LOGGED_IN)
             {
-                ;
+                csplog.setLogMsg("Already loggin!", 0, PKCS11FactoryOpts.class);
             }else
             {
                 String err = String.format("[JC_PKCS]:PKCS11Exception code: 0x%08x", ex.getErrorCode());
+                csplog.setLogMsg(err, 2, PKCS11FactoryOpts.class);
                 throw new JavaChainException(err, ex.getCause());
             }
         }
@@ -109,6 +115,7 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
 
 
 
+    @Override
     public void optFinalized() throws JavaChainException{
         try {
             p11.C_CloseSession(sessionhandle);
@@ -130,8 +137,8 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
     }
 
     @Override
-    public boolean isDefaultCsp() {
-        return false;
+    public String getKeyStore() {
+        return null;
     }
 
     @Override

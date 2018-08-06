@@ -18,7 +18,7 @@ package org.bcia.julongchain.csp.gm.sdt;
 import java.util.Map;
 
 /**
- * SDT GM algorithm factory options
+ * SDT 国密算法工厂选项
  *
  * @author tengxiumin
  * @date 2018/05/16
@@ -26,19 +26,16 @@ import java.util.Map;
  */
 public class SdtGmFactoryOpts implements ISdtGmFactoryOpts {
 
-    private String symmetricKeyType;
-    private String asymmetricKeyType;
-    private String hashType;
-    private String signType;
-    private String publicKeyPath;
-    private String privateKeyPath;
-    private String keyPath;
+    private String symmetricKeyType;    //对称密钥类型
+    private String asymmetricKeyType;   //非对称密钥类型
+    private String hashType;            //哈希类型
+    private String signType;            //签名类型
+    private String publicKeyPath;       //公钥数据存储路径
+    private String privateKeyPath;      //私钥数据存储路径
+    private String keyPath;             //对称密钥数据存储路径
 
-    private int secLevel;
-    private String hashFamily;
-    private boolean bEphemeral;
-    private String keyStorePath;
-    private boolean bDefaultCsp;
+    private String keyStorePath;        //密钥存储路径
+    private boolean bDefaultCsp;        //默认Csp
 
     public SdtGmFactoryOpts() {
     }
@@ -54,23 +51,40 @@ public class SdtGmFactoryOpts implements ISdtGmFactoryOpts {
         this.publicKeyPath = publicKeyPath;
         this.privateKeyPath = privateKeyPath;
         this.keyPath = keyPath;
+        this.keyStorePath = keyPath;
     }
 
+    /**
+     * 获取密钥服务提供者名称
+     * @return 提供者名称
+     */
     @Override
     public String getProviderName() {
         return PROVIDER_GM_SDT;
     }
 
+    /**
+     * 获取密钥服务提供者描述信息
+     * @return 提供者描述信息
+     */
     @Override
     public String getProviderDescription() {
         return "SM algorithm provided by SDT";
     }
 
+    /**
+     * 获取密钥存储路径
+     * @return 密钥存储路径
+     */
     @Override
-    public boolean isDefaultCsp() {
-        return bDefaultCsp;
+    public String getKeyStore() {
+        return keyStorePath;
     }
 
+    /**
+     * 解析配置信息
+     * @param optMap 配置信息Map
+     */
     @Override
     public void parseFrom(Map<String, String> optMap) {
         this.symmetricKeyType = optMap.get("symmetricKey");
@@ -82,59 +96,102 @@ public class SdtGmFactoryOpts implements ISdtGmFactoryOpts {
         this.keyPath = optMap.get("keyStore");
     }
 
+    /**
+     * 获取安全级别
+     * @return 安全级别
+     */
     @Override
     public int getSecLevel() {
-        return secLevel;
+        return 256;
     }
 
+    /**
+     * 获取哈希函数族
+     * @return
+     */
     @Override
     public String getHashFamily() {
-        return hashFamily;
+        return null;
     }
 
+    /**
+     * 密钥是否为临时存储
+     * @return true/false
+     */
     @Override
     public boolean isEphemeral() {
-        return bEphemeral;
+        return false;
     }
 
+    /**
+     * 获取密钥存储路径
+     * @return 密钥存储路径
+     */
     @Override
     public String getKeyStorePath() {
         return keyStorePath;
     }
 
+    /**
+     * 获取对称密钥类型
+     * @return 对称密钥类型
+     */
     @Override
     public String getSymmetricKeyType() {
         return symmetricKeyType;
     }
 
+    /**
+     * 获取非对称密钥类型
+     * @return 非对称密钥类型
+     */
     @Override
     public String getAsymmetricKeyType() {
         return asymmetricKeyType;
     }
 
+    /**
+     * 获取哈希类型
+     * @return 哈希类型
+     */
     @Override
     public String getHashType() {
         return hashType;
     }
 
+    /**
+     * 获取签名类型
+     * @return 签名类型
+     */
     @Override
     public String getSignType() {
         return signType;
     }
 
+    /**
+     * 获取公钥数据存储路径
+     * @return 公钥数据存储路径
+     */
     @Override
     public String getPublicKeyPath() {
         return publicKeyPath;
     }
 
+    /**
+     * 获取私钥数据存储路径
+     * @return 私钥数据存储路径
+     */
     @Override
     public String getPrivateKeyPath() {
         return privateKeyPath;
     }
 
+    /**
+     * 获取对称密钥数据存储路径
+     * @return 对称密钥数据存储路径
+     */
     @Override
     public String getKeyPath() {
         return keyPath;
     }
-
 }

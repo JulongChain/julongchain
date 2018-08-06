@@ -41,14 +41,16 @@ public class FileLedgerFactory implements IFactory {
     private static final JavaChainLog logger = JavaChainLogFactory.getLog(FileLedgerFactory.class);
 
     private IBlockStoreProvider blkStorageProvider;
-    private Map<String, ReadWriteBase> ledgers;
+    private static Map<String, ReadWriteBase> ledgers;
 
     public FileLedgerFactory(String directory) throws LedgerException {
         IndexConfig indexConfig = new IndexConfig(new String[]{BlockStorage.INDEXABLE_ATTR_BLOCK_NUM});
         LedgerConfig.setRootPath(directory);
         LedgerConfig.setMaxBlockfileSize(-1);
         this.blkStorageProvider = new FsBlockStoreProvider(new Config(directory, -1), indexConfig);
-        ledgers = new HashMap<>();
+		if (ledgers == null) {
+			ledgers = new HashMap<>();
+		}
     }
 
     @Override

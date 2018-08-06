@@ -19,6 +19,7 @@ package org.bcia.julongchain.common.tools.cryptogen;
 import org.apache.commons.io.FileUtils;
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.tools.cryptogen.bean.Configuration;
+import org.bcia.julongchain.common.tools.cryptogen.utils.X509CertificateUtil;
 import org.bcia.julongchain.msp.mgmt.Msp;
 import org.bcia.julongchain.msp.util.MspConfigBuilder;
 import org.bcia.julongchain.protos.msp.MspConfigPackage;
@@ -32,7 +33,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,11 +44,18 @@ import java.util.Objects;
 import static org.junit.Assert.*;
 
 
+/**
+ * MspHelper 测试类
+ *
+ * @author chenhao, liuxifeng
+ * @date 2018/7/12
+ * @company Excelsecu
+ */
 public class MspHelperTest {
 
     private static final String testCAOrg = "example.com";
     private static final String testCAName = "ca" + "." + testCAOrg;
-    private static final String testName = "peer0";
+    private static final String testName = "node0";
     private static final String testCountry = "China";
     private static final String testProvince = "Guangdong";
     private static final String testLocality = "ShenZhen";
@@ -87,8 +94,8 @@ public class MspHelperTest {
         Assert.assertEquals(testLocality, X509CertificateUtil.getSubject(subjectDN).getLocality().get(0));
         Assert.assertEquals(testOrganizationUnit, X509CertificateUtil.getSubject(subjectDN).getOrganizationalUnit().get(0));
         Assert.assertEquals(testStreetAddress, X509CertificateUtil.getSubject(subjectDN).getStreetAddress().get(0));
-        // generate local MSP for nodeType=PEER
-        MspHelper.generateLocalMSP(testDir, testName, null, signCA, tlsCA, MspHelper.PEER, true);
+        // generate local MSP for nodeType=NODE
+        MspHelper.generateLocalMSP(testDir, testName, null, signCA, tlsCA, MspHelper.NODE, true);
         // check to see that the right files were generated/saved
         List<String> mspFiles = new ArrayList<>();
         mspFiles.add(Paths.get(mspDir, "admincerts", testName + "-cert.pem").toString());
@@ -124,7 +131,7 @@ public class MspHelperTest {
     }
 
     @Test
-    public void generateVerifyingMSP() throws JavaChainException, IOException {
+    public void generateVerifyingMSP() throws JavaChainException {
         System.out.println("testDir=" + testDir);
 
         String caDir = Paths.get(testDir, "ca").toString();
@@ -198,47 +205,41 @@ public class MspHelperTest {
         assertTrue(configuration.getNodeOUs().getEnable());
         Assert.assertEquals(caFile, configuration.getNodeOUs().getClientOUIdentifier().getCertificate());
         Assert.assertEquals(MspHelper.CLIENT_OU, configuration.getNodeOUs().getClientOUIdentifier().getOrganizationalUnitIdentifier());
-        Assert.assertEquals(caFile, configuration.getNodeOUs().getPeerOUIdentifier().getCertificate());
-        Assert.assertEquals(MspHelper.PEER_OU, configuration.getNodeOUs().getPeerOUIdentifier().getOrganizationalUnitIdentifier());
+        Assert.assertEquals(caFile, configuration.getNodeOUs().getNodeOUIdentifier().getCertificate());
+        Assert.assertEquals(MspHelper.NODE_OU, configuration.getNodeOUs().getNodeOUIdentifier().getOrganizationalUnitIdentifier());
     }
 
     private void setupMspConfig(String mspDir) throws IOException {
-        List<String> caCert = new ArrayList<>();
+        List<byte[]> caCert = new ArrayList<>();
         File caCertFile = new File(Paths.get(mspDir, "cacerts").toString());
         for (File file : Objects.requireNonNull(caCertFile.listFiles())) {
-            caCert.add(FileUtils.readFileToString(file, Charset.forName("UTF-8")));
+            caCert.add(FileUtils.readFileToByteArray(file));
         }
 
-        List<String> adminCert = new ArrayList<>();
+        List<byte[]> adminCert = new ArrayList<>();
         File adminCertFile = new File(Paths.get(mspDir, "admincerts").toString());
         for (File file : Objects.requireNonNull(adminCertFile.listFiles())) {
-            adminCert.add(FileUtils.readFileToString(file, Charset.forName("UTF-8")));
+            adminCert.add(FileUtils.readFileToByteArray(file));
         }
 
-        List<String> keyStore = new ArrayList<>();
-        File keyStoreFile = new File(Paths.get(mspDir, "keystore").toString());
-        for (File file : Objects.requireNonNull(keyStoreFile.listFiles())) {
-            keyStore.add(FileUtils.readFileToString(file, Charset.forName("UTF-8")));
-        }
-
-        List<String> tlsCaCert = new ArrayList<>();
+        List<byte[]> tlsCaCert = new ArrayList<>();
         File tlsCertFile = new File(Paths.get(mspDir, "tlscacerts").toString());
         for (File file : Objects.requireNonNull(tlsCertFile.listFiles())) {
-            tlsCaCert.add(FileUtils.readFileToString(file, Charset.forName("UTF-8")));
+            tlsCaCert.add(FileUtils.readFileToByteArray(file));
         }
 
-        List<String> configContent = new ArrayList<>();
+        List<byte[]> configContent = new ArrayList<>();
         File configFile = new File(Paths.get(mspDir, "config.yaml").toString());
-        configContent.add(FileUtils.readFileToString(configFile, Charset.forName("UTF-8")));
+        configContent.add(FileUtils.readFileToByteArray(configFile));
 
-        List<String> signCert = new ArrayList<>();
+        List<byte[]> signCert = new ArrayList<>();
         File signCertFile = new File(Paths.get(mspDir, "signcerts").toString());
         for (File file : Objects.requireNonNull(signCertFile.listFiles())) {
-            signCert.add(FileUtils.readFileToString(file, Charset.forName("UTF-8")));
+            signCert.add(FileUtils.readFileToByteArray(file));
         }
 
-        MspConfigPackage.MSPConfig mspConfig = MspConfigBuilder.buildMspConfig(
-                "testMsp", caCert, keyStore, signCert, adminCert, new ArrayList<>(), new ArrayList<>(), configContent, tlsCaCert, new ArrayList<>());
+        MspConfigPackage.MSPConfig mspConfig = MspConfigBuilder.mspConfigBuilder(
+                "testMsp", caCert, signCert, adminCert, new ArrayList<>(), new ArrayList<>(), configContent, tlsCaCert, new ArrayList<>()).build();
         Msp msp = new Msp();
         msp.setup(mspConfig);
     }

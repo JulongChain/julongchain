@@ -16,7 +16,11 @@
 package org.bcia.julongchain.common.tools.cryptogen.bean;
 
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
+ * 获取辅助工具的版本信息
+ *
  * @author chenhao, yegangcheng
  * @date 2018/4/3
  * @company Excelsecu
@@ -26,20 +30,17 @@ public class MetaData {
     public static String mVersion = "";
 
     public static String getVersionInfo() {
-        if (mVersion.equals("")) {
+        if (StringUtils.isEmpty(mVersion)) {
             mVersion = "development build";
         }
-
-        StringBuilder builder = new StringBuilder();
-        builder.append(PROGRAM_NAME)
-                .append(":\n Version: ")
-                .append(mVersion)
-                .append("\n Java version: ")
-                .append(System.getProperty("java.version"))
-                .append("\n OS/Arch: ")
-                .append(System.getProperty("os.name"))
-                .append("/")
-                .append(System.getProperty("os.arch"));
-        return builder.toString();
+        return PROGRAM_NAME +
+                ":\n Version: " +
+                mVersion +
+                "\n Java version: " +
+                System.getProperty("java.version") +
+                "\n OS/Arch: " +
+                System.getProperty("os.name") +
+                "/" +
+                System.getProperty("os.arch");
     }
 }

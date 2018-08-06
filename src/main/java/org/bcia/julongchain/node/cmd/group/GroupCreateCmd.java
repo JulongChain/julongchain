@@ -24,6 +24,7 @@ import org.bcia.julongchain.node.Node;
 
 /**
  * 完成节点创建群组命令的解析
+ * node group create -c localhost:7050 -g mygroup
  * node group create -c localhost:7050 -g mygroup -f /home/julongchain/group.tx
  *
  * @author zhouhui
@@ -60,24 +61,24 @@ public class GroupCreateCmd extends AbstractNodeGroupCmd {
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
-        String defaultValue = "unknown";
+        String defaultValue = "";
 
         String consenter = null;
         if (cmd.hasOption(ARG_CONSENTER)) {
             consenter = cmd.getOptionValue(ARG_CONSENTER, defaultValue);
-            log.info("Consenter-----$" + consenter);
+            log.info("Consenter: " + consenter);
         }
 
         String groupId = null;
         if (cmd.hasOption(ARG_GROUP_ID)) {
             groupId = cmd.getOptionValue(ARG_GROUP_ID, defaultValue);
-            log.info("GroupId-----$" + groupId);
+            log.info("GroupId: " + groupId);
         }
 
         String groupConfigFile = null;
         if (cmd.hasOption(ARG_FILE_PATH)) {
             groupConfigFile = cmd.getOptionValue(ARG_FILE_PATH, defaultValue);
-            log.info("GroupId config File-----$" + groupConfigFile);
+            log.info("GroupId config File: " + groupConfigFile);
         }
 
         if (StringUtils.isBlank(groupId)) {
@@ -90,21 +91,21 @@ public class GroupCreateCmd extends AbstractNodeGroupCmd {
             return;
         }
 
-        String[] hostAndPort = consenter.split(":");
-        if (hostAndPort.length <= 1) {
+        String[] consenterHostPort = consenter.split(":");
+        if (consenterHostPort.length <= 1) {
             log.error("Consenter is not valid");
             return;
         }
 
         int port = 0;
         try {
-            port = Integer.parseInt(hostAndPort[1]);
+            port = Integer.parseInt(consenterHostPort[1]);
         } catch (NumberFormatException ex) {
             log.error("Consenter's port is not valid");
             return;
         }
 
-        nodeGroup.createGroup(hostAndPort[0], port, groupId, groupConfigFile);
+        nodeGroup.createGroup(consenterHostPort[0], port, groupId, groupConfigFile);
 
         log.info("Send Group create success");
     }

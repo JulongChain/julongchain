@@ -16,6 +16,8 @@
 package org.bcia.julongchain.common.tools.cryptogen.bean;
 
 /**
+ * MSP config.yaml 数据类 ouIdentifier 部分
+ *
  * @author chenhao, yegangcheng
  * @date 2018/7/4
  * @company Excelsecu

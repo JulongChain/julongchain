@@ -15,11 +15,15 @@
  */
 package org.bcia.julongchain.core.container;
 
+import org.bcia.julongchain.common.exception.VMException;
+import org.bcia.julongchain.common.log.JavaChainLog;
+import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.core.RWMutex;
 import org.bcia.julongchain.core.container.api.VM;
 import org.bcia.julongchain.core.container.dockercontroller.DockerVM;
-import org.bcia.julongchain.core.container.inproccontroller.InprocVM;
+import org.bcia.julongchain.core.container.inproccontroller.InprocController;
 
+import javax.naming.Context;
 import java.util.Map;
 
 /**
@@ -30,7 +34,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class VMController extends RWMutex{
-
+	private static final JavaChainLog log = JavaChainLogFactory.getLog(VMController.class);
     public static final String DOCKER = "Docker";
     public static final String SYSTEM = "System";
 
@@ -53,7 +57,7 @@ public class VMController extends RWMutex{
                 vm = new DockerVM();
                 break;
             case SYSTEM:
-                vm = new InprocVM();
+//                vm = new InprocVM();
                 break;
             default:
                 vm = new DockerVM();
@@ -63,11 +67,11 @@ public class VMController extends RWMutex{
         return vm;
     }
 
-    public void lockContainer(String id) {
+    public void lockContainer(String id, String vmType) {
 
     }
 
-    public void unlockContainer(String id) {
+    public void unlockContainer(String id, String vmType) {
 
     }
 

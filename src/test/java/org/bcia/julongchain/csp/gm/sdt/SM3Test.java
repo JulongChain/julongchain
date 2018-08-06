@@ -16,14 +16,14 @@
 package org.bcia.julongchain.csp.gm.sdt;
 
 import org.bcia.julongchain.common.util.Convert;
-import org.bcia.julongchain.csp.gm.sdt.SM3.SM3;
+import org.bcia.julongchain.csp.gm.sdt.sm3.SM3;
 import org.bcia.julongchain.csp.gm.sdt.jni.SMJniApi;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * SM3 算法单元测试
+ * SM3算法单元测试
  *
  * @author tengxiumin
  * @date 2018/05/16
@@ -35,18 +35,16 @@ public class SM3Test {
 
     @Before
     public void setUp() {
-
         System.out.println("setup...");
     }
 
     @After
     public void finalize(){
-
         System.out.println("finalize...");
     }
 
     @Test
-    public void testSM3Hash() {
+    public void testHash() {
         System.out.println("============ SM3 Hash test ============ ");
         int[] messageLenList = {1, 16, 32, 64, 128, 256, 512, 1024, 4096};
         hashUnitTest(messageLenList);
@@ -57,7 +55,7 @@ public class SM3Test {
         for(int i = 0; i < lists.length; i++) {
             try {
                 int msgLen = lists[i];
-                System.out.println("\n===== case "+ caseIndex++ +" :  message length is " + msgLen);
+                System.out.println("\n**** case " + caseIndex++ + ": message length is " + msgLen);
                 byte[] msg = new byte[msgLen];
                 if(msgLen > 1024) {
                     int leftLen = msgLen;
@@ -73,12 +71,12 @@ public class SM3Test {
                 } else {
                     msg = jni.randomGen(msgLen);
                 }
-                System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
+                System.out.println("[ input ] message : " + Convert.bytesToHexString(msg));
                 byte[] hash = sm3.hash(msg);
                 if (null != hash) {
-                    System.out.println("[output data] hash data : " + Convert.bytesToHexString(hash));
+                    System.out.println("[ output ] digest : " + Convert.bytesToHexString(hash));
                 } else {
-                    System.out.println("[**Error**] compute hash data failed");
+                    System.out.println("[** error **] failed computing the message digest");
                 }
             } catch (Exception e) {
                 System.out.println(e.getMessage());
@@ -87,32 +85,34 @@ public class SM3Test {
     }
 
     @Test
-    public void testSM3HashInvalidParameters() {
+    public void testHashInvalidParameters() {
+
+        System.out.println("============= SM3 hash invalid parameters test =============");
 
         byte[] msg0 = new byte[0];
         int caseIndex = 1;
         try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  SM3 hash message is null");
+            System.out.println("\n**** case " + caseIndex++ + ": message is null  ****");
             byte[] hash = sm3.hash(null);
             if (null != hash) {
-                System.out.println("[output data] hash data : " + Convert.bytesToHexString(hash));
+                System.out.println("[ output ] digest : " + Convert.bytesToHexString(hash));
             } else {
-                System.out.println("[**Error**] compute hash data failed");
+                System.out.println("[** error **] failed computing the message digest");
             }
         } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+            System.out.println("[## exception ##] " + e.getMessage());
         }
 
         try {
-            System.out.println("\n===== case B-"+ caseIndex++ +" :  SM3 hash message length is 0");
+            System.out.println("\n**** case " + caseIndex++ + ": message length is 0  ****");
             byte[] hash = sm3.hash(msg0);
             if (null != hash) {
-                System.out.println("[output data] hash data : " + Convert.bytesToHexString(hash));
+                System.out.println("[ output ] digest : " + Convert.bytesToHexString(hash));
             } else {
-                System.out.println("[**Error**] compute hash data failed");
+                System.out.println("[** error **] failed computing the message digest");
             }
         } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+            System.out.println("[## exception ##] " + e.getMessage());
         }
     }
 }

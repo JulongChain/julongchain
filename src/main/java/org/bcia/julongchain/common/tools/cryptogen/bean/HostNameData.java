@@ -17,6 +17,8 @@
 package org.bcia.julongchain.common.tools.cryptogen.bean;
 
 /**
+ * hostname 配置数据类
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/4
  * @company Excelsecu

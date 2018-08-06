@@ -63,6 +63,13 @@ public class PKCS11Digest {
         }
     }
 
+    /**
+     * Make Digest Method 1
+     * @param msg       Message
+     * @param opts      P11 factory
+     * @return digest value
+     * @throws JavaChainException
+     */
     public byte[] getDigest(byte[] msg, IPKCS11FactoryOpts opts) throws JavaChainException{
 
         try {
@@ -89,6 +96,13 @@ public class PKCS11Digest {
         }
     }
 
+    /**
+     * Make Digest Method 2
+     * @param msg       Message
+     * @param opts      P11 factory
+     * @return digest value
+     * @throws JavaChainException
+     */
     public static byte[] getDigestwithUpdate(byte[] msg, IPKCS11FactoryOpts opts) throws JavaChainException{
 
         try {

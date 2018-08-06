@@ -20,6 +20,8 @@ import java.security.PrivilegedAction;
 import java.security.Provider;
 
 /**
+ * 实现 Provider，加入 SM2 支持
+ *
  * @author chenhao
  * @date 2018/4/18
  * @company Excelsecu
@@ -31,6 +33,7 @@ public class SM2Provider extends Provider {
         super("ExcelsecuSM2", 1, "Excelsecu SM2 Provider");
 
         AccessController.doPrivileged(new PrivilegedAction<Object>() {
+            @Override
             public Object run() {
                 Service service = new Service(
                         SM2Provider.this, "AlgorithmParameters", "SM2",

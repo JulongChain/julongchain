@@ -41,6 +41,12 @@ public enum RsaSignOpts implements ISignerOpts {
     private int index;
     private long mechanism;
 
+    /**
+     * Opt for sign with rsa
+     * @param name          Sign Algorithm
+     * @param mechanism     Sign mechanism
+     * @param index         Index num
+     */
     private RsaSignOpts(String name, long mechanism, int index) {
         this.name = name;
         this.index = index;

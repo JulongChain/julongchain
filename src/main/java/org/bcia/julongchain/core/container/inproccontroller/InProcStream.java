@@ -15,23 +15,51 @@
  */
 package org.bcia.julongchain.core.container.inproccontroller;
 
+import org.bcia.julongchain.common.exception.InprocVMException;
+import org.bcia.julongchain.common.log.JavaChainLog;
+import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.core.container.scintf.ISmartContractStream;
+import org.bcia.julongchain.core.smartcontract.shim.SmartContractBase;
+import org.bcia.julongchain.core.smartcontract.shim.helper.Channel;
+import org.bcia.julongchain.core.smartcontract.shim.impl.ChatStream;
 import org.bcia.julongchain.protos.node.SmartContractShim;
 
+import java.io.InputStream;
+
 /**
- * 类描述
+ * In-Process VM
+ * Implement 2 methods:recv() & send()
+ * Holds 2 Channel recv & send
  *
- * @author wanliangbing
+ * @author sunzongyu
  * @date 2018/4/2
  * @company Dingxuan
  */
-public class InProcStream {
+public class InProcStream extends ChatStream implements ISmartContractStream {
+	private static final JavaChainLog log = JavaChainLogFactory.getLog(InputStream.class);
 
-    public SmartContractShim.SmartContractMessage recv(){
-        return null;
-    }
+	private Channel<SmartContractShim.SmartContractMessage> recv;
+	private Channel<SmartContractShim.SmartContractMessage> send;
 
-    public void send(SmartContractShim.SmartContractMessage msg) {
+	public InProcStream(Channel<SmartContractShim.SmartContractMessage> recv, Channel<SmartContractShim.SmartContractMessage> send, SmartContractBase sc) {
+		super(sc.newPeerClientConnection(), sc);
+		this.recv = recv;
+		this.send = send;
+	}
 
-    }
+	@Override
+	public SmartContractShim.SmartContractMessage recv() throws InprocVMException {
+		try {
+			return recv.take();
+		} catch (InterruptedException e) {
+			log.error(e.getMessage());
+			throw new InprocVMException(e.getMessage());
+		}
+	}
+
+    @Override
+	public void send(SmartContractShim.SmartContractMessage msg) {
+		send.add(msg);
+	}
 
 }

@@ -22,7 +22,7 @@ import org.junit.Test;
 import java.util.Arrays;
 
 /**
- * SDTSMJNI SM3接口单元测试
+ * SMJniApi SM3算法接口单元测试
  *
  * @author tengxiumin
  * @date 2018/05/29
@@ -35,125 +35,129 @@ public class SMJniSM3ApiTest {
     @Test
     public void testSM3Hash()
     {
-        System.out.println("============= SMJniApi SM3Hash test =============");
-        int[] msgLenList = {1, 16, 128, 256, 1024, 4096};
+        System.out.println("============= SMJniApi sm3Hash test =============");
+        int[] messageLenList = {1, 16, 128, 256, 1024, 4096};
         int caseIndex = 0;
-        for(int i = 0; i < msgLenList.length; i++) {
-            int msgLen = msgLenList[i];
-            byte[] msg = new byte[msgLen];
-            for(int j = 0; j < msgLen; j++) {
-                msg[j] = (byte)((j+1)%255);
+        for(int i = 0; i < messageLenList.length; i++) {
+            int messageLen = messageLenList[i];
+            byte[] message = new byte[messageLen];
+            for(int j = 0; j < messageLen; j++) {
+                message[j] = (byte)((j+1)%255);
             }
             try {
-                System.out.println("\n**** case " + caseIndex++ + ": SM3Hash message length = "+ msgLen + " ****");
-                System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
-                byte[] hash = jni.sm3Hash(msg);
-                if (null != hash) {
-                    System.out.println("[output data] SM3 hash data : " + Convert.bytesToHexString(hash));
+                System.out.println("\n**** case " + caseIndex++ + ": message length = "+ messageLen + " ****");
+                System.out.println("[ input ] message : " + Convert.bytesToHexString(message));
+                byte[] digest = jni.sm3Hash(message);
+                if (null != digest) {
+                    System.out.println("[ output ] digest: " + Convert.bytesToHexString(digest));
                 } else {
-                    System.out.println("[**Error**] SM3 hash failed");
+                    System.out.println("[** error** ] failed computing message digest by SM3 algorithm");
                 }
             } catch (Exception e) {
-                System.out.println("Exception: " + e.getMessage());
+                System.out.println("[## exception ##] " + e.getMessage());
             }
         }
     }
 
     @Test
     public void testSM3HashInvalidParams() {
-        System.out.println("============= SMJniApi SM3Hash invalid parameters test =============");
+        System.out.println("============= SMJniApi sm3Hash invalid parameters test =============");
         int caseIndex = 1;
         try {
-            System.out.println("\n**** case " + caseIndex++ + ": SM3Hash message is null ****");
-            byte[] hash = jni.sm3Hash(null);
-            if (null != hash) {
-                System.out.println("[output data] SM3 hash data : " + Convert.bytesToHexString(hash));
+            System.out.println("\n**** case " + caseIndex++ + ": message is null ****");
+            byte[] digest = jni.sm3Hash(null);
+            if (null != digest) {
+                System.out.println("[ output ] digest : " + Convert.bytesToHexString(digest));
             } else {
-                System.out.println("[**Error**] SM3 hash failed");
+                System.out.println("[** error** ] failed computing message digest by SM3 algorithm");
             }
         } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+            System.out.println("[## exception ##] " + e.getMessage());
         }
 
         try {
-            System.out.println("\n**** case " + caseIndex++ + ": SM3Hash message length is 0 ****");
-            byte[] msg = new byte[0];
-            byte[] hash = jni.sm3Hash(msg);
-            if (null != hash) {
-                System.out.println("[output data] SM3 hash data : " + Convert.bytesToHexString(hash));
+            System.out.println("\n**** case " + caseIndex++ + ": message length is 0 ****");
+            byte[] message = new byte[0];
+            byte[] digest = jni.sm3Hash(message);
+            if (null != digest) {
+                System.out.println("[ output ] digest : " + Convert.bytesToHexString(digest));
             } else {
-                System.out.println("[**Error**] SM3 hash failed");
+                System.out.println("[** error **] failed computing message digest by SM3 algorithm");
             }
         } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+            System.out.println("[## exception ##] " + e.getMessage());
         }
     }
 
     @Test
-    public void SM3HashDataCompareWithStandardData() {
-        System.out.println("============= SMJniApi SM3 hash data compare with GM/T 0004-2012 =============");
-        System.out.println("**** case 1: ****");
+    public void SM3HashResultCompareWithStandardData() {
+        System.out.println("============= SMJniApi sm3Hash result compare with GM/T 0004-2012 standard data =============");
+        System.out.println("****  case 1  ****");
         try {
-            byte[] GMHashData = {(byte)0x66, (byte)0xC7, (byte)0xF0, (byte)0xF4, (byte)0x62, (byte)0xEE, (byte)0xED, (byte)0xD9,
+            byte[] gmtDigest = {(byte)0x66, (byte)0xC7, (byte)0xF0, (byte)0xF4, (byte)0x62, (byte)0xEE, (byte)0xED, (byte)0xD9,
                     (byte)0xD1, (byte)0xF2, (byte)0xD4, (byte)0x6B, (byte)0xDC, (byte)0x10, (byte)0xE4, (byte)0xE2,
                     (byte)0x41, (byte)0x67, (byte)0xC4, (byte)0x87, (byte)0x5C, (byte)0xF2, (byte)0xF7, (byte)0xA2,
                     (byte)0x29, (byte)0x7D, (byte)0xA0, (byte)0x2B, (byte)0x8F, (byte)0x4B, (byte)0xA8, (byte)0xE0};
-            byte[] msg = {97, 98, 99};
-            System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
-            byte[] hash = jni.sm3Hash(msg);
-            System.out.println("[output data] hash data : " + Convert.bytesToHexString(hash));
+            byte[] message = {97, 98, 99};
+            System.out.println("[ input ] message : " + Convert.bytesToHexString(message));
+            byte[] digest = jni.sm3Hash(message);
+            System.out.println("[ output ] digest : " + Convert.bytesToHexString(digest));
 
-            if(Arrays.equals(hash, GMHashData)) {
-                System.out.println("[compare result equal] SM3 hash data is equal with GM/T 0004-2012");
+            if(Arrays.equals(digest, gmtDigest)) {
+                System.out.println("[ compare result | equal ] sm3Hash result is equal with GM/T 0004-2012 standard data");
             } else {
-                System.out.println("[compare result not equal] SM3 hash data is not equal with GM/T 0004-2012");
+                System.out.println("[ compare result | unequal ] sm3Hash result is not equal with GM/T 0004-2012 standard data");
             }
         } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+            System.out.println("[## exception ##] " + e.getMessage());
         }
 
-        System.out.println("**** case 2: ****");
+        System.out.println("****  case 2  ****");
         try {
-            byte[] GMHashData = {(byte)0xde, (byte)0xbe, (byte)0x9f, (byte)0xf9, (byte)0x22, (byte)0x75, (byte)0xb8, (byte)0xa1,
-                    (byte)0x38, (byte)0x60, (byte)0x48, (byte)0x89, (byte)0xc1, (byte)0x8e, (byte)0x5a, (byte)0x4d,
-                    (byte)0x6f, (byte)0xdb, (byte)0x70, (byte)0xe5, (byte)0x38, (byte)0x7e, (byte)0x57, (byte)0x65,
-                    (byte)0x29, (byte)0x3d, (byte)0xcb, (byte)0xa3, (byte)0x9c, (byte)0x0c, (byte)0x57, (byte)0x32};
-            byte[] msg = { 'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d',
-                    'a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d','a','b','c','d'};
-            System.out.println("[input data] message data : " + Convert.bytesToHexString(msg));
-            byte[] hash = jni.sm3Hash(msg);
-            System.out.println("[output data] hash data : " + Convert.bytesToHexString(hash));
+            byte[] gmtDigest = {(byte)0xDE, (byte)0xBE, (byte)0x9F, (byte)0xF9, (byte)0x22, (byte)0x75, (byte)0xB8, (byte)0xA1,
+                    (byte)0x38, (byte)0x60, (byte)0x48, (byte)0x89, (byte)0xC1, (byte)0x8E, (byte)0x5A, (byte)0x4D,
+                    (byte)0x6F, (byte)0xDB, (byte)0x70, (byte)0xE5, (byte)0x38, (byte)0x7E, (byte)0x57, (byte)0x65,
+                    (byte)0x29, (byte)0x3D, (byte)0xCB, (byte)0xA3, (byte)0x9C, (byte)0x0C, (byte)0x57, (byte)0x32};
+            byte[] message = new byte[64];
+            String srcString = "abcd";
+            for (int i = 0; i < 16; i++) {
+                System.arraycopy(srcString.getBytes(), 0, message, i*4, 4);
+            }
+            System.out.println("[ input ] message : " + Convert.bytesToHexString(message));
+            byte[] digest = jni.sm3Hash(message);
+            System.out.println("[ output ] digest : " + Convert.bytesToHexString(digest));
 
-            if(Arrays.equals(hash, GMHashData)) {
-                System.out.println("[compare result equal] SM3 hash data is equal with GM/T 0004-2012");
+            if(Arrays.equals(digest, gmtDigest)) {
+                System.out.println("[ compare result | equal ] sm3Hash result is equal with GM/T 0004-2012 standard data");
             } else {
-                System.out.println("[compare result not equal] SM3 hash data is not equal with GM/T 0004-2012");
+                System.out.println("[ compare result | unequal ] sm3Hash result is not equal with GM/T 0004-2012 standard data");
             }
         } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+            System.out.println("[## exception ##] " + e.getMessage());
         }
     }
 
     @Test
     public void testSM3HashSpeed() {
-        System.out.println("============= SMJniApi SM3 hash speed test =============");
+        System.out.println("============= SMJniApi sm3Hash speed test =============");
         try {
-            byte[] testMsg = new byte[1024];
+            byte[] testMessage = new byte[1024];
             for(int i = 0; i < 1024; i++) {
-                testMsg[i] = (byte)((i+1)%255);
+                testMessage[i] = (byte)((i+1)%255);
             }
             int num = 5;
-            byte[] hash = null;
+            byte[] digest = null;
             long startTime = System.currentTimeMillis();
             for(int i = 0;i < 1024*100*num; i++) {
-                hash = jni.sm3Hash(testMsg);
+                digest = jni.sm3Hash(testMessage);
             }
             long endTime = System.currentTimeMillis();
             float speed = (float) (100*num/ ((endTime - startTime)/1000.00));
-            System.out.println("[total time] SM3 hash " + (100*num) + "MB data need : " + (float) (endTime - startTime)/1000.00 + "s");
-            System.out.println("[speed] SM3 hash speed : " + speed + "MB/s");
+            System.out.println("[ total time ] sm3Hash " + (100*num) + "MB data need : " +
+                                (float) (endTime - startTime)/1000.00 + "s");
+            System.out.println("[ speed ] sm3Hash speed : " + speed + "MB/s");
         } catch (Exception e) {
-            System.out.println("Exception: " + e.getMessage());
+            System.out.println("[## exception ##] " + e.getMessage());
         }
     }
 }
