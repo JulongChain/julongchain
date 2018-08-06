@@ -157,7 +157,7 @@ public class Endorser implements IEndorserServer {
                 log.error(e.getMessage(), e);
             }
 
-            return ProposalResponseUtils.buildProposalResponse(smartContractResponse == null ?
+            return ProposalResponseUtils.buildProposalResponse(proposalResponse.getPayload() != null ?
                     proposalResponse.getPayload() : smartContractResponse.getPayload(), smartContractResponse.getMessage());
         }
     }
