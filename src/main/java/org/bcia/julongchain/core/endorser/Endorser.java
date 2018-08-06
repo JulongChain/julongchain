@@ -16,7 +16,6 @@
 package org.bcia.julongchain.core.endorser;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.LedgerException;
@@ -37,15 +36,8 @@ import org.bcia.julongchain.core.smartcontract.node.TransactionRunningUtil;
 import org.bcia.julongchain.node.common.helper.SpecHelper;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.ledger.rwset.Rwset;
-import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
-import org.bcia.julongchain.protos.node.ProposalPackage;
-import org.bcia.julongchain.protos.node.ProposalResponsePackage;
-import org.bcia.julongchain.protos.node.SmartContractEventPackage;
-import org.bcia.julongchain.protos.node.SmartContractPackage;
+import org.bcia.julongchain.protos.node.*;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 背书节点
@@ -134,7 +126,7 @@ public class Endorser implements IEndorserServer {
 
         if (StringUtils.isBlank(scName) || CommConstant.CSSC.equals(scName)) {
             if (!response.getPayload().isEmpty()) {
-                return ProposalResponseUtils.buildProposalResponse(response.getPayload());
+                return ProposalResponseUtils.buildProposalResponse(response.getPayload(), null);
             } else {
                 return ProposalResponseUtils.buildProposalResponse(response);
             }
@@ -157,7 +149,16 @@ public class Endorser implements IEndorserServer {
                 e.printStackTrace();
             }
 
-            return ProposalResponseUtils.buildProposalResponse(proposalResponse.getPayload());
+            SmartContractShim.SmartContractMessage smartContractMessage = TransactionRunningUtil.getTxMessage(scName, groupHeader.getTxId());
+            ProposalResponsePackage.Response smartContractResponse = null;
+            try {
+                smartContractResponse = ProposalResponsePackage.Response.parseFrom(smartContractMessage.getPayload());
+            } catch (InvalidProtocolBufferException e) {
+                log.error(e.getMessage(), e);
+            }
+
+            return ProposalResponseUtils.buildProposalResponse(smartContractResponse == null ?
+                    proposalResponse.getPayload() : smartContractResponse.getPayload(), smartContractResponse.getMessage());
         }
     }
 

@@ -37,10 +37,12 @@ import org.bcia.julongchain.protos.node.SmartContractPackage;
  * @company Dingxuan
  */
 public class ProposalResponseUtils {
-    public static ProposalResponsePackage.ProposalResponse buildProposalResponse(ByteString payload) {
+    public static ProposalResponsePackage.ProposalResponse buildProposalResponse(ByteString payload, String message) {
         //首先构造响应主内容
         ProposalResponsePackage.Response.Builder responseBuilder = ProposalResponsePackage.Response.newBuilder();
         responseBuilder.setPayload(payload);
+        responseBuilder.setMessage(message);
+
         ProposalResponsePackage.Response response = responseBuilder.build();
 
         //构造提案响应
