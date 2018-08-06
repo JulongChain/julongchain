@@ -33,7 +33,7 @@ public class GmRandom {
     private static SMJniApi smJniApi = new SMJniApi();
 
     /**
-     * 生成随机数
+     * 产生随机数
      * @param length 随机数长度
      * @return 随机数
      * @throws JavaChainException

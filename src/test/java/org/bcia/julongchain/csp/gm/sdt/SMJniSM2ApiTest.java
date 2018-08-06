@@ -25,7 +25,7 @@ import java.util.Arrays;
 import static org.bcia.julongchain.common.util.Convert.bytesToHexString;
 
 /**
- * SDTSMJNI SM2接口单元测试
+ * SMJniApi SM2算法接口单元测试
  *
  * @author tengxiumin
  * @date 2018/05/29

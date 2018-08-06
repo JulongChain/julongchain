@@ -18,7 +18,7 @@ package org.bcia.julongchain.csp.gm.sdt.sm4;
 import org.bcia.julongchain.csp.intfs.opts.IKeyImportOpts;
 
 /**
- * SM4 密钥导入选项
+ * GM SM4密钥导入选项
  *
  * @author tengxiumin
  * @date 2018/05/17
@@ -33,11 +33,19 @@ public class SM4KeyImportOpts implements IKeyImportOpts {
         this.ephemeral = ephemeral;
     }
 
+    /**
+     * 获取算法名称
+     * @return 算法名称
+     */
     @Override
     public String getAlgorithm() {
         return "SM4";
     }
 
+    /**
+     * 是否为临时密钥
+     * @return true/false
+     */
     @Override
     public boolean isEphemeral() {
         return ephemeral;

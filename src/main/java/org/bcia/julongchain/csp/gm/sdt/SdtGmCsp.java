@@ -31,7 +31,7 @@ import org.bcia.julongchain.csp.intfs.opts.*;
 
 
 /**
- * SDT 国密算法 密码服务提供者
+ * SDT 国密算法密码服务提供者
  *
  * @author tengxiumin
  * @date 2018/05/16

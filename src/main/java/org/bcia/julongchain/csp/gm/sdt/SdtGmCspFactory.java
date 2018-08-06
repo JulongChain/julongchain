@@ -20,7 +20,7 @@ import org.bcia.julongchain.csp.factory.IFactoryOpts;
 import org.bcia.julongchain.csp.intfs.ICsp;
 
 /**
- * SDT GM算法服务工厂
+ * SDT 国密算法服务工厂
  *
  * @author tengxiumin
  * @date 2018/05/16

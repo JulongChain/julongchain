@@ -464,7 +464,7 @@ public class VSSCSupportForLsscInvocation {
         }
 
         Collection.CollectionCriteria cc =Collection.CollectionCriteria.newBuilder().
-                setChannel(groupID).setNamespace(smartcontractName).build();
+                setGroup(groupID).setNamespace(smartcontractName).build();
 
         Collection.CollectionConfigPackage ccp=null;
         try {

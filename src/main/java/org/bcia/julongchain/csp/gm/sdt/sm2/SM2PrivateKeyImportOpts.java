@@ -18,7 +18,7 @@ package org.bcia.julongchain.csp.gm.sdt.sm2;
 import org.bcia.julongchain.csp.intfs.opts.IKeyImportOpts;
 
 /**
- * SM2 私钥导入选项
+ * GM SM2私钥导入选项
  *
  * @author tengxiumin
  * @date 2018/05/17
@@ -30,11 +30,19 @@ public class SM2PrivateKeyImportOpts implements IKeyImportOpts {
 
     public SM2PrivateKeyImportOpts(boolean ephemeral) { this.ephemeral = ephemeral; }
 
+    /**
+     * 获取算法名称
+     * @return 算法名称
+     */
     @Override
     public String getAlgorithm() {
         return "SM2";
     }
 
+    /**
+     * 是否为临时密钥
+     * @return true/false
+     */
     @Override
     public boolean isEphemeral() {
         return ephemeral;

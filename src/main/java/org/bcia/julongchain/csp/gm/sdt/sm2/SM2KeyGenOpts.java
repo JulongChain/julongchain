@@ -19,7 +19,7 @@ import org.bcia.julongchain.csp.intfs.opts.IKeyGenOpts;
 
 
 /**
- * GM SM2 密钥生存选项
+ * GM SM2密钥生成选项
  *
  * @author tengxiumin
  * @date 2018/05/16
@@ -27,11 +27,19 @@ import org.bcia.julongchain.csp.intfs.opts.IKeyGenOpts;
  */
 public class SM2KeyGenOpts implements IKeyGenOpts {
 
+    /**
+     * 获取算法名称
+     * @return 算法名称
+     */
     @Override
     public String getAlgorithm() {
         return "SM2";
     }
 
+    /**
+     * 是否为临时密钥
+     * @return true/false
+     */
     @Override
     public boolean isEphemeral() {
         return false;

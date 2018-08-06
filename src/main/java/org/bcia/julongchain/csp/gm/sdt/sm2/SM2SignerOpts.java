@@ -19,7 +19,7 @@ import org.bcia.julongchain.csp.intfs.opts.ISignerOpts;
 
 
 /**
- * GM SM2 签名者选项
+ * GM SM2签名者选项
  *
  * @author tengxiumin
  * @date 2018/05/16
@@ -27,11 +27,19 @@ import org.bcia.julongchain.csp.intfs.opts.ISignerOpts;
  */
 public class SM2SignerOpts implements ISignerOpts {
 
+    /**
+     * 获取哈希函数
+     * @return 哈希函数
+     */
     @Override
     public String hashFunc() {
         return null;
     }
 
+    /**
+     * 获取算法名称
+     * @return 算法名称
+     */
     @Override
     public String getAlgorithm() {
         return "SM2";

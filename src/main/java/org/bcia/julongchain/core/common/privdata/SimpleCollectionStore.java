@@ -54,7 +54,7 @@ public class SimpleCollectionStore implements ICollectionStore{
 
     @Override
     public Collection.CollectionConfigPackage retrieveCollectionConfigPackage(Collection.CollectionCriteria cc) throws JavaChainException {
-        IQueryExecutor qe = s.getQueryExecutorForLedger(cc.getChannel());
+        IQueryExecutor qe = s.getQueryExecutorForLedger(cc.getGroup());
         try {
             byte[] cb = qe.getState("lssc", s.getCollectionKVSKey(cc));
             if(cb == null){
@@ -82,7 +82,7 @@ public class SimpleCollectionStore implements ICollectionStore{
                 case Collection.CollectionConfig
                         .STATIC_COLLECTION_CONFIG_FIELD_NUMBER:
                     SimpleCollection sc = new SimpleCollection();
-                    sc.setUp(cconf.getStaticCollectionConfig(), s.getIdentityDeserializer(cc.getChannel()));
+                    sc.setUp(cconf.getStaticCollectionConfig(), s.getIdentityDeserializer(cc.getGroup()));
                     return sc;
                 default:
                     throw new JavaChainException("Unexpected collection type");
@@ -92,7 +92,7 @@ public class SimpleCollectionStore implements ICollectionStore{
     }
 
     private JavaChainException noSuchCollectionError(Collection.CollectionCriteria cc){
-        String errorMsg = String.format("collection %s/%s/%s could not be found", cc.getChannel(), cc.getNamespace(), cc.getCollection());
+        String errorMsg = String.format("collection %s/%s/%s could not be found", cc.getGroup(), cc.getNamespace(), cc.getCollection());
         log.error(errorMsg);
         return new JavaChainException(errorMsg);
     }

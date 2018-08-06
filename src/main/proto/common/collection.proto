@@ -69,7 +69,7 @@ message CollectionPolicyConfig {
 // CollectionCriteria defines an element of a private data that corresponds
 // to a certain transaction and collection
 message CollectionCriteria {
-    string channel = 1;
+    string group = 1;
     string tx_id = 2;
     string collection = 3;
     string namespace = 4;

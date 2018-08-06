@@ -16,7 +16,7 @@
 package org.bcia.julongchain.csp.gm.sdt.common;
 
 /**
- * Constant
+ * 常量定义
  *
  * @author tengxiumin
  * @date 2018/05/14

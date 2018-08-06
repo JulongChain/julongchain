@@ -22,7 +22,7 @@ import org.bcia.julongchain.csp.gm.sdt.common.Constants;
 import org.bcia.julongchain.csp.gm.sdt.jni.SMJniApi;
 
 /**
- * GM SM2 算法
+ * GM SM2算法
  *
  * @author tengxiumin
  * @date 2018/05/16

@@ -18,7 +18,7 @@ package org.bcia.julongchain.csp.gm.sdt.sm3;
 import org.bcia.julongchain.csp.intfs.opts.IHashOpts;
 
 /**
- * GM SM3 选项
+ * GM SM3哈希选项
  *
  * @author tengxiumin
  * @date 2018/05/14
@@ -28,6 +28,10 @@ public class SM3HashOpts implements IHashOpts {
 
     public SM3HashOpts() {}
 
+    /**
+     * 获取算法名称
+     * @return 算法名称
+     */
     @Override
     public String getAlgorithm() {
         return "SM3";
