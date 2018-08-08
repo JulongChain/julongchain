@@ -17,10 +17,7 @@ package org.bcia.julongchain.node.cmd.factory;
 
 import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.node.cmd.INodeCmd;
-import org.bcia.julongchain.node.cmd.group.GroupCreateCmd;
-import org.bcia.julongchain.node.cmd.group.GroupJoinCmd;
-import org.bcia.julongchain.node.cmd.group.GroupListCmd;
-import org.bcia.julongchain.node.cmd.group.GroupUpdateCmd;
+import org.bcia.julongchain.node.cmd.group.*;
 import org.bcia.julongchain.node.cmd.sc.ContractInstallCmd;
 import org.bcia.julongchain.node.cmd.sc.ContractInstantiateCmd;
 import org.bcia.julongchain.node.cmd.sc.ContractInvokeCmd;
@@ -55,6 +52,8 @@ public class NodeCmdFactory {
                 return new GroupUpdateCmd(node);
             } else if (NodeCmdConstant.LIST_GROUP.equalsIgnoreCase(subCommand)) {
                 return new GroupListCmd(node);
+            } else if (NodeCmdConstant.GROUP_INFO.equalsIgnoreCase(subCommand)) {
+                return new GroupInfoCmd(node);
             }
         } else if (NodeConstant.SMART_CONTRACT.equalsIgnoreCase(command)) {
             if (NodeCmdConstant.INSTALL_CONTRACT.equalsIgnoreCase(subCommand)) {
