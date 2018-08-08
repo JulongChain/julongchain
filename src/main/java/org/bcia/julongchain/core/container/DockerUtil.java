@@ -118,6 +118,9 @@ public class DockerUtil {
     DockerClient dockerClient = getDockerClient();
     List<Image> imageList = dockerClient.listImagesCmd().exec();
     for (Image image : imageList) {
+      if (image.getRepoTags() == null) {
+        continue;
+      }
       String imageTag = image.getRepoTags()[0];
       if (StringUtils.isEmpty(imageName) || StringUtils.contains(imageTag, imageName)) {
         imageNameList.add(imageTag);
