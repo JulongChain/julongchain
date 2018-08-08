@@ -124,9 +124,9 @@ public class Endorser implements IEndorserServer {
 //            txReadWriteSetBytes = new byte[]{0, 1, 2};
 //        }
 
-        if (StringUtils.isBlank(scName) || CommConstant.CSSC.equals(scName)) {
+        if (StringUtils.isBlank(scName) || CommConstant.CSSC.equals(scName) || CommConstant.QSSC.equals(scName)) {
             if (!response.getPayload().isEmpty()) {
-                return ProposalResponseUtils.buildProposalResponse(response.getPayload(), null);
+                return ProposalResponseUtils.buildProposalResponse(response.getPayload(), response.getMessage());
             } else {
                 return ProposalResponseUtils.buildProposalResponse(response);
             }
