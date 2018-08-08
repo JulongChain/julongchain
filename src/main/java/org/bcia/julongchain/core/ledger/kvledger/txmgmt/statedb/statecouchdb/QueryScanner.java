@@ -29,8 +29,6 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
  * @company Dingxuan
  */
 public class QueryScanner implements IResultsIterator {
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(QueryResult.class);
-
     private int cursor;
     private String ns;
 

@@ -36,14 +36,14 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class VersionedCouchDBProvider implements IVersionedDBProvider {
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(VersionedCouchDBProvider.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(VersionedCouchDBProvider.class);
 
 	private CouchDbClient dbInstance;
 	private Map<String, IVersionedDB> databases;
 
 
     public VersionedCouchDBProvider(){
-        log.debug("constructiong CouchDB VersionedDBProvider");
+        log.debug("Constructing CouchDB VersionedDBProvider");
 		CouchDBDefinition couchDBDefinition = new CouchDBDefinition();
 		CouchDbProperties properties = new CouchDbProperties(
 				couchDBDefinition.getUserName(),

@@ -34,7 +34,6 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class KvScanner implements IResultsIterator {
-
     private String nameSpace;
     private Iterator dbItr;
 

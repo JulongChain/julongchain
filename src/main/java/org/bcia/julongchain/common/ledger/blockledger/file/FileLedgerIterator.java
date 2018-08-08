@@ -34,7 +34,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class FileLedgerIterator implements IIterator {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(FileLedger.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(FileLedger.class);
     private FileLedger ledger;
     private long blockNum;
     private IResultsIterator commonIterator;
@@ -57,7 +57,7 @@ public class FileLedgerIterator implements IIterator {
         try {
             result = commonIterator.next();
         } catch (LedgerException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             map = new AbstractMap.SimpleEntry<>(null, Common.Status.SERVICE_UNAVAILABLE);
         }
         map = new AbstractMap.SimpleEntry<>(result
@@ -67,11 +67,11 @@ public class FileLedgerIterator implements IIterator {
 
     @Override
     public void readyChain() throws LedgerException{
-        synchronized (FileLedger.lock) {
+        synchronized (FileLedger.LOCK) {
             if (blockNum > ledger.height()) {
                 try {
-                    logger.debug("Require block num is [{}], ledger height is[{}], wait block append", blockNum, ledger.height());
-                    FileLedger.lock.wait();
+                    log.debug("Require block num is [{}], ledger height is[{}], wait block append", blockNum, ledger.height());
+                    FileLedger.LOCK.wait();
                 } catch (InterruptedException e) {
                     throw new LedgerException(e);
                 }

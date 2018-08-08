@@ -36,7 +36,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.Ver
  * @company Dingxuan
  */
 public class CombinedIterator implements IResultsIterator {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(CombinedIterator.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(CombinedIterator.class);
 
     private String ns;
     private IVersionedDB db;
@@ -59,7 +59,7 @@ public class CombinedIterator implements IResultsIterator {
         IResultsIterator updatesItr = updates.getRangeScanIterator(ns, startKey, endKey);
         QueryResult dbItm = dbItr.next();
         QueryResult updatesItm = updatesItr.next();
-        logger.debug("Combined iterator initialized");
+        log.debug("Combined iterator initialized");
         this.ns = ns;
         this.db = db;
         this.updates = updates;
@@ -75,14 +75,14 @@ public class CombinedIterator implements IResultsIterator {
     @Override
     public QueryResult next() throws LedgerException {
         if(dbItm == null && updatesItm == null){
-            logger.debug("dbItm and updatesItm both are null");
+            log.debug("dbItm and updatesItm both are null");
             return serveEndKeyIfNeeded();
         }
         int compareResult = compareKey(dbItm, updatesItm);
         QueryResult selectedItm = null;
         boolean moveDBItr = false;
         boolean moveUpdatesItr = false;
-        logger.debug("compareResult = " + compareResult);
+        log.debug("compareResult = " + compareResult);
         switch (compareResult){
             case -1:
                 selectedItm = dbItm;
@@ -108,7 +108,7 @@ public class CombinedIterator implements IResultsIterator {
         if(isDelete(selectedItm)){
             return next();
         }
-        logger.debug("Returning.");
+        log.debug("Returning.");
         return selectedItm;
     }
 
@@ -137,15 +137,15 @@ public class CombinedIterator implements IResultsIterator {
 
     private QueryResult serveEndKeyIfNeeded() throws LedgerException {
         if(!includeEndKey || endKeyServed){
-            logger.debug("Endkey not be served... Returning null");
+            log.debug("Endkey not be served... Returning null");
             return null;
         }
-        logger.debug("Serving the endKey");
+        log.debug("Serving the endKey");
         VersionedValue vv = updates.get(ns, endKey);
-        logger.debug("endKey value from updates " + vv);
+        log.debug("endKey value from updates " + vv);
         if(vv == null){
             vv = db.getState(ns, endKey);
-            logger.debug("endKey value of statedb " + vv);
+            log.debug("endKey value of statedb " + vv);
         }
         endKeyServed = true;
         if(vv == null){

@@ -68,7 +68,6 @@ import static org.bcia.julongchain.protos.node.SmartContractShim.SmartContractMe
  * @company Dingxuan
  */
 public class SmartContractSupport implements ISCSupport {
-
 	private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractSupport.class);
 
 	private ICA ca;
@@ -153,7 +152,7 @@ public class SmartContractSupport implements ISCSupport {
 	}
 
 	/**
-	 * call this under lock
+	 * call this under LOCK
 	 *
 	 * @param smartcontract
 	 * @return
@@ -163,7 +162,7 @@ public class SmartContractSupport implements ISCSupport {
 	}
 
 	/**
-	 * call this under lock
+	 * call this under LOCK
 	 *
 	 * @param smartcontract
 	 * @return

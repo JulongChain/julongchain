@@ -22,7 +22,6 @@ import org.bcia.julongchain.common.exception.SmartContractException;
 import org.bcia.julongchain.common.exception.SysSmartContractException;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.core.node.NodeConfig;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.Query;
@@ -51,7 +50,6 @@ public class SmartContractProvider {
      * @return
      */
     public static String getSmartContractPath(String path){
-        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
         File file = new File(path);
         //不存在则创建mkdir
         if(!file.exists()){
@@ -73,7 +71,6 @@ public class SmartContractProvider {
      * @return 文件系统中存储的SmartContract
      */
     public static byte[] getSmartContractPackage(String scName, String scVersion) throws JavaChainException{
-        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
         //获取文件路径
         String path = String.format("%s/%s.%s", smartContractInstallPath, scName, scVersion);
         InputStream is = null;
@@ -102,7 +99,6 @@ public class SmartContractProvider {
      * @throws JavaChainException
      */
     public static boolean smartContractPackageExists(String scName, String scVersion) throws JavaChainException{
-        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
         String path = String.format("%s/%s.%s", smartContractInstallPath, scName, scVersion);
         File file = new File(path);
         if(file.exists()){
@@ -149,7 +145,6 @@ public class SmartContractProvider {
     }
 
     public static ISmartContractPackage getSmartContractFromFS(String name, String version) throws JavaChainException {
-        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
         ISmartContractPackage pack = null;
         try {
             pack = new SDSPackage();

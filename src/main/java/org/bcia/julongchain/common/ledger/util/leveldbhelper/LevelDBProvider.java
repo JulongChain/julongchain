@@ -32,9 +32,6 @@ import java.util.*;
  * @company Dingxuan
  */
 public class LevelDBProvider implements IDBProvider {
-
-	private static JavaChainLog logger = JavaChainLogFactory.getLog(LevelDBProvider.class);
-
 	private IDBHandler db = null;
 	private static byte[] DB_NAME_KEY_SEP = new byte[]{0x00};
 	private static byte[] DB_LEDGERID_KEY_SEP = new byte[]{0x03};

@@ -35,7 +35,7 @@ import java.util.zip.GZIPOutputStream;
  * @company Dingxuan
  */
 public class IoUtil {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(IoUtil.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(IoUtil.class);
     private static final int BUFFER = 1024;
 
     /** DirEmpty returns true if the dir at dirPath is empty
@@ -43,8 +43,8 @@ public class IoUtil {
      * @param dirPath
      * @return
      */
-    public static Boolean DirEmpty(String dirPath){
-        return Boolean.FALSE;
+    public static boolean dirEmpty(String dirPath){
+        return false;
     }
 
     /**
@@ -68,7 +68,7 @@ public class IoUtil {
         List<String> list = new ArrayList<>();
         File dir = new File(dirPath);
         if(!dir.exists()){
-            logger.debug("Dir {} is not exists", dir);
+            log.debug("Dir {} is not exists", dir);
             return null;
         }
         for (File file : dir.listFiles()) {
@@ -92,25 +92,25 @@ public class IoUtil {
         int gMod = (perm % 100) / 10;
         int oMod = perm % 10;
         if(uMod > 7 || uMod < 0){
-            logger.error("Wrong mod type " + perm);
+            log.error("Wrong mod type " + perm);
             return;
         }
         if(gMod > 7 || gMod < 0){
-            logger.error("Wrong mod type " + perm);
+            log.error("Wrong mod type " + perm);
             return;
         }
         if(oMod > 7 || oMod < 0){
-            logger.error("Wrong mod type " + perm);
+            log.error("Wrong mod type " + perm);
             return;
         }
         if (!file.setWritable(uMod >= 4, (uMod > 0 && uMod < 5))) {
-            logger.error("Can not set write permission to dir " + file.getAbsolutePath());
+            log.error("Can not set write permission to dir " + file.getAbsolutePath());
         }
         if (!file.setReadable(gMod >= 4, (uMod > 0 && uMod < 5))) {
-            logger.error("Can not set read permission to dir " + file.getAbsolutePath());
+            log.error("Can not set read permission to dir " + file.getAbsolutePath());
         }
         if (!file.setExecutable(oMod >= 4, (uMod > 0 && uMod < 5))) {
-            logger.error("Can not set execute permission to dir " + file.getAbsolutePath());
+            log.error("Can not set execute permission to dir " + file.getAbsolutePath());
         }
     }
 
@@ -120,15 +120,15 @@ public class IoUtil {
     public static boolean createDirIfMissing(String dirPath){
         File dir = new File(dirPath);
         if(dir.exists()){
-            logger.debug("Dir [{}] is already exists", dirPath);
+            log.debug("Dir [{}] is already exists", dirPath);
             return true;
         }
         if (!dir.mkdirs()) {
-            logger.debug("Can not create dir [" + dirPath + "]");
+            log.debug("Can not create dir [" + dirPath + "]");
             return false;
         }
         chmod(dir, 644);
-        logger.debug("Create dir [{}] success", dir.getAbsolutePath());
+        log.debug("Create dir [{}] success", dir.getAbsolutePath());
         return true;
     }
 
@@ -138,25 +138,25 @@ public class IoUtil {
     public static boolean createFileIfMissing(String filePath){
         File file = new File(filePath);
         if(file.exists()){
-            logger.debug("File [{}] is already exists", filePath);
+            log.debug("File [{}] is already exists", filePath);
             return true;
         }
         File dir = file.getParentFile();
         if (!createDirIfMissing(dir.getAbsolutePath())) {
-            logger.debug("Can not create dir [" + dir.getAbsolutePath() + "]");
+            log.debug("Can not create dir [" + dir.getAbsolutePath() + "]");
             return false;
         }
         try {
             if (file.createNewFile()) {
                 chmod(file, 755);
-                logger.debug("Create file [{}] success", filePath);
+                log.debug("Create file [{}] success", filePath);
                 return true;
             } else {
-                logger.debug("Can not create file [" + filePath + "]");
+                log.debug("Can not create file [" + filePath + "]");
                 return false;
             }
         } catch (IOException e) {
-            logger.error("Got error error:{} when createing file:[{}]", e.getMessage(), filePath);
+            log.error("Got error error:{} when createing file:[{}]", e.getMessage(), filePath);
             return false;
         }
     }
@@ -180,7 +180,7 @@ public class IoUtil {
             oos.close();
             return result;
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new JavaChainException(e);
         }
     }
@@ -202,7 +202,7 @@ public class IoUtil {
             ois.close();
             return obj;
         } catch (Exception e){
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new JavaChainException(e);
         }
     }
@@ -214,11 +214,11 @@ public class IoUtil {
     public static Map<String, File> getFileRelativePath(String path){
         File file = new File(path);
         if(!file.exists()){
-            logger.debug("File {} is not exists", path);
+            log.debug("File {} is not exists", path);
             return null;
         }
         if(!file.isDirectory()){
-            logger.debug("Input must be a directory, but file {} is not", path);
+            log.debug("Input must be a directory, but file {} is not", path);
             return null;
         }
         Map<String, File> result = new TreeMap<>(Comparator.naturalOrder());
@@ -249,7 +249,7 @@ public class IoUtil {
                 }
             }
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new JavaChainException(e);
         }
     }
@@ -284,7 +284,7 @@ public class IoUtil {
                 taos.closeArchiveEntry();
             }
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new JavaChainException(e);
         } finally {
             closeStream(fis, taos, baos);
@@ -307,7 +307,7 @@ public class IoUtil {
             gzos.finish();
             gzos.flush();
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new JavaChainException(e);
         } finally {
             closeStream(baos, gzos);
@@ -343,7 +343,7 @@ public class IoUtil {
                 baos.reset();
             }
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new JavaChainException(e);
         } finally {
             closeStream( tais, bais, baos);
@@ -371,7 +371,7 @@ public class IoUtil {
                 baos.write(buff, 0, num);
             }
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new JavaChainException(e);
         } finally {
             closeStream( bais, baos, gzis);
@@ -402,7 +402,7 @@ public class IoUtil {
                 fos.write(fileBytes);
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new JavaChainException(e);
         } finally {
             closeStream(fos);
@@ -417,7 +417,7 @@ public class IoUtil {
     public static byte[] fileReader(String filePath, int cache) throws JavaChainException{
         File file = new File(filePath);
         if (!file.exists()) {
-            logger.debug("File {} not found", filePath);
+            log.debug("File {} not found", filePath);
             return null;
         }
         FileInputStream fis = null;
@@ -432,7 +432,7 @@ public class IoUtil {
             }
             return baos.toByteArray();
         } catch (Exception e){
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new JavaChainException(e);
         } finally {
             closeStream(fis, baos);

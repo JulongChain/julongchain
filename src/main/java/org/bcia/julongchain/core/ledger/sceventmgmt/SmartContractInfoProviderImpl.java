@@ -33,7 +33,7 @@ import org.bcia.julongchain.protos.node.SmartContractDataPackage;
  * @company Dingxuan
  */
 public class SmartContractInfoProviderImpl implements ISmartContractInfoProvider{
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(SmartContractInfoProviderImpl.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractInfoProviderImpl.class);
 
     @Override
     public boolean isSmartContractDeployed(String groupID, SmartContractDefinition smartContractDefinition) throws JavaChainException{

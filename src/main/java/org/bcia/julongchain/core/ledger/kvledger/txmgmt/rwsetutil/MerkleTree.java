@@ -37,7 +37,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class MerkleTree {
-    private static final JavaChainLog logger  = JavaChainLogFactory.getLog(MerkleTree.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(MerkleTree.class);
     private static final int LEAF_LEVEL = 1;
 
     private Map<Integer, List<byte[]>> tree;
@@ -56,13 +56,13 @@ public class MerkleTree {
     }
 
     public void update(byte[] nextLeafLevelHash) throws LedgerException{
-        logger.debug("Before update. Tree's max level is " + tree.size());
+        log.debug("Before update. Tree's max level is " + tree.size());
         List<byte[]> leafLevelHash = tree.computeIfAbsent(LEAF_LEVEL, k -> new ArrayList<>());
         leafLevelHash.add(nextLeafLevelHash);
         for (int currentLelvel = LEAF_LEVEL;; currentLelvel++) {
 			List<byte[]> currenLevelHashes = tree.computeIfAbsent(currentLelvel, k -> new ArrayList<>());
 			if(currenLevelHashes.size() < maxDegree){
-                logger.debug("After update. Tree's max level is " + tree.size());
+                log.debug("After update. Tree's max level is " + tree.size());
                 return;
             }
             byte[] nextLevelHash = computeCombinedHash(currenLevelHashes);
@@ -79,7 +79,7 @@ public class MerkleTree {
     }
 
     public void done() throws LedgerException{
-        logger.debug("Before done.");
+        log.debug("Before done.");
         int currentLevel = LEAF_LEVEL;
         byte[] hash = null;
         while(currentLevel < maxLevel){
@@ -105,7 +105,7 @@ public class MerkleTree {
            l.add(combinedHash);
            tree.put(maxLevel, l);
         }
-        logger.debug("After done.");
+        log.debug("After done.");
     }
 
     public KvRwset.QueryReadsMerkleSummary getSummery(){

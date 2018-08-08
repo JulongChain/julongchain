@@ -32,8 +32,7 @@ import org.bcia.julongchain.protos.consenter.Ab;
  * @company Dingxuan
  */
 public class FileLedger extends ReadWriteBase {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(FileLedger.class);
-    public static final Object lock = new Object();
+    public static final Object LOCK = new Object();
 
     private IFileLedgerBlockStore blockStore;
 
@@ -61,11 +60,11 @@ public class FileLedger extends ReadWriteBase {
                 startingBlockNumber = startType.getSpecified().getNumber();
                 long height = height();
                 if(startingBlockNumber > height){
-                    throw Util.NOT_FOUND_ERROR_ITERATOR;
+                	throw new LedgerException("Not found iterator");
                 }
                 break;
             default:
-                throw Util.NOT_FOUND_ERROR_ITERATOR;
+				throw new LedgerException("Not found iterator");
         }
         IResultsIterator iterator = blockStore.retrieveBlocks(startingBlockNumber);
         return new FileLedgerIterator(this, startingBlockNumber, iterator);
@@ -82,8 +81,8 @@ public class FileLedger extends ReadWriteBase {
     @Override
     public void append(Common.Block block) throws LedgerException{
         blockStore.addBlock(block);
-        synchronized (lock){
-            lock.notifyAll();
+        synchronized (LOCK){
+            LOCK.notifyAll();
         }
     }
 

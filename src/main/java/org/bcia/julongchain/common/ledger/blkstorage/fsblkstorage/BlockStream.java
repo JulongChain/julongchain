@@ -30,7 +30,7 @@ import java.util.AbstractMap;
  * @company Dingxuan
  */
 public class BlockStream {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockStream.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(BlockStream.class);
 
     private String rootDir;
     private int currentFileNum;
@@ -70,11 +70,11 @@ public class BlockStream {
     public AbstractMap.SimpleEntry<byte[], BlockPlacementInfo> nextBlockBytesAndPlacementInfo() throws LedgerException{
         AbstractMap.SimpleEntry<byte[], BlockPlacementInfo> entry = currentFileStream.nextBlockBytesAndPlacementInfo();
         byte[] blockBytes = entry.getKey();
-        logger.debug(String.format("Blockbytes [%s] read from file [%d]", BytesHexStrTranslate.bytesToHexFun1(blockBytes), currentFileNum));
+        log.debug(String.format("Blockbytes [%s] read from file [%d]", BytesHexStrTranslate.bytesToHexFun1(blockBytes), currentFileNum));
         //当前文件无法读取出block
 		boolean expected = ((blockBytes == null || blockBytes.length == 0) && (currentFileNum < endFileNum || endFileNum < 0));
         if(expected){
-            logger.debug(String.format("Current file [%d] exhausted. Moving to next file", currentFileNum));
+            log.debug(String.format("Current file [%d] exhausted. Moving to next file", currentFileNum));
             moveToNextBlockFileStream();
             return nextBlockBytesAndPlacementInfo();
         }

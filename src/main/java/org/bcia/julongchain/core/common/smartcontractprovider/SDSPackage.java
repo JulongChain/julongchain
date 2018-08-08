@@ -74,7 +74,6 @@ public class SDSPackage implements ISmartContractPackage {
 
         this.deploymentSpec = deploymentSpec;
 
-        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
 
         this.buf = buf;
         this.data = getSDSData(deploymentSpec);
@@ -95,7 +94,6 @@ public class SDSPackage implements ISmartContractPackage {
      */
     @Override
     public SmartContractPackage.SmartContractDeploymentSpec initFromFS(String scName, String scVersion) throws JavaChainException {
-        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
         reset();
         byte[] buf = SmartContractProvider.getSmartContractPackage(scName, scVersion);
         initFromBuffer(buf);
@@ -126,7 +124,6 @@ public class SDSPackage implements ISmartContractPackage {
      */
     @Override
     public void putSmartcontractToFS() throws JavaChainException {
-        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
         //创建文件前的检查
         if(buf == null){
             throw new JavaChainException("Uninitialized package");

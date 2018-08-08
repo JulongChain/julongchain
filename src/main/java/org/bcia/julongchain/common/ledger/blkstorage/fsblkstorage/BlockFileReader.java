@@ -30,7 +30,7 @@ import java.io.FileInputStream;
  * @company Dingxuan
  */
 public class BlockFileReader {
-	private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockFileReader.class);
+	private static JavaChainLog log = JavaChainLogFactory.getLog(BlockFileReader.class);
     private File file;
 
     public BlockFileReader(String filePath){
@@ -49,15 +49,15 @@ public class BlockFileReader {
 			//移动到指定位置
 			long skip = fis.skip(offset);
 			if (skip != offset) {
-				logger.debug("Wrong file skip. Expect skip = [{}], actual skip = [{}]", offset, skip);
+				log.debug("Wrong file skip. Expect skip = [{}], actual skip = [{}]", offset, skip);
 			}
 			int read = fis.read(result);
 			if (read != length) {
-				logger.debug("Wrong file read. Except read = [{}], actual read = [{}]", length, read);
+				log.debug("Wrong file read. Except read = [{}], actual read = [{}]", length, read);
 			}
 			fis.close();
 		} catch (Throwable e){
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			throw new LedgerException(e);
 		}
 		return result;

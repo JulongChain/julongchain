@@ -34,7 +34,7 @@ import org.bcia.julongchain.protos.common.Collection;
  * @company Dingxuan
  */
 public class CollectionStoreSupport implements IPrivDataSupport {
-	private static final JavaChainLog log = JavaChainLogFactory.getLog(CollectionStoreSupport.class);
+	private static JavaChainLog log = JavaChainLogFactory.getLog(CollectionStoreSupport.class);
 
     public final static String COLLECTION_SEPARATOR = "~";
     public final static String COLLECTION_SUFFIX ="collection";

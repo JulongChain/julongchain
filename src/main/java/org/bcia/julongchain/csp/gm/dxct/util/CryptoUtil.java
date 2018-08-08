@@ -16,7 +16,6 @@
 package org.bcia.julongchain.csp.gm.dxct.util;
 
 import org.bcia.julongchain.common.exception.CspException;
-import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.util.FileUtils;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;

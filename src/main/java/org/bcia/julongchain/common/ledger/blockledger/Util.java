@@ -32,8 +32,6 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class Util {
-    public static final LedgerException NOT_FOUND_ERROR_ITERATOR = new LedgerException("Not found iterator");
-
     /**
      * 获取新的区块
      * 根据当前账本中最新区块的编号获取下一个区块编号

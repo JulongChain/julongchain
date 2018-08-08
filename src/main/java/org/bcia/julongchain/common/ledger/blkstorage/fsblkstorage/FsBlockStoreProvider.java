@@ -35,7 +35,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public class FsBlockStoreProvider implements IBlockStoreProvider {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(FsBlockStoreProvider.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(FsBlockStoreProvider.class);
 
     private IndexConfig indexConfig;
     private IDBProvider leveldbProvider;
@@ -48,7 +48,7 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
         this.indexConfig = indexConfig;
         this.leveldbProvider = new LevelDBProvider(config.getIndexDir());
         this.config = config;
-        logger.debug("Creating fsBlockStore using path = " + config.getChainsDir());
+        log.debug("Creating fsBlockStore using path = " + config.getChainsDir());
     }
 
     /**

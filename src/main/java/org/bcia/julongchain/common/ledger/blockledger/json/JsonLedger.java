@@ -39,8 +39,8 @@ import java.util.AbstractMap;
  * @company Dingxuan
  */
 public class JsonLedger extends ReadWriteBase {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(JsonLedger.class);
-    private static final Object lock = new Object();
+    private static JavaChainLog log = JavaChainLogFactory.getLog(JsonLedger.class);
+    private static final Object LOCK = new Object();
     public static final String GROUP_DIRECTORY_FORMAT_STRING  = "chain_";
     public static final String BLOCK_FILE_FORMAT_STRING  = "block_%020d.json";
 
@@ -70,7 +70,7 @@ public class JsonLedger extends ReadWriteBase {
                 continue;
             }
             if(number != nextNumber){
-                logger.error("Missing block " + nextNumber + " in chain");
+                log.error("Missing block " + nextNumber + " in chain");
             }
             nextNumber++;
         }
@@ -84,10 +84,10 @@ public class JsonLedger extends ReadWriteBase {
         Common.Block block = entry.getKey();
         boolean found = entry.getValue();
         if (!found) {
-            logger.error(String.format("Block %d was in directory listing but error reading", height - 1));
+            log.error(String.format("Block %d was in directory listing but error reading", height - 1));
         }
         if(block == null){
-            logger.error("Error reading block " + (height - 1));
+            log.error("Error reading block " + (height - 1));
         } else {
             lastHash = block.getHeader().getDataHash();
         }
@@ -112,7 +112,7 @@ public class JsonLedger extends ReadWriteBase {
             }
             Common.Block.Builder builder = Common.Block.newBuilder();
             JsonFormat.parser().merge(blockJsonBuffer.toString(), builder);
-            logger.debug("Read block " + builder.getHeader().getNumber());
+            log.debug("Read block " + builder.getHeader().getNumber());
             //成功读取，返回true
             return new AbstractMap.SimpleImmutableEntry(builder.build(), true);
         } catch (Exception e){
@@ -120,10 +120,9 @@ public class JsonLedger extends ReadWriteBase {
             return new AbstractMap.SimpleImmutableEntry(null, true);
         } finally {
             try {
-                reader.close();
+				reader.close();
             } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-                return new AbstractMap.SimpleImmutableEntry(null, true);
+                log.error(e.getMessage(), e);
             }
         }
     }
@@ -137,11 +136,11 @@ public class JsonLedger extends ReadWriteBase {
                 return new JsonCursor(this, height - 1);
             case Ab.SeekPosition.SPECIFIED_FIELD_NUMBER:
                 if(startPosition.getSpecified().getNumber() > height){
-                    throw Util.NOT_FOUND_ERROR_ITERATOR;
+                	throw new LedgerException("Not found iterator");
                 }
                 return new JsonCursor(this, startPosition.getSpecified().getNumber());
             default:
-                throw Util.NOT_FOUND_ERROR_ITERATOR;
+				throw new LedgerException("Not found iterator");
         }
     }
 
@@ -161,8 +160,8 @@ public class JsonLedger extends ReadWriteBase {
         writeBlock(block);
         lastHash = block.getHeader().getDataHash();
         height++;
-        synchronized (lock) {
-            lock.notifyAll();
+        synchronized (LOCK) {
+            LOCK.notifyAll();
         }
     }
 
@@ -173,13 +172,13 @@ public class JsonLedger extends ReadWriteBase {
         try {
             if (!IoUtil.createFileIfMissing(name)) {
                 String errMsg = "Can not create file " + name;
-                logger.error(errMsg);
+                log.error(errMsg);
                 throw new LedgerException(errMsg);
             }
             writer = new BufferedWriter(new FileWriter(file));
             writer.write(JsonFormat.printer().print(block));
             writer.flush();
-            logger.debug("Wrote block " + block.getHeader().getNumber());
+            log.debug("Wrote block " + block.getHeader().getNumber());
             writer.close();
         } catch (IOException e) {
             throw new LedgerException(e);
@@ -223,6 +222,6 @@ public class JsonLedger extends ReadWriteBase {
     }
 
     public static Object getLock() {
-        return lock;
+        return LOCK;
     }
 }

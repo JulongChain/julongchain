@@ -39,7 +39,7 @@ import java.io.*;
  * @company Dingxuan
  */
 public class SignedSDSPackage implements ISmartContractPackage {
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(SignedSDSPackage.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(SignedSDSPackage.class);
 
     private byte[] buf;
     private SmartContractPackage.SmartContractDeploymentSpec depSpec;

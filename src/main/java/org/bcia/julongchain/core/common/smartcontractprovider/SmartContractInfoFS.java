@@ -30,7 +30,7 @@ import org.bcia.julongchain.protos.node.SmartContractPackage;
  */
 public class SmartContractInfoFS implements ISmartContractCacheSupport {
 
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(SmartContractInfoFS.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractInfoFS.class);
 
     /**
      * GetSmartContractFromFS  this is a wrapper for hiding package implementation.

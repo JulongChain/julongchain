@@ -32,7 +32,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
  * @company Dingxuan
  */
 public class QueryResultsItr implements IResultsIterator {
-    private static final JavaChainLog loggger  = JavaChainLogFactory.getLog(QueryResultsItr.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(QueryResultsItr.class);
 
     private IResultsIterator dbItr;
     private RWSetBuilder rwSetBuilder;
@@ -49,7 +49,7 @@ public class QueryResultsItr implements IResultsIterator {
             return null;
         }
         VersionedKV versionedQueyrRecord = (VersionedKV) queryResult.getObj();
-        loggger.debug("queryResultItr.Next() returned a record " + new String(versionedQueyrRecord.getVersionedValue().getValue()));
+        log.debug("queryResultItr.Next() returned a record " + new String(versionedQueyrRecord.getVersionedValue().getValue()));
         if(rwSetBuilder != null){
             rwSetBuilder.addToReadSet(versionedQueyrRecord.getCompositeKey().getNamespace(),
                     versionedQueyrRecord.getCompositeKey().getKey(),

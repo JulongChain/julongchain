@@ -30,7 +30,7 @@ import java.io.*;
  * @company Dingxuan
  */
 public class BlockFileWriter {
-	private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockFileWriter.class);
+	private static JavaChainLog log = JavaChainLogFactory.getLog(BlockFileWriter.class);
 
     private String filePath;
     private File file;
@@ -56,7 +56,7 @@ public class BlockFileWriter {
             byte[] inputBytes = new byte[targetSize];
             int read = fis.read(inputBytes);
 			if (read != targetSize) {
-				logger.debug("Can not read specified size. Expected file size [{}], actual file size [{}]", targetSize, read);
+				log.debug("Can not read specified size. Expected file size [{}], actual file size [{}]", targetSize, read);
 			}
             fis.close();
             fos = new FileOutputStream(file);

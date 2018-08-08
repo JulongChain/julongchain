@@ -31,8 +31,6 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class Validators {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Validators.class);
-
     private static Map<String, FileValidator> fileValidators = new HashMap<>();
 
     /**

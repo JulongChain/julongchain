@@ -43,7 +43,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class HistoryScanner implements IResultsIterator {
-    private static final JavaChainLog  logger = JavaChainLogFactory.getLog(HistoryScanner.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(HistoryScanner.class);
 
     /**
      * HistoryDB key头部 包含namespace, key
@@ -82,12 +82,12 @@ public class HistoryScanner implements IResultsIterator {
 	    //key:ns~key~blockNo~tranNo
         blockNum = HistoryDBHelper.splitCompositeHistoryKeyForBlockNum(historyKey);
         tranNum = HistoryDBHelper.splitCompositeHistoryKeyForTranNum(historyKey);
-        logger.debug(String.format("Found history record for namespace: %s, key: %s. BlockNum: %d, TranNum: %d", nameSpace, key, blockNum, tranNum));
+        log.debug(String.format("Found history record for namespace: %s, key: %s. BlockNum: %d, TranNum: %d", nameSpace, key, blockNum, tranNum));
 
         Common.Envelope tranEnvelope = blockStore.retrieveTxByBlockNumTranNum(blockNum, tranNum);
 //        QueryResult queryResult = getKeyModificationFromTran(tranEnvelope, nameSpace, key);
         QueryResult queryResult = getKvVersion(blockNum, tranNum);
-//        logger.debug("Found history key value for namespace=[{}], key=[{}] from transaction=[{}]", nameSpace, key, ((KvQueryResult.KeyModification) queryResult.getObj()).getTxId());
+//        log.debug("Found history key value for namespace=[{}], key=[{}] from transaction=[{}]", nameSpace, key, ((KvQueryResult.KeyModification) queryResult.getObj()).getTxId());
 
         return queryResult;
     }
@@ -97,7 +97,7 @@ public class HistoryScanner implements IResultsIterator {
 	    try {
 		    dbItr.close();
 	    } catch (IOException e) {
-	    	logger.error("Got error when close dbItr");
+	    	log.error("Got error when close dbItr");
 	    	throw new RuntimeException(e);
 	    }
     }
@@ -112,7 +112,7 @@ public class HistoryScanner implements IResultsIterator {
 
     private QueryResult getKeyModificationFromTran(Common.Envelope envelope, String ns, String key) throws LedgerException {
         try {
-            logger.debug("Entering getKeyModificationFromTran() with namespace=[{}], key=[{}]", ns, key);
+            log.debug("Entering getKeyModificationFromTran() with namespace=[{}], key=[{}]", ns, key);
             Common.Payload payload = ProtoUtils.getPayload(envelope);
             TransactionPackage.Transaction tx = ProtoUtils.getTransaction(payload.getData());
             ProposalPackage.SmartContractAction respPayload = ProtoUtils.getSCAction(tx.getActions(0));
@@ -141,7 +141,7 @@ public class HistoryScanner implements IResultsIterator {
             }
             throw new LedgerException("Namespace not found in transaction's RWSets");
         } catch (Throwable e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             throw new LedgerException(e);
         }
     }

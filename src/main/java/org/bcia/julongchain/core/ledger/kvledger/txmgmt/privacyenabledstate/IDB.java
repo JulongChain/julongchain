@@ -37,7 +37,7 @@ public interface IDB extends IVersionedDB {
 
     void loadCommittedVersionsOfPubAndHashedKeys(List<CompositeKey> pubKeys, List<HashedCompositeKey> hashKeys) throws LedgerException;
 
-    LedgerHeight getCacheKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException;
+    LedgerHeight getCachedKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException;
 
     void clearCachedVersions();
 

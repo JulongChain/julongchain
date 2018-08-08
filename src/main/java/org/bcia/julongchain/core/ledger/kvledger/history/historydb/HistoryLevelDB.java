@@ -44,8 +44,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public class HistoryLevelDB implements IHistoryDB {
-
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(HistoryLevelDB.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(HistoryLevelDB.class);
     private IDBProvider provider;
     private String dbName;
 
@@ -67,7 +66,7 @@ public class HistoryLevelDB implements IHistoryDB {
         long blockNo = block.getHeader().getNumber();
         int tranNo = 0;
         UpdateBatch dbBatch = new UpdateBatch();
-        logger.debug(String.format("Group [%s]: Updating historyDB for groupNo [%s] with [%d] transactions"
+        log.debug(String.format("Group [%s]: Updating historyDB for groupNo [%s] with [%d] transactions"
                 , dbName, blockNo, block.getData().getDataCount()));
         //获取失效
         TxValidationFlags txsFilter = TxValidationFlags.fromByteString(block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
@@ -85,7 +84,7 @@ public class HistoryLevelDB implements IHistoryDB {
         for (; tranNo < list.size(); tranNo++) {
             ByteString evnByte = list.get(tranNo);
             if(txsFilter.isInValid(tranNo)){
-                logger.debug(String.format("Group [%s]: Skipping write into historyDB for invalid transaction number %d."
+                log.debug(String.format("Group [%s]: Skipping write into historyDB for invalid transaction number %d."
                         , dbName, tranNo));
                 continue;
             }
@@ -102,7 +101,7 @@ public class HistoryLevelDB implements IHistoryDB {
                     TxRwSet txRWSet = new TxRwSet();
                     respPayload = Util.getActionFromEnvelope(evnByte);
                     if(respPayload == null || !respPayload.hasResponse()){
-                        logger.debug("Got null respPayload from env");
+                        log.debug("Got null respPayload from env");
                         continue;
                     }
                     txRWSet.fromProtoBytes(respPayload.getResults());
@@ -117,7 +116,7 @@ public class HistoryLevelDB implements IHistoryDB {
                         }
                     }
                 } else {
-                    logger.debug(String.format("Group [%s]: Skipping transaction [%d] since it is not an endorsement transaction"
+                    log.debug(String.format("Group [%s]: Skipping transaction [%d] since it is not an endorsement transaction"
                             , dbName, tranNo));
                 }
             }
@@ -130,7 +129,7 @@ public class HistoryLevelDB implements IHistoryDB {
         //同步写入leveldb
         provider.writeBatch(dbBatch, true);
 
-        logger.debug(String.format("Group [%s]: Update committed to historydb for blockNo [%d]"
+        log.debug(String.format("Group [%s]: Update committed to historydb for blockNo [%d]"
                 ,dbName, blockNo));
     }
 
@@ -173,14 +172,6 @@ public class HistoryLevelDB implements IHistoryDB {
     @Override
     public void commitLostBlock(BlockAndPvtData blockAndPvtData) throws LedgerException {
         commit(blockAndPvtData.getBlock());
-    }
-
-    /**
-     * 判断交易是否为有效交易
-     */
-    private boolean isInvalid(ByteString tx){
-
-        return true;
     }
 
     public IDBProvider getProvider() {

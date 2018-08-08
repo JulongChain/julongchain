@@ -262,7 +262,8 @@ public class LedgerManagerTest {
                 .setSignature(ByteString.copyFromUtf8("Envelope Signature"))
                 .build();
 
-        return envelope;
+
+		return envelope;
     }
 
     @Test

@@ -73,7 +73,7 @@ public class SystemSmartContractProvider implements ISystemSmartContractProvider
     }
 
     @Override
-    public boolean isSysSCAndNotInvkeableExternal(String name) {
+    public boolean isSysSCAndNotInvokableExternal(String name) {
         return sscManager.isSysSmartContractAndNotInvokableExternal(name);
     }
 

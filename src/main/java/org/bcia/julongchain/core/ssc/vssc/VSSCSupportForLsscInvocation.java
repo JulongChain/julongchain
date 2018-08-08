@@ -153,7 +153,6 @@ public class VSSCSupportForLsscInvocation {
                     throw new SysSmartContractException(e.getMessage());
                 }
                 TxRwSet txRwSet=null;
-                // TODO: 6/4/18 modify by sunzongyu, catch exception when get TxRwSet from proto message.
                 try {
                     txRwSet=RwSetUtil.txRwSetFromProtoMsg(rwSetProto);
                 } catch (LedgerException e) {
@@ -162,7 +161,7 @@ public class VSSCSupportForLsscInvocation {
                 }
                 List<NsRwSet> nsSet = txRwSet.getNsRwSets();
 
-                //extract the rwset for lscc
+                //extract the rwset for lssc
                 KvRwset.KVRWSet lsscRwSet=null;
                 for(NsRwSet ns:nsSet){
                     log.debug("Namespace %s",ns.getNameSpace());

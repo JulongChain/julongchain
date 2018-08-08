@@ -33,7 +33,7 @@ import java.util.AbstractMap;
  * @company Dingxuan
  */
 public class JsonCursor implements IIterator {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(JsonCursor.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(JsonCursor.class);
 
     private JsonLedger jl;
     private long blockNum;
@@ -59,7 +59,7 @@ public class JsonCursor implements IIterator {
                 return new QueryResult(new AbstractMap.SimpleImmutableEntry( new QueryResult(block), Common.Status.SUCCESS));
             }
             synchronized (JsonLedger.getLock()) {
-                logger.debug("Waiting for block append");
+                log.debug("Waiting for block append");
                 try {
                     JsonLedger.getLock().wait();
                 } catch (InterruptedException e) {

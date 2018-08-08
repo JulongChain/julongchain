@@ -29,8 +29,6 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
  * @company Dingxuan
  */
 public class KvScanner implements IResultsIterator {
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(KvScanner.class);
-
     private int cursor;
     private String ns;
 

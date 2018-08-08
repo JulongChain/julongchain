@@ -31,7 +31,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public class LockBasedQueryExecutor implements IQueryExecutor {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(LockBasedQueryExecutor.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(LockBasedQueryExecutor.class);
 
     private QueryHelper helper;
     private String txID;
@@ -44,7 +44,7 @@ public class LockBasedQueryExecutor implements IQueryExecutor {
     public LockBasedQueryExecutor(LockBasedTxManager txMgr, String txID) {
         this.helper = new QueryHelper(txMgr, null);
         this.txID = txID;
-        logger.debug("Constructing new query executor txid = " + txID);
+        log.debug("Constructing new query executor txid = " + txID);
     }
 
     @Override
@@ -84,12 +84,12 @@ public class LockBasedQueryExecutor implements IQueryExecutor {
 
     @Override
     public void done(){
-        logger.debug("Done with transaction simulation " + txID);
+        log.debug("Done with transaction simulation " + txID);
         try {
             helper.done();
         } catch (LedgerException e) {
-            logger.error("Can not done query helper");
-            logger.error(e.getMessage(), e);
+            log.error("Can not done query helper");
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
     }

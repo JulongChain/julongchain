@@ -23,7 +23,6 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDBProvider;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
-import org.lightcouch.CouchDbClient;
 
 /**
  * 提供leveldb实现的VersionDB辅助
@@ -33,15 +32,14 @@ import org.lightcouch.CouchDbClient;
  * @company Dingxuan
  */
 public class VersionedLevelDBProvider implements IVersionedDBProvider {
-
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(VersionedLevelDBProvider.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(VersionedLevelDBProvider.class);
 
     private IDBProvider db;
 
     public VersionedLevelDBProvider() throws LedgerException {
         String dbPath = LedgerConfig.getStateLevelDBPath();
         this.db = new LevelDBProvider(dbPath);
-        logger.debug("Create vdb using path " + this.db.getDBPath());
+        log.debug("Create vdb using path " + this.db.getDBPath());
     }
 
     @Override

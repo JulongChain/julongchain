@@ -29,7 +29,6 @@ import java.util.List;
  * @company Dingxuan
  */
 public class BlockIndexInfo {
-
     private long blockNum;
     private byte[] blockHash;
     private FileLocPointer flp;
@@ -46,7 +45,6 @@ public class BlockIndexInfo {
         this.metadata = metadata;
     }
 
-    private static final JavaChainLog loogger = JavaChainLogFactory.getLog(BlockIndexInfo.class);
     public long getBlockNum() {
         return blockNum;
     }

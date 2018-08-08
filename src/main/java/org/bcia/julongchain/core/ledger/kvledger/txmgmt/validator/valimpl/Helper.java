@@ -50,7 +50,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class Helper {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(Helper.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(Helper.class);
 
     public static PvtUpdateBatch validateAndPreparePvtBatch(Block block, Map<Long, TxPvtData> pvtData) throws LedgerException{
         PvtUpdateBatch pvtUpdates = new PvtUpdateBatch();
@@ -118,7 +118,7 @@ public class Helper {
                 throw new LedgerException(e);
             }
             if(txsFilter.isInValid(txIndex)){
-                logger.debug(String.format("Group [%s]: Block [%d] Transaction index [%d] TxID [%s]" +
+                log.debug(String.format("Group [%s]: Block [%d] Transaction index [%d] TxID [%s]" +
                         " marked as invalid by committer. Reason code [%s]",
                         gh.getGroupId(),
                         block.getHeader().getNumber(),
@@ -129,7 +129,7 @@ public class Helper {
             }
             TxRwSet txRwSet = null;
             Common.HeaderType txType = Common.HeaderType.forNumber(gh.getType());
-            logger.debug("txType " + txType);
+            log.debug("txType " + txType);
             if(Common.HeaderType.ENDORSER_TRANSACTION.equals(txType)){
                 ProposalPackage.SmartContractAction respPayload;
                 try {
@@ -172,9 +172,9 @@ public class Helper {
     }
 
     private static Rwset.TxReadWriteSet processNonEndorserTx(Common.Envelope txEnv, String txID, Common.HeaderType txType, ITxManager txMgr, boolean synchingState) throws LedgerException, InvalidTxException {
-        logger.debug(String.format("Performing custom processing for transaction [txid=%s], [txtype=%s]", txID, txType));
+        log.debug(String.format("Performing custom processing for transaction [txid=%s], [txtype=%s]", txID, txType));
         IProcessor processor = CustomTx.getProcessor(txType);
-        logger.debug("Processor for custom tx processing " + processor);
+        log.debug("Processor for custom tx processing " + processor);
         if(processor == null){
         	return null;
         }

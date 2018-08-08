@@ -28,10 +28,10 @@ import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
  * @date 2018/04/17
  * @company Dingxuan
  */
-public class CommonStorageDBProvider implements IDBPorvider {
+public class CommonStorageDBProvider implements IDBProvider {
     private IVersionedDBProvider vdbProvider;
 
-    public static CommonStorageDBProvider NewCommonStorageDBProvider() throws LedgerException {
+    public static CommonStorageDBProvider newCommonStorageDBProvider() throws LedgerException {
         IVersionedDBProvider vdbProvider = null;
         if(LedgerConfig.isCouchDBEnable()){
             //CouchDB is not enable

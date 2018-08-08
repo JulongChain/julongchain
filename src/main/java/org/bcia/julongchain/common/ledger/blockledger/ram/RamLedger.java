@@ -32,8 +32,8 @@ import org.bcia.julongchain.protos.consenter.Ab;
  * @company Dingxuan
  */
 public class RamLedger extends ReadWriteBase {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(RamLedger.class);
-    private static final Object lock = new Object();
+    private static JavaChainLog log = JavaChainLogFactory.getLog(RamLedger.class);
+    private static final Object LOCK = new Object();
 
     private int maxSize;
     private int size;
@@ -51,12 +51,12 @@ public class RamLedger extends ReadWriteBase {
 
     @Override
     public IIterator iterator(Ab.SeekPosition startPosition) throws LedgerException {
-        logger.debug("Starting get cursor");
+        log.debug("Starting get cursor");
         SimpleList list = null;
         Common.Block block = null;
         switch (startPosition.getTypeCase().getNumber()){
             case Ab.SeekPosition.OLDEST_FIELD_NUMBER:
-                logger.debug("Getting OLDEST block");
+                log.debug("Getting OLDEST block");
                 SimpleList oldest = this.oldest;
                 block = Common.Block.newBuilder()
                         .setHeader(Common.BlockHeader.newBuilder()
@@ -66,7 +66,7 @@ public class RamLedger extends ReadWriteBase {
                 list = new SimpleList(oldest, block);
                 break;
             case Ab.SeekPosition.NEWEST_FIELD_NUMBER:
-                logger.debug("Getting NEWEST block");
+                log.debug("Getting NEWEST block");
                 SimpleList newest = this.newest;
                 block = Common.Block.newBuilder()
                         .setHeader(Common.BlockHeader.newBuilder()
@@ -79,13 +79,13 @@ public class RamLedger extends ReadWriteBase {
                 oldest = this.oldest;
                 newest = this.newest;
                 long specified = startPosition.getSpecified().getNumber();
-                logger.debug("Attempting to return block " + specified);
+                log.debug("Attempting to return block " + specified);
 
                 if(specified < oldest.getBlock().getHeader().getNumber()
                         || specified > newest.getBlock().getHeader().getNumber() + 1){
-                    logger.debug(String.format("Returning error iterator because specified seek was %d with oldest %d and newest %d",
+                    log.debug(String.format("Returning error iterator because specified seek was %d with oldest %d and newest %d",
                             specified, oldest.getBlock().getHeader().getNumber(), newest.getBlock().getHeader().getNumber()));
-                    throw Util.NOT_FOUND_ERROR_ITERATOR;
+                    throw new LedgerException("Not found iterator");
                 }
 
                 if(specified == oldest.getBlock().getHeader().getNumber()){
@@ -109,11 +109,11 @@ public class RamLedger extends ReadWriteBase {
         long blockNum = list.getBlock().getHeader().getNumber() + 1;
 
         if(blockNum == ~(long) 0){
-            logger.debug("Pass pre genesis block");
+            log.debug("Pass pre genesis block");
             cursor.next();
             blockNum++;
         }
-        logger.debug("Finished create ram ledger cursor");
+        log.debug("Finished create ram ledger cursor");
         return cursor;
     }
 
@@ -141,14 +141,14 @@ public class RamLedger extends ReadWriteBase {
         this.newest = this.newest.getNext();
         this.size++;
         if(this.size > this.maxSize){
-            logger.debug("RAM ledger max size about to be exceeded, removing oldest itm: " + this.oldest.getBlock().getHeader().getNumber());
+            log.debug("RAM ledger max size about to be exceeded, removing oldest itm: " + this.oldest.getBlock().getHeader().getNumber());
             this.oldest = oldest.getNext();
             this.size--;
         }
-        synchronized (lock){
-            lock.notifyAll();
+        synchronized (LOCK){
+            LOCK.notifyAll();
         }
-        logger.debug("Appending block " + this.newest.getBlock().getHeader().getNumber() + " success");
+        log.debug("Appending block " + this.newest.getBlock().getHeader().getNumber() + " success");
     }
 
     public int getMaxSize() {
@@ -184,6 +184,6 @@ public class RamLedger extends ReadWriteBase {
     }
 
     public static Object getLock() {
-        return lock;
+        return LOCK;
     }
 }

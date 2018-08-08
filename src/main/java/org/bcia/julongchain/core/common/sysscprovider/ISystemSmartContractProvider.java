@@ -50,7 +50,7 @@ public interface ISystemSmartContractProvider {
      * @param name
      * @return
      */
-    boolean isSysSCAndNotInvkeableExternal(String name);
+    boolean isSysSCAndNotInvokableExternal(String name);
 
     /**
      * GetQueryExecutorForLedger returns a query executor for the

@@ -27,8 +27,6 @@ import org.bcia.julongchain.protos.common.Common;
  * @company Dingxuan
  */
 public class SimpleList {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(SimpleList.class);
-
     private SimpleList next;
     private Common.Block block;
 
@@ -56,6 +54,6 @@ public class SimpleList {
     }
 
 //    public Object getLock() {
-//        return lock;
+//        return LOCK;
 //    }
 }

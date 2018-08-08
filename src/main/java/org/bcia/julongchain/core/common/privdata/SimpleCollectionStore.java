@@ -34,7 +34,7 @@ import org.bcia.julongchain.protos.common.Collection;
  */
 public class SimpleCollectionStore implements ICollectionStore{
 
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(SimpleCollectionStore.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(SimpleCollectionStore.class);
 
     private IPrivDataSupport s;
 

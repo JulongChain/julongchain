@@ -17,7 +17,7 @@ package org.bcia.julongchain.core.aclmgmt.resources;
 
 /**
  * resources used for ACL checks. Note that some of the checks
- * such as LSCC_INSTALL are "peer wide" (current access checks in peer are
+ * such as LSSC_INSTALL are "peer wide" (current access checks in peer are
  * based on local MSP). These are not currently covered by resource or default
  * ACLProviders
  *

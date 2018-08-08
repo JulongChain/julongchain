@@ -31,7 +31,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class ScEventManager {
-    private static final JavaChainLog logger  = JavaChainLogFactory.getLog(ScEventManager.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(ScEventManager.class);
 
     private ISmartContractInfoProvider infoProvider = new SmartContractInfoProviderImpl();
     private Map<String, ISmartContractLifecycleEventListener> scLifecycleListeners = new HashMap<>();
@@ -67,22 +67,22 @@ public class ScEventManager {
      * @param smartContractDefinitions
      */
     public synchronized void handleSmartContractDeploy(String ledgerID, SmartContractDefinition[] smartContractDefinitions) throws JavaChainException{
-        logger.debug("handleSmartContractDeploy() - ledgerID = " + ledgerID);
+        log.debug("handleSmartContractDeploy() - ledgerID = " + ledgerID);
         //设置最后部署的智能合约
         latesSmartContractDeploys.put(ledgerID, smartContractDefinitions);
         for(SmartContractDefinition smartContractDefinition : smartContractDefinitions){
-            logger.debug(String.format("Group [%s]: Handling smartContract deploy event for smartContract [%s]", ledgerID, smartContractDefinition));
+            log.debug(String.format("Group [%s]: Handling smartContract deploy event for smartContract [%s]", ledgerID, smartContractDefinition));
             //获取db实例,
             byte[] dbArtifacts = new byte[0];
             dbArtifacts = infoProvider.retrieveSmartContractArtifacts(smartContractDefinition);
             //!installed, 无需完成智能合约实例
             if(dbArtifacts != null){
-                logger.info(String.format("Group [%s]: SmartContract [%s] is not installed so that no need to create SmartContract artifact", ledgerID, smartContractDefinition));
+                log.info(String.format("Group [%s]: SmartContract [%s] is not installed so that no need to create SmartContract artifact", ledgerID, smartContractDefinition));
                 continue;
             }
             //执行部署
             invokeHandler(ledgerID, smartContractDefinition, dbArtifacts);
-            logger.debug(String.format("Group [%s]: Handled smartcontract deploy event for smartcontract [%s]", ledgerID, smartContractDefinition));
+            log.debug(String.format("Group [%s]: Handled smartcontract deploy event for smartcontract [%s]", ledgerID, smartContractDefinition));
         }
     }
 
@@ -92,20 +92,20 @@ public class ScEventManager {
      * @param dbArtifacts
      */
     public synchronized void handleSmartContractInstall(SmartContractDefinition smartContractDefinition, byte[] dbArtifacts) throws JavaChainException{
-        //logger.debug("handleSmartContractInstall() - smartContractDefinition= " + smartContractDefinition);
+        //log.debug("handleSmartContractInstall() - smartContractDefinition= " + smartContractDefinition);
         for(Map.Entry<String, ISmartContractLifecycleEventListener> entry : scLifecycleListeners.entrySet()){
             String ledgerID = entry.getKey();
-            logger.debug(String.format("Group [%s]: Handling smartcontract install event for smartcontract [%s]", ledgerID, smartContractDefinition));
+            log.debug(String.format("Group [%s]: Handling smartcontract install event for smartcontract [%s]", ledgerID, smartContractDefinition));
             boolean deployed = isSmartContractPresentInLatestDeploys(ledgerID, smartContractDefinition);
             if(!deployed){
                 deployed = infoProvider.isSmartContractDeployed(ledgerID, smartContractDefinition);
             }
             if(!deployed){
-                logger.info(String.format("Group [%s]: SmartContract [%s] is not installed so that no need to create SmartContract artifact", ledgerID, smartContractDefinition));
+                log.info(String.format("Group [%s]: SmartContract [%s] is not installed so that no need to create SmartContract artifact", ledgerID, smartContractDefinition));
                 continue;
             }
             invokeHandler(ledgerID, smartContractDefinition, dbArtifacts);
-            logger.debug(String.format("Group [%s]: Handled smartcontract deploy event for smartcontract [%s]", ledgerID, smartContractDefinition));
+            log.debug(String.format("Group [%s]: Handled smartcontract deploy event for smartcontract [%s]", ledgerID, smartContractDefinition));
         }
     }
 

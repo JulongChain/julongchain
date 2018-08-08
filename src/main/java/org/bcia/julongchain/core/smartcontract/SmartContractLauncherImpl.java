@@ -34,7 +34,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class SmartContractLauncherImpl implements ILaunchIntf {
-	private static final JavaChainLog log = JavaChainLogFactory.getLog(SmartContractLauncherImpl.class);
+	private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractLauncherImpl.class);
 
 	private Context ctxt;
 	private SmartContractSupport scSupport;

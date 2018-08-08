@@ -23,14 +23,14 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.SignedScDepSpec;
 
 /**
- * 类描述
+ * 解析SmartcontractPackage工具类
  *
  * @author sunzongyu
  * @date 2018/05/09
  * @company Dingxuan
  */
 public class SmartContractPackageUtil {
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(SmartContractPackageUtil.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractPackageUtil.class);
 
     /**
      * 从Envelope中解析处GroupHeader

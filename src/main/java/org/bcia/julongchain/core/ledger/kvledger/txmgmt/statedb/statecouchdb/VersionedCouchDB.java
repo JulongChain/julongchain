@@ -28,10 +28,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.core.ledger.sceventmgmt.ISmartContractLifecycleEventListener;
 import org.bcia.julongchain.core.ledger.sceventmgmt.SmartContractDefinition;
 import org.bcia.julongchain.core.ledger.util.Util;
-import org.bcia.julongchain.csp.gmt0016.excelsecu.bean.Version;
-import org.bcia.julongchain.node.util.LedgerUtils;
 import org.lightcouch.CouchDbClient;
-import org.omg.CORBA.ByteHolder;
 
 import java.util.HashMap;
 import java.util.List;
@@ -47,17 +44,13 @@ import java.util.regex.Pattern;
  * @company Dingxuan
  */
 public class VersionedCouchDB implements IVersionedDB, ISmartContractLifecycleEventListener {
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(VersionedCouchDB.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(VersionedCouchDB.class);
 
     private static final String BINARY_WRAPPER = "valueBytes";
     private static final String ID_FIELD = "_id";
     private static final String REV_FIELD = "_rev";
     private static final String VERSION_FIELD = "~version";
     private static final String DELETED_FIELD = "_deleted";
-    private static final String[] reservedFields = new String[]{
-            BINARY_WRAPPER, ID_FIELD, REV_FIELD, VERSION_FIELD, DELETED_FIELD
-    };
-    private static final Map<String, Boolean> dbArtifactsDirFilter = new HashMap<>();
     private final int QUERY_SKIP = 0;
     private static final int MAX_DBNAME_LENGTH = 238;
     private static final int GROUP_NAME_ALLOWED_LENGTH = 50;
@@ -65,6 +58,10 @@ public class VersionedCouchDB implements IVersionedDB, ISmartContractLifecycleEv
 	private static final int COLLECTION_NAME_ALLOWED_LENGTH = 50;
     private static final String EXPECTED_DBNAME_PATTERN = "[a-z][a-z0-9.$_()-]*";
 
+	private static Map<String, Boolean> dbArtifactsDirFilter = new HashMap<>();
+	private static String[] reservedFields = new String[]{
+			BINARY_WRAPPER, ID_FIELD, REV_FIELD, VERSION_FIELD, DELETED_FIELD
+	};
     static{
         dbArtifactsDirFilter.put("META-INF/statedb/couchdb/indexes", true);
     }
@@ -247,7 +244,7 @@ public class VersionedCouchDB implements IVersionedDB, ISmartContractLifecycleEv
 
     @Override
     public void handleSmartContractDeploy(SmartContractDefinition smartContractDefinition, byte[] dbArtifactsTar) throws JavaChainException {
-        log.debug("Enterint handleSmartContractDeploy()");
+        log.debug("Entering handleSmartContractDeploy()");
         if(smartContractDefinition == null){
             throw new JavaChainException("Found null smartContractDefinition while creating couchdb index on group " + groupName);
         }

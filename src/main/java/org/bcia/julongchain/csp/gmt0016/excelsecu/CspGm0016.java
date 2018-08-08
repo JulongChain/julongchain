@@ -170,7 +170,7 @@ public class CspGm0016 implements ICsp {
         }
         try {
             if (mSkf.SKF_VerifyPIN(mHApplication, Constants.USER_TYPE, mProperties.getPinCode()) == 0) {
-                // TODO: 2018/4/2 lock the pin code
+                // TODO: 2018/4/2 LOCK the pin code
                 return null;
             }
 

@@ -115,7 +115,6 @@ public class QSSCTest extends BaseJunit4Test {
         List<ByteString> args2= new LinkedList<ByteString>();
         args2.add(ByteString.copyFromUtf8(QSSC.GET_TRANSACTION_BY_ID));
         args2.add(ByteString.copyFromUtf8(groupid));
-        //TODO modify by sunzongyu, change "null" to "ByteString.EMPTY". date 2018-05-14
         args2.add(ByteString.EMPTY);
         ISmartContract.SmartContractResponse res2 =mockStub.mockInvoke("2",args2);
         //因一些对象为空，部分接口尚未调通

@@ -36,7 +36,7 @@ import java.io.InputStream;
  * @company Dingxuan
  */
 public class InProcStream extends ChatStream implements ISmartContractStream {
-	private static final JavaChainLog log = JavaChainLogFactory.getLog(InputStream.class);
+	private static JavaChainLog log = JavaChainLogFactory.getLog(InputStream.class);
 
 	private Channel<SmartContractShim.SmartContractMessage> recv;
 	private Channel<SmartContractShim.SmartContractMessage> send;

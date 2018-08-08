@@ -20,7 +20,9 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Ledger;
 
 /**
- * Ledger captures the methods that are common across the 'PeerLedger', 'OrdererLedger', and 'IValidatedLedger'
+ * 账本接口:
+ * 提供查询区块链信息、根据区块号查询区块、获取区块迭代器、提交区块和关闭账本方法
+ * 主要实现为NodeLedger
  *
  * @author sunzongyu
  * @date 2018/04/03

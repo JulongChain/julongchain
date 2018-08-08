@@ -42,10 +42,8 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class LedgerManager {
-    private static final LedgerException ERR_LEDGER_MANAGER_NOT_INITIALIZED = new LedgerException("ledger mgmt should be initialized before using");
-    private static final LedgerException ERR_LEDGER_ALREADY_OPENEND = new LedgerException("ledger already openend");
     private static final Map<String, IStateListener> KV_LEDGER_STATE_LISTENERS = new HashMap<String, IStateListener>(){{
-        put("lscc", new KVLedgerLSSCStateListener());
+        put("lssc", new KVLedgerLSSCStateListener());
     }};
 
     private static JavaChainLog log = JavaChainLogFactory.getLog(LedgerManager.class);
@@ -57,7 +55,7 @@ public class LedgerManager {
      * 初始化
      */
     public static synchronized void initialize(Map<Common.HeaderType, IProcessor> processors) throws LedgerException{
-        log.info("Initializing ledger mgmt");
+        log.info("Initializing ledger management");
         initialized = true;
         CustomTx.initialize(processors);
 
@@ -67,13 +65,13 @@ public class LedgerManager {
         try {
             provider = new KvLedgerProvider();
         } catch (LedgerException e) {
-            log.error(String.format("Got error [%s] in initializing LedgerManager", e.getMessage()));
+            log.error(String.format("Got error [%s] in initializing LedgerManagement", e.getMessage()));
             throw e;
         }
         provider.initialize(KV_LEDGER_STATE_LISTENERS);
 
         ledgerProvider = provider;
-        log.info("ledger mgmt initialized");
+        log.info("Ledger management initialized");
     }
 
     /**
@@ -81,7 +79,7 @@ public class LedgerManager {
      */
     public static synchronized INodeLedger createLedger(Common.Block genesisBlock) throws LedgerException {
         if(!initialized){
-            throw ERR_LEDGER_MANAGER_NOT_INITIALIZED;
+            throw new LedgerException("Ledger management should be initialized before using");
         }
         String id;
         //获取区块id
@@ -102,7 +100,7 @@ public class LedgerManager {
      */
     public synchronized static INodeLedger openLedger(String id) throws LedgerException {
         if(!initialized){
-            throw ERR_LEDGER_MANAGER_NOT_INITIALIZED;
+            throw new LedgerException("Ledger management should be initialized before using");
         }
         log.info("Opening ledger with id = " + id);
         INodeLedger l = openedLedgers.get(id);
@@ -120,7 +118,7 @@ public class LedgerManager {
      */
     public synchronized static List<String> getLedgerIDs() throws LedgerException {
         if(!initialized){
-            throw ERR_LEDGER_MANAGER_NOT_INITIALIZED;
+        	throw new LedgerException("Ledger management should be initialized before using");
         }
         return ledgerProvider.list();
     }
@@ -129,16 +127,16 @@ public class LedgerManager {
      * 关闭LedgerManager
      */
     public synchronized static void close() throws LedgerException {
-        log.info("Closing ledger manager");
+        log.info("Closing ledger management");
         if(!initialized){
-            throw ERR_LEDGER_MANAGER_NOT_INITIALIZED;
+        	throw new LedgerException("Ledger management should be initialized before using");
         }
         for(INodeLedger l : openedLedgers.values()){
             l.close();
         }
         ledgerProvider.close();
         openedLedgers.clear();
-        log.info("Ledger manager closed");
+        log.info("Ledger management closed");
     }
 
     public synchronized static void initializeTestEnvWithCustomProcessors(Map<Common.HeaderType, IProcessor> processors) throws LedgerException {

@@ -38,7 +38,6 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class CommonStorageDB implements IDB {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(CommonStorageDB.class);
     private static final String NS_JOINER  = "$$";
     private static final String PVT_DATA_PREFIX  = "p";
     private static final String HASH_DATA_PREFIX = "h";
@@ -75,7 +74,7 @@ public class CommonStorageDB implements IDB {
     }
 
     @Override
-    public LedgerHeight getCacheKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException{
+    public LedgerHeight getCachedKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException{
         try {
             IBulkOptimizable bulkOptimizable = (IBulkOptimizable) vdb;
             String keyHashStr = new String(keyHash);
@@ -172,7 +171,7 @@ public class CommonStorageDB implements IDB {
         }
     }
 
-    private void addHashedUpdates(PubUpdateBatch pubUpdateBatch, HashedUpdateBatch hashedUpdateBatch, boolean SM3Key) throws LedgerException{
+    private void addHashedUpdates(PubUpdateBatch pubUpdateBatch, HashedUpdateBatch hashedUpdateBatch, boolean sm3Key) throws LedgerException{
         for(Map.Entry<String, NsBatch> entry : hashedUpdateBatch.getMap().getMap().entrySet()){
             String ns = entry.getKey();
             NsBatch nsBatch = entry.getValue();
@@ -180,7 +179,7 @@ public class CommonStorageDB implements IDB {
                 for(Map.Entry<String, VersionedValue> entry1 : nsBatch.getBatch().getUpdates(coll).entrySet()){
                     String key = entry1.getKey();
                     VersionedValue vv = entry1.getValue();
-                    if(SM3Key){
+                    if(sm3Key){
                         //TODO SM3 Hash
                         key = new String(Util.getHashBytes(key.getBytes()));
                     }
@@ -217,7 +216,7 @@ public class CommonStorageDB implements IDB {
 
     @Override
     public void applyUpdates(org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.UpdateBatch batch, LedgerHeight height) throws LedgerException {
-        throw new LedgerException("this fun should not be invoke on this type. Please invoke fun applyPrivacyAwareUpdates()");
+        throw new LedgerException("This function should not be invoke on this type. Please invoke fun applyPrivacyAwareUpdates()");
     }
 
     @Override

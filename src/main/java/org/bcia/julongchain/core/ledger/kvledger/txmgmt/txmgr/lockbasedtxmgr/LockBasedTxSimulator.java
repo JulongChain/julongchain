@@ -35,8 +35,6 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class LockBasedTxSimulator implements ITxSimulator {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(LockBasedTxSimulator.class);
-
     private LockBasedQueryExecutor queryExecutor;
     private RWSetBuilder rwSetBuilder;
     private boolean writePreformed;

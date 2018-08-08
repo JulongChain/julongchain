@@ -35,8 +35,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public class RangeQueryResultsValidator implements IRangeQueryValidator {
-
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(RangeQueryResultsValidator.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(RangeQueryResultsValidator.class);
 
     private KvRwset.RangeQueryInfo rqInfo;
     private IResultsIterator itr;
@@ -63,23 +62,23 @@ public class RangeQueryResultsValidator implements IRangeQueryValidator {
             return result == null;
         }
         for(KvRwset.KVRead kvRead : rqResults){
-            logger.debug("Comparing kvRead to queryResponse");
+            log.debug("Comparing kvRead to queryResponse");
             if(result == null){
-                logger.debug("Query response null.Key " + kvRead.getKey() + " got deleted");
+                log.debug("Query response null.Key " + kvRead.getKey() + " got deleted");
                 return false;
             }
             if(!((VersionedKV) result.getObj()).getCompositeKey().getKey().equals(kvRead.getKey())){
-                logger.debug(String.format("Key name mismatch: key in rwset = %s, key in query result = %s", kvRead.getKey(), ((VersionedKV) result.getObj()).getCompositeKey().getKey()));
+                log.debug(String.format("Key name mismatch: key in rwset = %s, key in query result = %s", kvRead.getKey(), ((VersionedKV) result.getObj()).getCompositeKey().getKey()));
                 return false;
             }
             if(!LedgerHeight.areSame(((VersionedKV) result.getObj()).getVersionedValue().getVersion(), convertToVersionHeight(kvRead.getVersion()))){
-                logger.debug(String.format("Version mismatch: key = %s", kvRead.getKey()));
+                log.debug(String.format("Version mismatch: key = %s", kvRead.getKey()));
                 return false;
             }
             itr.next();
         }
         if(result != null){
-            logger.debug("Extra result = ", result);
+            log.debug("Extra result = ", result);
             return false;
         }
         return true;

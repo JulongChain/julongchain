@@ -39,11 +39,11 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class VersionedLevelDB implements IVersionedDB {
-
-    private static final JavaChainLog logger  = JavaChainLogFactory.getLog(VersionedLevelDB.class);
     private static final byte[] COMPOSITE_KEY_SEP = {0x00};
     private static final byte LAST_KEY_INDICATOR = 0x01;
     private static final byte[] SAVE_POINT_KEY = {0x00};
+
+	private static JavaChainLog log = JavaChainLogFactory.getLog(VersionedLevelDB.class);
 
     private IDBProvider db;
     private String dbName;
@@ -55,7 +55,7 @@ public class VersionedLevelDB implements IVersionedDB {
 
     @Override
     public VersionedValue getState(String namespace, String key) throws LedgerException {
-        logger.debug(String.format("getState() ns = %s, key = %s", namespace, key));
+        log.debug(String.format("getState() ns = %s, key = %s", namespace, key));
         byte[] compositeKey = constructCompositeKey(namespace, key);
         byte[] dbVal = db.get(compositeKey);
         if (dbVal == null) {
@@ -104,7 +104,7 @@ public class VersionedLevelDB implements IVersionedDB {
 
     @Override
     public IResultsIterator executeQuery(String namespace, String query) throws LedgerException {
-        throw new LedgerException("ExecuteQuery is not support for leveldb");
+        throw new LedgerException("ExecuteQuery not supported for leveldb");
     }
 
     /**
@@ -120,7 +120,7 @@ public class VersionedLevelDB implements IVersionedDB {
             for(Map.Entry<String, VersionedValue> entry : updates.entrySet()){
                 String key = entry.getKey();
                 byte[] compositeKey = constructCompositeKey(ns, key);
-                logger.debug(String.format("Group [%s]: Applying key(String)=[%s] key(bytes)=[%s]"
+                log.debug(String.format("Group [%s]: Applying key(String)=[%s] key(bytes)=[%s]"
                         , dbName, new String(compositeKey), BytesHexStrTranslate.bytesToHexFun1(compositeKey )));
 
                 if(entry.getValue() == null){

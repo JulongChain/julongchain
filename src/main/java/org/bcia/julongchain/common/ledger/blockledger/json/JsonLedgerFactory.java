@@ -37,7 +37,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class JsonLedgerFactory implements IFactory {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(JsonLedgerFactory.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(JsonLedgerFactory.class);
 
     private String directory;
     private static Map<String, ReadWriteBase> ledgers;
@@ -45,7 +45,7 @@ public class JsonLedgerFactory implements IFactory {
     public JsonLedgerFactory(){}
 
     public JsonLedgerFactory(String directory) throws LedgerException{
-        logger.debug("Initializing json ledger at: " + directory);
+        log.debug("Initializing json ledger at: " + directory);
         //创建目录
         File file = new File(directory);
         if (!file.exists()){
@@ -77,22 +77,22 @@ public class JsonLedgerFactory implements IFactory {
 
     @Override
     public synchronized ReadWriteBase getOrCreate(String groupID) throws LedgerException {
-        logger.debug("Starting create json ledger using group id " + groupID);
+        log.debug("Starting create json ledger using group id " + groupID);
         ReadWriteBase l = ledgers.get(groupID);
         if(l != null){
-            logger.debug("Group id " + groupID + " is already exists");
+            log.debug("Group id " + groupID + " is already exists");
             return l;
         }
         String directory = this.directory + File.separator + JsonLedger.GROUP_DIRECTORY_FORMAT_STRING + groupID;
-        logger.debug(String.format("Initializing group %s at: %s", groupID, directory));
+        log.debug(String.format("Initializing group %s at: %s", groupID, directory));
         if (!IoUtil.createDirIfMissing(directory)) {
             String errMsg = "Can not create dir " + directory;
-            logger.error(errMsg);
+            log.error(errMsg);
             throw new LedgerException(errMsg);
         }
         ReadWriteBase group = newGroup(directory);
         ledgers.put(groupID, group);
-        logger.debug("Finished create json ledger");
+        log.debug("Finished create json ledger");
         return group;
     }
 
@@ -101,7 +101,7 @@ public class JsonLedgerFactory implements IFactory {
         jl.setDirectory(directory);
         jl.setPrinter(JsonFormat.printer());
         jl.initializeBlockHeight();
-        logger.debug("Initialized to block height " + (jl.getHeight() - 1));
+        log.debug("Initialized to block height " + (jl.getHeight() - 1));
         return jl;
     }
 

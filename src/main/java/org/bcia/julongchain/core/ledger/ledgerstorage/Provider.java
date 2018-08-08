@@ -36,8 +36,6 @@ import org.bcia.julongchain.core.ledger.pvtdatastorage.PvtDataProvider;
  * @company Dingxuan
  */
 public class Provider {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(Provider.class);
-
     private IBlockStoreProvider blkStoreProvider;
     private PvtDataProvider pvtDataProvider;
 

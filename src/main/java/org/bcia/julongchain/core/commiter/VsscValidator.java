@@ -102,7 +102,7 @@ public class VsscValidator implements IVsscValidator {
                     writesToNonInvokableSSC = true;
                 }
 
-                if (!writesToNonInvokableSSC && sysSmartContractProvider.isSysSCAndNotInvkeableExternal(nsRwSet
+                if (!writesToNonInvokableSSC && sysSmartContractProvider.isSysSCAndNotInvokableExternal(nsRwSet
                         .getNameSpace())) {
                     writesToNonInvokableSSC = true;
                 }
@@ -170,8 +170,8 @@ public class VsscValidator implements IVsscValidator {
                 }
             }
         } else {
-            if (sysSmartContractProvider.isSysSCAndNotInvkeableExternal(scName)) {
-                log.warn("isSysSCAndNotInvkeableExternal " + scName);
+            if (sysSmartContractProvider.isSysSCAndNotInvokableExternal(scName)) {
+                log.warn("isSysSCAndNotInvokableExternal " + scName);
                 return TransactionPackage.TxValidationCode.ILLEGAL_WRITESET;
             }
 

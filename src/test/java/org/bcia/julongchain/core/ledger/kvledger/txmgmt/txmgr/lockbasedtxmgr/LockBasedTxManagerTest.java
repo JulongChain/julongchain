@@ -28,7 +28,7 @@ public class LockBasedTxManagerTest {
 
 	@Before
 	public void before() throws Exception {
-		vdbProvider = CommonStorageDBProvider.NewCommonStorageDBProvider();
+		vdbProvider = CommonStorageDBProvider.newCommonStorageDBProvider();
 		mgr = new LockBasedTxManager(ledgerID, vdbProvider.getDBHandle(ledgerID), null);
 	}
 

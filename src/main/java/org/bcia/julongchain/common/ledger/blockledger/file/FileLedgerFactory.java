@@ -38,7 +38,7 @@ import java.util.*;
  * @company Dingxuan
  */
 public class FileLedgerFactory implements IFactory {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(FileLedgerFactory.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(FileLedgerFactory.class);
 
     private IBlockStoreProvider blkStorageProvider;
     private static Map<String, ReadWriteBase> ledgers;
@@ -55,17 +55,17 @@ public class FileLedgerFactory implements IFactory {
 
     @Override
     public synchronized ReadWriteBase getOrCreate(String groupID) throws LedgerException {
-        logger.debug("Starting create file ledger using group id " + groupID);
+        log.debug("Starting create file ledger using group id " + groupID);
         //已存在账本,直接返回
         ReadWriteBase ledger = ledgers.get(groupID);
         if(ledger != null){
-            logger.debug("Group id " + groupID + " is already exists");
+            log.debug("Group id " + groupID + " is already exists");
             return ledger;
         }
         IBlockStore blkStore = blkStorageProvider.openBlockStore(groupID);
         ledger = new FileLedger(blkStore);
         ledgers.put(groupID, ledger);
-        logger.debug("Finished create file ledger");
+        log.debug("Finished create file ledger");
         return ledger;
     }
 

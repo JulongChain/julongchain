@@ -31,15 +31,14 @@ import java.util.List;
  * @company Dingxuan
  */
 public class BlockFileHelper {
-
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockFileHelper.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(BlockFileHelper.class);
     private static final String BLOCK_FILE_PREFIX = "blockfile_";
 
     /**
      * 根据区块文件, 组织检查点信息
      */
     public static CheckpointInfo constructCheckpointInfoFromBlockFiles(String rootDir) throws LedgerException {
-        logger.debug("Retrieving checkpoint info from block files");
+        log.debug("Retrieving checkpoint info from block files");
         int lastFileNum;
         int numBlocksInFile;
         long endOffsetLastBlock;
@@ -50,15 +49,15 @@ public class BlockFileHelper {
         File fileInfo;
         //检索最近添加的区块文件
         lastFileNum = retrieveLastFileSuffix(rootDir);
-        logger.debug(String.format("Last file number found = %d", lastFileNum));
+        log.debug(String.format("Last file number found = %d", lastFileNum));
         //没有找到文件, 初始化检查点信息
         if(lastFileNum == -1){
-            logger.debug("File not found");
+            log.debug("File not found");
             return new CheckpointInfo(0, 0, true, 0);
         }
         //获取最近添加的区块文件
         fileInfo = getFileInfo(rootDir,lastFileNum);
-        logger.debug(String.format("Last block file info: Filename=[%s]", fileInfo.getName()));
+        log.debug(String.format("Last block file info: Filename=[%s]", fileInfo.getName()));
         //获取最新区块信息
         list = BlockFileManager.scanForLastCompleteBlock(rootDir, lastFileNum, (long) 0);
         //区块信息
@@ -71,7 +70,7 @@ public class BlockFileHelper {
         if(numBlocksInFile == 0 && lastFileNum > 0){
             int secondLastFileNum = lastFileNum - 1;
             fileInfo = getFileInfo(rootDir, secondLastFileNum);
-            logger.debug(String.format("Second last block file info: FileName=[%s]", fileInfo.getName()));
+            log.debug(String.format("Second last block file info: FileName=[%s]", fileInfo.getName()));
             lastBlockBytes = (byte[]) BlockFileManager.scanForLastCompleteBlock(rootDir, secondLastFileNum, (long) 0).get(BlockFileManager.LAST_BLOCK_BYTES);
         }
         //解析区块
@@ -87,7 +86,7 @@ public class BlockFileHelper {
      * 检索区块文件号最大的文件编号
      */
     private static int retrieveLastFileSuffix(String rootDir) throws LedgerException{
-        logger.debug("retrieveLastFileSuffix()");
+        log.debug("retrieveLastFileSuffix()");
         int biggestFileNum = -1;
         File[] filesInfo;
         try {
@@ -101,7 +100,7 @@ public class BlockFileHelper {
             String name = file.getName();
             //跳过文件名错误的文件和目录文件
             if(file.isDirectory() || !isBlockFileName(name)){
-                logger.debug("Skipping file name " + name);
+                log.debug("Skipping file name " + name);
                 continue;
             }
             //截取文件编号
@@ -111,7 +110,7 @@ public class BlockFileHelper {
                 biggestFileNum = fileNum;
             }
         }
-        logger.debug("retrieveLastFileSuffix() - biggestFileNum = " + biggestFileNum);
+        log.debug("retrieveLastFileSuffix() - biggestFileNum = " + biggestFileNum);
         return biggestFileNum;
     }
 

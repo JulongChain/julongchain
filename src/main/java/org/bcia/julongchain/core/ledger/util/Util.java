@@ -41,7 +41,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class Util {
-    private static final JavaChainLog logger   = JavaChainLogFactory.getLog(Util.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(Util.class);
     /**
      * 获取Envelope结构
      */
@@ -52,7 +52,7 @@ public class Util {
             env = Common.Envelope.parseFrom(data);
             return env;
         } catch (InvalidProtocolBufferException e) {
-            logger.error("Got error when getting Envelope");
+            log.error("Got error when getting Envelope");
             return null;
         }
     }
@@ -66,7 +66,7 @@ public class Util {
             payload = Common.Payload.parseFrom(env.getPayload());
             return payload;
         } catch (Exception e) {
-            logger.error("Got error when getting Payload");
+            log.error("Got error when getting Payload");
             return null;
         }
     }
@@ -80,7 +80,7 @@ public class Util {
             header = Common.GroupHeader.parseFrom(data);
             return header;
         } catch (InvalidProtocolBufferException e) {
-            logger.error("Got error when getting GroupHeader");
+            log.error("Got error when getting GroupHeader");
             return null;
         }
     }
@@ -94,7 +94,7 @@ public class Util {
             tx = TransactionPackage.Transaction.parseFrom(txBytes);
             return tx;
         } catch (InvalidProtocolBufferException e) {
-            logger.error("Got error when getting Transaction");
+            log.error("Got error when getting Transaction");
             return null;
         }
     }
@@ -109,30 +109,30 @@ public class Util {
         try {
             scaPayload = TransactionPackage.SmartContractActionPayload.parseFrom(txAction.getPayload());
         } catch (InvalidProtocolBufferException e) {
-            logger.error("Got error when getting SmartContractActionPayload");
-            logger.error(e.getMessage(), e);
+            log.error("Got error when getting SmartContractActionPayload");
+            log.error(e.getMessage(), e);
             return null;
         }
         if(scaPayload.getAction() == null || scaPayload.getAction().getProposalResponsePayload() == null){
-            logger.error("No valid payload in SmartContractActionPayload");
+            log.error("No valid payload in SmartContractActionPayload");
             return null;
         }
         try {
             prPayload = ProposalResponsePackage.ProposalResponsePayload.parseFrom(scaPayload.getAction().getProposalResponsePayload());
         } catch (InvalidProtocolBufferException e) {
-            logger.error("Got error when getting ProposalResponsePayload");
-            logger.error(e.getMessage(), e);
+            log.error("Got error when getting ProposalResponsePayload");
+            log.error(e.getMessage(), e);
             return null;
         }
         if(prPayload.getExtension() == null){
-            logger.error("Response payload missed extension");
+            log.error("Response payload missed extension");
             return null;
         }
         try {
             respPayload = ProposalPackage.SmartContractAction.parseFrom(prPayload.getExtension());
         } catch (InvalidProtocolBufferException e) {
-            logger.error("Got error when getting SmartContractAction");
-            logger.error(e.getMessage(), e);
+            log.error("Got error when getting SmartContractAction");
+            log.error(e.getMessage(), e);
             return null;
         }
         return respPayload;

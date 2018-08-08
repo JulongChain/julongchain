@@ -31,8 +31,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class FileValidator {
-
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(FileValidator.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(FileValidator.class);
 
     public FileValidator(){
 

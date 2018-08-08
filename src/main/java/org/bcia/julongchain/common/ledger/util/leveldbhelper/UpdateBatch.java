@@ -30,7 +30,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class UpdateBatch  {
-	private static final JavaChainLog logger = JavaChainLogFactory.getLog(UpdateBatch.class);
+	private static JavaChainLog log = JavaChainLogFactory.getLog(UpdateBatch.class);
 
 	private Map<byte[],byte[]> kvs = new HashMap<>();
 
@@ -41,7 +41,7 @@ public class UpdateBatch  {
 	 */
 	public void put(byte[] key, byte[] value) {
 		if(value == null){
-			logger.error("Can not put [null] value into update batch");
+			log.error("Can not put [null] value into update batch");
 			throw new RuntimeException("Can not put [null] value into update batch");
 		}
 		kvs.put(key, value);

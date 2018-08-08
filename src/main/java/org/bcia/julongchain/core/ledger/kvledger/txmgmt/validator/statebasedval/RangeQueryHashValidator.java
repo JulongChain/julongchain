@@ -34,7 +34,7 @@ import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
  * @company Dingxuan
  */
 public class RangeQueryHashValidator implements IRangeQueryValidator {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(RangeQueryHashValidator.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(RangeQueryHashValidator.class);
 
     private KvRwset.RangeQueryInfo rqInfo;
     private IResultsIterator itr;
@@ -61,35 +61,35 @@ public class RangeQueryHashValidator implements IRangeQueryValidator {
         int lastMatchedIndex = -1;
         KvRwset.QueryReadsMerkleSummary inMerkle = rqInfo.getReadsMerkleHashes();
         KvRwset.QueryReadsMerkleSummary merkle = null;
-        logger.debug("inMerkle");
+        log.debug("inMerkle");
         while(true){
             QueryResult result = null;
             result = itr.next();
-            logger.debug("Processing result = " + result);
+            log.debug("Processing result = " + result);
             if(result == null){
                 merkle = resultsHelper.done().getValue();
                 boolean equals = inMerkle.equals(merkle);
-                logger.debug("Combined interator exhausted.");
+                log.debug("Combined interator exhausted.");
                 return equals;
             }
             resultsHelper.addResult(RwSetUtil.newKVRead(((VersionedKV) result.getObj()).getCompositeKey().getKey(), ((VersionedKV) result.getObj()).getVersionedValue().getVersion()));
             merkle = resultsHelper.getMerkleSummary();
 
             if(merkle.getMaxLevel() < inMerkle.getMaxLevel()){
-                logger.debug("Hashes still under construction. Noting to compareTo yet. Need more results. Continuing...");
+                log.debug("Hashes still under construction. Noting to compareTo yet. Need more results. Continuing...");
                 continue;
             }
             if(lastMatchedIndex == merkle.getMaxLevelHashesList().size() - 1){
-                logger.debug(String.format("Need more results to build next entry [index=%d] at level [%d]. Continuing...", lastMatchedIndex + 1, merkle.getMaxLevel()));
+                log.debug(String.format("Need more results to build next entry [index=%d] at level [%d]. Continuing...", lastMatchedIndex + 1, merkle.getMaxLevel()));
                 continue;
             }
             if(merkle.getMaxLevelHashesList().size() > inMerkle.getMaxLevelHashesList().size()){
-                logger.debug("Entries exceeded from what are present in the incoming merkleSummary. Validation failed");
+                log.debug("Entries exceeded from what are present in the incoming merkleSummary. Validation failed");
                 return false;
             }
             lastMatchedIndex++;
             if(!merkle.getMaxLevelHashes(lastMatchedIndex).equals(inMerkle.getMaxLevelHashes(lastMatchedIndex))){
-                logger.debug(String.format("Hashes does not match at index [%d]. Validation failed", lastMatchedIndex));
+                log.debug(String.format("Hashes does not match at index [%d]. Validation failed", lastMatchedIndex));
                 return false;
             }
         }

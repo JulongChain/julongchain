@@ -30,14 +30,14 @@ import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
  * @company Dingxuan
  */
 public class HistoryLevelDBProvider implements IHistoryDBProvider {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(HistoryLevelDBProvider.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(HistoryLevelDBProvider.class);
 
     private IDBProvider provider = null;
 
     public HistoryLevelDBProvider() throws LedgerException{
         String dbPath = LedgerConfig.getHistoryLevelDBPath();
         this.provider = new LevelDBProvider(dbPath);
-        logger.debug(String.format("Create historyDB using dbPath = %s", this.provider.getDBPath()));
+        log.debug(String.format("Create historyDB using dbPath = %s", this.provider.getDBPath()));
     }
 
     @Override
@@ -49,10 +49,6 @@ public class HistoryLevelDBProvider implements IHistoryDBProvider {
     @Override
     public void close() throws LedgerException {
         provider.close();
-    }
-
-    public static JavaChainLog getLogger() {
-        return logger;
     }
 
     public IDBProvider getProvider() {

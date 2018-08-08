@@ -31,7 +31,6 @@ import java.util.List;
  * @company Dingxuan
  */
 public class NsIterator implements IResultsIterator {
-
     private String ns;
     private NsUpdates nsUpdates;
     private List<String> sortedKeys;

@@ -41,7 +41,7 @@ import java.util.List;
  */
 public class SimpleCollection implements ICollection, ICollectionAccessPolicy {
 
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(SimpleCollection.class);
+    private static JavaChainLog log = JavaChainLogFactory.getLog(SimpleCollection.class);
 
     private String name;
     private IPolicy accessPolicy;
