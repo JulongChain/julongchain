@@ -86,6 +86,7 @@ public class LockBasedQueryExecutor implements IQueryExecutor {
     public void done(){
         log.debug("Done with transaction simulation " + txID);
         try {
+        	LockBasedTxManager.getTxSimulatorMap().remove(txID);
             helper.done();
         } catch (LedgerException e) {
             log.error("Can not done query helper");

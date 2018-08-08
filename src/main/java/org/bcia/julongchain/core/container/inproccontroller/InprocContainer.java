@@ -68,12 +68,16 @@ public class InprocContainer {
 	}
 
 	private void logPath(SystemSmartContractBase ssc) {
-    	log.debug("In-Process VM start system smartcontract [" + ssc.getSystemSmartContractDescriptor().getSSCPath() + "]");
+		if (ssc.getSystemSmartContractDescriptor() != null) {
+			log.debug("In-Process VM start system smartcontract [" + ssc.getSystemSmartContractDescriptor().getSSCPath() + "]");
+		}
 	}
 
 	private void logArgs(String[] args) {
-		for (String arg : args) {
-			log.debug("In-Process VM start with args " + arg);
+		if (args != null) {
+			for (String arg : args) {
+				log.debug("In-Process VM start with args " + arg);
+			}
 		}
 	}
 }

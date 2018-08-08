@@ -236,4 +236,12 @@ public class LockBasedTxManager implements ITxManager {
     public void setStateListeners(Map<String, IStateListener> stateListeners) {
         this.stateListeners = stateListeners;
     }
+
+	public static void setTxSimulatorMap(Map<String, LockBasedTxSimulator> txSimulatorMap) {
+		LockBasedTxManager.txSimulatorMap = txSimulatorMap;
+	}
+
+	public static Map<String, LockBasedTxSimulator> getTxSimulatorMap() {
+		return txSimulatorMap;
+	}
 }

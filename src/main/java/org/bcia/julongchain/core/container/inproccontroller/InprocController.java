@@ -32,7 +32,7 @@ import java.util.Map;
  */
 @Component
 public class InprocController {
-	private JavaChainLog log = JavaChainLogFactory.getLog(InprocContainer.class);
+	private static JavaChainLog log = JavaChainLogFactory.getLog(InprocContainer.class);
 
 	private static Map<String, InprocContainer> containers = new HashMap<>();
 
@@ -100,5 +100,13 @@ public class InprocController {
 			throw new InprocVMException(msg);
 		}
 		containers.get(sscName).startContainer();
+	}
+
+	public static Map<String, InprocContainer> getContainers() {
+		return containers;
+	}
+
+	public static void setContainers(Map<String, InprocContainer> containers) {
+		InprocController.containers = containers;
 	}
 }
