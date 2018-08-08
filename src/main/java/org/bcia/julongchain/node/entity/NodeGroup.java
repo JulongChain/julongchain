@@ -35,6 +35,7 @@ import org.bcia.julongchain.common.util.proto.ProposalUtils;
 import org.bcia.julongchain.consenter.common.broadcast.BroadCastClient;
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContract;
 import org.bcia.julongchain.core.ssc.cssc.CSSC;
+import org.bcia.julongchain.core.ssc.qssc.QSSC;
 import org.bcia.julongchain.csp.factory.CspManager;
 import org.bcia.julongchain.msp.ISigningIdentity;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
@@ -44,6 +45,7 @@ import org.bcia.julongchain.node.common.helper.ConfigTreeHelper;
 import org.bcia.julongchain.node.common.helper.SpecHelper;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
+import org.bcia.julongchain.protos.common.Ledger;
 import org.bcia.julongchain.protos.consenter.Ab;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
@@ -374,10 +376,61 @@ public class NodeGroup {
         EndorserClient client = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
 
-        Query.GroupQueryResponse groupQueryResponse = null;
         try {
-            groupQueryResponse = Query.GroupQueryResponse.parseFrom(proposalResponse.getResponse().getPayload());
+            Query.GroupQueryResponse groupQueryResponse =
+                    Query.GroupQueryResponse.parseFrom(proposalResponse.getResponse().getPayload());
             return groupQueryResponse.getGroupsList();
+        } catch (InvalidProtocolBufferException e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    /**
+     * 获取当前节点的链结构信息
+     *
+     * @param nodeHost
+     * @param nodePort
+     * @param groupId
+     * @return
+     * @throws NodeException
+     */
+    public Ledger.BlockchainInfo getGroupInfo(String nodeHost, int nodePort, String groupId) throws NodeException {
+        SmartContractPackage.SmartContractInvocationSpec qsscSpec = SpecHelper.buildInvocationSpec(CommConstant.QSSC,
+                QSSC.GET_GROUP_INFO, groupId.getBytes());
+
+        ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
+        byte[] creator = identity.getIdentity().serialize();
+
+        byte[] nonce = null;
+        try {
+            nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
+        } catch (JavaChainException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException("Can not get nonce");
+        }
+
+        String txId = null;
+        try {
+            txId = ProposalUtils.computeProposalTxID(creator, nonce);
+        } catch (JavaChainException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException("Generate txId fail");
+        }
+
+        //生成proposal  Type=ENDORSER_TRANSACTION
+        ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType.ENDORSER_TRANSACTION,
+                "", txId, qsscSpec, nonce, creator, null);
+        ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
+
+        //获取背书节点返回信息
+        EndorserClient client = new EndorserClient(nodeHost, nodePort);
+        ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
+
+        try {
+            Ledger.BlockchainInfo blockchainInfo =
+                    Ledger.BlockchainInfo.parseFrom(proposalResponse.getResponse().getPayload());
+            return blockchainInfo;
         } catch (InvalidProtocolBufferException e) {
             log.error(e.getMessage(), e);
             return null;

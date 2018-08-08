@@ -36,6 +36,10 @@ public class NodeCmdConstant {
      */
     public static final String LIST_GROUP = "list";
     /**
+     * 列出群组的链结构信息
+     */
+    public static final String GROUP_INFO = "info";
+    /**
      * 更新群组配置
      */
     public static final String UPDATE_GROUP = "update";

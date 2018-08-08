@@ -172,6 +172,8 @@ public class NodeSmartContract {
                     //收到响应消息，判断是否是200消息
                     if (Common.Status.SUCCESS.equals(value.getStatus())) {
                         log.info("instantiate success");
+                    }else{
+                        log.info("instantiate success");
                     }
                 }
 
@@ -286,7 +288,8 @@ public class NodeSmartContract {
         });
     }
 
-    public void query(String groupId, String smartContractName, SmartContractPackage.SmartContractInput input) throws NodeException {
+    public void query(String nodeHost, int nodePort, String groupId, String smartContractName,
+                      SmartContractPackage.SmartContractInput input) throws NodeException {
         SmartContractPackage.SmartContractInvocationSpec spec = SpecHelper.buildInvocationSpec(smartContractName, input);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
@@ -312,9 +315,9 @@ public class NodeSmartContract {
                 .ENDORSER_TRANSACTION, groupId, txId, spec, nonce, creator, null);
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
-        EndorserClient client = new EndorserClient(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT);
+        EndorserClient client = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
 
-        log.info("Query Result: " + proposalResponse.getPayload().toStringUtf8());
+        log.info("Query Result: " + proposalResponse.getResponse().getMessage());
     }
 }
