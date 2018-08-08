@@ -17,16 +17,12 @@ package org.bcia.julongchain.core.container.dockercontroller;
 
 import org.bcia.julongchain.common.exception.VMException;
 import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractContext;
-import org.bcia.julongchain.core.container.scintf.SCID;
-import org.bcia.julongchain.core.container.api.IBuildSpecFactory;
+import org.bcia.julongchain.core.container.DockerUtil;
 import org.bcia.julongchain.core.container.api.IFormatter;
-import org.bcia.julongchain.core.container.api.IPrelaunchFunc;
 import org.bcia.julongchain.core.container.api.VM;
+import org.bcia.julongchain.core.container.scintf.SCID;
+import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.core.smartcontract.shim.SmartContractBase;
-
-import javax.naming.Context;
-import java.io.Reader;
-import java.util.Map;
 
 /**
  * 类描述
@@ -36,28 +32,48 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class DockerVM implements VM{
+	private String smartContractId;
+	private String containerId;
+
 	@Override
 	public void deploy(SmartContractBase smartContract, SmartContractContext scc, String[] args, String envs) throws VMException {
-
+		String imageId = DockerUtil.buildImage(NodeConfigFactory.getNodeConfig().getSmartContract().getDockerFile(), smartContractId);
+		containerId = DockerUtil.createContainer(imageId, smartContractId);
 	}
 
 	@Override
 	public void start() throws VMException {
-
+		DockerUtil.startContainer(containerId);
 	}
 
 	@Override
 	public void stop() throws VMException {
-
+		DockerUtil.stopContainer(containerId);
 	}
 
 	@Override
 	public void destroy() throws VMException {
-
+		DockerUtil.stopContainer(containerId);
 	}
 
 	@Override
 	public String getVMName(SCID ccID, IFormatter format) throws VMException {
-		return null;
+		return containerId;
+	}
+
+	public String getSmartContractId() {
+		return smartContractId;
+	}
+
+	public void setSmartContractId(String smartContractId) {
+		this.smartContractId = smartContractId;
+	}
+
+	public String getContainerId() {
+		return containerId;
+	}
+
+	public void setContainerId(String containnerId) {
+		this.containerId = containnerId;
 	}
 }
