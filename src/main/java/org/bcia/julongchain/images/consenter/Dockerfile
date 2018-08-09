@@ -18,6 +18,5 @@ COPY config/ /root/julongchain/config
 COPY msp/ /root/julongchain/msp
 COPY libsdtsmjni.so /lib
 COPY libsdtsm.so /lib
-COPY lib/ /root/julongchain/lib
 WORKDIR /root/julongchain
 CMD java -jar /root/julongchain/julongchain.jar consenter start
