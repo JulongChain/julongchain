@@ -255,11 +255,11 @@ public class SmartContractSupportService
                     break;
                 }
                 VersionedKV kv = (VersionedKV) queryResult.getObj();
-                if(kv.getCompositeKey().getKey().compareTo(endKey) == 1){
+				String key = kv.getCompositeKey().getKey();
+                if(key.compareTo(endKey) >= 0){
                     break;
                 }
 
-                String key = kv.getCompositeKey().getKey();
                 String namespace = kv.getCompositeKey().getNamespace();
                 byte[] value = kv.getVersionedValue().getValue();
 

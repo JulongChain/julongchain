@@ -47,6 +47,7 @@ public class FileLedgerTest {
     static final String dir = "/tmp/julongchain/fileLedger";
     FileLedgerFactory fileLedgerFactory;
     ReadWriteBase fileLedger;
+    Common.Block genesisBlock;
     @Before
     public void before() throws Exception{
         //重置目录
@@ -55,6 +56,7 @@ public class FileLedgerTest {
         fileLedgerFactory = new FileLedgerFactory(dir);
         //创建file ledger
         fileLedger = fileLedgerFactory.getOrCreate("myGroup");
+        //
     }
 
     @Test

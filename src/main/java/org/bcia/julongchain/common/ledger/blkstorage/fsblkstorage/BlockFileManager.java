@@ -161,7 +161,12 @@ public class BlockFileManager {
      * rootDir/blockfile_000000
      */
     public static String deriveBlockfilePath(String rootDir, int suffixNum) {
-        return String.format("%s/%s_%06d", rootDir, BLOCKFILE_PREFIX, suffixNum);
+    	final int totalLength = 6;
+		StringBuilder sb = new StringBuilder(Integer.toHexString(suffixNum)).reverse();
+		while (sb.length() < totalLength) {
+			sb.append(0);
+		}
+		return String.format("%s/%s_%s", rootDir, BLOCKFILE_PREFIX, sb.reverse().toString().toUpperCase());
     }
 
     public void close() {
@@ -641,5 +646,4 @@ public class BlockFileManager {
     public Ledger.BlockchainInfo getBlockchainInfo() {
         return bcInfo;
     }
-
 }

@@ -26,15 +26,24 @@ import org.bcia.julongchain.core.smartcontract.shim.SmartContractBase;
  */
 public abstract  class SystemSmartContractBase extends SmartContractBase implements ISystemSmartContract {
     private SystemSmartContractDescriptor descriptor;
-    public String getSmartContractStrDescription() {
+
+    public SystemSmartContractBase() {
+    	this.id = this.getClass().getName();
+	}
+
+    @Override
+	public String getSmartContractStrDescription() {
         return "系统智能合约";
     }
-    public void setSystemSmartContractDescriptor(SystemSmartContractDescriptor descriptor) {
+
+    @Override
+	public void setSystemSmartContractDescriptor(SystemSmartContractDescriptor descriptor) {
         this.id=descriptor.getSSCName();
         this.descriptor=descriptor;
     }
 
-    public SystemSmartContractDescriptor getSystemSmartContractDescriptor() {
+    @Override
+	public SystemSmartContractDescriptor getSystemSmartContractDescriptor() {
         return this.descriptor;
     }
 
