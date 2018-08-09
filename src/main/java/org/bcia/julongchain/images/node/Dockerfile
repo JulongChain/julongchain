@@ -19,6 +19,5 @@ COPY msp/ /root/julongchain/msp
 COPY smartcontract/ root/julongchain/smartcontract
 COPY libsdtsmjni.so /lib
 COPY libsdtsm.so /lib
-COPY lib/ /root/julongchain/lib
 WORKDIR /root/julongchain
 CMD java -jar /root/julongchain/julongchain.jar node start
