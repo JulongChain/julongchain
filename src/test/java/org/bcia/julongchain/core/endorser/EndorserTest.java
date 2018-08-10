@@ -67,7 +67,35 @@ public class EndorserTest extends BaseJunit4Test {
     }
 
     @Test
-    public void processProposal() {
+    public void processProposal() throws NodeException {
+        SmartContractPackage.SmartContractInvocationSpec csscSpec = SpecHelper.buildInvocationSpec(CommConstant.CSSC, CSSC
+                .GET_GROUPS, null);
+
+        ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
+        byte[] creator = identity.getIdentity().serialize();
+
+        byte[] nonce = null;
+        try {
+            nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
+        } catch (JavaChainException e) {
+            throw new NodeException("Can not get nonce");
+        }
+
+        String txId = null;
+        try {
+            txId = ProposalUtils.computeProposalTxID(creator, nonce);
+        } catch (JavaChainException e) {
+            throw new NodeException("Generate txId fail");
+        }
+
+        //生成proposal  Type=ENDORSER_TRANSACTION
+        ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType.ENDORSER_TRANSACTION,
+                "", txId, csscSpec, nonce, creator, null);
+        ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
+        ProposalResponsePackage.ProposalResponse endorserResponse = endorser.processProposal(signedProposal);
+
+        assertEquals(200, endorserResponse.getResponse().getStatus());
+
     }
 
     @Test
@@ -95,7 +123,6 @@ public class EndorserTest extends BaseJunit4Test {
         ProposalResponsePackage.Response esscResponse = endorser.endorseProposal(groupId, txId, signedProposal,
                 proposal, smartContractIDBuilder, response, simulateResults, event, visibility,
                 smartContractDefinition);
-
     }
 
     @Test
