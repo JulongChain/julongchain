@@ -18,6 +18,7 @@ package org.bcia.julongchain.common.util.proto;
 import com.google.protobuf.ByteString;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.csp.factory.CspManager;
 import org.bcia.julongchain.csp.gm.dxct.RngOpts;
 import org.bcia.julongchain.csp.intfs.ICsp;
@@ -194,7 +195,7 @@ public class ProposalUtils {
              byte[] creator,
              Map<String,byte[]> transientMap)
             throws JavaChainException {
-        byte[] nonce =CspManager.getDefaultCsp().rng(24,new RngOpts());
+        byte[] nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, new RngOpts());
         String txID=ProposalUtils.computeProposalTxID(creator, nonce);
         return buildSmartContractProposal(type,groupID,txID,invocationSpec,nonce,creator,transientMap);
     }

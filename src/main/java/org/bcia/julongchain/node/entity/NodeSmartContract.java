@@ -90,7 +90,7 @@ public class NodeSmartContract {
 
         byte[] nonce = new byte[0];
         try {
-            nonce = CspManager.getDefaultCsp().rng(24, null);
+            nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
         } catch (JavaChainException e) {
             log.error(e.getMessage(), e);
         }
@@ -111,8 +111,17 @@ public class NodeSmartContract {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //获取背书节点返回信息
-        EndorserClient client = new EndorserClient(nodeHost, nodePort);
-        ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
+        EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
+        ProposalResponsePackage.ProposalResponse proposalResponse = null;
+        try {
+            proposalResponse = endorserClient.sendProcessProposal(signedProposal);
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+            return;
+        } finally {
+            endorserClient.close();
+        }
+
         log.info("Install Result: " + proposalResponse.getResponse().getStatus());
     }
 
@@ -127,7 +136,7 @@ public class NodeSmartContract {
 
         byte[] nonce = new byte[0];
         try {
-            nonce = CspManager.getDefaultCsp().rng(24, null);
+            nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
         } catch (JavaChainException e) {
             log.error(e.getMessage(), e);
         }
@@ -148,8 +157,16 @@ public class NodeSmartContract {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //获取背书节点返回信息
-        EndorserClient client = new EndorserClient(nodeHost, nodePort);
-        ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
+        EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
+        ProposalResponsePackage.ProposalResponse proposalResponse = null;
+        try {
+            proposalResponse = endorserClient.sendProcessProposal(signedProposal);
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+            return;
+        } finally {
+            endorserClient.close();
+        }
 
         try {
             Common.Envelope signedTxEnvelope = EnvelopeHelper.createSignedTxEnvelope(proposal, identity, proposalResponse);
@@ -171,9 +188,9 @@ public class NodeSmartContract {
 
                     //收到响应消息，判断是否是200消息
                     if (Common.Status.SUCCESS.equals(value.getStatus())) {
-                        log.info("instantiate success");
-                    }else{
-                        log.info("instantiate success");
+                        log.info("Instantiate success");
+                    } else {
+                        log.info("Instantiate fail:" + value.getStatus());
                     }
                 }
 
@@ -215,7 +232,7 @@ public class NodeSmartContract {
 
         byte[] nonce = new byte[0];
         try {
-            nonce = CspManager.getDefaultCsp().rng(24, null);
+            nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
         } catch (JavaChainException e) {
             log.error(e.getMessage(), e);
         }
@@ -235,8 +252,17 @@ public class NodeSmartContract {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //背书
-        EndorserClient client = new EndorserClient(nodeHost, nodePort);
-        ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
+        //获取背书节点返回信息
+        EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
+        ProposalResponsePackage.ProposalResponse proposalResponse = null;
+        try {
+            proposalResponse = endorserClient.sendProcessProposal(signedProposal);
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+            return;
+        } finally {
+            endorserClient.close();
+        }
 
         try {
             Common.Envelope signedTxEnvelope = EnvelopeHelper.createSignedTxEnvelope(proposal, identity, proposalResponse);
@@ -298,7 +324,7 @@ public class NodeSmartContract {
 
         byte[] nonce = new byte[0];
         try {
-            nonce = CspManager.getDefaultCsp().rng(24, null);
+            nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
         } catch (JavaChainException e) {
             log.error(e.getMessage(), e);
         }
@@ -315,8 +341,17 @@ public class NodeSmartContract {
                 .ENDORSER_TRANSACTION, groupId, txId, spec, nonce, creator, null);
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
-        EndorserClient client = new EndorserClient(nodeHost, nodePort);
-        ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
+        //获取背书节点返回信息
+        EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
+        ProposalResponsePackage.ProposalResponse proposalResponse = null;
+        try {
+            proposalResponse = endorserClient.sendProcessProposal(signedProposal);
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+            return;
+        } finally {
+            endorserClient.close();
+        }
 
         log.info("Query Result: " + proposalResponse.getResponse().getMessage());
     }

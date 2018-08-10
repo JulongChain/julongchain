@@ -30,7 +30,7 @@ public class CommConstant {
     /**
      * 原数据：版本
      */
-    public static final String METADATA_VERSION = "development build";
+    public static final String METADATA_VERSION = "latest";
     /**
      * 背书系统智能合约
      */

@@ -18,6 +18,7 @@ package org.bcia.julongchain.common.util.proto;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.util.Utils;
@@ -41,7 +42,9 @@ public class ProposalResponseUtils {
         //首先构造响应主内容
         ProposalResponsePackage.Response.Builder responseBuilder = ProposalResponsePackage.Response.newBuilder();
         responseBuilder.setPayload(payload);
-        responseBuilder.setMessage(message);
+        if (StringUtils.isNotBlank(message)) {
+            responseBuilder.setMessage(message);
+        }
 
         ProposalResponsePackage.Response response = responseBuilder.build();
 

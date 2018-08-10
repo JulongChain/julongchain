@@ -305,7 +305,16 @@ public class NodeGroup {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
-        ProposalResponsePackage.ProposalResponse proposalResponse = endorserClient.sendProcessProposal(signedProposal);
+        ProposalResponsePackage.ProposalResponse proposalResponse = null;
+        try {
+            proposalResponse = endorserClient.sendProcessProposal(signedProposal);
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+            log.info("Join group fail:" + ex.getMessage());
+            return;
+        } finally {
+            endorserClient.close();
+        }
 
         if (proposalResponse != null && proposalResponse.getResponse() != null && proposalResponse.getResponse()
                 .getStatus() == ISmartContract.SmartContractResponse.Status.SUCCESS.getCode()) {
@@ -373,8 +382,16 @@ public class NodeGroup {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //获取背书节点返回信息
-        EndorserClient client = new EndorserClient(nodeHost, nodePort);
-        ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
+        EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
+        ProposalResponsePackage.ProposalResponse proposalResponse = null;
+        try {
+            proposalResponse = endorserClient.sendProcessProposal(signedProposal);
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+            return null;
+        } finally {
+            endorserClient.close();
+        }
 
         try {
             Query.GroupQueryResponse groupQueryResponse =
@@ -423,9 +440,16 @@ public class NodeGroup {
                 "", txId, qsscSpec, nonce, creator, null);
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
-        //获取背书节点返回信息
-        EndorserClient client = new EndorserClient(nodeHost, nodePort);
-        ProposalResponsePackage.ProposalResponse proposalResponse = client.sendProcessProposal(signedProposal);
+        EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
+        ProposalResponsePackage.ProposalResponse proposalResponse = null;
+        try {
+            proposalResponse = endorserClient.sendProcessProposal(signedProposal);
+            return null;
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+        } finally {
+            endorserClient.close();
+        }
 
         try {
             Ledger.BlockchainInfo blockchainInfo =

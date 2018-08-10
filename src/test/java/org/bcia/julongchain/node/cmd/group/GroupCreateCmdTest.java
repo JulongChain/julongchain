@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author zhouhui
  * @date 2018/3/27
  * @company Dingxuan
+ * @deprecated
  */
 public class GroupCreateCmdTest extends BaseJunit4Test {
 
