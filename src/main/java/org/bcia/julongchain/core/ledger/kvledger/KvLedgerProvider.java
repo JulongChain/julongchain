@@ -15,10 +15,10 @@
  */
 package org.bcia.julongchain.core.ledger.kvledger;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.proto.BlockUtils;
 import org.bcia.julongchain.core.ledger.BlockAndPvtData;
 import org.bcia.julongchain.core.ledger.INodeLedger;
@@ -47,7 +47,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class KvLedgerProvider implements INodeLedgerProvider {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(KvLedgerProvider.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(KvLedgerProvider.class);
 
     private IdStore idStore = null;
     private Provider ledgerStoreProvider = null;
@@ -97,7 +97,7 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         //获取账本id
         try {
             ledgerID = BlockUtils.getGroupIDFromBlock(genesisBlock);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error("Got error when creating kvledger provider");
             throw new LedgerException(e);
         }

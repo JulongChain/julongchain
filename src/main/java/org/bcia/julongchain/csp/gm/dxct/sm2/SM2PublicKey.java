@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.csp.gm.dxct.sm2;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.gm.dxct.sm3.SM3;
 
 /**
@@ -25,7 +25,7 @@ import org.bcia.julongchain.csp.gm.dxct.sm3.SM3;
  * @company Dingxuan
  */
 public class SM2PublicKey extends SM2Key {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SM2PublicKey.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SM2PublicKey.class);
     private  byte[]  publicKey;
     private SM3 sm3;
 

@@ -3,8 +3,8 @@ package org.bcia.julongchain.core.ledger.leveldb;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.util.leveldbhelper.LevelDBProvider;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.iq80.leveldb.DB;
 import org.junit.Assert;
@@ -23,7 +23,7 @@ import java.util.UUID;
  */
 public class LevelDBFactoryTest {
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(LevelDBFactoryTest.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(LevelDBFactoryTest.class);
 
     @Test
     public void getDB() throws LedgerException {

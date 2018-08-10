@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.common.tools.cryptogen.cmd;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 
 /**
  * 命令类接口
@@ -29,7 +29,7 @@ public interface ICryptoGenCmd {
     /**
      * 执行命令
      * @param args 命令参数
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    void execCmd(String[] args) throws JavaChainException;
+    void execCmd(String[] args) throws JulongChainException;
 }

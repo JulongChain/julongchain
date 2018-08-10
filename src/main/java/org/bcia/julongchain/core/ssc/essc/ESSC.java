@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.core.ssc.essc;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.proto.ProposalResponseUtils;
 import org.bcia.julongchain.common.util.proto.ProtoUtils;
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContractStub;
@@ -39,7 +39,7 @@ import java.util.List;
  */
 @Component
 public class ESSC extends SystemSmartContractBase {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ESSC.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ESSC.class);
 
     /**
      * Init is called once when the smartcontract started the first time

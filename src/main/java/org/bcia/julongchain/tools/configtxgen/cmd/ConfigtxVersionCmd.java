@@ -17,8 +17,8 @@ package org.bcia.julongchain.tools.configtxgen.cmd;
 
 import org.apache.commons.cli.ParseException;
 import org.bcia.julongchain.common.exception.ConfigtxToolsException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.tools.configtxgen.ConfigtxGenConstant;
 
 /**
@@ -29,7 +29,7 @@ import org.bcia.julongchain.tools.configtxgen.ConfigtxGenConstant;
  * @company Dingxuan
  */
 public class ConfigtxVersionCmd implements IConfigtxGenCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ConfigtxVersionCmd.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ConfigtxVersionCmd.class);
 
     @Override
     public void execCmd(String[] args) throws ParseException, ConfigtxToolsException {

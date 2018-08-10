@@ -16,8 +16,8 @@ limitations under the License.
 package org.bcia.julongchain.core.ledger.kvledger.txmgmt.validator.valimpl;
 
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.BlockAndPvtData;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate.IDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate.PvtUpdateBatch;
@@ -38,7 +38,7 @@ import org.bcia.julongchain.protos.common.Common;
  * @company Dingxuan
  */
 public class DefaultValidator implements IValidator {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(DefaultValidator.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(DefaultValidator.class);
 
     private ITxManager txMgr;
     private InternalValidator val;

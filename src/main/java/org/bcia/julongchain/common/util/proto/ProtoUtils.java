@@ -18,9 +18,9 @@ package org.bcia.julongchain.common.util.proto;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.common.Collection;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.*;
@@ -38,7 +38,7 @@ import java.io.UnsupportedEncodingException;
  * @company Dingxuan
  */
 public class ProtoUtils {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ProtoUtils.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ProtoUtils.class);
 
     /**
      * 从字节流解析出SmartContractID对象
@@ -129,7 +129,7 @@ public class ProtoUtils {
 
     public static void unMarshalCollectionConfigPackage(byte[] collectionConfigBytes,
                                                         Collection.CollectionConfigPackage collections)
-            throws JavaChainException {
+            throws JulongChainException {
 
     }
 

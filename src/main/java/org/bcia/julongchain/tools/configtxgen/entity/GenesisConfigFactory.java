@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.tools.configtxgen.entity;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.yaml.snakeyaml.Yaml;
 
@@ -35,7 +35,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class GenesisConfigFactory {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(GenesisConfigFactory.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(GenesisConfigFactory.class);
 
     private static GenesisConfig genesisConfig;
 

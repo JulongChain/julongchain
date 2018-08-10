@@ -17,16 +17,15 @@ package org.bcia.julongchain.msp.mgmt;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.CspException;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.MspException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.factory.CspManager;
 import org.bcia.julongchain.csp.factory.CspOptsManager;
 import org.bcia.julongchain.csp.gm.dxct.GmCsp;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2PrivateKeyImportOpts;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2PublicKeyImportOpts;
-import org.bcia.julongchain.csp.gm.dxct.util.CryptoUtil;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.msp.IIdentity;
@@ -58,7 +57,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class Msp implements IMsp {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Msp.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Msp.class);
     private final static int JULONG_MSP = 0;
     private int mspVersion;
     private IIdentity[] rootCerts;
@@ -369,7 +368,7 @@ public class Msp implements IMsp {
             IKey privateKey = null;
             try {
                 privateKey = csp.keyImport(skBytes, new SM2PrivateKeyImportOpts(true));
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 log.error(e.getMessage());
             }
             signIdentity = new SignIdentity(new Identity(id.getCertificate(), id.getPk(), this), new NodeSigner(this.csp, privateKey), this);
@@ -391,7 +390,7 @@ public class Msp implements IMsp {
         IKey certPubK = null;
         try {
             certPubK = csp.keyImport(pubKeyInfo, new SM2PublicKeyImportOpts(true));
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage(), e);
         }
         map.put(MspConstant.PUBLIC_KEY, certPubK);

@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.csp.pkcs11;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.intfs.opts.IKeyGenOpts;
@@ -68,7 +68,7 @@ public class TestKeyGenOpts {
             IKey mykey = csp.keyGen(opts);
             IKey mykey1 = csp.getKey(mykey.ski());
             return;
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -80,7 +80,7 @@ public class TestKeyGenOpts {
             IKeyGenOpts opts = new RsaOpts.RSA2048KeyGenOpts(false);
             IKey mykey = csp.keyGen(opts);
             IKey mykey1 = csp.getKey(mykey.ski());
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -94,7 +94,7 @@ public class TestKeyGenOpts {
             IKeyGenOpts opts = new RsaOpts.RSA3072KeyGenOpts(false);
             IKey mykey = csp.keyGen(opts);
             csp.getKey(mykey.ski());
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -106,7 +106,7 @@ public class TestKeyGenOpts {
             IKeyGenOpts opts = new RsaOpts.RSA4096KeyGenOpts(false);
             IKey mykey = csp.keyGen(opts);
             csp.getKey(mykey.ski());
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -120,7 +120,7 @@ public class TestKeyGenOpts {
             IKey mykey = csp.keyGen(opts);
             IKey mykey1 = csp.getKey(mykey.ski());
             return;
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -133,7 +133,7 @@ public class TestKeyGenOpts {
             IKey mykey = csp.keyGen(opts);
             IKey mykey1 = csp.getKey(mykey.ski());
             return;
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -149,7 +149,7 @@ public class TestKeyGenOpts {
     		ski[0] = 0x03;
     		IKey mykey1 = csp.getKey(ski);
     		return;
-    	} catch (JavaChainException e) {
+    	} catch (JulongChainException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

@@ -22,8 +22,8 @@ import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.julongchain.common.groupconfig.config.IConsenterConfig;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.PolicyConstant;
 import org.bcia.julongchain.common.util.proto.TxUtils;
 import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
@@ -40,7 +40,7 @@ import org.bcia.julongchain.protos.common.Configtx;
  * @company Dingxuan
  */
 public class SystemGroup  implements IProcessor {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SystemGroup.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SystemGroup.class);
     private StandardGroup standardGroup;
     private IGroupConfigTemplator groupConfigTemplator;
     private RuleSet filters;

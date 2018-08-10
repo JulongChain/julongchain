@@ -18,8 +18,8 @@ package org.bcia.julongchain.common.policycheck.cauthdsl;
 
 import com.google.protobuf.ByteString;
 import org.bcia.julongchain.common.exception.PolicyException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.proto.ProtoUtils;
 import org.bcia.julongchain.protos.common.MspPrincipal;
 import org.bcia.julongchain.protos.common.Policies;
@@ -34,7 +34,7 @@ import java.util.Arrays;
  * @company Aisino
  */
 public class CAuthDslBuilder {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CAuthDslBuilder.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(CAuthDslBuilder.class);
     // AcceptAllPolicy always evaluates to true
     //AcceptAllPolicy总是评估为true
     private Policies.SignaturePolicyEnvelope acceptAllPolicy;

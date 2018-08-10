@@ -1,12 +1,9 @@
 package org.bcia.julongchain.msp.mgmt;
 
-import org.apache.http.cookie.SM;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.util.FileUtils;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2;
 import org.bcia.julongchain.csp.gm.dxct.sm3.SM3;
-import org.bcia.julongchain.csp.gm.dxct.util.CryptoUtil;
-import org.bcia.julongchain.msp.util.MspUtil;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -14,23 +11,14 @@ import org.bouncycastle.util.encoders.Base64;
 import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
-import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.util.Base64Utils;
-import sun.security.util.Debug;
-import sun.security.util.DerValue;
-import sun.security.x509.AlgorithmId;
 
 import java.io.*;
-import java.math.BigInteger;
 import java.security.KeyFactory;
-import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.security.Security;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
-
-import static org.junit.Assert.*;
 
 /**
  * 类描述
@@ -47,7 +35,7 @@ public class MspValidateTest {
     }
 
     @Test
-    public void skKeyTest() throws IOException, JavaChainException, NoSuchAlgorithmException, InvalidKeySpecException {
+    public void skKeyTest() throws IOException, JulongChainException, NoSuchAlgorithmException, InvalidKeySpecException {
         SM2 sm2 = new SM2();
         SM3 sm3 = new SM3();
 //        String cert_path = MspValidateTest.class.getResource("/peer0-cert.pem").getPath();

@@ -16,9 +16,9 @@ limitations under the License.
 package org.bcia.julongchain.core.ledger.sceventmgmt;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.common.privdata.CollectionStoreSupport;
 import org.bcia.julongchain.core.common.privdata.IPrivDataSupport;
 import org.bcia.julongchain.core.ledger.IStateListener;
@@ -36,12 +36,12 @@ import java.util.List;
  * @company Dingxuan
  */
 public class KVLedgerLSSCStateListener implements IStateListener {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(KVLedgerLSSCStateListener.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(KVLedgerLSSCStateListener.class);
 
     private IPrivDataSupport privdata = new CollectionStoreSupport();
 
     @Override
-    public void handleStateUpdates(String ledgerID, List<KvRwset.KVWrite> stateUpdates) throws JavaChainException {
+    public void handleStateUpdates(String ledgerID, List<KvRwset.KVWrite> stateUpdates) throws JulongChainException {
         log.debug("Group [{}]: Handling state updates in LSSC namespace - stateUpdate", ledgerID);
         List<SmartContractDefinition> scDefinitions = new ArrayList<>();
         for(KvRwset.KVWrite kvWrite : stateUpdates){
@@ -61,7 +61,7 @@ public class KVLedgerLSSCStateListener implements IStateListener {
                 smartContractData = SmartContractDataPackage.SmartContractData.parseFrom(kvWrite.getValue());
             } catch (InvalidProtocolBufferException e) {
                 log.error(e.getMessage(), e);
-                throw new JavaChainException(e);
+                throw new JulongChainException(e);
             }
             scDefinitions.add(new SmartContractDefinition(smartContractData.getName(), smartContractData.getVersion(), smartContractData.getId().toByteArray()));
         }

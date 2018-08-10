@@ -18,14 +18,12 @@ package org.bcia.julongchain.node.common.client;
 import io.grpc.ManagedChannel;
 import io.grpc.netty.NettyChannelBuilder;
 import io.grpc.stub.StreamObserver;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 import org.bcia.julongchain.protos.consenter.AtomicBroadcastGrpc;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * 广播客户端实现
@@ -35,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  * @company Dingxuan
  */
 public class BroadcastClient implements IBroadcastClient {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(BroadcastClient.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BroadcastClient.class);
     /**
      * IP地址
      */

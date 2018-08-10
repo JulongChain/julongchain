@@ -17,8 +17,8 @@ package org.bcia.julongchain.core.ledger.couchdb;
 
 import com.alibaba.fastjson.JSONObject;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.node.NodeConfig;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.junit.Test;
@@ -37,7 +37,7 @@ import java.util.Map;
  * @company ShanghaiGeer
  */
 public class CouchDBTest {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CouchDBTest.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(CouchDBTest.class);
 
     public CouchDbClient creatConnectionDB() throws LedgerException {
         CouchDbProperties properties = new CouchDbProperties();

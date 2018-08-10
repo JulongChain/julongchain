@@ -18,14 +18,13 @@ package org.bcia.julongchain.consenter.common.server;
 
 import org.bcia.julongchain.common.deliver.DeliverHandler;
 import org.bcia.julongchain.common.deliver.DeliverSupport;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.genesis.GenesisBlockFactory;
 import org.bcia.julongchain.common.ledger.blockledger.IFactory;
 import org.bcia.julongchain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.julongchain.common.localmsp.ILocalSigner;
-import org.bcia.julongchain.common.localmsp.impl.LocalSigner;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.FileUtils;
 import org.bcia.julongchain.common.util.proto.BlockUtils;
 import org.bcia.julongchain.consenter.common.bootstrap.file.BootStrapHelper;
@@ -35,7 +34,6 @@ import org.bcia.julongchain.consenter.consensus.IConsensusPlugin;
 import org.bcia.julongchain.consenter.consensus.singleton.Singleton;
 import org.bcia.julongchain.core.common.grpc.GrpcServerConfig;
 import org.bcia.julongchain.core.common.grpc.SecureOptions;
-import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.node.common.helper.ConfigTreeHelper;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
@@ -56,13 +54,13 @@ import static org.bcia.julongchain.consenter.common.localconfig.ConsenterConfigF
  * @company Dingxuan
  */
 public class PreStart {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(PreStart.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(PreStart.class);
     private static ConsenterConfig defaultConsenterConfig;
     private static DeliverHandler defaultDeliverHandler;
     private  Registrar  defaultRegistrar;
 
 
-    public static void initAll() throws IOException, JavaChainException {
+    public static void initAll() throws IOException, JulongChainException {
         boolean mutalTLS=false;
         initConsnterConfig();
        // defaultRegistrar=initializeMultichannelRegistrar(defaultConsenterConfig,new LocalSigner());
@@ -82,7 +80,7 @@ public class PreStart {
         return new DeliverHandler(new DeliverSupport(registrar), defaultConsenterConfig.getGeneral().getAuthentication().get("timeWindow"), mutalTLS);
     }
 
-    public  Registrar initializeMultichannelRegistrar(ConsenterConfig consenterConfig, ILocalSigner signer) throws JavaChainException, IOException {
+    public  Registrar initializeMultichannelRegistrar(ConsenterConfig consenterConfig, ILocalSigner signer) throws JulongChainException, IOException {
      //   if(defaultRegistrar==null){
             IFactory lf = LedgerHelper.createLedgerFactroy(consenterConfig);
             if (lf.groupIDs().size() == 0) {
@@ -99,7 +97,7 @@ public class PreStart {
 //        }
     }
 
-    private static void initBootstrapGroup(ConsenterConfig consenterConfig, IFactory blockLedger) throws IOException, JavaChainException {
+    private static void initBootstrapGroup(ConsenterConfig consenterConfig, IFactory blockLedger) throws IOException, JulongChainException {
         Common.Block genesisBlock = null;
         switch (consenterConfig.getGeneral().getGenesisMethod()) {
             case "provisional":
@@ -117,7 +115,7 @@ public class PreStart {
             String chainId = BlockUtils.getGroupIDFromBlock(genesisBlock);
             ReadWriteBase gl = blockLedger.getOrCreate(chainId);
             gl.append(genesisBlock);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
             e.printStackTrace();
         }

@@ -21,13 +21,13 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.DuplicateChaincodeHandlerException;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.SmartContractException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.common.ledger.util.IoUtil;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.Utils;
 import org.bcia.julongchain.core.common.smartcontractprovider.ISmartContractPackage;
 import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractContext;
@@ -68,7 +68,7 @@ import static org.bcia.julongchain.protos.node.SmartContractShim.SmartContractMe
  * @company Dingxuan
  */
 public class SmartContractSupport implements ISCSupport {
-	private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractSupport.class);
+	private static JulongChainLog log = JulongChainLogFactory.getLog(SmartContractSupport.class);
 
 	private ICA ca;
 	private Authenticator auth;
@@ -309,7 +309,7 @@ public class SmartContractSupport implements ISCSupport {
         }
     }
 
-    private String createUserImage(String smartContractId, String version, String imageName) throws IOException, JavaChainException {
+    private String createUserImage(String smartContractId, String version, String imageName) throws IOException, JulongChainException {
         log.info("images is null");
 
         // 清空instantiate目录

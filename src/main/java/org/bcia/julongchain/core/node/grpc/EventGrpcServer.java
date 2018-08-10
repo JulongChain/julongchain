@@ -19,8 +19,8 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 import org.bcia.julongchain.common.exception.NodeException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.events.producer.IEventHubServer;
 import org.bcia.julongchain.protos.node.EventsGrpc;
 import org.bcia.julongchain.protos.node.EventsPackage;
@@ -35,7 +35,7 @@ import java.io.IOException;
  * @company Dingxuan
  */
 public class EventGrpcServer {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(EventGrpcServer.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(EventGrpcServer.class);
     /**
      * 监听的端口
      */

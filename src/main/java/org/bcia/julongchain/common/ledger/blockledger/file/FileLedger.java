@@ -18,8 +18,6 @@ package org.bcia.julongchain.common.ledger.blockledger.file;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.common.ledger.blockledger.*;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Ledger;
 import org.bcia.julongchain.protos.consenter.Ab;

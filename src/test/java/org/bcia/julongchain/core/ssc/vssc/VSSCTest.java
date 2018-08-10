@@ -2,9 +2,8 @@ package org.bcia.julongchain.core.ssc.vssc;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import io.netty.channel.ChannelHandler;
 import org.bcia.julongchain.BaseJunit4Test;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.SysSmartContractException;
 import org.bcia.julongchain.common.policycheck.cauthdsl.CAuthDslBuilder;
 import org.bcia.julongchain.common.util.CommConstant;
@@ -64,7 +63,7 @@ public class VSSCTest extends BaseJunit4Test {
         Common.Envelope tx= null;
         try {
             tx = createTx(false);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
             System.out.println("Create Trade failed,testing exits with error.");
             return;
@@ -245,10 +244,10 @@ public class VSSCTest extends BaseJunit4Test {
      * 创建模拟的交易
      * @param bEndorsedByDuplicatedIdentity
      * @return
-     * @throws JavaChainException
+     * @throws JulongChainException
      * @throws InvalidProtocolBufferException
      */
-    private Common.Envelope createTx(boolean bEndorsedByDuplicatedIdentity) throws JavaChainException, InvalidProtocolBufferException {
+    private Common.Envelope createTx(boolean bEndorsedByDuplicatedIdentity) throws JulongChainException, InvalidProtocolBufferException {
         //创建SmartContractID
         SmartContractPackage.SmartContractID smartContractID=SmartContractPackage.SmartContractID.newBuilder().
                                                        setName("foo").setVersion("v1").build();

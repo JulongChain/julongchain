@@ -17,8 +17,8 @@ package org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage;
 
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 
 /**
@@ -30,7 +30,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
  */
 public class BlocksItr implements IResultsIterator {
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(BlocksItr.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BlocksItr.class);
 
     private BlockFileManager mgr;
     private long maxBlockNumAvailable;

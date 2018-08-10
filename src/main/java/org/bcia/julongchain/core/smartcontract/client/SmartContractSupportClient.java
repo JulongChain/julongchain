@@ -20,8 +20,8 @@
 package org.bcia.julongchain.core.smartcontract.client;
 
 import org.bcia.julongchain.common.exception.SmartContractException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.core.container.inproccontroller.InprocController;
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContractStub;
@@ -44,7 +44,7 @@ import java.util.Map;
  */
 public class SmartContractSupportClient extends SmartContractBase {
 
-	private static JavaChainLog logger = JavaChainLogFactory.getLog(SmartContractSupportClient.class);
+	private static JulongChainLog logger = JulongChainLogFactory.getLog(SmartContractSupportClient.class);
 	private static Map<String, String> map = new HashMap<>();
 
 	static {

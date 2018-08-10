@@ -18,8 +18,8 @@ package org.bcia.julongchain.core.deliverservice.blocksprovider;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang.StringUtils;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 import org.bcia.julongchain.protos.gossip.Message;
@@ -34,7 +34,7 @@ import static org.bcia.julongchain.protos.common.Common.Status.SUCCESS;
  * @company Dingxuan
  */
 public class BlocksProviderImpl implements IBlocksProvider {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(BlocksProviderImpl.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BlocksProviderImpl.class);
     private final int WRONG_STATUS_THRESHOLD = 10;
     //10秒
     private final int MAX_WRONG_DELAY = 10000;

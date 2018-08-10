@@ -19,15 +19,13 @@ import io.grpc.ManagedChannel;
 import io.grpc.netty.NettyChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import org.bcia.julongchain.common.localmsp.impl.LocalSigner;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 import org.bcia.julongchain.protos.consenter.AtomicBroadcastGrpc;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * 投递客户端实现
@@ -37,7 +35,7 @@ import java.util.concurrent.TimeUnit;
  * @company Dingxuan
  */
 public class DeliverClient implements IDeliverClient {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(DeliverClient.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(DeliverClient.class);
 
     /**
      * IP地址

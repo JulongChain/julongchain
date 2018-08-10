@@ -17,7 +17,7 @@ package org.bcia.julongchain.common.util.proto;
 
 import com.google.protobuf.ByteString;
 import org.apache.commons.lang3.ArrayUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.csp.factory.CspManager;
 import org.bcia.julongchain.csp.gm.dxct.RngOpts;
@@ -133,9 +133,9 @@ public class ProposalUtils {
      * @param creator
      * @param nonce
      * @return
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public static String computeProposalTxID(byte[] creator, byte[] nonce) throws JavaChainException {
+    public static String computeProposalTxID(byte[] creator, byte[] nonce) throws JulongChainException {
         byte[] bytes = ArrayUtils.addAll(nonce, creator);
 
         //哈希得到交易ID
@@ -160,7 +160,7 @@ public class ProposalUtils {
                                              String groupID,
                                              SmartContractPackage.SmartContractInvocationSpec invocationSpec,
                                              byte[] creator)
-                                             throws JavaChainException {
+                                             throws JulongChainException {
         return createSmartcontractProposal(type,groupID,invocationSpec,creator);
     }
 
@@ -171,11 +171,11 @@ public class ProposalUtils {
      * @param invocationSpec
      * @param creator
      * @return
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     private static ProposalPackage.Proposal createSmartcontractProposal(Common.HeaderType type, String groupID,
                                                                         SmartContractPackage.SmartContractInvocationSpec invocationSpec,
-                                                                        byte[] creator) throws JavaChainException {
+                                                                        byte[] creator) throws JulongChainException {
         return createSmartcontractProposalWithTransient(type,groupID,invocationSpec,creator,null);
     }
 
@@ -187,14 +187,14 @@ public class ProposalUtils {
      * @param creator
      * @param transientMap
      * @return
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     public static ProposalPackage.Proposal createSmartcontractProposalWithTransient
             (Common.HeaderType type, String groupID,
              SmartContractPackage.SmartContractInvocationSpec invocationSpec,
              byte[] creator,
              Map<String,byte[]> transientMap)
-            throws JavaChainException {
+            throws JulongChainException {
         byte[] nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, new RngOpts());
         String txID=ProposalUtils.computeProposalTxID(creator, nonce);
         return buildSmartContractProposal(type,groupID,txID,invocationSpec,nonce,creator,transientMap);

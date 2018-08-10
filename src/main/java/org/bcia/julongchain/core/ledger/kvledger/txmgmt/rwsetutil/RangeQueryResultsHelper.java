@@ -16,8 +16,8 @@ limitations under the License.
 package org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil;
 
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
@@ -35,7 +35,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class RangeQueryResultsHelper {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(RangeQueryResultsHelper.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(RangeQueryResultsHelper.class);
 
     private List<KvRwset.KVRead> pendingResults = new ArrayList<>();
     private MerkleTree mt;

@@ -17,8 +17,6 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate;
 
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.*;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.CompositeKey;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;

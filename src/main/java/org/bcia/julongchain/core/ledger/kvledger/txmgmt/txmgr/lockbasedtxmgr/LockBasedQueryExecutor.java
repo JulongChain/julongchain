@@ -17,8 +17,8 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.IQueryExecutor;
 
 import java.util.List;
@@ -31,7 +31,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public class LockBasedQueryExecutor implements IQueryExecutor {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(LockBasedQueryExecutor.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(LockBasedQueryExecutor.class);
 
     private QueryHelper helper;
     private String txID;

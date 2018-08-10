@@ -16,8 +16,8 @@
 
 package org.bcia.julongchain.csp.pkcs11.util;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.csp.intfs.IHash;
 import org.bcia.julongchain.csp.pkcs11.IPKCS11FactoryOpts;
 import sun.security.pkcs11.wrapper.CK_MECHANISM;
@@ -40,9 +40,9 @@ public class PKCS11Digest {
 
     private static final int BUFFERSIZE = 96;
     
-    private static JavaChainLog logger;
+    private static JulongChainLog logger;
 
-    public PKCS11Digest(long mechanism) throws JavaChainException{
+    public PKCS11Digest(long mechanism) throws JulongChainException {
         this.mechanism = mechanism;
         switch((int)mechanism) {
             case (int)CKM_MD2:
@@ -59,7 +59,7 @@ public class PKCS11Digest {
                 digestLength = 48;
                 break;
             default:
-                throw new JavaChainException("[JC_PKCS]: no support the alg!");
+                throw new JulongChainException("[JC_PKCS]: no support the alg!");
         }
     }
 
@@ -68,9 +68,9 @@ public class PKCS11Digest {
      * @param msg       Message
      * @param opts      P11 factory
      * @return digest value
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public byte[] getDigest(byte[] msg, IPKCS11FactoryOpts opts) throws JavaChainException{
+    public byte[] getDigest(byte[] msg, IPKCS11FactoryOpts opts) throws JulongChainException {
 
         try {
             CK_MECHANISM ckm = new CK_MECHANISM();
@@ -85,14 +85,14 @@ public class PKCS11Digest {
             }
             else{
             	logger.error("[JC_PKCS]: digest methor1 data length error!");
-                throw new JavaChainException("[JC_PKCS]: digest methor1 data length error!");
+                throw new JulongChainException("[JC_PKCS]: digest methor1 data length error!");
             }
 
         }catch(PKCS11Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
             logger.error(err);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }
     }
 
@@ -101,9 +101,9 @@ public class PKCS11Digest {
      * @param msg       Message
      * @param opts      P11 factory
      * @return digest value
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public static byte[] getDigestwithUpdate(byte[] msg, IPKCS11FactoryOpts opts) throws JavaChainException{
+    public static byte[] getDigestwithUpdate(byte[] msg, IPKCS11FactoryOpts opts) throws JulongChainException {
 
         try {
 
@@ -119,13 +119,13 @@ public class PKCS11Digest {
             }
             else{
             	logger.error("[JC_PKCS]: digest methor2 data length error!");
-                throw new JavaChainException("[JC_PKCS]: digest methor2 data length error!");
+                throw new JulongChainException("[JC_PKCS]: digest methor2 data length error!");
             }
 
         }catch(PKCS11Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }
 
     }
@@ -156,7 +156,7 @@ public class PKCS11Digest {
                     System.arraycopy(b, 0, data, message.length, b.length);
                     byte[] digest = getDigestwithUpdate(data, opts);
                     return digest;
-                } catch (JavaChainException ex) {
+                } catch (JulongChainException ex) {
                 	logger.error("[JC_PKCS]: sum error!");
                     return null;
                 }
@@ -166,7 +166,7 @@ public class PKCS11Digest {
                 try {
                     byte[] buffer = new byte[BUFFERSIZE];
                     getDigestwithUpdate(buffer, opts);
-                } catch (JavaChainException ex) {
+                } catch (JulongChainException ex) {
                 	logger.error("[JC_PKCS]: reset error!");
                 	return;
                 }

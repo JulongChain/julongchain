@@ -16,8 +16,8 @@
 package org.bcia.julongchain.consenter.common.cmd.impl;
 
 import org.apache.commons.cli.ParseException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.common.cmd.IConsenterCmd;
 import org.bcia.julongchain.consenter.common.server.ConsenterServer;
 
@@ -29,7 +29,7 @@ import java.io.IOException;
  * @company Dingxuan
  */
 public class BenchMarkCmd implements IConsenterCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(BenchMarkCmd.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BenchMarkCmd.class);
     private ConsenterServer consenterServer;
 
     public BenchMarkCmd() {

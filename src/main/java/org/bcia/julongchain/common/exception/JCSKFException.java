@@ -22,7 +22,7 @@ package org.bcia.julongchain.common.exception;
  * @date 7/4/18
  * @company FEITIAN
  */
-public class JCSKFException extends JavaChainException {
+public class JCSKFException extends JulongChainException {
 
     public static final long JC_SKF_OK = 0x00000000;
     public static final long JC_SKF_NODEV = 0x80000001;

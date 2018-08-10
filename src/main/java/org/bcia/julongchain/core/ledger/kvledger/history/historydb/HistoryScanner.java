@@ -19,8 +19,8 @@ import com.google.protobuf.Timestamp;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.common.ledger.blkstorage.IBlockStore;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.proto.ProtoUtils;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.NsRwSet;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.TxRwSet;
@@ -43,7 +43,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class HistoryScanner implements IResultsIterator {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(HistoryScanner.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(HistoryScanner.class);
 
     /**
      * HistoryDB key头部 包含namespace, key

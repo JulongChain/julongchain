@@ -17,12 +17,12 @@ package org.bcia.julongchain.core.ssc.vssc;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.SysSmartContractException;
 import org.bcia.julongchain.common.groupconfig.capability.IApplicationCapabilities;
-import org.bcia.julongchain.common.log.JavaChainLog;
+import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.policies.policy.IPolicy;
 import org.bcia.julongchain.common.policies.IPolicyProvider;
 import org.bcia.julongchain.common.policycheck.policies.PolicyProvider;
@@ -65,7 +65,7 @@ public class VSSCSupportForLsscInvocation {
             IApplicationCapabilities ac,
             ICollectionStore collectionStore,
             ISystemSmartContractProvider sscProvider,
-            JavaChainLog log
+            JulongChainLog log
     )throws SysSmartContractException{
         ProposalPackage.SmartContractProposalPayload scpp=null;
         try {
@@ -337,7 +337,7 @@ public class VSSCSupportForLsscInvocation {
      * @return
      */
     private static void checkInstantiationPolicy(String groupID, Common.Envelope env, byte []instantiationPolicy,
-                                          Common.Payload payload,JavaChainLog log)throws SysSmartContractException{
+                                                 Common.Payload payload, JulongChainLog log)throws SysSmartContractException{
         IMspManager mspManager = GlobalMspManagement.getManagerForChain(groupID);
         if(mspManager==null){
             String msg=String.format("MSP getPolicyManager for group %s is null, aborting",groupID);
@@ -376,7 +376,7 @@ public class VSSCSupportForLsscInvocation {
         IQueryExecutor qe=null;
         try {
             qe=sscProvider.getQueryExecutorForLedger(groupID);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             String msg=String.format("Could not retrieve QueryExecutor for group %s, error %s",
                                             groupID,e.getMessage());
             throw new SysSmartContractException(msg);
@@ -468,7 +468,7 @@ public class VSSCSupportForLsscInvocation {
         Collection.CollectionConfigPackage ccp=null;
         try {
             ccp = collectionStore.retrieveCollectionConfigPackage(cc);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             String msg=e.getMessage();
             // fail if we get any error other than NoSuchCollectionError
             // because it means something went wrong while looking up the

@@ -16,24 +16,19 @@ package org.bcia.julongchain.csp.gm.dxct;
  * limitations under the License.
  */
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.gm.dxct.sm2.*;
 import org.bcia.julongchain.csp.gm.dxct.sm3.SM3;
 import org.bcia.julongchain.csp.gm.dxct.sm4.*;
 import org.bcia.julongchain.csp.gm.dxct.util.CryptoUtil;
-import org.bcia.julongchain.csp.gm.sdt.random.GmRandom;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IHash;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.intfs.opts.*;
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.util.encoders.Hex;
 
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.SecureRandom;
 import java.util.Random;
 
 /**
@@ -45,7 +40,7 @@ import java.util.Random;
 
 // GmCsp provides the Guomi's software implements of the ICsp interface.
 public class GmCsp implements ICsp {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(GmCsp.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(GmCsp.class);
     // List algorithms to be used.
     private SM2 sm2;
     private SM3 sm3;
@@ -69,10 +64,10 @@ public class GmCsp implements ICsp {
 
 
     @Override
-    public IKey keyGen(IKeyGenOpts opts) throws JavaChainException {
+    public IKey keyGen(IKeyGenOpts opts) throws JulongChainException {
         if (opts == null) {
             log.error("Invalid Opts parameter. It must not be null.");
-            throw new JavaChainException("Invalid Opts parameter. It must not be null.");
+            throw new JulongChainException("Invalid Opts parameter. It must not be null.");
         }
         if (opts instanceof SM2KeyGenOpts) {
 
@@ -92,19 +87,19 @@ public class GmCsp implements ICsp {
     }
 
     @Override
-    public IKey keyDeriv(IKey key, IKeyDerivOpts opts) throws JavaChainException {
+    public IKey keyDeriv(IKey key, IKeyDerivOpts opts) throws JulongChainException {
         return null;
     }
 
     @Override
-    public IKey keyImport(Object raw, IKeyImportOpts opts) throws JavaChainException {
+    public IKey keyImport(Object raw, IKeyImportOpts opts) throws JulongChainException {
         if (raw == null) {
             log.error("Invalid raw. It must not be nil.");
-            throw new JavaChainException("Invalid raw. It must not be nil.");
+            throw new JulongChainException("Invalid raw. It must not be nil.");
         }
         if (opts == null) {
             log.error("Invalid opts. It must not be nil.");
-            throw new JavaChainException("Invalid opts. It must not be nil.");
+            throw new JulongChainException("Invalid opts. It must not be nil.");
         }
         if (opts instanceof SM2PrivateKeyImportOpts) {
             IKey sm2PrivateKey = new SM2KeyImport(raw,null);
@@ -126,34 +121,34 @@ public class GmCsp implements ICsp {
     }
 
     @Override
-    public IKey getKey(byte[] ski) throws JavaChainException {
+    public IKey getKey(byte[] ski) throws JulongChainException {
         return null;
     }
 
     @Override
-    public byte[] hash(byte[] msg, IHashOpts opts) throws JavaChainException {
+    public byte[] hash(byte[] msg, IHashOpts opts) throws JulongChainException {
         if (msg.length == 0) {
             log.error("Invalid msg. Cannot be empty.");
-            throw new JavaChainException("Invalid msg. Cannot be empty.");
+            throw new JulongChainException("Invalid msg. Cannot be empty.");
         }
         byte[] results = sm3.hash(msg);
         return results;
     }
 
     @Override
-    public IHash getHash(IHashOpts opts) throws JavaChainException {
+    public IHash getHash(IHashOpts opts) throws JulongChainException {
         return null;
     }
 
     @Override
-    public byte[] sign(IKey key, byte[] plaintext, ISignerOpts opts) throws JavaChainException {
+    public byte[] sign(IKey key, byte[] plaintext, ISignerOpts opts) throws JulongChainException {
         if (key == null) {
             log.error("Invalid Key. It must not be nil.");
-            throw new JavaChainException("Invalid Key. It must not be nil.");
+            throw new JulongChainException("Invalid Key. It must not be nil.");
         }
         if (plaintext.length == 0) {
             log.error("Invalid content. Cannot be empty.");
-            throw new JavaChainException("Invalid content. Cannot be empty.");
+            throw new JulongChainException("Invalid content. Cannot be empty.");
         }
         if (opts instanceof SM2SignerOpts) {
             return sm2.sign(key.toBytes(), plaintext);
@@ -162,15 +157,15 @@ public class GmCsp implements ICsp {
     }
 
     @Override
-    public boolean verify(IKey key, byte[] signature, byte[] plaintext, ISignerOpts opts) throws JavaChainException {
+    public boolean verify(IKey key, byte[] signature, byte[] plaintext, ISignerOpts opts) throws JulongChainException {
         boolean verify = false;
         if (key == null) {
             log.error("Invalid Key. It must not be nil.");
-            throw new JavaChainException("Invalid Key. It must not be nil.");
+            throw new JulongChainException("Invalid Key. It must not be nil.");
         }
         if (signature.length == 0) {
             log.error("Invalid signature. It must not be nil.");
-            throw new JavaChainException("Invalid signature. It must not be nil.");
+            throw new JulongChainException("Invalid signature. It must not be nil.");
         }
         if (opts instanceof SM2SignerOpts) {
             verify = sm2.verify(key.getPublicKey().toBytes(), signature, plaintext);
@@ -179,10 +174,10 @@ public class GmCsp implements ICsp {
     }
 
     @Override
-    public byte[] encrypt(IKey key, byte[] plaintext, IEncrypterOpts opts) throws JavaChainException {
+    public byte[] encrypt(IKey key, byte[] plaintext, IEncrypterOpts opts) throws JulongChainException {
         if (key == null) {
             log.error("Invalid Key. It must not be nil.");
-            throw new JavaChainException("Invalid Key. It must not be nil.");
+            throw new JulongChainException("Invalid Key. It must not be nil.");
         }
         if (opts instanceof SM4EncrypterOpts) {
             return sm4.encryptECB(plaintext, key.toBytes());
@@ -191,14 +186,14 @@ public class GmCsp implements ICsp {
     }
 
     @Override
-    public byte[] decrypt(IKey key, byte[] ciphertext, IDecrypterOpts opts) throws JavaChainException {
+    public byte[] decrypt(IKey key, byte[] ciphertext, IDecrypterOpts opts) throws JulongChainException {
         if (key == null) {
             log.error("Invalid Key. It must not be nil.");
-            throw new JavaChainException("Invalid Key. It must not be nil.");
+            throw new JulongChainException("Invalid Key. It must not be nil.");
         }
         if (ciphertext.length == 0) {
             log.error("Invalid ciphertext. Cannot be empty.");
-            throw new JavaChainException("Invalid ciphertext. Cannot be empty.");
+            throw new JulongChainException("Invalid ciphertext. Cannot be empty.");
         }
         if (opts instanceof SM4DecrypterOpts) {
             return sm4.decryptECB(ciphertext, key.toBytes());
@@ -207,10 +202,10 @@ public class GmCsp implements ICsp {
     }
 
     @Override
-    public byte[] rng(int len, IRngOpts opts) throws JavaChainException {
+    public byte[] rng(int len, IRngOpts opts) throws JulongChainException {
         if (len <= 0) {
             log.error("The random length is less than Zero! ");
-            throw new JavaChainException("The random length is less than Zero! ");
+            throw new JulongChainException("The random length is less than Zero! ");
         }
 //        byte[] none = new SecureRandom().generateSeed(len);
 //        return none;

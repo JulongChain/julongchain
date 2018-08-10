@@ -16,10 +16,10 @@ limitations under the License.
 package org.bcia.julongchain.core.ledger.sceventmgmt;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractProvider;
 import org.bcia.julongchain.core.common.sysscprovider.SystemSmartContractProvider;
 import org.bcia.julongchain.core.ledger.IQueryExecutor;
@@ -33,19 +33,19 @@ import org.bcia.julongchain.protos.node.SmartContractDataPackage;
  * @company Dingxuan
  */
 public class SmartContractInfoProviderImpl implements ISmartContractInfoProvider{
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractInfoProviderImpl.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SmartContractInfoProviderImpl.class);
 
     @Override
-    public boolean isSmartContractDeployed(String groupID, SmartContractDefinition smartContractDefinition) throws JavaChainException{
+    public boolean isSmartContractDeployed(String groupID, SmartContractDefinition smartContractDefinition) throws JulongChainException {
         return isSmartContractDeployed(groupID, smartContractDefinition.getName(), smartContractDefinition.getVersion(), smartContractDefinition.getHash());
     }
 
-    private boolean isSmartContractDeployed(String groupID, String scName, String scVersion, byte[] scHash) throws JavaChainException{
+    private boolean isSmartContractDeployed(String groupID, String scName, String scVersion, byte[] scHash) throws JulongChainException {
         SystemSmartContractProvider sscProvider = new SystemSmartContractProvider();
         IQueryExecutor qe = null;
         try {
             qe = sscProvider.getQueryExecutorForLedger(groupID);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage(), e);
             throw e;
         }
@@ -60,7 +60,7 @@ public class SmartContractInfoProviderImpl implements ISmartContractInfoProvider
         } catch (InvalidProtocolBufferException e){
             log.error("Got wrong scData");
             log.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         } catch (LedgerException e) {
             log.error(e.getMessage(), e);
             throw e;
@@ -70,7 +70,7 @@ public class SmartContractInfoProviderImpl implements ISmartContractInfoProvider
     }
 
     @Override
-    public byte[] retrieveSmartContractArtifacts(SmartContractDefinition smartContractDefinition) throws JavaChainException{
+    public byte[] retrieveSmartContractArtifacts(SmartContractDefinition smartContractDefinition) throws JulongChainException {
         return SmartContractProvider.extractStatedbArtifactsForSmartContract(smartContractDefinition.getName(), smartContractDefinition.getVersion());
     }
 }

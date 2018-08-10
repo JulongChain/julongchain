@@ -21,8 +21,8 @@ import org.bcia.julongchain.common.ledger.blkstorage.BlockStorage;
 import org.bcia.julongchain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.common.ledger.util.leveldbhelper.UpdateBatch;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.util.TxValidationFlags;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.common.Common;
@@ -41,7 +41,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class BlockIndex implements Index {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(BlockIndex.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BlockIndex.class);
 
     private Map<String, Boolean> indexItemsMap;
     private IDBProvider db;

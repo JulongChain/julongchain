@@ -17,8 +17,8 @@ package org.bcia.julongchain.consenter.common.blockcutter;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.bcia.julongchain.common.groupconfig.config.IConsenterConfig;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.consensus.IReceiver;
 import org.bcia.julongchain.consenter.entity.BatchesMes;
 import org.bcia.julongchain.protos.common.Common;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class BlockCutter implements IReceiver {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(BlockCutter.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BlockCutter.class);
 
     private IConsenterConfig sharedConfigManager;
 

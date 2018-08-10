@@ -16,12 +16,11 @@
 package org.bcia.julongchain.msp.mgmt;
 
 import org.bcia.julongchain.common.exception.MspException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.factory.CspManager;
 import org.bcia.julongchain.csp.factory.CspOptsManager;
 import org.bcia.julongchain.csp.factory.IFactoryOpts;
-import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.msp.*;
 import org.bcia.julongchain.msp.mspconfig.MspConfig;
 import org.bcia.julongchain.msp.util.MspConfigHelper;
@@ -42,7 +41,7 @@ import static org.bcia.julongchain.msp.mspconfig.MspConfigFactory.loadMspConfig;
  * @company Dingxuan
  */
 public class GlobalMspManagement {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(GlobalMspManagement.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(GlobalMspManagement.class);
     /**
      * 本地的msp
      */

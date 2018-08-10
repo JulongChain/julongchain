@@ -20,8 +20,8 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.blkstorage.IBlockStore;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.common.ledger.util.leveldbhelper.UpdateBatch;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.BlockAndPvtData;
 import org.bcia.julongchain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
@@ -44,7 +44,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public class HistoryLevelDB implements IHistoryDB {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(HistoryLevelDB.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(HistoryLevelDB.class);
     private IDBProvider provider;
     private String dbName;
 

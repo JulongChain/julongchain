@@ -16,9 +16,9 @@
 
 package org.bcia.julongchain.common.tools.cryptogen.cmd;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.tools.cryptogen.bean.MetaData;
 
 /**
@@ -30,10 +30,10 @@ import org.bcia.julongchain.common.tools.cryptogen.bean.MetaData;
  */
 
 public class VersionCmd implements ICryptoGenCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(VersionCmd.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(VersionCmd.class);
 
     @Override
-    public void execCmd(String[] args) throws JavaChainException {
+    public void execCmd(String[] args) throws JulongChainException {
         System.out.println(MetaData.getVersionInfo());
     }
 }

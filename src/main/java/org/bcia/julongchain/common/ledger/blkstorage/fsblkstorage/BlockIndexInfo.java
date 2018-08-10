@@ -15,8 +15,6 @@
  */
 package org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 
 import java.util.List;

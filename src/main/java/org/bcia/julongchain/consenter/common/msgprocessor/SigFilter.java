@@ -18,8 +18,8 @@ package org.bcia.julongchain.consenter.common.msgprocessor;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.policy.IPolicy;
 import org.bcia.julongchain.common.policies.IPolicyManager;
 import org.bcia.julongchain.common.util.proto.SignedData;
@@ -33,7 +33,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public class SigFilter implements IRule {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SigFilter.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SigFilter.class);
     private String policyName;
     private IPolicyManager support;
 

@@ -20,7 +20,7 @@ package org.bcia.julongchain.common.exception;
  * @Date: 2018/5/31
  * @company Dingxuan
  */
-public class VerifyException extends JavaChainException {
+public class VerifyException extends JulongChainException {
     private static final String MODULE_NAME = "[Verify]";
     public VerifyException() {
         super();

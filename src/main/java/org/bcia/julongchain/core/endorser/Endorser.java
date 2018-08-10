@@ -21,8 +21,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.protos.ProposalResponsePayloadVO;
 import org.bcia.julongchain.common.resourceconfig.ISmartContractDefinition;
 import org.bcia.julongchain.common.util.CommConstant;
@@ -48,7 +48,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class Endorser implements IEndorserServer {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Endorser.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Endorser.class);
 
     private IEndorserSupport endorserSupport;
 

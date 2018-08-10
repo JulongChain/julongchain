@@ -17,8 +17,8 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.RWSetBuilder;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
@@ -32,7 +32,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
  * @company Dingxuan
  */
 public class QueryResultsItr implements IResultsIterator {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(QueryResultsItr.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(QueryResultsItr.class);
 
     private IResultsIterator dbItr;
     private RWSetBuilder rwSetBuilder;

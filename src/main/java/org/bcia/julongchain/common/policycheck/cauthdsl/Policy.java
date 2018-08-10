@@ -17,8 +17,8 @@
 package org.bcia.julongchain.common.policycheck.cauthdsl;
 
 import org.bcia.julongchain.common.exception.PolicyException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.policy.IPolicy;
 import org.bcia.julongchain.common.policycheck.policies.IEvalutor;
 import org.bcia.julongchain.common.util.proto.SignedData;
@@ -35,7 +35,7 @@ import java.util.List;
  * @company Aisino
  */
 public class Policy implements IPolicy {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Policy.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Policy.class);
 
     private IIdentityDeserializer deserializer;
     private IEvalutor evalutor;

@@ -16,8 +16,8 @@
 package org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage;
 
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.util.Util;
 
 import java.io.*;
@@ -31,7 +31,7 @@ import java.util.AbstractMap;
  * @company Dingxuan
  */
 public class BlockFileStream {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(BlockFileStream.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BlockFileStream.class);
 
     private int fileNum;
     private BlockFileReader reader;

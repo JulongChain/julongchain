@@ -18,8 +18,8 @@ package org.bcia.julongchain.common.policycheck.policies;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.PolicyException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.IPolicyProvider;
 import org.bcia.julongchain.common.policies.policy.IPolicy;
 import org.bcia.julongchain.common.policycheck.cauthdsl.CAuthDsl;
@@ -35,7 +35,7 @@ import org.bcia.julongchain.protos.common.Policies;
  * @company Aisino
  */
 public class PolicyProvider implements IPolicyProvider{
-    private static JavaChainLog log = JavaChainLogFactory.getLog(PolicyProvider.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(PolicyProvider.class);
     private IIdentityDeserializer deserializer;
     public PolicyProvider(IIdentityDeserializer deserializer) {
         this.deserializer = deserializer;

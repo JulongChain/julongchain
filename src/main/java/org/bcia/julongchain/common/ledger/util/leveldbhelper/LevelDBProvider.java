@@ -19,8 +19,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.exception.LevelDBException;
 import org.bcia.julongchain.common.ledger.util.IDBHandler;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
 
 import java.util.*;
 

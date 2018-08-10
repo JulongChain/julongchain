@@ -14,8 +14,8 @@ package org.bcia.julongchain.csp.gm.dxct.sm2; /**
  * limitations under the License.
  */
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
@@ -27,7 +27,6 @@ import org.bouncycastle.crypto.params.*;
 import org.bouncycastle.crypto.signers.SM2Signer;
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
-import org.bouncycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
@@ -38,7 +37,7 @@ import java.security.SecureRandom;
  * @company Dingxuan
  */
 public class SM2 {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SM2.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SM2.class);
     /**
      * 第一组参数
      */

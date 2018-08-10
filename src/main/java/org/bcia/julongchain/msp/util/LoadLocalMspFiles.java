@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 package org.bcia.julongchain.msp.util;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.FileUtils;
 import org.bcia.julongchain.csp.gm.dxct.util.CryptoUtil;
 import java.io.File;
@@ -31,7 +31,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public class LoadLocalMspFiles {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(LoadLocalMspFiles.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(LoadLocalMspFiles.class);
     File or;
     File[] files;
     /**

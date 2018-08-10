@@ -15,10 +15,9 @@
  */
 package org.bcia.julongchain.gossip.gossip;
 
-import afu.org.checkerframework.checker.oigj.qual.O;
 import org.bcia.julongchain.common.exception.GossipException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.gossip.NetworkMember;
 import org.bcia.julongchain.gossip.comm.RemotePeer;
 import org.bcia.julongchain.gossip.common.IMessageAcceptor;
@@ -32,7 +31,7 @@ import java.util.Arrays;
 
 public class GossipAdapterImpl implements IGossipAdapter, IAdapter{
 
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(GossipAdapterImpl.class);
+    private static final JulongChainLog log = JulongChainLogFactory.getLog(GossipAdapterImpl.class);
     private GossipServiceImpl gossipServiceImpl;
     private Discovery discovery;
 

@@ -21,7 +21,7 @@ import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.groupconfig.GroupConfigConstant;
@@ -29,8 +29,8 @@ import org.bcia.julongchain.common.groupconfig.MSPConfigHandler;
 import org.bcia.julongchain.common.groupconfig.config.ApplicationConfig;
 import org.bcia.julongchain.common.groupconfig.value.AnchorNodesValue;
 import org.bcia.julongchain.common.localmsp.ILocalSigner;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.PolicyConstant;
 import org.bcia.julongchain.common.resourceconfig.ResourcesConfigConstant;
 import org.bcia.julongchain.common.util.FileUtils;
@@ -57,7 +57,7 @@ import java.io.IOException;
  * @company Dingxuan
  */
 public class EnvelopeHelper {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(EnvelopeHelper.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(EnvelopeHelper.class);
 
 
     public static Common.Envelope makeGroupCreateTx(String groupId, ILocalSigner signer, Configtx.ConfigTree
@@ -666,12 +666,12 @@ public class EnvelopeHelper {
      * @param config
      * @param configEnv
      * @return
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     public static Common.GroupHeader unmarshalEnvelopeOfType(Common.Envelope envelopeConfig,
                                                              Common.HeaderType config,
                                                              Configtx.ConfigEnvelope configEnv)
-            throws JavaChainException {
+            throws JulongChainException {
         return null;
     }
 }

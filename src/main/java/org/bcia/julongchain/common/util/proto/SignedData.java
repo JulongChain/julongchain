@@ -17,8 +17,8 @@ package org.bcia.julongchain.common.util.proto;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.consenter.common.msgprocessor.SigFilter;
 import org.bcia.julongchain.consenter.util.Utils;
@@ -40,7 +40,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public class SignedData {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SigFilter.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SigFilter.class);
     private byte[] data;
     private byte[] identity;
     private byte[] signature;

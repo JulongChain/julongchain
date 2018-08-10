@@ -22,7 +22,7 @@ package org.bcia.julongchain.common.exception;
  * @date 2018/3/14
  * @company Dingxuan
  */
-public class ValidateException extends JavaChainException {
+public class ValidateException extends JulongChainException {
     private static final String MODULE_NAME = "[Validate]";
 
     public ValidateException() {

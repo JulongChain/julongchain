@@ -16,8 +16,8 @@
 package org.bcia.julongchain.common.util;
 
 import org.apache.commons.io.IOUtils;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 import java.io.*;
 
@@ -29,7 +29,7 @@ import java.io.*;
  * @company Dingxuan
  */
 public class FileUtils {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(FileUtils.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(FileUtils.class);
 
     /**
      * 将文件读写成字节数组

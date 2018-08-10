@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.gossip.service;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.gossip.api.AnchorPeer;
 import org.bcia.julongchain.gossip.api.IJoinChannelMessage;
 
@@ -32,7 +32,7 @@ import java.util.Set;
  */
 public class JoinChannelMessage implements IJoinChannelMessage{
 
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(JoinChannelMessage.class);
+    private static final JulongChainLog log = JulongChainLogFactory.getLog(JoinChannelMessage.class);
     private Long seqNum;
     private Map<String,AnchorPeer[]> members2AnchorPeers;
 

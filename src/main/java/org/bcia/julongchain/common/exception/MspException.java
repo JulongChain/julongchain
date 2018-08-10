@@ -20,7 +20,7 @@ package org.bcia.julongchain.common.exception;
  * @Date: 2018/4/18
  * @company Dingxuan
  */
-public class MspException extends  JavaChainException{
+public class MspException extends JulongChainException {
     private static final String MODULE_NAME = "[Msp]";
 
     public MspException() {

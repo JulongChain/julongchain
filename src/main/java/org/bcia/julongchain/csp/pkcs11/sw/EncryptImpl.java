@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.csp.pkcs11.sw;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.pkcs11.rsa.RsaKeyOpts;
 import org.bcia.julongchain.csp.pkcs11.util.SymmetryKey;
@@ -43,7 +43,7 @@ import com.sun.org.apache.xerces.internal.impl.dv.util.HexBin;
  * @company FEITIAN
  */
 public class EncryptImpl {
-    public byte[] encryptData(IKey key, byte[] plaint, String mode, String padding) throws JavaChainException {
+    public byte[] encryptData(IKey key, byte[] plaint, String mode, String padding) throws JulongChainException {
 
         try {
             if(key instanceof SymmetryKey.DESedePriKey)
@@ -79,31 +79,31 @@ public class EncryptImpl {
         }catch(InvalidKeyException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:InvalidKeyException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(InvalidKeySpecException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:InvalidKeySpecException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(NoSuchAlgorithmException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(NoSuchPaddingException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:NoSuchPaddingException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(BadPaddingException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:BadPaddingException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(IllegalBlockSizeException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:IllegalBlockSizeException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }
     }
 
-    public byte[] encryptData(IKey key, byte[] plaint, String mode, String padding, boolean pubflag) throws JavaChainException {
+    public byte[] encryptData(IKey key, byte[] plaint, String mode, String padding, boolean pubflag) throws JulongChainException {
 
         try {
             if(key instanceof RsaKeyOpts.RsaPriKey) {
@@ -162,27 +162,27 @@ public class EncryptImpl {
         }catch(InvalidKeyException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:InvalidKeyException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(InvalidKeySpecException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:InvalidKeySpecException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(NoSuchAlgorithmException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(NoSuchPaddingException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:NoSuchPaddingException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(BadPaddingException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:BadPaddingException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(IllegalBlockSizeException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:IllegalBlockSizeException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }
 
     }

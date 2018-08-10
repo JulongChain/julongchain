@@ -18,8 +18,8 @@ package org.bcia.julongchain.common.ledger.blockledger.ram;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.blockledger.IFactory;
 import org.bcia.julongchain.common.ledger.blockledger.ReadWriteBase;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class RamLedgerFactory implements IFactory {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(RamLedgerFactory.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(RamLedgerFactory.class);
 
     private int maxSize;
     private static Map<String, ReadWriteBase> ledgers;

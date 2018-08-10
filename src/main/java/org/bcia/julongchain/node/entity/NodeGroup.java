@@ -18,14 +18,14 @@ package org.bcia.julongchain.node.entity;
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.stub.StreamObserver;
 import org.apache.commons.lang3.StringUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.genesis.GenesisBlockFactory;
 import org.bcia.julongchain.common.groupconfig.GroupConfigConstant;
 import org.bcia.julongchain.common.localmsp.ILocalSigner;
 import org.bcia.julongchain.common.localmsp.impl.LocalSigner;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.common.util.CommLock;
 import org.bcia.julongchain.common.util.FileUtils;
@@ -66,7 +66,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public class NodeGroup {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(NodeGroup.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(NodeGroup.class);
 
     /**
      * 创建群组时的Profile名称
@@ -211,7 +211,7 @@ public class NodeGroup {
 //                        log.info("file is generated1-----$" + file.getCanonicalPath());
 //                    } catch (IOException e) {
 //                        log.error(e.getMessage(), e);
-//                    } catch (JavaChainException e) {
+//                    } catch (JulongChainException e) {
 //                        log.error(e.getMessage(), e);
 //                    }
 //                }
@@ -254,9 +254,9 @@ public class NodeGroup {
      *
      * @param groupId
      * @throws IOException
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    private Common.Block mockCreateBlock(String groupId) throws IOException, JavaChainException {
+    private Common.Block mockCreateBlock(String groupId) throws IOException, JulongChainException {
         GenesisConfig.Profile profile = GenesisConfigFactory.getGenesisConfig().getCompletedProfile
                 (PROFILE_CREATE_GROUP);
 
@@ -287,7 +287,7 @@ public class NodeGroup {
         byte[] nonce = new byte[0];
         try {
             nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage(), e);
             throw new NodeException("Can not get nonce");
         }
@@ -295,7 +295,7 @@ public class NodeGroup {
         String txId = null;
         try {
             txId = ProposalUtils.computeProposalTxID(creator, nonce);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage(), e);
             throw new NodeException("Generate txId fail");
         }
@@ -327,7 +327,7 @@ public class NodeGroup {
                 node.getLedgerIds().add(groupId);
             } catch (IOException e) {
                 log.error(e.getMessage(), e);
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 log.error(e.getMessage(), e);
             }
 
@@ -363,7 +363,7 @@ public class NodeGroup {
         byte[] nonce = null;
         try {
             nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage(), e);
             throw new NodeException("Can not get nonce");
         }
@@ -371,7 +371,7 @@ public class NodeGroup {
         String txId = null;
         try {
             txId = ProposalUtils.computeProposalTxID(creator, nonce);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage(), e);
             throw new NodeException("Generate txId fail");
         }
@@ -422,7 +422,7 @@ public class NodeGroup {
         byte[] nonce = null;
         try {
             nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage(), e);
             throw new NodeException("Can not get nonce");
         }
@@ -430,7 +430,7 @@ public class NodeGroup {
         String txId = null;
         try {
             txId = ProposalUtils.computeProposalTxID(creator, nonce);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage(), e);
             throw new NodeException("Generate txId fail");
         }

@@ -57,7 +57,7 @@ Maven依赖管理工具：Maven 3.5.2  <br/>
      -g 群组名称     <br/>
 
 加入群组  <br/>
-<i>  java -jar julongchain.jar group join -t 127.0.0.1:7051 -b /opt/BCIA/JavaChain/myGroup.block  </i><br/>
+<i>  java -jar julongchain.jar group join -t 127.0.0.1:7051 -b /opt/BCIA/JulongChain/myGroup.block  </i><br/>
   参数说明：  <br/>
       -t 要加入群组的目标节点地址 <br/>
       -b 创世区块保存的文件地址  <br/>

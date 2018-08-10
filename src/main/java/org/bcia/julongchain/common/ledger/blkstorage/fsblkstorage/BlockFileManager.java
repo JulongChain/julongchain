@@ -24,8 +24,8 @@ import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.common.ledger.util.IoUtil;
 import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bcia.julongchain.core.ledger.util.Util;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Ledger;
 import org.bcia.julongchain.protos.node.TransactionPackage;
@@ -43,7 +43,7 @@ public class BlockFileManager {
 
     private static final String BLOCKFILE_PREFIX = "blockfile";
     private static final byte[] BLK_MGR_INFO_KEY = "blkMgrInfo".getBytes();
-    private static JavaChainLog log = JavaChainLogFactory.getLog(BlockFileManager.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BlockFileManager.class);
     private static final byte BLOCK_BYTES_START = 10;
 
     public static final int LAST_BLOCK_BYTES = 0;

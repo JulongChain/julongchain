@@ -16,7 +16,7 @@
 package org.bcia.julongchain.core.ssc.lssc;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.SysSmartContractException;
 import org.bcia.julongchain.common.policies.policy.IPolicy;
@@ -56,7 +56,7 @@ public class LsscSupport {
     public void putSmartContractToLocalStorage(ISmartContractPackage scPackage) throws SysSmartContractException{
         try {
             scPackage.putSmartcontractToFS();
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             String msg=String.format("Error installing smartcontract code %s:%s(%s)",
                     scPackage.getSmartContractData().getName(),
                     scPackage.getSmartContractData().getVersion(),
@@ -72,7 +72,7 @@ public class LsscSupport {
      * @param version
      * @return
      */
-    public ISmartContractPackage getSmartContractFromLocalStorage(String smartcontractName,String version) throws JavaChainException{
+    public ISmartContractPackage getSmartContractFromLocalStorage(String smartcontractName,String version) throws JulongChainException {
         return SmartContractProvider.getSmartContractFromFS(smartcontractName,version);
     }
 
@@ -81,7 +81,7 @@ public class LsscSupport {
      * data that have previously been persisted to local storage
      * @return
      */
-    public Query.SmartContractQueryResponse getSmartContractsFromLocalStorage()throws JavaChainException{
+    public Query.SmartContractQueryResponse getSmartContractsFromLocalStorage()throws JulongChainException {
         return SmartContractProvider.getInstalledSmartcontracts();
     }
 
@@ -98,7 +98,7 @@ public class LsscSupport {
             SignedSDSPackage sscPackage=(SignedSDSPackage)scPackage;
             try {
                 instantiationPolicy=sscPackage.getInstantiationPolicy();
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 throw new SysSmartContractException(e);
             }
             if(instantiationPolicy==null){

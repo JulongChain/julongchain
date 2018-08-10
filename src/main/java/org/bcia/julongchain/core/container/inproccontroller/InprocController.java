@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.core.container.inproccontroller;
 import org.bcia.julongchain.common.exception.InprocVMException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ssc.SystemSmartContractBase;
 import org.springframework.stereotype.Component;
 
@@ -32,7 +32,7 @@ import java.util.Map;
  */
 @Component
 public class InprocController {
-	private static JavaChainLog log = JavaChainLogFactory.getLog(InprocContainer.class);
+	private static JulongChainLog log = JulongChainLogFactory.getLog(InprocContainer.class);
 
 	private static Map<String, InprocContainer> containers = new HashMap<>();
 

@@ -15,10 +15,10 @@
  */
 package org.bcia.julongchain.common.tools.cryptogen;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.MspException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.tools.cryptogen.sm2cert.SM2PublicKeyImpl;
 import org.bcia.julongchain.csp.factory.CspManager;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2KeyGenOpts;
@@ -51,7 +51,7 @@ import java.util.List;
  * @company Excelsecu
  */
 public class CspHelper {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CspHelper.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(CspHelper.class);
     private static final ICsp CSP = getCsp();
     private static final int ASN1_SEQUENCE = 0x30;
     private static final int HEAD_PUBLIC_KEY_UNCOMPRESSED = 0x04;
@@ -68,7 +68,7 @@ public class CspHelper {
         return CspManager.getDefaultCsp();
     }
 
-    public static IKey loadPrivateKey(String keystorePath) throws JavaChainException {
+    public static IKey loadPrivateKey(String keystorePath) throws JulongChainException {
         File keyStoreDir = new File(keystorePath);
         File[] files = keyStoreDir.listFiles();
         if (!keyStoreDir.isDirectory() || files == null) {
@@ -93,10 +93,10 @@ public class CspHelper {
                 log.error("An error occurred on loadPrivateKey: {}", e.getMessage());
             }
         }
-        throw new JavaChainException("no pem file found");
+        throw new JulongChainException("no pem file found");
     }
 
-    private static byte[] encodePrivateKeyPKCS8(byte[] privateKey, AlgorithmId algId) throws JavaChainException {
+    private static byte[] encodePrivateKeyPKCS8(byte[] privateKey, AlgorithmId algId) throws JulongChainException {
         DerOutputStream encodedPriKey = new DerOutputStream();
         DerOutputStream var = new DerOutputStream();
         try {
@@ -106,20 +106,20 @@ public class CspHelper {
             encodedPriKey.write((byte) ASN1_SEQUENCE, var);
             return encodedPriKey.toByteArray();
         } catch (IOException e) {
-            throw new JavaChainException("An error occurred :" + e);
+            throw new JulongChainException("An error occurred :" + e);
         }
     }
 
 
-    private static List<Object> decodePrivateKeyPKCS8(byte[] encodedData) throws JavaChainException {
+    private static List<Object> decodePrivateKeyPKCS8(byte[] encodedData) throws JulongChainException {
         try {
             DerValue derValue = new DerValue(new ByteArrayInputStream(encodedData));
             if (derValue.tag != ASN1_SEQUENCE) {
-                throw new JavaChainException("invalid key format");
+                throw new JulongChainException("invalid key format");
             } else {
                 BigInteger version = derValue.data.getBigInteger();
                 if (!version.equals(BigInteger.ZERO)) {
-                    throw new JavaChainException("version mismatch: (supported: " + Debug.toHexString(BigInteger.ZERO) + ", parsed: " + Debug.toHexString(version));
+                    throw new JulongChainException("version mismatch: (supported: " + Debug.toHexString(BigInteger.ZERO) + ", parsed: " + Debug.toHexString(version));
                 } else {
                     AlgorithmId algId = AlgorithmId.parse(derValue.data.getDerValue());
                     byte[] rawPrivateKey = derValue.data.getOctetString();
@@ -130,12 +130,12 @@ public class CspHelper {
                 }
             }
         } catch (IOException e) {
-            throw new JavaChainException("IOException : " + e.getMessage());
+            throw new JulongChainException("IOException : " + e.getMessage());
         }
     }
 
 
-    static IKey generatePrivateKey(String keystorePath) throws JavaChainException {
+    static IKey generatePrivateKey(String keystorePath) throws JulongChainException {
         try {
             IKey priv = CSP.keyGen(new SM2KeyGenOpts() {
                 @Override
@@ -148,11 +148,11 @@ public class CspHelper {
             Util.pemExport(path, "PRIVATE KEY", encodedData);
             return priv;
         } catch (Exception e) {
-            throw new JavaChainException("An error occurred" + e);
+            throw new JulongChainException("An error occurred" + e);
         }
     }
 
-    static ECPublicKey getSM2PublicKey(IKey priv) throws JavaChainException {
+    static ECPublicKey getSM2PublicKey(IKey priv) throws JulongChainException {
         IKey pubKey;
         try {
             pubKey = priv.getPublicKey();
@@ -161,14 +161,14 @@ public class CspHelper {
             pubKey = priv.getPublicKey();
         }
         if (!(pubKey instanceof SM2PublicKey)) {
-            throw new JavaChainException("pubKey is not the instance of SM2Key method");
+            throw new JulongChainException("pubKey is not the instance of SM2Key method");
         }
         SM2PublicKey sm2PublicKey = (SM2PublicKey) pubKey;
         try {
             byte[] bytes = sm2PublicKey.toBytes();
             // 默认非压缩公钥
             if (bytes[0] != HEAD_PUBLIC_KEY_UNCOMPRESSED) {
-                throw new JavaChainException("CspHelper getSM2PublicKey publicKey not uncompressed");
+                throw new JulongChainException("CspHelper getSM2PublicKey publicKey not uncompressed");
             }
 
             int xLength = (bytes.length - 1) / 2;
@@ -180,7 +180,7 @@ public class CspHelper {
             ECPoint secECPoint = new ECPoint(new BigInteger(bytesX), new BigInteger(bytesY));
             return new SM2PublicKeyImpl(secECPoint);
         } catch (Exception e) {
-            throw new JavaChainException("an error occurred on getECPublicKey: " + e.getMessage());
+            throw new JulongChainException("an error occurred on getECPublicKey: " + e.getMessage());
         }
     }
 }

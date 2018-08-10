@@ -17,7 +17,7 @@ package org.bcia.julongchain.node.common.helper;
 
 import com.google.protobuf.ByteString;
 import org.apache.commons.lang3.StringUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.ledger.util.IoUtil;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
@@ -172,7 +172,7 @@ public class SpecHelper {
                 byte[] tarBytes = IoUtil.tarWriter(scFileMap, 1024);
                 byte[] codePackage = IoUtil.gzipWriter(tarBytes);
                 deploymentSpec.setCodePackage(ByteString.copyFrom(codePackage));
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 throw new NodeException(e);
             }
         }

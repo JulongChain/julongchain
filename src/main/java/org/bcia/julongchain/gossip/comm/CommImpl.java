@@ -16,8 +16,8 @@
 package org.bcia.julongchain.gossip.comm;
 
 import org.bcia.julongchain.common.exception.GossipException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.smartcontract.shim.helper.Channel;
 import org.bcia.julongchain.gossip.common.IMessageAcceptor;
 import org.bcia.julongchain.gossip.common.TLSCertificates;
@@ -42,7 +42,7 @@ public class CommImpl implements IComm, IConnFactory{
     public static final Integer defReceBuffSize = 20;
     public static final Integer defSendBuffSize = 20;
 
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(CommImpl.class);
+    private static final JulongChainLog log = JulongChainLogFactory.getLog(CommImpl.class);
     private TLSCertificates tlsCerts;
     private PubSub pubSub;
     private byte[] peerIdentity;
@@ -123,7 +123,7 @@ public class CommImpl implements IComm, IConnFactory{
         return defSendBuffSize;
     }
 
-    public static JavaChainLog getLog() {
+    public static JulongChainLog getLog() {
         return log;
     }
 

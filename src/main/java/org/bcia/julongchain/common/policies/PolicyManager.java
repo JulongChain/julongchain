@@ -18,8 +18,8 @@ package org.bcia.julongchain.common.policies;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.PolicyException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.policy.IPolicy;
 import org.bcia.julongchain.common.policies.policy.ImplicitMetaPolicy;
 import org.bcia.julongchain.common.policies.policy.NormalPolicy;
@@ -39,7 +39,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class PolicyManager implements IPolicyManager {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(PolicyManager.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(PolicyManager.class);
 
     private String path;
     private Map<String, IPolicy> policies;

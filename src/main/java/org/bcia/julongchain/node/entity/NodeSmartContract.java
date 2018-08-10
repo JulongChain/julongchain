@@ -16,11 +16,11 @@
 package org.bcia.julongchain.node.entity;
 
 import io.grpc.stub.StreamObserver;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.common.util.CommLock;
 import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
@@ -48,7 +48,7 @@ import org.bcia.julongchain.protos.node.SmartContractPackage;
  * @company Dingxuan
  */
 public class NodeSmartContract {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(NodeSmartContract.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(NodeSmartContract.class);
 
     /**
      * 实例化智能合约超时时间:30min
@@ -91,14 +91,14 @@ public class NodeSmartContract {
         byte[] nonce = new byte[0];
         try {
             nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage(), e);
         }
 
         String txId = null;
         try {
             txId = ProposalUtils.computeProposalTxID(creator, nonce);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage(), e);
             throw new NodeException("Generate txId fail");
         }
@@ -137,14 +137,14 @@ public class NodeSmartContract {
         byte[] nonce = new byte[0];
         try {
             nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage(), e);
         }
 
         String txId = null;
         try {
             txId = ProposalUtils.computeProposalTxID(creator, nonce);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage(), e);
             throw new NodeException("Generate txId fail");
         }
@@ -233,14 +233,14 @@ public class NodeSmartContract {
         byte[] nonce = new byte[0];
         try {
             nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage(), e);
         }
 
         String txId = null;
         try {
             txId = ProposalUtils.computeProposalTxID(creator, nonce);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage(), e);
             throw new NodeException("Generate txId fail");
         }
@@ -325,14 +325,14 @@ public class NodeSmartContract {
         byte[] nonce = new byte[0];
         try {
             nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage(), e);
         }
 
         String txId = null;
         try {
             txId = ProposalUtils.computeProposalTxID(creator, nonce);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage(), e);
             throw new NodeException("Generate txId fail");
         }

@@ -14,7 +14,7 @@
 package org.bcia.julongchain.core.container.scintf;
 
 import org.apache.commons.lang3.StringUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bcia.julongchain.csp.gm.sdt.sm3.SM3;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
@@ -81,9 +81,9 @@ public class SCID {
 		this.version = version;
 	}
 
-	public String getName() throws JavaChainException {
+	public String getName() throws JulongChainException {
 		if (this.smartContractSpec == null) {
-			throw new JavaChainException("nil smart contract spec");
+			throw new JulongChainException("nil smart contract spec");
 		}
 
 		String name = this.smartContractSpec.getSmartContractId().getName();

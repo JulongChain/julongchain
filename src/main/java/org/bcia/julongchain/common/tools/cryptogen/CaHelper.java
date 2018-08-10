@@ -15,9 +15,9 @@
  */
 package org.bcia.julongchain.common.tools.cryptogen;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.tools.cryptogen.sm2cert.SM2X509CertImpl;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2Key;
 import org.bcia.julongchain.csp.intfs.IKey;
@@ -56,7 +56,7 @@ public class CaHelper {
     private IKey mSigner;
     private Certificate mSignCert;
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CaHelper.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(CaHelper.class);
     private static String SEPARATOR = "/";
 
 
@@ -85,10 +85,10 @@ public class CaHelper {
     }
 
     public X509Certificate signCertificate(String baseDir, String name, String[] ous, List<String> sans,
-                                           ECPublicKey pub, int ku, int[] eku) throws JavaChainException {
+                                           ECPublicKey pub, int ku, int[] eku) throws JulongChainException {
 
         if (name.contains(SEPARATOR)) {
-            throw new JavaChainException("the name is illegal");
+            throw new JulongChainException("the name is illegal");
         }
 
         try {
@@ -155,13 +155,13 @@ public class CaHelper {
             return genCertificateSM2(baseDir, name, x509CertImpl, algorithmId, mSigner);
         } catch (Exception e) {
             log.error("An error occurred on signCertificate:", e);
-            throw new JavaChainException("An error occurred on signCertificate");
+            throw new JulongChainException("An error occurred on signCertificate");
         }
     }
 
 
     public static CaHelper newCA(String baseDir, String org, String name, String country, String province, String locality,
-                                 String orgUnit, String streetAddress, String postalCode) throws JavaChainException {
+                                 String orgUnit, String streetAddress, String postalCode) throws JulongChainException {
 
         FileUtil.mkdirAll(Paths.get(baseDir));
 
@@ -172,7 +172,7 @@ public class CaHelper {
 
         try {
             if (!(privateKey instanceof SM2Key)) {
-                throw new JavaChainException("privateKey is not the instance of SM2Key");
+                throw new JulongChainException("privateKey is not the instance of SM2Key");
             }
 
             X509CertInfo x509CertInfo = new X509CertInfo();
@@ -219,7 +219,7 @@ public class CaHelper {
                     privateKey,
                     Certificate.getInstance(caCert.getEncoded()));
         } catch (Exception e) {
-            throw new JavaChainException("An error occurred on newCA: " + e.getMessage());
+            throw new JulongChainException("An error occurred on newCA: " + e.getMessage());
         }
 
     }
@@ -260,12 +260,12 @@ public class CaHelper {
     }
 
     private static X509Certificate genCertificateSM2(String baseDir, String name, SM2X509CertImpl template,
-                                                     AlgorithmId algorithmId, IKey privateKey) throws JavaChainException {
+                                                     AlgorithmId algorithmId, IKey privateKey) throws JulongChainException {
 
         try {
             template.sm2Sign(privateKey, algorithmId);
         } catch (Exception e) {
-            throw new JavaChainException("An error occurred on genCertificateSM2:" + e);
+            throw new JulongChainException("An error occurred on genCertificateSM2:" + e);
         }
 
         String path = Paths.get(baseDir, name + "-cert.pem").toString();
@@ -278,7 +278,7 @@ public class CaHelper {
         return template;
     }
 
-    public static Certificate loadCertificateSM2(String certPath) throws JavaChainException {
+    public static Certificate loadCertificateSM2(String certPath) throws JulongChainException {
         File certDir = new File(certPath);
         File[] files = certDir.listFiles();
         if (!certDir.isDirectory() || files == null) {
@@ -297,10 +297,10 @@ public class CaHelper {
                 byte[] certBytes = pemObject.getContent();
                 return Certificate.getInstance(certBytes);
             } catch (Exception e) {
-                throw new JavaChainException("An error occurred :" + e.getMessage());
+                throw new JulongChainException("An error occurred :" + e.getMessage());
             }
         }
-        throw new JavaChainException("no pem file found");
+        throw new JulongChainException("no pem file found");
     }
 
     public String getName() {

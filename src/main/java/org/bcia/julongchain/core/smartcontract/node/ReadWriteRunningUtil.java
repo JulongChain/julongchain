@@ -13,8 +13,8 @@
  */
 package org.bcia.julongchain.core.smartcontract.node;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 /**
  * 类描述
@@ -25,6 +25,6 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
  */
 public class ReadWriteRunningUtil {
 
-  private static final JavaChainLog logger =
-      JavaChainLogFactory.getLog(ReadWriteRunningUtil.class);
+  private static final JulongChainLog logger =
+      JulongChainLogFactory.getLog(ReadWriteRunningUtil.class);
 }

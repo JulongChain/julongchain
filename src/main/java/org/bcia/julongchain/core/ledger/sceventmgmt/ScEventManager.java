@@ -15,9 +15,9 @@ limitations under the License.
  */
 package org.bcia.julongchain.core.ledger.sceventmgmt;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -31,7 +31,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class ScEventManager {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ScEventManager.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ScEventManager.class);
 
     private ISmartContractInfoProvider infoProvider = new SmartContractInfoProviderImpl();
     private Map<String, ISmartContractLifecycleEventListener> scLifecycleListeners = new HashMap<>();
@@ -66,7 +66,7 @@ public class ScEventManager {
      * @param ledgerID
      * @param smartContractDefinitions
      */
-    public synchronized void handleSmartContractDeploy(String ledgerID, SmartContractDefinition[] smartContractDefinitions) throws JavaChainException{
+    public synchronized void handleSmartContractDeploy(String ledgerID, SmartContractDefinition[] smartContractDefinitions) throws JulongChainException {
         log.debug("handleSmartContractDeploy() - ledgerID = " + ledgerID);
         //设置最后部署的智能合约
         latesSmartContractDeploys.put(ledgerID, smartContractDefinitions);
@@ -91,7 +91,7 @@ public class ScEventManager {
      * @param smartContractDefinition
      * @param dbArtifacts
      */
-    public synchronized void handleSmartContractInstall(SmartContractDefinition smartContractDefinition, byte[] dbArtifacts) throws JavaChainException{
+    public synchronized void handleSmartContractInstall(SmartContractDefinition smartContractDefinition, byte[] dbArtifacts) throws JulongChainException {
         //log.debug("handleSmartContractInstall() - smartContractDefinition= " + smartContractDefinition);
         for(Map.Entry<String, ISmartContractLifecycleEventListener> entry : scLifecycleListeners.entrySet()){
             String ledgerID = entry.getKey();
@@ -115,7 +115,7 @@ public class ScEventManager {
      * @param smartContractDefinition
      * @param dbArtifactsTar
      */
-    private void invokeHandler(String ledgerID, SmartContractDefinition smartContractDefinition, byte[] dbArtifactsTar) throws JavaChainException {
+    private void invokeHandler(String ledgerID, SmartContractDefinition smartContractDefinition, byte[] dbArtifactsTar) throws JulongChainException {
         ISmartContractLifecycleEventListener listener = scLifecycleListeners.get(ledgerID);
         if(listener == null){
             return;

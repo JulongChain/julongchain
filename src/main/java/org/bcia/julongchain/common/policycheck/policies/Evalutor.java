@@ -17,15 +17,14 @@
 package org.bcia.julongchain.common.policycheck.policies;
 
 import org.bcia.julongchain.common.exception.PolicyException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.proto.SignedData;
 import org.bcia.julongchain.msp.IIdentity;
 import org.bcia.julongchain.msp.IIdentityDeserializer;
 import org.bcia.julongchain.protos.common.MspPrincipal;
 import org.bcia.julongchain.protos.common.Policies;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,7 +35,7 @@ import java.util.List;
  * @company Aisino
  */
 public class Evalutor implements IEvalutor{
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Evalutor.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Evalutor.class);
     private static final int TYPE = 2;
     private List<IEvalutor> policies ;
     private Policies.SignaturePolicy policy;

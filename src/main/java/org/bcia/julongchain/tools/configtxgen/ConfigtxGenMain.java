@@ -18,8 +18,8 @@ package org.bcia.julongchain.tools.configtxgen;
 import org.apache.commons.cli.ParseException;
 import org.bcia.julongchain.common.exception.ConfigtxToolsException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.tools.configtxgen.cmd.ConfigtxGenCmd;
 import org.bcia.julongchain.tools.configtxgen.cmd.IConfigtxGenCmd;
 
@@ -31,7 +31,7 @@ import org.bcia.julongchain.tools.configtxgen.cmd.IConfigtxGenCmd;
  * @company Dingxuan
  */
 public class ConfigtxGenMain {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ConfigtxGenMain.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ConfigtxGenMain.class);
 
     public static void main(String[] args) {
         try {

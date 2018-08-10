@@ -16,9 +16,8 @@ limitations under the License.
 package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.statecouchdb;
 
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.ledger.util.IDBProvider;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.couchdb.CouchDBDefinition;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDBProvider;
@@ -36,7 +35,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class VersionedCouchDBProvider implements IVersionedDBProvider {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(VersionedCouchDBProvider.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(VersionedCouchDBProvider.class);
 
 	private CouchDbClient dbInstance;
 	private Map<String, IVersionedDB> databases;

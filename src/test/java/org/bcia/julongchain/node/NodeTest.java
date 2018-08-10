@@ -2,13 +2,12 @@ package org.bcia.julongchain.node;
 
 import org.apache.commons.cli.ParseException;
 import org.bcia.julongchain.BaseJunit4Test;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.node.cmd.INodeCmd;
 import org.bcia.julongchain.node.cmd.group.GroupCreateCmd;
 import org.bcia.julongchain.node.cmd.group.GroupJoinCmd;
 import org.bcia.julongchain.node.cmd.group.GroupListCmd;
-import org.bcia.julongchain.node.cmd.group.GroupUpdateCmd;
 import org.bcia.julongchain.node.cmd.sc.ContractInstallCmd;
 import org.bcia.julongchain.node.cmd.sc.ContractInstantiateCmd;
 import org.bcia.julongchain.node.cmd.sc.ContractInvokeCmd;
@@ -50,13 +49,13 @@ public class NodeTest extends BaseJunit4Test {
         Assert.assertThat(nodeCmd1, Matchers.instanceOf(GroupCreateCmd.class));
 
         //加入群组
-        String[] caseArgs2 = new String[]{"group", "join", "-b", "/opt/BCIA/javachain/mygroup1.block"};
+        String[] caseArgs2 = new String[]{"group", "join", "-b", "/opt/BCIA/julongchain/mygroup1.block"};
         INodeCmd nodeCmd2 = node.execCmd(caseArgs2);
         Assert.assertThat(nodeCmd2, Matchers.instanceOf(GroupJoinCmd.class));
 
         //更新群组
 //        String[] caseArgs3 = new String[]{"group", "update", "-c", "localhost:7050", "-g", "mygroup", "-f",
-//                "/opt/BCIA/javachain/group1.tx"};
+//                "/opt/BCIA/julongchain/group1.tx"};
 //        INodeCmd nodeCmd3 = node.execCmd(caseArgs3);
 //        Assert.assertThat(nodeCmd3, Matchers.instanceOf(GroupUpdateCmd.class));
 
@@ -117,7 +116,7 @@ public class NodeTest extends BaseJunit4Test {
     }
 
     @Test
-    public void testMockCreateGroup() throws JavaChainException {
+    public void testMockCreateGroup() throws JulongChainException {
         Node.getInstance().mockInitialize();
         Node.getInstance().mockCreateGroup("myGroup");
     }

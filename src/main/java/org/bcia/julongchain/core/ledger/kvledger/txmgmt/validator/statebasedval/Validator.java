@@ -17,8 +17,8 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.validator.statebasedval
 
 
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate.IDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate.HashedCompositeKey;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate.HashedUpdateBatch;
@@ -49,7 +49,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class Validator implements InternalValidator {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Validator.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Validator.class);
 
     private IDB db;
 

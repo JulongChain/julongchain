@@ -16,7 +16,7 @@
 
 package org.bcia.julongchain.csp.pkcs11.rsa;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.pkcs11.IPKCS11FactoryOpts;
 import org.bcia.julongchain.csp.pkcs11.PKCS11CspLog;
@@ -165,7 +165,7 @@ public class RsaImpl {
          * @param opts        p11 factory
          * @return key
          */
-        public static IKey generateRsa(int keySize, boolean ephemeral, IPKCS11FactoryOpts opts) throws JavaChainException {
+        public static IKey generateRsa(int keySize, boolean ephemeral, IPKCS11FactoryOpts opts) throws JulongChainException {
 
             try {
                 //create bigint
@@ -230,12 +230,12 @@ public class RsaImpl {
                 ex.printStackTrace();                
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
                 RsaImpl.setLoggerErr(err, 1);
-                throw new JavaChainException(err, ex.getCause());
+                throw new JulongChainException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
                 RsaImpl.setLoggerErr(err, 1);
-                throw new JavaChainException(err, ex.getCause());
+                throw new JulongChainException(err, ex.getCause());
             }
         }
     }
@@ -262,7 +262,7 @@ public class RsaImpl {
          * @return 公钥摘要(cka_id value)
          */
         public static byte[] importRsaKey(byte[] PriRaw, byte[] PubRaw, boolean ephemeral,
-                                          IPKCS11FactoryOpts opts, boolean flagpubkey) throws JavaChainException{
+                                          IPKCS11FactoryOpts opts, boolean flagpubkey) throws JulongChainException {
 
             byte[] byteSKI;
             try {
@@ -319,27 +319,27 @@ public class RsaImpl {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
                 RsaImpl.setLoggerErr(err, 2);
-                throw new JavaChainException(err, ex.getCause());
+                throw new JulongChainException(err, ex.getCause());
             }catch(InvalidKeySpecException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:InvalidKeySpecException ErrMessage: %s", ex.getMessage());
                 RsaImpl.setLoggerErr(err, 2);
-                throw new JavaChainException(err, ex.getCause());
+                throw new JulongChainException(err, ex.getCause());
             }catch(PKCS11Exception ex){
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
                 RsaImpl.setLoggerErr(err, 2);
-                throw new JavaChainException(err, ex.getCause());
+                throw new JulongChainException(err, ex.getCause());
             }catch(InvalidKeyException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:InvalidKeyException ErrMessage: %s", ex.getMessage());
                 RsaImpl.setLoggerErr(err, 2);
-                throw new JavaChainException(err, ex.getCause());
+                throw new JulongChainException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
                 RsaImpl.setLoggerErr(err, 2);
-                throw new JavaChainException(err, ex.getCause());
+                throw new JulongChainException(err, ex.getCause());
             }
 
         }
@@ -373,7 +373,7 @@ public class RsaImpl {
             this.opts = opts;
         }
 
-        public static IKey getkey() throws JavaChainException {
+        public static IKey getkey() throws JulongChainException {
 
             try {
                 long[] keypbu = findKeypairFromSKI(opts, false, ski);
@@ -400,7 +400,7 @@ public class RsaImpl {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
                 RsaImpl.setLoggerErr(err, 3);
-                throw new JavaChainException(err, ex.getCause());
+                throw new JulongChainException(err, ex.getCause());
             }
         }
     }
@@ -429,14 +429,14 @@ public class RsaImpl {
          * @param newMechanism  the alg
          * @param opts          p11factory
          */
-        public static byte[] signRSA(byte[] ski, byte[] digest, long newMechanism, IPKCS11FactoryOpts opts) throws JavaChainException{
+        public static byte[] signRSA(byte[] ski, byte[] digest, long newMechanism, IPKCS11FactoryOpts opts) throws JulongChainException {
             try {
                 long[] privatekey = findKeypairFromSKI(opts, true, ski);
                 if (privatekey==null || (privatekey!=null && privatekey.length==0))
                 {
                     String str=String.format("[JC_PKCS]:No Find Key");
                     RsaImpl.setLoggerErr(str, 4);
-                    throw new JavaChainException(str);
+                    throw new JulongChainException(str);
                 }
                 CK_MECHANISM ckMechanism = new CK_MECHANISM();
                 ckMechanism.mechanism = newMechanism;
@@ -448,7 +448,7 @@ public class RsaImpl {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
                 RsaImpl.setLoggerErr(err, 4);
-                throw new JavaChainException(err, ex.getCause());
+                throw new JulongChainException(err, ex.getCause());
             }
 
 
@@ -479,14 +479,14 @@ public class RsaImpl {
          * @param newMechanism  the alg
          * @param opts          p11factory
          */
-        public boolean verifyRSA(byte[] ski, byte[] signature, byte[] digest, long newMechanism, IPKCS11FactoryOpts opts) throws JavaChainException{
+        public boolean verifyRSA(byte[] ski, byte[] signature, byte[] digest, long newMechanism, IPKCS11FactoryOpts opts) throws JulongChainException {
 
             try {
                 long[] publickey = findKeypairFromSKI(opts, false, ski);
                 if (publickey==null || (publickey!=null && publickey.length==0)) {
                     String str=String.format("[JC_PKCS]:No Find Key");
                     RsaImpl.setLoggerErr(str, 5);
-                    throw new JavaChainException(str);
+                    throw new JulongChainException(str);
                 }
                 CK_MECHANISM ckMechanism = new CK_MECHANISM();
                 ckMechanism.mechanism = newMechanism;
@@ -530,7 +530,7 @@ public class RsaImpl {
          * @param opts          p11factory
          * @return ciphertext
          */
-        public byte[] encryptRSA(byte[] ski, byte[] plaintext, boolean flagpub, long mechanism, IPKCS11FactoryOpts opts) throws JavaChainException {
+        public byte[] encryptRSA(byte[] ski, byte[] plaintext, boolean flagpub, long mechanism, IPKCS11FactoryOpts opts) throws JulongChainException {
             try {
                 long[] enckey;
                 if (flagpub)
@@ -542,7 +542,7 @@ public class RsaImpl {
 
                     String str=String.format("[JC_PKCS]:No Find Key");
                     RsaImpl.setLoggerErr(str, 6);
-                    throw new JavaChainException(str);
+                    throw new JulongChainException(str);
                 }
 
                 CK_ATTRIBUTE[] attributes = new CK_ATTRIBUTE[] {
@@ -563,7 +563,7 @@ public class RsaImpl {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
                 RsaImpl.setLoggerErr(err, 6);
-                throw new JavaChainException(err, ex.getCause());
+                throw new JulongChainException(err, ex.getCause());
             }
 
         }
@@ -593,7 +593,7 @@ public class RsaImpl {
          * @param opts          p11factory
          * @return plaintext
          */
-        public static byte[] decryptRSA(byte[] ski, byte[] ciphertext, boolean flagpub, long mechanism, IPKCS11FactoryOpts opts) throws JavaChainException{
+        public static byte[] decryptRSA(byte[] ski, byte[] ciphertext, boolean flagpub, long mechanism, IPKCS11FactoryOpts opts) throws JulongChainException {
             try {
                 long[] deckey;
                 if (flagpub)
@@ -605,7 +605,7 @@ public class RsaImpl {
 
                     String str=String.format("[JC_PKCS]:No Find Key");
                     RsaImpl.setLoggerErr(str, 7);
-                    throw new JavaChainException(str);
+                    throw new JulongChainException(str);
                 }
 
                 int outlen = 512;
@@ -624,7 +624,7 @@ public class RsaImpl {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
                 RsaImpl.setLoggerErr(err, 7);
-                throw new JavaChainException(err, ex.getCause());
+                throw new JulongChainException(err, ex.getCause());
             }
 
         }
@@ -637,7 +637,7 @@ public class RsaImpl {
      * Find the key of the specified SKI
      *
      */
-    private static long[] findKeypairFromSKI(IPKCS11FactoryOpts opts, boolean bPri, byte[] ski) throws JavaChainException{
+    private static long[] findKeypairFromSKI(IPKCS11FactoryOpts opts, boolean bPri, byte[] ski) throws JulongChainException {
 
         long keyclass = CKO_PUBLIC_KEY;
         if(bPri)
@@ -657,12 +657,12 @@ public class RsaImpl {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
             setLoggerErr(err, 0);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(Exception ex) {
         	ex.printStackTrace();
         	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
             setLoggerErr(err, 0);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }
     }
 
@@ -671,7 +671,7 @@ public class RsaImpl {
      * get public key der code
      *
      */
-    private static byte[] getPublicDer(BigInteger n, BigInteger e) throws JavaChainException{
+    private static byte[] getPublicDer(BigInteger n, BigInteger e) throws JulongChainException {
         try {
             RSAPublicKeyImpl rsapublickeyimpl = new RSAPublicKeyImpl(n, e);
             return rsapublickeyimpl.getEncoded();
@@ -679,7 +679,7 @@ public class RsaImpl {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:InvalidKeyException ErrMessage: %s", ex.getMessage());
             setLoggerErr(err, 0);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }
     }
 
@@ -688,7 +688,7 @@ public class RsaImpl {
      * get public key hash data
      *
      */
-    private static byte[] getPublicHash(BigInteger n, BigInteger e) throws JavaChainException{
+    private static byte[] getPublicHash(BigInteger n, BigInteger e) throws JulongChainException {
 
         try {
             MessageDigest shahash = MessageDigest.getInstance("SHA-1");
@@ -699,7 +699,7 @@ public class RsaImpl {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
             setLoggerErr(err, 0);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }
     }
 

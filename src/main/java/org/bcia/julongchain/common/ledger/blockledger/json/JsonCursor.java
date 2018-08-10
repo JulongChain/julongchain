@@ -17,8 +17,8 @@ package org.bcia.julongchain.common.ledger.blockledger.json;
 
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.blockledger.IIterator;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.julongchain.protos.common.Common;
 
@@ -33,7 +33,7 @@ import java.util.AbstractMap;
  * @company Dingxuan
  */
 public class JsonCursor implements IIterator {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(JsonCursor.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(JsonCursor.class);
 
     private JsonLedger jl;
     private long blockNum;

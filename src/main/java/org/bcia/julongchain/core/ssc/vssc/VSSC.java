@@ -17,14 +17,14 @@ package org.bcia.julongchain.core.ssc.vssc;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.SysSmartContractException;
 import org.bcia.julongchain.common.groupconfig.capability.IApplicationCapabilities;
 import org.bcia.julongchain.common.groupconfig.config.IApplicationConfig;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.policy.IPolicy;
 import org.bcia.julongchain.common.policycheck.policies.PolicyProvider;
 import org.bcia.julongchain.common.util.BytesHexStrTranslate;
@@ -58,7 +58,7 @@ import java.util.*;
  */
 @Component
 public class VSSC extends SystemSmartContractBase {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(VSSC.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(VSSC.class);
 
     public final static String DUPLICATED_IDENTITY_ERROR="Endorsement policy evaluation failure might be caused by duplicated identities";
     // sscProvider is the interface with which we call
@@ -251,7 +251,7 @@ public class VSSC extends SystemSmartContractBase {
         IQueryExecutor qe =null;
         try{
             qe=this.sscProvider.getQueryExecutorForLedger(groupID);
-        }catch(JavaChainException e){
+        }catch(JulongChainException e){
             String msg=String.format("Could not retrieve QueryExecutor for group %s, error %s",groupID,e.getMessage());
             throw new SysSmartContractException(msg);
         }

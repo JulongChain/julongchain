@@ -16,8 +16,8 @@
 
 package org.bcia.julongchain.common.tools.cryptogen.cmd;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.FileUtils;
 import org.bcia.julongchain.consenter.util.YamlLoader;
 
@@ -32,7 +32,7 @@ import java.net.URL;
  * @company Excelsecu
  */
 public class ShowTemplateCmd implements ICryptoGenCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ShowTemplateCmd.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ShowTemplateCmd.class);
 
     private static final String DEFAULT_TEMPLATE =
             "# ---------------------------------------------------------------------------\n" +

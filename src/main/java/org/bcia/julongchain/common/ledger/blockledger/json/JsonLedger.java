@@ -20,10 +20,9 @@ import com.google.protobuf.util.JsonFormat;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.blockledger.IIterator;
 import org.bcia.julongchain.common.ledger.blockledger.ReadWriteBase;
-import org.bcia.julongchain.common.ledger.blockledger.Util;
 import org.bcia.julongchain.common.ledger.util.IoUtil;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
@@ -39,7 +38,7 @@ import java.util.AbstractMap;
  * @company Dingxuan
  */
 public class JsonLedger extends ReadWriteBase {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(JsonLedger.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(JsonLedger.class);
     private static final Object LOCK = new Object();
     public static final String GROUP_DIRECTORY_FORMAT_STRING  = "chain_";
     public static final String BLOCK_FILE_FORMAT_STRING  = "block_%020d.json";

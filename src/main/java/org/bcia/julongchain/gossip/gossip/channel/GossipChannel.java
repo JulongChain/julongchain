@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.gossip.gossip.channel;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.gossip.api.IJoinChannelMessage;
 import org.bcia.julongchain.gossip.api.ISubChannelSelectionCriteria;
 import org.bcia.julongchain.gossip.discovery.NetworkMember;
@@ -26,7 +26,7 @@ import org.bcia.julongchain.gossip.gossip.SignedGossipMessage;
 
 public class GossipChannel implements IGossipChannel {
 
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(GossipChannel.class);
+    private static final JulongChainLog log = JulongChainLogFactory.getLog(GossipChannel.class);
     private IAdapter adapter;
     private Boolean shouldGossipStateInfo;
 

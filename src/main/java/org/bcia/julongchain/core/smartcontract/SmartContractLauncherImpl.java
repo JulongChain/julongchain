@@ -16,8 +16,8 @@ limitations under the License.
 package org.bcia.julongchain.core.smartcontract;
 
 import org.bcia.julongchain.common.exception.SmartContractException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policycheck.bean.Context;
 import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractContext;
 import org.bcia.julongchain.core.container.scintf.SCID;
@@ -34,7 +34,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class SmartContractLauncherImpl implements ILaunchIntf {
-	private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractLauncherImpl.class);
+	private static JulongChainLog log = JulongChainLogFactory.getLog(SmartContractLauncherImpl.class);
 
 	private Context ctxt;
 	private SmartContractSupport scSupport;

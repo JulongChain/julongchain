@@ -3,7 +3,7 @@ package org.bcia.julongchain.core.ssc.cssc;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.BaseJunit4Test;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.genesis.GenesisBlockFactory;
@@ -81,7 +81,7 @@ public class CSSCTest extends BaseJunit4Test {
         } catch (IOException e) {
             e.printStackTrace();
             return;
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
             return;
         }
@@ -89,7 +89,7 @@ public class CSSCTest extends BaseJunit4Test {
         try {
             sp = TxUtils.mockSignedEndorserProposalOrPanic("",
                     SmartContractPackage.SmartContractSpec.newBuilder().build());
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
             return;
         }
@@ -164,7 +164,7 @@ public class CSSCTest extends BaseJunit4Test {
 
 
 
-    private byte[] mockConfigBlock() throws IOException, ValidateException,JavaChainException {
+    private byte[] mockConfigBlock() throws IOException, ValidateException, JulongChainException {
         GenesisConfig.Profile profile=GenesisConfigFactory.getGenesisConfig().getCompletedProfile("SampleDevModeSolo");
         Configtx.ConfigTree tree = ConfigTreeHelper.buildGroupTree(profile);
         GenesisBlockFactory factory=new GenesisBlockFactory(tree);

@@ -16,7 +16,7 @@
 package org.bcia.julongchain.common.genesis;
 
 import com.google.protobuf.ByteString;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
 import org.bcia.julongchain.common.util.proto.ProposalUtils;
@@ -45,7 +45,7 @@ public class GenesisBlockFactory implements IGenesisBlockFactory {
     }
 
     @Override
-    public Common.Block getGenesisBlock(String groupId) throws JavaChainException {
+    public Common.Block getGenesisBlock(String groupId) throws JulongChainException {
         byte[] nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
 
         IMsp localMsp = GlobalMspManagement.getLocalMsp();

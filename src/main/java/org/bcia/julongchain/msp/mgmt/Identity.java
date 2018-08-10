@@ -16,11 +16,11 @@
 package org.bcia.julongchain.msp.mgmt;
 
 import com.google.protobuf.ByteString;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.exception.VerifyException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2SignerOpts;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.msp.IIdentity;
@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.util.Date;
 
 import static org.bcia.julongchain.common.util.Convert.bytesToHexString;
-import static org.bcia.julongchain.csp.factory.CspManager.getDefaultCsp;
 
 /**
  * @author zhangmingyang
@@ -42,7 +41,7 @@ import static org.bcia.julongchain.csp.factory.CspManager.getDefaultCsp;
  * @company Dingxuan
  */
 public class Identity implements IIdentity {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Identity.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Identity.class);
     /**
      * 身份
      */
@@ -69,7 +68,7 @@ public class Identity implements IIdentity {
         byte[] digest = new byte[0];
         try {
             digest = msp.getCsp().hash(cert.getEncoded(), null);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
@@ -126,7 +125,7 @@ public class Identity implements IIdentity {
             if (verify == false) {
                 throw new VerifyException("Veify the sign is fail");
             }
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             throw new VerifyException(e.getMessage());
         }
 

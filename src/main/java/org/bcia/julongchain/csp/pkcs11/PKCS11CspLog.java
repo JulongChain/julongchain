@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.csp.pkcs11;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -30,11 +30,11 @@ import java.util.Date;
  */
 public class PKCS11CspLog {
 
-    private static JavaChainLog logger;
+    private static JulongChainLog logger;
 
     public void setLogMsg(String msg, int level, Class<?> clazz) {
 
-        logger = JavaChainLogFactory.getLog(clazz);
+        logger = JulongChainLogFactory.getLog(clazz);
 
         Date date = new Date();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss,SSS");

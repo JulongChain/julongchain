@@ -17,11 +17,11 @@ package org.bcia.julongchain.core.ssc.lssc;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.SysSmartContractException;
 import org.bcia.julongchain.common.groupconfig.config.IApplicationConfig;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policycheck.IPolicyChecker;
 import org.bcia.julongchain.common.policycheck.PolicyChecker;
 import org.bcia.julongchain.common.policycheck.cauthdsl.CAuthDslBuilder;
@@ -78,7 +78,7 @@ import java.util.regex.Pattern;
  */
 @Component
 public class LSSC  extends SystemSmartContractBase {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(LSSC.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(LSSC.class);
     //INSTALL install command
     public final static String INSTALL="install";
     //DEPLOY deploy command
@@ -158,7 +158,7 @@ public class LSSC  extends SystemSmartContractBase {
                 // 2. check local MSP Admins policy
                 try{
                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.Admins,sp);
-                }catch (JavaChainException e){
+                }catch (JulongChainException e){
                     log.error(e.getMessage(), e);
                     return newErrorResponse(String.format("Authorization for INSTALL has been denied (error-%s)",e.getMessage()));
                 }
@@ -315,7 +315,7 @@ public class LSSC  extends SystemSmartContractBase {
                 //2. check local MSP Admins policy
                 try {
                     policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.Admins,sp);
-                } catch (JavaChainException e) {
+                } catch (JulongChainException e) {
                     log.error(e.getMessage(), e);
                     return newErrorResponse(String.format("Authorization for GETSMARTCONTRACTS has been denied with error:%s",e.getMessage()));
                 }
@@ -327,7 +327,7 @@ public class LSSC  extends SystemSmartContractBase {
                 //2. check local MSP Admins policy
                 try {
                     policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.Admins,sp);
-                } catch (JavaChainException e) {
+                } catch (JulongChainException e) {
                     log.error(e.getMessage(), e);
                     return newErrorResponse(String.format("Authorization for GETINSTALLEDSMARTCONTRACTS has been denied with error:%s",e.getMessage()));
                 }
@@ -461,13 +461,13 @@ public class LSSC  extends SystemSmartContractBase {
         ISmartContractPackage scPack =null;
         try {
             scPack =support.getSmartContractFromLocalStorage(name, scd.getVersion());
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             String msg=String.format("Get smartcontract %s from localstorage failed:%s",name ,e.getMessage());
             throw new SysSmartContractException(msg);
         }
         try {
             scPack.validateSC(scd);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             String msg=String.format("InvalidSCOnFSError:%s",e.getMessage());
             throw new SysSmartContractException(msg);
         }
@@ -506,7 +506,7 @@ public class LSSC  extends SystemSmartContractBase {
                 scPack = support.getSmartContractFromLocalStorage(data.getName(), data.getVersion());
                 path=scPack.getDepSpec().getSmartContractSpec().getSmartContractId().getPath();
                 input=scPack.getDepSpec().getSmartContractSpec().getInput().toString();
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 log.error(e.getMessage());
             }
 
@@ -536,7 +536,7 @@ public class LSSC  extends SystemSmartContractBase {
         Query.SmartContractQueryResponse scqr =null;
         try {
             scqr = support.getSmartContractsFromLocalStorage();
-        }catch (JavaChainException e){
+        }catch (JulongChainException e){
             return newErrorResponse(e.getMessage());
         }
         byte[] scqrBytes = scqr.toByteArray();
@@ -613,7 +613,7 @@ public class LSSC  extends SystemSmartContractBase {
         ISmartContractPackage scPack=null;
         try {
             scPack=SmartContractProvider.getSmartContractPackage(scBytes);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             throw new SysSmartContractException(e.getMessage());
         }
         if(scPack==null){
@@ -644,7 +644,7 @@ public class LSSC  extends SystemSmartContractBase {
         byte[] statedbArtifactsTar=null;
         try {
             statedbArtifactsTar=SmartContractProvider.extractStateDBArtifactsFromSCPackage(scPack);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             throw new SysSmartContractException(e.getMessage());
         }
 
@@ -658,7 +658,7 @@ public class LSSC  extends SystemSmartContractBase {
         // that is, if there are errors deploying the indexes the chaincode install can safely be re-attempted later.
         try {
             ScEventManager.getMgr().handleSmartContractInstall(smartContractDefinition,statedbArtifactsTar);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             throw new SysSmartContractException(e);
         }
         // Finally, if everything is good above, install the chaincode to local peer file system so that endorsements can start
@@ -711,7 +711,7 @@ public class LSSC  extends SystemSmartContractBase {
         String version=scds.getSmartContractSpec().getSmartContractId().getVersion();
         try {
             scPack=support.getSmartContractFromLocalStorage(name,version);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             String msg=String.format("Get smartcontract %s from localstorage failed:%s",name ,e.getMessage());
             throw new SysSmartContractException(msg);
         }

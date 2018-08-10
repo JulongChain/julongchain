@@ -15,11 +15,10 @@
  */
 package org.bcia.julongchain.msp.signer;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.intfs.opts.ISignerOpts;
-import org.bouncycastle.crypto.CryptoException;
 
 /**
  * @author zhangmingyang
@@ -44,7 +43,7 @@ public class NodeSigner implements ISigner {
     public byte[] sign(IKey key, byte[] msgContent, ISignerOpts opts){
         try {
             return this.csp.sign(this.sk,msgContent,opts);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         }
         return null;

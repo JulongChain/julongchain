@@ -19,16 +19,12 @@ import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.NetAddress;
-import org.bcia.julongchain.core.ssc.cssc.CSSC;
 import org.bcia.julongchain.core.ssc.qssc.QSSC;
 import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.protos.common.Ledger;
-import org.bcia.julongchain.protos.node.Query;
-
-import java.util.List;
 
 
 /**
@@ -40,7 +36,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public class GroupInfoCmd extends AbstractNodeGroupCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(GroupInfoCmd.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(GroupInfoCmd.class);
 
     /**
      * Target地址(Node)

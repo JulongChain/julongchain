@@ -26,8 +26,8 @@ import org.bcia.julongchain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.julongchain.common.groupconfig.config.IConsenterConfig;
 import org.bcia.julongchain.common.groupconfig.config.IConsortiumConfig;
 import org.bcia.julongchain.common.groupconfig.value.ConsortiumValue;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.util.CommonUtils;
 import org.bcia.julongchain.consenter.util.ConfigTxUtil;
 import org.bcia.julongchain.protos.common.Common;
@@ -42,7 +42,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class DefaultTemplator implements IGroupConfigTemplator {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(DefaultTemplator.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(DefaultTemplator.class);
     private IGroupConfigBundle groupConfigBundle;
 
     public DefaultTemplator(IGroupConfigBundle groupConfigBundle) {

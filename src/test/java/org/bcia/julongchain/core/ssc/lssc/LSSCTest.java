@@ -2,7 +2,7 @@ package org.bcia.julongchain.core.ssc.lssc;
 
 import com.google.protobuf.ByteString;
 import org.bcia.julongchain.BaseJunit4Test;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.SysSmartContractException;
 import org.bcia.julongchain.common.ledger.util.IoUtil;
 import org.bcia.julongchain.common.util.CommConstant;
@@ -99,7 +99,7 @@ public class LSSCTest extends BaseJunit4Test {
         ProposalPackage.SignedProposal signedProp = null;
         try {
             signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
             return;
         }
@@ -186,7 +186,7 @@ public class LSSCTest extends BaseJunit4Test {
         ProposalPackage.SignedProposal signedProp = null;
         try {
             signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
             return;
         }
@@ -241,7 +241,7 @@ public class LSSCTest extends BaseJunit4Test {
         ProposalPackage.SignedProposal signedProp = null;
         try {
             signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
             return;
         }
@@ -335,7 +335,7 @@ public class LSSCTest extends BaseJunit4Test {
         ProposalPackage.SignedProposal signedProp = null;
         try {
             signedProp = TxUtils.mockSignedEndorserProposalOrPanic("testGroup", spec);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
             return;
         }

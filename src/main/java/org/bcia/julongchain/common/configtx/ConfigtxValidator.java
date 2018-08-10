@@ -20,8 +20,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.configtx.util.ConfigMapUtils;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.IPolicyManager;
 import org.bcia.julongchain.common.policies.policy.IPolicy;
 import org.bcia.julongchain.common.protos.ConfigUpdateEnvelopeVO;
@@ -43,7 +43,7 @@ import java.util.regex.Pattern;
  * @company Dingxuan
  */
 public class ConfigtxValidator implements IConfigtxValidator {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ConfigtxValidator.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ConfigtxValidator.class);
 
     private static final int MAX_LENGTH = 249;
     private static final String REGEX_GROUP_ID = "[a-zA-Z][a-zA-Z0-9.-]*";

@@ -22,7 +22,7 @@ package org.bcia.julongchain.common.exception;
  * @date 3/7/18
  * @company Dingxuan
  */
-public class EventException extends JavaChainException {
+public class EventException extends JulongChainException {
     private static final String MODULE_NAME = "[Event]";
 
     public EventException() {

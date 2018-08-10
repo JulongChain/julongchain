@@ -18,8 +18,8 @@ package org.bcia.julongchain.core.node;
 import org.bcia.julongchain.common.config.IConfig;
 import org.bcia.julongchain.common.config.IConfigManager;
 import org.bcia.julongchain.common.exception.NodeException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.node.entity.Group;
 
@@ -31,7 +31,7 @@ import org.bcia.julongchain.node.entity.Group;
  * @company Dingxuan
  */
 public class ConfigManager implements IConfigManager {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ConfigManager.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ConfigManager.class);
 
     @Override
     public IConfig getGroupConfig(String groupID) {

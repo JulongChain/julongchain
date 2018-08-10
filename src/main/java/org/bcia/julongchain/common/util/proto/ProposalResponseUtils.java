@@ -19,7 +19,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.util.Utils;
 import org.bcia.julongchain.csp.factory.CspManager;
@@ -123,7 +123,7 @@ public class ProposalResponseUtils {
             byte[] events,
             SmartContractPackage.SmartContractID smartContractID,
             byte[] visibility,
-            ISigningIdentity signingIdentity) throws InvalidProtocolBufferException, JavaChainException {
+            ISigningIdentity signingIdentity) throws InvalidProtocolBufferException, JulongChainException {
         Common.Header header = Common.Header.parseFrom(headerBytes);
         //obtain the proposal hash given proposal header, payload and the requested visibility
 
@@ -132,7 +132,7 @@ public class ProposalResponseUtils {
             pHashBytes = getProposalHash1(header, payloadBytes, visibility);
         } catch (Exception e) {
             String msg = String.format("Could not compute proposal hash: err %s", e.getMessage());
-            JavaChainException exception = new JavaChainException(msg);
+            JulongChainException exception = new JulongChainException(msg);
             throw exception;
         }
         //get the bytes of the proposal smartContractResponse payload - we need to sign them
@@ -141,14 +141,14 @@ public class ProposalResponseUtils {
             prpBytes = getBytesProposalResponsePayload(pHashBytes, response, results, events, smartContractID);
         } catch (Exception e) {
             String msg = String.format("Failure while marshaling the ProposalResponsePayload: err %s", e.getMessage());
-            JavaChainException exception = new JavaChainException(msg);
+            JulongChainException exception = new JulongChainException(msg);
             throw exception;
         }
 
         byte[] endorser = signingIdentity.getIdentity().serialize();
         if (endorser == null || endorser.length == 0) {
             String msg = String.format("Could not serialize the signing identity for %s", signingIdentity.getIdentity().getMSPIdentifier());
-            JavaChainException exception = new JavaChainException(msg);
+            JulongChainException exception = new JulongChainException(msg);
             throw exception;
         }
 
@@ -156,7 +156,7 @@ public class ProposalResponseUtils {
         byte[] signature = signingIdentity.sign(Utils.appendBytes(prpBytes, endorser));
         if (signature == null || signature.length == 0) {
             String msg = String.format("Could not sign the proposal response payload");
-            JavaChainException exception = new JavaChainException(msg);
+            JulongChainException exception = new JulongChainException(msg);
             throw exception;
         }
 
@@ -219,7 +219,7 @@ public class ProposalResponseUtils {
      * @return
      */
     private static byte[] getProposalHash1(Common.Header header, byte[] payloadBytes, byte[] visibility) throws
-            InvalidProtocolBufferException, ValidateException, JavaChainException {
+            InvalidProtocolBufferException, ValidateException, JulongChainException {
         if (header == null || header.getGroupHeader() == null || header.getSignatureHeader() == null || payloadBytes
                 == null) {
             throw new ValidateException("Missing arguments");

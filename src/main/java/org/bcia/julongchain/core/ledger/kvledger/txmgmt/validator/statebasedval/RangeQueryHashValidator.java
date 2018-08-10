@@ -17,8 +17,8 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.validator.statebasedval
 
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.RangeQueryResultsHelper;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.RwSetUtil;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
@@ -34,7 +34,7 @@ import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
  * @company Dingxuan
  */
 public class RangeQueryHashValidator implements IRangeQueryValidator {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(RangeQueryHashValidator.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(RangeQueryHashValidator.class);
 
     private KvRwset.RangeQueryInfo rqInfo;
     private IResultsIterator itr;

@@ -17,9 +17,9 @@
 package org.bcia.julongchain.common.tools.cryptogen.cmd;
 
 import org.apache.commons.cli.*;
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.tools.cryptogen.FileUtil;
 import org.bcia.julongchain.common.tools.cryptogen.bean.Config;
 import org.bcia.julongchain.common.tools.cryptogen.bean.OrgSpec;
@@ -34,7 +34,7 @@ import static org.bcia.julongchain.common.tools.cryptogen.cmd.Util.*;
  * @company Excelsecu
  */
 public class GenerateCmd implements ICryptoGenCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(GenerateCmd.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(GenerateCmd.class);
     private static final String CMD_GENERATE = "generate";
     private static final String CMD_ARG_OUTPUT = "output";
     private static final String CMD_ARG_CONFIG = "config";
@@ -82,14 +82,14 @@ public class GenerateCmd implements ICryptoGenCmd {
         Config config = null;
         try {
             config = Util.loadAs(configFile, Config.class);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage());
             System.exit(-1);
         }
         for (OrgSpec orgSpec : config.getNodeOrgs()) {
             try {
                 renderOrgSpec(orgSpec, "node");
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 log.error("Error processing node configuration: " + e.getMessage());
                 deleteAllFiles();
                 System.exit(-1);
@@ -99,7 +99,7 @@ public class GenerateCmd implements ICryptoGenCmd {
         for (OrgSpec orgSpec : config.getConsenterOrgs()) {
             try {
                 renderOrgSpec(orgSpec, "consenter");
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 log.error("Error processing consenter configuration: " + e.getMessage());
                 deleteAllFiles();
                 System.exit(-1);

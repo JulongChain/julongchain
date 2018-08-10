@@ -22,7 +22,7 @@ package org.bcia.julongchain.common.exception;
  * @date 2018/07/23
  * @company Dingxuan
  */
-public class VMException extends JavaChainException {
+public class VMException extends JulongChainException {
 	private static final String MODULE_NAME = "[VM]";
 
 	public VMException() {

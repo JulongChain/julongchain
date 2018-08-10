@@ -20,8 +20,8 @@ import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.common.util.producer.Consumer;
 import org.bcia.julongchain.common.util.producer.Producer;
@@ -30,7 +30,6 @@ import org.bcia.julongchain.consenter.consensus.IChain;
 import org.bcia.julongchain.consenter.consensus.IConsensusPlugin;
 import org.bcia.julongchain.consenter.entity.BatchesMes;
 import org.bcia.julongchain.consenter.entity.Message;
-import org.bcia.julongchain.gossip.GossipService;
 import org.bcia.julongchain.protos.common.Common;
 
 import java.util.concurrent.BlockingQueue;
@@ -46,7 +45,7 @@ public class Singleton implements IChain, IConsensusPlugin {
     private Producer<Message> producer;
     private Consumer<Message> consumer;
     private static Singleton instance;
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Singleton.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Singleton.class);
     private static ChainSupport support;
     private Message normalMessage;
     private Message configMessage;
