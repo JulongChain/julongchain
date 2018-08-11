@@ -184,7 +184,6 @@ public class NodeSmartContract {
                 public void onNext(Ab.BroadcastResponse value) {
                     log.info("Broadcast onNext");
                     broadcastClient.close();
-                    instantiateLock.unLock();
 
                     //收到响应消息，判断是否是200消息
                     if (Common.Status.SUCCESS.equals(value.getStatus())) {
@@ -192,6 +191,9 @@ public class NodeSmartContract {
                     } else {
                         log.info("Instantiate fail:" + value.getStatus());
                     }
+
+                    //unLock必须放置在最后，以确保命令行性质的程序不被系统终止
+                    instantiateLock.unLock();
                 }
 
                 @Override
@@ -276,7 +278,6 @@ public class NodeSmartContract {
                 public void onNext(Ab.BroadcastResponse value) {
                     log.info("Broadcast onNext");
                     broadcastClient.close();
-                    invokeLock.unLock();
 
                     //收到响应消息，判断是否是200消息
                     if (Common.Status.SUCCESS.equals(value.getStatus())) {
@@ -284,6 +285,9 @@ public class NodeSmartContract {
                     } else {
                         log.info("Invoke fail: " + value.getStatus());
                     }
+
+                    //unLock必须放置在最后，以确保命令行性质的程序不被系统终止
+                    invokeLock.unLock();
                 }
 
                 @Override

@@ -172,11 +172,11 @@ public class NodeGroup {
             }
         });
 
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            log.error(e.getMessage(), e);
-        }
+//        try {
+//            Thread.sleep(50);
+//        } catch (InterruptedException e) {
+//            log.error(e.getMessage(), e);
+//        }
 
         createLock.tryLock(new CommLock.TimeoutCallback() {
             @Override
@@ -194,27 +194,6 @@ public class NodeGroup {
             public void onNext(Ab.DeliverResponse value) {
                 log.info("Deliver onNext");
                 deliverClient.close();
-                createLock.unLock();
-
-                //测试用
-//                if (true) {
-//                    try {
-//                        //模拟建立一个Block
-//                        Common.Block block = mockCreateBlock(groupId);
-//
-////                        LedgerManager.initialize(null);
-////                        LedgerManager.createLedger(block);
-//
-//                        FileUtils.writeFileBytes(groupId + ".block", block.toByteArray());
-//
-//                        File file = new File(groupId + ".block");
-//                        log.info("file is generated1-----$" + file.getCanonicalPath());
-//                    } catch (IOException e) {
-//                        log.error(e.getMessage(), e);
-//                    } catch (JulongChainException e) {
-//                        log.error(e.getMessage(), e);
-//                    }
-//                }
 
                 if (value.hasBlock()) {
                     Common.Block block = value.getBlock();
@@ -229,6 +208,9 @@ public class NodeGroup {
                 } else {
                     log.info("Deliver status:" + value.getStatus().getNumber());
                 }
+
+                //unLock必须放置在最后，以确保命令行性质的程序不被系统终止
+                createLock.unLock();
             }
 
             @Override
@@ -437,16 +419,16 @@ public class NodeGroup {
 
         //生成proposal  Type=ENDORSER_TRANSACTION
         ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType.ENDORSER_TRANSACTION,
-                "", txId, qsscSpec, nonce, creator, null);
+                groupId, txId, qsscSpec, nonce, creator, null);
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = null;
         try {
             proposalResponse = endorserClient.sendProcessProposal(signedProposal);
-            return null;
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
+            return null;
         } finally {
             endorserClient.close();
         }

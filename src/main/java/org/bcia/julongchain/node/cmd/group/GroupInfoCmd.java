@@ -25,6 +25,7 @@ import org.bcia.julongchain.common.util.NetAddress;
 import org.bcia.julongchain.core.ssc.qssc.QSSC;
 import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.protos.common.Ledger;
+import org.bouncycastle.util.encoders.Hex;
 
 
 /**
@@ -95,8 +96,8 @@ public class GroupInfoCmd extends AbstractNodeGroupCmd {
 
         if (blockchainInfo != null) {
             log.info("The height of the block chain is: " + blockchainInfo.getHeight());
-            log.info("The current block hash of the block chain is: " + blockchainInfo.getCurrentBlockHash().toStringUtf8());
-            log.info("The previous block hash of the block chain is: " + blockchainInfo.getPreviousBlockHash().toStringUtf8());
+            log.info("The current block hash of the block chain is: " + Hex.toHexString(blockchainInfo.getCurrentBlockHash().toByteArray()));
+            log.info("The previous block hash of the block chain is: " + Hex.toHexString(blockchainInfo.getPreviousBlockHash().toByteArray()));
         } else {
             log.info("Get blockchainInfo fail");
         }
