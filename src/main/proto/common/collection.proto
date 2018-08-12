@@ -9,7 +9,7 @@ syntax = "proto3";
 import "common/policies.proto";
 
 option go_package = "github.com/hyperledger/fabric/protos/common";
-option java_package = "org.bcia.javachain.protos.common";
+option java_package = "org.bcia.julongchain.protos.common";
 
 package common;
 
@@ -69,7 +69,7 @@ message CollectionPolicyConfig {
 // CollectionCriteria defines an element of a private data that corresponds
 // to a certain transaction and collection
 message CollectionCriteria {
-    string channel = 1;
+    string group = 1;
     string tx_id = 2;
     string collection = 3;
     string namespace = 4;

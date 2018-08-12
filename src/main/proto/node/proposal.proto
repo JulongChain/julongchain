@@ -19,12 +19,12 @@ Modified java_package and other contents by Dingxuan on 2018-03-02
 syntax = "proto3";
 
 option go_package = "github.com/hyperledger/fabric/protos/peer";
-option java_package = "org.bcia.javachain.protos.node";
+option java_package = "org.bcia.julongchain.protos.node";
 option java_outer_classname = "ProposalPackage";
 
 package protos;
 
-import "node/smartcontract.proto";
+import "node/smart_contract.proto";
 import "node/proposal_response.proto";
 
 /*
@@ -232,7 +232,7 @@ message SmartContractHeaderExtension {
 	bytes payload_visibility = 1;
 
 	// The ID of the SmartContract to target.
-	SmartContractID SmartContract_id = 2;
+	SmartContractID smart_contract_id = 2;
 }
 
 // SmartContractProposalPayload is the Proposal's payload message to be used when
@@ -272,5 +272,5 @@ message SmartContractAction {
 	// Committer will validate the version matching with latest SmartContract version.
 	// Adding SmartContractID to keep version opens up the possibility of multiple
 	// SmartContractAction per transaction.
-	SmartContractID SmartContract_id = 4;
+	SmartContractID smart_contract_id = 4;
 }

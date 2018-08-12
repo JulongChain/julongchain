@@ -8,7 +8,7 @@ Modified java_package and other contents by Dingxuan on 2018-03-28
 
 syntax = "proto3";
 
-option java_package = "org.bcia.javachain.protos.node";
+option java_package = "org.bcia.julongchain.protos.node";
 option java_outer_classname = "ResourcesPackage";
 option go_package = "github.com/hyperledger/fabric/protos/peer";
 
@@ -58,7 +58,7 @@ message SmartContractEndorsement {
 
 // ConfigTree encapsulates Group and resources configuration of a Group.
 // Both configurations are represented as common.Config
-message ConfigTree {
+message RootConfigTree {
     common.Config group_config = 1;
     common.Config resources_config = 2;
 }

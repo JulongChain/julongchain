@@ -7,7 +7,7 @@ SPDX-License-Identifier: Apache-2.0
 syntax = "proto3";
 
 option go_package = "github.com/hyperledger/fabric/protos/msp";
-option java_package = "org.bcia.javachain.protos.msp";
+option java_package = "org.bcia.julongchain.protos.msp";
 option java_outer_classname = "MspConfigPackage";
 
 package msp;
@@ -96,32 +96,10 @@ message FabricCryptoConfig {
     // SignatureHashFamily is a string representing the hash family to be used
     // during sign and verify operations.
     // Allowed values are "SHA2" and "SHA3".
-    string signature_hash_family = 1;
-
-    // IdentityIdentifierHashFunction is a string representing the hash function
-    // to be used during the computation of the identity identifier of an MSP identity.
-    // Allowed values are "SHA256", "SHA384" and "SHA3_256", "SHA3_384".
-    string identity_identifier_hash_function = 2;
-
-    string symmetrickey = 3;
-
-    string sign = 4;
-
-    string hash = 5;
-
-    string asymmetric = 6;
-
-    FileKeyStore filekeystore = 7;
-
+    map<string, CspMap> csp_factory_opts = 1;
 }
-message FileKeyStore {
-    string public_key_path = 1;
-
-    string private_key_path = 2;
-
-    string public_key_value=3;
-
-    string private_key_value=4;
+message CspMap {
+    map<string, string> csp_values = 1;
 }
 
 // IdemixMSPConfig collects all the configuration information for
