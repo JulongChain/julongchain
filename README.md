@@ -67,6 +67,12 @@ Maven依赖管理工具：Maven 3.5.2  <br/>
   参数说明：  <br/>
       -t 要查询的目标节点地址 <br/>
 
+查询当前群组链信息<br/>
+         <i>  java -jar julongchain.jar group info -t 127.0.0.1:7051 -g myGroup  </i><br/>
+   参数说明：  <br/>
+      -t 要查询的目标节点地址 <br/>
+      -g 群组名称           <br/>
+
 安装智能合约  <br/>
 <i>  java -jar julongchain.jar contract install -t 127.0.0.1:7051 -n mycc -v 1.0 -p /root/julongchain/mycc_src  </i><br/>
   参数说明：  <br/>
@@ -96,5 +102,15 @@ Maven依赖管理工具：Maven 3.5.2  <br/>
    -g 群组名称                  <br/>
    -n 智能合约名称               <br/>
    -i 智能合约invoke方法入参   <br/>
+
+查询智能合约（不产生新的区块）  <br/>
+<i>  java -jar julongchain.jar contract query -t 127.0.0.1:7051 -g myGroup -n mycc -i "{'args':['query','a']}"  </i><br/>
+  参数说明：  <br/>
+   -t 要查询智能合约的目标节点地址 <br/>
+   -g 群组名称                  <br/>
+   -n 智能合约名称               <br/>
+   -i 智能合约invoke方法入参      <br/>
+
+
    
 
