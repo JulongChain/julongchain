@@ -190,16 +190,10 @@ public class Registrar implements IChainCreator, IGroupSupportRegistrar, ISuppor
         return new GroupConfigBundle(groupId, config);
     }
 
-
     public void update(GroupConfigBundle groupConfigBundle) throws ConsenterException {
         checkResourcesOrPanic(groupConfigBundle);
         //TODO update实现 bundlesource
         ledgerResources.getMutableResources().update();
-    }
-
-
-    public String getSystemGroupID() {
-        return systemGroupID;
     }
 
     public Map<String, Object> broadcastGroupSupport(Common.Envelope msg) throws InvalidProtocolBufferException {

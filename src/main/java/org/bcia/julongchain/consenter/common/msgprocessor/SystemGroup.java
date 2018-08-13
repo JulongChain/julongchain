@@ -175,11 +175,6 @@ public class SystemGroup  implements IProcessor {
         return support;
     }
 
-//    @Override
-//    public IGroupConfigBundle newGroupConfig(Common.Envelope envelope) {
-//        return null;
-//    }
-
     public StandardGroup getStandardGroup() {
         return standardGroup;
     }

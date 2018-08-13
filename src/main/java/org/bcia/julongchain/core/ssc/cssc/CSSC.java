@@ -151,7 +151,7 @@ public class CSSC extends SystemSmartContractBase {
                 }
                 // 2. check local MSP Admins policy
                 try {
-                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.Admins, sp);
+                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.ADMINS, sp);
                 } catch (PolicyException e) {
                     log.error(e.getMessage());
                     return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check for group [%s]:%s", groupID, e.getMessage()));
@@ -187,7 +187,7 @@ public class CSSC extends SystemSmartContractBase {
                 // TODO: move to ACLProvider once it will support chainless ACLs
                 // 2. check local MSP Admins policy
                 try {
-                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.Members, sp);
+                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.MEMBERS, sp);
                 } catch (JulongChainException e) {
                     log.error(e.getMessage());
                     return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check :%s", e.getMessage()));

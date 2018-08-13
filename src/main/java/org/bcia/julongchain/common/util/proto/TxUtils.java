@@ -117,4 +117,11 @@ public class TxUtils {
         return envelope;
     }
 
+
+    public static void main(String[] args) throws InvalidProtocolBufferException {
+        Common.Envelope envelope=Common.Envelope.parseFrom("123".getBytes());
+
+       Common.Payload payload=Common.Payload.parseFrom(envelope.getPayload()) ;
+       payload.getHeader();
+    }
 }

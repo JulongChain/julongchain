@@ -157,7 +157,7 @@ public class LSSC  extends SystemSmartContractBase {
                 }
                 // 2. check local MSP Admins policy
                 try{
-                   policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.Admins,sp);
+                   policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.ADMINS,sp);
                 }catch (JulongChainException e){
                     log.error(e.getMessage(), e);
                     return newErrorResponse(String.format("Authorization for INSTALL has been denied (error-%s)",e.getMessage()));
@@ -314,7 +314,7 @@ public class LSSC  extends SystemSmartContractBase {
                 }
                 //2. check local MSP Admins policy
                 try {
-                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.Admins,sp);
+                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.ADMINS,sp);
                 } catch (JulongChainException e) {
                     log.error(e.getMessage(), e);
                     return newErrorResponse(String.format("Authorization for GETSMARTCONTRACTS has been denied with error:%s",e.getMessage()));
@@ -326,7 +326,7 @@ public class LSSC  extends SystemSmartContractBase {
                 }
                 //2. check local MSP Admins policy
                 try {
-                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.Admins,sp);
+                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.ADMINS,sp);
                 } catch (JulongChainException e) {
                     log.error(e.getMessage(), e);
                     return newErrorResponse(String.format("Authorization for GETINSTALLEDSMARTCONTRACTS has been denied with error:%s",e.getMessage()));

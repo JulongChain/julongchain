@@ -29,8 +29,8 @@ import static org.bcia.julongchain.msp.mgmt.GlobalMspManagement.getLocalMsp;
  * @company Dingxuan
  */
 public class MSPPrincipalGetter implements IMspPrincipalGetter {
-    public static final String Admins = "Admins";
-    public static final String Members = "Members";
+    public static final String ADMINS = "Admins";
+    public static final String MEMBERS = "Members";
 
     public MSPPrincipalGetter() {
     }
@@ -40,7 +40,7 @@ public class MSPPrincipalGetter implements IMspPrincipalGetter {
         String mspid = getLocalMsp().getIdentifier();
 
         switch (role) {
-            case Admins:
+            case ADMINS:
                 MspPrincipal.MSPRole mspAdmin = MspPrincipal.MSPRole.newBuilder()
                         .setMspIdentifier(mspid)
                         .setRole(MspPrincipal.MSPRole.MSPRoleType.ADMIN).build();
@@ -49,7 +49,7 @@ public class MSPPrincipalGetter implements IMspPrincipalGetter {
                         .setPrincipalClassification(MspPrincipal.MSPPrincipal.Classification.ROLE)
                         .setPrincipal(ByteString.copyFrom(principalBytes)).build();
                 return mspPrincipal;
-            case Members:
+            case MEMBERS:
                 MspPrincipal.MSPRole mspMembers = MspPrincipal.MSPRole.newBuilder()
                         .setMspIdentifier(mspid)
                         .setRole(MspPrincipal.MSPRole.MSPRoleType.ADMIN).build();

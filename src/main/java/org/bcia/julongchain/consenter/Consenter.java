@@ -38,7 +38,7 @@ public class Consenter {
         }
         String command = args[0];
         if (args.length == 1 && Constant.VERSION.equalsIgnoreCase(command)) {
-            log.info("Consentor version is V0.25!..");
+            //log.info("Consentor version is V0.25!..");
             iConsenterCmd = ConsenterCmdFactory.getInstance(command);
             String[] arg = new String[]{command};
             try {
