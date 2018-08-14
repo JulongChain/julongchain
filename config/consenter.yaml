@@ -123,8 +123,7 @@ fileLedger:
     # NOTE: If this is unset, a new temporary location will be chosen every time
     # the orderer is restarted, using the prefix specified by Prefix.
 #    location: /var/hyperledger/production/orderer
-    #location: /var/julongchain/production/consenter
-    location: F:\var\julongchain\production\consenter
+    location: /var/julongchain/production/consenter
     # The prefix to use when generating a ledger directory in temporary space.
     # Otherwise, this value is ignored.
     prefix: julongchain-consenterledger
