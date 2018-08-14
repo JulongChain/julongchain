@@ -19,8 +19,8 @@ import com.google.protobuf.ByteString;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.blockledger.IIterator;
 import org.bcia.julongchain.common.ledger.blockledger.ReadWriteBase;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 
@@ -34,7 +34,7 @@ import static org.bcia.julongchain.core.ledger.util.Util.getHashBytes;
  * @company Dingxuan
  */
 public class RamLedger extends ReadWriteBase {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(RamLedger.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(RamLedger.class);
     private static final Object LOCK = new Object();
 
     private int maxSize;
