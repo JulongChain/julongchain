@@ -17,8 +17,8 @@ package org.bcia.julongchain.node.cmd.server;
 
 import org.apache.commons.cli.ParseException;
 import org.bcia.julongchain.common.exception.NodeException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.node.Node;
 
 /**
@@ -30,7 +30,7 @@ import org.bcia.julongchain.node.Node;
  * @company Dingxuan
  */
 public class ServerStatusCmd extends AbstractNodeServerCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ServerStatusCmd.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ServerStatusCmd.class);
 
     public ServerStatusCmd(Node node) {
         super(node);

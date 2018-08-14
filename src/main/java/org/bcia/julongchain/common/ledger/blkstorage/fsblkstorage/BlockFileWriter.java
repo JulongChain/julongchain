@@ -17,8 +17,8 @@ package org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage;
 
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.util.IoUtil;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 import java.io.*;
 
@@ -30,7 +30,7 @@ import java.io.*;
  * @company Dingxuan
  */
 public class BlockFileWriter {
-	private static JavaChainLog log = JavaChainLogFactory.getLog(BlockFileWriter.class);
+	private static JulongChainLog log = JulongChainLogFactory.getLog(BlockFileWriter.class);
 
     private String filePath;
     private File file;

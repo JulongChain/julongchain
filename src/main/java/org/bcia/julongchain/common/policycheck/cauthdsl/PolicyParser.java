@@ -17,8 +17,8 @@
 package org.bcia.julongchain.common.policycheck.cauthdsl;
 import com.google.protobuf.ByteString;
 import org.bcia.julongchain.common.exception.PolicyException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policycheck.bean.Context;
 import org.bcia.julongchain.common.policycheck.bean.PolicyNode;
 import org.bcia.julongchain.common.util.proto.ProtoUtils;
@@ -27,7 +27,7 @@ import org.bcia.julongchain.protos.common.Policies;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.*;
+
 /**
  * 类描述
  * 签名策略脚本解析
@@ -36,7 +36,7 @@ import java.util.regex.*;
  * @company Aisino
  */
 public class PolicyParser {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(PolicyParser.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(PolicyParser.class);
     private static final int ARGS = 3;
     public static Context context;
     public static List<Policies.SignaturePolicy> policies = new ArrayList<Policies.SignaturePolicy>();

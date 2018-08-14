@@ -17,13 +17,13 @@ package org.bcia.julongchain.core.common.validation;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.ArrayUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.exception.VerifyException;
 import org.bcia.julongchain.common.groupconfig.capability.IApplicationCapabilities;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.common.util.proto.ProposalUtils;
 import org.bcia.julongchain.csp.factory.CspManager;
@@ -45,7 +45,7 @@ import org.bouncycastle.util.Arrays;
  * @company Dingxuan
  */
 public class MsgValidation {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(MsgValidation.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(MsgValidation.class);
 
     /**
      * 校验群组头部
@@ -196,7 +196,7 @@ public class MsgValidation {
         String expectTxId = null;
         try {
             expectTxId = ProposalUtils.computeProposalTxID(creator, nonce);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage(), e);
             throw new ValidateException("Can not get expectTxId");
         }
@@ -256,7 +256,7 @@ public class MsgValidation {
 
                 try {
                     proposalResponsePayload = validateEndorserTransaction(payload);
-                } catch (JavaChainException e) {
+                } catch (JulongChainException e) {
                     log.error(e.getMessage(), e);
                     return new Object[]{TransactionPackage.TxValidationCode.INVALID_ENDORSER_TRANSACTION};
                 } catch (InvalidProtocolBufferException e) {
@@ -289,7 +289,7 @@ public class MsgValidation {
     }
 
     private static ProposalResponsePackage.ProposalResponsePayload validateEndorserTransaction(Common.Payload payload)
-            throws JavaChainException, InvalidProtocolBufferException {
+            throws JulongChainException, InvalidProtocolBufferException {
         ValidateUtils.isNotNull(payload, "payload can not be null");
         ValidateUtils.isNotNull(payload.getHeader(), "payload.header can not be null");
         ValidateUtils.isNotNull(payload.getData(), "payload.data can not be null");

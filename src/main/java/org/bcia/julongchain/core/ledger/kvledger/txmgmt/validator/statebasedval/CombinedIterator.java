@@ -17,8 +17,8 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.validator.statebasedval
 
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.*;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.CompositeKey;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.UpdateBatch;
@@ -36,7 +36,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.Ver
  * @company Dingxuan
  */
 public class CombinedIterator implements IResultsIterator {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CombinedIterator.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(CombinedIterator.class);
 
     private String ns;
     private IVersionedDB db;

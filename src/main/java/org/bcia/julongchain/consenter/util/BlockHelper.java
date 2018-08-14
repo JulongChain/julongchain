@@ -16,10 +16,9 @@
 package org.bcia.julongchain.consenter.util;
 
 import com.google.protobuf.ByteString;
-import org.apache.commons.lang.ArrayUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.gm.dxct.sm3.SM3HashOpts;
 import org.bcia.julongchain.protos.common.Common;
 
@@ -31,7 +30,7 @@ import static org.bcia.julongchain.csp.factory.CspManager.getDefaultCsp;
  * @company Dingxuan
  */
 public class BlockHelper {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(BlockHelper.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BlockHelper.class);
     private  byte[] previousHash;
     private byte[] dataHash;
     private long number;
@@ -66,7 +65,7 @@ public class BlockHelper {
         byte[] digest = new byte[0];
         try {
             digest = getDefaultCsp().hash(data, new SM3HashOpts());
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         }
         return digest;

@@ -20,8 +20,8 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.blockledger.IFactory;
 import org.bcia.julongchain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.julongchain.common.ledger.util.IoUtil;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -37,7 +37,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class JsonLedgerFactory implements IFactory {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(JsonLedgerFactory.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(JsonLedgerFactory.class);
 
     private String directory;
     private static Map<String, ReadWriteBase> ledgers;

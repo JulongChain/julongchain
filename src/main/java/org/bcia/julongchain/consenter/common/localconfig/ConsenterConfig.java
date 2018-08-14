@@ -40,6 +40,7 @@ public class ConsenterConfig {
         private String gossipAddress;
         private String listenAddress;
         private String listenPort;
+        private String  version;
         private Map<String,String> tls;
         private Map<String,Integer> keepAlive;
         private String logLevel;
@@ -75,6 +76,14 @@ public class ConsenterConfig {
 
         public void setListenPort(String listenPort) {
             this.listenPort = listenPort;
+        }
+
+        public String getVersion() {
+            return version;
+        }
+
+        public void setVersion(String version) {
+            this.version = version;
         }
 
         public Map<String, String> getTls() {

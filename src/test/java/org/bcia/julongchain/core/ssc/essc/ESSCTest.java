@@ -3,7 +3,7 @@ package org.bcia.julongchain.core.ssc.essc;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.BaseJunit4Test;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.common.util.Utils;
 import org.bcia.julongchain.common.util.proto.ProposalUtils;
@@ -133,7 +133,7 @@ public class ESSCTest extends BaseJunit4Test {
                 assertThat(e.getClass().toString(),is("class java.lang.NullPointerException"));
                 //e.printStackTrace();
             }
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         }
 

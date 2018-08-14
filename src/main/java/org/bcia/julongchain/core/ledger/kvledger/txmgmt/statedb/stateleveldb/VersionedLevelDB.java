@@ -19,8 +19,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.StatedDB;
@@ -43,7 +43,7 @@ public class VersionedLevelDB implements IVersionedDB {
     private static final byte LAST_KEY_INDICATOR = 0x01;
     private static final byte[] SAVE_POINT_KEY = {0x00};
 
-	private static JavaChainLog log = JavaChainLogFactory.getLog(VersionedLevelDB.class);
+	private static JulongChainLog log = JulongChainLogFactory.getLog(VersionedLevelDB.class);
 
     private IDBProvider db;
     private String dbName;

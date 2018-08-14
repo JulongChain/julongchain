@@ -18,8 +18,8 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.validator.valimpl;
 import com.google.protobuf.ByteString;
 import org.bcia.julongchain.common.exception.InvalidTxException;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.proto.ProtoUtils;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
 import org.bcia.julongchain.core.ledger.TxPvtData;
@@ -50,7 +50,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class Helper {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Helper.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Helper.class);
 
     public static PvtUpdateBatch validateAndPreparePvtBatch(Block block, Map<Long, TxPvtData> pvtData) throws LedgerException{
         PvtUpdateBatch pvtUpdates = new PvtUpdateBatch();

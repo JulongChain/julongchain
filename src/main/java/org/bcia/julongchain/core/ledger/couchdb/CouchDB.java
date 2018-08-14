@@ -29,8 +29,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 import org.lightcouch.*;
 import java.io.InputStream;
@@ -50,7 +50,7 @@ import java.util.Map;
  */
 public class CouchDB {
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CouchDB.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(CouchDB.class);
     public int indexWarmCounter;
     private CouchDbClientBase dbc;
 

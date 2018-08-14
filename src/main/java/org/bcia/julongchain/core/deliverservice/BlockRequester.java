@@ -17,8 +17,8 @@ package org.bcia.julongchain.core.deliverservice;
 
 import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.common.localmsp.impl.LocalSigner;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.proto.TxUtils;
 import org.bcia.julongchain.core.deliverservice.blocksprovider.IBlocksDeliverer;
 import org.bcia.julongchain.core.deliverservice.blocksprovider.ILedgerInfo;
@@ -31,7 +31,7 @@ import org.bcia.julongchain.protos.consenter.Ab;
  * @company Dingxuan
  */
 public class BlockRequester {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(BlockRequester.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BlockRequester.class);
     private boolean tls;
     private String groupId;
     private IBlocksDeliverer client;

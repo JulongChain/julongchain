@@ -21,12 +21,12 @@ import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 import org.bcia.julongchain.common.deliver.DeliverHandler;
 import org.bcia.julongchain.common.deliver.DeliverServer;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.localmsp.impl.LocalSigner;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.common.broadcast.BroadCastHandler;
 import org.bcia.julongchain.consenter.common.multigroup.Registrar;
 import org.bcia.julongchain.gossip.GossipService;
@@ -45,7 +45,7 @@ import java.io.IOException;
 public class ConsenterServer {
     private int port = 7050;
     private Server server;
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ConsenterServer.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ConsenterServer.class);
 
     public void start() throws IOException {
         server = ServerBuilder.forPort(port)
@@ -101,7 +101,7 @@ public class ConsenterServer {
 
             } catch (IOException e) {
                 log.error(e.getMessage());
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 log.error(e.getMessage());
             }
         }

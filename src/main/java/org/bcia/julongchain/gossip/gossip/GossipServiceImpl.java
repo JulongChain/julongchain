@@ -16,8 +16,8 @@
 package org.bcia.julongchain.gossip.gossip;
 
 import org.bcia.julongchain.common.exception.GossipException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.smartcontract.shim.helper.Channel;
 import org.bcia.julongchain.gossip.CertStore;
 import org.bcia.julongchain.gossip.api.IJoinChannelMessage;
@@ -42,7 +42,7 @@ import java.util.Map;
 
 public class GossipServiceImpl implements  IGossip{
 
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(GossipServiceImpl.class);
+    private static final JulongChainLog log = JulongChainLogFactory.getLog(GossipServiceImpl.class);
 
     private byte[] selfIdentity;
     private Timestamp includeIdentityPeriod;

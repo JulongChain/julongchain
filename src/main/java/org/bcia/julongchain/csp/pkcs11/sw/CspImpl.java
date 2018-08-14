@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.csp.pkcs11.sw;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IHash;
 import org.bcia.julongchain.csp.intfs.IKey;
@@ -46,7 +46,7 @@ public class CspImpl implements ICsp {
     }
 
     @Override
-    public IKey keyGen(IKeyGenOpts opts) throws JavaChainException {
+    public IKey keyGen(IKeyGenOpts opts) throws JulongChainException {
 
 
         if (opts == null) {
@@ -176,18 +176,18 @@ public class CspImpl implements ICsp {
     }
 
     @Override
-    public IKey keyDeriv(IKey key, IKeyDerivOpts opts) throws JavaChainException {
+    public IKey keyDeriv(IKey key, IKeyDerivOpts opts) throws JulongChainException {
         return null;
     }
 
     @Override
-    public IKey keyImport(Object raw, IKeyImportOpts opts) throws JavaChainException {
+    public IKey keyImport(Object raw, IKeyImportOpts opts) throws JulongChainException {
         return null;
     }
 
 
     @Override
-    public IKey getKey(byte[] ski) throws JavaChainException {
+    public IKey getKey(byte[] ski) throws JulongChainException {
 /*
 		File dir = new File(PKCS11SwFactoryOpts.getPath());
         File[] files = dir.listFiles(); // 该文件目录下文件全部放入数组
@@ -212,7 +212,7 @@ public class CspImpl implements ICsp {
                     	PrivateKey prikey = gen.LoadPrivateKeyAsPEM(PKCS11SwFactoryOpts.getPath(), strAlg);
                     	PublicKey pubkey = gen.LoadPublicKeyAsPEM(PKCS11SwFactoryOpts.getPath(), strAlg);
                     }catch(IOException|NoSuchAlgorithmException|InvalidKeySpecException e) {
-                    	throw new JavaChainException("[JC_PKCS_SOFT]: LoadKey Error!");
+                    	throw new JulongChainException("[JC_PKCS_SOFT]: LoadKey Error!");
                     }
                 } else if (fileName.endsWith("key")) { // 判断文件名是否以.avi结尾
                     String strFileName = files[i].getAbsolutePath();
@@ -230,7 +230,7 @@ public class CspImpl implements ICsp {
 
 
     @Override
-    public byte[] hash(byte[] msg, IHashOpts opts) throws JavaChainException {
+    public byte[] hash(byte[] msg, IHashOpts opts) throws JulongChainException {
 
         HashImpl hashimpl = new HashImpl();
         if(opts instanceof PKCS11HashOpts.MD2Opts)
@@ -266,7 +266,7 @@ public class CspImpl implements ICsp {
     }
 
     @Override
-    public IHash getHash(IHashOpts opts) throws JavaChainException {
+    public IHash getHash(IHashOpts opts) throws JulongChainException {
 
         HashImpl hashimpl = new HashImpl();
         return hashimpl.getHash(opts.getAlgorithm());
@@ -274,7 +274,7 @@ public class CspImpl implements ICsp {
     }
 
     @Override
-    public byte[] sign(IKey key, byte[] digest, ISignerOpts opts) throws JavaChainException {
+    public byte[] sign(IKey key, byte[] digest, ISignerOpts opts) throws JulongChainException {
 
         if(((key instanceof RsaKeyOpts.RsaPriKey) && (opts instanceof RsaSignOpts))
                 ||((key instanceof EcdsaKeyOpts.EcdsaPriKey) && (opts instanceof EcdsaSignOpts))) {
@@ -283,12 +283,12 @@ public class CspImpl implements ICsp {
             byte[] signatura = signdata.signData(key, digest, opts.getAlgorithm());
             return signatura;
         }else {
-            throw new JavaChainException("[JC_PKCS_SOFT]:Parameter error or mismatch");
+            throw new JulongChainException("[JC_PKCS_SOFT]:Parameter error or mismatch");
         }
     }
 
     @Override
-    public boolean verify(IKey key, byte[] signature, byte[] digest, ISignerOpts opts) throws JavaChainException {
+    public boolean verify(IKey key, byte[] signature, byte[] digest, ISignerOpts opts) throws JulongChainException {
 
         if(((key instanceof RsaKeyOpts.RsaPriKey) && (opts instanceof RsaSignOpts))
                 ||((key instanceof EcdsaKeyOpts.EcdsaPriKey) && (opts instanceof EcdsaSignOpts))) {
@@ -296,12 +296,12 @@ public class CspImpl implements ICsp {
             boolean rv = verifydata.verifyData(key, digest, signature, opts.getAlgorithm());
             return rv;
         }else {
-            throw new JavaChainException("[JC_PKCS_SOFT]:Parameter error or mismatch");
+            throw new JulongChainException("[JC_PKCS_SOFT]:Parameter error or mismatch");
         }
     }
 
     @Override
-    public byte[] encrypt(IKey key, byte[] plaintext, IEncrypterOpts opts) throws JavaChainException {
+    public byte[] encrypt(IKey key, byte[] plaintext, IEncrypterOpts opts) throws JulongChainException {
 
         EncryptImpl encryptdata = new EncryptImpl();
         if (opts instanceof RsaEncrypterOpts) {
@@ -313,12 +313,12 @@ public class CspImpl implements ICsp {
                     ((AesEncrypterOpts) opts).getPadding());
             return encodedata;
         }else {
-            throw new JavaChainException("[JC_PKCS_SOFT]:Parameter error or mismatch");
+            throw new JulongChainException("[JC_PKCS_SOFT]:Parameter error or mismatch");
         }
     }
 
     @Override
-    public byte[] decrypt(IKey key, byte[] ciphertext, IDecrypterOpts opts) throws JavaChainException {
+    public byte[] decrypt(IKey key, byte[] ciphertext, IDecrypterOpts opts) throws JulongChainException {
         DecryptImpl decryptdata = new DecryptImpl();
         if (opts instanceof RsaDecrypterOpts) {
             byte[] data = decryptdata.decryptData(key, ciphertext, ((RsaDecrypterOpts) opts).getMode(),
@@ -329,12 +329,12 @@ public class CspImpl implements ICsp {
                     ((AesDecrypterOpts) opts).getMode());
             return data;
         }else {
-            throw new JavaChainException("[JC_PKCS_SOFT]:Parameter error or mismatch");
+            throw new JulongChainException("[JC_PKCS_SOFT]:Parameter error or mismatch");
         }
     }
 
     @Override
-    public byte[] rng(int len, IRngOpts opts) throws JavaChainException {
+    public byte[] rng(int len, IRngOpts opts) throws JulongChainException {
         byte[] none=new SecureRandom().engineGenerateSeed(len);
         return none;
     }

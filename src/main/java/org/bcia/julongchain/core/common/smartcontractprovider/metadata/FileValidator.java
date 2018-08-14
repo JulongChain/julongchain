@@ -18,8 +18,8 @@ package org.bcia.julongchain.core.common.smartcontractprovider.metadata;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 import java.util.Map;
 
@@ -31,7 +31,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class FileValidator {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(FileValidator.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(FileValidator.class);
 
     public FileValidator(){
 

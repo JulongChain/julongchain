@@ -16,34 +16,34 @@
 package org.bcia.julongchain.common.exception;
 
 /**
- * JavaChain异常父类
+ * JulongChain异常父类
  *
  * @author zhouhui
  * @date 2018/3/29
  * @company Dingxuan
  */
-public class JavaChainException extends Exception {
-    public JavaChainException() {
+public class JulongChainException extends Exception {
+    public JulongChainException() {
         super();
     }
 
-    public JavaChainException(String message) {
+    public JulongChainException(String message) {
         super(message);
     }
 
-    public JavaChainException(String message, Throwable cause) {
+    public JulongChainException(String message, Throwable cause) {
         super(message, cause);
     }
 
 
-    public JavaChainException(Throwable cause) {
+    public JulongChainException(Throwable cause) {
         super(cause);
     }
 
 
-    protected JavaChainException(String message, Throwable cause,
-                                 boolean enableSuppression,
-                                 boolean writableStackTrace) {
+    protected JulongChainException(String message, Throwable cause,
+                                   boolean enableSuppression,
+                                   boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 

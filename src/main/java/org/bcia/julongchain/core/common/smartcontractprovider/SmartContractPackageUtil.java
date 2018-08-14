@@ -16,9 +16,9 @@ limitations under the License.
 package org.bcia.julongchain.core.common.smartcontractprovider;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.SignedScDepSpec;
 
@@ -30,21 +30,21 @@ import org.bcia.julongchain.protos.node.SignedScDepSpec;
  * @company Dingxuan
  */
 public class SmartContractPackageUtil {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractPackageUtil.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SmartContractPackageUtil.class);
 
     /**
      * 从Envelope中解析处GroupHeader
      * @param env
      * @return
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public static Common.GroupHeader extractGroupHeaderFromEnvelope(Common.Envelope env) throws JavaChainException {
+    public static Common.GroupHeader extractGroupHeaderFromEnvelope(Common.Envelope env) throws JulongChainException {
         try {
             Common.Payload payload = Common.Payload.parseFrom(env.getPayload());
             return Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
         } catch (InvalidProtocolBufferException e) {
             log.error("Fail to unmarshal");
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         }
     }
 
@@ -52,15 +52,15 @@ public class SmartContractPackageUtil {
      * 从Envelope中解析处SignedSmartContractDeploymentSpec
      * @param env
      * @return
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public static SignedScDepSpec.SignedSmartContractDeploymentSpec extractSignedSmartContractDeploymentSpecFromEnvelope(Common.Envelope env) throws JavaChainException{
+    public static SignedScDepSpec.SignedSmartContractDeploymentSpec extractSignedSmartContractDeploymentSpecFromEnvelope(Common.Envelope env) throws JulongChainException {
         try {
             Common.Payload payload = Common.Payload.parseFrom(env.getPayload());
             return SignedScDepSpec.SignedSmartContractDeploymentSpec.parseFrom(payload.getData());
         } catch (InvalidProtocolBufferException e) {
             log.error("Fail to unmarshal");
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         }
     }
 }

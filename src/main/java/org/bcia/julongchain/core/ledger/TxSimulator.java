@@ -17,8 +17,8 @@ package org.bcia.julongchain.core.ledger;
 
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 import java.util.Map;
 
@@ -31,7 +31,7 @@ import java.util.Map;
  */
 public abstract class TxSimulator implements ITxSimulator {
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(TxSimulator.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(TxSimulator.class);
 
     @Override
     public void setState(String namespace, String key, byte[] value) throws

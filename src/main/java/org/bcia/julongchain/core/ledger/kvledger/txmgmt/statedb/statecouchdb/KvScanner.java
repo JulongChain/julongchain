@@ -17,8 +17,6 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.statecouchdb;
 
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 
 /**

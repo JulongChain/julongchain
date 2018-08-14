@@ -15,9 +15,9 @@
  */
 package org.bcia.julongchain.csp.gm.sdt.random;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.gm.sdt.jni.SMJniApi;
 
 /**
@@ -29,22 +29,22 @@ import org.bcia.julongchain.csp.gm.sdt.jni.SMJniApi;
  */
 public class GmRandom {
 
-    private static JavaChainLog logger = JavaChainLogFactory.getLog(GmRandom.class);
+    private static JulongChainLog logger = JulongChainLogFactory.getLog(GmRandom.class);
     private static SMJniApi smJniApi = new SMJniApi();
 
     /**
      * 产生随机数
      * @param length 随机数长度
      * @return 随机数
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public byte[] rng(int length) throws JavaChainException{
+    public byte[] rng(int length) throws JulongChainException {
         byte[] result = null;
         try {
             result = smJniApi.randomGen(length);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            throw new JavaChainException(e.getMessage());
+            throw new JulongChainException(e.getMessage());
         }
         return result;
     }

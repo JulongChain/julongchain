@@ -16,23 +16,12 @@
 package org.bcia.julongchain.core.ssc;
 
 import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.InprocVMException;
-import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.exception.SmartContractException;
 import org.bcia.julongchain.common.exception.SysSmartContractException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractContext;
-import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractProvider;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.container.inproccontroller.InprocController;
-import org.bcia.julongchain.core.ledger.INodeLedger;
-import org.bcia.julongchain.core.ledger.ITxSimulator;
-import org.bcia.julongchain.core.node.NodeConfig;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
-import org.bcia.julongchain.core.node.util.NodeUtils;
-import org.bcia.julongchain.core.smartcontract.SmartContractExecutor;
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContract;
 import org.bcia.julongchain.core.ssc.cssc.CSSC;
 import org.bcia.julongchain.core.ssc.essc.ESSC;
@@ -44,11 +33,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import javax.naming.*;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
@@ -73,7 +59,7 @@ import java.util.*;
 public class SystemSmartContractManager implements ISystemSmartContractManager {
     private SystemSmartContractDescriptor[] embedContractDescriptors = new SystemSmartContractDescriptor[5];
     private Map<String, ISystemSmartContract> sysSCMap = new HashMap<String, ISystemSmartContract>();
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SystemSmartContractManager.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SystemSmartContractManager.class);
 	private static final String PLUGIN_CLASS = "Plugin";
     private static final String PLUGIN_METHOD = "plugin";
     private static final String PLUGIN_SUFFIX = ".jar";

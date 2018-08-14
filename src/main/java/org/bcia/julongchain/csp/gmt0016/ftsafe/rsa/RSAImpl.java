@@ -16,9 +16,8 @@
 package org.bcia.julongchain.csp.gmt0016.ftsafe.rsa;
 
 import org.bcia.julongchain.common.exception.JCSKFException;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.SarException;
-import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspLog;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.IGMT0016FactoryOpts;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.util.BlockCipherParam;
@@ -54,9 +53,9 @@ public class RSAImpl {
      * @param lBits                 Size of Keypair
      * @param opts                  Skf factory
      * @return  IKey's instance
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public IKey generateRSAKey(String sContainerName, long lBits, IGMT0016FactoryOpts opts) throws JavaChainException {
+    public IKey generateRSAKey(String sContainerName, long lBits, IGMT0016FactoryOpts opts) throws JulongChainException {
 
         try {
             opts.getSKFFactory().SKF_VerifyPIN(opts.getAppHandle(), USER_TYPE, opts.getUserPin());
@@ -72,7 +71,7 @@ public class RSAImpl {
                 else {
                     String err = String.format("[JC_SKF]:JCSKFException ErrMessage: %s", ex.getMessage());
                     csplog.setLogMsg(err, 2, RSAImpl.class);
-                    throw new JavaChainException(err, ex.getCause());
+                    throw new JulongChainException(err, ex.getCause());
                 }
             }
 
@@ -113,32 +112,32 @@ public class RSAImpl {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(JCSKFException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:JCSKFException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(InvalidKeyException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:InvalidKeyException ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(NoSuchAlgorithmException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(IOException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:IOException ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }
     }
 
@@ -151,10 +150,10 @@ public class RSAImpl {
      * @param sContainerName        Container Name
      * @param opts                  Skf factory
      * @return IKey's instance
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     public IKey importRSAKey(long algid, byte[] derPublicKey, byte[] derPrivateKey,
-                             String sContainerName, IGMT0016FactoryOpts opts) throws JavaChainException {
+                             String sContainerName, IGMT0016FactoryOpts opts) throws JulongChainException {
         try {
             opts.getSKFFactory().SKF_VerifyPIN(opts.getAppHandle(), USER_TYPE, opts.getUserPin());
             List<String> appNamesList = opts.getSKFFactory().SKF_EnumContainer(opts.getAppHandle());
@@ -172,7 +171,7 @@ public class RSAImpl {
             {
                 String str = String.format("[JC_SKF]:No Find The Container %s!", sContainerName);
                 csplog.setLogMsg(str, 2, RSAImpl.class);
-                throw new JavaChainException(str);
+                throw new JulongChainException(str);
             }
 
             long type = opts.getSKFFactory().SKF_GetContainerType(lContainerHandle);
@@ -180,7 +179,7 @@ public class RSAImpl {
             {
                 String str = String.format("[JC_SKF]:The Container is not RSA!");
                 csplog.setLogMsg(str, 2, RSAImpl.class);
-                throw new JavaChainException(str);
+                throw new JulongChainException(str);
             }
 
             SKFCspKey.RSAPublicKeyBlob publicKeyBlob =
@@ -216,7 +215,7 @@ public class RSAImpl {
             if(!compereByteArray(pubder, derPublicKey))
             {
                 csplog.setLogMsg("[JC_SKF]: Import Encrypt Key Error!", 2, RSAImpl.class);
-                throw new JavaChainException("[JC_SKF]: Import Encrypt Key Error!");
+                throw new JulongChainException("[JC_SKF]: Import Encrypt Key Error!");
             }
             //public hash (no need, maybe need)
             byte[] PublicHash = getPublicHash(KeyBlob.getModulus(), KeyBlob.getPublicExponent());
@@ -232,32 +231,32 @@ public class RSAImpl {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(JCSKFException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:JCSKFException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(InvalidKeyException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:InvalidKeyException ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(NoSuchAlgorithmException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(IOException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:IOException ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }
     }
 
@@ -267,9 +266,9 @@ public class RSAImpl {
      * @param bSignFlag         Signatures or encrypted identities
      * @param opts              Skf factory
      * @return IKey's instance
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public IKey getRSAKey(String sContainerName, boolean bSignFlag, IGMT0016FactoryOpts opts) throws JavaChainException {
+    public IKey getRSAKey(String sContainerName, boolean bSignFlag, IGMT0016FactoryOpts opts) throws JulongChainException {
         try {
             List<String> appNamesList = opts.getSKFFactory().SKF_EnumContainer(opts.getAppHandle());
             boolean bFind = false;
@@ -316,32 +315,32 @@ public class RSAImpl {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(JCSKFException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:JCSKFException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(InvalidKeyException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:InvalidKeyException ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(NoSuchAlgorithmException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(IOException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:IOException ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }
 
     }
@@ -352,9 +351,9 @@ public class RSAImpl {
      * @param sContainerName    Container Name
      * @param opts              Skf factory
      * @return signature value
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public byte[] getRSASign(byte[] digest, String sContainerName, IGMT0016FactoryOpts opts) throws JavaChainException {
+    public byte[] getRSASign(byte[] digest, String sContainerName, IGMT0016FactoryOpts opts) throws JulongChainException {
         try {
             List<String> appNamesList = opts.getSKFFactory().SKF_EnumContainer(opts.getAppHandle());
             boolean bFind = false;
@@ -370,14 +369,14 @@ public class RSAImpl {
             {
                 String str = String.format("[JC_SKF]:No Find The Container %s!", sContainerName);
                 csplog.setLogMsg(str, 2, RSAImpl.class);
-                throw new JavaChainException(str);
+                throw new JulongChainException(str);
             }
             long type = opts.getSKFFactory().SKF_GetContainerType(lContainerHandle);
             if(type != 1)
             {
                 String str = String.format("[JC_SKF]:The Container %s' Type is not RSA", sContainerName);
                 csplog.setLogMsg(str, 2, RSAImpl.class);
-                throw new JavaChainException(str);
+                throw new JulongChainException(str);
             }
 
             byte[] signature = opts.getSKFFactory().SKF_RSASignData(lContainerHandle, digest, digest.length);
@@ -387,12 +386,12 @@ public class RSAImpl {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(JCSKFException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:JCSKFException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }
     }
 
@@ -403,10 +402,10 @@ public class RSAImpl {
      * @param sContainerName    Container Name
      * @param opts              Skf factory
      * @return success/error
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     public boolean getRSAVerify(byte[] signature, byte[] digest, String sContainerName, IGMT0016FactoryOpts opts)
-            throws JavaChainException{
+            throws JulongChainException {
 
         try {
             List<String> appNamesList = opts.getSKFFactory().SKF_EnumContainer(opts.getAppHandle());
@@ -423,14 +422,14 @@ public class RSAImpl {
             {
                 String str = String.format("[JC_SKF]:No Find The Container %s!", sContainerName);
                 csplog.setLogMsg(str, 2, RSAImpl.class);
-                throw new JavaChainException(str);
+                throw new JulongChainException(str);
             }
             long type = opts.getSKFFactory().SKF_GetContainerType(lContainerHandle);
             if(type != 1)
             {
                 String str = String.format("[JC_SKF]:The Container %s' Type is not RSA", sContainerName);
                 csplog.setLogMsg(str, 2, RSAImpl.class);
-                throw new JavaChainException(str);
+                throw new JulongChainException(str);
             }
 
             SKFCspKey.RSAPublicKeyBlob publicKeyBlob = (SKFCspKey.RSAPublicKeyBlob)opts.getSKFFactory().SKF_ExportPublicKey(
@@ -445,12 +444,12 @@ public class RSAImpl {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(JCSKFException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:JCSKFException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, RSAImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }
 
     }

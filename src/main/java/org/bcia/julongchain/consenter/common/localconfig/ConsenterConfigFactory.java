@@ -15,10 +15,9 @@
  */
 package org.bcia.julongchain.consenter.common.localconfig;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
-import org.bcia.julongchain.core.node.NodeConfig;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
@@ -31,7 +30,7 @@ import java.io.InputStream;
  * @company Dingxuan
  */
 public class ConsenterConfigFactory {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ConsenterConfigFactory.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ConsenterConfigFactory.class);
 
     public static ConsenterConfig loadConsenterConfig() {
         Yaml yaml = new Yaml();

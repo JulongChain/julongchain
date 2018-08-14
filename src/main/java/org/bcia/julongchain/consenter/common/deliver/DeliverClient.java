@@ -5,8 +5,8 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import org.bcia.julongchain.common.localmsp.ILocalSigner;
 import org.bcia.julongchain.common.localmsp.impl.LocalSigner;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
 import org.bcia.julongchain.protos.common.Common;
 
@@ -24,7 +24,7 @@ import static org.bcia.julongchain.protos.consenter.AtomicBroadcastGrpc.*;
  */
 @Component
 public class DeliverClient {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(DeliverClient.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(DeliverClient.class);
     /**
      * deliver 发送方法
      * @param ip

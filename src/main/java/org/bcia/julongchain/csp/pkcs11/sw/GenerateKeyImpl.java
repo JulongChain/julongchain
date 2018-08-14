@@ -54,7 +54,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESedeKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.pkcs11.ecdsa.EcdsaKeyOpts;
 import org.bcia.julongchain.csp.pkcs11.rsa.RsaKeyOpts;
@@ -213,7 +213,7 @@ public class GenerateKeyImpl {
         return privateKey;
     }
 
-    public static void savePublicKeyAsPEM(byte[] encode, String path) throws JavaChainException {
+    public static void savePublicKeyAsPEM(byte[] encode, String path) throws JulongChainException {
         try {
             String content = Base64Utils.encode(encode).toString();
             File file = new File(path + "/public.pem");
@@ -235,20 +235,20 @@ public class GenerateKeyImpl {
         }catch(FileNotFoundException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:FileNotFoundException ErrMessage: %s", e.getMessage());
-            throw new JavaChainException(err, e.getCause());
+            throw new JulongChainException(err, e.getCause());
         }catch(IOException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:IOException ErrMessage: %s", e.getMessage());
-            throw new JavaChainException(err, e.getCause());
+            throw new JulongChainException(err, e.getCause());
         }
     }
 
-    public static void savePrivateKeyAsPEM(byte[] encode, String path) throws JavaChainException {
+    public static void savePrivateKeyAsPEM(byte[] encode, String path) throws JulongChainException {
         try {
             String content = Base64Utils.encode(encode).toString();
             File file = new File(path + "/private.pem");
             if ( file.isFile() && file.exists() )
-                throw new JavaChainException("file already exists");
+                throw new JulongChainException("file already exists");
             try (RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw")) {
                 randomAccessFile.write("-----BEGIN PRIVATE KEY-----\n".getBytes());
                 int i = 0;
@@ -265,11 +265,11 @@ public class GenerateKeyImpl {
         }catch(FileNotFoundException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:FileNotFoundException ErrMessage: %s", e.getMessage());
-            throw new JavaChainException(err, e.getCause());
+            throw new JulongChainException(err, e.getCause());
         }catch(IOException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:IOException ErrMessage: %s", e.getMessage());
-            throw new JavaChainException(err, e.getCause());
+            throw new JulongChainException(err, e.getCause());
         }
     }
 
@@ -320,7 +320,7 @@ public class GenerateKeyImpl {
         return keyFactory.generatePublic(spec);
     }
 
-    public static IKey genDESedeKey() throws JavaChainException{
+    public static IKey genDESedeKey() throws JulongChainException {
 
         try {
             //1.初始化key秘钥
@@ -342,20 +342,20 @@ public class GenerateKeyImpl {
         }catch(NoSuchAlgorithmException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:NoSuchAlgorithmException ErrMessage: %s", e.getMessage());
-            throw new JavaChainException(err, e.getCause());
+            throw new JulongChainException(err, e.getCause());
         }catch(InvalidKeyException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:InvalidKeyException ErrMessage: %s", e.getMessage());
-            throw new JavaChainException(err, e.getCause());
+            throw new JulongChainException(err, e.getCause());
         }catch(InvalidKeySpecException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:InvalidKeySpecException ErrMessage: %s", e.getMessage());
-            throw new JavaChainException(err, e.getCause());
+            throw new JulongChainException(err, e.getCause());
         }
 
     }
 
-    public IKey genAESKey(int size) throws JavaChainException{
+    public IKey genAESKey(int size) throws JulongChainException {
 
         try {
             //1.构造密钥生成器，指定为AES算法,不区分大小写
@@ -377,12 +377,12 @@ public class GenerateKeyImpl {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:NoSuchAlgorithmException ErrMessage: %s", e.getMessage());
-            throw new JavaChainException(err, e.getCause());
+            throw new JulongChainException(err, e.getCause());
         }
     }
 
 
-    public IKey genRsaKey(int size) throws JavaChainException{
+    public IKey genRsaKey(int size) throws JulongChainException {
         try {
             KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
             generator.initialize(size, new SecureRandom());
@@ -404,16 +404,16 @@ public class GenerateKeyImpl {
         }catch(NoSuchAlgorithmException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(IOException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:IOException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }
     }
 
 
-    public IKey genEcdsaKey(String curveName) throws JavaChainException{
+    public IKey genEcdsaKey(String curveName) throws JulongChainException {
         try {
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC","SunEC");
             ECGenParameterSpec ecGenParameterSpec = new ECGenParameterSpec(curveName);
@@ -441,15 +441,15 @@ public class GenerateKeyImpl {
         }catch(NoSuchAlgorithmException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(InvalidAlgorithmParameterException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:InvalidAlgorithmParameterException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(NoSuchProviderException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:NoSuchProviderException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }
 
 
@@ -477,7 +477,7 @@ public class GenerateKeyImpl {
         return tempdata;
     }
 
-    public IKey getDESedeKey(byte[] keybyte) throws JavaChainException{
+    public IKey getDESedeKey(byte[] keybyte) throws JulongChainException {
         try {
             //通过读取到的key  获取到key秘钥对象
             DESedeKeySpec deSedeKeySpec=new DESedeKeySpec(keybyte);
@@ -490,15 +490,15 @@ public class GenerateKeyImpl {
         }catch(NoSuchAlgorithmException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:NoSuchAlgorithmException ErrMessage: %s", e.getMessage());
-            throw new JavaChainException(err, e.getCause());
+            throw new JulongChainException(err, e.getCause());
         }catch(InvalidKeyException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:InvalidKeyException ErrMessage: %s", e.getMessage());
-            throw new JavaChainException(err, e.getCause());
+            throw new JulongChainException(err, e.getCause());
         }catch(InvalidKeySpecException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:InvalidKeySpecException ErrMessage: %s", e.getMessage());
-            throw new JavaChainException(err, e.getCause());
+            throw new JulongChainException(err, e.getCause());
         }
     }
 
@@ -512,7 +512,7 @@ public class GenerateKeyImpl {
     }
 
 
-    public IKey getRsaKey(byte[] publicder, byte[] privateder) throws JavaChainException{
+    public IKey getRsaKey(byte[] publicder, byte[] privateder) throws JulongChainException {
         try {
             MessageDigest shahash = MessageDigest.getInstance("SHA-1");
             shahash.update(publicder);
@@ -523,11 +523,11 @@ public class GenerateKeyImpl {
         }catch(NoSuchAlgorithmException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }
     }
 
-    public IKey getRsaKey(byte[] publicder) throws JavaChainException{
+    public IKey getRsaKey(byte[] publicder) throws JulongChainException {
         try {
             MessageDigest shahash = MessageDigest.getInstance("SHA-1");
             shahash.update(publicder);
@@ -537,12 +537,12 @@ public class GenerateKeyImpl {
         }catch(NoSuchAlgorithmException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }
     }
 
 
-    public IKey getEcdsaKey(byte[] publicder, byte[] privateder) throws JavaChainException{
+    public IKey getEcdsaKey(byte[] publicder, byte[] privateder) throws JulongChainException {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance("EC");
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicder);
@@ -567,16 +567,16 @@ public class GenerateKeyImpl {
         }catch(NoSuchAlgorithmException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(InvalidKeySpecException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:InvalidKeySpecException ErrMessage: %s", e.getMessage());
-            throw new JavaChainException(err, e.getCause());
+            throw new JulongChainException(err, e.getCause());
         }
     }
 
 
-    public IKey getEcdsaKey(byte[] publicder) throws JavaChainException{
+    public IKey getEcdsaKey(byte[] publicder) throws JulongChainException {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance("EC");
             X509EncodedKeySpec keySpec = new X509EncodedKeySpec(publicder);
@@ -600,11 +600,11 @@ public class GenerateKeyImpl {
         }catch(NoSuchAlgorithmException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(InvalidKeySpecException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:InvalidKeySpecException ErrMessage: %s", e.getMessage());
-            throw new JavaChainException(err, e.getCause());
+            throw new JulongChainException(err, e.getCause());
         }
     }
 }

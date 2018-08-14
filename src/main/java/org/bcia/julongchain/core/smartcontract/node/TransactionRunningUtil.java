@@ -15,8 +15,8 @@ package org.bcia.julongchain.core.smartcontract.node;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.julongchain.protos.node.SmartContractShim;
 
@@ -31,8 +31,8 @@ import java.util.*;
  */
 public class TransactionRunningUtil {
 
-  private static final JavaChainLog logger =
-      JavaChainLogFactory.getLog(TransactionRunningUtil.class);
+  private static final JulongChainLog logger =
+      JulongChainLogFactory.getLog(TransactionRunningUtil.class);
 
   public static final String TX_STATUS_START = "start";
   public static final String TX_STATUS_COMPLETE = "complete";

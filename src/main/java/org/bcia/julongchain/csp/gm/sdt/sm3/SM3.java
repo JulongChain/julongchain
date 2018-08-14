@@ -15,9 +15,9 @@
  */
 package org.bcia.julongchain.csp.gm.sdt.sm3;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.gm.sdt.common.Constants;
 import org.bcia.julongchain.csp.gm.sdt.jni.SMJniApi;
 
@@ -30,7 +30,7 @@ import org.bcia.julongchain.csp.gm.sdt.jni.SMJniApi;
  */
 public class SM3 {
 
-    private static JavaChainLog logger = JavaChainLogFactory.getLog( SM3.class );
+    private static JulongChainLog logger = JulongChainLogFactory.getLog( SM3.class );
     private static SMJniApi smJniApi = new SMJniApi();
 
     /**
@@ -46,15 +46,15 @@ public class SM3 {
      * 计算消息摘要值
      * @param message 消息数据
      * @return 摘要值
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public byte[] hash(byte[] message) throws JavaChainException{
+    public byte[] hash(byte[] message) throws JulongChainException {
         byte[] result = null;
         try {
             result = smJniApi.sm3Hash(message);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            throw new JavaChainException(e.getMessage());
+            throw new JulongChainException(e.getMessage());
         }
         return result;
     }

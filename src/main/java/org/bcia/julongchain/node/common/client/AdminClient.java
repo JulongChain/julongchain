@@ -18,8 +18,8 @@ package org.bcia.julongchain.node.common.client;
 import com.google.protobuf.Empty;
 import io.grpc.ManagedChannel;
 import io.grpc.netty.NettyChannelBuilder;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.protos.node.AdminGrpc;
 
@@ -31,7 +31,7 @@ import org.bcia.julongchain.protos.node.AdminGrpc;
  * @company Dingxuan
  */
 public class AdminClient implements IAdminClient {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(AdminClient.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(AdminClient.class);
     /**
      * 主机地址
      */

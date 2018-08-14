@@ -15,11 +15,11 @@ limitations under the License.
  */
 package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.statecouchdb;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.UpdateBatch;
@@ -44,7 +44,7 @@ import java.util.regex.Pattern;
  * @company Dingxuan
  */
 public class VersionedCouchDB implements IVersionedDB, ISmartContractLifecycleEventListener {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(VersionedCouchDB.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(VersionedCouchDB.class);
 
     private static final String BINARY_WRAPPER = "valueBytes";
     private static final String ID_FIELD = "_id";
@@ -243,10 +243,10 @@ public class VersionedCouchDB implements IVersionedDB, ISmartContractLifecycleEv
     }
 
     @Override
-    public void handleSmartContractDeploy(SmartContractDefinition smartContractDefinition, byte[] dbArtifactsTar) throws JavaChainException {
+    public void handleSmartContractDeploy(SmartContractDefinition smartContractDefinition, byte[] dbArtifactsTar) throws JulongChainException {
         log.debug("Entering handleSmartContractDeploy()");
         if(smartContractDefinition == null){
-            throw new JavaChainException("Found null smartContractDefinition while creating couchdb index on group " + groupName);
+            throw new JulongChainException("Found null smartContractDefinition while creating couchdb index on group " + groupName);
         }
 		// TODO: 7/19/18 couchdb create index
 	}

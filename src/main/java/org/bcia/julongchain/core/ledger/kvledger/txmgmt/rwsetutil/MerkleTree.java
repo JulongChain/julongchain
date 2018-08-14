@@ -18,8 +18,8 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil;
 import com.google.protobuf.ByteString;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
@@ -37,7 +37,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class MerkleTree {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(MerkleTree.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(MerkleTree.class);
     private static final int LEAF_LEVEL = 1;
 
     private Map<Integer, List<byte[]>> tree;

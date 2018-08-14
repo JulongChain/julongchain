@@ -20,8 +20,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
 import org.bcia.julongchain.common.localmsp.ILocalSigner;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.proto.TxUtils;
 import org.bcia.julongchain.protos.common.Common;
 
@@ -31,7 +31,7 @@ import org.bcia.julongchain.protos.common.Common;
  * @company Dingxuan
  */
 public class CommonUtils {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CommonUtils.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(CommonUtils.class);
 
     public static byte[] marshlOrPanic(Message message){
         return marshal(message);

@@ -23,8 +23,8 @@ import org.bcia.julongchain.common.groupconfig.GroupConfigBundle;
 import org.bcia.julongchain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.julongchain.common.groupconfig.config.IConsenterConfig;
 import org.bcia.julongchain.common.groupconfig.config.IGroupConfig;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.util.CommonUtils;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
@@ -35,7 +35,7 @@ import org.bcia.julongchain.protos.common.Configtx;
  * @company Dingxuan
  */
 public class SystemGroupFilter implements IRule {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SystemGroupFilter.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SystemGroupFilter.class);
     private IChainCreator chainCreator;
     private IGroupConfig groupConfig;
 

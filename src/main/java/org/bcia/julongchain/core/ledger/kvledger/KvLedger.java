@@ -19,8 +19,8 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IPrunePolicy;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.common.ledger.blkstorage.IBlockStore;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.*;
 import org.bcia.julongchain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.julongchain.core.ledger.kvledger.history.historydb.IHistoryDB;
@@ -46,7 +46,7 @@ import java.util.*;
  */
 public class KvLedger implements INodeLedger {
 
-	private static JavaChainLog log = JavaChainLogFactory.getLog(KvLedger.class);
+	private static JulongChainLog log = JulongChainLogFactory.getLog(KvLedger.class);
 
 	private String ledgerID;
 	private IBlockStore blockStore;

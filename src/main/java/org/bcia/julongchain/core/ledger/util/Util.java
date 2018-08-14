@@ -17,10 +17,10 @@ package org.bcia.julongchain.core.ledger.util;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.factory.CspManager;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
@@ -41,7 +41,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class Util {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Util.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Util.class);
     /**
      * 获取Envelope结构
      */
@@ -179,7 +179,7 @@ public class Util {
         if (bytes != null) {
             try {
                 target = CspManager.getDefaultCsp().hash(bytes, null);
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 throw new LedgerException(e);
             }
         }

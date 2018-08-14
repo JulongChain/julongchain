@@ -22,7 +22,7 @@ package org.bcia.julongchain.common.exception;
  * @date 2018/06/05
  * @company Dingxuan
  */
-public class ConfigtxToolsException extends JavaChainException {
+public class ConfigtxToolsException extends JulongChainException {
     private static final String MODULE_NAME = "[ConfigtxGen]";
 
     public ConfigtxToolsException() {

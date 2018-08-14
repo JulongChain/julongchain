@@ -15,23 +15,17 @@
  */
 package org.bcia.julongchain.common.deliver;
 
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.ConsenterException;
-import org.bcia.julongchain.common.exception.GossipException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.ledger.blockledger.IIterator;
 import org.bcia.julongchain.common.ledger.blockledger.file.FileLedgerIterator;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.common.util.Expiration;
-import org.bcia.julongchain.common.util.proto.ProtoUtils;
-import org.bcia.julongchain.consenter.common.cmd.impl.StartCmd;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
 import org.bcia.julongchain.consenter.util.CommonUtils;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
-import org.bcia.julongchain.gossip.GossipServiceUtil;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 
@@ -44,7 +38,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class DeliverHandler implements IHandler {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(DeliverHandler.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(DeliverHandler.class);
     private ISupportManager sm;
     private long timeWindow;
     private boolean mutualTLS;

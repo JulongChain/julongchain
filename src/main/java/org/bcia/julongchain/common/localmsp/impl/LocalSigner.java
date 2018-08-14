@@ -17,8 +17,8 @@ package org.bcia.julongchain.common.localmsp.impl;
 
 import com.google.protobuf.ByteString;
 import org.bcia.julongchain.common.localmsp.ILocalSigner;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.msp.mgmt.Identity;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.protos.common.Common;
@@ -30,7 +30,7 @@ import org.bcia.julongchain.protos.common.Common;
  * @company Dingxuan
  */
 public class LocalSigner implements ILocalSigner {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(LocalSigner.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(LocalSigner.class);
 
     public LocalSigner() {
     }

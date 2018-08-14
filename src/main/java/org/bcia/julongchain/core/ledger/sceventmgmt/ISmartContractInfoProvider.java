@@ -15,7 +15,7 @@ limitations under the License.
  */
 package org.bcia.julongchain.core.ledger.sceventmgmt;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 
 /**
  * 智能合约信息提供者接口
@@ -32,12 +32,12 @@ public interface ISmartContractInfoProvider {
      * @param smartContractDefinition
      * @return
      */
-    boolean isSmartContractDeployed(String groupID, SmartContractDefinition smartContractDefinition) throws JavaChainException;
+    boolean isSmartContractDeployed(String groupID, SmartContractDefinition smartContractDefinition) throws JulongChainException;
 
     /**
      * 查询智能合约实体
      * @param smartContractDefinition
      * @return
      */
-    byte[] retrieveSmartContractArtifacts(SmartContractDefinition smartContractDefinition) throws JavaChainException;
+    byte[] retrieveSmartContractArtifacts(SmartContractDefinition smartContractDefinition) throws JulongChainException;
 }

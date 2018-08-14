@@ -16,8 +16,8 @@
 package org.bcia.julongchain.common.ledger.util.leveldbhelper;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +30,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class UpdateBatch  {
-	private static JavaChainLog log = JavaChainLogFactory.getLog(UpdateBatch.class);
+	private static JulongChainLog log = JulongChainLogFactory.getLog(UpdateBatch.class);
 
 	private Map<byte[],byte[]> kvs = new HashMap<>();
 

@@ -13,11 +13,11 @@
 # limitations under the License.
 #
 FROM julongchain/julongchain-baseimage
-COPY julongchain.jar /root/julongchain
-COPY config/ /root/julongchain/config
-COPY msp/ /root/julongchain/msp
-COPY lib/ /root/julongchain/lib
-COPY libsdtsmjni.so /lib
-COPY libsdtsm.so /lib
+COPY pom.xml /root/julongchain
+COPY src/ /root/julongchain/src
 WORKDIR /root/julongchain
-CMD java -jar /root/julongchain/julongchain.jar consenter start
+ENV CORE_NODE_ADDRESS #core_node_address#
+RUN mvn package
+RUN rm -rf /root/julongchain/pom.xml
+RUN rm -rf /root/julongchain/src
+CMD java -jar /root/julongchain/target/julongchain-smartcontract-java-jar-with-dependencies.jar -i #smart_contract_id -a #core_node_address_and_port

@@ -1,5 +1,6 @@
 package org.bcia.julongchain.csp.gm;
 
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.factory.IFactoryOpts;
 import org.bcia.julongchain.csp.gm.dxct.GmCsp;
 import org.bcia.julongchain.csp.gm.dxct.GmCspFactory;
@@ -12,7 +13,6 @@ import org.bcia.julongchain.csp.gm.dxct.sm4.SM4KeyGenOpts;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.intfs.opts.IHashOpts;
-import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemObjectParser;
@@ -85,7 +85,7 @@ public class GmCspTest {
          System.out.println("generate the SM2 PublicKey:"+Hex.toHexString(sm2key.getPublicKey().toBytes()));
          IKey sm4key=getDefaultCsp().keyGen(new SM4KeyGenOpts());
          System.out.println("SM4 Key:"+Hex.toHexString(sm4key.toBytes()));
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         }
 
@@ -120,7 +120,7 @@ public class GmCspTest {
             System.out.println(encodedHexDigests);
             Assert.assertArrayEquals(digests, expectedHashMsg);
             System.out.println("Hash Unit Test 1 passed!");
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -144,7 +144,7 @@ public class GmCspTest {
             System.out.println(encodedHexDigests);
             Assert.assertArrayEquals(digests, expectedHashMsg);
             System.out.println("Hash Unit Test 2 passed!");
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -166,7 +166,7 @@ public class GmCspTest {
             System.out.println(encodedHexDigests);
             Assert.assertArrayEquals(digests, expectedHashMsg);
             System.out.println("Hash Unit By Tester passed!");
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         }
     }
@@ -188,7 +188,7 @@ public class GmCspTest {
     }
 
     @Test
-    public void encrypt() throws JavaChainException {
+    public void encrypt() throws JulongChainException {
         GmFactoryOpts opts = new GmFactoryOpts();
         GmCsp gmCsp = new GmCsp(opts);
         SM4Key sm4Key = new SM4Key();

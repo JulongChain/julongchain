@@ -16,14 +16,11 @@
 package org.bcia.julongchain.consenter;
 
 import org.apache.commons.cli.ParseException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.common.cmd.IConsenterCmd;
 import org.bcia.julongchain.consenter.common.cmd.factory.ConsenterCmdFactory;
 import org.bcia.julongchain.consenter.util.Constant;
-
-import java.io.File;
-import java.nio.file.Files;
 
 /**
  * @author zhangmingyang
@@ -31,7 +28,7 @@ import java.nio.file.Files;
  * @company Dingxuan
  */
 public class Consenter {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Consenter.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Consenter.class);
     private IConsenterCmd iConsenterCmd;
 
     public void execCmd(String[] args) {
@@ -41,7 +38,7 @@ public class Consenter {
         }
         String command = args[0];
         if (args.length == 1 && Constant.VERSION.equalsIgnoreCase(command)) {
-            log.info("Consentor version is V0.25!..");
+            //log.info("Consentor version is V0.25!..");
             iConsenterCmd = ConsenterCmdFactory.getInstance(command);
             String[] arg = new String[]{command};
             try {

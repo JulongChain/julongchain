@@ -16,8 +16,8 @@
 package org.bcia.julongchain.csp.factory;
 
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.csp.gm.dxct.GmFactoryOpts;
 import org.bcia.julongchain.csp.gm.sdt.SdtGmFactoryOpts;
@@ -32,7 +32,7 @@ import java.util.*;
  * @company Dingxuan
  */
 public class CspOptsManager {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CspOptsManager.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(CspOptsManager.class);
 
     private  Map<String, IFactoryOpts> factoryOptsMap = new HashMap<>();
     private  List<IFactoryOpts> factoryOptsList = new ArrayList<>();

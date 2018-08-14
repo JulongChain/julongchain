@@ -16,10 +16,10 @@ limitations under the License.
 package org.bcia.julongchain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 
 import com.google.protobuf.ByteString;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.BlockAndPvtData;
 import org.bcia.julongchain.core.ledger.IQueryExecutor;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
@@ -47,7 +47,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class LockBasedTxManager implements ITxManager {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(LockBasedTxManager.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(LockBasedTxManager.class);
 
     private String ledgerID;
     private IDB db;
@@ -162,7 +162,7 @@ public class LockBasedTxManager implements ITxManager {
         }
     }
 
-    private void invokeNamespaceListeners(UpdateBatch batch) throws JavaChainException {
+    private void invokeNamespaceListeners(UpdateBatch batch) throws JulongChainException {
         List<String> namespaces = batch.getPubUpdateBatch().getBatch().getUpdatedNamespaces();
         for(String ns : namespaces){
         	if(stateListeners == null){

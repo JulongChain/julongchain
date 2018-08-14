@@ -15,9 +15,8 @@
  */
 package org.bcia.julongchain.csp.gmt0016.ftsafe.symmetry;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.SarException;
-import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspLog;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.IGMT0016FactoryOpts;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.util.BlockCipherParam;
@@ -40,9 +39,9 @@ public class SymmetryImpl {
      * @param blockCipherParam  BlockCipher for skf
      * @param opts              Gmt0016 factory
      * @return  Enciphered data
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public byte[] SymmetryEncrypt(byte[] plaintext, long lKeyHandle, BlockCipherParam blockCipherParam, IGMT0016FactoryOpts opts) throws JavaChainException {
+    public byte[] SymmetryEncrypt(byte[] plaintext, long lKeyHandle, BlockCipherParam blockCipherParam, IGMT0016FactoryOpts opts) throws JulongChainException {
         try {
 
             opts.getSKFFactory().SKF_EncryptInit(lKeyHandle, blockCipherParam);
@@ -53,12 +52,12 @@ public class SymmetryImpl {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, SymmetryImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, SymmetryImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }
 
     }
@@ -70,9 +69,9 @@ public class SymmetryImpl {
      * @param blockCipherParam  BlockCipher for skf
      * @param opts              Gmt0016 factory
      * @return  Plaint text
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public byte[] SymmetryDecrypt(byte[] ciphertext, long lKeyHandle, BlockCipherParam blockCipherParam, IGMT0016FactoryOpts opts) throws JavaChainException {
+    public byte[] SymmetryDecrypt(byte[] ciphertext, long lKeyHandle, BlockCipherParam blockCipherParam, IGMT0016FactoryOpts opts) throws JulongChainException {
         try {
 
             opts.getSKFFactory().SKF_DecryptInit(lKeyHandle, blockCipherParam);
@@ -83,12 +82,12 @@ public class SymmetryImpl {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, SymmetryImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, SymmetryImpl.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }
     }
 }

@@ -16,8 +16,8 @@
 package org.bcia.julongchain.consenter.consensus.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.common.blockcutter.BlockCutter;
 import org.bcia.julongchain.consenter.consensus.IChain;
 import org.bcia.julongchain.consenter.entity.ChainEntity;
@@ -42,7 +42,7 @@ import java.util.Map;
  */
 public class Chain implements IChain {
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Node1.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Node1.class);
     //TODO 使用自动注入报错，暂时new方式
     private DataMessageHandle dataMessageHandle=new DataMessageHandle();
     @Autowired

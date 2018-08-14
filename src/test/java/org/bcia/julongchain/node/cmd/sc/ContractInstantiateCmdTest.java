@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author zhouhui
  * @date 2018/3/29
  * @company Dingxuan
+ * @deprecated
  */
 public class ContractInstantiateCmdTest extends BaseJunit4Test {
 

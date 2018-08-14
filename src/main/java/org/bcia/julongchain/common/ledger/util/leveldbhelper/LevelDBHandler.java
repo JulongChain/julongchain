@@ -17,8 +17,8 @@ package org.bcia.julongchain.common.ledger.util.leveldbhelper;
 
 import org.bcia.julongchain.common.exception.LevelDBException;
 import org.bcia.julongchain.common.ledger.util.IDBHandler;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.leveldb.LevelDB;
 import org.bcia.julongchain.core.ledger.leveldb.LevelDBUtil;
 import org.iq80.leveldb.DB;
@@ -36,7 +36,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class LevelDBHandler implements IDBHandler {
-	private static JavaChainLog log = JavaChainLogFactory.getLog(LevelDBHandler.class);
+	private static JulongChainLog log = JulongChainLogFactory.getLog(LevelDBHandler.class);
 
     private String dbName = null;
     private DB db = null;

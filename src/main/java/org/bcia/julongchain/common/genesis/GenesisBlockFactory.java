@@ -16,7 +16,8 @@
 package org.bcia.julongchain.common.genesis;
 
 import com.google.protobuf.ByteString;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
 import org.bcia.julongchain.common.util.proto.ProposalUtils;
 import org.bcia.julongchain.csp.factory.CspManager;
@@ -36,7 +37,6 @@ import org.bcia.julongchain.protos.common.Configtx;
 public class GenesisBlockFactory implements IGenesisBlockFactory {
     private static final int MSP_VERSION = 1;
     private static final long CURRENT_EPOCH = 0L;
-    private static final int NONCE_LENGTH = 24;
 
     private Configtx.ConfigTree groupTree;
 
@@ -45,8 +45,8 @@ public class GenesisBlockFactory implements IGenesisBlockFactory {
     }
 
     @Override
-    public Common.Block getGenesisBlock(String groupId) throws JavaChainException {
-        byte[] nonce = CspManager.getDefaultCsp().rng(NONCE_LENGTH, null);
+    public Common.Block getGenesisBlock(String groupId) throws JulongChainException {
+        byte[] nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
 
         IMsp localMsp = GlobalMspManagement.getLocalMsp();
         ISigningIdentity signingIdentity = localMsp.getDefaultSigningIdentity();

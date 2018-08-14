@@ -22,7 +22,7 @@ package org.bcia.julongchain.common.exception;
  * @date 2018/07/05
  * @company Dingxuan
  */
-public class PrivDataException extends JavaChainException {
+public class PrivDataException extends JulongChainException {
 	private static final String MODULE_NAME = "[PrivData]";
 
 	public PrivDataException() {

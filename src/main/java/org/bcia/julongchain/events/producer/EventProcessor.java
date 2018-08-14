@@ -17,8 +17,8 @@ package org.bcia.julongchain.events.producer;
 
 import org.bcia.julongchain.common.exception.EventException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.common.util.producer.Consumer;
 import org.bcia.julongchain.common.util.producer.Producer;
@@ -37,7 +37,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  * @company Dingxuan
  */
 public class EventProcessor implements IEventProcessor {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(EventProcessor.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(EventProcessor.class);
 
     private Map<Integer, IHandlerList> eventConsumers;
     private EventsServerConfig eventsServerConfig;

@@ -26,7 +26,7 @@ import org.bcia.julongchain.protos.node.SmartContractPackage;
  * @date 2018/07/24
  * @company Dingxuan
  */
-public class DuplicateChaincodeHandlerException extends JavaChainException {
+public class DuplicateChaincodeHandlerException extends JulongChainException {
 	private static final String MODULE_NAME = "[DuplicateChaincodeHandler]";
 	private SmartContractPackage.SmartContractID scID;
 

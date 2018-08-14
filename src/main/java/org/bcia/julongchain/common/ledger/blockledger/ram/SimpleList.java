@@ -15,8 +15,6 @@ limitations under the License.
  */
 package org.bcia.julongchain.common.ledger.blockledger.ram;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 
 /**

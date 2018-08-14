@@ -16,7 +16,7 @@
 
 package org.bcia.julongchain.csp.pkcs11;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.intfs.ICsp;
 
 /**
@@ -28,5 +28,5 @@ import org.bcia.julongchain.csp.intfs.ICsp;
  */
 public interface IPKCS11Csp extends ICsp {
 
-    public void finalized() throws JavaChainException;
+    public void finalized() throws JulongChainException;
 }

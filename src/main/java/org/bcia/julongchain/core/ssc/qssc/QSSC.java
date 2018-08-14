@@ -16,10 +16,10 @@
 package org.bcia.julongchain.core.ssc.qssc;
 
 import com.google.protobuf.ByteString;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.aclmgmt.AclManagement;
 import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.node.util.NodeUtils;
@@ -46,7 +46,7 @@ import java.util.List;
  */
 @Component
 public class QSSC extends SystemSmartContractBase {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(QSSC.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(QSSC.class);
     // These are function names from Invoke first parameter
     public final static String GET_GROUP_INFO="GetGroupInfo";
 
@@ -101,7 +101,7 @@ public class QSSC extends SystemSmartContractBase {
         String res=getACLResource(function);
         try{
             AclManagement.getACLProvider().checkACL(function,groupID,sp);
-        }catch(JavaChainException e){
+        }catch(JulongChainException e){
             newErrorResponse(String.format("Authorization request for [%s][%s] failed:%s",function,groupID,e.getMessage()));
         }
 

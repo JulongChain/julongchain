@@ -15,10 +15,10 @@
  */
 package org.bcia.julongchain.core.ledger.ledgermgmt;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.proto.BlockUtils;
 import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.INodeLedgerProvider;
@@ -46,7 +46,7 @@ public class LedgerManager {
         put("lssc", new KVLedgerLSSCStateListener());
     }};
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(LedgerManager.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(LedgerManager.class);
     private static Map<String, INodeLedger> openedLedgers = new HashMap<>();
     private static INodeLedgerProvider ledgerProvider = null;
     private static boolean initialized = false;
@@ -85,7 +85,7 @@ public class LedgerManager {
         //获取区块id
         try {
             id = BlockUtils.getGroupIDFromBlock(genesisBlock);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             throw new LedgerException(e);
         }
         log.info(String.format("Creating ledger [%s] with genesis block", id));

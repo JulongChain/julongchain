@@ -18,9 +18,9 @@ package org.bcia.julongchain.common.ledger.util;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 import java.io.*;
 import java.util.*;
@@ -35,7 +35,7 @@ import java.util.zip.GZIPOutputStream;
  * @company Dingxuan
  */
 public class IoUtil {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(IoUtil.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(IoUtil.class);
     private static final int BUFFER = 1024;
 
     /** DirEmpty returns true if the dir at dirPath is empty
@@ -165,9 +165,9 @@ public class IoUtil {
      * 序列化对象
      * @param serializable
      * @return
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public static byte[] obj2ByteArray(Serializable serializable) throws JavaChainException {
+    public static byte[] obj2ByteArray(Serializable serializable) throws JulongChainException {
         ByteArrayOutputStream baos = null;
         ObjectOutputStream oos = null;
         try {
@@ -181,7 +181,7 @@ public class IoUtil {
             return result;
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         }
     }
 
@@ -189,9 +189,9 @@ public class IoUtil {
      * 反序列化对象
      * @param bytes
      * @return
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public static Object byteArray2Obj(byte[] bytes) throws JavaChainException{
+    public static Object byteArray2Obj(byte[] bytes) throws JulongChainException {
         ByteArrayInputStream bais = null;
         ObjectInputStream ois = null;
         try {
@@ -203,7 +203,7 @@ public class IoUtil {
             return obj;
         } catch (Exception e){
             log.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         }
     }
     /**
@@ -241,7 +241,7 @@ public class IoUtil {
     /**
      * 关闭流
      */
-    public static void closeStream(Closeable... closeables) throws JavaChainException{
+    public static void closeStream(Closeable... closeables) throws JulongChainException {
         try {
             for (Closeable closeable : closeables) {
                 if(closeable != null){
@@ -250,7 +250,7 @@ public class IoUtil {
             }
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         }
     }
 
@@ -262,7 +262,7 @@ public class IoUtil {
      * @param cache 缓冲区大小
      * @return tar 字节流
      */
-    public static byte[] tarWriter(Map<String, File> files, int cache) throws JavaChainException{
+    public static byte[] tarWriter(Map<String, File> files, int cache) throws JulongChainException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         TarArchiveOutputStream taos = new TarArchiveOutputStream(baos);
         taos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
@@ -285,7 +285,7 @@ public class IoUtil {
             }
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         } finally {
             closeStream(fis, taos, baos);
         }
@@ -297,7 +297,7 @@ public class IoUtil {
      * @param fileBytes 将要压缩的文件流
      * @return gzip压缩的文件流
      */
-    public static byte[] gzipWriter(byte[] fileBytes) throws JavaChainException{
+    public static byte[] gzipWriter(byte[] fileBytes) throws JulongChainException {
         ByteArrayOutputStream baos = null;
         GZIPOutputStream gzos = null;
         try {
@@ -308,7 +308,7 @@ public class IoUtil {
             gzos.flush();
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         } finally {
             closeStream(baos, gzos);
         }
@@ -323,7 +323,7 @@ public class IoUtil {
      *          key:文件相对路径
      *          value:文件流
      */
-    public static Map<String, byte[]> tarReader(byte[] tarBytes, int cache) throws JavaChainException{
+    public static Map<String, byte[]> tarReader(byte[] tarBytes, int cache) throws JulongChainException {
         Map<String, byte[]> result = new HashMap<>();
         ByteArrayOutputStream baos = null;
         ByteArrayInputStream bais = null;
@@ -344,7 +344,7 @@ public class IoUtil {
             }
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         } finally {
             closeStream( tais, bais, baos);
         }
@@ -357,7 +357,7 @@ public class IoUtil {
      * @param cache 缓冲大小
      * @return 解压后文件流
      */
-    public static byte[] gzipReader(byte[] fileBytes, int cache) throws JavaChainException{
+    public static byte[] gzipReader(byte[] fileBytes, int cache) throws JulongChainException {
         ByteArrayOutputStream baos = null;
         ByteArrayInputStream bais = null;
         GZIPInputStream gzis = null;
@@ -372,7 +372,7 @@ public class IoUtil {
             }
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         } finally {
             closeStream( bais, baos, gzis);
         }
@@ -386,7 +386,7 @@ public class IoUtil {
      *              value: 文件流
      * @param outputPath 输出路径
      */
-    public static void fileWriter(Map<String, byte[]> files, String outputPath) throws JavaChainException {
+    public static void fileWriter(Map<String, byte[]> files, String outputPath) throws JulongChainException {
         outputPath = outputPath.endsWith(File.separator) ? outputPath : outputPath + File.separator;
         FileOutputStream fos = null;
         try {
@@ -396,14 +396,14 @@ public class IoUtil {
                 File file = new File(outputPath + fileRelativePath);
                 File dir = file.getParentFile();
                 if (!createDirIfMissing(dir.getAbsolutePath())) {
-                    throw new JavaChainException("Can not create dir " + dir.getAbsolutePath());
+                    throw new JulongChainException("Can not create dir " + dir.getAbsolutePath());
                 }
                 fos = new FileOutputStream(file);
                 fos.write(fileBytes);
             }
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         } finally {
             closeStream(fos);
         }
@@ -414,7 +414,7 @@ public class IoUtil {
      * @param filePath 文件路径
      * @param cache 缓冲大小
      */
-    public static byte[] fileReader(String filePath, int cache) throws JavaChainException{
+    public static byte[] fileReader(String filePath, int cache) throws JulongChainException {
         File file = new File(filePath);
         if (!file.exists()) {
             log.debug("File {} not found", filePath);
@@ -433,7 +433,7 @@ public class IoUtil {
             return baos.toByteArray();
         } catch (Exception e){
             log.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         } finally {
             closeStream(fis, baos);
         }

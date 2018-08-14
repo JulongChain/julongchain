@@ -22,8 +22,8 @@ import org.apache.gossip.manager.GossipManager;
 import org.apache.gossip.manager.GossipManagerBuilder;
 import org.apache.gossip.model.SharedDataMessage;
 import org.bcia.julongchain.common.exception.GossipException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfigFactory;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.protos.common.Common;
@@ -48,7 +48,7 @@ import java.util.UUID;
  */
 public class GossipServiceUtil {
 
-  private static JavaChainLog log = JavaChainLogFactory.getLog(GossipServiceUtil.class);
+  private static JulongChainLog log = JulongChainLogFactory.getLog(GossipServiceUtil.class);
 
   private static final Integer messageLength = 10000;
 

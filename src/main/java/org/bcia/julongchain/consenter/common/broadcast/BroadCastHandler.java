@@ -19,13 +19,12 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.stub.StreamObserver;
 import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
 import org.bcia.julongchain.consenter.common.server.IHandler;
 import org.bcia.julongchain.consenter.consensus.singleton.Singleton;
 import org.bcia.julongchain.consenter.entity.ConfigMsg;
-import org.bcia.julongchain.consenter.entity.Message;
 import org.bcia.julongchain.consenter.util.Constant;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
@@ -41,7 +40,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class BroadCastHandler implements IHandler {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(BroadCastHandler.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BroadCastHandler.class);
     private IGroupSupportRegistrar sm;
 
     public BroadCastHandler(IGroupSupportRegistrar sm) {

@@ -19,13 +19,13 @@ import org.slf4j.Logger;
 import org.slf4j.Marker;
 
 /**
- * JavaChain日志
+ * JulongChain日志
  *
  * @author zhouhui
  * @date 2018/3/29
  * @company Dingxuan
  */
-public final class JavaChainLog implements Logger {
+public final class JulongChainLog implements Logger {
     private Logger logger;
 
     public Logger getLogger() {

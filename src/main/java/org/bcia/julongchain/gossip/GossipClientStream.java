@@ -17,8 +17,8 @@ package org.bcia.julongchain.gossip;
 
 import io.grpc.ManagedChannel;
 import io.grpc.stub.StreamObserver;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.gossip.GossipGrpc;
 import org.bcia.julongchain.protos.gossip.Message;
 
@@ -28,7 +28,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class GossipClientStream implements StreamObserver<Message.Envelope> {
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(GossipClientStream.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(GossipClientStream.class);
 
     private final ManagedChannel connection;
 

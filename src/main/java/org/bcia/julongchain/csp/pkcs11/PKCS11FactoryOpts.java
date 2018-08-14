@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.csp.pkcs11;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.pkcs11.entity.PKCS11Config;
 import org.bcia.julongchain.csp.pkcs11.entity.PKCS11Lib;
 import org.bcia.julongchain.csp.pkcs11.sw.IPKCS11SwFactoryOpts;
@@ -57,7 +57,7 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
         this.path = pkcsConf.getPath();
     }
 
-    public PKCS11FactoryOpts(PKCS11Lib pkcslib, PKCS11Config pkcsConf) throws JavaChainException {
+    public PKCS11FactoryOpts(PKCS11Lib pkcslib, PKCS11Config pkcsConf) throws JulongChainException {
 
         this.bSoftVerify = pkcsConf.getSoftVerify();
         this.bSensitive = pkcsConf.getnoKImport();
@@ -88,7 +88,7 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
                 String str=null;
                 str=String.format("[JC_PKCS]:Could not find token with label %s and serialNumber %s", pkcslib.getKeyLabel(),pkcslib.getKeySN());
                 csplog.setLogMsg(str, 2, PKCS11FactoryOpts.class);
-                throw new JavaChainException(str);
+                throw new JulongChainException(str);
             }
 
             this.sessionhandle = p11.C_OpenSession(slot,
@@ -99,7 +99,7 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
         }catch (IOException ex){
             String err = String.format("[JC_PKCS]:IOException ErrMessage:", ex.getMessage());
             csplog.setLogMsg(err, 2, PKCS11FactoryOpts.class);
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }catch(PKCS11Exception ex) {
             if(ex.getErrorCode() == PKCS11Constants.CKR_USER_ALREADY_LOGGED_IN)
             {
@@ -108,7 +108,7 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
             {
                 String err = String.format("[JC_PKCS]:PKCS11Exception code: 0x%08x", ex.getErrorCode());
                 csplog.setLogMsg(err, 2, PKCS11FactoryOpts.class);
-                throw new JavaChainException(err, ex.getCause());
+                throw new JulongChainException(err, ex.getCause());
             }
         }
     }
@@ -116,13 +116,13 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
 
 
     @Override
-    public void optFinalized() throws JavaChainException{
+    public void optFinalized() throws JulongChainException {
         try {
             p11.C_CloseSession(sessionhandle);
         }
         catch (PKCS11Exception ex){
             String err = String.format("[JC_PKCS]:PKCS11Exception code: 0x%08x", ex.getErrorCode());
-            throw new JavaChainException(err, ex.getCause());
+            throw new JulongChainException(err, ex.getCause());
         }
     }
 

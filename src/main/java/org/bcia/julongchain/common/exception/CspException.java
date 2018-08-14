@@ -22,7 +22,7 @@ package org.bcia.julongchain.common.exception;
  * @date 2018/3/29
  * @company Dingxuan
  */
-public class CspException extends JavaChainException {
+public class CspException extends JulongChainException {
     private static final String MODULE_NAME = "[Csp]";
 
     public CspException() {

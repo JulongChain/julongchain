@@ -15,25 +15,9 @@
  */
 package org.bcia.julongchain.core.container.inproccontroller;
 
-import com.google.protobuf.ByteString;
-import org.bcia.julongchain.common.exception.InprocVMException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.core.container.scintf.ISCSupport;
-import org.bcia.julongchain.core.smartcontract.shim.ISmartContract;
-import org.bcia.julongchain.core.smartcontract.shim.SmartContractBase;
-import org.bcia.julongchain.core.smartcontract.shim.helper.Channel;
-import org.bcia.julongchain.core.smartcontract.shim.impl.ChatStream;
-import org.bcia.julongchain.core.smartcontract.shim.impl.Handler;
-import org.bcia.julongchain.core.smartcontract.shim.impl.NextStateInfo;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ssc.SystemSmartContractBase;
-import org.bcia.julongchain.protos.node.SmartContractPackage;
-import org.bcia.julongchain.protos.node.SmartContractShim;
-
-import javax.naming.Context;
-import java.io.InputStream;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 类描述
@@ -43,7 +27,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @company Dingxuan
  */
 public class InprocContainer {
-	private static final JavaChainLog log = JavaChainLogFactory.getLog(InprocContainer.class);
+	private static final JulongChainLog log = JulongChainLogFactory.getLog(InprocContainer.class);
 
 	private SystemSmartContractBase sysSmartContract;
     private String[] args;

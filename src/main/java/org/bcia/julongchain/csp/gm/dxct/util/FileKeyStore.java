@@ -15,9 +15,9 @@
  */
 package org.bcia.julongchain.csp.gm.dxct.util;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.gm.dxct.IKeyStore;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2Key;
 import org.bcia.julongchain.csp.intfs.IKey;
@@ -39,7 +39,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public class FileKeyStore implements IKeyStore {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(FileKeyStore.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(FileKeyStore.class);
     /**
      * 所有文件的名称
      */
@@ -61,8 +61,8 @@ public class FileKeyStore implements IKeyStore {
         if (path == "") {
             try {
                 log.error("An invalid KeyStore path provided. Path cannot be an empty string.");
-                throw new JavaChainException("An invalid KeyStore path provided. Path cannot be an empty string.");
-            } catch (JavaChainException e) {
+                throw new JulongChainException("An invalid KeyStore path provided. Path cannot be an empty string.");
+            } catch (JulongChainException e) {
                 e.getMessage();
             }
         }

@@ -14,7 +14,7 @@
 
     <!--org.apache.log4j.DailyRollingFileAppender 每天产生一个日志文件-->
     <appender name="myFile" class="org.apache.log4j.DailyRollingFileAppender">
-        <param name="File" value="output.log"/><!--文件位置-->
+        <param name="File" value="logs/output.log"/><!--文件位置-->
         <param name="Append" value="true"/><!--是否选择追加-->
         <layout class="org.apache.log4j.PatternLayout">
             <param name="ConversionPattern"

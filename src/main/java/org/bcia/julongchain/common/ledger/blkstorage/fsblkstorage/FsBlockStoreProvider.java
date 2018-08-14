@@ -22,8 +22,8 @@ import org.bcia.julongchain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.common.ledger.util.IoUtil;
 import org.bcia.julongchain.common.ledger.util.leveldbhelper.LevelDBProvider;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public class FsBlockStoreProvider implements IBlockStoreProvider {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(FsBlockStoreProvider.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(FsBlockStoreProvider.class);
 
     private IndexConfig indexConfig;
     private IDBProvider leveldbProvider;

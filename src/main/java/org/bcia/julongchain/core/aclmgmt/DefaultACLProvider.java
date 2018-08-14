@@ -19,8 +19,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.PolicyConstant;
 import org.bcia.julongchain.common.policycheck.IPolicyChecker;
 import org.bcia.julongchain.common.policycheck.PolicyChecker;
@@ -44,7 +44,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class DefaultACLProvider implements IAclProvider {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(DefaultACLProvider.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(DefaultACLProvider.class);
 
     private IPolicyChecker policyChecker;
 

@@ -16,8 +16,8 @@
 package org.bcia.julongchain.core.events;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.EventsPackage;
 
@@ -29,7 +29,7 @@ import org.bcia.julongchain.protos.node.EventsPackage;
  * @company Dingxuan
  */
 public class DeliverHandler implements IDeliverHandler {
-    private JavaChainLog log = JavaChainLogFactory.getLog(DeliverHandler.class);
+    private JulongChainLog log = JulongChainLogFactory.getLog(DeliverHandler.class);
 
     @Override
     public EventsPackage.DeliverResponse handle(Common.Envelope envelope) {

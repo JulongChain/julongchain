@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.core.common.sysscprovider;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.groupconfig.config.IApplicationConfig;
 import org.bcia.julongchain.common.policies.IPolicyManager;
 import org.bcia.julongchain.core.ledger.IQueryExecutor;
@@ -59,9 +59,9 @@ public interface ISystemSmartContractProvider {
      * access to the ledger
      * @param groupID
      * @return
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    IQueryExecutor getQueryExecutorForLedger(String groupID) throws JavaChainException;
+    IQueryExecutor getQueryExecutorForLedger(String groupID) throws JulongChainException;
 
     /**
      * GetApplicationConfig returns the configtxapplication.SharedConfig for the channel

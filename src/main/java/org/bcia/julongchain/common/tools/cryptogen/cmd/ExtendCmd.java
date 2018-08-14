@@ -17,9 +17,9 @@
 package org.bcia.julongchain.common.tools.cryptogen.cmd;
 
 import org.apache.commons.cli.*;
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.tools.cryptogen.CaHelper;
 import org.bcia.julongchain.common.tools.cryptogen.CspHelper;
 import org.bcia.julongchain.common.tools.cryptogen.MspHelper;
@@ -44,7 +44,7 @@ import static org.bcia.julongchain.common.tools.cryptogen.cmd.Util.*;
  * @company Excelsecu
  */
 public class ExtendCmd implements ICryptoGenCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ExtendCmd.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ExtendCmd.class);
     private static final String CMD_EXTEND = "extend";
     private static final String CMD_ARG_INPUT = "input";
     private static final String CMD_ARG_CONFIG = "config";
@@ -57,7 +57,7 @@ public class ExtendCmd implements ICryptoGenCmd {
     private String configFile;
 
     @Override
-    public void execCmd(String[] args) throws JavaChainException {
+    public void execCmd(String[] args) throws JulongChainException {
         Options options = new Options();
         options.addOption(Option.builder()
                 .longOpt(CMD_ARG_INPUT)
@@ -85,11 +85,11 @@ public class ExtendCmd implements ICryptoGenCmd {
             configFile = commandLine.getOptionValue(CMD_ARG_CONFIG, null);
             extend();
         } catch (ParseException e) {
-            throw new JavaChainException(e.getMessage());
+            throw new JulongChainException(e.getMessage());
         }
     }
 
-    private void extendConsenterOrg(OrgSpec orgSpec) throws JavaChainException {
+    private void extendConsenterOrg(OrgSpec orgSpec) throws JulongChainException {
         String orgName = orgSpec.getDomain();
         String orgDir = Paths.get(inputDir, "consenterOrganizations", orgName).toString();
         String nodesDir = Paths.get(orgDir, "consenters").toString();
@@ -113,7 +113,7 @@ public class ExtendCmd implements ICryptoGenCmd {
         copyAllAdminCerts(usersDir, nodesDir, orgName, orgSpec, adminUser);
     }
 
-    private void extendNodeOrg(OrgSpec orgSpec) throws JavaChainException {
+    private void extendNodeOrg(OrgSpec orgSpec) throws JulongChainException {
         String orgName = orgSpec.getDomain();
         String orgDir = Paths.get(inputDir, "nodeOrganizations", orgName).toString();
 
@@ -151,7 +151,7 @@ public class ExtendCmd implements ICryptoGenCmd {
     }
 
 
-    private CaHelper getCA(String caDir, OrgSpec spec, String name) throws JavaChainException {
+    private CaHelper getCA(String caDir, OrgSpec spec, String name) throws JulongChainException {
         IKey privKey = CspHelper.loadPrivateKey(caDir);
         Certificate cert = CaHelper.loadCertificateSM2(caDir);
         NodeSpec ca = spec.getCa();
@@ -167,14 +167,14 @@ public class ExtendCmd implements ICryptoGenCmd {
                 cert);
     }
 
-    private void extend() throws JavaChainException {
+    private void extend() throws JulongChainException {
         // TODO fallback when failed
         Config config = Util.loadAs(configFile, Config.class);
 
         for (OrgSpec orgSpec : config.getNodeOrgs()) {
             try {
                 renderOrgSpec(orgSpec, "node");
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 log.error("Error processing node configuration: " + e.getMessage());
                 System.exit(-1);
             }
@@ -183,7 +183,7 @@ public class ExtendCmd implements ICryptoGenCmd {
         for (OrgSpec orgSpec : config.getConsenterOrgs()) {
             try {
                 renderOrgSpec(orgSpec, "consenter");
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 log.error("Error processing consenter configuration: " + e.getMessage());
                 System.exit(-1);
             }

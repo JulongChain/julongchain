@@ -19,8 +19,8 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.util.Util;
 
 import java.util.*;
@@ -35,7 +35,7 @@ import static org.bcia.julongchain.protos.common.Common.*;
  * @company Dingxuan
  */
 public class BlockSerialization {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(BlockSerialization.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BlockSerialization.class);
 
     private BlockHeader blockHeader;
     public List<TxIndexInfo> txOffsets = new ArrayList<>();

@@ -1,12 +1,12 @@
 package org.bcia.julongchain.csp.gm;
 
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.factory.IFactoryOpts;
 import org.bcia.julongchain.csp.gm.dxct.GmCspFactory;
 import org.bcia.julongchain.csp.gm.dxct.GmFactoryOpts;
 import org.bcia.julongchain.csp.gm.dxct.sm3.SM3HashOpts;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.opts.IHashOpts;
-import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Assert;
 import org.junit.Test;
@@ -65,7 +65,7 @@ public class GmCspFactoryTest {
             String encodedHexDigests=Hex.toHexString(digests);
             System.out.println(encodedHexDigests);
             Assert.assertArrayEquals(digests,expectedHashMsg);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();

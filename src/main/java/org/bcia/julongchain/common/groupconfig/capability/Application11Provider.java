@@ -21,7 +21,7 @@ import org.bcia.julongchain.protos.common.Configuration;
 import java.util.Map;
 
 /**
- * JavaChain1.1的应用提供者，兼容性考虑
+ * JulongChain1.1的应用提供者，兼容性考虑
  *
  * @author zhouhui
  * @date 2018/5/9

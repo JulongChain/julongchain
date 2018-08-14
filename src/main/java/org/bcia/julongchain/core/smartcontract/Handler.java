@@ -22,8 +22,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.SmartContractException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.common.sysscprovider.SmartContractInstance;
 import org.bcia.julongchain.core.container.scintf.ISmartContractStream;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
@@ -76,7 +76,7 @@ public class Handler {
      */
     private static final String END_STATE         = "end";
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Handler.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Handler.class);
 
     private ISmartContractStream chatStream;
     private FSM fsm;

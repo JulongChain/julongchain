@@ -21,9 +21,8 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.groupconfig.IGroupConfigBundle;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.common.util.proto.ProtoUtils;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.util.BlockHelper;
 import org.bcia.julongchain.consenter.util.CommonUtils;
 import org.bcia.julongchain.consenter.util.Utils;
@@ -36,7 +35,7 @@ import org.bcia.julongchain.protos.common.Configtx;
  * @company Dingxuan
  */
 public class BlockWriter {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(BlockWriter.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BlockWriter.class);
     // private IBlockWriterSupport support;
     private ChainSupport support;
 
@@ -183,11 +182,11 @@ public class BlockWriter {
     }
 
 
-    public static JavaChainLog getLog() {
+    public static JulongChainLog getLog() {
         return log;
     }
 
-    public static void setLog(JavaChainLog log) {
+    public static void setLog(JulongChainLog log) {
         BlockWriter.log = log;
     }
 

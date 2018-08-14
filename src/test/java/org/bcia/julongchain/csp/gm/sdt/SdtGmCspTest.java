@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.csp.gm.sdt;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.util.Convert;
 import org.bcia.julongchain.csp.factory.IFactoryOpts;
 import org.bcia.julongchain.csp.gm.dxct.RngOpts;
@@ -75,7 +75,7 @@ public class SdtGmCspTest {
             IKey sm2Key = csp.keyGen(new SM2KeyGenOpts());
             System.out.println("[ output ] SM2 private key : " + Convert.bytesToHexString(sm2Key.toBytes()));
             System.out.println("[ output ] SM2 public key : " + Convert.bytesToHexString(sm2Key.getPublicKey().toBytes()));
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         }
 
@@ -83,7 +83,7 @@ public class SdtGmCspTest {
             System.out.println("\n**** case " + caseIndex++ + ": generate SM4 key  ****");
             IKey sm4Key = csp.keyGen(new SM4KeyGenOpts());
             System.out.println("[ output ] SM4 key : " + Convert.bytesToHexString(sm4Key.toBytes()));
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         }
     }
@@ -113,7 +113,7 @@ public class SdtGmCspTest {
             byte[] sm2PrivateKeyDataFromFile = keysStore.loadKey("msp/keystore/sdt/", null, sm2PrivateKeyPermanent.ski(), KeysStore.KEY_TYPE_SK);
             System.out.println("[ output ] SM2 private key(from file) : " + Convert.bytesToHexString(sm2PrivateKeyDataFromFile));
 
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         }
 
@@ -135,7 +135,7 @@ public class SdtGmCspTest {
             byte[] sm2PublicKeyDataFromFile = keysStore.loadKey("msp/keystore/sdt/", null, sm2PublicKeyPermanent.ski(), KeysStore.KEY_TYPE_PK);
             System.out.println("[ output ] SM2 public key(from file) : " + Convert.bytesToHexString(sm2PublicKeyDataFromFile));
 
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         }
 
@@ -151,7 +151,7 @@ public class SdtGmCspTest {
             byte[] sm4KeyDataFromFile = keysStore.loadKey("msp/keystore/sdt/", null, sm4KeyPermanent.ski(), KeysStore.KEY_TYPE_KEY);
             System.out.println("[ output ] SM4 key(from file) : " + Convert.bytesToHexString(sm4KeyDataFromFile));
 
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         }
     }
@@ -171,7 +171,7 @@ public class SdtGmCspTest {
             } else {
                 System.out.println("[** error **] failed getting SM2 private key for ski [ " + skSkiHex + " ]");
             }
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         }
 
@@ -185,7 +185,7 @@ public class SdtGmCspTest {
             } else {
                 System.out.println("[** error **] failed getting SM2 public key for ski [ " + pkSkiHex + " ]");
             }
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         }
 
@@ -199,7 +199,7 @@ public class SdtGmCspTest {
             } else {
                 System.out.println("[** error **] failed getting SM4 key for ski [ " + keySkiHex + " ]");
             }
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         }
     }
@@ -225,7 +225,7 @@ public class SdtGmCspTest {
                 } else {
                     System.out.println("[** error **] failed computing the message digest");
                 }
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 e.printStackTrace();
             }
         }
@@ -379,7 +379,7 @@ public class SdtGmCspTest {
                 } else {
                     System.out.println("[** error **] failed encrypting data");
                 }
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 e.printStackTrace();
             }
         }
@@ -485,7 +485,7 @@ public class SdtGmCspTest {
                 } else {
                     System.out.println("[** error **] failed decrypting data");
                 }
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 e.printStackTrace();
             }
         }
@@ -506,7 +506,7 @@ public class SdtGmCspTest {
                 } else {
                     System.out.println("[** error **] failed generating random data");
                 }
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 e.printStackTrace();
             }
         }

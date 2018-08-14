@@ -16,6 +16,7 @@ FROM julongchain/julongchain-baseimage
 COPY julongchain.jar /root/julongchain
 COPY config/ /root/julongchain/config
 COPY msp/ /root/julongchain/msp
+COPY lib/ /root/julongchain/lib
 COPY smartcontract/ root/julongchain/smartcontract
 COPY libsdtsmjni.so /lib
 COPY libsdtsm.so /lib

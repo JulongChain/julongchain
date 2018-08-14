@@ -17,8 +17,8 @@ package org.bcia.julongchain.core.common.privdata;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.PolicyException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.policy.IPolicy;
 import org.bcia.julongchain.common.policycheck.policies.PolicyProvider;
 import org.bcia.julongchain.common.util.proto.SignedData;
@@ -41,7 +41,7 @@ import java.util.List;
  */
 public class SimpleCollection implements ICollection, ICollectionAccessPolicy {
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SimpleCollection.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SimpleCollection.class);
 
     private String name;
     private IPolicy accessPolicy;

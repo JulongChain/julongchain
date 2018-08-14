@@ -16,7 +16,7 @@
 
 package org.bcia.julongchain.common.tools.cryptogen.utils;
 
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,7 +117,7 @@ public class X509CertificateUtil {
                     subject.setPostalCode(postalCodeList);
                     break;
                 default:
-                    JavaChainLogFactory.getLog().error("Invalid keyword " + attr);
+                    JulongChainLogFactory.getLog().error("Invalid keyword " + attr);
                     break;
             }
 

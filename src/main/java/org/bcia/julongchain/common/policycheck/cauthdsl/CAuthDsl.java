@@ -17,8 +17,8 @@
 package org.bcia.julongchain.common.policycheck.cauthdsl;
 
 import org.bcia.julongchain.common.exception.PolicyException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policycheck.policies.Evalutor;
 import org.bcia.julongchain.common.policycheck.policies.IEvalutor;
 import org.bcia.julongchain.common.util.proto.SignedData;
@@ -41,7 +41,7 @@ import java.util.Map;
  * @company Aisino
  */
 public class CAuthDsl {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CAuthDsl.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(CAuthDsl.class);
     /**signedProposal
      * 删除重复身份，保留身份顺序
      * @param signedDatas

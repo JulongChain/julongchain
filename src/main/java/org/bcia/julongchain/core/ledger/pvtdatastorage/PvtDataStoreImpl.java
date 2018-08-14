@@ -19,8 +19,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.common.ledger.util.leveldbhelper.UpdateBatch;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bcia.julongchain.core.ledger.PvtNsCollFilter;
 import org.bcia.julongchain.core.ledger.TxPvtData;
@@ -37,7 +37,7 @@ import java.util.*;
  * @company Dingxuan
  */
 public class PvtDataStoreImpl implements IPvtDataStore {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(PvtDataStoreImpl.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(PvtDataStoreImpl.class);
 
     private IDBProvider db;
     private String ledgerID;

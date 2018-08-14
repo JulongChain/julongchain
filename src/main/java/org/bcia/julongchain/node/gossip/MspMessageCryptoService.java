@@ -17,8 +17,8 @@ package org.bcia.julongchain.node.gossip;
 
 import org.bcia.julongchain.common.exception.GossipException;
 import org.bcia.julongchain.common.localmsp.ILocalSigner;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policycheck.policies.IGroupPolicyManagerGetter;
 import org.bcia.julongchain.gossip.api.IMessageCryptoService;
 
@@ -26,7 +26,7 @@ import java.sql.Timestamp;
 
 public class MspMessageCryptoService implements IMessageCryptoService{
 
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(MspMessageCryptoService.class);
+    private static final JulongChainLog log = JulongChainLogFactory.getLog(MspMessageCryptoService.class);
     private IGroupPolicyManagerGetter channelPolicyManagerGetter;
     private ILocalSigner localSigner;
 

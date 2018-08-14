@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.csp.pkcs11.sw;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.pkcs11.ecdsa.EcdsaKeyOpts;
 import org.bcia.julongchain.csp.pkcs11.rsa.RsaKeyOpts;
@@ -34,7 +34,7 @@ import java.security.spec.X509EncodedKeySpec;
  * @company FEITIAN
  */
 public class VerifyImpl {
-    public boolean verifyData(IKey key, byte[] degiest, byte[] signature, String alg) throws JavaChainException {
+    public boolean verifyData(IKey key, byte[] degiest, byte[] signature, String alg) throws JulongChainException {
         try {
             if(key instanceof RsaKeyOpts.RsaPriKey)
             {
@@ -78,19 +78,19 @@ public class VerifyImpl {
         }catch(NoSuchAlgorithmException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:NoSuchAlgorithmException ErrMessage: %s", e.getMessage());
-            throw new JavaChainException(err, e.getCause());
+            throw new JulongChainException(err, e.getCause());
         }catch(InvalidKeyException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:InvalidKeyException ErrMessage: %s", e.getMessage());
-            throw new JavaChainException(err, e.getCause());
+            throw new JulongChainException(err, e.getCause());
         }catch(InvalidKeySpecException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:InvalidKeySpecException ErrMessage: %s", e.getMessage());
-            throw new JavaChainException(err, e.getCause());
+            throw new JulongChainException(err, e.getCause());
         }catch(SignatureException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:SignatureException ErrMessage: %s", e.getMessage());
-            throw new JavaChainException(err, e.getCause());
+            throw new JulongChainException(err, e.getCause());
         }
     }
 }

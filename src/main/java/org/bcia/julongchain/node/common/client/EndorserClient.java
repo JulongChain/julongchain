@@ -17,8 +17,8 @@ package org.bcia.julongchain.node.common.client;
 
 import io.grpc.ManagedChannel;
 import io.grpc.netty.NettyChannelBuilder;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.protos.node.EndorserGrpc;
 import org.bcia.julongchain.protos.node.ProposalPackage;
@@ -32,7 +32,7 @@ import org.bcia.julongchain.protos.node.ProposalResponsePackage;
  * @company Dingxuan
  */
 public class EndorserClient implements IEndorserClient {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(EndorserClient.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(EndorserClient.class);
     /**
      * IP地址
      */

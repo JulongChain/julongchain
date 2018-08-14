@@ -30,8 +30,8 @@ import org.bcia.julongchain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.julongchain.common.ledger.blockledger.Util;
 import org.bcia.julongchain.common.ledger.blockledger.file.FileLedgerIterator;
 import org.bcia.julongchain.common.localmsp.ILocalSigner;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.common.broadcast.IGroupSupportRegistrar;
 import org.bcia.julongchain.consenter.common.msgprocessor.DefaultTemplator;
 import org.bcia.julongchain.consenter.common.msgprocessor.IChainCreator;
@@ -58,7 +58,7 @@ import static org.bcia.julongchain.consenter.common.msgprocessor.SystemGroup.new
  * @company Dingxuan
  */
 public class Registrar implements IChainCreator, IGroupSupportRegistrar, ISupportManager {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Registrar.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Registrar.class);
     private Map<String, ChainSupport> chains = new ConcurrentHashMap<>();
 
     private Map<String, IConsensusPlugin> consenters;
@@ -190,16 +190,10 @@ public class Registrar implements IChainCreator, IGroupSupportRegistrar, ISuppor
         return new GroupConfigBundle(groupId, config);
     }
 
-
     public void update(GroupConfigBundle groupConfigBundle) throws ConsenterException {
         checkResourcesOrPanic(groupConfigBundle);
         //TODO update实现 bundlesource
         ledgerResources.getMutableResources().update();
-    }
-
-
-    public String getSystemGroupID() {
-        return systemGroupID;
     }
 
     public Map<String, Object> broadcastGroupSupport(Common.Envelope msg) throws InvalidProtocolBufferException {

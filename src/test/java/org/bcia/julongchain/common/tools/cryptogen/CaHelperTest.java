@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.common.tools.cryptogen;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.tools.cryptogen.utils.Subject;
 import org.bcia.julongchain.common.tools.cryptogen.utils.X509CertificateUtil;
 import org.bcia.julongchain.csp.intfs.IKey;
@@ -90,7 +90,7 @@ public class CaHelperTest {
                     testOrganizationalUnit,
                     testStreetAddress,
                     testPostalCode);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         }
 
@@ -180,7 +180,7 @@ public class CaHelperTest {
     }
 
     @Test
-    public void signCertificate() throws JavaChainException {
+    public void signCertificate() throws JulongChainException {
 
         System.out.println("testDir=" + testDir);
 
@@ -287,7 +287,7 @@ public class CaHelperTest {
                     KeyUsage.digitalSignature,
                     new int[]{});
             finishSign = true;
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             finishSign = false;
         }
         Assert.assertFalse(finishSign);

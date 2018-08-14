@@ -19,30 +19,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * JavaChain日志工厂
+ * JulongChain日志工厂
  *
  * @author zhouhui
  * @date 2018/3/29
  * @company Dingxuan
  */
-public class JavaChainLogFactory {
-    public static JavaChainLog getLog(Class<?> clazz) {
+public class JulongChainLogFactory {
+    public static JulongChainLog getLog(Class<?> clazz) {
         Logger logger = LoggerFactory.getLogger(clazz);
 
-        JavaChainLog log = new JavaChainLog();
+        JulongChainLog log = new JulongChainLog();
         log.setLogger(logger);
         return log;
     }
 
-    public static JavaChainLog getLog(String name) {
+    public static JulongChainLog getLog(String name) {
         Logger logger = LoggerFactory.getLogger(name);
 
-        JavaChainLog log = new JavaChainLog();
+        JulongChainLog log = new JulongChainLog();
         log.setLogger(logger);
         return log;
     }
 
-    public static JavaChainLog getLog() {
+    public static JulongChainLog getLog() {
         StackTraceElement[] sts = Thread.currentThread().getStackTrace();
 
 //        for (int i = 0; i < sts.length; i++) {
@@ -51,7 +51,7 @@ public class JavaChainLogFactory {
 
         Logger logger = LoggerFactory.getLogger(sts[2].getClassName());
 
-        JavaChainLog log = new JavaChainLog();
+        JulongChainLog log = new JulongChainLog();
         log.setLogger(logger);
         return log;
     }

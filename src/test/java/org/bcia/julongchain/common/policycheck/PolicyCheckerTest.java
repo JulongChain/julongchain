@@ -1,7 +1,7 @@
 package org.bcia.julongchain.common.policycheck;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.policycheck.policies.GroupPolicyManagerGetter;
 import org.bcia.julongchain.common.util.proto.SignedData;
@@ -10,7 +10,6 @@ import org.bcia.julongchain.msp.IIdentityDeserializer;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.msp.mgmt.IMspPrincipalGetter;
 import org.bcia.julongchain.msp.mgmt.Msp;
-import org.bcia.julongchain.msp.mgmt.MspManager;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.junit.Before;
@@ -48,7 +47,7 @@ public class PolicyCheckerTest {
     }
 
     @Test
-    public void checkPolicy() throws InvalidProtocolBufferException, JavaChainException, UnsupportedEncodingException {
+    public void checkPolicy() throws InvalidProtocolBufferException, JulongChainException, UnsupportedEncodingException {
         IIdentityDeserializer localMSP = mock(IIdentityDeserializer.class);
         Msp msp = new Msp();
         IMspPrincipalGetter principalGetter = mock(IMspPrincipalGetter.class);
@@ -78,7 +77,7 @@ public class PolicyCheckerTest {
     }
 
     @Test
-    public void checkPolicyNoChannel() throws JavaChainException {
+    public void checkPolicyNoChannel() throws JulongChainException {
         IIdentityDeserializer localmsp = GlobalMspManagement.getLocalMsp();
         IMspPrincipalGetter principalGetter = mock(IMspPrincipalGetter.class);
         PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManagerGetter(),localmsp,principalGetter);

@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.msp.mgmt;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.msp.IIdentity;
 import org.bcia.julongchain.msp.IMsp;
 import org.bcia.julongchain.msp.IMspManager;
@@ -31,7 +31,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class MspManager implements IMspManager {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(MspManager.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(MspManager.class);
     public  HashMap<String, IMsp> mspsMap = new HashMap<String, IMsp>();
     private IMspManager mspManager;
     private boolean up;

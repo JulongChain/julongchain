@@ -17,12 +17,12 @@ package org.bcia.julongchain.core.endorser;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.StringUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.exception.SmartContractException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.resourceconfig.ISmartContractDefinition;
 import org.bcia.julongchain.common.resourceconfig.config.SmartContractConfig;
 import org.bcia.julongchain.common.util.CommConstant;
@@ -51,7 +51,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class EndorserSupport implements IEndorserSupport {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(EndorserSupport.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(EndorserSupport.class);
 
     @Autowired
     private ISystemSmartContractManager sysSmartContractManager;
@@ -189,7 +189,7 @@ public class EndorserSupport implements IEndorserSupport {
         //TODO：有些参数未使用?
         try {
             AclManagement.getACLProvider().checkACL(Resources.PROPOSE, groupHeader.getGroupId(), signedProposal);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         }
     }

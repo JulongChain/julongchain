@@ -19,13 +19,13 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.config.IConfig;
 import org.bcia.julongchain.common.config.IConfigManager;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.SysSmartContractException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.groupconfig.GroupConfigConstant;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policycheck.IPolicyChecker;
 import org.bcia.julongchain.common.policycheck.PolicyChecker;
 import org.bcia.julongchain.common.policycheck.policies.GroupPolicyManagerGetter;
@@ -68,7 +68,7 @@ import java.util.List;
 
 @Component
 public class CSSC extends SystemSmartContractBase {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CSSC.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(CSSC.class);
 
     public final static String JOIN_GROUP = "JoinGroup";
 
@@ -141,7 +141,7 @@ public class CSSC extends SystemSmartContractBase {
                 }
                 try {
                     groupID = BlockUtils.getGroupIDFromBlock(block);
-                } catch (JavaChainException e) {
+                } catch (JulongChainException e) {
                     return newErrorResponse(String.format("\"JoinGroup\" request failed to extract group id from the block due to [%s]", e.getMessage()));
                 }
                 try {
@@ -151,7 +151,7 @@ public class CSSC extends SystemSmartContractBase {
                 }
                 // 2. check local MSP Admins policy
                 try {
-                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.Admins, sp);
+                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.ADMINS, sp);
                 } catch (PolicyException e) {
                     log.error(e.getMessage());
                     return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check for group [%s]:%s", groupID, e.getMessage()));
@@ -162,7 +162,7 @@ public class CSSC extends SystemSmartContractBase {
                 String groupName = ByteString.copyFrom(args.get(1)).toStringUtf8();
                 try {
                     AclManagement.getACLProvider().checkACL(Resources.CSSC_GetConfigBlock, groupName, sp);
-                } catch (JavaChainException e) {
+                } catch (JulongChainException e) {
                     return newErrorResponse(String.format("\"GET_CONFIG_BLOCK\" Authorization request failed %s: %s", groupName, e.getMessage()));
                 }
                 return getConfigBlock(groupName);
@@ -170,7 +170,7 @@ public class CSSC extends SystemSmartContractBase {
                 String groupName2 = ByteString.copyFrom(args.get(1)).toStringUtf8();
                 try {
                     AclManagement.getACLProvider().checkACL(Resources.CSSC_GetConfigTree, groupName2, sp);
-                } catch (JavaChainException e) {
+                } catch (JulongChainException e) {
                     return newErrorResponse(String.format("\"GET_CONFIG_TREE\" Authorization request failed %s: %s", groupName2, e.getMessage()));
                 }
                 return getConfigTree(groupName2);
@@ -178,7 +178,7 @@ public class CSSC extends SystemSmartContractBase {
                 String groupName3 = ByteString.copyFrom(args.get(1)).toStringUtf8();
                 try {
                     AclManagement.getACLProvider().checkACL(Resources.CSSC_SimulateConfigTreeUpdate, groupName3, sp);
-                } catch (JavaChainException e) {
+                } catch (JulongChainException e) {
                     return newErrorResponse(String.format("\"SIMULATE_CONFIG_TREE_UPDATE\" Authorization request failed %s: %s", groupName3, e.getMessage()));
                 }
                 return simulateConfigTreeUpdate(groupName3, args.get(2));
@@ -187,8 +187,8 @@ public class CSSC extends SystemSmartContractBase {
                 // TODO: move to ACLProvider once it will support chainless ACLs
                 // 2. check local MSP Admins policy
                 try {
-                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.Members, sp);
-                } catch (JavaChainException e) {
+                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.MEMBERS, sp);
+                } catch (JulongChainException e) {
                     log.error(e.getMessage());
                     return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check :%s", e.getMessage()));
                 }
@@ -236,7 +236,7 @@ public class CSSC extends SystemSmartContractBase {
 //        Common.GroupHeader header = null;
 //        try {
 //            header = EnvelopeHelper.unmarshalEnvelopeOfType(envelopeConfig, Common.HeaderType.CONFIG, configEnv);
-//        } catch (JavaChainException e) {
+//        } catch (JulongChainException e) {
 //            String msg = String.format("Bad configuration envelope: %s", e.getMessage());
 //            throw new SysSmartContractException(msg);
 //        }
@@ -275,7 +275,7 @@ public class CSSC extends SystemSmartContractBase {
     private SmartContractResponse joinGroup(String groupID, Common.Block block) {
         try {
             NodeUtils.createChainFromBlock(block);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             return newErrorResponse(e.getMessage());
         }
         NodeUtils.initChain(groupID);
@@ -368,7 +368,7 @@ public class CSSC extends SystemSmartContractBase {
             return newErrorResponse(e.getMessage());
         } catch (SysSmartContractException e) {
             return newErrorResponse(e.getMessage());
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             return newErrorResponse(e.getMessage());
         }
         return newSuccessResponse("Simulation is successful");

@@ -17,8 +17,8 @@ package org.bcia.julongchain.core.common.privdata;
 
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.PrivDataException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.IQueryExecutor;
 import org.bcia.julongchain.core.node.util.NodeUtils;
@@ -34,7 +34,7 @@ import org.bcia.julongchain.protos.common.Collection;
  * @company Dingxuan
  */
 public class CollectionStoreSupport implements IPrivDataSupport {
-	private static JavaChainLog log = JavaChainLogFactory.getLog(CollectionStoreSupport.class);
+	private static JulongChainLog log = JulongChainLogFactory.getLog(CollectionStoreSupport.class);
 
     public final static String COLLECTION_SEPARATOR = "~";
     public final static String COLLECTION_SUFFIX ="collection";
