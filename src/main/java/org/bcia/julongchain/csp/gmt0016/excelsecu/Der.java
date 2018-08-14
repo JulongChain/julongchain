@@ -31,15 +31,15 @@ public class Der {
 
     public static byte[] encode(byte[] r, byte[] s) {
 
-        byte rBit = r[r.length - 1]; //r highest position bit
-        byte sBit = s[s.length - 1]; //s highest position bit
+        int rBit = r[r.length - 1] & 0x80; //r highest position bit
+        int sBit = s[s.length - 1] & 0x80; //s highest position bit
 
         byte[] paddingByte = {0};
 
-        if (rBit == 0x01) {
+        if (rBit != 0) {
             r = concatArrays(paddingByte, r);
         }
-        if (sBit == 0x01) {
+        if (sBit != 0) {
             s = concatArrays(paddingByte, s);
         }
         byte rLength= intToByte(r.length);

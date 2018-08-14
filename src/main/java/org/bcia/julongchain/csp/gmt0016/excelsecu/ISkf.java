@@ -29,71 +29,71 @@ import java.util.List;
  */
 public interface ISkf {
 
-    long SKF_ConnectDev(String name) throws SarException;
+    long skfConnectDev(String name) throws SarException;
 
-    byte[] SKF_GenRandom(long hDev, int length) throws SarException;
+    byte[] skfGenRandom(long hDev, int length) throws SarException;
 
-    long SKF_GetDevState(String name) throws SarException;
+    long skfGetDevState(String name) throws SarException;
 
-    long SKF_VerifyPIN(long hApplication, long pinType, String pin) throws SarException;
+    long skfVerifyPIN(long hApplication, long pinType, String pin) throws SarException;
 
-    long SKF_CreateContainer(long hApplication, String containerName) throws SarException;
+    long skfCreateContainer(long hApplication, String containerName) throws SarException;
 
-    RSAPublicKeyBlob SKF_GenRSAKeyPair(long hContainer, long bitsLen) throws SarException;
+    RSAPublicKeyBlob skfGenRSAKeyPair(long hContainer, long bitsLen) throws SarException;
 
-    ECCPublicKeyBlob SKF_GenECCKeyPair(long hContainer, long algId) throws SarException;
+    ECCPublicKeyBlob skfGenECCKeyPair(long hContainer, long algId) throws SarException;
 
-    long SKF_GetContainerType(long hContainer) throws SarException;
+    long skfGetContainerType(long hContainer) throws SarException;
 
-    List<String> SKF_EnumContainer(long hApplication, long size) throws SarException;
+    List<String> skfEnumContainer(long hApplication, long size) throws SarException;
 
-    void SKF_DeleteContainer(long hApplication, String containerName) throws SarException;
+    void skfDeleteContainer(long hApplication, String containerName) throws SarException;
 
-    SessionKey SKF_ECCExportSessionKey(long hContainer, long algId, ECCPublicKeyBlob eccPublicKeyBlob) throws SarException;
+    SessionKey skfECCExportSessionKey(long hContainer, long algId, ECCPublicKeyBlob eccPublicKeyBlob) throws SarException;
 
-    void SKF_ImportECCKeyPair(long hContainer, EnvelopedKeyBlob envelopedKeyBlob) throws SarException;
+    void skfImportECCKeyPair(long hContainer, EnvelopedKeyBlob envelopedKeyBlob) throws SarException;
 
-    void SKF_ImportRSAKeyPair(long hContainer, long symAlgId, byte[] wrappedKey, long wrappedKeyLen, byte[] encryptedData, long encryptedDataLen) throws SarException;
+    void skfImportRSAKeyPair(long hContainer, long symAlgId, byte[] wrappedKey, long wrappedKeyLen, byte[] encryptedData, long encryptedDataLen) throws SarException;
 
-    long SKE_CreateApplication(long hDev, String appName, String adminPin, int adminPinRetryCount, String userPin, int userPinRetryCount, int createFileRights) throws SarException;
+    long skfCreateApplication(long hDev, String appName, String adminPin, int adminPinRetryCount, String userPin, int userPinRetryCount, int createFileRights) throws SarException;
 
-    PublicKeyBlob SKF_ExportPublicKey(long hContainer, boolean signFlag, long blobLen) throws SarException;
+    PublicKeyBlob skfExportPublicKey(long hContainer, boolean signFlag, long blobLen) throws SarException;
 
-    void SKF_EncryptInit(long hKey, BlockCipherParam blockCipherParam) throws SarException;
+    void skfEncryptInit(long hKey, BlockCipherParam blockCipherParam) throws SarException;
 
-    byte[] SKF_Encrypt(long hKey, byte[] data, long dataLen, long encryptedBufferLen) throws SarException;
+    byte[] skfEncrypt(long hKey, byte[] data, long dataLen, long encryptedBufferLen) throws SarException;
 
-    void SKF_CloseHandle(long hHandle) throws SarException;
+    void skfCloseHandle(long hHandle) throws SarException;
 
-    long SKF_ImportSessionKey(long hContainer, long algId, byte[] wrappedData, long wrappedLen) throws SarException;
+    long skfImportSessionKey(long hContainer, long algId, byte[] wrappedData, long wrappedLen) throws SarException;
 
-    long SKF_DigestInit(long hDev, long algId, ECCPublicKeyBlob eccPublicKeyBlob, char[] pucID, long idLen) throws SarException;
+    long skfDigestInit(long hDev, long algId, ECCPublicKeyBlob eccPublicKeyBlob, char[] pucID, long idLen) throws SarException;
 
-    byte[] SKF_Digest(long hHash, byte[] data, long dataLen, long hashDataBufferLen) throws SarException;
+    byte[] skfDigest(long hHash, byte[] data, long dataLen, long hashDataBufferLen) throws SarException;
 
-    byte[] SKF_RSASignData(long hContainer, byte[] data, long signBufferLen) throws SarException;
+    byte[] skfRSASignData(long hContainer, byte[] data, long signBufferLen) throws SarException;
 
-    byte[] SKF_ECCSignData(long hContainer, byte[] data, long dataLen) throws SarException;
+    byte[] skfECCSignData(long hContainer, byte[] data, long dataLen) throws SarException;
 
-    boolean SKF_RSAVerify(long hDev, RSAPublicKeyBlob rsaPublicKey, byte[] data, long dataLen, byte[] signature, long signLen) throws SarException;
+    boolean skfRSAVerify(long hDev, RSAPublicKeyBlob rsaPublicKey, byte[] data, long dataLen, byte[] signature, long signLen) throws SarException;
 
-    boolean SKF_ECCVerify(long hDev, ECCPublicKeyBlob eccPublickKey, byte[] data, long dataLen, byte[] signature) throws SarException;
+    boolean skfECCVerify(long hDev, ECCPublicKeyBlob eccPublickKey, byte[] data, long dataLen, byte[] signature) throws SarException;
 
-    void SKF_DecryptInit(long hKey, BlockCipherParam blockCipherParam) throws SarException;
+    void skfDecryptInit(long hKey, BlockCipherParam blockCipherParam) throws SarException;
 
-    byte[] SKF_Decrypt(long hKey, byte[] encryptedData, long encryptedLen, long dataBufferLen) throws SarException;
+    byte[] skfDecrypt(long hKey, byte[] encryptedData, long encryptedLen, long dataBufferLen) throws SarException;
 
-    List<String> SKF_EnumDev(boolean present, long size) throws SarException;
+    List<String> skfEnumDev(boolean present, long size) throws SarException;
 
-    void SKF_LockDev(long hDev, long timeOut) throws SarException;
+    void skfLockDev(long hDev, long timeOut) throws SarException;
 
-    long SKF_OpenApplication(long hDev, String name) throws SarException;
+    long skfOpenApplication(long hDev, String name) throws SarException;
 
-    void SKF_UnlockDev(long hDev) throws SarException;
+    void skfUnlockDev(long hDev) throws SarException;
 
-    void SKF_DisconnectDev(long hDev) throws SarException;
+    void skfDisconnectDev(long hDev) throws SarException;
 
-    void SKF_CloseContainer(long hContainer) throws SarException;
+    void skfCloseContainer(long hContainer) throws SarException;
 
-    ECCCipherBlob SKF_ExtECCEncrypt(long hDev, ECCPublicKeyBlob eccPublicKeyBlob, byte[] plainText, long plainTextLen) throws SarException;
+    ECCCipherBlob skfExtECCEncrypt(long hDev, ECCPublicKeyBlob eccPublicKeyBlob, byte[] plainText, long plainTextLen) throws SarException;
 }
