@@ -98,8 +98,8 @@ public class SmartContractSupportClient extends SmartContractBase {
 
 	public static void main(String[] args) throws Exception {
 		// launch(CommConstant.ESSC);
-//		InprocController.getContainers().put("qssc", new InprocContainer(new AccountingVoucher()));
-//		launch(CommConstant.QSSC);
+		InprocController.getContainers().put("acc", new InprocContainer(new AccountingVoucher()));
+		launch("acc");
 		while (true) {}
 	}
 }

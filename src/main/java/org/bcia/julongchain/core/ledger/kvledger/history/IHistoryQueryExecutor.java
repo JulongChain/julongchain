@@ -33,7 +33,7 @@ public interface IHistoryQueryExecutor {
     IResultsIterator getHistoryForKey(String namespace, String key) throws LedgerException;
 
 	/**
-	 * 查询key最新版本
+	 * 查询key之后第一个不以key起始的HistoryDB数据
 	 */
 	IResultsIterator getLastHistoryForKey(String namespace, String key) throws LedgerException;
 }

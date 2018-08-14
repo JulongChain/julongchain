@@ -16,6 +16,7 @@ limitations under the License.
 package org.bcia.julongchain.common.ledger.util;
 
 import com.google.protobuf.ByteString;
+import org.bcia.julongchain.common.genesis.GenesisBlockFactory;
 import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
 import org.bcia.julongchain.core.ledger.TxSimulationResults;
@@ -23,6 +24,7 @@ import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.protos.common.Common;
+import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
 import org.bcia.julongchain.protos.node.TransactionPackage;
@@ -42,6 +44,10 @@ import java.util.List;
  */
 public class Utils {
 	public static void main(String[] args) throws Exception {
+		resetEnv();
+	}
+
+	public static void resetEnv() {
 		String ledgerDir = "/var/julongchain/production";
 		rm();
 		rmi();
@@ -118,20 +124,30 @@ public class Utils {
 		}
 	}
 
-	public static Common.Block constructDefaultBlock(Common.Block preBlock, String groupID) throws Exception {
+	public static INodeLedger constructDefaultLedger() throws Exception {
+		String groupID = "myGroup";
+		String ns = "mycc";
+		GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
+		LedgerManager.initialize(null);
+		Common.Block block = factory.getGenesisBlock(groupID);
+		INodeLedger l = LedgerManager.createLedger(block);
+		Common.Block block1 = constructDefaultBlock(l, block, groupID, ns);
+		l.commit(block1);
+		return l;
+	}
+
+	public static Common.Block constructDefaultBlock(INodeLedger l, Common.Block preBlock, String groupID, String namespace) throws Exception {
 		return constructBlock(preBlock, groupID, Common.HeaderType.ENDORSER_TRANSACTION,
-				constructTxSimulationResults(groupID, "txID", "key0", "value0").getPubReadWriteByteString(),
-				constructTxSimulationResults(groupID, "txID", "key1", "value1").getPubReadWriteByteString(),
-				constructTxSimulationResults(groupID, "txID", "key2", "value2").getPubReadWriteByteString(),
-				constructTxSimulationResults(groupID, "txID", "key3", "value3").getPubReadWriteByteString()
+				constructTxSimulationResults(l, namespace, "txID", "key0", "value0").getPubReadWriteByteString(),
+				constructTxSimulationResults(l, namespace, "txID", "key1", "value1").getPubReadWriteByteString(),
+				constructTxSimulationResults(l, namespace, "txID", "key2", "value2").getPubReadWriteByteString(),
+				constructTxSimulationResults(l, namespace, "txID", "key3", "value3").getPubReadWriteByteString()
 		);
 	}
 
-	private static TxSimulationResults constructTxSimulationResults(String groupID, String txID, String key, String value) throws Exception{
-		LedgerManager.initialize(null);
-		INodeLedger l = LedgerManager.openLedger(groupID);
+	private static TxSimulationResults constructTxSimulationResults(INodeLedger l,String namespace, String txID, String key, String value) throws Exception{
 		ITxSimulator simulator = l.newTxSimulator(txID);
-		simulator.setState(groupID, key, ("pub " + value).getBytes());
+		simulator.setState(namespace, key, value.getBytes());
 		return simulator.getTxSimulationResults();
 	}
 
@@ -139,7 +155,7 @@ public class Utils {
 		Common.BlockData.Builder builder = Common.BlockData.newBuilder();
 		for (int i = 0; i < rwsets.length; i++) {
 			//pub								//rwset		//txID				//type	//version	//groupID
-			builder.addData(constructEnvelope(	rwsets[i], 	"txid" + i, 	type, 	1, 	groupID).toByteString());
+			builder.addData(constructEnvelope(	rwsets[i], 	"txID" + i, 	type, 	1, 	groupID).toByteString());
 		}
 		Common.BlockData data = builder.build();
 

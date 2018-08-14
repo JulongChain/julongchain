@@ -52,13 +52,14 @@ public class FileLedgerIterator implements IIterator {
      */
     @Override
     public QueryResult next() throws LedgerException {
-        Map.Entry<QueryResult, Common.Status> map = null;
-        QueryResult result = null;
+        Map.Entry<QueryResult, Common.Status> map;
+        QueryResult result;
         try {
             result = commonIterator.next();
         } catch (LedgerException e) {
             log.error(e.getMessage(), e);
             map = new AbstractMap.SimpleEntry<>(null, Common.Status.SERVICE_UNAVAILABLE);
+            return new QueryResult(map);
         }
         map = new AbstractMap.SimpleEntry<>(result
                 , result == null ? Common.Status.SERVICE_UNAVAILABLE : Common.Status.SUCCESS);
@@ -68,7 +69,7 @@ public class FileLedgerIterator implements IIterator {
     @Override
     public void readyChain() throws LedgerException{
         synchronized (FileLedger.LOCK) {
-            if (blockNum > ledger.height()) {
+            if (blockNum > ledger.height() - 1) {
                 try {
                     log.debug("Require block num is [{}], ledger height is[{}], wait block append", blockNum, ledger.height());
                     FileLedger.LOCK.wait();

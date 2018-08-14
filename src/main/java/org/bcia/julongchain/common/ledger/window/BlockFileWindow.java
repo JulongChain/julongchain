@@ -16,12 +16,16 @@ limitations under the License.
 package org.bcia.julongchain.common.ledger.window;
 
 import org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage.BlockFileReader;
+import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
+import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.common.Common;
 
+import javax.sql.rowset.BaseRowSet;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**

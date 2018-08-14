@@ -22,6 +22,7 @@ import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.common.log.JavaChainLog;
 import org.bcia.julongchain.common.log.JavaChainLogFactory;
 
+import java.io.File;
 import java.util.*;
 
 /**

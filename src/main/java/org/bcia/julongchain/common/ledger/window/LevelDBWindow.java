@@ -15,9 +15,12 @@ limitations under the License.
  */
 package org.bcia.julongchain.common.ledger.window;
 
+import org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage.Index;
 import org.bcia.julongchain.common.ledger.util.leveldbhelper.LevelDBProvider;
+import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -33,24 +36,42 @@ public class LevelDBWindow {
 	private final static int INDEX_LEVELDB = 1;
 	private final static int STATE_LEVELDB = 2;
 	private final static int PVT_DATA_LEVELDB = 3;
+	static byte[] b = new byte[]{(byte) 109, (byte) 121, (byte) 71, (byte) 114, (byte) 111, (byte) 117, (byte) 112, (byte) 3, (byte) 110, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0, (byte) 0};
 
 	public static void main(String[] args) throws Exception {
 					//数据库类型
-		new LevelDBWindow().soutLevelDB(STATE_LEVELDB,
-					//kv数据库中起始key, null为全部
-					null,
-					//展示new String(key)
-					true,
-					//每行展示key byte[]长度
-					-1,
-					//展示new String(value)
-					false,
-					//每行展示value byte[]长度
-					-1
-		);
+//		new LevelDBWindow().soutLevelDB(INDEX_LEVELDB,
+//					//kv数据库中起始key, null为全部
+//					null,
+//					//展示new String(key)
+//					true,
+//					//每行展示key byte[]长度
+//					-1,
+//					//展示new String(value)
+//					false,
+//					//每行展示value byte[]长度
+//					-1
+//		);
+		LevelDBProvider provider = new LevelDBProvider("/tmp/julongchain/fileLedger/index");
+		System.out.println(provider.getDBPath());
+
+		Iterator<Map.Entry<byte[], byte[]>> itr = provider.getIterator(null);
+		while (itr.hasNext()) {
+			Map.Entry<byte[], byte[]> entry = itr.next();
+			System.out.println(new String(entry.getKey()));
+			WindowUtil.soutByte(entry.getKey(), 30);
+			System.out.println(new String(entry.getValue()));
+			WindowUtil.soutByte(entry.getValue(), 30);
+			System.out.println("_____________________________________");
+		}
+
+
+		System.out.println("_____________________________________");
+		System.out.println(Arrays.toString(provider.get(b)));
+		System.out.println(Arrays.toString(b));
 	}
 
-	private void soutLevelDB(int levelDBType, byte[] startKey, boolean keyString, int keyBytes, boolean valueString, int valueBytes) throws Exception {
+	private static void soutLevelDB(int levelDBType, byte[] startKey, boolean keyString, int keyBytes, boolean valueString, int valueBytes) throws Exception {
 		LevelDBProvider provider = getLevelDBProvider(levelDBType);
 		System.out.println(provider.getDBPath());
 
@@ -73,7 +94,7 @@ public class LevelDBWindow {
 		}
 	}
 
-	private LevelDBProvider getLevelDBProvider(int levelDBType) throws Exception {
+	private static LevelDBProvider getLevelDBProvider(int levelDBType) throws Exception {
 		switch (levelDBType) {
 			case HISTORY_LEVELDB:
 				return new LevelDBProvider(LedgerConfig.getHistoryLevelDBPath());

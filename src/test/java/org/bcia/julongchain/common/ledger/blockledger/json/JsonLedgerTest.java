@@ -27,10 +27,7 @@ import org.bcia.julongchain.csp.factory.CspManager;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.consenter.Ab;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.File;
 
@@ -43,25 +40,27 @@ import java.io.File;
  */
 public class JsonLedgerTest {
     static final String dir = "/tmp/julongchain/jsonLedger";
-    IFactory jsonLedgerFactory;
-    ReadWriteBase jsonLedger;
-    @Before
-    public void before() throws Exception{
+    static IFactory jsonLedgerFactory;
+    static ReadWriteBase jsonLedger;
+    static Common.Block block;
+    @BeforeClass
+    public static void before() throws Exception{
         //重置目录
         System.out.println(deleteDir(new File(dir)));
         //重新生成fileLedgerFactory
         jsonLedgerFactory = new JsonLedgerFactory(dir);
         //创建file ledger
         jsonLedger = jsonLedgerFactory.getOrCreate("myGroup");
+        //提交创世区块
+		GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
+		block = factory.getGenesisBlock("myGroup");
+		jsonLedger.append(block);
     }
 
     @Test
     public void testGetOrCreate() throws Exception{
         Assert.assertNotNull(jsonLedger);
         Assert.assertTrue(new File(dir).exists());
-        Assert.assertSame(new File(dir).listFiles().length, 1);
-        Assert.assertSame(jsonLedger.height(), (long) 0);
-        Assert.assertEquals(jsonLedgerFactory.groupIDs().get(0), "myGroup");
     }
 
     @Test
@@ -75,17 +74,16 @@ public class JsonLedgerTest {
 
     @Test
     public void testAppend() throws Exception{
-        Assert.assertSame(jsonLedger.height(), (long) 0);
-        GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
-        Common.Block block = factory.getGenesisBlock("myGroup");
-        jsonLedger.append(block);
-        Assert.assertSame(jsonLedger.height(), (long) 1);
+		long height = jsonLedger.height();
 
         block = Common.Block.newBuilder()
                 .setHeader(Common.BlockHeader.newBuilder()
-                        .setPreviousHash(ByteString.copyFrom(CspManager.getDefaultCsp().hash(block.getData().toByteArray(), null)))
-                        .setNumber(1)
+                        .setPreviousHash(ByteString.copyFrom(CspManager.getDefaultCsp().hash(block.getHeader().toByteArray(), null)))
+                        .setNumber(height)
                         .build())
+				.setData(Common.BlockData.newBuilder()
+						.addData(ByteString.copyFromUtf8("BlockData" + height))
+						.build())
                 .setMetadata(Common.BlockMetadata.newBuilder()
                         .addMetadata(ByteString.EMPTY)
                         .addMetadata(ByteString.EMPTY)
@@ -94,13 +92,16 @@ public class JsonLedgerTest {
                         .build())
                 .build();
         jsonLedger.append(block);
-        Assert.assertSame(jsonLedger.height(), (long) 2);
+        Assert.assertSame(jsonLedger.height(), ++height);
 
         block = Common.Block.newBuilder()
                 .setHeader(Common.BlockHeader.newBuilder()
-                        .setPreviousHash(ByteString.copyFrom(CspManager.getDefaultCsp().hash(block.getData().toByteArray(), null)))
-                        .setNumber(2)
+                        .setPreviousHash(ByteString.copyFrom(CspManager.getDefaultCsp().hash(block.getHeader().toByteArray(), null)))
+                        .setNumber(height)
                         .build())
+				.setData(Common.BlockData.newBuilder()
+						.addData(ByteString.copyFromUtf8("BlockData" + height))
+						.build())
                 .setMetadata(Common.BlockMetadata.newBuilder()
                         .addMetadata(ByteString.EMPTY)
                         .addMetadata(ByteString.EMPTY)
@@ -109,7 +110,7 @@ public class JsonLedgerTest {
                         .build())
                 .build();
         jsonLedger.append(block);
-        Assert.assertSame(jsonLedger.height(), (long) 3);
+        Assert.assertSame(jsonLedger.height(), ++height);
     }
 
     @Test
@@ -127,18 +128,12 @@ public class JsonLedgerTest {
         } catch (LedgerException e) {
 //            Assert.assertEquals(e, Util.NOT_FOUND_ERROR_ITERATOR);
         }
-        GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
-        Common.Block block = factory.getGenesisBlock("testGroup");
-        jsonLedger.append(block);
         itr = jsonLedger.iterator(Ab.SeekPosition.newBuilder().setSpecified(Ab.SeekSpecified.getDefaultInstance()).build());
         Assert.assertNotNull(itr);
     }
 
     @Test
     public void testNext() throws Exception{
-        GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
-        Common.Block block = factory.getGenesisBlock("testGroup");
-        jsonLedger.append(block);
         JsonCursor cursor = new JsonCursor((JsonLedger) jsonLedger, jsonLedger.height() - 1);
         Assert.assertNotNull(cursor);
 
@@ -154,7 +149,8 @@ public class JsonLedgerTest {
 //    }
 
     @After
-    public void after() throws Exception{}
+    public void after() throws Exception{
+	}
 
     private static boolean deleteDir(File dir) {
         if (dir.isDirectory()) {

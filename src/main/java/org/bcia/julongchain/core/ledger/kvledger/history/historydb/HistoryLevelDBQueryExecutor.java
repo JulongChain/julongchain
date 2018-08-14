@@ -69,7 +69,7 @@ public class HistoryLevelDBQueryExecutor implements IHistoryQueryExecutor {
 	    byte[] compositeEndKey = HistoryDBHelper.constructPartialCompositeHistoryKey(namespace, key, true);
 
 	    DBIterator iterator = (DBIterator) historyDB.getProvider().getIterator((compositeEndKey));
-	    System.out.println(iterator.hasPrev());
+//	    System.out.println(iterator.hasPrev());
 //	    if(iterator.hasPrev()){
 //	    	iterator.peekPrev();
 //	    } else {

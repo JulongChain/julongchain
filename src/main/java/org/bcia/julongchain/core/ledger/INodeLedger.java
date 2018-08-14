@@ -39,7 +39,7 @@ public interface INodeLedger extends ILedger {
     TransactionPackage.ProcessedTransaction getTransactionByID(String txID) throws LedgerException;
 
     /**
-     * 通过区块hash获取区块
+     * 通过区块hash获取区块(headerHash)
      */
     Common.Block getBlockByHash(byte[] blockHash) throws LedgerException;
 

@@ -16,8 +16,10 @@ limitations under the License.
 package org.bcia.julongchain.core.ledger;
 
 import com.google.protobuf.ByteString;
+import com.sun.javafx.css.SubCssMetaData;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
+import org.bcia.julongchain.common.ledger.util.Utils;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.TxRwSet;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
@@ -25,10 +27,7 @@ import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.protos.ledger.queryresult.KvQueryResult;
 import org.bcia.julongchain.protos.ledger.rwset.Rwset;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
@@ -45,20 +44,25 @@ import java.util.List;
  */
 public class TxSimulatorTest {
     ITxSimulator simulator = null;
-    INodeLedger ledger = null;
+    static INodeLedger ledger = null;
     TxSimulationResults txSimulationResults = null;
-    final String ledgerID = "myGroup";
-    final String ns = "jdoe-voucher";
+    static final String ledgerID = "myGroup";
+    final String ns = "mycc";
 
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
 
-    @Before
-    public void before() throws LedgerException  {
-        LedgerManager.initialize(null);
+    @BeforeClass
+    public static void beforeClass() throws Exception  {
+		Utils.resetEnv();
+		Utils.constructDefaultLedger();
         ledger = LedgerManager.openLedger(ledgerID);
-        simulator = ledger.newTxSimulator("5");
     }
+
+    @Before
+	public void before() throws Exception {
+		simulator = ledger.newTxSimulator("5");
+	}
 
     @Test
     public void testSetState() throws Exception {
@@ -119,6 +123,7 @@ public class TxSimulatorTest {
     }
 
     /*-------------------------------------------------------------------
+		现阶段没有使用PvtData
     @Test
     public void testsetPrivateData() throws Exception{
 	    expectedEx.expect(LedgerException.class);
@@ -206,18 +211,19 @@ public class TxSimulatorTest {
 
     @Test
     public void testGetState() throws Exception {
-		byte[] as = simulator.getState(ns, "a");
-		Assert.assertEquals("10", new String(as));
-		byte[] cs = simulator.getState(ns, "c");
-		Assert.assertEquals("300", new String(cs));
+		for (int i = 0; i < 4; i++) {
+			byte[] value = simulator.getState(ns, "key" + i);
+			Assert.assertArrayEquals(value, ("value" + i).getBytes());
+		}
 	}
 
 	@Test
 	public void testGetStateMultipleKeys() throws Exception{
 		List<byte[]> states = simulator.getStateMultipleKeys(ns, new ArrayList<String>() {{
-			add("a");
-			add("b");
-			add("c");
+			add("key0");
+			add("key1");
+			add("key2");
+			add("key3");
 		}});
 		states.forEach((b) -> {
 			Assert.assertNotNull(b);
@@ -226,21 +232,16 @@ public class TxSimulatorTest {
 
 	@Test
 	public void testGetStateRangeScanIterator() throws Exception{
-    	simulator.getState(ns, "a");
-    	simulator.setState(ns, "a1", "haha".getBytes());
-		IResultsIterator itr = simulator.getStateRangeScanIterator(ns, "a", "b");
-		System.out.println(itr.next());
-//		for (int i = 0; i < 6; i++) {
-//			QueryResult n = itr.next();
-//			VersionedKV kv = (VersionedKV) n.getObj();
-//			System.out.println(kv.getCompositeKey().getKey());
-//			System.out.println(new String(kv.getVersionedValue().getValue()));
-//		}
-		TxSimulationResults txSimulationResults = simulator.getTxSimulationResults();
-		Rwset.TxReadWriteSet publicReadWriteSet = txSimulationResults.getPublicReadWriteSet();
-		TxRwSet txRwSet = new TxRwSet();
-		txRwSet.fromProtoBytes(publicReadWriteSet.getNsRwset(0).getRwset());
-		System.out.println(publicReadWriteSet);
+		IResultsIterator itr = simulator.getStateRangeScanIterator(ns, "a", "c");
+		while (true) {
+			QueryResult next = itr.next();
+			if (next == null) {
+				break;
+			}
+			VersionedKV kv = (VersionedKV) next.getObj();
+			Assert.assertNotNull(kv.getCompositeKey().getKey());
+			System.out.println(kv.getCompositeKey().getKey() + ":" + new String(kv.getVersionedValue().getValue()));
+		}
 	}
 
 	/*-------------------------------------------------------------
@@ -281,13 +282,6 @@ public class TxSimulatorTest {
 	}
 
 	-------------------------------------------------------------*/
-
-    private static void soutBytes(byte[] bytes){
-        int i = 0;
-        for(byte b : bytes){
-            System.out.print(b + " ");
-        }
-    }
 }
 
 
