@@ -43,6 +43,29 @@ import java.util.*;
  * @company Excelsecu
  */
 public class CspGm0016 implements ICsp {
+    // TODO temp use, remove later
+    private static final String RSA = "RSA";
+    private static final String ECC = "ECC";
+    private static final String SM2 = "SM2";
+
+    private static final String SM3 = "SM3";
+    private static final String SHA1 = "SHA1";
+    private static final String SHA256 = "SHA256";
+
+    private static final String SM1 = "SM1";
+    private static final String DES = "DES";
+    private static final String TDES = "TDES";
+    private static final String TRI_DES = "3DES";
+    private static final String SSF33 = "SSF33";
+    private static final String SM4 = "SM4";
+
+    private static final String TYPE_1 = "@1";
+    private static final String TYPE_2 = "@2";
+    private static final String TYPE_3 = "@3";
+    @SuppressWarnings("unused")
+    private static final String TYPE_1_ID = "1";
+    private static final String TYPE_2_ID = "2";
+    private static final String TYPE_3_ID = "3";
 
     private ISkf mSkf;
 
@@ -67,7 +90,7 @@ public class CspGm0016 implements ICsp {
     public CspGm0016() {
         this.mYaml = new Yaml();
         mSkf = new Skf();
-        mContainers = new HashMap<String, Container>();
+        mContainers = new HashMap<>();
         init();
     }
 
@@ -86,17 +109,17 @@ public class CspGm0016 implements ICsp {
         System.load(mProperties.getDriverPath());
         try {
             //size is the specified length of device list returned
-            List<String> deviceList = mSkf.SKF_EnumDev(true, ServiceConfig.DEVICE_LIST_LENGTH);
+            List<String> deviceList = mSkf.skfEnumDev(true, ServiceConfig.DEVICE_LIST_LENGTH);
             long devHandle = 0L;
             long applicationHandle = 0L;
             String name;
 
             for (String devName : deviceList) {
                 name = devName;
-                devHandle = mSkf.SKF_ConnectDev(name);
-                mSkf.SKF_LockDev(devHandle, ServiceConfig.LOCK_DEV_TIME_OUT);
+                devHandle = mSkf.skfConnectDev(name);
+                mSkf.skfLockDev(devHandle, ServiceConfig.LOCK_DEV_TIME_OUT);
                 try {
-                    applicationHandle = mSkf.SKF_OpenApplication(devHandle, name);
+                    applicationHandle = mSkf.skfOpenApplication(devHandle, name);
                     mDevName = name;
                     mHDev = devHandle;
                     mHApplication = applicationHandle;
@@ -105,8 +128,8 @@ public class CspGm0016 implements ICsp {
                 } catch (SarException e) {
                     //if not exist the specified application ,release the current dev
                     if (e.getErrorCode() == SarException.SAR_APPLICATION_NOT_EXIST) {
-                        mSkf.SKF_UnlockDev(devHandle);
-                        mSkf.SKF_DisconnectDev(devHandle);
+                        mSkf.skfUnlockDev(devHandle);
+                        mSkf.skfDisconnectDev(devHandle);
                     }
                 }
             }
@@ -118,8 +141,8 @@ public class CspGm0016 implements ICsp {
     private void createContainer() {
 
         try {
-            String container2Name = UUID.randomUUID().toString() + "@2";
-            mContainer2Handle = mSkf.SKF_CreateContainer(mHApplication, container2Name);
+            String container2Name = UUID.randomUUID().toString() + TYPE_2;
+            mContainer2Handle = mSkf.skfCreateContainer(mHApplication, container2Name);
             mContainers.put(container2Name, new Container(container2Name, mContainer2Handle));
             //TODO: 2018/4/2 生成密钥对，导入一对加密密钥对
         } catch (SarException e) {
@@ -128,11 +151,11 @@ public class CspGm0016 implements ICsp {
 
     }
 
-    private boolean CheckDevAvailable() {
-
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    private boolean checkDevAvailable() {
         if (mHDev != -1 && mHApplication != -1 && mDevName != null) {
             try {
-                switch ((int) mSkf.SKF_GetDevState(mDevName)) {
+                switch ((int) mSkf.skfGetDevState(mDevName)) {
                     case DeviceState.DEV_ABSENT_STATE:
                         break;
                     case DeviceState.DEV_PRESENT_STATE:
@@ -165,44 +188,44 @@ public class CspGm0016 implements ICsp {
     @Override
     public IKey keyGen(IKeyGenOpts opts) throws JulongChainException {
 
-        if (!CheckDevAvailable()) {
+        if (!checkDevAvailable()) {
             throw new JulongChainException("device is not available");
         }
         try {
-            if (mSkf.SKF_VerifyPIN(mHApplication, Constants.USER_TYPE, mProperties.getPinCode()) == 0) {
+            if (mSkf.skfVerifyPIN(mHApplication, Constants.USER_TYPE, mProperties.getPinCode()) == 0) {
                 // TODO: 2018/4/2 LOCK the pin code
                 return null;
             }
 
-            String container1Name = UUID.randomUUID().toString() + "@1";
-            long containerHandler = mSkf.SKF_CreateContainer(mHApplication, container1Name);
+            String container1Name = UUID.randomUUID().toString() + TYPE_1;
+            long containerHandler = mSkf.skfCreateContainer(mHApplication, container1Name);
             mContainers.put(container1Name, new Container(container1Name, containerHandler));
 
             //according to the algorithm, generates difference types of keypair with type 1 container
-            if ("RSA".equals(opts.getAlgorithm())) {
-                RSAPublicKeyBlob rsaKeyPair = mSkf.SKF_GenRSAKeyPair(containerHandler, 1024);
-            } else if ("SM2".equals(opts.getAlgorithm())) {
-                ECCPublicKeyBlob eccKeyPair = mSkf.SKF_GenECCKeyPair(containerHandler, AlgorithmID.SGD_SM2_1);
+            if (RSA.equals(opts.getAlgorithm())) {
+                RSAPublicKeyBlob rsaKeyPair = mSkf.skfGenRSAKeyPair(containerHandler, 1024);
+            } else if (SM2.equals(opts.getAlgorithm())) {
+                ECCPublicKeyBlob eccKeyPair = mSkf.skfGenECCKeyPair(containerHandler, AlgorithmID.SGD_SM2_1);
             }
 
-            long containerTYpe = mSkf.SKF_GetContainerType(mContainer2Handle);
+            long containerTYpe = mSkf.skfGetContainerType(mContainer2Handle);
 
             // empty container
             if (containerTYpe == 0) {
 
-                ECCPublicKeyBlob eccKeyPair = mSkf.SKF_GenECCKeyPair(mContainer2Handle, AlgorithmID.SGD_SM2_1);
-                mSkf.SKF_ECCExportSessionKey(mContainer2Handle, KeyID.SGD_SESSION_KEY, eccKeyPair);
+                ECCPublicKeyBlob eccKeyPair = mSkf.skfGenECCKeyPair(mContainer2Handle, AlgorithmID.SGD_SM2_1);
+                mSkf.skfECCExportSessionKey(mContainer2Handle, KeyID.SGD_SESSION_KEY, eccKeyPair);
 
             }
 
             //generates temp asymmetric keypair with type 3 container
-            String container3Name = UUID.randomUUID().toString() + "@3";
-            long container3Handle = mSkf.SKF_CreateContainer(mHApplication, container3Name);
+            String container3Name = UUID.randomUUID().toString() + TYPE_3;
+            long container3Handle = mSkf.skfCreateContainer(mHApplication, container3Name);
             mContainers.put(container3Name, new Container(container3Name, container3Handle));
-            mSkf.SKF_GenRSAKeyPair(container3Handle, Constants.MAX_RSA_MODULUS_LEN);
+            mSkf.skfGenRSAKeyPair(container3Handle, Constants.MAX_RSA_MODULUS_LEN);
 
             //generates temp symmetric key  with type 2 container
-            mSkf.SKF_GenECCKeyPair(mContainer2Handle, AlgorithmID.SGD_SM2_1);
+            mSkf.skfGenECCKeyPair(mContainer2Handle, AlgorithmID.SGD_SM2_1);
 
             // TODO: 2018/3/29 优化
 
@@ -211,18 +234,18 @@ public class CspGm0016 implements ICsp {
             //if no enough room ,delete type 3 container
             if (SarException.SAR_NO_ROOM == e.getErrorCode()) {
                 for (String containerName : mContainers.keySet()) {
-                    if (containerName.contains("@3")) {
+                    if (containerName.contains(TYPE_3)) {
                         try {
-                            mSkf.SKF_DeleteContainer(mHApplication, containerName);
+                            mSkf.skfDeleteContainer(mHApplication, containerName);
                         } catch (SarException e1) {
                             e1.printStackTrace();
                         }
                     }
                 }
             }
-            if(SarException.SAR_PIN_INCORRECT == e.getErrorCode()) {
-
-            }
+//            if (SarException.SAR_PIN_INCORRECT == e.getErrorCode()) {
+//
+//            }
 
         }
         return null;
@@ -232,7 +255,7 @@ public class CspGm0016 implements ICsp {
     @Override
     public IKey keyDeriv(IKey k, IKeyDerivOpts opts) throws JulongChainException {
 
-        if (!CheckDevAvailable()) {
+        if (!checkDevAvailable()) {
             throw new JulongChainException("device is not available");
         }
 
@@ -242,20 +265,20 @@ public class CspGm0016 implements ICsp {
     @Override
     public IKey keyImport(Object raw, IKeyImportOpts opts) throws SarException {
 
-        String containerName = UUID.randomUUID().toString() + "@1";
-        long containerHandle = mSkf.SKF_CreateContainer(mHApplication, containerName);
+        String containerName = UUID.randomUUID().toString() + TYPE_1;
+        long containerHandle = mSkf.skfCreateContainer(mHApplication, containerName);
         Container container = new Container(containerName, containerHandle);
         mContainers.put(containerName, container);
 
         // TODO: 2018/3/30
 
-//        if ("ECC".equals(opts.getAlgorithm())) {
-//            ECCPublicKeyBlob eccPublicKeyBlob = mSkf.SKF_GenECCKeyPair(container.getContainerHandle(), AlgorithmID.SGD_SM2_1);
-//            mSkf.SKF_ImportECCKeyPair(containerHandle,);
+//        if (ECC.equals(opts.getAlgorithm())) {
+//            ECCPublicKeyBlob eccPublicKeyBlob = mSkf.skfGenECCKeyPair(container.getContainerHandle(), AlgorithmID.SGD_SM2_1);
+//            mSkf.skfImportECCKeyPair(containerHandle,);
 //
-//        } else if ("RSA".equals(opts.getAlgorithm())) {
-//            RSAPublicKeyBlob rsaPublicKeyBlob=mSkf.SKF_GenRSAKeyPair(containerHandle,Constants.MAX_RSA_MODULUS_LEN);
-//            mSkf.SKF_ImportRSAKeyPair(container.getContainerHandle(),);
+//        } else if (RSA.equals(opts.getAlgorithm())) {
+//            RSAPublicKeyBlob rsaPublicKeyBlob=mSkf.skfGenRSAKeyPair(containerHandle,Constants.MAX_RSA_MODULUS_LEN);
+//            mSkf.skfImportRSAKeyPair(container.getContainerHandle(),);
 //        }
 
         return null;
@@ -264,7 +287,7 @@ public class CspGm0016 implements ICsp {
     @Override
     public IKey getKey(byte[] ski) throws JulongChainException {
 
-        if (!CheckDevAvailable()) {
+        if (!checkDevAvailable()) {
             throw new JulongChainException("device is not available");
         }
         boolean isGetKeyPair;
@@ -307,19 +330,19 @@ public class CspGm0016 implements ICsp {
         }
 
         String[] str = containerName.split("@");
-        isGetKeyPair = !str[1].equals("2");
+        isGetKeyPair = !TYPE_2_ID.equals(str[1]);
 
         //获取密钥对：
         if (isGetKeyPair) {
-            isTempKeyPair = str[1].equals("3");
+            isTempKeyPair = TYPE_3_ID.equals(str[1]);
 
             if (isTempKeyPair && mContainers.get(containerName) == null) {
                 //临时密钥对的在内存中的容器名称不存在
                 throw new CspException("tempKeyPair's container doesn't exist in Ram");
             }
 
-            long hContainer = mSkf.SKF_OpenApplication(mHApplication, containerName);
-            PublicKeyBlob publicKeyBlob = mSkf.SKF_ExportPublicKey(hContainer, signFlag, blobBufferLen);
+            long hContainer = mSkf.skfOpenApplication(mHApplication, containerName);
+            PublicKeyBlob publicKeyBlob = mSkf.skfExportPublicKey(hContainer, signFlag, blobBufferLen);
 
             if (publicKeyBlob.getType() == PublicKeyBlob.ECC_PUBLIC_KEY_BLOB_TYPE) {
                 ECCPublicKeyBlob eccPubKeyBlob = publicKeyBlob.getECCPublicKeyBlob();
@@ -332,42 +355,42 @@ public class CspGm0016 implements ICsp {
         }
 
         //获取对称密钥：
-        long hContainer = mSkf.SKF_OpenApplication(mHApplication, containerName);
-        long hKey = mSkf.SKF_ImportSessionKey(hContainer, AlgorithmID.SGD_SM2_1, cipher, cipher.length);
+        long hContainer = mSkf.skfOpenApplication(mHApplication, containerName);
+        long hKey = mSkf.skfImportSessionKey(hContainer, AlgorithmID.SGD_SM2_1, cipher, cipher.length);
         return new GmSymmKey(hKey, cipher);
     }
 
     @Override
     public byte[] hash(byte[] msg, IHashOpts opts) throws JulongChainException {
 
-        if (!CheckDevAvailable()) {
+        if (!checkDevAvailable()) {
             throw new JulongChainException("device is not available");
         }
 
-        if ("SM3".equals(opts.getAlgorithm())) {
+        if (SM3.equals(opts.getAlgorithm())) {
             // TODO: 2018/3/30 公钥待确定
-            long hashHandle = mSkf.SKF_DigestInit(mHDev, AlgorithmID.SGD_SM3, null, null, 0);
-            return mSkf.SKF_Digest(hashHandle, msg, msg.length, 256);
-        } else if ("SHA256".equals(opts.getAlgorithm())) {
-            long hashHandle = mSkf.SKF_DigestInit(mHDev, AlgorithmID.SGD_SHA256, null, null, 0);
-            return mSkf.SKF_Digest(hashHandle, msg, msg.length, 256);
+            long hashHandle = mSkf.skfDigestInit(mHDev, AlgorithmID.SGD_SM3, null, null, 0);
+            return mSkf.skfDigest(hashHandle, msg, msg.length, 256);
+        } else if (SHA256.equals(opts.getAlgorithm())) {
+            long hashHandle = mSkf.skfDigestInit(mHDev, AlgorithmID.SGD_SHA256, null, null, 0);
+            return mSkf.skfDigest(hashHandle, msg, msg.length, 256);
         }
 
         //SHA1
-        long hashHandle = mSkf.SKF_DigestInit(mHDev, AlgorithmID.SGD_SHA1, null, null, 0);
-        return mSkf.SKF_Digest(hashHandle, msg, msg.length, 160);
+        long hashHandle = mSkf.skfDigestInit(mHDev, AlgorithmID.SGD_SHA1, null, null, 0);
+        return mSkf.skfDigest(hashHandle, msg, msg.length, 160);
     }
 
     @Override
     public IHash getHash(IHashOpts opts) throws JulongChainException {
 
-        if (!CheckDevAvailable()) {
+        if (!checkDevAvailable()) {
             throw new JulongChainException("device is not available");
         }
 
-        if ("SM3".equals(opts.getAlgorithm())) {
+        if (SM3.equals(opts.getAlgorithm())) {
             return new SM3();
-        } else if ("SHA1".equals(opts.getAlgorithm())) {
+        } else if (SHA1.equals(opts.getAlgorithm())) {
             return new SHA1();
         }
         return new SHA256();
@@ -376,33 +399,33 @@ public class CspGm0016 implements ICsp {
     @Override
     public byte[] sign(IKey k, byte[] data, ISignerOpts opts) throws JulongChainException {
 
-        if (!CheckDevAvailable()) {
+        if (!checkDevAvailable()) {
             throw new JulongChainException("device is not available");
         }
 
         byte[] digest = new byte[0];
 
 
-        if (opts.hashFunc().equalsIgnoreCase(HashFunConstant.SM3) ) {
+        if (opts.hashFunc().equalsIgnoreCase(SM3) ) {
             SM3 sm3 = new SM3();
             digest = sm3.sum(data);
 
-        } else if (opts.hashFunc().equalsIgnoreCase(HashFunConstant.SHA1)) {
+        } else if (opts.hashFunc().equalsIgnoreCase(SHA1)) {
             SHA1 sha1 = new SHA1();
             digest = sha1.sum(data);
 
-        } else if (opts.hashFunc().equalsIgnoreCase(HashFunConstant.SHA256)) {
+        } else if (opts.hashFunc().equalsIgnoreCase(SHA256)) {
             SHA256 sha256 = new SHA256();
             digest = sha256.sum(data);
         }
 
-        if ("ECC".equals(opts.getAlgorithm())) {
+        if (ECC.equals(opts.getAlgorithm())) {
 
-            return mSkf.SKF_ECCSignData(mHApplication, digest, digest.length);
+            return mSkf.skfECCSignData(mHApplication, digest, digest.length);
 
-        } else if ("RSA".equals(opts.getAlgorithm())) {
+        } else if (RSA.equals(opts.getAlgorithm())) {
 
-            return mSkf.SKF_RSASignData(mHApplication, digest, digest.length);
+            return mSkf.skfRSASignData(mHApplication, digest, digest.length);
         }
 
 
@@ -412,30 +435,30 @@ public class CspGm0016 implements ICsp {
     @Override
     public boolean verify(IKey k, byte[] signature, byte[] data, ISignerOpts opts) throws JulongChainException {
 
-        if (!CheckDevAvailable()) {
+        if (!checkDevAvailable()) {
             throw new JulongChainException("device is not available");
         }
 
         if (k instanceof RSAPublicKeyBlob) {
             RSAPublicKeyBlob rsaPublicKeyBlob = (RSAPublicKeyBlob) k;
-            return mSkf.SKF_RSAVerify(mHDev, rsaPublicKeyBlob, data, data.length, signature, signature.length);
+            return mSkf.skfRSAVerify(mHDev, rsaPublicKeyBlob, data, data.length, signature, signature.length);
 
         } else if (k instanceof ECCPublicKeyBlob) {
             ECCPublicKeyBlob eccPublicKeyBlob = (ECCPublicKeyBlob) k;
-            return mSkf.SKF_ECCVerify(mHDev, eccPublicKeyBlob, data, data.length, signature);
+            return mSkf.skfECCVerify(mHDev, eccPublicKeyBlob, data, data.length, signature);
         }
         return false;
     }
 
     @Override
     public byte[] encrypt(IKey k, byte[] plaintext, IEncrypterOpts opts) throws JulongChainException {
-        if (!CheckDevAvailable()) {
+        if (!checkDevAvailable()) {
             throw new JulongChainException("device is not available");
         }
 
         String algorithm = opts.getAlgorithm();
-        if (algorithm.equals("SM1") || algorithm.equals("DES") || algorithm.equals("TDES")
-                || algorithm.equals("3DES") || algorithm.equals("SSF33") || algorithm.equals("SM4")) {
+        if (algorithm.equals(SM1) || algorithm.equals(DES) || algorithm.equals(TDES)
+                || algorithm.equals(TRI_DES) || algorithm.equals(SSF33) || algorithm.equals(SM4)) {
 
             if (!(k instanceof GmSymmKey)) {
                 throw new JulongChainException("IKey is not the instance of GmSymmKey");
@@ -443,8 +466,8 @@ public class CspGm0016 implements ICsp {
             GmSymmKey sKey = (GmSymmKey) k;
             try {
                 long hSessionKey = sKey.getKeyHandle();
-                mSkf.SKF_EncryptInit(hSessionKey, getDefaultBlockCipherParam(algorithm));
-                return mSkf.SKF_Encrypt(hSessionKey,
+                mSkf.skfEncryptInit(hSessionKey, getDefaultBlockCipherParam(algorithm));
+                return mSkf.skfEncrypt(hSessionKey,
                         plaintext,
                         plaintext.length,
                         plaintext.length + 16);
@@ -454,13 +477,13 @@ public class CspGm0016 implements ICsp {
             return new byte[0];
         }
 
-        if (algorithm.equals("ECC")) {
+        if (algorithm.equals(ECC)) {
             if (!(k instanceof GmECCKey)) {
                 throw new JulongChainException("IKey is not the instance of GmECCKey");
             }
             GmECCKey eccKey = (GmECCKey) k;
             try {
-                ECCCipherBlob eccCipherBlob = mSkf.SKF_ExtECCEncrypt(mHDev,
+                ECCCipherBlob eccCipherBlob = mSkf.skfExtECCEncrypt(mHDev,
                         new ECCPublicKeyBlob(eccKey.getxCoordinate(), eccKey.getyCoordinate()),
                         plaintext,
                         plaintext.length);
@@ -470,7 +493,7 @@ public class CspGm0016 implements ICsp {
             }
         }
 
-        if (algorithm.equals("RSA")) {
+        if (algorithm.equals(RSA)) {
             throw new JulongChainException("encryption of RSA is not available");
         }
 
@@ -480,13 +503,13 @@ public class CspGm0016 implements ICsp {
 
     @Override
     public byte[] decrypt(IKey k, byte[] ciphertext, IDecrypterOpts opts) throws CspException {
-        if (!CheckDevAvailable()) {
+        if (!checkDevAvailable()) {
             throw new CspException("device is not available");
         }
 
         String algorithm = opts.getAlgorithm();
-        if (algorithm.equals("SM1") || algorithm.equals("DES") || algorithm.equals("TDES")
-                || algorithm.equals("3DES") || algorithm.equals("SSF33") || algorithm.equals("SM4")) {
+        if (algorithm.equals(SM1) || algorithm.equals(DES) || algorithm.equals(TDES)
+                || algorithm.equals(TRI_DES) || algorithm.equals(SSF33) || algorithm.equals(SM4)) {
 
             if (!(k instanceof GmSymmKey)) {
                 throw new CspException("Ikey is not the instance of GmSymmKey");
@@ -494,8 +517,8 @@ public class CspGm0016 implements ICsp {
             GmSymmKey sKey = (GmSymmKey) k;
             try {
                 long hSessionKey = sKey.getKeyHandle();
-                mSkf.SKF_DecryptInit(hSessionKey, getDefaultBlockCipherParam(algorithm));
-                return mSkf.SKF_Decrypt(hSessionKey,
+                mSkf.skfDecryptInit(hSessionKey, getDefaultBlockCipherParam(algorithm));
+                return mSkf.skfDecrypt(hSessionKey,
                         ciphertext,
                         ciphertext.length,
                         ciphertext.length + 16);
@@ -503,27 +526,27 @@ public class CspGm0016 implements ICsp {
                 e.printStackTrace();
             }
         }
-        if (algorithm.equals("ECC")) {
+        if (algorithm.equals(ECC)) {
             throw new CspException("decryption of ECC is not available");
         }
-        if (algorithm.equals("RSA")) {
+        if (algorithm.equals(RSA)) {
             throw new CspException("decryption of RSA is not available");
         }
         return new byte[0];
     }
 
     private BlockCipherParam getDefaultBlockCipherParam(String algorithm) {
-        if ("SM1".equals(algorithm)) {
+        if (SM1.equals(algorithm)) {
             return BlockCipherParam.getDefault(AlgorithmID.SGD_SM1_ECB);
-        } else if ("DES".equals(algorithm)) {
+        } else if (DES.equals(algorithm)) {
             return BlockCipherParam.getDefault(AlgorithmID.SGD_DES_ECB);
-        } else if ("TDES".equals(algorithm)) {
+        } else if (TDES.equals(algorithm)) {
             return BlockCipherParam.getDefault(AlgorithmID.SGD_TDES_ECB);
-        } else if ("3DES".equals(algorithm)) {
+        } else if (TRI_DES.equals(algorithm)) {
             return BlockCipherParam.getDefault(AlgorithmID.SGD_3DES_ECB);
-        } else if ("SSF33".equals(algorithm)) {
+        } else if (SSF33.equals(algorithm)) {
             return BlockCipherParam.getDefault(AlgorithmID.SGD_SSF33_ECB);
-        } else if ("SM4".equals(algorithm)) {
+        } else if (SM4.equals(algorithm)) {
             return BlockCipherParam.getDefault(AlgorithmID.SGD_SMS4_ECB);
         }
         return null;

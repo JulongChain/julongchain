@@ -33,7 +33,7 @@ public class GmECCKey extends GmKey {
     @Override
     public byte[] ski() {
         byte[] tlvContainer = getTLV(GmKey.TAG_CONTAINER, containerName.length(), containerName.getBytes());
-        byte flag[] = new byte[1];
+        byte[] flag = new byte[1];
         flag[0] = signFlag ? (byte)1 : 0;
         byte[] tlvSignFlag = getTLV(GmKey.TAG_PUBLICK_KEY_SIGN_FLAG, 1, flag);
         byte[] skiData = new byte[tlvContainer.length + tlvSignFlag.length ];
