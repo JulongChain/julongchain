@@ -29,6 +29,7 @@ import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Ledger;
 import org.bcia.julongchain.protos.node.TransactionPackage;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -371,7 +372,7 @@ public class BlockFileManager {
      * 根据区块hash查找区块
      */
 	public Common.Block retrieveBlockByHash(byte[] blockHash) throws LedgerException {
-        log.debug(String.format("retrieveBlockByHash() - blockHash = [%s]", BytesHexStrTranslate.bytesToHexFun1(blockHash)));
+        log.debug(String.format("retrieveBlockByHash() - blockHash = [%s]", Hex.toHexString(blockHash)));
         FileLocPointer loc;
 		loc = index.getBlockLocByHash(blockHash);
         return fetchBlock(loc);

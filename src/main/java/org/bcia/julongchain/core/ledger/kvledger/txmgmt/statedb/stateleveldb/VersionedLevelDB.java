@@ -25,6 +25,7 @@ import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.StatedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -122,7 +123,7 @@ public class VersionedLevelDB implements IVersionedDB {
                 String key = entry.getKey();
                 byte[] compositeKey = constructCompositeKey(ns, key);
                 log.debug(String.format("Group [%s]: Applying key(String)=[%s] key(bytes)=[%s]"
-                        , dbName, new String(compositeKey), BytesHexStrTranslate.bytesToHexFun1(compositeKey )));
+                        , dbName, new String(compositeKey), Hex.toHexString(compositeKey)));
 
                 if(entry.getValue() == null){
                     dbBatch.delete(compositeKey);

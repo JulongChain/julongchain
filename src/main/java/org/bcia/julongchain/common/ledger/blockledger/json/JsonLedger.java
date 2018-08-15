@@ -27,6 +27,7 @@ import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.io.*;
 import java.util.AbstractMap;
@@ -158,7 +159,7 @@ public class JsonLedger extends ReadWriteBase {
             throw new LedgerException("Block number should have been " + height + " but was " + block.getHeader().getNumber());
         }
         if(lastHash != null && !lastHash.equals(block.getHeader().getPreviousHash())){
-            throw new LedgerException(String.format("Block should's previous hash is [%s]\n but last hash is [%s]", BytesHexStrTranslate.bytesToHexFun1(block.getHeader().getPreviousHash().toByteArray()), BytesHexStrTranslate.bytesToHexFun1(lastHash.toByteArray())));
+            throw new LedgerException(String.format("Block should's previous hash is [%s]\n but last hash is [%s]", Hex.toHexString(block.getHeader().getPreviousHash().toByteArray()), Hex.toHexString(lastHash.toByteArray())));
         }
         writeBlock(block);
         lastHash = ByteString.copyFrom(Util.getHashBytes(block.getHeader().toByteArray()));

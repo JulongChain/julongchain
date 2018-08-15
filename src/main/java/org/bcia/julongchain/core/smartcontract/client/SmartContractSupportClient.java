@@ -109,7 +109,7 @@ public class SmartContractSupportClient extends SmartContractBase {
 	}
 
 	public static void main(String[] args) throws Exception {
-		testLaunch("mycc");
+//		testLaunch("mycc");
 		while (true) {}
 	}
 }
