@@ -19,6 +19,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,7 +60,7 @@ public class UpdateBatch  {
 		if(ledgerID == null){
 			kvs = updateBatch.getKvs();
 		} else {
-			byte[] b = ArrayUtils.addAll(ledgerID.getBytes(), new byte[]{0x00});
+			byte[] b = ArrayUtils.addAll(ledgerID.getBytes(StandardCharsets.UTF_8), new byte[]{0x00});
 			updateBatch.getKvs().forEach((k, v) -> kvs.put(LevelDBProvider.constructLevelKey(ledgerID, k), v));
 		}
 

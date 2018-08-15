@@ -44,7 +44,7 @@ public class LockBasedTxManagerTest {
 //		Map<String, VersionedValue> updates = mgr.getBatch().getPubUpdateBatch().getBatch().getUpdates(ledgerID);
 //		Assert.assertSame(updates.get("key").getVersion().getTxNum(), (long) 0);
 //		Assert.assertSame(updates.get("key").getVersion().getBlockNum(), (long) 0);
-//		Assert.assertArrayEquals(updates.get("key").getValue(), "pub value".getBytes());
+//		Assert.assertArrayEquals(updates.get("key").getValue(), "pub value".getBytes(StandardCharsets.UTF_8));
 	}
 
 	@Test

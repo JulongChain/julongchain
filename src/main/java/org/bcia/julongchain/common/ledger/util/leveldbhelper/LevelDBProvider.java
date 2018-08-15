@@ -21,6 +21,7 @@ import org.bcia.julongchain.common.ledger.util.IDBHandler;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -108,7 +109,7 @@ public class LevelDBProvider implements IDBProvider {
 		if (ledgerID == null) {
 			return key;
 		}
-		byte[] arr = ArrayUtils.addAll(ledgerID.getBytes(), DB_LEDGERID_KEY_SEP);
+		byte[] arr = ArrayUtils.addAll(ledgerID.getBytes(StandardCharsets.UTF_8), DB_LEDGERID_KEY_SEP);
 		arr = ArrayUtils.addAll(arr, key);
 		return arr;
 	}
@@ -124,7 +125,7 @@ public class LevelDBProvider implements IDBProvider {
 			start++;
 		}
 		follow = str.substring(start, str.length());
-		return follow.getBytes();
+		return follow.getBytes(StandardCharsets.UTF_8);
 	}
 
 	@Override

@@ -32,6 +32,7 @@ import org.bcia.julongchain.protos.node.TransactionPackage;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -141,13 +142,14 @@ public class Utils {
 				constructTxSimulationResults(l, namespace, "txID", "key0", "value0").getPubReadWriteByteString(),
 				constructTxSimulationResults(l, namespace, "txID", "key1", "value1").getPubReadWriteByteString(),
 				constructTxSimulationResults(l, namespace, "txID", "key2", "value2").getPubReadWriteByteString(),
-				constructTxSimulationResults(l, namespace, "txID", "key3", "value3").getPubReadWriteByteString()
+				constructTxSimulationResults(l, namespace, "txID", "key3", "value3").getPubReadWriteByteString(),
+				constructTxSimulationResults(l, namespace, "txID", "妇产科", "妇产科").getPubReadWriteByteString()
 		);
 	}
 
 	private static TxSimulationResults constructTxSimulationResults(INodeLedger l,String namespace, String txID, String key, String value) throws Exception{
 		ITxSimulator simulator = l.newTxSimulator(txID);
-		simulator.setState(namespace, key, value.getBytes());
+		simulator.setState(namespace, key, value.getBytes(StandardCharsets.UTF_8));
 		return simulator.getTxSimulationResults();
 	}
 

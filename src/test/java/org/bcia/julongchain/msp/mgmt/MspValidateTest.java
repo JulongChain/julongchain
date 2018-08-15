@@ -175,7 +175,7 @@ public class MspValidateTest {
 //        final Base64.Decoder decoder =  Base64.Decoder.getDecoder();
 //        final Base64.Encoder encoder = Base64.getEncoder();
 //        final String text = "字串文字";
-//        final byte[] textByte = text.getBytes("UTF-8");
+//        final byte[] textByte = text.getBytes(StandardCharsets.UTF_8);
 ////编码
 //        final String encodedText = encoder.encodeToString(textByte);
 //        System.out.println(encodedText);
@@ -185,7 +185,7 @@ public class MspValidateTest {
 //        final Base64.Decoder decoder = Base64.getDecoder();
 //        final Base64.Encoder encoder = Base64.getEncoder();
 //        final String text = "字串文字";
-//        final byte[] textByte = text.getBytes("UTF-8");
+//        final byte[] textByte = text.getBytes(StandardCharsets.UTF_8);
 ////编码
 //        final String encodedText = encoder.encodeToString(textByte);
 //        System.out.println(encodedText);

@@ -30,6 +30,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Ledger;
 import org.bcia.julongchain.protos.node.TransactionPackage;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -42,7 +43,7 @@ import java.util.*;
 public class BlockFileManager {
 
     private static final String BLOCKFILE_PREFIX = "blockfile";
-    private static final byte[] BLK_MGR_INFO_KEY = "blkMgrInfo".getBytes();
+    private static final byte[] BLK_MGR_INFO_KEY = "blkMgrInfo".getBytes(StandardCharsets.UTF_8);
     private static JulongChainLog log = JulongChainLogFactory.getLog(BlockFileManager.class);
     private static final byte BLOCK_BYTES_START = 10;
 
@@ -576,7 +577,7 @@ public class BlockFileManager {
     }
 
     private byte[] compositeBlockManagerInfoKey(String ledgerid){
-        return ArrayUtils.addAll(BLK_MGR_INFO_KEY, ledgerid.getBytes());
+        return ArrayUtils.addAll(BLK_MGR_INFO_KEY, ledgerid.getBytes(StandardCharsets.UTF_8));
     }
 
     public static String getBlockfilePrefix() {

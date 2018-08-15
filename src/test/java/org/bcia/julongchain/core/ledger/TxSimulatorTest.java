@@ -30,6 +30,7 @@ import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -70,8 +71,8 @@ public class TxSimulatorTest {
     	expectedEx.expectMessage("This instance should not be used after calling Done()");
         ByteString rwset = null;
         KvRwset.KVRWSet kvRWSet = null;
-        simulator.setState(ledgerID, "key", "test set state".getBytes());
-        simulator.setState(ledgerID, "key1", "test set state".getBytes());
+        simulator.setState(ledgerID, "key", "test set state".getBytes(StandardCharsets.UTF_8));
+        simulator.setState(ledgerID, "key1", "test set state".getBytes(StandardCharsets.UTF_8));
         txSimulationResults = simulator.getTxSimulationResults();
         rwset = txSimulationResults.getPublicReadWriteSet().getNsRwset(0).getRwset();
         kvRWSet = KvRwset.KVRWSet.parseFrom(rwset);
@@ -79,7 +80,7 @@ public class TxSimulatorTest {
         Assert.assertEquals(kvRWSet.getWrites(1).getKey(), "key1");
         Assert.assertEquals(kvRWSet.getWrites(0).getValue().toStringUtf8(), "test set state");
         Assert.assertEquals(kvRWSet.getWrites(1).getValue().toStringUtf8(), "test set state");
-        simulator.setState(ledgerID + "1", "key", "test set state".getBytes());
+        simulator.setState(ledgerID + "1", "key", "test set state".getBytes(StandardCharsets.UTF_8));
     }
 
     @Test
@@ -95,7 +96,7 @@ public class TxSimulatorTest {
         Assert.assertEquals(kvRWSet.getWrites(0).getKey(), "key");
         Assert.assertTrue(kvRWSet.getWrites(0).getIsDelete());
         Assert.assertEquals(kvRWSet.getWrites(0).getValue().toStringUtf8(), "");
-        simulator.setState(ledgerID, "key", "test set state".getBytes());
+        simulator.setState(ledgerID, "key", "test set state".getBytes(StandardCharsets.UTF_8));
     }
 
     @Test
@@ -103,12 +104,12 @@ public class TxSimulatorTest {
         ByteString rwset = null;
         KvRwset.KVRWSet kvRWSet = null;
         simulator.setStateMultipleKeys(ledgerID, new HashMap<String, byte[]>(){{
-            put("key1", "test set state1".getBytes());
-            put("key2", "test set state2".getBytes());
-            put("key3", "test set state3".getBytes());
-            put("key4", "test set state4".getBytes());
-            put("key5", "test set state5".getBytes());
-            put("key6", "test set state6".getBytes());
+            put("key1", "test set state1".getBytes(StandardCharsets.UTF_8));
+            put("key2", "test set state2".getBytes(StandardCharsets.UTF_8));
+            put("key3", "test set state3".getBytes(StandardCharsets.UTF_8));
+            put("key4", "test set state4".getBytes(StandardCharsets.UTF_8));
+            put("key5", "test set state5".getBytes(StandardCharsets.UTF_8));
+            put("key6", "test set state6".getBytes(StandardCharsets.UTF_8));
         }});
         txSimulationResults = simulator.getTxSimulationResults();
         rwset = txSimulationResults.getPublicReadWriteSet().getNsRwset(0).getRwset();
@@ -131,14 +132,14 @@ public class TxSimulatorTest {
         ByteString rwset = null;
         KvRwset.KVRWSet kvRWSet = null;
         Rwset.CollectionPvtReadWriteSet CollRWSet = null;
-        simulator.setPrivateData(ns, coll, "key", "test set private data".getBytes());
+        simulator.setPrivateData(ns, coll, "key", "test set private data".getBytes(StandardCharsets.UTF_8));
         txSimulationResults = simulator.getTxSimulationResults();
         rwset = txSimulationResults.getPrivateReadWriteSet().getNsPvtRwset(0).getCollectionPvtRwset(0).getRwset();
         kvRWSet = KvRwset.KVRWSet.parseFrom(rwset);
         Assert.assertEquals(kvRWSet.getWrites(0).getKey(), "key");
         Assert.assertFalse(kvRWSet.getWrites(0).getIsDelete());
         Assert.assertEquals(kvRWSet.getWrites(0).getValue().toStringUtf8(), "test set private data");
-        simulator.setPrivateData(ns, coll, "key1", "test set private data1".getBytes());
+        simulator.setPrivateData(ns, coll, "key1", "test set private data1".getBytes(StandardCharsets.UTF_8));
     }
 
     @Test
@@ -146,16 +147,16 @@ public class TxSimulatorTest {
         ByteString rwset = null;
         KvRwset.KVRWSet kvRWSet = null;
         Rwset.CollectionPvtReadWriteSet CollRWSet = null;
-        simulator.setPrivateData(ns, coll, "key", "test set private data".getBytes());
-        simulator.setPrivateData(ns, coll, "key1", "test set private data1".getBytes());
-        simulator.setPrivateData(ns, coll + "1", "key1", "test set private data1".getBytes());
+        simulator.setPrivateData(ns, coll, "key", "test set private data".getBytes(StandardCharsets.UTF_8));
+        simulator.setPrivateData(ns, coll, "key1", "test set private data1".getBytes(StandardCharsets.UTF_8));
+        simulator.setPrivateData(ns, coll + "1", "key1", "test set private data1".getBytes(StandardCharsets.UTF_8));
         simulator.setPirvateDataMultipleKeys(ns, coll + "2", new HashMap<String, byte[]>(){{
-            put("key1", "test set private data mulitiple keys1".getBytes());
-            put("key2", "test set private data mulitiple keys2".getBytes());
-            put("key3", "test set private data mulitiple keys3".getBytes());
-            put("key4", "test set private data mulitiple keys4".getBytes());
-            put("key5", "test set private data mulitiple keys5".getBytes());
-            put("key6", "test set private data mulitiple keys6".getBytes());
+            put("key1", "test set private data mulitiple keys1".getBytes(StandardCharsets.UTF_8));
+            put("key2", "test set private data mulitiple keys2".getBytes(StandardCharsets.UTF_8));
+            put("key3", "test set private data mulitiple keys3".getBytes(StandardCharsets.UTF_8));
+            put("key4", "test set private data mulitiple keys4".getBytes(StandardCharsets.UTF_8));
+            put("key5", "test set private data mulitiple keys5".getBytes(StandardCharsets.UTF_8));
+            put("key6", "test set private data mulitiple keys6".getBytes(StandardCharsets.UTF_8));
 
         }});
         txSimulationResults = simulator.getTxSimulationResults();
@@ -184,7 +185,7 @@ public class TxSimulatorTest {
         Assert.assertEquals(kvRWSet.getWrites(0).getKey(), "key");
         Assert.assertTrue(kvRWSet.getWrites(0).getIsDelete());
         Assert.assertEquals(kvRWSet.getWrites(0).getValue().toStringUtf8(), "");
-        simulator.setPrivateData(ns, coll, "key", "test set private data".getBytes());
+        simulator.setPrivateData(ns, coll, "key", "test set private data".getBytes(StandardCharsets.UTF_8));
         simulator.deletePrivateData(ns, coll, "key");
         txSimulationResults = simulator.getTxSimulationResults();
         rwset = txSimulationResults.getPrivateReadWriteSet().getNsPvtRwset(0).getCollectionPvtRwset(0).getRwset();
@@ -192,8 +193,8 @@ public class TxSimulatorTest {
         Assert.assertEquals(kvRWSet.getWrites(0).getKey(), "key");
         Assert.assertTrue(kvRWSet.getWrites(0).getIsDelete());
         Assert.assertEquals(kvRWSet.getWrites(0).getValue().toStringUtf8(), "");
-        simulator.setPrivateData(ns, coll, "key", "test set private data".getBytes());
-        simulator.setPrivateData(ns, coll, "key1", "test set private data1".getBytes());
+        simulator.setPrivateData(ns, coll, "key", "test set private data".getBytes(StandardCharsets.UTF_8));
+        simulator.setPrivateData(ns, coll, "key1", "test set private data1".getBytes(StandardCharsets.UTF_8));
         simulator.deletePrivateData(ns, coll, "key");
         txSimulationResults = simulator.getTxSimulationResults();
         rwset = txSimulationResults.getPrivateReadWriteSet().getNsPvtRwset(0).getCollectionPvtRwset(0).getRwset();
@@ -211,10 +212,15 @@ public class TxSimulatorTest {
 
     @Test
     public void testGetState() throws Exception {
-		for (int i = 0; i < 4; i++) {
-			byte[] value = simulator.getState(ns, "key" + i);
-			Assert.assertArrayEquals(value, ("value" + i).getBytes());
-		}
+//		for (int i = 0; i < 4; i++) {
+//			byte[] value = simulator.getState(ns, "key" + i);
+//			Assert.assertArrayEquals(value, ("value" + i).getBytes(StandardCharsets.UTF_8));
+//		}
+		byte[] bytes = simulator.getState(ns, "妇产科");
+		System.out.println(new String(bytes));
+		System.out.println(Arrays.toString(bytes));
+		TxSimulationResults txSimulationResults = simulator.getTxSimulationResults();
+		System.out.println(txSimulationResults);
 	}
 
 	@Test
@@ -250,7 +256,7 @@ public class TxSimulatorTest {
 	public void testGetPrivateData() throws Exception{
 		for (int i = 0; i < 6; i++) {
 			byte[] privateData = simulator.getPrivateData(ledgerID, "coll", "key" + i);
-			Assert.assertTrue(Arrays.equals(privateData, ("pvt value" + i).getBytes()));
+			Assert.assertTrue(Arrays.equals(privateData, ("pvt value" + i).getBytes(StandardCharsets.UTF_8)));
 		}
 	}
 
@@ -265,7 +271,7 @@ public class TxSimulatorTest {
 			add("key5");
 		}});
 		for (int i = 0; i < 6; i++) {
-			Assert.assertTrue(Arrays.equals(privateDatas.get(i), ("pvt value" + i).getBytes()));
+			Assert.assertTrue(Arrays.equals(privateDatas.get(i), ("pvt value" + i).getBytes(StandardCharsets.UTF_8)));
 		}
 	}
 

@@ -24,9 +24,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 类描述
+ * In-process VM 控制器
  *
- * @author sunianle
+ * @author sunianle, sunzongyu
  * @date @date 2018/05/17
  * @company Dingxuan
  */

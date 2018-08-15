@@ -34,6 +34,7 @@ import org.bcia.julongchain.protos.ledger.queryresult.KvQueryResult;
 import org.bcia.julongchain.protos.ledger.rwset.Rwset;
 import org.bcia.julongchain.protos.node.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.bcia.julongchain.core.smartcontract.node.SmartContractRunningUtil.*;
@@ -450,7 +451,7 @@ public class SmartContractSupportService
         ITxSimulator txSimulator = l.newTxSimulator("mytestgroupid2");
         byte[] state = txSimulator.getState("mytestgroupid2", "key1");
 //	    System.out.println(new String(state));
-        txSimulator.setState("mytestgroupid1", "key", "value".getBytes());
+        txSimulator.setState("mytestgroupid1", "key", "value".getBytes(StandardCharsets.UTF_8));
         TxSimulationResults txSimulationResults = txSimulator.getTxSimulationResults();
         Rwset.TxReadWriteSet publicReadWriteSet = txSimulationResults.getPublicReadWriteSet();
         Rwset.NsReadWriteSet nsRwset = publicReadWriteSet.getNsRwset(0);

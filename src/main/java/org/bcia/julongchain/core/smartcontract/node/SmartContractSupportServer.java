@@ -110,30 +110,14 @@ public class SmartContractSupportServer {
                         .setProposalBytes(proposal.toByteString())
                         .build();
 
-        String scId = "acc";
+        String scId = "mycc";
 
         String txId = "txId " + UUID.randomUUID().toString();
         String groupId = "myGroup";
 
-        String path="src/main/java/org/bcia/julongchain/examples/smartcontract/java/smartcontract_example02";
-        String smartcontractName = "acc";
-        String version = "1.0";
-        List<String> initArgs=new LinkedList<String>();
-        initArgs.add("query");
-        initArgs.add("a");
-        initArgs.add("100");
-
-        SmartContractPackage.SmartContractDeploymentSpec cds = constructDeploySpec(smartcontractName, path, version, initArgs, false);
-        byte[] cdsBytes = ProtoUtils.marshalOrPanic(cds);
-        List<ByteString> args0 = new LinkedList<ByteString>();
-        args0.add(ByteString.copyFromUtf8(LSSC.INSTALL));
-        args0.add(ByteString.copyFrom(cdsBytes));
-
         SmartContractPackage.SmartContractInput smartContractInput =
                 SmartContractPackage.SmartContractInput.newBuilder()
-                        .addArgs(ByteString.copyFromUtf8("query"))
-                        .addArgs(ByteString.copyFromUtf8("1"))
-                        .addArgs(ByteString.copyFromUtf8("20"))
+                        .addArgs(ByteString.copyFromUtf8("save"))
                         .build();
 
         SmartContractEventPackage.SmartContractEvent smartContractEvent =
@@ -150,7 +134,7 @@ public class SmartContractSupportServer {
                         .build();
 
         SmartContractShim.SmartContractMessage scMsg = SmartContractSupportService.invoke(scId, msg);
-        System.out.println();
+        System.out.println(scMsg);
 
 
 //    List<KvRwset.KVRead> kvReads = TransactionRunningUtil.getKvReads(scId, txId);

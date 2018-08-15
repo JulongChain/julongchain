@@ -26,6 +26,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.StatedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -164,11 +165,11 @@ public class VersionedLevelDB implements IVersionedDB {
     }
 
     public static byte[] constructCompositeKey(String ns, String key){
-        byte[] result = ArrayUtils.addAll(ns.getBytes(), COMPOSITE_KEY_SEP);
+        byte[] result = ArrayUtils.addAll(ns.getBytes(StandardCharsets.UTF_8), COMPOSITE_KEY_SEP);
         if(key == null){
             return ArrayUtils.addAll(result, new byte[0]);
         } else {
-            return ArrayUtils.addAll(result, key.getBytes());
+            return ArrayUtils.addAll(result, key.getBytes(StandardCharsets.UTF_8));
         }
     }
 
