@@ -33,6 +33,7 @@ import org.bcia.julongchain.protos.node.TransactionPackage;
 import org.iq80.leveldb.DBIterator;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -78,6 +79,10 @@ public class HistoryScanner implements IResultsIterator {
         }
         Map.Entry<byte[], byte[]> entry = dbItr.next();
         byte[] historyKey = HistoryDBHelper.removeLedgerIDFromHistoryKey(ledgerID, entry.getKey());
+		String historyKeyStr = new String(historyKey, StandardCharsets.UTF_8);
+		if (!historyKeyStr.contains(key)) {
+			return null;
+		}
 
 	    //key:ns~key~blockNo~tranNo
         blockNum = HistoryDBHelper.splitCompositeHistoryKeyForBlockNum(historyKey);

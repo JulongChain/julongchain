@@ -28,6 +28,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.consenter.Ab;
 import org.junit.*;
+import org.junit.rules.ExpectedException;
 
 import java.io.File;
 
@@ -43,6 +44,10 @@ public class JsonLedgerTest {
     static IFactory jsonLedgerFactory;
     static ReadWriteBase jsonLedger;
     static Common.Block block;
+
+    @Rule
+	public ExpectedException thrown = ExpectedException.none();
+
     @BeforeClass
     public static void before() throws Exception{
         //重置目录
@@ -75,7 +80,7 @@ public class JsonLedgerTest {
     @Test
     public void testAppend() throws Exception{
 		long height = jsonLedger.height();
-
+		//正确用例
         block = Common.Block.newBuilder()
                 .setHeader(Common.BlockHeader.newBuilder()
                         .setPreviousHash(ByteString.copyFrom(CspManager.getDefaultCsp().hash(block.getHeader().toByteArray(), null)))
@@ -111,11 +116,49 @@ public class JsonLedgerTest {
                 .build();
         jsonLedger.append(block);
         Assert.assertSame(jsonLedger.height(), ++height);
+        //错误用例
+		block = Common.Block.newBuilder()
+				.setHeader(Common.BlockHeader.newBuilder()
+						.setPreviousHash(ByteString.copyFrom(CspManager.getDefaultCsp().hash(block.getHeader().toByteArray(), null)))
+						//区块号错误
+						.setNumber(height + 1)
+						.build())
+				.setData(Common.BlockData.newBuilder()
+						.addData(ByteString.copyFromUtf8("BlockData" + height))
+						.build())
+				.setMetadata(Common.BlockMetadata.newBuilder()
+						.addMetadata(ByteString.EMPTY)
+						.addMetadata(ByteString.EMPTY)
+						.addMetadata(ByteString.EMPTY)
+						.addMetadata(ByteString.EMPTY)
+						.build())
+				.build();
+		thrown.expect(LedgerException.class);
+		jsonLedger.append(block);
+
+		block = Common.Block.newBuilder()
+				.setHeader(Common.BlockHeader.newBuilder()
+						//preHash错误
+						.setPreviousHash(ByteString.copyFrom(CspManager.getDefaultCsp().hash(block.getData().toByteArray(), null)))
+						.setNumber(height)
+						.build())
+				.setData(Common.BlockData.newBuilder()
+						.addData(ByteString.copyFromUtf8("BlockData" + height))
+						.build())
+				.setMetadata(Common.BlockMetadata.newBuilder()
+						.addMetadata(ByteString.EMPTY)
+						.addMetadata(ByteString.EMPTY)
+						.addMetadata(ByteString.EMPTY)
+						.addMetadata(ByteString.EMPTY)
+						.build())
+				.build();
+		thrown.expect(LedgerException.class);
+		jsonLedger.append(block);
     }
 
     @Test
     public void testIterator() throws Exception{
-        IIterator itr = null;
+        IIterator itr;
 
         itr = jsonLedger.iterator(Ab.SeekPosition.newBuilder().setOldest(Ab.SeekOldest.getDefaultInstance()).build());
         Assert.assertNotNull(itr);
@@ -123,13 +166,8 @@ public class JsonLedgerTest {
         itr = jsonLedger.iterator(Ab.SeekPosition.newBuilder().setNewest(Ab.SeekNewest.getDefaultInstance()).build());
         Assert.assertNotNull(itr);
 
-        try {
-            jsonLedger.iterator(Ab.SeekPosition.newBuilder().setSpecified(Ab.SeekSpecified.getDefaultInstance()).build());
-        } catch (LedgerException e) {
-//            Assert.assertEquals(e, Util.NOT_FOUND_ERROR_ITERATOR);
-        }
-        itr = jsonLedger.iterator(Ab.SeekPosition.newBuilder().setSpecified(Ab.SeekSpecified.getDefaultInstance()).build());
-        Assert.assertNotNull(itr);
+		itr = jsonLedger.iterator(Ab.SeekPosition.newBuilder().setSpecified(Ab.SeekSpecified.getDefaultInstance()).build());
+		Assert.assertNotNull(itr);
     }
 
     @Test

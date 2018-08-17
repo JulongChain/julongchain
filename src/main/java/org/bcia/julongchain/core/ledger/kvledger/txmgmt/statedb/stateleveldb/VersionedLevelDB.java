@@ -21,7 +21,6 @@ import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
-import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.StatedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
@@ -41,9 +40,8 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class VersionedLevelDB implements IVersionedDB {
-    private static final byte[] COMPOSITE_KEY_SEP = {0x00};
-    private static final byte LAST_KEY_INDICATOR = 0x01;
-    private static final byte[] SAVE_POINT_KEY = {0x00};
+    private static final byte[] COMPOSITE_KEY_SEP = new String(new char[]{Character.MIN_VALUE}).getBytes();
+    private static final byte[] SAVE_POINT_KEY = new String(new char[]{Character.MIN_VALUE}).getBytes();
 
 	private static JulongChainLog log = JulongChainLogFactory.getLog(VersionedLevelDB.class);
 
@@ -96,12 +94,8 @@ public class VersionedLevelDB implements IVersionedDB {
     @Override
     public IResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
         byte[] compositeStartKey = constructCompositeKey(namespace, startKey);
-        byte[] compositeEndKey = constructCompositeKey(namespace, endKey);
-        if(endKey == null || "".equals(endKey)){
-            compositeEndKey[compositeEndKey.length - 1] = LAST_KEY_INDICATOR;
-        }
         Iterator dbItr = db.getIterator(compositeStartKey);
-        return new KvScanner(namespace, dbItr);
+        return new KvScanner(namespace, dbItr, endKey);
     }
 
     @Override

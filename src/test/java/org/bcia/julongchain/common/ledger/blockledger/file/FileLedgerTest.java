@@ -16,6 +16,7 @@ limitations under the License.
 package org.bcia.julongchain.common.ledger.blockledger.file;
 
 import com.google.protobuf.ByteString;
+import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.genesis.GenesisBlockFactory;
 import org.bcia.julongchain.common.ledger.blockledger.IIterator;
 import org.bcia.julongchain.common.ledger.blockledger.ReadWriteBase;
@@ -25,6 +26,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.consenter.Ab;
 import org.junit.*;
+import org.junit.rules.ExpectedException;
 
 import java.io.File;
 import java.util.Map;
@@ -42,7 +44,10 @@ public class FileLedgerTest {
     static Common.Block block;
     static ReadWriteBase fileLedger;
 
-    @BeforeClass
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
+	@BeforeClass
 	public static void beforeClass() throws Exception {
 		//重置目录
 		Utils.rmrf(dir);
@@ -63,9 +68,9 @@ public class FileLedgerTest {
     }
 
     @Test
-    public void testAppend() throws Exception{
+    public void testAppend() throws Exception {
 		long height = fileLedger.height();
-
+		//正确用例
 		block = Common.Block.newBuilder()
 				.setHeader(Common.BlockHeader.newBuilder()
 						.setNumber(height)
@@ -82,7 +87,22 @@ public class FileLedgerTest {
 
 		Map<String, File> fileRelativePath;
         fileRelativePath = IoUtil.getFileRelativePath(dir);
-        Assert.assertNotSame(fileRelativePath.get("chains/myGroup/blockfile_000000").length(), (long) 0);
+		Assert.assertNotSame(fileRelativePath.get("chains/myGroup/blockfile_000000").length(), (long) 0);
+        //错误用例
+		block = Common.Block.newBuilder()
+				.setHeader(Common.BlockHeader.newBuilder()
+						//区块号错误
+						.setNumber(height + 1)
+						.build())
+				.setMetadata(Common.BlockMetadata.newBuilder()
+						.addMetadata(ByteString.EMPTY)
+						.addMetadata(ByteString.EMPTY)
+						.addMetadata(ByteString.EMPTY)
+						.addMetadata(ByteString.EMPTY)
+						.build())
+				.build();
+		thrown.expect(LedgerException.class);
+		fileLedger.append(block);
     }
 
     @Test

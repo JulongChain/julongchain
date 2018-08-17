@@ -27,8 +27,8 @@ import org.bcia.julongchain.core.ledger.util.Util;
  * @company Dingxuan
  */
 public class HistoryDBHelper {
-    private static final byte[] COMPOSITE_KEY_SEP = {0x00};
-    private static final byte[] COMPOSITE_END_KEY = {Byte.MAX_VALUE};
+    private static final byte[] COMPOSITE_KEY_SEP = new String(new char[]{Character.MIN_VALUE}).getBytes();
+    private static final byte[] COMPOSITE_END_KEY = new String(new char[]{Character.MAX_VALUE}).getBytes();
 
     /**
      * 将namespace, key, blockNum, tranNum组装为HistoryDB key
@@ -64,7 +64,6 @@ public class HistoryDBHelper {
 		byte[] ledgerIDBytes = ledgerID.getBytes();
 		byte[] reuslt = new byte[historykey.length - 1 - ledgerIDBytes.length];
 		System.arraycopy(historykey, ledgerIDBytes.length + 1, reuslt, 0, reuslt.length);
-		String s = new String(reuslt);
 		return reuslt;
 	}
 

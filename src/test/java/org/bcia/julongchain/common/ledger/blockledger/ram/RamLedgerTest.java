@@ -26,6 +26,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.consenter.Ab;
 import org.junit.*;
+import org.junit.rules.ExpectedException;
 
 import static org.bcia.julongchain.common.ledger.util.Utils.rmrf;
 
@@ -41,6 +42,9 @@ public class RamLedgerTest {
     static IFactory ramLedgerFactory;
     static ReadWriteBase ramLedger;
 	static Common.Block block = null;
+
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
     @BeforeClass
     public static void before() throws Exception{
@@ -152,19 +156,6 @@ public class RamLedgerTest {
 //        channel = itr.readyChain();
 //        Assert.assertNotNull(channel);
 //    }
-
-    @Test
-    public void testNext() throws Exception{
-        IIterator itr;
-        itr = ramLedger.iterator(Ab.SeekPosition.newBuilder().setOldest(Ab.SeekOldest.getDefaultInstance()).build());
-        itr.next();
-
-        itr = ramLedger.iterator(Ab.SeekPosition.newBuilder().setNewest(Ab.SeekNewest.getDefaultInstance()).build());
-        itr.next();
-
-        itr = ramLedger.iterator(Ab.SeekPosition.newBuilder().setSpecified(Ab.SeekSpecified.getDefaultInstance()).build());
-        itr.next();
-    }
 
     @After
     public void after() throws Exception{}

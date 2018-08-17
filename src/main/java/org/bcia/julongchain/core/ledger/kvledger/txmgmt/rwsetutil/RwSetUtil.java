@@ -130,7 +130,7 @@ public class RwSetUtil {
      */
     public static KvRwset.Version newProtoVersion(LedgerHeight height){
         if(height == null){
-            return null;
+            return KvRwset.Version.getDefaultInstance();
         }
         return KvRwset.Version.newBuilder()
                 .setBlockNum(height.getBlockNum())

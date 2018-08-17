@@ -101,7 +101,7 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
                 args,
                 true,
                 false,
-                true
+				NodeConfigFactory.getNodeConfig().getSmartContract().getSystem().get("cssc").contains("enable")
         );
         embedContractDescriptors[1] = new SystemSmartContractDescriptor(
                 "essc",
@@ -110,7 +110,7 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
                 args,
                 false,
                 false,
-                true
+				NodeConfigFactory.getNodeConfig().getSmartContract().getSystem().get("essc").contains("enable")
         );
         embedContractDescriptors[2] = new SystemSmartContractDescriptor(
                 "lssc",
@@ -119,7 +119,7 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
                 args,
                 true,
                 true,
-                true
+				NodeConfigFactory.getNodeConfig().getSmartContract().getSystem().get("lssc").contains("enable")
         );
         embedContractDescriptors[3] = new SystemSmartContractDescriptor(
                 "qssc",
@@ -128,7 +128,7 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
                 args,
                 true,
                 true,
-                true
+				NodeConfigFactory.getNodeConfig().getSmartContract().getSystem().get("qssc").contains("enable")
         );
         embedContractDescriptors[4] = new SystemSmartContractDescriptor(
                 "vssc",
@@ -137,7 +137,7 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
                 args,
                 false,
                 false,
-                true
+				NodeConfigFactory.getNodeConfig().getSmartContract().getSystem().get("vssc").contains("enable")
         );
         cssc.setSystemSmartContractDescriptor(embedContractDescriptors[0]);
         essc.setSystemSmartContractDescriptor(embedContractDescriptors[1]);

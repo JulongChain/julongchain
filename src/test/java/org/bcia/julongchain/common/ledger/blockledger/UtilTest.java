@@ -122,14 +122,16 @@ public class UtilTest {
         }});
         Assert.assertNotNull(block);
         System.out.println(block);
-        Assert.assertSame(block.getHeader().getNumber(), (long) 0);
+        Assert.assertSame(block.getHeader().getNumber(), 0L);
     }
 
     @Test
     public void testGetBlockUsingJson() throws Exception{
         IFactory factory = new JsonLedgerFactory(dir);
         IReader reader = factory.getOrCreate(groupID);
-        final Common.Block block = Util.createNextBlock(reader, null);
+        final Common.Block block = Util.createNextBlock(reader, new ArrayList<Common.Envelope>(){{
+        	add(Common.Envelope.getDefaultInstance());
+		}});
         new Thread(() -> {
             try {
                 Thread.sleep(1002);

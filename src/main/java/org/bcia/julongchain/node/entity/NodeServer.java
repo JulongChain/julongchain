@@ -149,7 +149,7 @@ public class NodeServer {
         while (!Utils.isHostConnectable(host, port)) {
             log.info("wait consenter start, host:" + host + ", port:" + port);
             try {
-                Thread.sleep(1000l);
+                Thread.sleep(1000L);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -58,26 +58,6 @@ public class HistoryLevelDBQueryExecutor implements IHistoryQueryExecutor {
 
 	    return new HistoryScanner(compositeStartKey, namespace, key, iterator, blockStore, ledgerID);
     }
-
-    @Override
-    public IResultsIterator getLastHistoryForKey(String namespace, String key) throws LedgerException {
-	    if(!LedgerConfig.isHistoryDBEnabled()){
-		    String msg = "History db is not available";
-		    log.debug(msg);
-		    throw new LedgerException(msg);
-	    }
-	    byte[] compositeEndKey = HistoryDBHelper.constructPartialCompositeHistoryKey(namespace, key, true);
-
-	    DBIterator iterator = (DBIterator) historyDB.getProvider().getIterator((compositeEndKey));
-//	    System.out.println(iterator.hasPrev());
-//	    if(iterator.hasPrev()){
-//	    	iterator.peekPrev();
-//	    } else {
-//	    	return null;
-//	    }
-	    return new HistoryScanner(compositeEndKey, namespace, key, iterator, blockStore, ledgerID);
-    }
-
     private byte[] constructHistoryKey(byte[] key){
     	byte[] sep = new byte[]{0x00};
     	byte[] result = ArrayUtils.addAll(ledgerID.getBytes(), sep);

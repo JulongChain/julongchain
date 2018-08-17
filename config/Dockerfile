@@ -17,6 +17,7 @@ COPY pom.xml /root/julongchain
 COPY src/ /root/julongchain/src
 WORKDIR /root/julongchain
 ENV CORE_NODE_ADDRESS #core_node_address#
+ENV LANG C.UTF-8
 RUN mvn package
 RUN rm -rf /root/julongchain/pom.xml
 RUN rm -rf /root/julongchain/src

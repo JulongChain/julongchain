@@ -19,6 +19,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.exception.LevelDBException;
 import org.bcia.julongchain.common.ledger.util.IDBHandler;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
+import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -32,10 +33,10 @@ import java.util.*;
  * @company Dingxuan
  */
 public class LevelDBProvider implements IDBProvider {
-	private IDBHandler db = null;
-	private static byte[] DB_NAME_KEY_SEP = new byte[]{0x00};
-	private static byte[] DB_LEDGERID_KEY_SEP = new byte[]{0x03};
-	private String dbPath = null;
+	private IDBHandler db;
+	private static byte[] DB_NAME_KEY_SEP = new String(new char[]{Character.MIN_VALUE}).getBytes();
+	private static byte[] DB_LEDGERID_KEY_SEP = new String(new char[]{Character.MIN_VALUE}).getBytes();
+	private String dbPath;
 	private String ledgerID = null;
 	static Map<String, IDBProvider> dbs = new HashMap<>();
 

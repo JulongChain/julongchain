@@ -22,6 +22,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.StatedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
@@ -36,10 +37,12 @@ import java.util.Map;
 public class KvScanner implements IResultsIterator {
     private String nameSpace;
     private Iterator dbItr;
+	private String endKey;
 
-    public KvScanner(String nameSpace, Iterator dbItr) {
+    public KvScanner(String nameSpace, Iterator dbItr, String endKey) {
         this.nameSpace = nameSpace;
         this.dbItr = dbItr;
+        this.endKey = endKey;
     }
 
     @Override
@@ -49,10 +52,12 @@ public class KvScanner implements IResultsIterator {
         }
         Map.Entry<byte[], byte[]> iterator = (Map.Entry<byte[], byte[]>) dbItr.next();
         byte[] dbKey = iterator.getKey();
-	    String s = new String(dbKey);
 	    byte[] dbVal = iterator.getValue();
         byte[] dbValCpy = Arrays.copyOf(dbVal, dbVal.length);
         String key = VersionedLevelDB.splitCompositeKeyToKey(dbKey);
+		if (key.compareTo(endKey) >= 0) {
+			return null;
+		}
         byte[] value = StatedDB.decodeValueToBytes(dbValCpy);
         LedgerHeight version = StatedDB.decodeValueToHeight(dbValCpy);
         return new QueryResult(
@@ -81,4 +86,12 @@ public class KvScanner implements IResultsIterator {
     public void setDbItr(Iterator dbItr) {
         this.dbItr = dbItr;
     }
+
+	public String getEndKey() {
+		return endKey;
+	}
+
+	public void setEndKey(String endKey) {
+		this.endKey = endKey;
+	}
 }

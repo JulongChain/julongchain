@@ -143,7 +143,7 @@ public class Utils {
 				constructTxSimulationResults(l, namespace, "txID", "key1", "value1").getPubReadWriteByteString(),
 				constructTxSimulationResults(l, namespace, "txID", "key2", "value2").getPubReadWriteByteString(),
 				constructTxSimulationResults(l, namespace, "txID", "key3", "value3").getPubReadWriteByteString(),
-				constructTxSimulationResults(l, namespace, "txID", "妇产科", "妇产科").getPubReadWriteByteString()
+				constructTxSimulationResults(l, namespace, "txID", "中文测试", "中文测试").getPubReadWriteByteString()
 		);
 	}
 

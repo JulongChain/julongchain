@@ -64,8 +64,9 @@ public class QueryHelper {
         List<VersionedValue> versionedValues = txMgr.getDb().getStateMultipleKeys(ns, keys);
         List<byte[]> values = new ArrayList<>();
         for (int i = 0; i < versionedValues.size(); i++) {
-            byte[] val = versionedValues.get(i).getValue();
-            LedgerHeight ver = versionedValues.get(i).getVersion();
+			VersionedValue value = versionedValues.get(i);
+			byte[] val = value == null ? null : value.getValue();
+            LedgerHeight ver = value == null ? null : value.getVersion();
             addToReadSet(ns, keys.get(i), ver);
             values.add(val);
         }
