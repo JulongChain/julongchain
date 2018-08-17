@@ -34,12 +34,17 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * 查询系统智能合约　Query System Smart Contract,CSSC
- * CSSC implements the ledger query functions, including:
- * -GetChainInfo returns BlockchainInfo
- * -GetBlockByNumber returns a block
- * -GetBlockByHash returns a block
- * -GetTransactionByID returns a transaction
+ * 查询系统智能合约　Query System Smart Contract,QSSC
+ * QSSC实现账本查询功能，包括：
+ * -GetGroupInfo 获取区块链信息
+ * -GetBlockByNumber 根据编号返回一个区块
+ * -GetBlockByHash 根据哈希值返回一个区块
+ * -GetTransactionByID 根据ID返回交易
+ * QSSC的invoke函数，接受的args格式说明如下：
+ * "Args":["GetGroupInfo",<groupID>]
+ * "Args":["GetBlockByNumber",<groupID>,<blockNumber>]
+ * "Args":["GetBlockByHash",<groupID>,<hash>]
+ * "Args":["GetTransactionByID",<groupID>,<txID>]
  * @author sunianle
  * @date 3/5/18
  * @company Dingxuan
