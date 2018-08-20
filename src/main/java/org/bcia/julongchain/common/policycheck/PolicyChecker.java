@@ -70,7 +70,7 @@ public class PolicyChecker implements IPolicyChecker{
          }
 
         if(policyName == ""){
-             String msg=String.format("Invalid policy name during check policy on group [%s]. Name must be different from nil",groupID);
+             String msg=String.format("Invalid policy name during check policy on group [%s]. Name must be different from null",groupID);
              throw new PolicyException(msg);
         }
         if(signedProposal == null){
@@ -202,11 +202,11 @@ public class PolicyChecker implements IPolicyChecker{
      */
     public void checkPolicyBySignedData(String groupID, String policyName, List<SignedData> signedDatas) throws PolicyException{
         if(groupID == ""){
-            String msg=String.format("Invalid group ID name during check policy on signed data. Name must be different from nil");
+            String msg=String.format("Invalid group ID name during check policy on signed data. Name must be different from null");
             throw new PolicyException(msg);
         }
         if(policyName == ""){
-            String msg=String.format("Invalid policy name during check policy on signed data on channel [%s]. Name must be different from nil",groupID);
+            String msg=String.format("Invalid policy name during check policy on signed data on channel [%s]. Name must be different from null",groupID);
             throw new PolicyException(msg);
         }
         if(signedDatas == null){

@@ -49,7 +49,7 @@ public class PolicyProvider implements IPolicyProvider{
         try {
             signaturePolicyEnvelope = Policies.SignaturePolicyEnvelope.parseFrom(data);
         } catch (InvalidProtocolBufferException e) {
-            log.error("Error unmarshaling to SignaturePolicy");
+            log.error("Unmarshaling the SignaturePolicy is an error");
             throw new PolicyException(e);
         }
         if(signaturePolicyEnvelope.getVersion() != 0){

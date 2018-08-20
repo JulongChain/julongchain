@@ -29,7 +29,7 @@ import java.util.List;
  */
 public interface IEvalutor {
     /**
-     * 参照Fabric中compile方法的返回函数
+     * CAuthdsl类中的compile方法的返回函数
      * @param signedDatas
      * @param bool
      * @return
