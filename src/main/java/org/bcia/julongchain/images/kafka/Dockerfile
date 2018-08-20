@@ -13,6 +13,7 @@
 # limitations under the License.
 #
 FROM julongchain/julongchain-baseimage
+MAINTAINER Julongchain "qkl@dxct.org"
 
 ENV SCALA_VERSION=2.11 \
     KAFKA_VERSION=0.9.0.1 \

@@ -13,6 +13,7 @@
 # limitations under the License.
 #
 FROM julongchain/julongchain-baseimage
+MAINTAINER Julongchain "qkl@dxct.org"
 ENV MAVEN_VERSION=3.5.2
 ENV USER_HOME_DIR="/root"
 RUN mkdir -p /usr/share/maven /usr/share/maven/ref \

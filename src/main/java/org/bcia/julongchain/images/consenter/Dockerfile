@@ -13,6 +13,7 @@
 # limitations under the License.
 #
 FROM julongchain/julongchain-baseimage
+MAINTAINER Julongchain "qkl@dxct.org"
 COPY julongchain.jar /root/julongchain
 COPY config/ /root/julongchain/config
 COPY msp/ /root/julongchain/msp

@@ -13,6 +13,7 @@
 # limitations under the License.
 #
 FROM julongchain/julongchain-baseimage
+MAINTAINER Julongchain "qkl@dxct.org"
 
 # Add CouchDB user account
 RUN groupadd -r couchdb && useradd -d /opt/couchdb -g couchdb couchdb

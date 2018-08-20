@@ -13,6 +13,7 @@
 # limitations under the License.
 #
 FROM julongchain/julongchain-baseimage
+MAINTAINER Julongchain "qkl@dxct.org"
 
 # julongchain configuration locations
 ENV FABRIC_CFG_PATH /etc/bcia/julongchain
