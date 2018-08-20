@@ -26,4 +26,4 @@ ADD payload/javashim.tar.bz2 /root
 ADD payload/protos.tar.bz2 /root
 WORKDIR /root
 # Build java shim after copying proto files from fabric/proto
-RUN core/chaincode/shim/java/javabuild.sh
+RUN core/smartcontract/shim/java/javabuild.sh
