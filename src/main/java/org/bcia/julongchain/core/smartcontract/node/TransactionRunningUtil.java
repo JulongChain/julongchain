@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.protos.node.SmartContractShim;
 
 import java.util.ArrayList;
@@ -70,8 +71,12 @@ public class TransactionRunningUtil {
 
   public static void clearMap(String smartContractId, String txId) {
     txIdAndMessageMap.remove(composite(smartContractId, txId));
+    txIdAndMessageMap.remove(composite(CommConstant.LSSC, txId));
+    txIdAndMessageMap.remove(composite(CommConstant.ESSC, txId));
     txIdAndSmartContractIdMap.remove(txId);
     txIdAndStatusMap.remove(composite(smartContractId, txId));
+    txIdAndStatusMap.remove(composite(CommConstant.LSSC, txId));
+    txIdAndStatusMap.remove(composite(CommConstant.ESSC, txId));
   }
 
   public static String composite(String smartContractId, String txId) {
