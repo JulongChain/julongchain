@@ -175,7 +175,7 @@ public class ESSC extends SystemSmartContractBase {
         }
         ProposalResponsePackage.ProposalResponse proposalResponse=null;
         try {
-            proposalResponse= ProposalResponseUtils.buildProposlResponse(headerBytes, payloadBytes,
+            proposalResponse= ProposalResponseUtils.buildProposalResponse(headerBytes, payloadBytes,
                                                proResponse, resultBytes,
                                                eventBytes, smartContractID,
                                                visibilityBytes, signingEndorser);

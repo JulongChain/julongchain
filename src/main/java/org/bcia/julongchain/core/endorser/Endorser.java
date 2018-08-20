@@ -150,6 +150,7 @@ public class Endorser implements IEndorserServer {
             }
 
             SmartContractShim.SmartContractMessage smartContractMessage = TransactionRunningUtil.getTxMessage(scName, groupHeader.getTxId());
+            TransactionRunningUtil.clearMap(scName, groupHeader.getTxId());
             ProposalResponsePackage.Response smartContractResponse = null;
             try {
                 smartContractResponse = ProposalResponsePackage.Response.parseFrom(smartContractMessage.getPayload());
