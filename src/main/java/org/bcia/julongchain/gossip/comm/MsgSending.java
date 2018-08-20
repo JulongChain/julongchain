@@ -20,7 +20,7 @@ import org.bcia.julongchain.protos.gossip.Message;
 /**
  * class description
  *
- * @author
+ * @author wanliangbing
  * @date 18-7-24
  * @company Dingxuan
  */

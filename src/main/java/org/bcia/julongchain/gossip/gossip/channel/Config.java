@@ -17,6 +17,13 @@ package org.bcia.julongchain.gossip.gossip.channel;
 
 import java.time.Duration;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public class Config {
 
     private String ID;

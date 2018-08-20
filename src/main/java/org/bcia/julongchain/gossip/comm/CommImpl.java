@@ -31,7 +31,7 @@ import java.time.Duration;
 /**
  * class description
  *
- * @author
+ * @author wanliangbing
  * @date 18-7-24
  * @company Dingxuan
  */

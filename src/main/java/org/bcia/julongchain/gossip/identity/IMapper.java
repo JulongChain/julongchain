@@ -18,6 +18,13 @@ package org.bcia.julongchain.gossip.identity;
 import org.bcia.julongchain.common.exception.GossipException;
 import org.bcia.julongchain.gossip.api.IPeerSuspector;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public interface IMapper {
 
     public void put(byte[] pkiID, byte[] identity) throws GossipException;

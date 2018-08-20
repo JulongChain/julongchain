@@ -18,6 +18,10 @@ package org.bcia.julongchain.gossip.api;
 /**
  * SecurityAdvisor defines an external auxiliary object
  * that provides security and identity related capabilities
+ *
+ * @author wanliangbing
+ * @date 2018/08/20
+ * @company Dingxuan
  */
 public interface ISecurityAdvisor {
 

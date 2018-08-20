@@ -29,6 +29,13 @@ import org.bcia.julongchain.protos.gossip.Message;
 
 import java.util.Arrays;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public class GossipAdapterImpl implements IGossipAdapter, IAdapter{
 
     private static final JulongChainLog log = JulongChainLogFactory.getLog(GossipAdapterImpl.class);

@@ -15,6 +15,13 @@
  */
 package org.bcia.julongchain.gossip;
 
+/**
+ * 类描述
+ *
+ * @author wanliangbing
+ * @date 2018/08/20
+ * @company Dingxuan
+ */
 public class CertStore {
 
     private byte[] selfIdentity;

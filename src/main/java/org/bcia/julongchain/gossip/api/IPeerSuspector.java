@@ -15,6 +15,13 @@
  */
 package org.bcia.julongchain.gossip.api;
 
+/**
+ * 类描述
+ *
+ * @author wanliangbing
+ * @date 2018/08/20
+ * @company Dingxuan
+ */
 public interface IPeerSuspector {
 
     /**

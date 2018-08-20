@@ -17,6 +17,13 @@ package org.bcia.julongchain.gossip.filter;
 
 import org.bcia.julongchain.gossip.discovery.NetworkMember;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public interface IRoutingFilter {
 
     public Boolean routingFilter(NetworkMember networkMember);

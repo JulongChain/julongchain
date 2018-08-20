@@ -24,6 +24,13 @@ import org.bcia.julongchain.gossip.filter.IRoutingFilter;
 import org.bcia.julongchain.gossip.gossip.IReceivedMessage;
 import org.bcia.julongchain.gossip.gossip.SignedGossipMessage;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public class GossipChannel implements IGossipChannel {
 
     private static final JulongChainLog log = JulongChainLogFactory.getLog(GossipChannel.class);

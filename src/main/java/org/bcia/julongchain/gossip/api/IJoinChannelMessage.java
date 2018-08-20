@@ -19,6 +19,10 @@ package org.bcia.julongchain.gossip.api;
  * JoinChannelMessage is the message that asserts a creation or mutation
  * of a channel's membership list, and is the message that is gossipped
  * among the peers
+ *
+ * @author wanliangbing
+ * @date 2018/08/20
+ * @company Dingxuan
  */
 public interface IJoinChannelMessage {
 

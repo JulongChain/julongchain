@@ -18,6 +18,10 @@ package org.bcia.julongchain.gossip.api;
 /**
  * PeerSignature defines a signature of a peer
  * on a given message
+ *
+ * @author wanliangbing
+ * @date 2018/08/20
+ * @company Dingxuan
  */
 public class PeerSignature {
 

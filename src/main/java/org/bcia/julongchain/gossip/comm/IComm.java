@@ -23,6 +23,13 @@ import org.bcia.julongchain.gossip.gossip.SignedGossipMessage;
 
 import java.time.Duration;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public interface IComm {
 
     public byte[] getPKIid();
