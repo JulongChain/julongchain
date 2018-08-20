@@ -34,7 +34,7 @@ import java.util.Map;
  */
 public class TransactionRunningUtil {
 
-  private static final JulongChainLog logger =
+  private static JulongChainLog logger =
       JulongChainLogFactory.getLog(TransactionRunningUtil.class);
 
   public static final String TX_STATUS_START = "start";
