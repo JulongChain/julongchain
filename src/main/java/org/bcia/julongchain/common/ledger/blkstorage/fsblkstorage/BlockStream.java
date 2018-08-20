@@ -18,7 +18,6 @@ package org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
-import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.util.AbstractMap;

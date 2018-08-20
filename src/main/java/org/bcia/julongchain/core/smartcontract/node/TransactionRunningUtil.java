@@ -77,6 +77,7 @@ public class TransactionRunningUtil {
   public static String composite(String smartContractId, String txId) {
     ArrayList<String> strings = Lists.newArrayList(smartContractId, txId);
     String composite = StringUtils.join(strings, "||");
+
     return composite;
   }
 
@@ -121,6 +122,6 @@ public class TransactionRunningUtil {
    * @param txId
    */
   public static String getTxStatusById(String smartContractId, String txId) {
-    return txIdAndStatusMap.get(composite(smartContractId, txId));
+	  return txIdAndStatusMap.get(composite(smartContractId, txId));
   }
 }

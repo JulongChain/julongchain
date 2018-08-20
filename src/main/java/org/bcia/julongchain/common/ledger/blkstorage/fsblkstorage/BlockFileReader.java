@@ -64,7 +64,7 @@ public class BlockFileReader {
     }
 
     public void close(){
-    	//do nothing
+    	//nothing to do
 	}
 
     public File getFile() {

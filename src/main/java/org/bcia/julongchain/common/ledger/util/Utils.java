@@ -22,7 +22,6 @@ import org.bcia.julongchain.core.ledger.ITxSimulator;
 import org.bcia.julongchain.core.ledger.TxSimulationResults;
 import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.core.ledger.util.Util;
-import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.node.ProposalPackage;
@@ -108,21 +107,6 @@ public class Utils {
 	public static void rmrf(String dir) {
 		String cmd = "rm -rf " + dir;
 		exce(cmd);
-	}
-
-	/**
-	 * 打印数组
-	 */
-	public void soutBytes(byte[] bytes, int length) {
-		int i = 0;
-		for (byte aByte : bytes) {
-			i++;
-			System.out.print(aByte + "\t");
-			if(i > length){
-				System.out.println();
-				i = 0;
-			}
-		}
 	}
 
 	public static INodeLedger constructDefaultLedger() throws Exception {

@@ -148,7 +148,7 @@ public class Validator implements InternalValidator {
         if(updates.getBatch().exists(ns, kvRead.getKey())){
             return false;
         }
-        LedgerHeight committedVersion = db.getVersion(ns, kvRead.getKey());
+        LedgerHeight committedVersion = db.getHeight(ns, kvRead.getKey());
         log.debug("Comparing versions for keys " + kvRead.getKey());
         if(!LedgerHeight.areSame(committedVersion, RwSetUtil.newVersion(kvRead.getVersion()))){
             log.debug(String.format("Version mismatch for key [%s:%s]", ns, kvRead.getKey()));

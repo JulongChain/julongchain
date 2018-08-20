@@ -72,7 +72,7 @@ public class RangeQueryHashValidator implements IRangeQueryValidator {
                 log.debug("Combined interator exhausted.");
                 return equals;
             }
-            resultsHelper.addResult(RwSetUtil.newKVRead(((VersionedKV) result.getObj()).getCompositeKey().getKey(), ((VersionedKV) result.getObj()).getVersionedValue().getVersion()));
+            resultsHelper.addResult(RwSetUtil.newKVRead(((VersionedKV) result.getObj()).getCompositeKey().getKey(), ((VersionedKV) result.getObj()).getVersionedValue().getHeight()));
             merkle = resultsHelper.getMerkleSummary();
 
             if(merkle.getMaxLevel() < inMerkle.getMaxLevel()){

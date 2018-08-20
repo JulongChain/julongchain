@@ -71,7 +71,7 @@ public class RangeQueryResultsValidator implements IRangeQueryValidator {
                 log.debug(String.format("Key name mismatch: key in rwset = %s, key in query result = %s", kvRead.getKey(), ((VersionedKV) result.getObj()).getCompositeKey().getKey()));
                 return false;
             }
-            if(!LedgerHeight.areSame(((VersionedKV) result.getObj()).getVersionedValue().getVersion(), convertToVersionHeight(kvRead.getVersion()))){
+            if(!LedgerHeight.areSame(((VersionedKV) result.getObj()).getVersionedValue().getHeight(), convertToVersionHeight(kvRead.getVersion()))){
                 log.debug(String.format("Version mismatch: key = %s", kvRead.getKey()));
                 return false;
             }

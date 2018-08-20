@@ -15,7 +15,6 @@ limitations under the License.
  */
 package org.bcia.julongchain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 
-import org.apache.log4j.helpers.QuietWriter;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.RWSetBuilder;
@@ -76,7 +75,7 @@ public class ResultsItr implements IResultsIterator {
             return;
         }
         VersionedKV versionedKV = (VersionedKV) queryResult.getObj();
-        rangeQueryResultsHelper.addResult(RwSetUtil.newKVRead(versionedKV.getCompositeKey().getKey(), versionedKV.getVersionedValue().getVersion()));
+        rangeQueryResultsHelper.addResult(RwSetUtil.newKVRead(versionedKV.getCompositeKey().getKey(), versionedKV.getVersionedValue().getHeight()));
         rangeQueryInfo = rangeQueryInfo.toBuilder().setEndKey(versionedKV.getCompositeKey().getKey()).build();
     }
 

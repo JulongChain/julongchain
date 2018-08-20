@@ -50,8 +50,4 @@ public class SimpleList {
     public void setBlock(Common.Block block) {
         this.block = block;
     }
-
-//    public Object getLock() {
-//        return LOCK;
-//    }
 }

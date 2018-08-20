@@ -54,7 +54,7 @@ public class QueryHelper {
             return null;
         }
         byte[] val = versionedValue.getValue();
-        LedgerHeight ver = versionedValue.getVersion();
+        LedgerHeight ver = versionedValue.getHeight();
         addToReadSet(ns, key, ver);
         return val;
     }
@@ -66,7 +66,7 @@ public class QueryHelper {
         for (int i = 0; i < versionedValues.size(); i++) {
 			VersionedValue value = versionedValues.get(i);
 			byte[] val = value == null ? null : value.getValue();
-            LedgerHeight ver = value == null ? null : value.getVersion();
+            LedgerHeight ver = value == null ? null : value.getHeight();
             addToReadSet(ns, keys.get(i), ver);
             values.add(val);
         }
@@ -93,7 +93,7 @@ public class QueryHelper {
         checkDone();
         VersionedValue versionedValue = txMgr.getDb().getPrivateData(ns, coll, key);
         byte[] val = versionedValue.getValue();
-        LedgerHeight ver = versionedValue.getVersion();
+        LedgerHeight ver = versionedValue.getHeight();
         //TODO SM3 hash
         byte[] keyHash = Util.getHashBytes(key.getBytes(StandardCharsets.UTF_8));
         LedgerHeight hashVersion = txMgr.getDb().getKeyHashVersion(ns, coll, keyHash);
@@ -111,7 +111,7 @@ public class QueryHelper {
         List<byte[]> values = new ArrayList<>();
         for (int i = 0; i < versionedValues.size() ; i++) {
             byte[] val = versionedValues.get(i).getValue();
-            LedgerHeight ver = versionedValues.get(i).getVersion();
+            LedgerHeight ver = versionedValues.get(i).getHeight();
             addToHashedReadSet(ns, coll, keys.get(i), ver);
             values.add(val);
         }

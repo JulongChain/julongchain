@@ -36,16 +36,6 @@ import java.util.zip.GZIPOutputStream;
  */
 public class IoUtil {
     private static JulongChainLog log = JulongChainLogFactory.getLog(IoUtil.class);
-    private static final int BUFFER = 1024;
-
-    /** DirEmpty returns true if the dir at dirPath is empty
-     *
-     * @param dirPath
-     * @return
-     */
-    public static boolean dirEmpty(String dirPath){
-        return false;
-    }
 
     /**
      * 返回-1:文件不存在
@@ -59,10 +49,8 @@ public class IoUtil {
         return file.length();
     }
 
-    /** ListSubdirs returns the subdirectories
-     *
-     * @param dirPath
-     * @return
+    /**
+     * 列出下级目录
      */
     public static List<String> listSubdirs(String dirPath) {
         List<String> list = new ArrayList<>();
@@ -77,10 +65,6 @@ public class IoUtil {
             }
         }
         return list;
-    }
-
-    public static void logDirStatus(String msg, String dirPath) {
-        return;
     }
 
     /**
@@ -163,9 +147,6 @@ public class IoUtil {
 
     /**
      * 序列化对象
-     * @param serializable
-     * @return
-     * @throws JulongChainException
      */
     public static byte[] obj2ByteArray(Serializable serializable) throws JulongChainException {
         ByteArrayOutputStream baos = null;
@@ -187,9 +168,6 @@ public class IoUtil {
 
     /**
      * 反序列化对象
-     * @param bytes
-     * @return
-     * @throws JulongChainException
      */
     public static Object byteArray2Obj(byte[] bytes) throws JulongChainException {
         ByteArrayInputStream bais = null;
