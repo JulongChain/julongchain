@@ -48,10 +48,11 @@ import java.util.*;
 
 /**
  * 验证系统智能合约　Validator System Smart Contract,VSSC
- * ValidatorOneValidSignature implements the default transaction validation policy,
- * which is to check the correctness of the read-write set and the endorsement
- * signatures against an endorsement policy that is supplied as argument to
- * every invoke
+ * 验证系统智能合约实现了默认的交易验证策略，即检查读写集合的正确性，根据背书策略检查背书签名
+ * VSSC的invoke函数，接受的args格式说明如下：
+ * args[0] - 函数名 (当前未使用)
+ * args[1] - 序列化的Envelope（serialized Envelope）
+ * args[2] - 序列化的策略（serialized policy）
  * @author sunianle
  * @date 3/5/18
  * @company Dingxuan

@@ -55,12 +55,14 @@ import java.util.List;
 
 /**
  * 配置系统智能合约　Configure System Smart Contract,CSSC
- * Package cssc smartcontract configer provides functions to manage
- * configuration transactions as the network is being reconfigured. The
- * configuration transactions arrive from the ordering service to the committer
- * who calls this smartcontract. The smartcontract also provides peer configuration
- * services such as joining a chain or getting configuration data.
- *
+ * 配置系统合约提供网络重新配置时的配置交易管理功能。配置交易来自排序服务，到达提交节点，并由提交节点调用本系统合约。
+ * 该合约也提供节点配置服务，例如加入群组或获取配置数据。
+ * CSSC的invoke函数，接受的args格式说明如下：
+ * "Args":["JoinGroup",<blockBytes>]
+ * "Args":["GetConfigBlock",<groupID>]
+ * "Args":["GetGroups"]
+ * "Args":["GetConfigTree",<groupID>]
+ * "Args":["SimulateConfigTreeUpdate",<groupID>,<envlope>]
  * @author sunianle
  * @date 3/5/18
  * @company Dingxuan
