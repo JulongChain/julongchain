@@ -43,18 +43,18 @@ public class CouchDBTest {
         CouchDbProperties properties = new CouchDbProperties();
 //        String url = "192.168.1.83";
         String url = "127.0.0.1";
-        int port = 9000;
+        int port = 5984;
         int requestTimeout = 1000;
         int maxConnections = 5;
         String username = "admin";
         String password = "123456";
-        properties.setDbName("julongchain");
+        properties.setDbName("testindexoperations");
         properties.setHost(url);
         properties.setProtocol("http");
         properties.setPort(port);
 //        properties.setCreateDbIfNotExist(true);
-        properties.setUsername(null);
-        properties.setPassword(null);
+        properties.setUsername(username);
+        properties.setPassword(password);
         CouchDbClient dbClient = new CouchDbClient(properties);
         return dbClient;
     }
@@ -105,28 +105,6 @@ public class CouchDBTest {
     }
 
     @Test
-    public void SaveDcreateAttachment() throws Exception{
-        //{"asset_name":"marble02","color":"red","size":2,"owner":"tom"}
-        Map map = new HashMap();
-        map.put("asset_name", "marble02");
-        map.put("color", "red");
-        map.put("size", 2);
-        map.put("owner", "tom");
-        CouchDbClient db = creatConnectionDB();
-        String data ="mydata";
-        String name = "test";
-        Attachment attachment = new Attachment();
-        attachment.setData(data);
-        attachment.setContentType("text/plain");
-        Document document = new Document();
-        document.setId("4");
-        document.setAttachments(map);
-        //document.setRevision("");
-        document.addAttachment(name, attachment);
-        db.save(document);
-    }
-
-    @Test
     public void DeleteDoc() throws Exception{
         CouchDbClient db = creatConnectionDB();
         CouchDB couchDB = new CouchDB();
@@ -151,7 +129,6 @@ public class CouchDBTest {
         String id = "2";
         JSONObject object = couchDB.readDoc(db, id);
         String rev = (String)object.get("_rev");
-        // jsonElement.
         log.info(rev);
     }
 
@@ -191,13 +168,13 @@ public class CouchDBTest {
         CouchDB couchDB = new CouchDB();
         List<Object> list = new ArrayList();
         Map map1 = new HashMap();
-        map1.put("asset_name", "marble04");
+        map1.put("asset_name", "marble01");
         map1.put("color", "red");
         map1.put("size", 2);
         map1.put("owner", "tom");
 
         Map map2 = new HashMap();
-        map2.put("asset_name", "marble05");
+        map2.put("asset_name", "marble02");
         map2.put("color", "red");
         map2.put("size", 2);
         map2.put("owner", "zhangsan");
@@ -207,17 +184,19 @@ public class CouchDBTest {
         log.info(list1.toString());
     }
 
+    /**
+     * id in list
+     * @throws Exception
+     */
     @Test
     public void BatchRetrieveDocumentMetadata() throws Exception{
         CouchDbClient db = creatConnectionDB();
-        List<Object> list = new ArrayList();
-        View docs = db.view("_all_docs");
-
-        list.add("5a52d35c0ea208d776c1d7dff1018a05");
-        list.add("5a52d35c0ea208d776c1d7dff1018e8f");
-        View view = docs.keys(list);
-        log.info(view.toString());
+        List<String> list = new ArrayList();
+        list.add("marble01"); //id
+        list.add("marble02");  //id
         CouchDB couchDB = new CouchDB();
+        List list1 = couchDB.BatchRetrieveDocumentMetadata(db, list);
+        log.info(list1.toString());
     }
 
     @Test
@@ -231,6 +210,21 @@ public class CouchDBTest {
         db.save(map1);
     }
 
+    @Test
+    public void CreatIndexTest() throws Exception{
+        CouchDbClient db = creatConnectionDB();
+        CouchDB couchDB = new CouchDB();
+        String indexDefSize = "{\"index\":{\"fields\":[{\"size\":\"desc\"}]},\"ddoc\":\"indexSizeSortDoc\", \"name\":\"indexSizeSortName\",\"type\":\"json\"}";
+        Boolean aBoolean = couchDB.creatIndex(db, indexDefSize);
+    }
+
+    @Test
+    public void ListIndexTest() throws Exception{
+        CouchDbClient db = creatConnectionDB();
+        CouchDB couchDB = new CouchDB();
+        List list = couchDB.listIndex(db);
+        log.info(list.toString());
+    }
 
     @Test
     public void cofigTest() throws Exception {

@@ -248,6 +248,21 @@ public class CouchDB {
     }
 
     /**
+     *  BatchRetrieveDocumentMetadata - batch method to retrieve document metadata for  a set of keys,
+     *  including ID, couchdb revision number, and ledger version
+     * @param db
+     * @param keys
+     * @return
+     */
+    public List BatchRetrieveDocumentMetadata(CouchDbClient db, List<String> keys){
+        List<Object> docs = db.view("_all_docs")
+                .includeDocs(true)
+                .keys(keys)
+                .query(Object.class);
+        return docs;
+    }
+
+    /**
      * WarmIndex method provides a function for warming a single index
      * @param designdoc
      * @param indexname
