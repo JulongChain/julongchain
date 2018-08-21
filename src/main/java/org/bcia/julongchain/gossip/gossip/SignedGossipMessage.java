@@ -48,7 +48,7 @@ public class SignedGossipMessage {
         return newEnvelope;
     }
 
-    public void verify(byte[] peerIdentity, IVerifier verify) throws GossipException {
+    public void verify(byte[] nodeIdentity, IVerifier verify) throws GossipException {
         if (this.getEnvelope() == null) {
             throw new GossipException("Missing envelope");
         }
@@ -58,7 +58,7 @@ public class SignedGossipMessage {
         if (this.getEnvelope().getSignature().size() == 0) {
             throw new GossipException("Empty signature");
         }
-        verify.execute(peerIdentity, this.getEnvelope().getSignature().toByteArray(), this.getEnvelope().getPayload().toByteArray());
+        verify.execute(nodeIdentity, this.getEnvelope().getSignature().toByteArray(), this.getEnvelope().getPayload().toByteArray());
         if (this.getEnvelope().getSecretEnvelope() != null) {
             byte[] payload = this.getEnvelope().getSecretEnvelope().getPayload().toByteArray();
             byte[] sig = this.getEnvelope().getSecretEnvelope().getSignature().toByteArray();
@@ -68,7 +68,7 @@ public class SignedGossipMessage {
             if (sig.length == 0) {
                 throw new GossipException("Empty signature");
             }
-            verify.execute(peerIdentity, sig, payload);
+            verify.execute(nodeIdentity, sig, payload);
         }
     }
 

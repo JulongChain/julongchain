@@ -24,6 +24,6 @@ package org.bcia.julongchain.gossip.discovery;
  */
 public interface IIdentifier {
 
-    public PeerIdentification identifier();
+    public NodeIdentification identifier();
 
 }

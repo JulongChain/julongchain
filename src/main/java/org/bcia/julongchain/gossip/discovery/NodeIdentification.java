@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.gossip.comm;
+package org.bcia.julongchain.gossip.discovery;
 
 /**
  * class description
@@ -22,24 +22,24 @@ package org.bcia.julongchain.gossip.comm;
  * @date 18-7-24
  * @company Dingxuan
  */
-public class RemotePeer {
+public class NodeIdentification {
 
-    public String endpoint;
-    public byte[] PKIID;
+    private byte[] ID;
+    private Boolean selfOrg;
 
-    public String getEndpoint() {
-        return endpoint;
+    public byte[] getID() {
+        return ID;
     }
 
-    public void setEndpoint(String endpoint) {
-        this.endpoint = endpoint;
+    public void setID(byte[] ID) {
+        this.ID = ID;
     }
 
-    public byte[] getPKIID() {
-        return PKIID;
+    public Boolean getSelfOrg() {
+        return selfOrg;
     }
 
-    public void setPKIID(byte[] PKIID) {
-        this.PKIID = PKIID;
+    public void setSelfOrg(Boolean selfOrg) {
+        this.selfOrg = selfOrg;
     }
 }

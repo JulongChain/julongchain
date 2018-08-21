@@ -30,7 +30,7 @@ public class SendCriteria {
 
     private Duration timeout;
     private Integer minAck;
-    private Integer maxPeers;
+    private Integer maxNodes;
     private IRoutingFilter isEligible;
     private byte[] group;
 
@@ -50,12 +50,12 @@ public class SendCriteria {
         this.minAck = minAck;
     }
 
-    public Integer getMaxPeers() {
-        return maxPeers;
+    public Integer getMaxNodes() {
+        return maxNodes;
     }
 
-    public void setMaxPeers(Integer maxPeers) {
-        this.maxPeers = maxPeers;
+    public void setMaxNodes(Integer maxNodes) {
+        this.maxNodes = maxNodes;
     }
 
     public IRoutingFilter getIsEligible() {

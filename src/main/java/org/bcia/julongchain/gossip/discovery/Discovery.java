@@ -36,7 +36,7 @@ public interface Discovery {
 
     public NetworkMember[] getMembership();
 
-    public void initiateSync(Integer peerNum);
+    public void initiateSync(Integer nodeNum);
 
     public void connect(NetworkMember member, IIdentifier id);
 

@@ -16,7 +16,6 @@
 package org.bcia.julongchain.gossip.gossip;
 
 import org.bcia.julongchain.gossip.common.TLSCertificates;
-import org.bouncycastle.asn1.x509.Certificate;
 
 import java.time.Duration;
 
@@ -31,14 +30,14 @@ public class Config {
 
     private Integer bindPort;
     private String ID;
-    private String[] bootstrapPeers;
+    private String[] bootstrapNodes;
     private Integer propagateIterations;
-    private Integer propagatePeerNum;
+    private Integer propagateNodeNum;
     private Integer maxBlockCountToStore;
     private Integer maxPropagationBurstSize;
     private Duration maxPropagationBurstLatency;
     private Duration pullInterval;
-    private Integer pullPeerNum;
+    private Integer pullNodeNum;
     private Boolean skipBlockVerification;
     private Duration publishCertPeriod;
     private Duration publishStateInfoInterval;
@@ -63,12 +62,12 @@ public class Config {
         this.ID = ID;
     }
 
-    public String[] getBootstrapPeers() {
-        return bootstrapPeers;
+    public String[] getBootstrapNodes() {
+        return bootstrapNodes;
     }
 
-    public void setBootstrapPeers(String[] bootstrapPeers) {
-        this.bootstrapPeers = bootstrapPeers;
+    public void setBootstrapNodes(String[] bootstrapNodes) {
+        this.bootstrapNodes = bootstrapNodes;
     }
 
     public Integer getPropagateIterations() {
@@ -79,12 +78,12 @@ public class Config {
         this.propagateIterations = propagateIterations;
     }
 
-    public Integer getPropagatePeerNum() {
-        return propagatePeerNum;
+    public Integer getPropagateNodeNum() {
+        return propagateNodeNum;
     }
 
-    public void setPropagatePeerNum(Integer propagatePeerNum) {
-        this.propagatePeerNum = propagatePeerNum;
+    public void setPropagateNodeNum(Integer propagateNodeNum) {
+        this.propagateNodeNum = propagateNodeNum;
     }
 
     public Integer getMaxBlockCountToStore() {
@@ -119,12 +118,12 @@ public class Config {
         this.pullInterval = pullInterval;
     }
 
-    public Integer getPullPeerNum() {
-        return pullPeerNum;
+    public Integer getPullNodeNum() {
+        return pullNodeNum;
     }
 
-    public void setPullPeerNum(Integer pullPeerNum) {
-        this.pullPeerNum = pullPeerNum;
+    public void setPullNodeNum(Integer pullNodeNum) {
+        this.pullNodeNum = pullNodeNum;
     }
 
     public Boolean getSkipBlockVerification() {

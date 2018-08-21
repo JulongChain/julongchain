@@ -26,6 +26,6 @@ import org.bcia.julongchain.common.exception.GossipException;
  */
 public interface IVerifier {
 
-    public void execute(byte[] peerIdentity, byte[] signature, byte[] message) throws GossipException;
+    public void execute(byte[] nodeIdentity, byte[] signature, byte[] message) throws GossipException;
 
 }

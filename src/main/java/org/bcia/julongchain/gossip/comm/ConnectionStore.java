@@ -45,13 +45,13 @@ public class ConnectionStore {
         return connectionStore;
     }
 
-    public synchronized Connection getConnection(RemotePeer peer) throws GossipException {
+    public synchronized Connection getConnection(RemoteNode node) throws GossipException {
         if (isClosing) {
             log.error("Shutting down");
             return null;
         }
-        byte[] pkiID = peer.getPKIID();
-        String endpoint = peer.getEndpoint();
+        byte[] pkiID = node.getPKIID();
+        String endpoint = node.getEndpoint();
         Connection connection = pki2Conn.get(new String(pkiID));
         if (connection != null) {
             return connection;

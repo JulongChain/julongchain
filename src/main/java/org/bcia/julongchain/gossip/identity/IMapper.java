@@ -16,7 +16,7 @@
 package org.bcia.julongchain.gossip.identity;
 
 import org.bcia.julongchain.common.exception.GossipException;
-import org.bcia.julongchain.gossip.api.IPeerSuspector;
+import org.bcia.julongchain.gossip.api.INodeSuspector;
 
 /**
  * class description
@@ -35,9 +35,9 @@ public interface IMapper {
 
     public void verify(byte[] vkID, byte[] signature, byte[] message) throws GossipException;
 
-    public byte[] getPKIidOfCert(byte[] peerIdentity);
+    public byte[] getPKIidOfCert(byte[] nodeIdentity);
 
-    public void suspectPeers(IPeerSuspector isSuspected);
+    public void suspectNodes(INodeSuspector isSuspected);
 
     public void stop();
 
