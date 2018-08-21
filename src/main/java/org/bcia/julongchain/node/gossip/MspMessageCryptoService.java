@@ -31,7 +31,7 @@ public class MspMessageCryptoService implements IMessageCryptoService{
     private ILocalSigner localSigner;
 
     @Override
-    public byte[] getPKIidOFCert(byte[] peerIdentity) {
+    public byte[] getPKIidOfCert(byte[] nodeIdentity) {
         return new byte[0];
     }
 
@@ -46,22 +46,22 @@ public class MspMessageCryptoService implements IMessageCryptoService{
     }
 
     @Override
-    public void verify(byte[] peerIdentity, byte[] signature, byte[] message) throws GossipException {
+    public void verify(byte[] nodeIdentity, byte[] signature, byte[] message) throws GossipException {
 
     }
 
     @Override
-    public void verifyByChannel(byte[] chainID, byte[] peerIdentity, byte[] signature, byte[] message) throws GossipException {
+    public void verifyByChannel(byte[] chainID, byte[] nodeIdentity, byte[] signature, byte[] message) throws GossipException {
 
     }
 
     @Override
-    public void validateIdentity(byte[] peerIdentity) throws GossipException {
+    public void validateIdentity(byte[] nodeIdentity) throws GossipException {
 
     }
 
     @Override
-    public Timestamp expiration(byte[] peerIdentity) throws GossipException {
+    public Timestamp expiration(byte[] nodeIdentity) throws GossipException {
         return null;
     }
 }

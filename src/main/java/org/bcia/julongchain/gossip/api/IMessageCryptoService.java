@@ -28,7 +28,7 @@ import java.sql.Timestamp;
  */
 public interface IMessageCryptoService {
 
-    public byte[] getPKIidOFCert(byte[] nodeIdentity);
+    public byte[] getPKIidOfCert(byte[] nodeIdentity);
 
     public void verifyBlock(byte[] chainID, Long seqNum, byte[] signedBlock) throws GossipException;
 
