@@ -86,16 +86,16 @@ public class SmartContractSupport implements ISCSupport {
 	private boolean nodeTLS;
 
 	/** DevModeUserRunsChaincode property allows user to run chaincode in development environment */
-	public static final String DevModeUserRunsChaincode = "dev";
+	public static final String DEV_MODE_USER_RUNS_SMART_CONTRACT = "dev";
 
-	public static final int chaincodeStartupTimeoutDefault = 5000;
-	public static final String peerAddressDefault = "0.0.0.0:7051";
+	public static final int SMART_CONTRACT_STARTUP_TIMEOUT_DEFAULT = 5000;
+	public static final String NODE_ADDRESS_DEFAULT = "0.0.0.0:7051";
 
 	/** TXSimulatorKey is used to attach ledger simulation context */
-	public static String TXSimulatorKey = "txsimulatorkey";
+	public static String TX_SIMULATOR_KEY = "txsimulatorkey";
 
 	/** HistoryQueryExecutorKey is used to attach ledger history query executor context */
-	public static String HistoryQueryExecutorKey = "historyqueryexecutorkey";
+	public static String HISTORY_QUERY_EXECUTOR_KEY = "historyqueryexecutorkey";
 
 	/** Mutual TLS auth client key and cert paths in the chaincode container */
 	String TLS_CLIENT_KEY_PATH = "/etc/hyperledger/fabric/client.key";
@@ -114,9 +114,9 @@ public class SmartContractSupport implements ISCSupport {
 	 */
 	public ITxSimulator getTxSimulator(Context context) {
 		try {
-			return (ITxSimulator) context.lookup(TXSimulatorKey);
+			return (ITxSimulator) context.lookup(TX_SIMULATOR_KEY);
 		} catch (Exception e) {
-			log.error("Got error when lookup " + TXSimulatorKey + "\n" + e.getMessage());
+			log.error("Got error when lookup " + TX_SIMULATOR_KEY + "\n" + e.getMessage());
 			return null;
 		}
 	}
@@ -129,9 +129,9 @@ public class SmartContractSupport implements ISCSupport {
 	 */
 	public IHistoryQueryExecutor getHistoryQueryExecutor(Context context) {
 		try {
-			return ((IHistoryQueryExecutor) context.lookup(HistoryQueryExecutorKey));
+			return ((IHistoryQueryExecutor) context.lookup(HISTORY_QUERY_EXECUTOR_KEY));
 		} catch (Exception e) {
-			log.error("Got error when lookup " + HistoryQueryExecutorKey + "\n" + e.getMessage());
+			log.error("Got error when lookup " + HISTORY_QUERY_EXECUTOR_KEY + "\n" + e.getMessage());
 			return null;
 		}
 	}

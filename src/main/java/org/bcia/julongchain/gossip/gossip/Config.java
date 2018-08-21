@@ -20,6 +20,13 @@ import org.bouncycastle.asn1.x509.Certificate;
 
 import java.time.Duration;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public class Config {
 
     private Integer bindPort;

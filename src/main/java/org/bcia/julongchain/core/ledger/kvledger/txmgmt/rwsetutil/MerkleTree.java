@@ -40,13 +40,14 @@ import java.util.Map;
 public class MerkleTree {
     private static JulongChainLog log = JulongChainLogFactory.getLog(MerkleTree.class);
     private static final int LEAF_LEVEL = 1;
+    private static final int MIN_TREE_LEVEL = 2;
 
     private Map<Integer, List<byte[]>> tree;
     private int maxLevel;
     private int maxDegree;
 
     public MerkleTree(int maxDegree) {
-        if(maxDegree < 2){
+        if(maxDegree < MIN_TREE_LEVEL){
         	this.maxDegree = LedgerConfig.getMaxDegreeQueryReadsHashing();
         } else {
 			this.maxDegree = maxDegree;

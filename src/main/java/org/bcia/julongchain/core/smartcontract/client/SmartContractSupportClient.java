@@ -19,12 +19,10 @@
  */
 package org.bcia.julongchain.core.smartcontract.client;
 
-import com.sun.nio.sctp.PeerAddressChangeNotification;
 import org.bcia.julongchain.common.exception.SmartContractException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
-import org.bcia.julongchain.core.container.inproccontroller.InprocContainer;
 import org.bcia.julongchain.core.container.inproccontroller.InprocController;
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.julongchain.core.smartcontract.shim.SmartContractBase;
@@ -33,7 +31,6 @@ import org.bcia.julongchain.core.ssc.essc.ESSC;
 import org.bcia.julongchain.core.ssc.lssc.LSSC;
 import org.bcia.julongchain.core.ssc.qssc.QSSC;
 import org.bcia.julongchain.core.ssc.vssc.VSSC;
-import org.bcia.julongchain.examples.smartcontract.java.smartcontract_example02.AccountingVoucher;
 
 import java.lang.reflect.Constructor;
 import java.util.HashMap;

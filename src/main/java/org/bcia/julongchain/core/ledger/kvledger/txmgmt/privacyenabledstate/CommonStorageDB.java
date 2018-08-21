@@ -124,7 +124,7 @@ public class CommonStorageDB implements IDB {
         if(!bytesKeySuppoted()){
             keyHashStr = new String(Util.getHashBytes(keyHash));
         }
-        return getVersion(deriveHashedDataNs(ns, coll), keyHashStr);
+        return getHeight(deriveHashedDataNs(ns, coll), keyHashStr);
     }
 
     @Override
@@ -193,8 +193,8 @@ public class CommonStorageDB implements IDB {
     }
 
     @Override
-    public LedgerHeight getVersion(String namespace, String key) throws LedgerException {
-        return vdb.getVersion(namespace, key);
+    public LedgerHeight getHeight(String namespace, String key) throws LedgerException {
+        return vdb.getHeight(namespace, key);
     }
 
     @Override

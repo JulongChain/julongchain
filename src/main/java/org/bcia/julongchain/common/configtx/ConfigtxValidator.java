@@ -199,7 +199,7 @@ public class ConfigtxValidator implements IConfigtxValidator {
                 }
 
                 if (value.getVersion() != existingConfig.getVersion() + 1) {
-                    throw new ValidateException("value.getVersion is " + value.getVersion() + ", but current is "
+                    throw new ValidateException("value.getHeight is " + value.getVersion() + ", but current is "
                             + existingConfig.getVersion());
                 }
 

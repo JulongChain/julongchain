@@ -15,7 +15,6 @@ limitations under the License.
  */
 package org.bcia.julongchain.common.ledger.blockledger.json;
 
-import com.google.protobuf.ByteString;
 import com.google.protobuf.util.JsonFormat;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.blockledger.IIterator;
@@ -23,14 +22,15 @@ import org.bcia.julongchain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.julongchain.common.ledger.util.IoUtil;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
-import org.bcia.julongchain.common.util.BytesHexStrTranslate;
-import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.io.*;
 import java.util.AbstractMap;
+import java.util.Arrays;
+
+import static org.bcia.julongchain.core.ledger.util.Util.*;
 
 /**
  * Json账本
@@ -47,7 +47,7 @@ public class JsonLedger extends ReadWriteBase {
 
     private String directory;
     private long height;
-    private ByteString lastHash;
+    private byte[] lastHash;
     private JsonFormat.Printer printer;
 
     /**
@@ -93,7 +93,7 @@ public class JsonLedger extends ReadWriteBase {
         if(block == null){
             log.error("Error reading block " + (height - 1));
         } else {
-            lastHash = block.getHeader().getDataHash();
+            lastHash = block.getHeader().getDataHash().toByteArray();
         }
     }
 
@@ -158,11 +158,14 @@ public class JsonLedger extends ReadWriteBase {
         if(block.getHeader().getNumber() != height){
             throw new LedgerException("Block number should have been " + height + " but was " + block.getHeader().getNumber());
         }
-        if(lastHash != null && !lastHash.equals(block.getHeader().getPreviousHash())){
-            throw new LedgerException(String.format("Block should's previous hash is [%s]\n but last hash is [%s]", Hex.toHexString(block.getHeader().getPreviousHash().toByteArray()), Hex.toHexString(lastHash.toByteArray())));
+		byte[] preHash = block.getHeader().getPreviousHash().toByteArray();
+		if(lastHash != null && !Arrays.equals(lastHash, preHash)){
+            throw new LedgerException(String.format("Block should's previous hash is [%s]\n but last hash is [%s]",
+					Hex.toHexString(preHash),
+					Hex.toHexString(lastHash)));
         }
         writeBlock(block);
-        lastHash = ByteString.copyFrom(Util.getHashBytes(block.getHeader().toByteArray()));
+        lastHash = getHashBytes(block.getHeader().toByteArray());
         height++;
         synchronized (LOCK) {
             LOCK.notifyAll();
@@ -209,14 +212,6 @@ public class JsonLedger extends ReadWriteBase {
         this.height = height;
     }
 
-    public ByteString getLastHash() {
-        return lastHash;
-    }
-
-    public void setLastHash(ByteString lastHash) {
-        this.lastHash = lastHash;
-    }
-
     public JsonFormat.Printer getPrinter() {
         return printer;
     }
@@ -228,4 +223,12 @@ public class JsonLedger extends ReadWriteBase {
     public static Object getLock() {
         return LOCK;
     }
+
+	public byte[] getLastHash() {
+		return lastHash;
+	}
+
+	public void setLastHash(byte[] lastHash) {
+		this.lastHash = lastHash;
+	}
 }

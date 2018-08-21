@@ -194,7 +194,7 @@ public class VersionedCouchDB implements IVersionedDB, ISmartContractLifecycleEv
     }
 
     @Override
-    public LedgerHeight getVersion(String namespace, String key) throws LedgerException {
+    public LedgerHeight getHeight(String namespace, String key) throws LedgerException {
         return null;
     }
 

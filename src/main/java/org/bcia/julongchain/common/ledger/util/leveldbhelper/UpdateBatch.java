@@ -35,10 +35,8 @@ public class UpdateBatch  {
 
 	private Map<byte[],byte[]> kvs = new HashMap<>();
 
-	/** Put adds a KV
-	 *
-	 * @param key
-	 * @param value
+	/**
+	 * 添加K-V
 	 */
 	public void put(byte[] key, byte[] value) {
 		if(value == null){
@@ -48,14 +46,16 @@ public class UpdateBatch  {
 		kvs.put(key, value);
 	}
 
-	/** Delete deletes a Key and associated value
-	 *
-	 * @param key
+	/**
+	 * 删除K-V
 	 */
 	public void delete(byte[] key) {
 		kvs.put(key, null);
 	}
 
+	/**
+	 * 批量添加K-V
+	 */
 	public void addAll(UpdateBatch updateBatch, String ledgerID){
 		if(ledgerID == null){
 			kvs = updateBatch.getKvs();

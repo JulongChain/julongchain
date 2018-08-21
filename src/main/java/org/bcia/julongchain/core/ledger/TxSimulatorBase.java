@@ -29,9 +29,9 @@ import java.util.Map;
  * @date 2018/4/13
  * @company Dingxuan
  */
-public abstract class TxSimulator implements ITxSimulator {
+public abstract class TxSimulatorBase implements ITxSimulator {
 
-    private static JulongChainLog log = JulongChainLogFactory.getLog(TxSimulator.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(TxSimulatorBase.class);
 
     @Override
     public void setState(String namespace, String key, byte[] value) throws
@@ -91,7 +91,7 @@ public abstract class TxSimulator implements ITxSimulator {
         return null;
     }
 
-    public IResultsIterator ExecuteQuery(String namespace, String query)
+    public IResultsIterator executeQuery(String namespace, String query)
             throws LedgerException {
         log.debug("ExecuteQuery");
         log.debug("namespace:" + namespace + " query:" + query);

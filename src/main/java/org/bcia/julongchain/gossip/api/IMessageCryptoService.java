@@ -19,6 +19,13 @@ import org.bcia.julongchain.common.exception.GossipException;
 
 import java.sql.Timestamp;
 
+/**
+ * 类描述
+ *
+ * @author wanliangbing
+ * @date 2018/08/20
+ * @company Dingxuan
+ */
 public interface IMessageCryptoService {
 
     public byte[] getPKIidOFCert(byte[] peerIdentity);

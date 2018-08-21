@@ -26,6 +26,13 @@ import org.bcia.julongchain.protos.gossip.Message;
 
 import java.util.Map;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public interface IGossip {
 
     public void send(Message.GossipMessage msg, RemotePeer... peers);

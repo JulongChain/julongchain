@@ -16,6 +16,7 @@
 package org.bcia.julongchain.core.ledger.leveldb;
 
 import org.bcia.julongchain.common.exception.LevelDBException;
+import org.bcia.julongchain.core.node.NodeConfigFactory;
 
 import java.io.File;
 import java.nio.charset.Charset;
@@ -29,7 +30,7 @@ import java.nio.charset.Charset;
  */
 public class StateLevelDBFactory {
 
-    private static final String ROOT_PATH = File.separator + "var" + File.separator + "hyperledger" + File.separator + "production" + File.separator + "ledgersData" + File.separator + "stateLeveldb";
+    private static final String ROOT_PATH = NodeConfigFactory.getNodeConfig().getNode().getFileSystemPath() + File.separator + "stateLeveldb";
 
     public static byte[] getState(String smartContractId, String key) throws LevelDBException {
         LevelDB db = LevelDBUtil.getDB(ROOT_PATH);

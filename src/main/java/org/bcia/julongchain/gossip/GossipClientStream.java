@@ -26,6 +26,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
+/**
+ * 类描述
+ *
+ * @author wanliangbing
+ * @date 2018/08/20
+ * @company Dingxuan
+ */
 public class GossipClientStream implements StreamObserver<Message.Envelope> {
 
     private static JulongChainLog log = JulongChainLogFactory.getLog(GossipClientStream.class);

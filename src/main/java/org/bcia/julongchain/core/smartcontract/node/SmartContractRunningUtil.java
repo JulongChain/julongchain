@@ -31,7 +31,7 @@ import org.bcia.julongchain.common.log.JulongChainLogFactory;
  */
 public class SmartContractRunningUtil {
 
-  private static final JulongChainLog logger =
+  private static JulongChainLog logger =
       JulongChainLogFactory.getLog(SmartContractRunningUtil.class);
 
   public static final String SMART_CONTRACT_STATUS_NEW = "new";

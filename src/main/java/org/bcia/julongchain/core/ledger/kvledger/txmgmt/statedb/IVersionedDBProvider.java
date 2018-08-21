@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,16 +26,13 @@ import org.bcia.julongchain.common.exception.LedgerException;
  */
 public interface IVersionedDBProvider {
 
-    /** GetDBHandle returns a handle to a IVersionedDB
-     *
-     * @param id
-     * @return
-     * @throws LedgerException
+    /**
+     * 获取DB
      */
     IVersionedDB getDBHandle(String id) throws LedgerException;
 
-    /** Close closes all the IVersionedDB instances and releases any resources held by IVersionedDBProvider
-     *
+    /**
+	 * 关闭
      */
     void close();
 

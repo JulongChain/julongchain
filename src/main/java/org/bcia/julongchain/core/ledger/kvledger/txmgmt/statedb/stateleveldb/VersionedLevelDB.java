@@ -22,8 +22,8 @@ import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.StatedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
+import org.bcia.julongchain.core.ledger.util.Util;
 import org.bouncycastle.util.encoders.Hex;
 
 import java.nio.charset.StandardCharsets;
@@ -72,12 +72,12 @@ public class VersionedLevelDB implements IVersionedDB {
     }
 
     @Override
-    public LedgerHeight getVersion(String namespace, String key) throws LedgerException {
+    public LedgerHeight getHeight(String namespace, String key) throws LedgerException {
         VersionedValue versionedValue = getState(namespace, key);
         if (versionedValue == null) {
             return null;
         } else {
-            return versionedValue.getVersion();
+            return versionedValue.getHeight();
         }
     }
 
@@ -122,7 +122,7 @@ public class VersionedLevelDB implements IVersionedDB {
                 if(entry.getValue() == null){
                     dbBatch.delete(compositeKey);
                 } else {
-                    dbBatch.put(compositeKey, StatedDB.encodeValue(entry.getValue().getValue(), entry.getValue().getVersion()));
+                    dbBatch.put(compositeKey, Util.encodeValue(entry.getValue().getValue(), entry.getValue().getHeight()));
                 }
             }
         }

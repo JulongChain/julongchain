@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +16,7 @@
 package org.bcia.julongchain.common.ledger;
 
 /**
- * IPrunePolicy - a general interface for supporting different pruning policies
+ * 支持不同修剪策略的通用接口
  *
  * @author wanliangbing
  * @date 2018/3/7

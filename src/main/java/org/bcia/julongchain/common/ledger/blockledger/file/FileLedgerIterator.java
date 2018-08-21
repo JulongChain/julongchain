@@ -48,7 +48,7 @@ public class FileLedgerIterator implements IIterator {
     }
 
     /**
-     * 返回block的ByteString形式
+     * @return Map.Entry<QueryResult, Common.Status>
      */
     @Override
     public QueryResult next() throws LedgerException {

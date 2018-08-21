@@ -23,7 +23,7 @@ import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 
 /**
- * HistoryDB操作类
+ * HistoryDB服务提供者类
  *
  * @author sunzongyu
  * @date 2018/04/04

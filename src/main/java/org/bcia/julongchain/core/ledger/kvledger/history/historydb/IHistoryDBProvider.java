@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,25 +18,22 @@ package org.bcia.julongchain.core.ledger.kvledger.history.historydb;
 import org.bcia.julongchain.common.exception.LedgerException;
 
 /**
- * IHistoryDBProvider provides an instance of a history IDB
+ * 历史数据库服务提供者借口
  *
- * @author wanliangbing
+ * @author sunzongyu
  * @date 2018/3/9
  * @company Dingxuan
  */
 public interface IHistoryDBProvider {
 
-    /** GetDBHandle returns a handle to a IHistoryDB
-     *
-     * @param id
-     * @return
-     * @throws LedgerException
+    /**
+     * 获取History db
      */
     IHistoryDB getDBHandle(String id) throws LedgerException;
 
-    /** Close closes all the IHistoryDB instances and releases any resources held by IHistoryDBProvider
-     *
-     */
-    void close() throws LedgerException;
+	/**
+	 * 关闭
+	 */
+	void close() throws LedgerException;
 
 }

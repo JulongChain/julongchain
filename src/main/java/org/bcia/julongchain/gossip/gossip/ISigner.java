@@ -17,6 +17,13 @@ package org.bcia.julongchain.gossip.gossip;
 
 import org.bcia.julongchain.common.exception.GossipException;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public interface ISigner {
 
     public byte[] execute(byte[] msg) throws GossipException;

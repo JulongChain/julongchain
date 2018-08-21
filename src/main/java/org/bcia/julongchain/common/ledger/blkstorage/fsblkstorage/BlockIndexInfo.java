@@ -85,6 +85,9 @@ public class BlockIndexInfo {
 
     @Override
     public String toString() {
-        return String.format("blockNum=%d, blockHash length=%d, txOffsets length=%d", blockNum, blockHash == null ? 0 : blockHash.length, txOffsets.size());
+        return String.format("blockNum=%d, blockHash length=%d, txOffsets length=%d",
+				blockNum,
+				blockHash == null ? 0 : blockHash.length,
+				txOffsets == null ? 0 : txOffsets.size());
     }
 }

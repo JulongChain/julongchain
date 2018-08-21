@@ -26,23 +26,23 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
  */
 public class VersionedValue {
 
-    private LedgerHeight version;
+    private LedgerHeight height;
     private byte[] value;
 
-//    public VersionedValue(){
-//    }
+    public VersionedValue(){
+    }
 
-    public VersionedValue(LedgerHeight version, byte[] value){
-        this.version = version;
+    public VersionedValue(LedgerHeight height, byte[] value){
+        this.height = height;
         this.value = value;
     }
 
-    public LedgerHeight getVersion() {
-        return version;
+    public LedgerHeight getHeight() {
+        return height;
     }
 
-    public void setVersion(LedgerHeight version) {
-        this.version = version;
+    public void setHeight(LedgerHeight height) {
+        this.height = height;
     }
 
     public byte[] getValue() {

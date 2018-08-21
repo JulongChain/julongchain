@@ -13,7 +13,8 @@
 # limitations under the License.
 #
 FROM julongchain/julongchain-baseimage
-ENV MAVEN_VERSION=3.3.9
+MAINTAINER Julongchain "qkl@dxct.org"
+ENV MAVEN_VERSION=3.5.2
 ENV USER_HOME_DIR="/root"
 RUN mkdir -p /usr/share/maven /usr/share/maven/ref \
   && curl -fsSL http://apache.osuosl.org/maven/maven-3/$MAVEN_VERSION/binaries/apache-maven-$MAVEN_VERSION-bin.tar.gz \
@@ -25,4 +26,4 @@ ADD payload/javashim.tar.bz2 /root
 ADD payload/protos.tar.bz2 /root
 WORKDIR /root
 # Build java shim after copying proto files from fabric/proto
-RUN core/chaincode/shim/java/javabuild.sh
+RUN core/smartcontract/shim/java/javabuild.sh

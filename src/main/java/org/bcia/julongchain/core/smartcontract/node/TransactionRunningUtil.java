@@ -17,6 +17,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.protos.node.SmartContractShim;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ import java.util.Map;
  */
 public class TransactionRunningUtil {
 
-  private static final JulongChainLog logger =
+  private static JulongChainLog logger =
       JulongChainLogFactory.getLog(TransactionRunningUtil.class);
 
   public static final String TX_STATUS_START = "start";
@@ -70,13 +71,18 @@ public class TransactionRunningUtil {
 
   public static void clearMap(String smartContractId, String txId) {
     txIdAndMessageMap.remove(composite(smartContractId, txId));
+    txIdAndMessageMap.remove(composite(CommConstant.LSSC, txId));
+    txIdAndMessageMap.remove(composite(CommConstant.ESSC, txId));
     txIdAndSmartContractIdMap.remove(txId);
     txIdAndStatusMap.remove(composite(smartContractId, txId));
+    txIdAndStatusMap.remove(composite(CommConstant.LSSC, txId));
+    txIdAndStatusMap.remove(composite(CommConstant.ESSC, txId));
   }
 
   public static String composite(String smartContractId, String txId) {
     ArrayList<String> strings = Lists.newArrayList(smartContractId, txId);
     String composite = StringUtils.join(strings, "||");
+
     return composite;
   }
 
@@ -121,6 +127,6 @@ public class TransactionRunningUtil {
    * @param txId
    */
   public static String getTxStatusById(String smartContractId, String txId) {
-    return txIdAndStatusMap.get(composite(smartContractId, txId));
+	  return txIdAndStatusMap.get(composite(smartContractId, txId));
   }
 }

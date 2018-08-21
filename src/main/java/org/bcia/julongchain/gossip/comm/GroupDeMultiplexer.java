@@ -15,6 +15,13 @@
  */
 package org.bcia.julongchain.gossip.comm;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public class GroupDeMultiplexer {
 
     private Group[] groups;

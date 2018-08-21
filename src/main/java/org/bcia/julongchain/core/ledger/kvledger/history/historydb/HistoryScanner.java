@@ -88,11 +88,7 @@ public class HistoryScanner implements IResultsIterator {
         blockNum = HistoryDBHelper.splitCompositeHistoryKeyForBlockNum(historyKey);
         tranNum = HistoryDBHelper.splitCompositeHistoryKeyForTranNum(historyKey);
         log.debug(String.format("Found history record for namespace: %s, key: %s. BlockNum: %d, TranNum: %d", nameSpace, key, blockNum, tranNum));
-
-        Common.Envelope tranEnvelope = blockStore.retrieveTxByBlockNumTranNum(blockNum, tranNum);
-//        QueryResult queryResult = getKeyModificationFromTran(tranEnvelope, nameSpace, key);
         QueryResult queryResult = getKvVersion(blockNum, tranNum);
-//        log.debug("Found history key value for namespace=[{}], key=[{}] from transaction=[{}]", nameSpace, key, ((KvQueryResult.KeyModification) queryResult.getObj()).getTxId());
 
         return queryResult;
     }

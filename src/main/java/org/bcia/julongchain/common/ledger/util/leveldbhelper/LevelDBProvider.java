@@ -19,9 +19,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.exception.LevelDBException;
 import org.bcia.julongchain.common.ledger.util.IDBHandler;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
-import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 
-import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -91,7 +89,8 @@ public class LevelDBProvider implements IDBProvider {
 
 	@Override
 	public void delete(byte[] key, boolean sync) throws LevelDBException {
-		db.put(constructLevelKey(ledgerID, key), null, sync);
+//		db.put(constructLevelKey(ledgerID, key), null, sync);
+		db.delete(constructLevelKey(ledgerID, key), sync);
 	}
 
 	@Override

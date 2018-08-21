@@ -18,11 +18,10 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.StatedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
+import org.bcia.julongchain.core.ledger.util.Util;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
@@ -58,8 +57,8 @@ public class KvScanner implements IResultsIterator {
 		if (key.compareTo(endKey) >= 0) {
 			return null;
 		}
-        byte[] value = StatedDB.decodeValueToBytes(dbValCpy);
-        LedgerHeight version = StatedDB.decodeValueToHeight(dbValCpy);
+        byte[] value = Util.decodeValueToBytes(dbValCpy);
+        LedgerHeight version = new LedgerHeight(dbValCpy);
         return new QueryResult(
                 new VersionedKV(
                         new CompositeKey(nameSpace, key),
