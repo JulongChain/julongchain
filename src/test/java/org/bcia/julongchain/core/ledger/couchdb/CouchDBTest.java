@@ -282,6 +282,10 @@ public class CouchDBTest {
         log.info(dbAddress);
     }
 
+    /**
+     * 系统库测试
+     * @throws Exception
+     */
     @Test
     public void CreateSystemDatabasesIfNotExistTest() throws Exception{
         CouchDbClient db = creatConnectionDB();
