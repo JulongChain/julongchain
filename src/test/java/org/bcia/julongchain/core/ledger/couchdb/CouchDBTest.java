@@ -245,7 +245,7 @@ public class CouchDBTest {
     }
 
     /**
-     * 创建索引，条件为json结构。
+     * 创建索引，条件为json结构.
      * @throws Exception
      */
     @Test
