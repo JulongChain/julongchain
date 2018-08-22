@@ -17,6 +17,7 @@ package org.bcia.julongchain;
 
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.consenter.Consenter;
 import org.bcia.julongchain.node.Node;
 
@@ -52,7 +53,7 @@ public class App {
         log.info("Args: " + Arrays.toString(args));
         //开始解析执行命令行
         try {
-            if (args.length > 0 && args[0].equals("consenter")) {
+            if (args.length > 0 && args[0].equals(CommConstant.ARG_CONSENTER)) {
                 Consenter consenter = new Consenter();
 
                 String[] cleanArgs = new String[args.length - 1];
