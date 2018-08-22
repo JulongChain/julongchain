@@ -39,6 +39,11 @@ import java.util.Map;
 public class CouchDBTest {
     private static JulongChainLog log = JulongChainLogFactory.getLog(CouchDBTest.class);
 
+    /**
+     * 前置方法，设置了访问couchdb的各个参数
+     * @return
+     * @throws LedgerException
+     */
     public CouchDbClient creatConnectionDB() throws LedgerException {
         CouchDbProperties properties = new CouchDbProperties();
 //        String url = "192.168.1.83";
@@ -48,7 +53,7 @@ public class CouchDBTest {
         int maxConnections = 5;
         String username = "admin";
         String password = "123456";
-        properties.setDbName("testindexoperations");
+        properties.setDbName("julongchain");
         properties.setHost(url);
         properties.setProtocol("http");
         properties.setPort(port);
@@ -59,6 +64,22 @@ public class CouchDBTest {
         return dbClient;
     }
 
+    /**
+     * 测试获取连接对象方法
+     * @throws Exception
+     */
+    @Test
+    public void creatConnectionDBTest() throws Exception{
+        CouchDB couchDB = new CouchDB();
+        CouchDbClient dbClient = couchDB.creatConnectionDB("127.0.0.1", 5984, "admin", "123456", 5, 1000,
+                "julongchain", "http");
+        log.info(dbClient.toString());
+    }
+
+    /**
+     * 创建一个库，如果存在则不创建
+     * @throws LedgerException
+     */
     @Test
     public void CreateDatabaseIfNotExist() throws LedgerException{
         CouchDB couchDB = new CouchDB();
@@ -68,16 +89,24 @@ public class CouchDBTest {
 
     }
 
+    /**
+     * 获取数据库的配置信息
+     * @throws LedgerException
+     */
     @Test
-    public void getDatabaseInfo() throws LedgerException{
+    public void getDatabaseInfoTest() throws LedgerException{
         CouchDB couchDB = new CouchDB();
         CouchDbClient db = creatConnectionDB();
         CouchDbInfo info = couchDB.getDatabaseInfo(db);
         log.info(info.toString());
     }
 
+    /**
+     * 储存一个文档，存储内容包括id(唯一标识，不可重复)、rev、name、contentType、bytesIn（Attachment，数据类型为byte）
+     * @throws Exception
+     */
     @Test
-    public void SaveDoc() throws Exception{
+    public void SaveDocTest() throws Exception{
         CouchDB couchDB = new CouchDB();
         CouchDbClient db = creatConnectionDB();
         String id = "3";
@@ -91,21 +120,13 @@ public class CouchDBTest {
         couchDB.saveDoc(db, id, null, name, contentType, bytesIn);
     }
 
-    @Test
-    public void addAtt() throws Exception{
-        CouchDbClient db = creatConnectionDB();
-        Map map = new HashMap();
-        map.put("asset_name", "marble02");
-        map.put("color", "red");
-        map.put("size", 2);
-        map.put("owner", "tom");
-        byte[] bytesToDB = "test data".getBytes();
-        ByteArrayInputStream bytesIn = new ByteArrayInputStream(bytesToDB);
-        db.saveAttachment(bytesIn, "testdata", "text/plain", "1", null);
-    }
 
+    /**
+     * 根据id和rev删除文档，id和rev可以拷贝库中数据
+     * @throws Exception
+     */
     @Test
-    public void DeleteDoc() throws Exception{
+    public void DeleteDocTest() throws Exception{
         CouchDbClient db = creatConnectionDB();
         CouchDB couchDB = new CouchDB();
         String id = "27b8df429dde46d5afe6a88917d08e80";
@@ -114,35 +135,51 @@ public class CouchDBTest {
         log.info("test data",s);
     }
 
+    /**
+     * 删除某个数据库
+     * @throws Exception
+     */
     @Test
     public void DropDatabase() throws Exception{
         CouchDbClient db = creatConnectionDB();
         CouchDB couchDB = new CouchDB();
-        String name = "";
+        String name = "";//此处为数据库名
         couchDB.dropDatabase(db, name);
     }
 
+    /**
+     * 根据id查询文档，查询结果为object,id可以拷贝库中任意doc的id
+     * @throws Exception
+     */
     @Test
-    public void readDoc() throws Exception{
+    public void readDocTest() throws Exception{
         CouchDbClient db = creatConnectionDB();
         CouchDB couchDB = new CouchDB();
-        String id = "2";
+        String id = "3";//id可以拷贝库中任意doc的id
         JSONObject object = couchDB.readDoc(db, id);
-        String rev = (String)object.get("_rev");
-        log.info(rev);
+        String rev = (String)object.get("_rev");//单独打印rev，测试读取是否成功
+        log.info(object.toString());
     }
 
+    /**
+     * 根据id查询rev,id可以拷贝库中任意doc的id
+     * @throws Exception
+     */
     @Test
     public void getDocumentRevision() throws Exception{
         CouchDbClient db = creatConnectionDB();
         CouchDB couchDB = new CouchDB();
-        String id = "3";
+        String id = "3";//id可以拷贝库中任意doc的id
         String revision = couchDB.getDocumentRevision(db, id);
         log.info(revision);
     }
 
+    /**
+     * 根据两个id，查询两个id之间所有doc的信息,limit为条数（可以自己设定），skip默认为0
+     * @throws Exception
+     */
     @Test
-    public void readDocRange() throws Exception{
+    public void readDocRangeTest() throws Exception{
         CouchDbClient db = creatConnectionDB();
         CouchDB couchDB = new CouchDB();
         String startId = "1";
@@ -153,15 +190,10 @@ public class CouchDBTest {
         log.info(object.toString());
     }
 
-    @Test
-    public void queryDocuments() throws Exception{
-        CouchDbClient db = creatConnectionDB();
-        CouchDB couchDB = new CouchDB();
-        String pm = "{\"selector\":{\"owner\":{\"$eq\":\"tom\"}},\"limit\":2}";
-        List<Object> docs = couchDB.queryDocuments(db, pm, Object.class);
-        log.info(docs.toString());
-    }
-
+    /**
+     * 批量插入doc,参数为list<map>集合,参数可以自己设定
+     * @throws Exception
+     */
     @Test
     public void BatchUpdateDocuments() throws Exception{
         CouchDbClient db = creatConnectionDB();
@@ -185,7 +217,20 @@ public class CouchDBTest {
     }
 
     /**
-     * id in list
+     * 根绝查询语句查询doc，查询语句如下所示（为json格式）
+     * @throws Exception
+     */
+    @Test
+    public void queryDocuments() throws Exception{
+        CouchDbClient db = creatConnectionDB();
+        CouchDB couchDB = new CouchDB();
+        String pm = "{\"selector\":{\"owner\":{\"$eq\":\"tom\"}},\"limit\":2}";
+        List<Object> docs = couchDB.queryDocuments(db, pm, Object.class);
+        log.info(docs.toString());
+    }
+
+    /**
+     * 批量查询doc，查询条件为list（id）
      * @throws Exception
      */
     @Test
@@ -199,17 +244,10 @@ public class CouchDBTest {
         log.info(list1.toString());
     }
 
-    @Test
-    public void SaveObject() throws Exception{
-        CouchDbClient db = creatConnectionDB();
-        Map map1 = new HashMap();
-        map1.put("asset_name", "marble08");
-        map1.put("color", "red");
-        map1.put("size", 2);
-        map1.put("owner", "tom");
-        db.save(map1);
-    }
-
+    /**
+     * 创建索引，条件为json结构的条件语句
+     * @throws Exception
+     */
     @Test
     public void CreatIndexTest() throws Exception{
         CouchDbClient db = creatConnectionDB();
@@ -218,6 +256,10 @@ public class CouchDBTest {
         Boolean aBoolean = couchDB.creatIndex(db, indexDefSize);
     }
 
+    /**
+     * 查询某个库中所有的index
+     * @throws Exception，查询结果为list
+     */
     @Test
     public void ListIndexTest() throws Exception{
         CouchDbClient db = creatConnectionDB();
@@ -226,6 +268,10 @@ public class CouchDBTest {
         log.info(list.toString());
     }
 
+    /**
+     * 获取couchdb的配置文件
+     * @throws Exception
+     */
     @Test
     public void cofigTest() throws Exception {
         NodeConfig config = NodeConfigFactory.getNodeConfig();
@@ -234,5 +280,15 @@ public class CouchDBTest {
         Map<String, String> couchDBConfig = state.getCouchDBConfig();
         String dbAddress = couchDBConfig.get("couchDBAddress");
         log.info(dbAddress);
+    }
+
+    /**
+     * 系统库测试
+     * @throws Exception
+     */
+    @Test
+    public void CreateSystemDatabasesIfNotExistTest() throws Exception{
+        CouchDbClient db = creatConnectionDB();
+        CouchDBUtil.CreateSystemDatabasesIfNotExist(db);
     }
 }
