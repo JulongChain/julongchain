@@ -31,6 +31,7 @@ import org.bcia.julongchain.common.policycheck.PolicyChecker;
 import org.bcia.julongchain.common.policycheck.policies.GroupPolicyManagerGetter;
 import org.bcia.julongchain.common.util.proto.BlockUtils;
 import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
+import org.bcia.julongchain.common.util.proto.ProtoUtils;
 import org.bcia.julongchain.core.aclmgmt.AclManagement;
 import org.bcia.julongchain.core.aclmgmt.resources.Resources;
 import org.bcia.julongchain.core.node.ConfigManager;
@@ -118,10 +119,12 @@ public class CSSC extends SystemSmartContractBase {
         List<byte[]> args = stub.getArgs();
         int size = args.size();
         if (size < 1) {
+            log.error(String.format("Incorrect number of arguments, %d", size));
             return newErrorResponse(String.format("Incorrect number of arguments, %d", size));
         }
         String function = ByteString.copyFrom(args.get(0)).toStringUtf8();
         if (!GET_GROUPS.equals(function) && size < 2) {
+            log.error(String.format("Incorrect number of arguments, %d, %s", size, function));
             return newErrorResponse(String.format("Incorrect number of arguments, %d, %s", size, function));
         }
         log.debug("Invoke function:{}", function);
@@ -160,14 +163,28 @@ public class CSSC extends SystemSmartContractBase {
                 }
                 return joinGroup(groupID, block);
             case GET_CONFIG_BLOCK:
+                //TODO:modified by zhouhui for the CSCCTest(testInvokeWithInvalidParams-GET_CONFIG_BLOCK)  @2018.06.17
+                log.info("get config block");
+                if(sp == null){
+                    String msg = "SignedProposal can not be null";
+                    log.error(msg);
+                    return newErrorResponse(msg);
+                }
+
                 // 2. check policy
                 String groupName = ByteString.copyFrom(args.get(1)).toStringUtf8();
                 try {
                     AclManagement.getACLProvider().checkACL(Resources.CSSC_GetConfigBlock, groupName, sp);
+
                 } catch (JulongChainException e) {
                     return newErrorResponse(String.format("\"GET_CONFIG_BLOCK\" Authorization request failed %s: %s", groupName, e.getMessage()));
                 }
-                return getConfigBlock(groupName);
+            /*    } catch (JulongChainException e) {
+                    String msg = String.format("\"GET_CONFIG_BLOCK\" Authorization request failed %s: %s", groupName, e.getMessage());
+                    log.error(msg);
+                    return newErrorResponse(msg);*/
+
+               return getConfigBlock(groupName);
             case GET_CONFIG_TREE:
                 String groupName2 = ByteString.copyFrom(args.get(1)).toStringUtf8();
                 try {
@@ -312,10 +329,15 @@ public class CSSC extends SystemSmartContractBase {
      */
     private SmartContractResponse getConfigBlock(String groupID) {
         Common.Block block = NodeUtils.getCurrentConfigBlock(groupID);
+
         if (block == null) {
             String msg = String.format("Unknown group ID,%s", groupID);
+            log.error(msg);
             return newErrorResponse(msg);
         }
+//        else{
+//            ProtoUtils.printMessageJson(block);
+//        }
         byte[] blockBytes = block.toByteArray();
         return newSuccessResponse(blockBytes);
     }
