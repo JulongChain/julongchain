@@ -101,6 +101,8 @@ public class QSSCTest extends BaseJunit4Test {
         setupTestLedger(groupid,path);
 
         //不存在的交易
+
+
         List<ByteString> args= new LinkedList<ByteString>();
         args.add(ByteString.copyFromUtf8(QSSC.GET_TRANSACTION_BY_ID));
         args.add(ByteString.copyFromUtf8(groupid));
