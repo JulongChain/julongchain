@@ -31,9 +31,9 @@ import org.bcia.julongchain.gossip.gossip.SignedGossipMessage;
  */
 public interface IGossipChannel {
 
-    public NetworkMember[] getPeers();
+    public NetworkMember[] getNodes();
 
-    public IRoutingFilter peerFilter(ISubChannelSelectionCriteria subChannelSelectionCriteria);
+    public IRoutingFilter nodeFilter(ISubChannelSelectionCriteria subChannelSelectionCriteria);
 
     public Boolean isMemberInChan(NetworkMember member);
 

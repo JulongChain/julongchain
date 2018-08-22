@@ -22,7 +22,7 @@ package org.bcia.julongchain.gossip.api;
  * @date 2018/08/20
  * @company Dingxuan
  */
-public class AnchorPeer {
+public class AnchorNode {
 
     private String host;
     private Integer port;

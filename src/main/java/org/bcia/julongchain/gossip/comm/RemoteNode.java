@@ -1,5 +1,5 @@
 /**
- * Copyright DingXuan. All Rights Reserved.
+ * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,14 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.node.entity;
+package org.bcia.julongchain.gossip.comm;
 
 /**
- * 节点日志
+ * class description
  *
- * @author zhouhui
- * @date 2018/2/23
+ * @author wanliangbing
+ * @date 18-7-24
  * @company Dingxuan
  */
-public class NodeCLILog {
+public class RemoteNode {
+
+    public String endpoint;
+    public byte[] PKIID;
+
+    public String getEndpoint() {
+        return endpoint;
+    }
+
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
+    }
+
+    public byte[] getPKIID() {
+        return PKIID;
+    }
+
+    public void setPKIID(byte[] PKIID) {
+        this.PKIID = PKIID;
+    }
 }

@@ -16,18 +16,18 @@
 package org.bcia.julongchain.gossip.api;
 
 /**
- * PeerSignature defines a signature of a peer
+ * NodeSignature defines a signature of a node
  * on a given message
  *
  * @author wanliangbing
  * @date 2018/08/20
  * @company Dingxuan
  */
-public class PeerSignature {
+public class NodeSignature {
 
     private byte[] signature;
     private byte[] message;
-    private byte[] peerIdentityType;
+    private byte[] nodeIdentityType;
 
     public byte[] getSignature() {
         return signature;
@@ -45,11 +45,11 @@ public class PeerSignature {
         this.message = message;
     }
 
-    public byte[] getPeerIdentityType() {
-        return peerIdentityType;
+    public byte[] getNodeIdentityType() {
+        return nodeIdentityType;
     }
 
-    public void setPeerIdentityType(byte[] peerIdentityType) {
-        this.peerIdentityType = peerIdentityType;
+    public void setNodeIdentityType(byte[] nodeIdentityType) {
+        this.nodeIdentityType = nodeIdentityType;
     }
 }

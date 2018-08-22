@@ -57,7 +57,7 @@ public class Connection {
         MsgSending msgSending = new MsgSending();
         msgSending.setEnvelope(msg.getEnvelope());
         Channel<MsgSending> outBuff = this.getOutBuff();
-        Integer sendBuffSize = MiscUtil.getIntOrDefault("peer.gossip.sendBuffSize", CommImpl.defSendBuffSize);
+        Integer sendBuffSize = MiscUtil.getIntOrDefault("node.gossip.sendBuffSize", CommImpl.defSendBuffSize);
         if (outBuff.stream().count() == sendBuffSize.longValue()) {
             log.debug("Buffer to " + getInfo().getEndpoint().toString() + " overflowed, drooping message", msg.toString() );
             if (!shouldBlock) {

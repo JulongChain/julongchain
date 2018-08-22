@@ -26,14 +26,14 @@ package org.bcia.julongchain.gossip.api;
 public interface ISecurityAdvisor {
 
     /**
-     * OrgByPeerIdentity returns the OrgIdentityType
-     * of a given peer identity.
+     * OrgByNodeIdentity returns the OrgIdentityType
+     * of a given node identity.
      * If any error occurs, nil is returned.
-     * This method does not validate peerIdentity.
+     * This method does not validate nodeIdentity.
      * This validation is supposed to be done appropriately during the execution flow.
-     * @param peerIdentity
+     * @param nodeIdentity
      * @return
      */
-    public byte[] orgByPeerIdentity(byte[] peerIdentity);
+    public byte[] orgByNodeIdentity(byte[] nodeIdentity);
 
 }

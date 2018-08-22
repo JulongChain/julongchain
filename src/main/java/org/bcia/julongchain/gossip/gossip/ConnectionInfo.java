@@ -26,7 +26,7 @@ public class ConnectionInfo {
 
     private byte[] pkiID;
     private AuthInfo auth;
-    private byte[] peerIdentity;
+    private byte[] nodeIdentity;
     private String endpoint;
 
     public byte[] getPkiID() {
@@ -45,12 +45,12 @@ public class ConnectionInfo {
         this.auth = auth;
     }
 
-    public byte[] getPeerIdentity() {
-        return peerIdentity;
+    public byte[] getNodeIdentity() {
+        return nodeIdentity;
     }
 
-    public void setPeerIdentity(byte[] peerIdentity) {
-        this.peerIdentity = peerIdentity;
+    public void setNodeIdentity(byte[] nodeIdentity) {
+        this.nodeIdentity = nodeIdentity;
     }
 
     public String getEndpoint() {

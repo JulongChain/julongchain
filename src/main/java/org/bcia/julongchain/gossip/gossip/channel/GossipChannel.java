@@ -39,12 +39,12 @@ public class GossipChannel implements IGossipChannel {
 
 
     @Override
-    public NetworkMember[] getPeers() {
+    public NetworkMember[] getNodes() {
         return new NetworkMember[0];
     }
 
     @Override
-    public IRoutingFilter peerFilter(ISubChannelSelectionCriteria subChannelSelectionCriteria) {
+    public IRoutingFilter nodeFilter(ISubChannelSelectionCriteria subChannelSelectionCriteria) {
         return null;
     }
 

@@ -18,7 +18,7 @@ package org.bcia.julongchain.gossip.api;
 /**
  * JoinChannelMessage is the message that asserts a creation or mutation
  * of a channel's membership list, and is the message that is gossipped
- * among the peers
+ * among the nodes
  *
  * @author wanliangbing
  * @date 2018/08/20
@@ -40,10 +40,10 @@ public interface IJoinChannelMessage {
     public byte[][] members();
 
     /**
-     * AnchorPeersOf returns the anchor peers of the given organization
+     * AnchorNodesOf returns the anchor nodes of the given organization
      * @param orgIdentity
      * @return
      */
-    public AnchorPeer[] anchorPeersOf(byte[] orgIdentity);
+    public AnchorNode[] anchorNodesOf(byte[] orgIdentity);
 
 }

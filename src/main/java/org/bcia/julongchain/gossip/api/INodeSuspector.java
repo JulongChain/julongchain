@@ -13,33 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.gossip.discovery;
+package org.bcia.julongchain.gossip.api;
 
 /**
- * class description
+ * 类描述
  *
  * @author wanliangbing
- * @date 18-7-24
+ * @date 2018/08/20
  * @company Dingxuan
  */
-public class PeerIdentification {
+public interface INodeSuspector {
 
-    private byte[] ID;
-    private Boolean selfOrg;
+    /**
+     * NodeSuspector returns whether a node with a given identity is suspected
+     * as being revoked, or its CA is revoked
+     * @param nodeIdentity
+     * @return
+     */
+    public Boolean execute(byte[] nodeIdentity);
 
-    public byte[] getID() {
-        return ID;
-    }
-
-    public void setID(byte[] ID) {
-        this.ID = ID;
-    }
-
-    public Boolean getSelfOrg() {
-        return selfOrg;
-    }
-
-    public void setSelfOrg(Boolean selfOrg) {
-        this.selfOrg = selfOrg;
-    }
 }
