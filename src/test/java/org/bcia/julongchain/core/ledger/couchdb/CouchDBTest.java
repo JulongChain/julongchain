@@ -257,7 +257,7 @@ public class CouchDBTest {
     }
 
     /**
-     * 查询某个库中所有的index
+     * 查询某个库中所有的index.
      * @throws Exception，查询结果为list
      */
     @Test
