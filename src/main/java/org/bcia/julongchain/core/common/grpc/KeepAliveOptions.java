@@ -22,26 +22,26 @@ package org.bcia.julongchain.core.common.grpc;
  * @date 2018/3/20
  * @company Dingxuan
  */
-public class KeepaliveOptions {
+public class KeepAliveOptions {
     /**
-     * 一个期限，之后如果客户端没有察觉服务器的任何活动，它将ping服务器，以察觉其是否是活的
+     * 客户端间隔时间，在该时间内如果客户端没有察觉服务器的任何活动，它将ping服务器，以检测其是否处于活动状态
      */
     private long clientInterval;
     /**
-     * 一个期限，客户端在关闭连接之前发送ping信号后等待服务器响应的持续时间
+     * 客户端超时时间，客户端发送ping信号后等待服务器响应的持续时间
      */
     private long clientTimeout;
     /**
-     * 一个期限，之后如果服务器没有察觉客户端的任何活动，它将ping客户端，以察觉其是否是活的
+     * 服务器间隔时间，在该时间内如果服务器没有察觉客户端的任何活动，它将ping客户端，以检测其是否处于活动状态
      */
     private long serverInterval;
     /**
-     * 一个期限，服务器在关闭连接之前发送ping信号后等待客户端响应的持续时间
+     * 服务器超时时间，服务器发送ping信号后等待客户端响应的持续时间
      */
     private long serverTimeout;
 
     /**
-     * 客户端ping时的最小许可时间。如果客户端发送的ping信号更频繁，服务器就会断开连接。这个应该是保护服务器用的，防止客户端过于频繁的攻击
+     * 服务器最小间隔时间。如果客户端发送的ping信号太频繁，服务器就会断开连接。该属性用来保护服务器，防止客户端过于频繁的攻击
      */
     private long serverMinInterval;
 

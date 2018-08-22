@@ -156,7 +156,6 @@ public class GlobalMspManagement {
             MspConfig mspConfig = loadMspConfig();
             String mspConfigDir = mspConfig.getNode().getMspConfigPath();
             String mspId = mspConfig.getNode().getLocalMspId();
-            String mspType = mspConfig.getNode().getLocalMspType();
             String defaultOpts = mspConfig.getNode().getCsp().getDefaultValue();
 
             CspOptsManager cspOptsManager = CspOptsManager.getInstance();
