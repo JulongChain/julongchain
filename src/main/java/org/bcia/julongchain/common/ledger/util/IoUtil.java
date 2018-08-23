@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,6 +36,8 @@ import java.util.zip.GZIPOutputStream;
  */
 public class IoUtil {
     private static JulongChainLog log = JulongChainLogFactory.getLog(IoUtil.class);
+    private static final int MAX_FILE_MODE = 7;
+	private static final int MIN_FILE_MODE = 7;
 
     /**
      * 返回-1:文件不存在
@@ -59,13 +61,40 @@ public class IoUtil {
             log.debug("Dir {} is not exists", dir);
             return null;
         }
-        for (File file : dir.listFiles()) {
+		File[] files = dir.listFiles();
+		if (files == null) {
+			return list;
+		}
+		for (File file : files) {
             if(file.isDirectory()){
                 list.add(file.getName());
             }
         }
         return list;
     }
+
+	/**
+	 * 执行外部Linux命令
+	 * @param cmd	Linux命令
+	 * @return	执行结果
+	 */
+	public static List<String> exce(String cmd) {
+		System.out.println(cmd);
+		List<String> result = null;
+		try {
+			Process process = null;
+			result = new ArrayList<>();
+			process = Runtime.getRuntime().exec(cmd);
+			LineNumberReader reader = new LineNumberReader(new InputStreamReader(process.getInputStream()));
+			String line;
+			while((line = reader.readLine()) != null) {
+				result.add(line);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
 
     /**
      * 修改文件权限 755
@@ -75,27 +104,20 @@ public class IoUtil {
         int uMod = perm / 100;
         int gMod = (perm % 100) / 10;
         int oMod = perm % 10;
-        if(uMod > 7 || uMod < 0){
+        if(uMod > MAX_FILE_MODE || uMod < MIN_FILE_MODE){
             log.error("Wrong mod type " + perm);
             return;
         }
-        if(gMod > 7 || gMod < 0){
+        if(gMod > MAX_FILE_MODE || gMod < MIN_FILE_MODE){
             log.error("Wrong mod type " + perm);
             return;
         }
-        if(oMod > 7 || oMod < 0){
+        if(oMod > MAX_FILE_MODE || oMod < MIN_FILE_MODE){
             log.error("Wrong mod type " + perm);
             return;
         }
-        if (!file.setWritable(uMod >= 4, (uMod > 0 && uMod < 5))) {
-            log.error("Can not set write permission to dir " + file.getAbsolutePath());
-        }
-        if (!file.setReadable(gMod >= 4, (uMod > 0 && uMod < 5))) {
-            log.error("Can not set read permission to dir " + file.getAbsolutePath());
-        }
-        if (!file.setExecutable(oMod >= 4, (uMod > 0 && uMod < 5))) {
-            log.error("Can not set execute permission to dir " + file.getAbsolutePath());
-        }
+        String cmd = "chmod " + perm + " " + file.getAbsolutePath();
+        exce(cmd);
     }
 
     /**
@@ -302,7 +324,7 @@ public class IoUtil {
      *          value:文件流
      */
     public static Map<String, byte[]> tarReader(byte[] tarBytes, int cache) throws JulongChainException {
-        Map<String, byte[]> result = new HashMap<>();
+        Map<String, byte[]> result = new HashMap<>(16);
         ByteArrayOutputStream baos = null;
         ByteArrayInputStream bais = null;
         TarArchiveInputStream tais = null;

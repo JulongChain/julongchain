@@ -55,7 +55,6 @@ public class BlockHelper {
             block.getMetadataBuilder().addMetadata(ByteString.copyFrom(metaData.build().toByteArray()));
         }
         block.getHeaderBuilder().setNumber(seqNum).setPreviousHash(ByteString.copyFrom(previousHash));
-       // block.setHeader(blockHeader);
         block.setData(blockData);
         return block.build();
     }

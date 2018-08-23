@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.core.ledger;
 
+import afu.org.checkerframework.checker.oigj.qual.O;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.common.log.JulongChainLog;
@@ -91,6 +92,7 @@ public abstract class TxSimulatorBase implements ITxSimulator {
         return null;
     }
 
+    @Override
     public IResultsIterator executeQuery(String namespace, String query)
             throws LedgerException {
         log.debug("ExecuteQuery");

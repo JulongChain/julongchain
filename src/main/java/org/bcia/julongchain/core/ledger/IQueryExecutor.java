@@ -43,7 +43,6 @@ public interface IQueryExecutor {
 
     /**
      * 根据给出的namespace以及[startKey, endKey)返回查询迭代器
-	 * // TODO: 8/9/18 目前endkey无效
      */
     IResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException;
 

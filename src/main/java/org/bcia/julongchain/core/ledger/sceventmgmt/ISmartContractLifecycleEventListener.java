@@ -25,5 +25,9 @@ import org.bcia.julongchain.common.exception.JulongChainException;
  * @company Dingxuan
  */
 public interface ISmartContractLifecycleEventListener {
+
+	/**
+	 * 执行智能合约部署
+	 */
     void handleSmartContractDeploy(SmartContractDefinition smartContractDefinition, byte[] dbArtifactsTar) throws JulongChainException;
 }

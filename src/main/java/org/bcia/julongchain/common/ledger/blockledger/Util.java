@@ -61,9 +61,7 @@ public class Util {
         //添加区块Data
         Common.BlockData.Builder dataBuilder = Common.BlockData.newBuilder();
         if (messages != null) {
-            messages.forEach((msg) -> {
-                dataBuilder.addData(msg.toByteString());
-            });
+            messages.forEach((msg) -> dataBuilder.addData(msg.toByteString()));
         }
 		ByteString dataByteString = dataBuilder.build().toByteString();
 		//组装区块

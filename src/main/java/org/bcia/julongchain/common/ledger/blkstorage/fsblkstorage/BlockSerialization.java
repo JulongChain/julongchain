@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,8 +36,9 @@ import static org.bcia.julongchain.protos.common.Common.*;
  */
 public class BlockSerialization {
     private static JulongChainLog log = JulongChainLogFactory.getLog(BlockSerialization.class);
+	private static final int LENGTH_VARIATION_MARK = 7;
 
-    private BlockHeader blockHeader;
+	private BlockHeader blockHeader;
     public List<TxIndexInfo> txOffsets = new ArrayList<>();
     private BlockMetadata metadata;
 
@@ -150,9 +151,8 @@ public class BlockSerialization {
      *      ...
      */
     private static int computeLength(long i){
-    	final int lengthVariationMark = 7;
         int result = 0;
-        while ((i >>= lengthVariationMark) > 0){
+        while ((i >>= LENGTH_VARIATION_MARK) > 0){
             result++;
         }
         return ++result;

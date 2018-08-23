@@ -97,7 +97,7 @@ public class VsscValidator implements IVsscValidator {
                     writesToLSSC = true;
                 }
 
-                if (!writesToNonInvokableSSC && sysSmartContractProvider.isSysSCAndNotInvokableSC2SC(nsRwSet
+                if (!writesToNonInvokableSSC && sysSmartContractProvider.isSysSCAndNotInvokeSC2SC(nsRwSet
                         .getNameSpace())) {
                     writesToNonInvokableSSC = true;
                 }

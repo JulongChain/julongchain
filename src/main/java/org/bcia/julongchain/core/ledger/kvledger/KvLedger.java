@@ -54,7 +54,7 @@ public class KvLedger implements INodeLedger {
 	private IHistoryDB historyDB;
 
 	/**
-	 * Create new ledger call `kvLedger`
+	 * 创建新KvLedger
 	 */
 	public KvLedger(String ledgerID,
 	                IBlockStore blockStore,
@@ -70,7 +70,6 @@ public class KvLedger implements INodeLedger {
 		this.txtmgmt = txmgmt;
 		this.historyDB = historyDB;
 
-		//TODO get scEventListener
 		ISmartContractLifecycleEventListener scEventListener = versionedDB.getSmartcontractEventListener();
 		log.debug("Register state db for smartcontract lifecycle event " + (scEventListener != null));
 
@@ -81,8 +80,8 @@ public class KvLedger implements INodeLedger {
 		recoverDBs();
 	}
 
-	/** Recover the state database and history database (if exist)
-	 * by recommitting last valid blocks
+	/**
+	 * 恢复账本
 	 */
 	private void recoverDBs() throws LedgerException {
 		log.debug("Evtering revocerDBs()");
@@ -125,8 +124,8 @@ public class KvLedger implements INodeLedger {
 		}
 	}
 
-	/** recommitLostBlocks retrieves blocks in specified range and commit the write set to either
-	 * state IDB or history IDB or both
+	/**
+	 * 重新提交区块
 	 */
 	private void recommitLostBlocks(long firstBlockNum, long lastBlockNum, IRecoverable... recoverables) throws LedgerException{
 		BlockAndPvtData blockAndPvtData;
@@ -138,10 +137,8 @@ public class KvLedger implements INodeLedger {
 		}
 	}
 
-	/** GetTransactionByID retrieves a transaction by id
-	 *
-	 * @param txID
-	 * @return
+	/**
+	 * 根据交易ID获取交易
 	 */
 	@Override
 	public synchronized TransactionPackage.ProcessedTransaction getTransactionByID(String txID) throws LedgerException {
@@ -159,9 +156,8 @@ public class KvLedger implements INodeLedger {
 				.build();
 	}
 
-	/** GetBlockchainInfo returns basic info about blockchain
-	 *
-	 * @return
+	/**
+	 * 获取当前区块链状态
 	 */
 	@Override
 	public synchronized Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException {
@@ -172,8 +168,8 @@ public class KvLedger implements INodeLedger {
 		return bcInfo;
 	}
 
-	/** GetBlockByNumber returns block at a given height
-	 * blockNumber of  math.MaxUint64 will return last block
+	/**
+	 * 根据区块号获取区块
 	 */
 	@Override
 	public synchronized Common.Block getBlockByNumber(long blockNumber) throws LedgerException {
@@ -184,9 +180,8 @@ public class KvLedger implements INodeLedger {
 		return block;
 	}
 
-	/** GetBlocksIterator returns an iterator that starts from `startBlockNumber`(inclusive).
-	 * The iterator is a blocking iterator i.e., it blocks till the next block gets available in the ledger
-	 * IResultsIterator contains type BlockHolder
+	/**
+	 * 获取区块迭代器
 	 */
 	@Override
 	public IResultsIterator getBlocksIterator(long startBlockNumber) throws LedgerException{
@@ -197,10 +192,8 @@ public class KvLedger implements INodeLedger {
 		return itr;
 	}
 
-	/** GetBlockByHash returns a block given it's hash
-	 *
-	 * @param blockHash
-	 * @return
+	/**
+	 * 根据区块Hash(headerHash)获取区块
 	 */
 	@Override
 	public synchronized Common.Block getBlockByHash(byte[] blockHash) throws LedgerException {
@@ -211,10 +204,8 @@ public class KvLedger implements INodeLedger {
 		return block;
 	}
 
-	/** GetBlockByTxID returns a block which contains a transaction
-	 *
-	 * @param txID
-	 * @return
+	/**
+	 * 根据交易ID获取区块
 	 */
 	@Override
 	public synchronized Common.Block getBlockByTxID(String txID) throws LedgerException {
@@ -225,6 +216,9 @@ public class KvLedger implements INodeLedger {
 		return block;
 	}
 
+	/**
+	 * 通过交易Id获取交易可行性代码
+	 */
 	@Override
 	public synchronized TransactionPackage.TxValidationCode getTxValidationCodeByTxID(String txID) throws LedgerException {
 		TransactionPackage.TxValidationCode txValidationCode = blockStore.retrieveTxValidationCodeByTxID(txID);
@@ -234,54 +228,58 @@ public class KvLedger implements INodeLedger {
 		return txValidationCode;
 	}
 
-	/** NewTxSimulator returns new `ledger.TxSimulator`
-	 *
-	 * @return
+	/**
+	 * 获取交易模拟器
 	 */
 	@Override
 	public ITxSimulator newTxSimulator(String txId) throws LedgerException {
 		return txtmgmt.newTxSimulator(txId);
 	}
 
-	/** Prune prunes the blocks/transactions that satisfy the given policy
-	 *
-	 * @param prunePolicy
+	/**
+	 * TODO
+	 * 修剪策略
 	 */
 	@Override
 	public void prune(IPrunePolicy prunePolicy) throws LedgerException {
 		throw new LedgerException("Not yet implement");
 	}
 
-	/** NewQueryExecutor gives handle to a query executor.
-	 * A client can obtain more than one 'QueryExecutor's for parallel execution.
-	 * Any synchronization should be performed at the implementation level if required
+	/**
+	 * 新建交易查询器
 	 */
 	@Override
 	public IQueryExecutor newQueryExecutor() throws LedgerException{
-		//TODO uuid
 		return txtmgmt.newQueryExecutor(UUID.randomUUID().toString());
 	}
 
-	/** NewHistoryQueryExecutor gives handle to a history query executor.
-	 * A client can obtain more than one 'IHistoryQueryExecutor's for parallel execution.
-	 * Any synchronization should be performed at the implementation level if required
-	 * Pass the ledger blockstore so that historical values can be looked up from the chain
+	/**
+	 * 新建历史查询器
 	 */
 	@Override
 	public IHistoryQueryExecutor newHistoryQueryExecutor() throws LedgerException {
 		return historyDB.newHistoryQueryExecutor(blockStore);
 	}
 
+	/**
+	 * 根据区块号获取pvtdata和区块
+	 */
 	@Override
 	public synchronized BlockAndPvtData getPvtDataAndBlockByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
 		return ((Store) blockStore).getPvtDataAndBlockByNum(blockNum, filter);
 	}
 
+	/**
+	 * 根据区块号获取pvtdata
+	 */
 	@Override
 	public synchronized List<TxPvtData> getPvtDataByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
 		return  ((Store) blockStore).getPvtDataByNum(blockNum, filter);
 	}
 
+	/**
+	 * 修剪pvtdata策略
+	 */
 	@Override
 	public void purgePrivateData(long maxBlockNumToRetain) throws LedgerException {
 		throw new LedgerException("Not yet implement");
@@ -292,17 +290,16 @@ public class KvLedger implements INodeLedger {
 		throw new LedgerException("Not yet implement");
 	}
 
-	/** Commit commits the valid block (returned in the method RemoveInvalidTransactionsAndPrepare) and related state changes
-	 *
-	 * @param block
+	/**
+	 * 提交区块
 	 */
 	@Override
 	public void commit(Common.Block block) throws LedgerException {
 		commitWithPvtData(new BlockAndPvtData(block, null, null));
 	}
 
-	/** Close closes `KVLedger`
-	 *
+	/**
+	 * 关闭账本
 	 */
 	@Override
 	public void close() {
@@ -314,6 +311,9 @@ public class KvLedger implements INodeLedger {
 		}
 	}
 
+	/**
+	 * 提交区块和pvtdata
+	 */
 	@Override
 	public synchronized void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException {
 		long blockNo = blockAndPvtData.getBlock().getHeader().getNumber();
