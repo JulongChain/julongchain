@@ -97,16 +97,24 @@ public class EnvelopeHelper {
         return Configtx.ConfigEnvelope.parseFrom(payload.getData());
     }
 
+    /**
+     * 从信封对象中解析出ConfigUpdateEnvelope对象
+     *
+     * @param envelope
+     * @return
+     * @throws InvalidProtocolBufferException
+     * @throws ValidateException
+     */
     public static Configtx.ConfigUpdateEnvelope getConfigUpdateEnvelopeFrom(Common.Envelope envelope) throws
             InvalidProtocolBufferException, ValidateException {
-        ValidateUtils.isNotNull(envelope, "envelope can not be null");
-        ValidateUtils.isNotNull(envelope.getPayload(), "envelope.Payload can not be null");
+        ValidateUtils.isNotNull(envelope, "Envelope can not be null");
+        ValidateUtils.isNotNull(envelope.getPayload(), "Envelope.Payload can not be null");
 
         Common.Payload payload = Common.Payload.parseFrom(envelope.getPayload());
 
-        ValidateUtils.isNotNull(payload.getHeader(), "envelope.Payload.header can not be null");
-        ValidateUtils.isNotNull(payload.getHeader().getGroupHeader(), "envelope.groupHeader can not be null");
-        ValidateUtils.isNotNull(payload.getData(), "envelope.Payload.data can not be null");
+        ValidateUtils.isNotNull(payload.getHeader(), "Envelope.Payload.header can not be null");
+        ValidateUtils.isNotNull(payload.getHeader().getGroupHeader(), "Envelope.groupHeader can not be null");
+        ValidateUtils.isNotNull(payload.getData(), "Envelope.Payload.data can not be null");
 
         Common.GroupHeader groupHeader = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
 
