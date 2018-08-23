@@ -140,8 +140,6 @@ public class MerkleTree {
         for(byte[] h : hashes){
             combinedHash = ArrayUtils.addAll(combinedHash, h);
         }
-        //TODO compute hash
-        //TODO SM3 Hash
         return Util.getHashBytes(combinedHash);
     }
 

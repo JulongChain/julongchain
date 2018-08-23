@@ -60,8 +60,8 @@ public class Validator implements InternalValidator {
     public void preLoadCommittedVersionOfRSet(Block block) throws LedgerException{
         List<CompositeKey> pubKeys = new ArrayList<>();
         List<HashedCompositeKey> hashedKeys = new ArrayList<>();
-        Map<CompositeKey, Object> pubKeysMap = new HashMap<>();
-        Map<HashedCompositeKey, Object> hashedKeyMap = new HashMap<>();
+        Map<CompositeKey, Object> pubKeysMap = new HashMap<>(16);
+        Map<HashedCompositeKey, Object> hashedKeyMap = new HashMap<>(16);
         for(Transaction tx : block.getTxs()){
             for(NsRwSet nsRwSet : tx.getRwSet().getNsRwSets()){
                 for(KvRwset.KVRead kvRead : nsRwSet.getKvRwSet().getReadsList()){

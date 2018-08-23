@@ -37,7 +37,7 @@ import java.util.zip.GZIPOutputStream;
 public class IoUtil {
     private static JulongChainLog log = JulongChainLogFactory.getLog(IoUtil.class);
     private static final int MAX_FILE_MODE = 7;
-	private static final int MIN_FILE_MODE = 7;
+	private static final int MIN_FILE_MODE = 0;
 
     /**
      * 返回-1:文件不存在

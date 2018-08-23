@@ -29,6 +29,9 @@ import org.bcia.julongchain.core.ledger.util.Util;
 public class HistoryDBHelper {
     private static final byte[] COMPOSITE_KEY_SEP = new String(new char[]{Character.MIN_VALUE}).getBytes();
     private static final byte[] COMPOSITE_END_KEY = new String(new char[]{Character.MAX_VALUE}).getBytes();
+	private static final int MIN_HISTORY_KEY_LENGTH = 19;
+	private static final int BLOCK_NUM_AND_TRAN_NUM_LENGTH = 17;
+	private static final int TRAN_NUM_LENGTH = 8;
 
     /**
      * 将namespace, key, blockNum, tranNum组装为HistoryDB key
@@ -74,10 +77,10 @@ public class HistoryDBHelper {
      */
     public static long splitCompositeHistoryKeyForBlockNum(byte[] byteToSplit){
     	int length = byteToSplit.length;
-	    if (length <= 19) {
+	    if (length <= MIN_HISTORY_KEY_LENGTH) {
 		    return -1;
 	    }
-        return Util.bytesToLong(byteToSplit, length - 17, BlockFileManager.PEEK_BYTES_LEN);
+        return Util.bytesToLong(byteToSplit, length - BLOCK_NUM_AND_TRAN_NUM_LENGTH, BlockFileManager.PEEK_BYTES_LEN);
     }
 
     /**
@@ -87,22 +90,10 @@ public class HistoryDBHelper {
      */
     public static long splitCompositeHistoryKeyForTranNum(byte[] byteToSplit){
 	    int length = byteToSplit.length;
-	    if (length <= 19) {
+	    if (length <= MIN_HISTORY_KEY_LENGTH) {
 		    return -1;
 	    }
-        return Util.bytesToLong(byteToSplit, length - 8, BlockFileManager.PEEK_BYTES_LEN);
-    }
-
-    /**
-     * 获取History数据头部
-     */
-    public static byte[] splitCompositeHistoryKeyForHeader(byte[] byteToSplit){
-        if(byteToSplit.length <= 19){
-            return null;
-        }
-        byte[] header = new byte[byteToSplit.length - 18];
-        System.arraycopy(byteToSplit, 0, header, 0 , header.length);
-        return header;
+        return Util.bytesToLong(byteToSplit, length - TRAN_NUM_LENGTH, BlockFileManager.PEEK_BYTES_LEN);
     }
 
     /**
