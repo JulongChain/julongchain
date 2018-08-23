@@ -25,7 +25,7 @@ package org.bcia.julongchain.core.common.grpc;
 public class GrpcClientConfig {
     private SecureOptions secureOptions;
 
-    private KeepaliveOptions keepaliveOptions;
+    private KeepAliveOptions keepaliveOptions;
     /**
      * 当客户端尝试建立连接时，将阻塞的时间
      */
@@ -39,11 +39,11 @@ public class GrpcClientConfig {
         this.secureOptions = secureOptions;
     }
 
-    public KeepaliveOptions getKeepaliveOptions() {
+    public KeepAliveOptions getKeepaliveOptions() {
         return keepaliveOptions;
     }
 
-    public void setKeepaliveOptions(KeepaliveOptions keepaliveOptions) {
+    public void setKeepaliveOptions(KeepAliveOptions keepaliveOptions) {
         this.keepaliveOptions = keepaliveOptions;
     }
 

@@ -25,7 +25,7 @@ package org.bcia.julongchain.core.common.grpc;
 public class GrpcServerConfig {
     private SecureOptions secureOptions;
 
-    private KeepaliveOptions keepaliveOptions;
+    private KeepAliveOptions keepaliveOptions;
 
     public SecureOptions getSecureOptions() {
         return secureOptions;
@@ -35,11 +35,11 @@ public class GrpcServerConfig {
         this.secureOptions = secureOptions;
     }
 
-    public KeepaliveOptions getKeepaliveOptions() {
+    public KeepAliveOptions getKeepaliveOptions() {
         return keepaliveOptions;
     }
 
-    public void setKeepaliveOptions(KeepaliveOptions keepaliveOptions) {
+    public void setKeepaliveOptions(KeepAliveOptions keepaliveOptions) {
         this.keepaliveOptions = keepaliveOptions;
     }
 }
