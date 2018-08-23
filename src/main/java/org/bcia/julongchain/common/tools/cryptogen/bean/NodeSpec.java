@@ -33,7 +33,7 @@ public class NodeSpec {
     private String country = "";
     private String province = "";
     private String locality = "";
-    private String organizationUnit = "";
+    private String organizationalUnit = "";
     private String streetAddress = "";
     private String postalCode = "";
 
@@ -79,12 +79,12 @@ public class NodeSpec {
         this.locality = locality;
     }
 
-    public String getOrganizationUnit() {
-        return organizationUnit;
+    public String getOrganizationalUnit() {
+        return organizationalUnit;
     }
 
-    public void setOrganizationUnit(String organizationUnit) {
-        this.organizationUnit = organizationUnit;
+    public void setOrganizationalUnit(String organizationalUnit) {
+        this.organizationalUnit = organizationalUnit;
     }
 
     public String getStreetAddress() {
