@@ -42,7 +42,7 @@ public class JoinChannelMessage implements IJoinChannelMessage{
     }
 
     /**
-     * AnchorNodesOf returns the anchor nodes of the given organization
+     * AnchorNodesOf 返回给定公司的锚节点
      * @param orgIdentity
      * @return
      */
@@ -54,7 +54,7 @@ public class JoinChannelMessage implements IJoinChannelMessage{
     }
 
     /**
-     * Members returns the organizations of the channel
+     * Members 返回给定公司的通道
      * @return
      */
     @Override

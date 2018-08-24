@@ -16,8 +16,7 @@
 package org.bcia.julongchain.gossip.api;
 
 /**
- * SecurityAdvisor defines an external auxiliary object
- * that provides security and identity related capabilities
+ * SecurityAdvisor 定义一个外部附加的对象来提供安全身份相关的功能
  *
  * @author wanliangbing
  * @date 2018/08/20
@@ -26,11 +25,10 @@ package org.bcia.julongchain.gossip.api;
 public interface ISecurityAdvisor {
 
     /**
-     * OrgByNodeIdentity returns the OrgIdentityType
-     * of a given node identity.
-     * If any error occurs, nil is returned.
-     * This method does not validate nodeIdentity.
-     * This validation is supposed to be done appropriately during the execution flow.
+     * OrgByNodeIdentity 返回 OrgIdentityType 对应节点的身份
+     * 如果发生错误，返回nil
+     * 这种方法不会验证nodeIdentity
+     * 验证应当在执行时完成
      * @param nodeIdentity
      * @return
      */

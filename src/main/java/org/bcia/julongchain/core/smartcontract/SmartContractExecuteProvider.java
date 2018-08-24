@@ -24,7 +24,7 @@ import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
- * SmartContractExecuteProvider is an implementation of the ISmartContractProvider interface
+ * SmartContractExecuteProvider 是一个ISmartContractProvider界面的实现
  *
  * @author sunianle
  * @date 5/11/18
