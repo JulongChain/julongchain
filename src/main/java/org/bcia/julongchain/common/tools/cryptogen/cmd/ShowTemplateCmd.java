@@ -161,7 +161,7 @@ public class ShowTemplateCmd implements ICryptoGenCmd {
         String temp = DEFAULT_TEMPLATE;
         URL url = YamlLoader.class.getClassLoader().getResource("crypto-config.yaml");
         if (url == null) {
-            log.warn("crypto-config.yaml not found in jar, use default template");
+            log.info("no crypto-config.yaml in jar, use built-in template");
         } else {
             try {
                 temp = new String(FileUtils.readFileBytes(url.getPath()));
