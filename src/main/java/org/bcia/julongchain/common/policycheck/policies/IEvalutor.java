@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * 类描述
- *
+ *  策略评估接口
  * @author yuanjun
  * @date 31/05/18
  * @company Aisino

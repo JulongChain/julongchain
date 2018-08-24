@@ -22,7 +22,7 @@ import org.bcia.julongchain.common.policies.IPolicyManagerGetter;
 
 /**
  * 类描述
- *
+ * 策略管理者获取接口
  * @author yuanjun
  * @date 26/04/18
  * @company Aisino
