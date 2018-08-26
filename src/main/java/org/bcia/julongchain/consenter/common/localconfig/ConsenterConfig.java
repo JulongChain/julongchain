@@ -194,7 +194,7 @@ public class ConsenterConfig {
     public static class FileLedger {
         private String location;
         private String prefix;
-
+        private String groupName;
         public String getPrefix() {
             return prefix;
         }
@@ -209,6 +209,14 @@ public class ConsenterConfig {
 
         public void setLocation(String location) {
             this.location = location;
+        }
+
+        public String getGroupName() {
+            return groupName;
+        }
+
+        public void setGroupName(String groupName) {
+            this.groupName = groupName;
         }
     }
 

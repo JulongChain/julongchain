@@ -38,6 +38,7 @@ import org.bcia.julongchain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.julongchain.core.ssc.lssc.LSSC;
 import org.bcia.julongchain.msp.IMspManager;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
+import org.bcia.julongchain.msp.mgmt.MspMgmtMgr;
 import org.bcia.julongchain.protos.common.Collection;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.ledger.rwset.Rwset;
@@ -338,7 +339,7 @@ public class VSSCSupportForLsscInvocation {
      */
     private static void checkInstantiationPolicy(String groupID, Common.Envelope env, byte []instantiationPolicy,
                                                  Common.Payload payload, JulongChainLog log)throws SysSmartContractException{
-        IMspManager mspManager = GlobalMspManagement.getManagerForChain(groupID);
+        IMspManager mspManager = MspMgmtMgr.getManagerForChain(groupID);
         if(mspManager==null){
             String msg=String.format("MSP getPolicyManager for group %s is null, aborting",groupID);
             throw new SysSmartContractException(msg);

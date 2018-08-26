@@ -25,6 +25,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.springframework.stereotype.Component;
 
 /**
+ * 区块剪切处理类
  * @author zhangmingyang
  * @Date: 2018/3/15
  * @company Dingxuan
@@ -54,7 +55,7 @@ public class BlockCutter implements IReceiver {
         BatchesMes batchesMes = new BatchesMes();
         if (messageSizeBytes > sharedConfigManager.getBatchSize().getPreferredMaxBytes()) {
 
-            log.debug(String.format("he current message, with %s bytes, is larger than the preferred batch size of %s bytes and will be isolated.", messageSizeBytes, sharedConfigManager.getBatchSize().getPreferredMaxBytes()));
+            log.debug(String.format("The current message, with %s bytes, is larger than the preferred batch size of %s bytes and will be isolated.", messageSizeBytes, sharedConfigManager.getBatchSize().getPreferredMaxBytes()));
 
             if (pendingBatch.length > 0) {
                 Common.Envelope[] messageBatch = cut();

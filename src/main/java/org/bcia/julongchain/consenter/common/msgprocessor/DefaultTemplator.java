@@ -54,9 +54,9 @@ public class DefaultTemplator implements IGroupConfigTemplator {
         Common.Payload configUpdatePayload = CommonUtils.unmarshalPayload(envelope.getPayload().toByteArray());
         Configtx.ConfigUpdateEnvelope configUpdateEnv = ConfigTxUtil.unmarshalConfigUpdateEnvelope(configUpdatePayload.getData().toByteArray());
         if (configUpdatePayload.getHeader() == null) {
-            log.error("Failed initial channel config creation because config update header was missing");
+            log.error("Failed initial group config creation because config update header was missing");
             try {
-                throw new ConsenterException("Failed initial channel config creation because config update header was missing");
+                throw new ConsenterException("Failed initial group config creation because config update header was missing");
             } catch (ConsenterException e) {
                 e.printStackTrace();
             }
@@ -74,7 +74,7 @@ public class DefaultTemplator implements IGroupConfigTemplator {
         }
         long uv = configUpdate.getWriteSet().getChildsMap().get(GroupConfigConstant.APPLICATION).getVersion();
         if (uv != 1L) {
-            log.error(String.format("Config update for channel creation does not set application group version to 1, was %d", uv));
+            log.error(String.format("Config update for group creation does not set application group version to 1, was %d", uv));
         }
         Configtx.ConfigValue consortiumConfigValue = configUpdate.getWriteSet().getValuesMap().get(GroupConfigConstant.CONSORTIUM);
         if (consortiumConfigValue == null) {
@@ -89,7 +89,7 @@ public class DefaultTemplator implements IGroupConfigTemplator {
         Configtx.ConfigTree.Builder applicationGroupBuilder = Configtx.ConfigTree.newBuilder();
         Map<String, IConsortiumConfig> consortiumsConfig = groupConfigBundle.getGroupConfig().getConsortiumsConfig().getConsortiumConfigMap();
         if (consortiumsConfig == null) {
-            log.error("The ordering system channel does not appear to support creating channels");
+            log.error("The ordering system group does not appear to support creating groups");
         }
         IConsortiumConfig consortiumConf = consortiumsConfig.get(consortium.getName());
         if (consortiumConf == null) {

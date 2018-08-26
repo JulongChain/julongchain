@@ -20,12 +20,11 @@ package org.bcia.julongchain.consenter.util;
  * @Date: 2018/3/2
  * @company Dingxuan
  */
-public class Constant {
+public class ConsenterConstants {
     public static final String VERSION = "version";
     public static final String START = "start";
     public static final String BENCHMARK = "benchmark";
     public static final String ORDERER_CONFIG= "consenter.yaml";
-    public static final String CONFIGTX="configtx.yaml";
     public static final String SINGLETON="Singleton";
     public static final String KAFKA="kafka";
     public static final String COMSUMER="comumer";
@@ -38,6 +37,14 @@ public class Constant {
     public static final String  RETRY_INTERVAL_MILLIS="retryIntervalMillis";
     public static final String  ZOOKEEPER = "zookeeper";
 
-    public final static int MSGVERSION = 0;
-    public final static int EPOCH = 0;
+    public static final int MSGVERSION = 0;
+    public static final int EPOCH = 0;
+
+    public static final String TIMEWONDW="timeWindow";
+
+    public static final String ISCONFIG="isConfig";
+    public static final String GROUPHEADER="groupHeader";
+    public static final String CHAINSUPPORT="chainsupport";
+
+    public static final int METADATA_SIZE=4;
 }

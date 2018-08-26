@@ -136,7 +136,7 @@ public class SM2 {
      */
     public boolean verify(byte[] publicKey, byte[] signValue, byte[] msg) {
         SM2Signer signer = new SM2Signer();
-        BigInteger[] rs = decode(signValue);
+       // BigInteger[] rs = decode(signValue);
         ECPublicKeyParameters ecPub = new ECPublicKeyParameters(byte2ECpoint(publicKey), ecc_bc_spec);
         signer.init(false, ecPub);
         signer.update(msg, 0, msg.length);

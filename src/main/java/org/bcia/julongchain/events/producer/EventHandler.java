@@ -16,6 +16,7 @@
 package org.bcia.julongchain.events.producer;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.exception.VerifyException;
 import org.bcia.julongchain.common.log.JulongChainLog;
@@ -164,7 +165,12 @@ public class EventHandler implements IEventHandler {
         IMsp localMsp = GlobalMspManagement.getLocalMsp();
         //TODO
 
-        IIdentity eventIdentity = localMsp.deserializeIdentity(creator);
+        IIdentity eventIdentity = null;
+        try {
+            eventIdentity = localMsp.deserializeIdentity(creator);
+        } catch (MspException e) {
+            e.printStackTrace();
+        }
 
 //        eventIdentity.satisfiesPrincipal();
 

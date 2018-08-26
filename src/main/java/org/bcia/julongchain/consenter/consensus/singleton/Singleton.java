@@ -101,7 +101,7 @@ public class Singleton implements IChain, IConsensusPlugin {
         support = consenterSupport;
         instance = this;
         blockingQueue = new LinkedBlockingQueue<>();
-        producer = new Producer<Message>(blockingQueue);
+        producer = new Producer<>(blockingQueue);
         consumer = new Consumer<Message>(blockingQueue) {
             @Override
             public boolean consume(Message message) {
@@ -154,13 +154,14 @@ public class Singleton implements IChain, IConsensusPlugin {
                     support.getProcessor().processConfigMsg(configMessage.getMessage());
                 } catch (ConsenterException e) {
                     log.error(e.getMessage());
-                } catch (InvalidProtocolBufferException e) {
-                    log.warn(String.format("Discarding bad config message: %s", e.getMessage()));
-                } catch (ValidateException e) {
-                    log.error(e.getMessage());
-                } catch (PolicyException e) {
-                    log.error(e.getMessage());
                 }
+// catch (InvalidProtocolBufferException e) {
+//                    log.warn(String.format("Discarding bad config message: %s", e.getMessage()));
+//                } catch (ValidateException e) {
+//                    log.error(e.getMessage());
+//                } catch (PolicyException e) {
+//                    log.error(e.getMessage());
+//                }
             }
             //support.getCutter().ordered(configMessage.getMessage());
             Common.Envelope[] batch = support.getCutter().cut();

@@ -17,8 +17,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class BroadCastClient {
-
-
     /**
      * broadcast 发送方法
      * @param ip

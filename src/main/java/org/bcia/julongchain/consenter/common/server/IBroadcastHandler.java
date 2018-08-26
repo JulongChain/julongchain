@@ -13,17 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.common.deliver;
+package org.bcia.julongchain.consenter.common.server;
 
-import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.LedgerException;
+import io.grpc.stub.StreamObserver;
+import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.common.exception.ValidateException;
+import org.bcia.julongchain.protos.common.Common;
+import org.bcia.julongchain.protos.consenter.Ab;
+
+import java.io.IOException;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/5/29
+ * @Date: 2018/6/4
  * @company Dingxuan
  */
-public interface IHandler {
-  void handle(DeliverServer server) throws ValidateException, InvalidProtocolBufferException, LedgerException;
+public interface IBroadcastHandler {
+   void handle(Common.Envelope envelope, StreamObserver<Ab.BroadcastResponse> responseObserver) throws ConsenterException;
 }

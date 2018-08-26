@@ -41,9 +41,7 @@ public class LocalSigner implements ILocalSigner {
             byte[] creatorIdentityRaw=identity.serialize();
             Common.SignatureHeader.Builder signatureHeader=Common.SignatureHeader.newBuilder();
             byte[] nonce = null;
-            log.info("Gen the random start");
             nonce= identity.getMsp().getCsp().rng(24,null);
-            log.info("Gen the random end");
             signatureHeader.setNonce(ByteString.copyFrom(nonce));
             signatureHeader.setCreator(ByteString.copyFrom(creatorIdentityRaw));
             return signatureHeader.build();

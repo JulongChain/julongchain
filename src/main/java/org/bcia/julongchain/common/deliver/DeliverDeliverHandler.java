@@ -37,18 +37,18 @@ import java.util.Map;
  * @Date: 2018/5/29
  * @company Dingxuan
  */
-public class DeliverHandler implements IHandler {
-    private static JulongChainLog log = JulongChainLogFactory.getLog(DeliverHandler.class);
+public class DeliverDeliverHandler implements IDeliverHandler {
+    private static JulongChainLog log = JulongChainLogFactory.getLog(DeliverDeliverHandler.class);
     private ISupportManager sm;
     private long timeWindow;
     private boolean mutualTLS;
 
-    public DeliverHandler(ISupportManager sm, long timeWindow) {
+    public DeliverDeliverHandler(ISupportManager sm, long timeWindow) {
         this.sm = sm;
         this.timeWindow = timeWindow;
     }
 
-    public DeliverHandler(ISupportManager sm, long timeWindow, boolean mutualTLS) {
+    public DeliverDeliverHandler(ISupportManager sm, long timeWindow, boolean mutualTLS) {
         this.sm = sm;
         this.timeWindow = timeWindow;
         this.mutualTLS = mutualTLS;
@@ -95,7 +95,7 @@ public class DeliverHandler implements IHandler {
         }
         ChainSupport chain = sm.getChain(chdr.getGroupId());
         if (chain == null) {
-            log.debug(String.format("Rejecting deliver  channel %s not found", chdr.getGroupId()));
+            log.debug(String.format("Rejecting deliver group %s not found", chdr.getGroupId()));
             try {
                 sendStatusReply(server, Common.Status.NOT_FOUND);
             } catch (InvalidProtocolBufferException e) {
@@ -146,7 +146,7 @@ public class DeliverHandler implements IHandler {
                 case SPECIFIED:
                     stopNumber = stop.getNumber();
                     if (stopNumber < number) {
-                        log.warn(String.format("[channel: %s] Received invalid seekInfo message from %s: start number %d greater than stop number %d", chdr.getGroupId(), number, stopNumber));
+                        log.warn(String.format("[group: %s] Received invalid seekInfo message from %s: start number %d greater than stop number %d", chdr.getGroupId(), number, stopNumber));
                         sendStatusReply(server, Common.Status.BAD_REQUEST);
                     }
                     default:
@@ -164,7 +164,7 @@ public class DeliverHandler implements IHandler {
                 Common.Status status = block.getValue();
                 blockData.getHeader().getNumber();
                 if (status != Common.Status.SUCCESS) {
-                    log.error(String.format("[channel: %s] Error reading from channel, cause was: %s", chdr.getGroupId(), status));
+                    log.error(String.format("[group: %s] Error reading from group, cause was: %s", chdr.getGroupId(), status));
                     sendStatusReply(server, status);
                 }
                 number++;
@@ -174,7 +174,7 @@ public class DeliverHandler implements IHandler {
 //                } catch (ValidateException e) {
 //                    sendStatusReply(server, Common.Status.FORBIDDEN);
 //                }
-                log.debug(String.format("[channel: %s] Delivering block for %s", chdr.getGroupId(), seekInfo));
+                log.debug(String.format("[group: %s] Delivering block for %s", chdr.getGroupId(), seekInfo));
                 try {
                    // ProtoUtils.printMessageJson(blockData);
                    // GossipServiceUtil.addData(StartCmd.getGossipService(),chdr.getGroupId(),blockData.getHeader().getNumber(),blockData.toString());
@@ -225,7 +225,7 @@ public class DeliverHandler implements IHandler {
     }
 
     public void sendBlockReply(DeliverServer srv, Common.Block block) throws InvalidProtocolBufferException {
-        log.info("send the block");
+        log.info("Send the block");
         srv.send(new DeliverHandlerSupport().createBlockReply(block));
     }
 

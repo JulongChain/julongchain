@@ -38,9 +38,7 @@ public class MspConfigFactory {
 
         InputStream is = null;
         try {
-//            is = MspConfigFactory.class.getClassLoader().getResourceAsStream(MspConfig.MspConfig_FILE_PATH);
             is = new FileInputStream(CommConstant.CONFIG_DIR_PREFIX + MspConfig.MspConfig_FILE_PATH);
-
             MspConfig mspConfig = yaml.loadAs(is, MspConfig.class);
             return mspConfig;
         } finally {

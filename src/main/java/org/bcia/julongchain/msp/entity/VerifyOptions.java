@@ -23,5 +23,4 @@ package org.bcia.julongchain.msp.entity;
  */
 public class VerifyOptions {
     String DNSName;
-    //其他属性为定义,该类的属性go语言插件自带
 }

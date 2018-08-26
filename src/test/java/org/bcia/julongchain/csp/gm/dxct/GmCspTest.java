@@ -1,11 +1,14 @@
-package org.bcia.julongchain.csp.gm;
+package org.bcia.julongchain.csp.gm.dxct;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.factory.IFactoryOpts;
 import org.bcia.julongchain.csp.gm.dxct.GmCsp;
 import org.bcia.julongchain.csp.gm.dxct.GmCspFactory;
 import org.bcia.julongchain.csp.gm.dxct.GmFactoryOpts;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2KeyGenOpts;
+import org.bcia.julongchain.csp.gm.dxct.sm2.SM2KeyImport;
+import org.bcia.julongchain.csp.gm.dxct.sm2.SM2SignerOpts;
 import org.bcia.julongchain.csp.gm.dxct.sm3.SM3HashOpts;
 import org.bcia.julongchain.csp.gm.dxct.sm4.SM4EncrypterOpts;
 import org.bcia.julongchain.csp.gm.dxct.sm4.SM4Key;
@@ -27,7 +30,9 @@ import sun.security.pkcs.PKCS8Key;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Random;
 
 import static org.bcia.julongchain.csp.factory.CspManager.getDefaultCsp;
 
@@ -79,12 +84,12 @@ public class GmCspTest {
     public void keyGen() {
         System.out.println("test keyGen...");
         try {
-         IKey sm2key=getDefaultCsp().keyGen(new SM2KeyGenOpts());
+            IKey sm2key = getDefaultCsp().keyGen(new SM2KeyGenOpts());
 
-         System.out.println("generate the SM2 Privatekey:"+Hex.toHexString(sm2key.toBytes()));
-         System.out.println("generate the SM2 PublicKey:"+Hex.toHexString(sm2key.getPublicKey().toBytes()));
-         IKey sm4key=getDefaultCsp().keyGen(new SM4KeyGenOpts());
-         System.out.println("SM4 Key:"+Hex.toHexString(sm4key.toBytes()));
+            System.out.println("generate the SM2 Privatekey:" + Hex.toHexString(sm2key.toBytes()));
+            System.out.println("generate the SM2 PublicKey:" + Hex.toHexString(sm2key.getPublicKey().toBytes()));
+            IKey sm4key = getDefaultCsp().keyGen(new SM4KeyGenOpts());
+            System.out.println("SM4 Key:" + Hex.toHexString(sm4key.toBytes()));
         } catch (JulongChainException e) {
             e.printStackTrace();
         }
@@ -179,8 +184,15 @@ public class GmCspTest {
     }
 
     @Test
-    public void sign() {
-
+    public void sign() throws JulongChainException {
+        byte[] prik=Hex.decode("44c5ff2006af4b4d3e97c721be0e446c56939bb7d02debc16db7f535446850fe");
+        byte[] pubK=Hex.decode("047e371a5c8a01fca82820e8fa6d5ba8faee4cae4ee3ef65160c1ebdf5a7b0bbf2f0670e3496e8344df3065e549fdad924e1cf9c96e8e6e62b925c046bac25ea43");
+        IKey sk=new SM2KeyImport(prik,null);
+        byte[] hash=Hex.decode("f12bcfd72e000c7e8a3499821694b208d745f72172f173a2e595207bf66d48f9");
+        byte[] signValue=csp.sign(sk,hash,new SM2SignerOpts());
+        byte[] sign=Hex.decode("304402200f988879e415dbf972d62914d7e8c531424586f440ca1b12dabacc4cbb0cef1e02203d1e07a8c1c9277c1c91e25b2f92c72efd45e7493ac9082472e20a1bf884e2ac");
+        IKey pk=new SM2KeyImport(null,pubK);
+        System.out.println(csp.verify(pk, sign, hash, new SM2SignerOpts()));
     }
 
     @Test
@@ -218,18 +230,15 @@ public class GmCspTest {
     }
 
     @Test
-    public void rng() {
+    public void rng() throws JulongChainException {
+        for (int i = 0; i < 100; i++) {
+            long t1 = System.currentTimeMillis();
+            byte[] secureSeed=csp.rng(24,null);
+            long t2 = System.currentTimeMillis();
+            System.out.println(String.format("随机数长度：%s",secureSeed.length));
+            System.out.println(Hex.toHexString(secureSeed));
+            System.out.println(String.format("生成随机数消耗时间%s ms", (t2 - t1)));
+        }
 
-        //  SecureRandom csprng = new SecureRandom();
-
-        //  byte[] randomBytes = new byte[24];
-        // csprng.engineNextBytes();
-        // byte[] rng = csprng.engineGenerateSeed(24);
-
-        SecureRandom secureRandom = new SecureRandom();
-        byte[] secureSeed = secureRandom.generateSeed(24);
-        String s = new String(secureSeed);
-        System.out.println(s);
-        //csprng.nextBytes(randombytes);
     }
 }

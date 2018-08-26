@@ -30,7 +30,7 @@ import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
 import org.bcia.julongchain.consenter.consensus.IProcessor;
 import org.bcia.julongchain.consenter.entity.ConfigMsg;
 import org.bcia.julongchain.consenter.util.CommonUtils;
-import org.bcia.julongchain.consenter.util.Constant;
+import org.bcia.julongchain.consenter.util.ConsenterConstants;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 
@@ -77,7 +77,7 @@ public class SystemGroup  implements IProcessor {
     }
 
     @Override
-    public boolean classfiyMsg(Common.GroupHeader chdr) {
+    public boolean ClassifyMsg(Common.GroupHeader chdr) {
         return false;
     }
 
@@ -91,8 +91,13 @@ public class SystemGroup  implements IProcessor {
     }
 
     @Override
-    public ConfigMsg processConfigUpdateMsg(Common.Envelope envConfigUpdate) throws ConsenterException, InvalidProtocolBufferException, ValidateException {
-        String groupId = CommonUtils.groupId(envConfigUpdate);
+    public ConfigMsg processConfigUpdateMsg(Common.Envelope envConfigUpdate) throws ConsenterException {
+        String groupId = null;
+        try {
+            groupId = CommonUtils.groupId(envConfigUpdate);
+        } catch (InvalidProtocolBufferException e) {
+            throw new ConsenterException(e.getMessage());
+        }
         log.debug(String.format("Processing config update tx with system channel message processor for channel ID %s", groupId));
         String  standardGroupName= standardGroup.getSupport().getGroupId();
         if (groupId.equals(standardGroup.getSupport().getGroupId()) ) {
@@ -100,23 +105,30 @@ public class SystemGroup  implements IProcessor {
         }
         log.debug(String.format("Processing group create tx for group %s on system group %s", groupId,
                 standardGroup.getSupport().getGroupId()));
-        IGroupConfigBundle bundle = groupConfigTemplator.newGroupConfig(envConfigUpdate);
+        IGroupConfigBundle bundle = null;
+        Configtx.ConfigEnvelope newGroupConfigEnv = null;
+        try {
+            bundle = groupConfigTemplator.newGroupConfig(envConfigUpdate);
+            newGroupConfigEnv = bundle.getConfigtxValidator().proposeConfigUpdate(envConfigUpdate);
+        } catch (InvalidProtocolBufferException e) {
+            throw new ConsenterException(e.getMessage());
+        } catch (ValidateException e) {
+            throw new ConsenterException(e.getMessage());
+        }
 
-        Configtx.ConfigEnvelope newGroupConfigEnv = bundle.getConfigtxValidator().proposeConfigUpdate(envConfigUpdate);
-
-        Common.Envelope newChannelEnvConfig = TxUtils.createSignedEnvelope(Common.HeaderType.CONFIG_VALUE, groupId, standardGroup.getSupport().getSigner(), newGroupConfigEnv, Constant.MSGVERSION, Constant.EPOCH);
+        Common.Envelope newChannelEnvConfig = TxUtils.createSignedEnvelope(Common.HeaderType.CONFIG_VALUE, groupId, standardGroup.getSupport().getSigner(), newGroupConfigEnv, ConsenterConstants.MSGVERSION, ConsenterConstants.EPOCH);
 
         Common.Envelope wrappedOrdererTransaction =
                 TxUtils.createSignedEnvelope(Common.HeaderType.CONSENTER_TRANSACTION_VALUE,
                         standardGroup.getSupport().getGroupId(), standardGroup.getSupport().getSigner(), newChannelEnvConfig,
-                        Constant.MSGVERSION, Constant.EPOCH);
+                        ConsenterConstants.MSGVERSION, ConsenterConstants.EPOCH);
 //       new RuleSet(standardGroup.getFilters().getRules()).apply(wrappedOrdererTransaction);
 
         return new ConfigMsg(wrappedOrdererTransaction, standardGroup.getSupport().getSequence());
     }
 
     @Override
-    public ConfigMsg processConfigMsg(Common.Envelope env) throws ConsenterException, InvalidProtocolBufferException, ValidateException, PolicyException {
+    public ConfigMsg processConfigMsg(Common.Envelope env) throws ConsenterException {
         Common.Payload payload = null;
         try {
             payload = Common.Payload.parseFrom(env.getPayload().toByteArray());

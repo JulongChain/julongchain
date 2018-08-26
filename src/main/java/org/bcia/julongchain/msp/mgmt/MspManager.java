@@ -15,6 +15,8 @@
  */
 package org.bcia.julongchain.msp.mgmt;
 
+import org.bcia.julongchain.common.exception.MspException;
+
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.msp.IIdentity;
@@ -32,73 +34,60 @@ import java.util.Map;
  */
 public class MspManager implements IMspManager {
     private static JulongChainLog log = JulongChainLogFactory.getLog(MspManager.class);
-    public  HashMap<String, IMsp> mspsMap = new HashMap<String, IMsp>();
-    private IMspManager mspManager;
+    public  static Map<String, IMsp> mspsMap = new HashMap<String, IMsp>();
     private boolean up;
-    private static HashMap<String, IMsp> mspsByProviders = new HashMap<String, IMsp>();
+    private static Map<Integer, IMsp> mspsByProviders = new HashMap<>();
 
     public MspManager() {
     }
 
-    public MspManager(IMspManager mspManager, boolean up) {
-        this.mspManager = mspManager;
-        this.up = up;
-    }
-
-    public IMspManager createMspmgr(IMsp[] msps){
-
-        for (IMsp msp: msps) {
-            String mspId= msp.getIdentifier();
-            mspsMap.put(mspId,msp);
-        }
-        return this;
-    }
-
-
     @Override
-    public void setup(IMsp[] msps) {
+    public void setup(IMsp[] msps) throws MspException {
         if(up==true){
-            log.info("MSP getPolicyManager already up");
+            log.info("MSP manager already up");
         }
+
+        log.debug(String .format("Setting up the MSP manager (%d msps)", msps.length));
 
         for (IMsp msp: msps) {
             String mspId= msp.getIdentifier();
+            int providerType=msp.getType();
             mspsMap.put(mspId,msp);
+            mspsByProviders.put(providerType,msp);
         }
+        up=true;
+        log.debug(String.format("MSP manager setup complete, setup %d msps", msps.length));
 
     }
 
-    @Override
-    public Map<String, IMsp> getMSPs() {
+    /**
+     * 获取msp集合
+     * @return
+     * @throws MspException
+     */
+    public Map<String, IMsp> getMSPs() throws MspException{
         return mspsMap;
     }
 
     @Override
-    public IIdentity deserializeIdentity(byte[] serializedID) {
+    public IIdentity deserializeIdentity(byte[] serializedID) throws MspException{
+        IMsp msp=null;
         try {
-            Identities.SerializedIdentity sId = Identities.SerializedIdentity.parseFrom(serializedID);
-            // TODO 暂时先用getlocalmsp获取，之后需要通过id获取
-            IMsp msp = getMSPs().get(sId.getMspid());
-            //IMsp msp=GlobalMspManagement.getLocalMsp();
-            // return msp.deserializeIdentity(sId.getIdBytes().toByteArray());
-            return msp.deserializeIdentity(serializedID);
+            Identities.SerializedIdentity sId=Identities.SerializedIdentity.parseFrom(serializedID);
+            msp = mspsMap.get(sId.getMspid());
         } catch (Exception e) {
-            e.printStackTrace();
+          throw new MspException(e.getMessage());
         }
-
-        return null;
+        return msp.deserializeIdentity(serializedID);
     }
 
     @Override
     public void isWellFormed(Identities.SerializedIdentity identity) {
-
+        Msp msp= (Msp) mspsByProviders.get(0);
+        msp.isWellFormed(identity);
     }
 
     public boolean isUp() {
         return up;
-    }
-
-    public IMspManager getMspManager() {
-        return mspManager;
     }
 }

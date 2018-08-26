@@ -20,11 +20,11 @@ import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.common.cmd.IConsenterCmd;
 import org.bcia.julongchain.consenter.common.cmd.factory.ConsenterCmdFactory;
-import org.bcia.julongchain.consenter.util.Constant;
+import org.bcia.julongchain.consenter.util.ConsenterConstants;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/1 *
+ * @Date: 2018/3/1
  * @company Dingxuan
  */
 public class Consenter {
@@ -37,8 +37,7 @@ public class Consenter {
             return;
         }
         String command = args[0];
-        if (args.length == 1 && Constant.VERSION.equalsIgnoreCase(command)) {
-            //log.info("Consentor version is V0.25!..");
+        if (args.length == 1 && ConsenterConstants.VERSION.equalsIgnoreCase(command)) {
             iConsenterCmd = ConsenterCmdFactory.getInstance(command);
             String[] arg = new String[]{command};
             try {
@@ -46,7 +45,7 @@ public class Consenter {
             } catch (org.apache.commons.cli.ParseException e) {
                 e.printStackTrace();
             }
-        } else if (args.length == 1 && Constant.START.equalsIgnoreCase(command)) {
+        } else if (args.length == 1 && ConsenterConstants.START.equalsIgnoreCase(command)) {
             iConsenterCmd = ConsenterCmdFactory.getInstance(command);
             String[] argment = new String[]{command};
             try {
@@ -54,7 +53,7 @@ public class Consenter {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-        }else if (args.length == 1 && Constant.BENCHMARK.equalsIgnoreCase(command)) {
+        }else if (args.length == 1 && ConsenterConstants.BENCHMARK.equalsIgnoreCase(command)) {
             iConsenterCmd = ConsenterCmdFactory.getInstance(command);
             String[] argment = new String[]{command};
             try {
