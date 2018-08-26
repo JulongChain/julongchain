@@ -144,7 +144,7 @@ public class Registrar implements IChainCreator, IGroupSupportRegistrar, ISuppor
             if (ledgerResources.getMutableResources().getGroupConfig().getConsortiumsConfig() != null) {
                 ChainSupport chain = new ChainSupport(this, ledgerResources, consenters, signer);
                 this.templator = new DefaultTemplator(chain.getLedgerResources().getMutableResources());
-                chain.setProcessor(newSystemGroup(chain, templator, SystemGroup.createSystemChannelFilters(this, chain.getLedgerResources().getMutableResources())));
+                chain.setProcessor(newSystemGroup(chain, templator, SystemGroup.createSystemGroupFilters(this, chain.getLedgerResources().getMutableResources())));
                 //组装seekPosition
                 Ab.SeekPosition.Builder seekPosition = Ab.SeekPosition.newBuilder();
                 Ab.SeekOldest.Builder seekOldest = Ab.SeekOldest.newBuilder();

@@ -59,11 +59,11 @@ public class SystemGroup  implements IProcessor {
         return new SystemGroup(standardGroup,groupConfigTemplator,filters);
     }
 
-    public static  RuleSet createSystemChannelFilters(IChainCreator chainCreator,IGroupConfigBundle filterSupport) {
+    public static  RuleSet createSystemGroupFilters(IChainCreator chainCreator,IGroupConfigBundle filterSupport) {
         IConsenterConfig consenterConfig=filterSupport.getGroupConfig().getConsenterConfig();
        if(consenterConfig==null){
            try {
-               throw new ConsenterException("Cannot create system channel filters without orderer config");
+               throw new ConsenterException("Cannot create system group filters without orderer config");
            } catch (ConsenterException e) {
                e.printStackTrace();
            }
@@ -98,7 +98,7 @@ public class SystemGroup  implements IProcessor {
         } catch (InvalidProtocolBufferException e) {
             throw new ConsenterException(e.getMessage());
         }
-        log.debug(String.format("Processing config update tx with system channel message processor for channel ID %s", groupId));
+        log.debug(String.format("Processing config update tx with system group message processor for group ID %s", groupId));
         String  standardGroupName= standardGroup.getSupport().getGroupId();
         if (groupId.equals(standardGroup.getSupport().getGroupId()) ) {
             return standardGroup.processConfigUpdateMsg(envConfigUpdate);
@@ -116,11 +116,11 @@ public class SystemGroup  implements IProcessor {
             throw new ConsenterException(e.getMessage());
         }
 
-        Common.Envelope newChannelEnvConfig = TxUtils.createSignedEnvelope(Common.HeaderType.CONFIG_VALUE, groupId, standardGroup.getSupport().getSigner(), newGroupConfigEnv, ConsenterConstants.MSGVERSION, ConsenterConstants.EPOCH);
+        Common.Envelope newGroupEnvConfig = TxUtils.createSignedEnvelope(Common.HeaderType.CONFIG_VALUE, groupId, standardGroup.getSupport().getSigner(), newGroupConfigEnv, ConsenterConstants.MSGVERSION, ConsenterConstants.EPOCH);
 
         Common.Envelope wrappedOrdererTransaction =
                 TxUtils.createSignedEnvelope(Common.HeaderType.CONSENTER_TRANSACTION_VALUE,
-                        standardGroup.getSupport().getGroupId(), standardGroup.getSupport().getSigner(), newChannelEnvConfig,
+                        standardGroup.getSupport().getGroupId(), standardGroup.getSupport().getSigner(), newGroupEnvConfig,
                         ConsenterConstants.MSGVERSION, ConsenterConstants.EPOCH);
 //       new RuleSet(standardGroup.getFilters().getRules()).apply(wrappedOrdererTransaction);
 
