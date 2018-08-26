@@ -26,11 +26,11 @@ import java.util.Map;
  * @Date: 2018/6/6
  * @company Dingxuan
  */
-public class BroadCastSupport implements IGroupSupportRegistrar  {
+public class BroadcastSupport implements IGroupSupportRegistrar  {
 
     private  Registrar registrar;
 
-    public BroadCastSupport(Registrar registrar) {
+    public BroadcastSupport(Registrar registrar) {
         this.registrar = registrar;
     }
 

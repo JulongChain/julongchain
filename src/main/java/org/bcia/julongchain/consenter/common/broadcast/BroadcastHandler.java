@@ -40,11 +40,11 @@ import java.util.Map;
  * @Date: 2018/3/8
  * @company Dingxuan
  */
-public class BroadCastBroadcastHandler implements IBroadcastHandler {
-    private static JulongChainLog log = JulongChainLogFactory.getLog(BroadCastBroadcastHandler.class);
+public class BroadcastHandler implements IBroadcastHandler {
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BroadcastHandler.class);
     private IGroupSupportRegistrar sm;
 
-    public BroadCastBroadcastHandler(IGroupSupportRegistrar sm) {
+    public BroadcastHandler(IGroupSupportRegistrar sm) {
         this.sm = sm;
     }
 

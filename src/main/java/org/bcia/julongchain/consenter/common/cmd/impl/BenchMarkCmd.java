@@ -21,7 +21,7 @@ import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.localmsp.impl.LocalSigner;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
-import org.bcia.julongchain.consenter.common.broadcast.BroadCastBroadcastHandler;
+import org.bcia.julongchain.consenter.common.broadcast.BroadcastHandler;
 import org.bcia.julongchain.consenter.common.cmd.IConsenterCmd;
 import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfigFactory;
 import org.bcia.julongchain.consenter.common.multigroup.Registrar;
@@ -52,7 +52,7 @@ public class BenchMarkCmd implements IConsenterCmd {
         DeliverDeliverHandler deliverHandler=new DeliverDeliverHandler(registrar, ConsenterConfigFactory.getConsenterConfig().getGeneral().getAuthentication().get(ConsenterConstants.TIMEWONDW));
         consenterServer = new ConsenterServer(7050);
 
-        BroadCastBroadcastHandler broadCastHandle = new BroadCastBroadcastHandler(registrar);
+        BroadcastHandler broadCastHandle = new BroadcastHandler(registrar);
         consenterServer.bindBroadcastServer(broadCastHandle);
 
         consenterServer.bindDeverServer(deliverHandler);

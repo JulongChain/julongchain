@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
  * @company Dingxuan
  */
 @Component
-public class BroadCastClient {
+public class BroadcastClient {
     /**
      * broadcast 发送方法
      * @param ip
@@ -31,7 +31,6 @@ public class BroadCastClient {
             @Override
             public void onNext(Ab.BroadcastResponse broadcastResponse) {
                 System.out.println(broadcastResponse.getStatusValue());
-                //System.out.println(broadcastResponse.getInfo());
             }
 
             @Override
