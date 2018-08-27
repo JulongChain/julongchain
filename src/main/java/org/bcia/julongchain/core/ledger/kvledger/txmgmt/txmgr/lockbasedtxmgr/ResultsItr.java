@@ -34,6 +34,7 @@ import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
  */
 public class ResultsItr implements IResultsIterator {
     private String ns;
+	private String startKey;
     private String endKey;
     private IResultsIterator dbItr;
     private RWSetBuilder rwSetBuilder;
@@ -47,14 +48,16 @@ public class ResultsItr implements IResultsIterator {
                       RWSetBuilder rwSetBuilder,
                       boolean enableHashing,
                       int maxDegree) throws LedgerException {
+    	endKey = endKey == null ? new String(new char[]{Character.MAX_VALUE}) : endKey;
         IResultsIterator dbItr = db.getStateRangeScanIterator(ns, startKey, endKey);
         this.ns = ns;
         this.dbItr = dbItr;
         if(rwSetBuilder != null){
             this.rwSetBuilder = rwSetBuilder;
+			this.startKey = startKey == null ? new String(new char[]{Character.MIN_VALUE}) : startKey;
             this.endKey = endKey;
             this.rangeQueryInfo = KvRwset.RangeQueryInfo.newBuilder()
-                    .setStartKey(startKey)
+                    .setStartKey(this.startKey)
                     .build();
             this.rangeQueryResultsHelper = new RangeQueryResultsHelper(enableHashing, maxDegree);
         }
@@ -66,23 +69,27 @@ public class ResultsItr implements IResultsIterator {
         }
         if(queryResult == null){
             rangeQueryInfo = rangeQueryInfo.toBuilder()
-                    .setEndKey(endKey == null ? new String(new byte[]{Byte.MAX_VALUE}) : endKey)
+                    .setEndKey(endKey)
                     .setItrExhausted(true)
                     .build();
             return;
         }
         VersionedKV versionedKV = (VersionedKV) queryResult.getObj();
-        rangeQueryResultsHelper.addResult(RwSetUtil.newKVRead(versionedKV.getCompositeKey().getKey(), versionedKV.getVersionedValue().getVersion()));
+        rangeQueryResultsHelper.addResult(RwSetUtil.newKVRead(versionedKV.getCompositeKey().getKey(), versionedKV.getVersionedValue().getHeight()));
         rangeQueryInfo = rangeQueryInfo.toBuilder().setEndKey(versionedKV.getCompositeKey().getKey()).build();
     }
 
     @Override
     public QueryResult next() throws LedgerException {
         QueryResult queryResult = dbItr.next();
-        updateRangeQueryInfo(queryResult);
-        if(queryResult == null){
-            return null;
-        }
+		updateRangeQueryInfo(queryResult);
+		if (queryResult == null) {
+			return null;
+		}
+		VersionedKV kv = (VersionedKV) queryResult.getObj();
+		if (kv.getCompositeKey().getKey().compareTo(endKey) >= 0) {
+			return null;
+		}
         return queryResult;
     }
 

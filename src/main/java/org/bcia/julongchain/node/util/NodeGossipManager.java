@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.node.util;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 /**
  * 类描述
@@ -26,5 +26,5 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
  * @company Dingxuan
  */
 public class NodeGossipManager {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(NodeGossipManager.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(NodeGossipManager.class);
 }

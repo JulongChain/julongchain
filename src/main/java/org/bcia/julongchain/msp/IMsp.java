@@ -39,7 +39,7 @@ public interface IMsp extends IIdentityDeserializer{
      * 返回此msp的版本
      * @return
      */
-    public int getVersion();
+    int getVersion();
 
     /**
      * const常量,之后需要确认

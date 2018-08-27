@@ -17,8 +17,8 @@ package org.bcia.julongchain.common.ledger.util.leveldbhelper;
 
 import org.bcia.julongchain.common.exception.LevelDBException;
 import org.bcia.julongchain.common.ledger.util.IDBHandler;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.leveldb.LevelDB;
 import org.bcia.julongchain.core.ledger.leveldb.LevelDBUtil;
 import org.iq80.leveldb.DB;
@@ -36,11 +36,11 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class LevelDBHandler implements IDBHandler {
+	private static JulongChainLog log = JulongChainLogFactory.getLog(LevelDBHandler.class);
 
     private String dbName = null;
     private DB db = null;
     private boolean opened = false;
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(LevelDBHandler.class);
 
     public LevelDBHandler() {
     }
@@ -110,7 +110,7 @@ public class LevelDBHandler implements IDBHandler {
     @Override
     public void put(byte[] key, byte[] value, boolean sync) throws LevelDBException {
         if (!opened) {
-            logger.error("No db created");
+            log.error("No db created");
             throw new LevelDBException("No db created");
         }
         LevelDB db = LevelDBUtil.getDB(dbName);
@@ -123,7 +123,7 @@ public class LevelDBHandler implements IDBHandler {
     @Override
     public void delete(byte[] key, boolean sync) throws LevelDBException {
         if (!opened) {
-            logger.error("No db created");
+            log.error("No db created");
             throw new LevelDBException("No db created");
         }
         LevelDB db = LevelDBUtil.getDB(dbName);
@@ -136,7 +136,7 @@ public class LevelDBHandler implements IDBHandler {
     @Override
     public void writeBatch(UpdateBatch batch, boolean sync) throws LevelDBException {
         if (!opened) {
-            logger.error("No db created");
+            log.error("No db created");
             throw new LevelDBException("No db created");
         }
         LevelDB db = LevelDBUtil.getDB(dbName);

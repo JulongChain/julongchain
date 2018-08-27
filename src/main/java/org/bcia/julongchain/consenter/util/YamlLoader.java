@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.consenter.util;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import java.util.HashMap;
@@ -28,7 +28,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class YamlLoader {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(YamlLoader.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(YamlLoader.class);
 
     public static Map readYamlFile(String file){
         HashMap map=new HashMap();

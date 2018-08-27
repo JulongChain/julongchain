@@ -34,8 +34,15 @@ public interface IIterator extends IResultsIterator {
     @Override
     QueryResult next() throws LedgerException;
 
-    void readyChain() throws LedgerException;
+	/**
+	 * 判断区块链是否准备完成
+	 * 用于查询区块时,解除进程阻塞判断
+	 */
+	void readyChain() throws LedgerException;
 
-    @Override
+	/**
+	 * 关闭
+	 */
+	@Override
     void close() throws LedgerException;
 }

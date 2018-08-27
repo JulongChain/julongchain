@@ -15,9 +15,9 @@
  */
 package org.bcia.julongchain.core.common.smartcontractprovider;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
@@ -30,7 +30,7 @@ import org.bcia.julongchain.protos.node.SmartContractPackage;
  */
 public class SmartContractInfoFS implements ISmartContractCacheSupport {
 
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(SmartContractInfoFS.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SmartContractInfoFS.class);
 
     /**
      * GetSmartContractFromFS  this is a wrapper for hiding package implementation.
@@ -43,13 +43,13 @@ public class SmartContractInfoFS implements ISmartContractCacheSupport {
         SDSPackage scsdsPackage = new SDSPackage();
         try {
             scsdsPackage.initFromFS(name, version);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.info(e.getMessage(), e);
             log.info("Trying SignedSDSPackage");
             SignedSDSPackage sscsdsPackage= new SignedSDSPackage();
             try {
                 sscsdsPackage.initFromFS(name, version);
-            } catch (JavaChainException e1) {
+            } catch (JulongChainException e1) {
                 log.info(e1.getMessage(), e1);
                 log.info("Can not init from fs");
                 return null;
@@ -65,7 +65,7 @@ public class SmartContractInfoFS implements ISmartContractCacheSupport {
      * @param deploymentSpec
      * @return
      */
-    public ISmartContractPackage putSmartContract(SmartContractPackage.SmartContractDeploymentSpec deploymentSpec) throws JavaChainException{
+    public ISmartContractPackage putSmartContract(SmartContractPackage.SmartContractDeploymentSpec deploymentSpec) throws JulongChainException {
         SDSPackage sdsPackage = new SDSPackage();
         sdsPackage.initFromBuffer(deploymentSpec.toByteArray());
         sdsPackage.putSmartcontractToFS();

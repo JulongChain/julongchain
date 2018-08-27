@@ -1,7 +1,7 @@
 package org.bcia.julongchain.common.util.proto;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.genesis.GenesisBlockFactory;
 import org.bcia.julongchain.protos.common.Common;
@@ -36,7 +36,7 @@ public class BlockUtilsTest {
     }
 
     @Test
-    public void getLastConfigIndexFromBlock() throws JavaChainException, InvalidProtocolBufferException {
+    public void getLastConfigIndexFromBlock() throws JulongChainException, InvalidProtocolBufferException {
         Common.Block genesisBlock = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance()).getGenesisBlock("myGroup");
         long lastConfigIndex = BlockUtils.getLastConfigIndexFromBlock(genesisBlock);
         Assert.assertEquals(0L, lastConfigIndex);

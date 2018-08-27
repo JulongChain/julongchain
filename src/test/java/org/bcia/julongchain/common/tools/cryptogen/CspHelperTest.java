@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.common.tools.cryptogen;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.tools.cryptogen.utils.MockKey;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bouncycastle.util.encoders.Hex;
@@ -56,7 +56,7 @@ public class CspHelperTest {
     }
 
     @Test
-    public void loadPrivateKey() throws JavaChainException {
+    public void loadPrivateKey() throws JulongChainException {
         IKey priv = CspHelper.generatePrivateKey(testDir);
         String filePath = Paths.get(testDir, Hex.toHexString(priv.ski()) + "_sk").toString();
         File pkFile = new File(filePath);
@@ -70,7 +70,7 @@ public class CspHelperTest {
     }
 
     @Test
-    public void generatePrivateKey() throws JavaChainException {
+    public void generatePrivateKey() throws JulongChainException {
         System.out.println(testDir);
         IKey priv = CspHelper.generatePrivateKey(testDir);
 
@@ -86,7 +86,7 @@ public class CspHelperTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void getECPublicKey() throws JavaChainException {
+    public void getECPublicKey() throws JulongChainException {
 
         IKey priv = CspHelper.generatePrivateKey(testDir);
         ECPublicKey ecPubKey = CspHelper.getSM2PublicKey(priv);
@@ -94,20 +94,20 @@ public class CspHelperTest {
         assertTrue(ecPubKey instanceof PublicKey);
 
         //force errors using mockKey
-        expectedException.expect(JavaChainException.class);
+        expectedException.expect(JulongChainException.class);
         priv = new MockKey(null, null, new MockKey());
         CspHelper.getSM2PublicKey(priv);
 
         priv = new MockKey(null, null, new MockKey(null, "bytesErr", null));
 
-        expectedException.expect(JavaChainException.class);
+        expectedException.expect(JulongChainException.class);
         expectedException.expectMessage(((MockKey) priv).getBytesErr());
         CspHelper.getSM2PublicKey(priv);
 
         priv = new MockKey("pubKeyErr", null, new MockKey());
 
         expectedException.expectMessage(((MockKey) priv).getPubKeyErr());
-        expectedException.expect(JavaChainException.class);
+        expectedException.expect(JulongChainException.class);
         CspHelper.getSM2PublicKey(priv);
 
         FileUtil.removeAll(testDir);

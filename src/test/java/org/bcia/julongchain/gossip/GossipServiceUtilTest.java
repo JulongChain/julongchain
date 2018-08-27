@@ -2,14 +2,13 @@ package org.bcia.julongchain.gossip;
 
 import org.apache.gossip.manager.GossipManager;
 import org.bcia.julongchain.common.exception.GossipException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.UUID;
 
 /**
  * 类描述
@@ -20,7 +19,7 @@ import java.util.UUID;
  */
 public class GossipServiceUtilTest {
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(GossipServiceUtilTest.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(GossipServiceUtilTest.class);
 
     @Test
     /** 测试启动gossip服务 */

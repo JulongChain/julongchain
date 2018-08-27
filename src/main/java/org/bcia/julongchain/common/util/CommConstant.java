@@ -30,7 +30,7 @@ public class CommConstant {
     /**
      * 原数据：版本
      */
-    public static final String METADATA_VERSION = "development build";
+    public static final String METADATA_VERSION = "latest";
     /**
      * 背书系统智能合约
      */
@@ -55,11 +55,6 @@ public class CommConstant {
     public static final String VSSC = "vssc";
 
     /**
-     * 成员服务提供者类型
-     */
-    public static final int MSPTYPE_CSP_VALUE = 0;
-
-    /**
      * 部署
      */
     public static final String DEPLOY = "deploy";
@@ -74,6 +69,9 @@ public class CommConstant {
      */
     public static final String PATH_SEPARATOR = "/";
 
+    /**
+     * 配置文件父目录
+     */
     public static final String CONFIG_DIR_PREFIX = "config/";
 
     /**
@@ -86,4 +84,8 @@ public class CommConstant {
      */
     public static final int MAX_GRPC_MESSAGE_SIZE = 1 << 29;
 
+    /**
+     * 参数：共识节点
+     */
+    public static final String ARG_CONSENTER = "consenter";
 }

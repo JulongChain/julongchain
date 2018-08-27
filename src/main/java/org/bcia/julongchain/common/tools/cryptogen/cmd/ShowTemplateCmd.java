@@ -16,8 +16,8 @@
 
 package org.bcia.julongchain.common.tools.cryptogen.cmd;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.FileUtils;
 import org.bcia.julongchain.consenter.util.YamlLoader;
 
@@ -32,7 +32,7 @@ import java.net.URL;
  * @company Excelsecu
  */
 public class ShowTemplateCmd implements ICryptoGenCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ShowTemplateCmd.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ShowTemplateCmd.class);
 
     private static final String DEFAULT_TEMPLATE =
             "# ---------------------------------------------------------------------------\n" +
@@ -161,7 +161,7 @@ public class ShowTemplateCmd implements ICryptoGenCmd {
         String temp = DEFAULT_TEMPLATE;
         URL url = YamlLoader.class.getClassLoader().getResource("crypto-config.yaml");
         if (url == null) {
-            log.warn("crypto-config.yaml not found in jar, use default template");
+            log.info("no crypto-config.yaml in jar, use built-in template");
         } else {
             try {
                 temp = new String(FileUtils.readFileBytes(url.getPath()));

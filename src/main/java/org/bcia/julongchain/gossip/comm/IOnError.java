@@ -15,17 +15,17 @@
  */
 package org.bcia.julongchain.gossip.comm;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 
 /**
  * class description
  *
- * @author
+ * @author wanliangbing
  * @date 18-7-24
  * @company Dingxuan
  */
 public interface IOnError {
 
-    public void execute(JavaChainException error);
+    public void execute(JulongChainException error);
 
 }

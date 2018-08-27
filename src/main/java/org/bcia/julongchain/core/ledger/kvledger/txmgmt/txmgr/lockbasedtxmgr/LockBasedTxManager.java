@@ -16,11 +16,10 @@ limitations under the License.
 package org.bcia.julongchain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 
 import com.google.protobuf.ByteString;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.common.protos.EnvelopeVO;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.BlockAndPvtData;
 import org.bcia.julongchain.core.ledger.IQueryExecutor;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
@@ -48,7 +47,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class LockBasedTxManager implements ITxManager {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(LockBasedTxManager.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(LockBasedTxManager.class);
 
     private String ledgerID;
     private IDB db;
@@ -76,10 +75,10 @@ public class LockBasedTxManager implements ITxManager {
     @Override
     public synchronized ITxSimulator newTxSimulator(String txid) throws LedgerException {
 	    if (txSimulatorMap.containsKey(txid)) {
-		    logger.debug("Contains tx simulator with txid: " + txid);
+		    log.debug("Contains tx simulator with txid: " + txid);
 		    return txSimulatorMap.get(txid);
 	    } else {
-		    logger.debug("Constructing new tx simulator");
+		    log.debug("Constructing new tx simulator");
 		    LockBasedTxSimulator simulator = new LockBasedTxSimulator(this, txid);
 		    txSimulatorMap.put(txid, simulator);
 		    return simulator;
@@ -90,9 +89,7 @@ public class LockBasedTxManager implements ITxManager {
     public void validateAndPrepare(BlockAndPvtData blockAndPvtData, Boolean doMVCCValidation) throws LedgerException {
         try {
             Common.Block block = blockAndPvtData.getBlock();
-			EnvelopeVO envelopeVO = new EnvelopeVO();
-			envelopeVO.parseFrom(Common.Envelope.parseFrom(block.getData().getData(0)));
-			logger.debug("Validating new block with num trans = " + block.getData().getDataList().size());
+			log.debug("Validating new block with num trans = " + block.getData().getDataList().size());
             UpdateBatch b = validator.validateAndPrepareBatch(blockAndPvtData, doMVCCValidation);
             currentBlock = block;
             batch = b;
@@ -126,22 +123,22 @@ public class LockBasedTxManager implements ITxManager {
     @Override
     public void commitLostBlock(BlockAndPvtData blockAndPvtData) throws LedgerException {
         Common.Block block = blockAndPvtData.getBlock();
-        logger.debug("Constructing updateSet for the block " + block.getHeader().getNumber());
+        log.debug("Constructing updateSet for the block " + block.getHeader().getNumber());
         validateAndPrepare(blockAndPvtData, false);
-        logger.debug(String.format("Committing block %d to state database", block.getHeader().getNumber()));
+        log.debug(String.format("Committing block %d to state database", block.getHeader().getNumber()));
         commit();
     }
 
     @Override
     public synchronized void commit() throws LedgerException {
         try{
-            logger.debug("Committing updates to state db");
+            log.debug("Committing updates to state db");
             if(batch == null){
                 throw new LedgerException("validateAndPrepare() method should have been called before calling commit()");
             }
             db.applyPrivacyAwareUpdates(batch,
                     new LedgerHeight(currentBlock.getHeader().getNumber(), (long) (currentBlock.getData().getDataList().size() - 1)));
-            logger.debug("Update committed to state db");
+            log.debug("Update committed to state db");
         } finally {
             clearCache();
             batch = null;
@@ -165,7 +162,7 @@ public class LockBasedTxManager implements ITxManager {
         }
     }
 
-    private void invokeNamespaceListeners(UpdateBatch batch) throws JavaChainException {
+    private void invokeNamespaceListeners(UpdateBatch batch) throws JulongChainException {
         List<String> namespaces = batch.getPubUpdateBatch().getBatch().getUpdatedNamespaces();
         for(String ns : namespaces){
         	if(stateListeners == null){
@@ -175,7 +172,7 @@ public class LockBasedTxManager implements ITxManager {
             if(listener == null){
                 continue;
             }
-            logger.debug("Invoking listener for state changes overs namespace " + ns);
+            log.debug("Invoking listener for state changes over namespace " + ns);
             Map<String, VersionedValue> updateMap = batch.getPubUpdateBatch().getBatch().getUpdates(ns);
             List<KvRwset.KVWrite> kvWrites = new ArrayList<>();
             for(Map.Entry<String, VersionedValue> entry : updateMap.entrySet()){
@@ -239,4 +236,12 @@ public class LockBasedTxManager implements ITxManager {
     public void setStateListeners(Map<String, IStateListener> stateListeners) {
         this.stateListeners = stateListeners;
     }
+
+	public static void setTxSimulatorMap(Map<String, LockBasedTxSimulator> txSimulatorMap) {
+		LockBasedTxManager.txSimulatorMap = txSimulatorMap;
+	}
+
+	public static Map<String, LockBasedTxSimulator> getTxSimulatorMap() {
+		return txSimulatorMap;
+	}
 }

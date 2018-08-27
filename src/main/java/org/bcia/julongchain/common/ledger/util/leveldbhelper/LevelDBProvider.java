@@ -19,9 +19,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.exception.LevelDBException;
 import org.bcia.julongchain.common.ledger.util.IDBHandler;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -32,13 +31,10 @@ import java.util.*;
  * @company Dingxuan
  */
 public class LevelDBProvider implements IDBProvider {
-
-	private static JavaChainLog logger = JavaChainLogFactory.getLog(LevelDBProvider.class);
-
-	private IDBHandler db = null;
-	private static byte[] DB_NAME_KEY_SEP = new byte[]{0x00};
-	private static byte[] DB_LEDGERID_KEY_SEP = new byte[]{0x03};
-	private String dbPath = null;
+	private IDBHandler db;
+	private static byte[] DB_NAME_KEY_SEP = new String(new char[]{Character.MIN_VALUE}).getBytes();
+	private static byte[] DB_LEDGERID_KEY_SEP = new String(new char[]{Character.MIN_VALUE}).getBytes();
+	private String dbPath;
 	private String ledgerID = null;
 	static Map<String, IDBProvider> dbs = new HashMap<>();
 
@@ -93,7 +89,8 @@ public class LevelDBProvider implements IDBProvider {
 
 	@Override
 	public void delete(byte[] key, boolean sync) throws LevelDBException {
-		db.put(constructLevelKey(ledgerID, key), null, sync);
+//		db.put(constructLevelKey(ledgerID, key), null, sync);
+		db.delete(constructLevelKey(ledgerID, key), sync);
 	}
 
 	@Override
@@ -112,7 +109,7 @@ public class LevelDBProvider implements IDBProvider {
 		if (ledgerID == null) {
 			return key;
 		}
-		byte[] arr = ArrayUtils.addAll(ledgerID.getBytes(), DB_LEDGERID_KEY_SEP);
+		byte[] arr = ArrayUtils.addAll(ledgerID.getBytes(StandardCharsets.UTF_8), DB_LEDGERID_KEY_SEP);
 		arr = ArrayUtils.addAll(arr, key);
 		return arr;
 	}
@@ -128,7 +125,7 @@ public class LevelDBProvider implements IDBProvider {
 			start++;
 		}
 		follow = str.substring(start, str.length());
-		return follow.getBytes();
+		return follow.getBytes(StandardCharsets.UTF_8);
 	}
 
 	@Override

@@ -16,14 +16,13 @@
 package org.bcia.julongchain.core.endorser;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.protos.ProposalResponsePayloadVO;
 import org.bcia.julongchain.common.resourceconfig.ISmartContractDefinition;
 import org.bcia.julongchain.common.util.CommConstant;
@@ -37,15 +36,8 @@ import org.bcia.julongchain.core.smartcontract.node.TransactionRunningUtil;
 import org.bcia.julongchain.node.common.helper.SpecHelper;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.ledger.rwset.Rwset;
-import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
-import org.bcia.julongchain.protos.node.ProposalPackage;
-import org.bcia.julongchain.protos.node.ProposalResponsePackage;
-import org.bcia.julongchain.protos.node.SmartContractEventPackage;
-import org.bcia.julongchain.protos.node.SmartContractPackage;
+import org.bcia.julongchain.protos.node.*;
 import org.springframework.stereotype.Component;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 背书节点
@@ -56,7 +48,7 @@ import java.util.List;
  */
 @Component
 public class Endorser implements IEndorserServer {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Endorser.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Endorser.class);
 
     private IEndorserSupport endorserSupport;
 
@@ -132,9 +124,9 @@ public class Endorser implements IEndorserServer {
 //            txReadWriteSetBytes = new byte[]{0, 1, 2};
 //        }
 
-        if (StringUtils.isBlank(scName) || CommConstant.CSSC.equals(scName)) {
+        if (StringUtils.isBlank(scName) || CommConstant.CSSC.equals(scName) || CommConstant.QSSC.equals(scName)) {
             if (!response.getPayload().isEmpty()) {
-                return ProposalResponseUtils.buildProposalResponse(response.getPayload());
+                return ProposalResponseUtils.buildProposalResponse(response.getPayload(), response.getMessage());
             } else {
                 return ProposalResponseUtils.buildProposalResponse(response);
             }
@@ -157,7 +149,17 @@ public class Endorser implements IEndorserServer {
                 e.printStackTrace();
             }
 
-            return ProposalResponseUtils.buildProposalResponse(proposalResponse.getPayload());
+            SmartContractShim.SmartContractMessage smartContractMessage = TransactionRunningUtil.getTxMessage(scName, groupHeader.getTxId());
+            TransactionRunningUtil.clearMap(scName, groupHeader.getTxId());
+            ProposalResponsePackage.Response smartContractResponse = null;
+            try {
+                smartContractResponse = ProposalResponsePackage.Response.parseFrom(smartContractMessage.getPayload());
+            } catch (InvalidProtocolBufferException e) {
+                log.error(e.getMessage(), e);
+            }
+
+            return ProposalResponseUtils.buildProposalResponse(proposalResponse.getPayload() != null ?
+                    proposalResponse.getPayload() : smartContractResponse.getPayload(), smartContractResponse.getMessage());
         }
     }
 

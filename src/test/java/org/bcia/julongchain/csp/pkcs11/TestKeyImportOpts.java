@@ -25,7 +25,7 @@ import java.security.spec.ECGenParameterSpec;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.intfs.opts.IKeyImportOpts;
@@ -80,7 +80,7 @@ public class TestKeyImportOpts {
 			IKeyImportOpts opts = new RsaOpts.RSAPrivateKeyImportOpts(false);
 			IKey mykey = csp.keyImport(keyraw, opts);
 			csp.getKey(mykey.ski());
-		} catch (JavaChainException e) {
+		} catch (JulongChainException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
@@ -102,7 +102,7 @@ public class TestKeyImportOpts {
 			IKeyImportOpts opts = new RsaOpts.RSAPublicKeyImportOpts(false);
 			IKey mykey = csp.keyImport(keyraw, opts);
 			csp.getKey(mykey.ski());
-		} catch (JavaChainException e) {
+		} catch (JulongChainException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
@@ -124,7 +124,7 @@ public class TestKeyImportOpts {
 			IKeyImportOpts opts = new RsaOpts.RSAPrivateKeyImportOpts(false);
 			IKey mykey = csp.keyImport(keyraw, opts);
 			csp.getKey(mykey.ski());
-		} catch (JavaChainException e) {
+		} catch (JulongChainException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
@@ -146,7 +146,7 @@ public class TestKeyImportOpts {
 			IKeyImportOpts opts = new RsaOpts.RSAPublicKeyImportOpts(false);
 			IKey mykey = csp.keyImport(keyraw, opts);
 			csp.getKey(mykey.ski());
-		} catch (JavaChainException e) {
+		} catch (JulongChainException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
@@ -170,7 +170,7 @@ public class TestKeyImportOpts {
 			IKeyImportOpts opts = new EcdsaOpts.ECDSAPrivateKeyImportOpts(false);
 			IKey mykey = csp.keyImport(keyraw, opts);
 			
-		} catch (JavaChainException e) {
+		} catch (JulongChainException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchProviderException|NoSuchAlgorithmException e) {
@@ -199,7 +199,7 @@ public class TestKeyImportOpts {
 			IKeyImportOpts opts = new EcdsaOpts.ECDSAPublicKeyImportOpts(false);
 			IKey mykey = csp.keyImport(keyraw, opts);
 			
-		} catch (JavaChainException e) {
+		} catch (JulongChainException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchProviderException|NoSuchAlgorithmException e) {
@@ -225,7 +225,7 @@ public class TestKeyImportOpts {
 			IKey mykey = csp.keyImport(keyraw, opts);
 			return;
 			
-		} catch (JavaChainException e) {
+		} catch (JulongChainException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch(NoSuchAlgorithmException e) {

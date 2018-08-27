@@ -19,8 +19,8 @@ import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.command.BuildImageResultCallback;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 
 import java.io.File;
@@ -38,7 +38,7 @@ import java.util.List;
  */
 public class DockerUtil {
 
-  private static JavaChainLog logger = JavaChainLogFactory.getLog(DockerUtil.class);
+  private static JulongChainLog logger = JulongChainLogFactory.getLog(DockerUtil.class);
 
   public static DockerClient getDockerClient() {
     // tcp://localhost:2375
@@ -118,6 +118,9 @@ public class DockerUtil {
     DockerClient dockerClient = getDockerClient();
     List<Image> imageList = dockerClient.listImagesCmd().exec();
     for (Image image : imageList) {
+      if (image.getRepoTags() == null) {
+        continue;
+      }
       String imageTag = image.getRepoTags()[0];
       if (StringUtils.isEmpty(imageName) || StringUtils.contains(imageTag, imageName)) {
         imageNameList.add(imageTag);

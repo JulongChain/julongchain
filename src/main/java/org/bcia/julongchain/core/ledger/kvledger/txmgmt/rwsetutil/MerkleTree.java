@@ -18,12 +18,13 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil;
 import com.google.protobuf.ByteString;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,15 +38,16 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class MerkleTree {
-    private static final JavaChainLog logger  = JavaChainLogFactory.getLog(MerkleTree.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(MerkleTree.class);
     private static final int LEAF_LEVEL = 1;
+    private static final int MIN_TREE_LEVEL = 2;
 
     private Map<Integer, List<byte[]>> tree;
     private int maxLevel;
     private int maxDegree;
 
     public MerkleTree(int maxDegree) {
-        if(maxDegree < 2){
+        if(maxDegree < MIN_TREE_LEVEL){
         	this.maxDegree = LedgerConfig.getMaxDegreeQueryReadsHashing();
         } else {
 			this.maxDegree = maxDegree;
@@ -56,13 +58,13 @@ public class MerkleTree {
     }
 
     public void update(byte[] nextLeafLevelHash) throws LedgerException{
-        logger.debug("Before update. Tree's max level is " + tree.size());
+        log.debug("Before update. Tree's max level is " + tree.size());
         List<byte[]> leafLevelHash = tree.computeIfAbsent(LEAF_LEVEL, k -> new ArrayList<>());
         leafLevelHash.add(nextLeafLevelHash);
         for (int currentLelvel = LEAF_LEVEL;; currentLelvel++) {
 			List<byte[]> currenLevelHashes = tree.computeIfAbsent(currentLelvel, k -> new ArrayList<>());
 			if(currenLevelHashes.size() < maxDegree){
-                logger.debug("After update. Tree's max level is " + tree.size());
+                log.debug("After update. Tree's max level is " + tree.size());
                 return;
             }
             byte[] nextLevelHash = computeCombinedHash(currenLevelHashes);
@@ -79,7 +81,7 @@ public class MerkleTree {
     }
 
     public void done() throws LedgerException{
-        logger.debug("Before done.");
+        log.debug("Before done.");
         int currentLevel = LEAF_LEVEL;
         byte[] hash = null;
         while(currentLevel < maxLevel){
@@ -105,7 +107,7 @@ public class MerkleTree {
            l.add(combinedHash);
            tree.put(maxLevel, l);
         }
-        logger.debug("After done.");
+        log.debug("After done.");
     }
 
     public KvRwset.QueryReadsMerkleSummary getSummery(){
@@ -138,8 +140,6 @@ public class MerkleTree {
         for(byte[] h : hashes){
             combinedHash = ArrayUtils.addAll(combinedHash, h);
         }
-        //TODO compute hash
-        //TODO SM3 Hash
         return Util.getHashBytes(combinedHash);
     }
 
@@ -169,15 +169,15 @@ public class MerkleTree {
 
 	public static void main(String[] args) throws Exception {
 		MerkleTree tree = new MerkleTree(2);
-		tree.update("1".getBytes());
-		tree.update("2".getBytes());
-		tree.update("3".getBytes());
-		tree.update("4".getBytes());
-		tree.update("5".getBytes());
-		tree.update("6".getBytes());
-		tree.update("7".getBytes());
-		tree.update("8".getBytes());
-		tree.update("9".getBytes());
+		tree.update("1".getBytes(StandardCharsets.UTF_8));
+		tree.update("2".getBytes(StandardCharsets.UTF_8));
+		tree.update("3".getBytes(StandardCharsets.UTF_8));
+		tree.update("4".getBytes(StandardCharsets.UTF_8));
+		tree.update("5".getBytes(StandardCharsets.UTF_8));
+		tree.update("6".getBytes(StandardCharsets.UTF_8));
+		tree.update("7".getBytes(StandardCharsets.UTF_8));
+		tree.update("8".getBytes(StandardCharsets.UTF_8));
+		tree.update("9".getBytes(StandardCharsets.UTF_8));
 		tree.done();
 		KvRwset.QueryReadsMerkleSummary summery = tree.getSummery();
 		System.out.println(summery);

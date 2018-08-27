@@ -16,8 +16,6 @@
 package org.bcia.julongchain.core.common.smartcontractprovider.metadata;
 
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,8 +29,6 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class Validators {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Validators.class);
-
     private static Map<String, FileValidator> fileValidators = new HashMap<>();
 
     /**

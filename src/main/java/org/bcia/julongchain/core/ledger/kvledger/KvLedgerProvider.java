@@ -15,11 +15,10 @@
  */
 package org.bcia.julongchain.core.ledger.kvledger;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.ledger.util.IDBProvider;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.proto.BlockUtils;
 import org.bcia.julongchain.core.ledger.BlockAndPvtData;
 import org.bcia.julongchain.core.ledger.INodeLedger;
@@ -30,7 +29,7 @@ import org.bcia.julongchain.core.ledger.kvledger.history.historydb.IHistoryDB;
 import org.bcia.julongchain.core.ledger.kvledger.history.historydb.IHistoryDBProvider;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate.CommonStorageDBProvider;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate.IDB;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate.IDBPorvider;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate.IDBProvider;
 import org.bcia.julongchain.core.ledger.ledgerstorage.Provider;
 import org.bcia.julongchain.core.ledger.ledgerstorage.Store;
 import org.bcia.julongchain.protos.common.Common;
@@ -48,13 +47,12 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class KvLedgerProvider implements INodeLedgerProvider {
-    private static final JavaChainLog logger  = JavaChainLogFactory.getLog(KvLedgerProvider.class);
-    private static final LedgerException ERR_LEDGER_ID_EXISTS = new LedgerException("LedgerID is already exists");
+    private static JulongChainLog log = JulongChainLogFactory.getLog(KvLedgerProvider.class);
 
     private IdStore idStore = null;
     private Provider ledgerStoreProvider = null;
-    private IDBPorvider vdbProvider = null;
-    private IDBProvider provider = null;
+    private IDBProvider vdbProvider = null;
+    private org.bcia.julongchain.common.ledger.util.IDBProvider provider = null;
     private IHistoryDBProvider historyDBProvider = null;
     private Map<String, IStateListener> stateListeners = new HashMap<>();
 
@@ -62,17 +60,17 @@ public class KvLedgerProvider implements INodeLedgerProvider {
 	 * 新建Provider
 	 */
 	public KvLedgerProvider() throws LedgerException{
-		logger.info("Initializing ledger provider");
+		log.info("Initializing ledger provider");
 		//初始化idstore(ledgerProvider)
 		IdStore idStore = IdStore.openIDStore();
 		//初始化文件系统(chains/chains)以及pvtdata(pvtdataStore)
 		Provider ledgerStoreProvider = new Provider();
 		//初始化versiondb(stateLeveldb)
-		CommonStorageDBProvider vdbProvider = CommonStorageDBProvider.NewCommonStorageDBProvider();
+		CommonStorageDBProvider vdbProvider = CommonStorageDBProvider.newCommonStorageDBProvider();
 		//初始化HistoryDB(historyLeveldb)
 		IHistoryDBProvider historyDBProvider = new HistoryLevelDBProvider();
 
-		logger.info("Ledger provider initialized");
+		log.info("Ledger provider initialized");
 		this.idStore = idStore;
 		this.ledgerStoreProvider = ledgerStoreProvider;
 		this.vdbProvider = vdbProvider;
@@ -99,13 +97,13 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         //获取账本id
         try {
             ledgerID = BlockUtils.getGroupIDFromBlock(genesisBlock);
-        } catch (JavaChainException e) {
-            logger.error("Got error when creating kvledger provider");
+        } catch (JulongChainException e) {
+            log.error("Got error when creating kvledger provider");
             throw new LedgerException(e);
         }
         //账本以存在,抛出异常
         if(idStore.ledgerIDExists(ledgerID)) {
-            throw ERR_LEDGER_ID_EXISTS;
+            throw new LedgerException("Ledger [" + ledgerID + "] is already exists");
         }
         //开始创建账本, 并保存信息
         idStore.creatingLedgerID(ledgerID, genesisBlock);
@@ -127,10 +125,10 @@ public class KvLedgerProvider implements INodeLedgerProvider {
      */
     @Override
     public INodeLedger open(String ledgerID) throws LedgerException{
-        logger.debug("Opening kvledger with ledgerid " + ledgerID);
+        log.debug("Opening kvledger with ledgerid " + ledgerID);
         //没有创建过ledgerid,抛出异常
         if(!idStore.ledgerIDExists(ledgerID)){
-            logger.error("Ledger {} does not exists", ledgerID);
+            log.error("Ledger {} does not exists", ledgerID);
             throw new LedgerException("LedgerID " + ledgerID + " does not exists");
         }
         return openInternal(ledgerID);
@@ -168,21 +166,21 @@ public class KvLedgerProvider implements INodeLedgerProvider {
      */
     @Override
     public void recoverUnderConstructionLedger() throws LedgerException{
-        logger.debug("Recovering under construction ledger");
+        log.debug("Recovering under construction ledger");
         String ledgerID = idStore.getUnderConstructionFlag();
         //不存在有在建标记的账本
         if(ledgerID == null){
-            logger.debug("No under construction ledger found.");
+            log.debug("No under construction ledger found.");
             return;
         }
         //存在在建标记
-        logger.info(String.format("Ledger [%s] found as under construction", ledgerID));
+        log.info(String.format("Ledger [%s] found as under construction", ledgerID));
         INodeLedger ledger = openInternal(ledgerID);
         Ledger.BlockchainInfo bcInfo = ledger.getBlockchainInfo();
 
         switch ((int) bcInfo.getHeight()){
             case 0:
-                logger.info("Genesis block was not committed.");
+                log.info("Genesis block was not committed.");
                 runCleanup(ledgerID);
                 //重新提交创世区块
                 BlockAndPvtData bapd = new BlockAndPvtData();
@@ -195,7 +193,7 @@ public class KvLedgerProvider implements INodeLedgerProvider {
                 idStore.unsetUnderConstructionFlag();
                 break;
             case 1:
-                logger.info("Genesis block was committed.");
+                log.info("Genesis block was committed.");
                 Common.Block genesisBlock = ledger.getBlockByNumber((long) 0);
                 idStore.createLedgerID(ledgerID);
                 break;
@@ -241,11 +239,11 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         this.idStore = idStore;
     }
 
-    public IDBProvider getProvider() {
+    public org.bcia.julongchain.common.ledger.util.IDBProvider getProvider() {
         return provider;
     }
 
-    public void setProvider(IDBProvider provider) {
+    public void setProvider(org.bcia.julongchain.common.ledger.util.IDBProvider provider) {
         this.provider = provider;
     }
 
@@ -265,11 +263,11 @@ public class KvLedgerProvider implements INodeLedgerProvider {
         this.stateListeners = stateListeners;
     }
 
-    public IDBPorvider getVdbProvider() {
+    public IDBProvider getVdbProvider() {
         return vdbProvider;
     }
 
-    public void setVdbProvider(IDBPorvider vdbProvider) {
+    public void setVdbProvider(IDBProvider vdbProvider) {
         this.vdbProvider = vdbProvider;
     }
 }

@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.common.groupconfig;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.policy.IPolicy;
 import org.bcia.julongchain.common.policies.IPolicyManager;
 import org.bcia.julongchain.common.policies.PolicyConstant;
@@ -29,7 +29,7 @@ import org.bcia.julongchain.common.policies.PolicyConstant;
  * @company Dingxuan
  */
 public class LogSanityChecks {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(LogSanityChecks.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(LogSanityChecks.class);
 
     public static void logPolicy(IGroupConfigBundle bundle) {
         IPolicyManager policyManager = bundle.getPolicyManager();

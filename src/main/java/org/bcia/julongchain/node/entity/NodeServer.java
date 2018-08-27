@@ -21,42 +21,34 @@ import io.grpc.netty.NettyChannelBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.NodeException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.*;
 import org.bcia.julongchain.core.admin.AdminServer;
 import org.bcia.julongchain.core.endorser.Endorser;
 import org.bcia.julongchain.core.events.DeliverEventsServer;
-import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.core.node.NodeConfig;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.core.node.grpc.EventGrpcServer;
 import org.bcia.julongchain.core.node.grpc.NodeGrpcServer;
-import org.bcia.julongchain.core.node.util.NodeUtils;
 import org.bcia.julongchain.core.ssc.ISystemSmartContractManager;
 import org.bcia.julongchain.core.ssc.SystemSmartContractManager;
 import org.bcia.julongchain.events.producer.EventHubServer;
 import org.bcia.julongchain.events.producer.EventsServerConfig;
 import org.bcia.julongchain.gossip.GossipClientStream;
 import org.bcia.julongchain.gossip.GossipService;
-import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.node.common.client.AdminClient;
 import org.bcia.julongchain.node.common.client.IAdminClient;
-import org.bcia.julongchain.node.util.LedgerUtils;
 import org.bcia.julongchain.node.util.NodeConstant;
 import org.bcia.julongchain.protos.gossip.Message;
-import org.bcia.julongchain.protos.node.Query;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 节点服务
@@ -66,7 +58,7 @@ import java.util.concurrent.TimeUnit;
  * @company Dingxuan
  */
 public class NodeServer {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(NodeServer.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(NodeServer.class);
 
     /**
      * 记录当前进程id的文件
@@ -157,7 +149,7 @@ public class NodeServer {
         while (!Utils.isHostConnectable(host, port)) {
             log.info("wait consenter start, host:" + host + ", port:" + port);
             try {
-                Thread.sleep(1000l);
+                Thread.sleep(1000L);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

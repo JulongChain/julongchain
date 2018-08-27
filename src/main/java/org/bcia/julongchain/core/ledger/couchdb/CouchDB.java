@@ -29,8 +29,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 import org.lightcouch.*;
 import java.io.InputStream;
@@ -50,7 +50,7 @@ import java.util.Map;
  */
 public class CouchDB {
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CouchDB.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(CouchDB.class);
     public int indexWarmCounter;
     private CouchDbClientBase dbc;
 
@@ -245,6 +245,21 @@ public class CouchDB {
     public List BatchUpdateDocuments(CouchDbClient db, List<Object> list, boolean newEdits){
         List<Response> responses = db.bulk(list, newEdits);
         return responses;
+    }
+
+    /**
+     *  BatchRetrieveDocumentMetadata - batch method to retrieve document metadata for  a set of keys,
+     *  including ID, couchdb revision number, and ledger version
+     * @param db
+     * @param keys
+     * @return
+     */
+    public List BatchRetrieveDocumentMetadata(CouchDbClient db, List<String> keys){
+        List<Object> docs = db.view("_all_docs")
+                .includeDocs(true)
+                .keys(keys)
+                .query(Object.class);
+        return docs;
     }
 
     /**

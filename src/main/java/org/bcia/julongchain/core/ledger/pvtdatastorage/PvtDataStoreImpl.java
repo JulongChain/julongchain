@@ -19,12 +19,13 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.common.ledger.util.leveldbhelper.UpdateBatch;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bcia.julongchain.core.ledger.PvtNsCollFilter;
 import org.bcia.julongchain.core.ledger.TxPvtData;
 import org.bcia.julongchain.protos.ledger.rwset.Rwset;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.util.*;
 
@@ -37,7 +38,7 @@ import java.util.*;
  * @company Dingxuan
  */
 public class PvtDataStoreImpl implements IPvtDataStore {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(PvtDataStoreImpl.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(PvtDataStoreImpl.class);
 
     private IDBProvider db;
     private String ledgerID;
@@ -70,7 +71,7 @@ public class PvtDataStoreImpl implements IPvtDataStore {
         db.writeBatch(batch, true);
         isEmpty = false;
         lastCommittedBlock = blockNum;
-        logger.debug("InitLastCommittedBlock set to block " + blockNum);
+        log.debug("InitLastCommittedBlock set to block " + blockNum);
     }
 
     /**
@@ -78,7 +79,7 @@ public class PvtDataStoreImpl implements IPvtDataStore {
      */
     @Override
     public List<TxPvtData> getPvtDataByBlockNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
-        logger.debug("Getting private data for block " + blockNum);
+        log.debug("Getting private data for block " + blockNum);
         if (isEmpty){
             throw new LedgerException("Thr store is empty");
         }
@@ -87,7 +88,7 @@ public class PvtDataStoreImpl implements IPvtDataStore {
             throw new LedgerException("Last committed block " + lastCommittedBlock + " block reuqested " + blockNum);
         }
         byte[] startKey = KvEncoding.getStartKeyForRangeScanByBlockNum(blockNum);
-        logger.debug(String.format("Querying private data for write sets using startKey %s", BytesHexStrTranslate.bytesToHexFun1(startKey)));
+        log.debug(String.format("Querying private data for write sets using startKey %s", Hex.toHexString(startKey)));
         Iterator<Map.Entry<byte[], byte[]>> itr = db.getIterator(startKey);
         List<TxPvtData> pvtData = new ArrayList<>();
         while(itr.hasNext()){
@@ -102,7 +103,7 @@ public class PvtDataStoreImpl implements IPvtDataStore {
             } catch (InvalidProtocolBufferException e) {
                 throw new LedgerException(e);
             }
-            logger.debug(String.format("Retrieved private data write set for block %d, tran %d", bNum, tNum));
+            log.debug(String.format("Retrieved private data write set for block %d, tran %d", bNum, tNum));
             //过滤无效的rwset
             Rwset.TxPvtReadWriteSet fileteredWSet = trimPvtWSet(pvtRWSet, filter);
             TxPvtData data = new TxPvtData(tNum, fileteredWSet);
@@ -136,7 +137,7 @@ public class PvtDataStoreImpl implements IPvtDataStore {
         //执行写入
         db.writeBatch(batch, true);
         batchPending = true;
-        logger.info(String.format("Saved %d private data write sets for block [%d]", pvtData.size(), blockNum));
+        log.info(String.format("Saved %d private data write sets for block [%d]", pvtData.size(), blockNum));
     }
 
     /**
@@ -150,7 +151,7 @@ public class PvtDataStoreImpl implements IPvtDataStore {
             throw new LedgerException("No pending batch to commit");
         }
         long committingBlockNum = nextBlockNum();
-        logger.debug("Committing private data for block " + committingBlockNum);
+        log.debug("Committing private data for block " + committingBlockNum);
         UpdateBatch batch = new UpdateBatch();
         batch.delete(KvEncoding.getPendingCommitKey(ledgerID));
         batch.put(KvEncoding.getLastCommittedBlkKey(ledgerID), KvEncoding.encodeBlockNum(committingBlockNum));
@@ -158,7 +159,7 @@ public class PvtDataStoreImpl implements IPvtDataStore {
         batchPending = false;
         isEmpty = false;
         lastCommittedBlock = committingBlockNum;
-        logger.debug("Committed private data for block " + committingBlockNum);
+        log.debug("Committed private data for block " + committingBlockNum);
     }
 
     /**
@@ -171,7 +172,7 @@ public class PvtDataStoreImpl implements IPvtDataStore {
             throw new LedgerException("No pending batch to commit");
         }
         long rollingbackBlockNum = nextBlockNum();
-        logger.debug("Rolling back private data for block " + rollingbackBlockNum);
+        log.debug("Rolling back private data for block " + rollingbackBlockNum);
         List<byte[]> pendingBatchKeys = retrievePendingBatchKeys();
         UpdateBatch batch = new UpdateBatch();
         for(byte[] key : pendingBatchKeys){
@@ -180,7 +181,7 @@ public class PvtDataStoreImpl implements IPvtDataStore {
         batch.delete(KvEncoding.getPendingCommitKey(ledgerID));
         db.writeBatch(batch, true);
         batchPending = false;
-        logger.debug("Rolled back private data for block " + rollingbackBlockNum);
+        log.debug("Rolled back private data for block " + rollingbackBlockNum);
     }
 
     @Override

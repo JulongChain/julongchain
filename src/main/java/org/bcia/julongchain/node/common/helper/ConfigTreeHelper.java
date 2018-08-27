@@ -22,7 +22,7 @@ import org.bcia.julongchain.common.policies.config.IConfigPolicy;
 import org.bcia.julongchain.common.policies.config.ImplicitMetaAnyPolicy;
 import org.bcia.julongchain.common.policies.config.ImplicitMetaMajorityPolicy;
 import org.bcia.julongchain.common.policies.config.SignaturePolicy;
-import org.bcia.julongchain.msp.util.MspConfigHelper;
+import org.bcia.julongchain.msp.util.MspConfigBuilder;
 import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.common.Policies;
 import org.bcia.julongchain.protos.msp.MspConfigPackage;
@@ -238,7 +238,7 @@ public class ConfigTreeHelper {
                 .getAdminPrincipal()));
 
         //填充MSP信息
-        MspConfigPackage.MSPConfig mspConfig = MspConfigHelper.buildMspConfig(org.getMspDir(), org.getId());
+        MspConfigPackage.MSPConfig mspConfig = MspConfigBuilder.buildMspConfig(org.getMspDir(), org.getId());
         IConfigValue mspValue = new MspValue(mspConfig);
         addValue(orgTreeBuilder, mspValue.getKey(), mspValue.getValue(), GroupConfigConstant.POLICY_ADMINS);
 
@@ -296,7 +296,7 @@ public class ConfigTreeHelper {
                 .getAdminPrincipal()));
 
         //填充MSP信息
-        MspConfigPackage.MSPConfig mspConfig = MspConfigHelper.buildMspConfig(org.getMspDir(), org.getId());
+        MspConfigPackage.MSPConfig mspConfig = MspConfigBuilder.buildMspConfig(org.getMspDir(), org.getId());
         IConfigValue mspValue = new MspValue(mspConfig);
         addValue(orgTreeBuilder, mspValue.getKey(), mspValue.getValue(), GroupConfigConstant.POLICY_ADMINS);
 

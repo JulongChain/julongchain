@@ -15,6 +15,13 @@
  */
 package org.bcia.julongchain.gossip.discovery;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public interface Discovery {
 
     public NetworkMember lookup(byte[] PKIID);
@@ -29,7 +36,7 @@ public interface Discovery {
 
     public NetworkMember[] getMembership();
 
-    public void initiateSync(Integer peerNum);
+    public void initiateSync(Integer nodeNum);
 
     public void connect(NetworkMember member, IIdentifier id);
 

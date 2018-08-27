@@ -16,7 +16,6 @@
 package org.bcia.julongchain.csp.gm.dxct.util;
 
 import org.bcia.julongchain.common.exception.CspException;
-import org.bcia.julongchain.common.exception.JavaChainException;
 import org.bcia.julongchain.common.util.FileUtils;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -31,8 +30,10 @@ import sun.security.x509.AlgorithmId;
 
 import java.io.*;
 import java.math.BigInteger;
-import java.security.KeyFactory;
-import java.security.Security;
+import java.security.*;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Arrays;
 import java.util.Random;
@@ -180,7 +181,7 @@ public class CryptoUtil {
         String privateKeyPEM = str.replace("-----BEGIN PRIVATE KEY-----\n", "")
                 .replace("-----END PRIVATE KEY-----", "").replace("\n", "");
         Security.addProvider(new BouncyCastleProvider());
-        KeyFactory keyf = keyf = KeyFactory.getInstance("EC");
+        KeyFactory keyf = KeyFactory.getInstance("EC");
         PKCS8EncodedKeySpec priPKCS8 = new PKCS8EncodedKeySpec(Base64.decode(privateKeyPEM) );
         BCECPrivateKey priKey = (BCECPrivateKey)keyf.generatePrivate(priPKCS8);
         return priKey.getD().toByteArray();
@@ -199,5 +200,39 @@ public class CryptoUtil {
     }
 
 
+    /**
+     * 获取x509证书
+     * @param cert
+     * @return
+     * @throws Exception
+     */
+    public static X509Certificate getX509Certificate(byte[] cert) throws Exception {
+        Security.addProvider(new BouncyCastleProvider());
+        CertificateFactory cf = CertificateFactory.getInstance("X.509","BC");
+        X509Certificate x509cert = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(cert));
+        return x509cert;
+    }
+
+    public static  boolean verify(X509Certificate cert, X509Certificate[] chains) {
+        if(cert != null && chains.length > 0) {
+            for(int i=0;i<chains.length;i++)
+                try {
+                    cert.checkValidity();
+                    chains[i].getPublicKey();
+                    cert.verify(chains[i].getPublicKey(), "BC");
+                    if (i == chains.length - 1) {
+                        return true;
+                    } else {
+                        cert = chains[i];
+                        continue;
+                    }
+                } catch (InvalidKeyException | CertificateException | NoSuchAlgorithmException | NoSuchProviderException
+                        | SignatureException e) {
+                    e.printStackTrace();
+                    return false;
+                }
+        }
+        return false;
+    }
 
 }

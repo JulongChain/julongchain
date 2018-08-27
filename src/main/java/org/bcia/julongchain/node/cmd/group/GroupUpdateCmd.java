@@ -17,8 +17,8 @@ package org.bcia.julongchain.node.cmd.group;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.node.Node;
 
 /**
@@ -30,7 +30,7 @@ import org.bcia.julongchain.node.Node;
  * @company Dingxuan
  */
 public class GroupUpdateCmd extends AbstractNodeGroupCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(GroupCreateCmd.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(GroupCreateCmd.class);
 
     //参数：consenter地址
     private static final String ARG_CONSENTER = "c";

@@ -33,7 +33,7 @@ public interface IProcessor {
      * @param chdr
      * @return
      */
-    boolean classfiyMsg(Common.GroupHeader chdr);
+    boolean ClassifyMsg(Common.GroupHeader chdr);
 
     /**
      * 根据当前配置检查消息的有效性,fa
@@ -48,14 +48,14 @@ public interface IProcessor {
      * @param env
      * @return
      */
-    ConfigMsg processConfigUpdateMsg(Common.Envelope env) throws ConsenterException, InvalidProtocolBufferException, ValidateException;
+    ConfigMsg processConfigUpdateMsg(Common.Envelope env) throws ConsenterException;
 
     /**
-     * 接收'ORDERER_TX'或'CONFIG`类型的消息，解压嵌入其中的ConfigUpdate信封，
+     * 接收'CONFIG`类型的消息，解压嵌入其中的ConfigUpdate信封，
      * 并调用ProcessConfigUpdateMsg生成与原始消息类型相同的新Config消息.
      *
      * @param env
      * @return
      */
-    ConfigMsg processConfigMsg(Common.Envelope env) throws ConsenterException, InvalidProtocolBufferException, ValidateException, PolicyException;
+    ConfigMsg processConfigMsg(Common.Envelope env) throws ConsenterException;
 }

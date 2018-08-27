@@ -19,10 +19,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.common.ledger.blkstorage.IBlockStore;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.history.IHistoryQueryExecutor;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 import org.iq80.leveldb.DBIterator;
 
@@ -34,7 +33,7 @@ import org.iq80.leveldb.DBIterator;
  * @company Dingxuan
  */
 public class HistoryLevelDBQueryExecutor implements IHistoryQueryExecutor {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(HistoryLevelDBQueryExecutor.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(HistoryLevelDBQueryExecutor.class);
 
     private HistoryLevelDB historyDB;
     private IBlockStore blockStore;
@@ -47,38 +46,18 @@ public class HistoryLevelDBQueryExecutor implements IHistoryQueryExecutor {
     }
 
     @Override
-    public IResultsIterator getHistoryForKey(String ns, String key) throws LedgerException{
+    public IResultsIterator getHistoryForKey(String namespace, String key) throws LedgerException{
         if(!LedgerConfig.isHistoryDBEnabled()){
         	String msg = "History db is not available";
-			logger.debug(msg);
+			log.debug(msg);
             throw new LedgerException(msg);
         }
-        byte[] compositeStartKey = HistoryDBHelper.constructPartialCompositeHistoryKey(ns, key, false);
+        byte[] compositeStartKey = HistoryDBHelper.constructPartialCompositeHistoryKey(namespace, key, false);
 
         DBIterator iterator = (DBIterator) historyDB.getProvider().getIterator((compositeStartKey));
 
-	    return new HistoryScanner(compositeStartKey, ns, key, iterator, blockStore, ledgerID);
+	    return new HistoryScanner(compositeStartKey, namespace, key, iterator, blockStore, ledgerID);
     }
-
-    @Override
-    public IResultsIterator getLastHistoryForKey(String ns, String key) throws LedgerException {
-	    if(!LedgerConfig.isHistoryDBEnabled()){
-		    String msg = "History db is not available";
-		    logger.debug(msg);
-		    throw new LedgerException(msg);
-	    }
-	    byte[] compositeEndKey = HistoryDBHelper.constructPartialCompositeHistoryKey(ns, key, true);
-
-	    DBIterator iterator = (DBIterator) historyDB.getProvider().getIterator((compositeEndKey));
-	    System.out.println(iterator.hasPrev());
-//	    if(iterator.hasPrev()){
-//	    	iterator.peekPrev();
-//	    } else {
-//	    	return null;
-//	    }
-	    return new HistoryScanner(compositeEndKey, ns, key, iterator, blockStore, ledgerID);
-    }
-
     private byte[] constructHistoryKey(byte[] key){
     	byte[] sep = new byte[]{0x00};
     	byte[] result = ArrayUtils.addAll(ledgerID.getBytes(), sep);

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 
 /**
- * IResultsIterator - an iterator for query result set
+ * 通用查询接口
  *
  * @author wanliangbing
  * @date 2018/3/7

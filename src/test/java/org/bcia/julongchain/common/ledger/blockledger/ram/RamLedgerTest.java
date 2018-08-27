@@ -21,18 +21,14 @@ import org.bcia.julongchain.common.genesis.GenesisBlockFactory;
 import org.bcia.julongchain.common.ledger.blockledger.IFactory;
 import org.bcia.julongchain.common.ledger.blockledger.IIterator;
 import org.bcia.julongchain.common.ledger.blockledger.ReadWriteBase;
-import org.bcia.julongchain.common.ledger.blockledger.Util;
-import org.bcia.julongchain.core.smartcontract.shim.helper.Channel;
 import org.bcia.julongchain.csp.factory.CspManager;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.consenter.Ab;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
+import org.junit.rules.ExpectedException;
 
-import java.io.File;
+import static org.bcia.julongchain.common.ledger.util.Utils.rmrf;
 
 /**
  * 类描述
@@ -43,24 +39,30 @@ import java.io.File;
  */
 public class RamLedgerTest {
     static final String dir = "/tmp/julongchain/ramLedger";
-    IFactory ramLedgerFactory;
-    ReadWriteBase ramLedger;
+    static IFactory ramLedgerFactory;
+    static ReadWriteBase ramLedger;
+	static Common.Block block = null;
 
-    @Before
-    public void before() throws Exception{
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
+
+    @BeforeClass
+    public static void before() throws Exception{
         //重置目录
-        System.out.println(deleteDir(new File(dir)));
+		rmrf(dir);
         //重新生成fileLedgerFactory
         ramLedgerFactory = new RamLedgerFactory(10);
         //创建file ledger
         ramLedger = ramLedgerFactory.getOrCreate("myGroup");
+        //提交创世区块
+		GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
+		block = factory.getGenesisBlock("myGroup");
+		ramLedger.append(block);
     }
 
     @Test
     public void testGetOrCreate() throws Exception{
         Assert.assertNotNull(ramLedger);
-        Assert.assertSame(ramLedger.height(), (long) 0);
-        Assert.assertEquals(ramLedgerFactory.groupIDs().get(0), "myGroup");
     }
 
     @Test
@@ -76,30 +78,30 @@ public class RamLedgerTest {
 
     @Test
     public void testAppend() throws Exception{
-        Common.Block block = null;
-        GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
-        block = factory.getGenesisBlock("myGroup");
-        ramLedger.append(block);
-        Assert.assertSame(ramLedger.height(), (long) 1);
+		long height = ramLedger.height();
 
-        block = Common.Block.newBuilder()
-                .setHeader(Common.BlockHeader.newBuilder()
-                        .setPreviousHash(ByteString.copyFrom(CspManager.getDefaultCsp().hash(block.getData().toByteArray(), null)))
-                        .setNumber(1)
-                        .build())
-                .setMetadata(Common.BlockMetadata.newBuilder()
-                        .addMetadata(ByteString.EMPTY)
-                        .addMetadata(ByteString.EMPTY)
-                        .addMetadata(ByteString.EMPTY)
-                        .addMetadata(ByteString.EMPTY)
-                        .build())
-                .build();
-        ramLedger.append(block);
-        Assert.assertSame(ramLedger.height(), (long) 2);
+		for (int i = 0; i < 15; i++) {
+			block = Common.Block.newBuilder()
+					.setHeader(Common.BlockHeader.newBuilder()
+							.setPreviousHash(ByteString.copyFrom(CspManager.getDefaultCsp().hash(block.getHeader().toByteArray(), null)))
+							.setNumber(height)
+							.build())
+					.setMetadata(Common.BlockMetadata.newBuilder()
+							.addMetadata(ByteString.EMPTY)
+							.addMetadata(ByteString.EMPTY)
+							.addMetadata(ByteString.EMPTY)
+							.addMetadata(ByteString.EMPTY)
+							.build())
+					.build();
+			ramLedger.append(block);
+			System.out.println(height);
+			Assert.assertSame(ramLedger.height(), ++height);
+		}
     }
 
     @Test
     public void testIterator() throws Exception{
+		long height = ramLedger.height();
         IIterator itr = null;
 
         itr = ramLedger.iterator(Ab.SeekPosition.newBuilder().setOldest(Ab.SeekOldest.getDefaultInstance()).build());
@@ -108,31 +110,7 @@ public class RamLedgerTest {
         itr = ramLedger.iterator(Ab.SeekPosition.newBuilder().setNewest(Ab.SeekNewest.getDefaultInstance()).build());
         Assert.assertNotNull(itr);
 
-        try {
-            ramLedger.iterator(Ab.SeekPosition.newBuilder().setSpecified(Ab.SeekSpecified.getDefaultInstance()).build());
-        } catch (LedgerException e) {
-            Assert.assertEquals(e, Util.NOT_FOUND_ERROR_ITERATOR);
-        }
-        GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
-        Common.Block block = factory.getGenesisBlock("myTestGroup");
-        ramLedger.append(block);
-        itr = ramLedger.iterator(Ab.SeekPosition.newBuilder().setSpecified(Ab.SeekSpecified.getDefaultInstance()).build());
-        Assert.assertNotNull(itr);
-
-        block = Common.Block.newBuilder()
-                .setHeader(Common.BlockHeader.newBuilder()
-                        .setPreviousHash(ByteString.copyFrom(CspManager.getDefaultCsp().hash(block.getData().toByteArray(), null)))
-                        .setNumber(1)
-                        .build())
-                .setMetadata(Common.BlockMetadata.newBuilder()
-                        .addMetadata(ByteString.EMPTY)
-                        .addMetadata(ByteString.EMPTY)
-                        .addMetadata(ByteString.EMPTY)
-                        .addMetadata(ByteString.EMPTY)
-                        .build())
-                .build();
-        ramLedger.append(block);
-        itr = ramLedger.iterator(Ab.SeekPosition.newBuilder().setSpecified(Ab.SeekSpecified.getDefaultInstance()).build());
+        itr = ramLedger.iterator(Ab.SeekPosition.newBuilder().setSpecified(Ab.SeekSpecified.newBuilder().setNumber(height / 2).build()).build());
         Assert.assertNotNull(itr);
     }
 
@@ -179,72 +157,6 @@ public class RamLedgerTest {
 //        Assert.assertNotNull(channel);
 //    }
 
-    @Test
-    public void testNext() throws Exception{
-        IIterator itr = null;
-        Channel<Object> channel = null;
-
-        itr = ramLedger.iterator(Ab.SeekPosition.newBuilder().setOldest(Ab.SeekOldest.getDefaultInstance()).build());
-        itr.next();
-
-        itr = ramLedger.iterator(Ab.SeekPosition.newBuilder().setNewest(Ab.SeekNewest.getDefaultInstance()).build());
-        itr.next();
-
-        try {
-            ramLedger.iterator(Ab.SeekPosition.newBuilder().setSpecified(Ab.SeekSpecified.getDefaultInstance()).build());
-        } catch (LedgerException e) {
-            Assert.assertEquals(e, Util.NOT_FOUND_ERROR_ITERATOR);
-        }
-        GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
-        Common.Block block = factory.getGenesisBlock("myTestGroup");
-        ramLedger.append(block);
-        itr = ramLedger.iterator(Ab.SeekPosition.newBuilder().setSpecified(Ab.SeekSpecified.getDefaultInstance()).build());
-        // TODO: 5/29/18 等待新区块
-//        itr.next();
-
-        block = Common.Block.newBuilder()
-                .setHeader(Common.BlockHeader.newBuilder()
-                        .setPreviousHash(ByteString.copyFrom(CspManager.getDefaultCsp().hash(block.getData().toByteArray(), null)))
-                        .setNumber(1)
-                        .build())
-                .setMetadata(Common.BlockMetadata.newBuilder()
-                        .addMetadata(ByteString.EMPTY)
-                        .addMetadata(ByteString.EMPTY)
-                        .addMetadata(ByteString.EMPTY)
-                        .addMetadata(ByteString.EMPTY)
-                        .build())
-                .build();
-        ramLedger.append(block);
-        itr = ramLedger.iterator(Ab.SeekPosition.newBuilder().setSpecified(Ab.SeekSpecified.getDefaultInstance()).build());
-        itr.next();
-    }
-
     @After
     public void after() throws Exception{}
-
-
-    private static boolean deleteDir(File dir) {
-        if (dir.isDirectory()) {
-            String[] children = dir.list();
-            for (int i = 0; i < children.length; i++) {
-                boolean success = deleteDir(new File(dir, children[i]));
-                if (!success) {
-                    return false;
-                }
-            }
-        }
-        return dir.delete();
-    }
-
-    private void soutBytes(byte[] bytes) throws Exception{
-        int i = 0;
-        for (byte aByte : bytes) {
-            i++;
-            System.out.print(aByte + "\t");
-            if(i > 30){
-                System.out.println();
-                i = 0;
-            }
-        }
-    }
 }

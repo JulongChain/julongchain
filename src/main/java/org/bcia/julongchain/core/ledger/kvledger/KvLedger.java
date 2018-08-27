@@ -18,10 +18,9 @@ package org.bcia.julongchain.core.ledger.kvledger;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IPrunePolicy;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
-import org.bcia.julongchain.common.ledger.blkstorage.BlockStorage;
 import org.bcia.julongchain.common.ledger.blkstorage.IBlockStore;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.*;
 import org.bcia.julongchain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.julongchain.core.ledger.kvledger.history.historydb.IHistoryDB;
@@ -47,7 +46,7 @@ import java.util.*;
  */
 public class KvLedger implements INodeLedger {
 
-	private static final JavaChainLog logger  = JavaChainLogFactory.getLog(KvLedger.class);
+	private static JulongChainLog log = JulongChainLogFactory.getLog(KvLedger.class);
 
 	private String ledgerID;
 	private IBlockStore blockStore;
@@ -55,14 +54,14 @@ public class KvLedger implements INodeLedger {
 	private IHistoryDB historyDB;
 
 	/**
-	 * Create new ledger call `kvLedger`
+	 * 创建新KvLedger
 	 */
 	public KvLedger(String ledgerID,
 	                IBlockStore blockStore,
 	                IDB versionedDB,
 	                IHistoryDB historyDB,
 	                Map<String, IStateListener> stateListeners) throws LedgerException {
-		logger.debug("Creating KVLedger ledgerID = " + ledgerID);
+		log.debug("Creating KVLedger ledgerID = " + ledgerID);
 
 		ITxManager txmgmt = new LockBasedTxManager(ledgerID, versionedDB, stateListeners);
 
@@ -71,9 +70,8 @@ public class KvLedger implements INodeLedger {
 		this.txtmgmt = txmgmt;
 		this.historyDB = historyDB;
 
-		//TODO get scEventListener
 		ISmartContractLifecycleEventListener scEventListener = versionedDB.getSmartcontractEventListener();
-		logger.debug("Register state db for smartcontract lifecycle event " + (scEventListener != null));
+		log.debug("Register state db for smartcontract lifecycle event " + (scEventListener != null));
 
 		if(scEventListener != null){
 			ScEventManager.getMgr().register(ledgerID, scEventListener);
@@ -82,14 +80,14 @@ public class KvLedger implements INodeLedger {
 		recoverDBs();
 	}
 
-	/** Recover the state database and history database (if exist)
-	 * by recommitting last valid blocks
+	/**
+	 * 恢复账本
 	 */
 	private void recoverDBs() throws LedgerException {
-		logger.debug("Evtering revocerDBs()");
+		log.debug("Evtering revocerDBs()");
 		Ledger.BlockchainInfo info = blockStore.getBlockchainInfo();
 		if(info.getHeight() == 0){
-			logger.info("Block storage is empty");
+			log.info("Block storage is empty");
 			return;
 		}
 		long lastAvailableBlockNum = info.getHeight() - 1;
@@ -126,8 +124,8 @@ public class KvLedger implements INodeLedger {
 		}
 	}
 
-	/** recommitLostBlocks retrieves blocks in specified range and commit the write set to either
-	 * state IDB or history IDB or both
+	/**
+	 * 重新提交区块
 	 */
 	private void recommitLostBlocks(long firstBlockNum, long lastBlockNum, IRecoverable... recoverables) throws LedgerException{
 		BlockAndPvtData blockAndPvtData;
@@ -139,10 +137,8 @@ public class KvLedger implements INodeLedger {
 		}
 	}
 
-	/** GetTransactionByID retrieves a transaction by id
-	 *
-	 * @param txID
-	 * @return
+	/**
+	 * 根据交易ID获取交易
 	 */
 	@Override
 	public synchronized TransactionPackage.ProcessedTransaction getTransactionByID(String txID) throws LedgerException {
@@ -151,7 +147,7 @@ public class KvLedger implements INodeLedger {
 		tranEvn = blockStore.retrieveTxByID(txID);
 		txVResult = blockStore.retrieveTxValidationCodeByTxID(txID);
 		if(tranEvn == null || txVResult == null){
-			logger.info(String.format("Transaction not found, using id = [%s]", txID));
+			log.info(String.format("Transaction not found, using id = [%s]", txID));
 			return null;
 		}
 		return TransactionPackage.ProcessedTransaction.newBuilder()
@@ -160,129 +156,130 @@ public class KvLedger implements INodeLedger {
 				.build();
 	}
 
-	/** GetBlockchainInfo returns basic info about blockchain
-	 *
-	 * @return
+	/**
+	 * 获取当前区块链状态
 	 */
 	@Override
 	public synchronized Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException {
 		Ledger.BlockchainInfo bcInfo = blockStore.getBlockchainInfo();
 		if (bcInfo == null) {
-			logger.info("Blockchain info not found");
+			log.info("Blockchain info not found");
 		}
 		return bcInfo;
 	}
 
-	/** GetBlockByNumber returns block at a given height
-	 * blockNumber of  math.MaxUint64 will return last block
+	/**
+	 * 根据区块号获取区块
 	 */
 	@Override
 	public synchronized Common.Block getBlockByNumber(long blockNumber) throws LedgerException {
 		Common.Block block = blockStore.retrieveBlockByNumber(blockNumber);
 		if (block == null) {
-			logger.info(String.format("block not found, using block num = [%d]", blockNumber));
+			log.info(String.format("block not found, using block num = [%d]", blockNumber));
 		}
 		return block;
 	}
 
-	/** GetBlocksIterator returns an iterator that starts from `startBlockNumber`(inclusive).
-	 * The iterator is a blocking iterator i.e., it blocks till the next block gets available in the ledger
-	 * IResultsIterator contains type BlockHolder
+	/**
+	 * 获取区块迭代器
 	 */
 	@Override
 	public IResultsIterator getBlocksIterator(long startBlockNumber) throws LedgerException{
 		IResultsIterator itr = blockStore.retrieveBlocks(startBlockNumber);
 		if (itr == null) {
-			logger.info(String.format("Blocks iterator not found, using start block num = [%d]", startBlockNumber));
+			log.info(String.format("Blocks iterator not found, using start block num = [%d]", startBlockNumber));
 		}
 		return itr;
 	}
 
-	/** GetBlockByHash returns a block given it's hash
-	 *
-	 * @param blockHash
-	 * @return
+	/**
+	 * 根据区块Hash(headerHash)获取区块
 	 */
 	@Override
 	public synchronized Common.Block getBlockByHash(byte[] blockHash) throws LedgerException {
 		Common.Block block = blockStore.retrieveBlockByHash(blockHash);
 		if (block == null) {
-			logger.info("Block not found");
+			log.info("Block not found");
 		}
 		return block;
 	}
 
-	/** GetBlockByTxID returns a block which contains a transaction
-	 *
-	 * @param txID
-	 * @return
+	/**
+	 * 根据交易ID获取区块
 	 */
 	@Override
 	public synchronized Common.Block getBlockByTxID(String txID) throws LedgerException {
 		Common.Block block = blockStore.retrieveBlockByTxID(txID);
 		if (block == null) {
-			logger.info(String.format("Block not found, using txid = [%s]", txID));
+			log.info(String.format("Block not found, using txid = [%s]", txID));
 		}
 		return block;
 	}
 
+	/**
+	 * 通过交易Id获取交易可行性代码
+	 */
 	@Override
 	public synchronized TransactionPackage.TxValidationCode getTxValidationCodeByTxID(String txID) throws LedgerException {
 		TransactionPackage.TxValidationCode txValidationCode = blockStore.retrieveTxValidationCodeByTxID(txID);
 		if (txValidationCode == null) {
-			logger.info(String.format("Tx validation code not found, using txid = [%s]", txID));
+			log.info(String.format("Tx validation code not found, using txid = [%s]", txID));
 		}
 		return txValidationCode;
 	}
 
-	/** NewTxSimulator returns new `ledger.TxSimulator`
-	 *
-	 * @return
+	/**
+	 * 获取交易模拟器
 	 */
 	@Override
 	public ITxSimulator newTxSimulator(String txId) throws LedgerException {
 		return txtmgmt.newTxSimulator(txId);
 	}
 
-	/** Prune prunes the blocks/transactions that satisfy the given policy
-	 *
-	 * @param IPrunePolicy
+	/**
+	 * TODO
+	 * 修剪策略
 	 */
 	@Override
-	public void prune(IPrunePolicy IPrunePolicy) throws LedgerException {
+	public void prune(IPrunePolicy prunePolicy) throws LedgerException {
 		throw new LedgerException("Not yet implement");
 	}
 
-	/** NewQueryExecutor gives handle to a query executor.
-	 * A client can obtain more than one 'QueryExecutor's for parallel execution.
-	 * Any synchronization should be performed at the implementation level if required
+	/**
+	 * 新建交易查询器
 	 */
 	@Override
 	public IQueryExecutor newQueryExecutor() throws LedgerException{
-		//TODO uuid
 		return txtmgmt.newQueryExecutor(UUID.randomUUID().toString());
 	}
 
-	/** NewHistoryQueryExecutor gives handle to a history query executor.
-	 * A client can obtain more than one 'IHistoryQueryExecutor's for parallel execution.
-	 * Any synchronization should be performed at the implementation level if required
-	 * Pass the ledger blockstore so that historical values can be looked up from the chain
+	/**
+	 * 新建历史查询器
 	 */
 	@Override
 	public IHistoryQueryExecutor newHistoryQueryExecutor() throws LedgerException {
 		return historyDB.newHistoryQueryExecutor(blockStore);
 	}
 
+	/**
+	 * 根据区块号获取pvtdata和区块
+	 */
 	@Override
 	public synchronized BlockAndPvtData getPvtDataAndBlockByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
 		return ((Store) blockStore).getPvtDataAndBlockByNum(blockNum, filter);
 	}
 
+	/**
+	 * 根据区块号获取pvtdata
+	 */
 	@Override
 	public synchronized List<TxPvtData> getPvtDataByNum(long blockNum, PvtNsCollFilter filter) throws LedgerException {
 		return  ((Store) blockStore).getPvtDataByNum(blockNum, filter);
 	}
 
+	/**
+	 * 修剪pvtdata策略
+	 */
 	@Override
 	public void purgePrivateData(long maxBlockNumToRetain) throws LedgerException {
 		throw new LedgerException("Not yet implement");
@@ -293,17 +290,16 @@ public class KvLedger implements INodeLedger {
 		throw new LedgerException("Not yet implement");
 	}
 
-	/** Commit commits the valid block (returned in the method RemoveInvalidTransactionsAndPrepare) and related state changes
-	 *
-	 * @param block
+	/**
+	 * 提交区块
 	 */
 	@Override
 	public void commit(Common.Block block) throws LedgerException {
 		commitWithPvtData(new BlockAndPvtData(block, null, null));
 	}
 
-	/** Close closes `KVLedger`
-	 *
+	/**
+	 * 关闭账本
 	 */
 	@Override
 	public void close() {
@@ -315,22 +311,25 @@ public class KvLedger implements INodeLedger {
 		}
 	}
 
+	/**
+	 * 提交区块和pvtdata
+	 */
 	@Override
 	public synchronized void commitWithPvtData(BlockAndPvtData blockAndPvtData) throws LedgerException {
 		long blockNo = blockAndPvtData.getBlock().getHeader().getNumber();
-		logger.debug(String.format("Group %s: Validating state for block %d", ledgerID, blockNo));
+		log.debug(String.format("Group %s: Validating state for block %d", ledgerID, blockNo));
 		//执行校验工作, 并准备更新包
 		txtmgmt.validateAndPrepare(blockAndPvtData, true);
-		logger.debug(String.format("Group %s: Committing block %d to storage", ledgerID, blockNo));
+		log.debug(String.format("Group %s: Committing block %d to storage", ledgerID, blockNo));
 		//提交区块私有信息
 		blockStore.commitWithPvtData(blockAndPvtData);
-		logger.info(String.format("Group %s: Committed block %d to storage", ledgerID, blockNo));
-		logger.debug(String.format("Group %s: Committing block %d transaction to state db", ledgerID, blockNo));
+		log.info(String.format("Group %s: Committed block %d to storage", ledgerID, blockNo));
+		log.debug(String.format("Group %s: Committing block %d transaction to state db", ledgerID, blockNo));
 		//提交stateDB数据
 		txtmgmt.commit();
 		//在HistoryDB允许的情况下提交历史信息
 		if(LedgerConfig.isHistoryDBEnabled()){
-			logger.debug(String.format("Group %s: Committing block %d transaction to history db", ledgerID, blockNo));
+			log.debug(String.format("Group %s: Committing block %d transaction to history db", ledgerID, blockNo));
 			historyDB.commit(blockAndPvtData.getBlock());
 		}
 	}

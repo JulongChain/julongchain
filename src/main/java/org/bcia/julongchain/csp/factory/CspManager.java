@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.csp.factory;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.gm.dxct.GmCspFactory;
 import org.bcia.julongchain.csp.gm.sdt.SdtGmCspFactory;
 import org.bcia.julongchain.csp.intfs.ICsp;
@@ -34,7 +34,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public class CspManager {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CspManager.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(CspManager.class);
     /**
      * 默认使用的Csp
      */

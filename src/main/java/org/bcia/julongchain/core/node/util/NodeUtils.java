@@ -17,11 +17,11 @@ package org.bcia.julongchain.core.node.util;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.StringUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.NodeException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.resourceconfig.IResourcesConfigBundle;
 import org.bcia.julongchain.common.util.proto.BlockUtils;
 import org.bcia.julongchain.core.ledger.INodeLedger;
@@ -43,7 +43,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class NodeUtils {
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(NodeUtils.class);
+    private static final JulongChainLog log = JulongChainLogFactory.getLog(NodeUtils.class);
 
     public static INodeLedger getLedger(String groupId) {
 //        if (StringUtils.isBlank(groupId)) {
@@ -112,9 +112,9 @@ public class NodeUtils {
      * CreateChainFromBlock creates a new chain from config block
      *
      * @param block
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public static void createChainFromBlock(Common.Block block) throws JavaChainException {
+    public static void createChainFromBlock(Common.Block block) throws JulongChainException {
         String groupId = BlockUtils.getGroupIDFromBlock(block);
         INodeLedger ledger = LedgerManager.createLedger(block);
 
@@ -130,7 +130,7 @@ public class NodeUtils {
                 node.createGroup(groupId, ledger, block);
             } catch (InvalidProtocolBufferException e) {
                 log.error(e.getMessage(), e);
-                throw new JavaChainException(e);
+                throw new JulongChainException(e);
             }
         }
     }

@@ -19,8 +19,8 @@ import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.ConfigtxToolsException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfigFactory;
@@ -34,7 +34,7 @@ import org.bcia.julongchain.tools.configtxgen.helper.ConfigtxHelper;
  * @company Dingxuan
  */
 public class ConfigtxGenCmd implements IConfigtxGenCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ConfigtxGenCmd.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ConfigtxGenCmd.class);
 
     //参数：groupId
     private static final String ARG_GROUP_ID = "g";

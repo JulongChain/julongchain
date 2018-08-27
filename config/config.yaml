@@ -4,15 +4,16 @@
 #
 
 organizationalUnitIdentifiers:
-    certificate: "cacerts/cacert.pem"
-    organizationalUnitIdentifier: "COP"
+    certificate: "cacerts/ca.org1.example.com-cert.pem"
+    organizationalUnitIdentifier: "JL"
 
 nodeOUs:
-  isEnable: false
+  isEnable: true
   clientOUIdentifier:
     # if Certificate is empty, then the certifier identifier will not be enforced
-    certificate: "cacerts/cacert.pem"
-    OrganizationalUnitIdentifier: "OU_client"
-  peerOUIdentifier:
-    certificate: "cacerts/cacert.pem"
-    OrganizationalUnitIdentifier: "OU_peer"
+    certificate: "cacerts/ca.org1.example.com-cert.pem"
+    #OrganizationalUnitIdentifier: "OU_client"
+    organizationalUnitIdentifier: "JL"
+  nodeOUIdentifier:
+    certificate: "cacerts/ca.org1.example.com-cert.pem"
+    organizationalUnitIdentifier: "JL"

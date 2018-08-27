@@ -20,8 +20,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.VerifyException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.IPolicyManager;
 import org.bcia.julongchain.common.policies.policy.IPolicy;
 import org.bcia.julongchain.common.policycheck.policies.IGroupPolicyManagerGetter;
@@ -45,7 +45,7 @@ import java.util.List;
  * @company Aisino,Dingxuan
  */
 public class PolicyChecker implements IPolicyChecker{
-    private static JavaChainLog log = JavaChainLogFactory.getLog(PolicyChecker.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(PolicyChecker.class);
 
     private IGroupPolicyManagerGetter groupPolicyManagerGetter;
     private IIdentityDeserializer localMSP;
@@ -59,6 +59,7 @@ public class PolicyChecker implements IPolicyChecker{
     }
 
     /**
+     * 策略检查
      * @param groupID
      * @param policyName
      * @param signedProposal
@@ -70,7 +71,7 @@ public class PolicyChecker implements IPolicyChecker{
          }
 
         if(policyName == ""){
-             String msg=String.format("Invalid policy name during check policy on group [%s]. Name must be different from nil",groupID);
+             String msg=String.format("Invalid policy name during check policy on group [%s]. Name must be different from null",groupID);
              throw new PolicyException(msg);
         }
         if(signedProposal == null){
@@ -126,7 +127,12 @@ public class PolicyChecker implements IPolicyChecker{
         this.checkPolicyBySignedData(groupID,policyName,sd);
     }
 
-
+    /**
+     * 没有通道时检查策略是否有效，在本地MSP通过策略
+     * @param policyName
+     * @param signedProposal
+     * @throws PolicyException
+     */
     @Override
     public void checkPolicyNoGroup(String policyName, ProposalPackage.SignedProposal signedProposal)throws PolicyException {
         if(policyName == ""){
@@ -202,11 +208,11 @@ public class PolicyChecker implements IPolicyChecker{
      */
     public void checkPolicyBySignedData(String groupID, String policyName, List<SignedData> signedDatas) throws PolicyException{
         if(groupID == ""){
-            String msg=String.format("Invalid group ID name during check policy on signed data. Name must be different from nil");
+            String msg=String.format("Invalid group ID name during check policy on signed data. Name must be different from null");
             throw new PolicyException(msg);
         }
         if(policyName == ""){
-            String msg=String.format("Invalid policy name during check policy on signed data on channel [%s]. Name must be different from nil",groupID);
+            String msg=String.format("Invalid policy name during check policy on signed data on channel [%s]. Name must be different from null",groupID);
             throw new PolicyException(msg);
         }
         if(signedDatas == null){

@@ -15,8 +15,6 @@ limitations under the License.
  */
 package org.bcia.julongchain.common.ledger.blockledger.ram;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
@@ -27,8 +25,6 @@ import org.bcia.julongchain.protos.common.Common;
  * @company Dingxuan
  */
 public class SimpleList {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(SimpleList.class);
-
     private SimpleList next;
     private Common.Block block;
 
@@ -54,8 +50,4 @@ public class SimpleList {
     public void setBlock(Common.Block block) {
         this.block = block;
     }
-
-//    public Object getLock() {
-//        return lock;
-//    }
 }

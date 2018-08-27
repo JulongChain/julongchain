@@ -21,8 +21,10 @@ package org.bcia.julongchain.csp.gmt0016.excelsecu.bean;
  * @company Excelsecu
  */
 public class GmSymmKey extends GmKey {
-    private long hKey; //对称密钥句柄
-    private byte[] cipherData; //Key密文数据
+    // 对称密钥句柄
+    private long hKey;
+    // Key密文数据
+    private byte[] cipherData;
 
     public GmSymmKey() {
     }
@@ -34,7 +36,7 @@ public class GmSymmKey extends GmKey {
 
     @Override
     public byte[] ski() {
-        //TLV TLV
+        // TLV TLV
         byte[] tlvContainer = getTLV(GmKey.TAG_CONTAINER, containerName.length(), containerName.getBytes());
         byte[] tlvCipherData = getTLV(GmKey.TAG_KEY_CIPHER_DATA, cipherData.length, cipherData);
         byte[] skiData = new byte[tlvContainer.length + tlvCipherData.length];
@@ -43,7 +45,7 @@ public class GmSymmKey extends GmKey {
         return skiData;
     }
 
-    {}    public byte[] getCipherData() {
+    public byte[] getCipherData() {
         return cipherData;
     }
 

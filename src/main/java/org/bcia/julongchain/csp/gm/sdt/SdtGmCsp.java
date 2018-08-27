@@ -15,9 +15,9 @@
  */
 package org.bcia.julongchain.csp.gm.sdt;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.gm.sdt.sm2.*;
 import org.bcia.julongchain.csp.gm.sdt.sm3.SM3;
 import org.bcia.julongchain.csp.gm.sdt.sm4.*;
@@ -39,7 +39,7 @@ import org.bcia.julongchain.csp.intfs.opts.*;
  */
 public class SdtGmCsp implements ICsp {
 
-    private static JavaChainLog logger = JavaChainLogFactory.getLog(SdtGmCsp.class);
+    private static JulongChainLog logger = JulongChainLogFactory.getLog(SdtGmCsp.class);
 
     //默认密钥存储路径
     private final static String KEY_STORE_PATH = "msp/keystore/sdt/";
@@ -76,13 +76,13 @@ public class SdtGmCsp implements ICsp {
      * 生成密钥
      * @param opts 密钥生成选项
      * @return 密钥对象
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     @Override
-    public IKey keyGen(IKeyGenOpts opts) throws JavaChainException {
+    public IKey keyGen(IKeyGenOpts opts) throws JulongChainException {
         if (null == opts) {
             logger.error("Invalid Opts. It must not be null.");
-            throw new JavaChainException("Invalid Opts. It must not be null.");
+            throw new JulongChainException("Invalid Opts. It must not be null.");
         }
         //如果opts为SM2KeyGenOpts的实例，则生成SM2公私钥对
         if (opts instanceof SM2KeyGenOpts) {
@@ -120,7 +120,7 @@ public class SdtGmCsp implements ICsp {
             return sm4Key;
         }
         logger.error("Unsupported ‘IKeyGenOpts‘.");
-        throw new JavaChainException("Unsupported ‘IKeyGenOpts‘.");
+        throw new JulongChainException("Unsupported ‘IKeyGenOpts‘.");
     }
 
     /**
@@ -128,13 +128,13 @@ public class SdtGmCsp implements ICsp {
      * @param key 原密钥
      * @param opts 密钥派生选项
      * @return 派生密钥
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     @Override
-    public IKey keyDeriv(IKey key, IKeyDerivOpts opts) throws JavaChainException {
+    public IKey keyDeriv(IKey key, IKeyDerivOpts opts) throws JulongChainException {
         if (null == opts) {
             logger.error("Invalid Opts. It must not be null.");
-            throw new JavaChainException("Invalid Opts. It must not be null.");
+            throw new JulongChainException("Invalid Opts. It must not be null.");
         }
         if (opts instanceof SM2KeyDerivOpts) {
            //TODO: 待实现
@@ -145,7 +145,7 @@ public class SdtGmCsp implements ICsp {
             return null;
         }
         logger.error("Unsupported ‘IKeyDerivOpts‘.");
-        throw new JavaChainException("Unsupported ‘IKeyDerivOpts‘.");
+        throw new JulongChainException("Unsupported ‘IKeyDerivOpts‘.");
     }
 
     /**
@@ -153,17 +153,17 @@ public class SdtGmCsp implements ICsp {
      * @param raw 密钥原始数据
      * @param opts 密钥导入选项
      * @return 密钥对象
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     @Override
-    public IKey keyImport(Object raw, IKeyImportOpts opts) throws JavaChainException {
+    public IKey keyImport(Object raw, IKeyImportOpts opts) throws JulongChainException {
         if (null == raw) {
             logger.error("Invalid raw. It must not be null.");
-            throw new JavaChainException("Invalid raw. It must not be null.");
+            throw new JulongChainException("Invalid raw. It must not be null.");
         }
         if (null == opts) {
             logger.error("Invalid opts. It must not be null.");
-            throw new JavaChainException("Invalid opts. It must not be null.");
+            throw new JulongChainException("Invalid opts. It must not be null.");
         }
         //如果opts为SM2PrivateKeyImportOpts的实例，则导入为SM2私钥
         if (opts instanceof SM2PrivateKeyImportOpts) {
@@ -205,20 +205,20 @@ public class SdtGmCsp implements ICsp {
             return sm4Key;
         }
         logger.error("Unsupported ‘IKeyImportOpts‘.");
-        throw new JavaChainException("Unsupported ‘IKeyImportOpts‘.");
+        throw new JulongChainException("Unsupported ‘IKeyImportOpts‘.");
     }
 
     /**
      * 根据密钥标识获取密钥
      * @param ski 密钥标识
      * @return 密钥对象
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     @Override
-    public IKey getKey(byte[] ski) throws JavaChainException {
+    public IKey getKey(byte[] ski) throws JulongChainException {
         if(null == ski) {
             logger.error("Invalid ski. It must not be null.");
-            throw new JavaChainException("Invalid ski. It must not be null.");
+            throw new JulongChainException("Invalid ski. It must not be null.");
         }
         byte[] keyData = null;
         String path = KEY_STORE_PATH;
@@ -249,7 +249,7 @@ public class SdtGmCsp implements ICsp {
             IKey sm4Key = new SM4Key(keyData);
             return sm4Key;
         }
-        throw new JavaChainException("Cannot find the key for SKI [" + ski + "].");
+        throw new JulongChainException("Cannot find the key for SKI [" + ski + "].");
     }
 
     /**
@@ -257,13 +257,13 @@ public class SdtGmCsp implements ICsp {
      * @param msg 消息数据
      * @param opts 哈希选项
      * @return 摘要值
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     @Override
-    public byte[] hash(byte[] msg, IHashOpts opts) throws JavaChainException {
+    public byte[] hash(byte[] msg, IHashOpts opts) throws JulongChainException {
         if (null == msg) {
             logger.error("Invalid msg. It must not be null.");
-            throw new JavaChainException("Invalid msg. It must not be null.");
+            throw new JulongChainException("Invalid msg. It must not be null.");
         }
 
         byte[] results = sm3.hash(msg);
@@ -274,10 +274,10 @@ public class SdtGmCsp implements ICsp {
      * 获取哈希实例
      * @param opts 哈希选项
      * @return 哈希实例
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     @Override
-    public IHash getHash(IHashOpts opts) throws JavaChainException {
+    public IHash getHash(IHashOpts opts) throws JulongChainException {
         return null;
     }
 
@@ -287,28 +287,28 @@ public class SdtGmCsp implements ICsp {
      * @param digest 消息摘要
      * @param opts 签名者选项
      * @return 签名值
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     @Override
-    public byte[] sign(IKey key, byte[] digest, ISignerOpts opts) throws JavaChainException {
+    public byte[] sign(IKey key, byte[] digest, ISignerOpts opts) throws JulongChainException {
         if (null == key) {
             logger.error("Invalid Key. It must not be null.");
-            throw new JavaChainException("Invalid Key. It must not be null.");
+            throw new JulongChainException("Invalid Key. It must not be null.");
         }
         if (null == digest) {
             logger.error("Invalid digest. It must not be null.");
-            throw new JavaChainException("Invalid digest. It must not be null.");
+            throw new JulongChainException("Invalid digest. It must not be null.");
         }
         if (null == opts) {
             logger.error("Invalid opts. It must not be null.");
-            throw new JavaChainException("Invalid opts. It must not be null.");
+            throw new JulongChainException("Invalid opts. It must not be null.");
         }
         //如果opts为SM2SignerOpts的实例，则调用SM2算法进行签名
         if (opts instanceof SM2SignerOpts) {
             return sm2.sign(digest, key.toBytes());
         }
         logger.error("Unsupported ‘ISignerOpts‘.");
-        throw new JavaChainException("Unsupported ‘ISignerOpts‘.");
+        throw new JulongChainException("Unsupported ‘ISignerOpts‘.");
     }
 
     /**
@@ -318,22 +318,22 @@ public class SdtGmCsp implements ICsp {
      * @param digest 消息摘要
      * @param opts 签名者选项
      * @return 验签结果
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     @Override
-    public boolean verify(IKey key, byte[] signature, byte[] digest, ISignerOpts opts) throws JavaChainException {
+    public boolean verify(IKey key, byte[] signature, byte[] digest, ISignerOpts opts) throws JulongChainException {
         boolean verify = false;
         if (null == key) {
             logger.error("Invalid Key. It must not be null.");
-            throw new JavaChainException("Invalid Key. It must not be null.");
+            throw new JulongChainException("Invalid Key. It must not be null.");
         }
         if (null == signature) {
             logger.error("Invalid signature. It must not be null.");
-            throw new JavaChainException("Invalid signature. It must not be null.");
+            throw new JulongChainException("Invalid signature. It must not be null.");
         }
         if (null == opts) {
             logger.error("Invalid opts. It must not be null.");
-            throw new JavaChainException("Invalid opts. It must not be null.");
+            throw new JulongChainException("Invalid opts. It must not be null.");
         }
         //如果opts为SM2SignerOpts的实例，则调用SM2算法进行验签
         if (opts instanceof SM2SignerOpts) {
@@ -343,7 +343,7 @@ public class SdtGmCsp implements ICsp {
             return verify;
         }
         logger.error("Unsupported ‘ISignerOpts‘.");
-        throw new JavaChainException("Unsupported ‘ISignerOpts‘.");
+        throw new JulongChainException("Unsupported ‘ISignerOpts‘.");
     }
 
     /**
@@ -352,28 +352,28 @@ public class SdtGmCsp implements ICsp {
      * @param plaintext 明文数据
      * @param opts 加密选项
      * @return 密文数据
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     @Override
-    public byte[] encrypt(IKey key, byte[] plaintext, IEncrypterOpts opts) throws JavaChainException {
+    public byte[] encrypt(IKey key, byte[] plaintext, IEncrypterOpts opts) throws JulongChainException {
         if (null == key) {
             logger.error("Invalid Key. It must not be null.");
-            throw new JavaChainException("Invalid Key. It must not be null.");
+            throw new JulongChainException("Invalid Key. It must not be null.");
         }
         if (null == plaintext) {
             logger.error("Invalid plaintext. It must not be null.");
-            throw new JavaChainException("Invalid plaintext. It must not be null.");
+            throw new JulongChainException("Invalid plaintext. It must not be null.");
         }
         if (null == opts) {
             logger.error("Invalid opts. It must not be null.");
-            throw new JavaChainException("Invalid opts. It must not be null.");
+            throw new JulongChainException("Invalid opts. It must not be null.");
         }
         //如果opts为SM4EncrypterOpts的实例，则调用SM4算法ECB模式进行加密
         if (opts instanceof SM4EncrypterOpts) {
             return sm4.encryptECB(plaintext, key.toBytes());
         }
         logger.error("Unsupported ‘IEncrypterOpts’.");
-        throw new JavaChainException("Unsupported ‘IEncrypterOpts’.");
+        throw new JulongChainException("Unsupported ‘IEncrypterOpts’.");
     }
 
     /**
@@ -382,28 +382,28 @@ public class SdtGmCsp implements ICsp {
      * @param ciphertext 密文数据
      * @param opts 解密选项
      * @return
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     @Override
-    public byte[] decrypt(IKey key, byte[] ciphertext, IDecrypterOpts opts) throws JavaChainException {
+    public byte[] decrypt(IKey key, byte[] ciphertext, IDecrypterOpts opts) throws JulongChainException {
         if (null == key) {
             logger.error("Invalid Key. It must not be null.");
-            throw new JavaChainException("Invalid Key. It must not be null.");
+            throw new JulongChainException("Invalid Key. It must not be null.");
         }
         if (null == ciphertext) {
             logger.error("Invalid ciphertext. It must not be null.");
-            throw new JavaChainException("Invalid ciphertext. It must not be null.");
+            throw new JulongChainException("Invalid ciphertext. It must not be null.");
         }
         if (null == opts) {
             logger.error("Invalid opts. It must not be null.");
-            throw new JavaChainException("Invalid opts. It must not be null.");
+            throw new JulongChainException("Invalid opts. It must not be null.");
         }
         //如果opts为SM4EncrypterOpts的实例，则调用SM4算法ECB模式进行解密
         if (opts instanceof SM4DecrypterOpts) {
             return sm4.decryptECB(ciphertext, key.toBytes());
         }
         logger.error("Unsupported ‘IDecrypterOpts’.");
-        throw new JavaChainException("Unsupported ‘IDecrypterOpts’.");
+        throw new JulongChainException("Unsupported ‘IDecrypterOpts’.");
     }
 
     /**
@@ -411,10 +411,10 @@ public class SdtGmCsp implements ICsp {
      * @param len 随机数长度
      * @param opts 随机数生成选项
      * @return
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     @Override
-    public byte[] rng(int len, IRngOpts opts) throws JavaChainException {
+    public byte[] rng(int len, IRngOpts opts) throws JulongChainException {
         return gmRandom.rng(len);
     }
 }

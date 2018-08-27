@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.core.container.inproccontroller;
 import org.bcia.julongchain.common.exception.InprocVMException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ssc.SystemSmartContractBase;
 import org.springframework.stereotype.Component;
 
@@ -24,15 +24,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 类描述
+ * In-process VM 控制器
  *
- * @author sunianle
+ * @author sunianle, sunzongyu
  * @date @date 2018/05/17
  * @company Dingxuan
  */
 @Component
 public class InprocController {
-	private JavaChainLog log = JavaChainLogFactory.getLog(InprocContainer.class);
+	private static JulongChainLog log = JulongChainLogFactory.getLog(InprocContainer.class);
 
 	private static Map<String, InprocContainer> containers = new HashMap<>();
 
@@ -100,5 +100,13 @@ public class InprocController {
 			throw new InprocVMException(msg);
 		}
 		containers.get(sscName).startContainer();
+	}
+
+	public static Map<String, InprocContainer> getContainers() {
+		return containers;
+	}
+
+	public static void setContainers(Map<String, InprocContainer> containers) {
+		InprocController.containers = containers;
 	}
 }

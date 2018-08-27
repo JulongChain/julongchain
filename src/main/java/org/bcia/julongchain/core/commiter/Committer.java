@@ -19,8 +19,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.CommitterException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.commiter.util.CommitterUtils;
 import org.bcia.julongchain.core.ledger.BlockAndPvtData;
 import org.bcia.julongchain.core.ledger.INodeLedger;
@@ -40,7 +40,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class Committer implements ICommitter {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Committer.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Committer.class);
 
     public interface IConfigBlockEventer {
         void event(Common.Block block) throws CommitterException;

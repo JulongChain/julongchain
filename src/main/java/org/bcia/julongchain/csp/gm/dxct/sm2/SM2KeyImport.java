@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.csp.gm.dxct.sm2;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.gm.dxct.sm3.SM3;
 import org.bcia.julongchain.csp.intfs.IKey;
 
@@ -26,7 +26,7 @@ import org.bcia.julongchain.csp.intfs.IKey;
  * @company Dingxuan
  */
 public class SM2KeyImport implements IKey {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SM2KeyImport.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SM2KeyImport.class);
     private byte[] privateKey;
     private byte[] publicKey;
     private SM3 sm3;

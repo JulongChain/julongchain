@@ -13,6 +13,7 @@
 # limitations under the License.
 #
 FROM julongchain/julongchain-baseimage
+MAINTAINER Julongchain "qkl@dxct.org"
 
 # julongchain configuration locations
 ENV FABRIC_CFG_PATH /etc/bcia/julongchain
@@ -26,8 +27,8 @@ RUN mkdir -p \
 ADD payload/sampleconfig.tar.bz2 $JULONGCHAIN_CFG_PATH
 
 # julongchain binaries
-COPY payload/orderer /usr/local/bin
-COPY payload/peer /usr/local/bin
+COPY payload/consenter /usr/local/bin
+COPY payload/node /usr/local/bin
 
 # softhsm2
 COPY payload/install-softhsm2.sh /tmp

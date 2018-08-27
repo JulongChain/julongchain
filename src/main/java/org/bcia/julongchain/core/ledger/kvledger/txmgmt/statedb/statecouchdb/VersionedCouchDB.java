@@ -15,11 +15,11 @@ limitations under the License.
  */
 package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.statecouchdb;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.UpdateBatch;
@@ -28,10 +28,8 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.core.ledger.sceventmgmt.ISmartContractLifecycleEventListener;
 import org.bcia.julongchain.core.ledger.sceventmgmt.SmartContractDefinition;
 import org.bcia.julongchain.core.ledger.util.Util;
-import org.bcia.julongchain.csp.gmt0016.excelsecu.bean.Version;
-import org.bcia.julongchain.node.util.LedgerUtils;
+import org.bouncycastle.util.encoders.Hex;
 import org.lightcouch.CouchDbClient;
-import org.omg.CORBA.ByteHolder;
 
 import java.util.HashMap;
 import java.util.List;
@@ -47,17 +45,13 @@ import java.util.regex.Pattern;
  * @company Dingxuan
  */
 public class VersionedCouchDB implements IVersionedDB, ISmartContractLifecycleEventListener {
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(VersionedCouchDB.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(VersionedCouchDB.class);
 
     private static final String BINARY_WRAPPER = "valueBytes";
     private static final String ID_FIELD = "_id";
     private static final String REV_FIELD = "_rev";
     private static final String VERSION_FIELD = "~version";
     private static final String DELETED_FIELD = "_deleted";
-    private static final String[] reservedFields = new String[]{
-            BINARY_WRAPPER, ID_FIELD, REV_FIELD, VERSION_FIELD, DELETED_FIELD
-    };
-    private static final Map<String, Boolean> dbArtifactsDirFilter = new HashMap<>();
     private final int QUERY_SKIP = 0;
     private static final int MAX_DBNAME_LENGTH = 238;
     private static final int GROUP_NAME_ALLOWED_LENGTH = 50;
@@ -65,6 +59,10 @@ public class VersionedCouchDB implements IVersionedDB, ISmartContractLifecycleEv
 	private static final int COLLECTION_NAME_ALLOWED_LENGTH = 50;
     private static final String EXPECTED_DBNAME_PATTERN = "[a-z][a-z0-9.$_()-]*";
 
+	private static Map<String, Boolean> dbArtifactsDirFilter = new HashMap<>();
+	private static String[] reservedFields = new String[]{
+			BINARY_WRAPPER, ID_FIELD, REV_FIELD, VERSION_FIELD, DELETED_FIELD
+	};
     static{
         dbArtifactsDirFilter.put("META-INF/statedb/couchdb/indexes", true);
     }
@@ -95,7 +93,7 @@ public class VersionedCouchDB implements IVersionedDB, ISmartContractLifecycleEv
 		String untruncatedDBName = dbName;
 		if (dbName.length() > MAX_DBNAME_LENGTH) {
 			dbName = dbName.substring(0, GROUP_NAME_ALLOWED_LENGTH);
-			dbName += "(" + BytesHexStrTranslate.bytesToHexFun1(Util.getHashBytes(untruncatedDBName.getBytes())) + ")";
+			dbName += "(" + Hex.toHexString(Util.getHashBytes(untruncatedDBName.getBytes())) + ")";
 		}
 		dbName += "_";
 		log.debug("Modify " + untruncatedDBName + " to " + dbName);
@@ -121,7 +119,7 @@ public class VersionedCouchDB implements IVersionedDB, ISmartContractLifecycleEv
 		String escapeNamespace = escapeUpperCase(nsName);
 		String namespaceDBName = groupName + "_" + escapeNamespace;
 		if (namespaceDBName.length() > MAX_DBNAME_LENGTH) {
-			String hashOfNamespaceDBName = BytesHexStrTranslate.bytesToHexFun1(Util.getHashBytes((groupName + "_" + nsName).getBytes()));
+			String hashOfNamespaceDBName = Hex.toHexString(Util.getHashBytes((groupName + "_" + nsName).getBytes()));
 			if (groupName.length() > GROUP_NAME_ALLOWED_LENGTH) {
 				groupName = groupName.substring(0, GROUP_NAME_ALLOWED_LENGTH);
 			}
@@ -196,7 +194,7 @@ public class VersionedCouchDB implements IVersionedDB, ISmartContractLifecycleEv
     }
 
     @Override
-    public LedgerHeight getVersion(String namespace, String key) throws LedgerException {
+    public LedgerHeight getHeight(String namespace, String key) throws LedgerException {
         return null;
     }
 
@@ -246,10 +244,10 @@ public class VersionedCouchDB implements IVersionedDB, ISmartContractLifecycleEv
     }
 
     @Override
-    public void handleSmartContractDeploy(SmartContractDefinition smartContractDefinition, byte[] dbArtifactsTar) throws JavaChainException {
-        log.debug("Enterint handleSmartContractDeploy()");
+    public void handleSmartContractDeploy(SmartContractDefinition smartContractDefinition, byte[] dbArtifactsTar) throws JulongChainException {
+        log.debug("Entering handleSmartContractDeploy()");
         if(smartContractDefinition == null){
-            throw new JavaChainException("Found null smartContractDefinition while creating couchdb index on group " + groupName);
+            throw new JulongChainException("Found null smartContractDefinition while creating couchdb index on group " + groupName);
         }
 		// TODO: 7/19/18 couchdb create index
 	}

@@ -16,25 +16,29 @@
 package org.bcia.julongchain.msp.mgmt;
 
 import com.google.protobuf.ByteString;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.apache.commons.lang.ArrayUtils;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.exception.VerifyException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2SignerOpts;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.msp.IIdentity;
 import org.bcia.julongchain.msp.entity.IdentityIdentifier;
 import org.bcia.julongchain.msp.entity.OUIdentifier;
+import org.bcia.julongchain.msp.util.MspConstant;
+import org.bcia.julongchain.msp.util.MspUtil;
 import org.bcia.julongchain.protos.common.MspPrincipal;
 import org.bcia.julongchain.protos.msp.Identities;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 
 import static org.bcia.julongchain.common.util.Convert.bytesToHexString;
-import static org.bcia.julongchain.csp.factory.CspManager.getDefaultCsp;
 
 /**
  * @author zhangmingyang
@@ -42,23 +46,12 @@ import static org.bcia.julongchain.csp.factory.CspManager.getDefaultCsp;
  * @company Dingxuan
  */
 public class Identity implements IIdentity {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Identity.class);
-    /**
-     * 身份
-     */
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Identity.class);
     private IdentityIdentifier identityIdentifier;
-    /**
-     * 证书
-     */
     private Certificate certificate;
-    /**
-     * 公钥
-     */
     private IKey pk;
-    /**
-     * msp
-     */
     private Msp msp;
+
 
     public Identity() {
     }
@@ -69,23 +62,16 @@ public class Identity implements IIdentity {
         byte[] digest = new byte[0];
         try {
             digest = msp.getCsp().hash(cert.getEncoded(), null);
-        } catch (JavaChainException e) {
-            e.printStackTrace();
+        } catch (JulongChainException e) {
+            log.error(e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
         IdentityIdentifier id = new IdentityIdentifier(msp.getName(), bytesToHexString(digest));
         this.certificate = cert;
         this.msp = msp;
         this.identityIdentifier = id;
         this.pk = pk;
-    }
-
-    public Identity(IdentityIdentifier identityIdentifier, Certificate certificate, IKey pk, Msp msp) {
-        this.identityIdentifier = identityIdentifier;
-        this.certificate = certificate;
-        this.pk = pk;
-        this.msp = msp;
     }
 
     @Override
@@ -110,44 +96,48 @@ public class Identity implements IIdentity {
 
     @Override
     public OUIdentifier[] getOrganizationalUnits() throws MspException {
-        //TODO 通过msp获取证书链身份
-        if (certificate.equals(null)) {
-            return null;
+        if (certificate==null) {
+          throw new MspException("certificate is null");
         }
-        return new OUIdentifier[0];
-    }
+        byte[] cid = this.msp.getCertChainIdentifier(this);
+        OUIdentifier[] res=null;
+        Map<String, String> subject = MspUtil.parseFromString(certificate.getSubject().toString());
+        OUIdentifier ouIdentifier=new OUIdentifier();
+        ouIdentifier.setOrganizationalUnitIdentifier(subject.get(MspConstant.ORGANIZATION_UNIT));
+        ouIdentifier.setCertifiersIdentifier(cid);
 
+        res= (OUIdentifier[]) ArrayUtils.add(res,ouIdentifier);
+        return res;
+    }
     @Override
     public void verify(byte[] msg, byte[] sig) throws VerifyException {
         boolean verify = false;
         try {
-            //TODO 后续根据具体的csp,构造具体的签名选项
             verify = msp.getCsp().verify(pk, sig, msg, new SM2SignerOpts());
-            if (verify == false) {
+            if (verify==false) {
                 throw new VerifyException("Veify the sign is fail");
             }
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             throw new VerifyException(e.getMessage());
         }
-
     }
 
     @Override
     public byte[] serialize() {
-
+        byte[] serializedIdentityBytes=null;
         Identities.SerializedIdentity.Builder serializedIdentity = Identities.SerializedIdentity.newBuilder();
         serializedIdentity.setMspid(this.identityIdentifier.getMspid());
         try {
             serializedIdentity.setIdBytes(ByteString.copyFrom(certificate.getEncoded()));
-            return serializedIdentity.build().toByteArray();
+            serializedIdentityBytes=serializedIdentity.build().toByteArray();
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return serializedIdentityBytes;
     }
 
     @Override
-    public void satisfiesPrincipal(MspPrincipal.MSPPrincipal principal) throws IOException, MspException {
+    public void satisfiesPrincipal(MspPrincipal.MSPPrincipal principal) throws MspException {
         msp.satisfiesPrincipal(this, principal);
     }
 

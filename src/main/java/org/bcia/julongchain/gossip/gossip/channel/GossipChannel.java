@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.gossip.gossip.channel;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.gossip.api.IJoinChannelMessage;
 import org.bcia.julongchain.gossip.api.ISubChannelSelectionCriteria;
 import org.bcia.julongchain.gossip.discovery.NetworkMember;
@@ -24,20 +24,27 @@ import org.bcia.julongchain.gossip.filter.IRoutingFilter;
 import org.bcia.julongchain.gossip.gossip.IReceivedMessage;
 import org.bcia.julongchain.gossip.gossip.SignedGossipMessage;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public class GossipChannel implements IGossipChannel {
 
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(GossipChannel.class);
+    private static final JulongChainLog log = JulongChainLogFactory.getLog(GossipChannel.class);
     private IAdapter adapter;
     private Boolean shouldGossipStateInfo;
 
 
     @Override
-    public NetworkMember[] getPeers() {
+    public NetworkMember[] getNodes() {
         return new NetworkMember[0];
     }
 
     @Override
-    public IRoutingFilter peerFilter(ISubChannelSelectionCriteria subChannelSelectionCriteria) {
+    public IRoutingFilter nodeFilter(ISubChannelSelectionCriteria subChannelSelectionCriteria) {
         return null;
     }
 

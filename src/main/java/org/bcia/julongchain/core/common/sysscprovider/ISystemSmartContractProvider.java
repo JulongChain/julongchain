@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,16 +15,14 @@
  */
 package org.bcia.julongchain.core.common.sysscprovider;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.groupconfig.config.IApplicationConfig;
 import org.bcia.julongchain.common.policies.IPolicyManager;
 import org.bcia.julongchain.core.ledger.IQueryExecutor;
 
 /**
- * SystemChaincodeProvider provides an abstraction layer that is
- * used for different packages to interact with code in the
- * system chaincode package without importing it; more methods
- * should be added below if necessary
+ * 系统智能合约
+ * 提供抽象的系统智能合约服务
  *
  * @author sunianle, sunzongyu
  * @date 3/13/18
@@ -32,50 +30,32 @@ import org.bcia.julongchain.core.ledger.IQueryExecutor;
  */
 public interface ISystemSmartContractProvider {
     /**
-     * IsSysCC returns true if the supplied chaincode is a system chaincode
-     * @param name
-     * @return
+	 * 判断智能合约是否为系统智能合约
      */
     boolean isSysSmartContract(String name);
 
     /**
-     * IsSysCCAndNotInvokableCC2CC returns true if the supplied chaincode
-     * is a system chaincode and is not invokable through a cc2cc invocation
+	 * 智能合约是否可以通过智能合约调用
      */
-    boolean isSysSCAndNotInvokableSC2SC(String name);
+    boolean isSysSCAndNotInvokeSC2SC(String name);
 
     /**
-     * IsSysCCAndNotInvokable returns true if the supplied chaincode
-     * is a system chaincode and is not invokable through a proposal
-     * @param name
-     * @return
+	 * 不能通过提案调用的系统智能合约　
      */
-    boolean isSysSCAndNotInvkeableExternal(String name);
+    boolean isSysSCAndNotInvokableExternal(String name);
 
     /**
-     * GetQueryExecutorForLedger returns a query executor for the
-     * ledger of the supplied channel.
-     * That's useful for system chaincodes that require unfettered
-     * access to the ledger
-     * @param groupID
-     * @return
-     * @throws JavaChainException
+	 * 获取账本查询器
      */
-    IQueryExecutor getQueryExecutorForLedger(String groupID) throws JavaChainException;
+    IQueryExecutor getQueryExecutorForLedger(String groupID) throws JulongChainException;
 
     /**
-     * GetApplicationConfig returns the configtxapplication.SharedConfig for the channel
-     * and whether the Application config exists
-     * @param groupId
-     * @return
+	 * 获取配置
      */
     IApplicationConfig getApplicationConfig(String groupId);
 
     /**
-     * Returns the policy getPolicyManager associated to the passed channel
-     * and whether the policy getPolicyManager exists
-     * @param groupID
-     * @return
+	 * 获取策略管理者
      */
     IPolicyManager policyManager(String groupID);
 }

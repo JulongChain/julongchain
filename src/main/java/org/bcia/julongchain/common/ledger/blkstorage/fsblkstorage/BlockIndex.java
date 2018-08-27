@@ -21,13 +21,14 @@ import org.bcia.julongchain.common.ledger.blkstorage.BlockStorage;
 import org.bcia.julongchain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.common.ledger.util.leveldbhelper.UpdateBatch;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.util.TxValidationFlags;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.TransactionPackage;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class BlockIndex implements Index {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockIndex.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BlockIndex.class);
 
     private Map<String, Boolean> indexItemsMap;
     private IDBProvider db;
@@ -57,7 +58,7 @@ public class BlockIndex implements Index {
 
     public BlockIndex(IndexConfig indexConfig, IDBProvider db, String id) {
         String[] indexItems = indexConfig.getAttrsToIndex();
-        logger.debug(String.format("newBlockIndex() - indexItems length: [%d]", indexItems.length));
+        log.debug(String.format("newBlockIndex() - indexItems length: [%d]", indexItems.length));
         Map<String, Boolean> indexItemMap = new HashMap<>();
         for(String indexItem : indexItems){
             indexItemMap.put(indexItem, true);
@@ -75,7 +76,7 @@ public class BlockIndex implements Index {
         byte[] blockNumBytes;
         blockNumBytes = db.get(constructIndexCheckpointKey());
         if (blockNumBytes == null){
-        	logger.info("Got null result");
+        	log.info("Got null result");
         	return -1;
         }
         return Util.bytesToLong(blockNumBytes, 0, blockNumBytes.length);
@@ -87,10 +88,10 @@ public class BlockIndex implements Index {
     @Override
     public void indexBlock(BlockIndexInfo blockIndexInfo) throws LedgerException {
         if(indexItemsMap.size() == 0){
-           logger.debug("No indexing block, as nothing to index");
+           log.debug("No indexing block, as nothing to index");
            return;
         }
-        logger.debug(String.format("Indexing block [%s]", blockIndexInfo));
+        log.debug(String.format("Indexing block [%s]", blockIndexInfo));
         FileLocPointer flp = blockIndexInfo.getFlp();
         List<TxIndexInfo> txOffsets = blockIndexInfo.getTxOffsets();
         TxValidationFlags txsfltr = new TxValidationFlags(blockIndexInfo.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER_VALUE).size());
@@ -111,7 +112,7 @@ public class BlockIndex implements Index {
         if(Boolean.TRUE.equals(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_ID))){
             for(TxIndexInfo txOffset : txOffsets){
                 FileLocPointer txFlp = new FileLocPointer(flp.getFileSuffixNum(), txOffset.getLoc());
-                logger.debug(String.format("Adding txLoc [%s] for txID: [%s] to index", txFlp, txOffset.getTxID()));
+                log.debug(String.format("Adding txLoc [%s] for txID: [%s] to index", txFlp, txOffset.getTxID()));
                 byte[] txFlpBytes = txFlp.marshal();
                 batch.put(constructTxIDKey(txOffset.getTxID()), txFlpBytes);
             }
@@ -122,7 +123,7 @@ public class BlockIndex implements Index {
             for(int i = 0; i < txOffsets.size(); i++){
                 TxIndexInfo txOffset = txOffsets.get(i);
                 FileLocPointer txFlp = new FileLocPointer(flp.getFileSuffixNum(), txOffset.getLoc());
-                logger.debug(String.format("Adding txLoc [%s] for tx num: [%d] ID: [%s] to blockNumTranNum index", txFlp, i, txOffset.getTxID()));
+                log.debug(String.format("Adding txLoc [%s] for tx num: [%d] ID: [%s] to blockNumTranNum index", txFlp, i, txOffset.getTxID()));
                 byte[] txFlpBytes = txFlp.marshal();
                 batch.put(constructBlockNumTranNumKey(blockIndexInfo.getBlockNum(), (long) i), txFlpBytes);
             }
@@ -139,7 +140,7 @@ public class BlockIndex implements Index {
         if(Boolean.TRUE.equals(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_VALIDATION_CODE))){
             for (int i = 0; i < txOffsets.size(); i++) {
                 TxIndexInfo txOffset = txOffsets.get(i);
-                batch.put(constructTxValidationCodeIDKey(txOffset.getTxID()), String.valueOf(txsfltr.flag(i).getNumber()).getBytes());
+                batch.put(constructTxValidationCodeIDKey(txOffset.getTxID()), String.valueOf(txsfltr.flag(i).getNumber()).getBytes(StandardCharsets.UTF_8));
             }
         }
 
@@ -153,12 +154,12 @@ public class BlockIndex implements Index {
     @Override
     public FileLocPointer getBlockLocByHash(byte[] blockHash) throws LedgerException{
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_HASH) == null){
-        	logger.error("Function getBlockLocByHash is not indexed");
+        	log.error("Function getBlockLocByHash is not indexed");
         	return null;
         }
         byte[] b = db.get(constructBlockHashKey(blockHash));
         if(b == null){
-        	logger.info("Get block loc by hash got null result");
+        	log.info("Get block loc by hash got null result");
         	return null;
         }
         FileLocPointer blkLoc = new FileLocPointer();
@@ -172,12 +173,12 @@ public class BlockIndex implements Index {
     @Override
     public FileLocPointer getBlockLocByBlockNum(long blockID) throws LedgerException {
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM) == null){
-	        logger.error("Function getBlockLocByBlockNum is not indexed");
+	        log.error("Function getBlockLocByBlockNum is not indexed");
 	        return null;
         }
         byte[] b = db.get(constructBlockNumKey(blockID));
         if(b == null){
-	        logger.info("Get block loc by block num got null result");
+	        log.info("Get block loc by block num got null result");
         	return null;
         }
         FileLocPointer blkLoc = new FileLocPointer();
@@ -191,12 +192,12 @@ public class BlockIndex implements Index {
     @Override
     public FileLocPointer getTxLoc(String txID) throws LedgerException {
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_ID) == null){
-	        logger.error("Function getTxLoc is not indexed");
+	        log.error("Function getTxLoc is not indexed");
 	        return null;
         }
         byte[] b = db.get(constructTxIDKey(txID));
         if(b == null){
-	        logger.info("Get tx loc got null result");
+	        log.info("Get tx loc got null result");
         	return null;
         }
         FileLocPointer txFLP = new FileLocPointer();
@@ -210,12 +211,12 @@ public class BlockIndex implements Index {
     @Override
     public FileLocPointer getBlockLocByTxID(String txID) throws LedgerException{
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_TX_ID) == null){
-	        logger.error("Function getBlockLocByTxID is not indexed");
+	        log.error("Function getBlockLocByTxID is not indexed");
 	        return null;
         }
         byte[] b = db.get(constructBlockTxIDKey(txID));
         if(b == null){
-	        logger.info("Get block loc by tx id got null result");
+	        log.info("Get block loc by tx id got null result");
         	return null;
         }
         FileLocPointer txFLP = new FileLocPointer();
@@ -229,12 +230,12 @@ public class BlockIndex implements Index {
     @Override
     public FileLocPointer getTXLocByBlockNumTranNum(long blockNum, long tranNum) throws LedgerException{
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM) == null){
-	        logger.error("Function getTXLocByBlockNumTranNum is not indexed");
+	        log.error("Function getTXLocByBlockNumTranNum is not indexed");
 	        return null;
         }
         byte[] b = db.get(constructBlockNumTranNumKey(blockNum, tranNum));
         if(b == null){
-	        logger.info("Get tx loc by block num tran num got null result");
+	        log.info("Get tx loc by block num tran num got null result");
         	return null;
         }
         FileLocPointer txFLP = new FileLocPointer();
@@ -248,15 +249,15 @@ public class BlockIndex implements Index {
     @Override
     public TransactionPackage.TxValidationCode getTxValidationCodeByTxID(String txID) throws LedgerException {
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_VALIDATION_CODE) == null){
-	        logger.error("Function getTxValidationCodeByTxID is not indexed");
+	        log.error("Function getTxValidationCodeByTxID is not indexed");
 	        return null;
         }
         byte[] raw = db.get(constructTxValidationCodeIDKey(txID));
         if(raw == null){
-	        logger.info("Get tx validationg code by tx id got null result");
+	        log.info("Get tx validationg code by tx id got null result");
         	return null;
         } else if (raw.length != 1){
-        	logger.error("Got wrong txValidationCode which length is 1");
+        	log.error("Got wrong txValidationCode which length is 1");
         	return null;
         }
         return TransactionPackage.TxValidationCode.forNumber(Integer.valueOf(new String(raw)));
@@ -265,36 +266,36 @@ public class BlockIndex implements Index {
     private byte[] constructBlockNumKey(long blockNum) {
         byte[] blkNumBytes = Util.longToBytes(blockNum, BlockFileManager.PEEK_BYTES_LEN);
         byte[] result = new byte[0];
-        result = ArrayUtils.addAll(result, BLOCK_NUM_IDX_KEY_PREFIX.getBytes());
+        result = ArrayUtils.addAll(result, BLOCK_NUM_IDX_KEY_PREFIX.getBytes(StandardCharsets.UTF_8));
         result = ArrayUtils.addAll(result, blkNumBytes);
         return result;
     }
 
     private byte[] constructBlockHashKey(byte[] blockHash) {
         byte[] result = new byte[0];
-        result = ArrayUtils.addAll(result, BLOCK_HASH_IDX_KEY_PREFIX.getBytes());
+        result = ArrayUtils.addAll(result, BLOCK_HASH_IDX_KEY_PREFIX.getBytes(StandardCharsets.UTF_8));
         result = ArrayUtils.addAll(result, blockHash);
         return result;
     }
 
     private byte[] constructTxIDKey(String txID) {
         byte[] result = new byte[0];
-        result = ArrayUtils.addAll(result, TX_ID_IDX_KEY_PREFIX.getBytes());
-        result = ArrayUtils.addAll(result, txID.getBytes());
+        result = ArrayUtils.addAll(result, TX_ID_IDX_KEY_PREFIX.getBytes(StandardCharsets.UTF_8));
+        result = ArrayUtils.addAll(result, txID.getBytes(StandardCharsets.UTF_8));
         return result;
     }
 
     private byte[] constructBlockTxIDKey(String txID) {
         byte[] result = new byte[0];
-        result = ArrayUtils.addAll(result, BLOCK_TX_ID_IDX_KEY_PREFIX.getBytes());
-        result = ArrayUtils.addAll(result, txID.getBytes());
+        result = ArrayUtils.addAll(result, BLOCK_TX_ID_IDX_KEY_PREFIX.getBytes(StandardCharsets.UTF_8));
+        result = ArrayUtils.addAll(result, txID.getBytes(StandardCharsets.UTF_8));
         return result;
     }
 
     private byte[] constructTxValidationCodeIDKey(String txID) {
         byte[] result = new byte[0];
-        result = ArrayUtils.addAll(result, TX_VALIDATION_RESULT_IDX_KEY_PREFIX.getBytes());
-        result = ArrayUtils.addAll(result, txID.getBytes());
+        result = ArrayUtils.addAll(result, TX_VALIDATION_RESULT_IDX_KEY_PREFIX.getBytes(StandardCharsets.UTF_8));
+        result = ArrayUtils.addAll(result, txID.getBytes(StandardCharsets.UTF_8));
         return result;
     }
 
@@ -302,7 +303,7 @@ public class BlockIndex implements Index {
         byte[] blkNumBytes = Util.longToBytes(blockNum, BlockFileManager.PEEK_BYTES_LEN);
         byte[] txNumBytes = Util.longToBytes(txNum, BlockFileManager.PEEK_BYTES_LEN);
         byte[] result = new byte[0];
-        result = ArrayUtils.addAll(result, BLOCK_NUM_TRAN_NUM_IDX_KEY_PREFIX.getBytes());
+        result = ArrayUtils.addAll(result, BLOCK_NUM_TRAN_NUM_IDX_KEY_PREFIX.getBytes(StandardCharsets.UTF_8));
         result = ArrayUtils.addAll(result, blkNumBytes);
         result = ArrayUtils.addAll(result, txNumBytes);
         return result;
@@ -310,7 +311,7 @@ public class BlockIndex implements Index {
 
     private byte[] constructIndexCheckpointKey(){
         byte[] result = new byte[0];
-        result = ArrayUtils.addAll(result, INDEX_CHECK_POINT_KEY_STR.getBytes());
+        result = ArrayUtils.addAll(result, INDEX_CHECK_POINT_KEY_STR.getBytes(StandardCharsets.UTF_8));
         return result;
     }
 

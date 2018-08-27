@@ -17,10 +17,8 @@ package org.bcia.julongchain.core.smartcontract.shim.impl;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Timestamp;
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.ledger.util.IoUtil;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.Utils;
 import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
@@ -32,9 +30,7 @@ import org.bcia.julongchain.core.smartcontract.shim.ledger.IKeyModification;
 import org.bcia.julongchain.core.smartcontract.shim.ledger.IKeyValue;
 import org.bcia.julongchain.core.smartcontract.shim.ledger.IQueryResultsIterator;
 import org.bcia.julongchain.protos.node.ProposalPackage;
-import org.bcia.julongchain.protos.node.SmartContractDataPackage;
 import org.bcia.julongchain.protos.node.SmartContractEventPackage;
-import scala.collection.concurrent.INode;
 
 import java.time.Instant;
 import java.util.*;
@@ -48,7 +44,7 @@ import java.util.stream.Collectors;
  * @company Dingxuan
  */
 public class MockStub implements ISmartContractStub {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(MockStub.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(MockStub.class);
     private List<ByteString> args;
     private String name;
     private ISmartContract smartContract;

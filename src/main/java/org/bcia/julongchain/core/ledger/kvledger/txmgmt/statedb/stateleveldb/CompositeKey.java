@@ -23,7 +23,6 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
  * @company Dingxuan
  */
 public class CompositeKey {
-
     private String namespace;
     private String key;
 

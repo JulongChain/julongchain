@@ -16,17 +16,17 @@
 package org.bcia.julongchain.gossip.gossip;
 
 import org.bcia.julongchain.common.exception.GossipException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.smartcontract.shim.helper.Channel;
 import org.bcia.julongchain.gossip.CertStore;
 import org.bcia.julongchain.gossip.api.IJoinChannelMessage;
-import org.bcia.julongchain.gossip.api.IPeerSuspector;
+import org.bcia.julongchain.gossip.api.INodeSuspector;
 import org.bcia.julongchain.gossip.api.ISecurityAdvisor;
 import org.bcia.julongchain.gossip.api.ISubChannelSelectionCriteria;
 import org.bcia.julongchain.gossip.comm.GroupDeMultiplexer;
 import org.bcia.julongchain.gossip.comm.IComm;
-import org.bcia.julongchain.gossip.comm.RemotePeer;
+import org.bcia.julongchain.gossip.comm.RemoteNode;
 import org.bcia.julongchain.gossip.common.IMessageAcceptor;
 import org.bcia.julongchain.gossip.discovery.Discovery;
 import org.bcia.julongchain.gossip.discovery.IEnvelopeFilter;
@@ -40,9 +40,16 @@ import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Map;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public class GossipServiceImpl implements  IGossip{
 
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(GossipServiceImpl.class);
+    private static final JulongChainLog log = JulongChainLogFactory.getLog(GossipServiceImpl.class);
 
     private byte[] selfIdentity;
     private Timestamp includeIdentityPeriod;
@@ -64,8 +71,8 @@ public class GossipServiceImpl implements  IGossip{
     public void validateStateInfoMsg(SignedGossipMessage msg) throws GossipException {
         IVerifier verifier = new IVerifier() {
             @Override
-            public void execute(byte[] peerIdentity, byte[] signature, byte[] message) throws GossipException {
-                byte[] pkiID = getIdMapper().getPKIidOfCert(peerIdentity);
+            public void execute(byte[] nodeIdentity, byte[] signature, byte[] message) throws GossipException {
+                byte[] pkiID = getIdMapper().getPKIidOfCert(nodeIdentity);
                 if (pkiID == null) {
                     throw new GossipException("PKI_ID not found in identity mapper");
                 }
@@ -76,7 +83,7 @@ public class GossipServiceImpl implements  IGossip{
         msg.verify(identity, verifier);
     }
 
-    public byte[] getOrgOfPeer(byte[] pkiID) {
+    public byte[] getOrgOfNode(byte[] pkiID) {
         byte[] cert = new byte[]{};
         try {
             cert = getIdMapper().get(pkiID);
@@ -84,13 +91,13 @@ public class GossipServiceImpl implements  IGossip{
             log.error(e.getMessage(), e);
             return null;
         }
-        return getSecAdvisor().orgByPeerIdentity(cert);
+        return getSecAdvisor().orgByNodeIdentity(cert);
     }
 
-    public Object[] disclosurePolicy(NetworkMember remotePeer) {
-        byte[] remotePeerOrg = getOrgOfPeer(remotePeer.getPKIid());
-        if (remotePeerOrg == null || remotePeerOrg.length == 0) {
-            log.warn("Cannot determine organization of " + remotePeer.toString());
+    public Object[] disclosurePolicy(NetworkMember remoteNode) {
+        byte[] remoteNodeOrg = getOrgOfNode(remoteNode.getPKIid());
+        if (remoteNodeOrg == null || remoteNodeOrg.length == 0) {
+            log.warn("Cannot determine organization of " + remoteNode.toString());
             ISieve iSieve = new ISieve() {
                 @Override
                 public Boolean execute(SignedGossipMessage message) {
@@ -111,25 +118,25 @@ public class GossipServiceImpl implements  IGossip{
                 if (GossipMessageHelper.isAliveMsg(msg.getGossipMessage())) {
                     log.error("Programming error, this should be used only on alive messages");
                 }
-                byte[] org = getOrgOfPeer(msg.getGossipMessage().getAliveMsg().getMembership().getPkiId().toByteArray());
+                byte[] org = getOrgOfNode(msg.getGossipMessage().getAliveMsg().getMembership().getPkiId().toByteArray());
                 if (org.length == 0) {
                     log.warn("Unable to determine org of message " + msg.getGossipMessage().toString());
                     return false;
                 }
-                boolean fromSameForeignOrg = Arrays.equals(remotePeerOrg, org);
+                boolean fromSameForeignOrg = Arrays.equals(remoteNodeOrg, org);
                 boolean fromMyOrg = Arrays.equals(getSelfOrg(), org);
                 if (!(fromSameForeignOrg || fromMyOrg)) {
                     return false;
                 }
-                return Arrays.equals(org, remotePeerOrg)
+                return Arrays.equals(org, remoteNodeOrg)
                         || msg.getGossipMessage().getAliveMsg().getMembership().getEndpoint() != ""
-                        && remotePeer.getEndpoint() != "";
+                        && remoteNode.getEndpoint() != "";
             }
         };
         IEnvelopeFilter iEnvelopeFilter = new IEnvelopeFilter() {
             @Override
             public Message.Envelope execute(SignedGossipMessage msg) {
-                if (!Arrays.equals(getSelfOrg(), remotePeerOrg)) {
+                if (!Arrays.equals(getSelfOrg(), remoteNodeOrg)) {
                     Message.SecretEnvelope secretEnvelope = Message.SecretEnvelope.newBuilder().build();
                     Message.Envelope newEnvelope = Message.Envelope.newBuilder().mergeFrom(msg.getEnvelope()).setSecretEnvelope(secretEnvelope).build();
                     msg.setEnvelope(newEnvelope);
@@ -141,10 +148,10 @@ public class GossipServiceImpl implements  IGossip{
         return new Object[]{iSieve, iEnvelopeFilter};
     }
 
-    public IRoutingFilter peersByOriginOrgPolicy(NetworkMember peer) {
-        byte[] peersOrg = getOrgOfPeer(peer.getPKIid());
-        if (peersOrg.length == 0) {
-            log.warn("Unable to determine organization of peer " + peer.toString());
+    public IRoutingFilter nodesByOriginOrgPolicy(NetworkMember node) {
+        byte[] nodesOrg = getOrgOfNode(node.getPKIid());
+        if (nodesOrg.length == 0) {
+            log.warn("Unable to determine organization of node " + node.toString());
             return new IRoutingFilter() {
                 @Override
                 public Boolean routingFilter(NetworkMember networkMember) {
@@ -152,7 +159,7 @@ public class GossipServiceImpl implements  IGossip{
                 }
             };
         }
-        if (Arrays.equals(getSelfOrg(), peersOrg)) {
+        if (Arrays.equals(getSelfOrg(), nodesOrg)) {
             return new IRoutingFilter() {
                 @Override
                 public Boolean routingFilter(NetworkMember networkMember) {
@@ -163,18 +170,18 @@ public class GossipServiceImpl implements  IGossip{
         return new IRoutingFilter() {
             @Override
             public Boolean routingFilter(NetworkMember member) {
-                byte[] memberOrg = getOrgOfPeer(member.getPKIid());
+                byte[] memberOrg = getOrgOfNode(member.getPKIid());
                 if (memberOrg.length == 0) {
                     return false;
                 }
                 boolean isFromMyOrg = Arrays.equals(getSelfOrg(), memberOrg);
-                return isFromMyOrg || Arrays.equals(memberOrg, peersOrg);
+                return isFromMyOrg || Arrays.equals(memberOrg, nodesOrg);
             }
         };
     }
 
     @Override
-    public void send(Message.GossipMessage msg, RemotePeer... peers) {
+    public void send(Message.GossipMessage msg, RemoteNode... nodes) {
 
     }
 
@@ -184,12 +191,12 @@ public class GossipServiceImpl implements  IGossip{
     }
 
     @Override
-    public NetworkMember[] peers() {
+    public NetworkMember[] nodes() {
         return new NetworkMember[0];
     }
 
     @Override
-    public NetworkMember[] peersOfChannel(byte[] groupID) {
+    public NetworkMember[] nodesOfChannel(byte[] groupID) {
         return new NetworkMember[0];
     }
 
@@ -209,7 +216,7 @@ public class GossipServiceImpl implements  IGossip{
     }
 
     @Override
-    public IRoutingFilter peerFilter(byte[] groupID, ISubChannelSelectionCriteria messagePredicate) {
+    public IRoutingFilter nodeFilter(byte[] groupID, ISubChannelSelectionCriteria messagePredicate) {
         return null;
     }
 
@@ -229,7 +236,7 @@ public class GossipServiceImpl implements  IGossip{
     }
 
     @Override
-    public void suspectPeers(IPeerSuspector peerSuspector) {
+    public void suspectNodes(INodeSuspector nodeSuspector) {
 
     }
 

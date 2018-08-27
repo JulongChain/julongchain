@@ -17,8 +17,8 @@ package org.bcia.julongchain.core.aclmgmt;
 
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.PolicyException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.policy.IPolicy;
 import org.bcia.julongchain.common.resourceconfig.IResourcesConfigBundle;
 import org.bcia.julongchain.common.resourceconfig.config.IApisConfig;
@@ -37,7 +37,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public class AclProvider implements IAclProvider {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(AclProvider.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(AclProvider.class);
 
     private IAclProvider defaultACLProvider;
 

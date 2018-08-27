@@ -15,8 +15,9 @@
  */
 package org.bcia.julongchain;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.consenter.Consenter;
 import org.bcia.julongchain.node.Node;
 
@@ -30,7 +31,7 @@ import java.util.Arrays;
  * @company Dingxuan （公司名称）
  */
 public class App {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(App.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(App.class);
 
     public static void main(String[] args) {
         //打印异常日志的正反样例
@@ -52,7 +53,7 @@ public class App {
         log.info("Args: " + Arrays.toString(args));
         //开始解析执行命令行
         try {
-            if (args.length > 0 && args[0].equals("consenter")) {
+            if (args.length > 0 && args[0].equals(CommConstant.ARG_CONSENTER)) {
                 Consenter consenter = new Consenter();
 
                 String[] cleanArgs = new String[args.length - 1];

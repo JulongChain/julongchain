@@ -21,8 +21,8 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.julongchain.common.ledger.blockledger.Util;
 import org.bcia.julongchain.common.ledger.blockledger.file.FileLedgerFactory;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfigFactory;
 import org.bcia.julongchain.core.ledger.BlockAndPvtData;
 import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
@@ -42,7 +42,7 @@ import java.util.Set;
  */
 public class GossipService extends GossipGrpc.GossipImplBase {
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(GossipService.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(GossipService.class);
 
     private static Set<StreamObserver<Message.Envelope>> responseObservers = new HashSet<StreamObserver<Message.Envelope>>();
 

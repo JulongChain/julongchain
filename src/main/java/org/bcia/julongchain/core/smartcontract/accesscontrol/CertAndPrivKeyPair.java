@@ -24,12 +24,12 @@ package org.bcia.julongchain.core.smartcontract.accesscontrol;
  */
 public class CertAndPrivKeyPair {
 
-    /** Cert - an x509 certificate encoded in base64
+    /** cert 交易者的证书信息 - 一种用base64编码的X.509数字证书
      *
      */
     private String cert;
 
-    /** Key  - a private key of the corresponding certificate
+    /** key 密钥  - 一个相应证书的私钥
      *
      */
     private String key;

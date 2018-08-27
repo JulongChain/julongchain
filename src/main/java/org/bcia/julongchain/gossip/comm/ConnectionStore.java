@@ -16,8 +16,8 @@
 package org.bcia.julongchain.gossip.comm;
 
 import org.bcia.julongchain.common.exception.GossipException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.gossip.gossip.ConnectionInfo;
 
 import java.util.HashMap;
@@ -26,13 +26,13 @@ import java.util.Map;
 /**
  * class description
  *
- * @author
+ * @author wanliangbing
  * @date 18-7-24
  * @company Dingxuan
  */
 public class ConnectionStore {
 
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(ConnectionInfo.class);
+    private static final JulongChainLog log = JulongChainLogFactory.getLog(ConnectionInfo.class);
     private Boolean isClosing;
     private IConnFactory connFactory;
     private Map<String, Connection> pki2Conn;
@@ -45,13 +45,13 @@ public class ConnectionStore {
         return connectionStore;
     }
 
-    public synchronized Connection getConnection(RemotePeer peer) throws GossipException {
+    public synchronized Connection getConnection(RemoteNode node) throws GossipException {
         if (isClosing) {
             log.error("Shutting down");
             return null;
         }
-        byte[] pkiID = peer.getPKIID();
-        String endpoint = peer.getEndpoint();
+        byte[] pkiID = node.getPKIID();
+        String endpoint = node.getEndpoint();
         Connection connection = pki2Conn.get(new String(pkiID));
         if (connection != null) {
             return connection;
@@ -74,7 +74,7 @@ public class ConnectionStore {
         return connection;
     }
 
-    public static JavaChainLog getLog() {
+    public static JulongChainLog getLog() {
         return log;
     }
 

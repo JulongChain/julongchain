@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author zhouhui
  * @date 2018/4/13
  * @company Dingxuan
+ * @deprecated
  */
 public class ServerStartCmdTest extends BaseJunit4Test {
     @Autowired

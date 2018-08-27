@@ -16,8 +16,8 @@
 package org.bcia.julongchain.consenter.common.msgprocessor;
 
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
@@ -26,7 +26,7 @@ import org.bcia.julongchain.protos.common.Common;
  * @company Dingxuan
  */
 public class EmptyRejectRule implements IRule {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(EmptyRejectRule.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(EmptyRejectRule.class);
     private IRule emptyRejectRule;
 
     public EmptyRejectRule() {

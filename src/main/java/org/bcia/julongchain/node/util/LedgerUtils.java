@@ -18,8 +18,8 @@ package org.bcia.julongchain.node.util;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.common.util.proto.BlockUtils;
 import org.bcia.julongchain.core.ledger.INodeLedger;
@@ -34,7 +34,7 @@ import org.bcia.julongchain.protos.common.Ledger;
  * @company Dingxuan
  */
 public class LedgerUtils {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(LedgerUtils.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(LedgerUtils.class);
 
     /**
      * 获取当前账本的最新配置区块

@@ -20,8 +20,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.configtx.util.ConfigMapUtils;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.IPolicyManager;
 import org.bcia.julongchain.common.policies.policy.IPolicy;
 import org.bcia.julongchain.common.protos.ConfigUpdateEnvelopeVO;
@@ -36,50 +36,82 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 /**
- * 对象
+ * 交易验证器
  *
  * @author zhouhui
  * @date 2018/4/24
  * @company Dingxuan
  */
 public class ConfigtxValidator implements IConfigtxValidator {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ConfigtxValidator.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ConfigtxValidator.class);
 
     private static final int MAX_LENGTH = 249;
     private static final String REGEX_GROUP_ID = "[a-zA-Z][a-zA-Z0-9.-]*";
     private static final String REGEX_CONFIG_ID = "[a-zA-Z0-9.-]+";
     private static final String[] ILLEGAL_PATHS = {".", ".."};
 
+    /**
+     * 当前的群组Id
+     */
     private String groupId;
+    /**
+     * 当前的序列号
+     */
     private long sequence;
+    /**
+     * 当前的配置
+     */
     private Configtx.Config config;
+    /**
+     * 方便比较的配置集合
+     */
     private Map<String, ConfigComparable> configComparableMap;
+    /**
+     * 命名空间
+     */
     private String namespace;
+    /**
+     * 策略管理器
+     */
     private IPolicyManager policyManager;
 
-    public ConfigtxValidator(String groupId, Configtx.Config config, String namespace, IPolicyManager policyManager) throws
-            ValidateException {
+    /**
+     * 构造函数
+     *
+     * @param groupId       群组Id
+     * @param config        配置对象
+     * @param namespace     群组还是资源
+     * @param policyManager 策略管理器
+     * @throws ValidateException
+     */
+    public ConfigtxValidator(String groupId, Configtx.Config config, String namespace, IPolicyManager policyManager)
+            throws ValidateException {
+        ValidateUtils.isNotNull(config, "Config can not be null");
+        ValidateUtils.isNotNull(config.getGroupTree(), "Config.tree can not be null");
+
+        validateGroupId(groupId);
+
         this.groupId = groupId;
         this.config = config;
         this.namespace = namespace;
         this.policyManager = policyManager;
-
-        ValidateUtils.isNotNull(config, "config can not be null");
-        ValidateUtils.isNotNull(config.getGroupTree(), "config.tree can not be null");
-
-        validateGroupId(groupId);
-
-        //TODO：待补充
+        this.sequence = config.getSequence();
         this.configComparableMap = ConfigMapUtils.mapConfig(config.getGroupTree(), namespace);
     }
 
+    /**
+     * 校验群组id
+     *
+     * @param groupId
+     * @throws ValidateException
+     */
     private void validateGroupId(String groupId) throws ValidateException {
         if (StringUtils.isBlank(groupId)) {
-            throw new ValidateException("groupId can not be null");
+            throw new ValidateException("GroupId can not be empty");
         }
 
         if (groupId.length() > MAX_LENGTH) {
-            throw new ValidateException("groupId cannot be longer than max length");
+            throw new ValidateException("GroupId can not be longer than max length");
         }
 
         if (!Pattern.matches(REGEX_GROUP_ID, groupId)) {
@@ -89,11 +121,11 @@ public class ConfigtxValidator implements IConfigtxValidator {
 
     private void validateConfigId(String path) throws ValidateException {
         if (StringUtils.isBlank(path)) {
-            throw new ValidateException("path can not be null");
+            throw new ValidateException("Path can not be empty");
         }
 
         if (path.length() > MAX_LENGTH) {
-            throw new ValidateException("path cannot be longer than max length");
+            throw new ValidateException("Path can not be longer than max length");
         }
 
         if (ArrayUtils.contains(ILLEGAL_PATHS, path)) {
@@ -107,10 +139,11 @@ public class ConfigtxValidator implements IConfigtxValidator {
 
     @Override
     public void validate(Configtx.ConfigEnvelope configEnv) throws ValidateException, InvalidProtocolBufferException {
-        ValidateUtils.isNotNull(configEnv, "configEnv can not be null");
-        ValidateUtils.isNotNull(configEnv.getConfig(), "configEnv.getConfig can not be null");
+        ValidateUtils.isNotNull(configEnv, "ConfigEnv can not be null");
+        ValidateUtils.isNotNull(configEnv.getConfig(), "ConfigEnv.getConfig can not be null");
+
         if (configEnv.getConfig().getSequence() != sequence + 1) {
-            throw new ValidateException("configEnv.getConfig.getSequence should be current sequence + 1");
+            throw new ValidateException("ConfigEnv.getConfig.getSequence should be current sequence + 1");
         }
 
         Configtx.ConfigUpdateEnvelope configUpdateEnvelope =
@@ -120,7 +153,7 @@ public class ConfigtxValidator implements IConfigtxValidator {
         Configtx.ConfigTree configTree = ConfigMapUtils.configMapToConfig(proposedFullConfig, namespace);
 
         if (!Arrays.equals(configTree.toByteArray(), configEnv.getConfig().getGroupTree().toByteArray())) {
-            throw new ValidateException("configEnv.getConfig.getGroupTree don't match");
+            throw new ValidateException("ConfigEnv.getConfig.getGroupTree don't match");
         }
     }
 
@@ -147,7 +180,7 @@ public class ConfigtxValidator implements IConfigtxValidator {
 
         Configtx.ConfigUpdate configUpdate = configUpdateEnvelopeVO.getConfigUpdate();
         if (groupId != null && !groupId.equals(configUpdate.getGroupId())) {
-            String errorMsg = "groupId is " + groupId + ", but configUpdate's group is " + configUpdate.getGroupId();
+            String errorMsg = "GroupId is '" + groupId + "', but configUpdate's group is: " + configUpdate.getGroupId();
             log.error(errorMsg);
             throw new ValidateException(errorMsg);
         }
@@ -199,7 +232,7 @@ public class ConfigtxValidator implements IConfigtxValidator {
                 }
 
                 if (value.getVersion() != existingConfig.getVersion() + 1) {
-                    throw new ValidateException("value.getVersion is " + value.getVersion() + ", but current is "
+                    throw new ValidateException("Value.getHeight is " + value.getVersion() + ", but current is "
                             + existingConfig.getVersion());
                 }
 
@@ -254,7 +287,7 @@ public class ConfigtxValidator implements IConfigtxValidator {
     }
 
     private void validateModPolicy(String modPolicy) throws ValidateException {
-        ValidateUtils.isNotBlank(modPolicy, "modPolicy can not be empty");
+        ValidateUtils.isNotBlank(modPolicy, "ModPolicy can not be empty");
 
         int startIndex = 0;
         if (modPolicy.startsWith(CommConstant.PATH_SEPARATOR)) {
@@ -296,12 +329,12 @@ public class ConfigtxValidator implements IConfigtxValidator {
             String key = entry.getKey();
 
             if (!this.configComparableMap.containsKey(key)) {
-                throw new ValidateException("key is not exists: " + key);
+                throw new ValidateException("Key is not exists: " + key);
             }
 
             ConfigComparable configComparable = this.configComparableMap.get(key);
             if (configComparable.getVersion() != entry.getValue().getVersion()) {
-                throw new ValidateException("version is not same: " + key);
+                throw new ValidateException("Version is not same: " + key);
             }
         }
     }

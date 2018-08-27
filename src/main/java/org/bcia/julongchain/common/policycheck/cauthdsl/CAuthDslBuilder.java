@@ -18,8 +18,8 @@ package org.bcia.julongchain.common.policycheck.cauthdsl;
 
 import com.google.protobuf.ByteString;
 import org.bcia.julongchain.common.exception.PolicyException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.proto.ProtoUtils;
 import org.bcia.julongchain.protos.common.MspPrincipal;
 import org.bcia.julongchain.protos.common.Policies;
@@ -34,16 +34,13 @@ import java.util.Arrays;
  * @company Aisino
  */
 public class CAuthDslBuilder {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CAuthDslBuilder.class);
-    // AcceptAllPolicy always evaluates to true
+    private static JulongChainLog log = JulongChainLogFactory.getLog(CAuthDslBuilder.class);
     //AcceptAllPolicy总是评估为true
     private Policies.SignaturePolicyEnvelope acceptAllPolicy;
-    // MarshaledAcceptAllPolicy is the Marshaled version of AcceptAllPolicy.
     // arshaledAcceptAllPolicy是AcceptAllPolicy的Marshaled版本
     private byte[] marshaledAcceptAllPolicy;
     // RejectAllPolicy always evaluates to false
     private Policies.SignaturePolicyEnvelope rejectAllPolicy;
-    // MarshaledRejectAllPolicy is the Marshaled version of RejectAllPolicy
     // RejectAllPolicy总是评估为false
     private byte[] marshaledRejectAllPolicy;
 
@@ -58,7 +55,6 @@ public class CAuthDslBuilder {
         }catch (Exception e){
             log.error("Error marshaling trueEnvelope");
             throw new PolicyException(e);
-            //或者throw new PolicyException(e.getMessage());
         }
         try {
             rejectAllPolicy = CAuthDslBuilder.envelope(nOutOf(1,signaturePolicy),b);
@@ -70,7 +66,6 @@ public class CAuthDslBuilder {
 
 
     }
-    // Envelope builds an envelope message embedding a SignaturePolicy
     // 信封生成嵌入SignaturePolicy的信封消息
     public static Policies.SignaturePolicyEnvelope envelope(Policies.SignaturePolicy policy,byte[][] identities){
         MspPrincipal.MSPPrincipal[] ids = new MspPrincipal.MSPPrincipal[identities.length];
@@ -89,7 +84,6 @@ public class CAuthDslBuilder {
     }
 
     /**
-     *  SignedBy creates a SignaturePolicy requiring a given signer's signature
         SignedBy创建一个需要给定签名者签名的SignaturePolicy
      * @param index
      * @return
@@ -188,9 +182,6 @@ public class CAuthDslBuilder {
 
     /**
      *
-      SignedByAnyMember returns a policy that requires one valid
-      signature from a member of any of the orgs whose ids are
-      listed in the supplied string array
       SignedByAnyMember返回一个需要一个有效的策略
      从任何id的组织的成员签名
      列在提供的字符串数组中
@@ -202,9 +193,7 @@ public class CAuthDslBuilder {
     }
 
     /**
-     * SignedByAnyAdmin returns a policy that requires one valid
-       signature from a admin of any of the orgs whose ids are
-      listed in the supplied string array
+     *
       SignedByAnyAdmin返回一个需要一个有效的策略
      从任何id的组织的管理员签名
      列在提供的字符串数组中
@@ -216,7 +205,6 @@ public class CAuthDslBuilder {
     }
 
     /**
-     * And is a convenience method which utilizes NOutOf to produce And equivalent behavior
      是一种利用NOutOf生成等价行为的方便方法
      * @param lhs
      * @param rhs
@@ -228,7 +216,6 @@ public class CAuthDslBuilder {
     }
 
     /**
-     *  Or is a convenience method which utilizes NOutOf to produce Or equivalent behavior
       or是一种利用NOutOf产生或等同行为的便利方法
      * @param lhs
      * @param rhs
@@ -240,7 +227,6 @@ public class CAuthDslBuilder {
     }
 
     /**
-     *  NOutOf creates a policy which requires N out of the slice of policies to evaluate to true
       NOutOf创建一个策略，要求N从策略切片中评估为true
      * @param n
      * @param policies

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * versiondb 更新包
+ * versiondb 批量更新
  *
  * @author sunzongyu
  * @date 2018/4/9
@@ -45,7 +45,7 @@ public class UpdateBatch {
 
     public void put(String ns, String key, byte[] value, LedgerHeight version) throws LedgerException {
         if(value == null){
-            throw new LedgerException("Null value not allow");
+            throw new LedgerException("Null value not allowed");
         }
         VersionedValue vv = new VersionedValue(version, value);
         update(ns, key, vv);

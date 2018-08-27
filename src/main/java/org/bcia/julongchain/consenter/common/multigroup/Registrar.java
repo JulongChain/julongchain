@@ -30,18 +30,15 @@ import org.bcia.julongchain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.julongchain.common.ledger.blockledger.Util;
 import org.bcia.julongchain.common.ledger.blockledger.file.FileLedgerIterator;
 import org.bcia.julongchain.common.localmsp.ILocalSigner;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.common.broadcast.IGroupSupportRegistrar;
 import org.bcia.julongchain.consenter.common.msgprocessor.DefaultTemplator;
 import org.bcia.julongchain.consenter.common.msgprocessor.IChainCreator;
 import org.bcia.julongchain.consenter.common.msgprocessor.IGroupConfigTemplator;
 import org.bcia.julongchain.consenter.common.msgprocessor.SystemGroup;
 import org.bcia.julongchain.consenter.consensus.IConsensusPlugin;
-import org.bcia.julongchain.consenter.util.BlockHelper;
-import org.bcia.julongchain.consenter.util.BlockUtils;
-import org.bcia.julongchain.consenter.util.CommonUtils;
-import org.bcia.julongchain.consenter.util.ConfigTxUtil;
+import org.bcia.julongchain.consenter.util.*;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
@@ -58,7 +55,7 @@ import static org.bcia.julongchain.consenter.common.msgprocessor.SystemGroup.new
  * @company Dingxuan
  */
 public class Registrar implements IChainCreator, IGroupSupportRegistrar, ISupportManager {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Registrar.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Registrar.class);
     private Map<String, ChainSupport> chains = new ConcurrentHashMap<>();
 
     private Map<String, IConsensusPlugin> consenters;
@@ -93,7 +90,7 @@ public class Registrar implements IChainCreator, IGroupSupportRegistrar, ISuppor
             throw new ConsenterException("config does not contain consenter config");
         }
         if (!consenterConfig.getCapabilities().isSupported()) {
-            throw new ConsenterException("config requires unsupported channel capabilities");
+            throw new ConsenterException("config requires unsupported group capabilities");
         }
     }
 
@@ -147,7 +144,7 @@ public class Registrar implements IChainCreator, IGroupSupportRegistrar, ISuppor
             if (ledgerResources.getMutableResources().getGroupConfig().getConsortiumsConfig() != null) {
                 ChainSupport chain = new ChainSupport(this, ledgerResources, consenters, signer);
                 this.templator = new DefaultTemplator(chain.getLedgerResources().getMutableResources());
-                chain.setProcessor(newSystemGroup(chain, templator, SystemGroup.createSystemChannelFilters(this, chain.getLedgerResources().getMutableResources())));
+                chain.setProcessor(newSystemGroup(chain, templator, SystemGroup.createSystemGroupFilters(this, chain.getLedgerResources().getMutableResources())));
                 //组装seekPosition
                 Ab.SeekPosition.Builder seekPosition = Ab.SeekPosition.newBuilder();
                 Ab.SeekOldest.Builder seekOldest = Ab.SeekOldest.newBuilder();
@@ -158,17 +155,18 @@ public class Registrar implements IChainCreator, IGroupSupportRegistrar, ISuppor
                 //iter.close();
                 FileLedgerIterator fileLedgerIterator = (FileLedgerIterator) iter;
                 if (fileLedgerIterator.getBlockNum() != 0) {
-                    log.error(String.format("Error iterating over system channel: '%s', expected position 0, got %d", groupId, fileLedgerIterator.getBlockNum()));
+                    log.error(String.format("Error iterating over system group: '%s', expected position 0, got %d", groupId, fileLedgerIterator.getBlockNum()));
                 }
                 QueryResult queryResult = iter.next();
                 iter.close();
                 Map.Entry<QueryResult, Common.Status> genesisBlock = (Map.Entry<QueryResult, Common.Status>) queryResult.getObj();
-                genesisBlock.getValue();
+
+
                 Common.Block block = (Common.Block) genesisBlock.getKey().getObj();
                 if (genesisBlock.getValue() != Common.Status.SUCCESS) {
-                    log.error(String.format("Error reading genesis block of system channel '%s'", groupId));
+                    log.error(String.format("Error reading genesis block of system group '%s'", groupId));
                 }
-                log.info(String.format("Starting system channel '%s' with genesis block hash %s and consenter type %s", groupId, Hex.toHexString(BlockHelper.hash(block.getHeader().toByteArray())), chain.getLedgerResources().getMutableResources().getGroupConfig().getConsenterConfig().getConsensusType()));
+                log.info(String.format("Starting system group '%s' with genesis block hash %s and consenter type %s", groupId, Hex.toHexString(BlockHelper.hash(block.getHeader().toByteArray())), chain.getLedgerResources().getMutableResources().getGroupConfig().getConsenterConfig().getConsensusType()));
                 chains.put(groupId, chain);
                 systemGroupID = groupId;
                 systemGroup = chain;
@@ -180,7 +178,7 @@ public class Registrar implements IChainCreator, IGroupSupportRegistrar, ISuppor
                 chain.start();
             }
             if (systemGroupID == "") {
-                log.error("No system chain found.  If bootstrapping, does your system channel contain a consortiums group definition?");
+                log.error("No system chain found.  If bootstrapping, does your system group contain a consortiums group definition?");
             }
         }
         return new Registrar(chains, consenters, signer, ledgerFactory, systemGroup);
@@ -190,35 +188,30 @@ public class Registrar implements IChainCreator, IGroupSupportRegistrar, ISuppor
         return new GroupConfigBundle(groupId, config);
     }
 
-
     public void update(GroupConfigBundle groupConfigBundle) throws ConsenterException {
         checkResourcesOrPanic(groupConfigBundle);
         //TODO update实现 bundlesource
         ledgerResources.getMutableResources().update();
     }
-
-
-    public String getSystemGroupID() {
-        return systemGroupID;
-    }
-
+    @Override
     public Map<String, Object> broadcastGroupSupport(Common.Envelope msg) throws InvalidProtocolBufferException {
-        Common.GroupHeader chdr = CommonUtils.groupHeader(msg);
-        ChainSupport cs = chains.get(chdr.getGroupId());
-        if (cs == null) {
-            cs = systemGroup;
+        Common.GroupHeader groupHeader = CommonUtils.groupHeader(msg);
+        ChainSupport chainSupport = chains.get(groupHeader.getGroupId());
+        if (chainSupport == null) {
+            chainSupport = systemGroup;
         }
         boolean isConfig = false;
-        if (chdr.getType() == Common.HeaderType.CONFIG_UPDATE_VALUE) {
+        if (groupHeader.getType() == Common.HeaderType.CONFIG_UPDATE_VALUE) {
             isConfig = true;
         }
         Map<String, Object> map = new HashMap<>();
-        map.put("isConfig", isConfig);
-        map.put("chdr", chdr);
-        map.put("cs", cs);
+        map.put(ConsenterConstants.ISCONFIG, isConfig);
+        map.put(ConsenterConstants.GROUPHEADER, groupHeader);
+        map.put(ConsenterConstants.CHAINSUPPORT, chainSupport);
         return map;
     }
 
+    @Override
     public ChainSupport getChain(String chainId) {
         ChainSupport cs = chains.get(chainId);
         return cs;

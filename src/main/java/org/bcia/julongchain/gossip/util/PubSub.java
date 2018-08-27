@@ -21,10 +21,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * PubSub defines a struct that one can use to:
- * - publish items to a topic to multiple subscribers
- * - and subscribe to items from a topic
- * The subscriptions have a TTL and are cleaned when it passes.
+ * PubSub 定义结构:
+ * - 向多个订阅用户发表主题
+ * - 订阅主题
+ * 订阅拥有TTL，通过后会被清除
  * @author wanliangbing
  * @date 18-7-24
  * @company Dingxuan
@@ -32,7 +32,7 @@ import java.util.Set;
 public class PubSub {
 
     /**
-     * a map from topic to Set of subscriptions
+     * 从主题到订阅集合的表
      */
     private Map<String, Set<Object>> subscriptions;
 

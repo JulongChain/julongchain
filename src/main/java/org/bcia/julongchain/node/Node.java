@@ -26,8 +26,8 @@ import org.bcia.julongchain.common.groupconfig.config.IApplicationConfig;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.common.ledger.blockledger.IFileLedgerBlockStore;
 import org.bcia.julongchain.common.ledger.blockledger.file.FileLedger;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.resourceconfig.IResourcesConfigBundle;
 import org.bcia.julongchain.common.resourceconfig.ResourcesConfigBundle;
 import org.bcia.julongchain.common.util.proto.BlockUtils;
@@ -66,7 +66,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @company Dingxuan
  */
 public class Node {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Node.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Node.class);
 
     /**
      * 群组回调接口

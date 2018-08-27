@@ -18,8 +18,8 @@ package org.bcia.julongchain.common.policycheck.policies;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.PolicyException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.IPolicyProvider;
 import org.bcia.julongchain.common.policies.policy.IPolicy;
 import org.bcia.julongchain.common.policycheck.cauthdsl.CAuthDsl;
@@ -29,19 +29,24 @@ import org.bcia.julongchain.protos.common.Policies;
 
 /**
  * 类描述
- *
+ * 策略提供者
  * @author yuanjun
  * @date 02/05/18
  * @company Aisino
  */
 public class PolicyProvider implements IPolicyProvider{
-    private static JavaChainLog log = JavaChainLogFactory.getLog(PolicyProvider.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(PolicyProvider.class);
     private IIdentityDeserializer deserializer;
     public PolicyProvider(IIdentityDeserializer deserializer) {
         this.deserializer = deserializer;
     }
 
-
+    /**
+     *  根据传入的字节数组生成策略对象
+     * @param data
+     * @return
+     * @throws PolicyException
+     */
     @Override
     public IPolicy makePolicy(byte[] data) throws PolicyException {
 
@@ -49,7 +54,7 @@ public class PolicyProvider implements IPolicyProvider{
         try {
             signaturePolicyEnvelope = Policies.SignaturePolicyEnvelope.parseFrom(data);
         } catch (InvalidProtocolBufferException e) {
-            log.error("Error unmarshaling to SignaturePolicy");
+            log.error("Unmarshaling the SignaturePolicy is an error");
             throw new PolicyException(e);
         }
         if(signaturePolicyEnvelope.getVersion() != 0){

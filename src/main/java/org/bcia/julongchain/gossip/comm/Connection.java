@@ -17,8 +17,8 @@ package org.bcia.julongchain.gossip.comm;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.bcia.julongchain.common.exception.GossipException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.smartcontract.shim.helper.Channel;
 import org.bcia.julongchain.gossip.gossip.ConnectionInfo;
 import org.bcia.julongchain.gossip.gossip.SignedGossipMessage;
@@ -27,13 +27,13 @@ import org.bcia.julongchain.gossip.util.MiscUtil;
 /**
  * class description
  *
- * @author
+ * @author wanliangbing
  * @date 18-7-24
  * @company Dingxuan
  */
 public class Connection {
 
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(Connection.class);
+    private static final JulongChainLog log = JulongChainLogFactory.getLog(Connection.class);
     private ConnectionInfo info;
     private Channel<MsgSending> outBuff;
     private byte[] pkiID;
@@ -57,7 +57,7 @@ public class Connection {
         MsgSending msgSending = new MsgSending();
         msgSending.setEnvelope(msg.getEnvelope());
         Channel<MsgSending> outBuff = this.getOutBuff();
-        Integer sendBuffSize = MiscUtil.getIntOrDefault("peer.gossip.sendBuffSize", CommImpl.defSendBuffSize);
+        Integer sendBuffSize = MiscUtil.getIntOrDefault("node.gossip.sendBuffSize", CommImpl.defSendBuffSize);
         if (outBuff.stream().count() == sendBuffSize.longValue()) {
             log.debug("Buffer to " + getInfo().getEndpoint().toString() + " overflowed, drooping message", msg.toString() );
             if (!shouldBlock) {
@@ -75,7 +75,7 @@ public class Connection {
 
     }
 
-    public static JavaChainLog getLog() {
+    public static JulongChainLog getLog() {
         return log;
     }
 

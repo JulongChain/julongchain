@@ -23,7 +23,9 @@ import org.bcia.julongchain.protos.common.Common;
  * @company Dingxuan
  */
 public interface IHelper {
-    // GenesisBlock should return the genesis block required to bootstrap
-    // the ledger (be it reading from the filesystem, generating it, etc.)
+    /**
+     * 获取创世区块
+     * @return
+     */
     Common.Block getGenesisBlock();
 }

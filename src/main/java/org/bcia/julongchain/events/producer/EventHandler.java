@@ -16,17 +16,17 @@
 package org.bcia.julongchain.events.producer;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.exception.VerifyException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.Expiration;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.msp.IIdentity;
 import org.bcia.julongchain.msp.IMsp;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.protos.node.EventsPackage;
-import org.bouncycastle.asn1.x509.Time;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -43,7 +43,7 @@ import static org.bcia.julongchain.common.util.CommConstant.PATH_SEPARATOR;
  * @company Dingxuan
  */
 public class EventHandler implements IEventHandler {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(EventHandler.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(EventHandler.class);
 
     private Map<String, EventsPackage.Interest> interestedEvents;
     private Date sessionEndDate;
@@ -165,7 +165,12 @@ public class EventHandler implements IEventHandler {
         IMsp localMsp = GlobalMspManagement.getLocalMsp();
         //TODO
 
-        IIdentity eventIdentity = localMsp.deserializeIdentity(creator);
+        IIdentity eventIdentity = null;
+        try {
+            eventIdentity = localMsp.deserializeIdentity(creator);
+        } catch (MspException e) {
+            e.printStackTrace();
+        }
 
 //        eventIdentity.satisfiesPrincipal();
 

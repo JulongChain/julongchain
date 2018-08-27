@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,8 +19,8 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.util.Util;
 
 import java.util.*;
@@ -35,9 +35,10 @@ import static org.bcia.julongchain.protos.common.Common.*;
  * @company Dingxuan
  */
 public class BlockSerialization {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockSerialization.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BlockSerialization.class);
+	private static final int LENGTH_VARIATION_MARK = 7;
 
-    private BlockHeader blockHeader;
+	private BlockHeader blockHeader;
     public List<TxIndexInfo> txOffsets = new ArrayList<>();
     private BlockMetadata metadata;
 
@@ -98,8 +99,13 @@ public class BlockSerialization {
         //序列化后首部为1位标识位 + headerLen
         //序列化后尾部为1位表示位 + dataLen
         //headerLen、dataLen为每7位2进制位长度+1
-							//区块头部长度			//区块头部标志位长度							//区块尾部标志位长度
-        long headerLen = 	headerSerializedLen + 	1 + computeLength(headerSerializedLen) + 	1 + computeLength(dataSerializedLen);
+        long headerLen =
+		//		区块头部长度
+				headerSerializedLen +
+		//		区块头部标志位长度
+				1 + computeLength(headerSerializedLen) +
+		//		区块尾部标志位长度
+				1 + computeLength(dataSerializedLen);
         //头部结束后为Data起始位置
 		//当前位置为blockData的开始位置
         long offset = headerLen + blockPosition;
@@ -110,27 +116,27 @@ public class BlockSerialization {
             Envelope txEnvelope;
             Payload txPayload;
             GroupHeader gh = null;
-            long txEvnelopeLength;
+            long txEnvelopeLength;
             //解析并获取TxID
             try {
                 txEnvelope = Envelope.parseFrom(txEnvelopeBytes);
                 txPayload = Payload.parseFrom(txEnvelope.getPayload());
                 gh = GroupHeader.parseFrom(txPayload.getHeader().getGroupHeader());
-                txEvnelopeLength = txEnvelope.getSerializedSize();
+                txEnvelopeLength = txEnvelope.getSerializedSize();
             } catch (InvalidProtocolBufferException e) {
-                logger.error("Got error when resolve object from byteString");
+                log.error("Got error when resolve object from byteString");
                 return null;
             }
             //跳过blockData标志位
-            offset += (1 + computeLength(txEvnelopeLength));
+            offset += (1 + computeLength(txEnvelopeLength));
             //构造locpointer对象, 保存Envelope位置信息
             //offset        Envelope起始位置
             //bytesLength   Envelope长度, 应包含头部长度
-            LocPointer locPointer = new LocPointer(offset, txEvnelopeLength);
+            LocPointer locPointer = new LocPointer(offset, txEnvelopeLength);
             //构造txIndexInfo对象
             txOffsets.add(new TxIndexInfo(gh.getTxId(), locPointer));
             //Envelope起始位置相应移动
-            offset += txEvnelopeLength;
+            offset += txEnvelopeLength;
         }
 
         return txOffsets;
@@ -139,14 +145,14 @@ public class BlockSerialization {
     /**
      * 用于计算protobuf对象序列化后长度位长度
      * protobuf对象序列化后，byte[]长度增加128倍，长度位长度增加1
-     * 既    0~127          1
+     * 即    0~127          1
      *      128~16383       2
      *      16384~2097152   3
      *      ...
      */
     private static int computeLength(long i){
         int result = 0;
-        while ((i >>= 7) > 0){
+        while ((i >>= LENGTH_VARIATION_MARK) > 0){
             result++;
         }
         return ++result;

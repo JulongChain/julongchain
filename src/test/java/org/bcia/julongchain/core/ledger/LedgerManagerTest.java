@@ -36,6 +36,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.lang.reflect.Array;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -168,8 +169,8 @@ public class LedgerManagerTest {
     private TxSimulationResults constructTxSimulationResults(String groupID, String key, String value) throws Exception{
 
         ITxSimulator simulator = l.newTxSimulator("txid");
-        simulator.setState(groupID, key, ("pub " + value).getBytes());
-        simulator.setPrivateData(groupID, "coll", key, ("pvt " + value).getBytes());
+        simulator.setState(groupID, key, ("pub " + value).getBytes(StandardCharsets.UTF_8));
+        simulator.setPrivateData(groupID, "coll", key, ("pvt " + value).getBytes(StandardCharsets.UTF_8));
         return simulator.getTxSimulationResults();
     }
 
@@ -262,7 +263,8 @@ public class LedgerManagerTest {
                 .setSignature(ByteString.copyFromUtf8("Envelope Signature"))
                 .build();
 
-        return envelope;
+
+		return envelope;
     }
 
     @Test

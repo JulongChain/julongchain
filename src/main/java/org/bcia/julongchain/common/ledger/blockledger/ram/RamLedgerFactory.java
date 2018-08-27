@@ -18,8 +18,8 @@ package org.bcia.julongchain.common.ledger.blockledger.ram;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.blockledger.IFactory;
 import org.bcia.julongchain.common.ledger.blockledger.ReadWriteBase;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class RamLedgerFactory implements IFactory {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(RamLedgerFactory.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(RamLedgerFactory.class);
 
     private int maxSize;
     private static Map<String, ReadWriteBase> ledgers;
@@ -49,15 +49,15 @@ public class RamLedgerFactory implements IFactory {
 
     @Override
     public synchronized ReadWriteBase getOrCreate(String groupID) throws LedgerException {
-        logger.debug("Starting create ledger using group id " + groupID);
+        log.debug("Starting create ledger using group id " + groupID);
         ReadWriteBase l = ledgers.get(groupID);
         if(l != null){
-            logger.debug("Group " + groupID + " is already exists");
+            log.debug("Group " + groupID + " is already exists");
             return l;
         }
         l = newGroup(maxSize);
         ledgers.put(groupID, l);
-        logger.debug("Finished create ledger");
+        log.debug("Finished create ledger");
         return l;
     }
 
@@ -69,7 +69,7 @@ public class RamLedgerFactory implements IFactory {
                 .build();
         RamLedger rl = new RamLedger(maxSize, 1, new SimpleList(null, preGenesis), null);
         rl.setNewest(rl.getOldest());
-        logger.debug("Creating new group, pre genesis block num is " + preGenesis.getHeader().getNumber());
+        log.debug("Creating new group, pre genesis block num is " + preGenesis.getHeader().getNumber());
         return rl;
     }
 

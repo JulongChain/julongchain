@@ -5,7 +5,6 @@ import org.bcia.julongchain.common.ledger.blkstorage.IBlockStore;
 import org.bcia.julongchain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage.Config;
 import org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage.FsBlockStoreProvider;
-import org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage.FsBlockStoreTest;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 import org.junit.Assert;
@@ -52,7 +51,7 @@ public class HistoryLevelDBTest {
 
 	@Test
 	public void commit() throws Exception{
-		db.commit(FsBlockStoreTest.constructBlock(null));
+//		db.commit(FsBlockStoreTest.constructBlock(null));
 	}
 
 	@Test

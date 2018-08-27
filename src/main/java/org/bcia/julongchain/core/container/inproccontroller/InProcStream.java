@@ -16,8 +16,8 @@
 package org.bcia.julongchain.core.container.inproccontroller;
 
 import org.bcia.julongchain.common.exception.InprocVMException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.container.scintf.ISmartContractStream;
 import org.bcia.julongchain.core.smartcontract.shim.SmartContractBase;
 import org.bcia.julongchain.core.smartcontract.shim.helper.Channel;
@@ -36,7 +36,7 @@ import java.io.InputStream;
  * @company Dingxuan
  */
 public class InProcStream extends ChatStream implements ISmartContractStream {
-	private static final JavaChainLog log = JavaChainLogFactory.getLog(InputStream.class);
+	private static JulongChainLog log = JulongChainLogFactory.getLog(InputStream.class);
 
 	private Channel<SmartContractShim.SmartContractMessage> recv;
 	private Channel<SmartContractShim.SmartContractMessage> send;

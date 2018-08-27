@@ -19,7 +19,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 /**
- * CDSData is data stored in the LSCC on instantiation of a CC
+ * CDSData is data stored in the LSSC on instantiation of a SC
  * for CDSPackage.  This needs to be serialized for ChaincodeData
  * hence the protobuf format
  *

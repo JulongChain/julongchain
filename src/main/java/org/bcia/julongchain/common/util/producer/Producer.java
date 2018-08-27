@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.common.util.producer;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -29,7 +29,7 @@ import java.util.concurrent.TimeUnit;
  * @company Dingxuan
  */
 public class Producer<T> {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Producer.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Producer.class);
     /**
      * 生产一个产品的超时时间
      */

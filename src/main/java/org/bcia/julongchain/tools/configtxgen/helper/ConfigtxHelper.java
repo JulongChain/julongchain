@@ -19,8 +19,8 @@ import com.alibaba.fastjson.JSON;
 import org.bcia.julongchain.common.exception.ConfigtxToolsException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.genesis.GenesisBlockFactory;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.FileUtils;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
@@ -43,7 +43,7 @@ import java.io.IOException;
  * @company Dingxuan
  */
 public class ConfigtxHelper {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ConfigtxHelper.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ConfigtxHelper.class);
 
     public static void doOutputBlock(GenesisConfig.Profile profile, String groupId, String outputBlock)
             throws ValidateException, ConfigtxToolsException {

@@ -17,12 +17,11 @@ package org.bcia.julongchain.core.common.smartcontractprovider;
 
 import com.google.protobuf.ByteString;
 import org.apache.commons.lang3.StringUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.SmartContractException;
 import org.bcia.julongchain.common.exception.SysSmartContractException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.core.node.NodeConfig;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.Query;
@@ -41,7 +40,7 @@ import java.io.*;
  * @company Dingxuan
  */
 public class SmartContractProvider {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SmartContractProvider.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SmartContractProvider.class);
 
     public static String smartContractInstallPath = NodeConfigFactory.getNodeConfig().getNode().getFileSystemPath();
 
@@ -51,7 +50,6 @@ public class SmartContractProvider {
      * @return
      */
     public static String getSmartContractPath(String path){
-        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
         File file = new File(path);
         //不存在则创建mkdir
         if(!file.exists()){
@@ -72,8 +70,7 @@ public class SmartContractProvider {
      * @param scVersion SmartContract version
      * @return 文件系统中存储的SmartContract
      */
-    public static byte[] getSmartContractPackage(String scName, String scVersion) throws JavaChainException{
-        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
+    public static byte[] getSmartContractPackage(String scName, String scVersion) throws JulongChainException {
         //获取文件路径
         String path = String.format("%s/%s.%s", smartContractInstallPath, scName, scVersion);
         InputStream is = null;
@@ -82,14 +79,14 @@ public class SmartContractProvider {
             is = new FileInputStream(path);
         } catch (FileNotFoundException e) {
             log.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         }
         byte[] scBytes = new byte[(int) file.length()];
         try {
             is.read(scBytes);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         }
         return scBytes;
     }
@@ -99,10 +96,9 @@ public class SmartContractProvider {
      * @param scName SmartContract name
      * @param scVersion SmartContract version
      * @return 智能合约存在性
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public static boolean smartContractPackageExists(String scName, String scVersion) throws JavaChainException{
-        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
+    public static boolean smartContractPackageExists(String scName, String scVersion) throws JulongChainException {
         String path = String.format("%s/%s.%s", smartContractInstallPath, scName, scVersion);
         File file = new File(path);
         if(file.exists()){
@@ -117,14 +113,14 @@ public class SmartContractProvider {
      *
      * @param buf
      * @return
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public static ISmartContractPackage getSmartContractPackage(byte[] buf) throws JavaChainException {
+    public static ISmartContractPackage getSmartContractPackage(byte[] buf) throws JulongChainException {
         ISmartContractPackage smartContractPackage = new SDSPackage();
 
         try {
             smartContractPackage.initFromBuffer(buf);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.warn("try signed CDS");
             smartContractPackage = new SignedSDSPackage();
             smartContractPackage.initFromBuffer(buf);
@@ -142,30 +138,29 @@ public class SmartContractProvider {
      * @return
      */
 
-    public static byte[] extractStateDBArtifactsFromSCPackage(ISmartContractPackage scPack) throws JavaChainException {
+    public static byte[] extractStateDBArtifactsFromSCPackage(ISmartContractPackage scPack) throws JulongChainException {
         SmartContractPackage.SmartContractDeploymentSpec sds = scPack.getDepSpec();
         ByteString bytes = sds.getCodePackage();
         return bytes.toByteArray();
     }
 
-    public static ISmartContractPackage getSmartContractFromFS(String name, String version) throws JavaChainException {
-        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
+    public static ISmartContractPackage getSmartContractFromFS(String name, String version) throws JulongChainException {
         ISmartContractPackage pack = null;
         try {
             pack = new SDSPackage();
             pack.initFromFS(name, version);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             try {
                 pack = new SignedSDSPackage();
                 pack.initFromFS(name, version);
-            } catch (JavaChainException e1) {
+            } catch (JulongChainException e1) {
                 throw e;
             }
         }
         return pack;
     }
 
-    public static Query.SmartContractQueryResponse getInstalledSmartcontracts() throws JavaChainException {
+    public static Query.SmartContractQueryResponse getInstalledSmartcontracts() throws JulongChainException {
         File scInstallDir = new File(smartContractInstallPath);
         File[] files = scInstallDir.listFiles();
         Query.SmartContractQueryResponse.Builder builder = Query.SmartContractQueryResponse.newBuilder();
@@ -177,7 +172,7 @@ public class SmartContractProvider {
                 ISmartContractPackage scPackage;
                 try {
                     scPackage = getSmartContractFromFS(scName, scVersion);
-                } catch (JavaChainException e) {
+                } catch (JulongChainException e) {
                     log.error("Unreadable smartcontract file found on filesystem: " + file.getName());
                     continue;
                 }
@@ -231,11 +226,11 @@ public class SmartContractProvider {
      * @return
      * @throws SmartContractException
      */
-    public static byte[] extractStatedbArtifactsForSmartContract(String scName, String scVersion) throws JavaChainException {
+    public static byte[] extractStatedbArtifactsForSmartContract(String scName, String scVersion) throws JulongChainException {
         ISmartContractPackage scPackage;
         try {
             scPackage = getSmartContractFromFS(scName, scVersion);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.info("Error while loading installation package for scname {}, scversion {}. Err {}", scName, scVersion, e.getMessage());
             return null;
         }

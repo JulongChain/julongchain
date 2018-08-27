@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.csp.gm.dxct;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.intfs.IKey;
 
 /**
@@ -28,7 +28,7 @@ public interface IKeyStore {
     // If ReadOnly is true then StoreKey will fail.
     boolean readOnly();
     // GetKey returns a key object whose SKI is the one passed.
-    IKey getKey(byte[] ski) throws JavaChainException;
+    IKey getKey(byte[] ski) throws JulongChainException;
     // StoreKey stores the key k in this KeyStore.
     // If this KeyStore is read only then the method will fail.
     void storeKey(IKey ikey);

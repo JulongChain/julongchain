@@ -21,8 +21,8 @@ import org.bcia.julongchain.common.ledger.blockledger.IFactory;
 import org.bcia.julongchain.common.ledger.blockledger.file.FileLedgerFactory;
 import org.bcia.julongchain.common.ledger.blockledger.json.JsonLedgerFactory;
 import org.bcia.julongchain.common.ledger.blockledger.ram.RamLedgerFactory;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.tools.cryptogen.FileUtil;
 import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfig;
 
@@ -38,7 +38,7 @@ import java.nio.file.Paths;
  * @company Dingxuan
  */
 public class LedgerHelper {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(LedgerHelper.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(LedgerHelper.class);
 
     public static IFactory createLedgerFactroy(ConsenterConfig consenterConfig) throws LedgerException {
         IFactory lf = null;

@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.core.node;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.springframework.stereotype.Component;
 import org.yaml.snakeyaml.Yaml;
@@ -35,7 +35,7 @@ import java.io.InputStream;
  */
 @Component
 public class NodeConfigFactory {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(NodeConfigFactory.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(NodeConfigFactory.class);
 
     private static NodeConfig nodeConfig;
 

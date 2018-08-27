@@ -20,12 +20,11 @@ import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.julongchain.common.groupconfig.config.IConsenterConfig;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.Expiration;
 import org.bcia.julongchain.common.util.proto.SignedData;
 import org.bcia.julongchain.protos.common.Common;
-import org.bouncycastle.asn1.x509.Time;
 
 import java.util.Date;
 import java.util.List;
@@ -36,7 +35,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public class ExpirationRejectRule implements IRule {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ExpirationRejectRule.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ExpirationRejectRule.class);
     private IGroupConfigBundle filterSupport;
 
     public ExpirationRejectRule(IGroupConfigBundle filterSupport) {

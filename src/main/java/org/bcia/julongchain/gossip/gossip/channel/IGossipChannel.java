@@ -22,11 +22,18 @@ import org.bcia.julongchain.gossip.filter.IRoutingFilter;
 import org.bcia.julongchain.gossip.gossip.IReceivedMessage;
 import org.bcia.julongchain.gossip.gossip.SignedGossipMessage;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public interface IGossipChannel {
 
-    public NetworkMember[] getPeers();
+    public NetworkMember[] getNodes();
 
-    public IRoutingFilter peerFilter(ISubChannelSelectionCriteria subChannelSelectionCriteria);
+    public IRoutingFilter nodeFilter(ISubChannelSelectionCriteria subChannelSelectionCriteria);
 
     public Boolean isMemberInChan(NetworkMember member);
 

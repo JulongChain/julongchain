@@ -16,9 +16,9 @@
 
 package org.bcia.julongchain.common.tools.cryptogen;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +36,7 @@ import java.util.Set;
  * @company Excelsecu
  */
 public class FileUtil {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(FileUtil.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(FileUtil.class);
     private static String SYSTEM_PROP_OS = "os.name";
     private static String SYSTEM_PROP_VALUE_WINDOWS = "Windows";
 
@@ -74,7 +74,7 @@ public class FileUtil {
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                     try {
                         setPermission(file);
-                    } catch (JavaChainException e) {
+                    } catch (JulongChainException e) {
                         log.error(e.getMessage());
                         return FileVisitResult.TERMINATE;
                     }
@@ -85,7 +85,7 @@ public class FileUtil {
                 public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
                     try {
                         setPermission(dir);
-                    } catch (JavaChainException e) {
+                    } catch (JulongChainException e) {
                         log.error(e.getMessage());
                         return FileVisitResult.TERMINATE;
                     }
@@ -98,7 +98,7 @@ public class FileUtil {
     }
 
     // recursively set directory and its child directory or file permission 755
-    private static void setPermission(Path path) throws JavaChainException {
+    private static void setPermission(Path path) throws JulongChainException {
         if(System.getProperty(SYSTEM_PROP_OS).contains(SYSTEM_PROP_VALUE_WINDOWS)) {
             return;
         }
@@ -114,7 +114,7 @@ public class FileUtil {
         try {
             Files.setPosixFilePermissions(path, filePermissions);
         } catch (IOException e) {
-            throw new JavaChainException("set directory" + path + " permission failed " + e.getMessage());
+            throw new JulongChainException("set directory" + path + " permission failed " + e.getMessage());
         }
     }
 

@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.common.tools.cryptogen;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemWriter;
 import sun.security.util.ObjectIdentifier;
@@ -61,36 +61,36 @@ public class Util {
     public static final int EXT_KEY_USAGE_MICROSOFT_SERVER_GATED_CRYPTO = 10;
     public static final int EXT_KEY_USAGE_NETSCAPE_SERVER_GATED_CRYPTO = 11;
 
-    public static void pemExport(String path, String pemType, byte[] bytes) throws JavaChainException {
+    public static void pemExport(String path, String pemType, byte[] bytes) throws JulongChainException {
 
         File file = new File(path);
         if (file.exists()) {
             if (!file.delete()) {
-                throw new JavaChainException("deleted the file unsuccessfully");
+                throw new JulongChainException("deleted the file unsuccessfully");
             }
         } else {
             File dir = new File(file.getParent());
             if (!dir.exists()) {
                 if (!dir.mkdirs()) {
-                    throw new JavaChainException("made dir failed in method newCA");
+                    throw new JulongChainException("made dir failed in method newCA");
                 }
             }
         }
 
         try {
             if (!file.createNewFile()) {
-                throw new JavaChainException("created new file unsuccessfully");
+                throw new JulongChainException("created new file unsuccessfully");
             }
             PemWriter pemWriter = new PemWriter(new OutputStreamWriter(new FileOutputStream(file)));
             PemObject pemObject = new PemObject(pemType, bytes);
             pemWriter.writeObject(pemObject);
             pemWriter.close();
         } catch (Exception e) {
-            throw new JavaChainException("An error occurred on Util.pemExport :" + e.getMessage());
+            throw new JulongChainException("An error occurred on Util.pemExport :" + e.getMessage());
         }
     }
 
-    public static KeyUsageExtension parseKeyUsage(int keyUsage) throws JavaChainException {
+    public static KeyUsageExtension parseKeyUsage(int keyUsage) throws JulongChainException {
         KeyUsageExtension keyUsageExtension = new KeyUsageExtension();
         String keyUsageBinary = Integer.toBinaryString(keyUsage);
         int len = keyUsageBinary.length();
@@ -147,7 +147,7 @@ public class Util {
 
                 }
             } catch (Exception e) {
-                throw new JavaChainException("An error occurred on parseKeyUsage:" + e.getMessage());
+                throw new JulongChainException("An error occurred on parseKeyUsage:" + e.getMessage());
             }
         }
         return keyUsageExtension;

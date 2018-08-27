@@ -13,6 +13,7 @@
 # limitations under the License.
 #
 FROM julongchain/julongchain-baseimage
+MAINTAINER Julongchain "qkl@dxct.org"
 COPY pom.xml /root/julongchain
 COPY src/ /root/julongchain/src
 WORKDIR /root/julongchain

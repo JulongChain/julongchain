@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.csp.gm.sdt.jni;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.gm.sdt.common.Constants;
 
 /**
@@ -51,23 +51,23 @@ public class SMJniApi {
      * 产生随机数
      * @param length 随机数长度
      * @return 随机数
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public byte[] randomGen(int length) throws JavaChainException {
+    public byte[] randomGen(int length) throws JulongChainException {
         if(0 >= length) {
-            throw new JavaChainException("Invalid length. It must be bigger than 0.",
+            throw new JulongChainException("Invalid length. It must be bigger than 0.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.MAX_RANDOM_LENGTH < length) {
             String errorMsg = "Invalid length. It must be smaller than " + Integer.toString(Constants.MAX_RANDOM_LENGTH+1) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         byte[] outData = null;
         try {
             outData = nRandomGen(length);
         } catch (Exception e) {
-            throw new JavaChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
+            throw new JulongChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
                                         new Exception("Error code: " + e.getMessage()));
         }
         return outData;
@@ -77,24 +77,24 @@ public class SMJniApi {
      * 根据SM2私钥生成公钥
      * @param privateKey SM2私钥
      * @return SM2 公钥
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public byte[] sm2MakeKey(byte[] privateKey) throws JavaChainException {
+    public byte[] sm2MakeKey(byte[] privateKey) throws JulongChainException {
         if(null == privateKey) {
-            throw new JavaChainException("Invalid privateKey. It must not be null.",
+            throw new JulongChainException("Invalid privateKey. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.SM2_PRIVATEKEY_LEN != privateKey.length) {
             String errorMsg = "Invalid privateKey. It's length must be " +
                                 Integer.toString(Constants.SM2_PRIVATEKEY_LEN) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         byte[] outData = null;
         try {
             outData = nSM2MakeKey(privateKey, privateKey.length);
         } catch (Exception e) {
-            throw new JavaChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
+            throw new JulongChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
                     new Exception("Error code: " + e.getMessage()));
         }
         return outData;
@@ -105,31 +105,31 @@ public class SMJniApi {
      * @param key 原密钥
      * @param length 派生密钥长度
      * @return 派生密钥数据
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public byte[] sm2KDF(byte[] key, int length) throws JavaChainException {
+    public byte[] sm2KDF(byte[] key, int length) throws JulongChainException {
         if(null == key) {
-            throw new JavaChainException("Invalid key. It must not be null.",
+            throw new JulongChainException("Invalid key. It must not be null.",
                                         new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(0 == key.length) {
-            throw new JavaChainException("Invalid key. Cannot be empty.",
+            throw new JulongChainException("Invalid key. Cannot be empty.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.MAX_KDF_SOURCE_KEY_LENGTH < key.length) {
             String errorMsg = "Invalid key. It's length must be smaller than " +
                     Integer.toString(Constants.MAX_KDF_SOURCE_KEY_LENGTH+1) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(0 >= length) {
-            throw new JavaChainException("Invalid length. It must be bigger than 0.",
+            throw new JulongChainException("Invalid length. It must be bigger than 0.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.MAX_KDF_LENGTH < length) {
             String errorMsg = "Invalid length. It must be smaller than " +
                                 Integer.toString(Constants.MAX_KDF_LENGTH+1) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         byte[] outData = null;
@@ -137,7 +137,7 @@ public class SMJniApi {
             int keyLen = key.length;
             outData = nSM2KDF(key, keyLen, length);
         } catch (Exception e) {
-            throw new JavaChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
+            throw new JulongChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
                                         new Exception("Error code: " + e.getMessage()));
         }
         return outData;
@@ -149,38 +149,38 @@ public class SMJniApi {
      * @param random 随机数
      * @param privateKey 私钥
      * @return 签名值
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     public byte[] sm2Sign(byte[] digest, byte[] random,
-                          byte[] privateKey) throws JavaChainException {
+                          byte[] privateKey) throws JulongChainException {
         if(null == digest) {
-            throw new JavaChainException("Invalid digest. It must not be null.",
+            throw new JulongChainException("Invalid digest. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.SM3_DIGEST_LEN != digest.length) {
             String errorMsg = "Invalid digest. It's length must be " +
                     Integer.toString(Constants.SM3_DIGEST_LEN) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(null == random) {
-            throw new JavaChainException("Invalid random. It must not be null.",
+            throw new JulongChainException("Invalid random. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.SM2_SIGN_RANDOM_LEN != random.length) {
             String errorMsg = "Invalid random. It's length must be " +
                     Integer.toString(Constants.SM2_SIGN_RANDOM_LEN) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(null == privateKey) {
-            throw new JavaChainException("Invalid privateKey. It must not be null.",
+            throw new JulongChainException("Invalid privateKey. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.SM2_PRIVATEKEY_LEN != privateKey.length) {
             String errorMsg = "Invalid privateKey. It's length must be " +
                     Integer.toString(Constants.SM2_PRIVATEKEY_LEN) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         byte[] outData = null;
@@ -189,7 +189,7 @@ public class SMJniApi {
                             random, random.length,
                             privateKey, privateKey.length);
         } catch (Exception e) {
-            throw new JavaChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
+            throw new JulongChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
                                         new Exception("Error code: " + e.getMessage()));
         }
         return outData;
@@ -200,49 +200,49 @@ public class SMJniApi {
      * @param publicKey 公钥
      * @param signature 签名值
      * @return 验签结果
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     public int sm2Verify(byte[] digest, byte[] publicKey,
-                            byte[] signature) throws JavaChainException {
+                            byte[] signature) throws JulongChainException {
         if(null == digest) {
-            throw new JavaChainException("Invalid digest. It must not be null.",
+            throw new JulongChainException("Invalid digest. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.SM3_DIGEST_LEN != digest.length) {
             String errorMsg = "Invalid digest. It's length must be " +
                     Integer.toString(Constants.SM3_DIGEST_LEN) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(null == publicKey) {
-            throw new JavaChainException("Invalid publicKey. It must not be null.",
+            throw new JulongChainException("Invalid publicKey. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.SM2_PUBLICKEY_LEN != publicKey.length) {
             String errorMsg = "Invalid publicKey. It's length must be " +
                     Integer.toString(Constants.SM2_PUBLICKEY_LEN) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(null == signature) {
-            throw new JavaChainException("Invalid signature. It must not be null.",
+            throw new JulongChainException("Invalid signature. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.SM2_SIGNATURE_LEN != signature.length) {
             String errorMsg = "Invalid signature. It's length must be " +
                     Integer.toString(Constants.SM2_SIGNATURE_LEN) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         int result = 1;
         try {
             result = nSM2Verify(digest, digest.length, publicKey, publicKey.length, signature, signature.length);
         } catch (Exception e) {
-            throw new JavaChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
+            throw new JulongChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
                                         new Exception("Error code: " + e.getMessage()));
         }
         if(0 != result) {
-            throw new JavaChainException("Failed verifying signature.");
+            throw new JulongChainException("Failed verifying signature.");
         }
         return result;
     }
@@ -253,43 +253,43 @@ public class SMJniApi {
      * @param random 随机数
      * @param publicKey 公钥
      * @return 密文数据
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     public byte[] sm2Encrypt(byte[] plainText, byte[] random,
-                          byte[] publicKey) throws JavaChainException {
+                          byte[] publicKey) throws JulongChainException {
         if(null == plainText) {
-            throw new JavaChainException("Invalid plainText. It must not be null.",
+            throw new JulongChainException("Invalid plainText. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(0 == plainText.length) {
-            throw new JavaChainException("Invalid plainText. Cannot be empty.",
+            throw new JulongChainException("Invalid plainText. Cannot be empty.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(null == random) {
-            throw new JavaChainException("Invalid random. It must not be null.",
+            throw new JulongChainException("Invalid random. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.SM2_ENC_RANDOM_LEN != random.length) {
             String errorMsg = "Invalid random. It's length must be " +
                     Integer.toString(Constants.SM2_ENC_RANDOM_LEN) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(null == publicKey) {
-            throw new JavaChainException("Invalid publicKey. It must not be null.",
+            throw new JulongChainException("Invalid publicKey. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.SM2_PUBLICKEY_LEN != publicKey.length) {
             String errorMsg = "Invalid publicKey. It's length must be " +
                     Integer.toString(Constants.SM2_PUBLICKEY_LEN) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         byte[] outData = null;
         try {
             outData = nSM2Encrypt(plainText, plainText.length, random, random.length, publicKey, publicKey.length);
         } catch (Exception e) {
-            throw new JavaChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
+            throw new JulongChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
                                         new Exception("Error code: " + e.getMessage()));
         }
         return outData;
@@ -300,32 +300,32 @@ public class SMJniApi {
      * @param cipherText 密文数据
      * @param privateKey 私钥
      * @return 明文数据
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public byte[] sm2Decrypt(byte[] cipherText, byte[] privateKey) throws JavaChainException {
+    public byte[] sm2Decrypt(byte[] cipherText, byte[] privateKey) throws JulongChainException {
         if(null == cipherText) {
-            throw new JavaChainException("Invalid cipherText. It must not be null.",
+            throw new JulongChainException("Invalid cipherText. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(0 == cipherText.length) {
-            throw new JavaChainException("Invalid cipherText. Cannot be empty.",
+            throw new JulongChainException("Invalid cipherText. Cannot be empty.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(null == privateKey) {
-            throw new JavaChainException("Invalid privateKey. It must not be null.",
+            throw new JulongChainException("Invalid privateKey. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.SM2_PRIVATEKEY_LEN != privateKey.length) {
             String errorMsg = "Invalid privateKey. It's length must be " +
                     Integer.toString(Constants.SM2_PRIVATEKEY_LEN) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         byte[] outData = null;
         try {
             outData = nSM2Decrypt(cipherText, cipherText.length, privateKey, privateKey.length);
         } catch (Exception e) {
-            throw new JavaChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
+            throw new JulongChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
                                         new Exception("Error code: " + e.getMessage()));
         }
         return outData;
@@ -335,22 +335,22 @@ public class SMJniApi {
      * 计算消息摘要
      * @param message 消息数据
      * @return 摘要数据
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public byte[] sm3Hash(byte[] message) throws JavaChainException {
+    public byte[] sm3Hash(byte[] message) throws JulongChainException {
         if(null == message) {
-            throw new JavaChainException("Invalid message. It must not be null.",
+            throw new JulongChainException("Invalid message. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(0 == message.length) {
-            throw new JavaChainException("Invalid message. Cannot be empty.",
+            throw new JulongChainException("Invalid message. Cannot be empty.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         byte[] outData = null;
         try {
             outData = nSM3Hash(message, message.length);
         } catch (Exception e) {
-            throw new JavaChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
+            throw new JulongChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
                                         new Exception("Error code: " + e.getMessage()));
         }
         return outData;
@@ -361,32 +361,32 @@ public class SMJniApi {
      * @param key 密钥
      * @param plainText 明文数据
      * @return 密文数据
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public byte[] sm4ECBEncrypt(byte[] key, byte[] plainText) throws JavaChainException {
+    public byte[] sm4ECBEncrypt(byte[] key, byte[] plainText) throws JulongChainException {
         if(null == key) {
-            throw new JavaChainException("Invalid key. It must not be null.",
+            throw new JulongChainException("Invalid key. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.SM4_KEY_LEN != key.length) {
             String errorMsg = "Invalid key. It's length must be " +
                     Integer.toString(Constants.SM4_KEY_LEN) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(null == plainText) {
-            throw new JavaChainException("Invalid plainText. It must not be null.",
+            throw new JulongChainException("Invalid plainText. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(0 == plainText.length) {
-            throw new JavaChainException("Invalid plainText. Cannot be empty.",
+            throw new JulongChainException("Invalid plainText. Cannot be empty.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         byte[] outData = null;
         try {
             outData = nSM4ECBEncrypt(key, key.length, plainText, plainText.length);
         } catch (Exception e) {
-            throw new JavaChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
+            throw new JulongChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
                                         new Exception("Error code: " + e.getMessage()));
         }
         return outData;
@@ -397,34 +397,34 @@ public class SMJniApi {
      * @param key 密钥
      * @param cipherText 密文数据
      * @return 明文数据
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public byte[] sm4ECBDecrypt(byte[] key, byte[] cipherText) throws JavaChainException {
+    public byte[] sm4ECBDecrypt(byte[] key, byte[] cipherText) throws JulongChainException {
         if(null == key) {
-            throw new JavaChainException("Invalid key. It must not be null.",
+            throw new JulongChainException("Invalid key. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.SM4_KEY_LEN != key.length) {
             String errorMsg = "Invalid key. It's length must be " +
                     Integer.toString(Constants.SM4_KEY_LEN) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(null == cipherText) {
-            throw new JavaChainException("Invalid cipherText. It must not be null.",
+            throw new JulongChainException("Invalid cipherText. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.SM4_BLOCK_LEN > cipherText.length) {
             String errorMsg = "Invalid cipherText. It's length must not be smaller than " +
                     Integer.toString(Constants.SM4_BLOCK_LEN) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         byte[] outData = null;
         try {
             outData = nSM4ECBDecrypt(key, key.length, cipherText, cipherText.length);
         } catch (Exception e) {
-            throw new JavaChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
+            throw new JulongChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
                                         new Exception("Error code: " + e.getMessage()));
         }
         return outData;
@@ -436,35 +436,35 @@ public class SMJniApi {
      * @param iv  初始向量
      * @param plainText 明文数据
      * @return 密文数据
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public SM4CBCResult sm4CBCEncrypt(byte[] key, byte[] iv, byte[] plainText) throws JavaChainException {
+    public SM4CBCResult sm4CBCEncrypt(byte[] key, byte[] iv, byte[] plainText) throws JulongChainException {
         if(null == key) {
-            throw new JavaChainException("Invalid key. It must not be null.",
+            throw new JulongChainException("Invalid key. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.SM4_KEY_LEN != key.length) {
             String errorMsg = "Invalid key. It's length must be " +
                     Integer.toString(Constants.SM4_KEY_LEN) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(null == iv) {
-            throw new JavaChainException("Invalid iv. It must not be null.",
+            throw new JulongChainException("Invalid iv. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.SM4_IV_LEN != iv.length) {
             String errorMsg = "Invalid iv. It's length must be " +
                     Integer.toString(Constants.SM4_IV_LEN) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(null == plainText) {
-            throw new JavaChainException("Invalid plainText. It must not be null.",
+            throw new JulongChainException("Invalid plainText. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(0 == plainText.length) {
-            throw new JavaChainException("Invalid plainText. Cannot be empty.",
+            throw new JulongChainException("Invalid plainText. Cannot be empty.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         try {
@@ -477,7 +477,7 @@ public class SMJniApi {
                 return new SM4CBCResult(newIV, cipherData);
             }
         } catch (Exception e) {
-            throw new JavaChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
+            throw new JulongChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
                                         new Exception("Error code: " + e.getMessage()));
         }
         return null;
@@ -489,37 +489,37 @@ public class SMJniApi {
      * @param iv  初始向量
      * @param cipherText 密文数据
      * @return 明文数据
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public SM4CBCResult sm4CBCDecrypt(byte[] key, byte[] iv, byte[] cipherText) throws JavaChainException {
+    public SM4CBCResult sm4CBCDecrypt(byte[] key, byte[] iv, byte[] cipherText) throws JulongChainException {
         if(null == key) {
-            throw new JavaChainException("Invalid key. It must not be null.",
+            throw new JulongChainException("Invalid key. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.SM4_KEY_LEN != key.length) {
             String errorMsg = "Invalid key. It's length must be " +
                     Integer.toString(Constants.SM4_KEY_LEN) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(null == iv) {
-            throw new JavaChainException("Invalid iv. It must not be null.",
+            throw new JulongChainException("Invalid iv. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.SM4_IV_LEN != iv.length) {
             String errorMsg = "Invalid iv. It's length must be " +
                     Integer.toString(Constants.SM4_IV_LEN) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(null == cipherText) {
-            throw new JavaChainException("Invalid cipherText. It must not be null.",
+            throw new JulongChainException("Invalid cipherText. It must not be null.",
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         if(Constants.SM4_BLOCK_LEN > cipherText.length) {
             String errorMsg = "Invalid cipherText. It's length must not be smaller than " +
                     Integer.toString(Constants.SM4_BLOCK_LEN) + ".";
-            throw new JavaChainException(errorMsg,
+            throw new JulongChainException(errorMsg,
                     new Exception("Error code: " + Integer.toString(SMJNIAPI_ERR_PARAM)));
         }
         byte[] outData = null;
@@ -533,7 +533,7 @@ public class SMJniApi {
                 return new SM4CBCResult(newIV, plainData);
             }
         } catch (Exception e) {
-            throw new JavaChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
+            throw new JulongChainException(getErrorMsg(Integer.parseInt(e.getMessage())),
                                         new Exception("Error code: " + e.getMessage()));
         }
         return null;

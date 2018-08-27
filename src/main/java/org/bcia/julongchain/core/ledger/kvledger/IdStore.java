@@ -21,8 +21,8 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.common.ledger.util.leveldbhelper.LevelDBProvider;
 import org.bcia.julongchain.common.ledger.util.leveldbhelper.UpdateBatch;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.common.Common;
@@ -38,7 +38,7 @@ import java.util.*;
  * @company Dingxuan
  */
 public class IdStore {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(IdStore.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(IdStore.class);
 
     private IDBProvider provider = null;
 	private static final byte[] TIME_PREFIX= new byte[]{0};
@@ -52,7 +52,7 @@ public class IdStore {
         IdStore idStore = new IdStore();
         String dbPath = LedgerConfig.getLedgerProviderPath();
         idStore.setProvider(new LevelDBProvider(dbPath));
-        logger.debug("Create idstore using path = " + idStore.getProvider().getDBPath());
+        log.debug("Create idstore using path = " + idStore.getProvider().getDBPath());
         return idStore;
     }
 
@@ -121,7 +121,7 @@ public class IdStore {
             byte[] key = encodeLedgerKey(ledgerID);
             byte[] val = provider.get(key);
             if(val == null){
-                logger.debug("NO CREATING LEDGER EXISTS");
+                log.debug("NO CREATING LEDGER EXISTS");
                 return null;
             }
             return Common.Block.parseFrom(provider.get(key));

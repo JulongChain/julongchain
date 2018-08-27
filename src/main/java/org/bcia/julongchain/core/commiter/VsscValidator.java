@@ -19,8 +19,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.SmartContractException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policycheck.cauthdsl.CAuthDslBuilder;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.common.util.ValidateUtils;
@@ -50,7 +50,7 @@ import java.util.UUID;
  * @company Dingxuan
  */
 public class VsscValidator implements IVsscValidator {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(VsscValidator.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(VsscValidator.class);
 
     private ICommitterSupport committerSupport;
     private ISystemSmartContractProvider sysSmartContractProvider;
@@ -97,12 +97,12 @@ public class VsscValidator implements IVsscValidator {
                     writesToLSSC = true;
                 }
 
-                if (!writesToNonInvokableSSC && sysSmartContractProvider.isSysSCAndNotInvokableSC2SC(nsRwSet
+                if (!writesToNonInvokableSSC && sysSmartContractProvider.isSysSCAndNotInvokeSC2SC(nsRwSet
                         .getNameSpace())) {
                     writesToNonInvokableSSC = true;
                 }
 
-                if (!writesToNonInvokableSSC && sysSmartContractProvider.isSysSCAndNotInvkeableExternal(nsRwSet
+                if (!writesToNonInvokableSSC && sysSmartContractProvider.isSysSCAndNotInvokableExternal(nsRwSet
                         .getNameSpace())) {
                     writesToNonInvokableSSC = true;
                 }
@@ -170,8 +170,8 @@ public class VsscValidator implements IVsscValidator {
                 }
             }
         } else {
-            if (sysSmartContractProvider.isSysSCAndNotInvkeableExternal(scName)) {
-                log.warn("isSysSCAndNotInvkeableExternal " + scName);
+            if (sysSmartContractProvider.isSysSCAndNotInvokableExternal(scName)) {
+                log.warn("isSysSCAndNotInvokableExternal " + scName);
                 return TransactionPackage.TxValidationCode.ILLEGAL_WRITESET;
             }
 

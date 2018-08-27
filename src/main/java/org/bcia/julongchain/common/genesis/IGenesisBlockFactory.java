@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.common.genesis;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
@@ -26,5 +26,5 @@ import org.bcia.julongchain.protos.common.Common;
  * @company Dingxuan
  */
 public interface IGenesisBlockFactory {
-    Common.Block getGenesisBlock(String groupId) throws JavaChainException;
+    Common.Block getGenesisBlock(String groupId) throws JulongChainException;
 }

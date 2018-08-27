@@ -15,33 +15,29 @@
  */
 package org.bcia.julongchain.msp.mgmt;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.factory.CspOptsManager;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2PrivateKeyImportOpts;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2SignerOpts;
-import org.bcia.julongchain.csp.gm.dxct.util.CryptoUtil;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.msp.IIdentity;
 import org.bcia.julongchain.msp.ISigningIdentity;
 import org.bcia.julongchain.msp.signer.NodeSigner;
 import org.bcia.julongchain.msp.util.LoadLocalMspFiles;
 
-import java.io.IOException;
-
 import static org.bcia.julongchain.csp.factory.CspManager.getDefaultCsp;
 
 /**
  * 签名身份实体
- *
  * @author zhangmingyang
  * @date 2018/07/04
  * @company Dingxuan
  */
 public class SignIdentity implements ISigningIdentity {
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SignIdentity.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SignIdentity.class);
 
     private Identity identity;
     private NodeSigner nodeSigner;
@@ -64,7 +60,7 @@ public class SignIdentity implements ISigningIdentity {
             IKey privateKey = getDefaultCsp().keyImport(skBytes, new SM2PrivateKeyImportOpts(true));
             signvalue = msp.getCsp().sign(privateKey, msg, new SM2SignerOpts());
             log.info("Signvalue is ok");
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage());
         }
         return signvalue;

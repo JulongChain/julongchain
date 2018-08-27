@@ -17,10 +17,12 @@ package org.bcia.julongchain.core.ledger.util;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.apache.commons.lang3.ArrayUtils;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.csp.factory.CspManager;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
@@ -41,7 +43,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class Util {
-    private static final JavaChainLog logger   = JavaChainLogFactory.getLog(Util.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Util.class);
     /**
      * 获取Envelope结构
      */
@@ -52,7 +54,7 @@ public class Util {
             env = Common.Envelope.parseFrom(data);
             return env;
         } catch (InvalidProtocolBufferException e) {
-            logger.error("Got error when getting Envelope");
+            log.error("Got error when getting Envelope");
             return null;
         }
     }
@@ -66,7 +68,7 @@ public class Util {
             payload = Common.Payload.parseFrom(env.getPayload());
             return payload;
         } catch (Exception e) {
-            logger.error("Got error when getting Payload");
+            log.error("Got error when getting Payload");
             return null;
         }
     }
@@ -80,7 +82,7 @@ public class Util {
             header = Common.GroupHeader.parseFrom(data);
             return header;
         } catch (InvalidProtocolBufferException e) {
-            logger.error("Got error when getting GroupHeader");
+            log.error("Got error when getting GroupHeader");
             return null;
         }
     }
@@ -94,7 +96,7 @@ public class Util {
             tx = TransactionPackage.Transaction.parseFrom(txBytes);
             return tx;
         } catch (InvalidProtocolBufferException e) {
-            logger.error("Got error when getting Transaction");
+            log.error("Got error when getting Transaction");
             return null;
         }
     }
@@ -109,30 +111,30 @@ public class Util {
         try {
             scaPayload = TransactionPackage.SmartContractActionPayload.parseFrom(txAction.getPayload());
         } catch (InvalidProtocolBufferException e) {
-            logger.error("Got error when getting SmartContractActionPayload");
-            logger.error(e.getMessage(), e);
+            log.error("Got error when getting SmartContractActionPayload");
+            log.error(e.getMessage(), e);
             return null;
         }
         if(scaPayload.getAction() == null || scaPayload.getAction().getProposalResponsePayload() == null){
-            logger.error("No valid payload in SmartContractActionPayload");
+            log.error("No valid payload in SmartContractActionPayload");
             return null;
         }
         try {
             prPayload = ProposalResponsePackage.ProposalResponsePayload.parseFrom(scaPayload.getAction().getProposalResponsePayload());
         } catch (InvalidProtocolBufferException e) {
-            logger.error("Got error when getting ProposalResponsePayload");
-            logger.error(e.getMessage(), e);
+            log.error("Got error when getting ProposalResponsePayload");
+            log.error(e.getMessage(), e);
             return null;
         }
         if(prPayload.getExtension() == null){
-            logger.error("Response payload missed extension");
+            log.error("Response payload missed extension");
             return null;
         }
         try {
             respPayload = ProposalPackage.SmartContractAction.parseFrom(prPayload.getExtension());
         } catch (InvalidProtocolBufferException e) {
-            logger.error("Got error when getting SmartContractAction");
-            logger.error(e.getMessage(), e);
+            log.error("Got error when getting SmartContractAction");
+            log.error(e.getMessage(), e);
             return null;
         }
         return respPayload;
@@ -179,7 +181,7 @@ public class Util {
         if (bytes != null) {
             try {
                 target = CspManager.getDefaultCsp().hash(bytes, null);
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 throw new LedgerException(e);
             }
         }
@@ -200,7 +202,7 @@ public class Util {
     }
 
     /**
-     *
+     * 获取排序后的value
      */
     public static <T> List<T> getValuesBySortedKeys (Map<String, T> m){
         List<String> list = getSortedKeys(m);
@@ -210,4 +212,24 @@ public class Util {
         }
         return l;
     }
+
+	/**
+	 * 解码世界状态value
+	 */
+	public static byte[] decodeValueToBytes(byte[] encodeValue){
+		byte[] result = new byte[encodeValue.length - 16];
+		System.arraycopy(encodeValue, 16, result, 0, result.length);
+		return result;
+	}
+
+	/**
+	 * 编码世界状态value
+	 */
+	public static byte[] encodeValue(byte[] value, LedgerHeight version){
+		byte[] encodeValue = version.toBytes();
+		if(value != null){
+			encodeValue = ArrayUtils.addAll(encodeValue, value);
+		}
+		return encodeValue;
+	}
 }

@@ -8,11 +8,29 @@
 [Gitlab代码库管理系统](http://gitlab.bcia.net.cn:6060/)
 
 ## 如何编译
-使用IntelliJ IDEA开发环境。
+编译环境：  <br/>
+具体的环境配置请见相关文档  <br/>
+集成开发环境：IntelliJ IDEA 2017.3.3  <br/>
+JAVA 开发环境：JAVA JDK 1.8.0_151  <br/>
+Maven依赖管理工具：Maven 3.5.2  <br/>
+代码版本管理工具：GitLab  <br/>
 
-使用maven进行编译。
+编译步骤：  <br/>
+1.从GitLab下载项目源码：打开IntelliJ IDEA,选择菜单File => New => Project from Version Control => Git  <br/>
+  设置好文件夹和路径,输入Git Repository URL点后面的Test按钮测试链接成功后,点击Clone开始下载源码  <br/>
+  Git Repository URL:ssh://git@gitlab.bcia.net.cn:13622/bcia/julongchain.git  <br/>
+  
+2.添加框架支持：项目名字右键 => Add Framework Support,Java EE version选择Java EE 8,勾选Maven选项  <br/>
 
-JDK版本为1.8。
+3.设置Project环境：选择菜单File => Project Structure… => Project,Project SDK选择已安装的JDK 1.8  <br/>
+  Project language level 修改为8  <br/>
+  
+4.Maven导入依赖包：pom.xml右键 => Maven => Reimport  <br/>
+
+5.编译：在Maven Projects中展开julongchain => Lifecycle,选择双击compile编译  <br/>
+<br/>
+
+
 
 ## 当前版本
 当前版本为0.8。
@@ -39,7 +57,7 @@ JDK版本为1.8。
      -g 群组名称     <br/>
 
 加入群组  <br/>
-<i>  java -jar julongchain.jar group join -t 127.0.0.1:7051 -b /opt/BCIA/JavaChain/myGroup.block  </i><br/>
+<i>  java -jar julongchain.jar group join -t 127.0.0.1:7051 -b /opt/BCIA/JulongChain/myGroup.block  </i><br/>
   参数说明：  <br/>
       -t 要加入群组的目标节点地址 <br/>
       -b 创世区块保存的文件地址  <br/>
@@ -48,6 +66,12 @@ JDK版本为1.8。
 <i>  java -jar julongchain.jar group list -t 127.0.0.1:7051  </i><br/>
   参数说明：  <br/>
       -t 要查询的目标节点地址 <br/>
+
+查询当前群组链信息<br/>
+         <i>  java -jar julongchain.jar group info -t 127.0.0.1:7051 -g myGroup  </i><br/>
+   参数说明：  <br/>
+      -t 要查询的目标节点地址 <br/>
+      -g 群组名称           <br/>
 
 安装智能合约  <br/>
 <i>  java -jar julongchain.jar contract install -t 127.0.0.1:7051 -n mycc -v 1.0 -p /root/julongchain/mycc_src  </i><br/>
@@ -78,5 +102,15 @@ JDK版本为1.8。
    -g 群组名称                  <br/>
    -n 智能合约名称               <br/>
    -i 智能合约invoke方法入参   <br/>
+
+查询智能合约（不产生新的区块）  <br/>
+<i>  java -jar julongchain.jar contract query -t 127.0.0.1:7051 -g myGroup -n mycc -i "{'args':['query','a']}"  </i><br/>
+  参数说明：  <br/>
+   -t 要查询智能合约的目标节点地址 <br/>
+   -g 群组名称                  <br/>
+   -n 智能合约名称               <br/>
+   -i 智能合约invoke方法入参      <br/>
+
+
    
 

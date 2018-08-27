@@ -17,8 +17,15 @@ package org.bcia.julongchain.gossip.gossip;
 
 import org.bcia.julongchain.common.exception.GossipException;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public interface IVerifier {
 
-    public void execute(byte[] peerIdentity, byte[] signature, byte[] message) throws GossipException;
+    public void execute(byte[] nodeIdentity, byte[] signature, byte[] message) throws GossipException;
 
 }

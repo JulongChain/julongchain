@@ -24,8 +24,8 @@ import org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage.Config;
 import org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage.FsBlockStoreProvider;
 import org.bcia.julongchain.common.ledger.blockledger.IFactory;
 import org.bcia.julongchain.common.ledger.blockledger.ReadWriteBase;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 
 import java.util.*;
@@ -38,7 +38,7 @@ import java.util.*;
  * @company Dingxuan
  */
 public class FileLedgerFactory implements IFactory {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(FileLedgerFactory.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(FileLedgerFactory.class);
 
     private IBlockStoreProvider blkStorageProvider;
     private static Map<String, ReadWriteBase> ledgers;
@@ -55,27 +55,24 @@ public class FileLedgerFactory implements IFactory {
 
     @Override
     public synchronized ReadWriteBase getOrCreate(String groupID) throws LedgerException {
-        logger.debug("Starting create file ledger using group id " + groupID);
+        log.debug("Starting create file ledger using group id " + groupID);
         //已存在账本,直接返回
         ReadWriteBase ledger = ledgers.get(groupID);
         if(ledger != null){
-            logger.debug("Group id " + groupID + " is already exists");
+            log.debug("Group id " + groupID + " is already exists");
             return ledger;
         }
         IBlockStore blkStore = blkStorageProvider.openBlockStore(groupID);
         ledger = new FileLedger(blkStore);
         ledgers.put(groupID, ledger);
-        logger.debug("Finished create file ledger");
+        log.debug("Finished create file ledger");
         return ledger;
     }
 
     @Override
     public List<String> groupIDs() throws LedgerException {
-        List<String> groupIDS = new ArrayList<String>();
-        for (String s : blkStorageProvider.list()) {
-            groupIDS.add(s);
-        }
-        return groupIDS;
+		List<String> groupIDs = blkStorageProvider.list();
+		return groupIDs == null ? new ArrayList<>() : groupIDs;
     }
 
     @Override

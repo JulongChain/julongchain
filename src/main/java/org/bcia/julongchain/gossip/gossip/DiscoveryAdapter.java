@@ -19,6 +19,13 @@ import org.bcia.julongchain.core.smartcontract.shim.helper.Channel;
 import org.bcia.julongchain.gossip.comm.IComm;
 import org.bcia.julongchain.gossip.discovery.IDisclosurePolicy;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public class DiscoveryAdapter {
 
     private Boolean stopping;

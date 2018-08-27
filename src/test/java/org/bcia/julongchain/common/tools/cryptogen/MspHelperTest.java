@@ -17,7 +17,7 @@
 package org.bcia.julongchain.common.tools.cryptogen;
 
 import org.apache.commons.io.FileUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.tools.cryptogen.bean.Configuration;
 import org.bcia.julongchain.common.tools.cryptogen.utils.X509CertificateUtil;
 import org.bcia.julongchain.msp.mgmt.Msp;
@@ -77,7 +77,7 @@ public class MspHelperTest {
     public ExpectedException expectedRule = ExpectedException.none();
 
     @Test
-    public void generateLocalMSP() throws JavaChainException, IOException {
+    public void generateLocalMSP() throws JulongChainException, IOException {
         FileUtil.removeAll(testDir);
 
         String caDir = Paths.get(testDir, "ca").toString();
@@ -131,7 +131,7 @@ public class MspHelperTest {
     }
 
     @Test
-    public void generateVerifyingMSP() throws JavaChainException {
+    public void generateVerifyingMSP() throws JulongChainException {
         System.out.println("testDir=" + testDir);
 
         String caDir = Paths.get(testDir, "ca").toString();
@@ -168,7 +168,7 @@ public class MspHelperTest {
             assertTrue(new File(file).exists());
         }
         // finally check to see if we can load this as a verifying MSP config
-        expectedRule.expect(JavaChainException.class);
+        expectedRule.expect(JulongChainException.class);
         expectedRule.expectMessage("the name is illegal");
         tlsCA.setName("test/fail");
         MspHelper.generateVerifyingMSP(mspDir, signCA, tlsCA, true);
@@ -180,7 +180,7 @@ public class MspHelperTest {
 
 
     @Test
-    public void exportConfig() throws JavaChainException {
+    public void exportConfig() throws JulongChainException {
 
         String path = Paths.get(testDir, "export-test").toString();
         String configFile = Paths.get(path, "config.yaml").toString();
@@ -191,8 +191,8 @@ public class MspHelperTest {
 
         try {
             MspHelper.exportConfig(path, caFile, true);
-        } catch (JavaChainException e) {
-            throw new JavaChainException("failed to read config file: {}", e);
+        } catch (JulongChainException e) {
+            throw new JulongChainException("failed to read config file: {}", e);
         }
         Yaml yaml = new Yaml();
         Configuration configuration;
@@ -200,7 +200,7 @@ public class MspHelperTest {
             Map<String, Object> map = yaml.load(new FileInputStream(configFile));
             configuration = Configuration.parse(map);
         } catch (FileNotFoundException e) {
-            throw new JavaChainException(configFile + " is not found");
+            throw new JulongChainException(configFile + " is not found");
         }
         assertTrue(configuration.getNodeOUs().getEnable());
         Assert.assertEquals(caFile, configuration.getNodeOUs().getClientOUIdentifier().getCertificate());

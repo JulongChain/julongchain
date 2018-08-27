@@ -3,7 +3,7 @@ package org.bcia.julongchain.core.ssc.cssc;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.BaseJunit4Test;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.genesis.GenesisBlockFactory;
@@ -21,6 +21,7 @@ import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.Query;
 import org.bcia.julongchain.protos.node.ResourcesPackage;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
+
 import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfigFactory;
 import org.junit.Before;
@@ -49,6 +50,8 @@ public class CSSCTest extends BaseJunit4Test {
 
     @Before
     public void beforeTest(){
+        System.out.println("beforeTest----------------------------------------------");
+
         mockStub = new MockStub(CommConstant.CSSC, cssc);
     }
 
@@ -81,7 +84,7 @@ public class CSSCTest extends BaseJunit4Test {
         } catch (IOException e) {
             e.printStackTrace();
             return;
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
             return;
         }
@@ -89,7 +92,7 @@ public class CSSCTest extends BaseJunit4Test {
         try {
             sp = TxUtils.mockSignedEndorserProposalOrPanic("",
                     SmartContractPackage.SmartContractSpec.newBuilder().build());
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
             return;
         }
@@ -144,30 +147,116 @@ public class CSSCTest extends BaseJunit4Test {
 
     @Test
     public void testJoinGroupsWithWrongParams(){
-
+        ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("0",new LinkedList<ByteString>());
+        List<ByteString> args0 = new LinkedList<ByteString>();
+        //先删除账本
+        FileUtils.deleteDir(new File(LedgerConfig.getRootPath()));
+        //params:join_group  blockbytes;
+        args0.add(ByteString.copyFromUtf8(CSSC.JOIN_GROUP));
+        args0.add(ByteString.copyFromUtf8("action"));
+        ISmartContract.SmartContractResponse res = mockStub.mockInvoke("0", args0);
+        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
+        // assertThat(res.getMessage(),is(res.getMessage()));
     }
 
     @Test
     public void testJoinGroupsMissingParams(){
-
+        ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("0",new LinkedList<ByteString>());
+        List<ByteString> args0 = new LinkedList<ByteString>();
+        //先删除账本
+        FileUtils.deleteDir(new File(LedgerConfig.getRootPath()));
+        //params:join_group  blockbytes;
+        args0.add(ByteString.copyFromUtf8(CSSC.JOIN_GROUP));
+        //args0.add(ByteString.copyFrom(blockBytes));
+        ISmartContract.SmartContractResponse res = mockStub.mockInvoke("0", args0);
+        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
     }
 
     @Test
     public void testInvokeWithInvalidParams(){
+        ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("0",new LinkedList<ByteString>());
+        List<ByteString> args0 = new LinkedList<ByteString>();
+        //先删除账本
+        FileUtils.deleteDir(new File(LedgerConfig.getRootPath()));
 
+
+        //List<ByteString> args0 = new LinkedList<ByteString>();
+        args0.add(ByteString.copyFromUtf8("fooFuction"));
+        args0.add(ByteString.copyFromUtf8("mytestchainid"));
+        ISmartContract.SmartContractResponse res0 = mockStub.mockInvoke("0", args0);
+        assertThat(res0.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
+        //assertEquals(res0.getMessage(),"Requested funtion fooFution not found");
+
+        ProposalPackage.SignedProposal sp0= null;
+        List<ByteString> args1 = new LinkedList<ByteString>();
+        args1.add(ByteString.copyFromUtf8(CSSC.GET_CONFIG_BLOCK));
+        args1.add(ByteString.copyFromUtf8("mytestchainid"));
+        ISmartContract.SmartContractResponse res1 = mockStub.mockInvokeWithSignedProposal("1", args1,sp0);
+        assertThat(res1.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
+//        assertEquals(res1.getMessage(),"CSSC invoke expected to fail no signed proposal provided");//the statement of string "Incorrect number of arguments,0"  is Ok?
+
+        ProposalPackage.SignedProposal sp1= null;
+        List<ByteString> args2 = new LinkedList<ByteString>();
+        args2.add(ByteString.copyFromUtf8("GetGroups"));
+        ISmartContract.SmartContractResponse res2 = mockStub.mockInvokeWithSignedProposal("2", args2,sp1);
+       // ISmartContract.SmartContractResponse res2 = mockStub.mockInvoke("2", args2);
+        assertThat(res2.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
     }
 
     @Test
-    public void testSubmittingOrdererGenesis(){
+    public void testSubmittingOrdererGenesis() throws IOException, JulongChainException {
+        ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("0",new LinkedList<ByteString>());
+        List<ByteString> args0 = new LinkedList<ByteString>();
+        //先删除账本
+        FileUtils.deleteDir(new File(LedgerConfig.getRootPath()));
+        try {
+            LedgerManager.initialize(null);
+        } catch (LedgerException e) {
+            e.printStackTrace();
+            return;
+        }
+        byte[] blockBytes=null;
+        try {
+            blockBytes = mockConfigBlock2();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        } catch (JulongChainException e) {
+            e.printStackTrace();
+            return;
+        }
+
+
+        ProposalPackage.SignedProposal sp=null;
+        try {
+            sp = TxUtils.mockSignedEndorserProposalOrPanic("",
+                    SmartContractPackage.SmartContractSpec.newBuilder().build());
+        } catch (JulongChainException e) {
+            e.printStackTrace();
+            return;
+        }
+        args0.add(ByteString.copyFromUtf8(CSSC.JOIN_GROUP));
+        args0.add(ByteString.copyFrom(blockBytes));
+        ISmartContract.SmartContractResponse res = mockStub.mockInvokeWithSignedProposal("0", args0,sp);
+        assertThat(res.getStatus(),is(ISmartContract.SmartContractResponse.Status.INTERNAL_SERVER_ERROR));
+
+
 
     }
 
 
-
-    private byte[] mockConfigBlock() throws IOException, ValidateException,JavaChainException {
+    private byte[] mockConfigBlock() throws IOException, ValidateException,JulongChainException {
+//>>>>>>> Stashed changes
         GenesisConfig.Profile profile=GenesisConfigFactory.getGenesisConfig().getCompletedProfile("SampleDevModeSolo");
         Configtx.ConfigTree tree = ConfigTreeHelper.buildGroupTree(profile);
         GenesisBlockFactory factory=new GenesisBlockFactory(tree);
+        Common.Block block = factory.getGenesisBlock("mytestchainid");
+        return block.toByteArray();
+    }
+    private byte[] mockConfigBlock2() throws IOException, ValidateException,JulongChainException {
+        GenesisConfig.Profile profile = GenesisConfigFactory.getGenesisConfig().getCompletedProfile("SampleSingleMSPSolo");
+        Configtx.ConfigTree tree = ConfigTreeHelper.buildGroupTree(profile);
+        GenesisBlockFactory factory = new GenesisBlockFactory(tree);
         Common.Block block = factory.getGenesisBlock("mytestchainid");
         return block.toByteArray();
     }

@@ -22,15 +22,15 @@ import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.julongchain.common.groupconfig.config.IConsenterConfig;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.PolicyConstant;
 import org.bcia.julongchain.common.util.proto.TxUtils;
 import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
 import org.bcia.julongchain.consenter.consensus.IProcessor;
 import org.bcia.julongchain.consenter.entity.ConfigMsg;
 import org.bcia.julongchain.consenter.util.CommonUtils;
-import org.bcia.julongchain.consenter.util.Constant;
+import org.bcia.julongchain.consenter.util.ConsenterConstants;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 
@@ -40,7 +40,7 @@ import org.bcia.julongchain.protos.common.Configtx;
  * @company Dingxuan
  */
 public class SystemGroup  implements IProcessor {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SystemGroup.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SystemGroup.class);
     private StandardGroup standardGroup;
     private IGroupConfigTemplator groupConfigTemplator;
     private RuleSet filters;
@@ -59,11 +59,11 @@ public class SystemGroup  implements IProcessor {
         return new SystemGroup(standardGroup,groupConfigTemplator,filters);
     }
 
-    public static  RuleSet createSystemChannelFilters(IChainCreator chainCreator,IGroupConfigBundle filterSupport) {
+    public static  RuleSet createSystemGroupFilters(IChainCreator chainCreator,IGroupConfigBundle filterSupport) {
         IConsenterConfig consenterConfig=filterSupport.getGroupConfig().getConsenterConfig();
        if(consenterConfig==null){
            try {
-               throw new ConsenterException("Cannot create system channel filters without orderer config");
+               throw new ConsenterException("Cannot create system group filters without orderer config");
            } catch (ConsenterException e) {
                e.printStackTrace();
            }
@@ -77,7 +77,7 @@ public class SystemGroup  implements IProcessor {
     }
 
     @Override
-    public boolean classfiyMsg(Common.GroupHeader chdr) {
+    public boolean ClassifyMsg(Common.GroupHeader chdr) {
         return false;
     }
 
@@ -91,32 +91,44 @@ public class SystemGroup  implements IProcessor {
     }
 
     @Override
-    public ConfigMsg processConfigUpdateMsg(Common.Envelope envConfigUpdate) throws ConsenterException, InvalidProtocolBufferException, ValidateException {
-        String groupId = CommonUtils.groupId(envConfigUpdate);
-        log.debug(String.format("Processing config update tx with system channel message processor for channel ID %s", groupId));
+    public ConfigMsg processConfigUpdateMsg(Common.Envelope envConfigUpdate) throws ConsenterException {
+        String groupId = null;
+        try {
+            groupId = CommonUtils.groupId(envConfigUpdate);
+        } catch (InvalidProtocolBufferException e) {
+            throw new ConsenterException(e.getMessage());
+        }
+        log.debug(String.format("Processing config update tx with system group message processor for group ID %s", groupId));
         String  standardGroupName= standardGroup.getSupport().getGroupId();
         if (groupId.equals(standardGroup.getSupport().getGroupId()) ) {
             return standardGroup.processConfigUpdateMsg(envConfigUpdate);
         }
         log.debug(String.format("Processing group create tx for group %s on system group %s", groupId,
                 standardGroup.getSupport().getGroupId()));
-        IGroupConfigBundle bundle = groupConfigTemplator.newGroupConfig(envConfigUpdate);
+        IGroupConfigBundle bundle = null;
+        Configtx.ConfigEnvelope newGroupConfigEnv = null;
+        try {
+            bundle = groupConfigTemplator.newGroupConfig(envConfigUpdate);
+            newGroupConfigEnv = bundle.getConfigtxValidator().proposeConfigUpdate(envConfigUpdate);
+        } catch (InvalidProtocolBufferException e) {
+            throw new ConsenterException(e.getMessage());
+        } catch (ValidateException e) {
+            throw new ConsenterException(e.getMessage());
+        }
 
-        Configtx.ConfigEnvelope newGroupConfigEnv = bundle.getConfigtxValidator().proposeConfigUpdate(envConfigUpdate);
-
-        Common.Envelope newChannelEnvConfig = TxUtils.createSignedEnvelope(Common.HeaderType.CONFIG_VALUE, groupId, standardGroup.getSupport().getSigner(), newGroupConfigEnv, Constant.MSGVERSION, Constant.EPOCH);
+        Common.Envelope newGroupEnvConfig = TxUtils.createSignedEnvelope(Common.HeaderType.CONFIG_VALUE, groupId, standardGroup.getSupport().getSigner(), newGroupConfigEnv, ConsenterConstants.MSGVERSION, ConsenterConstants.EPOCH);
 
         Common.Envelope wrappedOrdererTransaction =
                 TxUtils.createSignedEnvelope(Common.HeaderType.CONSENTER_TRANSACTION_VALUE,
-                        standardGroup.getSupport().getGroupId(), standardGroup.getSupport().getSigner(), newChannelEnvConfig,
-                        Constant.MSGVERSION, Constant.EPOCH);
+                        standardGroup.getSupport().getGroupId(), standardGroup.getSupport().getSigner(), newGroupEnvConfig,
+                        ConsenterConstants.MSGVERSION, ConsenterConstants.EPOCH);
 //       new RuleSet(standardGroup.getFilters().getRules()).apply(wrappedOrdererTransaction);
 
         return new ConfigMsg(wrappedOrdererTransaction, standardGroup.getSupport().getSequence());
     }
 
     @Override
-    public ConfigMsg processConfigMsg(Common.Envelope env) throws ConsenterException, InvalidProtocolBufferException, ValidateException, PolicyException {
+    public ConfigMsg processConfigMsg(Common.Envelope env) throws ConsenterException {
         Common.Payload payload = null;
         try {
             payload = Common.Payload.parseFrom(env.getPayload().toByteArray());
@@ -174,11 +186,6 @@ public class SystemGroup  implements IProcessor {
     public static ChainSupport newDefaultTemplator(ChainSupport support) {
         return support;
     }
-
-//    @Override
-//    public IGroupConfigBundle newGroupConfig(Common.Envelope envelope) {
-//        return null;
-//    }
 
     public StandardGroup getStandardGroup() {
         return standardGroup;

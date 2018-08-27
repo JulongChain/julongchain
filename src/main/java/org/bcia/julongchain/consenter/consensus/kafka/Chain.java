@@ -16,12 +16,12 @@
 package org.bcia.julongchain.consenter.consensus.kafka;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.common.blockcutter.BlockCutter;
 import org.bcia.julongchain.consenter.consensus.IChain;
 import org.bcia.julongchain.consenter.entity.ChainEntity;
-import org.bcia.julongchain.consenter.util.Constant;
+import org.bcia.julongchain.consenter.util.ConsenterConstants;
 import org.bcia.julongchain.consenter.util.YamlLoader;
 import org.bcia.julongchain.consenter.util.Utils;
 import org.bcia.julongchain.gossip.Node1;
@@ -42,7 +42,7 @@ import java.util.Map;
  */
 public class Chain implements IChain {
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Node1.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Node1.class);
     //TODO 使用自动注入报错，暂时new方式
     private DataMessageHandle dataMessageHandle=new DataMessageHandle();
     @Autowired
@@ -53,7 +53,7 @@ public class Chain implements IChain {
     private YamlLoader yamlLoader =new YamlLoader();
     //TODO 不知如何获取
     private ChainEntity chain=new ChainEntity();
-    Map map=(HashMap) YamlLoader.readYamlFile(Constant.ORDERER_CONFIG).get(Constant.KAFKA);
+    Map map=(HashMap) YamlLoader.readYamlFile(ConsenterConstants.ORDERER_CONFIG).get(ConsenterConstants.KAFKA);
     BlockCutter blockCutter=new BlockCutter();
 
     @Override
@@ -68,7 +68,6 @@ public class Chain implements IChain {
 
     @Override
     public void waitReady() {
-
     }
 
     @Override
@@ -92,8 +91,8 @@ public class Chain implements IChain {
     //enqueue接受信息并返回真或假otheriwse验收
     public void enqueue(Kafka.KafkaMessage kafkaMessage){
         log.debug("[channel: %s] Enqueueing envelope...", chain.getChainID());
-        String topic = (String)((HashMap)map.get(Constant.COMSUMER)).get(Constant.TOPIC);
-        int partitionID = (int)((HashMap)map.get(Constant.COMSUMER)).get(Constant.PARTITION_ID);
+        String topic = (String)((HashMap)map.get(ConsenterConstants.COMSUMER)).get(ConsenterConstants.TOPIC);
+        int partitionID = (int)((HashMap)map.get(ConsenterConstants.COMSUMER)).get(ConsenterConstants.PARTITION_ID);
         // 获取kafkaInfo，从配置文件获取（现在这里定义，TODO该成全局）
         KafkaTopicPartitionInfo kafkaInfo=new KafkaTopicPartitionInfo(topic,partitionID);
         //创建生产者消息
@@ -337,13 +336,13 @@ public class Chain implements IChain {
     //1.创建生产者，消费者，分区消费者，父类消费者，2.调用消费者方法，调用方法
     //start方法调用该方法
     public void startThread(){
-        int maxReads =(int) ((HashMap)map.get(Constant.COMSUMER)).get(Constant.MAX_READS);
-        String topic = (String)((HashMap)map.get(Constant.COMSUMER)).get(Constant.TOPIC);
-        int partitionID = (int)((HashMap)map.get(Constant.COMSUMER)).get(Constant.PARTITION_ID);
+        int maxReads =(int) ((HashMap)map.get(ConsenterConstants.COMSUMER)).get(ConsenterConstants.MAX_READS);
+        String topic = (String)((HashMap)map.get(ConsenterConstants.COMSUMER)).get(ConsenterConstants.TOPIC);
+        int partitionID = (int)((HashMap)map.get(ConsenterConstants.COMSUMER)).get(ConsenterConstants.PARTITION_ID);
 
         KafkaTopicPartitionInfo topicPartitionInfo = new KafkaTopicPartitionInfo(topic, partitionID);
         List<KafkaBrokerInfo> seeds = new ArrayList<KafkaBrokerInfo>();
-        Map serversMap= (HashMap)map.get(Constant.SERVER);
+        Map serversMap= (HashMap)map.get(ConsenterConstants.SERVER);
         for(int i=1;i<=serversMap.size();i++){
             String index="brokerHost"+i;
             String host=(String)serversMap.get(index);

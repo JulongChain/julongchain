@@ -19,10 +19,10 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import org.apache.commons.lang3.ArrayUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.ledger.util.IoUtil;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
 import org.bcia.julongchain.protos.node.SmartContractDataPackage;
@@ -39,7 +39,7 @@ import java.io.*;
  * @company Dingxuan
  */
 public class SignedSDSPackage implements ISmartContractPackage {
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(SignedSDSPackage.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SignedSDSPackage.class);
 
     private byte[] buf;
     private SmartContractPackage.SmartContractDeploymentSpec depSpec;
@@ -50,25 +50,25 @@ public class SignedSDSPackage implements ISmartContractPackage {
     private byte[] id;
 
     @Override
-    public SmartContractDataPackage.SmartContractData initFromBuffer(byte[] buf) throws JavaChainException {
+    public SmartContractDataPackage.SmartContractData initFromBuffer(byte[] buf) throws JulongChainException {
         reset();
         this.buf = buf;
         try {
             this.env = Common.Envelope.parseFrom(buf);
         } catch (InvalidProtocolBufferException e) {
             log.error("Fail to unmarshal envelope form bytes");
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         }
         Common.GroupHeader gh = SmartContractPackageUtil.extractGroupHeaderFromEnvelope(env);
         if(gh.getType() != Common.HeaderType.SMART_CONTRACT_PACKAGE_VALUE){
-            throw new JavaChainException("Invalid type of envelope for smartcontract package");
+            throw new JulongChainException("Invalid type of envelope for smartcontract package");
         }
         this.sDepSpec = SmartContractPackageUtil.extractSignedSmartContractDeploymentSpecFromEnvelope(env);
         try {
             this.depSpec = SmartContractPackage.SmartContractDeploymentSpec.parseFrom(sDepSpec.getSmartContractDeploymentSpec());
         } catch (InvalidProtocolBufferException e) {
             log.error("Error getting deployment spec");
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         }
         this.data = getSDSData(sDepSpec);
         //TODO data -> byte[]
@@ -83,7 +83,7 @@ public class SignedSDSPackage implements ISmartContractPackage {
     }
 
     @Override
-    public SmartContractPackage.SmartContractDeploymentSpec initFromFS(String scName, String scVersion) throws JavaChainException {
+    public SmartContractPackage.SmartContractDeploymentSpec initFromFS(String scName, String scVersion) throws JulongChainException {
         reset();
         byte[] buf = SmartContractProvider.getSmartContractPackage(scName, scVersion);
         initFromBuffer(buf);
@@ -91,24 +91,24 @@ public class SignedSDSPackage implements ISmartContractPackage {
     }
 
     @Override
-    public void putSmartcontractToFS() throws JavaChainException {
+    public void putSmartcontractToFS() throws JulongChainException {
         if(buf == null){
-            throw new JavaChainException("Uninitialized package");
+            throw new JulongChainException("Uninitialized package");
         }
         if(id == null){
-            throw new JavaChainException("Id cannot be null if buf is not null");
+            throw new JulongChainException("Id cannot be null if buf is not null");
         }
         if(sDepSpec == null || depSpec == null){
-            throw new JavaChainException("Depspec cannot be null if buf is not null");
+            throw new JulongChainException("Depspec cannot be null if buf is not null");
         }
         if(env == null){
-            throw new JavaChainException("Env cannot be null if buf is not null");
+            throw new JulongChainException("Env cannot be null if buf is not null");
         }
         if(data == null){
-            throw new JavaChainException("Null data");
+            throw new JulongChainException("Null data");
         }
         if(datab == null){
-            throw new JavaChainException("Null datab");
+            throw new JulongChainException("Null datab");
         }
 
         String scName = depSpec.getSmartContractSpec().getSmartContractId().getName();
@@ -117,13 +117,13 @@ public class SignedSDSPackage implements ISmartContractPackage {
 
         File file = new File(path);
         if(file.exists()){
-            throw new JavaChainException(String.format("SmartContract %s is exists", path));
+            throw new JulongChainException(String.format("SmartContract %s is exists", path));
         }
         try {
             IoUtil.createFileIfMissing(path);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         }
 
         OutputStream os = null;
@@ -137,7 +137,7 @@ public class SignedSDSPackage implements ISmartContractPackage {
             os.write(buf);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         }
     }
 
@@ -157,9 +157,9 @@ public class SignedSDSPackage implements ISmartContractPackage {
         return depSpec;
     }
 
-    public byte[] getInstantiationPolicy() throws JavaChainException {
+    public byte[] getInstantiationPolicy() throws JulongChainException {
         if(sDepSpec == null){
-            throw new JavaChainException("GetInstantiationPolicy called on uninitialized package");
+            throw new JulongChainException("GetInstantiationPolicy called on uninitialized package");
         }
         return sDepSpec.getInstantiationPolicy().toByteArray();
     }
@@ -195,7 +195,7 @@ public class SignedSDSPackage implements ISmartContractPackage {
                 .build();
     }
 
-    private SignedSDSData getSDSData(SignedScDepSpec.SignedSmartContractDeploymentSpec ssds) throws JavaChainException{
+    private SignedSDSData getSDSData(SignedScDepSpec.SignedSmartContractDeploymentSpec ssds) throws JulongChainException {
         if(ssds == null){
             log.error("Null sds");
             return null;
@@ -205,7 +205,7 @@ public class SignedSDSPackage implements ISmartContractPackage {
             sds = SmartContractPackage.SmartContractDeploymentSpec.parseFrom(ssds.getSmartContractDeploymentSpec());
         } catch (Exception e){
             log.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         }
         //组装signedSDSData
         SignedSDSData ssdsData = new SignedSDSData();
@@ -230,23 +230,23 @@ public class SignedSDSPackage implements ISmartContractPackage {
     }
 
     @Override
-    public void validateSC(SmartContractDataPackage.SmartContractData scData) throws JavaChainException {
+    public void validateSC(SmartContractDataPackage.SmartContractData scData) throws JulongChainException {
         if(sDepSpec == null){
-            throw new JavaChainException("Uninitialized package");
+            throw new JulongChainException("Uninitialized package");
         }
         if(sDepSpec.getSmartContractDeploymentSpec() == null){
-            throw new JavaChainException("Signed smartcontract deployment spec cannot be null in a package");
+            throw new JulongChainException("Signed smartcontract deployment spec cannot be null in a package");
         }
         if(depSpec == null){
-            throw new JavaChainException("Smartcontract deployment spec cannot be null in a package");
+            throw new JulongChainException("Smartcontract deployment spec cannot be null in a package");
         }
         if(!scData.getName().equals(depSpec.getSmartContractSpec().getSmartContractId().getName()) ||
                 !scData.getVersion().equals(depSpec.getSmartContractSpec().getSmartContractId().getVersion())){
-            throw new JavaChainException("Invalid smartcontract data");
+            throw new JulongChainException("Invalid smartcontract data");
         }
         SignedSDSData otherData = (SignedSDSData) IoUtil.byteArray2Obj(scData.getData().toByteArray());
         if(!data.equals(otherData)){
-            throw new JavaChainException("Data mismatch");
+            throw new JulongChainException("Data mismatch");
         }
     }
 

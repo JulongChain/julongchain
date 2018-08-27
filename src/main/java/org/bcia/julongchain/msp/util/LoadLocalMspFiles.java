@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 package org.bcia.julongchain.msp.util;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.FileUtils;
 import org.bcia.julongchain.csp.gm.dxct.util.CryptoUtil;
 import java.io.File;
@@ -25,31 +25,15 @@ import java.util.List;
 
 /**
  * 加载本地msp文件夹
- *
  * @author zhangmingyang
  * @Date: 2018/4/4
  * @company Dingxuan
  */
 public class LoadLocalMspFiles {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(LoadLocalMspFiles.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(LoadLocalMspFiles.class);
     File or;
     File[] files;
-    /**
-     * 文件名集合
-     */
-    List<String> pathName = new ArrayList<String>();
-    /**
-     * 存放文件名和文件的绝对路径
-     */
-    private static HashMap<String, String> map = new HashMap<String, String>();
-    /**
-     * 存放文件的绝对路径和文件具体的值
-     */
-    public static HashMap<String, String> mspMap = new HashMap<String, String>();
-    /**
-     * 存在文件的相对路径和文件具体的值
-     */
-    public static  HashMap<String,String> pemMap=new HashMap<String,String>();
+
     public static final String ADMINCERTS = "admincerts";
     public static final String CACERTS= "cacerts";
     public static final String CRLSFOLDER = "crls";

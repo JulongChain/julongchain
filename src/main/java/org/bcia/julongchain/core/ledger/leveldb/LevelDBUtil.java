@@ -14,8 +14,8 @@
 package org.bcia.julongchain.core.ledger.leveldb;
 
 import org.bcia.julongchain.common.exception.LevelDBException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.history.historydb.HistoryDBHelper;
 import org.iq80.leveldb.*;
 
@@ -32,7 +32,7 @@ import java.util.*;
  */
 public class LevelDBUtil {
 
-	private static JavaChainLog log = JavaChainLogFactory.getLog(LevelDBUtil.class);
+	private static JulongChainLog log = JulongChainLogFactory.getLog(LevelDBUtil.class);
 
 	/** 保存当前打开的levelDB连接 */
 	private static Map<String, LevelDB> dbMap =

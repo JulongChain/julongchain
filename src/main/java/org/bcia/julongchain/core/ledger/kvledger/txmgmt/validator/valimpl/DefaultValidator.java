@@ -16,8 +16,8 @@ limitations under the License.
 package org.bcia.julongchain.core.ledger.kvledger.txmgmt.validator.valimpl;
 
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.BlockAndPvtData;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate.IDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate.PvtUpdateBatch;
@@ -38,7 +38,7 @@ import org.bcia.julongchain.protos.common.Common;
  * @company Dingxuan
  */
 public class DefaultValidator implements IValidator {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(DefaultValidator.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(DefaultValidator.class);
 
     private ITxManager txMgr;
     private InternalValidator val;
@@ -52,15 +52,15 @@ public class DefaultValidator implements IValidator {
     public UpdateBatch validateAndPrepareBatch(BlockAndPvtData blockAndPvtData, boolean doMVCCValidation) throws LedgerException {
         Common.Block block = blockAndPvtData.getBlock();
         Common.Block.Builder builder = block.toBuilder();
-        logger.debug("validateAndPrepareBatch() for block No." + block.getHeader().getNumber());
-        logger.debug("preprocessing block");
+        log.debug("validateAndPrepareBatch() for block No." + block.getHeader().getNumber());
+        log.debug("preprocessing block");
         Block internalBlock = Helper.preprocessProtoBlock(txMgr, builder, doMVCCValidation);
         PubAndHashUpdates pubAndHashUpdates = val.validateAndPrepareBatch(internalBlock, doMVCCValidation);
-        logger.debug("validating rwset...");
+        log.debug("validating rwset...");
         PvtUpdateBatch pvtUpdates = Helper.validateAndPreparePvtBatch(internalBlock, blockAndPvtData.getBlockPvtData());
-        logger.debug("postprocessing Proto block");
+        log.debug("postprocessing Proto block");
         Helper.postprocessProtoBlock(builder, internalBlock);
-        logger.debug("validateAndPrepareBatch complete");
+        log.debug("validateAndPrepareBatch complete");
 
         blockAndPvtData.setBlock(builder.build());
 

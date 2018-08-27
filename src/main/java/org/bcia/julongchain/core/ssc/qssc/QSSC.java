@@ -16,10 +16,10 @@
 package org.bcia.julongchain.core.ssc.qssc;
 
 import com.google.protobuf.ByteString;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.aclmgmt.AclManagement;
 import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.node.util.NodeUtils;
@@ -34,19 +34,24 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * 查询系统智能合约　Query System Smart Contract,CSSC
- * CSSC implements the ledger query functions, including:
- * -GetChainInfo returns BlockchainInfo
- * -GetBlockByNumber returns a block
- * -GetBlockByHash returns a block
- * -GetTransactionByID returns a transaction
+ * 查询系统智能合约　Query System Smart Contract,QSSC
+ * QSSC实现账本查询功能，包括：
+ * -GetGroupInfo 获取区块链信息
+ * -GetBlockByNumber 根据编号返回一个区块
+ * -GetBlockByHash 根据哈希值返回一个区块
+ * -GetTransactionByID 根据ID返回交易
+ * QSSC的invoke函数，接受的args格式说明如下：
+ * "Args":["GetGroupInfo",<groupID>]
+ * "Args":["GetBlockByNumber",<groupID>,<blockNumber>]
+ * "Args":["GetBlockByHash",<groupID>,<hash>]
+ * "Args":["GetTransactionByID",<groupID>,<txID>]
  * @author sunianle
  * @date 3/5/18
  * @company Dingxuan
  */
 @Component
 public class QSSC extends SystemSmartContractBase {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(QSSC.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(QSSC.class);
     // These are function names from Invoke first parameter
     public final static String GET_GROUP_INFO="GetGroupInfo";
 
@@ -101,7 +106,7 @@ public class QSSC extends SystemSmartContractBase {
         String res=getACLResource(function);
         try{
             AclManagement.getACLProvider().checkACL(function,groupID,sp);
-        }catch(JavaChainException e){
+        }catch(JulongChainException e){
             newErrorResponse(String.format("Authorization request for [%s][%s] failed:%s",function,groupID,e.getMessage()));
         }
 

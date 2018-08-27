@@ -22,8 +22,8 @@ import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.NetAddress;
 import org.bcia.julongchain.core.ssc.lssc.LSSC;
 import org.bcia.julongchain.node.Node;
@@ -37,7 +37,7 @@ import org.bcia.julongchain.protos.node.SmartContractPackage;
  * @company Dingxuan
  */
 public class ContractInvokeCmd extends AbstractNodeContractCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ContractInvokeCmd.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ContractInvokeCmd.class);
 
     /**
      * Target地址(Node)

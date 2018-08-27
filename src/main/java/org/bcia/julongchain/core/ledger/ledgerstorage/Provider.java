@@ -22,8 +22,6 @@ import org.bcia.julongchain.common.ledger.blkstorage.IBlockStoreProvider;
 import org.bcia.julongchain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage.Config;
 import org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage.FsBlockStoreProvider;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.julongchain.core.ledger.pvtdatastorage.IPvtDataStore;
 import org.bcia.julongchain.core.ledger.pvtdatastorage.PvtDataProvider;
@@ -36,8 +34,6 @@ import org.bcia.julongchain.core.ledger.pvtdatastorage.PvtDataProvider;
  * @company Dingxuan
  */
 public class Provider {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(Provider.class);
-
     private IBlockStoreProvider blkStoreProvider;
     private PvtDataProvider pvtDataProvider;
 

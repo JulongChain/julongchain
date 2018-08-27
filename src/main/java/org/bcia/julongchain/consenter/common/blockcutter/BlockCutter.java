@@ -17,21 +17,22 @@ package org.bcia.julongchain.consenter.common.blockcutter;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.bcia.julongchain.common.groupconfig.config.IConsenterConfig;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.consensus.IReceiver;
 import org.bcia.julongchain.consenter.entity.BatchesMes;
 import org.bcia.julongchain.protos.common.Common;
 import org.springframework.stereotype.Component;
 
 /**
+ * 区块剪切处理类
  * @author zhangmingyang
  * @Date: 2018/3/15
  * @company Dingxuan
  */
 @Component
 public class BlockCutter implements IReceiver {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(BlockCutter.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BlockCutter.class);
 
     private IConsenterConfig sharedConfigManager;
 
@@ -54,7 +55,7 @@ public class BlockCutter implements IReceiver {
         BatchesMes batchesMes = new BatchesMes();
         if (messageSizeBytes > sharedConfigManager.getBatchSize().getPreferredMaxBytes()) {
 
-            log.debug(String.format("he current message, with %s bytes, is larger than the preferred batch size of %s bytes and will be isolated.", messageSizeBytes, sharedConfigManager.getBatchSize().getPreferredMaxBytes()));
+            log.debug(String.format("The current message, with %s bytes, is larger than the preferred batch size of %s bytes and will be isolated.", messageSizeBytes, sharedConfigManager.getBatchSize().getPreferredMaxBytes()));
 
             if (pendingBatch.length > 0) {
                 Common.Envelope[] messageBatch = cut();

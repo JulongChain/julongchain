@@ -13,12 +13,13 @@
 # limitations under the License.
 #
 FROM julongchain/julongchain-baseimage
+MAINTAINER Julongchain "qkl@dxct.org"
 COPY julongchain.jar /root/julongchain
 COPY config/ /root/julongchain/config
 COPY msp/ /root/julongchain/msp
+COPY lib/ /root/julongchain/lib
 COPY smartcontract/ root/julongchain/smartcontract
 COPY libsdtsmjni.so /lib
 COPY libsdtsm.so /lib
-COPY lib/ /root/julongchain/lib
 WORKDIR /root/julongchain
 CMD java -jar /root/julongchain/julongchain.jar node start

@@ -15,13 +15,14 @@
  */
 package org.bcia.julongchain.msp.signer;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.intfs.opts.ISignerOpts;
-import org.bouncycastle.crypto.CryptoException;
 
 /**
+ * node节点签名
  * @author zhangmingyang
  * @Date: 2018/4/18
  * @company Dingxuan
@@ -36,18 +37,19 @@ public class NodeSigner implements ISigner {
         this.sk = sk;
     }
     @Override
-    public Object publicKey() {
+    public Object getPublicKey() {
         return this.pk;
     }
 
     @Override
-    public byte[] sign(IKey key, byte[] msgContent, ISignerOpts opts){
+    public byte[] sign(IKey key, byte[] msgContent, ISignerOpts opts) throws MspException{
+        byte[] signature=null;
         try {
-            return this.csp.sign(this.sk,msgContent,opts);
-        } catch (JavaChainException e) {
-            e.printStackTrace();
+            signature=this.csp.sign(this.sk,msgContent,opts);
+        } catch (JulongChainException e) {
+           throw new MspException(e.getMessage());
         }
-        return null;
+        return signature;
     }
 
     public ICsp getCsp() {

@@ -15,9 +15,9 @@
  */
 package org.bcia.julongchain.common.tools.cryptogen.sm2cert;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.tools.cryptogen.CspHelper;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2SignerOpts;
 import org.bcia.julongchain.csp.gm.dxct.sm3.SM3HashOpts;
@@ -41,7 +41,7 @@ import java.security.cert.CertificateException;
  * @company Excelsecu
  */
 public class SM2X509CertImpl extends X509CertImpl {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SM2X509CertImpl.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SM2X509CertImpl.class);
 
     public static final ObjectIdentifier SM3_WITH_SM2 = ObjectIdentifier.newInternal(new int[] {1, 2, 156, 10197, 1, 501});
     public static final AlgorithmId SM3_WITH_SM2_ALGORITHM_ID = new AlgorithmId(SM3_WITH_SM2);
@@ -50,7 +50,7 @@ public class SM2X509CertImpl extends X509CertImpl {
         super(info);
     }
 
-    public void sm2Sign(IKey privateKey, AlgorithmId algorithmId) throws JavaChainException, CertificateException {
+    public void sm2Sign(IKey privateKey, AlgorithmId algorithmId) throws JulongChainException, CertificateException {
         if (isReadOnly()) {
             throw new CertificateEncodingException("cannot over-write existing certificate");
         }
@@ -63,8 +63,7 @@ public class SM2X509CertImpl extends X509CertImpl {
             byte[] signedBytes = signedData.toByteArray();
             this.algId.encode(signedData);
 
-            byte[] digest = CspHelper.getCsp().hash(signedBytes, new SM3HashOpts());
-            this.signature = CspHelper.getCsp().sign(privateKey, digest, new SM2SignerOpts());
+            this.signature = CspHelper.getCsp().sign(privateKey, signedBytes, new SM2SignerOpts());
 
             signedData.putBitString(this.signature);
             signedCert.write((byte)48, signedData);

@@ -22,7 +22,7 @@ package org.bcia.julongchain.common.exception;
  * @date 2018/3/29
  * @company Dingxuan
  */
-public class InvalidTxException extends JavaChainException {
+public class InvalidTxException extends JulongChainException {
     private static final String MODULE_NAME = "[InvalidTx]";
 
     public InvalidTxException() {

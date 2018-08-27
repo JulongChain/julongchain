@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,9 +18,9 @@ package org.bcia.julongchain.common.ledger.util;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 import java.io.*;
 import java.util.*;
@@ -35,17 +35,9 @@ import java.util.zip.GZIPOutputStream;
  * @company Dingxuan
  */
 public class IoUtil {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(IoUtil.class);
-    private static final int BUFFER = 1024;
-
-    /** DirEmpty returns true if the dir at dirPath is empty
-     *
-     * @param dirPath
-     * @return
-     */
-    public static Boolean DirEmpty(String dirPath){
-        return Boolean.FALSE;
-    }
+    private static JulongChainLog log = JulongChainLogFactory.getLog(IoUtil.class);
+    private static final int MAX_FILE_MODE = 7;
+	private static final int MIN_FILE_MODE = 0;
 
     /**
      * 返回-1:文件不存在
@@ -59,19 +51,21 @@ public class IoUtil {
         return file.length();
     }
 
-    /** ListSubdirs returns the subdirectories
-     *
-     * @param dirPath
-     * @return
+    /**
+     * 列出下级目录
      */
     public static List<String> listSubdirs(String dirPath) {
         List<String> list = new ArrayList<>();
         File dir = new File(dirPath);
         if(!dir.exists()){
-            logger.debug("Dir {} is not exists", dir);
+            log.debug("Dir {} is not exists", dir);
             return null;
         }
-        for (File file : dir.listFiles()) {
+		File[] files = dir.listFiles();
+		if (files == null) {
+			return list;
+		}
+		for (File file : files) {
             if(file.isDirectory()){
                 list.add(file.getName());
             }
@@ -79,9 +73,28 @@ public class IoUtil {
         return list;
     }
 
-    public static void logDirStatus(String msg, String dirPath) {
-        return;
-    }
+	/**
+	 * 执行外部Linux命令
+	 * @param cmd	Linux命令
+	 * @return	执行结果
+	 */
+	public static List<String> exce(String cmd) {
+		System.out.println(cmd);
+		List<String> result = null;
+		try {
+			Process process = null;
+			result = new ArrayList<>();
+			process = Runtime.getRuntime().exec(cmd);
+			LineNumberReader reader = new LineNumberReader(new InputStreamReader(process.getInputStream()));
+			String line;
+			while((line = reader.readLine()) != null) {
+				result.add(line);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
 
     /**
      * 修改文件权限 755
@@ -91,27 +104,20 @@ public class IoUtil {
         int uMod = perm / 100;
         int gMod = (perm % 100) / 10;
         int oMod = perm % 10;
-        if(uMod > 7 || uMod < 0){
-            logger.error("Wrong mod type " + perm);
+        if(uMod > MAX_FILE_MODE || uMod < MIN_FILE_MODE){
+            log.error("Wrong mod type " + perm);
             return;
         }
-        if(gMod > 7 || gMod < 0){
-            logger.error("Wrong mod type " + perm);
+        if(gMod > MAX_FILE_MODE || gMod < MIN_FILE_MODE){
+            log.error("Wrong mod type " + perm);
             return;
         }
-        if(oMod > 7 || oMod < 0){
-            logger.error("Wrong mod type " + perm);
+        if(oMod > MAX_FILE_MODE || oMod < MIN_FILE_MODE){
+            log.error("Wrong mod type " + perm);
             return;
         }
-        if (!file.setWritable(uMod >= 4, (uMod > 0 && uMod < 5))) {
-            logger.error("Can not set write permission to dir " + file.getAbsolutePath());
-        }
-        if (!file.setReadable(gMod >= 4, (uMod > 0 && uMod < 5))) {
-            logger.error("Can not set read permission to dir " + file.getAbsolutePath());
-        }
-        if (!file.setExecutable(oMod >= 4, (uMod > 0 && uMod < 5))) {
-            logger.error("Can not set execute permission to dir " + file.getAbsolutePath());
-        }
+        String cmd = "chmod " + perm + " " + file.getAbsolutePath();
+        exce(cmd);
     }
 
     /**
@@ -120,15 +126,15 @@ public class IoUtil {
     public static boolean createDirIfMissing(String dirPath){
         File dir = new File(dirPath);
         if(dir.exists()){
-            logger.debug("Dir [{}] is already exists", dirPath);
+            log.debug("Dir [{}] is already exists", dirPath);
             return true;
         }
         if (!dir.mkdirs()) {
-            logger.debug("Can not create dir [" + dirPath + "]");
+            log.debug("Can not create dir [" + dirPath + "]");
             return false;
         }
         chmod(dir, 644);
-        logger.debug("Create dir [{}] success", dir.getAbsolutePath());
+        log.debug("Create dir [{}] success", dir.getAbsolutePath());
         return true;
     }
 
@@ -138,36 +144,33 @@ public class IoUtil {
     public static boolean createFileIfMissing(String filePath){
         File file = new File(filePath);
         if(file.exists()){
-            logger.debug("File [{}] is already exists", filePath);
+            log.debug("File [{}] is already exists", filePath);
             return true;
         }
         File dir = file.getParentFile();
         if (!createDirIfMissing(dir.getAbsolutePath())) {
-            logger.debug("Can not create dir [" + dir.getAbsolutePath() + "]");
+            log.debug("Can not create dir [" + dir.getAbsolutePath() + "]");
             return false;
         }
         try {
             if (file.createNewFile()) {
                 chmod(file, 755);
-                logger.debug("Create file [{}] success", filePath);
+                log.debug("Create file [{}] success", filePath);
                 return true;
             } else {
-                logger.debug("Can not create file [" + filePath + "]");
+                log.debug("Can not create file [" + filePath + "]");
                 return false;
             }
         } catch (IOException e) {
-            logger.error("Got error error:{} when createing file:[{}]", e.getMessage(), filePath);
+            log.error("Got error error:{} when createing file:[{}]", e.getMessage(), filePath);
             return false;
         }
     }
 
     /**
      * 序列化对象
-     * @param serializable
-     * @return
-     * @throws JavaChainException
      */
-    public static byte[] obj2ByteArray(Serializable serializable) throws JavaChainException {
+    public static byte[] obj2ByteArray(Serializable serializable) throws JulongChainException {
         ByteArrayOutputStream baos = null;
         ObjectOutputStream oos = null;
         try {
@@ -180,20 +183,17 @@ public class IoUtil {
             oos.close();
             return result;
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            log.error(e.getMessage(), e);
+            throw new JulongChainException(e);
         }
     }
 
     /**
      * 反序列化对象
-     * @param bytes
-     * @return
-     * @throws JavaChainException
      */
-    public static Object byteArray2Obj(byte[] bytes) throws JavaChainException{
-        ByteArrayInputStream bais = null;
-        ObjectInputStream ois = null;
+    public static Object byteArray2Obj(byte[] bytes) throws JulongChainException {
+        ByteArrayInputStream bais;
+        ObjectInputStream ois;
         try {
             bais = new ByteArrayInputStream(bytes);
             ois = new ObjectInputStream(bais);
@@ -202,8 +202,8 @@ public class IoUtil {
             ois.close();
             return obj;
         } catch (Exception e){
-            logger.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            log.error(e.getMessage(), e);
+            throw new JulongChainException(e);
         }
     }
     /**
@@ -214,11 +214,11 @@ public class IoUtil {
     public static Map<String, File> getFileRelativePath(String path){
         File file = new File(path);
         if(!file.exists()){
-            logger.debug("File {} is not exists", path);
+            log.debug("File {} is not exists", path);
             return null;
         }
         if(!file.isDirectory()){
-            logger.debug("Input must be a directory, but file {} is not", path);
+            log.debug("Input must be a directory, but file {} is not", path);
             return null;
         }
         Map<String, File> result = new TreeMap<>(Comparator.naturalOrder());
@@ -241,7 +241,7 @@ public class IoUtil {
     /**
      * 关闭流
      */
-    public static void closeStream(Closeable... closeables) throws JavaChainException{
+    public static void closeStream(Closeable... closeables) throws JulongChainException {
         try {
             for (Closeable closeable : closeables) {
                 if(closeable != null){
@@ -249,8 +249,8 @@ public class IoUtil {
                 }
             }
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            log.error(e.getMessage(), e);
+            throw new JulongChainException(e);
         }
     }
 
@@ -262,12 +262,12 @@ public class IoUtil {
      * @param cache 缓冲区大小
      * @return tar 字节流
      */
-    public static byte[] tarWriter(Map<String, File> files, int cache) throws JavaChainException{
+    public static byte[] tarWriter(Map<String, File> files, int cache) throws JulongChainException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         TarArchiveOutputStream taos = new TarArchiveOutputStream(baos);
         taos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
         FileInputStream fis = null;
-        TarArchiveEntry tae = null;
+        TarArchiveEntry tae;
         try {
             for (Map.Entry<String, File> entry : files.entrySet()) {
                 String fileName = entry.getKey();
@@ -276,7 +276,7 @@ public class IoUtil {
                 tae = new TarArchiveEntry(file);
                 tae.setName(fileName);
                 taos.putArchiveEntry(tae);
-                int num = 0;
+                int num;
                 byte[] buff = new byte[cache];
                 while((num = fis.read(buff)) != -1){
                     taos.write(buff, 0, num);
@@ -284,8 +284,8 @@ public class IoUtil {
                 taos.closeArchiveEntry();
             }
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            log.error(e.getMessage(), e);
+            throw new JulongChainException(e);
         } finally {
             closeStream(fis, taos, baos);
         }
@@ -297,7 +297,7 @@ public class IoUtil {
      * @param fileBytes 将要压缩的文件流
      * @return gzip压缩的文件流
      */
-    public static byte[] gzipWriter(byte[] fileBytes) throws JavaChainException{
+    public static byte[] gzipWriter(byte[] fileBytes) throws JulongChainException {
         ByteArrayOutputStream baos = null;
         GZIPOutputStream gzos = null;
         try {
@@ -307,8 +307,8 @@ public class IoUtil {
             gzos.finish();
             gzos.flush();
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            log.error(e.getMessage(), e);
+            throw new JulongChainException(e);
         } finally {
             closeStream(baos, gzos);
         }
@@ -323,8 +323,8 @@ public class IoUtil {
      *          key:文件相对路径
      *          value:文件流
      */
-    public static Map<String, byte[]> tarReader(byte[] tarBytes, int cache) throws JavaChainException{
-        Map<String, byte[]> result = new HashMap<>();
+    public static Map<String, byte[]> tarReader(byte[] tarBytes, int cache) throws JulongChainException {
+        Map<String, byte[]> result = new HashMap<>(16);
         ByteArrayOutputStream baos = null;
         ByteArrayInputStream bais = null;
         TarArchiveInputStream tais = null;
@@ -332,7 +332,7 @@ public class IoUtil {
             baos = new ByteArrayOutputStream();
             bais = new ByteArrayInputStream(tarBytes);
             tais = new TarArchiveInputStream(bais);
-            TarArchiveEntry tae = null;
+            TarArchiveEntry tae;
             while((tae = tais.getNextTarEntry()) != null){
                 int len = 0;
                 byte[] buff = new byte[cache];
@@ -343,8 +343,8 @@ public class IoUtil {
                 baos.reset();
             }
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            log.error(e.getMessage(), e);
+            throw new JulongChainException(e);
         } finally {
             closeStream( tais, bais, baos);
         }
@@ -357,7 +357,7 @@ public class IoUtil {
      * @param cache 缓冲大小
      * @return 解压后文件流
      */
-    public static byte[] gzipReader(byte[] fileBytes, int cache) throws JavaChainException{
+    public static byte[] gzipReader(byte[] fileBytes, int cache) throws JulongChainException {
         ByteArrayOutputStream baos = null;
         ByteArrayInputStream bais = null;
         GZIPInputStream gzis = null;
@@ -371,8 +371,8 @@ public class IoUtil {
                 baos.write(buff, 0, num);
             }
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            log.error(e.getMessage(), e);
+            throw new JulongChainException(e);
         } finally {
             closeStream( bais, baos, gzis);
         }
@@ -386,7 +386,7 @@ public class IoUtil {
      *              value: 文件流
      * @param outputPath 输出路径
      */
-    public static void fileWriter(Map<String, byte[]> files, String outputPath) throws JavaChainException {
+    public static void fileWriter(Map<String, byte[]> files, String outputPath) throws JulongChainException {
         outputPath = outputPath.endsWith(File.separator) ? outputPath : outputPath + File.separator;
         FileOutputStream fos = null;
         try {
@@ -396,14 +396,14 @@ public class IoUtil {
                 File file = new File(outputPath + fileRelativePath);
                 File dir = file.getParentFile();
                 if (!createDirIfMissing(dir.getAbsolutePath())) {
-                    throw new JavaChainException("Can not create dir " + dir.getAbsolutePath());
+                    throw new JulongChainException("Can not create dir " + dir.getAbsolutePath());
                 }
                 fos = new FileOutputStream(file);
                 fos.write(fileBytes);
             }
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            log.error(e.getMessage(), e);
+            throw new JulongChainException(e);
         } finally {
             closeStream(fos);
         }
@@ -414,10 +414,10 @@ public class IoUtil {
      * @param filePath 文件路径
      * @param cache 缓冲大小
      */
-    public static byte[] fileReader(String filePath, int cache) throws JavaChainException{
+    public static byte[] fileReader(String filePath, int cache) throws JulongChainException {
         File file = new File(filePath);
         if (!file.exists()) {
-            logger.debug("File {} not found", filePath);
+            log.debug("File {} not found", filePath);
             return null;
         }
         FileInputStream fis = null;
@@ -432,8 +432,8 @@ public class IoUtil {
             }
             return baos.toByteArray();
         } catch (Exception e){
-            logger.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            log.error(e.getMessage(), e);
+            throw new JulongChainException(e);
         } finally {
             closeStream(fis, baos);
         }

@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.gossip;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 /**
  * Gossip测试节点，第四个节点
@@ -26,6 +26,6 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
  * @company Dingxuan
  */
 public class Node4 {
-	private static JavaChainLog log = JavaChainLogFactory.getLog(Node4.class);
+	private static JulongChainLog log = JulongChainLogFactory.getLog(Node4.class);
 
 }

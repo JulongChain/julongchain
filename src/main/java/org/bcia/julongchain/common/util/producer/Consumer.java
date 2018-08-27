@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.common.util.producer;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 import java.util.concurrent.BlockingQueue;
 
@@ -28,7 +28,7 @@ import java.util.concurrent.BlockingQueue;
  * @company Dingxuan
  */
 public abstract class Consumer<T> extends Thread {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Consumer.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Consumer.class);
     private BlockingQueue<T> queue;
 
     public Consumer(BlockingQueue<T> queue) {

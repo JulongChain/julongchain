@@ -19,8 +19,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.CommitterException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.protos.ConfigEnvelopeVO;
 import org.bcia.julongchain.common.protos.PayloadVO;
 import org.bcia.julongchain.common.protos.TransactionVO;
@@ -46,7 +46,7 @@ import java.util.*;
  * @company Dingxuan
  */
 public class CommitterValidator implements ICommitterValidator {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CommitterValidator.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(CommitterValidator.class);
 
     private ICommitterSupport committerSupport;
     private IVsscValidator vsscValidator;

@@ -17,8 +17,8 @@ package org.bcia.julongchain.core.node;
 
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.groupconfig.config.IApplicationConfig;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.resourceconfig.ISmartContractDefinition;
 import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.node.entity.Group;
@@ -31,7 +31,7 @@ import org.bcia.julongchain.node.entity.Group;
  * @company Dingxuan
  */
 public class NodeSupport implements INodeSupport {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(NodeSupport.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(NodeSupport.class);
 
     @Override
     public IApplicationConfig getApplicationConfig(String groupId) {

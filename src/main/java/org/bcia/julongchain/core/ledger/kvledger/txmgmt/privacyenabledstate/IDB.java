@@ -33,11 +33,12 @@ import java.util.List;
  * @company Dingxuan
  */
 public interface IDB extends IVersionedDB {
+
     boolean isBulkOptimizable();
 
     void loadCommittedVersionsOfPubAndHashedKeys(List<CompositeKey> pubKeys, List<HashedCompositeKey> hashKeys) throws LedgerException;
 
-    LedgerHeight getCacheKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException;
+    LedgerHeight getCachedKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException;
 
     void clearCachedVersions();
 

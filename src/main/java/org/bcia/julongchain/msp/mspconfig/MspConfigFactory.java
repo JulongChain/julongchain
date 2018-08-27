@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.msp.mspconfig;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.yaml.snakeyaml.Yaml;
 
@@ -31,16 +31,14 @@ import java.io.InputStream;
  * @company Dingxuan
  */
 public class MspConfigFactory {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(MspConfigFactory.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(MspConfigFactory.class);
 
     public static MspConfig loadMspConfig() throws FileNotFoundException {
         Yaml yaml = new Yaml();
 
         InputStream is = null;
         try {
-//            is = MspConfigFactory.class.getClassLoader().getResourceAsStream(MspConfig.MspConfig_FILE_PATH);
             is = new FileInputStream(CommConstant.CONFIG_DIR_PREFIX + MspConfig.MspConfig_FILE_PATH);
-
             MspConfig mspConfig = yaml.loadAs(is, MspConfig.class);
             return mspConfig;
         } finally {

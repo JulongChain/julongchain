@@ -2,6 +2,8 @@
 Copyright IBM Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
+
+Modified java_package and other contents by Dingxuan on 2018-08-21
 */
 
 syntax = "proto3";
@@ -32,7 +34,7 @@ message MSPConfig {
 // This MSP may or may not come with a signing identity. If it does,
 // it can also issue signing identities. If it does not, it can only
 // be used to validate and verify certificates.
-message FabricMSPConfig {
+message JuLongMSPConfig {
     // Name holds the identifier of the MSP; MSP identifier
     // is chosen by the application that governs this MSP.
     // For example, and assuming the default implementation of MSP,
@@ -69,11 +71,11 @@ message FabricMSPConfig {
     // OrganizationalUnitIdentifiers holds one or more
     // fabric organizational unit identifiers that belong to
     // this MSP configuration
-    repeated FabricOUIdentifier organizational_unit_identifiers = 7;
+    repeated JuLongOUIdentifier organizational_unit_identifiers = 7;
 
     // FabricCryptoConfig contains the configuration parameters
     // for the cryptographic algorithms used by this MSP
-    FabricCryptoConfig crypto_config = 8;
+    JuLongCryptoConfig crypto_config = 8;
 
     // List of TLS root certificates trusted by this MSP.
     // They are returned by GetTLSRootCerts.
@@ -85,13 +87,13 @@ message FabricMSPConfig {
 
     // FabricNodeOUs contains the configuration to distinguish clients from peers from orderers
     // based on the OUs.
-    FabricNodeOUs FabricNodeOUs = 11;
+    JuLongNodeOUs JuLongNodeOUs = 11;
 }
 
 // FabricCryptoConfig contains configuration parameters
 // for the cryptographic algorithms used by the MSP
 // this configuration refers to
-message FabricCryptoConfig {
+message JuLongCryptoConfig {
 
     // SignatureHashFamily is a string representing the hash family to be used
     // during sign and verify operations.
@@ -161,7 +163,7 @@ message KeyInfo {
 
 // FabricOUIdentifier represents an organizational unit and
 // its related chain of trust identifier.
-message FabricOUIdentifier {
+message JuLongOUIdentifier {
 
     // Certificate represents the second certificate in a certification chain.
     // (Notice that the first certificate in a certification chain is supposed
@@ -180,16 +182,16 @@ message FabricOUIdentifier {
 // FabricNodeOUs contains configuration to tell apart clients from peers from orderers
 // based on OUs. If NodeOUs recognition is enabled then an msp identity
 // that does not contain any of the specified OU will be considered invalid.
-message FabricNodeOUs {
+message JuLongNodeOUs {
     // If true then an msp identity that does not contain any of the specified OU will be considered invalid.
     bool Enable = 1;
 
     // OU Identifier of the clients
-    FabricOUIdentifier clientOUIdentifier = 2;
+    JuLongOUIdentifier clientOUIdentifier = 2;
 
-    // OU Identifier of the peers
-    FabricOUIdentifier peerOUIdentifier = 3;
+    // OU Identifier of the nodes
+    JuLongOUIdentifier nodeOUIdentifier = 3;
 
-    // OU Identifier of the orderers
-    FabricOUIdentifier ordererOUIdentifier = 4;
+    // OU Identifier of the consenters
+    JuLongOUIdentifier consenterOUIdentifier = 4;
 }

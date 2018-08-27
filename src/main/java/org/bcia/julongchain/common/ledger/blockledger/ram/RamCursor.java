@@ -17,8 +17,8 @@ package org.bcia.julongchain.common.ledger.blockledger.ram;
 
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.blockledger.IIterator;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.julongchain.protos.common.Common;
 
@@ -32,7 +32,7 @@ import java.util.AbstractMap;
  * @company Dingxuan
  */
 public class RamCursor implements IIterator {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(RamCursor.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(RamCursor.class);
 
     private SimpleList list;
 
@@ -53,7 +53,7 @@ public class RamCursor implements IIterator {
                 return new QueryResult(new AbstractMap.SimpleImmutableEntry(new QueryResult(list.getBlock()), Common.Status.SUCCESS));
             }
             synchronized (RamLedger.getLock()){
-                logger.debug("Waiting for block number append");
+                log.debug("Waiting for block number append");
                 try {
                     RamLedger.getLock().wait();
                 } catch (InterruptedException e) {

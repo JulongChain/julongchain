@@ -33,15 +33,15 @@ public interface ICollectionAccessPolicy {
     boolean getAccessFilter(SignedData sd);
 
     /**
-     * The minimum number of peers private data will be sent to upon
+     * The minimum number of nodes private data will be sent to upon
      * endorsement. The endorsement would fail if dissemination to at least
-     * this number of peers is not achieved.
+     * this number of nodes is not achieved.
      */
     int getRequiredNodeCount();
 
     /**
-     * The maximum number of peers that private data will be sent to
-     * upon endorsement. This number has to be bigger than RequiredPeerCount().
+     * The maximum number of nodes that private data will be sent to
+     * upon endorsement. This number has to be bigger than RequiredNodeCount().
      */
     int getMaximumNodeCount();
 

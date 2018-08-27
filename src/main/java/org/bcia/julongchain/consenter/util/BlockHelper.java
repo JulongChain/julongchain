@@ -16,10 +16,9 @@
 package org.bcia.julongchain.consenter.util;
 
 import com.google.protobuf.ByteString;
-import org.apache.commons.lang.ArrayUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.gm.dxct.sm3.SM3HashOpts;
 import org.bcia.julongchain.protos.common.Common;
 
@@ -31,7 +30,7 @@ import static org.bcia.julongchain.csp.factory.CspManager.getDefaultCsp;
  * @company Dingxuan
  */
 public class BlockHelper {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(BlockHelper.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BlockHelper.class);
     private  byte[] previousHash;
     private byte[] dataHash;
     private long number;
@@ -45,18 +44,15 @@ public class BlockHelper {
 
     public static Common.Block createBlock(long seqNum, byte[] previousHash) {
         Common.Block.Builder block = Common.Block.newBuilder();
-        System.out.println(seqNum);
-      //  Common.BlockHeader.Builder blockHeader = Common.BlockHeader.newBuilder().setNumber(seqNum).setPreviousHash(ByteString.copyFrom(previousHash));
+        log.info(String.format("This Block's Num is %s",seqNum));
 
         Common.BlockData.Builder blockData = Common.BlockData.newBuilder();
         Common.BlockMetadata.Builder metaData = Common.BlockMetadata.newBuilder();
 
-        //TODO 封装append函数,BlockMetaIndex_name
-        for (int i = 0; i <4; i++) {
+        for (int i = 0; i<ConsenterConstants.METADATA_SIZE; i++) {
             block.getMetadataBuilder().addMetadata(ByteString.copyFrom(metaData.build().toByteArray()));
         }
         block.getHeaderBuilder().setNumber(seqNum).setPreviousHash(ByteString.copyFrom(previousHash));
-       // block.setHeader(blockHeader);
         block.setData(blockData);
         return block.build();
     }
@@ -66,9 +62,33 @@ public class BlockHelper {
         byte[] digest = new byte[0];
         try {
             digest = getDefaultCsp().hash(data, new SM3HashOpts());
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         }
         return digest;
+    }
+
+    public byte[] getPreviousHash() {
+        return previousHash;
+    }
+
+    public void setPreviousHash(byte[] previousHash) {
+        this.previousHash = previousHash;
+    }
+
+    public byte[] getDataHash() {
+        return dataHash;
+    }
+
+    public void setDataHash(byte[] dataHash) {
+        this.dataHash = dataHash;
+    }
+
+    public long getNumber() {
+        return number;
+    }
+
+    public void setNumber(long number) {
+        this.number = number;
     }
 }

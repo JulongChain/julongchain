@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.csp.pkcs11.entity;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 
 /**
  * Config for PKCS11 (Maybe useful)
@@ -32,7 +32,7 @@ public class PKCS11Config {
     //private boolean useecx963encodeing;
     private String path;
 
-    public PKCS11Config(int level, String hashfamily, boolean softVerify, boolean noKeyImport)  throws JavaChainException {
+    public PKCS11Config(int level, String hashfamily, boolean softVerify, boolean noKeyImport)  throws JulongChainException {
 
         switch (level){
             case 1:
@@ -42,7 +42,7 @@ public class PKCS11Config {
                 this.securityLevel = level;
                 break;
             default:
-                throw new JavaChainException("param level invalid");
+                throw new JulongChainException("param level invalid");
         }
 
         switch (hashfamily) {
@@ -53,7 +53,7 @@ public class PKCS11Config {
                 this.hashFamily = hashfamily;
                 break;
             default:
-                throw new JavaChainException("param hashfamily invalid");
+                throw new JulongChainException("param hashfamily invalid");
         }
 
         this.sfVer = softVerify;

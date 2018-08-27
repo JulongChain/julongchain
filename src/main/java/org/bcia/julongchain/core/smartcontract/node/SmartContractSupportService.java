@@ -34,6 +34,7 @@ import org.bcia.julongchain.protos.ledger.queryresult.KvQueryResult;
 import org.bcia.julongchain.protos.ledger.rwset.Rwset;
 import org.bcia.julongchain.protos.node.*;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 import static org.bcia.julongchain.core.smartcontract.node.SmartContractRunningUtil.*;
@@ -255,11 +256,11 @@ public class SmartContractSupportService
                     break;
                 }
                 VersionedKV kv = (VersionedKV) queryResult.getObj();
-                if(kv.getCompositeKey().getKey().compareTo(endKey) == 1){
+				String key = kv.getCompositeKey().getKey();
+                if(key.compareTo(endKey) >= 0){
                     break;
                 }
 
-                String key = kv.getCompositeKey().getKey();
                 String namespace = kv.getCompositeKey().getNamespace();
                 byte[] value = kv.getVersionedValue().getValue();
 
@@ -450,7 +451,7 @@ public class SmartContractSupportService
         ITxSimulator txSimulator = l.newTxSimulator("mytestgroupid2");
         byte[] state = txSimulator.getState("mytestgroupid2", "key1");
 //	    System.out.println(new String(state));
-        txSimulator.setState("mytestgroupid1", "key", "value".getBytes());
+        txSimulator.setState("mytestgroupid1", "key", "value".getBytes(StandardCharsets.UTF_8));
         TxSimulationResults txSimulationResults = txSimulator.getTxSimulationResults();
         Rwset.TxReadWriteSet publicReadWriteSet = txSimulationResults.getPublicReadWriteSet();
         Rwset.NsReadWriteSet nsRwset = publicReadWriteSet.getNsRwset(0);
