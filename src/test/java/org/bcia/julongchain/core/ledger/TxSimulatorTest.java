@@ -57,7 +57,7 @@ public class TxSimulatorTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-    @BeforeClass
+//    @BeforeClass
     public static void beforeClass() throws Exception  {
 		Utils.resetEnv();
 		Utils.constructDefaultLedger();
@@ -66,6 +66,8 @@ public class TxSimulatorTest {
 
     @Before
 	public void before() throws Exception {
+    	LedgerManager.initialize(null);
+		ledger = LedgerManager.openLedger(ledgerID);
 		simulator = ledger.newTxSimulator("5");
 	}
 
@@ -242,6 +244,12 @@ public class TxSimulatorTest {
 			add("not exists 1");
 		}});
 		states.forEach(Assert::assertNull);
+	}
+
+	@Test
+	public void stsda() throws Exception {
+		String startKey = "SUM_MONEY_" + String.format("%018.2f", 578.28);
+		System.out.println(startKey);
 	}
 
 	@Test

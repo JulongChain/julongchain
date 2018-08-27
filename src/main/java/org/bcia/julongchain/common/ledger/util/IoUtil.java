@@ -192,8 +192,8 @@ public class IoUtil {
      * 反序列化对象
      */
     public static Object byteArray2Obj(byte[] bytes) throws JulongChainException {
-        ByteArrayInputStream bais = null;
-        ObjectInputStream ois = null;
+        ByteArrayInputStream bais;
+        ObjectInputStream ois;
         try {
             bais = new ByteArrayInputStream(bytes);
             ois = new ObjectInputStream(bais);
@@ -267,7 +267,7 @@ public class IoUtil {
         TarArchiveOutputStream taos = new TarArchiveOutputStream(baos);
         taos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
         FileInputStream fis = null;
-        TarArchiveEntry tae = null;
+        TarArchiveEntry tae;
         try {
             for (Map.Entry<String, File> entry : files.entrySet()) {
                 String fileName = entry.getKey();
@@ -276,7 +276,7 @@ public class IoUtil {
                 tae = new TarArchiveEntry(file);
                 tae.setName(fileName);
                 taos.putArchiveEntry(tae);
-                int num = 0;
+                int num;
                 byte[] buff = new byte[cache];
                 while((num = fis.read(buff)) != -1){
                     taos.write(buff, 0, num);
@@ -332,7 +332,7 @@ public class IoUtil {
             baos = new ByteArrayOutputStream();
             bais = new ByteArrayInputStream(tarBytes);
             tais = new TarArchiveInputStream(bais);
-            TarArchiveEntry tae = null;
+            TarArchiveEntry tae;
             while((tae = tais.getNextTarEntry()) != null){
                 int len = 0;
                 byte[] buff = new byte[cache];
