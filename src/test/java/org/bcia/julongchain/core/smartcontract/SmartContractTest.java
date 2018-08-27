@@ -16,11 +16,21 @@
 package org.bcia.julongchain.core.smartcontract;
 
 import com.google.common.collect.Lists;
+import com.google.protobuf.ByteString;
+import org.apache.commons.io.FileUtils;
+import org.bcia.julongchain.common.exception.SysSmartContractException;
 import org.bcia.julongchain.common.util.CommConstant;
+import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.core.smartcontract.shim.impl.MockStub;
 import org.bcia.julongchain.core.ssc.lssc.LSSC;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
+import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -33,9 +43,31 @@ import java.util.UUID;
 public class SmartContractTest {
 
     @Test
-    public void testInstall() {
-        MockStub stub = new MockStub(CommConstant.LSSC, new LSSC());
-        stub.mockInvoke(UUID.randomUUID().toString(), Lists.newArrayList());
+    public void testInstall() throws SysSmartContractException {
+
+        String scName = "mycc";
+        String version = "1.0";
+        String srcPath = "/root/install";
+        String installCmd = "install";
+
+        LSSC lssc = new LSSC();
+        MockStub stub = new MockStub(CommConstant.LSSC, lssc);
+        lssc.init(stub);
+
+        SmartContractPackage.SmartContractID smartContractID = SmartContractPackage.SmartContractID.newBuilder().setName(scName).setVersion(version).setPath(srcPath).build();
+        SmartContractPackage.SmartContractSpec smartContractSpec = SmartContractPackage.SmartContractSpec.newBuilder().setSmartContractId(smartContractID).build();
+        SmartContractPackage.SmartContractDeploymentSpec smartContractDeploymentSpec = SmartContractPackage.SmartContractDeploymentSpec.newBuilder().setSmartContractSpec(smartContractSpec).build();
+
+        List<ByteString> list = new ArrayList<ByteString>();
+        list.add(ByteString.copyFrom(installCmd.getBytes()));
+        list.add(smartContractDeploymentSpec.toByteString());
+
+        lssc.executeInstall(stub, list.get(1).toByteArray());
+
+        String path = NodeConfigFactory.getNodeConfig().getNode().getFileSystemPath();
+        File scFile = FileUtils.getFile(path, scName + "." + version);
+
+        Assert.assertTrue(scFile.exists());
     }
 
     @Test
