@@ -13,17 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.common.deliver;
+package org.bcia.julongchain.consenter.common.broadcast;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.exception.ValidateException;
+import org.bcia.julongchain.consenter.common.multigroup.Registrar;
+import org.bcia.julongchain.protos.common.Common;
+
+import java.util.Map;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/5/29
+ * @Date: 2018/6/6
  * @company Dingxuan
  */
-public interface IHandler {
-  void handle(DeliverServer server) throws ValidateException, InvalidProtocolBufferException, LedgerException;
+public class BroadcastSupport implements IGroupSupportRegistrar  {
+
+    private  Registrar registrar;
+
+    public BroadcastSupport(Registrar registrar) {
+        this.registrar = registrar;
+    }
+
+    @Override
+    public Map<String, Object> broadcastGroupSupport(Common.Envelope msg) throws InvalidProtocolBufferException {
+        return new Registrar().broadcastGroupSupport(msg);
+    }
 }

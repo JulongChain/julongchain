@@ -32,7 +32,7 @@ import org.bcia.julongchain.common.util.FileUtils;
 import org.bcia.julongchain.common.util.proto.BlockUtils;
 import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
 import org.bcia.julongchain.common.util.proto.ProposalUtils;
-import org.bcia.julongchain.consenter.common.broadcast.BroadCastClient;
+
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContract;
 import org.bcia.julongchain.core.ssc.cssc.CSSC;
 import org.bcia.julongchain.core.ssc.qssc.QSSC;
@@ -323,10 +323,10 @@ public class NodeGroup {
      * 更新群组配置 V0.25
      */
     public void updateGroup(String ip, int port, String groupId) {
-        BroadCastClient broadCastClient = new BroadCastClient();
+        BroadcastClient broadcastClient = new BroadcastClient(ip,port);
         try {
             //broadCastClient.send(ip, port, groupId, this);
-            broadCastClient.send(ip, port, Common.Envelope.newBuilder().build(), null);
+            broadcastClient.send(Common.Envelope.newBuilder().build(), null);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

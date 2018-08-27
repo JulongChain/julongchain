@@ -25,7 +25,7 @@ import kafka.common.TopicAndPartition;
 import kafka.javaapi.*;
 import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.message.MessageAndOffset;
-import org.bcia.julongchain.consenter.util.Constant;
+import org.bcia.julongchain.consenter.util.ConsenterConstants;
 import org.bcia.julongchain.consenter.util.YamlLoader;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -46,12 +46,12 @@ public class KafkaSimpleConsumer {
     private Chain chain;
     @Autowired
     private YamlLoader yamlLoader =new YamlLoader();
-    Map map=(HashMap) yamlLoader.readYamlFile(Constant.ORDERER_CONFIG).get(Constant.KAFKA);
+    Map map=(HashMap) yamlLoader.readYamlFile(ConsenterConstants.ORDERER_CONFIG).get(ConsenterConstants.KAFKA);
 
     // 最大重试次数
-    private int maxRetryTimes = (int) ((HashMap)map.get(Constant.COMSUMER)).get(Constant.MAX_RETRY_TIMES);
+    private int maxRetryTimes = (int) ((HashMap)map.get(ConsenterConstants.COMSUMER)).get(ConsenterConstants.MAX_RETRY_TIMES);
     // 重试间隔时间
-    private long retryIntervalMillis =(int) ((HashMap)map.get(Constant.COMSUMER)).get(Constant.RETRY_INTERVAL_MILLIS);
+    private long retryIntervalMillis =(int) ((HashMap)map.get(ConsenterConstants.COMSUMER)).get(ConsenterConstants.RETRY_INTERVAL_MILLIS);
     // 缓存Topic/Partition对应的Broker连接信息
     private Map<KafkaTopicPartitionInfo, List<KafkaBrokerInfo>> replicaBrokers = new HashMap<KafkaTopicPartitionInfo, List<KafkaBrokerInfo>>();
 

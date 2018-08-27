@@ -18,7 +18,7 @@ package org.bcia.julongchain.msp.mspconfig;
 import java.util.Map;
 
 /**
- * 将gmcsp文件转换为配置对象
+ * gmcsp文件转换配置对象
  * @author zhangmingyang
  * @Date: 2018/6/13
  * @company Dingxuan

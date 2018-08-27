@@ -1,4 +1,4 @@
-package org.bcia.julongchain.csp.gm;
+package org.bcia.julongchain.csp.gm.dxct;
 
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.factory.IFactoryOpts;

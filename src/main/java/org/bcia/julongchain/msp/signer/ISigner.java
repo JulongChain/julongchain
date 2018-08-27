@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.msp.signer;
 
+import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.intfs.opts.ISignerOpts;
 import org.bouncycastle.crypto.CryptoException;
@@ -26,8 +27,19 @@ import org.bouncycastle.crypto.CryptoException;
  */
 public interface ISigner {
 
-    Object publicKey();
+    /**
+     * 获取公钥
+     * @return
+     */
+    Object getPublicKey();
 
-    byte[] sign(IKey key, byte[] msgContent, ISignerOpts opts);
+    /**
+     * 数据签名
+     * @param key
+     * @param msgContent
+     * @param opts
+     * @return
+     */
+    byte[] sign(IKey key, byte[] msgContent, ISignerOpts opts) throws MspException;
 
 }

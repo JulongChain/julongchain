@@ -323,7 +323,7 @@ public class Util {
         try {
             return CaHelper.newCA(caDir, orgName, commonName,
                     caSpec.getCountry(), caSpec.getProvince(), caSpec.getLocality(),
-                    caSpec.getOrganizationUnit(), caSpec.getStreetAddress(),
+                    caSpec.getOrganizationalUnit(), caSpec.getStreetAddress(),
                     caSpec.getPostalCode());
         } catch (JulongChainException e) {
             log.error("Error generating CaHelper for org " + orgName);

@@ -59,6 +59,7 @@ public class PolicyChecker implements IPolicyChecker{
     }
 
     /**
+     * 策略检查
      * @param groupID
      * @param policyName
      * @param signedProposal
@@ -126,7 +127,12 @@ public class PolicyChecker implements IPolicyChecker{
         this.checkPolicyBySignedData(groupID,policyName,sd);
     }
 
-
+    /**
+     * 没有通道时检查策略是否有效，在本地MSP通过策略
+     * @param policyName
+     * @param signedProposal
+     * @throws PolicyException
+     */
     @Override
     public void checkPolicyNoGroup(String policyName, ProposalPackage.SignedProposal signedProposal)throws PolicyException {
         if(policyName == ""){

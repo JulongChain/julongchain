@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.common.groupconfig;
 
+import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.msp.IMsp;
 import org.bcia.julongchain.msp.IMspManager;
 import org.bcia.julongchain.msp.mgmt.Msp;
@@ -98,7 +99,11 @@ public class MSPConfigHandler {
         }
 
         IMspManager mspManager = new MspManager();
-        mspManager.setup(mspArray);
+        try {
+            mspManager.setup(mspArray);
+        } catch (MspException e) {
+            e.printStackTrace();
+        }
         return mspManager;
     }
 

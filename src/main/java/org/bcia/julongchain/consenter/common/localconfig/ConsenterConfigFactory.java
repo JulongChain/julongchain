@@ -31,28 +31,29 @@ import java.io.InputStream;
  */
 public class ConsenterConfigFactory {
     private static JulongChainLog log = JulongChainLogFactory.getLog(ConsenterConfigFactory.class);
+    private static ConsenterConfig consenterConfig;
+
+    public static ConsenterConfig getConsenterConfig() {
+        if (consenterConfig == null) {
+            synchronized (ConsenterConfig.class) {
+                if (consenterConfig == null) {
+                    consenterConfig = loadConsenterConfig();
+                }
+            }
+        }
+        return consenterConfig;
+    }
 
     public static ConsenterConfig loadConsenterConfig() {
         Yaml yaml = new Yaml();
-//        InputStream is = ConsenterConfigFactory.class.getClassLoader().getResourceAsStream(ConsenterConfig.CONSENTER_CONFIG_PATH);
-
         InputStream is = null;
+        ConsenterConfig consenterConfig=null;
         try {
             is = new FileInputStream(CommConstant.CONFIG_DIR_PREFIX + ConsenterConfig.CONSENTER_CONFIG_PATH);
-            ConsenterConfig consenterConfig = yaml.loadAs(is, ConsenterConfig.class);
-            return consenterConfig;
+            consenterConfig = yaml.loadAs(is, ConsenterConfig.class);
         } catch (FileNotFoundException e) {
             log.error(e.getMessage(), e);
         }
-
-        return null;
-    }
-
-    public static void main(String[] args) {
-        ConsenterConfig consenterConfig = loadConsenterConfig();
-        System.out.println(consenterConfig.getKafka().getComumer().get("maxReads"));
-
-        String consenterAddress = ConsenterConfigFactory.loadConsenterConfig().getGeneral().getGossipAddress();
-        System.out.println(consenterAddress);
+        return consenterConfig;
     }
 }

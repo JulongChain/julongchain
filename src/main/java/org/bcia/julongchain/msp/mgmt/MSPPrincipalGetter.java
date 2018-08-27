@@ -22,9 +22,8 @@ import org.bcia.julongchain.protos.common.MspPrincipal;
 import static org.bcia.julongchain.msp.mgmt.GlobalMspManagement.getLocalMsp;
 
 /**
- * 类描述
- *
- * @author sunianle
+ * 根据角色类型构造MSPPrincipal
+ * @author sunianle,zhangmingyang
  * @date 4/2/18
  * @company Dingxuan
  */
@@ -52,7 +51,7 @@ public class MSPPrincipalGetter implements IMspPrincipalGetter {
             case MEMBERS:
                 MspPrincipal.MSPRole mspMembers = MspPrincipal.MSPRole.newBuilder()
                         .setMspIdentifier(mspid)
-                        .setRole(MspPrincipal.MSPRole.MSPRoleType.ADMIN).build();
+                        .setRole(MspPrincipal.MSPRole.MSPRoleType.MEMBER).build();
                 byte[] principalMemberBytes = mspMembers.toByteArray();
                 MspPrincipal.MSPPrincipal mspMembersPrincipal = MspPrincipal.MSPPrincipal.newBuilder()
                         .setPrincipalClassification(MspPrincipal.MSPPrincipal.Classification.ROLE)

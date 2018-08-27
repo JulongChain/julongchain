@@ -16,8 +16,7 @@
 package org.bcia.julongchain.gossip.api;
 
 /**
- * NodeSignature defines a signature of a node
- * on a given message
+ * NodeSignature 通过给定信息定义节点的签名
  *
  * @author wanliangbing
  * @date 2018/08/20

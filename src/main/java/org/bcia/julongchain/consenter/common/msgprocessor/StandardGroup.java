@@ -28,7 +28,7 @@ import org.bcia.julongchain.common.util.proto.TxUtils;
 import org.bcia.julongchain.consenter.consensus.IProcessor;
 import org.bcia.julongchain.consenter.entity.ConfigMsg;
 import org.bcia.julongchain.consenter.util.CommonUtils;
-import org.bcia.julongchain.consenter.util.Constant;
+import org.bcia.julongchain.consenter.util.ConsenterConstants;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 
@@ -69,7 +69,7 @@ public class StandardGroup implements IProcessor {
     }
 
     @Override
-    public boolean classfiyMsg(Common.GroupHeader chdr) {
+    public boolean ClassifyMsg(Common.GroupHeader chdr) {
         //配置类型返回true
         if (Common.HeaderType.CONFIG_VALUE == chdr.getType()) {
             return true;
@@ -89,20 +89,31 @@ public class StandardGroup implements IProcessor {
     }
 
     @Override
-    public ConfigMsg processConfigUpdateMsg(Common.Envelope env) throws InvalidProtocolBufferException, ValidateException{
+    public ConfigMsg processConfigUpdateMsg(Common.Envelope env) throws ConsenterException{
         long seq = standardGroupSupport.getSequence();
         //TODO 通过apply过滤
-        Configtx.ConfigEnvelope configEnvelope = standardGroupSupport.proposeConfigUpdate(env);
+        Configtx.ConfigEnvelope configEnvelope = null;
+        try {
+            configEnvelope = standardGroupSupport.proposeConfigUpdate(env);
+        } catch (InvalidProtocolBufferException e) {
+          throw new ConsenterException(e.getMessage());
+        } catch (ValidateException e) {
+            throw new ConsenterException(e.getMessage());
+        }
         int headerType = 0;
         Common.Envelope config = TxUtils.createSignedEnvelope(headerType, standardGroupSupport.getGroupId(),
-                standardGroupSupport.getSigner(), configEnvelope, Constant.MSGVERSION, Constant.EPOCH);
+                standardGroupSupport.getSigner(), configEnvelope, ConsenterConstants.MSGVERSION, ConsenterConstants.EPOCH);
         return new ConfigMsg(config, seq);
     }
 
     @Override
-    public ConfigMsg processConfigMsg(Common.Envelope env) throws InvalidProtocolBufferException, ValidateException, PolicyException {
+    public ConfigMsg processConfigMsg(Common.Envelope env) throws ConsenterException{
         Configtx.ConfigEnvelope configEnvelope = null;
-        CommonUtils.unmarshalEnvelopeOfType(env, Common.HeaderType.CONFIG, configEnvelope);
+        try {
+            CommonUtils.unmarshalEnvelopeOfType(env, Common.HeaderType.CONFIG, configEnvelope);
+        } catch (InvalidProtocolBufferException e) {
+        throw new ConsenterException(e.getMessage());
+        }
         //根据Envelope中groupHeader中的type,将data转换为ConfigEnvelop
         try {
             Common.GroupHeader groupHeader = Common.GroupHeader.parseFrom(env.getPayload().toByteArray());

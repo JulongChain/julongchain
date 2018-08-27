@@ -52,7 +52,7 @@ public interface IPolicyChecker {
 
     /**
      *
-     * CheckPolicyNoChannel检查通过签名的提议是否有效
+     * CheckPolicyNoGroup检查通过签名的提议是否有效
      * 在当地的MSP上通过政策。
      * @param policyName
      * @param signedProposal

@@ -29,7 +29,7 @@ import org.bcia.julongchain.protos.common.Policies;
 
 /**
  * 类描述
- *
+ * 策略提供者
  * @author yuanjun
  * @date 02/05/18
  * @company Aisino
@@ -41,7 +41,12 @@ public class PolicyProvider implements IPolicyProvider{
         this.deserializer = deserializer;
     }
 
-
+    /**
+     *  根据传入的字节数组生成策略对象
+     * @param data
+     * @return
+     * @throws PolicyException
+     */
     @Override
     public IPolicy makePolicy(byte[] data) throws PolicyException {
 

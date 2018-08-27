@@ -13,13 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.msp;
+package org.bcia.julongchain.consenter.common.server;
+
+import io.grpc.stub.StreamObserver;
+import org.bcia.julongchain.common.exception.ConsenterException;
+import org.bcia.julongchain.common.exception.ValidateException;
+import org.bcia.julongchain.protos.common.Common;
+import org.bcia.julongchain.protos.consenter.Ab;
+
+import java.io.IOException;
 
 /**
  * @author zhangmingyang
- * @Date: 2018/3/27
+ * @Date: 2018/6/4
  * @company Dingxuan
  */
-public interface IMspOpts {
-    int version();
+public interface IBroadcastHandler {
+   void handle(Common.Envelope envelope, StreamObserver<Ab.BroadcastResponse> responseObserver) throws ConsenterException;
 }

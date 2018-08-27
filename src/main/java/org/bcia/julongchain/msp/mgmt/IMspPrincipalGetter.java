@@ -24,5 +24,11 @@ import org.bcia.julongchain.protos.common.MspPrincipal;
  * @company Dingxuan
  */
 public interface IMspPrincipalGetter {
-   MspPrincipal.MSPPrincipal   get(String role) throws MspException;
+    /**
+     * 根据类型名称获取MSPPrincipal
+     * @param role
+     * @return
+     * @throws MspException
+     */
+    MspPrincipal.MSPPrincipal get(String role) throws MspException;
 }

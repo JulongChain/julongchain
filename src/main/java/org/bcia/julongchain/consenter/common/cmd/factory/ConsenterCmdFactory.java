@@ -19,7 +19,7 @@ import org.bcia.julongchain.consenter.common.cmd.IConsenterCmd;
 import org.bcia.julongchain.consenter.common.cmd.impl.BenchMarkCmd;
 import org.bcia.julongchain.consenter.common.cmd.impl.StartCmd;
 import org.bcia.julongchain.consenter.common.cmd.impl.VersionCmd;
-import org.bcia.julongchain.consenter.util.Constant;
+import org.bcia.julongchain.consenter.util.ConsenterConstants;
 
 
 /**
@@ -29,11 +29,11 @@ import org.bcia.julongchain.consenter.util.Constant;
  */
 public class ConsenterCmdFactory {
     public static IConsenterCmd getInstance(String command){
-    if(Constant.VERSION.equalsIgnoreCase(command)){
+    if(ConsenterConstants.VERSION.equalsIgnoreCase(command)){
         return new VersionCmd();
-    }else if(Constant.START.equalsIgnoreCase(command)){
+    }else if(ConsenterConstants.START.equalsIgnoreCase(command)){
         return new StartCmd();
-    }else if(Constant.BENCHMARK.equalsIgnoreCase(command)){
+    }else if(ConsenterConstants.BENCHMARK.equalsIgnoreCase(command)){
         return new BenchMarkCmd();
     }
         return null;

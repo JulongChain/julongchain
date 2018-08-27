@@ -16,10 +16,18 @@
 package org.bcia.julongchain.consenter.common.cmd.impl;
 
 import org.apache.commons.cli.ParseException;
+import org.bcia.julongchain.common.deliver.DeliverDeliverHandler;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.localmsp.impl.LocalSigner;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.consenter.common.broadcast.BroadcastHandler;
 import org.bcia.julongchain.consenter.common.cmd.IConsenterCmd;
+import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfigFactory;
+import org.bcia.julongchain.consenter.common.multigroup.Registrar;
 import org.bcia.julongchain.consenter.common.server.ConsenterServer;
+import org.bcia.julongchain.consenter.common.server.PreStart;
+import org.bcia.julongchain.consenter.util.ConsenterConstants;
 
 import java.io.IOException;
 
@@ -33,7 +41,21 @@ public class BenchMarkCmd implements IConsenterCmd {
     private ConsenterServer consenterServer;
 
     public BenchMarkCmd() {
-        consenterServer=new ConsenterServer();
+        Registrar registrar=null;
+        try {
+            registrar= new PreStart().initializeMultichannelRegistrar(ConsenterConfigFactory.getConsenterConfig(),new LocalSigner());
+        } catch (JulongChainException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        DeliverDeliverHandler deliverHandler=new DeliverDeliverHandler(registrar, ConsenterConfigFactory.getConsenterConfig().getGeneral().getAuthentication().get(ConsenterConstants.TIMEWONDW));
+        consenterServer = new ConsenterServer(7050);
+
+        BroadcastHandler broadCastHandle = new BroadcastHandler(registrar);
+        consenterServer.bindBroadcastServer(broadCastHandle);
+
+        consenterServer.bindDeverServer(deliverHandler);
     }
     @Override
     public void execCmd(String[] args) throws ParseException {

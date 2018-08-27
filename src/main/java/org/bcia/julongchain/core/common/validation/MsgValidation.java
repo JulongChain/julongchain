@@ -31,6 +31,7 @@ import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.msp.IIdentity;
 import org.bcia.julongchain.msp.IIdentityDeserializer;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
+import org.bcia.julongchain.msp.mgmt.MspMgmtMgr;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
@@ -171,7 +172,7 @@ public class MsgValidation {
         }
 
         //获取反序列化器
-        IIdentityDeserializer identityDeserializer = GlobalMspManagement.getIdentityDeserializer(groupId);
+        IIdentityDeserializer identityDeserializer = MspMgmtMgr.getIdentityDeserializer(groupId);
         ValidateUtils.isNotNull(identityDeserializer, "identityDeserializer can not be null");
 
         //反序列化出身份对象

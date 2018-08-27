@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.msp;
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.protos.msp.Identities;
 
@@ -30,11 +31,11 @@ public interface IIdentityDeserializer {
      * @param serializedIdentity
      * @return
      */
-     IIdentity deserializeIdentity(byte[] serializedIdentity);
+     IIdentity deserializeIdentity(byte[] serializedIdentity) throws MspException;
 
     /**
      * IsWellFormed检查给定的身份是否可以反序列化为其提供者特定的形式
      * @param identity
      */
-     void isWellFormed(Identities.SerializedIdentity identity);
+     void isWellFormed(Identities.SerializedIdentity identity) throws MspException;
 }

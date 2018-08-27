@@ -13,32 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.msp.util;
-
-import org.bouncycastle.asn1.x509.Certificate;
-
-import java.util.HashMap;
+package org.bcia.julongchain.msp.cache;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * msp工具类
+ * LRU cache
+ *
  * @author zhangmingyang
- * @date 2018/07/04
+ * @date 2018/07/16
  * @company Dingxuan
  */
-public class MspUtil {
-    public static Map parseFromString(String str) {
-        String[] split = str.split(",");
-        Map<String, String> subjectMap = new HashMap<>();
-        for (int i = 0; i < split.length; i++) {
-            String[] element = split[i].split("=");
-            if (element.length == 1) {
-                subjectMap.put(element[0].toString(), "");
-            }
-            if (element.length == 2) {
-                subjectMap.put(element[0].toString(), element[1].toString());
-            }
+public class LRUCache<K,V> extends LinkedHashMap<K,V>  {
+    private int cacheSize;
+
+    public LRUCache(int cacheSize) {
+        super(16, (float) 0.75,true);
+        this.cacheSize = cacheSize;
+    }
+
+    @Override
+    protected  boolean removeEldestEntry(Map.Entry<K,V> eldest){
+        return size()>=cacheSize;
+
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb=new StringBuilder();
+        for (Map.Entry<K,V> entry: entrySet()) {
+            sb.append(String.format("%s:%s ",entry.getKey(),entry.getValue()));
         }
-        return subjectMap;
+        return sb.toString();
     }
 }

@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @Date 2018-02-26
  * @company Dingxuan
  */
-public class BroadCastClientTest extends BaseJunit4Test{
+public class BroadcastClientTest extends BaseJunit4Test{
     @Autowired
-    public BroadCastClient broadCastClient;
+    public BroadcastClient broadcastClient;
     @Test
     public void send() throws Exception {
         String ip="localhost";

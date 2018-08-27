@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 /**
- * 对象
+ * 配置映射工具类
  *
  * @author zhouhui
  * @date 2018/4/24
@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
 public class ConfigMapUtils {
     private static final String CHILD_PREFIX = "[Tree]   ";
     private static final String VALUE_PREFIX = "[Value]  ";
-    private static final String POLICY_PREFIX = "[PolicyConstant] ";
+    private static final String POLICY_PREFIX = "[Policy] ";
 
     private static final int MAX_LENGTH = 249;
     private static final String REGEX_GROUP_ID = "[a-z][a-z0-9.-]*";
@@ -56,8 +56,8 @@ public class ConfigMapUtils {
         return result;
     }
 
-    private static void recurseMapConfig(Map<String, ConfigComparable> comparableMap, String[] paths, Configtx.ConfigTree
-            configTree) throws ValidateException {
+    private static void recurseMapConfig(Map<String, ConfigComparable> comparableMap, String[] paths, Configtx
+            .ConfigTree configTree) throws ValidateException {
         String[] newPaths = new String[paths.length - 1];
         System.arraycopy(paths, 0, newPaths, 0, paths.length - 1);
 

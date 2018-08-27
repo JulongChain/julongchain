@@ -75,7 +75,7 @@ public class ConfigComparable<T> {
      */
     private boolean equalConfigTree(Configtx.ConfigTree t, Configtx.ConfigTree otherT) {
         if (t == null || otherT == null) {
-            return false;
+            return t == otherT;
         }
 
         if (!Objects.equals(t.getVersion(), otherT.getVersion())
@@ -93,7 +93,7 @@ public class ConfigComparable<T> {
 
     private boolean equalConfigValue(Configtx.ConfigValue t, Configtx.ConfigValue otherT) {
         if (t == null || otherT == null) {
-            return false;
+            return t == otherT;
         }
 
         if (!Objects.equals(t.getVersion(), otherT.getVersion())
@@ -106,7 +106,7 @@ public class ConfigComparable<T> {
 
     private boolean equalConfigPolicy(Configtx.ConfigPolicy t, Configtx.ConfigPolicy otherT) {
         if (t == null || otherT == null) {
-            return false;
+            return t == otherT;
         }
 
         if (!Objects.equals(t.getVersion(), otherT.getVersion())

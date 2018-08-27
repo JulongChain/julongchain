@@ -44,14 +44,12 @@ public class BlockHelper {
 
     public static Common.Block createBlock(long seqNum, byte[] previousHash) {
         Common.Block.Builder block = Common.Block.newBuilder();
-        System.out.println(seqNum);
-      //  Common.BlockHeader.Builder blockHeader = Common.BlockHeader.newBuilder().setNumber(seqNum).setPreviousHash(ByteString.copyFrom(previousHash));
+        log.info(String.format("This Block's Num is %s",seqNum));
 
         Common.BlockData.Builder blockData = Common.BlockData.newBuilder();
         Common.BlockMetadata.Builder metaData = Common.BlockMetadata.newBuilder();
 
-        //TODO 封装append函数,BlockMetaIndex_name
-        for (int i = 0; i <4; i++) {
+        for (int i = 0; i<ConsenterConstants.METADATA_SIZE; i++) {
             block.getMetadataBuilder().addMetadata(ByteString.copyFrom(metaData.build().toByteArray()));
         }
         block.getHeaderBuilder().setNumber(seqNum).setPreviousHash(ByteString.copyFrom(previousHash));
@@ -68,5 +66,29 @@ public class BlockHelper {
             e.printStackTrace();
         }
         return digest;
+    }
+
+    public byte[] getPreviousHash() {
+        return previousHash;
+    }
+
+    public void setPreviousHash(byte[] previousHash) {
+        this.previousHash = previousHash;
+    }
+
+    public byte[] getDataHash() {
+        return dataHash;
+    }
+
+    public void setDataHash(byte[] dataHash) {
+        this.dataHash = dataHash;
+    }
+
+    public long getNumber() {
+        return number;
+    }
+
+    public void setNumber(long number) {
+        this.number = number;
     }
 }

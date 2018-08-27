@@ -25,8 +25,7 @@ package org.bcia.julongchain.gossip.api;
 public interface INodeSuspector {
 
     /**
-     * NodeSuspector returns whether a node with a given identity is suspected
-     * as being revoked, or its CA is revoked
+     * NodeSuspector 返回节点不管该节点是否有嫌疑或被取消证书资格
      * @param nodeIdentity
      * @return
      */

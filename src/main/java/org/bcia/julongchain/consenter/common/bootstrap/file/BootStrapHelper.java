@@ -22,6 +22,7 @@ import org.bcia.julongchain.protos.common.Common;
 import java.io.IOException;
 
 /**
+ * 启动工具类
  * @author zhangmingyang
  * @Date: 2018/5/9
  * @company Dingxuan
