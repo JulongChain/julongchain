@@ -1,5 +1,6 @@
 package org.bcia.julongchain.msp.mgmt;
 
+import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.exception.VerifyException;
 import org.bcia.julongchain.csp.factory.CspOptsManager;
 import org.bcia.julongchain.csp.factory.IFactoryOpts;
@@ -25,7 +26,7 @@ import static org.junit.Assert.assertEquals;
 public class GlobalMspManagementTest {
 
     @Test
-    public void loadLocalMspWithType() throws FileNotFoundException, VerifyException {
+    public void loadLocalMspWithType() throws FileNotFoundException, VerifyException, MspException {
         String testData="test data";
         MspConfig mspConfig = loadMspConfig();
         String mspConfigDir = mspConfig.getNode().getMspConfigPath();

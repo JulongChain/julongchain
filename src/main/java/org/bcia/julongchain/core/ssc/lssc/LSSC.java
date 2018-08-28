@@ -139,6 +139,9 @@ public class LSSC  extends SystemSmartContractBase {
         if(size<1){
             return newErrorResponse(String.format("Incorrect number of arguments, expected a minimum of 2,provided %d",size));
         }
+        for(int i = 0; i<args.size(); i++) {
+            System.out.println("=================:" + ByteString.copyFrom(args.get(i)).toStringUtf8());
+        }
         String function= ByteString.copyFrom(args.get(0)).toStringUtf8();
         //Handle ACL:
         //1. get the signed proposal
@@ -608,7 +611,7 @@ public class LSSC  extends SystemSmartContractBase {
      * @param stub
      * @param scBytes
      */
-    private void executeInstall(ISmartContractStub stub,byte[] scBytes) throws SysSmartContractException{
+    public void executeInstall(ISmartContractStub stub,byte[] scBytes) throws SysSmartContractException{
         log.debug("Execute install.");
         ISmartContractPackage scPack=null;
         try {
