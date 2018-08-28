@@ -40,23 +40,47 @@ public class ConfigMapUtils {
     private static final String VALUE_PREFIX = "[Value]  ";
     private static final String POLICY_PREFIX = "[Policy] ";
 
-    private static final int MAX_LENGTH = 249;
-    private static final String REGEX_GROUP_ID = "[a-z][a-z0-9.-]*";
+    /**
+     * 配置短路径最大长度
+     */
+    private static final int MAX_PATH_LENGTH = 249;
+    /**
+     * 合法短路径对应的正则表达式
+     */
     private static final String REGEX_CONFIG_ID = "[a-zA-Z0-9.-]+";
+    /**
+     * 无效的短路径
+     */
     private static final String[] ILLEGAL_NAMES = {".", ".."};
 
-    public static Map<String, ConfigComparable> mapConfig(Configtx.ConfigTree configTree, String rootKey) throws
+    /**
+     * 将配置树对象映射成可比较的对象集合
+     *
+     * @param configTree
+     * @param rootKey
+     * @return
+     * @throws ValidateException
+     */
+    public static Map<String, ConfigComparable> toComparableMap(Configtx.ConfigTree configTree, String rootKey) throws
             ValidateException {
         Map<String, ConfigComparable> result = new ConcurrentHashMap<>();
 
         if (configTree != null) {
-            recurseMapConfig(result, new String[]{rootKey}, configTree);
+            recurseMapConfigTree(result, new String[]{rootKey}, configTree);
         }
 
         return result;
     }
 
-    private static void recurseMapConfig(Map<String, ConfigComparable> comparableMap, String[] paths, Configtx
+    /**
+     * 递归映射配置树
+     *
+     * @param comparableMap 目标集合
+     * @param paths         当前路径（含父路径+当前路径）
+     * @param configTree    要被映射的配置树对象
+     * @throws ValidateException
+     */
+    private static void recurseMapConfigTree(Map<String, ConfigComparable> comparableMap, String[] paths, Configtx
             .ConfigTree configTree) throws ValidateException {
         String[] newPaths = new String[paths.length - 1];
         System.arraycopy(paths, 0, newPaths, 0, paths.length - 1);
@@ -77,7 +101,7 @@ public class ConfigMapUtils {
             System.arraycopy(paths, 0, childPaths, 0, paths.length);
             childPaths[paths.length] = childName;
 
-            recurseMapConfig(comparableMap, childPaths, childTree);
+            recurseMapConfigTree(comparableMap, childPaths, childTree);
         }
 
         //遍历所有的值
@@ -107,9 +131,19 @@ public class ConfigMapUtils {
         }
     }
 
-    private static void addToMap(Map<String, ConfigComparable> comparableMap, ConfigComparable comparable) throws ValidateException {
-        String prefix = null;
+    /**
+     * 向目标映射集合加入比较对象
+     *
+     * @param comparableMap
+     * @param comparable
+     * @throws ValidateException
+     */
+    private static void addToMap(Map<String, ConfigComparable> comparableMap, ConfigComparable comparable) throws
+            ValidateException {
+        //校验当前比对对象的路径标识是否合法
+        validateConfigPath(comparable.getKey());
 
+        String prefix = null;
         Object obj = comparable.getT();
         if (obj instanceof Configtx.ConfigTree) {
             prefix = CHILD_PREFIX;
@@ -119,8 +153,7 @@ public class ConfigMapUtils {
             prefix = POLICY_PREFIX;
         }
 
-        validateConfigId(comparable.getKey());
-
+        //拼接父路径和当前短路径，形成长路径
         if (ArrayUtils.isEmpty(comparable.getPath())) {
             prefix += CommConstant.PATH_SEPARATOR + comparable.getKey();
         } else {
@@ -131,52 +164,61 @@ public class ConfigMapUtils {
         comparableMap.put(prefix, comparable);
     }
 
-    private static void validateConfigId(String configId) throws ValidateException {
-        if (StringUtils.isBlank(configId)) {
-            throw new ValidateException("configId can not be null");
+    /**
+     * 校验配置路径（短路径）
+     *
+     * @param path
+     * @throws ValidateException
+     */
+    public static void validateConfigPath(String path) throws ValidateException {
+        if (StringUtils.isBlank(path)) {
+            throw new ValidateException("Config path can not be null");
         }
 
-        if (configId.length() > MAX_LENGTH) {
-            throw new ValidateException("configId cannot be longer than max length");
+        if (path.length() > MAX_PATH_LENGTH) {
+            throw new ValidateException("Config path can not be longer than max length");
         }
 
-        if (ArrayUtils.contains(ILLEGAL_NAMES, configId)) {
-            throw new ValidateException("illegal configId: " + configId);
+        if (ArrayUtils.contains(ILLEGAL_NAMES, path)) {
+            throw new ValidateException("Illegal path: " + path);
         }
 
-        if (!Pattern.matches(REGEX_CONFIG_ID, configId)) {
-            throw new ValidateException("Wrong configId: " + configId);
-        }
-    }
-
-    private static void validateGroupId(String groupId) throws ValidateException {
-        if (StringUtils.isBlank(groupId)) {
-            throw new ValidateException("groupId can not be null");
-        }
-
-        if (groupId.length() > MAX_LENGTH) {
-            throw new ValidateException("groupId cannot be longer than max length");
-        }
-
-        if (!Pattern.matches(REGEX_GROUP_ID, groupId)) {
-            throw new ValidateException("Wrong groupId: " + groupId);
+        if (!Pattern.matches(REGEX_CONFIG_ID, path)) {
+            throw new ValidateException("Wrong config path: " + path);
         }
     }
 
-    public static Configtx.ConfigTree configMapToConfig(Map<String, ConfigComparable> configComparableMap,
+    /**
+     * 将可比较的配置集合还原成配置树
+     *
+     * @param configComparableMap
+     * @param namespace
+     * @return
+     * @throws ValidateException
+     */
+    public static Configtx.ConfigTree restoreConfigTree(Map<String, ConfigComparable> configComparableMap,
                                                         String namespace) throws ValidateException {
         String rootPath = CommConstant.PATH_SEPARATOR + namespace;
-        return recurseConfigMap(rootPath, configComparableMap);
+        return recurseRestore(rootPath, configComparableMap);
     }
 
-    private static Configtx.ConfigTree recurseConfigMap(String path, Map<String, ConfigComparable> configComparableMap)
+    /**
+     * 递归还原配置树
+     *
+     * @param path                长路径
+     * @param configComparableMap
+     * @return
+     * @throws ValidateException
+     */
+    private static Configtx.ConfigTree recurseRestore(String path, Map<String, ConfigComparable> configComparableMap)
             throws ValidateException {
         String childPath = CHILD_PREFIX + path;
         ConfigComparable childConfigComparable = configComparableMap.get(childPath);
 
-        ValidateUtils.isNotNull(childConfigComparable, "childConfigComparable can not be null");
+        ValidateUtils.isNotNull(childConfigComparable, "ChildConfigComparable can not be null");
+        ValidateUtils.isNotNull(childConfigComparable.getT(), "ChildConfigComparable.getT can not be null");
         if (!(childConfigComparable.getT() instanceof Configtx.ConfigTree)) {
-            throw new ValidateException("must be configTree");
+            throw new ValidateException("Should be ConfigTree instance: " + childConfigComparable.getT());
         }
 
         Configtx.ConfigTree configTree = (Configtx.ConfigTree) childConfigComparable.getT();
@@ -189,7 +231,7 @@ public class ConfigMapUtils {
             Map.Entry<String, Configtx.ConfigTree> entry = childIterator.next();
             String childName = entry.getKey();
 
-            Configtx.ConfigTree newChildTree = recurseConfigMap(path + CommConstant.PATH_SEPARATOR + childName,
+            Configtx.ConfigTree newChildTree = recurseRestore(path + CommConstant.PATH_SEPARATOR + childName,
                     configComparableMap);
             newConfigTreeBuilder.putChilds(childName, newChildTree);
         }
@@ -204,12 +246,11 @@ public class ConfigMapUtils {
             String valuePath = VALUE_PREFIX + path + CommConstant.PATH_SEPARATOR + valueName;
 
             ConfigComparable configComparable = configComparableMap.get(valuePath);
-            if (configComparable == null || configComparable.getT() == null) {
-                throw new ValidateException("value can not be null");
-            }
 
+            ValidateUtils.isNotNull(configComparable, "ConfigComparable can not be null");
+            ValidateUtils.isNotNull(configComparable.getT(), "ConfigComparable.getT can not be null");
             if (!(configComparable.getT() instanceof Configtx.ConfigValue)) {
-                throw new ValidateException("should be value");
+                throw new ValidateException("Should be ConfigValue instance: " + configComparable.getT());
             }
 
             newConfigTreeBuilder.putValues(valueName, (Configtx.ConfigValue) configComparable.getT());
@@ -225,12 +266,11 @@ public class ConfigMapUtils {
             String policyPath = POLICY_PREFIX + path + CommConstant.PATH_SEPARATOR + policyName;
 
             ConfigComparable configComparable = configComparableMap.get(policyPath);
-            if (configComparable == null || configComparable.getT() == null) {
-                throw new ValidateException("value can not be null");
-            }
 
+            ValidateUtils.isNotNull(configComparable, "ConfigComparable can not be null");
+            ValidateUtils.isNotNull(configComparable.getT(), "ConfigComparable.getT can not be null");
             if (!(configComparable.getT() instanceof Configtx.ConfigPolicy)) {
-                throw new ValidateException("should be value");
+                throw new ValidateException("Should be ConfigPolicy instance: " + configComparable.getT());
             }
 
             newConfigTreeBuilder.putPolicies(policyName, (Configtx.ConfigPolicy) configComparable.getT());
