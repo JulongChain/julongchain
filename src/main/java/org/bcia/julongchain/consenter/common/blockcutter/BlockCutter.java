@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.consenter.common.blockcutter;
 
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.groupconfig.config.IConsenterConfig;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;

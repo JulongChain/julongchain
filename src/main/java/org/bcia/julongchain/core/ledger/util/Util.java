@@ -49,7 +49,7 @@ public class Util {
      */
     public static Common.Envelope getEnvelopFromBlock(ByteString data){
         //block以envelop开始
-        Common.Envelope env = null;
+        Common.Envelope env;
         try {
             env = Common.Envelope.parseFrom(data);
             return env;
@@ -63,7 +63,7 @@ public class Util {
      * 获取payload
      */
     public static Common.Payload getPayload(Common.Envelope env){
-        Common.Payload payload = null;
+        Common.Payload payload;
         try {
             payload = Common.Payload.parseFrom(env.getPayload());
             return payload;
@@ -77,7 +77,7 @@ public class Util {
      * 获取GroupHeader
      */
     public static Common.GroupHeader getGroupHeader(ByteString data){
-        Common.GroupHeader header = null;
+        Common.GroupHeader header;
         try {
             header = Common.GroupHeader.parseFrom(data);
             return header;
