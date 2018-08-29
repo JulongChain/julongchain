@@ -85,8 +85,8 @@ public class ConfigMapUtils {
         String[] newPaths = new String[paths.length - 1];
         System.arraycopy(paths, 0, newPaths, 0, paths.length - 1);
 
-        ConfigComparable<Configtx.ConfigTree> configTreeComparable = new ConfigComparable<Configtx.ConfigTree>(paths[paths.length -
-                1], newPaths, configTree);
+        ConfigComparable<Configtx.ConfigTree> configTreeComparable =
+                new ConfigComparable<Configtx.ConfigTree>(paths[paths.length - 1], newPaths, configTree);
         addToMap(comparableMap, configTreeComparable);
 
         //遍历所有的子树
@@ -112,8 +112,8 @@ public class ConfigMapUtils {
             String valueName = entry.getKey();
             Configtx.ConfigValue configValue = entry.getValue();
 
-            ConfigComparable<Configtx.ConfigValue> configValueComparable = new ConfigComparable<Configtx.ConfigValue>(valueName,
-                    paths, configValue);
+            ConfigComparable<Configtx.ConfigValue> configValueComparable =
+                    new ConfigComparable<Configtx.ConfigValue>(valueName, paths, configValue);
             addToMap(comparableMap, configValueComparable);
         }
 
@@ -125,8 +125,8 @@ public class ConfigMapUtils {
             String policyName = entry.getKey();
             Configtx.ConfigPolicy configPolicy = entry.getValue();
 
-            ConfigComparable<Configtx.ConfigPolicy> configPolicyComparable = new ConfigComparable<Configtx.ConfigPolicy>(policyName,
-                    paths, configPolicy);
+            ConfigComparable<Configtx.ConfigPolicy> configPolicyComparable =
+                    new ConfigComparable<Configtx.ConfigPolicy>(policyName, paths, configPolicy);
             addToMap(comparableMap, configPolicyComparable);
         }
     }

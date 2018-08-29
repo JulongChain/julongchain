@@ -28,7 +28,7 @@ import org.bouncycastle.crypto.digests.SM3Digest;
 public class SM3 {
     private SM3Digest sm3Digest;
     /**
-     *摘要长度
+     * 摘要长度
      */
     private int digestSize;
 
@@ -37,7 +37,7 @@ public class SM3 {
         digestSize = sm3Digest.getDigestSize();
     }
 
-    public byte[] hash(byte[] msg) {
+    public synchronized byte[] hash(byte[] msg) {
         byte[] resbuf = new byte[digestSize];
         sm3Digest.update(msg, 0, msg.length);
         sm3Digest.doFinal(resbuf, 0);

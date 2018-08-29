@@ -42,6 +42,7 @@ public class NodeConfig {
         private String networkId;
         private String listenAddress;
         private String consenterAddress;
+        private String smartContractListenAddress;
         private String address;
         private String addressAutoDetect;
         private KeepAlive keepalive;
@@ -88,6 +89,14 @@ public class NodeConfig {
 
         public void setConsenterAddress(String consenterAddress) {
             this.consenterAddress = consenterAddress;
+        }
+
+        public String getSmartContractListenAddress() {
+            return smartContractListenAddress;
+        }
+
+        public void setSmartContractListenAddress(String smartContractListenAddress) {
+            this.smartContractListenAddress = smartContractListenAddress;
         }
 
         public String getAddress() {

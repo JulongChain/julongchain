@@ -27,7 +27,6 @@ import org.bcia.julongchain.common.util.proto.ProposalResponseUtils;
 import org.bcia.julongchain.core.admin.IAdminServer;
 import org.bcia.julongchain.core.endorser.IEndorserServer;
 import org.bcia.julongchain.core.events.IDeliverEventsServer;
-import org.bcia.julongchain.core.smartcontract.node.SmartContractSupportService;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.*;
 
@@ -89,7 +88,7 @@ public class NodeGrpcServer {
         server = NettyServerBuilder.forPort(port).maxMessageSize(CommConstant.MAX_GRPC_MESSAGE_SIZE)
 //        server = ServerBuilder.forPort(port)
                 .addService(new EndorserServerImpl())
-                .addService(new SmartContractSupportService())
+//                .addService(new SmartContractSupportService())
                 .addService(new AdminServerImpl())
                 .addService(new DeliverServerImpl())
                 .build()
@@ -170,6 +169,7 @@ public class NodeGrpcServer {
                 public void onError(Throwable t) {
                     log.error(t.getMessage(), t);
                     responseObserver.onError(t);
+                    responseObserver.onCompleted();
                 }
 
                 @Override
@@ -200,6 +200,7 @@ public class NodeGrpcServer {
                 public void onError(Throwable t) {
                     log.error(t.getMessage(), t);
                     responseObserver.onError(t);
+                    responseObserver.onCompleted();
                 }
 
                 @Override
