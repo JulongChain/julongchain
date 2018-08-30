@@ -33,6 +33,10 @@ public class QueryResult {
         return obj;
     }
 
+    public <T> T getObj(Class<T> clazz) {
+    	return (T) obj;
+	}
+
     public void setObj(Object obj) {
         this.obj = obj;
     }

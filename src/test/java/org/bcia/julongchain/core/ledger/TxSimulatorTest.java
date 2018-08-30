@@ -218,6 +218,8 @@ public class TxSimulatorTest {
 
     @Test
     public void testGetState() throws Exception {
+		ByteString rwset = null;
+		KvRwset.KVRWSet kvRWSet = null;
     	//存在的state
 		for (int i = 0; i < 4; i++) {
 			byte[] value = simulator.getState(ns, "key" + i);
@@ -226,10 +228,25 @@ public class TxSimulatorTest {
 		//不存在的state
 		byte[] notExists = simulator.getState(ns, "not exist");
 		assertNull(notExists);
+		txSimulationResults = simulator.getTxSimulationResults();
+		rwset = txSimulationResults.getPublicReadWriteSet().getNsRwset(0).getRwset();
+		kvRWSet = KvRwset.KVRWSet.parseFrom(rwset);
+		int i = 0;
+		for (; i < 4; i++) {
+			KvRwset.KVRead read = kvRWSet.getReadsList().get(i);
+			Assert.assertEquals(read.getKey(), "key" + i);
+			assertSame(1L, read.getVersion().getBlockNum());
+			assertSame((long) i, read.getVersion().getTxNum());
+		}
+		KvRwset.KVRead read = kvRWSet.getReadsList().get(i);
+		Assert.assertEquals("not exist", read.getKey());
+		assertEquals(ByteString.EMPTY, read.getVersion().toByteString());
 	}
 
 	@Test
 	public void testGetStateMultipleKeys() throws Exception{
+		ByteString rwset = null;
+		KvRwset.KVRWSet kvRWSet = null;
 		//存在的state
 		List<byte[]> states = simulator.getStateMultipleKeys(ns, new ArrayList<String>() {{
 			add("key0");
@@ -244,12 +261,22 @@ public class TxSimulatorTest {
 			add("not exists 1");
 		}});
 		states.forEach(Assert::assertNull);
-	}
-
-	@Test
-	public void stsda() throws Exception {
-		String startKey = "SUM_MONEY_" + String.format("%018.2f", 578.28);
-		System.out.println(startKey);
+		txSimulationResults = simulator.getTxSimulationResults();
+		rwset = txSimulationResults.getPublicReadWriteSet().getNsRwset(0).getRwset();
+		kvRWSet = KvRwset.KVRWSet.parseFrom(rwset);
+		int i = 0;
+		for (; i < 4; i++) {
+			KvRwset.KVRead read = kvRWSet.getReadsList().get(i);
+			Assert.assertEquals(read.getKey(), "key" + i);
+			assertSame(1L, read.getVersion().getBlockNum());
+			assertSame((long) i, read.getVersion().getTxNum());
+		}
+		KvRwset.KVRead read = kvRWSet.getReadsList().get(i++);
+		Assert.assertEquals("not exists 0", read.getKey());
+		assertEquals(ByteString.EMPTY, read.getVersion().toByteString());
+		read  = kvRWSet.getReadsList().get(i++);
+		Assert.assertEquals("not exists 1", read.getKey());
+		assertEquals(ByteString.EMPTY, read.getVersion().toByteString());
 	}
 
 	@Test

@@ -51,7 +51,7 @@ public class QueryHelper {
         checkDone();
         VersionedValue versionedValue = txMgr.getDb().getState(ns, key);
         if(versionedValue == null){
-            return null;
+        	versionedValue = new VersionedValue(null, null);
         }
         byte[] val = versionedValue.getValue();
         LedgerHeight ver = versionedValue.getHeight();

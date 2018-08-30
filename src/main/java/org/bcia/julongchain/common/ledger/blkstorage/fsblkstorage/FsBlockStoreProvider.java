@@ -72,7 +72,7 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
      * 给出的ledgerid是否存在文件系统
      */
     @Override
-    public Boolean exists(String ledgerID) {
+    public boolean exists(String ledgerID) {
          return IoUtil.fileExists(config.getLedgerBlockDir(ledgerID)) >= 0;
     }
 
