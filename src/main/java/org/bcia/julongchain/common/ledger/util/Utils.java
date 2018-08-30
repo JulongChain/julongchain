@@ -28,10 +28,12 @@ import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
 import org.bcia.julongchain.protos.node.TransactionPackage;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
-
-import static org.bcia.julongchain.common.ledger.util.IoUtil.*;
 
 /**
  * Ledger工具类
@@ -43,6 +45,29 @@ import static org.bcia.julongchain.common.ledger.util.IoUtil.*;
 public class Utils {
 	public static void main(String[] args) throws Exception {
 		resetEnv();
+	}
+
+	/**
+	 * 执行外部Linux命令
+	 * @param cmd	Linux命令
+	 * @return	执行结果
+	 */
+	public static List<String> exce(String cmd) {
+		System.out.println(cmd);
+		List<String> result = null;
+		try {
+			Process process = null;
+			result = new ArrayList<>();
+			process = Runtime.getRuntime().exec(cmd);
+			LineNumberReader reader = new LineNumberReader(new InputStreamReader(process.getInputStream()));
+			String line;
+			while((line = reader.readLine()) != null) {
+				result.add(line);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return result;
 	}
 
 	public static void resetEnv() {

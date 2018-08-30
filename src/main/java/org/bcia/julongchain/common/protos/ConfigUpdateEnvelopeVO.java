@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 类描述
+ * 配置更新信封业务对象
  *
  * @author zhouhui
  * @date 2018/05/29
@@ -39,8 +39,8 @@ public class ConfigUpdateEnvelopeVO implements IProtoVO<Configtx.ConfigUpdateEnv
     @Override
     public void parseFrom(Configtx.ConfigUpdateEnvelope configUpdateEnvelope) throws InvalidProtocolBufferException,
             ValidateException {
-        ValidateUtils.isNotNull(configUpdateEnvelope, "configUpdateEnvelope can not be null");
-        ValidateUtils.isNotNull(configUpdateEnvelope.getConfigUpdate(), "configUpdateEnvelope.getConfigUpdate can " +
+        ValidateUtils.isNotNull(configUpdateEnvelope, "ConfigUpdateEnvelope can not be null");
+        ValidateUtils.isNotNull(configUpdateEnvelope.getConfigUpdate(), "ConfigUpdateEnvelope.getConfigUpdate can " +
                 "not be null");
 
         this.configUpdate = Configtx.ConfigUpdate.parseFrom(configUpdateEnvelope.getConfigUpdate());

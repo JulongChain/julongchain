@@ -32,6 +32,7 @@ import org.bcia.julongchain.core.node.NodeConfig;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.core.node.grpc.EventGrpcServer;
 import org.bcia.julongchain.core.node.grpc.NodeGrpcServer;
+import org.bcia.julongchain.core.node.grpc.SmartContractGrpcServer;
 import org.bcia.julongchain.core.ssc.ISystemSmartContractManager;
 import org.bcia.julongchain.core.ssc.SystemSmartContractManager;
 import org.bcia.julongchain.events.producer.EventHubServer;
@@ -96,7 +97,10 @@ public class NodeServer {
         //启动Node主服务(Grpc Server1)
         startNodeGrpcServer(nodeConfig);
 
-        //启动事件处理服务(Grpc Server2)
+        //启动智能合约服务(Grpc Server2)
+        startSmartContractGrpcServer(nodeConfig);
+
+        //启动事件处理服务(Grpc Server3)
         startEventGrpcServer(nodeConfig);
 
         //注册系统智能合约
@@ -219,6 +223,39 @@ public class NodeServer {
                 try {
                     nodeGrpcServer.start();
                     nodeGrpcServer.blockUntilShutdown();
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                } catch (InterruptedException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        }.start();
+    }
+
+    /**
+     * 开启智能合约Grpc服务
+     *
+     * @param nodeConfig
+     * @throws NodeException
+     */
+    private void startSmartContractGrpcServer(NodeConfig nodeConfig) throws NodeException {
+        //从配置中获取要监听的地址和端口
+        NetAddress address = null;
+        try {
+            String listenAddress = nodeConfig.getNode().getSmartContractListenAddress();
+            address = new NetAddress(listenAddress);
+        } catch (Exception e) {
+            throw new NodeException(e);
+        }
+
+        final SmartContractGrpcServer smartContractGrpcServer = new SmartContractGrpcServer(address.getPort());
+
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    smartContractGrpcServer.start();
+                    smartContractGrpcServer.blockUntilShutdown();
                 } catch (IOException e) {
                     log.error(e.getMessage(), e);
                 } catch (InterruptedException e) {
