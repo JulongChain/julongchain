@@ -14,7 +14,6 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;

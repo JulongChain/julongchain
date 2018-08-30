@@ -131,6 +131,15 @@ public class Utils {
 		);
 	}
 
+	public static Common.Block constructDefaultBlock1(INodeLedger l, Common.Block preBlock, String groupID, String namespace) throws Exception {
+		return constructBlock(preBlock, groupID, Common.HeaderType.ENDORSER_TRANSACTION,
+				constructTxSimulationResults(l, namespace, "txID", "key0", "value0").getPubReadWriteByteString(),
+				constructTxSimulationResults(l, namespace, "txID", "key1", "value1").getPubReadWriteByteString(),
+				constructTxSimulationResults(l, namespace, "txID", "key2", "value2").getPubReadWriteByteString(),
+				constructTxSimulationResults(l, namespace, "txID", "key3", "value3").getPubReadWriteByteString()
+		);
+	}
+
 	private static TxSimulationResults constructTxSimulationResults(INodeLedger l,String namespace, String txID, String key, String value) throws Exception{
 		ITxSimulator simulator = l.newTxSimulator(txID);
 		simulator.setState(namespace, key, value.getBytes(StandardCharsets.UTF_8));
@@ -138,6 +147,7 @@ public class Utils {
 	}
 
 	private static Common.Block constructBlock(Common.Block preBlock, String groupID, Common.HeaderType type, ByteString... rwsets) throws Exception {
+		int length = rwsets.length;
 		Common.BlockData.Builder builder = Common.BlockData.newBuilder();
 		for (int i = 0; i < rwsets.length; i++) {
 			//pub								//rwset		//txID				//type	//version	//groupID
@@ -154,7 +164,7 @@ public class Utils {
 		Common.BlockMetadata metadata = Common.BlockMetadata.newBuilder()
 				.addMetadata(ByteString.EMPTY)
 				.addMetadata(ByteString.EMPTY)
-				.addMetadata(ByteString.EMPTY)
+				.addMetadata(ByteString.copyFrom(new byte[length]))
 				.addMetadata(ByteString.EMPTY)
 				.build();
 
