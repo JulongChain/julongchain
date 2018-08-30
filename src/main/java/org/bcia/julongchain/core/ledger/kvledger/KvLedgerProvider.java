@@ -75,7 +75,7 @@ public class KvLedgerProvider implements INodeLedgerProvider {
 		this.ledgerStoreProvider = ledgerStoreProvider;
 		this.vdbProvider = vdbProvider;
 		this.historyDBProvider = historyDBProvider;
-		this.stateListeners = null;
+//		this.stateListeners = null;
 		//修复未完成的db
 		recoverUnderConstructionLedger();
 	}

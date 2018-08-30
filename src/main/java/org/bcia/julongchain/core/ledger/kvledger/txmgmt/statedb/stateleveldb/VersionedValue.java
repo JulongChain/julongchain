@@ -17,6 +17,9 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * 封装版本信息
  *
@@ -37,7 +40,20 @@ public class VersionedValue {
         this.value = value;
     }
 
-    public LedgerHeight getHeight() {
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		VersionedValue that = (VersionedValue) o;
+		return LedgerHeight.areSame(height, that.height) &&
+				Arrays.equals(value, that.value);
+	}
+
+	public LedgerHeight getHeight() {
         return height;
     }
 

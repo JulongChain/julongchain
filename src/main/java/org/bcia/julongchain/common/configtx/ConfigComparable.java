@@ -29,8 +29,17 @@ import java.util.Objects;
  * @company Dingxuan
  */
 public class ConfigComparable<T> {
+    /**
+     * 当前短路径(标识)
+     */
     private String key;
+    /**
+     * 父路径（递归成数组）
+     */
     private String[] path;
+    /**
+     * 当前要比较的对象
+     */
     private T t;
 
     public ConfigComparable(String key, String[] path, T t) {

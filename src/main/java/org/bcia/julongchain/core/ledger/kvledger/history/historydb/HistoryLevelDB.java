@@ -35,6 +35,7 @@ import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * LevelDB实现的HistoryDB
@@ -58,7 +59,7 @@ public class HistoryLevelDB implements IHistoryDB {
 
     @Override
     public IHistoryQueryExecutor newHistoryQueryExecutor(IBlockStore blockStore) {
-        return new HistoryLevelDBQueryExecutor(this, blockStore, dbName);
+		return new HistoryLevelDBQueryExecutor(this, blockStore, dbName);
     }
 
     @Override
@@ -158,23 +159,24 @@ public class HistoryLevelDB implements IHistoryDB {
     }
 
     @Override
-    public long recoverPoint(long lastAvailableBlock) throws LedgerException {
-        if(!LedgerConfig.isHistoryDBEnabled()){
-            return 0;
-        }
-        LedgerHeight savePoint = getLastSavepoint();
-        if(savePoint == null){
-            return 0;
-        }
-        return savePoint.getBlockNum() + 1;
-    }
-
-    @Override
     public void commitLostBlock(BlockAndPvtData blockAndPvtData) throws LedgerException {
         commit(blockAndPvtData.getBlock());
     }
 
-    public IDBProvider getProvider() {
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		HistoryLevelDB that = (HistoryLevelDB) o;
+		return Objects.equals(provider, that.provider) &&
+				Objects.equals(dbName, that.dbName);
+	}
+
+	public IDBProvider getProvider() {
         return provider;
     }
 

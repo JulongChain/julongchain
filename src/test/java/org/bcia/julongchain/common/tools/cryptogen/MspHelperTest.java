@@ -18,6 +18,7 @@ package org.bcia.julongchain.common.tools.cryptogen;
 
 import org.apache.commons.io.FileUtils;
 import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.tools.cryptogen.bean.Configuration;
 import org.bcia.julongchain.common.tools.cryptogen.utils.X509CertificateUtil;
 import org.bcia.julongchain.msp.mgmt.Msp;
@@ -209,7 +210,7 @@ public class MspHelperTest {
         Assert.assertEquals(MspHelper.NODE_OU, configuration.getNodeOUs().getNodeOUIdentifier().getOrganizationalUnitIdentifier());
     }
 
-    private void setupMspConfig(String mspDir) throws IOException {
+    private void setupMspConfig(String mspDir) throws IOException, MspException {
         List<byte[]> caCert = new ArrayList<>();
         File caCertFile = new File(Paths.get(mspDir, "cacerts").toString());
         for (File file : Objects.requireNonNull(caCertFile.listFiles())) {

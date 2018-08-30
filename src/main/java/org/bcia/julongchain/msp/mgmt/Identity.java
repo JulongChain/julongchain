@@ -16,7 +16,7 @@
 package org.bcia.julongchain.msp.mgmt;
 
 import com.google.protobuf.ByteString;
-import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.exception.VerifyException;

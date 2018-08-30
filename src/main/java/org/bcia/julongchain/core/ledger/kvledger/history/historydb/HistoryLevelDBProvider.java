@@ -22,6 +22,8 @@ import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 
+import java.util.Objects;
+
 /**
  * HistoryDB服务提供者类
  *
@@ -51,7 +53,7 @@ public class HistoryLevelDBProvider implements IHistoryDBProvider {
         provider.close();
     }
 
-    public IDBProvider getProvider() {
+	public IDBProvider getProvider() {
         return provider;
     }
 

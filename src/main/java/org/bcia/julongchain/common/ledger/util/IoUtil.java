@@ -36,8 +36,24 @@ import java.util.zip.GZIPOutputStream;
  */
 public class IoUtil {
     private static JulongChainLog log = JulongChainLogFactory.getLog(IoUtil.class);
-    private static final int MAX_FILE_MODE = 7;
-	private static final int MIN_FILE_MODE = 0;
+	private static final List<Integer> ALLOW_READ_MODE = new ArrayList<Integer>(){{
+		add(4);
+		add(5);
+		add(6);
+		add(7);
+	}};
+	private static final List<Integer> ALLOW_WRITE_MODE = new ArrayList<Integer>(){{
+		add(2);
+		add(3);
+		add(6);
+		add(7);
+	}};
+	private static final List<Integer> ALLOW_EXECUTE_MODE = new ArrayList<Integer>(){{
+		add(1);
+		add(3);
+		add(5);
+		add(7);
+	}};
 
     /**
      * 返回-1:文件不存在
@@ -73,29 +89,6 @@ public class IoUtil {
         return list;
     }
 
-	/**
-	 * 执行外部Linux命令
-	 * @param cmd	Linux命令
-	 * @return	执行结果
-	 */
-	public static List<String> exce(String cmd) {
-		System.out.println(cmd);
-		List<String> result = null;
-		try {
-			Process process = null;
-			result = new ArrayList<>();
-			process = Runtime.getRuntime().exec(cmd);
-			LineNumberReader reader = new LineNumberReader(new InputStreamReader(process.getInputStream()));
-			String line;
-			while((line = reader.readLine()) != null) {
-				result.add(line);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return result;
-	}
-
     /**
      * 修改文件权限 755
      * 默认文件存在
@@ -104,20 +97,21 @@ public class IoUtil {
         int uMod = perm / 100;
         int gMod = (perm % 100) / 10;
         int oMod = perm % 10;
-        if(uMod > MAX_FILE_MODE || uMod < MIN_FILE_MODE){
-            log.error("Wrong mod type " + perm);
-            return;
+        boolean readable = ALLOW_READ_MODE.contains(uMod);
+		boolean writable = ALLOW_WRITE_MODE.contains(uMod);
+		boolean executable = ALLOW_EXECUTE_MODE.contains(uMod);
+		boolean ownerOnlyReadable = ALLOW_READ_MODE.contains(Math.min(gMod, oMod)) ^ readable;
+		boolean ownerOnlyWritable = ALLOW_WRITE_MODE.contains(Math.min(gMod, oMod)) ^ writable;
+		boolean ownerOnlyExecutable = ALLOW_EXECUTE_MODE.contains(Math.min(gMod, oMod)) ^ executable;
+		if (!file.setReadable(readable, ownerOnlyReadable)) {
+			log.error("Can not set read permission to file " + file.getAbsolutePath());
+		}
+        if (!file.setWritable(writable, ownerOnlyWritable)) {
+            log.error("Can not set write permission to file " + file.getAbsolutePath());
         }
-        if(gMod > MAX_FILE_MODE || gMod < MIN_FILE_MODE){
-            log.error("Wrong mod type " + perm);
-            return;
+        if (!file.setExecutable(executable, ownerOnlyExecutable)) {
+            log.error("Can not set execute permission to file " + file.getAbsolutePath());
         }
-        if(oMod > MAX_FILE_MODE || oMod < MIN_FILE_MODE){
-            log.error("Wrong mod type " + perm);
-            return;
-        }
-        String cmd = "chmod " + perm + " " + file.getAbsolutePath();
-        exce(cmd);
     }
 
     /**

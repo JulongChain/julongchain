@@ -57,7 +57,7 @@ public class TxSimulatorTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-//    @BeforeClass
+    @BeforeClass
     public static void beforeClass() throws Exception  {
 		Utils.resetEnv();
 		Utils.constructDefaultLedger();
