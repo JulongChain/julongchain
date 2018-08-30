@@ -71,4 +71,22 @@ public class IHistoryQueryExecutorTest {
 		}
 		assertSame(1, i);
 	}
+
+	@Test
+	public void next() throws Exception{
+		//
+		int i = 0;
+		IResultsIterator itr = hqe.getHistoryForKey("mycc", "key0");
+		while (true) {
+			QueryResult next = itr.next();
+			if (next == null) {
+				break;
+			}
+			i++;
+		}
+		assertSame(1, i);
+		itr = hqe.getHistoryForKey("mycc", "key00");
+		assertNotNull(itr);
+		assertNull(itr.next());
+	}
 }

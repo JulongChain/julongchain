@@ -104,13 +104,13 @@ public class IoUtil {
 		boolean ownerOnlyWritable = ALLOW_WRITE_MODE.contains(Math.min(gMod, oMod)) ^ writable;
 		boolean ownerOnlyExecutable = ALLOW_EXECUTE_MODE.contains(Math.min(gMod, oMod)) ^ executable;
 		if (!file.setReadable(readable, ownerOnlyReadable)) {
-			log.error("Can not set read permission to dir " + file.getAbsolutePath());
+			log.error("Can not set read permission to file " + file.getAbsolutePath());
 		}
         if (!file.setWritable(writable, ownerOnlyWritable)) {
-            log.error("Can not set write permission to dir " + file.getAbsolutePath());
+            log.error("Can not set write permission to file " + file.getAbsolutePath());
         }
         if (!file.setExecutable(executable, ownerOnlyExecutable)) {
-            log.error("Can not set execute permission to dir " + file.getAbsolutePath());
+            log.error("Can not set execute permission to file " + file.getAbsolutePath());
         }
     }
 
