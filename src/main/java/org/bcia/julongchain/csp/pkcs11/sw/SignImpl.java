@@ -27,14 +27,22 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 
 /**
- * Class description
+ * PKCS11 Soft Sign
  *
- * @author
+ * @author Ying Xu
  * @date 5/25/18
  * @company FEITIAN
  */
 public class SignImpl {
 
+	/**
+	 * SignData
+	 * @param key		IKey used to sign
+	 * @param degiest	degiest message
+	 * @param alg		alg for sign
+	 * @return	signature value
+	 * @throws JulongChainException
+	 */
     public byte[] signData(IKey key, byte[] degiest, String alg) throws JulongChainException {
 
         try {

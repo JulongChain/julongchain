@@ -36,9 +36,9 @@ import java.util.Map;
  */
 public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOpts {
 
-    private boolean bSensitive;
-    private boolean bSoftVerify;
-    private boolean bUseEcX963Encodeing;
+    private static boolean bSensitive;
+    private static boolean bSoftVerify;
+    private static boolean bUseEcX963Encodeing;
 
     private long sessionhandle;
     private PKCS11 p11;
@@ -116,7 +116,7 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
 
 
     @Override
-    public void optFinalized() throws JulongChainException {
+    public void optFinalized() throws JulongChainException{
         try {
             p11.C_CloseSession(sessionhandle);
         }

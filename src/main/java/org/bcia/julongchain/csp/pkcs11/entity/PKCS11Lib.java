@@ -15,6 +15,8 @@
  */
 package org.bcia.julongchain.csp.pkcs11.entity;
 
+import org.bcia.julongchain.common.exception.JulongChainException;
+
 /**
  * Hardware information
  *
@@ -24,49 +26,44 @@ package org.bcia.julongchain.csp.pkcs11.entity;
  */
 public class PKCS11Lib {
 
-    private String Library;
-    private String KeyLabel;
-    private String KeySn;
-    private String KeyPin;
+    private String strLibrary;
+    private String strKeyLabel;
+    private String strKeySn;
+    private String strKeyPin;
 
-    public PKCS11Lib(String lib, String Label, String Sn, String Pin) {
-        if (lib == null || lib.equals(""))
-            this.Library = "/root/Desktop/libcastle.so.1.0.0";
-        else
-            this.Library = lib;
+    public PKCS11Lib(String strLib, String strLabel, String strSn, String strPin) throws JulongChainException{
 
-        if (Label == null || Label.equals(""))
-            this.KeyLabel = "ePass2003";
-        	//this.KeyLabel = "ePass Token";
-        else
-            this.KeyLabel = Label;
+        checkParam(strLabel);
+        checkParam(strLib);
+        checkParam(strSn);
+        checkParam(strPin);
 
-        if (Sn == null || Sn.equals(""))
-            this.KeySn = "249188990075001B";
-        	//this.KeySn = "0328470216020518";
-        else
-            this.KeySn = Sn;
+        this.strLibrary = strLib;
+        this.strKeyLabel = strLabel;
+        this.strKeySn = strSn;
+        this.strKeyPin = strPin;
+    }
 
-        if (Pin == null)
-            this.KeyPin = "12345678";
-        	//this.KeyPin = "123456";
-        else
-            this.KeyPin = Pin;
+    private void checkParam(String str) throws JulongChainException{
+        if (str == null || "".equals(str))
+        {
+            throw new JulongChainException("[JC_PKCS]:Param Err!");
+        }
     }
 
     public String getLibrary() {
-        return Library;
+        return strLibrary;
     }
 
     public String getKeyLabel() {
-        return KeyLabel;
+        return strKeyLabel;
     }
 
     public String getKeySN() {
-        return KeySn;
+        return strKeySn;
     }
 
     public String getKeyPin() {
-        return KeyPin;
+        return strKeyPin;
     }
 }

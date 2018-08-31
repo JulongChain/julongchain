@@ -20,7 +20,7 @@ import org.bcia.julongchain.csp.intfs.IKey;
 /**
  * ECDSA KEY
  *
- * @author XuYing
+ * @author Ying Xu
  * @date 4/19/18
  * @company FEITIAN
  */

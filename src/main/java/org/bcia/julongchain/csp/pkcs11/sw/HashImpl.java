@@ -70,7 +70,7 @@ public class HashImpl {
         return null;
     }
 
-    public static IHash getHash(String alg) throws JulongChainException {
+    public static IHash getHash(String alg) throws JulongChainException{
 
         switch(alg) {
             case PKCS11CSPConstant.SHA256:
@@ -98,12 +98,14 @@ public class HashImpl {
 
         IHash hash = new IHash() {
 
+            @Override
             public int write(byte[] p) {
                 message = new byte[p.length];
                 System.arraycopy(p, 0, message, 0, p.length);
                 return p.length;
             }
 
+            @Override
             public byte[] sum(byte[] b){
                 byte[] data = new byte[message.length + b.length];
                 System.arraycopy(message, 0, data, 0, message.length);
@@ -127,14 +129,17 @@ public class HashImpl {
                 }
             }
 
+            @Override
             public void reset() {
 
             }
 
+            @Override
             public int size() {
                 return digestLength;
             }
 
+            @Override
             public int blockSize() {
                 return BUFFERSIZE;
             }

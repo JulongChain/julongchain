@@ -23,7 +23,7 @@ import org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant;
 /**
  * Class description
  *
- * @author XuYing
+ * @author Ying Xu
  * @date 4/19/18
  * @company FEITIAN
  */

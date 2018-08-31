@@ -29,6 +29,8 @@ import sun.security.pkcs11.wrapper.PKCS11Constants;
  */
 public class PKCS11HashOpts {
     public static class SHA256Opts implements IHashOpts {
+
+        @Override
         public String getAlgorithm() {
             return PKCS11CSPConstant.SHA256;
         }
@@ -39,6 +41,8 @@ public class PKCS11HashOpts {
     }
 
     public static class SHA384Opts implements IHashOpts{
+
+        @Override
         public String getAlgorithm() {
             return PKCS11CSPConstant.SHA384;
         }
@@ -49,6 +53,8 @@ public class PKCS11HashOpts {
     }
 
     public static class SHA3_256Opts  implements IHashOpts{
+
+        @Override
         public String getAlgorithm() {
             return PKCS11CSPConstant.SHA3_256;
         }
@@ -61,12 +67,16 @@ public class PKCS11HashOpts {
     }
 
     public static class SHA3_384Opts  implements IHashOpts{
+
+        @Override
         public String getAlgorithm() {
             return PKCS11CSPConstant.SHA3_384;
         }
     }
 
     public static class SHA1Opts implements IHashOpts{
+
+        @Override
         public String getAlgorithm() {
             return PKCS11CSPConstant.SHA1;
         }
@@ -77,6 +87,8 @@ public class PKCS11HashOpts {
     }
 
     public static class MD5Opts implements IHashOpts{
+
+        @Override
         public String getAlgorithm() {
             return PKCS11CSPConstant.MD5;
         }
@@ -87,6 +99,8 @@ public class PKCS11HashOpts {
     }
 
     public static class MD2Opts implements IHashOpts{
+
+        @Override
         public String getAlgorithm() {
             return PKCS11CSPConstant.MD2;
         }

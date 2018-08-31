@@ -31,6 +31,10 @@ import java.util.Date;
 public class PKCS11CspLog {
 
     private static JulongChainLog logger;
+    
+    public final int LEVEL_DEBUG = 0;
+    public final int LEVEL_INFO = 1;
+    public final int LEVEL_ERROR = 2;
 
     public void setLogMsg(String msg, int level, Class<?> clazz) {
 
@@ -42,15 +46,15 @@ public class PKCS11CspLog {
 
         StringBuilder value = new StringBuilder();
         value.append(str);
-        if (level == 0) {
+        if (level == LEVEL_DEBUG) {
             value.append(" [CSP] [DEBUG] ");
             value.append(msg);
             logger.debug(value.toString());
-        }else if(level == 1) {
+        }else if(level == LEVEL_INFO) {
             value.append(" [CSP] [INFO] ");
             value.append(msg);
             logger.info(value.toString());
-        }else if(level == 2) {
+        }else if(level == LEVEL_ERROR) {
             value.append(" [CSP] [ERROR] ");
             value.append(msg);
             logger.error(value.toString());

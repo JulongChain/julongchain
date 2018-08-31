@@ -42,7 +42,7 @@ public class PKCS11Digest {
     
     private static JulongChainLog logger;
 
-    public PKCS11Digest(long mechanism) throws JulongChainException {
+    public PKCS11Digest(long mechanism) throws JulongChainException{
         this.mechanism = mechanism;
         switch((int)mechanism) {
             case (int)CKM_MD2:
@@ -70,7 +70,7 @@ public class PKCS11Digest {
      * @return digest value
      * @throws JulongChainException
      */
-    public byte[] getDigest(byte[] msg, IPKCS11FactoryOpts opts) throws JulongChainException {
+    public byte[] getDigest(byte[] msg, IPKCS11FactoryOpts opts) throws JulongChainException{
 
         try {
             CK_MECHANISM ckm = new CK_MECHANISM();
@@ -103,7 +103,7 @@ public class PKCS11Digest {
      * @return digest value
      * @throws JulongChainException
      */
-    public static byte[] getDigestwithUpdate(byte[] msg, IPKCS11FactoryOpts opts) throws JulongChainException {
+    public static byte[] getDigestwithUpdate(byte[] msg, IPKCS11FactoryOpts opts) throws JulongChainException{
 
         try {
 
@@ -135,6 +135,7 @@ public class PKCS11Digest {
 
         IHash hash = new IHash() {
 
+            @Override
             public synchronized int write(byte[] p) {
             	if(message != null)
             	{
@@ -143,12 +144,13 @@ public class PKCS11Digest {
             		System.arraycopy(p, 0, temp, message.length, p.length);
             		message = temp;
             	}
-            	else
-            		message = p;            	
-                
+            	else {
+                    message = p;
+                }
                 return message.length;
             }
 
+            @Override
             public byte[] sum(byte[] b){
                 try {
                     byte[] data = new byte[message.length + b.length];
@@ -162,6 +164,7 @@ public class PKCS11Digest {
                 }
             }
 
+            @Override
             public void reset() {
                 try {
                     byte[] buffer = new byte[BUFFERSIZE];
@@ -172,10 +175,12 @@ public class PKCS11Digest {
                 }
             }
 
+            @Override
             public int size() {
                 return digestLength;
             }
 
+            @Override
             public int blockSize() {
                 return BUFFERSIZE;
             }

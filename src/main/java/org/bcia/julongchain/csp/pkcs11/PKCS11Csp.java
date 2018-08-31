@@ -38,7 +38,7 @@ import sun.security.pkcs11.wrapper.PKCS11Exception;
 /**
  * Class description
  *
- * @author xuying
+ * @author Ying Xu
  * @date 2018/05/20
  * @company FEITIAN
  */
@@ -60,7 +60,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     @Override
     public IKey keyGen(IKeyGenOpts opts) throws JulongChainException {
         if (opts == null) {
-            csplog.setLogMsg("[JC_PKCS]:KeyGen Param Err!", 2, PKCS11Csp.class);
+            csplog.setLogMsg("[JC_PKCS]:KeyGen Param Err!", csplog.LEVEL_ERROR, PKCS11Csp.class);
         	throw new JulongChainException("[JC_PKCS]:Param Err!");
         }
 
@@ -70,14 +70,16 @@ public class PKCS11Csp implements IPKCS11Csp {
         if (opts instanceof RsaOpts.RSA1024KeyGenOpts)
         {
             genkey = new RsaImpl.GenerateRSA();
-            key = genkey.generateRsa(1024, opts.isEphemeral(), PKCS11FactoryOpts);
+            genkey.generateRsa(1024, opts.isEphemeral(), PKCS11FactoryOpts);
+            key = genkey.getIKey();
             return key;
         }
 
         if (opts instanceof RsaOpts.RSA2048KeyGenOpts)
         {
             genkey = new RsaImpl.GenerateRSA();
-            key = genkey.generateRsa(2048, opts.isEphemeral(), PKCS11FactoryOpts);
+            genkey.generateRsa(2048, opts.isEphemeral(), PKCS11FactoryOpts);
+            key = genkey.getIKey();
             return key;
         }
 /*
@@ -97,21 +99,24 @@ public class PKCS11Csp implements IPKCS11Csp {
 */
         if (opts instanceof EcdsaOpts.ECDSA192KeyGenOpts)
         {
-            EcdsaImpl.generateECKey eckey = new EcdsaImpl.generateECKey(192, opts.isEphemeral(), PKCS11FactoryOpts);
+            EcdsaImpl.GenerateECKey eckey = new EcdsaImpl.GenerateECKey();
+            eckey.generateECKey(192, opts.isEphemeral(), PKCS11FactoryOpts);
             key = eckey.getIKey();
             return key;
         }
         
         if (opts instanceof EcdsaOpts.ECDSA256KeyGenOpts)
         {
-            EcdsaImpl.generateECKey eckey = new EcdsaImpl.generateECKey(256, opts.isEphemeral(), PKCS11FactoryOpts);
+            EcdsaImpl.GenerateECKey eckey = new EcdsaImpl.GenerateECKey();
+            eckey.generateECKey(256, opts.isEphemeral(), PKCS11FactoryOpts);
             key = eckey.getIKey();
             return key;
         }
 /*
         if (opts instanceof EcdsaOpts.ECDSA384KeyGenOpts)
         {
-            EcdsaImpl.generateECKey eckey = new EcdsaImpl.generateECKey(384, opts.isEphemeral(), PKCS11FactoryOpts);
+            EcdsaImpl.GenerateECKey eckey = new EcdsaImpl.GenerateECKey
+            eckey.generateECKey(384, opts.isEphemeral(), PKCS11FactoryOpts);
             key = eckey.getIKey();
 
             return key;
@@ -157,7 +162,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     	        
     	        EcdsaImpl.ImportECKey importkey = new EcdsaImpl.ImportECKey();
     	        byte[] newski = importkey.importECKey(null,key.toBytes(),opts.isEphemeral(),PKCS11FactoryOpts,false);  
-    	        if(!DataUtil.compereByteArray(newski, byski))
+    	        if(!DataUtil.compareByteArray(newski, byski))
     			{
                     csplog.setLogMsg("[JC_PKCS]:Import key value err! Can not continue to KeyDeriv!", 2, PKCS11Csp.class);
     				throw new JulongChainException("[JC_PKCS]:Import key value err! Can not continue to KeyDeriv!");
@@ -208,7 +213,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     	        
     	        EcdsaImpl.ImportECKey importkey = new EcdsaImpl.ImportECKey();
     			byte[] newski = importkey.importECKey(key.toBytes(),key.getPublicKey().toBytes(),opts.isEphemeral(),PKCS11FactoryOpts,false);
-    			if(!DataUtil.compereByteArray(newski, byski))
+    			if(!DataUtil.compareByteArray(newski, byski))
     			{
                     csplog.setLogMsg("[JC_PKCS]:Import key value err! Can not continue to KeyDeriv!", 2, PKCS11Csp.class);
                     throw new JulongChainException("[JC_PKCS]:Import key value err! Can not continue to KeyDeriv!");

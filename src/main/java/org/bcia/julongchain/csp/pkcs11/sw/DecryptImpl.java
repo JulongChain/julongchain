@@ -105,7 +105,7 @@ public class DecryptImpl {
     }
 
 
-    public byte[] decryptData(IKey key, byte[] ciphervalue, String mode, String padding, boolean pubflag) throws JulongChainException {
+    public byte[] decryptData(IKey key, byte[] ciphervalue, String mode, String padding, boolean pubflag) throws JulongChainException{
         try {
             if(key instanceof RsaKeyOpts.RsaPriKey) {
                 if(pubflag)

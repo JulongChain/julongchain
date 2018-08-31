@@ -23,7 +23,7 @@ import sun.security.pkcs11.wrapper.PKCS11Constants;
 /**
  * RSA Encrypter Opts
  *
- * @author xuying
+ * @author Ying Xu
  * @date 2018/05/20
  * @company FEITIAN
  */

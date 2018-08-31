@@ -23,7 +23,7 @@ import org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant;
 /**
  * gen/import rsa keypair opts
  *
- * @author xuying
+ * @author Ying Xu
  * @date 2018/5/21
  * @company FEITIAN
  */
