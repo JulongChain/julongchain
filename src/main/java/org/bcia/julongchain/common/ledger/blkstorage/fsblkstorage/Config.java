@@ -20,7 +20,7 @@ import java.io.File;
 /**
  * 封装区块文件及索引数据库位置
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/4/7
  * @company Dingxuan
  */

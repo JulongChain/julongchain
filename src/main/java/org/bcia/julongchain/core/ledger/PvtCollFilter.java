@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * 私有的collection过滤器
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/09
  * @company Dingxuan
  */

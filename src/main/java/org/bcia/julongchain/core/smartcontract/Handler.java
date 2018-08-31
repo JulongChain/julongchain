@@ -54,7 +54,7 @@ import static org.bcia.julongchain.protos.node.SmartContractShim.SmartContractMe
  * Node端Handler
  * todo v0.8版本暂未使用
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/3/18
  * @company Dingxuan
  */

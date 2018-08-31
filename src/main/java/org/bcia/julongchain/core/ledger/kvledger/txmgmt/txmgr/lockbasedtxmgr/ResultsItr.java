@@ -30,7 +30,7 @@ import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
  * 查询范围为startKey~endKey
  * 迭代器查询在读写集中体现为rangeQueryInfo
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/18
  * @company Dingxuan
  */

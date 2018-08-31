@@ -18,7 +18,7 @@ package org.bcia.julongchain.core.ssc;
 /**
  * 系统智能合约插件配置
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/07/19
  * @company Dingxuan
  */

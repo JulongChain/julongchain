@@ -26,7 +26,7 @@ import org.bcia.julongchain.protos.ledger.queryresult.KvQueryResult;
 /**
  * pvtdata查询迭代器
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/18
  * @company Dingxuan
  */

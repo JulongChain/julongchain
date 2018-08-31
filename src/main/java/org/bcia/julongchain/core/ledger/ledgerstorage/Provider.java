@@ -29,7 +29,7 @@ import org.bcia.julongchain.core.ledger.pvtdatastorage.PvtDataProvider;
 /**
  * 提供文件系统以及pvtdata操作类
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/17
  * @company Dingxuan
  */

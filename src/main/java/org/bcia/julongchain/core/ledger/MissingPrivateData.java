@@ -18,7 +18,7 @@ package org.bcia.julongchain.core.ledger;
 /**
  * 丢失的私有数据
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/09
  * @company Dingxuan
  */

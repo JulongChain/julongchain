@@ -24,7 +24,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 /**
  *  区块迭代器
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/12
  * @company Dingxuan
  */

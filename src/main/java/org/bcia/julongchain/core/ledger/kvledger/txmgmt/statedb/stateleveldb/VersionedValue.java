@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,6 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 /**
  * 封装版本信息

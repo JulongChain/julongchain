@@ -31,7 +31,7 @@ import java.io.*;
 /**
  * 智能合约部署包
  *
- * @author sunianle, sunzongyu1
+ * @author sunianle, sunzongyu
  * @date 4/25/18
  * @company Dingxuan
  */

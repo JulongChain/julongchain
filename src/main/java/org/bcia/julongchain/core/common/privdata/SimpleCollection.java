@@ -33,7 +33,7 @@ import java.util.List;
 
 /**
  *　简单集合类
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/05/16
  * @company Dingxuan
  */

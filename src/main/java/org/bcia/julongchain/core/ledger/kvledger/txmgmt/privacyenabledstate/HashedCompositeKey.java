@@ -18,7 +18,7 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate;
 /**
  * 组合key的hash
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/17
  * @company Dingxuan
  */

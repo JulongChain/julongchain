@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * 用于处理特定metadata
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/05/16
  * @company Dingxuan
  */

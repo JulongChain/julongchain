@@ -27,7 +27,7 @@ import java.util.Objects;
 /**
  * HistoryDB服务提供者类
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/04
  * @company Dingxuan
  */

@@ -37,7 +37,7 @@ import java.util.Map;
 /**
  * 操作Ledger主要类
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/09
  * @company Dingxuan
  */

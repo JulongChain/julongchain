@@ -23,7 +23,7 @@ import org.bcia.julongchain.protos.node.SmartContractPackage;
 /**
  * 文件系统智能合约
  *
- * @author sunianle, sunzongyu1
+ * @author sunianle, sunzongyu
  * @date 5/11/18
  * @company Dingxuan
  */

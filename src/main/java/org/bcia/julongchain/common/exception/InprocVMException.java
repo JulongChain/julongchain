@@ -16,7 +16,7 @@ limitations under the License.
 package org.bcia.julongchain.common.exception;
 
 /**
- * 类描述
+ * In-process VM异常类
  *
  * @author sunzongyu
  * @date 2018/07/23

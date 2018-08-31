@@ -20,7 +20,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.Upd
 /**
  * 公有数据更新包
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/17
  * @company Dingxuan
  */

@@ -40,7 +40,7 @@ import java.util.Objects;
 /**
  * LevelDB实现的HistoryDB
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/04
  * @company Dingxuan
  */

@@ -42,7 +42,7 @@ import java.util.Map;
 /**
  * 交易管理者类
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/17
  * @company Dingxuan
  */

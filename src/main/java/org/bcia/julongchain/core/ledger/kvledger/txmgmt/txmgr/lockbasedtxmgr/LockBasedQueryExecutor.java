@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * 交易查询器类
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/18
  * @company Dingxuan
  */

@@ -25,7 +25,7 @@ import java.util.List;
  * Get*提供基础查询支持
  * ExecuteQuery提供丰富的查询支持
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/08
  * @company Dingxuan
  */

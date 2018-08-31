@@ -30,7 +30,7 @@ import static org.bcia.julongchain.protos.common.Common.*;
 /**
  * 序列化区块
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/12
  * @company Dingxuan
  */

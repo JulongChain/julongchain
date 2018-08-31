@@ -21,7 +21,7 @@ import java.util.Arrays;
 /**
  * 智能合约数据
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/05/08
  * @company Dingxuan
  */

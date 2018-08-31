@@ -32,7 +32,7 @@ import java.io.*;
 /**
  *　智能合约服务提供者类
  *
- * @author sunianle, sunzongyu1
+ * @author sunianle, sunzongyu
  * @date 3/7/18
  * @company Dingxuan
  */

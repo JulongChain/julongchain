@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * 封装block、私有数据
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/09
  * @company Dingxuan
  */

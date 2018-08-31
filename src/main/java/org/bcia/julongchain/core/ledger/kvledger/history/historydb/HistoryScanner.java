@@ -39,7 +39,7 @@ import java.util.Map;
 /**
  * 查询HistoryDB result
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/04
  * @company Dingxuan
  */

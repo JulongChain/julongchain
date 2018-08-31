@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Ns数据更新包
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/17
  * @company Dingxuan
  */

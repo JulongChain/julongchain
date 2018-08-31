@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * CouchDB描述类
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/07/17
  * @company Dingxuan
  */

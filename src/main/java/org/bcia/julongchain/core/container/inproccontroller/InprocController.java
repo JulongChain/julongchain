@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * In-process VM 控制器
  *
- * @author sunianle, sunzongyu1
+ * @author sunianle, sunzongyu
  * @date 2018/05/17
  * @company Dingxuan
  */

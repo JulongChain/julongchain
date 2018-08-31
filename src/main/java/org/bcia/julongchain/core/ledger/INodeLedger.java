@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * 结点账本
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/08
  * @company Dingxuan
  */

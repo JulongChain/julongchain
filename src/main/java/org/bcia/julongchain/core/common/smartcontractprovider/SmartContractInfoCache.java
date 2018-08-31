@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  * 智能合约缓存
- * @author sunianle, sunzongyu1
+ * @author sunianle, sunzongyu
  * @date 5/10/18
  * @company Dingxuan
  */

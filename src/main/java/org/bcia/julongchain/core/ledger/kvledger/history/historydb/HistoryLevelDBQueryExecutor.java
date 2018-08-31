@@ -28,7 +28,7 @@ import org.iq80.leveldb.DBIterator;
 /**
  * HistoryDB查询器
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/04
  * @company Dingxuan
  */

@@ -30,7 +30,7 @@ import org.bcia.julongchain.protos.common.Collection;
 /**
  * 集合辅助类
  *
- * @author sunianle, sunzongyu1
+ * @author sunianle, sunzongyu
  * @date 3/15/18
  * @company Dingxuan
  */

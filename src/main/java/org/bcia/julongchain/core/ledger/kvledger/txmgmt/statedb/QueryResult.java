@@ -18,7 +18,7 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb;
 /**
  * 所为所有迭代器统一的输出接口
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/4/9
  * @company Dingxuan
  */

@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * 辅助查询statedb
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/18
  * @company Dingxuan
  */

@@ -20,7 +20,7 @@ import org.bcia.julongchain.common.exception.LedgerException;
 /**
  * DB提供者接口
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/17
  * @company Dingxuan
  */

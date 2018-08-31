@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * 集合访问策略
  *
- * @author sunianle, sunzongyu1
+ * @author sunianle, sunzongyu
  * @date 4/27/18
  * @company Dingxuan
  */

@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * 交易模拟器
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/19
  * @company Dingxuan
  */

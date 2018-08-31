@@ -18,7 +18,7 @@ package org.bcia.julongchain.core.ledger.kvledger;
 /**
  * 可恢复的数据库接口
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/4/9
  * @company Dingxuan
  */

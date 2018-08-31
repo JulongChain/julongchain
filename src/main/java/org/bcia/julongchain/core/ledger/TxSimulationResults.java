@@ -21,7 +21,7 @@ import org.bcia.julongchain.protos.ledger.rwset.Rwset;
 /**
  * 模拟结果
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/09
  * @company Dingxuan
  */

@@ -24,7 +24,7 @@ import org.bcia.julongchain.protos.common.Collection;
 
 /**
  * 简单集合仓库
- * @author sunianle, sunzongyu1
+ * @author sunianle, sunzongyu
  * @date 3/20/18
  * @company Dingxuan
  */

@@ -25,7 +25,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 /**
  * 交易管理者接口
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/19
  * @company Dingxuan
  */

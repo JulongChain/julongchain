@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * pvt接口
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/09
  * @company Dingxuan
  */

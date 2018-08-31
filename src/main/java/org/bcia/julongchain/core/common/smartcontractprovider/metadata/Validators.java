@@ -24,7 +24,7 @@ import java.util.Map;
  * 验证器,用于验证某些输入是否合法
  * TODO 验证器验证couchdb，暂时无法实现
  *
- * @author sunianle, sunzongyu1
+ * @author sunianle, sunzongyu
  * @date 5/10/18
  * @company Dingxuan
  */

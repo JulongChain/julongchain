@@ -21,7 +21,7 @@ import org.bcia.julongchain.core.ledger.BlockAndPvtData;
 /**
  * 恢复账本接口
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/4/9
  * @company Dingxuan
  */

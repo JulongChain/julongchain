@@ -27,7 +27,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
  * 富查询迭代器
  * leveldb不支持
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/18
  * @company Dingxuan
  */

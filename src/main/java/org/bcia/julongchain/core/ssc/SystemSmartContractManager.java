@@ -50,7 +50,7 @@ import java.util.*;
  * ６.分别为每个组，调用deploySysSmartContracts(groupID);
  * ７.(SystemSmartContractManager内部)deploySysSmartContracts(groupID)调用buildSysSmartContracts编译智能合约，形成智能合约部署规范(DeploymentSpec);
  *
- * @author sunianle, sunzongyu1
+ * @author sunianle, sunzongyu
  * @date 3/6/18
  * @company Dingxuan
  */

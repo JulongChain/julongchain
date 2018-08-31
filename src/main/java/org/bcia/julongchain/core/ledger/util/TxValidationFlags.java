@@ -21,7 +21,7 @@ import org.bcia.julongchain.protos.node.TransactionPackage;
 /**
  * 交易验证器标志
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/09
  * @company Dingxuan
  */

@@ -26,7 +26,7 @@ import java.util.*;
 /**
  * 提供操作leveldb的操作方法，如增，删，改，查
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/03
  * @company Dingxuan
  */

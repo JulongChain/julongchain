@@ -24,7 +24,7 @@ import org.bcia.julongchain.core.ledger.IQueryExecutor;
  * 系统智能合约
  * 提供抽象的系统智能合约服务
  *
- * @author sunianle, sunzongyu1
+ * @author sunianle, sunzongyu
  * @date 3/13/18
  * @company Dingxuan
  */

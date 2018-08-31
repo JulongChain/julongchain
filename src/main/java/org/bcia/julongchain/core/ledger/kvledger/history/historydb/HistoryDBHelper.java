@@ -22,7 +22,7 @@ import org.bcia.julongchain.core.ledger.util.Util;
 /**
  * 提供构造HistoryDB key的方法
  *
- * @author sunzongyu1
+ * @author sunzongyu
  * @date 2018/04/08
  * @company Dingxuan
  */

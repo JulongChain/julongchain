@@ -63,7 +63,7 @@ import static org.bcia.julongchain.protos.node.SmartContractShim.SmartContractMe
 /**
  * 类描述
  *
- * @author wanliangbing, sunzongyu1
+ * @author wanliangbing, sunzongyu
  * @date 2018/3/14
  * @company Dingxuan
  */
