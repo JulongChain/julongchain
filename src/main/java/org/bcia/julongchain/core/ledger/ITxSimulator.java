@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,7 +26,7 @@ import java.util.Map;
  * Set*提供基本的操作
  * executeUPdate提供丰富的操作
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/09
  * @company Dingxuan
  */

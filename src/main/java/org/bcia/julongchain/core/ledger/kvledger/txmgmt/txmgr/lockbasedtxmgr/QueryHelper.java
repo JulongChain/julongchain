@@ -32,7 +32,7 @@ import java.util.Map;
 /**
  * 辅助查询statedb
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/18
  * @company Dingxuan
  */
@@ -94,7 +94,6 @@ public class QueryHelper {
         VersionedValue versionedValue = txMgr.getDb().getPrivateData(ns, coll, key);
         byte[] val = versionedValue.getValue();
         LedgerHeight ver = versionedValue.getHeight();
-        //TODO SM3 hash
         byte[] keyHash = Util.getHashBytes(key.getBytes(StandardCharsets.UTF_8));
         LedgerHeight hashVersion = txMgr.getDb().getKeyHashVersion(ns, coll, keyHash);
         if(!LedgerHeight.areSame(ver, hashVersion)){

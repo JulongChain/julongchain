@@ -26,9 +26,11 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 
 /**
- * 用于getStateRangeScan
+ * 查询迭代器
+ * 查询范围为startKey~endKey
+ * 迭代器查询在读写集中体现为rangeQueryInfo
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/18
  * @company Dingxuan
  */

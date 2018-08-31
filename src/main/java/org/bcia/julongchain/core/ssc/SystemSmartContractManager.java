@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -50,7 +50,7 @@ import java.util.*;
  * ６.分别为每个组，调用deploySysSmartContracts(groupID);
  * ７.(SystemSmartContractManager内部)deploySysSmartContracts(groupID)调用buildSysSmartContracts编译智能合约，形成智能合约部署规范(DeploymentSpec);
  *
- * @author sunianle, sunzongyu
+ * @author sunianle, sunzongyu1
  * @date 3/6/18
  * @company Dingxuan
  */
@@ -242,11 +242,8 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
     public boolean isWhitelisted(ISystemSmartContract contract) {
 		Map<String, String> smartcontract = NodeConfigFactory.getNodeConfig().getSmartContract().getSystem();
 		String value = smartcontract.get(contract.getSmartContractID()).toLowerCase();
-        if("enable".equals(value) || "true".equals(value) || "yes".equals(value)){
-            return true;
-        }
-        return false;
-    }
+		return "enable".equals(value) || "true".equals(value) || "yes".equals(value);
+	}
 
     @Override
     public ISystemSmartContract getSystemSmartContract(String smartContractID) {
@@ -277,8 +274,7 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
 	/**
 	 * 编译智能合约，形成智能合约部署规范(DeploymentSpec);
 	 */
-    private SmartContractPackage.SmartContractDeploymentSpec buildSysSmartContract(SmartContractPackage.SmartContractSpec spec)
-            throws SysSmartContractException {
+    private SmartContractPackage.SmartContractDeploymentSpec buildSysSmartContract(SmartContractPackage.SmartContractSpec spec) {
     	return SmartContractPackage.SmartContractDeploymentSpec.newBuilder()
 				.setExecEnv(SmartContractPackage.SmartContractDeploymentSpec.ExecutionEnvironment.SYSTEM)
 				.setSmartContractSpec(spec)

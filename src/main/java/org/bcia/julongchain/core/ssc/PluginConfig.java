@@ -16,9 +16,9 @@ limitations under the License.
 package org.bcia.julongchain.core.ssc;
 
 /**
- * 类描述
+ * 系统智能合约插件配置
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/07/19
  * @company Dingxuan
  */

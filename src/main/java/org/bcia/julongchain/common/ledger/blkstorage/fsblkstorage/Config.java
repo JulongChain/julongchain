@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,7 @@ import java.io.File;
 /**
  * 封装区块文件及索引数据库位置
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/4/7
  * @company Dingxuan
  */

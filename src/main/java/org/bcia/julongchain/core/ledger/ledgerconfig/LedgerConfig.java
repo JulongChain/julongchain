@@ -23,7 +23,7 @@ import java.io.File;
 /**
  * 账本配置
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/23
  * @company Dingxuan
  */

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -25,7 +25,7 @@ import java.util.List;
  * Get*提供基础查询支持
  * ExecuteQuery提供丰富的查询支持
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/08
  * @company Dingxuan
  */

@@ -32,10 +32,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * SimpleCollection implements a collection with static properties
- * and a public member set
- *
- * @author sunzongyu
+ *　简单集合类
+ * @author sunzongyu1
  * @date 2018/05/16
  * @company Dingxuan
  */
@@ -49,9 +47,7 @@ public class SimpleCollection implements ICollection, ICollectionAccessPolicy {
     private Collection.StaticCollectionConfig conf;
 
     /**
-     *
-     * Setup configures a simple collection object based on a given
-     * StaticCollectionConfig proto that has all the necessary information
+     *　设置config
      * @param collectionConfig
      * @param deserializer
      */
@@ -116,30 +112,16 @@ public class SimpleCollection implements ICollection, ICollectionAccessPolicy {
         }
     }
 
-    /**
-     * CollectionID returns the collection's ID
-     * @return
-     */
     @Override
     public String collectionID() {
         return this.name;
     }
 
-    /**
-     * MemberOrgs returns the MSP IDs that are part of this collection
-     * @return
-     */
     @Override
     public List<String> memberOrgs() {
         return this.memberOrgs;
     }
 
-    /**
-     * AccessFilter returns the member filter function that evaluates signed data
-     * against the member access policy of this collection
-     * @param sd
-     * @return
-     */
     @Override
     public boolean getAccessFilter(SignedData sd) {
         List<SignedData> l = new ArrayList<>();
@@ -152,11 +134,6 @@ public class SimpleCollection implements ICollection, ICollectionAccessPolicy {
         return true;
     }
 
-    /**
-     * AccessFilter returns the member filter function that evaluates signed data
-     * against the member access policy of this collection
-     * @return
-     */
     @Override
     public int getRequiredNodeCount() {
         return this.conf.getRequiredPeerCount();

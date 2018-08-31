@@ -35,7 +35,7 @@ import java.util.Map;
 /**
  * LevelDB实现的VersionDB
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/13
  * @company Dingxuan
  */
@@ -162,7 +162,7 @@ public class VersionedLevelDB implements IVersionedDB {
     public static byte[] constructCompositeKey(String ns, String key){
         byte[] result = ArrayUtils.addAll(ns.getBytes(StandardCharsets.UTF_8), COMPOSITE_KEY_SEP);
         if(key == null){
-            return ArrayUtils.addAll(result, new byte[0]);
+        	return result;
         } else {
             return ArrayUtils.addAll(result, key.getBytes(StandardCharsets.UTF_8));
         }

@@ -26,7 +26,7 @@ import java.util.*;
 /**
  * 提供操作leveldb的方法
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/03
  * @company Dingxuan
  */
@@ -89,7 +89,6 @@ public class LevelDBProvider implements IDBProvider {
 
 	@Override
 	public void delete(byte[] key, boolean sync) throws LevelDBException {
-//		db.put(constructLevelKey(ledgerID, key), null, sync);
 		db.delete(constructLevelKey(ledgerID, key), sync);
 	}
 

@@ -20,7 +20,7 @@ import org.bcia.julongchain.core.smartcontract.shim.ISmartContract;
 /**
  * 系统智能合约的描述类
  *
- * @author sunianle, sunzongyu
+ * @author sunianle, sunzongyu1
  * @date 2018/2/28
  * @company Dingxuan
  */

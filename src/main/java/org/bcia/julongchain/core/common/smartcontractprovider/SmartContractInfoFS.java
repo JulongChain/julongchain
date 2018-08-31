@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,10 +21,9 @@ import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
- * SmartContractInfoFS provides the implementation for SC on the FS and the access to it
- * It implements ISmartContractCacheSupport
+ * 文件系统智能合约
  *
- * @author sunianle, sunzongyu
+ * @author sunianle, sunzongyu1
  * @date 5/11/18
  * @company Dingxuan
  */
@@ -33,10 +32,7 @@ public class SmartContractInfoFS implements ISmartContractCacheSupport {
     private static JulongChainLog log = JulongChainLogFactory.getLog(SmartContractInfoFS.class);
 
     /**
-     * GetSmartContractFromFS  this is a wrapper for hiding package implementation.
-     * @param name
-     * @param version
-     * @return
+	 * 在文件系统中获取智能合约
      */
     @Override
     public ISmartContractPackage getSmartContract(String name, String version) {
@@ -60,10 +56,7 @@ public class SmartContractInfoFS implements ISmartContractCacheSupport {
     }
 
     /**
-     * putSmartContractIntoFS is a wrapper for putting raw SmartContractDeploymentSpec
-     * using CDSPackage. This is only used in UTs
-     * @param deploymentSpec
-     * @return
+	 * 将智能合约写入文件系统
      */
     public ISmartContractPackage putSmartContract(SmartContractPackage.SmartContractDeploymentSpec deploymentSpec) throws JulongChainException {
         SDSPackage sdsPackage = new SDSPackage();

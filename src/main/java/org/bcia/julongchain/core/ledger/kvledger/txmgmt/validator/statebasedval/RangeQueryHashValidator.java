@@ -29,7 +29,7 @@ import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
  * range query hash 验证器
  * 用于验证返回读集的hash
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/19
  * @company Dingxuan
  */

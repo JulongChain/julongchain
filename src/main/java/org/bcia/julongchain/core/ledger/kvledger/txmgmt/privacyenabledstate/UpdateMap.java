@@ -23,9 +23,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * namespace-nsBatch map
+ * 更新包
+ * 映射关系为namespace-nsBatch
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/17
  * @company Dingxuan
  */

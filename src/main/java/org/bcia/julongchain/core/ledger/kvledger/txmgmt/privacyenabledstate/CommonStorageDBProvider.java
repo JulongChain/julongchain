@@ -24,7 +24,7 @@ import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 /**
  * CommonStorageDB操作类
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/17
  * @company Dingxuan
  */
