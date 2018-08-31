@@ -24,7 +24,7 @@ import org.bcia.julongchain.protos.common.Common;
  * 交易处理器借口
  * 对交易的处理以模拟结果集(TxSimulatorResults)的形式展现
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/09
  * @company Dingxuan
  */

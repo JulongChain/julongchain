@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
@@ -63,7 +63,7 @@ import static org.bcia.julongchain.protos.node.SmartContractShim.SmartContractMe
 /**
  * 类描述
  *
- * @author wanliangbing, sunzongyu
+ * @author wanliangbing, sunzongyu1
  * @date 2018/3/14
  * @company Dingxuan
  */

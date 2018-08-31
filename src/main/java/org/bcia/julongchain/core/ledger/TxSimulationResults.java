@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +21,7 @@ import org.bcia.julongchain.protos.ledger.rwset.Rwset;
 /**
  * 模拟结果
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/09
  * @company Dingxuan
  */

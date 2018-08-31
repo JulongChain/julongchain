@@ -20,7 +20,7 @@ import org.bcia.julongchain.common.exception.JulongChainException;
 /**
  * 智能合约信息提供者接口
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/09
  * @company Dingxuan
  */

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,9 +51,10 @@ import static org.bcia.julongchain.core.smartcontract.shim.fsm.CallbackType.ENTE
 import static org.bcia.julongchain.protos.node.SmartContractShim.SmartContractMessage.Type.*;
 
 /**
- * Handler responsible for management of Peer's side of chaincode stream
+ * Node端Handler
+ * todo v0.8版本暂未使用
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/3/18
  * @company Dingxuan
  */
@@ -64,15 +65,15 @@ public class Handler {
      */
     private static final String CREATED_STATE     = "created";
     /**
-     * in: CREATED, rcv:  REGISTER, send: REGISTERED, INIT
+	 * 当前状态:CREATED	收到状态:REGISTER		发送状态:REGISTED, INIT
      */
     private static final String ESTABLISHED_STATE = "established";
     /**
-     * in:ESTABLISHED,TRANSACTION, rcv:COMPLETED
+	 * 当前状态:ESTABLISHED, TRANSACTION	收到状态:COMPLETED
      */
     private static final String READY_STATE       = "ready";
     /**
-     * in:INIT,ESTABLISHED, rcv: error, terminate container
+	 * 当前状态:INIT, ESTABLISHED		收到状态:ERROR, TERMINATE CONTAINER
      */
     private static final String END_STATE         = "end";
 

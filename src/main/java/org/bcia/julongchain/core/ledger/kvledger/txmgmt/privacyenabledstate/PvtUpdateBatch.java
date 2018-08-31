@@ -18,7 +18,7 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate;
 /**
  * 私有数据更新包
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/17
  * @company Dingxuan
  */

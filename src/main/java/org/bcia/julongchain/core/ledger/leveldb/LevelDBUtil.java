@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  *
  * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
@@ -26,7 +26,7 @@ import java.util.*;
 /**
  * 提供操作leveldb的操作方法，如增，删，改，查
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/03
  * @company Dingxuan
  */

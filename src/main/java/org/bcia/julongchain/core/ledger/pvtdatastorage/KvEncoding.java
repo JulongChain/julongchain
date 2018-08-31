@@ -24,7 +24,7 @@ import org.bcia.julongchain.core.ledger.util.Util;
  * 序列化kv
  * 用于序列化pvtDataStore
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/18
  * @company Dingxuan
  */

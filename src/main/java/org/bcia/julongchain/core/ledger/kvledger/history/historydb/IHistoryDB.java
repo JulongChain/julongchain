@@ -27,7 +27,7 @@ import org.bcia.julongchain.protos.common.Common;
  * HistoryDB接口
  * HistoryDB只储存block中有效交易的Key
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/04
  * @company Dingxuan
  */

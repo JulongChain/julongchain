@@ -25,7 +25,7 @@ import java.util.Map;
  * 用于处理未背书交易
  * 于账本初始化时创建并初始化
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/09
  * @company Dingxuan
  */

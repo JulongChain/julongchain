@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb;
 /**
  * 所为所有迭代器统一的输出接口
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/4/9
  * @company Dingxuan
  */

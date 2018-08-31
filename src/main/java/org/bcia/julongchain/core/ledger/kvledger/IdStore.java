@@ -33,7 +33,7 @@ import java.util.*;
  * 存储创建的账本ID
  * 使用ConstructionFlag标记账本是否正在建立
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/04
  * @company Dingxuan
  */

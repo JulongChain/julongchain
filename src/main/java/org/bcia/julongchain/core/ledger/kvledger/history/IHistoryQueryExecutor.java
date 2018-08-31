@@ -21,7 +21,7 @@ import org.bcia.julongchain.common.ledger.IResultsIterator;
 /**
  * 历史查询器接口
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/25
  * @company Dingxuan
  */

@@ -33,7 +33,7 @@ import java.util.*;
  * 实现pvt数据与blockchain同步写入
  * 主要方法为prepare、commit和rollback
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/19
  * @company Dingxuan
  */

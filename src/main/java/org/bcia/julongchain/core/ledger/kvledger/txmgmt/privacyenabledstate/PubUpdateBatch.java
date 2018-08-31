@@ -18,9 +18,9 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.UpdateBatch;
 
 /**
- * 共有数据更新包
+ * 公有数据更新包
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/17
  * @company Dingxuan
  */

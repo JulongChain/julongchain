@@ -20,7 +20,7 @@ import org.bcia.julongchain.protos.ledger.rwset.Rwset;
 /**
  * 私有交易数据
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/09
  * @company Dingxuan
  */

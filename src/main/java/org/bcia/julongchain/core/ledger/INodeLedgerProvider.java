@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,7 @@ import java.util.Map;
 /**
  * 账本服务提供者
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/02
  * @company Dingxuan
  */

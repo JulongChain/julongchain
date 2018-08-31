@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@ package org.bcia.julongchain.core.ledger.kvledger;
 /**
  * 可恢复的数据库接口
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/4/9
  * @company Dingxuan
  */
