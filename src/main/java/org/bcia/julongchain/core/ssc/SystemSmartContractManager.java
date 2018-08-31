@@ -214,7 +214,7 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
 			try {
 				controller.deDeploy(sscName);
 			} catch (InprocVMException e) {
-				log.error("Dedeploy " + sscName + "failed");
+				log.error("Dedeploy " + sscName + " failed");
 				log.error(e.getMessage());
 			}
 		}
@@ -278,7 +278,6 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
     	return SmartContractPackage.SmartContractDeploymentSpec.newBuilder()
 				.setExecEnv(SmartContractPackage.SmartContractDeploymentSpec.ExecutionEnvironment.SYSTEM)
 				.setSmartContractSpec(spec)
-				// TODO: 7/19/18 new byte[] in fabric
 				.setCodePackage(ByteString.EMPTY)
 				.build();
     }

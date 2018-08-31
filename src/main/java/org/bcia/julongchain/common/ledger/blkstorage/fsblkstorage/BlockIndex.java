@@ -118,7 +118,7 @@ public class BlockIndex implements Index {
             }
         }
 
-        //index4 查询历史数据
+        //index4 查询历史数据 - getTXLocByBlockNumTranNum()
         if(Boolean.TRUE.equals(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM))){
             for(int i = 0; i < txOffsets.size(); i++){
                 TxIndexInfo txOffset = txOffsets.get(i);
@@ -129,14 +129,14 @@ public class BlockIndex implements Index {
             }
         }
 
-        //index5 通过txid获取区块 getBlockByTxId()
+        //index5 通过txid获取区块 - getBlockByTxId()
         if(Boolean.TRUE.equals(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_TX_ID))){
             for(TxIndexInfo txOffset : txOffsets){
                 batch.put(constructBlockTxIDKey(txOffset.getTxID()), flpBytes);
             }
         }
 
-        //index6 根据txid获取交易有效标志
+        //index6 根据txid获取交易有效标志 - getTxValidationCodeByTxID()gggggg
         if(Boolean.TRUE.equals(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_VALIDATION_CODE))){
             for (int i = 0; i < txOffsets.size(); i++) {
                 TxIndexInfo txOffset = txOffsets.get(i);

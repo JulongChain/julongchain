@@ -84,7 +84,7 @@ public class KvLedger implements INodeLedger {
 	 * 恢复账本
 	 */
 	private void recoverDBs() throws LedgerException {
-		log.debug("Evtering revocerDBs()");
+		log.debug("Entering revocerDBs()");
 		Ledger.BlockchainInfo info = blockStore.getBlockchainInfo();
 		if(info.getHeight() == 0){
 			log.info("Block storage is empty");
@@ -104,17 +104,12 @@ public class KvLedger implements INodeLedger {
 			}
 		}
 		if(recoverers.size() == 0){
-			return;
+			//nothing to do
 		} else if(recoverers.size() == 1){
 			recommitLostBlocks(recoverers.get(0).getFirstBlockNum(), lastAvailableBlockNum, recoverers.get(0).getRecoverable());
 		} else {
 			//小号放前面 升序
-			Collections.sort(recoverers, new Comparator<Recoverer>() {
-				@Override
-				public int compare(Recoverer o1, Recoverer o2) {
-					return o1.getFirstBlockNum() > o2.getFirstBlockNum() ? 1 : -1;
-				}
-			});
+			recoverers.sort((o1, o2) -> o1.getFirstBlockNum() > o2.getFirstBlockNum() ? 1 : -1);
 			//小号向大号看齐
 			recommitLostBlocks(recoverers.get(0).getFirstBlockNum(), recoverers.get(1).getFirstBlockNum() - 1,
 					recoverers.get(0).getRecoverable());
