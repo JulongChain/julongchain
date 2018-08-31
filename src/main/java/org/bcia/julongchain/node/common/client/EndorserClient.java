@@ -24,6 +24,8 @@ import org.bcia.julongchain.protos.node.EndorserGrpc;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * 背书客户端实现
  *
@@ -62,6 +64,10 @@ public class EndorserClient implements IEndorserClient {
     public void close() {
         log.info("EndorserClient close");
 
-        managedChannel.shutdown();
+        try {
+            managedChannel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 }
