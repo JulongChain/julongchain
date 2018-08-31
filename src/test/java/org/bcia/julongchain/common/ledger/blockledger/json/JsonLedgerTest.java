@@ -117,7 +117,7 @@ public class JsonLedgerTest {
         jsonLedger.append(block);
         Assert.assertSame(jsonLedger.height(), ++height);
         //错误用例
-		block = Common.Block.newBuilder()
+		Common.Block block1 = Common.Block.newBuilder()
 				.setHeader(Common.BlockHeader.newBuilder()
 						.setPreviousHash(ByteString.copyFrom(CspManager.getDefaultCsp().hash(block.getHeader().toByteArray(), null)))
 						//区块号错误
@@ -134,9 +134,9 @@ public class JsonLedgerTest {
 						.build())
 				.build();
 		thrown.expect(LedgerException.class);
-		jsonLedger.append(block);
+		jsonLedger.append(block1);
 
-		block = Common.Block.newBuilder()
+		Common.Block block2 = Common.Block.newBuilder()
 				.setHeader(Common.BlockHeader.newBuilder()
 						//preHash错误
 						.setPreviousHash(ByteString.copyFrom(CspManager.getDefaultCsp().hash(block.getData().toByteArray(), null)))
@@ -153,7 +153,7 @@ public class JsonLedgerTest {
 						.build())
 				.build();
 		thrown.expect(LedgerException.class);
-		jsonLedger.append(block);
+		jsonLedger.append(block2);
     }
 
     @Test
@@ -169,6 +169,28 @@ public class JsonLedgerTest {
 		itr = jsonLedger.iterator(Ab.SeekPosition.newBuilder().setSpecified(Ab.SeekSpecified.getDefaultInstance()).build());
 		Assert.assertNotNull(itr);
     }
+
+    @Test
+	public void testHeight() throws Exception {
+    	long height = jsonLedger.height();
+		block = Common.Block.newBuilder()
+				.setHeader(Common.BlockHeader.newBuilder()
+						.setPreviousHash(ByteString.copyFrom(CspManager.getDefaultCsp().hash(block.getHeader().toByteArray(), null)))
+						.setNumber(height)
+						.build())
+				.setData(Common.BlockData.newBuilder()
+						.addData(ByteString.copyFromUtf8("BlockData" + height))
+						.build())
+				.setMetadata(Common.BlockMetadata.newBuilder()
+						.addMetadata(ByteString.EMPTY)
+						.addMetadata(ByteString.EMPTY)
+						.addMetadata(ByteString.EMPTY)
+						.addMetadata(ByteString.EMPTY)
+						.build())
+				.build();
+		jsonLedger.append(block);
+		Assert.assertSame(jsonLedger.height(), ++height);
+	}
 
     @Test
     public void testNext() throws Exception{

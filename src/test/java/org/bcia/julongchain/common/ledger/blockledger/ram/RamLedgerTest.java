@@ -100,6 +100,25 @@ public class RamLedgerTest {
     }
 
     @Test
+	public void testHeight() throws Exception {
+    	long height = ramLedger.height();
+		block = Common.Block.newBuilder()
+				.setHeader(Common.BlockHeader.newBuilder()
+						.setPreviousHash(ByteString.copyFrom(CspManager.getDefaultCsp().hash(block.getHeader().toByteArray(), null)))
+						.setNumber(height)
+						.build())
+				.setMetadata(Common.BlockMetadata.newBuilder()
+						.addMetadata(ByteString.EMPTY)
+						.addMetadata(ByteString.EMPTY)
+						.addMetadata(ByteString.EMPTY)
+						.addMetadata(ByteString.EMPTY)
+						.build())
+				.build();
+		ramLedger.append(block);
+		Assert.assertSame(++height, ramLedger.height());
+	}
+
+    @Test
     public void testIterator() throws Exception{
 		long height = ramLedger.height();
         IIterator itr = null;
