@@ -51,14 +51,14 @@ public class RwSetUtil {
      * 在NsReadWriteSet中获取NsRwSet
      */
     public static NsRwSet nsRwSetFromProtoMsg(Rwset.NsReadWriteSet protoMsg) throws LedgerException{
-        NsRwSet nsRwSet = null;
+        NsRwSet nsRwSet;
         try {
             nsRwSet = new NsRwSet(protoMsg.getNamespace(), KvRwset.KVRWSet.parseFrom(protoMsg.getRwset()));
         } catch (InvalidProtocolBufferException e) {
             throw new LedgerException(e);
         }
 
-        CollHashedRwSet collHashedRwSet = null;
+        CollHashedRwSet collHashedRwSet;
         for(Rwset.CollectionHashedReadWriteSet collHashedRwSetProtoMsg : protoMsg.getCollectionHashedRwsetList()){
             collHashedRwSet = collHashedRwSetFromProtoMsg(collHashedRwSetProtoMsg);
             nsRwSet.getCollHashedRwSets().add(collHashedRwSet);
@@ -71,7 +71,7 @@ public class RwSetUtil {
      */
     public static TxPvtRwSet txPvtRwSetFromProtoMsg(Rwset.TxPvtReadWriteSet protoMsg) throws LedgerException{
         TxPvtRwSet txPvtRwSet = new TxPvtRwSet();
-        NsPvtRwSet nsPvtRwSet = null;
+        NsPvtRwSet nsPvtRwSet;
         for(Rwset.NsPvtReadWriteSet nsPvtRwSetProtoMsg : protoMsg.getNsPvtRwsetList()){
             nsPvtRwSet = nsPvtRwSetFromProtoMsg(nsPvtRwSetProtoMsg);
             txPvtRwSet.getNsPvtRwSets().add(nsPvtRwSet);
@@ -142,7 +142,7 @@ public class RwSetUtil {
      * 通过proto中Version构建version.Height
      */
     public static LedgerHeight newVersion(KvRwset.Version protoVersion){
-        if(protoVersion == null){
+        if(protoVersion == null || protoVersion.equals(KvRwset.Version.getDefaultInstance())){
             return null;
         }
         return new LedgerHeight(protoVersion.getBlockNum(), protoVersion.getTxNum());
@@ -164,7 +164,6 @@ public class RwSetUtil {
      */
     public static KvRwset.KVReadHash newPvtKVReadHash(String key, LedgerHeight version) throws LedgerException {
         return KvRwset.KVReadHash.newBuilder()
-                // TODO: 5/31/18 SM3 Hash
                 .setKeyHash(ByteString.copyFrom(Util.getHashBytes(key.getBytes())))
                 .setVersion(newProtoVersion(version))
                 .build();
@@ -175,7 +174,6 @@ public class RwSetUtil {
      */
     public static KvRwset.KVWriteHash newPvtKVWriteHash(String key, ByteString value) throws LedgerException{
         KvRwset.KVWriteHash.Builder builder = KvRwset.KVWriteHash.newBuilder();
-        // TODO: 5/31/18 SM3 Hash
         ByteString keyHash = ByteString.copyFrom(Util.getHashBytes(key.getBytes()));
         ByteString valueHash = ByteString.EMPTY;
         if (value.size() != 0) {
