@@ -28,7 +28,7 @@ import java.util.List;
 /**
  * 管理pvtdata方法
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/17
  * @company Dingxuan
  */

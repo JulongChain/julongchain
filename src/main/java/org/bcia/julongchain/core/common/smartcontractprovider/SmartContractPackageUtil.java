@@ -25,7 +25,7 @@ import org.bcia.julongchain.protos.node.SignedScDepSpec;
 /**
  * 解析SmartcontractPackage工具类
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/05/09
  * @company Dingxuan
  */

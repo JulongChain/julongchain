@@ -31,7 +31,7 @@ import java.util.Map;
  * 处理pvt、pubdata
  * 主要用于couchdb
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/04/17
  * @company Dingxuan
  */

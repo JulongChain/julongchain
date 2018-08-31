@@ -19,18 +19,16 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 /**
- * SignedCDSData is data stored in the LSSC on instantiation of a SC
- * for SignedCDSPackage. This needs to be serialized for ChaincodeData
- * hence the protobuf format
+ * 签名的智能合约数据
  *
- * @author sunzongyu
+ * @author sunzongyu1
  * @date 2018/05/09
  * @company Dingxuan
  */
 public class SignedSDSData implements Serializable {
-    private byte[] codeHash = "protobuf:\"bytes,1,opt,name=hash\"".getBytes();
-    private byte[] metaDataHash = "protobuf:\"bytes,2,opt,name=metaDataHash\"".getBytes();
-    private byte[] signatureHash = "protobuf:\"bytes,3,opt,name=signatureHash\"".getBytes();
+    private byte[] codeHash = new byte[0];
+    private byte[] metaDataHash = new byte[0];
+    private byte[] signatureHash = new byte[0];
 
     @Override
     public boolean equals(Object obj) {

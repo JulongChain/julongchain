@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,7 +24,7 @@ import java.util.Map;
  * 验证器,用于验证某些输入是否合法
  * TODO 验证器验证couchdb，暂时无法实现
  *
- * @author sunianle, sunzongyu
+ * @author sunianle, sunzongyu1
  * @date 5/10/18
  * @company Dingxuan
  */
@@ -32,8 +32,7 @@ public class Validators {
     private static Map<String, FileValidator> fileValidators = new HashMap<>();
 
     /**
-     * ValidateMetadataFile checks that metadata files are valid
-     * according to the validation rules of the metadata directory (metadataType)
+	 * 使用文件系统中的metadata完成校验
      */
     public static void validateMetadataFile(String fileName, byte[] fileBytes, String metadataType) throws ValidateException {
         if (fileValidators.containsKey(metadataType)) {
