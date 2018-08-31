@@ -351,44 +351,4 @@ public class CspImpl implements ICsp {
         byte[] none=new SecureRandom().engineGenerateSeed(len);
         return none;
     }
-    
-    
-    public static void main(String[] args) {
-		try {
-			int level = 1;
-			String hashfamily = "SHA1";
-			boolean softVerify = true;
-			boolean noKeyImport = true;
-			PKCS11Config pkcscfg = new PKCS11Config(level, hashfamily, softVerify, noKeyImport);
-			pkcscfg.setPath("/root/Desktop/swpkcs/");			
-			PKCS11FactoryOpts opts = new PKCS11FactoryOpts(pkcscfg);
-			CspImpl csp = new CspImpl(opts);
-			
-			//gen key
-			
-			RsaOpts.RSA1024KeyGenOpts genopts = new RsaOpts.RSA1024KeyGenOpts(false);
-			IKey key = csp.keyGen(genopts);
-			
-			//import
-			/*
-			RsaOpts.RSA2048KeyGenOpts genopts2 = new RsaOpts.RSA2048KeyGenOpts(true);
-			IKey key2 = csp.keyGen(genopts2);
-			PKCS11KeyData raw = new PKCS11KeyData();
-			raw.setRawPri(key2.toBytes());
-			raw.setRawPub(key2.getPublicKey().toBytes());
-			RsaOpts.RSAPrivateKeyImportOpts importopts = new RsaOpts.RSAPrivateKeyImportOpts(true);
-			IKey key3 = csp.keyImport(raw, importopts);
-			*/
-			
-			//hash
-			/*
-			PKCS11HashOpts.SHA3_384Opts sha3348opt = new PKCS11HashOpts.SHA3_384Opts();
-			String message = "Hello World!";
-			byte[] hashvalue = csp.hash(message.getBytes(), sha3348opt);
-			*/
-			return;
-		}catch(JulongChainException ex) {
-			ex.printStackTrace();
-		}
-    }
 }
