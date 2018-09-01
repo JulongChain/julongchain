@@ -22,7 +22,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.EventsPackage;
 
 /**
- * 对象
+ * 投递处理器
  *
  * @author zhouhui
  * @date 2018/3/21

@@ -27,7 +27,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Ledger;
 
 /**
- * 对象
+ * 账本工具
  *
  * @author zhouhui
  * @date 2018/4/26
@@ -49,7 +49,7 @@ public class LedgerUtils {
             ValidateException, InvalidProtocolBufferException {
         //从账本中获取当前链的信息，如高度等
         Ledger.BlockchainInfo blockchainInfo = nodeLedger.getBlockchainInfo();
-        ValidateUtils.isNotNull(blockchainInfo, "blockchainInfo can not be null");
+        ValidateUtils.isNotNull(blockchainInfo, "BlockchainInfo can not be null");
 
         //从账本中获取最新的区块
         Common.Block lastBlock = nodeLedger.getBlockByNumber(blockchainInfo.getHeight() - 1);

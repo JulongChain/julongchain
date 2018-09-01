@@ -30,7 +30,7 @@ import java.util.Collection;
 public class ValidateUtils {
     /**
      * 确保对象不为空，否则抛出异常
-     * 举例：ValidateUtils.isNotNull(envelope, "envelope can not be null");
+     * 举例：ValidateUtils.isNotNull(envelope, "Envelope can not be null");
      *
      * @param obj
      * @param errorMessage
@@ -44,7 +44,7 @@ public class ValidateUtils {
 
     /**
      * 确保字符串不为空，否则抛出异常
-     * 举例：ValidateUtils.isNotBlank(broker, "broker can not be empty");
+     * 举例：ValidateUtils.isNotBlank(broker, "Broker can not be empty");
      *
      * @param str
      * @param errorMessage
@@ -58,7 +58,7 @@ public class ValidateUtils {
 
     /**
      * 确保对象不为空，否则抛出异常
-     * 举例：ValidateUtils.isNotEmpty(list, "list can not be empty");
+     * 举例：ValidateUtils.isNotEmpty(list, "List can not be empty");
      *
      * @param collection
      * @param errorMessage

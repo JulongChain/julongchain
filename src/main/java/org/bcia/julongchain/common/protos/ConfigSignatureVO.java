@@ -23,7 +23,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 
 /**
- * 类描述
+ * 配置签名业务对象
  *
  * @author zhouhui
  * @date 2018/05/29
@@ -36,8 +36,8 @@ public class ConfigSignatureVO implements IProtoVO<Configtx.ConfigSignature> {
     @Override
     public void parseFrom(Configtx.ConfigSignature configSignature) throws InvalidProtocolBufferException,
             ValidateException {
-        ValidateUtils.isNotNull(configSignature, "configSignature can not be null");
-        ValidateUtils.isNotNull(configSignature.getSignatureHeader(), "configSignature.getSignatureHeader can not " +
+        ValidateUtils.isNotNull(configSignature, "ConfigSignature can not be null");
+        ValidateUtils.isNotNull(configSignature.getSignatureHeader(), "ConfigSignature.getSignatureHeader can not " +
                 "be null");
 
         this.signatureHeader = Common.SignatureHeader.parseFrom(configSignature.getSignatureHeader());

@@ -70,9 +70,10 @@ public class ProposalUtils {
      * @param transientMap
      * @return
      */
-    public static ProposalPackage.Proposal buildSmartContractProposal(Common.HeaderType type, String groupId, String
-            txId, SmartContractPackage.SmartContractInvocationSpec scis, byte[] nonce, byte[] creator, Map<String, byte[]>
-                                                                              transientMap) {
+    public static ProposalPackage.Proposal buildSmartContractProposal(
+            Common.HeaderType type, String groupId, String txId,
+            SmartContractPackage.SmartContractInvocationSpec scis, byte[] nonce, byte[] creator, Map<String, byte[]>
+                    transientMap) {
         //首先构造SmartContractHeaderExtension对象
         ProposalPackage.SmartContractHeaderExtension.Builder headerExtensionBuilder = ProposalPackage
                 .SmartContractHeaderExtension.newBuilder();
@@ -101,8 +102,8 @@ public class ProposalUtils {
      * @param transientMap
      * @return
      */
-    public static ProposalPackage.SmartContractProposalPayload buildProposalPayload(SmartContractPackage.SmartContractInvocationSpec scis,Map<String,
-            byte[]> transientMap) {
+    public static ProposalPackage.SmartContractProposalPayload buildProposalPayload(
+            SmartContractPackage.SmartContractInvocationSpec scis, Map<String, byte[]> transientMap) {
         //SmartContractProposalPayload构造器
         ProposalPackage.SmartContractProposalPayload.Builder proposalPayloadBuilder = ProposalPackage
                 .SmartContractProposalPayload.newBuilder();
@@ -116,15 +117,6 @@ public class ProposalUtils {
         }
 
         return proposalPayloadBuilder.build();
-    }
-
-    public static SmartContractPackage.SmartContractSpec buildSmartContractSpec(){
-        return null;
-
-    }
-
-    public static SmartContractPackage.SmartContractInput buildSmartContractInput(){
-        return null;
     }
 
     /**
@@ -148,39 +140,36 @@ public class ProposalUtils {
 
     /**
      * 根据SmartcontractInvocationSpec生成交易提案
-     * @author sunianle
+     *
      * @param type
      * @param groupID
      * @param invocationSpec
      * @param creator
      * @return
+     * @author sunianle
      */
-    public static ProposalPackage.Proposal createProposalFromInvocationSpec
-                                            (Common.HeaderType type,
-                                             String groupID,
-                                             SmartContractPackage.SmartContractInvocationSpec invocationSpec,
-                                             byte[] creator)
-                                             throws JulongChainException {
-        return createSmartcontractProposal(type,groupID,invocationSpec,creator);
+    public static ProposalPackage.Proposal createProposalFromInvocationSpec(
+            Common.HeaderType type, String groupID, SmartContractPackage.SmartContractInvocationSpec invocationSpec,
+            byte[] creator) throws JulongChainException {
+        return createSmartcontractProposal(type, groupID, invocationSpec, creator);
     }
 
     /**
-     * @author sunianle
      * @param type
      * @param groupID
      * @param invocationSpec
      * @param creator
      * @return
      * @throws JulongChainException
+     * @author sunianle
      */
-    private static ProposalPackage.Proposal createSmartcontractProposal(Common.HeaderType type, String groupID,
-                                                                        SmartContractPackage.SmartContractInvocationSpec invocationSpec,
-                                                                        byte[] creator) throws JulongChainException {
-        return createSmartcontractProposalWithTransient(type,groupID,invocationSpec,creator,null);
+    private static ProposalPackage.Proposal createSmartcontractProposal(
+            Common.HeaderType type, String groupID, SmartContractPackage.SmartContractInvocationSpec invocationSpec,
+            byte[] creator) throws JulongChainException {
+        return createSmartcontractProposalWithTransient(type, groupID, invocationSpec, creator, null);
     }
 
     /**
-     * @author sunianle
      * @param type
      * @param groupID
      * @param invocationSpec
@@ -188,15 +177,13 @@ public class ProposalUtils {
      * @param transientMap
      * @return
      * @throws JulongChainException
+     * @author sunianle
      */
-    public static ProposalPackage.Proposal createSmartcontractProposalWithTransient
-            (Common.HeaderType type, String groupID,
-             SmartContractPackage.SmartContractInvocationSpec invocationSpec,
-             byte[] creator,
-             Map<String,byte[]> transientMap)
-            throws JulongChainException {
+    public static ProposalPackage.Proposal createSmartcontractProposalWithTransient(
+            Common.HeaderType type, String groupID, SmartContractPackage.SmartContractInvocationSpec invocationSpec,
+            byte[] creator, Map<String, byte[]> transientMap) throws JulongChainException {
         byte[] nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, new RngOpts());
-        String txID=ProposalUtils.computeProposalTxID(creator, nonce);
-        return buildSmartContractProposal(type,groupID,txID,invocationSpec,nonce,creator,transientMap);
+        String txID = ProposalUtils.computeProposalTxID(creator, nonce);
+        return buildSmartContractProposal(type, groupID, txID, invocationSpec, nonce, creator, transientMap);
     }
 }

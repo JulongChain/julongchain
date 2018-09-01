@@ -20,7 +20,7 @@ import org.bcia.julongchain.protos.common.Configuration;
 import java.util.Map;
 
 /**
- * 对象
+ * 群组提供者
  *
  * @author zhouhui
  * @date 2018/5/10

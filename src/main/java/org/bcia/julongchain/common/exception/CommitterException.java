@@ -16,7 +16,7 @@
 package org.bcia.julongchain.common.exception;
 
 /**
- * 对象
+ * 提交节点异常
  *
  * @author zhouhui
  * @date 2018/4/18

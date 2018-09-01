@@ -126,7 +126,7 @@ public class NodeGroup {
 
         } else {
             //不是空文件，反而是一个错误的文件，则直接报异常（要么不指定文件，要么就指定正确的文件）
-            log.error("groupFile is not exists: " + groupFile);
+            log.error("GroupFile is not exists: " + groupFile);
             throw new NodeException("Group File is not exists");
         }
 
@@ -187,7 +187,7 @@ public class NodeGroup {
     }
 
     private void getGenesisBlockThenWrite(String ip, int port, String groupId) {
-        log.info("getGenesisBlock begin");
+        log.info("GetGenesisBlock begin");
         IDeliverClient deliverClient = new DeliverClient(ip, port);
         deliverClient.getSpecifiedBlock(groupId, 0L, new StreamObserver<Ab.DeliverResponse>() {
             @Override

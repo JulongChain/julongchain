@@ -21,7 +21,10 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.ValidateException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.Utils;
+import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.csp.factory.CspManager;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.msp.ISigningIdentity;
@@ -38,6 +41,60 @@ import org.bcia.julongchain.protos.node.SmartContractPackage;
  * @company Dingxuan
  */
 public class ProposalResponseUtils {
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ProposalResponseUtils.class);
+
+    private static final String OK = "OK";
+    private static final int RESPONSE_VERSION = 1;
+
+    /**
+     * 构造标准提案响应
+     *
+     * @param payload
+     * @param signingIdentity
+     * @return
+     * @throws ValidateException
+     */
+    public static ProposalResponsePackage.ProposalResponse buildNormalProposalResponse(
+            ProposalResponsePackage.ProposalResponsePayload payload, ISigningIdentity signingIdentity)
+            throws ValidateException {
+        //首先构造响应主内容
+        ProposalResponsePackage.Response.Builder responseBuilder = ProposalResponsePackage.Response.newBuilder();
+        responseBuilder.setStatus(Common.Status.SUCCESS_VALUE);
+        responseBuilder.setMessage(OK);
+        ProposalResponsePackage.Response response = responseBuilder.build();
+
+        byte[] payloadBytes = payload.toByteArray();
+        ValidateUtils.isNotNull(payloadBytes, "PayloadBytes can not be null");
+
+        byte[] endorser = signingIdentity.getIdentity().serialize();
+        byte[] signature = signingIdentity.sign(ArrayUtils.addAll(payloadBytes, endorser));
+
+        //构造Endorsement
+        ProposalResponsePackage.Endorsement.Builder endorsementBuilder =
+                ProposalResponsePackage.Endorsement.newBuilder();
+        endorsementBuilder.setEndorser(ByteString.copyFrom(endorser));
+        endorsementBuilder.setSignature(ByteString.copyFrom(signature));
+        ProposalResponsePackage.Endorsement endorsement = endorsementBuilder.build();
+
+        ProposalResponsePackage.ProposalResponse.Builder proposalResponseBuilder =
+                ProposalResponsePackage.ProposalResponse.newBuilder();
+        proposalResponseBuilder.setVersion(RESPONSE_VERSION);
+        proposalResponseBuilder.setTimestamp(EnvelopeHelper.nowTimestamp());
+
+        proposalResponseBuilder.setResponse(response);
+        proposalResponseBuilder.setPayload(ByteString.copyFrom(payloadBytes));
+        proposalResponseBuilder.setEndorsement(endorsement);
+
+        return proposalResponseBuilder.build();
+    }
+
+    /**
+     * 构造提案响应
+     *
+     * @param payload
+     * @param message
+     * @return
+     */
     public static ProposalResponsePackage.ProposalResponse buildProposalResponse(ByteString payload, String message) {
         //首先构造响应主内容
         ProposalResponsePackage.Response.Builder responseBuilder = ProposalResponsePackage.Response.newBuilder();
@@ -49,25 +106,22 @@ public class ProposalResponseUtils {
         ProposalResponsePackage.Response response = responseBuilder.build();
 
         //构造提案响应
-        ProposalResponsePackage.ProposalResponse.Builder proposalResponseBuilder = ProposalResponsePackage
-                .ProposalResponse.newBuilder();
-        proposalResponseBuilder.setResponse(response);
-        return proposalResponseBuilder.build();
+        return buildProposalResponse(response);
     }
 
-    public static ProposalResponsePackage.ProposalResponse buildProposalResponse(ProposalResponsePackage.Response response) {
+    /**
+     * 构造提案响应
+     *
+     * @param response
+     * @return
+     */
+    public static ProposalResponsePackage.ProposalResponse buildProposalResponse(
+            ProposalResponsePackage.Response response) {
         //构造提案响应
         ProposalResponsePackage.ProposalResponse.Builder proposalResponseBuilder = ProposalResponsePackage
                 .ProposalResponse.newBuilder();
         proposalResponseBuilder.setResponse(response);
         return proposalResponseBuilder.build();
-    }
-
-    public static ProposalResponsePackage.Response buildResponse(ByteString payload) {
-        ProposalResponsePackage.Response.Builder responseBuilder = ProposalResponsePackage.Response.newBuilder();
-        responseBuilder.setStatus(Common.Status.SUCCESS_VALUE);
-        responseBuilder.setPayload(payload);
-        return responseBuilder.build();
     }
 
     /**
@@ -76,18 +130,13 @@ public class ProposalResponseUtils {
      * @param errorMsg
      * @return
      */
-    public static ProposalResponsePackage.ProposalResponse buildErrorProposalResponse(Common.Status status, String errorMsg) {
+    public static ProposalResponsePackage.ProposalResponse buildErrorProposalResponse(
+            Common.Status status, String errorMsg) {
         //首先构造响应主内容
-        ProposalResponsePackage.Response.Builder responseBuilder = ProposalResponsePackage.Response.newBuilder();
-        responseBuilder.setStatus(status.getNumber());
-        responseBuilder.setMessage(errorMsg);
-        ProposalResponsePackage.Response response = responseBuilder.build();
+        ProposalResponsePackage.Response response = buildErrorResponse(status, errorMsg);
 
         //构造提案响应
-        ProposalResponsePackage.ProposalResponse.Builder proposalResponseBuilder = ProposalResponsePackage
-                .ProposalResponse.newBuilder();
-        proposalResponseBuilder.setResponse(response);
-        return proposalResponseBuilder.build();
+        return buildProposalResponse(response);
     }
 
     /**
@@ -104,155 +153,78 @@ public class ProposalResponseUtils {
     }
 
     /**
-     * 创建提案响应
+     * 构造ProposalResponse
      *
      * @param headerBytes
      * @param payloadBytes
      * @param response
      * @param results
      * @param events
-     * @param smartContractID
+     * @param scId
      * @param visibility
      * @param signingIdentity
      * @return
-     * @author sunianle
+     * @throws InvalidProtocolBufferException
+     * @throws JulongChainException
      */
     public static ProposalResponsePackage.ProposalResponse buildProposalResponse(
-            byte[] headerBytes, byte[] payloadBytes, ProposalResponsePackage.Response response,
-            byte[] results,
-            byte[] events,
-            SmartContractPackage.SmartContractID smartContractID,
-            byte[] visibility,
+            byte[] headerBytes, byte[] payloadBytes, ProposalResponsePackage.Response response, byte[] results,
+            byte[] events, SmartContractPackage.SmartContractID scId, byte[] visibility,
             ISigningIdentity signingIdentity) throws InvalidProtocolBufferException, JulongChainException {
+        ValidateUtils.isNotNull(headerBytes, "HeaderBytes can not be null");
+        ValidateUtils.isNotNull(payloadBytes, "PayloadBytes can not be null");
+
+        //强转仅仅是为了校验
         Common.Header header = Common.Header.parseFrom(headerBytes);
-        //obtain the proposal hash given proposal header, payload and the requested visibility
 
-        byte[] pHashBytes = null;
-        try {
-            pHashBytes = getProposalHash1(header, payloadBytes, visibility);
-        } catch (Exception e) {
-            String msg = String.format("Could not compute proposal hash: err %s", e.getMessage());
-            JulongChainException exception = new JulongChainException(msg);
-            throw exception;
-        }
-        //get the bytes of the proposal smartContractResponse payload - we need to sign them
-        byte[] prpBytes = null;
-        try {
-            prpBytes = getBytesProposalResponsePayload(pHashBytes, response, results, events, smartContractID);
-        } catch (Exception e) {
-            String msg = String.format("Failure while marshaling the ProposalResponsePayload: err %s", e.getMessage());
-            JulongChainException exception = new JulongChainException(msg);
-            throw exception;
-        }
+        ValidateUtils.isNotNull(header.getGroupHeader(), "Header.GroupHeader can not be null");
+        ValidateUtils.isNotNull(header.getSignatureHeader(), "Header.SignatureHeader can not be null");
 
-        byte[] endorser = signingIdentity.getIdentity().serialize();
-        if (endorser == null || endorser.length == 0) {
-            String msg = String.format("Could not serialize the signing identity for %s", signingIdentity.getIdentity().getMSPIdentifier());
-            JulongChainException exception = new JulongChainException(msg);
-            throw exception;
-        }
-
-        //sign the concatenation of the proposal smartContractResponse and the serialized endorser identity with this endorser's key
-        byte[] signature = signingIdentity.sign(Utils.appendBytes(prpBytes, endorser));
-        if (signature == null || signature.length == 0) {
-            String msg = String.format("Could not sign the proposal response payload");
-            JulongChainException exception = new JulongChainException(msg);
-            throw exception;
-        }
-
-        ProposalResponsePackage.ProposalResponse.Builder builder = ProposalResponsePackage.ProposalResponse.newBuilder();
-        builder.setVersion(1);
-        ProposalResponsePackage.Endorsement endorsement = ProposalResponsePackage.Endorsement.newBuilder()
-                .setSignature(ByteString.copyFrom(signature))
-                .setEndorser(ByteString.copyFrom(endorser)).build();
-        builder.setEndorsement(endorsement);
-        builder.setPayload(ByteString.copyFrom(prpBytes));
-        ProposalResponsePackage.Response response1 = ProposalResponsePackage.Response.newBuilder().setStatus(200).setMessage("OK").build();
-        builder.setResponse(response1);
-
-        return builder.build();
-    }
-
-    /**
-     * GetBytesProposalResponsePayload gets proposal smartContractResponse payload
-     *
-     * @param pHashBytes
-     * @param response
-     * @param results
-     * @param events
-     * @param smartContractID
-     * @return
-     */
-    private static byte[] getBytesProposalResponsePayload(byte[] pHashBytes, ProposalResponsePackage.Response
-            response, byte[] results, byte[] events, SmartContractPackage.SmartContractID smartContractID) {
-        //构造SmartContractAction
-        ProposalPackage.SmartContractAction.Builder actionBuilder = ProposalPackage.SmartContractAction.newBuilder();
-        if (events != null) {
-            actionBuilder.setEvents(ByteString.copyFrom(events));
-        }
-        if (results != null) {
-            actionBuilder.setResults(ByteString.copyFrom(results));
-        }
-        actionBuilder.setResponse(response);
-        actionBuilder.setSmartContractId(smartContractID);
-        ProposalPackage.SmartContractAction smartContractAction = actionBuilder.build();
-
-        //构造ProposalResponsePayload
-        ProposalResponsePackage.ProposalResponsePayload.Builder responsePayloadBuilder = ProposalResponsePackage
-                .ProposalResponsePayload.newBuilder();
-        responsePayloadBuilder.setExtension(smartContractAction.toByteString());
-        if (pHashBytes != null) {
-            responsePayloadBuilder.setProposalHash(ByteString.copyFrom(pHashBytes));
-        }
-        ProposalResponsePackage.ProposalResponsePayload responsePayload = responsePayloadBuilder.build();
-
-        return responsePayload.toByteArray();
-    }
-
-    /**
-     * GetProposalHash1 gets the proposal hash bytes after sanitizing the
-     * chaincode proposal payload according to the rules of visibility
-     *
-     * @param header
-     * @param payloadBytes
-     * @param visibility
-     * @return
-     */
-    private static byte[] getProposalHash1(Common.Header header, byte[] payloadBytes, byte[] visibility) throws
-            InvalidProtocolBufferException, ValidateException, JulongChainException {
-        if (header == null || header.getGroupHeader() == null || header.getSignatureHeader() == null || payloadBytes
-                == null) {
-            throw new ValidateException("Missing arguments");
-        }
-
-        //强制转换，如果失败抛出异常
         ProposalPackage.SmartContractProposalPayload smartContractProposalPayload = ProposalPackage
                 .SmartContractProposalPayload.parseFrom(payloadBytes);
-
         byte[] proposalPayloadForTxBytes = getBytesProposalPayloadForTx(smartContractProposalPayload, visibility);
 
-        //TODO:应当用哪个CSP
-        ICsp defaultCsp = CspManager.getDefaultCsp();
+        //计算提案Hash
+        byte[] proposalHash = hashBytes(headerBytes, proposalPayloadForTxBytes);
 
-        byte[] bytes = ArrayUtils.addAll(ArrayUtils.addAll(header.getGroupHeader().toByteArray(), header
-                .getSignatureHeader().toByteArray()), proposalPayloadForTxBytes);
-        return defaultCsp.hash(bytes, null);
-
-//        //TODO:应当用哪个CSP，用哪个HashOpts
-//        IHash hash = CspManager.getDefaultCsp().getHash(new SM3HashOpts());
-//
-//        hash.write(header.getGroupHeader().toByteArray());
-//        hash.write(header.getSignatureHeader().toByteArray());
-//        hash.write(proposalPayloadForTxBytes);
-//
-//        return hash.sum(null);
+        //构造ProposalResponsePayload
+        ProposalResponsePackage.ProposalResponsePayload responsePayload = buildProposalResponsePayload(results,
+                events, response, scId, proposalHash);
+        return buildNormalProposalResponse(responsePayload, signingIdentity);
     }
 
+    /**
+     * 将多个byte数组拼接后进行哈希
+     *
+     * @param bytesArray
+     * @return
+     * @throws JulongChainException
+     */
+    private static byte[] hashBytes(byte[]... bytesArray) throws JulongChainException {
+        byte[] bytes = null;
+        for (int i = 0; i < bytesArray.length; i++) {
+            if (i == 0) {
+                bytes = bytesArray[0];
+            } else {
+                bytes = ArrayUtils.addAll(bytes, bytesArray[i]);
+            }
+        }
+
+        return CspManager.getDefaultCsp().hash(bytes, null);
+    }
+
+    /**
+     * 获取ProposalPayload的字节流(去临时信息)
+     *
+     * @param proposalPayload
+     * @param visibility
+     * @return
+     * @throws ValidateException
+     */
     private static byte[] getBytesProposalPayloadForTx(ProposalPackage.SmartContractProposalPayload proposalPayload,
                                                        byte[] visibility) throws ValidateException {
-        if (proposalPayload == null) {
-            throw new ValidateException("Missing smartContractProposalPayload");
-        }
+        ValidateUtils.isNotNull(proposalPayload, "SmartContractProposalPayload can not be null");
+        //TODO:visibility在将来的版本中实现
 
         //将SmartContractProposalPayload去transientMap属性
         ProposalPackage.SmartContractProposalPayload.Builder newProposalPayloadBuilder = ProposalPackage
@@ -278,5 +250,56 @@ public class ProposalResponseUtils {
         payloadBuilder.setExtension(action.toByteString());
         payloadBuilder.setProposalHash(hash);
         return payloadBuilder.build();
+    }
+
+    /**
+     * 构造ProposalResponsePayload
+     *
+     * @param results
+     * @param events
+     * @param response
+     * @param scId
+     * @param hash
+     * @return
+     */
+    public static ProposalResponsePackage.ProposalResponsePayload buildProposalResponsePayload(
+            byte[] results, byte[] events, ProposalResponsePackage.Response response,
+            SmartContractPackage.SmartContractID scId, byte[] hash) {
+        ProposalResponsePackage.ProposalResponsePayload.Builder payloadBuilder = ProposalResponsePackage
+                .ProposalResponsePayload.newBuilder();
+        if (hash != null) {
+            payloadBuilder.setProposalHash(ByteString.copyFrom(hash));
+        }
+
+        ProposalPackage.SmartContractAction smartContractAction = buildSmartContractAction(results, events, response,
+                scId);
+        payloadBuilder.setExtension(smartContractAction.toByteString());
+
+        return payloadBuilder.build();
+    }
+
+    /**
+     * 构造SmartContractAction
+     *
+     * @param results
+     * @param events
+     * @param response
+     * @param scId
+     * @return
+     */
+    public static ProposalPackage.SmartContractAction buildSmartContractAction(
+            byte[] results, byte[] events, ProposalResponsePackage.Response response,
+            SmartContractPackage.SmartContractID scId) {
+        ProposalPackage.SmartContractAction.Builder actionBuilder = ProposalPackage.SmartContractAction.newBuilder();
+        if (results != null) {
+            actionBuilder.setResults(ByteString.copyFrom(results));
+        }
+        if (events != null) {
+            actionBuilder.setEvents(ByteString.copyFrom(events));
+        }
+
+        actionBuilder.setResponse(response);
+        actionBuilder.setSmartContractId(scId);
+        return actionBuilder.build();
     }
 }

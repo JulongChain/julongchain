@@ -36,7 +36,7 @@ import java.util.Map;
 import static org.bcia.julongchain.tools.configtxgen.entity.GenesisConfig.DEFAULT_ADMIN_PRINCIPAL;
 
 /**
- * 类描述
+ * 配置树帮助类
  *
  * @author zhouhui
  * @date 2018/3/9

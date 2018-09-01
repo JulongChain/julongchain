@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 /**
- * 对象
+ * 背书节点测试类
  *
  * @author zhouhui
  * @date 2018/3/29

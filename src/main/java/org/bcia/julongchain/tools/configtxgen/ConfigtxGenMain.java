@@ -24,7 +24,7 @@ import org.bcia.julongchain.tools.configtxgen.cmd.ConfigtxGenCmd;
 import org.bcia.julongchain.tools.configtxgen.cmd.IConfigtxGenCmd;
 
 /**
- * 类描述
+ * 交易生成工具入口类
  *
  * @author zhouhui
  * @date 2018/06/06

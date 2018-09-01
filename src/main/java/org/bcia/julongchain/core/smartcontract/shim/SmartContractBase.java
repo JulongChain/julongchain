@@ -156,7 +156,7 @@ public abstract class SmartContractBase implements ISmartContract {
 				logger.error("failed connect to peer with SSLException", e);
 			}
 		} else {
-			builder.usePlaintext(true);
+			builder.usePlaintext();
 		}
 		return builder.build();
 	}
@@ -212,6 +212,7 @@ public abstract class SmartContractBase implements ISmartContract {
 	}
 
 	protected static SmartContractResponse newErrorResponse(String message, byte[] payload) {
+        logger.error(message);
 		return new SmartContractResponse(
 				SmartContractResponse.Status.INTERNAL_SERVER_ERROR, message, payload);
 	}
@@ -221,6 +222,7 @@ public abstract class SmartContractBase implements ISmartContract {
 	}
 
 	protected static SmartContractResponse newErrorResponse(String message) {
+        logger.error(message);
 		return newErrorResponse(message, null);
 	}
 

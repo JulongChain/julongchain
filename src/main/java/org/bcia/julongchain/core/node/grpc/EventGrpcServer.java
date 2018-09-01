@@ -72,7 +72,7 @@ public class EventGrpcServer {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                log.info("shutting down EventGrpcServer since JVM is shutting down");
+                log.info("Shutting down EventGrpcServer since JVM is shutting down");
                 EventGrpcServer.this.stop();
                 log.error("EventGrpcServer shut down");
             }
@@ -109,8 +109,8 @@ public class EventGrpcServer {
                         EventsPackage.Event resultEvent = eventHubServer.chat(value, responseObserver);
 //                        responseObserver.onNext(resultEvent);
                     } else {
-                        log.error("eventHubServer is not ready, but client sent some message: " + value);
-                        responseObserver.onError(new NodeException("eventHubServer is not ready"));
+                        log.error("EventHubServer is not ready, but client sent some message: " + value);
+                        responseObserver.onError(new NodeException("EventHubServer is not ready"));
                     }
                 }
 

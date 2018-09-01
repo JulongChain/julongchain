@@ -19,7 +19,7 @@ package org.bcia.julongchain.core.commiter;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
- * 类描述
+ * 区块验证请求
  *
  * @author zhouhui
  * @date 2018/05/23

@@ -75,7 +75,7 @@ public class ImplicitMetaPolicy implements IPolicy {
         }
 
         if (remaining > 0) {
-            throw new PolicyException("evaluate failed: " + (threshold - remaining) + " policies satisfied, but " +
+            throw new PolicyException("Evaluate failed: " + (threshold - remaining) + " policies satisfied, but " +
                     "needed " + threshold);
         }
 

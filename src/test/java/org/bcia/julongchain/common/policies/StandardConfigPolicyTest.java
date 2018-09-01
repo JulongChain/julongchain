@@ -10,7 +10,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * 对象
+ * 标准配置策略测试类
  *
  * @author zhouhui
  * @date 2018/4/14

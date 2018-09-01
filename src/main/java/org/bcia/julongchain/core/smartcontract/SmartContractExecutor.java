@@ -68,8 +68,8 @@ public class SmartContractExecutor {
         //启动智能合约
         SmartContractPackage.SmartContractInput scInput = scSupport.launch(scContext, spec);
         if (scInput == null) {
-            log.error("launch smart contract fail");
-            throw new SmartContractException("launch smart contract fail");
+            log.error("Launch smart contract fail");
+            throw new SmartContractException("Launch smart contract fail");
         }
 
 //        List<ByteString> argsList = scInput.getArgsList();
@@ -113,7 +113,7 @@ public class SmartContractExecutor {
                 }
                 return new Object[]{response, responseMessage.getSmartContractEvent()};
             } else {
-                throw new SmartContractException("execute smart contract fail: " + responseMessage.getPayload().toStringUtf8());
+                throw new SmartContractException("Execute smart contract fail: " + responseMessage.getPayload().toStringUtf8());
             }
         }
 

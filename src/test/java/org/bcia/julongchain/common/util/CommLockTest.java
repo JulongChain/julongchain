@@ -3,7 +3,7 @@ package org.bcia.julongchain.common.util;
 import org.junit.Test;
 
 /**
- * 类描述
+ * 公共锁测试类
  *
  * @author zhouhui
  * @date 2018/07/15

@@ -13,7 +13,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 /**
- * 对象
+ * 区块工具测试类
  *
  * @author zhouhui
  * @date 2018/4/27

@@ -18,7 +18,7 @@ package org.bcia.julongchain.events.producer;
 import java.util.Map;
 
 /**
- * 类描述
+ * 事件处理器接口
  *
  * @author zhouhui
  * @date 2018/05/18

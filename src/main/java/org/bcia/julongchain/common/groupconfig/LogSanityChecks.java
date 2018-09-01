@@ -22,7 +22,7 @@ import org.bcia.julongchain.common.policies.IPolicyManager;
 import org.bcia.julongchain.common.policies.PolicyConstant;
 
 /**
- * 类描述
+ * 命中性检查日志打印
  *
  * @author zhouhui
  * @date 2018/05/23

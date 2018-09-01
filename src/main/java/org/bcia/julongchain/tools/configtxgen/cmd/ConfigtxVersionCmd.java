@@ -22,7 +22,7 @@ import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.tools.configtxgen.ConfigtxGenConstant;
 
 /**
- * 类描述
+ * 交易生成工具版本命令
  *
  * @author zhouhui
  * @date 2018/06/05

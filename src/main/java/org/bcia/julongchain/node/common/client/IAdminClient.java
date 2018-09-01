@@ -16,7 +16,7 @@
 package org.bcia.julongchain.node.common.client;
 
 /**
- * 类描述
+ * 管理客户端接口
  *
  * @author zhouhui
  * @date 2018/06/28

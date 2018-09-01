@@ -24,7 +24,7 @@ import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.node.entity.Group;
 
 /**
- * 类描述
+ * 配置管理器
  *
  * @author zhouhui
  * @date 2018/05/31

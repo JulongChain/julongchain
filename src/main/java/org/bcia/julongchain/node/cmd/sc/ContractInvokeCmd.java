@@ -27,6 +27,7 @@ import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.NetAddress;
 import org.bcia.julongchain.core.ssc.lssc.LSSC;
 import org.bcia.julongchain.node.Node;
+import org.bcia.julongchain.node.util.NodeConstant;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
@@ -113,7 +114,8 @@ public class ContractInvokeCmd extends AbstractNodeContractCmd {
             log.info("InputStr: " + inputStr);
             JSONObject inputJson = JSONObject.parseObject(inputStr);
 
-            SmartContractPackage.SmartContractInput.Builder inputBuilder = SmartContractPackage.SmartContractInput.newBuilder();
+            SmartContractPackage.SmartContractInput.Builder inputBuilder =
+                    SmartContractPackage.SmartContractInput.newBuilder();
 
             JSONArray argsJSONArray = inputJson.getJSONArray(KEY_ARGS);
             for (int i = 0; i < argsJSONArray.size(); i++) {
@@ -160,8 +162,8 @@ public class ContractInvokeCmd extends AbstractNodeContractCmd {
         //invoke smart contract
         if (StringUtils.isBlank(targetAddress)) {
             log.info("TargetAddress is empty, use 127.0.0.1:7051");
-            nodeSmartContract.invoke(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT, consenterHostPort[0], consenterPort,
-                    groupId, scName, input);
+            nodeSmartContract.invoke(NodeConstant.DEFAULT_NODE_HOST, NodeConstant.DEFAULT_NODE_PORT,
+                    consenterHostPort[0], consenterPort, groupId, scName, input);
         } else {
             try {
                 NetAddress targetNetAddress = new NetAddress(targetAddress);

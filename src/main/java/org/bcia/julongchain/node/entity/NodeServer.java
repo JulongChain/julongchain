@@ -119,7 +119,7 @@ public class NodeServer {
             public void onGroupsReady(List<String> groupIds) {
                 log.info("OnGroupsReady-----");
                 try {
-                    startGossipService();
+//                    startGossipService();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
@@ -136,7 +136,9 @@ public class NodeServer {
         String host = split[0];
         Integer port = Integer.parseInt(split[1]);
         waitConnectable(host, port);
-        ManagedChannel managedChannel = NettyChannelBuilder.forAddress(host, port).usePlaintext().build();
+        ManagedChannel managedChannel =
+                NettyChannelBuilder.forAddress(host, port).maxInboundMessageSize(CommConstant.MAX_GRPC_MESSAGE_SIZE)
+                        .usePlaintext().build();
         GossipClientStream gossipClientStream = new GossipClientStream(managedChannel);
         GossipClientStream.setGossipClientStream(gossipClientStream);
         try {
@@ -151,7 +153,7 @@ public class NodeServer {
 
     private void waitConnectable(String host, Integer port) {
         while (!Utils.isHostConnectable(host, port)) {
-            log.info("wait consenter start, host:" + host + ", port:" + port);
+            log.info("Wait consenter start, host:" + host + ", port:" + port);
             try {
                 Thread.sleep(1000L);
             } catch (InterruptedException e) {
@@ -166,20 +168,20 @@ public class NodeServer {
             public void run() {
                 while (true) {
                     try {
-                        log.info("start a pull request.");
+                        log.info("Start a pull request.");
                         long height = LedgerManager.openLedger(ledgerID).getBlockchainInfo().getHeight();
                         Message.RemoteStateRequest remoteStateRequest = Message.RemoteStateRequest.newBuilder().setStartSeqNum(height).setEndSeqNum(height).build();
                         Message.GossipMessage gossipMessage = Message.GossipMessage.newBuilder().setGroup(ByteString.copyFromUtf8(ledgerID)).setStateRequest(remoteStateRequest).build();
                         Message.Envelope envelope = Message.Envelope.newBuilder().setPayload(gossipMessage.toByteString()).build();
-                        log.info("send pull request:" + ledgerID + " " + height);
+                        log.info("Send pull request:" + ledgerID + " " + height);
                         gossipClientStream.serialSend(envelope);
                         if (gossipClientStream.getQueueMap().get(ledgerID) == null) {
                             gossipClientStream.getQueueMap().put(ledgerID, new LinkedBlockingQueue<Message.Envelope>());
                         }
-                        log.info("receive block");
+                        log.info("Receive block");
                         Message.Envelope receiveEnvelope = gossipClientStream.getQueueMap().get(ledgerID).take();
                         GossipService.saveBlock(receiveEnvelope);
-                        log.info("saved block");
+                        log.info("Saved block");
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
                     }
@@ -332,10 +334,10 @@ public class NodeServer {
     private String getProcessId() {
         // get name representing the running Java virtual machine.
         String processName = ManagementFactory.getRuntimeMXBean().getName();
-        log.info("process name: " + processName);
+        log.info("Process name: " + processName);
 
         String processId = processName.split("@")[0];
-        log.info("process id: " + processId);
+        log.info("Process id: " + processId);
         return processId;
     }
 

@@ -22,7 +22,7 @@ import org.bcia.julongchain.common.policies.IPolicyManager;
 import org.bcia.julongchain.msp.IMspManager;
 
 /**
- * 对象
+ * 群组配置集接口定义
  *
  * @author zhouhui
  * @date 2018/3/27

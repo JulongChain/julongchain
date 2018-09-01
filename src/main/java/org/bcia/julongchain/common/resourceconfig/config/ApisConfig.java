@@ -39,7 +39,7 @@ public class ApisConfig implements IApisConfig {
         this.apiPolicyMap = new HashMap<String, String>();
 
         if (tree != null && tree.getChildsCount() > 0) {
-            throw new ValidateException("apis does not support child");
+            throw new ValidateException("Apis does not support child");
         }
 
         if (tree != null && tree.getValuesCount() > 0) {

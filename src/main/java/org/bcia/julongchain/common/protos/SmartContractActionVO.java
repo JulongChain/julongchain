@@ -26,7 +26,7 @@ import org.bcia.julongchain.protos.node.ProposalResponsePackage;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
- * 类描述
+ * 智能合约操作业务对象
  *
  * @author zhouhui
  * @date 2018/05/26
@@ -41,7 +41,7 @@ public class SmartContractActionVO implements IProtoVO<ProposalPackage.SmartCont
     @Override
     public void parseFrom(ProposalPackage.SmartContractAction smartContractAction) throws
             InvalidProtocolBufferException, ValidateException {
-        ValidateUtils.isNotNull(smartContractAction, "smartContractAction can not be null");
+        ValidateUtils.isNotNull(smartContractAction, "SmartContractAction can not be null");
 
         this.results = new TxRwSet();
         try {

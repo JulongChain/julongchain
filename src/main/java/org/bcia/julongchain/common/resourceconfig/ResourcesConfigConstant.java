@@ -16,7 +16,7 @@
 package org.bcia.julongchain.common.resourceconfig;
 
 /**
- * 对象
+ * 资源配置模块常量
  *
  * @author zhouhui
  * @date 2018/4/19

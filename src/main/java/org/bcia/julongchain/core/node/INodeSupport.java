@@ -19,7 +19,7 @@ import org.bcia.julongchain.common.groupconfig.config.IApplicationConfig;
 import org.bcia.julongchain.common.resourceconfig.ISmartContractDefinition;
 
 /**
- * 类描述
+ * 节点支持对象
  *
  * @author zhouhui
  * @date 2018/06/03

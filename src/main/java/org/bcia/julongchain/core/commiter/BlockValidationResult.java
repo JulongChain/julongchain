@@ -19,7 +19,7 @@ import org.bcia.julongchain.core.common.sysscprovider.SmartContractInstance;
 import org.bcia.julongchain.protos.node.TransactionPackage;
 
 /**
- * 类描述
+ * 区块验证结果
  *
  * @author zhouhui
  * @date 2018/05/23

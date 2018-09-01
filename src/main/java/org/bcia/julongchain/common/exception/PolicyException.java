@@ -16,7 +16,7 @@
 package org.bcia.julongchain.common.exception;
 
 /**
- * 权限异常
+ * 权限或策略异常
  *
  * @author zhouhui
  * @date 2018/4/17

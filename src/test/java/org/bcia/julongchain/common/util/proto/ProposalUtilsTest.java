@@ -4,7 +4,7 @@ import org.bcia.julongchain.common.exception.JulongChainException;
 import org.junit.Test;
 
 /**
- * 对象
+ * 提案工具测试类
  *
  * @author zhouhui
  * @date 2018/3/28

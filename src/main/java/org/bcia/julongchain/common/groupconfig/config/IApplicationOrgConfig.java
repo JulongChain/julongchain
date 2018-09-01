@@ -20,7 +20,7 @@ import org.bcia.julongchain.protos.node.Configuration;
 import java.util.List;
 
 /**
- * 对象
+ * 应用组织配置接口
  *
  * @author zhouhui
  * @date 2018/3/27

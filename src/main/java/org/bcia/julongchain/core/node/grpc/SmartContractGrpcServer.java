@@ -57,7 +57,7 @@ public class SmartContractGrpcServer {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                log.info("shutting down SmartContractGrpcServer since JVM is shutting down");
+                log.info("Shutting down SmartContractGrpcServer since JVM is shutting down");
                 SmartContractGrpcServer.this.stop();
                 log.info("SmartContractGrpcServer shut down");
             }

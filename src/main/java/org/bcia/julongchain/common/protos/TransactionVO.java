@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 类描述
+ * 交易业务对象
  *
  * @author zhouhui
  * @date 2018/05/26
@@ -36,8 +36,8 @@ public class TransactionVO implements IProtoVO<TransactionPackage.Transaction> {
     @Override
     public void parseFrom(TransactionPackage.Transaction transaction) throws InvalidProtocolBufferException,
             ValidateException {
-        ValidateUtils.isNotNull(transaction, "transaction can not be null");
-        ValidateUtils.isNotNull(transaction.getActionsList(), "transaction.action can not be null");
+        ValidateUtils.isNotNull(transaction, "Transaction can not be null");
+        ValidateUtils.isNotNull(transaction.getActionsList(), "Transaction.action can not be null");
 
         this.transactionActionVOList = new ArrayList<>();
         if (transaction.getActionsList() != null) {

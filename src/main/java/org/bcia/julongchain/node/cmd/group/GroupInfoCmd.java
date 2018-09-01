@@ -24,6 +24,7 @@ import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.NetAddress;
 import org.bcia.julongchain.core.ssc.qssc.QSSC;
 import org.bcia.julongchain.node.Node;
+import org.bcia.julongchain.node.util.NodeConstant;
 import org.bcia.julongchain.protos.common.Ledger;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -84,20 +85,25 @@ public class GroupInfoCmd extends AbstractNodeGroupCmd {
 
         if (StringUtils.isBlank(targetAddress)) {
             log.info("TargetAddress is empty, use 127.0.0.1:7051");
-            blockchainInfo = nodeGroup.getGroupInfo(QSSC.DEFAULT_HOST, QSSC.DEFAULT_PORT, groupId);
+            blockchainInfo = nodeGroup.getGroupInfo(NodeConstant.DEFAULT_NODE_HOST, NodeConstant.DEFAULT_NODE_PORT,
+                    groupId);
         } else {
             try {
                 NetAddress targetNetAddress = new NetAddress(targetAddress);
-                blockchainInfo = nodeGroup.getGroupInfo(targetNetAddress.getHost(), targetNetAddress.getPort(), groupId);
+                blockchainInfo = nodeGroup.getGroupInfo(targetNetAddress.getHost(), targetNetAddress.getPort(),
+                        groupId);
             } catch (ValidateException e) {
                 log.error(e.getMessage(), e);
             }
         }
 
         if (blockchainInfo != null) {
-            log.info("The height of the block chain is: " + blockchainInfo.getHeight());
-            log.info("The current block hash of the block chain is: " + Hex.toHexString(blockchainInfo.getCurrentBlockHash().toByteArray()));
-            log.info("The previous block hash of the block chain is: " + Hex.toHexString(blockchainInfo.getPreviousBlockHash().toByteArray()));
+            log.info("The height of the block chain is: "
+                    + blockchainInfo.getHeight());
+            log.info("The current block hash of the block chain is: "
+                    + Hex.toHexString(blockchainInfo.getCurrentBlockHash().toByteArray()));
+            log.info("The previous block hash of the block chain is: "
+                    + Hex.toHexString(blockchainInfo.getPreviousBlockHash().toByteArray()));
         } else {
             log.info("Get blockchainInfo fail");
         }

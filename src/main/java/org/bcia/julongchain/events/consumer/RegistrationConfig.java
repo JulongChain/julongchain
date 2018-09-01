@@ -22,7 +22,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 /**
- * 类描述
+ * 约束配置
  *
  * @author zhouhui
  * @date 2018/05/20
