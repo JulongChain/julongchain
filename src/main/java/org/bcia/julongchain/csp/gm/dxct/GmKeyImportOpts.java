@@ -18,6 +18,7 @@ package org.bcia.julongchain.csp.gm.dxct;
 import org.bcia.julongchain.csp.intfs.opts.IKeyImportOpts;
 
 /**
+ *国米密钥导入选项
  * @author zhangmingyang
  * @Date: 2018/4/18
  * @company Dingxuan

@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 将yaml文件转换为map
+ *
  * @author zhangmingyang
  * @Date: 2018/3/1
  * @company Dingxuan
@@ -30,11 +32,11 @@ import java.util.Map;
 public class YamlLoader {
     private static JulongChainLog log = JulongChainLogFactory.getLog(YamlLoader.class);
 
-    public static Map readYamlFile(String file){
-        HashMap map=new HashMap();
+    public static Map readYamlFile(String file) {
+        HashMap map = new HashMap();
         try {
             Yaml yaml = new Yaml();
-            map =(HashMap)yaml.load(YamlLoader.class.getClassLoader().getResourceAsStream(file));
+            map = (HashMap) yaml.load(YamlLoader.class.getClassLoader().getResourceAsStream(file));
         } catch (Exception e) {
             e.printStackTrace();
         }

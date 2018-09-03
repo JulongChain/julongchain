@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package org.bcia.julongchain.msp.cache;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -24,25 +25,25 @@ import java.util.Map;
  * @date 2018/07/16
  * @company Dingxuan
  */
-public class LRUCache<K,V> extends LinkedHashMap<K,V>  {
+public class LRUCache<K, V> extends LinkedHashMap<K, V> {
     private int cacheSize;
 
     public LRUCache(int cacheSize) {
-        super(16, (float) 0.75,true);
+        super(16, (float) 0.75, true);
         this.cacheSize = cacheSize;
     }
 
     @Override
-    protected  boolean removeEldestEntry(Map.Entry<K,V> eldest){
-        return size()>=cacheSize;
+    protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
+        return size() >= cacheSize;
 
     }
 
     @Override
     public String toString() {
-        StringBuilder sb=new StringBuilder();
-        for (Map.Entry<K,V> entry: entrySet()) {
-            sb.append(String.format("%s:%s ",entry.getKey(),entry.getValue()));
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<K, V> entry : entrySet()) {
+            sb.append(String.format("%s:%s ", entry.getKey(), entry.getValue()));
         }
         return sb.toString();
     }

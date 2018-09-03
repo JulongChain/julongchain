@@ -19,6 +19,8 @@ import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.protos.common.MspPrincipal;
 
 /**
+ * MspPrincipal 获取接口
+ *
  * @author zhangmingyang
  * @Date: 2018/5/17
  * @company Dingxuan
@@ -26,6 +28,7 @@ import org.bcia.julongchain.protos.common.MspPrincipal;
 public interface IMspPrincipalGetter {
     /**
      * 根据类型名称获取MSPPrincipal
+     *
      * @param role
      * @return
      * @throws MspException

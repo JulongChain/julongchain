@@ -34,6 +34,8 @@ import org.bcia.julongchain.protos.common.Configtx;
 import java.util.Map;
 
 /**
+ * 链支持者
+ *
  * @author zhangmingyang
  * @Date: 2018/5/8
  * @company Dingxuan

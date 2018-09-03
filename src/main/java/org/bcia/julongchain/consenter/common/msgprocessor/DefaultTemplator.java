@@ -37,6 +37,8 @@ import org.bcia.julongchain.protos.common.Configuration;
 import java.util.Map;
 
 /**
+ * 默认模板
+ *
  * @author zhangmingyang
  * @Date: 2018/5/26
  * @company Dingxuan
@@ -63,7 +65,7 @@ public class DefaultTemplator implements IGroupConfigTemplator {
         }
         Common.GroupHeader groupHeader = CommonUtils.unmarshalGroupHeader(configUpdatePayload.getHeader().getGroupHeader().toByteArray());
         Configtx.ConfigUpdate configUpdate = ConfigTxUtil.unmarshalConfigUpdate(configUpdateEnv.getConfigUpdate().toByteArray());
-        if (!configUpdate.getGroupId().equals(groupHeader.getGroupId()) ) {
+        if (!configUpdate.getGroupId().equals(groupHeader.getGroupId())) {
             log.error(String.format("Failing initial group config creation: mismatched group IDs: '%s' != '%s'", configUpdate.getGroupId(), groupHeader.getGroupId()));
         }
         if (configUpdate.getWriteSet() == null) {
@@ -108,7 +110,7 @@ public class DefaultTemplator implements IGroupConfigTemplator {
 
                 throw new ConsenterException("Proposed configuration has no application group members, but consortium contains members");
             } catch (ConsenterException e) {
-               log.error(e.getMessage());
+                log.error(e.getMessage());
             }
         }
         if (systemGroupTree.getChildsMap().get(GroupConfigConstant.CONSORTIUMS).getChildsMap().get(consortium.getName()).getChildsCount() > 0) {
@@ -118,7 +120,7 @@ public class DefaultTemplator implements IGroupConfigTemplator {
                 applicationGroupBuilder.putChilds(key, consortiumGroup);
             }
         }
-        Configtx.ConfigTree.Builder  groupTreeBuilder = Configtx.ConfigTree.newBuilder();
+        Configtx.ConfigTree.Builder groupTreeBuilder = Configtx.ConfigTree.newBuilder();
         Map<String, Configtx.ConfigValue> configValue = systemGroupTree.getValuesMap();
         for (String key : configValue.keySet()) {
             groupTreeBuilder.putValues(key, configValue.get(key));
@@ -171,7 +173,7 @@ public class DefaultTemplator implements IGroupConfigTemplator {
             configPolicyMap.get(key).toBuilder().setVersion(0);
         }
         Map<String, Configtx.ConfigTree> configTreeMap = configTreeBuild.getChildsMap();
-        for (String key: configTreeMap.keySet()) {
+        for (String key : configTreeMap.keySet()) {
             zeroVersions(configTreeBuild);
         }
     }

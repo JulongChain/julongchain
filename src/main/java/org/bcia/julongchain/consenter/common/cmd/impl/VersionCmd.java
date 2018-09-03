@@ -32,6 +32,8 @@ import org.bcia.julongchain.consenter.util.ConsenterConstants;
 import java.io.IOException;
 
 /**
+ * 版本查看命令
+ *
  * @author zhangmingyang
  * @Date: 2018/3/2
  * @company Dingxuan
@@ -42,7 +44,7 @@ public class VersionCmd implements IConsenterCmd {
     private static final String VERSION = "version";
 
     public VersionCmd() {
-        ConsenterConfig consenterConfig=ConsenterConfigFactory.getConsenterConfig();
+        ConsenterConfig consenterConfig = ConsenterConfigFactory.getConsenterConfig();
         consenterServer = new ConsenterServer(Integer.valueOf(consenterConfig.getGeneral().getListenPort()));
     }
 
@@ -51,10 +53,10 @@ public class VersionCmd implements IConsenterCmd {
         for (String str : args) {
             log.info("Arg: " + str);
         }
-        ConsenterConfig consenterConfig= ConsenterConfigFactory.loadConsenterConfig();
-        String consenterVersion=consenterConfig.getGeneral().getVersion();
+        ConsenterConfig consenterConfig = ConsenterConfigFactory.loadConsenterConfig();
+        String consenterVersion = consenterConfig.getGeneral().getVersion();
         if (args[0].equalsIgnoreCase(VERSION)) {
-            log.info(String.format("consnter version is %s",consenterVersion));
+            log.info(String.format("consnter version is %s", consenterVersion));
         }
 
 

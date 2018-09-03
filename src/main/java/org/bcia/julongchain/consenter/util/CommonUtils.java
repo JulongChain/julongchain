@@ -26,6 +26,8 @@ import org.bcia.julongchain.common.util.proto.TxUtils;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
+ * 通用辅助类
+ *
  * @author zhangmingyang
  * @Date: 2018/5/11
  * @company Dingxuan
@@ -33,11 +35,12 @@ import org.bcia.julongchain.protos.common.Common;
 public class CommonUtils {
     private static JulongChainLog log = JulongChainLogFactory.getLog(CommonUtils.class);
 
-    public static byte[] marshlOrPanic(Message message){
+    public static byte[] marshlOrPanic(Message message) {
         return marshal(message);
     }
-    public static byte[] marshal(Message message){
-        return  message.toByteArray();
+
+    public static byte[] marshal(Message message) {
+        return message.toByteArray();
     }
 
     public static Common.Envelope extractEnvelop(Common.Block block, int index) {
@@ -111,11 +114,11 @@ public class CommonUtils {
 
     }
 
-    public static Common.Header makePayloadHeader(Common.GroupHeader ch,Common.SignatureHeader sh){
-        Common.Header header=Common.Header.newBuilder()
+    public static Common.Header makePayloadHeader(Common.GroupHeader ch, Common.SignatureHeader sh) {
+        Common.Header header = Common.Header.newBuilder()
                 .setGroupHeader(ByteString.copyFrom(Utils.marshalOrPanic(ch)))
                 .setSignatureHeader(ByteString.copyFrom(Utils.marshalOrPanic(sh))).build();
-                return header;
+        return header;
     }
 
     public static Common.GroupHeader makeGroupHeader(int headerType, int version, String groupId, long epoch) {
@@ -129,14 +132,14 @@ public class CommonUtils {
     }
 
     public static Common.GroupHeader groupHeader(Common.Envelope env) throws InvalidProtocolBufferException {
-        Common.Payload  envPayload=  unmarshalPayload(env.getPayload().toByteArray());
-        if(envPayload.getHeader()==null){
+        Common.Payload envPayload = unmarshalPayload(env.getPayload().toByteArray());
+        if (envPayload.getHeader() == null) {
             log.error("no header was set");
         }
-        if(envPayload.getHeader().getGroupHeader()==null){
+        if (envPayload.getHeader().getGroupHeader() == null) {
             log.error("no Group header was set");
         }
-        Common.GroupHeader  chdr=  unmarshalGroupHeader(envPayload.getHeader().getGroupHeader().toByteArray());
+        Common.GroupHeader chdr = unmarshalGroupHeader(envPayload.getHeader().getGroupHeader().toByteArray());
         return chdr;
     }
 
@@ -148,15 +151,15 @@ public class CommonUtils {
     }
 
     public static String groupId(Common.Envelope env) throws InvalidProtocolBufferException {
-        Common.GroupHeader chdr=groupHeader(env);
+        Common.GroupHeader chdr = groupHeader(env);
         return chdr.getGroupId();
     }
 
 
-    public static Common.Envelope unmarshalEnvelope(byte[] encoded ){
-        Common.Envelope envelope=null;
+    public static Common.Envelope unmarshalEnvelope(byte[] encoded) {
+        Common.Envelope envelope = null;
         try {
-          envelope=Common.Envelope.parseFrom(encoded);
+            envelope = Common.Envelope.parseFrom(encoded);
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();
         }

@@ -33,6 +33,8 @@ import org.bcia.julongchain.consenter.util.ConsenterConstants;
 import java.io.IOException;
 
 /**
+ * 普通启动方式
+ *
  * @author zhangmingyang
  * @Date: 2018/3/2
  * @company Dingxuan
@@ -42,19 +44,18 @@ public class StartCmd implements IConsenterCmd {
     private ConsenterServer consenterServer;
 
     public StartCmd() {
-        Registrar registrar=null;
-        ConsenterConfig consenterConfig=ConsenterConfigFactory.getConsenterConfig();
+        Registrar registrar = null;
+        ConsenterConfig consenterConfig = ConsenterConfigFactory.getConsenterConfig();
         try {
-             registrar= new PreStart().initializeMultichannelRegistrar(consenterConfig,new LocalSigner());
+            registrar = new PreStart().initializeMultichannelRegistrar(consenterConfig, new LocalSigner());
         } catch (JulongChainException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        DeliverDeliverHandler  deliverHandler=new DeliverDeliverHandler(registrar,consenterConfig.getGeneral().getAuthentication().get(ConsenterConstants.TIMEWONDW));
+        DeliverDeliverHandler deliverHandler = new DeliverDeliverHandler(registrar, consenterConfig.getGeneral().getAuthentication().get(ConsenterConstants.TIMEWONDW));
 
         consenterServer = new ConsenterServer(Integer.valueOf(consenterConfig.getGeneral().getListenPort()));
-
         BroadcastHandler broadCastHandle = new BroadcastHandler(registrar);
 
         consenterServer.bindBroadcastServer(broadCastHandle);
@@ -83,8 +84,7 @@ public class StartCmd implements IConsenterCmd {
                 }
             }.start();
             Thread.sleep(1000);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

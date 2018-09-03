@@ -31,7 +31,7 @@ public class DeliverClient {
      * @param port
      */
     public  void send(String ip,int port) {
-        ManagedChannel managedChannel= ManagedChannelBuilder.forAddress(ip,port).usePlaintext(true).build();
+        ManagedChannel managedChannel= ManagedChannelBuilder.forAddress(ip,port).usePlaintext().build();
         AtomicBroadcastStub stub= newStub(managedChannel);
         StreamObserver<Common.Envelope> envelopeStreamObserver=stub.deliver(new StreamObserver<Ab.DeliverResponse>() {
             @Override

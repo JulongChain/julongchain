@@ -21,6 +21,8 @@ import org.bcia.julongchain.msp.mgmt.Msp;
 import java.util.Map;
 
 /**
+ * msp集合管理接口
+ *
  * @author zhangmingyang
  * @Date: 2018/3/6
  * @company Dingxuan
@@ -28,7 +30,8 @@ import java.util.Map;
 public interface IMspManager extends IIdentityDeserializer {
     /**
      * 根据配置信息设置MSP管理器实例
+     *
      * @param msps
      */
-     void setup(IMsp[] msps) throws MspException;
+    void setup(IMsp[] msps) throws MspException;
 }

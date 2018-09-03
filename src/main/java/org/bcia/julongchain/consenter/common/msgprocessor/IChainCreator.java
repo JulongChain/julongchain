@@ -22,14 +22,32 @@ import org.bcia.julongchain.protos.common.Configtx;
 
 
 /**
+ * 链创建接口
+ *
  * @author zhangmingyang
  * @Date: 2018/5/14
  * @company Dingxuan
  */
 public interface IChainCreator {
+    /**
+     * 创建群组配置
+     * @param envConfigUpdate
+     * @return
+     * @throws InvalidProtocolBufferException
+     */
     IGroupConfigBundle newGroupConfig(Common.Envelope envConfigUpdate) throws InvalidProtocolBufferException;
 
-    IGroupConfigBundle createBundle(String groupId, Configtx.Config  config);
+    /**
+     * 创建组配置包
+     * @param groupId
+     * @param config
+     * @return
+     */
+    IGroupConfigBundle createBundle(String groupId, Configtx.Config config);
 
-   int groupCount();
+    /**
+     * 群组数量
+     * @return
+     */
+    int groupCount();
 }

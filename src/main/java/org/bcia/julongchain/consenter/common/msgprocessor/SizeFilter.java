@@ -20,6 +20,7 @@ import org.bcia.julongchain.common.groupconfig.config.IConsenterConfig;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
+ * 消息大小过滤器
  * @author zhangmingyang
  * @Date: 2018/5/18
  * @company Dingxuan

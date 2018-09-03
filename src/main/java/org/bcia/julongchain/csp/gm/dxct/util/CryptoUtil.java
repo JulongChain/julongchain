@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 /**
+ * 加密工具类
  * @author zhangmingyang
  * @Date: 2018/4/28
  * @company Dingxuan
@@ -55,6 +56,11 @@ public class CryptoUtil {
     private final static String SK = "_sk";
 
 
+    /**
+     * 公钥文件生成
+     * @param path
+     * @param content
+     */
     public static void publicKeyFileGen(String path, byte[] content) {
         PemObject pemObject = new PemObject("PUBLIC KEY", content);
         StringWriter str = new StringWriter();
@@ -74,6 +80,11 @@ public class CryptoUtil {
     }
 
 
+    /**
+     * 私钥文件生成
+     * @param path
+     * @param content
+     */
     public static void privateKeyFileGen(String path, byte[] content) {
         PemObject pemObject = new PemObject("PRIVATE KEY", content);
         StringWriter str = new StringWriter();
@@ -92,6 +103,11 @@ public class CryptoUtil {
         }
     }
 
+    /**
+     * 加载密钥文件
+     * @param filePath
+     * @return
+     */
     public static byte[] loadKeyFile(String filePath) {
 
         File inFile = new File(filePath);
@@ -145,12 +161,6 @@ public class CryptoUtil {
         }
     }
 
-    //读取sm2证书
-    public static byte[] readPem(String certPath) throws IOException {
-        byte[] Bytes = FileUtils.readFileBytes(certPath);
-        byte[] certBytes = new PemReader(new InputStreamReader(new ByteArrayInputStream(Bytes))).readPemObject().getContent();
-        return certBytes;
-    }
 
     /**
      * 生成随机的字节数组
@@ -213,6 +223,12 @@ public class CryptoUtil {
         return x509cert;
     }
 
+    /**
+     * 证书链验证
+     * @param cert
+     * @param chains
+     * @return
+     */
     public static  boolean verify(X509Certificate cert, X509Certificate[] chains) {
         if(cert != null && chains.length > 0) {
             for(int i=0;i<chains.length;i++)

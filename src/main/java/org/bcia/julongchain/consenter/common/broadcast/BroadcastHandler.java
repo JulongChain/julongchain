@@ -26,7 +26,9 @@ import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
 import org.bcia.julongchain.consenter.common.server.ConsenterServer;
 import org.bcia.julongchain.consenter.common.server.IBroadcastHandler;
 import org.bcia.julongchain.consenter.consensus.singleton.Singleton;
+import org.bcia.julongchain.consenter.entity.ConfigMessage;
 import org.bcia.julongchain.consenter.entity.ConfigMsg;
+import org.bcia.julongchain.consenter.entity.NormalMessage;
 import org.bcia.julongchain.consenter.util.ConsenterConstants;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
@@ -36,6 +38,8 @@ import java.util.Map;
 
 
 /**
+ * broadcast服务对消息的排队
+ *
  * @author zhangmingyang
  * @Date: 2018/3/8
  * @company Dingxuan
@@ -83,12 +87,12 @@ public class BroadcastHandler implements IBroadcastHandler {
                     responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setInfo(e.getMessage()).build());
                     responseObserver.onCompleted();
                 }
-                //
                 Singleton singleton = null;
                 singleton = Singleton.getInstance(chainSupport);
-                singleton.order(envelope, configSeq);
+                NormalMessage normalMessage=new NormalMessage(configSeq,envelope);
+
                 try {
-                    singleton.pushToQueue(singleton.getNormalMessage());
+                    singleton.pushToQueue(normalMessage);
                 } catch (ValidateException e) {
                     responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatus(Common.Status.SERVICE_UNAVAILABLE).build());
                     responseObserver.onCompleted();
@@ -106,14 +110,14 @@ public class BroadcastHandler implements IBroadcastHandler {
                 }
                 Singleton singleton = null;
                 singleton = Singleton.getInstance(chainSupport);
-                singleton.configure(configMsg.getConfig(), configMsg.getConfigSeq());
+                ConfigMessage configMessage=new ConfigMessage(configMsg.getConfigSeq(),configMsg.getConfig());
                 try {
-                    singleton.pushToQueue(singleton.getConfigMessage());
+                    singleton.pushToQueue(configMessage);
+
                 } catch (ValidateException e) {
                     throw new ConsenterException(e.getMessage());
                 }
                 responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatus(Common.Status.SUCCESS).build());
-               // responseObserver.onCompleted();
             }
 
 

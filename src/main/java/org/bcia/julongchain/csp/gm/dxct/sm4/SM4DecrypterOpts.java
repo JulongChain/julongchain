@@ -15,9 +15,12 @@
  */
 package org.bcia.julongchain.csp.gm.dxct.sm4;
 
+import org.bcia.julongchain.csp.gm.dxct.util.GmCspConstant;
 import org.bcia.julongchain.csp.intfs.opts.IDecrypterOpts;
 
 /**
+ * sm4解密选项
+ *
  * @author zhangmingyang
  * @Date: 2018/4/28
  * @company Dingxuan
@@ -25,6 +28,6 @@ import org.bcia.julongchain.csp.intfs.opts.IDecrypterOpts;
 public class SM4DecrypterOpts implements IDecrypterOpts {
     @Override
     public String getAlgorithm() {
-        return "SM4";
+        return GmCspConstant.SM4;
     }
 }

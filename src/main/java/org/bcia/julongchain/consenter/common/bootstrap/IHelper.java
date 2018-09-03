@@ -18,6 +18,8 @@ package org.bcia.julongchain.consenter.common.bootstrap;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
+ * 获取创世区块接口
+ *
  * @author zhangmingyang
  * @Date: 2018/5/9
  * @company Dingxuan
@@ -25,6 +27,7 @@ import org.bcia.julongchain.protos.common.Common;
 public interface IHelper {
     /**
      * 获取创世区块
+     *
      * @return
      */
     Common.Block getGenesisBlock();

@@ -24,11 +24,11 @@ import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.consenter.Kafka;
 
 /**
- * 类描述
+ * 通用辅助类
  *
- * @author
+ * @author zhangmingyang
  * @date 2018/5/2
- * @company Shudun
+ * @company Dingxuan
  */
 
 public class Utils {
@@ -118,8 +118,6 @@ public class Utils {
         }
         return all_byte;
     }
-
-
 
 
 }

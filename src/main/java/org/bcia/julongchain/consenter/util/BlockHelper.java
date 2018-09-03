@@ -25,13 +25,15 @@ import org.bcia.julongchain.protos.common.Common;
 import static org.bcia.julongchain.csp.factory.CspManager.getDefaultCsp;
 
 /**
+ * 区块辅助类
+ *
  * @author zhangmingyang
  * @Date: 2018/5/10
  * @company Dingxuan
  */
 public class BlockHelper {
     private static JulongChainLog log = JulongChainLogFactory.getLog(BlockHelper.class);
-    private  byte[] previousHash;
+    private byte[] previousHash;
     private byte[] dataHash;
     private long number;
 
@@ -44,12 +46,12 @@ public class BlockHelper {
 
     public static Common.Block createBlock(long seqNum, byte[] previousHash) {
         Common.Block.Builder block = Common.Block.newBuilder();
-        log.info(String.format("This Block's Num is %s",seqNum));
+        log.info(String.format("This Block's Num is %s", seqNum));
 
         Common.BlockData.Builder blockData = Common.BlockData.newBuilder();
         Common.BlockMetadata.Builder metaData = Common.BlockMetadata.newBuilder();
 
-        for (int i = 0; i<ConsenterConstants.METADATA_SIZE; i++) {
+        for (int i = 0; i < ConsenterConstants.METADATA_SIZE; i++) {
             block.getMetadataBuilder().addMetadata(ByteString.copyFrom(metaData.build().toByteArray()));
         }
         block.getHeaderBuilder().setNumber(seqNum).setPreviousHash(ByteString.copyFrom(previousHash));

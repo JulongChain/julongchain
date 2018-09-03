@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.consenter.common.cmd.factory;
 
+import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.consenter.common.cmd.IConsenterCmd;
 import org.bcia.julongchain.consenter.common.cmd.impl.BenchMarkCmd;
 import org.bcia.julongchain.consenter.common.cmd.impl.StartCmd;
@@ -23,19 +24,21 @@ import org.bcia.julongchain.consenter.util.ConsenterConstants;
 
 
 /**
+ * consenter 命令行工厂
+ *
  * @author zhangmingyang
  * @Date: 2018/3/1
  * @company Dingxuan
  */
 public class ConsenterCmdFactory {
-    public static IConsenterCmd getInstance(String command){
-    if(ConsenterConstants.VERSION.equalsIgnoreCase(command)){
-        return new VersionCmd();
-    }else if(ConsenterConstants.START.equalsIgnoreCase(command)){
-        return new StartCmd();
-    }else if(ConsenterConstants.BENCHMARK.equalsIgnoreCase(command)){
-        return new BenchMarkCmd();
-    }
+    public static IConsenterCmd getInstance(String command) throws ConsenterException {
+        if (ConsenterConstants.VERSION.equalsIgnoreCase(command)) {
+            return new VersionCmd();
+        } else if (ConsenterConstants.START.equalsIgnoreCase(command)) {
+            return new StartCmd();
+        } else if (ConsenterConstants.BENCHMARK.equalsIgnoreCase(command)) {
+            return new BenchMarkCmd();
+        }
         return null;
     }
 

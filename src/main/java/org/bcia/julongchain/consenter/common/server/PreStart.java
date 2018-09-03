@@ -47,29 +47,28 @@ import java.util.Map;
 
 /**
  * 预启动
+ *
  * @author zhangmingyang
  * @Date: 2018/5/29
  * @company Dingxuan
  */
 public class PreStart {
     private static JulongChainLog log = JulongChainLogFactory.getLog(PreStart.class);
-    private  Registrar  defaultRegistrar;
+    private Registrar defaultRegistrar;
 
 
-    public  Registrar initializeMultichannelRegistrar(ConsenterConfig consenterConfig, ILocalSigner signer) throws JulongChainException, IOException {
-            IFactory lf = LedgerHelper.createLedgerFactroy(consenterConfig);
-            if (lf.groupIDs().size() == 0) {
-                initBootstrapGroup(consenterConfig, lf);
-            } else {
-                log.info("Not bootstrapping because of existing chains");
-            }
-            Map<String, IConsensusPlugin> consenters = new HashMap<>();
-            consenters.put("Singleton", new Singleton());
-            Registrar registrar=new Registrar();
-            defaultRegistrar=registrar.newRegistrar(lf, consenters, signer);
-            registrar=null;
-            System.gc();
-           return defaultRegistrar;
+    public Registrar initializeMultichannelRegistrar(ConsenterConfig consenterConfig, ILocalSigner signer) throws JulongChainException, IOException {
+        IFactory lf = LedgerHelper.createLedgerFactroy(consenterConfig);
+        if (lf.groupIDs().size() == 0) {
+            initBootstrapGroup(consenterConfig, lf);
+        } else {
+            log.info("Not bootstrapping because of existing chains");
+        }
+        Map<String, IConsensusPlugin> consenters = new HashMap<>();
+        consenters.put("Singleton", new Singleton());
+        Registrar registrar = new Registrar();
+        defaultRegistrar = registrar.newRegistrar(lf, consenters, signer);
+        return defaultRegistrar;
     }
 
     private static void initBootstrapGroup(ConsenterConfig consenterConfig, IFactory blockLedger) throws JulongChainException {
@@ -121,7 +120,7 @@ public class PreStart {
         return new GrpcServerConfig();
     }
 
-    public  Registrar getDefaultRegistrar() {
+    public Registrar getDefaultRegistrar() {
         return defaultRegistrar;
     }
 }

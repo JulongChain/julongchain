@@ -35,6 +35,7 @@ import java.util.Date;
 
 /**
  * 验证msp相关身份
+ *
  * @author zhangmingyang
  * @date 2018/07/04
  * @company Dingxuan
@@ -42,6 +43,7 @@ import java.util.Date;
 public class MspValidate {
     /**
      * 验证身份
+     *
      * @param msp
      * @param identity
      * @throws MspException
@@ -53,6 +55,7 @@ public class MspValidate {
 
     /**
      * 验证CA身份
+     *
      * @param msp
      * @param identity
      * @throws MspException
@@ -70,6 +73,7 @@ public class MspValidate {
 
     /**
      * 验证TLSCA身份
+     *
      * @param msp
      * @param certificate
      * @param options
@@ -94,6 +98,7 @@ public class MspValidate {
 
     /**
      * 验证证书连
+     *
      * @param certificate
      * @param chains
      * @throws MspException
@@ -119,14 +124,15 @@ public class MspValidate {
 
         //验证证书链
 
-        boolean result=CryptoUtil.verify(x509Certificate,chains);
-        if(result==false){
+        boolean result = CryptoUtil.verify(x509Certificate, chains);
+        if (result == false) {
             throw new MspException("This cert chains is not valild");
         }
     }
 
     /**
      * 验证身份组织
+     *
      * @param msp
      * @param identity
      * @throws MspException
@@ -168,8 +174,8 @@ public class MspValidate {
                 nodeOUIdentifier = msp.getNodeOU();
             }
 
-            if ((nodeOUIdentifier.getCertifiersIdentifier()!= null) && !(Arrays.equals(nodeOUIdentifier.getCertifiersIdentifier(),ou.getCertifiersIdentifier()))) {
-               throw new MspException(String.format("certifiersIdentifier does not match: [%s], MSP: [%s]", identity.getOrganizationalUnits(), msp.getName()));
+            if ((nodeOUIdentifier.getCertifiersIdentifier() != null) && !(Arrays.equals(nodeOUIdentifier.getCertifiersIdentifier(), ou.getCertifiersIdentifier()))) {
+                throw new MspException(String.format("certifiersIdentifier does not match: [%s], MSP: [%s]", identity.getOrganizationalUnits(), msp.getName()));
             }
             counter++;
             if (counter > 1) {
@@ -181,8 +187,10 @@ public class MspValidate {
                     "not a combination of them. OUs: [%s], MSP: [%s]", identity.getOrganizationalUnits(), msp.getName()));
         }
     }
+
     /**
      * 判断是否为根CA证书
+     *
      * @param certificate
      * @return
      */

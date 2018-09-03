@@ -23,16 +23,42 @@ import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
+ * consenter支持类
+ *
  * @author zhangmingyang
  * @Date: 2018/3/7
  * @company Dingxuan
  */
-public interface IConsenterSupport  {
+public interface IConsenterSupport {
 
+    /**
+     * 创建下一个区块结构
+     *
+     * @param messages
+     * @return
+     * @throws ConsenterException
+     */
     Common.Block createNextBlock(Common.Envelope[] messages) throws ConsenterException;
 
+    /**
+     * 写区块
+     *
+     * @param block
+     * @param encodedMetadataValue
+     * @throws ConsenterException
+     */
     void writeBlock(Common.Block block, byte[] encodedMetadataValue) throws ConsenterException;
 
+    /**
+     * 写配置块
+     *
+     * @param block
+     * @param encodedMetadataValue
+     * @throws InvalidProtocolBufferException
+     * @throws LedgerException
+     * @throws ValidateException
+     * @throws PolicyException
+     */
     void writeConfigBlock(Common.Block block, byte[] encodedMetadataValue) throws InvalidProtocolBufferException, LedgerException, ValidateException, PolicyException;
 
 }

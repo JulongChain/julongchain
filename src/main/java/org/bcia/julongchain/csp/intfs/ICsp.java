@@ -16,7 +16,9 @@ package org.bcia.julongchain.csp.intfs;
  * limitations under the License.
  */
 
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.exception.SarException;
 import org.bcia.julongchain.csp.intfs.opts.*;
 
 /**
@@ -31,43 +33,43 @@ import org.bcia.julongchain.csp.intfs.opts.*;
 public interface ICsp {
 
     // The keyGen generates a key according to the opts whose type is the IKeyGenOpts.
-    IKey keyGen(IKeyGenOpts opts) throws JulongChainException;
+    IKey keyGen(IKeyGenOpts opts) throws CspException;
 
     // The keyDeriv derives a key from the k according to the opts whose type is the IKeyDerivOpts.
-    IKey keyDeriv(IKey k, IKeyDerivOpts opts) throws JulongChainException;
+    IKey keyDeriv(IKey k, IKeyDerivOpts opts) throws CspException;
 
     // The keyImport imports a key from the raw according to the opts whose type is the IKeyImportOpts.
-    IKey keyImport(Object raw, IKeyImportOpts opts) throws JulongChainException;
+    IKey keyImport(Object raw, IKeyImportOpts opts) throws CspException;
 
     // The getKey returns a key according to the ski, i.e. Subject Key Identifier.
-    IKey getKey(byte[] ski) throws JulongChainException;
+    IKey getKey(byte[] ski) throws CspException;
 
     // The hash generates a hash value of the msg according to the opts whose type is the IHashOpts.
-    byte[] hash(byte[] msg, IHashOpts opts) throws JulongChainException;
+    byte[] hash(byte[] msg, IHashOpts opts) throws CspException;
 
     // The getHash returns an instance of Hash according to opts whose type is the IHashOpts.
-    IHash getHash(IHashOpts opts) throws JulongChainException;
+    IHash getHash(IHashOpts opts) throws CspException;
 
     // The sign generates a digital signature for the digest using the key k, according to the opts
     // whose type is the ISignerOpts.
     // The opts specifies a signature algorithm used, but also a hash function to produce a digest
     // for a large-sized message.
-    byte[] sign(IKey k, byte[] digest, ISignerOpts opts) throws JulongChainException;
+    byte[] sign(IKey k, byte[] digest, ISignerOpts opts) throws CspException;
 
     // The verify checks the validation of the signature against the key k and the digest, according
     // to the opts whose type is the ISignerOpts. Note that it is ISignerOpts definitely.
-    boolean verify(IKey k, byte[] signature, byte[] digest, ISignerOpts opts) throws JulongChainException;
+    boolean verify(IKey k, byte[] signature, byte[] digest, ISignerOpts opts) throws CspException;
 
     // The encrypt computes a ciphertext from the plaintext using key k, according to the opts
     // whose type is IEncrypterOpts.
     // The opts should consist of a symmetric encryption algorithm and an appropriate block-cipher mode.
-    byte[] encrypt(IKey k, byte[] plaintext, IEncrypterOpts opts) throws JulongChainException;
+    byte[] encrypt(IKey k, byte[] plaintext, IEncrypterOpts opts) throws CspException;
 
     // The decrypt outputs a plaintext from the ciphertext using the key k, according to the opts
     // whose type is IDecrypterOpts.
     // The opts should take a specified algorithm and mode as the argument.
-    byte[] decrypt(IKey k, byte[] ciphertext, IDecrypterOpts opts) throws JulongChainException;
+    byte[] decrypt(IKey k, byte[] ciphertext, IDecrypterOpts opts) throws CspException;
 
     // The rng provides a random number within a specified length, according to the opts whose type is IRngOpts.
-    byte[] rng(int len, IRngOpts opts) throws JulongChainException;
+    byte[] rng(int len, IRngOpts opts) throws CspException;
 }

@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.csp.gm.sdt.sm4;
 
-import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.gm.sdt.common.Constants;
@@ -40,15 +40,15 @@ public class SM4 {
     /**
      * 生成sm4密钥
      * @return sm4密钥
-     * @throws JulongChainException
+     * @throws CspException
      */
-    public byte[] generateKey() throws JulongChainException {
+    public byte[] generateKey() throws CspException {
         byte[] result = null;
         try {
             result = smJniApi.randomGen(Constants.SM4_KEY_LEN);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            throw new JulongChainException(e.getMessage());
+            throw new CspException(e.getMessage());
         }
         return result;
     }
@@ -58,20 +58,20 @@ public class SM4 {
      * @param plainText 明文数据
      * @param key 密钥
      * @return 密文数据
-     * @throws JulongChainException
+     * @throws CspException
      */
-    public byte[] encryptECB(byte[] plainText, byte[] key) throws JulongChainException {
+    public byte[] encryptECB(byte[] plainText, byte[] key) throws CspException {
         if(null == plainText) {
             logger.error("Invalid plainText. It must not be null.");
-            throw new JulongChainException("Invalid plainText. It must not be null.");
+            throw new CspException("Invalid plainText. It must not be null.");
         }
         if(0 == plainText.length) {
             logger.error("Invalid plainText. Cannot be empty.");
-            throw new JulongChainException("Invalid plainText. Cannot be empty.");
+            throw new CspException("Invalid plainText. Cannot be empty.");
         }
         if(null == key) {
             logger.error("Invalid key. It must not be null.");
-            throw new JulongChainException("Invalid key. It must not be null.");
+            throw new CspException("Invalid key. It must not be null.");
         }
         //填充数据
         byte[] paddingData = padding(plainText);
@@ -83,28 +83,28 @@ public class SM4 {
      * @param cipherText 密文数据
      * @param key 密钥
      * @return 明文数据
-     * @throws JulongChainException
+     * @throws CspException
      */
-    public byte[] decryptECB(byte[] cipherText, byte[] key) throws JulongChainException {
+    public byte[] decryptECB(byte[] cipherText, byte[] key) throws CspException {
         if(null == cipherText) {
             logger.error("Invalid cipherText. It must not be null.");
-            throw new JulongChainException("Invalid cipherText. It must not be null.");
+            throw new CspException("Invalid cipherText. It must not be null.");
         }
         if(Constants.SM4_BLOCK_LEN > cipherText.length) {
             String errorMsg = "Invalid cipherText. It's length cannot be smaller than " +
                     Integer.toString(Constants.SM4_BLOCK_LEN) + ".";
             logger.error(errorMsg);
-            throw new JulongChainException(errorMsg);
+            throw new CspException(errorMsg);
         }
         if(null == key) {
             logger.error("Invalid key. It must not be null.");
-            throw new JulongChainException("Invalid key. It must not be null.");
+            throw new CspException("Invalid key. It must not be null.");
         }
         if(Constants.SM4_KEY_LEN != key.length) {
             String errorMsg = "Invalid key. It's length must be " +
                     Integer.toString(Constants.SM4_KEY_LEN) + ".";
             logger.error(errorMsg);
-            throw new JulongChainException(errorMsg);
+            throw new CspException(errorMsg);
         }
         //分包处理(每包长度为Constants.SM4_PACKAGE_LEN)
         byte[] plainText = proccessDataECB(cipherText, key, TYPE_DECRYPT);
@@ -119,9 +119,9 @@ public class SM4 {
      * @param key 密钥
      * @param type 类型（加密/解密）
      * @return 加密或解密结果
-     * @throws JulongChainException
+     * @throws CspException
      */
-    private byte[] proccessDataECB(byte[] data, byte[] key, int type) throws JulongChainException {
+    private byte[] proccessDataECB(byte[] data, byte[] key, int type) throws CspException {
         //分包处理(每包长度为Constants.SM4_PACKAGE_LEN)
         byte[] result = new byte[data.length];
         int leftLength = data.length;
@@ -150,7 +150,7 @@ public class SM4 {
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage());
-                throw new JulongChainException(e.getMessage());
+                throw new CspException(e.getMessage());
             }
 
             if(null != tmpDestData) {
@@ -164,7 +164,7 @@ public class SM4 {
                     errorMsg = errorMsg + "decrypting data with SM4 ECB mode";
                 }
                 logger.error(errorMsg);
-                throw new JulongChainException(errorMsg);
+                throw new CspException(errorMsg);
             }
         }
         return result;
@@ -176,30 +176,30 @@ public class SM4 {
      * @param key 密钥
      * @param iv 初始向量
      * @return 密文数据
-     * @throws JulongChainException
+     * @throws CspException
      */
-    public byte[] encryptCBC(byte[] plainText, byte[] key, byte[] iv) throws JulongChainException {
+    public byte[] encryptCBC(byte[] plainText, byte[] key, byte[] iv) throws CspException {
         if(null == plainText) {
             logger.error("Invalid plainText. It must not be null.");
-            throw new JulongChainException("Invalid plainText. It must not be null.");
+            throw new CspException("Invalid plainText. It must not be null.");
         }
         if(0 == plainText.length) {
             logger.error("Invalid plainText. Cannot be empty.");
-            throw new JulongChainException("Invalid plainText. Cannot be empty.");
+            throw new CspException("Invalid plainText. Cannot be empty.");
         }
         if(null == key) {
             logger.error("Invalid key. It must not be null.");
-            throw new JulongChainException("Invalid key. It must not be null.");
+            throw new CspException("Invalid key. It must not be null.");
         }
         if(null == iv) {
             logger.error("Invalid iv. It must not be null.");
-            throw new JulongChainException("Invalid iv. It must not be null.");
+            throw new CspException("Invalid iv. It must not be null.");
         }
         if(Constants.SM4_IV_LEN != iv.length) {
             String errorMsg = "Invalid iv. It's length must be " +
                     Integer.toString(Constants.SM4_IV_LEN) + ".";
             logger.error(errorMsg);
-            throw new JulongChainException(errorMsg);
+            throw new CspException(errorMsg);
         }
         //填充数据
         byte[] paddingData = padding(plainText);
@@ -212,38 +212,38 @@ public class SM4 {
      * @param key 密钥
      * @param iv 初始向量
      * @return 明文数据
-     * @throws JulongChainException
+     * @throws CspException
      */
-    public byte[] decryptCBC(byte[] cipherText, byte[] key, byte[] iv) throws JulongChainException {
+    public byte[] decryptCBC(byte[] cipherText, byte[] key, byte[] iv) throws CspException {
         if(null == cipherText) {
             logger.error("Invalid cipherText. It must not be null.");
-            throw new JulongChainException("Invalid cipherText. It must not be null.");
+            throw new CspException("Invalid cipherText. It must not be null.");
         }
         if(Constants.SM4_BLOCK_LEN > cipherText.length) {
             String errorMsg = "Invalid cipherText. It's length cannot be smaller than " +
                                 Integer.toString(Constants.SM4_BLOCK_LEN) + ".";
             logger.error(errorMsg);
-            throw new JulongChainException(errorMsg);
+            throw new CspException(errorMsg);
         }
         if(null == key) {
             logger.error("Invalid key. It must not be null.");
-            throw new JulongChainException("Invalid key. It must not be null.");
+            throw new CspException("Invalid key. It must not be null.");
         }
         if(Constants.SM4_KEY_LEN != key.length) {
             String errorMsg = "Invalid key. It's length must be " +
                     Integer.toString(Constants.SM4_KEY_LEN) + ".";
             logger.error(errorMsg);
-            throw new JulongChainException(errorMsg);
+            throw new CspException(errorMsg);
         }
         if(null == iv) {
             logger.error("Invalid iv. It must not be null.");
-            throw new JulongChainException("Invalid iv. It must not be null.");
+            throw new CspException("Invalid iv. It must not be null.");
         }
         if(Constants.SM4_IV_LEN != iv.length) {
             String errorMsg = "Invalid iv. It's length must be " +
                     Integer.toString(Constants.SM4_IV_LEN) + ".";
             logger.error(errorMsg);
-            throw new JulongChainException(errorMsg);
+            throw new CspException(errorMsg);
         }
         //分包处理(每包长度为Constants.SM4_PACKAGE_LEN)
         byte[] plainText = proccessDataCBC(cipherText, key, iv, TYPE_DECRYPT);
@@ -259,9 +259,9 @@ public class SM4 {
      * @param iv 初始向量
      * @param type 类型（加密/解密）
      * @return 加密或解密结果
-     * @throws JulongChainException
+     * @throws CspException
      */
-    private byte[] proccessDataCBC(byte[] data, byte[] key, byte[] iv, int type) throws JulongChainException {
+    private byte[] proccessDataCBC(byte[] data, byte[] key, byte[] iv, int type) throws CspException {
         //分包处理(每包长度为Constants.SM4_PACKAGE_LEN)
         byte[] result = new byte[data.length];
         int leftLength = data.length;
@@ -292,7 +292,7 @@ public class SM4 {
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage());
-                throw new JulongChainException(e.getMessage());
+                throw new CspException(e.getMessage());
             }
 
             if(null != tmpResult) {
@@ -307,7 +307,7 @@ public class SM4 {
                     errorMsg = errorMsg + "decrypting data with SM4 CBC mode";
                 }
                 logger.error(errorMsg);
-                throw new JulongChainException(errorMsg);
+                throw new CspException(errorMsg);
             }
         }
         return result;
@@ -317,11 +317,11 @@ public class SM4 {
      * 数据填充（填充后数据长度为Constants.SM4_BLOCK_LEN的整数倍）
      * @param input 待填充数据
      * @return 填充后的数据
-     * @throws JulongChainException
+     * @throws CspException
      */
-    private byte[] padding(byte[] input) throws JulongChainException {
+    private byte[] padding(byte[] input) throws CspException {
         if (null == input) {
-            throw new JulongChainException("Invalid input. It must not be null.");
+            throw new CspException("Invalid input. It must not be null.");
         }
         int padLen = Constants.SM4_BLOCK_LEN - input.length % Constants.SM4_BLOCK_LEN;
         byte[] buff = new byte[input.length + padLen];
@@ -336,18 +336,18 @@ public class SM4 {
      * 数据去填充
      * @param input 填充后的数据
      * @return 去填充的数据
-     * @throws JulongChainException
+     * @throws CspException
      */
-    private byte[] unpadding(byte[] input) throws JulongChainException {
+    private byte[] unpadding(byte[] input) throws CspException {
         if (null == input) {
-            throw new JulongChainException("Invalid input. It must not be null.");
+            throw new CspException("Invalid input. It must not be null.");
         }
         if (1 > input.length) {
-            throw new JulongChainException("Invalid input. It's length must be bigger than 1.");
+            throw new CspException("Invalid input. It's length must be bigger than 1.");
         }
         int padLen = input[input.length - 1];
         if(padLen > input.length) {
-            throw new JulongChainException("Invalid input. It's padding length is bigger than the total data length.");
+            throw new CspException("Invalid input. It's padding length is bigger than the total data length.");
         }
         byte[] buff = new byte[input.length - padLen];
         System.arraycopy(input, 0, buff, 0, input.length - padLen);

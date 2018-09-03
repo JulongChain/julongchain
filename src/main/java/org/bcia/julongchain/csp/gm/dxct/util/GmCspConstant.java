@@ -13,34 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.consenter.entity;
-
-import org.bcia.julongchain.protos.common.Common;
+package org.bcia.julongchain.csp.gm.dxct.util;
 
 /**
- * 批次消息实体
+ * Gmcsp常量辅助类
  *
  * @author zhangmingyang
- * @Date: 2018/3/15
+ * @date 2018/08/31
  * @company Dingxuan
  */
-public class BatchesMes {
-    public Common.Envelope[][] messageBatches;
-    public boolean pending;
+public class GmCspConstant {
+    public static final String SM2="sm2";
+    public static final String SM3="sm3";
+    public static final String SM4="sm4";
 
-    public Common.Envelope[][] getMessageBatches() {
-        return messageBatches;
-    }
+    public static final String  SYSMETRICKEY_TYPE ="symmetricKey";
+    public static final String  ASYMMETRICKEY_TYPE ="asymmetric";
+    public static final String  HASH_TYPE="hash";
+    public static final String  SIGN_TYPE="sign";
+    public static final String  KEYSTROE_PATH="KeyStore";
 
-    public void setMessageBatches(Common.Envelope[][] messageBatches) {
-        this.messageBatches = messageBatches;
-    }
-
-    public boolean isPending() {
-        return pending;
-    }
-
-    public void setPending(boolean pending) {
-        this.pending = pending;
-    }
 }

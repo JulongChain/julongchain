@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.csp.pkcs11.aes;
 
-import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.pkcs11.IPKCS11FactoryOpts;
 import org.bcia.julongchain.csp.pkcs11.PKCS11CspLog;
@@ -125,9 +125,9 @@ public class AesImpl {
          * @param ephemeral     Ephemeral(True/False)
          * @param opts          P11 factory
          * @return IKey instance of SymmetryKey.AESPriKey
-         * @throws JulongChainException
+         * @throws CspException
          */
-        public static IKey generateAES(int size, boolean ephemeral, IPKCS11FactoryOpts opts) throws JulongChainException {
+        public static IKey generateAES(int size, boolean ephemeral, IPKCS11FactoryOpts opts) throws CspException {
             try {
                 //create a key attribute
                 CK_MECHANISM ckm = new CK_MECHANISM();
@@ -162,17 +162,17 @@ public class AesImpl {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
                 AesImpl.setLoggerErr(err, CLS_GENKEY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }catch(NoSuchAlgorithmException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
                 AesImpl.setLoggerErr(err, CLS_GENKEY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
                 AesImpl.setLoggerErr(err, CLS_GENKEY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }
         }
     }
@@ -188,9 +188,9 @@ public class AesImpl {
          * @param ephemeral     Ephemeral(True/False)
          * @param opts          P11 factory
          * @return  IKey instance of SymmetryKey.AESPriKey
-         * @throws JulongChainException
+         * @throws CspException
          */
-    	public static IKey importAES(byte[] keyvalue, boolean ephemeral, IPKCS11FactoryOpts opts) throws JulongChainException {
+    	public static IKey importAES(byte[] keyvalue, boolean ephemeral, IPKCS11FactoryOpts opts) throws CspException {
     		
     		try {
     			//create a pubkey attribute			
@@ -219,17 +219,17 @@ public class AesImpl {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
                 AesImpl.setLoggerErr(err, CLS_IMPORTKEY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }catch(NoSuchAlgorithmException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
                 AesImpl.setLoggerErr(err, CLS_IMPORTKEY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
                 AesImpl.setLoggerErr(err, CLS_IMPORTKEY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }
     	}
     }
@@ -246,9 +246,9 @@ public class AesImpl {
          * @param ski       Identify for Search Key
          * @param opts      P11 factory
          * @return  IKey instance of SymmetryKey.AESPriKey
-         * @throws JulongChainException
+         * @throws CspException
          */
-        public static IKey getAES(byte[] ski, IPKCS11FactoryOpts opts) throws JulongChainException {
+        public static IKey getAES(byte[] ski, IPKCS11FactoryOpts opts) throws CspException {
             try {
 
                 long[] keyhandle = findKeyFromSKI(opts, ski);
@@ -278,17 +278,17 @@ public class AesImpl {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
                 AesImpl.setLoggerErr(err, CLS_GETKEY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }catch(NoSuchAlgorithmException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
                 AesImpl.setLoggerErr(err, CLS_GETKEY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
                 AesImpl.setLoggerErr(err, CLS_GETKEY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }
         }
     }
@@ -312,16 +312,16 @@ public class AesImpl {
          * @param plaintext     Plain text
          * @param opts          P11 factory
          * @return Enciphered data
-         * @throws JulongChainException
+         * @throws CspException
          */
-        public static byte[] encrtyptWithAES(byte[] ski, long mechanism, byte[] plaintext, IPKCS11FactoryOpts opts) throws JulongChainException {
+        public static byte[] encrtyptWithAES(byte[] ski, long mechanism, byte[] plaintext, IPKCS11FactoryOpts opts) throws CspException {
             try {
                 long[] key = findKeyFromSKI(opts, ski);
                 if(key == null ||(key!=null && key.length==0))
                 {
                     String str = String.format("[JC_PKCS]:No Find Key");
                     AesImpl.setLoggerErr(str, CLS_ENCRYPT);
-                    throw new JulongChainException("[JC_PKCS]:No Find Key!");
+                    throw new CspException("[JC_PKCS]:No Find Key!");
                 }
                 CK_MECHANISM ckm = new CK_MECHANISM();
                 ckm.mechanism = mechanism;
@@ -341,12 +341,12 @@ public class AesImpl {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
                 AesImpl.setLoggerErr(err, CLS_ENCRYPT);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
                 AesImpl.setLoggerErr(err, CLS_ENCRYPT);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }
         }
 
@@ -365,16 +365,16 @@ public class AesImpl {
          * @param ciphertext    Enciphered data
          * @param opts          P11 factory
          * @return Plain text
-         * @throws JulongChainException
+         * @throws CspException
          */
-        public static byte[] decryptWithAES(byte[] ski, long mechanism, byte[] ciphertext, IPKCS11FactoryOpts opts) throws JulongChainException {
+        public static byte[] decryptWithAES(byte[] ski, long mechanism, byte[] ciphertext, IPKCS11FactoryOpts opts) throws CspException {
             try {
                 long[] key = findKeyFromSKI(opts, ski);
                 if(key == null ||(key!=null && key.length==0))
                 {
                     String str = String.format("[JC_PKCS]:No Find Key");
                     AesImpl.setLoggerErr(str, CLS_DECRYPT);
-                    throw new JulongChainException("[JC_PKCS]:No Find Key!");
+                    throw new CspException("[JC_PKCS]:No Find Key!");
                 }
                 CK_MECHANISM ckm = new CK_MECHANISM();
                 ckm.mechanism = mechanism;
@@ -390,12 +390,12 @@ public class AesImpl {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
                 AesImpl.setLoggerErr(err, CLS_DECRYPT);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
                 AesImpl.setLoggerErr(err, CLS_DECRYPT);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }
         }
     }
@@ -406,9 +406,9 @@ public class AesImpl {
      * @param opts      P11 factory
      * @param ski       Dentify for Search Key
      * @return Key Handle
-     * @throws JulongChainException
+     * @throws CspException
      */
-    private static long[] findKeyFromSKI(IPKCS11FactoryOpts opts, byte[] ski) throws JulongChainException{
+    private static long[] findKeyFromSKI(IPKCS11FactoryOpts opts, byte[] ski) throws CspException{
 
 
         long keyclass = CKO_SECRET_KEY;
@@ -449,17 +449,17 @@ public class AesImpl {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:PKCS11Exception ErrMessage: %s", ex.getMessage());
             setLoggerErr(err, CLS_SELF);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(NoSuchAlgorithmException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
             setLoggerErr(err, CLS_SELF);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(Exception ex) {
         	ex.printStackTrace();
         	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
             setLoggerErr(err, CLS_SELF);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
 
     }

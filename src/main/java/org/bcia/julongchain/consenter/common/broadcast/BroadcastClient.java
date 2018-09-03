@@ -3,6 +3,8 @@ package org.bcia.julongchain.consenter.common.broadcast;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 import org.bcia.julongchain.protos.consenter.AtomicBroadcastGrpc;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class BroadcastClient {
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BroadcastClient.class);
     /**
      * broadcast 发送方法
      * @param ip
@@ -31,6 +34,7 @@ public class BroadcastClient {
             @Override
             public void onNext(Ab.BroadcastResponse broadcastResponse) {
                 System.out.println(broadcastResponse.getStatusValue());
+                log.info("broadcastResponse is "+broadcastResponse.getStatus());
             }
 
             @Override
@@ -40,7 +44,8 @@ public class BroadcastClient {
 
             @Override
             public void onCompleted() {
-                System.out.println("onCompled!");
+                log.info("onCompled!");
+
             }
         });
 
@@ -63,7 +68,7 @@ public class BroadcastClient {
      * @param responseObserver
      */
     public void send(String ip, int port, Common.Envelope envelope, StreamObserver<Ab.BroadcastResponse> responseObserver) {
-        ManagedChannel managedChannel = ManagedChannelBuilder.forAddress(ip, port).usePlaintext(true).build();
+        ManagedChannel managedChannel = ManagedChannelBuilder.forAddress(ip, port).usePlaintext().build();
         AtomicBroadcastGrpc.AtomicBroadcastStub stub = AtomicBroadcastGrpc.newStub(managedChannel);
         StreamObserver<Common.Envelope> envelopeStreamObserver = stub.broadcast(responseObserver);
         envelopeStreamObserver.onNext(envelope);

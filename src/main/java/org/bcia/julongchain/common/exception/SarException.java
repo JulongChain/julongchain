@@ -22,7 +22,7 @@ package org.bcia.julongchain.common.exception;
  * @date 2018/4/2
  * @company Excelsecu
  */
-public class SarException extends JulongChainException {
+public class SarException extends CspException{
 
     public static final int SAR_OK = 0x00000000;
     public static final int SAR_FAIL = 0x0A000001;

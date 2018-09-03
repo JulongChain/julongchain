@@ -19,6 +19,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.protos.common.Configtx;
 
 /**
+ * 配置消息工具类
+ *
  * @author zhangmingyang
  * @Date: 2018/5/10
  * @company Dingxuan

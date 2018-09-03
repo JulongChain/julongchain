@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.csp.pkcs11;
 
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.factory.IFactoryOpts;
 import sun.security.pkcs11.wrapper.PKCS11;
@@ -41,5 +42,5 @@ public interface IPKCS11FactoryOpts extends IFactoryOpts {
     public boolean getNoImport();
 
     //
-    public void optFinalized() throws JulongChainException;
+    public void optFinalized() throws CspException;
 }

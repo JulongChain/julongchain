@@ -28,11 +28,12 @@ import static org.bcia.julongchain.msp.mgmt.GlobalMspManagement.getLocalMsp;
 
 /**
  * msp集合管理类
+ *
  * @author zhangmingyang
  * @date 2018/07/24
  * @company Dingxuan
  */
-public class MspMgmtMgr implements IMspManager{
+public class MspMgmtMgr implements IMspManager {
     private static JulongChainLog log = JulongChainLogFactory.getLog(MspMgmtMgr.class);
     private IMspManager mspManager;
     private boolean up;
@@ -60,38 +61,41 @@ public class MspMgmtMgr implements IMspManager{
     public void setup(IMsp[] msps) throws MspException {
         try {
             mspManager.setup(msps);
-            up=true;
+            up = true;
         } catch (MspException e) {
             throw new MspException(e.getMessage());
         }
 
     }
+
     /**
      * 返回提供的msp管理链
+     *
      * @param groupId
      * @return
      */
     public static IMspManager getManagerForChain(String groupId) {
         IMspManager mspManager = mspManagerMap.get(groupId);
-        if(mspManager==null){
-            log.debug(String.format("Created new msp manager for channel %s", groupId));
-            MspMgmtMgr mspMgmtMgr=new MspMgmtMgr(new MspManager(),false);
-            mspManagerMap.put(groupId,mspMgmtMgr);
-            mspManager=mspManagerMap.get(groupId);
-        }else {
+        if (mspManager == null) {
+            log.debug(String.format("Created new msp manager for group %s", groupId));
+            MspMgmtMgr mspMgmtMgr = new MspMgmtMgr(new MspManager(), false);
+            mspManagerMap.put(groupId, mspMgmtMgr);
+            mspManager = mspManagerMap.get(groupId);
+        } else {
             //TODO 通过反射判断是否为mspmanager type
-            log.debug(String.format("Returning existing manager for channel '%s'", groupId));
+            log.debug(String.format("Returning existing manager for group '%s'", groupId));
         }
         return mspManager;
     }
 
     /**
      * IdentityDeserializer
+     *
      * @param groupId
      * @return
      */
     public static IIdentityDeserializer getIdentityDeserializer(String groupId) {
-        if (groupId == ""||groupId==null) {
+        if (groupId == "" || groupId == null) {
             return getLocalMsp();
         }
         return getManagerForChain(groupId);
@@ -100,30 +104,33 @@ public class MspMgmtMgr implements IMspManager{
 
     /**
      * 返回所有已注册的manager
+     *
      * @return
      */
-    public static Map<String,IMspManager> getDeserializers(){
+    public static Map<String, IMspManager> getDeserializers() {
         return mspManagerMap;
     }
 
 
     /**
      * 将mspManager通过key装载到map中
+     *
      * @param groupId
      * @param manager
      */
     public void setMspManager(String groupId, IMspManager manager) {
         MspMgmtMgr mspManager = new MspMgmtMgr(manager, true);
-        mspManagerMap.put(groupId,mspManager);
+        mspManagerMap.put(groupId, mspManager);
     }
 
 
     /**
      * 返回本地签名身份，或者错误
+     *
      * @return
      */
-    public static ISigningIdentity getLocalSigningIdentityOrPanic(){
-        ISigningIdentity id= getLocalMsp().getDefaultSigningIdentity();
+    public static ISigningIdentity getLocalSigningIdentityOrPanic() {
+        ISigningIdentity id = getLocalMsp().getDefaultSigningIdentity();
         return id;
     }
 

@@ -15,8 +15,11 @@
  */
 package org.bcia.julongchain.csp.gm.dxct.sm2;
 
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.csp.gm.dxct.sm3.SM3;
 import org.bcia.julongchain.csp.intfs.IKey;
+
+import java.security.NoSuchAlgorithmException;
 
 /**
  * SM2Key 实现IKey接口
@@ -45,8 +48,14 @@ public class SM2Key implements IKey {
     }
 
     @Override
-    public byte[] ski() {
-        return sm3.hash(sm2KeyPair.getPrivatekey());
+    public byte[] ski() throws CspException{
+        byte[] hashValue=null;
+        try {
+            hashValue= sm3.hash(sm2KeyPair.getPrivatekey());
+        } catch (NoSuchAlgorithmException e) {
+           throw new CspException(e.getMessage());
+        }
+        return hashValue;
     }
 
     @Override

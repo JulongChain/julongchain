@@ -16,7 +16,7 @@
 
 package org.bcia.julongchain.csp.pkcs11.util;
 
-import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.csp.intfs.IHash;
 import org.bcia.julongchain.csp.pkcs11.IPKCS11FactoryOpts;
@@ -42,7 +42,7 @@ public class PKCS11Digest {
     
     private static JulongChainLog logger;
 
-    public PKCS11Digest(long mechanism) throws JulongChainException{
+    public PKCS11Digest(long mechanism) throws CspException{
         this.mechanism = mechanism;
         switch((int)mechanism) {
             case (int)CKM_MD2:
@@ -59,7 +59,7 @@ public class PKCS11Digest {
                 digestLength = 48;
                 break;
             default:
-                throw new JulongChainException("[JC_PKCS]: no support the alg!");
+                throw new CspException("[JC_PKCS]: no support the alg!");
         }
     }
 
@@ -68,9 +68,9 @@ public class PKCS11Digest {
      * @param msg       Message
      * @param opts      P11 factory
      * @return digest value
-     * @throws JulongChainException
+     * @throws CspException
      */
-    public byte[] getDigest(byte[] msg, IPKCS11FactoryOpts opts) throws JulongChainException{
+    public byte[] getDigest(byte[] msg, IPKCS11FactoryOpts opts) throws CspException{
 
         try {
             CK_MECHANISM ckm = new CK_MECHANISM();
@@ -85,14 +85,14 @@ public class PKCS11Digest {
             }
             else{
             	logger.error("[JC_PKCS]: digest methor1 data length error!");
-                throw new JulongChainException("[JC_PKCS]: digest methor1 data length error!");
+                throw new CspException("[JC_PKCS]: digest methor1 data length error!");
             }
 
         }catch(PKCS11Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
             logger.error(err);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
     }
 
@@ -101,9 +101,9 @@ public class PKCS11Digest {
      * @param msg       Message
      * @param opts      P11 factory
      * @return digest value
-     * @throws JulongChainException
+     * @throws CspException
      */
-    public static byte[] getDigestwithUpdate(byte[] msg, IPKCS11FactoryOpts opts) throws JulongChainException{
+    public static byte[] getDigestwithUpdate(byte[] msg, IPKCS11FactoryOpts opts) throws CspException{
 
         try {
 
@@ -119,13 +119,13 @@ public class PKCS11Digest {
             }
             else{
             	logger.error("[JC_PKCS]: digest methor2 data length error!");
-                throw new JulongChainException("[JC_PKCS]: digest methor2 data length error!");
+                throw new CspException("[JC_PKCS]: digest methor2 data length error!");
             }
 
         }catch(PKCS11Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
 
     }
@@ -158,7 +158,7 @@ public class PKCS11Digest {
                     System.arraycopy(b, 0, data, message.length, b.length);
                     byte[] digest = getDigestwithUpdate(data, opts);
                     return digest;
-                } catch (JulongChainException ex) {
+                } catch (CspException ex) {
                 	logger.error("[JC_PKCS]: sum error!");
                     return null;
                 }
@@ -169,7 +169,7 @@ public class PKCS11Digest {
                 try {
                     byte[] buffer = new byte[BUFFERSIZE];
                     getDigestwithUpdate(buffer, opts);
-                } catch (JulongChainException ex) {
+                } catch (CspException ex) {
                 	logger.error("[JC_PKCS]: reset error!");
                 	return;
                 }

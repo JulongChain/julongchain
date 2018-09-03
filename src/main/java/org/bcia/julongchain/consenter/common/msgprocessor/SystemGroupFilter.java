@@ -30,6 +30,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 
 /**
+ * 系统组过滤器
  * @author zhangmingyang
  * @Date: 2018/5/26
  * @company Dingxuan

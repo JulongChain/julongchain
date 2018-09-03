@@ -30,13 +30,15 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 
 /**
+ * 区块写入对象
+ *
  * @author zhangmingyang
  * @Date: 2018/3/16
  * @company Dingxuan
  */
 public class BlockWriter {
     private static JulongChainLog log = JulongChainLogFactory.getLog(BlockWriter.class);
-    // private IBlockWriterSupport support;
+
     private ChainSupport support;
 
     private Registrar registrar;
@@ -68,9 +70,9 @@ public class BlockWriter {
         Common.BlockHeader.Builder header = Common.BlockHeader.newBuilder(block.getHeader())
                 .setDataHash(ByteString.copyFrom(BlockHelper.hash(data.build().toByteArray())));
 
-        Common.Block.Builder updateBlockBuilder=Common.Block.newBuilder(block);
+        Common.Block.Builder updateBlockBuilder = Common.Block.newBuilder(block);
         updateBlockBuilder.setData(data).setHeader(header);
-     //   lastBlock=updateBlockBuilder.build();
+        //   lastBlock=updateBlockBuilder.build();
         return updateBlockBuilder.build();
     }
 
@@ -146,7 +148,7 @@ public class BlockWriter {
                     .addSignatures(metadataSignature)
                     .setValue(ByteString.copyFrom(blockSignatureValue)).build();
             Common.Block.Builder updateBlockBuilder = Common.Block.newBuilder(block);
-            updateBlockBuilder.getMetadataBuilder().setMetadata(Common.BlockMetadataIndex.SIGNATURES_VALUE,ByteString.copyFrom(metadata.toByteArray()));
+            updateBlockBuilder.getMetadataBuilder().setMetadata(Common.BlockMetadataIndex.SIGNATURES_VALUE, ByteString.copyFrom(metadata.toByteArray()));
             Common.Block updateBlock = updateBlockBuilder.build();
             //ProtoUtils.printMessageJson(block1);
             lastBlock = updateBlock;
@@ -159,7 +161,7 @@ public class BlockWriter {
     public void addLastConfigSignature(Common.Block block) {
         long configSeq = support.getSequence();
         if (configSeq > lastConfigSeq) {
-            log.debug(String.format("[channel: %s] Detected lastConfigSeq transitioning from %d to %d, setting lastConfigBlockNum from %d to %d",
+            log.debug(String.format("[group: %s] Detected lastConfigSeq transitioning from %d to %d, setting lastConfigBlockNum from %d to %d",
                     support.getGroupId(), lastConfigSeq, configSeq, lastConfigBlockNum, block.getHeader().getNumber()));
             lastConfigBlockNum = block.getHeader().getNumber();
             lastConfigSeq = configSeq;
@@ -174,7 +176,7 @@ public class BlockWriter {
                     .addSignatures(metadataSignature)
                     .setValue(ByteString.copyFrom(lastConfigValue)).build();
             Common.Block.Builder updateblock = Common.Block.newBuilder(block);
-            updateblock.getMetadataBuilder().setMetadata(Common.BlockMetadataIndex.LAST_CONFIG_VALUE,ByteString.copyFrom(metadata.toByteArray()));
+            updateblock.getMetadataBuilder().setMetadata(Common.BlockMetadataIndex.LAST_CONFIG_VALUE, ByteString.copyFrom(metadata.toByteArray()));
             lastBlock = updateblock.build();
         } catch (InvalidProtocolBufferException e) {
             e.printStackTrace();

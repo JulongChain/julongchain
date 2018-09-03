@@ -21,10 +21,18 @@ import org.bcia.julongchain.protos.common.Common;
 import java.util.Map;
 
 /**
+ * IGroupSupportRegistrar接口
+ * 定义broadcastGroupSupport方法,实现对消息的分类
  * @author zhangmingyang
  * @Date: 2018/5/8
  * @company Dingxuan
  */
 public interface IGroupSupportRegistrar {
+    /**
+     * 消息分类处理
+     * @param msg
+     * @return
+     * @throws InvalidProtocolBufferException
+     */
     Map<String,Object> broadcastGroupSupport(Common.Envelope msg) throws InvalidProtocolBufferException;
 }

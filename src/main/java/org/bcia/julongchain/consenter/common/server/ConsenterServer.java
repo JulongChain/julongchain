@@ -41,12 +41,13 @@ import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
+ * consenter服务管理
  * @author zhangmingyang
  * @Date: 2018/2/17
  * @company Dingxuan
  */
 public class ConsenterServer {
-    private int port = 7050;
+    private int port;
     private Server server;
     public static final AtomicReference<ServerCall<?, ?>> serverCallCapture = new AtomicReference<ServerCall<?, ?>>();
     private static JulongChainLog log = JulongChainLogFactory.getLog(ConsenterServer.class);
@@ -77,7 +78,7 @@ public class ConsenterServer {
                 .addService(new GossipService())
                 .build()
                 .start();
-        log.info("consenter service start, port: 7050");
+        log.info("consenter service start, port:"+port);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
@@ -104,7 +105,8 @@ public class ConsenterServer {
         }
 
     }
-    public static class ConsenterServerImpl extends AtomicBroadcastGrpc.AtomicBroadcastImplBase {
+
+    private static class ConsenterServerImpl extends AtomicBroadcastGrpc.AtomicBroadcastImplBase {
 
         @Override
         public StreamObserver<Common.Envelope> broadcast(StreamObserver<Ab.BroadcastResponse> responseObserver) {

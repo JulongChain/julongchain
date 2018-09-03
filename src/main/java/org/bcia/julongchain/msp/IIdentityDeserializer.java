@@ -20,6 +20,8 @@ import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.protos.msp.Identities;
 
 /**
+ * 身份反序列化接口
+ *
  * @author zhangmingyang
  * @Date: 2018/3/8
  * @company Dingxuan
@@ -28,14 +30,16 @@ public interface IIdentityDeserializer {
     /**
      * 反序列化身份
      * 如果身份关联到与正在执行反序列化的msp不同的msp，则反序列化将失败。
+     *
      * @param serializedIdentity
      * @return
      */
-     IIdentity deserializeIdentity(byte[] serializedIdentity) throws MspException;
+    IIdentity deserializeIdentity(byte[] serializedIdentity) throws MspException;
 
     /**
      * IsWellFormed检查给定的身份是否可以反序列化为其提供者特定的形式
+     *
      * @param identity
      */
-     void isWellFormed(Identities.SerializedIdentity identity) throws MspException;
+    void isWellFormed(Identities.SerializedIdentity identity) throws MspException;
 }

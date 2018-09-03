@@ -18,6 +18,8 @@ package org.bcia.julongchain.consenter.common.localconfig;
 import java.util.Map;
 
 /**
+ * consenter配置
+ *
  * @author zhangmingyang
  * @Date: 2018/5/24
  * @company Dingxuan

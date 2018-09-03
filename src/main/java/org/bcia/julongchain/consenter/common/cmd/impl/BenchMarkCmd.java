@@ -17,12 +17,14 @@ package org.bcia.julongchain.consenter.common.cmd.impl;
 
 import org.apache.commons.cli.ParseException;
 import org.bcia.julongchain.common.deliver.DeliverDeliverHandler;
+import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.localmsp.impl.LocalSigner;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.common.broadcast.BroadcastHandler;
 import org.bcia.julongchain.consenter.common.cmd.IConsenterCmd;
+import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfig;
 import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfigFactory;
 import org.bcia.julongchain.consenter.common.multigroup.Registrar;
 import org.bcia.julongchain.consenter.common.server.ConsenterServer;
@@ -32,6 +34,8 @@ import org.bcia.julongchain.consenter.util.ConsenterConstants;
 import java.io.IOException;
 
 /**
+ * benchmark 启动方式
+ *
  * @author zhangmingyang
  * @Date: 2018/5/7
  * @company Dingxuan
@@ -40,23 +44,25 @@ public class BenchMarkCmd implements IConsenterCmd {
     private static JulongChainLog log = JulongChainLogFactory.getLog(BenchMarkCmd.class);
     private ConsenterServer consenterServer;
 
-    public BenchMarkCmd() {
-        Registrar registrar=null;
+    public BenchMarkCmd() throws ConsenterException{
+        Registrar registrar = null;
+        ConsenterConfig consenterConfig = ConsenterConfigFactory.getConsenterConfig();
         try {
-            registrar= new PreStart().initializeMultichannelRegistrar(ConsenterConfigFactory.getConsenterConfig(),new LocalSigner());
+            registrar = new PreStart().initializeMultichannelRegistrar(ConsenterConfigFactory.getConsenterConfig(), new LocalSigner());
         } catch (JulongChainException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
+            throw new ConsenterException(e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
+            throw new ConsenterException(e.getMessage());
         }
-        DeliverDeliverHandler deliverHandler=new DeliverDeliverHandler(registrar, ConsenterConfigFactory.getConsenterConfig().getGeneral().getAuthentication().get(ConsenterConstants.TIMEWONDW));
-        consenterServer = new ConsenterServer(7050);
-
+        DeliverDeliverHandler deliverHandler = new DeliverDeliverHandler(registrar, ConsenterConfigFactory.getConsenterConfig().getGeneral().getAuthentication().get(ConsenterConstants.TIMEWONDW));
+        consenterServer = new ConsenterServer(Integer.valueOf(consenterConfig.getGeneral().getListenPort()));
         BroadcastHandler broadCastHandle = new BroadcastHandler(registrar);
         consenterServer.bindBroadcastServer(broadCastHandle);
-
         consenterServer.bindDeverServer(deliverHandler);
     }
+
     @Override
     public void execCmd(String[] args) throws ParseException {
         for (String str : args) {

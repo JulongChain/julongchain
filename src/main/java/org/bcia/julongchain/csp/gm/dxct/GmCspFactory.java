@@ -1,7 +1,7 @@
 package org.bcia.julongchain.csp.gm.dxct;
 
 /**
- * Copyright BCIA. All Rights Reserved.
+ * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,7 @@ import org.bcia.julongchain.csp.factory.IFactoryOpts;
 import org.bcia.julongchain.csp.intfs.ICsp;
 
 /**
- * @author zhanglin
- * @purpose Define the class, GmCspFactory
+ * @author zhanglin,zhangmingyang
  * @date 2018-01-25
  * @company Dingxuan
  */

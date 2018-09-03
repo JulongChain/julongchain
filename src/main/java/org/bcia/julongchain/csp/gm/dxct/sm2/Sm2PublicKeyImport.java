@@ -15,22 +15,26 @@
  */
 package org.bcia.julongchain.csp.gm.dxct.sm2;
 
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.csp.gm.dxct.sm3.SM3;
 import org.bcia.julongchain.csp.intfs.IKey;
 
+import java.security.NoSuchAlgorithmException;
+
 /**
- * 类描述
+ * sm2公钥导入对象
  *
  * @author zhangmingyang
  * @date 2018/07/06
  * @company Dingxuan
  */
-public class Sm2PublicKeyImport implements IKey{
+public class Sm2PublicKeyImport implements IKey {
     private byte[] publicKey;
     private SM3 sm3;
+
     public Sm2PublicKeyImport(byte[] publicKey) {
         this.publicKey = publicKey;
-        this.sm3=new SM3();
+        this.sm3 = new SM3();
     }
 
     @Override
@@ -39,8 +43,12 @@ public class Sm2PublicKeyImport implements IKey{
     }
 
     @Override
-    public byte[] ski() {
-        return sm3.hash(publicKey);
+    public byte[] ski() throws CspException{
+        try {
+            return sm3.hash(publicKey);
+        } catch (NoSuchAlgorithmException e) {
+            throw new CspException(e.getMessage());
+        }
     }
 
     @Override

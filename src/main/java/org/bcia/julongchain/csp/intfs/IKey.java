@@ -1,7 +1,7 @@
 package org.bcia.julongchain.csp.intfs;
 
 /**
- * Copyright BCIA. All Rights Reserved.
+ * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@ package org.bcia.julongchain.csp.intfs;
  * limitations under the License.
  */
 
+import org.bcia.julongchain.common.exception.CspException;
+
 /**
  * @author zhanglin
  * @purpose Define the interface, IKey
@@ -27,19 +29,19 @@ package org.bcia.julongchain.csp.intfs;
 public interface IKey {
 
     // The toBytes converts this key to its byte representation.
-    byte[] toBytes();
+    byte[] toBytes() throws CspException;
 
     // The ski returns the subject key identifier of this key.
-    byte[] ski();
+    byte[] ski() throws CspException;
 
     // The isSymmetric returns true if this key is a symmetric key, false otherwise.
-    boolean isSymmetric();
+    boolean isSymmetric() throws CspException;
 
     // The isPrivate returns true if this key is a private key, false otherwise.
-    boolean isPrivate();
+    boolean isPrivate() throws CspException;
 
     // The getPublicKey returns the corresponding public key part of an asymmetric public/private key pair.
     // This method returns null in symmetric key schemes.
-    IKey getPublicKey();
+    IKey getPublicKey() throws CspException;
 
 }

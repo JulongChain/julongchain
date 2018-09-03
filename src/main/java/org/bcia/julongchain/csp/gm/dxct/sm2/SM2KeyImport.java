@@ -15,10 +15,13 @@
  */
 package org.bcia.julongchain.csp.gm.dxct.sm2;
 
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.gm.dxct.sm3.SM3;
 import org.bcia.julongchain.csp.intfs.IKey;
+
+import java.security.NoSuchAlgorithmException;
 
 /**
  * @author zhangmingyang
@@ -26,7 +29,6 @@ import org.bcia.julongchain.csp.intfs.IKey;
  * @company Dingxuan
  */
 public class SM2KeyImport implements IKey {
-    private static JulongChainLog log = JulongChainLogFactory.getLog(SM2KeyImport.class);
     private byte[] privateKey;
     private byte[] publicKey;
     private SM3 sm3;
@@ -51,8 +53,12 @@ public class SM2KeyImport implements IKey {
     }
 
     @Override
-    public byte[] ski() {
-        return sm3.hash(privateKey);
+    public byte[] ski() throws CspException{
+        try {
+            return sm3.hash(privateKey);
+        } catch (NoSuchAlgorithmException e) {
+            throw new CspException(e.getMessage());
+        }
     }
 
     @Override

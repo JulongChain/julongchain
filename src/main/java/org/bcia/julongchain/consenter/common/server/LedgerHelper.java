@@ -33,6 +33,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
+ * 账本辅助类
+ *
  * @author zhangmingyang
  * @Date: 2018/5/29
  * @company Dingxuan
@@ -46,7 +48,7 @@ public class LedgerHelper {
         switch (consenterConfig.getGeneral().getLedgerType()) {
             case "file":
                 ld = consenterConfig.getFileLedger().getLocation();
-                if (ld == ""||ld==null) {
+                if (ld == "" || ld == null) {
                     ld = createTempDir(consenterConfig.getFileLedger().getPrefix());
                 }
                 log.debug(String.format("Ledger dir:", ld));
@@ -75,15 +77,15 @@ public class LedgerHelper {
 
     public static String createTempDir(String dirPrefix) {
         Path tempDirPath = null;
-        String  testDir=null;
+        String testDir = null;
         try {
             tempDirPath = Files.createTempDirectory(null);
-            testDir  = Paths.get(tempDirPath.toString()).toString();
+            testDir = Paths.get(tempDirPath.toString()).toString();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-       // String dirPath = Paths.get(dirPrefix, "").toString();
+        // String dirPath = Paths.get(dirPrefix, "").toString();
         return testDir;
     }
 
@@ -93,14 +95,10 @@ public class LedgerHelper {
         return subDirPath;
     }
 
-    public static void main(String[] args) {
-        String a = createSubDir("F:\\", "msp");
-        System.out.println(a);
-    }
 
-    private static String join(String... itms){
+    private static String join(String... itms) {
         StringBuffer buffer = new StringBuffer("");
-        for(String itm : itms){
+        for (String itm : itms) {
             buffer.append(itm);
             buffer.append(File.separator);
         }

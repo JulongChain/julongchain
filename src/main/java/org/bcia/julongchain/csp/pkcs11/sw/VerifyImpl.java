@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.csp.pkcs11.sw;
 
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.pkcs11.PKCS11CspLog;
@@ -47,7 +48,7 @@ public class VerifyImpl {
 	 * @return	true or false
 	 * @throws JulongChainException
 	 */
-    public boolean verifyData(IKey key, byte[] degiest, byte[] signature, String alg) throws JulongChainException {
+    public boolean verifyData(IKey key, byte[] degiest, byte[] signature, String alg) throws CspException {
         try {
         	
             if(key instanceof RsaKeyOpts.RsaPriKey)
@@ -93,24 +94,24 @@ public class VerifyImpl {
             }
             
             csplog.setLogMsg("[JC_PKCS_SOFT]:The alg not support!", csplog.LEVEL_INFO, VerifyImpl.class);            
-            throw new JulongChainException("[JC_PKCS_SOFT]:The alg not support!");
+            throw new CspException("[JC_PKCS_SOFT]:The alg not support!");
             
         }catch(NoSuchAlgorithmException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:NoSuchAlgorithmException ErrMessage: %s", e.getMessage());
-            throw new JulongChainException(err, e.getCause());
+            throw new CspException(err, e.getCause());
         }catch(InvalidKeyException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:InvalidKeyException ErrMessage: %s", e.getMessage());
-            throw new JulongChainException(err, e.getCause());
+            throw new CspException(err, e.getCause());
         }catch(InvalidKeySpecException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:InvalidKeySpecException ErrMessage: %s", e.getMessage());
-            throw new JulongChainException(err, e.getCause());
+            throw new CspException(err, e.getCause());
         }catch(SignatureException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:SignatureException ErrMessage: %s", e.getMessage());
-            throw new JulongChainException(err, e.getCause());
+            throw new CspException(err, e.getCause());
         }
     }
 }

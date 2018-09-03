@@ -19,10 +19,17 @@ import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
+ *
  * @author zhangmingyang
  * @Date: 2018/3/1
  * @company Dingxuan
  */
 public interface IConsensusPlugin {
+     /**
+      * 链处理方法
+      * @param consenterSupport
+      * @param metadata
+      * @return
+      */
      IChain handleChain(ChainSupport consenterSupport, Common.Metadata metadata);
 }
