@@ -15,17 +15,17 @@
  */
 package org.bcia.julongchain.csp.pkcs11.ecdsa;
 
-import com.sun.istack.internal.localization.NullLocalizable;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.util.Convert;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.pkcs11.IPKCS11FactoryOpts;
-import static org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant.*;
 import org.bcia.julongchain.csp.pkcs11.PKCS11CspLog;
 import org.bcia.julongchain.csp.pkcs11.util.DataUtil;
-
 import sun.security.ec.ECPublicKeyImpl;
-import sun.security.pkcs11.wrapper.*;
+import sun.security.pkcs11.wrapper.CK_ATTRIBUTE;
+import sun.security.pkcs11.wrapper.CK_MECHANISM;
+import sun.security.pkcs11.wrapper.PKCS11Constants;
+import sun.security.pkcs11.wrapper.PKCS11Exception;
 import sun.security.util.ECUtil;
 import sun.security.x509.X509Key;
 
@@ -34,13 +34,13 @@ import java.security.*;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-import java.text.SimpleDateFormat;
-
+import static org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant.*;
 import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
 
 /**
