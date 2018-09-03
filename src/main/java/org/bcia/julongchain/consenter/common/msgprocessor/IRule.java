@@ -20,11 +20,18 @@ import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
+ * 规则接口
+ *
  * @author zhangmingyang
  * @Date: 2018/5/9
  * @company Dingxuan
  */
 public interface IRule {
-    // Apply applies the rule to the given Envelope, either successfully or returns error
+    /**
+     * Apply将规则应用于给定的Envelope，或者成功或返回错误
+     * @param message
+     * @throws ConsenterException
+     * @throws InvalidProtocolBufferException
+     */
     void apply(Common.Envelope message) throws ConsenterException, InvalidProtocolBufferException;
 }

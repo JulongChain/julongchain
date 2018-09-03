@@ -21,6 +21,8 @@ import org.bcia.julongchain.csp.intfs.opts.ISignerOpts;
 import org.bouncycastle.crypto.CryptoException;
 
 /**
+ * 签名接口,定义获取公钥和签名接口
+ *
  * @author zhangmingyang
  * @Date: 2018/4/18
  * @company Dingxuan

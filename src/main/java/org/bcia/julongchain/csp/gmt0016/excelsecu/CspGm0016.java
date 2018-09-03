@@ -16,7 +16,8 @@
 package org.bcia.julongchain.csp.gmt0016.excelsecu;
 
 import org.bcia.julongchain.common.exception.CspException;
-import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.exception.CspException;
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.exception.SarException;
 import org.bcia.julongchain.csp.gmt0016.excelsecu.algorithm.SHA1;
 import org.bcia.julongchain.csp.gmt0016.excelsecu.algorithm.SHA256;
@@ -186,10 +187,10 @@ public class CspGm0016 implements ICsp {
     }
 
     @Override
-    public IKey keyGen(IKeyGenOpts opts) throws JulongChainException {
+    public IKey keyGen(IKeyGenOpts opts) throws CspException {
 
         if (!checkDevAvailable()) {
-            throw new JulongChainException("device is not available");
+            throw new CspException("device is not available");
         }
         try {
             if (mSkf.skfVerifyPIN(mHApplication, Constants.USER_TYPE, mProperties.getPinCode()) == 0) {
@@ -253,17 +254,17 @@ public class CspGm0016 implements ICsp {
     }
 
     @Override
-    public IKey keyDeriv(IKey k, IKeyDerivOpts opts) throws JulongChainException {
+    public IKey keyDeriv(IKey k, IKeyDerivOpts opts) throws CspException {
 
         if (!checkDevAvailable()) {
-            throw new JulongChainException("device is not available");
+            throw new CspException("device is not available");
         }
 
-        throw new JulongChainException("not allow to import key");
+        throw new CspException("not allow to import key");
     }
 
     @Override
-    public IKey keyImport(Object raw, IKeyImportOpts opts) throws SarException {
+    public IKey keyImport(Object raw, IKeyImportOpts opts) throws CspException{
 
         String containerName = UUID.randomUUID().toString() + TYPE_1;
         long containerHandle = mSkf.skfCreateContainer(mHApplication, containerName);
@@ -285,10 +286,10 @@ public class CspGm0016 implements ICsp {
     }
 
     @Override
-    public IKey getKey(byte[] ski) throws JulongChainException {
+    public IKey getKey(byte[] ski) throws CspException {
 
         if (!checkDevAvailable()) {
-            throw new JulongChainException("device is not available");
+            throw new CspException("device is not available");
         }
         boolean isGetKeyPair;
         String containerName = "";
@@ -361,10 +362,10 @@ public class CspGm0016 implements ICsp {
     }
 
     @Override
-    public byte[] hash(byte[] msg, IHashOpts opts) throws JulongChainException {
+    public byte[] hash(byte[] msg, IHashOpts opts) throws CspException {
 
         if (!checkDevAvailable()) {
-            throw new JulongChainException("device is not available");
+            throw new CspException("device is not available");
         }
 
         if (SM3.equals(opts.getAlgorithm())) {
@@ -382,10 +383,10 @@ public class CspGm0016 implements ICsp {
     }
 
     @Override
-    public IHash getHash(IHashOpts opts) throws JulongChainException {
+    public IHash getHash(IHashOpts opts) throws CspException {
 
         if (!checkDevAvailable()) {
-            throw new JulongChainException("device is not available");
+            throw new CspException("device is not available");
         }
 
         if (SM3.equals(opts.getAlgorithm())) {
@@ -397,10 +398,10 @@ public class CspGm0016 implements ICsp {
     }
 
     @Override
-    public byte[] sign(IKey k, byte[] data, ISignerOpts opts) throws JulongChainException {
+    public byte[] sign(IKey k, byte[] data, ISignerOpts opts) throws CspException {
 
         if (!checkDevAvailable()) {
-            throw new JulongChainException("device is not available");
+            throw new CspException("device is not available");
         }
 
         byte[] digest = new byte[0];
@@ -433,10 +434,10 @@ public class CspGm0016 implements ICsp {
     }
 
     @Override
-    public boolean verify(IKey k, byte[] signature, byte[] data, ISignerOpts opts) throws JulongChainException {
+    public boolean verify(IKey k, byte[] signature, byte[] data, ISignerOpts opts) throws CspException {
 
         if (!checkDevAvailable()) {
-            throw new JulongChainException("device is not available");
+            throw new CspException("device is not available");
         }
 
         if (k instanceof RSAPublicKeyBlob) {
@@ -451,9 +452,9 @@ public class CspGm0016 implements ICsp {
     }
 
     @Override
-    public byte[] encrypt(IKey k, byte[] plaintext, IEncrypterOpts opts) throws JulongChainException {
+    public byte[] encrypt(IKey k, byte[] plaintext, IEncrypterOpts opts) throws CspException {
         if (!checkDevAvailable()) {
-            throw new JulongChainException("device is not available");
+            throw new CspException("device is not available");
         }
 
         String algorithm = opts.getAlgorithm();
@@ -461,7 +462,7 @@ public class CspGm0016 implements ICsp {
                 || algorithm.equals(TRI_DES) || algorithm.equals(SSF33) || algorithm.equals(SM4)) {
 
             if (!(k instanceof GmSymmKey)) {
-                throw new JulongChainException("IKey is not the instance of GmSymmKey");
+                throw new CspException("IKey is not the instance of GmSymmKey");
             }
             GmSymmKey sKey = (GmSymmKey) k;
             try {
@@ -479,7 +480,7 @@ public class CspGm0016 implements ICsp {
 
         if (algorithm.equals(ECC)) {
             if (!(k instanceof GmECCKey)) {
-                throw new JulongChainException("IKey is not the instance of GmECCKey");
+                throw new CspException("IKey is not the instance of GmECCKey");
             }
             GmECCKey eccKey = (GmECCKey) k;
             try {
@@ -494,7 +495,7 @@ public class CspGm0016 implements ICsp {
         }
 
         if (algorithm.equals(RSA)) {
-            throw new JulongChainException("encryption of RSA is not available");
+            throw new CspException("encryption of RSA is not available");
         }
 
         return new byte[0];
@@ -553,8 +554,8 @@ public class CspGm0016 implements ICsp {
     }
 
     @Override
-    public byte[] rng(int len, IRngOpts opts) throws JulongChainException {
-        throw new JulongChainException();
+    public byte[] rng(int len, IRngOpts opts) throws CspException {
+        throw new CspException();
     }
 
 }

@@ -33,6 +33,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 
 /**
+ * 标准组
  * @author zhangmingyang
  * @Date: 2018/5/18
  * @company Dingxuan

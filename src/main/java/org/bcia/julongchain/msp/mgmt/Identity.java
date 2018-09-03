@@ -41,6 +41,8 @@ import java.util.Map;
 import static org.bcia.julongchain.common.util.Convert.bytesToHexString;
 
 /**
+ * 身份实体
+ *
  * @author zhangmingyang
  * @Date: 2018/4/17
  * @company Dingxuan
@@ -96,25 +98,26 @@ public class Identity implements IIdentity {
 
     @Override
     public OUIdentifier[] getOrganizationalUnits() throws MspException {
-        if (certificate==null) {
-          throw new MspException("certificate is null");
+        if (certificate == null) {
+            throw new MspException("certificate is null");
         }
         byte[] cid = this.msp.getCertChainIdentifier(this);
-        OUIdentifier[] res=null;
+        OUIdentifier[] res = null;
         Map<String, String> subject = MspUtil.parseFromString(certificate.getSubject().toString());
-        OUIdentifier ouIdentifier=new OUIdentifier();
+        OUIdentifier ouIdentifier = new OUIdentifier();
         ouIdentifier.setOrganizationalUnitIdentifier(subject.get(MspConstant.ORGANIZATION_UNIT));
         ouIdentifier.setCertifiersIdentifier(cid);
 
-        res= (OUIdentifier[]) ArrayUtils.add(res,ouIdentifier);
+        res = (OUIdentifier[]) ArrayUtils.add(res, ouIdentifier);
         return res;
     }
+
     @Override
     public void verify(byte[] msg, byte[] sig) throws VerifyException {
         boolean verify = false;
         try {
             verify = msp.getCsp().verify(pk, sig, msg, new SM2SignerOpts());
-            if (verify==false) {
+            if (verify == false) {
                 throw new VerifyException("Veify the sign is fail");
             }
         } catch (JulongChainException e) {
@@ -124,12 +127,12 @@ public class Identity implements IIdentity {
 
     @Override
     public byte[] serialize() {
-        byte[] serializedIdentityBytes=null;
+        byte[] serializedIdentityBytes = null;
         Identities.SerializedIdentity.Builder serializedIdentity = Identities.SerializedIdentity.newBuilder();
         serializedIdentity.setMspid(this.identityIdentifier.getMspid());
         try {
             serializedIdentity.setIdBytes(ByteString.copyFrom(certificate.getEncoded()));
-            serializedIdentityBytes=serializedIdentity.build().toByteArray();
+            serializedIdentityBytes = serializedIdentity.build().toByteArray();
         } catch (Exception e) {
             e.printStackTrace();
         }

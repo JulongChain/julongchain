@@ -16,7 +16,7 @@
 package org.bcia.julongchain.csp.intfs.opts;
 
 /**
- * 类描述
+ * hash函数常量
  *
  * @author zhangmingyang
  * @date 2018/05/30

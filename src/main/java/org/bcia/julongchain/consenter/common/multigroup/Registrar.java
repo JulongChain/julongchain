@@ -50,6 +50,8 @@ import static org.bcia.julongchain.common.groupconfig.LogSanityChecks.logPolicy;
 import static org.bcia.julongchain.consenter.common.msgprocessor.SystemGroup.newSystemGroup;
 
 /**
+ * 注册者,实现IChainCreator;IGroupSupportRegistrar;ISupportManager
+ * 处理消息，资源检查，区块写入账本逻辑
  * @author zhangmingyang
  * @Date: 2018/5/8
  * @company Dingxuan

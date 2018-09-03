@@ -15,10 +15,11 @@
  */
 package org.bcia.julongchain.csp.gm.dxct.sm2;
 
+import org.bcia.julongchain.csp.gm.dxct.util.GmCspConstant;
 import org.bcia.julongchain.csp.intfs.opts.IKeyImportOpts;
 
 /**
- * 类描述
+ * sm2公钥导入选项
  *
  * @author zhangmingyang
  * @date 2018/07/06
@@ -27,12 +28,14 @@ import org.bcia.julongchain.csp.intfs.opts.IKeyImportOpts;
 public class SM2PublicKeyImportOpts implements IKeyImportOpts {
 
     private boolean isEphemeral;
+
     public SM2PublicKeyImportOpts(boolean isEphemeral) {
         this.isEphemeral = isEphemeral;
     }
+
     @Override
     public String getAlgorithm() {
-        return "SM2";
+        return GmCspConstant.SM2;
     }
 
     @Override

@@ -24,6 +24,8 @@ import org.bcia.julongchain.protos.consenter.Ab;
 import java.io.IOException;
 
 /**
+ * IBroadcastHandler，提供给boradcast
+ * 服务处理接收到的消息
  * @author zhangmingyang
  * @Date: 2018/6/4
  * @company Dingxuan

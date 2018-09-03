@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.csp.gmt0016.ftsafe.util;
 
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.SarException;
 import org.bcia.julongchain.common.log.JulongChainLog;
@@ -64,7 +65,7 @@ public class GMDigest {
      * @return Digest value
      * @throws JulongChainException
      */
-    public static byte[] getHash(byte[] msg, IGMT0016FactoryOpts opts) throws JulongChainException {
+    public static byte[] getHash(byte[] msg, IGMT0016FactoryOpts opts) throws CspException {
         try {
             long lHashHandle = opts.getSKFFactory().SKF_DigestInit(opts.getDevHandle(), lAlgID, null, null);
             byte[] hashData = opts.getSKFFactory().SKF_Digest(lHashHandle, msg, msg.length);
@@ -73,7 +74,7 @@ public class GMDigest {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
             logger.error(err);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
     }
 

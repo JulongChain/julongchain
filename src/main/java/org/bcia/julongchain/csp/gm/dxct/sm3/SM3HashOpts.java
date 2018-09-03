@@ -1,7 +1,7 @@
 package org.bcia.julongchain.csp.gm.dxct.sm3;
 
 /**
- * Copyright BCIA. All Rights Reserved.
+ * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,22 @@ package org.bcia.julongchain.csp.gm.dxct.sm3;
  * limitations under the License.
  */
 
+import org.bcia.julongchain.csp.gm.dxct.util.GmCspConstant;
 import org.bcia.julongchain.csp.intfs.opts.IHashOpts;
 
 /**
- * @author zhanglin
- * @purpose Define the class, SM3HashOpts
- * @date 2018-01-25
+ * @author zhanglin, zhangmingyang
+ * @date 2018/01/25
  * @company Dingxuan
  */
 
 public class SM3HashOpts implements IHashOpts {
 
-    public SM3HashOpts(){}
+    public SM3HashOpts() {
+    }
 
     @Override
     public String getAlgorithm() {
-        return "SM3";
+        return GmCspConstant.SM3;
     }
 }

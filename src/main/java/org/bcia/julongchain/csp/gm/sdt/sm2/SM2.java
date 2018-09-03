@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.csp.gm.sdt.sm2;
 
-import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.gm.sdt.common.Constants;
@@ -39,9 +39,9 @@ public class SM2 {
     /**
      * 生成SM2公私钥对
      * @return SM2KeyPair SM2密钥对
-     * @throws JulongChainException
+     * @throws CspException
      */
-    public SM2KeyPair generateKeyPair() throws JulongChainException {
+    public SM2KeyPair generateKeyPair() throws CspException {
 
         byte[] privateKey = new byte[Constants.SM2_PRIVATEKEY_LEN];
         byte[] publicKey = new byte[Constants.SM2_PUBLICKEY_LEN];
@@ -50,12 +50,12 @@ public class SM2 {
             publicKey = smJniApi.sm2MakeKey(privateKey);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            throw new JulongChainException(e.getMessage());
+            throw new CspException(e.getMessage());
         }
 
         if (null == privateKey || Constants.SM2_PRIVATEKEY_LEN != privateKey.length
             || null == publicKey || Constants.SM2_PUBLICKEY_LEN != publicKey.length) {
-            throw new JulongChainException("Failed generating SM2 key pair.");
+            throw new CspException("Failed generating SM2 key pair.");
         }
         return new SM2KeyPair(publicKey, privateKey);
     }
@@ -65,9 +65,9 @@ public class SM2 {
      * @param key 原密钥
      * @param length 派生密钥长度
      * @return 派生密钥数据
-     * @throws JulongChainException
+     * @throws CspException
      */
-    public byte[] keyDerive(byte[] key, int length) throws JulongChainException {
+    public byte[] keyDerive(byte[] key, int length) throws CspException {
         //TODO: 待实现
         return null;
     }
@@ -77,16 +77,16 @@ public class SM2 {
      * @param digest 消息摘要
      * @param privateKey 私钥
      * @return 签名值
-     * @throws JulongChainException
+     * @throws CspException
      */
-    public byte[] sign(byte[] digest, byte[] privateKey) throws JulongChainException {
+    public byte[] sign(byte[] digest, byte[] privateKey) throws CspException {
         byte[] result = null;
         try {
             byte[] random = smJniApi.randomGen(Constants.SM2_SIGN_RANDOM_LEN);
             result = smJniApi.sm2Sign(digest, random, privateKey);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            throw new JulongChainException(e.getMessage());
+            throw new CspException(e.getMessage());
         }
         return result;
     }
@@ -97,15 +97,15 @@ public class SM2 {
      * @param publicKey 公钥
      * @param signature 签名值
      * @return 验签结果
-     * @throws JulongChainException
+     * @throws CspException
      */
-    public int verify(byte[] digest, byte[] publicKey, byte[] signature) throws JulongChainException {
+    public int verify(byte[] digest, byte[] publicKey, byte[] signature) throws CspException {
         int result = 1;
         try {
             result = smJniApi.sm2Verify(digest, publicKey, signature);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            throw new JulongChainException(e.getMessage());
+            throw new CspException(e.getMessage());
         }
         return result;
     }

@@ -23,7 +23,8 @@ import static org.bcia.julongchain.msp.mgmt.GlobalMspManagement.getLocalMsp;
 
 /**
  * 根据角色类型构造MSPPrincipal
- * @author sunianle,zhangmingyang
+ *
+ * @author sunianle, zhangmingyang
  * @date 4/2/18
  * @company Dingxuan
  */
@@ -58,7 +59,7 @@ public class MSPPrincipalGetter implements IMspPrincipalGetter {
                         .setPrincipal(ByteString.copyFrom(principalMemberBytes)).build();
                 return mspMembersPrincipal;
             default:
-                throw new MspException(String.format("MSP MSPPrincipalGetter role [%s] not recognized",role));
+                throw new MspException(String.format("MSP MSPPrincipalGetter role [%s] not recognized", role));
         }
     }
 }

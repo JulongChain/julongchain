@@ -14,42 +14,18 @@
  * limitations under the License.
  */
 package org.bcia.julongchain.consenter.entity;
-
 import org.bcia.julongchain.protos.common.Common;
-
-import java.io.Serializable;
 
 /**
  * 配置消息
+ *
  * @author zhangmingyang
- * @Date: 2018/3/15
+ * @date 2018/08/30
  * @company Dingxuan
  */
-public class ConfigMsg implements Serializable{
-    private Common.Envelope config;
-    private long configSeq;
-
-    public ConfigMsg() {
+public class ConfigMessage extends Message {
+    public ConfigMessage(long configSeq, Common.Envelope message){
+        super(configSeq, message);
     }
 
-    public ConfigMsg(Common.Envelope config, long configSeq) {
-        this.config = config;
-        this.configSeq = configSeq;
-    }
-
-    public Common.Envelope getConfig() {
-        return config;
-    }
-
-    public void setConfig(Common.Envelope config) {
-        this.config = config;
-    }
-
-    public long getConfigSeq() {
-        return configSeq;
-    }
-
-    public void setConfigSeq(long configSeq) {
-        this.configSeq = configSeq;
-    }
 }

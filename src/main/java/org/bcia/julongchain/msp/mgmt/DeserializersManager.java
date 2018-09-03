@@ -25,6 +25,7 @@ import java.util.Map;
 
 /**
  * 反序列化管理
+ *
  * @author zhangmingyang
  * @date 2018/07/20
  * @company Dingxuan
@@ -35,14 +36,15 @@ public class DeserializersManager {
 
     /**
      * 身份的反序列化
+     *
      * @param raw
      * @return
      * @throws MspException
      */
     public Identities.SerializedIdentity deserialize(byte[] raw) throws MspException {
-        Identities.SerializedIdentity sId=null;
+        Identities.SerializedIdentity sId = null;
         try {
-            sId= Identities.SerializedIdentity.parseFrom(raw);
+            sId = Identities.SerializedIdentity.parseFrom(raw);
         } catch (InvalidProtocolBufferException e) {
             throw new MspException(e.getMessage());
         }
@@ -51,26 +53,29 @@ public class DeserializersManager {
 
     /**
      * 获取本地msp的身份标识
+     *
      * @return
      */
-    public static String getLoalMspIdentifier(){
-        String id=GlobalMspManagement.getLocalMsp().getIdentifier();
+    public static String getLoalMspIdentifier() {
+        String id = GlobalMspManagement.getLocalMsp().getIdentifier();
         return id;
     }
 
     /**
      * 获取本地的msp
+     *
      * @return
      */
-    public static IMsp getLocalDeserializer(){
+    public static IMsp getLocalDeserializer() {
         return GlobalMspManagement.getLocalMsp();
     }
 
     /**
      * 获取反序列化map
+     *
      * @return
      */
-    public static Map<String,IMspManager> getGroupDeserializers(){
+    public static Map<String, IMspManager> getGroupDeserializers() {
         return MspMgmtMgr.getDeserializers();
     }
 

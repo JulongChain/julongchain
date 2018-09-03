@@ -25,6 +25,8 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 /**
+ * consenterconfig配置加载
+ *
  * @author zhangmingyang
  * @Date: 2018/05/24
  * @company Dingxuan

@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.csp.gm.sdt.sm3;
 
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
@@ -48,13 +49,13 @@ public class SM3 {
      * @return 摘要值
      * @throws JulongChainException
      */
-    public byte[] hash(byte[] message) throws JulongChainException {
+    public byte[] hash(byte[] message) throws CspException {
         byte[] result = null;
         try {
             result = smJniApi.sm3Hash(message);
         } catch (Exception e) {
             logger.error(e.getMessage());
-            throw new JulongChainException(e.getMessage());
+            throw new CspException(e.getMessage());
         }
         return result;
     }

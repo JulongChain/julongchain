@@ -60,6 +60,8 @@ import java.util.Map;
 import static org.bcia.julongchain.msp.mgmt.MspValidate.validateIdentityOus;
 
 /**
+ * msp（成员服务提供者）实体类
+ *
  * @author zhangmingyang
  * @Date: 2018/3/27
  * @company Dingxuan
@@ -396,6 +398,7 @@ public class Msp implements IMsp {
 
     /**
      * 装载根CA证书
+     *
      * @param mspConfig
      * @throws MspException
      */
@@ -415,6 +418,7 @@ public class Msp implements IMsp {
 
     /**
      * 装载admin证书
+     *
      * @param mspConfig
      * @throws IOException
      * @throws MspException
@@ -431,6 +435,7 @@ public class Msp implements IMsp {
 
     /**
      * 获取证书链的身份标识
+     *
      * @param identity
      * @return
      * @throws MspException
@@ -445,6 +450,7 @@ public class Msp implements IMsp {
 
     /**
      * 获取证书链
+     *
      * @param identity
      * @return
      * @throws MspException
@@ -508,6 +514,7 @@ public class Msp implements IMsp {
 
     /**
      * 获取有效的证书链
+     *
      * @param certificate
      * @param isIntermediateChain
      * @return
@@ -523,6 +530,7 @@ public class Msp implements IMsp {
 
     /**
      * 获取唯一有效的验证证书链
+     *
      * @param certificate
      * @param isIntermediateChain
      * @return
@@ -546,7 +554,7 @@ public class Msp implements IMsp {
 
     public void setupCRLs(MspConfigPackage.JuLongMSPConfig mspConfig) {
         //TODO crypto tools 中暂时还没有CRL列表
-        if(mspConfig.getRevocationListList().size()==0){
+        if (mspConfig.getRevocationListList().size() == 0) {
             return;
         }
     }
@@ -562,6 +570,7 @@ public class Msp implements IMsp {
 
     /**
      * 装载TLSCA证书
+     *
      * @param julongMspConfig
      */
     public void setupTLSCAs(MspConfigPackage.JuLongMSPConfig julongMspConfig) {
@@ -570,6 +579,7 @@ public class Msp implements IMsp {
 
     /**
      * 装载组织单元
+     *
      * @param julongMspConfig
      * @throws MspException
      */
@@ -605,6 +615,7 @@ public class Msp implements IMsp {
 
     /**
      * 获取证书Identifier
+     *
      * @param certRaw
      * @return
      * @throws MspException
@@ -622,6 +633,7 @@ public class Msp implements IMsp {
 
     /**
      * 根据配置获取签名身份
+     *
      * @param signingIdentityInfo
      * @return
      * @throws MspException
@@ -652,6 +664,7 @@ public class Msp implements IMsp {
 
     /**
      * 根据配置获取身份的map
+     *
      * @param idBytes
      * @return
      * @throws MspException

@@ -26,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * 区块剪切处理类
+ *
  * @author zhangmingyang
  * @Date: 2018/3/15
  * @company Dingxuan
@@ -64,7 +65,7 @@ public class BlockCutter implements IReceiver {
             batchesMes.setMessageBatches((Common.Envelope[][]) ArrayUtils.add(batchesMes.getMessageBatches(), new Common.Envelope[]{msg}));
         }
 
-        boolean messageWillOverflowBatchSizeBytes = pendingBatchSizeBytes +messageSizeBytes> sharedConfigManager.getBatchSize().getPreferredMaxBytes();
+        boolean messageWillOverflowBatchSizeBytes = pendingBatchSizeBytes + messageSizeBytes > sharedConfigManager.getBatchSize().getPreferredMaxBytes();
         if (messageWillOverflowBatchSizeBytes) {
             log.debug(String.format("The current message, with %s bytes, will overflow the pending batch of %s bytes.", messageSizeBytes, pendingBatchSizeBytes));
             log.debug("Pending batch would overflow if current message is added, cutting batch now.");
@@ -77,10 +78,12 @@ public class BlockCutter implements IReceiver {
         pendingBatchSizeBytes += messageSizeBytes;
 
         batchesMes.setPending(true);
-        if(pendingBatch.length>=sharedConfigManager.getBatchSize().getMaxMessageCount()){
+        if (pendingBatch.length >= sharedConfigManager.getBatchSize().getMaxMessageCount()) {
             log.debug("Batch size met,cutting batch");
             Common.Envelope[] messageBatch = cut();
-            batchesMes.setMessageBatches((Common.Envelope[][]) ArrayUtils.add(batchesMes.getMessageBatches(),messageBatch));
+
+            Common.Envelope[][] MessageBatches = ArrayUtils.add(batchesMes.getMessageBatches(), messageBatch);
+            batchesMes.setMessageBatches(MessageBatches);
             batchesMes.setPending(true);
         }
         return batchesMes;

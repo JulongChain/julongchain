@@ -18,6 +18,8 @@ package org.bcia.julongchain.consenter.entity;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
+ * 消息类,对接收消息进行统一封装
+ *
  * @author zhangmingyang
  * @Date: 2018/6/11
  * @company Dingxuan

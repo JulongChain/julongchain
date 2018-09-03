@@ -22,6 +22,8 @@ import org.bcia.julongchain.protos.common.Common;
 import java.util.Map;
 
 /**
+ * BroadcastSupport对接口IGroupSupportRegistrar
+ * 的实现,调用Registrar的具体实现
  * @author zhangmingyang
  * @Date: 2018/6/6
  * @company Dingxuan

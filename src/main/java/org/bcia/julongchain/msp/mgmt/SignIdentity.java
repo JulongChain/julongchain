@@ -31,6 +31,7 @@ import static org.bcia.julongchain.csp.factory.CspManager.getDefaultCsp;
 
 /**
  * 签名身份实体
+ *
  * @author zhangmingyang
  * @date 2018/07/04
  * @company Dingxuan

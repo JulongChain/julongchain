@@ -21,10 +21,18 @@ import org.bcia.julongchain.common.groupconfig.IGroupConfigBundle;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
+ * 通道配置模板
+ *
  * @author zhangmingyang
  * @Date: 2018/5/8
  * @company Dingxuan
  */
 public interface IGroupConfigTemplator {
+    /**
+     * 创建群组配置
+     * @param envelope
+     * @return
+     * @throws InvalidProtocolBufferException
+     */
     IGroupConfigBundle newGroupConfig(Common.Envelope envelope) throws InvalidProtocolBufferException;
 }

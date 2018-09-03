@@ -23,6 +23,7 @@ import org.bcia.julongchain.csp.intfs.opts.ISignerOpts;
 
 /**
  * node节点签名
+ *
  * @author zhangmingyang
  * @Date: 2018/4/18
  * @company Dingxuan
@@ -36,18 +37,19 @@ public class NodeSigner implements ISigner {
         this.csp = csp;
         this.sk = sk;
     }
+
     @Override
     public Object getPublicKey() {
         return this.pk;
     }
 
     @Override
-    public byte[] sign(IKey key, byte[] msgContent, ISignerOpts opts) throws MspException{
-        byte[] signature=null;
+    public byte[] sign(IKey key, byte[] msgContent, ISignerOpts opts) throws MspException {
+        byte[] signature = null;
         try {
-            signature=this.csp.sign(this.sk,msgContent,opts);
+            signature = this.csp.sign(this.sk, msgContent, opts);
         } catch (JulongChainException e) {
-           throw new MspException(e.getMessage());
+            throw new MspException(e.getMessage());
         }
         return signature;
     }

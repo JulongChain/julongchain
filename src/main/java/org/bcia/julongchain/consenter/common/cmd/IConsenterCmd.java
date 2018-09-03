@@ -19,10 +19,16 @@ package org.bcia.julongchain.consenter.common.cmd;
 import org.apache.commons.cli.ParseException;
 
 /**
+ * consenter命令行接口
  * @author zhangmingyang
  * @Date: 2018/3/1
  * @company Dingxuan
  */
 public interface IConsenterCmd {
+    /**
+     * cmd命令执行方法
+     * @param args
+     * @throws ParseException
+     */
     void execCmd(String[] args) throws ParseException;
 }

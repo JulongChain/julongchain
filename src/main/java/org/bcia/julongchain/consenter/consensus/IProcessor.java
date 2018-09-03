@@ -23,6 +23,7 @@ import org.bcia.julongchain.consenter.entity.ConfigMsg;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
+ * 处理者接口,对各类消息的排序处理
  * @author zhangmingyang
  * @Date: 2018/3/7
  * @company Dingxuan

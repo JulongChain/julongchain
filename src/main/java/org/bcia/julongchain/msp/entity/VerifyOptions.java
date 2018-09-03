@@ -16,7 +16,7 @@
 package org.bcia.julongchain.msp.entity;
 
 /**
- *
+ * 验证选项
  * @author zhangmingyang
  * @Date: 2018/3/15
  * @company Dingxuan

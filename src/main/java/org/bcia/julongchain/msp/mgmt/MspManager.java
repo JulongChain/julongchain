@@ -28,13 +28,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * IMspManager的实现
+ *
  * @author zhangmingyang
  * @Date: 2018/3/13
  * @company Dingxuan
  */
 public class MspManager implements IMspManager {
     private static JulongChainLog log = JulongChainLogFactory.getLog(MspManager.class);
-    public  static Map<String, IMsp> mspsMap = new HashMap<String, IMsp>();
+    public static Map<String, IMsp> mspsMap = new HashMap<String, IMsp>();
     private boolean up;
     private static Map<Integer, IMsp> mspsByProviders = new HashMap<>();
 
@@ -43,47 +45,48 @@ public class MspManager implements IMspManager {
 
     @Override
     public void setup(IMsp[] msps) throws MspException {
-        if(up==true){
+        if (up == true) {
             log.info("MSP manager already up");
         }
 
-        log.debug(String .format("Setting up the MSP manager (%d msps)", msps.length));
+        log.debug(String.format("Setting up the MSP manager (%d msps)", msps.length));
 
-        for (IMsp msp: msps) {
-            String mspId= msp.getIdentifier();
-            int providerType=msp.getType();
-            mspsMap.put(mspId,msp);
-            mspsByProviders.put(providerType,msp);
+        for (IMsp msp : msps) {
+            String mspId = msp.getIdentifier();
+            int providerType = msp.getType();
+            mspsMap.put(mspId, msp);
+            mspsByProviders.put(providerType, msp);
         }
-        up=true;
+        up = true;
         log.debug(String.format("MSP manager setup complete, setup %d msps", msps.length));
 
     }
 
     /**
      * 获取msp集合
+     *
      * @return
      * @throws MspException
      */
-    public Map<String, IMsp> getMSPs() throws MspException{
+    public Map<String, IMsp> getMSPs() throws MspException {
         return mspsMap;
     }
 
     @Override
-    public IIdentity deserializeIdentity(byte[] serializedID) throws MspException{
-        IMsp msp=null;
+    public IIdentity deserializeIdentity(byte[] serializedID) throws MspException {
+        IMsp msp = null;
         try {
-            Identities.SerializedIdentity sId=Identities.SerializedIdentity.parseFrom(serializedID);
+            Identities.SerializedIdentity sId = Identities.SerializedIdentity.parseFrom(serializedID);
             msp = mspsMap.get(sId.getMspid());
         } catch (Exception e) {
-          throw new MspException(e.getMessage());
+            throw new MspException(e.getMessage());
         }
         return msp.deserializeIdentity(serializedID);
     }
 
     @Override
     public void isWellFormed(Identities.SerializedIdentity identity) {
-        Msp msp= (Msp) mspsByProviders.get(0);
+        Msp msp = (Msp) mspsByProviders.get(0);
         msp.isWellFormed(identity);
     }
 

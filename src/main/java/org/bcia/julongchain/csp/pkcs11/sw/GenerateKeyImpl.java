@@ -54,6 +54,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DESedeKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.util.Convert;
 import org.bcia.julongchain.csp.intfs.IKey;
@@ -82,7 +83,7 @@ public class GenerateKeyImpl {
     private static final String encodeRules = "fendo";
     private static final int rowlen = 64;
 
-    public static void writefile(byte[] raw, String path) throws JulongChainException{
+    public static void writefile(byte[] raw, String path) throws CspException{
         try {
             String keyencode= HexBin.encode(raw);
             File file=new File(path);
@@ -93,7 +94,7 @@ public class GenerateKeyImpl {
         } catch (Exception e) {
             // TODO: handle exception
             e.printStackTrace();
-            throw new JulongChainException("[JC_PKCS_SOFT]:Writefile failed! ErrMessage: %s\", e.getMessage()");
+            throw new CspException("[JC_PKCS_SOFT]:Writefile failed! ErrMessage: %s\", e.getMessage()");
         }
     }
 
@@ -207,12 +208,12 @@ public class GenerateKeyImpl {
         return privateKey;
     }
 
-    public static void savePublicKeyAsPEM(byte[] encode, String path) throws JulongChainException {
+    public static void savePublicKeyAsPEM(byte[] encode, String path) throws CspException {
         try {
             String content = Base64Utils.encodeToString(encode);
             File file = new File(path + "/public.pem");
             if ( file.isFile() && file.exists() )
-            	throw new JulongChainException("[JC_PKCS_SOFT]:File already exists");
+            	throw new CspException("[JC_PKCS_SOFT]:File already exists");
             try (RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw")) {
                 randomAccessFile.write("-----BEGIN PUBLIC KEY-----\n".getBytes());
                 int i = 0;
@@ -228,20 +229,20 @@ public class GenerateKeyImpl {
         }catch(FileNotFoundException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:FileNotFoundException ErrMessage: %s", e.getMessage());
-            throw new JulongChainException(err, e.getCause());
+            throw new CspException(err, e.getCause());
         }catch(IOException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:IOException ErrMessage: %s", e.getMessage());
-            throw new JulongChainException(err, e.getCause());
+            throw new CspException(err, e.getCause());
         }
     }
 
-    public static void savePrivateKeyAsPEM(byte[] encode, String path) throws JulongChainException {
+    public static void savePrivateKeyAsPEM(byte[] encode, String path) throws CspException {
         try {
             String content = Base64Utils.encodeToString(encode);
             File file = new File(path + "/private.pem");
             if ( file.isFile() && file.exists() )
-                throw new JulongChainException("[JC_PKCS_SOFT]:File already exists");
+                throw new CspException("[JC_PKCS_SOFT]:File already exists");
             try (RandomAccessFile randomAccessFile = new RandomAccessFile(file, "rw")) {
                 randomAccessFile.write("-----BEGIN PRIVATE KEY-----\n".getBytes());
                 int i = 0;
@@ -256,11 +257,11 @@ public class GenerateKeyImpl {
         }catch(FileNotFoundException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:FileNotFoundException ErrMessage: %s", e.getMessage());
-            throw new JulongChainException(err, e.getCause());
+            throw new CspException(err, e.getCause());
         }catch(IOException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:IOException ErrMessage: %s", e.getMessage());
-            throw new JulongChainException(err, e.getCause());
+            throw new CspException(err, e.getCause());
         }
     }
 
@@ -346,7 +347,7 @@ public class GenerateKeyImpl {
 
     }
 
-    public IKey genAESKey(int size) throws JulongChainException{
+    public IKey genAESKey(int size) throws CspException{
 
         try {
             //1.构造密钥生成器，指定为AES算法,不区分大小写
@@ -368,12 +369,12 @@ public class GenerateKeyImpl {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:NoSuchAlgorithmException ErrMessage: %s", e.getMessage());
-            throw new JulongChainException(err, e.getCause());
+            throw new CspException(err, e.getCause());
         }
     }
 
 
-    public IKey genRsaKey(int size) throws JulongChainException{
+    public IKey genRsaKey(int size) throws CspException {
         try {
             KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
             generator.initialize(size, new SecureRandom());
@@ -395,11 +396,11 @@ public class GenerateKeyImpl {
         }catch(NoSuchAlgorithmException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(IOException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:IOException ErrMessage: %s", ex.getMessage());
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
     }
 
@@ -410,7 +411,7 @@ public class GenerateKeyImpl {
      * @return IKey
      * @throws JulongChainException
      */
-    public IKey genEcdsaKey(String curveName) throws JulongChainException{
+    public IKey genEcdsaKey(String curveName) throws CspException{
         try {
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("EC","SunEC");
             ECGenParameterSpec ecGenParameterSpec = new ECGenParameterSpec(curveName);
@@ -438,15 +439,15 @@ public class GenerateKeyImpl {
         }catch(NoSuchAlgorithmException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(InvalidAlgorithmParameterException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:InvalidAlgorithmParameterException ErrMessage: %s", ex.getMessage());
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(NoSuchProviderException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:NoSuchProviderException ErrMessage: %s", ex.getMessage());
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
 
 

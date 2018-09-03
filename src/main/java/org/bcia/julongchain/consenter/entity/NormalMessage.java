@@ -13,17 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.consenter.consensus;
+package org.bcia.julongchain.consenter.entity;
+
+import org.bcia.julongchain.protos.common.Common;
 
 /**
+ * 普通消息
+ *
  * @author zhangmingyang
- * @Date: 2018/3/7
+ * @date 2018/08/30
  * @company Dingxuan
  */
-public interface IOrdererCapabilities {
-    public boolean setChannelModPolicyDuringCreate();
+public class NormalMessage extends Message {
+    public NormalMessage(long configSeq, Common.Envelope message) {
+        super(configSeq, message);
+    }
 
-    public boolean resubmission();
-
-    public void supported();
 }

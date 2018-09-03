@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.csp.pkcs11.ecdsa;
 
-import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.util.Convert;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.pkcs11.IPKCS11FactoryOpts;
@@ -66,7 +66,7 @@ public class EcdsaImpl {
          * @param opts        p11 factory
          * @return
          */
-        public void generateECKey(int keySize, boolean ephemeral, IPKCS11FactoryOpts opts) throws JulongChainException {
+        public void generateECKey(int keySize, boolean ephemeral, IPKCS11FactoryOpts opts) throws CspException {
             try {
             	
                 ECParameterSpec params = ECUtil.getECParameterSpec(Security.getProvider("SunEC"), keySize);
@@ -129,17 +129,17 @@ public class EcdsaImpl {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
                 EcdsaImpl.setLoggerErr(err, CLS_GENKEY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }catch(IOException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:IOException ErrMessage: %s", ex.getMessage());
                 EcdsaImpl.setLoggerErr(err, CLS_GENKEY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
                 EcdsaImpl.setLoggerErr(err, CLS_GENKEY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }
 
         }
@@ -164,7 +164,7 @@ public class EcdsaImpl {
          * @param flagpubkey    公钥标记
          * @return 公钥摘要
          */
-        public static byte[] importECKey(byte[] prider, byte[] pubder, boolean ephemeral, IPKCS11FactoryOpts opts, boolean flagpubkey)  throws JulongChainException{
+        public static byte[] importECKey(byte[] prider, byte[] pubder, boolean ephemeral, IPKCS11FactoryOpts opts, boolean flagpubkey)  throws CspException{
 
             try {
                 byte[] byteSKI;
@@ -236,27 +236,27 @@ public class EcdsaImpl {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
                 EcdsaImpl.setLoggerErr(err, CLS_IMPORTKEY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
                 EcdsaImpl.setLoggerErr(err, CLS_IMPORTKEY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }catch(InvalidKeySpecException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:InvalidKeySpecException ErrMessage: %s", ex.getMessage());
                 EcdsaImpl.setLoggerErr(err, CLS_IMPORTKEY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }catch( NoSuchProviderException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:NoSuchProviderException ErrMessage: %s", ex.getMessage());
                 EcdsaImpl.setLoggerErr(err, CLS_IMPORTKEY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
                 EcdsaImpl.setLoggerErr(err, CLS_IMPORTKEY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }
 
         }
@@ -269,7 +269,7 @@ public class EcdsaImpl {
          * @param pubder        公钥DER编码
          * @return IKey
          */
-        public static IKey getKey(byte[] ski, byte[] pubder, byte[] prider) throws JulongChainException{
+        public static IKey getKey(byte[] ski, byte[] pubder, byte[] prider) throws CspException{
 
             if(prider == null)
             {
@@ -298,9 +298,9 @@ public class EcdsaImpl {
          * @param flagprikey    Key type identification(PrivateKey: True  PublicKey: Flase)
          * @param opts          P11 factory
          * @return  IKey instance of EcdsaKeyOpts.EcdsaPubKey
-         * @throws JulongChainException
+         * @throws CspException
          */
-    	public static IKey deriveKey(byte[] ski, boolean ephemeral, boolean flagprikey, IPKCS11FactoryOpts opts) throws JulongChainException {
+    	public static IKey deriveKey(byte[] ski, boolean ephemeral, boolean flagprikey, IPKCS11FactoryOpts opts) throws CspException {
     		try {    		
     			List<CK_ATTRIBUTE> keyTemplate = new ArrayList<CK_ATTRIBUTE>();
     			if(!flagprikey)
@@ -309,7 +309,7 @@ public class EcdsaImpl {
     				if (keypbu==null || keypbu.length==0) {
                         String str=String.format("[JC_PKCS]:No Find Key");
                         EcdsaImpl.setLoggerErr(str, CLS_DERIV);
-                        throw new JulongChainException(str);
+                        throw new CspException(str);
                     }
     				keyTemplate.add(new CK_ATTRIBUTE(CKA_CLASS, CKO_PUBLIC_KEY));
                     keyTemplate.add(new CK_ATTRIBUTE(CKA_KEY_TYPE, CKK_EC));
@@ -344,7 +344,7 @@ public class EcdsaImpl {
     				if (keypri==null || keypri.length==0) {
                         String str=String.format("[JC_PKCS]:No Find Key");
                         EcdsaImpl.setLoggerErr(str, CLS_DERIV);
-                        throw new JulongChainException(str);
+                        throw new CspException(str);
                     }
     				
     				keyTemplate.add(new CK_ATTRIBUTE(CKA_CLASS, CKO_PRIVATE_KEY));
@@ -397,12 +397,12 @@ public class EcdsaImpl {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
                 EcdsaImpl.setLoggerErr(err, CLS_DERIV);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             } catch(IOException ex) {
             	ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:IOException ErrMessage: %s", ex.getMessage());
                 EcdsaImpl.setLoggerErr(err, CLS_DERIV);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }
     	}
     }
@@ -425,7 +425,7 @@ public class EcdsaImpl {
             GetkeyEcKey.opts = opts;
         }
 
-        public static IKey getkey() throws JulongChainException{
+        public static IKey getkey() throws CspException{
 
             try {
 
@@ -460,17 +460,17 @@ public class EcdsaImpl {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
                 EcdsaImpl.setLoggerErr(err, CLS_GETKEY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }catch(IOException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:IOException ErrMessage: %s", ex.getMessage());
                 EcdsaImpl.setLoggerErr(err, CLS_GETKEY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
                 EcdsaImpl.setLoggerErr(err, CLS_GETKEY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }
         }
 
@@ -499,7 +499,7 @@ public class EcdsaImpl {
          * @param newMechanism  the mechanism
          * @param opts          p11factory
          */
-        public static byte[] signECDSA(byte[] ski, byte[] digest, long newMechanism, IPKCS11FactoryOpts opts) throws JulongChainException{
+        public static byte[] signECDSA(byte[] ski, byte[] digest, long newMechanism, IPKCS11FactoryOpts opts) throws CspException{
 
             try {
                 long[] privatekey = findKeypairFromSKI(opts, true, ski);
@@ -507,7 +507,7 @@ public class EcdsaImpl {
                 {
                     String str=String.format("[JC_PKCS]:No Find Key");
                     EcdsaImpl.setLoggerErr(str, CLS_SIGN);
-                    throw new JulongChainException(str);
+                    throw new CspException(str);
                 }
                 CK_MECHANISM ckMechanism = new CK_MECHANISM();
                 ckMechanism.mechanism = newMechanism;
@@ -519,12 +519,12 @@ public class EcdsaImpl {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
                 EcdsaImpl.setLoggerErr(err, CLS_SIGN);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
                 EcdsaImpl.setLoggerErr(err, CLS_SIGN);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }
 
         }
@@ -554,7 +554,7 @@ public class EcdsaImpl {
          * @param newMechanism  the alg
          * @param opts          p11factory
          */
-        public boolean verifyECDSA(byte[] ski, byte[] signature, byte[] digest, long newMechanism, IPKCS11FactoryOpts opts) throws JulongChainException{
+        public boolean verifyECDSA(byte[] ski, byte[] signature, byte[] digest, long newMechanism, IPKCS11FactoryOpts opts) throws CspException{
 
             try {
 
@@ -562,7 +562,7 @@ public class EcdsaImpl {
                 if (publickey==null || publickey.length==0) {
                     String str=String.format("[JC_PKCS]:No Find Key");
                     EcdsaImpl.setLoggerErr(str, CLS_VERIFY);
-                    throw new JulongChainException(str);
+                    throw new CspException(str);
                 }
 
                 CK_MECHANISM ckMechanism = new CK_MECHANISM();
@@ -580,7 +580,7 @@ public class EcdsaImpl {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
                 EcdsaImpl.setLoggerErr(err, CLS_VERIFY);
-                throw new JulongChainException(err, ex.getCause());
+                throw new CspException(err, ex.getCause());
             }
         }
     }
@@ -593,7 +593,7 @@ public class EcdsaImpl {
      * @param bPri      private flag
      * @param ski       cka_id value
      */
-    public static long[] findKeypairFromSKI(IPKCS11FactoryOpts opts, boolean bPri, byte[] ski) throws JulongChainException{
+    public static long[] findKeypairFromSKI(IPKCS11FactoryOpts opts, boolean bPri, byte[] ski) throws CspException{
 
         long keyclass = CKO_PUBLIC_KEY;
         if(bPri){
@@ -614,12 +614,12 @@ public class EcdsaImpl {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
             setLoggerErr(err, CLS_SELF);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(Exception ex) {
         	ex.printStackTrace();
         	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
             setLoggerErr(err, CLS_SELF);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
     }
 
@@ -627,7 +627,7 @@ public class EcdsaImpl {
      * Get Publickey DER Encoding of ASN.1 Types
      *
      */
-    private static byte[] getPublicDer(byte[] attecpoint, ECParameterSpec params) throws JulongChainException{
+    private static byte[] getPublicDer(byte[] attecpoint, ECParameterSpec params) throws CspException{
         try {
             ECPoint w = ECUtil.decodePoint(attecpoint, params.getCurve());
             KeyFactory keyFactory = KeyFactory.getInstance("EC");
@@ -638,22 +638,22 @@ public class EcdsaImpl {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:IOException ErrMessage: %s", ex.getMessage());
             setLoggerErr(err, CLS_SELF);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(NoSuchAlgorithmException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
             setLoggerErr(err, CLS_SELF);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(InvalidKeySpecException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:InvalidKeySpecException ErrMessage: %s", ex.getMessage());
             setLoggerErr(err, CLS_SELF);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(Exception ex) {
         	ex.printStackTrace();
         	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
             setLoggerErr(err, CLS_SELF);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
     }
 
@@ -662,7 +662,7 @@ public class EcdsaImpl {
      * get public key hash data
      *
      */
-    private static byte[] getPublicHash(byte[] attecpoint) throws JulongChainException {
+    private static byte[] getPublicHash(byte[] attecpoint) throws CspException {
         try {
             byte[] tempecpt = DataUtil.data(attecpoint);
             MessageDigest shahash = MessageDigest.getInstance("SHA-1");
@@ -672,12 +672,12 @@ public class EcdsaImpl {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
             setLoggerErr(err, CLS_SELF);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
             setLoggerErr(err, CLS_SELF);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
     }
     

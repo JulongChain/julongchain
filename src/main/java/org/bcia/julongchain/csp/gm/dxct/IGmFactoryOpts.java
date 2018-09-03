@@ -1,7 +1,7 @@
 package org.bcia.julongchain.csp.gm.dxct;
 
 /**
- * Copyright BCIA. All Rights Reserved.
+ * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,20 +19,18 @@ package org.bcia.julongchain.csp.gm.dxct;
 import org.bcia.julongchain.csp.factory.IFactoryOpts;
 
 /**
- * @author zhanglin
- * @purpose Define the interface, IGmFactoryOpts
- * @date 2018-01-25
+ * 国密工厂选项
+ * @author zhanglin,zhangmingyang
+ * @date 2018/01/25
  * @company Dingxuan
  */
 
 // The IGmFactoryOpts contains options for the GmFactory.
 public interface IGmFactoryOpts extends IFactoryOpts {
 
-    //Algorithm options.
     int getSecLevel();
     String getHashFamily();
 
-    // Keystore options.
     boolean isEphemeral();
     String getKeyStorePath();
     boolean isDummyKeystore();

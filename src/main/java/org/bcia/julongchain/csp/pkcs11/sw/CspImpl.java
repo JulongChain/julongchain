@@ -22,6 +22,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IHash;
@@ -61,10 +62,10 @@ public class CspImpl implements ICsp {
     }
 
     @Override
-    public IKey keyGen(IKeyGenOpts opts) throws JulongChainException {
+    public IKey keyGen(IKeyGenOpts opts) throws CspException {
         if (opts == null) {
         	csplog.setLogMsg("[JC_PKCS_SOFT]:KeyGen Param Err!", csplog.LEVEL_ERROR, PKCS11Csp.class);
-        	throw new JulongChainException("[JC_PKCS_SOFT]:Param Err!");
+        	throw new CspException("[JC_PKCS_SOFT]:Param Err!");
         }
         IKey key;
         GenerateKeyImpl gen = new GenerateKeyImpl();
@@ -189,18 +190,18 @@ public class CspImpl implements ICsp {
     }
 
     @Override
-    public IKey keyDeriv(IKey key, IKeyDerivOpts opts) throws JulongChainException {
+    public IKey keyDeriv(IKey key, IKeyDerivOpts opts) throws CspException {
         return null;
     }
 
     @Override
-    public IKey keyImport(Object raw, IKeyImportOpts opts) throws JulongChainException {
+    public IKey keyImport(Object raw, IKeyImportOpts opts) throws CspException {
         return null;
     }
 
 
     @Override
-    public IKey getKey(byte[] ski) throws JulongChainException {
+    public IKey getKey(byte[] ski) throws CspException {
 /*
 		File dir = new File(PKCS11SwFactoryOpts.getPath());
         File[] files = dir.listFiles(); // 该文件目录下文件全部放入数组
@@ -242,7 +243,7 @@ public class CspImpl implements ICsp {
 
 
     @Override
-    public byte[] hash(byte[] msg, IHashOpts opts) throws JulongChainException {
+    public byte[] hash(byte[] msg, IHashOpts opts) throws CspException {
 
         DigestImpl hashimpl = new DigestImpl();
         if(opts instanceof PKCS11HashOpts.MD2Opts)
@@ -279,7 +280,7 @@ public class CspImpl implements ICsp {
     }
 
     @Override
-    public IHash getHash(IHashOpts opts) throws JulongChainException {
+    public IHash getHash(IHashOpts opts) throws CspException {
 
         HashImpl hashimpl = new HashImpl();
         return hashimpl.getHash(opts.getAlgorithm());
@@ -287,7 +288,7 @@ public class CspImpl implements ICsp {
     }
 
     @Override
-    public byte[] sign(IKey key, byte[] digest, ISignerOpts opts) throws JulongChainException {
+    public byte[] sign(IKey key, byte[] digest, ISignerOpts opts) throws CspException {
 
         if(((key instanceof RsaKeyOpts.RsaPriKey) && (opts instanceof RsaSignOpts))
                 ||((key instanceof EcdsaKeyOpts.EcdsaPriKey) && (opts instanceof EcdsaSignOpts))) {
@@ -296,12 +297,12 @@ public class CspImpl implements ICsp {
             byte[] signatura = signdata.signData(key, digest, opts.getAlgorithm());
             return signatura;
         }else {
-            throw new JulongChainException("[JC_PKCS_SOFT]:Parameter error or mismatch");
+            throw new CspException("[JC_PKCS_SOFT]:Parameter error or mismatch");
         }
     }
 
     @Override
-    public boolean verify(IKey key, byte[] signature, byte[] digest, ISignerOpts opts) throws JulongChainException {
+    public boolean verify(IKey key, byte[] signature, byte[] digest, ISignerOpts opts) throws CspException {
 
         if(((key instanceof RsaKeyOpts.RsaPriKey) && (opts instanceof RsaSignOpts))
                 ||((key instanceof EcdsaKeyOpts.EcdsaPriKey) && (opts instanceof EcdsaSignOpts))) {
@@ -309,12 +310,12 @@ public class CspImpl implements ICsp {
             boolean rv = verifydata.verifyData(key, digest, signature, opts.getAlgorithm());
             return rv;
         }else {
-            throw new JulongChainException("[JC_PKCS_SOFT]:Parameter error or mismatch");
+            throw new CspException("[JC_PKCS_SOFT]:Parameter error or mismatch");
         }
     }
 
     @Override
-    public byte[] encrypt(IKey key, byte[] plaintext, IEncrypterOpts opts) throws JulongChainException {
+    public byte[] encrypt(IKey key, byte[] plaintext, IEncrypterOpts opts) throws CspException {
 
         EncryptImpl encryptdata = new EncryptImpl();
         if (opts instanceof RsaEncrypterOpts) {
@@ -326,12 +327,12 @@ public class CspImpl implements ICsp {
                     ((AesEncrypterOpts) opts).getPadding());
             return encodedata;
         }else {
-            throw new JulongChainException("[JC_PKCS_SOFT]:Parameter error or mismatch");
+            throw new CspException("[JC_PKCS_SOFT]:Parameter error or mismatch");
         }
     }
 
     @Override
-    public byte[] decrypt(IKey key, byte[] ciphertext, IDecrypterOpts opts) throws JulongChainException {
+    public byte[] decrypt(IKey key, byte[] ciphertext, IDecrypterOpts opts) throws CspException {
         DecryptImpl decryptdata = new DecryptImpl();
         if (opts instanceof RsaDecrypterOpts) {
             byte[] data = decryptdata.decryptData(key, ciphertext, ((RsaDecrypterOpts) opts).getMode(),
@@ -342,12 +343,12 @@ public class CspImpl implements ICsp {
                     ((AesDecrypterOpts) opts).getMode());
             return data;
         }else {
-            throw new JulongChainException("[JC_PKCS_SOFT]:Parameter error or mismatch");
+            throw new CspException("[JC_PKCS_SOFT]:Parameter error or mismatch");
         }
     }
 
     @Override
-    public byte[] rng(int len, IRngOpts opts) throws JulongChainException {
+    public byte[] rng(int len, IRngOpts opts) throws CspException {
         byte[] none=new SecureRandom().engineGenerateSeed(len);
         return none;
     }

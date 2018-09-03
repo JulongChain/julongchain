@@ -23,6 +23,7 @@ import org.bcia.julongchain.csp.factory.CspOptsManager;
 import org.bcia.julongchain.csp.factory.IFactoryOpts;
 import org.bcia.julongchain.msp.*;
 import org.bcia.julongchain.msp.mspconfig.MspConfig;
+import org.bcia.julongchain.msp.mspconfig.MspConfigFactory;
 import org.bcia.julongchain.msp.util.MspConfigBuilder;
 import org.bcia.julongchain.protos.msp.MspConfigPackage;
 
@@ -36,6 +37,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import static org.bcia.julongchain.msp.mspconfig.MspConfigFactory.loadMspConfig;
 
 /**
+ * 全局msp管理类
+ *
  * @author zhangmingyang
  * @Date: 2018/4/12
  * @company Dingxuan
@@ -53,6 +56,7 @@ public class GlobalMspManagement {
 
     /**
      * 通过类型加载本地msp
+     *
      * @param localmspdir
      * @param optsList
      * @param mspId
@@ -68,12 +72,13 @@ public class GlobalMspManagement {
             throw new MspException(String.format("The %s dir is not find", localmspdir));
         }
         MspConfigPackage.MSPConfig buildMspConfig = MspConfigBuilder.buildMspConfig(localmspdir, mspId);
-        localMsp=new Msp().setup(buildMspConfig);
+        localMsp = new Msp().setup(buildMspConfig);
         return localMsp;
     }
 
     /**
      * 加载本地msp
+     *
      * @return
      * @throws MspException
      */
@@ -83,17 +88,13 @@ public class GlobalMspManagement {
 
     /**
      * 获取本地msp
+     *
      * @return
      */
-    public static IMsp getLocalMsp(){
+    public static IMsp getLocalMsp() {
         if (localMsp == null) {
             //读取配置文件构造选项集合
-            MspConfig mspConfig = null;
-            try {
-                mspConfig = loadMspConfig();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
+            MspConfig mspConfig = MspConfigFactory.loadMspConfig();
             MspConfigPackage.MSPConfig buildMspConfig = null;
             buildMspConfig = MspConfigBuilder.buildMspConfig(mspConfig.getNode().getMspConfigPath(), mspConfig.getNode().getLocalMspId());
             localMsp = new Msp().setup(buildMspConfig);
@@ -104,6 +105,7 @@ public class GlobalMspManagement {
 
     /**
      * 初始化本地msp
+     *
      * @throws MspException
      */
     public static void initLocalMsp() throws MspException {
@@ -115,7 +117,7 @@ public class GlobalMspManagement {
             String defaultOpts = mspConfig.getNode().getCsp().getDefaultValue();
 
             CspOptsManager cspOptsManager = CspOptsManager.getInstance();
-            cspOptsManager.addAll(defaultOpts,mspConfig.getNode().getCsp().getFactoryOpts());
+            cspOptsManager.addAll(defaultOpts, mspConfig.getNode().getCsp().getFactoryOpts());
             List<IFactoryOpts> optsList = cspOptsManager.getFactoryOptsList();
 
             GlobalMspManagement.loadLocalMspWithType(mspConfigDir, optsList, defaultOpts, mspId);

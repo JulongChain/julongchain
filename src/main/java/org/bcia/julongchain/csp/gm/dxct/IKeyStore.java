@@ -24,12 +24,22 @@ import org.bcia.julongchain.csp.intfs.IKey;
  * @company Dingxuan
  */
 public interface IKeyStore {
-    // ReadOnly returns true if this KeyStore is read only, false otherwise.
-    // If ReadOnly is true then StoreKey will fail.
+    /**
+     * 只读返回 true,返回值为true时,存储密钥将失败
+     * @return
+     */
     boolean readOnly();
-    // GetKey returns a key object whose SKI is the one passed.
+    /**
+     * 获取蜜钥，返回一个密钥对象,其ski是传递的密钥对象
+     * @param ski
+     * @return
+     * @throws JulongChainException
+     */
     IKey getKey(byte[] ski) throws JulongChainException;
-    // StoreKey stores the key k in this KeyStore.
-    // If this KeyStore is read only then the method will fail.
+    /**
+     * 存储密钥到密钥库,如果密钥库是制度的
+     * 该方法无效
+     * @param ikey
+     */
     void storeKey(IKey ikey);
 }
