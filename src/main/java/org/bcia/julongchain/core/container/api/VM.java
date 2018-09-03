@@ -15,7 +15,10 @@
  */
 package org.bcia.julongchain.core.container.api;
 
-import org.bcia.julongchain.core.container.ccintf.SCID;
+import org.bcia.julongchain.common.exception.VMException;
+import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractContext;
+import org.bcia.julongchain.core.container.scintf.SCID;
+import org.bcia.julongchain.core.smartcontract.shim.SmartContractBase;
 
 import javax.naming.Context;
 import java.io.Reader;
@@ -30,18 +33,17 @@ import java.util.Map;
  */
 public interface VM {
 
-    void deploy(Context ctxt, SCID ccid, String[] args, String[] env, Reader
-            reader);
+	void deploy(SmartContractBase smartContract,
+				SmartContractContext scc,
+				String[] args,
+				String envs) throws VMException;
 
-    void start(Context ctxt, SCID ccid, String[] args, String[] env,
-               Map<String, byte[]> filesToUpload, IBuildSpecFactory build,
-               IPrelaunchFunc preLaunchFunc);
+    void start() throws VMException;
 
-    void stop(Context ctxt, SCID ccid, Long timeout, Boolean dontkill,
-              Boolean dontremove);
+    void stop() throws VMException;
 
-    void destroy(Context ctxt, SCID ccid, Boolean force, Boolean noprune);
+    void destroy() throws VMException;
 
-    String getVMName(SCID ccID, IFormat format);
+    String getVMName(SCID ccID, IFormatter format) throws VMException;
 
 }

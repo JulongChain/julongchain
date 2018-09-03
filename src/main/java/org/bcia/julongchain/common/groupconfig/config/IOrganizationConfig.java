@@ -16,7 +16,7 @@
 package org.bcia.julongchain.common.groupconfig.config;
 
 /**
- * 组织接口定义
+ * 组织配置接口
  *
  * @author zhouhui
  * @date 2018/3/27

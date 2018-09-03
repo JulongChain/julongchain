@@ -23,10 +23,13 @@ package org.bcia.julongchain.core.smartcontract;
  * @company Dingxuan
  */
 public class SmartContractRTEnv {
-
     private Handler handler;
 
-    public Handler getHandler() {
+	public SmartContractRTEnv(Handler handler) {
+		this.handler = handler;
+	}
+
+	public Handler getHandler() {
         return handler;
     }
 

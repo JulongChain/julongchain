@@ -17,13 +17,29 @@
 package org.bcia.julongchain.core.ledger.couchdb;
 
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
+import org.apache.http.Consts;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 import org.lightcouch.*;
-
 import java.io.InputStream;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 
 /**
  * 提供操作couchdb的操作方法，如增，删，改，查
@@ -34,7 +50,9 @@ import java.util.List;
  */
 public class CouchDB {
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CouchDB.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(CouchDB.class);
+    public int indexWarmCounter;
+    private CouchDbClientBase dbc;
 
     /**
      * creat a new client connection
@@ -47,16 +65,19 @@ public class CouchDB {
      * @throws Exception
      */
     public CouchDbClient creatConnectionDB(String url, int port, String username, String password, int maxConnections,
-                                  int requestTimeout, String dbName) throws LedgerException{
+                                  int requestTimeout, String dbName,String protocol) throws LedgerException{
         CouchDbProperties properties = new CouchDbProperties();
-        properties.setPath(url);
+        properties.setHost(url);
         properties.setPort(port);
         properties.setConnectionTimeout(requestTimeout);
         properties.setMaxConnections(maxConnections);
         properties.setDbName(dbName);
         properties.setUsername(username);
         properties.setPassword(password);
+        properties.setProtocol(protocol);
         CouchDbClient dbClient = new CouchDbClient(properties);
+        indexWarmCounter = 0;
+        CouchDBUtil.CreateSystemDatabasesIfNotExist(dbClient);
         return dbClient;
     }
 
@@ -107,6 +128,14 @@ public class CouchDB {
     public void ensureFullCommit(CouchDbClient db){
         CouchDbContext context = db.context();
         context.ensureFullCommit();
+        int nBlocks = LedgerConfig.getWarmIndexesAfterNBlocks();
+        if(LedgerConfig.isAutoWarmIndexesEnabled()){
+            if (indexWarmCounter >= nBlocks){
+                runWarmIndexAllIndexes(db);
+                indexWarmCounter = 0;
+            }
+            indexWarmCounter ++;
+        }
     }
 
     /**
@@ -218,7 +247,136 @@ public class CouchDB {
         return responses;
     }
 
+    /**
+     *  BatchRetrieveDocumentMetadata - batch method to retrieve document metadata for  a set of keys,
+     *  including ID, couchdb revision number, and ledger version
+     * @param db
+     * @param keys
+     * @return
+     */
+    public List BatchRetrieveDocumentMetadata(CouchDbClient db, List<String> keys){
+        List<Object> docs = db.view("_all_docs")
+                .includeDocs(true)
+                .keys(keys)
+                .query(Object.class);
+        return docs;
+    }
 
+    /**
+     * WarmIndex method provides a function for warming a single index
+     * @param designdoc
+     * @param indexname
+     * @return
+     */
+    public Boolean warmIndex(CouchDbClient db, String designdoc,String indexname){
+        Boolean boolFalg = false;
+        try {
+            List<NameValuePair> params = Lists.newArrayList();
+            params.add(new BasicNameValuePair("stale", "update_after"));
+            String paramStr = EntityUtils.toString(new UrlEncodedFormEntity(params, Consts.UTF_8));
+
+            String str = String.format("_design/%s/_view/%s?" + paramStr, designdoc, indexname);
+            URI build = URIBuilderUtil.buildUri(db.getDBUri()).path(str).build();
+            HttpGet get = new HttpGet(build);
+            HttpResponse response = db.executeRequest(get);
+            int code = response.getStatusLine().getStatusCode();
+            if (code == 200){
+                boolFalg = true;
+            }
+        } catch (Exception e) {
+            boolFalg = false;
+            e.printStackTrace();
+        }
+        return boolFalg;
+    }
+
+    /**
+     * ListIndex method lists the defined indexes for a database
+     * @return
+     */
+    public List listIndex(CouchDbClient db){
+        try {
+            List arraylist = new ArrayList();
+            URI uri = db.getDBUri();
+            URI build = URIBuilderUtil.buildUri(uri).path("_index/").build();
+            HttpGet get = new HttpGet(build);
+            get.addHeader("Accept", "application/json");
+            HttpResponse response = db.executeRequest(get);
+            InputStream stream = CouchDBUtil.getStream(response);
+            JSONObject jsonObject = inputToJson(stream);
+            List indexes = (List) jsonObject.get("indexes");
+            for(int i = 0 ; i < indexes.size() ; i++) {
+                Map hashmap = new HashMap();
+                Map map = (Map) indexes.get(i);
+                if((String) map.get("ddoc") == null){
+                    continue;
+                }else {
+                    hashmap.put("Name",map.get("name"));
+                    String ddoc = (String) map.get("ddoc");
+                    hashmap.put("DesignDoc",ddoc.split("/")[1]);
+                    arraylist.add(hashmap);
+                }
+            }
+            log.info(jsonObject.toString());
+            return arraylist;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * CreateIndex method provides a function creating an index
+     * @return
+     */
+    public Boolean creatIndex(CouchDbClient db, String indexdefinition){
+        Boolean boolFalg = false;
+        try {
+            Boolean bool = isJson(indexdefinition);
+            if (!bool){
+                log.info("JSON format is not valid");
+                return false;
+            }
+            URI uri = db.getDBUri();
+            URI build = URIBuilderUtil.buildUri(uri).path("_index/").build();
+            HttpPost post = new HttpPost(build);
+            setEntity(post, indexdefinition);
+            HttpResponse response = db.executeRequest(post);
+            InputStream stream = CouchDBUtil.getStream(response);
+            JSONObject jsonObject = inputToJson(stream);
+            String result = (String) jsonObject.get("Result");
+            if("created".equals(result)){
+                boolFalg = true;
+            }
+        } catch (Exception e) {
+            boolFalg = false;
+            e.printStackTrace();
+        }
+        return boolFalg;
+    }
+
+    /**
+     * WarmIndexAllIndexes method provides a function for warming all indexes for a database
+     * @return
+     */
+    public Boolean warmIndexAllIndexes(CouchDbClient db){
+        Boolean index = false;
+        List<Map<String, String>> list = listIndex(db);
+        for (Map<String, String> map : list) {
+            index = warmIndex(db, map.get("DesignDoc"), map.get("Name"));
+        }
+        return index;
+    }
+
+    /**
+     * runWarmIndexes is a wrapper for WarmIndexAllIndexes to catch andrt any errors
+     * @param db
+     * @return
+     */
+    public Boolean runWarmIndexAllIndexes(CouchDbClient db){
+        Boolean indexes = warmIndexAllIndexes(db);
+        return indexes;
+    }
 
     /**
      * InputStream to JSONObject
@@ -235,6 +393,22 @@ public class CouchDB {
         String s = out.toString();
         JSONObject object = JSONObject.parseObject(s);
         return object;
+    }
+
+    public void setEntity(HttpEntityEnclosingRequestBase httpRequest, String json) {
+        StringEntity entity = new StringEntity(json, "UTF-8");
+        entity.setContentType("application/json");
+        httpRequest.setEntity(entity);
+    }
+
+
+    public Boolean isJson(String str){
+        try {
+            JSONObject jsonStr= JSONObject.parseObject(str);
+            return  true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
 }

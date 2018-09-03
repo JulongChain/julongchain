@@ -22,7 +22,7 @@ import org.bcia.julongchain.node.cmd.INodeCmd;
 import org.bcia.julongchain.node.entity.NodeGroup;
 
 /**
- * 节点通道命令
+ * 节点群组命令
  *
  * @author zhouhui
  * @date 2018/2/23
@@ -32,7 +32,7 @@ public abstract class AbstractNodeGroupCmd implements INodeCmd {
 
     protected NodeGroup nodeGroup;
 
-    private Node node;
+    protected Node node;
 
     public AbstractNodeGroupCmd(Node node) {
         this.nodeGroup = new NodeGroup(node);

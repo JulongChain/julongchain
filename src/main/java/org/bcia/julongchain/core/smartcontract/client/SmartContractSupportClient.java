@@ -20,9 +20,10 @@
 package org.bcia.julongchain.core.smartcontract.client;
 
 import org.bcia.julongchain.common.exception.SmartContractException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
+import org.bcia.julongchain.core.container.inproccontroller.InprocController;
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.julongchain.core.smartcontract.shim.SmartContractBase;
 import org.bcia.julongchain.core.ssc.cssc.CSSC;
@@ -44,63 +45,68 @@ import java.util.Map;
  */
 public class SmartContractSupportClient extends SmartContractBase {
 
-  private static JavaChainLog logger = JavaChainLogFactory.getLog(SmartContractSupportClient.class);
-  private static Map<String, String> map = new HashMap<String, String>();
+	private static JulongChainLog logger = JulongChainLogFactory.getLog(SmartContractSupportClient.class);
+	private static Map<String, String> map = new HashMap<>();
 
-  static {
-    map.put(CommConstant.ESSC, ESSC.class.getName());
-    map.put(CommConstant.LSSC, LSSC.class.getName());
-    map.put(CommConstant.CSSC, CSSC.class.getName());
-    map.put(CommConstant.QSSC, QSSC.class.getName());
-    map.put(CommConstant.VSSC, VSSC.class.getName());
-  }
+	static {
+		map.put(CommConstant.ESSC, ESSC.class.getName());
+		map.put(CommConstant.LSSC, LSSC.class.getName());
+		map.put(CommConstant.CSSC, CSSC.class.getName());
+		map.put(CommConstant.QSSC, QSSC.class.getName());
+		map.put(CommConstant.VSSC, VSSC.class.getName());
+//		map.put("mycc", AccountingVoucher.class.getName());
+	}
 
-  @Override
-  public SmartContractResponse init(ISmartContractStub stub) {
-    logger.info("SmartContractSupportClient");
-    return newSuccessResponse();
-  }
+	@Override
+	public SmartContractResponse init(ISmartContractStub stub) {
+		logger.info("SmartContractSupportClient");
+		return newSuccessResponse();
+	}
 
-  @Override
-  public SmartContractResponse invoke(ISmartContractStub stub) {
-    logger.info("SmartContractSupportClient invoke " + stub.getTxId());
-    /** stub.getState("key1"); stub.getState("key2"); stub.getState("key3"); */
-    stub.putState("putKey1", "putValue1".getBytes());
-    /**
-     * stub.putState("putKey2", "putValue2".getBytes()); stub.putState("putKey3",
-     * "putValue3".getBytes());
-     */
-    return newSuccessResponse();
-  }
+	@Override
+	public SmartContractResponse invoke(ISmartContractStub stub) {
+		logger.info("SmartContractSupportClient invoke " + stub.getTxId());
+		/** stub.getState("key1"); stub.getState("key2"); stub.getState("key3"); */
+		stub.putState("putKey1", "putValue1".getBytes());
+		/**
+		 * stub.putState("putKey2", "putValue2".getBytes()); stub.putState("putKey3",
+		 * "putValue3".getBytes());
+		 */
+		return newSuccessResponse();
+	}
 
-  @Override
-  public String getSmartContractStrDescription() {
-    return null;
-  }
+	@Override
+	public String getSmartContractStrDescription() {
+		return null;
+	}
 
-  public static void launch(String smartContractId) throws SmartContractException {
-    try {
-      logger.info(String.format("launch smartContract[%s]", smartContractId));
-      String[] args = new String[] {"", ""};
-      args[0] = "-i" + smartContractId;
-      String smartContractClassName = map.get(smartContractId);
-      Class<?> clz = Class.forName(smartContractClassName);
-      Constructor<?> constructor = clz.getDeclaredConstructor();
-      SmartContractBase smartContract = (SmartContractBase) constructor.newInstance();
-      smartContract.start(args);
-    } catch (Exception e) {
-      logger.error(e.getMessage(), e);
-      throw new SmartContractException(e);
-    }
-  }
+	public static void launch(String smartContractId) throws SmartContractException {
+		try {
+			logger.info(String.format("launch smartContract[%s]", smartContractId));
+			new InprocController().launch(smartContractId);
+		} catch (Exception e) {
+			logger.error(e.getMessage(), e);
+			throw new SmartContractException(e);
+		}
+	}
 
-  public static Boolean checkSystemSmartContract(String smartContractId) {
-    return map.get(smartContractId) != null;
-  }
+	public static void testLaunch(String smartContractId) throws Exception {
+		logger.info(String.format("launch smartContract[%s]", smartContractId));
+		String[] args = new String[] {"", ""};
+		args[0] = "-i" + smartContractId;
+		String smartContractClassName = map.get(smartContractId);
+		Class<?> clz = Class.forName(smartContractClassName);
+		Constructor<?> constructor = clz.getDeclaredConstructor();
+		SmartContractBase smartContract = (SmartContractBase) constructor.newInstance();
+		smartContract.start(args);
+	}
 
-  public static void main(String[] args) throws Exception {
-    // launch(CommConstant.ESSC);
-    launch(CommConstant.QSSC);
-    while (true) {}
-  }
+	public static boolean checkSystemSmartContract(String smartContractId) {
+		return new InprocController().isRegistered(smartContractId);
+	}
+
+	public static void main(String[] args) throws Exception {
+//		testLaunch("mycc");
+		while (true) {}
+	}
 }

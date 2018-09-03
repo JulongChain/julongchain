@@ -22,7 +22,7 @@ import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.TransactionPackage;
 
 /**
- * 类描述
+ * 智能合约操作负载业务对象
  *
  * @author zhouhui
  * @date 2018/05/26
@@ -35,10 +35,10 @@ public class SmartContractActionPayloadVO implements IProtoVO<TransactionPackage
     @Override
     public void parseFrom(TransactionPackage.SmartContractActionPayload smartContractActionPayload) throws
             InvalidProtocolBufferException, ValidateException {
-        ValidateUtils.isNotNull(smartContractActionPayload, "smartContractActionPayload can not be null");
+        ValidateUtils.isNotNull(smartContractActionPayload, "SmartContractActionPayload can not be null");
         ValidateUtils.isNotNull(smartContractActionPayload.getSmartContractProposalPayload(),
-                "smartContractActionPayload.getSmartContractProposalPayload can not be null");
-        ValidateUtils.isNotNull(smartContractActionPayload.getAction(), "smartContractActionPayload.getAction can " +
+                "SmartContractActionPayload.getSmartContractProposalPayload can not be null");
+        ValidateUtils.isNotNull(smartContractActionPayload.getAction(), "SmartContractActionPayload.getAction can " +
                 "not be null");
 
         this.smartContractProposalPayloadVO = new SmartContractProposalPayloadVO();

@@ -15,25 +15,16 @@
  */
 package org.bcia.julongchain.core.common.sysscprovider;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.groupconfig.MSPConfigHandler;
-import org.bcia.julongchain.common.groupconfig.capability.IApplicationCapabilities;
-import org.bcia.julongchain.common.groupconfig.config.ApplicationConfig;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.groupconfig.config.IApplicationConfig;
 import org.bcia.julongchain.common.policies.IPolicyManager;
 import org.bcia.julongchain.common.util.SpringContext;
 import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.IQueryExecutor;
+import org.bcia.julongchain.core.node.NodeSupport;
 import org.bcia.julongchain.core.node.util.NodeUtils;
 import org.bcia.julongchain.core.ssc.ISystemSmartContractManager;
 import org.bcia.julongchain.core.ssc.SystemSmartContractManager;
-import org.bcia.julongchain.node.common.helper.ConfigTreeHelper;
-import org.bcia.julongchain.protos.common.Configtx;
-import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfig;
-import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfigFactory;
-
-import java.io.IOException;
 
 /**
  * 类描述
@@ -52,28 +43,12 @@ public class SystemSmartContractProvider implements ISystemSmartContractProvider
 
     @Override
     public IApplicationConfig getApplicationConfig(String groupId) {
-        //TODO: add by zhouhui 使测试通过
-        //构造应用子树
-        GenesisConfig.Profile profile = null;
-        try {
-            profile = GenesisConfigFactory.getGenesisConfig().getCompletedProfile(PROFILE_CREATE_GROUP);
-            Configtx.ConfigTree appTree = ConfigTreeHelper.buildApplicationTree(profile.getApplication());
-            //得到最终的应用配置
-            ApplicationConfig appConfig = new ApplicationConfig(appTree, new MSPConfigHandler(0));
-            IApplicationCapabilities applicationCapabilities = appConfig.getCapabilities();
-            return appConfig;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ValidateException e) {
-            e.printStackTrace();
-        }
-
-        return null;
+    	return new NodeSupport().getApplicationConfig(groupId);
     }
 
     @Override
     public IPolicyManager policyManager(String groupID) {
+		// TODO: 7/2/18 策略管理者
         return null;
     }
 
@@ -83,21 +58,20 @@ public class SystemSmartContractProvider implements ISystemSmartContractProvider
     }
 
     @Override
-    public boolean isSysSCAndNotInvokableSC2SC(String name) {
-        return false;
-//        return sscManager.isSysSmartContractAndNotInvokableSC2SC(name);
+    public boolean isSysSCAndNotInvokeSC2SC(String name) {
+        return sscManager.isSysSmartContractAndNotInvokableSC2SC(name);
     }
 
     @Override
-    public boolean isSysSCAndNotInvkeableExternal(String name) {
+    public boolean isSysSCAndNotInvokableExternal(String name) {
         return sscManager.isSysSmartContractAndNotInvokableExternal(name);
     }
 
     @Override
-    public IQueryExecutor getQueryExecutorForLedger(String groupID) throws JavaChainException {
+    public IQueryExecutor getQueryExecutorForLedger(String groupID) throws JulongChainException {
         INodeLedger l = NodeUtils.getLedger(groupID);
         if(l == null){
-            throw new JavaChainException("Can not get ledger for group " + groupID);
+            throw new JulongChainException("Can not get ledger for group " + groupID);
         }
         return l.newQueryExecutor();
     }

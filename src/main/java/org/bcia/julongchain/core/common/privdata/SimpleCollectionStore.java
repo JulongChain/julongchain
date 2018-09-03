@@ -16,25 +16,21 @@
 package org.bcia.julongchain.core.common.privdata;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.IQueryExecutor;
 import org.bcia.julongchain.protos.common.Collection;
 
 /**
- * a stored backed
- * by a ledger supplied by the specified ledgerGetter with
- * an internal name formed as specified by the supplied
- * collectionNamer function
- *
+ * 简单集合仓库
  * @author sunianle, sunzongyu
  * @date 3/20/18
  * @company Dingxuan
  */
 public class SimpleCollectionStore implements ICollectionStore{
 
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(SimpleCollectionStore.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SimpleCollectionStore.class);
 
     private IPrivDataSupport s;
 
@@ -43,18 +39,18 @@ public class SimpleCollectionStore implements ICollectionStore{
     }
 
     @Override
-    public ICollection retrieveColletion(Collection.CollectionCriteria collectionCriteria) throws JavaChainException {
+    public ICollection retrieveColletion(Collection.CollectionCriteria collectionCriteria) throws JulongChainException {
         return retrieveSimpleCollection(collectionCriteria);
     }
 
     @Override
-    public ICollectionAccessPolicy retrieveCollectionAccessPolicy(Collection.CollectionCriteria collectionCriteria) throws JavaChainException {
+    public ICollectionAccessPolicy retrieveCollectionAccessPolicy(Collection.CollectionCriteria collectionCriteria) throws JulongChainException {
         return retrieveSimpleCollection(collectionCriteria);
     }
 
     @Override
-    public Collection.CollectionConfigPackage retrieveCollectionConfigPackage(Collection.CollectionCriteria cc) throws JavaChainException {
-        IQueryExecutor qe = s.getQueryExecotorForLedger(cc.getChannel());
+    public Collection.CollectionConfigPackage retrieveCollectionConfigPackage(Collection.CollectionCriteria cc) throws JulongChainException {
+        IQueryExecutor qe = s.getQueryExecutorForLedger(cc.getGroup());
         try {
             byte[] cb = qe.getState("lssc", s.getCollectionKVSKey(cc));
             if(cb == null){
@@ -64,7 +60,7 @@ public class SimpleCollectionStore implements ICollectionStore{
             try {
                 collections = Collection.CollectionConfigPackage.parseFrom(cb);
             } catch (InvalidProtocolBufferException e) {
-                throw new JavaChainException("Invalid configuration for collection criteria " + cc);
+                throw new JulongChainException("Invalid configuration for collection criteria " + cc);
             }
             return collections;
         } finally {
@@ -72,7 +68,7 @@ public class SimpleCollectionStore implements ICollectionStore{
         }
     }
 
-    private SimpleCollection retrieveSimpleCollection(Collection.CollectionCriteria cc) throws JavaChainException{
+    private SimpleCollection retrieveSimpleCollection(Collection.CollectionCriteria cc) throws JulongChainException {
         Collection.CollectionConfigPackage collections = retrieveCollectionConfigPackage(cc);
         if(collections == null){
             return null;
@@ -82,18 +78,18 @@ public class SimpleCollectionStore implements ICollectionStore{
                 case Collection.CollectionConfig
                         .STATIC_COLLECTION_CONFIG_FIELD_NUMBER:
                     SimpleCollection sc = new SimpleCollection();
-                    sc.setUp(cconf.getStaticCollectionConfig(), s.getIdentityDeserializer(cc.getChannel()));
+                    sc.setUp(cconf.getStaticCollectionConfig(), s.getIdentityDeserializer(cc.getGroup()));
                     return sc;
                 default:
-                    throw new JavaChainException("Unexpected collection type");
+                    throw new JulongChainException("Unexpected collection type");
             }
         }
         throw noSuchCollectionError(cc);
     }
 
-    private JavaChainException noSuchCollectionError(Collection.CollectionCriteria cc){
-        String errorMsg = String.format("collection %s/%s/%s could not be found", cc.getChannel(), cc.getNamespace(), cc.getCollection());
+    private JulongChainException noSuchCollectionError(Collection.CollectionCriteria cc){
+        String errorMsg = String.format("collection %s/%s/%s could not be found", cc.getGroup(), cc.getNamespace(), cc.getCollection());
         log.error(errorMsg);
-        return new JavaChainException(errorMsg);
+        return new JulongChainException(errorMsg);
     }
 }

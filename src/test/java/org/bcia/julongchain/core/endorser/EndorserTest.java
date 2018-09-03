@@ -2,10 +2,10 @@ package org.bcia.julongchain.core.endorser;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.BaseJunit4Test;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.NodeException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.resourceconfig.ISmartContractDefinition;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.common.util.proto.ProposalUtils;
@@ -24,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 /**
- * 对象
+ * 背书节点测试类
  *
  * @author zhouhui
  * @date 2018/3/29
@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class EndorserTest extends BaseJunit4Test {
 
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(EndorserTest.class);
+    private static final JulongChainLog logger = JulongChainLogFactory.getLog(EndorserTest.class);
 
     @Autowired
     private Endorser endorser;
@@ -67,7 +67,35 @@ public class EndorserTest extends BaseJunit4Test {
     }
 
     @Test
-    public void processProposal() {
+    public void processProposal() throws NodeException {
+        SmartContractPackage.SmartContractInvocationSpec csscSpec = SpecHelper.buildInvocationSpec(CommConstant.CSSC, CSSC
+                .GET_GROUPS, null);
+
+        ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
+        byte[] creator = identity.getIdentity().serialize();
+
+        byte[] nonce = null;
+        try {
+            nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
+        } catch (JulongChainException e) {
+            throw new NodeException("Can not get nonce");
+        }
+
+        String txId = null;
+        try {
+            txId = ProposalUtils.computeProposalTxID(creator, nonce);
+        } catch (JulongChainException e) {
+            throw new NodeException("Generate txId fail");
+        }
+
+        //生成proposal  Type=ENDORSER_TRANSACTION
+        ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType.ENDORSER_TRANSACTION,
+                "", txId, csscSpec, nonce, creator, null);
+        ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
+        ProposalResponsePackage.ProposalResponse endorserResponse = endorser.processProposal(signedProposal);
+
+        assertEquals(200, endorserResponse.getResponse().getStatus());
+
     }
 
     @Test
@@ -84,7 +112,7 @@ public class EndorserTest extends BaseJunit4Test {
         String txId = "txId1";
         ProposalPackage.Proposal proposal = ProposalPackage.Proposal.newBuilder().build();
         ProposalPackage.SignedProposal signedProposal = ProposalPackage.SignedProposal.newBuilder().build();
-        Smartcontract.SmartContractID.Builder smartContractIDBuilder = Smartcontract.SmartContractID.newBuilder();
+        SmartContractPackage.SmartContractID.Builder smartContractIDBuilder = SmartContractPackage.SmartContractID.newBuilder();
         ProposalResponsePackage.Response response = ProposalResponsePackage.Response.newBuilder().build();
         SmartContractEventPackage.SmartContractEvent event = SmartContractEventPackage.SmartContractEvent.newBuilder
                 ().build();
@@ -95,16 +123,15 @@ public class EndorserTest extends BaseJunit4Test {
         ProposalResponsePackage.Response esscResponse = endorser.endorseProposal(groupId, txId, signedProposal,
                 proposal, smartContractIDBuilder, response, simulateResults, event, visibility,
                 smartContractDefinition);
-
     }
 
     @Test
-    public void callSmartContract() throws JavaChainException, InvalidProtocolBufferException {
-        Smartcontract.SmartContractInvocationSpec csscSpec = SpecHelper.buildInvocationSpec(CommConstant.CSSC, CSSC
+    public void callSmartContract() throws JulongChainException, InvalidProtocolBufferException {
+        SmartContractPackage.SmartContractInvocationSpec csscSpec = SpecHelper.buildInvocationSpec(CommConstant.CSSC, CSSC
                 .GET_GROUPS, null);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
         byte[] nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
 
         String txId = ProposalUtils.computeProposalTxID(creator, nonce);
@@ -121,7 +148,7 @@ public class EndorserTest extends BaseJunit4Test {
         List<Query.GroupInfo> groupsList = groupQueryResponse.getGroupsList();
 
         for(Query.GroupInfo groupInfo: groupsList){
-            System.out.println("groupInfo-----" + groupInfo.getGroupId());
+            System.out.println("GroupInfo: " + groupInfo.getGroupId());
         };
     }
 }

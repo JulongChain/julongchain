@@ -18,8 +18,8 @@ package org.bcia.julongchain.core.common.smartcontractprovider.metadata;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 import java.util.Map;
 
@@ -31,22 +31,21 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class FileValidator {
-
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(FileValidator.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(FileValidator.class);
 
     public FileValidator(){
 
     }
 
     public void handle(String fileName, byte[] fileBytes) throws ValidateException {
-        couchdbIndexFileValidator(fileName, fileBytes);
+        validateCouchdbIndexFile(fileName, fileBytes);
     }
 
 
     /**
-     * couchdbIndexFileValidator implements fileValidator
+	 * 校验couchDB的索引文件
      */
-    private static void couchdbIndexFileValidator(String fileName, byte[] fileBytes) throws ValidateException {
+    private static void validateCouchdbIndexFile(String fileName, byte[] fileBytes) throws ValidateException {
         String ext = fileName.substring(fileName.length() - 5);
         String json = ".json";
         if(!json.equals(ext)){
@@ -60,16 +59,14 @@ public class FileValidator {
     }
 
     /**
-     *
-     * @param srcPath
-     * @throws ValidateException
+	 * 校验couchDB的索引文件
      */
     public static void validateCouchdbIndexFile(String srcPath)throws ValidateException {
 
     }
 
     /**
-     * isJSON tests a string to determine if it can be parsed as valid JSON
+	 * 判断字符串是否为Json字符串
      * @param s
      * @return
      */
@@ -126,10 +123,7 @@ public class FileValidator {
     }
 
     /**
-     * processIndexMap processes an interface map and wraps field names or traverses
-     * the next level of the json query
-     * @param jsonFragment
-     * @throws ValidateException
+	 * 处理索引
      */
     private static void processIndexMap(Map<String,Object> jsonFragment)throws ValidateException {
         for(Map.Entry<String, Object> entry : jsonFragment.entrySet()){
@@ -159,9 +153,7 @@ public class FileValidator {
     }
 
     /**
-     * validateFieldMap validates the list of field objects
-     * @param jsonFragment
-     * @throws ValidateException
+	 * 校验文件
      */
     private static void validateFieldMap(Map<String,Object> jsonFragment)throws ValidateException{
         for(Map.Entry<String, Object> entry : jsonFragment.entrySet()) {

@@ -15,28 +15,47 @@
  */
 package org.bcia.julongchain.consenter.common.localconfig;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.common.util.CommConstant;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 /**
+ * consenterconfig配置加载
+ *
  * @author zhangmingyang
  * @Date: 2018/05/24
  * @company Dingxuan
  */
 public class ConsenterConfigFactory {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ConsenterConfigFactory.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ConsenterConfigFactory.class);
+    private static ConsenterConfig consenterConfig;
+
+    public static ConsenterConfig getConsenterConfig() {
+        if (consenterConfig == null) {
+            synchronized (ConsenterConfig.class) {
+                if (consenterConfig == null) {
+                    consenterConfig = loadConsenterConfig();
+                }
+            }
+        }
+        return consenterConfig;
+    }
 
     public static ConsenterConfig loadConsenterConfig() {
         Yaml yaml = new Yaml();
-        InputStream is = ConsenterConfigFactory.class.getClassLoader().getResourceAsStream(ConsenterConfig.CONSENTER_CONFIG_PATH);
-        ConsenterConfig consenterConfig = yaml.loadAs(is, ConsenterConfig.class);
+        InputStream is = null;
+        ConsenterConfig consenterConfig=null;
+        try {
+            is = new FileInputStream(CommConstant.CONFIG_DIR_PREFIX + ConsenterConfig.CONSENTER_CONFIG_PATH);
+            consenterConfig = yaml.loadAs(is, ConsenterConfig.class);
+        } catch (FileNotFoundException e) {
+            log.error(e.getMessage(), e);
+        }
         return consenterConfig;
-    }
-    public static void main(String[] args) {
-        ConsenterConfig consenterConfig = loadConsenterConfig();
-        System.out.println(consenterConfig.getKafka().getComumer().get("maxReads"));
     }
 }

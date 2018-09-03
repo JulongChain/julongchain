@@ -16,42 +16,40 @@
 package org.bcia.julongchain.node.entity;
 
 import com.google.protobuf.ByteString;
-import com.google.protobuf.InvalidProtocolBufferException;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.gossip.GossipService;
-import org.bcia.julongchain.common.exception.GossipException;
+import io.grpc.ManagedChannel;
+import io.grpc.netty.NettyChannelBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.NodeException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.*;
-import org.bcia.julongchain.core.aclmgmt.AclManagement;
-import org.bcia.julongchain.core.aclmgmt.IAclProvider;
 import org.bcia.julongchain.core.admin.AdminServer;
 import org.bcia.julongchain.core.endorser.Endorser;
 import org.bcia.julongchain.core.events.DeliverEventsServer;
-import org.bcia.julongchain.core.ledger.BlockAndPvtData;
 import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.core.node.NodeConfig;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.core.node.grpc.EventGrpcServer;
 import org.bcia.julongchain.core.node.grpc.NodeGrpcServer;
+import org.bcia.julongchain.core.node.grpc.SmartContractGrpcServer;
 import org.bcia.julongchain.core.ssc.ISystemSmartContractManager;
 import org.bcia.julongchain.core.ssc.SystemSmartContractManager;
 import org.bcia.julongchain.events.producer.EventHubServer;
 import org.bcia.julongchain.events.producer.EventsServerConfig;
-import org.bcia.julongchain.gossip.GossipServiceUtil;
-import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
+import org.bcia.julongchain.gossip.GossipClientStream;
+import org.bcia.julongchain.gossip.GossipService;
 import org.bcia.julongchain.node.Node;
+import org.bcia.julongchain.node.common.client.AdminClient;
+import org.bcia.julongchain.node.common.client.IAdminClient;
 import org.bcia.julongchain.node.util.NodeConstant;
-import org.bcia.julongchain.protos.common.Common;
+import org.bcia.julongchain.protos.gossip.Message;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
-import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * 节点服务
@@ -61,14 +59,21 @@ import java.util.UUID;
  * @company Dingxuan
  */
 public class NodeServer {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(NodeServer.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(NodeServer.class);
 
+    /**
+     * 记录当前进程id的文件
+     */
     private static final String PID_FILE_NAME = "node.pid";
 
-    private String cachedEndpoint;
-
+    /**
+     * 当前所在的节点
+     */
     private Node node;
 
+    /**
+     * 系统智能合约管理器
+     */
     private ISystemSmartContractManager systemSmartContractManager;
 
     public NodeServer(Node node) {
@@ -82,73 +87,40 @@ public class NodeServer {
     }
 
     public void start(boolean devMode) throws NodeException {
-        log.info("node server start-----");
+        log.info("Begin to start node, current version: " + NodeConstant.CURRENT_VERSION);
         if (devMode) {
-            log.info("start by devMode");
+            log.info("Start by devMode");
         }
 
         NodeConfig nodeConfig = NodeConfigFactory.getNodeConfig();
 
-        //检查当前的成员服务提供者类型，目前只支持CSP，即密码提供商
-        int mspType = GlobalMspManagement.getLocalMsp().getType();
-        if (mspType != NodeConstant.PROVIDER_CSP) {
-            log.error("Unsupported msp type: " + mspType);
-            return;
-        }
-
-        log.info("begin to start node, current version： " + NodeConstant.CURRENT_VERSION);
-
-        //获取当前的访问清单提供者
-        IAclProvider aclProvider = AclManagement.getACLProvider();
-
-        //初始化账本
-//        LedgerMgmt.initialize();
-//        ledgermgmt.Initialize(peer.ConfigTxProcessors)
-        try {
-            LedgerManager.initialize(null);
-        } catch (LedgerException e) {
-            e.printStackTrace();
-        }
-
-
-        String nodeEndpoint = null;
-
-//        if(StringUtils.isNotBlank(cachedEndpoint)){
-//            nodeEndpoint = cachedEndpoint;
-//        }else{
-//            nodeEndpoint = NodeConfiguration.getLocalAddress()
-//        }
-        //读取终端地址
-        //读取配置文件，形成serverConfig对象
-        //TODO:如何将Grpc服务与serverConfig关联
-
         //启动Node主服务(Grpc Server1)
         startNodeGrpcServer(nodeConfig);
 
-        //启动事件处理服务(Grpc Server2)
+        //启动智能合约服务(Grpc Server2)
+        startSmartContractGrpcServer(nodeConfig);
+
+        //启动事件处理服务(Grpc Server3)
         startEventGrpcServer(nodeConfig);
 
-        //创建智能合约支持服务
-        //创建Gossip服务
+        //注册系统智能合约
         systemSmartContractManager.registerSysSmartContracts();
-
         //初始化系统智能合约
         initSysSmartContracts();
 
         node.initialize(new Node.IGroupCallback() {
             @Override
             public void onGroupInitialized(String groupId) {
+                log.info("OnGroupInitialized: " + groupId);
                 systemSmartContractManager.deploySysSmartContracts(groupId);
             }
 
             @Override
             public void onGroupsReady(List<String> groupIds) {
-                // if (groupIds != null && groupIds.size() > 0) {
-                //     startGossipService(groupIds, nodeConfig);
-                // }
+                log.info("OnGroupsReady-----");
                 try {
                     startGossipService();
-                } catch (NodeException e) {
+                } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }
             }
@@ -158,80 +130,65 @@ public class NodeServer {
         recordPid(nodeConfig);
     }
 
-  // 启动gossip，定时读取数据
-  private void startGossipService() throws NodeException {
-    //  查询群组
-    try {
-      List<String> ledgerIds = LedgerManager.getLedgerIDs();
-      if (CollectionUtils.isNotEmpty(ledgerIds)) {
-        node.setLedgerIds(ledgerIds);
-      }
-    } catch (LedgerException e) {
-      log.error(e.getMessage(), e);
-      throw new NodeException(e.getMessage(), e);
-    }
-
-    // 启动gossip
-    try {
-      GossipService gossipService = GossipServiceUtil.startCommitterGossip();
-      new Thread() {
-        public void run() {
-          while (true) {
-
-            // 处理当前所有的群组
-            List<String> ledgerIds = node.getLedgerIds();
-            log.info("当前所有群组：" + ledgerIds.toString());
-            for (String ledgerId : ledgerIds) {
-              log.info("开始检查群组[" + ledgerId + "] 是否有新的区块");
-              long blockHeight = 0l;
-              try {
-                blockHeight = LedgerManager.openLedger(ledgerId).getBlockchainInfo().getHeight();
-                log.info("当前群组[" + ledgerId + "] 的区块高度是：" + blockHeight);
-                if (blockHeight == 0l) {
-                  log.info("群组高度为0，退出处理");
-                  continue;
-                }
-                Object data = GossipServiceUtil.getData(gossipService, ledgerId, blockHeight);
-                if (data == null) {
-                  log.info("当前群组[" + ledgerId + "]" + "没有新的区块[" + blockHeight + "]");
-                  continue;
-                }
-                log.info("当前群组[" + ledgerId + "]" + "发现新的区块[" + blockHeight + "]");
-                String blockByteStr = (String) data;
-                byte[] blockBytes = BytesHexStrTranslate.toBytes(blockByteStr);
-                log.info("开始打印区块==========================================");
-                log.info(blockByteStr);
-                log.info("结束打印区块==========================================");
-                log.info("开始转换区块");
-                Common.Block block = Common.Block.parseFrom(blockBytes);
-                BlockAndPvtData blockAndPvtData = new BlockAndPvtData(block, null, null);
-                log.info("完成转换区块");
-                log.info("开始保存区块");
-                LedgerManager.openLedger(ledgerId).commitWithPvtData(blockAndPvtData);
-                log.info("完成保存区块");
-              } catch (LedgerException e) {
-                log.error(e.getMessage(), e);
-              } catch (GossipException e) {
-                log.error(e.getMessage(), e);
-              } catch (InvalidProtocolBufferException e) {
-                log.error(e.getMessage(), e);
-              }
+    private void startGossipService() {
+        String consenterAddress = NodeConfigFactory.getNodeConfig().getNode().getGossip().getConsenterAddress();
+        String[] split = StringUtils.split(consenterAddress, ":");
+        String host = split[0];
+        Integer port = Integer.parseInt(split[1]);
+        waitConnectable(host, port);
+        ManagedChannel managedChannel =
+                NettyChannelBuilder.forAddress(host, port).maxInboundMessageSize(CommConstant.MAX_GRPC_MESSAGE_SIZE)
+                        .usePlaintext().build();
+        GossipClientStream gossipClientStream = new GossipClientStream(managedChannel);
+        GossipClientStream.setGossipClientStream(gossipClientStream);
+        try {
+            List<String> ledgerIDs = LedgerManager.getLedgerIDs();
+            for (String ledgerID : ledgerIDs) {
+                startPullFromConsenter(gossipClientStream, ledgerID);
             }
-
-            // 1s查询一次
-            try {
-              Thread.sleep(10000);
-            } catch (Exception e) {
-              log.error(e.getMessage(), e);
-            }
-          }
+        } catch (LedgerException e) {
+            log.error(e.getMessage(), e);
         }
-      }.start();
-    } catch (GossipException e) {
-      log.error(e.getMessage(), e);
-      throw new NodeException(e.getMessage(), e);
     }
-  }
+
+    private void waitConnectable(String host, Integer port) {
+        while (!Utils.isHostConnectable(host, port)) {
+            log.info("Wait consenter start, host:" + host + ", port:" + port);
+            try {
+                Thread.sleep(1000L);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void startPullFromConsenter(GossipClientStream gossipClientStream, String ledgerID) {
+        new Thread() {
+            @Override
+            public void run() {
+                while (true) {
+                    try {
+                        log.info("Start a pull request.");
+                        long height = LedgerManager.openLedger(ledgerID).getBlockchainInfo().getHeight();
+                        Message.RemoteStateRequest remoteStateRequest = Message.RemoteStateRequest.newBuilder().setStartSeqNum(height).setEndSeqNum(height).build();
+                        Message.GossipMessage gossipMessage = Message.GossipMessage.newBuilder().setGroup(ByteString.copyFromUtf8(ledgerID)).setStateRequest(remoteStateRequest).build();
+                        Message.Envelope envelope = Message.Envelope.newBuilder().setPayload(gossipMessage.toByteString()).build();
+                        log.info("Send pull request:" + ledgerID + " " + height);
+                        gossipClientStream.serialSend(envelope);
+                        if (gossipClientStream.getQueueMap().get(ledgerID) == null) {
+                            gossipClientStream.getQueueMap().put(ledgerID, new LinkedBlockingQueue<Message.Envelope>());
+                        }
+                        log.info("Receive block");
+                        Message.Envelope receiveEnvelope = gossipClientStream.getQueueMap().get(ledgerID).take();
+                        GossipService.saveBlock(receiveEnvelope);
+                        log.info("Saved block");
+                    } catch (Exception e) {
+                        log.error(e.getMessage(), e);
+                    }
+                }
+            }
+        }.start();
+    }
 
     private void initSysSmartContracts() {
         log.info("Init system smart contracts");
@@ -268,6 +225,39 @@ public class NodeServer {
                 try {
                     nodeGrpcServer.start();
                     nodeGrpcServer.blockUntilShutdown();
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                } catch (InterruptedException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        }.start();
+    }
+
+    /**
+     * 开启智能合约Grpc服务
+     *
+     * @param nodeConfig
+     * @throws NodeException
+     */
+    private void startSmartContractGrpcServer(NodeConfig nodeConfig) throws NodeException {
+        //从配置中获取要监听的地址和端口
+        NetAddress address = null;
+        try {
+            String listenAddress = nodeConfig.getNode().getSmartContractListenAddress();
+            address = new NetAddress(listenAddress);
+        } catch (Exception e) {
+            throw new NodeException(e);
+        }
+
+        final SmartContractGrpcServer smartContractGrpcServer = new SmartContractGrpcServer(address.getPort());
+
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    smartContractGrpcServer.start();
+                    smartContractGrpcServer.blockUntilShutdown();
                 } catch (IOException e) {
                     log.error(e.getMessage(), e);
                 } catch (InterruptedException e) {
@@ -317,49 +307,6 @@ public class NodeServer {
         }.start();
     }
 
-    private void startGossipService(List<String> groupIds, NodeConfig nodeConfig) {
-//        String groupId, String nodeId, String nodeAddress, String consenterId,
-//                String consenterAddress
-        final String nodeId = nodeConfig.getNode().getId();
-
-        final String consenterId = UUID.randomUUID().toString();
-        final String consenterAddress = nodeConfig.getNode().getConsenterAddress();
-
-        for (int i = 0; i < groupIds.size(); i++) {
-            String groupId = groupIds.get(i);
-            final String nodeAddress = "127.0.0.1:" + (50000 + i);
-
-            new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        node.getGossipManager().addGossipService(groupId, nodeId, nodeAddress, consenterId, consenterAddress);
-
-                        try {
-                            long blockHeight = LedgerManager.openLedger(groupId).getBlockchainInfo().getHeight();
-
-                            while (true) {
-                                Common.Block block = node.getGossipManager().acquireMessage(groupId, blockHeight);
-                                if (block != null) {
-                                    BlockAndPvtData blockAndPvtData = new BlockAndPvtData(block, new HashMap<>(), null);
-
-                                    node.getGroupMap().get(groupId).getCommiter().commitWithPrivateData(blockAndPvtData);
-                                }
-
-                                Thread.sleep(nodeConfig.getNode().getGossip().getPullInterval());
-                            }
-                        } catch (Exception e) {
-                            log.error(e.getMessage(), e);
-                        }
-
-                    } catch (GossipException e) {
-                        log.error(e.getMessage(), e);
-                    }
-                }
-            }.start();
-        }
-    }
-
     /**
      * 记录进程号
      *
@@ -387,14 +334,27 @@ public class NodeServer {
     private String getProcessId() {
         // get name representing the running Java virtual machine.
         String processName = ManagementFactory.getRuntimeMXBean().getName();
-        log.info("process name: " + processName);
+        log.info("Process name: " + processName);
 
         String processId = processName.split("@")[0];
-        log.info("process id: " + processId);
+        log.info("Process id: " + processId);
         return processId;
     }
 
-    public void status() {
+    public int status() throws NodeException {
+        NodeConfig nodeConfig = NodeConfigFactory.getNodeConfig();
 
+        //从配置中获取要监听的地址和端口
+        NetAddress address = null;
+        try {
+            String listenAddress = nodeConfig.getNode().getListenAddress();
+            address = new NetAddress(listenAddress);
+
+            IAdminClient adminClient = new AdminClient(address.getHost(), address.getPort());
+            return adminClient.getStatus();
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException(e);
+        }
     }
 }

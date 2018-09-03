@@ -22,7 +22,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 
 /**
- * 类描述
+ * 配置信封业务对象
  *
  * @author zhouhui
  * @date 2018/05/27
@@ -35,7 +35,7 @@ public class ConfigEnvelopeVO implements IProtoVO<Configtx.ConfigEnvelope> {
     @Override
     public void parseFrom(Configtx.ConfigEnvelope configEnvelope) throws InvalidProtocolBufferException,
             ValidateException {
-        ValidateUtils.isNotNull(configEnvelope, "configEnvelope can not be null");
+        ValidateUtils.isNotNull(configEnvelope, "ConfigEnvelope can not be null");
 
         this.config = configEnvelope.getConfig();
         this.lastUpdate = configEnvelope.getLastUpdate();

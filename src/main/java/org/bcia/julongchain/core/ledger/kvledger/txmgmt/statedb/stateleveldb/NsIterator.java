@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,7 +31,6 @@ import java.util.List;
  * @company Dingxuan
  */
 public class NsIterator implements IResultsIterator {
-
     private String ns;
     private NsUpdates nsUpdates;
     private List<String> sortedKeys;

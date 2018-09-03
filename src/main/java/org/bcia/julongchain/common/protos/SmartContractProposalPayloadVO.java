@@ -20,12 +20,12 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.protos.node.ProposalPackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 import java.util.Map;
 
 /**
- * 类描述
+ * 智能合约提案负载业务对象
  *
  * @author zhouhui
  * @date 2018/05/26
@@ -33,17 +33,17 @@ import java.util.Map;
  */
 public class SmartContractProposalPayloadVO implements IProtoVO<ProposalPackage.SmartContractProposalPayload> {
     private Map<String, ByteString> transientMap;
-    private Smartcontract.SmartContractInvocationSpec input;
+    private SmartContractPackage.SmartContractInvocationSpec input;
 
     @Override
     public void parseFrom(ProposalPackage.SmartContractProposalPayload smartContractProposalPayload) throws
             InvalidProtocolBufferException, ValidateException {
-        ValidateUtils.isNotNull(smartContractProposalPayload, "smartContractProposalPayload can not be null");
+        ValidateUtils.isNotNull(smartContractProposalPayload, "SmartContractProposalPayload can not be null");
 
         this.transientMap = smartContractProposalPayload.getTransientMapMap();
 
         if (smartContractProposalPayload.getInput() != null) {
-            this.input = Smartcontract.SmartContractInvocationSpec.parseFrom(smartContractProposalPayload.getInput());
+            this.input = SmartContractPackage.SmartContractInvocationSpec.parseFrom(smartContractProposalPayload.getInput());
         }
     }
 
@@ -61,7 +61,7 @@ public class SmartContractProposalPayloadVO implements IProtoVO<ProposalPackage.
         return transientMap;
     }
 
-    public Smartcontract.SmartContractInvocationSpec getInput() {
+    public SmartContractPackage.SmartContractInvocationSpec getInput() {
         return input;
     }
 }

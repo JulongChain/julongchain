@@ -16,10 +16,10 @@ limitations under the License.
 package org.bcia.julongchain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 
 import com.google.protobuf.ByteString;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.BlockAndPvtData;
 import org.bcia.julongchain.core.ledger.IQueryExecutor;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
@@ -30,14 +30,14 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.Ver
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.txmgr.ITxManager;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.validator.IValidator;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.validator.valimpl.DefaultValidator;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 交易管理者类
@@ -47,7 +47,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @company Dingxuan
  */
 public class LockBasedTxManager implements ITxManager {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(LockBasedTxManager.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(LockBasedTxManager.class);
 
     private String ledgerID;
     private IDB db;
@@ -55,6 +55,7 @@ public class LockBasedTxManager implements ITxManager {
     private UpdateBatch batch;
     private Common.Block currentBlock;
     private Map<String, IStateListener> stateListeners;
+    private static Map<String, LockBasedTxSimulator> txSimulatorMap = new HashMap<>();
 
     public LockBasedTxManager(String ledgerID,
                               IDB db,
@@ -66,22 +67,40 @@ public class LockBasedTxManager implements ITxManager {
         this.validator = new DefaultValidator(this, db);
     }
 
+	/**
+	 * 创建新的交易查询器
+	 * @param txid 交易id
+	 */
     @Override
     public synchronized IQueryExecutor newQueryExecutor(String txid) throws LedgerException {
         return new LockBasedQueryExecutor(this, txid);
     }
 
+	/**
+	 * 创建新的交易模拟器
+	 * @param txid 交易id
+	 */
     @Override
     public synchronized ITxSimulator newTxSimulator(String txid) throws LedgerException {
-        logger.debug("Constructing new tx simulator");
-        return new LockBasedTxSimulator(this, txid);
+	    if (txSimulatorMap.containsKey(txid)) {
+		    log.debug("Contains tx simulator with txid: " + txid);
+		    return txSimulatorMap.get(txid);
+	    } else {
+		    log.debug("Constructing new tx simulator");
+		    LockBasedTxSimulator simulator = new LockBasedTxSimulator(this, txid);
+		    txSimulatorMap.put(txid, simulator);
+		    return simulator;
+	    }
     }
 
+	/**
+	 * 验证交易有效性以及准备更新包
+	 */
     @Override
     public void validateAndPrepare(BlockAndPvtData blockAndPvtData, Boolean doMVCCValidation) throws LedgerException {
         try {
             Common.Block block = blockAndPvtData.getBlock();
-            logger.debug("Validating new block with num trans = " + block.getData().getDataList().size());
+			log.debug("Validating new block with num trans = " + block.getData().getDataList().size());
             UpdateBatch b = validator.validateAndPrepareBatch(blockAndPvtData, doMVCCValidation);
             currentBlock = block;
             batch = b;
@@ -92,19 +111,22 @@ public class LockBasedTxManager implements ITxManager {
         }
     }
 
-    @Override
-    public Height getLastSavepoint() throws LedgerException {
+	/**
+	 * 获取最新的保存点
+	 */
+	@Override
+    public LedgerHeight getLastSavepoint() throws LedgerException {
         return db.getLatestSavePoint();
     }
 
     /**
-     * return 0 true
-     * return !0 return - 1 != lastAvailableBlock
+	 * 判断是否需要恢复
+	 * @return blockHeight
      */
     @Override
     public long shouldRecover() throws LedgerException {
         long result = 0;
-        Height savePoint = getLastSavepoint();
+        LedgerHeight savePoint = getLastSavepoint();
         if(savePoint == null){
             return 0;
         }
@@ -115,22 +137,22 @@ public class LockBasedTxManager implements ITxManager {
     @Override
     public void commitLostBlock(BlockAndPvtData blockAndPvtData) throws LedgerException {
         Common.Block block = blockAndPvtData.getBlock();
-        logger.debug("Constructing updateSet for the block " + block.getHeader().getNumber());
+        log.debug("Constructing updateSet for the block " + block.getHeader().getNumber());
         validateAndPrepare(blockAndPvtData, false);
-        logger.debug(String.format("Committing block %d to state database", block.getHeader().getNumber()));
+        log.debug(String.format("Committing block %d to state database", block.getHeader().getNumber()));
         commit();
     }
 
     @Override
     public synchronized void commit() throws LedgerException {
         try{
-            logger.debug("Committing updates to state db");
+            log.debug("Committing updates to state db");
             if(batch == null){
                 throw new LedgerException("validateAndPrepare() method should have been called before calling commit()");
             }
             db.applyPrivacyAwareUpdates(batch,
-                    new Height(currentBlock.getHeader().getNumber(), (long) (currentBlock.getData().getDataList().size() - 1)));
-            logger.debug("Update committed to state db");
+                    new LedgerHeight(currentBlock.getHeader().getNumber(), (long) (currentBlock.getData().getDataList().size() - 1)));
+            log.debug("Update committed to state db");
         } finally {
             clearCache();
             batch = null;
@@ -154,7 +176,7 @@ public class LockBasedTxManager implements ITxManager {
         }
     }
 
-    private void invokeNamespaceListeners(UpdateBatch batch) throws JavaChainException {
+    private void invokeNamespaceListeners(UpdateBatch batch) throws JulongChainException {
         List<String> namespaces = batch.getPubUpdateBatch().getBatch().getUpdatedNamespaces();
         for(String ns : namespaces){
         	if(stateListeners == null){
@@ -164,7 +186,7 @@ public class LockBasedTxManager implements ITxManager {
             if(listener == null){
                 continue;
             }
-            logger.debug("Invoking listener for state changes overs namespace " + ns);
+            log.debug("Invoking listener for state changes over namespace " + ns);
             Map<String, VersionedValue> updateMap = batch.getPubUpdateBatch().getBatch().getUpdates(ns);
             List<KvRwset.KVWrite> kvWrites = new ArrayList<>();
             for(Map.Entry<String, VersionedValue> entry : updateMap.entrySet()){
@@ -228,4 +250,12 @@ public class LockBasedTxManager implements ITxManager {
     public void setStateListeners(Map<String, IStateListener> stateListeners) {
         this.stateListeners = stateListeners;
     }
+
+	public static void setTxSimulatorMap(Map<String, LockBasedTxSimulator> txSimulatorMap) {
+		LockBasedTxManager.txSimulatorMap = txSimulatorMap;
+	}
+
+	public static Map<String, LockBasedTxSimulator> getTxSimulatorMap() {
+		return txSimulatorMap;
+	}
 }

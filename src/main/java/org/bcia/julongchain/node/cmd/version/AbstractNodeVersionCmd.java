@@ -29,12 +29,9 @@ import org.bcia.julongchain.node.entity.NodeVersion;
  */
 public abstract class AbstractNodeVersionCmd implements INodeCmd {
 
-	private Node node;
+	protected Node node;
 
 	protected NodeVersion nodeVersion;
-
-	public AbstractNodeVersionCmd(){
-	}
 
 	public AbstractNodeVersionCmd(Node node) {
 		this.node = node;

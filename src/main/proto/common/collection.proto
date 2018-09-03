@@ -2,6 +2,8 @@
 Copyright IBM Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
+
+Modified java_package and other contents by Dingxuan on 2018-08-21
 */
 
 syntax = "proto3";
@@ -69,7 +71,7 @@ message CollectionPolicyConfig {
 // CollectionCriteria defines an element of a private data that corresponds
 // to a certain transaction and collection
 message CollectionCriteria {
-    string channel = 1;
+    string group = 1;
     string tx_id = 2;
     string collection = 3;
     string namespace = 4;

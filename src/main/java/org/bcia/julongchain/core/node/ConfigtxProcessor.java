@@ -22,8 +22,8 @@ import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.groupconfig.GroupConfigBundle;
 import org.bcia.julongchain.common.groupconfig.IGroupConfigBundle;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.resourceconfig.IResourcesConfigBundle;
 import org.bcia.julongchain.common.resourceconfig.ResourcesConfigBundle;
 import org.bcia.julongchain.common.util.ValidateUtils;
@@ -36,14 +36,14 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 
 /**
- * 对象
+ * 交易处理器
  *
  * @author zhouhui
  * @date 2018/4/25
  * @company Dingxuan
  */
 public class ConfigtxProcessor implements IProcessor {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ConfigtxProcessor.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ConfigtxProcessor.class);
 
     public static final String RESOURCES_CONFIG_KEY = "resourcesconfigtx.RESOURCES_CONFIG_KEY";
     public static final String GROUP_CONFIG_KEY = "resourcesconfigtx.GROUP_CONFIG_KEY";
@@ -95,7 +95,7 @@ public class ConfigtxProcessor implements IProcessor {
         try {
             Configtx.ConfigEnvelope configEnvelope = EnvelopeHelper.getConfigEnvelopeFrom(txEnvelope);
             Configtx.Config groupConfig = configEnvelope.getConfig();
-            ValidateUtils.isNotNull(groupConfig, "configEnvelope.getConfig can not be null");
+            ValidateUtils.isNotNull(groupConfig, "ConfigEnvelope.getConfig can not be null");
 
             persistConfig(simulator, GROUP_CONFIG_KEY, groupConfig);
 
@@ -103,7 +103,7 @@ public class ConfigtxProcessor implements IProcessor {
             Configtx.Config resourcesConfigSeed = ConfigTxUtils.getConfigFromSeedTx(configEnvelope);
 
             if (groupConfig.getSequence() == 1L && resourceConfigCapabilityOn) {
-                ValidateUtils.isNotNull(resourcesConfigSeed, "resourcesConfigSeed can not be null");
+                ValidateUtils.isNotNull(resourcesConfigSeed, "ResourcesConfigSeed can not be null");
 
                 persistConfig(simulator, RESOURCES_CONFIG_KEY, resourcesConfigSeed);
             }
@@ -127,8 +127,8 @@ public class ConfigtxProcessor implements IProcessor {
                 Configtx.Config existingResourcesConfig = retrievePersistedConfig(simulator, RESOURCES_CONFIG_KEY);
                 Configtx.Config existingGroupConfig = retrievePersistedConfig(simulator, GROUP_CONFIG_KEY);
 
-                ValidateUtils.isNotNull(existingResourcesConfig, "existingResourcesConfig can not be null");
-                ValidateUtils.isNotNull(existingGroupConfig, "existingGroupConfig can not be null");
+                ValidateUtils.isNotNull(existingResourcesConfig, "Existing ResourcesConfig can not be null");
+                ValidateUtils.isNotNull(existingGroupConfig, "Existing GroupConfig can not be null");
 
                 IGroupConfigBundle groupConfigBundle = new GroupConfigBundle(groupId, existingGroupConfig);
                 IResourcesConfigBundle resourcesConfigBundle = new ResourcesConfigBundle(groupId,

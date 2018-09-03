@@ -16,21 +16,25 @@
 package org.bcia.julongchain.msp;
 
 /**
+ * 签名身份接口
+ *
  * @author zhangmingyang
  * @Date: 2018/3/8
  * @company Dingxuan
  */
-public interface ISigningIdentity extends IIdentity{
+public interface ISigningIdentity {
     /**
      * 对消息进行签名
+     *
      * @param msg 待签名消息
      * @return
      */
-     byte[] sign(byte[] msg);
+    byte[] sign(byte[] msg);
 
     /**
      * 返回此身份的公共部分
+     *
      * @return
      */
-     IIdentity getPublicVersion();
+    IIdentity getIdentity();
 }

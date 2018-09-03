@@ -16,6 +16,8 @@ package org.bcia.julongchain.csp.intfs;
  * limitations under the License.
  */
 
+import org.bcia.julongchain.common.exception.CspException;
+
 /**
  * @author zhanglin
  * @purpose Define the interface, IHash
@@ -31,21 +33,21 @@ public interface IHash {
     // The write must not modify the slice data, even temporarily.
     //
     // Implementations must not retain p.
-    int write(byte[] p);
+    int write(byte[] p) throws CspException;
 
     // The sum appends the current hash to b and returns the resulting slice.
     // It does not change the underlying hash state.
-    byte[] sum(byte[] b);
+    byte[] sum(byte[] b) throws CspException;
 
     // The reset method resets the Hash to its initial state.
-    void reset();
+    void reset() throws CspException;
 
     // The size method returns the number of bytes sum will return.
-    int size();
+    int size() throws CspException;
 
     // The blockSize method returns the hash's underlying block size.
     // The write method must be able to accept any amount of data, but it may operate more
     // efficiently if all writes are a multiple of the block size.
-    int blockSize();
+    int blockSize() throws CspException;
 
 }

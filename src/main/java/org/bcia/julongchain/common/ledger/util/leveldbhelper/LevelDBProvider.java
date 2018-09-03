@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,13 +17,11 @@ package org.bcia.julongchain.common.ledger.util.leveldbhelper;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.exception.LevelDBException;
-import org.bcia.julongchain.common.ledger.util.IDBHandle;
+import org.bcia.julongchain.common.ledger.util.IDBHandler;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
 
-import java.util.Iterator;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 /**
  * 提供操作leveldb的方法
@@ -33,83 +31,109 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class LevelDBProvider implements IDBProvider {
+	private IDBHandler db;
+	private static byte[] DB_NAME_KEY_SEP = new String(new char[]{Character.MIN_VALUE}).getBytes();
+	private static byte[] DB_LEDGERID_KEY_SEP = new String(new char[]{Character.MIN_VALUE}).getBytes();
+	private String dbPath;
+	private String ledgerID = null;
+	static Map<String, IDBProvider> dbs = new HashMap<>();
 
-    private static JavaChainLog logger = JavaChainLogFactory.getLog(LevelDBProvider.class);
+	public LevelDBProvider(String dbPath) throws LevelDBException {
+		this.dbPath = dbPath;
+		db = new LevelDBHandler();
+		db.createDB(dbPath);
+	}
 
-    private IDBHandle db = null;
-    private byte[] dbNameKeySep = new byte[1];
-    private byte lastKeyIndicator = 0x01;
-    private String dbPath = null;
+	public IDBProvider getDBHandle(String ledgerID) throws LevelDBException{
+		IDBProvider db = dbs.get(ledgerID + dbPath);
+		if(db == null) {
+			db = new LevelDBProvider(dbPath);
+			db.setLedgerID(ledgerID);
+			dbs.put(ledgerID + dbPath, db);
+		}
+		return db;
+	}
 
-    public LevelDBProvider(String dbPath) throws LevelDBException {
-        this.dbPath = dbPath;
-        dbNameKeySep[0] = 0x00;
-        db = new LevelDBHandle();
-        db.createDB(dbPath);
-    }
+	@Override
+	public String getDBPath() {
+		return dbPath;
+	}
 
-    @Override
-    public String getDBPath() {
-        return dbPath;
-    }
+	public void setDbPath(String dbPath) {
+		this.dbPath = dbPath;
+	}
 
-    public void setDbPath(String dbPath) {
-        this.dbPath = dbPath;
-    }
+	@Override
+	public IDBHandler getDb() {
+		return db;
+	}
 
-    @Override
-    public IDBHandle getDb() {
-        return db;
-    }
+	public void setDb(IDBHandler db) {
+		this.db = db;
+	}
 
-    public void setDb(IDBHandle db) {
-        this.db = db;
-    }
+	@Override
+	public void close() throws LevelDBException {
+		db.close();
+	}
 
-    @Override
-    public void close() throws LevelDBException {
-        db.close();
-    }
+	@Override
+	public byte[] get(byte[] key) throws LevelDBException {
+		return db.get(constructLevelKey(ledgerID, key));
+	}
 
-    @Override
-    public byte[] get(byte[] key) throws LevelDBException {
-        return db.get(key);
-    }
+	@Override
+	public void put(byte[] key, byte[] value, boolean sync) throws LevelDBException {
+		db.put(constructLevelKey(ledgerID, key), value, sync);
+	}
 
-    @Override
-    public void put(byte[] key, byte[] value, boolean sync) throws LevelDBException {
-        db.put(key, value, sync);
-    }
+	@Override
+	public void delete(byte[] key, boolean sync) throws LevelDBException {
+		db.delete(constructLevelKey(ledgerID, key), sync);
+	}
 
-    @Override
-    public void delete(byte[] key, boolean sync) throws LevelDBException {
-    	db.put(key, null, sync);
-    }
+	@Override
+	public void writeBatch(UpdateBatch batch, boolean sync) throws LevelDBException {
+		UpdateBatch b = new UpdateBatch();
+		b.addAll(batch, ledgerID);
+		db.writeBatch(b, sync);
+	}
 
-    @Override
-    public void writeBatch(UpdateBatch batch, boolean sync) throws LevelDBException {
-        db.writeBatch(batch, sync);
-    }
+	@Override
+	public Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey) throws LevelDBException {
+		return db.getIterator(constructLevelKey(ledgerID, startKey));
+	}
 
-    @Override
-    public Iterator<Map.Entry<byte[], byte[]>> getIterator(byte[] startKey) throws LevelDBException {
-        return db.getIterator(startKey);
-    }
+	public static byte[] constructLevelKey(String ledgerID, byte[] key) {
+		if (ledgerID == null) {
+			return key;
+		}
+		byte[] arr = ArrayUtils.addAll(ledgerID.getBytes(StandardCharsets.UTF_8), DB_LEDGERID_KEY_SEP);
+		arr = ArrayUtils.addAll(arr, key);
+		return arr;
+	}
 
-    public byte[] constructLevelKey(String dbName, byte[] key) {
-        byte[] arr = ArrayUtils.addAll(dbName.getBytes(), dbNameKeySep);
-        arr = ArrayUtils.addAll(arr, key);
-        return arr;
-    }
+	public byte[] retrieveAppKey(byte[] levelKey) {
+		if (levelKey == null) {
+			return null;
+		}
+		String str = new String(levelKey);
+		String follow = null;
+		int start = 0;
+		while(str.indexOf(new String(DB_NAME_KEY_SEP), start) != -1){
+			start++;
+		}
+		follow = str.substring(start, str.length());
+		return follow.getBytes(StandardCharsets.UTF_8);
+	}
 
-    public byte[] retrieveAppKey(byte[] levelKey) {
-        String str = new String(levelKey);
-        String follow = null;
-        int start = 0;
-        while(str.indexOf(new String(dbNameKeySep), start) != -1){
-            start++;
-        }
-        follow = str.substring(start, str.length());
-        return follow.getBytes();
-    }
+	@Override
+	public String getLedgerID() {
+		return ledgerID;
+	}
+
+	@Override
+	public void setLedgerID(String ledgerID) {
+		this.ledgerID = ledgerID;
+	}
 }

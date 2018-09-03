@@ -14,16 +14,13 @@
 package org.bcia.julongchain.core.container;
 
 import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.model.BuildResponseItem;
-import com.github.dockerjava.api.model.Container;
-import com.github.dockerjava.api.model.Image;
-import com.github.dockerjava.api.model.SearchItem;
+import com.github.dockerjava.api.model.*;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.command.BuildImageResultCallback;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.StringUtils;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 
 import java.io.File;
@@ -41,7 +38,7 @@ import java.util.List;
  */
 public class DockerUtil {
 
-  private static JavaChainLog logger = JavaChainLogFactory.getLog(DockerUtil.class);
+  private static JulongChainLog logger = JulongChainLogFactory.getLog(DockerUtil.class);
 
   public static DockerClient getDockerClient() {
     // tcp://localhost:2375
@@ -50,7 +47,7 @@ public class DockerUtil {
     return dockerClient;
   }
 
-  private static void closeDockerClient(DockerClient dockerClient) {
+  public static void closeDockerClient(DockerClient dockerClient) {
     try {
       dockerClient.close();
     } catch (IOException e) {
@@ -116,10 +113,14 @@ public class DockerUtil {
    * @return
    */
   public static List<String> listImages(String imageName) {
+      logger.info("list images:" + imageName);
     List<String> imageNameList = new ArrayList<String>();
     DockerClient dockerClient = getDockerClient();
     List<Image> imageList = dockerClient.listImagesCmd().exec();
     for (Image image : imageList) {
+      if (image.getRepoTags() == null) {
+        continue;
+      }
       String imageTag = image.getRepoTags()[0];
       if (StringUtils.isEmpty(imageName) || StringUtils.contains(imageTag, imageName)) {
         imageNameList.add(imageTag);
@@ -128,6 +129,11 @@ public class DockerUtil {
     closeDockerClient(dockerClient);
     return imageNameList;
   }
+
+    public static void main(String[] args) {
+        List<String> list = listImages("");
+        System.out.println(list);
+    }
 
   /**
    * list containers
@@ -141,29 +147,25 @@ public class DockerUtil {
     DockerClient dockerClient = getDockerClient();
     List<Container> containerList = dockerClient.listContainersCmd().withShowAll(true).exec();
     for (Container container : containerList) {
-      if (StringUtils.isEmpty(name) || StringUtils.contains(container.getImage(), name)) {
-        result.add(container.getImage());
+      if (StringUtils.isEmpty(name) || StringUtils.contains(container.getNames()[0], name)) {
+        result.add(container.getId());
       }
     }
     closeDockerClient(dockerClient);
     return result;
   }
 
-  public static String createContainer(String imageId, String containerName) {
-    String containerId =
-        getDockerClient()
-            .createContainerCmd(imageId)
-            .withName(containerName)
-            .withCmd(
-                "/bin/sh",
-                "-c",
-                "java -jar /root/julongchain/target/julongchain-smartcontract-java-jar-with-dependencies.jar -i "
-                    + containerName)
-            .exec()
-            .getId();
-    logger.info("container ID:" + containerId);
-    return containerId;
-  }
+    public static String createContainer(String imageId, String containerName, String... cmdStr) {
+        String containerId =
+                getDockerClient()
+                        .createContainerCmd(imageId)
+                        .withName(containerName)
+                        .withCmd(cmdStr)
+                        .exec()
+                        .getId();
+        logger.info("container ID:" + containerId);
+        return containerId;
+    }
 
   public static void startContainer(String containerId) {
     logger.info("start container, ID:" + containerId);

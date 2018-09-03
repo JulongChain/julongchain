@@ -19,8 +19,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.CommitterException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.protos.ConfigEnvelopeVO;
 import org.bcia.julongchain.common.protos.PayloadVO;
 import org.bcia.julongchain.common.protos.TransactionVO;
@@ -33,7 +33,7 @@ import org.bcia.julongchain.core.ledger.util.TxValidationFlags;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.bcia.julongchain.protos.node.TransactionPackage;
 
 import java.util.*;
@@ -46,7 +46,7 @@ import java.util.*;
  * @company Dingxuan
  */
 public class CommitterValidator implements ICommitterValidator {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CommitterValidator.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(CommitterValidator.class);
 
     private ICommitterSupport committerSupport;
     private IVsscValidator vsscValidator;
@@ -59,15 +59,15 @@ public class CommitterValidator implements ICommitterValidator {
 
     @Override
     public Common.Block validate(Common.Block block) throws ValidateException {
-        ValidateUtils.isNotNull(block, "block can not be null");
-        ValidateUtils.isNotNull(block.getData(), "block.data can not be null");
-        ValidateUtils.isNotNull(block.getData().getDataList(), "block.data.dataList can not be null");
+        ValidateUtils.isNotNull(block, "Block can not be null");
+        ValidateUtils.isNotNull(block.getData(), "Block.data can not be null");
+        ValidateUtils.isNotNull(block.getData().getDataList(), "Block.data.dataList can not be null");
 
         //该区块中交易的数量
         int txCount = block.getData().getDataCount();
         if (txCount <= 0) {
             //如果交易数量少于1，该区块无效
-            throw new ValidateException("txCount should bigger than 0");
+            throw new ValidateException("TxCount should bigger than 0");
         }
 
         //交易验证器标识，对Block里面每一项交易打标记，到底是有效还是无效
@@ -320,13 +320,13 @@ public class CommitterValidator implements ICommitterValidator {
         SmartContractInstance upgradeInstance = null;
 
         TransactionVO transactionVO = (TransactionVO) payloadVO.getDataVO();
-        Smartcontract.SmartContractInvocationSpec invocationSpec = transactionVO.getTransactionActionVOList().get(0)
+        SmartContractPackage.SmartContractInvocationSpec invocationSpec = transactionVO.getTransactionActionVOList().get(0)
                 .getSmartContractActionPayloadVO().getSmartContractProposalPayloadVO().getInput();
 
         if (CommConstant.LSSC.equals(invokeInstance.getSmartContractName())) {
             if (CommConstant.UPGRADE.equals(invocationSpec.getSmartContractSpec().getInput().getArgs(0).toStringUtf8
                     ())) {
-                Smartcontract.SmartContractDeploymentSpec deploymentSpec = Smartcontract.SmartContractDeploymentSpec
+                SmartContractPackage.SmartContractDeploymentSpec deploymentSpec = SmartContractPackage.SmartContractDeploymentSpec
                         .parseFrom(invocationSpec.getSmartContractSpec().getInput().getArgs(2));
                 upgradeInstance = new SmartContractInstance();
                 upgradeInstance.setGroupId(payloadVO.getGroupHeaderVO().getGroupId());
@@ -339,7 +339,6 @@ public class CommitterValidator implements ICommitterValidator {
     }
 
     private boolean chainExists(String chain) {
-        //TODO:yao shi xian
         return true;
     }
 }

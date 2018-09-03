@@ -18,6 +18,8 @@ package org.bcia.julongchain.consenter.common.localconfig;
 import java.util.Map;
 
 /**
+ * consenter配置
+ *
  * @author zhangmingyang
  * @Date: 2018/5/24
  * @company Dingxuan
@@ -40,6 +42,7 @@ public class ConsenterConfig {
         private String gossipAddress;
         private String listenAddress;
         private String listenPort;
+        private String  version;
         private Map<String,String> tls;
         private Map<String,Integer> keepAlive;
         private String logLevel;
@@ -75,6 +78,14 @@ public class ConsenterConfig {
 
         public void setListenPort(String listenPort) {
             this.listenPort = listenPort;
+        }
+
+        public String getVersion() {
+            return version;
+        }
+
+        public void setVersion(String version) {
+            this.version = version;
         }
 
         public Map<String, String> getTls() {
@@ -185,7 +196,7 @@ public class ConsenterConfig {
     public static class FileLedger {
         private String location;
         private String prefix;
-
+        private String groupName;
         public String getPrefix() {
             return prefix;
         }
@@ -200,6 +211,14 @@ public class ConsenterConfig {
 
         public void setLocation(String location) {
             this.location = location;
+        }
+
+        public String getGroupName() {
+            return groupName;
+        }
+
+        public void setGroupName(String groupName) {
+            this.groupName = groupName;
         }
     }
 

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,39 +15,55 @@
  */
 package org.bcia.julongchain.core.common.privdata;
 
+import org.bcia.julongchain.common.exception.LedgerException;
+import org.bcia.julongchain.common.exception.PrivDataException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.IQueryExecutor;
+import org.bcia.julongchain.core.node.util.NodeUtils;
 import org.bcia.julongchain.msp.IIdentityDeserializer;
+import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
+import org.bcia.julongchain.msp.mgmt.MspMgmtMgr;
 import org.bcia.julongchain.protos.common.Collection;
 
 /**
- * 类描述
+ * 集合辅助类
  *
- * @author sunianle
+ * @author sunianle, sunzongyu
  * @date 3/15/18
  * @company Dingxuan
  */
 public class CollectionStoreSupport implements IPrivDataSupport {
+	private static JulongChainLog log = JulongChainLogFactory.getLog(CollectionStoreSupport.class);
+
     public final static String COLLECTION_SEPARATOR = "~";
     public final static String COLLECTION_SUFFIX ="collection";
 
     @Override
-    public IQueryExecutor getQueryExecotorForLedger(String groupID) {
-        return null;
-    }
+    public IQueryExecutor getQueryExecutorForLedger(String groupID) throws PrivDataException {
+		INodeLedger l = NodeUtils.getLedger(groupID);
+		try {
+			return l.newQueryExecutor();
+		} catch (LedgerException e) {
+			log.error(e.getMessage());
+			throw new PrivDataException(e);
+		}
+	}
 
     @Override
     public String getCollectionKVSKey(Collection.CollectionCriteria cc) {
-        return null;
+    	return buildCollectionKVSKey(cc.getNamespace());
     }
 
     @Override
     public IIdentityDeserializer getIdentityDeserializer(String groupID) {
-        return null;
+		return MspMgmtMgr.getManagerForChain(groupID);
     }
 
     @Override
-    public String buildCollectionKVSKey(String smartcontractname) {
-        return smartcontractname+ COLLECTION_SEPARATOR + COLLECTION_SUFFIX;
+    public String buildCollectionKVSKey(String smartContractname) {
+        return smartContractname+ COLLECTION_SEPARATOR + COLLECTION_SUFFIX;
     }
 
     @Override

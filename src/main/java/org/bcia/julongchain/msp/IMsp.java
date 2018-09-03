@@ -14,29 +14,36 @@
  * limitations under the License.
  */
 package org.bcia.julongchain.msp;
+
+import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.msp.entity.IdentityIdentifier;
 import org.bcia.julongchain.protos.common.MspPrincipal;
 import org.bcia.julongchain.protos.msp.MspConfigPackage;
 
+import java.io.IOException;
+
 /**
+ * 成员服务提供者接口
+ *
  * @author zhangmingyang
  * @Date: 2018/3/8
  * @company Dingxuan
  */
-public interface IMsp extends IIdentityDeserializer{
+public interface IMsp extends IIdentityDeserializer {
     /**
-     *  根据配置信息设置MSP实例
+     * 根据配置信息设置MSP实例
+     *
      * @param config
      */
 
     IMsp setup(MspConfigPackage.MSPConfig config);
 
-   //  IMsp load(GmSoftConf GmSoftConf);
     /**
      * 返回此msp的版本
+     *
      * @return
      */
-    public int getVersion();
+    int getVersion();
 
     /**
      * const常量,之后需要确认
@@ -44,52 +51,60 @@ public interface IMsp extends IIdentityDeserializer{
 
     /**
      * 返回提供者类型
+     *
      * @return
      */
-     int getType();
+    int getType();
 
     /**
      * 返回提供者的标识符
+     *
      * @return
      */
-     String getIdentifier();
+    String getIdentifier();
 
     /**
      * 返回与提供的标识符对应的签名标识
+     *
      * @param identityIdentifier
      * @return
      */
-     ISigningIdentity getSigningIdentity(IdentityIdentifier identityIdentifier);
+    ISigningIdentity getSigningIdentity(IdentityIdentifier identityIdentifier);
 
     /**
      * 返回默认的签名标识
+     *
      * @return
      */
-     ISigningIdentity getDefaultSigningIdentity();
+    ISigningIdentity getDefaultSigningIdentity();
 
     /**
      * 返回此MSP的TLS根证书
+     *
      * @return
      */
-     byte[][] getTLSRootCerts();
+    byte[][] getTLSRootCerts();
 
     /**
      * 返回此MSP的TLS中间根证书
+     *
      * @return
      */
-     byte[][] getTLSIntermediateCerts();
+    byte[][] getTLSIntermediateCerts();
 
     /**
      * 验证检查提供的身份是否有效
+     *
      * @param id
      */
-     void validate(IIdentity id);
+    void validate(IIdentity id) throws MspException;
 
     /**
      * SatisfiesPrincipal检查该标识是否与MSPPrincipal中提供的描述相匹配。
      * 检查可能涉及逐字节比较（如果委托人是序列化身份）或可能需要MSP验证
+     *
      * @param id
      * @param principal
      */
-     void satisfiesPrincipal(IIdentity id, MspPrincipal.MSPPrincipal principal);
+    void satisfiesPrincipal(IIdentity id, MspPrincipal.MSPPrincipal principal) throws IOException, MspException;
 }

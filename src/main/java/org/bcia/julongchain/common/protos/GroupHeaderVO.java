@@ -24,7 +24,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 
 /**
- * 类描述
+ * 群组头部业务对象
  *
  * @author zhouhui
  * @date 2018/05/26
@@ -42,7 +42,7 @@ public class GroupHeaderVO implements IProtoVO<Common.GroupHeader> {
 
     @Override
     public void parseFrom(Common.GroupHeader groupHeader) throws InvalidProtocolBufferException, ValidateException {
-        ValidateUtils.isNotNull(groupHeader, "payload can not be null");
+        ValidateUtils.isNotNull(groupHeader, "GroupHeader can not be null");
 
         this.type = groupHeader.getType();
         this.version = groupHeader.getVersion();
@@ -53,7 +53,7 @@ public class GroupHeaderVO implements IProtoVO<Common.GroupHeader> {
 
         if (type == Common.HeaderType.ENDORSER_TRANSACTION_VALUE || groupHeader.getType() == Common.HeaderType
                 .CONFIG_VALUE) {
-            ValidateUtils.isNotNull(groupHeader.getExtension(), "payload.extension can not be null");
+            ValidateUtils.isNotNull(groupHeader.getExtension(), "GroupHeader.extension can not be null");
             this.groupHeaderExtension = ProposalPackage.SmartContractHeaderExtension.parseFrom(groupHeader.getExtension());
         }
         this.tlsCertHash = groupHeader.getTlsCertHash();

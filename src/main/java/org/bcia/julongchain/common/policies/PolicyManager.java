@@ -18,8 +18,8 @@ package org.bcia.julongchain.common.policies;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.PolicyException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.policy.IPolicy;
 import org.bcia.julongchain.common.policies.policy.ImplicitMetaPolicy;
 import org.bcia.julongchain.common.policies.policy.NormalPolicy;
@@ -32,14 +32,14 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * 对象
+ * 策略管理器
  *
  * @author zhouhui
  * @date 2018/4/17
  * @company Dingxuan
  */
 public class PolicyManager implements IPolicyManager {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(PolicyManager.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(PolicyManager.class);
 
     private String path;
     private Map<String, IPolicy> policies;
@@ -69,7 +69,7 @@ public class PolicyManager implements IPolicyManager {
             String policyName = entry.getKey();
             Configtx.ConfigPolicy configPolicy = entry.getValue();
             if (configPolicy.getPolicy() == null) {
-                throw new PolicyException("Policy can not be null");
+                throw new PolicyException("PolicyConstant can not be null");
             }
 
             if (configPolicy.getPolicy().getType() == Policies.Policy.PolicyType.IMPLICIT_META_VALUE) {
@@ -79,7 +79,7 @@ public class PolicyManager implements IPolicyManager {
             } else {
                 IPolicyProvider provider = providers.get(configPolicy.getPolicy().getType());
                 if (provider == null) {
-                    log.warn("provider is null: " + configPolicy.getPolicy().getType());
+                    log.warn("Provider is null: " + configPolicy.getPolicy().getType());
                 } else {
                     //TODO:
                     IPolicy policy = provider.makePolicy(configPolicy.getPolicy().getValue().toByteArray());

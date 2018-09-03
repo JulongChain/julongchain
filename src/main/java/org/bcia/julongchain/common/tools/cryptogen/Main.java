@@ -17,23 +17,25 @@
 
 package org.bcia.julongchain.common.tools.cryptogen;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.tools.cryptogen.cmd.CryptoGenCmdFactory;
 import org.bcia.julongchain.common.tools.cryptogen.cmd.HelpCmd;
 import org.bcia.julongchain.common.tools.cryptogen.cmd.ICryptoGenCmd;
 
 /**
+ * 辅助工具主入口
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/3
  * @company Excelsecu
  */
 public class Main {
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Main.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Main.class);
 
-    public static void main(String[] args) throws JavaChainException {
+    public static void main(String[] args) throws JulongChainException {
         if (args.length == 0) {
             new HelpCmd().execCmd(args);
             return;

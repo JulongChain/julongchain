@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,26 +19,26 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import org.apache.commons.lang3.ArrayUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.ledger.util.IoUtil;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.node.SmartContractDataPackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 import java.io.*;
 
 /**
- * SDSPackage encapsulates SmartcontractDeploymentSpec.
+ * 智能合约部署包
  *
  * @author sunianle, sunzongyu
  * @date 4/25/18
  * @company Dingxuan
  */
 public class SDSPackage implements ISmartContractPackage {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SDSPackage.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SDSPackage.class);
 
-    private Smartcontract.SmartContractDeploymentSpec deploymentSpec;
+    private SmartContractPackage.SmartContractDeploymentSpec deploymentSpec;
     private byte[] buf;
     private SDSData data;
     private byte[] datab;
@@ -58,23 +58,22 @@ public class SDSPackage implements ISmartContractPackage {
      * 根据buf进行初始化
      * @param buf
      * @return
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     @Override
-    public SmartContractDataPackage.SmartContractData initFromBuffer(byte[] buf) throws JavaChainException {
+    public SmartContractDataPackage.SmartContractData initFromBuffer(byte[] buf) throws JulongChainException {
         reset();
 
-        Smartcontract.SmartContractDeploymentSpec deploymentSpec = null;
+        SmartContractPackage.SmartContractDeploymentSpec deploymentSpec = null;
         try {
-            deploymentSpec = Smartcontract.SmartContractDeploymentSpec.parseFrom(buf);
+            deploymentSpec = SmartContractPackage.SmartContractDeploymentSpec.parseFrom(buf);
         } catch (InvalidProtocolBufferException e) {
             log.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         }
 
         this.deploymentSpec = deploymentSpec;
 
-        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
 
         this.buf = buf;
         this.data = getSDSData(deploymentSpec);
@@ -91,11 +90,10 @@ public class SDSPackage implements ISmartContractPackage {
      * @param scName
      * @param scVersion
      * @return
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     @Override
-    public Smartcontract.SmartContractDeploymentSpec initFromFS(String scName, String scVersion) throws JavaChainException {
-        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
+    public SmartContractPackage.SmartContractDeploymentSpec initFromFS(String scName, String scVersion) throws JulongChainException {
         reset();
         byte[] buf = SmartContractProvider.getSmartContractPackage(scName, scVersion);
         initFromBuffer(buf);
@@ -107,10 +105,10 @@ public class SDSPackage implements ISmartContractPackage {
      * @param sds
      * @return
      */
-    private SDSData getSDSData(Smartcontract.SmartContractDeploymentSpec sds) throws JavaChainException{
+    private SDSData getSDSData(SmartContractPackage.SmartContractDeploymentSpec sds) throws JulongChainException {
         //检查是否为空
         if(sds == null){
-            throw new JavaChainException("Null sds");
+            throw new JulongChainException("Null sds");
         }
         SDSData sdsData = new SDSData();
         sdsData.setCodeHash(sds.getCodePackage().toByteArray());
@@ -122,26 +120,25 @@ public class SDSPackage implements ISmartContractPackage {
 
     /**
      * 将智能合约包存入文件系统
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
     @Override
-    public void putSmartcontractToFS() throws JavaChainException {
-        //TODO implement by sunzongyu, support for LSSC. date: 2018-05-08
+    public void putSmartcontractToFS() throws JulongChainException {
         //创建文件前的检查
         if(buf == null){
-            throw new JavaChainException("Uninitialized package");
+            throw new JulongChainException("Uninitialized package");
         }
         if(id == null){
-            throw new JavaChainException("Id can not be null if buf is not null");
+            throw new JulongChainException("Id can not be null if buf is not null");
         }
         if(deploymentSpec == null){
-            throw new JavaChainException("DeploymentSpec can not be null if buf is not null");
+            throw new JulongChainException("DeploymentSpec can not be null if buf is not null");
         }
         if(data == null){
-            throw new JavaChainException("Null data");
+            throw new JulongChainException("Null data");
         }
         if(datab == null){
-            throw new JavaChainException("Null data bytes");
+            throw new JulongChainException("Null data bytes");
         }
         //创建文件
         String scName = deploymentSpec.getSmartContractSpec().getSmartContractId().getName();
@@ -150,18 +147,18 @@ public class SDSPackage implements ISmartContractPackage {
 
         File file = new File(path);
         if(file.exists()){
-            throw new JavaChainException("SmartContract " + path + " exists");
+            throw new JulongChainException("SmartContract " + path + " exists");
         }
         try {
             if (!IoUtil.createFileIfMissing(file.getPath())) {
                 //创建文件失败
 	            String errMsg = "File [" + path + "] can not be created. Please make sure you have the permission of the directory";
 	            log.error(errMsg);
-                throw new JavaChainException(errMsg);
+                throw new JulongChainException(errMsg);
             }
         } catch (Exception e){
             log.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         }
         //写入文件
         OutputStream os = null;
@@ -169,18 +166,18 @@ public class SDSPackage implements ISmartContractPackage {
             os = new FileOutputStream(file);
         } catch (FileNotFoundException e) {
             log.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         }
         try {
             os.write(buf);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         }
     }
 
     @Override
-    public Smartcontract.SmartContractDeploymentSpec getDepSpec() {
+    public SmartContractPackage.SmartContractDeploymentSpec getDepSpec() {
         if(this.deploymentSpec == null){
             throw new RuntimeException("Function getDepSpec() called on uninitialized package");
         }
@@ -196,20 +193,20 @@ public class SDSPackage implements ISmartContractPackage {
     }
 
     @Override
-    public void validateSC(SmartContractDataPackage.SmartContractData scData) throws JavaChainException {
+    public void validateSC(SmartContractDataPackage.SmartContractData scData) throws JulongChainException {
         if(deploymentSpec == null){
-            throw new JavaChainException("Uninitialized packag");
+            throw new JulongChainException("Uninitialized packag");
         }
         if(data == null){
-            throw new JavaChainException("Null data");
+            throw new JulongChainException("Null data");
         }
         if(!scData.getName().equals(deploymentSpec.getSmartContractSpec().getSmartContractId().getName()) ||
                 !scData.getVersion().equals(deploymentSpec.getSmartContractSpec().getSmartContractId().getVersion())){
-            throw new JavaChainException("Invalid smartcontract data failed");
+            throw new JulongChainException("Invalid smartcontract data failed");
         }
         SDSData otherData = (SDSData) IoUtil.byteArray2Obj(scData.getData().toByteArray());
         if(!data.equals(otherData)){
-            throw new JavaChainException("Data mismatch");
+            throw new JulongChainException("Data mismatch");
         }
     }
 

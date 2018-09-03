@@ -16,12 +16,11 @@
 package org.bcia.julongchain.msp.entity;
 
 /**
- *
+ * 验证选项
  * @author zhangmingyang
  * @Date: 2018/3/15
  * @company Dingxuan
  */
 public class VerifyOptions {
     String DNSName;
-    //其他属性为定义,该类的属性go语言插件自带
 }

@@ -30,7 +30,7 @@ public interface IPolicyManager {
     IPolicy getPolicy(String id);
 
     /**
-     * the sub-policy getPolicyManager for a given path and whether it exists
+     * 获取子策略管理器
      *
      * @param paths
      * @return

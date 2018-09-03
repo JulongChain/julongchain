@@ -34,23 +34,25 @@ import org.bcia.julongchain.protos.common.Configtx;
 import java.util.Map;
 
 /**
+ * 链支持者
+ *
  * @author zhangmingyang
  * @Date: 2018/5/8
  * @company Dingxuan
  */
-public class ChainSupport implements IStandardGroupSupport,IConsenterSupport {
-     LedgerResources ledgerResources;
-     IProcessor processor;
-     BlockWriter blockWriter;
-     IChain chain;
-     IReceiver cutter;
-     ILocalSigner localSigner;
-     IGroupConfigBundle updateBundle;
+public class ChainSupport implements IStandardGroupSupport, IConsenterSupport {
+    private LedgerResources ledgerResources;
+    private IProcessor processor;
+    private BlockWriter blockWriter;
+    private IChain chain;
+    private IReceiver cutter;
+    private ILocalSigner localSigner;
+    private IGroupConfigBundle updateBundle;
 
     public ChainSupport() {
     }
 
-    public ChainSupport(Registrar registrar, LedgerResources ledgerResources, Map<String, IConsensue> consenters, ILocalSigner signer) {
+    public ChainSupport(Registrar registrar, LedgerResources ledgerResources, Map<String, IConsensusPlugin> consenters, ILocalSigner signer) {
         Common.Block lastBlock = null;
         Common.Metadata metadata = null;
         try {
@@ -67,7 +69,7 @@ public class ChainSupport implements IStandardGroupSupport,IConsenterSupport {
         this.blockWriter = new BlockWriter(this, registrar, lastBlock);
         // this.blockWriter = new BlockWriter(blockWriter.getSupport(), registrar, lastBlock);
         String consensusType = ledgerResources.getMutableResources().getGroupConfig().getConsenterConfig().getConsensusType();
-        IConsensue consenter = consenters.get(consensusType);
+        IConsensusPlugin consenter = consenters.get(consensusType);
         chain = consenter.handleChain(this, metadata);
     }
 
@@ -76,9 +78,10 @@ public class ChainSupport implements IStandardGroupSupport,IConsenterSupport {
     }
 
 
-    public  void update(IGroupConfigBundle groupConfigBundle){
-        this.updateBundle=groupConfigBundle;
+    public void update(IGroupConfigBundle groupConfigBundle) {
+        this.updateBundle = groupConfigBundle;
     }
+
     public void start() {
         chain.start();
     }
@@ -109,6 +112,34 @@ public class ChainSupport implements IStandardGroupSupport,IConsenterSupport {
 
     public IGroupConfigBundle getUpdateBundle() {
         return updateBundle;
+    }
+
+    public void setLedgerResources(LedgerResources ledgerResources) {
+        this.ledgerResources = ledgerResources;
+    }
+
+    public void setProcessor(IProcessor processor) {
+        this.processor = processor;
+    }
+
+    public void setBlockWriter(BlockWriter blockWriter) {
+        this.blockWriter = blockWriter;
+    }
+
+    public void setChain(IChain chain) {
+        this.chain = chain;
+    }
+
+    public void setCutter(IReceiver cutter) {
+        this.cutter = cutter;
+    }
+
+    public void setLocalSigner(ILocalSigner localSigner) {
+        this.localSigner = localSigner;
+    }
+
+    public void setUpdateBundle(IGroupConfigBundle updateBundle) {
+        this.updateBundle = updateBundle;
     }
 
     @Override
@@ -145,7 +176,7 @@ public class ChainSupport implements IStandardGroupSupport,IConsenterSupport {
     }
 
     @Override
-    public ILocalSigner signer() {
+    public ILocalSigner getSigner() {
         return localSigner;
     }
 
@@ -156,11 +187,12 @@ public class ChainSupport implements IStandardGroupSupport,IConsenterSupport {
 
     @Override
     public void writeBlock(Common.Block block, byte[] encodedMetadataValue) {
-            blockWriter.writeBlock(block,encodedMetadataValue);
+        blockWriter.writeBlock(block, encodedMetadataValue);
     }
 
     @Override
     public void writeConfigBlock(Common.Block block, byte[] encodedMetadataValue) throws InvalidProtocolBufferException, LedgerException, ValidateException, PolicyException {
-            blockWriter.writeConfigBlock(block,encodedMetadataValue);
+        blockWriter.writeConfigBlock(block, encodedMetadataValue);
     }
+
 }

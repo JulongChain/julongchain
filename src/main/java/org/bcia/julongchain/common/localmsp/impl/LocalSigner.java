@@ -17,11 +17,12 @@ package org.bcia.julongchain.common.localmsp.impl;
 
 import com.google.protobuf.ByteString;
 import org.bcia.julongchain.common.localmsp.ILocalSigner;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.msp.mgmt.Identity;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.protos.common.Common;
 
-import java.security.SecureRandom;
 
 /**
  * @author zhangmingyang
@@ -29,16 +30,19 @@ import java.security.SecureRandom;
  * @company Dingxuan
  */
 public class LocalSigner implements ILocalSigner {
+    private static JulongChainLog log = JulongChainLogFactory.getLog(LocalSigner.class);
+
     public LocalSigner() {
     }
     @Override
     public Common.SignatureHeader newSignatureHeader() {
         try {
-            Identity identity= (Identity) GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
+            Identity identity= (Identity) GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity().getIdentity();
             byte[] creatorIdentityRaw=identity.serialize();
             Common.SignatureHeader.Builder signatureHeader=Common.SignatureHeader.newBuilder();
-            byte[] none=new SecureRandom().generateSeed(24);
-            signatureHeader.setNonce(ByteString.copyFrom(none));
+            byte[] nonce = null;
+            nonce= identity.getMsp().getCsp().rng(24,null);
+            signatureHeader.setNonce(ByteString.copyFrom(nonce));
             signatureHeader.setCreator(ByteString.copyFrom(creatorIdentityRaw));
             return signatureHeader.build();
         } catch (Exception e) {

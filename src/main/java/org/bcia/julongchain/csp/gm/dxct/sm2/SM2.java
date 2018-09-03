@@ -1,4 +1,4 @@
-package org.bcia.julongchain.csp.gm.dxct.sm2; /**
+/**
  * Copyright DingXuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +13,10 @@ package org.bcia.julongchain.csp.gm.dxct.sm2; /**
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.bcia.julongchain.csp.gm.dxct.sm2;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
@@ -27,29 +28,22 @@ import org.bouncycastle.crypto.params.*;
 import org.bouncycastle.crypto.signers.SM2Signer;
 import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.math.ec.ECPoint;
-import org.bouncycastle.util.encoders.Hex;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
 /**
+ * 国密SM2实现
+ *
  * @author zhangmingyang
  * @Date: 2018/4/24
  * @company Dingxuan
  */
 public class SM2 {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SM2.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SM2.class);
+
     /**
-     * 第一组参数
-     */
-//    public static BigInteger SM2_ECC_P = new BigInteger("8542D69E4C044F18E8B92435BF6FF7DE457283915C45517D722EDB8B08F1DFC3", 16);
-//    public static BigInteger SM2_ECC_A = new BigInteger("787968B4FA32C3FD2417842E73BBFEFF2F3C848B6831D7E0EC65228B3937E498", 16);
-//    public static BigInteger SM2_ECC_B = new BigInteger("63E4C6D3B23B0C849CF84241484BFE48F61D59A5B16BA06E6E12D1DA27C5249A", 16);
-//    public static BigInteger SM2_ECC_N = new BigInteger("8542D69E4C044F18E8B92435BF6FF7DD297720630485628D5AE74EE7C32E79B7", 16);
-//    public static BigInteger SM2_ECC_GX = new BigInteger("421DEBD61B62EAB6746434EBC3CC315E32220B3BADD50BDC4C4E6C147FEDD43D", 16);
-//    public static BigInteger SM2_ECC_GY = new BigInteger("0680512BCBB42C07D47349D2153B70C4E5D7FDFCBFA36EA1A85841B9E46E09A2", 16);
-    /**
-     * 第二组参数
+     * sm2推荐参数
      */
     private static BigInteger SM2_ECC_N = new BigInteger("FFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFF7203DF6B21C6052B53BBF40939D54123", 16);
     private static BigInteger SM2_ECC_P = new BigInteger("FFFFFFFEFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF00000000FFFFFFFFFFFFFFFF", 16);
@@ -64,8 +58,8 @@ public class SM2 {
 
     public SM2() {
         curve = new ECCurve.Fp(SM2_ECC_P, SM2_ECC_A, SM2_ECC_B);
-        ECPoint G = curve.createPoint(SM2_ECC_GX, SM2_ECC_GY);
-        ecc_bc_spec = new ECDomainParameters(curve, G, SM2_ECC_N);
+        ECPoint ecc_point_g = curve.createPoint(SM2_ECC_GX, SM2_ECC_GY);
+        ecc_bc_spec = new ECDomainParameters(curve, ecc_point_g, SM2_ECC_N);
     }
 
     /**
@@ -76,17 +70,12 @@ public class SM2 {
     public SM2KeyPair generateKeyPair() {
         ECKeyGenerationParameters ecKeyGenerationParameters = new ECKeyGenerationParameters(ecc_bc_spec, new SecureRandom());
         ECKeyPairGenerator keyPairGenerator = new ECKeyPairGenerator();
-
         keyPairGenerator.init(ecKeyGenerationParameters);
-
         AsymmetricCipherKeyPair kp = keyPairGenerator.generateKeyPair();
         ECPrivateKeyParameters ecpriv = (ECPrivateKeyParameters) kp.getPrivate();
         ECPublicKeyParameters ecpub = (ECPublicKeyParameters) kp.getPublic();
         BigInteger privateKey = ecpriv.getD();
         ECPoint publicKey = ecpub.getQ();
-        log.info("publicKey: " + Hex.toHexString(publicKey.getEncoded(false)));
-        log.info("privateKey: " + Hex.toHexString(privateKey.toByteArray()));
-
         return new SM2KeyPair(publicKey.getEncoded(false), privateKey.toByteArray());
     }
 
@@ -115,7 +104,7 @@ public class SM2 {
      * @return
      * @throws CryptoException
      */
-    public byte[] sign(byte[] privateKey, byte[] msg) {
+    public byte[] sign(byte[] privateKey, byte[] msg) throws CryptoException {
         SM2Signer signer = new SM2Signer();
         BigInteger d = byte2BigInteger(privateKey);
         ECPrivateKeyParameters privateKeyParameters = new ECPrivateKeyParameters(d, ecc_bc_spec);
@@ -125,7 +114,8 @@ public class SM2 {
         try {
             sig = signer.generateSignature();
         } catch (CryptoException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
+            throw new CryptoException(e.getMessage());
         }
         return sig;
     }
@@ -140,7 +130,7 @@ public class SM2 {
      */
     public boolean verify(byte[] publicKey, byte[] signValue, byte[] msg) {
         SM2Signer signer = new SM2Signer();
-        BigInteger[] rs = decode(signValue);
+        // BigInteger[] rs = decode(signValue);
         ECPublicKeyParameters ecPub = new ECPublicKeyParameters(byte2ECpoint(publicKey), ecc_bc_spec);
         signer.init(false, ecPub);
         signer.update(msg, 0, msg.length);
@@ -154,18 +144,19 @@ public class SM2 {
      * @param publicLKey
      * @return
      */
-    public byte[] encrypt(byte[] input, byte[] publicLKey) {
+    public byte[] encrypt(byte[] input, byte[] publicLKey) throws InvalidCipherTextException {
         SM2Engine sm2Engine = new SM2Engine();
         ECPublicKeyParameters ecPub = new ECPublicKeyParameters(byte2ECpoint(publicLKey), ecc_bc_spec);
         ParametersWithRandom parametersWithRandom = new ParametersWithRandom(ecPub);
         sm2Engine.init(true, parametersWithRandom);
+        byte[] enc = null;
         try {
-            byte[] enc = sm2Engine.processBlock(input, 0, input.length);
-            return enc;
+            enc = sm2Engine.processBlock(input, 0, input.length);
         } catch (InvalidCipherTextException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
+            throw new InvalidCipherTextException(e.getMessage());
         }
-        return null;
+        return enc;
     }
 
     /**

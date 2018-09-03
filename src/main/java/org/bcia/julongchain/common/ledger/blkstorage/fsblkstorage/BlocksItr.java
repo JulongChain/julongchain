@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,8 +17,8 @@ package org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage;
 
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 
 /**
@@ -30,8 +30,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
  */
 public class BlocksItr implements IResultsIterator {
 
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlocksItr.class);
-    private static final Object lock = BlockFileManager.lock;
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BlocksItr.class);
 
     private BlockFileManager mgr;
     private long maxBlockNumAvailable;
@@ -53,16 +52,16 @@ public class BlocksItr implements IResultsIterator {
      * 读取区块时, 区块长度不足将等待区块的添加
      */
     public long waitForBlock(long blockNum) throws LedgerException {
-        synchronized (lock){
+        synchronized (BlockFileManager.LOCK){
             while(mgr.getCpInfo().getLastBlockNumber() < blockNum && !shouldClose()){
-                logger.debug(String.format("Going to wait for newer blocks.maxAvailaBlockNumber=[%d], waitForBlockNum=[%d]", mgr.getCpInfo().getLastBlockNumber(), blockNum));
+				log.debug(String.format("Going to wait for newer blocks.maxAvailaBlockNumber=[%d], waitForBlockNum=[%d]", mgr.getCpInfo().getLastBlockNumber(), blockNum));
                 try {
-                    lock.wait();
+                    BlockFileManager.LOCK.wait();
                 } catch (InterruptedException e) {
-                    logger.error(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                     throw new LedgerException(e);
                 }
-                logger.debug("Coming out of wait. MaxAvailaBlockNumber=[{}]", mgr.getCpInfo().getLastBlockNumber());
+                log.debug("Coming out of wait. MaxViableBlockNumber=[{}]", mgr.getCpInfo().getLastBlockNumber());
             }
             return mgr.getCpInfo().getLastBlockNumber();
         }
@@ -97,7 +96,7 @@ public class BlocksItr implements IResultsIterator {
             return null;
         }
         if(stream == null){
-            logger.debug("Initializing block stream for iterator, maxBlockNumAvaliable = " + maxBlockNumAvailable);
+            log.debug("Initializing block stream for iterator, maxBlockNumAvaliable = " + maxBlockNumAvailable);
             this.stream = new BlockStream();
             initStream();
         }
@@ -108,13 +107,13 @@ public class BlocksItr implements IResultsIterator {
 
     @Override
     public synchronized void close() throws LedgerException{
-        closeMarker = true;
-        synchronized (lock){
-            lock.notifyAll();
-            if(stream != null){
-                        stream.close();
-                    }
-        }
+		closeMarker = true;
+		synchronized (BlockFileManager.LOCK){
+			BlockFileManager.LOCK.notifyAll();
+			if(stream != null){
+				stream.close();
+			}
+		}
     }
 
     public BlockFileManager getMgr() {

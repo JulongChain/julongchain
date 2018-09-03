@@ -15,11 +15,13 @@
  */
 package org.bcia.julongchain.csp.factory;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.gm.dxct.GmCspFactory;
-import org.bcia.julongchain.csp.gm.dxct.GmFactoryOpts;
+import org.bcia.julongchain.csp.gm.sdt.SdtGmCspFactory;
 import org.bcia.julongchain.csp.intfs.ICsp;
+import org.bcia.julongchain.msp.mspconfig.MspConfig;
+import org.bcia.julongchain.msp.mspconfig.MspConfigFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -32,78 +34,105 @@ import java.util.List;
  * @company Dingxuan
  */
 public class CspManager {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CspManager.class);
-    //default csp
-    private static ICsp defaultCsp=null;
-    //initFactories尚未调用之前，临时使用的csp
-    private static ICsp bootCsp=null;
-    //csp factory map
-    private static HashMap<String,ICsp> cspMap=new HashMap<String,ICsp>();
+    private static JulongChainLog log = JulongChainLogFactory.getLog(CspManager.class);
+    /**
+     * 默认使用的Csp
+     */
+    private static ICsp defaultCsp = null;
+    /**
+     * 全部可用的Csp集合映射
+     */
+    private static HashMap<String, ICsp> cspMap = new HashMap<String, ICsp>();
 
     /**
      * 读取配置文件，并对工厂做初始化，创建相应的Csp
+     *
      * @param optsList 工厂配置列表
      */
-    public static void initCspFactories(List<IFactoryOpts> optsList){
-        for(IFactoryOpts opts:optsList){
-            String providerName=opts.getProviderName();
-            if(providerName==IFactoryOpts.PROVIDER_GM){
-                GmCspFactory factory=new GmCspFactory();
-                initCsp(factory,opts);
-            }
-            else if(providerName==IFactoryOpts.PROVIDER_GM_BOUNCYCASTLE){
+    public static void initCspFactories(List<IFactoryOpts> optsList, String defaultOpts) {
+        for (IFactoryOpts opts : optsList) {
+            ICspFactory factory = null;
 
+            String providerName = opts.getProviderName();
+            if (IFactoryOpts.PROVIDER_GM.equals(providerName)) {
+                factory = new GmCspFactory();
+            } else if (IFactoryOpts.PROVIDER_GM_SDT.equals(providerName)) {
+                factory = new SdtGmCspFactory();
+            } else if (IFactoryOpts.PROVIDER_GMT0016.equals(providerName)) {
+                //TODO
+            } else if (IFactoryOpts.PROVIDER_GMT0018.equals(providerName)) {
+                //TODO
+            } else if (IFactoryOpts.PROVIDER_GMT0019.equals(providerName)) {
+                //TODO
+            } else if (IFactoryOpts.PROVIDER_NIST.equals(providerName)) {
+                //TODO
+            } else if (IFactoryOpts.PROVIDER_PKCS11.equals(providerName)) {
+                //TODO
             }
-            else if(providerName==IFactoryOpts.PROVIDER_GMT0016){
 
-            }
-            else if(providerName==IFactoryOpts.PROVIDER_GMT0018){
-
-            }
-            else if(providerName==IFactoryOpts.PROVIDER_GMT0019){
-
-            }
-            else if(providerName==IFactoryOpts.PROVIDER_NIST){
-
-            }
-            else if(providerName==IFactoryOpts.PROVIDER_PKCS11){
-
-            }
+            initCsp(factory, opts, defaultOpts);
         }
     }
-    //根据工厂创建CSP实例，并做初始化
-    private static void initCsp(ICspFactory factory,IFactoryOpts opts){
+
+    /**
+     * 根据工厂创建CSP实例
+     *
+     * @param factory
+     * @param opts
+     * @param defaultOpts
+     */
+    private static void initCsp(ICspFactory factory, IFactoryOpts opts, String defaultOpts) {
         ICsp csp = factory.getCsp(opts);
-        log.info("Initialize CSP {}",opts.getProviderName());
-        cspMap.put(opts.getProviderName(),csp);
-        if(opts.isDefaultCsp()){
-            defaultCsp=csp;
+        log.info("Initialize CSP {}", opts.getProviderName());
+
+        cspMap.put(opts.getProviderName(), csp);
+
+        //指定默认的Csp
+        if (opts.getProviderName().equals(defaultOpts)) {
+            defaultCsp = csp;
         }
     }
 
-    //返回默认的CSP
-    public static ICsp getDefaultCsp(){
-        if(defaultCsp==null){
+    /**
+     * 返回默认的CSP
+     *
+     * @return
+     */
+    public static ICsp getDefaultCsp() {
+        if (defaultCsp == null) {
             log.warn("Before using CSP, please call initCspFactories(). Falling back to bootCsp.");
-            //IFactoryOpts opts = new GmFactoryOpts(256, "SM3", true, true, "",true);
-            IFactoryOpts opts = new GmFactoryOpts();
-            GmCspFactory factory=new GmCspFactory();
-            bootCsp=factory.getCsp(opts);
-            return bootCsp;
+
+            MspConfig mspConfig = null;
+            try {
+                mspConfig = MspConfigFactory.loadMspConfig();
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
+
+            String defaultOpts = mspConfig.getNode().getCsp().getDefaultValue();
+
+            CspOptsManager cspOptsManager = CspOptsManager.getInstance();
+            cspOptsManager.addAll(defaultOpts, mspConfig.getNode().getCsp().getFactoryOpts());
+
+            List<IFactoryOpts> optsList = cspOptsManager.getFactoryOptsList();
+            initCspFactories(optsList, defaultOpts);
         }
+
         return defaultCsp;
     }
 
-    //根据工厂名称返回指定的CSP
-    public static ICsp getCsp(String name){
+    /**
+     * 根据Csp名称返回指定的CSP
+     *
+     * @param name
+     * @return
+     */
+    public static ICsp getCsp(String name) {
         ICsp csp = cspMap.get(name);
-        if(csp==null){
-            log.error("Get Csp {} failed",name);
+        if (csp == null) {
+            log.error("Get Csp {} failed", name);
             return null;
         }
         return csp;
     }
-
-
-
 }

@@ -15,9 +15,12 @@
  */
 package org.bcia.julongchain.csp.gm.dxct.sm2;
 
+import org.bcia.julongchain.csp.gm.dxct.util.GmCspConstant;
 import org.bcia.julongchain.csp.intfs.opts.IKeyGenOpts;
 
 /**
+ * sm2 密钥生成选项
+ *
  * @author zhangmingyang
  * @Date: 2018/3/27
  * @company Dingxuan
@@ -25,7 +28,7 @@ import org.bcia.julongchain.csp.intfs.opts.IKeyGenOpts;
 public class SM2KeyGenOpts implements IKeyGenOpts {
     @Override
     public String getAlgorithm() {
-        return "SM2";
+        return GmCspConstant.SM2;
     }
 
     @Override

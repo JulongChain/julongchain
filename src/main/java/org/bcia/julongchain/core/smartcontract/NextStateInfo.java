@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.core.smartcontract;
 
-import org.bcia.julongchain.protos.node.SmartcontractShim;
+import org.bcia.julongchain.protos.node.SmartContractShim;
 
 /**
  * 类描述
@@ -26,15 +26,15 @@ import org.bcia.julongchain.protos.node.SmartcontractShim;
  */
 public class NextStateInfo {
 
-    private SmartcontractShim.SmartContractMessage msg;
+    private SmartContractShim.SmartContractMessage msg;
     private Boolean sendToCC;
     private Boolean sendSync;
 
-    public SmartcontractShim.SmartContractMessage getMsg() {
+    public SmartContractShim.SmartContractMessage getMsg() {
         return msg;
     }
 
-    public void setMsg(SmartcontractShim.SmartContractMessage msg) {
+    public void setMsg(SmartContractShim.SmartContractMessage msg) {
         this.msg = msg;
     }
 

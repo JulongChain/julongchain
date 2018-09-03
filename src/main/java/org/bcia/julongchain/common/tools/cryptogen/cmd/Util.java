@@ -18,9 +18,9 @@ package org.bcia.julongchain.common.tools.cryptogen.cmd;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.tools.cryptogen.CaHelper;
 import org.bcia.julongchain.common.tools.cryptogen.FileUtil;
 import org.bcia.julongchain.common.tools.cryptogen.MspHelper;
@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 密码材料生成工具类
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/17
  * @company Excelsecu
@@ -44,15 +46,15 @@ public class Util {
     static String ADMIN_BASE_NAME = "Admin";
     static String USER_BASE_NAME = "User";
 
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Util.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Util.class);
 
-    //copy the admin cert to each of the org's peer's or consenter's MSP admincerts
+    //copy the admin cert to each of the org's node's or consenter's MSP admincerts
     static void copyAllAdminCerts(String usersDir, String dstDir, String orgName, OrgSpec orgSpec, NodeSpec adminUser) {
-        String dir = dstDir.contains("peers") ? "peers" : "consenter";
+        String dir = dstDir.contains("nodes") ? "nodes" : "consenter";
         for (NodeSpec spec : orgSpec.getSpecs()) {
             try {
                 copyAdminCert(usersDir, Paths.get(dstDir, spec.getCommonName(), "msp", "admincerts").toString(), adminUser.getCommonName());
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 log.error("Error copying admin cert for org {} {} {}", orgName, dir, spec.getCommonName());
                 log.error(e.getMessage());
                 System.exit(1);
@@ -60,7 +62,7 @@ public class Util {
         }
     }
 
-    private static void copyAdminCert(String usersDir, String adminCertDir, String adminUserName) throws JavaChainException {
+    private static void copyAdminCert(String usersDir, String adminCertDir, String adminUserName) throws JulongChainException {
         File file = new File(Paths.get(adminCertDir, adminUserName + "-cert.pem").toString());
         if (file.exists()) {
             return;
@@ -75,12 +77,12 @@ public class Util {
             File dstFile = new File(Paths.get(adminCertDir, adminUserName + "-cert.pem").toString());
             FileUtils.copyFile(srcFile, dstFile);
         } catch (Exception e) {
-            throw new JavaChainException();
+            throw new JulongChainException();
         }
     }
 
 
-    static void renderOrgSpec(OrgSpec orgSpec, String prefix) throws JavaChainException {
+    static void renderOrgSpec(OrgSpec orgSpec, String prefix) throws JulongChainException {
 
         NodeTemplate nodeTemplate = orgSpec.getTemplate();
         int tempCount = nodeTemplate.getCount();
@@ -91,7 +93,7 @@ public class Util {
 
             NodeSpec nodeSpec = new NodeSpec();
             nodeSpec.setCommonName(hostName);
-            nodeSpec.setSANS(nodeTemplate.getSANS());
+            nodeSpec.setSans(nodeTemplate.getSans());
             List<NodeSpec> specs = orgSpec.getSpecs();
             specs.add(nodeSpec);
             orgSpec.setSpecs(specs);
@@ -127,26 +129,26 @@ public class Util {
         spec.setCommonName(cn);
         data.setCommonName(cn);
 
-        // Save off our original, unprocessed SANS entries
-        List<String> originSANS = spec.getSANS();
-        if (originSANS == null) {
-            originSANS = new ArrayList<>();
-            spec.setSANS(originSANS);
+        // Save off our original, unprocessed sans entries
+        List<String> originSans = spec.getSans();
+        if (originSans == null) {
+            originSans = new ArrayList<>();
+            spec.setSans(originSans);
         }
 
-        // Set our implicit SANS entries for CN/Hostname
+        // Set our implicit sans entries for CN/Hostname
         List<String> newSans = new ArrayList<>();
         newSans.add(cn);
         String hostName = spec.getHostname();
         if (hostName != null && hostName.length() != 0) {
             newSans.add(spec.getHostname());
         }
-        spec.setSANS(newSans);
+        spec.setSans(newSans);
 
-        // Finally, process any remaining SANS entries
-        for (String _san : originSANS) {
-            String san = parseTemplate(_san, data);
-            spec.getSANS().add(san);
+        // Finally, process any remaining sans entries
+        for (String orgSan : originSans) {
+            String san = parseTemplate(orgSan, data);
+            spec.getSans().add(san);
         }
     }
 
@@ -178,15 +180,15 @@ public class Util {
     }
 
 
-    static void generatePeerOrg(String baseDir, OrgSpec orgSpec) {
+    static void generateNodeOrg(String baseDir, OrgSpec orgSpec) {
         String orgName = orgSpec.getDomain();
         System.out.println(orgName);
         // generate CAs
-        String orgDir = Paths.get(baseDir, "peerOrganizations", orgName).toString();
+        String orgDir = Paths.get(baseDir, "nodeOrganizations", orgName).toString();
         String caDir = Paths.get(orgDir, "ca").toString();
         String tlsCADir = Paths.get(orgDir, "tlsca").toString();
         String mspDir = Paths.get(orgDir, "msp").toString();
-        String peerDir = Paths.get(orgDir, "peers").toString();
+        String nodeDir = Paths.get(orgDir, "nodes").toString();
         String userDir = Paths.get(orgDir, "users").toString();
         String adminCertDir = Paths.get(mspDir, "admincerts").toString();
 
@@ -202,12 +204,12 @@ public class Util {
 
         try {
             MspHelper.generateVerifyingMSP(mspDir, signCA, tlsCA, orgSpec.isEnableNodeOUs());
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             System.err.println("Error generating MSP for org " + orgName);
             e.printStackTrace();
             System.exit(1);
         }
-        generateNodes(peerDir, orgSpec.getSpecs(), signCA, tlsCA, MspHelper.PEER, orgSpec.isEnableNodeOUs());
+        generateNodes(nodeDir, orgSpec.getSpecs(), signCA, tlsCA, MspHelper.NODE, orgSpec.isEnableNodeOUs());
 
         List<NodeSpec> users = new ArrayList<>();
         int count = orgSpec.getUsers().getCount();
@@ -227,19 +229,19 @@ public class Util {
         // copy the admin cert to the org's MSP admincerts
         try {
             copyAdminCert(userDir, adminCertDir, adminUser.getCommonName());
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error("Error copying admin cert for org " + orgName, e);
 
             System.exit(1);
         }
-        copyAllAdminCerts(userDir, peerDir, orgName, orgSpec, adminUser);
+        copyAllAdminCerts(userDir, nodeDir, orgName, orgSpec, adminUser);
 
-        // copy the admin cert to each of the org's peer's MSP admincerts
+        // copy the admin cert to each of the org's node's MSP admincerts
         for (NodeSpec spec : orgSpec.getSpecs()) {
             try {
-                copyAdminCert(userDir, Paths.get(peerDir, spec.getCommonName(), "msp", "admincerts").toString(), adminUser.getCommonName());
-            } catch (JavaChainException e) {
-                log.error("Error copying admin cert for org " + orgName + " peer " + spec.getCommonName());
+                copyAdminCert(userDir, Paths.get(nodeDir, spec.getCommonName(), "msp", "admincerts").toString(), adminUser.getCommonName());
+            } catch (JulongChainException e) {
+                log.error("Error copying admin cert for org " + orgName + " node " + spec.getCommonName());
                 log.error(e.getMessage());
                 System.exit(1);
             }
@@ -253,8 +255,8 @@ public class Util {
 
             if (!file.exists()) {
                 try {
-                    MspHelper.generateLocalMSP(nodeDir, node.getCommonName(), node.getSANS(), signCA, tlsCA, nodeType, nodeOUs);
-                } catch (JavaChainException e) {
+                    MspHelper.generateLocalMSP(nodeDir, node.getCommonName(), node.getSans(), signCA, tlsCA, nodeType, nodeOUs);
+                } catch (JulongChainException e) {
                     log.error("Error generating local MSP for", e);
                     System.exit(1);
                 }
@@ -288,7 +290,7 @@ public class Util {
 
         try {
             MspHelper.generateVerifyingMSP(mspDir, signCA, tlsCA, orgSpec.isEnableNodeOUs());
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error("Error generating MSP for org " + orgName);
             log.error(e.getMessage());
             System.exit(1);
@@ -308,7 +310,7 @@ public class Util {
         //copy the admin cert to the org's MSP admincerts
         try {
             copyAdminCert(userDir, adminCertDir, adminUser.getCommonName());
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error("Error copying admin cert for org " + orgName);
             log.error(e.getMessage());
             System.exit(1);
@@ -321,9 +323,9 @@ public class Util {
         try {
             return CaHelper.newCA(caDir, orgName, commonName,
                     caSpec.getCountry(), caSpec.getProvince(), caSpec.getLocality(),
-                    caSpec.getOrganizationUnit(), caSpec.getStreetAddress(),
+                    caSpec.getOrganizationalUnit(), caSpec.getStreetAddress(),
                     caSpec.getPostalCode());
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error("Error generating CaHelper for org " + orgName);
             log.error(e.getMessage());
             System.exit(1);
@@ -332,17 +334,17 @@ public class Util {
         return null;
     }
 
-    public static <T> T loadAs(String filePath, Class<T> tClass) throws JavaChainException {
+    public static <T> T loadAs(String filePath, Class<T> tClass) throws JulongChainException {
         try {
             InputStream in;
             if (filePath == null) {
-                in = new ByteArrayInputStream(ShowTemplateCmd.template.getBytes());
+                in = new ByteArrayInputStream(ShowTemplateCmd.TEMPLATE.getBytes());
             } else {
                 in = new FileInputStream(new File(filePath));
             }
             return new Yaml().loadAs(in, tClass);
         } catch (FileNotFoundException e) {
-            throw new JavaChainException("file not found in file system while loading yaml, path: " + filePath);
+            throw new JulongChainException("file not found in file system while loading yaml, path: " + filePath);
         }
     }
 }

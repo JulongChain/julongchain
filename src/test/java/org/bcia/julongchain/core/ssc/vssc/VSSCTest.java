@@ -3,14 +3,11 @@ package org.bcia.julongchain.core.ssc.vssc;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.BaseJunit4Test;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.SysSmartContractException;
 import org.bcia.julongchain.common.policycheck.cauthdsl.CAuthDslBuilder;
 import org.bcia.julongchain.common.util.CommConstant;
-import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
-import org.bcia.julongchain.common.util.proto.ProposalResponseUtils;
-import org.bcia.julongchain.common.util.proto.ProposalUtils;
-import org.bcia.julongchain.common.util.proto.TxUtils;
+import org.bcia.julongchain.common.util.proto.*;
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContract;
 import org.bcia.julongchain.core.smartcontract.shim.impl.MockStub;
 import org.bcia.julongchain.msp.IMsp;
@@ -20,7 +17,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Policies;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,15 +51,19 @@ public class VSSCTest extends BaseJunit4Test {
         assertThat(smartContractResponse.getStatus(), is(ISmartContract.SmartContractResponse.Status.SUCCESS));
     }
 
+
     @Test
-    public void invoke() {
+    public void testInvokes()
+    {
         ISmartContract.SmartContractResponse smartContractResponse =mockStub.mockInit("1",new LinkedList<ByteString>());
         assertThat(smartContractResponse.getStatus(), is(ISmartContract.SmartContractResponse.Status.SUCCESS));
 
+        String expectErrMsg = null;
+        List<ByteString> args= new LinkedList<ByteString>();
         Common.Envelope tx= null;
         try {
             tx = createTx(false);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
             System.out.println("Create Trade failed,testing exits with error.");
             return;
@@ -75,13 +76,89 @@ public class VSSCTest extends BaseJunit4Test {
         String mspid="DEFAULT";
         byte[] policyBytes=getSignedByMSPMemberPolicy(mspid);
 
-        List<ByteString> args= new LinkedList<ByteString>();
+
+        //region TESTED OK
+        //  TESTED OK
         args.add(ByteString.copyFromUtf8("dv"));
         args.add(ByteString.copyFrom(envBytes));
         args.add(ByteString.copyFrom(policyBytes));
 
+        Invoke(args,expectErrMsg);
+        //endregion
+
+
+        //region not enough args
+        //  not enough args  TESTED
+        args= new LinkedList<ByteString>();
+        args.add(ByteString.copyFromUtf8("dv"));
+
+        expectErrMsg = "Incorrect number of arguments , 1)";
+        Invoke(args,expectErrMsg);
+        //endregion
+
+
+        //region broken Envelope
+        //  broken Envelope  TESTED
+        args= new LinkedList<ByteString>();
+        args.add(ByteString.copyFromUtf8("a"));
+        args.add(ByteString.copyFromUtf8("a"));
+        args.add(ByteString.copyFromUtf8("a"));
+
+        expectErrMsg = "VSSC error: GetEnvelope failed, err While parsing a protocol message, the input ended unexpectedly in the middle of a field.  " +
+                "This could mean either that the input has been truncated or that an embedded message misreported its own length.";
+        Invoke(args,expectErrMsg);
+        //endregion
+
+
+        //region broken policy
+        //  broken policy  TESTED
+        args= new LinkedList<ByteString>();
+        args.add(ByteString.copyFromUtf8("dv"));
+        args.add(ByteString.copyFrom(envBytes));
+        args.add(ByteString.copyFromUtf8("barf"));
+
+        expectErrMsg = "VSSC error:make policy failed,err com.google.protobuf.InvalidProtocolBufferException: " +
+                "While parsing a protocol message, the input ended unexpectedly in the middle of a field.  " +
+                "This could mean either that the input has been truncated or that an embedded message misreported its own length.";
+        Invoke(args,expectErrMsg);
+        //endregion
+
+
+        //region  broken type
+        //  broken type  TESTED
+        Common.Envelope  env= Common.Envelope.newBuilder()
+                .setPayload((Common.Payload.newBuilder()
+                        .setHeader(Common.Header.newBuilder()
+                                .setGroupHeader((Common.GroupHeader.newBuilder()
+                                        .setType(Common.HeaderType.CONSENTER_TRANSACTION.getNumber()).build()).toByteString()).build()).build()).toByteString())
+                .build();
+        byte[] envBrokenBytes = env.toByteArray();
+
+        args= new LinkedList<ByteString>();
+        args.add(ByteString.copyFromUtf8("dv"));
+        args.add(ByteString.copyFrom(envBrokenBytes));
+        args.add(ByteString.copyFrom(policyBytes));
+
+        expectErrMsg = "Only Endorser Transactions are supported, provided type 4";
+        Invoke(args,expectErrMsg);
+        //endregion
+
+    }
+
+
+
+    public void Invoke(List<ByteString> args,String expectErrMessage) {
+
         ISmartContract.SmartContractResponse smartContractResponse2 =mockStub.mockInvoke("1",args);
-        assertThat(smartContractResponse2.getStatus(), is(ISmartContract.SmartContractResponse.Status.SUCCESS));
+        if(expectErrMessage==null)
+        {
+            assertThat(smartContractResponse2.getStatus(), is(ISmartContract.SmartContractResponse.Status.SUCCESS));
+        }
+        else
+        {
+            assertThat(smartContractResponse2.getMessage(), is(expectErrMessage));
+        }
+
     }
 
     @Test
@@ -167,22 +244,22 @@ public class VSSCTest extends BaseJunit4Test {
      * 创建模拟的交易
      * @param bEndorsedByDuplicatedIdentity
      * @return
-     * @throws JavaChainException
+     * @throws JulongChainException
      * @throws InvalidProtocolBufferException
      */
-    private Common.Envelope createTx(boolean bEndorsedByDuplicatedIdentity) throws JavaChainException, InvalidProtocolBufferException {
+    private Common.Envelope createTx(boolean bEndorsedByDuplicatedIdentity) throws JulongChainException, InvalidProtocolBufferException {
         //创建SmartContractID
-        Smartcontract.SmartContractID smartContractID=Smartcontract.SmartContractID.newBuilder().
+        SmartContractPackage.SmartContractID smartContractID=SmartContractPackage.SmartContractID.newBuilder().
                                                        setName("foo").setVersion("v1").build();
         //创建SmartContractSpec
-        Smartcontract.SmartContractSpec spec=Smartcontract.SmartContractSpec.newBuilder().
+        SmartContractPackage.SmartContractSpec spec=SmartContractPackage.SmartContractSpec.newBuilder().
                                                    setSmartContractId(smartContractID).build();
         //创建SmartContractInvocationSpec
-        Smartcontract.SmartContractInvocationSpec invokeSpec=Smartcontract.SmartContractInvocationSpec.newBuilder().
+        SmartContractPackage.SmartContractInvocationSpec invokeSpec=SmartContractPackage.SmartContractInvocationSpec.newBuilder().
                                                    setSmartContractSpec(spec).build();
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
-        byte[] creator = identity.serialize();
+        byte[] creator = identity.getIdentity().serialize();
 
         String groupID="testGroup";
         //创建Proposal
@@ -219,12 +296,12 @@ public class VSSCTest extends BaseJunit4Test {
         return env;
     }
 
-    private byte[] processSignedCDS(Smartcontract.SmartContractDeploymentSpec cds,
+    private byte[] processSignedCDS(SmartContractPackage.SmartContractDeploymentSpec cds,
                                     Policies.SignaturePolicyEnvelope policy)throws SysSmartContractException{
         return null;
     }
 
-    private Smartcontract.SmartContractDeploymentSpec constructDeploymentSpec(String name,String path,String version,
+    private SmartContractPackage.SmartContractDeploymentSpec constructDeploymentSpec(String name,String path,String version,
                                                                               List<ByteString> initArgs,
                                                                               boolean bCreateFS)throws SysSmartContractException{
         return null;

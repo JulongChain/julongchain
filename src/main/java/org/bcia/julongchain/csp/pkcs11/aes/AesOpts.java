@@ -20,9 +20,9 @@ import org.bcia.julongchain.csp.intfs.opts.IKeyImportOpts;
 import org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant;
 
 /**
- * Class description
+ * Aes Opts for generate key and import key
  *
- * @author
+ * @author Ying Xu
  * @date 5/25/18
  * @company FEITIAN
  */
@@ -33,10 +33,13 @@ public class AesOpts {
         public AESKeyGenOpts(boolean bTemporary) {
             this.bTemporary = bTemporary;
         }
+
+        @Override
         public String getAlgorithm() {
             return PKCS11CSPConstant.AES;
         }
 
+        @Override
         public boolean isEphemeral() {
             return bTemporary;
         }
@@ -48,10 +51,13 @@ public class AesOpts {
         public AES128KeyGenOpts(boolean bTemporary) {
             this.bTemporary = bTemporary;
         }
+
+        @Override
         public String getAlgorithm() {
             return PKCS11CSPConstant.AES128;
         }
 
+        @Override
         public boolean isEphemeral() {
             return bTemporary;
         }
@@ -63,10 +69,13 @@ public class AesOpts {
         public AES192KeyGenOpts (boolean bTemporary) {
             this.bTemporary = bTemporary;
         }
+
+        @Override
         public String getAlgorithm() {
             return PKCS11CSPConstant.AES192;
         }
 
+        @Override
         public boolean isEphemeral() {
             return bTemporary;
         }
@@ -78,10 +87,13 @@ public class AesOpts {
         public AES256KeyGenOpts (boolean bTemporary) {
             this.bTemporary = bTemporary;
         }
+
+        @Override
         public String getAlgorithm() {
             return PKCS11CSPConstant.AES256;
         }
 
+        @Override
         public boolean isEphemeral() {
             return bTemporary;
         }
@@ -93,10 +105,13 @@ public class AesOpts {
         public AESKeyImportOpts (boolean bTemporary) {
             this.bTemporary = bTemporary;
         }
+
+        @Override
         public String getAlgorithm() {
             return PKCS11CSPConstant.AES;
         }
 
+        @Override
         public boolean isEphemeral() {
             return bTemporary;
         }

@@ -16,38 +16,53 @@
 
 package org.bcia.julongchain.csp.pkcs11.util;
 
+import static org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant.TAG;
+
+import org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant;
+
 /**
  * data transfer class
  *
- * @author xuying
- * @date 2018/05/20
+ * @author Ying Xu
+ * @date 5/20/18
  * @company FEITIAN
  */
 public class DataUtil {
 
 
     /**
-     * 进制转换
+     * Byte Array to Hex String
      *
-     * @param b     二行制数据
-     * @return  十六进制数据字符串
+     * @param src   Byte Array
+     * @return  Hex String
      */
-    public static String MyByteToHex(byte[] b)
+    /*
+    public static String MyByteToHex(byte[] src)
     {
-        String hs="";
-        String stmp="";
-        for (int n=0;n<b.length;n++)
-        {
-            stmp=(java.lang.Integer.toHexString(b[n] & 0XFF));
-            if (stmp.length()==1) hs=hs+"0"+stmp;
-            else hs=hs+stmp;
-            if (n<b.length-1)  hs=hs+":";
+        StringBuilder stringBuilder = new StringBuilder("");
+        if (src == null || src.length <= 0) {
+            return null;
         }
-        return hs.toUpperCase();
-    }
-    
-    
-    public static boolean compereByteArray(byte[] b1, byte[] b2) {
+        for (int i = 0; i < src.length; i++) {
+            int v = src[i] & 0xFF;
+            String hv = Integer.toHexString(v);
+            if (hv.length() < 2) {
+                stringBuilder.append(0);
+            }
+            stringBuilder.append(hv);
+        }
+        return stringBuilder.toString();
+
+    }*/
+
+
+    /**
+     * Compare ByteArray Consistency
+     * @param  b1   Source byte array
+     * @param  b2   Contrast byte array
+     * @return true/false
+     */
+    public static boolean compareByteArray(byte[] b1, byte[] b2) {
     	
        if(b1.length == 0 || b2.length == 0 ){
            return false;
@@ -60,11 +75,42 @@ public class DataUtil {
        boolean isEqual = true;
        for (int i = 0; i < b1.length && i < b2.length; i++) {
            if (b1[i] != b2[i]) {
-               System.out.println("different");
-	               isEqual = false;
-	               break;
-	           }
+               //System.out.println("different");
+	           isEqual = false;
+	           break;
 	       }
-	       return isEqual;
+	   }
+	   return isEqual;
 	}
+    
+    
+    /**
+     * 数据处理
+     *
+     * @param tempecpt     ECPoint数据
+     * @return 去tag后数据
+     */
+    public static byte[] data(byte[] tempecpt){
+
+        int len = tempecpt.length;
+        byte[] tempdata = new byte[len];
+        // Determine whether the data contains tag value
+        if(0 == (len % PKCS11CSPConstant.CARDINAL_NUM) &&
+                (tempecpt[0] == TAG)&&
+                (tempecpt[len-1] == TAG))
+        {
+            // Trim trailing 0x04
+            System.arraycopy(tempecpt, 0, tempdata, 0, len-1);
+        }
+        else if((tempecpt[0] == TAG) &&
+                (tempecpt[2] == TAG))
+        {
+            System.arraycopy(tempecpt, 2, tempdata, 0, len-2);
+        }
+        else{
+            tempdata = tempecpt;
+        }
+
+        return tempdata;
+    }
 }

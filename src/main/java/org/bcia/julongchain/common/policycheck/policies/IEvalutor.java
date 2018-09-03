@@ -22,12 +22,19 @@ import java.util.List;
 
 /**
  * 类描述
- *
+ *  策略评估接口
  * @author yuanjun
  * @date 31/05/18
  * @company Aisino
  */
 public interface IEvalutor {
-    boolean evalutor(List<SignedData> signedDatas,Boolean[] bool) throws PolicyException;
+    /**
+     * CAuthdsl类中的compile方法的返回函数
+     * @param signedDatas
+     * @param bool
+     * @return
+     * @throws PolicyException
+     */
+    boolean evaluate(List<SignedData> signedDatas,Boolean[] bool) throws PolicyException;
 
 }

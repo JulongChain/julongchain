@@ -17,7 +17,7 @@ package org.bcia.julongchain.common.util.proto;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.protos.common.Common;
@@ -34,7 +34,7 @@ public class BlockUtils {
         return Common.Block.parseFrom(blockBytes);
     }
 
-    public static String getGroupIDFromBlock(Common.Block block) throws JavaChainException {
+    public static String getGroupIDFromBlock(Common.Block block) throws JulongChainException {
         Common.Envelope envelope = null;
         Common.Payload payload = null;
         Common.GroupHeader gh = null;
@@ -55,7 +55,7 @@ public class BlockUtils {
                 return null;
             }
         } catch (InvalidProtocolBufferException e) {
-            throw new JavaChainException(e);
+            throw new JulongChainException(e);
         }
         return gh.getGroupId();
     }

@@ -16,17 +16,17 @@
 
 package org.bcia.julongchain.csp.pkcs11;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.intfs.ICsp;
 
 /**
  * interface description
  *
- * @author xuying
+ * @author Ying Xu
  * @date 2018/05/21
  * @company FEITIAN
  */
 public interface IPKCS11Csp extends ICsp {
 
-    public void finalized() throws JavaChainException;
+    public void finalized() throws JulongChainException;
 }

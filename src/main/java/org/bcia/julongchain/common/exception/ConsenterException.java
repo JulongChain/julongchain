@@ -22,7 +22,7 @@ package org.bcia.julongchain.common.exception;
  * @date 2018/3/29
  * @company Dingxuan
  */
-public class ConsenterException extends JavaChainException {
+public class ConsenterException extends JulongChainException {
     private static final String MODULE_NAME = "[Consenter]";
     public ConsenterException() {
         super();

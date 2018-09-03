@@ -16,32 +16,42 @@ package org.bcia.julongchain.csp.gm.dxct.sm3;
  * limitations under the License.
  */
 
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.csp.gm.dxct.sm2.SM2;
+import org.bcia.julongchain.csp.gm.dxct.util.GmCspConstant;
 import org.bouncycastle.crypto.digests.SM3Digest;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.util.encoders.Hex;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.Security;
 
 /**
- * @author zhanglin
- * @purpose Define the class, SM3
+ * 国密sm3实现
+ *
+ * @author zhanglin, zhangmingyang
  * @date 2018-01-25
  * @company Dingxuan
  */
 
 public class SM3 {
-    private SM3Digest sm3Digest;
-    /**
-     *摘要长度
-     */
-    private int digestSize;
-
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SM3.class);
     public SM3() {
-        sm3Digest = new SM3Digest();
-        digestSize = sm3Digest.getDigestSize();
     }
 
-    public byte[] hash(byte[] msg) {
-        byte[] resbuf = new byte[digestSize];
-        sm3Digest.update(msg, 0, msg.length);
-        sm3Digest.doFinal(resbuf, 0);
-        return resbuf;
-
+    public byte[] hash(byte[] msg) throws NoSuchAlgorithmException {
+        Security.addProvider(new BouncyCastleProvider());
+        MessageDigest messageDigest = null;
+        try {
+            messageDigest = MessageDigest.getInstance(GmCspConstant.SM3);
+        } catch (NoSuchAlgorithmException e) {
+            log.error(e.getMessage());
+          throw new NoSuchAlgorithmException(e.getMessage());
+        }
+        messageDigest.update(msg);
+        byte[] digest = messageDigest.digest();
+        return digest;
     }
 }

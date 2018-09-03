@@ -19,7 +19,7 @@ import org.bcia.julongchain.common.groupconfig.GroupConfigConstant;
 import org.bcia.julongchain.protos.consenter.Configuration;
 
 /**
- * 对象
+ * Kafka篮子配置项
  *
  * @author zhouhui
  * @date 2018/5/11

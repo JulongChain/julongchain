@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.common.tools.cryptogen;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.tools.cryptogen.bean.Configuration;
 import org.bcia.julongchain.common.tools.cryptogen.bean.NodeOUs;
 import org.bcia.julongchain.common.tools.cryptogen.bean.OrgUnitIdentifiersConfig;
@@ -25,6 +25,7 @@ import org.bcia.julongchain.csp.intfs.IKey;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.KeyUsage;
 import org.bouncycastle.util.encoders.Hex;
+import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileWriter;
@@ -39,6 +40,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * MSP 相关密码材料生成
+ *
  * @author chenhao, yegangcheng
  * @date 2018/4/3
  * @company Excelsecu
@@ -47,14 +50,14 @@ public class MspHelper {
 
     public static final int CLIENT = 0;
     public static final int CONSENTER = 1;
-    public static final int PEER = 2;
+    public static final int NODE = 2;
     public static final String CLIENT_OU = "client";
-    public static final String PEER_OU = "peer";
+    public static final String NODE_OU = "node";
 
-    private static String[] nodeOUMap = {null, "client", "peer"};
+    private static String[] nodeOUMap = {null, "client", "node"};
 
     public static void generateLocalMSP(String baseDir, String name, List<String> sans, CaHelper signCA,
-                                        CaHelper tlsCA, int nodeType, boolean nodeOUs) throws JavaChainException {
+                                        CaHelper tlsCA, int nodeType, boolean nodeOUs) throws JulongChainException {
         //create folder structure
         String mspDir = Paths.get(baseDir, "msp").toString();
         String tlsDir = Paths.get(baseDir, "tls").toString();
@@ -92,7 +95,7 @@ public class MspHelper {
         // the TLS CaHelper certificate goes into tlscacerts
         x509Export(Paths.get(mspDir, "tlscacerts", x509Filename(tlsCA.getName())).toString(), tlsCA.getSignCert());
 
-        if (nodeOUs && nodeType == PEER) {
+        if (nodeOUs && nodeType == NODE) {
             exportConfig(mspDir, "cacerts/" + x509Filename(signCA.getName()), true);
 
         }
@@ -106,7 +109,7 @@ public class MspHelper {
         try {
             x509Export(Paths.get(mspDir, "admincerts", x509Filename(name)).toString(), Certificate.getInstance(cert.getEncoded()));
         } catch (CertificateEncodingException e) {
-            throw new JavaChainException("generateLocalMSP failed while export admincerts: " + e.getMessage());
+            throw new JulongChainException("generateLocalMSP failed while export admincerts: " + e.getMessage());
         }
         /*
 		Generate the TLS artifacts in the TLS folder
@@ -125,7 +128,7 @@ public class MspHelper {
                 sans,
                 tlsPubKey,
                 KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
-                new int[]{Util.extKeyUsageServerAuth, Util.extKeyUsageClientAuth});
+                new int[]{Util.EXT_KEY_USAGE_SERVER_AUTH, Util.EXT_KEY_USAGE_CLIENT_AUTH});
 
         x509Export(Paths.get(tlsDir, "ca.crt").toString(), tlsCA.getSignCert());
 
@@ -138,13 +141,13 @@ public class MspHelper {
         try {
             Files.move(Paths.get(tlsDir, x509Filename(name)), Paths.get(tlsDir, tlsFilePrefix + ".crt"));
         } catch (IOException e) {
-            throw new JavaChainException("generateLocalMSP failed while move file: " + e.getMessage());
+            throw new JulongChainException("generateLocalMSP failed while move file: " + e.getMessage());
         }
         keyExport(tlsDir, Paths.get(tlsDir, tlsFilePrefix + ".key").toString(), tlsPrivKey);
 
     }
 
-    public static void generateVerifyingMSP(String baseDir, CaHelper signCA, CaHelper tlsCA, boolean nodeOUs) throws JavaChainException {
+    public static void generateVerifyingMSP(String baseDir, CaHelper signCA, CaHelper tlsCA, boolean nodeOUs) throws JulongChainException {
         // create folder structure and write artifacts to proper locations
         createFolderStructure(baseDir, false);
 
@@ -175,7 +178,7 @@ public class MspHelper {
                 new int[]{});
     }
 
-    private static void createFolderStructure(String rootDir, boolean local) throws JavaChainException {
+    private static void createFolderStructure(String rootDir, boolean local) throws JulongChainException {
         // create admincerts, cacerts, keystore and signcerts folders
         List<Path> folders = new ArrayList<>();
         folders.add(Paths.get(rootDir, "admincerts"));
@@ -196,15 +199,15 @@ public class MspHelper {
         return name + "-cert.pem";
     }
 
-    private static void x509Export(String path, Certificate cert) throws JavaChainException {
+    private static void x509Export(String path, Certificate cert) throws JulongChainException {
         try {
             pemExport(path, "CERTIFICATE", cert.getEncoded());
         } catch (Exception e) {
-            throw new JavaChainException("An error occurred on x509Export:" + e.getMessage());
+            throw new JulongChainException("An error occurred on x509Export:" + e.getMessage());
         }
     }
 
-    private static void keyExport(String keystore, String output, IKey key) throws JavaChainException {
+    private static void keyExport(String keystore, String output, IKey key) throws JulongChainException {
 
         String id = Hex.toHexString(key.ski());
         String keyPath = Paths.get(keystore, id + "_sk").toString();
@@ -212,38 +215,40 @@ public class MspHelper {
         try {
             Files.move(Paths.get(keyPath), Paths.get(output));
         } catch (IOException e) {
-            throw new JavaChainException("renamed unsuccessfully on keyExport");
+            throw new JulongChainException("renamed unsuccessfully on keyExport");
         }
     }
 
-    private static void pemExport(String path, String pemType, byte[] bytes) throws JavaChainException {
+    private static void pemExport(String path, String pemType, byte[] bytes) throws JulongChainException {
         Util.pemExport(path, pemType, bytes);
     }
 
-    public static void exportConfig(String mspDir, String caFile, boolean enable) throws JavaChainException {
+    public static void exportConfig(String mspDir, String caFile, boolean enable) throws JulongChainException {
 
         OrgUnitIdentifiersConfig clientOUIdentifier = new OrgUnitIdentifiersConfig();
         clientOUIdentifier.setCertificate(caFile);
         clientOUIdentifier.setOrganizationalUnitIdentifier(CLIENT_OU);
 
-        OrgUnitIdentifiersConfig peerOUIdentifier = new OrgUnitIdentifiersConfig();
-        peerOUIdentifier.setCertificate(caFile);
-        peerOUIdentifier.setOrganizationalUnitIdentifier(PEER_OU);
+        OrgUnitIdentifiersConfig nodeOUIdentifier = new OrgUnitIdentifiersConfig();
+        nodeOUIdentifier.setCertificate(caFile);
+        nodeOUIdentifier.setOrganizationalUnitIdentifier(NODE_OU);
 
         NodeOUs nodeOUs = new NodeOUs();
         nodeOUs.setClientOUIdentifier(clientOUIdentifier);
-        nodeOUs.setPeerOUIdentifier(peerOUIdentifier);
+        nodeOUs.setNodeOUIdentifier(nodeOUIdentifier);
         nodeOUs.setEnable(enable);
 
         Configuration configuration = new Configuration();
         configuration.setNodeOUs(nodeOUs);
 
-        Yaml yaml = new Yaml();
+        DumperOptions options = new DumperOptions();
+        options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+        Yaml yaml = new Yaml(options);
         String path = Paths.get(mspDir, "config.yaml").toString();
         try {
-            yaml.dump(configuration, new FileWriter(path));
+            yaml.dump(configuration.getPropertyMap(), new FileWriter(path));
         } catch (IOException e) {
-            throw new JavaChainException("An error occurred on exportConfig:" + e.getMessage());
+            throw new JulongChainException("An error occurred on exportConfig:" + e.getMessage());
         }
     }
 

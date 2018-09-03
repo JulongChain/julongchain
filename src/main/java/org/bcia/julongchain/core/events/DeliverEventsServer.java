@@ -19,14 +19,14 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.EventsPackage;
 
 /**
- * 对象
+ * 投递事件服务
  *
  * @author zhouhui
  * @date 2018/3/21
  * @company Dingxuan
  */
 public class DeliverEventsServer implements IDeliverEventsServer {
-    private IDeliverHandler deliverHandler;
+    private IDeliverHandler deliverHandler = new DeliverHandler();
 
     @Override
     public EventsPackage.DeliverResponse deliverFiltered(Common.Envelope envelope) {
@@ -38,37 +38,3 @@ public class DeliverEventsServer implements IDeliverEventsServer {
         return deliverHandler.handle(envelope);
     }
 }
-
-
-//    DeliverFiltered(Common.Envelope envelope) error {
-//        logger.Debugf("Starting new DeliverFiltered handler")
-//        defer dumpStacktraceOnPanic()
-//        srvSupport := &deliverFilteredBlockSupport{
-//            Deliver_DeliverFilteredServer: srv,
-//        }
-//        // getting policy checker based on resources.FILTEREDBLOCKEVENT resource name
-//        return s.dh.Handle(deliver.NewDeliverServer(srvSupport, s.policyCheckerProvider(resources.FILTEREDBLOCKEVENT), s.sendProducer(srv)))
-//    }
-//
-//    // Deliver sends a stream of blocks to a client after commitment
-//    func (s *server) Deliver(srv peer.Deliver_DeliverServer) error {
-//        logger.Debugf("Starting new Deliver handler")
-//        defer dumpStacktraceOnPanic()
-//        srvSupport := &deliverBlockSupport{
-//            Deliver_DeliverServer: srv,
-//        }
-//        // getting policy checker based on resources.BLOCKEVENT resource name
-//        return s.dh.Handle(deliver.NewDeliverServer(srvSupport, s.policyCheckerProvider(resources.BLOCKEVENT), s.sendProducer(srv)))
-//    }
-//
-//    func (s *server) sendProducer(srv peer.Deliver_DeliverFilteredServer) func(msg proto.Message) error {
-//        return func(msg proto.Message) error {
-//            response, ok := msg.(*peer.DeliverResponse)
-//            if !ok {
-//                logger.Errorf("received wrong response type, expected response type peer.DeliverResponse")
-//                return errors.New("expected response type peer.DeliverResponse")
-//            }
-//            return srv.Send(response)
-//        }
-//    }
-//}

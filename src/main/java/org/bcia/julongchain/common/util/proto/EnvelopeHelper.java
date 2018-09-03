@@ -21,7 +21,7 @@ import com.google.protobuf.Message;
 import com.google.protobuf.Timestamp;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.groupconfig.GroupConfigConstant;
@@ -29,8 +29,8 @@ import org.bcia.julongchain.common.groupconfig.MSPConfigHandler;
 import org.bcia.julongchain.common.groupconfig.config.ApplicationConfig;
 import org.bcia.julongchain.common.groupconfig.value.AnchorNodesValue;
 import org.bcia.julongchain.common.localmsp.ILocalSigner;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.PolicyConstant;
 import org.bcia.julongchain.common.resourceconfig.ResourcesConfigConstant;
 import org.bcia.julongchain.common.util.FileUtils;
@@ -57,8 +57,7 @@ import java.io.IOException;
  * @company Dingxuan
  */
 public class EnvelopeHelper {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(EnvelopeHelper.class);
-
+    private static JulongChainLog log = JulongChainLogFactory.getLog(EnvelopeHelper.class);
 
     public static Common.Envelope makeGroupCreateTx(String groupId, ILocalSigner signer, Configtx.ConfigTree
             consenterSystemGroupTree, GenesisConfig.Profile profile) throws InvalidProtocolBufferException,
@@ -79,14 +78,14 @@ public class EnvelopeHelper {
 
     public static Configtx.ConfigEnvelope getConfigEnvelopeFrom(Common.Envelope envelope) throws
             InvalidProtocolBufferException, ValidateException {
-        ValidateUtils.isNotNull(envelope, "envelope can not be null");
-        ValidateUtils.isNotNull(envelope.getPayload(), "envelope.Payload can not be null");
+        ValidateUtils.isNotNull(envelope, "Envelope can not be null");
+        ValidateUtils.isNotNull(envelope.getPayload(), "Envelope.Payload can not be null");
 
         Common.Payload payload = Common.Payload.parseFrom(envelope.getPayload());
 
-        ValidateUtils.isNotNull(payload.getHeader(), "envelope.Payload.header can not be null");
-        ValidateUtils.isNotNull(payload.getHeader().getGroupHeader(), "envelope.groupHeader can not be null");
-        ValidateUtils.isNotNull(payload.getData(), "envelope.Payload.data can not be null");
+        ValidateUtils.isNotNull(payload.getHeader(), "Envelope.Payload.header can not be null");
+        ValidateUtils.isNotNull(payload.getHeader().getGroupHeader(), "Envelope.groupHeader can not be null");
+        ValidateUtils.isNotNull(payload.getData(), "Envelope.Payload.data can not be null");
 
         Common.GroupHeader groupHeader = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
 
@@ -97,16 +96,24 @@ public class EnvelopeHelper {
         return Configtx.ConfigEnvelope.parseFrom(payload.getData());
     }
 
+    /**
+     * 从信封对象中解析出ConfigUpdateEnvelope对象
+     *
+     * @param envelope
+     * @return
+     * @throws InvalidProtocolBufferException
+     * @throws ValidateException
+     */
     public static Configtx.ConfigUpdateEnvelope getConfigUpdateEnvelopeFrom(Common.Envelope envelope) throws
             InvalidProtocolBufferException, ValidateException {
-        ValidateUtils.isNotNull(envelope, "envelope can not be null");
-        ValidateUtils.isNotNull(envelope.getPayload(), "envelope.Payload can not be null");
+        ValidateUtils.isNotNull(envelope, "Envelope can not be null");
+        ValidateUtils.isNotNull(envelope.getPayload(), "Envelope.Payload can not be null");
 
         Common.Payload payload = Common.Payload.parseFrom(envelope.getPayload());
 
-        ValidateUtils.isNotNull(payload.getHeader(), "envelope.Payload.header can not be null");
-        ValidateUtils.isNotNull(payload.getHeader().getGroupHeader(), "envelope.groupHeader can not be null");
-        ValidateUtils.isNotNull(payload.getData(), "envelope.Payload.data can not be null");
+        ValidateUtils.isNotNull(payload.getHeader(), "Envelope.Payload.header can not be null");
+        ValidateUtils.isNotNull(payload.getHeader().getGroupHeader(), "Envelope.groupHeader can not be null");
+        ValidateUtils.isNotNull(payload.getData(), "Envelope.Payload.data can not be null");
 
         Common.GroupHeader groupHeader = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
 
@@ -117,20 +124,12 @@ public class EnvelopeHelper {
         return Configtx.ConfigUpdateEnvelope.parseFrom(payload.getData());
     }
 
-    public static void sendCreateGroupTransaction() {
-
-    }
-
-    public static void sendTransaction() {
-
-    }
-
     public static Configtx.ConfigUpdate buildConfigUpdate(String groupId, Configtx.ConfigTree
             consenterSystemGroupTree, GenesisConfig.Profile profile) throws InvalidProtocolBufferException,
             ValidateException {
-        ValidateUtils.isNotNull(profile, "profile can not be null");
-        ValidateUtils.isNotNull(profile.getApplication(), "profile.getApplication can not be null");
-        ValidateUtils.isNotNull(profile.getConsortium(), "profile.getConsortium can not be null");
+        ValidateUtils.isNotNull(profile, "Profile can not be null");
+        ValidateUtils.isNotNull(profile.getApplication(), "Profile.getApplication can not be null");
+        ValidateUtils.isNotNull(profile.getConsortium(), "Profile.getConsortium can not be null");
 
         //构造应用子树
         Configtx.ConfigTree appTree = ConfigTreeHelper.buildApplicationTree(profile.getApplication());
@@ -294,7 +293,7 @@ public class EnvelopeHelper {
         }
 
         //签名头部的消息创建者字段应与身份一致
-        if (Arrays.compareUnsigned(signatureHeader.getCreator().toByteArray(), identity.serialize()) != 0) {
+        if (Arrays.compareUnsigned(signatureHeader.getCreator().toByteArray(), identity.getIdentity().serialize()) != 0) {
             throw new ValidateException("Wrong signatureHeader creator");
         }
 
@@ -312,49 +311,56 @@ public class EnvelopeHelper {
         TransactionPackage.SmartContractEndorsedAction.Builder endorsedActionBuilder = TransactionPackage
                 .SmartContractEndorsedAction.newBuilder();
 
-        ProposalResponsePackage.Endorsement[] endorsements = new ProposalResponsePackage.Endorsement[endorserResponses
-                .length];
         for (int i = 0; i < endorserResponses.length; i++) {
             ProposalResponsePackage.ProposalResponse endorserResponse = endorserResponses[i];
 
             if (endorserResponse.getResponse().getStatus() != 200 && endorserResponse.getResponse().getStatus() != 0) {
-                throw new ValidateException("endorserResponse status error: " + endorserResponse.getResponse());
+                throw new ValidateException("EndorserResponse status error: " + endorserResponse.getResponse());
             }
 
             if (i == 0) {
-                bytes = endorserResponse.getPayload().toByteArray();
-                endorsedActionBuilder.setProposalResponsePayload(endorserResponse.getPayload());
+                bytes = endorserResponse.getResponse().getPayload().toByteArray();
+                endorsedActionBuilder.setProposalResponsePayload(endorserResponse.getResponse().getPayload());
             } else {
-                if (Arrays.compareUnsigned(bytes, endorserResponse.getPayload().toByteArray()) != 0) {
+                if (Arrays.compareUnsigned(bytes, endorserResponse.getResponse().getPayload().toByteArray()) != 0) {
                     throw new ValidateException("Should be same payload");
                 }
             }
 
-            endorsements[i] = endorserResponse.getEndorsement();
             endorsedActionBuilder.addEndorsements(endorserResponse.getEndorsement());
         }
-        TransactionPackage.SmartContractEndorsedAction endorsedAction = endorsedActionBuilder.build();
 
-        //TODO:为什么要去掉transientMap属性？
-        ProposalPackage.SmartContractProposalPayload.Builder proposalPayloadBuilder = ProposalPackage
-                .SmartContractProposalPayload.newBuilder(smartContractProposalPayload);
-        proposalPayloadBuilder.clearTransientMap();
-        ProposalPackage.SmartContractProposalPayload clearProposalPayload = proposalPayloadBuilder.build();
+        /**
+         * 交易结构
+         * Transaction
+         *      \_ TransactionAction (1...n)
+         *         |\_ Header (1)
+         *          \_ SmartContractActionPayload (1)
+         *             |\_ SmartContractProposalPayload (1)
+         *              \_ SmartContractEndorsedAction (1)
+         *                 |\_ Endorsement (1...n)
+         *                  \_ ProposalResponsePayload
+         *                      \_ SmartContractAction
+         */
+        //TODO:去掉transientMap属性？
+        ProposalPackage.SmartContractProposalPayload.Builder clearProposalPayloadBuilder =
+                smartContractProposalPayload.toBuilder();
+        clearProposalPayloadBuilder.clearTransientMap();
+        ProposalPackage.SmartContractProposalPayload clearProposalPayload = clearProposalPayloadBuilder.build();
 
         TransactionPackage.SmartContractActionPayload.Builder actionPayloadBuilder = TransactionPackage
                 .SmartContractActionPayload.newBuilder();
         actionPayloadBuilder.setSmartContractProposalPayload(clearProposalPayload.toByteString());
-        actionPayloadBuilder.setAction(endorsedAction);
+        actionPayloadBuilder.setAction(endorsedActionBuilder);
         TransactionPackage.SmartContractActionPayload actionPayload = actionPayloadBuilder.build();
 
         TransactionPackage.TransactionAction.Builder transactionActionBuilder = TransactionPackage.TransactionAction
                 .newBuilder();
         transactionActionBuilder.setHeader(header.getSignatureHeader());
         transactionActionBuilder.setPayload(actionPayload.toByteString());
-        TransactionPackage.TransactionAction transactionAction = transactionActionBuilder.build();
 
         TransactionPackage.Transaction.Builder transactionBuilder = TransactionPackage.Transaction.newBuilder();
-        transactionBuilder.addActions(transactionAction);
+        transactionBuilder.addActions(transactionActionBuilder);
         TransactionPackage.Transaction transaction = transactionBuilder.build();
 
         Common.Payload.Builder payloadBuilder = Common.Payload.newBuilder();
@@ -570,12 +576,12 @@ public class EnvelopeHelper {
         //构造GroupHeader对象
         Common.GroupHeader groupHeader = buildGroupHeader(type, 0, groupId, txId, 0, extension);
         //构造SignatureHeader对象
-        Common.SignatureHeader SignatureHeader = buildSignatureHeader(creator, nonce);
+        Common.SignatureHeader signatureHeader = buildSignatureHeader(creator, nonce);
 
         //构造Header对象
         Common.Header.Builder headerBuilder = Common.Header.newBuilder();
         headerBuilder.setGroupHeader(groupHeader.toByteString());
-        headerBuilder.setSignatureHeader(SignatureHeader.toByteString());
+        headerBuilder.setSignatureHeader(signatureHeader.toByteString());
         return headerBuilder.build();
     }
 
@@ -653,19 +659,5 @@ public class EnvelopeHelper {
         //完成秒和纳秒（即10亿分之一秒）的设置
         return Timestamp.newBuilder().setSeconds(millis / 1000)
                 .setNanos((int) ((millis % 1000) * 1000000)).build();
-    }
-
-    /**
-     * @param envelopeConfig
-     * @param config
-     * @param configEnv
-     * @return
-     * @throws JavaChainException
-     */
-    public static Common.GroupHeader unmarshalEnvelopeOfType(Common.Envelope envelopeConfig,
-                                                             Common.HeaderType config,
-                                                             Configtx.ConfigEnvelope configEnv)
-            throws JavaChainException {
-        return null;
     }
 }

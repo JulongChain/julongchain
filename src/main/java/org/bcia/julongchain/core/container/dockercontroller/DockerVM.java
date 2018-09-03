@@ -15,15 +15,14 @@
  */
 package org.bcia.julongchain.core.container.dockercontroller;
 
-import org.bcia.julongchain.core.container.ccintf.SCID;
-import org.bcia.julongchain.core.container.api.IBuildSpecFactory;
-import org.bcia.julongchain.core.container.api.IFormat;
-import org.bcia.julongchain.core.container.api.IPrelaunchFunc;
+import org.bcia.julongchain.common.exception.VMException;
+import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractContext;
+import org.bcia.julongchain.core.container.DockerUtil;
+import org.bcia.julongchain.core.container.api.IFormatter;
 import org.bcia.julongchain.core.container.api.VM;
-
-import javax.naming.Context;
-import java.io.Reader;
-import java.util.Map;
+import org.bcia.julongchain.core.container.scintf.SCID;
+import org.bcia.julongchain.core.node.NodeConfigFactory;
+import org.bcia.julongchain.core.smartcontract.shim.SmartContractBase;
 
 /**
  * 类描述
@@ -33,105 +32,48 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class DockerVM implements VM{
+	private String smartContractId;
+	private String containerId;
 
-    private String id;
+	@Override
+	public void deploy(SmartContractBase smartContract, SmartContractContext scc, String[] args, String envs) throws VMException {
+		String imageId = DockerUtil.buildImage(NodeConfigFactory.getNodeConfig().getSmartContract().getDockerFile(), smartContractId);
+		containerId = DockerUtil.createContainer(imageId, smartContractId);
+	}
 
-    public IDockerClient getDockerClient() {
-        return new IDockerClient() {
-            @Override
-            public String createContainer(String opts) {
-                return null;
-            }
+	@Override
+	public void start() throws VMException {
+		DockerUtil.startContainer(containerId);
+	}
 
-            @Override
-            public void uploadToContainer(String id, String opts) {
+	@Override
+	public void stop() throws VMException {
+		DockerUtil.stopContainer(containerId);
+	}
 
-            }
+	@Override
+	public void destroy() throws VMException {
+		DockerUtil.stopContainer(containerId);
+	}
 
-            @Override
-            public void startContainer(String id, String cfg) {
+	@Override
+	public String getVMName(SCID ccID, IFormatter format) throws VMException {
+		return containerId;
+	}
 
-            }
+	public String getSmartContractId() {
+		return smartContractId;
+	}
 
-            @Override
-            public void attachToContainer(String opts) {
+	public void setSmartContractId(String smartContractId) {
+		this.smartContractId = smartContractId;
+	}
 
-            }
+	public String getContainerId() {
+		return containerId;
+	}
 
-            @Override
-            public void buildImage(String opts) {
-
-            }
-
-            @Override
-            public void removeImageExtended(String id, String opts) {
-
-            }
-
-            @Override
-            public void stopContainer(String id, Long timeout) {
-
-            }
-
-            @Override
-            public void KillContainer(String opts) {
-
-            }
-
-            @Override
-            public void removeContainer(String opts) {
-
-            }
-        };
-    }
-
-    public void createContainer(Context ctxt, IDockerClient client, String
-            imageID, String containerID, String[] args, String[] env, Boolean
-                                        attachStdout) {
-
-    }
-
-    public void deployImage(IDockerClient client, SCID ccid, String[] args,
-                            String[] env, Reader reader) {
-
-    }
-
-    @Override
-    public void start(Context context, SCID ccid, String[] args, String[]
-            env, Map<String, byte[]> filesToUpload, IBuildSpecFactory
-            builder, IPrelaunchFunc prelaunchFunc) {
-
-    }
-
-    @Override
-    public void stop(Context context, SCID ccid, Long timeout, Boolean
-            dontkill, Boolean dontremove) {
-
-    }
-
-    public void stopInternal(Context context, IDockerClient dockerClient,
-                             String id, Long timeout, Boolean dontkill,
-                             Boolean dontremove) {
-
-    }
-
-    @Override
-    public void destroy(Context context, SCID ccid, Boolean force, Boolean
-            noprune) {
-
-    }
-
-    @Override
-    public String getVMName(SCID ccid, IFormat format) {
-        return "";
-    }
-
-    public String formatImageName(String name) {
-        return "";
-    }
-
-    @Override
-    public void deploy(Context ctxt, SCID ccid, String[] args, String[] env, Reader reader) {
-
-    }
+	public void setContainerId(String containnerId) {
+		this.containerId = containnerId;
+	}
 }

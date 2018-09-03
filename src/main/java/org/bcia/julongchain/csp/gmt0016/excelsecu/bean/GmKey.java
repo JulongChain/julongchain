@@ -28,10 +28,12 @@ public class GmKey implements IKey {
     public static final int TAG_PUBLICK_KEY_SIGN_FLAG = 0x03; //公钥signFlag标识签名公钥和加密公钥
     protected String containerName;
 
+    @Override
     public byte[] toBytes() {
         return new byte[0];
     }
 
+    @Override
     public byte[] ski() {
         //TLV 结构
         return new byte[0];
@@ -45,7 +47,7 @@ public class GmKey implements IKey {
         this.containerName = containerName;
     }
 
-    protected byte[] getTLV(int tag, int length, byte[] value) {
+    byte[] getTLV(int tag, int length, byte[] value) {
         byte[] tlv = new byte[value.length + 2];
         tlv[0] = (byte) tag;
         tlv[1] = (byte) length;
@@ -53,14 +55,17 @@ public class GmKey implements IKey {
         return tlv;
     }
 
+    @Override
     public boolean isSymmetric() {
         return false;
     }
 
+    @Override
     public boolean isPrivate() {
         return false;
     }
 
+    @Override
     public IKey getPublicKey() {
         return null;
     }

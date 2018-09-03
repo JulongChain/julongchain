@@ -23,7 +23,7 @@ import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
 
 /**
- * 类描述
+ * 提案响应负载业务对象
  *
  * @author zhouhui
  * @date 2018/05/26
@@ -36,7 +36,7 @@ public class ProposalResponsePayloadVO implements IProtoVO<ProposalResponsePacka
     @Override
     public void parseFrom(ProposalResponsePackage.ProposalResponsePayload proposalResponsePayload) throws
             InvalidProtocolBufferException, ValidateException {
-        ValidateUtils.isNotNull(proposalResponsePayload, "proposalResponsePayload can not be null");
+        ValidateUtils.isNotNull(proposalResponsePayload, "ProposalResponsePayload can not be null");
 
         this.extension = new SmartContractActionVO();
         ProposalPackage.SmartContractAction smartContractAction = ProposalPackage.SmartContractAction.parseFrom

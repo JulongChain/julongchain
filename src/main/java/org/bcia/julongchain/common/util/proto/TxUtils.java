@@ -18,10 +18,10 @@ package org.bcia.julongchain.common.util.proto;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.localmsp.ILocalSigner;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.util.CommonUtils;
 import org.bcia.julongchain.consenter.util.Utils;
 import org.bcia.julongchain.msp.ISigningIdentity;
@@ -29,7 +29,7 @@ import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
  * 类描述
@@ -39,16 +39,16 @@ import org.bcia.julongchain.protos.node.Smartcontract;
  * @company Dingxuan
  */
 public class TxUtils {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(TxUtils.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(TxUtils.class);
 
     // MockSignedEndorserProposalOrPanic creates a SignedProposal with the passed arguments
     public static ProposalPackage.SignedProposal mockSignedEndorserProposalOrPanic(
             String groupID,
-            Smartcontract.SmartContractSpec spec
-    ) throws JavaChainException {
+            SmartContractPackage.SmartContractSpec spec
+    ) throws JulongChainException {
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
-        byte[] creator = identity.serialize();
-        Smartcontract.SmartContractInvocationSpec invocationSpec=Smartcontract.SmartContractInvocationSpec.newBuilder().build();
+        byte[] creator = identity.getIdentity().serialize();
+        SmartContractPackage.SmartContractInvocationSpec invocationSpec=SmartContractPackage.SmartContractInvocationSpec.newBuilder().build();
         ProposalPackage.Proposal proposal = ProposalUtils.createSmartcontractProposalWithTransient(Common.HeaderType.ENDORSER_TRANSACTION,
                 groupID,invocationSpec,creator,null);
         byte[] proBytes =proposal.toByteArray();
@@ -117,4 +117,11 @@ public class TxUtils {
         return envelope;
     }
 
+
+    public static void main(String[] args) throws InvalidProtocolBufferException {
+        Common.Envelope envelope=Common.Envelope.parseFrom("123".getBytes());
+
+       Common.Payload payload=Common.Payload.parseFrom(envelope.getPayload()) ;
+       payload.getHeader();
+    }
 }

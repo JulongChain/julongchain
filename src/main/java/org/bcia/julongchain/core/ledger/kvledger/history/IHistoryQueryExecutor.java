@@ -30,5 +30,5 @@ public interface IHistoryQueryExecutor {
 	/**
 	 * 查询HistoryDB中数据
 	 */
-    IResultsIterator getHistoryForKey(String ns, String key) throws LedgerException;
+    IResultsIterator getHistoryForKey(String namespace, String key) throws LedgerException;
 }

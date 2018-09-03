@@ -26,8 +26,8 @@ import org.bcia.julongchain.common.groupconfig.config.IApplicationConfig;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.common.ledger.blockledger.IFileLedgerBlockStore;
 import org.bcia.julongchain.common.ledger.blockledger.file.FileLedger;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.resourceconfig.IResourcesConfigBundle;
 import org.bcia.julongchain.common.resourceconfig.ResourcesConfigBundle;
 import org.bcia.julongchain.common.util.proto.BlockUtils;
@@ -38,11 +38,7 @@ import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.core.node.ConfigtxProcessor;
 import org.bcia.julongchain.core.node.GroupSupport;
 import org.bcia.julongchain.core.node.util.ConfigTxUtils;
-import org.bcia.julongchain.csp.factory.IFactoryOpts;
-import org.bcia.julongchain.csp.gm.dxct.GmFactoryOpts;
-import org.bcia.julongchain.csp.gm.sdt.SdtGmFactoryOpts;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
-import org.bcia.julongchain.msp.mspconfig.MspConfig;
 import org.bcia.julongchain.node.cmd.INodeCmd;
 import org.bcia.julongchain.node.cmd.factory.NodeCmdFactory;
 import org.bcia.julongchain.node.common.helper.ConfigTreeHelper;
@@ -62,8 +58,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.bcia.julongchain.msp.mspconfig.MspConfigFactory.loadMspConfig;
-
 /**
  * 节点对象
  *
@@ -72,11 +66,24 @@ import static org.bcia.julongchain.msp.mspconfig.MspConfigFactory.loadMspConfig;
  * @company Dingxuan
  */
 public class Node {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Node.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Node.class);
 
+    /**
+     * 群组回调接口
+     */
     public interface IGroupCallback {
+        /**
+         * 当某群组实例化完成时回调
+         *
+         * @param groupId
+         */
         void onGroupInitialized(String groupId);
 
+        /**
+         * 当群组全部实例化完成时回调
+         *
+         * @param groupIds
+         */
         void onGroupsReady(List<String> groupIds);
     }
 
@@ -92,8 +99,14 @@ public class Node {
      */
     private INodeCmd nodeCmd;
 
+    /**
+     * 当前Node节点加入的群组集合
+     */
     private Map<String, Group> groupMap = new ConcurrentHashMap<String, Group>();
 
+    /**
+     * 群组回调
+     */
     private IGroupCallback groupCallback;
 
     /**
@@ -131,14 +144,14 @@ public class Node {
         log.info("Node Command Start");
 
         if (args.length <= 0) {
-            log.warn("Node command need more args-----");
+            log.warn("Node command need more args");
             return null;
         }
 
         int cmdWordCount;//记录命令单词数量
         String command = args[0];
         if (args.length == 1 && !NodeConstant.VERSION.equalsIgnoreCase(command)) {
-            log.warn("Node " + command + " need more args-----");
+            log.warn("Node " + command + " need more args");
             return null;
         } else if (args.length == 1 && NodeConstant.VERSION.equalsIgnoreCase(command)) {
             //只有version命令只有一个单词，其余都是"命令+子命令"的形式,如"node server start"
@@ -167,34 +180,17 @@ public class Node {
      * 初始化
      */
     private void init() throws NodeException {
-        log.info("Node init-----");
-        initLocalMsp();
-    }
+        log.info("Node init");
 
-    private void initLocalMsp() throws NodeException {
-        log.info("Init LocalMsp-----");
         try {
-            MspConfig mspConfig = loadMspConfig();
-            String mspConfigDir = mspConfig.getNode().getMspConfigPath();
-            String mspId = mspConfig.getNode().getLocalMspId();
-            String mspType = mspConfig.getNode().getLocalMspType();
-
-            List<IFactoryOpts> optsList = new ArrayList<IFactoryOpts>();
-
-            IFactoryOpts gmFactoryOpts=new GmFactoryOpts();
-            gmFactoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("gm"));
-            optsList.add(gmFactoryOpts);
-
-//            IFactoryOpts sdtGmFactoryOpts = new SdtGmFactoryOpts();
-//            sdtGmFactoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("sdtgm"));
-//            optsList.add(sdtGmFactoryOpts);
-
-            GlobalMspManagement.loadLocalMspWithType(mspConfigDir, optsList, mspId, mspType);
-        } catch (Exception e) {
+            //初始化本地Msp
+            GlobalMspManagement.initLocalMsp();
+        } catch (MspException e) {
             log.error(e.getMessage(), e);
             throw new NodeException(e);
         }
     }
+
 
     /**
      * 实例化
@@ -215,7 +211,7 @@ public class Node {
             List<String> ledgerIDs = LedgerManager.getLedgerIDs();
             if (ledgerIDs != null && ledgerIDs.size() > 0) {
                 for (String ledgerId : ledgerIDs) {
-                    log.info("ledgerId-----$" + ledgerId);
+                    log.info("LedgerId: " + ledgerId);
 
                     try {
                         INodeLedger nodeLedger = LedgerManager.openLedger(ledgerId);
@@ -224,7 +220,7 @@ public class Node {
 
                         Group group = createGroup(ledgerId, nodeLedger, configBlock);
                         groupMap.put(ledgerId, group);
-                        log.info("ledgerId-----$" + ledgerId);
+                        log.info("Group: " + ledgerId);
 
                         if (callback != null) {
                             callback.onGroupInitialized(ledgerId);

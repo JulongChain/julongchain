@@ -17,16 +17,17 @@ package org.bcia.julongchain.core.endorser;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.StringUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.exception.SmartContractException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.resourceconfig.ISmartContractDefinition;
 import org.bcia.julongchain.common.resourceconfig.config.SmartContractConfig;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.core.aclmgmt.AclManagement;
+import org.bcia.julongchain.core.aclmgmt.resources.Resources;
 import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractContext;
 import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
@@ -50,7 +51,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class EndorserSupport implements IEndorserSupport {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(EndorserSupport.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(EndorserSupport.class);
 
     @Autowired
     private ISystemSmartContractManager sysSmartContractManager;
@@ -113,7 +114,7 @@ public class EndorserSupport implements IEndorserSupport {
     @Override
     public Object[] execute(String groupId, String scName, String scVersion, String txId, boolean sysSC,
                             ProposalPackage.SignedProposal signedProposal, ProposalPackage.Proposal proposal,
-                            Smartcontract.SmartContractInvocationSpec spec) throws NodeException {
+                            SmartContractPackage.SmartContractInvocationSpec spec) throws NodeException {
         SmartContractContext scContext = new SmartContractContext(groupId, scName, scVersion, txId, sysSC,
                 signedProposal, proposal);
         //TODO:Decorator功能未实现
@@ -128,7 +129,7 @@ public class EndorserSupport implements IEndorserSupport {
     @Override
     public Object[] execute(String groupId, String scName, String scVersion, String txId, boolean sysSC,
                             ProposalPackage.SignedProposal signedProposal, ProposalPackage.Proposal proposal,
-                            Smartcontract.SmartContractDeploymentSpec spec) throws NodeException {
+                            SmartContractPackage.SmartContractDeploymentSpec spec) throws NodeException {
         SmartContractContext scContext = new SmartContractContext(groupId, scName, scVersion, txId, sysSC,
                 signedProposal, proposal);
         try {
@@ -149,7 +150,7 @@ public class EndorserSupport implements IEndorserSupport {
         SmartContractContext scContext = new SmartContractContext(groupId, CommConstant.LSSC, version, txId, true,
                 signedProposal, proposal);
 
-        Smartcontract.SmartContractInvocationSpec lsscSpec = SpecHelper.buildInvocationSpec(CommConstant.LSSC,
+        SmartContractPackage.SmartContractInvocationSpec lsscSpec = SpecHelper.buildInvocationSpec(CommConstant.LSSC,
                 LSSC.GET_SC_DATA.getBytes(), groupId.getBytes(), scName.getBytes());
 
         try {
@@ -187,8 +188,8 @@ public class EndorserSupport implements IEndorserSupport {
             .SignatureHeader signatureHeader, ProposalPackage.SmartContractHeaderExtension extension) {
         //TODO：有些参数未使用?
         try {
-            AclManagement.getACLProvider().checkACL(null, groupHeader.getGroupId(), signedProposal);
-        } catch (JavaChainException e) {
+            AclManagement.getACLProvider().checkACL(Resources.PROPOSE, groupHeader.getGroupId(), signedProposal);
+        } catch (JulongChainException e) {
             e.printStackTrace();
         }
     }

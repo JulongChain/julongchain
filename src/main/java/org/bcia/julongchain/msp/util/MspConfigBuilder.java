@@ -16,17 +16,30 @@
 package org.bcia.julongchain.msp.util;
 
 import com.google.protobuf.ByteString;
+import org.apache.commons.lang3.ArrayUtils;
+import org.bcia.julongchain.common.exception.MspException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.common.util.FileUtils;
+import org.bcia.julongchain.csp.gm.dxct.util.CryptoUtil;
+import org.bcia.julongchain.msp.config.Config;
+import org.bcia.julongchain.msp.config.ConfigFactory;
+import org.bcia.julongchain.msp.mgmt.Msp;
+import org.bcia.julongchain.msp.mgmt.MspManager;
 import org.bcia.julongchain.msp.mspconfig.MspConfig;
 import org.bcia.julongchain.protos.msp.MspConfigPackage;
+import org.bouncycastle.asn1.x509.Certificate;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.bcia.julongchain.msp.mspconfig.MspConfigFactory.loadMspConfig;
 
 /**
  * 构造mspconfig
- *
  * @author zhangmingyang
  * @Date: 2018/4/8
  * @company Dingxuan
@@ -34,26 +47,53 @@ import static org.bcia.julongchain.msp.mspconfig.MspConfigFactory.loadMspConfig;
 
 
 public class MspConfigBuilder {
+    private static JulongChainLog log = JulongChainLogFactory.getLog(MspConfigBuilder.class);
+    private static final String WINDOWS = "win";
+    private static MspConfigPackage.JuLongNodeOUs.Builder defaultJuLongNodeOUsBuilder;
+    private static MspConfigPackage.JuLongOUIdentifier defaultJuLongOUIdentifier;
+
+    public static MspConfigPackage.MSPConfig buildMspConfig(String mspPath, String mspId) {
+
+        //拼接文件路径
+        String cacertDir = filePath(mspPath, LoadLocalMspFiles.CACERTS);
+        // 密钥文件未装载
+        String signcertDir = filePath(mspPath, LoadLocalMspFiles.SIGNCERTS);
+        String admincertDir = filePath(mspPath, LoadLocalMspFiles.ADMINCERTS);
+        String intermediatecertsDir = filePath(mspPath, LoadLocalMspFiles.INTERMEDIATECERTS);
+        String crlsDir = filePath(mspPath, LoadLocalMspFiles.CRLSFOLDER);
+        String configFile = filePath(mspPath, LoadLocalMspFiles.CONFIGFILENAME);
+        String tlscacertDir = filePath(mspPath, LoadLocalMspFiles.TLSCACERTS);
+        String tlsintermediatecertsDir = filePath(mspPath, LoadLocalMspFiles.TLSINTERMEDIATECERTS);
+
+        LoadLocalMspFiles loadLocalMspFiles = new LoadLocalMspFiles();
+        //国密证书部分
+        List<byte[]> caCerts = loadLocalMspFiles.getCertFromDir(cacertDir);
+        List<byte[]> signCerts = loadLocalMspFiles.getCertFromDir(signcertDir);
+        List<byte[]> adminCerts = loadLocalMspFiles.getCertFromDir(admincertDir);
+        List<byte[]> intermediateCerts = loadLocalMspFiles.getCertFromDir(intermediatecertsDir);
+        List<byte[]> CRLs = loadLocalMspFiles.getCertFromDir(crlsDir);
+        List<byte[]> configFileContents = loadLocalMspFiles.getCertFromDir(configFile);
+        List<byte[]> tlscaCerts = loadLocalMspFiles.getCertFromDir(tlscacertDir);
+        List<byte[]> tlsintermediateCerts = loadLocalMspFiles.getCertFromDir(tlsintermediatecertsDir);
 
 
-
-    public static MspConfigPackage.MSPConfig buildMspConfig(String mspId,List<String> cacert, List<String> keystore, List<String> signcert,
-                                                            List<String> admincert, List<String> intermediatecerts, List<String> crls,
-                                                            List<String> configFileContent, List<String> tlscacert, List<String> tlsintermediatecerts) {
-        MspConfigPackage.MSPConfig.Builder mspConfig = MspConfigPackage.MSPConfig.newBuilder();
-        MspConfigPackage.FabricMSPConfig fabricMSPConfig = buildFabricMspConfig(mspId,cacert, keystore, signcert,
-                admincert, intermediatecerts, crls,
-                configFileContent, tlscacert, tlsintermediatecerts);
-        mspConfig.setType(1);
-        mspConfig.setConfig(ByteString.copyFrom(fabricMSPConfig.toByteArray()));
-        return mspConfig.build();
+        MspConfigPackage.MSPConfig.Builder mspConfigBuilder = null;
+        try {
+            //构建节点单元配置
+            buildJuLongNodeOUs(mspPath);
+            mspConfigBuilder = MspConfigBuilder.mspConfigBuilder(mspId, caCerts, signCerts,
+                    adminCerts, intermediateCerts, CRLs, configFileContents, tlscaCerts, tlsintermediateCerts);
+        } catch (MspException e) {
+            log.info(e.getMessage());
+        }
+        return mspConfigBuilder.build();
     }
 
     /**
-     * 构造fabricMspConfig
+     * 构建配置,添加国密证书
      *
+     * @param mspId
      * @param cacert
-     * @param keystore
      * @param signcert
      * @param admincert
      * @param intermediatecerts
@@ -63,131 +103,146 @@ public class MspConfigBuilder {
      * @param tlsintermediatecerts
      * @return
      */
-    public static MspConfigPackage.FabricMSPConfig buildFabricMspConfig(String mspId,List<String> cacert, List<String> keystore, List<String> signcert,
-                                                                        List<String> admincert, List<String> intermediatecerts, List<String> crls,
-                                                                        List<String> configFileContent, List<String> tlscacert, List<String> tlsintermediatecerts) {
-        MspConfigPackage.FabricMSPConfig.Builder mspConfig = MspConfigPackage.FabricMSPConfig.newBuilder();
+    public static MspConfigPackage.MSPConfig.Builder mspConfigBuilder(String mspId, List<byte[]> cacert, List<byte[]> signcert,
+                                                                      List<byte[]> admincert, List<byte[]> intermediatecerts,
+                                                                      List<byte[]> crls, List<byte[]> configFileContent,
+                                                                      List<byte[]> tlscacert, List<byte[]> tlsintermediatecerts) throws MspException {
+        MspConfigPackage.MSPConfig.Builder mspConfigBuilder = MspConfigPackage.MSPConfig.newBuilder();
 
+        MspConfigPackage.JuLongMSPConfig.Builder julongMspConfigBuilder = MspConfigPackage.JuLongMSPConfig.newBuilder();
+        julongMspConfigBuilder.setName(mspId);
+        //设置管理员证书
+        julongMspConfigBuilder.addAdmins(ByteString.copyFrom(admincert.get(0)));
+        //设置根CA证书
+        julongMspConfigBuilder.addRootCerts(ByteString.copyFrom(cacert.get(0)));
 
-        mspConfig.setName(mspId);
-
-        mspConfig.addRootCerts(ByteString.copyFrom(cacert.get(0).getBytes()));
-        // mspConfig.addIntermediateCerts(ByteString.copyFrom(intermediatecerts.get(0).getBytes()));
-        mspConfig.addAdmins(ByteString.copyFrom(admincert.get(0).getBytes()));
-//        mspConfig.addRevocationList(ByteString.copyFrom(crls.get(0).getBytes()));
-        MspConfigPackage.SigningIdentityInfo signingIdentityInfo=buildSigningIdentityInfo(signcert);
-        mspConfig.setSigningIdentity(signingIdentityInfo);
-        if(tlsintermediatecerts==null||tlsintermediatecerts.size()==0){
-        }else {
-            mspConfig.addTlsIntermediateCerts(ByteString.copyFrom(tlsintermediatecerts.get(0).getBytes()));
+        //构建中间CA证书,中间CA证书在密码材料生成工具中没有生成
+        if (intermediatecerts == null || intermediatecerts.size() == 0) {
+        } else {
+            julongMspConfigBuilder.addIntermediateCerts(ByteString.copyFrom(intermediatecerts.get(0)));
         }
-        mspConfig.addTlsRootCerts(ByteString.copyFrom(tlscacert.get(0).getBytes()));
+        if (crls == null || crls.size() == 0) {
+        }
+        if (configFileContent == null || configFileContent.size() == 0) {
 
-        mspConfig.setFabricNodeOUs(buildFabricNodeOUs());
+        }
+        if (tlsintermediatecerts == null || tlsintermediatecerts.size() == 0) {
 
-        mspConfig.setCryptoConfig(buildCryptoConfig(keystore));
-        return mspConfig.build();
+        }
+        //设置TLS 根证书
+        julongMspConfigBuilder.addTlsRootCerts(ByteString.copyFrom(tlscacert.get(0)));
+        //将签名证书设置到签名身份信息中
+        MspConfigPackage.SigningIdentityInfo.Builder signingIdentityInfoBuilder = MspConfigPackage.SigningIdentityInfo.newBuilder();
+        signingIdentityInfoBuilder.setPublicSigner(ByteString.copyFrom(signcert.get(0)));
+        julongMspConfigBuilder.setSigningIdentity(signingIdentityInfoBuilder);
+
+        julongMspConfigBuilder.setJuLongNodeOUs(defaultJuLongNodeOUsBuilder);
+        julongMspConfigBuilder.addOrganizationalUnitIdentifiers(defaultJuLongOUIdentifier);
+        mspConfigBuilder.setConfig(ByteString.copyFrom(julongMspConfigBuilder.build().toByteArray()));
+        return mspConfigBuilder;
     }
 
+
     /**
-     * 构建fabricNodeOUs
+     * 构建节点组织
+     *
+     * @param mspPath
      * @return
+     * @throws MspException
      */
-
-    public static MspConfigPackage.FabricNodeOUs buildFabricNodeOUs(){
-        String testMessage="testMessage";
-        MspConfigPackage.FabricNodeOUs.Builder fabricNodeOUs=MspConfigPackage.FabricNodeOUs.newBuilder();
-        fabricNodeOUs.setEnable(true);
-
-        MspConfigPackage.FabricOUIdentifier.Builder clientOUIdentifier=   MspConfigPackage.FabricOUIdentifier.newBuilder();
-        clientOUIdentifier.setCertificate(ByteString.copyFrom(testMessage.getBytes()));
-        clientOUIdentifier.setOrganizationalUnitIdentifier(testMessage);
-
-        MspConfigPackage.FabricOUIdentifier.Builder peerOUIdentifier=   MspConfigPackage.FabricOUIdentifier.newBuilder();
-        peerOUIdentifier.setCertificate(ByteString.copyFrom(testMessage.getBytes()));
-        peerOUIdentifier.setOrganizationalUnitIdentifier(testMessage);
-
-        MspConfigPackage.FabricOUIdentifier.Builder ordererOUIdentifier=   MspConfigPackage.FabricOUIdentifier.newBuilder();
-        ordererOUIdentifier.setCertificate(ByteString.copyFrom(testMessage.getBytes()));
-        ordererOUIdentifier.setOrganizationalUnitIdentifier(testMessage);
-
-        fabricNodeOUs.setClientOUIdentifier(clientOUIdentifier.build());
-        fabricNodeOUs.setPeerOUIdentifier(peerOUIdentifier.build());
-        fabricNodeOUs.setOrdererOUIdentifier(ordererOUIdentifier.build());
-
-        return fabricNodeOUs.build();
-    }
-
-    /**
-     * 构建cryptoConfig
-     */
-    public static MspConfigPackage.FabricCryptoConfig buildCryptoConfig(List<String> keystore) {
-        MspConfigPackage.FabricCryptoConfig.Builder cryptoConfig = MspConfigPackage.FabricCryptoConfig.newBuilder();
-
-        MspConfig mspConfig = null;
+    public static MspConfigPackage.JuLongNodeOUs.Builder buildJuLongNodeOUs(String mspPath) throws MspException {
+        Config config = null;
+        MspConfigPackage.JuLongOUIdentifier[] juLongOUIdentifiers = null;
         try {
-            mspConfig = loadMspConfig();
+            config = ConfigFactory.loadConfig();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            throw new MspException(e.getMessage());
         }
-        String symmetrickey = mspConfig.getNode().getCsp().getFactoryOpts().get("gm").get("symmetricKey");
-        String sign = mspConfig.getNode().getCsp().getFactoryOpts().get("gm").get("sign");
-        String hash = mspConfig.getNode().getCsp().getFactoryOpts().get("gm").get("hash");
-        String asymmetric = mspConfig.getNode().getCsp().getFactoryOpts().get("gm").get("asymmetric");
-        String privateKeyPath = mspConfig.getNode().getCsp().getFactoryOpts().get("gm").get("publicKeyStore");
-        String publicKeyPath = mspConfig.getNode().getCsp().getFactoryOpts().get("gm").get("privateKeyStore");
-        cryptoConfig.setSymmetrickey(symmetrickey);
-        cryptoConfig.setSign(sign);
-        cryptoConfig.setHash(hash);
-        cryptoConfig.setAsymmetric(asymmetric);
-        cryptoConfig.setFilekeystore(buildFileKeyStore(privateKeyPath, publicKeyPath, keystore));
-        return cryptoConfig.build();
+
+
+        if (config.getOrganizationalUnitIdentifiers().size() > 0) {
+            Map<String, String> map = config.getOrganizationalUnitIdentifiers();
+            //TODO 装载organizationalUnitIdentifier
+            String key = map.get("certificate");
+            MspConfigPackage.JuLongOUIdentifier.Builder juLongOUIdentifierBuilder = MspConfigPackage.JuLongOUIdentifier.newBuilder();
+            byte[] raw = null;
+            String caCertPath = filePath(mspPath, key);
+            try {
+                raw = FileUtils.readFileBytes(caCertPath);
+                juLongOUIdentifierBuilder.setCertificate(ByteString.copyFrom(raw));
+            } catch (IOException e) {
+                throw new MspException(e.getMessage());
+            }
+            String ouid = map.get("organizationalUnitIdentifier");
+
+            juLongOUIdentifierBuilder.setOrganizationalUnitIdentifier(ouid);
+            // juLongOUIdentifiers= ArrayUtils.add(juLongOUIdentifiers,juLongOUIdentifierBuilder.build());
+            defaultJuLongOUIdentifier = juLongOUIdentifierBuilder.build();
+
+        }
+
+        log.info("Loading NodeOus");
+        if (config.getNodeOUs().getClientOUIdentifier() == null || config.getNodeOUs().getClientOUIdentifier().get(MspConstant.OUIDENTIFIER) == null) {
+            throw new MspException("Failed loading NodeOUs. ClientOU must be different from nil.");
+        }
+        if (config.getNodeOUs().getClientOUIdentifier() == null || config.getNodeOUs().getNodeOUIdentifier().get(MspConstant.OUIDENTIFIER) == null) {
+            throw new MspException("Failed loading NodeOUs. PeerOU must be different from nil.");
+        }
+        MspConfigPackage.JuLongNodeOUs.Builder juLongNodeOUsBuilder = MspConfigPackage.JuLongNodeOUs.newBuilder();
+        // Read certificates, if defined
+        // ClientOU
+        String clientCertPath = filePath(mspPath, config.getNodeOUs().getClientOUIdentifier().get(MspConstant.CERT));
+        byte[] clientCert = null;
+        byte[] nodeCert = null;
+        try {
+            clientCert = FileUtils.readFileBytes(clientCertPath);
+        } catch (IOException e) {
+            throw new MspException(e.getMessage());
+        }
+
+        // NodeOU
+        String nodeCertPath = filePath(mspPath, config.getNodeOUs().getNodeOUIdentifier().get(MspConstant.CERT));
+        try {
+            nodeCert = FileUtils.readFileBytes(nodeCertPath);
+        } catch (IOException e) {
+            throw new MspException(e.getMessage());
+        }
+
+        MspConfigPackage.JuLongOUIdentifier.Builder clientIdentifierBuilder = MspConfigPackage.JuLongOUIdentifier.newBuilder()
+                .setCertificate(ByteString.copyFrom(clientCert))
+                .setOrganizationalUnitIdentifier(config.getNodeOUs().getClientOUIdentifier().get(MspConstant.OUIDENTIFIER));
+
+        MspConfigPackage.JuLongOUIdentifier.Builder nodeIdentifierBuilder = MspConfigPackage.JuLongOUIdentifier.newBuilder()
+                .setCertificate(ByteString.copyFrom(nodeCert))
+                .setOrganizationalUnitIdentifier(config.getNodeOUs().getNodeOUIdentifier().get(MspConstant.OUIDENTIFIER));
+
+        juLongNodeOUsBuilder.setEnable(Boolean.valueOf(config.getNodeOUs().getIsEnable()));
+        juLongNodeOUsBuilder.setClientOUIdentifier(clientIdentifierBuilder);
+        juLongNodeOUsBuilder.setNodeOUIdentifier(nodeIdentifierBuilder);
+
+
+        defaultJuLongNodeOUsBuilder = juLongNodeOUsBuilder;
+        return juLongNodeOUsBuilder;
+
     }
+
 
     /**
-     * 构建签名实体
+     * 拼接字符串
      *
+     * @param prefixDir
+     * @param suffixDir
      * @return
      */
-    public static MspConfigPackage.SigningIdentityInfo buildSigningIdentityInfo(List<String> signcert) {
-        MspConfigPackage.SigningIdentityInfo.Builder signingIdentityInfo = MspConfigPackage.SigningIdentityInfo.newBuilder();
-        signingIdentityInfo.setPublicSigner(ByteString.copyFrom(signcert.get(0).getBytes()));
-        //源码中privateSigner为null
-        signingIdentityInfo.setPrivateSigner(buildKeyInfo());
-        return signingIdentityInfo.build();
+    public static String filePath(String prefixDir, String suffixDir) {
+        String absolutePath;
+        String os = System.getProperty("os.name");
+        if (os.toLowerCase().startsWith(WINDOWS)) {
+            absolutePath = prefixDir + "\\" + suffixDir;
+        } else {
+            absolutePath = prefixDir + "/" + suffixDir;
+        }
+        return absolutePath;
     }
-
-    /**
-     * 构建KeyInfo
-     *
-     * @return
-     */
-
-    public static MspConfigPackage.KeyInfo buildKeyInfo() {
-        String keyMaterial="keyMaterial";
-        MspConfigPackage.KeyInfo.Builder keyInfo = MspConfigPackage.KeyInfo.newBuilder();
-        keyInfo.setKeyIdentifier("keyIdentifier");
-        keyInfo.setKeyMaterial(ByteString.copyFrom(keyMaterial.getBytes()));
-        return keyInfo.build();
-    }
-
-
-    /**
-     * 构建fileKeyStore
-     *
-     * @param privateKeyPath
-     * @param publicKeyPath
-     * @return
-     */
-    public static MspConfigPackage.FileKeyStore buildFileKeyStore(String privateKeyPath, String publicKeyPath, List<String> keystore) {
-        MspConfigPackage.FileKeyStore.Builder fileKeyStore = MspConfigPackage.FileKeyStore.newBuilder();
-        fileKeyStore.setPrivateKeyPath(privateKeyPath);
-        fileKeyStore.setPublicKeyPath(publicKeyPath);
-        fileKeyStore.setPrivateKeyValue(keystore.get(0));
-        fileKeyStore.setPublicKeyValue(keystore.get(1));
-        return fileKeyStore.build();
-    }
-
-
 
 }

@@ -42,6 +42,7 @@ public class NodeConfig {
         private String networkId;
         private String listenAddress;
         private String consenterAddress;
+        private String smartContractListenAddress;
         private String address;
         private String addressAutoDetect;
         private KeepAlive keepalive;
@@ -88,6 +89,14 @@ public class NodeConfig {
 
         public void setConsenterAddress(String consenterAddress) {
             this.consenterAddress = consenterAddress;
+        }
+
+        public String getSmartContractListenAddress() {
+            return smartContractListenAddress;
+        }
+
+        public void setSmartContractListenAddress(String smartContractListenAddress) {
+            this.smartContractListenAddress = smartContractListenAddress;
         }
 
         public String getAddress() {
@@ -237,6 +246,9 @@ public class NodeConfig {
      */
     public static class SmartContract {
         private String instantiatePath;
+        private String dockerFile;
+        private String coreNodeAddress;
+        private String coreNodeAddressPort;
         private Map<String, String> id;
         private String builder;
         private boolean pull;
@@ -370,6 +382,30 @@ public class NodeConfig {
 
         public void setInstantiatePath(String instantiatePath) {
             this.instantiatePath = instantiatePath;
+        }
+
+        public String getCoreNodeAddress() {
+            return coreNodeAddress;
+        }
+
+        public void setCoreNodeAddress(String coreNodeAddress) {
+            this.coreNodeAddress = coreNodeAddress;
+        }
+
+        public String getDockerFile() {
+            return dockerFile;
+        }
+
+        public void setDockerFile(String dockerFile) {
+            this.dockerFile = dockerFile;
+        }
+
+        public String getCoreNodeAddressPort() {
+            return coreNodeAddressPort;
+        }
+
+        public void setCoreNodeAddressPort(String coreNodeAddressPort) {
+            this.coreNodeAddressPort = coreNodeAddressPort;
         }
     }
 

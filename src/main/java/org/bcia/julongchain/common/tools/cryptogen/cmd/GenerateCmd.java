@@ -17,9 +17,9 @@
 package org.bcia.julongchain.common.tools.cryptogen.cmd;
 
 import org.apache.commons.cli.*;
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.tools.cryptogen.FileUtil;
 import org.bcia.julongchain.common.tools.cryptogen.bean.Config;
 import org.bcia.julongchain.common.tools.cryptogen.bean.OrgSpec;
@@ -27,12 +27,18 @@ import org.bcia.julongchain.common.tools.cryptogen.bean.OrgSpec;
 import static org.bcia.julongchain.common.tools.cryptogen.cmd.Util.*;
 
 /**
+ * generate 命令实现类
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/4
  * @company Excelsecu
  */
 public class GenerateCmd implements ICryptoGenCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(GenerateCmd.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(GenerateCmd.class);
+    private static final String CMD_GENERATE = "generate";
+    private static final String CMD_ARG_OUTPUT = "output";
+    private static final String CMD_ARG_CONFIG = "config";
+    private static final String CMD_ARG_HELP = "help";
 
     private String outputDir;
 
@@ -43,28 +49,28 @@ public class GenerateCmd implements ICryptoGenCmd {
         CommandLineParser parser = new DefaultParser();
         Options options = new Options();
         options.addOption(Option.builder()
-                .longOpt("output")
+                .longOpt(CMD_ARG_OUTPUT)
                 .desc("The output directory in which to place artifacts, default \"crypto-config\"")
                 .hasArg()
                 .argName("directory name")
                 .build());
         options.addOption(Option.builder()
-                .longOpt("config")
+                .longOpt(CMD_ARG_CONFIG)
                 .desc("The configuration template to use, default using \"cryptogen template\"")
                 .hasArg()
                 .argName("file name")
                 .build());
-        options.addOption(null, "help", false, "Print this message");
+        options.addOption(null, CMD_ARG_HELP, false, "Print this message");
 
         try {
             CommandLine commandLine = parser.parse(options, args);
-            if (commandLine.hasOption("help")) {
+            if (commandLine.hasOption(CMD_ARG_HELP)) {
                 HelpFormatter helpFormatter = new HelpFormatter();
-                helpFormatter.printHelp("generate", options);
+                helpFormatter.printHelp(CMD_GENERATE, options);
                 return;
             }
-            outputDir = commandLine.getOptionValue("output", "crypto-config");
-            configFile = commandLine.getOptionValue("config", null);
+            outputDir = commandLine.getOptionValue(CMD_ARG_OUTPUT, "crypto-config");
+            configFile = commandLine.getOptionValue(CMD_ARG_CONFIG, null);
             deleteAllFiles();
             generate();
         } catch (ParseException e) {
@@ -76,24 +82,24 @@ public class GenerateCmd implements ICryptoGenCmd {
         Config config = null;
         try {
             config = Util.loadAs(configFile, Config.class);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage());
             System.exit(-1);
         }
-        for (OrgSpec orgSpec : config.getPeerOrgs()) {
+        for (OrgSpec orgSpec : config.getNodeOrgs()) {
             try {
-                renderOrgSpec(orgSpec, "peer");
-            } catch (JavaChainException e) {
-                log.error("Error processing peer configuration: " + e.getMessage());
+                renderOrgSpec(orgSpec, "node");
+            } catch (JulongChainException e) {
+                log.error("Error processing node configuration: " + e.getMessage());
                 deleteAllFiles();
                 System.exit(-1);
             }
-            generatePeerOrg(outputDir, orgSpec);
+            generateNodeOrg(outputDir, orgSpec);
         }
         for (OrgSpec orgSpec : config.getConsenterOrgs()) {
             try {
                 renderOrgSpec(orgSpec, "consenter");
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 log.error("Error processing consenter configuration: " + e.getMessage());
                 deleteAllFiles();
                 System.exit(-1);

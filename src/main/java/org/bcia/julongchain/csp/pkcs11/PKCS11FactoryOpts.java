@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.csp.pkcs11;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.csp.pkcs11.entity.PKCS11Config;
 import org.bcia.julongchain.csp.pkcs11.entity.PKCS11Lib;
 import org.bcia.julongchain.csp.pkcs11.sw.IPKCS11SwFactoryOpts;
@@ -30,15 +30,15 @@ import java.util.Map;
 /**
  * Class description
  *
- * @author
+ * @author Ying Xu
  * @date 4/19/18
  * @company FEITIAN
  */
 public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOpts {
 
-    private boolean bSensitive;
-    private boolean bSoftVerify;
-    private boolean bUseEcX963Encodeing;
+    private static boolean bSensitive;
+    private static boolean bSoftVerify;
+    private static boolean bUseEcX963Encodeing;
 
     private long sessionhandle;
     private PKCS11 p11;
@@ -48,13 +48,16 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
     private String path;
 
 
+    PKCS11CspLog csplog = new PKCS11CspLog();
+
+
     public PKCS11FactoryOpts(PKCS11Config pkcsConf) {
         this.bSoftVerify = pkcsConf.getSoftVerify();
         this.bSensitive = pkcsConf.getnoKImport();
         this.path = pkcsConf.getPath();
     }
 
-    public PKCS11FactoryOpts(PKCS11Lib pkcslib, PKCS11Config pkcsConf) throws JavaChainException {
+    public PKCS11FactoryOpts(PKCS11Lib pkcslib, PKCS11Config pkcsConf) throws CspException {
 
         this.bSoftVerify = pkcsConf.getSoftVerify();
         this.bSensitive = pkcsConf.getnoKImport();
@@ -84,7 +87,8 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
             {
                 String str=null;
                 str=String.format("[JC_PKCS]:Could not find token with label %s and serialNumber %s", pkcslib.getKeyLabel(),pkcslib.getKeySN());
-                throw new JavaChainException(str);
+                csplog.setLogMsg(str, 2, PKCS11FactoryOpts.class);
+                throw new CspException(str);
             }
 
             this.sessionhandle = p11.C_OpenSession(slot,
@@ -92,30 +96,33 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
             pin = pkcslib.getKeyPin().toCharArray();
             p11.C_Login(sessionhandle, PKCS11Constants.CKU_USER, pin);
 
-        }catch (IOException/*|KeyStoreException|CertificateException|NoSuchAlgorithmException*/ ex){
+        }catch (IOException ex){
             String err = String.format("[JC_PKCS]:IOException ErrMessage:", ex.getMessage());
-            throw new JavaChainException(err, ex.getCause());
+            csplog.setLogMsg(err, 2, PKCS11FactoryOpts.class);
+            throw new CspException(err, ex.getCause());
         }catch(PKCS11Exception ex) {
             if(ex.getErrorCode() == PKCS11Constants.CKR_USER_ALREADY_LOGGED_IN)
             {
-                ;
+                csplog.setLogMsg("Already loggin!", 0, PKCS11FactoryOpts.class);
             }else
             {
                 String err = String.format("[JC_PKCS]:PKCS11Exception code: 0x%08x", ex.getErrorCode());
-                throw new JavaChainException(err, ex.getCause());
+                csplog.setLogMsg(err, 2, PKCS11FactoryOpts.class);
+                throw new CspException(err, ex.getCause());
             }
         }
     }
 
 
 
-    public void optFinalized() throws JavaChainException{
+    @Override
+    public void optFinalized() throws CspException{
         try {
             p11.C_CloseSession(sessionhandle);
         }
         catch (PKCS11Exception ex){
             String err = String.format("[JC_PKCS]:PKCS11Exception code: 0x%08x", ex.getErrorCode());
-            throw new JavaChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
     }
 
@@ -130,8 +137,8 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
     }
 
     @Override
-    public boolean isDefaultCsp() {
-        return false;
+    public String getKeyStore() {
+        return null;
     }
 
     @Override

@@ -17,8 +17,8 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.validator.statebasedval
 
 
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate.IDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate.HashedCompositeKey;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate.HashedUpdateBatch;
@@ -32,7 +32,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.validator.valinternal.Bl
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.validator.valinternal.InternalValidator;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.validator.valinternal.PubAndHashUpdates;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.validator.valinternal.Transaction;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.julongchain.protos.node.TransactionPackage;
 
@@ -49,7 +49,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class Validator implements InternalValidator {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(Validator.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Validator.class);
 
     private IDB db;
 
@@ -60,8 +60,8 @@ public class Validator implements InternalValidator {
     public void preLoadCommittedVersionOfRSet(Block block) throws LedgerException{
         List<CompositeKey> pubKeys = new ArrayList<>();
         List<HashedCompositeKey> hashedKeys = new ArrayList<>();
-        Map<CompositeKey, Object> pubKeysMap = new HashMap<>();
-        Map<HashedCompositeKey, Object> hashedKeyMap = new HashMap<>();
+        Map<CompositeKey, Object> pubKeysMap = new HashMap<>(16);
+        Map<HashedCompositeKey, Object> hashedKeyMap = new HashMap<>(16);
         for(Transaction tx : block.getTxs()){
             for(NsRwSet nsRwSet : tx.getRwSet().getNsRwSets()){
                 for(KvRwset.KVRead kvRead : nsRwSet.getKvRwSet().getReadsList()){
@@ -101,11 +101,11 @@ public class Validator implements InternalValidator {
             TransactionPackage.TxValidationCode validationCode = validateEndorserTX(tx.getRwSet(), doMVCCValidation, updates);
             tx.setValidationCode(validationCode);
             if(TransactionPackage.TxValidationCode.VALID.equals(validationCode)){
-                logger.debug(String.format("Block [%d] Transaction index [%d] txID [%s] marked as valid by state validator", block.getNum(), tx.getIndexInBlock(), tx.getId()));
-                Height committingTxHeight = new Height(block.getNum(), tx.getIndexInBlock());
+                log.debug(String.format("Block [%d] Transaction index [%d] txID [%s] marked as valid by state validator", block.getNum(), tx.getIndexInBlock(), tx.getId()));
+                LedgerHeight committingTxHeight = new LedgerHeight(block.getNum(), tx.getIndexInBlock());
                 updates.applyWriteSet(tx.getRwSet(), committingTxHeight);
             } else {
-                logger.debug(String.format("Block [%d] Transaction id [%d] TxID [%s] marked as invalid by state validator.", block.getNum(), tx.getIndexInBlock(), tx.getId()));
+                log.debug(String.format("Block [%d] Transaction id [%d] TxID [%s] marked as invalid by state validator.", block.getNum(), tx.getIndexInBlock(), tx.getId()));
             }
         }
         return updates;
@@ -148,10 +148,10 @@ public class Validator implements InternalValidator {
         if(updates.getBatch().exists(ns, kvRead.getKey())){
             return false;
         }
-        Height committedVersion = db.getVersion(ns, kvRead.getKey());
-        logger.debug("Comparing versions for keys " + kvRead.getKey());
-        if(Height.areSame(committedVersion, RwSetUtil.newVersion(kvRead.getVersion()))){
-            logger.debug(String.format("Version mismatch for key [%s:%s]", ns, kvRead.getKey()));
+        LedgerHeight committedVersion = db.getHeight(ns, kvRead.getKey());
+        log.debug("Comparing versions for keys " + kvRead.getKey());
+		if(!LedgerHeight.areSame(committedVersion, RwSetUtil.newVersion(kvRead.getVersion()))){
+            log.debug(String.format("Version mismatch for key [%s:%s]", ns, kvRead.getKey()));
             return false;
         }
         return true;
@@ -167,21 +167,24 @@ public class Validator implements InternalValidator {
     }
 
     private boolean validateRangeQuery(String ns, KvRwset.RangeQueryInfo rqi, PubUpdateBatch updates) throws LedgerException {
-        logger.debug(String.format("validateRangeQueryL ns = %s, rangQueryInfo = %s", ns, rqi));
+        log.debug(String.format("validateRangeQueryL ns = %s, rangQueryInfo = %s", ns, rqi));
         boolean includeEndKey = !rqi.getItrExhausted();
 
         CombinedIterator combinedItr = new CombinedIterator(db, updates.getBatch(), ns, rqi.getStartKey(), rqi.getEndKey(), includeEndKey);
-        IRangeQueryValidator validator;
-        if(null != rqi.getReadsMerkleHashes()){
-            logger.debug("Hashing results are present in the range query info hence, initiating hashing based validation");
-            validator = new RangeQueryHashValidator();
-        } else {
-            logger.debug("Hashing results are not present in the range query info hence, initiating hashing based validation");
-            validator = new RangeQueryResultsValidator();
-        }
-        validator.init(rqi, combinedItr);
-        combinedItr.close();
-        return validator.validate();
+	    try {
+		    IRangeQueryValidator validator;
+		    if(null != rqi.getReadsMerkleHashes()){
+		        log.debug("Hashing results are present in the range query info hence, initiating hashing based validation");
+		        validator = new RangeQueryHashValidator();
+		    } else {
+		        log.debug("Hashing results are not present in the range query info hence, initiating hashing based validation");
+		        validator = new RangeQueryResultsValidator();
+		    }
+		    validator.init(rqi, combinedItr);
+		    return validator.validate();
+	    } finally {
+		    combinedItr.close();
+	    }
     }
 
     private boolean validateNsHashedReadSets(String ns, List<CollHashedRwSet> collHashedRwSets, HashedUpdateBatch updates) throws LedgerException {
@@ -206,9 +209,9 @@ public class Validator implements InternalValidator {
         if(updates.contains(ns, collectionName, kvReadHash.toByteArray())){
             return false;
         }
-        Height committedVersion = db.getKeyHashVersion(ns, collectionName, kvReadHash.getKeyHash().toByteArray());
-        if(!Height.areSame(committedVersion, RwSetUtil.newVersion(kvReadHash.getVersion()))){
-            logger.debug(String.format("Version mismatch for key[%s:%s]", ns, collectionName));
+        LedgerHeight committedVersion = db.getKeyHashVersion(ns, collectionName, kvReadHash.getKeyHash().toByteArray());
+        if(!LedgerHeight.areSame(committedVersion, RwSetUtil.newVersion(kvReadHash.getVersion()))){
+            log.debug(String.format("Version mismatch for key[%s:%s]", ns, collectionName));
             return false;
         }
         return true;

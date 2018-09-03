@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,25 +15,29 @@
  */
 package org.bcia.julongchain.core.ssc;
 
-import org.bcia.julongchain.common.exception.SmartContractException;
+import com.google.protobuf.ByteString;
+import org.bcia.julongchain.common.exception.InprocVMException;
 import org.bcia.julongchain.common.exception.SysSmartContractException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.container.inproccontroller.InprocController;
-import org.bcia.julongchain.core.node.NodeConfig;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
+import org.bcia.julongchain.core.smartcontract.shim.ISmartContract;
 import org.bcia.julongchain.core.ssc.cssc.CSSC;
 import org.bcia.julongchain.core.ssc.essc.ESSC;
 import org.bcia.julongchain.core.ssc.lssc.LSSC;
 import org.bcia.julongchain.core.ssc.qssc.QSSC;
 import org.bcia.julongchain.core.ssc.vssc.VSSC;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.File;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.*;
 
 /**
  * 系统智能合约管理器,整合管理功能函数接口
@@ -46,7 +50,7 @@ import java.util.Map;
  * ６.分别为每个组，调用deploySysSmartContracts(groupID);
  * ７.(SystemSmartContractManager内部)deploySysSmartContracts(groupID)调用buildSysSmartContracts编译智能合约，形成智能合约部署规范(DeploymentSpec);
  *
- * @author sunianle
+ * @author sunianle, sunzongyu
  * @date 3/6/18
  * @company Dingxuan
  */
@@ -55,7 +59,11 @@ import java.util.Map;
 public class SystemSmartContractManager implements ISystemSmartContractManager {
     private SystemSmartContractDescriptor[] embedContractDescriptors = new SystemSmartContractDescriptor[5];
     private Map<String, ISystemSmartContract> sysSCMap = new HashMap<String, ISystemSmartContract>();
-    private static JavaChainLog log = JavaChainLogFactory.getLog(SystemSmartContractManager.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SystemSmartContractManager.class);
+	private static final String PLUGIN_CLASS = "Plugin";
+    private static final String PLUGIN_METHOD = "plugin";
+    private static final String PLUGIN_SUFFIX = ".jar";
+    private static final List<SystemSmartContractDescriptor> sscPlugins = new ArrayList<>();
     @Autowired
     private CSSC cssc;
     @Autowired
@@ -71,6 +79,14 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
 
     @Autowired
     public SystemSmartContractManager() {
+		// TODO: 7/31/18 Spring IOC invalid
+    	cssc = new CSSC();
+    	essc = new ESSC();
+		lssc = new LSSC();
+		qssc = new QSSC();
+		vssc = new VSSC();
+		init();
+		controller = new InprocController();
         log.debug("Construct systemSmartContractManager");
     }
 
@@ -80,43 +96,48 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
         String[] args = new String[0];
         embedContractDescriptors[0] = new SystemSmartContractDescriptor(
                 "cssc",
-                "core/ssc/cssc",
+                CSSC.class.getName(),
+                "development build",
                 args,
                 true,
                 false,
-                true
+				NodeConfigFactory.getNodeConfig().getSmartContract().getSystem().get("cssc").contains("enable")
         );
         embedContractDescriptors[1] = new SystemSmartContractDescriptor(
                 "essc",
-                "core/ssc/essc",
+				ESSC.class.getName(),
+				"development build",
                 args,
                 false,
                 false,
-                true
+				NodeConfigFactory.getNodeConfig().getSmartContract().getSystem().get("essc").contains("enable")
         );
         embedContractDescriptors[2] = new SystemSmartContractDescriptor(
                 "lssc",
-                "core/ssc/lssc",
+				LSSC.class.getName(),
+				"development build",
                 args,
                 true,
                 true,
-                true
+				NodeConfigFactory.getNodeConfig().getSmartContract().getSystem().get("lssc").contains("enable")
         );
         embedContractDescriptors[3] = new SystemSmartContractDescriptor(
                 "qssc",
-                "core/ssc/qssc",
+				QSSC.class.getName(),
+				"development build",
                 args,
                 true,
                 true,
-                true
+				NodeConfigFactory.getNodeConfig().getSmartContract().getSystem().get("qssc").contains("enable")
         );
         embedContractDescriptors[4] = new SystemSmartContractDescriptor(
                 "vssc",
-                "core/ssc/vssc",
+				VSSC.class.getName(),
+				"development build",
                 args,
                 false,
                 false,
-                true
+				NodeConfigFactory.getNodeConfig().getSmartContract().getSystem().get("vssc").contains("enable")
         );
         cssc.setSystemSmartContractDescriptor(embedContractDescriptors[0]);
         essc.setSystemSmartContractDescriptor(embedContractDescriptors[1]);
@@ -128,7 +149,7 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
 
     @Override
     public void registerSysSmartContracts() {
-        log.info("Register system contracts");
+        log.info("Register system contracts...");
         registerSysSmartContract(essc);
         registerSysSmartContract(lssc);
         registerSysSmartContract(cssc);
@@ -142,9 +163,9 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
      * @param contract 要注册的系统合约
      * @return 是否注册成功
      */
-    private boolean registerSysSmartContract(ISystemSmartContract contract){
-        if(contract.getSystemSmartContractDescriptor().isEnabled()==false||
-                isWhitelisted(contract)==false){
+    private boolean registerSysSmartContract(SystemSmartContractBase contract){
+        if(!contract.getSystemSmartContractDescriptor().isEnabled() ||
+				!isWhitelisted(contract)){
             log.info("System Smartcontract ({},{},{}) disabled",
                     contract.getSystemSmartContractDescriptor().getSSCName(),
                     contract.getSystemSmartContractDescriptor().getSSCPath(),
@@ -152,29 +173,60 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
             return false;
         }
 
-        try {
-            controller.register(contract.getSystemSmartContractDescriptor().getSSCPath(),contract);
-        } catch (SmartContractException e) {
-            log.error("Register system contract {} failed:{}",contract.getSmartContractID(),e.getMessage());
-            return false;
-        }
-
         String contractID = contract.getSmartContractID();
-        log.info("Register system contract [%s]", contractID);
         sysSCMap.put(contractID, contract);
+		try {
+			controller.register(contract);
+		} catch (InprocVMException e) {
+			log.error("Register system contract {} failed:{}",contract.getSmartContractID(),e.getMessage());
+			return false;
+		}
         return true;
     }
 
-    //相当于应用智能合约的Instantiate
+    /**
+	 * 系统智能合约部署
+	 * 相当于应用智能合约的Instantiate
+	 * TODO: 7/25/18 exit program when catch exception
+     */
     @Override
-    public void deploySysSmartContracts(String groupID) {
+    public void deploySysSmartContracts(String groupID){
+		for (Map.Entry<String, ISystemSmartContract> entry : sysSCMap.entrySet()) {
+			String sscName = entry.getKey();
+			SystemSmartContractBase ssc = (SystemSmartContractBase) entry.getValue();
+			String[] args = new String[]{
+				"-i" + sscName
+			};
+			try {
+				controller.deploy(ssc, args);
+			} catch (InprocVMException e) {
+				log.error("Deploy " + sscName + "failed");
+				log.error(e.getMessage());
+			}
 
+		}
     }
 
     @Override
-    public void deDeploySysSmartContracts(String groupID) {
-
+    public void deDeploySysSmartContracts(String groupID){
+		for(Map.Entry<String, ISystemSmartContract> entry : sysSCMap.entrySet()) {
+			String sscName = entry.getKey();
+			try {
+				controller.deDeploy(sscName);
+			} catch (InprocVMException e) {
+				log.error("Dedeploy " + sscName + " failed");
+				log.error(e.getMessage());
+			}
+		}
     }
+
+    private List<ByteString> getInitArgsByteStringList(String[] initArgs) {
+    	List<ByteString> list = new ArrayList<>();
+		for (String initArg : initArgs) {
+			list.add(ByteString.copyFromUtf8(initArg));
+		}
+		return list;
+	}
 
     @Override
     public boolean isSysSmartContract(String smartContractID) {
@@ -188,15 +240,10 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
 
     @Override
     public boolean isWhitelisted(ISystemSmartContract contract) {
-        NodeConfig nodeConfig = NodeConfigFactory.getNodeConfig();
-        NodeConfig.SmartContract smartcontractConfig = nodeConfig.getSmartContract();
-        Map<String, String> sscMap = smartcontractConfig.getSystem();
-        String value=sscMap.get(contract.getSmartContractID());
-        if(value.equals("enable")||value.equals("true")||value.equals("yes")){
-            return true;
-        }
-        return false;
-    }
+		Map<String, String> smartcontract = NodeConfigFactory.getNodeConfig().getSmartContract().getSystem();
+		String value = smartcontract.get(contract.getSmartContractID()).toLowerCase();
+		return "enable".equals(value) || "true".equals(value) || "yes".equals(value);
+	}
 
     @Override
     public ISystemSmartContract getSystemSmartContract(String smartContractID) {
@@ -205,6 +252,11 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
 
     @Override
     public boolean isSysSmartContractAndNotInvokableExternal(String smartContractID) {
+		for(SystemSmartContractDescriptor sscd : embedContractDescriptors){
+			if(smartContractID.equals(sscd.getSSCName())){
+				return !sscd.isInvokableExternal();
+			}
+		}
         return false;
     }
 
@@ -212,21 +264,86 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
     public boolean isSysSmartContractAndNotInvokableSC2SC(String smartContractID) {
         for(SystemSmartContractDescriptor sscd : embedContractDescriptors){
             if(smartContractID.equals(sscd.getSSCName())){
-                return sscd.isInvokaleSC2SC();
+                return !sscd.isInvokaleSC2SC();
             }
         }
         return false;
     }
 
 
-    //编译智能合约，形成智能合约部署规范(DeploymentSpec);
-    private Smartcontract.SmartContractDeploymentSpec buildSysSmartContract(Smartcontract.SmartContractSpec spec)
-            throws SysSmartContractException {
-        return null;
+	/**
+	 * 编译智能合约，形成智能合约部署规范(DeploymentSpec);
+	 */
+    private SmartContractPackage.SmartContractDeploymentSpec buildSysSmartContract(SmartContractPackage.SmartContractSpec spec) {
+    	return SmartContractPackage.SmartContractDeploymentSpec.newBuilder()
+				.setExecEnv(SmartContractPackage.SmartContractDeploymentSpec.ExecutionEnvironment.SYSTEM)
+				.setSmartContractSpec(spec)
+				.setCodePackage(ByteString.EMPTY)
+				.build();
     }
 
-    //加载外部系统智能合约插件
-    private void loadSysSmartContracts() {
+	/**
+	 * 加载外部系统智能合约插件
+	 */
+    private List<SystemSmartContractDescriptor> loadSysSmartContracts() throws SysSmartContractException {
+    	List<PluginConfig> config = new ArrayList<>();
+		Map<String, String> systemPlugins = NodeConfigFactory.getNodeConfig().getSmartContract().getSystemPlugins();
+		// TODO: 7/19/18 yaml system plugins
+		loadSysSmartContractWithConfig(config);
+		return sscPlugins;
+	}
 
-    }
+	/**
+	 * 根据配置加载系统智能合约
+	 */
+	private static void loadSysSmartContractWithConfig(List<PluginConfig> config) throws SysSmartContractException{
+		for (PluginConfig conf : config) {
+			SystemSmartContractDescriptor sc = new SystemSmartContractDescriptor(conf.getName(),
+					conf.getPath(),
+					null,
+					null,
+					conf.isInvokableExternal(),
+					conf.isInvokableSC2SC(),
+					conf.isEnable());
+			ISmartContract plugin = loadPlugin(conf.getPath());
+			if (plugin == null) {
+				log.info("Load System Smartcontract {} from path {} unsuccessfully.", sc.getSSCName(), sc.getSSCPath());
+				continue;
+			}
+			sc.setSmartContract(plugin);
+			sscPlugins.add(sc);
+			log.info("Successfully load System Smartcontract {} from path {}.", sc.getSSCName(), sc.getSSCPath());
+		}
+	}
+
+	/**
+	 * java插件以jar包形式存在
+	 * TODO: 7/19/18 具体内部细节待定
+	 */
+	private static ISmartContract loadPlugin(String path) throws SysSmartContractException{
+		if (!path.endsWith(PLUGIN_SUFFIX)) {
+			String errMsg = "Java plugin must be a jar file";
+			log.error(errMsg);
+			return null;
+		}
+		File file = new File(path);
+		if (!file.exists()) {
+			String errMsg = "Can not find plugin at path [" + path + "]";
+			log.error(errMsg);
+			return null;
+		}
+		ISmartContract ssc = null;
+		try {
+			URL url = new URL("file:" + path);
+			URLClassLoader urlClassLoader = new URLClassLoader(new URL[]{url}, Thread.currentThread().getContextClassLoader());
+			Class<?> clazz = urlClassLoader.loadClass(PLUGIN_CLASS);
+			Method method = clazz.getMethod(PLUGIN_METHOD);
+			ssc = ((ISmartContract) method.invoke(clazz.newInstance()));
+		} catch (Exception e) {
+			String errMsg = "Got error when load plugin. Err:{\n" + e.getMessage() + "\n}";
+			log.error(errMsg);
+			throw new SysSmartContractException(errMsg);
+		}
+		return ssc;
+	}
 }

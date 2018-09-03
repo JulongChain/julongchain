@@ -18,7 +18,8 @@ package org.bcia.julongchain.msp.mspconfig;
 import java.util.Map;
 
 /**
- * 将gmcsp文件转换为配置对象
+ * gmcsp文件转换配置对象
+ *
  * @author zhangmingyang
  * @Date: 2018/6/13
  * @company Dingxuan
@@ -75,9 +76,9 @@ public class MspConfig {
         }
     }
 
-    public  static class Csp{
+    public static class Csp {
         private String defaultValue;
-        private Map<String,Map<String,String>> factoryOpts;
+        private Map<String, Map<String, String>> factoryOpts;
 
         public String getDefaultValue() {
             return defaultValue;
@@ -95,7 +96,8 @@ public class MspConfig {
             this.factoryOpts = factoryOpts;
         }
     }
-    public static  class GM{
+
+    public static class GM {
         private String symmetricKey;
         private String sign;
         private String hash;

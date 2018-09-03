@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 对象
+ * 资源配置集对象
  *
  * @author zhouhui
  * @date 2018/4/25
@@ -63,7 +63,7 @@ public class ResourcesConfigBundle implements IResourcesConfigBundle {
 
         //TODO:需要赋值
         Map<Integer, IPolicyProvider> policyProviderMap = new HashMap<Integer, IPolicyProvider>();
-//        policyProviderMap.put(Policies.Policy.PolicyType.SIGNATURE_VALUE, new PolicyProvider(configResources.getPolicyManager()));
+//        policyProviderMap.put(Policies.PolicyConstant.PolicyType.SIGNATURE_VALUE, new PolicyProvider(configResources.getPolicyManager()));
 
         IPolicyManager resourcesPolicyManager = new PolicyManager(ResourcesConfigConstant.RESOURCES,
                 policyProviderMap, config.getGroupTree());

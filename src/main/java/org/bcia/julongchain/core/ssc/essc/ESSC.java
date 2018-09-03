@@ -15,8 +15,8 @@
  */
 package org.bcia.julongchain.core.ssc.essc;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.proto.ProposalResponseUtils;
 import org.bcia.julongchain.common.util.proto.ProtoUtils;
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContractStub;
@@ -25,21 +25,30 @@ import org.bcia.julongchain.msp.IMsp;
 import org.bcia.julongchain.msp.ISigningIdentity;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /**
  * 背书系统智能合约　Endorse System Smart Contract,ESSC
- * 实现默认的背书策略，对proposal哈希值和读写集合做签名
+ * 背书系统智能合约（ESSC）实现默认的背书策略，对客户端或应用提交的提案哈希值和读写集合做签名。
+ *  ESSC的invoke函数，接受的args格式说明如下：
+ * args[0] - 函数名 (当前未使用)
+ * args[1] - 序列化的Header对象（serialized Header object）
+ * args[2] - 序列化的智能合约提案负载对象（serialized SmartContractProposalPayload object）
+ * args[3] - 执行智能合约的合约ID（SmartcontractID of executing smartcontract）
+ * args[4] - 执行智能合约的结果（result of executing smartcontract）
+ * args[5] - 仿真结果的二进制Blob（binary blob of simulation results）
+ * args[6] - 序列化的事件（serialized events）
+ * args[7] - 负载的可见性（payloadVisibility）
  * @author sunianle
  * @date 3/5/18
  * @company Dingxuan
  */
 @Component
 public class ESSC extends SystemSmartContractBase {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ESSC.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ESSC.class);
 
     /**
      * Init is called once when the smartcontract started the first time
@@ -99,7 +108,7 @@ public class ESSC extends SystemSmartContractBase {
             return newErrorResponse("SmartcontractID is empty");
         }
 
-        Smartcontract.SmartContractID smartContractID=null;
+        SmartContractPackage.SmartContractID smartContractID=null;
         try {
             smartContractID = ProtoUtils.unmarshalSmartcontractID(smartContractIDBytes);
         }catch(Exception e){
@@ -127,10 +136,12 @@ public class ESSC extends SystemSmartContractBase {
 
 
         //handle simulation results
+		// TODO: 7/2/18 install时会因为不需要指定groupID导致获取simulator失败
         byte[] resultBytes=args.get(5);
-        if(resultBytes.length==0){
-            return newErrorResponse("Simulation results is empty");
-        }
+		if (resultBytes.length == 0) {
+			log.warn("Simulation results is empty");
+//            return newErrorResponse("Simulation results is empty");
+		}
 
         // Handle serialized events if they have been provided
         // they might be nil in case there's no events but there

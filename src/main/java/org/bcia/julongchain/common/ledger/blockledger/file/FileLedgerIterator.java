@@ -18,8 +18,8 @@ package org.bcia.julongchain.common.ledger.blockledger.file;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.common.ledger.blockledger.IIterator;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.julongchain.protos.common.Common;
 
@@ -34,7 +34,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class FileLedgerIterator implements IIterator {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(FileLedger.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(FileLedger.class);
     private FileLedger ledger;
     private long blockNum;
     private IResultsIterator commonIterator;
@@ -48,17 +48,18 @@ public class FileLedgerIterator implements IIterator {
     }
 
     /**
-     * 返回block的ByteString形式
+     * @return Map.Entry<QueryResult, Common.Status>
      */
     @Override
     public QueryResult next() throws LedgerException {
-        Map.Entry<QueryResult, Common.Status> map = null;
-        QueryResult result = null;
+        Map.Entry<QueryResult, Common.Status> map;
+        QueryResult result;
         try {
             result = commonIterator.next();
         } catch (LedgerException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
             map = new AbstractMap.SimpleEntry<>(null, Common.Status.SERVICE_UNAVAILABLE);
+            return new QueryResult(map);
         }
         map = new AbstractMap.SimpleEntry<>(result
                 , result == null ? Common.Status.SERVICE_UNAVAILABLE : Common.Status.SUCCESS);
@@ -67,11 +68,11 @@ public class FileLedgerIterator implements IIterator {
 
     @Override
     public void readyChain() throws LedgerException{
-        synchronized (FileLedger.getLock()) {
+        synchronized (FileLedger.LOCK) {
             if (blockNum > ledger.height() - 1) {
                 try {
-                    logger.debug("Require block num is [{}], ledger height is[{}], wait block append", blockNum, ledger.height() - 1);
-                    FileLedger.getLock().wait();
+                    log.debug("Require block num is [{}], ledger height is[{}], wait block append", blockNum, ledger.height());
+                    FileLedger.LOCK.wait();
                 } catch (InterruptedException e) {
                     throw new LedgerException(e);
                 }

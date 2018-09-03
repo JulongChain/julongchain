@@ -18,20 +18,20 @@ package org.bcia.julongchain.tools.configtxgen;
 import org.apache.commons.cli.ParseException;
 import org.bcia.julongchain.common.exception.ConfigtxToolsException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.tools.configtxgen.cmd.ConfigtxGenCmd;
 import org.bcia.julongchain.tools.configtxgen.cmd.IConfigtxGenCmd;
 
 /**
- * 类描述
+ * 交易生成工具入口类
  *
  * @author zhouhui
  * @date 2018/06/06
  * @company Dingxuan
  */
 public class ConfigtxGenMain {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ConfigtxGenMain.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ConfigtxGenMain.class);
 
     public static void main(String[] args) {
         try {
@@ -54,7 +54,7 @@ public class ConfigtxGenMain {
         log.info("ConfigtxGen Command Start");
 
         if (args.length <= 0) {
-            log.warn("ConfigtxGen command need more args-----");
+            log.warn("ConfigtxGen command need more args");
             return null;
         }
 

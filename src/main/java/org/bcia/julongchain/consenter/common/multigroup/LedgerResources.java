@@ -18,11 +18,13 @@ package org.bcia.julongchain.consenter.common.multigroup;
 import org.bcia.julongchain.common.ledger.blockledger.ReadWriteBase;
 
 /**
+ * 账本资源实体
+ *
  * @author zhangmingyang
  * @Date: 2018/5/17
  * @company Dingxuan
  */
-public class LedgerResources{
+public class LedgerResources {
     private IMutableResources mutableResources;
     private ReadWriteBase readWriteBase;
 

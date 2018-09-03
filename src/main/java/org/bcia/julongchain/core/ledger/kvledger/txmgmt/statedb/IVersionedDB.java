@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.UpdateBatch;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 
 import java.util.List;
 
@@ -32,88 +32,63 @@ import java.util.List;
  */
 public interface IVersionedDB{
 
-    /** GetState gets the value for given namespace and key. For a chaincode, the namespace corresponds to the chaincodeId
-     *
-     * @param namespace
-     * @param key
-     * @return
-     * @throws LedgerException
-     */
+	/**
+	 * 获取当前世界状态
+	 * @param namespace	命名空间
+	 * @param key	key
+	 */
     VersionedValue getState(String namespace, String key) throws LedgerException;
 
-    Height getVersion(String namespace, String key) throws LedgerException;
+	/**
+	 * 获取key所在区块号及交易号
+	 */
+    LedgerHeight getHeight(String namespace, String key) throws LedgerException;
 
-    /** GetStateMultipleKeys gets the values for multiple keys in a single call
-     *
-     * @param namespace
-     * @param keys
-     * @return
-     * @throws LedgerException
+    /**
+	 * 批量查询世界状态
      */
     List<VersionedValue> getStateMultipleKeys(String namespace, List<String> keys) throws LedgerException;
 
-    /** GetStateRangeScanIterator returns an iterator that contains all the key-values between given key ranges.
-     * startKey is inclusive
-     * endKey is exclusive
-     * The returned IResultsIterator contains results of type *VersionedKV
-     *
-     * @param namespace
-     * @param startKey
-     * @param endKey
-     * @return
-     * @throws LedgerException
+    /**
+	 * 获取世界状态查询迭代器
      */
     IResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException;
 
-    /** ExecuteQuery executes the given query and returns an iterator that contains results of type *VersionedKV.
-     *
-     * @param namespace
-     * @param query
-     * @return
-     * @throws LedgerException
+    /**
+	 * 执行查询语句
+	 * TODO: 暂不支持
      */
     IResultsIterator executeQuery(String namespace, String query) throws LedgerException;
 
-    /** ApplyUpdates applies the batch to the underlying db.
-     * height is the height of the highest transaction in the Batch that
-     * a state db implementation is expected to ues as a save point
-     *
-     * @param batch
-     * @param height
-     * @throws LedgerException
+    /**
+	 * 执行提交
      */
-    void applyUpdates(UpdateBatch batch, Height height) throws LedgerException;
+    void applyUpdates(UpdateBatch batch, LedgerHeight height) throws LedgerException;
 
-    /** GetLatestSavePoint returns the height of the highest transaction upto which
-     * the state db is consistent
-     *
-     * @return
-     * @throws LedgerException
+    /**
+	 * 获取最后保存点
      */
-    Height getLatestSavePoint() throws LedgerException;
+    LedgerHeight getLatestSavePoint() throws LedgerException;
 
-    /** ValidateKey tests whether the key is supported by the db implementation.
-     * For instance, leveldb supports any bytes for the key while the couchdb supports only valid utf-8 string
-     *
-     * @param key
-     * @throws LedgerException
+    /**
+	 * 检验K-V
      */
     void validateKeyValue(String key, byte[] value) throws LedgerException;
 
-    /** Open opens the db
-     *
-     * @throws LedgerException
+    /**
+	 * 打开DB
      */
     void open() throws LedgerException;
 
-    /** Close closes the db
-     *
-     * @throws LedgerException
-     */
-    void close() throws LedgerException;
+	/**
+	 * 关闭
+	 */
+	void close() throws LedgerException;
 
     /**
-     * BytesKeySuppoted implements method in VersionedDB interface
+	 * 是否支持字节形式key
+	 * LevelDB	true
+	 * CouchDB	false
      */
     boolean bytesKeySuppoted();
 }

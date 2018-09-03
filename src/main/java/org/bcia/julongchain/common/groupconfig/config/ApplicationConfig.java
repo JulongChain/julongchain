@@ -40,9 +40,6 @@ public class ApplicationConfig implements IApplicationConfig {
     private Configuration.Capabilities capabilitiesProto;
     private IApplicationCapabilities capabilities;
 
-    public ApplicationConfig() {
-    }
-
     public ApplicationConfig(Configtx.ConfigTree appTree, MSPConfigHandler mspConfigHandler) throws
             InvalidProtocolBufferException, ValidateException {
         if (appTree != null && appTree.getValuesMap() != null) {

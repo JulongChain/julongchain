@@ -17,12 +17,13 @@ package org.bcia.julongchain.core.common.validation;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.ArrayUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.exception.VerifyException;
 import org.bcia.julongchain.common.groupconfig.capability.IApplicationCapabilities;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.common.util.proto.ProposalUtils;
 import org.bcia.julongchain.csp.factory.CspManager;
@@ -30,6 +31,7 @@ import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.msp.IIdentity;
 import org.bcia.julongchain.msp.IIdentityDeserializer;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
+import org.bcia.julongchain.msp.mgmt.MspMgmtMgr;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
@@ -44,7 +46,7 @@ import org.bouncycastle.util.Arrays;
  * @company Dingxuan
  */
 public class MsgValidation {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(MsgValidation.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(MsgValidation.class);
 
     /**
      * 校验群组头部
@@ -55,7 +57,7 @@ public class MsgValidation {
      */
     public static ProposalPackage.SmartContractHeaderExtension validateGroupHeader(Common.GroupHeader groupHeader)
             throws ValidateException {
-        ValidateUtils.isNotNull(groupHeader, "groupHeader can not be null");
+        ValidateUtils.isNotNull(groupHeader, "GroupHeader can not be null");
 
         //校验消息类型
         if (groupHeader.getType() != Common.HeaderType.ENDORSER_TRANSACTION_VALUE
@@ -88,8 +90,6 @@ public class MsgValidation {
             ValidateUtils.isNotNull(extension.getSmartContractId(), "SmartContractId can not be null");
 
             return extension;
-
-            //TODO:PayloadVisibility要判断吗
         }
 
         return null;
@@ -102,7 +102,7 @@ public class MsgValidation {
      * @throws ValidateException
      */
     public static void validateSignatureHeader(Common.SignatureHeader signatureHeader) throws ValidateException {
-        ValidateUtils.isNotNull(signatureHeader, "signatureHeader can not be null");
+        ValidateUtils.isNotNull(signatureHeader, "SignatureHeader can not be null");
 
         //校验随机数，应存在且有效
         if (signatureHeader.getNonce() == null || signatureHeader.getNonce().isEmpty()) {
@@ -123,9 +123,9 @@ public class MsgValidation {
      * @throws ValidateException
      */
     public static Object[] validateCommonHeader(Common.Header header) throws ValidateException {
-        ValidateUtils.isNotNull(header, "header can not be null");
-        ValidateUtils.isNotNull(header.getGroupHeader(), "groupHeader can not be null");
-        ValidateUtils.isNotNull(header.getSignatureHeader(), "signatureHeader can not be null");
+        ValidateUtils.isNotNull(header, "Header can not be null");
+        ValidateUtils.isNotNull(header.getGroupHeader(), "GroupHeader can not be null");
+        ValidateUtils.isNotNull(header.getSignatureHeader(), "SignatureHeader can not be null");
 
         Common.GroupHeader groupHeader = null;
         try {
@@ -164,18 +164,18 @@ public class MsgValidation {
      * @throws ValidateException
      */
     public static void checkSignature(byte[] signature, byte[] message, byte[] creator, String groupId) throws
-            ValidateException, VerifyException {
+            ValidateException, VerifyException, MspException {
         if (ArrayUtils.isEmpty(signature) || ArrayUtils.isEmpty(message) || ArrayUtils.isEmpty(creator)) {
             throw new ValidateException("Missing arguments");
         }
 
         //获取反序列化器
-        IIdentityDeserializer identityDeserializer = GlobalMspManagement.getIdentityDeserializer(groupId);
-        ValidateUtils.isNotNull(identityDeserializer, "identityDeserializer can not be null");
+        IIdentityDeserializer identityDeserializer = MspMgmtMgr.getIdentityDeserializer(groupId);
+        ValidateUtils.isNotNull(identityDeserializer, "IdentityDeserializer can not be null");
 
         //反序列化出身份对象
         IIdentity identity = identityDeserializer.deserializeIdentity(creator);
-        ValidateUtils.isNotNull(identity, "identity can not be null");
+        ValidateUtils.isNotNull(identity, "Identity can not be null");
 
         //校验自身
         identity.validate();
@@ -195,7 +195,7 @@ public class MsgValidation {
         String expectTxId = null;
         try {
             expectTxId = ProposalUtils.computeProposalTxID(creator, nonce);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.error(e.getMessage(), e);
             throw new ValidateException("Can not get expectTxId");
         }
@@ -255,7 +255,7 @@ public class MsgValidation {
 
                 try {
                     proposalResponsePayload = validateEndorserTransaction(payload);
-                } catch (JavaChainException e) {
+                } catch (JulongChainException e) {
                     log.error(e.getMessage(), e);
                     return new Object[]{TransactionPackage.TxValidationCode.INVALID_ENDORSER_TRANSACTION};
                 } catch (InvalidProtocolBufferException e) {
@@ -288,10 +288,10 @@ public class MsgValidation {
     }
 
     private static ProposalResponsePackage.ProposalResponsePayload validateEndorserTransaction(Common.Payload payload)
-            throws JavaChainException, InvalidProtocolBufferException {
-        ValidateUtils.isNotNull(payload, "payload can not be null");
-        ValidateUtils.isNotNull(payload.getHeader(), "payload.header can not be null");
-        ValidateUtils.isNotNull(payload.getData(), "payload.data can not be null");
+            throws JulongChainException, InvalidProtocolBufferException {
+        ValidateUtils.isNotNull(payload, "Payload can not be null");
+        ValidateUtils.isNotNull(payload.getHeader(), "Payload.header can not be null");
+        ValidateUtils.isNotNull(payload.getData(), "Payload.data can not be null");
 
         TransactionPackage.Transaction transaction = TransactionPackage.Transaction.parseFrom(payload.getData());
 
@@ -299,11 +299,11 @@ public class MsgValidation {
         // TODO: validate SmartContractHeaderExtension
 
         if (transaction.getActionsCount() != 1) {
-            throw new ValidateException("transaction.getActionsCount should be 1");
+            throw new ValidateException("Transaction.getActionsCount should be 1");
         }
 
         for (TransactionPackage.TransactionAction action : transaction.getActionsList()) {
-            ValidateUtils.isNotNull(action, "action can not be null");
+            ValidateUtils.isNotNull(action, "Action can not be null");
 
             Common.SignatureHeader signatureHeader = Common.SignatureHeader.parseFrom(action.getHeader());
             validateSignatureHeader(signatureHeader);
@@ -332,9 +332,9 @@ public class MsgValidation {
     }
 
     private static void validateConfigTransaction(Common.Payload payload) throws ValidateException {
-        ValidateUtils.isNotNull(payload, "payload can not be null");
-        ValidateUtils.isNotNull(payload.getHeader(), "payload.header can not be null");
-        ValidateUtils.isNotNull(payload.getData(), "payload.data can not be null");
+        ValidateUtils.isNotNull(payload, "Payload can not be null");
+        ValidateUtils.isNotNull(payload.getHeader(), "Payload.header can not be null");
+        ValidateUtils.isNotNull(payload.getData(), "Payload.data can not be null");
 
         //
     }

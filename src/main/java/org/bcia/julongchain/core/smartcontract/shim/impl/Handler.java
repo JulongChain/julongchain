@@ -2,6 +2,8 @@
 Copyright IBM Corp., DTCC All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
+
+Modified java_package and other contents by Dingxuan on 2018-08-30
 */
 
 package org.bcia.julongchain.core.smartcontract.shim.impl;
@@ -23,8 +25,8 @@ import org.bcia.julongchain.core.smartcontract.shim.helper.Channel;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage.Response;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage.Response.Builder;
 import org.bcia.julongchain.protos.node.SmartContractEventPackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
-import org.bcia.julongchain.protos.node.SmartcontractShim.*;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
+import org.bcia.julongchain.protos.node.SmartContractShim.*;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -36,7 +38,7 @@ import java.util.stream.Collectors;
 import static java.lang.String.format;
 import static org.bcia.julongchain.core.smartcontract.shim.fsm.CallbackType.AFTER_EVENT;
 import static org.bcia.julongchain.core.smartcontract.shim.fsm.CallbackType.BEFORE_EVENT;
-import static org.bcia.julongchain.protos.node.SmartcontractShim.SmartContractMessage.Type.*;
+import static org.bcia.julongchain.protos.node.SmartContractShim.SmartContractMessage.Type.*;
 
 public class Handler {
 
@@ -183,7 +185,7 @@ public class Handler {
 			try {
 
 				// Get the function and args from Payload
-				final Smartcontract.SmartContractInput input = Smartcontract.SmartContractInput.parseFrom(message.getPayload());
+				final SmartContractPackage.SmartContractInput input = SmartContractPackage.SmartContractInput.parseFrom(message.getPayload());
 
 				// Mark as a transaction (allow put/del state)
 				markIsTransaction(message.getGroupId(), message.getTxid(), true);
@@ -234,7 +236,7 @@ public class Handler {
 			try {
 
 				// Get the function and args from Payload
-				final Smartcontract.SmartContractInput input = Smartcontract.SmartContractInput.parseFrom(message.getPayload());
+				final SmartContractPackage.SmartContractInput input = SmartContractPackage.SmartContractInput.parseFrom(message.getPayload());
 
 				// Mark as a transaction (allow put/del state)
 				markIsTransaction(message.getGroupId(), message.getTxid(), true);
@@ -422,11 +424,11 @@ public class Handler {
 	ISmartContract.SmartContractResponse invokeSmartContract(String channelId, String txId, String smartcontractName, List<byte[]> args) {
 		try {
 			// create invocation specification of the smartcontract to invoke
-			final Smartcontract.SmartContractSpec invocationSpec = Smartcontract.SmartContractSpec.newBuilder()
-					.setSmartContractId(Smartcontract.SmartContractID.newBuilder()
+			final SmartContractPackage.SmartContractSpec invocationSpec = SmartContractPackage.SmartContractSpec.newBuilder()
+					.setSmartContractId(SmartContractPackage.SmartContractID.newBuilder()
 							.setName(smartcontractName)
 							.build())
-					.setInput(Smartcontract.SmartContractInput.newBuilder()
+					.setInput(SmartContractPackage.SmartContractInput.newBuilder()
 							.addAllArgs(args.stream().map(ByteString::copyFrom).collect(Collectors.toList()))
 							.build())
 					.build();
@@ -552,7 +554,7 @@ public class Handler {
 					.setGroupId(channelId)
 					.setTxid(txId)
 					.setPayload(payload)
-					.setSmartcontractEvent(event)
+					.setSmartContractEvent(event)
 					.build();
 		}
 	}

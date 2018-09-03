@@ -13,27 +13,26 @@
  */
 package org.bcia.julongchain.gossip;
 
-import com.codahale.metrics.MetricRegistry;
-import com.google.protobuf.ByteString;
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.gossip.GossipMember;
-import org.apache.gossip.GossipService;
 import org.apache.gossip.GossipSettings;
-import org.apache.gossip.RemoteGossipMember;
-import org.apache.gossip.crdt.Crdt;
-import org.apache.gossip.crdt.OrSet;
-import org.apache.gossip.event.GossipListener;
-import org.apache.gossip.event.GossipState;
-import org.apache.gossip.model.SharedGossipDataMessage;
+import org.apache.gossip.Member;
+import org.apache.gossip.RemoteMember;
+import org.apache.gossip.manager.GossipManager;
+import org.apache.gossip.manager.GossipManagerBuilder;
+import org.apache.gossip.model.SharedDataMessage;
 import org.bcia.julongchain.common.exception.GossipException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfigFactory;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
+import org.bcia.julongchain.protos.common.Common;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 /**
  * Gossip服务的相关方法，<br>
@@ -49,102 +48,95 @@ import java.util.*;
  */
 public class GossipServiceUtil {
 
-  private static JavaChainLog log = JavaChainLogFactory.getLog(GossipServiceUtil.class);
+  private static JulongChainLog log = JulongChainLogFactory.getLog(GossipServiceUtil.class);
 
-  /**
-   * 启动gossip server服务，（seed节点）
-   *
-   * @param address 节点的地址，格式为ip:port
-   * @throws GossipException
-   */
-  public static GossipService newGossipService(String address) throws GossipException {
-    log.info("newGossipService(address[" + address + "])");
+  private static final Integer messageLength = 10000;
 
-    GossipService gossipService = null;
+  private static final String cluster = "julongchain";
+
+  public static GossipManager newGossipService(String address) throws GossipException {
+
     try {
-      gossipService =
-          new GossipService(
-              "julongchain",
-              URI.create("udp://" + address),
-              UUID.randomUUID().toString(),
-              new HashMap<>(),
-              new ArrayList<>(),
-              new GossipSettings(),
-              new GossipListener() {
-                @Override
-                public void gossipEvent(GossipMember member, GossipState state) {}
-              },
-              new MetricRegistry());
-    } catch (InterruptedException e) {
-      throw new GossipException(e.getMessage(), e);
-    } catch (UnknownHostException e) {
+      GossipSettings settings = new GossipSettings();
+      settings.setPersistRingState(false);
+      settings.setPersistDataState(false);
+
+      List<Member> startupMembers = new ArrayList<Member>();
+
+      // RemoteMember member =
+      //     new RemoteMember(cluster, new URI("udp://" + address), UUID.randomUUID().toString());
+      // startupMembers.add(member);
+
+      GossipManager gossipService =
+          GossipManagerBuilder.newBuilder()
+              .cluster(cluster)
+              .uri(new URI("udp://" + address))
+              .id(UUID.randomUUID().toString())
+              .gossipMembers(startupMembers)
+              .gossipSettings(settings)
+              .build();
+
+      return gossipService;
+    } catch (Exception e) {
       throw new GossipException(e.getMessage(), e);
     }
-
-    return gossipService;
   }
 
-  /**
-   * 启动节点，并加入种子节点地址
-   *
-   * @param address 本机地址
-   * @param seedAddress 种子节点地址
-   * @return
-   * @throws GossipException
-   */
-  public static GossipService newGossipService(String address, String seedAddress)
+  public static GossipManager newGossipService(String address, String seedAddress)
       throws GossipException {
-
-    log.info("newGossipService(address[" + address + "],seedAddress[" + seedAddress + "])");
-
-    if (StringUtils.isEmpty(seedAddress)) {
-      return newGossipService(address);
-    }
-
-    List<GossipMember> gossipMembers = new ArrayList<>();
-    RemoteGossipMember remoteGossipMember =
-        new RemoteGossipMember(
-            "julongchain", URI.create("udp://" + seedAddress), UUID.randomUUID().toString());
-    gossipMembers.add(remoteGossipMember);
-
-    GossipService gossipService = null;
     try {
-      gossipService =
-          new GossipService(
-              "julongchain",
-              URI.create("udp://" + address),
-              UUID.randomUUID().toString(),
-              new HashMap<>(),
-              gossipMembers,
-              new GossipSettings(),
-              new GossipListener() {
-                @Override
-                public void gossipEvent(GossipMember member, GossipState state) {}
-              },
-              new MetricRegistry());
-    } catch (InterruptedException e) {
-      throw new GossipException(e.getMessage(), e);
-    } catch (UnknownHostException e) {
+      GossipSettings settings = new GossipSettings();
+      settings.setPersistRingState(false);
+      settings.setPersistDataState(false);
+
+      List<Member> startupMembers = new ArrayList<Member>();
+
+      RemoteMember seed =
+          new RemoteMember(cluster, new URI("udp://" + seedAddress), UUID.randomUUID().toString());
+      startupMembers.add(seed);
+
+      // RemoteMember member2 =
+      //     new RemoteMember(cluster, new URI("udp://" + address), UUID.randomUUID().toString());
+      // startupMembers.add(member2);
+
+      GossipManager gossipService =
+          GossipManagerBuilder.newBuilder()
+              .cluster(cluster)
+              .uri(new URI("udp://" + address))
+              .id(UUID.randomUUID().toString())
+              .gossipMembers(startupMembers)
+              .gossipSettings(settings)
+              .build();
+
+      return gossipService;
+    } catch (Exception e) {
       throw new GossipException(e.getMessage(), e);
     }
-
-    return gossipService;
   }
 
-  /**
-   * 节点上传区块
-   *
-   * @param gossipService 上传数据的gossip service
-   * @param group 上传数据的群组
-   * @param seqNum 区块的num
-   * @param data String格式的区块
-   * @throws GossipException
-   */
-  public static void addData(GossipService gossipService, String group, Long seqNum, String data)
+  public static void shareData(GossipManager gossipService, String group, Long seqNum, String data) {
+    SharedDataMessage m = new SharedDataMessage();
+    m.setExpireAt(Long.MAX_VALUE);
+    m.setKey(group + "-" + seqNum);
+    m.setPayload(data);
+    m.setTimestamp(System.currentTimeMillis());
+    gossipService.gossipSharedData(m);
+  }
+
+  public static String findData(GossipManager gossipService, String group, Long seqNum) {
+    SharedDataMessage sharedGossipData = gossipService.findSharedGossipData(group + "-" + seqNum);
+    if(sharedGossipData == null){
+      return null;
+    }
+    return (String) sharedGossipData.getPayload();
+  }
+
+  public static void addData(
+      GossipManager gossipService, String group, Long seqNum, Common.Block data)
       throws GossipException {
 
     if (gossipService == null) {
-      throw new GossipException("Gossip服务未启动。");
+      throw new GossipException("Gossip not start。");
     }
 
     log.info(
@@ -159,33 +151,63 @@ public class GossipServiceUtil {
             + "])");
 
     if (StringUtils.isEmpty(group) || seqNum == null || data == null) {
-      throw new GossipException("群组，区块高度，区块文件不能为空。");
+      throw new GossipException("group,blockNum,blockData is null。");
     }
 
-    SharedGossipDataMessage m = new SharedGossipDataMessage();
+    String blockStr = "";
+    try {
+      blockStr = new String(data.toByteArray(), "ISO8859-1");
+      log.info("=================================================");
+      //       log.info("blockStr:" + blockStr);
+      log.info("=================================================");
+    } catch (UnsupportedEncodingException e) {
+      log.error(e.getMessage(), e);
+      throw new GossipException(e);
+    }
+
+    int fileNumber = blockStr.length() / messageLength;
+    if (blockStr.length() % messageLength > 0) {
+      fileNumber = fileNumber + 1;
+    }
+    log.info("fileNumber:" + fileNumber);
+
+    SharedDataMessage m = new SharedDataMessage();
     m.setExpireAt(Long.MAX_VALUE);
     m.setKey(group + "-" + seqNum);
-    m.setPayload(new OrSet<String>(data));
+    m.setPayload(fileNumber);
     m.setTimestamp(System.currentTimeMillis());
-    gossipService.getGossipManager().merge(m);
+    gossipService.gossipSharedData(m);
+    log.info("send gossip:[" + group + "-" + seqNum + "]");
+
+    for (int i = 0; i < fileNumber; i++) {
+
+      int start = i * messageLength;
+      int end = (i + 1) * messageLength;
+      if (end > blockStr.length()) {
+        end = blockStr.length();
+      }
+
+      String str = blockStr.substring(start, end);
+
+      SharedDataMessage msg = new SharedDataMessage();
+      msg.setExpireAt(Long.MAX_VALUE);
+      msg.setKey(group + "-" + seqNum + "-" + i);
+      msg.setPayload(str);
+      msg.setTimestamp(System.currentTimeMillis());
+      gossipService.gossipSharedData(msg);
+
+      log.info("send gossip detail:[" + group + "-" + seqNum + "-" + i + "]");
+    }
   }
 
-  /**
-   * 读取指定区块num的数据
-   *
-   * @param gossipService 读取数据的gossip service
-   * @param group 读取数据的群组
-   * @param seqNum 区块的num
-   * @return
-   * @throws GossipException
-   */
-  public static Object getData(GossipService gossipService, String group, Long seqNum)
+  public static Common.Block getData(GossipManager gossipService, String group, Long seqNum)
       throws GossipException {
+
     if (gossipService == null) {
-      throw new GossipException("Gossip服务未启动。");
+      throw new GossipException("Gossip not start");
     }
     if (StringUtils.isEmpty(group) || seqNum == null) {
-      throw new GossipException("区块，区块高度不能为空。");
+      throw new GossipException("group, blockNum is null");
     }
 
     log.info(
@@ -197,54 +219,81 @@ public class GossipServiceUtil {
             + seqNum
             + "])");
 
-    Crdt crdt = gossipService.getGossipManager().findCrdt(group + "-" + seqNum);
-    if (crdt == null) {
+    SharedDataMessage sharedData = gossipService.findSharedGossipData(group + "-" + seqNum);
+
+    log.info("gossip get data, check [" + group + "-" + seqNum + "]");
+    if (sharedData == null) {
+      log.info("[" + group + "-" + seqNum + "] is null");
       return null;
     }
-    if (crdt.value() == null) {
+
+    Object fileNumberPayload = sharedData.getPayload();
+
+    Integer fileNumber = (Integer) fileNumberPayload;
+    log.info("=====================fileNumber:" + fileNumber);
+
+    if (fileNumber < 1) {
       return null;
     }
-    Set sets = (Set) crdt.value();
-    Iterator iterator = sets.iterator();
-    if (iterator.hasNext()) {
-      return iterator.next();
+
+    StringBuffer sb = new StringBuffer("");
+
+    for (int i = 0; i < fileNumber; i++) {
+      SharedDataMessage m = gossipService.findSharedGossipData(group + "-" + seqNum + "-" + i);
+      log.info("gossip get data detail, check [" + group + "-" + seqNum + "-" + i + "]");
+      if (m == null) {
+        log.info("=====================[" + group + "-" + seqNum + "-" + i + "] is null");
+        return null;
+      }
+      Object p = m.getPayload();
+      if (p == null) {
+        return null;
+      }
+      String str = (String) p;
+      sb.append(str);
     }
-    return null;
+
+    byte[] bytes = new byte[0];
+    try {
+      bytes = sb.toString().getBytes("ISO8859-1");
+    } catch (UnsupportedEncodingException e) {
+      throw new GossipException(e);
+    }
+
+    Common.Block block = null;
+    try {
+      block = Common.Block.parseFrom(bytes);
+    } catch (InvalidProtocolBufferException e) {
+      throw new GossipException(e);
+    }
+
+    return block;
   }
 
-  /**
-   * 从配置文件读取consenter地址，并启动gossip服务
-   *
-   * @return
-   * @throws GossipException
-   */
-  public static GossipService startConsenterGossip() throws GossipException {
+  public static GossipManager startConsenterGossip() throws GossipException {
     String consenterAddress =
         ConsenterConfigFactory.loadConsenterConfig().getGeneral().getGossipAddress();
     log.info("consenter gossip address:" + consenterAddress);
-    GossipService gossipService = newGossipService(consenterAddress);
-    gossipService.start();
-    log.info("启动consenter gossip: address[" + consenterAddress + "]");
+    GossipManager gossipService = newGossipService(consenterAddress);
+    gossipService.init();
+    log.info("started consenter gossip: address[" + consenterAddress + "]");
     return gossipService;
   }
 
-  /**
-   * 从配置文件读取committer地址，并启动gossip服务
-   *
-   * @return
-   * @throws GossipException
-   */
-  public static GossipService startCommitterGossip() throws GossipException {
+  public static GossipManager startCommitterGossip() throws GossipException {
     String consenterAddress =
         NodeConfigFactory.getNodeConfig().getNode().getGossip().getConsenterAddress();
     log.info("consenter gossip address:" + consenterAddress);
     String committerAddress =
         NodeConfigFactory.getNodeConfig().getNode().getGossip().getCommiterAddress();
     log.info("committer gossip address:" + committerAddress);
-    GossipService gossipService = newGossipService(committerAddress, consenterAddress);
-    gossipService.start();
+    GossipManager gossipService = newGossipService(committerAddress, consenterAddress);
+    gossipService.init();
     log.info(
-        "启动committer gossip: address[" + committerAddress + "] seedAddress:" + consenterAddress);
+        "start committer gossip: address["
+            + committerAddress
+            + "] seedAddress:"
+            + consenterAddress);
     return gossipService;
   }
 }

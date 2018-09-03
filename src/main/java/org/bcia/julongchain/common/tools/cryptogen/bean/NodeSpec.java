@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 节点对应证书的相关信息数据类
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/4
  * @company Excelsecu
@@ -31,7 +33,7 @@ public class NodeSpec {
     private String country = "";
     private String province = "";
     private String locality = "";
-    private String organizationUnit = "";
+    private String organizationalUnit = "";
     private String streetAddress = "";
     private String postalCode = "";
 
@@ -77,12 +79,12 @@ public class NodeSpec {
         this.locality = locality;
     }
 
-    public String getOrganizationUnit() {
-        return organizationUnit;
+    public String getOrganizationalUnit() {
+        return organizationalUnit;
     }
 
-    public void setOrganizationUnit(String organizationUnit) {
-        this.organizationUnit = organizationUnit;
+    public void setOrganizationalUnit(String organizationalUnit) {
+        this.organizationalUnit = organizationalUnit;
     }
 
     public String getStreetAddress() {
@@ -101,11 +103,11 @@ public class NodeSpec {
         this.postalCode = postalCode;
     }
 
-    public List<String> getSANS() {
+    public List<String> getSans() {
         return sans;
     }
 
-    public void setSANS(List<String> sans) {
+    public void setSans(List<String> sans) {
         this.sans = sans;
     }
 }

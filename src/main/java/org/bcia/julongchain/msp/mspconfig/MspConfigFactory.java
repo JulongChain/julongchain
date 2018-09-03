@@ -15,38 +15,52 @@
  */
 package org.bcia.julongchain.msp.mspconfig;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.common.util.CommConstant;
+import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfig;
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
+ * mspconfig 文件加载
+ *
  * @author zhangmingyang
  * @Date: 2018/3/29
  * @company Dingxuan
  */
 public class MspConfigFactory {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(MspConfigFactory.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(MspConfigFactory.class);
 
-    public static MspConfig loadMspConfig() throws FileNotFoundException {
-        Yaml yaml = new Yaml();
+    private static MspConfig instance;
 
-        InputStream is = null;
-        try {
-            is = MspConfigFactory.class.getClassLoader().getResourceAsStream(MspConfig.MspConfig_FILE_PATH);
-            MspConfig mspConfig = yaml.loadAs(is, MspConfig.class);
-            return mspConfig;
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    log.error(e.getMessage(), e);
+    public static MspConfig getMspConfig() {
+        if (instance == null) {
+            synchronized (MspConfigFactory.class) {
+                if (instance == null) {
+                    instance = loadMspConfig();
                 }
             }
         }
+        return instance;
+    }
+
+    public static MspConfig loadMspConfig() {
+        Yaml yaml = new Yaml();
+
+        InputStream is = null;
+        MspConfig mspConfig=null;
+        try {
+            is = new FileInputStream(CommConstant.CONFIG_DIR_PREFIX + MspConfig.MspConfig_FILE_PATH);
+             mspConfig = yaml.loadAs(is, MspConfig.class);
+            return mspConfig;
+        } catch (FileNotFoundException e) {
+            log.error(e.getMessage(), e);
+        }
+        return mspConfig;
     }
 }

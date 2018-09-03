@@ -15,14 +15,15 @@
  */
 package org.bcia.julongchain.csp.pkcs11;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.CspException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.factory.IFactoryOpts;
 import sun.security.pkcs11.wrapper.PKCS11;
 
 /**
  * interface description
  *
- * @author
+ * @author Ying Xu
  * @date 4/19/18
  * @company FEITIAN
  */
@@ -41,5 +42,5 @@ public interface IPKCS11FactoryOpts extends IFactoryOpts {
     public boolean getNoImport();
 
     //
-    public void optFinalized() throws JavaChainException;
+    public void optFinalized() throws CspException;
 }

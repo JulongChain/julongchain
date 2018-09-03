@@ -1,0 +1,46 @@
+node:
+    csp:
+        defaultValue: gm
+        factoryOpts:
+          gm:
+            # TODO: The default Hash and Security level needs refactoring to be
+            # fully configurable. Changing these defaults requires coordination
+            # SHA2 is hardcoded in several places, not only BCCSP
+            symmetricKey: SM4
+            sign: SM2
+            hash: SM3
+            asymmetric: SM2
+            # Location of Key Store
+                # If "", defaults to 'mspConfigPath'/keystore
+                # TODO: Ensure this is read with fabric/core/config.GetPath() once ready
+            KeyStore: msp/keystore/
+          sdtgm:
+                      # TODO: The default Hash and Security level needs refactoring to be
+                      # fully configurable. Changing these defaults requires coordination
+                      # SM3 is hardcoded in several places, not only BCCSP
+                      symmetricKey: SM4
+                      sign: SM2
+                      hash: SM3
+                      asymmetric: SM2
+                      security: 256
+                      # Location of Key Store
+                          # If "", defaults to 'mspConfigPath'/keystore
+                          # TODO: Ensure this is read with fabric/core/config.GetPath() once ready
+                      publicKeyStore: msp/keystore/sdt/
+                      privateKeyStore: msp/keystore/sdt/
+                      keyStore: msp/keystore/sdt/
+                #privateKeyStore: /opt/msp/keystore/privatekey.pem
+    # Path on the file system where node will find MSP local configurations
+    mspConfigPath: msp
+    #mspConfigPath: /opt/msp
+    #mspConfigPath: /root/IdeaProjects/javachain/src/main/resources/msp
+
+    # Identifier of the local MSP
+    # ----!!!!IMPORTANT!!!-!!!IMPORTANT!!!-!!!IMPORTANT!!!!----
+    # Deployers need to change the value of the localMspId string.
+    # In particular, the name of the local MSP ID of a node needs
+    # to match the name of one of the MSPs in each of the channel
+    # that this node is a member of. Otherwise this node's messages
+    # will not be identified as valid by other nodes.
+    localMspId: DEFAULT
+    localMspType: GMMSP

@@ -37,7 +37,7 @@ import org.bcia.julongchain.protos.common.Configtx;
 import java.util.Map;
 
 /**
- * 对象
+ * 配置交易工具类
  *
  * @author zhouhui
  * @date 2018/4/25
@@ -49,13 +49,13 @@ public class ConfigTxUtils {
     public static Configtx.Config validateAndApplyResourceConfig(String groupId, Common.Envelope txEnvelope)
             throws NodeException, ValidateException, InvalidTxException, InvalidProtocolBufferException, PolicyException {
         Map<String, Group> groupMap = Node.getInstance().getGroupMap();
-        ValidateUtils.isNotNull(groupMap, "groupMap can not be null");
+        ValidateUtils.isNotNull(groupMap, "GroupMap can not be null");
 
         Group group = groupMap.get(groupId);
-        ValidateUtils.isNotNull(group, "group can not be null");
+        ValidateUtils.isNotNull(group, "Group can not be null");
 
         GroupSupport groupSupport = group.getGroupSupport();
-        ValidateUtils.isNotNull(groupSupport, "groupSupport can not be null");
+        ValidateUtils.isNotNull(groupSupport, "GroupSupport can not be null");
 
         IResourcesConfigBundle resourcesConfigBundle = groupSupport.getResourcesConfigBundle();
         Configtx.Config fullResourceConfig = null;
@@ -98,7 +98,7 @@ public class ConfigTxUtils {
 
         Configtx.ConfigUpdateEnvelope configUpdateEnvelope = EnvelopeHelper.getConfigUpdateEnvelopeFrom
                 (configEnvelope.getLastUpdate());
-        ValidateUtils.isNotNull(configUpdateEnvelope.getConfigUpdate(), "configUpdate can not be null");
+        ValidateUtils.isNotNull(configUpdateEnvelope.getConfigUpdate(), "ConfigUpdate can not be null");
         Configtx.ConfigUpdate configUpdate = Configtx.ConfigUpdate.parseFrom(configUpdateEnvelope.getConfigUpdate());
 
         Map<String, ByteString> isolatedDataMap = configUpdate.getIsolatedDataMap();

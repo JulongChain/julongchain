@@ -15,7 +15,8 @@
  */
 package org.bcia.julongchain.core.container.scintf;
 
-import org.bcia.julongchain.protos.node.SmartcontractShim;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.protos.node.SmartContractShim;
 
 /**
  * 类描述
@@ -26,8 +27,8 @@ import org.bcia.julongchain.protos.node.SmartcontractShim;
  */
 public interface ISmartContractStream {
 
-    void send(SmartcontractShim.SmartContractMessage msg);
+    void send(SmartContractShim.SmartContractMessage msg);
 
-    SmartcontractShim.SmartContractMessage recv();
+    SmartContractShim.SmartContractMessage recv() throws JulongChainException;
 
 }

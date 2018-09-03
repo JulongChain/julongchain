@@ -15,8 +15,9 @@
  */
 package org.bcia.julongchain.common.tools.cryptogen;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.tools.cryptogen.bean.Subject;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.tools.cryptogen.utils.Subject;
+import org.bcia.julongchain.common.tools.cryptogen.utils.X509CertificateUtil;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bouncycastle.asn1.x509.Certificate;
 import org.bouncycastle.asn1.x509.KeyUsage;
@@ -38,7 +39,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-
+/**
+ * CaHelper 测试类
+ *
+ * @author chenhao, liuxifeng
+ * @date 2018/7/12
+ * @company Excelsecu
+ */
 public class CaHelperTest {
 
     private static final String testCANAme = "root0";
@@ -83,7 +90,7 @@ public class CaHelperTest {
                     testOrganizationalUnit,
                     testStreetAddress,
                     testPostalCode);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             e.printStackTrace();
         }
 
@@ -149,7 +156,7 @@ public class CaHelperTest {
                 null,
                 ecPubKey,
                 KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
-                new int[]{Util.extKeyUsageAny});
+                new int[]{Util.EXT_KEY_USAGE_ANY});
 
         try {
             KeyUsageExtension keyUsageExt = (KeyUsageExtension) X509CertImpl.toImpl(cert).getExtension(new ObjectIdentifier(new int[]{2,5,29,15}));
@@ -173,7 +180,7 @@ public class CaHelperTest {
     }
 
     @Test
-    public void signCertificate() throws JavaChainException {
+    public void signCertificate() throws JulongChainException {
 
         System.out.println("testDir=" + testDir);
 
@@ -206,7 +213,7 @@ public class CaHelperTest {
                 null,
                 ecPubKey,
                 KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
-                new int[]{Util.extKeyUsageAny});
+                new int[]{Util.EXT_KEY_USAGE_ANY});
 
         // KeyUsage should be x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment
         try {
@@ -220,7 +227,7 @@ public class CaHelperTest {
 
 
         // make sure ous are correctly set
-        String[] ous = new String[]{"TestOU", "PeerOU"};
+        String[] ous = new String[]{"TestOU", "NodeOU"};
         cert = rootCA.signCertificate(certDir,
                 testName,
                 ous,
@@ -243,7 +250,7 @@ public class CaHelperTest {
                 sans,
                 ecPubKey,
                 KeyUsage.digitalSignature,
-                new int[]{Util.extKeyUsageClientAuth, Util.extKeyUsageServerAuth});
+                new int[]{Util.EXT_KEY_USAGE_CLIENT_AUTH, Util.EXT_KEY_USAGE_SERVER_AUTH});
 
         // make sure sans are correctly set
         boolean containDNSName = false;
@@ -280,7 +287,7 @@ public class CaHelperTest {
                     KeyUsage.digitalSignature,
                     new int[]{});
             finishSign = true;
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             finishSign = false;
         }
         Assert.assertFalse(finishSign);

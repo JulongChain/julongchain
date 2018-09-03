@@ -2,12 +2,14 @@
 Copyright IBM Corp., DTCC All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
+
+Modified java_package and other contents by Dingxuan on 2018-08-30
 */
 
 package org.bcia.julongchain.core.smartcontract.shim.fsm;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.smartcontract.shim.fsm.exceptions.*;
 
 import java.util.HashMap;
@@ -15,7 +17,7 @@ import java.util.HashSet;
 
 public class FSM {
 
-	private static final JavaChainLog logger = JavaChainLogFactory.getLog(FSM.class);
+	private static final JulongChainLog logger = JulongChainLogFactory.getLog(FSM.class);
 
 	/** The current state of the FSM */
 	private String current;

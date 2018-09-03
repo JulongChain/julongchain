@@ -18,8 +18,6 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.txmgr.lockbasedtxmgr;
 import com.google.protobuf.ByteString;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
 import org.bcia.julongchain.core.ledger.TxSimulationResults;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.RWSetBuilder;
@@ -35,19 +33,17 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class LockBasedTxSimulator implements ITxSimulator {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(LockBasedTxSimulator.class);
-
     private LockBasedQueryExecutor queryExecutor;
     private RWSetBuilder rwSetBuilder;
     private boolean writePreformed;
     private boolean pvtdataQueriesPerformed;
 
-    public LockBasedTxSimulator(LockBasedTxManager txMgr, String txid) {
+    public LockBasedTxSimulator(LockBasedTxManager txMgr, String txID) {
         RWSetBuilder rwSetBuilder = new RWSetBuilder();
 
         QueryHelper queryHelper = new QueryHelper(txMgr, rwSetBuilder);
 
-        this.queryExecutor = new LockBasedQueryExecutor(queryHelper, txid);
+        this.queryExecutor = new LockBasedQueryExecutor(queryHelper, txID);
         this.rwSetBuilder = rwSetBuilder;
         this.writePreformed = false;
         this.pvtdataQueriesPerformed = false;

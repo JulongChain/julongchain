@@ -23,6 +23,8 @@ import java.io.*;
 import java.security.SecureRandom;
 
 /**
+ * 国密sm4实现
+ *
  * @author zhangmingyang
  * @Date: 2018/4/26
  * @company Dingxuan
@@ -43,7 +45,7 @@ public class SM4 {
      *
      * @return
      */
-    public  static byte[] generateKey() {
+    public static byte[] generateKey() {
         KeyGenerationParameters param = new KeyGenerationParameters(new SecureRandom(), 128);
         CipherKeyGenerator cipherKeyGenerator = new CipherKeyGenerator();
         cipherKeyGenerator.init(param);
@@ -52,7 +54,7 @@ public class SM4 {
     }
 
     /**
-     * 数据填充、去填充
+     * 数据填充,去填充
      *
      * @param input
      * @param mode
@@ -87,9 +89,9 @@ public class SM4 {
      * @return
      */
 
-    public byte[] encryptECB(byte[] plainText,byte[] sm4key) {
+    public byte[] encryptECB(byte[] plainText, byte[] sm4key) {
         byte[] paddingData = padding(plainText, SM4_ENCRYPT);
-        byte[] output = processData(paddingData,sm4key,SM4_ENCRYPT);
+        byte[] output = processData(paddingData, sm4key, SM4_ENCRYPT);
         return output;
     }
 
@@ -99,8 +101,8 @@ public class SM4 {
      * @param encryptData
      * @return
      */
-    public byte[] decryptECB(byte[] encryptData,byte[] sm4Key) {
-        byte[] output = processData(encryptData,sm4Key,SM4_DECRYPT);
+    public byte[] decryptECB(byte[] encryptData, byte[] sm4Key) {
+        byte[] output = processData(encryptData, sm4Key, SM4_DECRYPT);
         byte[] decrypt = padding(output, SM4_DECRYPT);
         return decrypt;
 
@@ -112,14 +114,14 @@ public class SM4 {
      * @param data
      * @return
      */
-    private static byte[] processData(byte[] data,byte[] sm4Key,int mode) {
+    private static byte[] processData(byte[] data, byte[] sm4Key, int mode) {
         int length = data.length;
         ByteArrayInputStream bins = new ByteArrayInputStream(data);
         ByteArrayOutputStream bous = new ByteArrayOutputStream();
         SM4Engine engine = new SM4Engine();
-        if(mode==SM4_ENCRYPT){
+        if (mode == SM4_ENCRYPT) {
             engine.init(true, new KeyParameter(sm4Key));
-        }else{
+        } else {
             engine.init(false, new KeyParameter(sm4Key));
         }
         for (; length > 0; length -= 16) {

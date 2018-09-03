@@ -21,7 +21,7 @@ import org.bcia.julongchain.csp.intfs.IKey;
 /**
  * RSA IKey implements
  *
- * @author xuying
+ * @author Ying Xu
  * @date 2018/05/20
  * @company FEITIAN
  */

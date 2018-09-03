@@ -23,10 +23,10 @@ import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.TxRwSet;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
- * 类描述
+ * 智能合约操作业务对象
  *
  * @author zhouhui
  * @date 2018/05/26
@@ -36,12 +36,12 @@ public class SmartContractActionVO implements IProtoVO<ProposalPackage.SmartCont
     private TxRwSet results;
     private ByteString events;
     private ProposalResponsePackage.Response response;
-    private Smartcontract.SmartContractID smartContractID;
+    private SmartContractPackage.SmartContractID smartContractID;
 
     @Override
     public void parseFrom(ProposalPackage.SmartContractAction smartContractAction) throws
             InvalidProtocolBufferException, ValidateException {
-        ValidateUtils.isNotNull(smartContractAction, "smartContractAction can not be null");
+        ValidateUtils.isNotNull(smartContractAction, "SmartContractAction can not be null");
 
         this.results = new TxRwSet();
         try {
@@ -86,7 +86,7 @@ public class SmartContractActionVO implements IProtoVO<ProposalPackage.SmartCont
         return response;
     }
 
-    public Smartcontract.SmartContractID getSmartContractID() {
+    public SmartContractPackage.SmartContractID getSmartContractID() {
         return smartContractID;
     }
 }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,10 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * SmartContractInfoCache implements in-memory cache for SmartContractData
-* needed by endorser to verify if the local instantiation policy
-* matches the instantiation policy on a channel before honoring
-* an invoke
+ * 智能合约缓存
  * @author sunianle, sunzongyu
  * @date 5/10/18
  * @company Dingxuan

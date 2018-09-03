@@ -16,14 +16,14 @@
 package org.bcia.julongchain.common.exception;
 
 /**
- * 权限异常
+ * 权限或策略异常
  *
  * @author zhouhui
  * @date 2018/4/17
  * @company Dingxuan
  */
-public class PolicyException extends JavaChainException {
-    private static final String MODULE_NAME = "[Policy]";
+public class PolicyException extends JulongChainException {
+    private static final String MODULE_NAME = "[PolicyConstant]";
 
     public PolicyException() {
         super();

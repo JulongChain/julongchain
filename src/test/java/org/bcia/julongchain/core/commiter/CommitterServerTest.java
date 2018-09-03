@@ -3,7 +3,7 @@ package org.bcia.julongchain.core.commiter;
 import org.junit.Test;
 
 /**
- * 对象
+ * 提交服务测试类
  *
  * @author zhouhui
  * @date 2018/4/19

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,14 +15,13 @@
  */
 package org.bcia.julongchain.core.common.smartcontractprovider;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
- * SmartContractInfoFS provides the implementation for SC on the FS and the access to it
- * It implements ISmartContractCacheSupport
+ * 文件系统智能合约
  *
  * @author sunianle, sunzongyu
  * @date 5/11/18
@@ -30,26 +29,23 @@ import org.bcia.julongchain.protos.node.Smartcontract;
  */
 public class SmartContractInfoFS implements ISmartContractCacheSupport {
 
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(SmartContractInfoFS.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(SmartContractInfoFS.class);
 
     /**
-     * GetSmartContractFromFS  this is a wrapper for hiding package implementation.
-     * @param name
-     * @param version
-     * @return
+	 * 在文件系统中获取智能合约
      */
     @Override
     public ISmartContractPackage getSmartContract(String name, String version) {
         SDSPackage scsdsPackage = new SDSPackage();
         try {
             scsdsPackage.initFromFS(name, version);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             log.info(e.getMessage(), e);
             log.info("Trying SignedSDSPackage");
             SignedSDSPackage sscsdsPackage= new SignedSDSPackage();
             try {
                 sscsdsPackage.initFromFS(name, version);
-            } catch (JavaChainException e1) {
+            } catch (JulongChainException e1) {
                 log.info(e1.getMessage(), e1);
                 log.info("Can not init from fs");
                 return null;
@@ -60,12 +56,9 @@ public class SmartContractInfoFS implements ISmartContractCacheSupport {
     }
 
     /**
-     * putSmartContractIntoFS is a wrapper for putting raw SmartContractDeploymentSpec
-     * using CDSPackage. This is only used in UTs
-     * @param deploymentSpec
-     * @return
+	 * 将智能合约写入文件系统
      */
-    public ISmartContractPackage putSmartContract(Smartcontract.SmartContractDeploymentSpec deploymentSpec) throws JavaChainException{
+    public ISmartContractPackage putSmartContract(SmartContractPackage.SmartContractDeploymentSpec deploymentSpec) throws JulongChainException {
         SDSPackage sdsPackage = new SDSPackage();
         sdsPackage.initFromBuffer(deploymentSpec.toByteArray());
         sdsPackage.putSmartcontractToFS();

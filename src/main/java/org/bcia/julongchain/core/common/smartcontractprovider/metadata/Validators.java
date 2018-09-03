@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,8 +16,6 @@
 package org.bcia.julongchain.core.common.smartcontractprovider.metadata;
 
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,13 +29,10 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class Validators {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Validators.class);
-
     private static Map<String, FileValidator> fileValidators = new HashMap<>();
 
     /**
-     * ValidateMetadataFile checks that metadata files are valid
-     * according to the validation rules of the metadata directory (metadataType)
+	 * 使用文件系统中的metadata完成校验
      */
     public static void validateMetadataFile(String fileName, byte[] fileBytes, String metadataType) throws ValidateException {
         if (fileValidators.containsKey(metadataType)) {

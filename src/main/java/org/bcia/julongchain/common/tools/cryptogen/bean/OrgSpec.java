@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * crypto-config.yaml 节点配置数据类
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/20
  * @company Excelsecu

@@ -13,14 +13,14 @@
  */
 package org.bcia.julongchain.core.smartcontract.node;
 
-import static org.bcia.julongchain.protos.node.SmartcontractShim.SmartContractMessage;
+import static org.bcia.julongchain.protos.node.SmartContractShim.SmartContractMessage;
 
 import io.grpc.stub.StreamObserver;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 /**
  * 智能合约运行时状态
@@ -31,8 +31,8 @@ import org.bcia.julongchain.common.log.JavaChainLogFactory;
  */
 public class SmartContractRunningUtil {
 
-  private static final JavaChainLog logger =
-      JavaChainLogFactory.getLog(SmartContractRunningUtil.class);
+  private static JulongChainLog logger =
+      JulongChainLogFactory.getLog(SmartContractRunningUtil.class);
 
   public static final String SMART_CONTRACT_STATUS_NEW = "new";
   public static final String SMART_CONTRACT_STATUS_BUSY = "busy";

@@ -17,14 +17,14 @@ package org.bcia.julongchain.core.ssc.vssc;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.SysSmartContractException;
 import org.bcia.julongchain.common.groupconfig.capability.IApplicationCapabilities;
 import org.bcia.julongchain.common.groupconfig.config.IApplicationConfig;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.policy.IPolicy;
 import org.bcia.julongchain.common.policycheck.policies.PolicyProvider;
 import org.bcia.julongchain.common.util.BytesHexStrTranslate;
@@ -39,6 +39,7 @@ import org.bcia.julongchain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.julongchain.core.ssc.SystemSmartContractBase;
 import org.bcia.julongchain.msp.IMspManager;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
+import org.bcia.julongchain.msp.mgmt.MspMgmtMgr;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.msp.Identities;
 import org.bcia.julongchain.protos.node.*;
@@ -48,17 +49,18 @@ import java.util.*;
 
 /**
  * 验证系统智能合约　Validator System Smart Contract,VSSC
- * ValidatorOneValidSignature implements the default transaction validation policy,
- * which is to check the correctness of the read-write set and the endorsement
- * signatures against an endorsement policy that is supplied as argument to
- * every invoke
+ * 验证系统智能合约实现了默认的交易验证策略，即检查读写集合的正确性，根据背书策略检查背书签名
+ * VSSC的invoke函数，接受的args格式说明如下：
+ * args[0] - 函数名 (当前未使用)
+ * args[1] - 序列化的Envelope（serialized Envelope）
+ * args[2] - 序列化的策略（serialized policy）
  * @author sunianle
  * @date 3/5/18
  * @company Dingxuan
  */
 @Component
 public class VSSC extends SystemSmartContractBase {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(VSSC.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(VSSC.class);
 
     public final static String DUPLICATED_IDENTITY_ERROR="Endorsement policy evaluation failure might be caused by duplicated identities";
     // sscProvider is the interface with which we call
@@ -115,7 +117,7 @@ public class VSSC extends SystemSmartContractBase {
         try {
             envelope=ProtoUtils.getEnvelopeFromBlock(blockBytes);
         } catch (Exception e) {
-            newErrorResponse(String.format("VSSC error: GetEnvelope failed, err %s",e.getMessage()));
+            return newErrorResponse(String.format("VSSC error: GetEnvelope failed, err %s",e.getMessage()));
         }
 
         // ...and the payload...
@@ -124,7 +126,7 @@ public class VSSC extends SystemSmartContractBase {
         try {
             payload=ProtoUtils.getPayload(envelope);
         } catch (Exception e) {
-            newErrorResponse(String.format("VSSC error: GetPayload failed, err %s",e.getMessage()));
+            return newErrorResponse(String.format("VSSC error: GetPayload failed, err %s",e.getMessage()));
         }
 
         // get the policy
@@ -136,7 +138,7 @@ public class VSSC extends SystemSmartContractBase {
         }
         IApplicationConfig ac = this.sscProvider.getApplicationConfig(groupHeader.getGroupId());
 
-        IMspManager manager=GlobalMspManagement.getManagerForChain(groupHeader.getGroupId());
+        IMspManager manager= MspMgmtMgr.getManagerForChain(groupHeader.getGroupId());
         PolicyProvider policyProvider=new PolicyProvider(manager);
         IPolicy policy = null;
         try {
@@ -251,7 +253,7 @@ public class VSSC extends SystemSmartContractBase {
         IQueryExecutor qe =null;
         try{
             qe=this.sscProvider.getQueryExecutorForLedger(groupID);
-        }catch(JavaChainException e){
+        }catch(JulongChainException e){
             String msg=String.format("Could not retrieve QueryExecutor for group %s, error %s",groupID,e.getMessage());
             throw new SysSmartContractException(msg);
         }

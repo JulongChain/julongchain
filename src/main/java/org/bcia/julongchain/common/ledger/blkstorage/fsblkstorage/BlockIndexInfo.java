@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +15,6 @@
  */
 package org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 
 import java.util.List;
@@ -29,7 +27,6 @@ import java.util.List;
  * @company Dingxuan
  */
 public class BlockIndexInfo {
-
     private long blockNum;
     private byte[] blockHash;
     private FileLocPointer flp;
@@ -46,7 +43,6 @@ public class BlockIndexInfo {
         this.metadata = metadata;
     }
 
-    private static final JavaChainLog loogger = JavaChainLogFactory.getLog(BlockIndexInfo.class);
     public long getBlockNum() {
         return blockNum;
     }
@@ -89,6 +85,9 @@ public class BlockIndexInfo {
 
     @Override
     public String toString() {
-        return String.format("blockNum=%d, blockHash length=%d, txOffsets length=%d", blockNum, blockHash.length, txOffsets.size());
+        return String.format("blockNum=%d, blockHash length=%d, txOffsets length=%d",
+				blockNum,
+				blockHash == null ? 0 : blockHash.length,
+				txOffsets == null ? 0 : txOffsets.size());
     }
 }

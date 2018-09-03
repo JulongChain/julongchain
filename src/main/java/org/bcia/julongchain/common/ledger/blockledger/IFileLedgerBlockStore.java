@@ -28,9 +28,19 @@ import org.bcia.julongchain.protos.common.Ledger;
  * @company Dingxuan
  */
 public interface IFileLedgerBlockStore {
+
+	/**
+	 * 添加区块
+	 */
     void addBlock(Common.Block block) throws LedgerException;
 
-    Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException;
+	/**
+	 * 获取区块链信息
+	 */
+	Ledger.BlockchainInfo getBlockchainInfo() throws LedgerException;
 
+	/**
+	 * 查询区块
+	 */
     IResultsIterator retrieveBlocks(long startBlockNumber) throws LedgerException;
 }

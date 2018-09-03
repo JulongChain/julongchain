@@ -15,6 +15,8 @@
  */
 package org.bcia.julongchain.core.ssc;
 
+import org.bcia.julongchain.common.exception.SysSmartContractException;
+
 /**
  * 系统智能合约管理器接口
  * 各接口被调用的时机：
@@ -25,27 +27,59 @@ package org.bcia.julongchain.core.ssc;
  *  a)(SystemSmartContractManager内部)deploySysSmartContracts调用buildSysSmartContracts编译智能合约，形成智能合约部署规范(DeploymentSpec);
  *  3.分别为每个组，调用deploySysSmartContracts(groupID);
  *  a)(SystemSmartContractManager内部)deploySysSmartContracts(groupID)调用buildSysSmartContracts编译智能合约，形成智能合约部署规范(DeploymentSpec);
- * @author sunianle
+ * @author sunianle, sunzongyu
  * @date 3/5/18
  * @company Dingxuan
  */
 public interface ISystemSmartContractManager {
-    //注册外部系统智能合约插件
-    void registerSysSmartContracts();
-    //为某个群组部署系统智能合约
-    void deploySysSmartContracts(String groupID);
-    //取消部署系统智能合约
-    void deDeploySysSmartContracts(String groupID);
-    //判断是否为系统智能合约
-    boolean isSysSmartContract(String smartContractID);
-    //判断某个系统智能合约是否在白名单中
-    boolean isWhitelisted(ISystemSmartContract contract);
-    //获取系统智能合约
-    ISystemSmartContract getSystemSmartContract(String smartContractID);
-    // isSysSmartContractAndNotInvokableExternal returns true if the chaincode
-    // is a system chaincode and *CANNOT* be invoked through
-    // a proposal to this peer
-    boolean isSysSmartContractAndNotInvokableExternal(String smartContractID);
+	/**
+	 * 注册外部系统智能合约插件
+	 */
 
+    void registerSysSmartContracts();
+
+	/**
+	 * 为某个群组部署系统智能合约
+	 * @param groupID
+	 */
+    void deploySysSmartContracts(String groupID);
+
+	/**
+	 * 取消部署系统智能合约
+	 * @param groupID
+	 */
+    void deDeploySysSmartContracts(String groupID);
+
+	/**
+	 * 判断是否为系统智能合约
+	 * @param smartContractID
+	 * @return
+	 */
+    boolean isSysSmartContract(String smartContractID);
+
+	/**
+	 * 判断某个系统智能合约是否在白名单中
+	 * @param contract
+	 * @return
+	 */
+    boolean isWhitelisted(ISystemSmartContract contract);
+
+	/**
+	 * 获取系统智能合约
+	 * @param smartContractID
+	 * @return
+	 */
+    ISystemSmartContract getSystemSmartContract(String smartContractID);
+
+	/**
+	 * 是否为系统智能合约以及是否可以外部调用
+	 */
+	boolean isSysSmartContractAndNotInvokableExternal(String smartContractID);
+
+	/**
+	 * 是否为系统智能合约以及是否可以由其他智能合约调用
+	 * @param smartContractID
+	 * @return
+	 */
     boolean isSysSmartContractAndNotInvokableSC2SC(String smartContractID);
 }

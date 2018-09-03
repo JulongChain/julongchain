@@ -23,7 +23,7 @@ import org.bcia.julongchain.msp.IMspManager;
 import org.bcia.julongchain.protos.common.Configtx;
 
 /**
- * 类描述
+ * 提交节点支持接口定义
  *
  * @author zhouhui
  * @date 2018/05/23

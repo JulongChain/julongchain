@@ -19,8 +19,8 @@ import io.grpc.Server;
 import io.grpc.ServerBuilder;
 import io.grpc.stub.StreamObserver;
 import org.bcia.julongchain.common.exception.NodeException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.events.producer.IEventHubServer;
 import org.bcia.julongchain.protos.node.EventsGrpc;
 import org.bcia.julongchain.protos.node.EventsPackage;
@@ -35,7 +35,7 @@ import java.io.IOException;
  * @company Dingxuan
  */
 public class EventGrpcServer {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(EventGrpcServer.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(EventGrpcServer.class);
     /**
      * 监听的端口
      */
@@ -72,7 +72,7 @@ public class EventGrpcServer {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                log.info("shutting down EventGrpcServer since JVM is shutting down");
+                log.info("Shutting down EventGrpcServer since JVM is shutting down");
                 EventGrpcServer.this.stop();
                 log.error("EventGrpcServer shut down");
             }
@@ -109,8 +109,8 @@ public class EventGrpcServer {
                         EventsPackage.Event resultEvent = eventHubServer.chat(value, responseObserver);
 //                        responseObserver.onNext(resultEvent);
                     } else {
-                        log.error("eventHubServer is not ready, but client sent some message: " + value);
-                        responseObserver.onError(new NodeException("eventHubServer is not ready"));
+                        log.error("EventHubServer is not ready, but client sent some message: " + value);
+                        responseObserver.onError(new NodeException("EventHubServer is not ready"));
                     }
                 }
 

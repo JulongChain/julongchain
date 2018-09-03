@@ -20,8 +20,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.EventException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.common.util.proto.ProposalResponseUtils;
 import org.bcia.julongchain.core.ledger.util.TxValidationFlags;
@@ -39,7 +39,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public class EventHelper {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(EventHelper.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(EventHelper.class);
 
     /**
      * createBlockEvents creates block events for a block. It removes the RW set
@@ -127,9 +127,9 @@ public class EventHelper {
                                 SmartContractEventPackage.SmartContractEvent.Builder newSmartContractEventBuilder =
                                         smartContractEvent.toBuilder();
                                 newSmartContractEventBuilder.clearPayload();
-                                filteredSmartContractActionBuilder.setSmartcontractEvent(newSmartContractEventBuilder);
+                                filteredSmartContractActionBuilder.setSmartContractEvent(newSmartContractEventBuilder);
                             }
-                            transactionActionsBuilder.addSmartcontractActions(filteredSmartContractActionBuilder);
+                            transactionActionsBuilder.addSmartContractActions(filteredSmartContractActionBuilder);
 
                             ProposalResponsePackage.ProposalResponsePayload newProposalResponsePayload =
                                     ProposalResponseUtils.buildProposalResponsePayload(smartContractAction.getEvents(),

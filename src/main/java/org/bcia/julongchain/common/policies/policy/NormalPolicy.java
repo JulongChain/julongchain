@@ -21,7 +21,7 @@ import org.bcia.julongchain.common.util.proto.SignedData;
 import java.util.List;
 
 /**
- * 对象
+ * 标准策略
  *
  * @author zhouhui
  * @date 2018/4/18

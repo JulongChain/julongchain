@@ -17,20 +17,16 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.statecouchdb;
 
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 
 /**
- * 类描述
+ * 查询器
  *
  * @author sunzongyu
  * @date 2018/05/22
  * @company Dingxuan
  */
 public class QueryScanner implements IResultsIterator {
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(QueryResult.class);
-
     private int cursor;
     private String ns;
 

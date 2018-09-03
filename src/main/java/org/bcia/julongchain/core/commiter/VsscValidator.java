@@ -19,8 +19,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.SmartContractException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policycheck.cauthdsl.CAuthDslBuilder;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.common.util.ValidateUtils;
@@ -43,14 +43,14 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * 类描述
+ * VSSC校验器
  *
  * @author zhouhui
  * @date 2018/05/23
  * @company Dingxuan
  */
 public class VsscValidator implements IVsscValidator {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(VsscValidator.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(VsscValidator.class);
 
     private ICommitterSupport committerSupport;
     private ISystemSmartContractProvider sysSmartContractProvider;
@@ -97,12 +97,12 @@ public class VsscValidator implements IVsscValidator {
                     writesToLSSC = true;
                 }
 
-                if (!writesToNonInvokableSSC && sysSmartContractProvider.isSysSCAndNotInvokableSC2SC(nsRwSet
+                if (!writesToNonInvokableSSC && sysSmartContractProvider.isSysSCAndNotInvokeSC2SC(nsRwSet
                         .getNameSpace())) {
                     writesToNonInvokableSSC = true;
                 }
 
-                if (!writesToNonInvokableSSC && sysSmartContractProvider.isSysSCAndNotInvkeableExternal(nsRwSet
+                if (!writesToNonInvokableSSC && sysSmartContractProvider.isSysSCAndNotInvokableExternal(nsRwSet
                         .getNameSpace())) {
                     writesToNonInvokableSSC = true;
                 }
@@ -134,12 +134,12 @@ public class VsscValidator implements IVsscValidator {
 
         if (!sysSmartContractProvider.isSysSmartContract(scName)) {
             if (writesToLSSC) {
-                log.warn("writesToLSSC and app smart contract");
+                log.warn("Writes to LSSC and app smart contract");
                 return TransactionPackage.TxValidationCode.ILLEGAL_WRITESET;
             }
 
             if (writesToNonInvokableSSC) {
-                log.warn("writesToNonInvokableSSC and app smart contract");
+                log.warn("Writes to NonInvokableSSC and app smart contract");
                 return TransactionPackage.TxValidationCode.ILLEGAL_WRITESET;
             }
 
@@ -157,7 +157,7 @@ public class VsscValidator implements IVsscValidator {
                 byte[] policy = (byte[]) infos[2];
 
                 if (namespace.equals(scName) && !scInstance.getSmartContractVersion().equals(scVersion)) {
-                    log.warn("smart contract didn't match version in lssc");
+                    log.warn("Smart contract didn't match version in lssc");
                     return TransactionPackage.TxValidationCode.EXPIRED_SMARTCONTRACT;
                 }
 
@@ -165,13 +165,13 @@ public class VsscValidator implements IVsscValidator {
                     vsscValidateTxForSC(envelopeBytes, groupHeader.getTxId(), groupHeader.getGroupId(), vsscInstance
                             .getSmartContractName(), vsscInstance.getSmartContractVersion(), policy);
                 } catch (SmartContractException e) {
-                    log.warn("vssc validate fail");
+                    log.warn("VSSC validate fail");
                     return TransactionPackage.TxValidationCode.ENDORSEMENT_POLICY_FAILURE;
                 }
             }
         } else {
-            if (sysSmartContractProvider.isSysSCAndNotInvkeableExternal(scName)) {
-                log.warn("isSysSCAndNotInvkeableExternal " + scName);
+            if (sysSmartContractProvider.isSysSCAndNotInvokableExternal(scName)) {
+                log.warn("IsSysSCAndNotInvokableExternal " + scName);
                 return TransactionPackage.TxValidationCode.ILLEGAL_WRITESET;
             }
 
@@ -190,7 +190,7 @@ public class VsscValidator implements IVsscValidator {
                 vsscValidateTxForSC(envelopeBytes, groupHeader.getTxId(), groupHeader.getGroupId(), vsscInstance
                         .getSmartContractName(), vsscInstance.getSmartContractVersion(), policy);
             } catch (SmartContractException e) {
-                log.warn("vssc validate fail");
+                log.warn("VSSC validate fail");
                 return TransactionPackage.TxValidationCode.ENDORSEMENT_POLICY_FAILURE;
             }
         }
@@ -215,7 +215,7 @@ public class VsscValidator implements IVsscValidator {
             //TODO: policy
         } else {
             scInstance.setSmartContractName(scId);
-            //TODO:wen iian zhong du
+            //TODO:
             scInstance.setSmartContractVersion(CommConstant.METADATA_VERSION);
 
             vsscInstance.setSmartContractName(CommConstant.VSSC);
@@ -230,7 +230,7 @@ public class VsscValidator implements IVsscValidator {
     private SmartContractDataPackage.SmartContractData getSCData(String scId) throws ValidateException,
             LedgerException, InvalidProtocolBufferException {
         INodeLedger nodeLedger = committerSupport.getLedger();
-        ValidateUtils.isNotNull(nodeLedger, "nodeLedger can not be null");
+        ValidateUtils.isNotNull(nodeLedger, "NodeLedger can not be null");
 
         IQueryExecutor queryExecutor = null;
         byte[] bytes = null;
@@ -243,11 +243,11 @@ public class VsscValidator implements IVsscValidator {
             }
         }
 
-        ValidateUtils.isNotNull(bytes, "lssc's state can not be null");
+        ValidateUtils.isNotNull(bytes, "LSSC's state can not be null");
 
         SmartContractDataPackage.SmartContractData scData = SmartContractDataPackage.SmartContractData.parseFrom(bytes);
-        ValidateUtils.isNotNull(scData.getVssc(), "lssc's vssc can not be null");
-        ValidateUtils.isNotNull(scData.getPolicy(), "lssc's policy can not be null");
+        ValidateUtils.isNotNull(scData.getVssc(), "LSSC's vssc can not be null");
+        ValidateUtils.isNotNull(scData.getPolicy(), "LSSC's policy can not be null");
 
         return scData;
     }
@@ -276,12 +276,12 @@ public class VsscValidator implements IVsscValidator {
             throws SmartContractException {
         String vsscTxId = UUID.randomUUID().toString();
 
-        // args[0] - function name (not used now)
-        // args[1] - serialized Envelope
-        // args[2] - serialized policy
+        // args[0] - 暂未使用（预留作为函数名）
+        // args[1] - 信封数据
+        // args[2] - 策略数据
         byte[][] args = new byte[][]{new byte[0], envelopeBytes, policy};
 
-        Smartcontract.SmartContractInvocationSpec invocationSpec = SpecHelper.buildInvocationSpec(vsscName, args);
+        SmartContractPackage.SmartContractInvocationSpec invocationSpec = SpecHelper.buildInvocationSpec(vsscName, args);
         SmartContractContext scContext = new SmartContractContext(groupId, vsscName, vsscVersion, vsscTxId, true,
                 null, null);
 

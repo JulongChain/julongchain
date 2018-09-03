@@ -15,34 +15,34 @@
  */
 package org.bcia.julongchain.csp.pkcs11.entity;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 
 /**
- * Class description
+ * Config for PKCS11 (Maybe useful)
  *
- * @author
+ * @author Ying Xu
  * @date 4/19/18
  * @company FEITIAN
  */
 public class PKCS11Config {
-    private int securityLevel;
-    private String hashFamily;
-    private boolean sfVer;
-    private boolean noKImport;
+    private static int securityLevel;
+    private static String hashFamily;
+    private static boolean sfVer;
+    private static boolean noKImport;
     //private boolean useecx963encodeing;
-    private String path;
+    private static String path;
 
-    public PKCS11Config(int level, String hashfamily, boolean softVerify, boolean noKeyImport)  throws JavaChainException {
+    public PKCS11Config(int level, String hashfamily, boolean softVerify, boolean noKeyImport)  throws JulongChainException {
 
         switch (level){
             case 1:
             case 5:
             case 256:
             case 384:
-                this.securityLevel = level;
+                PKCS11Config.securityLevel = level;
                 break;
             default:
-                throw new JavaChainException("param level invalid");
+                throw new JulongChainException("param level invalid");
         }
 
         switch (hashfamily) {
@@ -50,18 +50,18 @@ public class PKCS11Config {
             case "SHA1":
             case "SHA2":
             case "SHA3":
-                this.hashFamily = hashfamily;
+                PKCS11Config.hashFamily = hashfamily;
                 break;
             default:
-                throw new JavaChainException("param hashfamily invalid");
+                throw new JulongChainException("param hashfamily invalid");
         }
 
-        this.sfVer = softVerify;
-        this.noKImport = noKeyImport;
+        PKCS11Config.sfVer = softVerify;
+        PKCS11Config.noKImport = noKeyImport;
     }
 
     public void setPath(String path) {
-        this.path = path;
+        PKCS11Config.path = path;
     }
 
     public String getPath() {

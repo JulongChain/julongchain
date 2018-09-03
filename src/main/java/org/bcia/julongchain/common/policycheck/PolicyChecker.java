@@ -20,8 +20,8 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.VerifyException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.IPolicyManager;
 import org.bcia.julongchain.common.policies.policy.IPolicy;
 import org.bcia.julongchain.common.policycheck.policies.IGroupPolicyManagerGetter;
@@ -33,6 +33,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.MspPrincipal;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,11 +41,11 @@ import java.util.List;
  * 类描述
  * 策略检查器，通过通达及策略名获得策略，并使用此策略对签名进行验证
  * @author yuanjun,sunianle
- * @date 20/04/20
+ * @date 20/04/18
  * @company Aisino,Dingxuan
  */
 public class PolicyChecker implements IPolicyChecker{
-    private static JavaChainLog log = JavaChainLogFactory.getLog(PolicyChecker.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(PolicyChecker.class);
 
     private IGroupPolicyManagerGetter groupPolicyManagerGetter;
     private IIdentityDeserializer localMSP;
@@ -58,6 +59,7 @@ public class PolicyChecker implements IPolicyChecker{
     }
 
     /**
+     * 策略检查
      * @param groupID
      * @param policyName
      * @param signedProposal
@@ -69,7 +71,7 @@ public class PolicyChecker implements IPolicyChecker{
          }
 
         if(policyName == ""){
-             String msg=String.format("Invalid policy name during check policy on group [%s]. Name must be different from nil",groupID);
+             String msg=String.format("Invalid policy name during check policy on group [%s]. Name must be different from null",groupID);
              throw new PolicyException(msg);
         }
         if(signedProposal == null){
@@ -104,7 +106,7 @@ public class PolicyChecker implements IPolicyChecker{
              throw new PolicyException(msg);
         }
 
-        Common.Header header = null; //Common.Header.newBuilder();
+        Common.Header header = null;
         try {
             header = Common.Header.parseFrom(proposal.getHeader());
         } catch (InvalidProtocolBufferException e) {
@@ -125,11 +127,16 @@ public class PolicyChecker implements IPolicyChecker{
         this.checkPolicyBySignedData(groupID,policyName,sd);
     }
 
-
+    /**
+     * 没有通道时检查策略是否有效，在本地MSP通过策略
+     * @param policyName
+     * @param signedProposal
+     * @throws PolicyException
+     */
     @Override
     public void checkPolicyNoGroup(String policyName, ProposalPackage.SignedProposal signedProposal)throws PolicyException {
         if(policyName == ""){
-            String msg=String.format("Invalid policy name during groupless check policy. Name must be different from nil.");
+            String msg=String.format("Invalid policy name during groupless check policy. Name must be different from null.");
             throw new PolicyException(msg);
         }
         if(signedProposal == null){
@@ -160,8 +167,8 @@ public class PolicyChecker implements IPolicyChecker{
         }
         IIdentity id = null;
         try {
-            log.info("signatureHeader.getCreator()-----$" + signatureHeader.getCreator());
-            id = localMSP.deserializeIdentity(signatureHeader.getCreator().toByteArray());//
+            log.info("SignatureHeader.getCreator(): " + signatureHeader.getCreator());
+            id = localMSP.deserializeIdentity(signatureHeader.getCreator().toByteArray());
         }catch (Exception e){
             String msg=String.format("Failed deserializing proposal creator during channelless check policy with policy [%s]:%s",policyName,e.getMessage());
             throw new PolicyException(msg);
@@ -177,9 +184,12 @@ public class PolicyChecker implements IPolicyChecker{
             String msg=String.format("Failed getting local MSP principal during channelless check policy with policy [%s]:%s",policyName,e.getMessage());
             throw new PolicyException(msg);
         }
-        //MspPrincipal.MSPPrincipal m = MspPrincipal.MSPPrincipal.newBuilder().build();
         try {
-            id.satisfiesPrincipal(principal);
+            try {
+                id.satisfiesPrincipal(principal);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }catch (MspException e){
             String msg=String.format("Satisfies Principal get error:%s",e.getMessage());
             throw new PolicyException(msg);
@@ -198,11 +208,11 @@ public class PolicyChecker implements IPolicyChecker{
      */
     public void checkPolicyBySignedData(String groupID, String policyName, List<SignedData> signedDatas) throws PolicyException{
         if(groupID == ""){
-            String msg=String.format("Invalid group ID name during check policy on signed data. Name must be different from nil");
+            String msg=String.format("Invalid group ID name during check policy on signed data. Name must be different from null");
             throw new PolicyException(msg);
         }
         if(policyName == ""){
-            String msg=String.format("Invalid policy name during check policy on signed data on channel [%s]. Name must be different from nil",groupID);
+            String msg=String.format("Invalid policy name during check policy on signed data on channel [%s]. Name must be different from null",groupID);
             throw new PolicyException(msg);
         }
         if(signedDatas == null){

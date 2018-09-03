@@ -15,6 +15,8 @@ package org.bcia.julongchain.csp.gm.dxct.sm2; /**
  */
 
 /**
+ * sm2密钥对
+ *
  * @author zhangmingyang
  * @Date: 2018/4/24
  * @company Dingxuan

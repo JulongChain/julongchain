@@ -22,13 +22,13 @@ import sun.security.pkcs11.wrapper.PKCS11Constants;
 /**
  * Ecdsa Sign Opts
  *
- * @author xuying
+ * @author Xu Ying
  * @date 2018/05/21
  * @company FEITIAN
  */
 public enum EcdsaSignOpts implements ISignerOpts {
     ECDSA("NONEwithECDSA", PKCS11Constants.CKM_ECDSA, 1),
-    SHA1("SHA1withECDSA", /*PKCS11Constants.CKM_ECDSA_SHA1*/PKCS11Constants.CKM_ECDSA, 2),
+    SHA1("SHA1withECDSA", PKCS11Constants.CKM_ECDSA, 2),
     SHA256("SHA256withECDSA", PKCS11Constants.CKM_ECDSA, 3),
     SHA384("SHA384withECDSA", PKCS11Constants.CKM_ECDSA, 4);
 
@@ -38,6 +38,12 @@ public enum EcdsaSignOpts implements ISignerOpts {
     private long mechanism;
 
 
+    /**
+     * Opt for sign with ecdsa
+     * @param name          Sign Algorithm
+     * @param mechanism     Sign mechanism
+     * @param index         Index num
+     */
     private EcdsaSignOpts(String name, long mechanism, int index) {
         this.name = name;
         this.index = index;
@@ -49,6 +55,7 @@ public enum EcdsaSignOpts implements ISignerOpts {
     public String getAlgorithm() {
         return this.name;
     }
+
     @Override
     public String hashFunc() {
         // TODO Auto-generated method stub

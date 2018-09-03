@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 类描述
+ * 智能合约处理器列表
  *
  * @author zhouhui
  * @date 2018/05/18
@@ -37,15 +37,15 @@ public class SmartContractHandlerList implements IHandlerList {
 
     @Override
     public boolean add(EventsPackage.Interest interest, EventHandler eventHandler) throws ValidateException {
-        ValidateUtils.isNotNull(interest, "interest can not be null");
-        ValidateUtils.isNotNull(eventHandler, "eventHandler can not be null");
-        ValidateUtils.isNotNull(interest.getSmartcontractRegInfo(), "smartcontractRegInfo can not be null");
+        ValidateUtils.isNotNull(interest, "Interest can not be null");
+        ValidateUtils.isNotNull(eventHandler, "EventHandler can not be null");
+        ValidateUtils.isNotNull(interest.getSmartContractRegInfo(), "SmartContractRegInfo can not be null");
 
-        String scId = interest.getSmartcontractRegInfo().getSmartcontractId();
-        ValidateUtils.isNotBlank(scId, "smartcontractId can not be empty");
+        String scId = interest.getSmartContractRegInfo().getSmartContractId();
+        ValidateUtils.isNotBlank(scId, "SmartContractId can not be empty");
 
-        String eventName = interest.getSmartcontractRegInfo().getEventName();
-        ValidateUtils.isNotBlank(eventName, "eventName can not be empty");
+        String eventName = interest.getSmartContractRegInfo().getEventName();
+        ValidateUtils.isNotBlank(eventName, "EventName can not be empty");
 
         synchronized (this) {
             Map<String, List<IEventHandler>> eventHandlerMap = null;
@@ -75,15 +75,15 @@ public class SmartContractHandlerList implements IHandlerList {
 
     @Override
     public boolean delete(EventsPackage.Interest interest, EventHandler eventHandler) throws ValidateException {
-        ValidateUtils.isNotNull(interest, "interest can not be null");
-        ValidateUtils.isNotNull(eventHandler, "eventHandler can not be null");
-        ValidateUtils.isNotNull(interest.getSmartcontractRegInfo(), "smartcontractRegInfo can not be null");
+        ValidateUtils.isNotNull(interest, "Interest can not be null");
+        ValidateUtils.isNotNull(eventHandler, "EventHandler can not be null");
+        ValidateUtils.isNotNull(interest.getSmartContractRegInfo(), "SmartContractRegInfo can not be null");
 
-        String scId = interest.getSmartcontractRegInfo().getSmartcontractId();
-        ValidateUtils.isNotBlank(scId, "smartcontractId can not be empty");
+        String scId = interest.getSmartContractRegInfo().getSmartContractId();
+        ValidateUtils.isNotBlank(scId, "SmartContractId can not be empty");
 
-        String eventName = interest.getSmartcontractRegInfo().getEventName();
-        ValidateUtils.isNotBlank(eventName, "eventName can not be empty");
+        String eventName = interest.getSmartContractRegInfo().getEventName();
+        ValidateUtils.isNotBlank(eventName, "EventName can not be empty");
 
         synchronized (this) {
             Map<String, List<IEventHandler>> eventHandlerMap = null;
@@ -120,9 +120,9 @@ public class SmartContractHandlerList implements IHandlerList {
 
     @Override
     public void foreach(EventsPackage.Event event, IHandlerAction action) {
-        if (event.getSmartcontractEvent() != null && action != null) {
-            String scId = event.getSmartcontractEvent().getSmartContractId();
-            String eventName = event.getSmartcontractEvent().getEventName();
+        if (event.getSmartContractEvent() != null && action != null) {
+            String scId = event.getSmartContractEvent().getSmartContractId();
+            String eventName = event.getSmartContractEvent().getEventName();
             synchronized (this) {
                 if (StringUtils.isNotBlank(scId) && StringUtils.isNotBlank(eventName) && handlers.containsKey(scId)) {
                     Map<String, List<IEventHandler>> eventHandlerMap = handlers.get(scId);

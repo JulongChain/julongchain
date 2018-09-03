@@ -29,8 +29,17 @@ import java.util.Objects;
  * @company Dingxuan
  */
 public class ConfigComparable<T> {
+    /**
+     * 当前短路径(标识)
+     */
     private String key;
+    /**
+     * 父路径（递归成数组）
+     */
     private String[] path;
+    /**
+     * 当前要比较的对象
+     */
     private T t;
 
     public ConfigComparable(String key, String[] path, T t) {
@@ -75,7 +84,7 @@ public class ConfigComparable<T> {
      */
     private boolean equalConfigTree(Configtx.ConfigTree t, Configtx.ConfigTree otherT) {
         if (t == null || otherT == null) {
-            return false;
+            return t == otherT;
         }
 
         if (!Objects.equals(t.getVersion(), otherT.getVersion())
@@ -93,7 +102,7 @@ public class ConfigComparable<T> {
 
     private boolean equalConfigValue(Configtx.ConfigValue t, Configtx.ConfigValue otherT) {
         if (t == null || otherT == null) {
-            return false;
+            return t == otherT;
         }
 
         if (!Objects.equals(t.getVersion(), otherT.getVersion())
@@ -106,7 +115,7 @@ public class ConfigComparable<T> {
 
     private boolean equalConfigPolicy(Configtx.ConfigPolicy t, Configtx.ConfigPolicy otherT) {
         if (t == null || otherT == null) {
-            return false;
+            return t == otherT;
         }
 
         if (!Objects.equals(t.getVersion(), otherT.getVersion())

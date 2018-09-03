@@ -2,6 +2,8 @@
 Copyright IBM Corp., DTCC All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
+
+Modified java_package and other contents by Dingxuan on 2018-08-30
 */
 
 package org.bcia.julongchain.core.smartcontract.shim.impl;
@@ -25,7 +27,7 @@ import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalPackage.Proposal;
 import org.bcia.julongchain.protos.node.ProposalPackage.SignedProposal;
 import org.bcia.julongchain.protos.node.SmartContractEventPackage;
-import org.bcia.julongchain.protos.node.SmartcontractShim;
+import org.bcia.julongchain.protos.node.SmartContractShim;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -196,8 +198,8 @@ class SmartContractStub implements ISmartContractStub {
 				);
 	}
 
-	private Function<SmartcontractShim.QueryResultBytes, KV> queryResultBytesToKv = new Function<SmartcontractShim.QueryResultBytes, KV>() {
-		public KV apply(SmartcontractShim.QueryResultBytes queryResultBytes) {
+	private Function<SmartContractShim.QueryResultBytes, KV> queryResultBytesToKv = new Function<SmartContractShim.QueryResultBytes, KV>() {
+		public KV apply(SmartContractShim.QueryResultBytes queryResultBytes) {
 			try {
 				return KV.parseFrom(queryResultBytes.getResultBytes());
 			} catch (InvalidProtocolBufferException e) {
@@ -241,8 +243,8 @@ class SmartContractStub implements ISmartContractStub {
 				);
 	}
 
-	private Function<SmartcontractShim.QueryResultBytes, KvQueryResult.KeyModification> queryResultBytesToKeyModification = new Function<SmartcontractShim.QueryResultBytes, KvQueryResult.KeyModification>() {
-		public KvQueryResult.KeyModification apply(SmartcontractShim.QueryResultBytes queryResultBytes) {
+	private Function<SmartContractShim.QueryResultBytes, KvQueryResult.KeyModification> queryResultBytesToKeyModification = new Function<SmartContractShim.QueryResultBytes, KvQueryResult.KeyModification>() {
+		public KvQueryResult.KeyModification apply(SmartContractShim.QueryResultBytes queryResultBytes) {
 			try {
 				return KvQueryResult.KeyModification.parseFrom(queryResultBytes.getResultBytes());
 			} catch (InvalidProtocolBufferException e) {

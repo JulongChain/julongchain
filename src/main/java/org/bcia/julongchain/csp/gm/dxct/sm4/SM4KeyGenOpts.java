@@ -15,9 +15,12 @@
  */
 package org.bcia.julongchain.csp.gm.dxct.sm4;
 
+import org.bcia.julongchain.csp.gm.dxct.util.GmCspConstant;
 import org.bcia.julongchain.csp.intfs.opts.IKeyGenOpts;
 
 /**
+ * sm4蜜钥生成选项
+ *
  * @author zhangmingyang
  * @Date: 2018/4/28
  * @company Dingxuan
@@ -25,7 +28,7 @@ import org.bcia.julongchain.csp.intfs.opts.IKeyGenOpts;
 public class SM4KeyGenOpts implements IKeyGenOpts {
     @Override
     public String getAlgorithm() {
-        return "SM4";
+        return GmCspConstant.SM4;
     }
 
     @Override

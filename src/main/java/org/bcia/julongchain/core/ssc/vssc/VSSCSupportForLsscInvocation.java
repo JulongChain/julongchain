@@ -17,12 +17,12 @@ package org.bcia.julongchain.core.ssc.vssc;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.SysSmartContractException;
 import org.bcia.julongchain.common.groupconfig.capability.IApplicationCapabilities;
-import org.bcia.julongchain.common.log.JavaChainLog;
+import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.policies.policy.IPolicy;
 import org.bcia.julongchain.common.policies.IPolicyProvider;
 import org.bcia.julongchain.common.policycheck.policies.PolicyProvider;
@@ -38,6 +38,7 @@ import org.bcia.julongchain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.julongchain.core.ssc.lssc.LSSC;
 import org.bcia.julongchain.msp.IMspManager;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
+import org.bcia.julongchain.msp.mgmt.MspMgmtMgr;
 import org.bcia.julongchain.protos.common.Collection;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.ledger.rwset.Rwset;
@@ -65,7 +66,7 @@ public class VSSCSupportForLsscInvocation {
             IApplicationCapabilities ac,
             ICollectionStore collectionStore,
             ISystemSmartContractProvider sscProvider,
-            JavaChainLog log
+            JulongChainLog log
     )throws SysSmartContractException{
         ProposalPackage.SmartContractProposalPayload scpp=null;
         try {
@@ -74,9 +75,9 @@ public class VSSCSupportForLsscInvocation {
             String msg=String.format("VSSC error: GetSmartContractProposalPayload failed, err %s",e.getMessage());
             throw new SysSmartContractException(msg);
         }
-        Smartcontract.SmartContractInvocationSpec scis=null;
+        SmartContractPackage.SmartContractInvocationSpec scis=null;
         try {
-            Smartcontract.SmartContractInvocationSpec.parseFrom(scpp.getInput());
+            SmartContractPackage.SmartContractInvocationSpec.parseFrom(scpp.getInput());
         } catch (InvalidProtocolBufferException e) {
             String msg=String.format("VSSC error: Unmarshal SmartContractInvocationSpec failed, err %s",e.getMessage());
             throw new SysSmartContractException(msg);
@@ -114,9 +115,9 @@ public class VSSCSupportForLsscInvocation {
                     String msg=String.format("Wrong number of arguments for invocation lssc(%s): expected at least 2, received %d",lsscFunc,size);
                     throw new SysSmartContractException(msg);
                 }
-                Smartcontract.SmartContractDeploymentSpec scds;
+                SmartContractPackage.SmartContractDeploymentSpec scds;
                 try {
-                    scds=Smartcontract.SmartContractDeploymentSpec.parseFrom(argsListWithoutFunction.get(1));
+                    scds=SmartContractPackage.SmartContractDeploymentSpec.parseFrom(argsListWithoutFunction.get(1));
                 } catch (InvalidProtocolBufferException e) {
                     String msg=String.format("GetSmartContractDeploymentSpec error %s",e.getMessage());
                     throw new SysSmartContractException(msg);
@@ -153,7 +154,6 @@ public class VSSCSupportForLsscInvocation {
                     throw new SysSmartContractException(e.getMessage());
                 }
                 TxRwSet txRwSet=null;
-                // TODO: 6/4/18 modify by sunzongyu, catch exception when get TxRwSet from proto message.
                 try {
                     txRwSet=RwSetUtil.txRwSetFromProtoMsg(rwSetProto);
                 } catch (LedgerException e) {
@@ -162,7 +162,7 @@ public class VSSCSupportForLsscInvocation {
                 }
                 List<NsRwSet> nsSet = txRwSet.getNsRwSets();
 
-                //extract the rwset for lscc
+                //extract the rwset for lssc
                 KvRwset.KVRWSet lsscRwSet=null;
                 for(NsRwSet ns:nsSet){
                     log.debug("Namespace %s",ns.getNameSpace());
@@ -338,8 +338,8 @@ public class VSSCSupportForLsscInvocation {
      * @return
      */
     private static void checkInstantiationPolicy(String groupID, Common.Envelope env, byte []instantiationPolicy,
-                                          Common.Payload payload,JavaChainLog log)throws SysSmartContractException{
-        IMspManager mspManager = GlobalMspManagement.getManagerForChain(groupID);
+                                                 Common.Payload payload, JulongChainLog log)throws SysSmartContractException{
+        IMspManager mspManager = MspMgmtMgr.getManagerForChain(groupID);
         if(mspManager==null){
             String msg=String.format("MSP getPolicyManager for group %s is null, aborting",groupID);
             throw new SysSmartContractException(msg);
@@ -377,7 +377,7 @@ public class VSSCSupportForLsscInvocation {
         IQueryExecutor qe=null;
         try {
             qe=sscProvider.getQueryExecutorForLedger(groupID);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             String msg=String.format("Could not retrieve QueryExecutor for group %s, error %s",
                                             groupID,e.getMessage());
             throw new SysSmartContractException(msg);
@@ -464,12 +464,12 @@ public class VSSCSupportForLsscInvocation {
         }
 
         Collection.CollectionCriteria cc =Collection.CollectionCriteria.newBuilder().
-                setChannel(groupID).setNamespace(smartcontractName).build();
+                setGroup(groupID).setNamespace(smartcontractName).build();
 
         Collection.CollectionConfigPackage ccp=null;
         try {
             ccp = collectionStore.retrieveCollectionConfigPackage(cc);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             String msg=e.getMessage();
             // fail if we get any error other than NoSuchCollectionError
             // because it means something went wrong while looking up the

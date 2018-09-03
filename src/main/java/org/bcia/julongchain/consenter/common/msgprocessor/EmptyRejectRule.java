@@ -16,17 +16,19 @@
 package org.bcia.julongchain.consenter.common.msgprocessor;
 
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
+ * 空拒绝规则
+ *
  * @author zhangmingyang
  * @Date: 2018/5/25
  * @company Dingxuan
  */
 public class EmptyRejectRule implements IRule {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(EmptyRejectRule.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(EmptyRejectRule.class);
     private IRule emptyRejectRule;
 
     public EmptyRejectRule() {
@@ -38,9 +40,9 @@ public class EmptyRejectRule implements IRule {
 
     @Override
     public void apply(Common.Envelope message) {
-        if(message.getPayload()==null){
+        if (message.getPayload() == null) {
             try {
-                throw  new ValidateException("Message was empty");
+                throw new ValidateException("Message was empty");
             } catch (ValidateException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();

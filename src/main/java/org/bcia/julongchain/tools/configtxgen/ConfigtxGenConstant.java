@@ -16,7 +16,7 @@
 package org.bcia.julongchain.tools.configtxgen;
 
 /**
- * 类描述
+ * 交易生成常量
  *
  * @author zhouhui
  * @date 2018/06/06

@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.core.smartcontract;
 
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
  * 类描述
@@ -26,13 +26,13 @@ import org.bcia.julongchain.protos.node.Smartcontract;
  */
 public class DuplicateSmartContractHandlerError {
 
-    private Smartcontract.SmartContractID smartContractID;
+    private SmartContractPackage.SmartContractID smartContractID;
 
-    public Smartcontract.SmartContractID getSmartContractID() {
+    public SmartContractPackage.SmartContractID getSmartContractID() {
         return smartContractID;
     }
 
-    public void setSmartContractID(Smartcontract.SmartContractID
+    public void setSmartContractID(SmartContractPackage.SmartContractID
                                            smartContractID) {
         this.smartContractID = smartContractID;
     }

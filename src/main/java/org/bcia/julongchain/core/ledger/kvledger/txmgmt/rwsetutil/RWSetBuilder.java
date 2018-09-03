@@ -18,7 +18,7 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil;
 import com.google.protobuf.ByteString;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.core.ledger.TxSimulationResults;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.ledger.rwset.Rwset;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
@@ -42,7 +42,7 @@ public class RWSetBuilder {
     /**
      * 向读集合添加
      */
-    public void addToReadSet(String ns, String key, Height version){
+    public void addToReadSet(String ns, String key, LedgerHeight version){
         NsPubRwBuilder nsPubRwBuilder = getOrCreateNsPubRwBuilder(ns);
         nsPubRwBuilder.getReadMap().put(key, RwSetUtil.newKVRead(key, version));
     }
@@ -70,7 +70,7 @@ public class RWSetBuilder {
     /**
      * 向Hash读集合添加
      */
-    public void addToHashedReadSet(String ns, String coll, String key, Height version) throws LedgerException{
+    public void addToHashedReadSet(String ns, String coll, String key, LedgerHeight version) throws LedgerException{
         KvRwset.KVReadHash kvReadHash = RwSetUtil.newPvtKVReadHash(key, version);
         CollHashRwBuilder chrwb = getOrCreateCollHashedRwBuilder(ns, coll);
         chrwb.getReadMap().put(key, kvReadHash);

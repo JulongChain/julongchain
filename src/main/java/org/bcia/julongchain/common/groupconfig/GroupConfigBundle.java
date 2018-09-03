@@ -66,14 +66,14 @@ public class GroupConfigBundle implements IGroupConfigBundle,IMutableResources {
 
     public static GroupConfigBundle parseFrom(Common.Envelope envelope) throws ValidateException,
             InvalidProtocolBufferException, PolicyException {
-        ValidateUtils.isNotNull(envelope, "envelope can not be null");
-        ValidateUtils.isNotNull(envelope.getPayload(), "envelope.Payload can not be null");
+        ValidateUtils.isNotNull(envelope, "Envelope can not be null");
+        ValidateUtils.isNotNull(envelope.getPayload(), "Envelope.Payload can not be null");
 
         Common.Payload payload = Common.Payload.parseFrom(envelope.getPayload());
 
-        ValidateUtils.isNotNull(payload.getHeader(), "envelope.Payload.header can not be null");
-        ValidateUtils.isNotNull(payload.getHeader().getGroupHeader(), "envelope.groupHeader can not be null");
-        ValidateUtils.isNotNull(payload.getData(), "envelope.Payload.data can not be null");
+        ValidateUtils.isNotNull(payload.getHeader(), "Envelope.Payload.header can not be null");
+        ValidateUtils.isNotNull(payload.getHeader().getGroupHeader(), "Envelope.groupHeader can not be null");
+        ValidateUtils.isNotNull(payload.getData(), "Envelope.Payload.data can not be null");
 
         Common.GroupHeader groupHeader = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
 
@@ -108,7 +108,7 @@ public class GroupConfigBundle implements IGroupConfigBundle,IMutableResources {
      * @throws ValidateException
      */
     private void preValidate(Configtx.Config config) throws ValidateException {
-        ValidateUtils.isNotNull(config, "config can not be null");
+        ValidateUtils.isNotNull(config, "Config can not be null");
         ValidateUtils.isNotNull(config.getGroupTree(), "GroupTree can not be null");
         ValidateUtils.isNotNull(config.getGroupTree().getChildsMap(), "GroupTree's child can not be null");
 
@@ -119,14 +119,14 @@ public class GroupConfigBundle implements IGroupConfigBundle,IMutableResources {
                     .CAPABILITIES)) {
                 if (groupTree.getValuesMap().containsKey(GroupConfigConstant.CAPABILITIES)) {
                     //如果群组级别配置树具备某项能力，但共识级别配置树却不具备，则抛出异常
-                    throw new ValidateException("group have capabilities, but consenter hasn't");
+                    throw new ValidateException("Group have capabilities, but consenter has not");
                 }
 
                 Configtx.ConfigTree appTree = groupTree.getChildsMap().get(GroupConfigConstant.APPLICATION);
                 if (appTree != null && appTree.getValuesMap() != null && appTree.getValuesMap().containsKey
                         (GroupConfigConstant.CAPABILITIES)) {
                     //如果应用级别配置树具备某项能力，但共识级别配置树却不具备，则抛出异常
-                    throw new ValidateException("app have capabilities, but consenter hasn't");
+                    throw new ValidateException("App have capabilities, but consenter has not");
                 }
             }
         }
@@ -161,7 +161,7 @@ public class GroupConfigBundle implements IGroupConfigBundle,IMutableResources {
         IConsortiumsConfig consortiumsConfig = groupConfig.getConsortiumsConfig();
         if (consortiumsConfig != null) {
             IConsortiumsConfig otherConsortiumsConfig = otherBundle.getGroupConfig().getConsortiumsConfig();
-            ValidateUtils.isNotNull(otherConsortiumsConfig, "otherConsortiumsConfig can not be null");
+            ValidateUtils.isNotNull(otherConsortiumsConfig, "OtherConsortiumsConfig can not be null");
 
             if (consortiumsConfig.getConsortiumConfigMap() != null && consortiumsConfig.getConsortiumConfigMap().size
                     () > 0) {
@@ -207,7 +207,7 @@ public class GroupConfigBundle implements IGroupConfigBundle,IMutableResources {
                     if (otherOrganizationConfig != null && !Objects.equals(organizationConfig.getMspId(),
                             otherOrganizationConfig.getMspId())) {
                         //如果要比较的Map也存在对应的组织，但MSP却不相同,则抛出异常
-                        throw new ValidateException("Different org msp-----" + orgName + "," + organizationConfig
+                        throw new ValidateException("Different org msp: " + orgName + "," + organizationConfig
                                 .getMspId() + "," + otherOrganizationConfig.getMspId());
                     }
                 }

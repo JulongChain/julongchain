@@ -19,7 +19,7 @@ package org.bcia.julongchain.events.producer;
 import com.google.protobuf.Message;
 
 /**
- * 类描述
+ * 事件服务配置
  *
  * @author zhouhui
  * @date 2018/05/17

@@ -15,46 +15,46 @@
  */
 package org.bcia.julongchain.common.groupconfig;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.policy.IPolicy;
 import org.bcia.julongchain.common.policies.IPolicyManager;
 import org.bcia.julongchain.common.policies.PolicyConstant;
 
 /**
- * 类描述
+ * 命中性检查日志打印
  *
  * @author zhouhui
  * @date 2018/05/23
  * @company Dingxuan
  */
 public class LogSanityChecks {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(LogSanityChecks.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(LogSanityChecks.class);
 
     public static void logPolicy(IGroupConfigBundle bundle) {
         IPolicyManager policyManager = bundle.getPolicyManager();
 
         IPolicy groupReaderPolicy = policyManager.getPolicy(PolicyConstant.GROUP_READERS);
-        log.info("groupReaderPolicy-----$" + groupReaderPolicy);
+        log.info("GroupReaderPolicy: " + groupReaderPolicy);
         IPolicy groupWriterPolicy = policyManager.getPolicy(PolicyConstant.GROUP_WRITERS);
-        log.info("groupWriterPolicy-----$" + groupWriterPolicy);
+        log.info("GroupWriterPolicy: " + groupWriterPolicy);
 
         IPolicyManager appPolicyManager = policyManager.getSubPolicyManager(new String[]{PolicyConstant
                 .APPLICATION_PREFIX});
         if (appPolicyManager != null) {
             IPolicy groupAppReaderPolicy = policyManager.getPolicy(PolicyConstant.GROUP_APP_READERS);
-            log.info("groupAppReaderPolicy-----$" + groupAppReaderPolicy);
+            log.info("GroupAppReaderPolicy: " + groupAppReaderPolicy);
             IPolicy groupAppWriterPolicy = policyManager.getPolicy(PolicyConstant.GROUP_APP_WRITERS);
-            log.info("groupAppWriterPolicy-----$" + groupAppWriterPolicy);
+            log.info("GroupAppWriterPolicy: " + groupAppWriterPolicy);
             IPolicy groupAppAdminPolicy = policyManager.getPolicy(PolicyConstant.GROUP_APP_ADMINS);
-            log.info("groupAppAdminPolicy-----$" + groupAppAdminPolicy);
+            log.info("GroupAppAdminPolicy: " + groupAppAdminPolicy);
         }
 
         IPolicyManager consenterPolicyManager = policyManager.getSubPolicyManager(new String[]{PolicyConstant
                 .CONSENTER_PREFIX});
         if (consenterPolicyManager != null) {
             IPolicy blockValidationPolicy = policyManager.getPolicy(PolicyConstant.BLOCK_VALIDATION);
-            log.info("blockValidationPolicy-----$" + blockValidationPolicy);
+            log.info("BlockValidationPolicy: " + blockValidationPolicy);
         }
     }
 

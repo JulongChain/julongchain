@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * crypto-config.yaml 节点配置数据类 template 部分
+ *
  * @author chenhao, liuxifeng
  * @date 2018/4/20
  * @company Excelsecu
@@ -28,7 +30,7 @@ public class NodeTemplate {
     private int count = 0;
     private int start = 0;
     private String hostname = "";
-    private List<String> SANS = new ArrayList<>();
+    private List<String> sans = new ArrayList<>();
 
     public int getCount() {
         return count;
@@ -54,11 +56,11 @@ public class NodeTemplate {
         this.hostname = hostname;
     }
 
-    public List<String> getSANS() {
-        return SANS;
+    public List<String> getSans() {
+        return sans;
     }
 
-    public void setSANS(List<String> SANS) {
-        this.SANS = SANS;
+    public void setSans(List<String> sans) {
+        this.sans = sans;
     }
 }

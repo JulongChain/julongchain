@@ -29,7 +29,7 @@ public class NetAddress {
     private int port;
 
     public NetAddress(String address) throws ValidateException {
-        ValidateUtils.isNotBlank(address, "address can not be empty");
+        ValidateUtils.isNotBlank(address, "Address can not be empty");
 
         String[] hostAndPort = address.split(":");
         if (hostAndPort.length <= 1) {

@@ -64,7 +64,7 @@ public interface IDockerClient {
      * case of failure
      * @param opts
      */
-    void KillContainer(String opts);
+    void killContainer(String opts);
     /** RemoveContainer removes a docker container, returns an error in case
      * of failure
      */

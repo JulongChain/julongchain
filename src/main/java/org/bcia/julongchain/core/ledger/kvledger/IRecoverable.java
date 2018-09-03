@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,15 +27,14 @@ import org.bcia.julongchain.core.ledger.BlockAndPvtData;
  */
 public interface IRecoverable {
 
-    /** ShouldRecover return whether recovery is need.
-     * If the recovery is needed, this method also returns the block number to start recovery from.
-     * lastAvailableBlock is the max block number that has been committed to the block storage
-     */
+	/**
+	 * 判断账本是否需要被回复
+	 */
     long shouldRecover() throws LedgerException;
 
-    /** CommitLostBlock recommits the block
-     *
-     */
-    void commitLostBlock(BlockAndPvtData blockAndPvtData) throws LedgerException;
+	/**
+	 * 提交丢失区块
+	 */
+	void commitLostBlock(BlockAndPvtData blockAndPvtData) throws LedgerException;
 
 }

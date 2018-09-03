@@ -22,12 +22,19 @@ import org.bcia.julongchain.common.policies.IPolicyManagerGetter;
 
 /**
  * 类描述
- *
+ * 策略管理者获取接口
  * @author yuanjun
  * @date 26/04/18
  * @company Aisino
  */
 public interface IGroupPolicyManagerGetter extends IPolicyManagerGetter {
+    /**
+     * 通过groupid获取策略管理的对象
+     * @param groupId
+     * @return
+     * @throws InvalidProtocolBufferException
+     * @throws PolicyException
+     */
     IPolicyManager getPolicyManager(String groupId ) throws InvalidProtocolBufferException, PolicyException;
 
 }

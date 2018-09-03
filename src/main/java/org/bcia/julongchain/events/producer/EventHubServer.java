@@ -17,10 +17,11 @@ package org.bcia.julongchain.events.producer;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.stub.StreamObserver;
+import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.exception.VerifyException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.node.EventsPackage;
 
 /**
@@ -31,7 +32,7 @@ import org.bcia.julongchain.protos.node.EventsPackage;
  * @company Dingxuan
  */
 public class EventHubServer implements IEventHubServer {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(EventHubServer.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(EventHubServer.class);
     private IEventProcessor eventProcessor;
 
     public interface Callback {
@@ -64,6 +65,8 @@ public class EventHubServer implements IEventHubServer {
             log.error(e.getMessage(), e);
         } catch (VerifyException e) {
             log.error(e.getMessage(), e);
+        } catch (MspException e) {
+            e.printStackTrace();
         }
 
         return null;

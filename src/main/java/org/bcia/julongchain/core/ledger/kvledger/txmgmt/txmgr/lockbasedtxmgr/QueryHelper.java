@@ -19,11 +19,12 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.RWSetBuilder;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.VersionedValue;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,10 +51,10 @@ public class QueryHelper {
         checkDone();
         VersionedValue versionedValue = txMgr.getDb().getState(ns, key);
         if(versionedValue == null){
-            return null;
+        	versionedValue = new VersionedValue(null, null);
         }
         byte[] val = versionedValue.getValue();
-        Height ver = versionedValue.getVersion();
+        LedgerHeight ver = versionedValue.getHeight();
         addToReadSet(ns, key, ver);
         return val;
     }
@@ -63,8 +64,9 @@ public class QueryHelper {
         List<VersionedValue> versionedValues = txMgr.getDb().getStateMultipleKeys(ns, keys);
         List<byte[]> values = new ArrayList<>();
         for (int i = 0; i < versionedValues.size(); i++) {
-            byte[] val = versionedValues.get(i).getValue();
-            Height ver = versionedValues.get(i).getVersion();
+			VersionedValue value = versionedValues.get(i);
+			byte[] val = value == null ? null : value.getValue();
+            LedgerHeight ver = value == null ? null : value.getHeight();
             addToReadSet(ns, keys.get(i), ver);
             values.add(val);
         }
@@ -73,7 +75,7 @@ public class QueryHelper {
 
     public IResultsIterator getStateRangeScanIterator(String ns, String startKey, String endKey) throws LedgerException{
         checkDone();
-        ResultsItr itr = new ResultsItr(ns, startKey, endKey, txMgr.getDb(), rwSetBuilder, false, LedgerConfig.getMaxDegreeQueryReadsHashing());
+        ResultsItr itr = new ResultsItr(ns, startKey, endKey, txMgr.getDb(), rwSetBuilder, true, LedgerConfig.getMaxDegreeQueryReadsHashing());
         itrs.add(itr);
         return itr;
     }
@@ -91,11 +93,10 @@ public class QueryHelper {
         checkDone();
         VersionedValue versionedValue = txMgr.getDb().getPrivateData(ns, coll, key);
         byte[] val = versionedValue.getValue();
-        Height ver = versionedValue.getVersion();
-        //TODO SM3 hash
-        byte[] keyHash = Util.getHashBytes(key.getBytes());
-        Height hashVersion = txMgr.getDb().getKeyHashVersion(ns, coll, keyHash);
-        if(!Height.areSame(ver, hashVersion)){
+        LedgerHeight ver = versionedValue.getHeight();
+        byte[] keyHash = Util.getHashBytes(key.getBytes(StandardCharsets.UTF_8));
+        LedgerHeight hashVersion = txMgr.getDb().getKeyHashVersion(ns, coll, keyHash);
+        if(!LedgerHeight.areSame(ver, hashVersion)){
             throw new LedgerException(String.format("Private data matching public hash version is not available.Pub version %s. Pvt version %s",
                     ver, hashVersion));
         }
@@ -109,7 +110,7 @@ public class QueryHelper {
         List<byte[]> values = new ArrayList<>();
         for (int i = 0; i < versionedValues.size() ; i++) {
             byte[] val = versionedValues.get(i).getValue();
-            Height ver = versionedValues.get(i).getVersion();
+            LedgerHeight ver = versionedValues.get(i).getHeight();
             addToHashedReadSet(ns, coll, keys.get(i), ver);
             values.add(val);
         }
@@ -140,11 +141,13 @@ public class QueryHelper {
                 if (rwSetBuilder != null){
                     Map.Entry<List<KvRwset.KVRead>, KvRwset.QueryReadsMerkleSummary> entry = itr.getRangeQueryResultsHelper().done();
                     if(entry.getKey() != null){
-                        KvRwset.RangeQueryInfo rqi = itr.getRangeQueryInfo();
-                        KvRwset.QueryReads.Builder builder = rqi.getRawReads().toBuilder();
-                        builder = setKvReads(builder, entry.getKey());
-                        rqi.toBuilder().setRawReads(builder);
-                        itr.setRangeQueryInfo(rqi);
+                        KvRwset.RangeQueryInfo.Builder rqiBuilder = itr.getRangeQueryInfo().toBuilder();
+                        KvRwset.QueryReads.Builder builder = rqiBuilder.getRawReads().toBuilder();
+                        //add all kvReads
+                        builder.addAllKvReads(entry.getKey());
+                        itr.setRangeQueryInfo(rqiBuilder
+								.setRawReads(builder)
+								.build());
                     }
                     if(entry.getValue() != null){
                         itr.setRangeQueryInfo(itr.getRangeQueryInfo().toBuilder().setReadsMerkleHashes(entry.getValue()).build());
@@ -160,23 +163,13 @@ public class QueryHelper {
         }
     }
 
-    /**
-     * grpc set各种list貌似只能一个一个添加:( ...
-     */
-    private KvRwset.QueryReads.Builder setKvReads(KvRwset.QueryReads.Builder builder, List<KvRwset.KVRead> list){
-        for (int i = 0; i < list.size(); i++) {
-            builder.addKvReads(i, list.get(i));
-        }
-        return builder;
-    }
-
-    private void addToReadSet(String ns, String key, Height ver){
+    private void addToReadSet(String ns, String key, LedgerHeight ver){
         if(rwSetBuilder != null){
             rwSetBuilder.addToReadSet(ns, key, ver);
         }
     }
 
-    private void addToHashedReadSet(String ns, String coll, String key, Height ver) throws LedgerException{
+    private void addToHashedReadSet(String ns, String coll, String key, LedgerHeight ver) throws LedgerException{
         if(rwSetBuilder != null){
             rwSetBuilder.addToHashedReadSet(ns, coll, key, ver);
         }

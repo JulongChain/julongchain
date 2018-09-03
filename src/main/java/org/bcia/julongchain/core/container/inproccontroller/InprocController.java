@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,45 +14,99 @@
  * limitations under the License.
  */
 package org.bcia.julongchain.core.container.inproccontroller;
-
-import org.bcia.julongchain.common.exception.SmartContractException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.core.ssc.ISystemSmartContract;
+import org.bcia.julongchain.common.exception.InprocVMException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.core.ssc.SystemSmartContractBase;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 类描述
+ * In-process VM 控制器
  *
- * @author sunianle
- * @date @date 2018/05/17
+ * @author sunianle, sunzongyu
+ * @date 2018/05/17
  * @company Dingxuan
  */
 @Component
 public class InprocController {
-    private JavaChainLog log = JavaChainLogFactory.getLog(InprocContainer.class);
+	private static JulongChainLog log = JulongChainLogFactory.getLog(InprocContainer.class);
 
-    private Map<String,InprocContainer> typeRegistry=new HashMap<String,InprocContainer>();
-    private Map<String,InprocContainer>  instRegistry=new HashMap<String,InprocContainer>();
+	private static Map<String, InprocContainer> containers = new HashMap<>();
 
-    public void register(String sscPath, ISystemSmartContract contract) throws SmartContractException{
-        InprocContainer tmp=typeRegistry.get(sscPath);
-        if(tmp!=null){
-             String msg=String.format("%s already registered",sscPath);
-             throw new SmartContractException(msg);
-        }
-        InprocContainer container=new InprocContainer(contract);
-        typeRegistry.put(sscPath,container);
-    }
+	public void register(SystemSmartContractBase sysSmartcontract) throws InprocVMException{
+		String sscName = sysSmartcontract.getSystemSmartContractDescriptor().getSSCName();
+		if (isRegistered(sscName)) {
+			String msg = String.format("Before register, %s is already registered", sscName);
+			log.info(msg);
+			return;
+		}
+		containers.put(sscName, null);
+		log.info(sscName + " register success");
+	}
 
-    public Map<String, InprocContainer> getTypeRegistry() {
-        return typeRegistry;
-    }
+	public void logoff(String sscName) throws InprocVMException {
+		if (!isRegistered(sscName)) {
+			String msg = String.format("Before logoff, %s is not registered", sscName);
+			log.error(msg);
+			throw new InprocVMException(msg);
+		}
+		containers.remove(sscName);
+		log.info("Logoff : [" + sscName + "] successful.");
+	}
 
-    public Map<String, InprocContainer> getInstRegistry() {
-        return instRegistry;
-    }
+	public void deploy(SystemSmartContractBase sysSmartcontract,
+					   String[] args) throws InprocVMException {
+		String sscName = sysSmartcontract.getSystemSmartContractDescriptor().getSSCName();
+		if (!isRegistered(sscName)) {
+			String msg = String.format("Before deploy, %s is not registered", sscName);
+			log.error(msg);
+			throw new InprocVMException(msg);
+		}
+		if (isDeployed(sscName)) {
+			String msg = String.format("Before deploy, %s is already deployed", sscName);
+			log.info(msg);
+			return;
+		}
+		InprocContainer container = new InprocContainer(sysSmartcontract, args);
+		containers.put(sscName, container);
+		log.info("Deployed : [" + sscName + "] successful.");
+	}
+
+	public void deDeploy(String sscName) throws InprocVMException {
+		if (!isDeployed(sscName)) {
+			String msg = String.format("Before deDeploy, %s is not deployed", sscName);
+			log.error(msg);
+			throw new InprocVMException(msg);
+		}
+		containers.put(sscName, null);
+		log.info("Dedeployed : [" + sscName + "] successful.");
+	}
+
+	public boolean isRegistered(String sscName) {
+		return containers.containsKey(sscName);
+	}
+
+	public boolean isDeployed(String sscName) {
+		return containers.get(sscName) != null;
+	}
+
+	public void launch(String sscName) throws InprocVMException {
+		if (!isDeployed(sscName)) {
+			String msg = String.format("Before launch, %s is not deployed", sscName);
+			log.error(msg);
+			throw new InprocVMException(msg);
+		}
+		containers.get(sscName).startContainer();
+	}
+
+	public static Map<String, InprocContainer> getContainers() {
+		return containers;
+	}
+
+	public static void setContainers(Map<String, InprocContainer> containers) {
+		InprocController.containers = containers;
+	}
 }

@@ -13,15 +13,15 @@ public class LoadLocalMspFilesTest {
 
     @Test
     public void iteratorPath() {
-        LoadLocalMspFiles configBuilder = new LoadLocalMspFiles();
-        // configBuilder.iteratorPath("E:\\msp");
-
-        List<String> fileContent =  configBuilder.getPemMaterialFromDir("E:\\msp\\keystore\\");
-        System.out.println(fileContent.size());
-        String privatekey=new String(fileContent.get(0));
-
-        System.out.println(privatekey);
-        //init("E:\\msp");
+//        LoadLocalMspFiles configBuilder = new LoadLocalMspFiles();
+//        // configBuilder.iteratorPath("E:\\msp");
+//
+//        List<String> fileContent =  configBuilder.getPemMaterialFromDir("E:\\msp\\keystore\\");
+//        System.out.println(fileContent.size());
+//        String privatekey=new String(fileContent.get(0));
+//
+//        System.out.println(privatekey);
+//        //init("E:\\msp");
     }
 
     @Test

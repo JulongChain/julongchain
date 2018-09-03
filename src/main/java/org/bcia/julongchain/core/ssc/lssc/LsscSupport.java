@@ -16,7 +16,7 @@
 package org.bcia.julongchain.core.ssc.lssc;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.SysSmartContractException;
 import org.bcia.julongchain.common.policies.policy.IPolicy;
@@ -30,6 +30,7 @@ import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractProvi
 import org.bcia.julongchain.core.node.util.NodeUtils;
 import org.bcia.julongchain.msp.IMspManager;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
+import org.bcia.julongchain.msp.mgmt.MspMgmtMgr;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Policies;
 import org.bcia.julongchain.protos.node.ProposalPackage;
@@ -56,7 +57,7 @@ public class LsscSupport {
     public void putSmartContractToLocalStorage(ISmartContractPackage scPackage) throws SysSmartContractException{
         try {
             scPackage.putSmartcontractToFS();
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             String msg=String.format("Error installing smartcontract code %s:%s(%s)",
                     scPackage.getSmartContractData().getName(),
                     scPackage.getSmartContractData().getVersion(),
@@ -72,7 +73,7 @@ public class LsscSupport {
      * @param version
      * @return
      */
-    public ISmartContractPackage getSmartContractFromLocalStorage(String smartcontractName,String version) throws JavaChainException{
+    public ISmartContractPackage getSmartContractFromLocalStorage(String smartcontractName,String version) throws JulongChainException {
         return SmartContractProvider.getSmartContractFromFS(smartcontractName,version);
     }
 
@@ -81,7 +82,7 @@ public class LsscSupport {
      * data that have previously been persisted to local storage
      * @return
      */
-    public Query.SmartContractQueryResponse getSmartContractsFromLocalStorage()throws JavaChainException{
+    public Query.SmartContractQueryResponse getSmartContractsFromLocalStorage()throws JulongChainException {
         return SmartContractProvider.getInstalledSmartcontracts();
     }
 
@@ -98,7 +99,7 @@ public class LsscSupport {
             SignedSDSPackage sscPackage=(SignedSDSPackage)scPackage;
             try {
                 instantiationPolicy=sscPackage.getInstantiationPolicy();
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 throw new SysSmartContractException(e);
             }
             if(instantiationPolicy==null){
@@ -128,7 +129,7 @@ public class LsscSupport {
                                   String groupName,
                                   byte[] instantiationPolicy) throws SysSmartContractException{
         //create a policy object from the policy bytes
-        IMspManager mspManager = GlobalMspManagement.getManagerForChain(groupName);
+        IMspManager mspManager = MspMgmtMgr.getManagerForChain(groupName);
         if(mspManager==null){
             String msg=String.format("Error checking smartcontract instantiation policy: MSP getPolicyManager for group %s not found",groupName);
             throw new SysSmartContractException(msg);
@@ -153,8 +154,8 @@ public class LsscSupport {
         }
 
         SignedData signedData=new SignedData(signedProposal.getProposalBytes().toByteArray(),
-                                             shdr.getCreator().toByteArray(),
-                                             signedProposal.getSignature().toByteArray());
+                shdr.getCreator().toByteArray(),
+                signedProposal.getSignature().toByteArray());
         List<SignedData> datas=new ArrayList<SignedData>();
         datas.add(signedData);
         try {

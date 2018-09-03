@@ -21,7 +21,7 @@ import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
- * 类描述
+ * 信封业务对象
  *
  * @author zhouhui
  * @date 2018/05/26

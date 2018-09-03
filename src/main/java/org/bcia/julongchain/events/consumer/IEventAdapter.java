@@ -20,7 +20,7 @@ import org.bcia.julongchain.protos.node.EventsPackage;
 import java.util.List;
 
 /**
- * 类描述
+ * 事件适配器接口
  *
  * @author zhouhui
  * @date 2018/05/19

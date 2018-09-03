@@ -12,10 +12,12 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+
+Modified java_package and other contents by Dingxuan on 2018-08-21
 */
 syntax = "proto3";
 
-option java_package = "org.bica.julongchain.protos.node";
+option java_package = "org.bcia.julongchain.protos.node";
 option go_package = "github.com/hyperledger/fabric/protos/peer";
 
 package protos;
@@ -26,7 +28,7 @@ import "node/proposal_response.proto";
 message SignedSmartContractDeploymentSpec {
 
 	// This is the bytes of the ChaincodeDeploymentSpec
-	bytes smartcontract_deployment_spec = 1;
+	bytes smart_contract_deployment_spec = 1;
 
 	// This is the instantiation policy which is identical in structure
 	// to endorsement policy.  This policy is checked by the VSSC at commit
@@ -36,7 +38,7 @@ message SignedSmartContractDeploymentSpec {
 	bytes instantiation_policy = 2;
 
 	// The endorsements of the above deployment spec, the owner's signature over
-	// smartcontract_deployment_spec and Endorsement.endorser.
+	// smartContract_deployment_spec and Endorsement.endorser.
 	repeated Endorsement owner_endorsements = 3;
 }
 

@@ -21,7 +21,7 @@ import org.bcia.julongchain.protos.node.ProposalResponsePackage;
 import org.bcia.julongchain.protos.node.TransactionPackage;
 
 /**
- * 类描述
+ * VSSC校验器接口定义
  *
  * @author zhouhui
  * @date 2018/05/23

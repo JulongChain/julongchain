@@ -20,17 +20,14 @@ import io.grpc.Server;
 import io.grpc.netty.NettyServerBuilder;
 import io.grpc.stub.StreamObserver;
 import org.bcia.julongchain.common.exception.NodeException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.common.util.proto.ProposalResponseUtils;
 import org.bcia.julongchain.core.admin.IAdminServer;
 import org.bcia.julongchain.core.endorser.IEndorserServer;
 import org.bcia.julongchain.core.events.IDeliverEventsServer;
-import org.bcia.julongchain.core.smartcontract.node.SmartContractSupportService;
 import org.bcia.julongchain.protos.common.Common;
-import org.bcia.julongchain.protos.gossip.GossipGrpc;
-import org.bcia.julongchain.protos.gossip.Message;
 import org.bcia.julongchain.protos.node.*;
 
 import java.io.IOException;
@@ -43,7 +40,7 @@ import java.io.IOException;
  * @company Dingxuan
  */
 public class NodeGrpcServer {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(NodeGrpcServer.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(NodeGrpcServer.class);
     /**
      * 监听的端口
      */
@@ -91,8 +88,9 @@ public class NodeGrpcServer {
         server = NettyServerBuilder.forPort(port).maxMessageSize(CommConstant.MAX_GRPC_MESSAGE_SIZE)
 //        server = ServerBuilder.forPort(port)
                 .addService(new EndorserServerImpl())
-                .addService(new SmartContractSupportService())
+//                .addService(new SmartContractSupportService())
                 .addService(new AdminServerImpl())
+                .addService(new DeliverServerImpl())
                 .build()
                 .start();
         log.info("NodeGrpcServer start, port: " + port);
@@ -100,9 +98,9 @@ public class NodeGrpcServer {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                log.info("shutting down NodeGrpcServer since JVM is shutting down");
+                log.info("Shutting down NodeGrpcServer since JVM is shutting down");
                 NodeGrpcServer.this.stop();
-                log.error("NodeGrpcServer shut down");
+                log.info("NodeGrpcServer shut down");
             }
         });
     }
@@ -144,7 +142,7 @@ public class NodeGrpcServer {
                 responseObserver.onNext(proposalResponse);
                 responseObserver.onCompleted();
             } else {
-                log.error("endorserServer is not ready, but client sent some message: " + request);
+                log.error("EndorserServer is not ready, but client sent some message: " + request);
                 responseObserver.onError(new NodeException("endorserServer is not ready"));
                 responseObserver.onCompleted();
             }
@@ -161,8 +159,8 @@ public class NodeGrpcServer {
                         responseObserver.onNext(deliverEventsServer.deliver(value));
                         responseObserver.onCompleted();
                     } else {
-                        log.error("deliverEventsServer is not ready, but client sent some message: " + value);
-                        responseObserver.onError(new NodeException("deliverEventsServer is not ready"));
+                        log.error("DeliverEventsServer is not ready, but client sent some message: " + value);
+                        responseObserver.onError(new NodeException("DeliverEventsServer is not ready"));
                         responseObserver.onCompleted();
                     }
                 }
@@ -171,6 +169,7 @@ public class NodeGrpcServer {
                 public void onError(Throwable t) {
                     log.error(t.getMessage(), t);
                     responseObserver.onError(t);
+                    responseObserver.onCompleted();
                 }
 
                 @Override
@@ -191,8 +190,8 @@ public class NodeGrpcServer {
                         responseObserver.onNext(deliverEventsServer.deliverFiltered(value));
                         responseObserver.onCompleted();
                     } else {
-                        log.error("deliverEventsServer is not ready, but client sent some message: " + value);
-                        responseObserver.onError(new NodeException("deliverEventsServer is not ready"));
+                        log.error("DeliverEventsServer is not ready, but client sent some message: " + value);
+                        responseObserver.onError(new NodeException("DeliverEventsServer is not ready"));
                         responseObserver.onCompleted();
                     }
                 }
@@ -201,6 +200,7 @@ public class NodeGrpcServer {
                 public void onError(Throwable t) {
                     log.error(t.getMessage(), t);
                     responseObserver.onError(t);
+                    responseObserver.onCompleted();
                 }
 
                 @Override
@@ -212,34 +212,6 @@ public class NodeGrpcServer {
         }
     }
 
-    private class GossipServerImpl extends GossipGrpc.GossipImplBase {
-        @Override
-        public StreamObserver<Message.Envelope> gossipStream(StreamObserver<Message.Envelope> responseObserver) {
-            return new StreamObserver<Message.Envelope>() {
-                @Override
-                public void onNext(Message.Envelope value) {
-
-                }
-
-                @Override
-                public void onError(Throwable t) {
-
-                }
-
-                @Override
-                public void onCompleted() {
-
-                }
-            };
-        }
-
-        @Override
-        public void ping(Message.Empty request, StreamObserver<Message.Empty> responseObserver) {
-
-        }
-
-    }
-
     private class AdminServerImpl extends AdminGrpc.AdminImplBase {
         @Override
         public void getStatus(Empty request, StreamObserver<AdminPackage.ServerStatus>
@@ -248,7 +220,7 @@ public class NodeGrpcServer {
                 responseObserver.onNext(adminServer.getStatus());
                 responseObserver.onCompleted();
             } else {
-                log.error("adminServer is not ready, but client sent some message");
+                log.error("AdminServer is not ready, but client sent some message");
                 responseObserver.onError(new NodeException("adminServer is not ready"));
                 responseObserver.onCompleted();
             }

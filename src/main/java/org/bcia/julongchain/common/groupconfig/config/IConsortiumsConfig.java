@@ -18,7 +18,7 @@ package org.bcia.julongchain.common.groupconfig.config;
 import java.util.Map;
 
 /**
- * 对象
+ * 多联盟配置定义
  *
  * @author zhouhui
  * @date 2018/3/27

@@ -27,8 +27,11 @@ import org.bcia.julongchain.core.ledger.util.Util;
  * @company Dingxuan
  */
 public class HistoryDBHelper {
-    private static final byte[] COMPOSITE_KEY_SEP = {0x00};
-    private static final byte[] COMPOSITE_END_KEY = {Byte.MAX_VALUE};
+    private static final byte[] COMPOSITE_KEY_SEP = new String(new char[]{Character.MIN_VALUE}).getBytes();
+    private static final byte[] COMPOSITE_END_KEY = new String(new char[]{Character.MAX_VALUE}).getBytes();
+	private static final int MIN_HISTORY_KEY_LENGTH = 19;
+	private static final int BLOCK_NUM_AND_TRAN_NUM_LENGTH = 17;
+	private static final int TRAN_NUM_LENGTH = 8;
 
     /**
      * 将namespace, key, blockNum, tranNum组装为HistoryDB key
@@ -52,49 +55,45 @@ public class HistoryDBHelper {
         byte[] compositeKey = ns.getBytes();
         compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
         compositeKey = ArrayUtils.addAll(compositeKey, key.getBytes());
-        compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
         if(endKey){
             compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_END_KEY);
+        } else {
+	        compositeKey = ArrayUtils.addAll(compositeKey, COMPOSITE_KEY_SEP);
         }
         return compositeKey;
     }
 
+	public static byte[] removeLedgerIDFromHistoryKey(String ledgerID, byte[] historykey){
+		byte[] ledgerIDBytes = ledgerID.getBytes();
+		byte[] reuslt = new byte[historykey.length - 1 - ledgerIDBytes.length];
+		System.arraycopy(historykey, ledgerIDBytes.length + 1, reuslt, 0, reuslt.length);
+		return reuslt;
+	}
+
     /**
      * 解析HistoryDB key中的blockNum
      * @param byteToSplit 将要解析的bytes
-     * @param length 头部(ns + key)长度
      * @return blockNum
      */
-    public static long splitCompositeHistoryKeyForBlockNum(byte[] byteToSplit, int length){
-        if(length != byteToSplit.length - 17){
-            return -1;
-        }
-        return Util.bytesToLong(byteToSplit, length, BlockFileManager.PEEK_BYTES_LEN);
+    public static long splitCompositeHistoryKeyForBlockNum(byte[] byteToSplit){
+    	int length = byteToSplit.length;
+	    if (length <= MIN_HISTORY_KEY_LENGTH) {
+		    return -1;
+	    }
+        return Util.bytesToLong(byteToSplit, length - BLOCK_NUM_AND_TRAN_NUM_LENGTH, BlockFileManager.PEEK_BYTES_LEN);
     }
 
     /**
      * 解析HistoryDB key中的tranNum
      * @param byteToSplit 将要解析的bytes
-     * @param length 头部(ns + key)长度
      * @return blockNum
      */
-    public static long splitCompositeHistoryKeyForTranNum(byte[] byteToSplit, int length){
-        if(length != byteToSplit.length - 17){
-            return -1;
-        }
-        return Util.bytesToLong(byteToSplit, length + 9, BlockFileManager.PEEK_BYTES_LEN);
-    }
-
-    /**
-     * 获取History数据头部
-     */
-    public static byte[] splitCompositeHistoryKeyForHeader(byte[] byteToSplit){
-        if(byteToSplit.length <= 17){
-            return null;
-        }
-        byte[] header = new byte[byteToSplit.length - 17];
-        System.arraycopy(byteToSplit, 0, header, 0 , header.length);
-        return header;
+    public static long splitCompositeHistoryKeyForTranNum(byte[] byteToSplit){
+	    int length = byteToSplit.length;
+	    if (length <= MIN_HISTORY_KEY_LENGTH) {
+		    return -1;
+	    }
+        return Util.bytesToLong(byteToSplit, length - TRAN_NUM_LENGTH, BlockFileManager.PEEK_BYTES_LEN);
     }
 
     /**

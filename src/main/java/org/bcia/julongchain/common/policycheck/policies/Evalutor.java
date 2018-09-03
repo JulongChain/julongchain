@@ -17,26 +17,26 @@
 package org.bcia.julongchain.common.policycheck.policies;
 
 import org.bcia.julongchain.common.exception.PolicyException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.proto.SignedData;
 import org.bcia.julongchain.msp.IIdentity;
 import org.bcia.julongchain.msp.IIdentityDeserializer;
 import org.bcia.julongchain.protos.common.MspPrincipal;
 import org.bcia.julongchain.protos.common.Policies;
 
-import java.util.Date;
 import java.util.List;
 
 /**
  * 类描述
- *
+ * 策略评估的具体实现类
  * @author yuanjun
  * @date 31/05/18
  * @company Aisino
  */
 public class Evalutor implements IEvalutor{
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Evalutor.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Evalutor.class);
+    private static final int TYPE = 2;
     private List<IEvalutor> policies ;
     private Policies.SignaturePolicy policy;
     private IIdentityDeserializer deserializer;
@@ -50,41 +50,40 @@ public class Evalutor implements IEvalutor{
     }
 
     @Override
-    public boolean evalutor(List<SignedData> signedDatas, Boolean[] used) throws PolicyException {
-        if(policy.getTypeCase().getNumber() == 2){
-            Long grepKey = new Date().getTime();
-            log.debug("[%s] gate [%s] evaluation starts",signedDatas,grepKey);
+    public boolean evaluate(List<SignedData> signedDatas, Boolean[] used) throws PolicyException {
+        if(policy.getTypeCase().getNumber() == TYPE){
+            Long grepKey = System.currentTimeMillis();
+            log.debug("[%s] entrance [%s] evaluation starts",signedDatas,grepKey);
             int verified = 0;
-            Boolean[] _used = new Boolean[used.length];
+            Boolean[] newused = new Boolean[used.length];
             for(int i = 0; i < policies.size(); i++){
-                System.arraycopy(used,0,_used,0,used.length);
-                if(policies.get(i).evalutor(signedDatas,_used)){
+                System.arraycopy(used,0,newused,0,used.length);
+                if(policies.get(i).evaluate(signedDatas,newused)){
                     verified++;
-                    System.arraycopy(_used,0,used,0,used.length);
+                    System.arraycopy(newused,0,used,0,used.length);
                 }
             }
-            int N = policy.getNOutOf().getN();
-            if(verified >= N){
-                log.debug("[%p] gate [%s] evaluation succeeds",signedDatas,grepKey);
+            int n = policy.getNOutOf().getN();
+            if(verified >= n){
+                log.debug("[%p] entrance [%s] evaluation succeeds",signedDatas,grepKey);
             }else{
-                log.debug("[%p] gate [%s] evaluation  fails",signedDatas,grepKey);
+                log.debug("[%p] entrance [%s] evaluation  fails",signedDatas,grepKey);
             }
-            return verified >= N;
+            return verified >= n;
         }
         else{
             log.debug("[%p] signed by [%d] principal evaluation starts (used %v)",signedDatas,policy.getSignedBy(),used);
 
             for(int i=0;i<signedDatas.size();i++){
                 if(used[i]){
-                    log.debug("[%p] skipping identity [%d] because it has already been used", signedDatas, i);
+                    log.debug("[%p] ignoring identity [%d] because it has already been used", signedDatas, i);
                     continue;
                 }
-                // identity, err := deserializer.DeserializeIdentity(sd.Identity)
                 IIdentity iIdentity = null;
                 try {
                     iIdentity = deserializer.deserializeIdentity(signedDatas.get(i).getIdentity());
                 }catch (Exception e){
-                    String msg=String.format("Principal deserialization failure  %s for [%s]",e.getMessage(),signedDatas.get(i).getIdentity());
+                    String msg=String.format("Principal deserialization failure as message %s for [%s]",e.getMessage(),signedDatas.get(i).getIdentity());
                     throw new PolicyException(msg);
                 }
                 try {

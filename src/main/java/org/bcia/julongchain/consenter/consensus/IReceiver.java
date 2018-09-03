@@ -19,13 +19,23 @@ import org.bcia.julongchain.consenter.entity.BatchesMes;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
+ * 接收者接口,实现消息的排序和批次的切割
+ *
  * @author zhangmingyang
  * @Date: 2018/3/7
  * @company Dingxuan
  */
 public interface IReceiver {
-
+    /**
+     * 排序处理
+     * @param msg
+     * @return
+     */
     BatchesMes ordered(Common.Envelope msg);
 
+    /**
+     * 批次切割
+     * @return
+     */
     Common.Envelope[] cut();
 }

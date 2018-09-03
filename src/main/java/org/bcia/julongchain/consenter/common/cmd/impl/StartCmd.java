@@ -16,52 +16,70 @@
 package org.bcia.julongchain.consenter.common.cmd.impl;
 
 import org.apache.commons.cli.ParseException;
-import org.apache.gossip.GossipService;
-import org.bcia.julongchain.common.exception.GossipException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.deliver.DeliverDeliverHandler;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.localmsp.impl.LocalSigner;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.consenter.common.broadcast.BroadcastHandler;
 import org.bcia.julongchain.consenter.common.cmd.IConsenterCmd;
+import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfig;
+import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfigFactory;
+import org.bcia.julongchain.consenter.common.multigroup.Registrar;
 import org.bcia.julongchain.consenter.common.server.ConsenterServer;
-import org.bcia.julongchain.gossip.GossipServiceUtil;
+import org.bcia.julongchain.consenter.common.server.PreStart;
+import org.bcia.julongchain.consenter.util.ConsenterConstants;
 
 import java.io.IOException;
 
-import static org.bcia.julongchain.gossip.GossipServiceUtil.startConsenterGossip;
-
 /**
+ * 普通启动方式
+ *
  * @author zhangmingyang
  * @Date: 2018/3/2
  * @company Dingxuan
  */
 public class StartCmd implements IConsenterCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(StartCmd.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(StartCmd.class);
     private ConsenterServer consenterServer;
-    private static GossipService gossipService;
 
     public StartCmd() {
-        consenterServer = new ConsenterServer();
+        Registrar registrar = null;
+        ConsenterConfig consenterConfig = ConsenterConfigFactory.getConsenterConfig();
+        try {
+            registrar = new PreStart().initializeMultichannelRegistrar(consenterConfig, new LocalSigner());
+        } catch (JulongChainException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        DeliverDeliverHandler deliverHandler = new DeliverDeliverHandler(registrar, consenterConfig.getGeneral().getAuthentication().get(ConsenterConstants.TIMEWONDW));
+
+        consenterServer = new ConsenterServer(Integer.valueOf(consenterConfig.getGeneral().getListenPort()));
+        BroadcastHandler broadCastHandle = new BroadcastHandler(registrar);
+
+        consenterServer.bindBroadcastServer(broadCastHandle);
+
+        consenterServer.bindDeverServer(deliverHandler);
+
     }
 
     @Override
     public void execCmd(String[] args) throws ParseException {
         for (String str : args) {
-            log.info("arg-----$" + str);
+            log.info("Arg: " + str);
         }
         try {
             new Thread() {
                 @Override
                 public void run() {
                     try {
-                        gossipService= startConsenterGossip();
-                        log.info("gossip start port is  7053");
                         consenterServer.start();
                         consenterServer.blockUntilShutdown();
                     } catch (IOException ex) {
                         log.error(ex.getMessage(), ex);
                     } catch (InterruptedException ex) {
                         log.error(ex.getMessage(), ex);
-                    } catch (GossipException e) {
-                        e.printStackTrace();
                     }
                 }
             }.start();
@@ -69,9 +87,7 @@ public class StartCmd implements IConsenterCmd {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
-    public static GossipService getGossipService() {
-        return gossipService;
-    }
 }

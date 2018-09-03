@@ -20,8 +20,8 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.blockledger.IFactory;
 import org.bcia.julongchain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.julongchain.common.ledger.util.IoUtil;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -37,15 +37,15 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class JsonLedgerFactory implements IFactory {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(JsonLedgerFactory.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(JsonLedgerFactory.class);
 
     private String directory;
-    private Map<String, ReadWriteBase> ledgers;
+    private static Map<String, ReadWriteBase> ledgers;
 
     public JsonLedgerFactory(){}
 
     public JsonLedgerFactory(String directory) throws LedgerException{
-        logger.debug("Initializing json ledger at: " + directory);
+        log.debug("Initializing json ledger at: " + directory);
         //创建目录
         File file = new File(directory);
         if (!file.exists()){
@@ -53,7 +53,9 @@ public class JsonLedgerFactory implements IFactory {
         }
         //初始化
         this.directory = directory;
-        this.ledgers = new HashMap<>();
+		if (ledgers == null) {
+			ledgers = new HashMap<>();
+		}
 
         File[] infos = file.listFiles();
         if (infos != null) {
@@ -75,22 +77,22 @@ public class JsonLedgerFactory implements IFactory {
 
     @Override
     public synchronized ReadWriteBase getOrCreate(String groupID) throws LedgerException {
-        logger.debug("Starting create json ledger using group id " + groupID);
+        log.debug("Starting create json ledger using group id " + groupID);
         ReadWriteBase l = ledgers.get(groupID);
         if(l != null){
-            logger.debug("Group id " + groupID + " is already exists");
+            log.debug("Group id " + groupID + " is already exists");
             return l;
         }
         String directory = this.directory + File.separator + JsonLedger.GROUP_DIRECTORY_FORMAT_STRING + groupID;
-        logger.debug(String.format("Initializing group %s at: %s", groupID, directory));
+        log.debug(String.format("Initializing group %s at: %s", groupID, directory));
         if (!IoUtil.createDirIfMissing(directory)) {
             String errMsg = "Can not create dir " + directory;
-            logger.error(errMsg);
+            log.error(errMsg);
             throw new LedgerException(errMsg);
         }
         ReadWriteBase group = newGroup(directory);
         ledgers.put(groupID, group);
-        logger.debug("Finished create json ledger");
+        log.debug("Finished create json ledger");
         return group;
     }
 
@@ -99,7 +101,7 @@ public class JsonLedgerFactory implements IFactory {
         jl.setDirectory(directory);
         jl.setPrinter(JsonFormat.printer());
         jl.initializeBlockHeight();
-        logger.debug("Initialized to block height " + (jl.getHeight() - 1));
+        log.debug("Initialized to block height " + (jl.getHeight() - 1));
         return jl;
     }
 
@@ -125,7 +127,7 @@ public class JsonLedgerFactory implements IFactory {
         return ledgers;
     }
 
-    public void setLedgers(Map<String, ReadWriteBase> ledgers) {
-        this.ledgers = ledgers;
-    }
+	public static void setLedgers(Map<String, ReadWriteBase> ledgers) {
+		JsonLedgerFactory.ledgers = ledgers;
+	}
 }

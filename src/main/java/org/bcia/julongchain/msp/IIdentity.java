@@ -17,54 +17,71 @@ package org.bcia.julongchain.msp;
 
 import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.exception.VerifyException;
+import org.bcia.julongchain.msp.entity.IdentityIdentifier;
 import org.bcia.julongchain.msp.entity.OUIdentifier;
 import org.bcia.julongchain.protos.common.MspPrincipal;
 
+import java.io.IOException;
+import java.util.Date;
+
 /**
+ * 身份接口
  * @author zhangmingyang
  * @Date: 2018/3/8
  * @company Dingxuan
  */
 public interface IIdentity {
     /**
-     * ExpiresAt() time.Time 未定义
+     *到期时间
+     * @return
+     * @throws MspException
      */
-    /**
-     * 为定义该方法   定义实体类 IdentityIdentifier来实现  GetIdentifier() *IdentityIdentifier
-     */
+    Date expireAt() throws MspException;
 
     /**
-     * 返回此实例的msp id
+     * 获取身份
      * @return
      */
-
-
-
-     String getMSPIdentifier();
-
-     void validate();
-
-     OUIdentifier[] getOrganizationalUnits();
+    IdentityIdentifier getIdentifier();
 
     /**
-     * 使用此标识作为参考验证某个消息的签名
+     *获取msp身份
+     * @return
+     */
+    String getMSPIdentifier();
+
+    /**
+     * 验证
+     * @throws MspException
+     */
+    void validate() throws MspException;
+
+    /**
+     * 获取组织单元
+     * @return
+     * @throws MspException
+     */
+    OUIdentifier[] getOrganizationalUnits() throws MspException;
+
+    /**
+     * 消息验签
      * @param msg
      * @param sig
+     * @throws VerifyException
      */
-     void verify(byte[] msg, byte[] sig) throws VerifyException;
+    void verify(byte[] msg, byte[] sig) throws VerifyException;
 
     /**
-     * 将身份转换为字节
+     * 身份序列化
      * @return
      */
-     byte[] serialize();
+    byte[] serialize();
 
     /**
-     * SatisfiesPrincipal检查此实例是否匹配
-     在MSPPrincipal中提供的描述。 检查可能
-     涉及逐字节的比较（如果委托人是
-     序列化身份）或可能需要MSP验证
+     * mspprincipal
      * @param principal
+     * @throws MspException
+     * @throws IOException
      */
-     void satisfiesPrincipal(MspPrincipal.MSPPrincipal principal) throws MspException;
+    void satisfiesPrincipal(MspPrincipal.MSPPrincipal principal) throws MspException, IOException;
 }

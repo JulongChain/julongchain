@@ -21,7 +21,7 @@ import org.bcia.julongchain.protos.node.EventsPackage;
 import java.util.Date;
 
 /**
- * 类描述
+ * 事件工具类
  *
  * @author zhouhui
  * @date 2018/05/17

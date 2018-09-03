@@ -17,11 +17,11 @@ package org.bcia.julongchain.core.ssc.lssc;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.SysSmartContractException;
 import org.bcia.julongchain.common.groupconfig.config.IApplicationConfig;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policycheck.IPolicyChecker;
 import org.bcia.julongchain.common.policycheck.PolicyChecker;
 import org.bcia.julongchain.common.policycheck.cauthdsl.CAuthDslBuilder;
@@ -49,7 +49,7 @@ import org.bcia.julongchain.protos.common.Policies;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.Query;
 import org.bcia.julongchain.protos.node.SmartContractDataPackage;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -78,7 +78,7 @@ import java.util.regex.Pattern;
  */
 @Component
 public class LSSC  extends SystemSmartContractBase {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(LSSC.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(LSSC.class);
     //INSTALL install command
     public final static String INSTALL="install";
     //DEPLOY deploy command
@@ -96,8 +96,8 @@ public class LSSC  extends SystemSmartContractBase {
     //GETINSTALLEDMARTCONTRACTS gets the installed smartcontracts on a node
     public final static String GET_INSTALLED_SMARTCONTRACTS="getinstalledsmartcontracts";
 
-    public final static String allowedCharsSmartContractName="[A-Za-z0-9_-]+";
-    public final static String allowedCharsVersion="[A-Za-z0-9_.+-]+";
+    public final static String ALLOWED_CHARS_SMART_CONTRACT_NAME="[A-Za-z0-9_-]+";
+    public final static String ALLOWED_CHARS_VERSION="[A-Za-z0-9_.+-]+";
 
 //    @Autowired
     private LsscSupport support = new LsscSupport();
@@ -139,6 +139,9 @@ public class LSSC  extends SystemSmartContractBase {
         if(size<1){
             return newErrorResponse(String.format("Incorrect number of arguments, expected a minimum of 2,provided %d",size));
         }
+        for(int i = 0; i<args.size(); i++) {
+            System.out.println("=================:" + ByteString.copyFrom(args.get(i)).toStringUtf8());
+        }
         String function= ByteString.copyFrom(args.get(0)).toStringUtf8();
         //Handle ACL:
         //1. get the signed proposal
@@ -157,8 +160,8 @@ public class LSSC  extends SystemSmartContractBase {
                 }
                 // 2. check local MSP Admins policy
                 try{
-                   policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.Admins,sp);
-                }catch (JavaChainException e){
+                   policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.ADMINS,sp);
+                }catch (JulongChainException e){
                     log.error(e.getMessage(), e);
                     return newErrorResponse(String.format("Authorization for INSTALL has been denied (error-%s)",e.getMessage()));
                 }
@@ -190,13 +193,13 @@ public class LSSC  extends SystemSmartContractBase {
                     return newErrorResponse(String.format("Programming error, non-existent appplication config for group '%s'",groupName));
                 }
                 //the maximum number of arguments depends on the capability of the group
-                // TODO: 5/21/18  ac.getCapabilities() == null
-//                if((ac.getCapabilities().isPrivateGroupData()==false && size>6) ||
-//                        (ac.getCapabilities().isPrivateGroupData()==true && size>7)){
-//                    return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
-//                }
+				// TODO: 7/2/18 暂时没有能力capabilities概念
+                if((size>6 && !ac.getCapabilities().isPrivateGroupData()) ||
+                        (size>7 && ac.getCapabilities().isPrivateGroupData())){
+                    return newErrorResponse(String.format("Incorrect number of arguments, %d",size));
+                }
                 byte[] depSpecBytes2=args.get(2);
-                Smartcontract.SmartContractDeploymentSpec spec=null;
+                SmartContractPackage.SmartContractDeploymentSpec spec=null;
                 try {
                     spec=ProtoUtils.getSmartContractDeploymentSpec(depSpecBytes2);
                 }catch (InvalidProtocolBufferException e){
@@ -275,6 +278,7 @@ public class LSSC  extends SystemSmartContractBase {
                     case GET_SC_DATA:
                         resource=Resources.LSSC_GETSCDATA;
                         break;
+                    default:resource="";
                 }
                 try{
                     AclManagement.getACLProvider().checkACL(resource,groupName2,sp);
@@ -313,8 +317,8 @@ public class LSSC  extends SystemSmartContractBase {
                 }
                 //2. check local MSP Admins policy
                 try {
-                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.Admins,sp);
-                } catch (JavaChainException e) {
+                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.ADMINS,sp);
+                } catch (JulongChainException e) {
                     log.error(e.getMessage(), e);
                     return newErrorResponse(String.format("Authorization for GETSMARTCONTRACTS has been denied with error:%s",e.getMessage()));
                 }
@@ -325,8 +329,8 @@ public class LSSC  extends SystemSmartContractBase {
                 }
                 //2. check local MSP Admins policy
                 try {
-                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.Admins,sp);
-                } catch (JavaChainException e) {
+                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.ADMINS,sp);
+                } catch (JulongChainException e) {
                     log.error(e.getMessage(), e);
                     return newErrorResponse(String.format("Authorization for GETINSTALLEDSMARTCONTRACTS has been denied with error:%s",e.getMessage()));
                 }
@@ -441,7 +445,7 @@ public class LSSC  extends SystemSmartContractBase {
             String msg=String.format("SmartContractdata for%s unmarshal failed ",contractName);
             throw new SysSmartContractException(msg);
         }
-        if(scd.getName()!=contractName){
+        if(!(scd.getName().equals(contractName))){
             String msg=String.format("SmartContract mismatch:%s!=%s",contractName,scd.getName());
             throw new SysSmartContractException(msg);
         }
@@ -460,18 +464,18 @@ public class LSSC  extends SystemSmartContractBase {
         ISmartContractPackage scPack =null;
         try {
             scPack =support.getSmartContractFromLocalStorage(name, scd.getVersion());
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             String msg=String.format("Get smartcontract %s from localstorage failed:%s",name ,e.getMessage());
             throw new SysSmartContractException(msg);
         }
         try {
             scPack.validateSC(scd);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             String msg=String.format("InvalidSCOnFSError:%s",e.getMessage());
             throw new SysSmartContractException(msg);
         }
         //these are guaranteed to be non-nil because we got a valid scpack
-        Smartcontract.SmartContractDeploymentSpec depSpec = scPack.getDepSpec();
+        SmartContractPackage.SmartContractDeploymentSpec depSpec = scPack.getDepSpec();
         byte[] depSpecBytes = scPack.getDepSpecBytes();
         SmartContractCode smartContractCode=new SmartContractCode(scd,depSpec,depSpecBytes);
         return smartContractCode;
@@ -505,7 +509,7 @@ public class LSSC  extends SystemSmartContractBase {
                 scPack = support.getSmartContractFromLocalStorage(data.getName(), data.getVersion());
                 path=scPack.getDepSpec().getSmartContractSpec().getSmartContractId().getPath();
                 input=scPack.getDepSpec().getSmartContractSpec().getInput().toString();
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 log.error(e.getMessage());
             }
 
@@ -520,7 +524,7 @@ public class LSSC  extends SystemSmartContractBase {
             scInfoList.add(scInfo);
         }
 
-        Query.SmartContractQueryResponse scqr = Query.SmartContractQueryResponse.newBuilder().addAllSmartcontracts(scInfoList).build();
+        Query.SmartContractQueryResponse scqr = Query.SmartContractQueryResponse.newBuilder().addAllSmartContracts(scInfoList).build();
         byte[] scqrBytes = scqr.toByteArray();
         return newSuccessResponse(scqrBytes);
     }
@@ -535,7 +539,7 @@ public class LSSC  extends SystemSmartContractBase {
         Query.SmartContractQueryResponse scqr =null;
         try {
             scqr = support.getSmartContractsFromLocalStorage();
-        }catch (JavaChainException e){
+        }catch (JulongChainException e){
             return newErrorResponse(e.getMessage());
         }
         byte[] scqrBytes = scqr.toByteArray();
@@ -568,7 +572,7 @@ public class LSSC  extends SystemSmartContractBase {
             String msg=String.format("EmptySmartContractNameErr");
             throw new SysSmartContractException(msg);
         }
-        if(isValidSmartContractNameOrVersion(contractName,allowedCharsSmartContractName)==false){
+        if(isValidSmartContractNameOrVersion(contractName,ALLOWED_CHARS_SMART_CONTRACT_NAME)==false){
             String msg=String.format("InvalidChaincodeNameErr:%s",contractName);
             throw new SysSmartContractException(msg);
         }
@@ -588,7 +592,7 @@ public class LSSC  extends SystemSmartContractBase {
             String msg=String.format("EmptySmartContractVersionErr");
             throw new SysSmartContractException(msg);
         }
-        if(isValidSmartContractNameOrVersion(version,allowedCharsVersion)==false){
+        if(isValidSmartContractNameOrVersion(version,ALLOWED_CHARS_VERSION)==false){
             String msg=String.format("InvalidChaincodeVersionErr:%s",version);
             throw new SysSmartContractException(msg);
         }
@@ -607,12 +611,12 @@ public class LSSC  extends SystemSmartContractBase {
      * @param stub
      * @param scBytes
      */
-    private void executeInstall(ISmartContractStub stub,byte[] scBytes) throws SysSmartContractException{
+    public void executeInstall(ISmartContractStub stub,byte[] scBytes) throws SysSmartContractException{
         log.debug("Execute install.");
         ISmartContractPackage scPack=null;
         try {
             scPack=SmartContractProvider.getSmartContractPackage(scBytes);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             throw new SysSmartContractException(e.getMessage());
         }
         if(scPack==null){
@@ -620,7 +624,7 @@ public class LSSC  extends SystemSmartContractBase {
             throw new SysSmartContractException(message);
         }
 
-        Smartcontract.SmartContractDeploymentSpec scds = scPack.getDepSpec();
+        SmartContractPackage.SmartContractDeploymentSpec scds = scPack.getDepSpec();
         if(scds==null){
             String message="Null deployment spec from from the SC package";
             throw new SysSmartContractException(message);
@@ -643,7 +647,7 @@ public class LSSC  extends SystemSmartContractBase {
         byte[] statedbArtifactsTar=null;
         try {
             statedbArtifactsTar=SmartContractProvider.extractStateDBArtifactsFromSCPackage(scPack);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             throw new SysSmartContractException(e.getMessage());
         }
 
@@ -657,7 +661,7 @@ public class LSSC  extends SystemSmartContractBase {
         // that is, if there are errors deploying the indexes the chaincode install can safely be re-attempted later.
         try {
             ScEventManager.getMgr().handleSmartContractInstall(smartContractDefinition,statedbArtifactsTar);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             throw new SysSmartContractException(e);
         }
         // Finally, if everything is good above, install the chaincode to local peer file system so that endorsements can start
@@ -690,7 +694,7 @@ public class LSSC  extends SystemSmartContractBase {
      */
     private SmartContractDataPackage.SmartContractData executeDeployOrUpgrade(ISmartContractStub stub,
                                                      String groupName,
-                                                     Smartcontract.SmartContractDeploymentSpec scds,
+                                                     SmartContractPackage.SmartContractDeploymentSpec scds,
                                                      byte [] policy,
                                                      byte [] essc,
                                                      byte [] vssc,
@@ -710,7 +714,7 @@ public class LSSC  extends SystemSmartContractBase {
         String version=scds.getSmartContractSpec().getSmartContractId().getVersion();
         try {
             scPack=support.getSmartContractFromLocalStorage(name,version);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             String msg=String.format("Get smartcontract %s from localstorage failed:%s",name ,e.getMessage());
             throw new SysSmartContractException(msg);
         }
@@ -744,7 +748,7 @@ public class LSSC  extends SystemSmartContractBase {
     private SmartContractDataPackage.SmartContractData executeDeploy(
             ISmartContractStub stub,
             String groupName,
-            Smartcontract.SmartContractDeploymentSpec scds,
+            SmartContractPackage.SmartContractDeploymentSpec scds,
             byte[] policy,
             byte[] essc,
             byte[] vssc,
@@ -791,7 +795,7 @@ public class LSSC  extends SystemSmartContractBase {
     private SmartContractDataPackage.SmartContractData executeUpgrade(
             ISmartContractStub stub,
             String groupName,
-            Smartcontract.SmartContractDeploymentSpec scds,
+            SmartContractPackage.SmartContractDeploymentSpec scds,
             byte[] policy,
             byte[] essc,
             byte[] vssc,

@@ -20,10 +20,10 @@ import com.google.protobuf.Timestamp;
 import io.grpc.ManagedChannel;
 import io.grpc.netty.NettyChannelBuilder;
 import io.grpc.stub.StreamObserver;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.csp.factory.CspManager;
@@ -44,7 +44,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public class EventsClient {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(EventsClient.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(EventsClient.class);
 
     /**
      * 最小注册时间(100ms)
@@ -124,7 +124,7 @@ public class EventsClient {
 
         ISigningIdentity signingIdentity = localMsp.getDefaultSigningIdentity();
 
-        byte[] creator = signingIdentity.serialize();
+        byte[] creator = signingIdentity.getIdentity().serialize();
 
         EventsPackage.Event.Builder eventBuilder = EventsPackage.Event.newBuilder(event);
         eventBuilder.setCreator(ByteString.copyFrom(creator));
@@ -164,7 +164,7 @@ public class EventsClient {
     public void registerAsync(RegistrationConfig config) {
         IMsp localMsp = GlobalMspManagement.getLocalMsp();
         ISigningIdentity signingIdentity = localMsp.getDefaultSigningIdentity();
-        byte[] creator = signingIdentity.serialize();
+        byte[] creator = signingIdentity.getIdentity().serialize();
 
         EventsPackage.Register.Builder registerBuilder = EventsPackage.Register.newBuilder();
         registerBuilder.addAllEvents(config.getInterestedEvents()).build();
@@ -183,7 +183,7 @@ public class EventsClient {
         } catch (IOException e) {
             //TODO 是否要抛出该异常
             log.error(e.getMessage(), e);
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             //TODO
             log.error(e.getMessage(), e);
         }
@@ -228,7 +228,7 @@ public class EventsClient {
     public void unRegisterAsync(RegistrationConfig config) {
         IMsp localMsp = GlobalMspManagement.getLocalMsp();
         ISigningIdentity signingIdentity = localMsp.getDefaultSigningIdentity();
-        byte[] creator = signingIdentity.serialize();
+        byte[] creator = signingIdentity.getIdentity().serialize();
 
         EventsPackage.Unregister.Builder unregisterBuilder = EventsPackage.Unregister.newBuilder();
         unregisterBuilder.addAllEvents(config.getInterestedEvents()).build();
@@ -259,11 +259,11 @@ public class EventsClient {
      * @throws ValidateException
      */
     public void start() throws ValidateException {
-        ValidateUtils.isNotNull(eventAdapter, "eventAdapter can not be null");
+        ValidateUtils.isNotNull(eventAdapter, "EventAdapter can not be null");
 
         List<EventsPackage.Interest> interestedEvents = eventAdapter.getInterestedEvents();
         if (interestedEvents == null || interestedEvents.size() <= 0) {
-            throw new ValidateException("interestedEvents is empty");
+            throw new ValidateException("InterestedEvents is empty");
         }
 
         RegistrationConfig config = new RegistrationConfig();

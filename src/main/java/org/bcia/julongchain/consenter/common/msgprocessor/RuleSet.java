@@ -20,6 +20,8 @@ import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
+ * 规则集合
+ *
  * @author zhangmingyang
  * @Date: 2018/5/25
  * @company Dingxuan

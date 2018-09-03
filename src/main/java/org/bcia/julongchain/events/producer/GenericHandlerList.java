@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 类描述
+ * 通用处理器列表
  *
  * @author zhouhui
  * @date 2018/05/18
@@ -34,8 +34,8 @@ public class GenericHandlerList implements IHandlerList {
 
     @Override
     public boolean add(EventsPackage.Interest interest, EventHandler eventHandler) throws ValidateException {
-        ValidateUtils.isNotNull(interest, "interest can not be null");
-        ValidateUtils.isNotNull(eventHandler, "eventHandler can not be null");
+        ValidateUtils.isNotNull(interest, "Interest can not be null");
+        ValidateUtils.isNotNull(eventHandler, "EventHandler can not be null");
 
         synchronized (this) {
             if (handlers.containsKey(eventHandler)) {
@@ -49,8 +49,8 @@ public class GenericHandlerList implements IHandlerList {
 
     @Override
     public boolean delete(EventsPackage.Interest interest, EventHandler eventHandler) throws ValidateException {
-        ValidateUtils.isNotNull(interest, "interest can not be null");
-        ValidateUtils.isNotNull(eventHandler, "eventHandler can not be null");
+        ValidateUtils.isNotNull(interest, "Interest can not be null");
+        ValidateUtils.isNotNull(eventHandler, "EventHandler can not be null");
 
         synchronized (this) {
             if (!handlers.containsKey(eventHandler)) {

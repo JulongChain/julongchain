@@ -16,13 +16,13 @@
 package org.bcia.julongchain.common.exception;
 
 /**
- * 对象
+ * 提交节点异常
  *
  * @author zhouhui
  * @date 2018/4/18
  * @company Dingxuan
  */
-public class CommitterException extends JavaChainException {
+public class CommitterException extends JulongChainException {
     private static final String MODULE_NAME = "[Committer]";
 
     public CommitterException() {

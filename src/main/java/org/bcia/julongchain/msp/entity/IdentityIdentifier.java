@@ -16,13 +16,15 @@
 package org.bcia.julongchain.msp.entity;
 
 /**
+ * 身份实体标识对象
+ *
  * @author zhangmingyang
  * @Date: 2018/3/6
  * @company Dingxuan
  */
 public class IdentityIdentifier {
-    public String Mspid;
-    public String Id;
+    private String Mspid;
+    private String Id;
 
     public IdentityIdentifier(String mspid, String id) {
         Mspid = mspid;

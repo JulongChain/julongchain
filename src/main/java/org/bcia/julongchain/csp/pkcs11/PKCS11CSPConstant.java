@@ -18,62 +18,53 @@ package org.bcia.julongchain.csp.pkcs11;
 /**
  * Class description
  *
- * @author
+ * @author Ying Xu
  * @date 4/19/18
  * @company FEITIAN
  */
 public class PKCS11CSPConstant {
 
-    // ECDSA Elliptic Curve Digital Signature Algorithm (key gen, import, sign, verify),
-    // at default security level.
-    // Each CSP may or may not support default security level. If not supported than
-    // an error will be returned.
+    // ECDSA
     public static final String ECDSA = "ECDSA";
     public static final String ECDSA192 = "ECDSA192";
-    // ECDSA Elliptic Curve Digital Signature Algorithm over P-256 curve
+    // ECDSA P-256 curve
     public static final String ECDSA256 = "ECDSA256";
-    // ECDSA Elliptic Curve Digital Signature Algorithm over P-384 curve
+    // ECDSA P-384 curve
     public static final String ECDSA384 = "ECDSA384";
     // ECDSAReRand ECDSA key re-randomization
     public static final String ECDSAReRand = "ECDSAReRand";
-    // RSA at the default security level.
-    // Each CSP may or may not support default security level. If not supported than
-    // an error will be returned.
+    // RSA
     public static final String RSA = "RSA";
-    // RSA at 1024 bit security level.
+    // RSA 1024 bit
     public static final String RSA1024 = "RSA1024";
-    // RSA at 2048 bit security level.
+    // RSA 2048 bit
     public static final String RSA2048 = "RSA2048";
-    // RSA at 3072 bit security level.
+    // RSA 3072 bit
     public static final String RSA3072 = "RSA3072";
-    // RSA at 4096 bit security level.
+    // RSA 4096 bit
     public static final String RSA4096 = "RSA4096";
-    // AES Advanced Encryption Standard at the default security level.
-    // Each CSP may or may not support default security level. If not supported than
-    // an error will be returned.
+    // AES
     public static final String AES = "AES";
-    // AES Advanced Encryption Standard at 128 bit security level
+    // AES 128 bit
     public static final String AES128 = "AES128";
-    // AES Advanced Encryption Standard at 192 bit security level
+    // AES 192 bit
     public static final String AES192 = "AES192";
-    // AES Advanced Encryption Standard at 256 bit security level
+    // AES 256 bit
     public static final String AES256 = "AES256";
 
-    // HMAC keyed-hash message authentication code
+
     public static final String HMAC = "HMAC";
-    // HMACTruncated256 HMAC truncated at 256 bits.
+
     public static final String HMACTruncated256 = "HMAC_TRUNCATED_256";
 
-    // SHA Secure Hash Algorithm using default family.
-    // Each CSP may or may not support default security level. If not supported than
-    // an error will be returned.
+
     public static final String SHA = "SHA";
 
     public static final String SHA1 = "SHA1";
 
-    // SHA2 is an identifier for SHA2 hash family
+    // SHA2
     public static final String SHA2 = "SHA2";
-    // SHA3 is an identifier for SHA3 hash family
+    // SHA3
     public static final String SHA3 = "SHA3";
 
     // SHA256
@@ -95,4 +86,19 @@ public class PKCS11CSPConstant {
     public static final long CKM_SHA3_256_RSA_PKCS = 0x00000060L;
     public static final long CKM_SHA3_384_RSA_PKCS = 0x00000061L;
     public static final long CKM_DERIVEECCKEY = 0x80000002L;
+    
+    
+    public static final byte TAG = 0x04;
+    public static final int  CARDINAL_NUM = 2;
+    
+    public static final int CLS_SELF = 0;
+    public static final int CLS_GENKEY = 1;
+    public static final int CLS_IMPORTKEY = 2;
+    public static final int CLS_GETKEY = 3;
+    public static final int CLS_SIGN = 4;
+    public static final int CLS_VERIFY = 5;
+    public static final int CLS_ENCRYPT = 6;
+    public static final int CLS_DECRYPT = 7;
+    public static final int CLS_DERIV = 8;
+    
 }

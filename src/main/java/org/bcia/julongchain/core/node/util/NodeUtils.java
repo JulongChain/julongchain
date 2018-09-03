@@ -17,11 +17,12 @@ package org.bcia.julongchain.core.node.util;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.StringUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.NodeException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.common.resourceconfig.IResourcesConfigBundle;
 import org.bcia.julongchain.common.util.proto.BlockUtils;
 import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
@@ -42,16 +43,16 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class NodeUtils {
-    private static final JavaChainLog log = JavaChainLogFactory.getLog(NodeUtils.class);
+    private static final JulongChainLog log = JulongChainLogFactory.getLog(NodeUtils.class);
 
     public static INodeLedger getLedger(String groupId) {
 //        if (StringUtils.isBlank(groupId)) {
 //            return null;
 //        }
 //
-//        Node node = null;
+//        PolicyNode node = null;
 //        try {
-//            node = Node.getInstance();
+//            node = PolicyNode.getInstance();
 //        } catch (NodeException e) {
 //            log.error(e.getMessage(), e);
 //        }
@@ -111,9 +112,9 @@ public class NodeUtils {
      * CreateChainFromBlock creates a new chain from config block
      *
      * @param block
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    public static void createChainFromBlock(Common.Block block) throws JavaChainException {
+    public static void createChainFromBlock(Common.Block block) throws JulongChainException {
         String groupId = BlockUtils.getGroupIDFromBlock(block);
         INodeLedger ledger = LedgerManager.createLedger(block);
 
@@ -129,7 +130,7 @@ public class NodeUtils {
                 node.createGroup(groupId, ledger, block);
             } catch (InvalidProtocolBufferException e) {
                 log.error(e.getMessage(), e);
-                throw new JavaChainException(e);
+                throw new JulongChainException(e);
             }
         }
     }
@@ -189,15 +190,34 @@ public class NodeUtils {
             Node node = Node.getInstance();
             Map<String, Group> groupMap = node.getGroupMap();
 
-            for (String groupId : groupMap.keySet()) {
+            for (String groupId: groupMap.keySet()) {
                 Query.GroupInfo groupInfo = Query.GroupInfo.newBuilder().setGroupId(groupId).build();
                 groupInfoList.add(groupInfo);
-                log.info("groupId-----$" + groupId);
+                log.info("GroupId: " + groupId);
             }
         } catch (NodeException e) {
             log.error(e.getMessage(), e);
         }
 
         return groupInfoList;
+    }
+
+    public static IResourcesConfigBundle getResourcesConfigBundle(String groupId) {
+        Node node = null;
+        try {
+            node = Node.getInstance();
+        } catch (NodeException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        if (node != null) {
+            Map<String, Group> groupMap = node.getGroupMap();
+            Group group = groupMap.get(groupId);
+            if (group != null) {
+                return group.getGroupSupport().getResourcesConfigBundle();
+            }
+        }
+
+        return null;
     }
 }

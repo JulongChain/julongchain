@@ -18,8 +18,8 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.common.ledger.util.leveldbhelper.LevelDBProvider;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDBProvider;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
@@ -32,19 +32,19 @@ import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
  * @company Dingxuan
  */
 public class VersionedLevelDBProvider implements IVersionedDBProvider {
-
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(VersionedLevelDBProvider.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(VersionedLevelDBProvider.class);
 
     private IDBProvider db;
 
     public VersionedLevelDBProvider() throws LedgerException {
         String dbPath = LedgerConfig.getStateLevelDBPath();
         this.db = new LevelDBProvider(dbPath);
-        logger.debug("Create vdb using path " + this.db.getDBPath());
+        log.debug("Create vdb using path " + this.db.getDBPath());
     }
 
     @Override
     public IVersionedDB getDBHandle(String id) throws LedgerException {
+    	this.db = ((LevelDBProvider) db).getDBHandle(id);
         return new VersionedLevelDB(db, db.getDb().getDbName());
     }
 

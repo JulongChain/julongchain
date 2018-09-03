@@ -32,7 +32,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IHash;
 import org.bcia.julongchain.csp.intfs.IKey;
@@ -139,7 +139,7 @@ public class TestKeyOpts {
 			byte[] signature = csp.sign(mykey, bytehash, RsaSignOpts.SHA1);
 			boolean bverify = csp.verify(mykey, signature, bytehash, RsaSignOpts.SHA1);
 			return ;
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -183,7 +183,7 @@ public class TestKeyOpts {
 			
 			return;
             
-        } catch (JavaChainException| InvalidKeyException |NoSuchAlgorithmException| SignatureException e) {
+        } catch (JulongChainException | InvalidKeyException |NoSuchAlgorithmException| SignatureException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -216,7 +216,7 @@ public class TestKeyOpts {
 			boolean rv1 = compereByteArray(input2.getBytes(),data1);
 			*/
 			return ;
-    	}catch(JavaChainException e) {
+    	}catch(JulongChainException e) {
     		e.printStackTrace();
     	}
     }
@@ -259,7 +259,7 @@ public class TestKeyOpts {
 			boolean rv = compereByteArray(input2.getBytes(),data);
 			return;
 			
-    	} catch (JavaChainException| NoSuchAlgorithmException|NoSuchPaddingException
+    	} catch (JulongChainException | NoSuchAlgorithmException|NoSuchPaddingException
     			|InvalidKeyException|BadPaddingException|IllegalBlockSizeException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -291,7 +291,7 @@ public class TestKeyOpts {
 			boolean bverify = csp.verify(mykey, signvalue, bytehash, EcdsaSignOpts.SHA1);
 			return;
 			
-        } catch (JavaChainException e) {
+        } catch (JulongChainException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -344,7 +344,7 @@ public class TestKeyOpts {
 			boolean bverify2 = signature.verify(temp);
 			return;
 		    
-		} catch (JavaChainException| InvalidKeyException|InvalidAlgorithmParameterException
+		} catch (JulongChainException | InvalidKeyException|InvalidAlgorithmParameterException
 				|NoSuchAlgorithmException| SignatureException|NoSuchProviderException e) {
 		    // TODO Auto-generated catch block
 		    e.printStackTrace();
@@ -374,7 +374,7 @@ public class TestKeyOpts {
 			byte[] signvalue = csp.sign(mynewkey, bytehash, EcdsaSignOpts.SHA1); 
 			boolean bverify = csp.verify(mynewkey, signvalue, bytehash, EcdsaSignOpts.SHA1);
             return ;
-    	} catch (JavaChainException e) {
+    	} catch (JulongChainException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -402,7 +402,7 @@ public class TestKeyOpts {
 			byte[] ciphertext1 = cipher.doFinal(input2.getBytes());
 			
     		return;
-    	} catch (JavaChainException|NoSuchAlgorithmException| NoSuchPaddingException
+    	} catch (JulongChainException |NoSuchAlgorithmException| NoSuchPaddingException
     			|InvalidKeyException|BadPaddingException|IllegalBlockSizeException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

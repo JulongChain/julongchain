@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,8 +22,8 @@ import org.bcia.julongchain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.common.ledger.util.IoUtil;
 import org.bcia.julongchain.common.ledger.util.leveldbhelper.LevelDBProvider;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public class FsBlockStoreProvider implements IBlockStoreProvider {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(FsBlockStoreProvider.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(FsBlockStoreProvider.class);
 
     private IndexConfig indexConfig;
     private IDBProvider leveldbProvider;
@@ -48,7 +48,7 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
         this.indexConfig = indexConfig;
         this.leveldbProvider = new LevelDBProvider(config.getIndexDir());
         this.config = config;
-        logger.debug("Creating fsBlockStore using path = " + config.getChainsDir());
+        log.debug("Creating fsBlockStore using path = " + config.getChainsDir());
     }
 
     /**
@@ -65,14 +65,14 @@ public class FsBlockStoreProvider implements IBlockStoreProvider {
      */
     @Override
     public IBlockStore openBlockStore(String ledgerID) throws LedgerException {
-        return FsBlockStore.newFsBlockStore(ledgerID, config, indexConfig, leveldbProvider);
+        return FsBlockStore.newFsBlockStore(ledgerID, config, indexConfig, ((LevelDBProvider) leveldbProvider).getDBHandle(ledgerID));
     }
 
     /**
      * 给出的ledgerid是否存在文件系统
      */
     @Override
-    public Boolean exists(String ledgerID) {
+    public boolean exists(String ledgerID) {
          return IoUtil.fileExists(config.getLedgerBlockDir(ledgerID)) >= 0;
     }
 

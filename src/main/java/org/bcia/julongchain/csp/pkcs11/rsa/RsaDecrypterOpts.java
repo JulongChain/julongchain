@@ -23,7 +23,7 @@ import sun.security.pkcs11.wrapper.PKCS11Constants;
 /**
  * RSA Decrypter Opts
  *
- * @author xuying
+ * @author Ying Xu
  * @date 2018/05/20
  * @company FEITIAN
  */
@@ -43,6 +43,14 @@ public enum RsaDecrypterOpts implements IDecrypterOpts {
     private long mechanism;
     private boolean flagpub;
 
+
+    /**
+     * Opt for decrypt with rsa
+     * @param padding       Decrypter padding type
+     * @param mechanism     Decrypter mechanism
+     * @param flagpub       Key type identification(PublicKey: true, PrivateKey false)
+     * @param index         Index num
+     */
     private RsaDecrypterOpts(String padding, long mechanism, boolean flagpub, int index) {
         this.mechanism = mechanism;
         this.padding = padding;

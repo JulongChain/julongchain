@@ -1,0 +1,636 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+# Modified some contents by Dingxuan on 2018-05-17
+#
+
+###############################################################################
+#
+#    LOGGING section
+#
+###############################################################################
+#logging:
+
+    # Default logging levels are specified here.
+
+    # Valid logging levels are case-insensitive strings chosen from
+
+    #     CRITICAL | ERROR | WARNING | NOTICE | INFO | DEBUG
+
+    # The overall default logging level can be specified in various ways,
+    # listed below from strongest to weakest:
+    #
+    # 1. The --logging-level=<level> command line option overrides all other
+    #    default specifications.
+    #
+    # 2. The environment variable CORE_LOGGING_LEVEL otherwise applies to
+    #    all node commands if defined as a non-empty string.
+    #
+    # 3. The value of `level` that directly follows in this file.
+    #
+    # If no overall default level is provided via any of the above methods,
+    # the node will default to INFO (the value of defaultLevel in
+    # common/flogging/logging.go)
+
+    # Default for all modules running within the scope of a node.
+    # Note: this value is only used when --logging-level or CORE_LOGGING_LEVEL
+    #       are not set
+    #level:       info
+
+    # The overall default values mentioned above can be overridden for the
+    # specific components listed in the override section below.
+
+    # Override levels for various node modules. These levels will be
+    # applied once the node has completely started. They are applied at this
+    # time in order to be sure every logger has been registered with the
+    # logging package.
+    # Note: the modules listed below are the only acceptable modules at this
+    #       time.
+    #cauthdsl:   warning
+    #gossip:     warning
+    #grpc:       error
+    #ledger:     info
+    #msp:        warning
+    #policies:   warning
+    #nodeGossip: warning
+
+    # Message format for the node logs
+    #format: '%{color}%{time:2006-01-02 15:04:05.000 MST} [%{module}] %{shortfunc} -> %{level:.4s} %{id:03x}%{color:reset} %{message}'
+
+###############################################################################
+#
+#    Node section
+#
+###############################################################################
+node:
+
+    # The Node id is used for identifying this Node instance.
+    id: jdoe
+
+    # The networkId allows for logical seperation of networks
+    networkId: dev
+
+    # The Address at local network interface this Node will listen on.
+    # By default, it will listen on all network interfaces
+    listenAddress: 0.0.0.0:7051
+
+    consenterAddress: 0.0.0.0:7050
+
+    # The endpoint this node uses to listen for inbound smartContract connections.
+    # If this is commented-out, the listen address is selected to be
+    # the node's address (see below) with port 7052
+    smartContractListenAddress: 0.0.0.0:7052
+
+    # The endpoint the smartContract for this node uses to connect to the node.
+    # If this is not specified, the smartContractListenAddress address is selected.
+    # And if smartContractListenAddress is not specified, address is selected from
+    # node listenAddress.
+    # smartContractAddress: 0.0.0.0:7052
+
+    # When used as node config, this represents the endpoint to other nodes
+    # in the same organization. For nodes in other organization, see
+    # gossip.externalEndpoint for more info.
+    # When used as CLI config, this means the node's endpoint to interact with
+    address: 0.0.0.0:7051
+
+    # Whether the Node should programmatically determine its address
+    # This case is useful for docker containers.
+    addressAutoDetect: false
+
+    # Setting for runtime.GOMAXPROCS(n). If n < 1, it does not change the
+    # current setting
+    # gomaxprocs: -1
+
+    # Keepalive settings for node server and clients
+    keepalive:
+        # MinInterval is the minimum permitted time between client pings.
+        # If clients send pings more frequently, the node server will
+        # disconnect them
+        # minInterval: 60000
+        #client:
+        # Client keepalive settings for communicating with other node nodes
+            # Interval is the time between pings to node nodes.  This must
+            # greater than or equal to the minInterval specified by node
+            # nodes
+        clientInterval: 60000
+            # Timeout is the duration the client waits for a response from
+            # node nodes before closing the connection
+        clientTimeout: 20000
+        # DeliveryClient keepalive settings for communication with ordering
+        # nodes.
+        #deliveryClient:
+            # Interval is the time between pings to ordering nodes.  This must
+            # greater than or equal to the minInterval specified by ordering
+            # nodes.
+        deliveryClientInterval: 60000
+            # Timeout is the duration the client waits for a response from
+            # ordering nodes before closing the connection
+        deliveryClientTimeout: 20000
+
+
+    # Gossip related configuration
+    gossip:
+
+        commiterAddress: 127.0.0.1:7060
+        consenterAddress: 127.0.0.1:7050
+
+        # Bootstrap set to initialize gossip with.
+        # This is a list of other nodes that this node reaches out to at startup.
+        # Important: The endpoints here have to be endpoints of nodes in the same
+        # organization, because the node would refuse connecting to these endpoints
+        # unless they are in the same organization as the node.
+        bootstrap: 127.0.0.1:7051
+
+        # NOTE: orgLeader and useLeaderElection parameters are mutual exclusive.
+        # Setting both to true would result in the termination of the node
+        # since this is undefined state. If the nodes are configured with
+        # useLeaderElection=false, make sure there is at least 1 node in the
+        # organization that its orgLeader is set to true.
+
+        # Defines whenever node will initialize dynamic algorithm for
+        # "leader" selection, where leader is the node to establish
+        # connection with ordering service and use delivery protocol
+        # to pull ledger blocks from ordering service. It is recommended to
+        # use leader election for large networks of nodes.
+        useLeaderElection: true
+        # Statically defines node to be an organization "leader",
+        # where this means that current node will maintain connection
+        # with ordering service and disseminate block across nodes in
+        # its own organization
+        orgLeader: false
+
+        # Overrides the endpoint that the node publishes to nodes
+        # in its organization. For nodes in foreign organizations
+        # see 'externalEndpoint'
+        endpoint:
+        # Maximum count of blocks stored in memory
+        maxBlockCountToStore: 100
+        # Max time between consecutive message pushes(unit: millisecond)
+        maxPropagationBurstLatency: 10
+        # Max number of messages stored until a push is triggered to remote nodes
+        maxPropagationBurstSize: 10
+        # Number of times a message is pushed to remote nodes
+        propagateIterations: 1
+        # Number of nodes selected to push messages to
+        propagateNodeNum: 3
+        # Determines frequency of pull phases(unit: second)
+        pullInterval: 4000
+        # Number of nodes to pull from
+        pullNodeNum: 3
+        # Determines frequency of pulling state info messages from nodes(unit: second)
+        requestStateInfoInterval: 4000
+        # Determines frequency of pushing state info messages to nodes(unit: second)
+        publishStateInfoInterval: 4000
+        # Maximum time a stateInfo message is kept until expired
+        stateInfoRetentionInterval: 0
+        # Time from startup certificates are included in Alive messages(unit: second)
+        publishCertPeriod: 10000
+        # Should we skip verifying block messages or not (currently not in use)
+        skipBlockVerification: false
+        # Dial timeout(unit: second)
+        dialTimeout: 3000
+        # Connection timeout(unit: second)
+        connTimeout: 2000
+        # Buffer size of received messages
+        recvBuffSize: 20
+        # Buffer size of sending messages
+        sendBuffSize: 200
+        # Time to wait before pull engine processes incoming digests (unit: second)
+        digestWaitTime: 1000
+        # Time to wait before pull engine removes incoming nonce (unit: second)
+        requestWaitTime: 1000
+        # Time to wait before pull engine ends pull (unit: second)
+        responseWaitTime: 2000
+        # Alive check interval(unit: second)
+        aliveTimeInterval: 5000
+        # Alive expiration timeout(unit: second)
+        aliveExpirationTimeout: 25000
+        # Reconnect interval(unit: second)
+        reconnectInterval: 25000
+        # This is an endpoint that is published to nodes outside of the organization.
+        # If this isn't set, the node will not be known to other organizations.
+        externalEndpoint:
+        # Leader election service configuration
+        election:
+            # Longest time node waits for stable membership during leader election startup (unit: second)
+            startupGracePeriod: 15000
+            # Interval gossip membership samples to check its stability (unit: second)
+            membershipSampleInterval: 1000
+            # Time passes since last declaration message before node decides to perform leader election (unit: second)
+            leaderAliveThreshold: 10000
+            # Time between node sends propose message and declares itself as a leader (sends declaration message) (unit: second)
+            leaderElectionDuration: 5000
+
+        privateData:
+            # pullRetryThreshold determines the maximum duration of time private data corresponding for a given block
+            # would be attempted to be pulled from nodes until the block would be committed without the private data
+            pullRetryThreshold: 60000
+            # As private data enters the transient store, it is associated with the node's ledger's height at that time.
+            # transientstoreMaxBlockRetention defines the maximum difference between the current ledger's height upon commit,
+            # and the private data residing inside the transient store that is guaranteed not to be purged.
+            # Private data is purged from the transient store when blocks with sequences that are multiples
+            # of transientstoreMaxBlockRetention are committed.
+            transientstoreMaxBlockRetention: 1000
+            # pushAckTimeout is the maximum time to wait for an acknowledgement from each node
+            # at private data push at endorsement time.
+            pushAckTimeout: 3000
+
+    # EventHub related configuration
+    events:
+        # The address that the Event service will be enabled on the node
+        address: 0.0.0.0:7053
+
+        # total number of events that could be buffered without blocking send
+        buffersize: 100
+
+        # timeout duration for producer to send an event.
+        # if < 0, if buffer full, unblocks immediately and not send
+        # if 0, if buffer full, will block and guarantee the event will be sent out
+        # if > 0, if buffer full, blocks till timeout
+        timeout: 10
+
+        # timewindow is the acceptable difference between the node's current
+        # time and the client's time as specified in a registration event
+        timewindow: 900000
+
+        # Keepalive settings for node server and clients
+        # keepalive:
+            # MinInterval is the minimum permitted time in seconds which clients
+            # can send keepalive pings.  If clients send pings more frequently,
+            # the events server will disconnect them
+        #keepaliveMinInterval: 60000
+
+    # TLS Settings
+    # Note that node-smartContract connections through smartContractListenAddress is
+    # not mutual TLS auth. See comments on smartContractListenAddress for more info
+    tls:
+        # Require server-side TLS
+        enabled:  false
+        # Require client certificates / mutual TLS.
+        # Note that clients that are not configured to use a certificate will
+        # fail to connect to the node.
+        clientAuthRequired: false
+        # X.509 certificate used for TLS server
+        #cert:
+        certFile: tls/server.crt
+        # Private key used for TLS server (and client if clientAuthEnabled
+        # is set to true
+        # key:
+        keyFile: tls/server.key
+        # Trusted root certificate chain for tls.cert
+        # rootcert:
+        rootCertFile: tls/ca.crt
+        # Set of root certificate authorities used to verify client certificates
+        # clientRootCAs:
+        clientRootCAsFiles:
+              - tls/ca.crt
+        # Private key used for TLS when making client connections.  If
+        # not set, node.tls.key.file will be used instead
+        #clientKey:
+        clientKeyFile:
+        # X.509 certificate used for TLS when making client connections.
+        # If not set, node.tls.cert.file will be used instead
+        # clientCert:
+        clientCertFile:
+
+    # Authentication contains configuration parameters related to authenticating
+    # client messages
+    #authentication:
+        # the acceptable difference between the current server time and the
+        # client's time as specified in a client request message
+    authenticationTimeWindow: 900000
+
+    # Path on the file system where node will store data (eg ledger). This
+    # location must be access control protected to prevent unintended
+    # modification that might corrupt the node operations.
+    fileSystemPath: /var/julongchain/production/node
+
+    # BCCSP (Blockchain crypto provider): Select which crypto implementation or
+    # library to use
+    # BCCSP:
+        # Default: SW
+        # SW:
+            # TODO: The default Hash and Security level needs refactoring to be
+            # fully configurable. Changing these defaults requires coordination
+            # SHA2 is hardcoded in several places, not only BCCSP
+            # Hash: SHA2
+            # Security: 256
+            # Location of Key Store
+            # FileKeyStore:
+                # If "", defaults to 'mspConfigPath'/keystore
+                # TODO: Ensure this is read with fabric/core/config.GetPath() once ready
+                # KeyStore:
+
+    # Path on the file system where node will find MSP local configurations
+    mspConfigPath: msp
+
+    # Identifier of the local MSP
+    # ----!!!!IMPORTANT!!!-!!!IMPORTANT!!!-!!!IMPORTANT!!!!----
+    # Deployers need to change the value of the localMspId string.
+    # In particular, the name of the local MSP ID of a node needs
+    # to match the name of one of the MSPs in each of the channel
+    # that this node is a member of. Otherwise this node's messages
+    # will not be identified as valid by other nodes.
+    localMspId: DEFAULT
+
+    # Delivery service related config
+    deliveryClient:
+        # It sets the total time the delivery service may spend in reconnection
+        # attempts until its retry logic gives up and returns an error
+        reconnectTotalTimeThreshold: 3600000
+
+    # Type for the local MSP - by default it's of type bccsp
+    localMspType: bccsp
+
+    # Used with Go profiling tools only in none production environment. In
+    # production, it should be disabled (eg enabled: false)
+    profile:
+        enabled:     false
+        listenAddress: 0.0.0.0:6060
+
+    # Handlers defines custom handlers that can filter and mutate
+    # objects passing within the node, such as:
+    #   Auth filter - reject or forward proposals from clients
+    #   Decorators  - append or mutate the smartContract input passed to the smartContract
+    # Valid handler definition contains:
+    #   - A name which is a factory method name defined in
+    #     core/handlers/library/library.go for statically compiled handlers
+    #   - library path to shared object binary for pluggable filters
+    # Auth filters and decorators are chained and executed in the order that
+    # they are defined. For example:
+    # authFilters:
+    #   -
+    #     name: FilterOne
+    #     library: /opt/lib/filter.so
+    #   -
+    #     name: FilterTwo
+    # decorators:
+    #   -
+    #     name: DecoratorOne
+    #   -
+    #     name: DecoratorTwo
+    #     library: /opt/lib/decorator.so
+    handlers:
+        authFilters:
+          -
+            name: DefaultAuth
+          -
+            name: ExpirationCheck    # This filter checks identity x509 certificate expiration
+        decorators:
+          -
+            name: DefaultDecorator
+
+    # Number of goroutines that will execute transaction validation in parallel.
+    # By default, the node chooses the number of CPUs on the machine. Set this
+    # variable to override that choice.
+    # NOTE: overriding this value might negatively influence the performance of
+    # the node so please change this value only if you know what you're doing
+    # validatorPoolSize:
+
+###############################################################################
+#
+#    VM section
+#
+###############################################################################
+vm:
+
+    # Endpoint of the vm management system.  For docker can be one of the following in general
+    # unix:///var/run/docker.sock
+    # http://localhost:2375
+    # https://localhost:2376
+    endpoint: unix:///var/run/docker.sock
+    #endpoint: tcp://0.0.0.0:2375
+
+    # settings for docker vms
+    docker:
+        tls:
+            enabled: false
+            caFile: docker/ca.crt
+            certFile: docker/tls.crt
+            keyFile: docker/tls.key
+
+        # Enables/disables the standard out/err from smartContract containers for
+        # debugging purposes
+        attachStdout: false
+
+        # Parameters on creating docker container.
+        # Container may be efficiently created using ipam & dns-server for cluster
+        # NetworkMode - sets the networking mode for the container. Supported
+        # standard values are: `host`(default),`bridge`,`ipvlan`,`none`.
+        # Dns - a list of DNS servers for the container to use.
+        # Note:  `Privileged` `Binds` `Links` and `PortBindings` properties of
+        # Docker Host Config are not supported and will not be used if set.
+        # LogConfig - sets the logging driver (Type) and related options
+        # (Config) for Docker. For more info,
+        # https://docs.docker.com/engine/admin/logging/overview/
+        # Note: Set LogConfig using Environment Variables is not supported.
+        hostConfig:
+            networkMode: host
+            dns:
+               # - 192.168.0.1
+            logConfig:
+                type: json-file
+                max-size: "50m"
+                max-file: "5"
+            memory: 2147483648
+
+###############################################################################
+#
+#    SmartContractPackage section
+#
+###############################################################################
+smartContract:
+
+    instantiatePath: /var/julongchain/production/instantiate_temp
+    dockerFile: config/Dockerfile
+
+    coreNodeAddress: 172.17.0.1
+    coreNodeAddressPort: 7052
+
+    # The id is used by the SmartContract stub to register the executing SmartContract
+    # ID with the Node and is generally supplied through ENV variables
+    # the `path` form of ID is provided when installing the smartContract.
+    # The `name` is used for all other requests and can be any string.
+    id:
+        path:
+        name:
+
+    # Generic builder environment, suitable for most smartContract types
+    builder: $(DOCKER_NS)/fabric-ccenv:$(ARCH)-$(PROJECT_VERSION)
+
+    # Enables/disables force pulling of the base docker images (listed below)
+    # during user smartContract instantiation.
+    # Useful when using moving image tags (such as :latest)
+    pull: false
+
+    golang:
+        # golang will never need more than baseos
+        runtime: $(BASE_DOCKER_NS)/fabric-baseos:$(ARCH)-$(BASE_VERSION)
+
+        # whether or not golang smartContract should be linked dynamically
+        dynamicLink: false
+
+    car:
+        # car may need more facilities (JVM, etc) in the future as the catalog
+        # of platforms are expanded.  For now, we can just use baseos
+        runtime: $(BASE_DOCKER_NS)/fabric-baseos:$(ARCH)-$(BASE_VERSION)
+
+    java:
+        # This is an image based on java:openjdk-8 with addition compiler
+        # tools added for java shim layer packaging.
+        # This image is packed with shim layer libraries that are necessary
+        # for Java smartContract runtime.
+        Dockerfile:  |
+            from $(DOCKER_NS)/fabric-javaenv:$(ARCH)-$(PROJECT_VERSION)
+
+    node:
+        # need node.js engine at runtime, currently available in baseimage
+        # but not in baseos
+        runtime: $(BASE_DOCKER_NS)/fabric-baseimage:$(ARCH)-$(BASE_VERSION)
+
+    # Timeout duration for starting up a container and waiting for Register
+    # to come through. 1sec should be plenty for smartContract unit tests
+    startuptimeout: 300s
+
+    # Timeout duration for Invoke and Init calls to prevent runaway.
+    # This timeout is used by all smartContracts in all the channels, including
+    # system smartContracts.
+    # Note that during Invoke, if the image is not available (e.g. being
+    # cleaned up when in development environment), the node will automatically
+    # build the image, which might take more time. In production environment,
+    # the smartContract image is unlikely to be deleted, so the timeout could be
+    # reduced accordingly.
+    executetimeout: 30s
+
+    # There are 2 modes: "dev" and "net".
+    # In dev mode, user runs the smartContract after starting node from
+    # command line on local machine.
+    # In net mode, node will run smartContract in a docker container.
+    mode: net
+
+    # keepalive in seconds. In situations where the communiction goes through a
+    # proxy that does not support keep-alive, this parameter will maintain connection
+    # between node and smartContract.
+    # A value <= 0 turns keepalive off
+    keepalive: 0
+
+    # system smartContracts whitelist. To add system smartContract "myscc" to the
+    # whitelist, add "myscc: enable" to the list below, and register in
+    # smartcontract/importsysccs.go
+    system:
+        cssc: enable
+        lssc: enable
+        essc: enable
+        vssc: enable
+        qssc: enable
+
+    # System smartContract plugins: in addition to being imported and compiled
+    # into fabric through core/smartcontract/importsysccs.go, system smartContracts
+    # can also be loaded as shared objects compiled as Go plugins.
+    # See examples/plugins/scc for an example.
+    # Like regular system smartContracts, plugins must also be white listed in the
+    # smartContract.system section above.
+    systemPlugins:
+      # example configuration:
+      # - enabled: true
+      #   name: myscc
+      #   path: /opt/lib/myscc.so
+      #   invokableExternal: true
+      #   invokableCC2CC: true
+
+    # Logging section for the smartContract container
+    logging:
+      # Default level for all loggers within the smartContract container
+      level:  info
+      # Override default level for the 'shim' module
+      shim:   warning
+      # Format for the smartContract container logs
+      format: '%{color}%{time:2006-01-02 15:04:05.000 MST} [%{module}] %{shortfunc} -> %{level:.4s} %{id:03x}%{color:reset} %{message}'
+
+###############################################################################
+#
+#    Ledger section - ledger configuration encompases both the blockchain
+#    and the state
+#
+###############################################################################
+ledger:
+
+  blockchain:
+
+  state:
+    # stateDatabase - options are "goleveldb", "CouchDB"
+    # goleveldb - default state database stored in goleveldb.
+    # CouchDB - store state database in CouchDB
+    stateDatabase: leveldb
+    couchDBConfig:
+       # It is recommended to run CouchDB on the same server as the node, and
+       # not map the CouchDB container port to a server port in docker-compose.
+       # Otherwise proper security must be provided on the connection between
+       # CouchDB client (on the node) and server.
+       couchDBAddress: 127.0.0.1:5984Ma
+       # This username must have read and write authority on CouchDB
+       username:
+       # The password is recommended to pass as an environment variable
+       # during start up (eg LEDGER_COUCHDBCONFIG_PASSWORD).
+       # If it is stored here, the file must be access control protected
+       # to prevent unintended users from discovering the password.
+       password:
+       # Number of retries for CouchDB errors
+       maxRetries: 3
+       # Number of retries for CouchDB errors during node startup
+       maxRetriesOnStartup: 10
+       # CouchDB request timeout (unit: duration, e.g. 20s)
+       requestTimeout: 35s
+       # Limit on the number of records to return per query
+       queryLimit: 10000
+       # Limit on the number of records per CouchDB bulk update batch
+       maxBatchUpdateSize: 1000
+       # Warm indexes after every N blocks.
+       # This option warms any indexes that have been
+       # deployed to CouchDB after every N blocks.
+       # A value of 1 will warm indexes after every block commit,
+       # to ensure fast selector queries.
+       # Increasing the value may improve write efficiency of node and CouchDB,
+       # but may degrade query response time.
+       warmIndexesAfterNBlocks: 1
+
+  history:
+    # enableHistoryDatabase - options are true or false
+    # Indicates if the history of key updates should be stored.
+    # All history 'index' will be stored in goleveldb, regardless if using
+    # CouchDB or alternate database for the state.
+    enableHistoryDatabase: true
+
+###############################################################################
+#
+#    Metrics section
+#
+#
+###############################################################################
+metrics:
+        # enable or disable metrics server
+        enabled: false
+
+        # when enable metrics server, must specific metrics reporter type
+        # currently supported type: "statsd","prom"
+        reporter: statsd
+
+        # determines frequency of report metrics(unit: second)
+        interval: 1000
+
+        statsReporter:
+
+              # statsd server address to connect
+              address: 0.0.0.0:8125
+
+              # determines frequency of push metrics to statsd server(unit: second)
+              flushInterval: 2s
+
+              # max size bytes for each push metrics request
+              # intranet recommend 1432 and internet recommend 512
+              flushBytes: 1432
+
+        promReporter:
+
+              # prometheus http server listen address for pull metrics
+              listenAddress: 0.0.0.0:8080

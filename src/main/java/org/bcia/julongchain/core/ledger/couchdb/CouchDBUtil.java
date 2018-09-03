@@ -15,8 +15,12 @@
  */
 package org.bcia.julongchain.core.ledger.couchdb;
 
+import org.apache.http.HttpResponse;
 import org.lightcouch.CouchDbClient;
 import org.lightcouch.CouchDbContext;
+import org.lightcouch.CouchDbException;
+
+import java.io.InputStream;
 
 /**
  * creat System couchdb
@@ -27,20 +31,29 @@ import org.lightcouch.CouchDbContext;
  */
 public class CouchDBUtil {
 
-    //
-    public void createDatabaseIfNotExist(CouchDbClient dbInstance, String dbName){
-        CouchDbContext context = dbInstance.context();
-        context.createDB(dbName);
-    }
 
     //CreateSystemDatabasesIfNotExist - creates the system databases if they do not exist
-    public void CreateSystemDatabasesIfNotExist(CouchDbClient dbInstance){
+    public static void  CreateSystemDatabasesIfNotExist(CouchDbClient dbInstance){
         CouchDB couchDB = new CouchDB();
         String dbName1 = "_users";
         couchDB.createDatabaseIfNotExist(dbInstance, dbName1);
         String dbName2 = "_replicator";
         couchDB.createDatabaseIfNotExist(dbInstance, dbName2);
         String dbName3 = "_global_changes";
-        couchDB.createDatabaseIfNotExist(dbInstance, dbName2);
+        couchDB.createDatabaseIfNotExist(dbInstance, dbName3);
     }
+
+    /**
+     * @return {@link InputStream} of {@link HttpResponse}
+     */
+    public static InputStream getStream(HttpResponse response) {
+        try {
+            return response.getEntity().getContent();
+        } catch (Exception e) {
+            throw new CouchDbException("Error reading response. ", e);
+        }
+    }
+
+
+
 }

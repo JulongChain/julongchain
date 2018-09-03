@@ -27,7 +27,13 @@ import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
  * @company Dingxuan
  */
 public interface IRangeQueryValidator {
+	/**
+	 * 初始化
+	 */
     void init(KvRwset.RangeQueryInfo rqInfo, IResultsIterator itr) throws LedgerException ;
 
-    boolean validate()throws LedgerException;
+	/**
+	 * 校验
+	 */
+	boolean validate()throws LedgerException;
 }

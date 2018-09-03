@@ -17,8 +17,8 @@ package org.bcia.julongchain.node.cmd.group;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.node.Node;
 
 /**
@@ -30,7 +30,7 @@ import org.bcia.julongchain.node.Node;
  * @company Dingxuan
  */
 public class GroupUpdateCmd extends AbstractNodeGroupCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(GroupCreateCmd.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(GroupCreateCmd.class);
 
     //参数：consenter地址
     private static final String ARG_CONSENTER = "c";
@@ -65,25 +65,25 @@ public class GroupUpdateCmd extends AbstractNodeGroupCmd {
         String consenter = null;
         if (cmd.hasOption(ARG_CONSENTER)) {
             consenter = cmd.getOptionValue(ARG_CONSENTER, defaultValue);
-            log.info("Consenter-----$" + consenter);
+            log.info("Consenter: " + consenter);
         }
 
         String groupId = null;
         if (cmd.hasOption(ARG_GROUP_ID)) {
             groupId = cmd.getOptionValue(ARG_GROUP_ID, defaultValue);
-            log.info("GroupId-----$" + groupId);
+            log.info("GroupId: " + groupId);
         }
 
         String groupConfigFile = null;
         if (cmd.hasOption(ARG_FILE_PATH)) {
             groupConfigFile = cmd.getOptionValue(ARG_FILE_PATH, defaultValue);
-            log.info("GroupId config File-----$" + groupConfigFile);
+            log.info("GroupId config File: " + groupConfigFile);
         }
 
         String timeout = null;
         if (cmd.hasOption(ARG_TIMEOUT)) {
             timeout = cmd.getOptionValue(ARG_TIMEOUT, defaultValue);
-            log.info("Timeout-----$" + timeout);
+            log.info("Timeout: " + timeout);
         }
 
         if (StringUtils.isBlank(groupId)) {

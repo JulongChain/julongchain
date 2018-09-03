@@ -22,7 +22,7 @@ package org.bcia.julongchain.common.exception;
  * @date 2018/3/29
  * @company Dingxuan
  */
-public class LedgerException extends JavaChainException {
+public class LedgerException extends JulongChainException {
     private static final String MODULE_NAME = "[Ledger]";
 
     public LedgerException() {

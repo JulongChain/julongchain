@@ -22,7 +22,7 @@ package org.bcia.julongchain.common.exception;
  * @date 3/7/18
  * @company Dingxuan
  */
-public class SysSmartContractException extends JavaChainException {
+public class SysSmartContractException extends JulongChainException {
     private static final String MODULE_NAME = "[SysSmartContract]";
 
     public SysSmartContractException() {

@@ -19,8 +19,8 @@ import com.alibaba.fastjson.JSON;
 import org.bcia.julongchain.common.exception.ConfigtxToolsException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.genesis.GenesisBlockFactory;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.FileUtils;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
@@ -32,26 +32,29 @@ import org.bcia.julongchain.protos.node.Configuration;
 import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfigFactory;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
- * 类描述
+ * 交易帮助类
  *
  * @author zhouhui
  * @date 2018/06/06
  * @company Dingxuan
  */
 public class ConfigtxHelper {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ConfigtxHelper.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ConfigtxHelper.class);
 
     public static void doOutputBlock(GenesisConfig.Profile profile, String groupId, String outputBlock)
             throws ValidateException, ConfigtxToolsException {
-        ValidateUtils.isNotNull(profile, "profile can not be null");
-        ValidateUtils.isNotNull(profile.getConsortiums(), "profile.getConsortiums can not be null");
+        ValidateUtils.isNotNull(profile, "Profile can not be null");
+        ValidateUtils.isNotNull(profile.getConsortiums(), "Profile.getConsortiums can not be null");
 
         Configtx.ConfigTree groupTree = ConfigTreeHelper.buildGroupTree(profile);
         try {
             Common.Block genesisBlock = new GenesisBlockFactory(groupTree).getGenesisBlock(groupId);
+
+            org.apache.commons.io.FileUtils.forceMkdirParent(new File(outputBlock));
             FileUtils.writeFileBytes(outputBlock, genesisBlock.toByteArray());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -62,9 +65,11 @@ public class ConfigtxHelper {
     public static void doOutputGroupCreateTx(GenesisConfig.Profile profile, String groupId,
                                              String outputGroupCreateTx) throws ConfigtxToolsException,
             ValidateException {
-        ValidateUtils.isNotNull(profile, "profile can not be null");
+        ValidateUtils.isNotNull(profile, "Profile can not be null");
         try {
             Common.Envelope envelope = EnvelopeHelper.makeGroupCreateTx(groupId, null, null, profile);
+
+            org.apache.commons.io.FileUtils.forceMkdirParent(new File(outputGroupCreateTx));
             FileUtils.writeFileBytes(outputGroupCreateTx, envelope.toByteArray());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -75,9 +80,9 @@ public class ConfigtxHelper {
     public static void doOutputAnchorNodesUpdate(GenesisConfig.Profile profile, String groupId,
                                                  String outputAnchorNodesUpdate, String asOrg) throws ValidateException,
             ConfigtxToolsException {
-        ValidateUtils.isNotNull(profile, "profile can not be null");
-        ValidateUtils.isNotNull(profile.getApplication(), "profile.getApplication can not be null");
-        ValidateUtils.isNotNull(profile.getApplication().getOrganizations(), "profile.getApplication.getOrganizations" +
+        ValidateUtils.isNotNull(profile, "Profile can not be null");
+        ValidateUtils.isNotNull(profile.getApplication(), "Profile.getApplication can not be null");
+        ValidateUtils.isNotNull(profile.getApplication().getOrganizations(), "Profile.getApplication.getOrganizations" +
                 " can not be null");
 
         GenesisConfig.Organization asOrganization = null;
@@ -88,7 +93,7 @@ public class ConfigtxHelper {
                 break;
             }
         }
-        ValidateUtils.isNotNull(asOrganization, "asOrganization can not be null");
+        ValidateUtils.isNotNull(asOrganization, "AsOrganization can not be null");
         Configtx.ConfigUpdate configUpdate = EnvelopeHelper.makeConfigUpdate(groupId, asOrg,
                 parseAnchorNodes(asOrganization.getAnchorNodes()));
 
@@ -99,6 +104,7 @@ public class ConfigtxHelper {
         Common.Envelope envelope = EnvelopeHelper.buildSignedEnvelope(Common.HeaderType.CONFIG_UPDATE_VALUE, 0,
                 groupId, null, configUpdateEnvelope, 0);
         try {
+            org.apache.commons.io.FileUtils.forceMkdirParent(new File(outputAnchorNodesUpdate));
             FileUtils.writeFileBytes(outputAnchorNodesUpdate, envelope.toByteArray());
         } catch (IOException e) {
             log.error(e.getMessage(), e);
@@ -152,7 +158,7 @@ public class ConfigtxHelper {
 
         GenesisConfig.Organization[] organizations = genesisConfig.getOrganizations();
         if (organizations == null || organizations.length <= 0) {
-            throw new ValidateException("organizations is empty");
+            throw new ValidateException("Organizations is empty");
         }
 
         for (GenesisConfig.Organization org : organizations) {

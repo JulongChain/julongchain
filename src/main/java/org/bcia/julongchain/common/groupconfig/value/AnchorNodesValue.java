@@ -19,7 +19,7 @@ import org.bcia.julongchain.common.groupconfig.GroupConfigConstant;
 import org.bcia.julongchain.protos.node.Configuration;
 
 /**
- * 对象
+ * 锚节点配置项
  *
  * @author zhouhui
  * @date 2018/4/14

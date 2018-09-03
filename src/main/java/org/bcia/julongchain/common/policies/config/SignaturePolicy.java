@@ -15,18 +15,15 @@
  */
 package org.bcia.julongchain.common.policies.config;
 
-import org.bcia.julongchain.common.policycheck.common.IsSignaturePolicyType;
 import org.bcia.julongchain.protos.common.Policies;
 
 /**
- * 类描述
+ * 签名策略
  *
  * @author zhouhui
  * @date 2018/3/8
  * @company Dingxuan
- *//**
-     *
-     */
+ */
 public class SignaturePolicy extends StandardConfigPolicy {
     public SignaturePolicy(String key, Policies.SignaturePolicyEnvelope envelope) {
         super(key);
@@ -42,8 +39,6 @@ public class SignaturePolicy extends StandardConfigPolicy {
         return policyBuilder.build();
     }
 
-
-    public IsSignaturePolicyType isSignaturePolicy_type;
 
 
 }

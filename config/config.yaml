@@ -1,0 +1,19 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+organizationalUnitIdentifiers:
+    certificate: "cacerts/ca.org1.example.com-cert.pem"
+    organizationalUnitIdentifier: "JL"
+
+nodeOUs:
+  isEnable: true
+  clientOUIdentifier:
+    # if Certificate is empty, then the certifier identifier will not be enforced
+    certificate: "cacerts/ca.org1.example.com-cert.pem"
+    #OrganizationalUnitIdentifier: "OU_client"
+    organizationalUnitIdentifier: "JL"
+  nodeOUIdentifier:
+    certificate: "cacerts/ca.org1.example.com-cert.pem"
+    organizationalUnitIdentifier: "JL"

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,6 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
  * @company Dingxuan
  */
 public class CompositeKey {
-
     private String namespace;
     private String key;
 

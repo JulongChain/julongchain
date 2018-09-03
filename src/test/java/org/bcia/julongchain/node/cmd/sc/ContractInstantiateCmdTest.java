@@ -8,11 +8,12 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * 对象
+ * 实例化智能合约测试类
  *
  * @author zhouhui
  * @date 2018/3/29
  * @company Dingxuan
+ * @deprecated
  */
 public class ContractInstantiateCmdTest extends BaseJunit4Test {
 

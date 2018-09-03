@@ -17,8 +17,8 @@ package org.bcia.julongchain.events.producer;
 
 import org.bcia.julongchain.common.exception.EventException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.common.util.producer.Consumer;
 import org.bcia.julongchain.common.util.producer.Producer;
@@ -30,14 +30,14 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * 类描述
+ * 事件处理器
  *
  * @author zhouhui
  * @date 2018/05/17
  * @company Dingxuan
  */
 public class EventProcessor implements IEventProcessor {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(EventProcessor.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(EventProcessor.class);
 
     private Map<Integer, IHandlerList> eventConsumers;
     private EventsServerConfig eventsServerConfig;
@@ -125,7 +125,7 @@ public class EventProcessor implements IEventProcessor {
             eventType = EventsPackage.EventType.REGISTER_VALUE;
         } else if (event.hasBlock()) {
             eventType = EventsPackage.EventType.BLOCK_VALUE;
-        } else if (event.hasSmartcontractEvent()) {
+        } else if (event.hasSmartContractEvent()) {
             eventType = EventsPackage.EventType.SMART_CONTRACT_VALUE;
         } else if (event.hasRejection()) {
             eventType = EventsPackage.EventType.REJECTION_VALUE;
@@ -137,7 +137,7 @@ public class EventProcessor implements IEventProcessor {
     }
 
     public boolean send(EventsPackage.Event event) throws ValidateException {
-        ValidateUtils.isNotNull(event, "event can not be null");
+        ValidateUtils.isNotNull(event, "Event can not be null");
         return producer.produce(event);
     }
 

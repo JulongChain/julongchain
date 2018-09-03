@@ -15,9 +15,11 @@
  */
 package org.bcia.julongchain.common.tools.cryptogen.cmd;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 
 /**
+ * help 命令实现类
+ *
  * @author chenhao
  * @date 2018/5/21
  * @company Excelsecu
@@ -25,7 +27,7 @@ import org.bcia.julongchain.common.exception.JavaChainException;
 public class HelpCmd implements ICryptoGenCmd  {
 
     @Override
-    public void execCmd(String[] args) throws JavaChainException {
+    public void execCmd(String[] args) throws JulongChainException {
         System.out.println("Utility for generating BCIA key material\n" +
                 "Flags:\n" +
                 "  --help  Show context-sensitive help. e.g. generate --help\n" +

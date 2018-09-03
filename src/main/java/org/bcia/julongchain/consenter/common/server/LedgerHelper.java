@@ -21,8 +21,8 @@ import org.bcia.julongchain.common.ledger.blockledger.IFactory;
 import org.bcia.julongchain.common.ledger.blockledger.file.FileLedgerFactory;
 import org.bcia.julongchain.common.ledger.blockledger.json.JsonLedgerFactory;
 import org.bcia.julongchain.common.ledger.blockledger.ram.RamLedgerFactory;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.tools.cryptogen.FileUtil;
 import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfig;
 
@@ -33,12 +33,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
+ * 账本辅助类
+ *
  * @author zhangmingyang
  * @Date: 2018/5/29
  * @company Dingxuan
  */
 public class LedgerHelper {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(LedgerHelper.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(LedgerHelper.class);
 
     public static IFactory createLedgerFactroy(ConsenterConfig consenterConfig) throws LedgerException {
         IFactory lf = null;
@@ -46,7 +48,7 @@ public class LedgerHelper {
         switch (consenterConfig.getGeneral().getLedgerType()) {
             case "file":
                 ld = consenterConfig.getFileLedger().getLocation();
-                if (ld == ""||ld==null) {
+                if (ld == "" || ld == null) {
                     ld = createTempDir(consenterConfig.getFileLedger().getPrefix());
                 }
                 log.debug(String.format("Ledger dir:", ld));
@@ -75,15 +77,15 @@ public class LedgerHelper {
 
     public static String createTempDir(String dirPrefix) {
         Path tempDirPath = null;
-        String  testDir=null;
+        String testDir = null;
         try {
             tempDirPath = Files.createTempDirectory(null);
-            testDir  = Paths.get(tempDirPath.toString()).toString();
+            testDir = Paths.get(tempDirPath.toString()).toString();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-       // String dirPath = Paths.get(dirPrefix, "").toString();
+        // String dirPath = Paths.get(dirPrefix, "").toString();
         return testDir;
     }
 
@@ -93,14 +95,10 @@ public class LedgerHelper {
         return subDirPath;
     }
 
-    public static void main(String[] args) {
-        String a = createSubDir("F:\\", "msp");
-        System.out.println(a);
-    }
 
-    private static String join(String... itms){
+    private static String join(String... itms) {
         StringBuffer buffer = new StringBuffer("");
-        for(String itm : itms){
+        for (String itm : itms) {
             buffer.append(itm);
             buffer.append(File.separator);
         }

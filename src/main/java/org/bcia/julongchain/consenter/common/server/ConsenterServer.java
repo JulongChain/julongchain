@@ -15,42 +15,70 @@
  */
 package org.bcia.julongchain.consenter.common.server;
 
+import com.google.common.collect.ImmutableList;
 import com.google.protobuf.InvalidProtocolBufferException;
-import io.grpc.Server;
-import io.grpc.ServerBuilder;
+import io.grpc.*;
+import io.grpc.netty.NettyServerBuilder;
 import io.grpc.stub.StreamObserver;
-import org.bcia.julongchain.common.deliver.DeliverHandler;
 import org.bcia.julongchain.common.deliver.DeliverServer;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.deliver.IDeliverHandler;
+import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.localmsp.impl.LocalSigner;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
-import org.bcia.julongchain.consenter.common.broadcast.BroadCastHandler;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.common.multigroup.Registrar;
+import org.bcia.julongchain.consenter.util.RequestHeadersInterceptor;
+import org.bcia.julongchain.gossip.GossipService;
+import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 import org.bcia.julongchain.protos.consenter.AtomicBroadcastGrpc;
+
 import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 
 /**
+ * consenter服务管理
  * @author zhangmingyang
- * @Date: 2/27/18 5:14 PM *
+ * @Date: 2018/2/17
  * @company Dingxuan
  */
 public class ConsenterServer {
-    private int port = 7050;
+    private int port;
     private Server server;
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ConsenterServer.class);
+    public static final AtomicReference<ServerCall<?, ?>> serverCallCapture = new AtomicReference<ServerCall<?, ?>>();
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ConsenterServer.class);
+    private static IBroadcastHandler broadcastHandler;
+    private static IDeliverHandler deliverHandler;
+    public ConsenterServer(int port) {
+        this.port = port;
+    }
+
+
+    public void bindBroadcastServer(IBroadcastHandler broadcastHander) {
+        this.broadcastHandler = broadcastHander;
+    }
+
+
+    public void bindDeverServer(IDeliverHandler deliverHandler){
+        this.deliverHandler=deliverHandler;
+    }
+
+
 
     public void start() throws IOException {
-        server = ServerBuilder.forPort(port)
-                .addService(new ConsenterServerImpl())
+        List<ServerInterceptor> allInterceptors = ImmutableList.<ServerInterceptor>builder()
+                .add(RequestHeadersInterceptor.recordServerCallInterceptor(serverCallCapture)).build();
+        //server = ServerBuilder.forPort(port)
+          server= NettyServerBuilder.forPort(port)
+                .addService(ServerInterceptors.intercept(new ConsenterServerImpl(),allInterceptors))
+                .addService(new GossipService())
                 .build()
                 .start();
-        log.info("consenter service start, port: 7050");
+        log.info("consenter service start, port:"+port);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
@@ -75,46 +103,19 @@ public class ConsenterServer {
         if (server != null) {
             server.awaitTermination();
         }
-    }
-
-
-    public static void main(String[] args) throws IOException, InterruptedException {
-        ConsenterServer server = new ConsenterServer();
-        server.start();
-        server.blockUntilShutdown();
-
 
     }
 
-    // 定义一个实现服务接口的类
-    private class ConsenterServerImpl extends AtomicBroadcastGrpc.AtomicBroadcastImplBase {
-        private Registrar registrar;
-        private DeliverHandler deliverHandler;
-
-        {
-            try {
-                 PreStart.initAll();
-                registrar= new PreStart().initializeMultichannelRegistrar(PreStart.getDefaultConsenterConfig(),new LocalSigner());
-
-            } catch (IOException e) {
-                log.error(e.getMessage());
-            } catch (JavaChainException e) {
-                log.error(e.getMessage());
-            }
-        }
+    private static class ConsenterServerImpl extends AtomicBroadcastGrpc.AtomicBroadcastImplBase {
 
         @Override
         public StreamObserver<Common.Envelope> broadcast(StreamObserver<Ab.BroadcastResponse> responseObserver) {
             return new StreamObserver<Common.Envelope>() {
-
-                BroadCastHandler broadCastHandle = new BroadCastHandler(registrar);
-
                 @Override
                 public void onNext(Common.Envelope envelope) {
-
                     try {
-                        broadCastHandle.handle(envelope, responseObserver);
-                    } catch (IOException e) {
+                        broadcastHandler.handle(envelope,responseObserver);
+                    } catch (ConsenterException e) {
                         log.error(e.getMessage());
                     }
                 }
@@ -137,8 +138,6 @@ public class ConsenterServer {
                 @Override
                 public void onNext(Common.Envelope envelope) {
                     DeliverServer deliverServer=new DeliverServer(responseObserver,envelope) ;
-                    //deliverHandler=  new DeliverHandler(new Registrar().getRregistrar(),PreStart.getDefaultConsenterConfig().getGeneral().getAuthentication().get("timeWindow"));
-                   deliverHandler=new DeliverHandler(registrar,PreStart.getDefaultConsenterConfig().getGeneral().getAuthentication().get("timeWindow"));
                     try {
                         deliverHandler.handle(deliverServer);
                     } catch (ValidateException e) {

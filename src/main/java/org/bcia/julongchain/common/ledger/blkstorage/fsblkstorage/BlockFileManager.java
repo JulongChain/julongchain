@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,14 +22,15 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.common.ledger.util.IoUtil;
-import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bcia.julongchain.core.ledger.util.Util;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Ledger;
 import org.bcia.julongchain.protos.node.TransactionPackage;
+import org.bouncycastle.util.encoders.Hex;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -42,14 +43,14 @@ import java.util.*;
 public class BlockFileManager {
 
     private static final String BLOCKFILE_PREFIX = "blockfile";
-    private static final byte[] BLK_MGR_INFO_KEY = "blkMgrInfo".getBytes();
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockFileManager.class);
+    private static final byte[] BLK_MGR_INFO_KEY = "blkMgrInfo".getBytes(StandardCharsets.UTF_8);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BlockFileManager.class);
     private static final byte BLOCK_BYTES_START = 10;
 
     public static final int LAST_BLOCK_BYTES = 0;
     public static final int CURRENT_OFFSET = 1;
     public static final int NUM_BLOCKS = 2;
-    public static final Object lock = new Object();
+    public static final Object LOCK = new Object();
 	public static final int PEEK_BYTES_LEN = 8;
 
     private String rootDir;
@@ -74,31 +75,31 @@ public class BlockFileManager {
                             IndexConfig indexConfig,
                             IDBProvider indexStore) throws LedgerException{
 
-        logger.debug(String.format("Initializing file-based block storage for ledger: %s", id));
+        log.debug(String.format("Initializing file-based block storage for ledger: %s", id));
         //根据配置文件、id生成rootDir
         this.ledgerId = id;
         this.config = config;
         this.rootDir = config.getLedgerBlockDir(id);
         this.db = indexStore;
-        this.cpInfo = loadCurrentInfo();
+        cpInfo = loadCurrentInfo();
         //创建rootdir
         IoUtil.createDirIfMissing(getRootDir());
         //设置检查点信息
-        if(this.cpInfo == null){
-            logger.debug("Getting block information from block storage");
-            this.cpInfo = BlockFileHelper.constructCheckpointInfoFromBlockFiles(this.rootDir);
-            logger.debug(String.format("Info constructed by scanning the blocks dir = %s", this.cpInfo.toString()));
+        if(cpInfo == null){
+            log.debug("Getting block information from block storage");
+            cpInfo = BlockFileHelper.constructCheckpointInfoFromBlockFiles(this.rootDir);
+            log.debug(String.format("Info constructed by scanning the blocks dir = %s", cpInfo.toString()));
         } else {
-            logger.debug("Syncing block information from block storage (if needed)");
-            syncCpInfoFromFS(this.rootDir, this.cpInfo);
+            log.debug("Sync block information from block storage (if needed)");
+            syncCpInfoFromFS(this.rootDir, cpInfo);
         }
         //保存检查点信息到leveldb中
         //blkMgrInfoKey-checkpointInfo
-        saveCurrentInfo(this.cpInfo, true);
+        saveCurrentInfo(cpInfo, true);
         //写入文件 writer类
-        this.currentFileWriter = new BlockFileWriter(deriveBlockfilePath(this.rootDir, this.cpInfo.getLastestFileChunkSuffixNum()));
+        this.currentFileWriter = new BlockFileWriter(deriveBlockfilePath(this.rootDir, cpInfo.getLastestFileChunkSuffixNum()));
         //修剪文件为检查点保存的文件大小
-        this.currentFileWriter.truncateFile(this.cpInfo.getLatestFileChunksize());
+        this.currentFileWriter.truncateFile(cpInfo.getLatestFileChunksize());
         //设置blockindex对象
         this.index = new BlockIndex(indexConfig, indexStore, id);
         //设置blockchainINfo对象
@@ -108,18 +109,18 @@ public class BlockFileManager {
                 .setPreviousBlockHash(ByteString.EMPTY)
                 .build();
 
-        if (!this.cpInfo.getChainEmpty()) {
+        if (!cpInfo.getChainEmpty()) {
             try {
                 syncIndex();
             } catch (LedgerException e) {
-                logger.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
                 throw new LedgerException("Got error when syncIndex");
             }
-            Common.BlockHeader lastBlockHeader = retrieveBlockHeaderByNumber(this.cpInfo.getLastBlockNumber());
+            Common.BlockHeader lastBlockHeader = retrieveBlockHeaderByNumber(cpInfo.getLastBlockNumber());
             ByteString lastBlockHash = lastBlockHeader.getDataHash();
             ByteString previousBlockHash = lastBlockHeader.getPreviousHash();
             this.bcInfo = Ledger.BlockchainInfo.newBuilder()
-                    .setHeight(this.cpInfo.getLastBlockNumber() + 1)
+                    .setHeight(cpInfo.getLastBlockNumber() + 1)
                     .setCurrentBlockHash(lastBlockHash)
                     .setPreviousBlockHash(previousBlockHash)
                     .build();
@@ -130,12 +131,12 @@ public class BlockFileManager {
      * 更新检查点信息
      */
     private void syncCpInfoFromFS(String rootDir, CheckpointInfo cpInfo) throws LedgerException {
-        logger.debug(String.format("Starting checkpoint [%s]", cpInfo));
+        log.debug(String.format("Starting checkpoint [%s]", cpInfo));
         //组装区块文件名
         String filePath = deriveBlockfilePath(rootDir, cpInfo.getLastestFileChunkSuffixNum());
         //获取区块文件大小, 判断其存在性
         long size = IoUtil.fileExists(filePath);
-        logger.debug(String.format("Status of file [%s]: exists=[%s], size=[%d]", filePath, size < 0, size));
+        log.debug(String.format("Status of file [%s]: exists=[%s], size=[%d]", filePath, size < 0, size));
         if(size < 0 || size == cpInfo.getLatestFileChunksize()){
             return;
         }
@@ -153,15 +154,20 @@ public class BlockFileManager {
             cpInfo.setLastBlockNumber(cpInfo.getLastBlockNumber() + (long) numBlocks);
         }
         cpInfo.setChainEmpty(false);
-        logger.debug(String.format("Checkpoint after updates by scanning the last file segment: %s", cpInfo.toString()));
+        log.debug(String.format("Checkpoint after updates by scanning the last file segment: %s", cpInfo.toString()));
     }
 
     /**
      * 组装区块文件名
      * rootDir/blockfile_000000
      */
-    static String deriveBlockfilePath(String rootDir, Integer suffixNum) {
-        return String.format("%s/%s_%06d", rootDir, BLOCKFILE_PREFIX, suffixNum);
+    public static String deriveBlockfilePath(String rootDir, int suffixNum) {
+    	final int totalLength = 6;
+		StringBuilder sb = new StringBuilder(Integer.toHexString(suffixNum)).reverse();
+		while (sb.length() < totalLength) {
+			sb.append(0);
+		}
+		return String.format("%s/%s_%s", rootDir, BLOCKFILE_PREFIX, sb.reverse().toString().toUpperCase());
     }
 
     public void close() {
@@ -172,14 +178,14 @@ public class BlockFileManager {
      * 写下一文件
      */
     private void moveToNextFile() throws LedgerException {
-        CheckpointInfo cpInfo = new CheckpointInfo(this.cpInfo.getLastestFileChunkSuffixNum() + 1,
+        CheckpointInfo newCpInfo = new CheckpointInfo(cpInfo.getLastestFileChunkSuffixNum() + 1,
                 0,
                 false,
-                this.cpInfo.getLastBlockNumber());
-        BlockFileWriter nextFileWriter = new BlockFileWriter(deriveBlockfilePath(this.rootDir, cpInfo.getLastestFileChunkSuffixNum()));
-        saveCurrentInfo(cpInfo, true);
+                cpInfo.getLastBlockNumber());
+        BlockFileWriter nextFileWriter = new BlockFileWriter(deriveBlockfilePath(this.rootDir, newCpInfo.getLastestFileChunkSuffixNum()));
+        saveCurrentInfo(newCpInfo, true);
         this.currentFileWriter = nextFileWriter;
-        updateCheckpoint(cpInfo);
+        updateCheckpoint(newCpInfo);
     }
 
     /**
@@ -187,7 +193,7 @@ public class BlockFileManager {
      * blockBytesLenEncoded     8
      * blockbytes               blockBytesLen
      */
-	void addBlock(Common.Block block) throws LedgerException {
+	public void addBlock(Common.Block block) throws LedgerException {
         if(block.getHeader().getNumber() != bcInfo.getHeight()){
             throw new LedgerException(String.format("Block number should have been %d but was %d", getBlockchainInfo().getHeight(), block.getHeader().getNumber()));
         }
@@ -215,7 +221,7 @@ public class BlockFileManager {
             currentFileWriter.append(blockBytesLenEncoded, false);
         } catch (LedgerException e) {
             currentFileWriter.truncateFile(cpInfo.getLatestFileChunksize());
-            logger.error("Got error when appending block to file ", e);
+            log.error("Got error when appending block to file ", e);
             throw e;
         }
         //添加区块
@@ -253,16 +259,11 @@ public class BlockFileManager {
         long lastBlockIndexed = 0;
         boolean indexEmpty = false;
         //获取最新索引
-        try {
-            lastBlockIndexed = index.getLastBlockIndexed();
-        } catch (LedgerException e) {
-			if (!e.equals(BlockIndex.NO_BLOCK_INDEXED)) {
-				logger.error("Got error when syncIndex", e);
-				throw e;
-			}
-			//没有索引时设置索引为空
-            indexEmpty = true;
-        }
+        lastBlockIndexed = index.getLastBlockIndexed();
+	    if (lastBlockIndexed == -1) {
+		    //没有索引时设置索引为空
+		    indexEmpty = true;
+	    }
         //初始化index
         int startFileNum = 0;
         long startOffset = 0;
@@ -274,10 +275,10 @@ public class BlockFileManager {
         if(!indexEmpty){
             //索引和区块序号相同时, 完成同步
             if(lastBlockIndexed == cpInfo.getLastBlockNumber()){
-                logger.debug("Both the block files and indexes are in sync");
+                log.debug("Both the block files and indexes are in sync");
                 return;
             }
-            logger.debug(String.format("Last block indexed [%d], last block present in block files [%d]"
+            log.debug(String.format("Last block indexed [%d], last block present in block files [%d]"
                     , lastBlockIndexed, cpInfo.getLastBlockNumber()));
             FileLocPointer flp;
             //获取区块位置
@@ -288,11 +289,11 @@ public class BlockFileManager {
             skipFirstBlock = true;
             startingBlockNum = lastBlockIndexed + 1;
         } else {
-            logger.debug(String.format("No block indexed, last block present in block files=[%s]"
+            log.debug(String.format("No block indexed, last block present in block files=[%s]"
                     , cpInfo.getLastBlockNumber()));
         }
 
-        logger.debug(String.format("Start building index form block [%d] to last block [%d]"
+        log.debug(String.format("Start building index form block [%d] to last block [%d]"
                 , startingBlockNum, cpInfo.getLastBlockNumber()));
         //初始化block流
         BlockStream stream = new BlockStream(rootDir, startFileNum, startOffset, endFileNum);
@@ -302,7 +303,7 @@ public class BlockFileManager {
         if(skipFirstBlock){
             blockBytes = stream.nextBlockBytes();
             if(blockBytes == null){
-            	logger.error("Got null blockBytes for block num = [{}], but it is forbid");
+            	log.error("Got null blockBytes for block num = [{}], but it is forbid");
                 throw new LedgerException(String.format("Block bytes for block num = [%d] should not be null here." +
                         " The indexes for the block are already present", lastBlockIndexed));
             }
@@ -333,25 +334,25 @@ public class BlockFileManager {
             blockIndexInfo.setTxOffsets(info.getTxOffsets());
             blockIndexInfo.setMetadata(info.getMetadata());
 
-            logger.debug(String.format("syncIndex() indexing block [%d]", blockIndexInfo.getBlockNum()));
+            log.debug(String.format("syncIndex() indexing block [%d]", blockIndexInfo.getBlockNum()));
             //重新设置索引
             index.indexBlock(blockIndexInfo);
             if(blockIndexInfo.getBlockNum() % 10000 == 0){
-                logger.info(String.format("Indexed block number [%d]", blockIndexInfo.getBlockNum()));
+                log.info(String.format("Indexed block number [%d]", blockIndexInfo.getBlockNum()));
             }
         }
-        logger.info(String.format("Finished building index. Last block indexed [%d]", blockIndexInfo.getBlockNum()));
+        log.info(String.format("Finished building index. Last block indexed [%d]", blockIndexInfo.getBlockNum()));
     }
 
     /**
      * 更新检查点信息
      */
-    private void updateCheckpoint(CheckpointInfo cpInfo) {
-        synchronized (lock){
-            this.cpInfo = cpInfo;
-            logger.debug(String.format("Brodcasting about update checkpointInfo: %s", cpInfo));
+    private void updateCheckpoint(CheckpointInfo newCpInfo) {
+        synchronized (LOCK){
+            cpInfo = newCpInfo;
+            log.debug(String.format("Brodcasting about update checkpointInfo: %s", newCpInfo));
             //通知所有等待区块的线程
-            lock.notifyAll();
+            LOCK.notifyAll();
         }
     }
 
@@ -369,8 +370,8 @@ public class BlockFileManager {
     /**
      * 根据区块hash查找区块
      */
-	Common.Block retrieveBlockByHash(byte[] blockHash) throws LedgerException {
-        logger.debug(String.format("retrieveBlockByHash() - blockHash = [%s]", BytesHexStrTranslate.bytesToHexFun1(blockHash)));
+	public Common.Block retrieveBlockByHash(byte[] blockHash) throws LedgerException {
+        log.debug(String.format("retrieveBlockByHash() - blockHash = [%s]", Hex.toHexString(blockHash)));
         FileLocPointer loc;
 		loc = index.getBlockLocByHash(blockHash);
         return fetchBlock(loc);
@@ -379,8 +380,8 @@ public class BlockFileManager {
     /**
      * 根据区块号查找区块
      */
-	Common.Block retrieveBlockByNumber(long blockNum) throws LedgerException {
-        logger.debug(String.format("retrieveBlockByHash() - blockHash = [%d]", blockNum));
+	public Common.Block retrieveBlockByNumber(long blockNum) throws LedgerException {
+        log.debug(String.format("retrieveBlockByHash() - blockNum = [%d]", blockNum));
         if(blockNum == Long.MAX_VALUE){
             blockNum = getBlockchainInfo().getHeight() - 1;
         }
@@ -392,8 +393,8 @@ public class BlockFileManager {
     /**
      * 根据交易ID查找区块
      */
-	Common.Block retrieveBlockByTxID(String txID) throws LedgerException {
-        logger.debug(String.format("retrieveBlockByTxID() - txID = [%s]", txID));
+	public Common.Block retrieveBlockByTxID(String txID) throws LedgerException {
+        log.debug(String.format("retrieveBlockByTxID() - txID = [%s]", txID));
 
         FileLocPointer loc = index.getBlockLocByTxID(txID);
         return fetchBlock(loc);
@@ -402,8 +403,8 @@ public class BlockFileManager {
     /**
      * 根据交易ID查找交易校验码
      */
-	TransactionPackage.TxValidationCode retrieveTxValidationCodeByTxID(String txID) throws LedgerException{
-        logger.debug(String.format("retrieveTxValidationCodeByTxID() - txID = [%s]", txID));
+	public TransactionPackage.TxValidationCode retrieveTxValidationCodeByTxID(String txID) throws LedgerException{
+        log.debug(String.format("retrieveTxValidationCodeByTxID() - txID = [%s]", txID));
 		return index.getTxValidationCodeByTxID(txID);
     }
 
@@ -411,7 +412,7 @@ public class BlockFileManager {
      * 根据区块号查找区块头
      */
 	private Common.BlockHeader retrieveBlockHeaderByNumber(long blockNum) throws  LedgerException {
-        logger.debug(String.format("retrieveBlockHeaderByNumber - blockNum = [%d]", blockNum));
+        log.debug(String.format("retrieveBlockHeaderByNumber - blockNum = [%d]", blockNum));
         FileLocPointer loc = index.getBlockLocByBlockNum(blockNum);
         byte[] blockBytes = fetchBlockBytes(loc);
         SerializedBlockInfo info = BlockSerialization.extractSerializedBlockInfo(blockBytes, loc.getLocPointer().getOffset() + 8);
@@ -421,24 +422,27 @@ public class BlockFileManager {
     /**
      * 获取区块迭代器
      */
-	BlocksItr retrieveBlocks(long startNum) {
+	public BlocksItr retrieveBlocks(long startNum) {
         return new BlocksItr(this, startNum);
     }
 
     /**
      * 根据交易ID查找交易
      */
-	Common.Envelope retrieveTransactionByID(String txID) throws LedgerException {
-        logger.debug(String.format("retrieveTransactionByID() - txID = [%s]", txID));
+	public Common.Envelope retrieveTransactionByID(String txID) throws LedgerException {
+        log.debug(String.format("retrieveTransactionByID() - txID = [%s]", txID));
         FileLocPointer loc = index.getTxLoc(txID);
+		if (loc == null) {
+			return null;
+		}
         return fetchTransactionEnvelope(loc);
     }
 
     /**
      * 根据交易区块号以及交易序号查找交易
      */
-	Common.Envelope retrieveTransactionByBlockNumTranNum(long blockNum, long tranNum) throws LedgerException{
-        logger.debug(String.format("retrieveTransactionByBlockNumTranNum() - blockNum = [%d], tranNum = [%d]"
+	public Common.Envelope retrieveTransactionByBlockNumTranNum(long blockNum, long tranNum) throws LedgerException{
+        log.debug(String.format("retrieveTransactionByBlockNumTranNum() - blockNum = [%d], tranNum = [%d]"
                 , blockNum, tranNum));
         FileLocPointer loc = index.getTXLocByBlockNumTranNum(blockNum, tranNum);
         return fetchTransactionEnvelope(loc);
@@ -448,6 +452,9 @@ public class BlockFileManager {
      * 获取区块
      */
     private Common.Block fetchBlock(FileLocPointer lp) throws LedgerException{
+		if (lp == null) {
+			return null;
+		}
         byte[] blockBytes = fetchBlockBytes(lp);
         if (blockBytes == null){
             throw new LedgerException(String.format("Fail to fetch block by [%s]", lp));
@@ -463,7 +470,10 @@ public class BlockFileManager {
      * 获取交易Envelope
      */
     private Common.Envelope fetchTransactionEnvelope(FileLocPointer lp) throws LedgerException{
-        logger.debug(String.format("Entering fetchTransactionEnvelope() %s", lp));
+		if (lp == null) {
+			return null;
+		}
+        log.debug(String.format("Entering fetchTransactionEnvelope() %s", lp));
         byte[] txEnvelopeBytes = fetchRawBytes(lp);
         if (txEnvelopeBytes == null){
             throw new LedgerException(String.format("Fail to fetch envelope by [%s]", lp));
@@ -476,7 +486,7 @@ public class BlockFileManager {
         try {
             envelope = Common.Envelope.parseFrom(txEnvelopeBytes);
         } catch (InvalidProtocolBufferException e) {
-            logger.error("Got error when getting envelope from block bytes");
+            log.error("Got error when getting envelope from block bytes");
             throw new LedgerException(e);
         }
         return envelope;
@@ -486,6 +496,9 @@ public class BlockFileManager {
      * 获取区块
      */
     private byte[] fetchBlockBytes(FileLocPointer lp) throws LedgerException {
+		if (lp == null) {
+			return null;
+		}
         BlockFileStream stream = null;
         try {
             stream = new BlockFileStream(rootDir, lp.getFileSuffixNum(), lp.getLocPointer().getOffset());
@@ -501,6 +514,9 @@ public class BlockFileManager {
      * 获取获取对应位置字节
      */
     private byte[] fetchRawBytes(FileLocPointer lp) throws LedgerException {
+		if (lp == null) {
+			return null;
+		}
         BlockFileReader reader;
         String filePath = deriveBlockfilePath(rootDir, lp.getFileSuffixNum());
         reader = new BlockFileReader(filePath);
@@ -514,7 +530,7 @@ public class BlockFileManager {
         byte[] b;
         b = db.get(compositeBlockManagerInfoKey(ledgerId));
         if(b == null){
-            logger.debug("Fail to got BLK_MGR_INFO_KEY with " + ledgerId);
+            log.debug("Fail to got BLK_MGR_INFO_KEY with " + ledgerId);
             return null;
         }
         CheckpointInfo checkpointInfo = new CheckpointInfo();
@@ -533,7 +549,7 @@ public class BlockFileManager {
     /**
      * 检索最新的完整区块
      */
-    static List<Object> scanForLastCompleteBlock(String rootDir, Integer fileNum, long startingOffset) throws LedgerException{
+    public static List<Object> scanForLastCompleteBlock(String rootDir, int fileNum, long startingOffset) throws LedgerException{
         BlockFileStream stream = null;
         byte[] blockBytes;
         byte[] lastBlockBytes = null;
@@ -561,7 +577,7 @@ public class BlockFileManager {
     }
 
     private byte[] compositeBlockManagerInfoKey(String ledgerid){
-        return ArrayUtils.addAll(BLK_MGR_INFO_KEY, ledgerid.getBytes());
+        return ArrayUtils.addAll(BLK_MGR_INFO_KEY, ledgerid.getBytes(StandardCharsets.UTF_8));
     }
 
     public static String getBlockfilePrefix() {
@@ -594,10 +610,6 @@ public class BlockFileManager {
 
     public CheckpointInfo getCpInfo() {
         return cpInfo;
-    }
-
-    public void setCpInfo(CheckpointInfo cpInfo) {
-        this.cpInfo = cpInfo;
     }
 
     public BlockFileWriter getCurrentFileWriter() {
@@ -635,5 +647,4 @@ public class BlockFileManager {
     public Ledger.BlockchainInfo getBlockchainInfo() {
         return bcInfo;
     }
-
 }

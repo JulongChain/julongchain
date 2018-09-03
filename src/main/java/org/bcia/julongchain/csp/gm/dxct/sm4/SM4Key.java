@@ -15,10 +15,15 @@
  */
 package org.bcia.julongchain.csp.gm.dxct.sm4;
 
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.csp.gm.dxct.sm3.SM3;
 import org.bcia.julongchain.csp.intfs.IKey;
 
+import java.security.NoSuchAlgorithmException;
+
 /**
+ * sm4蜜钥对象
+ *
  * @author zhangmingyang
  * @Date: 2018/4/28
  * @company Dingxuan
@@ -38,8 +43,12 @@ public class SM4Key implements IKey {
     }
 
     @Override
-    public byte[] ski() {
-        return sm3.hash(sm4Key);
+    public byte[] ski() throws CspException {
+        try {
+            return sm3.hash(sm4Key);
+        } catch (NoSuchAlgorithmException e) {
+            throw new CspException(e.getMessage());
+        }
     }
 
     @Override

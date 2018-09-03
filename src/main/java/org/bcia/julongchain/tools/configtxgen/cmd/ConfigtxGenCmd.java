@@ -19,22 +19,22 @@ import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.ConfigtxToolsException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfig;
 import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfigFactory;
 import org.bcia.julongchain.tools.configtxgen.helper.ConfigtxHelper;
 
 /**
- * 类描述
+ * 交易生成工具命令支持
  *
  * @author zhouhui
  * @date 2018/06/06
  * @company Dingxuan
  */
 public class ConfigtxGenCmd implements IConfigtxGenCmd {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(ConfigtxGenCmd.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ConfigtxGenCmd.class);
 
     //参数：groupId
     private static final String ARG_GROUP_ID = "g";
@@ -75,75 +75,75 @@ public class ConfigtxGenCmd implements IConfigtxGenCmd {
         String groupId = null;
         if (cmd.hasOption(ARG_GROUP_ID)) {
             groupId = cmd.getOptionValue(ARG_GROUP_ID, defaultValue);
-            log.info("GroupId-----$" + groupId);
+            log.info("GroupId: " + groupId);
         }
 
         String profile = null;
         if (cmd.hasOption(ARG_PROFILE)) {
             profile = cmd.getOptionValue(ARG_PROFILE, defaultValue);
-            log.info("profile-----$" + profile);
+            log.info("Profile: " + profile);
         }
 
         String outputBlock = null;
         if (cmd.hasOption(ARG_OUTPUT_BLOCK)) {
             outputBlock = cmd.getOptionValue(ARG_OUTPUT_BLOCK, defaultValue);
-            log.info("OutputBlock-----$" + outputBlock);
+            log.info("OutputBlock: " + outputBlock);
         }
 
         String outputGroupCreateTx = null;
         if (cmd.hasOption(ARG_OUTPUT_GROUP_CREATE_TX)) {
             outputGroupCreateTx = cmd.getOptionValue(ARG_OUTPUT_GROUP_CREATE_TX, defaultValue);
-            log.info("OutputGroupCreateTx-----$" + outputGroupCreateTx);
+            log.info("OutputGroupCreateTx: " + outputGroupCreateTx);
         }
 
         String outputAnchorNodesUpdate = null;
         if (cmd.hasOption(ARG_OUTPUT_ANCHOR_NODES_UPDATE)) {
             outputAnchorNodesUpdate = cmd.getOptionValue(ARG_OUTPUT_ANCHOR_NODES_UPDATE, defaultValue);
-            log.info("OutputGroupCreateTx-----$" + outputAnchorNodesUpdate);
+            log.info("OutputGroupCreateTx: " + outputAnchorNodesUpdate);
         }
 
         String asOrg = null;
         if (cmd.hasOption(ARG_AS_ORGANIZATION)) {
             asOrg = cmd.getOptionValue(ARG_AS_ORGANIZATION, defaultValue);
-            log.info("asOrg-----$" + asOrg);
+            log.info("AsOrg: " + asOrg);
         }
 
         String inspectBlock = null;
         if (cmd.hasOption(ARG_INSPECTBLOCK)) {
             inspectBlock = cmd.getOptionValue(ARG_INSPECTBLOCK, defaultValue);
-            log.info("inspectBlock-----$" + inspectBlock);
+            log.info("InspectBlock: " + inspectBlock);
         }
 
         String inspectGroupCreateTx = null;
         if (cmd.hasOption(ARG_INSPECT_GROUP_CREATE_TX)) {
             inspectGroupCreateTx = cmd.getOptionValue(ARG_INSPECT_GROUP_CREATE_TX, defaultValue);
-            log.info("inspectGroupCreateTx-----$" + inspectGroupCreateTx);
+            log.info("InspectGroupCreateTx: " + inspectGroupCreateTx);
         }
 
         String printOrg = null;
         if (cmd.hasOption(ARG_PRINT_ORGANIZATION)) {
             printOrg = cmd.getOptionValue(ARG_PRINT_ORGANIZATION, defaultValue);
-            log.info("printOrg-----$" + printOrg);
+            log.info("PrintOrg: " + printOrg);
         }
 
         //-----------------------------------业务逻辑--------------------------------//
         if (StringUtils.isNotBlank(outputBlock)) {
-            ValidateUtils.isNotBlank(profile, "profile can not be empty");
+            ValidateUtils.isNotBlank(profile, "Profile can not be empty");
             GenesisConfig.Profile profileConfig = GenesisConfigFactory.getGenesisConfig().getCompletedProfile(profile);
             ConfigtxHelper.doOutputBlock(profileConfig, groupId, outputBlock);
             return;
         }
 
         if (StringUtils.isNotBlank(outputGroupCreateTx)) {
-            ValidateUtils.isNotBlank(profile, "profile can not be empty");
+            ValidateUtils.isNotBlank(profile, "Profile can not be empty");
             GenesisConfig.Profile profileConfig = GenesisConfigFactory.getGenesisConfig().getCompletedProfile(profile);
             ConfigtxHelper.doOutputGroupCreateTx(profileConfig, groupId, outputGroupCreateTx);
             return;
         }
 
         if (StringUtils.isNotBlank(outputAnchorNodesUpdate)) {
-            ValidateUtils.isNotBlank(profile, "profile can not be empty");
-            ValidateUtils.isNotBlank(asOrg, "asOrg can not be empty");
+            ValidateUtils.isNotBlank(profile, "Profile can not be empty");
+            ValidateUtils.isNotBlank(asOrg, "AsOrg can not be empty");
             GenesisConfig.Profile profileConfig = GenesisConfigFactory.getGenesisConfig().getCompletedProfile(profile);
             ConfigtxHelper.doOutputAnchorNodesUpdate(profileConfig, groupId, outputAnchorNodesUpdate, asOrg);
             return;

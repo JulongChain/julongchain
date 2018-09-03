@@ -15,28 +15,34 @@
  */
 package org.bcia.julongchain.common.tools.cryptogen.bean;
 
+/**
+ * MSP config.yaml 数据类 ouIdentifier 部分
+ *
+ * @author chenhao, yegangcheng
+ * @date 2018/7/4
+ * @company Excelsecu
+ */
 public class OrgUnitIdentifiersConfig {
-    //按go项目中的yaml指定的命名
-    private String Certificate;
-    private String OrganizationalUnitIdentifier;
+    private String certificate;
+    private String organizationalUnitIdentifier;
 
     public OrgUnitIdentifiersConfig() {
 
     }
 
     public String getCertificate() {
-        return Certificate;
+        return certificate;
     }
 
     public String getOrganizationalUnitIdentifier() {
-        return OrganizationalUnitIdentifier;
+        return organizationalUnitIdentifier;
     }
 
     public void setCertificate(String certificate) {
-        Certificate = certificate;
+        this.certificate = certificate;
     }
 
     public void setOrganizationalUnitIdentifier(String organizationalUnitIdentifier) {
-        OrganizationalUnitIdentifier = organizationalUnitIdentifier;
+        this.organizationalUnitIdentifier = organizationalUnitIdentifier;
     }
 }

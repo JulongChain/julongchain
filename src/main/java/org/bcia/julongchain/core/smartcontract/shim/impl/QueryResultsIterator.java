@@ -2,13 +2,15 @@
 Copyright IBM Corp. All Rights Reserved.
 
 SPDX-License-Identifier: Apache-2.0
+
+Modified java_package and other contents by Dingxuan on 2018-08-30
 */
 
 package org.bcia.julongchain.core.smartcontract.shim.impl;
 
 import org.bcia.julongchain.core.smartcontract.shim.ledger.IQueryResultsIterator;
-import org.bcia.julongchain.protos.node.SmartcontractShim.QueryResponse;
-import org.bcia.julongchain.protos.node.SmartcontractShim.QueryResultBytes;
+import org.bcia.julongchain.protos.node.SmartContractShim.QueryResponse;
+import org.bcia.julongchain.protos.node.SmartContractShim.QueryResultBytes;
 
 import java.util.Collections;
 import java.util.Iterator;

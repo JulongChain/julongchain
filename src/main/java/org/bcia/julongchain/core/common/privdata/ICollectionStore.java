@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.core.common.privdata;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.protos.common.Collection;
 
 /**
@@ -36,25 +36,25 @@ public interface ICollectionStore {
      *  Else - it's the latest configuration for the collection.
      * @param collectionCriteria
      * @return
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    ICollection retrieveColletion(Collection.CollectionCriteria collectionCriteria)throws JavaChainException;
+    ICollection retrieveColletion(Collection.CollectionCriteria collectionCriteria)throws JulongChainException;
 
     /**
      * GetCollectionAccessPolicy retrieves a collection's access policy
      * @param collectionCriteria
      * @return
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    ICollectionAccessPolicy retrieveCollectionAccessPolicy(Collection.CollectionCriteria collectionCriteria)throws JavaChainException;
+    ICollectionAccessPolicy retrieveCollectionAccessPolicy(Collection.CollectionCriteria collectionCriteria)throws JulongChainException;
 
     /**
      * RetrieveCollectionConfigPackage retrieves the configuration
      * for the collection with the supplied criteria
      * @param collectionCriteria
      * @return
-     * @throws JavaChainException
+     * @throws JulongChainException
      */
-    Collection.CollectionConfigPackage retrieveCollectionConfigPackage(Collection.CollectionCriteria collectionCriteria)throws JavaChainException;
+    Collection.CollectionConfigPackage retrieveCollectionConfigPackage(Collection.CollectionCriteria collectionCriteria)throws JulongChainException;
 
 }

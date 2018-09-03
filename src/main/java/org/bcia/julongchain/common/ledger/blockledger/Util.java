@@ -24,6 +24,8 @@ import org.bcia.julongchain.protos.consenter.Ab;
 import java.util.List;
 import java.util.Map;
 
+import static org.bcia.julongchain.core.ledger.util.Util.*;
+
 /**
  * 提供账本读写工具
  *
@@ -32,8 +34,6 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class Util {
-    public static final LedgerException NOT_FOUND_ERROR_ITERATOR = new LedgerException("Not found iterator");
-
     /**
      * 获取新的区块
      * 根据当前账本中最新区块的编号获取下一个区块编号
@@ -42,7 +42,7 @@ public class Util {
      */
     public static Common.Block createNextBlock(IReader reader, List<Common.Envelope> messages) throws LedgerException{
         long nextBlockNumber = 0;
-        ByteString previousBlockHash = null;
+        byte[] previousBlockHash = null;
         if(reader.height() > 0){
             //当当前账本中有数据时，应从最新的区块开始读取
             Ab.SeekPosition startPosition = Ab.SeekPosition.newBuilder()
@@ -56,22 +56,23 @@ public class Util {
                 throw new LedgerException("Error seeking to newest block for group with non-zero height");
             }
             nextBlockNumber = block.getHeader().getNumber() + 1;
-            previousBlockHash = block.getHeader().getDataHash();
+            previousBlockHash = getHashBytes(block.getHeader().toByteArray());
         }
         //添加区块Data
         Common.BlockData.Builder dataBuilder = Common.BlockData.newBuilder();
         if (messages != null) {
-            messages.forEach((msg) -> {
-                dataBuilder.addData(msg.toByteString());
-            });
+            messages.forEach((msg) -> dataBuilder.addData(msg.toByteString()));
         }
-        //组装区块
+		ByteString dataByteString = dataBuilder.build().toByteString();
+		//组装区块
         return Common.Block.newBuilder()
                 .setHeader(Common.BlockHeader.newBuilder()
                         .setNumber(nextBlockNumber)
-                        .setPreviousHash(previousBlockHash == null ? ByteString.EMPTY : previousBlockHash)
-		                .setDataHash(ByteString.copyFrom(org.bcia.julongchain.core.ledger.util.Util.getHashBytes(dataBuilder.build().toByteArray())))
-                        .build())
+                        .setPreviousHash(previousBlockHash == null ? ByteString.EMPTY : ByteString.copyFrom(previousBlockHash))
+						.setDataHash(dataByteString.equals(ByteString.EMPTY) ?
+								ByteString.EMPTY :
+								ByteString.copyFrom(getHashBytes(dataByteString.toByteArray())))
+						.build())
                 .setData(dataBuilder)
                 .setMetadata(Common.BlockMetadata.newBuilder()
                         .addMetadata(ByteString.EMPTY)
@@ -86,16 +87,15 @@ public class Util {
      * 获取区块
      * 当前账本中存在所需区块，直接返回
      * 当前账本中不存在所需区块，阻塞进程并等待append
-     * @param IReader 账本
+     * @param reader 账本
      * @param index 区块编号
      */
-    public static Common.Block getBlock(IReader IReader, long index) throws LedgerException {
-        IIterator i = IReader.iterator(Ab.SeekPosition.newBuilder()
+    public static Common.Block getBlock(IReader reader, long index) throws LedgerException {
+        IIterator i = reader.iterator(Ab.SeekPosition.newBuilder()
                 .setSpecified(Ab.SeekSpecified.newBuilder()
                         .setNumber(index)
                         .build())
                 .build());
-        Object token = null;
         //判断是否需要阻塞进程
         i.readyChain();
         Map.Entry<QueryResult, Common.Status> entry = (Map.Entry<QueryResult, Common.Status>) i.next().getObj();

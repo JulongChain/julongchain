@@ -15,7 +15,9 @@
  */
 package org.bcia.julongchain.core.container.inproccontroller;
 
-import org.bcia.julongchain.core.smartcontract.shim.ISmartContract;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.core.ssc.SystemSmartContractBase;
 
 /**
  * 类描述
@@ -25,54 +27,41 @@ import org.bcia.julongchain.core.smartcontract.shim.ISmartContract;
  * @company Dingxuan
  */
 public class InprocContainer {
+	private static final JulongChainLog log = JulongChainLogFactory.getLog(InprocContainer.class);
 
-    private ISmartContract smartContract;
-    private Boolean running;
+	private SystemSmartContractBase sysSmartContract;
     private String[] args;
-    private String[] env;
-    private Chan stopChan;
 
-    public InprocContainer(ISmartContract smartContract) {
-        this.smartContract = smartContract;
+    public InprocContainer() {
+	}
+
+    public InprocContainer(SystemSmartContractBase sysSmartContract) {
+		this();
+        this.sysSmartContract = sysSmartContract;
     }
 
-    public ISmartContract getSmartContract() {
-        return smartContract;
-    }
+	public InprocContainer(SystemSmartContractBase sysSmartContract, String[] args) {
+		this(sysSmartContract);
+		this.args = args;
+	}
 
-    public void setSmartContract(ISmartContract smartContract) {
-        this.smartContract = smartContract;
-    }
+	public void startContainer() {
+    	logPath(sysSmartContract);
+		logArgs(args);
+		sysSmartContract.start(args);
+	}
 
-    public Boolean getRunning() {
-        return running;
-    }
+	private void logPath(SystemSmartContractBase ssc) {
+		if (ssc.getSystemSmartContractDescriptor() != null) {
+			log.debug("In-Process VM start system smartcontract [" + ssc.getSystemSmartContractDescriptor().getSSCPath() + "]");
+		}
+	}
 
-    public void setRunning(Boolean running) {
-        this.running = running;
-    }
-
-    public String[] getArgs() {
-        return args;
-    }
-
-    public void setArgs(String[] args) {
-        this.args = args;
-    }
-
-    public String[] getEnv() {
-        return env;
-    }
-
-    public void setEnv(String[] env) {
-        this.env = env;
-    }
-
-    public Chan getStopChan() {
-        return stopChan;
-    }
-
-    public void setStopChan(Chan stopChan) {
-        this.stopChan = stopChan;
-    }
+	private void logArgs(String[] args) {
+		if (args != null) {
+			for (String arg : args) {
+				log.debug("In-Process VM start with args " + arg);
+			}
+		}
+	}
 }

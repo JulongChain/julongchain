@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,8 +16,8 @@
 package org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage;
 
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,7 +30,7 @@ import java.io.FileInputStream;
  * @company Dingxuan
  */
 public class BlockFileReader {
-	private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockFileReader.class);
+	private static JulongChainLog log = JulongChainLogFactory.getLog(BlockFileReader.class);
     private File file;
 
     public BlockFileReader(String filePath){
@@ -49,22 +49,22 @@ public class BlockFileReader {
 			//移动到指定位置
 			long skip = fis.skip(offset);
 			if (skip != offset) {
-				logger.debug("Wrong file skip. Expect skip = [{}], actual skip = [{}]", offset, skip);
+				log.debug("Wrong file skip. Expect skip = [{}], actual skip = [{}]", offset, skip);
 			}
 			int read = fis.read(result);
 			if (read != length) {
-				logger.debug("Wrong file read. Except read = [{}], actual read = [{}]", length, read);
+				log.debug("Wrong file read. Except read = [{}], actual read = [{}]", length, read);
 			}
 			fis.close();
 		} catch (Throwable e){
-			logger.error(e.getMessage(), e);
+			log.error(e.getMessage(), e);
 			throw new LedgerException(e);
 		}
 		return result;
     }
 
     public void close(){
-    	//do nothing
+    	//nothing to do
 	}
 
     public File getFile() {

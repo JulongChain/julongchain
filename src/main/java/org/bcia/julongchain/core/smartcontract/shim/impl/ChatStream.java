@@ -2,6 +2,8 @@
  * Copyright IBM Corp., DTCC All Rights Reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
+ *
+ * Modified java_package and other contents by Dingxuan on 2018-08-30
  */
 
 package org.bcia.julongchain.core.smartcontract.shim.impl;
@@ -15,15 +17,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContract;
 import org.bcia.julongchain.protos.node.SmartContractSupportGrpc;
-import org.bcia.julongchain.protos.node.SmartcontractShim;
+import org.bcia.julongchain.protos.node.SmartContractShim;
 
-public class ChatStream implements StreamObserver<SmartcontractShim.SmartContractMessage> {
+public class ChatStream implements StreamObserver<SmartContractShim.SmartContractMessage> {
 
 	private Log logger = LogFactory.getLog(ChatStream.class);
 
 	private final ManagedChannel connection;
 	private final Handler handler;
-	private StreamObserver<SmartcontractShim.SmartContractMessage> streamObserver;
+	private StreamObserver<SmartContractShim.SmartContractMessage> streamObserver;
 
 	public ChatStream(ManagedChannel connection, ISmartContract smartcontract) {
 		// Establish stream with validating peer
@@ -44,9 +46,9 @@ public class ChatStream implements StreamObserver<SmartcontractShim.SmartContrac
 		this.handler = new Handler(this, smartcontract);
 	}
 
-	public synchronized void serialSend(SmartcontractShim.SmartContractMessage message) {
+	public synchronized void serialSend(SmartContractShim.SmartContractMessage message) {
 			logger.info(String.format("[%-8s]Sending %s message to peer.", message.getTxid(), message.getType()));
-			logger.info(String.format("[%-8s]SmartcontractMessage: %s", message.getTxid(), toJsonString(message)));
+			logger.info(String.format("[%-8s]SmartContractMessage: %s", message.getTxid(), toJsonString(message)));
 		try {
 			this.streamObserver.onNext(message);
 			logger.info(String.format("[%-8s]%s message sent.", message.getTxid(), message.getType()));
@@ -57,7 +59,7 @@ public class ChatStream implements StreamObserver<SmartcontractShim.SmartContrac
 	}
 
 	@Override
-	public void onNext(SmartcontractShim.SmartContractMessage message) {
+	public void onNext(SmartContractShim.SmartContractMessage message) {
 			logger.info("Got message from peer: " + toJsonString(message));
 		try {
 			logger.info(String.format("[%-8s]Received message %s from org.hyperledger.fabric.shim", message.getTxid(), message.getType()));
@@ -79,7 +81,7 @@ public class ChatStream implements StreamObserver<SmartcontractShim.SmartContrac
 		handler.nextState.close();
 	}
 
-	static String toJsonString(SmartcontractShim.SmartContractMessage message) {
+	static String toJsonString(SmartContractShim.SmartContractMessage message) {
 		try {
 			String result =  JsonFormat.printer().print(message);
 			int start = 0;
@@ -96,12 +98,12 @@ public class ChatStream implements StreamObserver<SmartcontractShim.SmartContrac
 	public void receive() throws Exception {
 		NextStateInfo nsInfo = handler.nextState.take();
 		logger.info(nsInfo.toString());
-		SmartcontractShim.SmartContractMessage message = nsInfo.message;
+		SmartContractShim.SmartContractMessage message = nsInfo.message;
 		onNext(message);
 
 		// keepalive messages are PONGs to the fabric's PINGs
-		if (nsInfo.sendToSC || message.getType() == SmartcontractShim.SmartContractMessage.Type.KEEPALIVE) {
-			if (message.getType() == SmartcontractShim.SmartContractMessage.Type.KEEPALIVE) {
+		if (nsInfo.sendToSC || message.getType() == SmartContractShim.SmartContractMessage.Type.KEEPALIVE) {
+			if (message.getType() == SmartContractShim.SmartContractMessage.Type.KEEPALIVE) {
 				logger.info("Sending KEEPALIVE response");
 			} else {
 				logger.info(String.format("[%-8s]Send state message %s", message.getTxid(), message.getType()));

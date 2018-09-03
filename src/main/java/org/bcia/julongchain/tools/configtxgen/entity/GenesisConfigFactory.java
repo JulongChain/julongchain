@@ -15,8 +15,9 @@
  */
 package org.bcia.julongchain.tools.configtxgen.entity;
 
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.common.util.CommConstant;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.FileInputStream;
@@ -34,7 +35,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class GenesisConfigFactory {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(GenesisConfigFactory.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(GenesisConfigFactory.class);
 
     private static GenesisConfig genesisConfig;
 
@@ -55,11 +56,16 @@ public class GenesisConfigFactory {
 
         InputStream is = null;
         try {
-            is = GenesisConfigFactory.class.getClassLoader().getResourceAsStream(GenesisConfig.CONFIGTX_FILE_PATH);
+//            is = GenesisConfigFactory.class.getClassLoader().getResourceAsStream(GenesisConfig.CONFIGTX_FILE_PATH);
+            is = new FileInputStream(CommConstant.CONFIG_DIR_PREFIX + GenesisConfig.CONFIGTX_FILE_PATH);
+
             GenesisConfig genesisConfig = yaml.loadAs(is, GenesisConfig.class);
 
             genesisConfig.completeInstance();
             return genesisConfig;
+        } catch (FileNotFoundException e) {
+            log.error(e.getMessage(), e);
+            return null;
         } finally {
             if (is != null) {
                 try {

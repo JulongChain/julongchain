@@ -16,13 +16,13 @@
 package org.bcia.julongchain.common.exception;
 
 /**
- * 类描述
+ * 交易生成工具异常
  *
  * @author zhouhui
  * @date 2018/06/05
  * @company Dingxuan
  */
-public class ConfigtxToolsException extends JavaChainException {
+public class ConfigtxToolsException extends JulongChainException {
     private static final String MODULE_NAME = "[ConfigtxGen]";
 
     public ConfigtxToolsException() {

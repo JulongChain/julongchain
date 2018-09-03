@@ -22,7 +22,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.TransactionPackage;
 
 /**
- * 类描述
+ * 交易操作业务对象
  *
  * @author zhouhui
  * @date 2018/05/26
@@ -35,9 +35,9 @@ public class TransactionActionVO implements IProtoVO<TransactionPackage.Transact
     @Override
     public void parseFrom(TransactionPackage.TransactionAction transactionAction) throws
             InvalidProtocolBufferException, ValidateException {
-        ValidateUtils.isNotNull(transactionAction, "transactionAction can not be null");
-        ValidateUtils.isNotNull(transactionAction.getHeader(), "transactionAction.header can not be null");
-        ValidateUtils.isNotNull(transactionAction.getPayload(), "transactionAction.payload can not be null");
+        ValidateUtils.isNotNull(transactionAction, "TransactionAction can not be null");
+        ValidateUtils.isNotNull(transactionAction.getHeader(), "TransactionAction.header can not be null");
+        ValidateUtils.isNotNull(transactionAction.getPayload(), "TransactionAction.payload can not be null");
 
         this.signatureHeader = Common.SignatureHeader.parseFrom(transactionAction.getHeader());
 

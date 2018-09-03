@@ -18,8 +18,8 @@ package org.bcia.julongchain.core.ledger.pvtdatastorage;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.common.ledger.util.leveldbhelper.LevelDBProvider;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 
 /**
@@ -30,7 +30,7 @@ import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
  * @company Dingxuan
  */
 public class PvtDataProvider {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(PvtDataProvider.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(PvtDataProvider.class);
 
     private IDBProvider db;
 
@@ -40,7 +40,7 @@ public class PvtDataProvider {
     public PvtDataProvider() throws LedgerException{
 		String dbPath = LedgerConfig.getPvtDataStorePath();
 		this.db = new LevelDBProvider(dbPath);
-		logger.debug("Create pvtprovider using path = " + this.db.getDBPath());
+		log.debug("Create pvtprovider using path = " + this.db.getDBPath());
 	}
 
     /**

@@ -7,11 +7,12 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * 对象
+ * 调用智能合约测试类
  *
  * @author zhouhui
  * @date 2018/4/13
  * @company Dingxuan
+ * @deprecated
  */
 public class ContractInvokeCmdTest {
 

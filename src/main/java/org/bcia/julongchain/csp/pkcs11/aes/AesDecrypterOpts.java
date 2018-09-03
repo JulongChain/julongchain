@@ -20,9 +20,9 @@ import org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant;
 import sun.security.pkcs11.wrapper.PKCS11Constants;
 
 /**
- * Class description
+ * Aes Decrypt Opts
  *
- * @author
+ * @author Ying Xu
  * @date 5/25/18
  * @company FEITIAN
  */

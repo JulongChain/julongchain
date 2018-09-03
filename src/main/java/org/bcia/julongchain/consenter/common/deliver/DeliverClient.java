@@ -5,6 +5,8 @@ import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import org.bcia.julongchain.common.localmsp.ILocalSigner;
 import org.bcia.julongchain.common.localmsp.impl.LocalSigner;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
 import org.bcia.julongchain.protos.common.Common;
 
@@ -22,18 +24,20 @@ import static org.bcia.julongchain.protos.consenter.AtomicBroadcastGrpc.*;
  */
 @Component
 public class DeliverClient {
-    public static   void main(String[] args) {
-        String ip="localhost";
-        int port=7050;
-        System.out.println("begin");
-
-        ManagedChannel managedChannel= ManagedChannelBuilder.forAddress(ip,port).usePlaintext(true).build();
+    private static JulongChainLog log = JulongChainLogFactory.getLog(DeliverClient.class);
+    /**
+     * deliver 发送方法
+     * @param ip
+     * @param port
+     */
+    public  void send(String ip,int port) {
+        ManagedChannel managedChannel= ManagedChannelBuilder.forAddress(ip,port).usePlaintext().build();
         AtomicBroadcastStub stub= newStub(managedChannel);
         StreamObserver<Common.Envelope> envelopeStreamObserver=stub.deliver(new StreamObserver<Ab.DeliverResponse>() {
             @Override
             public void onNext(Ab.DeliverResponse deliverResponse) {
                 if(deliverResponse.getStatusValue()==200){
-                    System.out.println("chenggong");
+                    log.info("success");
                 }
             }
 
@@ -47,19 +51,13 @@ public class DeliverClient {
                 System.out.println("onCompled!");
             }
         });
-
             //客户端以流式的形式向服务器发送数据
            // envelopeStreamObserver.onNext(Common.Envelope.newBuilder().setPayload(ByteString.copyFrom(message.getBytes())).build());
-
         ILocalSigner localSigner = new LocalSigner();
         Common.GroupHeader  data = EnvelopeHelper.buildGroupHeader(Common.HeaderType.CONFIG_UPDATE_VALUE, 0,
                 "myGroup", 30);
-
         Common.Payload payload = EnvelopeHelper.buildPayload(Common.HeaderType.CONFIG_UPDATE_VALUE, 0, "myGroup", localSigner, data, 30);
-
         envelopeStreamObserver.onNext(Common.Envelope.newBuilder().setPayload(payload.toByteString()).build());
-
-
         try {
             Thread.sleep(9000);
         } catch (InterruptedException e) {

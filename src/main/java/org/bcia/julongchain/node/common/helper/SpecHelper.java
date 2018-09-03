@@ -17,14 +17,12 @@ package org.bcia.julongchain.node.common.helper;
 
 import com.google.protobuf.ByteString;
 import org.apache.commons.lang3.StringUtils;
-import org.bcia.julongchain.common.exception.JavaChainException;
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.ledger.util.IoUtil;
-import org.bcia.julongchain.common.util.CommConstant;
-import org.bcia.julongchain.protos.node.Smartcontract;
+import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 import java.io.File;
-import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
@@ -35,39 +33,51 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class SpecHelper {
-    public static Smartcontract.SmartContractInvocationSpec buildInvocationSpec(String smartContractName, String action, byte[] content) {
+    /**
+     * 构造针对scName的调用规格
+     *
+     * @param scName  要调用的智能合约名称
+     * @param action  操作
+     * @param content 参数
+     * @return
+     */
+    public static SmartContractPackage.SmartContractInvocationSpec buildInvocationSpec(String scName, String action,
+                                                                                       byte[] content) {
         //构造SmartContractInput对象
-        Smartcontract.SmartContractInput.Builder inputBuilder = Smartcontract.SmartContractInput.newBuilder();
-        inputBuilder.addArgs(ByteString.copyFrom(action, Charset.forName(CommConstant.DEFAULT_CHARSET)));
+        SmartContractPackage.SmartContractInput.Builder inputBuilder =
+                SmartContractPackage.SmartContractInput.newBuilder();
+        inputBuilder.addArgs(ByteString.copyFromUtf8(action));
         if (content != null) {
             inputBuilder.addArgs(ByteString.copyFrom(content));
         }
-        Smartcontract.SmartContractInput input = inputBuilder.build();
+        SmartContractPackage.SmartContractInput input = inputBuilder.build();
 
         //构造SmartContractSpec对象
-        Smartcontract.SmartContractSpec.Builder specBuilder = Smartcontract.SmartContractSpec.newBuilder();
-        specBuilder.setType(Smartcontract.SmartContractSpec.Type.JAVA);
-        specBuilder.setSmartContractId(Smartcontract.SmartContractID.newBuilder().setName(smartContractName));
+        SmartContractPackage.SmartContractSpec.Builder specBuilder =
+                SmartContractPackage.SmartContractSpec.newBuilder();
+        specBuilder.setType(SmartContractPackage.SmartContractSpec.Type.JAVA);
+        specBuilder.setSmartContractId(SmartContractPackage.SmartContractID.newBuilder().setName(scName));
         specBuilder.setInput(input);
-        Smartcontract.SmartContractSpec spec = specBuilder.build();
+        SmartContractPackage.SmartContractSpec spec = specBuilder.build();
 
         //构造SmartContractInvocationSpec对象
-        Smartcontract.SmartContractInvocationSpec.Builder invocationSpec = Smartcontract.SmartContractInvocationSpec
-                .newBuilder();
+        SmartContractPackage.SmartContractInvocationSpec.Builder invocationSpec =
+                SmartContractPackage.SmartContractInvocationSpec.newBuilder();
         invocationSpec.setSmartContractSpec(spec);
         return invocationSpec.build();
     }
 
     /**
-     * 构造针对scName的执调用规格
+     * 构造针对scName的调用规格
      *
      * @param scName 要调用的智能合约名称
      * @param args   参数集合，由操作和参数列表组成
      * @return
      */
-    public static Smartcontract.SmartContractInvocationSpec buildInvocationSpec(String scName, byte[]... args) {
+    public static SmartContractPackage.SmartContractInvocationSpec buildInvocationSpec(String scName, byte[]... args) {
         //构造SmartContractInput对象
-        Smartcontract.SmartContractInput.Builder inputBuilder = Smartcontract.SmartContractInput.newBuilder();
+        SmartContractPackage.SmartContractInput.Builder inputBuilder =
+                SmartContractPackage.SmartContractInput.newBuilder();
         for (byte[] bytes : args) {
             if (bytes != null) {
                 inputBuilder.addArgs(ByteString.copyFrom(bytes));
@@ -75,18 +85,45 @@ public class SpecHelper {
                 inputBuilder.addArgs(ByteString.copyFrom(new byte[0]));
             }
         }
-        Smartcontract.SmartContractInput input = inputBuilder.build();
+        SmartContractPackage.SmartContractInput input = inputBuilder.build();
 
         //构造SmartContractSpec对象
-        Smartcontract.SmartContractSpec.Builder specBuilder = Smartcontract.SmartContractSpec.newBuilder();
-        specBuilder.setType(Smartcontract.SmartContractSpec.Type.JAVA);
-        specBuilder.setSmartContractId(Smartcontract.SmartContractID.newBuilder().setName(scName));
+        SmartContractPackage.SmartContractSpec.Builder specBuilder =
+                SmartContractPackage.SmartContractSpec.newBuilder();
+        specBuilder.setType(SmartContractPackage.SmartContractSpec.Type.JAVA);
+        specBuilder.setSmartContractId(SmartContractPackage.SmartContractID.newBuilder().setName(scName));
         specBuilder.setInput(input);
-        Smartcontract.SmartContractSpec spec = specBuilder.build();
+        SmartContractPackage.SmartContractSpec spec = specBuilder.build();
 
         //构造SmartContractInvocationSpec对象
-        Smartcontract.SmartContractInvocationSpec.Builder invocationSpecBuilder = Smartcontract.SmartContractInvocationSpec
-                .newBuilder();
+        SmartContractPackage.SmartContractInvocationSpec.Builder invocationSpecBuilder =
+                SmartContractPackage.SmartContractInvocationSpec.newBuilder();
+        invocationSpecBuilder.setSmartContractSpec(spec);
+        return invocationSpecBuilder.build();
+    }
+
+    /**
+     * 构造针对scName的调用规格
+     *
+     * @param scName 要调用的智能合约名称
+     * @param input  入参对象
+     * @return
+     */
+    public static SmartContractPackage.SmartContractInvocationSpec buildInvocationSpec(String scName,
+                                                                                       SmartContractPackage.SmartContractInput input) {
+        //构造SmartContractSpec对象
+        SmartContractPackage.SmartContractSpec.Builder specBuilder =
+                SmartContractPackage.SmartContractSpec.newBuilder();
+        specBuilder.setType(SmartContractPackage.SmartContractSpec.Type.JAVA);
+        specBuilder.setSmartContractId(SmartContractPackage.SmartContractID.newBuilder().setName(scName));
+        if (input != null) {
+            specBuilder.setInput(input);
+        }
+        SmartContractPackage.SmartContractSpec spec = specBuilder.build();
+
+        //构造SmartContractInvocationSpec对象
+        SmartContractPackage.SmartContractInvocationSpec.Builder invocationSpecBuilder =
+                SmartContractPackage.SmartContractInvocationSpec.newBuilder();
         invocationSpecBuilder.setSmartContractSpec(spec);
         return invocationSpecBuilder.build();
     }
@@ -99,12 +136,12 @@ public class SpecHelper {
      * @param input
      * @return
      */
-    public static Smartcontract.SmartContractDeploymentSpec buildDeploymentSpec(String scName, String scVersion,
-                                                                                String scPath, Smartcontract
-                                                                                        .SmartContractInput input)
+    public static SmartContractPackage.SmartContractDeploymentSpec buildDeploymentSpec(String scName, String scVersion,
+                                                                                       String scPath,
+                                                                                       SmartContractPackage.SmartContractInput input)
             throws NodeException {
         //构造SmartContractID对象
-        Smartcontract.SmartContractID.Builder scIdBuilder = Smartcontract.SmartContractID.newBuilder();
+        SmartContractPackage.SmartContractID.Builder scIdBuilder = SmartContractPackage.SmartContractID.newBuilder();
         scIdBuilder.setName(scName);
         if (StringUtils.isNotBlank(scVersion)) {
             scIdBuilder.setVersion(scVersion);
@@ -112,20 +149,21 @@ public class SpecHelper {
         if (StringUtils.isNotBlank(scPath)) {
             scIdBuilder.setPath(scPath);
         }
-        Smartcontract.SmartContractID scId = scIdBuilder.build();
+        SmartContractPackage.SmartContractID scId = scIdBuilder.build();
 
         //构造SmartContractSpec对象
-        Smartcontract.SmartContractSpec.Builder specBuilder = Smartcontract.SmartContractSpec.newBuilder();
-        specBuilder.setType(Smartcontract.SmartContractSpec.Type.JAVA);
+        SmartContractPackage.SmartContractSpec.Builder specBuilder =
+                SmartContractPackage.SmartContractSpec.newBuilder();
+        specBuilder.setType(SmartContractPackage.SmartContractSpec.Type.JAVA);
         specBuilder.setSmartContractId(scId);
         if (input != null) {
             specBuilder.setInput(input);
         }
-        Smartcontract.SmartContractSpec spec = specBuilder.build();
+        SmartContractPackage.SmartContractSpec spec = specBuilder.build();
 
         //构造SmartContractDeploymentSpec对象
-        Smartcontract.SmartContractDeploymentSpec.Builder deploymentSpec = Smartcontract.SmartContractDeploymentSpec
-                .newBuilder();
+        SmartContractPackage.SmartContractDeploymentSpec.Builder deploymentSpec =
+                SmartContractPackage.SmartContractDeploymentSpec.newBuilder();
         deploymentSpec.setSmartContractSpec(spec);
 
         if (StringUtils.isNotEmpty(scPath)) {
@@ -134,7 +172,7 @@ public class SpecHelper {
                 byte[] tarBytes = IoUtil.tarWriter(scFileMap, 1024);
                 byte[] codePackage = IoUtil.gzipWriter(tarBytes);
                 deploymentSpec.setCodePackage(ByteString.copyFrom(codePackage));
-            } catch (JavaChainException e) {
+            } catch (JulongChainException e) {
                 throw new NodeException(e);
             }
         }

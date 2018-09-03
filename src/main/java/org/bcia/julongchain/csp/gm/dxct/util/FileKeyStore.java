@@ -15,9 +15,10 @@
  */
 package org.bcia.julongchain.csp.gm.dxct.util;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.CspException;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.gm.dxct.IKeyStore;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2Key;
 import org.bcia.julongchain.csp.intfs.IKey;
@@ -39,7 +40,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public class FileKeyStore implements IKeyStore {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(FileKeyStore.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(FileKeyStore.class);
     /**
      * 所有文件的名称
      */
@@ -57,12 +58,19 @@ public class FileKeyStore implements IKeyStore {
     }
 
 
+    /**
+     * 初始化
+     *
+     * @param pwd
+     * @param path
+     * @param readOnly
+     */
     private static void init(byte[] pwd, String path, boolean readOnly) {
         if (path == "") {
             try {
                 log.error("An invalid KeyStore path provided. Path cannot be an empty string.");
-                throw new JavaChainException("An invalid KeyStore path provided. Path cannot be an empty string.");
-            } catch (JavaChainException e) {
+                throw new JulongChainException("An invalid KeyStore path provided. Path cannot be an empty string.");
+            } catch (JulongChainException e) {
                 e.getMessage();
             }
         }
@@ -76,7 +84,7 @@ public class FileKeyStore implements IKeyStore {
     }
 
     @Override
-    public IKey getKey(byte[] ski) {
+    public IKey getKey(byte[] ski) throws CspException {
         if (ski.length == 0) {
             log.error("Invalid SKI. Cannot be of zero length.");
         }
@@ -87,9 +95,9 @@ public class FileKeyStore implements IKeyStore {
                 //IKey key= (IKey) loadPrivateKey(suffix);
                 //return  key;
             case "sk":
-                IKey key= loadPrivateKey(Hex.toHexString(ski));
+                IKey key = loadPrivateKey(Hex.toHexString(ski));
                 log.info(Hex.toHexString(key.toBytes()));
-                return  key;
+                return key;
             default:
 
         }
@@ -119,6 +127,11 @@ public class FileKeyStore implements IKeyStore {
     }
 
 
+    /**
+     * 迭代文件夹
+     *
+     * @param dir
+     */
     public void iteratorPath(String dir) {
 
         File or = new File(dir);
@@ -127,7 +140,7 @@ public class FileKeyStore implements IKeyStore {
             for (File file : files) {
                 if (file.isFile()) {
                     filesName.add(file.getName());
-                    filePathMap.put(file.getName(),file.getAbsolutePath());
+                    filePathMap.put(file.getName(), file.getAbsolutePath());
                 } else if (file.isDirectory()) {
                     iteratorPath(file.getAbsolutePath());
                 }
@@ -136,7 +149,10 @@ public class FileKeyStore implements IKeyStore {
     }
 
     /**
-     * 加载私钥
+     * 读取私钥文件
+     *
+     * @param alias
+     * @return
      */
     public SM2Key loadPrivateKey(String alias) {
 
@@ -160,17 +176,7 @@ public class FileKeyStore implements IKeyStore {
             e.printStackTrace();
         }
         pemObject.getContent();
-
-
-
         return new SM2Key();
-    }
-
-    public static void main(String[] args) {
-        FileKeyStore fileKeyStore = new FileKeyStore("D:\\msp", false, "123".getBytes());
-        byte[] ski = Hex.decode("4736e377f59b0ff3f8427ea1abadcbcc22078f23a7924518b344d1a3f42a7f37");
-        fileKeyStore.getKey(ski);
-
     }
 
 }

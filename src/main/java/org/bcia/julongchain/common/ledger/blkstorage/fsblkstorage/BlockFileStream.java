@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,8 +16,8 @@
 package org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage;
 
 import org.bcia.julongchain.common.exception.LedgerException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.util.Util;
 
 import java.io.*;
@@ -31,7 +31,7 @@ import java.util.AbstractMap;
  * @company Dingxuan
  */
 public class BlockFileStream {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(BlockFileStream.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BlockFileStream.class);
 
     private int fileNum;
     private BlockFileReader reader;
@@ -47,10 +47,10 @@ public class BlockFileStream {
 		this.reader = new BlockFileReader(filePath);
         this.currentOffset = startOffset;
         if(this.currentOffset > this.file.length()){
-        	logger.error("Current offset is out of file");
+        	log.error("Current offset is out of file");
             throw new LedgerException("Current offset is out of file");
         }
-        logger.debug(String.format("newBlockFileStream(): filePath=[%s], startOffset=[%d]", filePath, startOffset));
+        log.debug(String.format("newBlockFileStream(): filePath=[%s], startOffset=[%d]", filePath, startOffset));
         this.init = true;
     }
 
@@ -63,7 +63,7 @@ public class BlockFileStream {
         }
         //当前读取位置为文件结尾
         if(currentOffset == file.length()){
-            logger.debug(String.format("Finished reading file number [%d]", fileNum));
+            log.debug(String.format("Finished reading file number [%d]", fileNum));
             return new AbstractMap.SimpleEntry<>(null, null);
         }
         long remainingBytes = file.length() - currentOffset;
@@ -71,10 +71,10 @@ public class BlockFileStream {
         //剩余文件长度<8时抛出异常
         if(remainingBytes < BlockFileManager.PEEK_BYTES_LEN){
         	String errMsg = String.format("Remaining bytes length =[%d], we need at least [%d] bytes to get block", remainingBytes, BlockFileManager.PEEK_BYTES_LEN);
-            logger.error(errMsg);
+            log.error(errMsg);
             throw new LedgerException(errMsg);
         }
-        logger.debug(String.format("Remaining bytes=[%d], Going to peek [%d] bytes", remainingBytes, BlockFileManager.PEEK_BYTES_LEN));
+        log.debug(String.format("Remaining bytes=[%d], Going to peek [%d] bytes", remainingBytes, BlockFileManager.PEEK_BYTES_LEN));
         //读取8字节,并解析为block长度
 		byte[] lenBytes = reader.read(currentOffset, BlockFileManager.PEEK_BYTES_LEN);
         long length = Util.bytesToLong(lenBytes, 0, BlockFileManager.PEEK_BYTES_LEN);
@@ -82,7 +82,7 @@ public class BlockFileStream {
         //长度不足则抛出异常
         long expectedBytes = length + BlockFileManager.PEEK_BYTES_LEN;
         if(expectedBytes > remainingBytes){
-            logger.error(String.format("At least [%d] bytes expected. Remaing bytes [%d]", expectedBytes, remainingBytes));
+            log.error(String.format("At least [%d] bytes expected. Remaing bytes [%d]", expectedBytes, remainingBytes));
             throw new LedgerException("unexpected end of blockfile");
         }
         //读取block, 跳过前8位长度位
@@ -112,12 +112,8 @@ public class BlockFileStream {
 		reader.close();
     }
 
-    public Integer getFileNum() {
+    public int getFileNum() {
         return fileNum;
-    }
-
-    public void setFileNum(Integer fileNum) {
-        this.fileNum = fileNum;
     }
 
     public File getFile() {

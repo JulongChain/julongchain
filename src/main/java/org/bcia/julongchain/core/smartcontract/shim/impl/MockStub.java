@@ -12,14 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Modified java_package and other contents by Dingxuan on 2018-08-30
  */
 package org.bcia.julongchain.core.smartcontract.shim.impl;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.Timestamp;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.Utils;
+import org.bcia.julongchain.core.ledger.INodeLedger;
+import org.bcia.julongchain.core.ledger.ITxSimulator;
+import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContract;
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.julongchain.core.smartcontract.shim.ledger.CompositeKey;
@@ -41,7 +46,7 @@ import java.util.stream.Collectors;
  * @company Dingxuan
  */
 public class MockStub implements ISmartContractStub {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(MockStub.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(MockStub.class);
     private List<ByteString> args;
     private String name;
     private ISmartContract smartContract;
@@ -103,9 +108,23 @@ public class MockStub implements ISmartContractStub {
      */
     @Override
     public byte[] getState(String key) {
-        byte[] value=state.get(key);
-        log.debug("MockStub {} Getting {} {}",this.name,key,value);
-        return value;
+
+        byte[] state = null;
+        try {
+            LedgerManager.initialize(null);
+            INodeLedger l = LedgerManager.openLedger("myGroup");
+
+            ITxSimulator simulator = l.newTxSimulator("txID");
+            state = simulator.getState("lssc", "mycc");
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+	    return state;
     }
 
     @Override

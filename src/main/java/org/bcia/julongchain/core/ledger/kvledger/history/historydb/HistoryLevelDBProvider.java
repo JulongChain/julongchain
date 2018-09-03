@@ -18,30 +18,33 @@ package org.bcia.julongchain.core.ledger.kvledger.history.historydb;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.common.ledger.util.leveldbhelper.LevelDBProvider;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 
+import java.util.Objects;
+
 /**
- * HistoryDB操作类
+ * HistoryDB服务提供者类
  *
  * @author sunzongyu
  * @date 2018/04/04
  * @company Dingxuan
  */
 public class HistoryLevelDBProvider implements IHistoryDBProvider {
-    private static final JavaChainLog logger = JavaChainLogFactory.getLog(HistoryLevelDBProvider.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(HistoryLevelDBProvider.class);
 
     private IDBProvider provider = null;
 
     public HistoryLevelDBProvider() throws LedgerException{
         String dbPath = LedgerConfig.getHistoryLevelDBPath();
         this.provider = new LevelDBProvider(dbPath);
-        logger.debug(String.format("Create historyDB using dbPath = %s", this.provider.getDBPath()));
+        log.debug(String.format("Create historyDB using dbPath = %s", this.provider.getDBPath()));
     }
 
     @Override
     public IHistoryDB getDBHandle(String dbName) throws LedgerException {
+	    provider = ((LevelDBProvider) provider).getDBHandle(dbName);
         return new HistoryLevelDB(provider, dbName);
     }
 
@@ -50,11 +53,7 @@ public class HistoryLevelDBProvider implements IHistoryDBProvider {
         provider.close();
     }
 
-    public static JavaChainLog getLogger() {
-        return logger;
-    }
-
-    public IDBProvider getProvider() {
+	public IDBProvider getProvider() {
         return provider;
     }
 

@@ -15,30 +15,38 @@
  */
 package org.bcia.julongchain.core.aclmgmt;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
+import com.google.protobuf.InvalidProtocolBufferException;
+import org.apache.commons.lang3.StringUtils;
+import org.bcia.julongchain.common.exception.PolicyException;
+import org.bcia.julongchain.common.exception.ValidateException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.PolicyConstant;
 import org.bcia.julongchain.common.policycheck.IPolicyChecker;
 import org.bcia.julongchain.common.policycheck.PolicyChecker;
 import org.bcia.julongchain.common.policycheck.policies.GroupPolicyManagerGetter;
+import org.bcia.julongchain.common.util.proto.SignedData;
 import org.bcia.julongchain.core.aclmgmt.resources.Resources;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.msp.mgmt.MSPPrincipalGetter;
+import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * 类描述
+ * 默认的ACL提供器
  *
  * @author zhouhui
  * @date 2018/06/13
  * @company Dingxuan
  */
 public class DefaultACLProvider implements IAclProvider {
-    private IPolicyChecker policyChecker;
+    private static JulongChainLog log = JulongChainLogFactory.getLog(DefaultACLProvider.class);
 
-    private Map<String, String> resourcePolicyMap = new HashMap<>();
+    private IPolicyChecker policyChecker;
 
     private Map<String, String> groupPolicyMap = new HashMap<>();
 
@@ -51,10 +59,6 @@ public class DefaultACLProvider implements IAclProvider {
                 new MSPPrincipalGetter());
 
         //LSSC
-        resourcePolicyMap.put(Resources.LSSC_INSTALL, "");
-        resourcePolicyMap.put(Resources.LSSC_GETCHAINCODES, "");
-        resourcePolicyMap.put(Resources.LSSC_GETINSTALLEDCHAINCODES, "");
-
         groupPolicyMap.put(Resources.LSSC_DEPLOY, "");
         groupPolicyMap.put(Resources.LSSC_UPGRADE, "");
         groupPolicyMap.put(Resources.LSSC_GETSCINFO, PolicyConstant.GROUP_APP_READERS);
@@ -69,9 +73,6 @@ public class DefaultACLProvider implements IAclProvider {
         groupPolicyMap.put(Resources.QSSC_GetBlockByTxID, PolicyConstant.GROUP_APP_READERS);
 
         //CSSC
-        resourcePolicyMap.put(Resources.CSSC_JoinChain, "");
-        resourcePolicyMap.put(Resources.CSSC_GetChannels, "");
-
         groupPolicyMap.put(Resources.CSSC_GetConfigBlock, PolicyConstant.GROUP_APP_READERS);
         groupPolicyMap.put(Resources.CSSC_GetConfigTree, PolicyConstant.GROUP_APP_READERS);
         groupPolicyMap.put(Resources.CSSC_SimulateConfigTreeUpdate, PolicyConstant.GROUP_APP_WRITERS);
@@ -84,19 +85,35 @@ public class DefaultACLProvider implements IAclProvider {
     }
 
     @Override
-    public void checkACL(String resName, String groupID, ProposalPackage.SignedProposal idinfo) throws JavaChainException {
-        getDefaultPolicy(resName, true);
+    public void checkACL(String resName, String groupId, ProposalPackage.SignedProposal signedProposal) throws PolicyException {
+        String policyName = groupPolicyMap.get(resName);
+        if (StringUtils.isBlank(policyName)) {
+            String errrorMsg = "ResName's policy can not be empty: " + resName;
+            log.error(errrorMsg);
+            throw new PolicyException(errrorMsg);
+        }
 
-
+        policyChecker.checkPolicy(groupId, policyName, signedProposal);
     }
 
-    private void getDefaultPolicy(String resName, boolean isGroup) {
-//        if(isGroup){
-//            return groupPolicyMap.get(resName);
-//        }else{
-//            return resourcePolicyMap.get(resName);
-//        }
+    @Override
+    public void checkACL(String resName, String groupId, Common.Envelope envelope) throws PolicyException {
+        String policyName = groupPolicyMap.get(resName);
+        if (StringUtils.isBlank(policyName)) {
+            String errrorMsg = "ResName's policy can not be empty: " + resName;
+            log.error(errrorMsg);
+            throw new PolicyException(errrorMsg);
+        }
+
+        try {
+            List<SignedData> signedDataList = SignedData.asSignedData(envelope);
+            policyChecker.checkPolicyBySignedData(groupId, policyName, signedDataList);
+        } catch (ValidateException e) {
+            log.error(e.getMessage(), e);
+            throw new PolicyException(e);
+        } catch (InvalidProtocolBufferException e) {
+            log.error(e.getMessage(), e);
+            throw new PolicyException(e);
+        }
     }
-
-
 }

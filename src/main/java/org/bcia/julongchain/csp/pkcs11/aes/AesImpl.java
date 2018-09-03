@@ -15,14 +15,16 @@
  */
 package org.bcia.julongchain.csp.pkcs11.aes;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.pkcs11.IPKCS11FactoryOpts;
+import org.bcia.julongchain.csp.pkcs11.PKCS11CspLog;
+import static org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant.*;
+
+import org.bcia.julongchain.csp.pkcs11.util.DataUtil;
 import org.bcia.julongchain.csp.pkcs11.util.SymmetryKey;
 import sun.security.pkcs11.wrapper.CK_ATTRIBUTE;
 import sun.security.pkcs11.wrapper.CK_MECHANISM;
-import sun.security.pkcs11.wrapper.PKCS11Constants;
 import sun.security.pkcs11.wrapper.PKCS11Exception;
 
 import java.security.MessageDigest;
@@ -33,16 +35,99 @@ import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
 /**
  * Class description
  *
- * @author
+ * @author Ying Xu
  * @date 5/25/18
  * @company FEITIAN
  */
-public class AesImpl {
-	private static JavaChainLog logger;
+public class AesImpl {	
 
+    private static void setLoggerDebug(String msg, int classNO){
+
+        PKCS11CspLog csplog = new PKCS11CspLog();
+        switch (classNO){
+            case CLS_GENKEY:
+                csplog.setLogMsg(msg, csplog.LEVEL_DEBUG, AesImpl.GenerateAES.class);
+                break;
+            case CLS_IMPORTKEY:
+                csplog.setLogMsg(msg, csplog.LEVEL_DEBUG, AesImpl.ImoprtAESKey.class);
+                break;
+            case CLS_GETKEY:
+                csplog.setLogMsg(msg, csplog.LEVEL_DEBUG, AesImpl.GetAESKey.class);
+                break;
+            case CLS_ENCRYPT:
+                csplog.setLogMsg(msg, csplog.LEVEL_DEBUG, AesImpl.EncryptAES.class);
+                break;
+            case CLS_DECRYPT:
+                csplog.setLogMsg(msg, csplog.LEVEL_DEBUG, AesImpl.DecryptAES.class);
+                break;
+            default:
+                csplog.setLogMsg(msg, csplog.LEVEL_DEBUG, AesImpl.class);
+                break;
+        }
+    }
+
+    private static void setLoggerInfo(String msg, int classNO){
+        PKCS11CspLog csplog = new PKCS11CspLog();
+        switch (classNO){
+            case CLS_GENKEY:
+                csplog.setLogMsg(msg, csplog.LEVEL_INFO, AesImpl.GenerateAES.class);
+                break;
+            case CLS_IMPORTKEY:
+                csplog.setLogMsg(msg, csplog.LEVEL_INFO, AesImpl.ImoprtAESKey.class);
+                break;
+            case CLS_GETKEY:
+                csplog.setLogMsg(msg, csplog.LEVEL_INFO, AesImpl.GetAESKey.class);
+                break;
+            case CLS_ENCRYPT:
+                csplog.setLogMsg(msg, csplog.LEVEL_INFO, AesImpl.EncryptAES.class);
+                break;
+            case CLS_DECRYPT:
+                csplog.setLogMsg(msg, csplog.LEVEL_INFO, AesImpl.DecryptAES.class);
+                break;
+            default:
+                csplog.setLogMsg(msg, csplog.LEVEL_INFO, AesImpl.class);
+                break;
+        }
+    }
+
+    private static void setLoggerErr(String msg, int classNO){
+        PKCS11CspLog csplog = new PKCS11CspLog();
+        switch (classNO){
+            case CLS_GENKEY:
+                csplog.setLogMsg(msg, csplog.LEVEL_ERROR, AesImpl.GenerateAES.class);
+                break;
+            case CLS_IMPORTKEY:
+                csplog.setLogMsg(msg, csplog.LEVEL_ERROR, AesImpl.ImoprtAESKey.class);
+                break;
+            case CLS_GETKEY:
+                csplog.setLogMsg(msg, csplog.LEVEL_ERROR, AesImpl.GetAESKey.class);
+                break;
+            case CLS_ENCRYPT:
+                csplog.setLogMsg(msg, csplog.LEVEL_ERROR, AesImpl.EncryptAES.class);
+                break;
+            case CLS_DECRYPT:
+                csplog.setLogMsg(msg, csplog.LEVEL_ERROR, AesImpl.DecryptAES.class);
+                break;
+            default:
+                csplog.setLogMsg(msg, csplog.LEVEL_ERROR, AesImpl.class);
+                break;
+        }
+    }
+
+    /**
+     * Generate Aes Key Class
+     */
     public static class GenerateAES{
 
-        public static IKey generateAES(int size, boolean ephemeral, IPKCS11FactoryOpts opts) throws JavaChainException {
+        /**
+         * Generate Key
+         * @param size          Key Size
+         * @param ephemeral     Ephemeral(True/False)
+         * @param opts          P11 factory
+         * @return IKey instance of SymmetryKey.AESPriKey
+         * @throws CspException
+         */
+        public static IKey generateAES(int size, boolean ephemeral, IPKCS11FactoryOpts opts) throws CspException {
             try {
                 //create a key attribute
                 CK_MECHANISM ckm = new CK_MECHANISM();
@@ -76,26 +161,36 @@ public class AesImpl {
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                logger.error(err);
-                throw new JavaChainException(err, ex.getCause());
+                AesImpl.setLoggerErr(err, CLS_GENKEY);
+                throw new CspException(err, ex.getCause());
             }catch(NoSuchAlgorithmException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-                logger.error(err);
-                throw new JavaChainException(err, ex.getCause());
+                AesImpl.setLoggerErr(err, CLS_GENKEY);
+                throw new CspException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
-                logger.error(err);
-                throw new JavaChainException(err, ex.getCause());
+                AesImpl.setLoggerErr(err, CLS_GENKEY);
+                throw new CspException(err, ex.getCause());
             }
         }
     }
-    
-    
+
+    /**
+     * Generate Aes Key Class
+     */
     public static class ImoprtAESKey{
-    	
-    	public static IKey importAES(byte[] keyvalue, boolean ephemeral, IPKCS11FactoryOpts opts) throws JavaChainException {
+
+        /**
+         *
+         * @param keyvalue      Key value
+         * @param ephemeral     Ephemeral(True/False)
+         * @param opts          P11 factory
+         * @return  IKey instance of SymmetryKey.AESPriKey
+         * @throws CspException
+         */
+    	public static IKey importAES(byte[] keyvalue, boolean ephemeral, IPKCS11FactoryOpts opts) throws CspException {
     		
     		try {
     			//create a pubkey attribute			
@@ -123,34 +218,44 @@ public class AesImpl {
     		}catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                logger.error(err);
-                throw new JavaChainException(err, ex.getCause());
+                AesImpl.setLoggerErr(err, CLS_IMPORTKEY);
+                throw new CspException(err, ex.getCause());
             }catch(NoSuchAlgorithmException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-                logger.error(err);
-                throw new JavaChainException(err, ex.getCause());
+                AesImpl.setLoggerErr(err, CLS_IMPORTKEY);
+                throw new CspException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
-                logger.error(err);
-                throw new JavaChainException(err, ex.getCause());
+                AesImpl.setLoggerErr(err, CLS_IMPORTKEY);
+                throw new CspException(err, ex.getCause());
             }
     	}
     }
 
 
+    /**
+     * Get Aes Key From Hardware Class
+     */
+
     public static class GetAESKey{
 
-        public static IKey getAES(byte[] ski, IPKCS11FactoryOpts opts) throws JavaChainException {
+        /**
+         * Get Aes key
+         * @param ski       Identify for Search Key
+         * @param opts      P11 factory
+         * @return  IKey instance of SymmetryKey.AESPriKey
+         * @throws CspException
+         */
+        public static IKey getAES(byte[] ski, IPKCS11FactoryOpts opts) throws CspException {
             try {
 
                 long[] keyhandle = findKeyFromSKI(opts, ski);
                 if(keyhandle == null ||(keyhandle!=null && keyhandle.length==0))
                 {
-                	String str=null;
-                    str=String.format("[JC_PKCS]:No Find Key");
-                    logger.error(str);
+                    String str = String.format("[JC_PKCS]:No Find Key");
+                    AesImpl.setLoggerInfo(str, CLS_GETKEY);
                     return null;
                 }
 
@@ -172,43 +277,60 @@ public class AesImpl {
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                logger.error(err);
-                throw new JavaChainException(err, ex.getCause());
+                AesImpl.setLoggerErr(err, CLS_GETKEY);
+                throw new CspException(err, ex.getCause());
             }catch(NoSuchAlgorithmException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-                logger.error(err);
-                throw new JavaChainException(err, ex.getCause());
+                AesImpl.setLoggerErr(err, CLS_GETKEY);
+                throw new CspException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
-                logger.error(err);
-                throw new JavaChainException(err, ex.getCause());
+                AesImpl.setLoggerErr(err, CLS_GETKEY);
+                throw new CspException(err, ex.getCause());
             }
         }
     }
 
+
+    /**
+     * Encrypt with Aes
+     */
     public static class EncryptAES{
+
+        private static final int ENCDATALEN = 16;
 
         public EncryptAES() {
 
         }
 
-        public static byte[] encrtyptWithAES(byte[] ski, long mechanism, byte[] plaintext, IPKCS11FactoryOpts opts) throws JavaChainException {
+        /**
+         *
+         * @param ski           Dentify for Search Key
+         * @param mechanism     Encrtypt mechanism
+         * @param plaintext     Plain text
+         * @param opts          P11 factory
+         * @return Enciphered data
+         * @throws CspException
+         */
+        public static byte[] encrtyptWithAES(byte[] ski, long mechanism, byte[] plaintext, IPKCS11FactoryOpts opts) throws CspException {
             try {
                 long[] key = findKeyFromSKI(opts, ski);
                 if(key == null ||(key!=null && key.length==0))
                 {
-                    return null;
+                    String str = String.format("[JC_PKCS]:No Find Key");
+                    AesImpl.setLoggerErr(str, CLS_ENCRYPT);
+                    throw new CspException("[JC_PKCS]:No Find Key!");
                 }
                 CK_MECHANISM ckm = new CK_MECHANISM();
                 ckm.mechanism = mechanism;
                 opts.getPKCS11().C_EncryptInit(opts.getSessionhandle(), ckm, key[0]);
 
-                int n = plaintext.length / 16;
-                if(plaintext.length%6 > 0)
+                int n = plaintext.length / ENCDATALEN;
+                if(plaintext.length%ENCDATALEN > 0)
                     n++;
-                int outlen = n*32;
+                int outlen = n*ENCDATALEN*2;
                 byte[] out = new byte[outlen];
                 int enclen = opts.getPKCS11().C_Encrypt(opts.getSessionhandle(), plaintext, 0, plaintext.length, out, 0, outlen);
                 byte[] cipher = new byte[enclen];
@@ -218,27 +340,41 @@ public class AesImpl {
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                logger.error(err);
-                throw new JavaChainException(err, ex.getCause());
+                AesImpl.setLoggerErr(err, CLS_ENCRYPT);
+                throw new CspException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
-                logger.error(err);
-                throw new JavaChainException(err, ex.getCause());
+                AesImpl.setLoggerErr(err, CLS_ENCRYPT);
+                throw new CspException(err, ex.getCause());
             }
         }
 
     }
 
 
+    /**
+     * Decrypt with Aes
+     */
     public static class DecryptAES{
 
-        public static byte[] decryptWithAES(byte[] ski, long mechanism, byte[] ciphertext, IPKCS11FactoryOpts opts) throws JavaChainException {
+        /**
+         *
+         * @param ski           Dentify for Search Key
+         * @param mechanism     Decrypt mechanism
+         * @param ciphertext    Enciphered data
+         * @param opts          P11 factory
+         * @return Plain text
+         * @throws CspException
+         */
+        public static byte[] decryptWithAES(byte[] ski, long mechanism, byte[] ciphertext, IPKCS11FactoryOpts opts) throws CspException {
             try {
                 long[] key = findKeyFromSKI(opts, ski);
                 if(key == null ||(key!=null && key.length==0))
                 {
-                    return null;
+                    String str = String.format("[JC_PKCS]:No Find Key");
+                    AesImpl.setLoggerErr(str, CLS_DECRYPT);
+                    throw new CspException("[JC_PKCS]:No Find Key!");
                 }
                 CK_MECHANISM ckm = new CK_MECHANISM();
                 ckm.mechanism = mechanism;
@@ -253,24 +389,32 @@ public class AesImpl {
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                logger.error(err);
-                throw new JavaChainException(err, ex.getCause());
+                AesImpl.setLoggerErr(err, CLS_DECRYPT);
+                throw new CspException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
-                logger.error(err);
-                throw new JavaChainException(err, ex.getCause());
+                AesImpl.setLoggerErr(err, CLS_DECRYPT);
+                throw new CspException(err, ex.getCause());
             }
         }
     }
 
-    public static long[] findKeyFromSKI(IPKCS11FactoryOpts opts, byte[] ski) throws JavaChainException{
+
+    /**
+     * Find key from Hardware
+     * @param opts      P11 factory
+     * @param ski       Dentify for Search Key
+     * @return Key Handle
+     * @throws CspException
+     */
+    private static long[] findKeyFromSKI(IPKCS11FactoryOpts opts, byte[] ski) throws CspException{
 
 
-        long keyclass = PKCS11Constants.CKO_SECRET_KEY;
+        long keyclass = CKO_SECRET_KEY;
         CK_ATTRIBUTE[] template = new CK_ATTRIBUTE[2];
-        template[0] = new CK_ATTRIBUTE(PKCS11Constants.CKA_CLASS, keyclass);
-        template[1] = new CK_ATTRIBUTE(PKCS11Constants.CKA_KEY_TYPE, PKCS11Constants.CKK_AES);
+        template[0] = new CK_ATTRIBUTE(CKA_CLASS, keyclass);
+        template[1] = new CK_ATTRIBUTE(CKA_KEY_TYPE, CKK_AES);
 
         try {
             opts.getPKCS11().C_FindObjectsInit(opts.getSessionhandle(), template);
@@ -289,7 +433,7 @@ public class AesImpl {
                     MessageDigest shahash = MessageDigest.getInstance("SHA-1");
                     shahash.update(raw);
                     byte[] bytehash = shahash.digest();
-                    if(compereByteArray(bytehash, ski)) {
+                    if(DataUtil.compareByteArray(bytehash, ski)) {
                         opts.getPKCS11().C_FindObjectsFinal(opts.getSessionhandle());
                         return keypair;
                     }
@@ -304,40 +448,20 @@ public class AesImpl {
 
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:PKCS11Exception ErrMessage: %s", ex.getMessage());
-            logger.error(err);
-            throw new JavaChainException(err, ex.getCause());
+            setLoggerErr(err, CLS_SELF);
+            throw new CspException(err, ex.getCause());
         }catch(NoSuchAlgorithmException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-            logger.error(err);
-            throw new JavaChainException(err, ex.getCause());
+            setLoggerErr(err, CLS_SELF);
+            throw new CspException(err, ex.getCause());
         }catch(Exception ex) {
         	ex.printStackTrace();
         	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
-            logger.error(err);
-            throw new JavaChainException(err, ex.getCause());
+            setLoggerErr(err, CLS_SELF);
+            throw new CspException(err, ex.getCause());
         }
 
     }
     
-    public static boolean compereByteArray(byte[] b1, byte[] b2) {
-    	
-	       if(b1.length == 0 || b2.length == 0 ){
-	           return false;
-	       }
-	
-	       if (b1.length != b2.length) {
-	           return false;
-	       }
-	
-	       boolean isEqual = true;
-	       for (int i = 0; i < b1.length && i < b2.length; i++) {
-	           if (b1[i] != b2[i]) {
-	               System.out.println("different");
-	               isEqual = false;
-	               break;
-	           }
-	       }
-	       return isEqual;
-	}
 }

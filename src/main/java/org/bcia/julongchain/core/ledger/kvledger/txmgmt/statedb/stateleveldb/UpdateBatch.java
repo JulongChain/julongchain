@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,7 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.Height;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * versiondb 更新包
+ * versiondb 批量更新
  *
  * @author sunzongyu
  * @date 2018/4/9
@@ -43,15 +43,15 @@ public class UpdateBatch {
         return vv;
     }
 
-    public void put(String ns, String key, byte[] value, Height version) throws LedgerException {
+    public void put(String ns, String key, byte[] value, LedgerHeight version) throws LedgerException {
         if(value == null){
-            throw new LedgerException("Null value not allow");
+            throw new LedgerException("Null value not allowed");
         }
         VersionedValue vv = new VersionedValue(version, value);
         update(ns, key, vv);
     }
 
-    public void delete(String ns, String key, Height version){
+    public void delete(String ns, String key, LedgerHeight version){
         VersionedValue vv = new VersionedValue(version, null);
         update(ns, key, vv);
     }
@@ -71,7 +71,7 @@ public class UpdateBatch {
     public Map<String, VersionedValue> getUpdates(String ns){
         NsUpdates nsUpdates = updates.get(ns);
         if(nsUpdates == null){
-            return null;
+            return new HashMap<>();
         }
         return nsUpdates.getMap();
     }

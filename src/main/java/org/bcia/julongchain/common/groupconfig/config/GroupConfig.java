@@ -29,7 +29,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * 对象
+ * 群组配置对象
  *
  * @author zhouhui
  * @date 2018/3/28

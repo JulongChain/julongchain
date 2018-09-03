@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +15,6 @@
  */
 package org.bcia.julongchain.common.ledger.blkstorage;
 
-import org.bcia.julongchain.common.exception.LedgerException;
-
 /**
  * 提供索引前缀
  *
@@ -32,7 +30,4 @@ public class BlockStorage {
     public static final String INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM = "BlockNumTranNum";
     public static final String INDEXABLE_ATTR_BLOCK_TX_ID = "BlockTxID";
     public static final String INDEXABLE_ATTR_TX_VALIDATION_CODE = "TxValidationCode";
-
-    public static final LedgerException ERR_ARRT_NOT_INDEXED = new LedgerException("Attribute not indexed");
-    public static final LedgerException ERR_NOT_FOUND_IN_INDEX = new LedgerException("Entry not found in index");
 }

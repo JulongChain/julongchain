@@ -30,13 +30,9 @@ import org.bcia.julongchain.node.entity.NodeSmartContract;
  */
 public abstract class AbstractNodeContractCmd implements INodeCmd {
 
-	private Node node;
+	protected Node node;
 
 	protected NodeSmartContract nodeSmartContract;
-
-	public AbstractNodeContractCmd(){
-		nodeSmartContract = new NodeSmartContract();
-	}
 
 	public AbstractNodeContractCmd(Node node) {
 		this.node = node;

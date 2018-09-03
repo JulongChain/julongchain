@@ -19,7 +19,7 @@ import org.bcia.julongchain.common.groupconfig.GroupConfigConstant;
 import org.bcia.julongchain.protos.msp.MspConfigPackage;
 
 /**
- * 类描述
+ * Msp配置项
  *
  * @author zhouhui
  * @date 2018/3/10

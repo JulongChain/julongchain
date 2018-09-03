@@ -19,11 +19,16 @@ import org.bcia.julongchain.common.configtx.IConfigtxValidator;
 import org.bcia.julongchain.common.localmsp.ILocalSigner;
 
 /**
+ * 标准通道support接口
+ *
  * @author zhangmingyang
  * @Date: 2018/5/17
  * @company Dingxuan
  */
-public interface IStandardGroupSupport extends IConfigtxValidator{
-
-    ILocalSigner signer();
+public interface IStandardGroupSupport extends IConfigtxValidator {
+    /**
+     * 获取签名
+     * @return
+     */
+    ILocalSigner getSigner();
 }

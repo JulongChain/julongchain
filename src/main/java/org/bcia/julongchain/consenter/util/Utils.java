@@ -17,22 +17,22 @@ package org.bcia.julongchain.consenter.util;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.consenter.Kafka;
 
 /**
- * 类描述
+ * 通用辅助类
  *
- * @author
+ * @author zhangmingyang
  * @date 2018/5/2
- * @company Shudun
+ * @company Dingxuan
  */
 
 public class Utils {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(Utils.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(Utils.class);
 
     public void ChannelHeader(Common.Envelope env) {
         Common.Payload envPayload = UnmarshalPayload(env.toByteArray());
@@ -118,8 +118,6 @@ public class Utils {
         }
         return all_byte;
     }
-
-
 
 
 }

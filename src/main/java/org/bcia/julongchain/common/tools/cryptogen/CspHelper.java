@@ -15,20 +15,18 @@
  */
 package org.bcia.julongchain.common.tools.cryptogen;
 
-import org.bcia.julongchain.common.exception.JavaChainException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.exception.MspException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.tools.cryptogen.sm2cert.SM2PublicKeyImpl;
 import org.bcia.julongchain.csp.factory.CspManager;
-import org.bcia.julongchain.csp.factory.IFactoryOpts;
-import org.bcia.julongchain.csp.gm.dxct.GmFactoryOpts;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2KeyGenOpts;
-import org.bcia.julongchain.csp.gm.dxct.sm2.SM2KeyImportOpts;
+import org.bcia.julongchain.csp.gm.dxct.sm2.SM2PrivateKeyImportOpts;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2PublicKey;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IKey;
-import org.bcia.julongchain.msp.mspconfig.MspConfig;
-import org.bcia.julongchain.msp.mspconfig.MspConfigFactory;
+import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemReader;
@@ -46,39 +44,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * CSP 相关功能封装
+ *
  * @author chenhao, yegangcheng
  * @date 2018/4/3
  * @company Excelsecu
  */
 public class CspHelper {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CspHelper.class);
-    private static final ICsp csp = getCsp();
+    private static JulongChainLog log = JulongChainLogFactory.getLog(CspHelper.class);
+    private static final ICsp CSP = getCsp();
+    private static final int ASN1_SEQUENCE = 0x30;
+    private static final int HEAD_PUBLIC_KEY_UNCOMPRESSED = 0x04;
 
     static {
-        List<IFactoryOpts> list = new ArrayList<>();
-        IFactoryOpts opts = new GmFactoryOpts() {
-            @Override
-            public boolean isDefaultCsp() {
-                return true;
-            }
-        };
         try {
-            MspConfig mspConfig = MspConfigFactory.loadMspConfig();
-            GmFactoryOpts factoryOpts=new GmFactoryOpts();
-            factoryOpts.parseFrom(mspConfig.getNode().getCsp().getFactoryOpts().get("gm"));
-            list.add(factoryOpts);
-        } catch (FileNotFoundException e) {
-            log.error(e.getMessage());
+            GlobalMspManagement.initLocalMsp();
+        } catch (MspException e) {
+            log.error(e.getMessage(), e);
         }
-        list.add(opts);
-        CspManager.initCspFactories(list);
     }
 
     public static ICsp getCsp() {
         return CspManager.getDefaultCsp();
     }
 
-    public static IKey loadPrivateKey(String keystorePath) throws JavaChainException {
+    public static IKey loadPrivateKey(String keystorePath) throws JulongChainException {
         File keyStoreDir = new File(keystorePath);
         File[] files = keyStoreDir.listFiles();
         if (!keyStoreDir.isDirectory() || files == null) {
@@ -98,38 +88,38 @@ public class CspHelper {
                 byte[] encodedData = pemObject.getContent();
                 List<Object> list = decodePrivateKeyPKCS8(encodedData);
                 Object rawKey = list.get(1);
-                return csp.keyImport(rawKey, new SM2KeyImportOpts(true));
+                return CSP.keyImport(rawKey, new SM2PrivateKeyImportOpts(true));
             } catch (Exception e) {
                 log.error("An error occurred on loadPrivateKey: {}", e.getMessage());
             }
         }
-        throw new JavaChainException("no pem file found");
+        throw new JulongChainException("no pem file found");
     }
 
-    private static byte[] encodePrivateKeyPKCS8(byte[] privateKey, AlgorithmId algId) throws JavaChainException {
+    private static byte[] encodePrivateKeyPKCS8(byte[] privateKey, AlgorithmId algId) throws JulongChainException {
         DerOutputStream encodedPriKey = new DerOutputStream();
         DerOutputStream var = new DerOutputStream();
         try {
             var.putInteger(BigInteger.ZERO);
             algId.encode(var);
             var.putOctetString(privateKey);
-            encodedPriKey.write((byte) 48, var);
+            encodedPriKey.write((byte) ASN1_SEQUENCE, var);
             return encodedPriKey.toByteArray();
         } catch (IOException e) {
-            throw new JavaChainException("An error occurred :" + e);
+            throw new JulongChainException("An error occurred :" + e);
         }
     }
 
 
-    private static List<Object> decodePrivateKeyPKCS8(byte[] encodedData) throws JavaChainException {
+    private static List<Object> decodePrivateKeyPKCS8(byte[] encodedData) throws JulongChainException {
         try {
             DerValue derValue = new DerValue(new ByteArrayInputStream(encodedData));
-            if (derValue.tag != 48) {
-                throw new JavaChainException("invalid key format");
+            if (derValue.tag != ASN1_SEQUENCE) {
+                throw new JulongChainException("invalid key format");
             } else {
                 BigInteger version = derValue.data.getBigInteger();
                 if (!version.equals(BigInteger.ZERO)) {
-                    throw new JavaChainException("version mismatch: (supported: " + Debug.toHexString(BigInteger.ZERO) + ", parsed: " + Debug.toHexString(version));
+                    throw new JulongChainException("version mismatch: (supported: " + Debug.toHexString(BigInteger.ZERO) + ", parsed: " + Debug.toHexString(version));
                 } else {
                     AlgorithmId algId = AlgorithmId.parse(derValue.data.getDerValue());
                     byte[] rawPrivateKey = derValue.data.getOctetString();
@@ -140,15 +130,14 @@ public class CspHelper {
                 }
             }
         } catch (IOException e) {
-            throw new JavaChainException("IOException : " + e.getMessage());
+            throw new JulongChainException("IOException : " + e.getMessage());
         }
     }
 
 
-    public static IKey generatePrivateKey(String keystorePath) throws JavaChainException {
-
+    static IKey generatePrivateKey(String keystorePath) throws JulongChainException {
         try {
-            IKey priv = csp.keyGen(new SM2KeyGenOpts() {
+            IKey priv = CSP.keyGen(new SM2KeyGenOpts() {
                 @Override
                 public boolean isEphemeral() {
                     return true;
@@ -159,11 +148,11 @@ public class CspHelper {
             Util.pemExport(path, "PRIVATE KEY", encodedData);
             return priv;
         } catch (Exception e) {
-            throw new JavaChainException("An error occurred" + e);
+            throw new JulongChainException("An error occurred" + e);
         }
     }
 
-    public static ECPublicKey getSM2PublicKey(IKey priv) throws JavaChainException {
+    static ECPublicKey getSM2PublicKey(IKey priv) throws JulongChainException {
         IKey pubKey;
         try {
             pubKey = priv.getPublicKey();
@@ -172,14 +161,14 @@ public class CspHelper {
             pubKey = priv.getPublicKey();
         }
         if (!(pubKey instanceof SM2PublicKey)) {
-            throw new JavaChainException("pubKey is not the instance of SM2Key method");
+            throw new JulongChainException("pubKey is not the instance of SM2Key method");
         }
         SM2PublicKey sm2PublicKey = (SM2PublicKey) pubKey;
         try {
             byte[] bytes = sm2PublicKey.toBytes();
             // 默认非压缩公钥
-            if (bytes[0] != 0x04) {
-                throw new JavaChainException("CspHelper getSM2PublicKey publicKey not uncompressed");
+            if (bytes[0] != HEAD_PUBLIC_KEY_UNCOMPRESSED) {
+                throw new JulongChainException("CspHelper getSM2PublicKey publicKey not uncompressed");
             }
 
             int xLength = (bytes.length - 1) / 2;
@@ -191,7 +180,7 @@ public class CspHelper {
             ECPoint secECPoint = new ECPoint(new BigInteger(bytesX), new BigInteger(bytesY));
             return new SM2PublicKeyImpl(secECPoint);
         } catch (Exception e) {
-            throw new JavaChainException("an error occurred on getECPublicKey: " + e.getMessage());
+            throw new JulongChainException("an error occurred on getECPublicKey: " + e.getMessage());
         }
     }
 }

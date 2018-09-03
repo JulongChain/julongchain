@@ -17,8 +17,8 @@
 package org.bcia.julongchain.common.policycheck.cauthdsl;
 
 import org.bcia.julongchain.common.exception.PolicyException;
-import org.bcia.julongchain.common.log.JavaChainLog;
-import org.bcia.julongchain.common.log.JavaChainLogFactory;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policycheck.policies.Evalutor;
 import org.bcia.julongchain.common.policycheck.policies.IEvalutor;
 import org.bcia.julongchain.common.util.proto.SignedData;
@@ -41,14 +41,14 @@ import java.util.Map;
  * @company Aisino
  */
 public class CAuthDsl {
-    private static JavaChainLog log = JavaChainLogFactory.getLog(CAuthDsl.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(CAuthDsl.class);
     /**signedProposal
      * 删除重复身份，保留身份顺序
      * @param signedDatas
      * @return
      */
     public static List<SignedData> deduplicate(List<SignedData> signedDatas, IIdentityDeserializer deserializer) throws PolicyException {
-        Map<String,Object> ids = new HashMap<String,Object>();
+        Map<String,Object> ids = new HashMap<String,Object>(16);
         List<SignedData> result = new ArrayList<SignedData>();
         for(int i=0;i<signedDatas.size();i++){
             Identity identity = null;
@@ -58,7 +58,7 @@ public class CAuthDsl {
                 String msg=String.format("Principal deserialization failure  %s for [%s]",e.getMessage(),signedDatas.get(i).getIdentity());
                 throw new PolicyException(msg);
             }
-            String key = identity.identityIdentifier.Mspid+identity.identityIdentifier.Id;
+            String key = identity.getIdentityIdentifier().getMspid()+identity.getIdentityIdentifier().getId();
             if(ids.get(key) != null){
                 log.warn("De-duplicating identity [%s] at index [%s] in signature set",signedDatas.get(i).getIdentity(),i);
             }else{

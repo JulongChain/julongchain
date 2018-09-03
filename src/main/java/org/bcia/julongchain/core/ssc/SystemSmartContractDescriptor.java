@@ -15,10 +15,12 @@
  */
 package org.bcia.julongchain.core.ssc;
 
+import org.bcia.julongchain.core.smartcontract.shim.ISmartContract;
+
 /**
  * 系统智能合约的描述类
  *
- * @author sunianle
+ * @author sunianle, sunzongyu
  * @date 2018/2/28
  * @company Dingxuan
  */
@@ -29,15 +31,19 @@ public class SystemSmartContractDescriptor{
     private boolean bInvokableExternal;
     private boolean bInvokaleSC2SC;
     private boolean bEnabled;
+    private String sscVersion;
+    private ISmartContract smartContract;
 
     public SystemSmartContractDescriptor(String sscName,
                                          String sscPath,
-                                         String[] initArgs,
+										 String sscVersion,
+										 String[] initArgs,
                                          boolean bInvokableExternal,
                                          boolean bInvokaleSC2SC,
                                          boolean bEnabled) {
         this.sscName = sscName;
         this.sscPath = sscPath;
+        this.sscVersion = sscVersion == null ? "development build": sscVersion;
         this.initArgs = initArgs;
         this.bInvokableExternal = bInvokableExternal;
         this.bInvokaleSC2SC = bInvokaleSC2SC;
@@ -75,4 +81,16 @@ public class SystemSmartContractDescriptor{
         return this.bEnabled;
     }
 
+	public ISmartContract getSmartContract() {
+		return smartContract;
+	}
+
+	//获取系统智能合约版本
+	public String getSSCVersion() {
+    	return sscVersion;
+	}
+
+	public void setSmartContract(ISmartContract smartContract) {
+		this.smartContract = smartContract;
+	}
 }
