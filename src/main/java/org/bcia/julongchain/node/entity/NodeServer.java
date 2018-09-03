@@ -119,7 +119,7 @@ public class NodeServer {
             public void onGroupsReady(List<String> groupIds) {
                 log.info("OnGroupsReady-----");
                 try {
-//                    startGossipService();
+                    startGossipService();
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                 }

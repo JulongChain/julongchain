@@ -17,6 +17,7 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.grpc.stub.StreamObserver;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bcia.julongchain.common.exception.LedgerException;
@@ -158,7 +159,7 @@ public class SmartContractSupportService
                     addTxMessage(smartContractId, txId, message);
                     updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_ERROR);
                     updateTxStatus(smartContractId, txId, TX_STATUS_ERROR);
-                    handleReceiveCompleteOrErrorMessage(message, txId);
+                    handleReceiveCompleteOrErrorMessage(message, txId + "-" + smartContractId);
                     return;
                 }
 
@@ -173,7 +174,7 @@ public class SmartContractSupportService
                     addTxMessage(smartContractId, txId, message);
                     updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_READY);
                     updateTxStatus(smartContractId, txId, TX_STATUS_COMPLETE);
-                    handleReceiveCompleteOrErrorMessage(message, txId);
+                    handleReceiveCompleteOrErrorMessage(message, txId + "-" + smartContractId);
                     return;
                 }
 
@@ -227,8 +228,15 @@ public class SmartContractSupportService
     }
 
     private void handleReceiveCompleteOrErrorMessage(SmartContractMessage message, String txId) {
+        if (StringUtils.isEmpty(txId)) {
+            return;
+        }
         try {
-            txIdAndQueueMap.get(txId).put(message);
+            LinkedBlockingQueue queue = txIdAndQueueMap.get(txId);
+            if (queue == null) {
+                return;
+            }
+            queue.put(message);
         } catch (InterruptedException e) {
             logger.error(e.getMessage(), e);
         }
@@ -439,7 +447,7 @@ public class SmartContractSupportService
 
         // 保存
         LinkedBlockingQueue<SmartContractMessage> queue = new LinkedBlockingQueue<SmartContractMessage>();
-        txIdAndQueueMap.put(txId, queue);
+        txIdAndQueueMap.put(txId + "-" + smartContractId, queue);
         send(smartContractId, message);
 
         SmartContractMessage receiveMessage = null;
