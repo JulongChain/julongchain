@@ -105,7 +105,12 @@ public class LevelDBUtil {
 	 */
 	public static void add(DB db, byte[] key, byte[] value, boolean sync) throws LevelDBException {
 		WriteOptions writeOptions = new WriteOptions().sync(sync);
-		db.put(key, value, writeOptions);
+		try {
+			db.put(key, value, writeOptions);
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			throw new LevelDBException(e);
+		}
 	}
 
 	/**

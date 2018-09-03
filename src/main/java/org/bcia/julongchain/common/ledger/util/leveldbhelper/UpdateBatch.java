@@ -39,10 +39,10 @@ public class UpdateBatch  {
 	 * 添加K-V
 	 */
 	public void put(byte[] key, byte[] value) {
-		if(value == null){
-			log.error("Can not put [null] value into update batch");
-			throw new RuntimeException("Can not put [null] value into update batch");
-		}
+//		if(value == null){
+//			log.error("Can not put [null] value into update batch");
+//			throw new RuntimeException("Can not put [null] value into update batch");
+//		}
 		kvs.put(key, value);
 	}
 

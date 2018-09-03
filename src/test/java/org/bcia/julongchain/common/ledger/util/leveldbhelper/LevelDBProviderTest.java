@@ -6,10 +6,12 @@ import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 
 import static org.junit.Assert.*;
 import static org.bcia.julongchain.common.ledger.util.Utils.*;
@@ -26,15 +28,21 @@ import static org.bcia.julongchain.common.ledger.util.Utils.*;
  */
 public class LevelDBProviderTest {
 	static LevelDBProvider provider;
-	static String dir = "/tmp/julongchain/levledb";
+	static String workSpace = "/tmp/julongchain/levledb";
+	static String dir;
 	static String groupID = "myGroup";
 
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
+	@BeforeClass
+	public static void beforeClass() throws Exception {
+		rmrf(workSpace);
+	}
+
 	@Before
 	public void setUp() throws Exception {
-		rmrf(dir);
+		dir = workSpace + File.separator + UUID.randomUUID();
 		provider = new LevelDBProvider(dir);
 		provider.put("a".getBytes(), "a".getBytes(), true);
 		provider.setLedgerID(groupID);
@@ -75,6 +83,12 @@ public class LevelDBProviderTest {
 		assertNull(a);
 		assertNotNull(b);
 		assertArrayEquals("b".getBytes(), b);
+
+		//不存在
+		assertNull(provider.get("x".getBytes()));
+
+		//查询空
+		assertNull(provider.get(null));
 	}
 
 	@Test
@@ -88,6 +102,12 @@ public class LevelDBProviderTest {
 		assertNotNull(c);
 		assertArrayEquals("c".getBytes(), c);
 
+		//k,v不能为空
+		thrown.expect(Exception.class);
+		provider.put(null, null, true);
+		provider.put(null, "x".getBytes(), true);
+		provider.put("x".getBytes(), null, true);
+
 		provider.setLedgerID(groupID);
 		d = provider.get("d".getBytes());
 		assertNull(d);
@@ -95,6 +115,11 @@ public class LevelDBProviderTest {
 		d = provider.get("d".getBytes());
 		assertNotNull(d);
 		assertArrayEquals("d".getBytes(), d);
+
+		//v不能为空
+		thrown.expect(Exception.class);
+		provider.put(null, null, true);
+		provider.put("x".getBytes(), null, true);
 	}
 
 	@Test
@@ -115,6 +140,9 @@ public class LevelDBProviderTest {
 		provider.delete("b".getBytes(), true);
 		b = provider.get("b".getBytes());
 		assertNull(b);
+
+		//空
+		provider.delete(null, true);
 	}
 
 	@Test
@@ -140,6 +168,15 @@ public class LevelDBProviderTest {
 		assertNotNull(c);
 		assertArrayEquals("c".getBytes(), c);
 
+		//k,v不能为空
+		thrown.expect(Exception.class);
+		updateBatch = new UpdateBatch();
+		updateBatch.delete(null);
+		updateBatch.put(null, null);
+		updateBatch.put("x".getBytes(), null);
+		updateBatch.put(null, "x".getBytes());
+		provider.writeBatch(updateBatch, true);
+
 		provider.setLedgerID(groupID);
 		b = provider.get("b".getBytes());
 		d = provider.get("d".getBytes());
@@ -155,6 +192,15 @@ public class LevelDBProviderTest {
 		assertNull(b);
 		assertNotNull(d);
 		assertArrayEquals("d".getBytes(), d);
+
+		//空
+		thrown.expect(Exception.class);
+		updateBatch = new UpdateBatch();
+		updateBatch.delete(null);
+		updateBatch.put(null, null);
+		updateBatch.put("x".getBytes(), null);
+		updateBatch.put(null, "x".getBytes());
+		provider.writeBatch(updateBatch, true);
 	}
 
 	@Test
