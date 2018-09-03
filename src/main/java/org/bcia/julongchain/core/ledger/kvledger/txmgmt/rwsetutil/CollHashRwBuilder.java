@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * CollectionHashRWSet
+ * 集合Hash读写集
  *
  * @author sunzongyu
  * @date 2018/04/16

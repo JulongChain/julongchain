@@ -17,22 +17,28 @@ package org.bcia.julongchain.msp.util;
 
 import org.bouncycastle.asn1.x509.Certificate;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * 类描述
- *
+ * msp工具类
  * @author zhangmingyang
  * @date 2018/07/04
  * @company Dingxuan
  */
 public class MspUtil {
-
-    public static boolean isCA(Certificate certificate){
-        if(certificate.getIssuer().equals(certificate.getSubject())){
-            return true;
-        }else {
-            return false;
+    public static Map parseFromString(String str) {
+        String[] split = str.split(",");
+        Map<String, String> subjectMap = new HashMap<>();
+        for (int i = 0; i < split.length; i++) {
+            String[] element = split[i].split("=");
+            if (element.length == 1) {
+                subjectMap.put(element[0].toString(), "");
+            }
+            if (element.length == 2) {
+                subjectMap.put(element[0].toString(), element[1].toString());
+            }
         }
+        return subjectMap;
     }
-
-
 }

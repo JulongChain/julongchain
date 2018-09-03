@@ -160,7 +160,7 @@ public class ExtendCmd implements ICryptoGenCmd {
                 ca.getCountry(),
                 ca.getProvince(),
                 ca.getLocality(),
-                ca.getOrganizationUnit(),
+                ca.getOrganizationalUnit(),
                 ca.getStreetAddress(),
                 ca.getPostalCode(),
                 privKey,

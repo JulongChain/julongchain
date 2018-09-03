@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -101,7 +101,7 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
                 args,
                 true,
                 false,
-                true
+				NodeConfigFactory.getNodeConfig().getSmartContract().getSystem().get("cssc").contains("enable")
         );
         embedContractDescriptors[1] = new SystemSmartContractDescriptor(
                 "essc",
@@ -110,7 +110,7 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
                 args,
                 false,
                 false,
-                true
+				NodeConfigFactory.getNodeConfig().getSmartContract().getSystem().get("essc").contains("enable")
         );
         embedContractDescriptors[2] = new SystemSmartContractDescriptor(
                 "lssc",
@@ -119,7 +119,7 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
                 args,
                 true,
                 true,
-                true
+				NodeConfigFactory.getNodeConfig().getSmartContract().getSystem().get("lssc").contains("enable")
         );
         embedContractDescriptors[3] = new SystemSmartContractDescriptor(
                 "qssc",
@@ -128,7 +128,7 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
                 args,
                 true,
                 true,
-                true
+				NodeConfigFactory.getNodeConfig().getSmartContract().getSystem().get("qssc").contains("enable")
         );
         embedContractDescriptors[4] = new SystemSmartContractDescriptor(
                 "vssc",
@@ -137,7 +137,7 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
                 args,
                 false,
                 false,
-                true
+				NodeConfigFactory.getNodeConfig().getSmartContract().getSystem().get("vssc").contains("enable")
         );
         cssc.setSystemSmartContractDescriptor(embedContractDescriptors[0]);
         essc.setSystemSmartContractDescriptor(embedContractDescriptors[1]);
@@ -214,7 +214,7 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
 			try {
 				controller.deDeploy(sscName);
 			} catch (InprocVMException e) {
-				log.error("Dedeploy " + sscName + "failed");
+				log.error("Dedeploy " + sscName + " failed");
 				log.error(e.getMessage());
 			}
 		}
@@ -242,11 +242,8 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
     public boolean isWhitelisted(ISystemSmartContract contract) {
 		Map<String, String> smartcontract = NodeConfigFactory.getNodeConfig().getSmartContract().getSystem();
 		String value = smartcontract.get(contract.getSmartContractID()).toLowerCase();
-        if("enable".equals(value) || "true".equals(value) || "yes".equals(value)){
-            return true;
-        }
-        return false;
-    }
+		return "enable".equals(value) || "true".equals(value) || "yes".equals(value);
+	}
 
     @Override
     public ISystemSmartContract getSystemSmartContract(String smartContractID) {
@@ -277,12 +274,10 @@ public class SystemSmartContractManager implements ISystemSmartContractManager {
 	/**
 	 * 编译智能合约，形成智能合约部署规范(DeploymentSpec);
 	 */
-    private SmartContractPackage.SmartContractDeploymentSpec buildSysSmartContract(SmartContractPackage.SmartContractSpec spec)
-            throws SysSmartContractException {
+    private SmartContractPackage.SmartContractDeploymentSpec buildSysSmartContract(SmartContractPackage.SmartContractSpec spec) {
     	return SmartContractPackage.SmartContractDeploymentSpec.newBuilder()
 				.setExecEnv(SmartContractPackage.SmartContractDeploymentSpec.ExecutionEnvironment.SYSTEM)
 				.setSmartContractSpec(spec)
-				// TODO: 7/19/18 new byte[] in fabric
 				.setCodePackage(ByteString.EMPTY)
 				.build();
     }

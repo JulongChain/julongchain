@@ -30,6 +30,7 @@ import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractProvi
 import org.bcia.julongchain.core.node.util.NodeUtils;
 import org.bcia.julongchain.msp.IMspManager;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
+import org.bcia.julongchain.msp.mgmt.MspMgmtMgr;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Policies;
 import org.bcia.julongchain.protos.node.ProposalPackage;
@@ -128,7 +129,7 @@ public class LsscSupport {
                                   String groupName,
                                   byte[] instantiationPolicy) throws SysSmartContractException{
         //create a policy object from the policy bytes
-        IMspManager mspManager = GlobalMspManagement.getManagerForChain(groupName);
+        IMspManager mspManager = MspMgmtMgr.getManagerForChain(groupName);
         if(mspManager==null){
             String msg=String.format("Error checking smartcontract instantiation policy: MSP getPolicyManager for group %s not found",groupName);
             throw new SysSmartContractException(msg);
@@ -153,8 +154,8 @@ public class LsscSupport {
         }
 
         SignedData signedData=new SignedData(signedProposal.getProposalBytes().toByteArray(),
-                                             shdr.getCreator().toByteArray(),
-                                             signedProposal.getSignature().toByteArray());
+                shdr.getCreator().toByteArray(),
+                signedProposal.getSignature().toByteArray());
         List<SignedData> datas=new ArrayList<SignedData>();
         datas.add(signedData);
         try {

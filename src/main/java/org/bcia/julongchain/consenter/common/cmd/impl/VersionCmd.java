@@ -16,26 +16,36 @@
 package org.bcia.julongchain.consenter.common.cmd.impl;
 
 import org.apache.commons.cli.*;
+import org.bcia.julongchain.common.deliver.DeliverDeliverHandler;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.localmsp.impl.LocalSigner;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.common.cmd.IConsenterCmd;
+import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfig;
+import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfigFactory;
+import org.bcia.julongchain.consenter.common.multigroup.Registrar;
 import org.bcia.julongchain.consenter.common.server.ConsenterServer;
+import org.bcia.julongchain.consenter.common.server.PreStart;
+import org.bcia.julongchain.consenter.util.ConsenterConstants;
+
+import java.io.IOException;
 
 /**
+ * 版本查看命令
+ *
  * @author zhangmingyang
  * @Date: 2018/3/2
  * @company Dingxuan
  */
 public class VersionCmd implements IConsenterCmd {
     private static JulongChainLog log = JulongChainLogFactory.getLog(VersionCmd.class);
-    //   @Autowired
     public ConsenterServer consenterServer;
     private static final String VERSION = "version";
 
     public VersionCmd() {
-        //consenterServer= new VersionCmd();
-        //VersionCmd versionCmd=new VersionCmd();
-        consenterServer = new ConsenterServer();
+        ConsenterConfig consenterConfig = ConsenterConfigFactory.getConsenterConfig();
+        consenterServer = new ConsenterServer(Integer.valueOf(consenterConfig.getGeneral().getListenPort()));
     }
 
     @Override
@@ -43,15 +53,10 @@ public class VersionCmd implements IConsenterCmd {
         for (String str : args) {
             log.info("Arg: " + str);
         }
-        Options options = new Options();
-        //需要支持peer node start, 无需参数
-        options.addOption(VERSION, false, "start peer node");
-        //需要支持peer node start/peer node status
-        CommandLineParser parser = new DefaultParser();
-        CommandLine cmd = parser.parse(options, args);
-        String defaultValue = "UnKown";
-        if (cmd.hasOption(VERSION)) {
-            log.info("consnter version is V0.25!");
+        ConsenterConfig consenterConfig = ConsenterConfigFactory.loadConsenterConfig();
+        String consenterVersion = consenterConfig.getGeneral().getVersion();
+        if (args[0].equalsIgnoreCase(VERSION)) {
+            log.info(String.format("consnter version is %s", consenterVersion));
         }
 
 

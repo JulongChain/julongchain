@@ -16,9 +16,9 @@
 package org.bcia.julongchain.gossip.gossip;
 
 import org.bcia.julongchain.gossip.api.IJoinChannelMessage;
-import org.bcia.julongchain.gossip.api.IPeerSuspector;
+import org.bcia.julongchain.gossip.api.INodeSuspector;
 import org.bcia.julongchain.gossip.api.ISubChannelSelectionCriteria;
-import org.bcia.julongchain.gossip.comm.RemotePeer;
+import org.bcia.julongchain.gossip.comm.RemoteNode;
 import org.bcia.julongchain.gossip.common.IMessageAcceptor;
 import org.bcia.julongchain.gossip.discovery.NetworkMember;
 import org.bcia.julongchain.gossip.filter.IRoutingFilter;
@@ -26,15 +26,22 @@ import org.bcia.julongchain.protos.gossip.Message;
 
 import java.util.Map;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public interface IGossip {
 
-    public void send(Message.GossipMessage msg, RemotePeer... peers);
+    public void send(Message.GossipMessage msg, RemoteNode... nodes);
 
     public void sendByCriteria(SignedGossipMessage msg, SendCriteria sendCriteria);
 
-    public NetworkMember[] peers();
+    public NetworkMember[] nodes();
 
-    public NetworkMember[] peersOfChannel(byte[] groupID);
+    public NetworkMember[] nodesOfChannel(byte[] groupID);
 
     public void updateMetadata(byte[] metadata);
 
@@ -42,7 +49,7 @@ public interface IGossip {
 
     public void gossip(Message.GossipMessage gossipMessage);
 
-    public IRoutingFilter peerFilter(byte[] groupID, ISubChannelSelectionCriteria messagePredicate);
+    public IRoutingFilter nodeFilter(byte[] groupID, ISubChannelSelectionCriteria messagePredicate);
 
     public Map<String, Object> accept(IMessageAcceptor acceptor, Boolean passThrough);
 
@@ -50,7 +57,7 @@ public interface IGossip {
 
     public void leaveGroup(byte[] groupID);
 
-    public void suspectPeers(IPeerSuspector peerSuspector);
+    public void suspectNodes(INodeSuspector nodeSuspector);
 
     public void stop();
 

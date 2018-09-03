@@ -19,7 +19,7 @@ import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.protos.node.EventsPackage;
 
 /**
- * 类描述
+ * 处理器列表接口
  *
  * @author zhouhui
  * @date 2018/05/17

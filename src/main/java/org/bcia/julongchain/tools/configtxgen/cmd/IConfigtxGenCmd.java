@@ -20,7 +20,7 @@ import org.bcia.julongchain.common.exception.ConfigtxToolsException;
 import org.bcia.julongchain.common.exception.ValidateException;
 
 /**
- * 类描述
+ * 交易生成工具命令支持
  *
  * @author zhouhui
  * @date 2018/06/05

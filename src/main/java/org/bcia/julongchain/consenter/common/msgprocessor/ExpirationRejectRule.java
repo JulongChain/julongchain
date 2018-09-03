@@ -30,6 +30,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 溢出拒绝规则
+ *
  * @author zhangmingyang
  * @Date: 2018/5/9
  * @company Dingxuan

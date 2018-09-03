@@ -25,6 +25,7 @@ import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bcia.julongchain.core.ledger.PvtNsCollFilter;
 import org.bcia.julongchain.core.ledger.TxPvtData;
 import org.bcia.julongchain.protos.ledger.rwset.Rwset;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.util.*;
 
@@ -87,7 +88,7 @@ public class PvtDataStoreImpl implements IPvtDataStore {
             throw new LedgerException("Last committed block " + lastCommittedBlock + " block reuqested " + blockNum);
         }
         byte[] startKey = KvEncoding.getStartKeyForRangeScanByBlockNum(blockNum);
-        log.debug(String.format("Querying private data for write sets using startKey %s", BytesHexStrTranslate.bytesToHexFun1(startKey)));
+        log.debug(String.format("Querying private data for write sets using startKey %s", Hex.toHexString(startKey)));
         Iterator<Map.Entry<byte[], byte[]>> itr = db.getIterator(startKey);
         List<TxPvtData> pvtData = new ArrayList<>();
         while(itr.hasNext()){

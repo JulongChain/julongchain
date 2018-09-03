@@ -18,7 +18,7 @@ package org.bcia.julongchain.gossip.comm;
 /**
  * class description
  *
- * @author
+ * @author wanliangbing
  * @date 18-7-25
  * @company Dingxuan
  */

@@ -20,7 +20,7 @@ import org.bcia.julongchain.core.node.NodeConfigFactory;
 import java.util.Map;
 
 /**
- * CouchDB definition
+ * CouchDB描述类
  *
  * @author sunzongyu
  * @date 2018/07/17

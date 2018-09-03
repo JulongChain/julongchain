@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -41,7 +41,7 @@ public interface IBlockStoreProvider {
 	/**
 	 * 是否存在区块仓库
 	 */
-    Boolean exists(String ledgerID) throws LedgerException;
+    boolean exists(String ledgerID) throws LedgerException;
 
 	/**
 	 * 列出全部的区块仓库

@@ -17,7 +17,7 @@ package org.bcia.julongchain.gossip.service;
 
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
-import org.bcia.julongchain.gossip.api.AnchorPeer;
+import org.bcia.julongchain.gossip.api.AnchorNode;
 import org.bcia.julongchain.gossip.api.IJoinChannelMessage;
 
 import java.util.Map;
@@ -26,7 +26,7 @@ import java.util.Set;
 /**
  * class description
  *
- * @author
+ * @author wanliangbing
  * @date 18-7-24
  * @company Dingxuan
  */
@@ -34,7 +34,7 @@ public class JoinChannelMessage implements IJoinChannelMessage{
 
     private static final JulongChainLog log = JulongChainLogFactory.getLog(JoinChannelMessage.class);
     private Long seqNum;
-    private Map<String,AnchorPeer[]> members2AnchorPeers;
+    private Map<String,AnchorNode[]> members2AnchorNodes;
 
     @Override
     public Long sequenceNumber() {
@@ -42,28 +42,28 @@ public class JoinChannelMessage implements IJoinChannelMessage{
     }
 
     /**
-     * AnchorPeersOf returns the anchor peers of the given organization
+     * AnchorNodesOf 返回给定公司的锚节点
      * @param orgIdentity
      * @return
      */
     @Override
-    public AnchorPeer[] anchorPeersOf(byte[] orgIdentity) {
+    public AnchorNode[] anchorNodesOf(byte[] orgIdentity) {
         String orgIdentityStr = new String(orgIdentity);
-        AnchorPeer[] anchorPeers = members2AnchorPeers.get(orgIdentityStr);
-        return anchorPeers;
+        AnchorNode[] anchorNodes = members2AnchorNodes.get(orgIdentityStr);
+        return anchorNodes;
     }
 
     /**
-     * Members returns the organizations of the channel
+     * Members 返回给定公司的通道
      * @return
      */
     @Override
     public byte[][] members() {
-        Set<Map.Entry<String, AnchorPeer[]>> entries = members2AnchorPeers.entrySet();
-        int size = members2AnchorPeers.size();
+        Set<Map.Entry<String, AnchorNode[]>> entries = members2AnchorNodes.entrySet();
+        int size = members2AnchorNodes.size();
         byte[][] members = new byte[size][];
         int i = 0;
-        for (Map.Entry<String, AnchorPeer[]> entry : entries) {
+        for (Map.Entry<String, AnchorNode[]> entry : entries) {
             String orgIdentity = entry.getKey();
             members[i] = orgIdentity.getBytes();
             i++;

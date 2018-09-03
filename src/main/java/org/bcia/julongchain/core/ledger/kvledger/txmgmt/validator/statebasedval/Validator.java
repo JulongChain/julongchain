@@ -60,8 +60,8 @@ public class Validator implements InternalValidator {
     public void preLoadCommittedVersionOfRSet(Block block) throws LedgerException{
         List<CompositeKey> pubKeys = new ArrayList<>();
         List<HashedCompositeKey> hashedKeys = new ArrayList<>();
-        Map<CompositeKey, Object> pubKeysMap = new HashMap<>();
-        Map<HashedCompositeKey, Object> hashedKeyMap = new HashMap<>();
+        Map<CompositeKey, Object> pubKeysMap = new HashMap<>(16);
+        Map<HashedCompositeKey, Object> hashedKeyMap = new HashMap<>(16);
         for(Transaction tx : block.getTxs()){
             for(NsRwSet nsRwSet : tx.getRwSet().getNsRwSets()){
                 for(KvRwset.KVRead kvRead : nsRwSet.getKvRwSet().getReadsList()){
@@ -148,9 +148,9 @@ public class Validator implements InternalValidator {
         if(updates.getBatch().exists(ns, kvRead.getKey())){
             return false;
         }
-        LedgerHeight committedVersion = db.getVersion(ns, kvRead.getKey());
+        LedgerHeight committedVersion = db.getHeight(ns, kvRead.getKey());
         log.debug("Comparing versions for keys " + kvRead.getKey());
-        if(!LedgerHeight.areSame(committedVersion, RwSetUtil.newVersion(kvRead.getVersion()))){
+		if(!LedgerHeight.areSame(committedVersion, RwSetUtil.newVersion(kvRead.getVersion()))){
             log.debug(String.format("Version mismatch for key [%s:%s]", ns, kvRead.getKey()));
             return false;
         }

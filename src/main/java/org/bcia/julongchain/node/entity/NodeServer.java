@@ -32,6 +32,7 @@ import org.bcia.julongchain.core.node.NodeConfig;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.core.node.grpc.EventGrpcServer;
 import org.bcia.julongchain.core.node.grpc.NodeGrpcServer;
+import org.bcia.julongchain.core.node.grpc.SmartContractGrpcServer;
 import org.bcia.julongchain.core.ssc.ISystemSmartContractManager;
 import org.bcia.julongchain.core.ssc.SystemSmartContractManager;
 import org.bcia.julongchain.events.producer.EventHubServer;
@@ -96,7 +97,10 @@ public class NodeServer {
         //启动Node主服务(Grpc Server1)
         startNodeGrpcServer(nodeConfig);
 
-        //启动事件处理服务(Grpc Server2)
+        //启动智能合约服务(Grpc Server2)
+        startSmartContractGrpcServer(nodeConfig);
+
+        //启动事件处理服务(Grpc Server3)
         startEventGrpcServer(nodeConfig);
 
         //注册系统智能合约
@@ -132,7 +136,9 @@ public class NodeServer {
         String host = split[0];
         Integer port = Integer.parseInt(split[1]);
         waitConnectable(host, port);
-        ManagedChannel managedChannel = NettyChannelBuilder.forAddress(host, port).usePlaintext().build();
+        ManagedChannel managedChannel =
+                NettyChannelBuilder.forAddress(host, port).maxInboundMessageSize(CommConstant.MAX_GRPC_MESSAGE_SIZE)
+                        .usePlaintext().build();
         GossipClientStream gossipClientStream = new GossipClientStream(managedChannel);
         GossipClientStream.setGossipClientStream(gossipClientStream);
         try {
@@ -147,9 +153,9 @@ public class NodeServer {
 
     private void waitConnectable(String host, Integer port) {
         while (!Utils.isHostConnectable(host, port)) {
-            log.info("wait consenter start, host:" + host + ", port:" + port);
+            log.info("Wait consenter start, host:" + host + ", port:" + port);
             try {
-                Thread.sleep(1000l);
+                Thread.sleep(1000L);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -162,20 +168,20 @@ public class NodeServer {
             public void run() {
                 while (true) {
                     try {
-                        log.info("start a pull request.");
+                        log.info("Start a pull request.");
                         long height = LedgerManager.openLedger(ledgerID).getBlockchainInfo().getHeight();
                         Message.RemoteStateRequest remoteStateRequest = Message.RemoteStateRequest.newBuilder().setStartSeqNum(height).setEndSeqNum(height).build();
                         Message.GossipMessage gossipMessage = Message.GossipMessage.newBuilder().setGroup(ByteString.copyFromUtf8(ledgerID)).setStateRequest(remoteStateRequest).build();
                         Message.Envelope envelope = Message.Envelope.newBuilder().setPayload(gossipMessage.toByteString()).build();
-                        log.info("send pull request:" + ledgerID + " " + height);
+                        log.info("Send pull request:" + ledgerID + " " + height);
                         gossipClientStream.serialSend(envelope);
                         if (gossipClientStream.getQueueMap().get(ledgerID) == null) {
                             gossipClientStream.getQueueMap().put(ledgerID, new LinkedBlockingQueue<Message.Envelope>());
                         }
-                        log.info("receive block");
+                        log.info("Receive block");
                         Message.Envelope receiveEnvelope = gossipClientStream.getQueueMap().get(ledgerID).take();
                         GossipService.saveBlock(receiveEnvelope);
-                        log.info("saved block");
+                        log.info("Saved block");
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
                     }
@@ -219,6 +225,39 @@ public class NodeServer {
                 try {
                     nodeGrpcServer.start();
                     nodeGrpcServer.blockUntilShutdown();
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                } catch (InterruptedException e) {
+                    log.error(e.getMessage(), e);
+                }
+            }
+        }.start();
+    }
+
+    /**
+     * 开启智能合约Grpc服务
+     *
+     * @param nodeConfig
+     * @throws NodeException
+     */
+    private void startSmartContractGrpcServer(NodeConfig nodeConfig) throws NodeException {
+        //从配置中获取要监听的地址和端口
+        NetAddress address = null;
+        try {
+            String listenAddress = nodeConfig.getNode().getSmartContractListenAddress();
+            address = new NetAddress(listenAddress);
+        } catch (Exception e) {
+            throw new NodeException(e);
+        }
+
+        final SmartContractGrpcServer smartContractGrpcServer = new SmartContractGrpcServer(address.getPort());
+
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    smartContractGrpcServer.start();
+                    smartContractGrpcServer.blockUntilShutdown();
                 } catch (IOException e) {
                     log.error(e.getMessage(), e);
                 } catch (InterruptedException e) {
@@ -295,10 +334,10 @@ public class NodeServer {
     private String getProcessId() {
         // get name representing the running Java virtual machine.
         String processName = ManagementFactory.getRuntimeMXBean().getName();
-        log.info("process name: " + processName);
+        log.info("Process name: " + processName);
 
         String processId = processName.split("@")[0];
-        log.info("process id: " + processId);
+        log.info("Process id: " + processId);
         return processId;
     }
 

@@ -21,7 +21,7 @@ import org.bcia.julongchain.protos.common.Configuration;
 import java.util.Map;
 
 /**
- * 类描述
+ * 能力集配置项
  *
  * @author zhouhui
  * @date 2018/3/9

@@ -16,14 +16,25 @@
 package org.bcia.julongchain.consenter.common.cmd.impl;
 
 import org.apache.commons.cli.ParseException;
+import org.bcia.julongchain.common.deliver.DeliverDeliverHandler;
+import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.localmsp.impl.LocalSigner;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.consenter.common.broadcast.BroadcastHandler;
 import org.bcia.julongchain.consenter.common.cmd.IConsenterCmd;
+import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfig;
+import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfigFactory;
+import org.bcia.julongchain.consenter.common.multigroup.Registrar;
 import org.bcia.julongchain.consenter.common.server.ConsenterServer;
+import org.bcia.julongchain.consenter.common.server.PreStart;
+import org.bcia.julongchain.consenter.util.ConsenterConstants;
 
 import java.io.IOException;
 
 /**
+ * 普通启动方式
+ *
  * @author zhangmingyang
  * @Date: 2018/3/2
  * @company Dingxuan
@@ -33,7 +44,24 @@ public class StartCmd implements IConsenterCmd {
     private ConsenterServer consenterServer;
 
     public StartCmd() {
-        consenterServer = new ConsenterServer();
+        Registrar registrar = null;
+        ConsenterConfig consenterConfig = ConsenterConfigFactory.getConsenterConfig();
+        try {
+            registrar = new PreStart().initializeMultichannelRegistrar(consenterConfig, new LocalSigner());
+        } catch (JulongChainException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        DeliverDeliverHandler deliverHandler = new DeliverDeliverHandler(registrar, consenterConfig.getGeneral().getAuthentication().get(ConsenterConstants.TIMEWONDW));
+
+        consenterServer = new ConsenterServer(Integer.valueOf(consenterConfig.getGeneral().getListenPort()));
+        BroadcastHandler broadCastHandle = new BroadcastHandler(registrar);
+
+        consenterServer.bindBroadcastServer(broadCastHandle);
+
+        consenterServer.bindDeverServer(deliverHandler);
+
     }
 
     @Override
@@ -59,6 +87,7 @@ public class StartCmd implements IConsenterCmd {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
 }

@@ -16,13 +16,14 @@ limitations under the License.
 package org.bcia.julongchain.common.ledger.util;
 
 import com.google.protobuf.ByteString;
+import org.bcia.julongchain.common.genesis.GenesisBlockFactory;
 import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
 import org.bcia.julongchain.core.ledger.TxSimulationResults;
 import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.core.ledger.util.Util;
-import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.protos.common.Common;
+import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
 import org.bcia.julongchain.protos.node.TransactionPackage;
@@ -30,11 +31,13 @@ import org.bcia.julongchain.protos.node.TransactionPackage;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Ledger工具类
+ * 用于测试以及内部调试
  *
  * @author sunzongyu
  * @date 2018/08/08
@@ -42,10 +45,7 @@ import java.util.List;
  */
 public class Utils {
 	public static void main(String[] args) throws Exception {
-		String ledgerDir = "/var/julongchain/production";
-		rm();
-		rmi();
-		rmrf(ledgerDir);
+		resetEnv();
 	}
 
 	/**
@@ -69,6 +69,13 @@ public class Utils {
 			e.printStackTrace();
 		}
 		return result;
+	}
+
+	public static void resetEnv() {
+		String ledgerDir = "/var/julongchain/production";
+		rm();
+		rmi();
+		rmrf(ledgerDir);
 	}
 
 	/**
@@ -103,43 +110,49 @@ public class Utils {
 		exce(cmd);
 	}
 
-	/**
-	 * 打印数组
-	 */
-	public void soutBytes(byte[] bytes, int length) {
-		int i = 0;
-		for (byte aByte : bytes) {
-			i++;
-			System.out.print(aByte + "\t");
-			if(i > length){
-				System.out.println();
-				i = 0;
-			}
-		}
+	public static INodeLedger constructDefaultLedger() throws Exception {
+		String groupID = "myGroup";
+		String ns = "mycc";
+		GenesisBlockFactory factory = new GenesisBlockFactory(Configtx.ConfigTree.getDefaultInstance());
+		LedgerManager.initialize(null);
+		Common.Block block = factory.getGenesisBlock(groupID);
+		INodeLedger l = LedgerManager.createLedger(block);
+		Common.Block block1 = constructDefaultBlock(l, block, groupID, ns);
+		l.commit(block1);
+		return l;
 	}
 
-	public static Common.Block constructDefaultBlock(Common.Block preBlock, String groupID) throws Exception {
+	public static Common.Block constructDefaultBlock(INodeLedger l, Common.Block preBlock, String groupID, String namespace) throws Exception {
 		return constructBlock(preBlock, groupID, Common.HeaderType.ENDORSER_TRANSACTION,
-				constructTxSimulationResults(groupID, "txID", "key0", "value0").getPubReadWriteByteString(),
-				constructTxSimulationResults(groupID, "txID", "key1", "value1").getPubReadWriteByteString(),
-				constructTxSimulationResults(groupID, "txID", "key2", "value2").getPubReadWriteByteString(),
-				constructTxSimulationResults(groupID, "txID", "key3", "value3").getPubReadWriteByteString()
+				constructTxSimulationResults(l, namespace, "txID", "key0", "value0").getPubReadWriteByteString(),
+				constructTxSimulationResults(l, namespace, "txID", "key1", "value1").getPubReadWriteByteString(),
+				constructTxSimulationResults(l, namespace, "txID", "key2", "value2").getPubReadWriteByteString(),
+				constructTxSimulationResults(l, namespace, "txID", "key3", "value3").getPubReadWriteByteString(),
+				constructTxSimulationResults(l, namespace, "txID", "中文测试", "中文测试").getPubReadWriteByteString()
 		);
 	}
 
-	private static TxSimulationResults constructTxSimulationResults(String groupID, String txID, String key, String value) throws Exception{
-		LedgerManager.initialize(null);
-		INodeLedger l = LedgerManager.openLedger(groupID);
+	public static Common.Block constructDefaultBlock1(INodeLedger l, Common.Block preBlock, String groupID, String namespace) throws Exception {
+		return constructBlock(preBlock, groupID, Common.HeaderType.ENDORSER_TRANSACTION,
+				constructTxSimulationResults(l, namespace, "txID", "key0", "value0").getPubReadWriteByteString(),
+				constructTxSimulationResults(l, namespace, "txID", "key1", "value1").getPubReadWriteByteString(),
+				constructTxSimulationResults(l, namespace, "txID", "key2", "value2").getPubReadWriteByteString(),
+				constructTxSimulationResults(l, namespace, "txID", "key3", "value3").getPubReadWriteByteString()
+		);
+	}
+
+	private static TxSimulationResults constructTxSimulationResults(INodeLedger l,String namespace, String txID, String key, String value) throws Exception{
 		ITxSimulator simulator = l.newTxSimulator(txID);
-		simulator.setState(groupID, key, ("pub " + value).getBytes());
+		simulator.setState(namespace, key, value.getBytes(StandardCharsets.UTF_8));
 		return simulator.getTxSimulationResults();
 	}
 
 	private static Common.Block constructBlock(Common.Block preBlock, String groupID, Common.HeaderType type, ByteString... rwsets) throws Exception {
+		int length = rwsets.length;
 		Common.BlockData.Builder builder = Common.BlockData.newBuilder();
 		for (int i = 0; i < rwsets.length; i++) {
 			//pub								//rwset		//txID				//type	//version	//groupID
-			builder.addData(constructEnvelope(	rwsets[i], 	"txid" + i, 	type, 	1, 	groupID).toByteString());
+			builder.addData(constructEnvelope(	rwsets[i], 	"txID" + i, 	type, 	1, 	groupID).toByteString());
 		}
 		Common.BlockData data = builder.build();
 
@@ -152,7 +165,7 @@ public class Utils {
 		Common.BlockMetadata metadata = Common.BlockMetadata.newBuilder()
 				.addMetadata(ByteString.EMPTY)
 				.addMetadata(ByteString.EMPTY)
-				.addMetadata(ByteString.EMPTY)
+				.addMetadata(ByteString.copyFrom(new byte[length]))
 				.addMetadata(ByteString.EMPTY)
 				.build();
 

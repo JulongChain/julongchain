@@ -17,12 +17,19 @@ package org.bcia.julongchain.gossip.gossip.channel;
 
 import java.time.Duration;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public class Config {
 
     private String ID;
     private Duration publishStateInfoInterval;
     private Integer maxBlockCountToStore;
-    private Integer pullPeerNum;
+    private Integer pullNodeNum;
     private Duration pullInterval;
     private Duration requestStateInfoInterval;
     private Duration blockExpirationInterval;
@@ -52,12 +59,12 @@ public class Config {
         this.maxBlockCountToStore = maxBlockCountToStore;
     }
 
-    public Integer getPullPeerNum() {
-        return pullPeerNum;
+    public Integer getPullNodeNum() {
+        return pullNodeNum;
     }
 
-    public void setPullPeerNum(Integer pullPeerNum) {
-        this.pullPeerNum = pullPeerNum;
+    public void setPullNodeNum(Integer pullNodeNum) {
+        this.pullNodeNum = pullNodeNum;
     }
 
     public Duration getPullInterval() {

@@ -18,7 +18,7 @@ package org.bcia.julongchain.common.groupconfig.value;
 import com.google.protobuf.Message;
 
 /**
- * 标准配置值
+ * 标准配置项/配置值
  *
  * @author zhouhui
  * @date 2018/3/9

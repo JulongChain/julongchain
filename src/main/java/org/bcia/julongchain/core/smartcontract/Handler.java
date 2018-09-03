@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -51,7 +51,8 @@ import static org.bcia.julongchain.core.smartcontract.shim.fsm.CallbackType.ENTE
 import static org.bcia.julongchain.protos.node.SmartContractShim.SmartContractMessage.Type.*;
 
 /**
- * Handler responsible for management of Peer's side of chaincode stream
+ * Node端Handler
+ * todo v0.8版本暂未使用
  *
  * @author sunzongyu
  * @date 2018/3/18
@@ -60,19 +61,19 @@ import static org.bcia.julongchain.protos.node.SmartContractShim.SmartContractMe
 public class Handler {
 
     /**
-     * start state
+     * 创建状态
      */
     private static final String CREATED_STATE     = "created";
     /**
-     * in: CREATED, rcv:  REGISTER, send: REGISTERED, INIT
+	 * 当前状态:CREATED	收到状态:REGISTER		发送状态:REGISTED, INIT
      */
     private static final String ESTABLISHED_STATE = "established";
     /**
-     * in:ESTABLISHED,TRANSACTION, rcv:COMPLETED
+	 * 当前状态:ESTABLISHED, TRANSACTION	收到状态:COMPLETED
      */
     private static final String READY_STATE       = "ready";
     /**
-     * in:INIT,ESTABLISHED, rcv: error, terminate container
+	 * 当前状态:INIT, ESTABLISHED		收到状态:ERROR, TERMINATE CONTAINER
      */
     private static final String END_STATE         = "end";
 
@@ -229,7 +230,7 @@ public class Handler {
     }
 
     /**
-     * return new handler instance
+     *  返回新的handler对象
      */
     public static Handler newSmartContractSupportHandler(ISmartContractStream peerChatStream, SmartContractSupport smartContractSupport){
         return new Handler(smartContractSupport, peerChatStream);
@@ -237,7 +238,7 @@ public class Handler {
 
 
     /**
-     * return firest 8 chars in txid
+     *  返回8位txid
      */
     public static String shorttxid(String txid) {
         if(txid == null){
@@ -250,14 +251,14 @@ public class Handler {
     }
 
     /**
-     * set smart contract instance which's id is smartContractID
+     * 设置智能合约对象id
      */
     public void decomposeRegisteredName(SmartContractPackage.SmartContractID smartContractID) {
         this.setSmartContractInstance(getSmartContractInstance(smartContractID.getName()));
     }
 
     /**
-     * get smart contract with smartContractName
+     * 用smartContractName提取智能合约
      * @param smartContractName name:version/id
      */
     public static SmartContractInstance getSmartContractInstance(String smartContractName) {
@@ -288,14 +289,14 @@ public class Handler {
     }
 
     /**
-     * get smart contract's name
+     * 提取智能合约的名字
      */
     public String getSmartContractRootName() {
         return smartContractInstance.getSmartContractName();
     }
 
     /**
-     * send smart contract message with gRPC channel "chatStream" sychronized
+     * 通过gRPC通道同步的“chatStream”发送智能合约信息
      */
     public synchronized void serialSend(SmartContractShim.SmartContractMessage msg) {
         try {
@@ -307,7 +308,7 @@ public class Handler {
     }
 
     /**
-     * send smart contract message with gRPC channel "chatStream" asychronized
+     * 通过gRPC通道异步的“chatStream”发送智能合约信息
      */
     public void serialSendAsync(SmartContractShim.SmartContractMessage msg) {
         new Thread(() -> {
@@ -316,7 +317,7 @@ public class Handler {
     }
 
     /**
-     * get transaction context id which is chainid + txid
+     * 用“chainid + txid”提取交易背景id
      */
     public String getTxCtxId(String groupId, String txId) {
         if(groupId != null && txId != null){
@@ -327,7 +328,7 @@ public class Handler {
     }
 
     /**
-     * create transaction context with following args
+     * 用下面的参数创建交易背景
      */
     public TransactionContext createTxContext(Context ctxt, String chainID, String txid, ProposalPackage.SignedProposal signedProp, ProposalPackage.Proposal prop) {
         if(txCtxs == null) {
@@ -356,7 +357,7 @@ public class Handler {
     }
 
     /**
-     * get transcation context with transcation id "chainID + txid"
+     * 用“chainid + txid”提取交易背景id
      */
     public synchronized TransactionContext getTxContext(String groupId, String txId) {
         String txCtxID = getTxCtxId(groupId, txId);
@@ -364,7 +365,7 @@ public class Handler {
     }
 
     /**
-     * delete transcation context with transcation id "chainID + txid" if exist
+     * 通过交易id"chainID + txid"来删除交易背景
      */
     public synchronized void deleteTxContext(String chainID, String txid) {
         String txCtxID = getTxCtxId(chainID, txid);
@@ -377,7 +378,7 @@ public class Handler {
     }
 
     /**
-     * put current txContext into txContext's queryIteratorMap for init it.
+     * 将当前的txContext放进queryIteratorMap中
      */
     public synchronized void initializeQueryContext(TransactionContext txContext, String queryID,
                                        IResultsIterator queryIterator) {
@@ -392,7 +393,7 @@ public class Handler {
     }
 
     /**
-     * get a transcation context which's query id is "queryID" in cxContext's queryIteratorMap
+     * 在cxContext中的queryIteratorMap用query id来提取一个交易背景
      */
     public synchronized IResultsIterator getQueryIterator(TransactionContext txContext, String queryID) {
         if(txContext.getQueryIteratorMap() != null && queryID != null){
@@ -403,7 +404,7 @@ public class Handler {
     }
 
     /**
-     * close and remove current ResultIterator which's query id is "queryID"
+     * 用"queryID"关闭和移除当前的ResultIterator
      */
     public synchronized void cleanupQueryContext(TransactionContext txContext, String queryID){
         try {
@@ -416,7 +417,8 @@ public class Handler {
     }
 
     /**
-     * Check if the transactor is allow to call this chaincode on this channel
+     * 检查交易处理器是否可以调用通道中的链码
+     *
      */
     public boolean checkACL(ProposalPackage.SignedProposal signedProp, ProposalPackage.Proposal proposal, SmartContractInstance ccIns) {
 
@@ -424,7 +426,7 @@ public class Handler {
     }
 
     /**
-     * deregister this handler if it is registed
+     * 注销注册过的handler
      */
     public void deregister() {
         if(this.registered){
@@ -449,8 +451,8 @@ public class Handler {
     }
 
     /**
-     * return this channel's left alive time.
-     * if it is 0, wait others to signal this channel
+     * 返回通道的剩余活跃时间
+     * 如果为0，等待另外的信号
      */
     public void waitForKeepaliveTimer() {
         //need ssSupport.keepalive
@@ -549,7 +551,7 @@ public class Handler {
 //        }).start();
     }
 
-    /** HandleChaincodeStream Main loop for handling the associated Chaincode stream
+    /** 处理相关链码的循环
      */
     public static void handleChaincodeStream(SmartContractSupport chaincodeSupport, Context ctxt, ISmartContractStream stream) {
         //check deadline
@@ -559,7 +561,7 @@ public class Handler {
     }
 
     /**
-     * put txCtxID into txidMap
+     *  将 txCtxID 放入 txidMap
      */
     public synchronized Boolean createTXIDEntry(String groupId, String txid) {
         if(txidMap == null){
@@ -575,7 +577,7 @@ public class Handler {
     }
 
     /**
-     * remove teCtxID from txidMap
+     * 从 txidMap 中移除 teCtxID
      */
     public synchronized void deleteTXIDEntry(String groupId, String txid) {
         String txCtxID = getTxCtxId(groupId, txid);
@@ -587,7 +589,7 @@ public class Handler {
     }
 
     /**
-     * notiry READY message as next state
+     * 在下个状态开始前提示 READY 信息
      */
     public void notifyDuringStartup(Boolean val) {
         if(readyNotify != null){
@@ -614,7 +616,7 @@ public class Handler {
         }
     }
 
-    /** beforeRegisterEvent is invoked when chaincode tries to register.
+    /** 当链码尝试注册时 beforeRegisterEvent 被调用
      */
      public void beforeRegisterEvent(Event event, String state) {
          //在event中提取msg
@@ -641,7 +643,7 @@ public class Handler {
     }
 
     /**
-     * notify msg
+     * 通知 msg
      */
     public synchronized void notify(SmartContractShim.SmartContractMessage msg) {
         String txCtxId = getTxCtxId(msg.getGroupId(), msg.getTxid());
@@ -665,7 +667,7 @@ public class Handler {
         }
     }
 
-    /** beforeCompletedEvent is invoked when chaincode has completed execution of init, invoke.
+    /** 当链码完成执行init时beforeCompletedEvent被调用
      */
     public void beforeCompletedEvent(Event event, String state) {
         SmartContractShim.SmartContractMessage msg = extractMessageFromEvent(event);
@@ -673,7 +675,7 @@ public class Handler {
     }
 
     /**
-     * after fsm receive READY, send INIT to user chaincode
+     * 当 fsm 收到 READY 后， 发送 INIT 给用户链码
      */
     public void afterReady(Event event, String state){
         //发送INIT给用户链码
@@ -683,7 +685,7 @@ public class Handler {
                 .build());
     }
 
-    /** afterGetState handles a GET_STATE request from the chaincode.
+    /** afterGetState 处理来自链码的 GET_STATE 请求
      */
     public void afterGetState(Event event, String state) {
         SmartContractShim.SmartContractMessage msg = extractMessageFromEvent(event);
@@ -691,7 +693,7 @@ public class Handler {
         handleGetState(msg);
     }
 
-    /** Handles query to ledger to get state
+    /** 处理账本中的请求
      */
     public void handleGetState(SmartContractShim.SmartContractMessage msg) {
         new Thread(() -> {
@@ -767,7 +769,7 @@ public class Handler {
         }).start();
     }
 
-    /** afterGetStateByRange handles a GET_STATE_BY_RANGE request from the chaincode.
+    /** afterGetStateByRange 处理链码中 GET_STATE_BY_RANGE 请求
      */
     public void afterGetStateByRange(Event event, String state) {
         SmartContractShim.SmartContractMessage msg = extractMessageFromEvent(event);
@@ -778,7 +780,7 @@ public class Handler {
         log.info("Exiting GET_STATE_BY_RANGE");
     }
 
-    /** Handles query to ledger to rage query state
+    /** 根据范围来处理账本中的请求
      */
     public void handleGetStateByRange(SmartContractShim.SmartContractMessage msg) {
         new Thread(() -> {
@@ -888,7 +890,8 @@ public class Handler {
 
     public static Integer maxResultLimit = 100;
 
-    /** getQueryResponse takes an iterator and fetch state to construct QueryResponse
+    /** getQueryResponse 使用一个迭代器提取状态来构造 QueryResponse
+     *
      */
     public SmartContractShim.QueryResponse getQueryResponse(TransactionContext txContext, IResultsIterator iter,
                                                                    String iterID){
@@ -925,7 +928,7 @@ public class Handler {
     }
 
     /**
-     * get p.batch and set batch as null, count as 0
+     * 提取 p.batch 和 将 batch 设置成 null, 视为 0
      */
     public SmartContractShim.QueryResultBytes[] cut(PendingQueryResult p) {
         SmartContractShim.QueryResultBytes[] batch = new SmartContractShim.QueryResultBytes[0];
@@ -956,7 +959,7 @@ public class Handler {
         }
     }
 
-    /** afterQueryStateNext handles a QUERY_STATE_NEXT request from the chaincode.
+    /** afterQueryStateNext 处理来自链码的 QUERY_STATE_NEXT 请求
      */
     public void afterQueryStateNext(Event event, String state) {
         SmartContractShim.SmartContractMessage msg = extractMessageFromEvent(event);
@@ -965,7 +968,7 @@ public class Handler {
         log.info("Exiiting QUERY_STATE_NEXT");
     }
 
-    /** Handles query to ledger for query state next
+    /** 处理账本下个请求状态
      */
     public void handleQueryStateNext(SmartContractShim.SmartContractMessage msg) {
         new Thread(() -> {
@@ -1032,7 +1035,7 @@ public class Handler {
         }).start();
     }
 
-    /** afterQueryStateClose handles a QUERY_STATE_CLOSE request from the chaincode.
+    /** afterQueryStateClose 处理来自链码的 QUERY_STATE_CLOSE 请求
      */
     public void afterQueryStateClose(Event event, String state) {
         SmartContractShim.SmartContractMessage msg = extractMessageFromEvent(event);
@@ -1043,7 +1046,7 @@ public class Handler {
         log.info("Exiting QUERY_STATE_CLOSE");
     }
 
-    /** Handles the closing of a state iterator
+    /** 处理状态迭代器的关闭
      */
     public void handleQueryStateClose(SmartContractShim.SmartContractMessage msg) {
         new Thread(() -> {
@@ -1102,7 +1105,7 @@ public class Handler {
         }).start();
     }
 
-    /** afterGetQueryResult handles a GET_QUERY_RESULT request from the chaincode.
+    /** afterGetQueryResult 处理来自链码的 GET_QUERY_RESULT 请求
      */
     public void afterGetQueryResult(Event event, String state) {
         SmartContractShim.SmartContractMessage msg = extractMessageFromEvent(event);
@@ -1113,7 +1116,7 @@ public class Handler {
         log.info("Exiting GET_QUERY_RESULT");
     }
 
-    /** Handles query to ledger to execute query state
+    /** 处理账本中的请求结果
      */
     public void handleGetQueryResult(SmartContractShim.SmartContractMessage msg) {
         new Thread(() -> {
@@ -1207,7 +1210,7 @@ public class Handler {
         }).start();
     }
 
-    /** afterGetHistoryForKey handles a GET_HISTORY_FOR_KEY request from the chaincode.
+    /** afterGetHistoryForKey 处理来自链码的 GET_HISTORY_FOR_KEY 请求
      */
     public void afterGetHistoryForKey(Event event, String state) {
         SmartContractShim.SmartContractMessage msg = extractMessageFromEvent(event);
@@ -1217,7 +1220,7 @@ public class Handler {
         log.info("Exiting GET_HISTORY_FOR_KEY");
     }
 
-    /** Handles query to ledger history db
+    /** 处理查询账本历史的请求
      */
     public void handleGetHistoryForKey(SmartContractShim.SmartContractMessage msg) {
         new Thread(() -> {
@@ -1365,7 +1368,7 @@ public class Handler {
         return null;
     }
 
-    /** Handles request to ledger to put state
+    /** 处理账本进入繁忙状态的请求
      */
     public void enterBusyState(Event event, String state) {
         new Thread(() -> {
@@ -1618,7 +1621,7 @@ public class Handler {
         return msg;
     }
 
-    /**move to ready
+    /** 移动到Ready
      */
     public Channel<SmartContractShim.SmartContractMessage> ready(Context ctxt, String chainID, String txid, ProposalPackage.SignedProposal signedProp, ProposalPackage.Proposal prop) {
         TransactionContext txctx = createTxContext(ctxt, chainID, txid, signedProp, prop);
@@ -1638,7 +1641,7 @@ public class Handler {
         return  txctx.getResponseNotifier();
     }
 
-    /** handleMessage is the entrance method for Peer's handling of Chaincode messages.
+    /** handleMessage 是Peer处理链码消息的进入办法
      */
     public void handleMessage(SmartContractShim.SmartContractMessage msg) {
         log.info(String.format("[%s]Handling message of type: %s in state %s", shorttxid(msg.getTxid()), msg.getType(), fsm.current()));
@@ -1709,7 +1712,7 @@ public class Handler {
     }
 
     /**
-     * get chaincode message from event
+     * 从事件中调用链码消息
      */
     private SmartContractShim.SmartContractMessage extractMessageFromEvent(Event event) {
         try {
@@ -1722,7 +1725,7 @@ public class Handler {
     }
 
     /**
-     * create new event msg
+     * 创建新的事件 msg
      */
     private static SmartContractShim.SmartContractMessage newEventMessage(final SmartContractShim.SmartContractMessage.Type type
             , final  String GroupId, final String txId, final ByteString payload){
@@ -1743,7 +1746,7 @@ public class Handler {
     }
 
     /**
-     * throwable to string
+     * 抛出字符串
      */
     private static String printStackTrace(Throwable throwable) {
         if (throwable == null) return null;
@@ -1753,7 +1756,7 @@ public class Handler {
     }
 
     /**
-     * set QueryResponse's results
+     * 设置QueryResponse的结果
      */
     private static SmartContractShim.QueryResponse.Builder setQueryResponseReuslt(SmartContractShim.QueryResponse.Builder builder, SmartContractShim.QueryResultBytes[] batch){
         for (int i = 0; i < builder.getResultsCount(); i++) {

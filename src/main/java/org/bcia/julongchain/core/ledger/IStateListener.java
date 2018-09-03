@@ -28,5 +28,6 @@ import java.util.List;
  * @company Dingxuan
  */
 public interface IStateListener {
+
    void handleStateUpdates(String ledgerID, List<KvRwset.KVWrite> stateUpdates) throws JulongChainException;
 }

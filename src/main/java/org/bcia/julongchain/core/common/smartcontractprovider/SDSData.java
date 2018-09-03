@@ -19,20 +19,15 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 /**
- * CDSData is data stored in the LSSC on instantiation of a SC
- * for CDSPackage.  This needs to be serialized for ChaincodeData
- * hence the protobuf format
+ * 智能合约数据
  *
  * @author sunzongyu
  * @date 2018/05/08
  * @company Dingxuan
  */
 public class SDSData implements Serializable {
-    //CodeHash hash of CodePackage from ChaincodeDeploymentSpec
-    private byte[] codeHash = "protobuf:\"bytes,1,opt,name=codehash,proto3\"".getBytes();
-
-    //MetaDataHash hash of Name and Version from ChaincodeDeploymentSpec
-    private byte[] metaDataHash = "protobuf:\"bytes,2,opt,name=metadatahash,proto3\"".getBytes();
+    private byte[] codeHash = new byte[0];
+    private byte[] metaDataHash = new byte[0];
 
     public void reset(){
         //nothing to do

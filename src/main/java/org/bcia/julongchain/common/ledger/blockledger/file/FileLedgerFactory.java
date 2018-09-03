@@ -71,11 +71,8 @@ public class FileLedgerFactory implements IFactory {
 
     @Override
     public List<String> groupIDs() throws LedgerException {
-        List<String> groupIDS = new ArrayList<String>();
-        for (String s : blkStorageProvider.list()) {
-            groupIDS.add(s);
-        }
-        return groupIDS;
+		List<String> groupIDs = blkStorageProvider.list();
+		return groupIDs == null ? new ArrayList<>() : groupIDs;
     }
 
     @Override

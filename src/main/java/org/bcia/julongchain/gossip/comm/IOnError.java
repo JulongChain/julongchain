@@ -20,7 +20,7 @@ import org.bcia.julongchain.common.exception.JulongChainException;
 /**
  * class description
  *
- * @author
+ * @author wanliangbing
  * @date 18-7-24
  * @company Dingxuan
  */

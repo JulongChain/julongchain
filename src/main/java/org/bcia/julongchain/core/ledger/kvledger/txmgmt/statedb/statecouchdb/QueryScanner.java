@@ -20,7 +20,7 @@ import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 
 /**
- * 类描述
+ * 查询器
  *
  * @author sunzongyu
  * @date 2018/05/22

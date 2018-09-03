@@ -45,7 +45,7 @@ public class OrganizationConfig implements IOrganizationConfig {
         this.mspConfigHandler = mspConfigHandler;
 
         if (orgTree != null && orgTree.getChildsMap() != null && orgTree.getChildsMap().size() > 0) {
-            throw new ValidateException("Not supported sub organization");
+            throw new ValidateException("Not supported child organization");
         }
 
         if (orgTree != null && orgTree.getValuesMap() != null) {

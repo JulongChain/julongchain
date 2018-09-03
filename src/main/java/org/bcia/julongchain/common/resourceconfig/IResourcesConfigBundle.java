@@ -22,7 +22,7 @@ import org.bcia.julongchain.common.policies.IPolicyManager;
 import org.bcia.julongchain.common.resourceconfig.config.IResourcesConfig;
 
 /**
- * 对象
+ * 资源配置集接口
  *
  * @author zhouhui
  * @date 2018/4/25

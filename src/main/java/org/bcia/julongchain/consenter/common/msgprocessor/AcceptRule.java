@@ -18,12 +18,15 @@ package org.bcia.julongchain.consenter.common.msgprocessor;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
+ * 过滤规则接口
+ *
  * @author zhangmingyang
  * @Date: 2018/5/25
  * @company Dingxuan
  */
 public class AcceptRule implements IRule {
     private IRule acceptRule;
+
     @Override
     public void apply(Common.Envelope message) {
         return;

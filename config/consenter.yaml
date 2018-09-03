@@ -24,6 +24,8 @@ general:
     # Listen port: The port on which to bind to listen.
     listenPort: 7050
 
+
+    version: v0.8
     # TLS: TLS settings for the GRPC server.
     tls:
         enabled: false
@@ -125,6 +127,8 @@ fileLedger:
     # The prefix to use when generating a ledger directory in temporary space.
     # Otherwise, this value is ignored.
     prefix: julongchain-consenterledger
+    # The sysgroup's name.
+    groupName: systemGroup
 
 ################################################################################
 #

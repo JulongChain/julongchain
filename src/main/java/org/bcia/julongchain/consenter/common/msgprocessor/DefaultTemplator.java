@@ -37,6 +37,8 @@ import org.bcia.julongchain.protos.common.Configuration;
 import java.util.Map;
 
 /**
+ * 默认模板
+ *
  * @author zhangmingyang
  * @Date: 2018/5/26
  * @company Dingxuan
@@ -54,16 +56,16 @@ public class DefaultTemplator implements IGroupConfigTemplator {
         Common.Payload configUpdatePayload = CommonUtils.unmarshalPayload(envelope.getPayload().toByteArray());
         Configtx.ConfigUpdateEnvelope configUpdateEnv = ConfigTxUtil.unmarshalConfigUpdateEnvelope(configUpdatePayload.getData().toByteArray());
         if (configUpdatePayload.getHeader() == null) {
-            log.error("Failed initial channel config creation because config update header was missing");
+            log.error("Failed initial group config creation because config update header was missing");
             try {
-                throw new ConsenterException("Failed initial channel config creation because config update header was missing");
+                throw new ConsenterException("Failed initial group config creation because config update header was missing");
             } catch (ConsenterException e) {
                 e.printStackTrace();
             }
         }
         Common.GroupHeader groupHeader = CommonUtils.unmarshalGroupHeader(configUpdatePayload.getHeader().getGroupHeader().toByteArray());
         Configtx.ConfigUpdate configUpdate = ConfigTxUtil.unmarshalConfigUpdate(configUpdateEnv.getConfigUpdate().toByteArray());
-        if (!configUpdate.getGroupId().equals(groupHeader.getGroupId()) ) {
+        if (!configUpdate.getGroupId().equals(groupHeader.getGroupId())) {
             log.error(String.format("Failing initial group config creation: mismatched group IDs: '%s' != '%s'", configUpdate.getGroupId(), groupHeader.getGroupId()));
         }
         if (configUpdate.getWriteSet() == null) {
@@ -74,7 +76,7 @@ public class DefaultTemplator implements IGroupConfigTemplator {
         }
         long uv = configUpdate.getWriteSet().getChildsMap().get(GroupConfigConstant.APPLICATION).getVersion();
         if (uv != 1L) {
-            log.error(String.format("Config update for channel creation does not set application group version to 1, was %d", uv));
+            log.error(String.format("Config update for group creation does not set application group version to 1, was %d", uv));
         }
         Configtx.ConfigValue consortiumConfigValue = configUpdate.getWriteSet().getValuesMap().get(GroupConfigConstant.CONSORTIUM);
         if (consortiumConfigValue == null) {
@@ -89,7 +91,7 @@ public class DefaultTemplator implements IGroupConfigTemplator {
         Configtx.ConfigTree.Builder applicationGroupBuilder = Configtx.ConfigTree.newBuilder();
         Map<String, IConsortiumConfig> consortiumsConfig = groupConfigBundle.getGroupConfig().getConsortiumsConfig().getConsortiumConfigMap();
         if (consortiumsConfig == null) {
-            log.error("The ordering system channel does not appear to support creating channels");
+            log.error("The ordering system group does not appear to support creating groups");
         }
         IConsortiumConfig consortiumConf = consortiumsConfig.get(consortium.getName());
         if (consortiumConf == null) {
@@ -108,7 +110,7 @@ public class DefaultTemplator implements IGroupConfigTemplator {
 
                 throw new ConsenterException("Proposed configuration has no application group members, but consortium contains members");
             } catch (ConsenterException e) {
-               log.error(e.getMessage());
+                log.error(e.getMessage());
             }
         }
         if (systemGroupTree.getChildsMap().get(GroupConfigConstant.CONSORTIUMS).getChildsMap().get(consortium.getName()).getChildsCount() > 0) {
@@ -118,7 +120,7 @@ public class DefaultTemplator implements IGroupConfigTemplator {
                 applicationGroupBuilder.putChilds(key, consortiumGroup);
             }
         }
-        Configtx.ConfigTree.Builder  groupTreeBuilder = Configtx.ConfigTree.newBuilder();
+        Configtx.ConfigTree.Builder groupTreeBuilder = Configtx.ConfigTree.newBuilder();
         Map<String, Configtx.ConfigValue> configValue = systemGroupTree.getValuesMap();
         for (String key : configValue.keySet()) {
             groupTreeBuilder.putValues(key, configValue.get(key));
@@ -171,7 +173,7 @@ public class DefaultTemplator implements IGroupConfigTemplator {
             configPolicyMap.get(key).toBuilder().setVersion(0);
         }
         Map<String, Configtx.ConfigTree> configTreeMap = configTreeBuild.getChildsMap();
-        for (String key: configTreeMap.keySet()) {
+        for (String key : configTreeMap.keySet()) {
             zeroVersions(configTreeBuild);
         }
     }

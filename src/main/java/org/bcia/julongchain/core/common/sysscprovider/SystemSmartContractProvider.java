@@ -58,7 +58,7 @@ public class SystemSmartContractProvider implements ISystemSmartContractProvider
     }
 
     @Override
-    public boolean isSysSCAndNotInvokableSC2SC(String name) {
+    public boolean isSysSCAndNotInvokeSC2SC(String name) {
         return sscManager.isSysSmartContractAndNotInvokableSC2SC(name);
     }
 

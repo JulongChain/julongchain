@@ -19,20 +19,27 @@ import org.bcia.julongchain.common.exception.GossipException;
 
 import java.sql.Timestamp;
 
+/**
+ * 类描述
+ *
+ * @author wanliangbing
+ * @date 2018/08/20
+ * @company Dingxuan
+ */
 public interface IMessageCryptoService {
 
-    public byte[] getPKIidOFCert(byte[] peerIdentity);
+    public byte[] getPKIidOfCert(byte[] nodeIdentity);
 
     public void verifyBlock(byte[] chainID, Long seqNum, byte[] signedBlock) throws GossipException;
 
     public byte[] sign(byte[] msg) throws GossipException;
 
-    public void verify(byte[] peerIdentity, byte[] signature, byte[] message) throws GossipException;
+    public void verify(byte[] nodeIdentity, byte[] signature, byte[] message) throws GossipException;
 
-    public void verifyByChannel(byte[] chainID, byte[] peerIdentity, byte[] signature, byte[] message) throws GossipException;
+    public void verifyByChannel(byte[] chainID, byte[] nodeIdentity, byte[] signature, byte[] message) throws GossipException;
 
-    public void validateIdentity(byte[] peerIdentity) throws GossipException;
+    public void validateIdentity(byte[] nodeIdentity) throws GossipException;
 
-    public Timestamp expiration(byte[] peerIdentity) throws GossipException;
+    public Timestamp expiration(byte[] nodeIdentity) throws GossipException;
 
 }

@@ -19,11 +19,18 @@ import org.bcia.julongchain.gossip.filter.IRoutingFilter;
 
 import java.time.Duration;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public class SendCriteria {
 
     private Duration timeout;
     private Integer minAck;
-    private Integer maxPeers;
+    private Integer maxNodes;
     private IRoutingFilter isEligible;
     private byte[] group;
 
@@ -43,12 +50,12 @@ public class SendCriteria {
         this.minAck = minAck;
     }
 
-    public Integer getMaxPeers() {
-        return maxPeers;
+    public Integer getMaxNodes() {
+        return maxNodes;
     }
 
-    public void setMaxPeers(Integer maxPeers) {
-        this.maxPeers = maxPeers;
+    public void setMaxNodes(Integer maxNodes) {
+        this.maxNodes = maxNodes;
     }
 
     public IRoutingFilter getIsEligible() {

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,8 +36,9 @@ import static org.bcia.julongchain.protos.common.Common.*;
  */
 public class BlockSerialization {
     private static JulongChainLog log = JulongChainLogFactory.getLog(BlockSerialization.class);
+	private static final int LENGTH_VARIATION_MARK = 7;
 
-    private BlockHeader blockHeader;
+	private BlockHeader blockHeader;
     public List<TxIndexInfo> txOffsets = new ArrayList<>();
     private BlockMetadata metadata;
 
@@ -98,8 +99,13 @@ public class BlockSerialization {
         //序列化后首部为1位标识位 + headerLen
         //序列化后尾部为1位表示位 + dataLen
         //headerLen、dataLen为每7位2进制位长度+1
-							//区块头部长度			//区块头部标志位长度							//区块尾部标志位长度
-        long headerLen = 	headerSerializedLen + 	1 + computeLength(headerSerializedLen) + 	1 + computeLength(dataSerializedLen);
+        long headerLen =
+		//		区块头部长度
+				headerSerializedLen +
+		//		区块头部标志位长度
+				1 + computeLength(headerSerializedLen) +
+		//		区块尾部标志位长度
+				1 + computeLength(dataSerializedLen);
         //头部结束后为Data起始位置
 		//当前位置为blockData的开始位置
         long offset = headerLen + blockPosition;
@@ -145,9 +151,8 @@ public class BlockSerialization {
      *      ...
      */
     private static int computeLength(long i){
-    	final int lengthVariationMark = 7;
         int result = 0;
-        while ((i >>= lengthVariationMark) > 0){
+        while ((i >>= LENGTH_VARIATION_MARK) > 0){
             result++;
         }
         return ++result;

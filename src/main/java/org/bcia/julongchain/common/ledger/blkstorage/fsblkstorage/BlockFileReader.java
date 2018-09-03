@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -64,7 +64,7 @@ public class BlockFileReader {
     }
 
     public void close(){
-    	//do nothing
+    	//nothing to do
 	}
 
     public File getFile() {

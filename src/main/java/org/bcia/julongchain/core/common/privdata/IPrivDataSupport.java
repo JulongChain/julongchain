@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,37 +21,34 @@ import org.bcia.julongchain.msp.IIdentityDeserializer;
 import org.bcia.julongchain.protos.common.Collection;
 
 /**
- * IPrivDataSupport is an interface used to inject dependencies
+ * 抽象的私有数据辅助
  * @author sunianle, sunzongyu
  * @date 3/15/18
  * @company Dingxuan
  */
 public interface IPrivDataSupport {
     /**
-     * getQueryExecutorForLedger returns a query executor for the specified group
-	 *
-	 * @throws PrivDataException: Caused by newQueryExecutor
+	 * 获取查询器
      */
     IQueryExecutor getQueryExecutorForLedger(String groupID) throws PrivDataException;
 
     /**
-     *
-     * GetCollectionKVSKey returns the name of the collection
-     * given the collection criteria
-     * @param cc
-     * @return
+     * 获取给出集合的key
      */
     String getCollectionKVSKey(Collection.CollectionCriteria cc);
 
     /**
-     * GetIdentityDeserializer returns an IdentityDeserializer
-     * instance for the specified chain
-     * @param groupID
-     * @return
+	 * 获取并行实体
      */
     IIdentityDeserializer getIdentityDeserializer(String groupID);
 
-    String buildCollectionKVSKey(String smartContractname);
+	/**
+	 * 构建集合的key
+	 */
+	String buildCollectionKVSKey(String smartContractname);
 
+	/**
+	 * 判断给出key是否为集合key
+	 */
     boolean isCollectionConfigKey(String key);
 }

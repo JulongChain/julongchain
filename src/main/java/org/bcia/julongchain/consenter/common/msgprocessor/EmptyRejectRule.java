@@ -21,6 +21,8 @@ import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
+ * 空拒绝规则
+ *
  * @author zhangmingyang
  * @Date: 2018/5/25
  * @company Dingxuan
@@ -38,9 +40,9 @@ public class EmptyRejectRule implements IRule {
 
     @Override
     public void apply(Common.Envelope message) {
-        if(message.getPayload()==null){
+        if (message.getPayload() == null) {
             try {
-                throw  new ValidateException("Message was empty");
+                throw new ValidateException("Message was empty");
             } catch (ValidateException e) {
                 log.error(e.getMessage());
                 e.printStackTrace();

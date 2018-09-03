@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,15 +21,8 @@ import org.bcia.julongchain.core.ledger.ITxSimulator;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
- * Processor allows to generate simulation results during commit time for custom transactions.
- * A custom processor may represent the information in a propriety fashion and can use this process to translate
- * the information into the form of `TxSimulationResults`. Because, the original information is signed in a
- * custom representation, an implementation of a `Processor` should be cautious that the custom representation
- * is used for simulation in an deterministic fashion and should take care of compatibility cross fabric versions.
- * 'initializingLedger' true indicates that either the transaction being processed is from the genesis block or the ledger is
- * synching the state (which could happen during peer startup if the statedb is found to be lagging behind the blockchain).
- * In the former case, the transactions processed are expected to be valid and in the latter case, only valid transactions
- * are reprocessed and hence any validation can be skipped.
+ * 交易处理器借口
+ * 对交易的处理以模拟结果集(TxSimulatorResults)的形式展现
  *
  * @author sunzongyu
  * @date 2018/04/09

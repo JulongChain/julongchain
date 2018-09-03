@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +28,7 @@ import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.TransactionPackage;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -117,7 +118,7 @@ public class BlockIndex implements Index {
             }
         }
 
-        //index4 查询历史数据
+        //index4 查询历史数据 - getTXLocByBlockNumTranNum()
         if(Boolean.TRUE.equals(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM))){
             for(int i = 0; i < txOffsets.size(); i++){
                 TxIndexInfo txOffset = txOffsets.get(i);
@@ -128,18 +129,18 @@ public class BlockIndex implements Index {
             }
         }
 
-        //index5 通过txid获取区块 getBlockByTxId()
+        //index5 通过txid获取区块 - getBlockByTxId()
         if(Boolean.TRUE.equals(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_TX_ID))){
             for(TxIndexInfo txOffset : txOffsets){
                 batch.put(constructBlockTxIDKey(txOffset.getTxID()), flpBytes);
             }
         }
 
-        //index6 根据txid获取交易有效标志
+        //index6 根据txid获取交易有效标志 - getTxValidationCodeByTxID()gggggg
         if(Boolean.TRUE.equals(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_TX_VALIDATION_CODE))){
             for (int i = 0; i < txOffsets.size(); i++) {
                 TxIndexInfo txOffset = txOffsets.get(i);
-                batch.put(constructTxValidationCodeIDKey(txOffset.getTxID()), String.valueOf(txsfltr.flag(i).getNumber()).getBytes());
+                batch.put(constructTxValidationCodeIDKey(txOffset.getTxID()), String.valueOf(txsfltr.flag(i).getNumber()).getBytes(StandardCharsets.UTF_8));
             }
         }
 
@@ -265,36 +266,36 @@ public class BlockIndex implements Index {
     private byte[] constructBlockNumKey(long blockNum) {
         byte[] blkNumBytes = Util.longToBytes(blockNum, BlockFileManager.PEEK_BYTES_LEN);
         byte[] result = new byte[0];
-        result = ArrayUtils.addAll(result, BLOCK_NUM_IDX_KEY_PREFIX.getBytes());
+        result = ArrayUtils.addAll(result, BLOCK_NUM_IDX_KEY_PREFIX.getBytes(StandardCharsets.UTF_8));
         result = ArrayUtils.addAll(result, blkNumBytes);
         return result;
     }
 
     private byte[] constructBlockHashKey(byte[] blockHash) {
         byte[] result = new byte[0];
-        result = ArrayUtils.addAll(result, BLOCK_HASH_IDX_KEY_PREFIX.getBytes());
+        result = ArrayUtils.addAll(result, BLOCK_HASH_IDX_KEY_PREFIX.getBytes(StandardCharsets.UTF_8));
         result = ArrayUtils.addAll(result, blockHash);
         return result;
     }
 
     private byte[] constructTxIDKey(String txID) {
         byte[] result = new byte[0];
-        result = ArrayUtils.addAll(result, TX_ID_IDX_KEY_PREFIX.getBytes());
-        result = ArrayUtils.addAll(result, txID.getBytes());
+        result = ArrayUtils.addAll(result, TX_ID_IDX_KEY_PREFIX.getBytes(StandardCharsets.UTF_8));
+        result = ArrayUtils.addAll(result, txID.getBytes(StandardCharsets.UTF_8));
         return result;
     }
 
     private byte[] constructBlockTxIDKey(String txID) {
         byte[] result = new byte[0];
-        result = ArrayUtils.addAll(result, BLOCK_TX_ID_IDX_KEY_PREFIX.getBytes());
-        result = ArrayUtils.addAll(result, txID.getBytes());
+        result = ArrayUtils.addAll(result, BLOCK_TX_ID_IDX_KEY_PREFIX.getBytes(StandardCharsets.UTF_8));
+        result = ArrayUtils.addAll(result, txID.getBytes(StandardCharsets.UTF_8));
         return result;
     }
 
     private byte[] constructTxValidationCodeIDKey(String txID) {
         byte[] result = new byte[0];
-        result = ArrayUtils.addAll(result, TX_VALIDATION_RESULT_IDX_KEY_PREFIX.getBytes());
-        result = ArrayUtils.addAll(result, txID.getBytes());
+        result = ArrayUtils.addAll(result, TX_VALIDATION_RESULT_IDX_KEY_PREFIX.getBytes(StandardCharsets.UTF_8));
+        result = ArrayUtils.addAll(result, txID.getBytes(StandardCharsets.UTF_8));
         return result;
     }
 
@@ -302,7 +303,7 @@ public class BlockIndex implements Index {
         byte[] blkNumBytes = Util.longToBytes(blockNum, BlockFileManager.PEEK_BYTES_LEN);
         byte[] txNumBytes = Util.longToBytes(txNum, BlockFileManager.PEEK_BYTES_LEN);
         byte[] result = new byte[0];
-        result = ArrayUtils.addAll(result, BLOCK_NUM_TRAN_NUM_IDX_KEY_PREFIX.getBytes());
+        result = ArrayUtils.addAll(result, BLOCK_NUM_TRAN_NUM_IDX_KEY_PREFIX.getBytes(StandardCharsets.UTF_8));
         result = ArrayUtils.addAll(result, blkNumBytes);
         result = ArrayUtils.addAll(result, txNumBytes);
         return result;
@@ -310,7 +311,7 @@ public class BlockIndex implements Index {
 
     private byte[] constructIndexCheckpointKey(){
         byte[] result = new byte[0];
-        result = ArrayUtils.addAll(result, INDEX_CHECK_POINT_KEY_STR.getBytes());
+        result = ArrayUtils.addAll(result, INDEX_CHECK_POINT_KEY_STR.getBytes(StandardCharsets.UTF_8));
         return result;
     }
 

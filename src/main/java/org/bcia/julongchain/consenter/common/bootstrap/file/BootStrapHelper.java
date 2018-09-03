@@ -22,6 +22,8 @@ import org.bcia.julongchain.protos.common.Common;
 import java.io.IOException;
 
 /**
+ * 启动工具类
+ *
  * @author zhangmingyang
  * @Date: 2018/5/9
  * @company Dingxuan
@@ -37,8 +39,8 @@ public class BootStrapHelper implements IHelper {
     public Common.Block getGenesisBlock() {
         Common.Block gensisBlock = null;
         try {
-           byte[] bootstrapFile=FileUtils.readFileBytes(genesisBlockFile);
-            gensisBlock=Common.Block.parseFrom(bootstrapFile);
+            byte[] bootstrapFile = FileUtils.readFileBytes(genesisBlockFile);
+            gensisBlock = Common.Block.parseFrom(bootstrapFile);
         } catch (IOException e) {
             e.printStackTrace();
         }

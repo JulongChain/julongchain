@@ -18,7 +18,7 @@ package org.bcia.julongchain.consenter.consensus.kafka;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
 import kafka.producer.ProducerConfig;
-import org.bcia.julongchain.consenter.util.Constant;
+import org.bcia.julongchain.consenter.util.ConsenterConstants;
 import org.bcia.julongchain.consenter.util.YamlLoader;
 
 import java.util.HashMap;
@@ -40,7 +40,7 @@ public class KafkaProduce {
 
 
 
-    Map map=(HashMap) YamlLoader.readYamlFile(Constant.ORDERER_CONFIG).get(Constant.KAFKA);
+    Map map=(HashMap) YamlLoader.readYamlFile(ConsenterConstants.ORDERER_CONFIG).get(ConsenterConstants.KAFKA);
 
 
 
@@ -48,14 +48,14 @@ public class KafkaProduce {
         StringBuffer sbBrokerHost=new StringBuffer();
         StringBuffer sbZookeeperHost=new StringBuffer();
 
-        Map serversMap= (HashMap)map.get(Constant.SERVER);
+        Map serversMap= (HashMap)map.get(ConsenterConstants.SERVER);
         for(int i=1;i<=serversMap.size();i++){
             String index="brokerHost"+i;
             StringBuffer host=new StringBuffer((String)serversMap.get(index));
             sbBrokerHost=sbBrokerHost.append(host);
         }
 
-        Map zookeeperMap= (HashMap)map.get(Constant.ZOOKEEPER);
+        Map zookeeperMap= (HashMap)map.get(ConsenterConstants.ZOOKEEPER);
         for(int i=1;i<=zookeeperMap.size();i++){
             String index="ZKHost"+i;
             StringBuffer host=new StringBuffer((String)zookeeperMap.get(index));

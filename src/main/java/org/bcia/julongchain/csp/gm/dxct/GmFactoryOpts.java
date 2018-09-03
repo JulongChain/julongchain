@@ -1,7 +1,7 @@
 package org.bcia.julongchain.csp.gm.dxct;
 
 /**
- * Copyright BCIA. All Rights Reserved.
+ * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,13 @@ package org.bcia.julongchain.csp.gm.dxct;
  */
 
 import org.bcia.julongchain.csp.factory.IFactoryOpts;
+import org.bcia.julongchain.csp.gm.dxct.util.GmCspConstant;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * @author zhanglin
- * @purpose Define the interface, DecrypterOpts
+ * @author zhanglin,zhangmingyang
  * @date 2018-01-25
  * @company Dingxuan
  */
@@ -55,11 +55,11 @@ public class GmFactoryOpts implements IGmFactoryOpts {
 
     @Override
     public void parseFrom(Map<String, String> optMap) {
-        this.symmetricKeyType = optMap.get("symmetricKey");
-        this.asymmetricKeyType = optMap.get("asymmetric");
-        this.hashType = optMap.get("hash");
-        this.signType = optMap.get("sign");
-        this.keyStorePath=optMap.get("KeyStore");
+        this.symmetricKeyType = optMap.get(GmCspConstant.SYSMETRICKEY_TYPE);
+        this.asymmetricKeyType = optMap.get(GmCspConstant.ASYMMETRICKEY_TYPE);
+        this.hashType = optMap.get(GmCspConstant.HASH_TYPE);
+        this.signType = optMap.get(GmCspConstant.SIGN_TYPE);
+        this.keyStorePath=optMap.get(GmCspConstant.KEYSTROE_PATH);
     }
 
     @Override

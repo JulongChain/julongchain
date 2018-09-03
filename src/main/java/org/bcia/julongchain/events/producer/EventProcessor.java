@@ -30,7 +30,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * 类描述
+ * 事件处理器
  *
  * @author zhouhui
  * @date 2018/05/17
@@ -137,7 +137,7 @@ public class EventProcessor implements IEventProcessor {
     }
 
     public boolean send(EventsPackage.Event event) throws ValidateException {
-        ValidateUtils.isNotNull(event, "event can not be null");
+        ValidateUtils.isNotNull(event, "Event can not be null");
         return producer.produce(event);
     }
 

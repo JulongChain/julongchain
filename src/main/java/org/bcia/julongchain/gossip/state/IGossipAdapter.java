@@ -16,18 +16,25 @@
 package org.bcia.julongchain.gossip.state;
 
 import org.bcia.julongchain.gossip.NetworkMember;
-import org.bcia.julongchain.gossip.comm.RemotePeer;
+import org.bcia.julongchain.gossip.comm.RemoteNode;
 import org.bcia.julongchain.gossip.common.IMessageAcceptor;
 import org.bcia.julongchain.protos.gossip.Message;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public interface IGossipAdapter {
 
-    public void send(Message.GossipMessage msg, RemotePeer... peers);
+    public void send(Message.GossipMessage msg, RemoteNode... nodes);
 
     public Object[] accept(IMessageAcceptor acceptor, Boolean passThrough);
 
     public void updateChannelMetadata(byte[] metadata, byte[] chainID);
 
-    public NetworkMember[] peersOfChannel(byte[] chainID);
+    public NetworkMember[] nodesOfChannel(byte[] chainID);
 
 }

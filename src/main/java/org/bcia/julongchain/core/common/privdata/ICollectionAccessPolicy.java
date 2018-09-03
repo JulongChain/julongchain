@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,7 +20,7 @@ import org.bcia.julongchain.common.util.proto.SignedData;
 import java.util.List;
 
 /**
- * ICollectionAccessPolicy encapsulates functions for the access policy of a collection
+ * 集合访问策略
  *
  * @author sunianle, sunzongyu
  * @date 4/27/18
@@ -28,26 +28,22 @@ import java.util.List;
  */
 public interface ICollectionAccessPolicy {
     /**
-     * AccessFilter returns a member filter function for a collection
+	 * 判断是否通过
      */
     boolean getAccessFilter(SignedData sd);
 
     /**
-     * The minimum number of nodes private data will be sent to upon
-     * endorsement. The endorsement would fail if dissemination to at least
-     * this number of nodes is not achieved.
+	 * 获取请求的Node数量
      */
     int getRequiredNodeCount();
 
     /**
-     * The maximum number of nodes that private data will be sent to
-     * upon endorsement. This number has to be bigger than RequiredNodeCount().
+	 * 获取最大Node数量
      */
     int getMaximumNodeCount();
 
     /**
-     * MemberOrgs returns the collection's members as MSP IDs. This serves as
-     * a human-readable way of quickly identifying who is part of a collection.
+	 * 获取所有成员
      */
     List<String> memberOrgs();
 }

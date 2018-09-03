@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.csp.pkcs11.sw;
 
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.intfs.IHash;
 import org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant;
@@ -38,7 +39,7 @@ public class HashImpl {
 
 
 
-    public static byte[] getAlgDigest(String alg, byte[] msg)  throws JulongChainException {
+    public static byte[] getAlgDigest(String alg, byte[] msg)  throws CspException {
         try {
             MessageDigest hashalg = MessageDigest.getInstance(alg);
             hashalg.update(msg);
@@ -47,7 +48,7 @@ public class HashImpl {
         }catch(NoSuchAlgorithmException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
 
     }
@@ -70,7 +71,7 @@ public class HashImpl {
         return null;
     }
 
-    public static IHash getHash(String alg) throws JulongChainException {
+    public static IHash getHash(String alg) throws CspException {
 
         switch(alg) {
             case PKCS11CSPConstant.SHA256:
@@ -98,12 +99,14 @@ public class HashImpl {
 
         IHash hash = new IHash() {
 
+            @Override
             public int write(byte[] p) {
                 message = new byte[p.length];
                 System.arraycopy(p, 0, message, 0, p.length);
                 return p.length;
             }
 
+            @Override
             public byte[] sum(byte[] b){
                 byte[] data = new byte[message.length + b.length];
                 System.arraycopy(message, 0, data, 0, message.length);
@@ -127,14 +130,17 @@ public class HashImpl {
                 }
             }
 
+            @Override
             public void reset() {
 
             }
 
+            @Override
             public int size() {
                 return digestLength;
             }
 
+            @Override
             public int blockSize() {
                 return BUFFERSIZE;
             }

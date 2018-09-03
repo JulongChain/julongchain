@@ -22,7 +22,7 @@ import org.bcia.julongchain.node.cmd.INodeCmd;
 import org.bcia.julongchain.node.entity.NodeGroup;
 
 /**
- * 节点通道命令
+ * 节点群组命令
  *
  * @author zhouhui
  * @date 2018/2/23

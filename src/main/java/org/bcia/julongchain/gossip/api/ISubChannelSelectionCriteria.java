@@ -16,11 +16,11 @@
 package org.bcia.julongchain.gossip.api;
 
 /**
- * SubChannelSelectionCriteria describes a way of selecting peers from a sub-channel
- * given their signatures
+ * SubChannelSelectionCriteria 描述了一种用签名从sub-channel选择节点的方法
  */
+
 public interface ISubChannelSelectionCriteria {
 
-    public Boolean execute(PeerSignature signature);
+    public Boolean execute(NodeSignature signature);
 
 }

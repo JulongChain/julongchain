@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.csp.gmt0016.ftsafe.ec;
 
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.exception.JCSKFException;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.SarException;
@@ -55,7 +56,7 @@ public class ECImpl {
      * @return  IKey's instance
      * @throws JulongChainException
      */
-    public IKey generateECKey(String sContainerName, IGMT0016FactoryOpts opts) throws JulongChainException {
+    public IKey generateECKey(String sContainerName, IGMT0016FactoryOpts opts) throws CspException {
 
         try {
             opts.getSKFFactory().SKF_VerifyPIN(opts.getAppHandle(), USER_TYPE, opts.getUserPin());
@@ -118,17 +119,17 @@ public class ECImpl {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, ECImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(JCSKFException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:JCSKFException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, ECImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, ECImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
 
     }
@@ -145,7 +146,7 @@ public class ECImpl {
      * @throws JulongChainException
      */
     public IKey importECKey(long algid, byte[] derPublicKey, byte[] privateKey,
-                            String sContainerName, IGMT0016FactoryOpts opts) throws JulongChainException {
+                            String sContainerName, IGMT0016FactoryOpts opts) throws CspException {
 
         try {
 
@@ -227,17 +228,17 @@ public class ECImpl {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, ECImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(JCSKFException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:JCSKFException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, ECImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, ECImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
     }
 
@@ -250,7 +251,7 @@ public class ECImpl {
      * @return IKey's instance
      * @throws JulongChainException
      */
-    public IKey getECKey(String sContainerName, boolean bSignFlag, IGMT0016FactoryOpts opts) throws JulongChainException {
+    public IKey getECKey(String sContainerName, boolean bSignFlag, IGMT0016FactoryOpts opts) throws CspException {
 
         try {
             List<String> appNamesList = opts.getSKFFactory().SKF_EnumContainer(opts.getAppHandle());
@@ -306,17 +307,17 @@ public class ECImpl {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, ECImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(JCSKFException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:JCSKFException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, ECImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, ECImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
     }
 
@@ -332,7 +333,7 @@ public class ECImpl {
      * @throws JulongChainException
      */
     public byte[] getHash(byte[] msg, long lAlgID, String sContainerName, boolean bSignFlag, String sPucID, IGMT0016FactoryOpts opts)
-            throws JulongChainException {
+            throws CspException {
 
         try {
             List<String> appNamesList = opts.getSKFFactory().SKF_EnumContainer(opts.getAppHandle());
@@ -371,17 +372,17 @@ public class ECImpl {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, ECImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(JCSKFException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:JCSKFException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, ECImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, ECImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
     }
 
@@ -395,7 +396,7 @@ public class ECImpl {
      * @throws JulongChainException
      */
 
-    public byte[] getECSign(byte[] digest, String sContainerName, IGMT0016FactoryOpts opts) throws JulongChainException {
+    public byte[] getECSign(byte[] digest, String sContainerName, IGMT0016FactoryOpts opts) throws CspException {
         try {
             List<String> appNamesList = opts.getSKFFactory().SKF_EnumContainer(opts.getAppHandle());
             boolean bFind = false;
@@ -430,17 +431,17 @@ public class ECImpl {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, ECImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(JCSKFException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:JCSKFException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, ECImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, ECImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
     }
 
@@ -453,7 +454,7 @@ public class ECImpl {
      * @return success/error
      * @throws JulongChainException
      */
-    public boolean getECverify(byte[] signature, byte[] digest, String sContainerName, IGMT0016FactoryOpts opts) throws JulongChainException {
+    public boolean getECverify(byte[] signature, byte[] digest, String sContainerName, IGMT0016FactoryOpts opts) throws CspException {
         try {
             List<String> appNamesList = opts.getSKFFactory().SKF_EnumContainer(opts.getAppHandle());
             boolean bFind = false;
@@ -489,17 +490,17 @@ public class ECImpl {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, ECImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(JCSKFException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:JCSKFException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, ECImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, ECImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
     }
 

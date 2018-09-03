@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,10 +30,7 @@ import org.bcia.julongchain.protos.node.SmartContractPackage;
 import java.io.*;
 
 /**
- * SmartContractExecuteProvider provides an abstraction layer that is
- * used for different packages to interact with code in the
- * smartcontract package without importing it; more methods
- * should be added below if necessary
+ *　智能合约服务提供者类
  *
  * @author sunianle, sunzongyu
  * @date 3/7/18
@@ -46,8 +43,6 @@ public class SmartContractProvider {
 
     /**
      * 给静态变量smartContractInstallPath设置值为智能合约路径
-     * @param path
-     * @return
      */
     public static String getSmartContractPath(String path){
         File file = new File(path);
@@ -108,12 +103,7 @@ public class SmartContractProvider {
     }
 
     /**
-     * getSmartContractPackage tries each known package implementation one by one
-     * till the right package is found
-     *
-     * @param buf
-     * @return
-     * @throws JulongChainException
+	 * 获取打包的智能合约
      */
     public static ISmartContractPackage getSmartContractPackage(byte[] buf) throws JulongChainException {
         ISmartContractPackage smartContractPackage = new SDSPackage();
@@ -130,12 +120,8 @@ public class SmartContractProvider {
     }
 
     /**
-     * ExtractStatedbArtifactsFromCCPackage extracts the statedb artifacts from the code package tar and create a statedb artifact tar.
-     * The state db artifacts are expected to contain state db specific artifacts such as index specification in the case of couchdb.
-     * This function is called during chaincode instantiate/upgrade (from above), and from install, so that statedb artifacts can be created.
-     *
-     * @param scPack
-     * @return
+	 * 在世界状态数据库中获取智能合约包
+	 * 依赖couchDB
      */
 
     public static byte[] extractStateDBArtifactsFromSCPackage(ISmartContractPackage scPack) throws JulongChainException {
@@ -144,6 +130,9 @@ public class SmartContractProvider {
         return bytes.toByteArray();
     }
 
+	/**
+	 * 在文件系统中获取智能合约
+	 */
     public static ISmartContractPackage getSmartContractFromFS(String name, String version) throws JulongChainException {
         ISmartContractPackage pack = null;
         try {
@@ -160,7 +149,10 @@ public class SmartContractProvider {
         return pack;
     }
 
-    public static Query.SmartContractQueryResponse getInstalledSmartcontracts() throws JulongChainException {
+	/**
+	 * 获取已安装的智能合约
+	 */
+	public static Query.SmartContractQueryResponse getInstalledSmartcontracts() throws JulongChainException {
         File scInstallDir = new File(smartContractInstallPath);
         File[] files = scInstallDir.listFiles();
         Query.SmartContractQueryResponse.Builder builder = Query.SmartContractQueryResponse.newBuilder();
@@ -203,13 +195,7 @@ public class SmartContractProvider {
     }
 
     /**
-     * isSmartContractDeployed returns true if the smartcontract with given name and version is deployed
-     * @param groupID
-     * @param smartContractName
-     * @param smartContractVersion
-     * @param smartContractHash
-     * @return
-     * @throws SmartContractException
+	 * 判断智能合约是否已经部署
      */
     public static boolean isSmartContractDeployed(String groupID,String smartContractName,
                                                   String smartContractVersion,
@@ -218,13 +204,7 @@ public class SmartContractProvider {
     }
 
     /**
-     * ExtractStatedbArtifactsAsTarbytes extracts the statedb artifacts from the code package tar and create a statedb artifact tar.
-     * The state db artifacts are expected to contain state db specific artifacts such as index specification in the case of couchdb.
-     * This function is intented to be used during chaincode instantiate/upgrade so that statedb artifacts can be created.
-     * @param scName
-     * @param scVersion
-     * @return
-     * @throws SmartContractException
+	 * 提取智能合约
      */
     public static byte[] extractStatedbArtifactsForSmartContract(String scName, String scVersion) throws JulongChainException {
         ISmartContractPackage scPackage;
@@ -237,9 +217,7 @@ public class SmartContractProvider {
         return extractStateDBArtifactsFromSCPackage(scPackage);
     }
 	/**
-	 * GetCCContext returns an interface that encapsulates a
-	 * chaincode context; the interface is required to avoid
-	 * referencing the chaincode package from the interface definition
+	 * 获取智能合约上下文
 	 */
     public static SmartContractContext getSCContext(String groupID, String name, String version, String txid, boolean syssc, ProposalPackage.SignedProposal signedProp, ProposalPackage.Proposal proposal) throws SysSmartContractException{
 		if (StringUtils.isEmpty(version)) {

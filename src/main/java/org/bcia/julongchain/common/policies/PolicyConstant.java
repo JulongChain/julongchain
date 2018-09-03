@@ -16,7 +16,7 @@
 package org.bcia.julongchain.common.policies;
 
 /**
- * 类描述
+ * 策略模块常量
  *
  * @author zhouhui
  * @date 2018/3/9

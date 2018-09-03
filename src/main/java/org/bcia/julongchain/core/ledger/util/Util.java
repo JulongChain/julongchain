@@ -17,10 +17,12 @@ package org.bcia.julongchain.core.ledger.util;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.csp.factory.CspManager;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
@@ -47,7 +49,7 @@ public class Util {
      */
     public static Common.Envelope getEnvelopFromBlock(ByteString data){
         //block以envelop开始
-        Common.Envelope env = null;
+        Common.Envelope env;
         try {
             env = Common.Envelope.parseFrom(data);
             return env;
@@ -61,7 +63,7 @@ public class Util {
      * 获取payload
      */
     public static Common.Payload getPayload(Common.Envelope env){
-        Common.Payload payload = null;
+        Common.Payload payload;
         try {
             payload = Common.Payload.parseFrom(env.getPayload());
             return payload;
@@ -75,7 +77,7 @@ public class Util {
      * 获取GroupHeader
      */
     public static Common.GroupHeader getGroupHeader(ByteString data){
-        Common.GroupHeader header = null;
+        Common.GroupHeader header;
         try {
             header = Common.GroupHeader.parseFrom(data);
             return header;
@@ -200,7 +202,7 @@ public class Util {
     }
 
     /**
-     *
+     * 获取排序后的value
      */
     public static <T> List<T> getValuesBySortedKeys (Map<String, T> m){
         List<String> list = getSortedKeys(m);
@@ -210,4 +212,24 @@ public class Util {
         }
         return l;
     }
+
+	/**
+	 * 解码世界状态value
+	 */
+	public static byte[] decodeValueToBytes(byte[] encodeValue){
+		byte[] result = new byte[encodeValue.length - 16];
+		System.arraycopy(encodeValue, 16, result, 0, result.length);
+		return result;
+	}
+
+	/**
+	 * 编码世界状态value
+	 */
+	public static byte[] encodeValue(byte[] value, LedgerHeight version){
+		byte[] encodeValue = version.toBytes();
+		if(value != null){
+			encodeValue = ArrayUtils.addAll(encodeValue, value);
+		}
+		return encodeValue;
+	}
 }

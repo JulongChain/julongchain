@@ -32,7 +32,7 @@ import org.bcia.julongchain.common.util.FileUtils;
 import org.bcia.julongchain.common.util.proto.BlockUtils;
 import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
 import org.bcia.julongchain.common.util.proto.ProposalUtils;
-import org.bcia.julongchain.consenter.common.broadcast.BroadCastClient;
+
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContract;
 import org.bcia.julongchain.core.ssc.cssc.CSSC;
 import org.bcia.julongchain.core.ssc.qssc.QSSC;
@@ -126,7 +126,7 @@ public class NodeGroup {
 
         } else {
             //不是空文件，反而是一个错误的文件，则直接报异常（要么不指定文件，要么就指定正确的文件）
-            log.error("groupFile is not exists: " + groupFile);
+            log.error("GroupFile is not exists: " + groupFile);
             throw new NodeException("Group File is not exists");
         }
 
@@ -187,7 +187,7 @@ public class NodeGroup {
     }
 
     private void getGenesisBlockThenWrite(String ip, int port, String groupId) {
-        log.info("getGenesisBlock begin");
+        log.info("GetGenesisBlock begin");
         IDeliverClient deliverClient = new DeliverClient(ip, port);
         deliverClient.getSpecifiedBlock(groupId, 0L, new StreamObserver<Ab.DeliverResponse>() {
             @Override
@@ -323,10 +323,10 @@ public class NodeGroup {
      * 更新群组配置 V0.25
      */
     public void updateGroup(String ip, int port, String groupId) {
-        BroadCastClient broadCastClient = new BroadCastClient();
+        BroadcastClient broadcastClient = new BroadcastClient(ip,port);
         try {
             //broadCastClient.send(ip, port, groupId, this);
-            broadCastClient.send(ip, port, Common.Envelope.newBuilder().build(), null);
+            broadcastClient.send(Common.Envelope.newBuilder().build(), null);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }

@@ -259,11 +259,11 @@ public class EventsClient {
      * @throws ValidateException
      */
     public void start() throws ValidateException {
-        ValidateUtils.isNotNull(eventAdapter, "eventAdapter can not be null");
+        ValidateUtils.isNotNull(eventAdapter, "EventAdapter can not be null");
 
         List<EventsPackage.Interest> interestedEvents = eventAdapter.getInterestedEvents();
         if (interestedEvents == null || interestedEvents.size() <= 0) {
-            throw new ValidateException("interestedEvents is empty");
+            throw new ValidateException("InterestedEvents is empty");
         }
 
         RegistrationConfig config = new RegistrationConfig();

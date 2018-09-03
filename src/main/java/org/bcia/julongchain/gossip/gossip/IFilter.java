@@ -15,6 +15,13 @@
  */
 package org.bcia.julongchain.gossip.gossip;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public abstract class IFilter {
 
     private byte[] bytes1 = new byte[]{};

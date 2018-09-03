@@ -45,18 +45,14 @@ public class KVLedgerLSSCStateListener implements IStateListener {
         log.debug("Group [{}]: Handling state updates in LSSC namespace - stateUpdate", ledgerID);
         List<SmartContractDefinition> scDefinitions = new ArrayList<>();
         for(KvRwset.KVWrite kvWrite : stateUpdates){
-            // There are LSSC entries for the chaincode and for the chaincode collections.
-            // We need to ignore changes to chaincode collections, and handle changes to chaincode
-            // We can detect collections based on the presence of a CollectionSeparator, which never exists in chaincode names
             if (privdata.isCollectionConfigKey(kvWrite.getKey())) {
                 continue;
             }
-            // Ignore delete event
             if (kvWrite.getIsDelete()) {
                 continue;
             }
             log.info("Group [{}]: Handling LSSC state update for smartcontract {}", ledgerID, kvWrite.getKey());
-            SmartContractDataPackage.SmartContractData smartContractData = null;
+            SmartContractDataPackage.SmartContractData smartContractData;
             try {
                 smartContractData = SmartContractDataPackage.SmartContractData.parseFrom(kvWrite.getValue());
             } catch (InvalidProtocolBufferException e) {

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,14 +22,15 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.blkstorage.IndexConfig;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.common.ledger.util.IoUtil;
-import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Ledger;
 import org.bcia.julongchain.protos.node.TransactionPackage;
+import org.bouncycastle.util.encoders.Hex;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -42,7 +43,7 @@ import java.util.*;
 public class BlockFileManager {
 
     private static final String BLOCKFILE_PREFIX = "blockfile";
-    private static final byte[] BLK_MGR_INFO_KEY = "blkMgrInfo".getBytes();
+    private static final byte[] BLK_MGR_INFO_KEY = "blkMgrInfo".getBytes(StandardCharsets.UTF_8);
     private static JulongChainLog log = JulongChainLogFactory.getLog(BlockFileManager.class);
     private static final byte BLOCK_BYTES_START = 10;
 
@@ -370,7 +371,7 @@ public class BlockFileManager {
      * 根据区块hash查找区块
      */
 	public Common.Block retrieveBlockByHash(byte[] blockHash) throws LedgerException {
-        log.debug(String.format("retrieveBlockByHash() - blockHash = [%s]", BytesHexStrTranslate.bytesToHexFun1(blockHash)));
+        log.debug(String.format("retrieveBlockByHash() - blockHash = [%s]", Hex.toHexString(blockHash)));
         FileLocPointer loc;
 		loc = index.getBlockLocByHash(blockHash);
         return fetchBlock(loc);
@@ -576,7 +577,7 @@ public class BlockFileManager {
     }
 
     private byte[] compositeBlockManagerInfoKey(String ledgerid){
-        return ArrayUtils.addAll(BLK_MGR_INFO_KEY, ledgerid.getBytes());
+        return ArrayUtils.addAll(BLK_MGR_INFO_KEY, ledgerid.getBytes(StandardCharsets.UTF_8));
     }
 
     public static String getBlockfilePrefix() {

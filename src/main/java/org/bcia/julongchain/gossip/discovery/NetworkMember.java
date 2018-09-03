@@ -17,6 +17,13 @@ package org.bcia.julongchain.gossip.discovery;
 
 import org.bcia.julongchain.protos.gossip.Message;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public class NetworkMember {
 
     private String endpoint;

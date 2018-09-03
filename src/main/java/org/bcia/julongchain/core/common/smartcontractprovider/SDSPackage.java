@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,7 +29,7 @@ import org.bcia.julongchain.protos.node.SmartContractPackage;
 import java.io.*;
 
 /**
- * SDSPackage encapsulates SmartcontractDeploymentSpec.
+ * 智能合约部署包
  *
  * @author sunianle, sunzongyu
  * @date 4/25/18

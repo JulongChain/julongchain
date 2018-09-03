@@ -63,8 +63,7 @@ public class SM2X509CertImpl extends X509CertImpl {
             byte[] signedBytes = signedData.toByteArray();
             this.algId.encode(signedData);
 
-            byte[] digest = CspHelper.getCsp().hash(signedBytes, new SM3HashOpts());
-            this.signature = CspHelper.getCsp().sign(privateKey, digest, new SM2SignerOpts());
+            this.signature = CspHelper.getCsp().sign(privateKey, signedBytes, new SM2SignerOpts());
 
             signedData.putBitString(this.signature);
             signedCert.write((byte)48, signedData);

@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.csp.gmt0016.ftsafe.symmetry;
 
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.SarException;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspLog;
@@ -41,7 +42,7 @@ public class SymmetryImpl {
      * @return  Enciphered data
      * @throws JulongChainException
      */
-    public byte[] SymmetryEncrypt(byte[] plaintext, long lKeyHandle, BlockCipherParam blockCipherParam, IGMT0016FactoryOpts opts) throws JulongChainException {
+    public byte[] SymmetryEncrypt(byte[] plaintext, long lKeyHandle, BlockCipherParam blockCipherParam, IGMT0016FactoryOpts opts) throws CspException {
         try {
 
             opts.getSKFFactory().SKF_EncryptInit(lKeyHandle, blockCipherParam);
@@ -52,12 +53,12 @@ public class SymmetryImpl {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, SymmetryImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, SymmetryImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
 
     }
@@ -71,7 +72,7 @@ public class SymmetryImpl {
      * @return  Plaint text
      * @throws JulongChainException
      */
-    public byte[] SymmetryDecrypt(byte[] ciphertext, long lKeyHandle, BlockCipherParam blockCipherParam, IGMT0016FactoryOpts opts) throws JulongChainException {
+    public byte[] SymmetryDecrypt(byte[] ciphertext, long lKeyHandle, BlockCipherParam blockCipherParam, IGMT0016FactoryOpts opts) throws CspException {
         try {
 
             opts.getSKFFactory().SKF_DecryptInit(lKeyHandle, blockCipherParam);
@@ -82,12 +83,12 @@ public class SymmetryImpl {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:SarException ErrCode: 0x%08x, ErrMessage: %s", ex.getErrorCode(), ex.getMessage());
             csplog.setLogMsg(err, 2, SymmetryImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(Exception ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:Exception ErrMessage: %s", ex.getMessage());
             csplog.setLogMsg(err, 2, SymmetryImpl.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
     }
 }

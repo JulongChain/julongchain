@@ -24,6 +24,7 @@ import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.NetAddress;
 import org.bcia.julongchain.core.ssc.lssc.LSSC;
 import org.bcia.julongchain.node.Node;
+import org.bcia.julongchain.node.util.NodeConstant;
 
 /**
  * 完成节点安装智能合约的解析
@@ -113,7 +114,8 @@ public class ContractInstallCmd extends AbstractNodeContractCmd {
 
         if (StringUtils.isBlank(targetAddress)) {
             log.info("TargetAddress is empty, use 127.0.0.1:7051");
-            nodeSmartContract.install(LSSC.DEFAULT_HOST, LSSC.DEFAULT_PORT, scName, scVersion, scPath);
+            nodeSmartContract.install(NodeConstant.DEFAULT_NODE_HOST, NodeConstant.DEFAULT_NODE_PORT, scName,
+                    scVersion, scPath);
         } else {
             try {
                 NetAddress targetNetAddress = new NetAddress(targetAddress);

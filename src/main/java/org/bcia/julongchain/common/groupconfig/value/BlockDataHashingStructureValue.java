@@ -19,7 +19,7 @@ import org.bcia.julongchain.common.groupconfig.GroupConfigConstant;
 import org.bcia.julongchain.protos.common.Configuration;
 
 /**
- * 对象
+ * 块数据哈希结构配置项
  *
  * @author zhouhui
  * @date 2018/5/10

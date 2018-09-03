@@ -15,6 +15,13 @@
  */
 package org.bcia.julongchain.gossip.common;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public interface IMessageAcceptor {
 
     public Boolean messageAcceptor(Object object);

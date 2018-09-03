@@ -33,6 +33,7 @@ import org.bcia.julongchain.protos.node.TransactionPackage;
 import org.iq80.leveldb.DBIterator;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -78,16 +79,16 @@ public class HistoryScanner implements IResultsIterator {
         }
         Map.Entry<byte[], byte[]> entry = dbItr.next();
         byte[] historyKey = HistoryDBHelper.removeLedgerIDFromHistoryKey(ledgerID, entry.getKey());
+		String historyKeyStr = new String(historyKey, StandardCharsets.UTF_8);
+		if (!historyKeyStr.contains(key)) {
+			return null;
+		}
 
 	    //key:ns~key~blockNo~tranNo
         blockNum = HistoryDBHelper.splitCompositeHistoryKeyForBlockNum(historyKey);
         tranNum = HistoryDBHelper.splitCompositeHistoryKeyForTranNum(historyKey);
         log.debug(String.format("Found history record for namespace: %s, key: %s. BlockNum: %d, TranNum: %d", nameSpace, key, blockNum, tranNum));
-
-        Common.Envelope tranEnvelope = blockStore.retrieveTxByBlockNumTranNum(blockNum, tranNum);
-//        QueryResult queryResult = getKeyModificationFromTran(tranEnvelope, nameSpace, key);
         QueryResult queryResult = getKvVersion(blockNum, tranNum);
-//        log.debug("Found history key value for namespace=[{}], key=[{}] from transaction=[{}]", nameSpace, key, ((KvQueryResult.KeyModification) queryResult.getObj()).getTxId());
 
         return queryResult;
     }

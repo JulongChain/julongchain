@@ -16,78 +16,85 @@
 
 package org.bcia.julongchain.csp.pkcs11.sw;
 
+import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.intfs.IHash;
-import org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant;
+import org.bcia.julongchain.csp.pkcs11.PKCS11CspLog;
+
+import static org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant.*;
 import org.bouncycastle.jcajce.provider.digest.SHA3;
 
+
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * soft impl digest
  *
- * @author xuying
+ * @author Ying Xu
  * @date 2018/05/21
  * @company FEITIAN
  */
 public class DigestImpl {
-
+	
     // length of the digest in bytes
     private static int digestLength;
     private static byte[] message;
     private static final int BUFFERSIZE = 96;
 
+    PKCS11CspLog csplog = new PKCS11CspLog();
 
-
-    public static byte[] getAlgDigest(String alg, byte[] msg) {
+    public byte[] getAlgDigest(String alg, byte[] msg) {
         try {
             MessageDigest hashalg = MessageDigest.getInstance(alg);
             hashalg.update(msg);
             byte[] digest = hashalg.digest();
             return digest;
-        }catch(Exception e) {
+        }catch(NoSuchAlgorithmException e) {
             e.printStackTrace();
+            csplog.setLogMsg("[JC_PKCS_SOFT]:No Support Hash Alg!", csplog.LEVEL_ERROR, DigestImpl.class);   
         }
         return null;
     }
 
-
-    public static byte[] getSHA3AlgDigest(int bit, byte[] msg) {
-        if(bit == 256)
+    public byte[] getSHA3AlgDigest(String alg, byte[] msg){
+        if(alg == SHA3_256)
         {
             SHA3.DigestSHA3 digestSHA3_256 = new SHA3.Digest256();
             digestSHA3_256.update(msg);
             return digestSHA3_256.digest(msg);
         }
 
-        if(bit == 384)
+        if(alg == SHA3_384)
         {
             SHA3.DigestSHA3 digestSHA3_384 = new SHA3.Digest384();
             digestSHA3_384.update(msg);
             return digestSHA3_384.digest(msg);
         }
+       
+        csplog.setLogMsg("[JC_PKCS_SOFT]:No Support Hash Alg!", csplog.LEVEL_INFO, DigestImpl.class);       
         return null;
     }
 
-    public static IHash getHash(String alg) {
+    public IHash getHash(String alg) throws JulongChainException{
 
         switch(alg) {
-            case PKCS11CSPConstant.SHA256:
+            case SHA256:
                 digestLength = 32;
                 break;
-            case PKCS11CSPConstant.SHA384:
+            case SHA384:
                 digestLength = 48;
                 break;
-            case PKCS11CSPConstant.MD2:
-            case PKCS11CSPConstant.MD5:
+            case MD2:
+            case MD5:
                 digestLength = 16;
                 break;
-            case PKCS11CSPConstant.SHA1:
+            case SHA1:
                 digestLength = 20;
                 break;
-            case PKCS11CSPConstant.SHA3_256:
+            case SHA3_256:
                 digestLength = 64;
                 break;
-            case PKCS11CSPConstant.SHA3_384:
+            case SHA3_384:
                 digestLength = 96;
                 break;
             default:
@@ -103,20 +110,20 @@ public class DigestImpl {
             }
 
             public byte[] sum(byte[] b) {
+            	
                 byte[] data = new byte[message.length + b.length];
                 System.arraycopy(message, 0, data, 0, message.length);
                 System.arraycopy(b, 0, data, message.length, b.length);
-                if(alg == PKCS11CSPConstant.SHA3_256)
-                {
-                    return getSHA3AlgDigest(256, data);
-                }
-                else if(alg == PKCS11CSPConstant.SHA3_384)
-                {
-                    return getSHA3AlgDigest(384, data);
+                
+                if(alg == SHA3_256 || alg == SHA3_384)
+                {                	
+                	byte[] hashdata = getSHA3AlgDigest(alg, data);
+                	return hashdata;                	
                 }
                 else {
                     return getAlgDigest(alg, data);
                 }
+            	
             }
 
             public void reset() {

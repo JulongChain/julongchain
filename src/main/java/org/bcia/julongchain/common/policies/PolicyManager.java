@@ -32,7 +32,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * 对象
+ * 策略管理器
  *
  * @author zhouhui
  * @date 2018/4/17
@@ -79,7 +79,7 @@ public class PolicyManager implements IPolicyManager {
             } else {
                 IPolicyProvider provider = providers.get(configPolicy.getPolicy().getType());
                 if (provider == null) {
-                    log.warn("provider is null: " + configPolicy.getPolicy().getType());
+                    log.warn("Provider is null: " + configPolicy.getPolicy().getType());
                 } else {
                     //TODO:
                     IPolicy policy = provider.makePolicy(configPolicy.getPolicy().getValue().toByteArray());

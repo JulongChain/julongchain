@@ -19,7 +19,7 @@ import org.bcia.julongchain.common.groupconfig.GroupConfigConstant;
 import org.bcia.julongchain.protos.common.Policies;
 
 /**
- * 对象
+ * 群组创建策略配置项
  *
  * @author zhouhui
  * @date 2018/5/11

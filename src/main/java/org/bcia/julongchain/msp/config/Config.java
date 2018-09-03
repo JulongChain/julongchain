@@ -18,7 +18,7 @@ package org.bcia.julongchain.msp.config;
 import java.util.Map;
 
 /**
- * 类描述
+ * config.yaml 转为配置对象
  *
  * @author zhangmingyang
  * @date 2018/06/29
@@ -27,12 +27,13 @@ import java.util.Map;
 public class Config {
     public static final String Config_FILE_PATH = "config.yaml";
 
-    public Map<String,String> organizationalUnitIdentifiers;
+    public Map<String, String> organizationalUnitIdentifiers;
     public NodeOus nodeOUs;
-    public static class NodeOus{
-        public  String isEnable;
-        public Map<String,String> clientOUIdentifier;
-        public Map<String,String>  peerOUIdentifier;
+
+    public static class NodeOus {
+        public String isEnable;
+        public Map<String, String> clientOUIdentifier;
+        public Map<String, String> nodeOUIdentifier;
 
         public String getIsEnable() {
             return isEnable;
@@ -50,12 +51,12 @@ public class Config {
             this.clientOUIdentifier = clientOUIdentifier;
         }
 
-        public Map<String, String> getPeerOUIdentifier() {
-            return peerOUIdentifier;
+        public Map<String, String> getNodeOUIdentifier() {
+            return nodeOUIdentifier;
         }
 
-        public void setPeerOUIdentifier(Map<String, String> peerOUIdentifier) {
-            this.peerOUIdentifier = peerOUIdentifier;
+        public void setNodeOUIdentifier(Map<String, String> nodeOUIdentifier) {
+            this.nodeOUIdentifier = nodeOUIdentifier;
         }
     }
 

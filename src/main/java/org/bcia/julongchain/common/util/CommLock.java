@@ -16,7 +16,7 @@
 package org.bcia.julongchain.common.util;
 
 /**
- * 类描述
+ * 公共锁对象
  *
  * @author zhouhui
  * @date 2018/07/13

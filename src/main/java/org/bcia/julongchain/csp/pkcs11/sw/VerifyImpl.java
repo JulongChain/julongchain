@@ -15,8 +15,10 @@
  */
 package org.bcia.julongchain.csp.pkcs11.sw;
 
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.intfs.IKey;
+import org.bcia.julongchain.csp.pkcs11.PKCS11CspLog;
 import org.bcia.julongchain.csp.pkcs11.ecdsa.EcdsaKeyOpts;
 import org.bcia.julongchain.csp.pkcs11.rsa.RsaKeyOpts;
 import sun.security.ec.ECPublicKeyImpl;
@@ -27,15 +29,28 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
 /**
- * Class description
+ * PKCS11 Soft Verify
  *
- * @author
+ * @author Ying Xu
  * @date 5/25/18
  * @company FEITIAN
  */
 public class VerifyImpl {
-    public boolean verifyData(IKey key, byte[] degiest, byte[] signature, String alg) throws JulongChainException {
+	
+	PKCS11CspLog csplog = new PKCS11CspLog();
+	
+	/**
+	 * Verify
+	 * @param key			IKey used to verify
+	 * @param degiest		degiest message
+	 * @param signature		signature data
+	 * @param alg			alg of verify
+	 * @return	true or false
+	 * @throws JulongChainException
+	 */
+    public boolean verifyData(IKey key, byte[] degiest, byte[] signature, String alg) throws CspException {
         try {
+        	
             if(key instanceof RsaKeyOpts.RsaPriKey)
             {
                 X509EncodedKeySpec spec = new X509EncodedKeySpec(key.getPublicKey().toBytes());
@@ -46,6 +61,7 @@ public class VerifyImpl {
                 signature1.update(degiest);
                 boolean result = signature1.verify(signature);
             }
+            
             if(key instanceof RsaKeyOpts.RsaPubKey)
             {
                 X509EncodedKeySpec spec = new X509EncodedKeySpec(key.toBytes());
@@ -56,6 +72,7 @@ public class VerifyImpl {
                 signature1.update(degiest);
                 boolean result = signature1.verify(signature);
             }
+            
             if(key instanceof EcdsaKeyOpts.EcdsaPriKey) {
                 X509EncodedKeySpec spec = new X509EncodedKeySpec(key.getPublicKey().toBytes());
                 KeyFactory keyFactory = KeyFactory.getInstance("EC");
@@ -65,6 +82,7 @@ public class VerifyImpl {
                 signature1.update(degiest);
                 boolean result = signature1.verify(signature);
             }
+            
             if(key instanceof EcdsaKeyOpts.EcdsaPubKey) {
                 X509EncodedKeySpec spec = new X509EncodedKeySpec(key.toBytes());
                 KeyFactory keyFactory = KeyFactory.getInstance("EC");
@@ -74,23 +92,26 @@ public class VerifyImpl {
                 signature1.update(degiest);
                 boolean result = signature1.verify(signature);
             }
-            return false;
+            
+            csplog.setLogMsg("[JC_PKCS_SOFT]:The alg not support!", csplog.LEVEL_INFO, VerifyImpl.class);            
+            throw new CspException("[JC_PKCS_SOFT]:The alg not support!");
+            
         }catch(NoSuchAlgorithmException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:NoSuchAlgorithmException ErrMessage: %s", e.getMessage());
-            throw new JulongChainException(err, e.getCause());
+            throw new CspException(err, e.getCause());
         }catch(InvalidKeyException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:InvalidKeyException ErrMessage: %s", e.getMessage());
-            throw new JulongChainException(err, e.getCause());
+            throw new CspException(err, e.getCause());
         }catch(InvalidKeySpecException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:InvalidKeySpecException ErrMessage: %s", e.getMessage());
-            throw new JulongChainException(err, e.getCause());
+            throw new CspException(err, e.getCause());
         }catch(SignatureException e) {
             e.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:SignatureException ErrMessage: %s", e.getMessage());
-            throw new JulongChainException(err, e.getCause());
+            throw new CspException(err, e.getCause());
         }
     }
 }

@@ -24,7 +24,7 @@ import org.bcia.julongchain.protos.node.TransactionPackage;
 import java.util.List;
 
 /**
- * 类描述
+ * 智能合约背书操作业务对象
  *
  * @author zhouhui
  * @date 2018/05/26
@@ -37,9 +37,9 @@ public class SmartContractEndorsedActionVO implements IProtoVO<TransactionPackag
     @Override
     public void parseFrom(TransactionPackage.SmartContractEndorsedAction smartContractEndorsedAction) throws
             InvalidProtocolBufferException, ValidateException {
-        ValidateUtils.isNotNull(smartContractEndorsedAction, "smartContractEndorsedAction can not be null");
+        ValidateUtils.isNotNull(smartContractEndorsedAction, "SmartContractEndorsedAction can not be null");
         ValidateUtils.isNotNull(smartContractEndorsedAction.getProposalResponsePayload(),
-                "smartContractEndorsedAction.getProposalResponsePayload can not be null");
+                "SmartContractEndorsedAction.getProposalResponsePayload can not be null");
 
         this.proposalResponsePayloadVO = new ProposalResponsePayloadVO();
         ProposalResponsePackage.ProposalResponsePayload proposalResponsePayload = ProposalResponsePackage

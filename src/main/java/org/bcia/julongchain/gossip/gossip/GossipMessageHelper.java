@@ -18,6 +18,13 @@ package org.bcia.julongchain.gossip.gossip;
 import org.bcia.julongchain.common.exception.GossipException;
 import org.bcia.julongchain.protos.gossip.Message;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public class GossipMessageHelper {
 
     public static Boolean isAliveMsg(Message.GossipMessage gossipMessage) {

@@ -39,7 +39,6 @@ import org.bcia.julongchain.protos.common.Configtx;
 public class GroupPolicyManagerGetter implements IGroupPolicyManagerGetter {
     /**
      * 通过groupid获取策略管理的对象
-     *
      * @param groupId
      * @return
      * @throws InvalidProtocolBufferException

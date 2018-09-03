@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -54,7 +54,6 @@ public class BlocksItr implements IResultsIterator {
     public long waitForBlock(long blockNum) throws LedgerException {
         synchronized (BlockFileManager.LOCK){
             while(mgr.getCpInfo().getLastBlockNumber() < blockNum && !shouldClose()){
-				long lastBlockNumber = mgr.getCpInfo().getLastBlockNumber();
 				log.debug(String.format("Going to wait for newer blocks.maxAvailaBlockNumber=[%d], waitForBlockNum=[%d]", mgr.getCpInfo().getLastBlockNumber(), blockNum));
                 try {
                     BlockFileManager.LOCK.wait();
@@ -62,8 +61,7 @@ public class BlocksItr implements IResultsIterator {
                     log.error(e.getMessage(), e);
                     throw new LedgerException(e);
                 }
-				long lastBlockNumber1 = mgr.getCpInfo().getLastBlockNumber();
-                log.debug("Coming out of wait. MaxAvailaBlockNumber=[{}]", mgr.getCpInfo().getLastBlockNumber());
+                log.debug("Coming out of wait. MaxViableBlockNumber=[{}]", mgr.getCpInfo().getLastBlockNumber());
             }
             return mgr.getCpInfo().getLastBlockNumber();
         }

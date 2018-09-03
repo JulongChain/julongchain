@@ -97,7 +97,8 @@ public class CombinedIterator implements IResultsIterator {
                 selectedItm = updatesItm;
                 moveUpdatesItr = true;
                 break;
-                default:
+			default:
+				log.info("That is amazing!!!");
         }
         if(moveDBItr){
             dbItm = dbItr.next();

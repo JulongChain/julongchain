@@ -16,7 +16,7 @@
 package org.bcia.julongchain.common.protos;
 
 /**
- * 类描述
+ * 群组头部扩展业务对象
  *
  * @author zhouhui
  * @date 2018/05/26

@@ -19,7 +19,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.ValidateException;
 
 /**
- * 类描述
+ * Proto消息对象相应的业务对象接口定义
  *
  * @author zhouhui
  * @date 2018/05/26

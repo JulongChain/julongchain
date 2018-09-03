@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,7 +39,7 @@ public interface INodeLedger extends ILedger {
     TransactionPackage.ProcessedTransaction getTransactionByID(String txID) throws LedgerException;
 
     /**
-     * 通过区块hash获取区块
+     * 通过区块hash获取区块(DataHash)
      */
     Common.Block getBlockByHash(byte[] blockHash) throws LedgerException;
 

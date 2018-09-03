@@ -18,6 +18,7 @@ import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bcia.julongchain.csp.gm.sdt.sm3.SM3;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * 类描述
@@ -93,7 +94,7 @@ public class SCID {
 
 		if (StringUtils.isNotEmpty(this.chainID)) {
 			byte[] hash = new SM3().hash(this.chainID.getBytes());
-			String hexStr = BytesHexStrTranslate.bytesToHexFun1(hash);
+			String hexStr = Hex.toHexString(hash);
 			name = name + "-" + hexStr;
 		}
 

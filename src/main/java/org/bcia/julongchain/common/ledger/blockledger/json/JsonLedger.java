@@ -15,7 +15,6 @@ limitations under the License.
  */
 package org.bcia.julongchain.common.ledger.blockledger.json;
 
-import com.google.protobuf.ByteString;
 import com.google.protobuf.util.JsonFormat;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.blockledger.IIterator;
@@ -23,12 +22,15 @@ import org.bcia.julongchain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.julongchain.common.ledger.util.IoUtil;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
-import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.io.*;
 import java.util.AbstractMap;
+import java.util.Arrays;
+
+import static org.bcia.julongchain.core.ledger.util.Util.*;
 
 /**
  * Json账本
@@ -45,7 +47,7 @@ public class JsonLedger extends ReadWriteBase {
 
     private String directory;
     private long height;
-    private ByteString lastHash;
+    private byte[] lastHash;
     private JsonFormat.Printer printer;
 
     /**
@@ -54,6 +56,9 @@ public class JsonLedger extends ReadWriteBase {
     public void initializeBlockHeight(){
         File dir = new File(directory);
         File[] infoes = dir.listFiles();
+		if (infoes == null) {
+			return;
+		}
         long nextNumber = 0;
         //迭代目录中所有文件
         //排除不合法文件并获取最大区块号
@@ -62,9 +67,9 @@ public class JsonLedger extends ReadWriteBase {
                 continue;
             }
             String name = info.getName();
-            long number = 0;
+            long number;
             if(name.startsWith(GROUP_DIRECTORY_FORMAT_STRING)){
-                number = Long.parseLong(name.substring(GROUP_DIRECTORY_FORMAT_STRING.length(), name.length()));
+                number = Long.parseLong(name.substring(GROUP_DIRECTORY_FORMAT_STRING.length()));
             } else {
                 continue;
             }
@@ -88,14 +93,14 @@ public class JsonLedger extends ReadWriteBase {
         if(block == null){
             log.error("Error reading block " + (height - 1));
         } else {
-            lastHash = block.getHeader().getDataHash();
+            lastHash = block.getHeader().getDataHash().toByteArray();
         }
     }
 
 
     public synchronized AbstractMap.SimpleImmutableEntry<Common.Block, Boolean> readBlock(long number){
         String name = blockFileName(number);
-        BufferedReader reader = null;
+        BufferedReader reader;
         //没有对应文件，返回null, false
         try{
             reader = new BufferedReader(new FileReader(name));
@@ -104,10 +109,10 @@ public class JsonLedger extends ReadWriteBase {
         }
 
         try{
-            StringBuffer blockJsonBuffer = new StringBuffer("");
-            String s = "";
+            StringBuilder blockJsonBuffer = new StringBuilder();
+            String s;
             while((s = reader.readLine()) != null){
-                blockJsonBuffer.append(s + "\n");
+                blockJsonBuffer.append(s).append("\n");
             }
             Common.Block.Builder builder = Common.Block.newBuilder();
             JsonFormat.parser().merge(blockJsonBuffer.toString(), builder);
@@ -144,7 +149,7 @@ public class JsonLedger extends ReadWriteBase {
     }
 
     @Override
-    public long height() throws LedgerException {
+    public long height() {
         return height;
     }
 
@@ -153,11 +158,14 @@ public class JsonLedger extends ReadWriteBase {
         if(block.getHeader().getNumber() != height){
             throw new LedgerException("Block number should have been " + height + " but was " + block.getHeader().getNumber());
         }
-        if(lastHash != null && !lastHash.equals(block.getHeader().getPreviousHash())){
-            throw new LedgerException(String.format("Block should's previous hash is [%s]\n but last hash is [%s]", BytesHexStrTranslate.bytesToHexFun1(block.getHeader().getPreviousHash().toByteArray()), BytesHexStrTranslate.bytesToHexFun1(lastHash.toByteArray())));
+		byte[] preHash = block.getHeader().getPreviousHash().toByteArray();
+		if(lastHash != null && !Arrays.equals(lastHash, preHash)){
+            throw new LedgerException(String.format("Block should's previous hash is [%s]\n but last hash is [%s]",
+					Hex.toHexString(preHash),
+					Hex.toHexString(lastHash)));
         }
         writeBlock(block);
-        lastHash = block.getHeader().getDataHash();
+        lastHash = getHashBytes(block.getHeader().toByteArray());
         height++;
         synchronized (LOCK) {
             LOCK.notifyAll();
@@ -167,7 +175,7 @@ public class JsonLedger extends ReadWriteBase {
     private synchronized void writeBlock(Common.Block block) throws LedgerException{
         String name = blockFileName(block.getHeader().getNumber());
         File file = new File(name);
-        BufferedWriter writer = null;
+        BufferedWriter writer;
         try {
             if (!IoUtil.createFileIfMissing(name)) {
                 String errMsg = "Can not create file " + name;
@@ -204,14 +212,6 @@ public class JsonLedger extends ReadWriteBase {
         this.height = height;
     }
 
-    public ByteString getLastHash() {
-        return lastHash;
-    }
-
-    public void setLastHash(ByteString lastHash) {
-        this.lastHash = lastHash;
-    }
-
     public JsonFormat.Printer getPrinter() {
         return printer;
     }
@@ -223,4 +223,12 @@ public class JsonLedger extends ReadWriteBase {
     public static Object getLock() {
         return LOCK;
     }
+
+	public byte[] getLastHash() {
+		return lastHash;
+	}
+
+	public void setLastHash(byte[] lastHash) {
+		this.lastHash = lastHash;
+	}
 }

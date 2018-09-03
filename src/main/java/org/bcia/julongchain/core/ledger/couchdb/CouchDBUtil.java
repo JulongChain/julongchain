@@ -31,11 +31,6 @@ import java.io.InputStream;
  */
 public class CouchDBUtil {
 
-    //
-    public void createDatabaseIfNotExist(CouchDbClient dbInstance, String dbName){
-        CouchDbContext context = dbInstance.context();
-        context.createDB(dbName);
-    }
 
     //CreateSystemDatabasesIfNotExist - creates the system databases if they do not exist
     public static void  CreateSystemDatabasesIfNotExist(CouchDbClient dbInstance){
@@ -58,5 +53,7 @@ public class CouchDBUtil {
             throw new CouchDbException("Error reading response. ", e);
         }
     }
+
+
 
 }

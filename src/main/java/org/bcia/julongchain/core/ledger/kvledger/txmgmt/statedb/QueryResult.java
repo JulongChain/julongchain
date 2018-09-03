@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,6 +32,10 @@ public class QueryResult {
     public Object getObj() {
         return obj;
     }
+
+    public <T> T getObj(Class<T> clazz) {
+    	return (T) obj;
+	}
 
     public void setObj(Object obj) {
         this.obj = obj;

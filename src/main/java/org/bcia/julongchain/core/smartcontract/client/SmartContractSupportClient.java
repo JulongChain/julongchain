@@ -32,6 +32,7 @@ import org.bcia.julongchain.core.ssc.lssc.LSSC;
 import org.bcia.julongchain.core.ssc.qssc.QSSC;
 import org.bcia.julongchain.core.ssc.vssc.VSSC;
 
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,7 +54,7 @@ public class SmartContractSupportClient extends SmartContractBase {
 		map.put(CommConstant.CSSC, CSSC.class.getName());
 		map.put(CommConstant.QSSC, QSSC.class.getName());
 		map.put(CommConstant.VSSC, VSSC.class.getName());
-		// map.put("mycc", SmartContractSupportClient.class.getName());
+//		map.put("mycc", AccountingVoucher.class.getName());
 	}
 
 	@Override
@@ -89,14 +90,23 @@ public class SmartContractSupportClient extends SmartContractBase {
 		}
 	}
 
-	public static Boolean checkSystemSmartContract(String smartContractId) {
-		return map.get(smartContractId) != null;
+	public static void testLaunch(String smartContractId) throws Exception {
+		logger.info(String.format("launch smartContract[%s]", smartContractId));
+		String[] args = new String[] {"", ""};
+		args[0] = "-i" + smartContractId;
+		String smartContractClassName = map.get(smartContractId);
+		Class<?> clz = Class.forName(smartContractClassName);
+		Constructor<?> constructor = clz.getDeclaredConstructor();
+		SmartContractBase smartContract = (SmartContractBase) constructor.newInstance();
+		smartContract.start(args);
+	}
+
+	public static boolean checkSystemSmartContract(String smartContractId) {
+		return new InprocController().isRegistered(smartContractId);
 	}
 
 	public static void main(String[] args) throws Exception {
-		// launch(CommConstant.ESSC);
-//		InprocController.getContainers().put("qssc", new InprocContainer(new AccountingVoucher()));
-//		launch(CommConstant.QSSC);
+//		testLaunch("mycc");
 		while (true) {}
 	}
 }

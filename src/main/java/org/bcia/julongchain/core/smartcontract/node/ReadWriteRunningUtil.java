@@ -25,6 +25,6 @@ import org.bcia.julongchain.common.log.JulongChainLogFactory;
  */
 public class ReadWriteRunningUtil {
 
-  private static final JulongChainLog logger =
-      JulongChainLogFactory.getLog(ReadWriteRunningUtil.class);
+  private static JulongChainLog logger = JulongChainLogFactory.getLog(ReadWriteRunningUtil.class);
+
 }

@@ -19,10 +19,16 @@ import org.bcia.julongchain.common.groupconfig.GroupConfigBundle;
 import org.bcia.julongchain.common.groupconfig.IGroupConfigBundle;
 
 /**
+ * 不可变资源接口
+ *
  * @author zhangmingyang
  * @Date: 2018/5/17
  * @company Dingxuan
  */
 public interface IMutableResources extends IGroupConfigBundle {
-    GroupConfigBundle  update();
+    /**
+     * 群组配置包更新
+     * @return
+     */
+    GroupConfigBundle update();
 }

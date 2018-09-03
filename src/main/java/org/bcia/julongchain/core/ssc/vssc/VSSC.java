@@ -39,6 +39,7 @@ import org.bcia.julongchain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.julongchain.core.ssc.SystemSmartContractBase;
 import org.bcia.julongchain.msp.IMspManager;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
+import org.bcia.julongchain.msp.mgmt.MspMgmtMgr;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.msp.Identities;
 import org.bcia.julongchain.protos.node.*;
@@ -48,10 +49,11 @@ import java.util.*;
 
 /**
  * 验证系统智能合约　Validator System Smart Contract,VSSC
- * ValidatorOneValidSignature implements the default transaction validation policy,
- * which is to check the correctness of the read-write set and the endorsement
- * signatures against an endorsement policy that is supplied as argument to
- * every invoke
+ * 验证系统智能合约实现了默认的交易验证策略，即检查读写集合的正确性，根据背书策略检查背书签名
+ * VSSC的invoke函数，接受的args格式说明如下：
+ * args[0] - 函数名 (当前未使用)
+ * args[1] - 序列化的Envelope（serialized Envelope）
+ * args[2] - 序列化的策略（serialized policy）
  * @author sunianle
  * @date 3/5/18
  * @company Dingxuan
@@ -136,7 +138,7 @@ public class VSSC extends SystemSmartContractBase {
         }
         IApplicationConfig ac = this.sscProvider.getApplicationConfig(groupHeader.getGroupId());
 
-        IMspManager manager=GlobalMspManagement.getManagerForChain(groupHeader.getGroupId());
+        IMspManager manager= MspMgmtMgr.getManagerForChain(groupHeader.getGroupId());
         PolicyProvider policyProvider=new PolicyProvider(manager);
         IPolicy policy = null;
         try {

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * <p>Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file
@@ -85,19 +85,19 @@ public class SmartContractSupport implements ISCSupport {
 	private boolean userRunsSC;
 	private boolean nodeTLS;
 
-	/** DevModeUserRunsChaincode property allows user to run chaincode in development environment */
-	public static final String DevModeUserRunsChaincode = "dev";
+	/** DevModeUserRunsChaincode 允许用户在开发环境里运行链码*/
+	public static final String DEV_MODE_USER_RUNS_SMART_CONTRACT = "dev";
 
-	public static final int chaincodeStartupTimeoutDefault = 5000;
-	public static final String peerAddressDefault = "0.0.0.0:7051";
+	public static final int SMART_CONTRACT_STARTUP_TIMEOUT_DEFAULT = 5000;
+	public static final String NODE_ADDRESS_DEFAULT = "0.0.0.0:7051";
 
-	/** TXSimulatorKey is used to attach ledger simulation context */
-	public static String TXSimulatorKey = "txsimulatorkey";
+	/** TXSimulatorKey 附加到账本的同步环境 */
+	public static String TX_SIMULATOR_KEY = "txsimulatorkey";
 
-	/** HistoryQueryExecutorKey is used to attach ledger history query executor context */
-	public static String HistoryQueryExecutorKey = "historyqueryexecutorkey";
+	/** HistoryQueryExecutorKey 附加账本历史请求执行环境*/
+	public static String HISTORY_QUERY_EXECUTOR_KEY = "historyqueryexecutorkey";
 
-	/** Mutual TLS auth client key and cert paths in the chaincode container */
+	/** 交互 TLS auth client key 与 cert paths 在链码容器内 */
 	String TLS_CLIENT_KEY_PATH = "/etc/hyperledger/fabric/client.key";
 	String TLS_CLIENT_CERT_PATH = "/etc/hyperledger/fabric/client.crt";
 	String TLS_CLIENT_ROOT_CERT_PATH = "/etc/hyperledger/fabric/peer.crt";
@@ -107,39 +107,40 @@ public class SmartContractSupport implements ISCSupport {
 	}
 
 	/**
-	 * use this for ledger access and make sure TXSimulator is being used
+	 * 确保调用TXSimulator来使用账本
 	 *
 	 * @param context
 	 * @return
 	 */
 	public ITxSimulator getTxSimulator(Context context) {
 		try {
-			return (ITxSimulator) context.lookup(TXSimulatorKey);
+			return (ITxSimulator) context.lookup(TX_SIMULATOR_KEY);
 		} catch (Exception e) {
-			log.error("Got error when lookup " + TXSimulatorKey + "\n" + e.getMessage());
+			log.error("Got error when lookup " + TX_SIMULATOR_KEY + "\n" + e.getMessage());
 			return null;
 		}
 	}
 
 	/**
-	 * use this for ledger access and make sure IHistoryQueryExecutor is being used
+	 * 确保调用IHistoryQueryExecutor来使用账本
 	 *
 	 * @param context
 	 * @return
 	 */
 	public IHistoryQueryExecutor getHistoryQueryExecutor(Context context) {
 		try {
-			return ((IHistoryQueryExecutor) context.lookup(HistoryQueryExecutorKey));
+			return ((IHistoryQueryExecutor) context.lookup(HISTORY_QUERY_EXECUTOR_KEY));
 		} catch (Exception e) {
-			log.error("Got error when lookup " + HistoryQueryExecutorKey + "\n" + e.getMessage());
+			log.error("Got error when lookup " + HISTORY_QUERY_EXECUTOR_KEY + "\n" + e.getMessage());
 			return null;
 		}
 	}
 
 	/**
-	 * register placeholder Handler. This will be transferred in registerHandler
-	 * NOTE: from this point, existence of handler for this chaincode means the chaincode
-	 * is in the process of getting started (or has been started)
+	 * 注册Handler占位符并传递进registerHandler
+	 * 注意：从这一点来说，handler的存在表示链码在启动过程中
+	 *
+	 *
 	 *
 	 * @param smartcontract
 	 * @param notfy
@@ -152,7 +153,7 @@ public class SmartContractSupport implements ISCSupport {
 	}
 
 	/**
-	 * call this under LOCK
+	 * 在 LOCK 下面调用
 	 *
 	 * @param smartcontract
 	 * @return
@@ -162,7 +163,7 @@ public class SmartContractSupport implements ISCSupport {
 	}
 
 	/**
-	 * call this under LOCK
+	 * 在 LOCK 下面调用
 	 *
 	 * @param smartcontract
 	 * @return
@@ -175,7 +176,7 @@ public class SmartContractSupport implements ISCSupport {
 	}
 
 	/**
-	 * NewChaincodeSupport creates a new ChaincodeSupport instance
+	 * NewChaincodeSupport 创建一个新的ChaincodeSupport对象
 	 *
 	 * @param
 	 * @return
@@ -241,7 +242,7 @@ public class SmartContractSupport implements ISCSupport {
 	}
 
 	/**
-	 * getLogLevelFromViper gets the chaincode container log levels from viper
+	 * getLogLevelFromViper 从viper调用容器日志级别链码
 	 *
 	 * @param module
 	 * @return

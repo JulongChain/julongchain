@@ -16,16 +16,16 @@
 
 package org.bcia.julongchain.csp.pkcs11.rsa;
 
-import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.exception.CspException;
+import org.bcia.julongchain.common.util.Convert;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.pkcs11.IPKCS11FactoryOpts;
 import org.bcia.julongchain.csp.pkcs11.PKCS11CspLog;
 import org.bcia.julongchain.csp.pkcs11.util.DataUtil;
+import static org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant.*;
 
 
-import sun.security.pkcs11.wrapper.CK_ATTRIBUTE;
-import sun.security.pkcs11.wrapper.CK_MECHANISM;
-import sun.security.pkcs11.wrapper.PKCS11Exception;
+import sun.security.pkcs11.wrapper.*;
 import sun.security.rsa.RSAPrivateCrtKeyImpl;
 import sun.security.rsa.RSAPublicKeyImpl;
 
@@ -48,124 +48,32 @@ import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
 /**
  * RSA Keypair Impl
  *
- * @author xuying
- * @date 2018/05/20
+ * @author Ying Xu
+ * @date 5/20/18
  * @company FEITIAN
  */
 public class RsaImpl {
-
-    private static void setLoggerDebug(String msg, int classNO){
-
-        PKCS11CspLog csplog = new PKCS11CspLog();
-        switch (classNO){
-            case 1:
-                csplog.setLogMsg(msg, 0, RsaImpl.GenerateRSA.class);
-                break;
-            case 2:
-                csplog.setLogMsg(msg, 0, RsaImpl.ImportKeyRSA.class);
-                break;
-            case 3:
-                csplog.setLogMsg(msg, 0, RsaImpl.GetkeyRSA.class);
-                break;
-            case 4:
-                csplog.setLogMsg(msg, 0, RsaImpl.SignRSAKey.class);
-                break;
-            case 5:
-                csplog.setLogMsg(msg, 0, RsaImpl.VerifyRSAKey.class);
-                break;
-            case 6:
-                csplog.setLogMsg(msg, 0, RsaImpl.EncryptRSAKey.class);
-                break;
-            case 7:
-                csplog.setLogMsg(msg, 0, RsaImpl.DecryptRSAKey.class);
-                break;
-            default:
-                csplog.setLogMsg(msg, 0, RsaImpl.class);
-                break;
-        }
-    }
-
-    private static void setLoggerInfo(String msg, int classNO){
-        PKCS11CspLog csplog = new PKCS11CspLog();
-        switch (classNO){
-            case 1:
-                csplog.setLogMsg(msg, 1, RsaImpl.GenerateRSA.class);
-                break;
-            case 2:
-                csplog.setLogMsg(msg, 1, RsaImpl.ImportKeyRSA.class);
-                break;
-            case 3:
-                csplog.setLogMsg(msg, 1, RsaImpl.GetkeyRSA.class);
-                break;
-            case 4:
-                csplog.setLogMsg(msg, 1, RsaImpl.SignRSAKey.class);
-                break;
-            case 5:
-                csplog.setLogMsg(msg, 1, RsaImpl.VerifyRSAKey.class);
-                break;
-            case 6:
-                csplog.setLogMsg(msg, 1, RsaImpl.EncryptRSAKey.class);
-                break;
-            case 7:
-                csplog.setLogMsg(msg, 1, RsaImpl.DecryptRSAKey.class);
-                break;
-            default:
-                csplog.setLogMsg(msg, 1, RsaImpl.class);
-                break;
-        }
-    }
-
-    private static void setLoggerErr(String msg, int classNO){
-        PKCS11CspLog csplog = new PKCS11CspLog();
-        switch (classNO){
-            case 1:
-                csplog.setLogMsg(msg, 2, RsaImpl.GenerateRSA.class);
-                break;
-            case 2:
-                csplog.setLogMsg(msg, 2, RsaImpl.ImportKeyRSA.class);
-                break;
-            case 3:
-                csplog.setLogMsg(msg, 2, RsaImpl.GetkeyRSA.class);
-                break;
-            case 4:
-                csplog.setLogMsg(msg, 2, RsaImpl.SignRSAKey.class);
-                break;
-            case 5:
-                csplog.setLogMsg(msg, 2, RsaImpl.VerifyRSAKey.class);
-                break;
-            case 6:
-                csplog.setLogMsg(msg, 2, RsaImpl.EncryptRSAKey.class);
-                break;
-            case 7:
-                csplog.setLogMsg(msg, 2, RsaImpl.DecryptRSAKey.class);
-                break;
-            default:
-                csplog.setLogMsg(msg, 2, RsaImpl.class);
-                break;
-        }
-    }
     /**
      * Generate RSA Keypair
      *
-     * @author xuying
-     * @date 2018/05/20
+     * @author Ying Xu
+     * @date 5/20/18
      * @company FEITIAN
      */
     public static class GenerateRSA{
 
-        public GenerateRSA() {
-
-        }
-
+    	private static byte[] byteSKI;
+        private static byte[] pubder;
+        
         /**
          * 生成rsa密钥
          *
          * @param keySize     模长
          * @param ephemeral   临时标记
          * @param opts        p11 factory
-         * @return key
+         * @return 
          */
-        public static IKey generateRsa(int keySize, boolean ephemeral, IPKCS11FactoryOpts opts) throws JulongChainException {
+        public void generateRsa(int keySize, boolean ephemeral, IPKCS11FactoryOpts opts) throws CspException {
 
             try {
                 //create bigint
@@ -204,7 +112,6 @@ public class RsaImpl {
 
                 long[] keypair =opts.getPKCS11().C_GenerateKeyPair(opts.getSessionhandle(), ckm, rsaPubObject, rsaPrvObject);
 
-
                 CK_ATTRIBUTE[] attributes = new CK_ATTRIBUTE[] {
                         new CK_ATTRIBUTE(CKA_MODULUS),
                         new CK_ATTRIBUTE(CKA_PUBLIC_EXPONENT),
@@ -214,29 +121,31 @@ public class RsaImpl {
 
                 BigInteger n = attributes[0].getBigInteger();
                 BigInteger e = attributes[1].getBigInteger();
-                byte[] PublicHash = getPublicHash(n, e);
-                byte[] pubder =  getPublicDer(n, e);
+                byteSKI = getPublicHash(n, e);
+                pubder =  getPublicDer(n, e);
 
                 CK_ATTRIBUTE[] setski = new CK_ATTRIBUTE[2];
-                setski[0] = new CK_ATTRIBUTE(CKA_ID, PublicHash);
-                setski[1] = new CK_ATTRIBUTE(CKA_LABEL, DataUtil.MyByteToHex(PublicHash));
+                setski[0] = new CK_ATTRIBUTE(CKA_ID, byteSKI);
+                setski[1] = new CK_ATTRIBUTE(CKA_LABEL, Convert.bytesToHexString(byteSKI));
                 opts.getPKCS11().C_SetAttributeValue(opts.getSessionhandle(),keypair[0],setski);
                 opts.getPKCS11().C_SetAttributeValue(opts.getSessionhandle(),keypair[1],setski);
-
-                IKey ikey = new RsaKeyOpts.RsaPubKey(PublicHash, pubder);
-                return ikey;
 
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();                
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                RsaImpl.setLoggerErr(err, 1);
-                throw new JulongChainException(err, ex.getCause());
+                RsaImpl.setLoggerErr(err, CLS_GENKEY);
+                throw new CspException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
-                RsaImpl.setLoggerErr(err, 1);
-                throw new JulongChainException(err, ex.getCause());
+                RsaImpl.setLoggerErr(err, CLS_GENKEY);
+                throw new CspException(err, ex.getCause());
             }
+        }
+        
+        public IKey getIKey(){
+        	IKey ikey = new RsaKeyOpts.RsaPubKey(byteSKI, pubder);
+        	return ikey;
         }
     }
 
@@ -244,8 +153,8 @@ public class RsaImpl {
     /**
      * Import RSA Keypair
      *
-     * @author xuying
-     * @date 2018/05/20
+     * @author Ying Xu
+     * @date 5/20/18
      * @company FEITIAN
      */
     public static class ImportKeyRSA{
@@ -262,7 +171,7 @@ public class RsaImpl {
          * @return 公钥摘要(cka_id value)
          */
         public static byte[] importRsaKey(byte[] PriRaw, byte[] PubRaw, boolean ephemeral,
-                                          IPKCS11FactoryOpts opts, boolean flagpubkey) throws JulongChainException {
+                                          IPKCS11FactoryOpts opts, boolean flagpubkey) throws CspException{
 
             byte[] byteSKI;
             try {
@@ -318,28 +227,28 @@ public class RsaImpl {
             }catch(NoSuchAlgorithmException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
-                RsaImpl.setLoggerErr(err, 2);
-                throw new JulongChainException(err, ex.getCause());
+                RsaImpl.setLoggerErr(err, CLS_IMPORTKEY);
+                throw new CspException(err, ex.getCause());
             }catch(InvalidKeySpecException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:InvalidKeySpecException ErrMessage: %s", ex.getMessage());
-                RsaImpl.setLoggerErr(err, 2);
-                throw new JulongChainException(err, ex.getCause());
+                RsaImpl.setLoggerErr(err, CLS_IMPORTKEY);
+                throw new CspException(err, ex.getCause());
             }catch(PKCS11Exception ex){
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                RsaImpl.setLoggerErr(err, 2);
-                throw new JulongChainException(err, ex.getCause());
+                RsaImpl.setLoggerErr(err, CLS_IMPORTKEY);
+                throw new CspException(err, ex.getCause());
             }catch(InvalidKeyException ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:InvalidKeyException ErrMessage: %s", ex.getMessage());
-                RsaImpl.setLoggerErr(err, 2);
-                throw new JulongChainException(err, ex.getCause());
+                RsaImpl.setLoggerErr(err, CLS_IMPORTKEY);
+                throw new CspException(err, ex.getCause());
             }catch(Exception ex) {
             	ex.printStackTrace();
             	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
-                RsaImpl.setLoggerErr(err, 2);
-                throw new JulongChainException(err, ex.getCause());
+                RsaImpl.setLoggerErr(err, CLS_IMPORTKEY);
+                throw new CspException(err, ex.getCause());
             }
 
         }
@@ -359,8 +268,8 @@ public class RsaImpl {
     /**
      * Get RSA PublicKey
      *
-     * @author xuying
-     * @date 2018/05/20
+     * @author Ying Xu
+     * @date 5/20/18
      * @company FEITIAN
      */
     public static final class GetkeyRSA{
@@ -369,17 +278,17 @@ public class RsaImpl {
         private static IPKCS11FactoryOpts opts;
 
         public GetkeyRSA(byte[] ski, IPKCS11FactoryOpts opts){
-            this.ski = ski;
-            this.opts = opts;
+            GetkeyRSA.ski = ski;
+            GetkeyRSA.opts = opts;
         }
 
-        public static IKey getkey() throws JulongChainException {
+        public static IKey getkey() throws CspException {
 
             try {
                 long[] keypbu = findKeypairFromSKI(opts, false, ski);
-                if (keypbu==null || (keypbu!=null && keypbu.length==0)) {
+                if (keypbu==null || keypbu.length==0) {
                 	String str = String.format("[JC_PKCS]:No Find Key");
-                    RsaImpl.setLoggerInfo(str, 3);
+                    RsaImpl.setLoggerInfo(str, CLS_GETKEY);
                     return null;
                 }
                 else
@@ -392,15 +301,20 @@ public class RsaImpl {
                     BigInteger n = attributes[0].getBigInteger();
                     BigInteger e = attributes[1].getBigInteger();
                     byte[] pubder =  getPublicDer(n, e);
-
+                    byte[] byteSKI = getPublicHash(n, e);
+                    if(!DataUtil.compareByteArray(ski, byteSKI)) {
+                    	String str = String.format("[JC_PKCS]:No Find Key");
+                        RsaImpl.setLoggerInfo(str, CLS_GETKEY);
+                        return null;
+                    }
                     IKey ikey = new RsaKeyOpts.RsaPubKey(ski, pubder);
                     return ikey;
                 }
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                RsaImpl.setLoggerErr(err, 3);
-                throw new JulongChainException(err, ex.getCause());
+                RsaImpl.setLoggerErr(err, CLS_GETKEY);
+                throw new CspException(err, ex.getCause());
             }
         }
     }
@@ -410,8 +324,8 @@ public class RsaImpl {
     /**
      * Use the private key signature of the specified SKI
      *
-     * @author xuying
-     * @date 2018/05/20
+     * @author Ying Xu
+     * @date 5/20/18
      * @company FEITIAN
      */
     public static class SignRSAKey{
@@ -429,14 +343,14 @@ public class RsaImpl {
          * @param newMechanism  the alg
          * @param opts          p11factory
          */
-        public static byte[] signRSA(byte[] ski, byte[] digest, long newMechanism, IPKCS11FactoryOpts opts) throws JulongChainException {
+        public static byte[] signRSA(byte[] ski, byte[] digest, long newMechanism, IPKCS11FactoryOpts opts) throws CspException{
             try {
                 long[] privatekey = findKeypairFromSKI(opts, true, ski);
-                if (privatekey==null || (privatekey!=null && privatekey.length==0))
+                if (privatekey==null || privatekey.length==0)
                 {
                     String str=String.format("[JC_PKCS]:No Find Key");
-                    RsaImpl.setLoggerErr(str, 4);
-                    throw new JulongChainException(str);
+                    RsaImpl.setLoggerErr(str, CLS_SIGN);
+                    throw new CspException(str);
                 }
                 CK_MECHANISM ckMechanism = new CK_MECHANISM();
                 ckMechanism.mechanism = newMechanism;
@@ -447,8 +361,8 @@ public class RsaImpl {
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                RsaImpl.setLoggerErr(err, 4);
-                throw new JulongChainException(err, ex.getCause());
+                RsaImpl.setLoggerErr(err, CLS_SIGN);
+                throw new CspException(err, ex.getCause());
             }
 
 
@@ -459,8 +373,8 @@ public class RsaImpl {
     /**
      * Use the public key verify signature of the specified SKI
      *
-     * @author xuying
-     * @date 2018/05/20
+     * @author Ying Xu
+     * @date 5/20/18
      * @company FEITIAN
      */
     public static class VerifyRSAKey{
@@ -479,14 +393,14 @@ public class RsaImpl {
          * @param newMechanism  the alg
          * @param opts          p11factory
          */
-        public boolean verifyRSA(byte[] ski, byte[] signature, byte[] digest, long newMechanism, IPKCS11FactoryOpts opts) throws JulongChainException {
+        public boolean verifyRSA(byte[] ski, byte[] signature, byte[] digest, long newMechanism, IPKCS11FactoryOpts opts) throws CspException{
 
             try {
                 long[] publickey = findKeypairFromSKI(opts, false, ski);
-                if (publickey==null || (publickey!=null && publickey.length==0)) {
+                if (publickey==null || publickey.length==0) {
                     String str=String.format("[JC_PKCS]:No Find Key");
-                    RsaImpl.setLoggerErr(str, 5);
-                    throw new JulongChainException(str);
+                    RsaImpl.setLoggerErr(str, CLS_VERIFY);
+                    throw new CspException(str);
                 }
                 CK_MECHANISM ckMechanism = new CK_MECHANISM();
                 ckMechanism.mechanism = newMechanism;
@@ -497,7 +411,7 @@ public class RsaImpl {
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                RsaImpl.setLoggerErr(err, 5);
+                RsaImpl.setLoggerErr(err, CLS_VERIFY);
                 return false;
             }
 
@@ -510,8 +424,8 @@ public class RsaImpl {
     /**
      * Use the key encrypt of the specified SKI
      *
-     * @author xuying
-     * @date 2018/05/20
+     * @author Ying Xu
+     * @date 5/20/18
      * @company FEITIAN
      */
     public static class EncryptRSAKey{
@@ -530,19 +444,20 @@ public class RsaImpl {
          * @param opts          p11factory
          * @return ciphertext
          */
-        public byte[] encryptRSA(byte[] ski, byte[] plaintext, boolean flagpub, long mechanism, IPKCS11FactoryOpts opts) throws JulongChainException {
+        public byte[] encryptRSA(byte[] ski, byte[] plaintext, boolean flagpub, long mechanism, IPKCS11FactoryOpts opts) throws CspException {
             try {
                 long[] enckey;
-                if (flagpub)
+                if (flagpub) {
                     enckey = findKeypairFromSKI(opts, false, ski);
-                else
+                }else{
                     enckey = findKeypairFromSKI(opts, true, ski);
+                }
 
-                if (enckey==null || (enckey!=null && enckey.length==0)) {
+                if (enckey==null || enckey.length==0) {
 
                     String str=String.format("[JC_PKCS]:No Find Key");
-                    RsaImpl.setLoggerErr(str, 6);
-                    throw new JulongChainException(str);
+                    RsaImpl.setLoggerErr(str, CLS_ENCRYPT);
+                    throw new CspException(str);
                 }
 
                 CK_ATTRIBUTE[] attributes = new CK_ATTRIBUTE[] {
@@ -555,15 +470,15 @@ public class RsaImpl {
                 opts.getPKCS11().C_EncryptInit(opts.getSessionhandle(), ckMechanism, enckey[0]);
 
                 int outlen =  (int)attributes[0].getLong()/8;
-                byte[] out1 = new byte[outlen];
-                int rv = opts.getPKCS11().C_Encrypt(opts.getSessionhandle(), plaintext, 0, plaintext.length, out1, 0, outlen);
-                return out1;
+                byte[] cipher = new byte[outlen];
+                opts.getPKCS11().C_Encrypt(opts.getSessionhandle(), plaintext, 0, plaintext.length, cipher, 0, outlen);
+                return cipher;
 
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                RsaImpl.setLoggerErr(err, 6);
-                throw new JulongChainException(err, ex.getCause());
+                RsaImpl.setLoggerErr(err, CLS_ENCRYPT);
+                throw new CspException(err, ex.getCause());
             }
 
         }
@@ -575,8 +490,8 @@ public class RsaImpl {
     /**
      * Use the key decrypt of the specified SKI
      *
-     * @author xuying
-     * @date 2018/05/20
+     * @author Ying Xu
+     * @date 5/20/18
      * @company FEITIAN
      */
     public static class DecryptRSAKey{
@@ -593,19 +508,20 @@ public class RsaImpl {
          * @param opts          p11factory
          * @return plaintext
          */
-        public static byte[] decryptRSA(byte[] ski, byte[] ciphertext, boolean flagpub, long mechanism, IPKCS11FactoryOpts opts) throws JulongChainException {
+        public static byte[] decryptRSA(byte[] ski, byte[] ciphertext, boolean flagpub, long mechanism, IPKCS11FactoryOpts opts) throws CspException{
             try {
                 long[] deckey;
-                if (flagpub)
+                if (flagpub) {
                     deckey = findKeypairFromSKI(opts, false, ski);
-                else
+                }else{
                     deckey = findKeypairFromSKI(opts, true, ski);
+                }
 
-                if (deckey==null || (deckey!=null && deckey.length==0)) {
+                if (deckey==null || deckey.length==0) {
 
                     String str=String.format("[JC_PKCS]:No Find Key");
-                    RsaImpl.setLoggerErr(str, 7);
-                    throw new JulongChainException(str);
+                    RsaImpl.setLoggerErr(str, CLS_DECRYPT);
+                    throw new CspException(str);
                 }
 
                 int outlen = 512;
@@ -615,7 +531,7 @@ public class RsaImpl {
                 byte[] out = new byte[outlen];
 
                 opts.getPKCS11().C_DecryptInit(opts.getSessionhandle(), ckMechanism, deckey[0]);
-                int len = opts.getPKCS11().C_Decrypt(opts.getSessionhandle(), ciphertext, /*ciphertext.length*/0, ciphertext.length, out, 0, outlen);
+                int len = opts.getPKCS11().C_Decrypt(opts.getSessionhandle(), ciphertext, 0, ciphertext.length, out, 0, outlen);
                 byte[] data = new byte[len];
                 System.arraycopy(out, 0, data, 0, len);
 
@@ -623,25 +539,30 @@ public class RsaImpl {
             }catch(PKCS11Exception ex) {
                 ex.printStackTrace();
                 String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-                RsaImpl.setLoggerErr(err, 7);
-                throw new JulongChainException(err, ex.getCause());
+                RsaImpl.setLoggerErr(err, CLS_DECRYPT);
+                throw new CspException(err, ex.getCause());
             }
 
         }
     }
 
 
-
-
     /**
      * Find the key of the specified SKI
-     *
+     * @param opts  p11factory
+     * @param bPri  Privatekey tag
+     * @param ski   cka_id value
+     * @return  key handle
+     * @throws CspException
      */
-    private static long[] findKeypairFromSKI(IPKCS11FactoryOpts opts, boolean bPri, byte[] ski) throws JulongChainException {
+
+    private static long[] findKeypairFromSKI(IPKCS11FactoryOpts opts, boolean bPri, byte[] ski) throws CspException{
 
         long keyclass = CKO_PUBLIC_KEY;
         if(bPri)
+        {
             keyclass = CKO_PRIVATE_KEY;
+        }
 
         CK_ATTRIBUTE[] template = new CK_ATTRIBUTE[3];
         template[0] = new CK_ATTRIBUTE(CKA_CLASS, keyclass);
@@ -657,21 +578,24 @@ public class RsaImpl {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
             setLoggerErr(err, 0);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }catch(Exception ex) {
         	ex.printStackTrace();
         	String err = String.format("[JC_PKCS]:Exception ErrMessage: %s", ex.getMessage());
             setLoggerErr(err, 0);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
     }
 
 
     /**
-     * get public key der code
-     *
+     * Get Publickey DER Encoding of ASN.1 Types
+     * @param n     N
+     * @param e     E
+     * @return der encoding value
+     * @throws CspException
      */
-    private static byte[] getPublicDer(BigInteger n, BigInteger e) throws JulongChainException {
+    private static byte[] getPublicDer(BigInteger n, BigInteger e) throws CspException{
         try {
             RSAPublicKeyImpl rsapublickeyimpl = new RSAPublicKeyImpl(n, e);
             return rsapublickeyimpl.getEncoded();
@@ -679,16 +603,19 @@ public class RsaImpl {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:InvalidKeyException ErrMessage: %s", ex.getMessage());
             setLoggerErr(err, 0);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
         }
     }
 
 
     /**
-     * get public key hash data
-     *
+     * get rsa public key hash data
+     * @param n     N
+     * @param e     E
+     * @return  publickey hash value
+     * @throws CspException
      */
-    private static byte[] getPublicHash(BigInteger n, BigInteger e) throws JulongChainException {
+    private static byte[] getPublicHash(BigInteger n, BigInteger e) throws CspException{
 
         try {
             MessageDigest shahash = MessageDigest.getInstance("SHA-1");
@@ -699,7 +626,99 @@ public class RsaImpl {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
             setLoggerErr(err, 0);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
+        }
+    }
+    
+    
+    private static void setLoggerDebug(String msg, int classNO){
+
+        PKCS11CspLog csplog = new PKCS11CspLog();
+        switch (classNO){
+            case CLS_GENKEY:
+                csplog.setLogMsg(msg, csplog.LEVEL_DEBUG, RsaImpl.GenerateRSA.class);
+                break;
+            case CLS_IMPORTKEY:
+                csplog.setLogMsg(msg, csplog.LEVEL_DEBUG, RsaImpl.ImportKeyRSA.class);
+                break;
+            case CLS_GETKEY:
+                csplog.setLogMsg(msg, csplog.LEVEL_DEBUG, RsaImpl.GetkeyRSA.class);
+                break;
+            case CLS_SIGN:
+                csplog.setLogMsg(msg, csplog.LEVEL_DEBUG, RsaImpl.SignRSAKey.class);
+                break;
+            case CLS_VERIFY:
+                csplog.setLogMsg(msg, csplog.LEVEL_DEBUG, RsaImpl.VerifyRSAKey.class);
+                break;
+            case CLS_ENCRYPT:
+                csplog.setLogMsg(msg, csplog.LEVEL_DEBUG, RsaImpl.EncryptRSAKey.class);
+                break;
+            case CLS_DECRYPT:
+                csplog.setLogMsg(msg, csplog.LEVEL_DEBUG, RsaImpl.DecryptRSAKey.class);
+                break;
+            default:
+                csplog.setLogMsg(msg, csplog.LEVEL_DEBUG, RsaImpl.class);
+                break;
+        }
+    }
+
+    private static void setLoggerInfo(String msg, int classNO){
+        PKCS11CspLog csplog = new PKCS11CspLog();
+        switch (classNO){
+            case CLS_GENKEY:
+                csplog.setLogMsg(msg, csplog.LEVEL_INFO, RsaImpl.GenerateRSA.class);
+                break;
+            case CLS_IMPORTKEY:
+                csplog.setLogMsg(msg, csplog.LEVEL_INFO, RsaImpl.ImportKeyRSA.class);
+                break;
+            case CLS_GETKEY:
+                csplog.setLogMsg(msg, csplog.LEVEL_INFO, RsaImpl.GetkeyRSA.class);
+                break;
+            case CLS_SIGN:
+                csplog.setLogMsg(msg, csplog.LEVEL_INFO, RsaImpl.SignRSAKey.class);
+                break;
+            case CLS_VERIFY:
+                csplog.setLogMsg(msg, csplog.LEVEL_INFO, RsaImpl.VerifyRSAKey.class);
+                break;
+            case CLS_ENCRYPT:
+                csplog.setLogMsg(msg, csplog.LEVEL_INFO, RsaImpl.EncryptRSAKey.class);
+                break;
+            case CLS_DECRYPT:
+                csplog.setLogMsg(msg, csplog.LEVEL_INFO, RsaImpl.DecryptRSAKey.class);
+                break;
+            default:
+                csplog.setLogMsg(msg, csplog.LEVEL_INFO, RsaImpl.class);
+                break;
+        }
+    }
+
+    private static void setLoggerErr(String msg, int classNO){
+        PKCS11CspLog csplog = new PKCS11CspLog();
+        switch (classNO){
+            case CLS_GENKEY:
+                csplog.setLogMsg(msg, csplog.LEVEL_ERROR, RsaImpl.GenerateRSA.class);
+                break;
+            case CLS_IMPORTKEY:
+                csplog.setLogMsg(msg, csplog.LEVEL_ERROR, RsaImpl.ImportKeyRSA.class);
+                break;
+            case CLS_GETKEY:
+                csplog.setLogMsg(msg, csplog.LEVEL_ERROR, RsaImpl.GetkeyRSA.class);
+                break;
+            case CLS_SIGN:
+                csplog.setLogMsg(msg, csplog.LEVEL_ERROR, RsaImpl.SignRSAKey.class);
+                break;
+            case CLS_VERIFY:
+                csplog.setLogMsg(msg, csplog.LEVEL_ERROR, RsaImpl.VerifyRSAKey.class);
+                break;
+            case CLS_ENCRYPT:
+                csplog.setLogMsg(msg, csplog.LEVEL_ERROR, RsaImpl.EncryptRSAKey.class);
+                break;
+            case CLS_DECRYPT:
+                csplog.setLogMsg(msg, csplog.LEVEL_ERROR, RsaImpl.DecryptRSAKey.class);
+                break;
+            default:
+                csplog.setLogMsg(msg, csplog.LEVEL_ERROR, RsaImpl.class);
+                break;
         }
     }
 

@@ -8,7 +8,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * 对象
+ * 节点创建群组测试类
  *
  * @author zhouhui
  * @date 2018/3/27

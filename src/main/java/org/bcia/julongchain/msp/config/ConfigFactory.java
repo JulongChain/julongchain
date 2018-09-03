@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * 类描述
+ * config.yaml 文件加载
  *
  * @author zhangmingyang
  * @date 2018/06/29
@@ -37,7 +37,6 @@ public class ConfigFactory {
 
     public static Config loadConfig() throws FileNotFoundException {
         Yaml yaml = new Yaml();
-
         InputStream is = null;
         try {
             is = new FileInputStream(CommConstant.CONFIG_DIR_PREFIX + Config.Config_FILE_PATH);
@@ -52,10 +51,5 @@ public class ConfigFactory {
                 }
             }
         }
-    }
-
-    public static void main(String[] args) throws FileNotFoundException {
-        Config config=ConfigFactory.loadConfig();
-        System.out.println(config.getOrganizationalUnitIdentifiers().get("certificate"));
     }
 }

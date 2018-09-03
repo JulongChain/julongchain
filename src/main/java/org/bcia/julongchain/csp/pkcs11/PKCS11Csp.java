@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.csp.pkcs11;
 
-import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.csp.intfs.IHash;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.intfs.opts.*;
@@ -38,7 +38,7 @@ import sun.security.pkcs11.wrapper.PKCS11Exception;
 /**
  * Class description
  *
- * @author xuying
+ * @author Ying Xu
  * @date 2018/05/20
  * @company FEITIAN
  */
@@ -52,16 +52,16 @@ public class PKCS11Csp implements IPKCS11Csp {
     }
 
     @Override
-    public void finalized() throws JulongChainException {
+    public void finalized() throws CspException {
         
         PKCS11FactoryOpts.optFinalized();        
     }
 
     @Override
-    public IKey keyGen(IKeyGenOpts opts) throws JulongChainException {
+    public IKey keyGen(IKeyGenOpts opts) throws CspException {
         if (opts == null) {
-            csplog.setLogMsg("[JC_PKCS]:KeyGen Param Err!", 2, PKCS11Csp.class);
-        	throw new JulongChainException("[JC_PKCS]:Param Err!");
+            csplog.setLogMsg("[JC_PKCS]:KeyGen Param Err!", csplog.LEVEL_ERROR, PKCS11Csp.class);
+        	throw new CspException("[JC_PKCS]:Param Err!");
         }
 
         RsaImpl.GenerateRSA genkey;
@@ -70,14 +70,16 @@ public class PKCS11Csp implements IPKCS11Csp {
         if (opts instanceof RsaOpts.RSA1024KeyGenOpts)
         {
             genkey = new RsaImpl.GenerateRSA();
-            key = genkey.generateRsa(1024, opts.isEphemeral(), PKCS11FactoryOpts);
+            genkey.generateRsa(1024, opts.isEphemeral(), PKCS11FactoryOpts);
+            key = genkey.getIKey();
             return key;
         }
 
         if (opts instanceof RsaOpts.RSA2048KeyGenOpts)
         {
             genkey = new RsaImpl.GenerateRSA();
-            key = genkey.generateRsa(2048, opts.isEphemeral(), PKCS11FactoryOpts);
+            genkey.generateRsa(2048, opts.isEphemeral(), PKCS11FactoryOpts);
+            key = genkey.getIKey();
             return key;
         }
 /*
@@ -97,21 +99,24 @@ public class PKCS11Csp implements IPKCS11Csp {
 */
         if (opts instanceof EcdsaOpts.ECDSA192KeyGenOpts)
         {
-            EcdsaImpl.generateECKey eckey = new EcdsaImpl.generateECKey(192, opts.isEphemeral(), PKCS11FactoryOpts);
+            EcdsaImpl.GenerateECKey eckey = new EcdsaImpl.GenerateECKey();
+            eckey.generateECKey(192, opts.isEphemeral(), PKCS11FactoryOpts);
             key = eckey.getIKey();
             return key;
         }
         
         if (opts instanceof EcdsaOpts.ECDSA256KeyGenOpts)
         {
-            EcdsaImpl.generateECKey eckey = new EcdsaImpl.generateECKey(256, opts.isEphemeral(), PKCS11FactoryOpts);
+            EcdsaImpl.GenerateECKey eckey = new EcdsaImpl.GenerateECKey();
+            eckey.generateECKey(256, opts.isEphemeral(), PKCS11FactoryOpts);
             key = eckey.getIKey();
             return key;
         }
 /*
         if (opts instanceof EcdsaOpts.ECDSA384KeyGenOpts)
         {
-            EcdsaImpl.generateECKey eckey = new EcdsaImpl.generateECKey(384, opts.isEphemeral(), PKCS11FactoryOpts);
+            EcdsaImpl.GenerateECKey eckey = new EcdsaImpl.GenerateECKey
+            eckey.generateECKey(384, opts.isEphemeral(), PKCS11FactoryOpts);
             key = eckey.getIKey();
 
             return key;
@@ -140,7 +145,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     }
 
     @Override
-    public IKey keyDeriv(IKey key, IKeyDerivOpts opts) throws JulongChainException {
+    public IKey keyDeriv(IKey key, IKeyDerivOpts opts) throws CspException {
     	
     	if(key instanceof EcdsaKeyOpts.EcdsaPubKey)
     	{
@@ -150,17 +155,17 @@ public class PKCS11Csp implements IPKCS11Csp {
     			if(key.ski().length <= 0)
     	        {
                     csplog.setLogMsg("[JC_PKCS]:keyDeriv Param Err!", 2, PKCS11Csp.class);
-    	        	throw new JulongChainException("[JC_PKCS]:Param Err!");
+    	        	throw new CspException("[JC_PKCS]:Param Err!");
     	        }
     	        byte[] byski = new byte[key.ski().length-1];
     	        System.arraycopy(key.ski(), 1, byski, 0, key.ski().length-1);
     	        
     	        EcdsaImpl.ImportECKey importkey = new EcdsaImpl.ImportECKey();
     	        byte[] newski = importkey.importECKey(null,key.toBytes(),opts.isEphemeral(),PKCS11FactoryOpts,false);  
-    	        if(!DataUtil.compereByteArray(newski, byski))
+    	        if(!DataUtil.compareByteArray(newski, byski))
     			{
                     csplog.setLogMsg("[JC_PKCS]:Import key value err! Can not continue to KeyDeriv!", 2, PKCS11Csp.class);
-    				throw new JulongChainException("[JC_PKCS]:Import key value err! Can not continue to KeyDeriv!");
+    				throw new CspException("[JC_PKCS]:Import key value err! Can not continue to KeyDeriv!");
     			}
     	        
     			IKey mykey = deriv.deriveKey(byski, opts.isEphemeral(), false, PKCS11FactoryOpts);
@@ -170,7 +175,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     			if(key.ski().length <= 0)
     	        {
                     csplog.setLogMsg("[JC_PKCS]:keyDeriv Param Err!", 2, PKCS11Csp.class);
-    	        	throw new JulongChainException("[JC_PKCS]:Param Err!");
+    	        	throw new CspException("[JC_PKCS]:Param Err!");
     	        }
     	        byte[] byski = new byte[key.ski().length-1];
     	        System.arraycopy(key.ski(), 1, byski, 0, key.ski().length-1);
@@ -181,7 +186,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     			if(key.ski().length <= 0)
     	        {
                     csplog.setLogMsg("[JC_PKCS]:keyDeriv Param Err!", 2, PKCS11Csp.class);
-    	        	throw new JulongChainException("[JC_PKCS]:Param Err!");
+    	        	throw new CspException("[JC_PKCS]:Param Err!");
     	        }
     	        byte[] byski = new byte[key.ski().length-1];
     	        System.arraycopy(key.ski(), 1, byski, 0, key.ski().length-1);
@@ -201,17 +206,17 @@ public class PKCS11Csp implements IPKCS11Csp {
     			if(key.ski().length <= 0)
     	        {
                     csplog.setLogMsg("[JC_PKCS]:keyDeriv Param Err!", 2, PKCS11Csp.class);
-    	        	throw new JulongChainException("[JC_PKCS]:keyDeriv Param Err!");
+    	        	throw new CspException("[JC_PKCS]:keyDeriv Param Err!");
     	        }
     	        byte[] byski = new byte[key.ski().length-1];
     	        System.arraycopy(key.ski(), 1, byski, 0, key.ski().length-1);
     	        
     	        EcdsaImpl.ImportECKey importkey = new EcdsaImpl.ImportECKey();
     			byte[] newski = importkey.importECKey(key.toBytes(),key.getPublicKey().toBytes(),opts.isEphemeral(),PKCS11FactoryOpts,false);
-    			if(!DataUtil.compereByteArray(newski, byski))
+    			if(!DataUtil.compareByteArray(newski, byski))
     			{
                     csplog.setLogMsg("[JC_PKCS]:Import key value err! Can not continue to KeyDeriv!", 2, PKCS11Csp.class);
-                    throw new JulongChainException("[JC_PKCS]:Import key value err! Can not continue to KeyDeriv!");
+                    throw new CspException("[JC_PKCS]:Import key value err! Can not continue to KeyDeriv!");
     			}
     			
     			IKey mykey = deriv.deriveKey(byski, opts.isEphemeral(), true, PKCS11FactoryOpts);
@@ -227,12 +232,12 @@ public class PKCS11Csp implements IPKCS11Csp {
     }
 
     @Override
-    public IKey keyImport(Object raw, IKeyImportOpts opts) throws JulongChainException {
+    public IKey keyImport(Object raw, IKeyImportOpts opts) throws CspException {
 
         if(raw == null || opts == null)
         {
             csplog.setLogMsg("[JC_PKCS]:KeyImport Param Err!", 2, PKCS11Csp.class);
-            throw new JulongChainException("[JC_PKCS]:Param Err!");
+            throw new CspException("[JC_PKCS]:Param Err!");
         }
 
         byte[] ski;
@@ -285,13 +290,13 @@ public class PKCS11Csp implements IPKCS11Csp {
     }
 
     @Override
-    public IKey getKey(byte[] ski) throws JulongChainException {
+    public IKey getKey(byte[] ski) throws CspException {
         IKey key = null;
 
         if(ski.length <= 0)
         {
             csplog.setLogMsg("The Param Error!", 2, PKCS11Csp.class);
-            throw new JulongChainException("[JC_PKCS]:The Param Error!");
+            throw new CspException("[JC_PKCS]:The Param Error!");
         }
         byte[] byski = new byte[ski.length-1];
         System.arraycopy(ski, 1, byski, 0, ski.length-1);
@@ -319,11 +324,11 @@ public class PKCS11Csp implements IPKCS11Csp {
     }
 
     @Override
-    public byte[] hash(byte[] msg, IHashOpts opts) throws JulongChainException {
+    public byte[] hash(byte[] msg, IHashOpts opts) throws CspException {
         if(opts == null || msg == null)
         {
             csplog.setLogMsg("The Param Error!", 2, PKCS11Csp.class);
-            throw new JulongChainException("[JC_PKCS]:The Param Error!");
+            throw new CspException("[JC_PKCS]:The Param Error!");
         }
 
         PKCS11Digest p11digest = null;
@@ -368,11 +373,11 @@ public class PKCS11Csp implements IPKCS11Csp {
     }
 
     @Override
-    public IHash getHash(IHashOpts opts) throws JulongChainException {
+    public IHash getHash(IHashOpts opts) throws CspException {
         if(opts == null)
         {
             csplog.setLogMsg("The Param Error!", 2, PKCS11Csp.class);
-            throw new JulongChainException("[JC_PKCS]:The Param Error!");
+            throw new CspException("[JC_PKCS]:The Param Error!");
         }
 
         PKCS11Digest p11digest = null;
@@ -415,11 +420,11 @@ public class PKCS11Csp implements IPKCS11Csp {
     }
 
     @Override
-    public byte[] sign(IKey key, byte[] digest, ISignerOpts opts) throws JulongChainException {
+    public byte[] sign(IKey key, byte[] digest, ISignerOpts opts) throws CspException {
         if(opts == null)
         {
             csplog.setLogMsg("The Param For Sign is Error!", 2, PKCS11Csp.class);
-            throw new JulongChainException("[JC_PKCS]:The Param For Sign is Error!");
+            throw new CspException("[JC_PKCS]:The Param For Sign is Error!");
         }
 
         // RSA sign
@@ -446,16 +451,16 @@ public class PKCS11Csp implements IPKCS11Csp {
         }
 
         csplog.setLogMsg("No Support the Opts for Sign!", 2, PKCS11Csp.class);
-        throw new JulongChainException("[JC_PKCS]:No Support the Opts for Sign!");
+        throw new CspException("[JC_PKCS]:No Support the Opts for Sign!");
 
     }
 
     @Override
-    public boolean verify(IKey key, byte[] signature, byte[] digest, ISignerOpts opts) throws JulongChainException {
+    public boolean verify(IKey key, byte[] signature, byte[] digest, ISignerOpts opts) throws CspException {
         if(opts == null)
         {
             csplog.setLogMsg("The Param For Verify is Error!", 2, PKCS11Csp.class);
-            throw new JulongChainException("[JC_PKCS]:The Param For Verify is Error!");
+            throw new CspException("[JC_PKCS]:The Param For Verify is Error!");
         }
 
         // RSA
@@ -479,16 +484,16 @@ public class PKCS11Csp implements IPKCS11Csp {
         }
 
         csplog.setLogMsg("No Support the Opts for Verify!", 2, PKCS11Csp.class);
-        throw new JulongChainException("[JC_PKCS]:No Support the Opts for Verify!");
+        throw new CspException("[JC_PKCS]:No Support the Opts for Verify!");
     }
 
 
     @Override
-    public byte[] encrypt(IKey key, byte[] plaintext, IEncrypterOpts opts) throws JulongChainException {
+    public byte[] encrypt(IKey key, byte[] plaintext, IEncrypterOpts opts) throws CspException {
         if(opts == null)
         {
         	csplog.setLogMsg("The Param For Encrypt is Error!", 2, PKCS11Csp.class);
-        	throw new JulongChainException("[JC_PKCS]:The Param For Encrypt is Error!");
+        	throw new CspException("[JC_PKCS]:The Param For Encrypt is Error!");
         }
 
         if (opts instanceof RsaEncrypterOpts) {
@@ -510,16 +515,16 @@ public class PKCS11Csp implements IPKCS11Csp {
         }
 
         csplog.setLogMsg("No Support the Opts for Encrypt!", 2, PKCS11Csp.class);
-        throw new JulongChainException("[JC_PKCS]:No Support the Opts for Encrypt!");
+        throw new CspException("[JC_PKCS]:No Support the Opts for Encrypt!");
 
     }
 
     @Override
-    public byte[] decrypt(IKey key, byte[] ciphertext, IDecrypterOpts opts) throws JulongChainException {
+    public byte[] decrypt(IKey key, byte[] ciphertext, IDecrypterOpts opts) throws CspException {
         if(opts == null)
         {
             csplog.setLogMsg("The Param For Decrypt is Error!", 2, PKCS11Csp.class);
-            throw new JulongChainException("[JC_PKCS]:The Param For Decrypt is Error!");
+            throw new CspException("[JC_PKCS]:The Param For Decrypt is Error!");
         }
 
         if (opts instanceof RsaDecrypterOpts) {
@@ -541,11 +546,11 @@ public class PKCS11Csp implements IPKCS11Csp {
         }
 
         csplog.setLogMsg("No Support the Opts for Decrypt!", 2, PKCS11Csp.class);
-        throw new JulongChainException("[JC_PKCS]:No Support the Opts for Decrypt!");
+        throw new CspException("[JC_PKCS]:No Support the Opts for Decrypt!");
     }
 
     @Override
-    public byte[] rng(int len, IRngOpts opts) throws JulongChainException {
+    public byte[] rng(int len, IRngOpts opts) throws CspException {
         //byte[] none=new SecureRandom().engineGenerateSeed(len);
         //return none;
     	try {
@@ -557,7 +562,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     		ex.printStackTrace();
             String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
             csplog.setLogMsg(err, 2, PKCS11Csp.class);
-            throw new JulongChainException(err, ex.getCause());
+            throw new CspException(err, ex.getCause());
     	}
     	
     }

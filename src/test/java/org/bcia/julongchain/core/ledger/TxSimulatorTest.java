@@ -18,26 +18,30 @@ package org.bcia.julongchain.core.ledger;
 import com.google.protobuf.ByteString;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.TxRwSet;
+import org.bcia.julongchain.common.ledger.util.Utils;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
-import org.bcia.julongchain.protos.ledger.queryresult.KvQueryResult;
-import org.bcia.julongchain.protos.ledger.rwset.Rwset;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.ExpectedException;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import static org.junit.Assert.*;
+
+
 /**
- * 类描述
+ * 交易模拟器测试
+ * 账本创建参见org.bcia.julongchain.common.ledger.util.Utils
+ * 起始世界状态	key0:value0
+ * 				key1:value1
+ * 				key2:value2
+ * 				key3:value3
+ * 				中文测试:中文测试
  *
  * @author sunzongyu
  * @date 2018/04/24
@@ -45,29 +49,34 @@ import java.util.List;
  */
 public class TxSimulatorTest {
     ITxSimulator simulator = null;
-    INodeLedger ledger = null;
+    static INodeLedger ledger = null;
     TxSimulationResults txSimulationResults = null;
-    final String ledgerID = "myGroup";
-    final String ns = "jdoe-voucher";
+    static final String ledgerID = "myGroup";
+    final String ns = "mycc";
 
     @Rule
-    public ExpectedException expectedEx = ExpectedException.none();
+    public ExpectedException thrown = ExpectedException.none();
+
+    @BeforeClass
+    public static void beforeClass() throws Exception  {
+		Utils.resetEnv();
+		Utils.constructDefaultLedger();
+        ledger = LedgerManager.openLedger(ledgerID);
+    }
 
     @Before
-    public void before() throws LedgerException  {
-        LedgerManager.initialize(null);
-        ledger = LedgerManager.openLedger(ledgerID);
-        simulator = ledger.newTxSimulator("5");
-    }
+	public void before() throws Exception {
+    	LedgerManager.initialize(null);
+		ledger = LedgerManager.openLedger(ledgerID);
+		simulator = ledger.newTxSimulator("5");
+	}
 
     @Test
     public void testSetState() throws Exception {
-    	expectedEx.expect(LedgerException.class);
-    	expectedEx.expectMessage("This instance should not be used after calling Done()");
         ByteString rwset = null;
         KvRwset.KVRWSet kvRWSet = null;
-        simulator.setState(ledgerID, "key", "test set state".getBytes());
-        simulator.setState(ledgerID, "key1", "test set state".getBytes());
+        simulator.setState(ns, "key", "test set state".getBytes(StandardCharsets.UTF_8));
+        simulator.setState(ns, "key1", "test set state".getBytes(StandardCharsets.UTF_8));
         txSimulationResults = simulator.getTxSimulationResults();
         rwset = txSimulationResults.getPublicReadWriteSet().getNsRwset(0).getRwset();
         kvRWSet = KvRwset.KVRWSet.parseFrom(rwset);
@@ -75,23 +84,23 @@ public class TxSimulatorTest {
         Assert.assertEquals(kvRWSet.getWrites(1).getKey(), "key1");
         Assert.assertEquals(kvRWSet.getWrites(0).getValue().toStringUtf8(), "test set state");
         Assert.assertEquals(kvRWSet.getWrites(1).getValue().toStringUtf8(), "test set state");
-        simulator.setState(ledgerID + "1", "key", "test set state".getBytes());
+    	thrown.expect(LedgerException.class);
+        simulator.setState(ns + "1", "key", "test set state".getBytes(StandardCharsets.UTF_8));
     }
 
     @Test
     public void testDeleteState() throws Exception{
-	    expectedEx.expect(LedgerException.class);
-	    expectedEx.expectMessage("This instance should not be used after calling Done()");
         ByteString rwset = null;
         KvRwset.KVRWSet kvRWSet = null;
-        simulator.deleteState(ledgerID, "key");
+        simulator.deleteState(ns, "key");
         txSimulationResults = simulator.getTxSimulationResults();
         rwset = txSimulationResults.getPublicReadWriteSet().getNsRwset(0).getRwset();
         kvRWSet = KvRwset.KVRWSet.parseFrom(rwset);
         Assert.assertEquals(kvRWSet.getWrites(0).getKey(), "key");
         Assert.assertTrue(kvRWSet.getWrites(0).getIsDelete());
         Assert.assertEquals(kvRWSet.getWrites(0).getValue().toStringUtf8(), "");
-        simulator.setState(ledgerID, "key", "test set state".getBytes());
+		thrown.expect(LedgerException.class);
+        simulator.setState(ns, "key", "test set state".getBytes(StandardCharsets.UTF_8));
     }
 
     @Test
@@ -99,12 +108,12 @@ public class TxSimulatorTest {
         ByteString rwset = null;
         KvRwset.KVRWSet kvRWSet = null;
         simulator.setStateMultipleKeys(ledgerID, new HashMap<String, byte[]>(){{
-            put("key1", "test set state1".getBytes());
-            put("key2", "test set state2".getBytes());
-            put("key3", "test set state3".getBytes());
-            put("key4", "test set state4".getBytes());
-            put("key5", "test set state5".getBytes());
-            put("key6", "test set state6".getBytes());
+            put("key1", "test set state1".getBytes(StandardCharsets.UTF_8));
+            put("key2", "test set state2".getBytes(StandardCharsets.UTF_8));
+            put("key3", "test set state3".getBytes(StandardCharsets.UTF_8));
+            put("key4", "test set state4".getBytes(StandardCharsets.UTF_8));
+            put("key5", "test set state5".getBytes(StandardCharsets.UTF_8));
+            put("key6", "test set state6".getBytes(StandardCharsets.UTF_8));
         }});
         txSimulationResults = simulator.getTxSimulationResults();
         rwset = txSimulationResults.getPublicReadWriteSet().getNsRwset(0).getRwset();
@@ -116,24 +125,27 @@ public class TxSimulatorTest {
             Assert.assertFalse(write.getIsDelete());
             Assert.assertEquals(write.getValue().toStringUtf8(), "test set state" + j);
         }
+		thrown.expect(LedgerException.class);
+		simulator.setState(ns, "key", "test set state".getBytes(StandardCharsets.UTF_8));
     }
 
     /*-------------------------------------------------------------------
+		现阶段没有使用PvtData
     @Test
     public void testsetPrivateData() throws Exception{
-	    expectedEx.expect(LedgerException.class);
-	    expectedEx.expectMessage("This instance should not be used after calling Done()");
+	    thrown.expect(LedgerException.class);
+	    thrown.expectMessage("This instance should not be used after calling Done()");
         ByteString rwset = null;
         KvRwset.KVRWSet kvRWSet = null;
         Rwset.CollectionPvtReadWriteSet CollRWSet = null;
-        simulator.setPrivateData(ns, coll, "key", "test set private data".getBytes());
+        simulator.setPrivateData(ns, coll, "key", "test set private data".getBytes(StandardCharsets.UTF_8));
         txSimulationResults = simulator.getTxSimulationResults();
         rwset = txSimulationResults.getPrivateReadWriteSet().getNsPvtRwset(0).getCollectionPvtRwset(0).getRwset();
         kvRWSet = KvRwset.KVRWSet.parseFrom(rwset);
         Assert.assertEquals(kvRWSet.getWrites(0).getKey(), "key");
         Assert.assertFalse(kvRWSet.getWrites(0).getIsDelete());
         Assert.assertEquals(kvRWSet.getWrites(0).getValue().toStringUtf8(), "test set private data");
-        simulator.setPrivateData(ns, coll, "key1", "test set private data1".getBytes());
+        simulator.setPrivateData(ns, coll, "key1", "test set private data1".getBytes(StandardCharsets.UTF_8));
     }
 
     @Test
@@ -141,16 +153,16 @@ public class TxSimulatorTest {
         ByteString rwset = null;
         KvRwset.KVRWSet kvRWSet = null;
         Rwset.CollectionPvtReadWriteSet CollRWSet = null;
-        simulator.setPrivateData(ns, coll, "key", "test set private data".getBytes());
-        simulator.setPrivateData(ns, coll, "key1", "test set private data1".getBytes());
-        simulator.setPrivateData(ns, coll + "1", "key1", "test set private data1".getBytes());
+        simulator.setPrivateData(ns, coll, "key", "test set private data".getBytes(StandardCharsets.UTF_8));
+        simulator.setPrivateData(ns, coll, "key1", "test set private data1".getBytes(StandardCharsets.UTF_8));
+        simulator.setPrivateData(ns, coll + "1", "key1", "test set private data1".getBytes(StandardCharsets.UTF_8));
         simulator.setPirvateDataMultipleKeys(ns, coll + "2", new HashMap<String, byte[]>(){{
-            put("key1", "test set private data mulitiple keys1".getBytes());
-            put("key2", "test set private data mulitiple keys2".getBytes());
-            put("key3", "test set private data mulitiple keys3".getBytes());
-            put("key4", "test set private data mulitiple keys4".getBytes());
-            put("key5", "test set private data mulitiple keys5".getBytes());
-            put("key6", "test set private data mulitiple keys6".getBytes());
+            put("key1", "test set private data mulitiple keys1".getBytes(StandardCharsets.UTF_8));
+            put("key2", "test set private data mulitiple keys2".getBytes(StandardCharsets.UTF_8));
+            put("key3", "test set private data mulitiple keys3".getBytes(StandardCharsets.UTF_8));
+            put("key4", "test set private data mulitiple keys4".getBytes(StandardCharsets.UTF_8));
+            put("key5", "test set private data mulitiple keys5".getBytes(StandardCharsets.UTF_8));
+            put("key6", "test set private data mulitiple keys6".getBytes(StandardCharsets.UTF_8));
 
         }});
         txSimulationResults = simulator.getTxSimulationResults();
@@ -167,8 +179,8 @@ public class TxSimulatorTest {
 
     @Test
     public void testDeletePrivateData() throws Exception{
-	    expectedEx.expect(LedgerException.class);
-	    expectedEx.expectMessage("This instance should not be used after calling Done()");
+	    thrown.expect(LedgerException.class);
+	    thrown.expectMessage("This instance should not be used after calling Done()");
         ByteString rwset = null;
         KvRwset.KVRWSet kvRWSet = null;
         Rwset.CollectionPvtReadWriteSet CollRWSet = null;
@@ -179,7 +191,7 @@ public class TxSimulatorTest {
         Assert.assertEquals(kvRWSet.getWrites(0).getKey(), "key");
         Assert.assertTrue(kvRWSet.getWrites(0).getIsDelete());
         Assert.assertEquals(kvRWSet.getWrites(0).getValue().toStringUtf8(), "");
-        simulator.setPrivateData(ns, coll, "key", "test set private data".getBytes());
+        simulator.setPrivateData(ns, coll, "key", "test set private data".getBytes(StandardCharsets.UTF_8));
         simulator.deletePrivateData(ns, coll, "key");
         txSimulationResults = simulator.getTxSimulationResults();
         rwset = txSimulationResults.getPrivateReadWriteSet().getNsPvtRwset(0).getCollectionPvtRwset(0).getRwset();
@@ -187,8 +199,8 @@ public class TxSimulatorTest {
         Assert.assertEquals(kvRWSet.getWrites(0).getKey(), "key");
         Assert.assertTrue(kvRWSet.getWrites(0).getIsDelete());
         Assert.assertEquals(kvRWSet.getWrites(0).getValue().toStringUtf8(), "");
-        simulator.setPrivateData(ns, coll, "key", "test set private data".getBytes());
-        simulator.setPrivateData(ns, coll, "key1", "test set private data1".getBytes());
+        simulator.setPrivateData(ns, coll, "key", "test set private data".getBytes(StandardCharsets.UTF_8));
+        simulator.setPrivateData(ns, coll, "key1", "test set private data1".getBytes(StandardCharsets.UTF_8));
         simulator.deletePrivateData(ns, coll, "key");
         txSimulationResults = simulator.getTxSimulationResults();
         rwset = txSimulationResults.getPrivateReadWriteSet().getNsPvtRwset(0).getCollectionPvtRwset(0).getRwset();
@@ -206,41 +218,134 @@ public class TxSimulatorTest {
 
     @Test
     public void testGetState() throws Exception {
-		byte[] as = simulator.getState(ns, "a");
-		Assert.assertEquals("10", new String(as));
-		byte[] cs = simulator.getState(ns, "c");
-		Assert.assertEquals("300", new String(cs));
+		ByteString rwset = null;
+		KvRwset.KVRWSet kvRWSet = null;
+    	//存在的state
+		for (int i = 0; i < 4; i++) {
+			byte[] value = simulator.getState(ns, "key" + i);
+			Assert.assertArrayEquals(value, ("value" + i).getBytes(StandardCharsets.UTF_8));
+		}
+		//不存在的state
+		byte[] notExists = simulator.getState(ns, "not exist");
+		assertNull(notExists);
+		txSimulationResults = simulator.getTxSimulationResults();
+		rwset = txSimulationResults.getPublicReadWriteSet().getNsRwset(0).getRwset();
+		kvRWSet = KvRwset.KVRWSet.parseFrom(rwset);
+		int i = 0;
+		for (; i < 4; i++) {
+			KvRwset.KVRead read = kvRWSet.getReadsList().get(i);
+			Assert.assertEquals(read.getKey(), "key" + i);
+			assertSame(1L, read.getVersion().getBlockNum());
+			assertSame((long) i, read.getVersion().getTxNum());
+		}
+		KvRwset.KVRead read = kvRWSet.getReadsList().get(i);
+		Assert.assertEquals("not exist", read.getKey());
+		assertEquals(ByteString.EMPTY, read.getVersion().toByteString());
 	}
 
 	@Test
 	public void testGetStateMultipleKeys() throws Exception{
+		ByteString rwset = null;
+		KvRwset.KVRWSet kvRWSet = null;
+		//存在的state
 		List<byte[]> states = simulator.getStateMultipleKeys(ns, new ArrayList<String>() {{
-			add("a");
-			add("b");
-			add("c");
+			add("key0");
+			add("key1");
+			add("key2");
+			add("key3");
 		}});
-		states.forEach((b) -> {
-			Assert.assertNotNull(b);
-		});
+		states.forEach(Assert::assertNotNull);
+		//不存在的state
+		states = simulator.getStateMultipleKeys(ns, new ArrayList<String>() {{
+			add("not exists 0");
+			add("not exists 1");
+		}});
+		states.forEach(Assert::assertNull);
+		txSimulationResults = simulator.getTxSimulationResults();
+		rwset = txSimulationResults.getPublicReadWriteSet().getNsRwset(0).getRwset();
+		kvRWSet = KvRwset.KVRWSet.parseFrom(rwset);
+		int i = 0;
+		for (; i < 4; i++) {
+			KvRwset.KVRead read = kvRWSet.getReadsList().get(i);
+			Assert.assertEquals(read.getKey(), "key" + i);
+			assertSame(1L, read.getVersion().getBlockNum());
+			assertSame((long) i, read.getVersion().getTxNum());
+		}
+		KvRwset.KVRead read = kvRWSet.getReadsList().get(i++);
+		Assert.assertEquals("not exists 0", read.getKey());
+		assertEquals(ByteString.EMPTY, read.getVersion().toByteString());
+		read  = kvRWSet.getReadsList().get(i++);
+		Assert.assertEquals("not exists 1", read.getKey());
+		assertEquals(ByteString.EMPTY, read.getVersion().toByteString());
 	}
 
 	@Test
 	public void testGetStateRangeScanIterator() throws Exception{
-    	simulator.getState(ns, "a");
-    	simulator.setState(ns, "a1", "haha".getBytes());
-		IResultsIterator itr = simulator.getStateRangeScanIterator(ns, "a", "b");
-		System.out.println(itr.next());
-//		for (int i = 0; i < 6; i++) {
-//			QueryResult n = itr.next();
-//			VersionedKV kv = (VersionedKV) n.getObj();
-//			System.out.println(kv.getCompositeKey().getKey());
-//			System.out.println(new String(kv.getVersionedValue().getValue()));
-//		}
-		TxSimulationResults txSimulationResults = simulator.getTxSimulationResults();
-		Rwset.TxReadWriteSet publicReadWriteSet = txSimulationResults.getPublicReadWriteSet();
-		TxRwSet txRwSet = new TxRwSet();
-		txRwSet.fromProtoBytes(publicReadWriteSet.getNsRwset(0).getRwset());
-		System.out.println(publicReadWriteSet);
+		IResultsIterator itr = simulator.getStateRangeScanIterator(ns, "key", "kez");
+		int i = 0;
+		while (true) {
+			QueryResult next = itr.next();
+			if (next == null) {
+				break;
+			}
+			i++;
+			VersionedKV kv = (VersionedKV) next.getObj();
+			assertNotNull(kv.getCompositeKey().getKey());
+			assertTrue(kv.getCompositeKey().getKey().contains("key"));
+		}
+		assertSame(4, i);
+
+		i = 0;
+		itr = simulator.getStateRangeScanIterator(ns, "key0", "key3");
+		while (true) {
+			QueryResult next = itr.next();
+			if (next == null) {
+				break;
+			}
+			i++;
+			VersionedKV kv = (VersionedKV) next.getObj();
+			assertNotNull(kv.getCompositeKey().getKey());
+			assertTrue(kv.getCompositeKey().getKey().contains("key"));
+		}
+		assertSame(3, i);
+
+		i = 0;
+		itr = simulator.getStateRangeScanIterator(ns, "kez", null);
+		while (true) {
+			QueryResult next = itr.next();
+			if (next == null) {
+				break;
+			}
+			i++;
+			VersionedKV kv = (VersionedKV) next.getObj();
+			assertNotNull(kv.getCompositeKey().getKey());
+		}
+		assertSame(1, i);
+
+		i = 0;
+		itr = simulator.getStateRangeScanIterator(ns, null, "key2");
+		while (true) {
+			QueryResult next = itr.next();
+			if (next == null) {
+				break;
+			}
+			i++;
+			VersionedKV kv = (VersionedKV) next.getObj();
+		}
+		assertSame(2, i);
+
+
+		i = 0;
+		itr = simulator.getStateRangeScanIterator(ns, null, null);
+		while (true) {
+			QueryResult next = itr.next();
+			if (next == null) {
+				break;
+			}
+			i++;
+			VersionedKV kv = (VersionedKV) next.getObj();
+		}
+		assertSame(5, i);
 	}
 
 	/*-------------------------------------------------------------
@@ -249,7 +354,7 @@ public class TxSimulatorTest {
 	public void testGetPrivateData() throws Exception{
 		for (int i = 0; i < 6; i++) {
 			byte[] privateData = simulator.getPrivateData(ledgerID, "coll", "key" + i);
-			Assert.assertTrue(Arrays.equals(privateData, ("pvt value" + i).getBytes()));
+			Assert.assertTrue(Arrays.equals(privateData, ("pvt value" + i).getBytes(StandardCharsets.UTF_8)));
 		}
 	}
 
@@ -264,7 +369,7 @@ public class TxSimulatorTest {
 			add("key5");
 		}});
 		for (int i = 0; i < 6; i++) {
-			Assert.assertTrue(Arrays.equals(privateDatas.get(i), ("pvt value" + i).getBytes()));
+			Assert.assertTrue(Arrays.equals(privateDatas.get(i), ("pvt value" + i).getBytes(StandardCharsets.UTF_8)));
 		}
 	}
 
@@ -281,13 +386,6 @@ public class TxSimulatorTest {
 	}
 
 	-------------------------------------------------------------*/
-
-    private static void soutBytes(byte[] bytes){
-        int i = 0;
-        for(byte b : bytes){
-            System.out.print(b + " ");
-        }
-    }
 }
 
 

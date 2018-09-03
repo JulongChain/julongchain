@@ -25,7 +25,7 @@ import org.bcia.julongchain.csp.gm.sdt.SdtGmFactoryOpts;
 import java.util.*;
 
 /**
- * 类描述
+ * Csp选项管理器
  *
  * @author zhouhui
  * @date 2018/06/13
@@ -69,7 +69,7 @@ public class CspOptsManager {
             factoryOpts = new GmFactoryOpts();
         }
 
-        ValidateUtils.isNotNull(factoryOpts, "can not support this csp yet: " + name);
+        ValidateUtils.isNotNull(factoryOpts, "Can not support this csp yet: " + name);
 
         factoryOpts.parseFrom(optionMap);
 

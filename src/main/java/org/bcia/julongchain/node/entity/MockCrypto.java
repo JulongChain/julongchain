@@ -16,7 +16,7 @@
 package org.bcia.julongchain.node.entity;
 
 /**
- * 类描述
+ * 模拟密码工具
  *
  * @author zhouhui
  * @date 2018/3/13

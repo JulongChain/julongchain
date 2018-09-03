@@ -18,6 +18,13 @@ package org.bcia.julongchain.gossip.comm;
 import org.bcia.julongchain.core.smartcontract.shim.helper.Channel;
 import org.bcia.julongchain.gossip.common.IMessageAcceptor;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public class Group {
 
     private IMessageAcceptor pred;

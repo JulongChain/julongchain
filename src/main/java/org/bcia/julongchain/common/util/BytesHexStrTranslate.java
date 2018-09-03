@@ -22,6 +22,7 @@ package org.bcia.julongchain.common.util;
  * @date 5/16/18
  * @company Dingxuan
  */
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 public class BytesHexStrTranslate {
@@ -110,7 +111,7 @@ public class BytesHexStrTranslate {
     }
 
     public static void main(String[] args) throws Exception {
-        byte[] bytes = "测试".getBytes("utf-8");
+        byte[] bytes = "测试".getBytes(StandardCharsets.UTF_8);
         System.out.println("字节数组为：" + Arrays.toString(bytes));
         System.out.println("方法一：" + bytesToHexFun1(bytes));
         System.out.println("方法二：" + bytesToHexFun2(bytes));

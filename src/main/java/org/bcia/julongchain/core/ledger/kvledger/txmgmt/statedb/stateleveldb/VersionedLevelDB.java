@@ -21,11 +21,12 @@ import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.common.ledger.util.IDBProvider;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
-import org.bcia.julongchain.common.util.BytesHexStrTranslate;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
-import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.StatedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
+import org.bcia.julongchain.core.ledger.util.Util;
+import org.bouncycastle.util.encoders.Hex;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -39,9 +40,8 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class VersionedLevelDB implements IVersionedDB {
-    private static final byte[] COMPOSITE_KEY_SEP = {0x00};
-    private static final byte LAST_KEY_INDICATOR = 0x01;
-    private static final byte[] SAVE_POINT_KEY = {0x00};
+    private static final byte[] COMPOSITE_KEY_SEP = new String(new char[]{Character.MIN_VALUE}).getBytes();
+    private static final byte[] SAVE_POINT_KEY = new String(new char[]{Character.MIN_VALUE}).getBytes();
 
 	private static JulongChainLog log = JulongChainLogFactory.getLog(VersionedLevelDB.class);
 
@@ -72,12 +72,12 @@ public class VersionedLevelDB implements IVersionedDB {
     }
 
     @Override
-    public LedgerHeight getVersion(String namespace, String key) throws LedgerException {
+    public LedgerHeight getHeight(String namespace, String key) throws LedgerException {
         VersionedValue versionedValue = getState(namespace, key);
         if (versionedValue == null) {
             return null;
         } else {
-            return versionedValue.getVersion();
+            return versionedValue.getHeight();
         }
     }
 
@@ -94,12 +94,8 @@ public class VersionedLevelDB implements IVersionedDB {
     @Override
     public IResultsIterator getStateRangeScanIterator(String namespace, String startKey, String endKey) throws LedgerException {
         byte[] compositeStartKey = constructCompositeKey(namespace, startKey);
-        byte[] compositeEndKey = constructCompositeKey(namespace, endKey);
-        if(endKey == null || "".equals(endKey)){
-            compositeEndKey[compositeEndKey.length - 1] = LAST_KEY_INDICATOR;
-        }
         Iterator dbItr = db.getIterator(compositeStartKey);
-        return new KvScanner(namespace, dbItr);
+        return new KvScanner(namespace, dbItr, endKey);
     }
 
     @Override
@@ -121,12 +117,12 @@ public class VersionedLevelDB implements IVersionedDB {
                 String key = entry.getKey();
                 byte[] compositeKey = constructCompositeKey(ns, key);
                 log.debug(String.format("Group [%s]: Applying key(String)=[%s] key(bytes)=[%s]"
-                        , dbName, new String(compositeKey), BytesHexStrTranslate.bytesToHexFun1(compositeKey )));
+                        , dbName, new String(compositeKey), Hex.toHexString(compositeKey)));
 
                 if(entry.getValue() == null){
                     dbBatch.delete(compositeKey);
                 } else {
-                    dbBatch.put(compositeKey, StatedDB.encodeValue(entry.getValue().getValue(), entry.getValue().getVersion()));
+                    dbBatch.put(compositeKey, Util.encodeValue(entry.getValue().getValue(), entry.getValue().getHeight()));
                 }
             }
         }
@@ -164,11 +160,11 @@ public class VersionedLevelDB implements IVersionedDB {
     }
 
     public static byte[] constructCompositeKey(String ns, String key){
-        byte[] result = ArrayUtils.addAll(ns.getBytes(), COMPOSITE_KEY_SEP);
+        byte[] result = ArrayUtils.addAll(ns.getBytes(StandardCharsets.UTF_8), COMPOSITE_KEY_SEP);
         if(key == null){
-            return ArrayUtils.addAll(result, new byte[0]);
+        	return result;
         } else {
-            return ArrayUtils.addAll(result, key.getBytes());
+            return ArrayUtils.addAll(result, key.getBytes(StandardCharsets.UTF_8));
         }
     }
 

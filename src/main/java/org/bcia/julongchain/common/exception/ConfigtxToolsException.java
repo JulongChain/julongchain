@@ -16,7 +16,7 @@
 package org.bcia.julongchain.common.exception;
 
 /**
- * 类描述
+ * 交易生成工具异常
  *
  * @author zhouhui
  * @date 2018/06/05

@@ -91,14 +91,6 @@ public class GenesisBlockFactory implements IGenesisBlockFactory {
         blockMetadataBuilder.addMetadata(Common.Metadata.newBuilder().build().toByteString());
         blockMetadataBuilder.addMetadata(Common.Metadata.newBuilder().build().toByteString());
 
-//        blockMetadataBuilder.setMetadata(Common.BlockMetadataIndex.SIGNATURES_VALUE, Common.Metadata.newBuilder()
-//                .build().toByteString());
-//        blockMetadataBuilder.setMetadata(Common.BlockMetadataIndex.LAST_CONFIG_VALUE, metadata.toByteString());
-//        blockMetadataBuilder.setMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER_VALUE, Common.Metadata.newBuilder()
-//                .build().toByteString());
-//        blockMetadataBuilder.setMetadata(Common.BlockMetadataIndex.CONSENTER_VALUE, Common.Metadata.newBuilder()
-//                .build().toByteString());
-
         Common.BlockMetadata blockMetadata = blockMetadataBuilder.build();
 
         //构造最终区块

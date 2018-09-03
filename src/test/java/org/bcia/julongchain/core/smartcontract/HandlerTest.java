@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,6 +44,7 @@ import static org.mockito.Mockito.when;
 
 /**
  * Peer侧链码处理器单元测试
+ * todo v0.8版本暂未启用
  *
  * @author sunzongyu
  * @date 2018/03/23

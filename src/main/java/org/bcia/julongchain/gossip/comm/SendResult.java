@@ -15,11 +15,18 @@
  */
 package org.bcia.julongchain.gossip.comm;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public class SendResult {
 
     private Boolean sendSuccess;
     private String errorMessage;
-    private RemotePeer remotePeer;
+    private RemoteNode remoteNode;
 
     public Boolean getSendSuccess() {
         return sendSuccess;
@@ -37,11 +44,11 @@ public class SendResult {
         this.errorMessage = errorMessage;
     }
 
-    public RemotePeer getRemotePeer() {
-        return remotePeer;
+    public RemoteNode getRemoteNode() {
+        return remoteNode;
     }
 
-    public void setRemotePeer(RemotePeer remotePeer) {
-        this.remotePeer = remotePeer;
+    public void setRemoteNode(RemoteNode remoteNode) {
+        this.remoteNode = remoteNode;
     }
 }

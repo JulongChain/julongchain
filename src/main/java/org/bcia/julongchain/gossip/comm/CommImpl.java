@@ -31,7 +31,7 @@ import java.time.Duration;
 /**
  * class description
  *
- * @author
+ * @author wanliangbing
  * @date 18-7-24
  * @company Dingxuan
  */
@@ -45,7 +45,7 @@ public class CommImpl implements IComm, IConnFactory{
     private static final JulongChainLog log = JulongChainLogFactory.getLog(CommImpl.class);
     private TLSCertificates tlsCerts;
     private PubSub pubSub;
-    private byte[] peerIdentity;
+    private byte[] nodeIdentity;
     private IMapper idMapper;
     private ConnectionStore connStore;
     private byte[] PKIID;
@@ -63,22 +63,22 @@ public class CommImpl implements IComm, IConnFactory{
     }
 
     @Override
-    public void send(SignedGossipMessage msg, RemotePeer... peers) {
+    public void send(SignedGossipMessage msg, RemoteNode... nodes) {
 
     }
 
     @Override
-    public SendResult[] sendWithAck(SignedGossipMessage msg, Duration timeout, Integer minAck, RemotePeer... peers) {
+    public SendResult[] sendWithAck(SignedGossipMessage msg, Duration timeout, Integer minAck, RemoteNode... nodes) {
         return new SendResult[0];
     }
 
     @Override
-    public void probe(RemotePeer peer) throws GossipException {
+    public void probe(RemoteNode node) throws GossipException {
 
     }
 
     @Override
-    public byte[] handshake(RemotePeer peer) throws GossipException {
+    public byte[] handshake(RemoteNode node) throws GossipException {
         return new byte[0];
     }
 
@@ -93,7 +93,7 @@ public class CommImpl implements IComm, IConnFactory{
     }
 
     @Override
-    public void closeConn(RemotePeer peer) {
+    public void closeConn(RemoteNode node) {
 
     }
 
@@ -143,12 +143,12 @@ public class CommImpl implements IComm, IConnFactory{
         this.pubSub = pubSub;
     }
 
-    public byte[] getPeerIdentity() {
-        return peerIdentity;
+    public byte[] getNodeIdentity() {
+        return nodeIdentity;
     }
 
-    public void setPeerIdentity(byte[] peerIdentity) {
-        this.peerIdentity = peerIdentity;
+    public void setNodeIdentity(byte[] nodeIdentity) {
+        this.nodeIdentity = nodeIdentity;
     }
 
     public IMapper getIdMapper() {

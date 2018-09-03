@@ -28,16 +28,11 @@ public interface ISmartContractInfoProvider {
 
     /**
      * 智能合约是否配置
-     * @param groupID
-     * @param smartContractDefinition
-     * @return
      */
     boolean isSmartContractDeployed(String groupID, SmartContractDefinition smartContractDefinition) throws JulongChainException;
 
     /**
      * 查询智能合约实体
-     * @param smartContractDefinition
-     * @return
      */
     byte[] retrieveSmartContractArtifacts(SmartContractDefinition smartContractDefinition) throws JulongChainException;
 }

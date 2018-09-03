@@ -9,6 +9,7 @@ import org.bcia.julongchain.common.util.proto.TxUtils;
 import org.bcia.julongchain.msp.IIdentityDeserializer;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.msp.mgmt.IMspPrincipalGetter;
+import org.bcia.julongchain.msp.mgmt.MSPPrincipalGetter;
 import org.bcia.julongchain.msp.mgmt.Msp;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
@@ -79,7 +80,7 @@ public class PolicyCheckerTest {
     @Test
     public void checkPolicyNoChannel() throws JulongChainException {
         IIdentityDeserializer localmsp = GlobalMspManagement.getLocalMsp();
-        IMspPrincipalGetter principalGetter = mock(IMspPrincipalGetter.class);
+        IMspPrincipalGetter principalGetter = new MSPPrincipalGetter();//mock(IMspPrincipalGetter.class);
         PolicyChecker policyChecker = new PolicyChecker(new GroupPolicyManagerGetter(),localmsp,principalGetter);
         ProposalPackage.SignedProposal sp = TxUtils.mockSignedEndorserProposalOrPanic("",
                 SmartContractPackage.SmartContractSpec.newBuilder().build());

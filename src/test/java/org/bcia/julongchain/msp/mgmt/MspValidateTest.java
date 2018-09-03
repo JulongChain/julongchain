@@ -5,6 +5,7 @@ import org.bcia.julongchain.common.util.FileUtils;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2;
 import org.bcia.julongchain.csp.gm.dxct.sm3.SM3;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.jcajce.provider.asymmetric.ec.BCECPrivateKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Base64;
@@ -171,11 +172,11 @@ public class MspValidateTest {
 
 
     @Test
-    public  void base64() throws NoSuchAlgorithmException, InvalidKeySpecException, IOException {
+    public  void base64() throws NoSuchAlgorithmException, InvalidKeySpecException, IOException, CryptoException {
 //        final Base64.Decoder decoder =  Base64.Decoder.getDecoder();
 //        final Base64.Encoder encoder = Base64.getEncoder();
 //        final String text = "字串文字";
-//        final byte[] textByte = text.getBytes("UTF-8");
+//        final byte[] textByte = text.getBytes(StandardCharsets.UTF_8);
 ////编码
 //        final String encodedText = encoder.encodeToString(textByte);
 //        System.out.println(encodedText);
@@ -185,7 +186,7 @@ public class MspValidateTest {
 //        final Base64.Decoder decoder = Base64.getDecoder();
 //        final Base64.Encoder encoder = Base64.getEncoder();
 //        final String text = "字串文字";
-//        final byte[] textByte = text.getBytes("UTF-8");
+//        final byte[] textByte = text.getBytes(StandardCharsets.UTF_8);
 ////编码
 //        final String encodedText = encoder.encodeToString(textByte);
 //        System.out.println(encodedText);

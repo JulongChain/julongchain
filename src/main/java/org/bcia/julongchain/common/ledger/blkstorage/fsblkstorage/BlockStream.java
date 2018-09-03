@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +18,7 @@ package org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
-import org.bcia.julongchain.common.util.BytesHexStrTranslate;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.util.AbstractMap;
 
@@ -70,7 +70,7 @@ public class BlockStream {
     public AbstractMap.SimpleEntry<byte[], BlockPlacementInfo> nextBlockBytesAndPlacementInfo() throws LedgerException{
         AbstractMap.SimpleEntry<byte[], BlockPlacementInfo> entry = currentFileStream.nextBlockBytesAndPlacementInfo();
         byte[] blockBytes = entry.getKey();
-        log.debug(String.format("Blockbytes [%s] read from file [%d]", BytesHexStrTranslate.bytesToHexFun1(blockBytes), currentFileNum));
+        log.debug(String.format("Blockbytes [%s] read from file [%d]", Hex.toHexString(blockBytes), currentFileNum));
         //当前文件无法读取出block
 		boolean expected = ((blockBytes == null || blockBytes.length == 0) && (currentFileNum < endFileNum || endFileNum < 0));
         if(expected){

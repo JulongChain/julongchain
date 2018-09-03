@@ -15,8 +15,15 @@
  */
 package org.bcia.julongchain.gossip.discovery;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public interface IDisclosurePolicy {
 
-    public Object[] execute(NetworkMember remotePeer);
+    public Object[] execute(NetworkMember remoteNode);
 
 }

@@ -79,7 +79,7 @@ node:
     # The endpoint this node uses to listen for inbound smartContract connections.
     # If this is commented-out, the listen address is selected to be
     # the node's address (see below) with port 7052
-    # smartContractListenAddress: 0.0.0.0:7052
+    smartContractListenAddress: 0.0.0.0:7052
 
     # The endpoint the smartContract for this node uses to connect to the node.
     # If this is not specified, the smartContractListenAddress address is selected.
@@ -322,7 +322,7 @@ node:
                 # KeyStore:
 
     # Path on the file system where node will find MSP local configurations
-    mspConfigPath: /opt/BCIA/JavaChain/src/main/resources/msp
+    mspConfigPath: msp
 
     # Identifier of the local MSP
     # ----!!!!IMPORTANT!!!-!!!IMPORTANT!!!-!!!IMPORTANT!!!!----
@@ -445,7 +445,7 @@ smartContract:
     dockerFile: config/Dockerfile
 
     coreNodeAddress: 172.17.0.1
-    coreNodeAddressPort: 7051
+    coreNodeAddressPort: 7052
 
     # The id is used by the SmartContract stub to register the executing SmartContract
     # ID with the Node and is generally supplied through ENV variables
@@ -561,7 +561,7 @@ ledger:
     # stateDatabase - options are "goleveldb", "CouchDB"
     # goleveldb - default state database stored in goleveldb.
     # CouchDB - store state database in CouchDB
-    stateDatabase: goleveldb
+    stateDatabase: leveldb
     couchDBConfig:
        # It is recommended to run CouchDB on the same server as the node, and
        # not map the CouchDB container port to a server port in docker-compose.

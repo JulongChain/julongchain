@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * class description
  *
- * @author
+ * @author wanliangbing
  * @date 18-7-25
  * @company Dingxuan
  */

@@ -53,7 +53,7 @@ public class QueryResultsItr implements IResultsIterator {
         if(rwSetBuilder != null){
             rwSetBuilder.addToReadSet(versionedQueyrRecord.getCompositeKey().getNamespace(),
                     versionedQueyrRecord.getCompositeKey().getKey(),
-                    versionedQueyrRecord.getVersionedValue().getVersion());
+                    versionedQueyrRecord.getVersionedValue().getHeight());
         }
         return queryResult;
     }

@@ -20,6 +20,7 @@ import org.bcia.julongchain.protos.common.Common;
 import java.io.Serializable;
 
 /**
+ * 配置消息
  * @author zhangmingyang
  * @Date: 2018/3/15
  * @company Dingxuan

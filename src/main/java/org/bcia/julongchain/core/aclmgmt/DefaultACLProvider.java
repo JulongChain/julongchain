@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 类描述
+ * 默认的ACL提供器
  *
  * @author zhouhui
  * @date 2018/06/13
@@ -88,7 +88,7 @@ public class DefaultACLProvider implements IAclProvider {
     public void checkACL(String resName, String groupId, ProposalPackage.SignedProposal signedProposal) throws PolicyException {
         String policyName = groupPolicyMap.get(resName);
         if (StringUtils.isBlank(policyName)) {
-            String errrorMsg = "resName's policy can not be empty: " + resName;
+            String errrorMsg = "ResName's policy can not be empty: " + resName;
             log.error(errrorMsg);
             throw new PolicyException(errrorMsg);
         }
@@ -100,7 +100,7 @@ public class DefaultACLProvider implements IAclProvider {
     public void checkACL(String resName, String groupId, Common.Envelope envelope) throws PolicyException {
         String policyName = groupPolicyMap.get(resName);
         if (StringUtils.isBlank(policyName)) {
-            String errrorMsg = "resName's policy can not be empty: " + resName;
+            String errrorMsg = "ResName's policy can not be empty: " + resName;
             log.error(errrorMsg);
             throw new PolicyException(errrorMsg);
         }

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,8 +32,7 @@ public class Validators {
     private static Map<String, FileValidator> fileValidators = new HashMap<>();
 
     /**
-     * ValidateMetadataFile checks that metadata files are valid
-     * according to the validation rules of the metadata directory (metadataType)
+	 * 使用文件系统中的metadata完成校验
      */
     public static void validateMetadataFile(String fileName, byte[] fileBytes, String metadataType) throws ValidateException {
         if (fileValidators.containsKey(metadataType)) {

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,9 +27,7 @@ import org.bcia.julongchain.protos.node.SmartContractShim;
 import java.io.InputStream;
 
 /**
- * In-Process VM
- * Implement 2 methods:recv() & send()
- * Holds 2 Channel recv & send
+ * In-Process VM实现
  *
  * @author sunzongyu
  * @date 2018/4/2

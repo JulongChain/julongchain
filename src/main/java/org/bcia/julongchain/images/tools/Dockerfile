@@ -13,6 +13,7 @@
 # limitations under the License.
 #
 FROM julongchain/julongchain-baseimage
+MAINTAINER Julongchain "qkl@dxct.org"
 ENV JULONGCHAIN_CFG_PATH /etc/bcia/julongchain
 VOLUME /etc/bcia/julongchain
 ADD  payload/sampleconfig.tar.bz2 $JULONGCHAIN_CFG_PATH

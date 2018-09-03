@@ -15,16 +15,19 @@
  */
 package org.bcia.julongchain.csp.gm.dxct.sm4;
 
+import org.bcia.julongchain.csp.gm.dxct.util.GmCspConstant;
 import org.bcia.julongchain.csp.intfs.opts.IEncrypterOpts;
 
 /**
+ * sm4 加密选项
+ *
  * @author zhangmingyang
  * @Date: 2018/4/28
  * @company Dingxuan
  */
-public class SM4EncrypterOpts implements IEncrypterOpts{
+public class SM4EncrypterOpts implements IEncrypterOpts {
     @Override
     public String getAlgorithm() {
-        return "SM4";
+        return GmCspConstant.SM4;
     }
 }

@@ -15,9 +15,12 @@
  */
 package org.bcia.julongchain.csp.gm.dxct.sm2;
 
+import org.bcia.julongchain.csp.gm.dxct.util.GmCspConstant;
 import org.bcia.julongchain.csp.intfs.opts.ISignerOpts;
 
 /**
+ * sm2签名选项
+ *
  * @author zhangmingyang
  * @Date: 2018/3/27
  * @company Dingxuan
@@ -30,6 +33,6 @@ public class SM2SignerOpts implements ISignerOpts {
 
     @Override
     public String getAlgorithm() {
-        return "SM2";
+        return GmCspConstant.SM2;
     }
 }

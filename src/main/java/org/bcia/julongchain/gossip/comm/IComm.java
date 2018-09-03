@@ -23,23 +23,30 @@ import org.bcia.julongchain.gossip.gossip.SignedGossipMessage;
 
 import java.time.Duration;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public interface IComm {
 
     public byte[] getPKIid();
 
-    public void send(SignedGossipMessage msg, RemotePeer... peers);
+    public void send(SignedGossipMessage msg, RemoteNode... nodes);
 
-    public SendResult[] sendWithAck(SignedGossipMessage msg, Duration timeout, Integer minAck, RemotePeer... peers);
+    public SendResult[] sendWithAck(SignedGossipMessage msg, Duration timeout, Integer minAck, RemoteNode... nodes);
 
-    public void probe(RemotePeer peer) throws GossipException;
+    public void probe(RemoteNode node) throws GossipException;
 
-    public byte[] handshake(RemotePeer peer) throws GossipException;
+    public byte[] handshake(RemoteNode node) throws GossipException;
 
     public Channel<IReceivedMessage> accept(IMessageAcceptor messageAcceptor);
 
     public Channel<byte[]> presumedDead();
 
-    public void closeConn(RemotePeer peer);
+    public void closeConn(RemoteNode node);
 
     public void stop();
 

@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * 对象
+ * 创世区块配置工厂测试类
  *
  * @author zhouhui
  * @date 2018/3/20

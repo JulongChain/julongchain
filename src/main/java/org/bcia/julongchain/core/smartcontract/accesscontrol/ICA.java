@@ -25,22 +25,23 @@ package org.bcia.julongchain.core.smartcontract.accesscontrol;
  */
 public interface ICA {
 
-    /** CertBytes returns the certificate of the CA in PEM encoding
+    /** CertBytes 返回证书授权中心用PEM编码的证书
      *
      * @return
      */
     byte[] certBytes();
 
-    /** newCertKeyPair returns a certificate and private key pair and nil,
-     * or nil, error in case of failure
-     * The certificate is signed by the CA and is used for TLS client authentication
+    /** newCertKeyPair 返回一个证书和私钥对和零值，
+     *                 返回零值是为了以防错误和失败
+     *                 证书是由证书授权中心签名授权的给TLS客户验证
      */
     CertKeyPair newClientCertKeyPair();
 
-    /** NewServerCertKeyPair returns a CertKeyPair and nil,
-     * with a given custom SAN.
-     * The certificate is signed by the CA.
-     * Returns nil, error in case of failure
+    /** NewServerCertKeyPair 返回一个带有自定义San的CertKeyPair和零值
+     *                       返回一个带有自定义San的CertKeyPair和零值
+     *                       证书是由证书授权中心签名授权的，
+     *                       返回零值是为了以防错误和失败
+     *
      */
     CertKeyPair newServerCertKeyPair(String host);
 

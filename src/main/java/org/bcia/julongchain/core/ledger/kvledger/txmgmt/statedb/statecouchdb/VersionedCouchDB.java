@@ -28,6 +28,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.core.ledger.sceventmgmt.ISmartContractLifecycleEventListener;
 import org.bcia.julongchain.core.ledger.sceventmgmt.SmartContractDefinition;
 import org.bcia.julongchain.core.ledger.util.Util;
+import org.bouncycastle.util.encoders.Hex;
 import org.lightcouch.CouchDbClient;
 
 import java.util.HashMap;
@@ -92,7 +93,7 @@ public class VersionedCouchDB implements IVersionedDB, ISmartContractLifecycleEv
 		String untruncatedDBName = dbName;
 		if (dbName.length() > MAX_DBNAME_LENGTH) {
 			dbName = dbName.substring(0, GROUP_NAME_ALLOWED_LENGTH);
-			dbName += "(" + BytesHexStrTranslate.bytesToHexFun1(Util.getHashBytes(untruncatedDBName.getBytes())) + ")";
+			dbName += "(" + Hex.toHexString(Util.getHashBytes(untruncatedDBName.getBytes())) + ")";
 		}
 		dbName += "_";
 		log.debug("Modify " + untruncatedDBName + " to " + dbName);
@@ -118,7 +119,7 @@ public class VersionedCouchDB implements IVersionedDB, ISmartContractLifecycleEv
 		String escapeNamespace = escapeUpperCase(nsName);
 		String namespaceDBName = groupName + "_" + escapeNamespace;
 		if (namespaceDBName.length() > MAX_DBNAME_LENGTH) {
-			String hashOfNamespaceDBName = BytesHexStrTranslate.bytesToHexFun1(Util.getHashBytes((groupName + "_" + nsName).getBytes()));
+			String hashOfNamespaceDBName = Hex.toHexString(Util.getHashBytes((groupName + "_" + nsName).getBytes()));
 			if (groupName.length() > GROUP_NAME_ALLOWED_LENGTH) {
 				groupName = groupName.substring(0, GROUP_NAME_ALLOWED_LENGTH);
 			}
@@ -193,7 +194,7 @@ public class VersionedCouchDB implements IVersionedDB, ISmartContractLifecycleEv
     }
 
     @Override
-    public LedgerHeight getVersion(String namespace, String key) throws LedgerException {
+    public LedgerHeight getHeight(String namespace, String key) throws LedgerException {
         return null;
     }
 

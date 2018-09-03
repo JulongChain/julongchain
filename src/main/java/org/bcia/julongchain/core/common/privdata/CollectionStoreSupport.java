@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,10 +24,11 @@ import org.bcia.julongchain.core.ledger.IQueryExecutor;
 import org.bcia.julongchain.core.node.util.NodeUtils;
 import org.bcia.julongchain.msp.IIdentityDeserializer;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
+import org.bcia.julongchain.msp.mgmt.MspMgmtMgr;
 import org.bcia.julongchain.protos.common.Collection;
 
 /**
- * implements IPrivDataSupport
+ * 集合辅助类
  *
  * @author sunianle, sunzongyu
  * @date 3/15/18
@@ -57,7 +58,7 @@ public class CollectionStoreSupport implements IPrivDataSupport {
 
     @Override
     public IIdentityDeserializer getIdentityDeserializer(String groupID) {
-		return GlobalMspManagement.getManagerForChain(groupID);
+		return MspMgmtMgr.getManagerForChain(groupID);
     }
 
     @Override

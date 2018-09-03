@@ -15,17 +15,31 @@
  */
 package org.bcia.julongchain.csp.pkcs11.sw;
 
+import java.io.File;
+import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IHash;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.intfs.opts.*;
+import org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant;
+import org.bcia.julongchain.csp.pkcs11.PKCS11Csp;
+import org.bcia.julongchain.csp.pkcs11.PKCS11CspLog;
+import org.bcia.julongchain.csp.pkcs11.PKCS11FactoryOpts;
 import org.bcia.julongchain.csp.pkcs11.aes.AesDecrypterOpts;
 import org.bcia.julongchain.csp.pkcs11.aes.AesEncrypterOpts;
 import org.bcia.julongchain.csp.pkcs11.aes.AesOpts;
 import org.bcia.julongchain.csp.pkcs11.ecdsa.EcdsaKeyOpts;
 import org.bcia.julongchain.csp.pkcs11.ecdsa.EcdsaOpts;
 import org.bcia.julongchain.csp.pkcs11.ecdsa.EcdsaSignOpts;
+import org.bcia.julongchain.csp.pkcs11.entity.PKCS11Config;
+import org.bcia.julongchain.csp.pkcs11.entity.PKCS11KeyData;
 import org.bcia.julongchain.csp.pkcs11.rsa.*;
 import org.bcia.julongchain.csp.pkcs11.util.PKCS11HashOpts;
 import sun.security.provider.SecureRandom;
@@ -39,6 +53,8 @@ import sun.security.provider.SecureRandom;
  * @company FEITIAN
  */
 public class CspImpl implements ICsp {
+
+	PKCS11CspLog csplog = new PKCS11CspLog();
     private IPKCS11SwFactoryOpts PKCS11SwFactoryOpts;
 
     CspImpl(IPKCS11SwFactoryOpts PKCS11FactoryOpts) {
@@ -46,13 +62,11 @@ public class CspImpl implements ICsp {
     }
 
     @Override
-    public IKey keyGen(IKeyGenOpts opts) throws JulongChainException {
-
-
+    public IKey keyGen(IKeyGenOpts opts) throws CspException {
         if (opts == null) {
-            return null;
+        	csplog.setLogMsg("[JC_PKCS_SOFT]:KeyGen Param Err!", csplog.LEVEL_ERROR, PKCS11Csp.class);
+        	throw new CspException("[JC_PKCS_SOFT]:Param Err!");
         }
-
         IKey key;
         GenerateKeyImpl gen = new GenerateKeyImpl();
         if (opts instanceof RsaOpts.RSA1024KeyGenOpts)
@@ -176,18 +190,18 @@ public class CspImpl implements ICsp {
     }
 
     @Override
-    public IKey keyDeriv(IKey key, IKeyDerivOpts opts) throws JulongChainException {
+    public IKey keyDeriv(IKey key, IKeyDerivOpts opts) throws CspException {
         return null;
     }
 
     @Override
-    public IKey keyImport(Object raw, IKeyImportOpts opts) throws JulongChainException {
+    public IKey keyImport(Object raw, IKeyImportOpts opts) throws CspException {
         return null;
     }
 
 
     @Override
-    public IKey getKey(byte[] ski) throws JulongChainException {
+    public IKey getKey(byte[] ski) throws CspException {
 /*
 		File dir = new File(PKCS11SwFactoryOpts.getPath());
         File[] files = dir.listFiles(); // 该文件目录下文件全部放入数组
@@ -196,28 +210,27 @@ public class CspImpl implements ICsp {
                 String fileName = files[i].getName();
                 if (files[i].isDirectory()) { // 判断是文件还是文件夹
                     continue;
-                } else if (fileName.endsWith("pem")) { // 判断文件名是否以.avi结尾
-                    String strFileName = files[i].getAbsolutePath();
-                    System.out.println("---" + strFileName);
-                    String strAlg;
-                    GenerateKeyImpl gen = new GenerateKeyImpl();
-                    if(strFileName.contentEquals("rsa"))
-                    {
-                    	strAlg = PKCS11CSPConstant.RSA;
-                    }else if(strFileName.contentEquals("ecdsa")) {
-                    	strAlg = PKCS11CSPConstant.ECDSA;
-                    }
-
-                    try {
+                } else if (fileName.endsWith("pem")) { // 判断文件名是否以.pem结尾
+                	try {   
+	                	String strFileName = files[i].getAbsolutePath();
+	                    System.out.println("---" + strFileName);
+	                    String strAlg = "";
+	                    GenerateKeyImpl gen = new GenerateKeyImpl();
+	                    if(strFileName.contentEquals("rsa"))
+	                    {
+	                    	strAlg = PKCS11CSPConstant.RSA;
+	                    }else if(strFileName.contentEquals("ecdsa")) {
+	                    	strAlg = PKCS11CSPConstant.ECDSA;
+	                    }
                     	PrivateKey prikey = gen.LoadPrivateKeyAsPEM(PKCS11SwFactoryOpts.getPath(), strAlg);
                     	PublicKey pubkey = gen.LoadPublicKeyAsPEM(PKCS11SwFactoryOpts.getPath(), strAlg);
                     }catch(IOException|NoSuchAlgorithmException|InvalidKeySpecException e) {
                     	throw new JulongChainException("[JC_PKCS_SOFT]: LoadKey Error!");
                     }
-                } else if (fileName.endsWith("key")) { // 判断文件名是否以.avi结尾
+                } else if (fileName.endsWith("key")) { // 判断文件名是否以.key结尾
                     String strFileName = files[i].getAbsolutePath();
                     System.out.println("---" + strFileName);
-                    filelist.add(files[i]);
+                    
                 } else {
                     continue;
                 }
@@ -230,9 +243,9 @@ public class CspImpl implements ICsp {
 
 
     @Override
-    public byte[] hash(byte[] msg, IHashOpts opts) throws JulongChainException {
+    public byte[] hash(byte[] msg, IHashOpts opts) throws CspException {
 
-        HashImpl hashimpl = new HashImpl();
+        DigestImpl hashimpl = new DigestImpl();
         if(opts instanceof PKCS11HashOpts.MD2Opts)
         {
             return hashimpl.getAlgDigest(opts.getAlgorithm(), msg);
@@ -255,18 +268,19 @@ public class CspImpl implements ICsp {
         }
         if(opts instanceof PKCS11HashOpts.SHA3_256Opts)
         {
-            return hashimpl.getSHA3AlgDigest(256, msg);
+            return hashimpl.getSHA3AlgDigest(PKCS11CSPConstant.SHA3_256, msg);
         }
         if(opts instanceof PKCS11HashOpts.SHA3_384Opts)
         {
-            return hashimpl.getSHA3AlgDigest(384, msg);
+            return hashimpl.getSHA3AlgDigest(PKCS11CSPConstant.SHA3_384, msg);
         }
 
+        csplog.setLogMsg("[JC_PKCS_SOFT]:The Alg Not Support!", csplog.LEVEL_INFO, CspImpl.class);
         return null;
     }
 
     @Override
-    public IHash getHash(IHashOpts opts) throws JulongChainException {
+    public IHash getHash(IHashOpts opts) throws CspException {
 
         HashImpl hashimpl = new HashImpl();
         return hashimpl.getHash(opts.getAlgorithm());
@@ -274,7 +288,7 @@ public class CspImpl implements ICsp {
     }
 
     @Override
-    public byte[] sign(IKey key, byte[] digest, ISignerOpts opts) throws JulongChainException {
+    public byte[] sign(IKey key, byte[] digest, ISignerOpts opts) throws CspException {
 
         if(((key instanceof RsaKeyOpts.RsaPriKey) && (opts instanceof RsaSignOpts))
                 ||((key instanceof EcdsaKeyOpts.EcdsaPriKey) && (opts instanceof EcdsaSignOpts))) {
@@ -283,12 +297,12 @@ public class CspImpl implements ICsp {
             byte[] signatura = signdata.signData(key, digest, opts.getAlgorithm());
             return signatura;
         }else {
-            throw new JulongChainException("[JC_PKCS_SOFT]:Parameter error or mismatch");
+            throw new CspException("[JC_PKCS_SOFT]:Parameter error or mismatch");
         }
     }
 
     @Override
-    public boolean verify(IKey key, byte[] signature, byte[] digest, ISignerOpts opts) throws JulongChainException {
+    public boolean verify(IKey key, byte[] signature, byte[] digest, ISignerOpts opts) throws CspException {
 
         if(((key instanceof RsaKeyOpts.RsaPriKey) && (opts instanceof RsaSignOpts))
                 ||((key instanceof EcdsaKeyOpts.EcdsaPriKey) && (opts instanceof EcdsaSignOpts))) {
@@ -296,12 +310,12 @@ public class CspImpl implements ICsp {
             boolean rv = verifydata.verifyData(key, digest, signature, opts.getAlgorithm());
             return rv;
         }else {
-            throw new JulongChainException("[JC_PKCS_SOFT]:Parameter error or mismatch");
+            throw new CspException("[JC_PKCS_SOFT]:Parameter error or mismatch");
         }
     }
 
     @Override
-    public byte[] encrypt(IKey key, byte[] plaintext, IEncrypterOpts opts) throws JulongChainException {
+    public byte[] encrypt(IKey key, byte[] plaintext, IEncrypterOpts opts) throws CspException {
 
         EncryptImpl encryptdata = new EncryptImpl();
         if (opts instanceof RsaEncrypterOpts) {
@@ -313,12 +327,12 @@ public class CspImpl implements ICsp {
                     ((AesEncrypterOpts) opts).getPadding());
             return encodedata;
         }else {
-            throw new JulongChainException("[JC_PKCS_SOFT]:Parameter error or mismatch");
+            throw new CspException("[JC_PKCS_SOFT]:Parameter error or mismatch");
         }
     }
 
     @Override
-    public byte[] decrypt(IKey key, byte[] ciphertext, IDecrypterOpts opts) throws JulongChainException {
+    public byte[] decrypt(IKey key, byte[] ciphertext, IDecrypterOpts opts) throws CspException {
         DecryptImpl decryptdata = new DecryptImpl();
         if (opts instanceof RsaDecrypterOpts) {
             byte[] data = decryptdata.decryptData(key, ciphertext, ((RsaDecrypterOpts) opts).getMode(),
@@ -329,12 +343,12 @@ public class CspImpl implements ICsp {
                     ((AesDecrypterOpts) opts).getMode());
             return data;
         }else {
-            throw new JulongChainException("[JC_PKCS_SOFT]:Parameter error or mismatch");
+            throw new CspException("[JC_PKCS_SOFT]:Parameter error or mismatch");
         }
     }
 
     @Override
-    public byte[] rng(int len, IRngOpts opts) throws JulongChainException {
+    public byte[] rng(int len, IRngOpts opts) throws CspException {
         byte[] none=new SecureRandom().engineGenerateSeed(len);
         return none;
     }

@@ -20,12 +20,13 @@ import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.ValidateException;
 
 /**
- * 类描述
+ * 策略管理器获取器(工厂)
  *
  * @author zhouhui
  * @date 2018/3/9
  * @company Dingxuan
  */
 public interface IPolicyManagerGetter {
-    IPolicyManager getPolicyManager(String groupId) throws InvalidProtocolBufferException, PolicyException, ValidateException;
+    IPolicyManager getPolicyManager(String groupId) throws InvalidProtocolBufferException, PolicyException,
+            ValidateException;
 }

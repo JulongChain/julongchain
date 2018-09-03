@@ -35,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 对象
+ * 资源配置集对象
  *
  * @author zhouhui
  * @date 2018/4/25

@@ -25,7 +25,7 @@ import org.bcia.julongchain.protos.node.SmartContractPackage;
 import java.util.Map;
 
 /**
- * 类描述
+ * 智能合约提案负载业务对象
  *
  * @author zhouhui
  * @date 2018/05/26
@@ -38,7 +38,7 @@ public class SmartContractProposalPayloadVO implements IProtoVO<ProposalPackage.
     @Override
     public void parseFrom(ProposalPackage.SmartContractProposalPayload smartContractProposalPayload) throws
             InvalidProtocolBufferException, ValidateException {
-        ValidateUtils.isNotNull(smartContractProposalPayload, "smartContractProposalPayload can not be null");
+        ValidateUtils.isNotNull(smartContractProposalPayload, "SmartContractProposalPayload can not be null");
 
         this.transientMap = smartContractProposalPayload.getTransientMapMap();
 

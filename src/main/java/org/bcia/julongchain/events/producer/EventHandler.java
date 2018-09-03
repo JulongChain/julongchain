@@ -16,6 +16,7 @@
 package org.bcia.julongchain.events.producer;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.julongchain.common.exception.MspException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.exception.VerifyException;
 import org.bcia.julongchain.common.log.JulongChainLog;
@@ -35,7 +36,7 @@ import java.util.Map;
 import static org.bcia.julongchain.common.util.CommConstant.PATH_SEPARATOR;
 
 /**
- * 类描述
+ * 事件处理器
  *
  * @author zhouhui
  * @date 2018/05/17
@@ -92,7 +93,7 @@ public class EventHandler implements IEventHandler {
 
     private String getInterestKey(EventsPackage.Interest interest) throws ValidateException {
         EventsPackage.EventType eventType = interest.getEventType();
-        ValidateUtils.isNotNull(eventType, "eventType can not be null");
+        ValidateUtils.isNotNull(eventType, "EventType can not be null");
 
         String key = null;
         if (EventsPackage.EventType.BLOCK.equals(eventType)) {
@@ -127,9 +128,9 @@ public class EventHandler implements IEventHandler {
 
     private EventsPackage.Event validateEventMessage(EventsPackage.SignedEvent signedEvent) throws
             InvalidProtocolBufferException, ValidateException, VerifyException {
-        ValidateUtils.isNotNull(signedEvent, "signedEvent can not be null");
-        ValidateUtils.isNotNull(signedEvent.getEventBytes(), "event can not be null");
-        ValidateUtils.isNotNull(signedEvent.getSignature(), "signature can not be null");
+        ValidateUtils.isNotNull(signedEvent, "SignedEvent can not be null");
+        ValidateUtils.isNotNull(signedEvent.getEventBytes(), "Event can not be null");
+        ValidateUtils.isNotNull(signedEvent.getSignature(), "Signature can not be null");
 
         EventsPackage.Event event = EventsPackage.Event.parseFrom(signedEvent.getEventBytes());
         byte[] creator = event.getCreator().toByteArray();
@@ -142,7 +143,7 @@ public class EventHandler implements IEventHandler {
 
             if (nowDate.after(sessionEndDate)) {
                 //dangqian
-                throw new ValidateException("identity expired");
+                throw new ValidateException("Identity expired");
             }
         }
 
@@ -153,7 +154,7 @@ public class EventHandler implements IEventHandler {
 
             //TODO:namijibie
             if (nowMilliseconds - eventMilliseconds > eventsServerConfig.getTimeWindow()) {
-                throw new ValidateException("out of range");
+                throw new ValidateException("Out of range");
             }
         }
 
@@ -164,7 +165,12 @@ public class EventHandler implements IEventHandler {
         IMsp localMsp = GlobalMspManagement.getLocalMsp();
         //TODO
 
-        IIdentity eventIdentity = localMsp.deserializeIdentity(creator);
+        IIdentity eventIdentity = null;
+        try {
+            eventIdentity = localMsp.deserializeIdentity(creator);
+        } catch (MspException e) {
+            e.printStackTrace();
+        }
 
 //        eventIdentity.satisfiesPrincipal();
 

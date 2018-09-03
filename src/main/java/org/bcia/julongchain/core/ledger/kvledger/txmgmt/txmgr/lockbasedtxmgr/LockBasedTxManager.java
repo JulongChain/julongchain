@@ -67,11 +67,19 @@ public class LockBasedTxManager implements ITxManager {
         this.validator = new DefaultValidator(this, db);
     }
 
+	/**
+	 * 创建新的交易查询器
+	 * @param txid 交易id
+	 */
     @Override
     public synchronized IQueryExecutor newQueryExecutor(String txid) throws LedgerException {
         return new LockBasedQueryExecutor(this, txid);
     }
 
+	/**
+	 * 创建新的交易模拟器
+	 * @param txid 交易id
+	 */
     @Override
     public synchronized ITxSimulator newTxSimulator(String txid) throws LedgerException {
 	    if (txSimulatorMap.containsKey(txid)) {
@@ -85,6 +93,9 @@ public class LockBasedTxManager implements ITxManager {
 	    }
     }
 
+	/**
+	 * 验证交易有效性以及准备更新包
+	 */
     @Override
     public void validateAndPrepare(BlockAndPvtData blockAndPvtData, Boolean doMVCCValidation) throws LedgerException {
         try {
@@ -100,14 +111,17 @@ public class LockBasedTxManager implements ITxManager {
         }
     }
 
-    @Override
+	/**
+	 * 获取最新的保存点
+	 */
+	@Override
     public LedgerHeight getLastSavepoint() throws LedgerException {
         return db.getLatestSavePoint();
     }
 
     /**
-     * return 0 true
-     * return !0 return - 1 != lastAvailableBlock
+	 * 判断是否需要恢复
+	 * @return blockHeight
      */
     @Override
     public long shouldRecover() throws LedgerException {

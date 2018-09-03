@@ -38,6 +38,7 @@ public class SymmetryKey {
             System.arraycopy(ski, 0, this.ski, 1, ski.length);
         }
 
+        @Override
         public byte[] toBytes(){
 
             if(exportable)
@@ -46,19 +47,23 @@ public class SymmetryKey {
                 return null;
         }
 
+        @Override
         public byte[] ski() {
 
             return ski;
         }
 
+        @Override
         public boolean isSymmetric() {
             return true;
         }
 
+        @Override
         public boolean isPrivate() {
             return true;
         }
 
+        @Override
         public IKey getPublicKey() {
             return null;
         }
@@ -78,26 +83,32 @@ public class SymmetryKey {
             System.arraycopy(ski, 0, this.ski, 1, ski.length);
         }
 
+        @Override
         public byte[] toBytes(){
 
-            if(exportable)
+            if(exportable) {
                 return raw;
-            else
+            }else {
                 return null;
+            }
         }
 
+        @Override
         public byte[] ski() {
             return ski;
         }
 
+        @Override
         public boolean isSymmetric() {
             return true;
         }
 
+        @Override
         public boolean isPrivate() {
             return true;
         }
 
+        @Override
         public IKey getPublicKey() {
             return null;
         }

@@ -22,14 +22,14 @@ import java.util.List;
 
 /**
  * 类描述
- *
+ *  策略评估接口
  * @author yuanjun
  * @date 31/05/18
  * @company Aisino
  */
 public interface IEvalutor {
     /**
-     * 参照Fabric中compile方法的返回函数
+     * CAuthdsl类中的compile方法的返回函数
      * @param signedDatas
      * @param bool
      * @return

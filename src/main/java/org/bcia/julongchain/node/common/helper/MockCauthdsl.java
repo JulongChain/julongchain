@@ -18,7 +18,7 @@ package org.bcia.julongchain.node.common.helper;
 import org.bcia.julongchain.protos.common.Policies;
 
 /**
- * 类描述
+ * 模拟Cauthdsl解析类
  *
  * @author zhouhui
  * @date 2018/3/10

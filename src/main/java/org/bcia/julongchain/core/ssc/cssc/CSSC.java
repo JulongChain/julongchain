@@ -31,6 +31,7 @@ import org.bcia.julongchain.common.policycheck.PolicyChecker;
 import org.bcia.julongchain.common.policycheck.policies.GroupPolicyManagerGetter;
 import org.bcia.julongchain.common.util.proto.BlockUtils;
 import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
+import org.bcia.julongchain.common.util.proto.ProtoUtils;
 import org.bcia.julongchain.core.aclmgmt.AclManagement;
 import org.bcia.julongchain.core.aclmgmt.resources.Resources;
 import org.bcia.julongchain.core.node.ConfigManager;
@@ -55,12 +56,14 @@ import java.util.List;
 
 /**
  * 配置系统智能合约　Configure System Smart Contract,CSSC
- * Package cssc smartcontract configer provides functions to manage
- * configuration transactions as the network is being reconfigured. The
- * configuration transactions arrive from the ordering service to the committer
- * who calls this smartcontract. The smartcontract also provides peer configuration
- * services such as joining a chain or getting configuration data.
- *
+ * 配置系统合约提供网络重新配置时的配置交易管理功能。配置交易来自排序服务，到达提交节点，并由提交节点调用本系统合约。
+ * 该合约也提供节点配置服务，例如加入群组或获取配置数据。
+ * CSSC的invoke函数，接受的args格式说明如下：
+ * "Args":["JoinGroup",<blockBytes>]
+ * "Args":["GetConfigBlock",<groupID>]
+ * "Args":["GetGroups"]
+ * "Args":["GetConfigTree",<groupID>]
+ * "Args":["SimulateConfigTreeUpdate",<groupID>,<envlope>]
  * @author sunianle
  * @date 3/5/18
  * @company Dingxuan
@@ -116,10 +119,12 @@ public class CSSC extends SystemSmartContractBase {
         List<byte[]> args = stub.getArgs();
         int size = args.size();
         if (size < 1) {
+            log.error(String.format("Incorrect number of arguments, %d", size));
             return newErrorResponse(String.format("Incorrect number of arguments, %d", size));
         }
         String function = ByteString.copyFrom(args.get(0)).toStringUtf8();
         if (!GET_GROUPS.equals(function) && size < 2) {
+            log.error(String.format("Incorrect number of arguments, %d, %s", size, function));
             return newErrorResponse(String.format("Incorrect number of arguments, %d, %s", size, function));
         }
         log.debug("Invoke function:{}", function);
@@ -151,21 +156,35 @@ public class CSSC extends SystemSmartContractBase {
                 }
                 // 2. check local MSP Admins policy
                 try {
-                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.Admins, sp);
+                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.ADMINS, sp);
                 } catch (PolicyException e) {
                     log.error(e.getMessage());
                     return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check for group [%s]:%s", groupID, e.getMessage()));
                 }
                 return joinGroup(groupID, block);
             case GET_CONFIG_BLOCK:
+                //TODO:modified by zhouhui for the CSCCTest(testInvokeWithInvalidParams-GET_CONFIG_BLOCK)  @2018.06.17
+                log.info("get config block");
+                if(sp == null){
+                    String msg = "SignedProposal can not be null";
+                    log.error(msg);
+                    return newErrorResponse(msg);
+                }
+
                 // 2. check policy
                 String groupName = ByteString.copyFrom(args.get(1)).toStringUtf8();
                 try {
                     AclManagement.getACLProvider().checkACL(Resources.CSSC_GetConfigBlock, groupName, sp);
+
                 } catch (JulongChainException e) {
                     return newErrorResponse(String.format("\"GET_CONFIG_BLOCK\" Authorization request failed %s: %s", groupName, e.getMessage()));
                 }
-                return getConfigBlock(groupName);
+            /*    } catch (JulongChainException e) {
+                    String msg = String.format("\"GET_CONFIG_BLOCK\" Authorization request failed %s: %s", groupName, e.getMessage());
+                    log.error(msg);
+                    return newErrorResponse(msg);*/
+
+               return getConfigBlock(groupName);
             case GET_CONFIG_TREE:
                 String groupName2 = ByteString.copyFrom(args.get(1)).toStringUtf8();
                 try {
@@ -187,7 +206,7 @@ public class CSSC extends SystemSmartContractBase {
                 // TODO: move to ACLProvider once it will support chainless ACLs
                 // 2. check local MSP Admins policy
                 try {
-                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.Members, sp);
+                    policyChecker.checkPolicyNoGroup(MSPPrincipalGetter.MEMBERS, sp);
                 } catch (JulongChainException e) {
                     log.error(e.getMessage());
                     return newErrorResponse(String.format("\"JoinGroup\" request failed authorization check :%s", e.getMessage()));
@@ -310,10 +329,15 @@ public class CSSC extends SystemSmartContractBase {
      */
     private SmartContractResponse getConfigBlock(String groupID) {
         Common.Block block = NodeUtils.getCurrentConfigBlock(groupID);
+
         if (block == null) {
             String msg = String.format("Unknown group ID,%s", groupID);
+            log.error(msg);
             return newErrorResponse(msg);
         }
+//        else{
+//            ProtoUtils.printMessageJson(block);
+//        }
         byte[] blockBytes = block.toByteArray();
         return newSuccessResponse(blockBytes);
     }

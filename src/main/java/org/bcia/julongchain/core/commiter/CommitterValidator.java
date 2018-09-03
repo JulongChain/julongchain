@@ -59,15 +59,15 @@ public class CommitterValidator implements ICommitterValidator {
 
     @Override
     public Common.Block validate(Common.Block block) throws ValidateException {
-        ValidateUtils.isNotNull(block, "block can not be null");
-        ValidateUtils.isNotNull(block.getData(), "block.data can not be null");
-        ValidateUtils.isNotNull(block.getData().getDataList(), "block.data.dataList can not be null");
+        ValidateUtils.isNotNull(block, "Block can not be null");
+        ValidateUtils.isNotNull(block.getData(), "Block.data can not be null");
+        ValidateUtils.isNotNull(block.getData().getDataList(), "Block.data.dataList can not be null");
 
         //该区块中交易的数量
         int txCount = block.getData().getDataCount();
         if (txCount <= 0) {
             //如果交易数量少于1，该区块无效
-            throw new ValidateException("txCount should bigger than 0");
+            throw new ValidateException("TxCount should bigger than 0");
         }
 
         //交易验证器标识，对Block里面每一项交易打标记，到底是有效还是无效
@@ -339,7 +339,6 @@ public class CommitterValidator implements ICommitterValidator {
     }
 
     private boolean chainExists(String chain) {
-        //TODO:yao shi xian
         return true;
     }
 }

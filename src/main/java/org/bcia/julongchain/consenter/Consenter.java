@@ -16,29 +16,30 @@
 package org.bcia.julongchain.consenter;
 
 import org.apache.commons.cli.ParseException;
+import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.common.cmd.IConsenterCmd;
 import org.bcia.julongchain.consenter.common.cmd.factory.ConsenterCmdFactory;
-import org.bcia.julongchain.consenter.util.Constant;
+import org.bcia.julongchain.consenter.util.ConsenterConstants;
 
 /**
+ * consenter 服务主类
  * @author zhangmingyang
- * @Date: 2018/3/1 *
+ * @Date: 2018/3/1
  * @company Dingxuan
  */
 public class Consenter {
     private static JulongChainLog log = JulongChainLogFactory.getLog(Consenter.class);
     private IConsenterCmd iConsenterCmd;
 
-    public void execCmd(String[] args) {
+    public void execCmd(String[] args) throws ConsenterException {
         if (args.length <= 0) {
             log.warn("PolicyNode command need more args");
             return;
         }
         String command = args[0];
-        if (args.length == 1 && Constant.VERSION.equalsIgnoreCase(command)) {
-            log.info("Consentor version is V0.25!..");
+        if (args.length == 1 && ConsenterConstants.VERSION.equalsIgnoreCase(command)) {
             iConsenterCmd = ConsenterCmdFactory.getInstance(command);
             String[] arg = new String[]{command};
             try {
@@ -46,7 +47,7 @@ public class Consenter {
             } catch (org.apache.commons.cli.ParseException e) {
                 e.printStackTrace();
             }
-        } else if (args.length == 1 && Constant.START.equalsIgnoreCase(command)) {
+        } else if (args.length == 1 && ConsenterConstants.START.equalsIgnoreCase(command)) {
             iConsenterCmd = ConsenterCmdFactory.getInstance(command);
             String[] argment = new String[]{command};
             try {
@@ -54,7 +55,7 @@ public class Consenter {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-        }else if (args.length == 1 && Constant.BENCHMARK.equalsIgnoreCase(command)) {
+        }else if (args.length == 1 && ConsenterConstants.BENCHMARK.equalsIgnoreCase(command)) {
             iConsenterCmd = ConsenterCmdFactory.getInstance(command);
             String[] argment = new String[]{command};
             try {
@@ -69,7 +70,7 @@ public class Consenter {
         return;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ConsenterException {
         Consenter consenter = new Consenter();
         consenter.execCmd(args);
     }

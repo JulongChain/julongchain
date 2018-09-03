@@ -24,6 +24,7 @@ import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.NetAddress;
 import org.bcia.julongchain.core.ssc.cssc.CSSC;
 import org.bcia.julongchain.node.Node;
+import org.bcia.julongchain.node.util.NodeConstant;
 import org.bcia.julongchain.protos.node.Query;
 
 import java.util.List;
@@ -69,7 +70,7 @@ public class GroupListCmd extends AbstractNodeGroupCmd {
 
         if (StringUtils.isBlank(targetAddress)) {
             log.info("TargetAddress is empty, use 127.0.0.1:7051");
-            groupsList = nodeGroup.listGroups(CSSC.DEFAULT_HOST, CSSC.DEFAULT_PORT);
+            groupsList = nodeGroup.listGroups(NodeConstant.DEFAULT_NODE_HOST, NodeConstant.DEFAULT_NODE_PORT);
         } else {
             try {
                 NetAddress targetNetAddress = new NetAddress(targetAddress);

@@ -20,6 +20,7 @@ import org.bcia.julongchain.csp.gm.dxct.sm2.SM2;
 import org.bcia.julongchain.csp.gm.dxct.util.CryptoUtil;
 import org.bcia.julongchain.msp.util.LoadLocalMspFiles;
 import org.bouncycastle.asn1.x509.Certificate;
+import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.util.io.pem.PemReader;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +33,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 
 /**
- * 类描述
+ * 国密证书测试
  *
  * @author zhangmingyang
  * @date 2018/07/12
@@ -47,7 +48,7 @@ public class CertTest {
     }
 
     @Test
-    public void cryptogenCertTest() throws IOException {
+    public void cryptogenCertTest() throws IOException, CryptoException {
         String skPath = "msp/keystore";
         String signcerts = "msp/signcerts";
         String testData = "this is test data";

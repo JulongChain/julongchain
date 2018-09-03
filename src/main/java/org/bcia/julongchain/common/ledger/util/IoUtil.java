@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,16 +36,24 @@ import java.util.zip.GZIPOutputStream;
  */
 public class IoUtil {
     private static JulongChainLog log = JulongChainLogFactory.getLog(IoUtil.class);
-    private static final int BUFFER = 1024;
-
-    /** DirEmpty returns true if the dir at dirPath is empty
-     *
-     * @param dirPath
-     * @return
-     */
-    public static boolean dirEmpty(String dirPath){
-        return false;
-    }
+	private static final List<Integer> ALLOW_READ_MODE = new ArrayList<Integer>(){{
+		add(4);
+		add(5);
+		add(6);
+		add(7);
+	}};
+	private static final List<Integer> ALLOW_WRITE_MODE = new ArrayList<Integer>(){{
+		add(2);
+		add(3);
+		add(6);
+		add(7);
+	}};
+	private static final List<Integer> ALLOW_EXECUTE_MODE = new ArrayList<Integer>(){{
+		add(1);
+		add(3);
+		add(5);
+		add(7);
+	}};
 
     /**
      * 返回-1:文件不存在
@@ -59,10 +67,8 @@ public class IoUtil {
         return file.length();
     }
 
-    /** ListSubdirs returns the subdirectories
-     *
-     * @param dirPath
-     * @return
+    /**
+     * 列出下级目录
      */
     public static List<String> listSubdirs(String dirPath) {
         List<String> list = new ArrayList<>();
@@ -71,16 +77,16 @@ public class IoUtil {
             log.debug("Dir {} is not exists", dir);
             return null;
         }
-        for (File file : dir.listFiles()) {
+		File[] files = dir.listFiles();
+		if (files == null) {
+			return list;
+		}
+		for (File file : files) {
             if(file.isDirectory()){
                 list.add(file.getName());
             }
         }
         return list;
-    }
-
-    public static void logDirStatus(String msg, String dirPath) {
-        return;
     }
 
     /**
@@ -91,26 +97,20 @@ public class IoUtil {
         int uMod = perm / 100;
         int gMod = (perm % 100) / 10;
         int oMod = perm % 10;
-        if(uMod > 7 || uMod < 0){
-            log.error("Wrong mod type " + perm);
-            return;
+        boolean readable = ALLOW_READ_MODE.contains(uMod);
+		boolean writable = ALLOW_WRITE_MODE.contains(uMod);
+		boolean executable = ALLOW_EXECUTE_MODE.contains(uMod);
+		boolean ownerOnlyReadable = ALLOW_READ_MODE.contains(Math.min(gMod, oMod)) ^ readable;
+		boolean ownerOnlyWritable = ALLOW_WRITE_MODE.contains(Math.min(gMod, oMod)) ^ writable;
+		boolean ownerOnlyExecutable = ALLOW_EXECUTE_MODE.contains(Math.min(gMod, oMod)) ^ executable;
+		if (!file.setReadable(readable, ownerOnlyReadable)) {
+			log.error("Can not set read permission to file " + file.getAbsolutePath());
+		}
+        if (!file.setWritable(writable, ownerOnlyWritable)) {
+            log.error("Can not set write permission to file " + file.getAbsolutePath());
         }
-        if(gMod > 7 || gMod < 0){
-            log.error("Wrong mod type " + perm);
-            return;
-        }
-        if(oMod > 7 || oMod < 0){
-            log.error("Wrong mod type " + perm);
-            return;
-        }
-        if (!file.setWritable(uMod >= 4, (uMod > 0 && uMod < 5))) {
-            log.error("Can not set write permission to dir " + file.getAbsolutePath());
-        }
-        if (!file.setReadable(gMod >= 4, (uMod > 0 && uMod < 5))) {
-            log.error("Can not set read permission to dir " + file.getAbsolutePath());
-        }
-        if (!file.setExecutable(oMod >= 4, (uMod > 0 && uMod < 5))) {
-            log.error("Can not set execute permission to dir " + file.getAbsolutePath());
+        if (!file.setExecutable(executable, ownerOnlyExecutable)) {
+            log.error("Can not set execute permission to file " + file.getAbsolutePath());
         }
     }
 
@@ -163,9 +163,6 @@ public class IoUtil {
 
     /**
      * 序列化对象
-     * @param serializable
-     * @return
-     * @throws JulongChainException
      */
     public static byte[] obj2ByteArray(Serializable serializable) throws JulongChainException {
         ByteArrayOutputStream baos = null;
@@ -187,13 +184,10 @@ public class IoUtil {
 
     /**
      * 反序列化对象
-     * @param bytes
-     * @return
-     * @throws JulongChainException
      */
     public static Object byteArray2Obj(byte[] bytes) throws JulongChainException {
-        ByteArrayInputStream bais = null;
-        ObjectInputStream ois = null;
+        ByteArrayInputStream bais;
+        ObjectInputStream ois;
         try {
             bais = new ByteArrayInputStream(bytes);
             ois = new ObjectInputStream(bais);
@@ -267,7 +261,7 @@ public class IoUtil {
         TarArchiveOutputStream taos = new TarArchiveOutputStream(baos);
         taos.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
         FileInputStream fis = null;
-        TarArchiveEntry tae = null;
+        TarArchiveEntry tae;
         try {
             for (Map.Entry<String, File> entry : files.entrySet()) {
                 String fileName = entry.getKey();
@@ -276,7 +270,7 @@ public class IoUtil {
                 tae = new TarArchiveEntry(file);
                 tae.setName(fileName);
                 taos.putArchiveEntry(tae);
-                int num = 0;
+                int num;
                 byte[] buff = new byte[cache];
                 while((num = fis.read(buff)) != -1){
                     taos.write(buff, 0, num);
@@ -324,7 +318,7 @@ public class IoUtil {
      *          value:文件流
      */
     public static Map<String, byte[]> tarReader(byte[] tarBytes, int cache) throws JulongChainException {
-        Map<String, byte[]> result = new HashMap<>();
+        Map<String, byte[]> result = new HashMap<>(16);
         ByteArrayOutputStream baos = null;
         ByteArrayInputStream bais = null;
         TarArchiveInputStream tais = null;
@@ -332,7 +326,7 @@ public class IoUtil {
             baos = new ByteArrayOutputStream();
             bais = new ByteArrayInputStream(tarBytes);
             tais = new TarArchiveInputStream(bais);
-            TarArchiveEntry tae = null;
+            TarArchiveEntry tae;
             while((tae = tais.getNextTarEntry()) != null){
                 int len = 0;
                 byte[] buff = new byte[cache];

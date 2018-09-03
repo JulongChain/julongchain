@@ -32,7 +32,7 @@ import org.bcia.julongchain.protos.node.SignedScDepSpec;
 import java.io.*;
 
 /**
- * SignedSDSPackage encapsulates SignedSmartContractDeploymentSpec.
+ * 签名的只能合约部署包
  *
  * @author sunianle, sunzongyu
  * @date 4/25/18

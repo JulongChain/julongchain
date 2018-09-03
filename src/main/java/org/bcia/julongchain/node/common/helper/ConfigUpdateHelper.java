@@ -31,8 +31,8 @@ import java.util.*;
 public class ConfigUpdateHelper {
     public static Configtx.ConfigUpdate compute(Configtx.Config originalConfig, Configtx.Config pendingConfig) throws
             ValidateException {
-        ValidateUtils.isNotNull(originalConfig, "originalConfig can not be null");
-        ValidateUtils.isNotNull(pendingConfig, "pendingConfig can not be null");
+        ValidateUtils.isNotNull(originalConfig, "OriginalConfig can not be null");
+        ValidateUtils.isNotNull(pendingConfig, "PendingConfig can not be null");
         ValidateUtils.isNotNull(originalConfig.getGroupTree(), "No group tree found in original");
         ValidateUtils.isNotNull(pendingConfig.getGroupTree(), "No group tree found in pending");
 

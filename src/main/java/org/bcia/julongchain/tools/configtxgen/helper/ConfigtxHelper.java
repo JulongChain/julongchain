@@ -36,7 +36,7 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * 类描述
+ * 交易帮助类
  *
  * @author zhouhui
  * @date 2018/06/06
@@ -47,8 +47,8 @@ public class ConfigtxHelper {
 
     public static void doOutputBlock(GenesisConfig.Profile profile, String groupId, String outputBlock)
             throws ValidateException, ConfigtxToolsException {
-        ValidateUtils.isNotNull(profile, "profile can not be null");
-        ValidateUtils.isNotNull(profile.getConsortiums(), "profile.getConsortiums can not be null");
+        ValidateUtils.isNotNull(profile, "Profile can not be null");
+        ValidateUtils.isNotNull(profile.getConsortiums(), "Profile.getConsortiums can not be null");
 
         Configtx.ConfigTree groupTree = ConfigTreeHelper.buildGroupTree(profile);
         try {
@@ -65,7 +65,7 @@ public class ConfigtxHelper {
     public static void doOutputGroupCreateTx(GenesisConfig.Profile profile, String groupId,
                                              String outputGroupCreateTx) throws ConfigtxToolsException,
             ValidateException {
-        ValidateUtils.isNotNull(profile, "profile can not be null");
+        ValidateUtils.isNotNull(profile, "Profile can not be null");
         try {
             Common.Envelope envelope = EnvelopeHelper.makeGroupCreateTx(groupId, null, null, profile);
 
@@ -80,9 +80,9 @@ public class ConfigtxHelper {
     public static void doOutputAnchorNodesUpdate(GenesisConfig.Profile profile, String groupId,
                                                  String outputAnchorNodesUpdate, String asOrg) throws ValidateException,
             ConfigtxToolsException {
-        ValidateUtils.isNotNull(profile, "profile can not be null");
-        ValidateUtils.isNotNull(profile.getApplication(), "profile.getApplication can not be null");
-        ValidateUtils.isNotNull(profile.getApplication().getOrganizations(), "profile.getApplication.getOrganizations" +
+        ValidateUtils.isNotNull(profile, "Profile can not be null");
+        ValidateUtils.isNotNull(profile.getApplication(), "Profile.getApplication can not be null");
+        ValidateUtils.isNotNull(profile.getApplication().getOrganizations(), "Profile.getApplication.getOrganizations" +
                 " can not be null");
 
         GenesisConfig.Organization asOrganization = null;
@@ -93,7 +93,7 @@ public class ConfigtxHelper {
                 break;
             }
         }
-        ValidateUtils.isNotNull(asOrganization, "asOrganization can not be null");
+        ValidateUtils.isNotNull(asOrganization, "AsOrganization can not be null");
         Configtx.ConfigUpdate configUpdate = EnvelopeHelper.makeConfigUpdate(groupId, asOrg,
                 parseAnchorNodes(asOrganization.getAnchorNodes()));
 
@@ -158,7 +158,7 @@ public class ConfigtxHelper {
 
         GenesisConfig.Organization[] organizations = genesisConfig.getOrganizations();
         if (organizations == null || organizations.length <= 0) {
-            throw new ValidateException("organizations is empty");
+            throw new ValidateException("Organizations is empty");
         }
 
         for (GenesisConfig.Organization org : organizations) {

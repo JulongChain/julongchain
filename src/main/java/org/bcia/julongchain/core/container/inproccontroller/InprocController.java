@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,10 +24,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 类描述
+ * In-process VM 控制器
  *
- * @author sunianle
- * @date @date 2018/05/17
+ * @author sunianle, sunzongyu
+ * @date 2018/05/17
  * @company Dingxuan
  */
 @Component

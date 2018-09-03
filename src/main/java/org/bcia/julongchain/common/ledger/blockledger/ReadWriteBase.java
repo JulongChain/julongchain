@@ -20,6 +20,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 
 /**
+ * 账本读写基类
  * 提供账本读写方法
  *
  * @author sunzongyu

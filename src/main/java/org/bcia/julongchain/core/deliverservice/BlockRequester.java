@@ -40,10 +40,10 @@ public class BlockRequester {
     public void requestBlocks(ILedgerInfo ledgerInfo) throws ConsenterException {
         long height = ledgerInfo.getLedgerHeight();
         if (height > 0) {
-            log.debug(String.format("Starting deliver with block [%d] for channel %s", height, groupId));
+            log.debug(String.format("Starting deliver with block [%d] for group %s", height, groupId));
             seekLatestFromCommitter(height);
         } else {
-            log.debug(String.format("Starting deliver with oldest block for channel %s", groupId));
+            log.debug(String.format("Starting deliver with oldest block for group %s", groupId));
         }
     }
 

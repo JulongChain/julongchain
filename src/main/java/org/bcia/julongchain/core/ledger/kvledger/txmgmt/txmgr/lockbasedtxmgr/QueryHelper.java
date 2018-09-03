@@ -24,6 +24,7 @@ import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -50,10 +51,10 @@ public class QueryHelper {
         checkDone();
         VersionedValue versionedValue = txMgr.getDb().getState(ns, key);
         if(versionedValue == null){
-            return null;
+        	versionedValue = new VersionedValue(null, null);
         }
         byte[] val = versionedValue.getValue();
-        LedgerHeight ver = versionedValue.getVersion();
+        LedgerHeight ver = versionedValue.getHeight();
         addToReadSet(ns, key, ver);
         return val;
     }
@@ -63,8 +64,9 @@ public class QueryHelper {
         List<VersionedValue> versionedValues = txMgr.getDb().getStateMultipleKeys(ns, keys);
         List<byte[]> values = new ArrayList<>();
         for (int i = 0; i < versionedValues.size(); i++) {
-            byte[] val = versionedValues.get(i).getValue();
-            LedgerHeight ver = versionedValues.get(i).getVersion();
+			VersionedValue value = versionedValues.get(i);
+			byte[] val = value == null ? null : value.getValue();
+            LedgerHeight ver = value == null ? null : value.getHeight();
             addToReadSet(ns, keys.get(i), ver);
             values.add(val);
         }
@@ -91,9 +93,8 @@ public class QueryHelper {
         checkDone();
         VersionedValue versionedValue = txMgr.getDb().getPrivateData(ns, coll, key);
         byte[] val = versionedValue.getValue();
-        LedgerHeight ver = versionedValue.getVersion();
-        //TODO SM3 hash
-        byte[] keyHash = Util.getHashBytes(key.getBytes());
+        LedgerHeight ver = versionedValue.getHeight();
+        byte[] keyHash = Util.getHashBytes(key.getBytes(StandardCharsets.UTF_8));
         LedgerHeight hashVersion = txMgr.getDb().getKeyHashVersion(ns, coll, keyHash);
         if(!LedgerHeight.areSame(ver, hashVersion)){
             throw new LedgerException(String.format("Private data matching public hash version is not available.Pub version %s. Pvt version %s",
@@ -109,7 +110,7 @@ public class QueryHelper {
         List<byte[]> values = new ArrayList<>();
         for (int i = 0; i < versionedValues.size() ; i++) {
             byte[] val = versionedValues.get(i).getValue();
-            LedgerHeight ver = versionedValues.get(i).getVersion();
+            LedgerHeight ver = versionedValues.get(i).getHeight();
             addToHashedReadSet(ns, coll, keys.get(i), ver);
             values.add(val);
         }

@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.bcia.julongchain.common.exception.LedgerException;
+import org.bcia.julongchain.common.exception.SmartContractException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
@@ -34,7 +35,11 @@ import org.bcia.julongchain.protos.ledger.queryresult.KvQueryResult;
 import org.bcia.julongchain.protos.ledger.rwset.Rwset;
 import org.bcia.julongchain.protos.node.*;
 
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import static org.bcia.julongchain.core.smartcontract.node.SmartContractRunningUtil.*;
 import static org.bcia.julongchain.core.smartcontract.node.TransactionRunningUtil.*;
@@ -58,6 +63,8 @@ public class SmartContractSupportService
     public static Map<String, StreamObserver<SmartContractMessage>>
             smartContractIdAndStreamObserverMap =
             Collections.synchronizedMap(new HashMap<String, StreamObserver<SmartContractMessage>>());
+
+    private static Map<String, LinkedBlockingQueue> txIdAndQueueMap = new HashMap<String, LinkedBlockingQueue>();
 
     /**
      * 处理智能合约register信息（命令）
@@ -152,6 +159,7 @@ public class SmartContractSupportService
                     addTxMessage(smartContractId, txId, message);
                     updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_ERROR);
                     updateTxStatus(smartContractId, txId, TX_STATUS_ERROR);
+                    handleReceiveCompleteOrErrorMessage(message, txId + "-" + smartContractId);
                     return;
                 }
 
@@ -166,6 +174,7 @@ public class SmartContractSupportService
                     addTxMessage(smartContractId, txId, message);
                     updateSmartContractStatus(smartContractId, SMART_CONTRACT_STATUS_READY);
                     updateTxStatus(smartContractId, txId, TX_STATUS_COMPLETE);
+                    handleReceiveCompleteOrErrorMessage(message, txId + "-" + smartContractId);
                     return;
                 }
 
@@ -202,6 +211,8 @@ public class SmartContractSupportService
                 if (message.getType().equals(SmartContractMessage.Type.GET_HISTORY_FOR_KEY)) {
                     return;
                 }
+
+                logger.error("收到错误的消息类型，请检查参数。");
             }
 
             @Override
@@ -214,6 +225,21 @@ public class SmartContractSupportService
                 logger.info("SmartContract completed");
             }
         };
+    }
+
+    private void handleReceiveCompleteOrErrorMessage(SmartContractMessage message, String txId) {
+        if (StringUtils.isEmpty(txId)) {
+            return;
+        }
+        try {
+            LinkedBlockingQueue queue = txIdAndQueueMap.get(txId);
+            if (queue == null) {
+                return;
+            }
+            queue.put(message);
+        } catch (InterruptedException e) {
+            logger.error(e.getMessage(), e);
+        }
     }
 
     private void handlePutState(SmartContractMessage message, String txId, String groupId, String smartContractId, StreamObserver<SmartContractMessage> responseObserver) {
@@ -404,7 +430,7 @@ public class SmartContractSupportService
      * @param smartContractMessage 消息
      */
     public static SmartContractMessage invoke(
-            String smartContractId, SmartContractMessage smartContractMessage) {
+            String smartContractId, SmartContractMessage smartContractMessage) throws SmartContractException{
         logger.info("invoke " + smartContractId);
 
         // 修改消息的type为TRANSACTION
@@ -419,13 +445,19 @@ public class SmartContractSupportService
         addTxId(txId, smartContractId);
         updateTxStatus(smartContractId, txId, TX_STATUS_START);
 
+        // 保存
+        LinkedBlockingQueue<SmartContractMessage> queue = new LinkedBlockingQueue<SmartContractMessage>();
+        txIdAndQueueMap.put(txId + "-" + smartContractId, queue);
         send(smartContractId, message);
 
-        while (!StringUtils.equals(getTxStatusById(smartContractId, txId), TX_STATUS_COMPLETE)
-                && !StringUtils.equals(getTxStatusById(smartContractId, txId), TX_STATUS_ERROR)) {
+        SmartContractMessage receiveMessage = null;
+        try {
+            receiveMessage = queue.take();
+        } catch (InterruptedException e) {
+            logger.error(e.getMessage(), e);
+            throw new SmartContractException(e.getMessage());
         }
 
-        SmartContractMessage receiveMessage = getTxMessage(smartContractId, txId);
         return receiveMessage;
     }
 
@@ -450,7 +482,7 @@ public class SmartContractSupportService
         ITxSimulator txSimulator = l.newTxSimulator("mytestgroupid2");
         byte[] state = txSimulator.getState("mytestgroupid2", "key1");
 //	    System.out.println(new String(state));
-        txSimulator.setState("mytestgroupid1", "key", "value".getBytes());
+        txSimulator.setState("mytestgroupid1", "key", "value".getBytes(StandardCharsets.UTF_8));
         TxSimulationResults txSimulationResults = txSimulator.getTxSimulationResults();
         Rwset.TxReadWriteSet publicReadWriteSet = txSimulationResults.getPublicReadWriteSet();
         Rwset.NsReadWriteSet nsRwset = publicReadWriteSet.getNsRwset(0);

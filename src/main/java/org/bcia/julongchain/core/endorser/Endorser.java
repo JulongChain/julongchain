@@ -69,19 +69,12 @@ public class Endorser implements IEndorserServer {
      * @return
      */
     private ProposalResponsePackage.ProposalResponse buildErrorResponse(String errorMsg) {
-        ProposalResponsePackage.ProposalResponse.Builder proposalResponseBuilder = ProposalResponsePackage
-                .ProposalResponse.newBuilder();
-        ProposalResponsePackage.Response.Builder responseBuilder = ProposalResponsePackage.Response.newBuilder();
-        responseBuilder.setStatus(Common.Status.INTERNAL_SERVER_ERROR_VALUE);
-        responseBuilder.setMessage(errorMsg);
-        proposalResponseBuilder.setResponse(responseBuilder.build());
-        return proposalResponseBuilder.build();
+        return ProposalResponseUtils.buildErrorProposalResponse(Common.Status.INTERNAL_SERVER_ERROR, errorMsg);
     }
 
     @Override
     public ProposalResponsePackage.ProposalResponse processProposal(ProposalPackage.SignedProposal signedProposal)
             throws NodeException {
-        //TODO：获取客户端的IP和端口，暂无找到有效方法
         Object[] objs = null;
         try {
             //1、预处理，主要是完成验证和检查
@@ -115,7 +108,7 @@ public class Endorser implements IEndorserServer {
 
         if (response.getStatus() != Common.Status.SUCCESS_VALUE) {
             //TODO:是否要封装错误消息
-            return buildErrorResponse("simulateProposal fail");
+            return buildErrorResponse("SimulateProposal fail");
         }
 
         //无合约提案不需要背书，例如cssc
@@ -150,6 +143,7 @@ public class Endorser implements IEndorserServer {
             }
 
             SmartContractShim.SmartContractMessage smartContractMessage = TransactionRunningUtil.getTxMessage(scName, groupHeader.getTxId());
+            TransactionRunningUtil.clearMap(scName, groupHeader.getTxId());
             ProposalResponsePackage.Response smartContractResponse = null;
             try {
                 smartContractResponse = ProposalResponsePackage.Response.parseFrom(smartContractMessage.getPayload());
@@ -171,9 +165,9 @@ public class Endorser implements IEndorserServer {
      * @throws ValidateException
      */
     private Object[] preProcess(ProposalPackage.SignedProposal signedProposal) throws NodeException, ValidateException {
-        ValidateUtils.isNotNull(signedProposal, "signedProposal can not be null");
-        ValidateUtils.isNotNull(signedProposal.getProposalBytes(), "signedProposal.proposal can not be null");
-        ValidateUtils.isNotNull(signedProposal.getSignature(), "signedProposal.signature can not be null");
+        ValidateUtils.isNotNull(signedProposal, "SignedProposal can not be null");
+        ValidateUtils.isNotNull(signedProposal.getProposalBytes(), "SignedProposal.proposal can not be null");
+        ValidateUtils.isNotNull(signedProposal.getSignature(), "SignedProposal.signature can not be null");
 
         //校验Proposal字段
         ProposalPackage.Proposal proposal = null;
@@ -184,10 +178,10 @@ public class Endorser implements IEndorserServer {
             //转化不成功，说明是错误的Proposal字段
             throw new NodeException("Wrong proposal");
         }
-        ValidateUtils.isNotNull(proposal, "proposal can not be null");
+        ValidateUtils.isNotNull(proposal, "Proposal can not be null");
 
         //校验Proposal头部
-        ValidateUtils.isNotNull(proposal.getHeader(), "proposal.header can not be null");
+        ValidateUtils.isNotNull(proposal.getHeader(), "Proposal.header can not be null");
         Common.Header header = null;
         try {
             header = Common.Header.parseFrom(proposal.getHeader());
@@ -218,7 +212,7 @@ public class Endorser implements IEndorserServer {
         }
 
         //校验交易ID
-        ValidateUtils.isNotBlank(groupHeader.getTxId(), "txId can not be empty");
+        ValidateUtils.isNotBlank(groupHeader.getTxId(), "TxId can not be empty");
         try {
             MsgValidation.checkProposalTxId(groupHeader.getTxId(), signatureHeader.getCreator().toByteArray(),
                     signatureHeader.getNonce().toByteArray());
@@ -230,13 +224,13 @@ public class Endorser implements IEndorserServer {
         //当包含智能合约ID时，校验智能合约ID,是否允许执行
         if (extension != null && extension.getSmartContractId() != null && endorserSupport
                 .isSysSCAndNotInvokableExternal(extension.getSmartContractId().getName())) {
-            throw new NodeException("isSysCCAndNotInvokableExternal");
+            throw new NodeException("Is SysCC and not invokable external");
         }
 
         if (StringUtils.isNotBlank(groupHeader.getGroupId())) {
             //校验重复交易
             if (endorserSupport.getTransactionById(groupHeader.getGroupId(), groupHeader.getTxId()) != null) {
-                throw new NodeException("duplicate transaction, creator:" + signatureHeader.getCreator());
+                throw new NodeException("Duplicate transaction, creator:" + signatureHeader.getCreator());
             }
 
             //校验权限:仅应用智能合约校验
@@ -296,7 +290,7 @@ public class Endorser implements IEndorserServer {
         SmartContractEventPackage.SmartContractEvent scEvent = (SmartContractEventPackage.SmartContractEvent) objs[1];
 
         if (response.getStatus() >= Common.Status.BAD_REQUEST_VALUE) {
-            throw new NodeException("callSmartContract fail");
+            throw new NodeException("Call smart contract fail");
         }
 
         byte[] publicSimulateBytes = new byte[0];
@@ -306,13 +300,13 @@ public class Endorser implements IEndorserServer {
                 simulationResults = txSimulator.getTxSimulationResults();
             } catch (LedgerException e) {
                 log.error(e.getMessage(), e);
-                throw new NodeException("get TxSimulation fail");
+                throw new NodeException("Get TxSimulation fail");
             }
 
             if (simulationResults.getPrivateReadWriteSet() != null) {
                 if (scIDBuilder.getName().equals(CommConstant.LSSC)) {
-                    log.error("should not be lssc here");
-                    throw new NodeException("should not be lssc here");
+                    log.error("Should not be lssc here");
+                    throw new NodeException("Should not be lssc here");
                 }
 
                 distributor.distributePrivateData(groupId, txId, simulationResults.getPrivateReadWriteSet());
@@ -365,7 +359,7 @@ public class Endorser implements IEndorserServer {
                                                             SmartContractEventPackage.SmartContractEvent event,
                                                             byte[] visibility, ISmartContractDefinition
                                                                     smartContractDefinition) throws NodeException {
-        log.info("begin endorseProposal");
+        log.info("Begin endorseProposal");
 
         boolean useSysSmartContract = false;
         if (smartContractDefinition == null) {
@@ -385,15 +379,15 @@ public class Endorser implements IEndorserServer {
             smartContractIDBuilder.setVersion(smartContractDefinition.getSmartContractVersion());
         }
 
-        // arguments:
-        // args[0] - function name (not used now)
-        // args[1] - serialized Header object
-        // args[2] - serialized ProposalPayload object
-        // args[3] - SmartContractID of executing SmartContract
-        // args[4] - result of executing SmartContract
-        // args[5] - binary blob of simulation results
-        // args[6] - serialized events
-        // args[7] - payloadVisibility
+        // 参数列表:
+        // args[0] - 暂未使用（预留作为函数名）
+        // args[1] - 头部数据
+        // args[2] - 提案负载数据
+        // args[3] - 智能合约标识
+        // args[4] - 智能合约执行结果
+        // args[5] - 模拟结果数据
+        // args[6] - 事件数据
+        // args[7] - 负载的可见度数据
         byte[][] args = new byte[][]{new byte[0], proposal.getHeader().toByteArray(), proposal.getPayload()
                 .toByteArray(), smartContractIDBuilder.build().toByteArray(), response.toByteArray(),
                 simulateResults, event.toByteArray(), visibility};

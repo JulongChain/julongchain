@@ -23,11 +23,7 @@ import org.bcia.julongchain.core.ledger.IQueryExecutor;
 import org.bcia.julongchain.protos.common.Collection;
 
 /**
- * a stored backed
- * by a ledger supplied by the specified ledgerGetter with
- * an internal name formed as specified by the supplied
- * collectionNamer function
- *
+ * 简单集合仓库
  * @author sunianle, sunzongyu
  * @date 3/20/18
  * @company Dingxuan

@@ -27,7 +27,7 @@ import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfigFactory;
 import org.bcia.julongchain.tools.configtxgen.helper.ConfigtxHelper;
 
 /**
- * 类描述
+ * 交易生成工具命令支持
  *
  * @author zhouhui
  * @date 2018/06/06

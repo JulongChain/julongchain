@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,6 +19,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,32 +35,32 @@ public class UpdateBatch  {
 
 	private Map<byte[],byte[]> kvs = new HashMap<>();
 
-	/** Put adds a KV
-	 *
-	 * @param key
-	 * @param value
+	/**
+	 * 添加K-V
 	 */
 	public void put(byte[] key, byte[] value) {
-		if(value == null){
-			log.error("Can not put [null] value into update batch");
-			throw new RuntimeException("Can not put [null] value into update batch");
-		}
+//		if(value == null){
+//			log.error("Can not put [null] value into update batch");
+//			throw new RuntimeException("Can not put [null] value into update batch");
+//		}
 		kvs.put(key, value);
 	}
 
-	/** Delete deletes a Key and associated value
-	 *
-	 * @param key
+	/**
+	 * 删除K-V
 	 */
 	public void delete(byte[] key) {
 		kvs.put(key, null);
 	}
 
+	/**
+	 * 批量添加K-V
+	 */
 	public void addAll(UpdateBatch updateBatch, String ledgerID){
 		if(ledgerID == null){
 			kvs = updateBatch.getKvs();
 		} else {
-			byte[] b = ArrayUtils.addAll(ledgerID.getBytes(), new byte[]{0x00});
+			byte[] b = ArrayUtils.addAll(ledgerID.getBytes(StandardCharsets.UTF_8), new byte[]{0x00});
 			updateBatch.getKvs().forEach((k, v) -> kvs.put(LevelDBProvider.constructLevelKey(ledgerID, k), v));
 		}
 

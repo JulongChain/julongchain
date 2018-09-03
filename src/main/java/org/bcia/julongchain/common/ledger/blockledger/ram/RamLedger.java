@@ -15,6 +15,7 @@ limitations under the License.
  */
 package org.bcia.julongchain.common.ledger.blockledger.ram;
 
+import com.google.protobuf.ByteString;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.blockledger.IIterator;
 import org.bcia.julongchain.common.ledger.blockledger.ReadWriteBase;
@@ -22,6 +23,8 @@ import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
+
+import static org.bcia.julongchain.core.ledger.util.Util.getHashBytes;
 
 /**
  * 内存账本
@@ -127,7 +130,8 @@ public class RamLedger extends ReadWriteBase {
             throw new LedgerException(String.format("Block number should have been %d but was %d", this.newest.getBlock().getHeader().getNumber() + 1, block.getHeader().getNumber()));
         }
         if(this.newest.getBlock().getHeader().getNumber() + 1 != 0){
-            if(!block.getHeader().getPreviousHash().equals(this.newest.getBlock().getHeader().getDataHash())){
+			ByteString preHash = ByteString.copyFrom(getHashBytes(this.newest.getBlock().getHeader().toByteArray()));
+			if(!block.getHeader().getPreviousHash().equals(preHash)){
                 throw new LedgerException("Block have had wrong previous hash");
             }
         }

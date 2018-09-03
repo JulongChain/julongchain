@@ -16,7 +16,7 @@
 package org.bcia.julongchain.consenter.common.server;
 
 
-import org.bcia.julongchain.common.deliver.DeliverHandler;
+import org.bcia.julongchain.common.deliver.DeliverDeliverHandler;
 import org.bcia.julongchain.common.deliver.DeliverSupport;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.genesis.GenesisBlockFactory;
@@ -32,6 +32,7 @@ import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfig;
 import org.bcia.julongchain.consenter.common.multigroup.Registrar;
 import org.bcia.julongchain.consenter.consensus.IConsensusPlugin;
 import org.bcia.julongchain.consenter.consensus.singleton.Singleton;
+import org.bcia.julongchain.consenter.util.ConsenterConstants;
 import org.bcia.julongchain.core.common.grpc.GrpcServerConfig;
 import org.bcia.julongchain.core.common.grpc.SecureOptions;
 import org.bcia.julongchain.node.common.helper.ConfigTreeHelper;
@@ -44,8 +45,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.bcia.julongchain.consenter.common.localconfig.ConsenterConfigFactory.loadConsenterConfig;
-
 /**
  * 预启动
  *
@@ -55,56 +54,31 @@ import static org.bcia.julongchain.consenter.common.localconfig.ConsenterConfigF
  */
 public class PreStart {
     private static JulongChainLog log = JulongChainLogFactory.getLog(PreStart.class);
-    private static ConsenterConfig defaultConsenterConfig;
-    private static DeliverHandler defaultDeliverHandler;
-    private  Registrar  defaultRegistrar;
+    private Registrar defaultRegistrar;
 
 
-    public static void initAll() throws IOException, JulongChainException {
-        boolean mutalTLS=false;
-        initConsnterConfig();
-       // defaultRegistrar=initializeMultichannelRegistrar(defaultConsenterConfig,new LocalSigner());
-       // defaultDeliverHandler=initDeliverHandler(defaultRegistrar,mutalTLS);
-    }
-
-    private static ConsenterConfig initConsnterConfig() {
-        if (defaultConsenterConfig==null) {
-            defaultConsenterConfig = loadConsenterConfig();
-            return defaultConsenterConfig;
-        }else {
-            return defaultConsenterConfig;
+    public Registrar initializeMultichannelRegistrar(ConsenterConfig consenterConfig, ILocalSigner signer) throws JulongChainException, IOException {
+        IFactory lf = LedgerHelper.createLedgerFactroy(consenterConfig);
+        if (lf.groupIDs().size() == 0) {
+            initBootstrapGroup(consenterConfig, lf);
+        } else {
+            log.info("Not bootstrapping because of existing chains");
         }
+        Map<String, IConsensusPlugin> consenters = new HashMap<>();
+        consenters.put("Singleton", new Singleton());
+        Registrar registrar = new Registrar();
+        defaultRegistrar = registrar.newRegistrar(lf, consenters, signer);
+        return defaultRegistrar;
     }
 
-    private  DeliverHandler initDeliverHandler(Registrar registrar, boolean mutalTLS) {
-        return new DeliverHandler(new DeliverSupport(registrar), defaultConsenterConfig.getGeneral().getAuthentication().get("timeWindow"), mutalTLS);
-    }
-
-    public  Registrar initializeMultichannelRegistrar(ConsenterConfig consenterConfig, ILocalSigner signer) throws JulongChainException, IOException {
-     //   if(defaultRegistrar==null){
-            IFactory lf = LedgerHelper.createLedgerFactroy(consenterConfig);
-            if (lf.groupIDs().size() == 0) {
-                initBootstrapGroup(consenterConfig, lf);
-            } else {
-                log.info("Not bootstrapping because of existing chains");
-            }
-            Map<String, IConsensusPlugin> consenters = new HashMap<>();
-            consenters.put("Singleton", new Singleton());
-           defaultRegistrar=new Registrar().newRegistrar(lf, consenters, signer);
-           return defaultRegistrar;
-//        }else {
-//            return defaultRegistrar;
-//        }
-    }
-
-    private static void initBootstrapGroup(ConsenterConfig consenterConfig, IFactory blockLedger) throws IOException, JulongChainException {
+    private static void initBootstrapGroup(ConsenterConfig consenterConfig, IFactory blockLedger) throws JulongChainException {
         Common.Block genesisBlock = null;
         switch (consenterConfig.getGeneral().getGenesisMethod()) {
             case "provisional":
                 //根据配置生成创世区块
                 GenesisConfig.Profile completedProfile = GenesisConfigFactory.getGenesisConfig().getCompletedProfile(consenterConfig.getGeneral().getGenesisProfile());
                 Configtx.ConfigTree groupTree = ConfigTreeHelper.buildGroupTree(completedProfile);
-                genesisBlock = new GenesisBlockFactory(groupTree).getGenesisBlock("systemGroup");
+                genesisBlock = new GenesisBlockFactory(groupTree).getGenesisBlock(consenterConfig.getFileLedger().getGroupName());
                 break;
             case "file":
                 genesisBlock = new BootStrapHelper(consenterConfig.getGeneral().getGenesisFile()).getGenesisBlock();
@@ -146,15 +120,7 @@ public class PreStart {
         return new GrpcServerConfig();
     }
 
-    public static ConsenterConfig getDefaultConsenterConfig() {
-        return defaultConsenterConfig;
-    }
-
-    public static DeliverHandler getDefaultDeliverHandler() {
-        return defaultDeliverHandler;
-    }
-
-    public  Registrar getDefaultRegistrar() {
+    public Registrar getDefaultRegistrar() {
         return defaultRegistrar;
     }
 }

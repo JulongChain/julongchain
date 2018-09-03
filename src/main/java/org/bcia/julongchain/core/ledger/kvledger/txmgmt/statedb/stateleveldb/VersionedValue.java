@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,6 +17,8 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb;
 
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 
+import java.util.Arrays;
+
 /**
  * 封装版本信息
  *
@@ -26,23 +28,36 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
  */
 public class VersionedValue {
 
-    private LedgerHeight version;
+    private LedgerHeight height;
     private byte[] value;
 
-//    public VersionedValue(){
-//    }
+    public VersionedValue(){
+    }
 
-    public VersionedValue(LedgerHeight version, byte[] value){
-        this.version = version;
+    public VersionedValue(LedgerHeight height, byte[] value){
+        this.height = height;
         this.value = value;
     }
 
-    public LedgerHeight getVersion() {
-        return version;
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		VersionedValue that = (VersionedValue) o;
+		return LedgerHeight.areSame(height, that.height) &&
+				Arrays.equals(value, that.value);
+	}
+
+	public LedgerHeight getHeight() {
+        return height;
     }
 
-    public void setVersion(LedgerHeight version) {
-        this.version = version;
+    public void setHeight(LedgerHeight height) {
+        this.height = height;
     }
 
     public byte[] getValue() {

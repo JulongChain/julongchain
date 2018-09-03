@@ -32,23 +32,24 @@ import java.util.List;
  */
 public class Skf implements ISkf {
 
-    public long SKF_ConnectDev(String name) throws SarException {
+    @Override
+    public long skfConnectDev(String name) throws SarException {
         byte[] nameBytes = name.getBytes();
         byte[] nameBytesWithZeroPadding = new byte[nameBytes.length + 1];
         System.arraycopy(nameBytes, 0, nameBytesWithZeroPadding, 0, nameBytes.length);
 
         long[] buffer = new long[]{-1};
-        checkResult(SKF_ConnectDev_N(nameBytesWithZeroPadding, buffer));
+        checkResult(SkfConnectDev(nameBytesWithZeroPadding, buffer));
         return buffer[0];
     }
 
-    public byte[] SKF_GenRandom(long hDev, int length) throws SarException {
+    @Override
+    public byte[] skfGenRandom(long hDev, int length) throws SarException {
         checkHandler(hDev);
         byte[] randomData = new byte[length];
-        checkResult(SKF_GenRandom_N(hDev, randomData, length));
+        checkResult(SkfGenRandom(hDev, randomData, length));
         return randomData;
     }
-
 
     private void checkHandler(long hDev) throws SarException {
         if (hDev <= 0) {
@@ -73,62 +74,69 @@ public class Skf implements ISkf {
     }
 
 
-    public long SKF_GetDevState(String name) throws SarException {
+    @Override
+    public long skfGetDevState(String name) throws SarException {
         byte[] nameBytes = name.getBytes();
         byte[] nameBytesWithZeroPadding = new byte[nameBytes.length + 1];
         System.arraycopy(nameBytes, 0, nameBytesWithZeroPadding, 0, nameBytes.length);
 
         long[] state = new long[1];
-        checkResult(SKF_GetDevState_N(nameBytesWithZeroPadding, state));
+        checkResult(SkfGetDevState(nameBytesWithZeroPadding, state));
         return state[0];
     }
 
-    public long SKF_VerifyPIN(long hApplication, long pinType, String pin) throws SarException {
+    @Override
+    public long skfVerifyPIN(long hApplication, long pinType, String pin) throws SarException {
         byte[] pinBytes = pin.getBytes();
         byte[] pinBytesWithZeroPadding = new byte[pinBytes.length + 1];
         System.arraycopy(pinBytes, 0, pinBytesWithZeroPadding, 0, pinBytes.length);
 
         long[] retryCount = new long[1];
-        checkResult(SKF_VerifyPIN_N(hApplication, pinType, pinBytesWithZeroPadding, retryCount));
+        checkResult(SkfVerifyPIN(hApplication, pinType, pinBytesWithZeroPadding, retryCount));
         return retryCount[0];
     }
 
-    public long SKF_CreateContainer(long hApplication, String containerName) throws SarException {
+    @Override
+    public long skfCreateContainer(long hApplication, String containerName) throws SarException {
         byte[] nameBytes = containerName.getBytes();
         byte[] nameBytesWithZeroPadding = new byte[nameBytes.length + 1];
         System.arraycopy(nameBytes, 0, nameBytesWithZeroPadding, 0, nameBytes.length);
 
         long[] hContainer = new long[1];
-        checkResult(SKF_CreateContainer_N(hApplication, nameBytesWithZeroPadding, hContainer));
+        checkResult(SkfCreateContainer(hApplication, nameBytesWithZeroPadding, hContainer));
         return hContainer[0];
     }
 
-    public RSAPublicKeyBlob SKF_GenRSAKeyPair(long hContainer, long bitsLen) throws SarException {
+    @Override
+    public RSAPublicKeyBlob skfGenRSAKeyPair(long hContainer, long bitsLen) throws SarException {
         long[] algID = new long[1];
         long[] bitLen = new long[1];
         byte[] modulus = new byte[Constants.MAX_RSA_MODULUS_LEN];
         byte[] publicExponent = new byte[Constants.MAX_RSA_EXPONENT_LEN];
-        checkResult(SKF_GenRSAKeyPair_N(hContainer, bitsLen, algID, bitLen, modulus, publicExponent));
+        checkResult(SkfGenRSAKeyPair(hContainer, bitsLen, algID, bitLen, modulus, publicExponent));
         return new RSAPublicKeyBlob(algID[0], bitLen[0], modulus, publicExponent);
     }
 
-    public ECCPublicKeyBlob SKF_GenECCKeyPair(long hContainer, long algId) throws SarException {
+    @Override
+    public ECCPublicKeyBlob skfGenECCKeyPair(long hContainer, long algId) throws SarException {
         byte[] xCoordinate = new byte[Constants.ECC_MAX_XCOORDINATE_BITS_LEN];
         byte[] yCoordinate = new byte[Constants.ECC_MAX_YCOORDINATE_BITS_LEN];
-        checkResult(SKF_GenECCKeyPair_N(hContainer, algId, xCoordinate, yCoordinate));
+        checkResult(SkfGenECCKeyPair(hContainer, algId, xCoordinate, yCoordinate));
         return new ECCPublicKeyBlob(xCoordinate, yCoordinate);
     }
 
-    public long SKF_GetContainerType(long hContainer) throws SarException {
+    @Override
+    public long skfGetContainerType(long hContainer) throws SarException {
         long[] containerType = new long[1];
-        checkResult(SKF_GetContainerType_N(hContainer, containerType));
+        checkResult(SkfGetContainerType(hContainer, containerType));
         return containerType[0];
     }
 
-    public List<String> SKF_EnumContainer(long hApplication, long size) throws SarException {
+    @Override
+    public List<String> skfEnumContainer(long hApplication, long size) throws SarException {
 
         byte[] containerNameBytes = new byte[(int) size];
-        checkResult(SKF_EnumContainer_N(hApplication,containerNameBytes,size));
+        checkResult(SkfEnumContainer(hApplication,containerNameBytes,size));
         return parseContainerNameBytes(containerNameBytes);
 
 
@@ -136,16 +144,18 @@ public class Skf implements ISkf {
 
     private List<String> parseContainerNameBytes(byte[] containerNameBytes) {
         String[] names=new String(containerNameBytes,0,containerNameBytes.length).split("\0");
-        return new ArrayList<String>(Arrays.asList(names));
+        return new ArrayList<>(Arrays.asList(names));
 
     }
 
-    public void SKF_DeleteContainer(long hApplication, String containerName) throws SarException {
+    @Override
+    public void skfDeleteContainer(long hApplication, String containerName) throws SarException {
 
-        checkResult(SKF_DELETECONTAINER_N(hApplication, containerName.getBytes()));
+        checkResult(SkfDELETECONTAINER(hApplication, containerName.getBytes()));
     }
 
-    public SessionKey SKF_ECCExportSessionKey(long hContainer, long algId, ECCPublicKeyBlob eccPublicKeyBlob) throws SarException {
+    @Override
+    public SessionKey skfECCExportSessionKey(long hContainer, long algId, ECCPublicKeyBlob eccPublicKeyBlob) throws SarException {
         byte[] pubXCoordinate = eccPublicKeyBlob.getxCoordinate();
         byte[] pubYCoordinate = eccPublicKeyBlob.getyCoordinate();
         byte[] cipherXCoordinate = new byte[Constants.ECC_MAX_XCOORDINATE_BITS_LEN / 8];
@@ -155,7 +165,7 @@ public class Skf implements ISkf {
         byte[] cipher = new byte[1024];
         long[] hSessionKey = new long[1];
 
-        checkResult(SKF_ECCExportSessionKey_N(hContainer,
+        checkResult(SkfECCExportSessionKey(hContainer,
                 algId,
                 pubXCoordinate,
                 pubYCoordinate,
@@ -174,7 +184,8 @@ public class Skf implements ISkf {
         return new SessionKey(eccCipherBlob, hSessionKey[0]);
     }
 
-    public void SKF_ImportECCKeyPair(long hContainer, EnvelopedKeyBlob envelopedKeyBlob) throws SarException {
+    @Override
+    public void skfImportECCKeyPair(long hContainer, EnvelopedKeyBlob envelopedKeyBlob) throws SarException {
         long version = envelopedKeyBlob.getVersion();
         long symmAlgID = envelopedKeyBlob.getSymmAlgID();
         long bits = envelopedKeyBlob.getBits();
@@ -192,7 +203,7 @@ public class Skf implements ISkf {
         byte[] cipher = eccCipherBlob.getCipher();
         cipherLen[0] = cipher.length;
 
-        checkResult(SKF_ImportECCKeyPair_N(hContainer,
+        checkResult(SkfImportECCKeyPair(hContainer,
                 version,
                 symmAlgID,
                 bits,
@@ -206,16 +217,18 @@ public class Skf implements ISkf {
                 cipher));
     }
 
-    public void SKF_ImportRSAKeyPair(long hContainer,
+    @Override
+    public void skfImportRSAKeyPair(long hContainer,
                                      long symAlgId,
                                      byte[] wrappedKey,
                                      long wrappedKeyLen,
                                      byte[] encryptedData,
                                      long encryptedDataLen) throws SarException {
-        checkResult(SKF_ImportRSAKeyPair_N(hContainer, symAlgId, wrappedKey, wrappedKeyLen, encryptedData, encryptedDataLen));
+        checkResult(SkfImportRSAKeyPair(hContainer, symAlgId, wrappedKey, wrappedKeyLen, encryptedData, encryptedDataLen));
     }
 
-    public long SKE_CreateApplication(long hDev,
+    @Override
+    public long skfCreateApplication(long hDev,
                                       String appName,
                                       String adminPin,
                                       int adminPinRetryCount,
@@ -235,7 +248,7 @@ public class Skf implements ISkf {
         System.arraycopy(userPinBytes, 0, userPinBytesWithZeroPadding, 0, userPinBytes.length);
 
         long[] hApplication = new long[1];
-        checkResult(SKE_CreateApplication_N(hDev,
+        checkResult(SKE_CreateApplication(hDev,
                 appNameBytesWithZeroPadding,
                 adminPinBytesWithZeroPadding,
                 adminPinRetryCount,
@@ -247,7 +260,8 @@ public class Skf implements ISkf {
     }
 
 
-    public PublicKeyBlob SKF_ExportPublicKey(long hContainer, boolean signFlag, long blobLen) throws SarException {
+    @Override
+    public PublicKeyBlob skfExportPublicKey(long hContainer, boolean signFlag, long blobLen) throws SarException {
         int[] blobType = new int[1];
         long[] algID = new long[1];
         long[] bitLen = new long[1];
@@ -260,7 +274,7 @@ public class Skf implements ISkf {
         long[] blobLength = new long[1];
         blobLength[0] = blobLen;
 
-        checkResult(SKF_ExportPublicKey_N(hContainer,
+        checkResult(SkfExportPublicKey(hContainer,
                 signFlag,
                 blobType,
                 algID,
@@ -288,66 +302,72 @@ public class Skf implements ISkf {
         return publicKeyBlob;
     }
 
-    public void SKF_EncryptInit(long hKey, BlockCipherParam blockCipherParam) throws SarException {
+    @Override
+    public void skfEncryptInit(long hKey, BlockCipherParam blockCipherParam) throws SarException {
         byte[] IV = blockCipherParam.getIV();
         long paddingType = blockCipherParam.getPaddingType();
         long feedBitLen = blockCipherParam.getFeedBitLen();
-        checkResult(SKF_EncryptInit_N(hKey, IV, IV.length, paddingType, feedBitLen));
+        checkResult(SkfEncryptInit(hKey, IV, IV.length, paddingType, feedBitLen));
     }
 
-    public byte[] SKF_Encrypt(long hKey, byte[] data, long dataLen, long encryptedBufferLen) throws SarException {
+    @Override
+    public byte[] skfEncrypt(long hKey, byte[] data, long dataLen, long encryptedBufferLen) throws SarException {
         byte[] encryptedDataTmp = new byte[(int)dataLen];
         long[] encryptedLen = new long[1];
         encryptedLen[0] = encryptedBufferLen;
-        checkResult(SKF_Encrypt_N(hKey, data, dataLen, encryptedDataTmp, encryptedLen));
+        checkResult(SkfEncrypt(hKey, data, dataLen, encryptedDataTmp, encryptedLen));
         byte[] encryptedData = new byte[(int)encryptedLen[0]];
         System.arraycopy(encryptedDataTmp, 0, encryptedData, 0, (int)encryptedLen[0]);
         return encryptedData;
     }
 
-    public void SKF_CloseHandle(long hHandle) throws SarException {
-        checkResult(SKF_CloseHandle_N(hHandle));
+    @Override
+    public void skfCloseHandle(long hHandle) throws SarException {
+        checkResult(SkfCloseHandle(hHandle));
     }
 
-    public long SKF_ImportSessionKey(long hContainer, long algId, byte[] wrappedData, long wrappedLen) throws SarException {
+    @Override
+    public long skfImportSessionKey(long hContainer, long algId, byte[] wrappedData, long wrappedLen) throws SarException {
 
         long[] key = new long[1];
-        checkResult(SKF_ImportSessionKey_N(hContainer, algId, wrappedData, wrappedLen, key));
+        checkResult(SkfImportSessionKey(hContainer, algId, wrappedData, wrappedLen, key));
         return key[0];
     }
 
-
-    public long SKF_DigestInit(long hDev, long algId, ECCPublicKeyBlob eccPublicKeyBlob, char[] pucID, long idLen) throws SarException {
+    @Override
+    public long skfDigestInit(long hDev, long algId, ECCPublicKeyBlob eccPublicKeyBlob, char[] pucID, long idLen) throws SarException {
         long[] hHash = new long[1];
-        checkResult(SKF_DigestInit_N(hDev, algId, eccPublicKeyBlob.getxCoordinate(), eccPublicKeyBlob.getyCoordinate(), pucID, idLen, hHash));
+        checkResult(SkfDigestInit(hDev, algId, eccPublicKeyBlob.getxCoordinate(), eccPublicKeyBlob.getyCoordinate(), pucID, idLen, hHash));
         return hHash[0];
     }
 
-    public byte[] SKF_Digest(long hHash, byte[] data, long dataLen, long hashDataBufferLen) throws SarException {
+    @Override
+    public byte[] skfDigest(long hHash, byte[] data, long dataLen, long hashDataBufferLen) throws SarException {
         byte[] hash = new byte[(int) hashDataBufferLen];
         long[] hashLen = new long[1];
         hashLen[0] = hashDataBufferLen;
-        checkResult(SKF_Digest_N(hHash, data, dataLen, hash, hashLen));
+        checkResult(SkfDigest(hHash, data, dataLen, hash, hashLen));
         byte[] hashData = new byte[(int)hashLen[0]];
         System.arraycopy(hash, 0, hashData, 0, (int)hashLen[0]);
         return hashData;
     }
 
-    public byte[] SKF_RSASignData(long hContainer, byte[] data, long signBufferLen) throws SarException {
+    @Override
+    public byte[] skfRSASignData(long hContainer, byte[] data, long signBufferLen) throws SarException {
         byte[] sign = new byte[(int) signBufferLen];
         long[] signLen = new long[1];
         signLen[0] = signBufferLen;
-        checkResult(SKF_RSASignData_N(hContainer, data, data.length, sign, signLen));
+        checkResult(SkfRSASignData(hContainer, data, data.length, sign, signLen));
         byte[] signData = new byte[(int) signLen[0]];
         System.arraycopy(sign, 0, signData, 0, (int)signLen[0]);
         return signData;
     }
 
-
-    public byte[] SKF_ECCSignData(long hContainer, byte[] data, long dataLen) throws SarException {
+    @Override
+    public byte[] skfECCSignData(long hContainer, byte[] data, long dataLen) throws SarException {
         byte[] r = new byte[Constants.ECC_MAX_XCOORDINATE_BITS_LEN];
         byte[] s = new byte[Constants.ECC_MAX_XCOORDINATE_BITS_LEN];
-        checkResult(SKF_ECCSignData_N(hContainer,
+        checkResult(SkfECCSignData(hContainer,
                 data,
                 dataLen,
                 r,
@@ -355,11 +375,11 @@ public class Skf implements ISkf {
         return Der.encode(r, s);
     }
 
-
-    public boolean SKF_RSAVerify(long hDev, RSAPublicKeyBlob rsaPublicKeyBlob, byte[] data, long dataLen,
+    @Override
+    public boolean skfRSAVerify(long hDev, RSAPublicKeyBlob rsaPublicKeyBlob, byte[] data, long dataLen,
                                  byte[] signature, long signLen) throws SarException {
 
-        return checkVerify(SKF_RSAVerify_N(hDev,
+        return checkVerify(SkfRSAVerify(hDev,
                 rsaPublicKeyBlob.getAlgID(),
                 rsaPublicKeyBlob.getBitLen(),
                 rsaPublicKeyBlob.getModulus(),
@@ -370,9 +390,10 @@ public class Skf implements ISkf {
                 signLen));
     }
 
-    public boolean SKF_ECCVerify(long hDev, ECCPublicKeyBlob eccPublicKeyBlob, byte[] data,
+    @Override
+    public boolean skfECCVerify(long hDev, ECCPublicKeyBlob eccPublicKeyBlob, byte[] data,
                                  long dataLen, byte[] signature) throws SarException {
-        return checkVerify(SKF_ECCVerify_N(hDev,
+        return checkVerify(SkfECCVerify(hDev,
                 eccPublicKeyBlob.getxCoordinate(),
                 eccPublicKeyBlob.getyCoordinate(),
                 data,
@@ -381,65 +402,72 @@ public class Skf implements ISkf {
                 Der.decode(signature, Der.S)));
     }
 
-
-    public void SKF_DecryptInit(long hKey, BlockCipherParam blockCipherParam) throws SarException {
-        checkResult(SKF_DecryptInit_N(hKey,
+    @Override
+    public void skfDecryptInit(long hKey, BlockCipherParam blockCipherParam) throws SarException {
+        checkResult(SkfDecryptInit(hKey,
                 blockCipherParam.getIV(),
                 blockCipherParam.getIV().length,
                 blockCipherParam.getPaddingType(),
                 blockCipherParam.getFeedBitLen()));
     }
 
-    public byte[] SKF_Decrypt(long hKey, byte[] encryptedData, long encryptedLen, long dataBufferLen) throws
+    @Override
+    public byte[] skfDecrypt(long hKey, byte[] encryptedData, long encryptedLen, long dataBufferLen) throws
             SarException {
         byte[] decryptDataTmp = new byte[(int) dataBufferLen];
         long[] decryptLen = new long[1];
         decryptLen[0] = dataBufferLen;
-        checkResult(SKF_Decrypt_N(hKey, encryptedData, encryptedLen, decryptDataTmp, decryptLen));
+        checkResult(SkfDecrypt(hKey, encryptedData, encryptedLen, decryptDataTmp, decryptLen));
         byte[] decryptData = new byte[(int)decryptLen[0]];
         System.arraycopy(decryptDataTmp, 0, decryptData, 0, (int)decryptLen[0]);
         return decryptData;
     }
 
-
-    public List<String> SKF_EnumDev(boolean present, long size) throws SarException {
+    @Override
+    public List<String> skfEnumDev(boolean present, long size) throws SarException {
         byte[] devNamesBytes = new byte[(int) size];
-        checkResult(SKF_EnumDev_N(present, devNamesBytes, size));
+        checkResult(SkfEnumDev(present, devNamesBytes, size));
         return parseDevNameBytes(devNamesBytes);
     }
 
     private List<String> parseDevNameBytes(byte[] devNamesBytes) {
         String[] names=new String(devNamesBytes,0,devNamesBytes.length).split("\0");
-        return new ArrayList<String>(Arrays.asList(names));
+        return new ArrayList<>(Arrays.asList(names));
     }
 
-    public void SKF_LockDev(long hDev, long timeOut) throws SarException {
-        checkResult(SKF_LockDev_N(hDev, timeOut));
+    @Override
+    public void skfLockDev(long hDev, long timeOut) throws SarException {
+        checkResult(SkfLockDev(hDev, timeOut));
     }
 
-    public long SKF_OpenApplication(long hDev, String name) throws SarException {
+    @Override
+    public long skfOpenApplication(long hDev, String name) throws SarException {
         byte[] nameBytes = name.getBytes();
         byte[] nameBytesWithZeroPadding = new byte[nameBytes.length + 1];
         System.arraycopy(nameBytes, 0, nameBytesWithZeroPadding, 0, nameBytes.length);
 
         long[] phApplication = new long[1];
-        checkResult(SKF_OpenApplication_N(hDev, nameBytesWithZeroPadding, phApplication));
+        checkResult(SkfOpenApplication(hDev, nameBytesWithZeroPadding, phApplication));
         return phApplication[0];
     }
 
-    public void SKF_UnlockDev(long hDev) throws SarException {
-        checkResult(SKF_UnlockDev_N(hDev));
+    @Override
+    public void skfUnlockDev(long hDev) throws SarException {
+        checkResult(SkfUnlockDev(hDev));
     }
 
-    public void SKF_DisconnectDev(long hDev) throws SarException {
-        checkResult(SKF_DisconnectDev_N(hDev));
+    @Override
+    public void skfDisconnectDev(long hDev) throws SarException {
+        checkResult(SkfDisconnectDev(hDev));
     }
 
-    public void SKF_CloseContainer(long hContainer) throws SarException {
-        checkResult(SKF_CloseContainer_N(hContainer));
+    @Override
+    public void skfCloseContainer(long hContainer) throws SarException {
+        checkResult(SkfCloseContainer(hContainer));
     }
 
-    public ECCCipherBlob SKF_ExtECCEncrypt(long hDev, ECCPublicKeyBlob eccPublicKeyBlob, byte[] plainText, long plainTextLen) throws SarException {
+    @Override
+    public ECCCipherBlob skfExtECCEncrypt(long hDev, ECCPublicKeyBlob eccPublicKeyBlob, byte[] plainText, long plainTextLen) throws SarException {
         byte[] pubXCoordinate = eccPublicKeyBlob.getxCoordinate();
         byte[] pubYCoordinate = eccPublicKeyBlob.getyCoordinate();
         byte[] cipherXCoordinate = new byte[Constants.ECC_MAX_XCOORDINATE_BITS_LEN / 8];
@@ -448,7 +476,7 @@ public class Skf implements ISkf {
         long[] cipherLen = new long[1];
         byte[] cipher = new byte[1024];
 
-        checkResult(SKF_ExtECCEncrypt_N(hDev,
+        checkResult(SkfExtECCEncrypt(hDev,
                 pubXCoordinate,
                 pubYCoordinate,
                 plainText,
@@ -463,29 +491,29 @@ public class Skf implements ISkf {
         return new ECCCipherBlob(cipherXCoordinate, cipherYCoordinate, hash, cipherData);
     }
 
-    private static native int SKF_ConnectDev_N(byte[] name, long[] hDev);
+    private static native int SkfConnectDev(byte[] name, long[] hDev);
 
-    private static native int SKF_GenRandom_N(long hDev, byte[] random, int randomLength);
+    private static native int SkfGenRandom(long hDev, byte[] random, int randomLength);
 
-    private static native int SKF_GetDevState_N(byte[] name, long[] state);
+    private static native int SkfGetDevState(byte[] name, long[] state);
 
-    private static native int SKF_VerifyPIN_N(long hApplication, long pinType, byte[] pin, long[] retryCount);
+    private static native int SkfVerifyPIN(long hApplication, long pinType, byte[] pin, long[] retryCount);
 
-    private static native int SKF_CreateContainer_N(long hApplication, byte[] containerName, long[] hContainer);
+    private static native int SkfCreateContainer(long hApplication, byte[] containerName, long[] hContainer);
 
-    private static native int SKF_GenRSAKeyPair_N(long hContainer,
+    private static native int SkfGenRSAKeyPair(long hContainer,
                                                   long bitsLen,
                                                   long[] algID,
                                                   long[] bitLen,
                                                   byte[] modulus,
                                                   byte[] publicExponent);
 
-    private static native int SKF_GenECCKeyPair_N(long hContainer, long algId, byte[] xCoordinate,
+    private static native int SkfGenECCKeyPair(long hContainer, long algId, byte[] xCoordinate,
                                                   byte[] yCoordinate);
 
-    private static native int SKF_GetContainerType_N(long hContainer, long[] containerType);
+    private static native int SkfGetContainerType(long hContainer, long[] containerType);
 
-    private static native int SKF_ECCExportSessionKey_N(long hContainer,
+    private static native int SkfECCExportSessionKey(long hContainer,
                                                         long algId,
                                                         byte[] pubXCoordinate,
                                                         byte[] pubYCoordinate,
@@ -496,7 +524,7 @@ public class Skf implements ISkf {
                                                         byte[] cipher,
                                                         long[] sessionKey);
 
-    private static native int SKF_ImportECCKeyPair_N(long hContainer,
+    private static native int SkfImportECCKeyPair(long hContainer,
                                                      long version,
                                                      long symmAlgID,
                                                      long bits,
@@ -509,14 +537,14 @@ public class Skf implements ISkf {
                                                      long[] cipherLen,
                                                      byte[] cipher);
 
-    private static native int SKF_ImportRSAKeyPair_N(long hContainer,
+    private static native int SkfImportRSAKeyPair(long hContainer,
                                                      long symAlgId,
                                                      byte[] wrappedKey,
                                                      long wrappedKeyLen,
                                                      byte[] encryptedData,
                                                      long encryptedDataLen);
 
-    private static native int SKE_CreateApplication_N(long hDev,
+    private static native int SKE_CreateApplication(long hDev,
                                                       byte[] appName,
                                                       byte[] adminPin,
                                                       int adminPinRetryCount,
@@ -525,7 +553,7 @@ public class Skf implements ISkf {
                                                       int createFileRights,
                                                       long[] hApplication);
 
-    private static native int SKF_ExportPublicKey_N(long hContainer,
+    private static native int SkfExportPublicKey(long hContainer,
                                                     boolean signFlag,
                                                     int[] blobType,
                                                     long[] algID,
@@ -536,24 +564,24 @@ public class Skf implements ISkf {
                                                     byte[] yCoordinate,
                                                     long[] blobLen);
 
-    private static native int SKF_EncryptInit_N(long hKey,
+    private static native int SkfEncryptInit(long hKey,
                                                 byte[] IV,
                                                 long IVLen,
                                                 long paddingType,
                                                 long feedBitLen);
 
-    private static native int SKF_Encrypt_N(long hKey, byte[] data, long dataLen, byte[] encryptedData,
+    private static native int SkfEncrypt(long hKey, byte[] data, long dataLen, byte[] encryptedData,
                                             long[] encryptedLen);
 
-    private static native int SKF_CloseHandle_N(long hHandle);
+    private static native int SkfCloseHandle(long hHandle);
 
-    private static native int SKF_ImportSessionKey_N(long hContainer,
+    private static native int SkfImportSessionKey(long hContainer,
                                                      long algId,
                                                      byte[] wrappedData,
                                                      long wrappedLen,
                                                      long[] hKey);
 
-    private static native int SKF_DigestInit_N(long hDev,
+    private static native int SkfDigestInit(long hDev,
                                                long algId,
                                                byte[] xCoordinate,
                                                byte[] yCoordinate,
@@ -561,16 +589,16 @@ public class Skf implements ISkf {
                                                long idLen,
                                                long[] hHash);
 
-    private static native int SKF_Digest_N(long hHash, byte[] data, long dataLen, byte[] hashData,
-                                           long hashLen[]);
+    private static native int SkfDigest(long hHash, byte[] data, long dataLen, byte[] hashData,
+                                           long[] hashLen);
 
-    private static native int SKF_RSASignData_N(long hContainer, byte[] data, long dataLen, byte[] signature,
+    private static native int SkfRSASignData(long hContainer, byte[] data, long dataLen, byte[] signature,
                                                 long[] signLen);
 
-    private static native int SKF_ECCSignData_N(long hContainer, byte[] data, long dataLen, byte[] r, byte[] s)
+    private static native int SkfECCSignData(long hContainer, byte[] data, long dataLen, byte[] r, byte[] s)
             ;
 
-    private static native int SKF_RSAVerify_N(long hDev,
+    private static native int SkfRSAVerify(long hDev,
                                               long algID,
                                               long bitLen,
                                               byte[] modulus,
@@ -580,7 +608,7 @@ public class Skf implements ISkf {
                                               byte[] signature,
                                               long signLen);
 
-    private static native int SKF_ECCVerify_N(long hDev,
+    private static native int SkfECCVerify(long hDev,
                                               byte[] xCoordinate,
                                               byte[] yCoordinate,
                                               byte[] data,
@@ -588,28 +616,28 @@ public class Skf implements ISkf {
                                               byte[] r,
                                               byte[] s);
 
-    private static native int SKF_DecryptInit_N(long hKey,
+    private static native int SkfDecryptInit(long hKey,
                                                 byte[] IV,
                                                 long IVLen,
                                                 long paddingType,
                                                 long feedBitLen);
 
-    private static native int SKF_Decrypt_N(long hKey, byte[] encryptedData, long encryptedDataLen, byte[] data,
+    private static native int SkfDecrypt(long hKey, byte[] encryptedData, long encryptedDataLen, byte[] data,
                                             long[] dataLen);
 
-    private static native int SKF_EnumDev_N(boolean present, byte[] nameList, long size);
+    private static native int SkfEnumDev(boolean present, byte[] nameList, long size);
 
-    private static native int SKF_LockDev_N(long hDev, long timeOut);
+    private static native int SkfLockDev(long hDev, long timeOut);
 
-    private static native int SKF_OpenApplication_N(long hDev, byte[] appName, long[] hApplication);
+    private static native int SkfOpenApplication(long hDev, byte[] appName, long[] hApplication);
 
-    private static native int SKF_UnlockDev_N(long hDev);
+    private static native int SkfUnlockDev(long hDev);
 
-    private static native int SKF_DisconnectDev_N(long hDev);
+    private static native int SkfDisconnectDev(long hDev);
 
-    private static native int SKF_CloseContainer_N(long hContainer);
+    private static native int SkfCloseContainer(long hContainer);
 
-    private static native int SKF_ExtECCEncrypt_N(long hDev,
+    private static native int SkfExtECCEncrypt(long hDev,
                                                   byte[] pubXCoordinate,
                                                   byte[] pubYCoordinate,
                                                   byte[] plainText,
@@ -620,7 +648,7 @@ public class Skf implements ISkf {
                                                   long[] cipherLen,
                                                   byte[] cipher);
 
-    private static native int SKF_EnumContainer_N(long hApplication, byte[] nameList, long size);
+    private static native int SkfEnumContainer(long hApplication, byte[] nameList, long size);
 
-    private static native int SKF_DELETECONTAINER_N(long hApplication, byte[] containerName);
+    private static native int SkfDELETECONTAINER(long hApplication, byte[] containerName);
 }

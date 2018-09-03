@@ -19,7 +19,7 @@ import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
 /**
- * 类描述
+ * 节点Gossip管理器
  *
  * @author zhouhui
  * @date 2018/06/11

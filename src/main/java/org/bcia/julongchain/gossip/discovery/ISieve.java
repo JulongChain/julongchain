@@ -17,6 +17,13 @@ package org.bcia.julongchain.gossip.discovery;
 
 import org.bcia.julongchain.gossip.gossip.SignedGossipMessage;
 
+/**
+ * class description
+ *
+ * @author wanliangbing
+ * @date 18-7-24
+ * @company Dingxuan
+ */
 public interface ISieve {
 
     public Boolean execute(SignedGossipMessage message);

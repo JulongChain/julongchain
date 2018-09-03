@@ -19,7 +19,7 @@ import io.grpc.stub.StreamObserver;
 import org.bcia.julongchain.protos.node.EventsPackage;
 
 /**
- * 对象
+ * 事件中心服务接口
  *
  * @author zhouhui
  * @date 2018/3/20

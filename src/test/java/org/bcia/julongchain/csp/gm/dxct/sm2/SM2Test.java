@@ -1,6 +1,7 @@
 package org.bcia.julongchain.csp.gm.dxct.sm2;
 
 import org.bcia.julongchain.csp.gm.dxct.util.CryptoUtil;
+import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.util.encoders.Hex;
 import org.junit.Assert;
 import org.junit.Before;
@@ -11,6 +12,7 @@ import java.io.FileNotFoundException;
 import static org.junit.Assert.assertEquals;
 
 /**
+ * sm2 测试类
  * @author zhangmingyang
  * @Date: 2018/4/3
  * @company Dingxuan
@@ -51,7 +53,7 @@ public class SM2Test {
     }
 
     @Test
-    public void diffSizeDataSignWithVerify() {
+    public void diffSizeDataSignWithVerify() throws CryptoException {
         //128 byte data
         long before128Sign = System.currentTimeMillis();
         byte[] plain128Text = CryptoUtil.genByteArray(128);

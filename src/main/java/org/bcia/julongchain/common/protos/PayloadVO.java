@@ -23,7 +23,7 @@ import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.node.TransactionPackage;
 
 /**
- * 类描述
+ * 负载业务对象
  *
  * @author zhouhui
  * @date 2018/05/26
@@ -36,11 +36,11 @@ public class PayloadVO implements IProtoVO<Common.Payload> {
 
     @Override
     public void parseFrom(Common.Payload payload) throws InvalidProtocolBufferException, ValidateException {
-        ValidateUtils.isNotNull(payload, "payload can not be null");
-        ValidateUtils.isNotNull(payload.getHeader(), "payload.header can not be null");
-        ValidateUtils.isNotNull(payload.getHeader().getGroupHeader(), "payload.groupHeader can not be null");
-        ValidateUtils.isNotNull(payload.getHeader().getSignatureHeader(), "payload.signatureHeader can not be null");
-        ValidateUtils.isNotNull(payload.getData(), "payload.data can not be null");
+        ValidateUtils.isNotNull(payload, "Payload can not be null");
+        ValidateUtils.isNotNull(payload.getHeader(), "Payload.header can not be null");
+        ValidateUtils.isNotNull(payload.getHeader().getGroupHeader(), "Payload.groupHeader can not be null");
+        ValidateUtils.isNotNull(payload.getHeader().getSignatureHeader(), "Payload.signatureHeader can not be null");
+        ValidateUtils.isNotNull(payload.getData(), "Payload.data can not be null");
 
         groupHeaderVO = new GroupHeaderVO();
         Common.GroupHeader groupHeader = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());

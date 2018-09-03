@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 类描述
+ * 模拟交易模拟器
  *
  * @author zhouhui
  * @date 2018/3/15

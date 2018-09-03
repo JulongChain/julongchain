@@ -21,7 +21,7 @@ import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
- * 对象
+ * 提交节点工具类
  *
  * @author zhouhui
  * @date 2018/4/18

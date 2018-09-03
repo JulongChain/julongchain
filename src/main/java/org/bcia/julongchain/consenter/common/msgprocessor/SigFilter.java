@@ -28,6 +28,7 @@ import org.bcia.julongchain.protos.common.Common;
 import java.util.List;
 
 /**
+ * 签名过滤器
  * @author zhangmingyang
  * @Date: 2018/5/25
  * @company Dingxuan

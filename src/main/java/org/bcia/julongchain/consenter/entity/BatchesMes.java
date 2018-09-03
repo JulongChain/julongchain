@@ -18,6 +18,8 @@ package org.bcia.julongchain.consenter.entity;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
+ * 批次消息实体
+ *
  * @author zhangmingyang
  * @Date: 2018/3/15
  * @company Dingxuan

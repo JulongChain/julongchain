@@ -24,7 +24,7 @@ import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.node.entity.Group;
 
 /**
- * 类描述
+ * 节点支持对象
  *
  * @author zhouhui
  * @date 2018/06/03
