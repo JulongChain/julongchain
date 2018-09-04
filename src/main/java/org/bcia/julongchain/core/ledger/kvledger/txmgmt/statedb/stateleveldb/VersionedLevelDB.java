@@ -40,8 +40,8 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class VersionedLevelDB implements IVersionedDB {
-    private static final byte[] COMPOSITE_KEY_SEP = new String(new char[]{Character.MIN_VALUE}).getBytes();
-    private static final byte[] SAVE_POINT_KEY = new String(new char[]{Character.MIN_VALUE}).getBytes();
+    private static final byte[] COMPOSITE_KEY_SEP = new String(new char[]{Character.MIN_VALUE}).getBytes(StandardCharsets.UTF_8);
+    private static final byte[] SAVE_POINT_KEY = new String(new char[]{Character.MIN_VALUE}).getBytes(StandardCharsets.UTF_8);
 
 	private static JulongChainLog log = JulongChainLogFactory.getLog(VersionedLevelDB.class);
 
