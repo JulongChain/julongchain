@@ -52,8 +52,8 @@ public class PKCS11Csp implements IPKCS11Csp {
     }
 
     @Override
-    public void finalized() throws CspException {
-        
+    public void finalized() throws CspException
+    {
         PKCS11FactoryOpts.optFinalized();        
     }
 
