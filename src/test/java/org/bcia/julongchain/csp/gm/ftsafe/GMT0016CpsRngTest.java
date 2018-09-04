@@ -1,4 +1,4 @@
-package org.bcia.julongchain.csp.gmt0016;
+package org.bcia.julongchain.csp.gm.ftsafe;
 
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.factory.ICspFactory;
@@ -7,16 +7,9 @@ import org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspFactory;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016FactoryOpts;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.IGMT0016Csp;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.entity.GMT0016Lib;
-import org.bcia.julongchain.csp.gmt0016.ftsafe.symmetry.SM1Opts;
-import org.bcia.julongchain.csp.gmt0016.ftsafe.symmetry.SM4Opts;
-import org.bcia.julongchain.csp.gmt0016.ftsafe.symmetry.SSF33Opts;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.util.GMRngOpts;
 import org.bcia.julongchain.csp.intfs.ICsp;
-import org.bcia.julongchain.csp.intfs.IKey;
-import org.bcia.julongchain.csp.intfs.opts.IEncrypterOpts;
-import org.bcia.julongchain.csp.intfs.opts.IKeyGenOpts;
 import org.bcia.julongchain.csp.intfs.opts.IRngOpts;
-import org.bouncycastle.util.encoders.Hex;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

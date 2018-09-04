@@ -16,7 +16,7 @@
 package org.bcia.julongchain.csp.gmt0016.ftsafe;
 
 import org.bcia.julongchain.common.exception.JCSKFException;
-import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.exception.SarException;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.entity.GMT0016Lib;
 
@@ -40,13 +40,13 @@ public class GMT0016FactoryOpts implements IGMT0016FactoryOpts{
 
     GMT0016CspLog csplog = new GMT0016CspLog();
 
-    public GMT0016FactoryOpts(GMT0016Lib gmt0016Lib/*, GMT0016Config gmt0016Conf*/) throws JulongChainException {
+    public GMT0016FactoryOpts(GMT0016Lib gmt0016Lib/*, GMT0016Config gmt0016Conf*/) throws CspException {
         mSKF = new SKFFactoryOpts();
         sUserPin = gmt0016Lib.getUserPin();
         init(gmt0016Lib);
     }
 
-    private void init(GMT0016Lib lib) throws JulongChainException {
+    private void init(GMT0016Lib lib) throws CspException {
 
         try {
 
@@ -75,8 +75,8 @@ public class GMT0016FactoryOpts implements IGMT0016FactoryOpts{
                         break;
                     else {
                         String info = "[JC_SKF]:Find The Device, But No Find Application!";
-                        csplog.setLogMsg(info, 2, GMT0016FactoryOpts.class);
-                        throw new JulongChainException(info);
+                        csplog.setLogMsg(info, csplog.LEVEL_ERROR, GMT0016FactoryOpts.class);
+                        throw new CspException(info);
                     }
                 }
             }
@@ -85,8 +85,8 @@ public class GMT0016FactoryOpts implements IGMT0016FactoryOpts{
             {
                 String info = String.format("[JC_SKF]:No Find The Device! (SN: %s, Lable:%s)",
                         lib.getKeySN(), lib.getKeyLabel());
-                csplog.setLogMsg(info, 2, GMT0016FactoryOpts.class);
-                throw new JulongChainException(info);
+                csplog.setLogMsg(info, csplog.LEVEL_ERROR, GMT0016FactoryOpts.class);
+                throw new CspException(info);
             }
 
         }catch(SarException ex) {
@@ -97,26 +97,26 @@ public class GMT0016FactoryOpts implements IGMT0016FactoryOpts{
                 }catch(SarException e) {
                     ex.printStackTrace();
                     String err = String.format("[JC_SKF]:SarException ErrMessage: %s", ex.getMessage());
-                    csplog.setLogMsg(err, 2, GMT0016FactoryOpts.class);
-                    throw new JulongChainException(err, ex.getCause());
+                    csplog.setLogMsg(err, csplog.LEVEL_ERROR, GMT0016FactoryOpts.class);
+                    throw new CspException(err, ex.getCause());
                 }
             }
             else{
                 ex.printStackTrace();
                 String err = String.format("[JC_SKF]:SarException ErrMessage: %s", ex.getMessage());
-                csplog.setLogMsg(err, 2, GMT0016FactoryOpts.class);
-                throw new JulongChainException(err, ex.getCause());
+                csplog.setLogMsg(err, csplog.LEVEL_ERROR, GMT0016FactoryOpts.class);
+                throw new CspException(err, ex.getCause());
             }
         }catch(JCSKFException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:JCSKFException ErrMessage: %s", ex.getMessage());
-            csplog.setLogMsg(err, 2, GMT0016FactoryOpts.class);
-            throw new JulongChainException(err, ex.getCause());
+            csplog.setLogMsg(err, csplog.LEVEL_ERROR, GMT0016FactoryOpts.class);
+            throw new CspException(err, ex.getCause());
         }catch(UnsupportedEncodingException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_SKF]:UnsupportedEncodingException ErrMessage: %s", ex.getMessage());
-            csplog.setLogMsg(err, 2, GMT0016FactoryOpts.class);
-            throw new JulongChainException(err, ex.getCause());
+            csplog.setLogMsg(err, csplog.LEVEL_ERROR, GMT0016FactoryOpts.class);
+            throw new CspException(err, ex.getCause());
         }
     }
 

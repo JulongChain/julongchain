@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.csp.gmt0016.ftsafe;
 
-import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.csp.intfs.ICsp;
 
 /**
@@ -27,6 +27,6 @@ import org.bcia.julongchain.csp.intfs.ICsp;
  */
 public interface IGMT0016Csp extends ICsp {
 
-    public void finalized() throws JulongChainException;
+    public void finalized() throws CspException;
 }
 

@@ -1,4 +1,4 @@
-package org.bcia.julongchain.csp.gmt0016;
+package org.bcia.julongchain.csp.gm.ftsafe;
 
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.factory.ICspFactory;

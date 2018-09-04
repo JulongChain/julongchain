@@ -1,4 +1,4 @@
-package org.bcia.julongchain.csp.gmt0016;
+package org.bcia.julongchain.csp.gm.ftsafe;
 
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.factory.ICspFactory;
@@ -12,7 +12,6 @@ import org.bcia.julongchain.csp.gmt0016.ftsafe.util.GMHashOpts;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.intfs.opts.IHashOpts;
-import org.apache.commons.codec.binary.Hex;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

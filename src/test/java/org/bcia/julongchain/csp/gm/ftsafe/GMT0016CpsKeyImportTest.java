@@ -1,6 +1,6 @@
 package org.bcia.julongchain.csp.gm.ftsafe;
 
-import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.csp.factory.ICspFactory;
 import org.bcia.julongchain.csp.factory.IFactoryOpts;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant;
@@ -17,16 +17,23 @@ import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.intfs.opts.IKeyGenOpts;
 import org.bcia.julongchain.csp.intfs.opts.IKeyImportOpts;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
+/**
+ * Test methods to keyImport component GMT0016
+ *
+ * @author zhaoxiaobo
+ * @date 2018/08/26
+ * @company FEITIAN
+ */
 public class GMT0016CpsKeyImportTest {
 	private ICsp csp;
 
     @Before
-    public void before() throws JulongChainException{
+    public void before() throws CspException{
         System.out.println("==========class GMT0016Cps function keyImport test start==========");
         GMT0016Lib gmt0016Lib = new GMT0016Lib("/home/bcia/libes_3000gm.so","ePass3000GM","0955381103160217","rockey","123456","ENTERSAFE-ESPK");
         IFactoryOpts factoryOpts = new GMT0016FactoryOpts(gmt0016Lib);
@@ -39,7 +46,7 @@ public class GMT0016CpsKeyImportTest {
 
 
     @Test
-    public void testKeyImportByECC() throws JulongChainException{
+    public void testKeyImportByECC() throws CspException{
         System.out.println("==========test function keyImport and IKeyGenOpts instance ECCOpts.ECCKeyGenOpts==========");
 
         byte[] rawPub = {(byte)0x30, (byte)0x45, (byte)0x02, (byte)0x20,
@@ -64,9 +71,9 @@ public class GMT0016CpsKeyImportTest {
 
         ECCOpts.ECCKeyGenOpts eccKeyGenOpts = new ECCOpts.ECCKeyGenOpts(false);
         IKey eccKey = csp.keyGen(eccKeyGenOpts);
-        AnalyzeSKI analyzeSKI = new AnalyzeSKI();
-        analyzeSKI.analyzeSKI(eccKey.ski());
-        String containerName = analyzeSKI.getContainerName();
+        AnalyzeSKI anski = new AnalyzeSKI();
+        anski.analyzeSKI(eccKey.ski());
+        String containerName = anski.getContainerName();
         Assert.assertNotNull(containerName);
         System.out.println("==========containerName:"+containerName);
 
@@ -82,7 +89,7 @@ public class GMT0016CpsKeyImportTest {
     }
 
     @Test
-    public void testKeyImportByRSA() throws JulongChainException{
+    public void testKeyImportByRSA() throws CspException{
         System.out.println("==========test function keyImport and IKeyGenOpts instance RSAOpts.RSA2048KeyGenOpts==========");
 
         byte[] rawPub = {
@@ -222,9 +229,9 @@ public class GMT0016CpsKeyImportTest {
         System.out.println("rawPri length = "+rawPri.length);
         IKeyGenOpts rsa2048keyGenOpts = new RSAOpts.RSA2048KeyGenOpts(false);
         IKey rsa2048Key = csp.keyGen(rsa2048keyGenOpts);
-        AnalyzeSKI analyzeSKI = new AnalyzeSKI();
-        analyzeSKI.analyzeSKI(rsa2048Key.ski());
-        String containerName = analyzeSKI.getContainerName();
+        AnalyzeSKI anski = new AnalyzeSKI();
+        anski.analyzeSKI(rsa2048Key.ski());
+        String containerName = anski.getContainerName();
 
         GMT0016KeyData gmt0016KeyData = new GMT0016KeyData();
         gmt0016KeyData.setRawPri(rawPri);
@@ -235,9 +242,8 @@ public class GMT0016CpsKeyImportTest {
         Assert.assertNotNull(importKey);
     }
 
-
     @After
-    public void after() throws JulongChainException{
+    public void after() throws CspException{
         System.out.println("==========test end==========");
         ((IGMT0016Csp)csp).finalized();
     }
