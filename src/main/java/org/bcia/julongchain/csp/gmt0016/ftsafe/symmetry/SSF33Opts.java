@@ -29,14 +29,16 @@ import org.bcia.julongchain.csp.intfs.opts.IEncrypterOpts;
  */
 public class SSF33Opts {
 
+	private static final int SSF33_KEY_LEN = 16;
+	private static final long SSF33_ENC_PADDING = 1;
+	private static final long SSF33_ENC_NOPADDING = 0;
+	
     public static class SSF33ECBKeyGenOpts implements ISymmKeyGenOpts {
 
         private boolean bTemporary;
-        private int bit;
 
-        public SSF33ECBKeyGenOpts(boolean bTemporary, int bit) {
+        public SSF33ECBKeyGenOpts(boolean bTemporary) {
             this.bTemporary = bTemporary;
-            this.bit = bit;
         }
 
         @Override
@@ -54,18 +56,16 @@ public class SSF33Opts {
         }
 
         public int getBitLen() {
-            return bit;
+            return SSF33_KEY_LEN;
         }
     }
 
     public static class SSF33CBCKeyGenOpts implements ISymmKeyGenOpts {
 
         private boolean bTemporary;
-        private int bit;
 
-        public SSF33CBCKeyGenOpts(boolean bTemporary, int bit) {
+        public SSF33CBCKeyGenOpts(boolean bTemporary) {
             this.bTemporary = bTemporary;
-            this.bit = bit;
         }
 
         @Override
@@ -83,18 +83,16 @@ public class SSF33Opts {
         }
 
         public int getBitLen() {
-            return bit;
+            return SSF33_KEY_LEN;
         }
     }
 
     public static class SSF33CFBKeyGenOpts implements ISymmKeyGenOpts {
 
         private boolean bTemporary;
-        private int bit;
 
-        public SSF33CFBKeyGenOpts(boolean bTemporary, int bit) {
+        public SSF33CFBKeyGenOpts(boolean bTemporary) {
             this.bTemporary = bTemporary;
-            this.bit = bit;
         }
 
         @Override
@@ -112,18 +110,16 @@ public class SSF33Opts {
         }
 
         public int getBitLen() {
-            return bit;
+            return SSF33_KEY_LEN;
         }
     }
 
     public static class SSF33OFBKeyGenOpts implements ISymmKeyGenOpts {
 
         private boolean bTemporary;
-        private int bit;
 
-        public SSF33OFBKeyGenOpts(boolean bTemporary, int bit) {
+        public SSF33OFBKeyGenOpts(boolean bTemporary) {
             this.bTemporary = bTemporary;
-            this.bit = bit;
         }
 
         @Override
@@ -141,18 +137,16 @@ public class SSF33Opts {
         }
 
         public int getBitLen() {
-            return bit;
+            return SSF33_KEY_LEN;
         }
     }
 
     public static class SSF33MACKeyGenOpts implements ISymmKeyGenOpts {
 
         private boolean bTemporary;
-        private int bit;
 
-        public SSF33MACKeyGenOpts(boolean bTemporary, int bit) {
+        public SSF33MACKeyGenOpts(boolean bTemporary) {
             this.bTemporary = bTemporary;
-            this.bit = bit;
         }
 
         @Override
@@ -170,19 +164,17 @@ public class SSF33Opts {
         }
 
         public int getBitLen() {
-            return bit;
+            return SSF33_KEY_LEN;
         }
     }
 
-    public static class SSF33EncrypterOpts implements IEncrypterOpts {
+    public static class SSF33EncrypterNoPadOpts implements IEncrypterOpts {
 
         private byte[] byteIV;
-        private long lPadding;
         private long lFeedBitLen;
 
-        public SSF33EncrypterOpts(byte[] byteIV, long lPadding, long lfeedbit) {
+        public SSF33EncrypterNoPadOpts(byte[] byteIV, long lfeedbit) {
             this.byteIV = byteIV;
-            this.lPadding = lPadding;
             this.lFeedBitLen = lfeedbit;
         }
 
@@ -192,7 +184,51 @@ public class SSF33Opts {
         }
 
         public BlockCipherParam getBlockChipher() {
-            BlockCipherParam blockcipher = new BlockCipherParam(byteIV, byteIV.length, lPadding, lFeedBitLen);
+            BlockCipherParam blockcipher = new BlockCipherParam(byteIV, byteIV.length, SSF33_ENC_NOPADDING, lFeedBitLen);
+            return blockcipher;
+        }
+
+    }
+    
+    public static class SSF33EncrypterOpts implements IEncrypterOpts {
+
+        private byte[] byteIV;
+        private long lFeedBitLen;
+
+        public SSF33EncrypterOpts(byte[] byteIV, long lfeedbit) {
+            this.byteIV = byteIV;
+            this.lFeedBitLen = lfeedbit;
+        }
+
+        @Override
+        public String getAlgorithm() {
+            return GMT0016CspConstant.SSF33;
+        }
+
+        public BlockCipherParam getBlockChipher() {
+            BlockCipherParam blockcipher = new BlockCipherParam(byteIV, byteIV.length, SSF33_ENC_PADDING, lFeedBitLen);
+            return blockcipher;
+        }
+
+    }
+
+    public static class SSF33DecrypterNoPadOpts implements IDecrypterOpts {
+
+        private byte[] byteIV;
+        private long lFeedBitLen;
+
+        public SSF33DecrypterNoPadOpts(byte[] byteIV, long lfeedbit) {
+            this.byteIV = byteIV;
+            this.lFeedBitLen = lfeedbit;
+        }
+
+        @Override
+        public String getAlgorithm() {
+            return GMT0016CspConstant.SSF33;
+        }
+
+        public BlockCipherParam getBlockChipher() {
+            BlockCipherParam blockcipher = new BlockCipherParam(byteIV, byteIV.length, SSF33_ENC_NOPADDING, lFeedBitLen);
             return blockcipher;
         }
 
@@ -201,12 +237,10 @@ public class SSF33Opts {
     public static class SSF33DecrypterOpts implements IDecrypterOpts {
 
         private byte[] byteIV;
-        private long lPadding;
         private long lFeedBitLen;
 
-        public SSF33DecrypterOpts(byte[] byteIV, long lPadding, long lfeedbit) {
+        public SSF33DecrypterOpts(byte[] byteIV, long lfeedbit) {
             this.byteIV = byteIV;
-            this.lPadding = lPadding;
             this.lFeedBitLen = lfeedbit;
         }
 
@@ -216,7 +250,7 @@ public class SSF33Opts {
         }
 
         public BlockCipherParam getBlockChipher() {
-            BlockCipherParam blockcipher = new BlockCipherParam(byteIV, byteIV.length, lPadding, lFeedBitLen);
+            BlockCipherParam blockcipher = new BlockCipherParam(byteIV, byteIV.length, SSF33_ENC_PADDING, lFeedBitLen);
             return blockcipher;
         }
 

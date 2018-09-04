@@ -23,6 +23,7 @@ import org.bcia.julongchain.csp.pkcs11.ecdsa.EcdsaOpts;
 import org.bcia.julongchain.csp.pkcs11.entity.PKCS11Config;
 import org.bcia.julongchain.csp.pkcs11.entity.PKCS11Lib;
 import org.bcia.julongchain.csp.pkcs11.rsa.RsaOpts;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -66,8 +67,9 @@ public class TestKeyGenOpts {
         try {
             IKeyGenOpts opts = new RsaOpts.RSA1024KeyGenOpts(false);
             IKey mykey = csp.keyGen(opts);
+            Assert.assertNotNull(mykey);
             IKey mykey1 = csp.getKey(mykey.ski());
-            return;
+            Assert.assertNotNull(mykey1);
         } catch (JulongChainException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -79,49 +81,52 @@ public class TestKeyGenOpts {
         try {
             IKeyGenOpts opts = new RsaOpts.RSA2048KeyGenOpts(false);
             IKey mykey = csp.keyGen(opts);
+            Assert.assertNotNull(mykey);
             IKey mykey1 = csp.getKey(mykey.ski());
+            Assert.assertNotNull(mykey1);
         } catch (JulongChainException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
-/*    
- * the token no support
-    @Test
-    public void test3() {
+    /*
+     * the token no support
+        @Test
+        public void test3() {
 
-        try {
-            IKeyGenOpts opts = new RsaOpts.RSA3072KeyGenOpts(false);
-            IKey mykey = csp.keyGen(opts);
-            csp.getKey(mykey.ski());
-        } catch (JulongChainException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            try {
+                IKeyGenOpts opts = new RsaOpts.RSA3072KeyGenOpts(false);
+                IKey mykey = csp.keyGen(opts);
+                csp.getKey(mykey.ski());
+            } catch (JulongChainException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
-    }
-    @Test
-    public void test4() {
+        @Test
+        public void test4() {
 
-        try {
-            IKeyGenOpts opts = new RsaOpts.RSA4096KeyGenOpts(false);
-            IKey mykey = csp.keyGen(opts);
-            csp.getKey(mykey.ski());
-        } catch (JulongChainException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            try {
+                IKeyGenOpts opts = new RsaOpts.RSA4096KeyGenOpts(false);
+                IKey mykey = csp.keyGen(opts);
+                csp.getKey(mykey.ski());
+            } catch (JulongChainException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
         }
-    }
- */   
+     */
     @Test
     public void test5() {
 
         try {
             IKeyGenOpts opts = new EcdsaOpts.ECDSA256KeyGenOpts(false);
             IKey mykey = csp.keyGen(opts);
+            Assert.assertNotNull(mykey);
+
             IKey mykey1 = csp.getKey(mykey.ski());
-            return;
+            Assert.assertNotNull(mykey1);
         } catch (JulongChainException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -131,26 +136,24 @@ public class TestKeyGenOpts {
         try {
             IKeyGenOpts opts = new EcdsaOpts.ECDSA192KeyGenOpts(false);
             IKey mykey = csp.keyGen(opts);
+            Assert.assertNotNull(mykey);
+
             IKey mykey1 = csp.getKey(mykey.ski());
-            return;
+            Assert.assertNotNull(mykey1);
+
         } catch (JulongChainException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
     @Test
     public void test7() {
-    	
-    	try {
-    		//IKeyGenOpts opts = new AesOpts.AES128KeyGenOpts(false);
-    		//IKey mykey = csp.keyGen(opts);
-    		//IKey mykey1 = csp.getKey(mykey.ski());
-    		byte[] ski = "31234567891264564894564".getBytes();
-    		ski[0] = 0x03;
-    		IKey mykey1 = csp.getKey(ski);
-    		return;
-    	} catch (JulongChainException e) {
-            // TODO Auto-generated catch block
+
+        try {
+            byte[] ski = "31234567891264564894564".getBytes();
+            ski[0] = 0x03;
+            IKey mykey1 = csp.getKey(ski);
+            Assert.assertNotNull(mykey1);
+        } catch (JulongChainException e) {
             e.printStackTrace();
         }
     }

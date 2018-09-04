@@ -28,6 +28,9 @@ public class ECCDer {
 
     public static final int R_X = 0;
     public static final int S_Y = 1;
+    public static final byte TAG_SEQUENCE = 0x30;
+    public static final byte TAG_FLAG = 0x02;
+    public static final int VALUE_LEN = 0x21;
 
     public static byte[] encode(byte[] r_x, byte[] s_y) {
 
@@ -49,8 +52,8 @@ public class ECCDer {
 
         byte totalLength=intToByte(s_y.length+r_x.length+4);
         // Der 30 length 02 rLength r 02 sLength s
-        byte[] rByteArrayBefore = {0x30, totalLength, 0x02, rxLength};
-        byte[] betweenRAndS = {0x02, syLength};
+        byte[] rByteArrayBefore = {TAG_SEQUENCE, totalLength, TAG_FLAG, rxLength};
+        byte[] betweenRAndS = {TAG_FLAG, syLength};
 
         return concatArrays(rByteArrayBefore, r_x, betweenRAndS, s_y);
     }
@@ -63,7 +66,7 @@ public class ECCDer {
         byte[] s_y = new byte[sLength];
 
         if (type == R_X) {
-            if(rLength == 0x21)
+            if(rLength == VALUE_LEN)
             {
                 System.arraycopy(data, 5, r_x, 0, r_x.length-1);
             }else {
@@ -71,7 +74,7 @@ public class ECCDer {
             }
             return r_x;
         } else if (type == S_Y) {
-            if(sLength == 0x21)
+            if(sLength == VALUE_LEN)
             {
                 System.arraycopy(data, 7 + rLength, s_y, 0, s_y.length-1);
             }else {

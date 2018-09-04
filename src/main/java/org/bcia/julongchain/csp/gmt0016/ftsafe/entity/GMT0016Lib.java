@@ -15,6 +15,8 @@
  */
 package org.bcia.julongchain.csp.gmt0016.ftsafe.entity;
 
+import org.bcia.julongchain.common.exception.JulongChainException;
+
 /**
  * HardWare Information
  *
@@ -30,46 +32,32 @@ public class GMT0016Lib {
     private String sAdminPin;
     private String sAppName;
 
-    public GMT0016Lib() {
-        this.sLibrary = "/root/Desktop/libes_3000gm.so";
-        this.sKeyLabel = "ePass Token";
-        this.sKeySn = "0328470216020518";
-        this.sAdminPin = "rockey";
-        this.sUserPin = "123456a";
-        this.sAppName = "ENTERSAFE-ESPK";
-    }
-
 
     public GMT0016Lib(String slib, String sLabel, String sSn, String sAdminPin,
-                      String sUserPin, String sAppName) {
-        if (slib == null || slib.equals(""))
-            this.sLibrary = "/root/Desktop/libes_3000gm.so";
-        else
-            this.sLibrary = slib;
+                      String sUserPin, String sAppName) throws JulongChainException {
 
-        if (sLabel == null || sLabel.equals(""))
-            this.sKeyLabel = "ePass2003";
-        else
-            this.sKeyLabel = sLabel;
+        checkParam(sLabel);
+        checkParam(slib);
+        checkParam(sSn);
+        checkParam(sAdminPin);
+        checkParam(sUserPin);
+        //checkParam(sAppName);
 
-        if (sSn == null || sSn.equals(""))
-            this.sKeySn = "0328470216020518";
-        else
-            this.sKeySn = sSn;
-
-        if (sAdminPin == null)
-            this.sAdminPin = "rockey";
-        else
-            this.sAdminPin = sAdminPin;
-
-        if (sUserPin == null)
-            this.sUserPin = "12345678";
-        else
-            this.sUserPin = sUserPin;
-
-
+        this.sLibrary = slib;
+        this.sKeyLabel = sLabel;
+        this.sKeySn = sSn;
+        this.sAdminPin = sAdminPin;
+        this.sUserPin = sUserPin;
         this.sAppName = sAppName;
     }
+
+    private void checkParam(String str) throws JulongChainException {
+        if (str == null || "".equals(str))
+        {
+            throw new JulongChainException("[JC_SKF]:Param Err!");
+        }
+    }
+
 
     public String getLibrary() {
         return sLibrary;

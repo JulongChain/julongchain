@@ -32,10 +32,12 @@ public class JCSKFException extends JulongChainException {
 
     private static final String MODULE_NAME = "Gmt0016 FTsafe ";
     private long errCode;
+    private long retryCount;
 
     public JCSKFException(long errCode) {
         super(MODULE_NAME + String.format("Error code: 0x%08x", errCode));
         this.errCode = errCode;
+        this.retryCount = 0;
     }
 
     public long getErrCode() {

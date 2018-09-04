@@ -47,6 +47,13 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
 
+    /**
+     * Enumerate Devices
+     * @param bPresent          Device Status
+     * @return  Devices' Name List
+     * @throws SarException
+     * @throws JCSKFException
+     */
     public List<String> SKF_EnumDevs(boolean bPresent) throws SarException, JCSKFException {
 
         byte[] devNamesByte = null;
@@ -65,6 +72,12 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
 
+    /**
+     * Connect Device
+     * @param devName   Device Name
+     * @return  Device handle
+     * @throws SarException
+     */
     public long SKF_ConnectDev(String devName) throws SarException{
         byte[] devNameBytes = devName.getBytes();
         byte[] tempdevNameBytes = new byte[devNameBytes.length + 1];
@@ -76,6 +89,12 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
 
+    /**
+     * Get Deviceinfo
+     * @param lDevHandle    Device Handle
+     * @return  SKFDeviceInfo Impl
+     * @throws SarException
+     */
     public SKFDeviceInfo SKF_GetDevInfo(long lDevHandle) throws SarException{
         SKF_CheckHandler(lDevHandle);
         byte[] skf_ver = new byte[2];
@@ -108,6 +127,13 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
 
+    /**
+     * Enumerate Applications
+     * @param lDevHandle        Device handle
+     * @return Applications' Name List
+     * @throws SarException
+     * @throws JCSKFException
+     */
     public List<String> SKF_EnumApplication(long lDevHandle) throws SarException, JCSKFException{
         SKF_CheckHandler(lDevHandle);
 
@@ -125,6 +151,13 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
 
+    /**
+     * Open Application
+     * @param lDevHandle    Device Handle
+     * @param appName       Application Name
+     * @return  Application Handle
+     * @throws SarException
+     */
     public long SKF_OpenApplication(long lDevHandle, String appName) throws SarException {
         SKF_CheckHandler(lDevHandle);
         byte[] appNameBytes = appName.getBytes();
@@ -137,12 +170,25 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
 
+    /**
+     * Disconnect Device
+     * @param lDevHandle    Device Handle
+     * @throws SarException
+     */
     public void SKF_DisconnectDev(long lDevHandle) throws SarException{
         SKF_CheckHandler(lDevHandle);
-        SKF_CatchExcetpt(gmtDll.SKF_DisconnectDev_N(lDevHandle));
+        SKF_CatchExcetpt(gmtDll.SKF_DisConnectDev_N(lDevHandle));
     }
 
 
+    /**
+     * Verify Pin
+     * @param lAppHandle        Application Handle
+     * @param lUserType         User Type
+     * @param sPin              User Pin
+     * @return Success
+     * @throws SarException
+     */
     public long SKF_VerifyPIN(long lAppHandle, long lUserType, String sPin) throws SarException{
         SKF_CheckHandler(lAppHandle);
         byte[] pinBytes = sPin.getBytes();
@@ -151,10 +197,18 @@ public class SKFFactoryOpts implements ISKFFactory {
 
         long[] lPinRetryCount = new long[1];
         SKF_CatchExcetpt(gmtDll.SKF_VerifyPIN_N(lAppHandle, lUserType, temppinBytes, lPinRetryCount));
-        return lPinRetryCount[0];
+        //return lPinRetryCount[0]; //if need the retrycount, throw exception need add judge
+        return 0;
     }
 
 
+    /**
+     * Enumerate Container
+     * @param lAppHandle        Application Handle
+     * @return  Containers' Name list
+     * @throws SarException
+     * @throws JCSKFException
+     */
     public List<String> SKF_EnumContainer(long lAppHandle) throws SarException, JCSKFException{
         SKF_CheckHandler(lAppHandle);
 
@@ -174,19 +228,33 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
 
+    /**
+     * Create Contatiner
+     * @param lAppHandle        Application Handle
+     * @param sContainerName    Container Name
+     * @return  Container Name
+     * @throws SarException
+     */
     public long SKF_CreateContainer(long lAppHandle, String sContainerName) throws SarException{
         SKF_CheckHandler(lAppHandle);
 
         byte[] ContainerNameBytes = sContainerName.getBytes();
-        //byte[] tempContainerNameBytes = new byte[ContainerNameBytes.length + 1];
-        //System.arraycopy(ContainerNameBytes, 0, tempContainerNameBytes, 0, ContainerNameBytes.length);
+        byte[] tempContainerNameBytes = new byte[ContainerNameBytes.length + 1];
+        System.arraycopy(ContainerNameBytes, 0, tempContainerNameBytes, 0, ContainerNameBytes.length);
 
         long[] lContainerHandle = new long[1];
-        SKF_CatchExcetpt(gmtDll.SKF_CreateContainer_N(lAppHandle, ContainerNameBytes, lContainerHandle));
+        SKF_CatchExcetpt(gmtDll.SKF_CreateContainer_N(lAppHandle, /*ContainerNameBytes*/tempContainerNameBytes, lContainerHandle));
         return lContainerHandle[0];
     }
 
 
+    /**
+     * Open Container
+     * @param lAppHandle        Application Handle
+     * @param sContainerName    Container Name
+     * @return  Container Handle
+     * @throws SarException
+     */
     public long SKF_OpenContainer(long lAppHandle, String sContainerName) throws SarException {
         SKF_CheckHandler(lAppHandle);
 
@@ -200,16 +268,32 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
 
+    /**
+     * Close Container Handle
+     * @param lContainerHandle  Container Handle
+     * @throws SarException
+     */
     public void SKF_CloseContainer(long lContainerHandle) throws SarException {
         SKF_CatchExcetpt(gmtDll.SKF_CloseContainer_N(lContainerHandle));
     }
 
 
+    /**
+     * Close Handle
+     * @param lHandle       Handle
+     * @throws SarException
+     */
     public void SKF_CloseHandle(long lHandle) throws SarException {
         SKF_CatchExcetpt(gmtDll.SKF_CloseHandle_N(lHandle));
     }
 
 
+    /**
+     * Generate SM2 KeyPair
+     * @param lContainerHandle      Container Handle
+     * @return  SM2 publickey blob
+     * @throws SarException
+     */
     public SKFCspKey.ECCPublicKeyBlob SKF_GenECCKeyPair(long lContainerHandle) throws SarException {
         SKF_CheckHandler(lContainerHandle);
         byte[] xCoordinate = new byte[(int)(ECC_MAX_XCOORDINATE_BITS_LEN)/8];
@@ -226,6 +310,12 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
 
+    /**
+     * Get the Type of the Container
+     * @param lContainerHandle      Container Handle
+     * @return  Type(RSA or SM2)
+     * @throws SarException
+     */
     public long SKF_GetContainerType(long lContainerHandle) throws SarException{
         SKF_CheckHandler(lContainerHandle);
         long[] lType = new long[1];
@@ -234,6 +324,14 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
 
+    /**
+     * Export Public Key
+     * @param lContainerHandle      Container Handle
+     * @param bSignFlag             Key type (True: Sign  False: Encrypt)
+     * @param bECC                  Key Alg type (True: SM2 False: RSA)
+     * @return SM2 or RSA public key
+     * @throws SarException
+     */
     public Object SKF_ExportPublicKey(long lContainerHandle, boolean bSignFlag, boolean bECC) throws SarException{
         SKF_CheckHandler(lContainerHandle);
         long[] lBlobLen = new long[1];
@@ -271,6 +369,13 @@ public class SKFFactoryOpts implements ISKFFactory {
         }
     }
 
+    /**
+     * Generate random numbers
+     * @param lDevHandle        Device Handle
+     * @param length            Random numbers' Length
+     * @return  Byte Array of Random numbers
+     * @throws SarException
+     */
     public byte[] SKF_GenRandom(long lDevHandle, int length) throws SarException {
         SKF_CheckHandler(lDevHandle);
         byte[] randomData = new byte[length];
@@ -278,6 +383,14 @@ public class SKFFactoryOpts implements ISKFFactory {
         return randomData;
     }
 
+    /**
+     * Generate  symmetry key
+     * @param lDevHandle        Device Handle
+     * @param byteKey           Byte array of Symmetry key (Random numbers)
+     * @param lAlgID            Algorithm ID
+     * @return Key Handle
+     * @throws SarException
+     */
     public long SKF_SetSymmKey(long lDevHandle, byte[] byteKey, long lAlgID) throws SarException{
         SKF_CheckHandler(lDevHandle);
         long[] lSessionHandle = new long[1];
@@ -285,6 +398,12 @@ public class SKFFactoryOpts implements ISKFFactory {
         return lSessionHandle[0];
     }
 
+    /**
+     * Encrtypt Initialization
+     * @param lKeyHandle            Encrtypt Key Handle
+     * @param blockCipherParam      Block cipher algorithm related parameters
+     * @throws SarException
+     */
     public void SKF_EncryptInit(long lKeyHandle, BlockCipherParam blockCipherParam) throws SarException {
         SKF_CheckHandler(lKeyHandle);
         SKF_CatchExcetpt(gmtDll.SKF_EncryptInit_N(lKeyHandle, blockCipherParam.getIV(),
@@ -292,6 +411,14 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
 
+    /**
+     * Encrpy
+     * @param lKeyHandle        Encrypt Key Handle
+     * @param data              Data original
+     * @param dataLen           The length of the data
+     * @return  Ciphertext data
+     * @throws SarException
+     */
     public byte[] SKF_Encrypt(long lKeyHandle, byte[] data, long dataLen) throws SarException {
         SKF_CheckHandler(lKeyHandle);
         long[] lEncrytedDataLen = new long[1];
@@ -301,22 +428,47 @@ public class SKFFactoryOpts implements ISKFFactory {
         return encrytedData;
     }
 
+    /**
+     * Decrypt Initialization
+     * @param lKeyHandle        Decrtypt Key Handle
+     * @param blockCipherParam  Block cipher algorithm related parameters
+     * @throws SarException
+     */
     public void SKF_DecryptInit(long lKeyHandle, BlockCipherParam blockCipherParam) throws SarException {
         SKF_CheckHandler(lKeyHandle);
         SKF_CatchExcetpt(gmtDll.SKF_DecryptInit_N(lKeyHandle, blockCipherParam.getIV(),
                 blockCipherParam.getIVLen(), blockCipherParam.getPaddingType(), blockCipherParam.getFeedBitLen()));
     }
 
+    /**
+     * Decrtpt
+     * @param lKeyHandle    Decrtypt Key Handle
+     * @param cipherData    Ciphertext data
+     * @param cipherDataLen The length of the cipherdata
+     * @return
+     * @throws SarException
+     */
     public byte[] SKF_Decrypt(long lKeyHandle, byte[] cipherData, long cipherDataLen) throws SarException {
         SKF_CheckHandler(lKeyHandle);
         long[] lDecrytedDataLen = new long[1];
         SKF_CatchExcetpt(gmtDll.SKF_Decrypt_N(lKeyHandle, cipherData, cipherDataLen, null, lDecrytedDataLen));
+        byte[] tempData = new byte[(int)lDecrytedDataLen[0]];
+        SKF_CatchExcetpt(gmtDll.SKF_Decrypt_N(lKeyHandle, cipherData, cipherDataLen, tempData, lDecrytedDataLen));
         byte[] decrytedData = new byte[(int)lDecrytedDataLen[0]];
-        SKF_CatchExcetpt(gmtDll.SKF_Decrypt_N(lKeyHandle, cipherData, cipherDataLen, decrytedData, lDecrytedDataLen));
+        System.arraycopy(tempData, 0, decrytedData, 0, (int)lDecrytedDataLen[0]);
         return decrytedData;
     }
 
 
+    /**
+     * Expand the encryption with sm2
+     * @param lDevHandle        Device Handle
+     * @param eccPublicKeyBlob  Sm2 publickey blobk
+     * @param plainText         Data original, plaintext
+     * @param plainTextLen      The length of plaintext
+     * @return Ciphertext data of sm2
+     * @throws SarException
+     */
     public ECCCipherBlob SKF_ExtECCEncrypt(long lDevHandle, SKFCspKey.ECCPublicKeyBlob eccPublicKeyBlob,
                                            byte[] plainText, long plainTextLen) throws SarException {
 
@@ -333,6 +485,12 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
 
+    /**
+     * Import SM2 Encrtyption keypair
+     * @param lContainer                Container Handle
+     * @param eccEnvelopedKeyBlob       Protected encryption key pair
+     * @throws SarException
+     */
     public void SKF_ImportECCKeyPair(long lContainer, ECCEnvelopedKeyBlob eccEnvelopedKeyBlob) throws SarException{
         SKF_CheckHandler(lContainer);
         SKF_CatchExcetpt(gmtDll.SKF_ImportECCKeyPair_N(lContainer, eccEnvelopedKeyBlob.getVersion(), eccEnvelopedKeyBlob.getSymmAlgID(),
@@ -345,6 +503,15 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
 
+    /**
+     * Digest Initialization
+     * @param lDevHandle            Device Handle
+     * @param algId                 Algorithm ID
+     * @param eccPublicKeyBlob      Signer public key. Valid when Algorithm ID is equal SGD_SM3.
+     * @param sPucID                Signer ID
+     * @return  Hash Handle
+     * @throws SarException
+     */
     public long SKF_DigestInit(long lDevHandle, long algId, SKFCspKey.ECCPublicKeyBlob eccPublicKeyBlob, String sPucID) throws SarException{
         SKF_CheckHandler(lDevHandle);
 
@@ -362,6 +529,14 @@ public class SKFFactoryOpts implements ISKFFactory {
         return lHashHandle[0];
     }
 
+    /**
+     * Digest
+     * @param lHashHandle       Hash Handle
+     * @param msg               Message
+     * @param dataLen           The length of message
+     * @return Hash Data
+     * @throws SarException
+     */
     public byte[] SKF_Digest(long lHashHandle, byte[] msg, long dataLen) throws SarException {
         SKF_CheckHandler(lHashHandle);
         long[] lHashLen = new long[1];
@@ -373,6 +548,14 @@ public class SKFFactoryOpts implements ISKFFactory {
 
     }
 
+    /**
+     * ECC Sign
+     * @param lContainer    Container Handle
+     * @param digest        Digest Data
+     * @param digestLen     The length of data
+     * @return  Signature
+     * @throws SarException
+     */
     public byte[] SKF_ECCSignData(long lContainer, byte[] digest, long digestLen) throws SarException {
         byte[] r = new byte[(int)ECC_MAX_XCOORDINATE_BITS_LEN/8];
         byte[] s = new byte[(int)ECC_MAX_YCOORDINATE_BITS_LEN/8];
@@ -390,6 +573,16 @@ public class SKFFactoryOpts implements ISKFFactory {
         return ECCDer.encode(signBlob.getR(), signBlob.getS());
     }
 
+    /**
+     * ECC Verify
+     * @param lDevHandle            Device Handle
+     * @param eccPublicKeyBlob      SM2 PublicKey use to verify
+     * @param digest                Digest Data
+     * @param digestLen             The length of data
+     * @param signature             Signature
+     * @return  Success
+     * @throws SarException
+     */
     public boolean SKF_ECCVerify(long lDevHandle, SKFCspKey.ECCPublicKeyBlob eccPublicKeyBlob,byte[] digest,
                                  long digestLen, byte[] signature) throws SarException{
         SKF_CheckHandler(lDevHandle);
@@ -422,6 +615,13 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
 
+    /**
+     * Generation RSA Keypair
+     * @param lContainerHandle      Container Handle
+     * @param lBits                 The Bit of the keypair
+     * @return  Rsa publickey block
+     * @throws SarException
+     */
     public SKFCspKey.RSAPublicKeyBlob SKF_GenRSAKeyPair(long lContainerHandle, long lBits) throws SarException{
         SKF_CheckHandler(lContainerHandle);
 
@@ -461,6 +661,17 @@ public class SKFFactoryOpts implements ISKFFactory {
                 input, lInputLen, dataout, datalen));
         return dataout;
     }
+
+    /**
+     * Import Rsa encrtyption keypair
+     * @param lContainerHandle      Container Handle
+     * @param lAlgID                Algorithm ID
+     * @param wrappedKey            Symmetric algorithm key protected with the signature public key in the container
+     * @param wrappedKeyLen         The length of key
+     * @param encryptedData         RSA encrypted private key protected with symmetric algorithm key
+     * @param encryptedDataLen      he length of key data
+     * @throws SarException
+     */
     public void SKF_ImportRSAKeyPair(long lContainerHandle, long lAlgID, byte[] wrappedKey, long wrappedKeyLen,
                                      byte[] encryptedData, long encryptedDataLen) throws SarException{
         SKF_CheckHandler(lContainerHandle);
@@ -468,6 +679,14 @@ public class SKFFactoryOpts implements ISKFFactory {
                 encryptedData, encryptedDataLen));
     }
 
+    /**
+     * Sign with rsa key
+     * @param lContainerHandle      Container Handle
+     * @param data                  Data original
+     * @param dataLen               The length of data
+     * @return Signature data
+     * @throws SarException
+     */
     public byte[] SKF_RSASignData(long lContainerHandle, byte[] data, long dataLen) throws SarException{
         SKF_CheckHandler(lContainerHandle);
         long[] lSignatureLen = new long[1];
@@ -477,6 +696,15 @@ public class SKFFactoryOpts implements ISKFFactory {
         return signature;
     }
 
+    /**
+     * Verify with rsa key
+     * @param lDevHandle            Device Handle
+     * @param rsaPublicKey          Rsa Publickey blobk
+     * @param data                  Data original
+     * @param signature             Signature data
+     * @return True or throw exception
+     * @throws SarException
+     */
     public boolean SKF_RSAVerify(long lDevHandle, SKFCspKey.RSAPublicKeyBlob rsaPublicKey, byte[] data,
                                  byte[] signature) throws SarException{
         SKF_CheckHandler(lDevHandle);
@@ -485,18 +713,33 @@ public class SKFFactoryOpts implements ISKFFactory {
         return true;
     }
 
+    /**
+     * Check if the handle is valid
+     * @param lHandle       Handle
+     * @throws SarException
+     */
     private void SKF_CheckHandler(long lHandle) throws SarException {
         if (lHandle <= 0) {
             throw new SarException(SarException.SAR_INVALIDHANDLEERR);
         }
     }
 
+    /**
+     * Catch SarException
+     * @param resultValue
+     * @throws SarException
+     */
     private void SKF_CatchExcetpt(long resultValue) throws SarException{
         if(resultValue != SarException.SAR_OK) {
             throw new SarException((int)resultValue);
         }
     }
 
+    /**
+     * Catch skf related supplementary excetpt
+     * @param resultValue
+     * @throws JCSKFException
+     */
     private void SKF_CatchJCExcetpt(long resultValue) throws JCSKFException{
         if(resultValue != JCSKFException.JC_SKF_OK) {
             throw new JCSKFException((int)resultValue);
