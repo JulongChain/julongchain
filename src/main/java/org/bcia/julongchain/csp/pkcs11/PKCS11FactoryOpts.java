@@ -51,12 +51,14 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
     PKCS11CspLog csplog = new PKCS11CspLog();
 
 
+    // For soft impl
     public PKCS11FactoryOpts(PKCS11Config pkcsConf) {
         this.bSoftVerify = pkcsConf.getSoftVerify();
         this.bSensitive = pkcsConf.getnoKImport();
         this.path = pkcsConf.getPath();
     }
 
+    // For hardware impl
     public PKCS11FactoryOpts(PKCS11Lib pkcslib, PKCS11Config pkcsConf) throws CspException {
 
         this.bSoftVerify = pkcsConf.getSoftVerify();
@@ -87,7 +89,7 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
             {
                 String str=null;
                 str=String.format("[JC_PKCS]:Could not find token with label %s and serialNumber %s", pkcslib.getKeyLabel(),pkcslib.getKeySN());
-                csplog.setLogMsg(str, 2, PKCS11FactoryOpts.class);
+                csplog.setLogMsg(str, csplog.LEVEL_ERROR, PKCS11FactoryOpts.class);
                 throw new CspException(str);
             }
 
@@ -98,16 +100,16 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
 
         }catch (IOException ex){
             String err = String.format("[JC_PKCS]:IOException ErrMessage:", ex.getMessage());
-            csplog.setLogMsg(err, 2, PKCS11FactoryOpts.class);
+            csplog.setLogMsg(err, csplog.LEVEL_ERROR, PKCS11FactoryOpts.class);
             throw new CspException(err, ex.getCause());
         }catch(PKCS11Exception ex) {
             if(ex.getErrorCode() == PKCS11Constants.CKR_USER_ALREADY_LOGGED_IN)
             {
-                csplog.setLogMsg("Already loggin!", 0, PKCS11FactoryOpts.class);
+                csplog.setLogMsg("Already loggin!", csplog.LEVEL_DEBUG, PKCS11FactoryOpts.class);
             }else
             {
                 String err = String.format("[JC_PKCS]:PKCS11Exception code: 0x%08x", ex.getErrorCode());
-                csplog.setLogMsg(err, 2, PKCS11FactoryOpts.class);
+                csplog.setLogMsg(err, csplog.LEVEL_ERROR, PKCS11FactoryOpts.class);
                 throw new CspException(err, ex.getCause());
             }
         }

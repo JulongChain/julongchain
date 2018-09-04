@@ -140,7 +140,7 @@ public class PKCS11Csp implements IPKCS11Csp {
             return key;
         }
 
-        csplog.setLogMsg("[JC_PKCS]:No Support the Opts for Genkey!", 1, PKCS11Csp.class);
+        csplog.setLogMsg("[JC_PKCS]:No Support the Opts for Genkey!", csplog.LEVEL_INFO, PKCS11Csp.class);
         return null;
     }
 
@@ -154,7 +154,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     			EcdsaImpl.DeriveECKey deriv = new EcdsaImpl.DeriveECKey();
     			if(key.ski().length <= 0)
     	        {
-                    csplog.setLogMsg("[JC_PKCS]:keyDeriv Param Err!", 2, PKCS11Csp.class);
+                    csplog.setLogMsg("[JC_PKCS]:keyDeriv Param Err!", csplog.LEVEL_ERROR, PKCS11Csp.class);
     	        	throw new CspException("[JC_PKCS]:Param Err!");
     	        }
     	        byte[] byski = new byte[key.ski().length-1];
@@ -164,7 +164,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     	        byte[] newski = importkey.importECKey(null,key.toBytes(),opts.isEphemeral(),PKCS11FactoryOpts,false);  
     	        if(!DataUtil.compareByteArray(newski, byski))
     			{
-                    csplog.setLogMsg("[JC_PKCS]:Import key value err! Can not continue to KeyDeriv!", 2, PKCS11Csp.class);
+                    csplog.setLogMsg("[JC_PKCS]:Import key value err! Can not continue to KeyDeriv!", csplog.LEVEL_ERROR, PKCS11Csp.class);
     				throw new CspException("[JC_PKCS]:Import key value err! Can not continue to KeyDeriv!");
     			}
     	        
@@ -174,7 +174,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     			EcdsaImpl.DeriveECKey deriv = new EcdsaImpl.DeriveECKey();
     			if(key.ski().length <= 0)
     	        {
-                    csplog.setLogMsg("[JC_PKCS]:keyDeriv Param Err!", 2, PKCS11Csp.class);
+                    csplog.setLogMsg("[JC_PKCS]:keyDeriv Param Err!", csplog.LEVEL_ERROR, PKCS11Csp.class);
     	        	throw new CspException("[JC_PKCS]:Param Err!");
     	        }
     	        byte[] byski = new byte[key.ski().length-1];
@@ -185,7 +185,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     			EcdsaImpl.DeriveECKey deriv = new EcdsaImpl.DeriveECKey();
     			if(key.ski().length <= 0)
     	        {
-                    csplog.setLogMsg("[JC_PKCS]:keyDeriv Param Err!", 2, PKCS11Csp.class);
+                    csplog.setLogMsg("[JC_PKCS]:keyDeriv Param Err!", csplog.LEVEL_ERROR, PKCS11Csp.class);
     	        	throw new CspException("[JC_PKCS]:Param Err!");
     	        }
     	        byte[] byski = new byte[key.ski().length-1];
@@ -194,7 +194,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     			return mykey;
     		}
     		else {
-                csplog.setLogMsg("[JC_PKCS]:No Support the Opts for keyDeriv!", 1, PKCS11Csp.class);
+                csplog.setLogMsg("[JC_PKCS]:No Support the Opts for keyDeriv!", csplog.LEVEL_INFO, PKCS11Csp.class);
     			return null;
     		}
     	}
@@ -205,7 +205,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     			EcdsaImpl.DeriveECKey deriv = new EcdsaImpl.DeriveECKey();
     			if(key.ski().length <= 0)
     	        {
-                    csplog.setLogMsg("[JC_PKCS]:keyDeriv Param Err!", 2, PKCS11Csp.class);
+                    csplog.setLogMsg("[JC_PKCS]:keyDeriv Param Err!", csplog.LEVEL_ERROR, PKCS11Csp.class);
     	        	throw new CspException("[JC_PKCS]:keyDeriv Param Err!");
     	        }
     	        byte[] byski = new byte[key.ski().length-1];
@@ -222,12 +222,12 @@ public class PKCS11Csp implements IPKCS11Csp {
     			IKey mykey = deriv.deriveKey(byski, opts.isEphemeral(), true, PKCS11FactoryOpts);
     			return mykey;
     		}else {
-                csplog.setLogMsg("[JC_PKCS]:No Support the Opts for keyDeriv!", 1, PKCS11Csp.class);
+                csplog.setLogMsg("[JC_PKCS]:No Support the Opts for keyDeriv!", csplog.LEVEL_INFO, PKCS11Csp.class);
     			return null;
     		}
     	}
 
-        csplog.setLogMsg("[JC_PKCS]:The Key's Type not EC Key. The Impl Only support EC Key!", 1, PKCS11Csp.class);
+        csplog.setLogMsg("[JC_PKCS]:The Key's Type not EC Key. The Impl Only support EC Key!", csplog.LEVEL_INFO, PKCS11Csp.class);
         return null;
     }
 
@@ -236,7 +236,7 @@ public class PKCS11Csp implements IPKCS11Csp {
 
         if(raw == null || opts == null)
         {
-            csplog.setLogMsg("[JC_PKCS]:KeyImport Param Err!", 2, PKCS11Csp.class);
+            csplog.setLogMsg("[JC_PKCS]:KeyImport Param Err!", csplog.LEVEL_ERROR, PKCS11Csp.class);
             throw new CspException("[JC_PKCS]:Param Err!");
         }
 
@@ -285,7 +285,7 @@ public class PKCS11Csp implements IPKCS11Csp {
             	return importaeskey.importAES(prider, opts.isEphemeral(), PKCS11FactoryOpts);
         }
 
-        csplog.setLogMsg("[JC_PKCS]:No Support the Opts!", 1, PKCS11Csp.class);
+        csplog.setLogMsg("[JC_PKCS]:No Support the Opts!", csplog.LEVEL_INFO, PKCS11Csp.class);
         return null;
     }
 
@@ -295,7 +295,7 @@ public class PKCS11Csp implements IPKCS11Csp {
 
         if(ski.length <= 0)
         {
-            csplog.setLogMsg("The Param Error!", 2, PKCS11Csp.class);
+            csplog.setLogMsg("The Param Error!", csplog.LEVEL_ERROR, PKCS11Csp.class);
             throw new CspException("[JC_PKCS]:The Param Error!");
         }
         byte[] byski = new byte[ski.length-1];
@@ -327,7 +327,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     public byte[] hash(byte[] msg, IHashOpts opts) throws CspException {
         if(opts == null || msg == null)
         {
-            csplog.setLogMsg("The Param Error!", 2, PKCS11Csp.class);
+            csplog.setLogMsg("The Param Error!", csplog.LEVEL_ERROR, PKCS11Csp.class);
             throw new CspException("[JC_PKCS]:The Param Error!");
         }
 
@@ -357,12 +357,12 @@ public class PKCS11Csp implements IPKCS11Csp {
         }
         if(opts instanceof PKCS11HashOpts.SHA3_256Opts)
         {
-            csplog.setLogMsg("[JC_PKCS]:No Support the Opts with Hardware!", 2, PKCS11Csp.class);
+            csplog.setLogMsg("[JC_PKCS]:No Support the Opts with Hardware!", csplog.LEVEL_ERROR, PKCS11Csp.class);
             return null;
         }
         if(opts instanceof PKCS11HashOpts.SHA3_384Opts)
         {
-            csplog.setLogMsg("[JC_PKCS]:No Support the Opts with Hardware!", 2, PKCS11Csp.class);
+            csplog.setLogMsg("[JC_PKCS]:No Support the Opts with Hardware!", csplog.LEVEL_ERROR, PKCS11Csp.class);
             return null;
         }
 
@@ -376,7 +376,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     public IHash getHash(IHashOpts opts) throws CspException {
         if(opts == null)
         {
-            csplog.setLogMsg("The Param Error!", 2, PKCS11Csp.class);
+            csplog.setLogMsg("The Param Error!", csplog.LEVEL_ERROR, PKCS11Csp.class);
             throw new CspException("[JC_PKCS]:The Param Error!");
         }
 
@@ -404,13 +404,13 @@ public class PKCS11Csp implements IPKCS11Csp {
         if(opts instanceof PKCS11HashOpts.SHA3_256Opts)
         {
             //Hard No Support
-            csplog.setLogMsg("[JC_PKCS]:No Support the Opts with Hardware!", 2, PKCS11Csp.class);
+            csplog.setLogMsg("[JC_PKCS]:No Support the Opts with Hardware!", csplog.LEVEL_ERROR, PKCS11Csp.class);
             return null;
         }
         if(opts instanceof PKCS11HashOpts.SHA3_384Opts)
         {
         	//Hard No Support
-            csplog.setLogMsg("[JC_PKCS]:No Support the Opts with Hardware!", 2, PKCS11Csp.class);
+            csplog.setLogMsg("[JC_PKCS]:No Support the Opts with Hardware!", csplog.LEVEL_ERROR, PKCS11Csp.class);
             return null;
         }
 
@@ -423,7 +423,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     public byte[] sign(IKey key, byte[] digest, ISignerOpts opts) throws CspException {
         if(opts == null)
         {
-            csplog.setLogMsg("The Param For Sign is Error!", 2, PKCS11Csp.class);
+            csplog.setLogMsg("The Param For Sign is Error!", csplog.LEVEL_ERROR, PKCS11Csp.class);
             throw new CspException("[JC_PKCS]:The Param For Sign is Error!");
         }
 
@@ -450,7 +450,7 @@ public class PKCS11Csp implements IPKCS11Csp {
             return signature;
         }
 
-        csplog.setLogMsg("No Support the Opts for Sign!", 2, PKCS11Csp.class);
+        csplog.setLogMsg("No Support the Opts for Sign!", csplog.LEVEL_ERROR, PKCS11Csp.class);
         throw new CspException("[JC_PKCS]:No Support the Opts for Sign!");
 
     }
@@ -459,7 +459,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     public boolean verify(IKey key, byte[] signature, byte[] digest, ISignerOpts opts) throws CspException {
         if(opts == null)
         {
-            csplog.setLogMsg("The Param For Verify is Error!", 2, PKCS11Csp.class);
+            csplog.setLogMsg("The Param For Verify is Error!", csplog.LEVEL_ERROR, PKCS11Csp.class);
             throw new CspException("[JC_PKCS]:The Param For Verify is Error!");
         }
 
@@ -483,7 +483,7 @@ public class PKCS11Csp implements IPKCS11Csp {
             return bver;
         }
 
-        csplog.setLogMsg("No Support the Opts for Verify!", 2, PKCS11Csp.class);
+        csplog.setLogMsg("No Support the Opts for Verify!", csplog.LEVEL_ERROR, PKCS11Csp.class);
         throw new CspException("[JC_PKCS]:No Support the Opts for Verify!");
     }
 
@@ -492,7 +492,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     public byte[] encrypt(IKey key, byte[] plaintext, IEncrypterOpts opts) throws CspException {
         if(opts == null)
         {
-        	csplog.setLogMsg("The Param For Encrypt is Error!", 2, PKCS11Csp.class);
+        	csplog.setLogMsg("The Param For Encrypt is Error!", csplog.LEVEL_ERROR, PKCS11Csp.class);
         	throw new CspException("[JC_PKCS]:The Param For Encrypt is Error!");
         }
 
@@ -514,7 +514,7 @@ public class PKCS11Csp implements IPKCS11Csp {
             return ciphertext;
         }
 
-        csplog.setLogMsg("No Support the Opts for Encrypt!", 2, PKCS11Csp.class);
+        csplog.setLogMsg("No Support the Opts for Encrypt!", csplog.LEVEL_ERROR, PKCS11Csp.class);
         throw new CspException("[JC_PKCS]:No Support the Opts for Encrypt!");
 
     }
@@ -523,7 +523,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     public byte[] decrypt(IKey key, byte[] ciphertext, IDecrypterOpts opts) throws CspException {
         if(opts == null)
         {
-            csplog.setLogMsg("The Param For Decrypt is Error!", 2, PKCS11Csp.class);
+            csplog.setLogMsg("The Param For Decrypt is Error!", csplog.LEVEL_ERROR, PKCS11Csp.class);
             throw new CspException("[JC_PKCS]:The Param For Decrypt is Error!");
         }
 
@@ -545,7 +545,7 @@ public class PKCS11Csp implements IPKCS11Csp {
             return plaintext;
         }
 
-        csplog.setLogMsg("No Support the Opts for Decrypt!", 2, PKCS11Csp.class);
+        csplog.setLogMsg("No Support the Opts for Decrypt!", csplog.LEVEL_ERROR, PKCS11Csp.class);
         throw new CspException("[JC_PKCS]:No Support the Opts for Decrypt!");
     }
 
@@ -561,7 +561,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     	} catch(PKCS11Exception ex) {
     		ex.printStackTrace();
             String err = String.format("[JC_PKCS]:PKCS11Exception ErrCode: 0x%08x", ex.getErrorCode());
-            csplog.setLogMsg(err, 2, PKCS11Csp.class);
+            csplog.setLogMsg(err, csplog.LEVEL_ERROR, PKCS11Csp.class);
             throw new CspException(err, ex.getCause());
     	}
     	
