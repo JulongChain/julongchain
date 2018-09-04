@@ -21,4 +21,5 @@ RUN apt-get -y install net-tools
 RUN apt-get -y install iputils-ping
 RUN mkdir -p /root/julongchain
 WORKDIR /root/julongchain
+ENV LANG C.UTF-8
 
