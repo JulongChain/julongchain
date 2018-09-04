@@ -36,6 +36,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.julongchain.protos.node.TransactionPackage;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,7 +76,7 @@ public class Validator implements InternalValidator {
                     for(KvRwset.KVWriteHash kvHashedRead : col.getHashedRwSet().getHashedWritesList()){
                         HashedCompositeKey hashedCompositeKey = new HashedCompositeKey(nsRwSet.getNameSpace(),
                                 col.getCollectionName(),
-                                new String(kvHashedRead.getKeyHash().toByteArray()));
+                                new String(kvHashedRead.getKeyHash().toByteArray(), StandardCharsets.UTF_8));
                         if(!hashedKeyMap.containsKey(hashedCompositeKey)){
                             hashedKeyMap.put(hashedCompositeKey, null);
                             hashedKeys.add(hashedCompositeKey);

@@ -12,6 +12,7 @@ import org.bcia.julongchain.common.protos.EnvelopeVO;
 import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
+import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.core.node.util.NodeUtils;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Ledger;
@@ -87,7 +88,7 @@ public class FsBlockStoreTest {
 		store.addBlock(block);
 		bcInfo = store.getBlockchainInfo();
 		assertSame(block.getHeader().getNumber(), bcInfo.getHeight() - 1);
-		assertEquals(block.getHeader().getDataHash(), bcInfo.getCurrentBlockHash());
+		assertArrayEquals(block.getHeader().toByteArray(), bcInfo.getCurrentBlockHash().toByteArray());
 		assertEquals(block.getHeader().getPreviousHash(), bcInfo.getPreviousBlockHash());
 	}
 
@@ -102,9 +103,12 @@ public class FsBlockStoreTest {
 	@Test
 	public void retrieveBlockByHash() throws Exception {
 		Common.Block block = l.getBlockByNumber(1L);
-		ByteString dataHash = block.getHeader().getDataHash();
-		Common.Block block1 = store.retrieveBlockByHash(dataHash.toByteArray());
+		ByteString dataHash = block.getHeader().toByteString();
+		Common.Block block1 = store.retrieveBlockByHash(Util.getHashBytes(dataHash.toByteArray()));
 		assertEquals(block, block1);
+
+		thrown.expect(LedgerException.class);
+		Common.Block block2 = store.retrieveBlockByHash(null);
 	}
 
 	@Test
@@ -124,6 +128,9 @@ public class FsBlockStoreTest {
 		//不存在的txid
 		evn = store.retrieveTxByID("txID5");
 		assertNull(evn);
+
+		thrown.expect(LedgerException.class);
+		store.retrieveTxByID(null);
 	}
 
 	@Test
@@ -142,6 +149,9 @@ public class FsBlockStoreTest {
 		assertSame(1L, block.getHeader().getNumber());
 		block = store.retrieveBlockByTxID("txID5");
 		assertNull(block);
+
+		thrown.expect(LedgerException.class);
+		store.retrieveBlockByTxID(null);
 	}
 
 	@Test
@@ -151,5 +161,8 @@ public class FsBlockStoreTest {
 		assertSame(TransactionPackage.TxValidationCode.VALID, code);
 		code = store.retrieveTxValidationCodeByTxID("txID5");
 		assertNull(code);
+
+		thrown.expect(LedgerException.class);
+		store.retrieveTxValidationCodeByTxID(null);
 	}
 }

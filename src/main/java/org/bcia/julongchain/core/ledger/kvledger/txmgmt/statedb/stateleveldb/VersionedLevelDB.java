@@ -117,7 +117,7 @@ public class VersionedLevelDB implements IVersionedDB {
                 String key = entry.getKey();
                 byte[] compositeKey = constructCompositeKey(ns, key);
                 log.debug(String.format("Group [%s]: Applying key(String)=[%s] key(bytes)=[%s]"
-                        , dbName, new String(compositeKey), Hex.toHexString(compositeKey)));
+                        , dbName, new String(compositeKey, StandardCharsets.UTF_8), Hex.toHexString(compositeKey)));
 
                 if(entry.getValue() == null){
                     dbBatch.delete(compositeKey);
@@ -169,14 +169,14 @@ public class VersionedLevelDB implements IVersionedDB {
     }
 
     public static String splitCompositeKeyToKey(byte[] compositeKey){
-       String tmp = new String(compositeKey);
-       String[] result = tmp.split(new String(COMPOSITE_KEY_SEP));
+       String tmp = new String(compositeKey, StandardCharsets.UTF_8);
+       String[] result = tmp.split(new String(COMPOSITE_KEY_SEP, StandardCharsets.UTF_8));
        return result[result.length - 1];
     }
 
     public static String splitCompositeKeyToNs(byte[] compositeKey){
-        String tmp = new String(compositeKey);
-        String[] result = tmp.split(new String(COMPOSITE_KEY_SEP));
+        String tmp = new String(compositeKey, StandardCharsets.UTF_8);
+        String[] result = tmp.split(new String(COMPOSITE_KEY_SEP, StandardCharsets.UTF_8));
         return result[result.length - 2];
     }
 

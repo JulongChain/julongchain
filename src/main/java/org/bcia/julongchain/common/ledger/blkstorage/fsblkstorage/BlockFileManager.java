@@ -200,7 +200,7 @@ public class BlockFileManager {
         //序列化后的block
         byte[] blockBytes = block.toByteArray();
         //blockData的Hash
-        ByteString blockHash = block.getHeader().getDataHash();
+        ByteString blockHash = block.getHeader().toByteString();
         //当前区块文件的位置
         int currentOffset = cpInfo.getLatestFileChunksize();
         //区块长度(尾部)
@@ -241,7 +241,7 @@ public class BlockFileManager {
         FileLocPointer blockFLP = new FileLocPointer(newCPInfo.getLastestFileChunkSuffixNum(), currentOffset, 0);
         //组装区块索引
         BlockIndexInfo idxInfo = new BlockIndexInfo(block.getHeader().getNumber(),
-                blockHash.toByteArray(),
+                Util.getHashBytes(blockHash.toByteArray()),
                 blockFLP,
                 txOffsets,
                 block.getMetadata());
@@ -325,7 +325,7 @@ public class BlockFileManager {
             }
 
             //更新blockIndexInfo
-            blockIndexInfo.setBlockHash(info.getBlockHeader().getDataHash().toByteArray());
+            blockIndexInfo.setBlockHash(Util.getHashBytes(info.getBlockHeader().toByteArray()));
             blockIndexInfo.setBlockNum(info.getBlockHeader().getNumber());
             //封装文件信息
             blockIndexInfo.setFlp(new FileLocPointer(blockPlacementInfo.getFileNum(),
@@ -371,6 +371,11 @@ public class BlockFileManager {
      * 根据区块hash查找区块
      */
 	public Common.Block retrieveBlockByHash(byte[] blockHash) throws LedgerException {
+		if (blockHash == null) {
+			String errMsg = "BlockHash cannot be null";
+			log.error(errMsg);
+			throw new LedgerException(errMsg);
+		}
         log.debug(String.format("retrieveBlockByHash() - blockHash = [%s]", Hex.toHexString(blockHash)));
         FileLocPointer loc;
 		loc = index.getBlockLocByHash(blockHash);
@@ -394,6 +399,11 @@ public class BlockFileManager {
      * 根据交易ID查找区块
      */
 	public Common.Block retrieveBlockByTxID(String txID) throws LedgerException {
+		if (txID == null) {
+			String errMsg = "TxID cannot be null";
+			log.error(errMsg);
+			throw new LedgerException(errMsg);
+		}
         log.debug(String.format("retrieveBlockByTxID() - txID = [%s]", txID));
 
         FileLocPointer loc = index.getBlockLocByTxID(txID);
@@ -404,6 +414,11 @@ public class BlockFileManager {
      * 根据交易ID查找交易校验码
      */
 	public TransactionPackage.TxValidationCode retrieveTxValidationCodeByTxID(String txID) throws LedgerException{
+		if (txID == null) {
+			String errMsg = "TxID cannot be null";
+			log.error(errMsg);
+			throw new LedgerException(errMsg);
+		}
         log.debug(String.format("retrieveTxValidationCodeByTxID() - txID = [%s]", txID));
 		return index.getTxValidationCodeByTxID(txID);
     }
@@ -430,6 +445,11 @@ public class BlockFileManager {
      * 根据交易ID查找交易
      */
 	public Common.Envelope retrieveTransactionByID(String txID) throws LedgerException {
+		if (txID == null) {
+			String errMsg = "TxID cannot be null";
+			log.error(errMsg);
+			throw new LedgerException(errMsg);
+		}
         log.debug(String.format("retrieveTransactionByID() - txID = [%s]", txID));
         FileLocPointer loc = index.getTxLoc(txID);
 		if (loc == null) {

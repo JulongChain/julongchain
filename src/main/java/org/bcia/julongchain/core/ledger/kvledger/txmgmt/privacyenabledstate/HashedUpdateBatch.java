@@ -18,6 +18,8 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.privacyenabledstate;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * hash更新包
  *
@@ -37,15 +39,15 @@ public class HashedUpdateBatch {
         if(ns == null){
             return false;
         }
-        return nsBatch.getBatch().exists(coll, new String(keyHash));
+        return nsBatch.getBatch().exists(coll, new String(keyHash, StandardCharsets.UTF_8));
     }
 
     public void put(String ns, String coll, byte[] key, byte[] value, LedgerHeight version) throws LedgerException {
-        map.put(ns, coll, new String(key), value, version);
+        map.put(ns, coll, new String(key, StandardCharsets.UTF_8), value, version);
     }
 
     public void delete(String ns, String coll, byte[] key, LedgerHeight version) throws LedgerException {
-        map.delete(ns, coll, new String(key), version);
+        map.delete(ns, coll, new String(key, StandardCharsets.UTF_8), version);
     }
 
     public UpdateMap getMap() {

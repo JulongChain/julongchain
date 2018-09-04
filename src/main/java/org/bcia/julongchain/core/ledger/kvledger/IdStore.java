@@ -27,6 +27,7 @@ import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.common.Common;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -75,7 +76,7 @@ public class IdStore {
      */
     public String getUnderConstructionFlag() throws LedgerException {
         byte[] value = provider.get(UNDER_CONSTRUCTION_LEDGER_KEY);
-        return value == null ? null : new String(value);
+        return value == null ? null : new String(value, StandardCharsets.UTF_8);
     }
 
     /**
@@ -176,7 +177,7 @@ public class IdStore {
      * 删除key的LedgerKeyPrefix前缀
      */
     private String decodeLedgerID(byte[] key){
-        String keyStr = new String(key);
+        String keyStr = new String(key, StandardCharsets.UTF_8);
         return keyStr.substring(1, key.length);
     }
 

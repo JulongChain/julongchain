@@ -24,6 +24,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.core.ledger.sceventmgmt.ISmartContractLifecycleEventListener;
 import org.bcia.julongchain.core.ledger.util.Util;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -75,9 +76,9 @@ public class CommonStorageDB implements IDB {
     public LedgerHeight getCachedKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException{
         try {
             IBulkOptimizable bulkOptimizable = (IBulkOptimizable) vdb;
-            String keyHashStr = new String(keyHash);
+            String keyHashStr = new String(keyHash, StandardCharsets.UTF_8);
             if(!bytesKeySuppoted()){
-                keyHashStr = new String(Util.getHashBytes(keyHash));
+                keyHashStr = new String(Util.getHashBytes(keyHash), StandardCharsets.UTF_8);
             }
             return bulkOptimizable.getCachedVersion(deriveHashedDataNs(ns, coll), keyHashStr);
         } catch (Exception e) {
@@ -111,18 +112,18 @@ public class CommonStorageDB implements IDB {
 
     @Override
     public VersionedValue getValueHash(String ns, String coll, byte[] keyHash) throws LedgerException {
-        String keyHashStr = new String(keyHash);
+        String keyHashStr = new String(keyHash, StandardCharsets.UTF_8);
         if(!bytesKeySuppoted()){
-            keyHashStr = new String(Util.getHashBytes(keyHash));
+            keyHashStr = new String(Util.getHashBytes(keyHash), StandardCharsets.UTF_8);
         }
         return getState(deriveHashedDataNs(ns, coll), keyHashStr);
     }
 
     @Override
     public LedgerHeight getKeyHashVersion(String ns, String coll, byte[] keyHash) throws LedgerException {
-        String keyHashStr = new String(keyHash);
+        String keyHashStr = new String(keyHash, StandardCharsets.UTF_8);
         if(!bytesKeySuppoted()){
-            keyHashStr = new String(Util.getHashBytes(keyHash));
+            keyHashStr = new String(Util.getHashBytes(keyHash), StandardCharsets.UTF_8);
         }
         return getHeight(deriveHashedDataNs(ns, coll), keyHashStr);
     }
@@ -179,7 +180,7 @@ public class CommonStorageDB implements IDB {
                     VersionedValue vv = entry1.getValue();
                     if(sm3Key){
                         //TODO SM3 Hash
-                        key = new String(Util.getHashBytes(key.getBytes()));
+                        key = new String(Util.getHashBytes(key.getBytes()), StandardCharsets.UTF_8);
                     }
                     pubUpdateBatch.getBatch().update(deriveHashedDataNs(ns, coll), key, vv);
                 }

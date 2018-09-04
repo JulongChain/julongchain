@@ -16,6 +16,7 @@ limitations under the License.
 package org.bcia.julongchain.core.common.smartcontractprovider;
 
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -39,7 +40,7 @@ public class SDSData implements Serializable {
 
     @Override
     public String toString() {
-        return "codeHash: " + new String(codeHash) + "\nmetaHash: " + new String(metaDataHash);
+        return "codeHash: " + new String(codeHash, StandardCharsets.UTF_8) + "\nmetaHash: " + new String(metaDataHash, StandardCharsets.UTF_8);
     }
 
     @Override

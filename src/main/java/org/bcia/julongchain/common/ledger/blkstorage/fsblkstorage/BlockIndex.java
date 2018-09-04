@@ -260,7 +260,7 @@ public class BlockIndex implements Index {
         	log.error("Got wrong txValidationCode which length is 1");
         	return null;
         }
-        return TransactionPackage.TxValidationCode.forNumber(Integer.valueOf(new String(raw)));
+        return TransactionPackage.TxValidationCode.forNumber(Integer.valueOf(new String(raw, StandardCharsets.UTF_8)));
     }
 
     private byte[] constructBlockNumKey(long blockNum) {

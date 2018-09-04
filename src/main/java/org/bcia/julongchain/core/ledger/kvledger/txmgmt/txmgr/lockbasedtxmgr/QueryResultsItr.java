@@ -23,6 +23,8 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.RWSetBuilder;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.VersionedKV;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * 富查询迭代器
  * leveldb不支持
@@ -49,7 +51,7 @@ public class QueryResultsItr implements IResultsIterator {
             return null;
         }
         VersionedKV versionedQueyrRecord = (VersionedKV) queryResult.getObj();
-        log.debug("queryResultItr.Next() returned a record " + new String(versionedQueyrRecord.getVersionedValue().getValue()));
+        log.debug("queryResultItr.Next() returned a record " + new String(versionedQueyrRecord.getVersionedValue().getValue(), StandardCharsets.UTF_8));
         if(rwSetBuilder != null){
             rwSetBuilder.addToReadSet(versionedQueyrRecord.getCompositeKey().getNamespace(),
                     versionedQueyrRecord.getCompositeKey().getKey(),
