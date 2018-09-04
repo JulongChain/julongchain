@@ -15,7 +15,7 @@
  */
 package org.bcia.julongchain.csp.gmt0016.ftsafe.entity;
 
-import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.exception.CspException;
 
 /**
  * HardWare Information
@@ -34,7 +34,7 @@ public class GMT0016Lib {
 
 
     public GMT0016Lib(String slib, String sLabel, String sSn, String sAdminPin,
-                      String sUserPin, String sAppName) throws JulongChainException {
+                      String sUserPin, String sAppName) throws CspException {
 
         checkParam(sLabel);
         checkParam(slib);
@@ -51,10 +51,10 @@ public class GMT0016Lib {
         this.sAppName = sAppName;
     }
 
-    private void checkParam(String str) throws JulongChainException {
+    private void checkParam(String str) throws CspException {
         if (str == null || "".equals(str))
         {
-            throw new JulongChainException("[JC_SKF]:Param Err!");
+            throw new CspException("[JC_SKF]:Param Err!");
         }
     }
 

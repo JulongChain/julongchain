@@ -16,7 +16,6 @@
 package org.bcia.julongchain.csp.gmt0016.ftsafe.util;
 
 import org.bcia.julongchain.common.exception.CspException;
-import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.SarException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.IGMT0016FactoryOpts;
@@ -63,9 +62,9 @@ public class GMDigest {
      * @param msg       Message
      * @param opts      Gmt0016 factory
      * @return Digest value
-     * @throws JulongChainException
+     * @throws CspException
      */
-    public static byte[] getHash(byte[] msg, IGMT0016FactoryOpts opts) throws CspException {
+    public byte[] getHash(byte[] msg, IGMT0016FactoryOpts opts) throws CspException {
         try {
             long lHashHandle = opts.getSKFFactory().SKF_DigestInit(opts.getDevHandle(), lAlgID, null, null);
             byte[] hashData = opts.getSKFFactory().SKF_Digest(lHashHandle, msg, msg.length);
