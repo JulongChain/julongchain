@@ -21,5 +21,6 @@ COPY lib/ /root/julongchain/lib
 COPY smartcontract/ root/julongchain/smartcontract
 COPY libsdtsmjni.so /lib
 COPY libsdtsm.so /lib
+ENV LANG C.UTF-8
 WORKDIR /root/julongchain
 CMD java -jar /root/julongchain/julongchain.jar node start
