@@ -73,8 +73,19 @@ public class GMT0016CspConstant {
     public static final int TAG_PUBLICK_KEY_HASH = 0x04; //hash
     public static final int TAG_KEY_TYPE = 0x05;
 
-    public static final int BUFFERSIZE = 96;
 
+    public static final int ALG_RSA = 1;
+    public static final int ALG_ECC = 2;
+    public static final int ALG_AES = 3;
+
+    public static final int TYPE_RSA = 1;
+    public static final int TYPE_SM2 = 2;
+
+    public static final int TYPE_ENCRYPT = 0;
+    public static final int TYPE_SIGN = 1;
+
+    public static final int BUFFERSIZE = 96;
+    public static final byte DER_TAG = 0x04;
 
 
     // an error will be returned.

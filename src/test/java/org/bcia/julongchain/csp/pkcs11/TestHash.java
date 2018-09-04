@@ -21,18 +21,19 @@ import org.bcia.julongchain.csp.intfs.opts.IHashOpts;
 import org.bcia.julongchain.csp.pkcs11.entity.PKCS11Config;
 import org.bcia.julongchain.csp.pkcs11.entity.PKCS11Lib;
 import org.bcia.julongchain.csp.pkcs11.util.PKCS11HashOpts;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TestHash {
 	int secLevel= 5;
-	String hashFamily="MD";		
+	String hashFamily="MD";
 	String keyStorePath=null;
-	String Library=null;		
+	String Library=null;
 	String Label=null;
 	String SN=null;
 	String Pin=null;
-	boolean bSensitive=false; 
+	boolean bSensitive=false;
 	boolean bSoftVerify=false;
 	PKCS11Lib findlib = null;
 	PKCS11Config findconf = null;
@@ -57,6 +58,8 @@ public class TestHash {
 		try {
 			IHashOpts opts = new PKCS11HashOpts.MD2Opts();
 			byte[] hash = csp.hash(msg, opts);
+
+			Assert.assertNotNull(hash);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -66,6 +69,8 @@ public class TestHash {
 		try {
 			IHashOpts opts = new PKCS11HashOpts.MD5Opts();
 			byte[] hash = csp.hash(msg, opts);
+
+			Assert.assertNotNull(hash);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -79,10 +84,14 @@ public class TestHash {
 			String tt = "1234567890";
 			String tt1 = "helo";
 			String tt2 = "word";
+			Assert.assertNotNull(test);
+
 			int len = test.write(tt.getBytes());
+			Assert.assertEquals(len,10);
 			len = test.write(tt1.getBytes());
+			Assert.assertEquals(len,14);
 			len = test.write(tt2.getBytes());
-			return;
+			Assert.assertEquals(len,18);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -92,6 +101,8 @@ public class TestHash {
 		try {
 			IHashOpts opts = new PKCS11HashOpts.SHA256Opts();
 			byte[] hash = csp.hash(msg, opts);
+
+			Assert.assertNotNull(hash);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -101,6 +112,7 @@ public class TestHash {
 		try {
 			IHashOpts opts = new PKCS11HashOpts.SHA384Opts();
 			byte[] hash = csp.hash(msg, opts);
+			Assert.assertNotNull(hash);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -110,6 +122,7 @@ public class TestHash {
 		try {
 			IHashOpts opts = new PKCS11HashOpts.SHA3_256Opts();
 			byte[] hash = csp.hash(msg, opts);
+			Assert.assertNotNull(hash);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -119,6 +132,7 @@ public class TestHash {
 		try {
 			IHashOpts opts = new PKCS11HashOpts.SHA3_384Opts();
 			byte[] hash = csp.hash(msg, opts);
+			Assert.assertNotNull(hash);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

@@ -32,6 +32,10 @@ public class GMT0016CspLog {
 
     private static JulongChainLog logger;
 
+    public final int LEVEL_DEBUG = 0;
+    public final int LEVEL_INFO = 1;
+    public final int LEVEL_ERROR = 2;
+
     public void setLogMsg(String msg, int level, Class<?> clazz) {
 
         logger = JulongChainLogFactory.getLog(clazz);
