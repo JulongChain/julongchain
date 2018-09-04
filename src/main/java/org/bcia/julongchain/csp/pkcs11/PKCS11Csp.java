@@ -215,7 +215,7 @@ public class PKCS11Csp implements IPKCS11Csp {
     			byte[] newski = importkey.importECKey(key.toBytes(),key.getPublicKey().toBytes(),opts.isEphemeral(),PKCS11FactoryOpts,false);
     			if(!DataUtil.compareByteArray(newski, byski))
     			{
-                    csplog.setLogMsg("[JC_PKCS]:Import key value err! Can not continue to KeyDeriv!", 2, PKCS11Csp.class);
+                    csplog.setLogMsg("[JC_PKCS]:Import key value err! Can not continue to KeyDeriv!", csplog.LEVEL_ERROR, PKCS11Csp.class);
                     throw new CspException("[JC_PKCS]:Import key value err! Can not continue to KeyDeriv!");
     			}
     			
