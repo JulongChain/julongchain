@@ -97,13 +97,16 @@ public class Helper {
     public static Block preprocessProtoBlock(ITxManager txMgr, Common.Block.Builder blockBuilder, boolean doMVCCValidation) throws LedgerException {
         Common.Block block = blockBuilder.build();
         Block b = new Block(block.getHeader().getNumber());
-        TxValidationFlags txsFilter = TxValidationFlags.fromByteString(block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
-        if(txsFilter.length() == 0){
-            txsFilter = new TxValidationFlags(block.getData().getDataList().size());
-            Common.BlockMetadata.Builder blockMetadataBuilder = block.getMetadata().toBuilder().setMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber(), txsFilter.toByteString());
-            blockBuilder.setMetadata(blockMetadataBuilder);
-            block = blockBuilder.build();
-        }
+		ByteString metadata = block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER_VALUE);
+		TxValidationFlags txsFilter;
+		if(metadata == null || metadata.isEmpty()){
+			txsFilter = new TxValidationFlags(block.getData().getDataList().size());
+			Common.BlockMetadata.Builder blockMetadataBuilder = block.getMetadata().toBuilder()
+					.setMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber(), txsFilter.toByteString());
+			blockBuilder.setMetadata(blockMetadataBuilder);
+			block = blockBuilder.build();
+		}
+        txsFilter = TxValidationFlags.fromByteString(block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
         int txIndex = 0;
         for (; txIndex < block.getData().getDataList().size(); txIndex++) {
             byte[] envBytes = block.getData().getDataList().get(txIndex).toByteArray();

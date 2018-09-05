@@ -55,7 +55,7 @@ public class VersionedLevelDB implements IVersionedDB {
 
     @Override
     public VersionedValue getState(String namespace, String key) throws LedgerException {
-        log.debug(String.format("getState() ns = %s, key = %s", namespace, key));
+		log.debug("getState() ns = [" + namespace + "], key = [" + key + "]");
         byte[] compositeKey = constructCompositeKey(namespace, key);
         byte[] dbVal = db.get(compositeKey);
         if (dbVal == null) {
@@ -116,9 +116,7 @@ public class VersionedLevelDB implements IVersionedDB {
             for(Map.Entry<String, VersionedValue> entry : updates.entrySet()){
                 String key = entry.getKey();
                 byte[] compositeKey = constructCompositeKey(ns, key);
-                log.debug(String.format("Group [%s]: Applying key(String)=[%s] key(bytes)=[%s]"
-                        , dbName, new String(compositeKey, StandardCharsets.UTF_8), Hex.toHexString(compositeKey)));
-
+				log.debug("Group [" + dbName + "]: Applying key(String)=[" + new String(compositeKey, StandardCharsets.UTF_8) + "] key(bytes)=[" + Hex.toHexString(compositeKey) + "]");
                 if(entry.getValue() == null){
                     dbBatch.delete(compositeKey);
                 } else {
