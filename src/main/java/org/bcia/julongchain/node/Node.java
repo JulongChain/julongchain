@@ -45,7 +45,6 @@ import org.bcia.julongchain.node.common.helper.ConfigTreeHelper;
 import org.bcia.julongchain.node.entity.Group;
 import org.bcia.julongchain.node.util.LedgerUtils;
 import org.bcia.julongchain.node.util.NodeConstant;
-import org.bcia.julongchain.node.util.NodeGossipManager;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.common.Ledger;
@@ -100,7 +99,7 @@ public class Node {
     private INodeCmd nodeCmd;
 
     /**
-     * 当前Node节点加入的群组集合
+     * 当前Node节点加入的群组集合,Key为groupId
      */
     private Map<String, Group> groupMap = new ConcurrentHashMap<String, Group>();
 
@@ -108,13 +107,6 @@ public class Node {
      * 群组回调
      */
     private IGroupCallback groupCallback;
-
-    /**
-     * Node已经加入的群组
-     */
-    private List<String> ledgerIds = new ArrayList<>();
-
-    private NodeGossipManager gossipManager;
 
     private Node() throws NodeException {
         init();
@@ -206,6 +198,7 @@ public class Node {
             configtxProcessorMap.put(Common.HeaderType.CONFIG, configtxProcessor);
             configtxProcessorMap.put(Common.HeaderType.NODE_RESOURCE_UPDATE, configtxProcessor);
 
+            //实例化账本
             LedgerManager.initialize(configtxProcessorMap);
 
             List<String> ledgerIDs = LedgerManager.getLedgerIDs();
@@ -382,10 +375,6 @@ public class Node {
         return groupCallback;
     }
 
-    public NodeGossipManager getGossipManager() {
-        return gossipManager;
-    }
-
     //MockInitialize resets chains for test env
     public void mockInitialize() {
         try {
@@ -422,13 +411,5 @@ public class Node {
                 throw new NodeException(e);
             }
         }
-    }
-
-    public List<String> getLedgerIds() {
-        return ledgerIds;
-    }
-
-    public void setLedgerIds(List<String> ledgerIds) {
-        this.ledgerIds = ledgerIds;
     }
 }

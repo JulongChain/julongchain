@@ -302,16 +302,16 @@ public class NodeGroup {
                 .getStatus() == ISmartContract.SmartContractResponse.Status.SUCCESS.getCode()) {
 
             // TODO 周辉检查
-            try {
-                byte[] bytes = FileUtils.readFileBytes(blockPath);
-                Common.Block block = Common.Block.parseFrom(bytes);
-                String groupId = BlockUtils.getGroupIDFromBlock(block);
-                node.getLedgerIds().add(groupId);
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-            } catch (JulongChainException e) {
-                log.error(e.getMessage(), e);
-            }
+//            try {
+//                byte[] bytes = FileUtils.readFileBytes(blockPath);
+//                Common.Block block = Common.Block.parseFrom(bytes);
+//                String groupId = BlockUtils.getGroupIDFromBlock(block);
+//                node.getLedgerIds().add(groupId);
+//            } catch (IOException e) {
+//                log.error(e.getMessage(), e);
+//            } catch (JulongChainException e) {
+//                log.error(e.getMessage(), e);
+//            }
 
             log.info("Join group success");
         } else {
