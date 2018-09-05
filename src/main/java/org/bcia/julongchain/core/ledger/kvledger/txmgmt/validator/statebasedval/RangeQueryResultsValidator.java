@@ -64,7 +64,7 @@ public class RangeQueryResultsValidator implements IRangeQueryValidator {
         for(KvRwset.KVRead kvRead : rqResults){
             log.debug("Comparing kvRead to queryResponse");
             if(result == null){
-                log.debug("Query response null.Key " + kvRead.getKey() + " got deleted");
+                log.debug("Query response null. Key " + kvRead.getKey() + " got deleted");
                 return false;
             }
             if(!((VersionedKV) result.getObj()).getCompositeKey().getKey().equals(kvRead.getKey())){

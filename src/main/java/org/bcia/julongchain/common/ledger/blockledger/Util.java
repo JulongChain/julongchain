@@ -20,6 +20,7 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.util.List;
 import java.util.Map;
@@ -57,6 +58,7 @@ public class Util {
             }
             nextBlockNumber = block.getHeader().getNumber() + 1;
             previousBlockHash = getHashBytes(block.getHeader().toByteArray());
+            String s = Hex.toHexString(previousBlockHash);
         }
         //添加区块Data
         Common.BlockData.Builder dataBuilder = Common.BlockData.newBuilder();

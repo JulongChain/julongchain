@@ -118,7 +118,7 @@ public class BlockIndex implements Index {
             }
         }
 
-        //index4 查询历史数据 - getTXLocByBlockNumTranNum()
+        //index4 查询历史数据 - getTxLocByBlockNumTranNum()
         if(Boolean.TRUE.equals(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM))){
             for(int i = 0; i < txOffsets.size(); i++){
                 TxIndexInfo txOffset = txOffsets.get(i);
@@ -228,9 +228,9 @@ public class BlockIndex implements Index {
      * 根据blockID, 交易ID获取交易信息
      */
     @Override
-    public FileLocPointer getTXLocByBlockNumTranNum(long blockNum, long tranNum) throws LedgerException{
+    public FileLocPointer getTxLocByBlockNumTranNum(long blockNum, long tranNum) throws LedgerException{
         if(indexItemsMap.get(BlockStorage.INDEXABLE_ATTR_BLOCK_NUM_TRAN_NUM) == null){
-	        log.error("Function getTXLocByBlockNumTranNum is not indexed");
+	        log.error("Function getTxLocByBlockNumTranNum is not indexed");
 	        return null;
         }
         byte[] b = db.get(constructBlockNumTranNumKey(blockNum, tranNum));

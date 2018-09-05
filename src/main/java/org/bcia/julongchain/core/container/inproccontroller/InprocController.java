@@ -39,7 +39,7 @@ public class InprocController {
 	public void register(SystemSmartContractBase sysSmartcontract) throws InprocVMException{
 		String sscName = sysSmartcontract.getSystemSmartContractDescriptor().getSSCName();
 		if (isRegistered(sscName)) {
-			String msg = String.format("Before register, %s is already registered", sscName);
+			String msg = "Before register, [" + sscName + "] is already registered";
 			log.info(msg);
 			return;
 		}
@@ -49,7 +49,7 @@ public class InprocController {
 
 	public void logoff(String sscName) throws InprocVMException {
 		if (!isRegistered(sscName)) {
-			String msg = String.format("Before logoff, %s is not registered", sscName);
+			String msg = "Before logoff, [" + sscName + "] is not registered";
 			log.error(msg);
 			throw new InprocVMException(msg);
 		}
@@ -61,12 +61,12 @@ public class InprocController {
 					   String[] args) throws InprocVMException {
 		String sscName = sysSmartcontract.getSystemSmartContractDescriptor().getSSCName();
 		if (!isRegistered(sscName)) {
-			String msg = String.format("Before deploy, %s is not registered", sscName);
+			String msg = "Before deploy, [" + sscName + "] is not registered";
 			log.error(msg);
 			throw new InprocVMException(msg);
 		}
 		if (isDeployed(sscName)) {
-			String msg = String.format("Before deploy, %s is already deployed", sscName);
+			String msg = "Before deploy, [" + sscName + "] is already deployed";
 			log.info(msg);
 			return;
 		}
@@ -77,7 +77,7 @@ public class InprocController {
 
 	public void deDeploy(String sscName) throws InprocVMException {
 		if (!isDeployed(sscName)) {
-			String msg = String.format("Before deDeploy, %s is not deployed", sscName);
+			String msg = "Before deDeploy, [" + sscName + "] is not deployed";
 			log.error(msg);
 			throw new InprocVMException(msg);
 		}
@@ -95,7 +95,7 @@ public class InprocController {
 
 	public void launch(String sscName) throws InprocVMException {
 		if (!isDeployed(sscName)) {
-			String msg = String.format("Before launch, %s is not deployed", sscName);
+			String msg = "Before launch, [" + sscName + "] is not deployed";
 			log.error(msg);
 			throw new InprocVMException(msg);
 		}
