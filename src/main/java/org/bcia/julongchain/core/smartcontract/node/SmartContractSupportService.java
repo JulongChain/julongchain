@@ -429,7 +429,7 @@ public class SmartContractSupportService
      * @param smartContractId      智能合约编号
      * @param smartContractMessage 消息
      */
-    public static SmartContractMessage invoke(
+    public synchronized static SmartContractMessage invoke(
             String smartContractId, SmartContractMessage smartContractMessage) throws SmartContractException{
         logger.info("invoke " + smartContractId);
 
