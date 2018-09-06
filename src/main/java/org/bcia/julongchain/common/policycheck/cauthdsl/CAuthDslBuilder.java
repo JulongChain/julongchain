@@ -143,7 +143,7 @@ public class CAuthDslBuilder {
         Policies.SignaturePolicy[] signaturePolicies = {CAuthDslBuilder.signedBy(0)};
         speBuilder.setVersion(0);
         speBuilder.setRule(CAuthDslBuilder.nOutOf(1,signaturePolicies));
-        speBuilder.setIdentities(0,principal);
+        speBuilder.addIdentities(principal);
         return speBuilder.build();
     }
 
