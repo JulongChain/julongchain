@@ -33,6 +33,7 @@ import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.node.common.client.BroadcastClient;
 import org.bcia.julongchain.node.common.client.EndorserClient;
 import org.bcia.julongchain.node.common.client.IBroadcastClient;
+import org.bcia.julongchain.node.common.client.IEndorserClient;
 import org.bcia.julongchain.node.common.helper.SpecHelper;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
@@ -111,7 +112,7 @@ public class NodeSmartContract {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //获取背书节点返回信息
-        EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
+        IEndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = null;
         try {
             proposalResponse = endorserClient.sendProcessProposal(signedProposal);
@@ -157,7 +158,7 @@ public class NodeSmartContract {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //获取背书节点返回信息
-        EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
+        IEndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = null;
         try {
             proposalResponse = endorserClient.sendProcessProposal(signedProposal);
@@ -255,7 +256,7 @@ public class NodeSmartContract {
 
         //背书
         //获取背书节点返回信息
-        EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
+        IEndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = null;
         try {
             proposalResponse = endorserClient.sendProcessProposal(signedProposal);
@@ -346,7 +347,7 @@ public class NodeSmartContract {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //获取背书节点返回信息
-        EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
+        IEndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = null;
         try {
             proposalResponse = endorserClient.sendProcessProposal(signedProposal);

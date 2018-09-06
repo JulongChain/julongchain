@@ -286,7 +286,7 @@ public class NodeGroup {
                 "", txId, spec, nonce, creator, null);
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
-        EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
+        IEndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = null;
         try {
             proposalResponse = endorserClient.sendProcessProposal(signedProposal);
@@ -323,7 +323,7 @@ public class NodeGroup {
      * 更新群组配置 V0.25
      */
     public void updateGroup(String ip, int port, String groupId) {
-        BroadcastClient broadcastClient = new BroadcastClient(ip,port);
+        IBroadcastClient broadcastClient = new BroadcastClient(ip,port);
         try {
             //broadCastClient.send(ip, port, groupId, this);
             broadcastClient.send(Common.Envelope.newBuilder().build(), null);
@@ -364,7 +364,7 @@ public class NodeGroup {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //获取背书节点返回信息
-        EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
+        IEndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = null;
         try {
             proposalResponse = endorserClient.sendProcessProposal(signedProposal);
@@ -422,7 +422,7 @@ public class NodeGroup {
                 groupId, txId, qsscSpec, nonce, creator, null);
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
-        EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
+        IEndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = null;
         try {
             proposalResponse = endorserClient.sendProcessProposal(signedProposal);
