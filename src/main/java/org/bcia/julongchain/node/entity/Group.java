@@ -93,7 +93,12 @@ public class Group {
                     mspIdList.add(orgConfig.getMspId());
                 }
 
-                return (String[]) mspIdList.toArray();
+                String[] mspIds = new String[mspIdList.size()];
+                for (int i = 0; i < mspIdList.size(); i++) {
+                    mspIds[i] =  mspIdList.get(i);
+                }
+
+                return mspIds;
             }
         }
 
