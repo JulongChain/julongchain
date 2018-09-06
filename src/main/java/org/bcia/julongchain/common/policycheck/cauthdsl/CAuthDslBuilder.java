@@ -243,4 +243,11 @@ public class CAuthDslBuilder {
                 .build();
     }
 
+    public static Policies.SignaturePolicyEnvelope getAcceptAllPolicy() {
+        Policies.SignaturePolicy[] signaturePolicy = {};
+        byte[][] b = {};
+
+        return CAuthDslBuilder.envelope(nOutOf(0, signaturePolicy), b);
+    }
+
 }

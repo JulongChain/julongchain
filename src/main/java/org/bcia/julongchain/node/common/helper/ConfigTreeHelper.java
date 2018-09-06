@@ -362,7 +362,7 @@ public class ConfigTreeHelper {
 
         //TODO:要换成Cauthdsl里面的命令
         SignaturePolicy signaturePolicy = new SignaturePolicy(GroupConfigConstant.POLICY_ADMINS, CAuthDslBuilder
-                .signedByMspAdmin("Default"));
+                .getAcceptAllPolicy());
         addPolicy(consortiumsTreeBuilder, GroupConfigConstant.POLICY_ADMINS, signaturePolicy.getValue(), GroupConfigConstant
                 .CONSENTER_ADMINS_POLICY_NAME);
 
