@@ -26,7 +26,7 @@ import org.bcia.julongchain.node.cmd.server.ServerStartCmd;
 import org.bcia.julongchain.node.cmd.server.ServerStatusCmd;
 import org.bcia.julongchain.node.cmd.util.NodeCmdConstant;
 import org.bcia.julongchain.node.cmd.version.NodeVersionCmd;
-import org.bcia.julongchain.node.util.NodeConstant;
+import org.bcia.julongchain.node.common.util.NodeConstant;
 
 /**
  * 节点命令工厂

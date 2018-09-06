@@ -27,7 +27,7 @@ import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.NetAddress;
 import org.bcia.julongchain.core.ssc.lssc.LSSC;
 import org.bcia.julongchain.node.Node;
-import org.bcia.julongchain.node.util.NodeConstant;
+import org.bcia.julongchain.node.common.util.NodeConstant;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
