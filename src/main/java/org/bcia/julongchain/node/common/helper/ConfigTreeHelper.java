@@ -22,6 +22,7 @@ import org.bcia.julongchain.common.policies.config.IConfigPolicy;
 import org.bcia.julongchain.common.policies.config.ImplicitMetaAnyPolicy;
 import org.bcia.julongchain.common.policies.config.ImplicitMetaMajorityPolicy;
 import org.bcia.julongchain.common.policies.config.SignaturePolicy;
+import org.bcia.julongchain.common.policycheck.cauthdsl.CAuthDslBuilder;
 import org.bcia.julongchain.msp.util.MspConfigBuilder;
 import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.common.Policies;
@@ -332,18 +333,20 @@ public class ConfigTreeHelper {
             devMode) {
         Policies.SignaturePolicyEnvelope policyEnvelope = null;
         if (devMode) {
-            policyEnvelope = MockCauthdsl.signedByMspMember(mspId);
+            policyEnvelope = CAuthDslBuilder.signedByMspMember(mspId);
         } else {
-            policyEnvelope = MockCauthdsl.signedByMspAdmin(mspId);
+            policyEnvelope = CAuthDslBuilder.signedByMspAdmin(mspId);
         }
 
         IConfigPolicy adminPolicy = new SignaturePolicy(GroupConfigConstant.POLICY_ADMINS, policyEnvelope);
         addPolicy(configTreeBuilder, adminPolicy.getKey(), adminPolicy.getValue(), GroupConfigConstant.POLICY_ADMINS);
 
-        IConfigPolicy readerPolicy = new SignaturePolicy(GroupConfigConstant.POLICY_READERS, MockCauthdsl.signedByMspMember(mspId));
+        IConfigPolicy readerPolicy = new SignaturePolicy(GroupConfigConstant.POLICY_READERS, CAuthDslBuilder
+                .signedByMspMember(mspId));
         addPolicy(configTreeBuilder, readerPolicy.getKey(), readerPolicy.getValue(), GroupConfigConstant.POLICY_ADMINS);
 
-        IConfigPolicy writerPolicy = new SignaturePolicy(GroupConfigConstant.POLICY_WRITERS, MockCauthdsl.signedByMspMember(mspId));
+        IConfigPolicy writerPolicy = new SignaturePolicy(GroupConfigConstant.POLICY_WRITERS, CAuthDslBuilder
+                .signedByMspMember(mspId));
         addPolicy(configTreeBuilder, writerPolicy.getKey(), writerPolicy.getValue(), GroupConfigConstant.POLICY_ADMINS);
     }
 
@@ -358,7 +361,7 @@ public class ConfigTreeHelper {
         Configtx.ConfigTree.Builder consortiumsTreeBuilder = Configtx.ConfigTree.newBuilder();
 
         //TODO:要换成Cauthdsl里面的命令
-        SignaturePolicy signaturePolicy = new SignaturePolicy(GroupConfigConstant.POLICY_ADMINS, MockCauthdsl
+        SignaturePolicy signaturePolicy = new SignaturePolicy(GroupConfigConstant.POLICY_ADMINS, CAuthDslBuilder
                 .signedByMspAdmin("Default"));
         addPolicy(consortiumsTreeBuilder, GroupConfigConstant.POLICY_ADMINS, signaturePolicy.getValue(), GroupConfigConstant
                 .CONSENTER_ADMINS_POLICY_NAME);

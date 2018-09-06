@@ -1,5 +1,5 @@
 /**
- * Copyright Dingxuan. All Rights Reserved.
+ * Copyright DingXuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.node.entity;
+package org.bcia.julongchain.node.common.util;
 
 /**
- * 模拟密码工具
+ * 节点常量类
  *
  * @author zhouhui
- * @date 2018/3/13
+ * @date 2018/2/23
  * @company Dingxuan
  */
-public class MockCrypto {
+public class NodeConstant {
+    public static final String VERSION = "version";
+    public static final String NODE = "node";
+    public static final String SMART_CONTRACT = "contract";
+    public static final String GROUP = "group";
 
-    public static byte[] getRandomNonce() {
+    public static final String CURRENT_VERSION = "0.8";
 
-        return new byte[]{0, 1, 2};
-    }
+    /**
+     * 默认节点主机名
+     */
+    public static final String DEFAULT_NODE_HOST = "127.0.0.1";
+    /**
+     * 默认节点端口
+     */
+    public static final int DEFAULT_NODE_PORT = 7051;
 }

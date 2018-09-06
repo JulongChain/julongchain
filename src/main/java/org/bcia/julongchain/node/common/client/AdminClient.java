@@ -23,6 +23,8 @@ import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.protos.node.AdminGrpc;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * 管理客户端实现
  *
@@ -50,9 +52,8 @@ public class AdminClient implements IAdminClient {
 
     @Override
     public int getStatus() {
-        managedChannel =
-                NettyChannelBuilder.forAddress(host, port).maxInboundMessageSize(CommConstant.MAX_GRPC_MESSAGE_SIZE)
-                        .usePlaintext().build();
+        managedChannel = NettyChannelBuilder.forAddress(host, port).maxInboundMessageSize(CommConstant
+                .MAX_GRPC_MESSAGE_SIZE).usePlaintext().build();
         AdminGrpc.AdminBlockingStub stub = AdminGrpc.newBlockingStub(managedChannel);
         return stub.getStatus(Empty.getDefaultInstance()).getStatusValue();
     }
@@ -61,6 +62,10 @@ public class AdminClient implements IAdminClient {
     public void close() {
         log.info("AdminClient close");
 
-        managedChannel.shutdown();
+        try {
+            managedChannel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 }
