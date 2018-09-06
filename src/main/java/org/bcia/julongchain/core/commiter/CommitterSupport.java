@@ -19,10 +19,10 @@ import org.bcia.julongchain.common.exception.CommitterException;
 import org.bcia.julongchain.common.groupconfig.capability.IApplicationCapabilities;
 import org.bcia.julongchain.common.resourceconfig.ISmartContractDefinition;
 import org.bcia.julongchain.core.ledger.INodeLedger;
-import org.bcia.julongchain.core.node.GroupSupport;
 import org.bcia.julongchain.core.node.INodeSupport;
 import org.bcia.julongchain.core.node.NodeSupport;
 import org.bcia.julongchain.msp.IMspManager;
+import org.bcia.julongchain.node.entity.Group;
 import org.bcia.julongchain.protos.common.Configtx;
 
 /**
@@ -33,28 +33,26 @@ import org.bcia.julongchain.protos.common.Configtx;
  * @company Dingxuan
  */
 public class CommitterSupport implements ICommitterSupport {
-    private GroupSupport groupSupport;
+    private Group group;
     private INodeSupport nodeSupport;
 
-    public CommitterSupport(GroupSupport groupSupport) {
-        this.groupSupport = groupSupport;
+    public CommitterSupport(Group group) {
+        this.group = group;
 
         this.nodeSupport = new NodeSupport();
     }
 
     @Override
     public void acquire(long n) throws CommitterException {
-
     }
 
     @Override
     public void release(long n) {
-
     }
 
     @Override
     public INodeLedger getLedger() {
-        return groupSupport.getNodeLedger();
+        return group.getNodeLedger();
     }
 
     @Override
@@ -69,7 +67,7 @@ public class CommitterSupport implements ICommitterSupport {
 
     @Override
     public String[] getMspIds(String groupId) {
-        return groupSupport.getMspIds();
+        return group.getMspIds();
     }
 
     @Override

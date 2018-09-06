@@ -34,11 +34,11 @@ public class ConfigManager implements IConfigManager {
     private static JulongChainLog log = JulongChainLogFactory.getLog(ConfigManager.class);
 
     @Override
-    public IConfig getGroupConfig(String groupID) {
+    public IConfig getGroupConfig(String groupId) {
         try {
-            Group group = Node.getInstance().getGroupMap().get(groupID);
+            Group group = Node.getInstance().getGroupMap().get(groupId);
             if (group != null) {
-                return group.getGroupSupport().getGroupConfigBundle();
+                return group.getGroupConfigBundle();
             }
         } catch (NodeException ex) {
             log.error(ex.getMessage(), ex);
@@ -48,11 +48,11 @@ public class ConfigManager implements IConfigManager {
     }
 
     @Override
-    public IConfig getResourceConfig(String groupID) {
+    public IConfig getResourceConfig(String groupId) {
         try {
-            Group group = Node.getInstance().getGroupMap().get(groupID);
+            Group group = Node.getInstance().getGroupMap().get(groupId);
             if (group != null) {
-                return group.getGroupSupport().getResourcesConfigBundle();
+                return group.getResourcesConfigBundle();
             }
         } catch (NodeException ex) {
             log.error(ex.getMessage(), ex);

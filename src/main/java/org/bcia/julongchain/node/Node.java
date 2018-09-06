@@ -36,7 +36,6 @@ import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.customtx.IProcessor;
 import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.core.node.ConfigtxProcessor;
-import org.bcia.julongchain.core.node.GroupSupport;
 import org.bcia.julongchain.core.node.util.ConfigTxUtils;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.node.cmd.INodeCmd;
@@ -277,10 +276,15 @@ public class Node {
 
         IApplicationConfig applicationConfig = groupConfigBundle.getGroupConfig().getApplicationConfig();
 
-        final GroupSupport groupSupport = new GroupSupport();
-        groupSupport.setApplicationConfig(applicationConfig);
-        groupSupport.setNodeLedger(nodeLedger);
-        groupSupport.setFileLedger(new FileLedger(new IFileLedgerBlockStore() {
+        Group group = new Group();
+        group.setGroupId(groupId);
+
+//        final GroupSupport groupSupport = new GroupSupport();
+        group.setGroupConfigBundle(groupConfigBundle);
+        group.setApplicationConfig(applicationConfig);
+
+        group.setNodeLedger(nodeLedger);
+        group.setFileLedger(new FileLedger(new IFileLedgerBlockStore() {
             @Override
             public void addBlock(Common.Block block) throws LedgerException {
             }
@@ -300,8 +304,8 @@ public class Node {
             @Override
             public void call(IResourcesConfigBundle bundle) {
                 IApplicationConfig config = bundle.getGroupConfigBundle().getGroupConfig().getApplicationConfig();
-                groupSupport.setApplicationConfig(config);
-                groupSupport.setGroupConfigBundle(bundle.getGroupConfigBundle());
+                group.setApplicationConfig(config);
+                group.setGroupConfigBundle(bundle.getGroupConfigBundle());
             }
         };
 
@@ -320,7 +324,7 @@ public class Node {
         ResourcesConfigBundle resourcesConfigBundle = new ResourcesConfigBundle(groupId, resConfig,
                 groupConfigBundle, callbackList);
 
-        ICommitterValidator committerValidator = new CommitterValidator(new CommitterSupport(groupSupport));
+        ICommitterValidator committerValidator = new CommitterValidator(new CommitterSupport(group));
 
         ICommitter committer = new Committer(nodeLedger, new Committer.IConfigBlockEventer() {
             @Override
@@ -343,12 +347,10 @@ public class Node {
 
         //TODO:Gossip
 
-        groupSupport.setGroupConfigBundle(groupConfigBundle);
-        groupSupport.setResourcesConfigBundle(resourcesConfigBundle);
 
-        Group group = new Group();
-        group.setGroupSupport(groupSupport);
-        group.setBlock(configBlock);
+        group.setResourcesConfigBundle(resourcesConfigBundle);
+
+        group.setConfigBlock(configBlock);
         group.setCommiter(committer);
 
         groupMap.put(groupId, group);
@@ -359,7 +361,7 @@ public class Node {
     private void onConfigBlockChanged(String groupIDFromBlock, Common.Block newBlock) {
         Group group = groupMap.get(groupIDFromBlock);
         if (group != null) {
-            group.setBlock(newBlock);
+            group.setConfigBlock(newBlock);
         }
     }
 
@@ -390,7 +392,7 @@ public class Node {
     public void mockCreateGroup(String groupId) throws NodeException {
         Group group = groupMap.get(groupId);
 
-        if (group == null || group.getGroupSupport() == null || group.getGroupSupport().getNodeLedger() == null) {
+        if (group == null || group == null || group.getNodeLedger() == null) {
             GenesisConfig.Profile profile = null;
             try {
                 profile = GenesisConfigFactory.getGenesisConfig().getCompletedProfile(SAMPLE_DEVMODE_SOLO_PROFILE);
@@ -402,9 +404,8 @@ public class Node {
                 INodeLedger nodeLedger = LedgerManager.createLedger(genesisBlock);
 
                 Group newGroup = new Group();
-                GroupSupport groupSupport = new GroupSupport();
-                groupSupport.setNodeLedger(nodeLedger);
-                newGroup.setGroupSupport(groupSupport);
+                newGroup.setGroupId(groupId);
+                newGroup.setNodeLedger(nodeLedger);
                 groupMap.put(groupId, newGroup);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);

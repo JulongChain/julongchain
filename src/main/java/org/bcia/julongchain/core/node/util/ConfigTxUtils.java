@@ -28,7 +28,6 @@ import org.bcia.julongchain.common.util.proto.EnvelopeHelper;
 import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.IQueryExecutor;
 import org.bcia.julongchain.core.node.ConfigtxProcessor;
-import org.bcia.julongchain.core.node.GroupSupport;
 import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.node.entity.Group;
 import org.bcia.julongchain.protos.common.Common;
@@ -54,10 +53,7 @@ public class ConfigTxUtils {
         Group group = groupMap.get(groupId);
         ValidateUtils.isNotNull(group, "Group can not be null");
 
-        GroupSupport groupSupport = group.getGroupSupport();
-        ValidateUtils.isNotNull(groupSupport, "GroupSupport can not be null");
-
-        IResourcesConfigBundle resourcesConfigBundle = groupSupport.getResourcesConfigBundle();
+        IResourcesConfigBundle resourcesConfigBundle = group.getResourcesConfigBundle();
         Configtx.Config fullResourceConfig = null;
         try {
             fullResourceConfig = computeFullConfig(resourcesConfigBundle, txEnvelope);
@@ -65,9 +61,9 @@ public class ConfigTxUtils {
             throw new InvalidTxException(e);
         }
 
-        IResourcesConfigBundle bundle = new ResourcesConfigBundle(groupId, fullResourceConfig,
-                groupSupport.getGroupConfigBundle(), null);
-        groupSupport.setResourcesConfigBundle(bundle);
+        IResourcesConfigBundle bundle = new ResourcesConfigBundle(groupId, fullResourceConfig, group
+                .getGroupConfigBundle(), null);
+        group.setResourcesConfigBundle(bundle);
 
         return fullResourceConfig;
     }
