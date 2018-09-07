@@ -21,13 +21,12 @@ import com.google.protobuf.ByteString;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.NodeException;
-import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.NetAddress;
-import org.bcia.julongchain.core.ssc.lssc.LSSC;
 import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.node.common.util.NodeConstant;
+import org.bcia.julongchain.protos.node.ProposalResponsePackage;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
@@ -133,43 +132,26 @@ public class ContractQueryCmd extends AbstractNodeContractCmd {
             return;
         }
 
-        //-----------------------------------默认值--------------------------------//
-        //TODO:从-E中获取
-        String essc = null;
-        if (StringUtils.isBlank(essc)) {
-            essc = "escc";
-        }
-
-        //TODO:从-V中获取
-        String vssc = null;
-        if (StringUtils.isBlank(vssc)) {
-            essc = "vssc";
-        }
-
-        //TODO:从-P中获取
-        String policy = null;
-        if (StringUtils.isNotBlank(policy)) {
-            //TODO:有一大堆逻辑
-        }
-
-        //TODO:从-collections-config中获取
-        String collectionsConfigFile = null;
-        if (StringUtils.isNotBlank(collectionsConfigFile)) {
-            //TODO:有一大堆逻辑
-        }
+        ProposalResponsePackage.Response response = null;
 
         if (StringUtils.isBlank(targetAddress)) {
             log.info("TargetAddress is empty, use 127.0.0.1:7051");
-            nodeSmartContract.query(NodeConstant.DEFAULT_NODE_HOST, NodeConstant.DEFAULT_NODE_PORT, groupId, scName,
-                    input);
+            response = nodeSmartContract.query(NodeConstant.DEFAULT_NODE_HOST, NodeConstant.DEFAULT_NODE_PORT,
+                    groupId, scName, input);
         } else {
             try {
                 NetAddress targetNetAddress = new NetAddress(targetAddress);
-                nodeSmartContract.query(targetNetAddress.getHost(), targetNetAddress.getPort(), groupId, scName,
-                        input);
-            } catch (ValidateException e) {
+                response = nodeSmartContract.query(targetNetAddress.getHost(), targetNetAddress.getPort(), groupId,
+                        scName, input);
+            } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
+        }
+
+        if (response != null) {
+            log.info("Query result: " + response.getMessage() + ", " + response.getPayload());
+        } else {
+            log.info("No query result");
         }
     }
 
