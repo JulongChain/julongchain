@@ -69,10 +69,6 @@ public class ContractInstantiateCmd extends AbstractNodeContractCmd {
      * 参数：背书策略
      */
     private static final String ARG_POLICY = "P";
-    /**
-     * 参数
-     */
-    private static final String KEY_ARGS = "args";
 
     public ContractInstantiateCmd(Node node) {
         super(node);
@@ -125,26 +121,7 @@ public class ContractInstantiateCmd extends AbstractNodeContractCmd {
         }
 
         //合约具体执行参数
-        SmartContractPackage.SmartContractInput input = null;
-        if (cmd.hasOption(ARG_INPUT)) {
-            String inputStr = cmd.getOptionValue(ARG_INPUT, defaultValue);
-            log.info("InputStr: " + inputStr);
-            JSONObject inputJson = JSONObject.parseObject(inputStr);
-
-            SmartContractPackage.SmartContractInput.Builder inputBuilder =
-                    SmartContractPackage.SmartContractInput.newBuilder();
-
-            JSONArray argsJSONArray = inputJson.getJSONArray(KEY_ARGS);
-            for (int i = 0; i < argsJSONArray.size(); i++) {
-                inputBuilder.addArgs(ByteString.copyFrom(argsJSONArray.getString(i).getBytes()));
-            }
-
-            input = inputBuilder.build();
-            //打印一下参数，检查是否跟预期一致
-            for (int i = 0; i < input.getArgsCount(); i++) {
-                log.info("Input.getArg: " + input.getArgs(i).toStringUtf8());
-            }
-        }
+        SmartContractPackage.SmartContractInput input = getSmartContractInput(cmd, ARG_INPUT, defaultValue);
 
         String policy = null;
         if (cmd.hasOption(ARG_POLICY)) {
