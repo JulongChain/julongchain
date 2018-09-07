@@ -98,6 +98,7 @@ public class ProposalResponseUtils {
     public static ProposalResponsePackage.ProposalResponse buildProposalResponse(ByteString payload, String message) {
         //首先构造响应主内容
         ProposalResponsePackage.Response.Builder responseBuilder = ProposalResponsePackage.Response.newBuilder();
+        responseBuilder.setStatus(Common.Status.SUCCESS_VALUE);
         responseBuilder.setPayload(payload);
         if (StringUtils.isNotBlank(message)) {
             responseBuilder.setMessage(message);
