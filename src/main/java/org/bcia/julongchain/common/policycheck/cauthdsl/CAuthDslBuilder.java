@@ -28,7 +28,7 @@ import java.util.Arrays;
 
 /**
  * 类描述
- *
+ * 定义了用于生成各种所需结构的函数
  * @author yuanjun
  * @date 26/04/18
  * @company Aisino

@@ -29,7 +29,7 @@ import java.util.List;
 
 /**
  * 类描述
- *
+ * 用于策略签名评估
  * @author yuanjun
  * @date 26/04/18
  * @company Aisino
