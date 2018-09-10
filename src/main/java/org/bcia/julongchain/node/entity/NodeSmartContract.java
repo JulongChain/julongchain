@@ -150,6 +150,11 @@ public class NodeSmartContract {
             endorserClient.close();
         }
 
+        if (proposalResponse == null || proposalResponse.getResponse() == null
+                || proposalResponse.getResponse().getStatus() != Common.Status.SUCCESS_VALUE) {
+            throw new NodeException("Instantiate fail: " + proposalResponse.getResponse().getStatus());
+        }
+
         try {
             Common.Envelope signedTxEnvelope = EnvelopeHelper.createSignedTxEnvelope(proposal, identity,
                     proposalResponse);
@@ -232,6 +237,11 @@ public class NodeSmartContract {
             throw new NodeException(msg);
         } finally {
             endorserClient.close();
+        }
+
+        if (proposalResponse == null || proposalResponse.getResponse() == null
+                || proposalResponse.getResponse().getStatus() != Common.Status.SUCCESS_VALUE) {
+            throw new NodeException("Invoke fail: " + proposalResponse.getResponse().getStatus());
         }
 
         try {
