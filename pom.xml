@@ -46,22 +46,22 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
-            <version>4.1.29.Final</version>
+            <version>4.1.26.Final</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/io.netty/netty-transport-native-epoll -->
+        <!-- https://mvnrepository.com/artifact/io.netty/netty-transport-native-epoll
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-transport-native-epoll</artifactId>
             <version>4.1.29.Final</version>
-        </dependency>
+        </dependency> -->
 
-        <!-- https://mvnrepository.com/artifact/io.netty/netty-transport-native-kqueue -->
+        <!-- https://mvnrepository.com/artifact/io.netty/netty-transport-native-kqueue
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-transport-native-kqueue</artifactId>
             <version>4.1.29.Final</version>
-        </dependency>
+        </dependency> -->
 
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -258,7 +258,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java-util</artifactId>
-            <version>3.6.1</version>
+            <version>${protobuf.version}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.google.protobuf.nano/protobuf-javanano -->
@@ -368,7 +368,7 @@
             <version>2.2</version>
         </dependency>
 
-        <!-- 使用本地lib中的jar包
+        <!-- 使用本地lib中的jar包 -->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-tcnative-openssl-static</artifactId>
@@ -384,7 +384,7 @@
             <version>4.1.26.Final-SNAPSHOT</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/netty-handler-4.1.26.Final-SNAPSHOT.jar</systemPath>
-        </dependency>-->
+        </dependency>
 
         <dependency>
             <groupId>org.apache.gossip</groupId>
