@@ -10,9 +10,9 @@ import org.bcia.julongchain.common.util.proto.ProposalUtils;
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContract;
 import org.bcia.julongchain.core.smartcontract.shim.ISmartContractStub;
 import org.bcia.julongchain.core.smartcontract.shim.impl.MockStub;
+import org.bcia.julongchain.csp.factory.CspManager;
 import org.bcia.julongchain.msp.ISigningIdentity;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
-import org.bcia.julongchain.node.entity.MockCrypto;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
@@ -20,7 +20,6 @@ import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import scala.collection.parallel.ParSeqLike;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -78,7 +77,7 @@ public class ESSCTest extends BaseJunit4Test {
                     setSmartContractSpec(smartContractSpec).build();
             ISigningIdentity sId = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
             byte[] sIdBytes = sId.getIdentity().serialize();
-            byte[] nonce = MockCrypto.getRandomNonce();
+            byte[] nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
             String txID=ProposalUtils.computeProposalTxID(sIdBytes, nonce);
             ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType.ENDORSER_TRANSACTION,
                     Utils.getTestGroupID(), txID, invocationSpec, nonce, sIdBytes, null);

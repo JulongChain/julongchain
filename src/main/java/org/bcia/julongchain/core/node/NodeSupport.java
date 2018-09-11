@@ -38,7 +38,7 @@ public class NodeSupport implements INodeSupport {
         try {
             Group group = Node.getInstance().getGroupMap().get(groupId);
             if (group != null) {
-                return group.getGroupSupport().getApplicationConfig();
+                return group.getApplicationConfig();
             }
         } catch (NodeException ex) {
             log.error(ex.getMessage(), ex);
@@ -52,7 +52,7 @@ public class NodeSupport implements INodeSupport {
         try {
             Group group = Node.getInstance().getGroupMap().get(groupId);
             if (group != null) {
-                return group.getGroupSupport().getResourcesConfigBundle().getResourcesConfig().getSmartContractsConfig()
+                return group.getResourcesConfigBundle().getResourcesConfig().getSmartContractsConfig()
                         .getSmartContractByName(scName);
             }
         } catch (Exception ex) {

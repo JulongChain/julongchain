@@ -42,7 +42,7 @@ import org.bcia.julongchain.gossip.GossipService;
 import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.node.common.client.AdminClient;
 import org.bcia.julongchain.node.common.client.IAdminClient;
-import org.bcia.julongchain.node.util.NodeConstant;
+import org.bcia.julongchain.node.common.util.NodeConstant;
 import org.bcia.julongchain.protos.gossip.Message;
 
 import java.io.File;

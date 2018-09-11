@@ -27,6 +27,8 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 import org.bcia.julongchain.protos.consenter.AtomicBroadcastGrpc;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * 投递客户端实现
  *
@@ -89,12 +91,11 @@ public class DeliverClient implements IDeliverClient {
     public void close() {
         log.info("DeliverClient close");
 
-        managedChannel.shutdown();
-//        try {
-//            managedChannel.awaitTermination(1000, TimeUnit.MILLISECONDS);
-//        } catch (InterruptedException e) {
-//            log.error(e.getMessage(), e);
-//        }
+        try {
+            managedChannel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     private Common.Envelope createSeekSignedEnvelope(String groupId, Ab.SeekPosition seekPosition) {

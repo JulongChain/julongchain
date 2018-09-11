@@ -99,9 +99,7 @@ public class NodeUtils {
             Map<String, Group> groupMap = node.getGroupMap();
             Group group = groupMap.get(groupId);
             if (group != null) {
-
-                //TODO:是否是取应用--》组织
-                return group.getGroupSupport().getMspIds();
+                return group.getMspIds();
             }
         }
 
@@ -176,7 +174,7 @@ public class NodeUtils {
             Map<String, Group> groupMap = node.getGroupMap();
             Group group = groupMap.get(groupId);
             if (group != null) {
-                return group.getBlock();
+                return group.getConfigBlock();
             }
         }
 
@@ -190,7 +188,7 @@ public class NodeUtils {
             Node node = Node.getInstance();
             Map<String, Group> groupMap = node.getGroupMap();
 
-            for (String groupId: groupMap.keySet()) {
+            for (String groupId : groupMap.keySet()) {
                 Query.GroupInfo groupInfo = Query.GroupInfo.newBuilder().setGroupId(groupId).build();
                 groupInfoList.add(groupInfo);
                 log.info("GroupId: " + groupId);
@@ -214,7 +212,7 @@ public class NodeUtils {
             Map<String, Group> groupMap = node.getGroupMap();
             Group group = groupMap.get(groupId);
             if (group != null) {
-                return group.getGroupSupport().getResourcesConfigBundle();
+                return group.getResourcesConfigBundle();
             }
         }
 

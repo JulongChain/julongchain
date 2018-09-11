@@ -72,12 +72,9 @@ public class BlockUtils {
     public static Common.Envelope extractEnvelope(Common.Block block, int index) throws ValidateException,
             InvalidProtocolBufferException {
         //非空校验
-        ValidateUtils.isNotNull(block, "block can not be null");
-        ValidateUtils.isNotNull(block.getData(), "block.data can not be null");
-
-        if (block.getData().getDataList() == null || block.getData().getDataList().isEmpty()) {
-            throw new ValidateException("block.data.dataList can not be null");
-        }
+        ValidateUtils.isNotNull(block, "Block can not be null");
+        ValidateUtils.isNotNull(block.getData(), "Block.data can not be null");
+        ValidateUtils.isNotEmpty(block.getData().getDataList(), "Block.data.dataList can not be empty");
 
         //索引值校验
         if (index < 0 || index > block.getData().getDataCount() - 1) {
@@ -102,10 +99,10 @@ public class BlockUtils {
                 .LAST_CONFIG_VALUE);
 
         //非空校验
-        ValidateUtils.isNotNull(lastConfigMetadata, "lastConfigMetadata can not be null");
+        ValidateUtils.isNotNull(lastConfigMetadata, "Last config metadata can not be null");
 
         Common.LastConfig lastConfig = Common.LastConfig.parseFrom(lastConfigMetadata.getValue());
-        ValidateUtils.isNotNull(lastConfig, "lastConfig can not be null");
+        ValidateUtils.isNotNull(lastConfig, "Last config can not be null");
 
         return lastConfig.getIndex();
     }
@@ -122,11 +119,9 @@ public class BlockUtils {
     public static Common.Metadata getMetadataFromBlock(Common.Block block, int blockMetadataIndex) throws
             InvalidProtocolBufferException, ValidateException {
         //非空校验
-        ValidateUtils.isNotNull(block, "block can not be null");
-        ValidateUtils.isNotNull(block.getMetadata(), "block.metadata can not be null");
-        if (block.getMetadata().getMetadataList() == null || block.getMetadata().getMetadataList().isEmpty()) {
-            throw new ValidateException("block.metadata.metadataList can not be null");
-        }
+        ValidateUtils.isNotNull(block, "Block can not be null");
+        ValidateUtils.isNotNull(block.getMetadata(), "Block.metadata can not be null");
+        ValidateUtils.isNotEmpty(block.getMetadata().getMetadataList(), "Block.metadataList can not be empty");
 
         //索引值校验
         if (blockMetadataIndex < 0 || blockMetadataIndex > block.getMetadata().getMetadataCount() - 1) {

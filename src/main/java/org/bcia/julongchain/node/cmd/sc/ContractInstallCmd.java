@@ -24,7 +24,7 @@ import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.NetAddress;
 import org.bcia.julongchain.core.ssc.lssc.LSSC;
 import org.bcia.julongchain.node.Node;
-import org.bcia.julongchain.node.util.NodeConstant;
+import org.bcia.julongchain.node.common.util.NodeConstant;
 
 /**
  * 完成节点安装智能合约的解析

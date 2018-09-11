@@ -27,7 +27,7 @@ import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.NetAddress;
 import org.bcia.julongchain.core.ssc.lssc.LSSC;
 import org.bcia.julongchain.node.Node;
-import org.bcia.julongchain.node.util.NodeConstant;
+import org.bcia.julongchain.node.common.util.NodeConstant;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
@@ -108,26 +108,7 @@ public class ContractInvokeCmd extends AbstractNodeContractCmd {
             log.info("Contract name: " + scName);
         }
 
-        SmartContractPackage.SmartContractInput input = null;
-        if (cmd.hasOption(ARG_INPUT)) {
-            String inputStr = cmd.getOptionValue(ARG_INPUT, defaultValue);
-            log.info("InputStr: " + inputStr);
-            JSONObject inputJson = JSONObject.parseObject(inputStr);
-
-            SmartContractPackage.SmartContractInput.Builder inputBuilder =
-                    SmartContractPackage.SmartContractInput.newBuilder();
-
-            JSONArray argsJSONArray = inputJson.getJSONArray(KEY_ARGS);
-            for (int i = 0; i < argsJSONArray.size(); i++) {
-                inputBuilder.addArgs(ByteString.copyFrom(argsJSONArray.getString(i).getBytes()));
-            }
-
-            input = inputBuilder.build();
-            //打印一下参数，检查是否跟预期一致
-            for (int i = 0; i < input.getArgsCount(); i++) {
-                log.info("Input.getArg: " + input.getArgs(i).toStringUtf8());
-            }
-        }
+        SmartContractPackage.SmartContractInput input = getSmartContractInput(cmd, ARG_INPUT, defaultValue);
 
         //-----------------------------------校验入参--------------------------------//
         if (StringUtils.isBlank(groupId)) {

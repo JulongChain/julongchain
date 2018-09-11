@@ -28,7 +28,7 @@ import java.util.Arrays;
 
 /**
  * 类描述
- *
+ * 定义了用于生成各种所需结构的函数
  * @author yuanjun
  * @date 26/04/18
  * @company Aisino
@@ -143,7 +143,7 @@ public class CAuthDslBuilder {
         Policies.SignaturePolicy[] signaturePolicies = {CAuthDslBuilder.signedBy(0)};
         speBuilder.setVersion(0);
         speBuilder.setRule(CAuthDslBuilder.nOutOf(1,signaturePolicies));
-        speBuilder.setIdentities(0,principal);
+        speBuilder.addIdentities(principal);
         return speBuilder.build();
     }
 
@@ -241,6 +241,13 @@ public class CAuthDslBuilder {
         return Policies.SignaturePolicy.newBuilder()
                 .setNOutOf(builder)
                 .build();
+    }
+
+    public static Policies.SignaturePolicyEnvelope getAcceptAllPolicy() {
+        Policies.SignaturePolicy[] signaturePolicy = {};
+        byte[][] b = {};
+
+        return CAuthDslBuilder.envelope(nOutOf(0, signaturePolicy), b);
     }
 
 }
