@@ -68,7 +68,7 @@ public class NodeUtils {
 
         INodeLedger l = null;
         try {
-            LedgerManager.initialize(null);
+//            LedgerManager.initialize(null);
             l = LedgerManager.openLedger(groupId);
         } catch (LedgerException e) {
             e.printStackTrace();

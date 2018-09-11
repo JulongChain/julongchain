@@ -69,17 +69,18 @@ public class HistoryLevelDB implements IHistoryDB {
         UpdateBatch dbBatch = new UpdateBatch();
         log.debug(String.format("Group [%s]: Updating historyDB for groupNo [%s] with [%d] transactions"
                 , dbName, blockNo, block.getData().getDataCount()));
-        //获取失效
-        TxValidationFlags txsFilter = TxValidationFlags.fromByteString(block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
-        //没有失效的部分
-        if(txsFilter.length() == 0){
-            txsFilter = new TxValidationFlags(block.getData().getDataCount());
-            block = block.toBuilder()
-                    .setMetadata(block.getMetadata().toBuilder()
-                            .setMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber(), txsFilter.toByteString())
-                            .build())
-                    .build();
-        }
+		//读取metadata中的transaction filter,构建顾虑器
+		ByteString metadata = block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber());
+		TxValidationFlags txsFilter;
+		if (metadata == null || metadata.isEmpty()) {
+			txsFilter = new TxValidationFlags(block.getData().getDataCount());
+			block = block.toBuilder()
+					.setMetadata(block.getMetadata().toBuilder()
+							.setMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber(), txsFilter.toByteString())
+							.build())
+					.build();
+		}
+		txsFilter = TxValidationFlags.fromByteString(block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER.getNumber()));
         //将每个交易的写集写入HistoryDB
 	    List<ByteString> list = block.getData().getDataList();
         for (; tranNo < list.size(); tranNo++) {

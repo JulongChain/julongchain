@@ -98,6 +98,7 @@ public class Helper {
         Common.Block block = blockBuilder.build();
         Block b = new Block(block.getHeader().getNumber());
 		ByteString metadata = block.getMetadata().getMetadata(Common.BlockMetadataIndex.TRANSACTIONS_FILTER_VALUE);
+		//根据metadata中transaction filter的设置创建过滤器
 		TxValidationFlags txsFilter;
 		if(metadata == null || metadata.isEmpty()){
 			txsFilter = new TxValidationFlags(block.getData().getDataList().size());

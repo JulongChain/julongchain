@@ -55,6 +55,11 @@ public class LedgerManager {
      * 初始化
      */
     public static synchronized void initialize(Map<Common.HeaderType, IProcessor> processors) throws LedgerException{
+		if (initialized) {
+			String errMsg = "LedgerManager.initialize can only be called ONCE.";
+			log.error(errMsg);
+			throw new LedgerException(errMsg);
+		}
         log.info("Initializing ledger management");
         initialized = true;
         CustomTx.initialize(processors);

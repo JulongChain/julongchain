@@ -104,7 +104,7 @@ public class INodeLedgerTest {
 		Common.Block notExists = l.getBlockByTxID("not exists");
 		assertNull(notExists);
 
-//		thrown.expect(LedgerException.class);
+		thrown.expect(LedgerException.class);
 		l.getBlockByTxID(null);
 	}
 

@@ -97,7 +97,7 @@ public class LockBasedTxManager implements ITxManager {
 	 * 验证交易有效性以及准备更新包
 	 */
     @Override
-    public void validateAndPrepare(BlockAndPvtData blockAndPvtData, Boolean doMVCCValidation) throws LedgerException {
+    public void validateAndPrepare(BlockAndPvtData blockAndPvtData, boolean doMVCCValidation) throws LedgerException {
         try {
             Common.Block block = blockAndPvtData.getBlock();
 			log.debug("Validating new block with num trans = " + block.getData().getDataList().size());
