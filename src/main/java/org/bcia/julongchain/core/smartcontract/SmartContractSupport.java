@@ -13,27 +13,21 @@
  */
 package org.bcia.julongchain.core.smartcontract;
 
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.DuplicateChaincodeHandlerException;
-import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.SmartContractException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
-import org.bcia.julongchain.common.ledger.util.IoUtil;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
-import org.bcia.julongchain.common.util.Utils;
-import org.bcia.julongchain.core.common.smartcontractprovider.ISmartContractPackage;
 import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractContext;
-import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractProvider;
 import org.bcia.julongchain.core.container.DockerUtil;
 import org.bcia.julongchain.core.container.VMController;
+import org.bcia.julongchain.core.container.dockercontroller.DockerVM;
 import org.bcia.julongchain.core.container.scintf.ISCSupport;
 import org.bcia.julongchain.core.container.scintf.ISmartContractStream;
 import org.bcia.julongchain.core.ledger.ITxSimulator;
@@ -49,8 +43,6 @@ import org.bcia.julongchain.core.smartcontract.shim.helper.Channel;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
 
 import javax.naming.Context;
-import java.io.File;
-import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
@@ -89,7 +81,7 @@ public class SmartContractSupport implements ISCSupport {
 	public static final String DEV_MODE_USER_RUNS_SMART_CONTRACT = "dev";
 
 	public static final int SMART_CONTRACT_STARTUP_TIMEOUT_DEFAULT = 5000;
-	public static final String NODE_ADDRESS_DEFAULT = "0.0.0.0:7051";
+	public static final String NODE_ADDRESS_DEFAULT = "0.0.0.0:7052";
 
 	/** TXSimulatorKey 附加到账本的同步环境 */
 	public static String TX_SIMULATOR_KEY = "txsimulatorkey";
@@ -293,108 +285,23 @@ public class SmartContractSupport implements ISCSupport {
 
     private void startUserContract(String smartContractId, String version) throws SmartContractException {
         try {
+            DockerVM dockerVM = new DockerVM();
+            dockerVM.setSmartContractId(smartContractId);
+            dockerVM.setVersion(version);
             String imageName = getNodeIdFromYaml() + "-" + smartContractId + "-" + version;
-            String containerName = getNodeIdFromYaml() + "-" + smartContractId;
-
             List<String> images = DockerUtil.listImages(imageName);
-
             if (CollectionUtils.isEmpty(images)) {
-                createUserImage(smartContractId, version, imageName);
-                DockerUtil.createContainer(imageName, containerName);
+                dockerVM.deploy();
             }
-
-            // 启动容器
-            startDockerContainner(containerName, smartContractId);
+            dockerVM.start();
         } catch (Exception e) {
             throw new SmartContractException(e);
         }
     }
 
-    private String createUserImage(String smartContractId, String version, String imageName) throws IOException, JulongChainException {
-        log.info("images is null");
-
-        // 清空instantiate目录
-        String basePath = createBaseDirectory(smartContractId, version);
-
-        // 从文件系统读取安装的文件
-        ISmartContractPackage smartContractPackage =
-                SmartContractProvider.getSmartContractFromFS(smartContractId, version);
-        ByteString codePackage = smartContractPackage.getDepSpec().getCodePackage();
-        // 压缩文件
-        byte[] gzipBytes = IoUtil.gzipReader(codePackage.toByteArray(), 1024);
-        // 读取文件目录和文件内容
-        Map<String, byte[]> scFileBytesMap = IoUtil.tarReader(gzipBytes, 1024);
-        // 保存文件到instantiate目录
-        IoUtil.fileWriter(scFileBytesMap, basePath);
-        // 复制Dockerfile文件
-        String dockerFile = NodeConfigFactory.getNodeConfig().getSmartContract().getDockerFile();
-        FileUtils.copyFileToDirectory(
-                new File(dockerFile),
-                new File(basePath));
-        // replace core_node_address
-        String dockerFilePath = basePath + File.separator + "Dockerfile";
-        Utils.replaceFileContent(
-                dockerFilePath,
-                "#core_node_address#",
-                getCoreNodeAddress());
-        // replace smart_contract_id
-        Utils.replaceFileContent(dockerFilePath,
-                "#smart_contract_id",
-                smartContractId);
-        // replace core_node_address_and_port
-        Utils.replaceFileContent(dockerFilePath,
-                "#core_node_address_and_port",
-                getCoreNodeAddress() + ":" + getCoreNodeAddressPort());
-        // build镜像
-        String imageId =
-                DockerUtil.buildImage(basePath + "/Dockerfile", imageName);
-
-        log.info("image id :" + imageId);
-        return imageId;
-    }
 
     private String getNodeIdFromYaml() {
 	    return NodeConfigFactory.getNodeConfig().getNode().getId();
-    }
-
-    private String getCoreNodeAddressPort() {
-        return NodeConfigFactory.getNodeConfig().getSmartContract().getCoreNodeAddressPort();
-    }
-
-    private String getCoreNodeAddress() {
-        return NodeConfigFactory.getNodeConfig().getSmartContract().getCoreNodeAddress();
-    }
-
-    private String createBaseDirectory(String smartContractId, String version) throws IOException {
-        String basePath =
-                NodeConfigFactory.getNodeConfig().getSmartContract().getInstantiatePath()
-                        + "/"
-                        + smartContractId
-                        + "-"
-                        + version;
-        File basePathFile = new File(basePath);
-        if (!basePathFile.exists()) {
-            FileUtils.forceMkdir(basePathFile);
-        } else {
-            File pomFile = new File(basePath + File.separator + "pom.xml");
-            if (pomFile.exists()) {
-                FileUtils.forceDelete(pomFile);
-            }
-            File srcFile = new File(basePath + File.separator + "src");
-            if (srcFile.exists()) {
-                FileUtils.deleteDirectory(srcFile);
-            }
-        }
-        return basePath;
-    }
-
-    private void startDockerContainner(String containerName, String smartcontractId) throws InterruptedException {
-        log.info("container id:" + containerName);
-        DockerUtil.startContainer(containerName);
-        while (!SmartContractRunningUtil.checkSmartContractRunning(smartcontractId)) {
-            log.info("wait smart contract register[" + smartcontractId + "]");
-            Thread.sleep(1000);
-        }
     }
 
     private void startSystemContract(String smartContractId) throws SmartContractException {

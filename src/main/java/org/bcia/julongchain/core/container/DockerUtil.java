@@ -14,7 +14,10 @@
 package org.bcia.julongchain.core.container;
 
 import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.model.*;
+import com.github.dockerjava.api.model.BuildResponseItem;
+import com.github.dockerjava.api.model.Container;
+import com.github.dockerjava.api.model.Image;
+import com.github.dockerjava.api.model.SearchItem;
 import com.github.dockerjava.core.DockerClientBuilder;
 import com.github.dockerjava.core.command.BuildImageResultCallback;
 import com.google.common.collect.Sets;
@@ -155,6 +158,19 @@ public class DockerUtil {
     return result;
   }
 
+  public static String getContainerStatus(String name) {
+    DockerClient dockerClient = getDockerClient();
+    List<Container> list = dockerClient.listContainersCmd().withShowAll(true).exec();
+    for (Container container : list) {
+      if (StringUtils.isEmpty(name) || StringUtils.contains(container.getNames()[0], name)) {
+        closeDockerClient(dockerClient);
+        return container.getStatus();
+      }
+    }
+    closeDockerClient(dockerClient);
+    return null;
+  }
+
     public static String createContainer(String imageId, String containerName, String... cmdStr) {
         String containerId =
                 getDockerClient()
@@ -175,4 +191,9 @@ public class DockerUtil {
   public static void stopContainer(String containerId) {
     getDockerClient().stopContainerCmd(containerId).exec();
   }
+
+  public static void destroyContainer(String containerId) {
+    getDockerClient().stopContainerCmd(containerId);
+  }
+
 }
