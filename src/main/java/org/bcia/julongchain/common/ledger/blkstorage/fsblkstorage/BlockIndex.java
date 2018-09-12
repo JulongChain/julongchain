@@ -254,7 +254,7 @@ public class BlockIndex implements Index {
         }
         byte[] raw = db.get(constructTxValidationCodeIDKey(txID));
         if(raw == null){
-	        log.info("Get tx validationg code by tx id got null result");
+	        log.info("Get tx validation code by tx id got null result");
         	return null;
         } else if (raw.length != 1){
         	log.error("Got wrong txValidationCode which length is 1");

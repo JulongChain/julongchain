@@ -82,7 +82,8 @@ public class BlockFileManager {
         this.rootDir = config.getLedgerBlockDir(id);
         this.db = indexStore;
 		//检查区块链文件完整性以及是否被篡改
-		checkBlockFiles(rootDir);
+		// TODO: 9/12/18 consenter中区块与node中不同
+//		checkBlockFiles(rootDir);
         cpInfo = loadCurrentInfo();
         //创建rootdir
         IoUtil.createDirIfMissing(getRootDir());
