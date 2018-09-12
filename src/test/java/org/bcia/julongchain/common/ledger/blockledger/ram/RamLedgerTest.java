@@ -31,7 +31,7 @@ import org.junit.rules.ExpectedException;
 import static org.bcia.julongchain.common.ledger.util.Utils.rmrf;
 
 /**
- * 类描述
+ * Consenter账本内存账本测试类
  *
  * @author sunzongyu
  * @date 2018/05/28

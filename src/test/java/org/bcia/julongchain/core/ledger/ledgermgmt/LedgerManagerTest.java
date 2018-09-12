@@ -20,7 +20,7 @@ import static org.junit.Assert.*;
 import static org.bcia.julongchain.common.ledger.util.Utils.*;
 
 /**
- * 类描述
+ * 账本管理者测试类
  *
  * @author sunzongyu
  * @date 2018/09/11

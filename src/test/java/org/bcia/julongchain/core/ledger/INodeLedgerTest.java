@@ -34,7 +34,7 @@ import static org.bcia.julongchain.common.ledger.util.Utils.*;
 import static org.bcia.julongchain.core.ledger.util.Util.*;
 
 /**
- * 类描述
+ * 账本总体服务测试类
  *
  * @author sunzongyu
  * @date 2018/08/14

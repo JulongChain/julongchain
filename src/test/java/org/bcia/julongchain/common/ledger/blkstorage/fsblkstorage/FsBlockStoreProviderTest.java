@@ -18,7 +18,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- * 类描述
+ * FsBlockStoreProvider测试类
  *
  * @author sunzongyu
  * @date 2018/08/30

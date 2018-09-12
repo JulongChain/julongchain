@@ -12,7 +12,7 @@ import static org.bcia.julongchain.common.ledger.util.Utils.*;
 import static org.junit.Assert.*;
 
 /**
- * 类描述
+ * IdStore测试类
  *
  * @author sunzongyu
  * @date 2018/08/16
