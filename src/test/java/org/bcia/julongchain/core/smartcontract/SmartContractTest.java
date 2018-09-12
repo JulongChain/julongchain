@@ -18,8 +18,11 @@ package org.bcia.julongchain.core.smartcontract;
 import com.google.common.collect.Lists;
 import com.google.protobuf.ByteString;
 import org.apache.commons.io.FileUtils;
+import org.bcia.julongchain.common.exception.SmartContractException;
 import org.bcia.julongchain.common.exception.SysSmartContractException;
 import org.bcia.julongchain.common.util.CommConstant;
+import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractContext;
+import org.bcia.julongchain.core.container.DockerUtil;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.core.smartcontract.shim.impl.MockStub;
 import org.bcia.julongchain.core.ssc.lssc.LSSC;
@@ -71,7 +74,13 @@ public class SmartContractTest {
     }
 
     @Test
-    public void testInstantiate() {
+    public void testInstantiate() throws SmartContractException {
+        String scName = "mycc";
+        String version = "1.0";
+
+        SmartContractSupport smartContractSupport = new SmartContractSupport();
+        SmartContractContext smartContractContext = new SmartContractContext(scName, scName, version, UUID.randomUUID().toString(), false, null, null);
+        smartContractSupport.launch(smartContractContext, null);
 
     }
 
