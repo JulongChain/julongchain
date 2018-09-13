@@ -16,16 +16,18 @@
 package org.bcia.julongchain.csp.gmt0016.excelsecu.common;
 
 /**
+ * GM0016 权限常数
+ *
  * @author chenhao
  * @date 2018/4/2
  * @company Excelsecu
  */
 public class Permissions {
 
-    public static final int SECURE_NEVER_ACCOUNT=0x00000000;
-    public static final int SECURE_ADM_ACCOUNT=0x00000001;
-    public static final int SECURE_USER_ACCOUNT=0x00000010;
-    public static final int SECURE_ANYONE_ACCOUNT=0x000000FF;
+    public static final int SECURE_NEVER_ACCOUNT = 0x00000000;
+    public static final int SECURE_ADM_ACCOUNT = 0x00000001;
+    public static final int SECURE_USER_ACCOUNT = 0x00000010;
+    public static final int SECURE_ANYONE_ACCOUNT = 0x000000FF;
 
 
 }

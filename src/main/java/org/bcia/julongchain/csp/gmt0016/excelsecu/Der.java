@@ -18,6 +18,8 @@ package org.bcia.julongchain.csp.gmt0016.excelsecu;
 import java.util.Arrays;
 
 /**
+ * DER 签名编码实现类
+ *
  * @author chenhao
  * @date 2018/4/2
  * @company Excelsecu
