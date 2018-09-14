@@ -16,13 +16,13 @@
 package org.bcia.julongchain.common.exception;
 
 /**
- * GM/T-0016 API error.
+ * 根据 GM0016 错误码封装的异常
  *
  * @author chenhao
  * @date 2018/4/2
  * @company Excelsecu
  */
-public class SarException extends CspException{
+public class SarException extends CspException {
 
     public static final int SAR_OK = 0x00000000;
     public static final int SAR_FAIL = 0x0A000001;

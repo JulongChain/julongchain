@@ -16,23 +16,25 @@
 package org.bcia.julongchain.csp.gmt0016.excelsecu.common;
 
 /**
+ * GM0016 服务配置常数
+ *
  * @author chenhao
  * @date 2018/4/2
  * @company Excelsecu
  */
 public class ServiceConfig {
 
-    public static final String ADMIN_PIN_CODE="admin";
+    public static final String ADMIN_PIN_CODE = "admin";
 
-    public static final int ADMIN_PIN_RETRY_COUNT=3;
+    public static final int ADMIN_PIN_RETRY_COUNT = 3;
 
-    public static final int USER_PIN_RETRY_COUNT=3;
+    public static final int USER_PIN_RETRY_COUNT = 3;
 
-    public static final int DEVICE_LIST_LENGTH=10;
+    public static final int DEVICE_LIST_LENGTH = 10;
 
-    public static final int LOCK_DEV_TIME_OUT=5000;
+    public static final int LOCK_DEV_TIME_OUT = 5000;
 
-    public static final int MAX_CONTAINER_COUNT=20;
+    public static final int MAX_CONTAINER_COUNT = 20;
 
 
 

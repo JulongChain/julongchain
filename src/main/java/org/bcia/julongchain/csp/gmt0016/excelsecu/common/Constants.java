@@ -16,14 +16,16 @@
 package org.bcia.julongchain.csp.gmt0016.excelsecu.common;
 
 /**
+ * GM0016 其他常数
+ *
  * @author chenhao
  * @date 2018/4/2
  * @company Excelsecu
  */
 public class Constants {
 
-    public static final int ADMINE_TYPE=0;
-    public static final int USER_TYPE=1;
+    public static final int ADMINE_TYPE = 0;
+    public static final int USER_TYPE = 1;
     public static final int MAX_RSA_EXPONENT_LEN = 4;
     public static final int MAX_RSA_MODULUS_LEN = 256;
     public static final int ECC_MAX_XCOORDINATE_BITS_LEN = 512;

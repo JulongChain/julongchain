@@ -16,6 +16,8 @@
 package org.bcia.julongchain.csp.gmt0016.excelsecu;
 
 /**
+ * GM0016 容器类
+ *
  * @author chenhao
  * @date 2018/4/2
  * @company Excelsecu

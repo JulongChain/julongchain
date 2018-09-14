@@ -16,6 +16,8 @@
 package org.bcia.julongchain.csp.gmt0016.excelsecu.common;
 
 /**
+ * GM0016 算法常数
+ *
  * @author chenhao
  * @date 2018/4/2
  * @company Excelsecu

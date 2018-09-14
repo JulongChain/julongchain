@@ -17,6 +17,8 @@ package org.bcia.julongchain.csp.gmt0016.excelsecu.security;
 
 
 /**
+ * GM0016 ECC 公钥数据类
+ *
  * @author chenhao
  * @date 2018/4/2
  * @company Excelsecu

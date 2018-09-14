@@ -16,6 +16,8 @@
 package org.bcia.julongchain.csp.gmt0016.excelsecu.common;
 
 /**
+ * GM0016 设备状态常数
+ *
  * @author chenhao
  * @date 2018/4/2
  * @company Excelsecu

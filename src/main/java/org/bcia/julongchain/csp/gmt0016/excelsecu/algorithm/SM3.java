@@ -18,6 +18,8 @@ package org.bcia.julongchain.csp.gmt0016.excelsecu.algorithm;
 import org.bcia.julongchain.csp.intfs.IHash;
 
 /**
+ * SM3 Hash 算法操作类
+ *
  * @author chenhao
  * @date 2018/4/2
  * @company Excelsecu
