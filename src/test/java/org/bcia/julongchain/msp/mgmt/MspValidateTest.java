@@ -1,5 +1,6 @@
 package org.bcia.julongchain.msp.mgmt;
 
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.util.FileUtils;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2;
@@ -172,7 +173,7 @@ public class MspValidateTest {
 
 
     @Test
-    public  void base64() throws NoSuchAlgorithmException, InvalidKeySpecException, IOException, CryptoException {
+    public  void base64() throws NoSuchAlgorithmException, InvalidKeySpecException, IOException, CryptoException, CspException {
 //        final Base64.Decoder decoder =  Base64.Decoder.getDecoder();
 //        final Base64.Encoder encoder = Base64.getEncoder();
 //        final String text = "字串文字";

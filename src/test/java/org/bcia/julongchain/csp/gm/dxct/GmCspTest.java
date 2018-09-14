@@ -1,18 +1,26 @@
+/**
+ * Copyright Dingxuan. All Rights Reserved.
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.bcia.julongchain.csp.gm.dxct;
 
-import org.apache.commons.lang.RandomStringUtils;
-import org.bcia.julongchain.common.exception.JulongChainException;
+import org.bcia.julongchain.common.exception.CspException;
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.csp.factory.IFactoryOpts;
-import org.bcia.julongchain.csp.gm.dxct.GmCsp;
-import org.bcia.julongchain.csp.gm.dxct.GmCspFactory;
-import org.bcia.julongchain.csp.gm.dxct.GmFactoryOpts;
-import org.bcia.julongchain.csp.gm.dxct.sm2.SM2KeyGenOpts;
-import org.bcia.julongchain.csp.gm.dxct.sm2.SM2KeyImport;
-import org.bcia.julongchain.csp.gm.dxct.sm2.SM2SignerOpts;
+import org.bcia.julongchain.csp.gm.dxct.sm2.*;
 import org.bcia.julongchain.csp.gm.dxct.sm3.SM3HashOpts;
-import org.bcia.julongchain.csp.gm.dxct.sm4.SM4EncrypterOpts;
-import org.bcia.julongchain.csp.gm.dxct.sm4.SM4Key;
-import org.bcia.julongchain.csp.gm.dxct.sm4.SM4KeyGenOpts;
+import org.bcia.julongchain.csp.gm.dxct.sm4.*;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.intfs.opts.IHashOpts;
@@ -30,33 +38,12 @@ import sun.security.pkcs.PKCS8Key;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
-import java.util.Random;
 
 import static org.bcia.julongchain.csp.factory.CspManager.getDefaultCsp;
 
-
 /**
- * Copyright BCIA. All Rights Reserved.
- * <p>
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * <p>
- * http://www.apache.org/licenses/LICENSE-2.0
- * <p>
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-/**
- * @author zhanglin
- * @purpose Define the interface, DecrypterOpts
- * @date 2018-01-25
+ * @author zhanglin, zhangmingyang
+ * @date 2018/01/25
  * @company Dingxuan
  */
 
@@ -64,12 +51,11 @@ public class GmCspTest {
     private ICsp csp;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         System.out.println("before test");
         System.out.println("set up...");
         GmCspFactory factory = new GmCspFactory();
         Assert.assertNotNull(factory);
-        // IFactoryOpts opts = new GmFactoryOpts(256, "SM3", true, true, "",true);
         IFactoryOpts opts = new GmFactoryOpts();
         csp = factory.getCsp(opts);
         Assert.assertNotNull(csp);
@@ -80,36 +66,58 @@ public class GmCspTest {
         System.out.println("finalize...");
     }
 
+    /**
+     * 密钥生成测试
+     *
+     * @throws CspException
+     */
     @Test
-    public void keyGen() {
+    public void keyGenTest() throws CspException {
         System.out.println("test keyGen...");
         try {
-            IKey sm2key = getDefaultCsp().keyGen(new SM2KeyGenOpts());
-
-            System.out.println("generate the SM2 Privatekey:" + Hex.toHexString(sm2key.toBytes()));
-            System.out.println("generate the SM2 PublicKey:" + Hex.toHexString(sm2key.getPublicKey().toBytes()));
-            IKey sm4key = getDefaultCsp().keyGen(new SM4KeyGenOpts());
-            System.out.println("SM4 Key:" + Hex.toHexString(sm4key.toBytes()));
-        } catch (JulongChainException e) {
-            e.printStackTrace();
+            IKey sm2key = csp.keyGen(new SM2KeyGenOpts());
+            IKey sm4key = csp.keyGen(new SM4KeyGenOpts());
+            if (sm2key instanceof SM2Key) {
+                System.out.println("generate the key's type is SM2");
+                System.out.println("SM2 publicKey:" + Hex.toHexString(sm2key.getPublicKey().toBytes()));
+                System.out.println("SM2 privateKey:" + Hex.toHexString(sm2key.toBytes()));
+            }
+            if (sm4key instanceof SM4Key) {
+                System.out.println("generate the key's type is SM4");
+                System.out.println("SM4 Key:" + Hex.toHexString(sm4key.toBytes()));
+            }
+        } catch (CspException e) {
+            throw new CspException(e);
         }
-
-
     }
 
+    /**
+     * 密钥导入测试
+     *
+     * @throws CspException
+     */
     @Test
-    public void keyDeriv() {
+    public void keyImportTest() throws CspException {
+        byte[] sm2PK = Hex.decode("048708c51d06cd3e2c183499812aec48825ef56039bbfdc2c7023cefbc304d6c17b4746403d0254b9a33472002a84432b77ca0972c8fc56d97dd600293c35e0293");
+        byte[] sm2SK = Hex.decode("612c7ab32011048529173c1186110a1dd0de433af0eb70ceef84f10aa44e16de");
+        byte[] sm4Key = Hex.decode("0123456789abcdeffedcba9876543210");
+        IKey sm2PrivateKey = csp.keyImport(sm2SK, new SM2PrivateKeyImportOpts(true));
+        IKey sm2PublicKey = csp.keyImport(sm2PK, new SM2PrivateKeyImportOpts(true));
+        IKey sm4Sk = csp.keyImport(sm4Key, new SM4KeyImportOpts(true));
+        if (sm2PrivateKey instanceof SM2KeyImport) {
+            System.out.println("The key type is SM2KeyImport");
+        }
+        if (sm2PublicKey instanceof SM2KeyImport) {
+            System.out.println("The key type is SM2KeyImport");
+        }
+        if (sm4Sk instanceof SM4KeyImport) {
+            System.out.println("The key type is SM4KeyImport");
+        }
     }
 
-    @Test
-    public void keyImport() {
-    }
-
-    @Test
-    public void getKey() {
-    }
-
-    //ＧＭ/T 0004-2012 ＜ＳＭ３密码杂凑算法＞附录Ａ　示例１
+    /**
+     * ＧＭ/T 0004-2012 ＜ＳＭ３密码杂凑算法＞附录Ａ　示例１
+     */
     @Test
     public void hashUnitTest1() {
         try {
@@ -125,7 +133,7 @@ public class GmCspTest {
             System.out.println(encodedHexDigests);
             Assert.assertArrayEquals(digests, expectedHashMsg);
             System.out.println("Hash Unit Test 1 passed!");
-        } catch (JulongChainException e) {
+        } catch (CspException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -133,9 +141,13 @@ public class GmCspTest {
     }
 
 
-    //ＧＭ/T 0004-2012 ＜ＳＭ３密码杂凑算法＞附录Ａ　示例２
+    /**
+     * ＧＭ/T 0004-2012 ＜ＳＭ３密码杂凑算法＞附录Ａ　示例２
+     *
+     * @throws CspException
+     */
     @Test
-    public void hashUnitTest2() {
+    public void hashUnitTest2() throws CspException {
         try {
             String message = "abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd";
             byte[] msg = message.getBytes("ASCII");
@@ -149,16 +161,16 @@ public class GmCspTest {
             System.out.println(encodedHexDigests);
             Assert.assertArrayEquals(digests, expectedHashMsg);
             System.out.println("Hash Unit Test 2 passed!");
-        } catch (JulongChainException e) {
-            e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            throw new CspException(e);
         }
     }
 
-    //根据第三方软件进行对比测试
+    /**
+     * 根据第三方软件进行对比测试
+     */
     @Test
-    public void hashUnitTestByTester() {
+    public void hashUnitTestByTester() throws CspException {
         try {
             String message = "4865243A4EF5FFA94C";
             byte[] msg = Hex.decode(message);
@@ -171,71 +183,45 @@ public class GmCspTest {
             System.out.println(encodedHexDigests);
             Assert.assertArrayEquals(digests, expectedHashMsg);
             System.out.println("Hash Unit By Tester passed!");
-        } catch (JulongChainException e) {
+        } catch (CspException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * 签名测试
+     *
+     * @throws CspException
+     */
+    @Test
+    public void signAndVerfiyTest() throws CspException {
+        byte[] prik = Hex.decode("44c5ff2006af4b4d3e97c721be0e446c56939bb7d02debc16db7f535446850fe");
+        byte[] pubK = Hex.decode("047e371a5c8a01fca82820e8fa6d5ba8faee4cae4ee3ef65160c1ebdf5a7b0bbf2f0670e3496e8344df3065e549fdad924e1cf9c96e8e6e62b925c046bac25ea43");
+        IKey sk = new SM2KeyImport(prik, null);
+        byte[] data = Hex.decode("f12bcfd72e000c7e8a3499821694b208d745f72172f173a2e595207bf66d48f9");
+        byte[] signValue = csp.sign(sk, data, new SM2SignerOpts());
+        IKey pk = new SM2KeyImport(null, pubK);
+        System.out.println(csp.verify(pk, signValue, data, new SM2SignerOpts()));
+    }
+
 
     @Test
-    public void getHash() {
-
-
+    public void encryptAndDecryptTest() throws CspException {
+        byte[] testData = Hex.decode("01234567454545");
+        IKey sm4Key = csp.keyGen(new SM4KeyGenOpts());
+        byte[] encryptData = csp.encrypt(sm4Key, testData, new SM4EncrypterOpts());
+        byte[] plainText = csp.decrypt(sm4Key, encryptData, new SM4DecrypterOpts());
+        Assert.assertArrayEquals(testData, plainText);
+        System.out.println("plainText:" + Hex.toHexString(plainText));
     }
 
     @Test
-    public void sign() throws JulongChainException {
-        byte[] prik=Hex.decode("44c5ff2006af4b4d3e97c721be0e446c56939bb7d02debc16db7f535446850fe");
-        byte[] pubK=Hex.decode("047e371a5c8a01fca82820e8fa6d5ba8faee4cae4ee3ef65160c1ebdf5a7b0bbf2f0670e3496e8344df3065e549fdad924e1cf9c96e8e6e62b925c046bac25ea43");
-        IKey sk=new SM2KeyImport(prik,null);
-        byte[] hash=Hex.decode("f12bcfd72e000c7e8a3499821694b208d745f72172f173a2e595207bf66d48f9");
-        byte[] signValue=csp.sign(sk,hash,new SM2SignerOpts());
-        byte[] sign=Hex.decode("304402200f988879e415dbf972d62914d7e8c531424586f440ca1b12dabacc4cbb0cef1e02203d1e07a8c1c9277c1c91e25b2f92c72efd45e7493ac9082472e20a1bf884e2ac");
-        IKey pk=new SM2KeyImport(null,pubK);
-        System.out.println(csp.verify(pk, sign, hash, new SM2SignerOpts()));
-    }
-
-    @Test
-    public void verify() {
-    }
-
-    @Test
-    public void encrypt() throws JulongChainException {
-        GmFactoryOpts opts = new GmFactoryOpts();
-        GmCsp gmCsp = new GmCsp(opts);
-        SM4Key sm4Key = new SM4Key();
-        gmCsp.encrypt(sm4Key, "abc".getBytes(), new SM4EncrypterOpts());
-    }
-
-    @Test
-    public void decrypt() throws IOException {
-        // PemObject pemObject=new PemObject("privatekey","123".getBytes());
-        //PemWriter pemWriter=new PemWriter();
-
-        // new PemWriter().writeObject(pemObject);
-        // PKCS8EncodedKeySpec pkcs8EncodedKeySpec=new PKCS8EncodedKeySpec();
-        PKCS8Key pkcs8Key = new PKCS8Key();
-        PemObject pemObject = new PemObject("privatekey", "123".getBytes());
-        StringWriter str = new StringWriter();
-        PemWriter pemWriter = new PemWriter(str);
-        pemWriter.writeObject(pemObject);
-        //pemWriter.writeObject(pemObject);
-        pemWriter.close();
-        str.close();
-
-        System.out.println(str.toString());
-        //return str.toString();
-        PemReader pemReader;
-        PemObjectParser pemObjectParser;
-    }
-
-    @Test
-    public void rng() throws JulongChainException {
+    public void rngTest() throws CspException {
         for (int i = 0; i < 100; i++) {
             long t1 = System.currentTimeMillis();
-            byte[] secureSeed=csp.rng(24,null);
+            byte[] secureSeed = csp.rng(24, null);
             long t2 = System.currentTimeMillis();
-            System.out.println(String.format("随机数长度：%s",secureSeed.length));
+            System.out.println(String.format("随机数长度：%s", secureSeed.length));
             System.out.println(Hex.toHexString(secureSeed));
             System.out.println(String.format("生成随机数消耗时间%s ms", (t2 - t1)));
         }

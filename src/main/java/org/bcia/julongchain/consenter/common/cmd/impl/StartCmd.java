@@ -16,7 +16,7 @@
 package org.bcia.julongchain.consenter.common.cmd.impl;
 
 import org.apache.commons.cli.ParseException;
-import org.bcia.julongchain.common.deliver.DeliverDeliverHandler;
+import org.bcia.julongchain.common.deliver.DeliverHandler;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.localmsp.impl.LocalSigner;
 import org.bcia.julongchain.common.log.JulongChainLog;
@@ -53,7 +53,7 @@ public class StartCmd implements IConsenterCmd {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        DeliverDeliverHandler deliverHandler = new DeliverDeliverHandler(registrar, consenterConfig.getGeneral().getAuthentication().get(ConsenterConstants.TIMEWONDW));
+        DeliverHandler deliverHandler = new DeliverHandler(registrar, consenterConfig.getGeneral().getAuthentication().get(ConsenterConstants.TIMEWONDW));
 
         consenterServer = new ConsenterServer(Integer.valueOf(consenterConfig.getGeneral().getListenPort()));
         BroadcastHandler broadCastHandle = new BroadcastHandler(registrar);

@@ -37,18 +37,18 @@ import java.util.Map;
  * @Date: 2018/5/29
  * @company Dingxuan
  */
-public class DeliverDeliverHandler implements IDeliverHandler {
-    private static JulongChainLog log = JulongChainLogFactory.getLog(DeliverDeliverHandler.class);
+public class DeliverHandler implements IDeliverHandler {
+    private static JulongChainLog log = JulongChainLogFactory.getLog(DeliverHandler.class);
     private ISupportManager sm;
     private long timeWindow;
     private boolean mutualTLS;
 
-    public DeliverDeliverHandler(ISupportManager sm, long timeWindow) {
+    public DeliverHandler(ISupportManager sm, long timeWindow) {
         this.sm = sm;
         this.timeWindow = timeWindow;
     }
 
-    public DeliverDeliverHandler(ISupportManager sm, long timeWindow, boolean mutualTLS) {
+    public DeliverHandler(ISupportManager sm, long timeWindow, boolean mutualTLS) {
         this.sm = sm;
         this.timeWindow = timeWindow;
         this.mutualTLS = mutualTLS;
@@ -189,11 +189,11 @@ public class DeliverDeliverHandler implements IDeliverHandler {
                     return;
                 }
             }
-            try {
-                sendStatusReply(server, Common.Status.SUCCESS);
-            } catch (InvalidProtocolBufferException e) {
-                log.error(e.getMessage());
-            }
+//            try {
+//                sendStatusReply(server, Common.Status.SUCCESS);
+//            } catch (InvalidProtocolBufferException e) {
+//                log.error(e.getMessage());
+//            }
         }
 
 

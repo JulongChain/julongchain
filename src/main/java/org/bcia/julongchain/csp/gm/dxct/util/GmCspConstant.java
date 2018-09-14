@@ -33,4 +33,7 @@ public class GmCspConstant {
     public static final String  SIGN_TYPE="sign";
     public static final String  KEYSTROE_PATH="KeyStore";
 
+    public static final String CBC="cbc";
+    public static final String ECB="ecb";
+
 }

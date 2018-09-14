@@ -27,14 +27,13 @@ import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IHash;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.intfs.opts.*;
-import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.util.encoders.Hex;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
 /**
  * ICsp国密的实现
+ *
  * @author zhangmingyang
  * @date 2018-01-25
  * @company Dingxuan
@@ -74,14 +73,12 @@ public class GmCsp implements ICsp {
             SM2Key sm2Key = new SM2Key(sm2.generateKeyPair());
 
             if (!opts.isEphemeral()) {
-                //TODO  实现密钥存储接口
-                // CryptoUtil.publicKeyFileGen(Hex.toHexString(sm2Key.getPublicKey().ski()), sm2Key.getPublicKey().toBytes());
                 CryptoUtil.privateKeyFileGen(Hex.toHexString(sm2Key.ski()), sm2Key.toBytes());
             }
             return sm2Key;
         }
         if (opts instanceof SM4KeyGenOpts) {
-            return new SM4Key();
+            return new SM4Key(SM4.generateKey());
         }
         return null;
     }
@@ -102,21 +99,23 @@ public class GmCsp implements ICsp {
             throw new CspException("Invalid opts. It must not be nil.");
         }
         if (opts instanceof SM2PrivateKeyImportOpts) {
-            IKey sm2PrivateKey = new SM2KeyImport(raw,null);
+            IKey sm2PrivateKey = new SM2KeyImport(raw, null);
             if (!opts.isEphemeral()) {
                 CryptoUtil.privateKeyFileGen(Hex.toHexString(sm2PrivateKey.ski()), sm2PrivateKey.toBytes());
             }
             return sm2PrivateKey;
         }
-        if(opts instanceof SM2PublicKeyImportOpts){
-            IKey sm2PublicKey = new SM2KeyImport(null,raw);
+        if (opts instanceof SM2PublicKeyImportOpts) {
+            IKey sm2PublicKey = new SM2KeyImport(null, raw);
             if (!opts.isEphemeral()) {
                 CryptoUtil.publicKeyFileGen(Hex.toHexString(sm2PublicKey.getPublicKey().ski()), sm2PublicKey.getPublicKey().toBytes());
             }
             return sm2PublicKey;
         }
-
-
+        if (opts instanceof SM4KeyImportOpts) {
+            IKey sm4Key = new SM4KeyImport(raw);
+            return sm4Key;
+        }
         return null;
     }
 
@@ -134,7 +133,7 @@ public class GmCsp implements ICsp {
         byte[] results = new byte[0];
         try {
             results = sm3.hash(msg);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (CspException e) {
             throw new CspException(e.getMessage());
         }
         return results;
@@ -158,11 +157,11 @@ public class GmCsp implements ICsp {
         if (opts instanceof SM2SignerOpts) {
             try {
                 return sm2.sign(key.toBytes(), plaintext);
-            } catch (CryptoException e) {
-              throw new CspException(e.getMessage());
+            } catch (CspException e) {
+                throw new CspException(e.getMessage());
             }
         }
-        return null;
+        throw new CspException("SignerOpts Not recognized!");
     }
 
     @Override
@@ -216,8 +215,8 @@ public class GmCsp implements ICsp {
             log.error("The random length is less than Zero! ");
             throw new CspException("The random length is less than Zero! ");
         }
-        byte [] secureSeed=new byte[len];
-        Random random=new Random();
+        byte[] secureSeed = new byte[len];
+        Random random = new Random();
         random.nextBytes(secureSeed);
         return secureSeed;
     }

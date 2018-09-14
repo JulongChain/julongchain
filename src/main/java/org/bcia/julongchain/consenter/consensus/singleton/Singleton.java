@@ -37,8 +37,7 @@ import org.bcia.julongchain.protos.common.Common;
 import java.sql.Time;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.*;
 
 /**
  * 简单排序插件
@@ -57,12 +56,12 @@ public class Singleton implements IChain, IConsensusPlugin {
     private volatile boolean needDelay;
 
     public static Singleton getInstance(ChainSupport consenterSupport) {
-        if(consenterSupport==null){
+        if (consenterSupport == null) {
             return instance;
-        }else {
-           support=consenterSupport;
+        } else {
+            support = consenterSupport;
         }
-         return instance;
+        return instance;
     }
 
     @Override
@@ -123,87 +122,92 @@ public class Singleton implements IChain, IConsensusPlugin {
 
     /**
      * 区块处理
+     *
      * @throws InvalidProtocolBufferException
      * @throws LedgerException
      * @throws ValidateException
      * @throws PolicyException
      */
-    public void doProcess(Message message) throws InvalidProtocolBufferException, LedgerException, ValidateException, PolicyException {
+    public synchronized  void doProcess(Message message) throws InvalidProtocolBufferException, LedgerException, ValidateException, PolicyException {
 
         long seq = support.getSequence();
 
-            if(message instanceof NormalMessage){
-                if (message.getConfigSeq() < seq) {
-                    try {
-                        support.getProcessor().processNormalMsg(message.getMessage());
-                    } catch (InvalidProtocolBufferException e) {
-                        log.warn(String.format("Discarding bad normal message: %s", e.getMessage()));
-                    }
+        if (message instanceof NormalMessage) {
+            if (message.getConfigSeq() < seq) {
+                try {
+                    support.getProcessor().processNormalMsg(message.getMessage());
+                } catch (InvalidProtocolBufferException e) {
+                    log.warn(String.format("Discarding bad normal message: %s", e.getMessage()));
                 }
-                BatchesMes batchesMes = support.getCutter().ordered(message.getMessage());
-                Common.Envelope[][] batches = batchesMes.getMessageBatches();
-                if (batches== null && !needDelay) {
-                    needDelay=true;
-                    Timer timer=new Timer();
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            log.info("Ready to cut the batches....");
-                            if(needDelay){
-                                needDelay = false;
-                                Common.Envelope[] batch = support.getCutter().cut();
-                                if (batch.length == 0) {
-                                    log.warn("Batch timer expired with no pending requests, this might indicate a bug");
-                                    return;
-                                }
-                                log.debug("Batch timer expired, creating block");
-                                Common.Block block = support.createNextBlock(batch);
-                                support.writeBlock(block, null);
-                                log.info("Write the Block finished");
+            }
+            BatchesMes batchesMes = support.getCutter().ordered(message.getMessage());
+            Common.Envelope[][] batches = batchesMes.getMessageBatches();
+            if (batches == null && !needDelay) {
+                needDelay = true;
+                Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+
+                        if (needDelay) {
+                            needDelay = false;
+                            log.info("");
+                            Common.Envelope[] batch = support.getCutter().cut();
+                            if (null == batch || batch.length == 0) {
+                                log.warn("Batch timer expired with no pending requests, this might indicate a bug");
                                 return;
                             }
-
-
-                        }
-                    },support.getLedgerResources().getMutableResources().getGroupConfig().getConsenterConfig().getBatchTimeout());
-
-                }
-                    if(batches==null){
-
-                    }else {
-                        for (Common.Envelope[] env : batches) {
-                            Common.Block block = support.createNextBlock(env);
+                            log.debug("Batch timer expired, creating block");
+                            Common.Block block = support.createNextBlock(batch);
                             support.writeBlock(block, null);
-                        }
-                        if (batches.length > 0) {
-                            needDelay = false;
+                            //log.info("Write the Block finished");
+                            //   log.info("写入账本完成");
+                            return;
                         }
                     }
+                }, support.getLedgerResources().getMutableResources().getGroupConfig().getConsenterConfig().getBatchTimeout());
+
+            }
+            if (batches == null) {
 
             } else {
-                if (message.getConfigSeq() < seq) {
-                    try {
-                        support.getProcessor().processConfigMsg(message.getMessage());
-                    } catch (ConsenterException e) {
-                        log.error(e.getMessage());
-                        return;
-                    }
-                }
-                Common.Envelope[] batch = support.getCutter().cut();
-                if (batch != null) {
-                    Common.Block block = support.createNextBlock(batch);
+                for (Common.Envelope[] env : batches) {
+                    log.info("Ready to cut the batches....");
+                    Common.Block block = support.createNextBlock(env);
                     support.writeBlock(block, null);
-                }else {
-                    Common.Block block = support.createNextBlock(new Common.Envelope[]{message.getMessage()});
-                    support.writeConfigBlock(block, null);
+                    log.info("Write the Block finished");
                 }
-                needDelay = false;
+                if (batches.length > 0) {
+                    needDelay = false;
+                }
             }
+
+        } else {
+            if (message.getConfigSeq() < seq) {
+                try {
+                    support.getProcessor().processConfigMsg(message.getMessage());
+                } catch (ConsenterException e) {
+                    log.error(e.getMessage());
+                    return;
+                }
+            }
+            Common.Envelope[] batch = support.getCutter().cut();
+            System.out.println(batch.length);
+            if (batch.length != 0) {
+                Common.Block block = support.createNextBlock(batch);
+                support.writeBlock(block, null);
+            } else {
+                Common.Block block = support.createNextBlock(new Common.Envelope[]{message.getMessage()});
+                support.writeConfigBlock(block, null);
+            }
+            needDelay = false;
+        }
 
     }
 
     /**
      * 消息放入队列
+     *
      * @param message
      * @return
      * @throws ValidateException

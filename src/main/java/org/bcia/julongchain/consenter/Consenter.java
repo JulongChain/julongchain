@@ -25,6 +25,7 @@ import org.bcia.julongchain.consenter.util.ConsenterConstants;
 
 /**
  * consenter 服务主类
+ *
  * @author zhangmingyang
  * @Date: 2018/3/1
  * @company Dingxuan
@@ -55,7 +56,7 @@ public class Consenter {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-        }else if (args.length == 1 && ConsenterConstants.BENCHMARK.equalsIgnoreCase(command)) {
+        } else if (args.length == 1 && ConsenterConstants.BENCHMARK.equalsIgnoreCase(command)) {
             iConsenterCmd = ConsenterCmdFactory.getInstance(command);
             String[] argment = new String[]{command};
             try {
@@ -63,8 +64,7 @@ public class Consenter {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-        }
-        else{
+        } else {
             log.info("args is error!");
         }
         return;

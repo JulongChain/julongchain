@@ -53,7 +53,7 @@ public class BroadcastHandler implements IBroadcastHandler {
     }
 
     @Override
-    public void handle(Common.Envelope envelope, StreamObserver<Ab.BroadcastResponse> responseObserver) throws ConsenterException {
+    public synchronized void handle(Common.Envelope envelope, StreamObserver<Ab.BroadcastResponse> responseObserver) throws ConsenterException {
         if (ConsenterConstants.SINGLETON.equals(GenesisConfigFactory.getGenesisConfig().getConsenter().getConsenterType())) {
             Common.GroupHeader groupHeader = null;
             ChainSupport chainSupport = null;

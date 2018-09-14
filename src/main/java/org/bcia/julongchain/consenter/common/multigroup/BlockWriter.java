@@ -47,33 +47,38 @@ public class BlockWriter {
 
     private long lastConfigSeq;
 
-    private Common.Block lastBlock;
+    private  Common.Block lastBlock;
 
     public BlockWriter(ChainSupport support, Registrar registrar, Common.Block lastBlock) {
-        this.support = support;
-        this.registrar = registrar;
-        this.lastBlock = lastBlock;
-        this.lastConfigSeq = support.getSequence();
+        synchronized (BlockWriter.class) {
+            this.support = support;
+            this.registrar = registrar;
+            this.lastBlock = lastBlock;
+            this.lastConfigSeq = support.getSequence();
+        }
     }
 
 
     public Common.Block createNextBlock(Common.Envelope[] messages) {
+        synchronized (BlockWriter.class) {
 
-        byte[] previousBlockHash = BlockHelper.hash(lastBlock.getHeader().toByteArray());
-        Common.BlockData.Builder data = Common.BlockData.newBuilder();
+            byte[] previousBlockHash = BlockHelper.hash(lastBlock.getHeader().toByteArray());
+            Common.BlockData.Builder data = Common.BlockData.newBuilder();
 
-        for (int i = 0; i < messages.length; i++) {
-            data.addData(ByteString.copyFrom(messages[i].toByteArray()));
+            for (int i = 0; i < messages.length; i++) {
+                data.addData(ByteString.copyFrom(messages[i].toByteArray()));
+            }
+
+            Common.Block block = BlockHelper.createBlock(lastBlock.getHeader().getNumber() + 1, previousBlockHash);
+            Common.BlockHeader.Builder header = Common.BlockHeader.newBuilder(block.getHeader())
+                    .setDataHash(ByteString.copyFrom(BlockHelper.hash(data.build().toByteArray())));
+
+
+            Common.Block.Builder updateBlockBuilder = Common.Block.newBuilder(block);
+            updateBlockBuilder.setData(data).setHeader(header);
+            //   lastBlock=updateBlockBuilder.build();
+            return updateBlockBuilder.build();
         }
-
-        Common.Block block = BlockHelper.createBlock(lastBlock.getHeader().getNumber() + 1, previousBlockHash);
-        Common.BlockHeader.Builder header = Common.BlockHeader.newBuilder(block.getHeader())
-                .setDataHash(ByteString.copyFrom(BlockHelper.hash(data.build().toByteArray())));
-
-        Common.Block.Builder updateBlockBuilder = Common.Block.newBuilder(block);
-        updateBlockBuilder.setData(data).setHeader(header);
-        //   lastBlock=updateBlockBuilder.build();
-        return updateBlockBuilder.build();
     }
 
     public void writeConfigBlock(Common.Block block, byte[] encodedMetadataValue) throws InvalidProtocolBufferException, LedgerException, ValidateException, PolicyException {
@@ -103,12 +108,15 @@ public class BlockWriter {
         writeBlock(block, encodedMetadataValue);
     }
 
-    public synchronized void writeBlock(Common.Block block, byte[] encodedMetadataValue) {
-        lastBlock = block;
-        commitBlock(encodedMetadataValue);
+    public void writeBlock(Common.Block block, byte[] encodedMetadataValue) {
+        synchronized (BlockWriter.class) {
+
+            lastBlock = block;
+            commitBlock(encodedMetadataValue);
+        }
     }
 
-    private void commitBlock(byte[] encodedMetadataValue) {
+    private  void commitBlock(byte[] encodedMetadataValue) {
         if (encodedMetadataValue != null) {
             Common.Metadata metadata = null;
             try {
@@ -130,7 +138,7 @@ public class BlockWriter {
     }
 
 
-    public void addBlockSignature(Common.Block block) {
+    public  void addBlockSignature(Common.Block block) {
 
         try {
             Common.SignatureHeader signatureHeader = Common.SignatureHeader.parseFrom(Utils.marshalOrPanic(CommonUtils.newSignatureHeaderOrPanic(support.getLocalSigner())));
@@ -158,7 +166,7 @@ public class BlockWriter {
 
     }
 
-    public void addLastConfigSignature(Common.Block block) {
+     private void addLastConfigSignature(Common.Block block) {
         long configSeq = support.getSequence();
         if (configSeq > lastConfigSeq) {
             log.debug(String.format("[group: %s] Detected lastConfigSeq transitioning from %d to %d, setting lastConfigBlockNum from %d to %d",
@@ -183,10 +191,6 @@ public class BlockWriter {
         }
     }
 
-
-    public static JulongChainLog getLog() {
-        return log;
-    }
 
     public static void setLog(JulongChainLog log) {
         BlockWriter.log = log;
