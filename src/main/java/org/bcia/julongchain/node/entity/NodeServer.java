@@ -184,6 +184,11 @@ public class NodeServer {
                         log.info("Saved block");
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e1) {
+                            log.error(e1.getMessage(), e1);
+                        }
                     }
                 }
             }
