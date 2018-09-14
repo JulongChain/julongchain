@@ -13,26 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.csp.gm.dxct.sm2;
+package org.bcia.julongchain.csp.gm.dxct.sm4;
 
-import org.bcia.julongchain.csp.gm.dxct.util.GmCspConstant;
-import org.bcia.julongchain.csp.intfs.opts.IKeyGenOpts;
+import org.bcia.julongchain.csp.intfs.opts.IKeyImportOpts;
 
 /**
- * sm2 密钥生成选项
+ * 类描述
  *
  * @author zhangmingyang
- * @Date: 2018/3/27
+ * @date 2018/09/06
  * @company Dingxuan
  */
-public class SM2KeyGenOpts implements IKeyGenOpts {
+public class SM4KeyImportOpts implements IKeyImportOpts {
+    private boolean isEphemeral;
+    public SM4KeyImportOpts(boolean isEphemeral) {
+        this.isEphemeral=isEphemeral;
+    }
+
     @Override
     public String getAlgorithm() {
-        return GmCspConstant.SM2;
+        return null;
     }
 
     @Override
     public boolean isEphemeral() {
-        return true;
+        return isEphemeral;
     }
 }

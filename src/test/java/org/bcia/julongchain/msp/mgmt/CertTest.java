@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.msp.mgmt;
 
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.util.FileUtils;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2;
 import org.bcia.julongchain.csp.gm.dxct.util.CryptoUtil;
@@ -48,7 +49,7 @@ public class CertTest {
     }
 
     @Test
-    public void cryptogenCertTest() throws IOException, CryptoException {
+    public void cryptogenCertTest() throws IOException, CspException {
         String skPath = "msp/keystore";
         String signcerts = "msp/signcerts";
         String testData = "this is test data";

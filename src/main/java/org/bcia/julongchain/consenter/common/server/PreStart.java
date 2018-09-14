@@ -16,8 +16,6 @@
 package org.bcia.julongchain.consenter.common.server;
 
 
-import org.bcia.julongchain.common.deliver.DeliverDeliverHandler;
-import org.bcia.julongchain.common.deliver.DeliverSupport;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.genesis.GenesisBlockFactory;
 import org.bcia.julongchain.common.ledger.blockledger.IFactory;
@@ -32,7 +30,6 @@ import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfig;
 import org.bcia.julongchain.consenter.common.multigroup.Registrar;
 import org.bcia.julongchain.consenter.consensus.IConsensusPlugin;
 import org.bcia.julongchain.consenter.consensus.singleton.Singleton;
-import org.bcia.julongchain.consenter.util.ConsenterConstants;
 import org.bcia.julongchain.core.common.grpc.GrpcServerConfig;
 import org.bcia.julongchain.core.common.grpc.SecureOptions;
 import org.bcia.julongchain.node.common.helper.ConfigTreeHelper;

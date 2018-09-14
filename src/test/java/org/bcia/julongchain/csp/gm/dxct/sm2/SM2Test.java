@@ -1,8 +1,10 @@
 package org.bcia.julongchain.csp.gm.dxct.sm2;
 
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.csp.gm.dxct.util.CryptoUtil;
 import org.bouncycastle.crypto.CryptoException;
 import org.bouncycastle.util.encoders.Hex;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,6 +15,7 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * sm2 测试类
+ *
  * @author zhangmingyang
  * @Date: 2018/4/3
  * @company Dingxuan
@@ -23,8 +26,14 @@ public class SM2Test {
 
     @Before
     public void setup() {
+        System.out.println("before test");
+        System.out.println("set up...");
         sm2 = new SM2();
         sm2KeyPair = sm2.generateKeyPair();
+    }
+    @After
+    public void finalize() {
+        System.out.println("finalize...");
     }
 
     @Test
@@ -35,85 +44,94 @@ public class SM2Test {
     }
 
     @Test
-    public void standardDataSign() {
+    public void SignTest() throws CspException {
+        byte[] content = CryptoUtil.genByteArray(32);
+        byte[] privateKey = sm2KeyPair.getPrivatekey();
+        byte[] publicKey = sm2KeyPair.getPublickey();
+        byte[] singnature = sm2.sign(privateKey, content);
+        boolean result = sm2.verify(publicKey, singnature, content);
+        System.out.println("Validation results：" + result);
+    }
+
+
+    @Test
+    public void invalidParamSignTest() {
+        byte[] testData = null;
+        byte[] zeroData = new byte[0];
+        byte[] privateKey = sm2KeyPair.getPrivatekey();
+        try {
+            sm2.sign(privateKey, null);
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+            assertEquals("[Csp]plainText is null", e.getMessage());
+        }
+        try {
+            sm2.sign(zeroData, null);
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+            assertEquals("[Csp]privateKey's length is 0", e.getMessage());
+        }
+        try {
+            sm2.sign(privateKey, zeroData);
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+            assertEquals("[Csp]plainText's length is 0", e.getMessage());
+        }
+        try {
+            sm2.sign(null, CryptoUtil.genByteArray(12));
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+            assertEquals("[Csp]privateKey is null", e.getMessage());
+        }
+
+    }
+
+    @Test
+    public void invalidParamVerify() {
+        byte[] testData = null;
+        byte[] zeroData = new byte[0];
+        byte[] publicKey = sm2KeyPair.getPublickey();
+        try {
+            sm2.verify(null, null, null);
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+            assertEquals("[Csp]publicKey is null", e.getMessage());
+        }
+        try {
+            sm2.verify(publicKey, null, null);
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+            assertEquals("[Csp]signValue is null", e.getMessage());
+        }
 
     }
 
 
     @Test
-    public void validPramSign() {
-
-
+    public void publicKeyEncrypt() throws CspException {
+        byte[] testData = Hex.decode("01234567");
+        byte[] publicKey = sm2KeyPair.getPublickey();
+        byte[] privateKey = sm2KeyPair.getPrivatekey();
+        byte[] encryptData = sm2.encrypt(testData, publicKey);
+        byte[] plainData=sm2.decrypt(encryptData,privateKey);
+        assertEquals("01234567",Hex.toHexString(plainData));
     }
 
 
     @Test
-    public void invalidPramSign() {
+    public void diffSizeDataSignWithVerify() throws CspException {
+        int[] testData = {1, 16, 32, 64, 128, 256, 512, 1024, 2048, 1048576, 2097152};
 
+        for (int i = 0; i < testData.length; i++) {
+            byte[] content = CryptoUtil.genByteArray(testData[i]);
+            byte[] privateKey = sm2KeyPair.getPrivatekey();
+            byte[] publicKey = sm2KeyPair.getPublickey();
+            long t1 = System.currentTimeMillis();
+            byte[] singnature = sm2.sign(privateKey, content);
+            sm2.verify(publicKey, singnature, content);
+            long t2 = System.currentTimeMillis();
+            System.out.println(String.format("%s byte data expend the time %s:ms", testData[i], (t2 - t1)));
+        }
     }
 
-    @Test
-    public void diffSizeDataSignWithVerify() throws CryptoException {
-        //128 byte data
-        long before128Sign = System.currentTimeMillis();
-        byte[] plain128Text = CryptoUtil.genByteArray(128);
-        byte[] sign128Value = sm2.sign(sm2KeyPair.getPrivatekey(), plain128Text);
-        long after128Sign = System.currentTimeMillis();
-        System.out.println(String.format("128 byte data sign expend the time %s ms", (after128Sign - before128Sign)));
-
-        long before128Verify = System.currentTimeMillis();
-        boolean verify128=sm2.verify(sm2KeyPair.getPublickey(), sign128Value, plain128Text);
-        assertEquals(true,verify128);
-        long after128Verify = System.currentTimeMillis();
-        System.out.println(String.format("128 byte data verify expend the time %s ms", (after128Verify - before128Verify)));
-
-
-        //256 byte data
-        long before256Sign = System.currentTimeMillis();
-        byte[] plain256Text = CryptoUtil.genByteArray(256);
-        byte[] sign256Value = sm2.sign(sm2KeyPair.getPrivatekey(), plain256Text);
-        long after256Sign = System.currentTimeMillis();
-        System.out.println(String.format("256 byte data expend the time %s ms", (after256Sign - before256Sign)));
-
-        long before256Verify = System.currentTimeMillis();
-        boolean verify256=sm2.verify(sm2KeyPair.getPublickey(), sign256Value, plain256Text);
-        long after256Verify = System.currentTimeMillis();
-        assertEquals(true,verify256);
-        System.out.println(String.format("256 byte data verify expend the time %s ms", (after256Verify - before256Verify)));
-
-
-        //512 byte data
-        long before512Sign = System.currentTimeMillis();
-        byte[] plain512Text = CryptoUtil.genByteArray(512);
-        byte[] sign512Value=sm2.sign(sm2KeyPair.getPrivatekey(), plain512Text);
-        long after512Sign = System.currentTimeMillis();
-        System.out.println(String.format("512 byte data expend the time %s ms", (after512Sign - before512Sign)));
-
-        long before512Verify = System.currentTimeMillis();
-        boolean verify512=sm2.verify(sm2KeyPair.getPublickey(), sign512Value, plain512Text);
-        long after512Verify = System.currentTimeMillis();
-        assertEquals(true,verify512);
-        System.out.println(String.format("512 byte data verify expend the time %s ms", (after512Verify - before512Verify)));
-
-
-        //1024 byte data
-        long before1024Sign = System.currentTimeMillis();
-        byte[] plain1024Text = CryptoUtil.genByteArray(1024);
-        byte[] sign1024Value= sm2.sign(sm2KeyPair.getPrivatekey(), plain1024Text);
-        long after1024Sign = System.currentTimeMillis();
-        System.out.println(String.format("1024 byte data expend the time %s ms", (after1024Sign - before1024Sign)));
-
-        long before1024Verify = System.currentTimeMillis();
-        boolean verify1024=sm2.verify(sm2KeyPair.getPublickey(), sign1024Value, plain1024Text);
-        long after1024Verify = System.currentTimeMillis();
-        assertEquals(true,verify1024);
-        System.out.println(String.format("1024 byte data verify expend the time %s ms", (after1024Verify - before1024Verify)));
-
-
-    }
-
-    @Test
-    public void verify() {
-
-    }
 }

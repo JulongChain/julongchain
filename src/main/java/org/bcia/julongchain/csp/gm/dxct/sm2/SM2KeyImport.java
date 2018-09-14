@@ -56,7 +56,7 @@ public class SM2KeyImport implements IKey {
     public byte[] ski() throws CspException{
         try {
             return sm3.hash(privateKey);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (CspException e) {
             throw new CspException(e.getMessage());
         }
     }

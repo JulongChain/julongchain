@@ -19,26 +19,22 @@ import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.csp.gm.dxct.sm3.SM3;
 import org.bcia.julongchain.csp.intfs.IKey;
 
-import java.security.NoSuchAlgorithmException;
-
 /**
- * sm4密钥对象
+ * SM4导入选项
  *
  * @author zhangmingyang
- * @Date: 2018/4/28
+ * @date 2018/09/06
  * @company Dingxuan
  */
-public class SM4Key implements IKey {
-    private SM3 sm3;
+public class SM4KeyImport implements IKey{
     private byte[] sm4Key;
-
-    public SM4Key(byte[] sm4Key) {
-        this.sm3 = sm3;
-        this.sm4Key=sm4Key;
+    private SM3 sm3;
+    public SM4KeyImport(Object key) {
+        sm4Key= (byte[]) key;
     }
 
     @Override
-    public byte[] toBytes() {
+    public byte[] toBytes() throws CspException {
         return sm4Key;
     }
 
@@ -47,22 +43,22 @@ public class SM4Key implements IKey {
         try {
             return sm3.hash(sm4Key);
         } catch (CspException e) {
-            throw new CspException(e.getMessage());
+            throw new CspException(e);
         }
     }
 
     @Override
-    public boolean isSymmetric() {
+    public boolean isSymmetric() throws CspException {
         return true;
     }
 
     @Override
-    public boolean isPrivate() {
-        return false;
+    public boolean isPrivate() throws CspException {
+        return true;
     }
 
     @Override
-    public IKey getPublicKey() {
+    public IKey getPublicKey() throws CspException {
         return null;
     }
 }

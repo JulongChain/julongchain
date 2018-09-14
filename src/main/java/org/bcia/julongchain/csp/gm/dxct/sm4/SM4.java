@@ -14,13 +14,14 @@ package org.bcia.julongchain.csp.gm.dxct.sm4; /**
  * limitations under the License.
  */
 
+import org.bcia.julongchain.common.exception.CspException;
 import org.bouncycastle.crypto.CipherKeyGenerator;
 import org.bouncycastle.crypto.KeyGenerationParameters;
 import org.bouncycastle.crypto.engines.SM4Engine;
 import org.bouncycastle.crypto.params.KeyParameter;
 
 import java.io.*;
-import java.security.SecureRandom;
+import java.security.*;
 
 /**
  * 国密sm4实现
@@ -37,8 +38,7 @@ public class SM4 {
     /**
      * 解密类型
      */
-    public static final int SM4_DECRYPT = 0;
-
+    public static final int SM4_DECRYPT = 2;
 
     /**
      * sm4密钥生成
@@ -64,7 +64,6 @@ public class SM4 {
         if (input == null) {
             return null;
         }
-
         byte[] ret = (byte[]) null;
         if (mode == SM4_ENCRYPT) {
             int p = 16 - input.length % 16;
@@ -89,9 +88,21 @@ public class SM4 {
      * @return
      */
 
-    public byte[] encryptECB(byte[] plainText, byte[] sm4key) {
+    public byte[] encryptECB(byte[] plainText, byte[] sm4Key) throws CspException {
+        if (plainText == null) {
+            throw new CspException("plainText is null");
+        }
+        if (null == sm4Key) {
+            throw new CspException("sm4key is null");
+        }
+        if (plainText.length == 0) {
+            throw new CspException("plainText's length is 0");
+        }
+        if (sm4Key.length < 16 || sm4Key.length > 16) {
+            throw new CspException("sm4key's pattern is wrong!");
+        }
         byte[] paddingData = padding(plainText, SM4_ENCRYPT);
-        byte[] output = processData(paddingData, sm4key, SM4_ENCRYPT);
+        byte[] output = ecbProcessData(paddingData, sm4Key, SM4_ENCRYPT);
         return output;
     }
 
@@ -101,20 +112,34 @@ public class SM4 {
      * @param encryptData
      * @return
      */
-    public byte[] decryptECB(byte[] encryptData, byte[] sm4Key) {
-        byte[] output = processData(encryptData, sm4Key, SM4_DECRYPT);
+    public byte[] decryptECB(byte[] encryptData, byte[] sm4Key) throws CspException {
+        if (null == encryptData) {
+            throw new CspException("plainText is null");
+        }
+        if (encryptData.length == 0) {
+            throw new CspException("plainText's length is 0");
+        }
+
+        if (null == sm4Key) {
+            throw new CspException("sm4key is null");
+        }
+        if (sm4Key.length == 0) {
+            throw new CspException("sm4key's length is 0");
+        }
+
+        byte[] output = ecbProcessData(encryptData, sm4Key, SM4_DECRYPT);
         byte[] decrypt = padding(output, SM4_DECRYPT);
         return decrypt;
 
     }
 
     /**
-     * 处理消息原文或加密消息
+     * ecb模式处理消息原文或加密消息
      *
      * @param data
      * @return
      */
-    private static byte[] processData(byte[] data, byte[] sm4Key, int mode) {
+    public static byte[] ecbProcessData(byte[] data, byte[] sm4Key, int mode) {
         int length = data.length;
         ByteArrayInputStream bins = new ByteArrayInputStream(data);
         ByteArrayOutputStream bous = new ByteArrayOutputStream();
@@ -125,7 +150,6 @@ public class SM4 {
             engine.init(false, new KeyParameter(sm4Key));
         }
         for (; length > 0; length -= 16) {
-
 
             byte[] buf = new byte[16];
             System.arraycopy(data, 0, buf, 0, buf.length);
@@ -140,4 +164,72 @@ public class SM4 {
         byte[] output = bous.toByteArray();
         return output;
     }
+
+    /**
+     * cbc 模式加解密
+     *
+     * @param data
+     * @param sm4Key
+     * @param iv
+     * @param mode
+     * @return
+     * @throws CspException
+     */
+    public static byte[] cbcProcessData(byte[] data, byte[] sm4Key, byte[] iv, int mode) throws CspException {
+        int length = data.length;
+        ByteArrayInputStream bins = new ByteArrayInputStream(data);
+        ByteArrayOutputStream bous = new ByteArrayOutputStream();
+        SM4Engine engine = new SM4Engine();
+        if (mode == SM4_ENCRYPT) {
+            engine.init(true, new KeyParameter(sm4Key));
+            for (; length > 0; length -= 16) {
+                //buf存储padding后的data
+                byte[] buf = new byte[16];
+                byte[] out = new byte[16];
+                try {
+                    bins.read(buf);
+                    for (int i = 0; i < 16; i++) {
+                        //out为异或运算后的明文块
+                        out[i] = ((byte) (buf[i] ^ iv[i]));
+                    }
+                    engine.processBlock(out, 0, out, 0);
+                    //将加密运算后的数据作为iv值
+                    System.arraycopy(out, 0, iv, 0, 16);
+                    bous.write(out);
+                } catch (IOException e) {
+                    throw new CspException(e);
+                }
+            }
+        } else {
+            engine.init(false, new KeyParameter(sm4Key));
+            engine.init(false, new KeyParameter(sm4Key));
+            byte[] temp = new byte[16];
+            for (; length > 0; length -= 16) {
+                byte[] buf = new byte[16];
+                byte[] out = new byte[16];
+                try {
+                    bins.read(buf);
+                    System.arraycopy(buf, 0, temp, 0, 16);
+                    engine.processBlock(buf, 0, out, 0);
+                    for (int i = 0; i < 16; i++) {
+                        out[i] = (byte) (out[i] ^ iv[i]);
+                    }
+
+                    System.arraycopy(temp, 0, iv, 0, 16);
+                    bous.write(out);
+                } catch (IOException e) {
+                    throw new CspException(e);
+                }
+            }
+        }
+        try {
+            bins.close();
+            bous.close();
+        } catch (IOException e) {
+            throw new CspException(e);
+        }
+        byte[] output = bous.toByteArray();
+        return output;
+    }
+
 }

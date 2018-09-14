@@ -52,7 +52,7 @@ public class SM2Key implements IKey {
         byte[] hashValue=null;
         try {
             hashValue= sm3.hash(sm2KeyPair.getPrivatekey());
-        } catch (NoSuchAlgorithmException e) {
+        } catch (CspException e) {
            throw new CspException(e.getMessage());
         }
         return hashValue;
