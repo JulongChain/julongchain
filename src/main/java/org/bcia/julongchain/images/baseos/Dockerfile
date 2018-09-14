@@ -23,4 +23,5 @@ RUN apt-get -y install vim
 RUN mkdir -p /root/julongchain
 WORKDIR /root/julongchain
 ENV LANG C.UTF-8
+COPY /root/.m2/repository /root/.m2/repository
 
