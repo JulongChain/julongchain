@@ -24,7 +24,7 @@ import scala.collection.concurrent.INode;
 import static org.junit.Assert.*;
 
 /**
- * 类描述
+ * FsBlockStore测试类
  *
  * @author sunzongyu
  * @date 2018/08/30

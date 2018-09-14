@@ -18,6 +18,8 @@ package org.bcia.julongchain.csp.gmt0016.excelsecu.bean;
 import org.bcia.julongchain.csp.gmt0016.excelsecu.security.ECCPublicKeyBlob;
 
 /**
+ * GM0016 数字信封数据类
+ *
  * @author chenhao
  * @date 2018/4/2
  * @company Excelsecu

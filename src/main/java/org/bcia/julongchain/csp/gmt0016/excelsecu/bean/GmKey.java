@@ -18,6 +18,8 @@ package org.bcia.julongchain.csp.gmt0016.excelsecu.bean;
 import org.bcia.julongchain.csp.intfs.IKey;
 
 /**
+ * GM0016 国密密钥类
+ *
  * @author chenhao
  * @date 2018/4/2
  * @company Excelsecu

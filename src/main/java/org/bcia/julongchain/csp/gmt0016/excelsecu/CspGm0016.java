@@ -16,8 +16,6 @@
 package org.bcia.julongchain.csp.gmt0016.excelsecu;
 
 import org.bcia.julongchain.common.exception.CspException;
-import org.bcia.julongchain.common.exception.CspException;
-import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.exception.SarException;
 import org.bcia.julongchain.csp.gmt0016.excelsecu.algorithm.SHA1;
 import org.bcia.julongchain.csp.gmt0016.excelsecu.algorithm.SHA256;
@@ -39,6 +37,8 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 /**
+ * 基于 GM0016 的 ICSP 接口实现类
+ *
  * @author chenhao
  * @date 2018/4/2
  * @company Excelsecu
@@ -264,7 +264,7 @@ public class CspGm0016 implements ICsp {
     }
 
     @Override
-    public IKey keyImport(Object raw, IKeyImportOpts opts) throws CspException{
+    public IKey keyImport(Object raw, IKeyImportOpts opts) throws CspException {
 
         String containerName = UUID.randomUUID().toString() + TYPE_1;
         long containerHandle = mSkf.skfCreateContainer(mHApplication, containerName);

@@ -17,7 +17,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- * 类描述
+ * 状态数据库测试类
  *
  * @author sunzongyu
  * @date 2018/08/30

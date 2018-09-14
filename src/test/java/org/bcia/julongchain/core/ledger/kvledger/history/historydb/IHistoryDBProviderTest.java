@@ -9,7 +9,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * 类描述
+ * 历史数据库提供者测试类
  *
  * @author sunzongyu
  * @date 2018/08/29
