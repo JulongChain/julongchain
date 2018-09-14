@@ -21,7 +21,12 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpContentDecompressor;
 import io.netty.handler.ssl.SslContext;
-
+/**
+ * HTTP客户端ChannelPipeline对象创建和配置
+ * @author cuilf
+ * @date 2019/09/14
+ * @company InfosecTechnology
+ */
 public class HttpSnoopClientInitializer extends ChannelInitializer<SocketChannel> {
 
     private final SslContext sslCtx;

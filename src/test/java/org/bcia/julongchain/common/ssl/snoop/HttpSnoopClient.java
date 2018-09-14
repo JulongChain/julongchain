@@ -30,8 +30,10 @@ import org.bcia.julongchain.common.ssl.SslContextGMBuilderTest;
 import java.net.URI;
 
 /**
- * A simple HTTP client that prints out the content of the HTTP response to
- * {@link System#out} to test {@link HttpSnoopServer}.
+ * 一个简单的HTTP客户端，用来打印http响应的内容，用于测试HttpSnoopServer类
+ * @author cuilf
+ * @date 2019/09/14
+ * @company InfosecTechnology
  */
 public final class HttpSnoopClient {
 

@@ -28,7 +28,10 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import java.net.InetAddress;
 
 /**
- * Handles a server-side channel.
+ * 处理聊天时的服务端通道
+ * @author cuilf
+ * @date 2019/09/14
+ * @company InfosecTechnology
  */
 public class SecureChatServerHandler extends SimpleChannelInboundHandler<String> {
 

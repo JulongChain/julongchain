@@ -25,7 +25,10 @@ import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.ssl.SslContext;
 
 /**
- * Creates a newly configured {@link ChannelPipeline} for a new channel.
+ * 为服务端端通道创建一个新的已经配置的ChannelPipeline对象
+ * @author cuilf
+ * @date 2019/09/14
+ * @company InfosecTechnology
  */
 public class SecureChatServerInitializer extends ChannelInitializer<SocketChannel> {
 

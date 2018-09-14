@@ -27,7 +27,15 @@ import io.netty.handler.ssl.SslContextGMBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 
 /**
- * Simple SSL chat server.
+ * 简单的SSL聊天服务端，用于演示SSLSocket通信
+ * 使用步骤:
+ * 1.先启动服务端，再启动客户端
+ * 2.在客户端的console中打字并输出，能够收到服务端相同的返回数据
+ * 3.客户端发出"bye"，即可断开与服务端的连接并关闭客户端进程
+ * 4.服务端需要手动关闭
+ * @author cuilf
+ * @date 2019/09/14
+ * @company InfosecTechnology
  */
 public final class SecureChatServer {
 

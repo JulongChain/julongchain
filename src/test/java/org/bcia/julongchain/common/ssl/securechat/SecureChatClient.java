@@ -28,7 +28,10 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 /**
- * Simple SSL chat client.
+ * 简单的SSL聊天客户端，用于演示SSLSocket通信
+ * @author cuilf
+ * @date 2019/09/14
+ * @company InfosecTechnology
  */
 public final class SecureChatClient {
 
