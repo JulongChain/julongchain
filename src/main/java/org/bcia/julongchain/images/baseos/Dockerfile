@@ -19,7 +19,7 @@ RUN apt-get -y install openjdk-8-jdk
 RUN apt-get -y install maven
 RUN apt-get -y install net-tools
 RUN apt-get -y install iputils-ping
-RUN apt-get -y vim
+RUN apt-get -y install vim
 RUN mkdir -p /root/julongchain
 WORKDIR /root/julongchain
 ENV LANG C.UTF-8
