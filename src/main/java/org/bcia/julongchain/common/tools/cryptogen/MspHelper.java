@@ -58,7 +58,6 @@ public class MspHelper {
 
     public static void generateLocalMSP(String baseDir, String name, List<String> sans, CaHelper signCA,
                                         CaHelper tlsCA, int nodeType, boolean nodeOUs) throws JulongChainException {
-        //create folder structure
         String mspDir = Paths.get(baseDir, "msp").toString();
         String tlsDir = Paths.get(baseDir, "tls").toString();
 
@@ -66,62 +65,45 @@ public class MspHelper {
 
         FileUtil.mkdirAll(Paths.get(tlsDir));
 
-        /**
-         * Create the MSP identity artifacts
-         */
-        //get keystore path
         String keystore = Paths.get(mspDir, "keystore").toString();
 
-        //generate private key
         IKey priv = CspHelper.generatePrivateKey(keystore);
 
-        //get public key
         ECPublicKey ecPubKey = CspHelper.getSM2PublicKey(priv);
 
-        //generate X509 certificate using signing CaHelper
+        // 使用签名CA证书生成X509证书
         String[] ous = null;
         if (nodeOUs) {
             ous = new String[]{nodeOUMap[nodeType]};
 
         }
 
-        // TODO remove dependency of X509Certificate
+        // TODO 使用 BC 库的生成功能代替 X509Certificate
         X509Certificate cert = signCA.signCertificate(Paths.get(mspDir, "signcerts").toString(),
                 name, ous, null, ecPubKey, KeyUsage.digitalSignature, new int[]{});
 
-        // the signing CaHelper certificate goes into cacerts
+        // 签名CA证书放入cacerts
         x509Export(Paths.get(mspDir, "cacerts", x509Filename(signCA.getName())).toString(), signCA.getSignCert());
 
-        // the TLS CaHelper certificate goes into tlscacerts
+        // TLS CA证书放入tlscacerts
         x509Export(Paths.get(mspDir, "tlscacerts", x509Filename(tlsCA.getName())).toString(), tlsCA.getSignCert());
 
         if (nodeOUs && nodeType == NODE) {
             exportConfig(mspDir, "cacerts/" + x509Filename(signCA.getName()), true);
 
         }
-        // the signing identity goes into admincerts.
-        // This means that the signing identity
-        // of this MSP is also an admin of this MSP
-        // NOTE: the admincerts folder is going to be
-        // cleared up anyway by copyAdminCert, but
-        // we leave a valid admin for now for the sake
-        // of unit tests
+
+        // 个人签名证书放入admincerts
         try {
             x509Export(Paths.get(mspDir, "admincerts", x509Filename(name)).toString(), Certificate.getInstance(cert.getEncoded()));
         } catch (CertificateEncodingException e) {
             throw new JulongChainException("generateLocalMSP failed while export admincerts: " + e.getMessage());
         }
-        /*
-		Generate the TLS artifacts in the TLS folder
-	    */
 
-        // generate private key
         IKey tlsPrivKey = CspHelper.generatePrivateKey(tlsDir);
 
-        //get public key
         ECPublicKey tlsPubKey = CspHelper.getSM2PublicKey(tlsPrivKey);
 
-        //generate X509 certificate using TLS CaHelper
         tlsCA.signCertificate(Paths.get(tlsDir).toString(),
                 name,
                 null,
@@ -132,7 +114,7 @@ public class MspHelper {
 
         x509Export(Paths.get(tlsDir, "ca.crt").toString(), tlsCA.getSignCert());
 
-        //rename the generated TLS X509 cert
+        // 根据类型重命名tls证书名
         String tlsFilePrefix = "server";
         if (nodeType == CLIENT) {
             tlsFilePrefix = "client";
@@ -148,13 +130,12 @@ public class MspHelper {
     }
 
     public static void generateVerifyingMSP(String baseDir, CaHelper signCA, CaHelper tlsCA, boolean nodeOUs) throws JulongChainException {
-        // create folder structure and write artifacts to proper locations
         createFolderStructure(baseDir, false);
 
-        // the signing CaHelper certificate goes into cacerts
+        // 签名CA证书放入cacerts
         x509Export(Paths.get(baseDir, "cacerts", x509Filename(signCA.getName())).toString(), signCA.getSignCert());
 
-        // the TLS CaHelper certificate goes into tlscacerts
+        // TLS CA证书放入tlscacerts
         x509Export(Paths.get(baseDir, "tlscacerts", x509Filename(tlsCA.getName())).toString(), tlsCA.getSignCert());
 
         if (nodeOUs) {
@@ -179,7 +160,6 @@ public class MspHelper {
     }
 
     private static void createFolderStructure(String rootDir, boolean local) throws JulongChainException {
-        // create admincerts, cacerts, keystore and signcerts folders
         List<Path> folders = new ArrayList<>();
         folders.add(Paths.get(rootDir, "admincerts"));
         folders.add(Paths.get(rootDir, "cacerts"));
@@ -208,7 +188,6 @@ public class MspHelper {
     }
 
     private static void keyExport(String keystore, String output, IKey key) throws JulongChainException {
-
         String id = Hex.toHexString(key.ski());
         String keyPath = Paths.get(keystore, id + "_sk").toString();
 
@@ -224,7 +203,6 @@ public class MspHelper {
     }
 
     public static void exportConfig(String mspDir, String caFile, boolean enable) throws JulongChainException {
-
         OrgUnitIdentifiersConfig clientOUIdentifier = new OrgUnitIdentifiersConfig();
         clientOUIdentifier.setCertificate(caFile);
         clientOUIdentifier.setOrganizationalUnitIdentifier(CLIENT_OU);
