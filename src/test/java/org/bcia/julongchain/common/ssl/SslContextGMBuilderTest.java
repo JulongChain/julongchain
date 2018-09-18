@@ -26,6 +26,12 @@ import javax.net.ssl.SSLEngine;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+/**
+ * 国密SSL句柄创建测试，测试用例
+ * @author cuilf
+ * @date 2019/09/14
+ * @company InfosecTechnology
+ */
 public class SslContextGMBuilderTest {
     public static final String TRUST_CERT =
             "MIICTTCCAfKgAwIBAgIKZCTXgL0MKPOtBzAMBggqgRzPVQGDdQUAMF0xCzAJBgNV\n" +

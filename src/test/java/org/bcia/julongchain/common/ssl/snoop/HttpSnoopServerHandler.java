@@ -34,7 +34,12 @@ import java.util.Set;
 
 import static io.netty.handler.codec.http.HttpResponseStatus.*;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
-
+/**
+ * HTTP服务端协议解析处理
+ * @author cuilf
+ * @date 2019/09/14
+ * @company InfosecTechnology
+ */
 public class HttpSnoopServerHandler extends SimpleChannelInboundHandler<Object> {
 
     private HttpRequest request;

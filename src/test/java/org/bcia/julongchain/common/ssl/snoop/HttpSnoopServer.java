@@ -28,8 +28,10 @@ import io.netty.handler.ssl.SslContextGMBuilder;
 import org.bcia.julongchain.common.ssl.SslContextGMBuilderTest;
 
 /**
- * An HTTP server that sends back the content of the received HTTP request
- * in a pretty plaintext form.
+ * 一个简单的HTTP服务端，把接收到的HTTP请求内容返回到客户端
+ * @author cuilf
+ * @date 2019/09/14
+ * @company InfosecTechnology
  */
 public final class HttpSnoopServer {
 

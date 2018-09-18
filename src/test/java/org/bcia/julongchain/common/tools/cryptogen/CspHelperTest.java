@@ -28,8 +28,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.PublicKey;
-import java.security.interfaces.ECPublicKey;
 
 import static org.junit.Assert.*;
 
@@ -42,9 +40,7 @@ import static org.junit.Assert.*;
  * @company Excelsecu
  */
 public class CspHelperTest {
-
-
-    String testDir;
+    private String testDir;
 
     {
         try {
@@ -87,13 +83,9 @@ public class CspHelperTest {
 
     @Test
     public void getECPublicKey() throws JulongChainException {
-
         IKey priv = CspHelper.generatePrivateKey(testDir);
-        ECPublicKey ecPubKey = CspHelper.getSM2PublicKey(priv);
 
-        assertTrue(ecPubKey instanceof PublicKey);
-
-        //force errors using mockKey
+        // 使用不复合要求的key的异常测试
         expectedException.expect(JulongChainException.class);
         priv = new MockKey(null, null, new MockKey());
         CspHelper.getSM2PublicKey(priv);

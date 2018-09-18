@@ -19,7 +19,10 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 /**
- * Handles a client-side channel.
+ * 处理聊天时的客户端通道
+ * @author cuilf
+ * @date 2019/09/14
+ * @company InfosecTechnology
  */
 public class SecureChatClientHandler extends SimpleChannelInboundHandler<String> {
 
