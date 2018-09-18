@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM julongchain/julongchain-baseimage:0.8.3-alpha
+FROM docker.julongchain.org:5000/julongchain-baseimage:0.8.3-alpha
 MAINTAINER Julongchain "qkl@dxct.org"
 COPY pom.xml /root/julongchain
 COPY src/ /root/julongchain/src
