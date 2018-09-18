@@ -27,6 +27,7 @@ import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.core.smartcontract.shim.impl.MockStub;
 import org.bcia.julongchain.core.ssc.lssc.LSSC;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
+import org.bcia.julongchain.protos.node.SmartContractShim;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -37,9 +38,9 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * 类描述
+ * SmartContractTest
  *
- * @author
+ * @author wanliangbing
  * @date 2018/8/27
  * @company Dingxuan
  */
@@ -47,29 +48,22 @@ public class SmartContractTest {
 
     @Test
     public void testInstall() throws SysSmartContractException {
-
         String scName = "mycc";
         String version = "1.0";
         String srcPath = "/root/install";
         String installCmd = "install";
-
         LSSC lssc = new LSSC();
         MockStub stub = new MockStub(CommConstant.LSSC, lssc);
         lssc.init(stub);
-
         SmartContractPackage.SmartContractID smartContractID = SmartContractPackage.SmartContractID.newBuilder().setName(scName).setVersion(version).setPath(srcPath).build();
         SmartContractPackage.SmartContractSpec smartContractSpec = SmartContractPackage.SmartContractSpec.newBuilder().setSmartContractId(smartContractID).build();
         SmartContractPackage.SmartContractDeploymentSpec smartContractDeploymentSpec = SmartContractPackage.SmartContractDeploymentSpec.newBuilder().setSmartContractSpec(smartContractSpec).build();
-
         List<ByteString> list = new ArrayList<ByteString>();
         list.add(ByteString.copyFrom(installCmd.getBytes()));
         list.add(smartContractDeploymentSpec.toByteString());
-
         lssc.executeInstall(stub, list.get(1).toByteArray());
-
         String path = NodeConfigFactory.getNodeConfig().getNode().getFileSystemPath();
         File scFile = FileUtils.getFile(path, scName + "." + version);
-
         Assert.assertTrue(scFile.exists());
     }
 
@@ -77,16 +71,36 @@ public class SmartContractTest {
     public void testInstantiate() throws SmartContractException {
         String scName = "mycc";
         String version = "1.0";
-
         SmartContractSupport smartContractSupport = new SmartContractSupport();
         SmartContractContext smartContractContext = new SmartContractContext(scName, scName, version, UUID.randomUUID().toString(), false, null, null);
-        smartContractSupport.launch(smartContractContext, null);
-
+        SmartContractPackage.SmartContractInvocationSpec smartContractInvocationSpec = SmartContractPackage.SmartContractInvocationSpec.newBuilder().setSmartContractSpec(SmartContractPackage.SmartContractSpec.newBuilder().setSmartContractId(SmartContractPackage.SmartContractID.newBuilder().setName(scName).setVersion(version).build()).build()).build();
+        smartContractSupport.launch(smartContractContext, smartContractInvocationSpec);
+        String nodeId = NodeConfigFactory.getNodeConfig().getNode().getId();
+        List<String> imageList = DockerUtil.listImages(nodeId + "-" + scName + "-" + version);
+        Assert.assertTrue(imageList.size() > 0);
+        List<String> containerList = DockerUtil.listContainers(nodeId + "-" + scName);
+        Assert.assertTrue(containerList.size() > 0);
     }
 
     @Test
-    public void testInvoke() {
-
+    public void testInvoke() throws SmartContractException {
+        String scName = "mycc";
+        String version = "1.0";
+        SmartContractPackage.SmartContractInput smartContractInput = SmartContractPackage.SmartContractInput.newBuilder().build();
+        SmartContractShim.SmartContractMessage.Builder scMessageBuilder = SmartContractShim.SmartContractMessage
+                .newBuilder();
+        scMessageBuilder.setTypeValue(SmartContractShim.SmartContractMessage.Type.TRANSACTION.getNumber());
+        scMessageBuilder.setPayload(smartContractInput.toByteString());
+        scMessageBuilder.setTxid(UUID.randomUUID().toString());
+        scMessageBuilder.setGroupId("myGroup");
+        SmartContractSupport smartContractSupport = new SmartContractSupport();
+        SmartContractContext smartContractContext = new SmartContractContext(scName, scName, version, UUID.randomUUID().toString(), false, null, null);
+        smartContractSupport.execute(smartContractContext, scMessageBuilder.build(),10000l);
+        String nodeId = NodeConfigFactory.getNodeConfig().getNode().getId();
+        List<String> imageList = DockerUtil.listImages(nodeId + "-" + scName + "-" + version);
+        Assert.assertTrue(imageList.size() > 0);
+        List<String> containerList = DockerUtil.listContainers(nodeId + "-" + scName);
+        Assert.assertTrue(containerList.size() > 0);
     }
 
 }
