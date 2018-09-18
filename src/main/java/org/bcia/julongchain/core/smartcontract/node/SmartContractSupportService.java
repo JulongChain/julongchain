@@ -259,6 +259,11 @@ public class SmartContractSupportService
     }
 
     private void handlePutState(SmartContractMessage message, String txId, String groupId, String smartContractId, StreamObserver<SmartContractMessage> responseObserver) {
+        SmartContractMessage smartContractMessage = handlePutState(message, txId, groupId, smartContractId);
+        responseObserver.onNext(smartContractMessage);
+    }
+
+    public SmartContractMessage handlePutState(SmartContractMessage message, String txId, String groupId, String smartContractId) {
         SmartContractMessage.Type type = null;
         try {
             SmartContractShim.PutState putState = SmartContractShim.PutState.parseFrom(message.getPayload());
@@ -270,20 +275,22 @@ public class SmartContractSupportService
             logger.error(e.getMessage(), e);
             type = SmartContractMessage.Type.ERROR;
         }
-
-        SmartContractMessage responseMessage =
+        SmartContractMessage smartContractMessage =
                 SmartContractMessage.newBuilder()
                         .mergeFrom(message)
                         .setType(SmartContractMessage.Type.RESPONSE)
                         .setTxid(txId)
                         .setGroupId(groupId)
                         .build();
-
-        responseObserver.onNext(responseMessage);
+        return smartContractMessage;
     }
 
     private void handleDelState(SmartContractMessage message, String txId, String groupId, String smartContractId, StreamObserver<SmartContractMessage> responseObserver) {
+        SmartContractMessage responseMessage = handleDelState(message, txId, groupId, smartContractId);
+        responseObserver.onNext(responseMessage);
+    }
 
+    public SmartContractMessage handleDelState(SmartContractMessage message, String txId, String groupId, String smartContractId) {
         SmartContractMessage.Type type = null;
         try {
             SmartContractShim.DelState delState = SmartContractShim.DelState.parseFrom(message.getPayload());
@@ -295,25 +302,26 @@ public class SmartContractSupportService
             logger.error(e.getMessage(), e);
             type = SmartContractMessage.Type.ERROR;
         }
-
-        SmartContractMessage responseMessage =
+        SmartContractMessage smartContractMessage =
                 SmartContractMessage.newBuilder()
                         .mergeFrom(message)
                         .setType(type)
                         .setTxid(txId)
                         .setGroupId(groupId)
                         .build();
-
-        responseObserver.onNext(responseMessage);
+        return smartContractMessage;
     }
 
     private void handleGetHistoryForKey(SmartContractMessage message, String txId, String groupId, String smartContractId, StreamObserver<SmartContractMessage> responseObserver) {
+        SmartContractMessage responseMessage = handleGetHistoryForKey(message, txId, groupId, smartContractId);
+        responseObserver.onNext(responseMessage);
+    }
 
+    public SmartContractMessage handleGetHistoryForKey(SmartContractMessage message, String txId, String groupId, String smartContractId) {
         SmartContractMessage.Type type = null;
         SmartContractShim.QueryResponse queryResponse = SmartContractShim.QueryResponse.newBuilder().build();
         try {
             SmartContractShim.GetHistoryForKey getHistoryForKey = SmartContractShim.GetHistoryForKey.parseFrom(message.getPayload());
-
             HistoryLevelDBProvider provider = new HistoryLevelDBProvider();
             IHistoryDB db = provider.getDBHandle(groupId);
             String[] attrsToIndex = {
@@ -329,9 +337,7 @@ public class SmartContractSupportService
             IBlockStore blockStore = fsBlockStoreProvider.openBlockStore(groupId);
             IHistoryQueryExecutor hqe = db.newHistoryQueryExecutor(blockStore);
             IResultsIterator iterator = hqe.getHistoryForKey(smartContractId, getHistoryForKey.getKey());
-
             SmartContractShim.QueryResponse.Builder queryResponseBuilder = SmartContractShim.QueryResponse.newBuilder();
-
             while (true) {
                 QueryResult queryResult = iterator.next();
                 if (queryResult == null) {
@@ -340,16 +346,13 @@ public class SmartContractSupportService
                 KvRwset.Version version = (KvRwset.Version) queryResult.getObj();
                 queryResponseBuilder.addResults(SmartContractShim.QueryResultBytes.newBuilder().setResultBytes(version.toByteString()).build());
             }
-
             queryResponse = queryResponseBuilder.build();
-
             type = SmartContractMessage.Type.RESPONSE;
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             type = SmartContractMessage.Type.ERROR;
         }
-
-        SmartContractMessage responseMessage =
+        SmartContractMessage smartContractMessage =
                 SmartContractMessage.newBuilder()
                         .mergeFrom(message)
                         .setType(type)
@@ -357,11 +360,16 @@ public class SmartContractSupportService
                         .setGroupId(groupId)
                         .setPayload(queryResponse.toByteString())
                         .build();
-
-        responseObserver.onNext(responseMessage);
+        return smartContractMessage;
     }
 
     private void handleGetStateByRange(SmartContractMessage message, String txId, String groupId, String smartContractId, StreamObserver<SmartContractMessage> responseObserver) {
+        SmartContractMessage smartContractMessage = handleGetStateByRange(message, txId, groupId, smartContractId);
+        responseObserver.onNext(smartContractMessage);
+
+    }
+
+    public SmartContractMessage handleGetStateByRange(SmartContractMessage message, String txId, String groupId, String smartContractId) {
         try {
             SmartContractShim.GetStateByRange getStateByRange = SmartContractShim.GetStateByRange.parseFrom(message.getPayload());
             String startKey = getStateByRange.getStartKey();
@@ -379,7 +387,7 @@ public class SmartContractSupportService
                     break;
                 }
                 VersionedKV kv = (VersionedKV) queryResult.getObj();
-				String key = kv.getCompositeKey().getKey();
+                String key = kv.getCompositeKey().getKey();
                 if(key.compareTo(endKey) >= 0){
                     break;
                 }
@@ -404,9 +412,9 @@ public class SmartContractSupportService
                             .setGroupId(groupId)
                             .build();
 
-            responseObserver.onNext(responseMessage);
+            return responseMessage;
 
-        } catch (InvalidProtocolBufferException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
 
             SmartContractMessage responseMessage =
@@ -416,28 +424,18 @@ public class SmartContractSupportService
                             .setTxid(txId)
                             .setGroupId(groupId)
                             .build();
-            responseObserver.onNext(responseMessage);
-        } catch (LedgerException e) {
-            logger.error(e.getMessage(), e);
-
-            SmartContractMessage responseMessage =
-                    SmartContractMessage.newBuilder()
-                            .mergeFrom(message)
-                            .setType(SmartContractMessage.Type.ERROR)
-                            .setTxid(txId)
-                            .setGroupId(groupId)
-                            .build();
-            responseObserver.onNext(responseMessage);
+            return responseMessage;
         }
-
     }
 
     private void handleGetState(SmartContractMessage message, String txId, String groupId, String smartContractId, StreamObserver<SmartContractMessage> responseObserver) {
-        // shim传过来的key
+        SmartContractMessage smartContractMessage = handleGetState(message, txId, groupId, smartContractId);
+        responseObserver.onNext(smartContractMessage);
+    }
+
+    public SmartContractMessage handleGetState(SmartContractMessage message, String txId, String groupId, String smartContractId) {
         String key = message.getPayload().toStringUtf8();
-
-        logger.info("key:" + key);
-
+        SmartContractMessage smartContractMessage = null;
         try {
             INodeLedger nodeLedger = NodeUtils.getLedger(groupId);
             ITxSimulator txSimulator = nodeLedger.newTxSimulator(txId);
@@ -445,8 +443,7 @@ public class SmartContractSupportService
 
             if (worldStateBytes == null) {
                 worldStateBytes = new byte[]{};
-                // 发送读取结果到shim端
-                SmartContractMessage responseMessage =
+                smartContractMessage =
                         SmartContractMessage.newBuilder()
                                 .mergeFrom(message)
                                 .setType(SmartContractMessage.Type.RESPONSE)
@@ -454,10 +451,8 @@ public class SmartContractSupportService
                                 .setTxid(txId)
                                 .setGroupId(groupId)
                                 .build();
-                responseObserver.onNext(responseMessage);
             } else {
-                // 发送读取结果到shim端
-                SmartContractMessage responseMessage =
+                smartContractMessage =
                         SmartContractMessage.newBuilder()
                                 .mergeFrom(message)
                                 .setType(SmartContractMessage.Type.RESPONSE)
@@ -465,21 +460,19 @@ public class SmartContractSupportService
                                 .setTxid(txId)
                                 .setGroupId(groupId)
                                 .build();
-                responseObserver.onNext(responseMessage);
             }
 
 
-        } catch (LedgerException e) {
-            logger.error(e.getMessage(), e);
-            SmartContractMessage responseMessage =
+        } catch (Exception e) {
+            smartContractMessage =
                     SmartContractMessage.newBuilder()
                             .mergeFrom(message)
                             .setType(SmartContractMessage.Type.ERROR)
                             .setTxid(txId)
                             .setGroupId(groupId)
                             .build();
-            responseObserver.onNext(responseMessage);
         }
+        return smartContractMessage;
     }
 
     /**
