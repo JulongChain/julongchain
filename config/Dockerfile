@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM [base_mage]
+FROM #base_image
 COPY pom.xml /root/julongchain
 COPY src/ /root/julongchain/src
 WORKDIR /root/julongchain
