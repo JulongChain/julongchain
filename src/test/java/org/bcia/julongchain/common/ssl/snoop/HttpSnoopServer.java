@@ -39,7 +39,7 @@ public final class HttpSnoopServer {
     static final int PORT = Integer.parseInt(System.getProperty("port", SSL? "8443" : "8080"));
 
     public static void main(String[] args) throws Exception {
-        // Configure SSL.
+        // 配置 SSL.
         final SslContext sslCtx;
         if (SSL) {
             sslCtx = SslContextGMBuilder
@@ -51,7 +51,7 @@ public final class HttpSnoopServer {
             sslCtx = null;
         }
 
-        // Configure the server.
+        // 配置 server.
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {

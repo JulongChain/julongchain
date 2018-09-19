@@ -91,7 +91,7 @@ public final class SecureChatClient {
 
 
     public static void main(String[] args) throws Exception {
-        // Configure SSL.
+        // 配置 SSL.
         SslContext sslCtx = SslContextGMBuilder.forClient()
                 .trustManager(TRUST_CERT)
                 .keyManager(ENC_CERT, ENC_KEY, SIGN_CERT, SIGN_KEY, null)
@@ -104,10 +104,10 @@ public final class SecureChatClient {
              .channel(NioSocketChannel.class)
              .handler(new SecureChatClientInitializer(sslCtx));
 
-            // Start the connection attempt.
+            // 尝试连接.
             Channel ch = b.connect(HOST, PORT).sync().channel();
 
-            // Read commands from the stdin.
+            // 从 stdin 读取命令.
             ChannelFuture lastWriteFuture = null;
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
             for (;;) {
@@ -116,23 +116,22 @@ public final class SecureChatClient {
                     break;
                 }
 
-                // Sends the received line to the server.
+                // 发送接收到的消息到 server.
                 lastWriteFuture = ch.writeAndFlush(line + "\r\n");
 
-                // If user typed the 'bye' command, wait until the server closes
-                // the connection.
+                // 如果用户输入了 'bye' command, 等待服务器关闭连接.
                 if ("bye".equals(line.toLowerCase())) {
                     ch.closeFuture().sync();
                     break;
                 }
             }
 
-            // Wait until all messages are flushed before closing the channel.
+            // 关闭连接前等待所有的消息被写出.
             if (lastWriteFuture != null) {
                 lastWriteFuture.sync();
             }
         } finally {
-            // The connection is closed automatically on shutdown.
+            // 连接在客户端退出时自动关闭.
             group.shutdownGracefully();
         }
     }

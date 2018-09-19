@@ -39,8 +39,8 @@ public class SecureChatServerHandler extends SimpleChannelInboundHandler<String>
 
     @Override
     public void channelActive(final ChannelHandlerContext ctx) {
-        // Once session is secured, send a greeting and register the channel to the global channel
-        // list so the channel received the messages from others.
+        // 一旦session处于安全状态, 发送一个标记将但前channel注册到全局channel列表
+        // 可以接收其他channel的消息.
         ctx.pipeline().get(SslHandler.class).handshakeFuture().addListener(
                 new GenericFutureListener<Future<Channel>>() {
                     @Override
@@ -59,7 +59,7 @@ public class SecureChatServerHandler extends SimpleChannelInboundHandler<String>
 
     @Override
     public void channelRead0(ChannelHandlerContext ctx, String msg) throws Exception {
-        // Send the received message to all channels but the current one.
+        // 发送接收消息到其他的channel.
         for (Channel c: channels) {
             if (c != ctx.channel()) {
                 c.writeAndFlush("[" + ctx.channel().remoteAddress() + "] " + msg + '\n');
@@ -68,7 +68,7 @@ public class SecureChatServerHandler extends SimpleChannelInboundHandler<String>
             }
         }
 
-        // Close the connection if the client has sent 'bye'.
+        // 如果客户端发送 'bye'就关闭连接.
         if ("bye".equals(msg.toLowerCase())) {
             ctx.close();
         }

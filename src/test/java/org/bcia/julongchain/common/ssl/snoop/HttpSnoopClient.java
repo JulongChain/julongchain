@@ -57,7 +57,7 @@ public final class HttpSnoopClient {
             return;
         }
 
-        // Configure SSL context if necessary.
+        // 配置 SSL context.
         final boolean ssl = "https".equalsIgnoreCase(scheme);
         final SslContext sslCtx;
         if (ssl) {
@@ -69,7 +69,7 @@ public final class HttpSnoopClient {
             sslCtx = null;
         }
 
-        // Configure the client.
+        // 配置客户端 client.
         EventLoopGroup group = new NioEventLoopGroup();
         try {
             Bootstrap b = new Bootstrap();
@@ -77,30 +77,30 @@ public final class HttpSnoopClient {
              .channel(NioSocketChannel.class)
              .handler(new HttpSnoopClientInitializer(sslCtx));
 
-            // Make the connection attempt.
+            // 尝试连接.
             Channel ch = b.connect(host, port).sync().channel();
 
-            // Prepare the HTTP request.
+            // 准备HTTP请求参数.
             HttpRequest request = new DefaultFullHttpRequest(
                     HttpVersion.HTTP_1_1, HttpMethod.GET, uri.getRawPath());
             request.headers().set(HttpHeaderNames.HOST, host);
             request.headers().set(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
             request.headers().set(HttpHeaderNames.ACCEPT_ENCODING, HttpHeaderValues.GZIP);
 
-            // Set some example cookies.
+            // 设置演示用的 cookies.
             request.headers().set(
                     HttpHeaderNames.COOKIE,
                     ClientCookieEncoder.STRICT.encode(
                             new DefaultCookie("my-cookie", "foo"),
                             new DefaultCookie("another-cookie", "bar")));
 
-            // Send the HTTP request.
+            // 发送 HTTP 请求.
             ch.writeAndFlush(request);
 
-            // Wait for the server to close the connection.
+            // 等待服务器关闭连接.
             ch.closeFuture().sync();
         } finally {
-            // Shut down executor threads to exit.
+            // 关闭执行线程来退出客户端.
             group.shutdownGracefully();
         }
     }
