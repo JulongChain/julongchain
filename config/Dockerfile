@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-FROM docker.julongchain.org:5000/julongchain-baseimage:0.8.3-alpha
+FROM [base_mage]
 COPY pom.xml /root/julongchain
 COPY src/ /root/julongchain/src
 WORKDIR /root/julongchain

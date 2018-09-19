@@ -153,21 +153,6 @@ public class SmartContractSupportService
                     smartContractId = message.getSmartContractEvent().getSmartContractId();
                 }
 
-                logger.info(
-                        String.format(
-                                "Got message: smartContractId[%s] groupId[%s] txId[%s] messageStr[%s]",
-                                smartContractId, groupId, txId, message.toString()));
-
-                logger.info(
-                        String.format(
-                                "smart contract status: smartContractId[%s] smartContractStatus[%s]",
-                                smartContractId, getSmartContractStauts(smartContractId)));
-
-                logger.info(
-                        String.format(
-                                "transaction status: txId[%s] smartContractId[%s] txStatus[%s]",
-                                txId, smartContractId, getTxStatusById(smartContractId, txId)));
-
                 // 收到error信息
                 if (message.getType().equals(SmartContractMessage.Type.ERROR)) {
                     addTxMessage(smartContractId, txId, message);

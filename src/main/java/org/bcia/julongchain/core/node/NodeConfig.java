@@ -145,6 +145,7 @@ public class NodeConfig {
      *
      */
     public static class SmartContract {
+        private String baseImage;
         private String instantiatePath;
         private String dockerFile;
         private String coreNodeAddress;
@@ -154,6 +155,14 @@ public class NodeConfig {
         private Map<String, String> system;
         private Map<String, String> systemPlugins;
         private Map<String, String> logging;
+
+        public String getBaseImage() {
+            return baseImage;
+        }
+
+        public void setBaseImage(String baseImage) {
+            this.baseImage = baseImage;
+        }
 
         public String getExecutetimeout() {
             return executetimeout;

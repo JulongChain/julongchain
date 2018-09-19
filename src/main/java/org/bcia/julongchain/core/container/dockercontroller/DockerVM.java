@@ -27,6 +27,7 @@ import org.bcia.julongchain.core.common.smartcontractprovider.ISmartContractPack
 import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractProvider;
 import org.bcia.julongchain.core.container.DockerUtil;
 import org.bcia.julongchain.core.container.api.VM;
+import org.bcia.julongchain.core.node.NodeConfig;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.bcia.julongchain.core.smartcontract.node.SmartContractRunningUtil;
 
@@ -58,6 +59,10 @@ public class DockerVM implements VM{
 
 	private String getCoreNodeAddress() {
 		return NodeConfigFactory.getNodeConfig().getSmartContract().getCoreNodeAddress();
+	}
+
+	private String getBaseImage() {
+		return NodeConfigFactory.getNodeConfig().getSmartContract().getBaseImage();
 	}
 
 	private String createBaseDirectory() throws IOException {
@@ -141,6 +146,8 @@ public class DockerVM implements VM{
 			Utils.replaceFileContent(dockerFilePath, "#smart_contract_id", smartContractId);
 			// replace core_node_address_and_port
 			Utils.replaceFileContent(dockerFilePath, "#core_node_address_and_port",getCoreNodeAddress() + ":" + getCoreNodeAddressPort());
+			// replace baseImage
+			Utils.replaceFileContent(dockerFilePath, "#[base_image]", getBaseImage());
 		} catch (IOException e) {
 			throw new VMException(e.getMessage(), e);
 		}

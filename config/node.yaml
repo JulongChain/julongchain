@@ -136,6 +136,8 @@ vm:
 ###############################################################################
 smartContract:
 
+    baseImage: julongchain/julongchain-baseImage:0.8.3-alpha
+
     instantiatePath: /var/julongchain/production/instantiate_temp
     dockerFile: config/Dockerfile
 
