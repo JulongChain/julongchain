@@ -147,7 +147,7 @@ public class DockerVM implements VM{
 			// replace core_node_address_and_port
 			Utils.replaceFileContent(dockerFilePath, "#core_node_address_and_port",getCoreNodeAddress() + ":" + getCoreNodeAddressPort());
 			// replace baseImage
-			Utils.replaceFileContent(dockerFilePath, "#[base_image]", getBaseImage());
+			Utils.replaceFileContent(dockerFilePath, "[base_image]", getBaseImage());
 		} catch (IOException e) {
 			throw new VMException(e.getMessage(), e);
 		}
