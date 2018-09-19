@@ -21,7 +21,12 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpClientCodec;
 import io.netty.handler.codec.http.HttpContentDecompressor;
 import io.netty.handler.ssl.SslContext;
-
+/**
+ * HTTP客户端ChannelPipeline对象创建和配置
+ * @author cuilf
+ * @date 2019/09/14
+ * @company InfosecTechnology
+ */
 public class HttpSnoopClientInitializer extends ChannelInitializer<SocketChannel> {
 
     private final SslContext sslCtx;
@@ -34,17 +39,17 @@ public class HttpSnoopClientInitializer extends ChannelInitializer<SocketChannel
     public void initChannel(SocketChannel ch) {
         ChannelPipeline p = ch.pipeline();
 
-        // Enable HTTPS if necessary.
+        // 启用 HTTPS .
         if (sslCtx != null) {
             p.addLast(sslCtx.newHandler(ch.alloc()));
         }
 
         p.addLast(new HttpClientCodec());
 
-        // Remove the following line if you don't want automatic content decompression.
+        // 如果不想自动处理内容压缩请移除下面这一行.
         p.addLast(new HttpContentDecompressor());
 
-        // Uncomment the following line if you don't want to handle HttpContents.
+        // 如果不想处理HttpContents就放开下面这行注释.
         //p.addLast(new HttpObjectAggregator(1048576));
 
         p.addLast(new HttpSnoopClientHandler());

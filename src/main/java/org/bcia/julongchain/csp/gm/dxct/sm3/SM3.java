@@ -16,6 +16,7 @@ package org.bcia.julongchain.csp.gm.dxct.sm3;
  * limitations under the License.
  */
 
+import org.bcia.julongchain.common.exception.CspException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.gm.dxct.sm2.SM2;
@@ -41,14 +42,20 @@ public class SM3 {
     public SM3() {
     }
 
-    public byte[] hash(byte[] msg) throws NoSuchAlgorithmException {
+    public byte[] hash(byte[] msg) throws CspException {
+        if(null==msg){
+            throw new CspException("Input parameter is null");
+        }
+        if(msg.length==0){
+            throw new CspException("Input parameter's length is empty");
+        }
         Security.addProvider(new BouncyCastleProvider());
         MessageDigest messageDigest = null;
         try {
             messageDigest = MessageDigest.getInstance(GmCspConstant.SM3);
         } catch (NoSuchAlgorithmException e) {
             log.error(e.getMessage());
-          throw new NoSuchAlgorithmException(e.getMessage());
+          throw new CspException(e);
         }
         messageDigest.update(msg);
         byte[] digest = messageDigest.digest();

@@ -21,7 +21,12 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.ssl.SslContext;
-
+/**
+ * HTTP服务端ChannelPipeline对象创建和配置
+ * @author cuilf
+ * @date 2019/09/14
+ * @company InfosecTechnology
+ */
 public class HttpSnoopServerInitializer extends ChannelInitializer<SocketChannel> {
 
     private final SslContext sslCtx;
@@ -37,10 +42,10 @@ public class HttpSnoopServerInitializer extends ChannelInitializer<SocketChannel
             p.addLast(sslCtx.newHandler(ch.alloc()));
         }
         p.addLast(new HttpRequestDecoder());
-        // Uncomment the following line if you don't want to handle HttpChunks.
+        // 如果不想处理 HttpChunks的话请删除下面这行注释.
         //p.addLast(new HttpObjectAggregator(1048576));
         p.addLast(new HttpResponseEncoder());
-        // Remove the following line if you don't want automatic content compression.
+        // 如果不需要自动内容压缩的话，请移除下面这一行.
         //p.addLast(new HttpContentCompressor());
         p.addLast(new HttpSnoopServerHandler());
     }

@@ -24,7 +24,7 @@ import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.NetAddress;
 import org.bcia.julongchain.core.ssc.cssc.CSSC;
 import org.bcia.julongchain.node.Node;
-import org.bcia.julongchain.node.util.NodeConstant;
+import org.bcia.julongchain.node.common.util.NodeConstant;
 import org.bcia.julongchain.protos.node.Query;
 
 import java.util.List;
@@ -82,13 +82,13 @@ public class GroupListCmd extends AbstractNodeGroupCmd {
 
         if (groupsList != null) {
             int groupSize = groupsList.size();
-            log.info("Group List size: " + groupSize);
+            log.info("Group list size: " + groupSize);
             for (int i = 0; i < groupSize; i++) {
                 String groupId = groupsList.get(i).getGroupId();
                 log.info("Group List info: " + groupId);
             }
         } else {
-            log.info("Group List size: 0");
+            log.info("Group list is empty");
         }
     }
 }

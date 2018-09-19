@@ -129,7 +129,7 @@ public class TxSimulatorTest {
 		simulator.setState(ns, "key", "test set state".getBytes(StandardCharsets.UTF_8));
     }
 
-    /*-------------------------------------------------------------------
+    /**-------------------------------------------------------------------
 		现阶段没有使用PvtData
     @Test
     public void testsetPrivateData() throws Exception{
@@ -348,7 +348,7 @@ public class TxSimulatorTest {
 		assertSame(5, i);
 	}
 
-	/*-------------------------------------------------------------
+	/**-------------------------------------------------------------
 
 	@Test
 	public void testGetPrivateData() throws Exception{

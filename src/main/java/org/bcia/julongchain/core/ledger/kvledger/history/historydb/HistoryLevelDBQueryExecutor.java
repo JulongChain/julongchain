@@ -53,7 +53,6 @@ public class HistoryLevelDBQueryExecutor implements IHistoryQueryExecutor {
             throw new LedgerException(msg);
         }
         byte[] compositeStartKey = HistoryDBHelper.constructPartialCompositeHistoryKey(namespace, key, false);
-
         DBIterator iterator = (DBIterator) historyDB.getProvider().getIterator((compositeStartKey));
 
 	    return new HistoryScanner(compositeStartKey, namespace, key, iterator, blockStore, ledgerID);

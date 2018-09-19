@@ -36,16 +36,14 @@ import org.bcia.julongchain.core.ledger.INodeLedger;
 import org.bcia.julongchain.core.ledger.customtx.IProcessor;
 import org.bcia.julongchain.core.ledger.ledgermgmt.LedgerManager;
 import org.bcia.julongchain.core.node.ConfigtxProcessor;
-import org.bcia.julongchain.core.node.GroupSupport;
 import org.bcia.julongchain.core.node.util.ConfigTxUtils;
 import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.node.cmd.INodeCmd;
 import org.bcia.julongchain.node.cmd.factory.NodeCmdFactory;
 import org.bcia.julongchain.node.common.helper.ConfigTreeHelper;
+import org.bcia.julongchain.node.common.util.LedgerUtils;
+import org.bcia.julongchain.node.common.util.NodeConstant;
 import org.bcia.julongchain.node.entity.Group;
-import org.bcia.julongchain.node.util.LedgerUtils;
-import org.bcia.julongchain.node.util.NodeConstant;
-import org.bcia.julongchain.node.util.NodeGossipManager;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.common.Ledger;
@@ -100,7 +98,7 @@ public class Node {
     private INodeCmd nodeCmd;
 
     /**
-     * 当前Node节点加入的群组集合
+     * 当前Node节点加入的群组集合,Key为groupId
      */
     private Map<String, Group> groupMap = new ConcurrentHashMap<String, Group>();
 
@@ -108,13 +106,6 @@ public class Node {
      * 群组回调
      */
     private IGroupCallback groupCallback;
-
-    /**
-     * Node已经加入的群组
-     */
-    private List<String> ledgerIds = new ArrayList<>();
-
-    private NodeGossipManager gossipManager;
 
     private Node() throws NodeException {
         init();
@@ -206,6 +197,7 @@ public class Node {
             configtxProcessorMap.put(Common.HeaderType.CONFIG, configtxProcessor);
             configtxProcessorMap.put(Common.HeaderType.NODE_RESOURCE_UPDATE, configtxProcessor);
 
+            //实例化账本
             LedgerManager.initialize(configtxProcessorMap);
 
             List<String> ledgerIDs = LedgerManager.getLedgerIDs();
@@ -284,10 +276,15 @@ public class Node {
 
         IApplicationConfig applicationConfig = groupConfigBundle.getGroupConfig().getApplicationConfig();
 
-        final GroupSupport groupSupport = new GroupSupport();
-        groupSupport.setApplicationConfig(applicationConfig);
-        groupSupport.setNodeLedger(nodeLedger);
-        groupSupport.setFileLedger(new FileLedger(new IFileLedgerBlockStore() {
+        Group group = new Group();
+        group.setGroupId(groupId);
+
+//        final GroupSupport groupSupport = new GroupSupport();
+        group.setGroupConfigBundle(groupConfigBundle);
+        group.setApplicationConfig(applicationConfig);
+
+        group.setNodeLedger(nodeLedger);
+        group.setFileLedger(new FileLedger(new IFileLedgerBlockStore() {
             @Override
             public void addBlock(Common.Block block) throws LedgerException {
             }
@@ -307,8 +304,8 @@ public class Node {
             @Override
             public void call(IResourcesConfigBundle bundle) {
                 IApplicationConfig config = bundle.getGroupConfigBundle().getGroupConfig().getApplicationConfig();
-                groupSupport.setApplicationConfig(config);
-                groupSupport.setGroupConfigBundle(bundle.getGroupConfigBundle());
+                group.setApplicationConfig(config);
+                group.setGroupConfigBundle(bundle.getGroupConfigBundle());
             }
         };
 
@@ -327,7 +324,7 @@ public class Node {
         ResourcesConfigBundle resourcesConfigBundle = new ResourcesConfigBundle(groupId, resConfig,
                 groupConfigBundle, callbackList);
 
-        ICommitterValidator committerValidator = new CommitterValidator(new CommitterSupport(groupSupport));
+        ICommitterValidator committerValidator = new CommitterValidator(new CommitterSupport(group));
 
         ICommitter committer = new Committer(nodeLedger, new Committer.IConfigBlockEventer() {
             @Override
@@ -350,12 +347,10 @@ public class Node {
 
         //TODO:Gossip
 
-        groupSupport.setGroupConfigBundle(groupConfigBundle);
-        groupSupport.setResourcesConfigBundle(resourcesConfigBundle);
 
-        Group group = new Group();
-        group.setGroupSupport(groupSupport);
-        group.setBlock(configBlock);
+        group.setResourcesConfigBundle(resourcesConfigBundle);
+
+        group.setConfigBlock(configBlock);
         group.setCommiter(committer);
 
         groupMap.put(groupId, group);
@@ -366,7 +361,7 @@ public class Node {
     private void onConfigBlockChanged(String groupIDFromBlock, Common.Block newBlock) {
         Group group = groupMap.get(groupIDFromBlock);
         if (group != null) {
-            group.setBlock(newBlock);
+            group.setConfigBlock(newBlock);
         }
     }
 
@@ -380,10 +375,6 @@ public class Node {
 
     public IGroupCallback getGroupCallback() {
         return groupCallback;
-    }
-
-    public NodeGossipManager getGossipManager() {
-        return gossipManager;
     }
 
     //MockInitialize resets chains for test env
@@ -401,7 +392,7 @@ public class Node {
     public void mockCreateGroup(String groupId) throws NodeException {
         Group group = groupMap.get(groupId);
 
-        if (group == null || group.getGroupSupport() == null || group.getGroupSupport().getNodeLedger() == null) {
+        if (group == null || group == null || group.getNodeLedger() == null) {
             GenesisConfig.Profile profile = null;
             try {
                 profile = GenesisConfigFactory.getGenesisConfig().getCompletedProfile(SAMPLE_DEVMODE_SOLO_PROFILE);
@@ -413,22 +404,13 @@ public class Node {
                 INodeLedger nodeLedger = LedgerManager.createLedger(genesisBlock);
 
                 Group newGroup = new Group();
-                GroupSupport groupSupport = new GroupSupport();
-                groupSupport.setNodeLedger(nodeLedger);
-                newGroup.setGroupSupport(groupSupport);
+                newGroup.setGroupId(groupId);
+                newGroup.setNodeLedger(nodeLedger);
                 groupMap.put(groupId, newGroup);
             } catch (Exception e) {
                 log.error(e.getMessage(), e);
                 throw new NodeException(e);
             }
         }
-    }
-
-    public List<String> getLedgerIds() {
-        return ledgerIds;
-    }
-
-    public void setLedgerIds(List<String> ledgerIds) {
-        this.ledgerIds = ledgerIds;
     }
 }

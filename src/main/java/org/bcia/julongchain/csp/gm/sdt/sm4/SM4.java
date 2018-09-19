@@ -21,6 +21,7 @@ import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.csp.gm.sdt.common.Constants;
 import org.bcia.julongchain.csp.gm.sdt.jni.SM4CBCResult;
 import org.bcia.julongchain.csp.gm.sdt.jni.SMJniApi;
+import org.bouncycastle.util.encoders.Hex;
 
 /**
  * GM SM4算法
@@ -203,6 +204,7 @@ public class SM4 {
         }
         //填充数据
         byte[] paddingData = padding(plainText);
+        System.out.println("paddingdata:"+ Hex.toHexString(paddingData));
         return proccessDataCBC(paddingData, key, iv, TYPE_ENCRYPT);
     }
 

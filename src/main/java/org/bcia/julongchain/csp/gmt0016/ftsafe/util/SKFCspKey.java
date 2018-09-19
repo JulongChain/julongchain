@@ -34,7 +34,7 @@ public class SKFCspKey {
         public ECCPublicKeyBlob() {
             this.xCoordinate = new byte[(int)(ECC_MAX_XCOORDINATE_BITS_LEN)/8];
             this.yCoordinate = new byte[(int)(ECC_MAX_YCOORDINATE_BITS_LEN)/8];
-            this.lBit = 256;
+            this.lBit = 256L;
         }
 
         public ECCPublicKeyBlob(byte[] xCoordinate, byte[] yCoordinate, long lBit) {

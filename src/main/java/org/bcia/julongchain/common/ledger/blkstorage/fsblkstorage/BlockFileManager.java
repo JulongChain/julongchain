@@ -81,6 +81,9 @@ public class BlockFileManager {
         this.config = config;
         this.rootDir = config.getLedgerBlockDir(id);
         this.db = indexStore;
+		//检查区块链文件完整性以及是否被篡改
+		// TODO: 9/12/18 consenter中区块与node中不同
+//		checkBlockFiles(rootDir);
         cpInfo = loadCurrentInfo();
         //创建rootdir
         IoUtil.createDirIfMissing(getRootDir());
@@ -126,6 +129,63 @@ public class BlockFileManager {
                     .build();
         }
     }
+
+    public static void checkBlockFiles(String chainsDir) throws LedgerException{
+		try {
+			BlockFileStream stream = new BlockFileStream(chainsDir, 0, 0);
+			byte[] blockBytes = stream.nextBlockBytes();
+			Common.Block preBlock = null;
+			Common.Block currentBlock = blockBytes == null ?
+					null :
+					Common.Block.parseFrom(blockBytes);
+			while (true) {
+				if (blockBytes == null) {
+					log.info("Check block chain files success");
+					break;
+				}
+				//验证preHash和前一区块的header hash
+				if (preBlock != null) {
+					byte[] preHash = Util.getHashBytes(preBlock.getHeader().toByteArray());
+					byte[] preHashInFollowedBlock = currentBlock.getHeader().getPreviousHash().toByteArray();
+					if (!Arrays.equals(preHash, preHashInFollowedBlock)) {
+						String errMsg = "Block" + currentBlock.getHeader().getNumber() + "'s preHash [" +
+								Hex.toHexString(preHashInFollowedBlock) + "] is not the same as Block" +
+								preBlock.getHeader().getNumber() + "'s header hash [" +
+								Hex.toHexString(preHash) + "]";
+						log.error(errMsg);
+						log.error("Check block chain files failed");
+						// TODO: 9/5/18 exit code undefine
+						System.exit(1);
+					}
+				}
+				byte[] dataHash = Util.getHashBytes(currentBlock.getData().toByteArray());
+				byte[] dataHashInHeader = currentBlock.getHeader().getDataHash().toByteArray();
+				//验证data hash和header中的dataHash
+				if (!Arrays.equals(dataHash, dataHashInHeader)) {
+					String errMsg = "Block" + currentBlock.getHeader().getNumber() + "'s data hash in header is [" +
+							Hex.toHexString(dataHashInHeader) + "] which is not same as data's hash [" +
+							Hex.toHexString(dataHash) + "]";
+					log.error(errMsg);
+					log.error("Check block chain files failed");
+					// TODO: 9/5/18 exit code undefine
+					System.exit(2);
+				}
+				blockBytes = stream.nextBlockBytes();
+				if (blockBytes == null) {
+					log.info("Check block chain files success");
+					break;
+				} else {
+					preBlock = currentBlock;
+					currentBlock = Common.Block.parseFrom(blockBytes);
+				}
+			}
+		} catch (InvalidProtocolBufferException e) {
+			log.error(e.getMessage(), e);
+			log.error("Check block chain files failed");
+			// TODO: 9/5/18 exit code undefine
+			System.exit(3);
+		}
+	}
 
     /**
      * 更新检查点信息
@@ -200,7 +260,7 @@ public class BlockFileManager {
         //序列化后的block
         byte[] blockBytes = block.toByteArray();
         //blockData的Hash
-        ByteString blockHash = block.getHeader().getDataHash();
+        ByteString blockHash = block.getHeader().toByteString();
         //当前区块文件的位置
         int currentOffset = cpInfo.getLatestFileChunksize();
         //区块长度(尾部)
@@ -241,7 +301,7 @@ public class BlockFileManager {
         FileLocPointer blockFLP = new FileLocPointer(newCPInfo.getLastestFileChunkSuffixNum(), currentOffset, 0);
         //组装区块索引
         BlockIndexInfo idxInfo = new BlockIndexInfo(block.getHeader().getNumber(),
-                blockHash.toByteArray(),
+                Util.getHashBytes(blockHash.toByteArray()),
                 blockFLP,
                 txOffsets,
                 block.getMetadata());
@@ -325,7 +385,7 @@ public class BlockFileManager {
             }
 
             //更新blockIndexInfo
-            blockIndexInfo.setBlockHash(info.getBlockHeader().getDataHash().toByteArray());
+            blockIndexInfo.setBlockHash(Util.getHashBytes(info.getBlockHeader().toByteArray()));
             blockIndexInfo.setBlockNum(info.getBlockHeader().getNumber());
             //封装文件信息
             blockIndexInfo.setFlp(new FileLocPointer(blockPlacementInfo.getFileNum(),
@@ -371,6 +431,11 @@ public class BlockFileManager {
      * 根据区块hash查找区块
      */
 	public Common.Block retrieveBlockByHash(byte[] blockHash) throws LedgerException {
+		if (blockHash == null) {
+			String errMsg = "BlockHash cannot be null";
+			log.error(errMsg);
+			throw new LedgerException(errMsg);
+		}
         log.debug(String.format("retrieveBlockByHash() - blockHash = [%s]", Hex.toHexString(blockHash)));
         FileLocPointer loc;
 		loc = index.getBlockLocByHash(blockHash);
@@ -394,6 +459,11 @@ public class BlockFileManager {
      * 根据交易ID查找区块
      */
 	public Common.Block retrieveBlockByTxID(String txID) throws LedgerException {
+		if (txID == null) {
+			String errMsg = "TxID cannot be null";
+			log.error(errMsg);
+			throw new LedgerException(errMsg);
+		}
         log.debug(String.format("retrieveBlockByTxID() - txID = [%s]", txID));
 
         FileLocPointer loc = index.getBlockLocByTxID(txID);
@@ -404,6 +474,11 @@ public class BlockFileManager {
      * 根据交易ID查找交易校验码
      */
 	public TransactionPackage.TxValidationCode retrieveTxValidationCodeByTxID(String txID) throws LedgerException{
+		if (txID == null) {
+			String errMsg = "TxID cannot be null";
+			log.error(errMsg);
+			throw new LedgerException(errMsg);
+		}
         log.debug(String.format("retrieveTxValidationCodeByTxID() - txID = [%s]", txID));
 		return index.getTxValidationCodeByTxID(txID);
     }
@@ -430,6 +505,11 @@ public class BlockFileManager {
      * 根据交易ID查找交易
      */
 	public Common.Envelope retrieveTransactionByID(String txID) throws LedgerException {
+		if (txID == null) {
+			String errMsg = "TxID cannot be null";
+			log.error(errMsg);
+			throw new LedgerException(errMsg);
+		}
         log.debug(String.format("retrieveTransactionByID() - txID = [%s]", txID));
         FileLocPointer loc = index.getTxLoc(txID);
 		if (loc == null) {
@@ -444,7 +524,7 @@ public class BlockFileManager {
 	public Common.Envelope retrieveTransactionByBlockNumTranNum(long blockNum, long tranNum) throws LedgerException{
         log.debug(String.format("retrieveTransactionByBlockNumTranNum() - blockNum = [%d], tranNum = [%d]"
                 , blockNum, tranNum));
-        FileLocPointer loc = index.getTXLocByBlockNumTranNum(blockNum, tranNum);
+        FileLocPointer loc = index.getTxLocByBlockNumTranNum(blockNum, tranNum);
         return fetchTransactionEnvelope(loc);
     }
 

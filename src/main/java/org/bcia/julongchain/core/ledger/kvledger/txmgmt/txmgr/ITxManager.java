@@ -48,7 +48,7 @@ public interface ITxManager extends IRecoverable {
     /**
      * 校验数据
      */
-    void validateAndPrepare(BlockAndPvtData blockAndPvtData, Boolean doMVCCValidation) throws LedgerException;
+    void validateAndPrepare(BlockAndPvtData blockAndPvtData, boolean doMVCCValidation) throws LedgerException;
 
     /**
      * 获取保存点信息

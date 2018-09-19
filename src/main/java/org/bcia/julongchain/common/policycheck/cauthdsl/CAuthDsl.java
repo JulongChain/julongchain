@@ -35,7 +35,7 @@ import java.util.Map;
 
 /**
  * 类描述
- *
+ * 此类生成指定策略的评估函数
  * @author yuanjun
  * @date 31/05/18
  * @company Aisino

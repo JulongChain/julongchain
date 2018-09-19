@@ -26,6 +26,8 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * GM0016 SKF 接口实现类
+ *
  * @author chenhao
  * @date 2018/4/2
  * @company Excelsecu

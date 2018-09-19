@@ -16,13 +16,6 @@
 package org.bcia.julongchain.core.container.api;
 
 import org.bcia.julongchain.common.exception.VMException;
-import org.bcia.julongchain.core.common.smartcontractprovider.SmartContractContext;
-import org.bcia.julongchain.core.container.scintf.SCID;
-import org.bcia.julongchain.core.smartcontract.shim.SmartContractBase;
-
-import javax.naming.Context;
-import java.io.Reader;
-import java.util.Map;
 
 /**
  * VM is an abstract virtual image for supporting arbitrary virual machines
@@ -33,10 +26,7 @@ import java.util.Map;
  */
 public interface VM {
 
-	void deploy(SmartContractBase smartContract,
-				SmartContractContext scc,
-				String[] args,
-				String envs) throws VMException;
+	void deploy() throws VMException;
 
     void start() throws VMException;
 
@@ -44,6 +34,6 @@ public interface VM {
 
     void destroy() throws VMException;
 
-    String getVMName(SCID ccID, IFormatter format) throws VMException;
+    String getVMName() throws VMException;
 
 }

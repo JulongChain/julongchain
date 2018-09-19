@@ -18,6 +18,8 @@ package org.bcia.julongchain.csp.gmt0016.excelsecu.bean;
 import org.bcia.julongchain.csp.gmt0016.excelsecu.common.AlgorithmID;
 
 /**
+ * 对称加密参数类
+ *
  * @author chenhao
  * @date 2018/4/2
  * @company Excelsecu

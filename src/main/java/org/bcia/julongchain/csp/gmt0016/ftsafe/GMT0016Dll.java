@@ -111,7 +111,7 @@ public interface GMT0016Dll extends Library{
                                        byte[] cipherXCoordinate, byte[] cipherYCoordinate, byte[] Hash,
                                        long cipherLen, byte[] cipher);
 
-    public long SKF_DisconnectDev_N(long lDevHandle);
+    public long SKF_DisConnectDev_N(long lDevHandle);
 
     public long SKF_CloseContainer_N(long hContainer);
 

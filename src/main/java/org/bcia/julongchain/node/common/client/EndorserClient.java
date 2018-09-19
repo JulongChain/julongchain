@@ -66,7 +66,7 @@ public class EndorserClient implements IEndorserClient {
 
         try {
             managedChannel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
     }

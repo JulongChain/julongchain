@@ -28,15 +28,17 @@ import org.bcia.julongchain.csp.intfs.opts.IEncrypterOpts;
  * @company FEITIAN
  */
 public class SM1Opts {
+	
+	private static final int SM1_KEY_LEN = 16;
+	private static final long SM1_ENC_PADDING = 1;
+	private static final long SM1_ENC_NOPADDING = 0;
 
     public static class SM1ECBKeyGenOpts implements ISymmKeyGenOpts {
 
-        private boolean bTemporary;
-        private int bit;
+        private boolean bTemporary;        
 
-        public SM1ECBKeyGenOpts(boolean bTemporary, int bit) {
-            this.bTemporary = bTemporary;
-            this.bit = bit;
+        public SM1ECBKeyGenOpts(boolean bTemporary) {
+            this.bTemporary = bTemporary;            
         }
 
         @Override
@@ -54,18 +56,16 @@ public class SM1Opts {
         }
 
         public int getBitLen() {
-            return bit;
+            return SM1_KEY_LEN;
         }
     }
 
     public static class SM1CBCKeyGenOpts implements ISymmKeyGenOpts {
 
-        private boolean bTemporary;
-        private int bit;
+        private boolean bTemporary;        
 
-        public SM1CBCKeyGenOpts(boolean bTemporary, int bit) {
-            this.bTemporary = bTemporary;
-            this.bit = bit;
+        public SM1CBCKeyGenOpts(boolean bTemporary) {
+            this.bTemporary = bTemporary;            
         }
 
         @Override
@@ -83,18 +83,16 @@ public class SM1Opts {
         }
 
         public int getBitLen() {
-            return bit;
+            return SM1_KEY_LEN;
         }
     }
 
     public static class SM1CFBKeyGenOpts implements ISymmKeyGenOpts {
 
-        private boolean bTemporary;
-        private int bit;
+        private boolean bTemporary;      
 
-        public SM1CFBKeyGenOpts(boolean bTemporary, int bit) {
-            this.bTemporary = bTemporary;
-            this.bit = bit;
+        public SM1CFBKeyGenOpts(boolean bTemporary) {
+            this.bTemporary = bTemporary;            
         }
 
         @Override
@@ -112,18 +110,16 @@ public class SM1Opts {
         }
 
         public int getBitLen() {
-            return bit;
+            return SM1_KEY_LEN;
         }
     }
 
     public static class SM1OFBKeyGenOpts implements ISymmKeyGenOpts {
 
-        private boolean bTemporary;
-        private int bit;
+        private boolean bTemporary;        
 
-        public SM1OFBKeyGenOpts(boolean bTemporary, int bit) {
-            this.bTemporary = bTemporary;
-            this.bit = bit;
+        public SM1OFBKeyGenOpts(boolean bTemporary) {
+            this.bTemporary = bTemporary;            
         }
 
         @Override
@@ -141,17 +137,16 @@ public class SM1Opts {
         }
 
         public int getBitLen() {
-            return bit;
+            return SM1_KEY_LEN;
         }
     }
 
     public static class SM1MACKeyGenOpts implements ISymmKeyGenOpts {
 
         private boolean bTemporary;
-        private int bit;
-        public SM1MACKeyGenOpts(boolean bTemporary, int bit) {
-            this.bTemporary = bTemporary;
-            this.bit = bit;
+       
+        public SM1MACKeyGenOpts(boolean bTemporary) {
+            this.bTemporary = bTemporary;            
         }
 
         @Override
@@ -169,19 +164,17 @@ public class SM1Opts {
         }
 
         public int getBitLen() {
-            return bit;
+            return SM1_KEY_LEN;
         }
     }
 
-    public static class SM1EncrypterOpts implements IEncrypterOpts {
+    public static class SM1EncrypterNoPadOpts implements IEncrypterOpts {
 
-        private byte[] byteIV;
-        private long lPadding;
+        private byte[] byteIV;        
         private long lFeedBitLen;
 
-        public SM1EncrypterOpts(byte[] byteIV, long lPadding, long lfeedbit) {
-            this.byteIV = byteIV;
-            this.lPadding = lPadding;
+        public SM1EncrypterNoPadOpts(byte[] byteIV, long lfeedbit) {
+            this.byteIV = byteIV;           
             this.lFeedBitLen = lfeedbit;
         }
 
@@ -191,7 +184,51 @@ public class SM1Opts {
         }
 
         public BlockCipherParam getBlockChipher() {
-            BlockCipherParam blockcipher = new BlockCipherParam(byteIV, byteIV.length, lPadding, lFeedBitLen);
+            BlockCipherParam blockcipher = new BlockCipherParam(byteIV, byteIV.length, SM1_ENC_NOPADDING, lFeedBitLen);
+            return blockcipher;
+        }
+
+    }
+    
+    public static class SM1EncrypterOpts implements IEncrypterOpts {
+
+        private byte[] byteIV;        
+        private long lFeedBitLen;
+
+        public SM1EncrypterOpts(byte[] byteIV, long lfeedbit) {
+            this.byteIV = byteIV;            
+            this.lFeedBitLen = lfeedbit;
+        }
+
+        @Override
+        public String getAlgorithm() {
+            return GMT0016CspConstant.SM1;
+        }
+
+        public BlockCipherParam getBlockChipher() {
+            BlockCipherParam blockcipher = new BlockCipherParam(byteIV, byteIV.length, SM1_ENC_PADDING, lFeedBitLen);
+            return blockcipher;
+        }
+
+    }
+    
+    public static class SM1DecrypterNoPadOpts implements IDecrypterOpts {
+
+        private byte[] byteIV;        
+        private long lFeedBitLen;
+
+        public SM1DecrypterNoPadOpts(byte[] byteIV, long lfeedbit) {
+            this.byteIV = byteIV;            
+            this.lFeedBitLen = lfeedbit;
+        }
+
+        @Override
+        public String getAlgorithm() {
+            return GMT0016CspConstant.SM1;
+        }
+
+        public BlockCipherParam getBlockChipher() {
+            BlockCipherParam blockcipher = new BlockCipherParam(byteIV, byteIV.length, SM1_ENC_NOPADDING, lFeedBitLen);
             return blockcipher;
         }
 
@@ -199,13 +236,11 @@ public class SM1Opts {
 
     public static class SM1DecrypterOpts implements IDecrypterOpts {
 
-        private byte[] byteIV;
-        private long lPadding;
+        private byte[] byteIV;        
         private long lFeedBitLen;
 
-        public SM1DecrypterOpts(byte[] byteIV, long lPadding, long lfeedbit) {
-            this.byteIV = byteIV;
-            this.lPadding = lPadding;
+        public SM1DecrypterOpts(byte[] byteIV, long lfeedbit) {
+            this.byteIV = byteIV;            
             this.lFeedBitLen = lfeedbit;
         }
 
@@ -215,7 +250,7 @@ public class SM1Opts {
         }
 
         public BlockCipherParam getBlockChipher() {
-            BlockCipherParam blockcipher = new BlockCipherParam(byteIV, byteIV.length, lPadding, lFeedBitLen);
+            BlockCipherParam blockcipher = new BlockCipherParam(byteIV, byteIV.length, SM1_ENC_PADDING, lFeedBitLen);
             return blockcipher;
         }
 

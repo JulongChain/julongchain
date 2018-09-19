@@ -133,6 +133,10 @@ public class LevelDBProviderTest {
 		a = provider.get("a".getBytes());
 		assertNull(a);
 
+		//空
+		thrown.expect(Exception.class);
+		provider.delete(null, true);
+
 		provider.setLedgerID(groupID);
 		b = provider.get("b".getBytes());
 		assertNotNull(b);

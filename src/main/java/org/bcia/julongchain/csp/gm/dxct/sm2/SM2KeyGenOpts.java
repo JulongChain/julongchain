@@ -33,6 +33,6 @@ public class SM2KeyGenOpts implements IKeyGenOpts {
 
     @Override
     public boolean isEphemeral() {
-        return false;
+        return true;
     }
 }

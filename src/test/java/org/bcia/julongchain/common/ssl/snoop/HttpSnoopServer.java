@@ -28,8 +28,10 @@ import io.netty.handler.ssl.SslContextGMBuilder;
 import org.bcia.julongchain.common.ssl.SslContextGMBuilderTest;
 
 /**
- * An HTTP server that sends back the content of the received HTTP request
- * in a pretty plaintext form.
+ * 一个简单的HTTP服务端，把接收到的HTTP请求内容返回到客户端
+ * @author cuilf
+ * @date 2019/09/14
+ * @company InfosecTechnology
  */
 public final class HttpSnoopServer {
 
@@ -37,7 +39,7 @@ public final class HttpSnoopServer {
     static final int PORT = Integer.parseInt(System.getProperty("port", SSL? "8443" : "8080"));
 
     public static void main(String[] args) throws Exception {
-        // Configure SSL.
+        // 配置 SSL.
         final SslContext sslCtx;
         if (SSL) {
             sslCtx = SslContextGMBuilder
@@ -49,7 +51,7 @@ public final class HttpSnoopServer {
             sslCtx = null;
         }
 
-        // Configure the server.
+        // 配置 server.
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {

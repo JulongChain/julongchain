@@ -16,20 +16,12 @@
 package org.bcia.julongchain.consenter.common.cmd.impl;
 
 import org.apache.commons.cli.*;
-import org.bcia.julongchain.common.deliver.DeliverDeliverHandler;
-import org.bcia.julongchain.common.exception.JulongChainException;
-import org.bcia.julongchain.common.localmsp.impl.LocalSigner;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.common.cmd.IConsenterCmd;
 import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfig;
 import org.bcia.julongchain.consenter.common.localconfig.ConsenterConfigFactory;
-import org.bcia.julongchain.consenter.common.multigroup.Registrar;
 import org.bcia.julongchain.consenter.common.server.ConsenterServer;
-import org.bcia.julongchain.consenter.common.server.PreStart;
-import org.bcia.julongchain.consenter.util.ConsenterConstants;
-
-import java.io.IOException;
 
 /**
  * 版本查看命令

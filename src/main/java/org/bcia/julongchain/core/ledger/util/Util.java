@@ -24,6 +24,7 @@ import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.csp.factory.CspManager;
+import org.bcia.julongchain.csp.gm.dxct.sm3.SM3HashOpts;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
 import org.bcia.julongchain.protos.node.ProposalResponsePackage;
@@ -180,7 +181,7 @@ public class Util {
         byte[] target = null;
         if (bytes != null) {
             try {
-                target = CspManager.getDefaultCsp().hash(bytes, null);
+                target = CspManager.getDefaultCsp().hash(bytes, new SM3HashOpts());
             } catch (JulongChainException e) {
                 throw new LedgerException(e);
             }

@@ -11,7 +11,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- * 类描述
+ *　Consenter文件账本工厂测试类
  *
  * @author sunzongyu
  * @date 2018/08/13

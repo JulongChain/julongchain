@@ -33,7 +33,7 @@ import static org.bcia.julongchain.common.ledger.util.Utils.*;
 import static org.junit.Assert.*;
 
 /**
- * 类描述
+ * Consenter账本Util测试类
  *
  * @author sunzongyu
  * @date 2018/05/29

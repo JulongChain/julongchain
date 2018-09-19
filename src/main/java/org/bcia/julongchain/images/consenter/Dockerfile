@@ -20,5 +20,6 @@ COPY msp/ /root/julongchain/msp
 COPY lib/ /root/julongchain/lib
 COPY libsdtsmjni.so /lib
 COPY libsdtsm.so /lib
+ENV LANG C.UTF-8
 WORKDIR /root/julongchain
 CMD java -jar /root/julongchain/julongchain.jar consenter start

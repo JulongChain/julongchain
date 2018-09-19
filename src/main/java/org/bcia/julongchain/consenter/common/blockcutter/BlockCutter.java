@@ -24,6 +24,9 @@ import org.bcia.julongchain.consenter.entity.BatchesMes;
 import org.bcia.julongchain.protos.common.Common;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 区块剪切处理类
  *
@@ -37,7 +40,8 @@ public class BlockCutter implements IReceiver {
 
     private IConsenterConfig sharedConfigManager;
 
-    private Common.Envelope[] pendingBatch;
+    //private Common.Envelope[] pendingBatch;
+    private List<Common.Envelope> pendBatch=new ArrayList<>();
 
     private int pendingBatchSizeBytes;
 
@@ -50,15 +54,17 @@ public class BlockCutter implements IReceiver {
     }
 
     @Override
-    public BatchesMes ordered(Common.Envelope msg) {
+    public  BatchesMes ordered(Common.Envelope msg) {
 
         int messageSizeBytes = getMessageSizeBytes(msg);
+      //  System.out.println("消息长度----->"+messageSizeBytes);
         BatchesMes batchesMes = new BatchesMes();
         if (messageSizeBytes > sharedConfigManager.getBatchSize().getPreferredMaxBytes()) {
 
             log.debug(String.format("The current message, with %s bytes, is larger than the preferred batch size of %s bytes and will be isolated.", messageSizeBytes, sharedConfigManager.getBatchSize().getPreferredMaxBytes()));
 
-            if (pendingBatch.length > 0) {
+          //  if (pendingBatch.length > 0) {
+            if (pendBatch.size() > 0) {
                 Common.Envelope[] messageBatch = cut();
                 batchesMes.setMessageBatches((Common.Envelope[][]) ArrayUtils.add(batchesMes.getMessageBatches(), messageBatch));
             }
@@ -74,16 +80,25 @@ public class BlockCutter implements IReceiver {
         }
         log.debug("Enqueuing message into batch");
 
-        pendingBatch = (Common.Envelope[]) ArrayUtils.add(pendingBatch, msg);
+        //pendingBatch = ArrayUtils.add(pendingBatch, msg);
+
+        pendBatch.add(msg);
+
         pendingBatchSizeBytes += messageSizeBytes;
 
         batchesMes.setPending(true);
-        if (pendingBatch.length >= sharedConfigManager.getBatchSize().getMaxMessageCount()) {
+//        log.info("挂起批次长度为--------->"+pendingBatch.length);
+         //   log.info("挂起批次长度为--------->"+pendBatch.size());
+
+
+        //log.info("配置长度为--------->"+sharedConfigManager.getBatchSize().getMaxMessageCount());
+       // if (pendingBatch.length >= sharedConfigManager.getBatchSize().getMaxMessageCount()) {
+        if (pendBatch.size() >= sharedConfigManager.getBatchSize().getMaxMessageCount()) {
             log.debug("Batch size met,cutting batch");
             Common.Envelope[] messageBatch = cut();
-
-            Common.Envelope[][] MessageBatches = ArrayUtils.add(batchesMes.getMessageBatches(), messageBatch);
-            batchesMes.setMessageBatches(MessageBatches);
+          //  batchesMes.getMessageBatches();
+            Common.Envelope[][] messageBatches = ArrayUtils.add(batchesMes.getMessageBatches(), messageBatch);
+            batchesMes.setMessageBatches(messageBatches);
             batchesMes.setPending(true);
         }
         return batchesMes;
@@ -92,8 +107,11 @@ public class BlockCutter implements IReceiver {
     @Override
     public Common.Envelope[] cut() {
         log.info("This Block is cutting.....");
-        Common.Envelope[] batch = pendingBatch;
-        this.pendingBatch = null;
+       // Common.Envelope[] batch = pendingBatch;
+        Common.Envelope[] batch = new Common.Envelope[pendBatch.size()];
+        pendBatch.toArray(batch);
+      //  this.pendingBatch = null;
+        pendBatch.clear();
         this.pendingBatchSizeBytes = 0;
         return batch;
     }
@@ -111,13 +129,13 @@ public class BlockCutter implements IReceiver {
         this.sharedConfigManager = sharedConfigManager;
     }
 
-    public Common.Envelope[] getPendingBatch() {
-        return pendingBatch;
-    }
-
-    public void setPendingBatch(Common.Envelope[] pendingBatch) {
-        this.pendingBatch = pendingBatch;
-    }
+//    public Common.Envelope[] getPendingBatch() {
+//        return pendingBatch;
+//    }
+//
+//    public void setPendingBatch(Common.Envelope[] pendingBatch) {
+//        this.pendingBatch = pendingBatch;
+//    }
 
     public int getPendingBatchSizeBytes() {
         return pendingBatchSizeBytes;

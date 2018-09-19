@@ -17,7 +17,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 /**
- * 类描述
+ * 状态数据库测试类
  *
  * @author sunzongyu
  * @date 2018/08/30
@@ -52,7 +52,7 @@ public class VersionedLevelDBTest {
 	@Test
 	public void getState() throws Exception {
 		VersionedValue val = null;
-		for (int i = 0; i < 4; i++) {
+		for (int i = 1; i < 4; i++) {
 			val = vdb.getState(ns, "key" + i);
 			String s = new String(val.getValue(), StandardCharsets.UTF_8);
 			assertEquals("value" + i, s);
@@ -68,7 +68,7 @@ public class VersionedLevelDBTest {
 	@Test
 	public void getHeight() throws Exception {
 		LedgerHeight height;
-		for (int i = 0; i < 4; i++) {
+		for (int i = 1; i < 4; i++) {
 			height = vdb.getHeight(ns, "key" + i);
 			assertSame(1L, height.getBlockNum());
 			assertSame((long) i, height.getTxNum());
@@ -93,7 +93,7 @@ public class VersionedLevelDBTest {
 		}};
 		list = vdb.getStateMultipleKeys(ns, keys);
 		assertSame(5, list.size());
-		int i = 0;
+		int i = 1;
 		for (; i < 4; i++) {
 			VersionedValue versionedValue = list.get(i);
 			assertSame(1L, versionedValue.getHeight().getBlockNum());
@@ -111,6 +111,10 @@ public class VersionedLevelDBTest {
 		LedgerHeight height = new LedgerHeight(1, 5);
 		VersionedValue value = new VersionedValue(height, "value".getBytes());
 		nsUpdates.getMap().put("key", value);
+		nsUpdates.getMap().put(null, null);
+		nsUpdates.getMap().put(null, value);
+		//删除key
+		nsUpdates.getMap().put("key0", null);
 		updateBatch.getUpdates().put(ns, nsUpdates);
 		vdb.applyUpdates(updateBatch, height);
 		VersionedValue key4 = vdb.getState(ns, "key");

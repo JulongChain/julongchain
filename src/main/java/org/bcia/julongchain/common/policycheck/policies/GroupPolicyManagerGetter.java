@@ -17,16 +17,11 @@
 package org.bcia.julongchain.common.policycheck.policies;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.groupconfig.GroupConfigBundle;
 import org.bcia.julongchain.common.policies.*;
 import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
-import org.bcia.julongchain.core.RWMutex;
-import org.bcia.julongchain.core.node.GroupSupport;
-import org.bcia.julongchain.node.Node;
-import org.bcia.julongchain.node.entity.Group;
 import org.bcia.julongchain.protos.common.Configtx;
 
 /**

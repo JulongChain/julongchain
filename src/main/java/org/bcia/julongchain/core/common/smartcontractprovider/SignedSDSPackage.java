@@ -30,6 +30,7 @@ import org.bcia.julongchain.protos.node.SmartContractPackage;
 import org.bcia.julongchain.protos.node.SignedScDepSpec;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 
 /**
  * 签名的只能合约部署包
@@ -211,8 +212,8 @@ public class SignedSDSPackage implements ISmartContractPackage {
         SignedSDSData ssdsData = new SignedSDSData();
         ssdsData.setCodeHash(sds.getCodePackage().toByteArray());
         ssdsData.setMetaDataHash(ArrayUtils.addAll(
-                sds.getSmartContractSpec().getSmartContractId().getName().getBytes(),
-                sds.getSmartContractSpec().getSmartContractId().getVersion().getBytes()
+                sds.getSmartContractSpec().getSmartContractId().getName().getBytes(StandardCharsets.UTF_8),
+                sds.getSmartContractSpec().getSmartContractId().getVersion().getBytes(StandardCharsets.UTF_8)
         ));
         if(ssds.getInstantiationPolicy() == null){
             log.error(String.format("instantiation policy can not be null for smartcontract (%s:%s)",

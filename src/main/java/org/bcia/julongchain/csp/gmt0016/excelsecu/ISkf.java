@@ -23,6 +23,8 @@ import org.bcia.julongchain.csp.gmt0016.excelsecu.security.RSAPublicKeyBlob;
 import java.util.List;
 
 /**
+ * GM0016 SKF 接口类
+ *
  * @author chenhao
  * @date 2018/4/2
  * @company Excelsecu

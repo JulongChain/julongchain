@@ -1,5 +1,5 @@
 /**
- * Copyright Dingxuan. All Rights Reserved.
+ * Copyright DingXuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.node.entity;
+package org.bcia.julongchain.csp.gm.dxct.sm4;
+
+import org.bcia.julongchain.csp.intfs.opts.IKeyImportOpts;
 
 /**
- * 模拟密码工具
+ * 类描述
  *
- * @author zhouhui
- * @date 2018/3/13
+ * @author zhangmingyang
+ * @date 2018/09/06
  * @company Dingxuan
  */
-public class MockCrypto {
+public class SM4KeyImportOpts implements IKeyImportOpts {
+    private boolean isEphemeral;
+    public SM4KeyImportOpts(boolean isEphemeral) {
+        this.isEphemeral=isEphemeral;
+    }
 
-    public static byte[] getRandomNonce() {
+    @Override
+    public String getAlgorithm() {
+        return null;
+    }
 
-        return new byte[]{0, 1, 2};
+    @Override
+    public boolean isEphemeral() {
+        return isEphemeral;
     }
 }

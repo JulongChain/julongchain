@@ -80,17 +80,17 @@ public class HistoryScanner implements IResultsIterator {
         Map.Entry<byte[], byte[]> entry = dbItr.next();
         byte[] historyKey = HistoryDBHelper.removeLedgerIDFromHistoryKey(ledgerID, entry.getKey());
 		String historyKeyStr = new String(historyKey, StandardCharsets.UTF_8);
-		if (!historyKeyStr.contains(key)) {
+		if (!historyKeyContainsKey(historyKeyStr)) {
 			return null;
 		}
 
 	    //key:ns~key~blockNo~tranNo
         blockNum = HistoryDBHelper.splitCompositeHistoryKeyForBlockNum(historyKey);
         tranNum = HistoryDBHelper.splitCompositeHistoryKeyForTranNum(historyKey);
-        log.debug(String.format("Found history record for namespace: %s, key: %s. BlockNum: %d, TranNum: %d", nameSpace, key, blockNum, tranNum));
-        QueryResult queryResult = getKvVersion(blockNum, tranNum);
+        log.debug("Found history record for namespace: [" + nameSpace + "]" +
+				", key: [" + key + "]. BlockNum: [" + blockNum + "], TranNum: [" + tranNum + "].");
 
-        return queryResult;
+		return getKvVersion(blockNum, tranNum);
     }
 
     @Override
@@ -102,6 +102,13 @@ public class HistoryScanner implements IResultsIterator {
 	    	throw new RuntimeException(e);
 	    }
     }
+
+	/**
+	 * 判断查询到的HistoryKey是否为key的HistoryKey
+	 */
+    private boolean historyKeyContainsKey(String historyKey) {
+    	return key.equals(historyKey.substring(nameSpace.length() + 1, nameSpace.length() + key.length() + 1));
+	}
 
     private QueryResult getKvVersion(long blockNum, long tranNum){
 	    KvRwset.Version version = KvRwset.Version.newBuilder()

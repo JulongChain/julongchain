@@ -97,7 +97,7 @@ public class CaHelperTest {
         Assert.assertNotNull(rootCA);
         Assert.assertNotNull(rootCA.getSigner());
 
-        //check to make sure the root public key was stored
+        // 确认根公钥是否已存储
         File pemFile = new File(Paths.get(caDir, testCANAme + "-cert.pem").toString());
         Assert.assertTrue(pemFile.exists());
 
@@ -132,14 +132,11 @@ public class CaHelperTest {
         String caDir = Paths.get(testDir, "ca").toString();
         String certDir = Paths.get(testDir, "certs").toString();
 
-        //generate private key
         IKey priv = CspHelper.generatePrivateKey(certDir);
 
-        //get EC public key
         ECPublicKey ecPubKey = CspHelper.getSM2PublicKey(priv);
         Assert.assertNotNull(ecPubKey);
 
-        //create our CaHelper
         CaHelper rootCA = CaHelper.newCA(caDir,
                 testCA3Name,
                 testCA3Name,
@@ -188,14 +185,11 @@ public class CaHelperTest {
         String certDir = Paths.get(testDir, "certs").toString();
         System.out.println(testDir);
 
-        //generate private key
         IKey priv = CspHelper.generatePrivateKey(certDir);
 
-        //get EC public key
         ECPublicKey ecPubKey = CspHelper.getSM2PublicKey(priv);
         Assert.assertNotNull(ecPubKey);
 
-        //create our CaHelper
         CaHelper rootCA = CaHelper.newCA(caDir,
                 testCA2Name,
                 testCA2Name,
@@ -215,7 +209,6 @@ public class CaHelperTest {
                 KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
                 new int[]{Util.EXT_KEY_USAGE_ANY});
 
-        // KeyUsage should be x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment
         try {
             KeyUsageExtension keyUsageExt = (KeyUsageExtension) X509CertImpl.toImpl(cert).getExtension(new ObjectIdentifier(new int[]{2,5,29,15}));
             Assert.assertEquals(KeyUsage.digitalSignature | KeyUsage.keyEncipherment,
@@ -226,7 +219,7 @@ public class CaHelperTest {
         }
 
 
-        // make sure ous are correctly set
+        // 确认ous是否正确设置
         String[] ous = new String[]{"TestOU", "NodeOU"};
         cert = rootCA.signCertificate(certDir,
                 testName,
@@ -240,7 +233,7 @@ public class CaHelperTest {
         Assert.assertTrue(ousList.contains(ous[0]));
         Assert.assertTrue(ousList.contains(ous[1]));
 
-        // make sure sans are correctly set
+        // 确认sans是否正确设置
         List<String> sans = new ArrayList<>();
         sans.add(testName2);
         sans.add(testIP);
@@ -252,7 +245,7 @@ public class CaHelperTest {
                 KeyUsage.digitalSignature,
                 new int[]{Util.EXT_KEY_USAGE_CLIENT_AUTH, Util.EXT_KEY_USAGE_SERVER_AUTH});
 
-        // make sure sans are correctly set
+        // 确认sans是否正确设置
         boolean containDNSName = false;
         boolean containIPAddress = false;
         try {
@@ -272,7 +265,7 @@ public class CaHelperTest {
         Assert.assertTrue(containDNSName);
         Assert.assertTrue(containIPAddress);
 
-        // check to make sure the signed public key was stored
+        // 确认签名公钥是否已存储
         String pemFile = Paths.get(certDir , testName + "-cert.pem").toString();
         File file = new File(pemFile);
         Assert.assertTrue(file.exists());

@@ -66,11 +66,11 @@ public class NodeCmdFactoryTest extends BaseJunit4Test {
         Assert.assertThat(nodeCmd8, Matchers.instanceOf(ContractInvokeCmd.class));
 
         //服务启动命令
-        INodeCmd nodeCmd9 = NodeCmdFactory.getInstance(node, "server", "start");
+        INodeCmd nodeCmd9 = NodeCmdFactory.getInstance(node, "node", "start");
         Assert.assertThat(nodeCmd9, Matchers.instanceOf(ServerStartCmd.class));
 
         //服务状态命令
-        INodeCmd nodeCmd10 = NodeCmdFactory.getInstance(node, "server", "status");
+        INodeCmd nodeCmd10 = NodeCmdFactory.getInstance(node, "node", "status");
         Assert.assertThat(nodeCmd10, Matchers.instanceOf(ServerStatusCmd.class));
 
         //服务状态命令

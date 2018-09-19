@@ -16,7 +16,7 @@
 package org.bcia.julongchain.node.entity;
 
 import org.bcia.julongchain.node.Node;
-import org.bcia.julongchain.node.util.NodeConstant;
+import org.bcia.julongchain.node.common.util.NodeConstant;
 
 /**
  * 节点版本

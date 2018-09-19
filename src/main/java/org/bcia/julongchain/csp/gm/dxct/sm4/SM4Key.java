@@ -22,7 +22,7 @@ import org.bcia.julongchain.csp.intfs.IKey;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * sm4蜜钥对象
+ * sm4密钥对象
  *
  * @author zhangmingyang
  * @Date: 2018/4/28
@@ -32,13 +32,13 @@ public class SM4Key implements IKey {
     private SM3 sm3;
     private byte[] sm4Key;
 
-    public SM4Key() {
+    public SM4Key(byte[] sm4Key) {
         this.sm3 = sm3;
+        this.sm4Key=sm4Key;
     }
 
     @Override
     public byte[] toBytes() {
-        this.sm4Key = SM4.generateKey();
         return sm4Key;
     }
 
@@ -46,7 +46,7 @@ public class SM4Key implements IKey {
     public byte[] ski() throws CspException {
         try {
             return sm3.hash(sm4Key);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (CspException e) {
             throw new CspException(e.getMessage());
         }
     }

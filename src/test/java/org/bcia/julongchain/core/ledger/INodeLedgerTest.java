@@ -18,6 +18,7 @@ package org.bcia.julongchain.core.ledger;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.core.ledger.kvledger.history.IHistoryQueryExecutor;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
+import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.TransactionPackage;
 import org.junit.After;
@@ -33,7 +34,7 @@ import static org.bcia.julongchain.common.ledger.util.Utils.*;
 import static org.bcia.julongchain.core.ledger.util.Util.*;
 
 /**
- * 类描述
+ * 账本总体服务测试类
  *
  * @author sunzongyu
  * @date 2018/08/14
@@ -68,6 +69,10 @@ public class INodeLedgerTest {
 		//不存在的txID
 		TransactionPackage.ProcessedTransaction notExists = l.getTransactionByID("not exists");
 		assertNull(notExists);
+
+		//txID null
+		thrown.expect(LedgerException.class);
+		l.getTransactionByID(null);
 	}
 
 	@Test
@@ -75,12 +80,15 @@ public class INodeLedgerTest {
 		//存在的block hash
 		for (int i = 0; i < 2; i++) {
 			block = l.getBlockByNumber(i);
-			byte[] hashBytes = block.getHeader().getDataHash().toByteArray();
+			byte[] hashBytes = Util.getHashBytes(block.getHeader().toByteArray());
 			assertEquals(block, l.getBlockByHash(hashBytes));
 		}
 		//不存在的block hash
 		Common.Block notExists = l.getBlockByHash("not exists".getBytes(StandardCharsets.UTF_8));
 		assertNull(notExists);
+
+		thrown.expect(LedgerException.class);
+		l.getBlockByHash(null);
 	}
 
 	@Test
@@ -95,6 +103,9 @@ public class INodeLedgerTest {
 		//不存在的txID
 		Common.Block notExists = l.getBlockByTxID("not exists");
 		assertNull(notExists);
+
+		thrown.expect(LedgerException.class);
+		l.getBlockByTxID(null);
 	}
 
 	@Test

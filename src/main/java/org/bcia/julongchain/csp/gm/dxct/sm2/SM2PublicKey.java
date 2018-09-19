@@ -45,7 +45,7 @@ public class SM2PublicKey extends SM2Key {
     public byte[] ski() throws CspException {
         try {
             return sm3.hash(publicKey);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (CspException e) {
             throw new CspException(e.getMessage());
         }
     }

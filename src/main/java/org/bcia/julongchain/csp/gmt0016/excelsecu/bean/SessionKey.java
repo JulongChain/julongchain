@@ -16,6 +16,8 @@
 package org.bcia.julongchain.csp.gmt0016.excelsecu.bean;
 
 /**
+ * GM0016 会话密钥类
+ *
  * @author chenhao
  * @date 2018/4/2
  * @company Excelsecu

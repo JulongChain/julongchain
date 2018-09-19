@@ -36,6 +36,7 @@ import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
 import org.bcia.julongchain.protos.node.TransactionPackage;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,7 +76,7 @@ public class Validator implements InternalValidator {
                     for(KvRwset.KVWriteHash kvHashedRead : col.getHashedRwSet().getHashedWritesList()){
                         HashedCompositeKey hashedCompositeKey = new HashedCompositeKey(nsRwSet.getNameSpace(),
                                 col.getCollectionName(),
-                                new String(kvHashedRead.getKeyHash().toByteArray()));
+                                new String(kvHashedRead.getKeyHash().toByteArray(), StandardCharsets.UTF_8));
                         if(!hashedKeyMap.containsKey(hashedCompositeKey)){
                             hashedKeyMap.put(hashedCompositeKey, null);
                             hashedKeys.add(hashedCompositeKey);
@@ -144,6 +145,11 @@ public class Validator implements InternalValidator {
         return true;
     }
 
+	/**
+	 * 读集合有效性验证
+	 * 存在重复读集合无效
+	 * 读集合版本(区块号＋交易号)与当前世界状态不符无效
+	 */
     private boolean validateKVRead(String ns, KvRwset.KVRead kvRead, PubUpdateBatch updates) throws LedgerException {
         if(updates.getBatch().exists(ns, kvRead.getKey())){
             return false;
@@ -151,7 +157,7 @@ public class Validator implements InternalValidator {
         LedgerHeight committedVersion = db.getHeight(ns, kvRead.getKey());
         log.debug("Comparing versions for keys " + kvRead.getKey());
 		if(!LedgerHeight.areSame(committedVersion, RwSetUtil.newVersion(kvRead.getVersion()))){
-            log.debug(String.format("Version mismatch for key [%s:%s]", ns, kvRead.getKey()));
+			log.info("Version mismatch for key [" + ns + ":" + kvRead.getKey() + "]");
             return false;
         }
         return true;

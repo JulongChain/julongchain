@@ -35,18 +35,19 @@ import org.bcia.julongchain.csp.pkcs11.entity.PKCS11Config;
 import org.bcia.julongchain.csp.pkcs11.entity.PKCS11KeyData;
 import org.bcia.julongchain.csp.pkcs11.entity.PKCS11Lib;
 import org.bcia.julongchain.csp.pkcs11.rsa.RsaOpts;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 public class TestKeyImportOpts {
 	int secLevel= 5;
-	String hashFamily="MD";		
+	String hashFamily="MD";
 	String keyStorePath=null;
-	String Library=null;		
+	String Library=null;
 	String Label=null;
 	String SN=null;
 	String Pin=null;
-	boolean bSensitive=false; 
+	boolean bSensitive=false;
 	boolean bSoftVerify=false;
 	PKCS11Lib findlib = null;
 	PKCS11Config findconf = null;
@@ -67,21 +68,23 @@ public class TestKeyImportOpts {
 	}
 	@Test
 	public void test1() {
-		
+
 		try {
 			KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
 			keyGen.initialize(1024);
 			KeyPair key = keyGen.generateKeyPair();
-			
+
 			PKCS11KeyData keyraw = new PKCS11KeyData();
 			keyraw.setRawPri(key.getPrivate().getEncoded());
 			keyraw.setRawPub(key.getPublic().getEncoded());
-			
+
 			IKeyImportOpts opts = new RsaOpts.RSAPrivateKeyImportOpts(false);
 			IKey mykey = csp.keyImport(keyraw, opts);
+			Assert.assertNotNull(mykey);
 			csp.getKey(mykey.ski());
+
+			Assert.assertNotNull(csp.getKey(mykey.ski()));
 		} catch (JulongChainException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
@@ -89,21 +92,22 @@ public class TestKeyImportOpts {
 	}
 	@Test
 	public void test2() {
-		
+
 		try {
 			KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
 			keyGen.initialize(1024);
 			KeyPair key = keyGen.generateKeyPair();
-			
+
 			PKCS11KeyData keyraw = new PKCS11KeyData();
 			keyraw.setRawPri(null);
 			keyraw.setRawPub(key.getPublic().getEncoded());
-			
+
 			IKeyImportOpts opts = new RsaOpts.RSAPublicKeyImportOpts(false);
 			IKey mykey = csp.keyImport(keyraw, opts);
+			Assert.assertNotNull(mykey);
 			csp.getKey(mykey.ski());
+			Assert.assertNotNull(csp.getKey(mykey.ski()));
 		} catch (JulongChainException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
@@ -111,21 +115,22 @@ public class TestKeyImportOpts {
 	}
 	@Test
 	public void test3() {
-		
+
 		try {
 			KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
 			keyGen.initialize(2048);
 			KeyPair key = keyGen.generateKeyPair();
-			
+
 			PKCS11KeyData keyraw = new PKCS11KeyData();
 			keyraw.setRawPri(key.getPrivate().getEncoded());
 			keyraw.setRawPub(key.getPublic().getEncoded());
-			
+
 			IKeyImportOpts opts = new RsaOpts.RSAPrivateKeyImportOpts(false);
 			IKey mykey = csp.keyImport(keyraw, opts);
+			Assert.assertNotNull(mykey);
 			csp.getKey(mykey.ski());
+			Assert.assertNotNull(csp.getKey(mykey.ski()));
 		} catch (JulongChainException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
@@ -133,21 +138,22 @@ public class TestKeyImportOpts {
 	}
 	@Test
 	public void test4() {
-		
+
 		try {
 			KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
 			keyGen.initialize(2048);
 			KeyPair key = keyGen.generateKeyPair();
-			
+
 			PKCS11KeyData keyraw = new PKCS11KeyData();
 			keyraw.setRawPri(null);
 			keyraw.setRawPub(key.getPublic().getEncoded());
-			
+
 			IKeyImportOpts opts = new RsaOpts.RSAPublicKeyImportOpts(false);
 			IKey mykey = csp.keyImport(keyraw, opts);
+			Assert.assertNotNull(mykey);
 			csp.getKey(mykey.ski());
+			Assert.assertNotNull(csp.getKey(mykey.ski()));
 		} catch (JulongChainException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
@@ -155,67 +161,67 @@ public class TestKeyImportOpts {
 	}
 	@Test
 	public void test5() {
-		
+
 		try {
 			KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC","SunEC");
-		    ECGenParameterSpec ecsp;
-		    ecsp = new ECGenParameterSpec("secp256r1");
-		    kpg.initialize(ecsp);
-		    KeyPair kpU = kpg.genKeyPair();
-			
+			ECGenParameterSpec ecsp;
+			ecsp = new ECGenParameterSpec("secp256r1");
+			kpg.initialize(ecsp);
+			KeyPair kpU = kpg.genKeyPair();
+
 			PKCS11KeyData keyraw = new PKCS11KeyData();
 			keyraw.setRawPri(kpU.getPrivate().getEncoded());
 			keyraw.setRawPub(kpU.getPublic().getEncoded());
-			
+
 			IKeyImportOpts opts = new EcdsaOpts.ECDSAPrivateKeyImportOpts(false);
 			IKey mykey = csp.keyImport(keyraw, opts);
-			
+			Assert.assertNotNull(mykey);
+			csp.getKey(mykey.ski());
+			Assert.assertNotNull(csp.getKey(mykey.ski()));
+
 		} catch (JulongChainException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchProviderException|NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidAlgorithmParameterException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
 	@Test
 	public void test6() {
-		
+
 		try {
 			KeyPairGenerator kpg = KeyPairGenerator.getInstance("EC","SunEC");
-		    ECGenParameterSpec ecsp;
-		    ecsp = new ECGenParameterSpec("secp256r1");
-		    kpg.initialize(ecsp);
-		    KeyPair kpU = kpg.genKeyPair();
-			
+			ECGenParameterSpec ecsp;
+			ecsp = new ECGenParameterSpec("secp256r1");
+			kpg.initialize(ecsp);
+			KeyPair kpU = kpg.genKeyPair();
+
 			PKCS11KeyData keyraw = new PKCS11KeyData();
 			keyraw.setRawPri(null);
 			keyraw.setRawPub(kpU.getPublic().getEncoded());
-			
+
 			IKeyImportOpts opts = new EcdsaOpts.ECDSAPublicKeyImportOpts(false);
 			IKey mykey = csp.keyImport(keyraw, opts);
-			
+			Assert.assertNotNull(mykey);
+			csp.getKey(mykey.ski());
+			Assert.assertNotNull(csp.getKey(mykey.ski()));
+
 		} catch (JulongChainException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoSuchProviderException|NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InvalidAlgorithmParameterException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
+
 	@Test
 	public void test7() {
-		
-		try {			
-			KeyGenerator keyGen = KeyGenerator.getInstance("AES");			
+
+		try {
+			KeyGenerator keyGen = KeyGenerator.getInstance("AES");
 			keyGen.init(128); // for example
 			SecretKey secretKey = keyGen.generateKey();
 			PKCS11KeyData keyraw = new PKCS11KeyData();
@@ -223,10 +229,11 @@ public class TestKeyImportOpts {
 			keyraw.setRawPub(null);
 			IKeyImportOpts opts = new AesOpts.AESKeyImportOpts(false);
 			IKey mykey = csp.keyImport(keyraw, opts);
-			return;
-			
+			Assert.assertNotNull(mykey);
+			csp.getKey(mykey.ski());
+			Assert.assertNotNull(csp.getKey(mykey.ski()));
+
 		} catch (JulongChainException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch(NoSuchAlgorithmException e) {
 			e.printStackTrace();

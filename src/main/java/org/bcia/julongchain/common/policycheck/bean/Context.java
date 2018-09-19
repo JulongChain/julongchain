@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * 类描述
- *
+ * 策略解析时期待的上下文所用的实体类
  * @author yuanjun
  * @date 11/05/18
  * @company Aisino

@@ -18,7 +18,6 @@ package org.bcia.julongchain.node.entity;
 import io.grpc.stub.StreamObserver;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.NodeException;
-import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.CommConstant;
@@ -33,6 +32,7 @@ import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.node.common.client.BroadcastClient;
 import org.bcia.julongchain.node.common.client.EndorserClient;
 import org.bcia.julongchain.node.common.client.IBroadcastClient;
+import org.bcia.julongchain.node.common.client.IEndorserClient;
 import org.bcia.julongchain.node.common.helper.SpecHelper;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
@@ -80,28 +80,16 @@ public class NodeSmartContract {
         this.invokeLock = new CommLock(TIMEOUT_INVOKE);
     }
 
-    public void install(String nodeHost, int nodePort, String scName, String scVersion, String scPath) throws NodeException {
-        SmartContractPackage.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName, scVersion,
-                scPath, null);
+    public void install(String nodeHost, int nodePort, String scName, String scVersion, String scPath) throws
+            NodeException {
+        SmartContractPackage.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName,
+                scVersion, scPath, null);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
-
         byte[] creator = identity.getIdentity().serialize();
 
-        byte[] nonce = new byte[0];
-        try {
-            nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
-        } catch (JulongChainException e) {
-            log.error(e.getMessage(), e);
-        }
-
-        String txId = null;
-        try {
-            txId = ProposalUtils.computeProposalTxID(creator, nonce);
-        } catch (JulongChainException e) {
-            log.error(e.getMessage(), e);
-            throw new NodeException("Generate txId fail");
-        }
+        byte[] nonce = generateNonce();
+        String txId = generateTxId(creator, nonce);
 
         SmartContractPackage.SmartContractInvocationSpec lsscSpec = SpecHelper.buildInvocationSpec(CommConstant.LSSC,
                 LSSC.INSTALL.getBytes(), deploymentSpec.toByteArray());
@@ -111,13 +99,16 @@ public class NodeSmartContract {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //获取背书节点返回信息
-        EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
+        IEndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = null;
         try {
             proposalResponse = endorserClient.sendProcessProposal(signedProposal);
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
-            return;
+
+            String msg = "Install fail:" + ex.getMessage();
+            log.error(msg);
+            throw new NodeException(msg);
         } finally {
             endorserClient.close();
         }
@@ -126,28 +117,16 @@ public class NodeSmartContract {
     }
 
     public void instantiate(String nodeHost, int nodePort, String consenterHost, int consenterPort, String groupId,
-                            String scName, String scVersion, SmartContractPackage.SmartContractInput input) throws NodeException {
-        SmartContractPackage.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName, scVersion,
-                null, input);
+                            String scName, String scVersion, SmartContractPackage.SmartContractInput input) throws
+            NodeException {
+        SmartContractPackage.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName,
+                scVersion, null, input);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
-
         byte[] creator = identity.getIdentity().serialize();
 
-        byte[] nonce = new byte[0];
-        try {
-            nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
-        } catch (JulongChainException e) {
-            log.error(e.getMessage(), e);
-        }
-
-        String txId = null;
-        try {
-            txId = ProposalUtils.computeProposalTxID(creator, nonce);
-        } catch (JulongChainException e) {
-            log.error(e.getMessage(), e);
-            throw new NodeException("Generate txId fail");
-        }
+        byte[] nonce = generateNonce();
+        String txId = generateTxId(creator, nonce);
 
         SmartContractPackage.SmartContractInvocationSpec lsscSpec = SpecHelper.buildInvocationSpec(CommConstant.LSSC,
                 CommConstant.DEPLOY.getBytes(), groupId.getBytes(), deploymentSpec.toByteArray());
@@ -157,26 +136,28 @@ public class NodeSmartContract {
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //获取背书节点返回信息
-        EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
+        IEndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = null;
         try {
             proposalResponse = endorserClient.sendProcessProposal(signedProposal);
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
-            return;
+
+            String msg = "Instantiate fail:" + ex.getMessage();
+            log.error(msg);
+            throw new NodeException(msg);
         } finally {
             endorserClient.close();
         }
 
-        try {
-            Common.Envelope signedTxEnvelope = EnvelopeHelper.createSignedTxEnvelope(proposal, identity, proposalResponse);
+        if (proposalResponse == null || proposalResponse.getResponse() == null
+                || proposalResponse.getResponse().getStatus() != Common.Status.SUCCESS_VALUE) {
+            throw new NodeException("Instantiate fail: " + proposalResponse.getResponse().getStatus());
+        }
 
-//            EnvelopeVO envelopeVO = new EnvelopeVO();
-//            try {
-//                envelopeVO.parseFrom(signedTxEnvelope);
-//            } catch (InvalidProtocolBufferException e) {
-//                log.error(e.getMessage(), e);
-//            }
+        try {
+            Common.Envelope signedTxEnvelope = EnvelopeHelper.createSignedTxEnvelope(proposal, identity,
+                    proposalResponse);
 
             IBroadcastClient broadcastClient = new BroadcastClient(consenterHost, consenterPort);
             broadcastClient.send(signedTxEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
@@ -210,10 +191,12 @@ public class NodeSmartContract {
                     instantiateLock.unLock();
                 }
             });
-
-        } catch (ValidateException e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new NodeException(e);
+
+            String msg = "Instantiate fail:" + e.getMessage();
+            log.error(msg);
+            throw new NodeException(msg);
         }
 
         instantiateLock.tryLock(new CommLock.TimeoutCallback() {
@@ -229,48 +212,41 @@ public class NodeSmartContract {
         SmartContractPackage.SmartContractInvocationSpec sciSpec = SpecHelper.buildInvocationSpec(scName, input);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
-
         byte[] creator = identity.getIdentity().serialize();
 
-        byte[] nonce = new byte[0];
-        try {
-            nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
-        } catch (JulongChainException e) {
-            log.error(e.getMessage(), e);
-        }
-
-        String txId = null;
-        try {
-            txId = ProposalUtils.computeProposalTxID(creator, nonce);
-        } catch (JulongChainException e) {
-            log.error(e.getMessage(), e);
-            throw new NodeException("Generate txId fail");
-        }
+        byte[] nonce = generateNonce();
+        String txId = generateTxId(creator, nonce);
 
         //build proposal
-        ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType.ENDORSER_TRANSACTION,
-                groupId, txId, sciSpec, nonce, creator, null);
+        ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType
+                .ENDORSER_TRANSACTION, groupId, txId, sciSpec, nonce, creator, null);
         //build signedProposal
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //背书
         //获取背书节点返回信息
-        EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
+        IEndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = null;
         try {
             proposalResponse = endorserClient.sendProcessProposal(signedProposal);
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
-            return;
+
+            String msg = "Invoke fail:" + ex.getMessage();
+            log.error(msg);
+            throw new NodeException(msg);
         } finally {
             endorserClient.close();
         }
 
-        try {
-            Common.Envelope signedTxEnvelope = EnvelopeHelper.createSignedTxEnvelope(proposal, identity, proposalResponse);
+        if (proposalResponse == null || proposalResponse.getResponse() == null
+                || proposalResponse.getResponse().getStatus() != Common.Status.SUCCESS_VALUE) {
+            throw new NodeException("Invoke fail: " + proposalResponse.getResponse().getStatus());
+        }
 
-//            EnvelopeVO envelopeVO = new EnvelopeVO();
-//            envelopeVO.parseFrom(signedTxEnvelope);
+        try {
+            Common.Envelope signedTxEnvelope = EnvelopeHelper.createSignedTxEnvelope(proposal, identity,
+                    proposalResponse);
 
             IBroadcastClient broadcastClient = new BroadcastClient(consenterHost, consenterPort);
             broadcastClient.send(signedTxEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
@@ -307,7 +283,10 @@ public class NodeSmartContract {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            throw new NodeException(e);
+
+            String msg = "Invoke fail:" + e.getMessage();
+            log.error(msg);
+            throw new NodeException(msg);
         }
 
         invokeLock.tryLock(new CommLock.TimeoutCallback() {
@@ -318,45 +297,66 @@ public class NodeSmartContract {
         });
     }
 
-    public void query(String nodeHost, int nodePort, String groupId, String smartContractName,
-                      SmartContractPackage.SmartContractInput input) throws NodeException {
+    public ProposalResponsePackage.Response query(String nodeHost, int nodePort, String groupId, String
+            smartContractName, SmartContractPackage.SmartContractInput input) throws NodeException {
         SmartContractPackage.SmartContractInvocationSpec spec = SpecHelper.buildInvocationSpec(smartContractName, input);
 
         ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
-
         byte[] creator = identity.getIdentity().serialize();
 
-        byte[] nonce = new byte[0];
-        try {
-            nonce = CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
-        } catch (JulongChainException e) {
-            log.error(e.getMessage(), e);
-        }
-
-        String txId = null;
-        try {
-            txId = ProposalUtils.computeProposalTxID(creator, nonce);
-        } catch (JulongChainException e) {
-            log.error(e.getMessage(), e);
-            throw new NodeException("Generate txId fail");
-        }
+        byte[] nonce = generateNonce();
+        String txId = generateTxId(creator, nonce);
 
         ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType
                 .ENDORSER_TRANSACTION, groupId, txId, spec, nonce, creator, null);
         ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
 
         //获取背书节点返回信息
-        EndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
+        IEndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
         ProposalResponsePackage.ProposalResponse proposalResponse = null;
         try {
             proposalResponse = endorserClient.sendProcessProposal(signedProposal);
+            return proposalResponse.getResponse();
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
-            return;
+
+            String msg = "Query fail:" + ex.getMessage();
+            log.error(msg);
+            throw new NodeException(msg);
         } finally {
             endorserClient.close();
         }
+    }
 
-        log.info("Query Result: " + proposalResponse.getResponse().getMessage());
+    /**
+     * 获取随机数
+     *
+     * @return
+     * @throws NodeException
+     */
+    private byte[] generateNonce() throws NodeException {
+        try {
+            return CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
+        } catch (JulongChainException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException("Can not get nonce");
+        }
+    }
+
+    /**
+     * 生成交易Id
+     *
+     * @param creator
+     * @param nonce
+     * @return
+     * @throws NodeException
+     */
+    private String generateTxId(byte[] creator, byte[] nonce) throws NodeException {
+        try {
+            return ProposalUtils.computeProposalTxID(creator, nonce);
+        } catch (JulongChainException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException("Generate txId fail");
+        }
     }
 }

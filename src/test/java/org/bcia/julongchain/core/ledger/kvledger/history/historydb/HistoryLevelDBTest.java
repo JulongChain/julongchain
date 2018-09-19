@@ -106,7 +106,7 @@ public class HistoryLevelDBTest {
 	public void getLastSavepaoint() throws Exception {
 		LedgerHeight lastSavepoint = db.getLastSavepoint();
 		assertNotNull(lastSavepoint);
-		assertSame(lastSavepoint.getBlockNum(), 1L);
+		assertSame(lastSavepoint.getBlockNum(), 2L);
 		assertSame(lastSavepoint.getTxNum(), 5L);
 	}
 

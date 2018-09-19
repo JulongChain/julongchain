@@ -21,13 +21,12 @@ import com.google.protobuf.ByteString;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.NodeException;
-import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.NetAddress;
-import org.bcia.julongchain.core.ssc.lssc.LSSC;
 import org.bcia.julongchain.node.Node;
-import org.bcia.julongchain.node.util.NodeConstant;
+import org.bcia.julongchain.node.common.util.NodeConstant;
+import org.bcia.julongchain.protos.node.ProposalResponsePackage;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
@@ -101,26 +100,7 @@ public class ContractQueryCmd extends AbstractNodeContractCmd {
         }
 
         //解析出智能合约执行参数
-        SmartContractPackage.SmartContractInput input = null;
-        if (cmd.hasOption(ARG_INPUT)) {
-            String inputStr = cmd.getOptionValue(ARG_INPUT, defaultValue);
-            log.info("InputStr: " + inputStr);
-            JSONObject inputJson = JSONObject.parseObject(inputStr);
-
-            SmartContractPackage.SmartContractInput.Builder inputBuilder =
-                    SmartContractPackage.SmartContractInput.newBuilder();
-
-            JSONArray argsJSONArray = inputJson.getJSONArray(KEY_ARGS);
-            for (int i = 0; i < argsJSONArray.size(); i++) {
-                inputBuilder.addArgs(ByteString.copyFrom(argsJSONArray.getString(i).getBytes()));
-            }
-
-            input = inputBuilder.build();
-            //打印一下参数，检查是否跟预期一致
-            for (int i = 0; i < input.getArgsCount(); i++) {
-                log.info("Input.getArg: " + input.getArgs(i).toStringUtf8());
-            }
-        }
+        SmartContractPackage.SmartContractInput input = getSmartContractInput(cmd, ARG_INPUT, defaultValue);
 
         //-----------------------------------校验入参--------------------------------//
         if (StringUtils.isBlank(groupId)) {
@@ -133,43 +113,26 @@ public class ContractQueryCmd extends AbstractNodeContractCmd {
             return;
         }
 
-        //-----------------------------------默认值--------------------------------//
-        //TODO:从-E中获取
-        String essc = null;
-        if (StringUtils.isBlank(essc)) {
-            essc = "escc";
-        }
-
-        //TODO:从-V中获取
-        String vssc = null;
-        if (StringUtils.isBlank(vssc)) {
-            essc = "vssc";
-        }
-
-        //TODO:从-P中获取
-        String policy = null;
-        if (StringUtils.isNotBlank(policy)) {
-            //TODO:有一大堆逻辑
-        }
-
-        //TODO:从-collections-config中获取
-        String collectionsConfigFile = null;
-        if (StringUtils.isNotBlank(collectionsConfigFile)) {
-            //TODO:有一大堆逻辑
-        }
+        ProposalResponsePackage.Response response = null;
 
         if (StringUtils.isBlank(targetAddress)) {
             log.info("TargetAddress is empty, use 127.0.0.1:7051");
-            nodeSmartContract.query(NodeConstant.DEFAULT_NODE_HOST, NodeConstant.DEFAULT_NODE_PORT, groupId, scName,
-                    input);
+            response = nodeSmartContract.query(NodeConstant.DEFAULT_NODE_HOST, NodeConstant.DEFAULT_NODE_PORT,
+                    groupId, scName, input);
         } else {
             try {
                 NetAddress targetNetAddress = new NetAddress(targetAddress);
-                nodeSmartContract.query(targetNetAddress.getHost(), targetNetAddress.getPort(), groupId, scName,
-                        input);
-            } catch (ValidateException e) {
+                response = nodeSmartContract.query(targetNetAddress.getHost(), targetNetAddress.getPort(), groupId,
+                        scName, input);
+            } catch (Exception e) {
                 log.error(e.getMessage(), e);
             }
+        }
+
+        if (response != null) {
+            log.info("Query result: " + response.getMessage() + ", " + response.getPayload());
+        } else {
+            log.info("No query result");
         }
     }
 

@@ -139,6 +139,11 @@ public class KvLedger implements INodeLedger {
 	public synchronized TransactionPackage.ProcessedTransaction getTransactionByID(String txID) throws LedgerException {
 		Common.Envelope tranEvn = null;
 		TransactionPackage.TxValidationCode txVResult = null;
+		if (txID == null) {
+			String errMsg = "TxID cannot be null";
+			log.error(errMsg);
+			throw new LedgerException(errMsg);
+		}
 		tranEvn = blockStore.retrieveTxByID(txID);
 		txVResult = blockStore.retrieveTxValidationCodeByTxID(txID);
 		if(tranEvn == null || txVResult == null){
@@ -192,6 +197,11 @@ public class KvLedger implements INodeLedger {
 	 */
 	@Override
 	public synchronized Common.Block getBlockByHash(byte[] blockHash) throws LedgerException {
+		if (blockHash == null) {
+			String errMsg = "BlockHash cannot be null";
+			log.error(errMsg);
+			throw new LedgerException(errMsg);
+		}
 		Common.Block block = blockStore.retrieveBlockByHash(blockHash);
 		if (block == null) {
 			log.info("Block not found");
@@ -204,6 +214,11 @@ public class KvLedger implements INodeLedger {
 	 */
 	@Override
 	public synchronized Common.Block getBlockByTxID(String txID) throws LedgerException {
+		if (txID == null) {
+			String errMsg = "TxID cannot be null";
+			log.error(errMsg);
+			throw new LedgerException(errMsg);
+		}
 		Common.Block block = blockStore.retrieveBlockByTxID(txID);
 		if (block == null) {
 			log.info(String.format("Block not found, using txid = [%s]", txID));
@@ -216,6 +231,11 @@ public class KvLedger implements INodeLedger {
 	 */
 	@Override
 	public synchronized TransactionPackage.TxValidationCode getTxValidationCodeByTxID(String txID) throws LedgerException {
+		if (txID == null) {
+			String errMsg = "TxID cannot be null";
+			log.error(errMsg);
+			throw new LedgerException(errMsg);
+		}
 		TransactionPackage.TxValidationCode txValidationCode = blockStore.retrieveTxValidationCodeByTxID(txID);
 		if (txValidationCode == null) {
 			log.info(String.format("Tx validation code not found, using txid = [%s]", txID));

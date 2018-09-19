@@ -32,8 +32,8 @@ import java.util.*;
  */
 public class LevelDBProvider implements IDBProvider {
 	private IDBHandler db;
-	private static byte[] DB_NAME_KEY_SEP = new String(new char[]{Character.MIN_VALUE}).getBytes();
-	private static byte[] DB_LEDGERID_KEY_SEP = new String(new char[]{Character.MIN_VALUE}).getBytes();
+	private static byte[] DB_NAME_KEY_SEP = new String(new char[]{Character.MIN_VALUE}).getBytes(StandardCharsets.UTF_8);
+	private static byte[] DB_LEDGERID_KEY_SEP = new String(new char[]{Character.MIN_VALUE}).getBytes(StandardCharsets.UTF_8);
 	private String dbPath;
 	private String ledgerID = null;
 	static Map<String, IDBProvider> dbs = new HashMap<>();
@@ -117,10 +117,10 @@ public class LevelDBProvider implements IDBProvider {
 		if (levelKey == null) {
 			return null;
 		}
-		String str = new String(levelKey);
+		String str = new String(levelKey, StandardCharsets.UTF_8);
 		String follow = null;
 		int start = 0;
-		while(str.indexOf(new String(DB_NAME_KEY_SEP), start) != -1){
+		while(str.indexOf(new String(DB_NAME_KEY_SEP, StandardCharsets.UTF_8), start) != -1){
 			start++;
 		}
 		follow = str.substring(start, str.length());

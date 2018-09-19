@@ -1,11 +1,10 @@
 package org.bcia.julongchain.core.container;
 
-import com.github.dockerjava.api.DockerClient;
-import com.github.dockerjava.api.command.ListContainersCmd;
-import com.github.dockerjava.core.command.LogContainerResultCallback;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -21,8 +20,7 @@ public class DockerUtilTest {
     public void testCreateImages() {
         String dockerFilePath = "src/main/java/org/bcia/julongchain/images/baseos/test.in";
         String tag = "test-image1";
-        DockerUtil.buildImage(
-                dockerFilePath, tag);
+        DockerUtil.buildImage(dockerFilePath, tag);
         List<String> list = DockerUtil.listImages(tag);
         Assert.assertEquals(list.get(0), tag);
     }
@@ -30,12 +28,15 @@ public class DockerUtilTest {
     @Test
     public void testListContainer() {
         List<String> strings = DockerUtil.listContainers("test");
-        System.out.println(strings);
+        Assert.assertTrue(strings.size() > 0);
     }
 
     @Test
     public void testStartContainer() {
-        DockerUtil.startContainer("f62387bd60db495cf40aa84ebe831a023d4a6030010c903dbbc5fe5c7a883529");
+        String containerId = "f62387bd60db495cf40aa84ebe831a023d4a6030010c903dbbc5fe5c7a883529";
+        DockerUtil.startContainer(containerId);
+        String containerStatus = DockerUtil.getContainerStatus(containerId);
+        Assert.assertTrue(StringUtils.isNotEmpty(containerStatus));
     }
 
     @Test
@@ -51,13 +52,12 @@ public class DockerUtilTest {
 
     @Test
     public void testListImages() {
-        String imageName = "test-image1:latest";
+        String imageName = "julongchain/julongchain-node:latest";
         List<String> list = DockerUtil.listImages(imageName);
         System.out.println(list.toString());
         Assert.assertNotNull(list);
         Assert.assertEquals(list.size(), 1);
         Assert.assertEquals(list.get(0), imageName);
     }
-
 
 }

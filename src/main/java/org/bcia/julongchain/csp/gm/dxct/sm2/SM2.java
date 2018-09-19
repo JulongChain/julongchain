@@ -15,8 +15,12 @@
  */
 package org.bcia.julongchain.csp.gm.dxct.sm2;
 
+import org.apache.commons.lang.Validate;
+import org.bcia.julongchain.common.exception.CspException;
+import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bouncycastle.asn1.ASN1Integer;
 import org.bouncycastle.asn1.ASN1Sequence;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
@@ -104,7 +108,19 @@ public class SM2 {
      * @return
      * @throws CryptoException
      */
-    public byte[] sign(byte[] privateKey, byte[] msg) throws CryptoException {
+    public byte[] sign(byte[] privateKey, byte[] msg) throws CspException {
+        if (null == privateKey) {
+            throw new CspException("privateKey is null");
+        }
+        if (privateKey.length == 0) {
+            throw new CspException("privateKey's length is 0");
+        }
+        if (null==msg) {
+            throw new CspException("plainText is null");
+        }
+        if (msg.length == 0) {
+            throw new CspException("plainText's length is 0");
+        }
         SM2Signer signer = new SM2Signer();
         BigInteger d = byte2BigInteger(privateKey);
         ECPrivateKeyParameters privateKeyParameters = new ECPrivateKeyParameters(d, ecc_bc_spec);
@@ -115,7 +131,7 @@ public class SM2 {
             sig = signer.generateSignature();
         } catch (CryptoException e) {
             log.error(e.getMessage());
-            throw new CryptoException(e.getMessage());
+            throw new CspException(e);
         }
         return sig;
     }
@@ -128,9 +144,26 @@ public class SM2 {
      * @param msg
      * @return
      */
-    public boolean verify(byte[] publicKey, byte[] signValue, byte[] msg) {
+    public boolean verify(byte[] publicKey, byte[] signValue, byte[] msg) throws CspException {
+        if (null == publicKey) {
+            throw new CspException("publicKey is null");
+        }
+        if (publicKey.length == 0) {
+            throw new CspException("publicKey's length is 0");
+        }
+        if (null == signValue) {
+            throw new CspException("signValue is null");
+        }
+        if (signValue.length == 0) {
+            throw new CspException("signValue's length is 0");
+        }
+        if (null==msg) {
+            throw new CspException("plainText is null");
+        }
+        if (msg.length == 0) {
+            throw new CspException("plainText's length is 0");
+        }
         SM2Signer signer = new SM2Signer();
-        // BigInteger[] rs = decode(signValue);
         ECPublicKeyParameters ecPub = new ECPublicKeyParameters(byte2ECpoint(publicKey), ecc_bc_spec);
         signer.init(false, ecPub);
         signer.update(msg, 0, msg.length);
@@ -144,7 +177,19 @@ public class SM2 {
      * @param publicLKey
      * @return
      */
-    public byte[] encrypt(byte[] input, byte[] publicLKey) throws InvalidCipherTextException {
+    public byte[] encrypt(byte[] input, byte[] publicLKey) throws CspException {
+        if (null == input) {
+            throw new CspException("input is null");
+        }
+        if (input.length == 0) {
+            throw new CspException("input data length is 0");
+        }
+        if (null==publicLKey) {
+            throw new CspException("publicLKey is null");
+        }
+        if (publicLKey.length == 0) {
+            throw new CspException("publicLKey's length is 0");
+        }
         SM2Engine sm2Engine = new SM2Engine();
         ECPublicKeyParameters ecPub = new ECPublicKeyParameters(byte2ECpoint(publicLKey), ecc_bc_spec);
         ParametersWithRandom parametersWithRandom = new ParametersWithRandom(ecPub);
@@ -154,7 +199,7 @@ public class SM2 {
             enc = sm2Engine.processBlock(input, 0, input.length);
         } catch (InvalidCipherTextException e) {
             log.error(e.getMessage());
-            throw new InvalidCipherTextException(e.getMessage());
+            throw new CspException(e.getMessage());
         }
         return enc;
     }
@@ -166,7 +211,19 @@ public class SM2 {
      * @param privateKey
      * @return
      */
-    public byte[] decrypt(byte[] encryptData, byte[] privateKey) {
+    public byte[] decrypt(byte[] encryptData, byte[] privateKey) throws CspException{
+        if (null == privateKey) {
+            throw new CspException("privateKey is null");
+        }
+        if (privateKey.length == 0) {
+            throw new CspException("privateKey's length is 0");
+        }
+        if (null==encryptData) {
+            throw new CspException("plainText is null");
+        }
+        if (encryptData.length == 0) {
+            throw new CspException("plainText's length is 0");
+        }
         SM2Engine sm2Engine = new SM2Engine();
         BigInteger d = byte2BigInteger(privateKey);
         ECPrivateKeyParameters privateKeyParameters = new ECPrivateKeyParameters(d, ecc_bc_spec);

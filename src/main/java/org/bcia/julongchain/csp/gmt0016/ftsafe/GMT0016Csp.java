@@ -16,10 +16,9 @@
 package org.bcia.julongchain.csp.gmt0016.ftsafe;
 
 import org.bcia.julongchain.common.exception.CspException;
-import org.bcia.julongchain.common.exception.CspException;
-import org.bcia.julongchain.common.exception.SarException;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.ec.ECCOpts;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.ec.ECImpl;
+import org.bcia.julongchain.csp.gmt0016.ftsafe.util.AnalyzeSKI;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.entity.GMT0016KeyData;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.rsa.RSAImpl;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.rsa.RSAImportOpts;
@@ -29,16 +28,12 @@ import org.bcia.julongchain.csp.gmt0016.ftsafe.util.GMDigest;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.util.GMHashOpts;
 import org.bcia.julongchain.csp.intfs.IHash;
 import org.bcia.julongchain.csp.intfs.IKey;
-import org.bcia.julongchain.csp.intfs.opts.IDecrypterOpts;
-import org.bcia.julongchain.csp.intfs.opts.IEncrypterOpts;
-import org.bcia.julongchain.csp.intfs.opts.IHashOpts;
-import org.bcia.julongchain.csp.intfs.opts.IKeyDerivOpts;
-import org.bcia.julongchain.csp.intfs.opts.IKeyGenOpts;
-import org.bcia.julongchain.csp.intfs.opts.IKeyImportOpts;
-import org.bcia.julongchain.csp.intfs.opts.IRngOpts;
-import org.bcia.julongchain.csp.intfs.opts.ISignerOpts;
+import org.bcia.julongchain.csp.intfs.opts.*;
 
 import java.util.UUID;
+
+import static org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant.TYPE_RSA;
+import static org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant.TYPE_SM2;
 
 /**
  * The instance of csp interface with skf
@@ -64,17 +59,13 @@ public class GMT0016Csp implements IGMT0016Csp {
     @Override
     public void finalized() throws CspException {
 
-        try {
-            gmt0016FactoryOpts.getSKFFactory().SKF_DisconnectDev(gmt0016FactoryOpts.getDevHandle());
-        } catch (SarException e) {
-         throw new CspException();
-        }
+        gmt0016FactoryOpts.getSKFFactory().SKF_DisconnectDev(gmt0016FactoryOpts.getDevHandle());
     }
 
     @Override
-    public IKey keyGen(IKeyGenOpts opts) throws CspException{
+    public IKey keyGen(IKeyGenOpts opts) throws CspException {
         if (opts == null) {
-            csplog.setLogMsg("[JC_SKF]:keyGenParam Err!", 2, GMT0016Csp.class);
+            csplog.setLogMsg("[JC_SKF]:keyGenParam Err!", csplog.LEVEL_ERROR, GMT0016Csp.class);
             throw new CspException("[JC_SKF]:keyGenParam Err!");
         }
 
@@ -103,25 +94,15 @@ public class GMT0016Csp implements IGMT0016Csp {
 
         if(opts instanceof ISymmKeyGenOpts)
         {
-            byte[] random = new byte[0];
-            try {
-                random = gmt0016FactoryOpts.getSKFFactory().SKF_GenRandom(
-                        gmt0016FactoryOpts.getDevHandle(), ((ISymmKeyGenOpts) opts).getBitLen());
-            } catch (SarException e) {
-               throw new CspException();
-            }
-            long lSessionHandle = 0;
-            try {
-                lSessionHandle = gmt0016FactoryOpts.getSKFFactory().SKF_SetSymmKey(
-                        gmt0016FactoryOpts.getDevHandle(), random, ((ISymmKeyGenOpts) opts).getAlgID());
-            } catch (SarException e) {
-                throw new CspException();
-            }
+            byte[] random = gmt0016FactoryOpts.getSKFFactory().SKF_GenRandom(
+                    gmt0016FactoryOpts.getDevHandle(), ((ISymmKeyGenOpts) opts).getBitLen());
+            long lSessionHandle = gmt0016FactoryOpts.getSKFFactory().SKF_SetSymmKey(
+                    gmt0016FactoryOpts.getDevHandle(), random, ((ISymmKeyGenOpts) opts).getAlgID());
             SymmCspKey symmkey = new SymmCspKey(random, opts.isEphemeral(), lSessionHandle);
             return symmkey;
         }
 
-        csplog.setLogMsg("[JC_SKF]:No Support KeyGen Opts!", 1, GMT0016Csp.class);
+        csplog.setLogMsg("[JC_SKF]:No Support KeyGen Opts!", csplog.LEVEL_INFO, GMT0016Csp.class);
         return null;
     }
 
@@ -138,7 +119,7 @@ public class GMT0016Csp implements IGMT0016Csp {
 
         if(raw == null || opts == null)
         {
-            csplog.setLogMsg("[JC_SKF]:keyImportParam Err!", 2, GMT0016Csp.class);
+            csplog.setLogMsg("[JC_SKF]:keyImportParam Err!", csplog.LEVEL_ERROR, GMT0016Csp.class);
             throw new CspException("[JC_SKF]:Param Err!");
         }
         GMT0016KeyData keyraw = (GMT0016KeyData)raw;
@@ -158,7 +139,7 @@ public class GMT0016Csp implements IGMT0016Csp {
             return key;
         }
 
-        csplog.setLogMsg("[JC_SKF]:No Support KeyImport Opts!", 1, GMT0016Csp.class);
+        csplog.setLogMsg("[JC_SKF]:No Support KeyImport Opts!", csplog.LEVEL_INFO, GMT0016Csp.class);
         return null;
     }
 
@@ -166,61 +147,21 @@ public class GMT0016Csp implements IGMT0016Csp {
     @Override
     public IKey getKey(byte[] ski) throws CspException {
 
-        String sContainerName = "";
-        boolean bSignFlag = true;
-        byte[] cipher;
-        byte[] hash;
         int type = 0;
         //analyze ski
-        int skiIndex = 0;
-        while (skiIndex < ski.length) {
-            int tag = ski[skiIndex];
-            skiIndex++;
-            switch (tag) {
-                case GMT0016CspConstant.TAG_CONTAINER:
-                    int nameLen = ski[skiIndex];
-                    skiIndex++;
-                    byte[] name = new byte[nameLen];
-                    System.arraycopy(ski, skiIndex, name, 0, nameLen);
-                    skiIndex += nameLen;
-                    sContainerName = new String(name);
-                    break;
-                case GMT0016CspConstant.TAG_PUBLICK_KEY_SIGN_FLAG:
-                    int flagLen = ski[skiIndex];
-                    skiIndex++;
-                    bSignFlag = (ski[skiIndex] == (byte)1); //Sign Flag
-                    skiIndex += flagLen;
-                    break;
-                case GMT0016CspConstant.TAG_KEY_CIPHER_DATA:
-                    int dataLen = ski[skiIndex];
-                    skiIndex++;
-                    cipher = new byte[dataLen];
-                    System.arraycopy(ski, skiIndex, cipher, 0, dataLen);
-                    skiIndex += dataLen;
-                    break;
-                case GMT0016CspConstant.TAG_PUBLICK_KEY_HASH:
-                    int hashLen = ski[skiIndex];
-                    skiIndex++;
-                    hash = new byte[hashLen];
-                    System.arraycopy(ski, skiIndex, hash, 0, hashLen);
-                    skiIndex += hashLen;
-                    break;
-                case GMT0016CspConstant.TAG_KEY_TYPE:
-                    int typelen = ski[skiIndex];
-                    type = ski[++skiIndex];
-                    skiIndex += typelen;
-                    break;
-                default:
-                    break;
-            }
-        }
+        AnalyzeSKI alzSKI = new AnalyzeSKI();
+        alzSKI.analyzeSKI(ski);
+        String sContainerName = alzSKI.getContainerName();
+        boolean bSignFlag = alzSKI.getSignFlag();
+        //byte[] cipher = alzSKI.getCipher();
+        //byte[] hash = alzSKI.getHash();
 
-        if (type == 1)
+        if (type == TYPE_RSA)
         {
             RSAImpl rsa = new RSAImpl();
             IKey key = rsa.getRSAKey(sContainerName, bSignFlag, gmt0016FactoryOpts);
             return key;
-        }else if(type == 2){
+        }else if(type == TYPE_SM2){
             ECImpl ecc = new ECImpl();
             IKey key = ecc.getECKey(sContainerName, bSignFlag, gmt0016FactoryOpts);
             return key;
@@ -237,50 +178,17 @@ public class GMT0016Csp implements IGMT0016Csp {
         {
             GMHashOpts.SM3SignPreOpts sm3opts = (GMHashOpts.SM3SignPreOpts)opts;
             byte[] ski = sm3opts.getSki();
-            String sContainerName = "";
-            boolean bSignFlag = true;
-            int skiIndex = 0;
-            int type = 0;
-            while (skiIndex < ski.length) {
-                int tag = ski[skiIndex];
-                skiIndex++;
-                switch (tag) {
-                    case GMT0016CspConstant.TAG_CONTAINER:
-                        int nameLen = ski[skiIndex];
-                        skiIndex++;
-                        byte[] name = new byte[nameLen];
-                        System.arraycopy(ski, skiIndex, name, 0, nameLen);
-                        skiIndex += nameLen;
-                        sContainerName = new String(name);
-                        break;
-                    case GMT0016CspConstant.TAG_PUBLICK_KEY_SIGN_FLAG:
-                        int flagLen = ski[skiIndex];
-                        skiIndex++;
-                        bSignFlag = (ski[skiIndex] == (byte)1); //Sign Flag
-                        skiIndex += flagLen;
-                        break;
-                    case GMT0016CspConstant.TAG_KEY_CIPHER_DATA:
-                        int dataLen = ski[skiIndex];
-                        skiIndex++;
-                        skiIndex += dataLen;
-                        break;
-                    case GMT0016CspConstant.TAG_PUBLICK_KEY_HASH:
-                        int hashLen = ski[skiIndex];
-                        skiIndex++;
-                        skiIndex += hashLen;
-                        break;
-                    case GMT0016CspConstant.TAG_KEY_TYPE:
-                        int typelen = ski[skiIndex];
-                        type = ski[++skiIndex];
-                        skiIndex += typelen;
-                        break;
-                    default:
-                        break;
-                }
-            }
+            //analyze ski
+            AnalyzeSKI alzSKI = new AnalyzeSKI();
+            alzSKI.analyzeSKI(ski);
+            String sContainerName = alzSKI.getContainerName();
+            boolean bSignFlag = alzSKI.getSignFlag();
+            //byte[] cipher = alzSKI.getCipher();
+            //byte[] hash = alzSKI.getHash();
+            int type = alzSKI.getType();
 
-            if(type != 2) {
-                csplog.setLogMsg("[JC_SKF]: The Publickey is not sm2 type! Param Err!", 2, GMT0016Csp.class);
+            if(type != TYPE_SM2) {
+                csplog.setLogMsg("[JC_SKF]: The Publickey is not sm2 type! Param Err!", csplog.LEVEL_ERROR, GMT0016Csp.class);
                 throw new CspException("[JC_SKF]: The Publickey is not sm2 type! Param Err!");
             }
             ECImpl ec = new ECImpl();
@@ -326,12 +234,14 @@ public class GMT0016Csp implements IGMT0016Csp {
                 try {
                     byte[] digest = hash(buffer, opts);
                 }catch(CspException ex) {
-                    ;
+                    ex.printStackTrace();
+                    String err = String.format("[JC_SKF]:SarException ErrMessage: %s", ex.getMessage());
+                    csplog.setLogMsg(err, csplog.LEVEL_ERROR, GMT0016Csp.class);
                 }
             }
 
             public int size() {
-                return 16;////??????????
+                return 16;
             }
 
             public int blockSize() {
@@ -344,134 +254,58 @@ public class GMT0016Csp implements IGMT0016Csp {
 
     @Override
     public byte[] sign(IKey key, byte[] digest, ISignerOpts opts) throws CspException {
-        String sContainerName = "";
-        byte[] ski = key.ski();
-        boolean bSignFlag = true;
-        byte[] cipher;
-        byte[] hash;
-        int type = 0;
-        //analyze ski
-        int skiIndex = 0;
-        while (skiIndex < ski.length) {
-            int tag = ski[skiIndex];
-            skiIndex++;
-            switch (tag) {
-                case GMT0016CspConstant.TAG_CONTAINER:
-                    int nameLen = ski[skiIndex];
-                    skiIndex++;
-                    byte[] name = new byte[nameLen];
-                    System.arraycopy(ski, skiIndex, name, 0, nameLen);
-                    skiIndex += nameLen;
-                    sContainerName = new String(name);
-                    break;
-                case GMT0016CspConstant.TAG_PUBLICK_KEY_SIGN_FLAG:
-                    int flagLen = ski[skiIndex];
-                    skiIndex++;
-                    bSignFlag = (ski[skiIndex] == (byte)1); //Sign Flag
-                    skiIndex += flagLen;
-                    break;
-                case GMT0016CspConstant.TAG_KEY_CIPHER_DATA:
-                    int dataLen = ski[skiIndex];
-                    skiIndex++;
-                    cipher = new byte[dataLen];
-                    System.arraycopy(ski, skiIndex, cipher, 0, dataLen);
-                    skiIndex += dataLen;
-                    break;
-                case GMT0016CspConstant.TAG_PUBLICK_KEY_HASH:
-                    int hashLen = ski[skiIndex];
-                    skiIndex++;
-                    hash = new byte[hashLen];
-                    System.arraycopy(ski, skiIndex, hash, 0, hashLen);
-                    skiIndex += hashLen;
-                    break;
-                case GMT0016CspConstant.TAG_KEY_TYPE:
-                    int typelen = ski[skiIndex];
-                    type = ski[++skiIndex];
-                    skiIndex += typelen;
-                    break;
-                default:
-                    break;
-            }
-        }
 
-        if (type == 1 && bSignFlag)
+        byte[] ski = key.ski();
+        //analyze ski
+        AnalyzeSKI alzSKI = new AnalyzeSKI();
+        alzSKI.analyzeSKI(ski);
+        String sContainerName = alzSKI.getContainerName();
+        boolean bSignFlag = alzSKI.getSignFlag();
+        //byte[] cipher = alzSKI.getCipher();
+        //byte[] hash = alzSKI.getHash();
+        int type = alzSKI.getType();
+
+        if (type == TYPE_RSA && bSignFlag)
         {
             RSAImpl rsa = new RSAImpl();
             byte[] signature = rsa.getRSASign(digest, sContainerName, gmt0016FactoryOpts);
             return signature;
-        }else if (type == 2 && bSignFlag ){
+        }else if (type == TYPE_SM2 && bSignFlag ){
             ECImpl ec = new ECImpl();
             byte[] signature = ec.getECSign(digest, sContainerName, gmt0016FactoryOpts);
             return signature;
         }
 
-        csplog.setLogMsg("[JC_SKF]: Sign Param Err!", 2, GMT0016Csp.class);
+        csplog.setLogMsg("[JC_SKF]: Sign Param Err!",  csplog.LEVEL_ERROR, GMT0016Csp.class);
         return null;
     }
 
 
     @Override
     public boolean verify(IKey key, byte[] signature, byte[] digest, ISignerOpts opts) throws CspException {
-        String sContainerName = "";
-        byte[] ski = key.ski();
-        boolean bSignFlag = true;
-        byte[] cipher;
-        byte[] hash;
-        int type = 0;
-        //analyze ski
-        int skiIndex = 0;
-        while (skiIndex < ski.length) {
-            int tag = ski[skiIndex];
-            skiIndex++;
-            switch (tag) {
-                case GMT0016CspConstant.TAG_CONTAINER:
-                    int nameLen = ski[skiIndex];
-                    skiIndex++;
-                    byte[] name = new byte[nameLen];
-                    System.arraycopy(ski, skiIndex, name, 0, nameLen);
-                    skiIndex += nameLen;
-                    sContainerName = new String(name);
-                    break;
-                case GMT0016CspConstant.TAG_PUBLICK_KEY_SIGN_FLAG:
-                    int flagLen = ski[skiIndex];
-                    skiIndex++;
-                    bSignFlag = (ski[skiIndex] == (byte)1); //Sign Flag
-                    skiIndex += flagLen;
-                    break;
-                case GMT0016CspConstant.TAG_KEY_CIPHER_DATA:
-                    int dataLen = ski[skiIndex];
-                    skiIndex++;
-                    cipher = new byte[dataLen];
-                    System.arraycopy(ski, skiIndex, cipher, 0, dataLen);
-                    skiIndex += dataLen;
-                    break;
-                case GMT0016CspConstant.TAG_PUBLICK_KEY_HASH:
-                    int hashLen = ski[skiIndex];
-                    skiIndex++;
-                    hash = new byte[hashLen];
-                    System.arraycopy(ski, skiIndex, hash, 0, hashLen);
-                    skiIndex += hashLen;
-                    break;
-                case GMT0016CspConstant.TAG_KEY_TYPE:
-                    int typelen = ski[skiIndex];
-                    type = ski[++skiIndex];
-                    skiIndex += typelen;
-                    break;
-                default:
-                    break;
-            }
-        }
 
-        if (type == 1 && bSignFlag)
+        byte[] ski = key.ski();
+        //analyze ski
+        AnalyzeSKI alzSKI = new AnalyzeSKI();
+        alzSKI.analyzeSKI(ski);
+        String sContainerName = alzSKI.getContainerName();
+        boolean bSignFlag = alzSKI.getSignFlag();
+        //byte[] cipher = alzSKI.getCipher();
+        //byte[] hash = alzSKI.getHash();
+        int type = alzSKI.getType();
+
+        if (type == TYPE_RSA && bSignFlag)
         {
             RSAImpl rsa = new RSAImpl();
             boolean rv = rsa.getRSAVerify(signature, digest, sContainerName, gmt0016FactoryOpts);
-        }else if (type == 2 && bSignFlag ){
+            return rv;
+        }else if (type == TYPE_SM2 && bSignFlag ){
             ECImpl ec = new ECImpl();
-            boolean rv = ec.getECverify(signature, digest, sContainerName, gmt0016FactoryOpts);
+            boolean rv = ec.getECVerify(signature, digest, sContainerName, gmt0016FactoryOpts);
+            return rv;
         }
 
-        csplog.setLogMsg("[JC_SKF]: Verify Param Err!", 2, GMT0016Csp.class);
+        csplog.setLogMsg("[JC_SKF]: Verify Param Err!", csplog.LEVEL_ERROR, GMT0016Csp.class);
         return false;
     }
 
@@ -484,34 +318,34 @@ public class GMT0016Csp implements IGMT0016Csp {
             SymmetryImpl sym = new SymmetryImpl();
             if (opts instanceof SM1Opts.SM1EncrypterOpts)
             {
-                byte[] ciphertext = sym.SymmetryEncrypt(plaintext, lSessionHandle,
+                byte[] ciphertext = sym.symmetryEncrypt(plaintext, lSessionHandle,
                         ((SM1Opts.SM1EncrypterOpts) opts).getBlockChipher(),gmt0016FactoryOpts);
                 return ciphertext;
             }
             else if (opts instanceof SM4Opts.SM4EncrypterOpts)
             {
-                byte[] ciphertext = sym.SymmetryEncrypt(plaintext, lSessionHandle,
+                byte[] ciphertext = sym.symmetryEncrypt(plaintext, lSessionHandle,
                         ((SM4Opts.SM4EncrypterOpts) opts).getBlockChipher(),gmt0016FactoryOpts);
                 return ciphertext;
             }
             else if (opts instanceof SSF33Opts.SSF33EncrypterOpts)
             {
-                byte[] ciphertext = sym.SymmetryEncrypt(plaintext, lSessionHandle,
+                byte[] ciphertext = sym.symmetryEncrypt(plaintext, lSessionHandle,
                         ((SSF33Opts.SSF33EncrypterOpts) opts).getBlockChipher(),gmt0016FactoryOpts);
                 return ciphertext;
             }else {
-                csplog.setLogMsg("[JC_SKF]: No Support Opts", 2, GMT0016Csp.class);
+                csplog.setLogMsg("[JC_SKF]: No Support Opts", csplog.LEVEL_ERROR, GMT0016Csp.class);
                 throw new CspException("[JC_SKF]: No Support Opts, Param Err!");
             }
         } else {
-            csplog.setLogMsg("[JC_SKF]: Ikey is not the instance of SymmCspKey, No support!", 2, GMT0016Csp.class);
+            csplog.setLogMsg("[JC_SKF]: Ikey is not the instance of SymmCspKey, No support!", csplog.LEVEL_ERROR, GMT0016Csp.class);
             throw new CspException("[JC_SKF]: Ikey is not the instance of SymmCspKey, No support!");
         }
 
     }
 
     @Override
-    public byte[] decrypt(IKey key, byte[] ciphertext, IDecrypterOpts opts) throws CspException{
+    public byte[] decrypt(IKey key, byte[] ciphertext, IDecrypterOpts opts) throws CspException {
 
         if (key instanceof SymmCspKey) {
             SymmCspKey sKey = (SymmCspKey) key;
@@ -519,28 +353,28 @@ public class GMT0016Csp implements IGMT0016Csp {
             SymmetryImpl sym = new SymmetryImpl();
             if (opts instanceof SM1Opts.SM1DecrypterOpts)
             {
-                byte[] plaintext = sym.SymmetryDecrypt(ciphertext, lSessionHandle,
+                byte[] plaintext = sym.symmetryDecrypt(ciphertext, lSessionHandle,
                         ((SM1Opts.SM1DecrypterOpts) opts).getBlockChipher(),gmt0016FactoryOpts);
                 return plaintext;
             }
             else if (opts instanceof SM4Opts.SM4DecrypterOpts)
             {
-                byte[] plaintext = sym.SymmetryDecrypt(ciphertext, lSessionHandle,
+                byte[] plaintext = sym.symmetryDecrypt(ciphertext, lSessionHandle,
                         ((SM4Opts.SM4DecrypterOpts) opts).getBlockChipher(),gmt0016FactoryOpts);
                 return plaintext;
             }
             else if (opts instanceof SSF33Opts.SSF33DecrypterOpts)
             {
-                byte[] plaintext = sym.SymmetryDecrypt(ciphertext, lSessionHandle,
+                byte[] plaintext = sym.symmetryDecrypt(ciphertext, lSessionHandle,
                         ((SSF33Opts.SSF33DecrypterOpts) opts).getBlockChipher(),gmt0016FactoryOpts);
                 return plaintext;
             }else{
-                csplog.setLogMsg("[JC_SKF]: No Support Opts", 2, GMT0016Csp.class);
+                csplog.setLogMsg("[JC_SKF]: No Support Opts", csplog.LEVEL_ERROR, GMT0016Csp.class);
                 throw new CspException("[JC_SKF]: No Support Opts, Param Err!");
             }
 
         } else {
-            csplog.setLogMsg("[JC_SKF]: Ikey is not the instance of SymmCspKey, No support!", 2, GMT0016Csp.class);
+            csplog.setLogMsg("[JC_SKF]: Ikey is not the instance of SymmCspKey, No support!", csplog.LEVEL_ERROR, GMT0016Csp.class);
             throw new CspException("[JC_SKF]: Ikey is not the instance of SymmCspKey, No support!");
         }
 
@@ -549,12 +383,9 @@ public class GMT0016Csp implements IGMT0016Csp {
     @Override
     public byte[] rng(int len, IRngOpts opts) throws CspException {
         //byte[] none=new SecureRandom().engineGenerateSeed(len);
-        byte[] random = new byte[0];
-        try {
-            random = gmt0016FactoryOpts.getSKFFactory().SKF_GenRandom(gmt0016FactoryOpts.getDevHandle(), len);
-        } catch (SarException e) {
-          throw new CspException(e.getMessage());
-        }
+        byte[] random = gmt0016FactoryOpts.getSKFFactory().SKF_GenRandom(gmt0016FactoryOpts.getDevHandle(), len);
         return random;
     }
+    
+
 }

@@ -56,7 +56,7 @@ public interface Index {
 	/**
 	 * 根据区块号和交易序号获取交易位置
 	 */
-    FileLocPointer getTXLocByBlockNumTranNum(long blockNum, long tranNum) throws LedgerException;
+    FileLocPointer getTxLocByBlockNumTranNum(long blockNum, long tranNum) throws LedgerException;
 
 	/**
 	 * 根据交易ID获取区块

@@ -25,7 +25,10 @@ import io.netty.handler.codec.string.StringEncoder;
 import io.netty.handler.ssl.SslContext;
 
 /**
- * Creates a newly configured {@link ChannelPipeline} for a new channel.
+ * 为服务端端通道创建一个新的已经配置的ChannelPipeline对象
+ * @author cuilf
+ * @date 2019/09/14
+ * @company InfosecTechnology
  */
 public class SecureChatServerInitializer extends ChannelInitializer<SocketChannel> {
 
@@ -39,19 +42,17 @@ public class SecureChatServerInitializer extends ChannelInitializer<SocketChanne
     public void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
 
-        // Add SSL handler first to encrypt and decrypt everything.
-        // In this example, we use a bogus certificate in the server side
-        // and accept any invalid certificates in the client side.
-        // You will need something more complicated to identify both
-        // and server in the real world.
+        // 添加SSL用于加密每一个步骤.
+        // 在本次演示中我们在服务端使用了一张虚拟的证书，可以接收任何有效的客户端证书.
+        // 但在真实场景中你需要一个更复杂的客户端和服务端标记.
         pipeline.addLast(sslCtx.newHandler(ch.alloc()));
 
-        // On top of the SSL handler, add the text line codec.
+        // SSL之上添加编解码处理.
         pipeline.addLast(new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
         pipeline.addLast(new StringDecoder());
         pipeline.addLast(new StringEncoder());
 
-        // and then business logic.
+        // 处理业务逻辑.
         pipeline.addLast(new SecureChatServerHandler());
     }
 }

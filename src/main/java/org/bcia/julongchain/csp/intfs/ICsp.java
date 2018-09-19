@@ -1,7 +1,7 @@
 package org.bcia.julongchain.csp.intfs;
 
 /**
- * Copyright BCIA. All Rights Reserved.
+ * Copyright Dingxuan. All Rights Reserved.
  * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,54 +22,125 @@ import org.bcia.julongchain.common.exception.SarException;
 import org.bcia.julongchain.csp.intfs.opts.*;
 
 /**
- * @author zhanglin
+ * @author zhanglin, zhangmingyang
  * @purpose Define the interface, ICsp, and list its elements
  * @date 2018-01-25
  * @company Dingxuan
  */
 
-// ICsp is the blockchain cryptographic service provider that offers implementations of
-// cryptographic algorithms, such as NIST, GM(P.R.China's standards) and so on.
 public interface ICsp {
 
-    // The keyGen generates a key according to the opts whose type is the IKeyGenOpts.
+    /**
+     * 密钥生成,根据密钥生成选项生成密钥
+     *
+     * @param opts
+     * @return
+     * @throws CspException
+     */
     IKey keyGen(IKeyGenOpts opts) throws CspException;
 
-    // The keyDeriv derives a key from the k according to the opts whose type is the IKeyDerivOpts.
+    /**
+     * keyDeriv根据类型为IKeyDerivOpts的opts从k派生密钥
+     *
+     * @param k
+     * @param opts
+     * @return
+     * @throws CspException
+     */
     IKey keyDeriv(IKey k, IKeyDerivOpts opts) throws CspException;
 
-    // The keyImport imports a key from the raw according to the opts whose type is the IKeyImportOpts.
+    /**
+     * 根据IKeyImportOpts将raw导入密钥
+     *
+     * @param raw
+     * @param opts
+     * @return
+     * @throws CspException
+     */
     IKey keyImport(Object raw, IKeyImportOpts opts) throws CspException;
 
-    // The getKey returns a key according to the ski, i.e. Subject Key Identifier.
+    /**
+     * 根据ski值获取一个密钥
+     *
+     * @param ski
+     * @return
+     * @throws CspException
+     */
     IKey getKey(byte[] ski) throws CspException;
 
-    // The hash generates a hash value of the msg according to the opts whose type is the IHashOpts.
+    /**
+     * 根据hash选项,对消息进行hash
+     *
+     * @param msg
+     * @param opts
+     * @return
+     * @throws CspException
+     */
     byte[] hash(byte[] msg, IHashOpts opts) throws CspException;
 
-    // The getHash returns an instance of Hash according to opts whose type is the IHashOpts.
+    /**
+     * 根据IHashOpts选项，返回Hsah实例
+     *
+     * @param opts
+     * @return
+     * @throws CspException
+     */
     IHash getHash(IHashOpts opts) throws CspException;
 
-    // The sign generates a digital signature for the digest using the key k, according to the opts
-    // whose type is the ISignerOpts.
-    // The opts specifies a signature algorithm used, but also a hash function to produce a digest
-    // for a large-sized message.
+    /**
+     * 根据ISignerOpts,使用k对摘要进行数字签名
+     *
+     * @param k
+     * @param digest
+     * @param opts
+     * @return
+     * @throws CspException
+     */
     byte[] sign(IKey k, byte[] digest, ISignerOpts opts) throws CspException;
 
-    // The verify checks the validation of the signature against the key k and the digest, according
-    // to the opts whose type is the ISignerOpts. Note that it is ISignerOpts definitely.
+    /**
+     * 根据ISignerOpts,使用k对签名值进行验证
+     *
+     * @param k
+     * @param signature
+     * @param digest
+     * @param opts
+     * @return
+     * @throws CspException
+     */
     boolean verify(IKey k, byte[] signature, byte[] digest, ISignerOpts opts) throws CspException;
 
-    // The encrypt computes a ciphertext from the plaintext using key k, according to the opts
-    // whose type is IEncrypterOpts.
-    // The opts should consist of a symmetric encryption algorithm and an appropriate block-cipher mode.
+    /**
+     * 根据IEncrypterOpts,使用密钥k从将明文计算出密文,
+     * 选项应包括对称加密算法和适当的分组密码模式
+     *
+     * @param k
+     * @param plaintext
+     * @param opts
+     * @return
+     * @throws CspException
+     */
     byte[] encrypt(IKey k, byte[] plaintext, IEncrypterOpts opts) throws CspException;
 
-    // The decrypt outputs a plaintext from the ciphertext using the key k, according to the opts
-    // whose type is IDecrypterOpts.
-    // The opts should take a specified algorithm and mode as the argument.
+    /**
+     * 根据IDecrypterOpts的opts,解密器使用密钥k从密文输出明文,
+     * opts应采用指定的算法和模式作为参数
+     *
+     * @param k
+     * @param ciphertext
+     * @param opts
+     * @return
+     * @throws CspException
+     */
     byte[] decrypt(IKey k, byte[] ciphertext, IDecrypterOpts opts) throws CspException;
 
-    // The rng provides a random number within a specified length, according to the opts whose type is IRngOpts.
+    /**
+     * 根据IRngOpts,rng提供指定长度内的随机数
+     *
+     * @param len
+     * @param opts
+     * @return
+     * @throws CspException
+     */
     byte[] rng(int len, IRngOpts opts) throws CspException;
 }

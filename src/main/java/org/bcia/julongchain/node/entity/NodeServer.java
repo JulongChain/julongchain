@@ -42,7 +42,7 @@ import org.bcia.julongchain.gossip.GossipService;
 import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.node.common.client.AdminClient;
 import org.bcia.julongchain.node.common.client.IAdminClient;
-import org.bcia.julongchain.node.util.NodeConstant;
+import org.bcia.julongchain.node.common.util.NodeConstant;
 import org.bcia.julongchain.protos.gossip.Message;
 
 import java.io.File;
@@ -184,6 +184,11 @@ public class NodeServer {
                         log.info("Saved block");
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
+                        try {
+                            Thread.sleep(5000);
+                        } catch (InterruptedException e1) {
+                            log.error(e1.getMessage(), e1);
+                        }
                     }
                 }
             }
