@@ -3,7 +3,7 @@
 1、本项目中调用gRPC框架所采用的Protobuf协议中，用到的所有Proto文件等复用了Hyperledger Fabric的Proto文本，并修改了包名和若干内容以适配
 当前项目，同时保留了Hyperledger Fabric的License声明。<br/>
 2、本项目中的shim模块复用了Hyperledger Fabric的shim模块的代码，做了部分修改，同时保留了Hyperledger Fabric的License声明。<br/>
-3、本项目中其他部分的代码，架构上和实现上均有参照Hyperledger Fabric的架构和实现。并采用了Apache 2.0的License协议发布。Hyperledger Fabric
+3、本项目中其他部分的代码，采用Java语言进行实现，架构和逻辑上参考了Hyperledger Fabric项目（Go语言），并采用Apache 2.0的License协议发布。Hyperledger Fabric
 的Go语言源码采用的License声明如下：<br/>
 /*
 Copyright IBM Corp. All Rights Reserved.
