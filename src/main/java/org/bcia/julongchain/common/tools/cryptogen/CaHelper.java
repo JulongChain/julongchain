@@ -106,7 +106,7 @@ public class CaHelper {
                 orgUnits = new String[]{mOrganizationalUnit};
             }
 
-            //set the organization for the subject
+            // 设置证书 organization 字段
             X500Name subject = CaHelper.subjectTemplateAdditional(name,
                     mCountry,
                     mProvince,
@@ -136,7 +136,7 @@ public class CaHelper {
             if (sans != null && sans.size() > 0) {
                 GeneralNames generalNames = new GeneralNames();
                 for (String san : sans) {
-                    // try to parse as an IP address first
+                    // 尝试解析为 IP 地址
                     if (IPAddress.isValid(san)) {
                         generalNames.add(new GeneralName(new IPAddressName(san)));
                     } else {
@@ -167,7 +167,6 @@ public class CaHelper {
 
         IKey privateKey = CspHelper.generatePrivateKey(baseDir);
 
-        // get public signing certificate
         ECPublicKey ecPublicKey = CspHelper.getSM2PublicKey(privateKey);
 
         try {
@@ -182,7 +181,7 @@ public class CaHelper {
 
             x509CertInfo.set("key", new CertificateX509Key(ecPublicKey));
 
-            //set the organization for the subject
+            // 设置证书 organization 字段
             X500Name subject = subjectTemplateAdditional(name,
                     country,
                     province,
