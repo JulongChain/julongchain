@@ -74,13 +74,13 @@ public class CspGm0016 implements ICsp {
 
     private org.bcia.julongchain.csp.gmt0016.excelsecu.bean.Properties mProperties;
 
-    //application handle
+    // 应用句柄
     private long mHApplication = -1;
 
-    //dev handle
+    // 设备句柄
     private long mHDev = -1;
 
-    // type 2 container handle
+    // 类型二容器句柄
     private long mContainer2Handle;
 
     private Map<String, Container> mContainers;
