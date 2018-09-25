@@ -44,7 +44,7 @@ import java.util.*;
  * @company Excelsecu
  */
 public class CspGm0016 implements ICsp {
-    // TODO temp use, remove later
+    // TODO 临时使用，待删除
     private static final String RSA = "RSA";
     private static final String ECC = "ECC";
     private static final String SM2 = "SM2";
@@ -109,7 +109,7 @@ public class CspGm0016 implements ICsp {
     private void findDevice() {
         System.load(mProperties.getDriverPath());
         try {
-            //size is the specified length of device list returned
+            // 枚举设备列表
             List<String> deviceList = mSkf.skfEnumDev(true, ServiceConfig.DEVICE_LIST_LENGTH);
             long devHandle = 0L;
             long applicationHandle = 0L;
@@ -127,7 +127,7 @@ public class CspGm0016 implements ICsp {
                     createContainer();
                     break;
                 } catch (SarException e) {
-                    //if not exist the specified application ,release the current dev
+                    // 如果不存在指定应用，则释放设备句柄
                     if (e.getErrorCode() == SarException.SAR_APPLICATION_NOT_EXIST) {
                         mSkf.skfUnlockDev(devHandle);
                         mSkf.skfDisconnectDev(devHandle);
@@ -202,7 +202,7 @@ public class CspGm0016 implements ICsp {
             long containerHandler = mSkf.skfCreateContainer(mHApplication, container1Name);
             mContainers.put(container1Name, new Container(container1Name, containerHandler));
 
-            //according to the algorithm, generates difference types of keypair with type 1 container
+            // 根据算法类型，生成不同类型的密钥对，放入类型1容器中
             if (RSA.equals(opts.getAlgorithm())) {
                 RSAPublicKeyBlob rsaKeyPair = mSkf.skfGenRSAKeyPair(containerHandler, 1024);
             } else if (SM2.equals(opts.getAlgorithm())) {
@@ -211,7 +211,7 @@ public class CspGm0016 implements ICsp {
 
             long containerTYpe = mSkf.skfGetContainerType(mContainer2Handle);
 
-            // empty container
+            // 是空的容器
             if (containerTYpe == 0) {
 
                 ECCPublicKeyBlob eccKeyPair = mSkf.skfGenECCKeyPair(mContainer2Handle, AlgorithmID.SGD_SM2_1);
@@ -219,20 +219,17 @@ public class CspGm0016 implements ICsp {
 
             }
 
-            //generates temp asymmetric keypair with type 3 container
+            // 生成临时非对称密钥，并放入类型3容器中
             String container3Name = UUID.randomUUID().toString() + TYPE_3;
             long container3Handle = mSkf.skfCreateContainer(mHApplication, container3Name);
             mContainers.put(container3Name, new Container(container3Name, container3Handle));
             mSkf.skfGenRSAKeyPair(container3Handle, Constants.MAX_RSA_MODULUS_LEN);
 
-            //generates temp symmetric key  with type 2 container
+            // 生成临时密钥，并放入类型2容器中
             mSkf.skfGenECCKeyPair(mContainer2Handle, AlgorithmID.SGD_SM2_1);
-
-            // TODO: 2018/3/29 优化
-
         } catch (SarException e) {
 
-            //if no enough room ,delete type 3 container
+            // 没有足够空间，则优先删除类型3容器
             if (SarException.SAR_NO_ROOM == e.getErrorCode()) {
                 for (String containerName : mContainers.keySet()) {
                     if (containerName.contains(TYPE_3)) {
@@ -294,7 +291,7 @@ public class CspGm0016 implements ICsp {
         boolean isGetKeyPair;
         String containerName = "";
         boolean isTempKeyPair;
-        boolean signFlag = false; //true for signPubKey , false for encryptPubKey
+        boolean signFlag = false; // true：签名公钥，false：加密公钥
         long blobBufferLen = 300;
         byte[] cipher = new byte[0];
 
@@ -315,7 +312,7 @@ public class CspGm0016 implements ICsp {
                 case GmKey.TAG_PUBLICK_KEY_SIGN_FLAG:
                     int flagLen = ski[skiIndex];
                     skiIndex += flagLen;
-                    signFlag = (ski[skiIndex] == 1); //Flag的值只有一个byte
+                    signFlag = (ski[skiIndex] == 1); // Flag的值只有一个byte
                     skiIndex++;
                     break;
                 case GmKey.TAG_KEY_CIPHER_DATA:
