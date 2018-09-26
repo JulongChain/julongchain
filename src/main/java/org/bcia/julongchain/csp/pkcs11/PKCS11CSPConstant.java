@@ -16,7 +16,7 @@
 package org.bcia.julongchain.csp.pkcs11;
 
 /**
- * Class description
+ * 常量定义
  *
  * @author Ying Xu
  * @date 4/19/18
@@ -32,7 +32,7 @@ public class PKCS11CSPConstant {
     // ECDSA P-384 curve
     public static final String ECDSA384 = "ECDSA384";
     // ECDSAReRand ECDSA key re-randomization
-    public static final String ECDSAReRand = "ECDSAReRand";
+    //public static final String ECDSAReRand = "ECDSAReRand";
     // RSA
     public static final String RSA = "RSA";
     // RSA 1024 bit
@@ -90,7 +90,8 @@ public class PKCS11CSPConstant {
     
     public static final byte TAG = 0x04;
     public static final int  CARDINAL_NUM = 2;
-    
+   
+	// 定义各功能Class TAG
     public static final int CLS_SELF = 0;
     public static final int CLS_GENKEY = 1;
     public static final int CLS_IMPORTKEY = 2;

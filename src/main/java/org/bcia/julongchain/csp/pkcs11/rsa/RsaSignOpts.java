@@ -20,7 +20,7 @@ import org.bcia.julongchain.csp.intfs.opts.ISignerOpts;
 import sun.security.pkcs11.wrapper.PKCS11Constants;
 
 /**
- * Rsa Sign Opts
+ * Rsa 签名选项
  *
  * @author Ying Xu
  * @date 2018/05/20
@@ -42,10 +42,10 @@ public enum RsaSignOpts implements ISignerOpts {
     private long mechanism;
 
     /**
-     * Opt for sign with rsa
-     * @param name          Sign Algorithm
-     * @param mechanism     Sign mechanism
-     * @param index         Index num
+     * Rsa 签名选项
+     * @param name          签名算法名称（For 软实现）
+     * @param mechanism     签名算法（For 硬实现）
+     * @param index         索引
      */
     private RsaSignOpts(String name, long mechanism, int index) {
         this.name = name;

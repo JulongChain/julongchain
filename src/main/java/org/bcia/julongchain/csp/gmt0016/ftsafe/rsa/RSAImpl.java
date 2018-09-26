@@ -48,9 +48,9 @@ public class RSAImpl {
     GMT0016CspLog csplog = new GMT0016CspLog();
 
     /**
-     * Generate Rsa Keypair
-     * @param sContainerName        Container Name
-     * @param lBits                 Size of Keypair
+     * 生成 Rsa 密钥
+     * @param sContainerName        容器名称
+     * @param lBits                 密钥大小
      * @param opts                  Skf factory
      * @return  IKey's instance
      * @throws CspException
@@ -143,11 +143,11 @@ public class RSAImpl {
 
 
     /**
-     * Import Rsa KeyPair
-     * @param algid                 Algorithm id
-     * @param derPublicKey          PublicKey's der (for compare)
-     * @param derPrivateKey         PrivateKey's der
-     * @param sContainerName        Container Name
+     * 导入 Rsa 密钥
+     * @param algid                 算法
+     * @param derPublicKey          公钥Der编码 (for compare)
+     * @param derPrivateKey         私钥Der编码
+     * @param sContainerName        容器名称
      * @param opts                  Skf factory
      * @return IKey's instance
      * @throws CspException
@@ -261,9 +261,9 @@ public class RSAImpl {
     }
 
     /**
-     * Find and Get the designated rsa key
-     * @param sContainerName    Container Name
-     * @param bSignFlag         Signatures or encrypted identities
+     * 获取RSA密钥
+     * @param sContainerName    容器名称
+     * @param bSignFlag         密钥类型标识
      * @param opts              Skf factory
      * @return IKey's instance
      * @throws CspException
@@ -350,11 +350,11 @@ public class RSAImpl {
     }
 
     /**
-     * Sign with RSA
-     * @param digest            summary info
-     * @param sContainerName    Container Name
+     * 使用 RSA 密钥签名
+     * @param digest            摘要信息
+     * @param sContainerName    容器名称
      * @param opts              Skf factory
-     * @return signature value
+     * @return 签名数据
      * @throws CspException
      */
     public byte[] getRSASign(byte[] digest, String sContainerName, IGMT0016FactoryOpts opts) throws CspException {
@@ -400,10 +400,10 @@ public class RSAImpl {
     }
 
     /**
-     * Verify with RSA
-     * @param signature         signature value
-     * @param digest            summary info
-     * @param sContainerName    Container Name
+     * 使用 RSA 密钥验签
+     * @param signature         签名数据
+     * @param digest            摘要信息
+     * @param sContainerName    容器名称
      * @param opts              Skf factory
      * @return success/error
      * @throws CspException
@@ -460,10 +460,10 @@ public class RSAImpl {
 
 
     /**
-     * DER Encoding of ASN.1 Types
+     * 获取 ASN.1 规范的Der编码
      * @param modulus           N
      * @param publicExponent    E
-     * @return Der Encoding
+     * @return Der 编码
      * @throws InvalidKeyException
      */
     public byte[] getPublicDer(byte[] modulus, byte[] publicExponent) throws InvalidKeyException {
@@ -475,10 +475,10 @@ public class RSAImpl {
     }
 
     /**
-     * PublicKey Hash
+     * 获取公钥Hash
      * @param modulus           N
      * @param publicExponent    E
-     * @return publickey hash
+     * @return 公钥Hash
      * @throws NoSuchAlgorithmException
      * @throws IOException
      * @throws InvalidKeyException

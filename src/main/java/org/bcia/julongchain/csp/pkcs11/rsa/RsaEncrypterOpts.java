@@ -21,7 +21,7 @@ import org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant;
 import sun.security.pkcs11.wrapper.PKCS11Constants;
 
 /**
- * RSA Encrypter Opts
+ * RSA加密选项
  *
  * @author Ying Xu
  * @date 2018/05/20
@@ -46,11 +46,11 @@ public enum RsaEncrypterOpts implements IEncrypterOpts {
     private boolean flagpub;
 
     /**
-     * Opt for decrypt with rsa
-     * @param padding       Encrypter padding type
-     * @param mechanism     Encrypter mechanism
-     * @param flagpub       Key type identification(PublicKey: true, PrivateKey false)
-     * @param index         Index num
+     * RSA加密选项
+     * @param padding       补位方式
+     * @param mechanism     加密算法
+     * @param flagpub       密钥类型(PublicKey: true, PrivateKey false)
+     * @param index         索引
      */
     private RsaEncrypterOpts(String padding, long mechanism, boolean flagpub, int index) {
         this.mechanism = mechanism;

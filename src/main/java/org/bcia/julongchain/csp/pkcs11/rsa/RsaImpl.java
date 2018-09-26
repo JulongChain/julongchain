@@ -46,7 +46,7 @@ import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
 
 
 /**
- * RSA Keypair Impl
+ * RSA密钥实现
  *
  * @author Ying Xu
  * @date 5/20/18
@@ -54,7 +54,7 @@ import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
  */
 public class RsaImpl {
     /**
-     * Generate RSA Keypair
+     * 生成RSA密钥对
      *
      * @author Ying Xu
      * @date 5/20/18
@@ -70,12 +70,14 @@ public class RsaImpl {
          *
          * @param keySize     模长
          * @param ephemeral   临时标记
-         * @param opts        p11 factory
+         * @param opts        基于PKCS11的工厂
          * @return 
+		 * @throws CspException
          */
         public void generateRsa(int keySize, boolean ephemeral, IPKCS11FactoryOpts opts) throws CspException {
 
             try {
+                opts.getPKCS11().C_Login(opts.getSessionhandle(), PKCS11Constants.CKU_USER, opts.getPin());
                 //create bigint
                 int iValue =  new Random().nextInt(100);
                 String strDate = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
@@ -151,7 +153,7 @@ public class RsaImpl {
 
 
     /**
-     * Import RSA Keypair
+     * 导入rsa密钥对
      *
      * @author Ying Xu
      * @date 5/20/18
@@ -166,9 +168,10 @@ public class RsaImpl {
          * @param PriRaw        私钥DER编码
          * @param PubRaw        公钥DER编码
          * @param ephemeral     临时标记
-         * @param opts          p11 factory
+         * @param opts          基于PKCS11的工厂
          * @param flagpubkey    公钥标记
          * @return 公钥摘要(cka_id value)
+		 * @throws CspException
          */
         public static byte[] importRsaKey(byte[] PriRaw, byte[] PubRaw, boolean ephemeral,
                                           IPKCS11FactoryOpts opts, boolean flagpubkey) throws CspException{
@@ -199,6 +202,7 @@ public class RsaImpl {
                 }
                 else
                 {
+                    opts.getPKCS11().C_Login(opts.getSessionhandle(), PKCS11Constants.CKU_USER, opts.getPin());
                     byteSKI = importRsaKey(null,PubRaw,ephemeral,opts, true);
                     // decode private key
                     //PKCS8EncodedKeySpec privSpec = new PKCS8EncodedKeySpec(PriRaw);
@@ -266,7 +270,7 @@ public class RsaImpl {
 
 
     /**
-     * Get RSA PublicKey
+     * 获取RSA密钥
      *
      * @author Ying Xu
      * @date 5/20/18
@@ -322,7 +326,7 @@ public class RsaImpl {
 
 
     /**
-     * Use the private key signature of the specified SKI
+     * 使用私钥签名
      *
      * @author Ying Xu
      * @date 5/20/18
@@ -336,15 +340,18 @@ public class RsaImpl {
 
 
         /**
-         * sign data
+         * 签名
          *
-         * @param ski           cka_id value
-         * @param digest        digest data
-         * @param newMechanism  the alg
-         * @param opts          p11factory
+         * @param ski           索引值，即cka_id值
+         * @param digest        摘要信息
+         * @param newMechanism  签名算法
+         * @param opts          基于PKCS11的工厂
+		 * @return 签名数据
+		 * @throws CspException
          */
         public static byte[] signRSA(byte[] ski, byte[] digest, long newMechanism, IPKCS11FactoryOpts opts) throws CspException{
             try {
+                opts.getPKCS11().C_Login(opts.getSessionhandle(), PKCS11Constants.CKU_USER, opts.getPin());
                 long[] privatekey = findKeypairFromSKI(opts, true, ski);
                 if (privatekey==null || privatekey.length==0)
                 {
@@ -364,14 +371,12 @@ public class RsaImpl {
                 RsaImpl.setLoggerErr(err, CLS_SIGN);
                 throw new CspException(err, ex.getCause());
             }
-
-
         }
     }
 
 
     /**
-     * Use the public key verify signature of the specified SKI
+     * 使用公钥验签
      *
      * @author Ying Xu
      * @date 5/20/18
@@ -385,13 +390,15 @@ public class RsaImpl {
 
 
         /**
-         * verify signature
+         * 验签
          *
-         * @param ski           cka_id value
-         * @param signature     signature data
-         * @param digest        digest data
-         * @param newMechanism  the alg
-         * @param opts          p11factory
+         * @param ski           索引值，即cka_id值
+         * @param signature     签名数据
+         * @param digest        摘要信息
+         * @param newMechanism  签名算法
+         * @param opts          基于PKCS11的工厂
+		 * @return 验签成功
+		 * @throws CspException
          */
         public boolean verifyRSA(byte[] ski, byte[] signature, byte[] digest, long newMechanism, IPKCS11FactoryOpts opts) throws CspException{
 
@@ -422,7 +429,7 @@ public class RsaImpl {
 
 
     /**
-     * Use the key encrypt of the specified SKI
+     * 指定KEY进行加密
      *
      * @author Ying Xu
      * @date 5/20/18
@@ -435,14 +442,15 @@ public class RsaImpl {
         }
 
         /**
-         * encrypt data
+         * 加密
          *
-         * @param ski           cka_id value
-         * @param plaintext     plain data
-         * @param flagpub       public flag
-         * @param mechanism     the alg
-         * @param opts          p11factory
-         * @return ciphertext
+         * @param ski           索引值，即cka_id值
+         * @param plaintext     数据原文
+         * @param flagpub       密钥标识（公钥:true 私钥:false）
+         * @param mechanism     加密算法
+         * @param opts          基于PKCS11的工厂
+         * @return 加密数据
+		 * @throws CspException
          */
         public byte[] encryptRSA(byte[] ski, byte[] plaintext, boolean flagpub, long mechanism, IPKCS11FactoryOpts opts) throws CspException {
             try {
@@ -450,6 +458,7 @@ public class RsaImpl {
                 if (flagpub) {
                     enckey = findKeypairFromSKI(opts, false, ski);
                 }else{
+                    opts.getPKCS11().C_Login(opts.getSessionhandle(), PKCS11Constants.CKU_USER, opts.getPin());
                     enckey = findKeypairFromSKI(opts, true, ski);
                 }
 
@@ -488,7 +497,7 @@ public class RsaImpl {
 
 
     /**
-     * Use the key decrypt of the specified SKI
+     * 指定KEY进行解密
      *
      * @author Ying Xu
      * @date 5/20/18
@@ -499,14 +508,15 @@ public class RsaImpl {
         public DecryptRSAKey() {}
 
         /**
-         * decrypt data
+         * 解密
          *
-         * @param ski           cka_id value
-         * @param ciphertext    cipher data
-         * @param flagpub       public flag
-         * @param mechanism     the alg
-         * @param opts          p11factory
-         * @return plaintext
+         * @param ski           索引值，即cka_id值
+         * @param ciphertext    加密数据
+         * @param flagpub       密钥标识（公钥:true 私钥:false）
+         * @param mechanism     解密算法
+         * @param opts          基于PKCS11的工厂
+         * @return plaintext	原文数据
+		 * @throws CspException
          */
         public static byte[] decryptRSA(byte[] ski, byte[] ciphertext, boolean flagpub, long mechanism, IPKCS11FactoryOpts opts) throws CspException{
             try {
@@ -514,6 +524,7 @@ public class RsaImpl {
                 if (flagpub) {
                     deckey = findKeypairFromSKI(opts, false, ski);
                 }else{
+                    opts.getPKCS11().C_Login(opts.getSessionhandle(), PKCS11Constants.CKU_USER, opts.getPin());
                     deckey = findKeypairFromSKI(opts, true, ski);
                 }
 
@@ -548,11 +559,11 @@ public class RsaImpl {
 
 
     /**
-     * Find the key of the specified SKI
-     * @param opts  p11factory
-     * @param bPri  Privatekey tag
-     * @param ski   cka_id value
-     * @return  key handle
+     * 根据索引值查找指定的KEY
+     * @param opts  基于PKCS11的工厂
+     * @param bPri  密钥标识（私钥：true 公钥: false）
+     * @param ski   索引值，即cka_id值
+     * @return  对象句柄
      * @throws CspException
      */
 
@@ -589,10 +600,10 @@ public class RsaImpl {
 
 
     /**
-     * Get Publickey DER Encoding of ASN.1 Types
+     * 获取ASN.1 格式公钥编码
      * @param n     N
      * @param e     E
-     * @return der encoding value
+     * @return 公钥编码
      * @throws CspException
      */
     private static byte[] getPublicDer(BigInteger n, BigInteger e) throws CspException{
@@ -609,10 +620,10 @@ public class RsaImpl {
 
 
     /**
-     * get rsa public key hash data
+     * 获取公钥hash值
      * @param n     N
      * @param e     E
-     * @return  publickey hash value
+     * @return  公钥hash值
      * @throws CspException
      */
     private static byte[] getPublicHash(BigInteger n, BigInteger e) throws CspException{

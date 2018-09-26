@@ -21,7 +21,7 @@ import static org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant.TAG;
 import org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant;
 
 /**
- * data transfer class
+ * 数据转换类
  *
  * @author Ying Xu
  * @date 5/20/18
@@ -57,8 +57,8 @@ public class DataUtil {
 
 
     /**
-     * Compare ByteArray Consistency
-     * @param  b1   Source byte array
+     * 比较Byte数组是否一致
+     * @param  b1   数组
      * @param  b2   Contrast byte array
      * @return true/false
      */

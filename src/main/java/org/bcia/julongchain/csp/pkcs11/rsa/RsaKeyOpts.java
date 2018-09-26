@@ -19,7 +19,7 @@ package org.bcia.julongchain.csp.pkcs11.rsa;
 import org.bcia.julongchain.csp.intfs.IKey;
 
 /**
- * RSA IKey implements
+ * RSA的IKey
  *
  * @author Ying Xu
  * @date 2018/05/20

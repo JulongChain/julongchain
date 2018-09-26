@@ -37,7 +37,7 @@ import java.util.List;
 import static org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant.*;
 
 /**
- * SM2 Key Impl Class
+ * SM2实现
  *
  *
  * @author Ying Xu
@@ -51,10 +51,10 @@ public class ECImpl {
     GMT0016CspLog csplog = new GMT0016CspLog();
 
     /**
-     * Generate SM2 Keypair
-     * @param sContainerName  Container Name
+     * 生成 SM2 密钥
+     * @param sContainerName  容器名称
      * @param opts  skf factory
-     * @return  IKey's instance
+     * @return  SM2公钥IKey
      * @throws CspException
      */
     public IKey generateECKey(String sContainerName, IGMT0016FactoryOpts opts) throws CspException {
@@ -137,11 +137,11 @@ public class ECImpl {
 
 
     /**
-     * Import encrypt keypair
-     * @param algid             Algorithm id
-     * @param derPublicKey      Publickey's der
-     * @param privateKey        Privatekey
-     * @param sContainerName    Container Name
+     * 导入加密密钥
+     * @param algid             算法
+     * @param derPublicKey      公钥Derxydc
+     * @param privateKey        私钥
+     * @param sContainerName    容器名称
      * @param opts              Skf factory
      * @return IKey's instance
      * @throws CspException
@@ -244,9 +244,9 @@ public class ECImpl {
 
 
     /**
-     * Find and Get the designated sm2 key
-     * @param sContainerName    Container Name
-     * @param bSignFlag         Signatures or encrypted identities
+     * 获取 SM2 密钥
+     * @param sContainerName    容器名称
+     * @param bSignFlag         Key类型标识
      * @param opts              Skf factory
      * @return IKey's instance
      * @throws CspException
@@ -327,11 +327,11 @@ public class ECImpl {
 
     /**
      *
-     * @param msg               Information/(original) text
-     * @param lAlgID            Algorithm id
-     * @param sContainerName    Container Name
-     * @param bSignFlag         Signatures or encrypted identities
-     * @param sPucID            Signer ID
+     * @param msg               消息/原文
+     * @param lAlgID            算法
+     * @param sContainerName    容器名称
+     * @param bSignFlag         密钥类型标识
+     * @param sPucID            签名者ID
      * @param opts              Skf factory
      * @return Z
      * @throws CspException
@@ -392,11 +392,11 @@ public class ECImpl {
 
 
     /**
-     * Sign with SM2
-     * @param digest            summary info
-     * @param sContainerName    Container Name
+     * 使用 SM2 签名
+     * @param digest            摘要信息
+     * @param sContainerName    容器名称
      * @param opts              Skf factory
-     * @return signature value
+     * @return 签名数据
      * @throws CspException
      */
 
@@ -450,10 +450,10 @@ public class ECImpl {
     }
 
     /**
-     * Verify with SM2
-     * @param signature         signature value
-     * @param digest            summary info
-     * @param sContainerName    Container Name
+     * 使用 SM2 验签
+     * @param signature         签名数据
+     * @param digest            摘要信息
+     * @param sContainerName    容器名称
      * @param opts              Skf factory
      * @return success/error
      * @throws CspException
@@ -568,7 +568,7 @@ public class ECImpl {
 
 
     /**
-     * get public key hash data
+     * 获取公钥hash值
      *
      */
     private static byte[] getPublicHash(byte[] attecpoint) throws NoSuchAlgorithmException, Exception {

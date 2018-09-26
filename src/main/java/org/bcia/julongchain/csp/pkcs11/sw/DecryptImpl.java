@@ -35,7 +35,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 /**
- * Class description
+ * 解密实现
  *
  * @author
  * @date 5/25/18
@@ -43,6 +43,9 @@ import java.security.spec.X509EncodedKeySpec;
  */
 public class DecryptImpl {
 
+	/**
+	 * 对称密钥解密
+	 */
     public byte[] decryptData(IKey key, byte[] ciphervalue, String mode, String padding) throws CspException {
         try {
             if(key instanceof SymmetryKey.DESedePriKey)
@@ -106,6 +109,9 @@ public class DecryptImpl {
     }
 
 
+	/**
+	 * 非对称密钥解密
+	 */
     public byte[] decryptData(IKey key, byte[] ciphervalue, String mode, String padding, boolean pubflag) throws CspException {
         try {
             if(key instanceof RsaKeyOpts.RsaPriKey) {
@@ -118,7 +124,7 @@ public class DecryptImpl {
                     // specify mode and padding instead of relying on defaults (use OAEP if available!)
                     String type = String.format("RSA/%s/%s", mode, padding);
                     Cipher encrypt=Cipher.getInstance(type);
-                    // init with the *public key*!
+                    // init with the public key!
                     encrypt.init(Cipher.DECRYPT_MODE, rsakey);
                     // encrypt with known character encoding, you should probably use hybrid cryptography instead
                     byte[] byte_decode = encrypt.doFinal(ciphervalue);
@@ -133,7 +139,7 @@ public class DecryptImpl {
                     // specify mode and padding instead of relying on defaults (use OAEP if available!)
                     String type = String.format("RSA/%s/%s", mode, padding);
                     Cipher encrypt=Cipher.getInstance(type);
-                    // init with the *public key*!
+                    // init with the private key!
                     encrypt.init(Cipher.DECRYPT_MODE, rsakey);
                     // encrypt with known character encoding, you should probably use hybrid cryptography instead
                     byte[] byte_decode = encrypt.doFinal(ciphervalue);
@@ -152,15 +158,18 @@ public class DecryptImpl {
                     // specify mode and padding instead of relying on defaults (use OAEP if available!)
                     String type = String.format("RSA/%s/%s", mode, padding);
                     Cipher encrypt=Cipher.getInstance(type);
-                    // init with the *public key*!
+                    // init with the public key!
                     encrypt.init(Cipher.DECRYPT_MODE, rsakey);
                     // encrypt with known character encoding, you should probably use hybrid cryptography instead
                     byte[] byte_decode = encrypt.doFinal(ciphervalue);
                     return byte_decode;
                 }
+				else{
+					throw new CspException("[JC_PKCS_SOFT]:The Key is not private key type! Error!");
+				}
 
             }
-            return null;
+            throw new CspException("[JC_PKCS_SOFT]:No support key type!");
         }catch(InvalidKeyException ex) {
             ex.printStackTrace();
             String err = String.format("[JC_PKCS_SOFT]:InvalidKeyException ErrMessage: %s", ex.getMessage());

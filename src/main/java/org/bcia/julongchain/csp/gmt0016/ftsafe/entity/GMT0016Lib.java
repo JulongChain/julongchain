@@ -18,7 +18,7 @@ package org.bcia.julongchain.csp.gmt0016.ftsafe.entity;
 import org.bcia.julongchain.common.exception.CspException;
 
 /**
- * HardWare Information
+ * 硬件信息
  *
  * @author Ying Xu
  * @date 7/4/18

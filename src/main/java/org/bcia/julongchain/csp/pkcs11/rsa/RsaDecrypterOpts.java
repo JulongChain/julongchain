@@ -21,7 +21,7 @@ import org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant;
 import sun.security.pkcs11.wrapper.PKCS11Constants;
 
 /**
- * RSA Decrypter Opts
+ * RSA 解密选项
  *
  * @author Ying Xu
  * @date 2018/05/20
@@ -29,7 +29,7 @@ import sun.security.pkcs11.wrapper.PKCS11Constants;
  */
 public enum RsaDecrypterOpts implements IDecrypterOpts {
 
-    oPad_Pub("NoPadding", PKCS11Constants.CKM_RSA_X_509, true, 1),
+    NoPad_Pub("NoPadding", PKCS11Constants.CKM_RSA_X_509, true, 1),
     NoPad_Prv("NoPadding", PKCS11Constants.CKM_RSA_X_509, false, 2),
     OAEP_Pub("OAEPPadding", PKCS11Constants.CKM_RSA_PKCS_OAEP, true, 3),
     OAEP_Prv("OAEPPadding", PKCS11Constants.CKM_RSA_PKCS_OAEP, false, 4),
@@ -45,11 +45,11 @@ public enum RsaDecrypterOpts implements IDecrypterOpts {
 
 
     /**
-     * Opt for decrypt with rsa
-     * @param padding       Decrypter padding type
-     * @param mechanism     Decrypter mechanism
-     * @param flagpub       Key type identification(PublicKey: true, PrivateKey false)
-     * @param index         Index num
+     * RSA解密选项
+     * @param padding       补位方式
+     * @param mechanism     解密算法
+     * @param flagpub       密钥类型(PublicKey: true, PrivateKey: false)
+     * @param index         索引
      */
     private RsaDecrypterOpts(String padding, long mechanism, boolean flagpub, int index) {
         this.mechanism = mechanism;

@@ -28,7 +28,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 
 /**
- * PKCS11 Soft Sign
+ * 基于PKCS11软件实现签名
  *
  * @author Ying Xu
  * @date 5/25/18
@@ -37,12 +37,12 @@ import java.security.spec.PKCS8EncodedKeySpec;
 public class SignImpl {
 
 	/**
-	 * SignData
-	 * @param key		IKey used to sign
-	 * @param degiest	degiest message
-	 * @param alg		alg for sign
-	 * @return	signature value
-	 * @throws JulongChainException
+	 * 签名
+	 * @param key		指定的密钥
+	 * @param degiest	摘要信息
+	 * @param alg		签名算法
+	 * @return	签名数据
+	 * @throws	CspException
 	 */
     public byte[] signData(IKey key, byte[] degiest, String alg) throws CspException {
 

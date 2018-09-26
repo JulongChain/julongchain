@@ -36,7 +36,7 @@ import org.bcia.julongchain.csp.pkcs11.util.PKCS11HashOpts;
 import sun.security.pkcs11.wrapper.PKCS11Exception;
 
 /**
- * Class description
+ * 基于PKCS11的CSP实现
  *
  * @author Ying Xu
  * @date 2018/05/20
@@ -302,14 +302,14 @@ public class PKCS11Csp implements IPKCS11Csp {
         System.arraycopy(ski, 1, byski, 0, ski.length-1);
         
         if(ski[0] == 0x01) {
-            // Find RSA
+            // 查找获取 RSA 类型的IKey
             RsaImpl.GetkeyRSA getrsa = new RsaImpl.GetkeyRSA(byski, PKCS11FactoryOpts);
             key = getrsa.getkey();
         }
 
         if(ski[0] == 0x02)
         {
-            //Find ECDSA
+            // 查找获取 ECDSA 类型的IKey
             EcdsaImpl.GetkeyEcKey getecdsa = new EcdsaImpl.GetkeyEcKey(byski, PKCS11FactoryOpts);
             key = getecdsa.getkey();
         }
@@ -334,7 +334,7 @@ public class PKCS11Csp implements IPKCS11Csp {
         PKCS11Digest p11digest = null;
 
         byte[] value;
-        //byte[] value1;
+        
         if(opts instanceof PKCS11HashOpts.MD2Opts)
         {
             p11digest = new PKCS11Digest(((PKCS11HashOpts.MD2Opts) opts).getMechanism());
@@ -358,12 +358,12 @@ public class PKCS11Csp implements IPKCS11Csp {
         if(opts instanceof PKCS11HashOpts.SHA3_256Opts)
         {
             csplog.setLogMsg("[JC_PKCS]:No Support the Opts with Hardware!", csplog.LEVEL_ERROR, PKCS11Csp.class);
-            return null;
+            throw new CspException("[JC_PKCS]:No Support the Opts with Hardware!");
         }
         if(opts instanceof PKCS11HashOpts.SHA3_384Opts)
         {
             csplog.setLogMsg("[JC_PKCS]:No Support the Opts with Hardware!", csplog.LEVEL_ERROR, PKCS11Csp.class);
-            return null;
+            throw new CspException("[JC_PKCS]:No Support the Opts with Hardware!");
         }
 
         value =  p11digest.getDigest(msg, PKCS11FactoryOpts);
@@ -405,13 +405,13 @@ public class PKCS11Csp implements IPKCS11Csp {
         {
             //Hard No Support
             csplog.setLogMsg("[JC_PKCS]:No Support the Opts with Hardware!", csplog.LEVEL_ERROR, PKCS11Csp.class);
-            return null;
+            throw new CspException("[JC_PKCS]:No Support the Opts with Hardware!");
         }
         if(opts instanceof PKCS11HashOpts.SHA3_384Opts)
         {
         	//Hard No Support
             csplog.setLogMsg("[JC_PKCS]:No Support the Opts with Hardware!", csplog.LEVEL_ERROR, PKCS11Csp.class);
-            return null;
+            throw new CspException("[JC_PKCS]:No Support the Opts with Hardware!");
         }
 
         IHash hash = p11digest.getHash(PKCS11FactoryOpts);

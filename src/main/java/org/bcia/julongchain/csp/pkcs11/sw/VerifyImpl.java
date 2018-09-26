@@ -29,7 +29,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
 /**
- * PKCS11 Soft Verify
+ * 基于PKCS11的验签软实现
  *
  * @author Ying Xu
  * @date 5/25/18
@@ -40,13 +40,13 @@ public class VerifyImpl {
 	PKCS11CspLog csplog = new PKCS11CspLog();
 	
 	/**
-	 * Verify
-	 * @param key			IKey used to verify
-	 * @param degiest		degiest message
-	 * @param signature		signature data
-	 * @param alg			alg of verify
+	 * 验签
+	 * @param key			验签指定密钥
+	 * @param degiest		摘要数据
+	 * @param signature		签名数据
+	 * @param alg			签名算法
 	 * @return	true or false
-	 * @throws JulongChainException
+	 * @throws	CspException
 	 */
     public boolean verifyData(IKey key, byte[] degiest, byte[] signature, String alg) throws CspException {
         try {

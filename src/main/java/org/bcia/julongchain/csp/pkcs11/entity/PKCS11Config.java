@@ -18,7 +18,7 @@ package org.bcia.julongchain.csp.pkcs11.entity;
 import org.bcia.julongchain.common.exception.JulongChainException;
 
 /**
- * Config for PKCS11 (Maybe useful)
+ * PKCS11 配置信息 (Maybe useful)
  *
  * @author Ying Xu
  * @date 4/19/18

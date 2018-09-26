@@ -26,7 +26,7 @@ import sun.security.pkcs11.wrapper.PKCS11Exception;
 import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
 
 /**
- * hard hash impl
+ * 硬Hash实现
  *
  * @author xuying
  * @date 2018/05/21
@@ -64,10 +64,10 @@ public class PKCS11Digest {
     }
 
     /**
-     * Make Digest Method 1
-     * @param msg       Message
-     * @param opts      P11 factory
-     * @return digest value
+     * 计算摘要方法1
+     * @param msg       消息
+     * @param opts      基于PKCS11的Factory
+     * @return 摘要信息
      * @throws CspException
      */
     public byte[] getDigest(byte[] msg, IPKCS11FactoryOpts opts) throws CspException{
@@ -97,10 +97,10 @@ public class PKCS11Digest {
     }
 
     /**
-     * Make Digest Method 2
-     * @param msg       Message
-     * @param opts      P11 factory
-     * @return digest value
+     * 计算摘要方法2
+     * @param msg       消息
+     * @param opts      基于PKCS11的Factory
+     * @return 摘要信息
      * @throws CspException
      */
     public static byte[] getDigestwithUpdate(byte[] msg, IPKCS11FactoryOpts opts) throws CspException{

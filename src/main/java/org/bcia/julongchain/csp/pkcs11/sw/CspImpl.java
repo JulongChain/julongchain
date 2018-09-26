@@ -46,7 +46,7 @@ import sun.security.provider.SecureRandom;
 
 
 /**
- * Class description
+ * 基于PKCS11的CSP软实现
  *
  * @author
  * @date 5/25/18
@@ -141,7 +141,7 @@ public class CspImpl implements ICsp {
              * |[brainpoolP320r1,1.3.36.3.3.2.8.1.1.9]|[brainpoolP384r1,1.3.36.3.3.2.8.1.1.11]
              * |[brainpoolP512r1,1.3.36.3.3.2.8.1.1.13]
              */
-            key = gen.genEcdsaKey("secp256k1");//比特币选用
+            key = gen.genEcdsaKey("secp256k1");
             if(!opts.isEphemeral())
             {
                 gen.savePrivateKeyAsPEM(key.toBytes(), PKCS11SwFactoryOpts.getPath());

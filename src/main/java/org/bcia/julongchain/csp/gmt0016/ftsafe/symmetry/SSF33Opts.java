@@ -21,7 +21,7 @@ import org.bcia.julongchain.csp.intfs.opts.IDecrypterOpts;
 import org.bcia.julongchain.csp.intfs.opts.IEncrypterOpts;
 
 /**
- * SSF33 Opts for generate key and encrypt/decrypt
+ * SSF33 算法相关选项
  *
  * @author Ying Xu
  * @date 7/4/18
