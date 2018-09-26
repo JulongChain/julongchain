@@ -138,7 +138,7 @@ public class VersionedLevelDB implements IVersionedDB {
     }
 
     @Override
-    public void validateKeyValue(String key, byte[] value) throws LedgerException {
+    public void validateKeyValue(String key, Object value) throws LedgerException {
 
     }
 

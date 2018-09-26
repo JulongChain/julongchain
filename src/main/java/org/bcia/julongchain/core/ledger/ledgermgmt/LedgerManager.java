@@ -17,6 +17,9 @@ package org.bcia.julongchain.core.ledger.ledgermgmt;
 
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.LedgerException;
+import org.bcia.julongchain.common.ledger.blkstorage.fsblkstorage.BlockFileStream;
+import org.bcia.julongchain.common.ledger.util.IoUtil;
+import org.bcia.julongchain.common.ledger.util.Utils;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.proto.BlockUtils;
@@ -26,13 +29,18 @@ import org.bcia.julongchain.core.ledger.IStateListener;
 import org.bcia.julongchain.core.ledger.customtx.CustomTx;
 import org.bcia.julongchain.core.ledger.customtx.IProcessor;
 import org.bcia.julongchain.core.ledger.kvledger.KvLedgerProvider;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.rwsetutil.MerkleTree;
+import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.julongchain.core.ledger.sceventmgmt.KVLedgerLSSCStateListener;
 import org.bcia.julongchain.core.ledger.sceventmgmt.ScEventManager;
+import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.common.Common;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 操作Ledger主要类
@@ -60,6 +68,7 @@ public class LedgerManager {
 			log.error(errMsg);
 			throw new LedgerException(errMsg);
 		}
+		Util.checkBlockFiles(LedgerConfig.getChainsPath());
         log.info("Initializing ledger management");
         initialized = true;
         CustomTx.initialize(processors);

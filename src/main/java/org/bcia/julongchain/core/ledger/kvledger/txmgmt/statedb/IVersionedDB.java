@@ -73,7 +73,7 @@ public interface IVersionedDB{
     /**
 	 * 检验K-V
      */
-    void validateKeyValue(String key, byte[] value) throws LedgerException;
+    void validateKeyValue(String key, Object value) throws LedgerException;
 
     /**
 	 * 打开DB

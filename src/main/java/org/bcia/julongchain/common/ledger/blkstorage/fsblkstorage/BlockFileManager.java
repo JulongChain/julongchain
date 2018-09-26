@@ -83,7 +83,6 @@ public class BlockFileManager {
         this.db = indexStore;
 		//检查区块链文件完整性以及是否被篡改
 		// TODO: 9/12/18 consenter中区块与node中不同
-//		checkBlockFiles(rootDir);
         cpInfo = loadCurrentInfo();
         //创建rootdir
         IoUtil.createDirIfMissing(getRootDir());
@@ -129,63 +128,6 @@ public class BlockFileManager {
                     .build();
         }
     }
-
-    public static void checkBlockFiles(String chainsDir) throws LedgerException{
-		try {
-			BlockFileStream stream = new BlockFileStream(chainsDir, 0, 0);
-			byte[] blockBytes = stream.nextBlockBytes();
-			Common.Block preBlock = null;
-			Common.Block currentBlock = blockBytes == null ?
-					null :
-					Common.Block.parseFrom(blockBytes);
-			while (true) {
-				if (blockBytes == null) {
-					log.info("Check block chain files success");
-					break;
-				}
-				//验证preHash和前一区块的header hash
-				if (preBlock != null) {
-					byte[] preHash = Util.getHashBytes(preBlock.getHeader().toByteArray());
-					byte[] preHashInFollowedBlock = currentBlock.getHeader().getPreviousHash().toByteArray();
-					if (!Arrays.equals(preHash, preHashInFollowedBlock)) {
-						String errMsg = "Block" + currentBlock.getHeader().getNumber() + "'s preHash [" +
-								Hex.toHexString(preHashInFollowedBlock) + "] is not the same as Block" +
-								preBlock.getHeader().getNumber() + "'s header hash [" +
-								Hex.toHexString(preHash) + "]";
-						log.error(errMsg);
-						log.error("Check block chain files failed");
-						// TODO: 9/5/18 exit code undefine
-						System.exit(1);
-					}
-				}
-				byte[] dataHash = Util.getHashBytes(currentBlock.getData().toByteArray());
-				byte[] dataHashInHeader = currentBlock.getHeader().getDataHash().toByteArray();
-				//验证data hash和header中的dataHash
-				if (!Arrays.equals(dataHash, dataHashInHeader)) {
-					String errMsg = "Block" + currentBlock.getHeader().getNumber() + "'s data hash in header is [" +
-							Hex.toHexString(dataHashInHeader) + "] which is not same as data's hash [" +
-							Hex.toHexString(dataHash) + "]";
-					log.error(errMsg);
-					log.error("Check block chain files failed");
-					// TODO: 9/5/18 exit code undefine
-					System.exit(2);
-				}
-				blockBytes = stream.nextBlockBytes();
-				if (blockBytes == null) {
-					log.info("Check block chain files success");
-					break;
-				} else {
-					preBlock = currentBlock;
-					currentBlock = Common.Block.parseFrom(blockBytes);
-				}
-			}
-		} catch (InvalidProtocolBufferException e) {
-			log.error(e.getMessage(), e);
-			log.error("Check block chain files failed");
-			// TODO: 9/5/18 exit code undefine
-			System.exit(3);
-		}
-	}
 
     /**
      * 更新检查点信息

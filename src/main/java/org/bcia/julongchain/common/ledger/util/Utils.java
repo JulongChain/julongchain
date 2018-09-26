@@ -44,6 +44,11 @@ import java.util.List;
  * @company Dingxuan
  */
 public class Utils {
+	private static final List<String> EXCLUDE_IMAGE_NAME = new ArrayList<String>(){{
+		add("julongchain/julongchain-baseimage");
+		add("klaemo/couchdb");
+	}};
+
 	public static void main(String[] args) throws Exception {
 		resetEnv();
 	}
@@ -57,7 +62,7 @@ public class Utils {
 		System.out.println(cmd);
 		List<String> result = null;
 		try {
-			Process process = null;
+			Process process;
 			result = new ArrayList<>();
 			process = Runtime.getRuntime().exec(cmd);
 			LineNumberReader reader = new LineNumberReader(new InputStreamReader(process.getInputStream()));

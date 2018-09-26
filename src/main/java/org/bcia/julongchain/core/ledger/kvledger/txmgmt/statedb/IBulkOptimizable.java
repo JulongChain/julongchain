@@ -15,6 +15,7 @@ limitations under the License.
  */
 package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb;
 
+import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.CompositeKey;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
 
@@ -28,7 +29,7 @@ import java.util.List;
  * @company Dingxuan
  */
 public interface IBulkOptimizable {
-    void loadCommittedVersions(List<CompositeKey> keys);
+    void loadCommittedVersions(List<CompositeKey> keys) throws LedgerException;
 
     LedgerHeight getCachedVersion(String ns, String key);
 

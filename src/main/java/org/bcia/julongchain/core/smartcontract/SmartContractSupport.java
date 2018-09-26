@@ -396,7 +396,7 @@ public class SmartContractSupport implements ISCSupport {
 		String canName = scContext.getCanonicalName();
 		SmartContractRTEnv scrte = smartcontractHasBeenLaunched(canName);
 		if (scrte == null) {
-			String errMsg = "Handler nopt found for smartcontract " + canName;
+			String errMsg = "Handler not found for smartcontract " + canName;
 			log.error(errMsg);
 			throw new SmartContractException(errMsg);
 		}

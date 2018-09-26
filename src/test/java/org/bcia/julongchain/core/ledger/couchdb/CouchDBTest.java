@@ -15,7 +15,9 @@
  */
 package org.bcia.julongchain.core.ledger.couchdb;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import org.apache.commons.codec.binary.Base32InputStream;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
@@ -24,10 +26,10 @@ import org.bcia.julongchain.core.node.NodeConfigFactory;
 import org.junit.Test;
 import org.lightcouch.*;
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 /**
  * test couchdb
@@ -48,16 +50,16 @@ public class CouchDBTest {
         CouchDbProperties properties = new CouchDbProperties();
 //        String url = "192.168.1.83";
         String url = "127.0.0.1";
-        int port = 5984;
+        int port = 9000;
         int requestTimeout = 1000;
         int maxConnections = 5;
         String username = "admin";
-        String password = "123456";
+        String password = "Julongchain";
         properties.setDbName("julongchain");
         properties.setHost(url);
         properties.setProtocol("http");
         properties.setPort(port);
-//        properties.setCreateDbIfNotExist(true);
+        properties.setCreateDbIfNotExist(true);
         properties.setUsername(username);
         properties.setPassword(password);
         CouchDbClient dbClient = new CouchDbClient(properties);
@@ -70,9 +72,16 @@ public class CouchDBTest {
      */
     @Test
     public void creatConnectionDBTest() throws Exception{
-        CouchDB couchDB = new CouchDB();
-        CouchDbClient dbClient = couchDB.creatConnectionDB("127.0.0.1", 5984, "admin", "123456", 5, 1000,
-                "julongchain", "http");
+		CouchDB couchDB = new CouchDB();
+		CouchDbClient dbClient = couchDB.createConnectionDB(
+				"127.0.0.1",
+				9000,
+				"admin",
+				"Julongchain",
+				5,
+				1000,
+				"julongchain",
+				"http");
         log.info(dbClient.toString());
     }
 
@@ -120,6 +129,20 @@ public class CouchDBTest {
         couchDB.saveDoc(db, id, null, name, contentType, bytesIn);
     }
 
+	@Test
+	public void updateDocTest() throws Exception {
+		CouchDB couchDB = new CouchDB();
+		CouchDbClient db = creatConnectionDB();
+		String id = 3 + "";
+		Map<String, Object> map = new HashMap<>();
+		map.put("_id", id);
+		map.put("_rev", "1-c3180f22e0bc13d93bbad9469b6c2b64");
+		map.put("args", new String[]{"GetGroupInfo", "myGroup"});
+		map.put("groupID", "myGroup");
+		map.put("scName", "mycc");
+		map.put("update", "update");
+		System.out.println(couchDB.updateDoc(db, map));
+	}
 
     /**
      * 根据id和rev删除文档，id和rev可以拷贝库中数据
@@ -129,9 +152,9 @@ public class CouchDBTest {
     public void DeleteDocTest() throws Exception{
         CouchDbClient db = creatConnectionDB();
         CouchDB couchDB = new CouchDB();
-        String id = "27b8df429dde46d5afe6a88917d08e80";
-        String rev = "1-cbafc0fda20483668d9677c8f2ef65a6";
-        String s = couchDB.deleteDoc(db, id, rev);
+        String id = "3";
+//        String rev = "1-cbafc0fda20483668d9677c8f2ef65a6";
+        String s = couchDB.deleteDoc(db, id, null);
         log.info("test data",s);
     }
 
@@ -157,9 +180,12 @@ public class CouchDBTest {
         CouchDB couchDB = new CouchDB();
         String id = "3";//id可以拷贝库中任意doc的id
         JSONObject object = couchDB.readDoc(db, id);
-        String rev = (String)object.get("_rev");//单独打印rev，测试读取是否成功
-        log.info(object.toString());
-    }
+		JSONObject attachments = object.getJSONObject("_attachments");
+		for (Map.Entry<String, Object> entry : attachments.entrySet()) {
+			System.out.println(entry.getKey());
+			System.out.println(entry.getValue());
+		}
+	}
 
     /**
      * 根据id查询rev,id可以拷贝库中任意doc的id
