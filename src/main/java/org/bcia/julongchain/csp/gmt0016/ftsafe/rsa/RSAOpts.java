@@ -19,7 +19,7 @@ import org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant;
 import org.bcia.julongchain.csp.intfs.opts.IKeyGenOpts;
 
 /**
- * Generate RSA KeyPair Opts
+ * 生成 RSA 密钥选项
  *
  * @author  Ying Xu
  * @date 7/4/18

@@ -36,7 +36,7 @@ import static org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant.TYPE_RS
 import static org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant.TYPE_SM2;
 
 /**
- * The instance of csp interface with skf
+ * 基于GMT0016实现的CSP实现
  *
  * @author Ying Xu
  * @date 7/3/18
@@ -48,7 +48,7 @@ public class GMT0016Csp implements IGMT0016Csp {
     GMT0016CspLog csplog = new GMT0016CspLog();
 
     /**
-     * Initalize gmt0016 factory
+     * 初始cspfactory
      * @param gmt0016FactoryOpts
      */
     GMT0016Csp(IGMT0016FactoryOpts gmt0016FactoryOpts)
@@ -148,7 +148,7 @@ public class GMT0016Csp implements IGMT0016Csp {
     public IKey getKey(byte[] ski) throws CspException {
 
         int type = 0;
-        //analyze ski
+        //解析 ski
         AnalyzeSKI alzSKI = new AnalyzeSKI();
         alzSKI.analyzeSKI(ski);
         String sContainerName = alzSKI.getContainerName();
@@ -178,7 +178,7 @@ public class GMT0016Csp implements IGMT0016Csp {
         {
             GMHashOpts.SM3SignPreOpts sm3opts = (GMHashOpts.SM3SignPreOpts)opts;
             byte[] ski = sm3opts.getSki();
-            //analyze ski
+            //解析 ski
             AnalyzeSKI alzSKI = new AnalyzeSKI();
             alzSKI.analyzeSKI(ski);
             String sContainerName = alzSKI.getContainerName();
@@ -256,7 +256,7 @@ public class GMT0016Csp implements IGMT0016Csp {
     public byte[] sign(IKey key, byte[] digest, ISignerOpts opts) throws CspException {
 
         byte[] ski = key.ski();
-        //analyze ski
+        //解析 ski
         AnalyzeSKI alzSKI = new AnalyzeSKI();
         alzSKI.analyzeSKI(ski);
         String sContainerName = alzSKI.getContainerName();
@@ -285,7 +285,7 @@ public class GMT0016Csp implements IGMT0016Csp {
     public boolean verify(IKey key, byte[] signature, byte[] digest, ISignerOpts opts) throws CspException {
 
         byte[] ski = key.ski();
-        //analyze ski
+        //解析 ski
         AnalyzeSKI alzSKI = new AnalyzeSKI();
         alzSKI.analyzeSKI(ski);
         String sContainerName = alzSKI.getContainerName();

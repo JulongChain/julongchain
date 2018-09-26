@@ -18,7 +18,7 @@ package org.bcia.julongchain.csp.pkcs11.sw;
 import org.bcia.julongchain.csp.factory.IFactoryOpts;
 
 /**
- * Class description
+ * 基于PKCS11软实现factory接口
  *
  * @author
  * @date 5/25/18

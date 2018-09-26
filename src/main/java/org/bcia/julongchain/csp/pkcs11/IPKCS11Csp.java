@@ -20,7 +20,7 @@ import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.csp.intfs.ICsp;
 
 /**
- * interface description
+ * 基于PKCS11实现的CSP接口定义
  *
  * @author Ying Xu
  * @date 2018/05/21

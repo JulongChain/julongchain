@@ -18,7 +18,7 @@ package org.bcia.julongchain.csp.gmt0016.ftsafe.ec;
 import static org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant.*;
 
 /**
- * Signature Class for SM2
+ * 签名结构
  *
  * @author Ying Xu
  * @date 7/4/18

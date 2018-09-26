@@ -18,7 +18,7 @@ package org.bcia.julongchain.csp.gmt0016.ftsafe.symmetry;
 import org.bcia.julongchain.csp.intfs.IKey;
 
 /**
- * Symmetry IKey
+ * 对称密钥 IKey 实现
  *
  * @author Ying Xu
  * @date 7/4/18

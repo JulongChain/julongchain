@@ -22,7 +22,7 @@ import org.bcia.julongchain.csp.gmt0016.ftsafe.IGMT0016FactoryOpts;
 import org.bcia.julongchain.csp.gmt0016.ftsafe.util.BlockCipherParam;
 
 /**
- * Symmetry Key Impl Class
+ * 对称密钥密码提供服务相关实现
  *
  * @author Ying Xu
  * @date 7/4/18
@@ -33,12 +33,12 @@ public class SymmetryImpl {
     GMT0016CspLog csplog = new GMT0016CspLog();
 
     /**
-     *
-     * @param plaintext         Paint text
-     * @param lKeyHandle        SymmetryKey Handle
-     * @param blockCipherParam  BlockCipher for skf
+     * 对称密钥加密
+     * @param plaintext         数据原文
+     * @param lKeyHandle        对称密钥句柄
+     * @param blockCipherParam  BlockCipher 
      * @param opts              Gmt0016 factory
-     * @return  Enciphered data
+     * @return  密文数据
      * @throws CspException
      */
     public byte[] symmetryEncrypt(byte[] plaintext, long lKeyHandle, BlockCipherParam blockCipherParam, IGMT0016FactoryOpts opts) throws CspException {
@@ -63,12 +63,12 @@ public class SymmetryImpl {
     }
 
     /**
-     *
-     * @param ciphertext        Enciphered data
-     * @param lKeyHandle        SymmetryKey Handle
-     * @param blockCipherParam  BlockCipher for skf
+     * 对称密钥解密
+     * @param ciphertext        密文数据
+     * @param lKeyHandle        对称密钥句柄
+     * @param blockCipherParam  BlockCipher 
      * @param opts              Gmt0016 factory
-     * @return  Plaint text
+     * @return  Plaint text 数据原文
      * @throws CspException
      */
     public byte[] symmetryDecrypt(byte[] ciphertext, long lKeyHandle, BlockCipherParam blockCipherParam, IGMT0016FactoryOpts opts) throws CspException {

@@ -72,7 +72,7 @@ import sun.security.util.DerOutputStream;
 import sun.security.util.ECUtil;
 
 /**
- * Class description
+ * 生成、获取KEY实现
  *
  * @author
  * @date 5/25/18

@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Class description
+ * 基于PKCS11工厂实现初始化
  *
  * @author Ying Xu
  * @date 4/19/18
@@ -96,7 +96,7 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
             this.sessionhandle = p11.C_OpenSession(slot,
                     PKCS11Constants.CKF_SERIAL_SESSION|PKCS11Constants.CKF_RW_SESSION, null, null);
             pin = pkcslib.getKeyPin().toCharArray();
-            p11.C_Login(sessionhandle, PKCS11Constants.CKU_USER, pin);
+
 
         }catch (IOException ex){
             String err = String.format("[JC_PKCS]:IOException ErrMessage:", ex.getMessage());
@@ -124,8 +124,14 @@ public class PKCS11FactoryOpts implements IPKCS11FactoryOpts, IPKCS11SwFactoryOp
         }
         catch (PKCS11Exception ex){
             String err = String.format("[JC_PKCS]:PKCS11Exception code: 0x%08x", ex.getErrorCode());
+            csplog.setLogMsg(err, csplog.LEVEL_ERROR, PKCS11FactoryOpts.class);
             throw new CspException(err, ex.getCause());
         }
+    }
+
+    @Override
+    public char[] getPin(){
+        return pin;
     }
 
     @Override

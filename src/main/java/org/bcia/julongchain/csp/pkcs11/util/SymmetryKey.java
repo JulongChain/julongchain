@@ -18,7 +18,7 @@ package org.bcia.julongchain.csp.pkcs11.util;
 import org.bcia.julongchain.csp.intfs.IKey;
 
 /**
- * Class description
+ * 对称密钥IKey
  *
  * @author Ying Xu
  * @date 5/25/18
@@ -30,6 +30,7 @@ public class SymmetryKey {
         private boolean exportable;
         private byte[] ski;
 
+		// DES
         public DESedePriKey(byte[] raw, byte[] ski,  boolean exportable) {
             this.raw = raw;
             this.exportable = exportable;
@@ -70,6 +71,7 @@ public class SymmetryKey {
     }
 
 
+	// AES
     public static class AESPriKey implements IKey{
         private byte[] raw;
         private boolean exportable;

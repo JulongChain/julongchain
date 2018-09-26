@@ -16,7 +16,7 @@
 package org.bcia.julongchain.csp.gmt0016.ftsafe;
 
 /**
- * Constant Class
+ * 常量类
  *
  * @author Ying Xu
  * @date 7/4/18
@@ -28,12 +28,13 @@ public class GMT0016CspConstant {
     public static final long USER_TYPE=1;
 
 
-    //asymmetric algorithm
+    //对称算法
     public static final long SGD_RSA = 0x00010000;
     public static final long SGD_SM2_1 = 0x00020100;
     public static final long SGD_SM2_2 = 0x00020200;
     public static final long SGD_SM2_3 = 0x00020400;
 
+	//
     public static final long SM_BITS = 256;
     public static final long MAX_RSA_MODULUS_LEN = 256;
     public static final long MAX_RSA_EXPONENT_LEN = 4;
@@ -67,11 +68,11 @@ public class GMT0016CspConstant {
 
 
 
-    public static final int TAG_CONTAINER = 0x01; //container
-    public static final int TAG_KEY_CIPHER_DATA = 0x02;
-    public static final int TAG_PUBLICK_KEY_SIGN_FLAG = 0x03;
-    public static final int TAG_PUBLICK_KEY_HASH = 0x04; //hash
-    public static final int TAG_KEY_TYPE = 0x05;
+    public static final int TAG_CONTAINER = 0x01; //容器标识
+    public static final int TAG_KEY_CIPHER_DATA = 0x02; //
+    public static final int TAG_PUBLICK_KEY_SIGN_FLAG = 0x03; //
+    public static final int TAG_PUBLICK_KEY_HASH = 0x04; //公钥hash值
+    public static final int TAG_KEY_TYPE = 0x05; //密钥类型
 
 
     public static final int ALG_RSA = 1;
@@ -88,7 +89,7 @@ public class GMT0016CspConstant {
     public static final byte DER_TAG = 0x04;
 
 
-    // an error will be returned.
+    
     public static final String RSA = "RSA";
     // RSA at 1024 bit security level.
     public static final String RSA1024 = "RSA1024";

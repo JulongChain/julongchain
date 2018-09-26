@@ -25,7 +25,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Class description
+ * 摘要操作
  *
  * @author
  * @date 5/25/18
@@ -50,7 +50,6 @@ public class HashImpl {
             String err = String.format("[JC_PKCS_SOFT]:NoSuchAlgorithmException ErrMessage: %s", ex.getMessage());
             throw new CspException(err, ex.getCause());
         }
-
     }
 
 

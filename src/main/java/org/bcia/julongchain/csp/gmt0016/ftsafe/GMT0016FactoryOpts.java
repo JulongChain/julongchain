@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Class description
+ * 基于GMT0016的Factory实现
  *
  * @author Ying Xu
  * @date 7/3/18

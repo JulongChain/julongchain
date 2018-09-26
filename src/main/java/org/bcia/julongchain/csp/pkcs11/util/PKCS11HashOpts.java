@@ -21,7 +21,7 @@ import org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant;
 import sun.security.pkcs11.wrapper.PKCS11Constants;
 
 /**
- * 类描述
+ * Hash算法选项
  *
  * @author xuying
  * @date 2018/05/21

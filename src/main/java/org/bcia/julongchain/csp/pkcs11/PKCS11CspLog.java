@@ -22,7 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * Class description
+ * 日志格式
  *
  * @author Ying Xu
  * @date 7/18/18

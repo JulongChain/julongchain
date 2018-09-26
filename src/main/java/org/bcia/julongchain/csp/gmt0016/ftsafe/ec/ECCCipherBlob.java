@@ -18,7 +18,7 @@ package org.bcia.julongchain.csp.gmt0016.ftsafe.ec;
 import static org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant.*;
 
 /**
- * CipherBlob Class for SM2
+ * CipherBlob 结构类
  *
  * @author Ying Xu
  * @date 7/4/18
