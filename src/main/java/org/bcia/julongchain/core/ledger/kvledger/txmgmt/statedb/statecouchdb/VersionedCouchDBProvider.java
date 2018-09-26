@@ -18,6 +18,7 @@ package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.statecouchdb;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.core.ledger.couchdb.CouchDB;
 import org.bcia.julongchain.core.ledger.couchdb.CouchDBDefinition;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDB;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.IVersionedDBProvider;
@@ -53,7 +54,9 @@ public class VersionedCouchDBProvider implements IVersionedDBProvider {
 				couchDBDefinition.getUserName(),
 				couchDBDefinition.getPassword()
 
-		);
+		)
+				.setConnectionTimeout(couchDBDefinition.getRequestTimeOut())
+				.setMaxConnections(couchDBDefinition.getMaxRetriesOnStartUp());
 		this.databases = new HashMap<>();
 		this.dbInstance = new CouchDbClient(properties);
 	}
