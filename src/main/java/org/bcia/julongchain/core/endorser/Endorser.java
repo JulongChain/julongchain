@@ -354,7 +354,10 @@ public class Endorser implements IEndorserServer {
             scIdBuilder.setVersion(CommConstant.METADATA_VERSION);
         } else {
             essc = scDefinition.getEndorsement();
+            essc = CommConstant.ESSC;
             scIdBuilder.setVersion(scDefinition.getSmartContractVersion());
+
+            log.info("Essc: " + essc);
         }
 
         // 参数列表:
