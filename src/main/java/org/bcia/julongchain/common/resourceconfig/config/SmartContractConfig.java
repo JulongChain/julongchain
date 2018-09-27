@@ -72,10 +72,11 @@ public class SmartContractConfig implements ISmartContractDefinition {
                 validation = new Validation(this.vssc, this.policy);
             }
 
-            Configtx.ConfigValue endorsementValue = tree.getValuesMap().get
-                    (ResourcesConfigConstant.SMART_CONTRACT_ENDORSEMENT);
+            Configtx.ConfigValue endorsementValue =
+                    tree.getValuesMap().get(ResourcesConfigConstant.SMART_CONTRACT_ENDORSEMENT);
             if (endorsementValue != null) {
-                smartContractEndorsement = ResourcesPackage.SmartContractEndorsement.parseFrom(endorsementValue.getValue());
+                smartContractEndorsement =
+                        ResourcesPackage.SmartContractEndorsement.parseFrom(endorsementValue.getValue());
                 this.essc = smartContractEndorsement.getName();
             }
         }
