@@ -121,7 +121,7 @@ public class EndorserTest extends BaseJunit4Test {
         ISmartContractDefinition smartContractDefinition = new MockSmartContractDefinition();
 
         ProposalResponsePackage.Response esscResponse = endorser.endorseProposal(groupId, txId, signedProposal,
-                proposal, smartContractIDBuilder, response, simulateResults, event, visibility,
+                proposal, smartContractIDBuilder, response, simulateResults, event, visibility, false,
                 smartContractDefinition);
     }
 
