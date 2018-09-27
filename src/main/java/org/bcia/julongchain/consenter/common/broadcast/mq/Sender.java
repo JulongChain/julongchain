@@ -22,12 +22,14 @@ import org.apache.activemq.command.ActiveMQObjectMessage;
 import javax.jms.*;
 
 /**
+ * mq发送者
+ *
  * @author zhangmingyang
  * @Date: 2018/3/13
  * @company Dingxuan
  */
 public class Sender {
-    public static  void sendMessage(byte[] data){
+    public static void sendMessage(byte[] data) {
         ConnectionFactory connectionFactory;
         Connection connection = null;
         Session session;

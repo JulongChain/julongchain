@@ -53,76 +53,77 @@ public class BroadcastHandler implements IBroadcastHandler {
     }
 
     @Override
-    public synchronized void handle(Common.Envelope envelope, StreamObserver<Ab.BroadcastResponse> responseObserver) throws ConsenterException {
-        if (ConsenterConstants.SINGLETON.equals(GenesisConfigFactory.getGenesisConfig().getConsenter().getConsenterType())) {
-            Common.GroupHeader groupHeader = null;
-            ChainSupport chainSupport = null;
-            boolean isConfig = false;
-            String remoteAddr = ConsenterServer.serverCallCapture.get().getAttributes()
-                    .get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR).toString();
-            try {
-                Map<String, Object> map = sm.broadcastGroupSupport(envelope);
-                groupHeader = (Common.GroupHeader) map.get(ConsenterConstants.GROUPHEADER);
-                isConfig = (boolean) map.get(ConsenterConstants.ISCONFIG);
-                chainSupport = (ChainSupport) map.get(ConsenterConstants.CHAINSUPPORT);
-            } catch (InvalidProtocolBufferException e) {
-                responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatus(Common.Status.INTERNAL_SERVER_ERROR).build());
-                responseObserver.onCompleted();
-            }
-            try {
-                chainSupport.getChain().waitReady();
-            } catch (ConsenterException e) {
-                log.warn(String.format("[group: %s] Rejecting broadcast of message from %s with SERVICE_UNAVAILABLE: rejected by Consenter: %s", groupHeader.getGroupId(), remoteAddr, e.getMessage()));
-                responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatus(Common.Status.SERVICE_UNAVAILABLE).build());
-                responseObserver.onCompleted();
-            }
-            if (!isConfig) {
-                //普通消息
-                log.debug(String.format("[group: %s] Broadcast is processing normal message from %s with txid '%s' of type %s", groupHeader.getGroupId(), remoteAddr, groupHeader.getTxId(), groupHeader.getType()));
-                long configSeq = 0;
+    public void handle(Common.Envelope envelope, StreamObserver<Ab.BroadcastResponse> responseObserver) throws ConsenterException {
+        synchronized (BroadcastHandler.class) {
+            if (ConsenterConstants.SINGLETON.equals(GenesisConfigFactory.getGenesisConfig().getConsenter().getConsenterType())) {
+                Common.GroupHeader groupHeader = null;
+                ChainSupport chainSupport = null;
+                boolean isConfig = false;
+                String remoteAddr = ConsenterServer.serverCallCapture.get().getAttributes()
+                        .get(Grpc.TRANSPORT_ATTR_REMOTE_ADDR).toString();
+                if(envelope.toByteArray().length==0){
+                    throw new ConsenterException("Envelop Message length is:"+envelope.toByteArray().length);
+                }
                 try {
-                    configSeq = chainSupport.getProcessor().processNormalMsg(envelope);
+                    Map<String, Object> map = sm.broadcastGroupSupport(envelope);
+                    groupHeader = (Common.GroupHeader) map.get(ConsenterConstants.GROUPHEADER);
+                    isConfig = (boolean) map.get(ConsenterConstants.ISCONFIG);
+                    chainSupport = (ChainSupport) map.get(ConsenterConstants.CHAINSUPPORT);
                 } catch (InvalidProtocolBufferException e) {
-                     log.warn(String.format("[channel: %s] Rejecting broadcast of normal message from %s because of error: %s", groupHeader.getGroupId(),remoteAddr,e.getMessage()));
-                    responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setInfo(e.getMessage()).build());
+                    responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatus(Common.Status.INTERNAL_SERVER_ERROR).build());
                     responseObserver.onCompleted();
                 }
-                Singleton singleton = null;
-                singleton = Singleton.getInstance(chainSupport);
-                NormalMessage normalMessage=new NormalMessage(configSeq,envelope);
-
                 try {
-                    singleton.pushToQueue(normalMessage);
-                } catch (ValidateException e) {
+                    chainSupport.getChain().waitReady();
+                } catch (ConsenterException e) {
+                    log.warn(String.format("[group: %s] Rejecting broadcast of message from %s with SERVICE_UNAVAILABLE: rejected by Consenter: %s", groupHeader.getGroupId(), remoteAddr, e.getMessage()));
                     responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatus(Common.Status.SERVICE_UNAVAILABLE).build());
                     responseObserver.onCompleted();
                 }
-                responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatus(Common.Status.SUCCESS).build());
-                responseObserver.onCompleted();
-            } else {
-                //配置消息
-                ConfigMsg configMsg = null;
-                try {
-                    log.info(String.format("[group: %s] Broadcast is processing config update message from %s", groupHeader.getGroupId(), remoteAddr));
-                    configMsg = chainSupport.getProcessor().processConfigUpdateMsg(envelope);
-                } catch (ConsenterException e) {
-                    log.warn(String.format("[group: %s] Rejecting broadcast of config message from %s because of error: %s", groupHeader.getGroupId(), remoteAddr, e.getMessage()));
-                }
-                Singleton singleton = null;
-                singleton = Singleton.getInstance(chainSupport);
-                ConfigMessage configMessage=new ConfigMessage(configMsg.getConfigSeq(),configMsg.getConfig());
-                try {
-                    singleton.pushToQueue(configMessage);
+                if (!isConfig) {
+                    //普通消息
+                    log.debug(String.format("[group: %s] Broadcast is processing normal message from %s with txid '%s' of type %s", groupHeader.getGroupId(), remoteAddr, groupHeader.getTxId(), groupHeader.getType()));
+                    long configSeq = 0;
+                    try {
+                        configSeq = chainSupport.getProcessor().processNormalMsg(envelope);
+                    } catch (InvalidProtocolBufferException e) {
+                        log.warn(String.format("[channel: %s] Rejecting broadcast of normal message from %s because of error: %s", groupHeader.getGroupId(), remoteAddr, e.getMessage()));
+                        responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setInfo(e.getMessage()).build());
+                        responseObserver.onCompleted();
+                    }
+                    Singleton singleton = null;
+                    singleton = Singleton.getInstance(chainSupport);
+                    NormalMessage normalMessage = new NormalMessage(configSeq, envelope);
 
-                } catch (ValidateException e) {
-                    throw new ConsenterException(e.getMessage());
+                    try {
+                        singleton.pushToQueue(normalMessage);
+                    } catch (ValidateException e) {
+                        responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatus(Common.Status.SERVICE_UNAVAILABLE).build());
+                        responseObserver.onCompleted();
+                    }
+                    responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatus(Common.Status.SUCCESS).build());
+                    responseObserver.onCompleted();
+                } else {
+                    //配置消息
+                    ConfigMsg configMsg = null;
+                    try {
+                        log.info(String.format("[group: %s] Broadcast is processing config update message from %s", groupHeader.getGroupId(), remoteAddr));
+                        configMsg = chainSupport.getProcessor().processConfigUpdateMsg(envelope);
+                    } catch (ConsenterException e) {
+                        log.warn(String.format("[group: %s] Rejecting broadcast of config message from %s because of error: %s", groupHeader.getGroupId(), remoteAddr, e.getMessage()));
+                    }
+                    Singleton singleton = null;
+                    singleton = Singleton.getInstance(chainSupport);
+                    ConfigMessage configMessage = new ConfigMessage(configMsg.getConfigSeq(), configMsg.getConfig());
+                    try {
+                        singleton.pushToQueue(configMessage);
+
+                    } catch (ValidateException e) {
+                        throw new ConsenterException(e.getMessage());
+                    }
+                    responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatus(Common.Status.SUCCESS).build());
                 }
-                responseObserver.onNext(Ab.BroadcastResponse.newBuilder().setStatus(Common.Status.SUCCESS).build());
             }
-
-
-        } else {
-
         }
     }
 }

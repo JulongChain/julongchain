@@ -16,7 +16,8 @@
 package org.bcia.julongchain.core.deliverservice.blocksprovider;
 
 /**
- * 暂时定义gossip中的接口
+ * 消息解密服务接口
+ *
  * @author zhangmingyang
  * @Date: 2018/5/31
  * @company Dingxuan

@@ -59,6 +59,6 @@ public interface IConsenterSupport {
      * @throws ValidateException
      * @throws PolicyException
      */
-    void writeConfigBlock(Common.Block block, byte[] encodedMetadataValue) throws InvalidProtocolBufferException, LedgerException, ValidateException, PolicyException;
+    void writeConfigBlock(Common.Block block, byte[] encodedMetadataValue) throws ConsenterException;
 
 }

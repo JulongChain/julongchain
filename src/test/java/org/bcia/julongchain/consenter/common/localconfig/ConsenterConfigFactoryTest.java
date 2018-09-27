@@ -5,7 +5,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * 类描述
+ * consenter配置工厂测试
  *
  * @author zhangmingyang
  * @date 2018/08/26

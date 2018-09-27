@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.consenter.common.bootstrap.file;
 
+import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.common.util.FileUtils;
 import org.bcia.julongchain.consenter.common.bootstrap.IHelper;
 import org.bcia.julongchain.protos.common.Common;
@@ -36,13 +37,13 @@ public class BootStrapHelper implements IHelper {
     }
 
     @Override
-    public Common.Block getGenesisBlock() {
+    public Common.Block getGenesisBlock() throws ConsenterException {
         Common.Block gensisBlock = null;
         try {
             byte[] bootstrapFile = FileUtils.readFileBytes(genesisBlockFile);
             gensisBlock = Common.Block.parseFrom(bootstrapFile);
         } catch (IOException e) {
-            e.printStackTrace();
+           throw new ConsenterException(e);
         }
         return gensisBlock;
     }

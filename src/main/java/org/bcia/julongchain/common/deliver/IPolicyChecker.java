@@ -18,10 +18,12 @@ package org.bcia.julongchain.common.deliver;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
+ * 策略检查接口
+ *
  * @author zhangmingyang
  * @Date: 2018/5/29
  * @company Dingxuan
  */
 public interface IPolicyChecker {
-    void checkPolicy(Common.Envelope envelope,String groupId);
+    void checkPolicy(Common.Envelope envelope, String groupId);
 }

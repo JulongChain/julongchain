@@ -19,7 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * LRU cache
+ * LRU 缓存调度
  *
  * @author zhangmingyang
  * @date 2018/07/16

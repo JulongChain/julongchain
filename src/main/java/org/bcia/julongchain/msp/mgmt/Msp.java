@@ -80,7 +80,7 @@ public class Msp implements IMsp {
     private String name;
     private ICsp csp;
     private VerifyOptions verifyOptions;
-    private CertificateList CRL[];
+    private CertificateList[] certRevokList;
     private Map<String, byte[][]> ouIdentifiers = new HashMap<>();
     private MspConfigPackage.JuLongCryptoConfig juLongCryptoConfig;
     private boolean ouEnforcement;
@@ -758,8 +758,8 @@ public class Msp implements IMsp {
         return verifyOptions;
     }
 
-    public CertificateList[] getCRL() {
-        return CRL;
+    public CertificateList[] getCertRevokList() {
+        return certRevokList;
     }
 
     public Map<String, byte[][]> getOuIdentifiers() {
@@ -834,8 +834,8 @@ public class Msp implements IMsp {
         this.verifyOptions = verifyOptions;
     }
 
-    public void setCRL(CertificateList[] CRL) {
-        this.CRL = CRL;
+    public void setCertRevokList(CertificateList[] certRevokList) {
+        this.certRevokList = certRevokList;
     }
 
     public void setOuIdentifiers(Map<String, byte[][]> ouIdentifiers) {

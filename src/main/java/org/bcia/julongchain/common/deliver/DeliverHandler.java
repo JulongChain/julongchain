@@ -23,6 +23,7 @@ import org.bcia.julongchain.common.ledger.blockledger.IIterator;
 import org.bcia.julongchain.common.ledger.blockledger.file.FileLedgerIterator;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.consenter.Consenter;
 import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
 import org.bcia.julongchain.consenter.util.CommonUtils;
 import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.QueryResult;
@@ -33,6 +34,8 @@ import java.util.Date;
 import java.util.Map;
 
 /**
+ * Deliver服务处理
+ *
  * @author zhangmingyang
  * @Date: 2018/5/29
  * @company Dingxuan
@@ -55,15 +58,15 @@ public class DeliverHandler implements IDeliverHandler {
     }
 
     @Override
-    public void handle(DeliverServer server) throws ValidateException, InvalidProtocolBufferException, LedgerException {
+    public void handle(DeliverServer server) throws ConsenterException {
         try {
-            delivrBlocks(server, server.getEnvelope());
+            deliverBlocks(server, server.getEnvelope());
         } catch (ConsenterException e) {
-            e.printStackTrace();
+            throw new ConsenterException(e);
         }
     }
 
-    public void delivrBlocks(DeliverServer server, Common.Envelope envelope) throws ConsenterException, ValidateException, LedgerException, InvalidProtocolBufferException {
+    public void deliverBlocks(DeliverServer server, Common.Envelope envelope) throws ConsenterException {
         Common.Payload payload = null;
         try {
             payload = CommonUtils.unmarshalPayload(envelope.getPayload().toByteArray());
@@ -75,7 +78,7 @@ public class DeliverHandler implements IDeliverHandler {
             try {
                 log.warn(String.format("Malformed envelope received bad header"));
                 sendStatusReply(server, Common.Status.BAD_REQUEST);
-            } catch (InvalidProtocolBufferException e) {
+            } catch (ConsenterException e) {
                 log.error(e.getMessage());
             }
         }
@@ -83,7 +86,7 @@ public class DeliverHandler implements IDeliverHandler {
         if (chdr == null) {
             try {
                 sendStatusReply(server, Common.Status.BAD_REQUEST);
-            } catch (InvalidProtocolBufferException e) {
+            } catch (ConsenterException e) {
                 log.error(e.getMessage());
             }
         }
@@ -98,7 +101,7 @@ public class DeliverHandler implements IDeliverHandler {
             log.debug(String.format("Rejecting deliver group %s not found", chdr.getGroupId()));
             try {
                 sendStatusReply(server, Common.Status.NOT_FOUND);
-            } catch (InvalidProtocolBufferException e) {
+            } catch (ConsenterException e) {
                 log.error(e.getMessage());
             }
         }
@@ -123,14 +126,19 @@ public class DeliverHandler implements IDeliverHandler {
         } catch (InvalidProtocolBufferException e) {
             log.error(e.getMessage(), e);
             sendStatusReply(server, Common.Status.BAD_REQUEST);
-            throw new InvalidProtocolBufferException(e);
+            throw new ConsenterException(e);
         }
 
         if (seekInfo.getStart() == null || seekInfo.getStop() == null) {
             sendStatusReply(server, Common.Status.BAD_REQUEST);
         }
 
-        IIterator cursor = chain.getLedgerResources().getReadWriteBase().iterator(seekInfo.getStart());
+        IIterator cursor = null;
+        try {
+            cursor = chain.getLedgerResources().getReadWriteBase().iterator(seekInfo.getStart());
+        } catch (LedgerException e) {
+            e.printStackTrace();
+        }
         if (cursor instanceof FileLedgerIterator) {
             FileLedgerIterator fileLedgerIterator = (FileLedgerIterator) cursor;
             long number = fileLedgerIterator.getBlockNum();
@@ -141,7 +149,11 @@ public class DeliverHandler implements IDeliverHandler {
                     stopNumber = number;
                     break;
                 case NEWEST:
-                    stopNumber = chain.getLedgerResources().getReadWriteBase().height() - 1;
+                    try {
+                        stopNumber = chain.getLedgerResources().getReadWriteBase().height() - 1;
+                    } catch (LedgerException e) {
+                        throw new ConsenterException(e);
+                    }
                     break;
                 case SPECIFIED:
                     stopNumber = stop.getNumber();
@@ -149,17 +161,25 @@ public class DeliverHandler implements IDeliverHandler {
                         log.warn(String.format("[group: %s] Received invalid seekInfo message from %s: start number %d greater than stop number %d", chdr.getGroupId(), number, stopNumber));
                         sendStatusReply(server, Common.Status.BAD_REQUEST);
                     }
-                    default:
+                default:
             }
             {
                 if (seekInfo.getBehavior() == Ab.SeekInfo.SeekBehavior.FAIL_IF_NOT_READY) {
-                    if (number > chain.getLedgerResources().getReadWriteBase().height() - 1) {
-                        sendStatusReply(server, Common.Status.NOT_FOUND);
+                    try {
+                        if (number > chain.getLedgerResources().getReadWriteBase().height() - 1) {
+                            sendStatusReply(server, Common.Status.NOT_FOUND);
+                        }
+                    } catch (LedgerException e) {
+                        throw new ConsenterException(e);
                     }
                 }
                 QueryResult queryResult = nextBlock(cursor);
-                Map.Entry<QueryResult, Common.Status> block= (Map.Entry<QueryResult, Common.Status>) queryResult.getObj();
-                cursor.close();
+                Map.Entry<QueryResult, Common.Status> block = (Map.Entry<QueryResult, Common.Status>) queryResult.getObj();
+                try {
+                    cursor.close();
+                } catch (LedgerException e) {
+                    e.printStackTrace();
+                }
                 Common.Block blockData = (Common.Block) block.getKey().getObj();
                 Common.Status status = block.getValue();
                 blockData.getHeader().getNumber();
@@ -176,33 +196,27 @@ public class DeliverHandler implements IDeliverHandler {
 //                }
                 log.debug(String.format("[group: %s] Delivering block for %s", chdr.getGroupId(), seekInfo));
                 try {
-                   // ProtoUtils.printMessageJson(blockData);
-                   // GossipServiceUtil.addData(StartCmd.getGossipService(),chdr.getGroupId(),blockData.getHeader().getNumber(),blockData.toString());
                     sendBlockReply(server, blockData);
-                } catch (InvalidProtocolBufferException e) {
+                } catch (ConsenterException e) {
                     log.error(e.getMessage());
                 }
-//                catch (GossipException e) {
-//                    e.printStackTrace();
-//                }
                 if (stopNumber == blockData.getHeader().getNumber()) {
                     return;
                 }
             }
-//            try {
-//                sendStatusReply(server, Common.Status.SUCCESS);
-//            } catch (InvalidProtocolBufferException e) {
-//                log.error(e.getMessage());
-//            }
         }
 
 
     }
 
 
-    public QueryResult nextBlock(IIterator cursor) throws LedgerException {
+    public QueryResult nextBlock(IIterator cursor) throws ConsenterException {
         // FIXME: 2018/5/31
-        return cursor.next();
+        try {
+            return cursor.next();
+        } catch (LedgerException e) {
+            throw new ConsenterException(e);
+        }
     }
 
     public void validateGroupHeader(DeliverServer server, Common.GroupHeader chdr) throws ConsenterException, ValidateException {
@@ -220,11 +234,11 @@ public class DeliverHandler implements IDeliverHandler {
 
     }
 
-    public void sendStatusReply(DeliverServer srv, Common.Status status) throws InvalidProtocolBufferException {
+    public void sendStatusReply(DeliverServer srv, Common.Status status) throws ConsenterException {
         srv.send(new DeliverHandlerSupport().createStatusReply(status));
     }
 
-    public void sendBlockReply(DeliverServer srv, Common.Block block) throws InvalidProtocolBufferException {
+    public void sendBlockReply(DeliverServer srv, Common.Block block) throws ConsenterException {
         log.info("Send the block");
         srv.send(new DeliverHandlerSupport().createBlockReply(block));
     }

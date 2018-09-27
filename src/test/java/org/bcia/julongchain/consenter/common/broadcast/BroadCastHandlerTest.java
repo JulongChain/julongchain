@@ -1,7 +1,10 @@
 package org.bcia.julongchain.consenter.common.broadcast;
 
 import org.apache.commons.cli.ParseException;
+import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.common.exception.NodeException;
+import org.bcia.julongchain.consenter.Consenter;
+import org.bcia.julongchain.consenter.common.server.ConsenterServer;
 import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.node.cmd.INodeCmd;
 import org.bcia.julongchain.node.cmd.group.GroupCreateCmd;
@@ -15,13 +18,18 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * 类描述
+ * 消息处理测试类
  *
  * @author zhangmingyang
  * @date 2018/07/03
  * @company Dingxuan
  */
 public class BroadCastHandlerTest {
+
+    @Test
+    public void setup(){
+
+    }
 
     @Test
     public void processConfigMessage() throws NodeException {

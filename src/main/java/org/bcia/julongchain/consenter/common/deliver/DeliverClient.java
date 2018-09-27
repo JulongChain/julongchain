@@ -36,7 +36,7 @@ public class DeliverClient {
         StreamObserver<Common.Envelope> envelopeStreamObserver=stub.deliver(new StreamObserver<Ab.DeliverResponse>() {
             @Override
             public void onNext(Ab.DeliverResponse deliverResponse) {
-                if(deliverResponse.getStatusValue()==200){
+                if(deliverResponse.getStatus()==Common.Status.SUCCESS){
                     log.info("success");
                 }
             }
@@ -48,14 +48,13 @@ public class DeliverClient {
 
             @Override
             public void onCompleted() {
-                System.out.println("onCompled!");
+                log.info("onCompled!");
             }
         });
-            //客户端以流式的形式向服务器发送数据
-           // envelopeStreamObserver.onNext(Common.Envelope.newBuilder().setPayload(ByteString.copyFrom(message.getBytes())).build());
+        //客户端以流式的形式向服务器发送数据
+        // envelopeStreamObserver.onNext(Common.Envelope.newBuilder().setPayload(ByteString.copyFrom(message.getBytes())).build());
         ILocalSigner localSigner = new LocalSigner();
-        Common.GroupHeader  data = EnvelopeHelper.buildGroupHeader(Common.HeaderType.CONFIG_UPDATE_VALUE, 0,
-                "myGroup", 30);
+        Common.GroupHeader  data = EnvelopeHelper.buildGroupHeader(Common.HeaderType.CONFIG_UPDATE_VALUE, 0,"myGroup", 30);
         Common.Payload payload = EnvelopeHelper.buildPayload(Common.HeaderType.CONFIG_UPDATE_VALUE, 0, "myGroup", localSigner, data, 30);
         envelopeStreamObserver.onNext(Common.Envelope.newBuilder().setPayload(payload.toByteString()).build());
         try {

@@ -18,7 +18,7 @@ package org.bcia.julongchain.csp.gm.dxct;
 import org.bcia.julongchain.csp.intfs.opts.IRngOpts;
 
 /**
- * 类描述
+ * 随机数选项
  *
  * @author sunianle
  * @date 3/27/18

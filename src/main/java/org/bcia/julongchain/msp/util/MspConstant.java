@@ -16,16 +16,16 @@
 package org.bcia.julongchain.msp.util;
 
 /**
- * 类描述
+ * msp常量
  *
  * @author zhangmingyang
  * @date 2018/07/05
  * @company Dingxuan
  */
 public class MspConstant {
-    public final static String IDENTITY="identity";
-    public final static String PUBLIC_KEY="publickey";
-    public final static  String CERT="certificate";
-    public final static  String OUIDENTIFIER="organizationalUnitIdentifier";
+    public final static String IDENTITY = "identity";
+    public final static String PUBLIC_KEY = "publickey";
+    public final static String CERT = "certificate";
+    public final static String OUIDENTIFIER = "organizationalUnitIdentifier";
     public final static String ORGANIZATION_UNIT = "OU";
 }

@@ -26,6 +26,8 @@ import java.security.cert.X509Certificate;
 import java.util.Date;
 
 /**
+ * 逾期函数,根据身份获取证书过期时间
+ *
  * @author zhangmingyang
  * @Date: 2018/5/17
  * @company Dingxuan
@@ -33,30 +35,18 @@ import java.util.Date;
 public class Expiration implements IExpiresAtFunc {
     public Expiration() {
     }
+
     @Override
     public Date expiresAt(byte[] identityBytes) {
-        //TODO 之后修改证书解析方式
-//        Certificate certificate = null;
-//        try {
-//            certificate = Certificate.getInstance(new PemReader(new InputStreamReader(new ByteArrayInputStream(identityBytes)))
-//                    .readPemObject().getContent());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        if (certificate==null){
-//            return null;
-//        }
-//
-//        certificate.getEndDate();
         X509Certificate certificate = null;
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            InputStream stream= new ByteArrayInputStream(identityBytes);
-            certificate = (X509Certificate) cf .generateCertificate(stream);
+            InputStream stream = new ByteArrayInputStream(identityBytes);
+            certificate = (X509Certificate) cf.generateCertificate(stream);
         } catch (CertificateException e) {
             e.printStackTrace();
         }
-        if (certificate==null){
+        if (certificate == null) {
             return null;
         }
         return certificate.getNotBefore();

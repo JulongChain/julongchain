@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.consenter.common.bootstrap;
 
+import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
@@ -30,5 +31,5 @@ public interface IHelper {
      *
      * @return
      */
-    Common.Block getGenesisBlock();
+    Common.Block getGenesisBlock() throws ConsenterException;
 }

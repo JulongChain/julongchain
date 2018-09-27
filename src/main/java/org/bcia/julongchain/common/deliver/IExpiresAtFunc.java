@@ -18,10 +18,12 @@ package org.bcia.julongchain.common.deliver;
 import java.util.Date;
 
 /**
+ * 身份过期接口
+ *
  * @author zhangmingyang
  * @Date: 2018/5/30
  * @company Dingxuan
  */
 public interface IExpiresAtFunc {
-   Date expiresAt(byte[] identityBytes);
+    Date expiresAt(byte[] identityBytes);
 }
