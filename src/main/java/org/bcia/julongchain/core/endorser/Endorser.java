@@ -126,8 +126,8 @@ public class Endorser implements IEndorserServer {
                             .getTxId(), signedProposal, proposal, scIdBuilder, response, txReadWriteSetBytes,
                     scEvent, extension.getPayloadVisibility().toByteArray(), isSysSC, scDefinition);
 
-            return ProposalResponseUtils.buildProposalResponse(endorseResponse.getStatus(), response.getPayload(),
-                    response.getMessage());
+            return ProposalResponseUtils.buildProposalResponse(endorseResponse.getStatus(), endorseResponse.getPayload(),
+                    endorseResponse.getMessage());
 
 //            SmartContractShim.SmartContractMessage smartContractMessage = TransactionRunningUtil.getTxMessage(scName, groupHeader.getTxId());
 //            TransactionRunningUtil.clearMap(scName, groupHeader.getTxId());
