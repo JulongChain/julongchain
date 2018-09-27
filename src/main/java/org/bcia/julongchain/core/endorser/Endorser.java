@@ -91,9 +91,11 @@ public class Endorser implements IEndorserServer {
         Common.GroupHeader groupHeader = (Common.GroupHeader) objs[1];
         ProposalPackage.SmartContractHeaderExtension extension = (ProposalPackage.SmartContractHeaderExtension) objs[2];
 
-        SmartContractPackage.SmartContractID.Builder scIdBuilder = SmartContractPackage.SmartContractID.newBuilder(extension
-                .getSmartContractId());
+        SmartContractPackage.SmartContractID.Builder scIdBuilder = SmartContractPackage.SmartContractID.newBuilder
+                (extension.getSmartContractId());
         String scName = scIdBuilder.getName();
+
+        boolean isSysSC = endorserSupport.isSysSmartContract(scName);
 
         //2、开始模拟提案
         Object[] simulateObjs = simulateProposal(groupHeader.getGroupId(), scName, groupHeader.getTxId(),
@@ -111,12 +113,7 @@ public class Endorser implements IEndorserServer {
             return buildErrorResponse("SimulateProposal fail");
         }
 
-        //无合约提案不需要背书，例如cssc
-//        simulateResults = new byte[]{0, 1, 2};//TODO:for test 使得测试通过
-//        if (txReadWriteSetBytes == null || txReadWriteSetBytes.length <= 0) {
-//            txReadWriteSetBytes = new byte[]{0, 1, 2};
-//        }
-
+        //对所有的结果都背书可以确保处理消息的完整性，但为了性能折中，不需要Consenter节点参与的消息，不强求背书
         if (StringUtils.isBlank(scName) || CommConstant.CSSC.equals(scName) || CommConstant.QSSC.equals(scName)) {
             if (!response.getPayload().isEmpty()) {
                 return ProposalResponseUtils.buildProposalResponse(response.getPayload(), response.getMessage());
@@ -126,33 +123,23 @@ public class Endorser implements IEndorserServer {
         } else {
             //3、背书提案
             ProposalResponsePackage.Response endorseResponse = endorseProposal(groupHeader.getGroupId(), groupHeader
-                            .getTxId(), signedProposal, proposal, scIdBuilder,
-                    response, txReadWriteSetBytes, scEvent, extension.getPayloadVisibility().toByteArray(), scDefinition);
+                            .getTxId(), signedProposal, proposal, scIdBuilder, response, txReadWriteSetBytes,
+                    scEvent, extension.getPayloadVisibility().toByteArray(), isSysSC, scDefinition);
 
+            return ProposalResponseUtils.buildProposalResponse(endorseResponse.getStatus(), endorseResponse
+                    .getPayload(), endorseResponse.getMessage());
 
-            ProposalResponsePackage.ProposalResponse proposalResponse = null;
-
-            ProposalResponsePayloadVO proposalResponsePayloadVO = new ProposalResponsePayloadVO();
-            try {
-                proposalResponse = ProposalResponsePackage.ProposalResponse.parseFrom(endorseResponse.getPayload());
-                proposalResponsePayloadVO.parseFrom(ProposalResponsePackage.ProposalResponsePayload.parseFrom(proposalResponse.getPayload()));
-            } catch (InvalidProtocolBufferException e) {
-                e.printStackTrace();
-            } catch (ValidateException e) {
-                e.printStackTrace();
-            }
-
-            SmartContractShim.SmartContractMessage smartContractMessage = TransactionRunningUtil.getTxMessage(scName, groupHeader.getTxId());
-            TransactionRunningUtil.clearMap(scName, groupHeader.getTxId());
-            ProposalResponsePackage.Response smartContractResponse = null;
-            try {
-                smartContractResponse = ProposalResponsePackage.Response.parseFrom(smartContractMessage.getPayload());
-            } catch (InvalidProtocolBufferException e) {
-                log.error(e.getMessage(), e);
-            }
-
-            return ProposalResponseUtils.buildProposalResponse(proposalResponse.getPayload() != null ?
-                    proposalResponse.getPayload() : smartContractResponse.getPayload(), smartContractResponse.getMessage());
+//            SmartContractShim.SmartContractMessage smartContractMessage = TransactionRunningUtil.getTxMessage(scName, groupHeader.getTxId());
+//            TransactionRunningUtil.clearMap(scName, groupHeader.getTxId());
+//            ProposalResponsePackage.Response smartContractResponse = null;
+//            try {
+//                smartContractResponse = ProposalResponsePackage.Response.parseFrom(smartContractMessage.getPayload());
+//            } catch (InvalidProtocolBufferException e) {
+//                log.error(e.getMessage(), e);
+//            }
+//
+//            return ProposalResponseUtils.buildProposalResponse(proposalResponse.getPayload() != null ?
+//                    proposalResponse.getPayload() : smartContractResponse.getPayload(), smartContractResponse.getMessage());
         }
     }
 
@@ -352,31 +339,22 @@ public class Endorser implements IEndorserServer {
      * @param signedProposal
      * @return
      */
-    public ProposalResponsePackage.Response endorseProposal(String groupId, String txId, ProposalPackage
-            .SignedProposal signedProposal, ProposalPackage.Proposal proposal, SmartContractPackage.SmartContractID.Builder
-                                                                    smartContractIDBuilder, ProposalResponsePackage
-                                                                    .Response response, byte[] simulateResults,
-                                                            SmartContractEventPackage.SmartContractEvent event,
-                                                            byte[] visibility, ISmartContractDefinition
-                                                                    smartContractDefinition) throws NodeException {
+    public ProposalResponsePackage.Response endorseProposal(
+            String groupId, String txId, ProposalPackage.SignedProposal signedProposal, ProposalPackage.Proposal
+            proposal, SmartContractPackage.SmartContractID.Builder scIdBuilder, ProposalResponsePackage
+                    .Response response, byte[] simulateResults, SmartContractEventPackage.SmartContractEvent scEvent,
+            byte[] visibility, boolean isSysSC, ISmartContractDefinition scDefinition) throws NodeException {
         log.info("Begin endorseProposal");
-
-        boolean useSysSmartContract = false;
-        if (smartContractDefinition == null) {
-            useSysSmartContract = true;
-        }
-
-        useSysSmartContract = true;//TODO:for test
 
         //背书系统智能合约名称
         String essc = null;
-        if (useSysSmartContract) {
+        if (isSysSC) {
             essc = CommConstant.ESSC;
             //TODO:应该从某个配置文件里面读取
-            smartContractIDBuilder.setVersion(CommConstant.METADATA_VERSION);
+            scIdBuilder.setVersion(CommConstant.METADATA_VERSION);
         } else {
-            essc = smartContractDefinition.getEndorsement();
-            smartContractIDBuilder.setVersion(smartContractDefinition.getSmartContractVersion());
+            essc = scDefinition.getEndorsement();
+            scIdBuilder.setVersion(scDefinition.getSmartContractVersion());
         }
 
         // 参数列表:
@@ -389,13 +367,13 @@ public class Endorser implements IEndorserServer {
         // args[6] - 事件数据
         // args[7] - 负载的可见度数据
         byte[][] args = new byte[][]{new byte[0], proposal.getHeader().toByteArray(), proposal.getPayload()
-                .toByteArray(), smartContractIDBuilder.build().toByteArray(), response.toByteArray(),
-                simulateResults, event.toByteArray(), visibility};
+                .toByteArray(), scIdBuilder.build().toByteArray(), response.toByteArray(), simulateResults, scEvent
+                .toByteArray(), visibility};
         SmartContractPackage.SmartContractInvocationSpec invocationSpec = SpecHelper.buildInvocationSpec(essc, args);
         String version = CommConstant.METADATA_VERSION;
         //开始调用essc
-        ProposalResponsePackage.Response esscResponse = (ProposalResponsePackage.Response) callSmartContract(groupId, essc, version, txId,
-                signedProposal, proposal, invocationSpec)[0];
+        ProposalResponsePackage.Response esscResponse = (ProposalResponsePackage.Response) callSmartContract(groupId,
+                essc, version, txId, signedProposal, proposal, invocationSpec)[0];
         if (esscResponse.getStatus() >= Common.Status.BAD_REQUEST_VALUE) {
             //大于等于400意味着出错，一般为200 OK
             return esscResponse;
@@ -424,8 +402,8 @@ public class Endorser implements IEndorserServer {
 
         boolean isSysSmartContract = endorserSupport.isSysSmartContract(scName);
 
-        Object[] objs = endorserSupport.execute(groupId, scName,
-                scVersion, txId, isSysSmartContract, signedProposal, proposal, spec);
+        Object[] objs = endorserSupport.execute(groupId, scName, scVersion, txId, isSysSmartContract, signedProposal,
+                proposal, spec);
         ProposalResponsePackage.Response response = (ProposalResponsePackage.Response) objs[0];
 
         if (response.getStatus() >= Common.Status.BAD_REQUEST_VALUE) {

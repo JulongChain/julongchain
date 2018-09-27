@@ -113,6 +113,29 @@ public class ProposalResponseUtils {
     /**
      * 构造提案响应
      *
+     * @param payload
+     * @param message
+     * @return
+     */
+    public static ProposalResponsePackage.ProposalResponse buildProposalResponse(int status, ByteString payload, String
+            message) {
+        //首先构造响应主内容
+        ProposalResponsePackage.Response.Builder responseBuilder = ProposalResponsePackage.Response.newBuilder();
+        responseBuilder.setStatus(status);
+        responseBuilder.setPayload(payload);
+        if (StringUtils.isNotBlank(message)) {
+            responseBuilder.setMessage(message);
+        }
+
+        ProposalResponsePackage.Response response = responseBuilder.build();
+
+        //构造提案响应
+        return buildProposalResponse(response);
+    }
+
+    /**
+     * 构造提案响应
+     *
      * @param response
      * @return
      */
