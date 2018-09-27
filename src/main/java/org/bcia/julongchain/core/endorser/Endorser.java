@@ -126,8 +126,8 @@ public class Endorser implements IEndorserServer {
                             .getTxId(), signedProposal, proposal, scIdBuilder, response, txReadWriteSetBytes,
                     scEvent, extension.getPayloadVisibility().toByteArray(), isSysSC, scDefinition);
 
-            return ProposalResponseUtils.buildProposalResponse(endorseResponse.getStatus(), endorseResponse
-                    .getPayload(), endorseResponse.getMessage());
+            return ProposalResponseUtils.buildProposalResponse(endorseResponse.getStatus(), response.getPayload(),
+                    response.getMessage());
 
 //            SmartContractShim.SmartContractMessage smartContractMessage = TransactionRunningUtil.getTxMessage(scName, groupHeader.getTxId());
 //            TransactionRunningUtil.clearMap(scName, groupHeader.getTxId());
@@ -344,7 +344,7 @@ public class Endorser implements IEndorserServer {
             proposal, SmartContractPackage.SmartContractID.Builder scIdBuilder, ProposalResponsePackage
                     .Response response, byte[] simulateResults, SmartContractEventPackage.SmartContractEvent scEvent,
             byte[] visibility, boolean isSysSC, ISmartContractDefinition scDefinition) throws NodeException {
-        log.info("Begin endorseProposal");
+        log.info("Begin endorseProposal: " + groupId + ", " + txId + ", " + scIdBuilder.getName());
 
         //背书系统智能合约名称
         String essc = null;
@@ -398,7 +398,7 @@ public class Endorser implements IEndorserServer {
     public Object[] callSmartContract(String groupId, String scName, String scVersion, String txId, ProposalPackage
             .SignedProposal signedProposal, ProposalPackage.Proposal proposal, SmartContractPackage
                                               .SmartContractInvocationSpec spec) throws NodeException {
-        log.info("Begin callSmartContract: " + scName);
+        log.info("Begin callSmartContract: " + scName + ", " + scVersion);
 
         boolean isSysSmartContract = endorserSupport.isSysSmartContract(scName);
 
