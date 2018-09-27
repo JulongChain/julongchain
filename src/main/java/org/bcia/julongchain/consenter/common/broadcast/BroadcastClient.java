@@ -27,7 +27,7 @@ public class BroadcastClient {
      * @throws Exception
      */
     public void send(String ip,int port) throws Exception {
-        ManagedChannel managedChannel = ManagedChannelBuilder.forAddress(ip, port).usePlaintext(true).build();
+        ManagedChannel managedChannel = ManagedChannelBuilder.forAddress(ip, port).usePlaintext().build();
         AtomicBroadcastGrpc.AtomicBroadcastStub stub = AtomicBroadcastGrpc.newStub(managedChannel);
         StreamObserver<Common.Envelope> envelopeStreamObserver = stub.broadcast(new StreamObserver<Ab
                 .BroadcastResponse>() {

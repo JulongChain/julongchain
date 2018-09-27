@@ -14,5 +14,10 @@ public class ConsenterTest {
         String[] args={"start"};
         Consenter.main(args);
     }
+    @Test
+    public void versionTest() throws ConsenterException {
+        String[] args={"version"};
+        Consenter.main(args);
+    }
 
 }

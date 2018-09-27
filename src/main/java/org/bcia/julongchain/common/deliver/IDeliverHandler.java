@@ -16,14 +16,17 @@
 package org.bcia.julongchain.common.deliver;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.ValidateException;
 
 /**
+ * Deliver服务处理接口
+ *
  * @author zhangmingyang
  * @Date: 2018/5/29
  * @company Dingxuan
  */
 public interface IDeliverHandler {
-  void handle(DeliverServer server) throws ValidateException, InvalidProtocolBufferException, LedgerException;
+    void handle(DeliverServer server) throws ConsenterException;
 }

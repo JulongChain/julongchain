@@ -25,6 +25,8 @@ import org.bcia.julongchain.protos.common.Common;
 
 
 /**
+ * 本地msp接口实现
+ *
  * @author zhangmingyang
  * @Date: 2018/3/6
  * @company Dingxuan
@@ -34,14 +36,15 @@ public class LocalSigner implements ILocalSigner {
 
     public LocalSigner() {
     }
+
     @Override
     public Common.SignatureHeader newSignatureHeader() {
         try {
-            Identity identity= (Identity) GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity().getIdentity();
-            byte[] creatorIdentityRaw=identity.serialize();
-            Common.SignatureHeader.Builder signatureHeader=Common.SignatureHeader.newBuilder();
+            Identity identity = (Identity) GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity().getIdentity();
+            byte[] creatorIdentityRaw = identity.serialize();
+            Common.SignatureHeader.Builder signatureHeader = Common.SignatureHeader.newBuilder();
             byte[] nonce = null;
-            nonce= identity.getMsp().getCsp().rng(24,null);
+            nonce = identity.getMsp().getCsp().rng(24, null);
             signatureHeader.setNonce(ByteString.copyFrom(nonce));
             signatureHeader.setCreator(ByteString.copyFrom(creatorIdentityRaw));
             return signatureHeader.build();
@@ -54,7 +57,7 @@ public class LocalSigner implements ILocalSigner {
 
     @Override
     public byte[] sign(byte[] message) {
-       //通过获取msp实例,从实例中
-        return  GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity().sign(message);
+        //通过获取msp实例,从实例中
+        return GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity().sign(message);
     }
 }

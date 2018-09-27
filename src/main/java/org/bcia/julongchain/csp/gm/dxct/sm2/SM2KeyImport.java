@@ -24,6 +24,8 @@ import org.bcia.julongchain.csp.intfs.IKey;
 import java.security.NoSuchAlgorithmException;
 
 /**
+ * sm2密钥导入
+ *
  * @author zhangmingyang
  * @Date: 2018/5/4
  * @company Dingxuan
@@ -53,7 +55,7 @@ public class SM2KeyImport implements IKey {
     }
 
     @Override
-    public byte[] ski() throws CspException{
+    public byte[] ski() throws CspException {
         try {
             return sm3.hash(privateKey);
         } catch (CspException e) {

@@ -16,6 +16,7 @@
 package org.bcia.julongchain.consenter.common.multigroup;
 
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.ValidateException;
@@ -52,7 +53,7 @@ public class ChainSupport implements IStandardGroupSupport, IConsenterSupport {
     public ChainSupport() {
     }
 
-    public ChainSupport(Registrar registrar, LedgerResources ledgerResources, Map<String, IConsensusPlugin> consenters, ILocalSigner signer) {
+    public ChainSupport(Registrar registrar, LedgerResources ledgerResources, Map<String, IConsensusPlugin> consenters, ILocalSigner signer) throws ConsenterException {
         Common.Block lastBlock = null;
         Common.Metadata metadata = null;
         try {
@@ -191,7 +192,7 @@ public class ChainSupport implements IStandardGroupSupport, IConsenterSupport {
     }
 
     @Override
-    public void writeConfigBlock(Common.Block block, byte[] encodedMetadataValue) throws InvalidProtocolBufferException, LedgerException, ValidateException, PolicyException {
+    public void writeConfigBlock(Common.Block block, byte[] encodedMetadataValue) throws ConsenterException {
         blockWriter.writeConfigBlock(block, encodedMetadataValue);
     }
 

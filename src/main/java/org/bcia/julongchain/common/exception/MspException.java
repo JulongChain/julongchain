@@ -16,6 +16,8 @@
 package org.bcia.julongchain.common.exception;
 
 /**
+ * msp模块异常
+ *
  * @author zhangmingyang
  * @Date: 2018/4/18
  * @company Dingxuan

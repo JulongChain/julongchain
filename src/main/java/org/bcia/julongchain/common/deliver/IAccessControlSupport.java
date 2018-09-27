@@ -15,9 +15,10 @@
  */
 package org.bcia.julongchain.common.deliver;
 
-import org.bcia.julongchain.common.configtx.IConfigtxValidator;
 
 /**
+ * 权限控制支持接口
+ *
  * @author zhangmingyang
  * @Date: 2018/5/30
  * @company Dingxuan

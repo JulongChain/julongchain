@@ -18,11 +18,14 @@ package org.bcia.julongchain.common.localmsp;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
+ * 本地msp接口
+ *
  * @author zhangmingyang
  * @Date: 2018/3/6
  * @company Dingxuan
  */
 public interface ILocalSigner {
-     Common.SignatureHeader newSignatureHeader();
-     byte[] sign(byte[] message);
+    Common.SignatureHeader newSignatureHeader();
+
+    byte[] sign(byte[] message);
 }

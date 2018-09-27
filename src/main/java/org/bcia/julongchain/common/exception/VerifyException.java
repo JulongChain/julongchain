@@ -16,12 +16,15 @@
 package org.bcia.julongchain.common.exception;
 
 /**
+ * 验证签名异常
+ *
  * @author zhangmingyang
  * @Date: 2018/5/31
  * @company Dingxuan
  */
 public class VerifyException extends JulongChainException {
     private static final String MODULE_NAME = "[Verify]";
+
     public VerifyException() {
         super();
     }
@@ -41,8 +44,8 @@ public class VerifyException extends JulongChainException {
 
 
     protected VerifyException(String message, Throwable cause,
-                                 boolean enableSuppression,
-                                 boolean writableStackTrace) {
+                              boolean enableSuppression,
+                              boolean writableStackTrace) {
         super(MODULE_NAME + message, cause, enableSuppression, writableStackTrace);
     }
 }

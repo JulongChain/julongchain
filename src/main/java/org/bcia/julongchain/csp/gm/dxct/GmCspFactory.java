@@ -21,26 +21,28 @@ import org.bcia.julongchain.csp.factory.IFactoryOpts;
 import org.bcia.julongchain.csp.intfs.ICsp;
 
 /**
- * @author zhanglin,zhangmingyang
+ * ICspFactory实现
+ *
+ * @author zhanglin, zhangmingyang
  * @date 2018-01-25
  * @company Dingxuan
  */
 
 public class GmCspFactory implements ICspFactory {
 
-    public GmCspFactory(){
+    public GmCspFactory() {
 
     }
 
     @Override
-    public String getName(){
+    public String getName() {
         return IFactoryOpts.PROVIDER_GM;
     }
 
     @Override
-    public ICsp getCsp(IFactoryOpts opts){
-        IGmFactoryOpts gmOpts=(IGmFactoryOpts) opts;
-        GmCsp gmCsp =new GmCsp(gmOpts);
+    public ICsp getCsp(IFactoryOpts opts) {
+        IGmFactoryOpts gmOpts = (IGmFactoryOpts) opts;
+        GmCsp gmCsp = new GmCsp(gmOpts);
         return gmCsp;
     }
 }

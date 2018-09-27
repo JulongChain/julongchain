@@ -20,6 +20,8 @@ import org.bcia.julongchain.csp.gm.dxct.util.GmCspConstant;
 import org.bcia.julongchain.csp.intfs.opts.IHashOpts;
 
 /**
+ * sm3数据hash选项
+ *
  * @author zhanglin, zhangmingyang
  * @date 2018/01/25
  * @company Dingxuan
