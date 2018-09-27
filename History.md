@@ -25,12 +25,12 @@ JulongChain V0.8<br/>
     <th>是否集成</th>
   </tr>
   <tr>
-    <td>SZCA</td>    
-    <td>深圳CA为聚龙链打造的CA组件，为证书签发中心</td>
-    <td>深圳CA</td>
-    <td>已完成</td>
-    <td>已集成</td>
-  </tr>
+     <td>国密算法软实现</td>    
+     <td>使用软算法实现的国密算法</td>
+     <td>兴唐通讯</td>
+     <td>已完成</td>
+     <td>已集成</td>
+   </tr>
   <tr>
      <td>Cryptogen</td>    
      <td>密码生成工具</td>
@@ -39,12 +39,19 @@ JulongChain V0.8<br/>
      <td>已集成</td>
    </tr>
   <tr>
-     <td>国密算法软实现</td>    
-     <td>使用软算法实现的国密算法</td>
-     <td>兴唐通讯</td>
-     <td>已完成</td>
-     <td>已集成</td>
-   </tr>
+    <td>SZCA</td>    
+    <td>深圳CA为聚龙链打造的CA组件，为证书签发中心</td>
+    <td>深圳CA</td>
+    <td>已完成</td>
+    <td>已集成</td>
+  </tr>
+  <tr>
+     <td>CFCA</td>    
+     <td>CFCA为聚龙链打造的CA组件，为证书签发中心</td>
+     <td>CFCA</td>
+     <td>未完成</td>
+     <td>未集成</td>
+  </tr>  
   <tr>
      <td>Kafka组件</td>    
      <td>Kafka排序共识插件</td>
@@ -53,9 +60,9 @@ JulongChain V0.8<br/>
      <td>未集成</td>
    </tr>
   <tr>
-     <td>Cauthdsl组件</td>    
-     <td>鉴权领域专用语言</td>
-     <td>北京数盾</td>
+     <td>策略检查</td>    
+     <td>背书、执行合约等策略检查</td>
+     <td>航天信息</td>
      <td>已完成</td>
      <td>未集成</td>
    </tr>
@@ -64,13 +71,6 @@ JulongChain V0.8<br/>
      <td>替代状态数据库的KV数据库组件</td>
      <td>格尔软件</td>
      <td>已完成</td>
-     <td>未集成</td>
-   </tr>
-   <tr>
-     <td>CFCA</td>    
-     <td>CFCA为聚龙链打造的CA组件，为证书签发中心</td>
-     <td>CFCA</td>
-     <td>未完成</td>
      <td>未集成</td>
    </tr>
    <tr>
