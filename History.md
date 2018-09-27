@@ -28,8 +28,8 @@ JulongChain V0.8<br/>
      <td>国密算法软实现</td>    
      <td>使用软算法实现的国密算法</td>
      <td>兴唐通讯</td>
-     <td><font color='blue'>已完成</font></td>
-     <td><font color='blue'>已集成</font></td>
+     <td>已完成</td>
+     <td>已集成</td>
    </tr>
   <tr>
      <td>Cryptogen</td>    
