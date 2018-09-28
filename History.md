@@ -134,7 +134,7 @@ JulongChain V0.8<br/>
   </tr>
   <tr>
      <td>CFCA</td>    
-     <td>CFCA为聚龙链打造的CA组件，为证书签发中心</td>
+     <td>CFCA为聚龙链提供CA前端代理服务，通过第三方RA/CA实现CA的功能</td>
      <td>CFCA</td>
      <td>已实现，未集成</td>
   </tr>  
