@@ -404,7 +404,7 @@ public class EnvelopeHelper {
      * @param groupId
      * @param signer
      * @return
-     * @throws NodeException
+     * @deprecated 计划去掉ILocalSigner接口的使用，改用采用标准的ISigningIdentity接口
      */
     public static Common.Envelope sanityCheckAndSignConfigTx(Common.Envelope envelope, String groupId, ILocalSigner signer)
             throws NodeException {
@@ -471,6 +471,7 @@ public class EnvelopeHelper {
      * @param originalEnvelope
      * @param signer
      * @return
+     * @deprecated 计划去掉ILocalSigner接口的使用，改用采用标准的ISigningIdentity接口
      */
     public static Configtx.ConfigUpdateEnvelope signConfigUpdateEnvelope(Configtx.ConfigUpdateEnvelope originalEnvelope,
                                                                          ILocalSigner signer) {
@@ -496,6 +497,70 @@ public class EnvelopeHelper {
     }
 
     /**
+     * 为ConfigUpdateEnvelope签名一次（使用自己的身份）
+     *
+     * @param originalEnvelope
+     * @return
+     * @throws NodeException
+     * @throws ValidateException
+     */
+    public static Configtx.ConfigUpdateEnvelope signConfigUpdateEnvelope(Configtx.ConfigUpdateEnvelope originalEnvelope)
+            throws NodeException, ValidateException {
+        //获取默认的身份（自身的身份）填充
+        ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
+        return signConfigUpdateEnvelope(originalEnvelope, identity);
+    }
+
+    /**
+     * 为ConfigUpdateEnvelope签名一次
+     *
+     * @param originalEnvelope
+     * @param identity
+     * @return
+     * @throws NodeException
+     * @throws ValidateException
+     */
+    public static Configtx.ConfigUpdateEnvelope signConfigUpdateEnvelope(
+            Configtx.ConfigUpdateEnvelope originalEnvelope, ISigningIdentity identity) throws NodeException,
+            ValidateException {
+        ValidateUtils.isNotNull(originalEnvelope, "ConfigUpdateEnvelope can not be null");
+        ValidateUtils.isNotNull(originalEnvelope.getConfigUpdate(), "ConfigUpdateEnvelope can not be null");
+
+        //获取ConfigUpdateEnvelope对象的构造器,拷贝原对象
+        Configtx.ConfigUpdateEnvelope.Builder envelopeBuilder = Configtx.ConfigUpdateEnvelope.newBuilder
+                (originalEnvelope);
+
+        //构造签名对象,由两个字段构成SignatureHeader
+        byte[] creator = null;
+        if (identity != null) {
+            creator = identity.getIdentity().serialize();
+        } else {
+            log.warn("Identity is null");
+        }
+        byte[] nonce = generateNonce();
+        Common.SignatureHeader signatureHeader = buildSignatureHeader(creator, nonce);
+
+        //由SignatureHeader+ConfigUpdate合成原始字节数组，再计算出签名
+        byte[] signature = new byte[0];
+        if (identity != null) {
+            byte[] original = ArrayUtils.addAll(signatureHeader.toByteArray(), originalEnvelope.getConfigUpdate()
+                    .toByteArray());
+            //对原始数组进行签名
+            signature = identity.sign(original);
+        }
+
+        Configtx.ConfigSignature.Builder configSignatureBuilder = Configtx.ConfigSignature.newBuilder();
+        configSignatureBuilder.setSignatureHeader(signatureHeader.toByteString());
+        configSignatureBuilder.setSignature(ByteString.copyFrom(signature));
+        Configtx.ConfigSignature configSignature = configSignatureBuilder.build();
+
+        //ConfigUpdateEnvelope对象由ConfigUpdate和若干个ConfigSignature组成。增加一个签名即可
+        envelopeBuilder.addSignatures(configSignature);
+
+        return envelopeBuilder.build();
+    }
+
+    /**
      * 构建带签名的信封对象
      *
      * @param type    消息类型
@@ -505,6 +570,7 @@ public class EnvelopeHelper {
      * @param data    数据对象
      * @param epoch   所属纪元
      * @return
+     * @deprecated 计划去掉ILocalSigner接口的使用，改用采用标准的ISigningIdentity接口。见buildEnvelope
      */
     public static Common.Envelope buildSignedEnvelope(int type, int version, String groupId, ILocalSigner signer,
                                                       Message data, long epoch) {
@@ -535,6 +601,7 @@ public class EnvelopeHelper {
      * @param epoch   所属纪元
      * @return
      * @throws NodeException
+     * @deprecated 计划去掉ILocalSigner接口的使用，改用采用标准的ISigningIdentity接口
      */
     public static Common.Payload buildPayload(int type, int version, String groupId, ILocalSigner signer, Message
             data, long epoch) {
@@ -598,17 +665,33 @@ public class EnvelopeHelper {
     public static Common.Envelope buildEnvelope(
             int type, int version, String groupId, String txId, long epoch, ProposalPackage
             .SmartContractHeaderExtension extension, ISigningIdentity identity, Message data) throws NodeException {
+        //构造Payload
+        Common.Payload payload = buildPayload(type, version, groupId, txId, epoch, extension, identity, data);
+        return buildEnvelope(payload, identity);
+    }
+
+    /**
+     * 构造信封对象
+     *
+     * @param payload  信封负载，注意传入时确保不能为空
+     * @param identity
+     * @return
+     * @throws NodeException
+     */
+    private static Common.Envelope buildEnvelope(Common.Payload payload, ISigningIdentity identity) throws
+            NodeException {
         //获取Envelope对象的构造器
         Common.Envelope.Builder envelopeBuilder = Common.Envelope.newBuilder();
 
         //构造Payload
-        Common.Payload payload = buildPayload(type, version, groupId, txId, epoch, extension, identity, data);
         envelopeBuilder.setPayload(payload.toByteString());
 
         if (identity != null) {
             //Signature字段由Payload字段签名而成
             byte[] signatureBytes = identity.sign(payload.toByteArray());
             envelopeBuilder.setSignature(ByteString.copyFrom(signatureBytes));
+        } else {
+            log.warn("Identity is null");
         }
 
         return envelopeBuilder.build();
