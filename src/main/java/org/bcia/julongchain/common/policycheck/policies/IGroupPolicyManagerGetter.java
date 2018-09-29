@@ -29,6 +29,7 @@ import org.bcia.julongchain.common.policies.IPolicyManagerGetter;
  */
 public interface IGroupPolicyManagerGetter extends IPolicyManagerGetter {
     /**
+     *
      * 通过groupid获取策略管理的对象
      * @param groupId
      * @return
