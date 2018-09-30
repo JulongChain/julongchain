@@ -32,6 +32,9 @@ import org.bcia.julongchain.common.localmsp.ILocalSigner;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.PolicyConstant;
+import org.bcia.julongchain.common.protos.ConfigUpdateEnvelopeVO;
+import org.bcia.julongchain.common.protos.EnvelopeVO;
+import org.bcia.julongchain.common.protos.ProposalVO;
 import org.bcia.julongchain.common.resourceconfig.ResourcesConfigConstant;
 import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.common.util.FileUtils;
@@ -260,6 +263,14 @@ public class EnvelopeHelper {
         return writeSetBuilder.build();
     }
 
+    /**
+     * @param originalProposal
+     * @param identity
+     * @param endorserResponses
+     * @return
+     * @throws ValidateException
+     * @deprecated 方法体太长，准备拆分
+     */
     public static Common.Envelope createSignedTxEnvelope(ProposalPackage.Proposal originalProposal, ISigningIdentity
             identity, ProposalResponsePackage.ProposalResponse... endorserResponses) throws ValidateException {
         if (originalProposal == null || identity == null || endorserResponses == null) {
@@ -380,6 +391,41 @@ public class EnvelopeHelper {
     }
 
     /**
+     * 构造交易信封
+     *
+     * @param originalProposal
+     * @param identity
+     * @param endorserResponses
+     * @return
+     * @throws ValidateException
+     * @throws InvalidProtocolBufferException
+     * @throws NodeException
+     */
+    public static Common.Envelope buildTxEnvelope(ProposalPackage.Proposal originalProposal, ISigningIdentity
+            identity, ProposalResponsePackage.ProposalResponse... endorserResponses) throws ValidateException,
+            InvalidProtocolBufferException, NodeException {
+        ProposalVO proposalVO = new ProposalVO();
+        proposalVO.parseFrom(originalProposal);
+
+        //签名头部的消息创建者字段应与身份一致
+        if (Arrays.compareUnsigned(proposalVO.getHeaderVO().getSignatureHeader().getCreator().toByteArray(), identity
+                .getIdentity().serialize()) != 0) {
+            throw new ValidateException("Wrong signatureHeader creator");
+        }
+
+        TransactionPackage.Transaction transaction = TransactionHelper.buildSingleTransaction(proposalVO.getPayloadVO
+                ().toProto(), identity, endorserResponses);
+
+        Common.Payload.Builder payloadBuilder = Common.Payload.newBuilder();
+        Common.Header header = Common.Header.parseFrom(originalProposal.getHeader());
+        payloadBuilder.setHeader(header);
+        payloadBuilder.setData(transaction.toByteString());
+        Common.Payload payload = payloadBuilder.build();
+
+        return buildEnvelope(payload, identity);
+    }
+
+    /**
      * 从文件中读取成一个Envelope对象
      *
      * @param filePath
@@ -393,6 +439,7 @@ public class EnvelopeHelper {
             envelope = Common.Envelope.parseFrom(bytes);
             return envelope;
         } catch (IOException e) {
+            log.error(e.getMessage(), e);
             throw new NodeException("Can not read Group File");
         }
     }
@@ -466,6 +513,78 @@ public class EnvelopeHelper {
     }
 
     /**
+     * 完整性检查，通过则签名该配置交易
+     *
+     * @param envelope
+     * @param groupId
+     * @return
+     * @throws NodeException
+     */
+    public static Common.Envelope sanityCheckAndSignConfigTx(Common.Envelope envelope, String groupId) throws
+            NodeException {
+        //获取默认的身份（自身的身份）填充
+        ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
+        try {
+            return sanityCheckAndSignConfigTx(envelope, groupId, identity);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException(e);
+        }
+    }
+
+    /**
+     * 完整性检查，通过则签名配置交易
+     *
+     * @param envelope
+     * @param groupId
+     * @param identity
+     * @return
+     * @throws NodeException
+     * @throws InvalidProtocolBufferException
+     * @throws ValidateException
+     */
+    public static Common.Envelope sanityCheckAndSignConfigTx(
+            Common.Envelope envelope, String groupId, ISigningIdentity identity) throws NodeException,
+            InvalidProtocolBufferException, ValidateException {
+        EnvelopeVO envelopeVO = new EnvelopeVO();
+        envelopeVO.parseFrom(envelope);
+
+        //消息类型必须是CONFIG_UPDATE
+        if (envelopeVO.getPayloadVO().getHeaderVO().getGroupHeaderVO().getType() != Common.HeaderType
+                .CONFIG_UPDATE_VALUE) {
+            String msg = "Wrong header type";
+            throw new NodeException(msg);
+        }
+
+        //消息对象类型必须是ConfigUpdateEnvelope
+        if (!(envelopeVO.getPayloadVO().getDataVO() instanceof ConfigUpdateEnvelopeVO)) {
+            String msg = "Wrong msg type";
+            throw new NodeException(msg);
+        }
+
+        //群组id必须匹配
+        String groupIdInHeader = envelopeVO.getPayloadVO().getHeaderVO().getGroupHeaderVO().getGroupId();
+        ValidateUtils.isNotBlank(groupIdInHeader, "Header's groupId can not be empty");
+        if (!groupIdInHeader.equals(groupId)) {
+            String msg = "Wrong group id";
+            throw new NodeException(msg);
+        }
+
+        //获取Envelope对象的构造器
+        Common.Envelope.Builder signEnvelopeBuilder = Common.Envelope.newBuilder(envelope);
+
+        if (identity != null) {
+            //Signature字段由Payload字段签名而成
+            byte[] signatureBytes = identity.sign(envelope.getPayload().toByteArray());
+            signEnvelopeBuilder.setSignature(ByteString.copyFrom(signatureBytes));
+        } else {
+            log.warn("Identity is null");
+        }
+
+        return signEnvelopeBuilder.build();
+    }
+
+    /**
      * 对一个ConfigUpdateEnvelope对象进行签名
      *
      * @param originalEnvelope
@@ -531,14 +650,7 @@ public class EnvelopeHelper {
                 (originalEnvelope);
 
         //构造签名对象,由两个字段构成SignatureHeader
-        byte[] creator = null;
-        if (identity != null) {
-            creator = identity.getIdentity().serialize();
-        } else {
-            log.warn("Identity is null");
-        }
-        byte[] nonce = generateNonce();
-        Common.SignatureHeader signatureHeader = buildSignatureHeader(creator, nonce);
+        Common.SignatureHeader signatureHeader = buildSignatureHeader(identity);
 
         //由SignatureHeader+ConfigUpdate合成原始字节数组，再计算出签名
         byte[] signature = new byte[0];
@@ -881,6 +993,25 @@ public class EnvelopeHelper {
         }
 
         return groupHeaderBuilder.build();
+    }
+
+    /**
+     * 基于身份信息构造SignatureHeader对象
+     *
+     * @param identity
+     * @return
+     * @throws NodeException
+     */
+    public static Common.SignatureHeader buildSignatureHeader(ISigningIdentity identity) throws NodeException {
+        //构造签名对象,由两个字段构成SignatureHeader
+        byte[] creator = null;
+        if (identity != null) {
+            creator = identity.getIdentity().serialize();
+        } else {
+            log.warn("Identity is null");
+        }
+        byte[] nonce = generateNonce();
+        return buildSignatureHeader(creator, nonce);
     }
 
     /**
