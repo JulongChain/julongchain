@@ -51,7 +51,7 @@ public class PolicyNode {
             for (PolicyNode node : sons) {
                 nstr += node.n2str()+",";
             }
-            return "outof(ID,"+(msg.toString().toLowerCase().equals("or")?"1":sons.size())+","
+            return "outof(ID,"+("or".equals(msg.toString().toLowerCase())?"1":sons.size())+","
                     +nstr.substring(0, nstr.length()-1)
                     + ")";
         }
