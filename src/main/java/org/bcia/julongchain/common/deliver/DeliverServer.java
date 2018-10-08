@@ -18,15 +18,18 @@ package org.bcia.julongchain.common.deliver;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
 import io.grpc.stub.StreamObserver;
+import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 
 /**
+ * Deliver服务实现发送接口
+ *
  * @author zhangmingyang
  * @Date: 2018/5/29
  * @company Dingxuan
  */
-public class DeliverServer  implements ISender{
+public class DeliverServer implements ISender {
     StreamObserver<Ab.DeliverResponse> responseObserver;
     private IPolicyChecker policyChecker;
     private ISender sender;
@@ -54,8 +57,13 @@ public class DeliverServer  implements ISender{
     }
 
     @Override
-    public void send(Message msg) throws InvalidProtocolBufferException {
-        Ab.DeliverResponse deliverResponse= Ab.DeliverResponse.parseFrom(msg.toByteArray());
+    public void send(Message msg) throws ConsenterException {
+        Ab.DeliverResponse deliverResponse = null;
+        try {
+            deliverResponse = Ab.DeliverResponse.parseFrom(msg.toByteArray());
+        } catch (InvalidProtocolBufferException e) {
+            throw new ConsenterException(e);
+        }
         responseObserver.onNext(deliverResponse);
     }
 }

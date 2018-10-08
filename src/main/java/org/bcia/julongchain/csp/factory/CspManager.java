@@ -27,9 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * 类描述
+ * Csp管理类
  *
- * @author sunianle
+ * @author sunianle,zhangmingyang
  * @date 3/29/18
  * @company Dingxuan
  */

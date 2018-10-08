@@ -32,10 +32,16 @@ import org.bcia.julongchain.common.localmsp.ILocalSigner;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.policies.PolicyConstant;
+import org.bcia.julongchain.common.protos.ConfigUpdateEnvelopeVO;
+import org.bcia.julongchain.common.protos.EnvelopeVO;
+import org.bcia.julongchain.common.protos.ProposalVO;
 import org.bcia.julongchain.common.resourceconfig.ResourcesConfigConstant;
+import org.bcia.julongchain.common.util.CommConstant;
 import org.bcia.julongchain.common.util.FileUtils;
 import org.bcia.julongchain.common.util.ValidateUtils;
+import org.bcia.julongchain.csp.factory.CspManager;
 import org.bcia.julongchain.msp.ISigningIdentity;
+import org.bcia.julongchain.msp.mgmt.GlobalMspManagement;
 import org.bcia.julongchain.node.common.helper.ConfigTreeHelper;
 import org.bcia.julongchain.node.common.helper.ConfigUpdateHelper;
 import org.bcia.julongchain.protos.common.Common;
@@ -53,7 +59,7 @@ import java.io.IOException;
  * 信封对象帮助类
  *
  * @author zhouhui
- * @date 2018/3/6
+ * @date 2018/03/06
  * @company Dingxuan
  */
 public class EnvelopeHelper {
@@ -257,6 +263,14 @@ public class EnvelopeHelper {
         return writeSetBuilder.build();
     }
 
+    /**
+     * @param originalProposal
+     * @param identity
+     * @param endorserResponses
+     * @return
+     * @throws ValidateException
+     * @deprecated 方法体太长，准备拆分
+     */
     public static Common.Envelope createSignedTxEnvelope(ProposalPackage.Proposal originalProposal, ISigningIdentity
             identity, ProposalResponsePackage.ProposalResponse... endorserResponses) throws ValidateException {
         if (originalProposal == null || identity == null || endorserResponses == null) {
@@ -377,6 +391,41 @@ public class EnvelopeHelper {
     }
 
     /**
+     * 构造交易信封
+     *
+     * @param originalProposal
+     * @param identity
+     * @param endorserResponses
+     * @return
+     * @throws ValidateException
+     * @throws InvalidProtocolBufferException
+     * @throws NodeException
+     */
+    public static Common.Envelope buildTxEnvelope(ProposalPackage.Proposal originalProposal, ISigningIdentity
+            identity, ProposalResponsePackage.ProposalResponse... endorserResponses) throws ValidateException,
+            InvalidProtocolBufferException, NodeException {
+        ProposalVO proposalVO = new ProposalVO();
+        proposalVO.parseFrom(originalProposal);
+
+        //签名头部的消息创建者字段应与身份一致
+        if (Arrays.compareUnsigned(proposalVO.getHeaderVO().getSignatureHeader().getCreator().toByteArray(), identity
+                .getIdentity().serialize()) != 0) {
+            throw new ValidateException("Wrong signatureHeader creator");
+        }
+
+        TransactionPackage.Transaction transaction = TransactionHelper.buildSingleTransaction(proposalVO.getPayloadVO
+                ().toProto(), identity, endorserResponses);
+
+        Common.Payload.Builder payloadBuilder = Common.Payload.newBuilder();
+        Common.Header header = Common.Header.parseFrom(originalProposal.getHeader());
+        payloadBuilder.setHeader(header);
+        payloadBuilder.setData(transaction.toByteString());
+        Common.Payload payload = payloadBuilder.build();
+
+        return buildEnvelope(payload, identity);
+    }
+
+    /**
      * 从文件中读取成一个Envelope对象
      *
      * @param filePath
@@ -390,6 +439,7 @@ public class EnvelopeHelper {
             envelope = Common.Envelope.parseFrom(bytes);
             return envelope;
         } catch (IOException e) {
+            log.error(e.getMessage(), e);
             throw new NodeException("Can not read Group File");
         }
     }
@@ -401,7 +451,7 @@ public class EnvelopeHelper {
      * @param groupId
      * @param signer
      * @return
-     * @throws NodeException
+     * @deprecated 计划去掉ILocalSigner接口的使用，改用采用标准的ISigningIdentity接口
      */
     public static Common.Envelope sanityCheckAndSignConfigTx(Common.Envelope envelope, String groupId, ILocalSigner signer)
             throws NodeException {
@@ -463,11 +513,84 @@ public class EnvelopeHelper {
     }
 
     /**
+     * 完整性检查，通过则签名该配置交易
+     *
+     * @param envelope
+     * @param groupId
+     * @return
+     * @throws NodeException
+     */
+    public static Common.Envelope sanityCheckAndSignConfigTx(Common.Envelope envelope, String groupId) throws
+            NodeException {
+        //获取默认的身份（自身的身份）填充
+        ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
+        try {
+            return sanityCheckAndSignConfigTx(envelope, groupId, identity);
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException(e);
+        }
+    }
+
+    /**
+     * 完整性检查，通过则签名配置交易
+     *
+     * @param envelope
+     * @param groupId
+     * @param identity
+     * @return
+     * @throws NodeException
+     * @throws InvalidProtocolBufferException
+     * @throws ValidateException
+     */
+    public static Common.Envelope sanityCheckAndSignConfigTx(
+            Common.Envelope envelope, String groupId, ISigningIdentity identity) throws NodeException,
+            InvalidProtocolBufferException, ValidateException {
+        EnvelopeVO envelopeVO = new EnvelopeVO();
+        envelopeVO.parseFrom(envelope);
+
+        //消息类型必须是CONFIG_UPDATE
+        if (envelopeVO.getPayloadVO().getHeaderVO().getGroupHeaderVO().getType() != Common.HeaderType
+                .CONFIG_UPDATE_VALUE) {
+            String msg = "Wrong header type";
+            throw new NodeException(msg);
+        }
+
+        //消息对象类型必须是ConfigUpdateEnvelope
+        if (!(envelopeVO.getPayloadVO().getDataVO() instanceof ConfigUpdateEnvelopeVO)) {
+            String msg = "Wrong msg type";
+            throw new NodeException(msg);
+        }
+
+        //群组id必须匹配
+        String groupIdInHeader = envelopeVO.getPayloadVO().getHeaderVO().getGroupHeaderVO().getGroupId();
+        ValidateUtils.isNotBlank(groupIdInHeader, "Header's groupId can not be empty");
+        if (!groupIdInHeader.equals(groupId)) {
+            String msg = "Wrong group id";
+            throw new NodeException(msg);
+        }
+
+        //获取Envelope对象的构造器
+        Common.Envelope.Builder signEnvelopeBuilder = Common.Envelope.newBuilder(envelope);
+
+        if (identity != null) {
+            //Signature字段由Payload字段签名而成
+            byte[] signatureBytes = identity.sign(envelope.getPayload().toByteArray());
+            signEnvelopeBuilder.setSignature(ByteString.copyFrom(signatureBytes));
+        } else {
+            log.warn("Identity is null");
+        }
+
+        return signEnvelopeBuilder.build();
+    }
+
+    /**
      * 对一个ConfigUpdateEnvelope对象进行签名
      *
      * @param originalEnvelope
      * @param signer
      * @return
+     * @deprecated 计划去掉ILocalSigner接口的使用，改用采用标准的ISigningIdentity接口
      */
     public static Configtx.ConfigUpdateEnvelope signConfigUpdateEnvelope(Configtx.ConfigUpdateEnvelope originalEnvelope,
                                                                          ILocalSigner signer) {
@@ -493,6 +616,63 @@ public class EnvelopeHelper {
     }
 
     /**
+     * 为ConfigUpdateEnvelope签名一次（使用自己的身份）
+     *
+     * @param originalEnvelope
+     * @return
+     * @throws NodeException
+     * @throws ValidateException
+     */
+    public static Configtx.ConfigUpdateEnvelope signConfigUpdateEnvelope(Configtx.ConfigUpdateEnvelope originalEnvelope)
+            throws NodeException, ValidateException {
+        //获取默认的身份（自身的身份）填充
+        ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
+        return signConfigUpdateEnvelope(originalEnvelope, identity);
+    }
+
+    /**
+     * 为ConfigUpdateEnvelope签名一次
+     *
+     * @param originalEnvelope
+     * @param identity
+     * @return
+     * @throws NodeException
+     * @throws ValidateException
+     */
+    public static Configtx.ConfigUpdateEnvelope signConfigUpdateEnvelope(
+            Configtx.ConfigUpdateEnvelope originalEnvelope, ISigningIdentity identity) throws NodeException,
+            ValidateException {
+        ValidateUtils.isNotNull(originalEnvelope, "ConfigUpdateEnvelope can not be null");
+        ValidateUtils.isNotNull(originalEnvelope.getConfigUpdate(), "ConfigUpdateEnvelope can not be null");
+
+        //获取ConfigUpdateEnvelope对象的构造器,拷贝原对象
+        Configtx.ConfigUpdateEnvelope.Builder envelopeBuilder = Configtx.ConfigUpdateEnvelope.newBuilder
+                (originalEnvelope);
+
+        //构造签名对象,由两个字段构成SignatureHeader
+        Common.SignatureHeader signatureHeader = buildSignatureHeader(identity);
+
+        //由SignatureHeader+ConfigUpdate合成原始字节数组，再计算出签名
+        byte[] signature = new byte[0];
+        if (identity != null) {
+            byte[] original = ArrayUtils.addAll(signatureHeader.toByteArray(), originalEnvelope.getConfigUpdate()
+                    .toByteArray());
+            //对原始数组进行签名
+            signature = identity.sign(original);
+        }
+
+        Configtx.ConfigSignature.Builder configSignatureBuilder = Configtx.ConfigSignature.newBuilder();
+        configSignatureBuilder.setSignatureHeader(signatureHeader.toByteString());
+        configSignatureBuilder.setSignature(ByteString.copyFrom(signature));
+        Configtx.ConfigSignature configSignature = configSignatureBuilder.build();
+
+        //ConfigUpdateEnvelope对象由ConfigUpdate和若干个ConfigSignature组成。增加一个签名即可
+        envelopeBuilder.addSignatures(configSignature);
+
+        return envelopeBuilder.build();
+    }
+
+    /**
      * 构建带签名的信封对象
      *
      * @param type    消息类型
@@ -502,6 +682,7 @@ public class EnvelopeHelper {
      * @param data    数据对象
      * @param epoch   所属纪元
      * @return
+     * @deprecated 计划去掉ILocalSigner接口的使用，改用采用标准的ISigningIdentity接口。见buildEnvelope
      */
     public static Common.Envelope buildSignedEnvelope(int type, int version, String groupId, ILocalSigner signer,
                                                       Message data, long epoch) {
@@ -532,6 +713,7 @@ public class EnvelopeHelper {
      * @param epoch   所属纪元
      * @return
      * @throws NodeException
+     * @deprecated 计划去掉ILocalSigner接口的使用，改用采用标准的ISigningIdentity接口
      */
     public static Common.Payload buildPayload(int type, int version, String groupId, ILocalSigner signer, Message
             data, long epoch) {
@@ -558,6 +740,167 @@ public class EnvelopeHelper {
     }
 
     /**
+     * 构造信封对象
+     *
+     * @param type      消息类型
+     * @param version   消息协议的版本
+     * @param groupId   群组ID
+     * @param txId      交易ID
+     * @param epoch     所属纪元，目前以所需区块的高度值填充
+     * @param extension 智能合约扩展对象
+     * @param data
+     * @return
+     * @throws NodeException
+     */
+    public static Common.Envelope buildEnvelope(
+            int type, int version, String groupId, String txId, long epoch, ProposalPackage
+            .SmartContractHeaderExtension extension, Message data) throws NodeException {
+        //获取默认的身份（自身的身份）填充
+        ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
+        return buildEnvelope(type, version, groupId, txId, epoch, extension, identity, data);
+    }
+
+    /**
+     * 构建信封对象
+     *
+     * @param type      消息类型
+     * @param version   消息协议的版本
+     * @param groupId   群组ID
+     * @param txId      交易ID
+     * @param epoch     所属纪元，目前以所需区块的高度值填充
+     * @param extension 智能合约扩展对象
+     * @param identity
+     * @param data
+     * @return
+     * @throws NodeException
+     */
+    public static Common.Envelope buildEnvelope(
+            int type, int version, String groupId, String txId, long epoch, ProposalPackage
+            .SmartContractHeaderExtension extension, ISigningIdentity identity, Message data) throws NodeException {
+        //构造Payload
+        Common.Payload payload = buildPayload(type, version, groupId, txId, epoch, extension, identity, data);
+        return buildEnvelope(payload, identity);
+    }
+
+    /**
+     * 构造信封对象
+     *
+     * @param payload  信封负载，注意传入时确保不能为空
+     * @param identity
+     * @return
+     * @throws NodeException
+     */
+    private static Common.Envelope buildEnvelope(Common.Payload payload, ISigningIdentity identity) throws
+            NodeException {
+        //获取Envelope对象的构造器
+        Common.Envelope.Builder envelopeBuilder = Common.Envelope.newBuilder();
+
+        //构造Payload
+        envelopeBuilder.setPayload(payload.toByteString());
+
+        if (identity != null) {
+            //Signature字段由Payload字段签名而成
+            byte[] signatureBytes = identity.sign(payload.toByteArray());
+            envelopeBuilder.setSignature(ByteString.copyFrom(signatureBytes));
+        } else {
+            log.warn("Identity is null");
+        }
+
+        return envelopeBuilder.build();
+    }
+
+    /**
+     * 构造交易负载
+     *
+     * @param type      消息类型
+     * @param version   消息协议的版本
+     * @param groupId   群组ID
+     * @param txId      交易ID
+     * @param epoch     所属纪元，目前以所需区块的高度值填充
+     * @param extension 智能合约扩展对象
+     * @param data
+     * @return
+     * @throws NodeException
+     */
+    public static Common.Payload buildPayload(
+            int type, int version, String groupId, String txId, long epoch, ProposalPackage
+            .SmartContractHeaderExtension extension, Message data) throws NodeException {
+        //获取默认的身份（自身的身份）填充
+        ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
+        return buildPayload(type, version, groupId, txId, epoch, extension, identity, data);
+    }
+
+    /**
+     * 构造交易负载
+     *
+     * @param type      消息类型
+     * @param version   消息协议的版本
+     * @param groupId   群组ID
+     * @param txId      交易ID
+     * @param epoch     所属纪元，目前以所需区块的高度值填充
+     * @param extension 智能合约扩展对象
+     * @param identity  构建交易对象的身份实体
+     * @param data      不同的消息类型，可以是Transaction/ConfigEnvelope/ConfigUpdateEnvelope
+     * @return
+     * @throws NodeException
+     */
+    public static Common.Payload buildPayload(
+            int type, int version, String groupId, String txId, long epoch, ProposalPackage
+            .SmartContractHeaderExtension extension, ISigningIdentity identity, Message data) throws NodeException {
+        //获取Payload对象的构造器
+        Common.Payload.Builder payloadBuilder = Common.Payload.newBuilder();
+
+        byte[] creator = null;
+        if (identity != null) {
+            creator = identity.getIdentity().serialize();
+        } else {
+            log.warn("Identity is null");
+        }
+        byte[] nonce = generateNonce();
+
+        Common.Header header = buildHeader(type, version, groupId, txId, epoch, extension, creator, nonce);
+        payloadBuilder.setHeader(header);
+
+        if (data != null) {
+            payloadBuilder.setData(data.toByteString());
+        }
+
+        return payloadBuilder.build();
+    }
+
+    /**
+     * 获取随机数
+     *
+     * @return
+     * @throws NodeException
+     */
+    public static byte[] generateNonce() throws NodeException {
+        try {
+            return CspManager.getDefaultCsp().rng(CommConstant.DEFAULT_NONCE_LENGTH, null);
+        } catch (JulongChainException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException("Can not get nonce");
+        }
+    }
+
+    /**
+     * 生成交易Id
+     *
+     * @param creator
+     * @param nonce
+     * @return
+     * @throws NodeException
+     */
+    public static String generateTxId(byte[] creator, byte[] nonce) throws NodeException {
+        try {
+            return ProposalUtils.computeProposalTxID(creator, nonce);
+        } catch (JulongChainException e) {
+            log.error(e.getMessage(), e);
+            throw new NodeException("Generate txId fail");
+        }
+    }
+
+    /**
      * 构造Header对象
      *
      * @param type      消息类型
@@ -574,7 +917,7 @@ public class EnvelopeHelper {
                                             ProposalPackage.SmartContractHeaderExtension extension, byte[]
                                                     creator, byte[] nonce) {
         //构造GroupHeader对象
-        Common.GroupHeader groupHeader = buildGroupHeader(type, 0, groupId, txId, 0, extension);
+        Common.GroupHeader groupHeader = buildGroupHeader(type, version, groupId, txId, epoch, extension);
         //构造SignatureHeader对象
         Common.SignatureHeader signatureHeader = buildSignatureHeader(creator, nonce);
 
@@ -595,14 +938,7 @@ public class EnvelopeHelper {
      * @return
      */
     public static Common.GroupHeader buildGroupHeader(int type, int version, String groupId, long epoch) {
-        Common.GroupHeader.Builder groupHeaderBuilder = Common.GroupHeader.newBuilder();
-        groupHeaderBuilder.setType(type);
-        groupHeaderBuilder.setVersion(version);
-        groupHeaderBuilder.setTimestamp(nowTimestamp());
-        groupHeaderBuilder.setGroupId(groupId);
-        groupHeaderBuilder.setEpoch(epoch);
-
-        return groupHeaderBuilder.build();
+        return buildGroupHeader(type, version, nowTimestamp(), groupId, null, epoch, null);
     }
 
     /**
@@ -618,20 +954,64 @@ public class EnvelopeHelper {
      */
     public static Common.GroupHeader buildGroupHeader(int type, int version, String groupId, String txId, long epoch,
                                                       ProposalPackage.SmartContractHeaderExtension extension) {
+        //默认填充当前的时间戳
+        return buildGroupHeader(type, version, nowTimestamp(), groupId, txId, epoch, extension);
+    }
+
+    /**
+     * 构造GroupHeader对象
+     *
+     * @param type
+     * @param version
+     * @param timestamp
+     * @param groupId
+     * @param txId
+     * @param epoch
+     * @param extension
+     * @return
+     */
+    public static Common.GroupHeader buildGroupHeader(
+            int type, int version, Timestamp timestamp, String groupId, String txId, long epoch, ProposalPackage
+            .SmartContractHeaderExtension extension) {
         //首先构造GroupHeader对象
         Common.GroupHeader.Builder groupHeaderBuilder = Common.GroupHeader.newBuilder();
         groupHeaderBuilder.setType(type);
         groupHeaderBuilder.setVersion(version);
-        //TODO:是否采用UTC的时间或更精准的时间
-        groupHeaderBuilder.setTimestamp(EnvelopeHelper.nowTimestamp());
-        groupHeaderBuilder.setGroupId(groupId);
-        groupHeaderBuilder.setTxId(txId);
+        if (timestamp != null) {
+            groupHeaderBuilder.setTimestamp(timestamp);
+        }
+        if (StringUtils.isNotBlank(groupId)) {
+            groupHeaderBuilder.setGroupId(groupId);
+        }
+        if (StringUtils.isNotBlank(txId)) {
+            groupHeaderBuilder.setTxId(txId);
+        }
         groupHeaderBuilder.setEpoch(epoch);
+
         if (extension != null) {
             groupHeaderBuilder.setExtension(extension.toByteString());
         }
 
         return groupHeaderBuilder.build();
+    }
+
+    /**
+     * 基于身份信息构造SignatureHeader对象
+     *
+     * @param identity
+     * @return
+     * @throws NodeException
+     */
+    public static Common.SignatureHeader buildSignatureHeader(ISigningIdentity identity) throws NodeException {
+        //构造签名对象,由两个字段构成SignatureHeader
+        byte[] creator = null;
+        if (identity != null) {
+            creator = identity.getIdentity().serialize();
+        } else {
+            log.warn("Identity is null");
+        }
+        byte[] nonce = generateNonce();
+        return buildSignatureHeader(creator, nonce);
     }
 
     /**
@@ -644,8 +1024,12 @@ public class EnvelopeHelper {
     public static Common.SignatureHeader buildSignatureHeader(byte[] creator, byte[] nonce) {
         //构造SignatureHeader对象
         Common.SignatureHeader.Builder signatureHeaderBuilder = Common.SignatureHeader.newBuilder();
-        signatureHeaderBuilder.setCreator(ByteString.copyFrom(creator));
-        signatureHeaderBuilder.setNonce(ByteString.copyFrom(nonce));
+        if (creator != null) {
+            signatureHeaderBuilder.setCreator(ByteString.copyFrom(creator));
+        }
+        if (nonce != null) {
+            signatureHeaderBuilder.setNonce(ByteString.copyFrom(nonce));
+        }
         return signatureHeaderBuilder.build();
     }
 

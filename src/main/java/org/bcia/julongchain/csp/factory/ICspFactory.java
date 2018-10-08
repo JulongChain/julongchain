@@ -19,18 +19,26 @@ package org.bcia.julongchain.csp.factory;
 import org.bcia.julongchain.csp.intfs.ICsp;
 
 /**
- * @author zhanglin
- * @purpose Define the interface, ICspFactory
- * @date 2018-01-25
+ * csp工厂接口
+ *
+ * @author zhanglin, zhangmingyang
+ * @date 2018/1/25
  * @company Dingxuan
  */
 
-// ICspFactory is a factory for blockchain cryptographic service.
 public interface ICspFactory {
 
     // The getName returns the name of this factory.
-    String getName();
 
-    // The getCsp returns an instance of Csp according to the opts whose type is IFactoryOpts.
+    /**
+     * 返回工厂名称
+     * @return
+     */
+    String getName();
+    /**
+     * 根据选项获取 ICsp
+     * @param opts
+     * @return
+     */
     ICsp getCsp(IFactoryOpts opts);
 }

@@ -13,21 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.consenter.consensus.kafka;
+package org.bcia.julongchain.core.deliverservice.blocksprovider;
 
-import org.bcia.julongchain.protos.consenter.Kafka;
+import org.bcia.julongchain.gossip.NetworkMember;
+import org.bcia.julongchain.protos.gossip.Message;
 
 /**
+ * gossip 服务适配器接口
+ *
  * @author zhangmingyang
- * @Date: 2018/3/20
+ * @Date: 2018/5/31
  * @company Dingxuan
  */
-public class KafkaMessage {
-    public static Kafka.KafkaMessageRegular buildKafkaMessageRegular(){
-        Kafka.KafkaMessageRegular.Builder kafakaMessageRegularBuilder= Kafka.KafkaMessageRegular.newBuilder();
-       // kafakaMessageRegularBuilder.setPayload();
-        kafakaMessageRegularBuilder.setClass_Value(Kafka.KafkaMessageRegular.Class.CONFIG_VALUE);
+public interface IGossipServiceAdapter {
 
-        return kafakaMessageRegularBuilder.build();
-    }
+    NetworkMember[] nodeOfGroup(byte[] groupId);
+
+    void addPayload(String groupId, Message.Payload gossipPayload);
+
+    void gossip(Message.GossipMessage msg);
 }

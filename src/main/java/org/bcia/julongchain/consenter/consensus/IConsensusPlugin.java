@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.consenter.consensus;
 
+import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
 import org.bcia.julongchain.protos.common.Common;
 
@@ -31,5 +32,5 @@ public interface IConsensusPlugin {
       * @param metadata
       * @return
       */
-     IChain handleChain(ChainSupport consenterSupport, Common.Metadata metadata);
+     IChain handleChain(ChainSupport consenterSupport, Common.Metadata metadata) throws ConsenterException;
 }

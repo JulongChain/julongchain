@@ -18,6 +18,8 @@ package org.bcia.julongchain.common.deliver;
 import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
 
 /**
+ * 链支持管理接口
+ *
  * @author zhangmingyang
  * @Date: 2018/5/29
  * @company Dingxuan

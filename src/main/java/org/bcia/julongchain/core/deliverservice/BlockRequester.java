@@ -26,6 +26,8 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 
 /**
+ * 块请求者
+ *
  * @author zhangmingyang
  * @Date: 2018/6/1
  * @company Dingxuan
@@ -66,8 +68,8 @@ public class BlockRequester {
         long epoch = 0;
         byte[] tlsCertHash = getTLSCertHash();
 
-       Common.Envelope envelope= TxUtils.createSignedEnvelopeWithTLSBinding(Common.HeaderType.DELIVER_SEEK_INFO_VALUE,groupId,new LocalSigner(),seekInfo,msgVersion,epoch,tlsCertHash);
-       client.send(envelope);
+        Common.Envelope envelope = TxUtils.createSignedEnvelopeWithTLSBinding(Common.HeaderType.DELIVER_SEEK_INFO_VALUE, groupId, new LocalSigner(), seekInfo, msgVersion, epoch, tlsCertHash);
+        client.send(envelope);
     }
 
 
@@ -87,7 +89,7 @@ public class BlockRequester {
         int msgVersion = 0;
         long epoch = 0;
         byte[] tlsCertHash = getTLSCertHash();
-        Common.Envelope envelope= TxUtils.createSignedEnvelopeWithTLSBinding(Common.HeaderType.DELIVER_SEEK_INFO_VALUE,groupId,new LocalSigner(),seekInfo,msgVersion,epoch,tlsCertHash);
+        Common.Envelope envelope = TxUtils.createSignedEnvelopeWithTLSBinding(Common.HeaderType.DELIVER_SEEK_INFO_VALUE, groupId, new LocalSigner(), seekInfo, msgVersion, epoch, tlsCertHash);
         client.send(envelope);
 
     }

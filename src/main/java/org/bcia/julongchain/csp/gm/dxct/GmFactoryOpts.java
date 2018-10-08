@@ -23,7 +23,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author zhanglin,zhangmingyang
+ * 国密工厂选项
+ *
+ * @author zhanglin, zhangmingyang
  * @date 2018-01-25
  * @company Dingxuan
  */
@@ -38,6 +40,7 @@ public class GmFactoryOpts implements IGmFactoryOpts {
 
     public GmFactoryOpts() {
     }
+
     @Override
     public String getProviderName() {
         return PROVIDER_GM;
@@ -59,7 +62,7 @@ public class GmFactoryOpts implements IGmFactoryOpts {
         this.asymmetricKeyType = optMap.get(GmCspConstant.ASYMMETRICKEY_TYPE);
         this.hashType = optMap.get(GmCspConstant.HASH_TYPE);
         this.signType = optMap.get(GmCspConstant.SIGN_TYPE);
-        this.keyStorePath=optMap.get(GmCspConstant.KEYSTROE_PATH);
+        this.keyStorePath = optMap.get(GmCspConstant.KEYSTROE_PATH);
     }
 
     @Override

@@ -14,7 +14,7 @@ import java.io.IOException;
 import static org.junit.Assert.*;
 
 /**
- * 类描述
+ * deliver服务处理测试
  *
  * @author zhangmingyang
  * @date 2018/07/03

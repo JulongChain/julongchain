@@ -18,12 +18,16 @@ package org.bcia.julongchain.core.deliverservice.blocksprovider;
 import com.google.protobuf.InvalidProtocolBufferException;
 
 /**
+ * 块提供者接口
+ *
  * @author zhangmingyang
  * @Date: 2018/5/31
  * @company Dingxuan
  */
 public interface IBlocksProvider {
     void deliverBlocks() throws InvalidProtocolBufferException;
+
     void updateOrderingEndpoints(String[] endpoints);
+
     void stop();
 }

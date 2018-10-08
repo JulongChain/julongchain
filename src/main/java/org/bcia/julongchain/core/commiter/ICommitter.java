@@ -16,28 +16,26 @@
 package org.bcia.julongchain.core.commiter;
 
 import org.bcia.julongchain.common.exception.CommitterException;
-import org.bcia.julongchain.core.ledger.*;
-import org.bcia.julongchain.protos.common.*;
+import org.bcia.julongchain.common.exception.ValidateException;
+import org.bcia.julongchain.core.ledger.BlockAndPvtData;
+import org.bcia.julongchain.protos.common.Common;
 
 import java.util.List;
-import java.util.Map;
 
 /**
- * 确认服务接口
+ * 提交者接口
  *
- * @author wanglei
- * @date 18/3/27
+ * @author wanglei zhouhui
+ * @date 2018/03/27
  * @company Dingxuan
  */
 public interface ICommitter {
 
-    void commitWithPrivateData(BlockAndPvtData blockAndPvtData) throws CommitterException;
+    void commitWithPrivateData(BlockAndPvtData blockAndPvtData) throws CommitterException, ValidateException;
 
     BlockAndPvtData getPrivateDataAndBlockByNum(long seqNumber) throws CommitterException;
 
-    TxPvtData[] getPrivateDataByNum(long blockNumber, Map<String, Map<String, Boolean>> filter) throws CommitterException;
-
-    long ledgerHeight() throws CommitterException;
+    long getLedgerHeight() throws CommitterException;
 
     List<Common.Block> getBlocks(long[] blockSeqs);
 

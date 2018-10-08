@@ -47,8 +47,7 @@ public class SmartContractExecutor {
      * @param spec      智能合约规格（部署/执行）
      * @return
      */
-    public Object[] execute(SmartContractContext scContext, Object spec) throws
-            SmartContractException {
+    public Object[] execute(SmartContractContext scContext, Object spec) throws SmartContractException {
         //TODO:测试数据
         long timeout = 3000;
 
@@ -106,14 +105,15 @@ public class SmartContractExecutor {
                 ProposalResponsePackage.Response response = null;
                 try {
                     response = ProposalResponsePackage.Response.parseFrom(responseMessage.getPayload());
-                    log.info(response.getMessage());
+                    log.info("Response message: " + response.getMessage());
                 } catch (InvalidProtocolBufferException e) {
                     log.error(e.getMessage(), e);
                     throw new SmartContractException("Wrong Response");
                 }
                 return new Object[]{response, responseMessage.getSmartContractEvent()};
             } else {
-                throw new SmartContractException("Execute smart contract fail: " + responseMessage.getPayload().toStringUtf8());
+                throw new SmartContractException("Execute smart contract fail: " + responseMessage.getPayload()
+                        .toStringUtf8());
             }
         }
 
@@ -129,8 +129,8 @@ public class SmartContractExecutor {
      * @param groupId 群组ID
      * @return
      */
-    private SmartContractShim.SmartContractMessage buildSmartContractMessage(int msgType, byte[] payload, String txId, String groupId, ProposalPackage.SignedProposal signedProposal) {
-
+    private SmartContractShim.SmartContractMessage buildSmartContractMessage(
+            int msgType, byte[] payload, String txId, String groupId, ProposalPackage.SignedProposal signedProposal) {
         SmartContractShim.SmartContractMessage.Builder scMessageBuilder = SmartContractShim.SmartContractMessage
                 .newBuilder();
 
@@ -138,15 +138,6 @@ public class SmartContractExecutor {
         scMessageBuilder.setPayload(ByteString.copyFrom(payload));
         scMessageBuilder.setTxid(txId);
         scMessageBuilder.setGroupId(groupId);
-
-
-        // Common.GroupHeader groupHeader = Common.GroupHeader.newBuilder().setType(Common.HeaderType.ENDORSER_TRANSACTION.getNumber()).build();
-        // Common.Header header = Common.Header.newBuilder().setGroupHeader(groupHeader.toByteString()).build();
-        // ProposalPackage.Proposal proposal = ProposalPackage.Proposal.newBuilder().setHeader(header
-        //         .toByteString()).build();
-        // ProposalPackage.SignedProposal signedProposal = ProposalPackage.SignedProposal.newBuilder()
-        //         .setProposalBytes(proposal.toByteString()).build();
-
         scMessageBuilder.setProposal(signedProposal);
 
         return scMessageBuilder.build();

@@ -17,6 +17,7 @@ package org.bcia.julongchain.consenter.common.multigroup;
 
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
+import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.PolicyException;
 import org.bcia.julongchain.common.exception.ValidateException;
@@ -81,7 +82,7 @@ public class BlockWriter {
         }
     }
 
-    public void writeConfigBlock(Common.Block block, byte[] encodedMetadataValue) throws InvalidProtocolBufferException, LedgerException, ValidateException, PolicyException {
+    public void writeConfigBlock(Common.Block block, byte[] encodedMetadataValue) throws ConsenterException {
         Common.Envelope ctx = CommonUtils.extractEnvelop(block, 0);
         Common.Payload payload = Utils.unmarshalPayload(ctx.getPayload().toByteArray());
         if (payload.getHeader() == null) {
@@ -95,9 +96,17 @@ public class BlockWriter {
                 break;
             case Common.HeaderType.CONFIG_VALUE:
                 Configtx.ConfigEnvelope configEnvelope = Utils.unmarshalConfigEnvelope(payload.getData().toByteArray());
-                support.validate(configEnvelope);
-
-                IGroupConfigBundle iGroupConfigBundle = support.createBundle(groupHeader.getGroupId(), configEnvelope.getConfig());
+                IGroupConfigBundle iGroupConfigBundle = null;
+                try {
+                    support.validate(configEnvelope);
+                    iGroupConfigBundle = support.createBundle(groupHeader.getGroupId(), configEnvelope.getConfig());
+                } catch (ValidateException e) {
+                    throw new ConsenterException(e);
+                } catch (PolicyException e) {
+                    throw new ConsenterException(e);
+                } catch (InvalidProtocolBufferException e) {
+                    throw new ConsenterException(e);
+                }
                 //  support.getLedgerResources().getMutableResources().update();
                 support.update(iGroupConfigBundle);
                 break;

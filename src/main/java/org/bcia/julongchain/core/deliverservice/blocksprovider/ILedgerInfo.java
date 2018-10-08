@@ -18,6 +18,8 @@ package org.bcia.julongchain.core.deliverservice.blocksprovider;
 import org.bcia.julongchain.common.exception.ConsenterException;
 
 /**
+ * 账本信息接口
+ *
  * @author zhangmingyang
  * @Date: 2018/5/31
  * @company Dingxuan

@@ -32,16 +32,13 @@ import org.bcia.julongchain.protos.node.ProposalResponsePackage;
 import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
- * 类描述
+ * Envelop消息辅助类
  *
  * @author sunianle,zhangmingyang
  * @date 3/29/18
  * @company Dingxuan
  */
 public class TxUtils {
-    private static JulongChainLog log = JulongChainLogFactory.getLog(TxUtils.class);
-
-    // MockSignedEndorserProposalOrPanic creates a SignedProposal with the passed arguments
     public static ProposalPackage.SignedProposal mockSignedEndorserProposalOrPanic(
             String groupID,
             SmartContractPackage.SmartContractSpec spec
@@ -73,12 +70,7 @@ public class TxUtils {
     }
 
     public static Common.Envelope getEnvelopeFromBlock(byte[] data) {
-//        Common.Envelope.Builder envelope = Common.Envelope.newBuilder();
-//        try {
-//            envelope.mergeFrom(data);
-//        } catch (InvalidProtocolBufferException e) {
-//            e.printStackTrace();
-//        }
+
         Common.Envelope envelope= null;
         try {
             envelope = Common.Envelope.parseFrom(data);
@@ -115,13 +107,5 @@ public class TxUtils {
                 .setPayload(ByteString.copyFrom(paylBytes))
                 .setSignature(ByteString.copyFrom(sig)).build();
         return envelope;
-    }
-
-
-    public static void main(String[] args) throws InvalidProtocolBufferException {
-        Common.Envelope envelope=Common.Envelope.parseFrom("123".getBytes());
-
-       Common.Payload payload=Common.Payload.parseFrom(envelope.getPayload()) ;
-       payload.getHeader();
     }
 }

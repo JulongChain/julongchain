@@ -38,6 +38,9 @@ import java.util.List;
 public class PolicyParser {
     private static JulongChainLog log = JulongChainLogFactory.getLog(PolicyParser.class);
     private static final int ARGS = 3;
+    private static final String OUTOF = "outof";
+    private static final String MEMBER = "member";
+    private static final String ADMIN = "admin";
     public static Context context;
     public static List<Policies.SignaturePolicy> policies = new ArrayList<Policies.SignaturePolicy>();
 
@@ -65,9 +68,9 @@ public class PolicyParser {
     }
     public static List<PolicyNode> queryNode(PolicyNode node){
         List<PolicyNode> policyNodes = new ArrayList<PolicyNode>();
-        if("outof".equals(node.getMsg())){
+        if(OUTOF.equals(node.getMsg())){
             for(int i=0;i<node.sons.size();i++){
-                if("outof".equals(node.sons.get(i).msg.toString())){
+                if(OUTOF.equals(node.sons.get(i).msg.toString())){
                     policyNodes.add(node.sons.get(i));
                 }else{
                     continue;
@@ -101,9 +104,9 @@ public class PolicyParser {
             str = str.replaceAll("\'","");
             String[] strs = str.split("\\.");
             MspPrincipal.MSPRole.MSPRoleType role = null;
-            if("member".equals(strs[strs.length-1])){
+            if(MEMBER.equals(strs[strs.length-1])){
                 role = MspPrincipal.MSPRole.MSPRoleType.MEMBER;
-            }if("admin".equals(strs[strs.length-1])){
+            }if(ADMIN.equals(strs[strs.length-1])){
                 role = MspPrincipal.MSPRole.MSPRoleType.ADMIN;
             }else{
                 String msg=String.format("Unrecognized type, expected a principal or a policy, got %s",node.sons.get(i).getMsg());

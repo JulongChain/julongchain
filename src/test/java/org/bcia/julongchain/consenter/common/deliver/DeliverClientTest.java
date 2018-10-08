@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
+ * Deliver 客户端测试类
  * @author zhangmingyang
  * @Date 2018-02-26
  * @company Dingxuan

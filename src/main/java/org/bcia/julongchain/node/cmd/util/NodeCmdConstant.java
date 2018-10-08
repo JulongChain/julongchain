@@ -60,6 +60,10 @@ public class NodeCmdConstant {
      */
     public static final String INSTANCE_CONTRACT = "instantiate";
     /**
+     * 升级智能合约
+     */
+    public static final String UPGRADE_CONTRACT = "upgrade";
+    /**
      * 调用智能合约
      */
     public static final String INVOKE_CONTRACT = "invoke";

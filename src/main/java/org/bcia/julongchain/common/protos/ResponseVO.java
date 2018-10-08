@@ -13,35 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.common.config;
-
+package org.bcia.julongchain.common.protos;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.protos.common.Common;
-import org.bcia.julongchain.protos.common.Configtx;
+import org.bcia.julongchain.protos.node.ProposalResponsePackage;
 
 /**
- * IConfig 封装了config树
+ * 提案响应中的响应对象
  *
- * @author sunianle,zhangmingyang
- * @date 3/13/18
+ * @author zhouhui
+ * @date 2018/09/30
  * @company Dingxuan
  */
-public interface IConfig {
-    /**
-     * 获取当前配置
-     * @return
-     */
-    Configtx.Config getCurrentConfig();
+public class ResponseVO implements IProtoVO<ProposalResponsePackage.Response> {
+    private int status;
+    private String message;
 
-    /**
-     * 更新propose配置,尝试针对当前配置状态验证新的configtx
-     * @param configtx
-     * @return
-     * @throws InvalidProtocolBufferException
-     * @throws ValidateException
-     */
-    Configtx.ConfigEnvelope updateProposeConfig(Common.Envelope configtx) throws InvalidProtocolBufferException,
-            ValidateException;
+
+    @Override
+    public void parseFrom(ProposalResponsePackage.Response response) throws InvalidProtocolBufferException,
+            ValidateException {
+
+
+    }
+
+    @Override
+    public ProposalResponsePackage.Response toProto() {
+        return null;
+    }
 }

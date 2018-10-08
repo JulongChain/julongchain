@@ -17,50 +17,50 @@ package org.bcia.julongchain.node.cmd.group;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
+import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.node.Node;
 
 /**
- 完成更新群组配置命令的解析
+ * 完成更新群组配置命令的解析
  * node group update -c localhost:7050 -g mygroup -f /home/julongchain/group.tx
  *
- * @author wanglei
- * @date 2018/3/2
+ * @author wanglei zhouhui
+ * @date 2018/03/02
  * @company Dingxuan
  */
 public class GroupUpdateCmd extends AbstractNodeGroupCmd {
-    private static JulongChainLog log = JulongChainLogFactory.getLog(GroupCreateCmd.class);
+    private static JulongChainLog log = JulongChainLogFactory.getLog(GroupUpdateCmd.class);
 
-    //参数：consenter地址
+    /**
+     * consenter地址
+     */
     private static final String ARG_CONSENTER = "c";
-    //参数：groupId
+    /**
+     * groupId
+     */
     private static final String ARG_GROUP_ID = "g";
-    //参数：group配置文件路径
+    /**
+     * group配置文件路径
+     */
     private static final String ARG_FILE_PATH = "f";
-    //参数：超时时间
-    private static final String ARG_TIMEOUT = "t";
-    //参数：是否使用TLS传输
-    private static final String ARG_USE_TLS = "tls";
-    //参数：CA文件位置
-    private static final String ARG_CA = "ca";
 
     public GroupUpdateCmd(Node node) {
         super(node);
     }
 
     @Override
-    public void execCmd(String[] args) throws ParseException {
+    public void execCmd(String[] args) throws ParseException, NodeException {
         Options options = new Options();
         options.addOption(ARG_CONSENTER, true, "Input consenter's IP and port");
         options.addOption(ARG_GROUP_ID, true, "Input group id");
         options.addOption(ARG_FILE_PATH, true, "Input group config file path");
-        options.addOption(ARG_TIMEOUT, true, "Input group update timeout");
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
 
-        String defaultValue = "unknown";
+        String defaultValue = "";
 
         String consenter = null;
         if (cmd.hasOption(ARG_CONSENTER)) {
@@ -80,12 +80,6 @@ public class GroupUpdateCmd extends AbstractNodeGroupCmd {
             log.info("GroupId config File: " + groupConfigFile);
         }
 
-        String timeout = null;
-        if (cmd.hasOption(ARG_TIMEOUT)) {
-            timeout = cmd.getOptionValue(ARG_TIMEOUT, defaultValue);
-            log.info("Timeout: " + timeout);
-        }
-
         if (StringUtils.isBlank(groupId)) {
             log.error("GroupId should not be null, Please input it");
             return;
@@ -96,23 +90,22 @@ public class GroupUpdateCmd extends AbstractNodeGroupCmd {
             return;
         }
 
-        String[] ipAndPort = consenter.split(":");
-        if (ipAndPort.length <= 1) {
+        String[] consenterHostPort = consenter.split(":");
+        if (consenterHostPort.length <= 1) {
             log.error("Consenter is not valid");
             return;
         }
 
         int port = 0;
         try {
-            port = Integer.parseInt(ipAndPort[1]);
+            port = Integer.parseInt(consenterHostPort[1]);
         } catch (NumberFormatException ex) {
             log.error("Consenter's port is not valid");
             return;
         }
 
-        //0.25 无配置文件
-        nodeGroup.updateGroup(ipAndPort[0], port, groupId);
+        nodeGroup.updateGroup(consenterHostPort[0], port, groupId, groupConfigFile);
 
-        log.info("Group updated!");
+        log.info("Send Group update success");
     }
 }

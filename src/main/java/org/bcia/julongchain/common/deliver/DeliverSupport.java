@@ -19,6 +19,7 @@ import org.bcia.julongchain.consenter.common.multigroup.ChainSupport;
 import org.bcia.julongchain.consenter.common.multigroup.Registrar;
 
 /**
+ * Deliver支持,实现ISupportManager接口
  * @author zhangmingyang
  * @Date: 2018/6/9
  * @company Dingxuan

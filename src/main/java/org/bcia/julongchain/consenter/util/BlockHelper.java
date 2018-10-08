@@ -46,7 +46,7 @@ public class BlockHelper {
 
     public static Common.Block createBlock(long seqNum, byte[] previousHash) {
         Common.Block.Builder block = Common.Block.newBuilder();
-        log.info(String.format("This Block's Num is %s", seqNum));
+        //log.info(String.format("This Block's Num is %s", seqNum));
 
         Common.BlockData.Builder blockData = Common.BlockData.newBuilder();
         Common.BlockMetadata.Builder metaData = Common.BlockMetadata.newBuilder();

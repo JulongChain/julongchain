@@ -29,6 +29,8 @@ import static org.bcia.julongchain.protos.common.Common.Status.FORBIDDEN;
 import static org.bcia.julongchain.protos.common.Common.Status.SUCCESS;
 
 /**
+ * 区块提供者服务
+ *
  * @author zhangmingyang
  * @Date: 2018/5/31
  * @company Dingxuan
@@ -41,12 +43,12 @@ public class BlocksProviderImpl implements IBlocksProvider {
 
     private String groupId;
     private IStreamClient client;
-    private IGossipServcieAdapter gossip;
+    private IGossipServiceAdapter gossip;
     private IMessageCryptoService mcs;
     private int done;
     private int wrongStatusThreshold;
 
-    public BlocksProviderImpl(String groupId, IStreamClient client, IGossipServcieAdapter gossip, IMessageCryptoService mcs) {
+    public BlocksProviderImpl(String groupId, IStreamClient client, IGossipServiceAdapter gossip, IMessageCryptoService mcs) {
         this.groupId = groupId;
         this.client = client;
         this.gossip = gossip;
@@ -120,7 +122,7 @@ public class BlocksProviderImpl implements IBlocksProvider {
 
     @Override
     public void updateOrderingEndpoints(String[] endpoints) {
-        if(!isEndpointsUpdated(endpoints)){
+        if (!isEndpointsUpdated(endpoints)) {
             return;
         }
         log.debug(String.format("Updating endpoint, to %s", endpoints));
@@ -140,8 +142,9 @@ public class BlocksProviderImpl implements IBlocksProvider {
             return true;
         }
         for (String endopint : endpoints) {
-            if (!StringUtils.contains(String.valueOf(client.getEndpoints()), endopint)) ;
-            return true;
+            if (!StringUtils.contains(String.valueOf(client.getEndpoints()), endopint)) {
+                return true;
+            }
         }
         return false;
     }
@@ -178,7 +181,7 @@ public class BlocksProviderImpl implements IBlocksProvider {
         return client;
     }
 
-    public IGossipServcieAdapter getGossip() {
+    public IGossipServiceAdapter getGossip() {
         return gossip;
     }
 

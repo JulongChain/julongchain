@@ -78,7 +78,7 @@ public class SystemGroup  implements IProcessor {
     }
 
     @Override
-    public boolean ClassifyMsg(Common.GroupHeader chdr) {
+    public boolean classfiyMsg(Common.GroupHeader chdr) {
         return false;
     }
 

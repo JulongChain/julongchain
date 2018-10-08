@@ -15,6 +15,7 @@
  */
 package org.bcia.julongchain.common.util.producer;
 
+import org.bcia.julongchain.common.exception.ConsenterException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 
