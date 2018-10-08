@@ -15,9 +15,9 @@
  */
 package org.bcia.julongchain.core.commiter.util;
 
-import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.ValidateException;
+import org.bcia.julongchain.common.util.proto.BlockUtils;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
@@ -37,8 +37,8 @@ public class CommitterUtils {
      * @throws ValidateException
      */
     public static boolean isConfigBlock(Common.Block block) throws InvalidProtocolBufferException, ValidateException {
-        //获取第一个信封对象
-        Common.Envelope envelope = getEnvelopeFromBlock(block, 0);
+        //获取第一个信封对象(配置交易单独成块，所以获取第一个信封就行)
+        Common.Envelope envelope = BlockUtils.extractEnvelope(block, 0);
         if (envelope == null) {
             return false;
         }
@@ -62,29 +62,4 @@ public class CommitterUtils {
         //当且仅当头部类型为CONFIG时为配置区块
         return groupHeader.getType() == Common.HeaderType.CONFIG_VALUE;
     }
-
-    /**
-     * 从区块对象中获取信封对象
-     *
-     * @param block
-     * @param index
-     * @return
-     * @throws ValidateException
-     * @throws InvalidProtocolBufferException
-     */
-    public static Common.Envelope getEnvelopeFromBlock(Common.Block block, int index) throws ValidateException,
-            InvalidProtocolBufferException {
-        if (block.getData() == null) {
-            throw new ValidateException("Missing data");
-        }
-
-        int dataCount = block.getData().getDataCount();
-        if (index < 0 || index >= dataCount) {
-            throw new ValidateException("Wrong index");
-        }
-
-        ByteString dataByteString = block.getData().getData(index);
-        return Common.Envelope.parseFrom(dataByteString);
-    }
-
 }

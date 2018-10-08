@@ -311,9 +311,9 @@ public class CommitterValidator implements ICommitterValidator {
         payloadVO.parseFrom(payload);
 
         SmartContractInstance invokeInstance = new SmartContractInstance();
-        invokeInstance.setGroupId(payloadVO.getGroupHeaderVO().getGroupId());
+        invokeInstance.setGroupId(payloadVO.getHeaderVO().getGroupHeaderVO().getGroupId());
 
-        ProposalPackage.SmartContractHeaderExtension extension = payloadVO.getGroupHeaderVO().getGroupHeaderExtension();
+        ProposalPackage.SmartContractHeaderExtension extension = payloadVO.getHeaderVO().getGroupHeaderVO().getGroupHeaderExtension();
         invokeInstance.setSmartContractName(extension.getSmartContractId().getName());
         invokeInstance.setSmartContractVersion(extension.getSmartContractId().getVersion());
 
@@ -329,7 +329,7 @@ public class CommitterValidator implements ICommitterValidator {
                 SmartContractPackage.SmartContractDeploymentSpec deploymentSpec = SmartContractPackage.SmartContractDeploymentSpec
                         .parseFrom(invocationSpec.getSmartContractSpec().getInput().getArgs(2));
                 upgradeInstance = new SmartContractInstance();
-                upgradeInstance.setGroupId(payloadVO.getGroupHeaderVO().getGroupId());
+                upgradeInstance.setGroupId(payloadVO.getHeaderVO().getGroupHeaderVO().getGroupId());
                 upgradeInstance.setSmartContractName(deploymentSpec.getSmartContractSpec().getSmartContractId().getName());
                 upgradeInstance.setSmartContractVersion(deploymentSpec.getSmartContractSpec().getSmartContractId().getVersion());
             }

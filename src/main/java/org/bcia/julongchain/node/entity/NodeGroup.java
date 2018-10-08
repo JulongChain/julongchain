@@ -83,11 +83,16 @@ public class NodeGroup {
      * 创建群组时使用的锁
      */
     private CommLock createLock;
+    /**
+     * 更新群组时使用的锁
+     */
+    private CommLock updateLock;
 
     public NodeGroup(Node node) {
         this.node = node;
 
         this.createLock = new CommLock(TIMEOUT_CREATE);
+        this.updateLock = new CommLock(TIMEOUT_CREATE);
     }
 
     /**
@@ -107,7 +112,8 @@ public class NodeGroup {
         ILocalSigner signer = new LocalSigner();
         if (StringUtils.isNotBlank(groupFile) && FileUtils.isExists(groupFile)) {
             //如果群组文件存在，则直接从文件读取，形成信封对象
-            envelope = EnvelopeHelper.readFromFile(groupFile);
+            Common.Envelope fileEnvelope = EnvelopeHelper.readFromFile(groupFile);
+            envelope = EnvelopeHelper.sanityCheckAndSignConfigTx(fileEnvelope, groupId);
         } else if (StringUtils.isBlank(groupFile)) {
             //如果是空文件，则组成一个默认的信封对象
             try {
@@ -126,12 +132,12 @@ public class NodeGroup {
             throw new NodeException("Group File is not exists");
         }
 
-        log.info("SanityCheckAndSignConfigTx begin");
-        Common.Envelope signedEnvelope = EnvelopeHelper.sanityCheckAndSignConfigTx(envelope, groupId, signer);
+//        log.info("SanityCheckAndSignConfigTx begin");
+//        Common.Envelope signedEnvelope = EnvelopeHelper.sanityCheckAndSignConfigTx(envelope, groupId, signer);
 
         log.info("Begin to broadcast");
         IBroadcastClient broadcastClient = new BroadcastClient(consenterHost, consenterPort);
-        broadcastClient.send(signedEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
+        broadcastClient.send(envelope, new StreamObserver<Ab.BroadcastResponse>() {
             @Override
             public void onNext(Ab.BroadcastResponse value) {
                 log.info("Receive broadcast onNext");
@@ -241,6 +247,71 @@ public class NodeGroup {
     }
 
     /**
+     * 更新群组
+     *
+     * @param consenterHost
+     * @param consenterPort
+     * @param groupId
+     * @param groupFile
+     */
+    public void updateGroup(String consenterHost, int consenterPort, String groupId, String groupFile) throws
+            NodeException {
+        Common.Envelope envelope = null;
+
+        ILocalSigner signer = new LocalSigner();
+        if (StringUtils.isNotBlank(groupFile) && FileUtils.isExists(groupFile)) {
+            //如果群组文件存在，则直接从文件读取，形成信封对象
+            Common.Envelope fileEnvelope = EnvelopeHelper.readFromFile(groupFile);
+            envelope = EnvelopeHelper.sanityCheckAndSignConfigTx(fileEnvelope, groupId);
+        } else {
+            //不是空文件，反而是一个错误的文件，则直接报异常（要么不指定文件，要么就指定正确的文件）
+            log.error("GroupFile is not exists: " + groupFile);
+            throw new NodeException("Group File is not exists");
+        }
+
+        log.info("Begin to broadcast");
+        IBroadcastClient broadcastClient = new BroadcastClient(consenterHost, consenterPort);
+        broadcastClient.send(envelope, new StreamObserver<Ab.BroadcastResponse>() {
+            @Override
+            public void onNext(Ab.BroadcastResponse value) {
+                log.info("Receive broadcast onNext");
+                broadcastClient.close();
+
+                //收到响应消息，判断是否是200消息
+                if (Common.Status.SUCCESS.equals(value.getStatus())) {
+                    log.info("Update group success");
+
+                } else {
+                    log.error("Some thing is wrong: " + value.getStatus());
+
+                }
+                updateLock.unLock();
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                log.error(t.getMessage(), t);
+                broadcastClient.close();
+                updateLock.unLock();
+            }
+
+            @Override
+            public void onCompleted() {
+                log.info("Broadcast completed");
+                broadcastClient.close();
+                updateLock.unLock();
+            }
+        });
+
+        updateLock.tryLock(new CommLock.TimeoutCallback() {
+            @Override
+            public void onTimeout() {
+                log.error("Timeout in group create");
+            }
+        });
+    }
+
+    /**
      * 加入群组
      *
      * @param nodeHost
@@ -291,19 +362,6 @@ public class NodeGroup {
 
             log.error(msg);
             throw new NodeException(msg);
-        }
-    }
-
-    /**
-     * 更新群组配置 V0.25
-     */
-    public void updateGroup(String ip, int port, String groupId) {
-        IBroadcastClient broadcastClient = new BroadcastClient(ip, port);
-        try {
-            //broadCastClient.send(ip, port, groupId, this);
-            broadcastClient.send(Common.Envelope.newBuilder().build(), null);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
         }
     }
 

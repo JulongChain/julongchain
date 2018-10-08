@@ -326,27 +326,22 @@ public class Node {
 
         ICommitterValidator committerValidator = new CommitterValidator(new CommitterSupport(group));
 
-        ICommitter committer = new Committer(nodeLedger, new Committer.IConfigBlockEventer() {
+        ICommitter committer = new Committer(nodeLedger, new Committer.IConfigBlockListener() {
             @Override
-            public void event(Common.Block block) throws CommitterException {
+            public void onConfigBlockChanged(Common.Block configBlock) throws CommitterException {
                 try {
-                    String groupIDFromBlock = BlockUtils.getGroupIDFromBlock(block);
-                    onConfigBlockChanged(groupIDFromBlock, block);
+                    String groupIDFromBlock = BlockUtils.getGroupIDFromBlock(configBlock);
+                    Group group = groupMap.get(groupIDFromBlock);
+                    if (group != null) {
+                        group.setConfigBlock(configBlock);
+                        log.info("ConfigBlock Changed: " + groupIDFromBlock);
+                    }
                 } catch (Exception e) {
                     log.error(e.getMessage(), e);
                     throw new CommitterException(e);
                 }
             }
         });
-
-        //TODO
-//        Configuration.ConsenterAddresses consenterAddresses = groupConfigBundle.getGroupConfig().getConsenterAddresses();
-//        if (consenterAddresses == null || consenterAddresses.getAddressesCount() <= 0) {
-//            throw new ValidateException("consenterAddresses can not be null");
-//        }
-
-        //TODO:Gossip
-
 
         group.setResourcesConfigBundle(resourcesConfigBundle);
 
@@ -356,13 +351,6 @@ public class Node {
         groupMap.put(groupId, group);
 
         return group;
-    }
-
-    private void onConfigBlockChanged(String groupIDFromBlock, Common.Block newBlock) {
-        Group group = groupMap.get(groupIDFromBlock);
-        if (group != null) {
-            group.setConfigBlock(newBlock);
-        }
     }
 
     private void updateTrustedRoots(IResourcesConfigBundle bundle) {

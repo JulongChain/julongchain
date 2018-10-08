@@ -28,15 +28,15 @@ import org.bcia.julongchain.protos.node.SmartContractPackage;
 
 /**
  * 完成节点实例化智能合约的解析
- * node contract instantiate -t 127.0.0.1:7051 -c localhost:7050 -g $group_id -n mycc -v 1.0
+ * node contract upgrade -t 127.0.0.1:7051 -c localhost:7050 -g $group_id -n mycc -v 1.1
  * -i "{'args':['init','a','100','b','200']}" -P "OR	('Org1MSP.member','Org2MSP.member')"
  *
  * @author zhouhui
- * @date 2018/2/24
+ * @date 2018/10/01
  * @company Dingxuan
  */
-public class ContractInstantiateCmd extends AbstractNodeContractCmd {
-    private static JulongChainLog log = JulongChainLogFactory.getLog(ContractInstantiateCmd.class);
+public class ContractUpgradeCmd extends AbstractNodeContractCmd {
+    private static JulongChainLog log = JulongChainLogFactory.getLog(ContractUpgradeCmd.class);
     /**
      * Target地址(Node)
      */
@@ -66,7 +66,7 @@ public class ContractInstantiateCmd extends AbstractNodeContractCmd {
      */
     private static final String ARG_POLICY = "P";
 
-    public ContractInstantiateCmd(Node node) {
+    public ContractUpgradeCmd(Node node) {
         super(node);
     }
 
@@ -161,12 +161,12 @@ public class ContractInstantiateCmd extends AbstractNodeContractCmd {
 
         if (StringUtils.isBlank(targetAddress)) {
             log.info("TargetAddress is empty, use 127.0.0.1:7051");
-            nodeSmartContract.instantiate(NodeConstant.DEFAULT_NODE_HOST, NodeConstant.DEFAULT_NODE_PORT,
+            nodeSmartContract.upgrade(NodeConstant.DEFAULT_NODE_HOST, NodeConstant.DEFAULT_NODE_PORT,
                     consenterHostPort[0], consenterPort, groupId, scName, scVersion, input);
         } else {
             try {
                 NetAddress targetNetAddress = new NetAddress(targetAddress);
-                nodeSmartContract.instantiate(targetNetAddress.getHost(), targetNetAddress.getPort(),
+                nodeSmartContract.upgrade(targetNetAddress.getHost(), targetNetAddress.getPort(),
                         consenterHostPort[0], consenterPort, groupId, scName, scVersion, input);
             } catch (ValidateException e) {
                 log.error(e.getMessage(), e);

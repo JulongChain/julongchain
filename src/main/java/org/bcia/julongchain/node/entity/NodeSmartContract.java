@@ -207,6 +207,97 @@ public class NodeSmartContract {
         });
     }
 
+    public void upgrade(String nodeHost, int nodePort, String consenterHost, int consenterPort, String groupId,
+                        String scName, String scVersion, SmartContractPackage.SmartContractInput input) throws
+            NodeException {
+        SmartContractPackage.SmartContractDeploymentSpec deploymentSpec = SpecHelper.buildDeploymentSpec(scName,
+                scVersion, null, input);
+
+        ISigningIdentity identity = GlobalMspManagement.getLocalMsp().getDefaultSigningIdentity();
+        byte[] creator = identity.getIdentity().serialize();
+
+        byte[] nonce = generateNonce();
+        String txId = generateTxId(creator, nonce);
+
+        SmartContractPackage.SmartContractInvocationSpec lsscSpec = SpecHelper.buildInvocationSpec(CommConstant.LSSC,
+                CommConstant.UPGRADE.getBytes(), groupId.getBytes(), deploymentSpec.toByteArray());
+        //生成proposal  Type=ENDORSER_TRANSACTION
+        ProposalPackage.Proposal proposal = ProposalUtils.buildSmartContractProposal(Common.HeaderType
+                .ENDORSER_TRANSACTION, groupId, txId, lsscSpec, nonce, creator, null);
+        ProposalPackage.SignedProposal signedProposal = ProposalUtils.buildSignedProposal(proposal, identity);
+
+        //获取背书节点返回信息
+        IEndorserClient endorserClient = new EndorserClient(nodeHost, nodePort);
+        ProposalResponsePackage.ProposalResponse proposalResponse = null;
+        try {
+            proposalResponse = endorserClient.sendProcessProposal(signedProposal);
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+
+            String msg = "Upgrade fail:" + ex.getMessage();
+            log.error(msg);
+            throw new NodeException(msg);
+        } finally {
+            endorserClient.close();
+        }
+
+        if (proposalResponse == null || proposalResponse.getResponse() == null
+                || proposalResponse.getResponse().getStatus() != Common.Status.SUCCESS_VALUE) {
+            throw new NodeException("Upgrade fail: " + proposalResponse.getResponse().getStatus());
+        }
+
+        try {
+            Common.Envelope signedTxEnvelope = EnvelopeHelper.createSignedTxEnvelope(proposal, identity,
+                    proposalResponse);
+
+            IBroadcastClient broadcastClient = new BroadcastClient(consenterHost, consenterPort);
+            broadcastClient.send(signedTxEnvelope, new StreamObserver<Ab.BroadcastResponse>() {
+                @Override
+                public void onNext(Ab.BroadcastResponse value) {
+                    log.info("Broadcast onNext");
+                    broadcastClient.close();
+
+                    //收到响应消息，判断是否是200消息
+                    if (Common.Status.SUCCESS.equals(value.getStatus())) {
+                        log.info("Upgrade success");
+                    } else {
+                        log.info("Upgrade fail:" + value.getStatus());
+                    }
+
+                    //unLock必须放置在最后，以确保命令行性质的程序不被系统终止
+                    instantiateLock.unLock();
+                }
+
+                @Override
+                public void onError(Throwable t) {
+                    log.error(t.getMessage(), t);
+                    broadcastClient.close();
+                    instantiateLock.unLock();
+                }
+
+                @Override
+                public void onCompleted() {
+                    log.info("Broadcast completed");
+                    broadcastClient.close();
+                    instantiateLock.unLock();
+                }
+            });
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+
+            String msg = "Upgrade fail:" + e.getMessage();
+            log.error(msg);
+            throw new NodeException(msg);
+        }
+
+        instantiateLock.tryLock(new CommLock.TimeoutCallback() {
+            @Override
+            public void onTimeout() {
+                log.error("Timeout in smart contract upgrade");
+            }
+        });
+    }
+
     public void invoke(String nodeHost, int nodePort, String consenterHost, int consenterPort, String groupId,
                        String scName, SmartContractPackage.SmartContractInput input) throws NodeException {
         SmartContractPackage.SmartContractInvocationSpec sciSpec = SpecHelper.buildInvocationSpec(scName, input);

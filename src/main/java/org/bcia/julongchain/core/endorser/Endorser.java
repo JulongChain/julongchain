@@ -126,20 +126,33 @@ public class Endorser implements IEndorserServer {
                             .getTxId(), signedProposal, proposal, scIdBuilder, response, txReadWriteSetBytes,
                     scEvent, extension.getPayloadVisibility().toByteArray(), isSysSC, scDefinition);
 
-            return ProposalResponseUtils.buildProposalResponse(endorseResponse.getStatus(), endorseResponse.getPayload(),
-                    endorseResponse.getMessage());
+//            return ProposalResponseUtils.buildProposalResponse(endorseResponse.getStatus(), response.getPayload(),
+//                    response.getMessage());
 
-//            SmartContractShim.SmartContractMessage smartContractMessage = TransactionRunningUtil.getTxMessage(scName, groupHeader.getTxId());
-//            TransactionRunningUtil.clearMap(scName, groupHeader.getTxId());
-//            ProposalResponsePackage.Response smartContractResponse = null;
-//            try {
-//                smartContractResponse = ProposalResponsePackage.Response.parseFrom(smartContractMessage.getPayload());
-//            } catch (InvalidProtocolBufferException e) {
-//                log.error(e.getMessage(), e);
-//            }
-//
-//            return ProposalResponseUtils.buildProposalResponse(proposalResponse.getPayload() != null ?
-//                    proposalResponse.getPayload() : smartContractResponse.getPayload(), smartContractResponse.getMessage());
+            ProposalResponsePackage.ProposalResponse proposalResponse = null;
+
+            ProposalResponsePayloadVO proposalResponsePayloadVO = new ProposalResponsePayloadVO();
+            try {
+                proposalResponse = ProposalResponsePackage.ProposalResponse.parseFrom(endorseResponse.getPayload());
+                proposalResponsePayloadVO.parseFrom(ProposalResponsePackage.ProposalResponsePayload.parseFrom(proposalResponse.getPayload()));
+            } catch (InvalidProtocolBufferException e) {
+                e.printStackTrace();
+            } catch (ValidateException e) {
+                e.printStackTrace();
+            }
+
+            SmartContractShim.SmartContractMessage smartContractMessage = TransactionRunningUtil.getTxMessage(scName, groupHeader.getTxId());
+            TransactionRunningUtil.clearMap(scName, groupHeader.getTxId());
+            ProposalResponsePackage.Response smartContractResponse = null;
+            try {
+                smartContractResponse = ProposalResponsePackage.Response.parseFrom(smartContractMessage.getPayload());
+            } catch (InvalidProtocolBufferException e) {
+                log.error(e.getMessage(), e);
+            }
+
+            return ProposalResponseUtils.buildProposalResponse(endorseResponse.getStatus(),
+                    proposalResponse.getPayload() != null ?
+                            proposalResponse.getPayload() : smartContractResponse.getPayload(), smartContractResponse.getMessage());
         }
     }
 

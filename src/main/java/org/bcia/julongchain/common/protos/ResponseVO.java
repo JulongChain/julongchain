@@ -13,31 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bcia.julongchain.core.commiter;
+package org.bcia.julongchain.common.protos;
 
-import org.bcia.julongchain.common.exception.CommitterException;
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.core.ledger.BlockAndPvtData;
-import org.bcia.julongchain.protos.common.Common;
-
-import java.util.List;
+import org.bcia.julongchain.protos.node.ProposalResponsePackage;
 
 /**
- * 提交者接口
+ * 提案响应中的响应对象
  *
- * @author wanglei zhouhui
- * @date 2018/03/27
+ * @author zhouhui
+ * @date 2018/09/30
  * @company Dingxuan
  */
-public interface ICommitter {
+public class ResponseVO implements IProtoVO<ProposalResponsePackage.Response> {
+    private int status;
+    private String message;
 
-    void commitWithPrivateData(BlockAndPvtData blockAndPvtData) throws CommitterException, ValidateException;
 
-    BlockAndPvtData getPrivateDataAndBlockByNum(long seqNumber) throws CommitterException;
+    @Override
+    public void parseFrom(ProposalResponsePackage.Response response) throws InvalidProtocolBufferException,
+            ValidateException {
 
-    long getLedgerHeight() throws CommitterException;
 
-    List<Common.Block> getBlocks(long[] blockSeqs);
+    }
 
-    void close();
+    @Override
+    public ProposalResponsePackage.Response toProto() {
+        return null;
+    }
 }

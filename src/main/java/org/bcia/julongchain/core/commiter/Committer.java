@@ -21,51 +21,70 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.core.commiter.util.CommitterUtils;
 import org.bcia.julongchain.core.ledger.BlockAndPvtData;
 import org.bcia.julongchain.core.ledger.INodeLedger;
-import org.bcia.julongchain.core.ledger.TxPvtData;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Ledger;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
- * 确认服务实现
+ * 提交者实现
  *
  * @author wanglei zhouhui
- * @date 18/3/27
+ * @date 2018/03/27
  * @company Dingxuan
  */
 public class Committer implements ICommitter {
     private static JulongChainLog log = JulongChainLogFactory.getLog(Committer.class);
 
-    public interface IConfigBlockEventer {
-        void event(Common.Block block) throws CommitterException;
-    }
-
-    private INodeLedger nodeLedger;
-    private IConfigBlockEventer eventer;
-
-    public Committer(INodeLedger nodeLedger) {
-        this.nodeLedger = nodeLedger;
-        this.eventer = new IConfigBlockEventer() {
-            @Override
-            public void event(Common.Block block) throws CommitterException {
-
-            }
-        };
-    }
-
-    public Committer(INodeLedger nodeLedger, IConfigBlockEventer eventer) {
-        this.nodeLedger = nodeLedger;
-        this.eventer = eventer;
+    /**
+     * 配置区块更新的监听
+     */
+    public interface IConfigBlockListener {
+        /**
+         * 配置区块更改事件
+         *
+         * @param configBlock
+         * @throws CommitterException
+         */
+        void onConfigBlockChanged(Common.Block configBlock) throws CommitterException;
     }
 
     /**
-     * 预提交区块
+     * 节点账本
+     */
+    private INodeLedger nodeLedger;
+    /**
+     * 配置区块更新监听
+     */
+    private IConfigBlockListener configBlockListener;
+
+    /**
+     * 构造函数，无配置区块更新监听
+     *
+     * @param nodeLedger
+     */
+    public Committer(INodeLedger nodeLedger) {
+        this(nodeLedger, null);
+    }
+
+    /**
+     * 构造函数
+     *
+     * @param nodeLedger
+     * @param configBlockListener
+     */
+    public Committer(INodeLedger nodeLedger, IConfigBlockListener configBlockListener) {
+        this.nodeLedger = nodeLedger;
+        this.configBlockListener = configBlockListener;
+    }
+
+    /**
+     * 提交区块之前操作
      *
      * @param block
      * @throws CommitterException
@@ -75,17 +94,20 @@ public class Committer implements ICommitter {
     private void preCommit(Common.Block block) throws CommitterException, InvalidProtocolBufferException,
             ValidateException {
         if (CommitterUtils.isConfigBlock(block)) {
-            log.info("get a config block");
+            log.info("Get a config block");
 
-            if (eventer != null) {
-                eventer.event(block);
+            if (configBlockListener != null) {
+                configBlockListener.onConfigBlockChanged(block);
             }
         }
     }
 
     @Override
-    public void commitWithPrivateData(BlockAndPvtData blockAndPvtData) throws CommitterException {
+    public void commitWithPrivateData(BlockAndPvtData blockAndPvtData) throws CommitterException, ValidateException {
         log.info("commitWithPrivateData");
+        ValidateUtils.isNotNull(blockAndPvtData, "BlockAndPvtData can not be null");
+        ValidateUtils.isNotNull(blockAndPvtData.getBlock(), "BlockAndPvtData.getBlock can not be null");
+
         try {
             //提交前处理
             preCommit(blockAndPvtData.getBlock());
@@ -98,35 +120,38 @@ public class Committer implements ICommitter {
         } catch (InvalidProtocolBufferException e) {
             log.error(e.getMessage(), e);
             throw new CommitterException(e);
-        } catch (ValidateException e) {
-            log.error(e.getMessage(), e);
-            throw new CommitterException(e);
         } catch (LedgerException e) {
             log.error(e.getMessage(), e);
             throw new CommitterException(e);
         }
     }
 
+    /**
+     * 提交区块之后操作
+     *
+     * @param block
+     * @throws CommitterException
+     */
     private void postCommit(Common.Block block) throws CommitterException {
-        //TODO：创建区块事件
+        //TODO：暂无要处理的事件
     }
 
     @Override
     public BlockAndPvtData getPrivateDataAndBlockByNum(long seqNumber) throws CommitterException {
-        return null;
+        try {
+            return nodeLedger.getPvtDataAndBlockByNum(seqNumber, null);
+        } catch (LedgerException e) {
+            log.error(e.getMessage(), e);
+            throw new CommitterException(e);
+        }
     }
 
     @Override
-    public TxPvtData[] getPrivateDataByNum(long blockNumber, Map<String, Map<String, Boolean>> filter) throws CommitterException {
-        return new TxPvtData[0];
-    }
-
-    @Override
-    public long ledgerHeight() throws CommitterException {
+    public long getLedgerHeight() throws CommitterException {
         try {
             Ledger.BlockchainInfo blockchainInfo = nodeLedger.getBlockchainInfo();
             return blockchainInfo.getHeight();
-        } catch (LedgerException e) {
+        } catch (Exception e) {
             log.error(e.getMessage(), e);
             throw new CommitterException(e);
         }
