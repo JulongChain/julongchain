@@ -68,7 +68,7 @@ public class LedgerManager {
 			log.error(errMsg);
 			throw new LedgerException(errMsg);
 		}
-		Util.checkBlockFiles(LedgerConfig.getChainsPath());
+//		Util.checkBlockFiles(LedgerConfig.getChainsPath());
         log.info("Initializing ledger management");
         initialized = true;
         CustomTx.initialize(processors);

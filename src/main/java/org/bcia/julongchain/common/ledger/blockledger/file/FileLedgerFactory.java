@@ -27,6 +27,7 @@ import org.bcia.julongchain.common.ledger.blockledger.ReadWriteBase;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
+import org.bcia.julongchain.core.ledger.util.Util;
 
 import java.util.*;
 
@@ -47,10 +48,12 @@ public class FileLedgerFactory implements IFactory {
         IndexConfig indexConfig = new IndexConfig(new String[]{BlockStorage.INDEXABLE_ATTR_BLOCK_NUM});
         LedgerConfig.setRootPath(directory);
         LedgerConfig.setMaxBlockfileSize(-1);
-        this.blkStorageProvider = new FsBlockStoreProvider(new Config(directory, -1), indexConfig);
+		Config fileLedgerConfig = new Config(directory, -1);
+		this.blkStorageProvider = new FsBlockStoreProvider(fileLedgerConfig, indexConfig);
 		if (ledgers == null) {
 			ledgers = new HashMap<>();
 		}
+//		Util.checkBlockFiles(fileLedgerConfig.getChainsDir());
     }
 
     @Override

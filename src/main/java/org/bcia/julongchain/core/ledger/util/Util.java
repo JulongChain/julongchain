@@ -182,14 +182,15 @@ public class Util {
      * 进行hash运算
      */
     public static byte[] getHashBytes(byte[] bytes) throws LedgerException {
-        byte[] target = null;
-        if (bytes != null) {
-            try {
-                target = CspManager.getDefaultCsp().hash(bytes, new SM3HashOpts());
-            } catch (JulongChainException e) {
-                throw new LedgerException(e);
-            }
-        }
+        byte[] target;
+        if (bytes == null) {
+        	bytes = new byte[0];
+		}
+		try {
+			target = CspManager.getDefaultCsp().hash(bytes, new SM3HashOpts());
+		} catch (JulongChainException e) {
+			throw new LedgerException(e);
+		}
         return target;
     }
 
@@ -336,6 +337,7 @@ public class Util {
 				log.info("Block file in [" + groupDir + "] checking success");
 			}
 		} catch (Exception e) {
+			log.error("Got error, total block number is " + totalBlockNum);
 			log.error(e.getMessage());
 			throw new LedgerException(e);
 		}
