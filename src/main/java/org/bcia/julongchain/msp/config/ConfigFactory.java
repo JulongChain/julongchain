@@ -39,7 +39,7 @@ public class ConfigFactory {
         Yaml yaml = new Yaml();
         InputStream is = null;
         try {
-            is = new FileInputStream(CommConstant.CONFIG_DIR_PREFIX + Config.Config_FILE_PATH);
+            is = new FileInputStream(CommConstant.CONFIG_DIR_PREFIX + Config.CONFIG_FILE_PATH);
             Config config = yaml.loadAs(is, Config.class);
             return config;
         } finally {

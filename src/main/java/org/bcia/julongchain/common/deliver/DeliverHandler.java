@@ -137,7 +137,7 @@ public class DeliverHandler implements IDeliverHandler {
         try {
             cursor = chain.getLedgerResources().getReadWriteBase().iterator(seekInfo.getStart());
         } catch (LedgerException e) {
-            e.printStackTrace();
+          throw new ConsenterException(e);
         }
         if (cursor instanceof FileLedgerIterator) {
             FileLedgerIterator fileLedgerIterator = (FileLedgerIterator) cursor;

@@ -36,7 +36,7 @@ public interface IProcessor {
      * @param chdr
      * @return
      */
-    boolean classfiyMsg(Common.GroupHeader chdr);
+    boolean classifyMsg(Common.GroupHeader chdr);
 
     /**
      * 处理普通消息

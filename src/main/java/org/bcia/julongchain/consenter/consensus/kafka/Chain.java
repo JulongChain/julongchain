@@ -220,7 +220,7 @@ public class Chain implements IChain {
             Kafka.KafkaMetadata.Builder kafkaMetadataBuilder=Kafka.KafkaMetadata.newBuilder();
             kafkaMetadataBuilder.setLastOffsetPersisted(newOffset);
             kafkaMetadataBuilder.setLastOriginalOffsetProcessed(chain.getLastOriginalOffsetProcessed());
-            byte[]  metadata= Utils.MarshalOrPanic(kafkaMetadataBuilder.build());
+            byte[]  metadata= Utils.marshalOrPanic(kafkaMetadataBuilder.build());
 
             //TODO orderer提供方法(WriteBlock写块)
             //chain.WriteBlock(block, metadata)
@@ -236,7 +236,7 @@ public class Chain implements IChain {
                  kafkaMetadataBuilder=Kafka.KafkaMetadata.newBuilder();
                 kafkaMetadataBuilder.setLastOffsetPersisted(newOffset);
                 kafkaMetadataBuilder.setLastOriginalOffsetProcessed(chain.getLastOriginalOffsetProcessed());
-                metadata= Utils.MarshalOrPanic(kafkaMetadataBuilder.build());
+                metadata= Utils.marshalOrPanic(kafkaMetadataBuilder.build());
 
                 //TODO orderer提供方法(WriteBlock写块)
                 //chain.WriteBlock(block, metadata)
@@ -262,7 +262,7 @@ public class Chain implements IChain {
             Kafka.KafkaMetadata.Builder kafkaMetadataBuilder=Kafka.KafkaMetadata.newBuilder();
             kafkaMetadataBuilder.setLastOffsetPersisted(newOffset);
             kafkaMetadataBuilder.setLastOriginalOffsetProcessed(chain.getLastOriginalOffsetProcessed());
-            byte[]  metadata= Utils.MarshalOrPanic(kafkaMetadataBuilder.build());
+            byte[]  metadata= Utils.marshalOrPanic(kafkaMetadataBuilder.build());
 
             //TODO orderer提供方法(WriteBlock写块)
             //chain.WriteBlock(block, metadata)
@@ -277,7 +277,7 @@ public class Chain implements IChain {
         Kafka.KafkaMetadata.Builder kafkaMetadataBuilder=Kafka.KafkaMetadata.newBuilder();
         kafkaMetadataBuilder.setLastOffsetPersisted(newOffset);
         kafkaMetadataBuilder.setLastOriginalOffsetProcessed(chain.getLastOriginalOffsetProcessed());
-        byte[]  metadata= Utils.MarshalOrPanic(kafkaMetadataBuilder.build());
+        byte[]  metadata= Utils.marshalOrPanic(kafkaMetadataBuilder.build());
 
         //TODO orderer提供方法(WriteBlock写块)
         //chain.WriteBlock(block, metadata)
@@ -320,7 +320,7 @@ public class Chain implements IChain {
            Kafka.KafkaMetadata.Builder kafkaMetadataBuilder=Kafka.KafkaMetadata.newBuilder();
            kafkaMetadataBuilder.setLastOffsetPersisted(receivedOffset);
            kafkaMetadataBuilder.setLastOriginalOffsetProcessed(chain.getLastOriginalOffsetProcessed());
-           byte[]  metadata= Utils.MarshalOrPanic(kafkaMetadataBuilder.build());
+           byte[]  metadata= Utils.marshalOrPanic(kafkaMetadataBuilder.build());
 
            //TODO orderer提供方法(WriteBlock写块)
            //chain.WriteBlock(block, metadata)

@@ -17,12 +17,12 @@ package org.bcia.julongchain.csp.intfs.opts;
  */
 
 /**
- * @author zhanglin
- * @purpose Define the interface, IKeyGenOpts
+ * 密钥生成选项接口
+ *
+ * @author zhanglin, zhangmingyang
  * @date 2018-01-25
  * @company Dingxuan
  */
 
-// IKeyGenOpts contains options for key-generation with a CSP.
 public interface IKeyGenOpts extends IAlgorithmOpts, IKeyOpts {
 }

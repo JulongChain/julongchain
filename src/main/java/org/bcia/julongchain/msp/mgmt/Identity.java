@@ -88,7 +88,7 @@ public class Identity implements IIdentity {
 
     @Override
     public String getMSPIdentifier() {
-        return this.identityIdentifier.getMspid();
+        return this.identityIdentifier.getMspId();
     }
 
     @Override
@@ -129,7 +129,7 @@ public class Identity implements IIdentity {
     public byte[] serialize() {
         byte[] serializedIdentityBytes = null;
         Identities.SerializedIdentity.Builder serializedIdentity = Identities.SerializedIdentity.newBuilder();
-        serializedIdentity.setMspid(this.identityIdentifier.getMspid());
+        serializedIdentity.setMspid(this.identityIdentifier.getMspId());
         try {
             serializedIdentity.setIdBytes(ByteString.copyFrom(certificate.getEncoded()));
             serializedIdentityBytes = serializedIdentity.build().toByteArray();
