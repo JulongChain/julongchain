@@ -46,6 +46,7 @@ public class SM4Opts {
             return GMT0016CspConstant.SM4_ECB;
         }
 
+        @Override
         public long getAlgID() {
             return GMT0016CspConstant.SGD_SMS4_ECB;
         }
@@ -55,6 +56,7 @@ public class SM4Opts {
             return bTemporary;
         }
 
+        @Override
         public int getBitLen() {
             return SM4_KEY_LEN;
         }
@@ -78,10 +80,12 @@ public class SM4Opts {
             return bTemporary;
         }
 
+        @Override
         public long getAlgID() {
             return GMT0016CspConstant.SGD_SMS4_CBC;
         }
 
+        @Override
         public int getBitLen() {
             return SM4_KEY_LEN;
         }
@@ -105,10 +109,12 @@ public class SM4Opts {
             return bTemporary;
         }
 
+        @Override
         public long getAlgID() {
             return GMT0016CspConstant.SGD_SMS4_CFB;
         }
 
+        @Override
         public int getBitLen() {
             return SM4_KEY_LEN;
         }
@@ -132,10 +138,12 @@ public class SM4Opts {
             return bTemporary;
         }
 
+        @Override
         public long getAlgID() {
             return GMT0016CspConstant.SGD_SMS4_OFB;
         }
 
+        @Override
         public int getBitLen() {
             return SM4_KEY_LEN;
         }
@@ -159,10 +167,12 @@ public class SM4Opts {
             return bTemporary;
         }
 
+        @Override
         public long getAlgID() {
             return GMT0016CspConstant.SGD_SMS4_MAC;
         }
 
+        @Override
         public int getBitLen() {
             return SM4_KEY_LEN;
         }

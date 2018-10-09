@@ -41,6 +41,8 @@ import static org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant.*;
 public class SKFFactoryOpts implements ISKFFactory {
 
     private GMT0016Dll gmtDll;
+    private static final int DEV_MININUM = 2;
+    private static final long INVALID_HANDLE = 0;
 
     public void InitSKF(String lib) {
         gmtDll = GMT0016Dll.getInstance(lib);
@@ -49,10 +51,10 @@ public class SKFFactoryOpts implements ISKFFactory {
 
     /**
      * 枚举设备
-     * @param bPresent   设备状态
+     * @param bPresent          设备状态
      * @return  设备名称列表
-     * @throws SarException
-     * @throws JCSKFException
+     * @throws SarException     错误码
+     * @throws JCSKFException   错误码
      */
     public List<String> SKF_EnumDevs(boolean bPresent) throws SarException, JCSKFException {
 
@@ -60,7 +62,7 @@ public class SKFFactoryOpts implements ISKFFactory {
         long[] lSize = new long[1];
 
         SKF_CatchExcetpt(gmtDll.SKF_EnumDev_N(bPresent, null, lSize));
-        if(lSize[0] < 2) {//default exist 0x00
+        if(lSize[0] < DEV_MININUM) {//default exist 0x00
             SKF_CatchJCExcetpt(JCSKFException.JC_SKF_NODEV);
         }
 
@@ -76,7 +78,7 @@ public class SKFFactoryOpts implements ISKFFactory {
      * 连接设备
      * @param devName   设备名称
      * @return  设备句柄
-     * @throws SarException
+     * @throws SarException 错误码
      */
     public long SKF_ConnectDev(String devName) throws SarException{
         byte[] devNameBytes = devName.getBytes();
@@ -93,7 +95,7 @@ public class SKFFactoryOpts implements ISKFFactory {
      * 获取设备信息
      * @param lDevHandle    设备句柄
      * @return  设备信息
-     * @throws SarException
+     * @throws SarException 错误码
      */
     public SKFDeviceInfo SKF_GetDevInfo(long lDevHandle) throws SarException{
         SKF_CheckHandler(lDevHandle);
@@ -131,8 +133,8 @@ public class SKFFactoryOpts implements ISKFFactory {
      * 枚举应用
      * @param lDevHandle        设备句柄
      * @return 应用名称列表
-     * @throws SarException
-     * @throws JCSKFException
+     * @throws SarException     错误码
+     * @throws JCSKFException   错误码
      */
     public List<String> SKF_EnumApplication(long lDevHandle) throws SarException, JCSKFException{
         SKF_CheckHandler(lDevHandle);
@@ -141,7 +143,7 @@ public class SKFFactoryOpts implements ISKFFactory {
         long[] lSize = new long[1];
 
         SKF_CatchExcetpt(gmtDll.SKF_EnumApplication_N(lDevHandle, null, lSize));
-        if(lSize[0] < 2) {//default exist 0x00
+        if(lSize[0] < DEV_MININUM) {//default exist 0x00
             SKF_CatchJCExcetpt(JCSKFException.JC_SKF_NOAPP);
         }
         byte[] appNameByte = new byte[(int)lSize[0]];
@@ -156,7 +158,7 @@ public class SKFFactoryOpts implements ISKFFactory {
      * @param lDevHandle    设备句柄
      * @param appName       应用名称
      * @return  应用句柄
-     * @throws SarException
+     * @throws SarException 错误码
      */
     public long SKF_OpenApplication(long lDevHandle, String appName) throws SarException {
         SKF_CheckHandler(lDevHandle);
@@ -173,7 +175,7 @@ public class SKFFactoryOpts implements ISKFFactory {
     /**
      * 断开设备
      * @param lDevHandle    设备句柄
-     * @throws SarException
+     * @throws SarException 错误码
      */
     public void SKF_DisconnectDev(long lDevHandle) throws SarException{
         SKF_CheckHandler(lDevHandle);
@@ -186,8 +188,8 @@ public class SKFFactoryOpts implements ISKFFactory {
      * @param lAppHandle        应用句柄
      * @param lUserType         用户类型
      * @param sPin              用户PIN码
-     * @return Success
-     * @throws SarException
+     * @return Success          成功
+     * @throws SarException     错误码
      */
     public long SKF_VerifyPIN(long lAppHandle, long lUserType, String sPin) throws SarException{
         SKF_CheckHandler(lAppHandle);
@@ -206,8 +208,8 @@ public class SKFFactoryOpts implements ISKFFactory {
      * 枚举容器
      * @param lAppHandle        应用句柄
      * @return  容器名称列表
-     * @throws SarException
-     * @throws JCSKFException
+     * @throws SarException     错误码
+     * @throws JCSKFException   错误码
      */
     public List<String> SKF_EnumContainer(long lAppHandle) throws SarException, JCSKFException{
         SKF_CheckHandler(lAppHandle);
@@ -216,7 +218,7 @@ public class SKFFactoryOpts implements ISKFFactory {
         long[] lSize = new long[1];
 
         SKF_CatchExcetpt(gmtDll.SKF_EnumContainer_N(lAppHandle, null, lSize));
-        if(lSize[0] < 2) {//exist default 0x00
+        if(lSize[0] < DEV_MININUM) {//exist default 0x00
             //SKF_CatchJCExcetpt(JCSKFException.JC_SKF_NOCONTAINER);
             return null;
         }
@@ -233,7 +235,7 @@ public class SKFFactoryOpts implements ISKFFactory {
      * @param lAppHandle        应用句柄
      * @param sContainerName    容器名称
      * @return  容器句柄
-     * @throws SarException
+     * @throws SarException     错误码
      */
     public long SKF_CreateContainer(long lAppHandle, String sContainerName) throws SarException{
         SKF_CheckHandler(lAppHandle);
@@ -253,7 +255,7 @@ public class SKFFactoryOpts implements ISKFFactory {
      * @param lAppHandle        应用句柄
      * @param sContainerName    容器名称
      * @return  Container Handle	容器句柄
-     * @throws SarException
+     * @throws SarException     错误码
      */
     public long SKF_OpenContainer(long lAppHandle, String sContainerName) throws SarException {
         SKF_CheckHandler(lAppHandle);
@@ -271,7 +273,7 @@ public class SKFFactoryOpts implements ISKFFactory {
     /**
      * 关闭容器句柄
      * @param lContainerHandle  容器句柄
-     * @throws SarException
+     * @throws SarException     错误码
      */
     public void SKF_CloseContainer(long lContainerHandle) throws SarException {
         SKF_CatchExcetpt(gmtDll.SKF_CloseContainer_N(lContainerHandle));
@@ -281,7 +283,7 @@ public class SKFFactoryOpts implements ISKFFactory {
     /**
      * 关闭句柄
      * @param lHandle       句柄
-     * @throws SarException
+     * @throws SarException 错误码
      */
     public void SKF_CloseHandle(long lHandle) throws SarException {
         SKF_CatchExcetpt(gmtDll.SKF_CloseHandle_N(lHandle));
@@ -292,7 +294,7 @@ public class SKFFactoryOpts implements ISKFFactory {
      * 生成SM2密钥对
      * @param lContainerHandle      容器句柄
      * @return  SM2的密钥公钥
-     * @throws SarException
+     * @throws SarException         错误码
      */
     public SKFCspKey.ECCPublicKeyBlob SKF_GenECCKeyPair(long lContainerHandle) throws SarException {
         SKF_CheckHandler(lContainerHandle);
@@ -301,8 +303,8 @@ public class SKFFactoryOpts implements ISKFFactory {
         SKF_CatchExcetpt(gmtDll.SKF_GenECCKeyPair_N(lContainerHandle, SGD_SM2_1, xCoordinate, yCoordinate));
         int xlen = DataUtil.getVirtualValueLength(xCoordinate);
         int ylen = DataUtil.getVirtualValueLength(yCoordinate);
-        byte x[] = new byte[xlen];
-        byte y[] = new byte[ylen];
+        byte[] x = new byte[xlen];
+        byte[] y = new byte[ylen];
         System.arraycopy(xCoordinate, 0, x, 0, xlen);
         System.arraycopy(yCoordinate, 0, y, 0, ylen);
         SKFCspKey.ECCPublicKeyBlob eccPubBlob = new SKFCspKey.ECCPublicKeyBlob(x, y, 256);
@@ -314,7 +316,7 @@ public class SKFFactoryOpts implements ISKFFactory {
      * 获取容器类型
      * @param lContainerHandle      容器句柄
      * @return 类型(RSA or SM2)
-     * @throws SarException
+     * @throws SarException         错误码
      */
     public long SKF_GetContainerType(long lContainerHandle) throws SarException{
         SKF_CheckHandler(lContainerHandle);
@@ -330,7 +332,7 @@ public class SKFFactoryOpts implements ISKFFactory {
      * @param bSignFlag             密钥类型 (True: Sign  False: Encrypt)
      * @param bECC                  是否为SM2密钥 (True: SM2 False: RSA)
      * @return SM2 或 RSA 公钥
-     * @throws SarException
+     * @throws SarException         错误码
      */
     public Object SKF_ExportPublicKey(long lContainerHandle, boolean bSignFlag, boolean bECC) throws SarException{
         SKF_CheckHandler(lContainerHandle);
@@ -374,7 +376,7 @@ public class SKFFactoryOpts implements ISKFFactory {
      * @param lDevHandle        设备句柄
      * @param length            随机数长度
      * @return  随机数数组
-     * @throws SarException
+     * @throws SarException     错误码
      */
     public byte[] SKF_GenRandom(long lDevHandle, int length) throws SarException {
         SKF_CheckHandler(lDevHandle);
@@ -387,9 +389,9 @@ public class SKFFactoryOpts implements ISKFFactory {
      * 生成对称密钥
      * @param lDevHandle        设备句柄
      * @param byteKey           对称密钥 (Random numbers)
-     * @param lAlgID            算法
-     * @return Key Handle
-     * @throws SarException
+     * @param lAlgID            算法ID
+     * @return Key Handle   密钥句柄
+     * @throws SarException     错误码
      */
     public long SKF_SetSymmKey(long lDevHandle, byte[] byteKey, long lAlgID) throws SarException{
         SKF_CheckHandler(lDevHandle);
@@ -399,10 +401,10 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
     /**
-     * Encrtypt Initialization
-     * @param lKeyHandle            Encrtypt Key Handle
-     * @param blockCipherParam      Block cipher algorithm related parameters
-     * @throws SarException
+     * 初始化加密操作
+     * @param lKeyHandle            用于加密的密钥句柄
+     * @param blockCipherParam      分组密码算法相关参数
+     * @throws SarException         错误码
      */
     public void SKF_EncryptInit(long lKeyHandle, BlockCipherParam blockCipherParam) throws SarException {
         SKF_CheckHandler(lKeyHandle);
@@ -412,12 +414,12 @@ public class SKFFactoryOpts implements ISKFFactory {
 
 
     /**
-     * Encrpy
-     * @param lKeyHandle        Encrypt Key Handle
-     * @param data              Data original
-     * @param dataLen           The length of the data
-     * @return  Ciphertext data
-     * @throws SarException
+     * 加密操作
+     * @param lKeyHandle        用于加密的密钥句柄
+     * @param data              原文数据
+     * @param dataLen           原文数据长度
+     * @return  Ciphertext data 密文数据
+     * @throws SarException     错误码
      */
     public byte[] SKF_Encrypt(long lKeyHandle, byte[] data, long dataLen) throws SarException {
         SKF_CheckHandler(lKeyHandle);
@@ -429,10 +431,10 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
     /**
-     * Decrypt Initialization
-     * @param lKeyHandle        Decrtypt Key Handle
-     * @param blockCipherParam  Block cipher algorithm related parameters
-     * @throws SarException
+     * 初始化解密操作
+     * @param lKeyHandle        用于解密的密钥句柄
+     * @param blockCipherParam  分组密码算法相关参数
+     * @throws SarException     错误码
      */
     public void SKF_DecryptInit(long lKeyHandle, BlockCipherParam blockCipherParam) throws SarException {
         SKF_CheckHandler(lKeyHandle);
@@ -441,12 +443,12 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
     /**
-     * Decrtpt
-     * @param lKeyHandle    Decrtypt Key Handle
-     * @param cipherData    Ciphertext data
-     * @param cipherDataLen The length of the cipherdata
-     * @return
-     * @throws SarException
+     * 解密操作
+     * @param lKeyHandle    用于解密的密钥句柄
+     * @param cipherData    密文数据
+     * @param cipherDataLen 密文数据长度
+     * @return  原文数据
+     * @throws SarException 错误码
      */
     public byte[] SKF_Decrypt(long lKeyHandle, byte[] cipherData, long cipherDataLen) throws SarException {
         SKF_CheckHandler(lKeyHandle);
@@ -461,13 +463,13 @@ public class SKFFactoryOpts implements ISKFFactory {
 
 
     /**
-     * Expand the encryption with sm2
-     * @param lDevHandle        Device Handle
-     * @param eccPublicKeyBlob  Sm2 publickey blobk
-     * @param plainText         Data original, plaintext
-     * @param plainTextLen      The length of plaintext
-     * @return Ciphertext data of sm2
-     * @throws SarException
+     * ECC外来公钥加密
+     * @param lDevHandle        设备句柄
+     * @param eccPublicKeyBlob  ECC公钥数据结构
+     * @param plainText         原文数据
+     * @param plainTextLen      原文数据长度
+     * @return 密文数据
+     * @throws SarException     错误码
      */
     public ECCCipherBlob SKF_ExtECCEncrypt(long lDevHandle, SKFCspKey.ECCPublicKeyBlob eccPublicKeyBlob,
                                            byte[] plainText, long plainTextLen) throws SarException {
@@ -486,10 +488,10 @@ public class SKFFactoryOpts implements ISKFFactory {
 
 
     /**
-     * Import SM2 Encrtyption keypair
-     * @param lContainer                Container Handle
-     * @param eccEnvelopedKeyBlob       Protected encryption key pair
-     * @throws SarException
+     * 导入ECC加密密钥对
+     * @param lContainer                容器句柄
+     * @param eccEnvelopedKeyBlob       受保护的加密密钥对
+     * @throws SarException             错误码
      */
     public void SKF_ImportECCKeyPair(long lContainer, ECCEnvelopedKeyBlob eccEnvelopedKeyBlob) throws SarException{
         SKF_CheckHandler(lContainer);
@@ -504,13 +506,13 @@ public class SKFFactoryOpts implements ISKFFactory {
 
 
     /**
-     * Digest Initialization
-     * @param lDevHandle            Device Handle
-     * @param algId                 Algorithm ID
-     * @param eccPublicKeyBlob      Signer public key. Valid when Algorithm ID is equal SGD_SM3.
-     * @param sPucID                Signer ID
-     * @return  Hash Handle
-     * @throws SarException
+     * 密码杂凑初始化
+     * @param lDevHandle            设备句柄
+     * @param algId                 密码杂凑算法标识
+     * @param eccPublicKeyBlob      签名者公钥。当算法标识为SGD_SM3时有效。
+     * @param sPucID                签名者ID
+     * @return  密码杂凑对象句柄
+     * @throws SarException         错误码
      */
     public long SKF_DigestInit(long lDevHandle, long algId, SKFCspKey.ECCPublicKeyBlob eccPublicKeyBlob, String sPucID) throws SarException{
         SKF_CheckHandler(lDevHandle);
@@ -530,12 +532,12 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
     /**
-     * Digest
-     * @param lHashHandle       Hash Handle
-     * @param msg               Message
-     * @param dataLen           The length of message
-     * @return Hash Data
-     * @throws SarException
+     * 密码杂凑
+     * @param lHashHandle       密码杂凑对象句柄
+     * @param msg               消息数据
+     * @param dataLen           消息数据长度
+     * @return Hash Data    密码杂凑数据
+     * @throws SarException 错误码
      */
     public byte[] SKF_Digest(long lHashHandle, byte[] msg, long dataLen) throws SarException {
         SKF_CheckHandler(lHashHandle);
@@ -549,12 +551,12 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
     /**
-     * ECC Sign
-     * @param lContainer    Container Handle
-     * @param digest        Digest Data
-     * @param digestLen     The length of data
-     * @return  Signature
-     * @throws SarException
+     * ECC 签名
+     * @param lContainer    容器句柄
+     * @param digest        待签数据
+     * @param digestLen     待签数据长度
+     * @return  Signature   签名值
+     * @throws SarException 错误码
      */
     public byte[] SKF_ECCSignData(long lContainer, byte[] digest, long digestLen) throws SarException {
         byte[] r = new byte[(int)ECC_MAX_XCOORDINATE_BITS_LEN/8];
@@ -562,8 +564,8 @@ public class SKFFactoryOpts implements ISKFFactory {
         SKF_CatchExcetpt(gmtDll.SKF_ECCSignData_N(lContainer, digest, digestLen, r, s));
         int rlen = DataUtil.getVirtualValueLength(r);
         int slen = DataUtil.getVirtualValueLength(s);
-        byte br[] = new byte[rlen];
-        byte bs[] = new byte[slen];
+        byte[] br = new byte[rlen];
+        byte[] bs = new byte[slen];
         System.arraycopy(r, 0, br, 0, rlen);
         System.arraycopy(s, 0, bs, 0, slen);
 
@@ -574,14 +576,14 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
     /**
-     * ECC Verify
-     * @param lDevHandle            Device Handle
-     * @param eccPublicKeyBlob      SM2 PublicKey use to verify
-     * @param digest                Digest Data
-     * @param digestLen             The length of data
-     * @param signature             Signature
+     * ECC 验签
+     * @param lDevHandle            设备句柄
+     * @param eccPublicKeyBlob      ECC公钥数据结构
+     * @param digest                待验证签名数据
+     * @param digestLen             数据长度
+     * @param signature             待验证签名值
      * @return  Success
-     * @throws SarException
+     * @throws SarException         错误码
      */
     public boolean SKF_ECCVerify(long lDevHandle, SKFCspKey.ECCPublicKeyBlob eccPublicKeyBlob,byte[] digest,
                                  long digestLen, byte[] signature) throws SarException{
@@ -616,11 +618,11 @@ public class SKFFactoryOpts implements ISKFFactory {
 
 
     /**
-     * Generation RSA Keypair
-     * @param lContainerHandle      Container Handle
-     * @param lBits                 The Bit of the keypair
-     * @return  Rsa publickey block
-     * @throws SarException
+     * 生成RSA密钥对
+     * @param lContainerHandle      容器句柄
+     * @param lBits                 密钥模长
+     * @return  Rsa公钥数据结构
+     * @throws SarException     错误码
      */
     public SKFCspKey.RSAPublicKeyBlob SKF_GenRSAKeyPair(long lContainerHandle, long lBits) throws SarException{
         SKF_CheckHandler(lContainerHandle);
@@ -663,14 +665,14 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
     /**
-     * Import Rsa encrtyption keypair
-     * @param lContainerHandle      Container Handle
-     * @param lAlgID                Algorithm ID
-     * @param wrappedKey            Symmetric algorithm key protected with the signature public key in the container
-     * @param wrappedKeyLen         The length of key
-     * @param encryptedData         RSA encrypted private key protected with symmetric algorithm key
-     * @param encryptedDataLen      he length of key data
-     * @throws SarException
+     * 导入RSA加密密钥
+     * @param lContainerHandle      容器句柄
+     * @param lAlgID                对称算法密钥标识
+     * @param wrappedKey            使用该容器内签名公钥保护的对称算法密钥
+     * @param wrappedKeyLen         保护的对称算法密钥长度
+     * @param encryptedData         对称算法密钥保护的RSA加密私钥
+     * @param encryptedDataLen      对称算法密钥保护的RSA加密公私钥对长度
+     * @throws SarException     错误码
      */
     public void SKF_ImportRSAKeyPair(long lContainerHandle, long lAlgID, byte[] wrappedKey, long wrappedKeyLen,
                                      byte[] encryptedData, long encryptedDataLen) throws SarException{
@@ -680,12 +682,12 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
     /**
-     * Sign with rsa key
-     * @param lContainerHandle      Container Handle
-     * @param data                  Data original
-     * @param dataLen               The length of data
-     * @return Signature data
-     * @throws SarException
+     * RSA签名
+     * @param lContainerHandle      容器句柄
+     * @param data                  被签名的数据
+     * @param dataLen               数据长度
+     * @return 签名值
+     * @throws SarException     错误码
      */
     public byte[] SKF_RSASignData(long lContainerHandle, byte[] data, long dataLen) throws SarException{
         SKF_CheckHandler(lContainerHandle);
@@ -697,13 +699,13 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
     /**
-     * Verify with rsa key
-     * @param lDevHandle            Device Handle
-     * @param rsaPublicKey          Rsa Publickey blobk
-     * @param data                  Data original
-     * @param signature             Signature data
-     * @return True or throw exception
-     * @throws SarException
+     * RSA验签
+     * @param lDevHandle            设备句柄
+     * @param rsaPublicKey          RSA公钥数据结构
+     * @param data                  待验证签名的数据
+     * @param signature             待验证签名值
+     * @return 成功
+     * @throws SarException     错误码
      */
     public boolean SKF_RSAVerify(long lDevHandle, SKFCspKey.RSAPublicKeyBlob rsaPublicKey, byte[] data,
                                  byte[] signature) throws SarException{
@@ -714,20 +716,20 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
     /**
-     * Check if the handle is valid
-     * @param lHandle       Handle
-     * @throws SarException
+     * 校验句柄是否有效
+     * @param lHandle       句柄
+     * @throws SarException     错误码
      */
     private void SKF_CheckHandler(long lHandle) throws SarException {
-        if (lHandle <= 0) {
+        if (lHandle <= INVALID_HANDLE) {
             throw new SarException(SarException.SAR_INVALIDHANDLEERR);
         }
     }
 
     /**
-     * Catch SarException
-     * @param resultValue
-     * @throws SarException
+     * 捕获SarException
+     * @param resultValue   返回值
+     * @throws SarException     错误码
      */
     private void SKF_CatchExcetpt(long resultValue) throws SarException{
         if(resultValue != SarException.SAR_OK) {
@@ -736,9 +738,9 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
     /**
-     * Catch skf related supplementary excetpt
-     * @param resultValue
-     * @throws JCSKFException
+     * 捕获JCSKFException
+     * @param resultValue   返回值
+     * @throws JCSKFException   错误码
      */
     private void SKF_CatchJCExcetpt(long resultValue) throws JCSKFException{
         if(resultValue != JCSKFException.JC_SKF_OK) {

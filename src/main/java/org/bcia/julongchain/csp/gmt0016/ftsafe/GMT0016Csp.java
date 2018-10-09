@@ -29,6 +29,7 @@ import org.bcia.julongchain.csp.gmt0016.ftsafe.util.GMHashOpts;
 import org.bcia.julongchain.csp.intfs.IHash;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.intfs.opts.*;
+import org.bcia.julongchain.msp.mspconfig.MspConfig;
 
 import java.util.UUID;
 
@@ -208,48 +209,56 @@ public class GMT0016Csp implements IGMT0016Csp {
     @Override
     public IHash getHash(IHashOpts opts) throws CspException {
 
-        IHash hash = new IHash() {
-            private byte[] msg;
-            public int write(byte[] p) {
-                msg = new byte[p.length];
-                System.arraycopy(p, 0, msg, 0, p.length);
-                return p.length;
-            }
+        try {
+            IHash hash = new IHash() {
+                private byte[] msg;
 
-            public byte[] sum(byte[] b) {
-                byte[] data = new byte[msg.length + b.length];
-                System.arraycopy(msg, 0, data, 0, msg.length);
-                System.arraycopy(b, 0, data, msg.length, b.length);
-                try {
-                    byte[] digest = hash(data, opts);
-                    return digest;
-                }catch(CspException ex) {
-                    ;
+                public int write(byte[] p) {
+                    msg = new byte[p.length];
+                    System.arraycopy(p, 0, msg, 0, p.length);
+                    return p.length;
                 }
-                return null;
-            }
 
-            public void reset() {
-                byte[] buffer = new byte[GMT0016CspConstant.BUFFERSIZE];
-                try {
-                    byte[] digest = hash(buffer, opts);
-                }catch(CspException ex) {
-                    ex.printStackTrace();
-                    String err = String.format("[JC_SKF]:SarException ErrMessage: %s", ex.getMessage());
-                    csplog.setLogMsg(err, csplog.LEVEL_ERROR, GMT0016Csp.class);
+                public byte[] sum(byte[] b) throws CspException {
+                    byte[] data = new byte[msg.length + b.length];
+                    System.arraycopy(msg, 0, data, 0, msg.length);
+                    System.arraycopy(b, 0, data, msg.length, b.length);
+                    try {
+                        byte[] digest = hash(data, opts);
+                        return digest;
+                    } catch (CspException ex) {
+                        String err = String.format("[JC_SKF]:CspException ErrMessage: %s", ex.getMessage());
+                        csplog.setLogMsg(err, csplog.LEVEL_ERROR, GMT0016Csp.class);
+                        throw new CspException(err);
+                    }
                 }
-            }
 
-            public int size() {
-                return 16;
-            }
+                public void reset() throws CspException {
+                    byte[] buffer = new byte[GMT0016CspConstant.BUFFERSIZE];
+                    try {
+                        byte[] digest = hash(buffer, opts);
+                    } catch (CspException ex) {
+                        ex.printStackTrace();
+                        String err = String.format("[JC_SKF]:CspException ErrMessage: %s", ex.getMessage());
+                        csplog.setLogMsg(err, csplog.LEVEL_ERROR, GMT0016Csp.class);
+                        throw new CspException(err);
+                    }
+                }
 
-            public int blockSize() {
-                return GMT0016CspConstant.BUFFERSIZE;
-            }
-        };
+                public int size() {
+                    return 16;
+                }
 
-        return hash;
+                public int blockSize() {
+                    return GMT0016CspConstant.BUFFERSIZE;
+                }
+            };
+
+            return hash;
+        }catch(Exception ex){
+            throw new CspException("[JC_SKF]: New IHash Err!");
+        }
+
     }
 
     @Override

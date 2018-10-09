@@ -90,7 +90,7 @@ public interface GMT0016Dll extends Library{
     public long SKF_DigestInit_N(long lDevHandle, long algId, long bitLen, byte[] xCoordinate, byte[] yCoordinate, char[] Id,
                                  long idLen, long[] lHashHandle);
 
-    public long SKF_Digest_N(long hHashHandle, byte[] data, long dataLen, byte[] hashData, long hashLen[]);
+    public long SKF_Digest_N(long hHashHandle, byte[] data, long dataLen, byte[] hashData, long[] hashLen);
 
     public long SKF_RSASignData_N(long lContainerHandle, byte[] data, long dataLen, byte[] signature, long[] signLen);
 

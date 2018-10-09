@@ -47,6 +47,8 @@ import static org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant.*;
 public class ECImpl {
 
     private static final int KEYLEN = 256;
+    private static final byte TAG_DER = 0x04;
+    private static final int LEN_SYMMKEY = 16;
 
     GMT0016CspLog csplog = new GMT0016CspLog();
 
@@ -55,7 +57,7 @@ public class ECImpl {
      * @param sContainerName  容器名称
      * @param opts  skf factory
      * @return  SM2公钥IKey
-     * @throws CspException
+     * @throws CspException     错误码
      */
     public IKey generateECKey(String sContainerName, IGMT0016FactoryOpts opts) throws CspException {
 
@@ -82,14 +84,14 @@ public class ECImpl {
                 for(String name : appNamesList) {
                     if(name.equals(sContainerName)) {
                         bFind = true;
-                        //save container handle
+                        //打开容器
                         lHandleContainer = opts.getSKFFactory().SKF_OpenContainer(opts.getAppHandle(), sContainerName);
                         break;
                     }
                 }}
             if(!bFind)
             {
-                //create container handle
+                //创建容器并获取句柄
                 lHandleContainer = opts.getSKFFactory().SKF_CreateContainer(opts.getAppHandle(), sContainerName);
             }
             SKFCspKey.ECCPublicKeyBlob eccPublicKeyBlob = opts.getSKFFactory().SKF_GenECCKeyPair(lHandleContainer);
@@ -101,17 +103,17 @@ public class ECImpl {
              *
              */
             byte[] ecpoint = new byte[32*2+1];
-            ecpoint[0] = 0x04;
+            ecpoint[0] = TAG_DER;
             System.arraycopy(eccPublicKeyBlob.getxCoordinate(), 0, ecpoint, 1, eccPublicKeyBlob.getxCoordinate().length);
             System.arraycopy(eccPublicKeyBlob.getyCoordinate(), 0, ecpoint,
                     1+eccPublicKeyBlob.getxCoordinate().length, eccPublicKeyBlob.getyCoordinate().length);
 
             byte[] pubder =  ECCDer.encode(eccPublicKeyBlob.getxCoordinate(), eccPublicKeyBlob.getyCoordinate());
-            //public hash (no need, maybe need)
+            //公钥 hash (no need, maybe need)
             byte[] bytehash = getPublicHash(ecpoint);
             //ski
-            //param1 : RSA 1 ECC 2 AES 3 ....
-            //param3 : encrypt 0 sign 1
+            //参数1 : RSA 1 ECC 2 AES 3 ....
+            //参数3 : encrypt 0 sign 1
             byte[] skiData = DataUtil.getKeySki(ALG_ECC, sContainerName.getBytes(), TYPE_SIGN, bytehash);
 
             GMT0016CspKey.ECCPublicCspKey eccPublicCspKey = new GMT0016CspKey.ECCPublicCspKey(skiData, pubder);
@@ -144,7 +146,7 @@ public class ECImpl {
      * @param sContainerName    容器名称
      * @param opts              Skf factory
      * @return IKey's instance
-     * @throws CspException
+     * @throws CspException     错误码
      */
     public IKey importECKey(long algid, byte[] derPublicKey, byte[] privateKey,
                             String sContainerName, IGMT0016FactoryOpts opts) throws CspException {
@@ -158,7 +160,7 @@ public class ECImpl {
             for(String name : appNamesList) {
                 if(name.equals(sContainerName)) {
                     bFind = true;
-                    //save container handle
+                    //打开容器
                     lContainerHandle = opts.getSKFFactory().SKF_OpenContainer(opts.getAppHandle(), sContainerName);
                     break;
                 }
@@ -180,11 +182,11 @@ public class ECImpl {
             SKFCspKey.ECCPublicKeyBlob eccPublicKeyBlob =
                     (SKFCspKey.ECCPublicKeyBlob)opts.getSKFFactory().SKF_ExportPublicKey(lContainerHandle, true, true);
 
-            //gen symmkey
-            byte[] random = opts.getSKFFactory().SKF_GenRandom(opts.getDevHandle(), 16);
+            //生成对称保护密钥
+            byte[] random = opts.getSKFFactory().SKF_GenRandom(opts.getDevHandle(), LEN_SYMMKEY);
             long lSessionHandle = opts.getSKFFactory().SKF_SetSymmKey(opts.getDevHandle(), random, algid);
             ECCCipherBlob eccCipherBlob = opts.getSKFFactory().SKF_ExtECCEncrypt(opts.getDevHandle(), eccPublicKeyBlob, random, random.length);
-            //use session key encrypt private key
+            //使用对称保护密钥加密私钥
             BlockCipherParam blockCipherParam = new BlockCipherParam();
             opts.getSKFFactory().SKF_EncryptInit(lSessionHandle, blockCipherParam);
             //byte[] data = new byte[64];
@@ -210,16 +212,16 @@ public class ECImpl {
 
             byte[] ecpoint = new byte[32*2];
             //ecpoint[0] = 0x04;
-            System.arraycopy(KeyBlob.getxCoordinate(), 0, ecpoint, /*1*/0, KeyBlob.getxCoordinate().length);
+            System.arraycopy(KeyBlob.getxCoordinate(), 0, ecpoint, 0, KeyBlob.getxCoordinate().length);
             System.arraycopy(KeyBlob.getyCoordinate(), 0, ecpoint,
-                    /*1+*/KeyBlob.getxCoordinate().length, KeyBlob.getyCoordinate().length);
-            //der
+                    KeyBlob.getxCoordinate().length, KeyBlob.getyCoordinate().length);
+            //公钥der
             byte[] pubder =  ECCDer.encode(KeyBlob.getxCoordinate(), KeyBlob.getyCoordinate());
-            //public hash (no need, maybe need)
+            //公钥 hash (no need, maybe need)
             byte[] bytehash = getPublicHash(ecpoint);
             //ski
-            //param1 : RSA 1 ECC 2 AES 3 ....
-            //param3 : encrypt 0 sign 1
+            //参数1 : RSA 1 ECC 2 AES 3 ....
+            //参数3 : encrypt 0 sign 1
             byte[] skiData = DataUtil.getKeySki(ALG_ECC, sContainerName.getBytes(), TYPE_ENCRYPT, bytehash);
             GMT0016CspKey.ECCPublicCspKey eccPublicCspKey = new GMT0016CspKey.ECCPublicCspKey(skiData, pubder);
             return eccPublicCspKey;
@@ -249,7 +251,7 @@ public class ECImpl {
      * @param bSignFlag         Key类型标识
      * @param opts              Skf factory
      * @return IKey's instance
-     * @throws CspException
+     * @throws CspException     错误码
      */
     public IKey getECKey(String sContainerName, boolean bSignFlag, IGMT0016FactoryOpts opts) throws CspException {
 
@@ -261,7 +263,7 @@ public class ECImpl {
             for(String name : appNamesList) {
                 if(name.equals(sContainerName)) {
                     bFind = true;
-                    //save container handle
+                    //打开容器
                     lContainerHandle = opts.getSKFFactory().SKF_OpenContainer(opts.getAppHandle(), sContainerName);
                     break;
                 }
@@ -284,7 +286,7 @@ public class ECImpl {
                     (SKFCspKey.ECCPublicKeyBlob)opts.getSKFFactory().SKF_ExportPublicKey(lContainerHandle, bSignFlag, true);
 
             opts.getSKFFactory().SKF_CloseContainer(lContainerHandle);
-            //der
+            //公钥der
             byte[] ecpoint = new byte[32*2+1];
             ecpoint[0] = 0x04;
             System.arraycopy(eccPublicKeyBlob.getxCoordinate(), 0, ecpoint, 1, eccPublicKeyBlob.getxCoordinate().length);
@@ -293,16 +295,16 @@ public class ECImpl {
 
 
             byte[] pubder =  ECCDer.encode(eccPublicKeyBlob.getxCoordinate(), eccPublicKeyBlob.getyCoordinate());
-            //public hash (no need, maybe need)
+            //公钥 hash (no need, maybe need)
             byte[] bytehash = getPublicHash(ecpoint);
             //ski
-            //param1 : RSA 1 ECC 2 AES 3 ....
-            //param3 : encrypt 0 sign 1
+            //参数1 : RSA 1 ECC 2 AES 3 ....
+            //参数3 : encrypt 0 sign 1
             byte[] skiData;
-            if(bSignFlag)
-                skiData = DataUtil.getKeySki(ALG_ECC, sContainerName.getBytes(), TYPE_SIGN, bytehash);
-            else
-                skiData = DataUtil.getKeySki(ALG_ECC, sContainerName.getBytes(), TYPE_ENCRYPT, bytehash);
+            if(bSignFlag){
+                skiData = DataUtil.getKeySki(ALG_ECC, sContainerName.getBytes(), TYPE_SIGN, bytehash);}
+            else{
+                skiData = DataUtil.getKeySki(ALG_ECC, sContainerName.getBytes(), TYPE_ENCRYPT, bytehash);}
 
             GMT0016CspKey.ECCPublicCspKey eccPublicCspKey = new GMT0016CspKey.ECCPublicCspKey(skiData, pubder);
             return eccPublicCspKey;
@@ -334,7 +336,7 @@ public class ECImpl {
      * @param sPucID            签名者ID
      * @param opts              Skf factory
      * @return Z
-     * @throws CspException
+     * @throws CspException     错误码
      */
     public byte[] getHash(byte[] msg, long lAlgID, String sContainerName, boolean bSignFlag, String sPucID, IGMT0016FactoryOpts opts)
             throws CspException {
@@ -346,7 +348,7 @@ public class ECImpl {
             for(String name : appNamesList) {
                 if(name.equals(sContainerName)) {
                     bFind = true;
-                    //save container handle
+                    //打开容器
                     lContainerHandle = opts.getSKFFactory().SKF_OpenContainer(opts.getAppHandle(), sContainerName);
                     break;
                 }
@@ -397,7 +399,7 @@ public class ECImpl {
      * @param sContainerName    容器名称
      * @param opts              Skf factory
      * @return 签名数据
-     * @throws CspException
+     * @throws CspException     错误码
      */
 
     public byte[] getECSign(byte[] digest, String sContainerName, IGMT0016FactoryOpts opts) throws CspException {
@@ -409,7 +411,7 @@ public class ECImpl {
             for(String name : appNamesList) {
                 if(name.equals(sContainerName)) {
                     bFind = true;
-                    //save container handle
+                    //打开容器
                     lContainerHandle = opts.getSKFFactory().SKF_OpenContainer(opts.getAppHandle(), sContainerName);
                     break;
                 }
@@ -456,7 +458,7 @@ public class ECImpl {
      * @param sContainerName    容器名称
      * @param opts              Skf factory
      * @return success/error
-     * @throws CspException
+     * @throws CspException     错误码
      */
     public boolean getECVerify(byte[] signature, byte[] digest, String sContainerName, IGMT0016FactoryOpts opts) throws CspException {
         try {
@@ -467,7 +469,7 @@ public class ECImpl {
             for(String name : appNamesList) {
                 if(name.equals(sContainerName)) {
                     bFind = true;
-                    //save container handle
+                    //打开容器
                     lContainerHandle = opts.getSKFFactory().SKF_OpenContainer(opts.getAppHandle(), sContainerName);
                     break;
                 }
@@ -559,7 +561,7 @@ public class ECImpl {
 
 
     public static Object bytesToObject(byte[] bytes) throws Exception {
-        //byte array to bject
+        //byte数组转成Object
         ByteArrayInputStream in = new ByteArrayInputStream(bytes);
         ObjectInputStream sIn = new ObjectInputStream(in);
         return sIn.readObject();
