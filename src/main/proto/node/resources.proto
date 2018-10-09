@@ -1,0 +1,64 @@
+/*
+Copyright IBM Corp. All Rights Reserved.
+
+SPDX-License-Identifier: Apache-2.0
+
+Modified java_package and other contents by Dingxuan on 2018-03-28
+*/
+
+syntax = "proto3";
+
+option java_package = "org.bcia.julongchain.protos.node";
+option java_outer_classname = "ResourcesPackage";
+option go_package = "github.com/hyperledger/fabric/protos/peer";
+
+package protos;
+
+import "common/configtx.proto";
+
+// APIResource represents an API resource in the peer whose ACL is determined by the policy_ref field
+message APIResource {
+    string policy_ref = 1; // The policy name to use for this API
+}
+
+// SmartContractIdentifier identifies a piece of SmartContract.  For a peer to accept invocations of
+// this SmartContract, the hash of the installed code must match, as must the version string
+// included with the install command.
+message SmartContractIdentifier {
+    bytes hash = 1; // The hash of the SmartContract bytes
+    string version = 2; // A user friendly human readable name corresponding to the ID
+}
+
+// SmartContractValidation instructs the peer how transactions for this SmartContract should be
+// validated.  The only validation mechanism which ships with fabric today is the standard
+// 'vssc' validation mechanism.  This built in validation method utilizes an endorsement policy
+// which checks that a sufficient number of signatures have been included.  The 'arguement'
+// field encodes any parameters required by the validation implementation.
+message SmartContractValidation {
+    string name = 1; // Specifies which code to run to validate transactions, defaults to 'vssc'
+    bytes argument = 2; // When 'vssc' a marshaled VSSCArgs
+}
+
+// VSSCArgs is passed (marshaled) as a parameter to the VSSC imlementation via the
+// argument field of the SmartContractValidation message.
+message VSSCArgs {
+    string endorsement_policy_ref = 1; // A named reference to an endorsement policy,
+    // for instance /Group/Application/Writers
+}
+
+// SmartContractEndorsement instructs the peer how transactions should be endorsed.  The only
+// endorsement mechanism which ships with the fabric today is the standard 'escc' mechanism.
+// This code simply simulates the proposal to generate a RW set, then signs the result
+// using the peer's local signing identity.
+message SmartContractEndorsement {
+    string name = 1; // Specifies what code to run for endorsements, defaults 'escc'
+    // Eventually we may wish add an arg here, just like the SmartContractValidation message, but
+    // omitting now until there is a need for it.
+}
+
+// ConfigTree encapsulates Group and resources configuration of a Group.
+// Both configurations are represented as common.Config
+message RootConfigTree {
+    common.Config group_config = 1;
+    common.Config resources_config = 2;
+}

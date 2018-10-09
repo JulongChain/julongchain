@@ -1,0 +1,246 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+# Modified some contents by Dingxuan on 2018-05-17
+#
+
+###############################################################################
+#
+#    Node section
+#
+###############################################################################
+node:
+
+    # The Node id is used for identifying this Node instance.
+    id: jdoe
+
+    # The networkId allows for logical seperation of networks
+    networkId: dev
+
+    # The Address at local network interface this Node will listen on.
+    # By default, it will listen on all network interfaces
+    listenAddress: 0.0.0.0:7051
+
+    consenterAddress: 0.0.0.0:7050
+
+    # The endpoint this node uses to listen for inbound smartContract connections.
+    # If this is commented-out, the listen address is selected to be
+    # the node's address (see below) with port 7052
+    smartContractListenAddress: 0.0.0.0:7052
+
+    # Keepalive settings for node server and clients
+    keepalive:
+        # MinInterval is the minimum permitted time between client pings.
+        # If clients send pings more frequently, the node server will
+        # disconnect them
+        minInterval: 60000
+        #client:
+        # Client keepalive settings for communicating with other node nodes
+            # Interval is the time between pings to node nodes.  This must
+            # greater than or equal to the minInterval specified by node
+            # nodes
+        clientInterval: 60000
+            # Timeout is the duration the client waits for a response from
+            # node nodes before closing the connection
+        clientTimeout: 20000
+        # DeliveryClient keepalive settings for communication with ordering
+        # nodes.
+        #deliveryClient:
+            # Interval is the time between pings to ordering nodes.  This must
+            # greater than or equal to the minInterval specified by ordering
+            # nodes.
+        deliveryClientInterval: 60000
+            # Timeout is the duration the client waits for a response from
+            # ordering nodes before closing the connection
+        deliveryClientTimeout: 20000
+
+    # Gossip related configuration
+    gossip:
+        commiterAddress: 127.0.0.1:7060
+        consenterAddress: 127.0.0.1:7050
+
+    # EventHub related configuration
+    events:
+        # The address that the Event service will be enabled on the node
+        address: 0.0.0.0:7053
+
+        # total number of events that could be buffered without blocking send
+        buffersize: 100
+
+        # timeout duration for producer to send an event.
+        # if < 0, if buffer full, unblocks immediately and not send
+        # if 0, if buffer full, will block and guarantee the event will be sent out
+        # if > 0, if buffer full, blocks till timeout
+        timeout: 10
+
+        # timewindow is the acceptable difference between the node's current
+        # time and the client's time as specified in a registration event
+        timewindow: 900000
+
+    # TLS Settings
+    # Note that node-smartContract connections through smartContractListenAddress is
+    # not mutual TLS auth. See comments on smartContractListenAddress for more info
+    tls:
+        # Require server-side TLS
+        enabled:  false
+        # Require client certificates / mutual TLS.
+        # Note that clients that are not configured to use a certificate will
+        # fail to connect to the node.
+        clientAuthRequired: false
+        # X.509 certificate used for TLS server
+        #cert:
+        certFile: tls/server.crt
+        # Private key used for TLS server (and client if clientAuthEnabled
+        # is set to true
+        # key:
+        keyFile: tls/server.key
+        # Trusted root certificate chain for tls.cert
+        # rootcert:
+        rootCertFile: tls/ca.crt
+        # Set of root certificate authorities used to verify client certificates
+        # clientRootCAs:
+        clientRootCAsFiles:
+              - tls/ca.crt
+        # Private key used for TLS when making client connections.  If
+        # not set, node.tls.key.file will be used instead
+        #clientKey:
+        clientKeyFile:
+        # X.509 certificate used for TLS when making client connections.
+        # If not set, node.tls.cert.file will be used instead
+        # clientCert:
+        clientCertFile:
+
+    # Path on the file system where node will store data (eg ledger). This
+    # location must be access control protected to prevent unintended
+    # modification that might corrupt the node operations.
+    fileSystemPath: /var/julongchain/production/node
+
+###############################################################################
+#
+#    VM section
+#
+###############################################################################
+vm:
+
+    # Endpoint of the vm management system.  For docker can be one of the following in general
+    # unix:///var/run/docker.sock
+    # http://localhost:2375
+    # https://localhost:2376
+    endpoint: unix:///var/run/docker.sock
+    #endpoint: tcp://0.0.0.0:2375
+
+###############################################################################
+#
+#    SmartContractPackage section
+#
+###############################################################################
+smartContract:
+
+    baseImage: julongchain/julongchain-baseimage:0.8.3-alpha
+
+    instantiatePath: /var/julongchain/production/instantiate_temp
+    dockerFile: config/Dockerfile
+
+    coreNodeAddress: 172.17.0.1
+    coreNodeAddressPort: 7052
+
+    # Timeout duration for Invoke and Init calls to prevent runaway.
+    # This timeout is used by all smartContracts in all the channels, including
+    # system smartContracts.
+    # Note that during Invoke, if the image is not available (e.g. being
+    # cleaned up when in development environment), the node will automatically
+    # build the image, which might take more time. In production environment,
+    # the smartContract image is unlikely to be deleted, so the timeout could be
+    # reduced accordingly.
+    executetimeout: 30s
+
+    # keepalive in seconds. In situations where the communiction goes through a
+    # proxy that does not support keep-alive, this parameter will maintain connection
+    # between node and smartContract.
+    # A value <= 0 turns keepalive off
+    keepalive: 0
+
+    # system smartContracts whitelist. To add system smartContract "myscc" to the
+    # whitelist, add "myscc: enable" to the list below, and register in
+    # smartcontract/importsysccs.go
+    system:
+        cssc: enable
+        lssc: enable
+        essc: enable
+        vssc: enable
+        qssc: enable
+
+    # System smartContract plugins: in addition to being imported and compiled
+    # into fabric through core/smartcontract/importsysccs.go, system smartContracts
+    # can also be loaded as shared objects compiled as Go plugins.
+    # See examples/plugins/scc for an example.
+    # Like regular system smartContracts, plugins must also be white listed in the
+    # smartContract.system section above.
+    systemPlugins:
+      # example configuration:
+      # - enabled: true
+      #   name: myscc
+      #   path: /opt/lib/myscc.so
+      #   invokableExternal: true
+      #   invokableCC2CC: true
+
+    # Logging section for the smartContract container
+    logging:
+      # Default level for all loggers within the smartContract container
+      level:  info
+      # Override default level for the 'shim' module
+      shim:   warning
+      # Format for the smartContract container logs
+      format: '%{color}%{time:2006-01-02 15:04:05.000 MST} [%{module}] %{shortfunc} -> %{level:.4s} %{id:03x}%{color:reset} %{message}'
+
+###############################################################################
+#
+#    Ledger section - ledger configuration encompases both the blockchain
+#    and the state
+#
+###############################################################################
+ledger:
+
+  state:
+    # stateDatabase - options are "goleveldb", "CouchDB"
+    # goleveldb - default state database stored in goleveldb.
+    # CouchDB - store state database in CouchDB
+    stateDatabase: leveldb
+    couchDBConfig:
+       # It is recommended to run CouchDB on the same server as the node, and
+       # not map the CouchDB container port to a server port in docker-compose.
+       # Otherwise proper security must be provided on the connection between
+       # CouchDB client (on the node) and server.
+       couchDBAddress: 127.0.0.1:5984Ma
+       # This username must have read and write authority on CouchDB
+       username:
+       # The password is recommended to pass as an environment variable
+       # during start up (eg LEDGER_COUCHDBCONFIG_PASSWORD).
+       # If it is stored here, the file must be access control protected
+       # to prevent unintended users from discovering the password.
+       password:
+       # Number of retries for CouchDB errors
+       maxRetries: 3
+       # Number of retries for CouchDB errors during node startup
+       maxRetriesOnStartup: 10
+       # CouchDB request timeout (unit: duration, e.g. 20s)
+       requestTimeout: 35s
+       # Limit on the number of records to return per query
+       queryLimit: 10000
+       # Limit on the number of records per CouchDB bulk update batch
+       maxBatchUpdateSize: 1000
+       # Warm indexes after every N blocks.
+       # This option warms any indexes that have been
+       # deployed to CouchDB after every N blocks.
+       # A value of 1 will warm indexes after every block commit,
+       # to ensure fast selector queries.
+       # Increasing the value may improve write efficiency of node and CouchDB,
+       # but may degrade query response time.
+       warmIndexesAfterNBlocks: 1
+
+  history:
+    # enableHistoryDatabase - options are true or false
+    # Indicates if the history of key updates should be stored.
+    # All history 'index' will be stored in goleveldb, regardless if using
+    # CouchDB or alternate database for the state.
+    enableHistoryDatabase: true

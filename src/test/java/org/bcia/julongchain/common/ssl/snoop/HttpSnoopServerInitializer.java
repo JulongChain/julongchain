@@ -1,0 +1,52 @@
+/*
+ * Copyright 2012 The Netty Project
+ *
+ * The Netty Project licenses this file to you under the Apache License,
+ * version 2.0 (the "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at:
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations
+ * under the License.
+ */
+package org.bcia.julongchain.common.ssl.snoop;
+
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.http.HttpRequestDecoder;
+import io.netty.handler.codec.http.HttpResponseEncoder;
+import io.netty.handler.ssl.SslContext;
+/**
+ * HTTP服务端ChannelPipeline对象创建和配置
+ * @author cuilf
+ * @date 2019/09/14
+ * @company InfosecTechnology
+ */
+public class HttpSnoopServerInitializer extends ChannelInitializer<SocketChannel> {
+
+    private final SslContext sslCtx;
+
+    public HttpSnoopServerInitializer(SslContext sslCtx) {
+        this.sslCtx = sslCtx;
+    }
+
+    @Override
+    public void initChannel(SocketChannel ch) {
+        ChannelPipeline p = ch.pipeline();
+        if (sslCtx != null) {
+            p.addLast(sslCtx.newHandler(ch.alloc()));
+        }
+        p.addLast(new HttpRequestDecoder());
+        // 如果不想处理 HttpChunks的话请删除下面这行注释.
+        //p.addLast(new HttpObjectAggregator(1048576));
+        p.addLast(new HttpResponseEncoder());
+        // 如果不需要自动内容压缩的话，请移除下面这一行.
+        //p.addLast(new HttpContentCompressor());
+        p.addLast(new HttpSnoopServerHandler());
+    }
+}
