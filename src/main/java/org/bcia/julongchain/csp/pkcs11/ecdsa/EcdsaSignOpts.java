@@ -20,9 +20,9 @@ import org.bcia.julongchain.csp.intfs.opts.ISignerOpts;
 import sun.security.pkcs11.wrapper.PKCS11Constants;
 
 /**
- * Ecdsa Sign Opts
+ * Ecdsa 签名选项
  *
- * @author Xu Ying
+ * @author Ying Xu
  * @date 2018/05/21
  * @company FEITIAN
  */
@@ -39,10 +39,10 @@ public enum EcdsaSignOpts implements ISignerOpts {
 
 
     /**
-     * Opt for sign with ecdsa
-     * @param name          Sign Algorithm
-     * @param mechanism     Sign mechanism
-     * @param index         Index num
+     * ECDSA 签名选择
+     * @param name          签名算法名称（For 软实现）
+     * @param mechanism     签名算法（For 硬实现）
+     * @param index         索引
      */
     private EcdsaSignOpts(String name, long mechanism, int index) {
         this.name = name;

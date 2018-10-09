@@ -18,12 +18,15 @@ package org.bcia.julongchain.common.deliver;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protobuf.Message;
+import org.bcia.julongchain.common.exception.ConsenterException;
 
 /**
+ * 发送者接口
+ *
  * @author zhangmingyang
  * @Date: 2018/5/29
  * @company Dingxuan
  */
 public interface ISender {
-   void send(Message msg) throws InvalidProtocolBufferException;
+    void send(Message msg) throws ConsenterException;
 }

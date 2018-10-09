@@ -139,9 +139,9 @@ public class LSSC  extends SystemSmartContractBase {
         if(size<1){
             return newErrorResponse(String.format("Incorrect number of arguments, expected a minimum of 2,provided %d",size));
         }
-        for(int i = 0; i<args.size(); i++) {
-            System.out.println("=================:" + ByteString.copyFrom(args.get(i)).toStringUtf8());
-        }
+//        for(int i = 0; i<args.size(); i++) {
+//            System.out.println("=================:" + ByteString.copyFrom(args.get(i)).toStringUtf8());
+//        }
         String function= ByteString.copyFrom(args.get(0)).toStringUtf8();
         //Handle ACL:
         //1. get the signed proposal

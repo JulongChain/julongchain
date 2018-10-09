@@ -20,7 +20,7 @@ import org.bcia.julongchain.csp.gmt0016.ftsafe.IGMT0016KeyImportOpts;
 import static org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant.*;
 
 /**
- * RSA Import Opts
+ * 导入 RSA 密钥选项
  *
  * @author Ying Xu
  * @date 7/4/18

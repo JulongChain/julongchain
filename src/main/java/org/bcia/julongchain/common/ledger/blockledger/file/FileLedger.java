@@ -18,6 +18,8 @@ package org.bcia.julongchain.common.ledger.blockledger.file;
 import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.ledger.IResultsIterator;
 import org.bcia.julongchain.common.ledger.blockledger.*;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Ledger;
 import org.bcia.julongchain.protos.consenter.Ab;
@@ -31,6 +33,7 @@ import org.bcia.julongchain.protos.consenter.Ab;
  */
 public class FileLedger extends ReadWriteBase {
     public static final Object LOCK = new Object();
+	private static JulongChainLog log = JulongChainLogFactory.getLog(FileLedger.class);
 
     private IFileLedgerBlockStore blockStore;
 
@@ -58,7 +61,7 @@ public class FileLedger extends ReadWriteBase {
                 startingBlockNumber = startType.getSpecified().getNumber();
                 long height = height();
                 if(startingBlockNumber > height){
-                	throw new LedgerException("Not found iterator");
+                	log.info("Require start block num=" + startingBlockNumber + ", height=" + height);
                 }
                 break;
             default:

@@ -34,27 +34,14 @@ import org.bcia.julongchain.protos.consenter.Kafka;
 public class Utils {
     private static JulongChainLog log = JulongChainLogFactory.getLog(Utils.class);
 
-    public void ChannelHeader(Common.Envelope env) {
-        Common.Payload envPayload = UnmarshalPayload(env.toByteArray());
+    public void groupHeader(Common.Envelope env) {
+        Common.Payload envPayload = unmarshalPayload(env.toByteArray());
         if (envPayload.getHeader() == null) {
         }
         //TODO 检查envPayload.Header.ChannelHeader
         //TODO 执行UnmarshalChannelHeader()
         //TODO 返回ChannelHeader对象
     }
-
-    public Common.Payload UnmarshalPayload(byte[] encoded) {
-        Common.Payload payload = Common.Payload.newBuilder().build();
-        //TODO payload进行赋值
-        return payload;
-
-    }
-
-    public static byte[] MarshalOrPanic(Kafka.KafkaMetadata kafkaMetadata) {
-        byte[] data = kafkaMetadata.toByteArray();
-        return data;
-    }
-
 
     public static Common.Payload unmarshalPayload(byte[] encoded) {
         Common.Payload payload = null;

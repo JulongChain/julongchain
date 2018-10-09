@@ -15,9 +15,6 @@
  */
 package org.bcia.julongchain.node.cmd.sc;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-import com.google.protobuf.ByteString;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.NodeException;
@@ -25,7 +22,6 @@ import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.NetAddress;
-import org.bcia.julongchain.core.ssc.lssc.LSSC;
 import org.bcia.julongchain.node.Node;
 import org.bcia.julongchain.node.common.util.NodeConstant;
 import org.bcia.julongchain.protos.node.SmartContractPackage;

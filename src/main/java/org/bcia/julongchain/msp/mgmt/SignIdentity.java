@@ -55,12 +55,12 @@ public class SignIdentity implements ISigningIdentity {
         byte[] signvalue = null;
         try {
             //获取默认的工厂选项的密钥存储路经
-            String sk_path = CspOptsManager.getInstance().getDefaultFactoryOpts().getKeyStore();
-            byte[] skBytes = new LoadLocalMspFiles().getSkFromDir(sk_path).get(0);
+            String skPath = CspOptsManager.getInstance().getDefaultFactoryOpts().getKeyStore();
+            byte[] skBytes = new LoadLocalMspFiles().getSkFromDir(skPath).get(0);
             //TODO 后续判断是哪一种工厂选项,根据具体的签名类型,构造对应的密钥导入选项
             IKey privateKey = getDefaultCsp().keyImport(skBytes, new SM2PrivateKeyImportOpts(true));
             signvalue = msp.getCsp().sign(privateKey, msg, new SM2SignerOpts());
-            log.info("Signvalue is ok");
+            log.info("Data signature has been completed");
         } catch (JulongChainException e) {
             log.error(e.getMessage());
         }

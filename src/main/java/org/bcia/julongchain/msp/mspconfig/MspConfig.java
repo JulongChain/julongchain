@@ -25,7 +25,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class MspConfig {
-    public static final String MspConfig_FILE_PATH = "gmcsp.yaml";
+    public static final String MSPCONFIG_FILE_PATH = "gmcsp.yaml";
 
     public Node node;
 

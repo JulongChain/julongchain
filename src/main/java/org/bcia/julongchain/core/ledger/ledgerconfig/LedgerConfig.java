@@ -46,6 +46,7 @@ public class LedgerConfig {
     private static String ROOT_DIR = DEFAULT_ROOT_DIR;
     private static final int DEFAULT_MAX_BLOCKFILE_SIZE = 64 * 1024 * 1024;
     private static int MAX_BLOCKFILE_SIZE;
+    private static final int MAX_BATCH_SIZE = Integer.valueOf(NodeConfigFactory.getNodeConfig().getLedger().getState().getCouchDBConfig().get("maxBatchUpdateSize"));
 
     public static boolean isCouchDBEnable(){
 	    return NodeConfigFactory.getNodeConfig().getLedger().getState().getStateDatabase().toLowerCase().contains("couchdb");
@@ -88,7 +89,7 @@ public class LedgerConfig {
     }
 
     public static String getChainsPath(){
-        return join(ROOT_DIR, CONF_CHAINS);
+        return join(ROOT_DIR, CONF_CHAINS, CONF_CHAINS);
     }
 
     public static int getMaxBlockfileSize(){
@@ -103,7 +104,11 @@ public class LedgerConfig {
         MAX_BLOCKFILE_SIZE = maxBlockfileSize;
     }
 
-    public static void setRootPath(String rootPath){
+	public static int getMaxBatchSize() {
+		return MAX_BATCH_SIZE;
+	}
+
+	public static void setRootPath(String rootPath){
         if(rootPath == null){
             ROOT_DIR = DEFAULT_ROOT_DIR;
         } else {

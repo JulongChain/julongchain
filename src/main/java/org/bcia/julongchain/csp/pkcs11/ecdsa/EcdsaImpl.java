@@ -44,7 +44,7 @@ import static org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant.*;
 import static sun.security.pkcs11.wrapper.PKCS11Constants.*;
 
 /**
- * Class for Ecdsa Impl
+ * ECDSA密钥实现
  *
  * @author Ying Xu
  * @date 4/19/18
@@ -65,10 +65,12 @@ public class EcdsaImpl {
          * @param ephemeral   临时标记
          * @param opts        p11 factory
          * @return
+		 * @throws CspException
          */
         public void generateECKey(int keySize, boolean ephemeral, IPKCS11FactoryOpts opts) throws CspException {
             try {
-            	
+            	opts.getPKCS11().C_Login(opts.getSessionhandle(), PKCS11Constants.CKU_USER, opts.getPin());
+
                 ECParameterSpec params = ECUtil.getECParameterSpec(Security.getProvider("SunEC"), keySize);
                 byte[] encodedParams = ECUtil.encodeECParameterSpec(Security.getProvider("SunEC"), params);                
 
@@ -144,6 +146,11 @@ public class EcdsaImpl {
 
         }
 
+		/**
+         * 获取IKey
+         * @return IKey ECDSA公钥类型IKey
+		 * @throws CspException
+         */
         public IKey getIKey(){
             return new EcdsaKeyOpts.EcdsaPubKey(byteSKI, pubder);
         }
@@ -163,6 +170,7 @@ public class EcdsaImpl {
          * @param opts          p11 factory
          * @param flagpubkey    公钥标记
          * @return 公钥摘要
+		 * @throws CspException
          */
         public static byte[] importECKey(byte[] prider, byte[] pubder, boolean ephemeral, IPKCS11FactoryOpts opts, boolean flagpubkey)  throws CspException{
 
@@ -205,6 +213,7 @@ public class EcdsaImpl {
                 }
                 else
                 {
+                    opts.getPKCS11().C_Login(opts.getSessionhandle(), PKCS11Constants.CKU_USER, opts.getPin());
                     byteSKI = importECKey(null,pubder,ephemeral,opts, true);
                     PKCS8EncodedKeySpec prikeySpec = new PKCS8EncodedKeySpec(prider);
                     ECPrivateKey ecprikey = (ECPrivateKey) keyFactory.generatePrivate(prikeySpec);
@@ -268,6 +277,7 @@ public class EcdsaImpl {
          * @param prider        私钥DER编码
          * @param pubder        公钥DER编码
          * @return IKey
+		 * @throws CspException
          */
         public static IKey getKey(byte[] ski, byte[] pubder, byte[] prider) throws CspException{
 
@@ -283,7 +293,7 @@ public class EcdsaImpl {
     }
 
     /**
-     * Derive Ecdas Keypair
+     * 衍生密钥
      */
     public static class DeriveECKey{
     	private static byte[] byteSKI;
@@ -292,12 +302,12 @@ public class EcdsaImpl {
     	public DeriveECKey() {}
 
         /**
-         *
-         * @param ski           Identify for Search Key
-         * @param ephemeral     Ephemeral(True/False)
-         * @param flagprikey    Key type identification(PrivateKey: True  PublicKey: Flase)
+         * 衍生密钥
+         * @param ski           密钥索引
+         * @param ephemeral     临时标记(True/False)
+         * @param flagprikey    密钥标记(PrivateKey: True  PublicKey: Flase)
          * @param opts          P11 factory
-         * @return  IKey instance of EcdsaKeyOpts.EcdsaPubKey
+         * @return  ECDSA公钥类型IKey
          * @throws CspException
          */
     	public static IKey deriveKey(byte[] ski, boolean ephemeral, boolean flagprikey, IPKCS11FactoryOpts opts) throws CspException {
@@ -338,8 +348,9 @@ public class EcdsaImpl {
                     
                     return new EcdsaKeyOpts.EcdsaPubKey(byteSKI, pubder);
                     
-    			} else {   				
-    				
+    			} else {
+
+                    opts.getPKCS11().C_Login(opts.getSessionhandle(), PKCS11Constants.CKU_USER, opts.getPin());
     				long[] keypri = findKeypairFromSKI(opts, true, ski);
     				if (keypri==null || keypri.length==0) {
                         String str=String.format("[JC_PKCS]:No Find Key");
@@ -409,7 +420,7 @@ public class EcdsaImpl {
 
 
     /**
-     * Get Ecdsa PublicKey
+     * 获取ECDSA类型IKey（公钥）
      *
      * @author xuying
      * @date 2018/05/20
@@ -478,7 +489,7 @@ public class EcdsaImpl {
 
 
     /**
-     * Use the private key signature of the specified SKI
+     * 使用指定Key签名
      *
      * @author Ying Xu
      * @date 2018/05/20
@@ -492,16 +503,19 @@ public class EcdsaImpl {
 
 
         /**
-         * sign data
+         * 签名
          *
-         * @param ski           cka_id value
-         * @param digest        digest data
-         * @param newMechanism  the mechanism
+         * @param ski           Key索引（即cka_id）
+         * @param digest        摘要数据
+         * @param newMechanism  签名算法
          * @param opts          p11factory
+		 * @return 签名数据
+		 * @throws CspException
          */
         public static byte[] signECDSA(byte[] ski, byte[] digest, long newMechanism, IPKCS11FactoryOpts opts) throws CspException{
 
             try {
+                opts.getPKCS11().C_Login(opts.getSessionhandle(), PKCS11Constants.CKU_USER, opts.getPin());
                 long[] privatekey = findKeypairFromSKI(opts, true, ski);
                 if (privatekey==null || privatekey.length==0)
                 {
@@ -533,7 +547,7 @@ public class EcdsaImpl {
 
 
     /**
-     * Use the public key verify signature of the specified SKI
+     * 使用指定Key验签
      *
      * @author Ying Xu
      * @date 2018/05/20
@@ -546,13 +560,15 @@ public class EcdsaImpl {
 
 
         /**
-         * verify signature
+         * 验签
          *
-         * @param ski           cka_id value
-         * @param signature     signature data
-         * @param digest        digest data
-         * @param newMechanism  the alg
+         * @param ski           Key索引（即cka_id）
+         * @param signature     签名数据
+         * @param digest        摘要数据
+         * @param newMechanism  签名算法
          * @param opts          p11factory
+		 * @retrun 验签成功/失败
+		 * @throws CspException
          */
         public boolean verifyECDSA(byte[] ski, byte[] signature, byte[] digest, long newMechanism, IPKCS11FactoryOpts opts) throws CspException{
 
@@ -587,11 +603,13 @@ public class EcdsaImpl {
 
 
     /**
-     * Find the key of the specified SKI
+     * 根据key索引获取对象句柄
      *
      * @param opts      p11factory
-     * @param bPri      private flag
-     * @param ski       cka_id value
+     * @param bPri      密钥标识（私钥：true 公钥：false）
+     * @param ski       索引（即cka_id）
+	 * @return 对象句柄
+	 * @throws CspException
      */
     public static long[] findKeypairFromSKI(IPKCS11FactoryOpts opts, boolean bPri, byte[] ski) throws CspException{
 
@@ -624,7 +642,7 @@ public class EcdsaImpl {
     }
 
     /**
-     * Get Publickey DER Encoding of ASN.1 Types
+     * 获取 ASN.1 Types 格式公钥
      *
      */
     private static byte[] getPublicDer(byte[] attecpoint, ECParameterSpec params) throws CspException{
@@ -659,7 +677,7 @@ public class EcdsaImpl {
 
 
     /**
-     * get public key hash data
+     * 获取公钥hash值
      *
      */
     private static byte[] getPublicHash(byte[] attecpoint) throws CspException {

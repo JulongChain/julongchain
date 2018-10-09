@@ -23,10 +23,8 @@ import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
-import org.bcia.julongchain.common.util.Utils;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.csp.factory.CspManager;
-import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.msp.ISigningIdentity;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.node.ProposalPackage;
@@ -99,6 +97,29 @@ public class ProposalResponseUtils {
         //首先构造响应主内容
         ProposalResponsePackage.Response.Builder responseBuilder = ProposalResponsePackage.Response.newBuilder();
         responseBuilder.setStatus(Common.Status.SUCCESS_VALUE);
+        responseBuilder.setPayload(payload);
+        if (StringUtils.isNotBlank(message)) {
+            responseBuilder.setMessage(message);
+        }
+
+        ProposalResponsePackage.Response response = responseBuilder.build();
+
+        //构造提案响应
+        return buildProposalResponse(response);
+    }
+
+    /**
+     * 构造提案响应
+     *
+     * @param payload
+     * @param message
+     * @return
+     */
+    public static ProposalResponsePackage.ProposalResponse buildProposalResponse(int status, ByteString payload, String
+            message) {
+        //首先构造响应主内容
+        ProposalResponsePackage.Response.Builder responseBuilder = ProposalResponsePackage.Response.newBuilder();
+        responseBuilder.setStatus(status);
         responseBuilder.setPayload(payload);
         if (StringUtils.isNotBlank(message)) {
             responseBuilder.setMessage(message);

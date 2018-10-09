@@ -15,6 +15,7 @@ limitations under the License.
  */
 package org.bcia.julongchain.core.ledger.couchdb;
 
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.statecouchdb.Conf;
 import org.bcia.julongchain.core.node.NodeConfigFactory;
 
 import java.util.Map;
@@ -39,9 +40,8 @@ public class CouchDBDefinition {
 	public CouchDBDefinition() {
 		this.host = couchDBConfig.get("couchDBAddress");
 		this.port = Integer.valueOf(couchDBConfig.get("couchDBPort"));
-		// TODO: 7/17/18 if set couchdb username & password, server will response 401
-		this.userName = null;
-		this.password = null;
+		this.userName = couchDBConfig.get("username");
+		this.password = couchDBConfig.get("password");
 		this.maxRetries = Integer.valueOf(couchDBConfig.get("maxRetries"));
 		this.maxRetriesOnStartUp = Integer.valueOf(couchDBConfig.get("maxRetriesOnStartup"));
 		this.requestTimeOut = Integer.valueOf(couchDBConfig.get("requestTimeout"));

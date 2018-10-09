@@ -28,7 +28,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * soft impl digest
+ * 软实现计算摘要信息
  *
  * @author Ying Xu
  * @date 2018/05/21

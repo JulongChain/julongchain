@@ -32,7 +32,7 @@ import java.util.List;
 import static org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant.*;
 
 /**
- * SKFFactory Class
+ * SKFFactory接口实现
  *
  * @author Ying Xu
  * @date 7/4/18
@@ -48,9 +48,9 @@ public class SKFFactoryOpts implements ISKFFactory {
 
 
     /**
-     * Enumerate Devices
-     * @param bPresent          Device Status
-     * @return  Devices' Name List
+     * 枚举设备
+     * @param bPresent   设备状态
+     * @return  设备名称列表
      * @throws SarException
      * @throws JCSKFException
      */
@@ -73,9 +73,9 @@ public class SKFFactoryOpts implements ISKFFactory {
 
 
     /**
-     * Connect Device
-     * @param devName   Device Name
-     * @return  Device handle
+     * 连接设备
+     * @param devName   设备名称
+     * @return  设备句柄
      * @throws SarException
      */
     public long SKF_ConnectDev(String devName) throws SarException{
@@ -90,9 +90,9 @@ public class SKFFactoryOpts implements ISKFFactory {
 
 
     /**
-     * Get Deviceinfo
-     * @param lDevHandle    Device Handle
-     * @return  SKFDeviceInfo Impl
+     * 获取设备信息
+     * @param lDevHandle    设备句柄
+     * @return  设备信息
      * @throws SarException
      */
     public SKFDeviceInfo SKF_GetDevInfo(long lDevHandle) throws SarException{
@@ -128,9 +128,9 @@ public class SKFFactoryOpts implements ISKFFactory {
 
 
     /**
-     * Enumerate Applications
-     * @param lDevHandle        Device handle
-     * @return Applications' Name List
+     * 枚举应用
+     * @param lDevHandle        设备句柄
+     * @return 应用名称列表
      * @throws SarException
      * @throws JCSKFException
      */
@@ -152,10 +152,10 @@ public class SKFFactoryOpts implements ISKFFactory {
 
 
     /**
-     * Open Application
-     * @param lDevHandle    Device Handle
-     * @param appName       Application Name
-     * @return  Application Handle
+     * 打开应用
+     * @param lDevHandle    设备句柄
+     * @param appName       应用名称
+     * @return  应用句柄
      * @throws SarException
      */
     public long SKF_OpenApplication(long lDevHandle, String appName) throws SarException {
@@ -171,8 +171,8 @@ public class SKFFactoryOpts implements ISKFFactory {
 
 
     /**
-     * Disconnect Device
-     * @param lDevHandle    Device Handle
+     * 断开设备
+     * @param lDevHandle    设备句柄
      * @throws SarException
      */
     public void SKF_DisconnectDev(long lDevHandle) throws SarException{
@@ -182,10 +182,10 @@ public class SKFFactoryOpts implements ISKFFactory {
 
 
     /**
-     * Verify Pin
-     * @param lAppHandle        Application Handle
-     * @param lUserType         User Type
-     * @param sPin              User Pin
+     * 校验PIN码
+     * @param lAppHandle        应用句柄
+     * @param lUserType         用户类型
+     * @param sPin              用户PIN码
      * @return Success
      * @throws SarException
      */
@@ -203,9 +203,9 @@ public class SKFFactoryOpts implements ISKFFactory {
 
 
     /**
-     * Enumerate Container
-     * @param lAppHandle        Application Handle
-     * @return  Containers' Name list
+     * 枚举容器
+     * @param lAppHandle        应用句柄
+     * @return  容器名称列表
      * @throws SarException
      * @throws JCSKFException
      */
@@ -229,10 +229,10 @@ public class SKFFactoryOpts implements ISKFFactory {
 
 
     /**
-     * Create Contatiner
-     * @param lAppHandle        Application Handle
-     * @param sContainerName    Container Name
-     * @return  Container Name
+     * 创建容器
+     * @param lAppHandle        应用句柄
+     * @param sContainerName    容器名称
+     * @return  容器句柄
      * @throws SarException
      */
     public long SKF_CreateContainer(long lAppHandle, String sContainerName) throws SarException{
@@ -249,10 +249,10 @@ public class SKFFactoryOpts implements ISKFFactory {
 
 
     /**
-     * Open Container
-     * @param lAppHandle        Application Handle
-     * @param sContainerName    Container Name
-     * @return  Container Handle
+     * 打开容器
+     * @param lAppHandle        应用句柄
+     * @param sContainerName    容器名称
+     * @return  Container Handle	容器句柄
      * @throws SarException
      */
     public long SKF_OpenContainer(long lAppHandle, String sContainerName) throws SarException {
@@ -269,8 +269,8 @@ public class SKFFactoryOpts implements ISKFFactory {
 
 
     /**
-     * Close Container Handle
-     * @param lContainerHandle  Container Handle
+     * 关闭容器句柄
+     * @param lContainerHandle  容器句柄
      * @throws SarException
      */
     public void SKF_CloseContainer(long lContainerHandle) throws SarException {
@@ -279,8 +279,8 @@ public class SKFFactoryOpts implements ISKFFactory {
 
 
     /**
-     * Close Handle
-     * @param lHandle       Handle
+     * 关闭句柄
+     * @param lHandle       句柄
      * @throws SarException
      */
     public void SKF_CloseHandle(long lHandle) throws SarException {
@@ -289,9 +289,9 @@ public class SKFFactoryOpts implements ISKFFactory {
 
 
     /**
-     * Generate SM2 KeyPair
-     * @param lContainerHandle      Container Handle
-     * @return  SM2 publickey blob
+     * 生成SM2密钥对
+     * @param lContainerHandle      容器句柄
+     * @return  SM2的密钥公钥
      * @throws SarException
      */
     public SKFCspKey.ECCPublicKeyBlob SKF_GenECCKeyPair(long lContainerHandle) throws SarException {
@@ -311,9 +311,9 @@ public class SKFFactoryOpts implements ISKFFactory {
 
 
     /**
-     * Get the Type of the Container
-     * @param lContainerHandle      Container Handle
-     * @return  Type(RSA or SM2)
+     * 获取容器类型
+     * @param lContainerHandle      容器句柄
+     * @return 类型(RSA or SM2)
      * @throws SarException
      */
     public long SKF_GetContainerType(long lContainerHandle) throws SarException{
@@ -325,11 +325,11 @@ public class SKFFactoryOpts implements ISKFFactory {
 
 
     /**
-     * Export Public Key
-     * @param lContainerHandle      Container Handle
-     * @param bSignFlag             Key type (True: Sign  False: Encrypt)
-     * @param bECC                  Key Alg type (True: SM2 False: RSA)
-     * @return SM2 or RSA public key
+     * 导出公钥
+     * @param lContainerHandle      容器句柄
+     * @param bSignFlag             密钥类型 (True: Sign  False: Encrypt)
+     * @param bECC                  是否为SM2密钥 (True: SM2 False: RSA)
+     * @return SM2 或 RSA 公钥
      * @throws SarException
      */
     public Object SKF_ExportPublicKey(long lContainerHandle, boolean bSignFlag, boolean bECC) throws SarException{
@@ -370,10 +370,10 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
     /**
-     * Generate random numbers
-     * @param lDevHandle        Device Handle
-     * @param length            Random numbers' Length
-     * @return  Byte Array of Random numbers
+     * 生成随机数
+     * @param lDevHandle        设备句柄
+     * @param length            随机数长度
+     * @return  随机数数组
      * @throws SarException
      */
     public byte[] SKF_GenRandom(long lDevHandle, int length) throws SarException {
@@ -384,10 +384,10 @@ public class SKFFactoryOpts implements ISKFFactory {
     }
 
     /**
-     * Generate  symmetry key
-     * @param lDevHandle        Device Handle
-     * @param byteKey           Byte array of Symmetry key (Random numbers)
-     * @param lAlgID            Algorithm ID
+     * 生成对称密钥
+     * @param lDevHandle        设备句柄
+     * @param byteKey           对称密钥 (Random numbers)
+     * @param lAlgID            算法
      * @return Key Handle
      * @throws SarException
      */

@@ -40,7 +40,6 @@ public class BlockCutter implements IReceiver {
 
     private IConsenterConfig sharedConfigManager;
 
-    //private Common.Envelope[] pendingBatch;
     private List<Common.Envelope> pendBatch=new ArrayList<>();
 
     private int pendingBatchSizeBytes;
@@ -57,13 +56,12 @@ public class BlockCutter implements IReceiver {
     public  BatchesMes ordered(Common.Envelope msg) {
 
         int messageSizeBytes = getMessageSizeBytes(msg);
-      //  System.out.println("消息长度----->"+messageSizeBytes);
+
         BatchesMes batchesMes = new BatchesMes();
         if (messageSizeBytes > sharedConfigManager.getBatchSize().getPreferredMaxBytes()) {
 
             log.debug(String.format("The current message, with %s bytes, is larger than the preferred batch size of %s bytes and will be isolated.", messageSizeBytes, sharedConfigManager.getBatchSize().getPreferredMaxBytes()));
 
-          //  if (pendingBatch.length > 0) {
             if (pendBatch.size() > 0) {
                 Common.Envelope[] messageBatch = cut();
                 batchesMes.setMessageBatches((Common.Envelope[][]) ArrayUtils.add(batchesMes.getMessageBatches(), messageBatch));
@@ -80,23 +78,14 @@ public class BlockCutter implements IReceiver {
         }
         log.debug("Enqueuing message into batch");
 
-        //pendingBatch = ArrayUtils.add(pendingBatch, msg);
-
         pendBatch.add(msg);
 
         pendingBatchSizeBytes += messageSizeBytes;
 
         batchesMes.setPending(true);
-//        log.info("挂起批次长度为--------->"+pendingBatch.length);
-         //   log.info("挂起批次长度为--------->"+pendBatch.size());
-
-
-        //log.info("配置长度为--------->"+sharedConfigManager.getBatchSize().getMaxMessageCount());
-       // if (pendingBatch.length >= sharedConfigManager.getBatchSize().getMaxMessageCount()) {
         if (pendBatch.size() >= sharedConfigManager.getBatchSize().getMaxMessageCount()) {
             log.debug("Batch size met,cutting batch");
             Common.Envelope[] messageBatch = cut();
-          //  batchesMes.getMessageBatches();
             Common.Envelope[][] messageBatches = ArrayUtils.add(batchesMes.getMessageBatches(), messageBatch);
             batchesMes.setMessageBatches(messageBatches);
             batchesMes.setPending(true);
@@ -106,11 +95,9 @@ public class BlockCutter implements IReceiver {
 
     @Override
     public Common.Envelope[] cut() {
-        log.info("This Block is cutting.....");
-       // Common.Envelope[] batch = pendingBatch;
+        log.info("This Batches is cutting.....");
         Common.Envelope[] batch = new Common.Envelope[pendBatch.size()];
         pendBatch.toArray(batch);
-      //  this.pendingBatch = null;
         pendBatch.clear();
         this.pendingBatchSizeBytes = 0;
         return batch;
@@ -128,15 +115,6 @@ public class BlockCutter implements IReceiver {
     public void setSharedConfigManager(IConsenterConfig sharedConfigManager) {
         this.sharedConfigManager = sharedConfigManager;
     }
-
-//    public Common.Envelope[] getPendingBatch() {
-//        return pendingBatch;
-//    }
-//
-//    public void setPendingBatch(Common.Envelope[] pendingBatch) {
-//        this.pendingBatch = pendingBatch;
-//    }
-
     public int getPendingBatchSizeBytes() {
         return pendingBatchSizeBytes;
     }

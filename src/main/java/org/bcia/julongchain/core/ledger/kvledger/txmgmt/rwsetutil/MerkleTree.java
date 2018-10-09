@@ -23,6 +23,7 @@ import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.core.ledger.ledgerconfig.LedgerConfig;
 import org.bcia.julongchain.core.ledger.util.Util;
 import org.bcia.julongchain.protos.ledger.rwset.kvrwset.KvRwset;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ public class MerkleTree {
                 return;
             }
             byte[] nextLevelHash = computeCombinedHash(currenLevelHashes);
-            tree.remove(currentLelvel);
+            tree.put(currentLelvel, new ArrayList<>());
             int nextLevel = currentLelvel + 1;
 
 			List<byte[]> nextLevelHashes = tree.computeIfAbsent(nextLevel, k -> new ArrayList<>());
@@ -112,7 +113,8 @@ public class MerkleTree {
 
     public KvRwset.QueryReadsMerkleSummary getSummery(){
         List<ByteString> list = new ArrayList<>();
-		for (byte[] bytes : getMaxLevelHashes()) {
+		List<byte[]> maxLevelHashes = getMaxLevelHashes();
+		for (byte[] bytes : maxLevelHashes) {
 			list.add(ByteString.copyFrom(bytes));
 		}
 		return KvRwset.QueryReadsMerkleSummary.newBuilder()
@@ -126,6 +128,10 @@ public class MerkleTree {
         return tree.get(maxLevel);
     }
 
+    public byte[] getRootHash() throws LedgerException {
+    	return computeCombinedHash(getMaxLevelHashes());
+	}
+
     public boolean isEmpty(){
         return maxLevel == 1 && tree.get(maxLevel).size() == 0;
     }
@@ -138,9 +144,12 @@ public class MerkleTree {
     public static byte[] computeCombinedHash(List<byte[]> hashes) throws LedgerException{
         byte[] combinedHash = new byte[]{};
         for(byte[] h : hashes){
+			if (h == null) {
+				continue;
+			}
             combinedHash = ArrayUtils.addAll(combinedHash, h);
         }
-        return Util.getHashBytes(combinedHash);
+        return combinedHash.length == 0 ? new byte[]{} : Util.getHashBytes(combinedHash);
     }
 
     public Map<Integer, List<byte[]>> getTree() {
@@ -169,16 +178,17 @@ public class MerkleTree {
 
 	public static void main(String[] args) throws Exception {
 		MerkleTree tree = new MerkleTree(2);
-		tree.update("1".getBytes(StandardCharsets.UTF_8));
-		tree.update("2".getBytes(StandardCharsets.UTF_8));
-		tree.update("3".getBytes(StandardCharsets.UTF_8));
-		tree.update("4".getBytes(StandardCharsets.UTF_8));
-		tree.update("5".getBytes(StandardCharsets.UTF_8));
-		tree.update("6".getBytes(StandardCharsets.UTF_8));
-		tree.update("7".getBytes(StandardCharsets.UTF_8));
-		tree.update("8".getBytes(StandardCharsets.UTF_8));
-		tree.update("9".getBytes(StandardCharsets.UTF_8));
+//		tree.update("1".getBytes(StandardCharsets.UTF_8));
+//		tree.update("2".getBytes(StandardCharsets.UTF_8));
+//		tree.update("3".getBytes(StandardCharsets.UTF_8));
+//		tree.update("4".getBytes(StandardCharsets.UTF_8));
+//		tree.update("5".getBytes(StandardCharsets.UTF_8));
+//		tree.update("6".getBytes(StandardCharsets.UTF_8));
+//		tree.update("7".getBytes(StandardCharsets.UTF_8));
+//		tree.update("8".getBytes(StandardCharsets.UTF_8));
+//		tree.update("9".getBytes(StandardCharsets.UTF_8));
 		tree.done();
+		System.out.println(Hex.toHexString(tree.getRootHash()) == null);
 		KvRwset.QueryReadsMerkleSummary summery = tree.getSummery();
 		System.out.println(summery);
 	}

@@ -19,11 +19,14 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 
 /**
+ * 块deliver服务接口
+ *
  * @author zhangmingyang
  * @Date: 2018/5/31
  * @company Dingxuan
  */
 public interface IBlocksDeliverer {
-   Ab.DeliverResponse recv();
-   void send(Common.Envelope envelope);
+    Ab.DeliverResponse recv();
+
+    void send(Common.Envelope envelope);
 }

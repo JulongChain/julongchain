@@ -18,7 +18,7 @@ package org.bcia.julongchain.csp.pkcs11.entity;
 import org.bcia.julongchain.common.exception.JulongChainException;
 
 /**
- * Hardware information
+ * 硬件相关信息
  *
  * @author Ying Xu
  * @date 4/19/18

@@ -25,7 +25,7 @@ import java.util.Map;
  * @company Dingxuan
  */
 public class Config {
-    public static final String Config_FILE_PATH = "config.yaml";
+    public static final String CONFIG_FILE_PATH = "config.yaml";
 
     public Map<String, String> organizationalUnitIdentifiers;
     public NodeOus nodeOUs;

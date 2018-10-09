@@ -22,22 +22,25 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 
 /**
- * IConfig encapsulates config (group or resource) tree
+ * IConfig 封装了config树
  *
- * @author sunianle
+ * @author sunianle,zhangmingyang
  * @date 3/13/18
  * @company Dingxuan
  */
 public interface IConfig {
     /**
-     * getCurrentConfig returns the current config
-     *
+     * 获取当前配置
      * @return
      */
     Configtx.Config getCurrentConfig();
 
     /**
-     * updateProposeConfig attempts to validate a new configtx against the current config state
+     * 更新propose配置,尝试针对当前配置状态验证新的configtx
+     * @param configtx
+     * @return
+     * @throws InvalidProtocolBufferException
+     * @throws ValidateException
      */
     Configtx.ConfigEnvelope updateProposeConfig(Common.Envelope configtx) throws InvalidProtocolBufferException,
             ValidateException;

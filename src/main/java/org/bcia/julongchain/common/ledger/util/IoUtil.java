@@ -207,15 +207,15 @@ public class IoUtil {
      */
     public static Map<String, File> getFileRelativePath(String path){
         File file = new File(path);
+		Map<String, File> result = new TreeMap<>(Comparator.naturalOrder());
         if(!file.exists()){
             log.debug("File {} is not exists", path);
-            return null;
+            return result;
         }
         if(!file.isDirectory()){
             log.debug("Input must be a directory, but file {} is not", path);
-            return null;
+            return result;
         }
-        Map<String, File> result = new TreeMap<>(Comparator.naturalOrder());
         Queue<File> queue = new LinkedList<>();
         queue.add(file);
         while(queue.size() > 0){

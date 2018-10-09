@@ -16,13 +16,18 @@
 package org.bcia.julongchain.core.deliverservice.blocksprovider;
 
 /**
+ * 流客户端
+ *
  * @author zhangmingyang
  * @Date: 2018/5/31
  * @company Dingxuan
  */
-public interface IStreamClient extends IBlocksDeliverer{
+public interface IStreamClient extends IBlocksDeliverer {
     void updateEndpoints(String[] endpoints);
-    String [] getEndpoints();
+
+    String[] getEndpoints();
+
     void close();
+
     void disConnect(boolean disableEndpoint);
 }

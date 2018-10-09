@@ -19,45 +19,48 @@ import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.ValidateException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
- * 类描述
+ * 区块操作工具类
  *
  * @author sunianle
- * @date 4/3/18
+ * @date 2018/04/03
  * @company Dingxuan
  */
 public class BlockUtils {
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BlockUtils.class);
+
     public static Common.Block getBlockFromBlockBytes(byte[] blockBytes) throws InvalidProtocolBufferException {
         return Common.Block.parseFrom(blockBytes);
     }
 
+    /**
+     * 从区块中获取群组id
+     *
+     * @param block 所要获取群组的区块，一般为配置区块
+     * @return
+     * @throws JulongChainException
+     */
     public static String getGroupIDFromBlock(Common.Block block) throws JulongChainException {
-        Common.Envelope envelope = null;
-        Common.Payload payload = null;
-        Common.GroupHeader gh = null;
         try {
-            if (block == null || block.getData() == null || block.getData().getDataCount() == 0) {
-                return null;
-            }
-            envelope = Common.Envelope.parseFrom(block.getData().getData(0));
-            if (envelope == null || envelope.getPayload() == null) {
-                return null;
-            }
-            payload = Common.Payload.parseFrom(envelope.getPayload());
-            if (payload.getHeader() == null || payload.getHeader().getGroupHeader() == null) {
-                return null;
-            }
-            gh = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
-            if (gh == null || gh.getGroupId() == null) {
-                return null;
-            }
-        } catch (InvalidProtocolBufferException e) {
-            throw new JulongChainException(e);
+            //获取第一个信封对象
+            Common.Envelope envelope = extractEnvelope(block, 0);
+
+            //获取负载对象
+            Common.Payload payload = Common.Payload.parseFrom(envelope.getPayload());
+
+            //获取群组头部
+            Common.GroupHeader groupHeader = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
+
+            return groupHeader.getGroupId();
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+            throw new JulongChainException("Get groupId from block fail");
         }
-        return gh.getGroupId();
     }
 
     /**
@@ -150,7 +153,6 @@ public class BlockUtils {
         Common.Block.Builder blockBuilder = Common.Block.newBuilder();
         blockBuilder.setHeader(Common.BlockHeader.getDefaultInstance());
         blockBuilder.setData(Common.BlockData.getDefaultInstance());
-        blockBuilder.setMetadata(blockMetadata);
         blockBuilder.setMetadata(blockMetadata);
 
         return blockBuilder.build();

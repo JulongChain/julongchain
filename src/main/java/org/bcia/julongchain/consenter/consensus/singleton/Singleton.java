@@ -56,12 +56,14 @@ public class Singleton implements IChain, IConsensusPlugin {
     private volatile boolean needDelay;
 
     public static Singleton getInstance(ChainSupport consenterSupport) {
-        if (consenterSupport == null) {
+        synchronized (Singleton.class) {
+            if (consenterSupport == null) {
+                return instance;
+            } else {
+                support = consenterSupport;
+            }
             return instance;
-        } else {
-            support = consenterSupport;
         }
-        return instance;
     }
 
     @Override
@@ -87,7 +89,7 @@ public class Singleton implements IChain, IConsensusPlugin {
     }
 
     @Override
-    public IChain handleChain(ChainSupport consenterSupport, Common.Metadata metadata) {
+    public IChain handleChain(ChainSupport consenterSupport, Common.Metadata metadata) throws ConsenterException {
         return new Singleton(consenterSupport);
     }
 
@@ -106,14 +108,8 @@ public class Singleton implements IChain, IConsensusPlugin {
             public boolean consume(Message message) {
                 try {
                     doProcess(message);
-                } catch (InvalidProtocolBufferException e) {
-                    e.printStackTrace();
-                } catch (LedgerException e) {
-                    e.printStackTrace();
-                } catch (ValidateException e) {
-                    e.printStackTrace();
-                } catch (PolicyException e) {
-                    e.printStackTrace();
+                } catch (ConsenterException e) {
+                    log.error(e.getMessage());
                 }
                 return true;
             }
@@ -123,12 +119,10 @@ public class Singleton implements IChain, IConsensusPlugin {
     /**
      * 区块处理
      *
-     * @throws InvalidProtocolBufferException
-     * @throws LedgerException
-     * @throws ValidateException
-     * @throws PolicyException
+     * @param message
+     * @throws ConsenterException
      */
-    public synchronized  void doProcess(Message message) throws InvalidProtocolBufferException, LedgerException, ValidateException, PolicyException {
+    public void doProcess(Message message) throws ConsenterException {
 
         long seq = support.getSequence();
 
@@ -138,6 +132,7 @@ public class Singleton implements IChain, IConsensusPlugin {
                     support.getProcessor().processNormalMsg(message.getMessage());
                 } catch (InvalidProtocolBufferException e) {
                     log.warn(String.format("Discarding bad normal message: %s", e.getMessage()));
+                    throw new ConsenterException(e);
                 }
             }
             BatchesMes batchesMes = support.getCutter().ordered(message.getMessage());
@@ -151,7 +146,6 @@ public class Singleton implements IChain, IConsensusPlugin {
 
                         if (needDelay) {
                             needDelay = false;
-                            log.info("");
                             Common.Envelope[] batch = support.getCutter().cut();
                             if (null == batch || batch.length == 0) {
                                 log.warn("Batch timer expired with no pending requests, this might indicate a bug");
@@ -160,8 +154,6 @@ public class Singleton implements IChain, IConsensusPlugin {
                             log.debug("Batch timer expired, creating block");
                             Common.Block block = support.createNextBlock(batch);
                             support.writeBlock(block, null);
-                            //log.info("Write the Block finished");
-                            //   log.info("写入账本完成");
                             return;
                         }
                     }
@@ -188,11 +180,11 @@ public class Singleton implements IChain, IConsensusPlugin {
                     support.getProcessor().processConfigMsg(message.getMessage());
                 } catch (ConsenterException e) {
                     log.error(e.getMessage());
-                    return;
+                    throw new ConsenterException(e);
+                    //return;
                 }
             }
             Common.Envelope[] batch = support.getCutter().cut();
-            System.out.println(batch.length);
             if (batch.length != 0) {
                 Common.Block block = support.createNextBlock(batch);
                 support.writeBlock(block, null);

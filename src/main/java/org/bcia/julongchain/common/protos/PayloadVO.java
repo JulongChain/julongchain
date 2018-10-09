@@ -30,33 +30,28 @@ import org.bcia.julongchain.protos.node.TransactionPackage;
  * @company Dingxuan
  */
 public class PayloadVO implements IProtoVO<Common.Payload> {
-    private GroupHeaderVO groupHeaderVO;
-    private Common.SignatureHeader signatureHeader;
+    private HeaderVO headerVO;
     private IProtoVO dataVO;
 
     @Override
     public void parseFrom(Common.Payload payload) throws InvalidProtocolBufferException, ValidateException {
         ValidateUtils.isNotNull(payload, "Payload can not be null");
         ValidateUtils.isNotNull(payload.getHeader(), "Payload.header can not be null");
-        ValidateUtils.isNotNull(payload.getHeader().getGroupHeader(), "Payload.groupHeader can not be null");
-        ValidateUtils.isNotNull(payload.getHeader().getSignatureHeader(), "Payload.signatureHeader can not be null");
         ValidateUtils.isNotNull(payload.getData(), "Payload.data can not be null");
 
-        groupHeaderVO = new GroupHeaderVO();
-        Common.GroupHeader groupHeader = Common.GroupHeader.parseFrom(payload.getHeader().getGroupHeader());
-        groupHeaderVO.parseFrom(groupHeader);
+        headerVO = new HeaderVO();
+        headerVO.parseFrom(payload.getHeader());
 
-        this.signatureHeader = Common.SignatureHeader.parseFrom(payload.getHeader().getSignatureHeader());
-
-        if (groupHeaderVO.getType() == Common.HeaderType.ENDORSER_TRANSACTION_VALUE) {
+        int type = headerVO.getGroupHeaderVO().getType();
+        if (type == Common.HeaderType.ENDORSER_TRANSACTION_VALUE) {
             this.dataVO = new TransactionVO();
             TransactionPackage.Transaction transaction = TransactionPackage.Transaction.parseFrom(payload.getData());
             this.dataVO.parseFrom(transaction);
-        } else if (groupHeaderVO.getType() == Common.HeaderType.CONFIG_VALUE) {
+        } else if (type == Common.HeaderType.CONFIG_VALUE) {
             this.dataVO = new ConfigEnvelopeVO();
             Configtx.ConfigEnvelope configEnvelope = Configtx.ConfigEnvelope.parseFrom(payload.getData());
             this.dataVO.parseFrom(configEnvelope);
-        } else if (groupHeaderVO.getType() == Common.HeaderType.CONFIG_UPDATE_VALUE) {
+        } else if (type == Common.HeaderType.CONFIG_UPDATE_VALUE) {
             this.dataVO = new ConfigUpdateEnvelopeVO();
             Configtx.ConfigUpdateEnvelope configUpdateEnvelope = Configtx.ConfigUpdateEnvelope.parseFrom(payload
                     .getData());
@@ -67,22 +62,21 @@ public class PayloadVO implements IProtoVO<Common.Payload> {
     @Override
     public Common.Payload toProto() {
         Common.Payload.Builder builder = Common.Payload.newBuilder();
-        builder.getHeaderBuilder().setGroupHeader(groupHeaderVO.toProto().toByteString());
-        builder.getHeaderBuilder().setSignatureHeader(signatureHeader.toByteString());
+        builder.setHeader(headerVO.toProto());
 
         if (dataVO instanceof TransactionVO) {
             builder.setData(((TransactionVO) dataVO).toProto().toByteString());
+        } else if (dataVO instanceof ConfigEnvelopeVO) {
+            builder.setData(((ConfigEnvelopeVO) dataVO).toProto().toByteString());
+        } else if (dataVO instanceof ConfigUpdateEnvelopeVO) {
+            builder.setData(((ConfigUpdateEnvelopeVO) dataVO).toProto().toByteString());
         }
 
         return builder.build();
     }
 
-    public GroupHeaderVO getGroupHeaderVO() {
-        return groupHeaderVO;
-    }
-
-    public Common.SignatureHeader getSignatureHeader() {
-        return signatureHeader;
+    public HeaderVO getHeaderVO() {
+        return headerVO;
     }
 
     public IProtoVO getDataVO() {

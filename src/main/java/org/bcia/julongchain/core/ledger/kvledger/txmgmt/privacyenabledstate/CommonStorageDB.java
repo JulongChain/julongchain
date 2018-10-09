@@ -224,7 +224,7 @@ public class CommonStorageDB implements IDB {
     }
 
     @Override
-    public void validateKeyValue(String key, byte[] value) throws LedgerException {
+    public void validateKeyValue(String key, Object value) throws LedgerException {
 
     }
 

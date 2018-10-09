@@ -3,6 +3,8 @@ package org.bcia.julongchain.msp.mgmt;
 import org.junit.Test;
 
 /**
+ * Msp测试
+ *
  * @author zhangmingyang
  * @Date: 2018/4/17
  * @company Dingxuan
@@ -15,8 +17,8 @@ public class MspTest {
 
     @Test
     public void setup() {
-        Msp msp=new Msp();
-       // msp.setup()
+        Msp msp = new Msp();
+        // msp.setup()
     }
 
     @Test

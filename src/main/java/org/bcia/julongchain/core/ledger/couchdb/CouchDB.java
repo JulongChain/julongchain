@@ -64,8 +64,8 @@ public class CouchDB {
      * @return
      * @throws Exception
      */
-    public CouchDbClient creatConnectionDB(String url, int port, String username, String password, int maxConnections,
-                                  int requestTimeout, String dbName,String protocol) throws LedgerException{
+    public CouchDbClient createConnectionDB(String url, int port, String username, String password, int maxConnections,
+											int requestTimeout, String dbName, String protocol) throws LedgerException{
         CouchDbProperties properties = new CouchDbProperties();
         properties.setHost(url);
         properties.setPort(port);
@@ -75,9 +75,9 @@ public class CouchDB {
         properties.setUsername(username);
         properties.setPassword(password);
         properties.setProtocol(protocol);
+		properties.setCreateDbIfNotExist(true);
         CouchDbClient dbClient = new CouchDbClient(properties);
         indexWarmCounter = 0;
-        CouchDBUtil.CreateSystemDatabasesIfNotExist(dbClient);
         return dbClient;
     }
 
@@ -155,6 +155,17 @@ public class CouchDB {
         return error;
     }
 
+	/**
+	 * SaveDoc method provides a function to save an object as document.
+	 * @param db
+	 * @param obj
+	 * @return
+	 */
+	public String saveDoc(CouchDbClient db, Object obj) {
+		Response response = db.save(obj);
+		return response.getError();
+	}
+
     /**
      * DeleteDoc method provides function to delete a document from the database by id
      * @param db
@@ -197,6 +208,17 @@ public class CouchDB {
             return null;
         }
     }
+
+	/**
+	 * UpdateDoc method provides function to update a document.
+	 * @param db
+	 * @param obj
+	 * @return
+	 */
+	public String updateDoc(CouchDbClient db, Object obj) {
+		Response response = db.update(obj);
+		return response.getError();
+	}
 
     /**
      *
@@ -324,6 +346,8 @@ public class CouchDB {
             return null;
         }
     }
+
+//    public void bulk
 
     /**
      * CreateIndex method provides a function creating an index

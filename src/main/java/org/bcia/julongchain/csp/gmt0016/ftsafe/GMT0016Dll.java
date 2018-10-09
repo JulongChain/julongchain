@@ -19,7 +19,7 @@ import com.sun.jna.Library;
 import com.sun.jna.Native;
 
 /**
- * Interface description
+ * 调用接口定义
  *
  * @author Ying Xu
  * @date 7/4/18

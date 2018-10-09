@@ -23,7 +23,7 @@ package org.bcia.julongchain.common.exception;
  * @company Dingxuan
  */
 public class NodeException extends JulongChainException {
-    private static final String MODULE_NAME = "[PolicyNode]";
+    private static final String MODULE_NAME = "[Node]";
 
     public NodeException() {
         super();

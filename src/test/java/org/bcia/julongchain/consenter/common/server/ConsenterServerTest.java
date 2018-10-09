@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.IOException;
 
 /**
+ * consenter服务测试
  * @author zhangmingyang
  * @Date: 2018/3/1
  * @company Dingxuan

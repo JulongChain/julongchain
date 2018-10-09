@@ -21,7 +21,7 @@ import org.bcia.julongchain.csp.intfs.opts.IKeyImportOpts;
 import org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant;
 
 /**
- * Class description
+ * 生成/导入/衍生 ECDSA 密钥选项
  *
  * @author Ying Xu
  * @date 4/19/18

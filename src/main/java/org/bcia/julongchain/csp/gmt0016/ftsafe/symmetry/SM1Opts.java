@@ -21,7 +21,7 @@ import org.bcia.julongchain.csp.intfs.opts.IDecrypterOpts;
 import org.bcia.julongchain.csp.intfs.opts.IEncrypterOpts;
 
 /**
- * SM1 Opts for generate key and encrypt/decrypt
+ * SM1 算法相关选项
  *
  * @author Ying Xu
  * @date 7/4/18

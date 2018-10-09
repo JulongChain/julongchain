@@ -15,16 +15,39 @@ limitations under the License.
  */
 package org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.statecouchdb;
 
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.statedb.stateleveldb.CompositeKey;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.version.LedgerHeight;
+
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * 包含committedVersions和revisionNumbers
  * 处理块过程中用于本地缓存
  * committedVersions 用于验证读集合
- * revisionNumbers   用于批量提交截断
+ * revisionNumbers   用于批量提交阶段
  *
  * @author sunzongyu
  * @date 2018/05/22
  * @company Dingxuan
  */
 public class CommittedVersions {
+	private Map<CompositeKey, LedgerHeight> committedVersions = new HashMap<>(32);
+	private Map<CompositeKey, String> revisionNumbers = new HashMap<>(32);
 
+	public Map<CompositeKey, String> getRevisionNumbers() {
+		return revisionNumbers;
+	}
+
+	public void setRevisionNumbers(Map<CompositeKey, String> revisionNumbers) {
+		this.revisionNumbers = revisionNumbers;
+	}
+
+	public Map<CompositeKey, LedgerHeight> getCommittedVersions() {
+		return committedVersions;
+	}
+
+	public void setCommittedVersions(Map<CompositeKey, LedgerHeight> committedVersions) {
+		this.committedVersions = committedVersions;
+	}
 }

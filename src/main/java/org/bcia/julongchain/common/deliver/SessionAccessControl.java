@@ -28,11 +28,13 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 会话权限控制
+ *
  * @author zhangmingyang
  * @Date: 2018/5/30
  * @company Dingxuan
  */
-public class SessionAccessControl  {
+public class SessionAccessControl {
     private ChainSupport acSupport;
     private IPolicyChecker checkPolicy;
     private String group;
@@ -41,9 +43,10 @@ public class SessionAccessControl  {
     private Date sessionEndTime;
     private boolean usedAtLeastOnce;
     private Expiration expiration;
+
     public SessionAccessControl(ChainSupport acSupport, IPolicyChecker checkPolicy, String group, Common.Envelope envelope, Expiration expiration) throws InvalidProtocolBufferException, ValidateException {
-        List<SignedData> signedData=null;
-        signedData= SignedData.asSignedData(envelope);
+        List<SignedData> signedData = null;
+        signedData = SignedData.asSignedData(envelope);
         this.acSupport = acSupport;
         this.checkPolicy = checkPolicy;
         this.group = group;
@@ -51,22 +54,22 @@ public class SessionAccessControl  {
         this.sessionEndTime = expiration.expiresAt(signedData.get(0).getIdentity());
     }
 
-    public void enaluate() throws ValidateException {
+    public void evaluate() throws ValidateException {
         Date nowDate = new Date();
-        if(nowDate.after(sessionEndTime)&&!sessionEndTime.equals(null)){
-            throw new ValidateException(String.format("client identity expired %s before",sessionEndTime));
+        if (nowDate.after(sessionEndTime) && !sessionEndTime.equals(null)) {
+            throw new ValidateException(String.format("client identity expired %s before", sessionEndTime));
         }
-        boolean policyCheckNeeded=!usedAtLeastOnce;
-        long currentConfigSequence=acSupport.getSequence();
-        if(currentConfigSequence>lastConfigSequence){
-            lastConfigSequence=currentConfigSequence;
-            policyCheckNeeded=true;
+        boolean policyCheckNeeded = !usedAtLeastOnce;
+        long currentConfigSequence = acSupport.getSequence();
+        if (currentConfigSequence > lastConfigSequence) {
+            lastConfigSequence = currentConfigSequence;
+            policyCheckNeeded = true;
         }
-        if (!policyCheckNeeded){
+        if (!policyCheckNeeded) {
             return;
         }
-        usedAtLeastOnce=true;
-        checkPolicy.checkPolicy(envelope,group);
+        usedAtLeastOnce = true;
+        checkPolicy.checkPolicy(envelope, group);
     }
 
 }

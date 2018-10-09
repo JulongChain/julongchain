@@ -19,12 +19,16 @@ import org.bcia.julongchain.common.ledger.blockledger.IReader;
 import org.bcia.julongchain.common.policies.IPolicyManager;
 
 /**
+ * support接口,继承权限控制支持接口
+ *
  * @author zhangmingyang
  * @Date: 2018/5/29
  * @company Dingxuan
  */
-public interface ISupport extends IAccessControlSupport{
+public interface ISupport extends IAccessControlSupport {
     long sequence();
+
     IPolicyManager getPolicyManager();
+
     IReader getReader();
 }

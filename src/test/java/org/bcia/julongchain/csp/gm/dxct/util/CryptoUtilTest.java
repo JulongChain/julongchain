@@ -6,6 +6,8 @@ import org.junit.Test;
 import java.io.IOException;
 
 /**
+ * 加密辅助类测试
+ *
  * @author zhangmingyang
  * @Date: 2018/5/3
  * @company Dingxuan

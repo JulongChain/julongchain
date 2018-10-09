@@ -16,18 +16,19 @@
 package org.bcia.julongchain.common.deliver;
 
 
-
 import com.google.protobuf.Message;
 import org.bcia.julongchain.protos.common.Common;
 
 
 /**
+ * Deliver服务处理支持接口
+ *
  * @author zhangmingyang
  * @Date: 2018/5/29
  * @company Dingxuan
  */
 public interface IDeliverHandlerSupport {
-   // Common.Envelope recv();
     Message createStatusReply(Common.Status status);
+
     Message createBlockReply(Common.Block block);
 }

@@ -38,7 +38,7 @@ import java.security.spec.X509EncodedKeySpec;
 
 
 /**
- * PKCS11 Soft Implementation Encryption Class
+ * 基于PKCS11的加密软实现
  *
  * @author Ying Xu
  * @date 5/25/18
@@ -46,7 +46,7 @@ import java.security.spec.X509EncodedKeySpec;
  */
 public class EncryptImpl {
 	PKCS11CspLog csplog = new PKCS11CspLog();
-	// For Symmetric key
+	// 对称密钥加密
     public byte[] encryptData(IKey key, byte[] plaint, String mode, String padding) throws CspException {
 
         try {
@@ -109,7 +109,7 @@ public class EncryptImpl {
         }
     }
 
-    // For Asymmetric key
+    // 非对称密钥加密
     public byte[] encryptData(IKey key, byte[] plaint, String mode, String padding, boolean pubflag) throws CspException {
 
         try {
@@ -120,12 +120,10 @@ public class EncryptImpl {
                     KeyFactory keyFactory = KeyFactory.getInstance("RSA");
                     RSAPublicKey rsakey = (RSAPublicKey)keyFactory.generatePublic(spec);
 
-                    // specify mode and padding instead of relying on defaults (use OAEP if available!)
+                    // 指定模式和填充，而不是依赖默认值(如果可用的话使用OAEP！)
                     String type = String.format("RSA/%s/%s", mode, padding);
-                    Cipher encrypt=Cipher.getInstance(type);
-                    // init with the *public key*!
+                    Cipher encrypt=Cipher.getInstance(type);                    
                     encrypt.init(Cipher.ENCRYPT_MODE, rsakey);
-                    // encrypt with known character encoding, you should probably use hybrid cryptography instead
                     byte[] encryptedMessage = encrypt.doFinal(plaint);
                     return encryptedMessage;
                 }
@@ -134,13 +132,10 @@ public class EncryptImpl {
                     PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(key.toBytes());
                     KeyFactory keyFactory = KeyFactory.getInstance("RSA");
                     RSAPrivateKey rsakey = (RSAPrivateKey)keyFactory.generatePrivate(spec);
-
-                    // specify mode and padding instead of relying on defaults (use OAEP if available!)
+                    
                     String type = String.format("RSA/%s/%s", mode, padding);
-                    Cipher encrypt=Cipher.getInstance(type);
-                    // init with the *public key*!
-                    encrypt.init(Cipher.ENCRYPT_MODE, rsakey);
-                    // encrypt with known character encoding, you should probably use hybrid cryptography instead
+                    Cipher encrypt=Cipher.getInstance(type);                    
+                    encrypt.init(Cipher.ENCRYPT_MODE, rsakey);                    
                     byte[] encryptedMessage = encrypt.doFinal(plaint);
                     return encryptedMessage;
                 }
@@ -154,13 +149,10 @@ public class EncryptImpl {
                     KeyFactory keyFactory = KeyFactory.getInstance("RSA");
                     //RSAPublicKeyImpl rsakey = (RSAPublicKeyImpl)keyFactory.generatePublic(spec);
                     RSAPublicKey rsakey = (RSAPublicKey)keyFactory.generatePublic(spec);
-
-                    // specify mode and padding instead of relying on defaults (use OAEP if available!)
+                    
                     String type = String.format("RSA/%s/%s", mode, padding);
-                    Cipher encrypt=Cipher.getInstance(type);
-                    // init with the *public key*!
-                    encrypt.init(Cipher.ENCRYPT_MODE, rsakey);
-                    // encrypt with known character encoding, you should probably use hybrid cryptography instead
+                    Cipher encrypt=Cipher.getInstance(type);                    
+                    encrypt.init(Cipher.ENCRYPT_MODE, rsakey);                    
                     byte[] encryptedMessage = encrypt.doFinal(plaint);
                     return encryptedMessage;
                 }

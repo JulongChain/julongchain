@@ -24,6 +24,7 @@ import org.bcia.julongchain.protos.common.Common;
 
 /**
  * 处理者接口,对各类消息的排序处理
+ *
  * @author zhangmingyang
  * @Date: 2018/3/7
  * @company Dingxuan
@@ -31,21 +32,24 @@ import org.bcia.julongchain.protos.common.Common;
 public interface IProcessor {
     /**
      * 判断是否为配置消息,如果是配置消息返回true;否则返回false
+     *
      * @param chdr
      * @return
      */
-    boolean ClassifyMsg(Common.GroupHeader chdr);
+    boolean classifyMsg(Common.GroupHeader chdr);
 
     /**
-     * 根据当前配置检查消息的有效性,fa
+     * 处理普通消息
+     *
      * @param env
      * @return
      */
-     long processNormalMsg(Common.Envelope env) throws InvalidProtocolBufferException;
+    long processNormalMsg(Common.Envelope env) throws InvalidProtocolBufferException;
 
     /**
      * 将尝试将配置更新应用于当前配置，如果成功返回结果配置消息和configSeq，则从中计算配置
      * 如果配置更新消息无效，则返回错误
+     *
      * @param env
      * @return
      */

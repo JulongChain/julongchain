@@ -21,7 +21,7 @@ import org.bcia.julongchain.csp.intfs.opts.IKeyImportOpts;
 import org.bcia.julongchain.csp.pkcs11.PKCS11CSPConstant;
 
 /**
- * gen/import rsa keypair opts
+ * 生成/导入 rsa 密钥选项
  *
  * @author Ying Xu
  * @date 2018/5/21

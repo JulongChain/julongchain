@@ -27,6 +27,7 @@ import org.bcia.julongchain.common.exception.LedgerException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.log.JulongChainLog;
 import org.bcia.julongchain.common.log.JulongChainLogFactory;
+import org.bcia.julongchain.consenter.Consenter;
 import org.bcia.julongchain.consenter.common.multigroup.Registrar;
 import org.bcia.julongchain.consenter.util.RequestHeadersInterceptor;
 import org.bcia.julongchain.gossip.GossipService;
@@ -42,6 +43,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * consenter服务管理
+ *
  * @author zhangmingyang
  * @Date: 2018/2/17
  * @company Dingxuan
@@ -53,32 +55,32 @@ public class ConsenterServer {
     private static JulongChainLog log = JulongChainLogFactory.getLog(ConsenterServer.class);
     private static IBroadcastHandler broadcastHandler;
     private static IDeliverHandler deliverHandler;
+
     public ConsenterServer(int port) {
         this.port = port;
     }
 
 
-    public void bindBroadcastServer(IBroadcastHandler broadcastHander) {
-        this.broadcastHandler = broadcastHander;
+    public void bindBroadcastServer(IBroadcastHandler broadcastHandler) {
+        this.broadcastHandler = broadcastHandler;
     }
 
 
-    public void bindDeverServer(IDeliverHandler deliverHandler){
-        this.deliverHandler=deliverHandler;
+    public void bindDeverServer(IDeliverHandler deliverHandler) {
+        this.deliverHandler = deliverHandler;
     }
-
 
 
     public void start() throws IOException {
         List<ServerInterceptor> allInterceptors = ImmutableList.<ServerInterceptor>builder()
                 .add(RequestHeadersInterceptor.recordServerCallInterceptor(serverCallCapture)).build();
         //server = ServerBuilder.forPort(port)
-          server= NettyServerBuilder.forPort(port)
-                .addService(ServerInterceptors.intercept(new ConsenterServerImpl(),allInterceptors))
+        server = NettyServerBuilder.forPort(port)
+                .addService(ServerInterceptors.intercept(new ConsenterServerImpl(), allInterceptors))
                 .addService(new GossipService())
                 .build()
                 .start();
-        log.info("consenter service start, port:"+port);
+        log.info("consenter service start, port:" + port);
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
 
@@ -114,7 +116,7 @@ public class ConsenterServer {
                 @Override
                 public void onNext(Common.Envelope envelope) {
                     try {
-                        broadcastHandler.handle(envelope,responseObserver);
+                        broadcastHandler.handle(envelope, responseObserver);
                     } catch (ConsenterException e) {
                         log.error(e.getMessage());
                     }
@@ -137,15 +139,10 @@ public class ConsenterServer {
             return new StreamObserver<Common.Envelope>() {
                 @Override
                 public void onNext(Common.Envelope envelope) {
-                    DeliverServer deliverServer=new DeliverServer(responseObserver,envelope) ;
+                    DeliverServer deliverServer = new DeliverServer(responseObserver, envelope);
                     try {
                         deliverHandler.handle(deliverServer);
-                    } catch (ValidateException e) {
-                        e.printStackTrace();
-                    } catch (InvalidProtocolBufferException e) {
-                        e.printStackTrace();
-                    } catch (LedgerException e) {
-                        e.printStackTrace();
+                    } catch (ConsenterException e) {
                     }
                 }
 

@@ -55,7 +55,7 @@ public class MspConfigFactory {
         InputStream is = null;
         MspConfig mspConfig=null;
         try {
-            is = new FileInputStream(CommConstant.CONFIG_DIR_PREFIX + MspConfig.MspConfig_FILE_PATH);
+            is = new FileInputStream(CommConstant.CONFIG_DIR_PREFIX + MspConfig.MSPCONFIG_FILE_PATH);
              mspConfig = yaml.loadAs(is, MspConfig.class);
             return mspConfig;
         } catch (FileNotFoundException e) {

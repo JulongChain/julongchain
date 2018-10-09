@@ -20,21 +20,23 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.consenter.Ab;
 
 /**
+ * Deliver服务处理支持
+ *
  * @author zhangmingyang
  * @Date: 2018/6/4
  * @company Dingxuan
  */
-public class DeliverHandlerSupport implements  IDeliverHandlerSupport{
+public class DeliverHandlerSupport implements IDeliverHandlerSupport {
     @Override
     public Message createStatusReply(Common.Status status) {
-        Ab.DeliverResponse.Builder deliverResponseBuilder= Ab.DeliverResponse.newBuilder();
+        Ab.DeliverResponse.Builder deliverResponseBuilder = Ab.DeliverResponse.newBuilder();
         deliverResponseBuilder.setStatus(status);
         return deliverResponseBuilder.build();
     }
 
     @Override
     public Message createBlockReply(Common.Block block) {
-        Ab.DeliverResponse.Builder deliverResponseBuilder= Ab.DeliverResponse.newBuilder();
+        Ab.DeliverResponse.Builder deliverResponseBuilder = Ab.DeliverResponse.newBuilder();
         deliverResponseBuilder.setBlock(block);
         return deliverResponseBuilder.build();
     }

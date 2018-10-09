@@ -18,7 +18,7 @@ package org.bcia.julongchain.csp.gmt0016.ftsafe.ec;
 import java.util.Arrays;
 
 /**
- * Make DER Encoding of ASN.1 Types
+ * 生成ASN.1规范的编码
  *
  * @author Ying Xu
  * @date 7/4/18
