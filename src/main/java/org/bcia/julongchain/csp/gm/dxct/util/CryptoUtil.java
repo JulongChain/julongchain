@@ -133,14 +133,14 @@ public class CryptoUtil {
 
 
     /**
-     * 读取
-     * @param sk_path
+     * 读取私钥文件
+     * @param skPath
      * @return
      * @throws CspException
      * @throws IOException
      */
-    public static byte[] readSkFile(String sk_path) throws CspException, IOException {
-        InputStreamReader reader = new InputStreamReader(new FileInputStream(sk_path));
+    public static byte[] readSkFile(String skPath) throws CspException, IOException {
+        InputStreamReader reader = new InputStreamReader(new FileInputStream(skPath));
         PemReader pemReader = new PemReader(reader);
         PemObject pemObject = pemReader.readPemObject();
         reader.close();

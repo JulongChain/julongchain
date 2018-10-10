@@ -58,7 +58,7 @@ public class CAuthDsl {
                 String msg=String.format("Principal deserialization failure  %s for [%s]",e.getMessage(),signedDatas.get(i).getIdentity());
                 throw new PolicyException(msg);
             }
-            String key = identity.getIdentityIdentifier().getMspid()+identity.getIdentityIdentifier().getId();
+            String key = identity.getIdentityIdentifier().getMspId()+identity.getIdentityIdentifier().getId();
             if(ids.get(key) != null){
                 log.warn("De-duplicating identity [%s] at index [%s] in signature set",signedDatas.get(i).getIdentity(),i);
             }else{

@@ -34,7 +34,7 @@ public class AnalyzeSKI {
 
     public void analyzeSKI(byte[] ski){
 
-        //analyze ski
+        //解析ski
         int skiIndex = 0;
         while (skiIndex < ski.length) {
             int tag = ski[skiIndex];
@@ -51,7 +51,8 @@ public class AnalyzeSKI {
                 case GMT0016CspConstant.TAG_PUBLICK_KEY_SIGN_FLAG:
                     int flagLen = ski[skiIndex];
                     skiIndex++;
-                    bSignFlag = (ski[skiIndex] == (byte)1); //Sign Flag
+                    //签名标识
+                    bSignFlag = (ski[skiIndex] == (byte)1);
                     skiIndex += flagLen;
                     break;
                 case GMT0016CspConstant.TAG_KEY_CIPHER_DATA:

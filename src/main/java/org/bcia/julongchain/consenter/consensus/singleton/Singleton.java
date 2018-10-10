@@ -146,7 +146,6 @@ public class Singleton implements IChain, IConsensusPlugin {
 
                         if (needDelay) {
                             needDelay = false;
-                            log.info("");
                             Common.Envelope[] batch = support.getCutter().cut();
                             if (null == batch || batch.length == 0) {
                                 log.warn("Batch timer expired with no pending requests, this might indicate a bug");

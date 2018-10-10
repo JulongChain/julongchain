@@ -47,13 +47,15 @@ public class RSAImpl {
 
     GMT0016CspLog csplog = new GMT0016CspLog();
 
+    private static final int LEN_SYMMKEY = 16;
+
     /**
      * 生成 Rsa 密钥
      * @param sContainerName        容器名称
      * @param lBits                 密钥大小
      * @param opts                  Skf factory
      * @return  IKey's instance
-     * @throws CspException
+     * @throws CspException         错误码
      */
     public IKey generateRSAKey(String sContainerName, long lBits, IGMT0016FactoryOpts opts) throws CspException {
 
@@ -81,7 +83,7 @@ public class RSAImpl {
                 for(String name : appNamesList) {
                     if(name.equals(sContainerName)) {
                         bFind = true;
-                        //save container handle
+                        //获取句柄
                         lHandleContainer = opts.getSKFFactory().SKF_OpenContainer(opts.getAppHandle(), sContainerName);
                         break;
                     }
@@ -89,18 +91,18 @@ public class RSAImpl {
             }
             if(!bFind)
             {
-                //create container and save handle
+                //创建容器并获取句柄
                 lHandleContainer = opts.getSKFFactory().SKF_CreateContainer(opts.getAppHandle(), sContainerName);
             }
             SKFCspKey.RSAPublicKeyBlob rsaPublicKeyBlob = opts.getSKFFactory().SKF_GenRSAKeyPair(lHandleContainer, lBits);
 
-            //public key der
+            //公钥der
             byte[] pubder =  getPublicDer(rsaPublicKeyBlob.getModulus(), rsaPublicKeyBlob.getPublicExponent());
-            //public hash (no need, maybe need)
+            //公钥 hash (no need, maybe need)
             byte[] PublicHash = getPublicHash(rsaPublicKeyBlob.getModulus(), rsaPublicKeyBlob.getPublicExponent());
             //ski
-            //param1 : RSA 1 ECC 2 AES 3 ....
-            //param3 : encrypt 0 sign 1
+            //参数1 : RSA 1 ECC 2 AES 3 ....
+            //参数3 : encrypt 0 sign 1
             byte[] skiData = DataUtil.getKeySki(TYPE_RSA, sContainerName.getBytes(), TYPE_SIGN, PublicHash);
 
             opts.getSKFFactory().SKF_CloseContainer(lHandleContainer);
@@ -150,7 +152,7 @@ public class RSAImpl {
      * @param sContainerName        容器名称
      * @param opts                  Skf factory
      * @return IKey's instance
-     * @throws CspException
+     * @throws CspException         错误码
      */
     public IKey importRSAKey(long algid, byte[] derPublicKey, byte[] derPrivateKey,
                              String sContainerName, IGMT0016FactoryOpts opts) throws CspException {
@@ -162,7 +164,7 @@ public class RSAImpl {
             for(String name : appNamesList) {
                 if(name.equals(sContainerName)) {
                     bFind = true;
-                    //save container handle
+                    //获取句柄
                     lContainerHandle = opts.getSKFFactory().SKF_OpenContainer(opts.getAppHandle(), sContainerName);
                     break;
                 }
@@ -193,35 +195,35 @@ public class RSAImpl {
 			byte[] data = new byte[(int)lDataLen[0]];
 			lSessionHandle = opts.getSKFFactory().SKF_RSAExportSessionKey(lContainerHandle, algid, publicKeyBlob,data, lDataLen);
 */
-            byte[] random = opts.getSKFFactory().SKF_GenRandom(opts.getDevHandle(), 16);
+            byte[] random = opts.getSKFFactory().SKF_GenRandom(opts.getDevHandle(), LEN_SYMMKEY);
             long lSessionHandle = opts.getSKFFactory().SKF_SetSymmKey(opts.getDevHandle(), random, algid);
-            byte[] data = opts.getSKFFactory().SKF_ExtRSAPubKeyOperation(opts.getDevHandle(), publicKeyBlob, random, 16L);
-            //use session key encrypt private key
+            byte[] data = opts.getSKFFactory().SKF_ExtRSAPubKeyOperation(opts.getDevHandle(), publicKeyBlob, random, LEN_SYMMKEY);
+            //使用对称保护密钥加密私钥
             BlockCipherParam blockCipherParam = new BlockCipherParam();
-            blockCipherParam.setPaddingType(1);
-            blockCipherParam.setIVLen(16);
+            blockCipherParam.setPaddingType(blockCipherParam.PADTYPE_PKCS5);
+            blockCipherParam.setIVLen(LEN_SYMMKEY);
             opts.getSKFFactory().SKF_EncryptInit(lSessionHandle, blockCipherParam);
             byte[] encdata = opts.getSKFFactory().SKF_Encrypt(lSessionHandle,derPrivateKey, derPrivateKey.length);
             opts.getSKFFactory().SKF_CloseHandle(lSessionHandle);
-            //import encrypt key
+            //导入加密密钥
             opts.getSKFFactory().SKF_ImportRSAKeyPair(lContainerHandle, algid, data, data.length, encdata, encdata.length);
-            //export encrypt public key
+            //导出公钥
             SKFCspKey.RSAPublicKeyBlob KeyBlob =
                     (SKFCspKey.RSAPublicKeyBlob)opts.getSKFFactory().SKF_ExportPublicKey(lContainerHandle, false, false);
 
             opts.getSKFFactory().SKF_CloseContainer(lContainerHandle);
-            //public key der
+            //公钥der
             byte[] pubder =  getPublicDer(KeyBlob.getModulus(), KeyBlob.getPublicExponent());
             if(!DataUtil.compereByteArray(pubder, derPublicKey))
             {
                 csplog.setLogMsg("[JC_SKF]: Import Encrypt Key Error!", csplog.LEVEL_ERROR, RSAImpl.class);
                 throw new CspException("[JC_SKF]: Import Encrypt Key Error!");
             }
-            //public hash (no need, maybe need)
+            //公钥hash (no need, maybe need)
             byte[] PublicHash = getPublicHash(KeyBlob.getModulus(), KeyBlob.getPublicExponent());
             //ski
-            //param1 : RSA 1 ECC 2 AES 3 ....
-            //param3 : encrypt 0 sign 1
+            //参数1 : RSA 1 ECC 2 AES 3 ....
+            //参数3 : encrypt 0 sign 1
             byte[] skiData = DataUtil.getKeySki(TYPE_RSA, sContainerName.getBytes(), TYPE_ENCRYPT, PublicHash);
             GMT0016CspKey.RSAPublicCspKey rsaPublicCspKey = new GMT0016CspKey.RSAPublicCspKey(skiData,  pubder);
 
@@ -266,7 +268,7 @@ public class RSAImpl {
      * @param bSignFlag         密钥类型标识
      * @param opts              Skf factory
      * @return IKey's instance
-     * @throws CspException
+     * @throws CspException     错误码
      */
     public IKey getRSAKey(String sContainerName, boolean bSignFlag, IGMT0016FactoryOpts opts) throws CspException {
         try {
@@ -277,7 +279,7 @@ public class RSAImpl {
             for(String name : appNamesList) {
                 if(name.equals(sContainerName)) {
                     bFind = true;
-                    //open container
+                    //打开容器
                     lContainerHandle = opts.getSKFFactory().SKF_OpenContainer(opts.getAppHandle(), sContainerName);
                     break;
                 }
@@ -300,18 +302,18 @@ public class RSAImpl {
 
             opts.getSKFFactory().SKF_CloseContainer(lContainerHandle);
 
-            //public key der
+            //公钥der
             byte[] pubder =  getPublicDer(publicKeyBlob.getModulus(), publicKeyBlob.getPublicExponent());
-            //public hash (no need, maybe need)
+            //公钥hash (no need, maybe need)
             byte[] PublicHash = getPublicHash(publicKeyBlob.getModulus(), publicKeyBlob.getPublicExponent());
             //ski
-            //param1 : RSA 1 ECC 2 AES 3 ....
-            //param3 : encrypt 0 sign 1
+            //参数1 : RSA 1 ECC 2 AES 3 ....
+            //参数3 : encrypt 0 sign 1
             byte[] skiData;
-            if (bSignFlag)
-                skiData = DataUtil.getKeySki(TYPE_RSA, sContainerName.getBytes(), TYPE_SIGN, PublicHash);
-            else
-                skiData = DataUtil.getKeySki(TYPE_RSA, sContainerName.getBytes(), TYPE_ENCRYPT, PublicHash);
+            if (bSignFlag){
+                skiData = DataUtil.getKeySki(TYPE_RSA, sContainerName.getBytes(), TYPE_SIGN, PublicHash);}
+            else{
+                skiData = DataUtil.getKeySki(TYPE_RSA, sContainerName.getBytes(), TYPE_ENCRYPT, PublicHash);}
             GMT0016CspKey.RSAPublicCspKey rsaPublicCspKey = new GMT0016CspKey.RSAPublicCspKey(skiData,  pubder);
             return rsaPublicCspKey;
 
@@ -355,7 +357,7 @@ public class RSAImpl {
      * @param sContainerName    容器名称
      * @param opts              Skf factory
      * @return 签名数据
-     * @throws CspException
+     * @throws CspException     错误码
      */
     public byte[] getRSASign(byte[] digest, String sContainerName, IGMT0016FactoryOpts opts) throws CspException {
         try {
@@ -406,7 +408,7 @@ public class RSAImpl {
      * @param sContainerName    容器名称
      * @param opts              Skf factory
      * @return success/error
-     * @throws CspException
+     * @throws CspException     错误码
      */
     public boolean getRSAVerify(byte[] signature, byte[] digest, String sContainerName, IGMT0016FactoryOpts opts)
             throws CspException {
@@ -464,11 +466,11 @@ public class RSAImpl {
      * @param modulus           N
      * @param publicExponent    E
      * @return Der 编码
-     * @throws InvalidKeyException
+     * @throws InvalidKeyException  错误码
      */
     public byte[] getPublicDer(byte[] modulus, byte[] publicExponent) throws InvalidKeyException {
         BigInteger b_n = new BigInteger(1, modulus);
-        byte[] temp = b_n.toByteArray();
+        //byte[] temp = b_n.toByteArray();
         BigInteger b_e = new BigInteger(publicExponent);
         RSAPublicKeyImpl rsapublickeyimpl = new RSAPublicKeyImpl(b_n, b_e);
         return rsapublickeyimpl.getEncoded();
@@ -479,9 +481,9 @@ public class RSAImpl {
      * @param modulus           N
      * @param publicExponent    E
      * @return 公钥Hash
-     * @throws NoSuchAlgorithmException
-     * @throws IOException
-     * @throws InvalidKeyException
+     * @throws NoSuchAlgorithmException     错误码
+     * @throws IOException                  错误码
+     * @throws InvalidKeyException          错误码
      */
     public byte[] getPublicHash(byte[] modulus, byte[] publicExponent)
             throws NoSuchAlgorithmException,IOException, InvalidKeyException {

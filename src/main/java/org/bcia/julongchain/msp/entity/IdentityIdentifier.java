@@ -23,31 +23,27 @@ package org.bcia.julongchain.msp.entity;
  * @company Dingxuan
  */
 public class IdentityIdentifier {
-    private String Mspid;
-    private String Id;
+    private String mspId;
+    private String id;
 
-    public IdentityIdentifier(String mspid, String id) {
-        Mspid = mspid;
-        Id = id;
+    public IdentityIdentifier(String mspId, String id) {
+        this.mspId = mspId;
+        this.id = id;
     }
 
-    public IdentityIdentifier(String mspid) {
-        Mspid = mspid;
+    public String getMspId() {
+        return mspId;
     }
 
-    public String getMspid() {
-        return Mspid;
-    }
-
-    public void setMspid(String mspid) {
-        Mspid = mspid;
+    public void setMspId(String mspId) {
+        this.mspId = mspId;
     }
 
     public String getId() {
-        return Id;
+        return id;
     }
 
     public void setId(String id) {
-        Id = id;
+        this.id = id;
     }
 }

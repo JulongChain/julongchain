@@ -70,7 +70,7 @@ public class StandardGroup implements IProcessor {
     }
 
     @Override
-    public boolean classfiyMsg(Common.GroupHeader chdr) {
+    public boolean classifyMsg(Common.GroupHeader chdr) {
         //配置类型返回true
         if (Common.HeaderType.CONFIG_VALUE == chdr.getType()) {
             return true;

@@ -29,6 +29,9 @@ public class BlockCipherParam {
     private long lPaddingType;
     private long lFeedBitLen;
 
+    public long PADTYPE_PKCS5 = 1;
+    public long PADTYPE_NONE = 0;
+
     public BlockCipherParam() {
         this.byteIV = new byte[32];
         this.lIVLen = 0L;
