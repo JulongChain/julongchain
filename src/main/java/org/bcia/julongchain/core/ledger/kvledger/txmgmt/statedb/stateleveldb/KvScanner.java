@@ -54,7 +54,8 @@ public class KvScanner implements IResultsIterator {
 	    byte[] dbVal = iterator.getValue();
         byte[] dbValCpy = Arrays.copyOf(dbVal, dbVal.length);
         String key = VersionedLevelDB.splitCompositeKeyToKey(dbKey);
-		if (key.compareTo(endKey) >= 0) {
+		String ns = VersionedLevelDB.splitCompositeKeyToNs(dbKey);
+		if (ns.compareTo(nameSpace) != 0 || key.compareTo(endKey) >= 0) {
 			return null;
 		}
         byte[] value = Util.decodeValueToBytes(dbValCpy);
