@@ -76,8 +76,9 @@ public class URIBuilderUtil {
     }
 
     public URIBuilderUtil query(Params params) {
-        if (params.getParams() != null)
+        if (params.getParams() != null){
             this.params.addAll(params.getParams());
+        }
         return this;
     }
 

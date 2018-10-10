@@ -33,7 +33,7 @@ public class CouchDBUtil {
 
 
     //CreateSystemDatabasesIfNotExist - creates the system databases if they do not exist
-    public static void  CreateSystemDatabasesIfNotExist(CouchDbClient dbInstance){
+    public static void  createSystemDatabasesIfNotExist(CouchDbClient dbInstance){
         CouchDB couchDB = new CouchDB();
         String dbName1 = "_users";
         couchDB.createDatabaseIfNotExist(dbInstance, dbName1);

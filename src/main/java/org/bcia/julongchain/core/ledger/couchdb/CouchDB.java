@@ -264,7 +264,7 @@ public class CouchDB {
      * @param newEdits
      * @return
      */
-    public List BatchUpdateDocuments(CouchDbClient db, List<Object> list, boolean newEdits){
+    public List batchUpdateDocuments(CouchDbClient db, List<Object> list, boolean newEdits){
         List<Response> responses = db.bulk(list, newEdits);
         return responses;
     }
@@ -276,7 +276,7 @@ public class CouchDB {
      * @param keys
      * @return
      */
-    public List BatchRetrieveDocumentMetadata(CouchDbClient db, List<String> keys){
+    public List batchRetrieveDocumentMetadata(CouchDbClient db, List<String> keys){
         List<Object> docs = db.view("_all_docs")
                 .includeDocs(true)
                 .keys(keys)
@@ -292,6 +292,7 @@ public class CouchDB {
      */
     public Boolean warmIndex(CouchDbClient db, String designdoc,String indexname){
         Boolean boolFalg = false;
+        int statusCode = 200;
         try {
             List<NameValuePair> params = Lists.newArrayList();
             params.add(new BasicNameValuePair("stale", "update_after"));
@@ -302,7 +303,7 @@ public class CouchDB {
             HttpGet get = new HttpGet(build);
             HttpResponse response = db.executeRequest(get);
             int code = response.getStatusLine().getStatusCode();
-            if (code == 200){
+            if (statusCode == 200){
                 boolFalg = true;
             }
         } catch (Exception e) {
@@ -355,6 +356,7 @@ public class CouchDB {
      */
     public Boolean creatIndex(CouchDbClient db, String indexdefinition){
         Boolean boolFalg = false;
+        String resultFalg = "created";
         try {
             Boolean bool = isJson(indexdefinition);
             if (!bool){
@@ -369,7 +371,7 @@ public class CouchDB {
             InputStream stream = CouchDBUtil.getStream(response);
             JSONObject jsonObject = inputToJson(stream);
             String result = (String) jsonObject.get("Result");
-            if("created".equals(result)){
+            if(resultFalg.equals(result)){
                 boolFalg = true;
             }
         } catch (Exception e) {
