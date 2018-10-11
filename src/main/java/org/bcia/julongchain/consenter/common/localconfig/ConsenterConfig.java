@@ -191,6 +191,29 @@ public class ConsenterConfig {
         public void setGossipAddress(String gossipAddress) {
             this.gossipAddress = gossipAddress;
         }
+
+        @Override
+        public String toString() {
+            return "General{" +
+                    "ledgerType='" + ledgerType + '\'' +
+                    ", gossipAddress='" + gossipAddress + '\'' +
+                    ", listenAddress='" + listenAddress + '\'' +
+                    ", listenPort='" + listenPort + '\'' +
+                    ", version='" + version + '\'' +
+                    ", tls=" + tls +
+                    ", keepAlive=" + keepAlive +
+                    ", logLevel='" + logLevel + '\'' +
+                    ", logFormat='" + logFormat + '\'' +
+                    ", genesisMethod='" + genesisMethod + '\'' +
+                    ", genesisProfile='" + genesisProfile + '\'' +
+                    ", genesisFile='" + genesisFile + '\'' +
+                    ", localMspDir='" + localMspDir + '\'' +
+                    ", localMspId='" + localMspId + '\'' +
+                    ", profile=" + profile +
+                    ", bccsp=" + bccsp +
+                    ", authentication=" + authentication +
+                    '}';
+        }
     }
 
     public static class FileLedger {
@@ -220,6 +243,15 @@ public class ConsenterConfig {
         public void setGroupName(String groupName) {
             this.groupName = groupName;
         }
+
+        @Override
+        public String toString() {
+            return "FileLedger{" +
+                    "location='" + location + '\'' +
+                    ", prefix='" + prefix + '\'' +
+                    ", groupName='" + groupName + '\'' +
+                    '}';
+        }
     }
 
     public static class RamLedger {
@@ -231,6 +263,13 @@ public class ConsenterConfig {
 
         public void setHistorySize(int historySize) {
             this.historySize = historySize;
+        }
+
+        @Override
+        public String toString() {
+            return "RamLedger{" +
+                    "historySize=" + historySize +
+                    '}';
         }
     }
 
@@ -299,6 +338,19 @@ public class ConsenterConfig {
         public void setVerbose(boolean verbose) {
             this.verbose = verbose;
         }
+
+        @Override
+        public String toString() {
+            return "Kafka{" +
+                    "comumer=" + comumer +
+                    ", server=" + server +
+                    ", zookeeper=" + zookeeper +
+                    ", retry=" + retry +
+                    ", tls=" + tls +
+                    ", verbose=" + verbose +
+                    ", version='" + version + '\'' +
+                    '}';
+        }
     }
 
     public static class Debug {
@@ -320,6 +372,14 @@ public class ConsenterConfig {
         public void setBroadcastTraceDir(String broadcastTraceDir) {
             this.broadcastTraceDir = broadcastTraceDir;
         }
+
+        @Override
+        public String toString() {
+            return "Debug{" +
+                    "broadcastTraceDir='" + broadcastTraceDir + '\'' +
+                    ", deliverTraceDir='" + deliverTraceDir + '\'' +
+                    '}';
+        }
     }
 
     public static class Bccsp{
@@ -340,6 +400,14 @@ public class ConsenterConfig {
 
         public void setSw(Map<String, String> sw) {
             this.sw = sw;
+        }
+
+        @Override
+        public String toString() {
+            return "Bccsp{" +
+                    "defaultValue='" + defaultValue + '\'' +
+                    ", sw=" + sw +
+                    '}';
         }
     }
 

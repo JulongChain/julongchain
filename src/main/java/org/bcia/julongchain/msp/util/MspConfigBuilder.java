@@ -124,10 +124,8 @@ public class MspConfigBuilder {
         if (crls == null || crls.size() == 0) {
         }
         if (configFileContent == null || configFileContent.size() == 0) {
-
         }
         if (tlsintermediatecerts == null || tlsintermediatecerts.size() == 0) {
-
         }
         //设置TLS 根证书
         julongMspConfigBuilder.addTlsRootCerts(ByteString.copyFrom(tlscacert.get(0)));

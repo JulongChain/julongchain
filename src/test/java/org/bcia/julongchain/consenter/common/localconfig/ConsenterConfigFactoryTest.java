@@ -14,12 +14,12 @@ import static org.junit.Assert.*;
 public class ConsenterConfigFactoryTest {
 
     @Test
-    public void getConsenterConfig() {
-       ConsenterConfig consenterConfig= ConsenterConfigFactory.getConsenterConfig();
-       System.out.println(consenterConfig.getFileLedger().getGroupName());
-    }
-
-    @Test
-    public void loadConsenterConfig() {
+    public void getConsenterConfigTest() {
+        ConsenterConfig consenterConfig = ConsenterConfigFactory.getConsenterConfig();
+        System.out.println("------------------------consenter.yaml文件结构--------------------------");
+        System.out.println(consenterConfig.getFileLedger().toString());
+        System.out.println(consenterConfig.getGeneral().toString());
+        System.out.println(consenterConfig.getRamLedger().toString());
+        System.out.println(consenterConfig.getDebug().toString());
     }
 }

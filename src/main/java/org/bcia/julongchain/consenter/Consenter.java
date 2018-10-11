@@ -36,8 +36,8 @@ public class Consenter {
 
     public void execCmd(String[] args) throws ConsenterException {
         if (args.length <= 0) {
-            log.warn("PolicyNode command need more args");
-            return;
+            log.warn("Need more args!");
+            throw new ConsenterException("Need more args!");
         }
         String command = args[0];
         if (args.length == 1 && ConsenterConstants.VERSION.equalsIgnoreCase(command)) {
@@ -46,7 +46,7 @@ public class Consenter {
             try {
                 iConsenterCmd.execCmd(arg);
             } catch (org.apache.commons.cli.ParseException e) {
-                e.printStackTrace();
+               throw new ConsenterException(e);
             }
         } else if (args.length == 1 && ConsenterConstants.START.equalsIgnoreCase(command)) {
             iConsenterCmd = ConsenterCmdFactory.getInstance(command);
@@ -54,7 +54,7 @@ public class Consenter {
             try {
                 iConsenterCmd.execCmd(argment);
             } catch (ParseException e) {
-                e.printStackTrace();
+               throw new ConsenterException(e);
             }
         } else if (args.length == 1 && ConsenterConstants.BENCHMARK.equalsIgnoreCase(command)) {
             iConsenterCmd = ConsenterCmdFactory.getInstance(command);
@@ -62,10 +62,11 @@ public class Consenter {
             try {
                 iConsenterCmd.execCmd(argment);
             } catch (ParseException e) {
-                e.printStackTrace();
+              throw new ConsenterException(e);
             }
         } else {
-            log.info("args is error!");
+            log.error("args is error!");
+            throw new ConsenterException("args is error!");
         }
         return;
     }

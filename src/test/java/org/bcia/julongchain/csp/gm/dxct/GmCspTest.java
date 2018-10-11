@@ -24,6 +24,7 @@ import org.bcia.julongchain.csp.gm.dxct.sm4.*;
 import org.bcia.julongchain.csp.intfs.ICsp;
 import org.bcia.julongchain.csp.intfs.IKey;
 import org.bcia.julongchain.csp.intfs.opts.IHashOpts;
+import org.bcia.julongchain.csp.pkcs11.rsa.RsaSignOpts;
 import org.bouncycastle.util.encoders.Hex;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemObjectParser;
@@ -190,31 +191,242 @@ public class GmCspTest {
         }
     }
 
+
+    @Test
+    public void invalidParamHashTest(){
+        byte[] testData=Hex.decode("");
+        byte[] nullData=null;
+        //待hash数据为null
+        try {
+            csp.hash(nullData,null);
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+            Assert.assertEquals("[Csp]Invalid data. It must not be null.",e.getMessage());
+        }
+
+        //待hash数据长度为0
+        try {
+            csp.hash(testData,null);
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+            Assert.assertEquals("[Csp]Invalid data. Cannot be empty.",e.getMessage());
+        }
+    }
+
     /**
      * 签名测试
-     *
-     * @throws CspException
      */
     @Test
-    public void signAndVerfiyTest() throws CspException {
+    public void signTest() {
+        //正确的参数
         byte[] prik = Hex.decode("44c5ff2006af4b4d3e97c721be0e446c56939bb7d02debc16db7f535446850fe");
-        byte[] pubK = Hex.decode("047e371a5c8a01fca82820e8fa6d5ba8faee4cae4ee3ef65160c1ebdf5a7b0bbf2f0670e3496e8344df3065e549fdad924e1cf9c96e8e6e62b925c046bac25ea43");
         IKey sk = new SM2KeyImport(prik, null);
         byte[] data = Hex.decode("f12bcfd72e000c7e8a3499821694b208d745f72172f173a2e595207bf66d48f9");
-        byte[] signValue = csp.sign(sk, data, new SM2SignerOpts());
-        IKey pk = new SM2KeyImport(null, pubK);
-        System.out.println(csp.verify(pk, signValue, data, new SM2SignerOpts()));
+        byte[] zeroLengthData = Hex.decode("");
+        byte[] nullData = null;
+        try {
+            byte[] signature = csp.sign(sk, data, new SM2SignerOpts());
+            System.out.println("sm2签名值:" + Hex.toHexString(signature));
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+        }
+        //null的签名选项
+        try {
+            csp.sign(sk, data, null);
+        } catch (CspException e) {
+            System.out.println(e);
+            Assert.assertEquals("[Csp]Invalid ISignerOpts. It must not be null.", e.getMessage());
+        }
+
+        //为null签名数据
+        try {
+            csp.sign(sk, nullData, new SM2SignerOpts());
+        } catch (CspException e) {
+            System.out.println(e);
+            Assert.assertEquals("[Csp]Invalid plaintext. Cannot be null.", e.getMessage());
+        }
+
+        //原文长度为0
+        try {
+            csp.sign(sk, zeroLengthData, new SM2SignerOpts());
+        } catch (CspException e) {
+            System.out.println(e);
+            Assert.assertEquals("[Csp]Invalid plaintext. plaintext's length is zero.", e.getMessage());
+        }
     }
 
 
+    /**
+     * 验证签名测试
+     */
+
     @Test
-    public void encryptAndDecryptTest() throws CspException {
+    public void verifyTest() throws CspException {
+        byte[] signature = Hex.decode("3046022100c988ccc735ddcadb4b3ad50e35c9754117fc63b4c0b939c1225f317dc229b97f022100d431c67b4f796a048ec03150bd7edd680198913487fee640b183d1014176e2ba");
+        byte[] invalidSignature=Hex.decode("3046022100c988ccc735ddcadb4b3ad50e35c9754117fc63b4c0b939c1225f317dc229b97f022100d431c67b4f796a048ec03150bd7edd680198fee640b183d1014176e2ba");
+        byte[] data = Hex.decode("f12bcfd72e000c7e8a3499821694b208d745f72172f173a2e595207bf66d48f9");
+        byte[] pubK = Hex.decode("047e371a5c8a01fca82820e8fa6d5ba8faee4cae4ee3ef65160c1ebdf5a7b0bbf2f0670e3496e8344df3065e549fdad924e1cf9c96e8e6e62b925c046bac25ea43");
+        byte[] invaildPubK = Hex.decode("047e371a5c8a01fca82820e8fa6d5ba8faee4cae4ee3ef65160c1ebdf5a7b0bbf2f0670e3496e8344df3065e987fdad924e1cf9c96e8e6e62b925c046bac25ea43");
+        byte[] nullPk = null;
+        boolean result = false;
+        IKey nullPublicKey = new SM2KeyImport(null, null);
+        IKey invaildPk = new SM2KeyImport(null, invaildPubK);
+        IKey pk = new SM2KeyImport(null, pubK);
+        //正确的选项
+        try {
+            result = csp.verify(pk, signature, data, new SM2SignerOpts());
+            System.out.println("sm2验签结果：" + result);
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+        }
+
+        //null的公钥
+        try {
+            result = csp.verify(nullPublicKey, signature, data, new SM2SignerOpts());
+            System.out.println("sm2验签结果：" + result);
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+            Assert.assertEquals("[Csp]publicKey is null", e.getMessage());
+        }
+
+        //null的签名选项
+
+        try {
+            result = csp.verify(pk, signature, data, null);
+            System.out.println("sm2验签结果：" + result);
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+            Assert.assertEquals("[Csp]Invalid ISignerOpts. It must not be null.", e.getMessage());
+        }
+
+        //为null的原文数据
+        try {
+            result = csp.verify(pk, signature, null, new SM2SignerOpts());
+            System.out.println("sm2验签结果：" + result);
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+            Assert.assertEquals("[Csp]plainText is null", e.getMessage());
+        }
+
+        //长度为0的原文长度
+        try {
+            result = csp.verify(pk, signature, Hex.decode(""), new SM2SignerOpts());
+            System.out.println("sm2验签结果：" + result);
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+            Assert.assertEquals("[Csp]plainText's length is 0", e.getMessage());
+        }
+
+        //无效的签名值
+        try {
+            result = csp.verify(pk, invalidSignature, data, new SM2SignerOpts());
+            System.out.println("sm2验签结果：" + result);
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+        }
+
+    }
+
+    /**
+     * 加密测试
+     * @throws CspException
+     */
+
+    @Test
+    public void encryptTest() throws CspException {
+        //标准数据
+        byte[] sm4KeyBytes = Hex.decode("0123456789abcdeffedcba9876543210");
         byte[] testData = Hex.decode("01234567454545");
-        IKey sm4Key = csp.keyGen(new SM4KeyGenOpts());
+        byte[] nullData=null;
+        IKey sm4Key=new SM4KeyImport(sm4KeyBytes);
+        IKey zeroLengthSm4Key=new SM4KeyImport(Hex.decode(""));
+        IKey errorSm4Key=new SM4KeyImport(Hex.decode("0123456789abcdeffedcba9876543210547858"));
         byte[] encryptData = csp.encrypt(sm4Key, testData, new SM4EncrypterOpts());
+        System.out.println("加密后的数据："+Hex.toHexString(encryptData));
         byte[] plainText = csp.decrypt(sm4Key, encryptData, new SM4DecrypterOpts());
+
         Assert.assertArrayEquals(testData, plainText);
         System.out.println("plainText:" + Hex.toHexString(plainText));
+
+        //待加密数据为null
+        try {
+            csp.encrypt(sm4Key, nullData, new SM4EncrypterOpts());
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+            Assert.assertEquals("[Csp]plainText is null",e.getMessage());
+        }
+
+        //sm4密钥为null
+        try {
+            csp.encrypt(null, testData, new SM4EncrypterOpts());
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+            Assert.assertEquals("[Csp]Invalid Key. It must not be nil.",e.getMessage());
+        }
+
+        //sm4密钥的长度为0
+        try {
+            csp.encrypt(zeroLengthSm4Key, testData, new SM4EncrypterOpts());
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+            Assert.assertEquals("[Csp]sm4key's pattern is wrong!",e.getMessage());
+        }
+        //错误的sm4密钥
+        try {
+            csp.encrypt(errorSm4Key, testData, new SM4EncrypterOpts());
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+            Assert.assertEquals("[Csp]sm4key's pattern is wrong!",e.getMessage());
+        }
+    }
+
+    /**
+     * 解密测试
+     * @throws CspException
+     */
+    @Test
+    public void DecryptTest() throws CspException{
+        //标准数据验证
+        byte[] testData = Hex.decode("01234567454545");
+        byte[] sm4KeyBytes = Hex.decode("0123456789abcdeffedcba9876543210");
+        IKey zeroLengthSm4Key=new SM4KeyImport(Hex.decode(""));
+        IKey errorSm4Key=new SM4KeyImport(Hex.decode("0123456789abcdeffedcba9876543210547858"));
+        IKey sm4Key=new SM4KeyImport(sm4KeyBytes);
+        byte[] encryptData=Hex.decode("598bf709bb7aa0a669bc95bdc14474d2");
+        byte[] plainText = csp.decrypt(sm4Key, encryptData, new SM4DecrypterOpts());
+        System.out.println("plainText:" + Hex.toHexString(plainText));
+        Assert.assertArrayEquals(testData, plainText);
+
+        //加密数据为null
+        try {
+            csp.decrypt(sm4Key,null,new SM4DecrypterOpts());
+        } catch (CspException e) {
+            Assert.assertEquals("[Csp]Invalid ciphertext.It must not be nil",e.getMessage());
+        }
+
+        //加密数据长度为0
+        try {
+            csp.decrypt(sm4Key,Hex.decode(""),new SM4DecrypterOpts());
+        } catch (CspException e) {
+            Assert.assertEquals("[Csp]Invalid ciphertext. Cannot be empty.",e.getMessage());
+        }
+
+        //sm4密钥长度为0
+        try {
+            csp.decrypt(zeroLengthSm4Key,encryptData,new SM4DecrypterOpts());
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+            Assert.assertEquals("[Csp]SM4 requires a 128 bit key",e.getMessage());
+        }
+
+        //错误的sm4密钥
+        try {
+            csp.decrypt(errorSm4Key,encryptData,new SM4DecrypterOpts());
+        } catch (CspException e) {
+            System.out.println(e.getMessage());
+           Assert.assertEquals("[Csp]SM4 requires a 128 bit key",e.getMessage());
+        }
+
     }
 
     @Test
