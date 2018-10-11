@@ -32,8 +32,13 @@ import java.io.InputStream;
 public class CouchDBUtil {
 
 
-    //CreateSystemDatabasesIfNotExist - creates the system databases if they do not exist
-    public static void  CreateSystemDatabasesIfNotExist(CouchDbClient dbInstance){
+    /*
+     创建系统库
+     _users
+     _replicator
+     _global_changes
+     */
+    public static void  createSystemDatabasesIfNotExist(CouchDbClient dbInstance){
         CouchDB couchDB = new CouchDB();
         String dbName1 = "_users";
         couchDB.createDatabaseIfNotExist(dbInstance, dbName1);

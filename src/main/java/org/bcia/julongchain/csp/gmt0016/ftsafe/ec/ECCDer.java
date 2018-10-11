@@ -31,6 +31,7 @@ public class ECCDer {
     public static final byte TAG_SEQUENCE = 0x30;
     public static final byte TAG_FLAG = 0x02;
     public static final int VALUE_LEN = 0x21;
+    public static final byte TAG_NEGATIVE = 0x31;
 
     public static byte[] encode(byte[] r_x, byte[] s_y) {
 
@@ -41,10 +42,10 @@ public class ECCDer {
         byte[] rbigByte = binRStr.getBytes();
         byte[] sbigByte = binSStr.getBytes();
         byte[] paddingByte = {0};
-        if (rbigByte[0] == 0x31) {
+        if (rbigByte[0] == TAG_NEGATIVE) {
             r_x = concatArrays(paddingByte, r_x);
         }
-        if (sbigByte[0] == 0x31) {
+        if (sbigByte[0] == TAG_NEGATIVE) {
             s_y = concatArrays(paddingByte, s_y);
         }
         byte rxLength= intToByte(r_x.length);

@@ -51,10 +51,12 @@ public class SM1Opts {
             return bTemporary;
         }
 
+        @Override
         public long getAlgID() {
             return GMT0016CspConstant.SGD_SM1_ECB;
         }
 
+        @Override
         public int getBitLen() {
             return SM1_KEY_LEN;
         }
@@ -78,10 +80,12 @@ public class SM1Opts {
             return bTemporary;
         }
 
+        @Override
         public long getAlgID() {
             return GMT0016CspConstant.SGD_SM1_CBC;
         }
 
+        @Override
         public int getBitLen() {
             return SM1_KEY_LEN;
         }
@@ -105,10 +109,12 @@ public class SM1Opts {
             return bTemporary;
         }
 
+        @Override
         public long getAlgID() {
             return GMT0016CspConstant.SGD_SM1_CFB;
         }
 
+        @Override
         public int getBitLen() {
             return SM1_KEY_LEN;
         }
@@ -132,10 +138,12 @@ public class SM1Opts {
             return bTemporary;
         }
 
+        @Override
         public long getAlgID() {
             return GMT0016CspConstant.SGD_SM1_OFB;
         }
 
+        @Override
         public int getBitLen() {
             return SM1_KEY_LEN;
         }
@@ -159,10 +167,12 @@ public class SM1Opts {
             return bTemporary;
         }
 
+        @Override
         public long getAlgID() {
             return GMT0016CspConstant.SGD_SM1_MAC;
         }
 
+        @Override
         public int getBitLen() {
             return SM1_KEY_LEN;
         }

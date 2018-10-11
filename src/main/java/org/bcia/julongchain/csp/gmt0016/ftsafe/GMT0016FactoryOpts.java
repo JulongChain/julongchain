@@ -71,8 +71,9 @@ public class GMT0016FactoryOpts implements IGMT0016FactoryOpts{
                         bFindApp = true;
                         break;
                     }
-                    if(bFindApp)
+                    if(bFindApp) {
                         break;
+                    }
                     else {
                         String info = "[JC_SKF]:Find The Device, But No Find Application!";
                         csplog.setLogMsg(info, csplog.LEVEL_ERROR, GMT0016FactoryOpts.class);

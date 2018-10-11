@@ -238,7 +238,7 @@ public class CouchDBTest {
         map2.put("owner", "zhangsan");
         list.add(map1);
         list.add(map2);
-        List list1 = couchDB.BatchUpdateDocuments(db, list, true);
+        List list1 = couchDB.batchUpdateDocuments(db, list, true);
         log.info(list1.toString());
     }
 
@@ -266,7 +266,7 @@ public class CouchDBTest {
         list.add("marble01"); //id
         list.add("marble02");  //id
         CouchDB couchDB = new CouchDB();
-        List list1 = couchDB.BatchRetrieveDocumentMetadata(db, list);
+        List list1 = couchDB.batchRetrieveDocumentMetadata(db, list);
         log.info(list1.toString());
     }
 
@@ -315,6 +315,6 @@ public class CouchDBTest {
     @Test
     public void CreateSystemDatabasesIfNotExistTest() throws Exception{
         CouchDbClient db = creatConnectionDB();
-        CouchDBUtil.CreateSystemDatabasesIfNotExist(db);
+        CouchDBUtil.createSystemDatabasesIfNotExist(db);
     }
 }

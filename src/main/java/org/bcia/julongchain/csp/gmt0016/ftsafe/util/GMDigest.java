@@ -32,7 +32,7 @@ import static org.bcia.julongchain.csp.gmt0016.ftsafe.GMT0016CspConstant.*;
  */
 public class GMDigest {
 
-    // length of the digest in bytes
+    // 杂凑数据长度
     // private static int digestLength;
     private static long lAlgID;
     private static JulongChainLog logger;
@@ -58,10 +58,10 @@ public class GMDigest {
     }
 
     /**
-     * Get digest
-     * @param msg       Message
+     * 获取密码杂凑数据
+     * @param msg       消息数据
      * @param opts      Gmt0016 factory
-     * @return Digest value
+     * @return 密码杂凑数据
      * @throws CspException
      */
     public byte[] getHash(byte[] msg, IGMT0016FactoryOpts opts) throws CspException {

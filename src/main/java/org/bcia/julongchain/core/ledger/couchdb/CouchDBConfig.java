@@ -21,7 +21,7 @@ import org.bcia.julongchain.core.node.NodeConfigFactory;
 import java.util.Map;
 
 /**
- * read couchdb config
+ * 获取couchbd连接配置
  *
  * @author zhaiyihua
  * @date 2018/05/20
