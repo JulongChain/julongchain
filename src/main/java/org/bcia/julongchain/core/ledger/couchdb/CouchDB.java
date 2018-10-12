@@ -55,12 +55,12 @@ public class CouchDB {
     private CouchDbClientBase dbc;
 
     /**
-     * creat a new client connection
-     * @param url
-     * @param username
-     * @param password
-     * @param maxConnections
-     * @param requestTimeout
+     * 创建couchdb连接
+     * @param url   - 连接地址
+     * @param username - 登录用户名
+     * @param password  - 登录密码
+     * @param maxConnections - 最大连接数
+     * @param requestTimeout - 请求超时时间
      * @return
      * @throws Exception
      */
@@ -82,9 +82,9 @@ public class CouchDB {
     }
 
     /**
-     * creat a new db
-     * @param dbInstance
-     * @param dbName
+     * 创建一个couchdb数据库
+     * @param dbInstance - 连接对象
+     * @param dbName - 库名
      */
     public void createDatabaseIfNotExist(CouchDbClient dbInstance, String dbName){
         CouchDbContext context = dbInstance.context();
@@ -92,8 +92,8 @@ public class CouchDB {
     }
 
     /**
-     * GetDatabaseInfo method provides function to retrieve database information
-     * @param db
+     * 获取couchdb连接信息
+     * @param db - 连接对象
      * @return
      */
     public CouchDbInfo getDatabaseInfo(CouchDbClient db){
@@ -103,8 +103,8 @@ public class CouchDB {
     }
 
     /**
-     * close db
-     * @param db
+     * 关闭couchdb连接
+     * @param db - 连接对象
      * @throws Exception
      */
     public void closeDatabase(CouchDbClient db) throws Exception{
@@ -112,9 +112,9 @@ public class CouchDB {
     }
 
     /**
-     * delete IDB
-     * @param db
-     * @param dbName
+     * 销毁一个couchdb库
+     * @param db - 连接对象
+     * @param dbName - 库名
      */
     public void dropDatabase(CouchDbClient db, String dbName){
         CouchDbContext context = db.context();
@@ -139,7 +139,7 @@ public class CouchDB {
     }
 
     /**
-     * SaveDoc method provides a function to save a document, id and byte array
+     * 插入数据，包括数据的id,revsion,name,类型,doc
      * @param db
      * @param id
      * @param rev
@@ -156,7 +156,7 @@ public class CouchDB {
     }
 
 	/**
-	 * SaveDoc method provides a function to save an object as document.
+	 * 插入数据
 	 * @param db
 	 * @param obj
 	 * @return
@@ -167,7 +167,7 @@ public class CouchDB {
 	}
 
     /**
-     * DeleteDoc method provides function to delete a document from the database by id
+     * 根据id和revision删除单条数据
      * @param db
      * @param id
      * @param rev
@@ -180,7 +180,7 @@ public class CouchDB {
     }
 
     /**
-     * getDocumentRevision will return the revision if the document exists, otherwise it will return ""
+     * 据id查询数据revision
      * @param id
      * @return
      */
@@ -191,8 +191,7 @@ public class CouchDB {
     }
 
     /**
-     *ReadDoc method provides function to retrieve a document and its revision
-     *from the database by id
+     * 根据id查询数据
      * @param db
      * @param id
      * @return
@@ -210,7 +209,7 @@ public class CouchDB {
     }
 
 	/**
-	 * UpdateDoc method provides function to update a document.
+	 * 更新数据
 	 * @param db
 	 * @param obj
 	 * @return
@@ -221,11 +220,11 @@ public class CouchDB {
 	}
 
     /**
-     *
+     *根据初始和结束条件查询数据
      * @param db
-     * @param startKey
-     * @param endKey
-     * @param limit
+     * @param startKey - 初始条件
+     * @param endKey - 结束条件
+     * @param limit - 分页条数
      * @param skip
      * @return
      */
@@ -245,9 +244,9 @@ public class CouchDB {
     }
 
     /**
-     * QueryDocuments met fion forunctocessing a query
+     * 根据条件语句查询数据
      * @param db
-     * @param queryString
+     * @param queryString - 条件语句
      * @param classOfT
      * @param <T>
      * @return
@@ -258,7 +257,7 @@ public class CouchDB {
     }
 
     /**
-     * BatchUpdateDocuments - batch method to batch update documents
+     * 批量更新数据
      * @param db
      * @param list
      * @param newEdits
@@ -314,7 +313,7 @@ public class CouchDB {
     }
 
     /**
-     * ListIndex method lists the defined indexes for a database
+     * 查询库中所有索引
      * @return
      */
     public List listIndex(CouchDbClient db){
@@ -348,10 +347,9 @@ public class CouchDB {
         }
     }
 
-//    public void bulk
 
     /**
-     * CreateIndex method provides a function creating an index
+     * 创建索引
      * @return
      */
     public Boolean creatIndex(CouchDbClient db, String indexdefinition){
@@ -405,7 +403,7 @@ public class CouchDB {
     }
 
     /**
-     * InputStream to JSONObject
+     * InputStream 转换 JSONObject
      * @param inputStream
      * @return
      * @throws Exception
@@ -427,7 +425,11 @@ public class CouchDB {
         httpRequest.setEntity(entity);
     }
 
-
+    /**
+     * 判断字符串是否为json
+     * @param str - 输入的字符串
+     * @return
+     */
     public Boolean isJson(String str){
         try {
             JSONObject jsonStr= JSONObject.parseObject(str);

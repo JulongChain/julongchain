@@ -16,6 +16,8 @@
 package org.bcia.julongchain.consenter.common.bootstrap.file;
 
 import org.bcia.julongchain.common.exception.ConsenterException;
+import org.bcia.julongchain.common.log.JulongChainLog;
+import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.common.util.FileUtils;
 import org.bcia.julongchain.consenter.common.bootstrap.IHelper;
 import org.bcia.julongchain.protos.common.Common;
@@ -30,6 +32,7 @@ import java.io.IOException;
  * @company Dingxuan
  */
 public class BootStrapHelper implements IHelper {
+    private static JulongChainLog log = JulongChainLogFactory.getLog(BootStrapHelper.class);
     private String genesisBlockFile;
 
     public BootStrapHelper(String genesisBlockFile) {
@@ -43,6 +46,7 @@ public class BootStrapHelper implements IHelper {
             byte[] bootstrapFile = FileUtils.readFileBytes(genesisBlockFile);
             gensisBlock = Common.Block.parseFrom(bootstrapFile);
         } catch (IOException e) {
+            log.error(e.getMessage(), e);
            throw new ConsenterException(e);
         }
         return gensisBlock;

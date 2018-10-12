@@ -27,8 +27,11 @@ import org.bcia.julongchain.common.log.JulongChainLogFactory;
 import org.bcia.julongchain.consenter.util.BlockHelper;
 import org.bcia.julongchain.consenter.util.CommonUtils;
 import org.bcia.julongchain.consenter.util.Utils;
+import org.bcia.julongchain.core.ledger.kvledger.txmgmt.validator.valinternal.Block;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
+
+import javax.annotation.concurrent.GuardedBy;
 
 /**
  * 区块写入对象

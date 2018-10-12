@@ -53,6 +53,15 @@ public class SM2Test {
         System.out.println("Validation results：" + result);
     }
 
+    @Test
+    public void invalidKeySignTest(){
+        byte[] error=Hex.decode("612c7ab32011048529173c1186110a1dd0de433af0eb70ceef84f10aa44e16de");
+        try {
+            sm2.sign(error,error);
+        } catch (CspException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
     public void invalidParamSignTest() {

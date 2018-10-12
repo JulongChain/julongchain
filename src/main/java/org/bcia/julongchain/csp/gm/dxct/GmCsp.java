@@ -126,9 +126,13 @@ public class GmCsp implements ICsp {
 
     @Override
     public byte[] hash(byte[] msg, IHashOpts opts) throws CspException {
+        if (msg == null) {
+            log.error("Invalid data. It must not be null.");
+            throw new CspException("Invalid data. It must not be null.");
+        }
         if (msg.length == 0) {
-            log.error("Invalid msg. Cannot be empty.");
-            throw new CspException("Invalid msg. Cannot be empty.");
+            log.error("Invalid data. Cannot be empty.");
+            throw new CspException("Invalid data. Cannot be empty.");
         }
         byte[] results = new byte[0];
         try {
@@ -147,12 +151,20 @@ public class GmCsp implements ICsp {
     @Override
     public byte[] sign(IKey key, byte[] plaintext, ISignerOpts opts) throws CspException {
         if (key == null) {
-            log.error("Invalid Key. It must not be nil.");
-            throw new CspException("Invalid Key. It must not be nil.");
+            log.error("Invalid Key. It must not be null.");
+            throw new CspException("Invalid Key. It must not be null.");
+        }
+        if(opts==null){
+            log.error("Invalid ISignerOpts. It must not be null.");
+            throw new CspException("Invalid ISignerOpts. It must not be null.");
+        }
+        if (plaintext == null) {
+            log.error("Invalid plaintext. Cannot be null.");
+            throw new CspException("Invalid plaintext. Cannot be null.");
         }
         if (plaintext.length == 0) {
-            log.error("Invalid content. Cannot be empty.");
-            throw new CspException("Invalid content. Cannot be empty.");
+            log.error("Invalid plaintext. plaintext's length is zero.");
+            throw new CspException("Invalid plaintext. plaintext's length is zero.");
         }
         if (opts instanceof SM2SignerOpts) {
             try {
@@ -170,6 +182,10 @@ public class GmCsp implements ICsp {
         if (key == null) {
             log.error("Invalid Key. It must not be nil.");
             throw new CspException("Invalid Key. It must not be nil.");
+        }
+        if(opts==null){
+            log.error("Invalid ISignerOpts. It must not be null.");
+            throw new CspException("Invalid ISignerOpts. It must not be null.");
         }
         if (signature.length == 0) {
             log.error("Invalid signature. It must not be nil.");
@@ -198,6 +214,14 @@ public class GmCsp implements ICsp {
         if (key == null) {
             log.error("Invalid Key. It must not be nil.");
             throw new CspException("Invalid Key. It must not be nil.");
+        }
+        if(key.toBytes().length!=16){
+            log.error("SM4 requires a 128 bit key");
+            throw new CspException("SM4 requires a 128 bit key");
+        }
+        if (ciphertext == null) {
+            log.error("Invalid ciphertext.It must not be nil.");
+            throw new CspException("Invalid ciphertext.It must not be nil");
         }
         if (ciphertext.length == 0) {
             log.error("Invalid ciphertext. Cannot be empty.");

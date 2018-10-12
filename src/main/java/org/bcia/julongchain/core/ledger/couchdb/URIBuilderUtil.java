@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * build connection for couchdb URI
+ * 创建 couchdb URI
  *
  * @author zhaiyihua
  * @date 2018/07/20
