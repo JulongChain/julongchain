@@ -1,5 +1,9 @@
 package org.bcia.julongchain.core.container;
 
+import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.ListContainersCmd;
+import com.github.dockerjava.api.model.Container;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,46 +22,83 @@ public class DockerUtilTest {
 
     @Test
     public void testCreateImages() {
-        String dockerFilePath = "src/main/java/org/bcia/julongchain/images/baseos/test.in";
-        String tag = "test-image1";
+        String dockerFilePath = "src/main/java/org/bcia/julongchain/images/baseos/test";
+        String tag = "test-image:latest";
         DockerUtil.buildImage(dockerFilePath, tag);
         List<String> list = DockerUtil.listImages(tag);
         Assert.assertEquals(list.get(0), tag);
+        DockerUtil.removeImage(tag);
     }
 
     @Test
     public void testListContainer() {
-        List<String> strings = DockerUtil.listContainers("test");
+        String imageId = "test-image:latest";
+        String containerId = "test-container";
+        List<String> list = DockerUtil.listImages(imageId);
+        if (CollectionUtils.isNotEmpty(list)) {
+            DockerUtil.removeImage(imageId);
+        }
+        String dockerFilePath = "src/main/java/org/bcia/julongchain/images/baseos/test";
+        DockerUtil.buildImage(dockerFilePath, imageId);
+        DockerUtil.createContainer(imageId, containerId);
+        List<String> strings = DockerUtil.listContainers(containerId);
         Assert.assertTrue(strings.size() > 0);
+        DockerUtil.removeContainer(containerId);
+        DockerUtil.removeImage(imageId);
     }
 
     @Test
     public void testStartContainer() {
-        String containerId = "f62387bd60db495cf40aa84ebe831a023d4a6030010c903dbbc5fe5c7a883529";
+        String imageId = "test-image:latest";
+        String containerId = "test-container";
+        List<String> list = DockerUtil.listImages(imageId);
+        if (CollectionUtils.isNotEmpty(list)) {
+            DockerUtil.removeImage(imageId);
+        }
+        String dockerFilePath = "src/main/java/org/bcia/julongchain/images/baseos/test";
+        DockerUtil.buildImage(dockerFilePath, imageId);
+        DockerUtil.createContainer(imageId, containerId);
+        List<String> strings = DockerUtil.listContainers(containerId);
+        Assert.assertTrue(strings.size() > 0);
         DockerUtil.startContainer(containerId);
         String containerStatus = DockerUtil.getContainerStatus(containerId);
-        Assert.assertTrue(StringUtils.isNotEmpty(containerStatus));
+        Assert.assertTrue(StringUtils.contains(containerStatus, "Up"));
+        DockerUtil.stopContainer(containerId);
+        DockerUtil.removeContainer(containerId);
+        DockerUtil.removeImage(imageId);
     }
 
     @Test
     public void testCreateContainer() {
-        String imageName = "testImage";
-        List<String> imageTags = DockerUtil.listImages(imageName);
-        String imageId = imageTags.get(0);
-        String name = "testContainer";
-        DockerUtil.createContainer(imageId, name, "/bin/bash");
-        List<String> containers = DockerUtil.listContainers(name);
-        Assert.assertEquals(containers.get(0), name);
+        String imageId = "test-image:latest";
+        String containerId = "test-container";
+        List<String> list = DockerUtil.listImages(imageId);
+        if (CollectionUtils.isNotEmpty(list)) {
+            DockerUtil.removeImage(imageId);
+        }
+        String dockerFilePath = "src/main/java/org/bcia/julongchain/images/baseos/test";
+        DockerUtil.buildImage(dockerFilePath, imageId);
+        DockerUtil.createContainer(imageId, containerId);
+        List<String> strings = DockerUtil.listContainers(containerId);
+        Assert.assertTrue(strings.size() > 0);
+        DockerUtil.removeContainer(containerId);
+        DockerUtil.removeImage(imageId);
     }
 
     @Test
     public void testListImages() {
-        String imageName = "julongchain/julongchain-node:latest";
-        List<String> list = DockerUtil.listImages(imageName);
-        System.out.println(list.toString());
-        Assert.assertNotNull(list);
-        Assert.assertEquals(list.size(), 1);
-        Assert.assertEquals(list.get(0), imageName);
+        String imageId = "test-image:latest";
+        List<String> list = DockerUtil.listImages(imageId);
+        if (CollectionUtils.isNotEmpty(list)) {
+            DockerUtil.removeImage(imageId);
+        }
+        String dockerFilePath = "src/main/java/org/bcia/julongchain/images/baseos/test";
+        DockerUtil.buildImage(dockerFilePath, imageId);
+        List<String> list1 = DockerUtil.listImages(imageId);
+        DockerUtil.removeImage(imageId);
+        Assert.assertNotNull(list1);
+        Assert.assertEquals(list1.size(), 1);
+        Assert.assertEquals(list1.get(0), imageId);
     }
 
 }

@@ -192,8 +192,20 @@ public class DockerUtil {
     getDockerClient().stopContainerCmd(containerId).exec();
   }
 
+  public static void killContainer(String containerId) {
+    getDockerClient().killContainerCmd(containerId).exec();
+  }
+
+  public static void removeContainer(String containerId) {
+    getDockerClient().removeContainerCmd(containerId).exec();
+  }
+
+  public static void removeImage(String imageId) {
+    getDockerClient().removeImageCmd(imageId).exec();
+  }
+
   public static void destroyContainer(String containerId) {
-    getDockerClient().stopContainerCmd(containerId);
+    getDockerClient().stopContainerCmd(containerId).exec();
   }
 
 }
