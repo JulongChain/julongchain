@@ -13,9 +13,7 @@ Maven依赖管理工具：Maven 3.5.2  <br/>
 代码版本管理工具：Git  <br/>
 
 编译步骤：  <br/>
-1.从GitHub上下载项目源码。打开IntelliJ IDEA,选择菜单File -> New -> Project from Version Control -> Git打开Clone Repository对话框  <br/>
-  设置好文件夹和路径,输入Git Repository URL点后面的Test按钮测试链接成功后,点击Clone开始下载源码  <br/>
-  Git Repository URL:https://github.com/JulongChain/julongchain.git  <br/>
+1.从GitHub上下载项目源码。打开IntelliJ IDEA,选择菜单File -> New -> Project from Version Control -> Git打开Clone Repository对话框  <br/>在URL文本框输入本项目的地址<i>https://github.com/JulongChain/julongchain.git</i>，然后点击"Test"按钮，测试链接连接是否成功。待连接成功后，在Directory文本框输入或选择项目工作文件夹。最后，点击Clone开始下载源码  <br/>
   
 2.添加框架支持：项目名字右键 => Add Framework Support,Java EE version选择Java EE 8,勾选Maven选项  <br/>
 
@@ -36,7 +34,7 @@ Maven依赖管理工具：Maven 3.5.2  <br/>
 
 聚龙链平台使用Apache License, Version 2.0 (Apache-2.0), located in the [LICENSE](LICENSE) file.
 
-##命令行支持
+## 命令行支持
 
 启动Consenter服务  <br/>
 <i>  java -jar julongchain.jar consenter start  </i>
