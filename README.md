@@ -5,8 +5,6 @@
 ## 链接
 [Jira任务管理系统](http://jira.bcia.net.cn:8082/)
 
-[Gitlab代码库管理系统](http://gitlab.bcia.net.cn:6060/)
-
 ## 如何编译
 编译环境：  <br/>
 具体的环境配置请见相关文档  <br/>
