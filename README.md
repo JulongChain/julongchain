@@ -1,5 +1,5 @@
 ## 聚龙链（JulongChain）平台
-聚龙链平台是一个基于Java的开源联盟链区块链平台。
+聚龙链平台是一个基于Java的开源联盟链区块链底层技术平台。该项目旨在使用符合国家密码管理要求的国密算法和证书体系，打造一个数据防篡改、账本分布共享、系统安全可靠的开源区块链基础设施平台，为金融、政务、能源等重点领域区块链应用提供平台支撑。
 
 
 ## 链接
@@ -7,16 +7,15 @@
 
 ## 如何编译
 编译环境：  <br/>
-具体的环境配置请见相关文档  <br/>
 集成开发环境：IntelliJ IDEA 2017.3.3  <br/>
-JAVA 开发环境：JAVA JDK 1.8.0_151  <br/>
+JAVA开发环境：JDK 1.8.0_151  <br/>
 Maven依赖管理工具：Maven 3.5.2  <br/>
-代码版本管理工具：GitLab  <br/>
+代码版本管理工具：Git  <br/>
 
 编译步骤：  <br/>
-1.从GitLab下载项目源码：打开IntelliJ IDEA,选择菜单File => New => Project from Version Control => Git  <br/>
+1.从GitHub上下载项目源码。打开IntelliJ IDEA,选择菜单File -> New -> Project from Version Control -> Git打开Clone Repository对话框  <br/>
   设置好文件夹和路径,输入Git Repository URL点后面的Test按钮测试链接成功后,点击Clone开始下载源码  <br/>
-  Git Repository URL:ssh://git@gitlab.bcia.net.cn:13622/bcia/julongchain.git  <br/>
+  Git Repository URL:https://github.com/JulongChain/julongchain.git  <br/>
   
 2.添加框架支持：项目名字右键 => Add Framework Support,Java EE version选择Java EE 8,勾选Maven选项  <br/>
 
