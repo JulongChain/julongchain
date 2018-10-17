@@ -89,7 +89,7 @@ public class DockerVM implements VM{
 	}
 
 	public String getContainerName() {
-		String containerName = getNodeIdFromYaml() + "-" + smartContractId;
+		String containerName = getNodeIdFromYaml() + "-" + smartContractId + "-" + version;
 		return containerName;
 	}
 
