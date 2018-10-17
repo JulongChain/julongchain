@@ -111,6 +111,15 @@ Maven依赖管理工具：Maven 3.5.2  <br/>
    -n 智能合约名称               <br/>
    -i 智能合约invoke方法入参      <br/>
 
+升级智能合约  <br/>
+<i>  java -jar julongchain.jar contract upgrade -t 127.0.0.1:7051 -c 127.0.0.1:7050 -g myGroup -n mycc -v 1.1  -i "{'args':['init','a','100','b','200']}" -P "OR('Org1MSP.member','Org2MSP.member')"  </i><br/>
+  参数说明：  <br/>
+   -t 要升级智能合约的目标节点地址 <br/>
+   -c 共识节点地址               <br/>
+   -g 群组名称                  <br/>
+   -n 智能合约名称               <br/>
+   -v 智能合约版本             <br/>
+   -P 背书策略                 <br/>
 
    
 
