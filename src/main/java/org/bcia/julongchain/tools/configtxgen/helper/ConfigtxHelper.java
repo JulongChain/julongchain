@@ -15,7 +15,6 @@
  */
 package org.bcia.julongchain.tools.configtxgen.helper;
 
-import com.alibaba.fastjson.JSON;
 import org.bcia.julongchain.common.exception.ConfigtxToolsException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.genesis.GenesisBlockFactory;
@@ -135,7 +134,8 @@ public class ConfigtxHelper {
         try {
             byte[] fileBytes = FileUtils.readFileBytes(inspectBlock);
             Common.Block block = Common.Block.parseFrom(fileBytes);
-            log.info("Get a block: \n" + JSON.toJSONString(block, true));
+            log.info("Get a block: \n");
+            ProtoUtils.printMessageJson(block);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             throw new ConfigtxToolsException(e);
@@ -146,7 +146,8 @@ public class ConfigtxHelper {
         try {
             byte[] fileBytes = FileUtils.readFileBytes(inspectGroupCreateTx);
             Common.Envelope envelope = Common.Envelope.parseFrom(fileBytes);
-            log.info("Get a envelope: \n" + JSON.toJSONString(envelope, true));
+            log.info("Get a envelope: \n");
+            ProtoUtils.printMessageJson(envelope);
         } catch (IOException e) {
             log.error(e.getMessage(), e);
             throw new ConfigtxToolsException(e);
