@@ -37,7 +37,7 @@ import java.util.*;
 import java.util.regex.Pattern;
 
 /**
- * 交易验证器
+ * 配置交易验证器
  *
  * @author zhouhui
  * @date 2018/4/24

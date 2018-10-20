@@ -21,7 +21,7 @@ import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
 
 /**
- * 交易验证器接口
+ * 配置交易验证器接口
  *
  * @author zhouhui
  * @date 2018/06/01

@@ -27,7 +27,7 @@ import org.bcia.julongchain.tools.configtxgen.entity.GenesisConfigFactory;
 import org.bcia.julongchain.tools.configtxgen.helper.ConfigtxHelper;
 
 /**
- * 交易生成工具命令支持
+ * 配置交易生成工具命令支持
  *
  * @author zhouhui
  * @date 2018/06/06
@@ -78,48 +78,56 @@ public class ConfigtxGenCmd implements IConfigtxGenCmd {
             log.info("GroupId: " + groupId);
         }
 
+        //解析出配置文件名
         String profile = null;
         if (cmd.hasOption(ARG_PROFILE)) {
             profile = cmd.getOptionValue(ARG_PROFILE, defaultValue);
             log.info("Profile: " + profile);
         }
 
+        //解析出创世区块的输出路径
         String outputBlock = null;
         if (cmd.hasOption(ARG_OUTPUT_BLOCK)) {
             outputBlock = cmd.getOptionValue(ARG_OUTPUT_BLOCK, defaultValue);
             log.info("OutputBlock: " + outputBlock);
         }
 
+        //解析出创建群组配置交易的输出路径
         String outputGroupCreateTx = null;
         if (cmd.hasOption(ARG_OUTPUT_GROUP_CREATE_TX)) {
             outputGroupCreateTx = cmd.getOptionValue(ARG_OUTPUT_GROUP_CREATE_TX, defaultValue);
             log.info("OutputGroupCreateTx: " + outputGroupCreateTx);
         }
 
+        //解析出更新群组配置交易的输出路径
         String outputAnchorNodesUpdate = null;
         if (cmd.hasOption(ARG_OUTPUT_ANCHOR_NODES_UPDATE)) {
             outputAnchorNodesUpdate = cmd.getOptionValue(ARG_OUTPUT_ANCHOR_NODES_UPDATE, defaultValue);
             log.info("OutputGroupCreateTx: " + outputAnchorNodesUpdate);
         }
 
+        //解析出组织名
         String asOrg = null;
         if (cmd.hasOption(ARG_AS_ORGANIZATION)) {
             asOrg = cmd.getOptionValue(ARG_AS_ORGANIZATION, defaultValue);
             log.info("AsOrg: " + asOrg);
         }
 
+        //要检查的Block文件路径
         String inspectBlock = null;
         if (cmd.hasOption(ARG_INSPECTBLOCK)) {
             inspectBlock = cmd.getOptionValue(ARG_INSPECTBLOCK, defaultValue);
             log.info("InspectBlock: " + inspectBlock);
         }
 
+        //要检查的配置交易文件路径
         String inspectGroupCreateTx = null;
         if (cmd.hasOption(ARG_INSPECT_GROUP_CREATE_TX)) {
             inspectGroupCreateTx = cmd.getOptionValue(ARG_INSPECT_GROUP_CREATE_TX, defaultValue);
             log.info("InspectGroupCreateTx: " + inspectGroupCreateTx);
         }
 
+        //要打印的组织名
         String printOrg = null;
         if (cmd.hasOption(ARG_PRINT_ORGANIZATION)) {
             printOrg = cmd.getOptionValue(ARG_PRINT_ORGANIZATION, defaultValue);
