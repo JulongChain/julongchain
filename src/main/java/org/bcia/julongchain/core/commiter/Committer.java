@@ -182,4 +182,7 @@ public class Committer implements ICommitter {
         nodeLedger.close();
     }
 
+    public INodeLedger getNodeLedger() {
+        return nodeLedger;
+    }
 }
