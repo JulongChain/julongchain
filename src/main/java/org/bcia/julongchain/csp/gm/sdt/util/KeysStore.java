@@ -85,7 +85,7 @@ public class KeysStore {
                 if(!dir.exists()) {
                     dir.mkdirs();
                 }
-                if(path.endsWith("/")) {
+                if(path.endsWith(File.separator)) {
                     fullPath = path + fullPath;
                 } else {
                     fullPath = path + File.separator + fullPath;
@@ -138,7 +138,7 @@ public class KeysStore {
         String fileName = getFileNameByType(ski, keyType);
         String fullPath = fileName;
         if(null != path && !"".equals(path)) {
-            if(path.endsWith("/")) {
+            if(path.endsWith(File.separator)) {
                 fullPath = path + fullPath;
             } else {
                 fullPath = path + File.separator + fullPath;

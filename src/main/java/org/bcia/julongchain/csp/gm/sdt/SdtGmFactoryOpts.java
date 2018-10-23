@@ -26,16 +26,24 @@ import java.util.Map;
  */
 public class SdtGmFactoryOpts implements ISdtGmFactoryOpts {
 
-    private String symmetricKeyType;    //对称密钥类型
-    private String asymmetricKeyType;   //非对称密钥类型
-    private String hashType;            //哈希类型
-    private String signType;            //签名类型
-    private String publicKeyPath;       //公钥数据存储路径
-    private String privateKeyPath;      //私钥数据存储路径
-    private String keyPath;             //对称密钥数据存储路径
-
-    private String keyStorePath;        //密钥存储路径
-    private boolean bDefaultCsp;        //默认Csp
+    //对称密钥类型
+    private String symmetricKeyType;
+    //非对称密钥类型
+    private String asymmetricKeyType;
+    //哈希类型
+    private String hashType;
+    //签名类型
+    private String signType;
+    //公钥数据存储路径
+    private String publicKeyPath;
+    //私钥数据存储路径
+    private String privateKeyPath;
+    //对称密钥数据存储路径
+    private String keyPath;
+    //密钥存储路径
+    private String keyStorePath;
+    //默认Csp
+    private boolean bDefaultCsp;
 
     public SdtGmFactoryOpts() {
     }
