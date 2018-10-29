@@ -36,7 +36,7 @@ public class SmartContractsConfig implements ISmartContractsConfig {
 
     public SmartContractsConfig(Configtx.ConfigTree tree) throws ValidateException, InvalidProtocolBufferException {
         if (tree != null && tree.getValuesCount() > 0) {
-            throw new ValidateException("SmartContracts does not support value");
+            throw new ValidateException("SmartContracts does not support values");
         }
 
         smartContractConfigMap = new HashMap<String, ISmartContractDefinition>();
