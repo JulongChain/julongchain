@@ -25,7 +25,7 @@ import org.bcia.julongchain.common.exception.JulongChainException;
 import org.bcia.julongchain.common.exception.NodeException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.groupconfig.GroupConfigConstant;
-import org.bcia.julongchain.common.groupconfig.MSPConfigHandler;
+import org.bcia.julongchain.common.groupconfig.MspConfigHandler;
 import org.bcia.julongchain.common.groupconfig.config.ApplicationConfig;
 import org.bcia.julongchain.common.groupconfig.value.AnchorNodesValue;
 import org.bcia.julongchain.common.localmsp.ILocalSigner;
@@ -140,7 +140,7 @@ public class EnvelopeHelper {
         //构造应用子树
         Configtx.ConfigTree appTree = ConfigTreeHelper.buildApplicationTree(profile.getApplication());
         //得到最终的应用配置
-        ApplicationConfig appConfig = new ApplicationConfig(appTree, new MSPConfigHandler(0));
+        ApplicationConfig appConfig = new ApplicationConfig(appTree, new MspConfigHandler(0));
 
         if (consenterSystemGroupTree != null) {
             //TODO:要实现吗？
