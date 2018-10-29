@@ -44,11 +44,6 @@ public class JulongChainLogFactory {
 
     public static JulongChainLog getLog() {
         StackTraceElement[] sts = Thread.currentThread().getStackTrace();
-
-//        for (int i = 0; i < sts.length; i++) {
-//            System.out.print("sts[" + i + "].getClassName()-----$" + sts[i].getClassName()+"\r\n");
-//        }
-
         Logger logger = LoggerFactory.getLogger(sts[2].getClassName());
 
         JulongChainLog log = new JulongChainLog();

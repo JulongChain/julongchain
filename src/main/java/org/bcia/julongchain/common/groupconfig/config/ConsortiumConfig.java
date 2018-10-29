@@ -18,7 +18,7 @@ package org.bcia.julongchain.common.groupconfig.config;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.groupconfig.GroupConfigConstant;
-import org.bcia.julongchain.common.groupconfig.MSPConfigHandler;
+import org.bcia.julongchain.common.groupconfig.MspConfigHandler;
 import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.common.Policies;
 
@@ -37,7 +37,7 @@ public class ConsortiumConfig implements IConsortiumConfig {
     private Policies.Policy groupCreationPolicy;
     private Map<String, IOrganizationConfig> organizationConfigMap;
 
-    public ConsortiumConfig(Configtx.ConfigTree consortiumTree, MSPConfigHandler mspConfigHandler) throws
+    public ConsortiumConfig(Configtx.ConfigTree consortiumTree, MspConfigHandler mspConfigHandler) throws
             InvalidProtocolBufferException, ValidateException {
         if (consortiumTree != null && consortiumTree.getValuesMap() != null) {
             Configtx.ConfigValue configValue = consortiumTree.getValuesMap().get(GroupConfigConstant.GROUP_CREATION_POLICY);

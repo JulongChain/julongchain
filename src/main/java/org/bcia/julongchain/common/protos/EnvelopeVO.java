@@ -18,6 +18,7 @@ package org.bcia.julongchain.common.protos;
 import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.ValidateException;
+import org.bcia.julongchain.common.util.ValidateUtils;
 import org.bcia.julongchain.protos.common.Common;
 
 /**
@@ -33,6 +34,8 @@ public class EnvelopeVO implements IProtoVO<Common.Envelope> {
 
     @Override
     public void parseFrom(Common.Envelope envelope) throws InvalidProtocolBufferException, ValidateException {
+        ValidateUtils.isNotNull(envelope, "Envelope can not be null");
+
         Common.Payload payload = Common.Payload.parseFrom(envelope.getPayload());
         this.payloadVO = new PayloadVO();
         payloadVO.parseFrom(payload);

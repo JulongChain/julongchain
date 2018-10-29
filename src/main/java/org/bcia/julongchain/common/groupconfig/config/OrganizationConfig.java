@@ -19,7 +19,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.commons.lang3.StringUtils;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.groupconfig.GroupConfigConstant;
-import org.bcia.julongchain.common.groupconfig.MSPConfigHandler;
+import org.bcia.julongchain.common.groupconfig.MspConfigHandler;
 import org.bcia.julongchain.msp.IMsp;
 import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.msp.MspConfigPackage;
@@ -33,12 +33,12 @@ import org.bcia.julongchain.protos.msp.MspConfigPackage;
  */
 public class OrganizationConfig implements IOrganizationConfig {
     private MspConfigPackage.MSPConfig mspConfig;
-    private MSPConfigHandler mspConfigHandler;
+    private MspConfigHandler mspConfigHandler;
     private IMsp msp;
     private String mspId;
     private String name;
 
-    public OrganizationConfig(String name, MSPConfigHandler mspConfigHandler, Configtx.ConfigTree orgTree) throws
+    public OrganizationConfig(String name, MspConfigHandler mspConfigHandler, Configtx.ConfigTree orgTree) throws
             ValidateException, InvalidProtocolBufferException {
         this.name = name;
 

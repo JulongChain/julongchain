@@ -32,12 +32,12 @@ import java.util.Map;
  * @date 2018/3/27
  * @company Dingxuan
  */
-public class MSPConfigHandler {
-    private static class PendingMSPConfig {
+public class MspConfigHandler {
+    private static class PendingMspConfig {
         private IMsp msp;
         private MspConfigPackage.MSPConfig mspConfig;
 
-        public PendingMSPConfig(IMsp msp, MspConfigPackage.MSPConfig mspConfig) {
+        public PendingMspConfig(IMsp msp, MspConfigPackage.MSPConfig mspConfig) {
             this.msp = msp;
             this.mspConfig = mspConfig;
         }
@@ -61,40 +61,28 @@ public class MSPConfigHandler {
 
     private int mspVersion;
 
-    private Map<String, PendingMSPConfig> idMap;
+    private Map<String, PendingMspConfig> idMap;
 
-    public MSPConfigHandler(int mspVersion) {
+    public MspConfigHandler(int mspVersion) {
         this.mspVersion = mspVersion;
 
-        idMap = new HashMap<String, PendingMSPConfig>();
+        idMap = new HashMap<String, PendingMspConfig>();
     }
 
     public IMsp proposeMSP(MspConfigPackage.MSPConfig mspConfig) {
-//        if (mspConfig.getType() == MspType.CSP.ordinal()) {
-//        IMspFactory factory = new MockMspFactory();
-//        IMspOpts opts = new MockMspOpts();
-//
-//        IMsp msp = factory.getMsp(opts);
         IMsp msp = new Msp();
 
         msp.setup(mspConfig);
         String mspId = msp.getIdentifier();
-
-        //TODO:判断是否已经存在
-        //PendingMSPConfig existingPendingMSPConfig = idMap.get(mspId);
-
-        idMap.put(mspId, new PendingMSPConfig(msp, mspConfig));
-
-
+        idMap.put(mspId, new PendingMspConfig(msp, mspConfig));
         return msp;
-//        }
     }
 
     public IMspManager createMSPManager() {
         IMsp[] mspArray = new IMsp[idMap.size()];
         int i = 0;
-        for (PendingMSPConfig pendingMSPConfig : idMap.values()) {
-            mspArray[i++] = pendingMSPConfig.getMsp();
+        for (PendingMspConfig pendingMspConfig : idMap.values()) {
+            mspArray[i++] = pendingMspConfig.getMsp();
         }
 
         IMspManager mspManager = new MspManager();

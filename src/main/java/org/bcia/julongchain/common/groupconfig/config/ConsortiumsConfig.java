@@ -17,7 +17,7 @@ package org.bcia.julongchain.common.groupconfig.config;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.ValidateException;
-import org.bcia.julongchain.common.groupconfig.MSPConfigHandler;
+import org.bcia.julongchain.common.groupconfig.MspConfigHandler;
 import org.bcia.julongchain.protos.common.Configtx;
 
 import java.util.HashMap;
@@ -34,7 +34,7 @@ import java.util.Map;
 public class ConsortiumsConfig implements IConsortiumsConfig {
     private Map<String, IConsortiumConfig> consortiumConfigMap;
 
-    public ConsortiumsConfig(Configtx.ConfigTree consortiumsTree, MSPConfigHandler mspConfigHandler) throws
+    public ConsortiumsConfig(Configtx.ConfigTree consortiumsTree, MspConfigHandler mspConfigHandler) throws
             InvalidProtocolBufferException, ValidateException {
         consortiumConfigMap = new HashMap<String, IConsortiumConfig>();
         if (consortiumsTree != null && consortiumsTree.getChildsMap() != null) {

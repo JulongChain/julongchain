@@ -18,7 +18,7 @@ package org.bcia.julongchain.common.groupconfig.config;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.groupconfig.GroupConfigConstant;
-import org.bcia.julongchain.common.groupconfig.MSPConfigHandler;
+import org.bcia.julongchain.common.groupconfig.MspConfigHandler;
 import org.bcia.julongchain.common.groupconfig.capability.GroupProvider;
 import org.bcia.julongchain.common.groupconfig.capability.IGroupCapabilities;
 import org.bcia.julongchain.msp.IMspManager;
@@ -86,7 +86,7 @@ public class GroupConfig implements IGroupConfig {
             validateConsenterAddresses();
         }
 
-        MSPConfigHandler mspConfigHandler = new MSPConfigHandler(0);
+        MspConfigHandler mspConfigHandler = new MspConfigHandler(0);
 
         if (groupTree != null && groupTree.getChildsMap() != null) {
             Iterator<Map.Entry<String, Configtx.ConfigTree>> entries = groupTree.getChildsMap().entrySet().iterator();
@@ -118,11 +118,6 @@ public class GroupConfig implements IGroupConfig {
 
     public Configuration.BlockDataHashingStructure getBlockDataHashingStructure() {
         return blockDataHashingStructure;
-    }
-
-    @Override
-    public Configuration.ConsenterAddresses getConsenterAddresses() {
-        return consenterAddresses;
     }
 
     public Configuration.Consortium getConsortium() {

@@ -25,10 +25,12 @@ import org.bcia.julongchain.common.policies.IPolicyManager;
 import org.bcia.julongchain.common.policies.IPolicyProvider;
 import org.bcia.julongchain.common.policies.PolicyManager;
 import org.bcia.julongchain.common.policies.PolicyRouter;
+import org.bcia.julongchain.common.policycheck.policies.PolicyProvider;
 import org.bcia.julongchain.common.resourceconfig.config.IResourcesConfig;
 import org.bcia.julongchain.common.resourceconfig.config.ResourcesConfig;
 import org.bcia.julongchain.protos.common.Common;
 import org.bcia.julongchain.protos.common.Configtx;
+import org.bcia.julongchain.protos.common.Policies;
 
 import java.util.HashMap;
 import java.util.List;
@@ -61,9 +63,9 @@ public class ResourcesConfigBundle implements IResourcesConfigBundle {
 
         this.resourcesConfig = new ResourcesConfig(config.getGroupTree());
 
-        //TODO:需要赋值
         Map<Integer, IPolicyProvider> policyProviderMap = new HashMap<Integer, IPolicyProvider>();
-//        policyProviderMap.put(Policies.PolicyConstant.PolicyType.SIGNATURE_VALUE, new PolicyProvider(configResources.getPolicyManager()));
+        policyProviderMap.put(Policies.Policy.PolicyType.SIGNATURE_VALUE, new PolicyProvider
+                (groupConfigBundle.getMspManager()));
 
         IPolicyManager resourcesPolicyManager = new PolicyManager(ResourcesConfigConstant.RESOURCES,
                 policyProviderMap, config.getGroupTree());

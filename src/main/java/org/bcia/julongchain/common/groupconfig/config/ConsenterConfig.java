@@ -18,7 +18,7 @@ package org.bcia.julongchain.common.groupconfig.config;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.groupconfig.GroupConfigConstant;
-import org.bcia.julongchain.common.groupconfig.MSPConfigHandler;
+import org.bcia.julongchain.common.groupconfig.MspConfigHandler;
 import org.bcia.julongchain.common.groupconfig.capability.ConsenterProvider;
 import org.bcia.julongchain.common.groupconfig.capability.IConsenterCapabilities;
 import org.bcia.julongchain.common.util.ValidateUtils;
@@ -36,6 +36,11 @@ import java.util.regex.Pattern;
  * @company Dingxuan
  */
 public class ConsenterConfig implements IConsenterConfig {
+    /**
+     * 合法Kafka服务器对应的正则表达式
+     */
+    private static final String REGEX_KAFKA_BROKER = "^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9.-]*[a-zA-Z0-9])$";
+
     private Configuration.ConsensusType consensusTypeProto;
     private Configuration.BatchSize batchSize;
     private Configuration.BatchTimeout batchTimeoutProto;
@@ -50,7 +55,7 @@ public class ConsenterConfig implements IConsenterConfig {
     private long maxChannelsCount;
     private IConsenterCapabilities capabilities;
 
-    public ConsenterConfig(Configtx.ConfigTree consenterTree, MSPConfigHandler mspConfigHandler) throws
+    public ConsenterConfig(Configtx.ConfigTree consenterTree, MspConfigHandler mspConfigHandler) throws
             InvalidProtocolBufferException, ValidateException {
         if (consenterTree != null && consenterTree.getValuesMap() != null) {
             Configtx.ConfigValue consensusTypeValue = consenterTree.getValuesMap().get(GroupConfigConstant
@@ -174,7 +179,7 @@ public class ConsenterConfig implements IConsenterConfig {
             throw new ValidateException("Wrong port");
         }
 
-        if (!Pattern.matches("^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9.-]*[a-zA-Z0-9])$", host)) {
+        if (!Pattern.matches(REGEX_KAFKA_BROKER, host)) {
             throw new ValidateException("Wrong host");
         }
     }

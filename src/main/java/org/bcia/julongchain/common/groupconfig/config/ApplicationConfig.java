@@ -18,7 +18,7 @@ package org.bcia.julongchain.common.groupconfig.config;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.groupconfig.GroupConfigConstant;
-import org.bcia.julongchain.common.groupconfig.MSPConfigHandler;
+import org.bcia.julongchain.common.groupconfig.MspConfigHandler;
 import org.bcia.julongchain.common.groupconfig.capability.ApplicationProvider;
 import org.bcia.julongchain.common.groupconfig.capability.IApplicationCapabilities;
 import org.bcia.julongchain.protos.common.Configtx;
@@ -40,7 +40,7 @@ public class ApplicationConfig implements IApplicationConfig {
     private Configuration.Capabilities capabilitiesProto;
     private IApplicationCapabilities capabilities;
 
-    public ApplicationConfig(Configtx.ConfigTree appTree, MSPConfigHandler mspConfigHandler) throws
+    public ApplicationConfig(Configtx.ConfigTree appTree, MspConfigHandler mspConfigHandler) throws
             InvalidProtocolBufferException, ValidateException {
         if (appTree != null && appTree.getValuesMap() != null) {
             Configtx.ConfigValue configValue = appTree.getValuesMap().get(GroupConfigConstant.CAPABILITIES);

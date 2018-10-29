@@ -18,7 +18,7 @@ package org.bcia.julongchain.common.groupconfig.config;
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.bcia.julongchain.common.exception.ValidateException;
 import org.bcia.julongchain.common.groupconfig.GroupConfigConstant;
-import org.bcia.julongchain.common.groupconfig.MSPConfigHandler;
+import org.bcia.julongchain.common.groupconfig.MspConfigHandler;
 import org.bcia.julongchain.protos.common.Configtx;
 import org.bcia.julongchain.protos.node.Configuration;
 
@@ -34,7 +34,7 @@ import java.util.List;
 public class ApplicationOrgConfig extends OrganizationConfig implements IApplicationOrgConfig {
     private Configuration.AnchorNodes anchorNodes;
 
-    public ApplicationOrgConfig(String name, MSPConfigHandler mspConfigHandler, Configtx.ConfigTree orgTree) throws
+    public ApplicationOrgConfig(String name, MspConfigHandler mspConfigHandler, Configtx.ConfigTree orgTree) throws
             InvalidProtocolBufferException, ValidateException {
         super(name, mspConfigHandler, orgTree);
 

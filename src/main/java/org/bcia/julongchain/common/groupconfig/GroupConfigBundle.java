@@ -92,7 +92,7 @@ public class GroupConfigBundle implements IGroupConfigBundle,IMutableResources {
         this.config = config;
         this.groupConfig = new GroupConfig(config.getGroupTree());
 
-        HashMap<Integer, IPolicyProvider> policyProviderMap = new HashMap<>();
+        Map<Integer, IPolicyProvider> policyProviderMap = new HashMap<>();
         policyProviderMap.put(Policies.Policy.PolicyType.SIGNATURE_VALUE, new PolicyProvider(groupConfig
                 .getMspManager()));
 

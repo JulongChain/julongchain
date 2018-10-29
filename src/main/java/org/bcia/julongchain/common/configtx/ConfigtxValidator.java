@@ -72,7 +72,7 @@ public class ConfigtxValidator implements IConfigtxValidator {
      */
     private Map<String, ConfigComparable> configComparableMap;
     /**
-     * 命名空间
+     * 命名空间(目前一律是Group)
      */
     private String namespace;
     /**

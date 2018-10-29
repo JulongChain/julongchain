@@ -17,7 +17,6 @@ package org.bcia.julongchain.common.groupconfig.config;
 
 import org.bcia.julongchain.common.groupconfig.capability.IGroupCapabilities;
 import org.bcia.julongchain.msp.IMspManager;
-import org.bcia.julongchain.protos.common.Configuration;
 
 /**
  * 群组配置接口
@@ -27,7 +26,6 @@ import org.bcia.julongchain.protos.common.Configuration;
  * @company Dingxuan
  */
 public interface IGroupConfig {
-    Configuration.ConsenterAddresses getConsenterAddresses();
 
     /**
      * 获取能力集
