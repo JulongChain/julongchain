@@ -49,20 +49,6 @@
             <version>4.1.26.Final</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/io.netty/netty-transport-native-epoll
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-transport-native-epoll</artifactId>
-            <version>4.1.29.Final</version>
-        </dependency> -->
-
-        <!-- https://mvnrepository.com/artifact/io.netty/netty-transport-native-kqueue
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-transport-native-kqueue</artifactId>
-            <version>4.1.29.Final</version>
-        </dependency> -->
-
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -241,7 +227,6 @@
             </exclusions>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.google.api.grpc/proto-google-common-protos -->
         <dependency>
             <groupId>com.google.api.grpc</groupId>
             <artifactId>proto-google-common-protos</artifactId>
@@ -254,14 +239,12 @@
             <version>${protobuf.version}</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.google.protobuf/protobuf-java-util -->
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java-util</artifactId>
             <version>${protobuf.version}</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.google.protobuf.nano/protobuf-javanano -->
         <dependency>
             <groupId>com.google.protobuf.nano</groupId>
             <artifactId>protobuf-javanano</artifactId>
@@ -410,8 +393,6 @@
             <systemPath>${project.basedir}/lib/gossip-transport-udp-0.1.3-incubating-SNAPSHOT.jar</systemPath>
         </dependency>
 
-
-        <!-- https://mvnrepository.com/artifact/com.sun.jna/jna -->
         <dependency>
             <groupId>com.sun.jna</groupId>
             <artifactId>jna</artifactId>
