@@ -54,7 +54,7 @@ Maven依赖管理工具：Maven 3.5.2  <br/>
 ## 如何打包运行
 前置条件：<br/>
 系统已经安装JDK8和Docker，配置好JDK 1.8的环境变量。<br/>
-开发好智能合约，也可直接下载系统智能合约样例<i>https://github.com/JulongChain/julongchain-demo</i>,使用时只保留src和pom.xml文件即可。<br/>
+开发好智能合约，也可直接下载系统智能合约样例<i>https://github.com/JulongChain/julongchain-smartcontract-ab-java-0.8</i>,使用时只保留src和pom.xml文件即可。<br/>
 
 详细步骤：
 <ul>
@@ -82,7 +82,7 @@ Maven依赖管理工具：Maven 3.5.2  <br/>
      -g 群组名称     <br/>
 
 加入群组  <br/>
-<i>  java -jar julongchain.jar group join -t 127.0.0.1:7051 -b /opt/BCIA/JulongChain/myGroup.block  </i><br/>
+<i>  java -jar julongchain.jar group join -t 127.0.0.1:7051 -b /home/bcia/Julongchain/myGroup.block  </i><br/>
   参数说明：  <br/>
       -t 要加入群组的目标节点地址 <br/>
       -b 创世区块保存的文件地址  <br/>
@@ -99,7 +99,7 @@ Maven依赖管理工具：Maven 3.5.2  <br/>
       -g 群组名称           <br/>
 
 安装智能合约  <br/>
-<i>  java -jar julongchain.jar contract install -t 127.0.0.1:7051 -n mycc -v 1.0 -p /root/julongchain/mycc_src  </i><br/>
+<i>  java -jar julongchain.jar contract install -t 127.0.0.1:7051 -n mycc -v 1.0 -p /home/bcia/julongchain-smartcontract-ab-java-0.8  </i><br/>
   参数说明：  <br/>
    -t 要安装智能合约的目标节点地址 <br/>
    -n 智能合约名称      <br/>
@@ -119,7 +119,7 @@ Maven依赖管理工具：Maven 3.5.2  <br/>
    -P 背书策略                 <br/>
    
 调用智能合约  <br/>
-<i>  java -jar julongchain.jar contract invoke -t 127.0.0.1:7051 -c 127.0.0.1:7050 -g myGroup -n mycc -i "{'args':['invoke','a','b',
+<i>  java -jar julongchain.jar contract invoke -t 127.0.0.1:7051 -c 127.0.0.1:7050 -g myGroup -n mycc -i "{'args':['move','a','b',
 '10']}"  </i><br/>
   参数说明：  <br/>
    -t 要执行智能合约的目标节点地址 <br/>

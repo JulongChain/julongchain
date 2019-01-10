@@ -54,6 +54,7 @@ public class Singleton implements IChain, IConsensusPlugin {
     private static Singleton instance;
     private static ChainSupport support;
     private volatile boolean needDelay;
+    private static Timer timer = new Timer();
 
     public static Singleton getInstance(ChainSupport consenterSupport) {
         synchronized (Singleton.class) {
@@ -139,7 +140,7 @@ public class Singleton implements IChain, IConsensusPlugin {
             Common.Envelope[][] batches = batchesMes.getMessageBatches();
             if (batches == null && !needDelay) {
                 needDelay = true;
-                Timer timer = new Timer();
+
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
@@ -160,11 +161,14 @@ public class Singleton implements IChain, IConsensusPlugin {
                 }, support.getLedgerResources().getMutableResources().getGroupConfig().getConsenterConfig().getBatchTimeout());
 
             }
-            if (batches == null) {
+            if (batches == null||batches.length==0) {
 
             } else {
                 for (Common.Envelope[] env : batches) {
                     log.info("Ready to cut the batches....");
+                    if(null==env||env.length==0){
+                        return;
+                    }
                     Common.Block block = support.createNextBlock(env);
                     support.writeBlock(block, null);
                     log.info("Write the Block finished");
